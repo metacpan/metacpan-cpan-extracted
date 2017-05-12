@@ -1,0 +1,38 @@
+---
+abstract: 'Lob API Bindings'
+author:
+  - 'Ali Anari <ali@anari.me>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Memoize: '0'
+  Storable: '0'
+  Test::Modern: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Lob
+requires:
+  Method::Signatures: '0'
+  Moo: '1.006000'
+  Throwable::Error: '0'
+  WebService::BaseClientRole: '0.0004'
+  WebService::Client: '0'
+  aliased: '0'
+resources:
+  bugtracker: https://github.com/aanari/WebService-Lob/issues
+  repository: git://github.com/aanari/WebService-Lob.git
+version: '0.0107'
+x_contributors:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'

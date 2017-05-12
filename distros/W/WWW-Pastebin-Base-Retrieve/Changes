@@ -1,0 +1,9 @@
+Revision history for WWW-Pastebin-Base-Retrieve
+
+0.002   2013-11-01
+        - Fixed the "qw() as parentheses is deprecated" warning
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.001   2008-03-21
+        - First version, released on an unsuspecting world.
+

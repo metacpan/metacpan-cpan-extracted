@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Bloglines-Blogroll.t
+lib/WebService/Bloglines/Blogroll.pm
+META.yml                                 Module meta-data (added by MakeMaker)

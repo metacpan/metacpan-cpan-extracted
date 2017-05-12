@@ -1,0 +1,50 @@
+<%flags>inherit => '/page.mhtml'</%flags>
+<%method content>
+<%args>
+%articles
+@calendar
+$today
+$year
+%month
+</%args>
+
+<table class="calendar">
+<tr>
+  <th>Sun</th>
+  <th>Mon</th>
+  <th>Tue</th>
+  <th>Wed</th>
+  <th>Thu</th>
+  <th>Fri</th>
+  <th>Sat</th>
+</tr>
+
+% for my $week (@calendar) {
+<tr>
+%   for my $day (map {; $_ ? $month{ $_ } : undef } @$week) {
+%     my %class;
+%     my $article = $day ? $articles{ $day->ymd } : undef;
+%     if ($day) {
+%       $class{today}  = $day->ymd eq $today->ymd;
+%       $class{future} = $day > $today;
+%       $class{advent} = $day >= $calendar->start_date
+%                     && $day <= $calendar->end_date;
+%     }
+%     $class{missing} = ! $class{future} && $class{advent} && ! $article;
+%     my $class = join q{ }, grep { $class{$_} } keys %class;
+%     if ($day) {
+    <td id="dec-<% sprintf('%02u', $day->day) %>" class="day <% $class %>">
+%       if ($article) {
+      <a class="article" title="<% $article->title |h %> (<% $article->topic |h %>)" href="<% $article->date->ymd %>.html"><% $article->date->day %></a>
+%       } else {
+      <% $day->day %>
+%       }
+%     } else {
+    <td>&nbsp;
+%     }
+    </td>
+%   }
+</tr>
+% }
+</table>
+</%method>

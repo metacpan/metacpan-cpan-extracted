@@ -1,0 +1,183 @@
+#!/usr/bin/perl
+
+# Created on: 2015-05-03 11:06:30
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use WebService::SonarQube;
+
+our $VERSION = 0.08;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'url|u=s',
+        'username|U=s',
+        'password|P=s',
+        'list|l',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    my $sonar = WebService::SonarQube->new(%option);
+
+    if ($option{list}) {
+        if ($option{verbose}) {
+            my $api = $sonar->webservices_list(include_internals=>'true');
+            for my $ws (@{ $api->{webServices} }) {
+                if (!$ws->{description}) {
+                    $ws->{description} = $ws->{path};
+                    $ws->{description} =~ s/^api.//;
+                }
+                print "\n$ws->{description}:\n";
+                for my $action (@{ $ws->{actions} }) {
+                    print "  $action->{description}\n" if $action->{description};
+                    print "    $ws->{path}/$action->{key}\n";
+                }
+            }
+        }
+        else {
+            my $max = 10;
+            for my $ws (keys %{ $sonar->commands }) {
+                $max = length $ws if length $ws > $max;
+            }
+            for my $ws (sort keys %{ $sonar->commands }) {
+                printf "%${max}s %s\n", $ws, $sonar->commands->{$ws}->{description} || '';
+            }
+        }
+        return;
+    }
+
+    my $call = shift @ARGV;
+    $call =~ s{^api/}{};
+    $call =~ s{/}{_}g;
+
+    my %params = map {
+            my ($key, $value) = split /=/, $_, 2;
+            ($key => $value);
+        }
+        @ARGV;
+
+    my $result = $sonar->$call(%params);
+
+    {
+        no warnings;
+        $Data::Dumper::Sortkeys = 1;
+        $Data::Dumper::Indent   = 1;
+    }
+
+    print Dumper $result;
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+ws-sonar - Execute a SonarQube API command
+
+=head1 VERSION
+
+This documentation refers to ws-sonar version 0.0.1
+
+=head1 SYNOPSIS
+
+   ws-sonar [option] api_command [key=value ...]
+
+ OPTIONS:
+  api_command   Is one of the web service api calls supported by the
+                SonarQube instance specified in --url.
+                eg: api/server/index or webservices/list
+  key=value     Any parameters that "api_command" needs can be specified
+                via key=value pairs.
+
+  -u --url[=]string
+                The base url to access SonarQube
+  -U --username[=]string
+                The username to login to SonarQube for actions that require
+                authentication
+  -P --password[=]string
+                The password for --username
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for ws-sonar
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2015 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

@@ -1,0 +1,5 @@
+- Upgrade from FreeImage 3.5.1 to FreeImage 3.9.1 (or the latest)
+- Build and include static gcc lib (LibFreeImage.a?) so that we can build
+  with MinGW/cygwin
+- more tests
+- test12.pl crashes during LockPage.  Find out why.

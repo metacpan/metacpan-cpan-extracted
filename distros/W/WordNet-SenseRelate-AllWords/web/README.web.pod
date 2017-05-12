@@ -1,0 +1,212 @@
+=head1 NAME
+
+README.web - [Web] README file for Web interface of 
+WordNet::SenseRelate::AllWords
+
+=head1 DESCRIPTION
+
+The web interface employs a client-server model.  The two CGI scripts,
+allwords.cgi and version.cgi, are the clients that request information
+to the allwords server, allwords_server.pl. 
+
+The allwords server is a network interface to the 
+WordNet::SenseRelate::AllWords. The allwords server file, allwords_server.pl
+interacts with AllWords.pm for the disambiguation results. It loads all the
+modules required by SenseRelate::AllWords and listens for network requests for 
+disambiguation information. A client can then connect to the allwords server
+and request disambiguation information. This information, if available, will 
+be returned by the allwords server to the client over the netwrok connection.
+
+In the web interface, allwords.cgi and version.cgi are the clients that
+connect to the allwords server and request either for disambiguation 
+information or version information. The information retrieved by these two 
+clients from the server is then presented via web pages to the end-user. 
+Thus, allwords.cgi and version.cgi create web pages for the end-user, using
+information obtained from the backend allwords server(allwords_server.pl). 
+Here is a block schematic:
+
+
+[AllWords Server] <-----> [Web Server] <-----> [End User]
+(allwords_server.pl)      (allwords.cgi)        (browser)
+                             (version.cgi)
+
+
+The allwords server can be run on the same machine on which your
+web server is running or it can be on a different machine.  Running
+allwords_server.pl on a different machine than the webserver can be
+useful if you have only limited control over the webserver machine (for
+example, you might not be able to install WordNet on the webserver
+machine).
+
+=head2 Software Dependencies
+
+The following Modules are required by WordNet::SenseRelate::AllWords Web 
+interface :
+
+=over 
+
+=item WordNet::QueryData
+
+=item WordNet::Tools
+
+=item WordNet::Similarity
+
+=item WordNet::SenseRelate::AllWords
+
+=item IO::Socket
+
+=back
+
+
+All of these modules are available at CPAN. Please refer to INSTALL.pod 
+of WordNet-SenseRelate-AllWords for information about installing 
+dependencies.
+
+=head2 Web Interface File Structure
+
+This web interface distribution contains two 
+directories: 
+
+=over
+
+=item 1) web/cgi-bin/allwords
+
+=item 2) web/htdocs/allwords 
+
+=back
+
+The web/cgi-bin/allwords directory contains the following three scripts:
+
+=over
+
+=item 1) allwords.cgi
+
+=item 2) allwords_server.pl
+
+=item 3) version.cgi
+
+=back
+
+The two CGI scripts, allwords.cgi and version.cgi, are the clients of the 
+server allwords_server.pl. It is allwords_server.pl that actually interacts 
+with AllWords.pm.
+
+The web/cgi-bin/allwords directory also contains the following directory, 
+which is used for temporary storage of user input: 
+
+=over
+
+=item web/cgi-bin/allwords/user_data/ 
+
+=back
+
+For every disambiguation request, a unique user directory is created here, 
+where we store all information about the input files and the result files. 
+The user_data directory also contains the default stoplist file, 
+default-stoplist-raw.txt. This stoplist file should be the exact replica 
+of samples/default-stoplist-raw.txt.
+
+The web/htdocs/allwords directory contains one html script and the user_data 
+directory: 
+
+=over
+
+=item 1) allwords.html
+
+=item 2) user_data/
+
+=back
+
+allwords.html displays a user interface to the user and posts data to 
+allwords.cgi or version.cgi. After all processing is done, the use directory 
+in cgi-bin/allwords/user_data directory is moved to htdocs/allwords/user_data
+directory so that the user can browse his input files and results.  
+
+The allwords server can run on a different machine, from where your web server
+is running. However, the user data will be stored on the machine where your 
+web server is running. Please refer the documentation of allwords_server.pl,
+allword.cgi and version.cgi for more details about how server-client 
+communicate with each other.  
+
+=head1 OPTIONS
+
+Please refer to the README.pod of WordNet-SenseRelate-AllWords for 
+information about the various options present on the user interface. 
+This  document only discusses differences in web interface options with 
+wsd.pl options.
+
+=head2 Input Text 
+
+You can either upload a file or enter your text in the text area on the 
+web interface. The text can be one of the three formats below.
+
+=over 
+
+=item 1.
+raw :  The movie star married the director. 
+
+=item 2.
+tagged : The/DT star/NN married/VBD the/DT director/NN
+
+=item 3.
+wntagged : The star#n married#v the director#n
+
+=back
+
+=head2 Stoplist
+
+If the user doesn't upload a stoplist, the default stoplist will 
+automatically be used, UNLESS the user unchecks the default stoplist 
+option (which is always on). If the user unchecks this option and does 
+not upload his own stoplist, then no stoplist will be employed. 
+
+However, if the user uploads his own stoplist and also checks the box 
+for using the default stoplist, the user's stoplist will override the 
+default and be used.
+
+You can find your default stoplist in this location
+web/cgi-bin/allwords/user_data/default-stoplist-raw.txt
+
+=head2 Trace
+
+The trace option allows the user to select multiple trace levels at the 
+same time. The sum of all trace values is sent to AllWords.pm while 
+creating AllWords object. The trace can be viewed by clicking on 'See 
+Trace output'. It is also available in result files as trace.txt for 
+future reference.          
+
+=head2 Configuration file option
+
+The web interface doesn't support config file option. Instead we use reasonable 
+default configuration parameters. 
+
+=head1 AUTHORS
+
+ Varada Kolhatkar, University of Minnesota, Duluth
+ kolha002 at d.umn.edu
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by : 
+$Id: README.web.pod,v 1.13 2009/02/13 15:56:15 kvarada Exp $ 
+
+=head1 SEE ALSO
+
+ L<allwords.cgi> L<version.cgi> L<INSTALL.web.pod> L<README.pod>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2008, Varada Kolhatkar, Ted Pedersen, Jason Michelizzi
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

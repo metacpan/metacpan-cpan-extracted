@@ -1,0 +1,104 @@
+0.28 Wednesday 18th January 2012
+ - Fix RT #74123
+ - Fix RT #69998
+
+0.27 Sunday 31st July 2011
+ - include patch to use source and explanation from SOAP output <chimo@chromic.org>
+ - small fixes to author tests
+
+0.26 Monday 7th September 2009
+ - Suppress and test warning in no XML::XPath installed RT #47960
+
+0.25 Thursday 23rd August 2009
+ - change proxy port in test to stop clash with default squid port
+ - update columns in detailed output tests run under TST_AUTHOR to match validator change RT #47960
+
+0.24 Monday 25th August 2008
+ - fix 06detailed.t which was failing when not run under TEST_AUTHOR :(
+
+0.23 Sunday 24th August 2008
+ - add in msgid and explanation methods to Error object partly courtesy of Matt Ryder <mattryder@iinet.net.au>
+ - update author tests in line with changes to validator output
+ - made soap12 the default output format.
+ - added few things to make interface more comaptible with CSS validator module
+
+0.22 Tuesday 28th August 2007
+ - Fixed some typos - thanks to William McKee for pointing them out
+
+0.21 Tuesday 7th August 2007
+ - updated tests to fix failures when XML::XPath not installed due to
+   trying to skip wrong number of tests. 
+   
+0.20 Sunday 5th August 2007
+ - updated tests to use hardcoded responses where possible
+   to stop failures caused by changed error messages
+ - full test suite only run if $ENV{'TEST_AUTHOR'} set
+ - some internals refactoring to support test changes
+
+0.19 Tuesday 17th April 2007
+ - updated t/14warnings.t in line with changed validator error
+ - also make test a little less likely to break in future
+ - added in examples directory for cpants game related reasons
+
+0.18 Thursday 5th April 2007
+ - skip the right number of tests for 03invalid.t
+ - make 04bad_validtor.t a bit more robust of can't contact fake validator
+ - update 11detailed_soap.t to reflect changes in validator error messages
+
+0.17 Saturday 13th January 2007
+ - skip the right number of test of no xpath for 13soap_wrong_format.t
+
+0.16 Saturday 13th January 2007
+  - Added in custom user agent support courtesy of Chris Dolan <cdolan@cpan.org>
+
+0.15 Monday 18th December 2006
+   - Updated tests so they don't fail if the validator is unreachable
+
+0.14 Saturday 4th November 2006
+    - Updated wrong format error tests as non beta validator now supports SOAP
+    - Removes non digits from header error count to work round validator bug
+
+0.13 Tuesday 25th April 2006
+    - Added in warnings method to use extra info from SOAP output
+    - Makes stab at catching incorrect output for detailed methods
+
+0.12 Sunday 5th March 2006
+    - added in Proxy support courtesy of Carl Vincent <c.a.vincent@ncl.ac.uk>
+
+0.11 Saturday 25th February 2006
+    - added output option and asociated SOAP output support
+
+0.10 Monday 12th September 2005
+    - scalar and file tests now skip if no connection
+    - fixed typo also from rt.cpan.org #14480
+
+0.09 Wednesday 7th September 2005
+    - Added in pod coverage test
+    - fixed doc bug -> rt.cpan.org #14480
+
+0.08 Saturday 27th August 2005
+    - Fixed broken scalar validation
+
+0.07 Wednesday 17th July 2005
+    - Fixed broken test
+
+0.06 Tuesday 16th November 2004
+    - Can now validate scalars and local files
+    - Updated Makefile to check for Test::Warn
+
+0.05 Tuesday 9th November 2004
+    - Actually document the detailed option :(
+    - Fix a few bugs in the SYNOPSIS code
+
+0.04 Tuesday 9th November 2004
+    - Update docs to say you should enable detailed if using errors method
+    - Update errors method to do the right thing if detailed not enabled
+
+0.03 Sunday 9th May 2004
+    - Fix to failing test after new validator release
+
+0.02 Tuesday 13th January 2004
+    - Some documentation patches and generally tidying up
+
+0.01 Tuesday 15th November 2003
+    - Initial release

@@ -1,0 +1,11 @@
+CHANGES
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+NINJA
+README
+lib/WWW/Mechanize/Timed.pm
+t/pod.t
+t/pod_coverage.t
+t/simple.t
+

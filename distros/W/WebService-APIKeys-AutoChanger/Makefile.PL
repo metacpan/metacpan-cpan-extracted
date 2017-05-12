@@ -1,0 +1,12 @@
+use inc::Module::Install;
+name 'WebService-APIKeys-AutoChanger';
+all_from 'lib/WebService/APIKeys/AutoChanger.pm';
+requires 'Data::Valve';
+requires 'Data::Throttler';
+requires 'UNIVERSAL::require';
+requires 'List::Util';
+requires 'Class::Accessor::Fast';
+build_requires 'Test::More';
+use_test_base;
+auto_include;
+WriteAll;

@@ -1,0 +1,44 @@
+WWW-TamperData
+
+Tamperdata is an extension to the popular firefox browser which allows you to view and modify the 
+headers and parameters of web requests. WWW::Tamperdata allows you to replay, view or manipulate 
+tamperdata transcripts exported to xml files.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::TamperData
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-TamperData
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-TamperData
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-TamperData
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-TamperData
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Eldar Marcussen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

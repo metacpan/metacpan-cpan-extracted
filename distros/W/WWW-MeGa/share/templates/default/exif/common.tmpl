@@ -1,0 +1,16 @@
+<%if EXIF %>
+<table class='exif'>
+<tr><td>Date</td><td><%= EXIF.DateTimeOriginal %></td></tr>
+<tr><td>ISO</td><td><%= EXIF.ISO %></td></tr>
+<tr><td>Focus</td><td><%= EXIF.FocalLength %></td></tr>
+<tr><td>Aperture</td><td><%= EXIF.FNumber %></td></tr>
+<tr><td>Exposure</td><td><%= EXIF.ExposureTime %></td></tr>
+<tr><td>ExposureCompensation</td><td><%= EXIF.ExposureCompensation %></td></tr>
+<tr><td>White Balance</td><td><%= EXIF.WhiteBalance %></td></tr>
+<tr><td>Model</td><td><%= EXIF.Model %></td></tr>
+<tr><td>Flash?</td><td><%switch EXIF.FlashOn %><%case On%>X<%case Off%><%/switch %></td></tr>
+<tr><td>Metering Mode</td><td><%= EXIF.MeteringMode %></td></tr>
+<tr><td>Measured EV</td><td><%= EXIF.MeasuredEV %></td></tr>
+<tr><td>Lense</td><td><%= EXIF.LensType %></td></tr>
+</table>
+<%/if %>

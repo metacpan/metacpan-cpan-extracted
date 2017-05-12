@@ -1,0 +1,8 @@
+The Eventful API allows you to build tools and applications that interact 
+with Eventful.  (See http://eventful.com.)  This module provides a Perl
+interface to that API, including the digest-based authentication infrastructure.  
+
+See http://api.eventful.com/ for details.
+
+Copyright 2013 Eventful, Inc.  All rights reserved.  This module may be
+redistributed under the same terms as Perl itself.

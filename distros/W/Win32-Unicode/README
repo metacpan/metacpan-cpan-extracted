@@ -1,0 +1,27 @@
+This is Perl module Win32::Unicode.
+
+INSTALLATION
+
+Win32::Unicode installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Win32::Unicode
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test (or nmake && nmake test)
+
+Then install it:
+
+    % make install (or nmake install)
+
+DOCUMENTATION
+
+Win32::Unicode documentation is available as in POD. So you can do:
+
+    % perldoc Win32::Unicode
+
+to read the documentation online with your favorite pager.
+
+xaicron

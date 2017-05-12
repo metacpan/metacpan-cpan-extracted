@@ -1,0 +1,1418 @@
+<html>
+<head>
+
+<meta http-equiv=Content-Type content="text/html; charset=windows-1251">
+
+<title>WebTool Help</title>
+
+</head>
+
+<body link=blue vlink=#000099 bgcolor="#FFFFFF" text="#000000" alink="#000099" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5">
+
+<table width="100%" BORDER="0" BACKGROUND="images/bgimage.jpg">
+  <tr> 
+    <td>
+      <div class=Section1> 
+        <p align="left"><b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          <font size="4">&nbsp;&nbsp;WebTools HELP File</font></font></b><br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> <u><font color="#000099" size="3">Contents:</font></u></font></b> 
+          <br>
+          <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#000066">1. 
+          <font color="#990066"><a href="HELP.html#1">Overview</a></font></font></b> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">2. 
+          <font color="#990066"><a href="HELP.html#2">Web Tools</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">3. 
+          <font color="#990066"><a href="HELP.html#3">GlobExport</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">4. 
+          <font color="#990066"><a href="HELP.html#4">STDoutHandle</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">5. 
+          <font color="#990066"> <a href="HELP.html#5">Xreader</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">6. 
+          <font color="#990066"><a href="HELP.html#6">Config</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">7. 
+          <font color="#990066"><a href="HELP.html#7">Security and restrictions</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">8. 
+          <font color="#990066"><a href="HELP.html#8">Various stuff</a></font></font></b></font> 
+          <BR>
+          <font color="#000066" size="3"><b><font face="Verdana, Arial, Helvetica, sans-serif">9. 
+          <font color="#990066"><a href="HELP.html#9">Author</a></font></font></b></font> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          <br>
+          &nbsp;</font></b> <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="1"></a>1. 
+          Overview</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;WebTools 
+          was projected to reduce maximum development work in web projects! It 
+          decide most of common tasks, so you can think about more important things 
+          at all. Note that, this package is not 10-15 kb</font></b> <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">and 
+          you will need a time to learn everything about it. But don't afraid 
+          to start. I am sure that it will be helpful for you :-)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> This 
+          document is not a comprehensive help. It is reference! For more information 
+          and help please see examples into docs directory!<br>
+          <br>
+          <br>
+          </font></b> <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="2"></a>2. 
+          Web Tools</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;This 
+          module capsulate most of functionally that Web developer need for its 
+          projects! </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Mainly 
+          is support: sessions, user accounts, html-perl code (php like), Database 
+          support, templates and more..</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><u><font color="#006633" size="3">Exported 
+          Variables</font><br>
+          <br>
+          </u></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC">*SESSIONSTDOUT 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Standard 
+          OUTput handler used by webtools to emulate</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;PRINT-like 
+          operators.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          %SESREG</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;This 
+          hash contain all registered variables with &quot;this&quot; session.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          %SIGNALS</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;This 
+          hash contained all catched signals from user's script.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          %sess_cookies </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Contain 
+          all cookies received from input stream.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          %uploaded_files</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Contain 
+          filenames of all uploaded files via multipart form!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          They are names of files on local machine (i.e. your web server)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          You can open and read these files from your server's tmp directory!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Note that you must to clean up by yourself (please delete these files 
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">after 
+          your job) </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cpg_priority</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Show priority of cookies and get/post 
+          global variables. This variable can<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contain 'cookie' (cookies has higher priority) 
+          or 'get/post' (get/post<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variables rewrite cookies values)<br>
+          <font color="#0000CC"> <br>
+          </font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC">$sentcontent</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Show 
+          whether Send_Content() where called! (i.e. data were flushed to browser)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $ip_restrict_mode</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          'on' or 'off' restriction of session by IP</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $apacheshtdocs</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;This 
+          is apache`s htdocs directory.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $reg_buffer</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Contain 
+          registered session data!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cookie_path_cgi </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is PATH added to cookies (e.g: /cgi-bin/) </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cookie_domain_cgi</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is DOMAIN added to cookies (e.g: .july.bg) </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cookie_exp_date_cgi</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is DATE added to cookies</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $secure_cookie_cgi</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is SECURE atribute added to cookies (e.g: 1 or 0) </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $session_started</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Show 
+          whether session_start were started!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $print_header_buffer</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Here 
+          is a place where script holds 'headers' (only!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $print_flush_buffer</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Here 
+          is a place where script holds 'body'!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $sql_host </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Variables 
+          that contain SQL host from confing.pl</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $sql_user</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Variables 
+          that contain user name from confing.pl,</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;used 
+          to access SQL server.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $sql_pass</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Variables 
+          that contain user pass from confing.pl, </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;used 
+          to access SQL server.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $sql_database_sessions</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is database name of session's table.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $sql_sessions_table</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is a name of session's table.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cgi_script_timeout</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          is a expiration time of script i.e. maximum running time of script. 
+          Default it's value is 120 seconds! If you &nbsp;need more time for your 
+          script, please don't change&nbsp;that var directly, please use function 
+          set_script_timeout()</font></b> <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;If 
+          you thing you need more time for all your scripts at</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;all, 
+          then change this var (it is found into config.pl)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC"><br>
+          $cgi_lib_forbid_mulipart</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;If 
+          you want to protect yourself from multipart spam</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;turn 
+          this to 'on' (Default it is set to 'off')<br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          &nbsp;If you disable this variable you will not longer receive</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;Multipart 
+          forms via POST!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><u><font color="#006633" size="3">Exported 
+          Functions<br>
+          <br>
+          </font></u></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">hideerror</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Function 
+          that will be executed when error occur in SQL server.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_query</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;SQL 
+          query function. $result = <font color="#0000CC">sql_query</font> ($query,$DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_fetchrow</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;SQL 
+          function that fetching rows from SQL server. </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> @arr 
+          = <font color="#0000CC">sql_fetchrow</font> ($result_handler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_affected_rows</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;SQL 
+          function that show a count of affected rows. </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$number 
+          = <font color="#0000CC">sql_affected_rows</font> ($result_handler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_inserted_id</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;SQL 
+          function that show current inserted ID number.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$number 
+          = <font color="#0000CC">sql_inserted_id</font> ($result_handler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_num_rows</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;SQL 
+          function that show a count of affected rows.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$number 
+          = <font color="#0000CC">sql_ num_rows</font> ($result_handler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_quote</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Quote 
+          one scalari.e. escape special chars and add at both begin and end parts 
+          needed quotes!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$quoted_string 
+          = <font color="#FF0000">sql_quote</font> ($unquoted,$DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_connect</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Connect 
+          SQL server. No params needed!<br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          &nbsp;Return $DBHandler as result.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_connect</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Connect 
+          SQL server. Same as previous but it's take up to 6 parameters.<br>
+          &nbsp; </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;$DBHandler 
+          = <font color="#0000CC">sql_connect</font> ($host,$database,$user,$pass,[$port],[$full_path]);<br>
+          &nbsp;&nbsp;</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;$host 
+          is needfull only for MySQL DB; $database is DNS for Access DB, normal</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;DB 
+          name for MySQL and file name (without path and without ext eg.: 'july');</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$port 
+          is proper only for MySQL DB; $full_path is a path to Flat DB file (eg.: 
+          ./db/)<br>
+          &nbsp;&nbsp;</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;NOTE: 
+          You should specify all parameters except these in &quot;[]&quot; (if 
+          they are not applyable)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_select_db</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;Select new database.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$new_DBHandler 
+          = <font color="#0000CC">sql_select_db</font> ($new_database,$DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;As 
+          result of this function new database are now activated (selected) but 
+          you &nbsp;must save (and use) the new one Database Handler instead of 
+          previous one!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_disconnect</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Disconnect 
+          SQL server. No params needed!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Return 
+          1 as result.<br>
+          <br>
+          <font color="#FF0000"><br>
+          sql_errmsg</font> <br>
+          &nbsp;&nbsp;Return error message.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$err_mes 
+          = <font color="#0000CC">sql_errmsg</font> ($DBHandler);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_errno</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;Return error number.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$err_numb 
+          = <font color="#0000CC">sql_errno</font> ($DBHandler);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          sql_data_seek</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;Move result handler to some row number.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$res 
+          = <font color="#0000CC">sql_data_seek</font> ($row_number,$result_handler);</font></b> 
+          <BR>
+          
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          load_database_driver</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;Load database driver (on runtime)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$res 
+          = <font color="#0000CC">load_database_driver</font> ($driver_name);<BR>
+          &nbsp;&nbsp;Where $driver_name can be 'mysql', 'flat', 'access' and 'sess_flat'!
+          </font></b> 
+          <BR>
+          
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          DB_OnDestroy</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Event 
+          on destroy DB handler!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          DB_OnExit</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Event 
+          on script exit!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">session_start</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Start 
+          SESSION. It can be inherited or created as is.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$SID 
+          = <font color="#0000CC">session_start</font> ($DBHandler,$NewSessionFLAG);<br>
+          &nbsp;&nbsp;Where $NewSessionFLAG can be 1 or 0 (1 - will create absolutely 
+          new session</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;(old 
+          session is ignored), 0 - will inherit old session if any)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_register</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Register 
+          one buffer (compressed vars) into Session table.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$result 
+          = <font color="#0000CC">session_register</font> ($Buffer,$DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_destroy </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Destroy 
+          current session</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$SID 
+          = <font color="#0000CC">session_destroy</font> ($DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_ip_restrict</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          mode of session restriction by IP. Valid modes are: 'on' and 'off'</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">session_ip_restrict</font> 
+          ($mode);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_id</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Return 
+          current $SID as result.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_clear_expired </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Clear 
+          all expired records from database.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$SID 
+          = <font color="#0000CC">session_clear_expired</font> ($DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_id_adder</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Add 
+          SID ident to all links and forms in source!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$result_source 
+          = <font color="#0000CC">session_id_adder</font> ($source);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_expire_update </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Update 
+          current session`s time up to now.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$result 
+          = <font color="#0000CC">session_expire_update</font> ($DBHandler);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          action_sid_adder</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Add 
+          SID indents to all forms in source!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$result_source 
+          = <font color="#0000CC">action_sid_adder</font> ($source);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          href_sid_adder</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Add 
+          SID ident to all links in source!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$result_source 
+          =<font color="#0000CC"> href_sid_adder</font> ($source);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          convert_ses_time</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Convert 
+          session time to &quot;codded&quot; integer.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$coded_string 
+          =<font color="#0000CC"> convert_ses_time</font> ($source_time,$count_of_new_str);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          new_session </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Show 
+          whether new session were started.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          GetCurrentSID</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Return 
+          current Session ID.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          register_var</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Register 
+          one variable (scalar , array or hash) into current session.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$coded_buffer 
+          = <font color="#0000CC">register_var </font>($type,$name,@val);<br>
+          &nbsp;&nbsp;where $type could be scalar, array or hash, $name can be 
+          any </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">permitted 
+          variable name under whom module will save data.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;@val 
+          is a array that contain data for registration. It could be also</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;just 
+          scalar or even hash</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          unregister_var</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;UnRegister 
+          one variable (scalar, array or hash)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$coded_buffer 
+          = <font color="#0000CC">unregister_var</font> ($name,$buffer);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_scalar</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Read 
+          one scalar from DB (Already Registrated!!!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$scalar 
+          = <font color="#0000CC">read_scalar</font> ($name);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_array</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Read 
+          one array from DB (Already Registrated!!!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;@array 
+          = <font color="#0000CC">read_array</font> ($name);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_hash</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Read 
+          one hash from DB (Already Registrated!!!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;%hash 
+          = <font color="#0000CC">read_hash</font> ($name);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          update_var </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Update 
+          one variable from $reg_buffer.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$coded_buffer 
+          = <font color="#0000CC">update_var</font> ($type,$name,$buffer,@new_val);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          exists_var </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Check 
+          whether one variable exists into $reg_var!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$bool_result 
+          = <font color="#0000CC">exists_var</font> ($type,$name,$buffer);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_set_id_name</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          name of session (labeled) (exmpl: 'sid')</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">session_set_id_name</font> 
+          ($new_sid_label);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_id_name </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Get 
+          current name of sesson (exmpl: 'pid','sid'…)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;<font color="#0000CC">&nbsp;session_id_name</font> 
+          ();</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_expiration</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Get 
+          current expiration date (exmpl: '+1h')</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">session_expiration</font> 
+          ();</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          session_cookie_path</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Get 
+          current session cookie`s pat (exmpl: '/cgi-bin/')</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">session_cookie_path</font> 
+          ();</font></b> <br>
+          <br>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b><br>
+          <font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><br>
+          <font color="#FF0000">attach_var</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;Attach one variable(scalar) with output HTML 
+          page.<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;Variable is 'moving' page to page via cookies 
+          (or via links <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;and 'action' if cookies are not accepted)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000CC">attach_var</font>($var_name,$var_value);<br>
+          <br>
+          </b></font>
+        <p align="left"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">detach_var</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;&nbsp;Detach variable, attached with attach_var()<br>
+          &nbsp;&nbsp;&nbsp;<font color="#0000CC">detach_var</font>($var_name);<BR>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________<br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">delete_cookie</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;High 
+          level delete cookie function. It can get only 1 param!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">delete_cookie</font> 
+          ($name);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          write_cookie</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;High 
+          level write cookie function. It can get up to 6 params!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">write_cookie</font> 
+          ($name,$value,$expr_date,$path,$domain);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Params 
+          from 3 to 6 are not required!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_cookie</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;High 
+          level read cookie function. It can get only 1 param!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">read_cookie 
+          </font>($name);</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          GetCookies</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Get 
+          all cookies(or only wished) and put them all into %Cookies.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Don`t 
+          call this function directrly! (Use: <font color="#0000CC">read_cookie</font>() 
+          instead!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetCookies</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          cookie(or cookies) and return raw cookie string!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Don`t 
+          call this function directrly! (Use: <font color="#0000CC">write_cookie</font>() 
+          instead!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetCookieExpDate</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          cookie`s expiration for a cookie!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetCookiePath</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          cookie`s path for a cookie!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetCookieDomain</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          cookie`s domain for a cookie!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetSecureCookie</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          cookie`s secure attribute for a cookie!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          GetCompressedCookies</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Get 
+          all compressed cookies (like common function)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          SetCompressedCookies</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Set 
+          compressed cookies (like common function)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">Header 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Write 
+          one Header filed. </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;<font color="#0000CC">Header</font> 
+          (type=&gt;'type' , val=&gt;'value');</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Type 
+          can be: 'content',' cookie', 'raw',' modified',' MIME',' window',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;'Pragma',' 
+          Expires',' Referer'.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;And 
+          respective example`s values for val are:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;'text/html','name=July;Path=/','full 
+          featured row field!', 'some DATE',</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;'1.0', 
+          'some window target', 'nocache', 'some DATE'.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Most 
+          wanted type is row!!! NOTE: You can`t access HTTP Header</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;anyway 
+          except this Header function!<br>
+          &nbsp; &nbsp;Example: <font color="#0000CC">Header </font>(<font color="#990000">type=&gt;'row' 
+          , val=&gt;&quot;Content-type: text/html\n&quot;</font>);<br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          Parse_Form</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          <font color="#0000CC"> Not implemented</font> (only for back ware compatibility)!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          b_print</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          <font color="#0000CC">Not implemented</font> (only for back ware compatibility)!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          ClearBuffer </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Clear current printed body data! (use that way only!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          ClearHeader</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Clear current printed header data! (use that way only!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          flush_print</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          At the end of script this function automatically flush all header's 
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">and 
+          body`s data!!! (automatically session, cookies and so on…)<br>
+          &nbsp;&nbsp;If you call function with parameter &quot;1&quot; you will 
+          use function in false mode! This mode is proper when your script use 
+          downloader.pl (module for cgi downloads)<br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_form </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Read one var form input form (not need!!! All vars from forms </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">and 
+          cookies are global variables!)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_form_array </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Same like previous but reading is from array not from hash!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          read_var</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Read one scalar from browser (via cookie or just via link/form... <br>
+          &nbsp;&nbsp;&nbsp;&nbsp; </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">- 
+          no mater :-))) (Well I sad…not need anymore :-)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">RunScript</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Well that is main function at all! :-))) It eval (first compile html</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Code into Perl code) all. That function is called from process.cgi</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          set_script_timeout</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          That function set script's timeout (in seconds), after which scripts</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          terminate automatically! This prevent from infinitive scripts!<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$res = <font color="#0000CC">set_script_timeout</font> 
+          ($time_out_in_sec);</font></b> 
+        <p align="left"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">set_variables_dump<br>
+          </font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          &nbsp;&nbsp; That function force dump of get/post, cookies, session 
+          variables </font></b><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          and uploaded files at the end of result html page. If you want to use<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this feature call this function wherever 
+          you want before end of script.<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Call function with parameter '1' if you 
+          want to use this feature or '0' <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to turn it off!<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Note: However, you also need to be in 
+          debug mode (see config.pl)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;before this feature to be useful!</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Second parameter is debug style view, it can take<BR>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;follow values: 'html', 'popup' and 'layer'. Try it!<BR>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#0000CC">set_variables_dump</font> 
+          (1,'popup');</font></b> <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><br>
+          <br>
+          r_str </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">rand_srand</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp; 
+          Random string generator (and initial sub). Used from WebTools engine.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">SignUpUser</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$res 
+          = <font color="#0000CC">SignUpUser</font> ($user,$pass,$data,$dbh);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$res 
+          can be 1 - success and 0 - :-(<br>
+          &nbsp; &nbsp;$data is user's data that you may whant to save into database. 
+          You can save there up to 1MB!<br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">SignInUser 
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;($ID,$DATA) 
+          = <font color="#0000CC">SignInUser</font> ($user,$pass,$dbh);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$ID 
+          is Id on user</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$DATA 
+          is custom data on same user fetched from DB!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">________________________________________________</font></b> 
+          <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><u><font color="#FF0000" size="3">* 
+          &nbsp;SIGNALS IN WEBTOOLS</font><br>
+          <br>
+          </u></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;That 
+          module support base signals from Unix/Linux and couple customs.<br>
+          &nbsp;&nbsp;So you can handle follow SIGs:</font></b> <BR>
+          &nbsp; <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">'<font color="#006633">OnFlush</font>' 
+          - That event will happened when script prepare to print all data (Header 
+          and Body).</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">'<font color="#006633">OnError</font>' 
+          - That event will happened when some internal script error appear.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">'<font color="#006633">OnExit</font>' 
+          - That event will happened when script exit.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">'<font color="#006633">OnTerm</font>' 
+          - You can use this event when connection between server and browser 
+          has been broken (used signals: TERM,STOP,PIPE)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">'<font color="#006633">OnTimeOut</font>' 
+          - This event will happened when your scripts lifetime is down (Default 
+          it is 120 seconds) (used signal is: ALRM)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">To use 
+          these events you must initialize global hash %SIGNALS whit proper reference 
+          to sub.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          Example:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> <font color="#990000">$SIGNALS{'OnTimeOut'} 
+          = \&amp;MyDefaultTimeOutSubroutine;</font></font></b> <BR>
+          <font color="#990000"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          sub MyDefaultTimeOutSubroutine { print &quot;Timeout!!!&quot;; }</font></b></font> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Note: 
+          All events are case-sensitive!<br>
+          <br>
+          <font color="#FF0000"><br>
+          <u><font size="3">* &nbsp;What libraries are currently loaded?</font></u></font><br>
+          <br>
+          That can be difficult question and some time you may need to reUSE or 
+          to reREQUIRE some library. However I decide to introduce simple mechanism 
+          solving that problem. Every library (or almost anyone) have unique number 
+          that exist if given module were loaded.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Number 
+          - Library:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">1</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          - Database driver for MySQL (db_mysql.pl)<br>
+          <font color="#FF0000">2</font> - Database driver for MS Access (db_access.pl)<br>
+          <font color="#FF0000">4</font> - Database driver for Flat files (db_flat.pl)<br>
+          <font color="#FF0000">8</font> - Xreader (xreader.pl)<br>
+          <font color="#FF0000">16</font> - Flat support for Sessions (sess_flat.pl)<br>
+          <font color="#FF0000">32</font> - Miscellaneous tools (tools.pl)<br>
+          <font color="#FF0000">64</font> - Mail library (mail.pl)<br>
+          <font color="#FF0000">128</font> - Simple functions for coding/encoding 
+          (utl.pl)<br>
+          <font color="#FF0000">256</font> - Download library (downloader.pl)<br>
+          <font color="#FF0000">512</font> - Php simulation library (php.pl)<br>
+          <font color="#FF0000">1024</font> - Simple fork library (fork.pl)<br>
+          <font color="#FF0000">2048 </font>- Sub set of JavaScript functions 
+          (JavaScript.pl)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">If you 
+          want to find out whether some library is already loaded in WebTools 
+          (this can speed up all execution process) you can check respective library 
+          on that way:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;<font color="#990000">if 
+          (!($webtools::loaded_functions &amp; 8)) {eval &quot;require 'xreader.pl'&quot;;}</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Follow 
+          code will load &quot;xreader.pl&quot; library when it has not been loaded 
+          yet.<br>
+          Please use this format with require syntax to prevent double loading 
+          of respective library!</font></b> <BR>
+          &nbsp; <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="3"></a>3. 
+          GlobExport</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> This 
+          module is used indirect from scripts (included by webtools.pm). It parses 
+          input data from form (POST), from GET and from Cookies. All input data 
+          are exports to global variables!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> There 
+          aren't support functions for this module (constructor and destructor 
+          are automatically called).</font></b> <BR>
+          &nbsp; <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="4"></a>4. 
+          STDoutHandle</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> This 
+          module catch standard output (STDOUT) and printed data are buffered 
+          on default.</font></b> <BR>
+          &nbsp; <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="5"></a>5. 
+          XReader</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">This 
+          module is very cool its supply possibility of script to use extern templates 
+          (html code and SQL inline)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+          &nbsp;&nbsp;That function read from file HTML data (with some</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;futures) 
+          and substitute SQL queries and vars with</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;respective 
+          values!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;$scalar 
+          = <font color="#0000CC">xreader</font>($N_of_part,$filename);</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">For more 
+          information see docs/examples/Lesson-8-xreader, but first read Templates 
+          lesson in docs/templates !</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="6"></a>6. 
+          Config.pl</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Typical 
+          configuration for &quot;Web Tools&quot;<br>
+          If you want to edit this file via Web just </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000">use 
+          install.cgi !</font></b><br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          <font color="#006633">#[Name_Of_Project]</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::projectname = 'webtools'; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># This 
+          is a name of project. Also this name is a base for other parameters 
+          in this configuration file</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          <font color="#006633">#[SQL]</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::db_support = 'db_flat'; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Name 
+          of database driver. Can be: db_mysql, db_access, db_flat</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_host = 'localhost'; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># host/ip 
+          to DB server (MySQL)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_port = '3306';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Port 
+          of SQL server</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_user = 'me';<font color="#FF0000"> # !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># User 
+          name used to connect SQL server</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_pass = 'secret_password'; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># ... 
+          and DB password</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          <font color="#006633">#[DataBase]</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_database_sessions = $webtools::projectname.'db';<font color="#FF0000"> 
+          # !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Database 
+          name (name some like project!?!?!). If need change it!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_sessions_table = $webtools::projectname.'_sessions'; 
+          <font color="#FF0000"># !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Name 
+          of session table.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sql_user_table = $webtools::projectname.'_users'; <font color="#FF0000"># 
+          !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Table 
+          that contain all users (and admin too)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          <font color="#006633">#[CHECK]</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::check_module_functions = 'on';<font color="#FF0000"> # !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># SCRIPTS 
+          RUN IN CHECK MODE! After first check(test),</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># please 
+          turn this 'off'!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># YOU 
+          CAN ALWAYS TURN THIS ON WHEN YOU WANT TO CHECK</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># YOUR 
+          CURRENT CONFIGURATION WITHOUT ANY OPPRESSION!!!</font></b> <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">#</font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">[Secure]</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::wait_attempt = '4';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Count 
+          of attempts when database is flocked</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::wait_for_open = '2.0';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Time 
+          between two attempts (in sec)</font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sess_time = '2'; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Expire 
+          time on session: 60 minutes</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::sys_conf_d 
+          = 'hour'; <font color="#FF0000"># !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Type 
+          of sess time dimension</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::rand_sid_length 
+          = '16';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Length 
+          of SID string!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::sess_cookie = 'sesstime';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># 'sesstime' 
+          - cookie expire when session expired. Enter any other value to expire 
+          cookie when user close browser.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::l_sid = 'sid';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Session 
+          label ID used by module</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::cgi_lib_forbid_mulipart = 'off';<font color="#FF0000"> # 
+          !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># If 
+          you want to protect yourself from multipart spam turn this 'on' (you 
+          will be no longer able to use multipart forms)!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::cgi_lib_maxdata = 4194304; <font color="#FF0000"># !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Set 
+          maximum bytes to accept via POST (some king of multipart </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># protection)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Please 
+          note that you can't set this to 0!!!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::cgi_script_timeout = 120;<font color="#FF0000"> # !!!</font></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Expiration 
+          time of script! (120 seconds default). After expiration script </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># will 
+          be terminated!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Please 
+          note that you can't set this to 0!!! You always must know how much time 
+          you need!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::ip_restrict_mode = 'on';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Set 
+          'on' to restrict session by IP! If you have proxy problems with </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># restricted 
+          IPs, please set 'off' or use proper</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># function 
+          to set mode of this variable! (see: session_ip_restrict function)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Allowed 
+          values are: &quot;on&quot; and &quot;off&quot;.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::run_restrict_mode = 'off';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Set 
+          'on' to restrict external web user to your scripts.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># If 
+          IP's of user not exists in DB/ips.pl WebTools will</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># close 
+          script immediately!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Allowed 
+          values are: &quot;on&quot; and &quot;off&quot;.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">#</font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">[Debug]</font></b> 
+          <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::debugging 
+          = 'on';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Set 
+          debugging mode</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::debug_mail 
+          = 'on'; <font color="#FF0000"># !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Show 
+          whether real mail must by sent or must by saved into mail </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># directory!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">#</font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">[Mail]</font></b> 
+          <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::sendmail 
+          = '/usr/sbin/sendmail';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Real 
+          full path to sendmail</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">#</font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">[Other]</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::charset 
+          = 'n5b0xzlQWdgfNXytCMAwq1TYu7SVBmUIvcOPZ2aprER9kjh3sHJKL8e4oiDFG6';</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Please 
+          mix well this chars to get higher security of your session ID :-)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::cpg_priority = 'cookie';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Show 
+          order of value fetching! There is 2 values: 'cookie' and 'get/post'.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># 'cookie' 
+          means that cookie's variable has higher priority!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          </font></b><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::sess_force_flat 
+          = 'on'; <font color="#FF0000"># !!!</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Session 
+          support via DB or via file! (possible values are: 'on' and 'off')</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># When 
+          you haven't DB support in your hand, you still can use sessions without 
+          DataBase!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># To 
+          begin using DB instead of flat files just set &quot;this&quot; variable 
+          &quot;off&quot; (that is more secure and more compatible!)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Most 
+          session functions required &quot;dbh&quot; but you can leave it empty 
+          or to supply real db handler: no matter!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># NOTE: 
+          Use flat files when you haven't 500 opened sessions in &quot;tmp&quot; 
+          directory or more!</font></b> <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::support_email 
+          = 'support@your_host.com';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> # Support 
+          e-mail for unexpected errors! :)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          $webtools::var_printing_mode = 'buffered';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Default 
+          output is buffered,</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># leave 
+          this variable empty if you need output</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># of 
+          your script to flush immediately!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Other 
+          else for non buffered mode.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Actually 
+          buffering depend of OS, Perl, Apache and socket!</font></b> <br>
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">@webtools::treat_htmls_ext 
+          = (</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Order 
+          of html files location: Default, module first look for:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># &quot;html&quot;,&quot;htm&quot;,&quot;whtml&quot; 
+          and &quot;cgihtml&quot;. If you specify in URL</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># ...?file=env.html 
+          script will ignore extension and will look for</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># file 
+          with extension ordered in @treat_htmls_ext array</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># If 
+          you leave this array empty then no lookups will be made!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Order 
+          of below array is really important!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Example:</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># If 
+          your real file is: env.cgi and you want script to</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># look 
+          for env.html then with array below you will never success!</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># That 
+          is true because find operation will be broken when script found</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># extension 
+          you look for i.e. in our case (env.)html and after that it</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># won't 
+          continue! So if you want to run files that match our example</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># file 
+          then follow array should look like this: </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># ('htm','whtml','cgihtml','cgi','html')</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 'html',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 'htm',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 'whtml',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 'cgihtml',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 'cgi',</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> );</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">#</font></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">[PATHS]</font></b> 
+          <br>
+          <br>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::tmp 
+          = '/tmp/';<font color="#FF0000"> # !!!</font></font></b> <br>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Please 
+          set full path to your temp directory</font></b> <br>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::driver_path 
+          = './drivers/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your DB Drivers (please keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::library_path 
+          = './libs/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your Libraries (please keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::db_path 
+          = './db/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your DBs and tables (please keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::mailsender_path 
+          = './mail/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your DBs and tables (please keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::xreader_path 
+          = './jhtml/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your xreader files(jhtml-s) (please keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::perl_html_dir 
+          = './htmls/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your perl's(webtools scripts) html files</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::apacheshtdocs 
+          = '/var/www/htdocs/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Path 
+          to your apache htdocs directory('/usr/local/apache/htdocs/') (please 
+          keep structure)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::cgi_home_path 
+          = Get_CGI_Directory();</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Get 
+          webtools cgi-bin directory (exmp: '/cgi-bin/webtools/') </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># NOTE: 
+          This path is not absolute and is not an HTTP!!! (actualy part of HTTP)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$webtools::http_home_path 
+          = '/webtools/';</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># Please 
+          change this to your http path!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"># NOTE: 
+          This path is not absolute and is not an HTTP!!! (actually part of HTTP)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="7"></a>7. 
+          <u>Security and restrictions</u></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><u><br>
+          </u> If you have been completed read install.html document you probably 
+          already mentioned most security problems in CGI world, so one of all 
+          main targets are security and restrictions.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> First 
+          of all I want to insure you, that WebTools capture most of CGI security 
+          holes.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">* 
+          Safely running of perl/html scripts:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Main 
+          script &quot;process.cgi&quot; should run other scripts like &quot;env.html&quot; 
+          , so only way to do it, is using of &quot;file&quot; variable in follow 
+          format:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> <a
+
+href="http://your_server/cgi-bin/your_webtools/process.cgi?file=some_script">http://your_server/cgi-bin/your_webtools/process.cgi?file=some_script</a>,</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">where 
+          some_script can be located in your &quot;htmls&quot; directory! So it 
+          is extremely important to set your default &quot;htmls&quot; directory 
+          (in config.pl) with care (e.g.: /home/my_domain/my_web/cgi-bin/my_webtools/htmls/) 
+          or (./htmls/ where your current directory is &quot;webtools&quot; directory).<br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">WebTools 
+          will care about security problems with script called like this:</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a
+
+href="http://your_server/cgi-bin/your_webtools/process.cgi?file=/etc/passwd">http://your_server/cgi-bin/your_webtools/process.cgi?file=/etc/passwd</a><br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">To prevent 
+          security problems, you should follow next rules:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          Never leave anyone directory variable empty! (like 'htmls', 'db', 'tmp'…)</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          Never set in these variable ROOT directory. <br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">No body 
+          can write in URL locater (in browser) query like that:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a
+
+href="http://your_server/cgi-bin/your_webtools/process.cgi?file=../some_script">http://your_server/cgi-bin/your_webtools/process.cgi?file=../some_script</a></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">You are 
+          protected for any kind of FILE crack actions like: </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          &quot;..&quot; one directory down</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          &quot;.&quot; Current directory</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          &quot;/&quot; or &quot;\&quot; Root directory</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          &quot;~&quot; Home directory</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          Also you have protected from any &quot;illegal&quot; characters in your 
+          query!<br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">However 
+          you can use queries like:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">…/process.cgi?file=/some_local_dir/some_script</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">where 
+          /some_local_dir/ is directory in your &quot;default htmls&quot; directory. 
+          For example that could be: /home/my_htmls/some_local_dir/ </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          So I hope that you are understood how important is not keeping of &quot;htmls&quot; 
+          directory empty or ROOT!!!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Also 
+          via &quot;file=&quot; variable in query line you CAN'T call scripts 
+          with whatever you want extension! Only acceptable are: whtml html htm 
+          cgihtml and cgi</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          Please notice that all these files are WEBTOOLS files (HTML plus Perl 
+          :-) )!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">* 
+          FLOOD protection:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Principle 
+          WebTools haven't FLOOD protections but you should know that all multipart 
+          data (I mean uploads) are saved in your TMP directory and if you don't 
+          know about them, after end of your script WebTools will automatically 
+          delete all of them!<br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;Also 
+          you have POST limit size. i.e. you can't accept more data that specified 
+          in confg.pl file ($cgi_lib_maxdata default is 4 MB)</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">* 
+          TIME protection:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;If 
+          your script stop to respond (for example stay in infinitive loop) or 
+          wait forever for some event WebTools will &quot;kill&quot; your script 
+          immediately after lifetime specified in config.pl ($cgi_script_timeout 
+          default 120 seconds)<br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">To change 
+          that time please use set_script_timeout($timeout) function.</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+          To capture event &quot;OnTimeOut&quot; please set follow handler:</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">$SIGNALS{'OnTimeOut'} 
+          = \&amp;your_sub;</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">* 
+          IP restrictions:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;If 
+          you write web based application for small community you may want to 
+          keep out external web visitors from your site?!? Now you can protect 
+          all your WebTools based applications from external visitors based on 
+          IP restriction. To switch this feature on, you need to fill out db/ips.pl 
+          file with IPs that match your needs. Currently all IPs are allowed to 
+          run your scripts! Please edit or delete lines that not match your protection 
+          policy!</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000">* 
+          Session restriction based on IP</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;If 
+          you use sessions you may want to protect your sessions by IP i.e. one 
+          opened session can be used only by PC, created that session! <br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Note: 
+          If your visitors use proxy to access your scripts you may need to switch 
+          this feature off (Use follow syntax: session_ip_restrict('off'); )<br>
+          <br>
+          </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Also 
+          you should know that scripts are never restricted by IP if you use forced 
+          flat file session support! (See config.pl and $sess_force_flat)</font></b> 
+          <BR>
+          &nbsp; <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;All 
+          functions and WebTools itself are released to help and to protect all 
+          of us, BUT you should realize that we are not GODs and you will take 
+          all responsibility of WebTools actions on your server and on all world 
+          wide! Please keep that in your mind.</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">PLEASE 
+          SEND ALL SECURITY PROBLEMS THAT YOU MET IN YOUR PRACTICE WITH WebTools 
+          at <a href="mailto:julian@proscrptum.com">julian@proscrptum.com</a></font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Thank's</font></b> 
+          <BR>
+          &nbsp; <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="8"></a>8. 
+          <u>Various stuff</u></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><u><br>
+          <br>
+          </u> &nbsp;&nbsp;That section regards various questions.<br>
+          <br>
+          &nbsp;&nbsp;<font color="#006633"><u>1. Highlighting for UltraEdit text 
+          editor.</u></font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> &nbsp;&nbsp;If 
+          you want to have feature of highlighting with UltraEdit please open 
+          your docs/WORDFILE.TXT </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Now go 
+          to your UltraEdit directory and open WORDFILE.TXT and add to this file 
+          a contain of docs/WORDFILE.TXT file!<br>
+          Edit follow line: </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">/L7&quot;WebTools&quot; 
+          .... </font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">you may 
+          need to change number of language supprt (default is 7: /L7....). </font></b> 
+          <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Save 
+          changes of UltraEdit wordfile. Now UltraEdit will highlight files with 
+          extensions: whtml and cgihtml :-)</font></b> <BR>
+          &nbsp; <BR>
+          <b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#FF0000"><a name="9"></a>9. 
+          <u>AUTHOR</u>:</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#006633">Julian 
+          Lishev</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">email: 
+          <font color="#0000CC">julian@proscriptum.com</font></font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Sofia, 
+          Bulgaria</font></b> <BR>
+          <b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;</font></b> 
+        </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+
+
+
+</html>
+

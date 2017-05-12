@@ -1,0 +1,6 @@
+Revision history for Perl extension Wikiversity::Hello.
+
+0.01  Mon Dec  3 03:42:14 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Wikiversity::Hello
+

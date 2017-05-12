@@ -1,0 +1,32 @@
+Revision history for Web::Authenticate
+
+0.011     2017-01-15 12:37:58-08:00 America/Los_Angeles
+    Set override up to work properly in is_authenticated for allow_after_login_redirect_override.
+
+0.010     2017-01-14 18:05:30-08:00 America/Los_Angeles
+    Fixed documentation for Web::Authenticate::Result::CheckForSession and fixed bug where check_for_session would cause you to redirect to login page.
+
+0.009     2017-01-14 17:32:36-08:00 America/Los_Angeles
+    Added check_for_session. Also moved deleting invalid sessions to session handler.
+
+0.008     2017-01-12 23:06:00-08:00 America/Los_Angeles
+    Updated typo in Web::Authenticate::Authenticator::Redirect::Role
+
+0.007     2017-01-12 22:54:18-08:00 America/Los_Angeles
+	Authenticators now require a name and error message. Current session is always deleted. Allow multiple sessions per user moved to Authenticate.pm. 
+	Login result now tells you if username or password was invalid.
+ 
+0.006     2017-01-09 23:06:49-08:00 America/Los_Angeles
+    Changed //= to ||=
+ 
+0.004     2017-01-09 22:37:24-08:00 America/Los_Angeles
+    Added ability to void sessions if user agent or ip address change.
+ 
+0.003     2017-01-09 01:42:00-08:00 America/Los_Angeles
+    Fixed documentation.
+ 
+0.002     2017-01-08 20:32:42-08:00 America/Los_Angeles
+    Fixing tabs and pod errors.
+ 
+0.001     2017-01-08 20:23:07-08:00 America/Los_Angeles
+        Released to the world!

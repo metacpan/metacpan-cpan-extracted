@@ -1,0 +1,221 @@
+NAME
+    Web::Util::DBIC::Paging - Easily page, search, and sort
+    DBIx::Class::ResultSets in a web context
+
+VERSION
+    version 0.001003
+
+SYNOPSIS
+     package MyApp::People;
+
+     use Web::Simple;
+     use JSON::MaybeXS;
+     use Web::Util::ExtPaging;
+     use Web::Util::DBIC::Paging;
+
+     sub dispatch_request {
+      my $people_rs = get_rs();
+
+      sub (/people) {
+        [
+           200,
+           [ 'Content-type', 'application/json' ],
+           [
+             encode_json(
+                ext_paginate(
+                   search(
+                      page_and_sort($rs)
+                   )
+                )
+             ) ],
+        ]
+      },
+      sub () { [ 404, [ 'Content-type', 'text/plain' ], [ 'not found' ] ] }
+     }
+
+DESCRIPTION
+    This module helps you to map various DBIx::Class features to CGI
+    parameters. For the most part that means it will help you search, sort,
+    and paginate with a minimum of effort and thought.
+
+EXPORTED SUBS
+    All subs take a type, paramish thing, resultset, and optionally a
+    config. All methods return a ResultSet. Subs are exported with
+    Sub::Exporter::Progressive, so should be fast and light for the defaults
+    but upgrade to actually using Sub::Exporter if you need to alias or
+    prefix the subs.
+
+    The "paramish thing" is what the type is for and can be any of:
+
+    "c | ctx | context | catalyst"
+      for the $c argument in a catalyst app
+
+    "r | req | request"
+      for a Plack::Request object
+
+    "e | env | psgi_env"
+      for a PSGI Environment hashref.
+
+    "raw"
+      for a plain hashref.
+
+  "page_and_sort"
+     my $result = page_and_sort(c => $c, $c->model('DB::Foo'));
+
+    This is a helper method that will first sort your data and then
+    "paginate" it. Valid configuration parameters are documented for each of
+    those methods.
+
+  paginate
+     my $result = paginate(c => $c, $c->model('DB::Foo'));
+
+    Paginates the passed in resultset based on the following parameters:
+
+    "start" first row to display
+    "limit" amount of rows per page
+
+    The sole config param is "page_size" which will be the page size if
+    there is no "limit" parameter in the request. The default "page_size" is
+    25.
+
+  search
+     my $searched_rs = search(c => $c, $c->model('DB::Foo'));
+
+    If the $resultset has a "controller_search" method it will call that
+    method on the passed in resultset with all of the CGI parameters. I like
+    to have this method look something like the following:
+
+     # Base search dispatcher, defined in MyApp::Schema::ResultSet
+     sub _build_search {
+        my $self           = shift;
+        my $dispatch_table = shift;
+        my $q              = shift;
+
+        my %search = ();
+        my %meta   = ();
+
+        foreach ( keys %{$q} ) {
+           if ( my $fn = $dispatch_table->{$_} and $q->{$_} ) {
+              my ( $tmp_search, $tmp_meta ) = $fn->( $q->{$_} );
+              %search = ( %search, %{$tmp_search||{}} );
+              %meta   = ( %meta,   %{$tmp_meta||{}} );
+           }
+        }
+
+        return $self->search(\%search, \%meta);
+     }
+
+     # search method in specific resultset
+     sub controller_search {
+        my $self   = shift;
+        my $params = shift;
+        return $self->_build_search({
+           status => sub {
+              return { 'repair_order_status' => shift }, {};
+           },
+           part_id => sub {
+              return {
+                 'lineitems.part_id' => { -like => q{%}.shift( @_ ).q{%} }
+              }, { join => 'lineitems' };
+           },
+        },$params);
+     }
+
+    If the "controller_search" method does not exist, this method will call
+    "simple_search" instead.
+
+  sort_rs
+     my $result = sort_rs(c => $c, $c->model('DB::Foo'));
+
+    Exactly the same as "search", except calls "controller_sort" or
+    "simple_sort". Here is how I use it:
+
+     # Base sort dispatcher, defined in MyApp::Schema::ResultSet
+     sub _build_sort {
+        my $self = shift;
+        my $dispatch_table = shift;
+        my $default = shift;
+        my $q = shift;
+
+        my %search = ();
+        my %meta   = ();
+
+        my $direction = $q->{dir};
+        my $sort      = $q->{sort};
+
+        if ( my $fn = $dispatch_table->{$sort} ) {
+           my ( $tmp_search, $tmp_meta ) = $fn->( $direction );
+           %search = ( %search, %{$tmp_search||{}} );
+           %meta   = ( %meta,   %{$tmp_meta||{}} );
+        } elsif ( $sort && $direction ) {
+           my ( $tmp_search, $tmp_meta ) = $default->( $sort, $direction );
+           %search = ( %search, %{$tmp_search||{}} );
+           %meta   = ( %meta,   %{$tmp_meta||{}} );
+        }
+
+        return $self->search(\%search, \%meta);
+     }
+
+     # sort method in specific resultset
+     sub controller_sort {
+        my $self = shift;
+        my $params = shift;
+        return $self->_build_sort({
+           first_name => sub {
+              my $direction = shift;
+              return {}, {
+                 order_by => { "-$direction" => [qw{last_name first_name}] },
+              };
+           },
+        }, sub {
+           my $param = shift;
+           my $direction = shift;
+           return {}, {
+              order_by => { "-$direction" => $param },
+           };
+        },$params);
+     }
+
+  simple_deletion
+     simple_deletion(c => $c, $c->model('DB::Foo'));
+
+    Deletes from the passed in resultset based on the sole CGI parameter,
+    "to_delete", which must be a list of primary keys.
+
+    This is the only method that does not return a ResultSet. Instead it
+    returns an arrayref of the id's that it deleted. If the ResultSet has
+    has a multipk this will expect each tuple of PK's to be separated by
+    commas.
+
+    Note that this method uses the "$rs->delete" method, as opposed to
+    "$rs->delete_all"
+
+  simple_search
+     my $searched_rs = simple_search(c => $c, $c->model('DB::Foo'));
+
+    Searches the resultset based on all fields in the request. Searches with
+    "$fieldname => { -like => "%$value%" }" for char fields, everything else
+    gets basic equality searchs. If there are multiple values for a CGI
+    parameter it will use all values via an "or".
+
+    The sole configuration value is "skip" and it is used to skip
+    unsearchable parameters. The default is "limit start sort dir _dc rm
+    xaction".
+
+  simple_sort
+     my $sorted_rs = simple_sort(c => $c, $c->model('DB::Foo'));
+
+    Sorts the passed in resultset based on the following CGI parameters:
+
+    "sort" field to sort by, defaults to primarky key =item "dir" direction
+    to sort
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

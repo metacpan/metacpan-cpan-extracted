@@ -1,0 +1,8 @@
+# As root,
+
+perl Makefile.PL
+make install
+
+
+# There are perl dependencies to resolve- this is done automatically via cpan.
+# If you have problems installing, feel free to contact the author.

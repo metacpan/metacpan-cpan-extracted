@@ -1,0 +1,25 @@
+Update:  this module is [http://search.cpan.org/dist/Class-CGI/ Now on the CPAN] and [http://groups.yahoo.com/group/class_cgi/ has a mailing list].  Feel free to join and contribute.
+
+--
+
+The following is a description of a module I (Ovid) keep meaning to write, but don't.  Anyone want to tackle it?
+
+= NAME
+
+[=Class::CGI] -- Use CGI parameters as objects
+
+= SYNOPSIS
+
+ use Class::CGI (
+     customer_id => Class::CGI::Customer
+ );
+
+ my $cgi      = Class::CGI->new;
+ my $customer = $cgi->param('customer_id');
+ my $name     = $customer->name;
+
+= DESCRIPTION
+
+For small CGI scripts, it's still common to get a parameter, untaint it, pass it to an object constructor and get the object back.  This module would allow one to to build [=Class::CGI] handler classes (subclassing would not be appropriate) which could take the parameter value, automatically perform those steps and just return the object.  Much grunt work would just go away.
+
+[http://use.perl.org/~Ovid/journal/20569 Initial idea and discussion].

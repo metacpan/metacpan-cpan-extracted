@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Mechanize-Frames.t
+lib/WWW/Mechanize/Frames.pm
+META.yml                                 Module meta-data (added by MakeMaker)

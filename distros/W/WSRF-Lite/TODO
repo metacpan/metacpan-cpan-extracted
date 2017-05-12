@@ -1,0 +1,59 @@
+TODO
+====
+- Implement queryResourceProperties
+
+- Implement WS-Security - signing SOAP using x509 digitial
+  certificates is done. More testing needs to be done
+  for interoperability. The current API is crap - 
+  what is required is a WSS::SigningPolicy object that allows
+  the user to specify what he wants to be signed/ or
+  verified.
+
+  Server Side
+  ===========  
+  sub serviceOperation {
+    my $envelope = pop @_;
+    $SigningPolicy = WSS::SigningPolicy->new();
+    $SigningPolicy->sign('Body' => namespace);
+
+    die "Not signed\n" unless 
+                  WSS::verify($envelope,$SigningPolicy);
+
+    $header = SOAP::Header->new()....
+    $data   = SOAP::data->new()....
+
+    #sign the response using the rules defined by $SigningPolicy
+    return $header, $data, $SigningPolicy;
+  }
+ 
+
+  Client Side
+  ===========
+
+  $SigningPolicy = WSS::SigningPolicy->new('Body' => namespace);
+
+  $ans = WSRF::Lite ->wsaddress($wsa)
+                    ->uri($namespace)
+                    ->sign($SigningPolicy)
+                    ->createCounterResource();
+
+  #check the signature using a WSS::SigningPolicy object
+  WSS::verify($ans, $SigningPolicy); 
+
+
+- Why does wget fail when a HTTP GET is done on a WS-Resource
+  endpoint - curl and GET work?
+
+- When using Get(Multiple)ResourceProperty we ignore
+  namespaces because SOAP::Lite has thrown them away at
+  that point - SOAP::Lite 0.65 might rescue us.
+  
+- Problems if clients use xsi:types in SOAP messages.    
+
+- Need to handle "mustunderstand" in SOAP Headers properly.
+
+- Implement WS-Notification
+
+- Fix Weird Socket errors messages with SContainer
+
+- Content rules for WS-ServiceGroups.

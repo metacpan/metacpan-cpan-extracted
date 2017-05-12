@@ -1,0 +1,58 @@
+
+priority 1:
+
+ * make HostValve and ApplicationValve only use HttpRequest/Response
+
+priority 2:
+ * input handle and output handle interfaces
+ * retie stdin, stdout
+
+priority 3: 
+
+ * char streams using Text::Iconv
+ * locales - default, mappings using Locale::Codes
+ * use utf8
+ * other authenticators
+ * filters
+ * container events
+ * naming
+ * resources
+ * full spec compliance
+ * move response buffering to output handle
+ * ConnectorBase
+ * simple realm
+ * certificate valve
+ * snoop servlet with ssl info
+ * connection pooling
+ * testing with various container combinations
+
+priority 4:
+
+ * PersistentSessionManager and most implementations
+ * most realms
+ * exception stack trace on demand
+ * exception-common distro
+ * fastcgi connector
+ * syslog logger
+ * single signon
+
+priority 5:
+
+ * refactor container classes to more easily support multiple
+   protocols; make it so that $WOMBAT_HOME is only needed for
+   "standard" (http protocol) containers
+ * lifecycle interface
+ * webdav servlet
+ * localized messages
+
+questionable:
+ * require 5.6.1 so isa() works correctly?
+ * Log::Dispatch for loggers?
+ * consolidated Session package?
+ * better random numbers needed for session id generator?
+ * authenticator redirect to ssl port when necessary?
+ * request dispatcher call back to connector for forward and include?
+ * how to set global debug constant from outside Wombat::Globals?
+ * per-component debug level?
+ * are class loaders interesting? they could manage @INC so
+   applications can't load each others' code

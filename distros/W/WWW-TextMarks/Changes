@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::TextMarks.
+
+0.01  Fri Sep 18 22:07:51 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::TextMarks -b 5.8.0
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension WWW::Blog::Metadata::Yadis
+
+0.03  Tue Apr 4 12:42:00 2006
+        - Take first description if content contains two or more 
+          Yadis Resource Descriptor URL
+
+0.02  Tue Apr 4 12:20:00 2006
+        - Yadis Resource Descriptor MUST use absolute URL, so remove
+          URI module 
+
+0.01  Mon Apr 3 12:43:00 2006
+	- original version
+

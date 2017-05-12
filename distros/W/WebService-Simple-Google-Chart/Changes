@@ -1,0 +1,11 @@
+Revision history for Perl extension WebService::Simple::Google::Chart
+0.05  Sat May 23 21:01:00 2009
+      - fixed bug about getting chart url
+0.04  Thu May 27 01:15:00 2008
+      - fix required module version
+0.03  Mon May 26 01:11:00 2008
+      - support new WebService::Simple 0.12
+0.02  Mon Apr 28 13:40:00 2008
+      - change interface
+0.01  Sun Apr 27 12:37:21 2008
+      - original version

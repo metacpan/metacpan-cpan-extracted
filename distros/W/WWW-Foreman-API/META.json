@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl client to the Foreman API",
+   "author" : [
+      "Vincent Lequertier <vi.le@autistici.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Foreman-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "0",
+            "REST::Client" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-www-foreman-api@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?WWW-Foreman-API"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/SkySymbol/perl-www-foreman-api.git",
+         "web" : "https://github.com/SkySymbol/perl-www-foreman-api"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

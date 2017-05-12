@@ -1,0 +1,22 @@
+2017-03-07  JJ Merelo  <jmerelo@flash>
+
+	* lib/Web/SIVA.pm (day): Adds scraping for early text based reports. 
+
+2017-03-06  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Web/SIVA.pm: Bumps up version for upcoming changes
+
+2017-03-05  JJ Merelo  <jmerelo@flash>
+
+	* lib/Web/SIVA.pm: Changing version number for changes in interface.
+
+2017-03-05  Juan J. merelo  <jmerelo@penny>
+
+	* .gitignore: Prepares everything for release
+	
+
+Revision history for Web-SIVA
+
+0.0.1  Sun Mar  5 08:41:56 2017
+       Initial release.
+

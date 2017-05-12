@@ -1,0 +1,30 @@
+---
+abstract: 'Perl bindings to LongURL API'
+author:
+  - 'Kevin Spencer <kspencer@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  LWP::Online: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-LongURL
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  JSON::Any: 0
+  LWP::UserAgent: 0
+  URI::Escape: 0
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

@@ -1,0 +1,29 @@
+---
+abstract: "Perl API for HashiCorp's Vault"
+author:
+  - 'Dean Hamstead <dean@bytefoundry.com.au>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-HashiCorp-Vault
+requires:
+  Moo: '0'
+  WebService::Client: '0'
+  namespace::clean: '0'
+  perl: v5.8.0
+resources:
+  homepage: https://github.com/ByteFoundryAU/perl-WebService-HashiCorp-Vault
+  repository: https://github.com/ByteFoundryAU/perl-WebService-HashiCorp-Vault.git
+version: '0.002'
+x_author_pledge:
+  version: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,101 @@
+<?php
+
+[% INCLUDE inc_test_file_header.tmpl file_title="Test case for the class \"${package_name}_Method_${method.class_name}\"" -%]
+
+require_once 'PEAR.php';
+require_once 'PHPUnit/Framework.php';
+require_once '[% package_dir %]/Method/[% method.class_name %].php';
+require_once '[% package_dir %]/Factory.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Test class for ${package_name}_Method_${method.class_name}" -%]
+class [% package_name %]_Method_[% method.class_name %]Test extends PHPUnit_Framework_TestCase
+{
+    protected $factory;
+	
+    public function setUp()
+    {
+        $this->factory = new [% package_name %]_Factory();
+    }
+	
+    public function testNew()
+    {
+        $obj = new [% package_name %]_Method_[% method.class_name %]($this->factory);
+        $this->assertNotNull($obj);
+    }
+    
+    public function testGetUrl()
+    {
+        $obj = new [% package_name %]_Method_[% method.class_name %]($this->factory);
+        $this->assertEquals('[% method.url %]', $obj->getUrl());
+    }
+    
+    public function testGetParamsConf()
+    {
+    	$obj = new [% package_name %]_Method_[% method.class_name %]($this->factory);
+    	$conf = $obj->getParamsConf();
+    	$this->assertType('array', $conf);
+    	if ($conf['defaults']) {
+    	    $this->assertType('array', $conf['defaults']);
+    	    $this->assertNull($conf['defaults'][0]);
+    	}
+    	if ($conf['fixed']) {
+    	    $this->assertType('array', $conf['fixed']);
+    	    $this->assertNull($conf['fixed'][0]);
+    	}
+    	if ($conf['keys']) {
+    	    $this->assertType('array', $conf['keys']);
+    	    $this->assertNotNull($conf['keys'][0]);
+    	}
+    	if ($conf['notnull']) {
+    	    $this->assertType('array', $conf['notnull']);
+    	    $this->assertNotNull($conf['notnull'][0]);
+    	}
+    }
+    
+    public function testGetResponseConf()
+    {
+        $obj = new [% package_name %]_Method_[% method.class_name %]($this->factory);
+        $conf = $obj->getResponseConf();
+        $this->assertType('array', $conf);
+        if ($conf['force_array']) {
+            $this->assertType('array', $conf['force_array']);
+            $this->assertNotNull($conf['force_array'][0]);
+        }
+    }
+    
+    public function testExecute()
+    {
+        $obj = new [% package_name %]_Method_[% method.class_name %]($this->factory);
+[% FOREACH test = method.tests -%]
+[% name = (test.name or "Test[${loop.index}]") -%]
+
+        // [% name %]
+        $params = array(
+[% FOREACH key = sort_keys(test.params) -%]
+            '[% key %]' => [% test.params.$key | $env_param %],
+[% END -%]
+        );
+        $res =& $obj->execute($params);
+[% SWITCH test.type -%]
+[% CASE "lib_error" -%]
+        $this->assertTrue(PEAR::isError($res), '[% name %]: isError');
+[% CASE "error" -%]
+        $this->assertTrue(PEAR::isError($res), '[% name %]: isError');
+[% CASE -%]
+        $this->assertFalse(PEAR::isError($res), '[% name %]: isError');
+        $data = $res->getData();
+        $this->assertNotNull($data, '[% name %]: getData');
+[% FOREACH node = method.return.to_array -%]
+[% NEXT IF node.depth < 2 -%]
+[% NEXT IF node_nullable(node) -%]
+        $this->assertObjectHasAttribute('[% node.name %]', $data[% node_access(node.parent, 1) %], '[% name %]: [% node.name %]');
+[% IF node.multiple -%]
+        $this->assertType('array', $data[% node_access(node) %], '[% name %]: [% node.name %]');
+[% END -%]
+[% END -%]
+[% END -%]
+[% END -%]
+    }
+}
+
+?>

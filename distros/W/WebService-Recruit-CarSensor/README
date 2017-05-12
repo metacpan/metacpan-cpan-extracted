@@ -1,0 +1,124 @@
+NAME
+    WebService::Recruit::CarSensor - An Interface for CarSensor.net Web
+    Service
+
+SYNOPSIS
+        use WebService::Recruit::CarSensor;
+    
+        my $service = WebService::Recruit::CarSensor->new();
+    
+        my $param = {
+            'key' => $ENV{'WEBSERVICE_RECRUIT_KEY'},
+            'pref' => '13',
+        };
+        my $res = $service->usedcar( %$param );
+        my $root = $res->root;
+        printf("api_version: %s\n", $root->api_version);
+        printf("results_available: %s\n", $root->results_available);
+        printf("results_returned: %s\n", $root->results_returned);
+        printf("results_start: %s\n", $root->results_start);
+        printf("usedcar: %s\n", $root->usedcar);
+        print "...\n";
+
+DESCRIPTION
+    カーセンサーnetに掲載されている中古車情報及び新車
+    カタログ情報を様々な軸で検索できるAPIです。
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $service = WebService::Recruit::CarSensor->new();
+
+    This accepts optional parameters.
+
+        my $conf = {
+            utf8_flag => 1,
+            param => {
+                # common parameters of this web service 
+            },
+        };
+        my $service = WebService::Recruit::CarSensor->new( %$conf );
+
+  add_param
+    Add common parameter of tihs web service.
+
+        $service->add_param( param_key => param_value );
+
+    You can add multiple parameters by calling once.
+
+        $service->add_param( param_key1 => param_value1,
+                             param_key2 => param_value2,
+                             ...);
+
+  get_param
+    Returns common parameter value of the specified key.
+
+        my $param_value = $service->get( 'param_key' );
+
+  usedcar
+    This makes a request for "usedcar" API. See
+    WebService::Recruit::CarSensor::Usedcar for details.
+
+        my $res = $service->usedcar( %$param );
+
+  catalog
+    This makes a request for "catalog" API. See
+    WebService::Recruit::CarSensor::Catalog for details.
+
+        my $res = $service->catalog( %$param );
+
+  brand
+    This makes a request for "brand" API. See
+    WebService::Recruit::CarSensor::Brand for details.
+
+        my $res = $service->brand( %$param );
+
+  country
+    This makes a request for "country" API. See
+    WebService::Recruit::CarSensor::Country for details.
+
+        my $res = $service->country( %$param );
+
+  large_area
+    This makes a request for "large_area" API. See
+    WebService::Recruit::CarSensor::LargeArea for details.
+
+        my $res = $service->large_area( %$param );
+
+  pref
+    This makes a request for "pref" API. See
+    WebService::Recruit::CarSensor::Pref for details.
+
+        my $res = $service->pref( %$param );
+
+  body
+    This makes a request for "body" API. See
+    WebService::Recruit::CarSensor::Body for details.
+
+        my $res = $service->body( %$param );
+
+  color
+    This makes a request for "color" API. See
+    WebService::Recruit::CarSensor::Color for details.
+
+        my $res = $service->color( %$param );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $service->utf8_flag( 1 );
+        $service->user_agent( 'Foo-Bar/1.0 ' );
+        $service->lwp_useragent( LWP::UserAgent->new() );
+        $service->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://webservice.recruit.co.jp/carsensor/
+
+AUTHOR
+    RECRUIT Media Technology Labs <mtl@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 RECRUIT Media Technology Labs
+

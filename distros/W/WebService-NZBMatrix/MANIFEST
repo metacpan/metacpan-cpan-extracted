@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/WebService/NZBMatrix.pm

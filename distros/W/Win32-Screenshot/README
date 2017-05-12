@@ -1,0 +1,44 @@
+Win32::Screenshot - Capture the screen v1.20
+============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::Magick
+
+SYNOPSIS
+
+  use Win32::Screenshot;
+
+  $image = CaptureRect( $x, $y, $width, $height );
+  $image->Write('screenshot.png');
+
+DESCRIPTION
+
+The package utilizes some Win32 API function and Image::Magick to let
+you capture the screen, a window or a part of it. The "Capture*(...)"
+functions returns a new Image::Magick object which you can easily use to
+modify the screenshot or to store it in the file. You can define your
+own post processing handlers and chain them in the list.
+
+There are Perl equivalents of Win32 API functions for working with
+windows implemented in the package. These functions will allow easy
+identification of windows on the screen.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by P.Smejkal
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

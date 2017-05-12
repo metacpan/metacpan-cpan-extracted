@@ -1,0 +1,68 @@
+Revision history for Win32-Word-Writer
+
+CHANGES
+
+
+0.03 - 2009-08-27
+
+* Relax RTF test, since the RTF format changed in later Word versions.
+
+* Document Word bug
+
+* FAQ - Q: Can you implement X for me? A: No. But maybe you can?
+
+* New command: InsertPicture - initial patch from Youri A. Zobenko,
+  thanks!
+
+
+
+
+0.02 - 2005-04-04
+
+* Add Changes section
+
+* Replace \t with 4 spaces
+
+* Bug: Empty line before first Heading if using NewParagraph instead
+  of WriteParagraph. Fixed.
+
+
+
+0.01 - 2005-03-29
+
+* Save as HTML and other formats.
+
+
+* Tests for WriteParagraph, NewParagraph
+
+
+* SetStyle with character styles
+
+
+* Italics and Bold
+
+
+* Rename to Win32::Word::Writer
+
+
+* Tests for lists
+
+
+* Tests for tables
+
+
+* Change from MakeMaker to Module::Build
+
+
+* Various typos
+
+
+
+
+TODO
+
+
+Tests for Tables of Contents etc
+
+Tests for Bookmarks
+

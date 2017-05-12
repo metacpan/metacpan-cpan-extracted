@@ -1,0 +1,39 @@
+#
+# typemap file for the NetPacket extension
+#
+# Copyright (c) 2003 Jean-Louis Morel. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+
+
+#
+# Map C types to Perl types
+#
+
+LPADAPTER           T_PTR
+LPPACKET            T_PTR
+UCHAR*              T_PTR
+PPACKET_OID_DATA    T_OPAQUEPTR
+BOOLEAN             T_BOOL
+ULONG               T_UV
+UCHAR               T_U_CHAR
+struct bpf_program * T_OPAQUEPTR
+
+#
+# Input conversions
+#
+
+INPUT
+
+
+
+
+#
+# Output conversions
+#
+
+OUTPUT
+
+
+

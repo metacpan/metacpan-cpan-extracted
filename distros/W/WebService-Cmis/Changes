@@ -1,0 +1,149 @@
+Revision history for WebService-Cmis:
+
+2013-07-17 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * preparing release 0.09
+	 * fixed test for setContentStream based on caps
+	 * exclude internal functions from pod
+	 * working towards broader coverage
+	   This one basically adds support for Alfresco's new cmis endpoint based
+	   on Apache Chemistry Open Cmis bindings while still retaining
+	   functionality for the old one. Some people might still like talking to
+	   the now deprecated old cmis endpoint as it might still offer features
+	   not yet covered by Open Cmis.
+	   
+	   Support for Nuxeo is there now.
+	   
+	   With it comes a rework of the authentication services part when
+	   allocating a rest client. We have
+	   
+	   - basic auth (as before),
+	   
+	   - cookie based authentication
+	   
+	   - token based auth
+	   
+	   - header based auth (experimental)
+	   
+	   The test suite now tries to document features broken in some repositories
+	   that can't be tested by us here successfully. As we still want our tests
+	   to cope with it there's a list of brokenFeatures keeping track of vendors and
+	   product versions. Each breakackage comes with a link pointing to the filed
+	   bug report as possible, e.g. ALF-19186, ALF-19186. In some cases I am really
+	   not sure how to deal with bugs which might simply be incompatibilities among
+	   repositories or due to my misunderstanding the CMIS specs.
+	   
+	   We've got a new test dependency: XML::SemanticDiff. It helped to figure out
+	   some problematic cases, but I might take that stuff out on a later point again.
+	   
+	   I've added a way to deal with getSummary() / updateSummary() in a reasonable way.
+	   These two accessed the atom summary of an entry. I'd expect that vendors make use
+	   of as much atom features as possible while mapping their document model onto CMIS.
+	   Unfortunately they don't. For one the old web scripts based Alfresco bindings did
+	   just fine, whereas the new Open CMis based ones put them somewhere else inside
+	   alfresco-specific nodes, a regression.
+	   
+	   Nuxeo goes with Dublin Core which makes more sense in my book.  As
+	   gettign a document's tag line seems quite important I tried to smoothen that out
+	   in the client bindings, which sucks of course. At least I was able to read/write
+	   a document's description again on Nuxeo, while getting back read-only on Alfresco
+	   again (Open CMIS bindings).
+
+2012-10-02 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixing Bug #79914
+	   also: skip manifest tests on a normal test run
+
+2012-09-25 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * improvements to test suite
+	   - test for a proper {testRoot} setting in cmis.cfg
+	      - be more robust against a non-configured changeslog
+	      - switch off LC_NUMERIC locales in Property tests
+
+2012-09-20 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * rationalized logging in
+	 * added ticket-based authentication
+
+2012-09-11 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixing (build)/prerequisites
+	 * skip all server tests when none is configured
+
+2012-08-31 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixed setting summary to the empty string
+	 * added cancelCheckOut tests
+	   - added a more detailed test to clarify the ckeckin-pwc-cancelchecout behavior
+	   - fixed auto-clearing of client cache on certain repository operations
+
+2012-08-29 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * improved changelog generator
+	 * preparing release 0.03
+	 * pick up proprietary properties as well
+	 * added example code to getAllowableActions()
+
+2012-08-28 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixed pod
+	 * implemented setContentStream
+	   - rationalized the way objects are changed by version services
+	   - removed some unused encoding stuff
+	   - rationalited api wrt contentFile/contentData parameters
+	 * improved caching; allowing to override cache-control
+	 * this is called edit-media, not edit-meta
+
+2012-08-27 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixed pod, fixed example configuration
+	 * added getEditLink, getLast, some missing relations
+
+2012-08-24 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * update signatore
+	   (how do I automate this)
+	 * removing useless object type mapping
+	   ... as we are testing the baseTypeId and not the objectTypeId which
+	   might vary a lot.
+	 * too many ignore thingies
+	 * updating signature
+	 * improved tests and pod docu
+	   also:
+	   
+	   - added {cacheEnabled} option to test suite to speed up accessing remote hosts
+	   - properly implemented getRenditions, was called getRenditionInfo before
+
+2012-08-23 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * added tests applying ACLs to objects
+	 * fixing link to xcmis test host
+	 * re-adding test suite
+	   - generating README from pod
+	   - implemented applyACL()
+	   - signed all files
+	   - added tests for ACLs and ACEs
+	   - fixed handling of permissions in ACE
+	   - added test for cmis.cfg used by the test suite itself
+
+2012-08-22 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * fixed copyright notions and acknowledegments
+	 * added pod for interfaces not yet implemented
+	 * removing pod markup from readme
+	 * Fixed distro files, removed private REST::Client
+
+2012-08-21 MichaelDaum <github@michaeldaumconsulting.com>
+
+	 * converted to Test::Class
+
+2012-03-16 Michael Daum <github@michaeldaumconsulting.com>
+
+	 * checking in existing unit tests
+	   These need to be converted from Unit::TestCase to Test::More
+	 * fixing pod unit tests
+	 * boilerplate content
+	 * boilerplate and initial checkin
+	 * first commit
+

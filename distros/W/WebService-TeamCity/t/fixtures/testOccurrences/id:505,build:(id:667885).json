@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "",
+   "duration" : 4004,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:505,build:(id:667885)",
+   "id" : "id:505,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_tag(true)",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:4167963475368295375",
+      "id" : 4167963475368295375,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_tag(true)"
+   }
+}

@@ -1,0 +1,108 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Util::XmlMapper - xml file parser</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Util::XmlMapper - xml file parser</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $mapper = Wombat::Util::XmlMapper-&gt;new();
+  $mapper-&gt;setValidating(1);</PRE>
+<PRE>
+  $mapper-&gt;addRule('Server', $mapper-&gt;objectCreate('Wombat::Core::Server'));
+  $mapper-&gt;addRule('Server', $mapper-&gt;setProperties());</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Configures a set of actions to take while parsing an XML file.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Create and return an instance, initializing fields to default values.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addRule">addRule($xpath, $action)</A></STRONG><BR>
+<DD>
+Add a rule that specifies an action to be taken for each node with the
+given xpath.
+<P></P>
+<DT><STRONG><A NAME="item_objectCreate">objectCreate($class, [$attribute])</A></STRONG><BR>
+<DD>
+Return an action that creates an object and adds it to the stack. If
+an attribute is specified, that attribute's value will be used as the
+class name; otherwise the specified class will be defaulted to.
+<P></P>
+<DT><STRONG><A NAME="item_setProperties"><CODE>setProperties()</CODE></A></STRONG><BR>
+<DD>
+Return an action that calls a property setter method on the object at
+the top of the stack for each attribute in the curent element.
+<P></P>
+<DT><STRONG><A NAME="item_addChild"><CODE>addChild($method)</CODE></A></STRONG><BR>
+<DD>
+Return an action that uses the named method to add the object at the
+top the stack as a child of the object just below it in the stack.
+<P></P>
+<DT><STRONG><A NAME="item_methodSetter">methodSetter($method, [$num])</A></STRONG><BR>
+<DD>
+Return an action that calls the named method on the object at the top
+of the stack. Method parameters are taken from the specified number of
+sub-elements of the current element, or from the body of the current
+element if 0 sub-elements are specified.
+<P></P>
+<DT><STRONG><A NAME="item_methodParam">methodParam($index, [$attribute])</A></STRONG><BR>
+<DD>
+Return an action that extracts the value for the named attribute on
+the current element, or the body of the current element if no
+attribute is provided, and sets it in the array at the top of the
+stack ath tindicated index. Use this method to accumulate parameter
+values for a previously called <A HREF="#item_methodSetter"><CODE>methodSetter()</CODE></A> action.
+<P></P>
+<DT><STRONG><A NAME="item_readXml">readXml($fh. [$root])</A></STRONG><BR>
+<DD>
+Read and parse an XML stream and perform all configured
+actions. Return the root of the generated object hierarchy, optionally
+using the provided root object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Wombat/Util/XmlAction.html">the Wombat::Util::XmlAction manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

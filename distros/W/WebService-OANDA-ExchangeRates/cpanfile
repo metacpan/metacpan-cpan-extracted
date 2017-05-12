@@ -1,0 +1,13 @@
+requires 'JSON::XS';
+requires 'LWP::UserAgent';
+requires 'Moo';
+requires 'Try::Tiny';
+requires 'Type::Tiny';
+requires 'Types::URI';
+test_requires 'Data::Dumper';
+test_requires 'HTTP::Response';
+test_requires 'Module::Spy';
+test_requires 'Test::Fatal';
+test_requires 'Test::More';
+test_requires 'Test::Pod::Coverage';
+test_requires 'URI';

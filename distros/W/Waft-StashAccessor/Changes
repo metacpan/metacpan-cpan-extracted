@@ -1,0 +1,6 @@
+Revision history for Perl extension Waft::StashAccessor.
+
+0.01  Mon Nov 10 00:51:04 2008
+    - original version; created by h2xs 1.23 with options
+        -AX -b 5.5.0 -n Waft::StashAccessor
+

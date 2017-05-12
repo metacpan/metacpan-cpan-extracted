@@ -1,0 +1,60 @@
+Revision history for Perl extension WWW::Mechanize::FormFiller.
+
+0.12 20170119
+  . Prerequisite fix, no need to update
+  - Data::Tagset was not listed as an installation prerequisite
+
+0.11 20140119
+  . Test fix, no need to update
+  - Data::Random returns words containing ' or - ; adjust tests for that
+    Thanks to Slaven Rezic for reporting this as RT #91944
+
+0.10 20090424
+  . Distribution fix, no need to update
+  - added MANIFEST.skip to distribution
+  - POD formatting fix thanks to Damyan Ivanov
+
+0.09 20090418
+  . Test fix, no need to update
+  - Finally remove t/08*, which checked for HTML::Form behaviour which changed
+  - Update author test suite
+
+0.08 20071009
+  - Rerelease because the old one went missing
+  - No need to upgrade
+
+0.07 20071007
+  - Rerelease because the old one went missing
+  - No need to upgrade
+
+0.06 20061214
+  - Added patch (plus Test) by Mark Stosberg to make filling in
+    an invalid value to a field die with a more descriptive message
+  - Disabled automatic inline test generation
+
+0.05 ????????
+  - Documentation fixed for Chars.pm (Thanks to Mark Stosberg)
+  - Now it is possible to also use regular expressions instead
+    of names to specify the fields.
+  - Added documentation and inline test for the above feature
+
+0.04  20030517
+  - Fixed Makefile.PL for Perl 5.8.0
+  - Fixed inline tests
+  - Fixed inline examples so they actually show in the Pod
+  - Added more inline tests to test the synopses
+  - New prerequisite: Data::Random - to fill out forms with
+    better random data
+  - Added custom random date generation
+  - Added 'use strict' to all FormFiller::Value::* modules (only cosmetic)
+  - Added WWW::Mechanize::FormFiller::fillout, the dwim routine to
+    fill out forms, suggested by Mark Stosberg. Thanks !
+
+0.02  20030217
+  - More tests
+  - Inline tests
+  - first release on CPAN in preparation of WWW::Mechanize::Shell
+
+0.01  Thu Nov  7 23:04:33 2002
+  - original version; created by h2xs 1.21 with options
+    -X WWW::Mechanize::FormFiller

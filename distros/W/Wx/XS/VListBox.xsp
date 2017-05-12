@@ -1,0 +1,205 @@
+#############################################################################
+## Name:        XS/VListBox.xsp
+## Purpose:     XS++ for Wx::VListBox
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     18/09/2006
+## RCS-ID:      $Id: VListBox.xsp 3042 2011-03-20 06:00:15Z mdootson $
+## Copyright:   (c) 2006-2007, 2010-2011 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxVListBox*}{simple};
+%typemap{wxPlVListBox*}{simple};
+
+#if WXPERL_W_VERSION_GE( 2, 5, 0 )
+
+#include <wx/vlbox.h>
+
+%name{Wx::VListBox} class wxVListBox
+{
+    bool Create( wxWindow *parent, wxWindowID id = wxID_ANY,
+                 const wxPoint& pos = wxDefaultPosition,
+                 const wxSize& size = wxDefaultSize,
+                 long style = 0,
+                 const wxString& name = wxVListBoxNameStr );
+
+    size_t GetItemCount() const;
+    bool HasMultipleSelection() const;
+    bool IsCurrent(size_t item) const;
+    bool IsSelected(size_t item) const;
+    size_t GetSelectedCount() const;
+    wxPoint GetMargins() const;
+    const wxColour& GetSelectionBackground() const;
+    void SetItemCount( size_t count );
+    void Clear();
+    int  GetSelection() const;
+    void SetSelection( int selection );
+    bool Select( size_t item, bool select = true );
+    bool SelectRange( size_t from, size_t to );
+    void Toggle( size_t item );
+    bool SelectAll();
+    bool DeselectAll();
+    void SetMargins( wxCoord x, wxCoord y );
+    void SetSelectionBackground( const wxColour& col );
+};
+
+%{
+
+#!sub wxVListBox
+#!sub OnDrawItem
+#!sub OnMeasureItem
+#!sub OnDrawBackground
+#!sub OnDrawSeparator
+
+void
+wxVListBox::GetFirstSelected()
+  PPCODE:
+    unsigned long cookie;
+    int ret = THIS->GetFirstSelected( cookie );
+    EXTEND( SP, 2 );
+    PUSHs( sv_2mortal( newSViv( ret ) ) );
+    PUSHs( sv_2mortal( newSViv( cookie ) ) );
+
+void
+wxVListBox::GetNextSelected( unsigned long cookie )
+  PPCODE:
+    int ret = THIS->GetNextSelected( cookie );
+    EXTEND( SP, 2 );
+    PUSHs( sv_2mortal( newSViv( ret ) ) );
+    PUSHs( sv_2mortal( newSViv( cookie ) ) );
+
+%}
+
+%file{xspp/vlbox.h};
+%{
+
+#include "cpp/v_cback.h"
+
+// void METH(wxDC&, const wxRect&, size_t)
+#define DEC_V_CBACK_VOID__WXDC_WXRECT_SIZET_const( METHOD ) \
+    void METHOD( wxDC& p1, const wxRect& p2, size_t p3 ) const
+
+#define DEF_V_CBACK_VOID__WXDC_WXRECT_SIZET_const_pure( CLASS, BASE, METHOD )\
+    void CLASS::METHOD( wxDC& p1, const wxRect& p2, size_t p3 ) const        \
+    {                                                                        \
+        dTHX;                                                                \
+        if( wxPliFCback( aTHX_ &m_callback, #METHOD ) )                      \
+        {                                                                    \
+            wxAutoSV ret( aTHX_ wxPliCCback( aTHX_ &m_callback,              \
+                                             G_SCALAR|G_DISCARD,             \
+                                             "QoL", &p1,                     \
+                                             new wxRect( p2 ), "Wx::Rect",   \
+                                             p3 ) );                         \
+            return;                                                          \
+        } else                                                               \
+            return;                                                          \
+    }
+    
+#define DEF_V_CBACK_VOID__WXDC_WXRECT_SIZET_const( CLASS, BASE, METHOD )\
+    void CLASS::METHOD( wxDC& p1, const wxRect& p2, size_t p3 ) const        \
+    {                                                                        \
+        dTHX;                                                                \
+        if( wxPliFCback( aTHX_ &m_callback, #METHOD ) )                      \
+        {                                                                    \
+            wxAutoSV ret( aTHX_ wxPliCCback( aTHX_ &m_callback,              \
+                                             G_SCALAR|G_DISCARD,             \
+                                             "QoL", &p1,                     \
+                                             new wxRect( p2 ), "Wx::Rect",   \
+                                             p3 ) );                         \
+            return;                                                          \
+        } else                                                               \
+            BASE::METHOD( p1, p2, p3);                                       \
+    }
+    
+// void METH(wxDC&, wxRect&, size_t)
+#define DEC_V_CBACK_VOID__WXDC_WXRECTREF_SIZET_const( METHOD ) \
+    void METHOD( wxDC& p1, wxRect& p2, size_t p3 ) const
+
+#define DEF_V_CBACK_VOID__WXDC_WXRECTREF_SIZET_const( CLASS, BASE, METHOD )\
+    void CLASS::METHOD( wxDC& p1, wxRect& p2, size_t p3 ) const        \
+    {                                                                        \
+        dTHX;                                                                \
+        if( wxPliFCback( aTHX_ &m_callback, #METHOD ) )                      \
+        {                                                                    \
+            wxAutoSV ret( aTHX_ wxPliCCback( aTHX_ &m_callback,              \
+                                             G_SCALAR|G_DISCARD,             \
+                                             "QqL", &p1,                     \
+                                             &p2, "Wx::Rect",                \
+                                             p3 ) );                         \
+            return;                                                          \
+        } else                                                               \
+            BASE::METHOD( p1, p2, p3);                                       \
+    }
+
+class wxPlVListBox : public wxVListBox {
+    WXPLI_DECLARE_DYNAMIC_CLASS( wxPlVListBox );
+    WXPLI_DECLARE_V_CBACK();
+public:
+    WXPLI_DEFAULT_CONSTRUCTOR( wxPlVListBox, "Wx::VListBox", true );
+    WXPLI_CONSTRUCTOR_6( wxPlVListBox, "Wx::VListBox", true,
+                         wxWindow*, wxWindowID, const wxPoint&,
+                         const wxSize&, long, const wxString& );
+
+    DEC_V_CBACK_WXCOORD__VOID_const( EstimateTotalHeight );
+    DEC_V_CBACK_WXCOORD__SIZET_const( OnMeasureItem );
+    DEC_V_CBACK_VOID__WXDC_WXRECT_SIZET_const( OnDrawItem );
+    DEC_V_CBACK_VOID__WXDC_WXRECTREF_SIZET_const( OnDrawSeparator );
+#if WXPERL_W_VERSION_GE( 2, 5, 1 )
+    DEC_V_CBACK_VOID__WXDC_WXRECT_SIZET_const( OnDrawBackground );
+#endif
+};
+
+DEF_V_CBACK_WXCOORD__VOID_const( wxPlVListBox, wxVListBox,
+                                 EstimateTotalHeight );
+DEF_V_CBACK_WXCOORD__SIZET_const_pure( wxPlVListBox, wxVListBox,
+                                       OnMeasureItem ); 
+DEF_V_CBACK_VOID__WXDC_WXRECT_SIZET_const_pure( wxPlVListBox, wxVListBox,
+                                                OnDrawItem );
+DEF_V_CBACK_VOID__WXDC_WXRECTREF_SIZET_const( wxPlVListBox, wxVListBox,
+                                                OnDrawSeparator );                                                 
+#if WXPERL_W_VERSION_GE( 2, 5, 1 )
+DEF_V_CBACK_VOID__WXDC_WXRECT_SIZET_const( wxPlVListBox, wxVListBox,
+                                                OnDrawBackground );
+#endif
+WXPLI_IMPLEMENT_DYNAMIC_CLASS( wxPlVListBox, wxVListBox );
+
+
+%}
+%file{-};
+
+#include "cpp/overload.h"
+#include "xspp/vlbox.h"
+
+%name{Wx::PlVListBox} class wxPlVListBox
+{
+%{
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::PlVListBox::new" )
+%}
+
+    %name{newDefault} wxPlVListBox()
+        %code{% RETVAL = new wxPlVListBox( CLASS ); 
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+    %name{newFull} wxPlVListBox( wxWindow *parent,
+                                 wxWindowID id = wxID_ANY,
+                                 const wxPoint& pos = wxDefaultPosition,
+                                 const wxSize& size = wxDefaultSize,
+                                 long style = 0,
+                                 const wxString& name = wxVListBoxNameStr )
+        %code{% RETVAL = new wxPlVListBox( CLASS, parent, id, pos, size,
+                                           style, name );
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+};
+
+#endif

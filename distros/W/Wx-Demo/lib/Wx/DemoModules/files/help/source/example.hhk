@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<head>
+  <meta name="GENERATOR" content="hand">
+  <!-- Sitemap 1.0 -->
+</HEAD>
+<BODY> <OBJECT type="text/site properties">
+    <param name="ImageType" value="Folder">
+  </OBJECT>
+  <UL>
+    <LI> <OBJECT type="text/sitemap">
+        <param name="Local" value="topic3.html">
+        <param name="Name" value="Quinto Orazio Flacco">
+      </OBJECT>
+    </LI>
+    <LI> <OBJECT type="text/sitemap">
+        <param name="Local" value="topic2.html#2">
+        <param name="Name" value="Paul Verlaine">
+      </OBJECT>
+    </LI>
+    <LI> <OBJECT type="text/sitemap">
+        <param name="Local" value="topic2.html#1">
+        <param name="Name" value="J. R. R. Tolkien">
+      </OBJECT>
+    </LI>
+    <LI> <OBJECT type="text/sitemap">
+        <param name="Local" value="topic1.html">
+        <param name="Name" value="Petrarca">
+      </OBJECT>
+    </LI>
+  </UL>
+</BODY>
+</HTML>
+

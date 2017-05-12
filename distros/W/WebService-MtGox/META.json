@@ -1,0 +1,50 @@
+{
+   "abstract" : "access to mtgox.com's bitcoin trading API",
+   "author" : [
+      "John BEPPU <beppu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.5711, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-MtGox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : 0,
+            "Getopt::Long" : 0,
+            "JSON" : 0,
+            "LWP::Protocol::https" : 0,
+            "LWP::UserAgent" : 0,
+            "Moo" : 0,
+            "Ouch" : 0,
+            "Test::More" : 0,
+            "Try::Tiny" : 0,
+            "parent" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

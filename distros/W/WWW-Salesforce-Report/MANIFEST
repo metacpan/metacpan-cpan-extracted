@@ -1,0 +1,23 @@
+Changes
+examples/csv.pl
+examples/send_report.pl
+examples/t.pl
+ignore.txt
+lib/WWW/Salesforce/pod2htmd.tmp
+lib/WWW/Salesforce/pod2htmi.tmp
+lib/WWW/Salesforce/Report.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-new.t
+t/01-online.t
+t/02-local.t
+t/bad_report_1.csv
+t/bad_report_2.csv
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/report.csv
+t/sfdc.cfg
+META.yml                                 Module meta-data (added by MakeMaker)

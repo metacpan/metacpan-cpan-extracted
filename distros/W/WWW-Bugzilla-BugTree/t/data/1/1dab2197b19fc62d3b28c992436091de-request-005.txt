@@ -1,0 +1,2 @@
+GET https://landfill.bugzilla.org/bugzilla-3.6-branch/show_bug.cgi?id=10155&ctype=xml
+

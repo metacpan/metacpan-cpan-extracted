@@ -1,0 +1,59 @@
+{
+   "abstract" : "combine WWW::Mechanize and HTML::TreeBuilder in nice ways",
+   "author" : [
+      "Ash Berlin C<< <ash@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.14, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Mechanize-TreeBuilder",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder" : "0",
+            "Moose" : "2.1200",
+            "MooseX::Role::Parameterized" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ashb/WWW-Mechanize-TreeBuilder/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ashb/WWW-Mechanize-TreeBuilder"
+      }
+   },
+   "version" : "1.20000"
+}

@@ -1,0 +1,44 @@
+
+NAME
+
+WWW::TWikiClient - WWW::Mechanize-based client to access a TWiki.
+
+ABOUT
+
+This class is derived from WWW::Mechanize for easy remote controlling
+a TWiki based website. It was originally developed to migrate from a
+VQWiki to TWiki.
+
+After it lived some time under the Acme::PM::Dresden namespace I made
+it an extra distribution because it seems to be useful for others.
+
+It was originally developed during the same time when
+WWW:Mechanize::TWiki appeared. I watched that other module for some
+time but WWW::TWikiClient follows a more explicit implementation
+approach that worked better for me.
+
+There are many TWikis with many different skins out there. TWikiClient
+tries to work quite generically. I mostly developed it with TWikis
+version 01Sep2004 (Cairo release) using the PatternSkin but I also did
+some tests against some other skins and twiki versions:
+
+   * Beijing release (01Feb2003)
+      * default skin (with only preview button in topic edit)
+   * Cairo release (01Sep2004)
+      * default skin (with several buttons in topic edit)
+      * BlueSkin (the old version, probably 0.4)
+      * PatternSkin
+   * Dakar release 4.0.2
+      * Reported to run, not tested by myself
+
+
+AUTHOR
+
+ Steffen Schwigon <schwigon@cpan.org>
+
+
+COPYRIGHT AND LICENSE
+
+ Copyright (c) 2006. Steffen Schwigon
+ All rights reserved. You can redistribute and/or modify
+ this bundle under the same terms as Perl itself.

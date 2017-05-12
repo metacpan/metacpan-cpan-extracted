@@ -1,0 +1,14 @@
+ChangeLog
+doc/TODO
+INSTALL
+lib/WWW/PkgFind.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/git-pkgfind
+scripts/pkgfind
+t/00_initialize.t
+t/01_script_compile.t
+t/zz_dump_config.t
+

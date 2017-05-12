@@ -1,0 +1,66 @@
+Revision history for Perl extension WWW-PivotalTracker
+
+1.00  Mon, 08 Mar 2010 04:49:20 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Re-enable Test::CheckChanges now that it supports developer releases.
+     - Clean up t/00-load.t
+     - Add META.yml to the .gitignore, and sort it.
+     - Move the guts of the pivotal_tracker script into a module.
+     - Update the Makefile.PL
+
+0.17  Sun, 28 Feb 2010 06:17:03 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+
+0.16_01  Sun, 21 Feb 2010 23:02:14 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Drop Perl6::Parameters from the CLI script.
+     - Update the existing interface to the PT v3 API.
+
+0.16  Wed, 28 Jan 2009 08:27:46 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add ability to show stories one per line
+
+0.15  Thu, 22 Jan 2009 14:29:30 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add support for project name flag
+     - Remove vim modeline, and fold markers.
+
+0.14  Mon, 12 Jan 2009 06:09:53 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing description option to pivotal_tracker
+     - Make the description of stories readable, when it spans multiple lines.
+     - Implement ability to add story notes
+
+0.13  Wed, 07 Jan 2009 04:34:01 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Fix code style for project_details declaration
+     - Tweak POD for stories_for_filter
+     - Fix code formatting
+     - Flesh-out examples for stories_for_filter
+     - Simplify _create_story
+     - Fix broken _display_error in pivotal_tracker script
+     - Make sure a Story ID is given to pivotal_tracker when deleting
+     - Add "Owned By" flag, and story output
+     - Implement ability to update existing stories
+
+0.12  Wed, 31 Dec 2008 19:46:17 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Remove crufty .orig files
+     - Add Vim fold markers to test module.
+     - Implement stories_for_filter
+
+0.11  Wed, 31 Dec 2008 18:05:28 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Fix capitalization of test_requires for Sub::Override
+     - Update Changes file, and add Test::CheckChanges test.
+     - Maintain Changes file using Module::Changes and Changes.yml
+     - Add blib, and pm_to_blib to .gitignore
+     - Use a Module::Changes (YAML) based Changes file.
+     - Fix formatting in tests for WWW::PivotalTracker
+     - Fix formatting of example script config file.
+     - Actually return content from _post_request.
+     - Minor tweaks necessary for using ShipIt.
+     - Remove VERSION section from POD
+
+0.10_05  Mon, 22 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing requires, and test_Requires lines in Makefile.PL
+
+0.10_04  Sun, 21 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Create tests for WWW::PivotalTracker
+
+0.10_03  Sun, 21 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Update some of the POD.
+
+0.10_02  Sat, 20 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - First developer version released to CPAN

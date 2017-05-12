@@ -1,0 +1,47 @@
+WWW::SVT::Play
+==============
+This module supports extraction of meta data from the URLs on SVT
+Play (<http://svtplay.se>). It is meant to ease the use of SVT
+Play from the command line, e.g. viewing videos with mplayer
+instead of the flash player. But it could also be used just to
+integrate metadata information, like title, duration and other
+stuff in other applications.
+
+A simple script is included, useful for getting the stream URLs
+for a given video.
+
+Installation
+------------
+The installation of this module follows the usual steps for
+installing a Perl module (based on ExtUtils::MakeMaker).
+
+    perl Makefile.PL
+    make test
+    make install # this command will probably have to be run as root
+
+This module requires at least Perl 5.10. It also has some non-core
+module dependencies. A complete list should be available in the
+Makefile.PL file (in the PREREQ_PM key).
+
+If you see failing tests, please report them to me, preferbly
+by opening an issue on Github.
+
+Availability and Bug Reporting
+------------------------------
+The latest released version of this module is available through
+CPAN. The latest development version is available on Github [1].
+
+It's encouraged to report bugs on github.com, but I respect
+your right to not have to create an account there. For this
+reason, I have no problems getting bug reports, feature requests
+and patches by mail.
+
+1: https://github.com/olof/WWW-SVT-Play
+
+Copyright
+---------
+    Copyright (c) 2012, 2013 - Olof Johansson <olof@cpan.org>
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

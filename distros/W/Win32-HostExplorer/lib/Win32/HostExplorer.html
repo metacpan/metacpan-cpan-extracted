@@ -1,0 +1,343 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Win32::HostExplorer - Automate telnet using Hummingbird HostExplorer and interact with the presentation space.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#construction_and_methods">CONSTRUCTION AND METHODS</a></li>
+		<li><a href="#generic_methods">GENERIC METHODS</a></li>
+		<ul>
+
+			<li><a href="#system_commands">System Commands</a></li>
+			<li><a href="#action_keys">Action Keys</a></li>
+			<li><a href="#editing">Editing</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#copyright___license">COPYRIGHT &amp; LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Win32::HostExplorer - Automate telnet using Hummingbird HostExplorer and interact with the presentation space.</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>Version 0.01</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    <span class="keyword">use</span> <span class="variable">Win32::HostExplorer</span><span class="operator">;</span>
+</pre>
+<pre>
+    <span class="comment"># Create new instance of HostExplorer</span>
+    <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Win32::HostExplorer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">debug</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span> <span class="string">logfile</span> <span class="operator">=&gt;</span> <span class="variable">$log_file</span> <span class="operator">);</span>
+</pre>
+<pre>
+    <span class="comment"># Print the first line, last line</span>
+    <span class="keyword">print</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">title_row</span><span class="operator">(),</span>  <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">status_row</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</pre>
+<pre>
+    <span class="comment"># Retrieve lines 2 and 7 through 12</span>
+    <span class="keyword">my</span> <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">show_lines</span><span class="operator">(</span> <span class="number">2</span><span class="operator">,</span> <span class="number">7</span><span class="operator">..</span><span class="number">12</span> <span class="operator">);</span>
+</pre>
+<pre>
+    <span class="comment"># Search lines 7 through 9 for the pattern</span>
+    <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">match_pattern</span><span class="operator">(</span> <span class="string">'.*money\s+(\S+)'</span><span class="operator">,</span> <span class="number">7</span><span class="operator">..</span><span class="number">9</span> <span class="operator">);</span>
+</pre>
+<pre>
+    <span class="comment"># Position cursor on row 7, column 11</span>
+    <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$row</span><span class="operator">,</span> <span class="variable">$col</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cursor_pos</span><span class="operator">(</span> <span class="number">7</span><span class="operator">,</span> <span class="number">11</span> <span class="operator">);</span>
+</pre>
+<pre>
+    <span class="comment"># Send text to row/column 7,1</span>
+    <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">field_input</span><span class="operator">(</span> <span class="number">7</span><span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="string">'Thelonius Monk'</span> <span class="operator">);</span>
+</pre>
+<pre>
+    <span class="comment"># Execute function key 'F1' within terminal</span>
+    <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">f1</span><span class="operator">();</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The Win32::HostExplorer module provides an object-oriented interface and
+methods to interact with the HostExplorer presentation space.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="construction_and_methods">CONSTRUCTION AND METHODS</a></h2>
+<ul>
+<li><strong><a name="item_new">Win32::HostExplorer-&gt;new();</a></strong>
+
+<p>The constructor returning the object for a new HostExplorer instance using Win32::OLE. Two options are supported with this method in hash format. All are optional.</p>
+<p>debug</p>
+<p>Setting the debug level to 1 will cause each to method to announce itself and its caller. Setting debug to 2 will add the arguments passed to the method.  Setting debug to 3 will add the return value of the method.</p>
+<p>logfile</p>
+<p>This designates a log file to be used in conjunction with the <code>write_log()</code> method.</p>
+</li>
+<li><strong><a name="item_show_lines">show_lines( 3, 8..14 )</a></strong>
+
+<p>Reads lines from the presentation space using line numbers as arguments. They are returned in list or scalar context. The default action, with no arguments, returns lines 1-24. Ranges are expressed as (start)..(end).</p>
+</li>
+<li><strong><a name="item_title_row"><code>title_row()</code></a></strong>
+
+<p>Reads the first row of the presentation space, which can often contain the page title.</p>
+</li>
+<li><strong><a name="item_status_row"><code>status_row()</code></a></strong>
+
+<p>Reads the last row of the presentation space, which can often contain the results of a command sequence.</p>
+</li>
+<li><strong><a name="item_cursor_pos">cursor_pos( 7, 11 )</a></strong>
+
+<p>With row/col arguments, positions the cursor in the presentation space, else returns the cursor position only.</p>
+<p>Row and column indexes begin with 1;</p>
+</li>
+<li><strong><a name="item_field_input">field_input( 7, 1, 'bang a gong' )</a></strong>
+
+<p>Combines three methods to position the cursor on a given row/column, clear the field, and insert keys.</p>
+</li>
+<li><strong><a name="item_match_pattern">match_pattern( '.*free money\s+(\S+)', 7..9 )</a></strong>
+
+<p>Applies a regex pattern against the specified lines in the presentation space.</p>
+<p>This returns, either the entire pattern matched or the parenthesized group.  Only one group is allowed.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="generic_methods">GENERIC METHODS</a></h2>
+<p>
+</p>
+<h3><a name="system_commands">System Commands</a></h3>
+<ul>
+<li><strong><a name="item_activate"><code>activate()</code></a></strong>
+
+<p>Brings the window to the foreground.</p>
+</li>
+<li><strong><a name="item_close"><code>close()</code></a></strong>
+
+<p>This will close the session immediately.</p>
+</li>
+<li><strong><a name="item_connect"><code>connect()</code></a></strong>
+
+<p>Connect the client to a host system.</p>
+</li>
+<li><strong><a name="item_connect_status"><code>connect_status()</code></a></strong>
+
+<p>Tests the connection to your host.
+0 = not connected, 1 = connected</p>
+</li>
+<li><strong><a name="item_clear"><code>clear()</code></a></strong>
+
+<p>Clears all data from the terminal.</p>
+</li>
+<li><strong><a name="item_disconnect"><code>disconnect()</code></a></strong>
+
+<p>Disconnects the client from a host system.</p>
+</li>
+<li><strong><a name="item_hide"><code>hide()</code> <code>show()</code></a></strong>
+
+<p>Hide or display the screen whether it is minimized, normal, or maximized.
+A hidden screen no longer shows in the taskbar.</p>
+</li>
+<li><strong><a name="item_maximize"><code>maximize()</code> <code>minimize()</code> <code>restore()</code></a></strong>
+
+<p>Methods to size the window.</p>
+</li>
+<li><strong><a name="item_hide_toolbar"><code>hide_toolbar()</code> <code>show_toolbar()</code></a></strong>
+
+<p>Use these methods to hide or show the session toolbar.</p>
+</li>
+<li><strong><a name="item_start_capture"><code>start_capture()</code> <code>stop_capture()</code></a></strong>
+
+<p>Starts/stops capture mode.</p>
+</li>
+<li><strong><a name="item_set_font"><code>set_font()</code></a></strong>
+
+<p>A method to change the font.</p>
+<p>$obj-&gt;set_font( 'Courier New', 0, 12 ); # ( $fontname, $width, $height )</p>
+</li>
+<li><strong><a name="item_font_larger"><code>font_larger()</code> <code>font_smaller()</code></a></strong>
+
+<p>Resize the font.</p>
+</li>
+<li><strong><a name="item_print_screen"><code>print_screen()</code></a></strong>
+
+<p>Print the current host session to the Windows printer specified in the profile for the session</p>
+</li>
+<li><strong><a name="item_save_screen"><code>save_screen()</code></a></strong>
+
+<p>Save the current screen to a file.</p>
+<p>$obj-&gt;save_screen( 'C:\saved.txt' );</p>
+</li>
+<li><strong><a name="item_search"><code>search()</code></a></strong>
+
+<p>Search the presentation space for a string.  Returns (row,col) — found or 0 — not found. Parameters - 'string', case( def. 0 = no case or 1 = case sensitive ), start_row( def. 1 ), start_col( def. 1 ).</p>
+<p>$obj-&gt;search( ``elvis'', 0 ,1 ,1 );</p>
+</li>
+<li><strong><code>set_font()</code></strong>
+
+<p>Set the session font.</p>
+<p>$obj-&gt;set_font( 'Courier New',$w, $h );</p>
+</li>
+<li><strong><a name="item_text"><code>text()</code></a></strong>
+
+<p>Use to retrieve the entire screen as a string.</p>
+<p>my $text = $obj-&gt;text();</p>
+</li>
+<li><strong><a name="item_text_rc"><code>text_rc()</code></a></strong>
+
+<p>Used to retrieve part of the screen as a string. Values for length include: 0 = Copy to EOF,   -1 = Copy to EOL,   -2 = Copy to EOW, -3 = Copy to EOScr, &gt;0 = Exact length.</p>
+<p>my $text = $obj-&gt;text_rc($row,$column,$length);</p>
+</li>
+<li><strong><a name="item_update"><code>update()</code>
+This method forces a repaint of the session window.</a></strong>
+
+<p>$obj-&gt;update();</p>
+</li>
+</ul>
+<p>
+</p>
+<h3><a name="action_keys">Action Keys</a></h3>
+<ul>
+<li><strong><a name="item_enter"><code>enter()</code></a></strong>
+
+<p>Sends the 'enter' key sequence.</p>
+</li>
+<li><strong><a name="item_f1"><code>f1()</code> .. <code>f12()</code>   <code>pa1()</code> .. <code>pa3()</code></a></strong>
+
+<p>Function keys within the session.</p>
+</li>
+</ul>
+<p>
+</p>
+<h3><a name="editing">Editing</a></h3>
+<ul>
+<li><strong><a name="item_back_space"><code>back_space()</code></a></strong>
+
+<p>Sends the 'backspace' key.</p>
+</li>
+<li><strong><a name="item_send_keys">send_keys( 'Thelonius Monk' )</a></strong>
+
+<p>Used to insert a key sequence into the presentation space at the current cursor position.</p>
+</li>
+<li><strong><a name="item_erase_eof"><code>erase_eof()</code></a></strong>
+
+<p>Clears text from the cursor position to the end of the field.</p>
+</li>
+<li><strong><a name="item_erase_eol"><code>erase_eol()</code></a></strong>
+
+<p>Clears text from the cursor position to the end of the line.</p>
+</li>
+<li><strong><a name="item_erase_input"><code>erase_input()</code></a></strong>
+
+<p>Clears all editable text from the presentation space.</p>
+</li>
+<li><strong><a name="item_selectall"><code>selectall()</code> <code>copy()</code> <code>selectall_copy()</code> <code>paste()</code> <code>paste_wordwrap()</code></a></strong>
+
+<p>Copy/paste commands.</p>
+</li>
+<li><strong><a name="item_set_insert"><code>set_insert()</code> <code>unset_insert()</code></a></strong>
+
+<p>These toggle the insert mode and return the state of the mode.
+0 = reset, 1 = set</p>
+</li>
+<li><strong><a name="item_newline"><code>newline()</code></a></strong>
+
+<p>Sends the 'newline' key sequence moving the cursor to the first editable position on the next line.</p>
+</li>
+<li><strong><a name="item_tab"><code>tab()</code> <code>back_tab()</code></a></strong>
+
+<p>These methods are used to send the 'tab' or 'back-tab' key sequences, moving the cursor tab-wise through the input fields.</p>
+</li>
+<li><strong><a name="item_left"><code>left()</code> <code>right()</code> <code>up()</code> <code>down()</code> <code>home()</code> <code>end()</code></a></strong>
+
+<p>Cursor movement.</p>
+</li>
+<li><strong><a name="item_put_text"><code>put_text()</code></a></strong>
+
+<p>Like the <a href="#item_send_keys"><code>send_keys()</code></a> method but it allows you to specify the location to write the text.                   $obj-&gt;put_text( ``Donna Lee'', 2, 10 )</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>George Kevin Hathorn, <code>&lt;gekeha at gmail dot com&gt;</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Please report any bugs or feature requests to
+<code>bug-win32-hostexplorer at rt.cpan.org</code>, or through the web interface at
+<a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-HostExplorer">http://rt.cpan.org/NoAuth/ReportBug.html</a>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>You can find documentation for this module with the perldoc command.</p>
+<pre>
+    perldoc Win32::HostExplorer</pre>
+<p>You can also look for information at:</p>
+<ul>
+<li><strong><a name="item_annocpan_3a_annotated_cpan_documentation">AnnoCPAN: Annotated CPAN documentation</a></strong>
+
+<p><a href="http://annocpan.org/dist/Win32-HostExplorer">http://annocpan.org/dist/Win32-HostExplorer</a></p>
+</li>
+<li><strong><a name="item_cpan_ratings">CPAN Ratings</a></strong>
+
+<p><a href="http://cpanratings.perl.org/d/Win32-HostExplorer">http://cpanratings.perl.org/d/Win32-HostExplorer</a></p>
+</li>
+<li><strong><a name="item_rt_3a_cpan_27s_request_tracker">RT: CPAN's request tracker</a></strong>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-HostExplorer">http://rt.cpan.org/NoAuth/Bugs.html</a></p>
+</li>
+<li><strong><a name="item_search_cpan">Search CPAN</a></strong>
+
+<p><a href="http://search.cpan.org/dist/Win32-HostExplorer">http://search.cpan.org/dist/Win32-HostExplorer</a></p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="copyright___license">COPYRIGHT &amp; LICENSE</a></h1>
+<p>Copyright 2007 George Kevin Hathorn, all rights reserved.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

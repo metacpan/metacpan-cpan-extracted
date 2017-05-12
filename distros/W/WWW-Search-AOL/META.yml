@@ -1,0 +1,30 @@
+---
+abstract: 'backend for searching search.aol.com'
+author:
+  - 'Shlomi Fish'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Search-AOL
+provides:
+  WWW::Search::AOL:
+    file: lib/WWW/Search/AOL.pm
+    version: '0.0107'
+requires:
+  HTML::TreeBuilder: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  WWW::Search: '2.565'
+  WWW::Search::Test: '2.287'
+  perl: '5.008'
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/www-search-backends
+version: '0.0107'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

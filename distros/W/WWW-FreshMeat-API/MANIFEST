@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/freshmeat-submit.pl
+lib/WWW/FreshMeat/API.pm
+lib/WWW/FreshMeat/API/Agent/XML/RPC.pm
+lib/WWW/FreshMeat/API/Pub.pm
+lib/WWW/FreshMeat/API/Pub/V1_03.pm
+lib/WWW/FreshMeat/API/Session.pm
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/simple_mock.t
+Makefile.PL
+META.yml

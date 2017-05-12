@@ -1,0 +1,2609 @@
+Subroutine getCategories redefined at lib/WordPress/Base/XMLRPC.pm line 444.
+
+### --------------------------
+
+### $method_name: 'getPage'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getPages'
+
+
+### $return_value: [
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20061113T11:08:22',
+###                    date_created_gmt => '20061113T19:08:22',
+###                    description => 'This is my playground.
+My playground is not a toy.
+There are no toys in my playground.
+
+I am a....
+Hm.
+Ex artist.. "Dad".. Ex to many a woman.
+
+Etcetera.
+Whatever.
+
+I smoke.
+Lots, it seems lately that be the case.
+
+<!-- ddfm1 -->
+
+<pre>
+-----BEGIN GEEK CODE BLOCK-----
+Version: 3.1
+GFA/IT/P dpu@ s:-- a C+++$ UL++$ P+++$ L+++$ E--- W+++ N++ o? K? w--- !o
+M- V? PS+++ PE-- Y+ PGP t 5 X+ R !tv b+++ DI++ D+ G e+ h* r+ y*>$
+------END GEEK CODE BLOCK------
+</pre>',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/about/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    page_id => '2',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/about/',
+###                    text_more => '',
+###                    title => 'About Moi',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '0',
+###                    wp_page_parent_title => '',
+###                    wp_password => '',
+###                    wp_slug => 'about'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080110T08:59:32',
+###                    date_created_gmt => '20080110T16:59:32',
+###                    description => 'Development on linux rocks.
+At first it felt strange and limited- Like the guis (graphical user interface(s)) were missing.
+Most of coding and development happens on the terminal (the command line).
+
+There are several command line tools that are little added candy bonuses to working.
+
+vim
+The text editor.
+This is what you use to write and edit code.
+
+cvs
+This is probably my fave, after vim. 
+It keeps track of projects. 
+At first it will seem like added stress, more work to do. 
+It\'s a creepy thing before you get used to it.
+I couldn\'t develop without cvs anymore. I would cry.
+
+tree
+List a hierarchy tree of files, instead of firing up a file browser, you can see your way around.
+
+convert and mogrify
+Make a million thumbnails without touching gimp or photoshop. Perfect and without human intervention.
+',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/cool-linux-commands/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '0',
+###                    page_id => '74',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/cool-linux-commands/',
+###                    text_more => '',
+###                    title => 'cool linux commands',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '0',
+###                    wp_page_parent_title => '',
+###                    wp_password => '',
+###                    wp_slug => 'cool-linux-commands'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080110T09:20:20',
+###                    date_created_gmt => '20080110T17:20:20',
+###                    description => 'One of the dumbest things I used to do in making web pages was to resize images and make thumbnails in \'photoshop\'.
+
+The next less dumb thing I did was to script thumbnailing. To allow a server to make the thumbnails instantly.
+Then I got comfortable with things like convert and mogrify.
+
+Both of these are interfaces to image magick.
+
+These are used via the command line, the terminal. You feed them a list of one or more images (by path) and what to do with them.
+
+Here\'s a big thing to not forget:
+
+<blockquote>
+<b>convert</b> makes copies of the original images
+
+<b>mogrify</b> changes the original images
+</blockquote>
+
+<h3>Resizing images</h3>
+What if you want an image to be no more then 800 pixels tall and wide?
+
+<code>convert ./original.jpg -resize 800x800 ./copy.jpg</code>
+
+Do it to the original:
+
+<code>mogrify -resize 800x800 ./original.jpg</code>
+
+So let\'s have a more useful example. I downloaded images from my camera. And I want to resize them and make thumbnails. My originals reside in ~/images/set1.  (Whenever you see a ~ symbol it means \'home\' to the computer, usually /home/yourlogin)
+
+<pre>cp -R  /home/myself/images/set1 /home/myself/images/set1post # 1
+cd /home/myself/images/set1post #2
+mogrify -resize 800x800 ./*jpg #3
+find ./*jpg -exec convert \'{}\' -resize 100x100 \'{}\'small \\; #4
+rename \'.jpgsmall\' \'_small.jpg\' ./* #5 </pre>
+
+First of all, it\'s safe to leave the # marks, these are interpreted as comments, thus ignored.
+1) Let\'s replicate the directory set of images first, recursively.
+2) Change into the new directory
+3) Change the originals to be no more wide or tall then 800px, for the web.
+4) Use find to convert the files from image.jpg to image.jpgsmall, for all of them, this way we ahve copies.
+5) Name the files properly, anywhere we see something like \'.jpgsmall\', change it to \'_small.jpg\'
+
+<h3>converting between image formats</h3>
+
+Now, as ImageMagick tells it, primarity, it is a package for converting images from one format to another.
+What if you have a freaking tif file that you need to be something else?
+
+<code>convert ./original_image.tif ./converted_image.jpg</code>
+',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/cool-linux-commands/command-line-image-magick-convert-and-mogrify/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '0',
+###                    page_id => '75',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/cool-linux-commands/command-line-image-magick-convert-and-mogrify/',
+###                    text_more => '',
+###                    title => 'convert and mogrify',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '74',
+###                    wp_page_parent_title => 'cool linux commands',
+###                    wp_password => '',
+###                    wp_slug => 'command-line-image-magick-convert-and-mogrify'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080105T18:57:24',
+###                    date_created_gmt => '20080106T02:57:24',
+###                    description => 'These tools are useful for development.
+
+
+Most of the time you work on the terminal, and to find your way around a project you use things like find, ls, and tab completion.
+If you need more of a bird\'s eye view, you may fire up a gui browser like konqueror. But that\'s a gui, and guis are for users. 
+
+Another option is tree.  Here is example output of tree:
+
+<pre>[leo@localhost devel]$ tree
+.
+`-- WordPress
+    |-- bin
+    |   `-- wppost
+    |-- lib
+    |   `-- WordPress
+    |       |-- Base.pm
+    |       `-- Post.pm
+    |-- t
+    |-- wp-content
+    |   `-- plugins
+    |       |-- akismet
+    |       |   |-- akismet.gif
+    |       |   `-- akismet.php
+    |       |-- hello.php
+    |       |-- pictpress.php
+    |       |-- pm_admin_menu.php
+    |       |-- postmaster
+    |       |   `-- readme.txt
+    |       |-- postmaster.php
+    |       `-- wp-db-backup.php
+    |-- wp-mail.php
+    `-- xmlrpc.php
+
+9 directories, 13 files</pre>
+
+What if you want to do something a tiny bit more intricate?
+If you are working inside a cvs tree.. things can get pretty crazy.
+Here is default tree output in a cvs filesystem hierarcy slice:
+
+<pre>[leo@localhost PDF-OCR]$ tree
+|-- CVS
+|   |-- Entries
+|   |-- Entries.Log
+|   |-- Repository
+|   `-- Root
+|-- INSTALL
+|-- MANIFEST
+|-- META.yml
+|-- Makefile.PL
+|-- PDF-OCR-1.02.tar.gz
+|-- PDF-OCR-1.03.tar.gz
+|-- PDF-OCR-1.04.tar.gz
+|-- README
+|-- bin
+|   |-- CVS
+|   |   |-- Entries
+|   |   |-- Repository
+|   |   `-- Root
+|   |-- ocr
+|   |-- pdf2ocr
+|   |-- pdf2ocrturntotext
+|   `-- pdfgetext
+|-- lib
+|   |-- CVS
+|   |   |-- Entries
+|   |   |-- Entries.Log
+|   |   |-- Repository
+|   |   `-- Root
+|   |-- Image
+|   |   |-- CVS
+|   |   |   |-- Entries
+|   |   |   |-- Entries.Log
+|   |   |   |-- Repository
+|   |   |   `-- Root
+|   |   `-- OCR
+|   |       `-- CVS
+|   |           |-- Entries
+|   |           |-- Repository
+|   |           `-- Root
+|   `-- PDF
+|       |-- CVS
+|       |   |-- Entries
+|       |   |-- Entries.Log
+|       |   |-- Repository
+|       |   `-- Root
+|       |-- OCR
+|       |   |-- CVS
+|       |   |   |-- Entries
+|       |   |   |-- Entries.Log
+|       |   |   |-- Repository
+|       |   |   `-- Root
+|       |   |-- Thorough
+|       |   |   |-- CVS
+|       |   |   |   |-- Entries
+|       |   |   |   |-- Repository
+|       |   |   |   `-- Root
+|       |   |   `-- Cached.pm
+|       |   `-- Thorough.pm
+|       `-- OCR.pm
+`-- t
+    |-- 00_dependencies_check.t
+    |-- 01_PDF_OCR.t
+    |-- 2_PDFOCRThorough.t
+    |-- 3_PDFOCRThoroughCached.t
+    |-- CVS
+    |   |-- Entries
+    |   |-- Entries.Log
+    |   |-- Repository
+    |   `-- Root
+    |-- dyer
+    |   |-- CVS
+    |   |   |-- Entries
+    |   |   |-- Repository
+    |   |   `-- Root
+    |   |-- file1.pdf
+    |   |-- file1ap.pdf
+    |   |-- file2.pdf
+    |   |-- file2ap.pdf
+    |   |-- file3.pdf
+    |   |-- file4.pdf
+    |   `-- file5ap.pdf
+    `-- scan1.pdf
+
+19 directories, 63 files</pre>
+
+Wohoa.. that\'s a lot of junk to look over.. What if we just want to see the roject files, not the  cvs files..
+Here\'s what we can do, use the parameter -I CVS, this excludes things matching a pattern match:
+
+<pre>[leo@localhost PDF-OCR]$ tree -I CVS
+|-- INSTALL
+|-- MANIFEST
+|-- META.yml
+|-- Makefile.PL
+|-- PDF-OCR-1.02.tar.gz
+|-- PDF-OCR-1.03.tar.gz
+|-- PDF-OCR-1.04.tar.gz
+|-- README
+|-- bin
+|   |-- ocr
+|   |-- pdf2ocr
+|   |-- pdf2ocrturntotext
+|   `-- pdfgetext
+|-- lib
+|   |-- Image
+|   |   `-- OCR
+|    `-- PDF
+|       |-- OCR
+|       |   |-- Thorough
+|       |   |   `-- Cached.pm
+|       |   `-- Thorough.pm
+|       `-- OCR.pm
+`-- t
+    |-- 00_dependencies_check.t
+    |-- 01_PDF_OCR.t
+    |-- 2_PDFOCRThorough.t
+    |-- 3_PDFOCRThoroughCached.t
+    |-- dyer
+    |   |-- file1.pdf
+    |   |-- file1ap.pdf
+    |   |-- file2.pdf
+    |   |-- file2ap.pdf
+    |   |-- file3.pdf
+    |   |-- file4.pdf
+    |   `-- file5ap.pdf
+    `-- scan1.pdf
+
+19 directories, 63 files</pre>
+
+Pretty cool, huh? 
+It\'s very useful to me when I\'m busy on a more complex project and I need to get around, and I don\'t want to use a damn gui to browse a filesystem section.
+
+<strong>installing tree</strong>
+
+Tree is not a standard command. You must install it with yum or build it on your machine.
+
+',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/cool-linux-commands/cool-linux-commands-tree/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '0',
+###                    page_id => '43',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/cool-linux-commands/cool-linux-commands-tree/',
+###                    text_more => '',
+###                    title => 'tree',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '74',
+###                    wp_page_parent_title => 'cool linux commands',
+###                    wp_password => '',
+###                    wp_slug => 'cool-linux-commands-tree'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080122T09:46:53',
+###                    date_created_gmt => '20080122T17:46:53',
+###                    description => '',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/elsewhere/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    page_id => '88',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/elsewhere/',
+###                    text_more => '',
+###                    title => 'Elsewhere',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '0',
+###                    wp_page_parent_title => '',
+###                    wp_password => '',
+###                    wp_slug => 'elsewhere'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080123T20:35:47',
+###                    date_created_gmt => '20080124T04:35:47',
+###                    description => 'Let\'s say our location is 10415 Armory Road Kensington MD 20895
+<!--start_raw-->
+    <div id="map" style="width: 300px; height: 200px"></div>
+<!--end_raw--> 
+
+or something else..
+<!--start_raw-->
+    <div id="map2" style="width: 300px; height: 200px"></div>
+<!--end_raw--> 
+',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/gmap-test/',
+###                    mt_allow_comments => '0',
+###                    mt_allow_pings => '0',
+###                    page_id => '90',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/gmap-test/',
+###                    text_more => '',
+###                    title => 'GMap test',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '0',
+###                    wp_page_parent_title => '',
+###                    wp_password => '',
+###                    wp_slug => 'gmap-test'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080121T12:38:30',
+###                    date_created_gmt => '20080121T20:38:30',
+###                    description => 'These are some interesting resources online.',
+###                    excerpt => '',
+###                    link => 'http://leocharre.com/perl-resources/',
+###                    mt_allow_comments => '0',
+###                    mt_allow_pings => '0',
+###                    page_id => '87',
+###                    page_status => 'publish',
+###                    permaLink => 'http://leocharre.com/perl-resources/',
+###                    text_more => '',
+###                    title => 'Resources',
+###                    userid => '2',
+###                    wp_author => 'leocharre',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_page_order => '0',
+###                    wp_page_parent_id => '0',
+###                    wp_page_parent_title => '',
+###                    wp_password => '',
+###                    wp_slug => 'perl-resources'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'newPage'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'deletePage'
+
+ERROR:faultString Sorry, no such page.
+ERROR:faultCode 404
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'editPage'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getPageList'
+
+
+### $return_value: [
+###                  {
+###                    dateCreated => '20061113T11:08:22',
+###                    date_created_gmt => '20061113T19:08:22',
+###                    page_id => '2',
+###                    page_parent_id => '0',
+###                    page_title => 'About Moi'
+###                  },
+###                  {
+###                    dateCreated => '20080105T18:57:24',
+###                    date_created_gmt => '20080106T02:57:24',
+###                    page_id => '43',
+###                    page_parent_id => '74',
+###                    page_title => 'tree'
+###                  },
+###                  {
+###                    dateCreated => '20080110T08:59:32',
+###                    date_created_gmt => '20080110T16:59:32',
+###                    page_id => '74',
+###                    page_parent_id => '0',
+###                    page_title => 'cool linux commands'
+###                  },
+###                  {
+###                    dateCreated => '20080110T09:20:20',
+###                    date_created_gmt => '20080110T17:20:20',
+###                    page_id => '75',
+###                    page_parent_id => '74',
+###                    page_title => 'convert and mogrify'
+###                  },
+###                  {
+###                    dateCreated => '20080121T12:38:30',
+###                    date_created_gmt => '20080121T20:38:30',
+###                    page_id => '87',
+###                    page_parent_id => '0',
+###                    page_title => 'Resources'
+###                  },
+###                  {
+###                    dateCreated => '20080122T09:46:53',
+###                    date_created_gmt => '20080122T17:46:53',
+###                    page_id => '88',
+###                    page_parent_id => '0',
+###                    page_title => 'Elsewhere'
+###                  },
+###                  {
+###                    dateCreated => '20080123T20:35:47',
+###                    date_created_gmt => '20080124T04:35:47',
+###                    page_id => '90',
+###                    page_parent_id => '0',
+###                    page_title => 'GMap test'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'getAuthors'
+
+
+### $return_value: [
+###                  {
+###                    display_name => 'leocharre',
+###                    user_id => '2',
+###                    user_login => 'leocharre'
+###                  },
+###                  {
+###                    display_name => 'chamilton',
+###                    user_id => '3',
+###                    user_login => 'chamilton'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'getCategories'
+
+
+### $return_value: [
+###                  {
+###                    categoryId => '4',
+###                    categoryName => 'art',
+###                    description => 'art',
+###                    htmlUrl => 'http://leocharre.com/articles/category/art/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/art/feed/'
+###                  },
+###                  {
+###                    categoryId => '6',
+###                    categoryName => 'cool linux commands',
+###                    description => 'cool linux commands',
+###                    htmlUrl => 'http://leocharre.com/articles/category/cool-linux-commands/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/cool-linux-commands/feed/'
+###                  },
+###                  {
+###                    categoryId => '5',
+###                    categoryName => 'near life experience',
+###                    description => 'near life experience',
+###                    htmlUrl => 'http://leocharre.com/articles/category/near-life-experience/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/near-life-experience/feed/'
+###                  },
+###                  {
+###                    categoryId => '2',
+###                    categoryName => 'perl',
+###                    description => 'perl',
+###                    htmlUrl => 'http://leocharre.com/articles/category/perl/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/perl/feed/'
+###                  },
+###                  {
+###                    categoryId => '3',
+###                    categoryName => 'posix',
+###                    description => 'posix',
+###                    htmlUrl => 'http://leocharre.com/articles/category/posix/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/posix/feed/'
+###                  },
+###                  {
+###                    categoryId => '1',
+###                    categoryName => 'Uncategorized',
+###                    description => 'Uncategorized',
+###                    htmlUrl => 'http://leocharre.com/articles/category/uncategorized/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/uncategorized/feed/'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'newCategory'
+
+ERROR:faultString Sorry, the new category failed.
+ERROR:faultCode 500
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'suggestCategories'
+
+
+### $return_value: [
+###                  {
+###                    cat_ID => {
+###                                data => '4',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'art',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '0',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'art',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '0',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'art',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'art',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '4',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '4'
+###                  },
+###                  {
+###                    cat_ID => {
+###                                data => '6',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'cool linux commands',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '4',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'cool-linux-commands',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '4',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'cool linux commands',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'cool-linux-commands',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '6',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '6'
+###                  },
+###                  {
+###                    cat_ID => {
+###                                data => '5',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'near life experience',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '5',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'near-life-experience',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '5',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'near life experience',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'near-life-experience',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '5',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '5'
+###                  },
+###                  {
+###                    cat_ID => {
+###                                data => '2',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'perl',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '3',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'perl',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '3',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'perl',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'perl',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '2',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '2'
+###                  },
+###                  {
+###                    cat_ID => {
+###                                data => '3',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'posix',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '9',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'posix',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '9',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'posix',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'posix',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '3',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '3'
+###                  },
+###                  {
+###                    cat_ID => {
+###                                data => '1',
+###                                type => 'string'
+###                              },
+###                    cat_name => {
+###                                  data => 'Uncategorized',
+###                                  type => 'string'
+###                                },
+###                    category_count => {
+###                                        data => '9',
+###                                        type => 'string'
+###                                      },
+###                    category_description => {
+###                                              data => '',
+###                                              type => 'string'
+###                                            },
+###                    category_nicename => {
+###                                           data => 'uncategorized',
+###                                           type => 'string'
+###                                         },
+###                    category_parent => {
+###                                         data => '0',
+###                                         type => 'string'
+###                                       },
+###                    count => {
+###                               data => '9',
+###                               type => 'string'
+###                             },
+###                    description => {
+###                                     data => '',
+###                                     type => 'string'
+###                                   },
+###                    name => {
+###                              data => 'Uncategorized',
+###                              type => 'string'
+###                            },
+###                    parent => {
+###                                data => '0',
+###                                type => 'string'
+###                              },
+###                    slug => {
+###                              data => 'uncategorized',
+###                              type => 'string'
+###                            },
+###                    taxonomy => 'category',
+###                    term_group => '0',
+###                    term_id => {
+###                                 data => '1',
+###                                 type => 'string'
+###                               },
+###                    term_taxonomy_id => '1'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'uploadFile'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'newPost'
+
+ERROR:faultString Sorry, your entry could not be posted. Something wrong happened.
+ERROR:faultCode 500
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'editPost'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getPost'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getRecentPosts'
+
+
+### $return_value: [
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080130T14:19:05',
+###                    date_created_gmt => '20080130T22:19:05',
+###                    description => 'test description here',
+###                    link => 'http://leocharre.com/articles/test_1201731544/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/test_1201731544/',
+###                    postid => '119',
+###                    title => 'test_1201731544',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'test_1201731544'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080129T12:26:46',
+###                    date_created_gmt => '20080129T20:26:46',
+###                    description => 'This is the content that will be slurped up.
+This is more bla..
+
+This example will work on client side only. If you want to change prefix
+on server side you should override default serializer. See
+examples/server/soap.* for examples.
+access to any method
+
+If for some reason you want to get access to remote procedures that
+have the same name as methods of SOAP::Lite object these calls
+(obviously) won\'t be dispatched. In that case you can originate your
+call trough call()
+
+
+More content bla bla.
+',
+###                    link => 'http://leocharre.com/articles/test-post-from-file/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/test-post-from-file/',
+###                    postid => '118',
+###                    title => 'Test Post From File',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'test-post-from-file'
+###                  },
+###                  {
+###                    categories => [
+###                                    'near life experience'
+###                                  ],
+###                    dateCreated => '20080129T10:27:11',
+###                    date_created_gmt => '20080129T18:27:11',
+###                    description => 'This is the "Tao te ching". It is a collection of 81 "poems" that make up a philosophy.
+The Tao was written by Lao Tzu. 
+
+There are many translations of the Tao. Here is the version that I prefer. It was made by a 
+scholar named Wing Tsit Chan. 
+The version is not easily found, the book is out of print.
+Thus, when I found it again, I placed it here so that others looking for the Wing Tsit Chan Translation of the Tao may have an easier time finding it.
+
+<a href=\'http://leocharre.com/wp-content/uploads/tao_te_ching_translated_by_wing_tsit_chan.html\' title=\'tao te ching translated by wing tsit chan\'>tao te ching translated by wing tsit chan</a>',
+###                    link => 'http://leocharre.com/articles/tao-te-ching-translated-by-wing-tsit-chan/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/tao-te-ching-translated-by-wing-tsit-chan/',
+###                    postid => '110',
+###                    title => 'tao te ching translated by wing tsit chan',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'tao-te-ching-translated-by-wing-tsit-chan'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080129T10:22:17',
+###                    date_created_gmt => '20080129T18:22:17',
+###                    description => 'I code for a living. I need a lot of text on two screens at all times.
+I need the best monitor possible so that my eyes will not burn out and I won\'t be able to keep working.
+If the company I work for did not buy me the hardware I need, I would go out and buy it myself.
+
+I am a recent convert to lcd screens. 
+
+There are a couple of peculiarities about the ViewSonic VA903b that I have learned and want to share.
+I have two of these, and for a little while I wanted to chuck them out with the bath water.
+
+Two things that could be happening with the VA903b to give you a moire effect, a blurry image:
+
+1) If you see ghosting of light letters on a dark background: check the cable on the back of the monitor, make sure it is plugged in properly.
+Wiggle it a bit, and the ghosting dissappears. If the cable is too tight from being far from the computer, your image is bad.
+
+2) Check the horizontal size of your screen. I noticed that the auto adjust does not automatically adjust the horizontonal size of the screen.
+I also noticed that there is a sweet spot just under the total number of cells on the screen. This setting is *more* important then the "fine tune"
+option on the "manual adjust" menu.
+
+Having figured those two things out, I love my monitors way past my old CRTs. I don\'t know that I could ever use a CRT again.',
+###                    link => 'http://leocharre.com/articles/viewsonic-va903b/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'VA903b, ViewSonic VA903b',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/viewsonic-va903b/',
+###                    postid => '109',
+###                    title => 'ViewSonic VA903b',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'viewsonic-va903b'
+###                  },
+###                  {
+###                    categories => [
+###                                    'cool linux commands',
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20080129T10:17:13',
+###                    date_created_gmt => '20080129T18:17:13',
+###                    description => '<!--start_raw-->
+<p>Ingredients:<ul><li>Linux distro (Fedora Core 4)</li><li>Camera USB (Kodak Easyshare LS743)</li><li>gphoto2</li></ul></p>
+<p>So I get a camera, and take pictures.. now what? I got linux. I thought this may be complicated.. But guess what..</p>
+
+<h3>Step 1</h3>
+<p>Make sure gphoto2 is installed. If not.. open shell cli prompt (whatever) and become su, then <code># yum -y install gphoto2</code>, wait for it to complete.. 
+</p>
+
+<h3>Step 2</h3>
+<p>Make your dir to receive photos, change to it..  then <code># gphoto2 -P</code></p>
+
+<h3>Step 3</h3>
+<p>All your photos are downloaded to your current working dir. Now, delete the photos.. <code># gphoto2 -DR</code> .. All the photos are deleted from your camera.</p>
+
+<p>Done. That\'s it. No mouse clicking. No stupid dialogues. Wow.</p>
+<!--end_raw-->',
+###                    link => 'http://leocharre.com/articles/downloading-images-from-a-camera-with-linux/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'gphoto2',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/downloading-images-from-a-camera-with-linux/',
+###                    postid => '108',
+###                    title => 'Downloading Images from a Camera with Linux',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'downloading-images-from-a-camera-with-linux'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080127T18:30:21',
+###                    date_created_gmt => '20080128T02:30:21',
+###                    description => 'So, I saw Marie Antoinette.
+
+Turns out this movie is directed by Sofia Coppola.
+
+I loved Lost in Translation.
+The good thing about that movie, is that what is on the verge of happening throughout the whole thing never does happen. And you\'re left with this beautiful sweet taste of a sin half way committed.
+
+In the movie Marie Antoinette, you know what\'s going to happen.
+The main characters of the movie are all going to be killed.
+The whole movie plays like a children\'s show, very flowery. 
+So you think- this is good. Can\'t wait to see where this ends up very witty- this must be showing the situation from their standpoint.. You\'re just.. la dee da.. and look at the pretty flowers, and the sunlight and then - oh no, we\'re dead! The End. Movie over.. aha! What a great movie.. but no. Sorry Sofia Coppola. You suck here.
+You can\'t use the same formula and get away with it, not here.
+This screenplay had a chance to actually be witty, to leave some kind of an aftertaste in your eyeballs, nut nooOOOoooo... I\'m Sofia Coppola, I\'m going to make a joke without a punchline and you\'re all going to laugh anyway.
+
+Well, I ain\'t laughing. 
+
+Nor is your father, Francis Ford Coppola. I know it. I know he\'s shaking his head and thinking *tsk* *tsk* - and you\'re like.. "Why daddy! Why! It *is* a good movie! It\'s a fucking masterpiece! It\'s a great movie, daddy!!! buahahhhahahahaah!"
+And daddy don\'t say nuthin\' does he?! Maybe he nods and says \'yes honey, you made a movie.\'
+But, I wanna be like daddy!!!
+
+Sorry, it takes more then a dick and balls to make Francis Ford Coppola, Sofia.
+
+
+
+Ps. Gotta tell ya though, incredibly good score. The Strokes.. Joy Division. Almost made the movie good. Try it without the video next time, should be cheaper to make.
+<div class="post_images_b"><span><img src="http://leocharre.com/wp-content/uploads/medium-marie-antoinette-movie.jpg" alt="medium marie antoinette movie"></span><span style="break:both"></span></div>',
+###                    link => 'http://leocharre.com/articles/marie-antoinette/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/marie-antoinette/',
+###                    postid => '102',
+###                    title => 'Marie Antoinette',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'marie-antoinette'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080124T08:15:23',
+###                    date_created_gmt => '20080124T16:15:23',
+###                    description => '=== Location Widget ===
+Contributors: leocharre
+Tags: widget, location, google map
+Requires at least: 2.2
+Tested up to: 2.3.2
+VERSION: $Revision: 1.1.1.1 $
+
+Lets you insert widgets representing a location, an address. Includes a link to google maps,
+generated from the address data.
+
+== Description ==
+
+This lets you insert an address widget, if enough data is available, then a link to google
+maps is made visible.
+
+Usage is similar to the text widget.
+
+== Installation ==
+
+To install the plugin follow these steps :
+
+1. Download the location.zip file to your local machine.
+1. Unzip the file.
+1. Upload the "location-widget" folder to your "/wp-content/plugins/" directory.
+1. Activate the plugin through the \'Plugins\' menu in WordPress
+
+== Screenshots ==
+
+1. Select how many location widgets you want.
+<img src="http://leocharre.com/wp-content/uploads/medium-screenshot-1.png">
+
+2. Enter whatever data you want, a title, address lines 1 through 3, city, state, zip, etc.
+<img src="http://leocharre.com/wp-content/uploads/medium-screenshot-2.png">
+
+3. At the bottom right we see the location widgets as visitors see them. A link to google maps
+is generated, provided we have enough data to suggest an address.
+<img src="http://leocharre.com/wp-content/uploads/medium-screenshot-3.png">
+
+
+
+<div>Download <a href=\'http://leocharre.com/wp-content/uploads/location-widget1.zip\' title=\'location-widget.zip\'>location-widget1.zip</a></div>
+',
+###                    link => 'http://leocharre.com/articles/wordpress-location-widget/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/wordpress-location-widget/',
+###                    postid => '97',
+###                    title => 'wordpress location widget',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'wordpress-location-widget'
+###                  },
+###                  {
+###                    categories => [
+###                                    'perl',
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20080120T13:34:55',
+###                    date_created_gmt => '20080120T21:34:55',
+###                    description => 'I tackled this problem via XMLRPC and perl.
+I ended up packaging this under <a href="http://search.cpan.org/~leocharre/WordPress-Post-1.04/">WordPress::Post</a> on cpan.
+
+Usage examples:
+
+<pre>wppost -t \'title of the post\' -c stuff,fruit,cake -i \'This is what I think of bla.\'</pre>
+
+You can also write a text file, the name of the text file is the title.
+
+<pre>wppost -i ./path/to/title_of_the_post.txt</pre>
+
+This program is in its infancy. But dammit, it works. It\'s how I posted this content via the command like. Also, you can include images in your posts. Multiple images. Via the command line.
+Anything not in the argument is considered posting content..
+So what if your post if about a party you went to, and you have 5 pictures..
+
+First write your halloween_party.txt file, then have your photos lined up somewhere.. then..
+
+<pre>wppost -i halloween_party.txt ./images/halloween_photos_post/*jpg</pre>
+
+Done. Linux rocks.
+',
+###                    link => 'http://leocharre.com/articles/posting-to-wordpress-via-the-command-line/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'cli, command line wordpress post, wordpress',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/posting-to-wordpress-via-the-command-line/',
+###                    postid => '86',
+###                    title => 'posting to wordpress via the command line',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'posting-to-wordpress-via-the-command-line'
+###                  },
+###                  {
+###                    categories => [
+###                                    'cool linux commands'
+###                                  ],
+###                    dateCreated => '20080120T13:25:03',
+###                    date_created_gmt => '20080120T21:25:03',
+###                    description => "mencoder -aoc copy -ovc copy ./file1.avi ./file1.avi -o ./out.avi
+
+mencoder is part of mplayer, you can install via yum on fedora core packages..
+
+<pre>yum -y install mencoder</pre>
+
+I had a lot of these to join.. so..
+I made a perl script that I can use use without so much fuss.. one that I don\x{2019}t have to tell it what the output file is going to be.
+I put it in ~/bin/avijoin
+
+
+<pre>
+#!/usr/bin/perl
+use strict;
+
+my \$outfile = outfile();
+
+my \@arg = (qw(mencoder -oac copy -ovc copy), \@ARGV, '-o',\$outfile);
+
+system(\@arg) == 0 or die(\$?);
+
+print \"Wrote:\\n\$outfile\";
+
+exit;
+
+sub outfile {
+\@ARGV or die('missing args');
+my \$outfile = \$ARGV[0];
+\$outfile=~s/([^\\/]+)\\.(\\w{1,5})\$// or die;
+my (\$filename,\$ext) = (uc \$1,\$2);
+my \$x=0;
+\$filename=~s/\\W//g;
+my \$_outfile;
+
+for(1){
+\$_outfile=\"\$outfile/\$filename\$x.\$ext\";
+last unless -e \$_outfile;
+\$x++;
+}
+return \$_outfile;
+
+}
+</pre>
+
+Make sure to chmod 0755 ~/bin/avijoin
+
+
+",
+###                    link => 'http://leocharre.com/articles/how-to-join-avi-movies/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/how-to-join-avi-movies/',
+###                    postid => '85',
+###                    title => 'how to join avi movies',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'how-to-join-avi-movies'
+###                  },
+###                  {
+###                    categories => [
+###                                    'cool linux commands'
+###                                  ],
+###                    dateCreated => '20080116T18:42:42',
+###                    date_created_gmt => '20080117T02:42:42',
+###                    description => 'I want to go over linux rename command very quickly. It\'s a simple command but I used to find it tricky and unintuitive.
+
+The man rename output examples of foo and bar are freaking cryptic.
+So I want to show some real world examples of rename
+
+Let\'s do a directory listing...
+
+<pre>[leo@localhost rename_example_dir]$ ls -l
+total 1872
+-rw-rw-r-- 1 leo leo 845805 2008-01-16 20:36 P1010591.JPG
+-rw-rw-r-- 1 leo leo 914240 2008-01-16 20:36 P1010624.JPG
+-rw-rw-r-- 1 leo leo  38167 2008-01-16 20:35 Picture 11.jpg
+-rw-rw-r-- 1 leo leo  29726 2008-01-16 20:35 Picture 16.jpg
+-rw-rw-r-- 1 leo leo  25545 2008-01-16 20:35 Picture 21.jpg
+-rw-rw-r-- 1 leo leo  23886 2008-01-16 20:35 Picture 22.jpg
+-rw-rw-r-- 1 leo leo  14736 2008-01-16 20:35 Picture 3.jpg
+</pre>
+
+Great. Now, let\'s change those filenames.. 
+
+<pre>[leo@localhost rename_example_dir]$ rename \'Picture \' \'PICTURE_\' ./Pictu*
+[leo@localhost rename_example_dir]$ ls -l
+total 1872
+-rw-rw-r-- 1 leo leo 845805 2008-01-16 20:36 P1010591.JPG
+-rw-rw-r-- 1 leo leo 914240 2008-01-16 20:36 P1010624.JPG
+-rw-rw-r-- 1 leo leo  38167 2008-01-16 20:35 PICTURE_11.jpg
+-rw-rw-r-- 1 leo leo  29726 2008-01-16 20:35 PICTURE_16.jpg
+-rw-rw-r-- 1 leo leo  25545 2008-01-16 20:35 PICTURE_21.jpg
+-rw-rw-r-- 1 leo leo  23886 2008-01-16 20:35 PICTURE_22.jpg
+-rw-rw-r-- 1 leo leo  14736 2008-01-16 20:35 PICTURE_3.jpg
+</pre>
+
+Ok, how about we match up the file extensions too..
+
+<pre>[leo@localhost rename_example_dir]$ rename JPG jpg ./*
+[leo@localhost rename_example_dir]$ ls -l
+total 1872
+-rw-rw-r-- 1 leo leo 845805 2008-01-16 20:36 P1010591.jpg
+-rw-rw-r-- 1 leo leo 914240 2008-01-16 20:36 P1010624.jpg
+-rw-rw-r-- 1 leo leo  38167 2008-01-16 20:35 PICTURE_11.jpg
+-rw-rw-r-- 1 leo leo  29726 2008-01-16 20:35 PICTURE_16.jpg
+-rw-rw-r-- 1 leo leo  25545 2008-01-16 20:35 PICTURE_21.jpg
+-rw-rw-r-- 1 leo leo  23886 2008-01-16 20:35 PICTURE_22.jpg
+-rw-rw-r-- 1 leo leo  14736 2008-01-16 20:35 PICTURE_3.jpg
+</pre>
+
+Now let\'s talk about what the heck happened.
+The command is..
+<blockquote>
+rename <b>$takeout $putin</b> <i>$towhatfiles</i>
+</blockquote>
+
+First argument is what you do not want there, second argument is what you want to replace it with, third argument is a list of files, you can use wildcards and all the other freaky unix filematch  operators.
+
+
+
+
+',
+###                    link => 'http://leocharre.com/articles/rename/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/rename/',
+###                    postid => '81',
+###                    title => 'rename',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'rename'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080116T17:32:51',
+###                    date_created_gmt => '20080117T01:32:51',
+###                    description => '
+Here\'s an example of a cgi script running so that it is profiled..
+
+script.cgi :
+<pre>
+#!/usr/bin/perl -d
+use Devel::DProf;
+
+# do whatever .....
+
+</pre>
+
+
+Afterwards, a tmon.out file resides alongside your script.cgi
+
+<pre>
+# dprofpp -I ./tmon.out
+</pre>
+
+
+Why the heck would you want to profile a cgi??
+As I say over and over again to myself and to anyone that may happen to stand around me, I think a cgi is not a program. I think any web application is not supposed to be an application at all.
+
+I think that a web application should be an INTERFACE to a an application.
+A cgi may do things like manage authentication, take user input, and give feedback. That\'s all. It should NOT do crazy things like perform OCR, make calculations, generate thumbnails, etc etc. 
+That kind of code should be developed and tested via the command line on a terminal emulator.
+
+After that works, you can make your interface, or WUI, as I like to call them. Web User Interface.
+
+Now, although your web interface may not do much but take input and spit feedback- what is going on behind the scenes may be very complicated. 
+Sometimes your application runs great, and you get users telling you "hey, it\'s slow..".
+You have to perform all the things they do with their variables etc.. to see what\'s going on.
+
+Replicating a cgi environment with authentication, encryption, and god knows what else.. is a pain - in fact.. I\'ve tried a couple of times and it sucked all my energy out. Screw that.
+
+So this is the next best thing- profile a cgi run!!!
+It\'s wonderful- if you have a slow cgi app, this is really useful.
+
+',
+###                    link => 'http://leocharre.com/articles/how-to-profile-cgi/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'Devel::DProf, dprofpp, profile cgi, profiling cgi',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/how-to-profile-cgi/',
+###                    postid => '80',
+###                    title => 'how to profile cgi',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'how-to-profile-cgi'
+###                  },
+###                  {
+###                    categories => [
+###                                    'perl',
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20080115T05:01:03',
+###                    date_created_gmt => '20080115T13:01:03',
+###                    description => 'I have a digital cam. I take pictures.
+I don\'t like a million DSCIM or DSCF or whatever files.
+It\'s inconvenient with so damn many.
+
+It would be nice to rename all the images according to the date, as recorded inside the image exif data, that is, the sate stamp put in by your camera.
+
+I hacked together this script to do that..
+Use at your own peril. This is a hack.
+Eventually I will release a refined version on cpan.
+
+This scrip requires modules Image::ExifTool, LEOCHARRE::CLI ..
+
+<pre>
+#!/usr/bin/perl -w
+use strict;
+use File::Copy;
+use Cwd;
+use LEOCHARRE::CLI;
+
+# requires Image::ExifTool
+#
+my $o = gopts(\'m\');
+
+#yn(\'rename all jpg files by date in \'.cwd().\'?\') or exit;
+
+
+
+my $files = argv_aspaths();
+
+(defined $files and scalar @$files )or die("no file arguments provided");
+
+
+if ($o->{m}){
+   -d \'./noout\' or mkdir \'./noout\';
+}
+
+for (@$files){
+   $_=~/(.+)\\/([^\\/]+)$/ or next;
+   my $abs = $1;
+   my $filename = $2;
+   $filename=~/\\.jpg$/i or next;
+   print STDERR "$abs   - $filename \\n" if DEBUG;
+
+   if ($filename=~/\\d{4}[_\\: ]+\\d{2}[_\\: ]+\\d{2}/){
+      print STDERR "file $filename already named?\\n" if DEBUG;
+      next;
+   }
+
+   
+
+   my $out =  `exiftool -DateTimeOriginal \'$abs/$filename\'`;
+   chomp $out;
+
+   unless( $out ){
+      print STDERR " no out? $filename\\n" if DEBUG;
+      if ($o->{m}){
+         File::Copy::move("$abs/$filename", "$abs/noout/$filename");
+
+      }
+      next;
+      
+   } 
+   $out=~s/^Date\\/Time Original[\\:\\s]*//i;
+   $out=~s/:| /_/g;
+   
+
+   unless( $out=~/^[\\d_]+$/ ){
+      print STDERR "dont like [$out]\\n" if DEBUG;
+      next;
+   }   
+
+   print STDERR "$filename : [$out]\\n" if DEBUG;;
+
+   rename("$abs/$filename", "$abs/$out\\_$filename");
+   print STDERR "moved to $abs/$out\\_$filename\\n" if DEBUG;  
+   
+}
+
+
+=head1 OPTION FLAGS
+
+   -m move to noout dir if cant get date
+
+
+</pre>',
+###                    link => 'http://leocharre.com/articles/rename-images-by-exif-date/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/rename-images-by-exif-date/',
+###                    postid => '79',
+###                    title => 'rename images by exif date',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'rename-images-by-exif-date'
+###                  },
+###                  {
+###                    categories => [
+###                                    'near life experience'
+###                                  ],
+###                    dateCreated => '20080115T04:07:14',
+###                    date_created_gmt => '20080115T12:07:14',
+###                    description => 'I love coffee.
+
+Coffee should be hot.
+The temperature, should be hot.
+You should drink coffee when it\'s almost too hit for you.
+If the cofee were hotter, it would hurt you.
+Perhaps it hurts a little as you drink it.
+
+Coffee should be strong.
+
+Coffee should not be drank in large ammounts.
+Coffee should be strong, and hot. 
+You should not need to drink large volumes of coffee.
+Good coffee does not need to be drank in large ammounts.
+Drinking large ammounts of good hot coffee should make even a veteran coffee drinker feel slightly uncomfortable.
+
+Drink and smoke.
+There are three drinks that go with smoking.
+Coffee, acohol, and Pepsi.
+I learned this long ago, when I yet was not a smoker.
+
+Coffee should be drank black, like a woman\'s heart.
+One should not put creamer or sugar in coffee.
+It is permissible to do so rarely. For taste. 
+Use heavy cream and sugar. 
+Do not put non fat creamer or fake sweateners in cofee.
+This is coffee. This is not about long life, this is about quality of life.
+If you want to put \'shit\' in your coffee, get your coffee at McDonalds or 7Eleven.
+
+How to Brew Coffee.
+
+As of late my very loved method is the French Press...
+To be continued.',
+###                    link => 'http://leocharre.com/articles/coffee/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/coffee/',
+###                    postid => '78',
+###                    title => 'Coffee',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'coffee'
+###                  },
+###                  {
+###                    categories => [
+###                                    'perl',
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20080112T17:14:24',
+###                    date_created_gmt => '20080113T01:14:24',
+###                    description => 'So I was doing a fresh install of my customized database api package for perl. LEOCHARRE::Database.
+Goodly enough, my perl Makefile.PL let me know that I was missing DBD::mysql. Great.
+
+I fire up cpan install DBD::mysql, and alas.. No go! How come??
+
+Turns out you need to install mysql-client and mysql-devel.
+I\'m on a fedora core gui, so I use yum..
+
+<code>yum -y install mysql-client mysql-devel</code>
+
+Great.
+Now let\'s try cpan again..
+<code>cpan install DBD::mysql</code>
+
+It works better.. but oops.. still ..
+<code>2 tests skipped.
+Failed 31/34 test scripts, 8.82% okay. 473/478 subtests failed, 1.05% okay.
+make: *** [test_dynamic] Error 255
+  /usr/bin/make test -- NOT OK
+Running make install
+  make test had returned bad status, won\'t install without force
+</code>
+
+What\'s up?
+I think the mysql server\'s not running on this machine, thus, we need to install to make a full successful check via cpan.
+
+<code>yum -y install mysql-server</code>
+
+And then..
+<code>[root@localhost LEOCHARRE-Database]# /etc/init.d/mysqld status
+mysqld is stopped
+[root@localhost LEOCHARRE-Database]# /etc/init.d/mysqld start
+Initializing MySQL database:  Installing MySQL system tables...
+OK
+Filling help tables...
+Ok
+</code>
+
+Great. Let\'s try that cpan again..
+
+<code>cpan install DBD::mysql</code>
+
+Haha! It works! :-)
+',
+###                    link => 'http://leocharre.com/articles/problems-installing-dbdmysql/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'DBD::mysql, DBI, mysql, perl',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/problems-installing-dbdmysql/',
+###                    postid => '77',
+###                    title => 'problems installing DBD::mysql',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'problems-installing-dbdmysql'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080111T10:45:27',
+###                    date_created_gmt => '20080111T18:45:27',
+###                    description => 'I converted this image using stencilize, installed WordPress-Post, resolved cpan dependencies, and uploaded via the cli..<div class="post_images_b"><span><img src="http://leocharre.com/wp-content/uploads/medium_6213040-md.jpg" alt="medium 6213040-md"></span><span><img src="http://leocharre.com/wp-content/uploads/medium_6213040-md_OUT.jpg" alt="medium 6213040-md OUT"></span><span style="break:both"></span></div>',
+###                    link => 'http://leocharre.com/articles/conversion/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/conversion/',
+###                    postid => '76',
+###                    title => 'conversion',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'conversion'
+###                  },
+###                  {
+###                    categories => [
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20080107T04:12:37',
+###                    date_created_gmt => '20080107T12:12:37',
+###                    description => '<div class="post_images_a"><span><a href="http://leocharre.com/wp-content/uploads/2008/01/dell_inspiron_600m1.jpg" title="view image"><img src="http://leocharre.com/wp-content/uploads/2008/01/dell_inspiron_600m.thumbnails1.jpg" alt="dell inspiron 600m"></a></span><span style="break:both;"></span></div>This is a review. Not a hints and tips sheet.
+
+OVERALL VERDICT
+
+This is a quiet and fast machine. The screen resolution is amazing. This machine is great for coding, which is what I do.
+The lowdown is that it gets hot and it\'s therefore not a LAPtop. 
+I strongly recommend this machine for coding. I am schocked this machine does what it does, being a "dell".
+
+DETAILS
+
+The Dell Inspiron 600m
+
+Usually I hate anything that\'s not either IBM or Apple. Dell, let\'s face it, it\'s trash. It\'s a computer for users. It\'s a fucking windows machine. Right?
+
+SPECS
+
+This particular model has two 256 meg mem sims, totaling at 512 megs.
+The processor is a pentium m.
+The video card is ATI Radeon R250 [Mobility FireGL 9000].
+Two usb ports. 
+Built in ethernet and phone jacks.
+DVDrom CDrw in same drive.
+
+BATTERY
+
+I don\'t have a preference for working unplugged as far as power goes. When I have worked off the battery, I think it does not last long, a couple of hours maybe.
+The battery does have a button that lights up to tell you how much juice is left. This is really nice, works unplugged from the machine as well, so if you had two..
+
+THE SCREEN
+
+I give it a ten.
+The resolution is set at 1400x1050 at 60hz. This is really good for coding.
+I can set up two gnome-terminals at 750x1050 and they work wonderfully well. You can use some good font like Lucida Typewriter 9 point, and this is really wonderful and clean an environment to work in.
+
+NOISE
+
+One of the most important things for me when I code is the peace. I need quiet. This machine is incredibly quiet. The fan barely turns on unless needed. I am completely satisfied with the noise level of this machine- I could not ask for more.
+
+HEAT
+
+This is NOT a LAP top. This fucker gets hot. It\'s a pentium M, 1.6 ghz or so.. (check).
+
+PERFORMANCE
+
+This machine is snappy as hell.
+I have at work a 64bit 1.6Ghz machine with 1 gig mem, and for normal usage, this laptop outperforms it, often.
+
+Of course if I need to queue the machine to do something I am not interacting with.. the 64bit machine will eat this dell alive and spit out the seeds.
+
+INSTALLING LINUX
+
+I used Fedora Core 8.
+First install it fucked up. I went ahead and just reinstalled, ignoring what happened before. Worked great.
+
+Hardware works great..
+I can switch to a terminal output with Ctrl+Alt+F* and back to the gui with no problem. Some machines fuck this up.
+
+Linux is amazing on a dell inspiron 600m.
+',
+###                    link => 'http://leocharre.com/articles/linux-on-a-dell-inspiron-600m-2/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/linux-on-a-dell-inspiron-600m-2/',
+###                    postid => '71',
+###                    title => 'Linux On A Dell Inspiron 600m',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'linux-on-a-dell-inspiron-600m-2'
+###                  },
+###                  {
+###                    categories => [
+###                                    'near life experience'
+###                                  ],
+###                    dateCreated => '20080106T10:38:51',
+###                    date_created_gmt => '20080106T18:38:51',
+###                    description => 'I\'m watching Invincible.
+
+Normally I wouldn\'t give two flying fucks about a goddam sports movie.
+But... it was the Eagles- it was Mark Wahlberg, it was Philly.
+And it\'s inspiring.
+And our hero is all too real-
+And his neighborhood.. reminds me of my little lives past.
+And it makes me miss my Pennsylvania girl.
+The one who made me watch Football in a bar for the first time in my life.
+
+<div><img id="image69" src="http://leocharre.com/wp-content/uploads/2008/01/invincible_35.jpg" alt="invincible_35.jpg" /><div>
+
+I miss the city.
+I miss Boston.
+I miss what I saw of Philly.
+I miss walking into a house falling down.
+I miss poverty, the fucked up walls in a house run by slumlords who won\'t turn up the heat in winter.
+People liek Fred Ficken who you call complaining that you\'re freezing to death and they have the fucking nerve to walk into your apartment unannounced and look around pause and say \'no, it\'s not cold here..\'.
+
+I miss the endless three story row houses in Mission Hill.
+The roads of Roxbury.
+I miss the miles of city.
+The hummanity uncontrolled.
+Forgotten but it still lives.
+I miss the night time.
+Walking alone because I have nowhere to go, for in my mind I have had a moment of clarity in which \'home\' is only ... only where my feet may be standing on at a given moment.
+
+I miss.
+',
+###                    link => 'http://leocharre.com/articles/invincible/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/invincible/',
+###                    postid => '68',
+###                    title => 'Invincible',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'invincible'
+###                  },
+###                  {
+###                    categories => [
+###                                    'near life experience'
+###                                  ],
+###                    dateCreated => '20080105T05:21:31',
+###                    date_created_gmt => '20080105T13:21:31',
+###                    description => 'I\'ve been up for a long time now.
+I did not sleep thursday night.. and now the night of friday.. and now the morning of saturday..
+How long is that?
+I feel like a zombie.
+ .. i like feeling so tired
+so tired your body hurts
+but in some good way
+and all you can really feel is that you are awake
+and that you should not be
+
+amazing how it helps with all the horror of life
+i might be hungry even.. and i don\'t care
+i wouldn\'t eat if some good french-cameroonian or indian food were to be in front of me..
+that\'s how tired i am
+i am so tired i am typing this shit
+slowly..ish..
+
+holding a burnt  out butt on my right hand
+while i type
+
+if i goto sleep, and sooner or later i will..
+then i will perhaps dream and have more nightmares
+and even if not, iw will be here all over again tommorrow
+and it will start all over again
+all of it
+none of it
+and then, and then... i will sleep
+and then i will wake up
+and then i will sleep
+and then
+i am starting to feel my eyes unbearably heavy and wanting to close as i correct my spelling mistakes as isleep.. i wonder if I am properly toing  without ooking at the keyboard,,, because now my eyes ae closed....
+wow.... what garble was that... i amrtpoing whjile i am asleep...
+oh  shit..
+i  just woke up
+
+wow
+weird
+ok
+
+but see.. that\'s misleading
+because this is how i felt friday morning at 5am when i knew i just had to go to sleep..
+i felt like this
+that i NEEDEd sleep
+but then as soon as you get what your want, i have to stop tying..
+ i am seriously zoning out
+',
+###                    link => 'http://leocharre.com/articles/zombie/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/zombie/',
+###                    postid => '42',
+###                    title => 'zombie',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'zombie'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080103T19:47:48',
+###                    date_created_gmt => '20080104T03:47:48',
+###                    description => '\'nightmares about women\'
+\'morning is when i wake up\'
+\'in the city we are less\'
+
+three fifty one in the fucking morning
+
+i hate php
+it\'s so convenient, that\'s added to the list
+
+it\'s... creepy
+like a retarded child with a gun
+
+i am supposed to go to sleep now
+turn the leaf on another day
+
+',
+###                    link => 'http://leocharre.com/articles/cheap-wide-angle-shots-3/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/cheap-wide-angle-shots-3/',
+###                    postid => '17',
+###                    title => 'Nightmares about women',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'cheap-wide-angle-shots-3'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '20080103T12:40:26',
+###                    date_created_gmt => '20080103T20:40:26',
+###                    description => 'I\'m supposed to seek out a method of properly adding content to something like wordpress.
+Thing is.. what comes to mind is the command line.
+GUis are for end users.
+
+Wordpress is retarded.
+You have to register every entry into the database or it won\'t show.
+For files too, like images.
+
+That\'s retarded.
+
+Wordpress is retarded.
+
+I\'m tempted to code a perl module just to fuck with it..
+Turns out some goofball coded this already.. <a href="http://search.cpan.org/~senger/WordPress-V0.1.1/lib/WordPress.pm">WordPress</a>
+But after looking over the code.. it\'s junk.
+I think the fuckwad made it just so he could say "look, see? I can code perl!\'
+Fuckwad. 
+
+
+<b>update</b>
+
+aha..  I see
+Actually, if the files were not recorded in the database, things like news feeds would not include the images.
+Hm.
+
+Fuckin a.
+',
+###                    link => 'http://leocharre.com/articles/very-good-title/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/very-good-title/',
+###                    postid => '9',
+###                    title => 'Wordpress image gallery like thingie',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'very-good-title'
+###                  },
+###                  {
+###                    categories => [
+###                                    'cool linux commands',
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20070129T10:04:08',
+###                    date_created_gmt => '20070129T18:04:08',
+###                    description => '<h3>OVERVIEW</h3>
+
+First thing you need is a way to figure out what the skew angle is.
+
+<h4>unpaper 0.2</h4>
+
+I tried using \'unpaper\' v 0.2 
+
+But for some reason no matter how much I fumbled with the settings.. I could not get it to detect a skew.
+
+<h4>pagetools 0.1</h4>
+
+The next thing I tried was something called \'pagetools\' 
+http://sourceforge.net/projects/pagetools/
+The current version for that is 0.1 (as of this writing).
+You can see them on http://sourceforge.net/projects/pagetools/
+
+
+This version has no real installer per se, you unzip, untar, and then
+where you extracted you run \'make\'.
+The following is an example of how you would go about doing this.
+This may fail on your machine- use your head and don\'t dispair.
+(as root..)
+
+<pre>
+	cd ~/
+	mkdir tmp
+	cd tmp
+	wget http://downloads.sourceforge.net/pagetools/pagetools-0.1.tar.gz?use_mirror=internap
+	gunzip pagetools-0.1.tar.gz
+	tar -xvf pagetools-0.1.tar
+	make
+</pre>
+
+And likely get an error about missing pbm.h
+WHY! Because this is provided by another package.
+I did a yum search
+
+<pre>
+	yum provides pbm.h
+</pre>
+
+And got some results. Then chose what to install..
+
+<pre>
+	yum install netpbm-devel
+</pre>
+
+Great. Then I did a \'make clean\' to wipe my previous make try..
+
+<pre>
+	make clean
+</pre>
+
+Now run the make again..
+
+<pre>
+	make
+</pre>
+
+And.. and?? What happenned??
+What happened is if you look in pbm_findskew/pbm_findskew , this binary is what
+was compiled for you. 
+
+<h3>Try the sucker out.</h3>
+
+Imagine you have a skewed.png image..
+(assuming you habe imagemagick installed on your system)
+
+<pre>
+	convert skewed.png skewed.pbm
+	./pbm_findskew/pbm_findskew skewed.pbm
+</pre>
+
+Output is something like \'0.839234\'
+Great. Now.. Use that value to fix your original
+
+<pre>
+	mogrify -rotate "-0.839234" skewed.png
+</pre>
+
+Why minus - ? 	Because pbm_findskew tells you how many degrees counter clockqise you must 
+rotate to get it straight.
+
+Check it out.
+
+<pre>
+	eog skewed.png
+</pre>
+
+<h3>Conclusion</h3>
+
+You could script this together pretty easy with perl/bash.
+I was doing this originally to prep stuff for gocr. But.. I think the quality of the rotated
+image is not as good for ocr reaing as the original!! Weird- but makes sense.
+',
+###                    link => 'http://leocharre.com/articles/how-to-deskew-an-image/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/how-to-deskew-an-image/',
+###                    postid => '107',
+###                    title => 'how to deskew an image',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'how-to-deskew-an-image'
+###                  },
+###                  {
+###                    categories => [
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20061220T10:01:12',
+###                    date_created_gmt => '20061220T18:01:12',
+###                    description => "This is a great linux command line application that lets you repair creat etc par2 file.
+
+Background: If you make massive downloads online a lot of your data can be missing. PAR2 is a 
+way of creating .. let's call them.. 'semi backup files' for those of us with lesser intelligence. (me).
+
+You maye have seen downloads for things like movies on usenet, and some of the files are all screwy. But
+still you see people saying things like 'just par2 the suckers..' and you scratch your head and .. anyway.
+
+If you got here you probably know what par2 is and you are having PROBLEMS COMPILING  on a 64bit machine!
+this is that it may look like:
+
+<pre>
+reedsolomon.cpp:54: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::SetInput(const std::vector&lt;bool, std::allocator&lt;bool&gt; &gt;&)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:54: error: template-id \x{2018}SetInput&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::SetInput(const std::vector&lt;bool, std::allocator&lt;bool&gt; &gt;&)\x{2019} does not match any template declaration
+reedsolomon.cpp:54: error: invalid function declaration
+reedsolomon.cpp:83: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::SetInput(u32)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:83: error: template-id \x{2018}SetInput&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::SetInput(u32)\x{2019} does not match any template declaration
+reedsolomon.cpp:83: error: invalid function declaration
+reedsolomon.cpp:104: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::Process(size_t, u32, const void*, u32, void*)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:104: error: template-id \x{2018}Process&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;8u, 285u, unsigned char&gt; &gt;::Process(size_t, u32, const void*, u32, void*)\x{2019} does not match any template declaration
+reedsolomon.cpp:104: error: invalid function declaration
+reedsolomon.cpp:192: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::SetInput(const std::vector&lt;bool, std::allocator&lt;bool&gt; &gt;&)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:192: error: template-id \x{2018}SetInput&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::SetInput(const std::vector&lt;bool, std::allocator&lt;bool&gt; &gt;&)\x{2019} does not match any template declaration
+reedsolomon.cpp:192: error: invalid function declaration
+reedsolomon.cpp:236: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::SetInput(u32)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:236: error: template-id \x{2018}SetInput&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::SetInput(u32)\x{2019} does not match any template declaration
+reedsolomon.cpp:236: error: invalid function declaration
+reedsolomon.cpp:270: error: explicit specialization of \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::Process(size_t, u32, const void*, u32, void*)\x{2019} must be introduced by \x{2018}template &lt;&gt;\x{2019}
+reedsolomon.cpp:270: error: template-id \x{2018}Process&lt;&gt;\x{2019} for \x{2018}bool ReedSolomon&lt;Galois&lt;16u, 69643u, short unsigned int&gt; &gt;::Process(size_t, u32, const void*, u32, void*)\x{2019} does not match any template declaration
+reedsolomon.cpp:270: error: invalid function declaration
+make[1]: *** [reedsolomon.o] Error 1
+make[1]: Leaving directory `/tmp/par2cmdline-0.4'
+make: *** [all] Error 2
+</pre>
+
+The problem is the file reedsolomon.cpp , it's got a problem when you try to compile with gcc 4.0
+
+Open up the magic tool and cure for all the problems in the univers: vim , and edit reedsolomon.cpp
+Run this command (after pressing 'Esc' and ':' (which puts you in command mode )) 
+
+	<code>:%s/^bool ReedSolomon/template <> bool ReedSolomon/g</code>
+
+save the file, run make again and it should compile
+
+
+",
+###                    link => 'http://leocharre.com/articles/installing-par2-par2cmdline-on-fedora-core-4/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => 'par2',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/installing-par2-par2cmdline-on-fedora-core-4/',
+###                    postid => '106',
+###                    title => 'installing par2 par2cmdline on fedora core 4',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'installing-par2-par2cmdline-on-fedora-core-4'
+###                  },
+###                  {
+###                    categories => [
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20060815T09:58:51',
+###                    date_created_gmt => '20060815T17:58:51',
+###                    description => '<!--start_raw-->
+<!--
+<h1>Metadata, inodes, and indexing on ext3.</h1><p>I work in a multi-os, multiple volum and multiple filesystem enviornment.</p><p>We are ann office that services clients and a lot of what we do is keep track of paperwork. </p><p>Ext3 inodes are very interesting. I\'ve done in the past is to run an indexer partially based on resource inode. That is, to index file (and directory) data for fast lookup accross a filesystem (or multiple volumes). </p><p>The are various challenges.</p><p>Users must be able to work with files.</p><p>Different users have different privileges to files.</p><p>Users are not familiar with the command line.</p><p>There are a lot of users.</p><p> </p><p>One of the tools to help here is indexing all files accross the network.</p><p>I needed to know about inodes...</p>-->
+
+<h1>inodes , ext3 </h1>
+
+<p>I wanted to index files partly based on inodes. I wanted to store metadata on files. Why work with inodes? 
+<ul><li>While users play with filenames, the system doesnt care about names. The inode is the most important thing.</li>
+<li>if you rename a file, the inode stays the same. </li>
+<li>No matter where you \'move\' the file, the inode stays the same.</li>
+<li>The inode table is recorded on that filesystem, on that volume. Inode stays the same on mount, umount.. on any machine that reads ext3.</li>
+</ul>
+<p>Possible problems.</p>
+<p>Copying a file loses all sense to the system. That is , a copy of a file is to the system - a completely different data collection- however to the user it is the same.</p>
+<p>Jane copies \'family fotos\' from disk a to disk b- In Jane\'s mind, these are the same. In the computer\'s mind, these might as well be jane\'s photos and the blue prints to the whitehouse. How do we keep metadata associated?</p>
+
+
+
+<!--end_raw-->',
+###                    link => 'http://leocharre.com/articles/linux-ext3-inode-questions/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/linux-ext3-inode-questions/',
+###                    postid => '105',
+###                    title => 'linux ext3 inode questions',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'linux-ext3-inode-questions'
+###                  },
+###                  {
+###                    categories => [
+###                                    'near life experience'
+###                                  ],
+###                    dateCreated => '20060731T02:00:43',
+###                    date_created_gmt => '20060731T10:00:43',
+###                    description => '<!--start_raw-->
+You can do whatever you want to do<br />
+     other people are *not* an obstacle.<br />
+     <br />
+      Your talent does not define your success.<br />
+     It is your perseverence and your willingness to not give up on youserself that make things happen. <br />
+     <br />
+     Other people do not set boundaries and limits on what we can and can not do.<br />
+     <br />
+      <br />
+     I can prove it.<br />
+     <br />
+ Albert Camus is a good writer. At least, I think so. And a I think a lot of other people think so as well. But how many people like his writing, or are willing to read his work?<br />
+     <br />
+     I have read and I beliebe that a writer is made by his reader.<br />
+     Thus, to be a writer, Camus must be read.<br />
+ If Camus today walked door to door and asked a person if they heard of his work, how many people would say yes? If he asked them to buy a copy of one of his work, how many would? And how many would read it? How many of those would like it, and then buy another of his works also?<br />
+     My crucial point:<br />
+     How many doors would Camus have to knock on before he found a reader- and thus become a writer?<br />
+     Ten? A hundred? A thousand? <br />
+     It could be a thousand.<br />
+     Does that make Camus a bad writer? <br />
+     Does that mean Camus should stop trying to be a writer?<br />
+     <br />
+ Music is another great example. People are very particular about music. I think Hank William Jr. is a good musician- Or so I hear, that many people like his music. If he knocked on my door, I would turn him away- I don&#39;t like his music. How many people would turn Mr William away? <br />
+      Yet, his music is famous, millions of people in the world have paid money for his music, and admire his work.<br />
+     <br />
+ If Camus and Hank William keep knocking on doors, somebody, somewhere, at some point- Will accept their work. They will give them a chance- Maybe even pay money for their efforts.<br />
+     <br />
+     <br />
+ The same things happens with mediocre talent. How many times have you eaten a meal at a fancy restaurant that you didn&#39;t like? How many times have you paid ten dollars to watch a movie and then asked yourself &#39;how the hell did this stupid movie get made? This sucked! I want my money back!&#39; <br />
+ Have you ever seen a work of art that clearly was no good? You looked at the price tag and it was selling for more then your house? And then.. Maybe.. the next day.. somebody *bought* it!!!!<br />
+     How does this happen?<br />
+     <br />
+     Because just as with good talent- Mediocrity does not define who gets a chance.<br />
+     No matter how lousy your talent is, you can get a chance.<br />
+     <br />
+     I am not a hair dresser. I have no experience cutting hair. <br />
+ If I apply for work cutting hair, is it true that no one will hire me? How many places do I have to apply to before I give up? How many places do I have to ask for employment before I tell myself &quot;nobody will hire me, I give up&quot;? Ten? A hundred? A thousand?<br />
+     It&#39;s the simple law of chance. If you keep asking, you will get what you want.<br />
+     <br />
+     <br />
+     What is your dream?<br />
+ Do you want to be a painter? Do you want to be a musician? Do you want to be a real estate agent, a teacher? Do you want to be a basketball player?<br />
+     Even if you are missing an arm, at some point- Someone will hire you to lift heavy objects if that is what you want to do. <br />
+     <br />
+     How many times will you be turned away until you give up?<br />
+     <br />
+     Who is really telling you no? <br />
+     <br />
+ The curse of the human condition is that in all truth, we are in complete control of our destiny. Whatever your dream, whatever your desire; if you don&#39;t have it, it is because you stopped giving yourself a chance.</p>
+
+<!--end_raw-->
+',
+###                    link => 'http://leocharre.com/articles/its-my-bday/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/its-my-bday/',
+###                    postid => '103',
+###                    title => 'It\'s my bday',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'its-my-bday'
+###                  },
+###                  {
+###                    categories => [
+###                                    'posix'
+###                                  ],
+###                    dateCreated => '20060618T09:53:38',
+###                    date_created_gmt => '20060618T17:53:38',
+###                    description => '<blockquote>
+ linux kernel 2.16
+ Fedora Core 4 distro
+ IBM Thinkpad 600E
+ PII 366Mhz
+ 198m memmory
+ 5.6g hd.
+</blockquote>
+ 
+The date is June 06- no, this is not a prehistory document. This is really one of my work computers.  It is sturdy, beautiful, has great review all over the net from geeks and hackers. The CD drive is bust, the battery is dead, I love it.
+  
+I spent a long time looking for a card that would work with my laptop. I found one, last night it worked. It still works. 
+ It\'s a <b>Netgear MA401RA</b>, which is different then a netgear ma401.
+  
+It works. I had to fc#x with it, but.. It\'s really something. A linux laptop with a wireless connection.
+',
+###                    link => 'http://leocharre.com/articles/netgear-ma401ra-works-with-fc4/',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/articles/netgear-ma401ra-works-with-fc4/',
+###                    postid => '104',
+###                    title => 'Netgear MA401RA works with fc4',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => 'netgear-ma401ra-works-with-fc4'
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '19991130T00:00:00',
+###                    date_created_gmt => '19991130T00:00:00',
+###                    description => 'OMFG, I just learned what xml-rpc is.. what it can do... holy cow.
+
+I was using it and I didn\'t even know what it was...
+Wow..
+This is insane, the possibilities...
+
+I was experimenting with WordPress, and its xmlrpc.php file, thinking it was just one more php thing. 
+
+I made some perl tools to automate content posting to wordpress, and then.. wow..',
+###                    link => 'http://leocharre.com/?p=51',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/?p=51',
+###                    postid => '51',
+###                    title => 'xmlrpc',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => ''
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '19991130T00:00:00',
+###                    date_created_gmt => '19991130T00:00:00',
+###                    description => '"Why have you stooped so low as to apologize to php \'hackers\' for not knowing their inferior \'language\'.
+"What\'s this about php \'developer\'- there is no such thing, bro ;-)
+php is all good and it has its place, but that place is not in the same time period as c, perl, python, ruby, java... 
+"I have no idea why you\'re talking like that- you must have a dark fetish with messing with the low arts. You must be a great programmer to be so humble in the face of the horror that is php- surely a language written by some passed out drunk unix hacker as a joke- a way to weed out mice from men."
+
+http://blog.xforward.com/?page_id=56#comment-15',
+###                    link => 'http://leocharre.com/?p=40',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/?p=40',
+###                    postid => '40',
+###                    title => 'letter to brett duncavage',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => ''
+###                  },
+###                  {
+###                    categories => [
+###                                    'Uncategorized'
+###                                  ],
+###                    dateCreated => '19991130T00:00:00',
+###                    date_created_gmt => '19991130T00:00:00',
+###                    description => '',
+###                    link => 'http://leocharre.com/?p=41',
+###                    mt_allow_comments => '1',
+###                    mt_allow_pings => '1',
+###                    mt_excerpt => '',
+###                    mt_keywords => '',
+###                    mt_text_more => '',
+###                    permaLink => 'http://leocharre.com/?p=41',
+###                    postid => '41',
+###                    title => 'What Makes for Good Content Presentation',
+###                    userid => '2',
+###                    wp_author_display_name => 'leocharre',
+###                    wp_author_id => '2',
+###                    wp_password => '',
+###                    wp_slug => ''
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'getCategories'
+
+
+### $return_value: [
+###                  {
+###                    categoryId => '4',
+###                    categoryName => 'art',
+###                    description => 'art',
+###                    htmlUrl => 'http://leocharre.com/articles/category/art/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/art/feed/'
+###                  },
+###                  {
+###                    categoryId => '6',
+###                    categoryName => 'cool linux commands',
+###                    description => 'cool linux commands',
+###                    htmlUrl => 'http://leocharre.com/articles/category/cool-linux-commands/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/cool-linux-commands/feed/'
+###                  },
+###                  {
+###                    categoryId => '5',
+###                    categoryName => 'near life experience',
+###                    description => 'near life experience',
+###                    htmlUrl => 'http://leocharre.com/articles/category/near-life-experience/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/near-life-experience/feed/'
+###                  },
+###                  {
+###                    categoryId => '2',
+###                    categoryName => 'perl',
+###                    description => 'perl',
+###                    htmlUrl => 'http://leocharre.com/articles/category/perl/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/perl/feed/'
+###                  },
+###                  {
+###                    categoryId => '3',
+###                    categoryName => 'posix',
+###                    description => 'posix',
+###                    htmlUrl => 'http://leocharre.com/articles/category/posix/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/posix/feed/'
+###                  },
+###                  {
+###                    categoryId => '1',
+###                    categoryName => 'Uncategorized',
+###                    description => 'Uncategorized',
+###                    htmlUrl => 'http://leocharre.com/articles/category/uncategorized/',
+###                    parentId => '0',
+###                    rssUrl => 'http://leocharre.com/articles/category/uncategorized/feed/'
+###                  }
+###                ]
+
+
+### --------------------------
+
+### $method_name: 'newMediaObject'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'deletePost'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getTemplate'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'setTemplate'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+
+
+### --------------------------
+
+### $method_name: 'getUsersBlogs'
+
+ERROR:faultString Bad login/pass combination.
+ERROR:faultCode 403
+
+### $return_value: undef
+

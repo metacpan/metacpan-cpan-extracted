@@ -1,0 +1,68 @@
+**** Release 0.017 *****
+
+Wednesday 3 March 1999 - Ave Wrigley <wrigley@cre.canon.co.uk>
+
+* uses HTML::TreeBuilder instead of the (depricated) HTML::Parse 
+
+* uses HTML::LinkExtor to extract links
+
+* minor documentation bugs
+
+* IGNORE_UNKNOWN option allows the robot to ignore unknown HTML tags
+
+* ACCEPT_LANGUAGE option allows the user to specify languages accepted by the
+  USER_AGENT
+
+* robot does a head request to check the MIME type of potential links, rather
+  than relying on filename extension
+
+**** Release 0.018 *****
+
+Thursday April 8 10:52:31 BST 1999
+
+* temporary filename munging changed to avoid problems on Win32
+
+**** Release 0.019 *****
+
+Tuesday April 27 10:57:08 BST 1999
+
+* regex to determine which links are HTML links changed - m{/$} added
+
+**** Release 0.020 *****
+
+Friday May  7 09:54:41 BST 1999
+
+* bug fix for javascript links (thanks to Petr Kristan <petr.kristan@epos.cz>)
+
+**** Release 0.021 *****
+
+* no longer supports $filename argument for invoke-on-contents hook
+* add-url-test hook added
+* listUrls method added
+* unshiftUrl method added
+* CHECK_MIME_TYPES attribute added
+
+**** Release 0.022 *****
+
+Thu Dec  9 11:58:36 GMT 1999
+
+* DELAY attribute added
+
+**** Release 0.024 *****
+
+Wednesday November 15 17:24:40 2006 - Konstantin Matyukhin <kmatyukhin@gmail.com>
+
+* new maintainer release
+* some ancient bugs fixed (Closes: #4209, #6233)
+
+**** Release 0.025 *****
+
+Tuesday January  9 01:29:40 2007 - Konstantin Matyukhin <kmatyukhin@gmail.com>
+
+* bug fix for memory leak (thanks to Vyacheslav Solodovnikov <s@omnicom.ru>)
+
+**** Release 0.026 *****
+
+Friday August  7 17:02:40 2009 - Konstantin Matyukhin <kmatyukhin@gmail.com>
+
+* Normaly runs with utf-8 content (Closes: 42870)

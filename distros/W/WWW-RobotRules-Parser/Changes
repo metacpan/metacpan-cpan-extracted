@@ -1,0 +1,23 @@
+Changes
+=======
+
+0.04001 - 01 Dec 2007
+  - Add Test::More to prereqs
+  - Make POD tests optional
+  - No other code changes
+
+0.04 - 15 May 2007
+  - No code change.
+  - Migrate to Module::Install
+  - Doc tweaks
+
+0.03 - 10 Jul 2006
+  - Shouldn't be cut n' pasting test code. fixed 99-pod-coverage.t
+
+0.02
+  - No code change.
+  - Add this Changes file.
+  - Add POD tests
+
+0.01 - 10 May 2006
+  - Initial release

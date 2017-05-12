@@ -1,0 +1,25 @@
+---
+abstract: 'Reads stock options values from bovespa ( with 15min lag ).'
+author:
+  - 'Hernan Lopes (hernanlopes@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Finances-Bovespa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: 0
+  Test::Simple: 0.44
+  WWW::Mechanize: 0
+  XML::XPath: 0
+version: 0.10

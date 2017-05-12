@@ -1,0 +1,397 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Connector::HttpRequestBase - internal http request base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Connector::HttpRequestBase - internal http request base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Connector::HttpRequest;</PRE>
+<PRE>
+  use base qw(Wombat::Connector::HttpRequestBase);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::HttpRequest</STRONG> and
+<STRONG>Servlet::Http::HttpServletRequest</STRONG> which can be used for most
+connectors that implement the HTTP protocol. Only connector-specific
+methods need to be implemented. Extends
+<STRONG>Wombat::Connector::RequestBase</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Connector::Http::RequestBase</STRONG>
+instance, initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAuthType"><CODE>getAuthType()</CODE></A></STRONG><BR>
+<DD>
+Return the authentication type used for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthType"><CODE>setAuthType($type)</CODE></A></STRONG><BR>
+<DD>
+Set the authentication type used for this request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24type">$type</A></STRONG><BR>
+<DD>
+the authentication type, as defined in
+<CODE>Servlet::Http::HttpServletRequest</CODE>
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContextPath"><CODE>getContextPath()</CODE></A></STRONG><BR>
+<DD>
+Return the portion of the request URI used to select the Application
+for the Request.
+<P></P>
+<DT><STRONG><A NAME="item_setContextPath"><CODE>setContextPath($path)</CODE></A></STRONG><BR>
+<DD>
+Set the context path for this Request. This will normally be called
+when the associated Application is mapping the Request to a particular
+Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24path">$path</A></STRONG><BR>
+<DD>
+the context path
+<P></P></DL>
+<DT><STRONG><A NAME="item_addCookie"><CODE>addCookie($cookie)</CODE></A></STRONG><BR>
+<DD>
+Add a Cookie to the set of Cookies for this Request. This will
+normally be called when the Connector is parsing the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24cookie">$cookie</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::Cookie</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_getCookies"><CODE>getCookies()</CODE></A></STRONG><BR>
+<DD>
+Return the set of Cookies received with this Request.
+<P></P>
+<DT><STRONG><A NAME="item_clearCookies"><CODE>clearCookies()</CODE></A></STRONG><BR>
+<DD>
+Remove all Cookies for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_getDateHeader"><CODE>getDateHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value of the named date header, or -1.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Add a value for the named request header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the parameter name
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the parameter value, scalar
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the first value for the named request header.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Return the names of all headers received for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaders"><CODE>getHeaders($name)</CODE></A></STRONG><BR>
+<DD>
+Return the list of values for the named request header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearHeaders"><CODE>clearHeaders()</CODE></A></STRONG><BR>
+<DD>
+Unset all headers for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_getMethod"><CODE>getMethod()</CODE></A></STRONG><BR>
+<DD>
+Return the HTTP request method used for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setMethod"><CODE>setMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Set the HTTP request method used for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24method">$method</A></STRONG><BR>
+<DD>
+the request method
+<P></P></DL>
+<DT><STRONG><A NAME="item_getParameter"><CODE>getParameter($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value of the named request parameter. If more than one
+value is defined, return only the first one. Extract parameters from
+the request if not already done.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_getParameterMap"><CODE>getParameterMap()</CODE></A></STRONG><BR>
+<DD>
+Return a hash of the parameters of this Request. The keys of the hash
+are the parameter names, and the values of the hash are arrays of
+parameter values. Extract parameters from the request if not already
+done.
+<P></P>
+<DT><STRONG><A NAME="item_getParameterNames"><CODE>getParameterNames()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the names of the parameters contained in
+this Request. Extract parameters from the request if not already done.
+<P></P>
+<DT><STRONG><A NAME="item_getParameterValues"><CODE>getParameterValues($name)</CODE></A></STRONG><BR>
+<DD>
+Return an array containing all of the values of the named request
+parameter. Extract parameters from the request if not already done.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_getPathInfo"><CODE>getPathInfo()</CODE></A></STRONG><BR>
+<DD>
+Return the path information for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setPathInfo"><CODE>setPathInfo($path)</CODE></A></STRONG><BR>
+<DD>
+Set the path information for this Request. This will normally be
+called when the associated Application is mapping the Request to a
+particular Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$path</STRONG><BR>
+<DD>
+the path information
+<P></P></DL>
+<DT><STRONG><A NAME="item_getPathTranslated"><CODE>getPathTranslated()</CODE></A></STRONG><BR>
+<DD>
+turn extra path information for this request, translated to a real
+path.
+<P></P>
+<DT><STRONG><A NAME="item_getQueryString"><CODE>getQueryString()</CODE></A></STRONG><BR>
+<DD>
+Return the query string for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setQueryString"><CODE>setQueryString($query)</CODE></A></STRONG><BR>
+<DD>
+Set the query string for this Request. This is normally called by the
+Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24query">$query</A></STRONG><BR>
+<DD>
+the query string
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRemoteUser"><CODE>getRemoteUser()</CODE></A></STRONG><BR>
+<DD>
+Return the name of the remote user that has been authenticated for
+this Request.
+<P></P>
+<DT><STRONG><A NAME="item_isRequestedSessionIdFromCookie"><CODE>isRequestedSessionIdFromCookie()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not the requested session ID for
+this Request came in through a cookie.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestedSessionCookie"><CODE>setRequestedSessionCookie($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not the requested session ID for this
+Request came in through a cookie. This is normally called by the
+Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequestedSessionId"><CODE>getRequestedSessionId()</CODE></A></STRONG><BR>
+<DD>
+Return the session ID included in this Request, if any.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestedSessionId"><CODE>setRequestedSessionId($id)</CODE></A></STRONG><BR>
+<DD>
+Set the requested session ID for this Request. This is normally called
+by the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24id">$id</A></STRONG><BR>
+<DD>
+the session id
+<P></P></DL>
+<DT><STRONG><A NAME="item_isRequestedSessionIdFromURL"><CODE>isRequestedSessionIdFromURL()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not the requested session ID for
+this Request came in through the request URL.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestedSessionURL"><CODE>setRequestedSessionURL($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not the requested session ID for this
+Request came in through the request URL. This is normally called by
+the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$flag</STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequestURI"><CODE>getRequestURI()</CODE></A></STRONG><BR>
+<DD>
+Return the request URI for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestURI"><CODE>setRequestURI($uri)</CODE></A></STRONG><BR>
+<DD>
+Set the unparsed request URI for this Request. This is normally called
+by the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24uri">$uri</A></STRONG><BR>
+<DD>
+the request URI
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequestURL"><CODE>getRequestURL()</CODE></A></STRONG><BR>
+<DD>
+Reconstructs the URL the client used to make the request. The returned
+URL contains a protocol, server name, port number, and server path,
+but it does no tinclude query string parameters.
+<P>This method is useful for creating redirect messages and for reporting
+errors.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getServletPath"><CODE>getServletPath()</CODE></A></STRONG><BR>
+<DD>
+Return the portion of the request URI used to select the servlet that
+will process this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setServletPath"><CODE>setServletPath($path)</CODE></A></STRONG><BR>
+<DD>
+Set the servlet path for this Request. This is normally called when
+the associated Application is mapping the Request to a particular
+Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$path</STRONG><BR>
+<DD>
+the servlet path
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession($boolean)</CODE></A></STRONG><BR>
+<DD>
+Return the Session associated with this Request, creating one if
+necessary and requested.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24create">$create</A></STRONG><BR>
+<DD>
+a flag indicating whether or not a session is to be created if one is
+needed and does not exist
+<P></P></DL>
+<DT><STRONG><A NAME="item_setSession"><CODE>setSession($session)</CODE></A></STRONG><BR>
+<DD>
+Set the internal Session associated with this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24session">$session</A></STRONG><BR>
+<DD>
+The <STRONG>Wombat::Core::Session</STRONG> to set
+<P></P></DL>
+<DT><STRONG><A NAME="item_getUserPrincipal"><CODE>getUserPrincipal()</CODE></A></STRONG><BR>
+<DD>
+Return the name of the current authenticated user.
+<P></P>
+<DT><STRONG><A NAME="item_setUserPrincipal"><CODE>setUserPrincipal($principal)</CODE></A></STRONG><BR>
+<DD>
+Set the principal that has been authenticated for this Request. This
+value is also used to calculate the value to be returned by
+<A HREF="#item_getRemoteUser"><CODE>getRemoteUser()</CODE></A>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Util::Principal</STRONG> to set
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_isRequestedSessionIdValid"><CODE>isRequestedSessionIdValid()</CODE></A></STRONG><BR>
+<DD>
+Return a boolean value indicating whether or not the requested session
+ID is still valid.
+<P></P>
+<DT><STRONG><A NAME="item_isUserInRole"><CODE>isUserInRole($role)</CODE></A></STRONG><BR>
+<DD>
+Return a boolean value indicating whether or not the authenticated
+user principal is associated with the named role.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24role">$role</A></STRONG><BR>
+<DD>
+the name of the role
+<P></P></DL>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Http/HttpServletRequest.html">the Servlet::Http::HttpServletRequest manpage</A>,
+<A HREF="../../../api/Servlet/Util/Principal.html">the Servlet::Util::Principal manpage</A>,
+<A HREF="../../../api/Wombat/HttpRequest.html">the Wombat::HttpRequest manpage</A>,
+<A HREF="../../../api/Wombat/HttpSession.html">the Wombat::HttpSession manpage</A>,
+<A HREF="../../../api/Wombat/Connector/RequestBase.html">the Wombat::Connector::RequestBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

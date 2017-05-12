@@ -1,0 +1,24 @@
+NAME
+    WWW::Tumblr::ThemeParser - Parse Tumblr custom themes
+
+SYNOPSIS
+        use WWW::Tumblr::ThemeParser;
+        my $html;
+        my $p = WWW::Tumblr::ThemeParser->new( \$html );
+        while ( my $t = $p->get_token ) {
+            # ...
+        }
+
+DESCRIPTION
+    *WWW::Tumblr::ThemeParser* is a token-based parser for Tumblr's custom
+    theme tag format. Parsing a Tumblr theme constructs a list of
+    tokens--very similar to the list of tokens provided by
+    *HTML::TokeParser*--that can be processed by the caller.
+
+AUTHOR
+    Benjamin Trott <ben@sixapart.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

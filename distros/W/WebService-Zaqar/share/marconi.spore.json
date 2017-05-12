@@ -1,0 +1,136 @@
+{
+   "methods" : {
+      "check_node_health" : {
+         "authentication" : 1,
+         "method" : "HEAD",
+         "path" : "/v1/health",
+         "expected_status" : [ 204, 503 ]
+      },
+      "claim_messages" : {
+         "authentication" : 1,
+         "method" : "POST",
+         "optional_params" : [
+            "limit"
+         ],
+         "path" : "/v1/queues/:queue_name/claims",
+         "payload" : [
+            "ttl",
+            "grace"
+         ],
+         "required_payload" : "true"
+      },
+      "create_queue" : {
+         "authentication" : 1,
+         "method" : "PUT",
+         "path" : "/v1/queues/:queue_name"
+      },
+      "delete_message" : {
+         "authentication" : 1,
+         "method" : "DELETE",
+         "optional_params" : [
+            "claim_id"
+         ],
+         "path" : "/v1/queues/:queue_name/messages/:message_id"
+      },
+      "delete_messages" : {
+         "authentication" : 1,
+         "method" : "DELETE",
+         "path" : "/v1/queues/:queue_name/messages",
+         "required_params" : [
+            "ids"
+         ]
+      },
+      "delete_queue" : {
+         "authentication" : 1,
+         "method" : "DELETE",
+         "path" : "/v1/queues/:queue_name"
+      },
+      "exists_queue" : {
+         "authentication" : 1,
+         "method" : "HEAD",
+         "path" : "/v1/queues/:queue_name",
+         "expected_status": [ 204, 404 ]
+      },
+      "get_claim" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/queues/:queue_name/claims/:claim_id"
+      },
+      "get_message" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/queues/:queue_name/messages/:message_id"
+      },
+      "get_messages" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/queues/:queue_name/messages",
+         "required_params" : [
+            "ids"
+         ]
+      },
+      "get_node_health" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/health",
+         "expected_status" : [ 204, 503 ]
+      },
+      "get_queue_metadata" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/queues/:queue_name/metadata"
+      },
+      "get_queue_stats" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1/queues/:queue_name/stats"
+      },
+      "home" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "path" : "/v1"
+      },
+      "list_messages" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "optional_params" : [
+            "marker",
+            "limit",
+            "echo",
+            "include_claimed"
+         ],
+         "path" : "/v1/queues/:queue_name/messages"
+      },
+      "list_queues" : {
+         "authentication" : 1,
+         "method" : "GET",
+         "optional_params" : [
+            "marker",
+            "limit",
+            "detailed"
+         ],
+         "path" : "/v1/queues"
+      },
+      "post_messages" : {
+         "authentication" : 1,
+         "method" : "POST",
+         "path" : "/v1/queues/:queue_name/messages"
+      },
+      "release_claim" : {
+         "authentication" : 1,
+         "method" : "DELETE",
+         "path" : "/v1/queues/:queue_name/claims/:claim_id"
+      },
+      "set_queue_metadata" : {
+         "authentication" : 1,
+         "method" : "PUT",
+         "path" : "/v1/queues/:queue_name/metadata"
+      },
+      "update_claim" : {
+         "authentication" : 1,
+         "method" : "PATCH",
+         "path" : "/v1/queues/:queue_name/claims/:claim_id"
+      }
+   },
+   "version" : "1.0"
+}

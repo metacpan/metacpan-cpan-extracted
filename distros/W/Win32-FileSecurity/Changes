@@ -1,0 +1,87 @@
+Revision history for Perl extension Win32::FileSecurity.
+
+1.09  Thu Nov 28 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+
+1.08  Wed Aug 20 2008
+	- In Get() use SIDs when the account name is not available.
+	  Also fixes http://rt.cpan.org/Ticket/Display.html?id=29557
+
+1.07  Tue Aug 19 2008
+        - Don't split account names on "\\", always pass them as-is
+	  to LookupAccountName().
+	  Fixes http://rt.cpan.org/Public/Bug/Display.html?id=14890
+	  Fixes http://rt.cpan.org/Public/Bug/Display.html?id=29867
+	  Fixes http://rt.cpan.org/Public/Bug/Display.html?id=29869
+	  Fixes http://rt.cpan.org/Public/Bug/Display.html?id=38479
+	- some whitespace and comment cleanup
+	  moved revision history from POD to Changes file
+
+1.06  Fri Jun 13 2008
+        - move sample.pl to eg/sample.pl so that it doesn't get installed
+
+1.05  Tue Apr 17 2008
+	- version 1.05 for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- added ppport.h
+	- renamed test.pl to sample.pl because it doesn't generate TAP output
+	- casts to suppress compiler warnings under Win64
+
+1.04  Mon May 22 21:14:00 2000
+	- support for building under Perl v5.6.0
+	- support for passing Unicode strings to underlying Win32 calls
+	- fixed a bug in the Set() method (could use local account
+	  instead of domain account if both were present)
+
+1.03  Fri Feb  6 20:57:24 1998
+	- updated to base version 0.67 (fixes serious bugs)
+
+1.02  Sun Dec 14 05:13:12 1997
+	- fixed uninitialized vars on unknown ACLs (fix
+	  suggested by Jutta Klebe <jmk@exc.bybyte.de>)
+	- added constants to @EXPORT list
+	- pod fixes
+
+1.01  Sat Apr  5 14:23:42 1997
+	- original version; created by h2xs 1.18
+	- imported Activeware version
+
+0.67 ALPHA 1997.07.07
+	- Kludged bug in mapping bits to separate ACE's.  Notably,
+	  this screwed up CHANGE access by leaving out a delete bit in
+	  the INHERIT_ONLY_ACE | OBJECT_INHERIT_ACE Access Control
+	  Entry.
+	- May need to rethink...
+
+0.66 ALPHA 1997.03.13
+	- Fixed bug in memory allocation check
+
+0.65 ALPHA 1997.02.25
+	- Tested with 5.003 build 303
+	- Added ISA exporter, and @EXPORT_OK
+	- Added F, FULL, R, READ, C, CHANGE as composite pre-built mask names.
+	- Added server\ to keys returned in hash from Get
+	- Made constants and MakeMask case insensitive (I don't know why I did that)
+	- Fixed mask comparison in ListDacl and Enumerate Rights from
+	  simple & mask to exact bit match ! ( ( x & y ) ^ x ) makes
+	  sure all bits in x are set in y
+	- Fixed some "wild" pointers
+
+0.60 ALPHA 1996.07.31
+	- Now suitable for file and directory permissions
+	- Included ListDacl.exe in bundle for debugging
+	- Added "intuitive" inheritance for directories, basically
+	  functions like FM triggered by presence of GENERIC_ rights
+	  this may need to change
+	- Changed from AddAccessAllowedAce to AddAce for control over inheritance
+
+0.51 ALPHA 1996.07.20
+	- Fixed memory allocation bug
+
+0.50 ALPHA 1996.07.29
+	- Base functionality
+	- Using AddAccessAllowedAce
+	- Suitable for file permissions

@@ -1,0 +1,121 @@
+1.004000 2017-01-04
+
+[ENHANCEMENTS]
+
+- This module now uses namespace::autoclean to remove imported functions from
+  the namespaces of modules.
+
+[ BUGFIXES ]
+
+- Updated API to work with the latest GeoIP2 release, which uses
+  namespace::autoclean to remove imported functions from the namespace.
+  Previously, this module relied on has() being in the namespace of the model
+  classes.
+
+[OTHER]
+
+- Updated the docs for the WebService::MinFraud::Record::BillingAddress and
+  WebService::MinFraud::Record::ShippingAddress classes' is_postal_in_city
+  method to no longer say that it is US-only
+
+
+1.003000 2016-11-21
+
+[ENHANCEMENTS]
+
+- The disposition was added to the minFraud response models. This is used to
+  return the disposition of the transaction as set by the custom rules for the
+  account.
+
+
+1.002000 2016-11-11
+
+[ENHANCEMENTS]
+
+- Added the new input /credit_card/token.
+
+
+1.001000 2016-10-10
+
+[ENHANCEMENTS]
+
+- Added the following new values to the /event/type validation:
+  password_reset and email_change.
+
+
+1.000001 2016-09-15
+
+[ OTHER ]
+
+- Remove outdated beta notice.
+
+
+1.000000 2016-09-15
+
+[ENHANCEMENTS]
+
+- Added the following new values to the /payment/processor validation:
+  concept_payments, ecomm365, orangepay, and pacnet_services.
+
+
+0.004000 2016-06-08
+
+[BREAKING CHANGE]
+
+- credits_remaining has been removed from the web service models and has been
+  replaced by queries_remaining.
+
+[ENHANCEMENTS]
+
+- Added queries_remaining and funds_remaining. Note that funds_remaining
+  will not be returned by the web service until our new  credit system is in
+  place.
+- Added device confidence and last_seen to minFraud Insights
+
+
+0.003000 2016-05-23
+
+[ENHANCEMENTS]
+
+- Added support for the minFraud Factors.
+- Added IP address risk to the minFraud Score model.
+- Added the following new values to the /payment/processor validation:
+  ccnow, dalpay, epay (replaces epayeu), payplus, pinpayments, quickpay, and
+  verepay.
+
+[ BUGFIXES ]
+
+- Setting the locales on the client now sets the locales in the model objects
+  as documented
+- An WebService::MinFraud::Error::IPAddressNotFound is no longer erroneously
+  thrown if a 404 is received.
+- Some bugs in the HTTP error status handling were fixed.
+- When validating a request body, this module no longer validates the TLD on
+  domains to prevent false errors due to new gTLDs.
+
+[ OTHER ]
+
+- Added tests for WebService::MinFraud::Client that uses mocked user agent.
+
+
+0.002000 2016-01-21
+
+- The warning "input" has been restructured to be "input_pointer"
+- brand and type added to credit_card
+- device id added
+- email is_free and is_high_risk added
+
+
+0.001003 2015-08-03
+
+- Remove trivial hash values from the request for stricter validation
+
+
+0.001002 2015-06-30
+
+- Improve POD
+
+
+0.001001 2015-06-29
+
+- First release

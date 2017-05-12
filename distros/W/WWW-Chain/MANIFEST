@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+lib/WWW/Chain.pm
+lib/WWW/Chain/UA.pm
+lib/WWW/Chain/UA/LWP.pm
+t/00-load.t
+t/10-base.t
+t/20-lwp.t
+t/30-methods.t
+t/release-pod-syntax.t

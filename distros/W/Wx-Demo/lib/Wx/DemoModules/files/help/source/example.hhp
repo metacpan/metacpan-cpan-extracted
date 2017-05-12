@@ -1,0 +1,32 @@
+[OPTIONS]
+Compatibility=1.1
+Full-text search=Yes
+Contents file=example.hhc
+Compiled file=example.chm
+Default Window=manuaHelp
+Default topic=contents.html
+Index file=example.hhk
+Title=wxPerl demo Online Help example
+
+[WINDOWS]
+manuaHelp=,"example.hhc","example.hhk","contents.html",,,,,,0x2420,,0x380e,,,,,0,,,
+
+[FILES]
+contents.html
+topic1.html
+topic2.html
+topic3.html
+
+[ALIAS]
+IDH_Contents=contents.html
+IDH_Petrarca=topic1.html
+IDH_Tolkien=topic2.html
+IDH_Verlaine=topic2.html
+IDH_Orazio=topic3.html
+
+[MAP]
+#define IDH_Contents  50
+#define IDH_Petrarca 100
+#define IDH_Tolkien  200
+#define IDH_Verlaine 250
+#define IDH_Orazio   300

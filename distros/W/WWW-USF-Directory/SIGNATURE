@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd32074586ac2a188a57d5ee5f27bdd06d4c9e43 Build.PL
+SHA1 15b355091a2af488d0149270bde655996bc6e412 Changes
+SHA1 a809c6971c66430d9e95ae5adb7d2ca76fa5b875 LICENSE
+SHA1 8edeb63391f9a653c293da18a515e3a937b315b2 MANIFEST
+SHA1 e9a1c1e9dc2316f112d55cb5ceed939942ba1a96 META.json
+SHA1 739a0261cad77d30a941d79cb9606cf764f79333 META.yml
+SHA1 2d0d0912c0bef16c9bddea6c18a1e14edc933001 README
+SHA1 a6d1f01921d9c882cff424192a0fc72978c83afd ex/directory_repeater.pl
+SHA1 25b3437e12fd85acb778d7395a0a5ddc41fed6b5 ex/email_autocomplete.pl
+SHA1 f46009c413f82b4c5415d457703d157791c740f0 lib/WWW/USF/Directory.pm
+SHA1 bcbeac0e0ed2eec5f31e742524af054ea2b57964 lib/WWW/USF/Directory/Entry.pm
+SHA1 f58e7309377be58c9591d01f985518292a9d0fb7 lib/WWW/USF/Directory/Entry/Affiliation.pm
+SHA1 db52ac48f74450a5182786ae947453885a3690f2 lib/WWW/USF/Directory/Exception.pm
+SHA1 c445cbd8662cdc7cca9604772e289110d13f0133 lib/WWW/USF/Directory/Exception/MethodArguments.pm
+SHA1 77d309e63abb88e6cdd5eaf225978b5aed6a431d lib/WWW/USF/Directory/Exception/TooManyResults.pm
+SHA1 43e8e11c679376f98252eb005f9dd08280c747be lib/WWW/USF/Directory/Exception/UnknownResponse.pm
+SHA1 99d88162c03d62e61a7db3db882615c4d1132325 t/00-load.t
+SHA1 18dcaea527124ed223eb3156db5a8e1cc3d05439 t/basic.t
+SHA1 dc6ded63e4a84fcc4570eeca78b64d5341684b96 t/lib/MyUA.pm
+SHA1 d465430623af680548a2e8c5aec42c125533d37d xt/clean-namespaces.t
+SHA1 f701560286900e876821fda0db2e21c213aee99a xt/consistent-version.t
+SHA1 2aaf167872d38ca99f36a928080dc1e7e84592ff xt/critic-examples.t
+SHA1 dd6e273cf2fd60fa661a98415b19843709948d77 xt/critic.t
+SHA1 76a22d8dfebe19b13619e729b8827d13e83d9cb1 xt/eol.t
+SHA1 287f1d31206aa4eb3bce3c973ae541edeb5d126e xt/kwalitee.t
+SHA1 1d0e50663da754f4bc6619890c2d55a35c2dd70a xt/manifest.t
+SHA1 f22334dd22710591fc7aaa7a2b0fbe3ae7f36cc4 xt/perl-version.t
+SHA1 6eb6567b702ed4697c450d19cb9258fd0ff69311 xt/perlcriticrc
+SHA1 ac0c15a880b4b917fe91f439c117d31075e15888 xt/pod-coverage.t
+SHA1 41a6575381e5b576e320c27fa2f36e22c1232cc7 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOomP/AAoJEGN8PvITkwmb8ecP/iiQiqXpMiX1RAGCTgD1q/fV
+I0K3pXXAyIRRYDcqmH4vNYRGEFw/xnEj7rY+uC0I+d12hHcsDyQbZ412J6c/QgGR
+HTHxjf89V5W3c0rNzZAf6blHHJ3/K39VkL6c8/v1OWTkPXKNrIKf87aZ8K6r/rJf
+GzfCAhS6MCR2BZJr9eWDRniWMH8tLTrl05r4N/0Mkn/IWtzgcBftRHzLhmMZRyb7
+zh3UYQxoPnj+IHhR59+U1AFF9lj+ldDDLcewLEnUZ9+WlT77Ckb4/S3S/RxXt38E
+zHIp5QpXiIGqHcVR2YwBlzhUsNuiAmgXxBiywgVNqKIPxbmsmrfPkxo6wMiTjydr
+Dh3oKJMqS/QnhKITQ73iqWxl/C4DWW9Q/rV2nEoTiONnuUtivvCJU0dqPS3b7DCN
+3opK6t1QTpHeHMrQPMeLFQ96znTJkSZ7XdekKBpIV40cWNGvgpM4btGma+fMDU+H
+DJGLZU+MK5GOyclszdmYnL8TdBRpvo44Zk34k/tQ5Sy48MtbPgb5imNDU7yczeNy
+y6t1u347iN3wW+45/WabQqUeAo74G4rAJ2enXswv28rHXUVmq1KbK5DbwiSbqqZw
+q8Wpnv+LPuvXgo5awdJPuLMTgcZjQXdsMd6wxGvpLG2fgctHw/RCq67jv1zz/bea
+QDyp4waTJpnIa2181PQT
+=bUzU
+-----END PGP SIGNATURE-----

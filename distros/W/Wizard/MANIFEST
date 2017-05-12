@@ -1,0 +1,53 @@
+MANIFEST			This file
+MANIFEST.SKIP
+Makefile.PL			Makefile generator
+lib/Wizard.pm			Main Wizard module
+lib/Wizard/Elem/BR/HTML.pm
+lib/Wizard/Elem/BR/Shell.pm
+lib/Wizard/Elem/Data/HTML.pm
+lib/Wizard/Elem/Data/Shell.pm
+lib/Wizard/Elem/HTML.pm
+lib/Wizard/Elem/Shell.pm
+lib/Wizard/Elem/Select/HTML.pm
+lib/Wizard/Elem/Select/Shell.pm
+lib/Wizard/Elem/Submit/HTML.pm
+lib/Wizard/Elem/Submit/Shell.pm
+lib/Wizard/Elem/Text/HTML.pm
+lib/Wizard/Elem/Text/Shell.pm
+lib/Wizard/Elem/TextArea/HTML.pm
+lib/Wizard/Elem/TextArea/Shell.pm
+lib/Wizard/Elem/Title/HTML.pm
+lib/Wizard/Elem/Title/Shell.pm
+lib/Wizard/Elem/Link/HTML.pm
+lib/Wizard/Elem/Link/Shell.pm
+lib/Wizard/Elem/CheckBox/HTML.pm
+lib/Wizard/Elem/CheckBox/Shell.pm
+lib/Wizard/Examples.pm
+lib/Wizard/Examples/ISDN.pm
+lib/Wizard/Examples/ISDN/Settings.pm
+lib/Wizard/Examples/Apache.pm
+lib/Wizard/Examples/Apache.pod
+lib/Wizard/Examples/Apache/Admin.pm
+lib/Wizard/Examples/Apache/Host.pm
+lib/Wizard/Examples/Apache/Host.pod
+lib/Wizard/Examples/Apache/Server.pm
+lib/Wizard/Examples/Apache/Server.pod
+lib/Wizard/Examples/Apache/VirtualServer.pm
+lib/Wizard/Examples/Apache/VirtualServer.pod
+lib/Wizard/Examples/Apache/Directory.pm
+lib/Wizard/Examples/Apache/Directory.pod
+lib/Wizard/Form.pm
+lib/Wizard/Form/HTML.pm
+lib/Wizard/Form/Shell.pm
+lib/Wizard/SaveAble.pm
+lib/Wizard/SaveAble/ShellVars.pm
+lib/Wizard/Shell.pm		Wizard subclass running in a shell
+lib/Wizard/HTML.pm		Wizard subclass running in a web browser
+lib/Wizard/State.pm
+lib/HTML/EP/Wizard.pm
+wizard.PL			Generic wizard front-end
+wizard.ep			HTML::EP based wizard front-end
+gethelp.ep			
+apacheAdmin.PL
+wwwAdmin.pod			
+t/base.t

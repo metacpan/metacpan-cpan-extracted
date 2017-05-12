@@ -1,0 +1,7 @@
+TYPEMAP
+struct wpa_ctrl*	T_WPA_CTRL_WRAPPER
+
+INPUT
+
+T_WPA_CTRL_WRAPPER
+	$var = perl_wpa_ctrl_get_wpa_ctrl_ptr_from_sv($arg);

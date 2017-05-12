@@ -1,0 +1,12 @@
+ChangeLog
+MANIFEST
+LICENSE
+lib/WebDyne/Request/FastCGI/Run.pm
+lib/WebDyne/Request/FastCGI/Static.pm
+lib/WebDyne/Request/FastCGI/Constant.pm
+lib/WebDyne/Request/FastCGI.pm
+bin/wdfastcgi
+t/00-load.t
+Makefile.PL
+README
+META.yml                                 Module meta-data (added by MakeMaker)

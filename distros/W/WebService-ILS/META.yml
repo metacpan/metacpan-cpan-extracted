@@ -1,0 +1,67 @@
+---
+abstract: 'Standardised library discovery/circulation services'
+author:
+  - 'Srdjan Janković <srdjan@catalyst.net.nz>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-ILS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::ILS:
+    file: lib/WebService/ILS.pm
+    version: '0.11'
+  WebService::ILS::JSON:
+    file: lib/WebService/ILS/JSON.pm
+  WebService::ILS::OneClickDigital:
+    file: lib/WebService/ILS/OneClickDigital.pm
+  WebService::ILS::OneClickDigital::Partner:
+    file: lib/WebService/ILS/OneClickDigital/Partner.pm
+  WebService::ILS::OneClickDigital::PartnerBase:
+    file: lib/WebService/ILS/OneClickDigital/PartnerBase.pm
+  WebService::ILS::OneClickDigital::PartnerPatron:
+    file: lib/WebService/ILS/OneClickDigital/PartnerPatron.pm
+  WebService::ILS::OneClickDigital::Patron:
+    file: lib/WebService/ILS/OneClickDigital/Patron.pm
+  WebService::ILS::OverDrive:
+    file: lib/WebService/ILS/OverDrive.pm
+  WebService::ILS::OverDrive::Library:
+    file: lib/WebService/ILS/OverDrive/Library.pm
+  WebService::ILS::OverDrive::Patron:
+    file: lib/WebService/ILS/OverDrive/Patron.pm
+  WebService::ILS::XML:
+    file: lib/WebService/ILS/XML.pm
+recommends:
+  XML::LibXML: '0'
+requires:
+  Class::Tiny: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  Hash::Merge: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Modern::Perl: '0'
+  Params::Check: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  repository: git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,20 @@
+---
+abstract: 'IP Rental API'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-IPRental
+requires:
+  SOAP::Lite: 0
+  XML::Simple: 0
+resources:
+  repository: git://github.com/fayland/perl-WebService-IPRental.git
+version: 0.02

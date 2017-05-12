@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<WGXMenu name='M'>
+		<Button name='A' text='&amp;A'>
+			<Item text='One'/>
+			<Item text='Two'>
+				<Item text='alpha' onClick='sub { $_[0]->Height(200); }'/>
+				<Item name='beta' text='beta' checked='1' onClick='sub { $self->{beta}->Checked(not $self->{beta}->Checked); }'/>
+			</Item>
+			<Item text='Three'/>
+			<Button name='Four' text='Four'>
+				<Item text='A'/>
+				<Item text='B'/>
+				<Button text='C'>
+					<Item text='1'/>
+					<Item text='2'/>
+					<Item text='3'/>
+				</Button>
+			</Button>
+			<Item separator='1'/>
+			<Item name='Five' text='Five' checked='1' onClick='sub { $self->{Five}->Checked(not $self->{Five}->Checked); }'/>
+			<Item text='Six'/>
+		</Button>
+		<Item name='B' text='&amp;B'>
+			<Item text='One'/>
+			<Item separator='1'/>
+			<Item text='Two'/>
+			<Button text='Three'>
+				<Item text='A'/>
+				<Item text='B'/>
+				<Button text='C'>
+					<Item text='1'/>
+					<Button text='2'>
+						<Item text='A'/>
+						<Item text='B'/>
+						<Button text='C'>
+							<Item text='1'/>
+							<Item text='2'/>
+							<Item text='3'/>
+						</Button>
+					</Button>
+					<Item text='3'/>
+				</Button>
+			</Button>
+			<Item text='Four'/>
+			<Item text='Five'/>
+		</Item>
+	</WGXMenu>
+	<Window
+		name='W'
+		left='200' top='200' width='250' height='100'
+		class='$self->{C}'
+		menu='$self->{M}'
+		title='Menus - example'
+	>
+		<Label
+			align='center'
+			text='click here'
+			onClick='sub {
+				my ($x, $y) = Win32::GUI::GetCursorPos();
+				$self->{W}->TrackPopupMenu($self->{Four}, $x, $y);
+			}'
+		/>
+	</Window>
+</GUI>
+

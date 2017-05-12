@@ -1,0 +1,336 @@
+NAME
+    "Win32::Security::NamedObject" - Security manipulation for named objects
+
+SYNOPSIS
+            use Win32::Security::NamedObject;
+
+            my $noFoo = Win32::Security::NamedObject->('FILE', "C:\\Foo\\foo.txt");
+            my $dacl = $noFoo->dacl();
+            print $dacl->dump();
+
+DESCRIPTION
+    This module provide an object-oriented interface for manipulating
+    security information on named objects (i.e. files, registry keys, etc.).
+    Note that, like the rest of "Win32-Security", it currently only provides
+    support for files. It has been architected to eventually support all
+    object types supported by the "GetNamedSecurityInfo" Win32 API call.
+    Also, it currently only supports access to the DACL and Owner
+    information - SACL access will come later.
+
+  Installation instructions
+    "Win32::Security::NamedObject" installs as part of "Win32-Security" and
+    depends upon the other modules in the distribution. There are three
+    options for installing this distribution:
+
+    *   Using "Module::Build 0.24" or later:
+
+          Build.PL
+          perl build test
+          perl build install
+
+        See "TESTING" for more information about enabling the more extensive
+        test suite.
+
+    *   Using the PPM (the file has the extension ".ppm.zip") on CPAN and
+        installing under ActivePerl for Win32 by unzipping the ".ppm.zip"
+        file and then:
+
+          ppm install Win32-Security.ppd
+
+    *   Installing manually by copying the "*.pm" files in
+        "lib\Win32\Security" to "Perl\site\lib\Win32\Security" and the
+        "*.pl" files in "script" to "Perl\bin".
+
+  Dependencies
+    The suite of "Win32-Security" modules depends upon:
+
+    "Class::Prototyped" 0.98 or later
+        Support for prototype-based programming in Perl.
+        "Win32::Security::ACE" uses this to programmatically generate large
+        number of classes that use multiple-inheritance.
+        "Win32::Security::ACL" and "Win32::Security::NamedObject" use this
+        to support programmatic generation of classes that interact with the
+        "Win32::Security::ACE" classes. "Win32::Security::Recursor" uses
+        this to allow for flexible behavior modification (since
+        "Win32::Security::Recursor" objects are really behavioral, not
+        stateful).
+
+    "Data::BitMask" 0.13 or later
+        Flexible support for manipulating masks and constants.
+
+    "Win32::API"
+        Support for making arbitrary Win32 API calls from Perl. There is no
+        C code anywhere in "Win32-Security". "Win32::API" is why.
+
+    All of the above modules should be available on CPAN, and also via PPM.
+
+"Win32-Security" MODULES
+  "Win32::Security::SID"
+    "Win32::Security::SID" provides a set of functions for doing SID
+    manipulation (binary to text and vice-versa) as well as wrappers around
+    "Win32::LookupAccountName" and "Win32::LookupAccountSID" that make them
+    friendlier.
+
+  "Win32::Security::Raw"
+    "Win32::Security::Raw" provides a number of function wrappers around a
+    number of Win32 API calls. Each wrapper wraps around a single Win32 API
+    call and provides rudimentary data structure marshalling and parsing.
+    This is the only module that uses "Win32::API" to make API calls - all
+    of the other modules make their API calls through the wrappers provided
+    by this module.
+
+  "Win32::Security::ACE"
+    "Win32::Security::ACE" provides an object-oriented interface for
+    parsing, creating, and manipulating Access Control Entries (ACEs).
+
+  "Win32::Security::ACL"
+    "Win32::Security::ACE" provides an object-oriented interface for
+    manipulating Access Control Lists (ACLs).
+
+  "Win32::Security::NamedObject"
+    "Win32::Security::NamedObject" provides support for accessing and
+    modifying the security information attached to Named Objects.
+
+  "Win32::Security::Recursor"
+    "Win32::Security::Recursor" provides support for recursing through trees
+    of Named Objects and inspecting and/or modifying the security settings
+    for those objects.
+
+"Win32-Security" SCRIPTS
+    Provided for your use are a few utilities that make use of the above
+    modules. These scripts were the raison d'etre for the modules, and so it
+    seemed justifiable to ship them with it. The scripts should be
+    automatically installed to "Perl\bin", so if "perl.exe" is in your path,
+    these scripts should be in your path as well (i.e. you should be able to
+    type ""PermDump.pl -h"" at the command prompt). The scripts have
+    documentation (use the "-h" option), but here is a quick overview of
+    them so that you don't overlook them.
+
+  "PermDump.pl"
+    This utility dumps permissions on files. It supports distinguishing
+    between inherited and explicit permissions along with determining when
+    there are problems with inherited permissions. It has a number of
+    options, and it's designed to output in either TDF or CSV format for
+    easy parsing and viewing.
+
+    I would personally recommend that all system administrators set up a
+    nightly task to dump all the permissions on shared server volumes to a
+    text file. This makes it easy to recover should you make a mistake while
+    doing permissions manipulation, and it also gives you a searchable file
+    for looking for permissions without waiting for the script to dump
+    permissions. While the script is very fast and generally scans several
+    hundred files per second, if you have a volume with hundreds of
+    thousands of files, it can still take a while to run. Such a command
+    line might look like:
+
+      PermDump.pl -c -r D:\Shared > D:\Shared_Perms.csv
+
+    or, if you want the paths to be relative:
+
+      D: && cd D:\Shared && PermDump.pl -c -r . > D:\Shared_Perms.csv
+
+  "PermFix.pl"
+    WARNING: This utility is in beta. It has not undergone extensive testing
+    yet, and the test suite for this script is still under development. I
+    strongly encourage users to use "PermDump.pl" to take a snapshot of the
+    existing permissions before using this script in case there are
+    problems, and to examine the resulting permissions closely for signs of
+    error.
+
+    This utility is designed to do one simple task: fix problems with
+    inherited permissions resulting from files and/or folders being moved
+    between two folders on the same volume that have differing inheritable
+    permissions.
+
+  "PermChg.pl"
+    WARNING: This utility is in beta. It has not undergone extensive testing
+    yet, and the test suite for this script is still under development. I
+    strongly encourage users to use "PermDump.pl" to take a snapshot of the
+    existing permissions before using this script in case there are
+    problems, and to examine the resulting permissions closely for signs of
+    error.
+
+    NOTES: The owner modification support in the script is not yet finished.
+    Also, the "-file" option has not had very extensive testing.
+
+    This utility is the counterpart to "PermDump.pl". It allows you to
+    change the permissions. Unlike "X?CACLS.EXE", this utility properly
+    understands and interacts with inherited permissions. It supports two
+    modes for specifying permissions. The first allows you to specify
+    permissions using the command line much like "X?CACLS.EXE". The second
+    allows you to pass the permissions in a text file using the same format
+    as is outputted by "PermDump.pl".
+
+    Say you get a call from an executive insisting that Jane be given access
+    to everything that John currently has access to. The first step is to
+    make Jane a member of all of the groups that John is in, but that
+    doesn't address explicitly assigned permissions. To deal with that, dump
+    all the permissions on the volume using "PermDump.pl". Open the file up
+    in Excel and sort on the Trustee. Copy the lines for John into another
+    spreadsheet and replace the Trustee name with Jane's. Then pass that
+    into "PermChg.pl" with the "-file" option and you're done!
+
+TESTING
+    For a set of modules like Win32-Security that are intended to interact
+    with permissions, the only way to really test them is to have them
+    interact with real permissions. Unfortunately, the only viable to do
+    that is to modify a live filesystem and see what happens. However, I
+    felt uncomfortable running such tests as part of a default test suite,
+    so I have disabled them by default.
+
+    The tests in question are in the "t\extended.t" and "t\scripts.t" files.
+    They create a single directory in "%TEMP%" named
+    "Win32-Security_TestDir_$$" (where $$ is the process ID>. They create
+    directories and files in that test directory and apply permissions to
+    them. The tests require "CACLS.EXE" (which should be present on all
+    Windows 2000/XP/2003 installs) and that a usable version of "perl.exe"
+    be in the path.
+
+    The tests take a while to run (five minutes on my 1.8 GHz machine)
+    because they are very extensive (7500+ tests in "extended.t" alone), but
+    I strongly urge you to consider running them and reporting any errors.
+
+    To enable them, open "t\extended.t" and "t\scripts.t" and change line 11
+    in each to read ""$enabled = 1;"". I strongly encourage testing using
+    every OS you plan to use the modules with, and using both privileged and
+    non-privileged accounts.
+
+ARCHITECTURE
+    "Win32::Security::NamedObject" uses the same class architecture as
+    "Win32::Security::ACL". Unlike "Win32::Security::ACE" and
+    "Win32::Security::ACL", it doesn't use the flyweight design pattern.
+    (For obvious reasons - you're unlikely to create multiple
+    "Win32::Security::NamedObject" objects for the same thing!)
+
+Method Reference
+  "new"
+    This creates a new "Win32::Security::NamedObject" object.
+
+    The various calling forms are:
+
+    * "Win32::Security::NamedObject->new($objectType, $objectName)"
+    * ""Win32::Security::NamedObject::$objectType"->new($objectName)"
+
+    Note that when using $objectType in the package name, the value needs to
+    be canonicalized (i.e. "SE_FILE_OBJECT", not the shortcut "FILE"). If
+    the $objectType has already been canonicalized, improved performance can
+    be realized by making the call on the fully-qualified package name and
+    thus avoiding the call to redo the canonicalization. Aliases are
+    permitted when $objectName is passed as a parameter.
+
+    The currently permitted objectName formats (text copied from
+    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/securit
+    y/security/se_object_type.asp ) are:
+
+    "SE_FILE_OBJECT"
+        Indicates a file or directory. The name string that identifies a
+        file or directory object can be:
+
+        *   A relative path, such as "abc.dat" or "..\\abc.dat"
+
+        *   An absolute path, such as "\\abc.dat", "c:\\dir1\\abc.dat", or
+            "g:\\remote_dir\\abc.dat"
+
+        *   A UNC name, such as "\\\\computer_name\\share_name\\abc.dat"
+
+        *   A local file system root, such as "\\\\\\\\.\\\\c:". Security
+            set on a file system root does not persist when the system is
+            restarted
+
+    "SE_REGISTRY_KEY"
+        Indicates a registry key. A registry key object can be in the local
+        registry, such as "CLASSES_ROOT\\some_path"; or in a remote
+        registry, such as "\\\\computer_name\\CLASSES_ROOT\\some_path". The
+        names of registry keys must use the following literal strings to
+        identify the predefined registry keys: "CLASSES_ROOT",
+        "CURRENT_USER", "MACHINE", and "USERS".
+
+        In addition, the following literal strings will be mapped to the
+        legal literals:
+
+        *   "HKEY_CLASSES_ROOT" -> "CLASSES_ROOT"
+
+        *   "HKEY_CURRENT_USER" -> "CURRENT_USER"
+
+        *   "HKEY_LOCAL_MACHINE" -> "MACHINE"
+
+        *   "HKEY_USERS" -> "USERS"
+
+  "dbmObjectType"
+    Returns the "Data::BitMask" object for interacting with Object Types
+
+    See "Win32::Security::ACE->dbmObjectType()" for more explanation.
+
+  "objectType"
+    Returns the type of object to which the ACE is or should be attached.
+
+  "objectName"
+    Returns the name of the object.
+
+  "dacl"
+    Gets or sets the DACL for the object. If no parameters are passed, it
+    reads the DACL for the object and returns a "Win32::Security::ACL" class
+    object. To set the DACL, pass the desired "Win32::Security::ACL" for the
+    object and an optional "SECURITY_INFORMATION" mask for specifying the
+    bits "UNPROTECTED_DACL_SECURITY_INFORMATION" or
+    "PROTECTED_DACL_SECURITY_INFORMATION". If the
+    "UNPROTECTED_DACL_SECURITY_INFORMATION" is set, then permissions are
+    inherited. If "PROTECTED_DACL_SECURITY_INFORMATION" is set, then
+    permissions are NOT inherited (i.e. inheritance is blocked). If neither
+    is set, then the existing setting is maintained.
+
+    Be forewarned that when setting the DACL, under Windows 2000 and more
+    recent OSes, the call to "SetNamedSecurityInfo" results in the automatic
+    propagation of inheritable ACEs to existing child objects (see
+    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/securit
+    y/securi ty/setnamedsecurityinfo.asp for more information). This does
+    not happen under Windows NT, and if you need propagation of inheritable
+    permissions under Windows NT, you need to write your own code to
+    implement that. Under OSes that support automatic propagation, the call
+    to set a DACL can take a very long time to return if there are a lot of
+    child objects! Finally, any errors in the inherited DACLs buried in the
+    tree will be automatically fixed by this call, constrained by the
+    privileges of the account executing the code.
+
+    When setting the DACL under Windows 2000 and more recent OSes, if
+    "UNPROTECTED_DACL_SECURITY_INFORMATION" is specified, or if the
+    "SECURITY_INFORMATION" mask is unspecified and the object is currently
+    inheriting permissions, then any ACEs in the passed DACL that have the
+    "INHERITED_ACE" bit set in "aceFlags" are automatically ignored. The OS
+    will automatically propagate the inheritable ACEs and will only
+    explicitly set those ACEs in the passed DACL that do not have the
+    "INHERITED_ACE" bit set in "aceFlags".
+
+    If "PROTECTED_DACL_SECURITY_INFORMATION" is specified, or if the
+    "SECURITY_INFORMATION" mask is unspecified and the object is currently
+    blocking inherited permissions, than the "INHERITED_ACE" bit in
+    "aceFlags" for all ACEs in the passed DACL is automatically cleared.
+    That is to say, all passed ACEs are treated as explicit, independent of
+    the "INHERITED_ACE" bit in "aceFlags".
+
+  "ownerTrustee"
+    Gets or sets the Trustee for the Owner of the object. If no parameters
+    are passed, it reads the Owner for the object and returns a Trustee
+    name. To set the Owner, pass the desired Trustee. It calls "ownerSid",
+    so see that method for information on "SeRestorePrivilege".
+
+  "ownerSid"
+    Gets or sets the binary SID for the Owner of the object. If no
+    parameters are passed, it reads the Owner for the object and returns a
+    binary SID. To set the Owner, pass the desired binary SID. The first
+    time this is called in set mode, it will attempt to enable the
+    "SeRestorePrivilege", which permits setting the Owner of an object to
+    anyone. If this fails, the call will "croak".
+
+  "control"
+    Returns the "Data::BitMask::break_mask" form of the Security Descriptor
+    Control (i.e. a hash containing all matching constants for the control
+    mask of the SD).
+
+  "fixDacl"
+    Fixes the inherited ACEs in the DACL. See the caveats concerning setting
+    DACLS using "dacl" for further information.
+
+AUTHOR
+    Toby Ovod-Everett, toby@ovod-everett.org
+

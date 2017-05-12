@@ -1,0 +1,64 @@
+Revision history for WWW-Scraper-ISBN-TheNile_Driver
+====================================================
+
+0.14    2014-12-10
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.13    2014-07-31
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - removed conversion tests.
+        - extended test suite.
+
+0.12    2013-09-22
+        - added git repository links to metadata.
+        - updated pattern matching due to page layout changes.
+
+0.11    2013-03-17
+        - added isbn-check.pl to examples.
+        - change file dates changed to meet W3CDTF standards.
+        - META updates.
+        - updated test suite.
+
+0.10    2012-05-13
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.09    2011-05-06
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - added conversion routines due to problems with ISBN10 searches.
+
+0.08    2011-02-14
+        - updated test due to data change.
+
+0.07    2010-11-29
+        - amended pingtest() in network tests.
+        - added further skip test if test books are withdrawn from the site.
+        - image path update.
+
+0.06    2010-10-06
+        - fixed skip count.
+        - provided alternate ping test methods.
+        - fixes due to changes in page layout.
+
+0.05    2010-09-15
+        - further refinement of tests.
+
+0.04    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.03    2010-08-10
+        - added better protection from network failures.
+        - updated prerequisite requirements.
+
+0.02    2010-08-02
+        - added connection protection if client or server offline.
+        - documentation updates.
+
+0.01    2010-07-30
+        - initial release

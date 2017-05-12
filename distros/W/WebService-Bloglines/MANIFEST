@@ -1,0 +1,12 @@
+Changes
+lib/WebService/Bloglines.pm
+lib/WebService/Bloglines/Entries.pm
+lib/WebService/Bloglines/Subscriptions.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/01_notifier.t
+t/02_listsubs.t
+t/03_getitems.t

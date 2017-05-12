@@ -1,0 +1,20 @@
+ARTISTIC
+Changes
+Copying
+example/Man
+example/W
+example/wedit
+example/Wname
+lib/Wily.pm
+lib/Wily/Connect.pm
+lib/Wily/Message.pm
+lib/Wily/RPC.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/0-signature.t
+t/Message.t
+t/Wily.t
+SIGNATURE
+META.yml                                 Module meta-data (added by MakeMaker)

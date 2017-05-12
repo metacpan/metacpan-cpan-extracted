@@ -1,0 +1,26 @@
+---
+abstract: 'A client API For Hosting Partners '
+author:
+  - 'SymKat I<<symkat@symkat.com>>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-CloudFlare-Host
+no_index:
+  directory:
+    - inc
+requires:
+  Data::Dumper: 0
+  LWP: 0
+  Moose: 0
+  Try::Tiny: 0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 000100

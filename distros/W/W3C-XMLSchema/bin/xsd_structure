@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# PODNAME: xsd_structure
+# ABSTRACT: Structure information from an XSD (XML Schema Definition) file
+
+use W3C::XMLSchema;
+
+my $xsd=W3C::XMLSchema->new( file => shift );
+print "Target namespace: " . $xsd->target_namespace . "\n";
+
+print "\nAttribute model groups:\n";
+print "-" x 20, "\n";
+foreach my $attr_group ( @{ $xsd->attribute_groups } ) {
+    print $attr_group->name . "\n";
+#    foreach my $attr ( @{ $attr_group->attributes } ) {
+#        print "\t" . $attr->name . " (" . $attr->type . ") " . ( $attr->use eq 'required' ? '*' : '-' ) . "\n";
+#    }
+}
+
+print "\nModel groups:\n";
+print "-" x 20, "\n";
+foreach my $group ( @{ $xsd->groups } ) {
+    print $group->name . "\n";
+#    foreach my $attr ( @{ $attr_group->attributes } ) {
+#        print "\t" . $attr->name . " (" . $attr->type . ") " . ( $attr->use eq 'required' ? '*' : '-' ) . "\n";
+#    }
+}
+
+print "-" x 20, "\n";
+print "Dump finished.\n";
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+xsd_structure - Structure information from an XSD (XML Schema Definition) file
+
+=head1 VERSION
+
+version 0.0.4
+
+=head1 AUTHOR
+
+Robin Smidsrød <robin@smidsrod.no>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Robin Smidsrød.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

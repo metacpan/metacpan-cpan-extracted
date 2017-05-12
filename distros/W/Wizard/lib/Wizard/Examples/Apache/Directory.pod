@@ -1,0 +1,61 @@
+=pod
+
+=head1 Directory Menu
+
+Hier werden die Verzeichnisse der virtuellen Webserver administriert.
+
+=head2 Attribute eines Directory.
+
+=over 4
+
+=item I<apache_directory_pathname> Directory pathname
+
+Eindeutiger Pfad des Directory, relativ zum root Verzeichnis des
+dazugehoerigen virtuellen Webservers.
+
+=item I<apache_directory_redirecturl> Directory redirect url
+
+Falls das Verzeichnis ein redirect beschreiben soll, muessen Sie
+hier die Redirect-Url (Die Url worauf dieses Directory redirected 
+wird) angeben.
+
+=item I<apache_directory_user> User who owns that directory
+
+Falls Sie keine Redirect-Url eingegeben haben, muessen Sie hier
+einen gueltigen User eingeben, der der Besitzer dieses Verzeichnis
+sein soll.
+
+=item I<apache_directory_group> Group that owns that directory
+
+Optionale Eingabe einer gueltigen Gruppe, der dieses Verzeichnis 
+gehoert.
+
+=back
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+                         Phone: +49 7123 14887
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+                         Phone: +49 7072 920696
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+=cut
+

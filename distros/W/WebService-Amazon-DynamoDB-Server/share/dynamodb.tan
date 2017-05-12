@@ -1,0 +1,53 @@
+# Top-level object
+class DynamoDB.Root {
+	prop regions = hash of obj;
+
+	event log(str message);
+	event error(str message);
+}
+
+# Each region serves as a namespace for zero or more tables.
+# Clients "connect" to regions (via REST)
+class DynamoDB.Region {
+	smashed prop name = str;
+	prop tables = array of obj;
+
+	method create_table(dict(any) param);
+
+	event error(str message);
+}
+
+# Represents a table - a collection of items.
+class DynamoDB.Table {
+	smashed prop name = str;
+	# Current state - this will change to UPDATING whenever the table is modified
+	prop state = str;
+	# All the items we have in the table
+	prop items = hash of obj;
+	# History of state changes - table metadata, not items
+	prop history = queue of dict(any);
+	# History of item add/change/delete events
+	prop item_history = queue of dict(any);
+
+	# Throughput stats, for graphing and monitoring
+	prop read_throughput_history = queue of dict(any);
+	prop write_throughput_history = queue of dict(any);
+
+	# Table state has changed, possible values include CREATING, UPDATING, DELETING, ACTIVE
+	event state_changed(str state);
+	# We've refused a read due to being over capacity
+	event excess_read(int capacity);
+	# We've refused a write due to being over capacity
+	event excess_write(int capacity);
+}
+
+
+# Represents a single item in a DynamoDB table.
+class DynamoDB.Item {
+	prop attributes = hash of dict(any);
+	prop history = queue of dict(any);
+
+	event changed();
+	event deleted();
+}
+

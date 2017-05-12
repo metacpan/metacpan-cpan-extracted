@@ -1,0 +1,29 @@
+Revision history for Weightbot-API
+
+0.01    2011-11-19
+        * First public release
+
+0.02    2012-05-04
+        * New feature - use_cache_file
+
+0.03    2012-11-18
+        * Fixing bugs
+
+0.04    2013-06-23
+        * Switched to Dist::Zilla
+
+1.0.0   2013-08-28
+        [Major]
+        * Switched to SemVer
+
+        [Minor]
+        * Ignoring incorrect SSL certificate at https://weightbot.com
+
+        [Patch]
+        * Added Prereqs section in dist.ini
+        * Removed unnecessary tests
+        * Fixing travis
+
+1.1.0   2013-08-30
+        [Minor]
+        * Working with https://weightbot.com only if SSL cert is correct

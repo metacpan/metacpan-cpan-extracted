@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+# ABSTRACT: Upload images to rajce.net.
+# PODNAME: rajce-put
+
+use strict;
+use warnings;
+
+use Net::Netrc;
+use WebService::Rajce;
+use Pod::Usage;
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt);
+
+$|++;
+
+my %opt;
+
+GetOptions(
+	't|title=s' => \$opt{t},
+	'd|description=s' => \$opt{d},
+	'k|keep-exif' => \$opt{k},
+	'v|verbose' => \$opt{v},
+	'D|debug' => \$opt{d},
+	'V|version' => \$opt{V},
+	'h|help' => \$opt{h},
+);
+
+if($opt{h}){
+	pod2usage(-verbose => 2, -output => '-');
+	exit;
+}
+
+my $version = $WebService::Rajce::VERSION;
+
+if($opt{V}){
+	print "$version\n";
+	exit;
+}
+
+if(!@ARGV or !$opt{t}){
+	pod2usage(-verbose => 1, -output => '-');
+	exit;
+}
+
+my $desc = '';
+if($opt{d}){
+	$desc = $opt{d};
+}
+
+my $rajce = new WebService::Rajce('keep_exif'=>$opt{k},'debug'=>$opt{D});
+
+my $user = Net::Netrc->lookup($rajce->{API})
+	or die "Cant find $rajce->{API} in \$HOME/.netrc";
+
+info("Login to rajce.net ...",%opt);
+my $login = $rajce->login($user->login,$user->password)
+	or die "Bad username or password.";
+info(" OK\n",%opt);
+
+info("Create new album ...",%opt);
+my $album = $rajce->create_album($opt{t},$desc)
+	or die "Failed to create new album";
+info(" OK\n",%opt);
+
+foreach my $file(@ARGV){
+	info("Uploading $file ...",%opt);
+	$rajce->add_photo($file,$album)
+		or die "Failed add file $file";
+	info(" OK\n",%opt);
+}
+
+sub info{
+	my ($message,%opt) = @_;
+	if($opt{v}){
+		print "$message";
+	}
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rajce-put - Upload images to rajce.net.
+
+=head1 VERSION
+
+version 1.152450
+
+=head1 SYNOPSIS
+
+rajce-put [OPTIONS] ... [FILES] ...
+
+=head1 DESCRIPTION
+
+This program will upload images to rajce.net. Before you start uploading
+add entry to $HOME/.netrc
+
+Something like this:
+
+machine http://www.rajce.idnes.cz/liveAPI/index.php login mail@example.com password nbu123
+
+Set the correct access rights:
+
+$ chmod 700 $HOME/.netrc
+
+Behind proxy server try set:
+
+export http_proxy=http://your.proxyserver:port
+
+=head1 OPTIONS AND ARGUMENTS
+
+	 -t, --title
+			Specify title of album
+
+	 -d, --description
+			Description of album
+
+	 -k, --keep-exif
+			Keep exif data
+
+	 -v, --verbose
+			Verbose mode
+
+	 -D, --debug
+			Debugging messages
+
+	 -V, --version
+			Show version and exit
+
+	 -h, --help
+			Show help
+
+=head1 EXAMPLES
+
+rajce-put -vkt 'Example' --description 'Something' tmp/*.jpg
+
+=head1 SEE ALSO
+
+For creating account visit: www.rajce.net/ucet
+
+https://metacpan.org/module/WebService::Rajce
+
+=head1 AUTHOR
+
+Petr Kletecka <pek@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Petr Kletecka.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

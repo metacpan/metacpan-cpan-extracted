@@ -1,0 +1,26 @@
+---
+name: Wiki-Toolkit-Store-Mediawiki
+version: 0.06
+author:
+  - 'Derek Price <derek@ximbiot.com>'
+abstract: |-
+  Mediawiki (MySQL) storage backend for
+  Wiki::Toolkit
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Time::Piece::Adaptive: 0
+  Time::Seconds: 0
+  Wiki::Toolkit::Store::Database: 0
+build_requires:
+  Test::More: 0
+provides:
+  Wiki::Toolkit::Store::Mediawiki:
+    file: lib/Wiki/Toolkit/Store/Mediawiki.pm
+    version: 0.06
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

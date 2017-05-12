@@ -1,0 +1,30 @@
+---
+abstract: 'An interface to the SendGrid email service'
+author:
+  - 'Jonathan Lloyd <webmaster@lifegames.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0.96'
+  Try::Tiny: '0.09'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-SendGrid
+requires:
+  Carp: '0'
+  DateTime::Format::HTTP: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  JSON::XS: '2.3'
+  Mail::RFC822::Address: '0'
+  Moose: '2'
+  Moose::Util::TypeConstraints: '2'
+  MooseX::Method::Signatures: '0.36'
+  URI: '0'
+  WWW::Curl::Simple: '0'
+version: '1.03'

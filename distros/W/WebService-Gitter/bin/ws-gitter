@@ -1,0 +1,112 @@
+#!perl
+
+use strict;
+use warnings;
+use v5.10;
+
+use WebService::Gitter;
+use Getopt::Long::Descriptive;
+use Data::Dumper;
+use Net::Ping;
+
+# PODNAME: ws-gitter
+our $VERSION = '0.5.2'; # VERSION 
+# check internet connection
+my $p = Net::Ping->new;
+
+# check if connected the internet
+if (not $p->ping("developer.gitter.im")) {
+	die "Error. You are not connected to the internet. Try again later.";
+}
+
+my ($opt, $usage) = describe_options(
+	'ws-gitter --token my_api_key <OPTIONS>',
+	['token|t=s', "Gitter API key", { required => 1 } ],
+	['current_user|c', "Information about logged current user."],
+	['rooms|r', "List your joined rooms"],
+	['room_id|rid=s',
+		"List the room id. Example flag usage: --room_id FreeCodeCamp/FreeCodeCamp. If no argument passed to this parameter, it will use FreeCodeCamp/FreeCodeCamp room as argument by default.", {default => 'FreeCodeCamp/FreeCodeCamp'}
+	],
+	['room_users|ru=s', "List users by the room name specified by the argument which is room id that could be gathered by running the program with --room_id flag first. Example flag usage: --room_users 546fd572db8155e6700d6eaf"
+	],
+	['help|h', "Print this help message."],
+);
+
+my $client = WebService::Gitter->new(token_pass => $opt->token);
+
+if ($opt->current_user) {
+	say Dumper $client->current_user;
+}
+
+elsif ($opt->rooms) {
+	say Dumper $client->rooms;
+}
+
+elsif ($opt->room_id) {
+	say Dumper $client->room_id($opt->room_id);
+}
+
+elsif ($opt->room_users) {
+	say Dumper $client->room_users($opt->room_users);
+}
+
+# FIXME
+elsif ($opt->send_message) {
+	...
+}
+
+elsif ($opt->help) {
+	say $usage;
+}
+
+else {
+	die "Error!";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ws-gitter
+
+=head1 VERSION
+
+version 0.5.2
+
+=head1 SYNOPSIS
+
+	$ perl bin/ws-gitter --help
+	Mandatory parameter 'token' missing in call to "eval"
+
+	ws-gitter	--token my_api_key <OPTIONS>
+		-t STR --token STR         Gitter API key
+		-c --current_user          Information about logged current user.
+		-r --rooms                 List your joined rooms
+		--rid STR --room_id STR    List the room id. Example flag usage:
+	    	                       --room_id FreeCodeCamp/FreeCodeCamp. If no
+	        	                   argument passed to this parameter, it will
+	            	               use FreeCodeCamp/FreeCodeCamp room as
+	                	           argument by default.
+		--ru STR --room_users STR  List users by the room name specified by
+	    	                       the argument which is room id that could
+	        	                   be gathered by running the program with
+	            	               --room_id flag first. Example flag usage:
+	                	           --room_users 546fd572db8155e6700d6eaf
+		-h --help                  Print this help message.
+
+=head1 AUTHOR
+
+faraco <skelic3@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by faraco.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

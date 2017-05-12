@@ -1,0 +1,87 @@
+{
+   "abstract" : "Web-Interface to cpancover.com",
+   "author" : [
+      "Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wcpancover",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Cover::Results" : "0",
+            "CPAN::ReleaseHistory" : "0.10",
+            "DBD::SQLite" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Candy" : "0",
+            "DBIx::Class::DeploymentHandler" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "Mojolicious" : "6.0",
+            "Mojolicious::Plugin::DBInfo" : "0",
+            "Mojolicious::Plugin::I18N" : "0",
+            "Mojolicious::Plugin::ServerInfo" : "0",
+            "SQL::Translator" : "0",
+            "String::Similarity" : "0",
+            "Term::Prompt" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wollmers/Wcpancover/issues"
+      },
+      "homepage" : "https://github.com/wollmers/Wcpancover",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wollmers/Wcpancover.git",
+         "web" : "https://github.com/wollmers/Wcpancover"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>",
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>"
+   ]
+}
+

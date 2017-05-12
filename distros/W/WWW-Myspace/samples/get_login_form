@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w -I../lib
+
+use WWW::Myspace;
+use CGI qw/:standard/;;
+my $myspace = new WWW::Myspace;
+
+my $login_form = $myspace->get_login_form;
+
+die $myspace->error if $myspace->error;
+
+# Display a login form
+print header,
+    start_html('Is it worth logging in?'),
+    $myspace->get_login_form,
+    end_html;
+

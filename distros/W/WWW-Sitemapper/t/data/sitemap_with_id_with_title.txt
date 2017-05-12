@@ -1,0 +1,9 @@
+[0] index.html Root
+  [0:0] 1.html Child1
+    [0:0:0] friendly_url.html FriendlyUrl
+      [0:0:0:0] 3.html Child3
+        [0:0:0:0:0] 31.html Child31
+        [0:0:0:0:1] 32.html Dziecię32
+  [0:1] 2.html Child2
+    [0:1:0] 21.html Child21
+    [0:1:1] 22.html Child22

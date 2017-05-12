@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+     <!DOCTYPE co PUBLIC "-//WAPFORUM//DTD CO 1.0//EN"
+                  "http://www.wapforum.org/DTD/co_1.0.dtd">
+<co>
+     <invalidate-object uri="foo.wml"></invalidate-object>
+     <invalidate-service uri="/bar"></invalidate-service>
+</co>

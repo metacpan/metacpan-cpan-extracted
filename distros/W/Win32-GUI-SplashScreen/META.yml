@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Win32-GUI-SplashScreen
+version:             0.04
+abstract:            Win32::GUI SplashScreen support
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    Win32::GUI:                    1.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Robert May <robertmay@cpan.org>

@@ -1,0 +1,9 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Search/EbayUK.pm
+lib/WWW/Search/EBayGlobal.pm
+lib/WWW/Search/EbayUK/ByEndDate.pm
+lib/WWW/Search/EBayGlobal/ByEndDate.pm
+test.pl

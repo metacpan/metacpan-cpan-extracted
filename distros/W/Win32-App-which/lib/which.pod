@@ -1,0 +1,85 @@
+=head1 NAME
+
+which - locate a command
+
+=head1 SYNOPSIS
+
+    which [-a] [--] filename
+
+=head1 DESCRIPTION
+
+C<which> returns the pathname of the files which would be executed in the
+current environment. It does this by searching the PATH for executable files
+matching the name of the argument.
+
+As this is Win32:
+
+=over 4
+
+=item *
+
+the current directory is explored before PATH
+
+=item *
+
+the extensions specified in PATHEXT are added to the given filename to find an
+executable file matching the command
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-a>
+
+print all pathnames instead of only the first one
+
+=back
+
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item C<0>
+
+if the specified command is found
+
+=item C<1>
+
+if the specified command is not found
+
+=item C<2>
+
+if an invalid option is specified
+
+=back
+
+=head1 SEE ALSO
+
+This program in distributed in the CPAN distribution L<Win32::App::which>.
+
+=head1 AUTHOR
+
+Olivier MenguE<eacute> C<<dolmen@cpan.org>>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright E<copy> 2010-2011 Olivier MenguE<eacute>.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

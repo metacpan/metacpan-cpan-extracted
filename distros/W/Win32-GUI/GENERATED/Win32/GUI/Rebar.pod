@@ -1,0 +1,522 @@
+
+=head1 NAME
+
+Win32::GUI::Rebar - Create and manipulate Rebar (aka Coolbar) controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Rebar object;
+can also be called as PARENT->AddRebar(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -autosize => 0/1 (default 0)
+    Set/Unset autosize style.
+  -bandborders => 0/1 (default 0)
+    display a border to separate bands.
+  -doubleclick => 0/1 (default 0)
+    Set/Unset double click toggle style.
+  -fixedorder => 0/1 (default 0)
+    band position cannot be swapped.
+  -imagelist => Win32::GUI::ImageList object
+    Set imagelist.
+  -nodivider => 0/1 (default 1)
+    Set/Unset nodivider style.
+  -varheight => 0/1 (default 1)
+    display bands using the minimum required height.
+  -vertical => 0/1 (default 0)
+    Set/Unset vertical style.
+  -vgripper => 0/1 (default 0)
+    Set/Unset vertical gripper style.
+  -tooltip => Win32::GUI::Tooltip
+    Set tooltip window.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BandCount
+
+B<BandCount()>
+
+See L<GetBandCount()|Win32::GUI::Rebar/GetBandCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BandInfo
+
+B<BandInfo(INDEX)>
+
+See L<GetBandInfo()|Win32::GUI::Rebar/GetBandInfo>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginDrag
+
+B<BeginDrag(INDEX,[POSITION=-1])>
+
+Puts the rebar control in drag-and-drop mode.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteBand
+
+B<DeleteBand(INDEX)>
+
+Delete a band. Index is Zero-based
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DragMove
+
+B<DragMove([POSITION=-1])>
+
+Updates the drag position in the rebar control after a previous BeginDrag().
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndDrag
+
+B<EndDrag()>
+
+Terminates the rebar control's drag-and-drop operation.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBandBorder
+
+B<GetBandBorder()>
+
+Retrieves the borders of a band.
+Returns a four elements array defining the rebar rectangle (left, top,
+right, bottom) or undef on errors.
+If the rebar control does not have -bandborders option set, only the left
+value have valid information.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBandCount
+
+B<GetBandCount()>
+
+Returns the number of bands in the rebar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBandInfo
+
+B<GetBandInfo(INDEX)>
+
+Returns information on the band as a hash.
+
+  -text       => Contains the display text for the band.
+  -foreground => Band foreground colors.
+  -background => Band background colors.
+  -image      => Image index in imagelist.
+  -child      => Handle to the child window contained in the band, if any.
+  -bitmap     => Bitmap background handle.
+  -width      => Length of the band, in pixels.
+  -minwidth   => Minimum width of the child window, in pixels. The band can't be sized smaller than this value.
+  -minheight  => Minimum height of the child window, in pixels. The band can't be sized smaller than this value.
+  -style      => Flags that specify the band style.
+  -idealwidth => Ideal band width. The band maximises to this size, and if chevrons are enabled
+                 they are shown when the band is smaller than this value.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBarHeight
+
+B<GetBarHeight(INDEX)>
+
+Retrieves the height of the rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBarInfo
+
+B<GetBarInfo()>
+
+Retrieves ReBar hash information.
+
+ -imagelist => HANDLE
+   Handle to an image list
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBkColor
+
+B<GetBkColor()>
+
+Retrieves a rebar control's default background color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColorScheme
+
+B<GetColorScheme()>
+
+Retrieves Rebar color scheme hash information.
+
+ -clrBtnHighlight => COLOR
+   the highlight color of the buttons.
+ -clrBtnShadow => COLOR
+   the shadow color of the buttons.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPallette
+
+B<GetPallette()>
+
+Retrieves a rebar control's default background color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRect
+
+B<GetRect(index)>
+
+Retrieves the bounding rectangle for a given band in a rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRowCount
+
+B<GetRowCount()>
+
+Returns the number of rows that the rebars are arranged in.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRowHeight
+
+B<GetRowHeight(ROW)>
+
+Retrieves the height of a specified row in a rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextColor
+
+B<GetTextColor()>
+
+Retrieves a rebar control's default text color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTooltips
+
+B<GetTooltips()>
+
+Retrieves the handle to any tooltip control associated with the rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HideBand
+
+B<HideBand(INDEX, [FLAG])>
+
+Hide the band. Index is Zero-based. If flag is 1, the band is shown.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X,Y)>
+
+Determines which portion of a rebar band is at a given point on the screen, if a rebar band exists at that point.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IdToIndex
+
+B<IdToIndex(ID)>
+
+Converts a band identifier to a band index in a rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertBand
+
+B<InsertBand(%OPTIONS)>
+
+Insert a new band into the rebar control.
+
+Allowed %OPTIONS are:
+
+ -image      => Zero based index of the imagelist.
+ -index      => Zero based index where the band is inserted.
+ -bitmap     => The background bitmap for the band.
+ -child      => Child control. See Below.
+ -foreground => Band foreground colors.
+ -background => Band background colors.
+ -width      => The width of the band.
+ -minwidth   => The minimum width of the band.
+ -minheight  => The minimum height of the band.
+ -text       => The text for the band.
+ -style      => The style of the band. See Below
+ -idealwidth => Ideal band width. The band maximises to this size, and if chevrons are enabled they are shown when the band is smaller than this value.
+
+Each band can only contain one child control. However, you can add a child window that contains many controls:
+
+ $mainwindow = <main window code>
+
+ my $band = new Win32::GUI::Window (
+     -parent   => $mainwindow,
+     -name     => "RebarBand1",
+     -popstyle => WS_CAPTION | WS_SIZEBOX,
+     -pushstyle => WS_CHILD,
+ );
+
+ # create Date time control for band 1
+ my $DateTime = $band->AddDateTime (
+     -name     => "DateTime",
+     -pos      => [0, 0],
+     -size     => [130, 20],
+     -tip      => 'A date and time',
+ );
+ #set the format for the datetime control
+ $DateTime->Format('dd-MMM-yyyy HH:mm:ss');
+
+ #Add a button to band 1
+ $band->AddButton (
+          -name     => 'Button',
+          -pos      => [135, 0],
+          -size     => [50, 20],
+          -text     => 'Button',
+          -tip      => 'A Button',
+          -onClick => sub {print 'button clicked' },
+ );
+
+ my $rebar = $mainwindow->AddRebar(
+     -name   => "Rebar",
+     -bandborders => 1,
+ );
+
+ #Insert band
+ $rebar->InsertBand (
+   -child     => $band,
+   -width     => 210,
+   -minwidth  => 210,
+   -minheight => 20,
+ );
+
+Styles : Each band can have it's own style. As a default, each band has RBBS_CHILDEDGE | RBBS_FIXEDBMP
+
+ RBBS_BREAK = 1           The band is on a new line.
+ RBBS_FIXEDSIZE = 2       The band can't be sized. With this style, the sizing grip is not displayed on the band.
+ RBBS_CHILDEDGE = 4       The band has an edge at the top and bottom of the child window.
+ RBBS_HIDDEN = 8          The band will not be visible.
+ RBBS_FIXEDBMP = 32       The background bitmap does not move when the band is resized.
+ RBBS_VARIABLEHEIGHT = 64 The band can be resized by the rebar control.
+ RBBS_GRIPPERALWAYS = 128 The band will always have a sizing grip, even if it is the only band in the rebar.
+ RBBS_NOGRIPPER = 256     The band will never have a sizing grip, even if there is more than one band in the rebar.
+ RBBS_USECHEVRON = 512    The band will display chevrons if its width is less than the ideal width
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MaximizeBand
+
+B<MaximizeBand(INDEX, [FLAG])>
+
+Maximize the band. Index is Zero-based. The flag indicates if the ideal width of the band should be used.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MinimizeBand
+
+B<MinimizeBand(INDEX)>
+
+Minimize the band. Index is Zero-based.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MoveBand
+
+B<MoveBand(iFrom, iTo)>
+
+Moves a band from one index to another.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RowCount
+
+B<RowCount()>
+
+See L<GetRowCount()|Win32::GUI::Rebar/GetRowCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBandInfo
+
+B<SetBandInfo(INDEX, %OPTIONS)>
+
+Sets characteristics of an existing band in a rebar control.
+B<%OPTIONS> : See L<InserBand()|Win32::GUI::Rebar/InserBand>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBarInfo
+
+B<SetBarInfo(%OPTIONS)>
+
+Sets a Rebar informations.
+
+B<%OPTIONS> :
+
+ -imagelist => Imagelist.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkColor
+
+B<SetBkColor(COLOR)>
+
+Sets a rebar control's default background color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColorScheme
+
+B<SetColorScheme(%OPTIONS)>
+
+Sets Rebar color scheme.
+
+B<%OPTIONS> :
+
+ -clrBtnHighlight => COLOR.
+    the highlight color of the buttons.
+ -clrBtnShadow => COLOR.
+    the shadow color of the buttons.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPalette
+
+B<SetPalette(PALETTE)>
+
+Sets the rebar control's current palette.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetParent
+
+B<SetParent(PARENT)>
+
+Sets a rebar control's parent window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextColor
+
+B<SetTextColor(COLOR)>
+
+Sets a rebar control's default text color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(TOOLTIP)>
+
+Associates a tooltip control with the rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ShowBand
+
+B<ShowBand(INDEX, [FLAG])>
+
+Show the band. Index is Zero-based. If flag is 1, the band is hidden.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SizeToRect
+
+B<SizeToRect(LEFT, TOP, RIGHT, BOTTOM)>
+
+Attempts to find the best layout of the bands for the given rectangle.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChevronPushed
+
+B<ChevronPushed(bandindex, left, top, right, bottom)>
+
+Sent when a chevron on a rebar band is clicked
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HeightChange
+
+B<HeightChange()>
+
+Sent when the height of the Rebar control has changed.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

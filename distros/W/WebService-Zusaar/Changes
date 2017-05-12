@@ -1,0 +1,17 @@
+Revision history for WebService-Zusaar
+
+0.0.4 Thu Feb 28 14:30:00 2013
+	* Fix: Namaspace WebService::Zusaar
+
+0.0.3 Wed Feb 27 22:18:00 2013
+	* Change(Docs)
+	* Fix(Zussar.pm): Bug (prev method)
+	* Add(Zussar.pm): Available '*_at' method for 'date' fields.
+
+0.0.2 Wed Feb 27 18:00:00 2013
+	* Fix(Test): Moved - perlcritic.t and test for POD
+	* Fix(Zussar.pm): Minimal fix about push into array
+
+0.0.1 Mon Feb 25 20:45:00 2013
+	* Initial release.
+

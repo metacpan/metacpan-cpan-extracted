@@ -1,0 +1,58 @@
+{
+   "abstract" : "Support for theme modification, either through scripting or through gedit plugin.",
+   "author" : [
+      "Adam Harrison <adamdharrison@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Shopify-Tools-Themer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.00",
+            "File::stat" : "0",
+            "Getopt::Long" : "0",
+            "IO::Handle" : "0",
+            "JSON" : "0",
+            "LWP::Simple" : "0",
+            "MIME::Base64" : "0",
+            "Pod::Usage" : "0",
+            "Term::Prompt" : "0",
+            "Test::More" : "0",
+            "WWW::Shopify" : "0.9"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Shopify::Tools::Themer" : {
+         "file" : "lib/WWW/Shopify/Tools/Themer.pm",
+         "version" : "0.11"
+      },
+      "WWW::Shopify::Tools::Themer::Manifest" : {
+         "file" : "lib/WWW/Shopify/Tools/Themer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

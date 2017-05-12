@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use WWW::LongURL;
+use strict;
+use warnings;
+
+my $longurl = WWW::LongURL->new();
+my @services = $longurl->get_services();
+if (! @services) {
+    die $longurl->error(), "\n";
+}
+
+for my $service (@services) {
+    binmode(STDOUT, ':utf8');
+    print $service, "\n";
+}

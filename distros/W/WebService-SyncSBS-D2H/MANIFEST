@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-SyncSBS-D2H.t
+lib/WebService/SyncSBS/D2H.pm
+lib/WebService/SyncSBS/Delicious.pm
+lib/WebService/SyncSBS/Hatena.pm
+examples/sbssync.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w -I../lib
+
+use CGI qw/:standard/;
+use WWW::Myspace;
+my $myspace = new WWW::Myspace;
+die "Not Logged In\n" unless $myspace->logged_in;
+
+print header,
+    start_html('Is it worth logging in?');
+
+my ( %notifiers ) = $myspace->get_notifications;
+
+foreach $code ( keys( %notifiers ) ) {
+    print $notifiers{ $code }, br;
+}
+
+print p, $myspace->get_login_form, p,
+    end_html;

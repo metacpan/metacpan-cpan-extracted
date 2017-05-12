@@ -1,0 +1,68 @@
+---
+abstract: 'SOP version 1.1 authentication module'
+author:
+  - 'yowcow <yoko.oyama [ at ] d8aspring.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+  Test::Perl::Critic: '0'
+  Test::Pod::Coverage: '0'
+  Test::Pretty: '0'
+  Test::Stub: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-SOP-Auth-V1_1
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::SOP::Auth::V1_1:
+    file: lib/WebService/SOP/Auth/V1_1.pm
+    version: '0.04'
+  WebService::SOP::Auth::V1_1::Request::DELETE:
+    file: lib/WebService/SOP/Auth/V1_1/Request/DELETE.pm
+  WebService::SOP::Auth::V1_1::Request::GET:
+    file: lib/WebService/SOP/Auth/V1_1/Request/GET.pm
+  WebService::SOP::Auth::V1_1::Request::POST:
+    file: lib/WebService/SOP/Auth/V1_1/Request/POST.pm
+  WebService::SOP::Auth::V1_1::Request::POST_JSON:
+    file: lib/WebService/SOP/Auth/V1_1/Request/POST_JSON.pm
+  WebService::SOP::Auth::V1_1::Request::PUT:
+    file: lib/WebService/SOP/Auth/V1_1/Request/PUT.pm
+  WebService::SOP::Auth::V1_1::Request::PUT_JSON:
+    file: lib/WebService/SOP/Auth/V1_1/Request/PUT_JSON.pm
+  WebService::SOP::Auth::V1_1::Util:
+    file: lib/WebService/SOP/Auth/V1_1/Util.pm
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  HTTP::Request::Common: '6.07'
+  JSON::XS: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1/issues
+  homepage: https://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1
+  repository: git://github.com/researchpanelasia/p5-WebService-SOP-Auth-V1_1.git
+version: '0.04'
+x_authority: cpan:YOWCOW
+x_contributors:
+  - 't-sekiguchi <Takafumi_Sekiguchi@voyagegroup.com>'
+  - 'yowcowvg <yoko_ohyama@voyagegroup.com>'
+  - 'yowcow <yowcow@cpan.org>'
+  - 'Yoko OYAMA <yowcow@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

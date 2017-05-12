@@ -1,0 +1,72 @@
+Win32-StreamNames version 1.04
+==============================
+
+
+Win32::StreamNames - Perl extension for reading Windows ADS names
+
+SYNOPSIS
+
+    use Win32::StreamNames;
+    @streams = StreamNames( $file );
+    
+    if (@streams)
+    {
+       ...
+    }
+    else
+    {
+       # No Additional Data Stream names
+       ...
+    }
+
+DESCRIPTION
+
+Additional Data Streams (ADS) were introduced in Windows 2000 with
+NTFS 5 (data streams have always been a feature of Windows).
+With ADS, a simple file can be extended to include other 
+information, and Windows Explorer does just that with its
+Summary Information (from the file Properties dialog).
+
+To get at the stream names associated with a file requires a call
+to the BackupRead Win32 API, This module provides a simple wrapper
+to the API calls.
+
+The only externl function, StreamNames, takes a file or directory 
+name as an argument, and returns a list of stream names.  These may
+be appended to the original filename to get a fully qualified name,
+which may be opened using the usual Perl functions.  
+
+If the specified file or directory cannot be opened then $^E is set   
+and an empty list is returned.  Note that an empty list is not
+necessarily an error, since a file need not have any additional
+streams.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+   If using the GNU toolset (for example with Strawberry Perl), 
+   use dmake instead of nmake.
+
+DEPENDENCIES
+
+This module will only run on Microsoft Windows, and requires a C compiler, a
+linker, and a 'make' utility (usually nmake.exe) for installation.
+
+The tests will only run on NTFS5 (available with Windows 2000) or later.
+
+The tests use Win32API::File to check the file system type, which is
+bundled with the ActiveState Perl implementation.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2007, 2009 Clive Darke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

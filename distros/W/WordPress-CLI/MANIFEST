@@ -1,0 +1,16 @@
+INSTALL
+MANIFEST
+Makefile.PL
+README
+bin/wordpress-info
+bin/wordpress-upload-media
+bin/wordpress-upload-post
+lib/WordPress/CLI/Base.pm
+lib/WordPress/CLI.pm
+t/00.t
+t/01-base.t
+t/example-conf.txt
+t/image.jpg
+t/leo-charre-painting-city.jpg
+t/painting-of-the-city-by-leo-charre.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

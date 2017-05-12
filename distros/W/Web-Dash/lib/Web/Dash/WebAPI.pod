@@ -1,0 +1,102 @@
+
+=encoding UTF8
+
+=head1 NAME
+
+Web::Dash::WebAPI - Web API for Web::Dash
+
+=head1 DESCRIPTION
+
+This document describes Web API provided by L<Web::Dash>.
+
+=head1 ENDPOINT
+
+=head2 GET /search.json
+
+Makes a search with a Lens and returns the search results.
+
+B<Query Parameters>
+
+=over
+
+=item C<lens> = LENS_SERVICE_NAME (required)
+
+The service name of the Lens to be used.
+
+The service name of a lens is the C<DBusName> parameter written in the .lens file.
+For example, .lens file for the Application lens is usually located at
+C</usr/share/unity/lenses/applications/applications.lens>, and its C<DBusName> is
+C<com.canonical.Unity.Lens.Applications>
+
+=item C<q> = QUERY_STRING (required)
+
+Search query.
+It must be encoded in UTF-8.
+
+=back
+
+B<Response>
+
+In success, the HTTP response code is 200.
+The response is a JSON object.
+The C<error> attribute of the object is C<null>,
+and the C<results> attribute of the object is an array of search results.
+
+Each entry in the C<results> array is a JSON object representing a search result.
+The search result object is basically an object returned by C<search_sync()> method of L<Web::Dash::Lens>.
+Its category object returned by C<category_sync()> method of L<Web::Dash::Lens> is joined to the result object's C<category> attribute.
+See example below.
+
+In failure, the HTTP response code is 4** or 5**.
+The response is a JSON object.
+The C<error> attribute of the object describes the cause of the error.
+
+B<Example>
+
+Request to L<Wikipedia|http://en.wikipedia.org/> Lens.
+
+    GET /search.json?lens=net.launchpad.lens.wikipedia&q=dash
+
+Response:
+
+  {
+     "error" : null,
+     "results" : [
+        {
+           "category_index" : 0,
+           "name" : "Dash",
+           "icon_hint" : "/opt/extras.ubuntu.com/unity-lens-wikipedia/media/wiki_blank-0.png",
+           "uri" : "0xb4b04e90:http://en.wikipedia.org/wiki/Dash",
+           "dnd_uri" : "http://en.wikipedia.org/wiki/Dash",
+           "comment" : "A dash is a punctuation mark, similar to a hyphen or minus sign but differing primarily in length and serving different functions. ",
+           "category" : {
+              "name" : "Articles",
+              "icon_hint" : "/usr/share/icons/unity-icon-theme/places/svg/group-installed.svg",
+              "renderer" : "tile-horizontal"
+           },
+           "mimetype" : "text/html"
+        },
+        {
+           "category_index" : 0,
+           "name" : "Dashiell Hammett",
+           "icon_hint" : "http://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Dashiellhammett.jpg/96px-Dashiellhammett.jpg",
+           "uri" : "0xb4b04e90:http://en.wikipedia.org/wiki/Dashiell Hammett",
+           "dnd_uri" : "http://en.wikipedia.org/wiki/Dashiell Hammett",
+           "comment" : "Samuel Dashiell Hammett (; May 27, 1894 – January 10, 1961) was an American author of hard-boiled detective novels and short stories, a screenplay writer, and political activist. ",
+           "category" : {
+              "name" : "Articles",
+              "icon_hint" : "/usr/share/icons/unity-icon-theme/places/svg/group-installed.svg",
+              "renderer" : "tile-horizontal"
+           },
+           "mimetype" : "text/html"
+        }
+     ]
+  }
+
+
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+

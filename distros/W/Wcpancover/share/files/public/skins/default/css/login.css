@@ -1,0 +1,180 @@
+.hero-image {
+    margin-bottom: 20px;
+}
+
+.hero-image img {
+    border-radius: 0 0 20px 20px;
+    z-index: 50;
+}
+
+.logo-row {
+    margin-bottom: 20px;
+}
+
+div.login-group {
+    position: relative;    
+}
+
+div.login-widget {
+    position: absolute;
+    bottom: 30px;
+    right: 20px;
+}
+
+@media (max-width: 979px) {
+    div.login-widget {
+        position: relative;
+        bottom: 0;
+        right: 0;
+    }
+}
+
+div.hero-shadow {
+    position: absolute;
+    background: transparent;
+    height: 10px;
+  background-image: -moz-linear-gradient(top, #444444, transparent);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#444444), to(transparent));
+  background-image: -webkit-linear-gradient(top, #444444, transparent);
+  background-image: -o-linear-gradient(top, #444444, transparent);
+  background-image: linear-gradient(to bottom, #444444, transparent);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff444444', endColorstr='transparent', GradientType=0); 
+    top: 0px;
+    left: 0px;
+    margin: 0;
+}
+
+
+
+
+
+/* MENU */
+
+/* #959593 #555654 */
+div.menu3 {
+    background-color: #5e5e5e;
+    /* margin-bottom: 26px; */
+
+  background-image: -moz-linear-gradient(top, #959593, #555654);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#959593), to(#555654));
+  background-image: -webkit-linear-gradient(top, #959593, #555654);
+  background-image: -o-linear-gradient(top, #959593, #555654);
+  background-image: linear-gradient(to bottom, #959593, #555654);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff959593', endColorstr='#ff555654', GradientType=0);
+}
+
+
+
+.menu3 ul {
+    margin:0px; 
+    padding:0px; 
+    list-style-type:none;
+    width: auto;
+    float: left;
+    position: relative;
+}
+.menu3 li {
+    float:left; 
+    width: auto; 
+    text-align:center;
+    border-right: 1px solid #FFFFFF;
+}
+.menu3 li ul {
+    display:none; 
+}
+.menu3 li ul{
+    /* height: 25px; */
+    left: 0;
+    position: absolute;
+    /* top: -999em; */
+    width: 100%; 
+}
+.menu3 li:hover ul {
+    display:block;
+    position:absolute;
+    z-index: 60;
+}
+
+.menu3 li.active ul {
+    display:block;
+    position:absolute;
+    z-index: 50;
+}
+.menu3 li ul li {
+    background-color: #EF7C00; 
+    border-top:1px solid #FFFFFF;
+    /* float: none; */
+    float: left;
+}
+/* #0B77AF, #064667 */
+.menu3 li ul li {
+    background-color: #EF7C00; 
+    border-top:1px solid #FFFFFF;
+    /* float: none; */
+    float: left;
+}
+
+/* #61AACD, #005d88 */
+.menu3 li.active ul li {
+  background-image: -moz-linear-gradient(top, #61AACD, #005d88);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#61AACD), to(#005d88));
+  background-image: -webkit-linear-gradient(top, #61AACD, #005d88);
+  background-image: -o-linear-gradient(top, #61AACD, #005d88);
+  background-image: linear-gradient(to bottom, #61AACD, #005d88);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff61AACD', endColorstr='#ff005d88', GradientType=0);
+}
+.menu3 li a {
+    background-color: #EF7C00;
+    color:#FFFFFF;
+    display: block;
+    padding: 4px 20px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* 58a6ca 005b85 */ 
+.menu3 li a {
+  background-image: -moz-linear-gradient(top, #58a6ca, #005b85);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#58a6ca), to(#005b85));
+  background-image: -webkit-linear-gradient(top, #58a6ca, #005b85);
+  background-image: -o-linear-gradient(top, #58a6ca, #005b85);
+  background-image: linear-gradient(to bottom, #58a6ca, #005b85);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff58a6ca', endColorstr='#ff005b85', GradientType=0);
+}
+
+.menu3 li.active a {
+    background-color: #efefef;
+    color:#0B77AF;
+}
+
+.menu3 li.active ul li.active a {
+    color:#064667;
+}
+
+.menu3 li ul li:hover {
+    background-color: #0B77AF;
+}
+
+.menu3 li.active ul li:hover {
+    background-color: #FFFFFF;
+}
+
+.menu3 li.active ul li.active {
+    background-color: #efefef;
+    color: #525051;
+}
+
+.menu3 li ul li a:hover {
+    background-color: #A35400;
+    text-decoration: underline;
+}
+.menu3 li.active ul li a:hover {
+    background-color: #FFFFFF;
+    color:            #A35400;
+    text-decoration: underline;
+}
+

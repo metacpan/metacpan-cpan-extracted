@@ -1,0 +1,12 @@
+This file documents the revision history for Perl extension WWW::Mechanize::CGI.
+
+0.3  2005-12-12 00:50:00 2005
+    - added support for relative paths in cgi_application(). (Chris Dolan <cdolan@cpan.org>)
+    - cgi_application() now sets SCRIPT_FILENAME. (Chris Dolan <cdolan@cpan.org>)
+
+0.2  2005-11-13 21:52:00 2005
+    - added support for external CGI applications.
+    - documented fork option.
+
+0.1  2005-10-31 00:59:00 2005
+    - first release.

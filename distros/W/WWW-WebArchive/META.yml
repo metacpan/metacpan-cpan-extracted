@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-WebArchive
+version:      0.50
+version_from: lib/WWW/WebArchive.pm
+installdirs:  site
+requires:
+    App::Options:                  0.01
+    App::Trace:                    0.01
+    WWW::Mechanize:                0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

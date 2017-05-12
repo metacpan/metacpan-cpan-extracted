@@ -1,0 +1,4 @@
+<Directory @DocumentRoot@>
+  Options +ExecCGI
+  AddHandler cgi-script .cgi
+</Directory>

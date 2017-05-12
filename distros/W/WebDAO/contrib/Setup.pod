@@ -1,0 +1,253 @@
+=begin pod
+=CHAPTER Configuring  Webdao
+
+Configuration is done via environment variables.
+The following variables is using:
+
+=begin table :caption('Configuration parameters')
+name                   description                      sample
+------------|-------------------------------------------|-----------
+wdIndexFile |" index.html - name of the file to be processed upon request. Possible values : absolute path or relative to C<DOCUMENT_ROOT>. Default: C<$ENV{DOCUMENT_ROOT}/index.xhtml> "|  index.html
+wdEngine |" name of the package core module. This module serves all requests coming to I</>. Default: I<WebDAO::Engine> "| ShowPrice
+wdEnginePar |" initialization parameters when creating the main module. Value a string containing the pairs I<key=value>. Pairs are semicolon separated (I<;>). Default: I<undef> "| config=/home/zag/showprice.ini
+wdSession | Name the package module, which serves a sessional. This module is used to identify a web session. Default: I<WebDAO::Session> | WebDAO::Sessionco
+wdFCGIreq  | number of requests for each  I<FastCGI> process. The parameter is used to work in I<FastCGI> mode. Default: -1 - unlimited | 1000
+wdDebug  |" Debug level. 1 - critical errors, 2 .. n - warns, info.  Default: 0 - off "| 2
+
+=end table
+
+For server lighttpd uses names respectively: WD_INDEXFILE, WD_ENGINE, WD_ENGINE_PAR, WD_SESSION, WD_STORE, WD_STORE_PAR, WD_DEBUG.
+
+=head2 Configuring Web server
+
+It supports all popular Web servers: IIS (isapi_fcgi.dll), nginx, lighttpd, apache. 
+
+The I<WebDAO> suuports: I<cgi>, I<FastCGi>, I<mod_perl>. The most productive is the mode I<FastCGI>.
+
+In the examples used the following initial conditions.
+
+=begin table :caption('Baseline data')
+Parameter                         |  Value
+----------------------------------|-----------
+Web root                          | /usr/zag/www
+Temporary directory               | /tmp        
+Directory for logs                | /var/log/   
+Domain name                       | example.org 
+Path for file socket for FastCGI  | /tmp/myapp.socket
+
+=end table
+
+=head3 Setup standalone  FastCGI
+
+	
+In the package I<WebDAO> includes a script C<wd_fcgi.fpl> ( C</usr/local/bin/wd_fcgi.fpl> for example).
+	
+To run an independent server using the following command:
+
+    #!/bin/sh
+    /usr/local/bin/wd_fcgi.fpl -d -l /tmp/myapp.socket -n 5 -maxreq 1000
+
+For help use  I<--help>:
+
+        /usr/local/bin/wd_fcgi.fpl --help
+
+Output:
+
+    Usage:
+    wd_fcgi.fpl [options]
+
+        -d -daemon     Daemonize the server.
+        -p -pidfile    Write a pidfile with the pid of the process manager.
+        -l -listen     Listen on a socket path, hostname:port, or :port.
+        -n -nproc      The number of processes started to handle requests.
+        -m -maxreq     Number of request before process will be restarted 
+                       -1 - unlimited. (defailt: -1)
+
+
+=head4 nginx ( standalone FastCGI)
+
+=item * Simple example
+
+
+    server {
+        listen       80;
+        server_name  example.org;
+
+        charset utf-8;
+
+        access_log  /var/log/nginx/example.org-access.log ;
+	error_log  /var/log/nginx/example.org-error.log  debug;
+        root   /home/zag/www/;
+        location ~ / {
+            include        fastcgi_params;
+            fastcgi_pass   unix:/tmp/webdao.sock;
+            fastcgi_param wdSession WebDAO::Sessionco;
+            fastcgi_param wdIndexFile index.xhtm;
+        }
+
+    }
+
+=item * An example of using a custom package of basic module
+
+For example, even if used as the name of the module: I<MySite>. The constructor of this class as a parameter takes I<config> - path to the configuration file.
+
+
+    server {
+        listen       80;
+        server_name  example.org;
+
+        charset utf-8;
+
+        access_log  /var/log/nginx/example.org-access.log;
+	error_log  /var/log/nginx/example.org-error.log  debug;
+        root   /home/zag/www/;
+        #sample for static data
+        #location ~* ^/(js|imag|img|data|data2|css|static|images)/ {
+        #}
+        location ~ / {
+            include        fastcgi_params;
+            fastcgi_pass   unix:/tmp/webdao.sock;
+            fastcgi_param wdSession WebDAO::Sessionco;
+            fastcgi_param wdIndexFile index.xhtm;
+    	    fastcgi_param wdEngine MySite;
+	    fastcgi_param wdEnginePar config=/home/zag/www/mysite.ini;
+        }
+
+    }
+
+
+=head4 apache (static + standalone  FastCGI)
+
+There are two modes. When use own manager I<FCGI> (I<FastCgiServer>) and connection is made through FCGI socket.
+
+Requires installation of the module I<mod_fastcgi>:
+
+        mod_fastcgi-2.4.2
+
+As part of the global C<httpd.conf> want to add one of the required sections:
+
+=item 1 Static (FastCgiServer)
+
+     <LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+        <IfModule mod_fastcgi.c>
+        AddHandler fastcgi-script fpl fcgi
+        FastCgiServer /usr/local/bin/wd_fcgi.fpl \
+            -idle-timeout 3000 -flush -restart-delay 5 \
+            -initial-env wdFCGIreq=1000 -processes 4 \
+    </IfModule>
+
+=item 2 Standalone ( FastCgiExternalServer )
+
+     <LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+      <IfModule mod_fastcgi.c>
+      # Connect via net socket
+      # FastCgiExternalServer /usr/local/bin/wd_fcgi.fpl -host localhost:60000
+       FastCgiExternalServer /usr/local/bin/wd_fcgi.fpl -socket /tmp/myapp.socket
+      </IfModule>
+
+
+At B<VirtualHost> section:
+
+ <VirtualHost>
+    DocumentRoot /usr/zag/www
+    ServerName example.org
+    ErrorLog /var/log/example.org-error_log
+    CustomLog /var/log/example.org-access_log common
+    SetEnv wdEngine WedDAO::Kern
+    SetEnv wdIndexFile index.xhtml
+    SetEnv wdSession WebDAO::Sessionco
+
+    RewriteEngine on
+    AddDefaultCharset UTF-8
+    RewriteCond     %{HTTP:Authorization}   ^(.*)$ [NC]
+    RewriteRule     /.*             -       [E=HTTP_AUTHORIZATION:%1]
+    <IfModule mod_fastcgi.c>
+        RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+        RewriteRule ^/(.*) /usr/local/bin/wd_fcgi.fpl?$1 [QSA]
+    </IfModule>
+ </VirtualHost>
+
+
+
+=head4 lighttpd (standalone FastCGI)
+
+    var.engine = "ZagSite"
+    var.defaults = (
+        "WD_SESSION"=>"WebDAO::Sessionco",
+        "WD_INDEXFILE"=>"index.xhtm"
+    )
+    $HTTP["host"] == "example.org" {
+    server.document-root    = "/home/zag/www/"
+    setenv.add-environment =  var.defaults 
+    }
+    #use custom root class - MySite
+    $HTTP["host"] == "example.com" {
+    server.document-root    = "/home/zag/www/"
+    setenv.add-environment =  var.defaults + (  
+        "WD_ENGINE" => "MySite",
+        "WD_ENGINE_PAR"=>"config=/home/zag/www/mysite.ini" 
+        )
+    }
+    #skip static 
+    $HTTP["url"] !~ "^/(js|imag|img|css|static)" {
+       fastcgi.server = (
+        "" => (
+            "" => (
+                "socket"      => "/tmp/webdao.sock",
+                "check-local" => "disable"
+                    )
+                )
+            )
+
+    }
+
+
+=head3 Work in cgi mode
+
+For work I<WebDAO> as I<CGI> application use the script I<wd_cgi.pl>
+
+
+=head4 apache ( CGI )
+
+ <VirtualHost *>
+    DocumentRoot /usr/zag/www
+    ServerName example.org
+    ErrorLog /var/log/example.org-error_log
+    CustomLog /var/log/example.org-access_log common
+    
+    SetEnv wdIndexFile index.xhtm
+    SetEnv wdEngine WebDAO::Engine
+    SetEnv wdSession WebDAO::Sessionco
+    
+    RewriteEngine on
+    RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+    RewriteRule ^/(.*) /usr/local/bin/wd_cgi.pl?$1 [QSA]
+    <Directory "/usr/local/bin/wd_cgi.pl">
+      AddHandler cgi-script cgi pl
+      Options Indexes FollowSymLinks ExecCGI
+    </Directory>
+ </VirtualHost>
+
+=head4 Use from command line
+
+To run from the command line using the script I<wd_shell.pl>. In the process of being implemented using the environment variables.
+
+  Usage:
+      wd_shell.pl [options] file.pl
+
+       options:
+
+        -help  - print help message
+        -man   - print man page
+        -f file    - set root [x]html file 
+  
+  Options:
+
+    -help   Print a brief help message and exits
+    -man    Prints manual page and exits
+    -f filename
+            Set filename set root [x]html file for load domain
+
+See also: L<WebDAO::Test>.
+=end pod
+

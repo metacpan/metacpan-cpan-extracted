@@ -1,0 +1,26 @@
+-- These queries were used to produced the data in the spatial.data file.
+-- They are not run as part of the test suite themselves.
+declare @str nvarchar(MAX) = 'POLYGON((',
+        @start int = 50
+DECLARE @x int = @start,
+        @y int = @start,
+        @g geometry
+while @x > 0 and @y > 0
+begin
+   select @str += ltrim(str(@x)) + ' ' + ltrim(str(@y)) + ','
+   SELECT @x -= 1;
+   select @str += ltrim(str(@x)) + ' ' + ltrim(str(@y)) + ','
+   SELECT @y -= 1;
+end
+SELECT @str += ltrim(str(@start)) + ' ' + ltrim(str(@start)) + '))'
+SET @g = geometry::STPolyFromText(@str, 10);
+SET @g = @g.MakeValid()
+SELECT datalength(@g);
+SELECT datalength(@g.STEndPoint()), datalength(@g.STPointN(3));
+SELECT @g, @g.STEndPoint(), @g.STPointN(3)
+go
+
+
+DECLARE @g geography;
+SET @g = geography::STPolyFromText('POLYGON((-122.358 47.653, -122.348 47.649, -122.348 47.658, -122.358 47.658, -122.358 47.653))', 4326)
+SELECT @g, @g.STStartPoint(), @g.STPointN(2)

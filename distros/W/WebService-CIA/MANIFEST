@@ -1,0 +1,23 @@
+Build.PL
+Changes
+examples/from_dbm.pl
+examples/from_web.pl
+lib/WebService/CIA.pm
+lib/WebService/CIA/Parser.pm
+lib/WebService/CIA/Source.pm
+lib/WebService/CIA/Source/DBM.pm
+lib/WebService/CIA/Source/Web.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/lib/WCUA.pm
+t/pod-coverage.t
+t/pod.t
+t/webservice-cia-parser.t
+t/webservice-cia-source-dbm.t
+t/webservice-cia-source-web-internet.t
+t/webservice-cia-source-web.t
+t/webservice-cia-source.t
+t/webservice-cia.t
+webservice-cia-makedbm.pl

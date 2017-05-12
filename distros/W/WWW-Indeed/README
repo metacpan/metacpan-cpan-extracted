@@ -1,0 +1,24 @@
+WWW::Indeed
+====================
+
+This module provides an object-oriented Perl interface to the Indeed.com web service.
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    LWP::UserAgent
+    XML::Simple
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 Michael Aquilina. All rights reserved.

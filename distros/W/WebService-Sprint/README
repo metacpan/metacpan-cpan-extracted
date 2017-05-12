@@ -1,0 +1,60 @@
+WebService-Sprint
+
+Implements some features of Sprint's developer web services. For more
+information, see:
+
+<http://developer.sprint.com/site/global/sandbox/home.jsp>
+<http://developer.sprint.com/site/global/sandbox/sprint_services/sprint_services.jsp>
+
+Currently supports:
+- Presence
+- Location (3G)
+- Geofence perimeter check
+- User management -- retrieving list of devices, adding or removing devices
+
+Does not support:
+- All other geofence operations
+- SMS
+- iDen Content Uploader
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::Sprint
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Sprint
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-Sprint
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-Sprint
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Sprint/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2012 Brett T. Warden
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,62 @@
+
+=head1 NAME
+
+WWW::Scripter::Location - Location object for WWW::Scripter
+
+=head1 VERSION
+
+Version 0.032
+
+=head1 METHODS
+
+=over
+
+=item hash
+
+=item host
+
+=item hostname
+
+=item href
+
+=item pathname
+
+=item port
+
+=item protocol
+
+=item search
+
+Each of these returns or sets the corresponding part of the URI. (Actually,
+C<href> refers to the whole thing, not just a part.) If you set one of
+these, it tells the WWW::Scripter object to go to another page.
+
+What the location object shows as being the current URL includes the
+fragment (hash) if any, and can also be modified by 
+C<< history->pushState >>. To get the real URL, use WWW::Scripter's C<uri>
+method, which is inherited from WWW::Mechanize.
+
+=item reload
+
+Does what it says.
+
+=item replace ( $new_uri )
+
+Replaces the current page in Mech's history with C<$new_uri>, which it
+tells Mech to go and fetch.
+
+=back
+
+=head1 AUTHOR & COPYRIGHT
+
+See L<WWW::Scripter>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item -
+
+L<WWW::Scripter>
+
+=back

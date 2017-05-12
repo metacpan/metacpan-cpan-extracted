@@ -1,0 +1,173 @@
+
+
+        +==========================================================+
+        |                                                          |
+        |              ODBC extension for Win32 Perl               |
+        |                                                          |
+        |                     ODBC.PM package                      |
+        |                                                          |
+        |              -----------------------------               |
+        |                                                          |
+        |              by Dave Roth <rothd@roth.net>               |
+        |                                                          |
+        |                                                          |
+        |  Copyright (c) 1996-1997 Dave Roth. All rights reserved. |
+        |   This program is free software; you can redistribute    |
+        | it and/or modify it under the same terms as Perl itself. |
+        |                                                          |
+        +==========================================================+
+
+
+          based on original code by Dan DeMaggio <dmag@umich.edu>
+
+ Use under GNU General Public License or Larry Wall's "Artistic License"
+
+
+    ---------------------------------------------------------------------
+        CHECK OUT THE FAQ!!! HTTP://WWW.ROTH.NET/ODBC/ODBCFAQ.HTM
+    ---------------------------------------------------------------------
+
+ This is a hack of Dan DeMaggio's <dmag@umich.edu> NTXS.C ODBC implimentation.
+ I have recoded and restructered most of it including most of the ODBC.PM
+ package but its very core is still based on Dan's code (thanks Dan!).
+
+
+ODBC.PM HISTORY:
+---------------
+96.04.07 Joseph L. Casadonte Jr. <joc@netaxs.com>
+         -Modified Data() to accept multiple field names
+          and return an array or scalar.
+         -Confirm Win95 compliance.
+         -Various bug fixes.
+96.04.10 Dave Roth <rothd@roth.net>
+         -Fixed the RowCount() to default to the current connection.
+96.04.15 Dave Roth <rothd@roth.net>		
+		 -Changed version numbers to a date format.
+96.05.07 Dave Roth <rothd@roth.net>
+         -Fixed Data(): If returning an array, the array consisted of
+          the requested fieldnames + the values. Now only returns the
+          values. Thanks to Dan Westerlund <westerlund@dkraft.se>!
+96.05.11 Dave Roth <rothd@roth.net>
+		 -Corrected SetStmtCloseType(): it was using the CloseType as
+		  if it was a ConnectionNumber instead.
+96.07.22 Brian Dunfordshore <Brian_Dunfordshore@bridge.com>
+         -Added MoreResults().
+96.10.17 Dave Roth <rothd@roth.net>
+         -Added support for new functions in ODBC.PLL (see below)
+96.10.18 Dave Roth <rothd@roth.net>
+         -Corrected the calls to GetData().
+         -Added a "dirty" flag so Data() and DataHash() know whether or not
+          to go to ODBCGetData() or use the namespace for field data.
+96.10.25 Dave Roth <rothd@roth.net>
+         -Added ODBC:: reference. Now you can access constants by ODBC::xxx.
+96.10.26 Jutta M. Klebe <jmk@exc.bybyte.de>
+         -The Dirty flag was not reset in Data() & DataHash().
+97.01.04 Dave Roth <rothd@roth.net>
+		 - Durring the closing of the module it calls new function ODBCShutDown().
+97.02.08 Dave Roth <rothd@roth.net>
+         - Corrected Error reporting bug.
+
+99.09.25 Gurusamy Sarathy <gsar@cpan.org>
+	 - DumpData() typo fix from Rex Livingston <Rex.Livingston@praxa.com.au>
+	 - s/sql/Sql/; a minor efficiency improvement
+	 - some minor tweaks for compatibility with Perl 5.005xx
+	 - html -> pod documentation from David Rosinger <dsrosing@ingr.com>
+	 - added ODBC_{ADD,REMOVE,CONFIG}_SYS_DSN constants for working with
+	   system DSNs (from Stergios Marinopoulos <stergios@onward-net.com>)
+	 - minor cosmetic edits to Constant.cpp for portability
+
+2000.05.22 Gurusamy Sarathy <gsar@cpan.org>
+	 - avoid warnings from GetData() (from Rex Livingston)
+	 - cosmetic fixes to indentation
+
+ODBC.PLL HISTORY:
+----------------
+96.04.10 Dave Roth <rothd@roth.net>
+         -Fixed a "memory bug": we were using SQL_CLOSE when closing
+          an ODBC statement. This kept the cursor alive in memory so
+          it can be cached in the event the same SQL statement is issued.
+          We are now using SQL_DROP. This may lessen speed if the same
+          SQL statements are issued again and again per connection.
+         -Cleaned up some code.
+96.04.12 Dave Roth <rothd@roth.net>
+         -Added G/SetStmtCloseType() functions.
+         -Added some constants.
+96.04.13 ** We now are trying to include a version for builds up to and
+		 including 105 and another for builds 106 and greater (for now).
+96.04.15 Jutta M. Klebe <jmk@exc.bybyte.de>
+         -Fix Bug in ODBCFetchRow(): when retrieving a field with a NULL 
+          value the value from the previous field was reported.
+		 -Changed version numbers to a date format.
+96.04.22 Jutta M. Klebe <jmk@exc.bybyte.de>
+         -Fix the SDWORD wrap-around bug in ODBCFetchRow(): when a column of
+		  size  2147483647 adding 1 (for a NULL byte in szBuf) yields
+		  (-2147483648) (not easy to "net UCHAR (-2147483648)"!!)
+96.04.22 Dave Roth <rothd@roth.net>
+		 -Inspired by Jutta, I have increased the max limit for SetMaxBufSize()
+		  to 2,147,483,647 bytes.
+96.05.03 Dave Roth <rothd@roth.net>
+		 -Set the lowest allocated char array to be 20 bytes in ODBCFetchRow().
+		  Evidentally sometimes the ODBC manager will report too few chars 
+		  that are needed to represent an autonumber field.
+96.05.08 Dave Roth <rothd@roth.net>
+		 -Convert all results from ODBCTableList() to uppercase since different
+		  ODBC drivers impliment this differently (some uppercase some lower).
+		  Thanks again to Jutta M. Klebe <jmk@exc.bybyte.de>
+		  *** This patch is open for suggestions!!! ***
+96.05.13 Mike Knister <knister@sierra.net>
+         -Change SQL_COLUMN_LENGTH to SQL_COLUMN_DISPLAY_SIZE in the
+          SQLColAttributes() line withing ODBC_Fetch(). This was returning the
+          number of bytes needed to represent the C data type for the
+          particular column. We need it to return the number of bytes needed
+          to represent an ASCII version of the value held within the data type.
+96.07.22 Brian Dunfordshore <Brian_Dunfordshore@bridge.com>
+         -Added ODBCMoreResults().
+96.10.17 Dave Roth <rothd@roth.net>
+    Modified:
+         - Fetch() is now based on both SQLFetch() and SQLExtendedFetch().
+         - Error() now works correctly.
+         - new() now lets you specify ConnectOptions to impliment before
+           the actual connection is made.
+    Added:
+         - ConfigDSN()
+         - SetStmtOption()
+         - DataSources()
+         - Debug()
+         - DropCursor()
+         - GetConnectOption()
+         - GetCursorName()
+         - GetData()
+         - GetDSN()
+         - GetFunctions()
+         - GetInfo()
+         - GetStmtOption()
+         - SetConnectOption()
+         - SetCursorName()
+         - SetPos()
+         - SetStmtOption()
+         - Transact()
+         - Support for all ODBC/SQL constants.
+96.10.26 Jutta M. Klebe <jmk@exc.bybyte.de>
+		 - Correct GetData() returning NULL values (again).
+97.01.04 Dave Roth <rothd@roth.net>
+		 - Now using a Multi-threading aware OOP model.
+		 - Optimized some functions.
+		 - Added:
+		   ODBCClone		
+		   ODBCGetSQLState
+		   ODBCGetStats	
+		   ODBCShutDown() -- for correct memory deallocation when used with
+		                     perlis.dll (win32 platform). 
+97.02.08 Dave Roth <rothd@roth.net>
+		 - Fixed Error reporting which broke a version or two ago.
+		 - Fixed (hopefully) the nasty binary NULL bug returning char#255's.
+		 - Removed non-necessary debugging routines for release versions.
+		 - Consolidated Get/SetSmtpOptions into one routine.
+
+
+
+
+
+
+
+        

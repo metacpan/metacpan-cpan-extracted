@@ -1,0 +1,40 @@
+#!perl
+use strict;
+use warnings;
+use WWW::Facebook::API;
+
+my $client = WWW::Facebook::API->new(
+    desktop      => 1,
+    throw_errors => 1,
+    parse        => 1,
+);
+
+print "Enter your public API key: ";
+chomp( my $val = <STDIN> );
+$client->api_key($val);
+print "Enter your API secret: ";
+chomp( $val = <STDIN> );
+$client->secret($val);
+
+my $token = $client->auth->login( sleep => 20 );
+$client->auth->get_session($token);
+
+use Data::Dumper;
+my $friends_perl = $client->friends->get;
+print Dumper $friends_perl;
+
+my $query = $client->fql->query(
+    query => 'SELECT name FROM user WHERE uid=' . $client->session_uid );
+print Dumper $query;
+
+my $notifications_perl = $client->notifications->get;
+print Dumper $notifications_perl;
+
+# Current user's quotes
+my $quotes_perl = $client->users->get_info(
+    uids   => $friends_perl,
+    fields => ['quotes']
+);
+print Dumper $quotes_perl;
+
+$client->auth->logout;

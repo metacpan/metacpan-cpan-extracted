@@ -1,0 +1,15 @@
+Revision history for Web::Components::Role::Email
+
+0.3.1     2017-03-10 22:58:42
+          - Toolchain update CVE-2016-1238
+          - More defensive encode calls
+
+0.2.1     2016-04-01 15:14:05
+          - Better error reporting
+          - Added badge markup
+          - Fewer test dependencies in boilerplate
+          - Passes tests
+
+0.1.1     2015-09-02 20:22:21
+          - Added project files to master branch
+

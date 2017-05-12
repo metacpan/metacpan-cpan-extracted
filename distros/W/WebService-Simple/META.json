@@ -1,0 +1,127 @@
+{
+   "abstract" : "Simple Interface To Web Services APIs",
+   "author" : [
+      "Yusuke Wada  C<< <yusuke@kamawada.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XML::Feed" : "0",
+            "XML::LibXML" : "0",
+            "XML::Parser::Lite::Tree" : "0",
+            "XML::Parser::Lite::Tree::XPath" : "0"
+         },
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Class::Data::ConfigHash" : "0",
+            "Class::Inspector" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "HTTP::Message" : "0",
+            "Hash::MultiValue" : "0",
+            "JSON" : "2.0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "UNIVERSAL::require" : "0",
+            "URI" : "1.36",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Simple" : {
+         "file" : "lib/WebService/Simple.pm",
+         "version" : "0.25"
+      },
+      "WebService::Simple::Parser" : {
+         "file" : "lib/WebService/Simple/Parser.pm"
+      },
+      "WebService::Simple::Parser::JSON" : {
+         "file" : "lib/WebService/Simple/Parser/JSON.pm"
+      },
+      "WebService::Simple::Parser::XML::Feed" : {
+         "file" : "lib/WebService/Simple/Parser/XML/Feed.pm"
+      },
+      "WebService::Simple::Parser::XML::LibXML" : {
+         "file" : "lib/WebService/Simple/Parser/XML/LibXML.pm"
+      },
+      "WebService::Simple::Parser::XML::Lite" : {
+         "file" : "lib/WebService/Simple/Parser/XML/Lite.pm"
+      },
+      "WebService::Simple::Parser::XML::Simple" : {
+         "file" : "lib/WebService/Simple/Parser/XML/Simple.pm"
+      },
+      "WebService::Simple::Response" : {
+         "file" : "lib/WebService/Simple/Response.pm",
+         "version" : "0.25"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yusukebe/WebService-Simple/issues"
+      },
+      "homepage" : "https://github.com/yusukebe/WebService-Simple",
+      "repository" : {
+         "url" : "git://github.com/yusukebe/WebService-Simple.git",
+         "web" : "https://github.com/yusukebe/WebService-Simple"
+      }
+   },
+   "version" : "0.25",
+   "x_authority" : "cpan:YUSUKEBE",
+   "x_contributors" : [
+      "Daisuke Maki <dmaki@cpan.org>",
+      "mattn <mattn.jp@gmail.com>",
+      "drry <drry@drry.jp>",
+      "Tomohiro Teranish <tomyhero@cpan.org>",
+      "Matsuno Tokuhiro <tokuhirom@gmail.com>",
+      "Naoki Tomita <tomita@cpan.org>",
+      "isync <o.zucker@web.de>",
+      "Tim Vroom <vroom@blockstackers.com>",
+      "isync <O.Zucker@web.de>",
+      "Yusuke Wada <yusuke@kamawada.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

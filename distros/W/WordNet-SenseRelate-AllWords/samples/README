@@ -1,0 +1,24 @@
+The samples directory contains several files that may be helpful.
+
+Contents:
+
+short-raw.txt
+short-tagged.txt
+short-wntagged.txt
+     These files are example files that can be used to test the
+     software with each of the different input formats. 
+
+semcor-sample.txt
+
+     A short extract from one Semcor 2.0 file that can be used as
+     input to utils/semcor-reformat.pl.  Semcor can be downloaded from
+     http://www.cs.unt.edu/~rada/downloads.html#semcor
+
+default-stoplist-raw.txt
+
+     This stoplist is based on the SMART stoplist, and is more 
+     extenstive than the default stoplist that is provided with 
+     the Web interface (web/cgi-bin/allwords/default-stoplist-raw.txt)
+     The Web stoplist is a small set of common stop words that
+     have unusual and potentially unexpected WordNet entries. 
+

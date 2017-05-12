@@ -1,0 +1,72 @@
+{
+   "abstract" : "automates usage of Freshmeat.net",
+   "author" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "keywords" : [
+      "freshmeat",
+      "API"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Freshmeat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : 0,
+            "LWP::Online" : "1.06",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : 0,
+            "Mouse" : "0.24",
+            "XML::Parser" : 0,
+            "XML::Simple" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Freshmeat" : {
+         "file" : "lib/WWW/Freshmeat.pm",
+         "version" : "0.22"
+      },
+      "WWW::Freshmeat::Project" : {
+         "file" : "lib/WWW/Freshmeat/Project.pm",
+         "version" : "0.22"
+      },
+      "WWW::Freshmeat::Project::URL" : {
+         "file" : "lib/WWW/Freshmeat/Project/URL.pm",
+         "version" : "0.22"
+      },
+      "WWW::Freshmeat::User" : {
+         "file" : "lib/WWW/Freshmeat/User.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/chorny/WWW-Freshmeat"
+      },
+      "x_Ohloh" : "https://www.ohloh.net/p/WWW-Freshmeat"
+   },
+   "version" : "0.22"
+}

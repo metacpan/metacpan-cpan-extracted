@@ -1,0 +1,64 @@
+{
+   "abstract" : "Lisp-style resumable exceptions (conditions)",
+   "author" : [
+      "Lukas Mai <l.mai@web.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Worlogog-Incident",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.56",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dispatch::Class" : "0",
+            "Exporter::Tiny" : "0",
+            "Return::MultiLevel" : "0",
+            "Scope::OnExit::Wrap" : "0",
+            "Worlogog::Restart" : "0",
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mauke/Worlogog-Incident.git",
+         "web" : "https://github.com/mauke/Worlogog-Incident"
+      }
+   },
+   "version" : "0.02"
+}

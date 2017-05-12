@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+Changes.txt
+lib/Win32/HideConsole.pm
+examples/hideconsole.pl

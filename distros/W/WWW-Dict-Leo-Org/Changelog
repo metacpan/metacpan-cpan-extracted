@@ -1,0 +1,280 @@
+2.00:
+
+Fixed rt.cpan.org#119714 rt.cpan.org#120563 and https://github.com/TLINDEN/leo/pull/1:
+We're now implementing the XML interface, since the HTML interface
+is no longer available. Many thanks to Roland Hieber for the help!
+
+Fixed DB_File loading, now more portable.
+
+1.45:
+
+fixed rt.cpan.org#118472.
+
+1.44:
+
+Fixed error handling, added sample code for module usage.
+
+1.43:
+
+Fix POD.
+
+1.42:
+
+Better tabluar output (better column calc). However, russian
+grapheme length is still wrong.
+
+1.41:
+
+Generalized lang parsing and passing to dict.leo.org, which
+also adds support for new languages like ru, ch or pl. Thanks
+to J.A.Eichler.
+
+1.40:
+
+not logged, sorry.
+
+1.39:
+
+fixed rt.cpan.org#91464: disable caching if DB_File is not found.
+
+1.38:
+
+fixed rt.cpan.org#92944, missed translations. The problem was,
+that the pda.leo.org uses a differnt number of tables depending
+on the translation. So, now we just fetch all tables (2-4) and
+ignore those which are not translations (forum posts or empty cells).
+
+Applied patch rt.cpan.org#92914 (POD locale encoding).
+
+1.37:
+
+fixed rt.cpan.org#92679, the site url and table structure
+changed.
+
+1.36:
+
+applied patch rt.cpan.org#35543, which fixes handling
+of utf8 terminals.
+
+fixed rt.cpan.org#84196 using the suggested changes.
+
+applied patch rt.cpan.org#86641, spelling fixes.
+
+1.35:
+
+Switched to use pda.leo.org, which is easier to parse,
+faster to load and seems not change that often.
+
+1.34:
+
+Oh, if a search only returns one section, nothing have been
+returned. This was a bug which has been fixed.
+
+
+1.33:
+
+Replaced handcrafted html parser by HTML::TableParser module.
+It was over seven years old, so time has come. The new parsing
+should now be much more stable and catch most, if not all,
+tinkering on dict.leo.org.
+
+The organization of the array of hashes returned by ::translate()
+has changed. Take a look at the example in the pod or view the
+supplied 'leo' script how to use it.
+
+1.32:
+
+Fixed strange packaging bug.
+
+Fixed yet another parsing bug (there are now titles formatted different than
+other titles, damn).
+
+Changed default translation direction to 0, so that dict.leo.org determines
+automatically the direction to use.
+
+
+1.31:
+
+Fixed dict.leo.org siteupdates (back to stoneage: they added some
+invalid html again).
+
+
+1.30:
+
+Fixed bug in leo script, it did not load WWW::Dict::Leo::Org but just
+Org, which I did during development, but which doesn't work after
+installation.
+
+Updated the version in leo script to 1.30 too.
+
+
+1.29:
+
+Added changelog entry for 1.28 (actually I forgot it)
+
+Added documentation for the methods of the module (forgotten too)
+
+
+1.28:
+
+Transformed the script into a installable perl module. 'leo'
+itself still exists but uses now this module for the actual
+translation job. The perl module WWW::Dict::Leo::Org can
+be used from perl scipts and applications for translation.
+
+
+1.27:
+
+fixed site updates on dict.leo.org - hey, they finally fixed some faulty html
+which in fact caused parse errors in the script.
+
+changed the default user agent to a some more recent one.
+
+
+1.26:
+
+bugfix - removed gzip accept header.
+
+
+1.25:
+
+fixed latest site update, they added javascript
+popup-links. Thanks to Sylvia for the hint.
+
+
+1.24:
+
+bugfix: last patch didn't work with proxy.
+
+
+1.23:
+
+fixed latest site update (lang must be part of the cgi
+url, for whatever reason). Thanks to Tobi Werth for the
+patch!
+
+
+1.22:
+
+added more translation options (-l):
+
+ - en (used so far as the default), leo.org: en<->de
+ - fr, leo.org: fr<->de
+ - fr2de
+ - de2fr
+
+if no string is given as input, stdin will be read (one line)
+instead; if stdout is not connected to a tty, no escape chars will
+be used, e.g.:
+
+ echo "attention" | leo -l fr | grep acht
+
+This allows leo to be used for scripting or something, you
+may imagine yourself the possibilities.
+
+
+added proxy authentication support.
+
+added a section about proxy to the man-page.
+
+1.21:
+
+added -d flag to get debugging informations.
+
+fixed parser bug, which occured under some rare circumstances.
+
+
+1.20:
+
+applied patch by almaric, which reflects latest site changes.
+
+the user agent can now be configured in the config file.
+
+1.19:
+
+once more, they changed the site design (and - btw - it contains
+still HTML failures!).
+
+1.18:
+
+reflection of DICT site changes.
+
+1.17:
+
+there's a "more Examples..." link on the bottom of doct.leo.org
+if the query returned too many examples. leo did not properly
+respond to this, which is fixed now. But: leo does *not* fetch
+the pending examples at the moment!
+
+1.16:
+
+reflection of DICT site changes.
+new html parser code, seems to be more stable against site changes,
+I think.
+
+1.15:
+
+lost
+
+1.14:
+added cache feature.
+
+added manpage, install Makefile and README file.
+
+1.13:
+reflection of DICT site changes.
+
+revision 1.12
+date: 2002/07/22 20:03:17;  author: scip;  state: Exp;  lines: +131 -15
+added some commandline options to reflect some new dict.leo.org features
+----------------------------
+revision 1.11
+date: 2002/07/18 19:11:58;  author: scip;  state: Exp;  lines: +3 -3
+applied patch by Thomas Glanzmann <sithglan@stud.uni-erlangen.de>,
+which fixes "no result" parsing
+----------------------------
+revision 1.10
+date: 2002/07/17 20:56:52;  author: scip;  state: Exp;  lines: +11 -9
+updated 4 new leo (july/2002)
+----------------------------
+revision 1.9
+date: 2001/09/21 17:19:31;  author: scip;  state: Exp;  lines: +31 -10
+added proxy support to leo
+----------------------------
+revision 1.8
+date: 2001/06/21 23:42:17;  author: scip;  state: Exp;  lines: +5 -5
+committed
+----------------------------
+revision 1.7
+date: 2001/06/05 21:16:24;  author: scip;  state: Exp;  lines: +19 -6
+fixed: returns now an error, if leo did not find a match
+added: we are now advertising us as Konqueror :-)
+----------------------------
+revision 1.6
+date: 2001/05/26 01:48:36;  author: scip;  state: Exp;  lines: +6 -2
+added copyright message
+----------------------------
+revision 1.5
+date: 2001/05/24 21:17:34;  author: scip;  state: Exp;  lines: +19 -7
+removed call to lynx, use IO::Socket from now on!
+----------------------------
+revision 1.4
+date: 2001/05/24 01:39:25;  author: scip;  state: Exp;  lines: +2 -2
+added alphabetical sorting
+----------------------------
+revision 1.3
+date: 2001/05/24 01:33:22;  author: scip;  state: Exp;  lines: +2 -2
+changed bold to blue
+----------------------------
+revision 1.2
+date: 2001/05/24 01:15:33;  author: scip;  state: Exp;  lines: +1 -1
+initial submit
+----------------------------
+revision 1.1
+date: 2001/05/24 01:14:32;  author: scip;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2001/05/24 01:14:32;  author: scip;  state: Exp;  lines: +0 -0
+scripts entered into cvs

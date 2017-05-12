@@ -1,0 +1,27 @@
+Revision history for WWW-VieDeMerde
+
+0.21  Sun Aug 30 21:49 2009
+      Support comments
+		Error management
+
+0.1   Sat Aug 29 11:31 2009
+      support API 2.0 and fmylife.com
+      support get command
+
+
+0.02	Sun Nov 02 00:03:58 CEST 2008
+		Added random, top*, flop*, cat methods
+		Better function for calling API functions
+
+0.012   Thu Oct 23 17:27:26 CEST 2008
+		Added LICENCE field in Makefile.PL.
+		A suggestion of Gabor Szabo.
+
+0.011   Sun Oct 19 12:46:40 CEST 2008
+        Added =encoding utf8 in pod. Sorry.
+		Corrected some English mistakes.
+		Removed Data::Dump dependency.
+
+0.01    Sat Oct 18 16:58:01 CEST 2008
+        First version
+

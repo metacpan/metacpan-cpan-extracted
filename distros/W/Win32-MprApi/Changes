@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::MprApi.
+
+0.01  Mon Jan 27 16:30:00 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Win32::MprApi
+
+0.02  Fri Jan 31 18:36:01 2003
+	- moved Win32::API constructors in module global namespace
+		to fix a handler leakage

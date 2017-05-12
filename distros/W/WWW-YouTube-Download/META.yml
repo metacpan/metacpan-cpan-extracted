@@ -1,0 +1,61 @@
+---
+abstract: 'Very simple YouTube video download interface'
+author:
+  - 'xaicron <xaicron {@} cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-YouTube-Download
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::YouTube::Download:
+    file: lib/WWW/YouTube/Download.pm
+    version: '0.59'
+requires:
+  HTML::Entities: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Term::ANSIColor: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+  XML::TreePP: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/xaicron/p5-www-youtube-download/issues
+  homepage: https://github.com/xaicron/p5-www-youtube-download
+  repository: git://github.com/xaicron/p5-www-youtube-download.git
+version: '0.59'
+x_contributors:
+  - 'akiym <akiyama@8ant.org>'
+  - 'Maurice <mauricemengel@gmail.com>'
+  - 'ks <ks-for-git@live.jp>'
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+  - 'Flavio Poletti <flavio@polettix.it>'
+  - 'TANIGUCHI Takaki <takaki@asis.media-as.org>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Ahmad Syaltut <Isyaltut@gmail.com>'
+  - 'Mikolaj Kucharski <mikolaj@kucharski.name>'
+  - 'isync <o.zucker@web.de>'
+  - 'Thomas Sibley <tsibley@cpan.org>'
+  - 'Yuji Shimada <xaicron@gmail.com>'
+  - 'isync <O.Zucker@web.de>'
+  - 'Paulo Custodio <pauloscustodio@gmail.com>'
+  - 'B. Estrade <estrabd@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

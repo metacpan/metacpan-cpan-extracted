@@ -1,0 +1,69 @@
+Revision history for Perl extension Waft.
+
+0.9910  Thu Oct 29 21:17:39 2009
+    - changed to be thread-safe
+        - changed from $Waft::Self to $__self in template. sorry...
+        - next() is safe only as instance method
+    - get_content() returns values from code on wantarray
+    - next() supports method mixed SUPER::, *:: and next()
+    - other minor spec changes
+    - added pod
+
+0.9909  Tue Oct 27 01:45:59 2009
+    - waft tags are inserted before label tag as well as form tags
+    - added method get_content to buffer contents
+    - next() supports call from eval
+    - other minor spec changes
+
+0.9908  Sat Feb 28 13:22:23 2009
+    - next() supports multiple (diamond) inheritance
+    - changed text_filter() so that first space is converted into '&nbsp;'
+
+0.9907  Sun Nov 16 04:11:52 2008
+    - added method next() for mixin. it's too simple at this time. in the
+      future, it will support mutiple inheritance
+    - other minor spec changes and bug fixes
+
+0.9906  Mon Nov 10 00:18:53 2008
+    - added escape support for JavaScript string
+    - support CR only line break in text_filter(). (not using Text::Tabs)
+    - other minor spec changes and bug fixes
+
+0.9905  Sun Nov  2 03:49:46 2008
+    - fixed HTML escape problem in text_filter()
+    - added mixin support
+    - added methods for make absolute url
+    - other minor spec changes and bug fixes
+    - added pod
+
+0.99_04  Mon Sep 15 21:44:40 2008
+    - refixed UTF-8 problem in initializing a page
+    - usual lib directory (lib/Module/) also came to be found in
+      find_template_file(), in addition to template directory
+      (lib/Module.template/)
+        but in this case, template file extension is limited in .html, .css,
+        .js and .txt. you can change them with set_allow_template_file_exts()
+    - added cache processing in find_template_file()
+    - changed class name of Waft object back to Waft::Object from Waft::Class
+    - added $Waft::Cache for debug to disable cache processing
+
+0.99_03  Mon Sep  8 01:17:57 2008
+    - fixed a UTF-8 problem in initializing a page
+    - modified code to get script basename and added a few tests
+    - other minor spec changes
+    - added pod for DISPATCH 
+
+0.99_01  Sun Aug 31 22:09:14 2008
+    - complete rewrite
+    - fixed to run under taint mode
+    - add processing about template
+        - return 'not_found.html' when not found
+        - return 'internal_server_error.html' when failed to stat()
+        - return 'forbidden.html' when failed to open()
+        - add action methods of these pages
+    - other minor spec changes and bug fixes
+
+0.52  Fri Dec 28 11:58:36 2007
+    - original version; created by h2xs 1.23 with options
+        -AX -n Waft -v 0.52
+

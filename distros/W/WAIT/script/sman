@@ -1,0 +1,433 @@
+#!perl -w
+#                              -*- Mode: Perl -*- 
+# $Basename: sman $
+# $Revision: 1.14 $
+# Author          : Ulrich Pfeifer
+# Created On      : Fri Aug 30 15:52:25 1996
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Mon May  8 11:03:46 2000
+# Language        : CPerl
+# 
+# (C) Copyright 1996-2000, Ulrich Pfeifer
+# 
+
+use strict;
+
+use Term::ReadLine;
+use Getopt::Long;
+use Fcntl;
+use Config;
+
+require WAIT::Config;
+require WAIT::Database;
+require WAIT::Query::Base;
+require WAIT::Query::Wais;
+
+
+$SIG{PIPE} = 'IGNORE';
+my %OPT = (database => 'DB',
+           dir      => $WAIT::Config->{WAIT_home} || '/tmp',
+           table    => 'man',
+           pager    => $WAIT::Config->{'pager'} || 'more',
+           filter   => 0,
+           max      => 15,
+          );
+
+GetOptions(\%OPT,
+           'database=s',
+           'dir=s',
+           'table=s',
+           'filter=i',
+           'max=i',
+           'pager:s') || die "Usage: ...\n";
+
+my $db = WAIT::Database->open(name      => $OPT{database},
+                              mode      => O_RDONLY,
+                              directory => $OPT{dir})
+  or die "Could not open database $OPT{database}: $@";
+
+my $tb = $db->table(name => $OPT{table})
+  or die "Could not open table $OPT{table}: $@";
+
+# not used: my $layout = $tb->layout; # a WAIT::Parse::Nroff object
+
+my $term = new Term::ReadLine 'Simple Query Interface';
+
+require WAIT::Format::Term;
+my $format;
+if ($Config::Config{'archname'} eq 'i586-linux') {
+  # for color xterm
+  $format = new WAIT::Format::Term query_s => "[01;31m", query_e => "[00m";
+} else {
+  $format = new WAIT::Format::Term;
+}
+
+my $pager =  ($OPT{pager}) ? \&pager : \&less;
+my $OUT   = $term->OUT;
+
+my $st = 1;
+print $OUT "Enter 'h' for help.\n";
+
+# sman is basically offering three services: find the hits and show
+# them (a query), show metadata for a hit (a view), show a hot (display)
+
+my($query, @did);
+
+while (defined ($_ = &myreadline("$st> "))) {
+  chomp; $st++;
+
+  my(%hits, $query_text);
+  if (/^$/) {
+    next;
+  } elsif (/^m (\d+)$/) {
+    $OPT{max} = $1;
+  } elsif (/^f\s*(\d+)?$/) {
+    $OPT{filter} = $1;
+    next;
+  } elsif (/^t$/i) {
+    if ($pager eq \&less) {
+      $pager = \&pager;
+    } else {
+      $pager = \&less;
+    }
+    next;
+  } elsif (/^(\d+)$/) {
+    if (defined $did[$1]) {
+      display($did[$1]);                    # <----------- display (full doc)
+      next;
+    }
+  } elsif (/^d\s*(\d+)/) {
+    if (defined $did[$1]) {
+      view($did[$1]);                       # <----------- view (metadata from WAIT)
+      next;
+    }
+  } elsif (/^q$/i) {
+    last;
+  } elsif (/^l$/i) {
+    # fall through
+  } elsif (/^[h?]$/i) {
+    help();
+    next;
+  } elsif (/^hh$/i) {
+    extended_help();
+    next;
+  } else {                                  # <----------- A query (Display a list)
+    $query_text = $_;
+    eval {$query = WAIT::Query::Wais::query($tb, $_)};
+    if ($@ ne '') {
+      print $OUT "$_ => $query\n\$\@='$@'\n";
+    } elsif (ref($query)) {
+      %hits = $query->execute(top => $OPT{max}, picky => 1);
+      # the hash %hits has as keys document numbers and as values
+      # quality figures. The doc numbers are not what we have as docid
+      # to find the item in the access class, they are WAIT's private
+      # numbers.
+    } else {
+      next;
+    }
+  }
+
+  next unless %hits;
+  my $no = 1; # numbering the hits for the result table that is
+              # presented to the user
+
+  @did = (); # store the internal numbers (keys of %hits). The user
+             # will use $no in sman's interface to select a hit.
+
+  # the following loop uses the values of %hits to sort the results
+  # according to the quality and cut after a number of rows. After
+  # that %hits isn't needed anymore.
+  print "Query: $query_text\n";
+  for my $did (sort {$hits{$b} <=> $hits{$a}} keys %hits) {
+
+    my %tattr = $tb->fetch($did);
+    # the hash %tattr contains several attributes of the item we are
+    # referring to, namely the attributes that we named in the "attr"
+    # argument of the create_table statement in smakewhatis
+
+    printf $OUT "%2d %6.3f %s\n", $no, $hits{$did},
+                 substr($tattr{headline} ||'',0,68);
+    $did[$no] = $did;
+    last if $no++ >= $OPT{max};
+
+  }
+
+} continue {
+  # we don't do this since Andreas Koenig does not think of it as feature
+  # $term->SetHistory(grep length($_)>4, $term->GetHistory)
+}
+warn "Thank you for using sman\n";
+
+$tb->close;
+$db->close;
+
+sub myreadline {
+  if (@ARGV) {
+    return shift @ARGV;
+  } else {
+    $term->readline(@_);
+  }
+}
+sub help {
+  my $idb = "\n\t'". join(q[', '], $tb->fields()) . "'";
+    print $OUT qq[Available commands:
+
+ <num>          Show the  document <num>
+ d <num>        Show the db entry of document <num>
+ f <num>        Display only <num> lines context 
+ h,?            Display this help message
+ hh             Display query examples
+ m <num>        Set maxhits to <num>
+ t              Toggle display mode (term/less)
+ q              Exit from $0
+ l              redisplay last ranking
+Other input is tried as wais query.
+The following fields are known: $idb
+] ;
+}
+
+sub extended_help {
+  print q{
+Here are some query examples:
+
+information retrieval               free text query 
+information or retrieval            same as above 
+des=information retrieval           `information' must be in the description 
+des=(information retrieval)         one of them in description 
+des=(information or retrieval)      same as above 
+des=(information and retrieval)     both of them in description 
+des=(information not retrieval)     `information' in description and
+                                    `retrieval' not in description 
+des=(information system*)           wild-card search
+au=ilia                             author names may be misspelled
+
+You can build arbitary boolean combination of the above examples.
+Field names may be abbreviated.
+}
+}
+
+sub view {
+  my $did = shift;
+  my %tattr = $tb->fetch($did);
+  for (keys %tattr) {
+    print $OUT "$_ $tattr{$_}\n";
+  }
+}
+
+sub display {
+  my $did = shift;
+
+  return unless defined $query and defined $did;
+
+  print $OUT "Wais display document $did\n";
+  my %tattr = $tb->fetch($did);
+  my $tdid = $tattr{docid};
+# WHAT DOES HE DO HERE? ULI???
+# Re: some indexing scripts did use pathnames relative to the table directory
+# especially the cpanwait script does this. uli
+#  if ($tdid !~ m(^/)) {
+#    $tdid = $tb->dir . '/' . $tdid;
+#  }
+
+  # The main task of all that follows from here is highlighting. WAIT
+  # is designed to make it possible to show the user why a certain
+  # document was chosen by the indexer.
+
+  my $buf = $tb->fetch_extern($tdid);
+  # This $buf can be an object that can have enough information to do
+  # highlighting without WAIT's help. If you prefer to implement your
+  # own highlighting, you can do so now with e.g. print
+  # $buf->highlight(query => $query)
+
+  # All you need to know to implement highlighting is how a
+  # WAIT::Query::Base object looks like (left as an exercise for the
+  # reader).
+
+  # The impatient reader may want to implement something without
+  # highlighting, in which case he does not need any info about the
+  # query object and can rightaway run e.g.
+  #   print $buf->as_string
+
+  # Thus the impatient reader does not necessarily need the following
+  # heavy wizardry. Just to give you an idea what's going on: every
+  # word in the text must be compared to every word in the query if it
+  # is worth highlighting, and which part of the word is worth
+  # highlighting. This must be done differently for every field in the
+  # table and for every index defined for that field. Try to run a
+  # query with 100 words and you'll be amazed to see it really works.
+  # Or maybe it doesn't. You should be aware that the hilighting code
+  # is to be regarded as alpha. It is certainly the least tested part
+  # of WAIT so far.
+
+  if ($buf) {
+    my @txt = $query->hilight($buf);
+    # In this operation the following things melt into one piece:
+    # $query: The query entered by the user (Class isa WAIT::Query::Base)
+    # $tb:    The table we queried (Class WAIT::Table)
+    # $buf:   The document to display (User defined class or string)
+    # The steps taken are:
+    # 1.) $query calls "hilight" on $tb and passes
+    #     filtered and raw search terms ($query->{Plain} and $query->{Raw}).
+    # 2.) $tb asks the layout object to tag the object which results
+    #     in an array with alternating elements of tags (anon HASHes) and
+    #     strings.
+    # 3.) $tb adds some markup on its own: {qt=>1} or some such
+
+    # The result of that process can optionally be sent through a
+    # filter, just to impress your friends with yet more heavy
+    # wizardry
+    if ($OPT{filter}) {
+      @txt = &filter(@txt);
+    }
+
+    # And then a formatter (in our case a terminal formatter) turns
+    # all the markup into escape sequences and strings that can in
+    # turn be sent through a pager for instance
+    &$pager($format->as_string(\@txt));
+  }
+
+  # Hey, that's it. The user out there is deeply impressed now. You
+  # can lean back again:-) He got a document that has some words
+  # hilighted and will probably read and enjoy it. Maybe he'll send
+  # you an email.
+}
+
+sub filter {
+  my @result;
+  my @context;
+  my $lines   = 0;
+  my $clines  = 0;
+  my $elipsis = 0;
+
+  print STDERR "Filter ...";
+  while (@_) {
+    my %tag = %{shift @_};
+    my $txt =  shift @_;
+
+    for (split /(\n)/, $txt) {
+      if ($_ eq "\n") {
+        if (exists $tag{_qt}) {
+          #die "Weird!";
+          push @result, {_i=>1}, "[WEIRD]";
+        } elsif ($lines) {
+          push @result, {}, $_;
+          $lines--;
+        } else {
+          push @context, {}, $_;
+          $clines++;
+        }
+      } else {
+        if (exists $tag{_qt}) {
+          push @result, {_i=>1}, "\n[ $elipsis lines ]\n" if $elipsis;
+          push @result, @context, {%tag}, $_;
+          delete $tag{_qt};
+          @context = (); $clines = 0; $elipsis=0;
+          $lines = $OPT{filter}+1;
+        } elsif ($lines) {
+          push @result, \%tag, $_;
+        } else {
+          push @context, \%tag, $_;
+        }
+      }
+      if ($clines>$OPT{filter}) {
+        my (%tag, $txt);
+        while ($clines>$OPT{filter}) {
+          %tag = %{shift @context};
+          $txt =  shift @context;
+          if ($txt =~ /\n/) {
+            $clines--;
+            $elipsis++;
+          }
+        }
+      }
+    }
+  }
+  print STDERR " done\n";
+  @result;
+}
+
+sub less {
+  my $flags;
+  if ($WAIT::Config->{pager} =~ /less/) {
+    $flags = '-r';
+  } elsif ($WAIT::Config->{pager} =~ /more/) {
+    $flags = '-c';
+  }
+  open(PAGER, "|$WAIT::Config->{pager} $flags") or die;
+  print PAGER @_;
+  close PAGER;
+}
+
+sub pager {
+  my @lines = split /\n/, $_[0];
+  my $line = 0;
+  for (@lines) {
+    print "$_\n"; $line++;
+    if ($line % 24 == 0) {
+      my $key = $term->readline("[return]");
+      return if $key =~ /^q/i;
+    }
+  }
+}
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+sman - Search and disply manuals interactive
+
+=head1 SYNOPSIS
+
+B<sman>
+[B<-database> I<database name>]
+[B<-dir> I<database directory>]
+[B<-table> I<name>]
+[B<-less>]
+[B<-filter> I<num>]
+[B<-max> I<num>]
+
+=head1 DESCRIPTION
+
+B<Sman> is an interactive search interface to your systems manual pages.
+
+=head2 OPTIONS
+
+=over 10
+
+=item B<-database> I<database name>
+
+Change the default database name to I<database name>.
+
+=item B<-dir> I<database directory>
+
+Change the default database directory to I<database directory>.
+
+=item B<-table> I<name>
+
+Use I<name> instead of C<man> as table name.
+
+=item B<-pager> I<name>
+
+Use I<name> instead of the default pager. If no I<name> is supplied a
+buildin pager is used.
+
+=item B<-filter> I<num>
+
+Display only I<num> lines above and below an occurance of a search
+term in the manual.
+
+=item B<-max> I<num>
+
+Display only I<num>  hits. Default is to 10.
+
+=head1 SEE ALSO
+
+L<smakewhatis>.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@ls6.informatik.uni-dortmund.de>E<gt>

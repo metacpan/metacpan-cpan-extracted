@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w -I../lib
+# last_login friendID
+# Prints the last login date
+# friendID
+#
+# Example:
+# last_login 12345
+# 
+# get_friends 12345
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace( auto_login => 0 );
+#unless ( $myspace->logged_in ) { die "Login failed\n" }
+
+my $time = $myspace->last_login( @ARGV ) or die $myspace->error;
+print "Last Login in \"time\" format: " . $time . "\n";
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) =
+  localtime( $time);
+
+print "Last Login: " . ( $mon + 1 ) . "/" . $mday . "/" .
+	  ( $year + 1900 ) . "\n";
+

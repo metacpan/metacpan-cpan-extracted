@@ -1,0 +1,9 @@
+use HTTP'Daemon;
+use URI;
+--$|;
+$d = new HTTP'Daemon or exit;
+print new URI url $d =>-> port, "\n";
+
+$r = get_request{ $c = $d->accept };
+send_response $c new HTTP'Response 200, "OK", undef, "lext";
+$c->close;

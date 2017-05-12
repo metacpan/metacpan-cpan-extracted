@@ -1,0 +1,52 @@
+=encoding utf8
+
+
+This is Perl module B<WWW::Expand::More>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/WWW-Expand-More"><img src="https://secure.travis-ci.org/bayashi/WWW-Expand-More.png"/></a> <a href="https://coveralls.io/r/bayashi/WWW-Expand-More"><img src="https://coveralls.io/repos/bayashi/WWW-Expand-More/badge.png?branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/WWW-Expand-More"><img src="http://cpa
+nts.cpanauthors.org/dist/WWW-Expand-More.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+WWW::Expand::More installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan WWW::Expand::More
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+WWW::Expand::More documentation is available as in POD. So you can do:
+
+    % perldoc WWW::Expand::More
+
+
+=head1 REPOSITORY
+
+WWW::Expand::More is hosted on github
+L<http://github.com/bayashi/WWW-Expand-More>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

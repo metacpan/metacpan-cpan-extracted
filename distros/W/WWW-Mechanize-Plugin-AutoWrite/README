@@ -1,0 +1,45 @@
+WWW-Mechanize-Plugin-AutoWrite
+==============================
+
+This module provides a plugin for WWW::Mechanize that automatically saves the
+contents of the last page accessed. The module can also save the whole HTTP
+session by saving the pages as well as the HTTP headers from the request and the
+response.
+
+This plugin is simply activated by loading it and by instruction the
+WWW::Mechanize where to store the files. Then the mechanize pages will be saved
+automatically as they are fetched. This is true for any kind of HTTP request:
+get, post, etc.
+
+See the file "Changes" for all changes made to this software.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries at runtime:
+
+  WWW::Mechanize
+  File::Slurp
+  MIME::Types
+  File::Path
+  File::Spec
+  File::Basename
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Jozef Kutej
+Copyright (C) 2008 by Jozef Kutej and Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

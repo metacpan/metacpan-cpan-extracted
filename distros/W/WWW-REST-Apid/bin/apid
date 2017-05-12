@@ -1,0 +1,574 @@
+#!/usr/bin/perl
+
+package WWW::REST::Apid::Daemon;
+
+$WWW::REST::Apid::Daemon::VERSION = '0.07';
+
+use lib qw(../blib/lib);
+use WWW::REST::Apid;
+use Daemon::Generic;
+use Config::General qw(ParseConfig);
+use Data::Dumper;
+use Carp::Heavy;
+use Carp;
+
+sub get;
+sub auth;
+sub request;
+
+our ($server, $doauth, $cval, $docval, $apidoc, $authbasic, $authuri);
+
+our %tpl = (
+            head => qq(<html><head><title>[name] [version]</title></head>
+                       <body><h1>[name] [version]</h1>),
+            cap  => qq(<h2>[path]</h2><ul>),
+            auth => qq(<li>requires authentication</li>),
+            val  => qq(<li>requires POST data:<br/><pre>[val]</pre></li>),
+            des  => qq(</ul><p>[des]</p>),
+            foot => qq(</body>)
+           );
+
+
+# decorator syntactic sugar
+use constant login    => 'login';
+use constant validate => 'validate';
+use constant basic    => 'basic';
+use constant redirect => 'redirect';
+use constant doc      => 'doc';
+
+
+sub implement {
+  my ($what, $sub) = @_;
+  if ($what eq login) {
+    $server->{sublogin} = $sub;
+  }
+}
+
+sub request {
+  # decorators
+  my ($what, $arg) = @_;
+  if ($what eq login) {
+    $doauth = 1;
+  }
+  elsif ($what eq validate) {
+    $cval = $arg;  #new Data::Validate::Struct($arg);
+  }
+  elsif ($what eq doc) {
+    $docval = $arg;
+  }
+  else {
+    die "Invalid decorator requested: " . $what;
+  }
+}
+
+sub addoc {
+  my ($path, $doc) = @_;
+
+  if (! $apidoc) {
+    $apidoc = &addtpl('head');
+  }
+
+  $apidoc .= &addtpl(cap  => $path);
+  $apidoc .= &addtpl(auth => $path);
+  $apidoc .= &addtpl(val  => $path);
+  $apidoc .= &addtpl(des  => $doc);
+}
+
+sub addtpl {
+  my ($type, $doc) = @_;
+
+  my $t = $tpl{$type};
+
+  if ($type eq 'cap') {
+    $t =~ s/\[path\]/$doc/g;
+  }
+  elsif ($type eq 'auth') {
+    if (! $map{$doc}->{auth}) {
+      $t = '';
+    }
+  }
+  elsif ($type eq 'val') {
+    if ($valid{$doc}) {
+      my $val = Dumper($valid{$doc}->{structure});
+      $val =~ s/\$VAR1 = /       /;
+      $t =~ s/\[val\]/$val/g;
+    }
+    else {
+      $t = '';
+    }
+  }
+  elsif ($type eq 'des') {
+     $t =~ s/\[des\]/$doc/g;
+  }
+  elsif ($type eq 'head') {
+    $t =~ s/\[name\]/$cfg{apiname}/g;
+    $t =~ s/\[version\]/$cfg{apiversion}/g;
+  }
+
+  return $t;
+}
+
+sub auth {
+  my($type, $param) = @_;
+  if ($type eq redirect) {
+    $authuri = $param;
+  }
+  elsif ($type eq basic) {
+    $authbasic = $param;
+  }
+  else {
+    die "Unknown auth type $type\n";
+  }
+}
+
+sub get {
+  my($path, $sub) = @_;
+
+  $server->mapuri(
+                  path     => $path,
+                  handler  => $sub,
+                  doauth   => $doauth,
+                  validate => $cval
+                 );
+
+  $doauth = 0;
+  $cval = 0;
+
+  if ($docval) {
+    &addoc($path, $docval);
+    $docval = '';
+  }
+
+}
+
+
+sub dodoc {
+  ($req, $res) = @_;
+  $res->header('Content-type' => 'text/html; charset=UTF-8');
+  $res->add_content($apidoc . $tpl{foot});
+  return 1;
+}
+
+
+sub gd_preconfig {
+  my $self = shift;
+  my %c = ParseConfig($self->{configfile}) or die "Could not open config: $!\n";
+
+  # cwd if requested
+  if (exists $c{docroot}) {
+    if (-d $c{docroot}) {
+      chdir $c{docroot};
+    }
+    else {
+      croak "Documentroot $c{docroot} doesn't exist!\n";
+    }
+  }
+
+  # set pidfile, override Daemon::Generic behavior
+  $self->{gd_pidfile} = $c{pidfile} ? $c{pidfile} : '/var/run/apid.pid';
+  if ($self->{gd_pidfile} !~ /^\// && exists $c{docroot}) {
+    if (-d $c{docroot}) {
+      $self->{gd_pidfile} = "$c{docroot}/$pidfile";
+    }
+  }
+
+  # set procname
+  $0 = "APId";
+  if (exists $c{apiname}) {
+    my $n = $c{apiname};
+    $n =~ s/[\s\/]//g;
+    $0 = "APId-$n";
+  }
+
+  return %c;
+}
+
+
+
+sub gd_postconfig {
+  my($self, %c) = @_;
+
+  %cfg = %c;
+
+  $server = WWW::REST::Apid->new(%cfg,
+                                 log => sub {
+                                   my($msg) = @_;
+                                   printf ("%s [%d] %s\n", scalar localtime(), $$, $msg);
+                                 },
+                                 foreground => $self->{gd_foreground},
+                                );
+
+  if (-e $cfg{map}) {
+    require $cfg{map};
+  }
+  else {
+    die "Could not find map file $cfg{map}!\n";
+  }
+
+  $server->lateconfig(authuri => $authuri, authbasic => $authbasic);
+
+  if ($apidoc) {
+    $server->mapuri(path => '/doc', handler => sub { &dodoc });
+  }
+}
+
+
+sub gd_run {
+  $server->run();
+}
+
+
+
+newdaemon(
+          progname   => 'apid',
+          pidfile    => $pidfile,
+          configfile => 'apid.conf',
+         );
+
+
+
+
+
+
+1;
+
+=head1 NAME
+
+apid - Generic REST API Daemon
+
+=head1 SYNOPSIS
+
+ Usage: apid [ -c file ] [ -f ] { command }
+  -c file         Specify configuration file (instead of apid.conf)
+  -f              Run in the foreground (don't detach)
+
+ Possible commands are:
+  start      Starts a new apid if there isn't one running already
+  stop       Stops a running apid
+  reload     Causes a running apid to reload it's config file.
+             Starts a new one if none is running.
+  restart    Stops a running apid if one is running. Starts a new one.
+  check      Check the configuration file and report the daemon state
+  help       Display this usage info
+  version    Display the version of apid
+  debug      Starts a new apid in the foreground
+
+=head1 DESCRIPTION
+
+apid is a generic http(s) daemon which can be used to provide a RESTful
+web service in front of something which isn't already web aware. If you
+already have some application server or website with a service running,
+apid is of no use for you. However, if there's some arcane, weird or
+just old computing system which is accessible by perl you want to make
+available online as a web service, then apid might be a solution.
+
+To use apid, you have to write a perl script which maps uris to handlers,
+so you're totally free in what you want to achieve and how to do it.
+
+=head1 FEATURES
+
+=over
+
+=item *
+
+supports http and https.
+
+=item *
+
+authentication via POST vars or basic authentication
+
+=item *
+
+decorators which you can use to enable authentication or
+input validation per uri.
+
+=item *
+
+automatically converts incoming data (post vars, json post or
+query string) to a perl structure for easy access. Handlers
+return perl structures which will be converted automatically
+to json as well.
+
+=back
+
+=head1 CONFIGURATION
+
+A config file is required for apid to work. The format is very simple,
+one option per line, the value separated by an equal sign. Empty lines
+or lines preceeded with '# are ignored.
+
+Possible parameters:
+
+ host       = localhost
+ port       = 4433
+ map        = my.pm
+ apiname    = My API
+ apiversion = 0.0.1
+ sslcrt     = server.crt
+ sslkey     = server.key
+
+If sslkey or sslcrt is omitted, apid will speak http, otherwise https.
+You can configure more aspects of ssl by using L<IO::Socket::SSL->new()>
+parameters.
+
+=head1 MAP SCRIPT
+
+The map script, in the config specified with the B<map> parameter, controls
+the behavior of apid. In its simplest form it only contains a couple of
+handlers, here an example:
+
+ get '/date' => sub {
+   my $date = scalar localtime();
+   return { date => $date };
+ };
+
+Now, start apid:
+
+ apid -c my.conf -f start
+
+And access the api function:
+
+ % curl http://localhost:8080/date
+ {"date":"Wed Oct 22 20:29:50 2014"}
+
+Can't be easier.
+
+=head2 AUTHENTICATION
+
+To use authentication, you have to implement a login function and you have to
+tell apid which kind of auth you want.
+
+Full example:
+
+ use Authen::Simple::LDAP;
+
+ auth basic => 'my api';
+
+ implement login => sub {
+   my($user, $pass) = @_;
+
+   my $ldap = Authen::Simple::LDAP->new( 
+     host    => 'ldap.company.com',
+     basedn  => 'ou=People,dc=company,dc=net'
+   );
+
+   if ( $ldap->authenticate( $user, $pass ) ) {
+     return 1; # ok
+   }
+
+   return 0; # fail
+ };
+
+ request login;
+ get '/date' => sub {
+   my $date = scalar localtime();
+   return { date => $date };
+ };
+
+In this case we are using basic authentication which is backed by LDAP.
+If successfull, apid will return a cookie with a session id, which
+can be used in subsequent requests. However, with basic authentication
+this is optional, you may also leave the session cookie and just put
+the auth data into every request.
+
+=head3 ENABLE BASIC AUTHENTICATION
+
+ auth basic => 'my api';
+
+The second parameter to the B<auth> decorator is the realm.
+
+=head3 ENABLE POST/REDIRECT AUTHENTICATION
+
+ auth redirect => '/login';
+
+The second parameter to the B<auth> decorator is the login uri.
+
+In this mode, an unauthenticated user is being redirected to the
+specified uri, where the user has to POST the username and password,
+which can either be posted as a JSON string or as query string. Examples:
+
+Post auth data as JSON string:
+
+ curl -d "{\"user\":{\"me\":\"mypass\"}}" http://localhost:8080/login
+
+Post auth data directly:
+
+ curl -d "user=me&pass=mypass" http://localhost:8080/login
+
+It is also possible to use a query string
+
+ curl "http://localhost:8080/login?user=me&pass=mypass"
+
+=head3 LOGIN IMPLEMENTATION
+
+In either case, you must implement the actual login function by
+using the 'implement' decorator:
+
+ implement login => sub { my($user, $pass) = @_; ... };
+
+Inside, you can use whatever you want. I'd suggest using one of
+the Authen::Simple submodules.
+
+The login handler must return true to indicate authentication
+was successfull.
+
+=head3 AUTHENTICATION DECORATOR
+
+To enable authentication for a specific uri, add the following
+decorator in front of it:
+
+ request login;
+ get '/date' => sub { .. };
+
+This has to be done for every uri handler. If you leave the
+decorator for a handler it can be accessed without authentication.
+Example:
+
+ request login;
+ get '/date'   => sub { .. };
+
+ get '/uptime' => sub { .. };
+
+ request login;
+ get '/vmstat' => sub { .. };
+
+In this example, the uris /data and /vmstat require authentication
+while /uptime can be accessed by everyone.
+
+=head2 URI MAPPING
+
+There's only one decorator call you use to map an uri to a
+handler: B<get>. Apid doesn't distinguish between POST, PUT, DELETE
+or GET requests. So, however the uri have been called, your handler
+will always be called. If you need to distinguish between the
+various request types, you have to do it yourself in your handler.
+
+ get '/some/uri' => sub { my $data = shift; ... return {}; };
+
+The handler gets passed the submitted data as its first and only
+parameter, if present. The data is always a perl structure.
+
+Apid expects the handler to return a perl structure as well, which
+will be converted to JSON and returned to the client.
+
+There are a couple of variables which are available to each
+handler:
+
+=over
+
+=item B<$req>
+
+This is a standard L<HTTP::Request> object. In addition, if authentication
+was enabled, it contains the username of the authenticated client:
+
+ $req->{user}
+
+=item B<$res>
+
+This is a standard L<HTTP::Response> object. You may modify the HTTP
+return code or add additional headers to the response as you please.
+
+=item B<%cfg>
+
+This is a hash containing all options of the configuration file. It has
+been parsed by L<Config::General>.
+
+=back
+
+=head2 INPUT VALIDATION
+
+Apid can validate input data automatically by using L<Data::Validate::Struct>.
+To enable it, use the validate decorator:
+
+ request validate => { expression => 'text' };
+ get '/ps/search' => sub {
+   my $data = shift;
+   return &ps2a($data->{expression});
+ };
+
+The parameter to the decorator is the validator struct required by
+L<Data::Validate::Struct>. Please refer to the documentation there
+for details.
+
+If input validation fails, apid will return an error message as JSON
+and HTTP response code 403.
+
+=head2 AUTOMATIC DOCUMENTATION
+
+Usually you'll want to write the documentation for your API
+yourself. For the lazy ones, there's a documentation decorator,
+which you can use to generate it.
+
+ request doc => 'some text';
+ get '/some/uri' => sub { .. };
+
+If apid encounters one or more documentation decorators it generates
+a documentation which is available at /doc/.
+
+Beware, that this documentation is very basic, however it at least
+explains if the uri requires authentication, what kind or input it
+expects (if validation were enabled) and if authentication is required.
+
+=head1 HELPFUL CURL COMMANDS FOR TESTING
+
+auth to url with login requested:
+
+ curl -c cookies -b cookies -k -v --user USER:PASS https://localhost:4443/foo/bar
+
+access url when auth ok:
+
+ curl -c cookies -b cookies -k -v https://localhost:4443/foo/bar
+
+post query data:
+
+ curl -k -v -d "name=foo&year=2014" https://localhost:4443/foo/bar
+
+post json data:
+
+ curl -k -v -d "{\"user\":{\"name\":\"foo\"}}" https://localhost:4443/foo/bar
+
+post json file 'body.json':
+
+ curl -k -v -H "Content-Type: application/json" -d @body.json https://localhost:4443/foo/bar
+
+post data as query string:
+
+ curl -k -v -d "https://localhost:4443/foo/bar?name=hans&age=2014"
+
+get json data:
+
+ curl -k -v -d https://localhost:4443/foo/bar
+
+=head1 AUTHOR
+
+T.v.Dein <tlinden@cpan.org>
+
+=head1 BUGS
+
+Report bugs to
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-REST-Apid
+
+=head1 SEE ALSO
+
+L<WWW::REST::Apid>
+L<HTTP::Daemon>
+L<HTTP::Daemon::SSL>
+L<Daemon::Generic>
+L<Config::General>
+L<Data::Validate::Struct>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2014 by T.v.Dein <tlinden@cpan.org>.
+All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 VERSION
+
+apid Version 0.07.
+
+=cut

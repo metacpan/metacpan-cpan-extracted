@@ -1,0 +1,218 @@
+NAME
+    WWW::Authen::Simple - Cookie based session and authentication module
+    using database backend. Also provides group based authorization.
+
+SYNOPSIS
+     use WWW::Authen::Simple;
+
+     my $simple = WWW::Authen::Simple->new(
+                    db => $DBI_handle,
+                    cookie_domain => 'cookie_domain'
+     );
+     # Alternitively, any of the methods to set variables may also be
+     # used directly in the constructor
+     $simple->logout() if $cgi->param('logout');
+     $simple->login( $cgi->param('login'), $cgi->param('pass') );
+     if ($simple->logged_in()) {
+        if ($simple->in_group('Admin','rw')) {
+           &do_admin_page();
+        } else {
+           &do_something();
+        }
+     } else {
+        print redirect('/login.pl');
+     }
+
+ABSTRACT
+    WWW::Authen::Simple provides another way to do cookie based sessions and
+    authentication. It's goal is to provide a very simple API to handle
+    sessions and authentication.
+
+    The database layout has been abstracted, so you should be able to fit
+    this into whatever database layout you currently use, or use the
+    provided default to base your application.
+
+    NOTE: the database abstraction is configured by a hash. If changes to
+    it's structure are needed, you currently have to rebuild the entire
+    hash, and pass it in (ie. there is no API to make it easy to change
+    yet).
+
+REQUIRES
+     DBI and an appropriate DBD driver for your database
+     Digest::MD5 (standard perl module)
+     CGI
+
+    In most common situations, you'll also want to have:
+
+     A web server (untested on windows, but it should work)
+     cgi-bin or mod-perl access
+     Perl: Perl 5.00503 or later must be installed on the web server.
+
+INSTALLATION
+    The module can be installed using the standard Perl procedure:
+
+        perl Makefile.PL
+        make
+        make test
+        make install    # you need to be root
+
+    Windows users without a working "make" can get nmake from:
+
+        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+METHODS
+    "$simple = WWW::Authen::Simple->new();"
+        This creates a new Simple object. Optionally, you can pass in a hash
+        with configuration information. See the method descriptions for more
+        detail on what they mean.
+
+             cookie_domain => 'www.somedomain.com', # required
+             db => $DBI_handle, # required
+             expire_seconds => 3600, # optional. default 3600
+             cleanup_seconds =>  43200, # optional. default 43200 
+             debug => 0, # optional. default 0
+             conf => $config_hash_ref, # optional. defaults hardcoded.
+
+    "$simple->db( $DBIx_PDlib_object );"
+        Required. Database Handle from DBIx::PDlib;
+
+    "$simple->cookie_domain( 'www.some_domain.com' );"
+        Required. The Domain your authenticating into. Needed to store the
+        cookie info.
+
+    "$simple->login( $login, $password );"
+        If $login and $password are undef (not set / not passed in), it
+        checks the users cookies for a valid ticket. Otherwise, checks the
+        username/password against the database.
+
+        Returns:
+
+           (0,$login) : inactive account, user doesn't exist,
+                        password doesn't match, or invalid ticket
+           (1,$login,$uid) : login successful
+           (-1,$login) : login expired
+           (0,0) : no user/pass sent, no cookies exist.
+
+    "$simple->logout();"
+        Logs the current user out by nulling out their session ticket in the
+        database.
+
+    "$simple->logged_in();"
+        Returns 1 if the user is logged in. Returns undef is login() was
+        called, but the user failed authentication. Returns 0 (zero) if the
+        login() hasn't been called yet.
+
+    "$simple->uid();"
+        Get the current session user id.
+
+    "$simple->username();"
+        Get the current session username.
+
+    "$simple->groups();"
+        Returns an array of all groups names and group id's the user belongs
+        to.
+
+    "$simple->in_group($group,$rw);"
+        $group can be the group name, or the group id.
+
+        $rw (optional) can be:
+
+           1  : Read access for the group.
+           2  : Write access for the group.
+           3  : Both read and write access for the group.
+           r  : Read access for the group.
+           w  : Write access for the group.
+           rw : Both read and write access for the group.
+
+        If called without the $rw option, it returns the raw access bits
+        (will be true if the user is in the group and has any level of
+        access: read, write, or both).
+
+        If called with the $rw option, returns true if the user is in the
+        group, and has that level of access. Returns false otherwise.
+
+    "$simple->debug( [0|1|2] );"
+        Optional. Sets the debugging bit. 1 turns it on, 0 turns it off. 2
+        will print out verbose messages to STDERR.
+
+    "$simple->cleanup();"
+        Cleans out the old sessions from the session database. Should be
+        called once in a while from a cron script. The frequency of calls to
+        this is up to you, and it's need depends on how heavy your usage is.
+        If you never call cleanup(), it won't be the end of the world...
+        things will keep working just fine.
+
+    "$simple->cleanup_seconds($integer_seconds);"
+        How old a session entry should be before it get's cleaned out.
+        Defaults to 43200 seconds (12 hours).
+
+    "$simple->conf($conf);"
+        $conf is optional. Set's the config hash if it's passed in.
+
+        Returns the config hash.
+
+        Config hash is structured like so:
+
+          $conf = {
+            session_table   => {
+                _table  => 'sessions',  # table name
+                login   => 'username',  # username field
+                address => 'address',   # remote address field
+                ticket  => 'ticket',    # session ticket field
+                point   => 'point',     # timestamp point field
+                },
+            user_table  => {
+                _table  => 'Users',     # table name
+                uid     => 'uid',       # user unique id field
+                login   => 'login',     # username field
+                passwd  => 'passwd',    # password field
+                status  => 'disabled',  # status field
+                # sub ref to determine if status value is active
+                _active_status  => sub { return 1 if ($_[0] != 1); },
+                # sub ref to determine if status value is disabled
+                _disabled_status    => sub { return 1 if ($_[0] == 1); },
+                },
+            # group statement is used to get the groups. It should
+            # fetch a groupname, groupid, and an accessbit.
+            # If you don't want to use the accessbit field, just stick
+            # the groupid field there as well.
+            # %uid% will be replaced with a quoted uid value for the user.
+            # here's an alternate statement, to give you some ideas:
+            #   SELECT groupname, gid, gid FROM Users WHERE uid = %uid%
+            group_statement => 'SELECT g.Name, ug.gid, ug.accessbit
+                                FROM Groups g, UserGroups ug
+                                WHERE ug.uid = %uid%',
+            # subroutine ref used to encrypt password for db storage
+            'crypt' => sub { return Digest::MD5::md5_base64($_[0]); }
+            };
+
+SEE ALSO
+    "examples" subdirectory of this distribution.
+
+    Averist.pm: http://www.nongnu.org/averist/ : A more flexable
+    session/auth module.
+
+    CGI::Session: http://search.cpan.org/dist/CGI-Session
+
+    Apache::Session: http://search.cpan.org/dist/Apache-Session
+
+    CGI::Session::Auth: http://search.cpan.org/dist/CGI-Session-Auth
+
+TODO
+    Tests need written.
+
+    Session storage abstraction.
+
+    Authentication method abstraction.
+
+AUTHORS
+    Josh I. Miller, <jmiller@purifieddata.net>
+
+    Seth T. Jackson, <sjackson@purifieddata.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Seth Jackson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

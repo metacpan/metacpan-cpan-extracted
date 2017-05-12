@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/WWW-Twilio-API.t
+t/build_content.t
+lib/WWW/Twilio/API.pm
+examples.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

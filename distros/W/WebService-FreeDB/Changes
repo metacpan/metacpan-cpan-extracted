@@ -1,0 +1,88 @@
+Revision history for Perl extension WebService::FreeDB
+
+0.1 Fri Aug 30 16:00:23 MEST 2002
+  - first internal release
+0.3 Fri Sep 20 10:16:27 MEST 2002
+  - 1st release on CPAN
+  - bugfixes 
+  - some changes for releasing on CPAN
+0.4 Wed Oct 23 14:16:15 MEST 2002
+  - Selection fixed 
+  - No disc-found fixed
+  - feature "alternatives" added
+  - feature "categories" as selection added
+  - feature "rest" aka "comment" added
+    (only for a CD - does it exist for every track ?)
+  - example/cdsearch does now accept a direkt cd-url for retrieving driectly
+  - xml-output-method 
+
+0.41 Wed Oct 23 15:40:41 MEST 2002
+  -fixed cdsearch use..
+   sorry for this....
+
+0.5 
+  -ask4urls now prints a sorted list
+  -now empty db-entries does not matter
+  -xml output will now special coded (& -> &emph; and so on)
+
+0.51 
+  -version 0.5 comes without subdirs ....better to be fixed !
+
+0.52 Tue Jan 21 11:02:47 CET 2003
+  -Error of incorrect tags corrected (thanks to Geoff for the comments...:-) )
+
+0.55 Mon Mar 24 17:50:33 MET 2003
+  -Lots of Thanks to Iain Truskett for the patches and other hints.
+   They are now implemented. (Well - most of them)
+   No more features but corrected spelling, POD, t/freedb.t and Makefile.PL :-)  - Wonderful Iain !
+
+0.56 Mon Jun 16 22:31:40 MEST 2003
+  -No technical new stuff.
+  -more comments 
+  -reformated to 4char indent
+  -mainly 80chars are enough per line - except some lines.
+  
+0.60 Fri Sep 19 19:25:43 CEST 2003
+  - outxml now supports more detailed informations and can be used by 
+    other programs, too. Have a look at www.moth.de !
+
+0.61 Fri Sep 26 11:35:12 CEST 2003
+  - new upload to CPAN - version problem
+  
+0.62 Fri Sep 26 13:31:31 CEST 2003
+  - XML Output closing CD Tag inserted (where has it gone ??? ;-) )
+
+0.63 Oct 31 16:30:50 MET 2003
+  - Changed $disc{cdname} to $disc{album}, like supposed to be in FreeDB.
+
+0.7  Wed Nov  5 17:10:11 MET 2003
+  - added proxy support
+    (developed by Joerg Bensch - many THX to him!)
+0.71 Sun Jun 12 12:44:44 MEST 200
+  - Patched due to new html code by freedb.org
+    Thanks goes to Stew Benedict for hint and the patch !
+0.72 Fri Mar 31 21:38:34 CEST 2006
+  - Patched due to changes at HTML FreeDB Interface
+
+0.73 Sun Apr  2 15:39:26 CEST 2006
+  - Patched due to changes at HTML FreeDB Interface again
+
+0.74 Fri Apr  7 13:11:30 CEST 2006
+  - Forgot to change Version within module - now its 0.74 everywhere
+
+0.75 Tue Apr 25 10:45:34 CEST 2006
+  - Again patched due to changes at HTML Interface
+
+0.76 Tue Apr 25 10:45:34 CEST 2006
+  - Again patched due to changes at HTML Interface (track view commercial)
+
+0.77 Wed Sep  6 13:10:33 CEST 2006
+  - Again patched due to changes at HTML Interface
+
+0.78 2011-09-28 rurban
+  - Again patched due to changes at HTML Interface (single line results with JS expansion)
+    Limitation: getdiscs only returns the first 10 results of the query
+
+0.79 2012-02-28 rurban
+  - Fixed defined(@array) for 5.16
+  - More stable searchResult data matcher, which works with empty HTML lines. Still a mess though.

@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Window name='W'
+		dim='100, 100, 400, 400'
+	>
+		<WGXSplitter
+			dim='0, 0, 200, 200'
+			horizontal='0'
+			splittersize='4'
+			start='100'
+			range='0, 200'
+		>
+			<Item>
+				<TreeView lines='1' rootlines='1' buttons='1' visible='1'>
+					<Item name='TV_0' text='TV_0' selectedimage='1'>
+						<Item name='TV_0_0' text='TV_0_0'>
+							<Item name='TV_0_0_0' text='TV_0_0_0'/>
+							<Item name='TV_0_0_1' text='TV_0_0_1'/>
+							<Item name='TV_0_0_2' text='TV_0_0_2'/>
+						</Item>
+						<Item name='TV_0_1' text='TV_0_1'/>
+					</Item>
+					<Item name='TV_1' text='TV_1' selectedimage='1'>
+						<Item name='TV_1_0' text='TV_1_0'/>
+						<Item name='TV_1_1' text='TV_1_1'/>
+						<Item name='TV_1_2' text='TV_1_2'/>
+						<Item name='TV_1_3' text='TV_1_3'/>
+					</Item>
+				</TreeView>
+			</Item>
+			<Item>
+				<Label 
+					text='Panel 2' 
+					foreground='exec:[0,0,0]' background='exec:[0,255,0]'
+				/>
+			</Item>
+		</WGXSplitter>
+
+		<WGXSplitter
+			dim='200, 0, $self->{W}->ScaleWidth - 200, 200'
+			horizontal='1'
+			splittersize='4'
+			start='100'
+			range='0, 200'
+		>
+			<Item>
+				<Label 
+					text='Panel 3'
+					foreground='exec:[255,255,255]' background='exec:[0,0,255]'
+				/>
+			</Item>
+			<Item>
+				<TabStrip>
+					<Item text='Zero'>
+						<Label text='This is tab zero!'/>
+					</Item>
+					<Item text='One'>
+						<Label text='This is tab one!'/>
+					</Item>
+				</TabStrip>
+			</Item>
+		</WGXSplitter>
+
+		<WGXSplitter
+			dim='0, 200, 200, $self->{W}->ScaleHeight - 200'
+			horizontal='1'
+			splittersize='4'
+			start='100'
+			min='0'
+		>
+			<Item>
+				<Label 
+					text='Panel 1'
+					foreground='exec:[255,255,255]' background='exec:[255,0,0]'
+				/>
+			</Item>
+			<Item>
+				<Label 
+					text='Panel 2' 
+					foreground='exec:[0,0,0]' background='exec:[0,255,0]'
+				/>
+			</Item>
+		</WGXSplitter>
+
+		<WGXSplitter
+			dim='200, 200, $self->{W}->ScaleWidth - 200, $self->{W}->ScaleHeight - 200'
+			horizontal='0'
+			splittersize='4'
+			start='100'
+			min='0'
+		>
+			<Item>
+				<Label 
+					text='Panel 3'
+					foreground='exec:[255,255,255]' background='exec:[0,0,255]'
+				/>
+			</Item>
+			<Item>
+				<Listbox>
+					<Item text='Item 1'/>
+					<Item text='Item 2'/>
+					<Item text='Item 3'/>
+					<Item text='Item 4' default='1'/>
+				</Listbox>
+			</Item>
+		</WGXSplitter>
+
+	</Window>
+</GUI>

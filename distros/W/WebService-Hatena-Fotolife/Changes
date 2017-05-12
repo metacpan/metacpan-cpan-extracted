@@ -1,0 +1,22 @@
+Revision history for Perl extension WebService::Hatena::Fotolife.
+
+0.07  Wed Oct 8 2013
+      - added OAuth API support (thanks to id:wakabatan)
+
+0.06  Tue Jul 24 2012
+      - fixed a bug when file_media_type contains arrayref of mime types
+
+0.05  Wed Feb 01 2012
+      - added support for hatena:* namespace.
+
+0.04  Tue Jan 11 2011
+      - generator parameter now must be specified explicitely, if you need it.
+
+0.03  Wed Nov 17 2010
+      - added geo support (thanks to id:wakabatan)
+
+0.02  Wed Jul 15 2009
+      - supported folder and generator option.
+
+0.01  Sun Mar 28 2005
+      - initial release

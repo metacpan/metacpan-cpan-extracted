@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Logger::LoggerBase - logger base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Logger::LoggerBase - logger base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Logger;</PRE>
+<PRE>
+  use base qw(Wombat::Logger::LoggerBase);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base class for logger implementations. The only method
+that must be implemented is <A HREF="#item_write"><CODE>write()</CODE></A>, plus any accessor methods
+required for configuration, and <A HREF="#item_start"><CODE>start()</CODE></A> and <A HREF="#item_stop"><CODE>stop()</CODE></A> if resources
+must be initialized and cleaned up.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Logger::LoggerBase</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container with which this Logger is associated.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container with which this Logger is associated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the Container with which this Logger is associated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLevel"><CODE>getLevel()</CODE></A></STRONG><BR>
+<DD>
+Return the verbosity level of this Logger.
+<P></P>
+<DT><STRONG><A NAME="item_setLevel"><CODE>setLevel($level)</CODE></A></STRONG><BR>
+<DD>
+Set the verbosity level of this Logger. Messages logged with a higher
+verbosity than this will be silently ignored.
+<P>Allowable values in increasing order are:</P>
+<DL>
+<DT><STRONG><A NAME="item_%27FATAL%27">'FATAL'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27ERROR%27">'ERROR'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27WARNING%27">'WARNING'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27INFO%27">'INFO'</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%27DEBUG%27">'DEBUG'</A></STRONG><BR>
+<DD>
+</DL>
+<P>The default level is 'ERROR'.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24level">$level</A></STRONG><BR>
+<DD>
+the verbosity level, as a string
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+if the specified log level is not one of the allowed values
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_log">log($message, $exception, $level)</A></STRONG><BR>
+<DD>
+Send a message and/or an exception to the log destination. If a level
+is specified, the Logger must be set to a verbosity level greater than
+or equal to the specified level. If a level is not specified, the
+message and/or exception will be logged unconditionally.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24message">$message</A></STRONG><BR>
+<DD>
+an optional string message to log
+<P></P>
+<DT><STRONG><A NAME="item_%24exception">$exception</A></STRONG><BR>
+<DD>
+an optional exception to log in stack trace form
+<P></P>
+<DT><STRONG>$level</STRONG><BR>
+<DD>
+an optional log level
+<P></P></DL>
+<DT><STRONG><A NAME="item_write"><CODE>write($string)</CODE></A></STRONG><BR>
+<DD>
+Write the specified string to the log destination. The default
+implementation does nothing. Subclasses must override this method.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24string">$string</A></STRONG><BR>
+<DD>
+the string to write to the log destination
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for the beginning of active use of this Logger. This method
+must be called before any of the public methods of the component are
+utilized. Subclasses should initialize logging resources with this
+method.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the Logger cannot be started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate the active use of this Logger. This method must
+be the last called on a given instance of this component. Subclasses
+should release logging resources with this method.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the Logger cannot be stopped
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Exception.html">the Wombat::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

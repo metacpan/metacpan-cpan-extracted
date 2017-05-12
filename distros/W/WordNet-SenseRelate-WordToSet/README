@@ -1,0 +1,132 @@
+NAME
+    README - General Information about WordNet-SenseRelate-WordToSet
+
+OVERVIEW
+    This module takes as input a single target word, and a set of one or
+    more other words. It finds the sense of that target word that is most
+    related to those words in the set. For example, if the target word is
+    "bank", and the words in the set are "money cash loan stock", we might
+    expect that the most related sense of "bank" is that pertaining to
+    financial instituations.
+
+    This is potentially useful in determining the predominant sense of a
+    word in a particular domain. For example, if the target word is "game",
+    and the words in the set are from the domain of board games (e.g.,
+    "monopoly chess checkers", then the sense of "game" that we'd expect to
+    be most similar or related would be that of games you play rather than
+    the game you hunt. For example, here's some output when game is compared
+    to board games:
+
+     wordtoset.pl game monopoly checkers chess --type WordNet::Similarity::wup
+
+     game#n#1 : 2.52631578947368 : a contest with rules to determine a winner; 
+                    "you need four people to play this game"  
+
+     game#n#10 : 2.17777777777778 : your occupation or line of work; 
+                    "he's in the plumbing game"; "she's in show biz"  
+
+     game#n#3 : 2.17777777777778 : an amusement or pastime; 
+                    "they played word games"; 
+                    "he thought of his painting as a game that filled his 
+                    empty time"; "his life was all fun and games"  
+
+    Here's some output when we compare that to wild animals:
+
+     wordtoset.pl game turkey boar deer --type WordNet::Similarity::wup
+
+     game#n#4 : 1.98 : animal hunted for food or sport  
+
+     game#n#7 : 1.27777777777778 : the flesh of wild animals that is 
+                            used for food  
+
+     game#n#9 : 1.24542124542125 : the game equipment needed in order to 
+                            play a particular game; "the child received 
+                            several games for his birthday"  
+
+    Note that wordtoset.pl will output all of the senses, but we've only
+    shown the top three here in the interests of brevity. We can see that
+    according to the Wu-Palmer measure (wup), the sense of game most similar
+    to the given sense is as we've described above.
+
+    WordToSet might also be useful in detecting sentiment orientation. For
+    example, suppose the target word is "war". You could compare that to two
+    different sets such as : "peace love happiness" and "hate death fear".
+    While the predominant sense of "war" might not change, if it has a
+    substantially higher score relative to one of the sets then it could be
+    concluded that war is more associated with that set than the other.
+
+    This module uses WordNet and measures of semantic relatedness and
+    similarity from WordNet::Similarity to arrive at its output.
+
+SYNOPSIS
+       # from the command line
+   
+       wordtoset.pl star nebula cosmos orion --type WordNet::Similarity::lin
+
+       wordtoset.pl star movie hollywood director --type WordNet::Similarity::vector 
+
+       # from within a program
+
+       use WordNet::SenseRelate::WordToSet;
+       use WordNet::QueryData;
+
+       my $qd = WordNet::QueryData->new;
+
+       my %options = (wordnet => $qd,
+                      measure => 'WordNet::Similarity::lesk');
+
+       my $wsd = WordNet::SenseRelate::WordToSet->new (%options);
+
+       my $result = $wsd->disambiguate (target => 'java',
+                          context => ['programming_language', 'applet']);
+
+       foreach my $key (keys %$result) {
+           print $key, ' : ', $result->{$key}, "\n";
+       }
+
+CONTENTS
+    When the distribution is unpacked, several subdirectories are created:
+
+    /lib
+        This directory contains the Perl modules that do the actual work of
+        disambiguation. By default, these files are isntalled into
+        /usr/local/lib/site_perl/PERL_VERSION (where PERL_VERSION is the
+        version of Perl you are using), or a similar directory. See the
+        INSTALL file for more details.
+
+    /bin
+        This directory contains a script, wordtoset.pl, that lets you run
+        the WSD software without writing your own Perl script.
+
+    /doc
+        This directory contains pod files for README, CHANGES, and INSTALL.
+        These are what should be changed, the files found in the top level
+        directory should be considered read-only.
+
+    /t  This directory contains test scripts. These scripts are run when you
+        run 'make test'.
+
+SEE ALSO
+     L<http://senserelate.sourceforge.net/>
+
+AUTHORS
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+     Jason Michelizzi
+
+    This document last modified by : $Id: README.pod,v 1.5 2008/04/07
+    03:28:36 tpederse Exp $
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2004-2008, Ted Pedersen and Jason Michelizzi
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

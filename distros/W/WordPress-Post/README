@@ -1,0 +1,131 @@
+
+================================================================================
+
+WordPress::Post - DEPRECATED see WordPress::CLI instead
+
+SYNOPSIS
+       use WordPress::Post;
+
+       my $o= WordPress::Post->new ({ 
+          proxy => 'http://this/xmlrpc.php', 
+          username => 'lou', 
+          password => '2342ss' 
+       });
+
+       $o->post({
+          title => 'My Vacation Plans',
+          description => 'Jump around. Sleep.',      
+       });
+
+DESCRIPTION
+    This module is deprecated. See WordPress::CLI distribution instead.
+
+    The module WordPress did not work for me. This one works.
+
+    It lets you post to a wordpress blog/site.
+
+    A script is included with this distribution, wppost. It allows you to
+    post content via the command line. You can also have picture
+    attachments.
+
+METHODS
+  new()
+    Argument is hash ref. Keys are 'proxy', 'username', and 'password'.
+
+       my $o= new WordPress::Base ({ 
+          proxy => 'http://this/xmlrpc.php', 
+          username => 'lou', 
+          password => '2342ss' 
+       });
+
+    Method resides in WordPress::Base.
+
+  post()
+    Argument is hash ref. This is the 'struct' referred to in xmlrpc.
+
+    Possible keys are:
+
+       title - string
+       description - body of your post, string
+       mt_excerpt - string
+       mt_text_more - boolean?
+       mt_allow_comments - boolean?
+       mt_allow_pings - boolean?
+       mt_tb_ping_urls - boolean?
+       dateCreated - cant figure out the right string
+       categories - array ref
+
+    Example use:
+
+       $o->post({
+          title       => 'This is what happened',
+          description => 'Morning is when I wake up.',
+          categories  => ['life','sleep'],
+       });
+
+    Returns post id. This is useful if you want to know how to reach it via
+    the web right away. For example if your address for the wordpress blog
+    is http://super.net/wp, then a post returning id '3' would be reached
+    via http://super.net/wp/?p=3
+
+  post_file()
+    Argument is abs path to file you want to post. Returns url via which the
+    file can be reached.
+
+    This is useful in building more complex posts, with attachments, etc.
+
+BUGS
+    This module is in infancy. It works for me, and well.
+
+    I need to figure out how to determine the date, dateCreated strings such
+    as 2006-12-31 fail, I also tried '2006-12-31 12:00:00', still fails.
+
+    Please contact the AUTHOR for any issues.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+    WordPress::CLI - replacement
+
+INSTALLING AND TESTING
+    To test I suggest you download the package and test it out by hand.
+
+    For testing you will need to have a word press blog set up. You must
+    also know the proxy address, a username and password.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Date::Simple: 0
+File::Type: 0
+Image::Magick: 0
+LEOCHARRE::CLI: 0
+MIME::Base64: 0
+Smart::Comments: 0
+XMLRPC::Lite: 0
+YAML: 0
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    "Artistic License" or the "GNU General Public License".
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the "GNU General Public License" for more details.
+

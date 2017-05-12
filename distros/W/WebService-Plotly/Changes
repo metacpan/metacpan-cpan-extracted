@@ -1,0 +1,36 @@
+Revision history for WebService-Plotly
+
+1.133400  2013-12-06 10:49:16 Europe/Berlin
+    - declare dependency on version.pm 0.77 for ->parse() on older perls
+
+1.133380  2013-12-04 10:36:32 Europe/Berlin
+    - die with an explanatory message if PDL version is to low to encode to
+      JSON
+    - allow PDL version comparisons to deal with uninstalled, or dev versions
+
+1.133370  2013-12-03 14:00:04 Europe/Berlin
+    - moved repo to plotly account
+    - when using PDL functionality, PDL needs to be 2.006 or greater
+    - PDL no longer hard dependency
+
+1.133331  2013-11-30 00:45:27 Europe/Berlin
+    - doc fixes to make example images visible on sco, courtesy of sivoais
+
+1.133330  2013-11-29 20:46:18 Europe/Berlin
+    - add examples, courtesy of sivoais
+
+1.133230  2013-11-19 19:15:17 Europe/Berlin
+    - restrict PDL data to integers to avoid platform porting issues
+
+1.132950  2013-10-22 11:36:48 Europe/Berlin
+    - and even more test fixes to avoid byte order, json key order and url key
+      order issues
+
+1.132940  2013-10-21 14:47:24 Europe/Berlin
+    - more test fixes
+
+1.132910  2013-10-18 19:08:59 Europe/Berlin
+    - fix PDL testing issues
+
+1.132850  2013-10-12 22:25:14 Europe/Berlin
+    - first release

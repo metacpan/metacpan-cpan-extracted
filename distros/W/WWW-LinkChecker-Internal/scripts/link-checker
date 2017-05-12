@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+=head1 USE
+
+    perl link-checker --base='http://localhost/sites/mysite/'
+
+Traverses the pages and checks for inner broken links.
+
+=head1 FLAGS
+
+=over 4
+
+=item * --base '$URL'
+
+The base URL of the web site (and the start URL for the traversal.
+
+=item * --pre-skip '$REGEX'
+
+A regular expression for matching a URL so it won't be checked for outgoing
+links (but will be tried to be followed). Can be specified more than once.
+
+=item * --before-insert-skip '$REGEX'
+
+A regular expression for preventing URLs from being retrieved in the first
+place. Can be specified more than once.
+
+=item * --start '$URL'
+
+An alternative start URL (instead of the base URL) to start the scan from.
+
+=item * --state-filename /path/to/filename
+
+A path to a filename that will be used to read and write the state of the
+checker, which will sometimes allow it to resume.
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Uses a regular expression to get rid of the anchor part (#my_id)
+
+=item * Does not handle JavaScript-generated HTML properly.
+
+=back
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use WWW::Mechanize;
+
+use List::MoreUtils qw( any none );
+use JSON::MaybeXS qw/encode_json decode_json/;
+use Path::Tiny qw/ path /;
+
+my $base_url;
+my $alternative_start_url;
+
+my @pre_skip_texts;
+my @before_insert_skips_texts;
+my $state_fn;
+GetOptions(
+    'base=s' => \$base_url,
+    'pre-skip=s' => \@pre_skip_texts,
+    'before-insert-skip=s' => \@before_insert_skips_texts,
+    'start=s' => \$alternative_start_url,
+    'state-filename=s' => \$state_fn,
+)
+or die "GetOptions failed.";
+
+if (!defined ($base_url))
+{
+    die "--base must be specified";
+}
+
+my @pre_skip_regexes = map { qr/$_/ } @pre_skip_texts;
+my @before_insert_skips_regexes = map { qr/$_/ } @before_insert_skips_texts;
+
+my $start_url = ($alternative_start_url || $base_url);
+
+my $state = +($state_fn && (-e $state_fn)) ? decode_json(path($state_fn)->slurp_utf8) :
+    {
+        stack => [{ url => $start_url, from => undef(), }],
+        encountered_urls => {$start_url => 1,},
+    };
+STACK:
+while (my $url_rec = $state->{stack}->[-1])
+{
+    my $url = $url_rec->{'url'};
+    print "Checking SRC URL '$url'\n";
+
+    my $mech = WWW::Mechanize->new();
+    eval {
+        $mech->get( $url );
+    };
+
+    if ($@)
+    {
+        if ($state_fn)
+        {
+            path($state_fn)->spew_utf8(encode_json($state));
+        }
+        die "SRC URL $url_rec->{from} points to '$url'.";
+    }
+    pop(@{$state->{stack}});
+
+    if (any { $url =~ $_} @pre_skip_regexes)
+    {
+        next STACK;
+    }
+
+    foreach my $link ($mech->links())
+    {
+        my $dest_url = $link->url_abs() . "";
+        $dest_url =~ s{#[^#]+\z}{}ms;
+        if ((!exists($state->{encountered_urls}->{$dest_url})) and
+            $dest_url =~ m{\A\Q$base_url\E}ms and
+            (none { $dest_url =~ $_ } @before_insert_skips_regexes)
+        )
+        {
+            $state->{encountered_urls}->{$dest_url} = 1;
+            push @{ $state->{stack} }, { url => $dest_url, from => $url, };
+        }
+    }
+}
+
+
+print "Finished checking the site under the base URL '$base_url'.\nNo broken links were found\n";
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 by Shlomi Fish
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=cut

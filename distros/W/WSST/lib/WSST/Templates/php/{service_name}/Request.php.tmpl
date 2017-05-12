@@ -1,0 +1,184 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Request" -%]
+
+require_once 'PEAR.php';
+
+require_once '[% package_dir %]/Factory.php';
+require_once '[% package_dir %]/Response.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Class encapsulating the HTTP Request" -%]
+class [% package_name %]_Request
+{
+    /**
+     * Factory object
+     *
+     * @access protected
+     * @var object
+     */
+    var $fac;
+    
+    /**
+     * Destination URL
+     *
+     * @access private
+     * @var string
+     */
+    var $_url = null;
+    
+    /**
+     * Parameters to send
+     *
+     * @access private
+     * @var array
+     */
+    var $_params = array();
+    
+    /**
+     * Request method
+     *
+     * @access private
+     * @var string
+     */
+    var $_requestMethod = 'GET';
+
+    /**
+     * Array of ignore status code
+     * 
+     * @access private
+     * @var array
+     */
+    var $_ignoreStatusCode = array();
+
+    /**
+     * Constructor
+     *
+     * @access public
+     * @param object $fac Factory object
+     */
+    function [% package_name %]_Request(&$fac)
+    {
+        $this->fac =& $fac;
+    }
+    
+    /**
+     * Get URL
+     *
+     * @access public
+     * @return string URL
+     */
+    function getUrl()
+    {
+        return $this->_url;
+    }
+    
+    /**
+     * Set URL
+     *
+     * @access public
+     * @param string $url URL
+     * @return void 
+     */
+    function setUrl($url)
+    {
+        $this->_url = $url;
+    }
+    
+    /**
+     * Get parameters
+     *
+     * @access public
+     * @return array parameters
+     */
+    function getParams()
+    {
+        return $this->_params;
+    }
+    
+    /**
+     * Set parameters
+     *
+     * @access public
+     * @param array $params parameters
+     * @return void
+     */
+    function setParams($params)
+    {
+        $this->_params = $params;
+    }
+    
+    /**
+     * Add parameters
+     * 
+     * @access public
+     * @param array $params parameters
+     * @return void
+     */
+    function addParams($params)
+    {
+        $this->_params = array_merge($this->_params, $params);
+    }
+    
+    /**
+     * Get request method
+     *
+     * @access public
+     * @return string request method
+     */
+    function getRequestMethod()
+    {
+        return $this->_requestMethod;
+    }
+    
+    /**
+     * Set request method
+     *
+     * @access public
+     * @param string $requestMethod request method
+     * @return void
+     */
+    function setRequestMethod($requestMethod)
+    {
+        $this->_requestMethod = strtoupper($requestMethod);
+    }
+    
+    /**
+     * Ignore error status code
+     * 
+     * @access public
+     * @param int $statusCode status code
+     */
+    function ignoreStatusCode($statusCode)
+    {
+        $this->_ignoreStatusCode[] = $statusCode;
+    }
+    
+    /**
+     * Returns true if specified status code is ignored
+     * 
+     * @access public
+     * @param int $statusCode status code
+     * @return bool true if $statusCode is ignored, or false 
+     */
+    function isIgnoreStatusCode($statusCode)
+    {
+        return in_array($statusCode, $this->_ignoreStatusCode);
+    }
+    
+    /**
+     * Send Request to destination URL
+     *
+     * @access public
+     * @return mixed [% package_name %]_Response|PEAR_Error
+     */
+    function &send()
+    {
+        if (is_null($this->_url)) {
+            return PEAR::raiseError('URL has not been set.');
+        }
+
+        return PEAR::raiseError('Not implemented.');
+    }
+}
+
+?>

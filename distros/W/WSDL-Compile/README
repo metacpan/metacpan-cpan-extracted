@@ -1,0 +1,178 @@
+NAME
+    WSDL::Compile - Compile SOAP WSDL from your Moose classes.
+
+SYNOPSIS
+    # Name of your WebService: Example
+    # Op stands for Operation
+    # Your method is CreateCustomer
+    #
+    # Request - what you expect to receive
+    package Example::Op::CreateCustomer::Request;
+    use Moose;
+    use MooseX::Types::XMLSchema qw( :all );
+    use WSDL::Compile::Meta::Attribute::WSDL;
+
+    has 'FirstName' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:string',
+       required => 1,
+       xs_minOccurs => 1,
+    );
+    has 'LastName' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:string',
+       required => 1,
+       xs_minOccurs => 1,
+    );
+    has 'Contacts' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'ArrayRef[Example::CT::Contact]',
+       xs_maxOccurs => undef,
+    );
+
+    # Response - that's what will be sent back
+    package Example::Op::CreateCustomer::Response;
+    use Moose;
+    use MooseX::Types::XMLSchema qw( :all );
+    use WSDL::Compile::Meta::Attribute::WSDL;
+
+    has 'CustomerID' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:int',
+       required => 1,
+       xs_minOccurs => 1,
+    );
+
+    # Fault - class that defines faultdetails
+    package Example::Op::CreateCustomer::Fault;
+    use Moose;
+    use MooseX::Types::XMLSchema qw( :all );
+    use WSDL::Compile::Meta::Attribute::WSDL;
+
+    has 'Code' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:int',
+    );
+    has 'Description' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:string',
+    );
+
+    # CT stands for ComplexType
+    # So you can have more complex data structures
+    package Example::CT::Contact;
+    use Moose;
+    use MooseX::Types::XMLSchema qw( :all );
+    use WSDL::Compile::Meta::Attribute::WSDL;
+
+    has 'AddressLine1' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:string',
+    );
+    has 'AddressLine2' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'Maybe[xs:string]',
+    );
+    has 'City' => (
+       metaclass => 'WSDL',
+       is => 'rw',
+       isa => 'xs:string',
+    );
+
+    # below could be put in a script
+    package main;
+    use strict;
+    use warnings;
+    use WSDL::Compile;
+
+    my $gen = WSDL::Compile->new(
+       service => {
+           name => 'Example',
+           tns => 'http://localhost/Example',
+           documentation => 'Example Web Service',
+       },
+       operations => [
+           qw/
+               CreateCustomer
+           /
+       ],
+    );
+
+    my $wsdl = $gen->generate_wsdl();
+
+    print $wsdl;
+
+    Please take a look at example/ directory and/or tests for more details.
+
+ATTRIBUTES
+  namespace
+    Namespace for SOAP classes.
+
+  service
+    Hashref with following elements:
+
+    *   name
+
+        Name of web service
+
+    *   tns
+
+        Target namaspace
+
+    *   documentation
+
+        Description of web service
+
+  operations
+    Arrayref of all operations available in web service
+
+FUNCTIONS
+  generate_wsdl
+    Compile a WSDL file based on the classes. Returns string that you should
+    save as .wsdl file.
+
+  build_messages
+    Builds wsdl:message.
+
+  build_portType
+    Builds wsdl:portType.
+
+  build_binding
+    Builds wsdl:binding.
+
+  build_service
+    Builds wsdl:service.
+
+  build_definitions
+    Builds wsdl:definitions.
+
+  build_documentation
+    Builds wsdl:documentation.
+
+  build_types
+    Builds wsdl:types.
+
+AUTHOR
+    Alex J. G. Burzyński, "<ajgb at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-wsdl-compile at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WSDL-Compile>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Alex J. G. Burzyński.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License.
+

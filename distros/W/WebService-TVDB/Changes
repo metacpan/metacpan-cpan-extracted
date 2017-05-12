@@ -1,0 +1,44 @@
+1.133200  2013-11-16 23:14:08 Europe/London
+    Fix tests
+
+1.130690  2013-03-10 20:14:22 Europe/London
+    No longer need to call Mirros.xml (#18). [Tim De Pauw]
+    Removed www prefix (#18). [Tim De Pauw]
+    Allow searching all languages (#16). [Tim De Pauw]
+
+1.130350  2013-02-04 19:59:45 Europe/London
+    Fix failing tests.
+    Fix example code (#13).
+    Fix parsing series data if there are zero or one episodes (#12).
+    Add method to search by ID (#1, #14). Thanks fayland.
+
+1.123160  2012-11-11 17:59:08 Europe/London
+    Use HTTP::Online to test for online access when running tests.
+
+1.122800  2012-10-06 17:30:17 Europe/London
+    Specify HTTP user agent. [Tim De Pauw]
+    Ensure cache path is untainted.
+    Fix "Use of uninitialized value in pattern match (m//) at /.../WebService/TVDB/Episode.pm line 47".
+
+1.122570  2012-09-13 18:57:22 Europe/London
+    Fix dependency (File::Homedir should be File::HomeDir)
+
+1.122460  2012-09-02 17:41:56 Europe/London
+    Encode the POD for languages.
+    Keep a local cache of series data. [Tim De Pauw]
+    Implement a retry option when getting URL's. [Tim De Pauw]
+    Enabling SuppressEmpty for XML::Simple (sets unknown episode overviews and banner ratings to undef instead of {}). [Tim De Pauw]
+
+1.120740  2012-03-14 00:32:17 Europe/London
+    Generate WebService::TVDB::Languages on build.
+    Need at least Net::Ping 2.33 for testing.
+
+1.120600  2012-02-29 10:42:26 Europe/London
+    Fix failing tests when ~/.tvdb does not exist.
+
+1.120580  2012-02-27 21:31:49 Europe/London
+    Rename from Net::TVDB to WebService::TVDB (see http://blog.andrew-jones.com/2012/02/26/introducing-net-tvdb/#comments)
+    Check thetvdb.com is up before running live tests.
+
+1.120570  2012-02-26 21:18:44 Europe/London
+    Initial version.

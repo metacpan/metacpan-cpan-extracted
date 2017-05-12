@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - 'David Moreno <david@axiombox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  LWP::Simple: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Tumblr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Net::OAuth::Client: '0'
+resources:
+  X_twitter: http://twitter.com/habanerd
+  bugtracker: https://github.com/damog/www-tumblr/issues
+  homepage: http://github.com/damog/www-tumblr
+  repository: git://github.com/damog/www-tumblr.git
+version: '5.2'

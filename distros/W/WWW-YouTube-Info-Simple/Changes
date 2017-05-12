@@ -1,0 +1,22 @@
+Revision history for Perl extension WWW::YouTube::Info::Simple.
+
+0.01  Mon Aug 23 11:26:42 2010
+    - original version; created by h2xs 1.23 with options
+    -AX WWW::YouTube::Info::Simple
+0.02  Fri Aug 27 13:03:38 2010
+    - spelling and formating of POD
+0.03  Fri Aug 27 15:45:37 2010
+    - fixed potential collision at export
+0.04  Wed Sep  1 10:52:24 2010
+    - upgrades at prereq
+0.05  Sun Sep  5 00:18:01 2010
+    - fixed encoding at get_keywords
+0.06  Sat Jul 23 21:50:45 2011
+    - added method get_conn
+    - added tests
+0.07  Thu Aug 11 13:57:09 2011
+    - added fallbacks to get_url, get_resolution
+      fmt_url_map, fmt_map seem to be lost more and more
+0.08  Mon Oct 15 12:24:56 2012
+    - added signature parameter to get_url
+

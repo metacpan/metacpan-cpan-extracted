@@ -1,0 +1,31 @@
+{
+   "comment" : "Better logging in case of SNI enabling error\n\nDon't print stacktrace, it's too verbose.\n",
+   "date" : "20160111T221013+0300",
+   "files" : {
+      "file" : [
+         {
+            "after-revision" : "251b7bc67b7fd55dbfc0ebeac1ad92265d64b62b",
+            "before-revision" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649",
+            "file" : "git-server/src/jetbrains/buildServer/buildTriggers/vcs/git/SNIHttpClientConnection.java",
+            "relative-file" : "git-server/src/jetbrains/buildServer/buildTriggers/vcs/git/SNIHttpClientConnection.java"
+         }
+      ]
+   },
+   "href" : "/httpAuth/app/rest/changes/id:2252908",
+   "id" : 2252908,
+   "user" : {
+      "href" : "/httpAuth/app/rest/users/id:787",
+      "id" : 787,
+      "name" : "Neverov",
+      "username" : "neverov"
+   },
+   "username" : "dmitry.neverov",
+   "vcsRootInstance" : {
+      "href" : "/httpAuth/app/rest/vcs-root-instances/id:2495",
+      "id" : "2495",
+      "name" : "ssh://git.labs.intellij.net/teamcity/git-plugin.git#%default.branch%",
+      "vcs-root-id" : "TeamCityPluginsByJetBrains_Git_SshGitLabsIntellijNetTeamcityGitPluginGitDefaultB"
+   },
+   "version" : "251b7bc67b7fd55dbfc0ebeac1ad92265d64b62b",
+   "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2252908&personal=false"
+}

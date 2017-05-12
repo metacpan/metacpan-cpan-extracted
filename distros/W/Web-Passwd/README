@@ -1,0 +1,38 @@
+Web::Passwd - Web-based htpasswd Management
+
+Web::Passwd is a web-based utility for managing Apache htpasswd files.
+It uses the CGI::Application framework, so functionality is encapsulated
+in the module and very little code is required to create an instance.
+
+This was written expressly for Apache webserver 1.3 or higher running
+under Linux.  However, there is nothing as far as I am aware that would
+prevent execution on Apache 2.x or Apache under Windows.
+
+INSTALLATION
+
+To install this module with the standard make, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or to install on a system without make, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Web::Passwd
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Evan Kaufman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

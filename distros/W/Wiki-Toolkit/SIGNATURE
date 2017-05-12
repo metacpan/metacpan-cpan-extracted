@@ -1,0 +1,128 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 863de991221d5e688fcb12a26d18287997ec8ec8 Changes
+SHA1 eef58741b82a1f029e62cc854755dfc2f4ada7b5 INSTALL
+SHA1 68934db09105a239a787dd59d7b8e33ddc1a32f5 MANIFEST
+SHA1 47e2eb3565b1bee9af00454f9a3d11a65f6c7596 META.json
+SHA1 42ffd4225fea03a0db238fc077462a2741ed14f4 META.yml
+SHA1 5f6efa52b5208df57a0152fb66040cebe9c6772d Makefile.PL
+SHA1 0c94c05497c37c21a91b89eb94ba2ae2b6c9199d README
+SHA1 b609af99f3e2315da9a65c50f0b6744d61bcd0bc bin/user-setup-mysql-dbixfts.pl
+SHA1 e57ba0b4eaa405246ff6768507c2dff380e4988f bin/wiki-toolkit-delete-node
+SHA1 b0e09c8a7380cf28e0745f5067d199bf600297d8 bin/wiki-toolkit-rename-node
+SHA1 8c77175cffbc7941daa59e3d932d8dbca494a8e3 bin/wiki-toolkit-revert-to-date
+SHA1 53224377b164bfd46034f6e3749c96d9c7fe97ad bin/wiki-toolkit-setupdb
+SHA1 6fbcbe2306408fd2558861751134d6d50da26440 lib/Wiki/Toolkit.pm
+SHA1 d94d5a76e824fa260e726fbcd256d7b8709d8f00 lib/Wiki/Toolkit/Extending.pod
+SHA1 c1fca2977999ad797368106c96aa7257b71e86b4 lib/Wiki/Toolkit/Feed/Atom.pm
+SHA1 9705573a60cb8ebc17dc7939c67207b52e44c722 lib/Wiki/Toolkit/Feed/Listing.pm
+SHA1 7e1f2d10851ecd7a5067d6361cdd0a39e3bc06f8 lib/Wiki/Toolkit/Feed/RSS.pm
+SHA1 58be3b135711f9abfea1c3715713730e1c8cddc8 lib/Wiki/Toolkit/Formatter/Default.pm
+SHA1 841470aa33e8287e436c6f4680b23a395bad2d43 lib/Wiki/Toolkit/Formatter/Multiple.pm
+SHA1 0a52d967a3065ce98dd7350d03f6407b19a6f1bc lib/Wiki/Toolkit/Formatter/WikiLinkFormatterParent.pm
+SHA1 977a1604f01d3ea74e95b90b3235fd6b25a3eae6 lib/Wiki/Toolkit/Plugin.pm
+SHA1 e76d7723c0826e2df9d3d218f1734346a01d8d43 lib/Wiki/Toolkit/Search/Base.pm
+SHA1 d66d0d743a74b2b5a86c251d6fd5a3d4c9777a3b lib/Wiki/Toolkit/Search/DBIxFTS.pm
+SHA1 7ca86c4e93b9c030e392872157b184bffb5d9b7f lib/Wiki/Toolkit/Search/Lucy.pm
+SHA1 7c160f1f45417e83c9cb0e4e2df5f1e371a3e925 lib/Wiki/Toolkit/Search/Plucene.pm
+SHA1 9e4b253033b5e5546d1fc2ad208893beffe4b11f lib/Wiki/Toolkit/Search/SII.pm
+SHA1 1ca6436c912d89042e7c4fb6e91c2f5e782e1384 lib/Wiki/Toolkit/Setup/DBIxFTSMySQL.pm
+SHA1 84c0431f366bec41a136de78c54841400ff98f50 lib/Wiki/Toolkit/Setup/Database.pm
+SHA1 1e3bd15f46bfc7ff7ae4ca3f8c3cea6d3e8e6a8b lib/Wiki/Toolkit/Setup/MySQL.pm
+SHA1 9e0ddd7269cce1d5a5178724bd95968d0208f16a lib/Wiki/Toolkit/Setup/Pg.pm
+SHA1 bab05bcb78464ddd3fc5f3a115c379bc77891e78 lib/Wiki/Toolkit/Setup/SII.pm
+SHA1 fa38885ff7746c1b83864d05aeead2d4f28be2df lib/Wiki/Toolkit/Setup/SQLite.pm
+SHA1 2d8897ff7cf90d9b9f73196c9a074afa933ce660 lib/Wiki/Toolkit/Store/Database.pm
+SHA1 24c27460c4e406b0c0152b9524f59cabaa7fdbfc lib/Wiki/Toolkit/Store/MySQL.pm
+SHA1 930fd48491c98860d76b8a54f07226ea0e601b35 lib/Wiki/Toolkit/Store/Pg.pm
+SHA1 87f87e00d4505653acffb0c60c2e547c4e496add lib/Wiki/Toolkit/Store/SQLite.pm
+SHA1 ffb913278dfdf3dcd218df1b8eef34a3b49bec8a lib/Wiki/Toolkit/TestConfig/Utilities.pm
+SHA1 728709ea39831912e55dc14829e470476a605a71 lib/Wiki/Toolkit/TestLib.pm
+SHA1 42e299ea6ea7e8196bed2a27b9c2ff1bedfdcfdd t/001_load.t
+SHA1 2a3dcdf422275c94003924b96528fd6cd36d9c32 t/002_datastore_setup.t
+SHA1 2297741bce71cd8019f073fa6300a378b7355764 t/003_instantiate.t
+SHA1 4aca7bc185dd9807958a02e77df3c3e562b953d3 t/004_write_and_retrieve.t
+SHA1 0b0ddffa885e2bdfa0dbdb34bbab0ccd724fd200 t/005_delete.t
+SHA1 762cb2b5dd64d47a7ad35506dbc0f2e82dd4bad7 t/006_list_all.t
+SHA1 0c88d41b9dd148ade30629506384796be15ac0db t/007_search.t
+SHA1 d58fbfdfaead5ff0b21eb9707d526559a5a46974 t/008_write_and_rewrite.t
+SHA1 cc04461a34b0da8cffe318f6cbd4da1a75d77ecc t/009_backlinks.t
+SHA1 db911060b3a3bb76800586b2af1ce1bb59e1f820 t/010_metadata.t
+SHA1 1f701b47ea49d98c01fc3330e65ec7128f94c97e t/011_recent_changes.t
+SHA1 9eaf665441379797837578ecc79e695b38047a49 t/012_blank_data.t
+SHA1 acc6c003e6cdfd847b80bbb47923ceebde79240d t/013_fuzzy_title_match.t
+SHA1 38a1f4e33bf54e5a27566fe334fcfd517b5aba1a t/014_advanced_metadata.t
+SHA1 ec866646127ffba2cf319d261cc27dd0e58b148d t/015_dangling_links.t
+SHA1 2b0dc6641c6e1b8290043f4c81cbb1cd90ff92b0 t/016_recent_changes_between.t
+SHA1 6d8b292281a044030eaab63c52d215b774a55a45 t/017_delete_version.t
+SHA1 056d69169f5d755695fbbd140db63ae1d043150b t/018_rc_multiple_metadata_criteria.t
+SHA1 a66ec66d0d6160a08ea8d07f516ebbe3e77f8bdc t/019_recent_changes_case.t
+SHA1 e78dffe59869cb7d3034a685d0505b0ff14e849b t/020_node_exists_case_insensitive.t
+SHA1 172804f543f304afe6599fbf341598ecd2a8ac48 t/021_moderation.t
+SHA1 a0a08d58894b033b3a05fc1401fdb60251e4931f t/022_list_unmoderated.t
+SHA1 26ed2cc986e5a250e9e4d844a9806076d1aeedac t/025_list_node_all_versions.t
+SHA1 e509921acbbc81ef9854a10d844e218fa733742d t/026_schema_current.t
+SHA1 50d38bca1b5181b797b3236247d4e571ae9d760a t/027_list_last_version_before.t
+SHA1 8c4ca0c7c0ac1e3035779ffeb7834a93702e44c8 t/040_rename.t
+SHA1 7535dd0d99fe1061e83ecf0b6073bac3543741bf t/050_mysql_store.t
+SHA1 ece618af3160f836af18d9045dc90c2875f6210c t/051_pg_store.t
+SHA1 fef0ca79290c643f60f6635c28a5767e1338129c t/052_sqlite_store.t
+SHA1 bd2b42bf5dbc133b315d3490773506b76e1cf2a4 t/060_recent_changes_new_only.t
+SHA1 d39ec155e3e210f99823217390b8060e6aa429ed t/061_list_metadata_by_type.t
+SHA1 6a12f95b5ff292c842b918d014a3109cb9f9a3a9 t/062_recent_changes_metadata_was.t
+SHA1 6adec606eae81ca262ff2b04c70f03b55566bbc6 t/100_formatting.t
+SHA1 e3a21e8441b1b6b92942cc3346f091da410116f7 t/101_default_formatter.t
+SHA1 77269781bbea9c82a2def6977fb4389d3f599d50 t/102_multiple_formatter.t
+SHA1 2afd8e2873f64323796e22404898e58f539906ca t/150_plugins.t
+SHA1 11f06774a1c282551424d43b1c5f61b217a6008b t/151_plugin_methods.t
+SHA1 a2abb23523645b1a4db6792b0bc301512bc3e7e9 t/152_pre_plugin_approval.t
+SHA1 f1fd13ed7ec7058a6a7710593163eb80282e04ce t/297_feed_rss_recentchanges.t
+SHA1 baae4956bdcdee9dea01a996ecf60f6be3e9836a t/298_feed_rss_node_all_versions.t
+SHA1 69f2b5827cdf152af29a999aa82dcc68a307a095 t/299_feed_rss_gen_node_dist_feed.t
+SHA1 52d17b764873682eb3698d422fcea96754e03798 t/300_feed_atom_setup.t
+SHA1 bda92f8eded61520352737b906a4c581401d16c3 t/301_feed_atom_add_test_data.t
+SHA1 92eaf1aa4de5f882f886711606b287d496c969ba t/302_feed_atom_recentchanges.t
+SHA1 66752df9042f2031826f41774179a07d7e98202a t/303_feed_atom_node_all_versions.t
+SHA1 44a9dd3d35623b6814f73d8b9ae3d28a008685d7 t/304_feed_atom_gen_node_dist_feed.t
+SHA1 677cefac48fec94b52c8374065f12d6571cbc8a4 t/400_upgrade.t
+SHA1 c41e905ec9c1f9b421cc3fa517084f883a67dd3c t/401_null_change.t
+SHA1 61e28ddd05ab0f3722f2a8cdce80a8f314b86391 t/500_pod.t
+SHA1 380e8a31c59fdff6fdfb520dbac077e5a19fd660 t/700_lucy_bug.t
+SHA1 f9e3379a88e74fadd003718a775cb124d4f01797 t/701_lucy_setup.t
+SHA1 c20f21c6b2fe3329a1a4db7c42d202cf6c2ceb39 t/702_metadata_search.t
+SHA1 86b5cd9b1fc5bf513b7005ec13958d107945951c t/703_search_weightings.t
+SHA1 82c6a9d000d457718bf955b45a8c96f82ea0c52b t/704_search_content_munging.t
+SHA1 bd4c5dc9cd2f906aceadeaef2ff94a12545c0c3e t/705_search_exclusion.t
+SHA1 0944b423c21abacdd290e2c035b58b9a3f72f686 t/lib/Wiki/Toolkit/Plugin/Bar.pm
+SHA1 5ba3e2fa69ad7ca30aa726289275e1e2f7220fc6 t/lib/Wiki/Toolkit/Plugin/Foo.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCAAGBQJYZ61JAAoJEMAFfnFNaU+yoqcQAMoNJRNtCumoIStL6IntZMhz
+8bgOMCEGHYkVv/J9Kx/spm+Ez0/WG46Z5Bw1S2WLSj19vEGA2I9ADca5ywttgocK
+3Jb4gverjODCbWEx57482Gff7msHHM8gQij3JNLirRUzUNXU1aXq/pmQu7JeP0Db
+FjG+KOAw2WfmRJruTtLE/fDLtp29NtdBo6nHenQ5hLneCgEnHvYHMd2QG/2nltx+
+ANZkdUKvpWgOR17kzpbFCilUfv+g4OtwnYd4Hxb4mkcAfaNDF2li+MoRILintPgt
+84pzArIYhxtuGhcGGNxAVaHkEdZEL/1y80kVWzyUAdOIqeWraaw7RpvCutEtNoQE
+QHL475t4pzSK6qiOI90bHjgqFpQsMhUw/4Kuvx6d4crNRs/8iHWi8gZOtySEehmv
+Cm1gXFzKRYege410obVy0y/anM97ht88mcFTmeVEDdLRT82UvolH7QRqTnck2zm9
+QnfmD1mxDNPKfPa//iQb/BkcZloshZIUNm1i1QkrD43koLi2qGicxcVJMl9lO0BB
+o0AtyYlozXmG+elerAmpX8bItz5CZb+C6LyCHie/iL7wHTkRQ1uJGpJ6GTf9x+MG
+BTp/3jjlE3b8gysRd8EP5lkj7lINPIQuauOU1SbMLg3jhF3InKIU1yWBDZoEmLjv
+qBI0YuJfW0x11K1nWg1V
+=OQEV
+-----END PGP SIGNATURE-----

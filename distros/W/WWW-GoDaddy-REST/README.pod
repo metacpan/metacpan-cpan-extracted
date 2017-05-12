@@ -1,0 +1,383 @@
+=head1 NAME
+
+WWW::GoDaddy::REST - Work with services conforming to the GDAPI spec
+
+=head1 SYNOPSIS
+
+ use WWW::GoDaddy::REST;
+
+ my $client = WWW::GoDaddy::REST->new({
+   url => 'https://example.com/v1',
+   basic_username => 'theuser',
+   basic_password => 'notsosecret'
+ });
+
+ # see docs for WWW::GoDaddy::REST::Resource for more info
+ my $auto  = $client->query_by_id('autos',$vehicle_id_number);
+
+ print $auto->f('make');        # get a field
+ print $auto->f('model','S');   # set a field
+ $saved_auto = $auto->save();
+
+ my $resource = $auto->follow_link('link_name');
+ my $resource = $auto->do_action('drive', { lat => ..., lon => ...});
+
+ $auto->delete();
+
+ my @autos = $client->query('autos',{ 'make' => 'tesla' });
+
+=head1 DESCRIPTION
+
+This client makes it easy to code against a REST API that is created using
+the Go Daddy (r) API Specification (GDAPI) L<https://github.com/godaddy/gdapi>.
+
+You will typically only need three pieces of information:
+ - base url of the api (this must include the version number)
+ - username
+ - password
+
+=head1 SEARCHING AND FILTERS
+
+There are two methods that deal with searching: C<query> and C<query_by_id>.
+
+=head2 SEARCH BY ID
+
+Example:
+
+  $resource = $client->query_by_id('schema_name','id');
+
+=head2 SEARCH WITH FILTER
+
+Filters are hash references.  The first level key is the field
+name that you are searching on.  The value of the field is an array
+reference that has a list of hash references.
+
+Full Syntax Example:
+
+  @items = $client->query( 'the_schema_name', 
+    {
+        'your_field_name' => [
+        {
+            'modifier' => 'your modifier like "eq" or "ne"',
+            'value'    => 'your search value'
+        },
+        {
+            #...
+        },
+        ],
+        'another_field' => ...
+    }
+  );
+
+Now there are shortcuts as well.
+
+Single Field Equality Example:
+
+  @items = $client->query( 'the_schema_name', 
+    { 'your_field_name' => 'your search value' }
+  );
+
+Assumed Equality Example:
+
+  @items = $client->query( 'the_schema_name', 
+    {
+        'your_field_name' => [
+        {
+            # notice the missing 'modifier' key
+            'value' => 'your search value',
+        }
+        ],
+        'another_field' => 'equality search too'
+    }
+  );
+
+=head1 ATTRIBUTES
+
+Attributes can be provided in the C<new> method and have corresponding
+methods to get/set the values.
+
+=over 4
+
+=item url
+
+Base URL for the web service.  This must include the version portion of the
+URL as well.
+
+Trailing slash can be present or left out.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new( {
+           url => 'https://example.com/v1'
+       } );
+
+=item basic_username
+
+The username or key you were assigned for the web service.  
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new( {
+           url => '...',
+           basic_username => 'me',
+           basic_password => '...'
+       } );
+
+NOTE: not all web services authenticate using HTTP Basic Auth.  In this case,
+you will need to provide your own C<user_agent> with default headers to 
+accomplish authentication on your own.
+
+=item basic_password
+
+The password or secret you were assigned for the web service.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new( {
+           url => '...',
+           basic_username => '...',
+           basic_password => 'very_secret'
+       } );
+
+NOTE: not all web services authenticate using HTTP Basic Auth.  In this case,
+you will need to provide your own C<user_agent> with default headers to 
+accomplish authentication on your own.
+
+=item user_agent
+
+The instance of L<LWP::UserAgent> that is used for all HTTP(S) interraction.
+
+This has a sane default if you do not provide an instance yourself.
+
+You may override this if you wish in the constructor or later on at runtime.
+
+See the C<default_user_agent> in L<"CLASS METHODS">.
+
+Example:
+
+  $ua = LWP::UserAgent->new();
+  $ua->default_headers->push_header(
+    'Authorization' => 'MyCustom ASDFDAFFASFASFSAFSDFAS=='
+  );
+  $c = WWW::GoDaddy::REST->new({
+         url => '...',
+         user_agent => $ua
+  });
+
+=item schemas_file
+
+Optional path to a file containing the JSON for all of the schemas for this web
+service (from the schemas collection).  If you would like to avoid a round trip
+to the server at runtime, this is the way to do it.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new({
+         url => '...',
+         schemas_file => '/my/app/schema.json'
+  });
+
+See the GDAPI Specification for more information about schemas and collections.
+L<https://github.com/godaddy/gdapi/blob/master/specification.md>
+
+=item raise_http_errors
+
+Boolean value that indicates whether a C<die()> will occur in the 
+event of a non successful HTTP response (4xx 5xx etc).
+
+It defaults to True.  Set to a false value if you wish to check
+the HTTP response code in the resultant resource on your own.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item query
+
+Search for a list of resources given a schema name and a filter.
+
+In scalar context, this returns a L<WWW::GoDaddy::REST::Collection>
+object.
+
+In list context, this returns a list of L<WWW::GoDaddy::REST::Resource>
+objects (or subclasses).
+
+Example:
+
+  @items      = $client->query('schema_name',{ 'field' => 'value' });
+  $collection = $client->query('schema_name',{ 'field' => 'value' });
+
+See L<"SEARCHING AND FILTERS"> for more information.
+
+=item query_by_id
+
+Search for a single instance of a resource by its primary id.
+
+This returns a L<WWW::GoDaddy::REST::Resource> (or a subclass).
+
+Example:
+
+  $resource = $client->query_by_id('the_schema','the_id');
+
+=item schema
+
+Given a schema name, return a L<WWW::GoDaddy::REST::Schema> object or
+undef if it is not found.
+
+Example:
+
+  $schema_resource = $client->schema('the_schema');
+
+=item schemas_url
+
+If no schema name is provided, return the schema collection url where you can
+retrieve the collection of all schemas.
+
+If a schema name is provided, return the URL where you can retrieve the schema
+with the given name.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new({url => 'http://example.com/v1/'});
+  $c->schemas_url();        # http://example.com/v1/schemas/
+  $c->schemas_url('error'); # http://example.com/v1/schemas/error
+
+=item http_request
+
+Perform the HTTP request and return a hashref of the decoded JSON response.
+
+If this is called in list context, it returns the decoded JSON response and 
+the associated L<HTTP::Response> object.
+
+This takes the following parameters (similar but not the same as L<HTTP::Request>):
+  - HTTP method
+  - URL relative to the web service base C<url>
+  - Optional hashref of data to send as JSON content
+
+The url provided will be rooted to the base url, C<url>.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new({
+         url => 'http://example.com/v1/'
+  });
+
+  # GET http://example.com/v1/servers/Asdf
+  $data_hashref = $c->http_request('GET','/servers/Asdf')
+
+  ($hash,$http_response) = $c->http_request('GET','/servers/Asdf');
+
+=item http_request_as_resource
+
+Perform the HTTP request and return a L<WWW::GoDaddy::REST::Resource> instance.
+
+This takes the following parameters (similar but not the same as L<HTTP::Request>):
+  - HTTP method
+  - URL relative to the web service base C<url>
+  - Optional hashref of data to send as JSON content
+
+The url provided will be rooted to the base url, C<url>.
+
+The url provided will be rooted to the base url, C<url>.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new({
+         url => 'http://example.com/v1/'
+  });
+
+  # GET http://example.com/v1/servers/Asdf
+  $resource = $c->http_request_as_resource('GET','/servers/Asdf')
+
+=item http_request_schemas_json
+
+Retrieve the JSON string for the schemas collection.
+
+Example:
+
+  $c = WWW::GoDaddy::REST->new({
+         url => 'http://example.com/v1/'
+  });
+
+  $schemas_json = $c->http_request_schemas_json();
+  # write this out to a file for later use
+  # with the 'schemas_file' parameter for example
+
+
+=item build_http_request
+
+Given parameters for a L<HTTP::Request> object, return an instance
+of this object with certain defaults filled in.
+
+As of this writing the defaults filled in are:
+
+ - HTTP basic auth headers if auth is provided
+
+Unlike other methods such as C<http_request>, the C<url> is not rooted
+to the base url.
+
+Example:
+
+  
+  $c = WWW::GoDaddy::REST->new({
+         url => 'http://example.com/v1/'
+  });
+
+  $request = $c->build_http_request('GET','http://example.com/v1/test');
+
+=back
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item default_user_agent
+
+Generate a default L<LWP::UserAgent>.  See C<user_agent>.
+
+Example:
+
+  $ua = WWW::GoDaddy::REST->default_user_agent();
+  $ua->default_headers->push('X-Custom' => 'thing');
+  $c = WWW::GoDaddy::REST->new({
+         user_agent => $ua,
+         url => '...'
+  });
+
+=back
+
+=head1 SEE ALSO
+
+C<gdapi-shell> command line program.
+
+=head1 AUTHOR
+
+David Bartle, C<< <davidb@mediatemple.net> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2014 Go Daddy Operating Company, LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation 
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+
+
+=cut
+

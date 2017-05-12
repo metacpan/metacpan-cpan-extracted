@@ -1,0 +1,66 @@
+# NAME
+
+WWW::PivotalTracker::Command - Command-line interface to Pivotal Tracker <http://www.pivotaltracker.com/>
+
+# VERSION
+
+1.00
+
+# SYNOPSIS
+
+This module provides a command-line interface to interact with the Pivotal
+Tracker API.
+
+    #!/usr/bin/perl
+
+    use WWW::PivotalTracker::Command;
+    my $cmd = WWW::PivotalTracker::Command->new();
+    $cmd->run();
+
+# AUTHOR
+
+Jacob Helwig, `<jhelwig at cpan.org>`
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-www-pivotaltracker at rt.cpan.org`,
+or through the web interface at <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-PivotalTracker>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+# SUPPORT
+
+- * RT: CPAN's request tracker
+
+<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker>
+
+- * AnnoCPAN: Annotated CPAN documentation
+
+<http://annocpan.org/dist/WWW-PivotalTracker>
+
+- * CPAN Ratings
+
+<http://cpanratings.perl.org/d/WWW-PivotalTracker>
+
+- * Search CPAN
+
+<http://search.cpan.org/dist/WWW-PivotalTracker/>
+
+- * Source code
+
+L<git://github.com/jhelwig/www-pivotaltracker.git>
+
+- * Webpage
+
+<http://github.com/jhelwig/www-pivotaltracker>
+
+# ACKNOWLEDGEMENTS
+
+Chris Hellmuth
+
+# COPYRIGHT & LICENSE
+
+Copyright 2008-2010 Jacob Helwig.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

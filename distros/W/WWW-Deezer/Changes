@@ -1,0 +1,15 @@
+Revision history for Perl extension WWW::Deezer.
+
+0.03  Thu Jan 12 16:00:45 CET 2017
+    - new tests
+    - changes in documentation
+    - new attributes in Artist, Album and Track classes
+
+0.02  Mon Jun 25 20:00:54 2013
+    - around wraps multiple methods in WWW::Deezer::Obj successors
+    - datatype coercion from JSON::Boolean to perl scalar
+
+0.01  Mon Jun 24 13:50:31 2013
+	- original version; created by h2xs 1.23 with options
+		-X WWW::Deezer
+

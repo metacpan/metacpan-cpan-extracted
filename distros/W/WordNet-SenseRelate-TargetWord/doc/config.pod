@@ -1,0 +1,174 @@
+=head1 NAME
+
+config.pod - listing of configuration options, and configuration file 
+format.
+
+=head1 SYNOPSIS
+
+Description of all known configuration options, and configuration file
+format.
+
+=head1 DESCRIPTION
+
+The following is a list of options supported by the
+WordNet::SenseRelate::TargetWord modules. This is intended to serve as a
+"master list" of options so that descriptions can be copied from here and
+pasted into the documentation for specific modules.
+
+=over
+
+=item WordNet::SenseRelate::Preprocess::Compounds
+
+No configuration options.
+
+=item WordNet::SenseRelate::Context::NearestWords
+
+B<windowstop>=I<FILENAME>
+    FILENAME specifies a list of stop words which should be ignored during
+    context selection.
+
+B<windowsize>=I<N>
+    N is an integer that specifies the size of the window (default is 5).
+
+B<contextpos>=<POS>
+    POS specifies the part-of-speech ('n', 'v', 'a' or 'r') to which the
+    context words should be restricted.
+
+=item WordNet::SenseRelate::Algorithm::Local
+
+B<measure>=I<MODULENAME>
+    MODULENAME is the name of the semantic relatedness module that will be
+    used by the local disambiguation algorithm to compute the relatedness
+    of word senses.
+
+B<measureconfig>=I<FILENAME>
+    FILENAME is the name of the cofiguration file that will be used to
+    initialize the semantic relatedness module.
+
+=item WordNet::SenseRelate::Algorithm::Global
+
+B<measure>=I<MODULENAME>
+    MODULENAME is the name of the semantic relatedness module that will be
+    used by the local disambiguation algorithm to compute the relatedness
+    of word senses.
+
+B<measureconfig>=I<FILENAME>
+    FILENAME is the name of the cofiguration file that will be used to
+    initialize the semantic relatedness module.
+
+=item WordNet::SenseRelate::Algorithm::SenseOne
+
+No configuration options
+
+=item WordNet::SenseRelate::Algorithm::Random
+
+No configuration options.
+
+=back
+
+=head1 CONFIGURATION FILE FORMAT
+
+A configuration file can be passed to both, disamb.pl as well as to
+disamb-gui.pl in order to set up the configuration parameters for the
+modules. The format of this file is specified in this section.
+
+The configuration file must start with a header, which is the string
+"WordNet::SenseRelate::TargetWord" on the first byte of the first line of
+the file.
+
+It consists of a number of sections. Each section contains a list of
+modules for that section, along with the configuration options for the
+modules.
+
+A section starts with the string
+
+  [SECTION:section_name]
+
+A new section header indicates the end of the previous section. The utilies
+in this package recognize four types of sections:
+
+  [SECTION:PREPROCESS]
+
+  [SECTION:CONTEXT]
+
+  [SECTION:POSTPROCESS]
+
+  [SECTION:ALGORITHM]
+
+Any other section will be ignored by the program, without warning. Each of
+the sections is used to specify the list of modules for that section. A
+module is specified by [START modname] and [END] tags appearing on separate
+lines.
+
+Configuration parameters for the module appear on separate lines in between
+the start and end tags as PARAMETER=VALUE pairs.
+
+Example config file:
+
+I<WordNet::SenseRelate::TargetWord>
+
+I<[SECTION:PREPROCESS]>
+
+I<[START WordNet::SenseRelate::Preprocess::Compounds]>
+
+I<[END]>
+
+I<[SECTION:CONTEXT]>
+
+I<[START WordNet::SenseRelate::Context::NearestWords]>
+
+I<windowsize=5>
+
+I<windowstop=/home/sid/window-stop.txt>
+
+I<[END]>
+
+I<[SECTION:POSTPROCESS]>
+
+I<[SECTION:ALGORITHM]>
+
+I<[START WordNet::SenseRelate::Algorithm::Local]>
+
+I<[END]>
+
+The above config file has four sections -- PREPROCESS, CONTEXT, POSTPROCESS
+and ALGORITHM. The PREPROCESS section contains a single module for compound
+detection, and has no config parameters. The CONTEXT section lists one
+module (NearestWords), with parameters I<windowsize> and
+I<windowstop>. There are no modules listed in the POSTPROCESS section. The
+ALGORITHM section lists the Local disambiguation algorithm module, also
+with no config parameters.
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah, Salt Lake City
+ sidd at cs.utah.edu
+
+ Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+ banerjee+ at cs.cmu.edu
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 SEE ALSO
+
+L<intro.pod>, I<WordNet::SenseRelate::TargetWord>(3pm)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+Banerjee
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.

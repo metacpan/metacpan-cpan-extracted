@@ -1,0 +1,108 @@
+Revision history for Perl extension WebService::Browshot.
+
+1.0.0  Wed Sep 14 2011 22:16:11 2011
+	- original version; Browshot API 1.0
+
+1.1.0  Sun Nov 06 2011 14:02:00 2011
+	- Browshot API 1.1
+	- Support for /api/v1/instance/create
+	- Support for /api/v1/browser/create
+
+1.2.0  Tue Nov 15 2011 21:03:00 2011
+	- Browshot API 1.2
+	- Support for /api/v1/account/info
+
+1.2.1  Sat Nov 19 2011 20:11:00 2011
+	- Add dependency to LWP::Protocol::https
+	- Add additional debug messages
+	- Unit tests
+
+1.2.2 Sat Nov 19 2011 20:38:00 2011
+	- WebService::Browshot is on github: https://github.com/juliensobrier/browshot-perl
+
+1.3.0 Tue Dec 06 2011 21:42:00 2011
+	- Browshot API 1.3, no code change
+
+1.3.1 Mon Dec 26 2011 21:42:00 2011
+	- Retry requests (up to 2 times) to browshot.com in case of error
+
+1.4.0 Thu Jan 05 2012 21:11:00 2012
+	- Browshot API 1.4
+	- handle the new simple API with the functions simple and simple_file
+
+1.4.1 Wed Feb 01 2012 22:11:00 2012
+	- Fix URI encoding
+
+1.5.0 Mon Feb 06 2012 20:49:00
+	- Browshot API 1.5, no code change
+
+1.5.1 Fri Mar 06 2012 21:43:00
+	- Use binmode to print PNG to file (Windows compatibility issue)
+
+1.6.0 Sun Mar 18 2012 14:40:00
+	- Browshot API 1.6, no code change
+
+1.6.1 Wed Apr 04 2012 21:42:00
+	- Fix unit tests for instance_info
+
+1.7.0 Fri Apr 13 2012 20:42:00
+	- Update screnshot_info to handle new parameters
+	- Update unit tests for API 1.7
+
+1.8.0 Wed Apr 25 2012 20:18:00
+	- API 1.8.0
+
+1.9.0 Tue May 15 2012 20:59:00
+	- API 1.9.0
+
+1.9.1 Sat May 19 2012 13:59:00
+	- Update documentation
+
+1.9.2 Sat May 26 2012 21:46:00
+	- Fix text plan (Thank you to contributor wreis)
+	- Fix screenshot_thumbnail
+
+1.9.3 Mon Jun 18 2012 21:18:00
+	- Keep backward compatiblity for screenshot_thumbnail.
+
+1.9.4 Wed Oct 10 2012 21:44:00
+	- Fix status code in error messages.
+	- Fix unit test with invalid key
+
+1.10.0 Sun Oct 28 2012 14:31:00
+ 	- API 1.10
+	- Add method screenshot_delete
+
+1.10.1 Thu Apr 25 2013 22:32:00
+ 	- Fix SSL warning
+
+1.11.0 Thu May 09 2013 21:03:00
+	- Optional HTTP timeout
+
+1.11.1 Wed Jul 17 2013 21:46:00
+	- Return Browshot response in case of error if the reply is valid JSON.
+
+1.12   Mon Aug 12 2013 21:07:00
+ 	- API 1.12
+	- Add method screenshot_search
+
+1.12.1 Tue Sep 10 2013 20:37:00
+	- Disable remote tests by defautl. "export BROWSHOT_REMOTE_TESTS=1" to enable API tests.
+	- Handle new arguments for account_info
+
+1.12.2 Wed Sep 18 2013 21:37:00
+	- Fix spelling mistakes in the documentation.
+
+1.13.0 Tue Oct 08 2013 20:52:00
+	- API 1.13
+	- Add method screenshot_html
+	- Add method screenshot_multiple
+
+1.14.0 Fri Jan 03 2014 21:48:00
+	- API 1.14
+	- Add method batch_create
+	- Add method batch_info
+
+1.14.1 Tue Dec 30 2014 20:43:00
+	- Remove deprecated API calls
+	- Update unit tests

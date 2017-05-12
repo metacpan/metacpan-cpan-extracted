@@ -1,0 +1,32 @@
+Revision history for Perl module Win32::PEFile
+
+0.7007 Mon Jun 15 22:02:00 2015
+    - Added getImportNamesArray or .idata section
+
+0.7006 Thu Mar 20 18:33:51 2014
+    - Remove more defined or use!
+    - Set 5.8.8 as required Perl version
+
+0.7005 Wed Mar 19 22:10:00 2014
+    - Remove defined or use in a couple of places to make 5.8.8 tests happy
+    - Fix a POD error flagged by CPAN Testers
+
+0.7004 Mon Mar 17 20:20:00 2014
+    - Add getVersionCount()
+    - Major internal restructuring
+    - Some internal support for editing and writing PE files,
+        but still much work to do
+
+0.7003 Sat Oct 30 23:45:23 2010
+    - Provide workaround for 5.12.2 handling of read beyond end of string file
+ 
+0.7002 Sat Oct 23 13:54:34 2010
+    - Fix packing issue that treated .exe file as text and "fixed" line ends
+    - Use binmode everywhere rather than :raw I/O layer only in some places
+ 
+0.7001 Fri Oct 22 00:14:19 2010
+    - fix test file path.
+    - add mention of Win32::Exe to documentation
+ 
+0.7000_01 Sat Oct 9 13:35:34 2010
+    - original version; created by ExtUtils::ModuleMaker 0.49

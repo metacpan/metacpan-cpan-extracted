@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Weather-NWS
+version:             0.02
+abstract:            Interface to NWS Web Services
+license:             ~
+author:              
+    - Josh McAdams <josh dot mcadams at gmail dot com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Std:                    0
+    LWP::Simple:                   0
+    Readonly:                      0
+    SOAP::DateTime:                0
+    strict:                        0
+    Test::More:                    0
+    Test::Pod:                     1.14
+    Test::Pod::Coverage:           1.04
+    warnings:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

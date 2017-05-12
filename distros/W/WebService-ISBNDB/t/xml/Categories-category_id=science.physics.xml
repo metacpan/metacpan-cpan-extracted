@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:11">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.physics" parent_id="science">
+<Name>Physics</Name>
+<Details summary="" depth="1" element_count="699" />
+<SubCategories>
+<SubCategory id="science.physics.study_and_teaching" />
+<SubCategory id="science.physics.nuclear" />
+<SubCategory id="science.physics.atmospheric" />
+<SubCategory id="science.physics.simulation" />
+<SubCategory id="science.physics.statistical" />
+<SubCategory id="science.physics.astrophysics" />
+<SubCategory id="science.physics.theories" />
+<SubCategory id="science.physics.congresses" />
+<SubCategory id="science.physics.symmetry" />
+<SubCategory id="science.physics.relativity" />
+<SubCategory id="science.physics.experiments" />
+<SubCategory id="science.physics.bibliography" />
+<SubCategory id="science.physics.solid_state" />
+<SubCategory id="science.physics.history" />
+<SubCategory id="science.physics.juvenile_literature" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

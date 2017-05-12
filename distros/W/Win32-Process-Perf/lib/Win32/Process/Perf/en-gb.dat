@@ -1,0 +1,28 @@
+Process
+ID Process
+% Privileged Time
+% Processor Time
+% User Time
+Creating Process ID
+Elapsed Time
+Handle Count
+IO Data Bytes/sec
+IO Data Operations/sec
+IO Other Bytes/sec
+IO Other Operations/sec
+IO Read Bytes/sec
+IO Read Operations/sec
+IO Write Bytes/sec
+IO Write Operations/sec
+Page Faults/sec
+Page File Bytes
+Page File Bytes Peak
+Pool Nonpaged Bytes
+Pool Paged Bytes
+Priority Base
+Private Bytes
+Thread Count
+Virtual Bytes
+Virtual Bytes Peak
+Working Set
+Working Set Peak

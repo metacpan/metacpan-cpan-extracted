@@ -1,0 +1,81 @@
+{
+   "abstract" : "Parse robots.txt",
+   "author" : [
+      "INA Lintaro <tarao.gnn@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-RobotRules-Parser-MultiValue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Hash::MultiValue" : "0",
+            "Text::Glob" : "0",
+            "URI" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Test::Base" : "0",
+            "Test::Class" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::RobotRules::Parser::MultiValue" : {
+         "file" : "lib/WWW/RobotRules/Parser/MultiValue.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tarao/perl5-WWW-RobotRules-Parser-MultiValue/issues"
+      },
+      "homepage" : "https://github.com/tarao/perl5-WWW-RobotRules-Parser-MultiValue",
+      "repository" : {
+         "url" : "git://github.com/tarao/perl5-WWW-RobotRules-Parser-MultiValue.git",
+         "web" : "https://github.com/tarao/perl5-WWW-RobotRules-Parser-MultiValue"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:TARAO"
+}

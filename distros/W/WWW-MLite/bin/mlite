@@ -1,0 +1,114 @@
+#!/usr/bin/perl -w
+# $Id: mlite 19 2014-07-23 15:11:44Z minus $
+use strict;
+
+=encoding windows-1251
+
+=head1 NAME
+
+mlite - WWW::MLite helper
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 SYNOPSIS
+
+    mlite [PROJECT_DIRECTORY]
+
+=head1 DESCRIPTION
+
+Creating WWW::MLite projects
+
+=head1 HISTORY
+
+=over 8
+
+=item B<1.00 / Wed Jul 23 07:30:32 2014 GMT>
+
+Init version
+
+=back
+
+See C<CHANGES> file
+
+=head1 DEPENDENCIES
+
+L<WWW::MLite>
+
+=head1 TO DO
+
+See C<TODO> file
+
+=head1 BUGS
+
+Coming soon
+
+=head1 SEE ALSO
+
+C<perl>, L<WWW::MLite>
+
+=head1 AUTHOR
+
+Serz Minus (Lepenkov Sergey) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2014 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is distributed under the GNU GPL v3.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See C<LICENSE> file
+
+=cut
+
+use CTK;
+use CTK::FilePid;
+use WWW::MLite::Helper;
+
+use constant {
+    DEBUG     => 0,
+    PIDFILE   => 'mlite.pid',
+    SKELDIR   => 'share/skel', # Äèðåêòîðèÿ äî ñêåëåòîíà ïðîåêòà (ÏÅÐÅÄ ÈÑÏÎËÜÇÎÂÀÍÈÅÌ ÑÅÏÀÐÈÐÎÂÀÒÜ!!!)
+};
+
+my $userdir = @ARGV ? shift @ARGV : ''; # Ïîëüçîâàòåëüñêèé êàòàëîã
+my $c = new CTK; $OPT{debug} = DEBUG;
+
+# Definitions
+my $pidfile = new CTK::FilePid({ file => CTK::catfile($c->tmpdir, PIDFILE) });
+my $pidstat = $pidfile->running || 0;
+exception("PID STATE (".$pidfile->file()."): ALREADY EXISTS (PID: $pidstat)" ) if $pidstat;
+$pidfile->write;
+
+START: debug "-"x16, " START ", tms," ","-"x16;
+{    
+    my $helper = new WWW::MLite::Helper (
+            -ctk => $c,
+            -dir => $userdir,
+        );
+    if ($helper) {
+        $helper->build;
+    } else {
+        say "Operation aborted";
+    }
+}
+FINISH: debug "-"x16, " FINISH ", tms," ","-"x16;
+$pidfile->remove;
+exit(0);
+
+1;
+__END__
+use Data::Dumper; $Data::Dumper::Deparse = 1;

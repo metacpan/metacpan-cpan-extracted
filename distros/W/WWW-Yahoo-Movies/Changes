@@ -1,0 +1,25 @@
+Revision history for Perl extension WWW::Yahoo::Movies.
+
+0.05 Dec 27 2007
+	- fixed a logic of parsing of cast info (thanks to David Sullivan for his patch).
+
+0.04 May 25 2007
+	- fixed a parsing a movie title which contains some digits (thanks to Jesper Nøhr
+		for his bugreport);
+	- fixed a parsing a moive release date in case if it doesn't contain
+		additional information at the end.
+
+0.03 December 18 2006
+	- added methods to get movie people list: cast, producers and directors;
+	- fixed a bug with processing movie information;
+	- added new tests.
+
+0.02 November 24 2005
+	- added possibility to specify a timeout for HTTP request;
+	- added possibility to specify an user agent for HTTP request;
+	- converted movie runtime in minutes when return;
+	- split MPAA Rating on code and description;
+
+0.01  August  30 2005
+	- original version; created by h2xs 1.23
+

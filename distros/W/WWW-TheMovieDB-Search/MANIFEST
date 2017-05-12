@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-TheMovieDB-Search.t
+lib/WWW/TheMovieDB/Search.pm

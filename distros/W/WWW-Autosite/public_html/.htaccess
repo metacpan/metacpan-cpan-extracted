@@ -1,0 +1,58 @@
+#RewriteEngine On
+#ErrorDocument 404 /cgi-bin/autosite/router.cgi
+RewriteEngine On
+
+
+RewriteRule ^images\/ /cgi-bin/apache-magick.cgi [L]
+
+
+
+# MAN 
+#RewriteRule man/?query=(.*) /cgi-bin/man.cgi?query=$1 [L]
+#RewriteRule man/\?*(.*) /cgi-bin/man.cgi?query=$1 [L]
+
+# thumbnailing
+#RewriteRule  (.*.).jpg.jpg$ /cgi-bin/autosite/thumbnail.cgi?$1.jpg [L]
+#RewriteRule thumbnail/(.*) /cgi-bin/autosite/thumbnail.cgi?$1 [L]
+
+# parse directories
+DirectoryIndex index.html /cgi-bin/autosite/dir.cgi
+
+
+
+# THESE WONT DO FOR CACHING, saving sgc
+
+# POD handler
+RewriteCond %{DOCUMENT_ROOT}/$1$2 -s
+#RewriteRule %{DOCUMENT_ROOT}/../cgi-bin/autosite/text.$3.pl -s
+RewriteRule (.*[^\/]+\.)(pm|PL|pl|pod|cgi)\.html$ /cgi-bin/autosite/pod.html.pl [L]
+
+
+# TEXT handler
+RewriteRule %{DOCUMENT_ROOT}/$1$2 -s
+RewriteRule %{DOCUMENT_ROOT}/../cgi-bin/autosite/text.$3.pl -s
+RewriteRule (.*[^\/]+\.)(pm|PL|pl|css|js|txt|cgi|pod)\.([^\/]+)$ /cgi-bin/autosite/text.$3.pl [L]
+
+# IMAGE handler
+RewriteRule %{DOCUMENT_ROOT}/$1$2 -s
+RewriteRule %{DOCUMENT_ROOT}/../cgi-bin/autosite/image.$3.pl -s
+RewriteRule (.*[^\/]+\.)(jpg|jpeg|JPG|JPEG|gif|GIF|png|PNG)\.([^\/]+)$ /cgi-bin/autosite/image.$3.pl [L]
+
+
+
+
+# this wouldnt be any good when we are actually writting to disk , for what we need the 404
+#ErrorDocument 404 /cgi-bin/autosite/router.cgi
+
+#RewriteRule \.hi$ /cgi-bin/autosite/router.cgi [L]
+#RewriteRule pod\.html$ /cgi-bin/autosite/router.cgi [L]
+
+
+# WRAPPING HTM, assumes any .htm file needs wrapping.
+# handlers work for files that actually exist
+Action wraphtm /cgi-bin/autosite/wraphtm.cgi
+AddHandler wraphtm .htm 
+
+
+
+

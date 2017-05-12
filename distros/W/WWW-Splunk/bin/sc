@@ -1,0 +1,233 @@
+#!/usr/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+sc - Splunk Client
+
+=head1 SYNOPSIS
+
+B<sc>
+[--host <host>]
+[--port <port>]
+[--login <login>]
+[--password <password>]
+[--insecure]
+<subcommand>
+[<arguments>,...]
+
+=head1 DESCRIPTION
+
+This is remote client for Splunk log search engine based upon L<WWW::Splunk>.
+It is currently quite limited in capabilities, but intended and designed to
+be extended in future.
+
+=cut
+
+use Getopt::Long qw/GetOptionsFromArray/;
+use WWW::Splunk;
+use LWP::UserAgent;
+use Pod::Usage;
+
+use strict;
+use warnings;
+
+our $VERSION = '2.06';
+
+# Subcommand dispatch
+
+my %commands = (
+	search	=> \&search,
+);
+
+# Command line options
+
+my $host = 'localhost';
+my $port = 8089;
+my $login = 'admin';
+my $password = 'changeme';
+my $insecure = 0;
+
+=head1 OPTIONS
+
+=over
+
+=item B<< --host <host> >>
+
+Sets remote server to connect to. Defaults to localhost.
+
+=item B<< --port <port> >>
+
+Sets port of remote server to connect to. Defaults to 8089.
+Please note that this is the management port, not the WWW interface port.
+
+=item B<< --login <login> >>
+
+User name of the user to connect to Splunk as. Defaults to admin.
+The defaults for username and password will probably (hopefully?)
+not suit your configuration.
+
+=item B<< --password <password> >>
+
+Password of the user to connect to Splunk as. Defaults to changeme.
+
+=item B<--insecure>
+
+Tolerate SSL errors.
+
+=item B<< <subcommand> [<arguments>] >>
+
+Subcommand to run. Currently defined is just B<search>.
+
+=back
+
+=cut
+
+new Getopt::Long::Parser (
+        config => [qw/require_order/]
+)->getoptions (
+	"host=s"	=> \$host,
+	"port=i"	=> \$port,
+	"login=s"	=> \$login,
+	"password=s"	=> \$password,
+	"insecure"	=> \$insecure,
+	"h|help"	=> sub { pod2usage (0) },
+	"m|man"		=> sub { pod2usage (-verbose => 2) },
+) or die "Could not parse command line";
+
+# Dispatch
+
+my $subcommand = shift @ARGV;
+die "Missing subcommand" unless $subcommand;
+die "Invalid subcommand" unless exists $commands{$subcommand};
+
+my $splunk = new WWW::Splunk ({
+	host	=> $host,
+	port	=> $port,
+	login	=> $login,
+	password => $password,
+	unsafe_ssl => $insecure,
+});
+
+exit $commands{$subcommand}->(@ARGV);
+
+# Implementation
+
+sub print_results
+{
+	my $format = shift;
+	return unless @_;
+
+	$format ||= exists $_[0]->{_raw} ? 'raw' : 'compact';
+
+	if ($format eq 'compact') {
+		foreach my $entry (@_) {
+			print join " ", map { "$_=$entry->{$_}" } sort keys %$entry;
+			print "\n";
+		}
+	} elsif ($format eq 'long') {
+		foreach my $entry (@_) {
+			print "$_=$entry->{$_}\n" foreach sort keys %$entry;
+			print "\n";
+		}
+	} elsif ($format eq 'raw') {
+		print join "\n", (map { $_->{_raw} || '(no raw log)' } @_), '';
+	} else {
+		die "Unknown format: $format";
+	}
+}
+
+=head1 COMMANDS
+
+=head2 B<search>
+[-t|--since <time>]
+[-T|--until <time>]
+[-f|--format compact|long|raw]
+<search string>
+
+Conduct a search, output the raw log data as they are looked up.
+Terminate when the search is finished.
+
+=over 4
+
+=item B<-t>, B<--since> B<< <time> >>
+
+Cut off at given time. The time specification is any string understood
+by L<Date::Manip>. Most common formats apply as well as human-readable
+relative time specifications (see L<EXAMPLES>).
+
+Use C<rt> for real time search, optionally with specifcation of the
+search window, such as C<rt-10> for 10-second window, or C<rt-1m>
+for one minute.
+
+Defaults to unlimited.
+
+=item B<-T>, B<--until> B<< <time> >>
+
+Do not look for entries newer than given time. The format of the time
+specification is the same as for B<--since> option.
+
+If this or I<--since> is C<rt> a real-time search is conducted.
+
+=item B<-f>, B<--format> I<compact>|I<long>|I<raw>
+
+Switch output format style.
+
+=back
+
+=cut
+
+sub search
+{
+	my ($since, $until, $format);
+        GetOptionsFromArray (\@_,
+                't|since=s' => \$since,
+                'T|until=s' => \$until,
+                'f|format=s' => \$format,
+        ) or die 'Bad arguments to search';
+
+	if (($since and $since =~ /^rt/) or ($until and $until =~ /^rt/)) {
+		# Real time search
+		$splunk->rt_search (join (' ', @_), sub {
+			print_results ($format => @_);
+		}, $since, $until);
+	} else {
+		my $sid = $splunk->start_search (join (' ', @_), $since, $until);
+
+		until ($splunk->results_read ($sid)) {
+			my @results = $splunk->search_results ($sid);
+			print_results ($format => @results);
+		}
+	}
+
+	return 0;
+}
+
+=head1 EXAMPLES
+
+=over
+
+=item B<sc --host splunk.example.net --login user --password s1kr3t2 --since '2 days ago' --until yesterday search 'network AND error | head 10'>
+
+Perform a simple search query limited by given time frame.
+
+=item B<sc --since 'rt-30' search 'source=/var/log/httpd/access_log |stats count by http_status_code'>
+
+Perform a simple real-time search.
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Splunk>, L<WWW::Splunk::API>
+
+=head1 AUTHORS
+
+Lubomir Rintel, L<< <lkundrak@v3.sk> >>,
+Michal Josef Špaček L<< <skim@cpan.org> >>
+
+The code is hosted on GitHub L<http://github.com/tupinek/perl-WWW-Splunk>.
+Bug fixes and feature enhancements are always welcome.
+
+=cut

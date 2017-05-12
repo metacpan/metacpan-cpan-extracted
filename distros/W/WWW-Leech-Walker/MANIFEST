@@ -1,0 +1,7 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/WWW/Leech/Walker.pm
+t/001_load.t

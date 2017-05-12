@@ -1,0 +1,22 @@
+Revision history for Perl extension WWW::Search::TheITJobBoard.
+
+0.04  29 January 2008 
+	- Test updated after cpantesters results
+	
+0.04  29 January 2008 
+	- Updated URI from .co.uk to .com to conform with site change
+	  ... ought to update full REST API, really
+	  
+0.03  Mon Mar  6 12:34:23 2006
+	- Removed the stub C<preprocess_results_page> since we never used it.
+	- Allowed C<native_query> and C<native_setup_search> to take a list as well as a hash ref
+	- Added option to automatically get details of jobs
+	- Added new key to WWW::SearchResults returned, 'details'
+
+0.02  Fri Mar  3 18:50:06 2006
+	- now gets multiple pages with better defaults and better docs
+
+0.01  Fri Mar  3 10:50:06 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n WWW::Search::TheITJobBoard
+

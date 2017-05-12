@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use encoding 'utf8';
+
+use WWW::Dict::TWMOE::Phrase;
+
+my $arg = shift || die <<USAGE;
+Usage: $0 [Chinese Phrase]
+USAGE
+
+my $dict = WWW::Dict::TWMOE::Phrase->new();
+my $definition = $dict->define($arg);
+
+for(@$definition) {
+    print "\n$_->{phrase}\n" . "==" x length($_->{phrase}). "\n\n";
+    print "注音一式：$_->{zuin_form_1}\n"
+        if $_->{zuin_form_1};
+    print "注音二式：$_->{zuin_form_2}\n"
+            if $_->{zuin_form_2};
+    print "同義字：$_->{synonym}\n"
+        if $_->{synonym};
+    print "同義字：$_->{antonym}\n"
+        if $_->{antonym};
+    print "\n解釋：\n\t$_->{definition}\n\n";
+}

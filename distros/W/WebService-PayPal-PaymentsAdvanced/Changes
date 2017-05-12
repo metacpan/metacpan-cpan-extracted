@@ -1,0 +1,85 @@
+Revision history for WebService-PayPal-PaymentsAdvanced
+
+0.000021 2016-06-13
+    - Use correct throw method for HTTP error.
+
+0.000020 2016-06-13
+    - Update notify.paypal.com IP addresses.
+
+0.000019 2016-06-09
+    - Always add the response content to the HTTP error exception messages as
+      many fake LWP::UserAgent 500s do not set any distinguishing headers.
+
+0.000018 2016-05-18
+    - The connection timeout was increased to 60 seconds as requests to the
+      service frequently run 20-30 seconds.
+    - Previously, this API would throw
+      WebService::PayPal::PaymentsAdvanced::Error::HTTP exceptions with
+      messages indicating that there was an HTTP error when the request failed
+      for other reasons such as a timeout. The message should now more
+      accurately reflect the cause of the exception.
+
+0.000017 2016-02-16
+    - Successful refunds now return a
+      WebService::PayPal::PaymentsAdvanced::Response::Credit response object.
+
+0.000016 2016-02-09
+    - Successful voids now return a
+      WebService::PayPal::PaymentsAdvanced::Response::Void response object.
+
+0.000015 2016-01-22
+    - Make less assumptions about inquiry_transaction().  This is a breaking
+      change.
+
+0.000014 2015-12-08
+    - *_reference_transaction() methods now accept an additional, optional
+      argument for parameters which are to be passed through directly to
+      PayPal.
+
+0.000013 2015-12-03
+    - PaymentsAdvanced constructor now takes an optional arrayref of result
+      codes to treat as non-fatal.
+
+0.000012 2015-11-23
+    - capture_delayed_transaction() now optionally accepts an amount.
+
+0.000010 2015-11-11
+    - Response objects no longer assume that PPREF will always be present.
+
+0.000009 2015-11-04
+    - WebService::PayPal::PaymentsAdvanced::Error::HTTP now provides
+      request_uri. WebService::PayPal::PaymentsAdvanced::Error::HostedForm
+      provides request_uri and http_status.
+
+0.000008  2015-10-27 17:58:19-04:00 America/Toronto
+    - Fixes an error when adding query params to a URI object
+
+0.000007  2015-10-16 21:05:02-04:00 America/Toronto
+    - Adds auth_from_credit_card_reference_transaction()
+    - Adds auth_from_paypal_reference_transaction()
+
+0.000006  2015-09-14 10:20:56-04:00 America/Toronto
+    - Adds built-in mocking for testing and running your own local mocked
+      PayPal services
+    - Moves away from using one generic response object to using various, more
+      specific response objects
+
+0.000005  2015-08-07 10:52:50-04:00 America/Toronto
+    - Adds post() and void_transaction methods to PaymentsAdvanced.pm
+    - Makes use of HashRefs more consistent in API
+    - Adds new methods: capture_delayed_transaction(), transaction_status() and
+      sale_from_reference_transaction
+    - Adds "verbose" attribute to constructor
+
+0.000004  2015-07-24 17:34:27-04:00 America/Toronto
+    - Bumps up minimum version of Moo to 1.004005
+
+0.000003  2015-07-22 13:04:12-04:00 America/Toronto
+    - Adds LWP::Protocol::https to deps
+    - Removes IP address validation on redirect
+
+0.000002  2015-07-20 14:41:56-04:00 America/Toronto
+    - Don't support Perls earlier than 5.14
+
+0.000001  2015-07-17 18:27:22-04:00 America/Toronto
+    - Initial release.

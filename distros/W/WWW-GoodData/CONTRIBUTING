@@ -1,0 +1,45 @@
+You're more than welcome to improve WWW::GoodData. Here's a couple of 
+recommendations that aim to make things easier for anyone if followed.
+
+Thank you for your contributions!
+
+1.) Be consistent.
+
+If you add new code, look for similar things that are already done. This 
+applies to conventions, commit messages, documentation as well as coding style.
+
+2.) Don't hack.
+
+Don't hardcode URLs or violate protocols. If you stumble upon a resource that's 
+hard to use, or impossible to use properly, let GoodData know that they should 
+fix it. If you don't know how, mail support@gooddata.com.
+
+If you still need to do something hacky, add a note to ISSUES file.
+
+3.) Maintain a clear library and shell interface.
+
+If you add functionality, add a library function and possibly a command to 
+bin/gdc. Don't add logic to the bin/gdc shell.
+
+Add functionality to shell instead of adding single-purpose scripts to bin/. 
+Rationale behind this is to have possibility to do multiple actions within a 
+single WWW::GoodData session (such as creating a user and adding a project for 
+him).
+
+4.) Ensure there's good documentation.
+
+Follow existing convention on addig POD documentation on everything. There's 
+much room for improvement (e.g. adding EXAMPLES sections), don't be afraid to 
+modify documentation.
+
+5.) Only use public references.
+
+Only use API with public documentation, code is no replacement for it. 
+Everything WWW::GoodData does should be explained here: 
+http://docs.gooddata.apiary.io/
+
+Also, no references to non-public bug-tracking or mailing lists or anything 
+like that anywhere -- in the code, comments, commit messages.
+
+--
+Lubomir Rintel

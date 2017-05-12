@@ -1,0 +1,29 @@
+Revision history for Perl extension Web-Library
+
+0.06  2013-08-12 01:17:47 CEST
+    [Improvements]
+        - cpanfile: require Test::Differences
+
+0.05  2013-08-11 19:54:37 CEST
+    [Improvements]
+        - Now works for Dist::Milla-based distribution wrappers that don't have
+          a Makefile.PL but a dist.ini
+
+0.04  2013-08-11 19:28:19 CEST
+    - first release with Dist::Milla
+
+0.03  2013-08-11 19:23:45 CEST
+    [Improvements]
+        - Converted the distribution to use Dist::Milla
+        - library_ok(): also output version number
+
+0.02 Fri May 17 08:47:31 2013 CEST
+    [New Features]
+        - Added Web::Library::Test testing helpers
+        - reset() clears all mounted libraries
+    [Improvements]
+        - include_paths() now returns an array reference in scalar context
+
+0.01 Thu May  2 11:42:35 2013 CEST
+    [New Features]
+        - original version

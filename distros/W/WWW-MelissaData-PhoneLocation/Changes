@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::FoneFinder.
+
+0.01  Mon Sep 21 18:49:12 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::FoneFinder -b 5.8.0
+

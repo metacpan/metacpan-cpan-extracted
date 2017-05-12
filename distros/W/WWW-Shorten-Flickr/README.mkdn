@@ -1,0 +1,44 @@
+# NAME
+
+WWW::Shorten::Flickr -  Perl interface to flic.kr
+
+# SYNOPSIS
+
+  use WWW::Shorten::Flickr;
+  use WWW::Shorten 'Flickr';
+
+  $short_url = makeashorterlink($long_url);
+  $long_url  = makealongerlink($short_url);
+
+# DESCRIPTION
+
+WWW::Shorten::Flickr is Perl interface to the flic.kr.
+
+# Functions
+
+## makeashorterlink
+
+The function `makeashorterlink` will return the shorter Flickr URL Shortener version. `makeashorterlink` 
+will accept as an argument either the full Flickr URL or just the Flickr identifier of the photo.
+
+If anything goes wrong, then either function will return `undef`.
+
+## makealongerlink
+
+The function `makealongerlink` does the reverse. `makealongerlink`
+will accept as an argument either the full Flickr URL Shortener URL or just the Flickr URL Shortener identifier.
+
+If anything goes wrong, then either function will return `undef`.
+
+# AUTHOR
+
+Shinsuke Matsui <smatsui@karashi.org>
+
+# SEE ALSO
+
+[WWW::Shorten](http://search.cpan.org/search?mode=module&query=WWW::Shorten), <http://flic.kr/>
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

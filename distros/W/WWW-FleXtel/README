@@ -1,0 +1,135 @@
+NAME
+    WWW::FleXtel - Manipulate FleXtel phone number redirection
+
+SYNOPSIS
+     use strict;
+     use WWW::FleXtel qw();
+     use Data::Dumper qw(Dumper);
+     
+ my $flextel = WWW::FleXtel->new(
+             number   => "0701776655",
+             pin      => "1234",
+             account  => "A99999", # not required
+             password => "password", # not required
+         );
+     
+ printf("Diverted to %s\n", $flextel->get_destination);
+     printf("Diverted to %s\n", $flextel->set_destination(
+             destination => "01923001122"
+         );
+     
+ print Dumper($flextel->get_phonebook);
+
+DESCRIPTION
+    This module provides a very basic OO interface to FleXtel telephone
+    number redirection webpage.
+
+METHODS
+  new
+     my $flextel = WWW::FleXtel->new(
+             number   => "0701776655",
+             pin      => "1234",
+             account  => "A99999", # not required
+             password => "password", # not required
+         );
+
+    Create a new WWW::FleXtel object. Currently the *account* and *password*
+    parameters are unsed and therefor do not need to be passed to this
+    constructor method.
+
+    This method does have any mandatory parameters. However values passed
+    this constructor method will be used as default fallback values if they
+    are not passed to the subsequent accessor methods detailed below.
+
+    number
+        Specifies the default FleXtel number to use for all subsequent
+        queries.
+
+    pin Specifies the default PIN to use for all subsqeuent queries.
+
+    account
+        Specifies the default FleXtel account number to use for all
+        subsequent queries. This parameter is not currently used, but may be
+        used in future releases.
+
+    password
+        Specifies the default account password to use for all subsequent
+        queries. This parameter is not currently use, but may be used in
+        future releases.
+
+    timeout
+        Specifies (in seconds) the timeout for all HTTP connections. By
+        default this is set to 15 seconds.
+
+    cache_ttl
+        Specifies (in seconds) the TTL for values to be cached internally
+        within the WWW::FleXtel object. By default this is set to 5 seconds.
+
+  get_destination
+     my $destination = $flextel->get_destination;
+     print "Diverted to $destination\n";
+
+    Retrieves the destination telephone number that your FleXtel number is
+    currently diverted to.
+
+  set_destination
+     my $destination = $flextel->set_destination(destination => "01923001122");
+     print "Diverted to $destination\n";
+
+    Sets the destination telephone number that your FleXtel number is
+    diverted to.
+
+  get_phonebook
+     my $phonebook = $flextel->get_phonebook;
+     use Data::Dumper qw(Dumper);
+     print Dumper($phonebook);
+     
+ my $destination = $flextel->get_destination;
+     my ($person) = grep(/\S/, map {
+             $_->{title} if defined $_ && $_->{number} eq $destination
+         } @{$phonebook}); $person ||= "*not recorded*";
+     print "$destination is $person in your phonebook\n";
+
+    This method extracts the indexes, names and numbers from your FleXtel
+    number's phonebook.
+
+  get_icd
+     my $icd = $flextel->get_icd;
+
+  get_email
+     my $notification_address = $flextel->get_email;
+
+TODO
+    Add support for retrieving a list of all FleXtel phone numbers attached
+    to an account number.
+
+SEE ALSO
+    <http://www.flextel.ltd.uk>
+
+VERSION
+    $Id: FleXtel.pm 942 2007-02-06 18:51:21Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+    If you like this software, why not show your appreciation by sending the
+    author something nice from her Amazon wishlist? (
+    http://www.amazon.co.uk/gp/registry/1VZXC59ESWYK0?sort=priority )
+
+ACKNOWLEDGEMENTS
+    Special thanks to Kevin Archer at FleXtel and the FleXtel support and
+    development team for implementing the simple CVS access methods to their
+    website.
+
+    See CREDITS in the distribution tarball.
+
+COPYRIGHT
+    Copyright 2007 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

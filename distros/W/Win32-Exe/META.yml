@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Win32-Exe
+version:            0.17
+abstract:           Manipulate Win32 executable files
+author:
+    - Audrey Tang <cpan@audreyt.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    File::Copy:  0
+    Test::More:  0
+requires:
+    Parse::Binary:  0.11
+    perl:           5.006000
+    XML::Parser:    2.36
+    XML::Simple:    2.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

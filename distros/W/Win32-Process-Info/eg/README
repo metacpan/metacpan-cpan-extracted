@@ -1,0 +1,7 @@
+This directory contains examples of the use of Win32::Process::Info.
+
+ProcessInfo.pl
+    This script displays the processes running in your system. Without
+    any options specified, the output is similar to the output of
+    'pulist', which is part of the resource kit. You can get help by
+    specifying -?, or any invalid option.

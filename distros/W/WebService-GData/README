@@ -1,0 +1,35 @@
+WebService-GData version 0.01
+=============================
+
+Give access to Google data protocol API v2.
+This is the base on which other services are built: YouTube,Analytics,Calendar,etc.
+You can connect/read/write the data when the service enables it.
+Access to YouTube data API v2 is in progress.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  
+In order to use https protocol, you will also need:
+
+  Crypt::SSLeay
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by shirirules
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

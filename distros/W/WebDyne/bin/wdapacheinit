@@ -1,0 +1,244 @@
+#!/bin/perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#
+#  This is free software, licensed under:
+#
+#    The GNU General Public License, Version 2, June 1991
+#
+#  Full license text is available at:
+#
+#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#
+
+
+#  Init Apache config files
+#
+sub BEGIN {
+
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+    foreach my $dn ($RealBin, File::Spec->path()) {
+        if (-f (my $fn=File::Spec->catfile($dn, 'perl5lib.pl'))) {
+            require $fn;
+            perl5lib->import(File::Spec->catdir($dn, File::Spec->updir()));
+            last;
+        }
+    }
+}
+use strict qw(vars);
+use vars qw($VERSION);
+use Cwd qw(realpath);
+use WebDyne::Base;
+use Getopt::Long;
+use Pod::Usage;
+
+
+#  Version info
+#
+$VERSION='1.246';
+
+
+#  Get command line options, add them to environment so picked up
+#  by WebDyne::Install::Apache::Constant module when loaded
+#
+my %opt;
+GetOptions(
+    \%opt,
+    (
+        'help|?',
+        'man',
+        'apache_uname|uname=s',
+        'apache_gname|gname=s',
+        'httpd_bin|httpd=s',
+        'dir_apache_conf|apache_conf|conf=s',
+        'dir_apache_modules|apache_modules|modules=s',
+        'file_mod_perl_lib|mod_perl_lib|mod_perl=s',
+        'mp2',
+        'webdyne_cache_dn|webdyne_cache|cache_dn|cache|dir_webdyne_cache=s',
+        'silent',
+        'setcontext',
+        'uninstall',
+        'text|print',
+        'version'
+    )) || pod2usage(2);
+pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1)
+    if $opt{'help'};
+pod2usage(-verbose => 2) if $opt{'man'};
+$opt{'version'} && do {print "$Script version: $VERSION\n"; exit 0};
+map {$ENV{uc($_)}=$opt{$_}} keys %opt;
+
+
+#  By default the WebDyne::Install::Apache::Constant module will issue a
+#  warning if something not found, but will continue. In this case we want
+#  to consider any warning fatal.
+#
+local $SIG{'__WARN__'}=sub {
+    my $warn=shift();
+    my %warn=(
+        APACHE_UNAME      => '--uname',
+        APACHE_GNAME      => '--gname',
+        HTTPD_BIN         => '--httpd_bin',
+        DIR_APACHE_CONF   => '--dir_apache_conf',
+        FILE_MOD_PERL_LIB => '--mod_perl_lib',
+    );
+
+    #  Translate warning messages from Contants module about setting env vars into
+    #  messages about setting command line options. Crude, but will do for now.
+    #
+    while (my ($env, $param)=each %warn) {
+        last if $warn=~s/(.*)$env.*/$1$param option./;
+    }
+    pod2usage(-verbose => 99, -sections => 'Options', -message => "ERROR: " . ucfirst($warn))
+};
+require WebDyne::Install::Apache;
+
+
+#  Get location prefile, call install/uninstall routine
+#
+my $prefix_dn=realpath(File::Spec->rel2abs(File::Spec->updir(), $RealBin));
+if ($opt{'uninstall'}) {
+    exit ${WebDyne::Install::Apache->uninstall($prefix_dn, $RealBin, \%opt) || die errstr()}
+}
+else {
+    exit ${WebDyne::Install::Apache->install($prefix_dn, $RealBin, \%opt) || die errstr()}
+}
+
+__END__
+
+=head1 Name
+
+wdapacheinit - configure Apache to process .psp files through WebDyne
+
+=head1 Synopsis
+
+B<wdapacheinit> B<[options]>
+
+=head1 Options
+
+-?, --help
+Show brief help message
+
+
+=over 5
+
+
+=item --man
+
+
+
+
+Display the manual page
+
+
+=item --uname
+
+
+
+
+The user name that the Apache daemon runs under when started, e.g.
+"varname", "httpd", "apache" etc.
+
+
+=item --gname
+
+
+
+
+The group name that the Apache daemons runs under when started
+
+
+=item --httpd_bin
+
+
+
+
+Full path and filename of Apache httpd executable,
+e.g./opt/apache/bin/httpd
+
+
+=item --mod_perl_lib
+
+
+
+
+Full path and filename of the Apache mod_perl library, e.g.
+/opt/apache/lib/modules/mod_perl.so
+
+
+=item --dir_apache_conf
+
+
+
+
+Location (directory name) where the main Apache config file
+resides, e.g /opt/apache/etc/conf
+
+
+=item --dir_webdyne_cache
+
+
+
+
+Location (directort name) where partially compiled psp files will
+be cached
+
+
+=item --silent
+
+
+
+
+No output
+
+
+=item --uninstall
+
+
+
+
+Remove references to WebDyne from Apache config files
+
+=back
+
+
+=head1 Description
+
+B<wdapacheinit> will attempt to locate Apache configuration files and
+modify them so that requests for .psp pages are processed through the
+perl-handler WebDyne module.
+
+Where Apache uses a conf.d configuration file structure the installer
+will simply create a webdyne.conf file with the appropriate
+configuration int the conf.d directory. Where no conf.d structure can
+be found the installer will create the webdyne.conf file in the same
+location as the main Apachehttpd.conf file, then modify httpd.conf to
+append an include reference to the Webdyne config file.
+
+The installer will attempt to locate the necessary files and other
+information using common defaults - however if it can not discover the
+required information automatically (e.g. the path to the Apache binary)
+it will be necessary to specify it explicitly using the appropriate
+command line option.
+
+=head1 Author
+
+Written by Andrew Speer, andrew@webdyne.org
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+Full license text is available at:
+L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+

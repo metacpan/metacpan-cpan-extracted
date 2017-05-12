@@ -1,0 +1,62 @@
+Revision history for WWW-HKP
+
+0.041 2015-09-08
+ - use Dist::Zilla::PluginBundle::ZURBORG
+ - various fixes for passing Perl::Critic tests
+ - tidy up code
+ - use AnyEvent::Proc
+ - allow ssl connection
+ - allow fingerprints as keyid
+ - fix index operation
+ - new method: import_keys()
+ - extend method submit()
+ - new function: discover
+
+0.040 2014-11-29
+ - change version format
+
+0.04 2014-11-24
+ - auto-update changelog before release
+
+ [API CHANGES]
+
+ [BUG FIXES]
+
+ [DOCUMENTATION]
+
+ [ENHANCEMENTS]
+
+0.03 2014-11-24
+ - Revert "changed distname to project name (debian-like)"
+ - changed license to ISC
+ - no Changes file yet
+ - Makefile.PL improvements
+ - upgrade to new build system
+ - fixed build system
+ - added README for github
+ - add Travis CI configuration
+ - add dependencies for Travis CI
+ - convert README to Markdown
+ - update .gitignore
+ - add dependencies for Travis CI
+ - add README.md to MANIFEST and .travis.yml to MANIFEST.IGNORE
+ - enable Module::Signature
+ - fix tabstops in pod
+ - dont make signatures anymore
+ - add repository URL and homepage to meta files
+ - brush up Pod
+ - reduce warnings on recent perls
+ - add Hash::Merge::Simple for travis CI to (hopefully) build
+ - Merge branch 'dist-enhancements' of
+   github.com:sergeyromanov/libwww-hkp-perl into
+   sergeyromanov-dist-enhancements
+ - fix typo
+
+0.02 2014-04-02
+ - changed my email address
+ - wrong parenthesis fixed
+ - rename Net::HKP to WWW::HKP
+ - ignore backup and meta files
+ - added unit testing
+ - adding whitespace for correct handling of verbatim pod block
+ - changed distname to project name (debian-like)

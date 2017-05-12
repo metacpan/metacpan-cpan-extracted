@@ -1,0 +1,45 @@
+Wikiversity-Hello version 0.01
+==============================
+
+Wikiversity::Hello is an introductory module for readers following the
+tutorial about loading a CPAN module at
+   http://en.wikiversity.org/wiki/Perl_Modules_on_CPAN
+
+Installation of this module is the exercise at the end of that lesson.
+The module simply provides a function which congratulates the user for
+successfully installing and running it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+
+    perl -MWikiversity::Hello -e hurrah
+
+PERL LESSONS AT WIKIVERSITY
+
+Wikiversity is an online educational site of the Wikimedia Foundation,
+the same organization as Wikipedia.  This module is part of the Perl
+training at Wikiversity.  http://en.wikiversity.org/wiki/Topic:Perl
+
+If you conduct Perl training, you may use this in your curriculum.
+And of course you knew this part was coming - please also help make
+the training better by adding your experience to it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Ian Kluft
+
+http://ian.kluft.com/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

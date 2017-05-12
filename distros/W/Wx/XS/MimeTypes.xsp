@@ -1,0 +1,214 @@
+#############################################################################
+## Name:        XS/MimeTypes.xsp
+## Purpose:     XS++ for wxMimeTypesManager and related classes
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     28/03/2005
+## RCS-ID:      $Id: MimeTypes.xsp 2911 2010-04-26 19:51:34Z mbarbon $
+## Copyright:   (c) 2005-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%{
+#if wxUSE_MIMETYPE
+#include <wx/mimetype.h>
+%}
+        
+%typemap{wxMimeTypesManager*}{simple};
+%typemap{wxFileType*}{simple};
+%typemap{wxIconLocation*}{simple};
+%typemap{wxFileTypeInfo*}{simple};
+%typemap{const wxFileTypeInfo*}{parsed}{
+    %cpp_type{%wxFileTypeInfo*%};
+};
+
+#if WXPERL_W_VERSION_GE( 2, 5, 2 )
+
+%name{Wx::IconLocation} class wxIconLocation
+{
+    bool IsOk() const;
+};
+
+#endif
+
+%name{Wx::FileTypeInfo} class wxFileTypeInfo
+{
+    bool IsValid() const;
+    void SetIcon( const wxString& iconFile, int iconIndex = 0 );
+    void SetShortDesc( const wxString& shortDesc );
+
+    const wxString& GetMimeType() const;
+    const wxString& GetOpenCommand() const;
+    const wxString& GetPrintCommand() const;
+    const wxString& GetShortDesc() const;
+    const wxString& GetDescription() const;
+    int GetExtensionsCount() const;
+    const wxString& GetIconFile();
+    int GetIconIndex() const;
+};
+
+%{
+wxFileTypeInfo*
+wxFileTypeInfo::new( strings )
+    wxArrayString strings
+
+void
+wxFileTypeInfo::GetExtensions()
+  PPCODE:
+    const wxArrayString& extensions = THIS->GetExtensions();
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ extensions );
+    SPAGAIN;
+
+%}
+
+%name{Wx::FileType} class wxFileType
+{
+};
+
+%{
+void
+wxFileType::GetMimeTypes()
+  PREINIT:
+    wxArrayString mimeTypes;
+  PPCODE:
+    bool ok = THIS->GetMimeTypes( mimeTypes );
+    if( ok )
+    {
+        PUTBACK;
+        wxPli_stringarray_push( aTHX_ mimeTypes );
+        SPAGAIN;
+    }
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetMimeType()
+  PREINIT:
+    wxString mimeType;
+  PPCODE:
+    bool ok = THIS->GetMimeType( &mimeType );
+    if( ok )
+    {
+        XPUSHs( wxPli_wxString_2_sv( aTHX_ mimeType, sv_newmortal() ) );
+    }
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetExtensions()
+  PREINIT:
+    wxArrayString extensions;
+  PPCODE:
+    bool ok = THIS->GetExtensions( extensions );
+    if( ok )
+    {
+        PUTBACK;
+        wxPli_stringarray_push( aTHX_ extensions );
+        SPAGAIN;
+    }
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetIcon()
+  PREINIT:
+#if WXPERL_W_VERSION_GE( 2, 5, 2 )
+    wxIconLocation iconLoc;
+#else
+    wxIcon iconLoc;
+#endif
+  PPCODE:
+    bool ok = THIS->GetIcon( &iconLoc );
+    if( ok )
+    {
+#if WXPERL_W_VERSION_GE( 2, 5, 2 )
+        XPUSHs( wxPli_non_object_2_sv( aTHX_ sv_newmortal(),
+                                       new wxIconLocation( iconLoc ),
+                                       "Wx::IconLocation" ) );
+#else
+        XPUSHs( wxPli_non_object_2_sv( aTHX_ sv_newmortal(),
+                                       new wxIcon( iconLoc ),
+                                       "Wx::Icon" ) );
+#endif
+    }
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetDescription()
+  PREINIT:
+    wxString desc;
+  PPCODE:
+    bool ok = THIS->GetDescription( &desc );
+    if( ok )
+    {
+        XPUSHs( wxPli_wxString_2_sv( aTHX_ desc, sv_newmortal() ) );
+    }
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetOpenCommand( file, mimeType = wxEmptyString )
+    wxString file
+    wxString mimeType
+  PREINIT:
+    wxString command;
+  PPCODE:
+    bool ok = THIS->GetOpenCommand( &command,
+                                    wxFileType::MessageParameters
+                                        ( file, mimeType ) );
+    if( ok )
+        XPUSHs( wxPli_wxString_2_sv( aTHX_ command, sv_newmortal() ) );
+    else
+        XSRETURN_EMPTY;
+
+void
+wxFileType::GetPrintCommand( file, mimeType = wxEmptyString )
+    wxString file
+    wxString mimeType
+  PREINIT:
+    wxString command;
+  PPCODE:
+    bool ok = THIS->GetPrintCommand( &command,
+                                     wxFileType::MessageParameters
+                                         ( file, mimeType ) );
+    if( ok )
+        XPUSHs( wxPli_wxString_2_sv( aTHX_ command, sv_newmortal() ) );
+    else
+        XSRETURN_EMPTY;
+
+%}
+
+%name{Wx::MimeTypesManager} class wxMimeTypesManager
+{
+    wxMimeTypesManager();
+
+%{
+static void
+wxMimeTypesManager::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxMimeTypesManager()
+        %code{% wxPli_thread_sv_unregister( aTHX_ "Wx::MimeTypesManager", THIS, ST(0) );
+                delete THIS;
+                %};
+
+    void AddFallbacks( const wxFileTypeInfo *fallbacks );
+    wxFileType* GetFileTypeFromExtension( const wxString& extension );
+    wxFileType* GetFileTypeFromMimeType( const wxString& mimeType );
+    bool IsOfType( const wxString& mimeType, const wxString& wildcard );
+#if WXPERL_W_VERSION_LT( 2, 9, 0 )
+    bool ReadMailcap( const wxString& filename, bool fallback = false );
+    bool ReadMimeTypes( const wxString& filename );
+#endif
+};
+
+%{
+#endif // wxUSE_MIMETYPE
+%}

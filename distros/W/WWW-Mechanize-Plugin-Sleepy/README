@@ -1,0 +1,80 @@
+NAME
+    WWW::Mechanize::Plugin::Sleepy - A WWW::Mechanize plugin to provide the
+    behaviour of WWW::Mechanize::Sleepy while using
+    WWW::Mechanize::Pluggable
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+    Set all Mechanize objects to sleep for 5 seconds between requests:
+
+        use WWW::Mechanize::Pluggable Sleepy => [ sleep => 5 ];
+
+    or, set single Mechanize instance to sleep for 5 seconds between
+    requests:
+
+        use WWW::Mechanize::Pluggable;
+    
+        my $mech = WWW::Mechanize::Pluggable->new( sleep => 5 );
+
+    To change sleep time:
+
+        $mech->sleep(2);    # now sleep for 2 seconds per request
+
+    To sleep for a random number of seconds, specify the range as a string
+    in the following format:
+
+        'i1..i2'
+    
+        # e.g. will sleep between 5 and 10 seconds, inclusive
+        $mech->sleep('5..10');
+
+DESCRIPTION
+    This module makes it easy to slow down WWW::Mechanize when using
+    WWW::Mechanize::Pluggable, in the manner of WWW::Mechanize::Sleepy.
+
+    The code merely adds hooks containing a "sleep()" before several
+    WWW::Mechanize methods, but is possibly preferable to scattering
+    "sleep()"s throughout code in order to slow down tests, for example.
+
+METHODS
+  sleep
+        $mech->sleep(1);
+        $mech->sleep('5..10');
+    
+        my $sleep = $mech->sleep;
+
+    Get/set sleep time
+
+ACKNOWLEDGEMENTS
+    Code and tests based on WWW::Mechanize::Sleepy
+
+SEE ALSO
+    *   WWW::Mechanize::Sleepy
+
+    *   WWW::Mechanize::Pluggable
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mjemmeson/www-mechanize-plugin-sleepy/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mjemmeson/www-mechanize-plugin-sleepy>
+
+      git clone git://github.com/mjemmeson/www-mechanize-plugin-sleepy.git
+
+AUTHOR
+    Michael Jemmeson <michael.jemmeson@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Foxtons Ltd.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

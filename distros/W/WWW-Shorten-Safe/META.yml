@@ -1,0 +1,23 @@
+---
+abstract: 'Interface to shortening URLs using http://safe.mn/, http://clic.gs/, http://go2.gs/ or http://cliks.fr/.'
+author:
+  - 'Julien Sobrier <jsobrier@safe.mn>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Shorten-Safe
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+  WWW::Shorten: 3
+version: 1.22

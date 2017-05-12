@@ -1,0 +1,321 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::CryptData - Perl wrapper for Win32 CryptProtectData and CryptUnprotectData functions.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::CryptData - Perl wrapper for Win32 CryptProtectData and CryptUnprotectData functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#export">EXPORT</A></LI>
+	</UL>
+
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#cryptprotectdata(\$datain,\$datadescr,\$optionalentropy,\$reserved,\%promptstruct,$flags,\$dataout)"><CODE>CryptProtectData(\$DataIn,\$DataDescr,\$OptionalEntropy,\$Reserved,\%PromptStruct,$Flags,\$DataOut)</CODE></A></LI>
+		<LI><A HREF="#cryptunprotectdata(\$datain,\$datadescr,\$optionalentropy,\$reserved,\%promptstruct,$flags,\$dataout)"><CODE>CryptUnprotectData(\$DataIn,\$DataDescr,\$OptionalEntropy,\$Reserved,\%PromptStruct,$Flags,\$DataOut)</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#data structures">DATA Structures</A></LI>
+	<UL>
+
+		<LI><A HREF="#%promptstruct">%PromptStruct</A></LI>
+	</UL>
+
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::CryptData - Perl wrapper for Win32 CryptProtectData and CryptUnprotectData functions.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Win32::CryptData;</PRE>
+<PRE>
+ $ret = Win32::CryptProtect::CryptProtectData();</PRE>
+<PRE>
+ $ret = Win32::CryptProtect::CryptUnprotectData();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Interface to Win32 Crypto API functions and data structures, needed to perform data encryption and decrtyption. Typically, only a user with logon credentials matching those of the encrypter can decrypt the data. In addition, decryption usually can only be done on the computer where the data was encrypted. However, a user with a roaming profile can decrypt the data from another computer on the network.</P>
+<P>This module covers a small subset of the functions and data structures provided by the Win32 Crypto API.</P>
+<P><STRONG>Purpose</STRONG></P>
+<P>This documentation provides information about services, components, and tools that enable application developers to add cryptographic security to their applications. This includes CryptoAPI 2.0, Cryptographic Service Providers (CSP), CryptoAPI Tools, CAPICOM, WinTrust, issuing and managing certificates, and developing customizable public-key infrastructures. Certificate and smart card enrollment, certificate management, and custom module development are also described.</P>
+<P><STRONG>Developer Audience</STRONG></P>
+<P>CryptoAPI is intended for use by developers of applications based on the Microsoft® Windows® and Microsoft Windows NT® operating systems that will enable users to create and exchange documents and other data in a secure environment, especially over nonsecure media such as the Internet. Developers should be familiar with the C and C++ programming languages and the Windows programming environment. Although not required, an understanding of cryptography or security-related subjects is advised.</P>
+<P>CAPICOM is intended for use by developers who are creating applications using the Microsoft Visual Basic® development system, the Visual Basic Scripting Edition (VBScript) programming language, or the C++ programming language.</P>
+<P><STRONG>Run-time Requirements</STRONG></P>
+<P>The Crypto API is supported on:</P>
+<UL>
+<LI><STRONG><A NAME="item_Windows_Server_2003">Windows Server 2003</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Windows_XP">Windows XP</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Windows_2000">Windows 2000</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Microsoft_Windows_2000">Microsoft Windows 2000</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Microsoft_Windows_NT%2C_version_4%2E0%2C_with_Serv">Microsoft Windows NT, version 4.0, with Service Pack 4 or later</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Windows_98_with_Microsoft_Internet_Explorer_5_or_l">Windows 98 with Microsoft Internet Explorer 5 or later</A></STRONG><BR>
+
+</UL>
+<P><STRONG>Note</STRONG></P>
+<P>CAPICOM 1.0 is supported by the same operating systems, with the addition of Windows 95 with Microsoft Internet Explorer 5 or later.</P>
+<P>CAPICOM is available as a redistributable file that can be downloaded from the Platform SDK Redistributables Web site.</P>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="cryptprotectdata(\$datain,\$datadescr,\$optionalentropy,\$reserved,\%promptstruct,$flags,\$dataout)"><CODE>CryptProtectData(\$DataIn,\$DataDescr,\$OptionalEntropy,\$Reserved,\%PromptStruct,$Flags,\$DataOut)</CODE></A></H2>
+<P>The CryptProtectData function performs encryption on the data in $DataIn.
+Typically, only a user with the same logon credential as the encrypter can decrypt the data.
+In addition, the encryption and decryption usually must be done on the same computer.</P>
+<P><EM><STRONG>Parameters</STRONG></EM></P>
+<DL>
+<DT><STRONG><A NAME="item_%24DataIn">$DataIn</A></STRONG><BR>
+<DD>
+Reference to a scalar that contains the plaintext to be encrypted.
+<P></P>
+<DT><STRONG><A NAME="item_%5C%24DataDescr">\$DataDescr</A></STRONG><BR>
+<DD>
+Reference to a scalar with a readable description of the data to be encrypted.
+This description string is included with the encrypted data.
+This parameter is optional and can be set to undef.
+<P></P>
+<DT><STRONG><A NAME="item_%5C%24OptionalEntropy">\$OptionalEntropy</A></STRONG><BR>
+<DD>
+Reference to a scalar that contains a password or other additional entropy used to encrypt the data.
+The value used in the encryption phase must also be used in the decryption phase.
+This parameter can be set to undef for no additional entropy.
+<P></P>
+<DT><STRONG><A NAME="item_%5C%24Reserved">\$Reserved</A></STRONG><BR>
+<DD>
+Reserved for future use and must be set to a reference to undef.
+<P></P>
+<DT><STRONG><A NAME="item_%5C%25PromptStruct">\%PromptStruct</A></STRONG><BR>
+<DD>
+Reference to a %PromptStruct structure that provides information about where and when prompts
+are to be displayed and what the content of those prompts should be.
+This parameter can be set to NULL in both the encryption and decryption phases
+<P></P>
+<DT><STRONG><A NAME="item_%24Flags">$Flags</A></STRONG><BR>
+<DD>
+This parameter can be one or more of the following flags:
+<PRE>
+ CRYPTPROTECT_LOCAL_MACHINE
+   When this flag is set, it associates the data encrypted with the current computer instead of with an individual user.
+   Any user on the computer on which CryptProtectData is called can use CryptUnprotectData to decrypt the data.</PRE>
+<PRE>
+ CRYPTPROTECT_UI_FORBIDDEN
+   This flag is used for remote situations where presenting a user interface (UI) is not an option.
+   When this flag is set and UI is specified for either the protect or unprotect operation, the operation fails.</PRE>
+<PRE>
+ CRYPTPROTECT_AUDIT
+   This flag generates an audit on protect and unprotect operations.</PRE>
+<PRE>
+ CRYPTPROTECT_VERIFY_PROTECTION
+   This flag verifies the protection of a protected item.</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%5C%24DataOut">\$DataOut</A></STRONG><BR>
+<DD>
+Reference to a scalar that receives the encrypted data.
+<P></P></DL>
+<P><STRONG>Example</STRONG></P>
+<PRE>
+  use strict;
+  use Win32::CryptData qw(:flags);</PRE>
+<PRE>
+  my $DataIn = 'This is plain data';
+  my $DataDescr = 'This is the description';
+  my $OptionalEntropy = 'mysecret';
+  my $Reserved = undef;
+  my %PromptStruct = (
+    PromptFlags =&gt; CRYPTPROTECT_PROMPT_ON_PROTECT | CRYPTPROTECT_PROMPT_ON_UNPROTECT | CRYPTPROTECT_PROMPT_STRONG,
+    hwndApp =&gt; undef,
+    Prompt =&gt; 'This is the caption'
+  );
+  my $Flags = CRYPTPROTECT_AUDIT;
+  my $DataOut;</PRE>
+<PRE>
+  my $ret = Win32::CryptData::CryptProtectData(\$DataIn, \$DataDescr, \$OptionalEntropy, \$Reserved, \%PromptStruct, $Flags, \$DataOut);</PRE>
+<PRE>
+  if($ret)
+  {
+    print &quot;Encrypted data (hex): &quot; . unpack(&quot;H*&quot;, $DataOut) . &quot;\n&quot;;
+  }
+  else
+  {
+    print &quot;Error: $^E\n&quot;;
+  }</PRE>
+<P><STRONG>Return Values</STRONG></P>
+<P>If the function succeeds, the return value is 1.</P>
+<P>If the function fails, the error code is contained in $^E.</P>
+<P><STRONG>Remarks</STRONG></P>
+<P>Typically, only a user with logon credentials matching those of the encrypter can decrypt the data.
+In addition, decryption usually can only be done on the computer where the data was encrypted.
+However, a user with a roaming profile can decrypt the data from another computer on the network.</P>
+<P>If the CRYPTPROTECT_LOCAL_MACHINE flag is set when the data is encrypted,
+any user on the computer where the encryption was done can decrypt the data.</P>
+<P>The function creates a session key to perform the encryption.
+The session key is re-derived when the data is to be decrypted.</P>
+<P>The function also adds a MAC (keyed integrity check) to the encrypted data
+to guard against data tampering.</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Client: Included in Windows XP, Windows 2000 Professional.
+Server: Included in Windows Server 2003, Windows 2000 Server.
+Header: Declared in Wincrypt.h.
+Library: Use Crypt32.lib.</P>
+<P>
+<H2><A NAME="cryptunprotectdata(\$datain,\$datadescr,\$optionalentropy,\$reserved,\%promptstruct,$flags,\$dataout)"><CODE>CryptUnprotectData(\$DataIn,\$DataDescr,\$OptionalEntropy,\$Reserved,\%PromptStruct,$Flags,\$DataOut)</CODE></A></H2>
+<P>The CryptUnprotectData function decrypts and does an integrity check of the data in $DataIn.
+Usually, only a user with the same logon credentials as the encrypter can decrypt the data.
+In addition, the encryption and decryption must be done on the same computer.</P>
+<P><EM><STRONG>Parameters</STRONG></EM></P>
+<DL>
+<DT><STRONG><A NAME="item_%5C%24DataIn">\$DataIn</A></STRONG><BR>
+<DD>
+Reference to a scalar that contains the encrypted data.
+<P></P>
+<DT><STRONG>\$DataDescr</STRONG><BR>
+<DD>
+Reference to a scaral that will receive a string-readable description of the encrypted data included with the encrypted data.
+This parameter can be set to undef.
+<P></P>
+<DT><STRONG>\$OptionalEntropy</STRONG><BR>
+<DD>
+Reference to a scalar that contains a password or other additional entropy used when the data was encrypted.
+<P></P>
+<DT><STRONG>\$Reserved</STRONG><BR>
+<DD>
+Reserved for future use and must be set to a reference to undef.
+<P></P>
+<DT><STRONG>\%PromptStruct</STRONG><BR>
+<DD>
+Reference to a %PromptStruct structure that provides information about where and when prompts
+are to be displayed and what the content of those prompts should be.
+This parameter can be set to NULL.
+<P></P>
+<DT><STRONG>$Flags</STRONG><BR>
+<DD>
+This parameter can be one or more of the following flags:
+<PRE>
+ CRYPTPROTECT_UI_FORBIDDEN
+   This flag is used for remote situations where the user interface (UI) is not an option.
+   When this flag is set and UI is specified for either the protect or unprotect operation, the operation fails.</PRE>
+<P></P>
+<DT><STRONG>\$DataOut</STRONG><BR>
+<DD>
+Reference to a scalar where the function stores the decrypted data.
+<P></P></DL>
+<P><STRONG>Examples</STRONG></P>
+<PRE>
+  use strict;
+  use Win32::CryptData qw(:all);</PRE>
+<PRE>
+  my $DataIn = 'This is encrypted data';
+  my $DataDescr = undef;
+  my $OptionalEntropy = 'mysecret';
+  my $Reserved = undef;
+  my %PromptStruct = (
+    PromptFlags =&gt; undef,
+    hwndApp =&gt; undef,
+    Prompt =&gt; 'This is the caption'
+  );
+  my $Flags = undef;
+  my $DataOut;</PRE>
+<PRE>
+  my $ret = Win32::CryptData::CryptUnprotectData(\$DataIn, \$DataDescr, \$OptionalEntropy, \$Reserved, \%PromptStruct, $Flags, \$DataOut);</PRE>
+<PRE>
+  if($ret)
+  {
+    print &quot;Decrypted data: $DataOut\n&quot;;
+    print &quot;Description: $DataDescr\n&quot;;
+  }
+  else
+  {
+    print &quot;Error: $^E\n&quot;;
+  }</PRE>
+<P><STRONG>Return Values</STRONG></P>
+<P>If the function succeeds, the return value is 1.</P>
+<P>If the function fails, the error code is contained in $^E.</P>
+<P><STRONG>Remarks</STRONG></P>
+<P>The CryptProtectData function creates a session key when the data is encrypted.
+That key is re-derived and used to decrypt the data BLOB.</P>
+<P>The MAC hash added to the encrypted data can be used to determine whether the encrypted data was altered in any way.
+Any tampering results in the return of the ERROR_INVALID_DATA code.</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Client: Included in Windows XP, Windows 2000 Professional.
+Server: Included in Windows Server 2003, Windows 2000 Server.
+Header: Declared in Wincrypt.h.
+Library: Use Crypt32.lib.</P>
+<P>
+<HR>
+<H1><A NAME="data structures">DATA Structures</A></H1>
+<P>
+<H2><A NAME="%promptstruct">%PromptStruct</A></H2>
+<P>The %PromptStruct hash defines the behaviour of the prompting dialog box, the valid keys are:</P>
+<DL>
+<DT><STRONG><A NAME="item_PromptFlags">PromptFlags</A></STRONG><BR>
+<DD>
+any of the valid flags:
+<PRE>
+  CRYPTPROTECT_PROMPT_ON_PROTECT
+    This flag is used to provide the prompt for the protect phase.</PRE>
+<PRE>
+  CRYPTPROTECT_PROMPT_ON_UNPROTECT
+    This flag can be combined with CRYPTPROTECT_PROMPT_ON_PROTECT to enforce the UI (user interface) policy of the caller.
+    When CryptUnprotectData is called, the dwPromptFlags specified in the CryptProtectData call are enforced.</PRE>
+<PRE>
+  CRYPTPROTECT_PROMPT_STRONG
+    This flag forces user to provide an encryption password</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_hwndApp">hwndApp</A></STRONG><BR>
+<DD>
+Window handle to the parent window
+<P></P>
+<DT><STRONG><A NAME="item_Prompt">Prompt</A></STRONG><BR>
+<DD>
+A string containing the text of a prompt to be displayed
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Thanks to Aldo Calpini for the powerful Win32::API module that makes this thing work.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Luigino Masarati, &lt;<A HREF="mailto:lmasarati@hotmail.com">lmasarati@hotmail.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::CryptData - Perl wrapper for Win32 CryptProtectData and CryptUnprotectData functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

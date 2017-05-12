@@ -1,0 +1,74 @@
+WWW::Search::DrugBank
+=====================
+
+This is a screen scraper for querying the University of Alberta's
+DrugBank database.
+
+It uses the L<WWW::Search> interface to provide information about
+pharmaceuticals:
+
+  use WWW::Search;
+
+  my $search = new WWW::Search('DrugBank');
+
+  my @ids = qw/ APRD00109 APRD00189 APRD00849 /;
+  $search->native_query( \@ids );
+
+  while( my $drug = $search->next_result ) {
+    printf "Generic name: %s\n", $drug->{generic_name};
+    printf "Melting point: %s\n", $drug->{melting_point};
+    printf "CAS registry number: %s\n", $drug->{cas_registry_number};
+    printf "PubChem compound ID: %s\n", $drug->{pubchem_id}->{compound};
+    printf "PubChem substance ID: %s\n", $drug->{pubchem_id}->{substance};
+    print "\n";
+    # ... etc.
+  }
+
+PREREQUISITES
+
+  * WWW::Search
+  * Test::More
+  * XML::LibXML
+  * HTML::TreeBuilder
+  * HTML::Entities
+  * URI
+
+Currently, parsing DrugBank cards relies on XML::LibXML, which
+requires libxml2 (L<http://xmlsoft.org>). I would have used the
+pure-Perl XML::XPath module had it not been so excruciatingly slow.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc WWW::Search::DrugBank
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Search-DrugBank
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Search-DrugBank
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/WWW-Search-DrugBank
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/WWW-Search-DrugBank
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David Iberri
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use autodie;
+use strict;
+use warnings;
+
+# to check if there are more abbreviations, i use this
+#
+# % devscript/extract-proverbs | perl -lne'@w=split /\s/, $_; for (@w) { print unless /[aeiou]/ }' | nauniq
+
+my %abbrevs = (
+    dl  => "dalam",
+    dng => "dengan",
+    dp  => "daripada",
+    dr  => "dari",
+    kpd => "kepada",
+    krn => "karena",
+    pd  => "pada",
+    sbg => "sebagai",
+    spt => "seperti",
+    yg  => "yang",
+);
+my $abbrev_re = join "|", map {quotemeta} keys %abbrevs;
+
+local $/ = "\n\n";
+open my($fh), "<", "../stardict/kbbi/build/0.03/kbbi.babylon";
+my %mem;
+while (my $entry = <$fh>) {
+    my @lines = split /^/, $entry;
+    next unless $lines[1] =~ /\[pb\]/;
+    next if $lines[0] =~ /[();]/;
+    $lines[0] =~ s/\s*\|\s*/, /g;
+    $lines[0] =~ s/\b($abbrev_re)\b/$abbrevs{$1}/g;
+    next if $mem{$lines[0]}++;
+    print $lines[0];
+}

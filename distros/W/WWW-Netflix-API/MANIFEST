@@ -1,0 +1,32 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/WWW/Netflix/API.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/api.t
+t/api-errors.t
+t/access_token.t
+t/boilerplate.t
+t/attributes.t
+t/queue.t
+t/rest2sugar.t
+t/catalog.t
+t/urlappender.t
+examples/vars.inc
+examples/profile.pl
+examples/login.pl
+examples/feeds.pl
+examples/history2ical.pl
+examples/queue.pl
+examples/catalog.pl
+examples/search.pl
+examples/catalog2db.pl
+examples/catalog-lwp_handlers.pl
+examples/catalog_filter.pl
+examples/rest2sugar.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

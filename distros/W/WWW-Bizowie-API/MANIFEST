@@ -1,0 +1,8 @@
+Changes
+lib/WWW/Bizowie/API.pm
+lib/WWW/Bizowie/API/Response.pm
+Makefile.PL
+MANIFEST
+README
+t/01.t
+META.yml                                 Module meta-data (added by MakeMaker)

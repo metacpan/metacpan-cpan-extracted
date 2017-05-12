@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Screenshot.xs
+t/Win32-Screenshot.t
+fallback/const-c.inc
+fallback/const-xs.inc
+Screenshot.pm
+TYPEMAP
+META.yml                                 Module meta-data (added by MakeMaker)

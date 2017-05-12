@@ -1,0 +1,93 @@
+NAME
+    WWW::Arbeitsagentur - Search for jobs via arbeitsagentur.de
+
+SYNOPSIS
+ # example for using the quick-search module:
+ use WWW::Arbeitsagentur::Search::FastSearchForWork;
+ my $search = WWW::Arbeitsagentur::Search::FastSearchForWork->new(
+        # where to save your files (optional)
+        path            => "download/",
+        # search for a normal job (instead of temp/contract work etc.)
+        job_typ         => 1,
+        # only save jobs whose postal code matches this regex
+        plz_filter      => qr/.+/,
+        # job title
+        beruf           => 'Fachinformatiker/in - Anwendungsentwicklung', 
+    );
+     # how many pages were found?
+     my $result = $search->search();
+
+     # Access the results:
+     my @pages  = $search->results();
+ 
+DESCRIPTION
+    WWW::Arbeitsagentur provides access to the search engine of the federal
+    job agency of Germany. You may search either for jobs or applicants, if
+    you have an account. Search results are collected and may be filtered
+    and stored for offline-use.
+
+METHODS
+  $search->connect()
+    Builds up a connection to http://www.arbeitsagentur.de
+
+    *Returns:*
+
+    0 - an error occurred
+
+    1 - success
+
+    Dies if attempt to connect fails completely.
+
+  $search->login()
+    After establishing a connection, you can login with your account data,
+    either as an applicant or as a recruiter. Your Perl setup has be
+    SSL-capable, ie. Crypt::SSLeay and (on Windows) the corresponding dlls
+    have to be installed.
+
+    *Returns:*
+
+    0 - an error occurred
+
+    1 - success
+
+  $search->logout()
+    Logout from the Arbeitsagentur. Otherwise, you will get a warning the
+    next time you log in via the web interface.
+
+    *Returns:*
+
+    0 - an error occurred
+
+    1 - success
+
+MOTIVATIONS
+    If you use the search engine on Arbeitsagentur (which is the largest one
+    in Germany for searching jobs or applicants), you may wish to filter
+    certain job offers or applicants permanently, either because you already
+    know them or they are not what you seek. Normally, you will receive the
+    same results if you search again the next day and so you need to step
+    through all the result pages again. WWW::Arbeitsagentur allows you to
+    build a script which searches for jobs/applicants automatically,
+    filtering and displaying results in a more user friendly way than the
+    current web interface of the Arbeitsagentur.
+
+    This module is a rewrite of an existing project of mine. The new version
+    will include tests, more documentation and a better interface, as well
+    as an easy way to install via CPAN / Module::Build.
+
+TODO
+    The module stands incomplete, as some parts will have to be rewritten
+    and ported over from http://arbeitssuche.sf.net. So, if you need a
+    working solution _now_, try the SourceForge version.
+
+AUTHOR
+    Ingo Wiarda; E-Mail: Ingo_Wiarda@web.de
+
+COPYRIGHT AND LICENSE
+    WWW::Arbeitsagentur is written and mantained by Ingo Wiarda. It is based
+    upon "Projekt Arbeit" on arbeitssuche.sf.net, Copyright (C) 2004-2006 by
+    Ingo Wiarda, Stefan Rother
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

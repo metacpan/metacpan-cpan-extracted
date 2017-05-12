@@ -1,0 +1,36 @@
+[Changes for 0.06 - 2015-04-13]
+
+* Fix Perl 5.20.2 compatibility. (Oliver Tuschhoff)
+
+[Changes for 0.05 - 2010-10-24]
+
+* LICENSING CHANGE: This module is now in the public domain under
+  CC0 1.0 Universal terms. However, these two individual files
+  are still under the BSD license by their respective authors:
+
+      pgsymlink.c
+      tclreadlink.c
+
+* Fix Perl 5.8.4+VC6 compilation. (asavige++)
+
+* Fix Strawberry Perl compilation.
+
+* Upgrade to new Module::Package build facility.
+
+[Changes for 0.04 - 2004-10-10]
+
+* readlink() support, adapted from Tcl's source code.
+* Add proper copyright notices for both pgsymlink.c and tclreadlink.c.
+
+[Changes for 0.03 - 2004-09-24]
+
+* Fix building on Perl 5.6.1 by providing a correct typemap.
+* Fix the installation procedure mentioned in README.
+
+[Changes for 0.02 - 2004-09-18]
+
+* Added documentations and tests.
+
+[Changes for 0.01 - 2004-09-18]
+
+* Initial release to CPAN.

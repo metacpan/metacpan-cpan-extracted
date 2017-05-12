@@ -1,0 +1,57 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Ivan Baktsheev <dot.and.thing@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-App",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Minimal" : "1.29",
+            "Class::Easy" : "0.09",
+            "Data::Dump::XML" : "1",
+            "Project::Easy" : "0.18",
+            "XML::LibXSLT" : "1.60"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Web-App"
+      },
+      "homepage" : "http://perlhug.com",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://web-app.git.sourceforge.net/gitroot/web-app/web-app"
+      }
+   },
+   "version" : "1.21"
+}

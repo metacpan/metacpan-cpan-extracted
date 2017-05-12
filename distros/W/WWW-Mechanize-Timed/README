@@ -1,0 +1,58 @@
+NAME
+    WWW::Mechanize::Timed - Time Mechanize requests
+
+SYNOPSIS
+      use WWW::Mechanize::Timed;
+      my $ua = WWW::Mechanize::Timed->new();
+      $ua->get($url);
+      print "Total time: " . $ua->client_response_receive_time . "\n";
+
+DESCRIPTION
+    This module is a subclass of WWW::Mechanize that times each stage of the
+    HTTP request. These can then be used in monitoring systems.
+
+CONSTRUCTOR
+  new
+    The constructor is provided by WWW::Mechnize. See that module's
+    documentation for details.
+
+METHODS
+    The vast majority of methods are provided by WWW::Mechanize. See that
+    module's documentation for details. Additional methods provided by this
+    module follow. The most useful method is client_response_receive_time,
+    or how long it took to get the data from the webserver once the response
+    was made (and gives an idea of how loaded the webserver was). All times
+    are in seconds.
+
+  client_request_connect_time
+    The time it took to connect to the remote server.
+
+  client_request_transmit_time
+    The time it took to transmit the request.
+
+  client_response_server_time
+    Time it took to respond to the request.
+
+  client_response_receive_time
+    Time it took to get the data back.
+
+THANKS
+    Andy Lester for WWW::Mechanize. Simon Wistow for LWPx::TimedHTTP.
+
+LICENCE AND COPYRIGHT
+    This module is copyright Fotango Ltd 2004. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.000 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    The full text of the licences can be found in the Artistic and COPYING
+    files included with this module, or in perlartistic and perlgpl as
+    supplied with Perl 5.8.1 and later.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+SEE ALSO
+    WWW::Mechanize.
+

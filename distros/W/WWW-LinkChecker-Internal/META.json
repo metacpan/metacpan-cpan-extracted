@@ -1,0 +1,63 @@
+{
+   "abstract" : "Check a web site for broken internal links.",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [
+      "checker",
+      "html",
+      "link-checker",
+      "internal",
+      "link",
+      "links",
+      "website",
+      "www"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-LinkChecker-Internal",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "WWW::Mechanize" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::LinkChecker::Internal" : {
+         "file" : "lib/WWW/LinkChecker/Internal.pm",
+         "version" : "v0.4.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-www-linkchecker-internal"
+      }
+   },
+   "version" : "v0.4.0"
+}

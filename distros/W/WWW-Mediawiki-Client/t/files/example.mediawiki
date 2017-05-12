@@ -1,0 +1,9 @@
+$VAR1 = {
+          'language_code' => 'en',
+          'space_substitute' => '+',
+          'username' => undef,
+          'host' => 'localhost',
+          'password' => undef,
+          'watch' => 0,
+          'minor_edit' => 0,
+        };

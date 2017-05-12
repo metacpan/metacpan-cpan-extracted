@@ -1,0 +1,12 @@
+Revision history for Perl module Wx::Perl::FSHandler::LWP.
+
+0.03  Sun Mar 11 19:49:25 CET 2007
+	- Workaround double slashes in URIs passed by Wx::FileSystem.
+
+0.02  Tue Oct  3 21:49:43 CEST 2006
+	- Improved documentation.
+	- Added passthrough Makefile.PL.
+	- More tests.
+
+0.01  Wed Jul 16 11:35:23 CEST 2006
+	- First public release.

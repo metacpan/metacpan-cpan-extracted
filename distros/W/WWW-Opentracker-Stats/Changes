@@ -1,0 +1,17 @@
+Revision history for Perl extension WWW::Opentracker::Stats.
+
+1.11    Wed Apr  1 10:01:49 2009
+        - Fix: Added missing dependency Class::Data::Inheritable
+
+1.10    Mon Mar 30 17:10:44 2009
+        - Changed package namespace from Net::Opentracker::Stats to
+            WWW::Opentracker::Stats.
+
+1.00    Sun Mar  8 14:17:51 2009
+        - First release.
+        - Supports the following statistics from opentracker:
+            peer, tcp4, udp4, conn, tpbs, fscp, top10, herr, renew, scrp, torr
+        - The tpbs statistics is retrieves bencoded, and then parsed by this
+            module. This statistics provides the total number of complete
+            downloads for each torrent.
+

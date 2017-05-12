@@ -1,0 +1,38 @@
+---
+abstract: 'Class for searching http://www.antikvariat-judaica.cz/ .'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.01
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Search-AntikvariatJudaicaCZ
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  LWP::UserAgent: 0
+  Readonly: 0
+  WWW::Search: 0
+  Web::Scraper: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Search-AntikvariatJudaicaCZ
+  homepage: https://github.com/tupinek/WWW-Search-AntikvariatJudaicaCZ
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/tupinek/WWW-Search-AntikvariatJudaicaCZ
+version: '0.02'

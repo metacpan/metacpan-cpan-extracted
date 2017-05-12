@@ -1,0 +1,40 @@
+Revision history for Perl module WebService::BambooHR
+
+0.07 2016-03-05 NEILB
+    - Hopefully made the test for employeeChanges() more resilient to
+      changes in the live test data.
+
+0.06 2016-02-02 NEILB
+    - Added company_report() method, which is used to get the data behind
+      a custom report in Bamboo.
+    - The changed_employees() method had stopped working, because Bamboo
+      had started return JSON, where previously I'd been getting XML.
+      Have hopefully also made the test for this method ignore any future
+      edits in the Bamboo test company.
+    - changed_employees() now returns the changes in date order from oldest
+      to most recent.
+    - Now use JSON::MaybeXS rather than JSON.
+
+0.05 2015-02-15 NEILB
+    - Documentation added for WebService::BambooHR::Exception,
+      thanks to MANWAR.
+
+0.04 2014-02-25 NEILB
+    - The changed-employees test was failing, because the test account
+      had been changed again. Hopefully won't happen again, otherwise
+      I'll change what the test does.
+
+0.03 2014-02-13 NEILB
+    - List all field names in Employee fields
+    - Added pseudo fields for selfServiceAccess, terminationType,
+      and terminationReason. These can only be accessed in the API
+      itself via field numbers.
+
+0.02 2014-02-03 NEILB
+    - The changed-employees test was failing, because the data in the
+      test account had been changed.
+    - Specified min perl version as 5.006
+
+0.01 2014-02-01 NEILB
+    - initial release to CPAN
+

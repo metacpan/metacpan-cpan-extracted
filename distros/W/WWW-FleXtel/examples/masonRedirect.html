@@ -1,0 +1,62 @@
+<%method title>Redirect FleXtel Number</%method>
+
+FleXtel number <% $flextelNumber %> is diverted to <% $status->{destination} %>.
+
+<p>
+  <form method="post">
+    Redirect to <select name="new_destination">
+% for my $mem (@{$status->{phonebook}}) {
+%	next unless $mem->{number};
+    <option <% ($status->{destination} =~ /^$mem->{number}\b/ ? 'selected' : '') %>
+	value="<% $mem->{number} %>"><% $mem->{number} %> (<% $mem->{title} %>)</option>
+% }
+    </select> 
+    <input type="submit" value="Redirect" id="change_destination"
+	onClick="javascript:document.getElementById('change_destination').disabled=true" />
+  </form>
+</p>
+
+<%args>
+	$new_destination => '';
+</%args>
+
+<%init>
+	use WWW::FleXtel qw();
+	use Storable qw(store retrieve);
+
+	# Define some paramaters
+	my $flextelNumber = '07017766554';
+	my $cacheTTL = 60*30; # 30 minutes
+	my $cacheFile = '/tmp/flextelNumber.dat';
+	my $status = -f $cacheFile ? retrieve($cacheFile) : {};
+
+	# Define our FleXtel account
+	my $flextel = WWW::FleXtel->new(
+			number => $flextelNumber,
+			pin    => '????',
+		);
+
+	# Try and redirect the number if asked to
+	my $redirected = '';
+	if ($new_destination =~ /^[0-9 \+\#]+$/ && $status->{destination} !~ /^$new_destination\b/) {
+		$redirected = $flextel->set_destination(
+					destination => $new_destination
+				);
+	}
+
+	# Refresh the status data
+	if ($redirected || !defined $status->{last_updated}
+			|| time - $status->{last_updated} > $cacheTTL) {
+		my $destination = $flextel->get_destination;
+		my $phonebook = $flextel->get_phonebook;
+
+		# Write to the cache if we received the data back okay
+		if (defined $destination && $destination && defined $phonebook && @{$phonebook}) {
+			$status->{destination} = $destination;
+			$status->{phonebook} = $phonebook;
+			$status->{last_updated} = time;
+			store($status, $cacheFile);
+		}
+	}
+</%init>
+

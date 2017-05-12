@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8a14223232a1261986f3c42584d99395c7cd78e6 Antikvariat11CZ.pm
+SHA1 8186d564cd56d33a4a352e9d1b218ac7504d4625 Changes
+SHA1 5b4c76e0e99c847b819105fa8517af3484c7e996 LICENSE
+SHA1 cbafae35a17477d207996b078548b68dedb93090 MANIFEST
+SHA1 01f3b8099aee9c959b8cd3f7ceec96aaecb6b7c9 META.yml
+SHA1 c08589fc5dd40e7b22fc8141740a97b72050ff3f Makefile.PL
+SHA1 34a475d643f163a994ff90cb48a5ee74c026b5e4 README
+SHA1 cf537b5eb76fe7ee26f3c55de8ab826d6ce71736 examples/ex1.pl
+SHA1 4f7982f7e554df23debce735ab343d88d7355140 inc/Module/Install.pm
+SHA1 c68c85ca62ae30d83f633975cd9af2a0789f59e0 inc/Module/Install/Base.pm
+SHA1 4797fd314e2653a427e725104704b0320993ba8c inc/Module/Install/Can.pm
+SHA1 b771d93af2bfc41273f48fa36082bf1bd6f21dbe inc/Module/Install/Fetch.pm
+SHA1 f4f3258a505a432a58cbcdc1fd030ef5e8e90985 inc/Module/Install/Makefile.pm
+SHA1 100a0dd8572f0b40373350fdd6c0a6f035d9dc39 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 4490fed943f4e556db9fd054b7ec8765ca417f7d inc/Module/Install/Win32.pm
+SHA1 8464ddf690b9f7036a0974ff172ec0ced2f6a329 inc/Module/Install/WriteAll.pm
+SHA1 166686c8bfdc7527cd5a1a40b5f2cadb54ea4727 t/WWW-Search-Antikvariat11CZ/00-use.t
+SHA1 0493d7c46effe48bd8662a6527c39695857aef64 t/WWW-Search-Antikvariat11CZ/01-version.t
+SHA1 efa814e118b26a1b73740c7313a9d4526649ca7c t/WWW-Search-Antikvariat11CZ/02-pod_coverage.t
+SHA1 300c1a21bea074df63a6dcb09402552f14ff94fd t/WWW-Search-Antikvariat11CZ/03-pod.t
+SHA1 e61afc3cb5bd224e09a694ea44d25752fc53c5e0 t/data/2014_09_01.html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUBPoUAAoJEAwa+cf4dLBa/O8IAO9+hfqbR2bHVXGmVjy50m7I
+g9g8zqFpaZ442PWETrXs6WwflothYunmRbifdJAdDqoFS7wJTpXAYnUPpt15CFEM
+Hi+MPPG7rS8TvbVn7xaHFYsxBRtFpfxfkUJ6A1FwRKUma3eU3WYxM3Ic3K8r3Hkf
++SFFHRdb/IP0vKLU9GUtmEU3CtYkXlZ/ywmK+lbSEBZxjO3alVfEQLyDttVr9wdo
+SbvJoM9x/STtI2XOBXx527xJJ26457Q36kcIktKhMmrKDxGhT/NQdaPzYJkQ16yS
+xCCQxdLmIX4fT31cZLALXg2+EI+C3hrAbedPUk80/nKu9Qvz7EcUkwtaZCqL8nA=
+=O7Mn
+-----END PGP SIGNATURE-----

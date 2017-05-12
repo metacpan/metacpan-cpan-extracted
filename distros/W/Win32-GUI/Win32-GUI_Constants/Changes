@@ -1,0 +1,7 @@
+Revision history for Perl extension Win32::GUI::Constants.
+
+0.02  15/10/2006
+    - Win32::GUI 1.04 release.  See CHANGELOG.
+
+0.01  22/05/2006
+    - original version

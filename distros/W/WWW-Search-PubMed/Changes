@@ -1,0 +1,21 @@
+Revision history for Perl extension WWW::Search::PubMed:
+
+1.004	Wed Oct 31 2007
+	- Added WWW::Search::PubMed::Result class to allow for more result fields:
+	  - pmid
+	  - abstract
+
+1.003	Mon Nov 27 2006
+	- More Kwalitee updates:
+	  - Updated META.yml
+
+1.002	Wed Oct 11 2006
+	- Changes to conform to CPANTS Kwalitee:
+	  - Added pod tests.
+	  - Added Changes file.
+	  - Added examples directory.
+	  - Updated Makefile.PL to use Module::Install and provide licensing terms.
+
+1.001	Thu Feb 09 2006
+	- Original version meant to replace the abandoned version by JSMYSER.
+

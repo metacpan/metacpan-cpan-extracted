@@ -1,0 +1,92 @@
+<HTML>
+<style type="text/css">
+<!--
+.myTABLE {
+	background : #99FFCC;
+		border : 2px solid #9900CC;
+		font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size : 10px;
+		}
+INPUT {
+	background-color : #0099FF;
+	border-bottom-width : thin;
+	border-left-width : 1px;
+	border-style : double;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color : White;
+}
+
+-->
+</style>
+
+
+<body bgcolor="#FFFFFF" text="#666666" link="#0033FF" vlink="#00FFFF" alink="#CC3366" leftmargin="10" topmargin="10" marginwidth="0" marginheight="0" onload="document.forms[0].cookie_name.focus()">
+<FORM name="f1" METHOD="POST" ACTION="/cgi-bin/webtools/process.cgi?file=cookies/cookies.html">
+  <TABLE class="myTABLE" BORDER=0 cellpadding="5" cellspacing="5">
+    <TR> 
+      <TD> <b>Cookie Name</b> </TD>
+      <TD> 
+        <INPUT TYPE="TEXT" NAME="cookie_name">
+      </TD>
+    </TR>
+    <TR> 
+      <TD> <b>Value </b> </TD>
+      <TD> 
+        <INPUT TYPE="TEXT" NAME="cookie_value">
+      </TD>
+    </TR>
+  </TABLE> 
+<table width="255" border="0" cellspacing="5" cellpadding="5">
+  <tr>
+    <td valign="middle"> 
+      <div align="center"> 
+        <input type="SUBMIT" value="Set Cookie" name="SUBMIT" onclick="this.form.action.value='set';this.form.submit();">
+      </div>
+    </td>
+  </tr>
+</table>
+<table width="255" border="0" cellspacing="5" cellpadding="5">
+  <tr>
+    <td valign="middle"> 
+      <div align="center"> 
+        <input type="BUTTON" value="Del Cookie" name="B2" onclick="this.form.action.value='del';this.form.submit();">
+        <input type="BUTTON" value="Refresh" name="B1" onclick="this.form.action.value='refresh';this.form.submit();">
+        <input type="HIDDEN" value="" name="action">
+      </div>
+    </td>
+  </tr>
+</table>
+</FORM>
+
+<p>&nbsp;</p> <BR>
+
+<!-- PERL: Hide Perl`s script
+<?perl 
+
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');  # HTTP Content-type header
+ if ($action eq 'set')
+   {
+     write_cookie($cookie_name,$cookie_value);     
+   }
+ if ($action eq 'del')
+   {
+     delete_cookie($cookie_name);
+   }
+ if ($action eq 'refresh')
+   {
+     # we do nothing to refresh
+   }
+
+ # show of the cookies ...
+ if (%sess_cookies)
+   {
+     print "These are your current cookies:<BR>\n";
+     while ( ($cookie_name,$cookie_value) = each( %sess_cookies) )
+       {
+         print "$cookie_name = <B>$cookie_value</B> <BR>\n";
+       }
+   }
+ ?>
+ //-->
+</body>
+</HTML>

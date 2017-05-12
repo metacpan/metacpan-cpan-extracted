@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns:cmis="http://docs.oasis-open.org/ns/cmis/core/200908/" xmlns:cmisra="http://docs.oasis-open.org/ns/cmis/restatom/200908/" xmlns:app="http://www.w3.org/2007/app">
+  <atom:author>
+    <atom:name>Administrator</atom:name>
+  </atom:author>
+  <atom:id>http://chemistry.apache.org/YjY4ZWJjZDEtZmMyOC00MzNmLTliYTEtNjBkOTc3NDAzY2Nj</atom:id>
+  <atom:title>free.jpg</atom:title>
+  <app:edited>2012-10-04T07:22:31Z</app:edited>
+  <atom:updated>2012-10-04T07:22:31Z</atom:updated>
+  <atom:content src="http://localhost:8081/nuxeo/atom/cmis/default/content/free.jpg?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="image/jpeg"/>
+  <cmisra:object xmlns:ns3="http://docs.oasis-open.org/ns/cmis/messaging/200908/">
+    <cmis:properties>
+      <cmis:propertyId propertyDefinitionId="cmis:objectId" localName="cmis:objectId" displayName="Object ID" queryName="cmis:objectId">
+        <cmis:value>b68ebcd1-fc28-433f-9ba1-60d977403ccc</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="cmis:objectTypeId" localName="cmis:objectTypeId" displayName="Type ID" queryName="cmis:objectTypeId">
+        <cmis:value>Picture</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="cmis:baseTypeId" localName="cmis:baseTypeId" displayName="Base Type ID" queryName="cmis:baseTypeId">
+        <cmis:value>cmis:document</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyString propertyDefinitionId="cmis:name" localName="cmis:name" displayName="Name" queryName="cmis:name">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:createdBy" localName="cmis:createdBy" displayName="Created By" queryName="cmis:createdBy">
+        <cmis:value>Administrator</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:creationDate" localName="cmis:creationDate" displayName="Creation Date" queryName="cmis:creationDate">
+        <cmis:value>2012-10-04T09:22:31.874+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="cmis:lastModifiedBy" localName="cmis:lastModifiedBy" displayName="Last Modified By" queryName="cmis:lastModifiedBy">
+        <cmis:value>Administrator</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:lastModificationDate" localName="cmis:lastModificationDate" displayName="Last Modification Date" queryName="cmis:lastModificationDate">
+        <cmis:value>2012-10-04T09:22:31.892+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="cmis:changeToken" localName="cmis:changeToken" displayName="Change Token" queryName="cmis:changeToken"/>
+      <cmis:propertyString propertyDefinitionId="nuxeo:lifecycleState" localName="nuxeo:lifecycleState" displayName="Lifecycle State" queryName="nuxeo:lifecycleState">
+        <cmis:value>project</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="nuxeo:secondaryObjectTypeIds" localName="nuxeo:secondaryObjectTypeIds" displayName="Facets" queryName="nuxeo:secondaryObjectTypeIds">
+        <cmis:value>Commentable</cmis:value>
+        <cmis:value>HasRelatedText</cmis:value>
+        <cmis:value>MultiviewPicture</cmis:value>
+        <cmis:value>Picture</cmis:value>
+        <cmis:value>Publishable</cmis:value>
+        <cmis:value>Versionable</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="nuxeo:parentId" localName="nuxeo:parentId" displayName="Nuxeo Parent ID" queryName="nuxeo:parentId">
+        <cmis:value>b1e10163-2032-4078-91ab-ff608ae430cd</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyString propertyDefinitionId="nuxeo:pathSegment" localName="nuxeo:pathSegment" displayName="Path Segment" queryName="nuxeo:pathSegment">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isImmutable" localName="cmis:isImmutable" displayName="Is Immutable" queryName="cmis:isImmutable">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isLatestVersion" localName="cmis:isLatestVersion" displayName="Is Latest Version" queryName="cmis:isLatestVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isMajorVersion" localName="cmis:isMajorVersion" displayName="Is Major Version" queryName="cmis:isMajorVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isLatestMajorVersion" localName="cmis:isLatestMajorVersion" displayName="Is Latest Major Version" queryName="cmis:isLatestMajorVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyString propertyDefinitionId="cmis:versionLabel" localName="cmis:versionLabel" displayName="Version Label" queryName="cmis:versionLabel">
+        <cmis:value>1.0</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="cmis:versionSeriesId" localName="cmis:versionSeriesId" displayName="Version Series ID" queryName="cmis:versionSeriesId">
+        <cmis:value>b68ebcd1-fc28-433f-9ba1-60d977403ccc</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isVersionSeriesCheckedOut" localName="cmis:isVersionSeriesCheckedOut" displayName="Is Version Series Checked Out" queryName="cmis:isVersionSeriesCheckedOut">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyString propertyDefinitionId="cmis:versionSeriesCheckedOutBy" localName="cmis:versionSeriesCheckedOutBy" displayName="Version Series Checked Out By" queryName="cmis:versionSeriesCheckedOutBy"/>
+      <cmis:propertyId propertyDefinitionId="cmis:versionSeriesCheckedOutId" localName="cmis:versionSeriesCheckedOutId" displayName="Version Series Checked Out ID" queryName="cmis:versionSeriesCheckedOutId"/>
+      <cmis:propertyString propertyDefinitionId="cmis:checkinComment" localName="cmis:checkinComment" displayName="Checkin Comment" queryName="cmis:checkinComment"/>
+      <cmis:propertyInteger propertyDefinitionId="cmis:contentStreamLength" localName="cmis:contentStreamLength" displayName="Content Stream Length" queryName="cmis:contentStreamLength">
+        <cmis:value>63118</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="cmis:contentStreamMimeType" localName="cmis:contentStreamMimeType" displayName="MIME Type" queryName="cmis:contentStreamMimeType">
+        <cmis:value>image/jpeg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:contentStreamFileName" localName="cmis:contentStreamFileName" displayName="Filename" queryName="cmis:contentStreamFileName">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="cmis:contentStreamId" localName="cmis:contentStreamId" displayName="Content Stream ID" queryName="cmis:contentStreamId"/>
+      <cmis:propertyString propertyDefinitionId="nuxeo:contentStreamDigest" localName="nuxeo:contentStreamDigest" displayName="Content Stream Digest" queryName="nuxeo:contentStreamDigest">
+        <cmis:value>e7ce7f2f27827c60455a6292363e73b4</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyBoolean propertyDefinitionId="nuxeo:isVersion" localName="nuxeo:isVersion" displayName="Is Version" queryName="nuxeo:isVersion">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="nuxeo:isCheckedIn" localName="nuxeo:isCheckedIn" displayName="Is Checked In PWC" queryName="nuxeo:isCheckedIn">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyString propertyDefinitionId="genre" localName="genre" displayName="genre" queryName="genre"/>
+      <cmis:propertyString propertyDefinitionId="headline" localName="headline" displayName="headline" queryName="headline"/>
+      <cmis:propertyString propertyDefinitionId="typage" localName="typage" displayName="typage" queryName="typage"/>
+      <cmis:propertyString propertyDefinitionId="origin" localName="origin" displayName="origin" queryName="origin"/>
+      <cmis:propertyString propertyDefinitionId="slugline" localName="slugline" displayName="slugline" queryName="slugline"/>
+      <cmis:propertyString propertyDefinitionId="caption" localName="caption" displayName="caption" queryName="caption"/>
+      <cmis:propertyString propertyDefinitionId="dateline" localName="dateline" displayName="dateline" queryName="dateline"/>
+      <cmis:propertyString propertyDefinitionId="byline" localName="byline" displayName="byline" queryName="byline"/>
+      <cmis:propertyString propertyDefinitionId="source" localName="source" displayName="source" queryName="source"/>
+      <cmis:propertyString propertyDefinitionId="cropCoords" localName="cropCoords" displayName="cropCoords" queryName="cropCoords"/>
+      <cmis:propertyString propertyDefinitionId="language" localName="language" displayName="language" queryName="language"/>
+      <cmis:propertyString propertyDefinitionId="subheadline" localName="subheadline" displayName="subheadline" queryName="subheadline"/>
+      <cmis:propertyString propertyDefinitionId="credit" localName="credit" displayName="credit" queryName="credit"/>
+      <cmis:propertyString propertyDefinitionId="dc:creator" localName="dc:creator" displayName="dc:creator" queryName="dc:creator">
+        <cmis:value>Administrator</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="dc:source" localName="dc:source" displayName="dc:source" queryName="dc:source"/>
+      <cmis:propertyString propertyDefinitionId="dc:nature" localName="dc:nature" displayName="dc:nature" queryName="dc:nature"/>
+      <cmis:propertyString propertyDefinitionId="dc:contributors" localName="dc:contributors" displayName="dc:contributors" queryName="dc:contributors">
+        <cmis:value>Administrator</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="dc:created" localName="dc:created" displayName="dc:created" queryName="dc:created">
+        <cmis:value>2012-10-04T09:22:31.874+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="dc:description" localName="dc:description" displayName="dc:description" queryName="dc:description"/>
+      <cmis:propertyString propertyDefinitionId="dc:rights" localName="dc:rights" displayName="dc:rights" queryName="dc:rights"/>
+      <cmis:propertyString propertyDefinitionId="dc:subjects" localName="dc:subjects" displayName="dc:subjects" queryName="dc:subjects"/>
+      <cmis:propertyString propertyDefinitionId="dc:publisher" localName="dc:publisher" displayName="dc:publisher" queryName="dc:publisher"/>
+      <cmis:propertyDateTime propertyDefinitionId="dc:valid" localName="dc:valid" displayName="dc:valid" queryName="dc:valid"/>
+      <cmis:propertyString propertyDefinitionId="dc:format" localName="dc:format" displayName="dc:format" queryName="dc:format"/>
+      <cmis:propertyDateTime propertyDefinitionId="dc:issued" localName="dc:issued" displayName="dc:issued" queryName="dc:issued"/>
+      <cmis:propertyDateTime propertyDefinitionId="dc:modified" localName="dc:modified" displayName="dc:modified" queryName="dc:modified">
+        <cmis:value>2012-10-04T09:22:31.892+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="dc:language" localName="dc:language" displayName="dc:language" queryName="dc:language"/>
+      <cmis:propertyString propertyDefinitionId="dc:coverage" localName="dc:coverage" displayName="dc:coverage" queryName="dc:coverage"/>
+      <cmis:propertyDateTime propertyDefinitionId="dc:expired" localName="dc:expired" displayName="dc:expired" queryName="dc:expired"/>
+      <cmis:propertyString propertyDefinitionId="dc:lastContributor" localName="dc:lastContributor" displayName="dc:lastContributor" queryName="dc:lastContributor">
+        <cmis:value>Administrator</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="dc:title" localName="dc:title" displayName="dc:title" queryName="dc:title">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="uid" localName="uid" displayName="uid" queryName="uid"/>
+      <cmis:propertyInteger propertyDefinitionId="minor_version" localName="minor_version" displayName="minor_version" queryName="minor_version">
+        <cmis:value>0</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyInteger propertyDefinitionId="major_version" localName="major_version" displayName="major_version" queryName="major_version">
+        <cmis:value>1</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="iptc:province_or_state" localName="iptc:province_or_state" displayName="iptc:province_or_state" queryName="iptc:province_or_state"/>
+      <cmis:propertyString propertyDefinitionId="iptc:language" localName="iptc:language" displayName="iptc:language" queryName="iptc:language"/>
+      <cmis:propertyString propertyDefinitionId="iptc:time_created" localName="iptc:time_created" displayName="iptc:time_created" queryName="iptc:time_created"/>
+      <cmis:propertyString propertyDefinitionId="iptc:keywords" localName="iptc:keywords" displayName="iptc:keywords" queryName="iptc:keywords"/>
+      <cmis:propertyDateTime propertyDefinitionId="iptc:release_date" localName="iptc:release_date" displayName="iptc:release_date" queryName="iptc:release_date"/>
+      <cmis:propertyString propertyDefinitionId="iptc:record_version" localName="iptc:record_version" displayName="iptc:record_version" queryName="iptc:record_version"/>
+      <cmis:propertyString propertyDefinitionId="iptc:supplemental_categories" localName="iptc:supplemental_categories" displayName="iptc:supplemental_categories" queryName="iptc:supplemental_categories"/>
+      <cmis:propertyString propertyDefinitionId="iptc:original_transmission_ref" localName="iptc:original_transmission_ref" displayName="iptc:original_transmission_ref" queryName="iptc:original_transmission_ref"/>
+      <cmis:propertyString propertyDefinitionId="iptc:caption" localName="iptc:caption" displayName="iptc:caption" queryName="iptc:caption"/>
+      <cmis:propertyString propertyDefinitionId="iptc:release_time" localName="iptc:release_time" displayName="iptc:release_time" queryName="iptc:release_time"/>
+      <cmis:propertyString propertyDefinitionId="iptc:urgency" localName="iptc:urgency" displayName="iptc:urgency" queryName="iptc:urgency"/>
+      <cmis:propertyString propertyDefinitionId="iptc:by_line" localName="iptc:by_line" displayName="iptc:by_line" queryName="iptc:by_line"/>
+      <cmis:propertyString propertyDefinitionId="iptc:city" localName="iptc:city" displayName="iptc:city" queryName="iptc:city"/>
+      <cmis:propertyString propertyDefinitionId="iptc:country_or_primary_location" localName="iptc:country_or_primary_location" displayName="iptc:country_or_primary_location" queryName="iptc:country_or_primary_location"/>
+      <cmis:propertyString propertyDefinitionId="iptc:headline" localName="iptc:headline" displayName="iptc:headline" queryName="iptc:headline"/>
+      <cmis:propertyString propertyDefinitionId="iptc:copyright_notice" localName="iptc:copyright_notice" displayName="iptc:copyright_notice" queryName="iptc:copyright_notice"/>
+      <cmis:propertyString propertyDefinitionId="iptc:credit" localName="iptc:credit" displayName="iptc:credit" queryName="iptc:credit"/>
+      <cmis:propertyString propertyDefinitionId="iptc:originating_program" localName="iptc:originating_program" displayName="iptc:originating_program" queryName="iptc:originating_program"/>
+      <cmis:propertyDateTime propertyDefinitionId="iptc:date_created" localName="iptc:date_created" displayName="iptc:date_created" queryName="iptc:date_created"/>
+      <cmis:propertyString propertyDefinitionId="iptc:writer" localName="iptc:writer" displayName="iptc:writer" queryName="iptc:writer"/>
+      <cmis:propertyString propertyDefinitionId="iptc:special_instructions" localName="iptc:special_instructions" displayName="iptc:special_instructions" queryName="iptc:special_instructions"/>
+      <cmis:propertyString propertyDefinitionId="iptc:object_name" localName="iptc:object_name" displayName="iptc:object_name" queryName="iptc:object_name"/>
+      <cmis:propertyString propertyDefinitionId="iptc:by_line_title" localName="iptc:by_line_title" displayName="iptc:by_line_title" queryName="iptc:by_line_title"/>
+      <cmis:propertyString propertyDefinitionId="iptc:category" localName="iptc:category" displayName="iptc:category" queryName="iptc:category"/>
+      <cmis:propertyString propertyDefinitionId="iptc:source" localName="iptc:source" displayName="iptc:source" queryName="iptc:source"/>
+      <cmis:propertyString propertyDefinitionId="imd:icc_profile" localName="imd:icc_profile" displayName="imd:icc_profile" queryName="imd:icc_profile"/>
+      <cmis:propertyString propertyDefinitionId="imd:white_balance" localName="imd:white_balance" displayName="imd:white_balance" queryName="imd:white_balance"/>
+      <cmis:propertyInteger propertyDefinitionId="imd:pixel_xdimension" localName="imd:pixel_xdimension" displayName="imd:pixel_xdimension" queryName="imd:pixel_xdimension">
+        <cmis:value>200</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyInteger propertyDefinitionId="imd:yresolution" localName="imd:yresolution" displayName="imd:yresolution" queryName="imd:yresolution">
+        <cmis:value>72</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="imd:copyright" localName="imd:copyright" displayName="imd:copyright" queryName="imd:copyright"/>
+      <cmis:propertyString propertyDefinitionId="imd:color_space" localName="imd:color_space" displayName="imd:color_space" queryName="imd:color_space">
+        <cmis:value>_UNKNOWN</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="imd:date_time_original" localName="imd:date_time_original" displayName="imd:date_time_original" queryName="imd:date_time_original"/>
+      <cmis:propertyString propertyDefinitionId="imd:orientation" localName="imd:orientation" displayName="imd:orientation" queryName="imd:orientation">
+        <cmis:value>TOP_LEFT</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyInteger propertyDefinitionId="imd:xresolution" localName="imd:xresolution" displayName="imd:xresolution" queryName="imd:xresolution">
+        <cmis:value>72</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="imd:user_comment" localName="imd:user_comment" displayName="imd:user_comment" queryName="imd:user_comment"/>
+      <cmis:propertyString propertyDefinitionId="imd:image_description" localName="imd:image_description" displayName="imd:image_description" queryName="imd:image_description"/>
+      <cmis:propertyInteger propertyDefinitionId="imd:pixel_ydimension" localName="imd:pixel_ydimension" displayName="imd:pixel_ydimension" queryName="imd:pixel_ydimension">
+        <cmis:value>196</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="imd:iso_speed_ratings" localName="imd:iso_speed_ratings" displayName="imd:iso_speed_ratings" queryName="imd:iso_speed_ratings"/>
+      <cmis:propertyString propertyDefinitionId="imd:equipment" localName="imd:equipment" displayName="imd:equipment" queryName="imd:equipment"/>
+      <cmis:propertyDecimal propertyDefinitionId="imd:fnumber" localName="imd:fnumber" displayName="imd:fnumber" queryName="imd:fnumber"/>
+      <cmis:propertyDecimal propertyDefinitionId="imd:focal_length" localName="imd:focal_length" displayName="imd:focal_length" queryName="imd:focal_length"/>
+      <cmis:propertyString propertyDefinitionId="imd:exposure_time" localName="imd:exposure_time" displayName="imd:exposure_time" queryName="imd:exposure_time"/>
+      <cmis:propertyString propertyDefinitionId="icon" localName="icon" displayName="icon" queryName="icon">
+        <cmis:value>/icons/image.gif</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="icon-expanded" localName="icon-expanded" displayName="icon-expanded" queryName="icon-expanded"/>
+      <cmis:propertyInteger propertyDefinitionId="size" localName="size" displayName="size" queryName="size">
+        <cmis:value>63118</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyString propertyDefinitionId="filename" localName="filename" displayName="filename" queryName="filename"/>
+    </cmis:properties>
+  </cmisra:object>
+  <atom:link rel="service" href="http://localhost:8081/nuxeo/atom/cmis/default?repositoryId=default" type="application/atomsvc+xml"/>
+  <atom:link rel="self" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=entry" cmisra:id="b68ebcd1-fc28-433f-9ba1-60d977403ccc"/>
+  <atom:link rel="enclosure" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=entry"/>
+  <atom:link rel="edit" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=entry"/>
+  <atom:link rel="describedby" href="http://localhost:8081/nuxeo/atom/cmis/default/type?id=Picture" type="application/atom+xml;type=entry"/>
+  <atom:link rel="http://docs.oasis-open.org/ns/cmis/link/200908/allowableactions" href="http://localhost:8081/nuxeo/atom/cmis/default/allowableactions?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/cmisallowableactions+xml"/>
+  <atom:link rel="up" href="http://localhost:8081/nuxeo/atom/cmis/default/parents?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=feed"/>
+  <atom:link rel="version-history" href="http://localhost:8081/nuxeo/atom/cmis/default/versions?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc&amp;versionSeries=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=feed"/>
+  <atom:link rel="edit" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc&amp;returnVersion=latest" type="application/atom+xml;type=entry"/>
+  <atom:link rel="edit-media" href="http://localhost:8081/nuxeo/atom/cmis/default/content?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="image/jpeg"/>
+  <atom:link rel="working-copy" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=entry"/>
+  <atom:link rel="via" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=entry"/>
+  <atom:link rel="http://docs.oasis-open.org/ns/cmis/link/200908/relationships" href="http://localhost:8081/nuxeo/atom/cmis/default/relationships?id=b68ebcd1-fc28-433f-9ba1-60d977403ccc" type="application/atom+xml;type=feed"/>
+</atom:entry>

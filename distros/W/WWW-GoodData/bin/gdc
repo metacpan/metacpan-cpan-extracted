@@ -1,0 +1,922 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+gdc - Client utility for GoodData on-demand Business Intelligence platform
+
+=head1 SYNOPSIS
+
+gdc [global options] <command> [command options]
+
+=head1 DESCRIPTION
+
+B<gdc> is the command-line and interactive client for GoodData REST-ful
+service API built on top of L<WWW::GoodData> client library.
+
+=cut
+
+use WWW::GoodData;
+use WWW::GoodData::Agent;
+use Getopt::Long 2.36 qw/GetOptionsFromArray/;
+use Pod::Usage;
+use Text::ParseWords;
+use Term::ReadLine;
+
+use strict;
+use warnings;
+
+# Global context
+my $gdc = new WWW::GoodData;
+my $command = 'shell';
+my $user;
+my $password;
+my $project;
+my $root;
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Print a brief help message and exits.
+
+=item B<-H>, B<--man>
+
+Prints the manual page and exits.
+
+=item B<-u>, B<--user> B<< <email> >>
+
+Use the identity of specified user.
+See also the B<login> command.
+
+=item B<-p>, B<--password>
+
+Log in on start, provided B<--user> option was set as well.
+
+=item B<-P>, B<--project>
+
+Project URI. It is used as a default value for commands that
+accept project URI option (such as B<rmproject> and B<lsreports>)
+and can be changed from within the shell (see B<project>
+and B<mkproject> commands).
+
+No checking is done with the project URI util a command that
+acts upon the project is issued.
+
+=item B<-r>, B<--root>
+
+URL of the service API root.
+Defaults to L<https://secure.gooddata.com/gdc/>.
+
+=back
+
+=cut
+
+new Getopt::Long::Parser (
+	config => [qw/require_order no_ignore_case/]
+)->getoptions (
+	'u|user=s' => \$user,
+	'p|password=s' => \$password,
+	'P|project=s' => \$project,
+	'r|root=s' => sub { $gdc->{agent} =
+		new WWW::GoodData::Agent ($_[1]) },
+) or pod2usage (2);
+$command = shift if @ARGV;
+
+sub password
+{
+	my $prompt = shift;
+	my $password;
+
+	return undef unless -t STDIN;
+
+	# stty might not be portable to NT and such
+	system 'stty -echo'
+		and die 'Can not ask for password securely';
+	print "$prompt: ";
+	chomp ($password = <STDIN>);
+	print "\n";
+	system 'stty echo';
+
+	return $password;
+}
+
+=head1 COMMANDS
+
+=cut 
+
+my %actions = (
+	login => \&login,
+	logout => \&logout,
+	lsprojects => \&lsprojects,
+	rmproject => \&rmproject,
+	mkproject => \&mkproject,
+	mkuser => \&mkuser,
+	lsroles => \&lsroles,
+	project => \&project,
+	lsreports => \&lsreports,
+	export => \&export,
+	model => \&model,
+	chmodel => \&chmodel,
+	upload => \&upload,
+	mkobject => \&mkobject,
+	mkreportdef => \&mkreportdef,
+	help => \&help,
+	shell => \&shell,
+);
+
+=head2 shell
+
+Launch an interactive client session.
+
+This is the default action that is taken unless another
+command is specified.
+
+=cut
+
+sub shell
+{
+	my $gdc = shift;
+
+	my $readline = new Term::ReadLine ('WWW::GoodData shell');
+	while (1) {
+		my $line = $readline->readline ("> ");
+		return unless defined $line;
+		$readline->addhistory ($line) if $line;
+		my ($command, @args) = shellwords ($line);
+		next unless defined $command;
+		if (exists $actions{$command}) {
+			eval { $actions{$command}->($gdc, @args) };
+			warn $@ if $@;
+		} else {
+			warn 'No such command';
+		}
+	}
+}
+
+=head2 login [user] [password]
+
+Verify user identity and obtain an authorization token.
+If no credentials are supplied, global ones are used.
+
+If the password is not specified, it is requested
+from terminal provided terminal echo can be turned off.
+
+This action is taken implicitly if user name has been specified.
+
+=over 4
+
+=item B<-u>, B<--user> B<< <email> >>
+
+Alternative way to specifiy user login.
+
+=item B<-p>, B<--password>
+
+Alternative way to specifiy user password.
+
+=back
+
+=cut
+
+sub login
+{
+	my $gdc = shift;
+
+	undef $password;
+	GetOptionsFromArray (\@_,
+		'u|user=s' => \$user,
+		'p|password=s' => \$password,
+	) or die 'Bad arguments to login';
+	$user = shift if @_;
+	$password = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No user name given' unless defined $user;
+	$password = password ('Password') unless defined $password;
+
+	$gdc->login ($user, $password);
+}
+
+=head2 logout
+
+Drop credentials if user is logged in, otherwise do nothing.
+Automatically done upon utility exit.
+
+=cut
+
+sub logout
+{
+	my $gdc = shift;
+
+	$gdc->logout;
+}
+
+=head2 project [uri]
+
+Change or print the default project URI. Default project is used
+by various commands involving projects, including B<mkproject> and
+B<rmproject>.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Project URI.
+No checking is done with the project URI.
+
+=back
+
+=cut
+
+sub project
+{
+	my $gdc = shift;
+
+	my $this_project;
+	GetOptionsFromArray (\@_,
+		'P|project=s' => \$this_project,
+	) or die 'Bad arguments to lsprojects';
+	$this_project = shift if @_;
+	die 'Extra arguments' if @_;
+
+	if ($this_project) {
+		$project = $this_project;
+	} else {
+		print $project ? "$project\n" : "No project selected.\n";
+	}
+}
+
+=head2 lsprojects
+
+Print a list of available projects.
+
+=over 4
+
+=item B<-v>, B<--long>
+
+Add unnecessary details.
+
+=back
+
+=cut
+
+sub lsprojects
+{
+	my $gdc = shift;
+
+	my $long;
+
+	GetOptionsFromArray (\@_,
+		'v|long' => \$long,
+	) or die 'Bad arguments to lsprojects';
+	die 'Extra arguments' if @_;
+
+	foreach my $project ($gdc->projects) {
+		if ($long) {
+			print "Link: ".$project->{link}."\n";
+			print "\tTitle: ".$project->{title}."\n";
+			print "\tSummary: ".$project->{summary}."\n";
+			print "\tCreated: ".$project->{created}."\n";
+			print "\tUpdated: ".$project->{updated}."\n";
+		} else {
+			print $project->{link}.' ';
+			print $project->{title}."\n";
+		}
+	}
+}
+
+=head2 lsroles
+
+Print a list of available roles in project.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=back
+
+=cut
+
+sub lsroles
+{
+	my $gdc = shift;
+
+	my $this_project = $project;
+
+	GetOptionsFromArray (\@_,
+		'P|project=s' => \$this_project,
+	) or die 'Bad arguments to lsroles';
+	die 'Extra arguments' if @_;
+
+	die "No project selected" unless $this_project;
+
+	foreach my $role (@{$gdc->get_roles($this_project)}) {
+		print $role."\n";
+	}
+}
+
+=head2 rmproject
+
+Delete a project.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=back
+
+=cut
+
+sub rmproject
+{
+	my $gdc = shift;
+
+	my $project = $project;
+	GetOptionsFromArray (\@_,
+		'P|project=s' => \$project,
+	) or die 'Bad arguments to rmproject';
+	$project = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project name given' unless defined $project;
+
+	$gdc->delete_project ($project);
+}
+
+=head2 mkuser <email> <firstname> <lastname>
+
+Create user.
+
+=over 4
+
+=item B<-d>, B<--domain>
+
+URI of an user domain in which will be user created.
+
+Defaults to C</gdc/account/domains/default>, which is almost definitely useless to you.
+Get a proper domain URI from your support representative.
+
+=item B<-e>, B<--email>
+
+User email.
+
+=item B<-l>, B<--login>
+
+User login. Same as email if no login is provided
+
+=item B<-p>, B<--password>
+
+User password. Will be asked for if not provided.
+
+=item B<-f>, B<--firstname>
+
+User first name.
+
+=item B<-l>, B<--lastname>
+
+User last name.
+
+=item B<-t>, B<--phone>
+
+User phone number.
+
+=item B<-c>, B<--company>
+
+User company.
+
+=item B<-o>, B<--sso>
+
+User company's DNS suffix, if SSO is used.
+
+=back
+
+=cut
+
+sub mkuser
+{
+	my $gdc = shift;
+
+	my $domain = '/gdc/account/domains/default';
+	my $email;
+	my $login;
+	my $passwd;
+	my $firstname;
+	my $lastname;
+	my $phone;
+	my $company;
+	my $sso_provider;
+
+	GetOptionsFromArray (\@_,
+		'd|domain=s' => \$domain,
+		'e|email=s' => \$email,
+		'l|login=s' => \$login,
+		'p|password=s' => \$passwd,
+		'f|firstname=s' => \$firstname,
+		'l|lastname=s' => \$lastname,
+		't|phone=s' => \$phone,
+		'c|company=s' => \$company,
+		'o|sso=s' => \$sso_provider,
+	) or die 'Bad arguments to mkuser';
+	$email = shift if @_;
+	$firstname = shift if @_;
+	$lastname = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No user e-mail given' unless defined $email;
+	die 'No first name given' unless defined $firstname;
+	die 'No last name given' unless defined $lastname;
+	$passwd = password ("New user's Password") unless defined $passwd;
+
+	$user = $gdc->create_user ($domain, $email, $login, $passwd, $firstname,
+		$lastname, $phone, $company, $sso_provider);
+}
+
+=head2 mkproject <title> [summary]
+
+Create a project.
+
+=over 4
+
+=item B<-t>, B<--title>
+
+Title of the project.
+
+=item B<-s>, B<--summary>
+
+Descriptive summary of the project.
+
+=item B<-e>, B<--template>
+
+Project template. The list of valid project templates is available from
+the template server: L<https://secure.gooddata.com/projectTemplates/>.
+
+=item B<-d>, B<--driver>
+
+Valid db engine drivers are 'Pg' (default) and 'mysql'.
+
+=item B<-k>, B<--token>
+
+Authorization token.
+
+=back
+
+=cut
+
+sub mkproject
+{
+	my $gdc = shift;
+
+	my $title;
+	my $summary = '';
+	my $template;
+	my $driver;
+	my $token;
+
+	GetOptionsFromArray (\@_,
+		't|title=s' => \$title,
+		's|summary=s' => \$summary,
+		'e|template=s' => \$template,
+		'd|driver=s' => \$driver,
+		'k|token=s' => \$token,
+	) or die 'Bad arguments to mkproject';
+	$title = shift if @_;
+	$summary = shift if @_;
+	$template = shift if @_;
+	$driver = shift if @_;
+	$token = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project title given' unless defined $title;
+
+	$project = $gdc->create_project ($title, $summary, $template, $driver, $token);
+}
+
+=head2 lsreports
+
+Print a list of reports in a project.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=item B<-v>, B<--long>
+
+Add unnecessary details.
+
+=back
+
+=cut
+
+sub lsreports
+{
+	my $gdc = shift;
+
+	my $long;
+	my $project = $project;
+
+	GetOptionsFromArray (\@_,
+		'v|long' => \$long,
+		'P|project=s' => \$project,
+	) or die 'Bad arguments to lsprojects';
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+
+	foreach my $report ($gdc->reports ($project)) {
+		if ($long) {
+			print "Link: ".$report->{link}."\n";
+			print "\tTitle: ".$report->{title}."\n";
+			print "\tSummary: ".$report->{summary}."\n";
+			print "\tCreated: ".$report->{created}."\n";
+			print "\tUpdated: ".$report->{updated}."\n";
+		} else {
+			print $report->{link}.' ';
+			print $report->{title}."\n";
+		}
+	}
+}
+
+=head2 export
+
+Export a report computation result into file.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=item B<-r>, B<--report>
+
+Set report URI (see B<lsreports>).
+
+=item B<-f>, B<--file>
+
+File to place the result into.
+
+=item B<-F>, B<--format>
+
+One of B<pdf>, B<xls>, B<png> (latter only valid for chart reports),
+Can be unspecified if file name ends with a dot and format name
+(extension).
+
+=back
+
+=cut
+
+sub export
+{
+	my $gdc = shift;
+
+	my $report;
+	my $file;
+	my $format;
+
+	GetOptionsFromArray (\@_,
+		'r|report' => \$report,
+		'f|file=s' => \$file,
+		'F|format=s' => \$format,
+	) or die 'Bad arguments to export';
+	$report = shift if @_;
+	$file = shift if @_;
+	$file =~ /\.([^\.]+)$/ and $format = $1
+		if $file and not $format;
+	$format = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No report URI given' unless defined $report;
+	die 'No output file given' unless defined $file;
+	die 'No output format given' unless defined $format;
+
+	my $document = $gdc->export_report ($report, $format);
+	open (my $dump, '>', $file) or die $!;
+	print $dump $document;
+	close ($dump) or die $!;
+}
+
+=head2 model
+
+Export a Logical Data Model (LDM) picture in PNG format into file.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=item B<-f>, B<--file>
+
+File to place the result into.
+
+=back
+
+=cut
+
+sub model
+{
+	my $gdc = shift;
+
+	my $long;
+	my $project = $project;
+	my $file;
+
+	GetOptionsFromArray (\@_,
+		'P|project=s' => \$project,
+		'f|file=s' => \$file,
+	) or die 'Bad arguments to model';
+	$file = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+	die 'No output file given' unless defined $file;
+
+	my $document = $gdc->ldm_picture ($project);
+	open (my $dump, '>', $file) or die $!;
+	print $dump $document;
+	close ($dump) or die $!;
+}
+
+=head2 chmodel
+
+Change a Logical Data Model (LDM) with MAQL DDL script.
+
+The MAQL script can be either specified inline as argument
+to B<chmodel>, or read from file specified with B<--file>
+option (see below).
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=item B<-f>, B<--file>
+
+Read MAQL script from specified file.
+
+=back
+
+=cut
+
+sub chmodel
+{
+	my $gdc = shift;
+
+	my $long;
+	my $project = $project;
+	my $maql;
+	my $file;
+
+	GetOptionsFromArray (\@_,
+		'P|project' => \$project,
+		'f|file=s' => \$file,
+	) or die 'Bad arguments to model';
+	$maql = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+	if ($file) {
+		open (my $script, '<', $file) or die $!;
+		$maql = join '', <$script>;
+		close ($script) or die $!;
+	}
+	die 'No MAQL script given' unless defined $maql;
+	$gdc->ldm_manage ($project, $maql);
+}
+
+=head2 upload
+
+Update data set with new data.
+
+=over 4
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=item B<-f>, B<--file>
+
+SLI Manifest of the upload.
+
+=back
+
+=cut
+
+sub upload
+{
+	my $gdc = shift;
+
+	my $long;
+	my $project = $project;
+	my $file;
+
+	GetOptionsFromArray (\@_,
+		'P|project' => \$project,
+		'f|file=s' => \$file,
+	) or die 'Bad arguments to model';
+	$file = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+	die 'No SLI manifest given' unless defined $file;
+	$gdc->upload ($project, $file)
+}
+
+=head2 mkobject <type> <title> <expression>
+
+Create a new metadata object of a given type with expression as the only
+content.
+
+=over 4
+
+=item B<-T>, B<--type>
+
+Type of the object.
+
+=item B<-t>, B<--title>
+
+Title of the object.
+
+=item B<-s>, B<--summary>
+
+Descriptive summary of the object.
+
+=item B<-e>, B<--expr>
+
+Expression (typically MAQL).
+
+=item B<-u>, B<--uri>
+
+Instead of creating a new object, rewrite an old one with a given URI.
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=back
+
+=cut
+
+sub mkobject
+{
+	my $gdc = shift;
+
+	my $project = $project;
+	my $uri;
+	my $type;
+	my $title;
+	my $summary = '';
+	my $expression;
+
+	GetOptionsFromArray (\@_,
+		'T|type=s' => \$type,
+		't|title=s' => \$title,
+		's|summary=s' => \$summary,
+		'e|expr=s' => \$expression,
+		'P|project=s' => \$project,
+		'u|uri=s' => \$uri,
+	) or die 'Bad arguments to mkobject';
+	$type = shift if @_;
+	$title = shift if @_;
+	$expression = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+
+	print $gdc->create_object_with_expression ($project, $uri, $type, $title,
+		$summary, $expression) . "\n";
+}
+
+=head2 mkreportdef <title> [summary]
+
+Create a new reportDefinition in metadata.
+
+=over 4
+
+=item B<-t>, B<--title>
+
+Title of the object.
+
+=item B<-s>, B<--summary>
+
+Descriptive summary of the object.
+
+=item B<-m>, B<--metric>
+
+Add a metric by its URL.
+
+=item B<-d>, B<--dim>
+
+Add an attribute to dimensionality by its URL.
+
+=item B<-f>, B<--filter>
+
+Add a filter by its expression.
+
+=item B<-u>, B<--uri>
+
+Instead of creating a new object, rewrite an old one with a given URI.
+
+=item B<-P>, B<--project>
+
+Set or override the project to act on.
+See global B<--project> option for the detailed description.
+
+=back
+
+=cut
+
+sub mkreportdef
+{
+	my $gdc = shift;
+
+	my $project = $project;
+	my $uri;
+	my $title;
+	my $summary = '';
+	my $metrics;
+	my $dim;
+	my $filters;
+
+	GetOptionsFromArray (\@_,
+		't|title=s' => \$title,
+		's|summary=s' => \$summary,
+		'P|project=s' => \$project,
+		'm|metric=s@' => \$metrics,
+		'd|dim=s@' => \$dim,
+		'f|filter=s@' => \$filters,
+		'u|uri=s' => \$uri,
+	) or die 'Bad arguments to mkreportdef';
+	$title = shift if @_;
+	$summary = shift if @_;
+	die 'Extra arguments' if @_;
+	die 'No project URI given' unless defined $project;
+
+	print $gdc->create_report_definition ($project, $uri, $title, $summary,
+		$metrics, $dim, $filters ) . "\n";
+}
+
+=head2 help
+
+Print list of available commands.
+
+=cut
+
+sub help
+{
+	my $gdc = shift;
+
+	GetOptionsFromArray (\@_)
+		or die 'Bad arguments to help';
+	die 'Extra arguments' if @_;
+
+	print map { "$_\n" } 'Valid commands: ',
+		map { "\t$_" } sort keys %actions ;
+}
+
+login ($gdc, $user, $password ? "$password" : undef) if defined $user;
+pod2usage ("No such command exists: '$command'")
+	unless exists $actions{$command};
+$actions{$command}->($gdc, @ARGV);
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<https://secure.gooddata.com/gdc/> -- Browsable GoodData API
+
+=item *
+
+L<http://developer.gooddata.com/api/maql-ddl.html> -- MAQL DDL language documentation
+
+=item *
+
+L<WWW::GoodData> -- Client library for GoodData
+
+=item *
+
+L<LWP::UserAgent> -- Perl HTTP client
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2011, 2012, 2013, 2014 Lubomir Rintel
+
+Copyright 2012, 2013 Adam Stulpa, Tomas Janousek
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Lubomir Rintel C<lkundrak@v3.sk>
+
+=cut

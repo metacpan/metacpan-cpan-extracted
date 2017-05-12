@@ -1,0 +1,89 @@
+[% PROCESS config.tt -%]
+[%- base = xsd.get_module_name(xsd.target_namespace) -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Moose;
+use namespace::autoclean;
+use Data::Dumper qw/Dumper/;
+use Moose::Util::TypeConstraints;
+use MooseX::Types::XMLSchema qw/:all/;
+use W3C::SOAP::XSD::Types qw/:all/;
+[%- IF config.alias %]
+use MooseX::Aliases;
+[%- END %]
+use W3C::SOAP::XSD::Traits;
+[%
+found = {};
+FOREACH use_module IN modules;
+    use_module = subtypes.$use_module ? subtypes.$use_module.module : use_module;
+    NEXT IF found.$use_module;
+    found.$use_module = 1; -%]
+use [% use_module %];
+[% END %]
+[% FOREACH attribute IN attributes;
+    type = attribute.type;
+    type = subtypes.$type ? subtypes.$type.name : attribute.type; %]
+use Moose::Util::TypeConstraints;
+[%- END %]
+[%- IF node.extension %]
+use [% base %]::Base;
+extends '[% base %]::Base', '[% node.extension %]';
+[%- ELSE %]
+extends '[% base %]::Base';
+[%- END %]
+
+our $VERSION = version->new('0.0.1');
+
+has '+xsd_ns' => (
+    default => '[% xsd.target_namespace %]',
+    required => 1,
+);
+#has '+xsd_ns_name' => (
+#    default => '[% ns_name %]',
+#);
+
+[% FOREACH element IN node.sequence %]
+[% INCLUDE xsd/element.pm.tt complex=1 %]
+[%- END %]
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] - Talks to the [% end_point %] on the ESB
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+[% FOREACH element IN node.sequence %]
+[% INCLUDE xsd/element.pod.tt %]
+[%- END %]
+=back
+
+[% INCLUDE pod.tt %]

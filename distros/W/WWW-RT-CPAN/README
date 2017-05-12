@@ -1,0 +1,56 @@
+SYNOPSIS
+
+     use WWW::RT::CPAN qw(
+         list_dist_active_tickets
+         list_dist_resolved_tickets
+         list_dist_rejected_tickets
+     );
+    
+     my $res = list_dist_active_tickets(dist => 'Acme-MetaSyntactic');
+
+    Sample result:
+
+     [
+       200,
+       "OK",
+       [
+         {
+           broken_in => [], # e.g. ["0.40", "0.41"]
+           fixed_in => [],
+           id => 120076,
+           last_updated_raw => "8 hours ago",
+           severity => "Wishlist",
+           status => "new",
+           title => "Option to return items in order?",
+         },
+         {
+           broken_in => [],
+           fixed_in => [],
+           id => 118805,
+           last_updated_raw => "3 months ago",
+           severity => "Wishlist",
+           status => "new",
+           title => "Print list of categories of a theme?",
+         },
+       ],
+      ]
+
+    Another example (dist not found):
+
+     my $res = list_dist_active_tickets(dist => 'Foo-Bar');
+
+    Example result:
+
+     [400, "No such distribution"]
+
+DESCRIPTION
+
+    This module provides some functions to retrieve data from
+    https://rt.cpan.org by scraping the web pages. Compared to
+    RT::Client::REST, it provides less functionality but it can get public
+    information without having to log in first.
+
+SEE ALSO
+
+    RT::Client::REST
+

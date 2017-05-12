@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+Poll.pm
+README
+test.pl
+demo/README
+demo/poll.pl
+demo/poll_admin.pl
+demo/bar.jpg
+demo/data/qid.dat
+demo/data/questions.dat
+demo/data/latest.inc
+demo/data/102_ans.dat
+demo/data/102_poll.dat

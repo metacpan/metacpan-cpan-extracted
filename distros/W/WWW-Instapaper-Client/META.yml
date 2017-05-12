@@ -1,0 +1,27 @@
+---
+abstract: "An implementation of the Instapaper client API\r\n(see L<http://www.instapaper.com/api>)"
+author: []
+build_requires:
+  Test::Harness: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Instapaper-Client
+provides:
+  WWW::Instapaper::Client:
+    file: lib/WWW/Instapaper/Client.pm
+    version: 0.901
+requires:
+  Class::Base: 0
+  Crypt::SSLeay: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.901

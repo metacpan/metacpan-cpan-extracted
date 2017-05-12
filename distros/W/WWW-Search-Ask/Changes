@@ -1,0 +1,11 @@
+2008-11-29  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Ask.pm (_parse_tree): fixed next-page link pattern
+
+2007-06-30    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Ask.pm (parse_tree): fix for new page format
+
+2007-04-21    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Ask.pm: first working version

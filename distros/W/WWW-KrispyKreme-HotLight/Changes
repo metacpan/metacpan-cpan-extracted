@@ -1,0 +1,28 @@
+Revision history for WWW-KrispyKreme-Hotlight
+
+1.1  2015-11-27 12:23:24 PST
+        - Require Perl 5.10
+        - Require Mojolicious 6.0
+
+1.0  2015-11-24 22:49:02 PST
+        - Support new API
+
+0.06  2014-07-14 09:19:01 PDT
+        - switch to a faster, all-Mojo class
+
+0.05  2014-07-03 10:22:57 PDT
+        - require Test::RequiresInternet on test
+        - switch to MIT license
+
+0.04  2013-06-15 10:11:39 PDT
+        - add test: donuts.t
+
+0.03  2013-06-11 10:41:02 PDT
+        - replace mojo prereq versions as '0' to avoid cpanm version errors
+
+0.02  2013-05-28 08:54:05 PDT
+        - Rename as WWW::Krispy::Kreme::HotLight
+        - Replace Moose with Mojo::Base
+
+0.01  2013-05-17 13:23:59 PDT
+        - Initial release

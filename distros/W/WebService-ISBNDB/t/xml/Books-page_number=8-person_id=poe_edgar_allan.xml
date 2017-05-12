@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:32Z">
+<BookList total_results="252" page_size="10" page_number="8" shown_results="10">
+<BookData book_id="morella" isbn="0585052107">
+<Title>Morella</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:20Z" price_time="2006-10-08T07:57:18Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086006 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="spirit_possession_fiction">Spirit possession -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-morella-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="morning_on_the_wissahiccon" isbn="0585052115">
+<Title>Morning on the Wissahiccon</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:22Z" price_time="2006-10-08T07:57:21Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086007 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="wissahickon_creek_pa_description_and_travel">Wissahickon Creek (Pa.) -- Description and travel</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:22Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-morning_on_the_wissahiccon-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="ms_found_in_a_bottle" isbn="0585052123">
+<Title>Ms. found in a bottle</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:24Z" price_time="2006-10-08T07:57:25Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086008 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="ghost_stories">Ghost stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-ms_found_in_a_bottle-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="murders_in_the_rue_morgue" isbn="0585052131">
+<Title>Murders in the Rue Morgue</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:26Z" price_time="2006-10-08T07:57:28Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086009 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="murder_fiction">Murder -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-murders_in_the_rue_morgue-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="mystification" isbn="0585052158">
+<Title>Mystification</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:28Z" price_time="2006-10-08T07:57:32Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086011 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="literary_forgeries_and_mystifications_fiction">Literary forgeries and mystifications -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:28Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-mystification-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="narraciones_extraordinarias" isbn="9583006408">
+<Title>Narraciones Extraordinarias</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Alan Poe, </AuthorsText>
+<PublisherText publisher_id="panamericana_editorial">Panamericana Editorial</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.7&quot;x8.5&quot;x0.6&quot;; 316 pages; 0.7 lb" language="" edition_info="Paperback; 2003-09-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-14T12:07:15Z" price_time="2006-10-08T07:57:35Z" />
+<Summary>Book in Spanish</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-12-20T21:07:26Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9789583006401" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-20T21:07:29Z" currency_rate="1" price="7.88" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="28.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="28.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:20Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:20Z" currency_rate="1" price="18.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:23Z" currency_rate="1" price="6.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:23Z" currency_rate="1" price="34.05" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/narraciones_extraordinarias/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=9583006408&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:45Z" currency_rate="1" price="16" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_formats_libros_en_espa_241_ol_infantil_y_juvenil_">Amazon.com -- Formats -- Libros en español -- Infantil y juvenil -- General</Subject>
+<Subject subject_id="amazon_com_formats_libros_en_espa_241_ol_infantil_y_ju_aaaa3">Amazon.com -- Formats -- Libros en español -- Infantil y juvenil -- 4 a 8 años</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="never_bet_the_devil_your_head" isbn="0585052174">
+<Title>Never bet the devil your head</Title>
+<TitleLong>Never bet the devil your head a tale with a moral</TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:33Z" price_time="2005-08-26T03:27:02Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086013 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="conduct_of_life_fiction">Conduct of life -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:33Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-never_bet_the_devil_your_head-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="poems_and_essays_on_poetry" isbn="0415967376">
+<Title>Poems and essays on poetry</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with an introduction by C. H. Sisson</AuthorsText>
+<PublisherText publisher_id="routledge">New York : Routledge, 2003.</PublisherText>
+<Details dewey_decimal="" physical_description_text="xvi, 150 p. ; 22 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-03-27T01:02:50Z" price_time="2006-04-03T14:38:35Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Poems and Essays on Poetry (Fyfield Books)" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="16.95" />
+<Price store_isbn="" store_title="Poems and Essays on Poetry (Fyfield Books)" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="16.94" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="12.71" />
+<Price store_isbn="" store_title="Selected Poems and Essays: Edgar Allan Poe" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="16.9" />
+<Price store_isbn="" store_title="Selected Poems and Essays" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="16.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="27.95" />
+<Price store_isbn="" store_title="Selected Poems and Essays" store_url="http://isbndb.com/x/book/poems_and_essays_on_poetry/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-04-03T14:38:34Z" currency_rate="1" price="16.94" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_poetry_american">Fantasy poetry, American</Subject>
+<Subject subject_id="poetry_history_and_criticism_theory_etc">Poetry -- History and criticism -- Theory, etc</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Connecticut State University" last_update="2004-03-27T01:02:50Z" marc_url="http://isbndb.com/x/libdata/isbndb-287-poems_and_essays_on_poetry-20040326.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="sisson_c_h">Sisson, C. H.</Person>
+</Authors>
+</BookData>
+<BookData book_id="poems_and_prose" isbn="0679445056">
+<Title>Poems and prose</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Poe</AuthorsText>
+<PublisherText publisher_id="a_a_knopf">New York : A.A. Knopf : 1995.</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="255 p. ; 17 cm." language="eng" edition_info="" dewey_decimal_normalized="811.3" lcc_number="PS2605" change_time="2004-07-24T08:42:17Z" price_time="2006-09-01T02:44:04Z" />
+<Summary></Summary>
+<Notes>Includes index.</Notes>
+<UrlsText>Publisher description http://www.loc.gov/catdir/description/random041/95015329.html</UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="9.38" />
+<Price store_isbn="" store_title="Poe: Poems (Everyman's Library Pocket Poets)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="1.85" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="8.82" />
+<Price store_isbn="" store_title="Poe: Poems (Everyman's Library Pocket Poets)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="10.25" />
+<Price store_isbn="" store_title="Poe: Poems (Everyman's Library Pocket Poets)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Poe: Poems" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="2.5" />
+<Price store_isbn="" store_title="Poe" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=3038754" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:56Z" currency_rate="1" price="9.23" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:58Z" currency_rate="1" price="12.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:58Z" currency_rate="1" price="8.5" />
+<Price store_isbn="" store_title="Poems" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30117163%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:58Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="Poe: Poems " store_url="http://www.biblio.com/details.php?dcx=92222604&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:59Z" currency_rate="1" price="2.42" />
+<Price store_isbn="" store_title="Poe: Poems" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0679445056&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:59Z" currency_rate="1" price="12.5" />
+<Price store_isbn="" store_title="Poe: Poems" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:43:59Z" currency_rate="1" price="7.5" />
+<Price store_isbn="" store_title="Poe: Poems" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:43:59Z" currency_rate="1" price="9.38" />
+<Price store_isbn="" store_title="Poe: Poems (Everyman's Library Pocket Poets)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:44:01Z" currency_rate="1" price="1.85" />
+<Price store_isbn="" store_title="Poe Poems Product 381593" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.381593&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:44:03Z" currency_rate="1" price="9.64" />
+<Price store_isbn="" store_title="Poe: Poems (Everyman's Library Pocket Poets)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:44:03Z" currency_rate="1" price="1.85" />
+<Price store_isbn="" store_title="Poe" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:44:04Z" currency_rate="1" price="10.69" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780679445050" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T02:44:04Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Poems: Poe (Everyman's Library)" store_url="http://isbndb.com/x/book/poems_and_prose/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-01T02:44:04Z" currency_rate="1" price="12.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_poetry_american">Fantasy poetry, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-07-24T08:42:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-poems_and_prose-20040724.mrc" />
+<MARC library_name="Missouri Education and Research Library Information Network (MERLIN)" last_update="2006-02-21T08:27:41Z" marc_url="http://isbndb.com/x/libdata/isbndb-281-poems_and_prose-20060221.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="poems_of_edgar_allan_poe" isbn="0585049807">
+<Title>Poems of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="bibliobytes">Hoboken, N.J. : BiblioBytes ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2605" change_time="2006-05-14T15:43:38Z" price_time="2006-05-14T16:04:28Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://0-www.netLibrary.com.bianca.penlib.du.edu/urlapi.asp?action=summary&amp;v=1&amp;bookid=2008569 View electronic book</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Denver" last_update="2006-05-14T15:43:38Z" marc_url="http://isbndb.com/x/libdata/isbndb-266-poems_of_edgar_allan_poe-20060514.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

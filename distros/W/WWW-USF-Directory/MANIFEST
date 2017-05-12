@@ -1,0 +1,31 @@
+Build.PL
+Changes
+ex/directory_repeater.pl
+ex/email_autocomplete.pl
+lib/WWW/USF/Directory.pm
+lib/WWW/USF/Directory/Entry.pm
+lib/WWW/USF/Directory/Entry/Affiliation.pm
+lib/WWW/USF/Directory/Exception.pm
+lib/WWW/USF/Directory/Exception/MethodArguments.pm
+lib/WWW/USF/Directory/Exception/TooManyResults.pm
+lib/WWW/USF/Directory/Exception/UnknownResponse.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/basic.t
+t/lib/MyUA.pm
+xt/clean-namespaces.t
+xt/consistent-version.t
+xt/critic-examples.t
+xt/critic.t
+xt/eol.t
+xt/kwalitee.t
+xt/manifest.t
+xt/perl-version.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+META.json
+SIGNATURE    Added here by Module::Build

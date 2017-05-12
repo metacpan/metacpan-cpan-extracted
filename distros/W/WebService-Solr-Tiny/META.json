@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl interface to Apache Solr",
+   "author" : [
+      "James Raspass <jraspass@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Solr-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI::Query::FromHash" : "0.003",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::MockObject" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Solr::Tiny" : {
+         "file" : "lib/WebService/Solr/Tiny.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JRaspass/WebService-Solr-Tiny/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/JRaspass/WebService-Solr-Tiny.git",
+         "web" : "https://github.com/JRaspass/WebService-Solr-Tiny"
+      }
+   },
+   "version" : "0.001"
+}
+

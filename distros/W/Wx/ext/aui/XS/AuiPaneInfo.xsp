@@ -1,0 +1,186 @@
+#############################################################################
+## Name:        ext/aui/XS/AuiPaneInfo.xsp
+## Purpose:     XS++ for Wx::AuiPaneInfo
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     11/11/2006
+## RCS-ID:      $Id: AuiPaneInfo.xsp 2971 2010-08-28 13:49:35Z mbarbon $
+## Copyright:   (c) 2006-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+#include <wx/aui/framemanager.h>
+
+%module{Wx};
+
+%name{Wx::AuiPaneInfo} class wxAuiPaneInfo
+{
+    wxAuiPaneInfo();
+
+%{
+static void
+wxAuiPaneInfo::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+    ## // thread OK
+    ~wxAuiPaneInfo()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::AuiPaneInfo", THIS, ST(0) );
+                 if( wxPli_object_is_deleteable( aTHX_ ST(0) ) )
+                     delete THIS;
+               %};
+
+    void SafeSet( const wxAuiPaneInfo& source );
+
+    bool IsOk() const;
+    bool IsFixed() const;
+    bool IsResizable() const;
+    bool IsShown() const;
+    bool IsFloating() const;
+    bool IsDocked() const;
+    bool IsToolbar() const;
+    bool IsTopDockable() const;
+    bool IsBottomDockable() const;
+    bool IsLeftDockable() const;
+    bool IsRightDockable() const;
+    bool IsFloatable() const;
+    bool IsMovable() const;
+    bool IsDestroyOnClose() const;
+    bool IsMaximized() const;
+    bool HasCaption() const;
+    bool HasGripper() const;
+    bool HasBorder() const;
+    bool HasCloseButton() const;
+    bool HasMaximizeButton() const;
+    bool HasMinimizeButton() const;
+    bool HasPinButton() const;
+    bool HasGripperTop() const;
+
+%typemap{wxAuiPaneInfo&}{parsed}{
+    %cpp_type{%SV*%};
+    %call_function_code{%$Call%};
+    %output_code{%$CVar = $PerlVar; SvREFCNT_inc( $PerlVar )%};
+};
+
+    wxAuiPaneInfo& Window( wxWindow* w );
+    wxAuiPaneInfo& Name( const wxString& n );
+    wxAuiPaneInfo& Caption( const wxString& c );
+    wxAuiPaneInfo& Left();
+    wxAuiPaneInfo& Right();
+    wxAuiPaneInfo& Top();
+    wxAuiPaneInfo& Bottom();
+    wxAuiPaneInfo& Center();
+    wxAuiPaneInfo& Centre();
+    wxAuiPaneInfo& Direction( int direction );
+    wxAuiPaneInfo& Layer( int layer );
+    wxAuiPaneInfo& Row( int row );
+    wxAuiPaneInfo& Position( int pos );
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    wxAuiPaneInfo& DockFixed( bool b = true );
+#endif
+
+    %name{BestSizeSize} wxAuiPaneInfo& BestSize( const wxSize& size );
+    %name{BestSizeWH} wxAuiPaneInfo& BestSize( int x, int y );
+%{
+void
+wxAuiPaneInfo::BestSize( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, BestSizeSize )
+        MATCH_REDISP( wxPliOvl_n_n, BestSizeWH )
+    END_OVERLOAD( Wx::AuiPaneInfo::BestSize )
+%}
+
+    %name{MaxSizeSize} wxAuiPaneInfo& MaxSize( const wxSize& size );
+    %name{MaxSizeWH} wxAuiPaneInfo& MaxSize( int x, int y );
+%{
+void
+wxAuiPaneInfo::MaxSize( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, MaxSizeSize )
+        MATCH_REDISP( wxPliOvl_n_n, MaxSizeWH )
+    END_OVERLOAD( Wx::AuiPaneInfo::MaxSize )
+%}
+
+    %name{MinSizeSize} wxAuiPaneInfo& MinSize( const wxSize& size );
+    %name{MinSizeWH} wxAuiPaneInfo& MinSize( int x, int y );
+%{
+void
+wxAuiPaneInfo::MinSize( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, MinSizeSize )
+        MATCH_REDISP( wxPliOvl_n_n, MinSizeWH )
+    END_OVERLOAD( Wx::AuiPaneInfo::MinSize )
+%}
+
+    %name{FloatingPositionPoint} wxAuiPaneInfo& FloatingPosition( const wxPoint& pos );
+    %name{FloatingPositionXY} wxAuiPaneInfo& FloatingPosition( int x, int y );
+%{
+void
+wxAuiPaneInfo::FloatingPosition( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, FloatingPositionPoint )
+        MATCH_REDISP( wxPliOvl_n_n, FloatingPositionXY )
+    END_OVERLOAD( Wx::AuiPaneInfo::FloatingPosition )
+%}
+
+    %name{FloatingSizeSize} wxAuiPaneInfo& FloatingSize( const wxSize& size );
+    %name{FloatingSizeWH} wxAuiPaneInfo& FloatingSize( int x, int y );
+%{
+void
+wxAuiPaneInfo::FloatingSize( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, FloatingSizeSize )
+        MATCH_REDISP( wxPliOvl_n_n, FloatingSizeWH )
+    END_OVERLOAD( Wx::AuiPaneInfo::FloatingSize )
+%}
+
+    wxAuiPaneInfo& Fixed();
+    wxAuiPaneInfo& Resizable( bool resizable = true );
+    wxAuiPaneInfo& Dock();
+    wxAuiPaneInfo& Float();
+    wxAuiPaneInfo& Hide();
+    wxAuiPaneInfo& Show( bool show = true );
+    wxAuiPaneInfo& CaptionVisible( bool visible = true );
+    wxAuiPaneInfo& Maximize();
+    wxAuiPaneInfo& Restore();
+    wxAuiPaneInfo& PaneBorder( bool visible = true );
+    wxAuiPaneInfo& Gripper( bool visible = true );
+    wxAuiPaneInfo& GripperTop( bool attop = true );
+    wxAuiPaneInfo& CloseButton( bool visible = true );
+    wxAuiPaneInfo& MaximizeButton( bool visible = true );
+    wxAuiPaneInfo& MinimizeButton( bool visible = true );
+    wxAuiPaneInfo& PinButton( bool visible = true );
+    wxAuiPaneInfo& DestroyOnClose( bool b = true );
+    wxAuiPaneInfo& TopDockable( bool b = true );
+    wxAuiPaneInfo& BottomDockable( bool b = true );
+    wxAuiPaneInfo& LeftDockable( bool b = true );
+    wxAuiPaneInfo& RightDockable( bool b = true );
+    wxAuiPaneInfo& Floatable( bool b = true );
+    wxAuiPaneInfo& Movable( bool b = true );
+
+#if WXPERL_W_VERSION_LT( 2, 8, 0 )
+    wxAuiPaneInfo& SaveHidden();
+    wxAuiPaneInfo& RestoreHidden();
+#endif
+
+    wxAuiPaneInfo& Dockable( bool b = true );
+
+    wxAuiPaneInfo& DefaultPane();
+
+    wxAuiPaneInfo& CentrePane();
+    wxAuiPaneInfo& CenterPane();
+
+    wxAuiPaneInfo& ToolbarPane();
+    wxAuiPaneInfo& SetFlag( unsigned int flag, bool option_state );
+    bool HasFlag( unsigned int flag ) const;
+
+%typemap{wxAuiPaneInfo&}{reference};
+
+};

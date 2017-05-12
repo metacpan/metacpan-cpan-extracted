@@ -1,0 +1,175 @@
+{
+   "abstract" : "PDF output for wxWidgets",
+   "author" : [
+      "Mark Wardell <mwardell@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4222",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wx-PdfDocument",
+   "no_index" : {
+      "directory" : [
+         "src",
+         "cpp",
+         "inc",
+         "myinc",
+         "msw",
+         "patches",
+         "demo"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "ExtUtils::XSpp" : "0.1602",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "Text::Patch" : "1.8"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::wxWidgets" : "0.27",
+            "Class::Accessor" : "0.34",
+            "Wx" : "0.9909",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Wx::DemoModules::wxPdfDocument" : {
+         "file" : "lib/Wx/DemoModules/wxPdfDocument.pm",
+         "version" : "0.03"
+      },
+      "Wx::DemoModules::wxPdfDocument::CustomPrintOut" : {
+         "file" : "lib/Wx/DemoModules/wxPdfDocument.pm",
+         "version" : "0.03"
+      },
+      "Wx::DemoModules::wxPdfDocument::DelegatedPrintout" : {
+         "file" : "lib/Wx/DemoModules/wxPdfDocument.pm",
+         "version" : "0.03"
+      },
+      "Wx::PdfBarCodeCreator" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfColour" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfDC" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfDocument" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.21"
+      },
+      "Wx::PdfDocument::Loader" : {
+         "file" : "lib/Wx/PdfDocument/Loader.pm",
+         "version" : "0.10"
+      },
+      "Wx::PdfFont" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfFontDescription" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfFontManager" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfInfo" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfLayer" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfLayerGroup" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfLayerMembership" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfLineStyle" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfLink" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfOcg" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPageLink" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPageSetupDialog" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPrintData" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPrintDialog" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPrintPreview" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPrintPreviewImpl" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfPrinter" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PdfShape" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      },
+      "Wx::PlPdfDocument" : {
+         "file" : "lib/Wx/PdfDocument.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://code.google.com/p/wxperl-pdfdocument/wiki/Home",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://wxperl-pdfdocument.googlecode.com/svn/"
+      }
+   },
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

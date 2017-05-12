@@ -1,0 +1,66 @@
+Win32/Daemon/Simple version 0.2.6
+================================
+
+Simple framework for Windows services
+
+use strict;
+use File::Spec;
+use Win32::Daemon;
+use Win32::Daemon::Simple
+	Service => 'TestSimpleService',
+	Name => 'Test Simple Service',
+	Version => '1.0',
+	Info => {
+		display =>  'Test Simple Service',
+		description => 'Test Service for Win32::Daemon::Simple',
+		user    =>  '',
+		pwd     =>  '',
+		interactive => 0,
+	},
+	Params => {
+		Tick => 0,
+		Interval => 1,
+		LogFile => "TestSimple.log",
+		Description => <<'*END*',
+Tick : (0/1) controls whether the service writes a "tick" message to
+  the log once a minute if there's nothing to do
+Interval : how often does the service look for new or modified files
+  (in minutes)
+*END*
+	},
+	param_modify => {
+		LogFile => sub {File::Spec->rel2abs($_[0])},
+	};
+
+ServiceLoop(\&doSomething);
+exit;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+(You may need to use "nmake" instead of "make"!)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::Daemon
+  Win32::Console
+  Win32::Registry
+    - you need either version 0.08 or the patch from
+	   http://jenda.krynicky.cz/#Win32::Registry2
+	   or http://www24.brinkster.com/jenda/index.html#Win32::Registry2
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jenda@Krynicky.cz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

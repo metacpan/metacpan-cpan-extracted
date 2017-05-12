@@ -1,0 +1,113 @@
+2017-02-18 11:42 git
+        * Large breaking upgrade to make it compatible with current
+          WordPress versions. Obselete functions removed, new ones added. 
+
+2009-12-17 12:33  cvs
+
+	* lib/WordPress/XMLRPC.pm, lib/WordPress/XMLRPC.pod,
+	  t/04_XMLRPC_page.t: There was an error with the
+	  code/documentation for editPage() Now editPage() will take
+	  content hashref as first arg, and publish boolean as second
+	  optional arg- OR it will take page id, content hashref, and
+	  optional 'publish boolean' arg.
+
+	  From Alan Haggai Alavi "..Error with editPage(). It accepts three
+	  arguments instead of two.  The attached patch seems to.." Thanks!
+
+2009-10-29 20:58  cvs
+
+	* lib/WordPress/XMLRPC.pm, lib/WordPress/XMLRPC.pod, t/18_media.t,
+	  t/media.jpg: Added test and help to upload media.  Added a help
+	  sub to turn a file on disk to the data struct required (bits,
+	  etc)
+
+2009-09-25 09:55  cvs
+
+	* lib/WordPress/XMLRPC.pm, t/00_basic.t, t/02_XMLRPC.t,
+	  t/04_XMLRPC_page.t, t/04_XMLRPC_post.t, t/10_XMLRPC.t.optional,
+	  t/11_category.t, t/12_categories.t, t/14_options.t,
+	  t/15_templates.t, t/16_tags.t, t/17_comments.t, t/test.pl: Made
+	  sure some tests skip out if ENV FULLTESTING is set to 0- or if
+	  t/wppost is not present.  Fixed bug in test 12.
+
+2009-09-09 14:59  cvs
+
+	* lib/WordPress/XMLRPC.pod: Fixed up documentation formatting.
+
+2009-09-09 11:37  cvs
+
+	* Makefile.PL, README, lib/WordPress/XMLRPC.pm,
+	  lib/WordPress/XMLRPC.pod, t/11_category.t, t/11_category_new.t,
+	  t/13_newmethods_in_new_xmlrpcversion.pl, t/14_options.t,
+	  t/15_templates.t, t/16_tags.t, t/17_comments.t,
+	  t/analize_xmlrpc.pl, t/wppost: Made major update, included many
+	  new xml rpc calls that were not available when this module was
+	  first built.	New methods:	deleteCategory deleteComment
+	  editComment getComment getCommentCount    getCommentStatusList
+	  getComments getOptions getPageStatusList    getPageTemplates
+	  getPostStatusList getTags newComment setOptions
+
+	  This has been updated to match the xmlrpc.php file included with;
+	  wordpress v 2.8.4
+
+2009-08-29 19:04  cvs
+
+	* Makefile.PL, README, lib/WordPress/XMLRPC.pm: Made sure that
+	  perl/gpl license shows up properly.
+
+2008-07-28 17:25  cvs
+
+	* lib/WordPress/XMLRPC.pm, t/12_categories.t: added getCategory(),
+	  this was philosophically hard.. because there was no getCategory
+	  method in xmlrpc.php ... but it is very useful.
+
+2008-07-28 09:31  cvs
+
+	* lib/WordPress/XMLRPC.pm, t/11_category_new.t: Fixed newCategory
+	  It was suggesting argument is string but it should have  been
+	  hash ref, now checks that the hash ref contains at least 'name'
+	  key.
+
+2008-06-25 11:19  cvs
+
+	* Changes, MANIFEST: added changefile
+
+2008-06-25 11:18  cvs
+
+	* lib/WordPress/XMLRPC.pm: Added extra argument checking, now if
+	  you pass a scalar or hash instead of a hash ref when needed, we
+	  croak about it.  Someone contacted me trying to pass a hash
+	  instead of a hash ref to newPost().
+
+2008-06-25 07:47  cvs
+
+	* Makefile.PL, lib/WordPress/XMLRPC.pm, t/00_basic.t,
+	  t/02_XMLRPC.t, t/04_XMLRPC_page.t, t/04_XMLRPC_post.t,
+	  t/10_XMLRPC.t.optional, t/11_category_new.t, t/12_categories.t:
+	  Took out usage of Smart::Comments, some people were having
+	  trouble with deps.
+
+2008-06-20 11:09  cvs
+
+	* lib/WordPress/XMLRPC.pm: updated documentation
+
+2008-06-19 15:01  cvs
+
+	* lib/WordPress/XMLRPC.pm, t/11_category_new.t, t/12_categories.t:
+	  testing out newCategory, but it fails. I think WordPress has a
+	  bug.
+
+2008-02-01 19:33  cvs
+
+	* MANIFEST, Makefile.PL, README, t/00_basic.t, t/02_XMLRPC.t,
+	  t/04_XMLRPC_page.t, t/04_XMLRPC_post.t, t/10_XMLRPC.out,
+	  t/10_XMLRPC.t.optional, t/analize_xmlrpc.pl, t/test.pl, t/wppost,
+	  t/xmlrpc.php, lib/WordPress/XMLRPC.pm: Initial revision
+
+2008-02-01 19:33  cvs
+
+	* MANIFEST, Makefile.PL, README, t/00_basic.t, t/02_XMLRPC.t,
+	  t/04_XMLRPC_page.t, t/04_XMLRPC_post.t, t/10_XMLRPC.out,
+	  t/10_XMLRPC.t.optional, t/analize_xmlrpc.pl, t/test.pl, t/wppost,
+	  t/xmlrpc.php, lib/WordPress/XMLRPC.pm: init import
+

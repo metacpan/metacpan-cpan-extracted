@@ -1,0 +1,38 @@
+$Id: README 6483 2011-06-13 13:32:45Z chris $
+
+INTRODUCTION
+============
+
+This module provides access to the MoviePosterDB api.
+
+
+INSTALLATION
+============
+
+   1 perl Makefile.PL
+   2 make
+   3 make test
+   4 make install # as superuser
+
+
+DEPENDENCIES
+============
+
+Class::Accessor
+Cache::FileCache
+Digest::MD5
+File::Spec::Functions
+JSON
+LWP::UserAgent
+URI
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2010-2011 Christopher Key <cjk32@cam.ac.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

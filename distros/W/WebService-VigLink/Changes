@@ -1,0 +1,24 @@
+Revision history for Perl extension WebService-VigLink.
+
+0.06 Tue May 17 11:08:00 PST 2020
+    - Let the caller handle encoding issues
+    - Use Any::URI::Escape to load XS escape subs if present
+    - Resolve a few encoding nits with the url encoding
+
+0.05 Mon May 10 18:30:00 PST 2010
+    - namespace change to VigLink (upper case L instead of lower case)
+
+0.04 Tue May 4 16:00:00 PST 2010
+    - encode html entities numerically
+
+0.03 Tue May 4 13:02:00 PST 2010
+    - use uri_escape_utf8 for text and title
+    - deprecate version param, thanks to @viglink for the spot
+
+0.02 Mon May 3 12:10:00 PST 2010
+    - fix fatal error in constructor
+    - use referrer instead of ref to avoid quoting reserved word
+
+0.01 Sun May 2 21:53:51 PST 2010
+    - initial version
+

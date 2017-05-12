@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+use 5.008009;
+use strict;
+use warnings;
+
+use Getopt::Long qw/GetOptions/;
+use WWW::Offliberty qw/off/;
+
+GetOptions ('param=s' => \my %params);
+print "$_\n" for off shift, %params;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+off - Offliberate this
+
+=head1 SYNOPSIS
+
+  off 'http://vimeo.com/whatever'
+  off --param video_file=1 'http://youtube.com/watch?v=something'
+  off --param param1=value1 --param param2=value2 link_to_offliberate
+
+=head1 DESCRIPTION
+
+off is a command-line interface to the offliberty.com download
+service. It prints a list of download URLs for a given resource (e.g.
+a youtube video). You can also send parameters using the C<--param>
+argument. See the L<WWW::Offliberty> documentation for more
+information about parameters.
+
+=head1 SEE ALSO
+
+L<WWW::Offliberty>, L<http://offliberty.com>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

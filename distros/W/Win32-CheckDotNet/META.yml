@@ -1,0 +1,30 @@
+---
+abstract: 'Perl extension for checking installed .NET versions'
+author:
+  - 'Alexander Becker <cf@pod.mail>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.98
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-CheckDotNet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 6.76
+  Log::Log4perl: 1.42
+  Moose: 2.0604
+  Win32::TieRegistry: 0.26
+  Win32API::Registry: 0.30
+  perl: 5.016003
+version: 0.02

@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Twilio-TwiML.t
+t/documentation.t
+t/traps.t
+t/twilio.t
+lib/WWW/Twilio/TwiML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

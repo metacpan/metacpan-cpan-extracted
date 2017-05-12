@@ -1,0 +1,15 @@
+Changelog
+INSTALL
+MANIFEST
+Makefile.PL
+README.md
+bin/apid
+lib/WWW/REST/Apid.pm
+sample/index.html
+sample/ps.conf
+sample/README
+sample/ps.map
+sample/jquery.js
+t/run.t
+META.json
+META.yml

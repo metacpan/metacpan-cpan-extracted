@@ -1,0 +1,63 @@
+NAME
+    WWW::TextMarks - Provides access to the TextMarks SMS Service V2 API
+
+SYNOPSIS
+      use WWW::TextMarks;
+      my $tm = WWW::TextMarks->new(
+        apik => 'example_com_12345678',
+        user => '5556781234',
+        pass => 'y0ur$ekretPassword',
+        tm   => 'yourtextmark',
+      );
+      my $res = $tm->send('5559994321', 'Hey, pick up your dry cleaning.');
+      if ($res->{success})
+      {
+        print "Yippie.\n";
+      }
+      else
+      {
+        print "Error: $res->{error}\n";
+      }
+
+DESCRIPTION
+    WWW::TextMarks provides access to the TextMarks SMS Service V2 API.
+
+    Currently, it only allows you to send text messages to individual
+    subscribers. Eventually, it'll also allow you to maintain your
+    subscriber list and perform the full set of tasks made available by the
+    TextMarks API.
+
+    Patches are welcome in case you get to it before I do. :-)
+
+METHODS
+  new
+    See SYNOPSIS above for an example.
+
+    Required: apik, user, pass, tm. Optional: url
+
+    Setting the "url" is not recommended unless the embedded URL in this
+    module fails to work properly or if you require an alternate URL
+    provided by TextMarks.
+
+    The "apik" is created by registering for an API key at:
+    <http://www.textmarks.com/dev/api/reg/?ref=devapi>
+
+    The "user" and "pass" is your TextMarks website login username and
+    password. Your username is most likely your cell phone number.
+
+  send
+    See SYNOPSIS above for an example.
+
+    The first argument is the SMS recipient's phone number. The second
+    argument is the message to send. There are no other arguments.
+
+    If you wish to send to many recipients, just call "send" multiple times,
+    once per recipient.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Dusty Wilson, <dusty@megagram.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,29 @@
+---
+name: WebService-StreetMapLink
+version: 0.21
+author:
+  - 'David Rolsky <autarch@urth.org>'
+abstract: An API for generating links to online map services
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Factory::Util: 0
+  Geography::States: 0
+  Params::Validate: 0
+  Test::More: 0
+  URI: 1.28
+build_requires:
+  Module::Build: 0
+provides:
+  WebService::StreetMapLink:
+    file: lib/WebService/StreetMapLink.pm
+    version: 0.21
+  WebService::StreetMapLink::Google:
+    file: lib/WebService/StreetMapLink/Google.pm
+  WebService::StreetMapLink::MapQuest:
+    file: lib/WebService/StreetMapLink/MapQuest.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

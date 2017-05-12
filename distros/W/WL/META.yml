@@ -1,0 +1,176 @@
+---
+abstract: 'Perl Wayland protocol binding'
+author:
+  - 'Lubomir Rintel <lkundrak@v3.sk>'
+build_requires:
+  XML::Smart: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WL
+provides:
+  WL:
+    file: lib/WL.pm
+    version: 0.92
+  WL::Base:
+    file: lib/WL/Base.pm
+  WL::Connection:
+    file: lib/WL/Connection.pm
+  WL::desktop:
+    file: lib/WL/desktop.pm
+    version: 0.92
+  WL::desktop_shell:
+    file: lib/WL/desktop.pm
+    version: 2
+  WL::fullscreen_shell:
+    file: lib/WL/fullscreen_shell.pm
+    version: 0.92
+  WL::gtk:
+    file: lib/WL/gtk.pm
+    version: 0.92
+  WL::gtk_shell:
+    file: lib/WL/gtk.pm
+    version: 1
+  WL::gtk_surface:
+    file: lib/WL/gtk.pm
+    version: 1
+  WL::input_method:
+    file: lib/WL/input_method.pm
+    version: 0.92
+  WL::scaler:
+    file: lib/WL/scaler.pm
+    version: 0.92
+  WL::screensaver:
+    file: lib/WL/desktop.pm
+    version: 1
+  WL::screenshooter:
+    file: lib/WL/screenshooter.pm
+    version: 0.92
+  WL::text:
+    file: lib/WL/text.pm
+    version: 0.92
+  WL::text_cursor_position:
+    file: lib/WL/text_cursor_position.pm
+    version: 0.92
+  WL::wl_buffer:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_callback:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_compositor:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_data_device:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_data_device_manager:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_data_offer:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_data_source:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_display:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_input_method:
+    file: lib/WL/input_method.pm
+    version: 1
+  WL::wl_input_method_context:
+    file: lib/WL/input_method.pm
+    version: 1
+  WL::wl_input_panel:
+    file: lib/WL/input_method.pm
+    version: 1
+  WL::wl_input_panel_surface:
+    file: lib/WL/input_method.pm
+    version: 1
+  WL::wl_keyboard:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_output:
+    file: lib/WL.pm
+    version: 2
+  WL::wl_pointer:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_region:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_registry:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_scaler:
+    file: lib/WL/scaler.pm
+    version: 2
+  WL::wl_seat:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_shell:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_shell_surface:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_shm:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_shm_pool:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_subcompositor:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_subsurface:
+    file: lib/WL.pm
+    version: 1
+  WL::wl_surface:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_test:
+    file: lib/WL/wl_test.pm
+    version: 0.92
+  WL::wl_text_input:
+    file: lib/WL/text.pm
+    version: 1
+  WL::wl_text_input_manager:
+    file: lib/WL/text.pm
+    version: 1
+  WL::wl_touch:
+    file: lib/WL.pm
+    version: 3
+  WL::wl_viewport:
+    file: lib/WL/scaler.pm
+    version: 2
+  WL::workspace_manager:
+    file: lib/WL/workspaces.pm
+    version: 1
+  WL::workspaces:
+    file: lib/WL/workspaces.pm
+    version: 0.92
+  WL::xdg_popup:
+    file: lib/WL/xdg_shell.pm
+    version: 1
+  WL::xdg_shell:
+    file: lib/WL/xdg_shell.pm
+    version: 0.92
+  WL::xdg_surface:
+    file: lib/WL/xdg_shell.pm
+    version: 1
+requires:
+  File::Temp: 0
+  IO::Socket::UNIX: 0
+  Socket::MsgHdr: 0
+  XML::Smart: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WL
+  repository: https://github.com/lkundrak/perl-wayland
+version: 0.92

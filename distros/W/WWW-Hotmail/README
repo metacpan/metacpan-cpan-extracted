@@ -1,0 +1,107 @@
+NAME
+    WWW::Hotmail - Connect to Hotmail, download, delete and send messages
+
+SYNOPSIS
+      use WWW::Hotmail;
+  
+      my $hotmail = WWW::Hotmail->new();
+  
+      $hotmail->login('foo@hotmail.com', "bar")
+       or die $WWW::Hotmail::errstr;
+  
+      my @msgs = $hotmail->messages();
+      die $WWW::Hotmail::errstr if ($!);
+
+      print "You have ".scalar(@msgs)." messages\n";
+
+      for (@msgs) {
+            print "messge from ".$_->from."\n";
+            # retrieve the message from hotmail
+            my $mail = $_->retrieve;
+            # deliver it locally
+            $mail->accept;
+            # forward the message
+            $mail->resend('myother@email.address.com');
+            # delete it from the inbox
+            $_->delete;
+      }
+  
+      $hotmail->compose(
+        to      => ['user@email.com','otheruser@otheremail.com'],
+        subject => 'Hello Person!',
+        body    => q[Dear Person,
+  
+      I am writing today to tell you about something important.
+
+      Thanks for all your support.
+  
+      Sincerely,
+      Other Person
+      ]) or die $WWW::Hotmail::errstr;
+
+DESCRIPTION
+    This module is a partial replacement for the "gotmail" script
+    (http://ssl.usu.edu/paul/gotmail/), so if this doesn't do what you want,
+    try that instead.
+
+    Create a new "WWW::Hotmail" object with "new", and then log in with your
+    MSN username and password with the "login" method.
+
+METHODS
+  login
+    Make sure to add the domain to your username, for example
+    foo@hotmail.com. Then this will allow you to use the "messages" method
+    to look at the mail in your inbox. The login method does not retrieve
+    messages on login. The messages method does that now.
+
+  messages
+    This method returns a list of "WWW::Hotmail::Message"s; each message
+    supports four methods: "subject" gives you the subject of the email,
+    just because it was stunningly easy to implement. "retrieve" retrieves
+    an email into a "Mail::Audit" object - see Mail::Audit for more details.
+    "from" gives you the from field. Finally "delete" moves it to your
+    trash.
+
+  compose
+    You can use the "compose" message to send a message through the account
+    you are currently logged in to. You should be able to use this method as
+    many times and as often as you like during the life of the
+    "WWW::Hotmail" object. As its argument, it takes a hash whose keys are
+    "to", "cc", "bcc", "subject", "body". Newlines should work fine in the
+    "body" argument. Any field can be an array; it will be joined with a
+    comma. This function returns 1 on success and undef on failure. Check
+    $WWW::Hotmail::errstr for errors, or use $WWW::Hotmail::errhtml for an
+    html version of the error.
+
+NOTES
+    This module used to croak errors for you. If you would like this
+    behavior, then add $WWW::Hotmail::croak_on_error = 1; to your script. It
+    will not croak html.
+
+    This module should work with email addresses at charter.com, compaq.net,
+    hotmail.com, msn.com, passport.com, and webtv.net
+
+    This module is reasonably fragile. It seems to work, but I haven't
+    tested edge cases. If it breaks, you get to keep both pieces. I hope to
+    improve it in the future, but this is enough for release.
+
+SEE ALSO
+    WWW::Mechanize, Mail::Audit, "gotmail"
+
+AUTHOR
+    David Davis, <xantus@cpan.org> - I've taken ownership of this module,
+    please direct all questions to me.
+
+ORIGINAL AUTHOR
+    Simon Cozens, <simon@kasei.com>
+
+CONTRIBUTIONS
+    David M. Bradford <dave@tinypig.com> - Added the ability to send
+    messages via hotmail.
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2004 by Kasei Copyright 2004 by David Davis
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,469 @@
+package WebService::Mailgun;
+use 5.008001;
+use strict;
+use warnings;
+
+use Furl;
+use JSON::XS;
+use URI;
+use Try::Tiny;
+use Carp;
+
+our $VERSION = "0.06";
+our $API_BASE = 'api.mailgun.net/v3';
+
+use Class::Accessor::Lite (
+    new => 1,
+    rw  => [qw(api_key domain RaiseError)],
+    ro  => [qw(error error_status)],
+);
+
+sub decode_response {
+    my ($self, $res) = @_;
+
+    if ($res->is_success) {
+        return decode_json $res->content;
+    } else {
+        my $json;
+        try {
+            $json = decode_json $res->content;
+        } catch {
+            $json = { message => $res->content };
+        };
+        $self->{error} = $json->{message};
+        $self->{error_status} = $res->status_line;
+        if ($self->RaiseError) {
+            carp $self->error;
+            croak $self->error_status;
+        } else {
+            return;
+        }
+    }
+}
+
+sub recursive {
+    my ($self, $method, $query, $key, $api_uri) = @_;
+
+    $query //= {};
+    $key //= 'items';
+    my @result;
+    my $previous;
+    unless($api_uri) {
+        $api_uri = URI->new($self->api_url($method));
+        $api_uri->query_form($query);
+    }
+
+    while (1) {
+        my $res = $self->client->get($api_uri->as_string);
+        my $json = $self->decode_response($res);
+        unless($json && scalar @{$json->{$key}}) {
+            $previous = URI->new($json->{paging}->{previous});
+            $previous->userinfo('api:'.$self->api_key);
+            last;
+        }
+        push @result, @{$json->{$key}};
+        $api_uri = URI->new($json->{paging}->{next});
+        $api_uri->userinfo('api:'.$self->api_key);
+    }
+
+    return \@result, $previous;
+}
+
+sub client {
+    my $self = shift;
+
+    $self->{_client} //= Furl->new(
+        agent => __PACKAGE__ . '/' . $VERSION,
+    );
+}
+
+sub api_url {
+    my ($self, $method) = @_;
+
+    sprintf 'https://api:%s@%s/%s',
+        $self->api_key, $API_BASE, $method;
+}
+
+sub domain_api_url {
+    my ($self, $method) = @_;
+
+    sprintf 'https://api:%s@%s/%s/%s',
+        $self->api_key, $API_BASE, $self->domain, $method;
+}
+
+sub message {
+    my ($self, $args) = @_;
+
+    my $res = $self->client->post($self->domain_api_url('messages'), [], $args);
+    $self->decode_response($res);
+}
+
+sub lists {
+    my $self = shift;
+
+    return $self->recursive('lists/pages');
+}
+
+sub add_list {
+    my ($self, $args) = @_;
+
+    my $res = $self->client->post($self->api_url("lists"), [], $args);
+    $self->decode_response($res);
+}
+
+sub list {
+    my ($self, $address) = @_;
+
+    my $res = $self->client->get($self->api_url("lists/$address"));
+    my $json = $self->decode_response($res) or return;
+    return $json->{list};
+}
+
+sub update_list {
+    my ($self, $address, $args) = @_;
+
+    my $res = $self->client->put($self->api_url("lists/$address"), [], $args);
+    $self->decode_response($res);
+}
+
+sub delete_list {
+    my ($self, $address) = @_;
+
+    my $res = $self->client->delete($self->api_url("lists/$address"));
+    $self->decode_response($res);
+}
+
+sub list_members {
+    my ($self, $address) = @_;
+
+    return $self->recursive("lists/$address/members/pages");
+}
+
+sub add_list_member {
+    my ($self, $address, $args) = @_;
+
+    my $res = $self->client->post(
+        $self->api_url("lists/$address/members"), [], $args);
+    $self->decode_response($res);
+}
+
+sub add_list_members {
+    my ($self, $address, $args) = @_;
+
+    my $res = $self->client->post(
+        $self->api_url("lists/$address/members.json"), [], $args);
+    $self->decode_response($res);
+}
+
+sub list_member {
+    my ($self, $address, $member) = @_;
+
+    my $res = $self->client->get($self->api_url("lists/$address/members/$member"));
+    my $json = $self->decode_response($res) or return;
+    return $json->{member};
+}
+
+sub update_list_member {
+    my ($self, $address, $member, $args) = @_;
+
+    my $res = $self->client->put(
+        $self->api_url("lists/$address/members/$member"), [], $args);
+    $self->decode_response($res);
+}
+
+sub delete_list_member {
+    my ($self, $address, $member) = @_;
+
+    my $res = $self->client->delete(
+        $self->api_url("lists/$address/members/$member"));
+    $self->decode_response($res);
+}
+
+sub event {
+    my ($self, $args) = @_;
+
+    if (ref($args) && ref($args) eq 'HASH') {
+        return $self->recursive("events", $args);
+    } else {
+        return $self->recursive("events", {}, 'items', URI->new($args));
+    }
+}
+
+sub get_message_from_event {
+    my ($self, $event) = @_;
+
+    die "invalid event! this method need 'stored' event only." if $event->{event} ne 'stored';
+    my $uri = URI->new($event->{storage}->{url});
+    $uri->userinfo('api:'.$self->api_key);
+
+    my $res = $self->client->get($uri->as_string);
+    $self->decode_response($res);
+}
+
+1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+WebService::Mailgun - API client for Mailgun (L<https://mailgun.com/>)
+
+=head1 SYNOPSIS
+
+    use WebService::Mailgun;
+
+    my $mailgun = WebService::Mailgun->new(
+        api_key => '<YOUR_API_KEY>',
+        domain => '<YOUR_MAIL_DOMAIN>',
+    );
+
+    # send mail
+    my $res = $mailgun->message({
+        from    => 'foo@example.com',
+        to      => 'bar@example.com',
+        subject => 'test',
+        text    => 'text',
+    });
+
+=head1 DESCRIPTION
+
+WebService::Mailgun is API client for Mailgun (L<https://mailgun.com/>).
+
+=head1 METHOD
+
+=head2 new(api_key => $api_key, domain => $domain, RaiseError => 0|1)
+
+Create mailgun object.
+
+=head3 RaiseError (default: 0)
+
+The RaiseError attribute can be used to force errors to raise exceptions rather than simply return error codes in the normal way. It is "off" by default.
+
+=head2 error
+
+return recent error message.
+
+=head2 error_status
+
+return recent API result status_line.
+
+=head2 message($args)
+
+Send email message.
+
+    # send mail
+    my $res = $mailgun->message({
+        from    => 'foo@example.com',
+        to      => 'bar@example.com',
+        subject => 'test',
+        text    => 'text',
+    });
+
+L<https://documentation.mailgun.com/api-sending.html#sending>
+
+=head2 lists()
+
+Get list of mailing lists.
+
+    # get mailing lists
+    my $lists = $mailgun->lists();
+    # => ArrayRef of mailing list object.
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 add_list($args)
+
+Add mailing list.
+
+    # add mailing list
+    my $res = $mailgun->add_list({
+        address => 'ml@example.com', # Mailing list address
+        name    => 'ml sample',      # Mailing list name (Optional)
+        description => 'sample',     # description (Optional)
+        access_level => 'members',   # readonly(default), members, everyone
+    });
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 list($address)
+
+Get detail for mailing list.
+
+    # get mailing list detail
+    my $data = $mailgun->list('ml@exmaple.com');
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 update_list($address, $args)
+
+Update mailing list detail.
+
+    # update mailing list
+    my $res = $mailgun->update_list('ml@example.com' => {
+        address => 'ml@example.com', # Mailing list address (Optional)
+        name    => 'ml sample',      # Mailing list name (Optional)
+        description => 'sample',     # description (Optional)
+        access_level => 'members',   # readonly(default), members, everyone
+    });
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 delete_list($address)
+
+Delete mailing list.
+
+    # delete mailing list
+    my $res = $mailgun->delete_list('ml@example.com');
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 list_members($address)
+
+Get members for mailing list.
+
+    # get members
+    my $res = $mailgun->list_members('ml@example.com');
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 add_list_member($address, $args)
+
+Add member for mailing list.
+
+    # add member
+    my $res = $mailgun->add_list_member('ml@example.com' => {
+        address => 'user@example.com', # member address
+        name    => 'username',         # member name (Optional)
+        vars    => '{"age": 34}',      # member params(JSON string) (Optional)
+        subscribed => 'yes',           # yes(default) or no
+        upsert     => 'no',            # no (default). if yes, update exists member
+    });
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 add_list_members($address, $args)
+
+Adds multiple members for mailing list.
+
+    use JSON::XS; # auto export 'encode_json'
+
+    # add members
+    my $res = $mailgun->add_list_members('ml@example.com' => {
+        members => encode_json [
+            { address => 'user1@example.com' },
+            { address => 'user2@example.com' },
+            { address => 'user3@example.com' },
+        ],
+        upsert  => 'no',            # no (default). if yes, update exists member
+    });
+
+    # too simple
+    my $res = $mailgun->add_list_members('ml@example.com' => {
+        members => encode_json [qw/user1@example.com user2@example.com/],
+    });
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 list_member($address, $member_address)
+
+Get member detail.
+
+    # update member
+    my $res = $mailgun->list_member('ml@example.com', 'user@example.com');
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 update_list_member($address, $member_address, $args)
+
+Update member detail.
+
+    # update member
+    my $res = $mailgun->update_list_member('ml@example.com', 'user@example.com' => {
+        address => 'user@example.com', # member address (Optional)
+        name    => 'username',         # member name (Optional)
+        vars    => '{"age": 34}',      # member params(JSON string) (Optional)
+        subscribed => 'yes',           # yes(default) or no
+    });
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 delete_list_members($address, $member_address)
+
+Delete member for mailing list.
+
+    # delete member
+    my $res = $mailgun->delete_list_member('ml@example.com' => 'user@example.com');
+
+L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+
+=head2 event($option|$uri)
+
+Get event data.
+
+    # get event data
+    my ($events, $purl) = $mailgun->event({ event => 'stored' });
+
+L<Events|https://documentation.mailgun.com/api-events.html>
+
+=head2 get_message_from_event($event)
+
+Get stored message.
+
+    # get event data
+    my ($events, $purl) = $mailgun->event({ event => 'stored' });
+    my $msg = $mailgun->get_message_from_event($events->[0]);
+
+L<Stored Message|https://documentation.mailgun.com/api-sending.html#retrieving-stored-messages>
+
+=head1 Event Pooling
+
+event method return previous url. it can use for fetch event.
+
+    # event Pooling
+    my ($events, $purl) = $mailgun->event({ event => 'stored' });
+    // do something ...
+    $events = $mailgun->event($purl);
+    // ...
+
+L<Event Polling|https://documentation.mailgun.com/api-events.html#event-polling>    
+
+=head1 TODO
+
+this API not implement yet.
+
+=over
+
+=item * L<Domains|https://documentation.mailgun.com/api-domains.html>
+
+=item * L<Stats|https://documentation.mailgun.com/api-stats.html>
+
+=item * L<Tags|https://documentation.mailgun.com/api-tags.html>
+
+=item * L<Suppressions|https://documentation.mailgun.com/api-suppressions.html>
+
+=item * L<Routes|https://documentation.mailgun.com/api-routes.html>
+
+=item * L<Webhooks|https://documentation.mailgun.com/api-webhooks.html>
+
+=item * L<Email Validation|https://documentation.mailgun.com/api-email-validation.html>
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Mailgun>, L<https://documentation.mailgun.com/>
+
+=head1 LICENSE
+
+Copyright (C) Kan Fushihara.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Kan Fushihara E<lt>kan.fushihara@gmail.comE<gt>
+
+=cut
+

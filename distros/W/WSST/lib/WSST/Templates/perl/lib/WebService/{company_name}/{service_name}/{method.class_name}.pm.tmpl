@@ -1,0 +1,170 @@
+package [% package_name %]::[% method.class_name %];
+
+use strict;
+use base qw( [% package_name %]::Base );
+use vars qw( $VERSION );
+use Class::Accessor::Fast;
+use Class::Accessor::Children::Fast;
+
+$VERSION = '[% version %]';
+
+sub http_method { '[% method.request_method or "GET" %]'; }
+
+sub url { '[% method.url %]'; }
+
+sub query_class { '[% package_name %]::[% method.class_name %]::Query'; }
+
+sub query_fields { [
+    [% make_query_fields(method) %]
+]; }
+
+sub default_param { {
+    [% make_default_param(method) %]
+}; }
+
+sub notnull_param { [
+    [% make_notnull_param(method) %]
+]; }
+
+sub elem_class { '[% package_name %]::[% method.class_name %]::Element'; }
+
+sub root_elem_list { [
+    [% "'${method.return.name}'," %]
+    [% "'${method.error.name}'," IF method.error and method.error.name != method.return.name %]
+]; }
+
+sub elem_fields { {
+    [% make_elem_fields(method) %]
+}; }
+
+sub force_array { [
+    [% make_force_array(method) %]
+]; }
+
+[% IF method.error -%]
+sub is_error {
+    my $self = shift;
+    my $root = eval { $self->root; };
+[% IF method.error_status -%]
+    if (!$root && $self->code =~ /^([% join("|", method.error_status) %])$/) {
+        $root = eval {
+            my $tree = $self->treepp->parse($self->xml) || return;
+            my $key = ( keys %$tree )[0] || return;
+            $tree->{$key};
+        };
+    }
+[% END -%]
+    return 1 unless $root;
+[% FOREACH node = method.error.to_array -%]
+[% NEXT IF node.depth < 2 -%]
+    return 0 unless $root[% node_access(node.parent) %]->can('[% node.name %]');
+[% IF node.values -%]
+    return 0 unless $root[% node_access(node) %] =~ /^([% join("|", node.values) %])$/;
+[% ELSE -%]
+    return 0 unless defined $root[% node_access(node) %];
+[% END -%]
+[% END -%]
+    return 1;
+}
+
+[% END -%]
+# __PACKAGE__->mk_query_accessors();
+
+@[% package_name %]::[% method.class_name %]::Query::ISA = qw( Class::Accessor::Fast );
+[% package_name %]::[% method.class_name %]::Query->mk_accessors( @{query_fields()} );
+
+# __PACKAGE__->mk_elem_accessors();
+
+@[% package_name %]::[% method.class_name %]::Element::ISA = qw( Class::Accessor::Children::Fast );
+[% package_name %]::[% method.class_name %]::Element->mk_ro_accessors( @{root_elem_list()} );
+[% package_name %]::[% method.class_name %]::Element->mk_child_ro_accessors( %{elem_fields()} );
+
+=head1 NAME
+
+[% package_name %]::[% method.class_name %] - [% title %] "[% method.name %]" API
+
+=head1 SYNOPSIS
+
+    use [% package_name %];
+    
+    my $service = [% package_name %]->new();
+    
+    my $param = {
+[% FOREACH key = sort_keys(method.first_good_test.params) -%]
+        '[% key %]' => [% method.first_good_test.params.$key | $env_param %],
+[% END -%]
+    };
+    my $res = $service->[% method.interface_name %]( %$param );
+    my $root = $res->root;
+[% FOREACH node = tree_to_array(method.return) -%]
+[% LAST IF loop.index > 6 -%]
+[% NEXT IF node.depth == 1 -%]
+    printf("[% node.name %]: %s\n", $root[% node_access(node) %]);
+[% END -%]
+    print "...\n";
+
+=head1 DESCRIPTION
+
+This module is an interface for the C<[% method.name %]> API.
+It accepts following query parameters to make an request.
+
+    my $param = {
+[% FOREACH param = method.params -%]
+[% NEXT IF param.fixed -%]
+[% val = param.examples.0 or 'XXXXXXXX' -%]
+        '[% param.name %]' => [% "'$val'" %],
+[% END -%]
+    };
+    my $res = $service->[% method.interface_name %]( %$param );
+
+C<$service> above is an instance of L<[% package_name %]>.
+
+=head1 METHODS
+
+=head2 root
+
+This returns the root element of the response.
+
+    my $root = $res->root;
+
+You can retrieve each element by the following accessors.
+
+[% FOREACH node = tree_to_array(method.return) -%]
+[% NEXT IF node.depth == 1 -%]
+    $root[% node_access(node) %];
+[% END -%]
+
+=head2 xml
+
+This returns the raw response context itself.
+
+    print $res->xml, "\n";
+
+=head2 code
+
+This returns the response status code.
+
+    my $code = $res->code; # usually "200" when succeeded
+
+=head2 is_error
+
+This returns true value when the response has an error.
+
+    die 'error!' if $res->is_error;
+
+=head1 SEE ALSO
+
+L<[% package_name %]>
+
+=head1 AUTHOR
+
+[% join(",\n", author) %]
+
+[% IF perl_copyright or copyright -%]
+=head1 COPYRIGHT
+
+[% perl_copyright or copyright %]
+
+[% END -%]
+=cut
+1;

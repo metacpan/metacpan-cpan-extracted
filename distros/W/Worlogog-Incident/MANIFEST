@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Worlogog/Incident.pm
+t/00-load.t
+t/condsys.t
+t/condsys2.t
+t/hyperspec.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

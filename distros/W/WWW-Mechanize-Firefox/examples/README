@@ -1,0 +1,25 @@
+The following is a description of the example files that are provided
+with WWW::Mechanize::Firefox. They are intended to demonstrate the
+different features and options of the module.
+
+
+Getting started
+===============
+open-local-file.pl              Open a local file in Firefox
+open-url.pl                     Open an URL in Firefox
+screenshot.pl                   Take a screenshot of a website
+dump-links.pl                   Dump links on a webpage
+bcat.pl                         Send console text to the browser
+
+Javascript
+==========
+manipulate-javascript.pl        Make changes to Javascript values in a webpage
+javascript.pl                   Execute Javascript in the webpage context
+js-console.pl                   Send messages to the Error Console
+tail-console.pl                 Display messages from the Error Console to STDOUT
+
+Advanced / Firefox application
+========
+urlbar.pl                       Listen to changes in the location bar
+fullscreen.pl                   Switch the browser to full screen
+proxy-settings.pl               Change the proxy settings and other settings in Firefox

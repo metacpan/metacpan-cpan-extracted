@@ -1,0 +1,736 @@
+
+[![Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Shell.svg?branch=master)](https://github.com/Corion/WWW-Mechanize-Shell)
+
+# NAME
+
+WWW::Mechanize::Shell - An interactive shell for WWW::Mechanize
+
+# SYNOPSIS
+
+From the command line as
+
+    perl -MWWW::Mechanize::Shell -eshell
+
+or alternatively as a custom shell program via :
+
+    #!/usr/bin/perl -w
+    use strict;
+    use WWW::Mechanize::Shell;
+
+    my $shell = WWW::Mechanize::Shell->new("shell");
+
+    if (@ARGV) {
+      $shell->source_file( @ARGV );
+    } else {
+      $shell->cmdloop;
+    };
+
+# DESCRIPTION
+
+This module implements a www-like shell above WWW::Mechanize
+and also has the capability to output crude Perl code that recreates
+the recorded session. Its main use is as an interactive starting point
+for automating a session through WWW::Mechanize.
+
+The cookie support is there, but no cookies are read from your existing
+browser sessions. See [HTTP::Cookies](https://metacpan.org/pod/HTTP::Cookies) on how to implement reading/writing
+your current browsers cookies.
+
+## `WWW::Mechanize::Shell->new %ARGS`
+
+This is the constructor for a new shell instance. Some of the options
+can be passed to the constructor as parameters.
+
+By default, a file `.mechanizerc` (respectively `mechanizerc` under Windows)
+in the users home directory is executed before the interactive shell loop is
+entered. This can be used to set some defaults. If you want to supply a different
+filename for the rcfile, the `rcfile` parameter can be passed to the constructor :
+
+    rcfile => '.myapprc',
+
+## `$shell->release_agent`
+
+Since the shell stores a reference back to itself within the
+WWW::Mechanize instance, it is necessary to break this
+circular reference. This method does this.
+
+## `$shell->source_file FILENAME`
+
+The `source_file` method executes the lines of FILENAME
+as if they were typed in.
+
+    $shell->source_file( $filename );
+
+## `$shell->display_user_warning`
+
+All user warnings are routed through this routine
+so they can be rerouted / disabled easily.
+
+## `$shell->print_paged LIST`
+
+Prints the text in LIST using `$ENV{PAGER}`. If `$ENV{PAGER}`
+is empty, prints directly to `STDOUT`. Most of this routine
+comes from the `perldoc` utility.
+
+## `$shell->link_text LINK`
+
+Returns a meaningful text from a WWW::Mechanize::Link object. This is (in order of
+precedence) :
+
+    $link->text
+    $link->name
+    $link->url
+
+## `$shell->history`
+
+Returns the (relevant) shell history, that is, all commands
+that were not solely for the information of the user. The
+lines are returned as a list.
+
+    print join "\n", $shell->history;
+
+## `$shell->script`
+
+Returns the shell history as a Perl program. The
+lines are returned as a list. The lines do not have
+a one-by-one correspondence to the lines in the history.
+
+    print join "\n", $shell->script;
+
+## `$shell->status`
+
+`status` is called for status updates.
+
+## `$shell->display FILENAME LINES`
+
+`display` is called to output listings, currently from the
+`history` and `script` commands. If the second parameter
+is defined, it is the name of the file to be written,
+otherwise the lines are displayed to the user.
+
+# COMMANDS
+
+The shell implements various commands :
+
+## exit
+
+Leaves the shell.
+
+## restart
+
+Restart the shell.
+
+This is mostly useful when you are modifying the shell itself. It dosen't
+work if you use the shell in oneliner mode with `-e`.
+
+## get
+
+Download a specific URL.
+
+This is used as the entry point in all sessions
+
+Syntax:
+
+    get URL
+
+## save
+
+Download a link into a file.
+
+If more than one link matches the RE, all matching links are
+saved. The filename is taken from the last part of the
+URL. Alternatively, the number of a link may also be given.
+
+Syntax:
+
+    save RE
+
+## content
+
+Display the content for the current page.
+
+Syntax: content \[FILENAME\]
+
+If the FILENAME argument is provided, save the content to the file.
+
+A trailing "\\n" is added to the end of the content when using the
+shell, so this might not be ideally suited to save binary files without
+manual editing of the produced script.
+
+## title
+
+Display the current page title as found
+in the `<TITLE>` tag.
+
+## headers
+
+Prints all `<H1>` through `<H5>` strings found in the content,
+indented accordingly.  With an argument, prints only those
+levels; e.g., `headers 145` prints H1,H4,H5 strings only. 
+
+## ua
+
+Get/set the current user agent
+
+Syntax:
+
+    # fake Internet Explorer
+    ua "Mozilla/4.0 (compatible; MSIE 4.01; Windows 98)"
+
+    # fake QuickTime v5
+    ua "QuickTime (qtver=5.0.2;os=Windows NT 5.0Service Pack 2)"
+
+    # fake Mozilla/Gecko based
+    ua "Mozilla/5.001 (windows; U; NT4.0; en-us) Gecko/25250101"
+
+    # set empty user agent :
+    ua ""
+
+## links
+
+Display all links on a page
+
+The links numbers displayed can used by `open` to directly
+select a link to follow.
+
+## parse
+
+Dump the output of HTML::TokeParser of the current content
+
+## forms
+
+Display all forms on the current page.
+
+## form
+
+Select the form named NAME
+
+If NAME matches `/^\d+$/`, it is assumed to be the (1-based) index
+of the form to select. There is no way of selecting a numerically
+named form by its name.
+
+## dump
+
+Dump the values of the current form
+
+## value
+
+Set a form value
+
+Syntax:
+
+    value NAME [VALUE]
+
+## tick
+
+Set checkbox marks
+
+Syntax:
+
+    tick NAME VALUE(s)
+
+If no value is given, all boxes are checked.
+
+## untick
+
+Remove checkbox marks
+
+Syntax:
+
+    untick NAME VALUE(s)
+
+If no value is given, all marks are removed.
+
+## submit
+
+submits the form without clicking on any button
+
+## click
+
+Clicks on the button named NAME.
+
+No regular expression expansion is done on NAME.
+
+Syntax:
+
+    click NAME
+
+If you have a button that has no name (displayed as NONAME),
+use
+
+    click ""
+
+to click on it.
+
+## open
+
+<open> accepts one argument, which can be a regular expression or the number
+of a link on the page, starting at zero. These numbers are displayed by the
+`links` function. It goes directly to the page if a number is used
+or if the RE has one match. Otherwise, a list of links matching
+the regular expression is displayed.
+
+The regular expression should start and end with "/".
+
+Syntax:
+
+    open  [ RE | # ]
+
+## back
+
+Go back one page in the browser page history.
+
+## reload
+
+Repeat the last request, thus reloading the current page.
+
+Note that also POST requests are blindly repeated, as this command
+is mostly intended to be used when testing server side code.
+
+## browse
+
+Open the web browser with the current page
+
+Displays the current page in the browser.
+
+## set
+
+Set a shell option
+
+Syntax:
+
+    set OPTION [value]
+
+The command lists all valid options. Here is a short overview over
+the different options available :
+
+    autosync      - automatically synchronize the browser window
+    autorestart   - restart the shell when any required module changes
+                    This does not work with C<-e> oneliners.
+    watchfiles    - watch all required modules for changes
+    cookiefile    - the file where to store all cookies
+    dumprequests  - dump all requests to STDOUT
+    dumpresponses - dump the headers of the responses to STDOUT
+    verbose       - print commands to STDERR as they are run,
+                    when sourcing from a file
+
+## history
+
+Display your current session history as the relevant commands.
+
+Syntax:
+
+    history [FILENAME]
+
+Commands that have no influence on the browser state are not added
+to the history. If a parameter is given to the `history` command,
+the history is saved to that file instead of displayed onscreen.
+
+## script
+
+Display your current session history as a Perl script using WWW::Mechanize.
+
+Syntax:
+
+    script [FILENAME]
+
+If a parameter is given to the `script` command, the script is saved to
+that file instead of displayed on the console.
+
+This command was formerly known as `history`.
+
+## comment
+
+Adds a comment to the script and the history. The comment
+is prepended with a \\n to increase readability.
+
+## fillout
+
+Fill out the current form
+
+Interactively asks the values hat have no preset
+value via the autofill command.
+
+## auth
+
+Set basic authentication credentials.
+
+Syntax:
+
+    auth user password
+
+If you know the authority and the realm in advance, you can
+presupply the credentials, for example at the start of the script :
+
+        >auth corion secret
+        >get http://www.example.com
+        Retrieving http://www.example.com(200)
+        http://www.example.com>
+
+## table
+
+Display a table described by the columns COLUMNS.
+
+Syntax:
+
+    table COLUMNS
+
+Example:
+
+    table Product Price Description
+
+If there is a table on the current page that has in its first row the three
+columns `Product`, `Price` and `Description` (not necessarily in that order),
+the script will display these columns of the whole table.
+
+The `HTML::TableExtract` module is needed for this feature.
+
+## tables
+
+Display a list of tables.
+
+Syntax:
+
+    tables
+
+This command will display the top row for every
+table on the current page. This is convenient if you want
+to find out what the exact spellings for each column are.
+
+The command does not always work nice, for example if a
+site uses tables for layout, it will be harder to guess
+what tables are irrelevant and what tables are relevant.
+
+[HTML::TableExtract](https://metacpan.org/pod/HTML::TableExtract) is needed for this feature.
+
+## cookies
+
+Set the cookie file name
+
+Syntax:
+
+    cookies FILENAME
+
+## autofill
+
+Define an automatic value
+
+Sets a form value to be filled automatically. The NAME parameter is
+the WWW::Mechanize::FormFiller::Value subclass you want to use. For
+session fields, `Keep` is a good candidate, for interactive stuff,
+`Ask` is a value implemented by the shell.
+
+A field name starting and ending with a slash (`/`) is taken to be
+a regular expression and will be applied to all fields with their
+name matching the expression. A field with a matching name still
+takes precedence over the regular expression.
+
+Syntax:
+
+    autofill NAME [PARAMETERS]
+
+Examples:
+
+    autofill login Fixed corion
+    autofill password Ask
+    autofill selection Random red green orange
+    autofill session Keep
+    autofill "/date$/" Random::Date string "%m/%d/%Y"
+
+## eval
+
+Evaluate Perl code and print the result
+
+Syntax:
+
+    eval CODE
+
+For the generated scripts, anything matching the regular expression
+`/\$self->agent\b/` is automatically
+replaced by `$agent` in your eval code, to do the Right Thing.
+
+Examples:
+
+    # Say hello
+    eval "Hello World"
+
+    # And take a look at the current content type
+    eval $self->agent->ct
+
+## source
+
+Execute a batch of commands from a file
+
+Syntax:
+
+    source FILENAME
+
+## versions
+
+Print the version numbers of important modules
+
+Syntax:
+
+    versions
+
+## timeout
+
+Set new timeout value for the agent. Effects all subsequent
+requests. VALUE is in seconds.
+
+Syntax:
+
+    timeout VALUE
+
+## ct
+
+prints the content type of the most current response.
+
+Syntax:
+
+    ct
+
+## referrer
+
+set the value of the Referer: header
+
+Syntax:
+
+    referer URL
+    referrer URL
+
+## referer
+
+Alias for referrer
+
+## response
+
+display the last server response
+
+## `$shell->munge_code( CODE )`
+
+Munges a coderef to become code fit for
+output independent of WWW::Mechanize::Shell.
+
+## `shell`
+
+This subroutine is exported by default as a convenience method
+so that the following oneliner invocation works:
+
+    perl -MWWW::Mechanize::Shell -eshell
+
+You can pass constructor arguments to this
+routine as well. Any scripts given in `@ARGV`
+will be run. If `@ARGV` is empty,
+an interactive loop will be started.
+
+# SAMPLE SESSIONS
+
+## Entering values
+
+    # Search for a term on Google
+    get http://www.google.com
+    value q "Corions Homepage"
+    click btnG
+    script
+    # (yes, this is a bad example of automating, as Google
+    #  already has a Perl API. But other sites don't)
+
+## Retrieving a table
+
+    get http://www.perlmonks.org
+    open "/Saints in/"
+    table User Experience Level
+    script
+    # now you have a program that gives you a csv file of
+    # that table.
+
+## Uploading a file
+
+    get http://aliens:xxxxx/
+    value f path/to/file
+    click "upload"
+
+## Batch download
+
+    # download prerelease versions of my modules
+    get http://www.corion.net/perl-dev
+    save /.tar.gz$/
+
+# REGULAR EXPRESSION SYNTAX
+
+Some commands take regular expressions as parameters. A regular
+expression **must** be a single parameter matching `^/.*/([isxm]+)?$`, so
+you have to use quotes around it if the expression contains spaces :
+
+    /link_foo/       # will match as (?-xims:link_foo)
+    "/link foo/"     # will match as (?-xims:link foo)
+
+Slashes do not need to be escaped, as the shell knows that a RE starts and
+ends with a slash :
+
+    /link/foo/       # will match as (?-xims:link/foo)
+    "/link/ /foo/"   # will match as (?-xims:link/\s/foo)
+
+The `/i` modifier works as expected.
+If you desire more power over the regular expressions, consider dropping
+to Perl or recommend me a good parser module for regular expressions.
+
+# DISPLAYING HTML
+
+WWW::Mechanize::Shell now uses the module HTML::Display
+to display the HTML of the current page in your browser.
+Have a look at the documentation of HTML::Display how to
+make it use your browser of choice in the case it does not
+already guess it correctly.
+
+# FILLING FORMS VIA CUSTOM CODE
+
+If you want to stay within the confines of the shell, but still
+want to fill out forms using custom Perl code, here is a recipe
+how to achieve this :
+
+Code passed to the `eval` command gets evalutated in the WWW::Mechanize::Shell
+namespace. You can inject new subroutines there and these get picked
+up by the Callback class of WWW::Mechanize::FormFiller :
+
+    # Fill in the "date" field with the current date/time as string
+    eval sub &::custom_today { scalar localtime };
+    autofill date Callback WWW::Mechanize::Shell::custom_today
+    fillout
+
+This method can also be used to retrieve data from shell scripts :
+
+    # Fill in the "date" field with the current date/time as string
+    # works only if there is a program "date"
+    eval sub &::custom_today { chomp `date` };
+    autofill date Callback WWW::Mechanize::Shell::custom_today
+    fillout
+
+As the namespace is different between the shell and the generated
+script, make sure you always fully qualify your subroutine names,
+either in your own namespace or in the main namespace.
+
+# GENERATED SCRIPTS
+
+The `script` command outputs a skeleton script that reproduces
+your actions as done in the current session. It pulls in
+`WWW::Mechanize::FormFiller`, which is possibly not needed. You
+should add some error and connection checking afterwards.
+
+# ADDING FIELDS TO HTML
+
+If you are automating a JavaScript dependent site, you will encounter
+JavaScript like this :
+
+    <script>
+      document.write( "<input type=submit name=submit>" );
+    </script>
+
+HTML::Form will not know about this and will not have provided a
+submit button for you (understandably). If you want to create such
+a submit button from within your automation script, use the following
+code :
+
+    $agent->current_form->push_input( submit => { name => "submit", value =>"submit" } );
+
+This also works for other dynamically generated input fields.
+
+To fake an input field from within a shell session, use the `eval` command :
+
+    eval $self->agent->current_form->push_input(submit=>{name=>"submit",value=>"submit"});
+
+And yes, the generated script should do the Right Thing for this eval as well.
+
+# LOCAL FILES
+
+If you want to use the shell on a local file without setting up a `http` server
+to serve the file, you can use the `file:` URI scheme to load it into the "browser":
+
+    get file:local.html
+    forms
+
+# PROXY SUPPORT
+
+Currently, the proxy support is realized via a call to
+the `env_proxy` method of the WWW::Mechanize object, which
+loads the proxies from the environment. There is no provision made
+to prevent using proxies (yet). The generated scripts also
+load their proxies from the environment.
+
+# ONLINE HELP
+
+The online help feature is currently a bit broken in `Term::Shell`,
+but a fix is in the works. Until then, you can re-enable the
+dynamic online help by patching `Term::Shell` :
+
+Remove the three lines
+
+      my $smry = exists $o->{handlers}{$h}{smry}
+    ? $o->summary($h)
+    : "undocumented";
+
+in `sub run_help` and replace them by
+
+      my $smry = $o->summary($h);
+
+The shell works without this patch and the online help is still
+available through `perldoc WWW::Mechanize::Shell`
+
+# BUGS
+
+Bug reports are very welcome - please use the RT interface at
+https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Shell or send a
+descriptive mail to bug-WWW-Mechanize-Shell@rt.cpan.org . Please
+try to include as much (relevant) information as possible - a test script
+that replicates the undesired behaviour is welcome every time!
+
+- The two parameter version of the `auth` command guesses the realm from
+the last received response. Currently a RE is used to extract the realm,
+but this fails with some servers resp. in some cases. Use the four
+parameter version of `auth`, or if not possible, code the extraction
+in Perl, either in the final script or through `eval` commands.
+- The shell currently detects when you want to follow a JavaScript link and tells you
+that this is not supported. It would be nicer if there was some callback mechanism
+to (automatically?) extract URLs from JavaScript-infected links.
+
+# TODO
+
+- Add XPath expressions (by moving `WWW::Mechanize` from HTML::Parser to XML::XMLlib
+or maybe easier, by tacking Class::XPath onto an HTML tree)
+- Add `head` as a command ?
+- Optionally silence the HTML::Parser / HTML::Forms warnings about invalid HTML.
+
+# EXPORT
+
+The routine `shell` is exported into the importing namespace. This
+is mainly for convenience so you can use the following commandline
+invocation of the shell like with CPAN :
+
+    perl -MWWW::Mechanize::Shell -e"shell"
+
+# REPOSITORY
+
+The public repository of this module is 
+[https://github.com/Corion/WWW-Mechanize-Shell](https://github.com/Corion/WWW-Mechanize-Shell).
+
+# SUPPORT
+
+The public support forum of this module is
+[http://perlmonks.org/](http://perlmonks.org/).
+
+# COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Copyright (C) 2002-2017 Max Maischein
+
+# AUTHOR
+
+Max Maischein, <corion@cpan.org>
+
+Please contact me if you find bugs or otherwise improve the module. More tests are also very welcome !
+
+# SEE ALSO
+
+[WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize),[WWW::Mechanize::FormFiller](https://metacpan.org/pod/WWW::Mechanize::FormFiller),[WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW::Mechanize::Firefox)

@@ -1,0 +1,122 @@
+NAME
+    WebService::Lucene - Module to interface with the Lucene indexing
+    webservice
+
+SYNOPSIS
+        # Connect to the web service
+        $ws = WebService::Lucene->new( $url );
+    
+        # Create an index
+        $ndex = $ws->create_index( $index );
+    
+        # Get a particular index
+        $index = $ws->get_index( $name );
+    
+        # Index a document
+        $document = $index->add_document( $document );
+    
+        # Get a document
+        $document = $index->get_document( $id );
+    
+        # Delete the document
+        $document->delete;
+    
+        # Search an index
+        $results = $index->search( $query );
+    
+        # Get documents from search
+        @documents = $results->documents;
+    
+        # Delete an index
+        $index->delete;
+
+DESCRIPTION
+    This module is a Perl API in to the Lucene indexing web service.
+    http://lucene-ws.net/
+
+METHODS
+  new( $url )
+    This method will connect to the Lucene Web Service located at $url.
+
+        my $ws = WebService::Lucene->new( 'http://localhost:8080/lucene/' );
+
+  base_url( [$url] )
+    Accessor for the base url of the service.
+
+  get_index( $name )
+    Retuens an WebService::Lucene::Index object for $name.
+
+  indexes( )
+    Alias for "indices"
+
+  indices( )
+    Returns an array of WebService::Lucene::Index objects.
+
+  properties( [$properties] )
+    Hash reference to a list of properties for the service.
+
+  _fetch_service_properties( )
+    Grabs the "service.properties" documents and sends the contents to
+    "_parse_service_properties".
+
+  _parse_service_properties( $xml )
+    Parses the XML and populates the object's "properties"
+
+  _fetch_service_document( )
+    Connects to the service url and passes the contents on to
+    "_parse_service_document".
+
+  _parse_service_document( $xml )
+    Parses the Atom Publishing Protocol introspection document and populates
+    the service's "indices".
+
+  title( [$title] )
+    Accessor for the title of the service.
+
+  _fetch_content( $url )
+    Shortcut for fetching the content at $url.
+
+  create_index( $name )
+    Creates the index on the server and returns the
+    WebService::Lucene::Index object.
+
+  delete_index( $name )
+    Deletes an index.
+
+  update( )
+    Updates the "service.properties" document.
+
+  _properties_as_entry( )
+    Genereates an XML::Atom::Entry suitable for updating the
+    "service.properties" document.
+
+  search( $indices, $query, [$params] )
+    Searches one or more indices for $query. Returns an
+    WebService::Lucene::Results object.
+
+        my $results = $ws->search( [ 'index1', 'index2' ], 'foo' );
+
+  facets( $indices, [$params] )
+    Gets facets for one or more indices. Returns an
+    WebService::Lucene::Results object.
+
+        my $results = $ws->facets( [ 'index1', 'index2' ] );
+
+SEE ALSO
+    *   XML::Atom::Client
+
+    *   WWW::OpenSearch
+
+    *   http://lucene-ws.net/
+
+AUTHORS
+    Brian Cassidy <bricas@cpan.org>
+
+    Adam Paynter <adapay@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2009 National Adult Literacy Database
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

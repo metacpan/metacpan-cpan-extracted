@@ -1,0 +1,19 @@
+#!perl
+use strict;
+use warnings;
+use encoding 'utf8';
+use YAML;
+use WWW::Dict::Zdic;
+
+my $arg = shift || die <<USAGE;
+Usage: $0 [Chinese character]
+USAGE
+
+my $dic = WWW::Dict::Zdic->new();
+my $def = $dic->define($arg);
+
+print "\n$arg\n" . "==" x length($arg) . "\n";
+for (@$def) {
+    print "$_->{category}\n--------\n";
+    print "$_->{definition}\n\n";
+}

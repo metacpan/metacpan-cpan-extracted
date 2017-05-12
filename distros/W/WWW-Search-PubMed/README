@@ -1,0 +1,36 @@
+NAME
+       WWW::Search::PubMed - Search the
+
+SYNOPSIS
+        use WWW::Search;
+        my $s = new WWW::Search ('PubMed');
+        $s->native_query( 'ACGT' );
+        while (my $r = $s->next_result) {
+          print $r->title . "\n";
+          print $r->description . "\n";
+        }
+
+DESCRIPTION
+       WWW::Search::PubMed proivides a WWW::Search backend for searching the
+       NCBI/PubMed abstracts database.
+
+VERSION
+       This document describes WWW::Search::PubMed version 1.003,
+       released 27 November 2006.
+
+REQUIRES
+       WWW::Search
+       XML::DOM
+
+SEE ALSO
+       <http://www.ncbi.nlm.nih.gov:80/entrez/query/static/overview.html>
+       <http://eutils.ncbi.nlm.nih.gov/entrez/query/static/esearch_help.html>
+       <http://eutils.ncbi.nlm.nih.gov/entrez/query/static/efetchlit_help.html>
+
+AUTHOR
+       Gregory Williams <gwilliams@cpan.org>
+
+COPYRIGHT
+       Copyright (c) 2003-2006 Gregory Todd Williams. All rights reserved.  This
+       program is free software; you can redistribute it and/or modify it under
+       the same terms as Perl itself.

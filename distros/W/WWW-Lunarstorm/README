@@ -1,0 +1,24 @@
+WWW/Lunarstorm version 0.02
+=====================================
+
+INSTALLATION
+  To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DESCRIPTION
+  This module provides functions for interacting with the Swedish commu-
+  nity Lunarstorm (www.lunarstorm.se).
+
+DEPENDENCIES
+  This module requires these other modules and libraries:
+
+  LWP::UserAgent, HTTP::Cookies, HTML::TableExtract, URI::Escape
+
+COPYRIGHT AND LICENCE
+  Copyright (c) 2004 Martin Stenberg All rights reserved. This program is
+  free software; you can redistribute it and/or modify it under the same
+  terms as Perl itself.

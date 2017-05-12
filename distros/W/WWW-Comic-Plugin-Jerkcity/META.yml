@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               WWW-Comic-Plugin-Jerkcity
+version:            0.8008135
+abstract:           WWW::Comic plugin to fetch Jerkcity
+author:
+    - Luke Poskitt <ltp@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:          0
+    WWW::Comic::Plugin:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

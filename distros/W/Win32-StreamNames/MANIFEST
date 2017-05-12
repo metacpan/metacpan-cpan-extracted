@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+StreamNames.xs
+t/Win32-StreamNames.t
+lib/Win32/StreamNames.pm

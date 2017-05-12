@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Win32-Girder-IEvent
+version:      0.04
+version_from: 
+installdirs:  site
+requires:
+    Digest::MD5:                   2
+    IO::Socket::INET:              1.25
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

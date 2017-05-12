@@ -1,0 +1,34 @@
+---
+abstract: 'Perl wrapper around the Mailchimp v1.3 API'
+author:
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+build_requires:
+  Test::Fatal: '0.010'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Mailchimp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '0'
+  LWP: '0'
+  Moo: '1.000007'
+  MooX::Types::MooseLike: '0.16'
+  PHP::HTTPBuildQuery: '0'
+  Sub::Name: '0.05'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mailchimp
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/arcanez/www-mailchimp
+version: '0.010'

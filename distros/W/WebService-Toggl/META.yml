@@ -1,0 +1,110 @@
+---
+abstract: 'Wrapper for the toggl.com task logging API'
+author:
+  - 'Fitz Elliott <felliott@fiskur.org>'
+build_requires:
+  IO::All: '0'
+  JSON::MaybeXS: '0'
+  Module::Pluggable: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Toggl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Toggl:
+    file: lib/WebService/Toggl.pm
+    version: '0.11'
+  WebService::Toggl::API::Client:
+    file: lib/WebService/Toggl/API/Client.pm
+  WebService::Toggl::API::Clients:
+    file: lib/WebService/Toggl/API/Clients.pm
+  WebService::Toggl::API::Me:
+    file: lib/WebService/Toggl/API/Me.pm
+  WebService::Toggl::API::Project:
+    file: lib/WebService/Toggl/API/Project.pm
+  WebService::Toggl::API::ProjectUser:
+    file: lib/WebService/Toggl/API/ProjectUser.pm
+  WebService::Toggl::API::ProjectUsers:
+    file: lib/WebService/Toggl/API/ProjectUsers.pm
+  WebService::Toggl::API::Projects:
+    file: lib/WebService/Toggl/API/Projects.pm
+  WebService::Toggl::API::Tag:
+    file: lib/WebService/Toggl/API/Tag.pm
+  WebService::Toggl::API::Tags:
+    file: lib/WebService/Toggl/API/Tags.pm
+  WebService::Toggl::API::Task:
+    file: lib/WebService/Toggl/API/Task.pm
+  WebService::Toggl::API::Tasks:
+    file: lib/WebService/Toggl/API/Tasks.pm
+  WebService::Toggl::API::TimeEntries:
+    file: lib/WebService/Toggl/API/TimeEntries.pm
+  WebService::Toggl::API::TimeEntry:
+    file: lib/WebService/Toggl/API/TimeEntry.pm
+  WebService::Toggl::API::User:
+    file: lib/WebService/Toggl/API/User.pm
+  WebService::Toggl::API::Users:
+    file: lib/WebService/Toggl/API/Users.pm
+  WebService::Toggl::API::Workspace:
+    file: lib/WebService/Toggl/API/Workspace.pm
+  WebService::Toggl::API::WorkspaceUser:
+    file: lib/WebService/Toggl/API/WorkspaceUser.pm
+  WebService::Toggl::API::WorkspaceUsers:
+    file: lib/WebService/Toggl/API/WorkspaceUsers.pm
+  WebService::Toggl::API::Workspaces:
+    file: lib/WebService/Toggl/API/Workspaces.pm
+  WebService::Toggl::Report::Details:
+    file: lib/WebService/Toggl/Report/Details.pm
+  WebService::Toggl::Report::Summary:
+    file: lib/WebService/Toggl/Report/Summary.pm
+  WebService::Toggl::Report::Weekly:
+    file: lib/WebService/Toggl/Report/Weekly.pm
+  WebService::Toggl::Request:
+    file: lib/WebService/Toggl/Request.pm
+  WebService::Toggl::Role::API:
+    file: lib/WebService/Toggl/Role/API.pm
+  WebService::Toggl::Role::Base:
+    file: lib/WebService/Toggl/Role/Base.pm
+  WebService::Toggl::Role::Item:
+    file: lib/WebService/Toggl/Role/Item.pm
+  WebService::Toggl::Role::Report:
+    file: lib/WebService/Toggl/Role/Report.pm
+  WebService::Toggl::Role::Set:
+    file: lib/WebService/Toggl/Role/Set.pm
+requires:
+  DateTime: '0'
+  HTTP::Tiny: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Package::Variant: '0'
+  Role::REST::Client: '0'
+  Storable: '0'
+  Sub::Quote: '0'
+  Types::Standard: '0'
+  URI::Escape: '0'
+  namespace::clean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/felliott/WebService-Toggl/issues
+  homepage: https://github.com/felliott/WebService-Toggl
+  repository: git://github.com/felliott/WebService-Toggl.git
+version: '0.11'
+x_contributors:
+  - 'Matt Gill <code@mattgill.net>'

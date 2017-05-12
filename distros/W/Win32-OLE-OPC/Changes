@@ -1,0 +1,14 @@
+Revision history for Perl extension Win32::OLE::OPC.
+
+0.92 Tue Apr 30 10:07:56  2002
+        - Added abilty to connect to remote OPC servers using DCOM.
+
+0.91 Thu Jan 11 10:10:20  2001
+        - Release made for CPAN.
+
+0.8  Wed Feb  9 10:27:32  2000
+        - First release using MakeMaker for install.
+
+0.7  Wed Feb  9 09:26:01 2000
+        - original version; created by h2xs 1.19
+

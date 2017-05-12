@@ -1,0 +1,227 @@
+<?xml version="1.0" ?>
+<asnDocuments>
+   <Document xml:id="355392">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D1000121</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D1000121</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/behavioralStudies">Behavioral Studies</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D1000121_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D1000121_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D1000121_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D1000121_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D1000121</DocumentHtml>
+   </Document>
+   <Document xml:id="355428">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10001D1</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10001D1</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/civics">Civics</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10001D1_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10001D1_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10001D1_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10001D1_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10001D1</DocumentHtml>
+   </Document>
+   <Document xml:id="355472">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D100008A</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D100008A</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/economics">Economics</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D100008A_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D100008A_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D100008A_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D100008A_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D100008A</DocumentHtml>
+   </Document>
+   <Document xml:id="355515">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D100008C</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D100008C</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Language Arts Content Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/english">English</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1998</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D100008C_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D100008C_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D100008C_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D100008C_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D100008C</DocumentHtml>
+   </Document>
+   <Document xml:id="355596">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D100006A</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D100006A</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Language Arts Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/english">English</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>2003</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D100006A_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D100006A_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D100006A_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D100006A_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D100006A</DocumentHtml>
+   </Document>
+   <Document xml:id="356349">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10000E4</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10000E4</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/geography">Geography</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10000E4_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10000E4_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10000E4_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10000E4_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10000E4</DocumentHtml>
+   </Document>
+   <Document xml:id="356391">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10001BD</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10001BD</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/historicalUnderstanding">Historical Understanding</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10001BD_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10001BD_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10001BD_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10001BD_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10001BD</DocumentHtml>
+   </Document>
+   <Document xml:id="356430">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10001DE</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10001DE</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/k-4HistoryAndStateHistory">K-4 History and State History</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10001DE_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10001DE_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10001DE_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10001DE_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10001DE</DocumentHtml>
+   </Document>
+   <Document xml:id="356466">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D100009D</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D100009D</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Mathematics Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/math">Math</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1998</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D100009D_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D100009D_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D100009D_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D100009D_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D100009D</DocumentHtml>
+   </Document>
+   <Document xml:id="356565">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D1000230</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D1000230</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Wyoming Mathematics Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/math">Math</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>2003</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D1000230_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D1000230_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D1000230_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D1000230_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D1000230</DocumentHtml>
+   </Document>
+   <Document xml:id="357177">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10000EB</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10000EB</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Science Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/science">Science</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10000EB_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10000EB_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10000EB_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10000EB_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10000EB</DocumentHtml>
+   </Document>
+   <Document xml:id="357342">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10000F0</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10000F0</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Science Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/science">Science</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>2003</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10000F0_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10000F0_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10000F0_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10000F0_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10000F0</DocumentHtml>
+   </Document>
+   <Document xml:id="357501">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10002AD</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10002AD</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Wyoming Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/socialStudies">Social Studies</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>2003</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10002AD_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10002AD_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10002AD_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10002AD_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10002AD</DocumentHtml>
+   </Document>
+   <Document xml:id="357608">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10002D4</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10002D4</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Wyoming Fine and Performing Arts Content Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/theArts">The Arts</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>2003</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10002D4_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10002D4_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10002D4_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10002D4_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10002D4</DocumentHtml>
+   </Document>
+   <Document xml:id="357683">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D1000122</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D1000122</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/usHistory">U.S. History</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D1000122_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D1000122_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D1000122_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D1000122_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D1000122</DocumentHtml>
+   </Document>
+   <Document xml:id="357713">
+     <DocumentID type="asnUri">http://asn.jesandco.org/resources/D10000F7</DocumentID>
+     <DocumentID type="asnPurl">http://purl.org/ASN/resources/D10000F7</DocumentID>
+     <DocumentTitle xml:lang="en"><![CDATA[Social Studies Content and Performance Standards]]></DocumentTitle>
+     <DocumentSubject href="http://purl.org/ASN/scheme/ASNTopic/worldHistory">World History</DocumentSubject>
+     <DocumentJurisdiction href="http://purl.org/ASN/scheme/ASNJurisdiction/WY">WY</DocumentJurisdiction>
+     <LocalAdoptionDate>1999</LocalAdoptionDate>
+     <PublicationStatus href="http://purl.org/ASN/scheme/ASNPublicationStatus/Deprecated">Deprecated</PublicationStatus>
+     <DocumentRdf type="xml">http://asn.jesandco.org/resources/D10000F7_full.xml</DocumentRdf>
+     <DocumentRdf type="json">http://asn.jesandco.org/resources/D10000F7_full.json</DocumentRdf>
+     <DocumentRdf type="turtle">http://asn.jesandco.org/resources/D10000F7_full.ttl</DocumentRdf>
+     <DocumentRdf type="notation3">http://asn.jesandco.org/resources/D10000F7_full.n3</DocumentRdf>
+     <DocumentHtml>http://asn.jesandco.org/resources/D10000F7</DocumentHtml>
+   </Document>
+</asnDocuments>

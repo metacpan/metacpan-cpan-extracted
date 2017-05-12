@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>The Game of Go</title>
+<script src="js/gospectate1_1.js"></script>
+<script>
+var xmlHttp;
+var game_id = '';
+var move_number = '54';
+var latest_move = '54';
+
+var image_path = 'img';
+var board_size = '9';
+var clear_delay = '5000';
+
+function goMove( number, color, action, b, w, bx, wx) { 
+  
+    this.number = number; 
+    this.color = color; 
+    this.action = action; 
+    this.black = b;
+    this.white = w;
+    this.blackcap = bx;
+    this.whitecap = wx;
+} 
+var moves = Array();
+
+moves[0] = new goMove(0,'W','START','6_2,2_6','','','');
+moves[1] = new goMove(1,'B','HANDICAP','6_2,2_6','','','');
+moves[2] = new goMove(2,'W','4_4','2_6,6_2','4_4','','');
+moves[3] = new goMove(3,'B','2_2','2_2,2_6,6_2','4_4','','');
+moves[4] = new goMove(4,'W','2_4','2_2,2_6,6_2','2_4,4_4','','');
+moves[5] = new goMove(5,'B','4_2','2_2,2_6,4_2,6_2','2_4,4_4','','');
+moves[6] = new goMove(6,'W','3_6','2_2,2_6,4_2,6_2','2_4,3_6,4_4','','');
+moves[7] = new goMove(7,'B','1_6','1_6,2_2,2_6,4_2,6_2','2_4,3_6,4_4','','');
+moves[8] = new goMove(8,'W','2_7','1_6,2_2,2_6,4_2,6_2','2_4,2_7,3_6,4_4','','');
+moves[9] = new goMove(9,'B','1_4','1_4,1_6,2_2,2_6,4_2,6_2','2_4,2_7,3_6,4_4','','');
+moves[10] = new goMove(10,'W','1_3','1_4,1_6,2_2,2_6,4_2,6_2','1_3,2_4,2_7,3_6,4_4','','');
+moves[11] = new goMove(11,'B','2_5','1_4,1_6,2_2,2_5,2_6,4_2,6_2','1_3,2_4,2_7,3_6,4_4','','');
+moves[12] = new goMove(12,'W','3_5','1_4,1_6,2_2,2_5,2_6,4_2,6_2','1_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[13] = new goMove(13,'B','1_5','1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','1_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[14] = new goMove(14,'W','2_3','1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','1_3,2_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[15] = new goMove(15,'B','1_2','1_2,1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','1_3,2_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[16] = new goMove(16,'W','0_3','1_2,1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','0_3,1_3,2_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[17] = new goMove(17,'B','0_4','0_4,1_2,1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','0_3,1_3,2_3,2_4,2_7,3_5,3_6,4_4','','');
+moves[18] = new goMove(18,'W','4_3','0_4,1_2,1_4,1_5,1_6,2_2,2_5,2_6,4_2,6_2','0_3,1_3,2_3,2_4,2_7,3_5,3_6,4_3,4_4','','');
+moves[19] = new goMove(19,'B','1_7','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,6_2','0_3,1_3,2_3,2_4,2_7,3_5,3_6,4_3,4_4','','');
+moves[20] = new goMove(20,'W','1_8','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,6_2','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,4_3,4_4','','');
+moves[21] = new goMove(21,'B','2_8','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,2_8,4_2,6_2','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,4_3,4_4','','');
+moves[22] = new goMove(22,'W','3_8','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,6_2','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4','2_8','');
+moves[23] = new goMove(23,'B','6_3','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,6_2,6_3','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4','','');
+moves[24] = new goMove(24,'W','6_4','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,6_2,6_3','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,6_4','','');
+moves[25] = new goMove(25,'B','5_3','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,6_4','','');
+moves[26] = new goMove(26,'W','5_4','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4','','');
+moves[27] = new goMove(27,'B','7_4','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,7_4','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4','','');
+moves[28] = new goMove(28,'W','7_5','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,7_4','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,7_5','','');
+moves[29] = new goMove(29,'B','7_7','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,7_5','','');
+moves[30] = new goMove(30,'W','6_6','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,6_6,7_5','','');
+moves[31] = new goMove(31,'B','6_7','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,6_6,7_5','','');
+moves[32] = new goMove(32,'W','7_6','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,6_6,7_5,7_6','','');
+moves[33] = new goMove(33,'B','5_7','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,5_7,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,5_4,6_4,6_6,7_5,7_6','','');
+moves[34] = new goMove(34,'W','4_7','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,5_7,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[35] = new goMove(35,'B','5_8','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[36] = new goMove(36,'W','3_2','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[37] = new goMove(37,'B','3_1','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[38] = new goMove(38,'W','3_3','0_4,1_2,1_4,1_5,1_6,1_7,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[39] = new goMove(39,'B','2_1','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_5,7_6','','');
+moves[40] = new goMove(40,'W','7_3','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_3,7_5,7_6','','');
+moves[41] = new goMove(41,'B','8_3','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_3,7_5,7_6','','');
+moves[42] = new goMove(42,'W','7_2','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_4,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_5,7_6','','');
+moves[43] = new goMove(43,'B','7_1','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_1,7_4,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_5,7_6','','');
+moves[44] = new goMove(44,'W','8_4','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_5,7_6,8_4','7_4','');
+moves[45] = new goMove(45,'B','6_1','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_5,7_6,8_4','','');
+moves[46] = new goMove(46,'W','7_4','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_4','','');
+moves[47] = new goMove(47,'B','4_1','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_4','','');
+moves[48] = new goMove(48,'W','4_6','0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_4','','');
+moves[49] = new goMove(49,'B','0_2','0_2,0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_3','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_4','','');
+moves[50] = new goMove(50,'W','8_2','0_2,0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_2,8_4','8_3','');
+moves[51] = new goMove(51,'B','8_1','0_2,0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_1','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_2,8_4','','');
+moves[52] = new goMove(52,'W','PASS','0_2,0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_1','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_2,8_4','','');
+moves[53] = new goMove(53,'B','NEGOTIATE','0_2,0_4,1_2,1_4,1_5,1_6,1_7,2_1,2_2,2_5,2_6,3_1,4_1,4_2,5_3,5_7,5_8,6_1,6_2,6_3,6_7,7_1,7_7,8_1','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_2,8_4','','');
+moves[54] = new goMove(54,'W','NEGOTIATE','0_2,1_2,2_1,2_2,3_1,4_1,4_2,5_3,6_1,6_2,6_3,7_1,8_1','0_3,1_3,1_8,2_3,2_4,2_7,3_2,3_3,3_5,3_6,3_8,4_3,4_4,4_6,4_7,5_4,6_4,6_6,7_2,7_3,7_4,7_5,7_6,8_2,8_4','','');
+
+</script>
+<link href="go.css" rel="stylesheet" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body onLoad="initialize()" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table border="0" cellpadding="0" cellspacing="0" bgcolor="#000000" class="gamespace"><tr>
+<td bgcolor="#f7f7f7" width="3"></td>
+<td bgcolor="#f7f7f7">
+<table cellpadding="0" cellspacing="0" width="320">
+<tr>
+<td class="gamestatus" nowrap><img src='img/white.png' width='25' height='25' align='absmiddle' id='gamestatus_icon'> <span id='gamestatus' class='gamestatus'>Winner is white</span></td>
+<td align="right" class="move" nowrap>Move # <span id ="movenumber"></span></td>
+</tr>
+<tr><td colspan="2"><div class="messagespace" id="messagespace">Spectating Game...</div></td></tr>
+<tr><td colspan="2" align="center"><div id="goboard" class="boardspace"><div id="goboard"><table background="img/bg_wood.jpg" border="0" cellpadding="4"><tr><td><table width="100" height="100" border="0" cellpadding="0" cellspacing="0"><tr><td></td><td class='boardx' align='center'>1</td><td class='boardx' align='center'>2</td><td class='boardx' align='center'>3</td><td class='boardx' align='center'>4</td><td class='boardx' align='center'>5</td><td class='boardx' align='center'>6</td><td class='boardx' align='center'>7</td><td class='boardx' align='center'>8</td><td class='boardx' align='center'>9</td><td></td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>1</td>	<td background='img/grid_es.gif' width='25' height='25'><img src='img/empty.gif' id='0_0' width='25' height='25' onClick="intersectionClick('0_0')" ondblclick="intersectionDblClick('0_0')"  onMouseOver="intersectionMouseOver('0_0')" onMouseOut="intersectionMouseOut('0_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='1_0' width='25' height='25' onClick="intersectionClick('1_0')" ondblclick="intersectionDblClick('1_0')"  onMouseOver="intersectionMouseOver('1_0')" onMouseOut="intersectionMouseOut('1_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='2_0' width='25' height='25' onClick="intersectionClick('2_0')" ondblclick="intersectionDblClick('2_0')"  onMouseOver="intersectionMouseOver('2_0')" onMouseOut="intersectionMouseOut('2_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='3_0' width='25' height='25' onClick="intersectionClick('3_0')" ondblclick="intersectionDblClick('3_0')"  onMouseOver="intersectionMouseOver('3_0')" onMouseOut="intersectionMouseOut('3_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='4_0' width='25' height='25' onClick="intersectionClick('4_0')" ondblclick="intersectionDblClick('4_0')"  onMouseOver="intersectionMouseOver('4_0')" onMouseOut="intersectionMouseOut('4_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='5_0' width='25' height='25' onClick="intersectionClick('5_0')" ondblclick="intersectionDblClick('5_0')"  onMouseOver="intersectionMouseOver('5_0')" onMouseOut="intersectionMouseOut('5_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='6_0' width='25' height='25' onClick="intersectionClick('6_0')" ondblclick="intersectionDblClick('6_0')"  onMouseOver="intersectionMouseOver('6_0')" onMouseOut="intersectionMouseOut('6_0')"></td>
+	<td background='img/grid_esw.gif' width='25' height='25'><img src='img/empty.gif' id='7_0' width='25' height='25' onClick="intersectionClick('7_0')" ondblclick="intersectionDblClick('7_0')"  onMouseOver="intersectionMouseOver('7_0')" onMouseOut="intersectionMouseOut('7_0')"></td>
+	<td background='img/grid_sw.gif' width='25' height='25'><img src='img/empty.gif' id='8_0' width='25' height='25' onClick="intersectionClick('8_0')" ondblclick="intersectionDblClick('8_0')"  onMouseOver="intersectionMouseOver('8_0')" onMouseOut="intersectionMouseOut('8_0')"></td>
+<td class='boardy' align='left' width='18' height='25'>1</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>2</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_1' width='25' height='25' onClick="intersectionClick('0_1')" ondblclick="intersectionDblClick('0_1')"  onMouseOver="intersectionMouseOver('0_1')" onMouseOut="intersectionMouseOut('0_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_1' width='25' height='25' onClick="intersectionClick('1_1')" ondblclick="intersectionDblClick('1_1')"  onMouseOver="intersectionMouseOver('1_1')" onMouseOut="intersectionMouseOut('1_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='2_1' width='25' height='25' onClick="intersectionClick('2_1')" ondblclick="intersectionDblClick('2_1')"  onMouseOver="intersectionMouseOver('2_1')" onMouseOut="intersectionMouseOut('2_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_1' width='25' height='25' onClick="intersectionClick('3_1')" ondblclick="intersectionDblClick('3_1')"  onMouseOver="intersectionMouseOver('3_1')" onMouseOut="intersectionMouseOut('3_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_1' width='25' height='25' onClick="intersectionClick('4_1')" ondblclick="intersectionDblClick('4_1')"  onMouseOver="intersectionMouseOver('4_1')" onMouseOut="intersectionMouseOut('4_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_1' width='25' height='25' onClick="intersectionClick('5_1')" ondblclick="intersectionDblClick('5_1')"  onMouseOver="intersectionMouseOver('5_1')" onMouseOut="intersectionMouseOut('5_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='6_1' width='25' height='25' onClick="intersectionClick('6_1')" ondblclick="intersectionDblClick('6_1')"  onMouseOver="intersectionMouseOver('6_1')" onMouseOut="intersectionMouseOut('6_1')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_1' width='25' height='25' onClick="intersectionClick('7_1')" ondblclick="intersectionDblClick('7_1')"  onMouseOver="intersectionMouseOver('7_1')" onMouseOut="intersectionMouseOut('7_1')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_1' width='25' height='25' onClick="intersectionClick('8_1')" ondblclick="intersectionDblClick('8_1')"  onMouseOver="intersectionMouseOver('8_1')" onMouseOut="intersectionMouseOut('8_1')"></td>
+<td class='boardy' align='left' width='18' height='25'>2</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>3</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_2' width='25' height='25' onClick="intersectionClick('0_2')" ondblclick="intersectionDblClick('0_2')"  onMouseOver="intersectionMouseOver('0_2')" onMouseOut="intersectionMouseOut('0_2')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_2' width='25' height='25' onClick="intersectionClick('1_2')" ondblclick="intersectionDblClick('1_2')"  onMouseOver="intersectionMouseOver('1_2')" onMouseOut="intersectionMouseOut('1_2')"></td>
+	<td background='img/grid_star.gif' width='25' height='25'><img src='img/empty.gif' id='2_2' width='25' height='25' onClick="intersectionClick('2_2')" ondblclick="intersectionDblClick('2_2')"  onMouseOver="intersectionMouseOver('2_2')" onMouseOut="intersectionMouseOut('2_2')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_2' width='25' height='25' onClick="intersectionClick('3_2')" ondblclick="intersectionDblClick('3_2')"  onMouseOver="intersectionMouseOver('3_2')" onMouseOut="intersectionMouseOut('3_2')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_2' width='25' height='25' onClick="intersectionClick('4_2')" ondblclick="intersectionDblClick('4_2')"  onMouseOver="intersectionMouseOver('4_2')" onMouseOut="intersectionMouseOut('4_2')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_2' width='25' height='25' onClick="intersectionClick('5_2')" ondblclick="intersectionDblClick('5_2')"  onMouseOver="intersectionMouseOver('5_2')" onMouseOut="intersectionMouseOut('5_2')"></td>
+	<td background='img/grid_star.gif' width='25' height='25'><img src='img/empty.gif' id='6_2' width='25' height='25' onClick="intersectionClick('6_2')" ondblclick="intersectionDblClick('6_2')"  onMouseOver="intersectionMouseOver('6_2')" onMouseOut="intersectionMouseOut('6_2')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_2' width='25' height='25' onClick="intersectionClick('7_2')" ondblclick="intersectionDblClick('7_2')"  onMouseOver="intersectionMouseOver('7_2')" onMouseOut="intersectionMouseOut('7_2')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_2' width='25' height='25' onClick="intersectionClick('8_2')" ondblclick="intersectionDblClick('8_2')"  onMouseOver="intersectionMouseOver('8_2')" onMouseOut="intersectionMouseOut('8_2')"></td>
+<td class='boardy' align='left' width='18' height='25'>3</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>4</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_3' width='25' height='25' onClick="intersectionClick('0_3')" ondblclick="intersectionDblClick('0_3')"  onMouseOver="intersectionMouseOver('0_3')" onMouseOut="intersectionMouseOut('0_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_3' width='25' height='25' onClick="intersectionClick('1_3')" ondblclick="intersectionDblClick('1_3')"  onMouseOver="intersectionMouseOver('1_3')" onMouseOut="intersectionMouseOut('1_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='2_3' width='25' height='25' onClick="intersectionClick('2_3')" ondblclick="intersectionDblClick('2_3')"  onMouseOver="intersectionMouseOver('2_3')" onMouseOut="intersectionMouseOut('2_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_3' width='25' height='25' onClick="intersectionClick('3_3')" ondblclick="intersectionDblClick('3_3')"  onMouseOver="intersectionMouseOver('3_3')" onMouseOut="intersectionMouseOut('3_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_3' width='25' height='25' onClick="intersectionClick('4_3')" ondblclick="intersectionDblClick('4_3')"  onMouseOver="intersectionMouseOver('4_3')" onMouseOut="intersectionMouseOut('4_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_3' width='25' height='25' onClick="intersectionClick('5_3')" ondblclick="intersectionDblClick('5_3')"  onMouseOver="intersectionMouseOver('5_3')" onMouseOut="intersectionMouseOut('5_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='6_3' width='25' height='25' onClick="intersectionClick('6_3')" ondblclick="intersectionDblClick('6_3')"  onMouseOver="intersectionMouseOver('6_3')" onMouseOut="intersectionMouseOut('6_3')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_3' width='25' height='25' onClick="intersectionClick('7_3')" ondblclick="intersectionDblClick('7_3')"  onMouseOver="intersectionMouseOver('7_3')" onMouseOut="intersectionMouseOut('7_3')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_3' width='25' height='25' onClick="intersectionClick('8_3')" ondblclick="intersectionDblClick('8_3')"  onMouseOver="intersectionMouseOver('8_3')" onMouseOut="intersectionMouseOut('8_3')"></td>
+<td class='boardy' align='left' width='18' height='25'>4</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>5</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_4' width='25' height='25' onClick="intersectionClick('0_4')" ondblclick="intersectionDblClick('0_4')"  onMouseOver="intersectionMouseOver('0_4')" onMouseOut="intersectionMouseOut('0_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_4' width='25' height='25' onClick="intersectionClick('1_4')" ondblclick="intersectionDblClick('1_4')"  onMouseOver="intersectionMouseOver('1_4')" onMouseOut="intersectionMouseOut('1_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='2_4' width='25' height='25' onClick="intersectionClick('2_4')" ondblclick="intersectionDblClick('2_4')"  onMouseOver="intersectionMouseOver('2_4')" onMouseOut="intersectionMouseOut('2_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_4' width='25' height='25' onClick="intersectionClick('3_4')" ondblclick="intersectionDblClick('3_4')"  onMouseOver="intersectionMouseOver('3_4')" onMouseOut="intersectionMouseOut('3_4')"></td>
+	<td background='img/grid_star.gif' width='25' height='25'><img src='img/empty.gif' id='4_4' width='25' height='25' onClick="intersectionClick('4_4')" ondblclick="intersectionDblClick('4_4')"  onMouseOver="intersectionMouseOver('4_4')" onMouseOut="intersectionMouseOut('4_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_4' width='25' height='25' onClick="intersectionClick('5_4')" ondblclick="intersectionDblClick('5_4')"  onMouseOver="intersectionMouseOver('5_4')" onMouseOut="intersectionMouseOut('5_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='6_4' width='25' height='25' onClick="intersectionClick('6_4')" ondblclick="intersectionDblClick('6_4')"  onMouseOver="intersectionMouseOver('6_4')" onMouseOut="intersectionMouseOut('6_4')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_4' width='25' height='25' onClick="intersectionClick('7_4')" ondblclick="intersectionDblClick('7_4')"  onMouseOver="intersectionMouseOver('7_4')" onMouseOut="intersectionMouseOut('7_4')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_4' width='25' height='25' onClick="intersectionClick('8_4')" ondblclick="intersectionDblClick('8_4')"  onMouseOver="intersectionMouseOver('8_4')" onMouseOut="intersectionMouseOut('8_4')"></td>
+<td class='boardy' align='left' width='18' height='25'>5</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>6</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_5' width='25' height='25' onClick="intersectionClick('0_5')" ondblclick="intersectionDblClick('0_5')"  onMouseOver="intersectionMouseOver('0_5')" onMouseOut="intersectionMouseOut('0_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_5' width='25' height='25' onClick="intersectionClick('1_5')" ondblclick="intersectionDblClick('1_5')"  onMouseOver="intersectionMouseOver('1_5')" onMouseOut="intersectionMouseOut('1_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='2_5' width='25' height='25' onClick="intersectionClick('2_5')" ondblclick="intersectionDblClick('2_5')"  onMouseOver="intersectionMouseOver('2_5')" onMouseOut="intersectionMouseOut('2_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_5' width='25' height='25' onClick="intersectionClick('3_5')" ondblclick="intersectionDblClick('3_5')"  onMouseOver="intersectionMouseOver('3_5')" onMouseOut="intersectionMouseOut('3_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_5' width='25' height='25' onClick="intersectionClick('4_5')" ondblclick="intersectionDblClick('4_5')"  onMouseOver="intersectionMouseOver('4_5')" onMouseOut="intersectionMouseOut('4_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_5' width='25' height='25' onClick="intersectionClick('5_5')" ondblclick="intersectionDblClick('5_5')"  onMouseOver="intersectionMouseOver('5_5')" onMouseOut="intersectionMouseOut('5_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='6_5' width='25' height='25' onClick="intersectionClick('6_5')" ondblclick="intersectionDblClick('6_5')"  onMouseOver="intersectionMouseOver('6_5')" onMouseOut="intersectionMouseOut('6_5')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_5' width='25' height='25' onClick="intersectionClick('7_5')" ondblclick="intersectionDblClick('7_5')"  onMouseOver="intersectionMouseOver('7_5')" onMouseOut="intersectionMouseOut('7_5')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_5' width='25' height='25' onClick="intersectionClick('8_5')" ondblclick="intersectionDblClick('8_5')"  onMouseOver="intersectionMouseOver('8_5')" onMouseOut="intersectionMouseOut('8_5')"></td>
+<td class='boardy' align='left' width='18' height='25'>6</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>7</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_6' width='25' height='25' onClick="intersectionClick('0_6')" ondblclick="intersectionDblClick('0_6')"  onMouseOver="intersectionMouseOver('0_6')" onMouseOut="intersectionMouseOut('0_6')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_6' width='25' height='25' onClick="intersectionClick('1_6')" ondblclick="intersectionDblClick('1_6')"  onMouseOver="intersectionMouseOver('1_6')" onMouseOut="intersectionMouseOut('1_6')"></td>
+	<td background='img/grid_star.gif' width='25' height='25'><img src='img/empty.gif' id='2_6' width='25' height='25' onClick="intersectionClick('2_6')" ondblclick="intersectionDblClick('2_6')"  onMouseOver="intersectionMouseOver('2_6')" onMouseOut="intersectionMouseOut('2_6')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_6' width='25' height='25' onClick="intersectionClick('3_6')" ondblclick="intersectionDblClick('3_6')"  onMouseOver="intersectionMouseOver('3_6')" onMouseOut="intersectionMouseOut('3_6')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_6' width='25' height='25' onClick="intersectionClick('4_6')" ondblclick="intersectionDblClick('4_6')"  onMouseOver="intersectionMouseOver('4_6')" onMouseOut="intersectionMouseOut('4_6')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_6' width='25' height='25' onClick="intersectionClick('5_6')" ondblclick="intersectionDblClick('5_6')"  onMouseOver="intersectionMouseOver('5_6')" onMouseOut="intersectionMouseOut('5_6')"></td>
+	<td background='img/grid_star.gif' width='25' height='25'><img src='img/empty.gif' id='6_6' width='25' height='25' onClick="intersectionClick('6_6')" ondblclick="intersectionDblClick('6_6')"  onMouseOver="intersectionMouseOver('6_6')" onMouseOut="intersectionMouseOut('6_6')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_6' width='25' height='25' onClick="intersectionClick('7_6')" ondblclick="intersectionDblClick('7_6')"  onMouseOver="intersectionMouseOver('7_6')" onMouseOut="intersectionMouseOut('7_6')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_6' width='25' height='25' onClick="intersectionClick('8_6')" ondblclick="intersectionDblClick('8_6')"  onMouseOver="intersectionMouseOver('8_6')" onMouseOut="intersectionMouseOut('8_6')"></td>
+<td class='boardy' align='left' width='18' height='25'>7</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>8</td>	<td background='img/grid_nes.gif' width='25' height='25'><img src='img/empty.gif' id='0_7' width='25' height='25' onClick="intersectionClick('0_7')" ondblclick="intersectionDblClick('0_7')"  onMouseOver="intersectionMouseOver('0_7')" onMouseOut="intersectionMouseOut('0_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='1_7' width='25' height='25' onClick="intersectionClick('1_7')" ondblclick="intersectionDblClick('1_7')"  onMouseOver="intersectionMouseOver('1_7')" onMouseOut="intersectionMouseOut('1_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='2_7' width='25' height='25' onClick="intersectionClick('2_7')" ondblclick="intersectionDblClick('2_7')"  onMouseOver="intersectionMouseOver('2_7')" onMouseOut="intersectionMouseOut('2_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='3_7' width='25' height='25' onClick="intersectionClick('3_7')" ondblclick="intersectionDblClick('3_7')"  onMouseOver="intersectionMouseOver('3_7')" onMouseOut="intersectionMouseOut('3_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='4_7' width='25' height='25' onClick="intersectionClick('4_7')" ondblclick="intersectionDblClick('4_7')"  onMouseOver="intersectionMouseOver('4_7')" onMouseOut="intersectionMouseOut('4_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='5_7' width='25' height='25' onClick="intersectionClick('5_7')" ondblclick="intersectionDblClick('5_7')"  onMouseOver="intersectionMouseOver('5_7')" onMouseOut="intersectionMouseOut('5_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='6_7' width='25' height='25' onClick="intersectionClick('6_7')" ondblclick="intersectionDblClick('6_7')"  onMouseOver="intersectionMouseOver('6_7')" onMouseOut="intersectionMouseOut('6_7')"></td>
+	<td background='img/grid_nesw.gif' width='25' height='25'><img src='img/empty.gif' id='7_7' width='25' height='25' onClick="intersectionClick('7_7')" ondblclick="intersectionDblClick('7_7')"  onMouseOver="intersectionMouseOver('7_7')" onMouseOut="intersectionMouseOut('7_7')"></td>
+	<td background='img/grid_nsw.gif' width='25' height='25'><img src='img/empty.gif' id='8_7' width='25' height='25' onClick="intersectionClick('8_7')" ondblclick="intersectionDblClick('8_7')"  onMouseOver="intersectionMouseOver('8_7')" onMouseOut="intersectionMouseOut('8_7')"></td>
+<td class='boardy' align='left' width='18' height='25'>8</td></tr>
+<tr><td class='boardy' align='right' width='18' height='25'>9</td>	<td background='img/grid_ne.gif' width='25' height='25'><img src='img/empty.gif' id='0_8' width='25' height='25' onClick="intersectionClick('0_8')" ondblclick="intersectionDblClick('0_8')"  onMouseOver="intersectionMouseOver('0_8')" onMouseOut="intersectionMouseOut('0_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='1_8' width='25' height='25' onClick="intersectionClick('1_8')" ondblclick="intersectionDblClick('1_8')"  onMouseOver="intersectionMouseOver('1_8')" onMouseOut="intersectionMouseOut('1_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='2_8' width='25' height='25' onClick="intersectionClick('2_8')" ondblclick="intersectionDblClick('2_8')"  onMouseOver="intersectionMouseOver('2_8')" onMouseOut="intersectionMouseOut('2_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='3_8' width='25' height='25' onClick="intersectionClick('3_8')" ondblclick="intersectionDblClick('3_8')"  onMouseOver="intersectionMouseOver('3_8')" onMouseOut="intersectionMouseOut('3_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='4_8' width='25' height='25' onClick="intersectionClick('4_8')" ondblclick="intersectionDblClick('4_8')"  onMouseOver="intersectionMouseOver('4_8')" onMouseOut="intersectionMouseOut('4_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='5_8' width='25' height='25' onClick="intersectionClick('5_8')" ondblclick="intersectionDblClick('5_8')"  onMouseOver="intersectionMouseOver('5_8')" onMouseOut="intersectionMouseOut('5_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='6_8' width='25' height='25' onClick="intersectionClick('6_8')" ondblclick="intersectionDblClick('6_8')"  onMouseOver="intersectionMouseOver('6_8')" onMouseOut="intersectionMouseOut('6_8')"></td>
+	<td background='img/grid_new.gif' width='25' height='25'><img src='img/empty.gif' id='7_8' width='25' height='25' onClick="intersectionClick('7_8')" ondblclick="intersectionDblClick('7_8')"  onMouseOver="intersectionMouseOver('7_8')" onMouseOut="intersectionMouseOut('7_8')"></td>
+	<td background='img/grid_nw.gif' width='25' height='25'><img src='img/empty.gif' id='8_8' width='25' height='25' onClick="intersectionClick('8_8')" ondblclick="intersectionDblClick('8_8')"  onMouseOver="intersectionMouseOver('8_8')" onMouseOut="intersectionMouseOut('8_8')"></td>
+<td class='boardy' align='left' width='18' height='25'>9</td></tr>
+<tr><td></td><td class='boardx' align='center'>1</td><td class='boardx' align='center'>2</td><td class='boardx' align='center'>3</td><td class='boardx' align='center'>4</td><td class='boardx' align='center'>5</td><td class='boardx' align='center'>6</td><td class='boardx' align='center'>7</td><td class='boardx' align='center'>8</td><td class='boardx' align='center'>9</td><td></td></tr>
+</table></td></tr></table></div></div></td></tr>
+<tr><td align="center" nowrap colspan='2'><div class='buttons'><input type="submit" id="firstmove" name="FirstMove" value="First" onClick='viewFirst()'> &nbsp; <input type="submit" id="previous" name="Previous" value="Previous" onClick='viewPrevious()'> &nbsp; <input type="submit" id="next" name="Next" value="Next" onClick='viewNext()'> &nbsp; <input type="submit" id="lastmove" name="LastMove" value="Last" onClick='viewLast()'></div></td></tr>
+</table>
+</td>
+<td width="3"></td>
+<td width="300">
+<iframe src="adsense/ad_go_game_9x9.html" width="300" height="250" frameborder="0" scrolling="no"></iframe>
+</td></tr>
+</table>
+</body>
+</html>

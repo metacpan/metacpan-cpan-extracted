@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#
+#  This is free software, licensed under:
+#
+#    The GNU General Public License, Version 2, June 1991
+#
+#  Full license text is available at:
+#
+#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#
+
+#
+#  Dump the compiled version of WebDyne HTML scripts, as stored in the cache dir
+#
+package main;
+
+
+#  Compiler pragma
+#
+sub BEGIN {
+
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+    foreach my $dn ($RealBin, File::Spec->path()) {
+        if (-f (my $fn=File::Spec->catfile($dn, 'perl5lib.pl'))) {
+            require $fn;
+            perl5lib->import(File::Spec->catdir($dn, File::Spec->updir()));
+            last;
+        }
+    }
+}
+use strict qw(vars);
+use vars qw($VERSION);
+
+
+#  Use the base module
+#
+use WebDyne::Base;
+
+
+#  External modules
+#
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use Storable;
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='1.246';
+
+
+#  Run main
+#
+exit ${&main(\@ARGV) || die errdump()};
+
+
+#============================================================================
+
+
+sub main {
+
+
+    #  Get argv array ref
+    #
+    my $argv_ar=shift();
+
+
+    #  Get command line options
+    #
+    my %opt;
+    GetOptions(\%opt, 'help|?', 'man', 'version') ||
+        pod2usage(2);
+    pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1) if $opt{'help'};
+    pod2usage(-verbose => 2) if $opt{'man'};
+    $opt{'version'} && do {print "$Script version: $VERSION\n"; exit 0};
+
+    #  Get srce file
+    #
+    my $srce_pn=$argv_ar->[0] ||
+        pod2usage("$Script: no source file specified !");
+
+
+    #  Retrieve
+    #
+    my $data_ar=Storable::retrieve($srce_pn);
+
+
+    #  Dump
+    #
+    $Data::Dumper::Indent=1;
+    print Data::Dumper::Dumper($data_ar);
+
+
+    #  Done
+    #
+    return \undef;
+
+
+}
+
+__END__
+
+=head1 Name
+
+wddump - dump the data structure of a WebDyne page in the cache
+directory
+
+=head1 Synopsis
+
+B<wddump> B<[OPTIONS]> B<FILE>
+
+=head1 Options
+
+-h, --help
+Show brief help message.
+
+=head1 Description
+
+The B<wddump> command displays internal the data structure of a compiled
+WebDyne psp file from the WebDyne cache directory.  B<wddump> is of
+limited diagnostic use - the B<wdcompile> tool is more suitable for
+troubleshooting HTML tree errors.
+
+B<wddump> can be useful to see a picture of the final data structure looks
+like on complex pages built via many filters, combining static and
+dynamic blocks etc.
+
+=head1 Examples
+
+B<wdrender> B</var/webdyne/cache/26f2c4edc8bfd52fbde915290db96779>
+
+Display the data structure from a compiled, cached webdyne file.
+
+=head1 Author
+
+Written by Andrew Speer, andrew@webdyne.org
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+Full license text is available at:
+L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+

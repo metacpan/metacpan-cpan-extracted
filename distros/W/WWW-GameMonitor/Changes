@@ -1,0 +1,14 @@
+WWW::GameMonitor Changes
+
+  0.03 - Wed May 31 07:22:18 UTC 2006 - Dusty Wilson
+  Added getBuddyList function.
+  Updated documentation.
+  Updated constructor to use new variables for getBuddyList.
+
+  0.02 - Tue May 30 05:30:24 UTC 2006 - Dusty Wilson
+  Changed caching to use Hey::Cache.
+  Updated documentation.
+  Changed "Fresh" to "Expires".
+
+  0.01 - Sat May 27 23:00:43 UTC 2006 - Dusty Wilson
+  New module with basic functionality.

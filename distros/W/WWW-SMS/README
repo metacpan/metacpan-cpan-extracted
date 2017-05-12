@@ -1,0 +1,75 @@
+DESCRIPTION
+
+	WWW::SMS - A Perl framework for sending SMS messages
+
+
+PREREQUISITES
+
+	WWW::SMS depends on nothing (except Telephone::Number,
+	but that's included in this package).
+	
+	Anyway its submodules won't work without:
+	
+		- HTTP::Request::Common
+		- HTTP::Cookies
+		- LWP::UserAgent
+
+	SFR.pm (French gateway submodule) also requires:
+
+		- Date::Manip
+
+
+BUILDING/INSTALLING
+
+	Once the archive is unpacked, use these commands:
+	
+		% perl Makefile.PL
+		% make
+		% make install
+
+STATUS
+
+	This version (0.09) is the currently stable release.
+
+	You can find latest version at
+	http://sourceforge.net/projects/www-sms/ 
+	or on CPAN.
+
+	Please send any feedback to the current WWW-SMS
+	mantainer: Ivo Marino <eim@cpan.org> or to the
+	founder: Giulio Motta <giulienk@cpan.org>
+
+
+CHANGELOG
+
+	0.09
+		- New project mantainer Ivo Marino <eim@cpan.org>
+		- New submodules (Libero.pm and Omnitel.pm)
+
+	0.08
+		- Fixed a couple of silly bugs
+		- Added simple tests
+
+	0.07
+		- New submodules: Enel (by me), GsmboxDE and 
+		  LoopDE (by Juergen Weigert)
+		- No more silly __DATA__ in Telephone:Number.
+		- Now we "use strict" even in Telephone:Number.
+
+	0.06
+		- We begin to use strict
+		- Samples pop3tosms.pl and smstk.pl now are better
+		- This README is born
+		- Other bugfixes
+
+COPYRIGHT
+
+	Copyright 2001-2003
+	Giulio Motta <giulienk@cpan.org>
+	Ivo Marino <eim@cpan.org>
+
+	Submodules copyrighted by their authors.
+
+	This library is free software; you can redistribute it
+	and/or modify it under the same terms as Perl itself.
+

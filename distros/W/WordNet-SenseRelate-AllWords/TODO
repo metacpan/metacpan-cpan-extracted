@@ -1,0 +1,83 @@
+NAME
+    TODO - Todo list for WordNet::SenseRelate::AllWords
+
+SYNOPSIS
+    Plans for future versions of AllWords, including AllWords.pm, wsd.pl
+    driver, and web interface.
+
+DESCRIPTION
+  For version 0.20
+    1)  Add config file option to the web interface so that it would be able
+        to handle the files specified in the configuration file ( for
+        example, stoplist file path specified in the configuration file).
+        This is not provided now because the client-server model of the web
+        interface makes it hard to handle such paths on the server machine.
+
+    2)  Add logging for AllWords.pm. We log allwords_server.pl. However we
+        don't log AllWords.pm, which makes it difficult for debugging if
+        something goes wrong in the core algorithm.
+
+    3)  Store error code and error message in AllWords object which will be
+        useful in AllWords clients, that is allwords_server.pl and wsd.pl.
+        We can check for those errors and take appropriate actions in the
+        client code.
+
+    4)  Had a number of reported test failures in 0.08 due to WordNet
+        version issues. Need to add version checks to test cases to avoid
+        this. These tests should use WordNet::Tools, not the deprecated
+        version() method in QueryData.
+
+    5)  Expanding set of POS tags that can be used, either by modifying
+        AllWords.pm or allowing user to submit a config file of some kind
+        defining the tag set. At present limited to Penn TreeBank set of 47
+        tags.
+
+    6)  Return codes that identifies trace level (to enable color coding).
+
+    7)  Graceful shutdown and restart of web server. Allow for a stop or
+        restart command from the command line, rather than having to kill
+        the process.
+
+    8)  Make a design decision about whether web interface should
+        communicate directly with AllWords.pm via disambiguation method, or
+        should use wsd.pl command.
+
+    9)  Develop methods for testing web interface, or at least directly
+        testing disambiguate method as used by web interface. Should have
+        test cases that can be run to demonstrate problems as listed here,
+        and also make sure that once they are fixed they stay fixed.
+
+    10) Expand the testing in /t for AllWords.pm and wsd.pl. Right now it's
+        quite minimal, and has very limited coverage. We should have
+        multiple .t files, organized in some way to indicate what kind of
+        testing we are doing, maybe based on format and then options being
+        used, as in tagged.t for testing pos tagged data, wntagged.t for
+        wordnet tagged data, raw.t or plain.t for that format, and so there.
+        There is no reason that the testing be confined to one file per
+        module or program as it is now.
+
+AUTHORS
+     Varada Kolhatkar, University of Minnesota, Duluth
+     kolha002 at d.umn.edu
+
+     Ted Pedersen, University of Minnesota, Duluth
+     tpederse at d.umn.edu
+
+    This document last modified by : $Id: TODO.pod,v 1.15 2009/05/27
+    21:10:49 kvarada Exp $
+
+SEE ALSO
+    CHANGES, README, INSTALL
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008, Varada Kolhatkar, Ted Pedersen, Jason Michelizzi
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

@@ -1,0 +1,45 @@
+--- #YAML:1.0
+name:               WWW-Patent-Page
+version:            0.109.0
+abstract:           get patent documents
+author:
+    - Wanda B. Anon <Wanda.B.Anon@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Archive::Zip:         0
+    base:                 0
+    Carp:                 0
+    Data::Dumper:         0
+    diagnostics:          0
+    English:              0
+    File::Spec:           0
+    File::Temp:           0.17
+    HTML::Form:           0
+    HTML::HeadParser:     0
+    HTML::TokeParser:     0
+    HTTP::Headers:        0
+    HTTP::Request::Common:  0
+    HTTP::Response:       0
+    IO::Scalar:           0
+    LWP::UserAgent:       0
+    PDF::API2:            0.53
+    strict:               0
+    subs:                 0
+    Test::More:           0
+    URI:                  0
+    vars:                 0
+    version:              0
+    warnings:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,26 @@
+---
+name: WebService-Wedata
+version: v0.0.4
+author:
+  - 'Tsutomu KOYACHI <rtk2106@gmail.com>'
+abstract: Perl Interface for wedata.net
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  JSON::XS: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  version: 0
+provides:
+  WebService::Wedata:
+    file: lib/WebService/Wedata.pm
+    version: v0.0.4
+  WebService::Wedata::Database:
+    file: lib/WebService/Wedata/Database.pm
+  WebService::Wedata::Item:
+    file: lib/WebService/Wedata/Item.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

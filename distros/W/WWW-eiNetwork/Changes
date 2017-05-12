@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW::eiNetwork.
+
+0.02  Sun Jun 27 14:56:00 2010
+    - change API to support PIN number auth
+
+0.01  Fri Jan 11 21:26:21 2008
+	- original version

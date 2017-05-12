@@ -1,0 +1,33 @@
+WWW/MapBlast version 0.01
+=========================
+
+Simply accesses L<MapBlast.com|http://www.MapBlast.com> and
+retrieves latitude and longitude information.
+
+Only minimal error checking, so have a look through the source before you use.
+
+INSTALLATION
+
+The usual perl method:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP::UserAgent;
+	HTTP::Request;
+	HTML::TokeParser;
+	strict;
+	warnings;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) Lee Goddard, 2001.  All Rights Reserved.
+
+This module is supplied and may be used under the same terms as Perl itself.
+

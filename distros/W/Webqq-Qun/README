@@ -1,0 +1,44 @@
+Webqq::Qun v1.5
+========================
+腾讯提供了基于web的群管理方式，可以参见页面http://qun.qq.com/member.html
+
+可进行群成员添加、查询、筛选、设置管理员、取消管理员、设置群名片等常用功能
+
+本模块对该页面的功能进行了封装，提供面向对象的接口，方便实现对群成员管理的自动化操作
+
+操作的基本流程是：
+
+    =>  1.登录(授权) 
+    =>  2.生成token 
+    =>  3.获取个人信息 
+    =>  4.获取好友信息 
+    =>  5.获取群列表信息 
+    =>  6.获取群成员信息 
+    =>  7.对群成员进行各种操作
+
+INSTALLATION:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   推荐使用CPAN安装
+
+   cpan -i Webqq::Qun
+
+DEPENDENCIES:
+   
+   JSON
+   LWP::UserAgent
+   LWP::Protocol::https
+   Webqq::Encryption
+
+COPYRIGHT and LICENCE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

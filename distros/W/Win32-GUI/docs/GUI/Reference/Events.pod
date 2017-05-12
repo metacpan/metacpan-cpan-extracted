@@ -1,0 +1,15 @@
+=for comment $Id: Events.pod,v 1.1 2005/06/26 16:41:00 robertemay Exp $
+
+=head1 NAME
+
+Win32::GUI::Reference::Events - Common Events
+
+=head1 DESCRIPTION
+
+The events documented on this page are applicable to most windows and controls.
+
+=head1 EVENTS
+
+__W32G_EVENTLIST__
+
+__W32G_POSTAMBLE__

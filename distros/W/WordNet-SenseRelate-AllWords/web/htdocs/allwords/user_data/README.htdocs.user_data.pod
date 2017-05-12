@@ -1,0 +1,14 @@
+=head1 NAME
+
+README.htdocs.user_data - [Web] Explanation of user_data directory in 
+htdocs of Web interface
+
+=head1 Purpose of the directory
+
+For each instance of the web-interface, a directory is created under
+web/cgi-bin/allwords/user_data.  Once the processing is complete the
+user directory is moved in this directory. If an error occurs and
+processing is interrupted then the user directory remains in
+web/cgi-bin/allwords/user_data.
+
+Last modified by : $Id: README.htdocs.user_data.pod,v 1.3 2008/05/24 12:53:58 tpederse Exp $

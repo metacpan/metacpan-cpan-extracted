@@ -1,0 +1,74 @@
+use strict;
+use Webservice::InterMine;
+
+my $service = Webservice::InterMine->get_service('www.flymine.org/query');
+
+# Print out the names of the available enrichment widgets:
+for my $ew (grep {$_->{widgetType} eq 'enrichment'} $service->widgets) {
+    printf "%s (%s)\n", $ew->{name}, $ew->{description};
+}
+
+# Get a reference to the list you want to analyse.
+my $list = $service->list('PL classIII');
+
+# Run the enrichment calculation
+my $results = $list->enrichment(
+    widget => 'publication_enrichment',
+    population => 'PL classII',
+    maxp => 0.01
+);
+
+while (<$results>) {
+    printf "%s (%s) - %.10f\n", $_->{identifier}, $_->{description}, $_->{'p-value'};
+}
+
+=pod
+
+=head1 NAME
+
+    Webservice::InterMine::Cookbook::List::Enrichment - List Enrichment
+
+=head1 SYNOPSIS
+
+    use strict;
+    use Webservice::InterMine;
+
+    my $service = Webservice::InterMine->get_service('www.flymine.org/query');
+
+    # Print out the names of the available enrichment widgets:
+    for my $ew (grep {$_->{widgetType} eq 'enrichment'} $service->widgets) {
+        printf "%s (%s)\n", $ew->{name}, $ew->{description};
+    }
+
+    # Get a reference to the list you want to analyse.
+    my $list = $service->list('PL classIII');
+
+    # Run the enrichment calculation
+    my $results = $list->enrichment(
+        widget => 'publication_enrichment',
+        population => 'PL classII',
+        maxp => 0.01
+    );
+
+    while (<$results>) {
+        printf "%s (%s) - %.10f\n", $_->{identifier}, $_->{description}, $_->{'p-value'};
+    }
+
+=head1 DESCRIPTION
+
+You can perfom enrichment calculations on lists that you have access to.
+
+=head1 SEE ALSO
+
+=over 
+
+=item L<Webservice::InterMine::Service>
+
+=item L<Webservice::InterMine::List>
+
+=item L<Webservice::InterMine::ResultIterator>
+
+=back
+
+=cut
+

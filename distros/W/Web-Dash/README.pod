@@ -1,0 +1,234 @@
+=pod
+
+=head1 NAME
+
+Web::Dash - Unity Dash from Web browsers (experimental)
+
+=head1 DESCRIPTION
+
+L<Web::Dash> is a Web application version of Unity Dash.
+Unity Dash is a powerful searching tool integrated in Unity desktop environment,
+which is employed by Ubuntu Linux.
+
+For detail of Unity, See L<https://wiki.ubuntu.com/Unity>
+
+L<Web::Dash> acts like Unity Dash without the need of the whole Unity infrastructure.
+All you need is some Lenses (searching agents) and your favorite Web browser,
+and you can have the awesome searching power of Dash.
+
+=head1 CAVEAT
+
+=head2 This is an experimental application
+
+L<Web::Dash> is quite an B<experimental> application.
+
+It is not based on any official specification or documentation about Unity Dash or Unity Lens.
+Instead, I analyzed the behavior of Unity Dash and Unity Lenses from outside,
+and implemented what I guess was the correct usage of them.
+
+I tested L<Web::Dash> in Ubuntu 12.04 and Xubuntu 12.04.
+However it may not work as expected in other environments.
+It is also possible for L<Web::Dash> to stop working in future versions of Unity or Ubuntu.
+
+=head2 Privacy issues
+
+Some Lenses are meant to search the local file system.
+If you export those lenses to others, they are able to
+see names of your files.
+
+=head1 SCREENSHOTS
+
+See L<https://github.com/debug-ito/Web-Dash/wiki/Screenshots>
+
+=head1 TUTORIAL
+
+=head2 Installation
+
+To install L<Web::Dash>, first you need development tools and files for libexpat and libdbus.
+
+    $ sudo apt-get install build-essential pkg-config libexpat1-dev libdbus-1-dev
+
+Then, type
+
+    $ sudo sh -c 'wget -O- http://cpanmin.us | perl - Web::Dash'
+
+to install L<Web::Dash> from CPAN.
+
+Of course, if you already have a CPAN client installed, you can type
+
+    $ sudo cpanm Web::Dash
+
+
+=head2 Installing some lenses
+
+Most Unity Lenses are provided as .deb packages named C<unity-lens-*>.
+
+In Ubuntu, some Lens packages are served by "extra" repository.
+Make sure the repository is enabled in your system.
+
+    $ grep extras /etc/apt/sources.list
+    deb http://extras.ubuntu.com/ubuntu precise main
+    deb-src http://extras.ubuntu.com/ubuntu precise main
+
+Uncomment the deb lines if they are commented out.
+
+To install Github lens, for example, type
+
+    $ sudo apt-get update
+    $ sudo apt-get install unity-lens-github
+
+
+=head2 Start webdash
+
+To start webdash, type
+
+    $ webdash
+    Twiggy: Accepting connections at http://127.0.0.1:5000/
+
+Access the URL with a Web browser.
+
+
+=head2 Run webdash in Ubuntu Server
+
+In a non-GUI environment, first you need to execute the following.
+
+    $ eval `dbus-launch --auto-syntax`
+
+This will launch a DBus daemon for a session bus,
+and set the environment variables necessary to access the bus.
+
+After that, run C<webdash> as usual.
+
+    $ webdash
+
+If you run C<webdash> at startup (e.g., in /etc/rc.local),
+B<< make sure to specify C<LANG> environment variable. >>
+Lens processes need the C<LANG> environment variable to be set.
+
+
+=head1 WEB API
+
+L<Web::Dash> has a Web API for searching. See L<Web::Dash::WebAPI>.
+
+
+=head1 AS A MODULE
+
+As a Perl module, L<Web::Dash> provides a class object that can generate a L<PSGI> application.
+You can use L<Web::Dash> in your .psgi file to customize which Lenses to export.
+
+=head1 SYNOPSIS
+
+In your app.psgi file.
+
+    use Web::Dash;
+    
+    Web::Dash->new(lenses_dir => '/your/personal/lenses/directory')->to_app;
+
+Or, if you want to select lenses...
+
+    use Web::Dash;
+    use Web::Dash::Lens;
+
+    my @lenses;
+    foreach my $lens_file (
+        'extras-unity-lens-github', 'video'
+    ) {
+        push(@lenses, Web::Dash::Lens->new(
+            lens_file => "/usr/share/unity/lenses/$lens_file/$lens_file.lens"
+        ));
+    }
+    Web::Dash->new(lenses => \@lenses)->to_app;
+
+
+=head1 CLASS METHODS
+
+=head2 $dash = Web::Dash->new(%args)
+
+The constructor.
+
+Fields in C<%args> are:
+
+=over
+
+=item C<lenses_dir> => DIRECTORY_PATH (optional, default: '/usr/share/unity/lenses')
+
+Specifies the root directory path under which it searches for lens files.
+
+It loads *.lens files under this directory and creates L<Web::Dash::Lens> objects from them.
+
+=item C<lenses> => ARRAYREF_OF_LENSES (optional)
+
+Specifies an array-ref of L<Web::Dash::Lens> objects that you want to use with L<Web::Dash>.
+
+If this option is specified, C<lenses_dir> option is ignored.
+
+=back
+
+=head1 OBJECT METHODS
+
+=head2 $psgi_app = $dash->to_app()
+
+Creates a L<PSGI> application from the C<$dash>.
+
+Note that the PSGI application uses L<AnyEvent> for asynchronous responses.
+Use L<AnyEvent>-compatible PSGI servers (like L<Twiggy>) to run the app.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<webdash>
+
+Web::Dash daemon runner script.
+
+=item L<Web::Dash::Lens>
+
+An experimental Unity Lens object.
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Toshio Ito.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+

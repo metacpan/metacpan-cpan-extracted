@@ -1,0 +1,375 @@
+package WebAPI::DBIC::Resource::Role::Relationship;
+$WebAPI::DBIC::Resource::Role::Relationship::VERSION = '0.004002';
+
+use Devel::Dwarn;
+use Carp qw(confess);
+use Hash::Util qw(lock_keys);
+
+use Moo::Role;
+
+requires 'uri_for';
+requires 'id_column_values_for_item';
+requires 'add_params_to_url';
+
+
+# recurse into a prefetch-like structure invoking a callback
+# XXX still a work in progress, only used by ActiveModule so far
+sub traverse_prefetch {
+    my $self = shift;
+    my $set = shift;
+    my $parent_rel = shift;
+    my $prefetch = shift;
+    my $callback = shift;
+
+    return unless $prefetch;
+
+    if (not ref($prefetch)) { # leaf node
+        $callback->($self, $set, $parent_rel, $prefetch);
+        return;
+    }
+
+    if (ref($prefetch) eq 'HASH') {
+        while (my ($prefetch_key, $prefetch_value) = each(%$prefetch)) {
+            #warn "traverse_prefetch [@$parent_rel] $prefetch\{$prefetch_key}\n";
+            $self->traverse_prefetch($set,             $parent_rel,   $prefetch_key, $callback);
+            # XXX traverse_prefetch first arg is a set but this passes a class:
+            my $result_subclass = $set->result_class->relationship_info($prefetch_key)->{class};
+            $self->traverse_prefetch($result_subclass, [ @$parent_rel, $prefetch_key ], $prefetch_value, $callback);
+        }
+    }
+    elsif (ref($prefetch) eq 'ARRAY') {
+        for my $sub_prefetch (@$prefetch) {
+            $self->traverse_prefetch($set, $parent_rel, $sub_prefetch, $callback);
+        }
+    }
+    else {
+        confess "Unsupported ref(prefetch): " . ref($prefetch);
+    }
+
+    return;
+}
+
+
+our %_get_relationship_link_info_cache;
+
+sub _get_relationship_link_info_cached {
+    my $wrapped = $_get_relationship_link_info_cache{join "\t", @_} ||= [ _get_relationship_link_info(@_) ];
+    return $wrapped->[0];
+}
+
+
+sub _get_relationship_link_info {
+    my ($result_class, $relname) = @_;
+    my $rel = $result_class->relationship_info($relname);
+
+    my $link_info = { # what we'll return
+        result_class => $rel->{source},
+        id_fields => undef,
+        id_filter => undef,
+    };
+    lock_keys(%$link_info);
+
+    my $cond = $rel->{cond};
+
+    # https://metacpan.org/pod/DBIx::Class::Relationship::Base#add_relationship
+    if (ref $cond eq 'CODE') {
+
+
+        my $bail = sub {
+            my ($inform) = shift || '';
+            unless (our $warn_once->{"$result_class $relname"}++) {
+                warn "$result_class relationship $relname has coderef-based condition which is not handled yet $inform\n";
+                Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+            }
+            return undef;
+        };
+
+        return sub {
+            my ($self, $code_cond_args) = @_;
+
+            my ($crosstable_cond, $joinfree_cond) = $cond->({
+                self_alias        => 'self',    # alias of the invoking resultset ('me' in case of a result object),
+                foreign_alias     => 'foreign', # alias of the to-be-joined resultset (often matches relname),
+                %$code_cond_args                # eg self_resultsource, foreign_relname, self_rowobj
+            });
+            #Dwarn [ $crosstable_cond, $joinfree_cond ] unless our $warn_once->{"$result_class $relname dwarn"}++;
+
+            # XXX herein we attempt the insane task of mapping SQL::Abstract conditions
+            # into something usable by WebAPI::DBIC - this is a total hack
+            # There is a better way: https://github.com/timbunce/WebAPI-DBIC/issues/8
+            # but it requires DBIC 0.082801+ (2014-10-05)
+
+            for my $crosstable_cond_key (keys %$crosstable_cond) {
+                my $cond = $crosstable_cond->{$crosstable_cond_key};
+
+                # first we look for the FK indentity field
+                my $ident;
+                if (ref $cond eq 'HASH') {
+                    if ($cond->{'-ident'}) {
+                        # "foreign.artist" => { "-ident" => "self.artistid" },
+                        $ident = $cond->{'-ident'}
+                    }
+                    elsif (ref $cond->{'='} eq 'HASH' && $cond->{'='}{'-ident'}) {
+                        # "foreign.artist" => { "=" => { "-ident" => "self.artistid" } }
+                        $ident = $cond->{'='}{'-ident'};
+                    }
+                    elsif (ref $cond->{'='} eq 'SCALAR') {
+                        # "foreign.artist" => { "=" => \"self.artistid" },
+                        $ident = ${ $cond->{'='} };
+                    }
+                }
+
+                if ($ident) {
+                    $ident =~ s/^self\.// or die "panic";
+                    $link_info->{id_fields} = [ $ident ];
+                }
+                else {
+                    # other kinds of conditions which we'll translate into me.field=foo url params
+                    return $bail->('- unknown crosstable_cond_key');
+                }
+            }
+
+            if ($joinfree_cond) {
+                # The join-free condition returned for relationship '$rel_name' must be a hash
+                # reference with all keys being valid columns on the related result source
+                return $bail->('- has join-free condition');
+            }
+
+            return $link_info;
+        };
+    }
+
+    if (ref $cond ne 'HASH') {
+        # we'll may end up silencing this warning till we can offer better support
+        unless (our $warn_once->{"$result_class $relname"}++) {
+            warn "$result_class relationship $relname cond value $cond not handled yet\n";
+            Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+        }
+        return undef;
+    }
+
+    if (keys %$cond > 1) {
+        # if we loosen this constraint we might need to recheck it for some cases below
+        unless (our $warn_once->{"$result_class $relname"}++) {
+            warn "$result_class relationship $relname ignored since it has multiple conditions\n";
+            Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+        }
+        return undef;
+    }
+
+    # TODO support and test more kinds of relationships
+    # TODO refactor
+
+    if ($rel->{attrs}{accessor} eq 'multi') { # a 1-to-many relationship
+
+        # XXX are there any cases we're not dealing with here?
+        # such as multi-colum FKs
+
+        Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+
+        my $foreign_key = (keys %$cond)[0];
+        $foreign_key =~ s/^foreign\.//
+            or warn "Odd, no 'foreign.' prefix on $foreign_key ($result_class, $relname)";
+
+        # express that we want to filter the many to match the key(s) of the 1
+        # here we list the names of the fields in the foreign table that correspond
+        # to the names of the id columns in the result_class table
+        $link_info->{id_filter} = [ $foreign_key ];
+        return $link_info;
+    }
+
+    # accessor is the inflation type (single/filter/multi)
+    if ($rel->{attrs}{accessor} !~ /^(?: single | filter )$/x) {
+        unless (our $warn_once->{"$result_class $relname"}++) {
+            warn "$result_class relationship $relname ignored since we only support 'single' accessors (not $rel->{attrs}{accessor}) at the moment\n";
+            Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+        }
+        return undef;
+    }
+
+    my $fieldname = (values %$cond)[0]; # first and only value
+    $fieldname =~ s/^self\.// if $fieldname;
+
+    if (not $fieldname) {
+        unless (our $warn_once->{"$result_class $relname"}++) {
+            warn "$result_class relationship $relname ignored since we can't determine a fieldname (@{[ %$cond ]})\n";
+            Dwarn $rel if $ENV{WEBAPI_DBIC_DEBUG};
+        }
+        return undef;
+    }
+
+    $link_info->{id_fields} = [ $fieldname ];
+    return $link_info;
+}
+
+
+
+sub get_url_for_item_relationship {
+    my ($self, $item, $relname) = @_;
+
+    my $result_class = $item->result_class;
+
+    #Dwarn
+    my $rel_link_info = _get_relationship_link_info_cached($result_class, $relname)
+        or return undef;
+
+    if (ref $rel_link_info eq 'CODE') {
+        $rel_link_info = $rel_link_info->($self, {
+            self_resultsource => $item->result_source,
+            self_rowobj       => $item,
+            foreign_relname   => $relname, # XXX ?
+        })
+            or return undef;
+    }
+
+    my @uri_for_args;
+    if ($rel_link_info->{id_fields}) { # link to an item (1-1)
+        my @id_kvs = map { $item->get_column($_) } @{ $rel_link_info->{id_fields} };
+        return undef if grep { not defined } @id_kvs; # no link because a key value is null
+        push @uri_for_args, map { $_ => shift @id_kvs } 1..@id_kvs;
+    }
+
+    my $dst_class = $rel_link_info->{result_class} or die "panic";
+    push @uri_for_args, result_class => $dst_class;
+
+    my $linkurl = $self->uri_for( @uri_for_args );
+
+    if (not $linkurl) { # XXX this comment is HAL-specific
+        warn "Result source $dst_class has no resource uri in this app so relations (like $result_class $relname) won't have _links for it.\n"
+            unless our $warn_once->{"$result_class $relname $dst_class"}++;
+        return undef;
+    }
+
+    my %params;
+    if (my $id_filter = $rel_link_info->{id_filter}) {
+        my @id_vals = $self->id_column_values_for_item($item);
+        die "panic" if @id_vals != @$id_filter;
+        for my $id_field (@$id_filter) {
+            $params{ "me.".$id_field } = shift @id_vals;
+        }
+    }
+
+    my $href = $self->add_params_to_url(
+        $linkurl,
+        {},
+        \%params,
+    );
+
+    return $href;
+}
+
+
+sub get_url_template_for_set_relationship { # XXX hack, for jsonapi, move?
+    my ($self, $set, $relname) = @_;
+
+    my $result_class = $set->result_class;
+    my $result_source = $set->result_source;
+
+    #Dwarn
+    my $rel_link_info = _get_relationship_link_info_cached($result_class, $relname)
+        or return undef;
+
+    if (ref $rel_link_info eq 'CODE') {
+        $rel_link_info = $rel_link_info->($self, {
+            self_resultsource => $result_source,
+            self_rowobj       => undef, # XXX
+            foreign_relname   => $relname, # XXX ?
+        })
+            or return undef;
+    }
+
+    my @uri_for_args;
+    if ($rel_link_info->{id_fields}) { # link to an item (1-1)
+        my @id_kvs = @{ $rel_link_info->{id_fields} };
+        push @uri_for_args, map {
+            my $name = shift @id_kvs;
+            $_ => "{$relname.$name}"
+        } 1..@id_kvs;
+    }
+
+    my $dst_class = $rel_link_info->{result_class} or die "panic";
+    push @uri_for_args, result_class => $dst_class;
+
+    my $linkurl = $self->uri_for( @uri_for_args );
+
+    if (not $linkurl) {
+        warn "Result source $dst_class has no resource uri in this app so relations (like $result_class $relname) won't have _links for it.\n"
+            unless our $warn_once->{"$result_class $relname $dst_class"}++;
+        return undef;
+    }
+
+    my %params;
+    if (my $id_filter = $rel_link_info->{id_filter}) {
+        my @names = $result_source->unique_constraint_columns( $self->id_unique_constraint_name );
+        die "panic" if @names != @$id_filter;
+        for my $id_field (@$id_filter) {
+            my $name = shift @names;
+            $params{ "me.".$id_field } = "{$relname.$name}";
+        }
+    }
+
+    my $href = $self->add_params_to_url(
+        $linkurl,
+        {},
+        \%params,
+    );
+
+    return $href;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WebAPI::DBIC::Resource::Role::Relationship
+
+=head1 VERSION
+
+version 0.004002
+
+=head1 NAME
+
+WebAPI::DBIC::Resource::Role::Relationship - methods relating to relationships between resources
+
+=begin example
+
+
+
+
+=end example
+
+        $Data::Dumper::Deparse = 1;
+        return {
+            "$$args{'foreign_alias'}.artist", {-'ident', "$$args{'self_alias'}.artistid"},
+            "$$args{'foreign_alias'}.year", 1984
+        },
+        $$args{'self_resultobj'} && {
+            "$$args{'foreign_alias'}.artist", $$args{'self_resultobj'}->artistid,
+            "$$args{'foreign_alias'}.year", 1984
+        };
+
+=head2 get_url_for_item_relationship
+
+    $url = $self->get_url_for_item_relationship($item, $relname);
+
+Given a specific item and relationship name return a url for the related
+records, if possible else return undef.
+
+=head1 AUTHOR
+
+Tim Bunce <Tim.Bunce@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Tim Bunce.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014-2016, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# Web::MREST server executable
+#
+# -------------------------------------------------------------------------
+
+use 5.014;
+use strict;
+use warnings;
+
+use App::CELL qw( $log $site );
+use Web::MREST;
+use Data::Dumper;
+use File::Path qw( remove_tree );
+use Getopt::Long;
+use Log::Any::Adapter;
+use Module::Runtime qw( is_module_name require_module );
+use Plack::Builder;
+use Plack::Runner;
+use Plack::Session::Store::File;
+use Pod::Usage;
+use Try::Tiny;
+use Web::Machine;
+use Web::MREST::CLI qw( normalize_filespec );
+
+
+ 
+=head1 NAME
+
+mrest - Web::MREST server startup script
+
+
+
+=head1 SYNOPSIS
+
+Possible invocations (any options after C<--> are parsed by
+L<Plack::Runner>: basically, they can be anything accepted by C<plackup>:
+
+    $ mrest --distro My-Distro --module My::Module
+    $ mrest -d My::Distro -m My::Module
+    $ mrest --distro My-Distro --module My::Module --sitedir /etc/my-module
+    $ mrest -d My::Distro -m My::Module -s /etc/my-module
+    $ mrest -- --server Starman
+    $ mrest --help
+
+
+=head1 DESCRIPTION
+
+Run this script from the bash prompt to start the server. 
+
+
+
+=head1 PASSING OPTIONS TO PLACK
+
+This script starts the server by instantiates a L<Plack::Runner> object and
+calling its C<run> method. Before doing that, it calls the C<parse_options>
+method with C<@ARGV> as its argument. However, the script does so B<after>
+parsing its own options. Options intended to be parsed by L<Plack::Runner>
+should be placed at the end of the command line, preceded by C<-->.
+
+
+
+=head1 DEBUGGING OPTIONS
+
+You can include an C<--early-debug> option on the command line, with
+the name of a file in which L<Web::MREST> will capture "early" log
+messages -- i.e. all log messages generated before the "official" MREST
+log file (i.e. the one defined in the site parameters) is known.
+
+
+
+=head1 FUNCTIONS
+
+=cut
+
+sub _welcome_message {
+    my $message = "Starting Web::MREST ver. $Web::MREST::VERSION";
+    print "$message\n";
+    $log->notice( $message );
+}
+
+sub _get_sharedir {
+    my ( $distro, $module ) = @_;
+
+    # for distro, we allow both formats My::Distro and My-Distro
+    # distro might be just Foo, or Foo::Bar, or Foo-Bar
+    my @tmp_c;
+    if ( $distro =~ m/\:/ ) {
+        @tmp_c = split( '::', $distro ); 
+    } elsif ( $distro =~ m/\-/ ) {
+        @tmp_c = split( '-', $distro );
+    } else {
+        @tmp_c = ( $distro );
+    }
+    my $app_distro = join( '-', @tmp_c );
+    my $app_module = $module;
+    die "$app_module is not a module name" unless is_module_name( $app_module );
+    print "App distro is $app_distro\n";
+    print "App module is $app_module\n";
+    my $distro_sharedir;
+    my $status;
+    try {
+        $distro_sharedir = File::ShareDir::dist_dir( $app_distro );
+        print "Distro sharedir is $distro_sharedir\n";
+    } catch {
+        $status = "Could not find a sharedir for distro $app_distro: $_";
+    };
+    if ( $status ) {
+        die $status;
+    }
+    return ( $app_distro, $app_module, $distro_sharedir );
+}
+
+sub _load_config_params {
+    my ( $app_distro, $sitedir, $early_debug ) = @_;
+    print "Loading configuration parameters from $sitedir\n";
+    my $status = Web::MREST::init( distro => $app_distro, sitedir => $sitedir, early_debug => $early_debug );
+    die $status->text unless $status->ok;
+}
+
+sub _set_up_logging {
+    #print "Setting up logging\n";
+    my $log_file = normalize_filespec( $site->MREST_LOG_FILE );
+    my $should_reset = $site->MREST_LOG_FILE_RESET;
+    unlink $log_file if $should_reset;
+    Log::Any::Adapter->set( 'File', $log_file );
+    my $message = "Logging to $log_file";
+    print "$message\n";
+    $log->info( $message );
+
+    if ( ! $site->MREST_APPNAME ) {
+        die "Site parameter MREST_APPNAME is undefined - please investigate!";
+    }
+    $log->init( 
+        ident => $site->MREST_APPNAME, 
+        debug_mode => ( $site->MREST_DEBUG_MODE || 0 ),
+    );
+}
+
+sub function_exists {
+    no strict 'refs';
+    my $funcname = shift;
+    return \&{$funcname} if defined &{$funcname};
+    return;
+}
+
+sub _call_init {
+    my $app_module = shift;
+    require_module( $app_module );
+    if ( my $subref = function_exists( $app_module . "::init" ) ) {
+        print "Calling $app_module" . "::init()\n";
+        &$subref();
+    }
+}
+
+sub _init_webmachine {
+    my $app_module = shift;
+    print "Starting server\n";
+    return Web::Machine->new(
+        resource => $app_module,
+        tracing => 1,
+    )->to_app;
+}
+
+
+
+=head1 MAIN
+
+=cut
+
+_welcome_message();
+
+# process command-line options
+my $help = 0;
+my $distro = '';
+my $module = '';
+my $sitedir = '';
+my $early_debug = '';
+GetOptions( 
+    'distro|d=s' => \$distro,
+    'early-debug|e=s' => \$early_debug,
+    'help|?' => \$help, 
+    'module|m=s' => \$module,
+    'sitedir|s=s' => \$sitedir,
+);
+pod2usage(1) if $help;
+
+print "Early debug mode activated\n" if $early_debug;
+
+# distro and module are required
+die "You must specify at least --distro and --module (with values). Bailing out"
+    unless $distro and $module;
+
+my ( $app_distro, $app_module, $distro_sharedir ) = _get_sharedir( $distro, $module );
+print "Local site configuration directory is $sitedir\n" if $sitedir;
+_load_config_params( $app_distro, $sitedir, $early_debug );  # initializes $site
+_set_up_logging();                   # needs $site
+_call_init( $app_module );
+my $app = _init_webmachine( $app_module );
+my $runner = Plack::Runner->new;
+$runner->parse_options(@ARGV);
+remove_tree('/tmp/mrest-sessions');
+mkdir '/tmp/mrest-sessions';
+
+$runner->run( 
+    builder {
+        enable "LogErrors", logger => sub {
+            my $args = shift;
+            my $level = $args->{'level'};
+            my $message = $args->{'message'};
+            $log->$level( $message );
+        };
+#        enable "StackTrace", force => 1;
+#        enable "Session", store => 'File';
+        enable "Session", store => Plack::Session::Store::File->new(
+            dir => '/tmp/mrest-sessions'
+        );
+        enable "Static", path => qr{/favicon}, root => $distro_sharedir;
+        $app;
+    }
+);
+

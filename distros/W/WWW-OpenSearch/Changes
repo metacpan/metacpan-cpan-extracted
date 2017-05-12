@@ -1,0 +1,89 @@
+Revision history for Perl extension WWW::OpenSearch
+
+0.17 2013-01-18
+ - Avoid hash randomization problem in test (RT #82796)
+
+0.16 2010-05-25
+ - Fix tests for Test::More 0.95_02
+
+0.15 2009-11-19
+ - repackaged with a new version of Module::Install
+
+0.14 2008-04-17
+ - Handle broken LWP 5.810 in Makefile.PL
+
+0.13 2007-12-21
+ - Fix pod coverage (Ian Beckwith)
+
+0.12 2007-05-01
+ - switch from ||= to a "defined" idiom for some params
+ - switch to Module::Install
+
+0.11 2007-04-17
+ - added a simple OSD parsing test
+
+0.10_02 2007-01-23
+ - fix Request.pm to clone the extra attributes we've added (Marc Tobias)
+
+0.10_01 2007-01-22
+ - use URI::Template for parsing OSD uri templates
+ - added opensearch-specific Request and Agent classes
+ - un-break get_best_url()
+ - you can now pass a WWW::OpenSearch::Url to WWW::OpenSearch's search()
+   method
+ - added ns() (namespace) field to Url.pm
+ - re-worked paging to use the new Request object
+
+ [THINGS THAT MAY BREAK YOUR CODE]
+ - using URI::Template means some methods are now proxied to that class
+ - removed agent argument in new() in OpenSearch.pm
+ - handling of POST requests in prepare_query() in Url.pm now  returns data
+   suitable for passing to HTTP::Request
+ - un-link Response.pm and the parent WWW::OpenSearch object -- a Response
+   is now in the context of whatever WWW::OpenSearch::Url was used
+
+0.09 2006-12-07
+ - fix link fetching from atom feeds
+
+0.08 2006-09-13
+ - fix optional attributes for Image
+ - added strict to Url object
+
+0.07 2006-09-11
+ - inflate query and image fields to objects for OSD 1.1
+ - pod updates
+
+0.06_02 2006-07-20
+ - added tests
+ - updated available description info
+ - try to handle POST urls better
+ - update XML::Atom calls to latest release API
+ - added option to override the useragent from new()
+ - fix undef warning
+ - turn utf8 flag off for queries
+
+0.06_01 2006-05-18
+ - Complete re-write to handle OpenSearch 1.1/Atom
+ - Now uses XML::Feed to abstract RSS and Atom
+ - Improved OpenSearch Description/Url handling
+ - Encapsulate returns in a Response object
+
+0.05 2006-01-09
+ - Added partial support of OpenSearch 1.1. There's no API change and old
+   elements just work as before, with 1.1 OpenSearch document as well. See
+   http://opensearch.a9.com/docs/upgrading10.jsp (Thanks to Masaaki Hirose)
+
+0.04 2005-07-29
+ - Drop off XML::Simple for efficiency. LibXMLify everything. Now you need
+   XML::RSS::LibXML 
+
+0.03 2005-07-24
+ - Hacked current_page so you can specify page number correctly (Thanks to
+   Naoya Ito)
+
+0.02 2005-03-26
+ - Added accessors for attributes
+ - Fixed POD
+
+0.01 2005-03-17
+ - original version

@@ -1,0 +1,8 @@
+The page source for each of the files in this example web site can be viewed
+using the built-in <b>debug</b> facility (see pages.cgi). All of the files
+except <b>pages.cgi</b> are located in the <b>pages</b> directory except the
+<b>pages.cgi</b> file itself. 
+<p>
+<b>pages.cgi</b> is accessed using the
+<b>debug</b> <i>location</i> directive to access it on its file path. View
+this configuration in the %pages portion of the <b>pages.cgi</b> file.

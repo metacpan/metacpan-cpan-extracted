@@ -1,0 +1,23 @@
+---
+name: WWW-ErnestMarples
+version: 0.01
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Interface to the ernestmarples.com UK postcode lookup API
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-ErnestMarples
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/WWW-ErnestMarples.git
+requires:
+  HTML::Tiny: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+provides:
+  WWW::ErnestMarples:
+    file: lib/WWW/ErnestMarples.pm
+    version: 0.01
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

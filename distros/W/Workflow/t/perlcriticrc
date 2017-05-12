@@ -1,0 +1,41 @@
+
+# $Id$
+
+severity = 5
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHORS|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHORS|COPYRIGHT
+
+#Needs to be readdressed at some point
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+#Might be to late to address
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+#The violater of this is an overwrite for Class::Accessor
+[-NamingConventions::ProhibitAmbiguousNames]
+
+#We are using Constants
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+#We currently utilize a package variable deliberately, should be addressed
+#again
+[-Variables::ProhibitPackageVars]
+
+#For embedded SQL this is perfectly ok
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+
+#Exchange for Module::Load?
+[-BuiltinFunctions::ProhibitStringyEval]
+
+#------------------------------------------------------------------------------
+
+# TODO
+
+[-TestingAndDebugging::ProhibitNoStrict]
+
+[-InputOutput::ProhibitBarewordFileHandles]

@@ -1,0 +1,122 @@
+NAME
+    WebService::Bukget - Provides access to the v3 Bukget API
+
+VERSION
+    version 1.00
+
+SYNOPSIS
+        use WebService::Bukget;
+
+        my $bukget = WebService::Bukget->new();
+        my $authors = $bukget->authors;
+
+NAME
+    WebService::Bukget - A module that allows easy access to the Bukget API
+
+CALLING CONVENTIONS
+    All methods used to access Bukget endpoints expect you to pass at the
+    very least a hashref with the following keys:
+
+    *   on_success - A coderef that gets the WebService::Bukget instance and
+        the decoded JSON result as parameters
+
+    *   on_failure - A coderef that gets an arrayref of code and status as
+        parameters
+
+    Optionally you can pass another key called "params" which should be a
+    hashref of parameters to pass to the get request. See the examples below
+    for more information, and also see the API documentation at
+    <http://bukget.org/pages/docs/API3.html>
+
+METHODS
+  geninfo
+    Maps to the "geninfo" endpoint
+
+  categories
+    Maps to the "categories" endpoint
+
+  plugins
+    Maps to the "plugins" endpoint
+
+  authors
+    Maps to the "authors" endpoint
+
+EXAMPLES
+        # Fetch the latest geninfo 
+        $bukget->geninfo({
+            on_success => sub {
+                my ($b, $r) = (@_);
+
+                print 'Last updated: ', $r->[0]->{timestamp}, "\n";
+            },
+            on_failure => sub {
+                die 'oops, ';
+            },
+        });
+
+        # Fetch the latest 5 geninfo entries
+        $bukget->geninfo({
+            params => { 
+                size => 5 
+            },
+            on_success => sub {
+                my ($b, $r) = (@_);
+
+                print 'Last updated: ', $_->{timestamp}, "\n" for(@$r);
+            },
+            on_failure => sub {
+                die 'oops, ';
+            },
+        });
+
+        # Fetch the first page of plugins from the 'Admin Tools' category,
+        # using 10 items per page, and only fetching the slug, logo and game version fields
+        $bukget->categories('Admin Tools' => {
+            params => { 
+                size   => 10,
+                start  => 0,
+                fields => [qw/slug logo versions.game_version/],
+            },
+            on_success => sub {
+                my ($b, $r) = (@_);
+
+                ...
+            },
+            on_failure => sub {
+                die 'oops, ';
+            },
+        });
+
+TO-DO$
+    *   Clean up the code some since it's rather ugly
+
+    *   Add support for the search function in the Bukget API
+
+AUTHOR
+    Ben van Staveren, "<madcat at cpan.org>"
+
+BUGS/CONTRIBUTING
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/benvanstaveren/WebService-Bukget/issues>. You can
+    fork my Git repository at
+    <https://github.com/benvanstaveren/WebService-Bukget/> if you want to
+    make changes or supply me with patches.
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Ben van Staveren.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+AUTHOR
+    Ben van Staveren <madcat@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Ben van Staveren.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

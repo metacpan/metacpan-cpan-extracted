@@ -1,0 +1,116 @@
+NAME
+    WebService::MorphIO - Perl class to communication with morph.io.
+
+SYNOPSIS
+     use WebService::MorphIO;
+     my $obj = WebService::MorphIO->new(%parameters);
+     $obj->csv('output.csv');
+     $obj->sqlite('output.sqlite');
+
+METHODS
+    "new(%parameters)"
+            Constructor.
+
+            *       "api_key"
+
+                     Morph.io API key.
+                     It is required.
+                     Default value is undef.
+
+            *       "project"
+
+                     Project.
+                     It is required.
+                     Default value is undef.
+
+            *       "select"
+
+                     Select.
+                     It is usable for csv() method.
+                     Default value is 'SELECT * FROM data'.
+
+            *       "web_uri"
+
+                     Web URI of service.
+                     Default value is 'https://morph.io/'.
+
+    "csv($output_file)"
+             Get CSV file and save to output file.
+             It is affected by 'select' parameter.
+             Returns undef.
+
+    "sqlite($output_file)"
+             Get sqlite file and save to output file.
+             Returns undef.
+
+ERRORS
+     new():
+             Parameter 'api_key' is required.
+             Parameter 'project' is required.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     csv():
+             Cannot get '%s'.
+
+     sqlite():
+             Cannot get '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Temp qw(tempfile);
+     use Perl6::Slurp qw(slurp);
+     use WebService::MorphIO;
+
+     # Arguments.
+     if (@ARGV < 2) {
+             print STDERR "Usage: $0 api_key project\n";
+             exit 1;
+     }
+     my $api_key = $ARGV[0];
+     my $project = $ARGV[1];
+
+     # Temp file.
+     my (undef, $temp_file) = tempfile();
+
+     # Object.
+     my $obj = WebService::MorphIO->new(
+             'api_key' => $api_key,
+             'project' => $project,
+     );
+
+     # Save CSV file.
+     $obj->csv($temp_file);
+
+     # Print to output.
+     print slurp($temp_file);
+
+     # Clean.
+     unlink $temp_file;
+
+     # Output:
+     # Usage: ./examples/ex1.pl api_key project
+
+DEPENDENCIES
+    Class::Utils, Encode, Error::Pure, IO::Barf, LWP::Simple, URI,
+    URI::Escape.
+
+REPOSITORY
+    <https://github.com/tupinek/WebService-MorphIO>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

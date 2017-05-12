@@ -1,0 +1,94 @@
+NAME
+    Revision history for Perl extension WordNet::Similarity::Visual.
+
+SYNOPSIS
+    A list of changes to the WordNet::Similarity package.
+
+DESCRIPTION
+
+  Version 0.07
+    *   07/22/2005
+
+        (1) Added Visualization module for hso measure.
+
+        (2) Handle boundary cases, like paths for synonyms.
+
+        (3) Different colors for different POS
+
+
+  Version 0.06
+    *   07/19/2005
+
+        (1) Added Visualization module for the lch and wup measures.
+
+        (2) Made the nodes clickable and provide user with more information.
+
+        (3) now Show the glos of a sense-node using tooltips
+
+        (4) Removed some bottlenecks due to instance creations for WordNet::Querydata
+
+
+  Version 0.05
+    *   07/15/2005
+
+        (1) Added Visualization module for the wup and lch measure.
+
+        (2) Added meta language conversion for the lch measure.
+
+        (3) Removed bugs in the meta-language modules for path and wup.
+
+        (4) Removed bugs in the visualization module for path.
+
+  Version 0.04
+    *   07/07/2005
+
+        (1) Added Visualization module for the path measure.
+
+
+        (2) Removed bugs in the meta-language modules for path and wup.
+
+
+  Version 0.03
+    *   07/03/2005
+
+        (1) Corrected the problems with documentation in the module.
+
+  Version 0.02
+    *   06/30/2005
+
+        (1) Added functionality to convert Trace string to meta-language for
+            path and wup measures.
+
+        (2) Added test cases for the module.
+
+        (3) Fixed a bug in WordNet::Similarity GUI, where in wrong measure was
+            bieng used. This was because of the difference in the
+            value of measure_index returned by the Selection Box and the
+            measure Index in the array.
+
+        (4) Added a horizontal pane to the GUI for WordNet::Similarity, the
+            left-side of the pane displays the Similarity Results, and the
+            right-side displays the Trace output/meta-language.
+
+        (5) Made the Similarity Result labels Clickable, allows user to select
+            one of the similarity results, and thus view its corresponding trace
+            string/meta-language.
+
+        (6) Added functionality to write the Configuration files, if they are
+            missing when WordNet::Similarity::Visual is executed.
+
+        (7) Fixed the bug in the Makfile regarding the GTK2 dependency.
+
+  Version 0.01
+    *   06/22/2005
+
+        (1) Created CPAN modules for WordNet::Similarity::Visual.
+
+        (2) Improved GUI, by making it more responsive. The GUI now refreshes
+            whenever it regains focus.
+
+        (3) Added the ability to stop the Similarity computation.
+
+        (4) Completed the GUI frontend for WordNet::Similarity.
+
+        (5) Completed the GUI frontend for WordNet::QueryData.

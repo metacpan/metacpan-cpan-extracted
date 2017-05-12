@@ -1,0 +1,29 @@
+Revision history for Win32-GUI-HyperLink
+
+0.04     19 July 2009
+         Released on CPAN
+
+ - Correct typo in PAR_TEMP env variable for working with PAR
+ - Turn off debugging for release version!
+
+0.03     17 July 2009
+         Released on CPAN
+
+ - Update build process (including failing build under cygwin)
+ - Fix constants warnings from Win32::GUI
+ - General code tidy up and typo corrections
+
+0.02     17 July 2005
+         Released on CPAN, and at http://www.robmay.me.uk/win32gui/
+         as PPM
+
+ - Fixed paths searched for splash image
+
+0.01     17 July 2005
+         Released on CPAN, and at http://www.robmay.me.uk/win32gui/
+         as PPM
+
+ - Inital public release
+
+----------------------------------------------------------------------
+$Id: Changes,v 1.2 2005/07/17 23:33:37 Robert May Exp $

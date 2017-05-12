@@ -1,0 +1,1 @@
+AFPL GhostScript 8.50

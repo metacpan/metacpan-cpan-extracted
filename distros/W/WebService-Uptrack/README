@@ -1,0 +1,31 @@
+WebService-Uptrack version 0.0.1
+
+Read the POD. :)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Readonly
+Moose
+Moose::Util::TypeConstraints
+MooseX::StrictConstructor
+HTTP::Request
+HTTP::Response
+LWP::UserAgent
+JSON::XS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Steve Huff <shuff at cpan dot org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

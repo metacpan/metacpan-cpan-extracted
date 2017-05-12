@@ -1,0 +1,48 @@
+---
+abstract: 'Access data from InterMine queries in biological formats.'
+author:
+  - 'Alex Kalderimis <dev@intermine.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Webservice-InterMine-Bio
+provides:
+  Webservice::InterMine::Bio:
+    file: lib/Webservice/InterMine/Bio.pm
+    version: 0.9900
+  Webservice::InterMine::Bio::BEDQuery:
+    file: lib/Webservice/InterMine/Bio/BEDQuery.pm
+    version: 0
+  Webservice::InterMine::Bio::FastaQuery:
+    file: lib/Webservice/InterMine/Bio/FastaQuery.pm
+    version: 0
+  Webservice::InterMine::Bio::GFFQuery:
+    file: lib/Webservice/InterMine/Bio/GFFQuery.pm
+    version: 0
+  Webservice::InterMine::Bio::RegionQuery:
+    file: lib/Webservice/InterMine/Bio/RegionQuery.pm
+    version: 0
+  Webservice::InterMine::Bio::SequenceFeatureQuery:
+    file: lib/Webservice/InterMine/Bio/SequenceFeatureQuery.pm
+    version: 0
+recommends:
+  Bio::DB::SeqFeature::Store: 0
+  Bio::SeqIO: 0
+requires:
+  File::Temp: 0
+  IO::Handle: 0
+  Moose: 2.0
+  PerlIO::gzip: 0
+  URI: 0
+  Webservice::InterMine: 0.9909
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.9900

@@ -1,0 +1,528 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Node - how to configure data service nodes
+
+=head1 SYNOPSIS
+
+This page describes the role that data service nodes play in the
+Web::DataService framework, and how to configure them.  It includes a list of
+the attributes that you can use to define them.
+
+=head1 NODE DEFINITIONS
+
+Data service nodes are the fundamental organizing elements of a data service
+definition under this framework.  They correspond to the various resources
+provided by the data service.  You define them by calling the method
+C<define_node> on a data service instance and specifying one or more sets of
+attributes.  Any node for which the attributes C<role> and C<method> are both
+defined will correspond to a data service operation (we call these "operation
+nodes") while other nodes may correspond to documentation pages, images,
+stylesheets, or other files.
+
+The only required attribute for a node is C<path>, which provides a unique
+key.  Most attributes of data service nodes are inherited path-wise.  That is,
+a node with path "foo/bar" will inherit from the node with path "foo" any
+attributes whose values are not explicitly specified in its definition.  The
+node with path "/" functions as the root, and its attribute values provide
+defaults for all of the other nodes.  Any node attribute can be explicitly
+disabled for a particular node by specifying its value as the empty string.
+Those attributes that are not inherited will be noted below.
+
+Most of the attributes listed here may also be specified in the application
+configuration file, in the same manner as data service attributes.  In that case,
+they will provide default values for the nodes.  Attributes for which you wish
+to give the same value to all (or most) nodes can be conveniently specified in
+this way, or you can specify them when defining the root node "/".  You can always
+override them at a lower level of the node hierarchy, if you wish.
+
+The node attributes do not have accessor methods.  Rather, you can retrieve
+the value of any node attribute by calling the C<node_attr> method on a data
+service instance or a request instance:
+
+    # for example, you could use either of the following:
+    
+    $node_title = $ds->node_attr($node_path, 'title');
+    $node_title = $request->node_attr('title');
+
+For example, each operation subroutine is called as a method of a request
+object.  This request object itself has many attributes (with accessors) that
+are derived from the data service node that matches the request.  However, you
+can if necessary query for arbitrary node attributes:
+
+    sub my_operation {
+        my ($request) = @_;
+        my $default_limit = $request->node_attr('default_limit');
+        ...
+
+=head2 Node Lists
+
+In the process of fully documenting a data service, it is important to
+document the relationships between nodes.  For this reason, Web::DataService
+provides "node lists" which can be used in documentation templates to display
+lists of related nodes (see
+L<NODELIST|Web::DataService::Documentation/NODELIST>).
+
+A default node list is created for each node, whose primary purpose is to list
+all or some of its child nodes.  The name of this list is the same as the node
+path.  You can place any node in its parent's list by giving it a
+L<place|/place> attribute with a value greater than zero.  You can also add
+other nodes to these default lists, or create arbitrarily named lists, by
+calling the L<list_node|Web::DataService/list_node> method.  See L<LIST
+ELEMENT ATTRIBUTES/"LIST ELEMENT ATTRIBUTES"> below for a list of the
+attributes that you can use in defining list elements.
+
+=head1 NODE ATTRIBUTES
+
+With the exception of C<path>, each of these attributes is optional.
+
+=head2 path
+
+This attribute is required for every node, and must be unique among the nodes
+defined for this data service.  For each incoming request, the URL path and
+parameters are processed in various ways (depending upon which data service
+features and special parameters have been enabled) to extract a path which is
+compared to the set of defined nodes.  If one matches, then the attributes of
+that node will be used to generate the appropriate response.  Otherwise, a 404
+error ("not found") will be returned to the client.
+
+=head2 disabled
+
+If this attribute is given a true value, then it will never match any request.
+Any request corresponding to this node's path (whether it is an operation
+request or a documentation request) will return a 404 error.  The attribute is
+inherited, so any children of this node will be likewise disabled.  You can
+use this to define placeholder nodes for functionality to be added later, or
+to remove existing functions from your application and leave the code in place
+to be re-activated later.
+
+=head2 undocumented
+
+If this attribute is given a true value, then any request asking for
+documentation about this node will return a 404 error.  The node will still be
+active for requests that ask for its operation.  This allows you to provide
+undocumented data service operations, while explicitly noting that fact in
+your code.
+
+=head2 title
+
+The value of this attribute must be a string, which will be used as the title
+for any documentation generated about the node.  If not specified, the node
+path will be used instead.  This attribute is B<not inherited>.  Best practice
+is to define a specific and informative title for each node.
+
+=head2 doc_string
+
+You can set this attribute either directly or by including one or more
+documentation strings after the node attribute hash in the call to
+C<define_node>.  The default documentation templates use this value as the
+main description on each documentation page.  If you wish to use a longer
+description than can be easily conveyed in a call to C<define_node>, then
+create a specific documentation template for this node.
+
+=head2 place
+
+If this attribute is given a numeric value greater than zero, then this node
+will be included in its parent node's default L<node list|/"Node Lists">.
+Node lists are ordered by C<place> value and secondarily by order of
+definition, so you can use the values of this attribute to order the nodes as
+you choose.  This attribute is not inherited.
+
+If you wish to include a node in a list other than the default node list for
+its parent node, use a separate call to
+L<list_node|Web::DataService/list_node>.
+
+=head2 method
+
+A node that has both this attribute and the attribute L</role> is considered
+to be an "operation node".  The attribute value must be the name of a
+subroutine (not a code reference) in the package specified by C<role>.  An
+"operation request" that matches this node will result in the creation of a
+"request object" whose class contains the appropriate role, followed by a
+method call to the specified subroutine.
+
+=head2 role
+
+The value of this attribute must be the name of a L<Moo> L<Role|Moo::Role>
+defined by an already-loaded package.  Any operation methods defined for this
+node and/or its children must occur in that package.  All operation nodes must
+either have this attribute specified explicitly or inherit its value from a
+parent node.
+
+=head2 arg
+
+This attribute is only relevant for operation nodes.  If specified, its
+value will be provided as an argument when the specified method is called
+to carry out the operation.  By means of this attribute, you can arrange for
+more than one node to call the same method, and have that method behave
+differently depending upon which argument it receives.
+
+=head2 ruleset
+
+This attribute is only relevant for operation nodes.  Its value must be the
+name of a ruleset defined for this data service instance.  This ruleset will
+be automatically used to validate the URL parameters for any request that
+matches this node, and will also be used in the process of generating
+documentation about the node.
+
+If the attribute is not specified, a ruleset name will be automatically
+generated by taking the node path, changing any slashes into colons, and
+adding the ruleset prefix (if any has been defined for this data service).  If
+the resulting name corresponds to a defined ruleset, that ruleset will be
+used.  You will probably find it convenient to use these auto-generated
+ruleset names in most cases, and will rarely need to specify this attribute.
+
+=head2 output
+
+This attribute is only relevant for operation nodes.  Its value must be the
+name of an output block defined for this data service, or the names of more
+then one output block separated by commas and optional whitespace.  For
+example:
+
+    output => 'block1, block2'
+
+This block or blocks will make up the fixed output of this node's operation.
+
+=head2 output_label
+
+The value attribute will be used to label the fixed output blocks in the
+generated documentation for this node.  Its value must be a string.  If not
+specified, it defaults to C<basic>.
+
+=head2 optional_output
+
+If specified, the value of this attribute must be the name of a single output
+map (in other words, a set) defined for this data service.  This will be used,
+in conjunction with the value of the special parameter C<show>, to select
+additional output blocks to be included in a response.  This attribute is
+useless unless the special parameter C<show> is enabled, and will only be used
+when responding to requests that include a value for that parameter.
+
+=head2 usage
+
+The value of this attribute must be either a single string or an array of
+strings.  These strings will be used to generate usage examples as part of the
+documentation for this node.  Each string will be parsed to determine the
+following list of elements:
+
+=over
+
+=item *
+
+A node path
+
+=item *
+
+A format
+
+=item *
+
+A parameter string (optional)
+
+=back
+
+For example, the following string:
+
+    single.json?state=wi
+
+will be parsed as: path="single", format="json", params="state=wi".  These
+elements are then used to construct a data service operation URL based on the
+set of features and special parameters that are enabled for this data
+service. Note that you must use this syntax no matter how your data service is
+configured (i.e. even if you have specified a format parameter instead of
+format suffix).  This attribute is not inherited.
+
+=head2 file_path
+
+If this attribute is specified, then this node will be a "file node".  The
+value must be a filename relative to the "public file" directory established
+by the foundation framework (for L<Dancer>, this is the directory "public"
+under the application root).  A request that exactly matches this node will
+return the contents of this file, a 404 error if the file does not exist, or a
+500 error if it exists but is not readable.  It is an error to specify both
+C<file_path> and C<file_dir> for a single node, or to specify either of them
+along with C<method>.
+
+=head2 file_dir
+
+If this attribute is specified, then this node will be a "file node".  The
+value must be a directory path relative to the "public file" directory (see
+L</file_dir>).  A request whose path exactly matches this node will result in
+a 404 error, but one whose path has this node's path as a prefix will look up
+the remainder of the path in this directory.  If the indicated file exists and
+is readable, its contents will be returned.  If it exists but is not readable,
+a 500 error will be returned.  Otherewise, a 404 error results.
+
+=head2 public_access
+
+If this attribute is given a true value, then all response messages generated
+in association with this node will have the CORS header
+"Access-control-allow-origin" set to "*".  Until we provide better means of
+controlling the CORS header in a later version of this framework, we suggest
+that you always set this to true for the root node.
+
+=head2 default_format
+
+The value of this attribute must be the name of one of the formats defined for
+this data service.  If no response format can be determined from the request URL
+and/or parameters, then the specified format will be used for any operation
+request matching this node.  If the data service will only be returning data
+in a single format, then you should set the value of this attribute in the
+root node to the name of that format.
+
+=head2 default_limit
+
+The value of this attribute will put a limit on the size of the result set for
+all operation requests matching this node, unless overridden by the special
+parameter L</limit>.  The purpose of this attribute is to prevent
+badly-composed requests from accidentally generating an enormous result set.
+A client can always include C<limit=all> in the request parameters to retrieve
+the full result set.  However, provided that clients leave that parameter off
+unless needed, this attribute provides a backstop.  The value of this
+attribute must be a positive integer.  Unless you want a hard limit that
+clients cannot override, you should make sure that the special parameter
+C<limit> is enabled if you use this attribute (it is included in the standard
+set).
+
+=head2 default_header
+
+By default, text format output includes a header unless the client explicitly
+turns it off by including C<header=no> in the request parameters.  If this
+parameter is set to a B<false> value, then no header will be provided for text
+format responses matching this node unless explicitly requested by the client
+using C<header=yes>.  Unless you want to disable headers entirely, you should
+make sure that the special parameter C<header> is enabled if you use this
+attribute (it is included in the standard set).
+
+=head2 default_datainfo
+
+By default, information about the dataset is included in a response only if
+the client requests it by including C<datainfo=yes> in the request parameters.
+If this attribute is set to a true value, then this information will be
+included by default for all operation requests matching this node unless the
+client specifies C<datainfo=no> (assuming that the special parameter
+C<datainfo> is active).  If you want clients to have control over whether or
+not this information is provided, you should make sure that the special
+parameter C<datainfo> is enabled (it is included in the standard set).
+
+=head2 default_count
+
+By default, a count of the number of records found and returned is included in
+a response only if the client requests it by including C<count=yes> in the
+request parameters.  If this attribute is set to a true value, then this
+information will be included by default for all operation requests matching
+this node unless the client specifies C<count=no>.  If you want clients to
+have control over whether or not this information is provided, you should make
+sure that the special parameter C<count> is enabled (it is included in the
+standard set).
+
+=head2 default_linebreak
+
+The value of this attribute must be either 'crlf', 'cr', or 'lf'.  If not
+specified, it defaults to 'crlf'.  The specified character sequence will be
+used to separate the lines of any text format output from requests that
+match this node, unless overridden by the special parameter C<linebreak>.
+
+=head2 default_save_filename
+
+The value of this attribute will used for the 'content-disposition' header of
+the response message for requests matching this node, if the special parameter
+C<save> is given with a basic 'true' value and not a filename.  The name of
+the requested response format will automatically be appended as a suffix, so no
+suffix should be included in the attribute value.  For requests given through
+a web browser, most browsers will offer to save the file under this name.
+
+=head2 stream_threshold
+
+The value of this attribute must be a positive integer.  It is only relevant
+if the feature C<stream_data> is enabled for this data service.  Any response
+whose length exceeds the value of this attribute will be streamed to the
+client instead of sent as a single message.  This feature is a good idea to
+enable for any service that can produce responses of more than a few hundred
+kilobytes.  If the feature is enabled but this attribute is not specified, it
+defaults to 100Kb.
+
+=head2 allow_method
+
+This is a set-valued attribute.  The individual values must be HTTP method
+types (i.e. GET, POST), specifying which HTTP methods are valid for requests
+matching this node.  If C<GET> is allowed, then C<HEAD> is allowed
+automatically as well.  If not specified, then the methods C<GET> and C<HEAD>
+are allowed.
+
+=head2 allow_format
+
+This is a set-valued attribute.  The individual values must be the names of
+response formats defined for this data service, specifying which ones are valid
+for requests matching this node.  If not specified, then all defined formats
+are allowed.
+
+=head2 allow_vocab
+
+This is a set-valued attribute.  The individual values must be the names of
+vocabularies defined for this data service, specifying which ones are valid
+for requests matching this node.  If not specified, then all defined
+vocabularies are allowed.
+
+=head2 doc_template
+
+The value of this attribute must be a file pathname relative to the
+L<documentation template directory|/doc_template_dir>.  The specified template
+file will be used to respond to any documentation requests matching this node.
+If not specified, then an automatic path will be constructed by starting with
+the node path and adding "_doc" followed by the filename suffix specified by
+the templating plugin.  If no file is found under that name, then the node
+path followed by "/index" and the same suffix is tried.  You will probably
+find it easiest to name your documentation files according to one of these two
+patterns, so that you will rarely if ever need to specify a value for this
+attribute.
+
+=head2 doc_default_op_template
+
+When a request for documentation matches this node, if the template specified
+by the L</doc_template> attribute is not found, and if the automatic paths are
+not found either, then the value of this attribute is tried next if this is an
+operation node.  If specified, the attribute value must be a file pathname
+relative to the L<documentation template directory|/doc_template_dir>.  The
+contents of the template should be a generic "operation documentation"
+template that can be filled in from the node attributes such as
+L</doc_string>.  In most cases, you will want to specify this attribute at
+the root node so that its value will be inherited by all of the other nodes.
+
+=head2 doc_default_template
+
+When a request for documentation matches this node, if none of the other
+template paths correspond to an actual template file on disk, then the value
+of this attribute will be tried as a final default.  The contents of this
+template might say something like "no documentation can be found".  If not
+specified, the default value is 'doc_not_found' followed by the appropriate
+suffix for the selected templating engine (i.e. '.tt' for Template Toolkit).
+
+=head2 doc_defs
+
+If specified, the value of this attribute must be a file path relative to the
+L<documentation template directory|/doc_template_dir>.  This file will be
+evaluated before each documentation template is rendered.  Its purpose is to
+define standard elements for use by the documentation template, the header,
+and the footer.  You may set this to the empty string if you do not wish a
+definition file to be used.
+
+If not specified, the default value is 'doc_defs' followed by the appropriate
+suffix for the selected templating engine (i.e. '.tt' for Template Toolkit).
+In most cases, you will want to either use the default or specify this
+attribute at the root node.
+
+=head2 doc_header
+
+If specified, the value of this attribute must be a file path relative to the
+L<documentation template directory|/doc_template_dir>.  This file will be
+evaluated before each documentation template is rendered, but after the file
+specified by L</doc_defs>.  Its purpose is to generate a header for the
+documentation pages.  You may set this to the empty string if you do not wish
+a header to be applied to the documentation pages.
+
+If not specified, the default value is 'doc_header' followed by the
+appropriate suffix for the selected templating engine (i.e. '.tt' for Template
+Toolkit).  In most cases, you will want to either use the default or specify
+this attribute at the root node.
+
+=head2 doc_footer
+
+If specified, the value of this attribute must be a file path relative to the
+L<documentation template directory|/doc_template_dir>.  This file will be
+evaluated after each documentation template is rendered.  Its purpose is to
+generate a footer for the documentation pages.  You may set this to the empty
+string if you do not wish a footer to be applied to the documentation pages.
+
+If not specified, the default value is 'doc_footer' followed by the
+appropriate suffix for the selected templating engine (i.e. '.tt' for Template
+Toolkit).  In most cases, you will want to either use the default or specify this
+attribute at the root node.
+
+=head2 doc_stylesheet
+
+If specified, the value of this attribute must be an absolute or relative URL
+(I<not a file path>) which should refer to a stylesheet file to go with the
+documentation pages.  If you wish the data service to provide this file, you
+will need to define a data service node with one of the attributes C<file_dir>
+or C<file_path> (and enable the C<send_files> feature).  Typically, this node
+should have the path "css" or "css/dsdoc.css", and its attribute should point
+to a similarly-named subdirectory of the public file directory set up by the
+foundation framework ("public" in the case of L<Dancer>).
+
+If not specified, the default value is a URL generated using the appropriate
+pattern for this data service for the node path "/css/dsdoc.css".  The default
+installation of this framework includes an appropriate CSS file under that
+name, which you can edit however you choose.
+
+=head1 LIST ELEMENT ATTRIBUTES
+
+The entries in a L<node list|/"Node Lists"> can have some or all of the
+following attributes.  The only required attributes are C<path>, C<list>
+and C<place>.  Whenever you define a node with
+L<define_node|Web::DataService/define_node> and give it a non-zero value for
+L<place|/place>, a list element is automatically created with these values.
+This element is placed into the node list corresponding to the newly defined
+node's path parent.
+
+If you wish to add other (i.e. non-hierarchical) entries to these node lists,
+or to define your own lists, you can use the
+L<list_node|Web::DataService/list_node> method and provide some or all of the
+following attributes:
+
+=head2 path [for list element]
+
+This attribute specifies the path of a "target" node to be displayed in the
+list.  It must correspond to a node of this data service.
+
+=head2 list
+
+This attribute specifies the name of the list in which this entry will appear.
+This name may be a node path, or any other string you choose.  If the named
+list does not already exist, it will be created.
+
+=head2 place [for list element]
+
+This attribute specifies where in the list the new record should appear.  Its
+value must be numeric.  Node lists are sorted by the value of C<place>, and
+secondarily by the order in which the nodes were defined.  If you give this
+attribute a value of zero, then this list entry will not be displayed.  You
+may want to do this to create placeholder entries that are inactive for now.
+
+=head2 title [for list element]
+
+This optional attribute provides the title for the list entry.  If not given,
+the title of the target node will be used by default.
+
+=head2 usage [for list element]
+
+This optional attribute can be used to provide usage examples for the list
+entry.  If not given, the usage examples (if any) of the target node
+will be used by default.
+
+=head2 doc_string [for list element]
+
+This optional attribute can be used to provide a documentation string for the
+list entry.  If not given, the documentation string (if any) of the target
+node will be used by default.  The usual way to set this attribute is by
+including one or more documentation strings after the list element attribute
+hash in the call to L<list_node|Web::DataService/list_node>.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

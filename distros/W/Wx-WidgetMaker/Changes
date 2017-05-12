@@ -1,0 +1,21 @@
+Revision history for Wx::WidgetMaker.
+
+0.11  Wed Aug 04 2004
+      o  fixed tests
+      o  fixed -id bug in popup_menu
+      o  added SIGNATURE
+
+0.10  Mon Nov 10 2003
+      o  added -id parameter to widgets so that events
+         can be associated with them
+      o  made bitmap suffixes in image_button case-insensitive
+      o  added META.yml file
+
+0.02  Thu Nov 06 2003
+      o  added -id parameter to 'submit'
+      o  allowed 'print' to Add a sizer to another sizer
+      o  removed 'use base qw(Wx::Panel)' (relic of other plans)
+
+0.01  Tue Sep 10 2002
+      o  Original version; created by h2xs 1.21 with options
+         -XA -n Wx::WidgetMaker

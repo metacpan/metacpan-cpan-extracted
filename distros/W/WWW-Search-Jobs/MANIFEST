@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/WWW/Search/AOL/Classifieds/Employment.pm
+lib/WWW/Search/Brassring.pm
+lib/WWW/Search/Dice.pm
+lib/WWW/Search/Monster.pm
+lib/WWW/Search/Yahoo/Classifieds/Employment.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/pod.t
+t/use.t

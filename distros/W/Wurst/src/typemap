@@ -1,0 +1,27 @@
+const char            T_CHAR
+const float           T_FLOAT
+float                 T_FLOAT
+const int             T_IV
+const size_t          T_UV
+const char       *    T_PV
+unsigned int     *    T_PV
+float            *    T_PTROBJ
+float            **   T_PTROBJ
+Aa_strct_clssfcn *    T_PTROBJ
+Aa_clssfcn       *    T_PTROBJ
+Dpt_list         *    T_PTROBJ
+Prob_vec         *    T_PTROBJ
+Sec_s_data       *    T_PTROBJ
+Seq              *    T_PTROBJ
+Seq_array        *    T_PTROBJ
+Seq_array        **   T_PTROBJ
+Sub_mat          *    T_PTROBJ
+Score_mat        *    T_PTROBJ
+Pair_set         *    T_PTROBJ
+Coord            *    T_PTROBJ
+FXParam          *    T_PTROBJ
+RSParam          *    T_PTROBJ
+Seqprof          *    T_PTROBJ
+Scor_set         *    T_PTROBJ
+Clssfcn          *    T_PTROBJ
+

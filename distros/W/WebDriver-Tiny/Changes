@@ -1,0 +1,35 @@
+0.006 2016-12-14
+    - Reorganise window methods.
+    - Always send a JSON payload, to appease geckodriver.
+    - Assorted fixes. Thanks arc.
+
+0.005 2016-11-22
+    - Doc fixes. Thanks tomhukins.
+    - Avoid timeouts by using HTTP::Tiny's public API.
+
+0.004 2016-02-24
+    - Require Perl 5.20 to allow for cleaner code.
+    - Require Carp 1.25 to ensure errors have periods on the end.
+    - Add $drv->alert_text.
+    - Add $drv->status.
+    - Add $drv->storage.
+    - Add $elem->location.
+    - Add $elem->location_in_view.
+
+0.003 2015-09-11
+    - Add support for ChromeDriver.
+    - Document how to use different backends.
+    - Add cookie getter/setter.
+    - Rename delete_cookie to cookie_delete.
+    - Support cookie_delete(@list_of_cookies_to_delete).
+    - Add support for asynchronous JavaScript.
+    - Rename execute to js.
+    - Rename execute_phantom to js_phantom.
+    - Add append, split, and uniq methods to element collections.
+
+0.002 2015-07-05
+    - $drv->() caches the closure and is now twice as fast.
+    - $drv->base_url('foo'), and $drv->window_maximize now return $self.
+
+0.001 2015-06-09
+    - Initial release.

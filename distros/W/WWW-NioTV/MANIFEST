@@ -1,0 +1,12 @@
+Build.PL
+Changes
+examples/test.pl
+lib/WWW/NioTV.pm
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

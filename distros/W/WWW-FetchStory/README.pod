@@ -1,0 +1,79 @@
+=head1 NAME
+
+WWW::FetchStory - Fetch a story from a fiction website
+
+=head1 DESCRIPTION
+
+WWW::FetchStory is a perl module, with an associated script, 'fetch_story',
+which fetches a story from a fiction website, intelligently dealing with the
+content from various different fiction websites such as fanfiction.net; it
+strips the extras frtom the HTML (such as navbars and javascript) and saves it
+so that all you get is the story text and its formatting.  If a story is
+deduced to be a multi-chapter story, all chapters of the story are downloaded,
+and saved to separate files.
+
+=head2 Fetcher Plugins
+
+In order to tidy the HTML and parse the pages for data about the story,
+site-specific "Fetcher" plugins have been written for various sites
+such as fanfiction.net, LiveJournal and others.
+These plugins can scrape meta-information about the story from the
+given page, including the URLs of all the chapters of a multi-chapter story.
+
+Of course, if the site in question alters its page format, then the
+Fetcher for that site will break.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the
+"./" notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as
+in a directory under your home directory, like "/home/fred/perl"
+go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to
+find the modules, and the PATH variable to find the script.
+
+Therefore you will need to change:
+your path, to include /home/fred/perl/script (where the script will be)
+
+	PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+	PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+	Kathryn Andersen RUBYKAT
+	http://www.katspace.org
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2010-2012 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

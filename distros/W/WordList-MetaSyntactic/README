@@ -1,0 +1,20 @@
+SYNOPSIS
+
+    Use one of the WordList::MetaSyntactic::* modules.
+
+DESCRIPTION
+
+    Base class for WordList::MetaSyntactic::* modules.
+    <WordList::MetaSyntactic::*> are wordlist modules that get their
+    wordlist from corresponding Acme::MetaSyntactic::* modules.
+
+METHODS
+
+    See WordList.
+
+SEE ALSO
+
+    WordList
+
+    Acme::MetaSyntactic
+

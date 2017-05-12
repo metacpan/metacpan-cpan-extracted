@@ -1,0 +1,18 @@
+Date: Wed, 27 Oct 2004 15:33:03 -0700 (PDT)
+From: Paul Kulchenko <paulclinger@yahoo.com>
+To: Bryce Harrington <bryce@osdl.org>
+Subject: Re: TicketAuth license?
+
+Bryce,
+
+If you're talking about this module [1] feel free to use and modify
+it any way you want. It hasn't been uploaded to CPAN only because I
+wrote it as an example on how it can be done, and it's very much
+specific to the way SOAP::Lite does things.
+
+Technically it's under the same license as Perl itself; if you can
+keep my name in it is good, if not, that's fine too. If you need
+anything more formal (like a statement that it's distributed under
+such and such license) let me know.
+
+Paul.

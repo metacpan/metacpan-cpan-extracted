@@ -1,0 +1,19 @@
+table.search {
+    width: 100%;
+}
+
+table.search td {
+    white-space: nowrap;
+    padding: .2em 1em .2em 1em;
+}
+
+table.search td.page_name   { 
+    text-align: left;
+}
+table.search td.edit_by   { 
+    text-align: center;
+}
+table.search td.edit_time { 
+    text-align: right;
+}
+

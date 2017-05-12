@@ -1,0 +1,20 @@
+== Rescue Your Doomed Project ==
+
+Any large software project struggles with managing code, managing people, and managing expectations. This is especially true for free software projects developed mostly by volunteers. Your project will run into one or more of them. Here’s what can possibly go wrong, how you can make your problems worse… and how to fix them.
+
+Topics include:
+
+* how not to manage volunteers
+* how not to promote your project to potential users
+* how to avoid releasing software
+* how to let bottlenecks derail your plans
+* how to reduce the quality of your code
+* how to chase away interested volunteers
+* how to chase away core contributors
+* how to render beautiful documentation useless
+* how to ensure that carefully-devised technical plans will go largely ignored
+* how to hide important knowledge in inaccessible silos
+* how to promote technical contributions over the polish that really matters
+* how to maintain features no one knows anything about
+
+... and most importantly, how to identify stupidly simple ways to make users and developers happy, productive, and successful.

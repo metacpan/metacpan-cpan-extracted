@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::Mechanize::AutoPager
+
+0.02  Thu Jun  5 11:18:06 PDT 2008
+        - Fixed the default siteinfo URL
+        - Handles JSON siteinfo
+        (Thanks to tokuhirom http://d.hatena.ne.jp/tokuhirom/20080605/1212683828)
+
+0.01  Tue May 29 14:58:15 2007
+        - original version

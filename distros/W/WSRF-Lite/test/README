@@ -1,0 +1,23 @@
+Test Scripts for checking services are working OK. They are used 
+when developing WSRF::Lite. 
+
+signature_checker.pl is used to create and validate a signed
+SOAP message using WS-Security - simply run the script. The
+script has lots of comments explaining what is going on.
+
+wsrftest.pl is used to test a WSRF::Lite Container is working
+properly. It can be use to check a container that is using
+either HTTP or HTTPS. The script checks WSRF WS-Resources that
+use either one process per WS-Resource, one process multiple
+WS-Resources or WS-Resources that use a file to store state.
+Simply run the script to find out the command line options,
+at the prompt type a number from 1-9 to run a particular test.
+The script assumes the WSRF::Lite Container is listing to port
+50000 on the localhost
+
+
+client_test.pl is used to test the client scripts in the
+client scripts directory of WSRF::Lite - it runs each script
+against a WSRF::Lite Container that is assumed to be listening
+to port 50000 on localhost. There are 29 tests associated with 
+this script. Simply run the script to run the tests.

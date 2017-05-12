@@ -1,0 +1,18 @@
+LICENSE
+Changes
+lib/WWW/Google/PageSpeedOnline.pm
+lib/WWW/Google/PageSpeedOnline/Params.pm
+lib/WWW/Google/PageSpeedOnline/Advise.pm
+lib/WWW/Google/PageSpeedOnline/Stats.pm
+lib/WWW/Google/PageSpeedOnline/Result.pm
+lib/WWW/Google/PageSpeedOnline/Result/Rule.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-unit-test.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

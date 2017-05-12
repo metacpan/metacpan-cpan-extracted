@@ -1,0 +1,35 @@
+---
+abstract: 'Perl interface to Notify My Android web API'
+author:
+  - 'Steve Huff <shuff@cpan.org>'
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Data::Dumper: 0
+  Test::More: 0
+  Test::UseAllModules: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-NotifyMyAndroid
+requires:
+  Carp: 0
+  Data::Printer: 0
+  FindBin::libs: 0
+  LWP::Protocol::https: 0
+  Params::Validate: 0
+  Readonly: 0
+  Regexp::Common: 0
+  WebService::Simple: 0
+  base: 0
+  strictures: 1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-NotifyMyAndroid
+  repository: git://github.com/chiselwright/webservice-notifymyandroid.git
+version: 0.0.6

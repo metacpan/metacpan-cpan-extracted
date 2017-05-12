@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WebService/Search123.pm
+lib/WebService/Search123/Ad.pm
+t/00-search123-load.t
+t/pod-coverage.t
+t/pod.t

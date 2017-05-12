@@ -1,0 +1,95 @@
+{
+   "abstract" : "Implements V2.0 of the DNSMadeEasy API",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-DNSMadeEasy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DDP" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "HTTP::Request" : "0",
+            "Moo" : "0",
+            "MooX::Singleton" : "0",
+            "Role::REST::Client" : "0",
+            "String::CamelSnakeKebab" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::DNSMadeEasy" : {
+         "file" : "lib/WebService/DNSMadeEasy.pm",
+         "version" : "0.02"
+      },
+      "WebService::DNSMadeEasy::Client" : {
+         "file" : "lib/WebService/DNSMadeEasy/Client.pm"
+      },
+      "WebService::DNSMadeEasy::ManagedDomain" : {
+         "file" : "lib/WebService/DNSMadeEasy/ManagedDomain.pm"
+      },
+      "WebService::DNSMadeEasy::ManagedDomain::Record" : {
+         "file" : "lib/WebService/DNSMadeEasy/ManagedDomain/Record.pm"
+      },
+      "WebService::DNSMadeEasy::Monitor" : {
+         "file" : "lib/WebService/DNSMadeEasy/Monitor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/WebService-DNSMadeEasy/issues"
+      },
+      "homepage" : "https://github.com/kablamo/WebService-DNSMadeEasy",
+      "repository" : {
+         "url" : "git://github.com/kablamo/WebService-DNSMadeEasy.git",
+         "web" : "https://github.com/kablamo/WebService-DNSMadeEasy"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:KABLAMO"
+}

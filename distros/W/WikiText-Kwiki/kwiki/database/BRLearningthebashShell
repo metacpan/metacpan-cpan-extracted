@@ -1,0 +1,33 @@
+== Learning the bash Shell ==
+
+Newham, C & Rosenblatt, B
+
+*Publisher:*  O'Reilly
+
+*ISBN:* 0-596-00965-8
+
+333 pp, $34.95 USA, $48.95 CAN.
+
+Official Blurb from O'Reilly:
+This refreshed edition serves as the most valuable guide yet to the bash shell. It's full of practical examples of shell commands and programs guaranteed to make everyday use of Linux that much easier. Includes information on key bindings, command line editing and processing, integrated programming features, signal handling, and much more!
+
+*Intended audience:* From the book's introduction: "... casual UNIX and Linux users who are just above the 'raw beginner' level."
+
+*Disclosure:*  I am not part of this target audience as I am a bit past the casual user stage.  I am not familiar with the previous editions of this book.
+
+=== What I liked: ===
+* This book has a very friendly tone, like your buddy the UNIX God/dess is hanging out explaining things to you.
+* I did learn a couple of new tricks. :)
+
+=== What needed some help: ===
+* Your buddy is so smart (and we all have one of these!) that s/he has forgotten how to talk to people who don't also know everything.  There is a lot of noise here.
+* There is a certain amount of "lying" that goes on when you're describing basics.  It seems that this book attempts to avoid that by excessive use of footnotes and asides of the "we'll get to that later" type.  I find this extremely distracting.
+* Better delineation of sections/subsections would greatly improve the readability and "accessibility" - I found it difficult to go back and find things I remembered reading.
+
+*Bottom line:*
+*This book is very dense.  Not recommended for people with short attention spans or as a reference book.  Would be useful as a class textbook.*
+
+-----
+
+=== Chapter-by-chapter: ===
+I'm sad to say, I got so frustrated trying to thrash my way through this that I gave up about 2/3 of the way through it.  So no chapter notes this time.

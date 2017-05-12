@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:41Z">
+<BookList total_results="252" page_size="10" page_number="14" shown_results="10">
+<BookData book_id="the_annotated_tales_of_edgar_allan_poe" isbn="0385149905">
+<Title>The annotated tales of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited with an introd., notes, and a bibliography by Stephen Peithman</AuthorsText>
+<PublisherText publisher_id="doubleday">Garden City, N.Y. : Doubleday, 1981.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xvii, 683, [1] p. : ill. ; 29 cm." language="eng" edition_info="$30.00" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2004-07-15T19:03:52Z" price_time="2006-10-08T07:59:45Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780385149907" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-28T06:37:08Z" currency_rate="1" price="26.25" />
+<Price store_isbn="" store_title="The Annotated Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_annotated_tales_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:46Z" currency_rate="1" price="24.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_annotated_tales_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="79.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_annotated_tales_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="22" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_annotated_tales_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:55Z" currency_rate="1" price="18.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Princeton University Library" last_update="2004-07-15T19:03:52Z" marc_url="http://isbndb.com/x/libdata/isbndb-princetonuniv-the_annotated_tales_of_edgar_allan_poe-20040715.mrc" />
+<MARC library_name="Washington Research Library Consortium" last_update="2006-01-28T06:37:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-213-the_annotated_tales_of_edgar_allan_poe-20060127.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="peithman_stephen">Peithman, Stephen</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear" isbn="1568821468">
+<Title>The Antarktos Cycle: Horror and Wonder at the Ends of the Earth</Title>
+<TitleLong>The Antarktos Cycle: Horror and Wonder at the Ends of the Earth (Call of Cthulhu Fiction)</TitleLong>
+<AuthorsText>John Wood Campbell, Arthur C. Clarke, John Glasby, Roger Johnson, HP Lovecraft, Edgar Allan Poe, John Taine, Jules Verne, Wilson Colin, Robert M. Price, John W. Campbell</AuthorsText>
+<PublisherText publisher_id="chaosium_inc">Chaosium, Inc.</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.4&quot;x8.4&quot;x1.3&quot;; 572 pages; 1.4 lb" language="" edition_info="Paperback; 1999-08-01" dewey_decimal_normalized="" lcc_number="" change_time="2004-12-26T11:33:49Z" price_time="2006-10-08T07:59:49Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Antarktos Cycle" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-08-05T22:52:36Z" currency_rate="1" price="19.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9781568821467" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T22:52:36Z" currency_rate="1" price="21" />
+<Price store_isbn="" store_title="Antarktos Cycle" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:47Z" currency_rate="1" price="49.95" />
+<Price store_isbn="" store_title="The Antarktos Cycle" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:47Z" currency_rate="1" price="19.95" />
+<Price store_isbn="" store_title="The Antarktos Cycle: Horror and Wonder at the Ends of the Earth (Call of Cthulhu Fiction)" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="40" />
+<Price store_isbn="" store_title="The Antarktos Cycle: Horror and Wonder at the Ends of the Earth (Call of Cthulhu Fiction)" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="199.99" />
+<Price store_isbn="" store_title="The Antarktos Cycle" store_url="http://isbndb.com/x/book/the_antarktos_cycle_horror_and_wonder_at_the_ends_of_the_ear/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:55Z" currency_rate="1" price="20" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_horror_united_states">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_robert">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Robert</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_price_robert_m">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Price, Robert M</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_contemporary">Amazon.com -- Literature &amp; Fiction -- General -- Contemporary</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_authors_a_z_c_clarke_arth">Amazon.com -- Science Fiction &amp; Fantasy -- Authors, A-Z -- ( C ) -- Clarke, Arthur C</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_authors_a_z_v_verne_jules">Amazon.com -- Science Fiction &amp; Fantasy -- Authors, A-Z -- ( V ) -- Verne, Jules</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_science_fiction_general">Amazon.com -- Science Fiction &amp; Fantasy -- Science Fiction -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="campbell_john_creighton">Campbell, John Creighton</Person>
+<Person person_id="clarke_arthur_charles">Clarke, Arthur Charles</Person>
+<Person person_id="glasby_john_stephen">Glasby, John Stephen</Person>
+<Person person_id="johnson_roger">Johnson, Roger</Person>
+<Person person_id="hp_lovecraft">HP Lovecraft</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="john_taine">John Taine</Person>
+<Person person_id="verne_jules">Verne, Jules</Person>
+<Person person_id="wilson_colin_a01">Wilson Colin</Person>
+<Person person_id="price_robert_m">Price, Robert M.</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_assignation_a01" isbn="0585051771">
+<Title>The assignation</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:16:28Z" price_time="2006-10-08T07:59:53Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085973 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:16:28Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-the_assignation_a01-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_black_cat" isbn="0930350871">
+<Title>The black cat</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; [wood engravings by Alan James Robinson]</AuthorsText>
+<PublisherText publisher_id="northeastern_university_press">Boston : Northeastern University Press, 1986, c1984.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="[25] p. : ill. ; 24 cm." language="eng" edition_info="(alk. paper) :$14.95" dewey_decimal_normalized="813.3" lcc_number="PS2613" change_time="2004-07-21T20:22:06Z" price_time="2006-10-08T07:59:56Z" />
+<Summary></Summary>
+<Notes>"Text...is from the 1845 Wiley-Putnam edition"--Colophon.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-23T12:30:32Z" currency_rate="1" price="4.56" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-23T12:30:32Z" currency_rate="1" price="16.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-23T12:30:32Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="The Black Cat" store_url="49817528&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-23T12:30:32Z" currency_rate="1" price="7.5" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780930350871" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-23T12:30:32Z" currency_rate="1" price="3.03" />
+<Price store_isbn="" store_title="The Black Cat" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="The Black Cat" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="2.75" />
+<Price store_isbn="" store_title="The Black Cat" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:56Z" currency_rate="1" price="2.89" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Oregon" last_update="2004-07-21T20:22:06Z" marc_url="http://isbndb.com/x/libdata/isbndb-306-the_black_cat-20040721.mrc" />
+<MARC library_name="Syracuse University (Syracuse, NY)" last_update="2004-07-28T15:53:41Z" marc_url="http://isbndb.com/x/libdata/isbndb-92-the_black_cat-20040728.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="robinson_alan">Robinson, Alan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_black_cat_a03" isbn="0886820014">
+<Title>The black cat</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; illustrations by Etienne Delessert</AuthorsText>
+<PublisherText publisher_id="creative_education">Mankato, MN : Creative Education, c1985, 1843.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="32 p. ; 22 cm." language="eng" edition_info="$17.45" dewey_decimal_normalized="813.3" lcc_number="" change_time="2006-09-20T16:03:48Z" price_time="2006-10-08T07:59:59Z" />
+<Summary></Summary>
+<Notes>"A creative short story"--Cover.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="1985 Black Cat by Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_black_cat_a03/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-20T16:04:22Z" currency_rate="1" price="15.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780886820015" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-20T16:04:22Z" currency_rate="1" price="3.89" />
+<Price store_isbn="" store_title="The Black Cat" store_url="http://isbndb.com/x/book/the_black_cat_a03/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:48Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Black Cat (Classic Short Stories)" store_url="http://isbndb.com/x/book/the_black_cat_a03/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Black Cat (Classic Short Stories)" store_url="http://isbndb.com/x/book/the_black_cat_a03/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_a03/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:54:25Z" currency_rate="1" price="13.11" />
+</Prices>
+<Subjects>
+<Subject subject_id="cats_fiction">Cats -- Fiction</Subject>
+<Subject subject_id="horror_tales">Horror tales</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Hurst Public Library (Hurst, TX)" last_update="2006-09-20T16:03:48Z" marc_url="http://isbndb.com/x/libdata/isbndb-233-the_black_cat_a03-20060920.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="delessert_etienne">Delessert, Etienne</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_black_cat_and_other_stories" isbn="0582417740">
+<Title>The black cat and other stories</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; retold by David Wharry</AuthorsText>
+<PublisherText publisher_id="pearson_education">Harlow : Pearson Education, 1999.</PublisherText>
+<Details dewey_decimal="" physical_description_text="38 p. : ill. ; 20 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-15T12:52:00Z" price_time="2006-10-08T08:00:02Z" />
+<Summary></Summary>
+<Notes>Black cat -- Oval portrait -- Berenice -- Mask of the red death.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Black Cat and Other Stories" store_url="http://www.biblio.com/details.php?dcx=33840499&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-18T13:36:10Z" currency_rate="1" price="10.45" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-18T13:36:11Z" currency_rate="1" price="3.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-18T13:36:11Z" currency_rate="1" price="12.75" />
+<Price store_isbn="" store_title="The Black Cat and Other Stories by Edgar A. Poe (1999)" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-18T13:36:13Z" currency_rate="1" price="11.03" />
+<Price store_isbn="" store_title="Black Cat and Other Stories, the, Level 3, Penguin Readers" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="7.84" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="7.85" />
+<Price store_isbn="" store_title="Black Cat and Other Stories, The, Level 3, Penguin Readers" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="7.84" />
+<Price store_isbn="" store_title="The Black Cat and Other Stories (Penguin Readers, Level 3)" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="The Black Cat and Other Stories (Penguin Readers, Level 3)" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="0.89" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="8.33" />
+<Price store_isbn="" store_title="BLACK CAT&quot; AND OTHER STORIES" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="4.3" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33781295%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:10Z" currency_rate="1" price="8.58" />
+<Price store_isbn="" store_title="Black Cat and Other Stories, The, Level 3, Penguin Readers" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:54:27Z" currency_rate="1" price="8.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T08:00:02Z" currency_rate="1" price="9.54" />
+</Prices>
+<Subjects>
+<Subject subject_id="readers_for_new_literates">Readers for new literates</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University College of the Cariboo (Kamloops, BC)" last_update="2005-01-15T12:52:00Z" marc_url="http://isbndb.com/x/libdata/isbndb-59-the_black_cat_and_other_stories-20050115.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_black_cat_and_other_stories_a01" isbn="0140815139">
+<Title>The black cat and other stories</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; retold by David Wharry</AuthorsText>
+<PublisherText publisher_id="penguin_english">London : Penguin English, 1991.</PublisherText>
+<Details dewey_decimal="428.6" physical_description_text="44 p. : ill. ; 20 cm." language="eng" edition_info="(pbk) :No price" dewey_decimal_normalized="428.6" lcc_number="" change_time="2005-12-12T17:31:12Z" price_time="2006-10-04T21:29:15Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+<Subject subject_id="readers">Readers</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Deakin University" last_update="2005-12-12T17:31:12Z" marc_url="http://isbndb.com/x/libdata/isbndb-185-the_black_cat_and_other_stories_a01-20051212.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="wharry_david">Wharry, David</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_black_cat_and_other_stories_a02" isbn="3895080918">
+<Title>The Black Cat and Other Stories</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="konemann_a01">Konemann</PublisherText>
+<Details dewey_decimal="" physical_description_text="330 pages" language="" edition_info="Hardcover; 1996-11" dewey_decimal_normalized="" lcc_number="" change_time="2005-12-30T06:08:05Z" price_time="2006-07-12T16:41:35Z" />
+<Summary>The Murders In The Rue Morgue, The Mystery of Marie Roget, The Purloined Letter, The Pit and the Pendulum, The Cask of Amontillado, The Gold-Bug.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:25Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:25Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Black Cat &amp; Other Stories" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-07-12T16:41:25Z" currency_rate="1" price="6.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-07-12T16:41:25Z" currency_rate="1" price="5.57" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9783895080913" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:25Z" currency_rate="1" price="2.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:26Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Edgar Allen Poe II Product 615350" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.615350&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-07-12T16:41:26Z" currency_rate="1" price="5.59" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:27Z" currency_rate="1" price="3.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_black_cat_and_other_stories_a02/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-07-12T16:41:27Z" currency_rate="1" price="12.75" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=83242836&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-12T16:41:27Z" currency_rate="1" price="1" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_book_of_the_poe_centenary" isbn="0883053624">
+<Title>The book of the Poe centenary</Title>
+<TitleLong>The book of the Poe centenary: a record of the exercises at the University of Virginia, January 16-19, 1909, in commemoration of the one hundredth birthday of Edgar Allan Poe</TitleLong>
+<AuthorsText>edited by Charles W. Kent and John S. Patton</AuthorsText>
+<PublisherText publisher_id="norwood_editions">Norwood, Pa. : Norwood Editions, 1975 [c1909]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="211 p. ; 23 cm." language="eng" edition_info="$22.50" dewey_decimal_normalized="818.309" lcc_number="PS2635" change_time="2005-02-23T17:01:02Z" price_time="2006-05-17T17:41:17Z" />
+<Summary></Summary>
+<Notes>Reprint of the ed. published by the University of Virginia, Charlottesville.
+
+Includes index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_anniversaries_etc">Poe, Edgar Allan,1809-1849 -- Anniversaries, etc</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2005-02-23T17:01:02Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_book_of_the_poe_centenary-20050223.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="kent_charles_foster">Kent, Charles Foster</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="patton_john">Patton, John</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_brevities" isbn="0877522294">
+<Title>The brevities</Title>
+<TitleLong>The brevities: Pinakidia, Marginalia, Fifty suggestions, and other works</TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with introduction and notes by Burton R. Pollin</AuthorsText>
+<PublisherText publisher_id="gordian_press">New York : Gordian Press, 1985.</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="lx, 575 p. : ill., 1 port. ; 25 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2619" change_time="2004-11-08T03:03:07Z" price_time="2006-08-30T13:46:44Z" />
+<Summary></Summary>
+<Notes>Includes bibliographies and index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Brevities" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="121.49" />
+<Price store_isbn="" store_title="Collected Writings Volume 2: Poe" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="11.39" />
+<Price store_isbn="" store_title="Collected Writings Volume 2 :Poe" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="Brevities: Pinakidia, Marginalia, Fifty Suggestions and Other Works (Collected Writings of Edgar Allan Poe, Vol 2)" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="Brevities: Pinakidia, Marginalia, Fifty Suggestions and Other Works (Collected Writings of Edgar Allan Poe, Vol 2)" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="63.75" />
+<Price store_isbn="" store_title="Brevities: Pinakidia, Marginalia, Fifty Suggestions and Other Works" store_url="http://isbndb.com/x/book/the_brevities/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-30T13:46:41Z" currency_rate="1" price="100" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Memorial University of Newfoundland Search Form" last_update="2004-08-27T01:20:42Z" marc_url="http://isbndb.com/x/libdata/isbndb-173-the_brevities-20040826.mrc" />
+<MARC library_name="Library of Congress" last_update="2004-11-08T03:03:07Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_brevities-20041107.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="pollin_burton_ralph">Pollin, Burton Ralph</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

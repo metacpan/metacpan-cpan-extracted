@@ -1,0 +1,31 @@
+WWW-Sucksub-Divxstation
+
+WWW::Sucksub::Divxstation allows an automated access to web database divxstation.com
+Any search are collected in a dbm file where subtitles http address and titles are stored.
+each distant search continue to collect results in a local database file.
+You can use this small db to search and produce simple html report
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Timothée Foucart
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

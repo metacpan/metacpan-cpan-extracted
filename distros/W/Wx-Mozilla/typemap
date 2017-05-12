@@ -1,0 +1,9 @@
+wxMozillaBrowser *	O_WXOBJECT
+wxMozillaBeforeLoadEvent *	O_WXOBJECT
+wxMozillaStateChangedEvent *	O_WXOBJECT
+wxMozillaSecurityChangedEvent *	O_WXOBJECT
+wxMozillaLoadCompleteEvent *	O_WXOBJECT
+wxMozillaStatusChangedEvent *	O_WXOBJECT
+wxMozillaTitleChangedEvent *	O_WXOBJECT
+wxMozillaProgressEvent *	O_WXOBJECT
+wxMozillaRightClickEvent *	O_WXOBJECT

@@ -1,0 +1,58 @@
+Revision history for Perl extension Wx::TreeListCtrl.
+
+0.13  Jun  22  2011
+    - Fix Mac OSX Compilation
+
+0.12  Jun  21  2011
+    - Used lastest base wxTreeListCtrl code from http://wxcode.sourceforge.net
+      several methods updated to take 'coulmn' param.
+      Interface should now closely match that described at
+      http://wxcode.sourceforge.net/components/treelistctrl/reference.html
+
+0.11  Oct   2  2010
+    - Makefile.PL no longer depends on wxperl_overload
+    - Better module metadata (Alexandr Ciornii)
+
+0.10  Apr  23  2010
+
+    - Wx::build::MakeMaker added to configure_requires (Alexandr Ciornii)
+    - Editable column in example (Alexandr Ciornii)
+    - Demo module improvements (Alexandr Ciornii)
+
+0.09  Mar  16  2010
+    - Makefile and use fixes
+    - version released for PPM repo update.
+
+0.08  Feb  10  2010
+    - namespace fix
+    
+0.07  Feb  10  2010
+    - Fixed possible Wx::TreeListColumnInfo thread memory leak
+    - Added some tests.   
+
+0.06  Feb   2  2010
+    - Updated to use latest source from wxTreeListCtrl
+      in wxPython dist but added wxTR_SHOW_ROOT_LABEL_ONLY
+      back in.
+    - added GetColumn SetColumn GetCurrentItem SetCurrentItem
+    - confirmed compilation on wxMAC (carbon), wxMSW, wxGTK (linux)
+
+0.051 A patched non official version.
+      get the official version from search.cpan.org
+
+0.05  Mon Aug  21 2006
+    - changed build system in accordance with Wx 0.57
+    - removed script/pipe.pl
+
+0.04  Fri Aug  18 2006
+    - added lib/Wx/DemoModules/wxTreeList.pm
+
+0.03  Thu Aug  17 2006
+    - added EXPORT_TAG 'treelist'
+
+0.02  Thu Aug  17 2006
+    - fixed exporting of constants
+
+0.01  Tue Aug  8 10:28:54 2006
+    - first attempt at wrapping wxTreeListCtrl
+

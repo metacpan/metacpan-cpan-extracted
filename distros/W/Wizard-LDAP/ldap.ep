@@ -1,0 +1,11 @@
+<ep-package name="HTML::EP::Wizard">
+<ep-session class="HTML::EP::Session::Cookie" id="wizard" expires="+1h"
+            path="/" zlib="1" base64="1">
+<ep-wizard class="Wizard::LDAP">
+
+<HTML>
+$@htmltitle$
+<form action="ldap.ep" METHOD="POST">
+$@htmlbody$
+</form>
+</HTML>

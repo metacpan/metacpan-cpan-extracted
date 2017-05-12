@@ -1,0 +1,17 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    This module provides several functions for performing common tasks on
+    PAUSE. There is also a CLI script pause distributed separately in
+    App::pause.
+
+SEE ALSO
+
+    CPAN::Uploader which also does uploading from CLI.
+
+    WWW::PAUSE::CleanUpHomeDir which can clean old releases from your PAUSE
+    account (CLI script is provided in example).
+
+    https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using-cli/
+

@@ -1,0 +1,99 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Realm::GenericPrincipal - generic security principal class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Realm::GenericPrincipal - generic security principal class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Generic implementation of <STRONG>Servlet::Util::Principal</STRONG> that is
+available for use by <STRONG>Wombat::Realm</STRONG> implementations.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Realm::GenericPrincipal</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return the username of the user represented by this Principal.
+<P></P>
+<DT><STRONG><A NAME="item_getPassword"><CODE>getPassword()</CODE></A></STRONG><BR>
+<DD>
+Return the authentication credentials for the user represented by this
+Principal.
+<P></P>
+<DT><STRONG><A NAME="item_getRealm"><CODE>getRealm()</CODE></A></STRONG><BR>
+<DD>
+Return the Realm with which this Principal is associated.
+<P></P>
+<DT><STRONG><A NAME="item_getRoles"><CODE>getRoles()</CODE></A></STRONG><BR>
+<DD>
+Return the array of roles associated with this user.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_hasRole"><CODE>hasRole($role)</CODE></A></STRONG><BR>
+<DD>
+Return true if this principal possesses the specified role, or false
+otherwise.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24role">$role</A></STRONG><BR>
+<DD>
+the name of the security role to be checked
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><STRONG>Servlet::Util::Principal</STRONG>,
+<STRONG>Wombat::Realm</STRONG></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,13 @@
+Changes
+example/ctrl.pl
+lib/WebService/LastFM.pm
+lib/WebService/LastFM/NowPlaying.pm
+lib/WebService/LastFM/Playlist.pm
+lib/WebService/LastFM/Session.pm
+lib/WebService/LastFM/Track.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_request.t
+META.yml                                 Module meta-data (added by MakeMaker)

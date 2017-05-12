@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW::Scraper::Typo3.
+
+1.01  Thu Aug 26 17:45:00 2010
+	- Add common::sense as a requirement in Build.PL and Makefile.PL.
+
+1.00  Wed Aug 18 08:56:00 2010
+	- Original version

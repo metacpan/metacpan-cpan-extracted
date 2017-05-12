@@ -1,0 +1,346 @@
+Revision history for WWW-Facebook-API
+
+0.4.18 Fri Mar 12 23:39:59 PST 2010
+    - Fixed Canvas.pm to correctly select MD5-hex value. (Andrey Ilyin)++
+    - Updated Canvas.pm docs to specify cookie method needed
+    - Updated copyright information
+
+0.4.17  Thu Nov 26 09:48:03 PST 2009
+	- Updated Stream.publish to automatically call encode action_links
+	  to JSON. (Larry Mak)++
+	- Fixed upload method in Video along with docs (Anthony Bouvier)++
+	- Updated server call in API.pm to allow a filename to be passed in
+	  from the upload methods under Video and Photo. (Anthony Bouvier)++
+	- Didn't include Canvas testing b/c it looks like the code changes
+	  back in August broke the mocking. (It's on the TODO list)
+	- Added format testing for Video.upload
+
+0.4.16  Mon Aug 24 18:43:12 PDT 2009
+	Added Exception submodule for handling exceptions (Kevin Riggle)++
+
+0.4.15  Fri Aug 21 22:26:44 PDT 2009
+	Updated POD and formatting (for Perl::Critic) (gregor herrmann)++
+	Added new namespaces that are now a part of Facebook API along with
+	  basic tests
+	Added documentation for all namespaces in API.pm
+	Deleted deprecated namespaces and methods
+	Added begin and end methods to start and finish permissions mode in
+	  Permissions.pm
+        Changed formatting and removed versioning information. Versioning
+	  information is no longer specific to each submodule, but to the
+	  distribution
+
+0.4.14  Tue Oct 14 22:37;41 EDT 2008
+	Added Application,Admin,SMS APIs + tests (tburke++)
+	Fixed a bug with get_registered_template_bundle in Feed API (tburke++)
+
+0.4.13  Wed Jul 30 18:14:59 PDT 2008
+	Added Readonly as dependency
+
+0.4.12  Wed Jul 30 04:09:26 PDT 2008
+	Perltidy'd
+	Fixed RT#33571 and RT#37617 (gregor herrmann)++
+	Addresses RT#37840 (clscott++)
+	
+0.4.11  Thu Feb 28 20:44:29 PST 2008
+	Fix documentation bug for notifications->send_email
+	Add FAQ entry for RT#31620 and RT#31944
+	Regen'ed README
+	Fixed utf8 encoding issue: RT#32500 (thanks for the patch, Ryan)
+	Added get_lists in friends namespace
+	Added data namespace with tests
+	Updated documentation to match various API updates
+	Perltidy'd
+
+0.4.10 Sat Dec  1 17:30:58 PST 2007
+	Fixed bug where session_key parameter value wasn't being used when
+	  passed to a call (thanks Louise-Philippe)
+	Perl-tidied and critiqued
+	Added stub documentation for base and new methods
+
+0.4.9  Sun Nov 25 11:39:47 PST 2007
+	Fixed some documentation errors
+	Updated documentation to match current documentation on Facebook site
+	Added pages namespace
+	Removed get_FBML and set_FBML in profile namespace
+
+0.4.8  Sun Nov 11 14:37:41 PST 2007
+	Updated docs and added FAQ with two questions
+	Added marketplace
+	Added users->has_app_permission, users->is_app_added, users->set_status
+	Added feed->publish_templatized_action (thanks Larry Mak)
+	Changed autogen methods for subclasses in API.pm (thanks Shawn)
+	No longer send secret when authenticating (thanks Derek)
+
+0.4.7  Mon Sep  3 18:32:38 PDT 2007
+	Updated POD and README
+
+0.4.6  Mon Sep  3 18:24:35 PDT 2007
+	Updated POD and README (and forgot to commit changes ):
+
+0.4.5  Mon Sep  3 16:35:59 PDT 2007
+	BUG FIX: $api->photos->upload now works as documented
+	BUG FIX: some session keys weren't being parsed correctly,
+	  which made later API calls ultimately fail.
+	Updated tests to account for FBML version
+	Some internal refactoring
+
+0.4.4  Sat Jul 28 13:59:17 PDT 2007
+	Fixed get_infinite_sesion url (codegen => code_gen)
+	Fixed error message carping (only matters in debug mode)
+	Added app_id attribute
+	Commented out tests using IO::String, since they're failing for some
+	  people and are not accurately representing the module's functionality
+
+0.4.3  Fri Jul 20 14:55:48 PDT 2007
+	Fix failing test for when CGI module is greater than 3.15 (t/canvas.t)
+	Try to fix test problem w/IO::String on 5.9.x(?)
+	Make live tests work again (changed SECRET_KEY to SECRET)
+	Run some tests only if AUTHOR_TESTS is set
+
+0.4.2  Sun Jul 15 03:10:07 PDT 2007
+	*** API CHANGE ***
+	WFA_SECRET_KEY environment variable is now WFA_SECRET
+	Config can now be loaded from a file if specified as a parameter:
+	  config => 'file_name'
+	Any calls to Facebook that returned empty hash/array references will now
+	  return nothing instead of the empty reference.
+	Reworked require_* and redirect methods to work better. See docs.
+	  redirect() now punts to CGI->new->redirect (was $self->query->redirect)
+	Try to fix test failure when checking debug output
+
+0.4.1  Wed Jul 11 07:39:25 PDT 2007
+	Fixed doc formatting and removed 'update' namespace doc
+	  (Thanks Tom Hukins)
+	Fixed require_* methods and added tests (Thanks Skyler Clark)
+	_get_url_params now works when 'canvas' is passed in by itself, or if
+	 it's passed in as a key.
+	Removed 'is_app_added' from 'users' namespace
+	Updated test coverage
+
+0.4.0  Tue Jul 10 06:28:44 PDT 2007
+	Fixed failing test in t/auth.t on linux (Thanks Tom Hukins)
+	Fixed parse => 1 and format => XML bug (added tests)
+
+0.3.9  Sun Jul  8 18:53:57 PDT 2007
+	Fixed skipped test construct
+	Moved new and base subs for different namespaces into API.pm generator
+	Added tests for canvas methods
+	Added tests for auth methods
+	Added tests for most other namespace methods, some better than others.
+	  (Better than nothin')
+	Removed WWW::Facebook::API::Update, since no longer in API.
+
+0.3.8  Sun Jul  8 02:45:58 PDT 2007
+	FQL->query() now always returns an array reference when using JSON and
+	  'parse' is set to true. (Thanks Jim Spath)
+	Added query() call in examples/facebook-desktop-json for now.
+	Don't call allow_nonref() if JSON::Any isn't using JSON::XS
+	Fixed fql bug when not using JSON and not having $self->parse set.
+	Fixed which secret to be used in call() method.
+	Added quite a few tests
+	Using environment variables for defaults if defined (see docs)
+	Added _parser() for repeated code
+
+0.3.7  Thu Jul  5 07:20:14 PDT 2007
+	Simpler fix for JSON problem, which fixed some other bugs that cropped
+	  up with previous method. (Thanks Skyler Clark)
+
+0.3.6  Fri Jun 29 11:06:53 PDT 2007
+	Critical bug in 0.3.5 in setting attributes (affects using the canvas)
+	  (Thanks Jim Spath)
+
+0.3.5  Thu Jun 28 12:38:24 PDT 2007
+	Added canvas->get_non_fb_params() (Thanks Matt Sickler)
+	Clarified Canvas documentation for validate_sig() (Thanks Matt Sickler)
+	Refactored get_*_url methods
+	Worked on require_* methods and added docs
+	Added 'query' attribute to API.pm to store current CGI or
+	  Apache::Request object.
+	Fixed test coverage table formatting in docs
+	Add JSON::XS nonref fix to _parse (returns from notifications->send
+	  haven't been working) (Thanks Matt Sickler and Jim Spath)
+
+0.3.4  Fri Jun 22 19:16:34 PDT 2007
+	Cleaned up attribute creators and namespace method creators (Thanks
+	  Matt Sickler)
+	Added debug message in _parse
+	Require auth_token for get_session() calls (was being set to secret
+	  if no token was passed in for web apps, and that was wrong)
+	Edited docs to clarify what needs to be done for web apps to call
+	  auth->get_session(). (Thanks Olaf Alders)
+	XML is no longer parsed when the parse flag is true. (Thanks Olaf
+	  Alders)
+	Added CONTRIBUTORS section for those who've contributed ideas and code
+	canvas->in_frame now checks for 'in_iframe' rather than erroneous
+	  'in_frame'. Fixed doc example call, too. (Thanks Simon Cavalletto)
+	JSON loading patch (Thanks J. Shirley)
+
+0.3.3  Thu Jun  7 22:26:17 PDT 2007
+	Ran through Perl::Critic and added tests (not included in MANIFEST)
+	Added method call_success in API.pm to simplify error tracking
+	Added method get_infinite_session_url to API.pm
+	Added test coverage table to the end of API.pm
+	Error message and code is now stored in last_error_message
+	Updated docs (some errors in examples, too)
+	
+0.3.2  Sun Jun  3 21:38:20 PDT 2007
+	*** API CHANGE ***
+	  Change auth->login method to comply with Facebook TOS A.9.iv
+	  Changed examples accordingly (removed web examples, kept canvas)
+	Added TODO section in API.pm
+	Removed dependency on WWW::Mechanize, and just use LWP::UserAgent
+
+0.3.1  Sun Jun  3 13:46:03 PDT 2007
+	Fixed POD formatting and synopsis example
+	Updated docs for diagnostics messages
+	Removed internal methods in Auth.pm
+	README now has doc for API.pm
+
+0.3.0  Sun Jun  3 01:16:18 PDT 2007
+	*** API changes ***
+	JSON::Any is used by default, and parse is on by default, so
+	  a Perl data structure will be returned
+	The JSON or XML response is still returned if parse is set to 0
+	Removed the (now unneeded) parse variables.
+	Removed API::Base, API::Simple, API::Errors
+	Removed Login.pm and moved its login method to Auth.pm
+	Changed get_add_url and get_login_url to take in a hash. Those, along
+	  with auth->login now use the _add_url_params method.
+	Added some API tests
+	Updated examples/facebook-{desktop,web}-json to reflect new API
+	Added examples/facebook-{desktop,web}-raw to show XML output on calls
+	Removed examples/facebook-{desktop,web}-xml
+	Updated examples/facebook-canvas-xml and renamed to facebook-canvas-json
+	Fixed bug in get_session parsing
+	Fixed POD errors in API.pm
+	Tests: updated t/auth.t and and t/00.load.t; removed t/api_simple.t
+
+Branch Sat Jun  2 01:40:44 PDT 2007
+	simple is now the default. { NoAttr => 1, SuppressEmpty => 1}
+	  is default parse_params for XML
+	Updated docs
+	Updated examples
+	Updated Auth.pm and Base.pm to account for simple change
+	Removed now defunct WWW::Facebook::API::Simple
+	Applied David Leadbeater's patch
+	  fixes generat_sig and verify_sig in Base.pm
+	  adds get_facebook_url, get_add_url, get_login_url, get_app_url
+	  added canvas example
+
+0.2.3  Sat Jun  2 01:59:54 PDT 2007
+	Add XML::Simple dependency until streamline is complete
+
+0.2.2  Sat Jun  2 01:24:19 PDT 2007
+	Added method to Base (and paramter to API->new) to configure options
+	  passed to XML or JSON parser (if used): parse_params
+	Added generate_sig, verify_sig, session, unescape_string to Base.pm
+	Added is_app_added to Users.pm
+	Perltidy'd examples, and fixed xml parsing dereferencing that was
+	  broken in HEAD
+	Fixed parse_params bug (thanks Patrick)
+	Applied patch for Canvas class (thanks David Leadbeater)
+	Changed Canvas methods a bit (semantics the same)
+	parse_response is now set to 1 as the default.
+
+0.2.1  Fri Jun  1 02:55:17 PDT 2007
+	Removed OSX-specific code in Login.pm (shouldn't cause any major
+	  damage, but annoying nonetheless)
+
+0.2.0  Fri Jun  1 02:55:17 PDT 2007
+	Perltidy'd
+	Updated docs to match current usage
+	Removed Moose and XML::Simple dependency
+	fixed last_call_success method being called on wrong object
+	Updated docs to reflect dependency change
+
+0.1.6  Thu May 31 17:54:39 PDT 2007
+	fixed 'errors' method calls in Base.pm
+
+0.1.5  Thu May 31 11:15:52 PDT 2007
+	**** API Change in Errors.pm ****
+	  log_debug and log_error are no more. log_string is.
+	applied patch to add FBML methods RT#27351 (thanks Tom)
+	throw_errors flag wasn't being used, and now is (thanks Clayton)
+	autogenerated namespaces in API.pm  (saves typing :-)
+
+0.1.4  Wed May 30 06:16:35 PDT 2007
+	update docs
+	fixed signature generation bug (thanks Shawn) and added test
+
+0.1.3  Tue May 29 19:21:23 PDT 2007
+	updated docs to have profile and feed
+
+0.1.2  Tue May 29 13:37:23 PDT 2007
+	listened to wisdom and fixed test dependency problem RT#27305
+          (thanks Sean)
+	added 'format' attribute to Base
+	returns JSON (raw response) if specified
+	reworked logic for fixing quotes hash refs
+	changed POST to GET for Login->login
+	moved most of 'simple' logic into Base
+	fixed error catching code in Base->call
+	added private method _make_xml_for to create xml if specified
+	changed debugging output to just print raw response
+	made calls in different sub-modules a lot simpler
+
+0.1.1  Mon May 28 22:07:01 PDT 2007
+	added profile.* and feed.* methods of API
+	added logout method under Auth
+	updated example to use logout method
+	added debugging information
+	added two load tests
+	hash refs under quotes (none which should be refs) are now removed
+
+0.1.0  Mon May 28 07:48:50 PDT 2007
+	slightly changed how to check for errors
+	updated docs
+
+0.0.9  Mon May 28 06:53:17 PDT 2007
+	changed from GET to POST for dealing with REST server, since it appears
+	  that FB is more strict now about what kind of connection it expects
+	  (thanks to Shawn Van Ittersum for the tip)
+	fixed test dependency problem RT#27305
+	removed URI::Escape from dependency list
+	updated copyright
+
+0.0.8  Sat May  5 11:22:27 PDT 2007
+	doc coverage and perl-critic tests no longer packaged
+
+0.0.7  Fri May  4 10:08:07 PDT 2007
+	doc cleanup
+
+0.0.6  Thu May  3 04:42:22 PDT 2007
+	lots of changes to make module to match API 1.0
+	added Simple interface
+	removed tests that were not longer useful
+
+0.0.5  Sun Nov  5 00:57:05 2006
+         updated module to match API:
+           removed Wall.pm
+           changed documentation
+         added tests:
+           messages.t
+           pokes.t
+           session.t
+
+0.0.4  Sat Nov  4 20:57:47 2006
+         updated module to match API:
+           added friends.getAppUsers
+           added friends.getRequests
+           added session.ping
+         fixed some documentation typos
+         clarified some documentation
+
+0.0.3  Sat Sep 16 14:32:27 2006
+        Added friends->get_app_users, which was added to the official
+            Facebook API
+
+0.0.2  Sat Sep 16 13:00:24 2006
+        Initial release.
+        Added more tests
+        Changed module structure slightly
+            - Client/Auth/UserLogin.pm -> Client/Login.pm
+
+0.0.1  Mon Aug 21 13:09:11 2006
+        Initial development.

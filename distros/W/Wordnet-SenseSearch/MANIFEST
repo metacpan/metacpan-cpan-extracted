@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Wordnet-SenseSearch.t
+lib/Wordnet/SenseSearch.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Card.pm
+Changes
+MANIFEST
+Makefile.PL
+lib/WML/Card/UP.pm
+lib/WML/Card/7110.pm
+lib/WML/Card/Palm.pm
+lib/WML/Deck.pm
+test.pl

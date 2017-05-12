@@ -1,0 +1,62 @@
+{
+   "abstract" : "An interface to Flattr's social micro-payment API",
+   "author" : [
+      "Tom Hukins <tom@eborcom.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Flattr",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "0"
+         },
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "URI::QueryParam" : "0",
+            "URI::Template" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-WebService-Flattr@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Flattr"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.scrubhole.org/WebService-Flattr"
+      }
+   },
+   "version" : "0.55"
+}
+

@@ -1,0 +1,80 @@
+Revision history for WWW-Google-UserAgent
+
+0.20  Sat Oct 03 06:10:00 2015
+      - Updated Makefile.PL to have Type::Tiny as pre-requisite.
+
+0.19  Mon Sep 28 14:25:00 2015
+      - Fixed the way Type::Library, Type::Utils and Types::Standard was imported in the
+        package WWW::Google::UserAgent::DataType as it was conflicting with the package
+        WWW::Google::CustomSearch strangely.
+
+0.18  Sat Aug 15 08:45:00 2015
+      - Removed unused attribute 'reason' from package WWW::Google::UserAgent::Exception.
+      - Updated package WWW::Google::UserAgent to reflect the above changes.
+
+0.17  Tue Aug 04 12:00:00 2015
+      - Re-structured package WWW::Google::UserAgent::DataTypes to be a library of
+      Google API commonly used data types.
+
+0.16  Sun Feb 22 18:50:00 2015
+      - Further more tidied up pod document.
+
+0.15  Sun Feb 22 09:50:00 2015
+      - Tidied up pod document.
+
+0.14  Sun Jan 18 19:15:00 2015
+      - Updated Makefile.PL and added support of 'https' by adding dependency as below as documented:
+        - IO::Socket::SSL v1.56
+        - Net::SSLeay v1.49
+      HTTP::Tiny v0.053 document says:
+         >> Direct https connections are supported only if IO::Socket::SSL 1.56 or greater and
+         >> Net::SSLeay 1.49 or greater are installed.
+
+0.13  Mon Jan 12 14:30:18 2015
+      - Updated method get() and post() description in the pod document.
+      - Added 'SEE ALSO' section to the pod document.
+      - Added 'use 5.006;' line to the following test scripts:
+        - t/meta-json.t
+        - t/meta-yml.t
+
+0.12  Fri Jan 09 16:40:00 2015
+      - Fixed the typo in the package name of WWW::Google::UserAgent::DataTypes and
+        WWW::Google::UserAgent::Exception in the 'provides' list of Makefile.PL file.
+
+0.11  Fri Jan 09 15:12:00 2015
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Removed SIGNATURE file.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.10  Thu Aug 28 02:30:00 2014
+      - Added key "META_MERGE" key on condition (ExUtils::MakeMake->VERSION(6.46).
+
+0.09  Fri Aug 15 00:02:18 2014
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+
+0.08  Sat Aug 09 05:18:10 2014
+      - Tidied up README file.
+
+0.07  Tue Jul 29 15:00:00 2014
+      - Fixed the unit test t/00-load.t
+
+0.06  Mon Jul 28 23:26:29 2014
+      - Fixed method post() and return the exception object correctly.
+
+0.05  Mon Jul 28 17:23:30 2014
+      - Fixed invalid call to method status() in the module WWW::Google::UserAgent::Exception.
+
+0.04  Mon Jul 28 14:49:21 2014
+      - Fixed typo in the pod document
+
+0.03  Mon Jul 28 14:10:29 2014
+      - Updated WWW::Google::UserAgent to import the package correctly.
+
+0.02  Sun Jul 27 11:30:00 2014
+      - Slight re-organized the library.
+
+0.01  Sat Jul 19 16:31:20 2014
+      - First version, released.

@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Win32::TRADOS::Languages;
+use Win32::RunAsAdmin;
+use Getopt::Euclid;
+
+my $elev = Win32::RunAsAdmin::check;
+my $mode = 'read';
+
+my @values = defined $ARGV{'<lang>'} ? @{$ARGV{'<lang>'}} : ();
+if (@values) {
+    $mode = 'write';
+}
+$mode = 'interactive' if $ARGV{'-i'};
+Win32::RunAsAdmin::restart() if $mode ne 'read' and not $elev;
+
+my $idng = eval { Win32::TRADOS::Languages::get_idng; };
+if ($@) {
+    print STDERR "$@\n";
+    if ($mode eq 'interactive') { <STDIN> }
+    exit 1;
+}
+
+DISPLAY:
+if ($mode eq 'interactive' or $mode eq 'read') {
+    my @languages = eval { Win32::TRADOS::Languages::get_languages($idng); };
+    if ($@) {
+        print STDERR "$@\n";
+        if ($mode eq 'interactive') { <STDIN> }
+        exit 1;
+    }
+    print "IDNG: $idng\n\n";
+    my $slot = 1;
+    foreach my $language (@languages) {
+        my $l =  Win32::TRADOS::Languages::idng2iso($language);
+        my $ln = Win32::TRADOS::Languages::idng2lang($language);
+        $l .= " ($ln)" if $ln;
+
+        print "$slot: $l\n";
+        $slot++;
+    }
+}
+exit if $mode eq 'read';
+
+if ($mode eq 'interactive') {
+    print "\n";
+    print "Enter new values or <Enter> to quit: ";
+
+    READ:
+    my $line = <STDIN>;
+    chomp $line;
+    exit unless $line;
+
+    @values = split / /, $line;
+    if (@values > 5) {
+        print "Need 1 to 5 values or <Enter> to quit: ";
+        goto READ;
+    }
+}
+
+my $problem = 0;
+my $problems = '';
+foreach my $s (0, 1, 2, 3, 4) {
+    my $ln = Win32::TRADOS::Languages::lang2idng ($values[$s]);
+    if (defined $ln) {
+        $values[$s] = $ln;
+    } else {
+        $problem = 1;
+        $problems .= sprintf("Don't understand value %s in slot %s\n", $values[$s], $s + 1);
+    }
+}
+
+if ($problem) {
+    if ($mode eq 'interactive') {
+        print "$problems\nNeed 1 to 5 values or <Enter> to quit: ";
+        goto READ;
+    } else {
+        print STDERR $problems;
+        exit 1;
+    }
+}
+
+$idng = Win32::TRADOS::Languages::set_languages($idng, @values);
+Win32::TRADOS::Languages::set_idng($idng);
+goto DISPLAY if $mode eq 'interactive';
+
+__END__
+
+=head1 NAME
+ 
+ttx-lang - Change TRADOS 2007 languages on the fly
+ 
+=head1 VERSION
+ 
+Version 0.01
+ 
+=head1 OPTIONS
+ 
+=over
+ 
+=item <lang>...
+ 
+Up to five languages, specified by their TRADOS 2007 numeric code, ISO code,
+or name.
+ 
+=item -i
+ 
+Open in interactive mode, allowing you to keep the utility open and
+enter new language combinations when needed.
+
+=back
+
+Call without any command-line options to just read the IDNG value and list the installed languages.
+ 
+=head1 AUTHOR
+ 
+Michael Roberts (michael@vivtek.com)
+ 
+=head1 DESCRIPTION
+ 
+B<ttx-lang> reads the Registry to find the languages installed by TRADOS 2007, then allows you
+to change those languages. TRADOS will pick them up next time it starts.
+
+Writing to the Registry requires elevated privileges, so if you set the languages from the command
+line or enter interactive mode, you will see a UAC popup asking whether you want Perl to make
+changes to your system.
+ 
+=cut

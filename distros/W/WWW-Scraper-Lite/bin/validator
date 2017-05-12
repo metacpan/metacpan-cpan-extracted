@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl
+#########
+# Author:        rmp
+# Last Modified: $Date: 2011-05-29 22:56:18 +0100 (Sun, 29 May 2011) $
+# Id:            $Id: indexer 11 2011-05-29 21:56:18Z rmp $
+# $HeadURL: svn+ssh://psyphi.net/repository/svn/www-scraper-lite/trunk/bin/indexer $
+#
+use lib qw(lib);
+use strict;
+use warnings;
+use WWW::Scraper::Lite;
+use Carp;
+use Getopt::Long;
+use English qw(-no_match_vars);
+use IPC::Open2;
+use IO::Scalar;
+use Data::Dumper;
+
+our $VERSION    = do { my ($r) = q$Revision: 11 $ =~ /(\d+)/smx; $r; };
+my $opts = {};
+GetOptions($opts, qw(url=s follow validate=s help)) or croak $ERRNO;
+
+if(!$opts->{url} || $opts->{help}) {
+  print <<'EOT' or croak $ERRNO;
+indexer -url=http://www.../ [-help]
+
+ -url=...                     The website to crawl
+ -validate=/usr/bin/validate  WDG HTML validater to use
+ -follow                      Whether to follow links or not
+ -help                        This help
+EOT
+  exit;
+}
+
+if(!$opts->{validate}) {
+  $opts->{validate} = '/usr/bin/validate';
+} else {
+  ($opts->{validate}) = $opts->{validate} =~ m{([[:lower:]\d_\-./]+)}smix;
+}
+
+my $starting_url = $opts->{url};
+{
+  my $scraper = WWW::Scraper::Lite->new;
+  $scraper->crawl($starting_url,
+                  {
+                   $opts->{follow}?(q[//a]  => \&process_url):(),
+		   q[/*] => \&process_page,
+                  }
+                 );
+}
+
+sub process_url {
+  my ($scraper, $node) = @_;
+  my $url = $node->{href};
+
+  if(!$url) {
+    #########
+    # no 'href' attribute in this anchor
+    #
+    return;
+  }
+
+  $url = $scraper->url_make_absolute($url);
+
+  if($url !~ m{^http}smix) {
+    #########
+    # unsupported protocol
+    #
+    return;
+  }
+
+
+  if($url !~ m{^$starting_url}smix) {
+    #########
+    # external website
+    #
+    return;
+  }
+
+  $url = $scraper->url_remove_anchor($url);
+
+  if($url =~ m{(pdf|png|jpe?g|gif|zip|css|js|docx?|pptx?|xlsx?|odt|odp|ods)$}smix) {
+    #########
+    # unsupported filetype
+    # todo: queue for independent processing
+    #
+    return;
+  }
+
+  if(!$url) {
+    return;
+  }
+
+
+  return $scraper->enqueue($url);
+}
+
+sub process_page {
+  my ($scraper, $node) = @_;
+  my $url    = $scraper->current->{url};
+  print "$url\n" or croak $ERRNO;
+  my $html   = $scraper->current->{response}->content;
+
+  open my $fh, q[-|], $opts->{validate}, qw(-w -xml), $url or croak "Error opening $opts->{validate}: $ERRNO";
+  while(<$fh>) {
+    print or croak "Error printing: $ERRNO";
+  }
+  close $fh or do { };# validate doesn't exit cleanly
+  return 1;
+}

@@ -1,0 +1,103 @@
+Revision history for Perl module WebService::Rackspace::CloudFiles:
+
+2.01  2017-03-23
+    - Messed up the 2.00 release with an outdated MANIFEST file
+
+2.00  2017-03-01
+    - Replaced Moose in favor of Moo (Dondi Michael Stroma)
+
+1.10 Mon Aug 12 16:10:00 GMT+2 2013
+    - Fixed wrong return precedence (Reini Urban)
+
+1.09 Wed Jul 17 17:20:00 GMT+2 2013
+    - Add support for Rackspace Headers (Luke Closs)
+      https://www.rackspace.com/blog/thanks-for-your-feedback-cloud-files-supports-12-new-headers/
+
+1.08 Wed Jul 17 11:58:00 GMT+2 2013
+    - Fixed enabling CDN on a container (gh-9)
+    - Reverted: Fixed test concerning cdn. This actually didn't fix it at all
+
+1.07 Mon Feb 21 09:17:00 GMT+2 2013
+    - Fixed test concerning cdn (gh-9)
+    - Now using File::stat instead of File::Stat (Olivier Mengué, gh-10)
+
+1.06 Mon Dec 17 21:06:00 GMT+2 2012
+    - Custom location_url now supported (Yanick Champoux, gh-8)
+
+1.05 Sun Aug 26 14:16:00 GMT+2 2012
+    - Improved ETag checking (Adam Lelean)
+    - Allow setting number of retries (Adam Lelean)
+
+1.04 Sun Nov 08 23:44:00 GMT+2 2011
+    - Added missing prerequisite LWP::Protocol::https which used to be part of
+      libwww-perl but has been extracted from it (gh-5)
+    - purge_cdn method available for Container's and Object's since 1.03 but
+      this wasn't mentioned in CHANGES (gh-3, Khaled Hussein)
+
+1.03 Sun Nov 07 22:32:00 GMT+2 2011
+    - Fixed several tests
+    - Added missing prerequisite URI::QueryParam (gh-4)
+    - Added basic support for enabling and disabling CDN on containers and
+      added cdn_url and cdn_ssl_url methods to Object to retrieve their public
+      url's
+    - Upped required version of Moose to 2.0007
+    - Now using JSON::Any instead of JSON::XS::VersionOneAndTwo
+
+1.02 Sun Jan 16 14:55:00 GMT+2 2010
+    - Authentication location can now be set to either usa or uk (Adam Lelean) 
+
+1.01 Sat Oct 16 15:55:00 GMT+2 2010
+    - Added missing File::Stat dependency as it's a required module for testing
+    - Fixed content-type tests
+    - HEAD requests will now succeed if the response code is a successful status
+      code of 2xx (gh-1)
+
+1.00 Sat Jun 03 10:49:00 GMT+2 2010
+    - Forked from Net::Mosso::CloudFiles. Mosso changed name to Rackspace over
+	  a year ago.	
+    - Moved from ExtUtils::MakeMaker to Module::Install
+
+0.44 Sat Jun 03 09:39:02 GMT+2 2010
+    - Support for metadata - patch supplied by Jay Kuri, modified and applied by
+	  Christiaan Kras - closes RT#48561
+    - All tests now pass since RT#58854 for DateTime::Format::HTTP has been
+      fixed.
+
+0.43 Sat May 30 17:45:34 BST 2009
+    - work with latest Moose
+
+0.42 Fri Mar 27 15:49:48 GMT 2009
+    - add Crypt::SSLeay as a dependency as we use SSL for all
+      requests
+    - update documentation
+    - add Pod tests
+    - make request, uri methods private
+
+0.41 Tue Mar 17 14:52:50 GMT 2009
+    - fix problem with uploading binary data
+
+0.40 Tue Mar 17 11:15:28 GMT 2009
+    - Major rewrite to be more like Net::Amazon::S3
+    - Use new JSON request for listing objects - adding size, etag,
+      content_type and last_modified
+
+0.35 Mon Feb  2 06:10:06 GMT 2009
+    - Reauthenticate when the authentication token expires
+      (after one hour)
+    - Return more than 10,000 objects by issuing multiple calls
+      (objects now returns a Data::Stream::Bulk object)
+    - Only do 990 keep alive requests per connection
+    - Add prefix as an option to objects
+
+0.34 Tue Jan 13 15:37:27 GMT 2009
+    - Retry upon errors using LWP::UserAgent::Determined
+    - Make all the classes immutable
+
+0.33 Tue Jan 13 09:04:11 GMT 2009
+    - Add getting and putting to files
+    - Prohibit UTF8 key names
+    - Change the default content type from text/plain to 
+      application/octet-stream
+
+0.32 Wed Oct 22 23:01:11 BST 2008
+	- First release

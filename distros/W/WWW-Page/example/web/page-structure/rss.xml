@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page
+	content-type="text/xml; charset=UTF-8"	
+	import="Import::Client"
+	transform="rss.xsl"
+	xmlns:feed="urn:www-page">
+
+	<manifest>
+		<title>Test site</title>
+	</manifest>
+
+	<content>
+		<feed:rss-view/>
+	</content>
+</page>

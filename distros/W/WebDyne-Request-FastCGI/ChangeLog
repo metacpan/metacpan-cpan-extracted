@@ -1,0 +1,80 @@
+commit 7d0e0110438211949aace5c636a541096dd910b8
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sat Jul 16 16:23:16 2011 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.021
+    
+    Updated to new version system that syncs dist version to main module version
+
+commit 68a4d4a1b2947590756e8372013db92658c98bcd
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:22:03 2011 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.019
+    
+    Modify Makefile PREREQ section to be more compatible with older version of CPAN
+
+commit c0222d84a268df1e7d265ac49f892e28258f4ee5
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:41:29 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.018
+    
+    change tag used for text errors from tt=>pre to preserve cr/lf
+    clean mm_ver redundancy in Makefile.PL, edit README
+
+commit 8ce00b3230d970ba9aed73c6fab979376a803172
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:36:42 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.017
+    
+    Cleaned up wdfastcgi binary, removed extraneous ref to File::Spec and
+    fixed incorrect comments
+
+commit d61f480661a0c3ee9ba5b302796faf9897879c90
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:24:57 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.016
+    
+    Updated to YAML 1.4
+
+commit ff337bc063a3666d39b7e934e4a3d819e5f835a2
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 16:45:22 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.015
+    
+    Corrected email address
+
+commit 39c586857145395e44908a476a468d4ae5242823
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 16:23:47 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.014
+    
+    Fix copyright and author information, update Makefile.PL to generate better META.yml
+
+commit bb640a866b2a1960154d13a5531e5771225a5f62
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Thu Apr 8 22:09:25 2010 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.013
+    
+    Cleaned up ready for CPAN release, add rudimentry module load test, update documentation
+
+commit 3c872046877882103c7e4844cb8de5b79f6755f4
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Mon Aug 24 02:19:18 2009 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.12
+    
+    Cleanup after initial import into Git
+
+commit 9e49a2e868c0573cae1a8947825b0c43d475a348
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Sat Aug 22 15:13:06 2009 +0930
+
+    Tag: WebDyne-Request-FastCGI_1.10
+

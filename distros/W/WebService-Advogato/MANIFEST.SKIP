@@ -1,0 +1,10 @@
+^_build/
+^Build$
+^blib/
+~$
+\.bak$
+^Makefile$
+^pm_to_blib$
+^MANIFEST\.SKIP$
+CVS
+.svn

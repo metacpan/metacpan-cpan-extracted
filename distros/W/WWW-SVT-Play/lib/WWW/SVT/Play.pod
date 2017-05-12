@@ -1,0 +1,53 @@
+=head1 NAME
+
+WWW::SVT::Play - extract information from SVT Play
+
+=head1 DESCRIPTION
+
+Swedish state public service television, Sveriges Television, has
+created a popular "Play" service (i.e. on demand web based
+streaming). But one thing was missing. An API! So we have to
+scrape unfortunately. With this module, the otherwise good
+service is completed.
+
+You can fetch data, including stream URIs, for videos hosted on
+SVT Play using the module L<WWW::SVT::Play::Video>.
+
+=head1 AVAILABILITY AND BUG REPORTING
+
+The latest released version of this module is available through
+CPAN. It's encouraged to report bugs on github.com, but I will
+also monitor the CPAN RT and (of course,) e-mail.
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+SVT recently announced that they are moving to using HDS (HTTP
+Dynamic Streaming). I'm seeing a lot of content moving to this.
+The module is still useful, but there are extra steps required
+to view some content, not currently implemented by the module.
+The L</SEE ALSO> section contains a URL to the announcement.
+
+HDS is a Adobe technology aimed at Adobe Flash users, as such,
+it isn't quite as available on Apple based platforms like iOS.
+For this reason, I guess, SVT also support HLS (HTTP Live
+Streaming). This is a much easier format to scrape/work with,
+so I'm planning to add support for this in this module.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<SVT Play|http://svtplay.se/>
+
+=item * L<SVT announces move to HDS|http://blogg.svt.se/testbild/2012/09/ny-streamingteknik-for-svt-play/> (Swedish)
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012, 2013 - Olof Johansson <olof@cpan.org>
+All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

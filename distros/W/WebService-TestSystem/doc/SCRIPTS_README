@@ -1,0 +1,18 @@
+This package includes several commandline tools for interacting with the
+test system from a remote machine.
+
+To use this package, first ensure you have SOAP::Lite installed if you
+don't already, then simply invoke the scripts.
+
+   stp-lshost        # lists the STP hosts
+   stp-lsimage       # lists the distros
+   stp-lstest        # lists the tests
+   stp-trsearch      # searches the test results
+   stp-trget IDNUM   # retrieves data for a test request
+
+The first four can be run with no parameters; for the fifth you give it
+the test request ID number.
+
+All of the scripts have manpages, which you can access by calling them
+with the --man option.  For example, `stp-trsearch --man`.  This will
+explain additional parameters each tool supports.

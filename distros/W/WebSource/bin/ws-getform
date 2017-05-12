@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ws-getform : A small tool to extract form declarations
+
+=head1 DESCRIPTION
+
+Given a URL of a document containing one or more forms, this tool fetches the
+docuement and extracts the contained forms. The output format is almost the one
+used by the query operator used in WebSource.
+
+=cut
+
+use HTML::Form;
+use LWP::UserAgent;
+use XML::LibXML;
+use HTTP::Request;
+
+use strict;
+
+$#ARGV >= 0 or die "No argument";
+my $srcUrl = $ARGV[0];
+
+my $html;
+my $base;
+if(! -f $srcUrl) {
+  # Build User Agent
+  my $userAgent = LWP::UserAgent->new;
+  $userAgent->agent("MyAgent/1.0");
+
+  # Fetch URL
+  my $response = $userAgent->get($srcUrl) or die "Couldn't download $srcUrl";
+  $html =  $response->content;
+  $base = $response->base;
+} else {
+  open(IN,$srcUrl);
+  while(<IN>) {
+    $html .= $_;
+  }
+  close(IN);
+  $base = $srcUrl;
+}
+#print "Recieved...\n";
+#print $html;
+#print "\n...\n";
+#
+# Find forms
+#
+my @forms = HTML::Form->parse($html,$base) or die "Couldn't parse $srcUrl";
+
+#
+# Build result document
+#
+my $resDoc = XML::LibXML::Document->new("1.0","iso-8859-1");
+my $formList = $resDoc->createElement("form-list");
+$resDoc->setDocumentElement($formList);
+$formList->setAttribute("src",$srcUrl);
+
+foreach my $form (@forms) {
+  my $queryNode = $resDoc->createElement("query");
+  $formList->appendChild($queryNode);
+  $queryNode->setAttribute("method",$form->method);
+  $queryNode->appendTextChild("base",$form->action);
+
+  my $parametersNode = $resDoc->createElement("parameters");
+  $queryNode->appendChild($parametersNode);
+
+  foreach my $input ($form->inputs) {
+    my $paramNode = $resDoc->createElement("param");
+    $parametersNode->appendChild($paramNode);
+
+    $paramNode->setAttribute("type",$input->type);
+    $paramNode->setAttribute("name",$input->name);
+
+    my $valueNode = $resDoc->createElement("value");
+    if($input->value) {
+      $paramNode->setAttribute("default",$input->value);
+    }
+  }
+
+  #my $queryNode = $resDoc->createElement("query");
+  #$formNode->appendChild($queryNode);
+  #$queryNode->appendText($form->make_request->as_string);
+}
+
+print $resDoc->toString(1);

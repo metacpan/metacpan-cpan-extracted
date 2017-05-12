@@ -1,0 +1,89 @@
+{
+   "city" : {
+      "population" : 0,
+      "country" : "United States of America",
+      "coord" : {
+         "lat" : 42.9912,
+         "lon" : -71.4631
+      },
+      "name" : "Manchester",
+      "id" : "5089178"
+   },
+   "cod" : "200",
+   "list" : [
+      {
+         "pressure" : 1049.98,
+         "dt" : 1397750400,
+         "temp" : {
+            "morn" : 40.28,
+            "night" : 30.67,
+            "eve" : 38.98,
+            "min" : 30.67,
+            "max" : 40.28,
+            "day" : 40.28
+         },
+         "weather" : [
+            {
+               "icon" : "01d",
+               "id" : 800,
+               "description" : "sky is clear",
+               "main" : "Clear"
+            }
+         ],
+         "speed" : 8.81,
+         "clouds" : 0,
+         "deg" : 82,
+         "humidity" : 55
+      },
+      {
+         "pressure" : 1041.91,
+         "dt" : 1397836800,
+         "temp" : {
+            "morn" : 29.19,
+            "night" : 34.83,
+            "eve" : 39.81,
+            "min" : 29.19,
+            "max" : 40.95,
+            "day" : 39.94
+         },
+         "weather" : [
+            {
+               "icon" : "04d",
+               "id" : 803,
+               "description" : "broken clouds",
+               "main" : "Clouds"
+            }
+         ],
+         "speed" : 7.5,
+         "clouds" : 80,
+         "deg" : 79,
+         "humidity" : 74
+      },
+      {
+         "pressure" : 1029.22,
+         "dt" : 1397923200,
+         "temp" : {
+            "morn" : 32.54,
+            "night" : 47.48,
+            "eve" : 57.61,
+            "min" : 32.54,
+            "max" : 57.61,
+            "day" : 49.33
+         },
+         "weather" : [
+            {
+               "icon" : "01d",
+               "id" : 800,
+               "description" : "sky is clear",
+               "main" : "Clear"
+            }
+         ],
+         "speed" : 3.37,
+         "clouds" : 0,
+         "deg" : 249,
+         "humidity" : 69
+      }
+   ],
+   "cnt" : 3,
+   "message" : 0.0058
+}

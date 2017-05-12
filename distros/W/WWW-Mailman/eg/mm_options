@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use WWW::Mailman;
+use Getopt::Long;
+use YAML::Tiny qw( LoadFile DumpFile Dump );
+
+my %param = (
+    config => 'mailman.yml',
+    cookie => 'mailman.cookie',
+);
+GetOptions( \%param, 'config=s', 'cookie=s' )
+    or die "Usage: $0 [ --config file ] [ --cookie file ]\n";
+
+my $lists = LoadFile( $param{config} );
+my %opt = ( cookie_file => $param{cookie} );
+
+# actual code
+
+# get the options details of all configured lists
+for my $list ( values %$lists ) {
+    my $mm = WWW::Mailman->new( %opt, %$list );
+    $list->{options} = $mm->options();
+}
+
+# dump the result as YAML
+print Dump( $lists );
+

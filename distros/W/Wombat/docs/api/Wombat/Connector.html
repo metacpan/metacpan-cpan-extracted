@@ -1,0 +1,176 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Connector - internal connector interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Connector - internal connector interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface specifies a component that receives requests from and
+returns responses to a client application. A Connector performs the
+following general logic:</P>
+<OL>
+<LI>
+Receive a request from the client application
+<P></P>
+<LI>
+Create appropriate Request and Response instances and populate their
+fields based on the contents of the request.
+<OL>
+<LI>
+For all Requests, the <EM>connector</EM>, <EM>handle</EM>, <EM>protocol</EM>,
+<EM>remoteAddr</EM>, <EM>response</EM>, <EM>scheme</EM>, <EM>secure</EM>, <EM>serverName</EM>, and
+<EM>serverPort</EM> <STRONG>MUST</STRONG> be set. The <EM>contentLength</EM>, <EM>contentType</EM> and
+<EM>socket</EM> fields are also generally set.
+<P></P>
+<LI>
+For HttpRequests, the <EM>method</EM>, <EM>queryString</EM>,
+<EM>requestedSessionCookie</EM>, <EM>requestedSessionId</EM>,
+<EM>requestedSessionURL</EM>, and <EM>requestURI</EM> fields <STRONG>MUST</STRONG> be
+set. Additionally, the various <EM>addXXX</EM> methods <STRONG>MUST</STRONG> be called to
+record the presence of cookies, headers and locales in the original
+request.
+<P></P>
+<LI>
+For all Responses, the <EM>connector</EM>, <EM>handle</EM> and <EM>request</EM> fields
+<STRONG>MUST</STRONG> be set.
+<P></P>
+<LI>
+No additional fields must be set for HttpResponses.
+<P></P></OL>
+<LI>
+Identify an appropriate Container to use for processing this
+request. For a standalone Wombat installation, this will probably be a
+(singleton) Engine. For a Connector attaching Wombat to a web server,
+this step could take advantage of parsing already performed within the
+web server to identify the Application, and perhaps even the Wrapper,
+to utilize in satisfying this Request.
+<P></P>
+<LI>
+Call <CODE>invoke()</CODE> on the selected Container, passing the initialized
+Request and Response instances as arguments.
+<P></P>
+<LI>
+Return any response created by the Container to the client, or return
+an appropriate error message if an exception of any type was thrown.
+<P></P></OL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container used for processing Requests received by this
+Connector.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container used for processing Requests received by this
+Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> used for processing Requests
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return the display name of this Connector.
+<P></P>
+<DT><STRONG><A NAME="item_getScheme"><CODE>getScheme()</CODE></A></STRONG><BR>
+<DD>
+Return the scheme that will be assigned to Requests recieved through
+this Connector. Default value is <EM>http</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_setScheme"><CODE>setScheme($scheme)</CODE></A></STRONG><BR>
+<DD>
+Set the scheme that will be assigned to Requests received through this
+Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24scheme">$scheme</A></STRONG><BR>
+<DD>
+the scheme
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSecure"><CODE>getSecure()</CODE></A></STRONG><BR>
+<DD>
+Return the secure connection flag that will be assigned to Requests
+received through this Connector. Default value is false.
+<P></P>
+<DT><STRONG><A NAME="item_setSecure"><CODE>setSecure($secure)</CODE></A></STRONG><BR>
+<DD>
+Set the secure connection flag that will be assigned to Requests
+received through this Connector.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24secure">$secure</A></STRONG><BR>
+<DD>
+the boolean secure connection flag
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_await"><CODE>await()</CODE></A></STRONG><BR>
+<DD>
+Begin listening for requests. Depending upon the implementations, this
+method may return immediately (for Connectors that execute
+asynchrously, eg Apache) or may block (eg Http Connector).
+<P></P>
+<DT><STRONG><A NAME="item_createRequest"><CODE>createRequest()</CODE></A></STRONG><BR>
+<DD>
+Create and return a Request object suitable for specifying the
+contents of a request to the responsible Container.
+<P></P>
+<DT><STRONG><A NAME="item_createResponse"><CODE>createResponse()</CODE></A></STRONG><BR>
+<DD>
+Create and return a Response object suitable for receiving the
+contents of a response from the responsible Container.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Wombat/Application.html">the Wombat::Application manpage</A>,
+<A HREF="../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../api/Wombat/Engine.html">the Wombat::Engine manpage</A>,
+<A HREF="../../api/Wombat/HttpRequest.html">the Wombat::HttpRequest manpage</A>,
+<A HREF="../../api/Wombat/HttpResponse.html">the Wombat::HttpResponse manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A>,
+<A HREF="../../api/Wombat/Response.html">the Wombat::Response manpage</A>,
+<A HREF="../../api/Wombat/Wrapper.html">the Wombat::Wrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

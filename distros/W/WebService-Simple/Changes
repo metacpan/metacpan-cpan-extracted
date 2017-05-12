@@ -1,0 +1,110 @@
+Revision history for WebService-Simple
+
+0.25 2015-08-31T10:41:04Z
+
+      - Use search.cpan.org uploads feeds for the test instead of YouTube feeds, thank you @eserte
+      - Support application/json POST requests by @isync, thank you!
+
+0.24 2015-01-17T06:20:25Z
+
+      - Optional no compression, or no croak() on HTTP is_error by @isync, thank you!
+      - Fixed tests, check URI query parmeters using URI::QueryParam.
+
+0.23 2015-01-08T05:07:37Z
+
+      - Fixed bugs about making URL parmeters.
+
+0.22 2015-01-07T17:11:24Z
+
+      - Support HTTP compression, thank you @isync
+      - Fixed non-working WebService::Simple::AWS, thank you @isync
+
+0.21  2013/08/20
+
+       - Update tests for using XML::Parser::Lite::Tree
+
+0.20  2013/08/20
+
+       - Support Perl 5.18.*
+       - Fixed for Hash randomization.
+       
+0.19  2013/08/20
+
+       - Testing POD as author tests.
+       - Move repository.
+       
+0.18  2011/02/14
+
+       - Modified caching mechanism. thanks to tomi-ru!
+       - Add twitter example to POD.
+       
+0.17  2011/02/12
+
+       - Post enabled. thanks to tomi-ru!
+       
+0.16  2009/06/13
+
+       - Fixed some tests, thanks to tomyhero and tokuhirom.
+       - Add docoments to POD.
+       
+0.15  Sun Feb 1 13:49:00 2009
+
+       - fixed test for XML::Feed parser
+       
+0.14  Sat Jun 31 08:48:00 2009
+
+       - add a parser using XML::Feed
+       
+0.13  Sat Jun 3 13:05:00 2009
+
+       - bug fix about cache
+       - add test for uri escape
+       
+0.12  Mon MAY 26 01:10:00 2008
+
+       - bug fix, thanks to lestrrat
+       
+0.11  Fri Apr 27 22:22:00 2008
+
+       - Fixed test
+       
+0.10  Fri Apr 27 16:06:00 200
+
+       - Added request_url method
+       
+0.09  Fri Apr 25 11:39:00 2008
+
+       - Bug fix
+       - WebService::Simple::Parser::JSON support JSONP
+       
+0.08  Fri Apr 24 20:17:00 2008
+
+       - Fixed Simple.pm
+       
+0.07  Fri Apr 24 16:18:00 2008
+
+       - Fixed Simple.pm
+       
+0.06  Fri Apr 24 16:18:00 2008
+
+       - Fixed typo
+       
+0.05  Fri Apr 24 16:08:00 2008
+
+       - Fixed typo
+       
+0.04  Fri Apr 24 15:42:00 2008
+
+       - LWP::UserAgent base
+       
+0.03  Fri Apr 04 15:41:00 2008
+
+       - Fixed Makefile.PL and Build.PL
+       
+0.02  Thu Apr 03 16:13:00 2008
+
+       - Added CHACHING
+       
+0.01  Thu Mar 27 10:06:09 2008
+
+       - original version

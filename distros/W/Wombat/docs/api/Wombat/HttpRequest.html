@@ -1,0 +1,211 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::HttpRequest - internal http request interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::HttpRequest - internal http request interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface extends <STRONG>Servlet::Http::HttpServletRequest</STRONG> and
+<STRONG>Wombat::Request</STRONG> to provide fields and methods accessible only to
+the container.</P>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addCookie"><CODE>addCookie($cookie)</CODE></A></STRONG><BR>
+<DD>
+Add a Cookie to the set of Cookies for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24cookie">$cookie</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::Cookie</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Add a value for the named request header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the parameter name
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the parameter value, scalar
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearCookies"><CODE>clearCookies()</CODE></A></STRONG><BR>
+<DD>
+Remove all Cookies for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_clearHeaders"><CODE>clearHeaders()</CODE></A></STRONG><BR>
+<DD>
+Unset all headers for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthType"><CODE>setAuthType($type)</CODE></A></STRONG><BR>
+<DD>
+Set the authentication type used for this request, or <CODE>undef</CODE> for no
+authentication.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24type">$type</A></STRONG><BR>
+<DD>
+the authentication type, as defined in
+<CODE>Servlet::Http::HttpServletRequest</CODE>
+<P></P></DL>
+<DT><STRONG><A NAME="item_setContextPath"><CODE>setContextPath($path)</CODE></A></STRONG><BR>
+<DD>
+Set the context path for this Request. This will normally be called
+when the associated Application is mapping the Request to a particular
+Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24path">$path</A></STRONG><BR>
+<DD>
+the context path
+<P></P></DL>
+<DT><STRONG><A NAME="item_setMethod"><CODE>setMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Set the HTTP request method used for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24method">$method</A></STRONG><BR>
+<DD>
+the request method
+<P></P></DL>
+<DT><STRONG><A NAME="item_setQueryString"><CODE>setQueryString($query)</CODE></A></STRONG><BR>
+<DD>
+Set the query string for this Request. This will normally be called by
+the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24query">$query</A></STRONG><BR>
+<DD>
+the query string
+<P></P></DL>
+<DT><STRONG><A NAME="item_setPathInfo"><CODE>setPathInfo($path)</CODE></A></STRONG><BR>
+<DD>
+Set the path information for this Request. This will normally be
+called when the associated Application is mapping the Request to a
+particular Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$path</STRONG><BR>
+<DD>
+the path information
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRequestedSessionCookie"><CODE>setRequestedSessionCookie($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not the requested session ID for this
+Request came in through a cookie. This is normally called by the
+Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRequestedSessionId"><CODE>setRequestedSessionId($id)</CODE></A></STRONG><BR>
+<DD>
+Set the requested session ID for this Request. This is normally called
+by the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24id">$id</A></STRONG><BR>
+<DD>
+the session id
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRequestedSessionURL"><CODE>setRequestedSessionURL($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not the requested session ID for this
+Request came in through the request URL. This is normally called by
+the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$flag</STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRequestURI"><CODE>setRequestURI($uri)</CODE></A></STRONG><BR>
+<DD>
+Set the unparsed request URI for this Request. This is normally called
+by the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24uri">$uri</A></STRONG><BR>
+<DD>
+the request URI
+<P></P></DL>
+<DT><STRONG><A NAME="item_setServletPath"><CODE>setServletPath($path)</CODE></A></STRONG><BR>
+<DD>
+Set the servlet path for this Request. This is normally called when
+the associated Application is mapping the Request to a particular
+Wrapper.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$path</STRONG><BR>
+<DD>
+the servlet path
+<P></P></DL>
+<DT><STRONG><A NAME="item_setSession"><CODE>setSession($session)</CODE></A></STRONG><BR>
+<DD>
+Set the internal Session associated with this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24session">$session</A></STRONG><BR>
+<DD>
+The <STRONG>Wombat::Core::Session</STRONG> to set
+<P></P></DL>
+<DT><STRONG><A NAME="item_setUserPrincipal"><CODE>setUserPrincipal($principal)</CODE></A></STRONG><BR>
+<DD>
+Set the principal that has been authenticated for this Request. This
+value is also used to calculate the value to be returned by
+<A HREF="../../api/Wombat/Request.html#getremoteuser()">getRemoteUser() in the Wombat::Request manpage</A>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the user principal
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Http/Cookie.html">the Servlet::Http::Cookie manpage</A>,
+<A HREF="../../api/Servlet/Http/HttpServletRequest.html">the Servlet::Http::HttpServletRequest manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

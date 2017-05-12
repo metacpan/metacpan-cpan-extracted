@@ -1,0 +1,6 @@
+Revision history for Perl extension Win32::SystemInfo::CpuUsage.
+
+0.01  Mon Apr 21 14:36:12 2008
+	- original version; created by h2xs 1.23 with options
+		-x -n Win32::SystemInfo::CpuUsage cpuUsage.h
+

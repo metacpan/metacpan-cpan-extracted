@@ -1,0 +1,26 @@
+Wordnet-SenseSearch version 0.02
+================================
+
+This is a very simple module with little functionality. I don't have time to 
+extend it, but was surprised to find no Perl Wordnet interfaces (to my 
+knowledge) that use a binary search to lookup index entries (as opposed to 
+loading the entire indexes into memory). So please email me if you want to 
+take this over, or better yet, adopt the Search::Dict technique shown here 
+in other Wordnet interfaces. This kind of lookup is plenty fast for most 
+applications.
+
+This module provides only one method, which takes a sense key and returns data 
+for the identified synset.
+
+INSTALLATION
+
+You need the Wordnet files; change the path in lib/Wordnet/SenseSearch.pm to
+match the directory containing your data/index files.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

@@ -1,0 +1,21 @@
+9784798137469,
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/rakute.pl
+lib/WebService/Rakuten/API.pm
+lib/WebService/Rakuten/API/Provider.pm
+lib/WebService/Rakuten/API/Provider/#Books.pm#
+lib/WebService/Rakuten/API/Provider/Books.pm
+lib/WebService/Rakuten/API/Provider/Ichiba.pm
+lib/WebService/Rakuten/API/Provider/Recipe.pm
+lib/WebService/Rakuten/API/Provider/Travel.pm
+minil.toml
+specify valid applicationId,
+t/00_compile.t
+{"error":"invalid_token","error_description":"specify valid access token"},
+META.yml
+MANIFEST

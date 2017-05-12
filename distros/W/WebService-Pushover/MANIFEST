@@ -1,0 +1,20 @@
+.travis.yml
+Build.PL
+Changes
+lib/WebService/Pushover.pm
+Makefile.PL
+Makefile.PL.orig
+MANIFEST			This list of files
+META.json
+META.yml
+README.mkdn
+t/00-sanity.t
+t/01-messages.t
+t/02-receipts.t
+t/03-sounds.t
+t/04-users.t
+t/99-integration.t
+t/critic.t
+t/lib/Test/MockPushover.pm
+t/pod-coverage.t
+t/pod.t

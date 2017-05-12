@@ -1,0 +1,28 @@
+.gitignore
+bin/svtplay
+Changes
+lib/WWW/SVT/Play.pod
+lib/WWW/SVT/Play/Utils.pm
+lib/WWW/SVT/Play/Video.pm
+lib/WWW/SVT/Play/Video/Stream.pm
+lib/WWW/SVT/Play/Video/Stream/HDS.pm
+lib/WWW/SVT/Play/Video/Stream/HLS.pm
+lib/WWW/SVT/Play/Video/Stream/HTTP.pm
+lib/WWW/SVT/Play/Video/Stream/RTMP.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01-distribution.t
+t/data/0.json
+t/data/948447.json
+t/data/979684.json
+t/data/aliases.json
+t/data/ref/0.json
+t/data/ref/948447.json
+t/data/ref/979684.json
+t/lib/LWP/UserAgent.pm
+t/utils/gen_ref_data.pl
+t/video.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

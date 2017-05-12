@@ -1,0 +1,13 @@
+ChangeLog
+lib/WWW/Scroogle.pm
+lib/WWW/Scroogle/Result.pm
+Makefile.PL
+MANIFEST
+README
+t/01-WWW-Scroogle-Result.t
+t/02-WWW-Scroogle.t
+t/pod.t
+t/pod_coverage.t
+META.yml
+Build.PL
+SIGNATURE    Added here by Module::Build

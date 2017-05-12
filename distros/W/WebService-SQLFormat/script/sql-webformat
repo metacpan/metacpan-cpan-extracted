@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use WebService::SQLFormat;
+
+my $formatter = WebService::SQLFormat->new(
+    identifier_case => 'upper',
+    reindent        => 1,
+);
+
+my $in;
+
+while (<STDIN>) {
+    $in .= $_;
+}
+
+$in ||= shift @ARGV;
+
+die 'No SQL found' unless $in;
+
+print $formatter->format_sql($in);
+
+# PODNAME: sql-webformat

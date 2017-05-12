@@ -1,0 +1,5 @@
+<%method gentoc>
+<%perl>
+print Data::Type::toc();
+</%perl>
+</%method>

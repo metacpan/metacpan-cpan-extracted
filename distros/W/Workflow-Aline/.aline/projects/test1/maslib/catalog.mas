@@ -1,0 +1,65 @@
+<%method as_block>
+<%perl>
+# BE CAREFULL, $dtq is available after pass1. Use <& maslib/delayed.mas, comp => '' &>
+my $aref = $dtq->dbh->selectall_arrayref( q{SELECT exported FROM types ORDER BY export_prefix} ) || Carp::croak "$DBI::err";
+		
+print join( ', ', map { @{ $_ } } @$aref ), "\n";
+</%perl>
+</%method>
+
+<%method dump>
+
+=over 4
+
+<%perl>
+my $c = $dtq->catalog;
+
+foreach( keys %{ $c } )
+{
+printf "=item %s\n\n", uc $_;
+print $c->{$_},"\n\n";
+}
+</%perl>
+
+=back
+
+</%method>
+
+<%method collections_as_pod>
+All types are grouped and though belong to a B<collection>. The collection is identified by a short id. All members are living in a namespace that is prefixed with it (uppercased).
+
+=over 3
+
+=item L<Standard Collection ('STD')|Data::Type::Collection::Std>
+
+This is a heterogenous collection of datatypes which is loaded by default. It contains various issues from CPAN modules (i.e. business, creditcard, email, markup, regexps and etc.) and some everyday things. See L<Data::Type::Collection::Std>.
+
+=item L<W3C/XML-Schema Collection ('W3C')|Data::Type::Collection::W3C>
+
+A nearly 1-to-1 use of L<XML::Schema> datatypes. It is nearly complete and works off the shelf. Please visit the XMLSchema L<http://www.w3.org/TR/xmlschema-2/> homepage for sophisticated documentation. See L<Data::Type::Collection::W3C>.
+
+=item L<Database Collection ('DB')|Data::Type::Collection::DB>
+
+Common database table types (VARCHAR, TINYTEXT, TIMESTAMP, etc.). See L<Data::Type::Collection::DB>.
+
+=item L<Biological Collection ('BIO')|Data::Type::Collection::Bio>
+
+Everything that is related to biological matters (DNA, RNA, etc.). See L<Data::Type::Collection::Bio>.
+
+=item L<Chemistry Collection ('CHEM')|Data::Type::Collection::Chem>
+
+Everything that is related to chemical matters (Atoms, etc.). See L<Data::Type::Collection::Chem>.
+
+=item L<Perl5 Collection ('PERL')|Data::Type::Collection::Perl>
+
+Reserved and undecided. See L<Data::Type::Collection::Perl>.
+
+=item L<Perl6 Apocalypse Collection ('PERL6')|Data::Type::Collection::Perl6>
+
+Placeholder for the Apocalypse and Synopsis 6 suggested datatypes for perl6. See L<Data::Type::Collection::Perl6>.
+
+=back
+
+B<[Note]> L<C<ALL>|Data::Type/EXPORT> is a an alias for all available collections at once.
+
+</%method>

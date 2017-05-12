@@ -1,0 +1,34 @@
+WWW-Search-Coveralia version 0.000_001
+======================================
+
+WWW::Search::Coveralia is a subclass of WWW::Search that searches the L<http://coveralia.com> cover art website.
+
+Currently, it can be used to search for artists (WWW::Search::Coveralia::Artists) or albums (WWW::Search::Coveralia::Albums). This will be extended in future versions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* WWW::Search
+* List::MoreUtils
+* PerlX::Maybe
+* HTML::TreeBuilder
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

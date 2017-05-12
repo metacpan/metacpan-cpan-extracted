@@ -1,0 +1,98 @@
+#############################################################################
+## Name:        XS/NotificationMessage.xsp
+## Purpose:     XS++ for Wx::NotificationMessage
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     25/12/2007
+## RCS-ID:      $Id: NotificationMessage.xsp 3086 2011-10-09 02:43:04Z mdootson $
+## Copyright:   (c) 2007, 2009 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+
+#include <wx/notifmsg.h>
+
+%typemap{wxNotificationMessage*}{simple};
+
+%name{Wx::NotificationMessage} class wxNotificationMessage
+{
+%{
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::NotificationMessage::new" )
+%}
+    %name{newDefault}
+    wxNotificationMessage();
+
+#ifdef __WXMSW__
+    %name{newFull}
+    wxNotificationMessage( const wxString& title,
+                           const wxString& message = wxEmptyString,
+                           wxWindow *parent = NULL,
+                           int flags = wxICON_INFORMATION )
+        %code{% RETVAL = new wxNotificationMessage( title, message, parent );
+                %};
+#else
+    %name{newFull}
+    wxNotificationMessage( const wxString& title,
+                           const wxString& message = wxEmptyString,
+                           wxWindow *parent = NULL,
+                           int flags = wxICON_INFORMATION );
+#endif
+
+%{
+static void
+wxNotificationMessage::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxNotificationMessage()
+        %code{% wxPli_thread_sv_unregister( aTHX_ "Wx::NotificationMessage", THIS, ST(0) );
+                delete THIS;
+                %};
+
+    bool Show( int timeout = -1 );
+    bool Close();
+
+    void SetFlags( int flags );
+    void SetTitle( const wxString& title );
+    void SetMessage( const wxString& message );
+    void SetParent( wxWindow *parent );
+
+#ifdef __WXMSW__
+
+# The necessary support for Taskbar Balloons is not in MSCV6
+# Even if VC6 is used with Platform SDK, wxWidgets will not
+# build in balloon support so exclude on same criteria
+
+#if ( ( defined(__VISUALC__) && (__VISUALC__ >= 1300) ) || defined(__MINGW32__) )
+%{
+wxTaskBarIcon*
+UseTaskBarIcon( icon )
+    wxTaskBarIcon* icon
+  CODE:
+    RETVAL = wxNotificationMessage::UseTaskBarIcon( icon );
+  OUTPUT: RETVAL
+
+void
+AlwaysUseGeneric( alwaysUseGeneric )
+    bool alwaysUseGeneric
+  CODE:
+    wxNotificationMessage::AlwaysUseGeneric( alwaysUseGeneric );
+%}
+#endif
+
+#endif
+
+};
+
+#endif

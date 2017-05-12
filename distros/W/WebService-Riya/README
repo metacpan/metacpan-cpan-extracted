@@ -1,0 +1,47 @@
+NAME
+       WebService::Riya - Perl interface to the Riya API
+
+SYNOPSIS
+         use WebService::Riya;
+
+         my $api = WebService::Riya->new(
+             api_key   => 'yourapikey',
+             user_name => 'yourusername',
+             password  => 'yourpassword',
+         );
+
+         my $response = $api->callMethod('riya.photos.search.SearchPublic', {
+                     'person' => 'david',
+             });
+
+DESCRIPTION
+       This module provides you Perl interface for Riya API.
+
+       Riya.com is photo sharing service.
+
+METHODS
+       new([%options])
+
+       this method returns an instance of this module.  and this method allows
+       following arguments; - user_name (almost your email address for log in
+       to Riya.com) - password - api_key
+
+       get_auth_token
+
+       Get a token for using API.  this method uses riya.auth.GetToken of
+       Riya.com API.
+
+       call_method
+
+       call Riya.com API.  seealso Riya.com API document.
+
+AUTHOR
+       Takatsugu Shigeta, <takatsugu.shigeta@gmail.com>
+
+LICENSE
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+SEE ALSO
+       <http://www.riya.com/apiDoc>
+

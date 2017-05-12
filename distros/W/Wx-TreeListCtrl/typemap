@@ -1,0 +1,19 @@
+#############################################################################
+## Name:        typemap
+## Purpose:     typemap
+## Author:      Mark Wardell
+## Modified by:
+## Created:     08/08/2006
+## RCS-ID:      $Id: typemap,v 1.00 2006/08/08 10:30:08
+## Copyright:   (c) 2006 Mark Wardell
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+
+wxTreeListCtrl *		O_WXOBJECT
+wxTreeListHeaderWindow *        O_WXOBJECT
+wxTreeListMainWindow *          O_WXOBJECT
+wxTreeListColumnInfo *	        O_WXOBJECT_THR
+wxTreeListColumnInfoInternal *  O_WXOBJECT

@@ -1,0 +1,14 @@
+Revision history for Perl extension WebService-Reactio
+
+0.03 2015-10-27T01:25:14Z
+
+    - support message API
+
+0.02 2015-07-27T06:48:28Z
+
+    - fix cpanfile (@syohex)
+
+0.01 2015-07-24T05:59:34Z
+
+    - original version
+

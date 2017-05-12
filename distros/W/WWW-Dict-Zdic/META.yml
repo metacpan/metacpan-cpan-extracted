@@ -1,0 +1,22 @@
+abstract: Zdic Chinese Dictionary interface
+author: Kang-min Liu  C<< <gugod@gugod.org> >>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: WWW-Dict-Zdic
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Field: 0
+  Encode: 0
+  HTML::Entities: 0
+  HTML::TagParser: 0
+  URI::Escape: 0
+  WWW::Dict: 0
+  WWW::Mechanize: 0
+  perl: 5.8.0
+version: 0.0.4

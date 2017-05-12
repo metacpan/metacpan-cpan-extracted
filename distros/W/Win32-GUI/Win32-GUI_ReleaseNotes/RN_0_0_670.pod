@@ -1,0 +1,131 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_0_0_670 - This is the release notes for Version 0.0.670 of Win32::GUI
+
+=head1 Release Date
+
+11th December, 2003
+
+=head1 Summary of Changes
+
+This release of Win32::GUI introduces many bug fix and new features
+the most important being:
+
+New :
+
+  - add Hook/UnHook methods
+  - new DateTime styles and methods
+  - new RichEdit methods
+  - improve GetOpenFileName / GetSaveFileName.
+  - new _DropFiles Events
+  - SendMessage now support a pointer to a string or a struct in LPARAM.
+  - NEM KeyDown and KeyUp receive new parameter with virtual key value.
+  - NEM Timer event
+
+Bug:
+
+  - Fix accelerator keys
+  - Fix ImageList bug
+  - Fix Windows XP Color
+  - Fix options parsing for TextField 
+  - Fix -prompt support on Textfield with -pos and -size option.
+  - Fix DoEvents double events
+  - Fix PeekMessage warm message
+  - Fix menu enabled option.
+
+Build :
+  - MinGW support
+  - ActivePerl 5.005 support
+
+
+=head1 CHANGELOG
+
+  + [Laurent Rocher]
+	- GUI.pm : Change version to 0.0.670
+	- GUI.h  : Set NO_XSLOCKS for perl 5.005
+	- GUI_MessageLoops.cpp : Fix for perl 5.005
+  + [Steve Pick]
+	- GUI.xs : Update to Hook() - now returns previous handler coderef
+      on hook reassignment, 0 if no previous assignment, and undef if error.
+	- GUI_MessageLoops.cpp : Added code to call Hook()ed handlers to
+      NEM_ChildMsgLoop
+  + [Laurent Rocher]
+	- GUI.pm : Add AddDatetime, AddGraphics methods
+	- GUI.xs : Fix DoEvents double event, add some DateTime methods
+      (GetTime, SetTime, SetNone, IsNone).
+	- GUI_Options.cpp : Add option parsing for DateTime control
+      (-align, -format, -shownone, -updown)
+	- Typemap : LPARAM handle as string or integer.
+  + [Steve Pick]
+	- GUI.xs : Added Hook and UnHook methods. These let you do
+      $win->Hook(MsgID, \&somesub); to hook a message to a sub. The sub
+      must be a coderef, and is called with self, wparam and lparam args
+      when the message is received by the window.
+	- GUI.h  : Addition of avHooks to PERLWIN32GUI_CREATESTRUCT and
+      PERLWIN32GUI_USERDATA.
+	- GUI_MessageLoops.cpp : Addition of hook-calling code to
+      NEM_WindowMsgLoop.
+  + [Laurent Rocher]
+	- GUI.pm : Fix -prompt option for TextField, correct color option for
+      class (Win98SE).
+	- GUI_Options.cpp : Correct -popstyle and -popexstyle like options.
+  + [Glenn Linderman] GUI_Options.cpp : Correct menu -enabled option.
+  + [Steve Pick] GUI.h : Added PERLWIN32GUI_NEM_TIMER event.
+	- GUI.pm: fixed Win32::GUI::Class::new to avoid the "white background"
+      syndrome on Windows 2000. Fixed conditional so that all operating
+      systems with version above and including 5.1 have the
+      no-white-background fix.
+	- GUI_MessageLoops.cpp: added WM_TIMER event to NEM_WindowMsgLoop,
+      now NEM handler -onTimer will be called whenever a timer added to
+      the window triggers. The NAME of the timer is provided as an argument
+      to the handler.
+	- GUI_Options.cpp: Fix to allow -onTimer.
+	- GUI_Events.cpp: NEM Events always returned PerlResult of -2, even
+      if a handler was found and called for the event. Now it returns 0 if
+      everything was successful, as it should judging by the rest of the code.
+  + [Laurent Rocher] Add build with MinGW and ExtUtils-FakeConfig support.
+      You can build Win32-GUI for ActiveState Perl with Free MingW Compiler.
+      See HowTo : http://perso.club-internet.fr/rocherl/Win32GUI.html
+  + [Steve Pick] GUI.pm: Fix ImageList bug
+  + [Glenn Linderman] MessageLoops.cpp: Fix Window Cursor bug (Without
+    return FALSE statement)
+  + [Steve Pick] GUI.xs : Fix PeekMessage (move SvROK in inner if and
+    remove sv_2mortal)
+  + [Aldo Calpini] GUI.pm
+	- fixed Win32::GUI::Class::new to avoid the "white background" syndrome
+      on XP)
+	- fixed a bug with options parsing in Win32::GUI::Textfield::new
+	- reworked a little the code for Win32::GUI::AcceleratorTable
+  + [Glenn Linderman] Accelerator key patch, Correct NotifyIcon DESTROY,
+    add PM_* constants for use with TrackPopupMenu.
+  + [Laurent Rocher] Fix some warnings, Remove unused variables, remove
+    constants.c file.
+  + [Trevor Garside] Add new RichEdit methods.
+  + [Steve Pick & Laurent Rocher] Add parameters for WM_KEYDOWN and
+    WM_KEYUP NEM events in NEM_ChildMsgLoop.
+  + [Johan Lindstrom] Add WM_DROPFILES event in WindowMsgLoop.
+  + [Laurent Rocher] Add new options for GetOpenFileName and GetSaveFileName.
+  + [Jeremy White & Laurent Rocher] Add new datetime control methods
+    and DTS_* styles constants.
+
+=head1 Contributors to this release
+
+=over
+
+=item Jeremy White
+
+=item Laurent Rocher
+
+=item Johan Lindstrom
+
+=item Steve Pick
+
+=item Trevor Garside
+
+=item Glenn Linderman
+
+=item Aldo Calpini
+
+=back
+
+=cut

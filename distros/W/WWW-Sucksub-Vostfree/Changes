@@ -1,0 +1,14 @@
+Revision history for WWW-Sucksub-Vostfree
+
+0.01    10/11/2005
+        First version, released on an unsuspecting world.
+
+0.02	15/11/2005
+		 * Correct pod doc ( format )
+		 * correct alias.pm depandancies in makefiles
+0.03	02/12/2005
+		* dbm file should store absolute url now
+		* POD corrections ( incorrect abstract + some english faults)
+0.04-0.05	02/12/2005
+		* warning should empeach serach when pattern search 
+		is less than 2 characters long.

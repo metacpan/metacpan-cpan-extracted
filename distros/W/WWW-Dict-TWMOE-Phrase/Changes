@@ -1,0 +1,23 @@
+# Revision history for WWW-Dict-TWMOE-Phrase
+
+versino: 0.05
+date:
+changes:
+- Kwalitee improvements
+
+version: 0.03
+date:    Thu Sep  7 20:10:09 CST 2006
+changes:
+- Add a dict-like command.
+
+version: 0.02
+date:    Sat Jul  8 00:14:00 CST 2006
+changes:
+- Forgot to put dependency info in Makefile.PL
+
+version: 0.01
+date:    Fri Jul  7 23:23:16 CST 2006
+changes:
+- Initial release
+- Provide very basic functionality to query exact word phrases.
+

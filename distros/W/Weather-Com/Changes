@@ -1,0 +1,96 @@
+Revision history for Perl extension Weather::Com.
+$Revision: 1.23 $
+
+0.5.3 Thu Nov 22 20:00 2007
+    - FIXED BUG #30869: Cannot install via CPAN shell
+
+0.5.2 Mon Jul 09 21:39 2007
+    - FIXED BUG #26126: Timeout did not work due to typo
+    - FIXED BUG #25154: (test within OOInterface.t failed)
+    - FIXED BUG #25151: Installing Weather-Com install 0.1
+    - FIXED BUG: test for network connection failed due to more New Yorks... 
+
+0.5.1 Fri May 26 14:41 2006
+    - added French language pack
+    - fixed bug: air pressure tendency was not translated
+
+0.5 Thu Dec 29 00:11 2005
+    - now we have dynamic language support
+
+0.4.1 Fri Apr 29 11:30 2005
+    - re-release of 0.4 because 0.4 version uploaded to CPAN was broken
+    - rewrote parts of README in terms of localization
+
+0.4 Sun Apr 24 16:00 2005
+    - moved to 'Locale::Maketext' for L10N
+    - reworked all tests, now using Test::MockObject to be able to run
+      all tests even without a network connection
+    - developed a bunch of new tests
+    - fixed some minor bugs
+
+0.4_pre2 Tue Apr 14 23:50 2005
+    - reworked the locations cache mechnism to make it case insensitive
+    - reworked the locations cache to use not only the search string as
+      key but also the name of each location found
+      (see CHANGES section of Weather::Com::Cached POD for details)
+    - reworked locations search (see Weather::Com::Cached POD for details)
+
+0.4_pre1 Sat Apr 09 15:30 2005
+    - introducing I18n package to translate weather conditions, uv indices,
+      moon phases and directions (North, South, etc.) into:
+        * English
+        * German
+    - fixed bug: AirPressure->tendency() did never return a valid value
+    
+0.3.1 Tue Mar 01 00:30 2005
+    - Fixed Bug [11720]: The new Weather::Com::DateTime objects seemed to work 
+      properly only in Germany (home of author)?!?! 
+      Some localtime/gmtime/Time::Format problems.
+      This is fixed now. Weather::Com::DateTime has been totally rewritten.
+
+0.3 Do Feb 26 16:16:00 2005
+    - Introducing forecasts. There are the following new classes:
+       - Weather::Com::Forecast
+       - Weather::Com::DayForecast
+       - Weather::Com::DayPart
+    - Now, moon phase information is also available with current conditions   
+       - Weather::Com::Moon
+    - Any date or time in main OO interface is now a Weather::Com::DateTime
+      object.
+    - Weather::Com now requires Time::Format
+    - Fixed Bug [11448]: Weather::Com::Wind->maximum_gust() did not return 
+      any valid data
+    - Introducing locations cache (build into Weather::Com::Cached)
+       => we'll only search for location codes on the web, if we didn't have
+          done so before and therefore already have them in our cachefile
+          "locations.dat"
+    - Optimized caching for high level OO interface
+       => significant speed improvements 
+0.2 Do Feb 03 23:08:00 2005
+    - New default high level OO interface:
+         - Weather::Com::Finder
+         - Weather::Com::Location
+         - Weather::Com::CurrentConditions
+         - coming soon: Weather::Com::Forecast (up to 10 days)
+    - Added a short tutorial and starting point as Weather::Com.pod
+    - Changed package structure due to namespace issues. Weather::Com will
+      become Weather::Com::Base, the other's will be called:
+         - Weather::Com::Cached
+         - Weather::Com::Simple
+      So we'll get some structure in it. This will be usefull if one wants
+      to write some other caching package, we than can tell it 
+      Weather::Com::Cached::MySQL for example, etc.
+    - added automated version information (using the CVS $Revision: 1.23 $ tag)
+      to all packages
+    - added consistency checking for paramters passed to Weather::Com
+    - Weather::Com now only accepts paths to put the cache in if it is
+      writable to the user that runs the programm
+    - changed caching so we now hold one cache file for metric and one for
+      US system data for each location (only the ones used, if you're only 
+      asking for metric data, you'll never get a us cache files and vice versa)
+    - Added Proxy Authentication capabilities so you can use these module for
+      applications behind an authenticated http proxy, also.
+	- enhanced Weather::Com::Simple with some methods to more granular data
+
+0.1   Sa Aug 21 22:00:00 2004
+	- original version

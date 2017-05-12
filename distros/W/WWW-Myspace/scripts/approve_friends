@@ -1,0 +1,259 @@
+#!/usr/bin/perl -w
+######################################################################
+# approve_friends
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: approve_friends,v 1.5 2006/03/15 01:49:48 grant Exp $
+######################################################################
+# Copyright (c) 2004 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+#
+
+=head1 NAME
+
+approve_friends - Approve new friends and post a comment to them
+
+=head1 VERSION
+
+Version 0.09
+
+=cut
+
+our $VERSION='0.09';
+
+=head1 SYNOPSIS
+
+approve_friends [-m message] [-y] [-u username -p password] [-nc]
+    [-f filename] [-c cache_file] [-gc message ]
+
+approve_friends [-f filename.yaml]
+
+The first form of the command specifies arguments on the command line. If
+the -f flag is used, the username, password, and message will be read from
+the file. The username on the first line, password on the second, and
+message on the remaining lines.
+
+ -nc: no comment. Just approve friend requests, don't leave comments.
+ -c cache_file: Use "cache_file" as the file to store info about who
+ 	we've commented.
+ -gc message: If we approve less than 50 friends, post "message" as a
+ 	comment to any friends we have that don't already have a comment on
+ 	their page. See the example below for how this is useful.
+
+The second form of the command takes a YAML configuration file. Any other
+command-line arguments will be ignored.
+
+Note that the ability to specify the cache file lets you set a
+different file if you have multiple accounts. If you use the same
+cache_file as you do for the "comment" script (and you should),
+both scripts will avoid posting to users you've already commented
+with either script. This allows you to run them concurrently.
+
+EXAMPLES
+
+ # Approve and leave a comment for new friends. Since we can comment 50
+ # people a day, if we've approved/commented less than 50, go through the
+ # rest of our friends list and leave a comment for as many as we can.
+ # This will leave "Thanks for adding me!" as a comment for new friends,
+ # and "Just stopping by to say hello!" as a comment for existing friends.
+ # Remember, Comment.pm will automatically skip profiles you've already
+ # commented or are on the top 8 of.
+ # Stops at 50 total posts.
+ approve_friends -m "Thanks for adding me\!" \
+     -gc "Just stopping by to say hello\!"
+
+ Sample YAML config file:
+ 
+ ---
+ username: myaccount@myspace.com
+ password: ILikePasswords
+ message: |
+   This is a message.
+   
+   It is a few lines long
+   
+   - Me
+ silent: 1  # Or 0 (default)
+ no_comment: 1  # Or 0 (default)
+ cache_file: /home/joe/approve_cache
+
+=cut
+
+#---------------------------------------------------------------------
+# Setup Variables
+
+use warnings;
+use strict;
+
+# Debugging?
+our $DEBUG=0;
+
+our $DEFAULT_MESSAGE = 'Thanks for adding me!';
+
+#---------------------------------------------------------------------
+# Libraries
+
+use WWW::Myspace 0.21;
+use WWW::Myspace::Comment;
+
+use YAML 'LoadFile';
+#use IO::All;
+
+######################################################################
+# Main Program
+
+# Get passed arguments
+my $args = &parse_args(@ARGV);
+my $result;
+
+# Log in
+my $date = `date`; chop $date;
+print "Logging in to myspace at ${date}...\n";
+my $myspace = "";
+if ( $args->{'username'} ) {
+	$myspace = WWW::Myspace->new( $args->{'username'}, $args->{'password'} );
+} else {
+	$myspace = new WWW::Myspace;
+}
+die "Login failed\n" unless ( $myspace->logged_in );
+
+# Approve friends
+print "Checking for friends to approve...\n";
+my @friends = $myspace->approve_friend_requests;
+
+# If we approved any, comment them
+my $comment = WWW::Myspace::Comment->new( $myspace );
+$comment->set_noisy(1);
+
+# Set the comment counter
+my $max_count;
+if ( defined $args->{'bypass'} ) {
+	$max_count = 400;
+	$comment->{send_message_on_captcha} = 1;
+} else {
+	$max_count = 50;
+}
+
+# Set the cache file if necessary
+$comment->cache_file( $args->{'cache_file'} )
+	if ( defined $args->{'cache_file'} );
+
+if ( @friends ) {
+	print "Approved " . @friends . " new friends: @friends\n";
+	
+	unless ( defined $args->{'no_comment'} ) {
+
+		print "Leaving comments...\n";
+	
+		# If we're posting less than $max_count friends, comment them all.
+		$comment->ignore_duplicates(1) if ( ( ! $args->{'general_comment'} ) &&
+			( @friends < $max_count ) );
+		$result = $comment->post_comments( $args->{'message'}, @friends );
+		print "New add comments finished with status: $result\n";
+	}
+	
+}
+
+if ( $args->{'general_comment'} && ( @friends < $max_count ) ) {
+	print "Leaving comments for other friends...\n";
+
+	# Leave $max_count total comments, including those we left above
+	$comment->max_count( $max_count - @friends );
+	print "Sending to " . $comment->max_count . " friends\n";
+	( $DEBUG ) && print "I'd be sending this to ". $comment->max_count .
+		" friends if I weren't in debug mode:\n" . $args->{'general_comment'} .
+		"\n";
+	$result = $comment->post_comments( $args->{'general_comment'},
+		$myspace->get_friends );
+	print "General comments finished with status: $result\n";
+}
+
+print "Done.\n";
+
+######################################################################
+# Subroutines
+
+#----------------------------------------------------------------------
+# parse_args( @ARGS )
+# Parse command-line arguments and return a has of values
+
+sub parse_args {
+
+	my ( @passed_args ) = @_;
+
+	# Initialize
+	my $args = {};
+	my @friend_ids = ();
+	my ( $arg, $line, $data );
+
+	while ( $arg = shift( @passed_args ) ) {
+		if ( $arg eq "-m" ) {
+			$args->{'message'} = shift( @passed_args )
+		} elsif ( $arg eq "-y" ) {
+			$args->{'silent'}=1;
+		} elsif ( $arg eq "-u" ) {
+			$args->{'username'}=shift( @passed_args );
+		} elsif ( $arg eq "-p" ) {
+			$args->{'password'}=shift( @passed_args );
+		} elsif ( $arg eq "-f" ) {
+			$args->{'filename'}=shift( @passed_args );
+		} elsif ( $arg eq "-nc" ) {
+			$args->{'no_comment'} = 1;
+		} elsif ( $arg eq "-c" ) {
+			$args->{'cache_file'} = shift( @passed_args );
+		} elsif ( $arg eq "-gc" ) {
+			$args->{'general_comment'} = shift( @passed_args );
+		} elsif ( $arg eq "-b" ) {
+			$args->{'bypass'} = 1;
+		} else {
+			die "Invalid argument: $arg\n";
+		}
+
+	}
+
+	# Verify data
+	if ( ( $args->{'username'} ) && ( ! $args->{'password'} ) ) {
+		print "You must specify a password if you provide a username\n";
+		&fail();
+	}
+	
+	# Check for -f flag - means we read username, password, and message
+	# from a file
+	if ( defined $args->{'filename'} ) {
+		open FILE, "<", $args->{'filename'} or die "Invalid filename: ".$args->{'filename'};
+
+		# New YAML support
+		if ( $args->{'filename'} =~ /\.ya?ml$/i ) {
+			( $DEBUG ) && print "Reading YAML config file " . $args->{'filename'} . "\n";
+#			$data < io( $args->{'filename'} );
+#			$args = LoadFile( $data );
+			$args = LoadFile( $args->{'filename'} );
+		} else {
+			( $DEBUG ) && print "Reading standard config file ". $args->{'filename'} . "\n";
+			$args->{'username'} = <FILE>;
+			$args->{'password'} = <FILE>;
+			undef $args->{'message'}; # Just in case...
+			foreach $line ( <FILE> ) {
+				$args->{'message'} .= $line;
+			}
+		}
+
+		close FILE;
+	}
+	
+	# Check the comment
+	unless ( $args->{'message'} ) {
+		$args->{'message'} = $DEFAULT_MESSAGE;
+	}
+	
+	# Debugging output
+	if ( $DEBUG ) {
+		print "Got arguments:\n";
+		foreach $arg (sort( keys( %{$args} ) ) ) {
+			print "$arg:" . $args->{"$arg"} . "\n";
+		}
+	}
+
+	# Return our arguments
+	return $args;
+}

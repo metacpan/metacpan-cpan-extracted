@@ -1,0 +1,294 @@
+NAME
+    apid - Generic REST API Daemon
+
+SYNOPSIS
+     Usage: apid [ -c file ] [ -f ] { command }
+      -c file         Specify configuration file (instead of apid.conf)
+      -f              Run in the foreground (don't detach)
+
+     Possible commands are:
+      start      Starts a new apid if there isn't one running already
+      stop       Stops a running apid
+      reload     Causes a running apid to reload it's config file.
+                 Starts a new one if none is running.
+      restart    Stops a running apid if one is running. Starts a new one.
+      check      Check the configuration file and report the daemon state
+      help       Display this usage info
+      version    Display the version of apid
+      debug      Starts a new apid in the foreground
+
+DESCRIPTION
+    apid is a generic http(s) daemon which can be used to provide a RESTful
+    web service in front of something which isn't already web aware. If you
+    already have some application server or website with a service running,
+    apid is of no use for you. However, if there's some arcane, weird or
+    just old computing system which is accessible by perl you want to make
+    available online as a web service, then apid might be a solution.
+
+    To use apid, you have to write a perl script which maps uris to
+    handlers, so you're totally free in what you want to achieve and how to
+    do it.
+
+FEATURES
+    *   supports http and https.
+
+    *   authentication via POST vars or basic authentication
+
+    *   decorators which you can use to enable authentication or input
+        validation per uri.
+
+    *   automatically converts incoming data (post vars, json post or query
+        string) to a perl structure for easy access. Handlers return perl
+        structures which will be converted automatically to json as well.
+
+CONFIGURATION
+    A config file is required for apid to work. The format is very simple,
+    one option per line, the value separated by an equal sign. Empty lines
+    or lines preceeded with '# are ignored.
+
+    Possible parameters:
+
+     host       = localhost
+     port       = 4433
+     map        = my.pm
+     apiname    = My API
+     apiversion = 0.0.1
+     sslcrt     = server.crt
+     sslkey     = server.key
+
+    If sslkey or sslcrt is omitted, apid will speak http, otherwise https.
+    You can configure more aspects of ssl by using IO::Socket::SSL-new()>
+    parameters.
+
+MAP SCRIPT
+    The map script, in the config specified with the map parameter, controls
+    the behavior of apid. In its simplest form it only contains a couple of
+    handlers, here an example:
+
+     get '/date' => sub {
+       my $date = scalar localtime();
+       return { date => $date };
+     };
+
+    Now, start apid:
+
+     apid -c my.conf -f start
+
+    And access the api function:
+
+     % curl http://localhost:8080/date
+     {"date":"Wed Oct 22 20:29:50 2014"}
+
+    Can't be easier.
+
+  AUTHENTICATION
+    To use authentication, you have to implement a login function and you
+    have to tell apid which kind of auth you want.
+
+    Full example:
+
+     use Authen::Simple::LDAP;
+
+     auth basic => 'my api';
+
+     implement login => sub {
+       my($user, $pass) = @_;
+
+       my $ldap = Authen::Simple::LDAP->new( 
+         host    => 'ldap.company.com',
+         basedn  => 'ou=People,dc=company,dc=net'
+       );
+
+       if ( $ldap->authenticate( $user, $pass ) ) {
+         return 1; # ok
+       }
+
+       return 0; # fail
+     };
+
+     request login;
+     get '/date' => sub {
+       my $date = scalar localtime();
+       return { date => $date };
+     };
+
+    In this case we are using basic authentication which is backed by LDAP.
+    If successfull, apid will return a cookie with a session id, which can
+    be used in subsequent requests. However, with basic authentication this
+    is optional, you may also leave the session cookie and just put the auth
+    data into every request.
+
+   ENABLE BASIC AUTHENTICATION
+     auth basic => 'my api';
+
+    The second parameter to the auth decorator is the realm.
+
+   ENABLE POST/REDIRECT AUTHENTICATION
+     auth redirect => '/login';
+
+    The second parameter to the auth decorator is the login uri.
+
+    In this mode, an unauthenticated user is being redirected to the
+    specified uri, where the user has to POST the username and password,
+    which can either be posted as a JSON string or as query string.
+    Examples:
+
+    Post auth data as JSON string:
+
+     curl -d "{\"user\":{\"me\":\"mypass\"}}" http://localhost:8080/login
+
+    Post auth data directly:
+
+     curl -d "user=me&pass=mypass" http://localhost:8080/login
+
+    It is also possible to use a query string
+
+     curl "http://localhost:8080/login?user=me&pass=mypass"
+
+   LOGIN IMPLEMENTATION
+    In either case, you must implement the actual login function by using
+    the 'implement' decorator:
+
+     implement login => sub { my($user, $pass) = @_; ... };
+
+    Inside, you can use whatever you want. I'd suggest using one of the
+    Authen::Simple submodules.
+
+    The login handler must return true to indicate authentication was
+    successfull.
+
+   AUTHENTICATION DECORATOR
+    To enable authentication for a specific uri, add the following decorator
+    in front of it:
+
+     request login;
+     get '/date' => sub { .. };
+
+    This has to be done for every uri handler. If you leave the decorator
+    for a handler it can be accessed without authentication. Example:
+
+     request login;
+     get '/date'   => sub { .. };
+
+     get '/uptime' => sub { .. };
+
+     request login;
+     get '/vmstat' => sub { .. };
+
+    In this example, the uris /data and /vmstat require authentication while
+    /uptime can be accessed by everyone.
+
+  URI MAPPING
+    There's only one decorator call you use to map an uri to a handler: get.
+    Apid doesn't distinguish between POST, PUT, DELETE or GET requests. So,
+    however the uri have been called, your handler will always be called. If
+    you need to distinguish between the various request types, you have to
+    do it yourself in your handler.
+
+     get '/some/uri' => sub { my $data = shift; ... return {}; };
+
+    The handler gets passed the submitted data as its first and only
+    parameter, if present. The data is always a perl structure.
+
+    Apid expects the handler to return a perl structure as well, which will
+    be converted to JSON and returned to the client.
+
+    There are a couple of variables which are available to each handler:
+
+    $req
+        This is a standard HTTP::Request object. In addition, if
+        authentication was enabled, it contains the username of the
+        authenticated client:
+
+         $req->{user}
+
+    $res
+        This is a standard HTTP::Response object. You may modify the HTTP
+        return code or add additional headers to the response as you please.
+
+    %cfg
+        This is a hash containing all options of the configuration file. It
+        has been parsed by Config::General.
+
+  INPUT VALIDATION
+    Apid can validate input data automatically by using
+    Data::Validate::Struct. To enable it, use the validate decorator:
+
+     request validate => { expression => 'text' };
+     get '/ps/search' => sub {
+       my $data = shift;
+       return &ps2a($data->{expression});
+     };
+
+    The parameter to the decorator is the validator struct required by
+    Data::Validate::Struct. Please refer to the documentation there for
+    details.
+
+    If input validation fails, apid will return an error message as JSON and
+    HTTP response code 403.
+
+  AUTOMATIC DOCUMENTATION
+    Usually you'll want to write the documentation for your API yourself.
+    For the lazy ones, there's a documentation decorator, which you can use
+    to generate it.
+
+     request doc => 'some text';
+     get '/some/uri' => sub { .. };
+
+    If apid encounters one or more documentation decorators it generates a
+    documentation which is available at /doc/.
+
+    Beware, that this documentation is very basic, however it at least
+    explains if the uri requires authentication, what kind or input it
+    expects (if validation were enabled) and if authentication is required.
+
+HELPFUL CURL COMMANDS FOR TESTING
+    auth to url with login requested:
+
+     curl -c cookies -b cookies -k -v --user USER:PASS https://localhost:4443/foo/bar
+
+    access url when auth ok:
+
+     curl -c cookies -b cookies -k -v https://localhost:4443/foo/bar
+
+    post query data:
+
+     curl -k -v -d "name=foo&year=2014" https://localhost:4443/foo/bar
+
+    post json data:
+
+     curl -k -v -d "{\"user\":{\"name\":\"foo\"}}" https://localhost:4443/foo/bar
+
+    post json file 'body.json':
+
+     curl -k -v -H "Content-Type: application/json" -d @body.json https://localhost:4443/foo/bar
+
+    post data as query string:
+
+     curl -k -v -d "https://localhost:4443/foo/bar?name=hans&age=2014"
+
+    get json data:
+
+     curl -k -v -d https://localhost:4443/foo/bar
+
+AUTHOR
+    T.v.Dein <tlinden@cpan.org>
+
+BUGS
+    Report bugs to
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-REST-Apid
+
+SEE ALSO
+    WWW::REST::Apid HTTP::Daemon HTTP::Daemon::SSL Daemon::Generic
+    Config::General Data::Validate::Struct
+
+COPYRIGHT
+    Copyright (c) 2014 by T.v.Dein <tlinden@cpan.org>. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+VERSION
+    apid Version 0.07.
+

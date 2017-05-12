@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+
+# Nicked from http://code.google.com/p/selenium-profiler/
+
+use strict;
+use warnings;
+
+use URI::Split qw/uri_split/;
+use WWW::Selenium;
+use DateTime;
+use WWW::Selenium::NetworkCapture;
+
+use vars qw/$site $path $browser/;
+
+if ($#ARGV < 0) {
+    print "usage:\n\tweb_profiler.pl <url> [browser_launcher]\n";
+    print "example:\n\tweb_profiler.pl http://www.google.com/ *firefox\n";
+    exit 1;
+} else {
+    my $url = $ARGV[0];
+    if ($url !~ /^http/) {
+	$url = 'http://' . $url;
+    }
+    my ($scheme, $auth, $tmp_path, $query, $frag) = uri_split($url);
+    $site = $scheme . '://' . $auth;
+    $tmp_path =~ s/;.*$//; # strip URI params off
+    if ($tmp_path eq '') {
+	$tmp_path = '/';
+    }
+    $path = $tmp_path;
+    $browser = '*chrome';
+}
+if ($#ARGV == 1) {
+    $browser = $ARGV[1];
+}
+
+run($site, $path, $browser);
+
+sub run {
+    my ($site, $path, $browser) = @_;
+
+    my $sel = WWW::Selenium->new(
+	host => "localhost", 
+	port => 4444, 
+	browser => $browser, 
+	browser_url => $site
+    );
+
+    $sel->{session_id} = $sel->get_string(
+	"getNewBrowserSession",
+	$sel->{browser_start_command},
+	$sel->{browser_url},
+	undef,
+	'captureNetworkTraffic=true'
+    );
+
+#    sleep 30;
+
+    $sel->open($path);
+    $sel->wait_for_page_to_load(60000);
+    my $end_loading = DateTime->now();
+
+    my $traffic_xml = $sel->get_string('captureNetworkTraffic', 'xml');
+    $traffic_xml =~ s/""/"/g; # bug in Selenium?
+
+    $sel->stop();
+
+    my $nc = WWW::Selenium::NetworkCapture->new($traffic_xml);
+
+    my $num_requests = $nc->get_num_requests();
+    my $total_size = $nc->get_content_size();
+    my %status_map = $nc->get_http_status_codes();
+    my %file_ext_map = $nc->get_file_extension_stats();
+    my @http_details = $nc->get_http_details();
+
+    my ($start_first_request, $end_first_request, $end_last_request) =
+	$nc->get_network_times();
+
+    my $end_load_elapsed = get_elapsed_secs($start_first_request, $end_loading);
+    my $end_last_request_elapsed = get_elapsed_secs($start_first_request, $end_last_request);
+    my $end_first_request_elapsed = get_elapsed_secs($start_first_request, $end_first_request);
+
+    print "--------------------------------\n";
+    print "results for $site\n";
+    
+    print "\ncontent size: $total_size kb\n";
+    
+    print "\nhttp requests: $num_requests\n";
+    foreach my $status (sort keys %status_map) {
+        print "status $status: $status_map{$status}\n";
+    }
+    
+    print "\nprofiler timing:\n";
+    print "$end_load_elapsed secs (page load)\n";
+    print "$end_last_request_elapsed secs (network: end last request)\n";
+    print "$end_first_request_elapsed secs (network: end first request)\n";
+    
+    print "\nfile extensions: (count, size)\n";
+
+    foreach my $file_ext (sort keys %file_ext_map) {
+	if ($file_ext !~ /^HASH/) { # where is this coming from?
+	    print "$file_ext: $file_ext_map{$file_ext}[0], $file_ext_map{$file_ext}[1] kb\n";
+	}
+    }
+        
+    print "\nhttp timing detail: (status, method, doc, size, time)\n";
+    for (my $i = 0; $i < scalar @http_details; $i++) {
+        print "$http_details[$i][0], $http_details[$i][1], $http_details[$i][2], $http_details[$i][3], $http_details[$i][4] ms\n";
+    }
+}
+
+sub get_elapsed_secs {
+    my ($dt_start, $dt_end) = @_;
+
+    return
+	($dt_end - $dt_start)->seconds +
+	($dt_end - $dt_start)->nanoseconds / 1000000000.0;
+}

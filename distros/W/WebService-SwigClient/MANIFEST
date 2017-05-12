@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/swig_client
+carton.lock
+cpanfile
+dist.ini
+lib/WebService/SwigClient.pm
+t/basic.t

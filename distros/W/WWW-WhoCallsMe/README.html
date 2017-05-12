@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WWW::WhoCallsMe - Query WhoCallsMe.com for details about a caller's phone number</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#new">new</a></li>
+		<li><a href="#fetch">fetch</a></li>
+	</ul>
+
+	<li><a href="#dependencies">DEPENDENCIES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#copyright___license">COPYRIGHT / LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>WWW::WhoCallsMe - Query WhoCallsMe.com for details about a caller's phone number</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use WWW::WhoCallsMe;
+  my $who = WWW::WhoCallsMe-&gt;new;</pre>
+<pre>
+  my $number = '6305053008';
+  my $calledme = $who-&gt;fetch($number);
+  if ($calledme-&gt;{listed})
+  {
+    my $name = $calledme-&gt;{name};
+    print &quot;The number $number is listed.  &quot;;
+    print &quot;It seems that $name was calling.&quot; if $name;
+    print &quot;I don't know who was calling, though.&quot; unless $name;
+    print &quot;\n&quot;;
+  }
+  else
+  {
+    print &quot;This number is not listed.\n&quot;;
+  }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>WhoCallsMe.com is a website that compiles reports from users about
+companies that call people.  These callers might be telemarketers,
+bill collectors, legit companies, or otherwise.  These reports are
+filed by the person that received the call.  In some cases, the
+report includes the name of the company that called.  This module
+attempts to grab this information and report it back to your program.</p>
+<p>You supply the phone number and it tells you if the number is listed,
+what names have been reported for this number, and a guess at the
+company name of the caller.</p>
+<p>
+</p>
+<h2><a name="new">new</a></h2>
+<pre>
+  my $who = WWW::WhoCallsMe-&gt;new;</pre>
+<p>Accepts no parameters.</p>
+<p>Returns a new WWW::WhoCallsMe object for your enjoyment.</p>
+<p>
+</p>
+<h2><a name="fetch">fetch</a></h2>
+<pre>
+  my $hashref = $who-&gt;fetch($number);</pre>
+<p>Accepts one <em>required</em> argument: the phone number.</p>
+<p>Returns a hashref containing this information:</p>
+<ul>
+<li>
+<p>number - scalar: the number that was queried</p>
+</li>
+<li>
+<p>success - scalar: whether or not the HTTP query succeeded</p>
+</li>
+<li>
+<p>listed - scalar: determines if the number is listed</p>
+</li>
+<li>
+<p>name - scalar: the guessed name of the caller (based on frequency of occurrences in the callername array)</p>
+</li>
+<li>
+<p>callername - array: list of reported caller names (the &quot;Caller:&quot; field)</p>
+</li>
+<li>
+<p>callerid - array: list of reported caller id values (the &quot;Caller ID:&quot; field)</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="dependencies">DEPENDENCIES</a></h1>
+<p><em>LWP</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://www.whocallsme.com/">http://www.whocallsme.com/</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TODO</a></h1>
+<p>I have no plans to expand this module, but I welcome any wishlist
+requests.  If you can think of something reasonable to add to this
+module, I'll consider doing it.  I also accept patches from others.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Report all bugs through CPAN's bug reporting tool.  Feel free to
+file wishlist requests there as well.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright___license">COPYRIGHT / LICENSE</a></h1>
+<p>All data that is provided by this module is provided by
+WhoCallsMe.com.  They probably own the copyright to all of the data.
+Their site doesn't appear to specify any kind of copyright or licensing
+information.  Be reasonable with it.  I'll leave it up to you to
+interpret what they think is okay for you to do with their data.</p>
+<p>The (short amount of) code in this module is (C) Dusty Wilson, but
+no real rights are reserved.  Feel free to use it as you see fit,
+as long as it doesn't get me in trouble.  ;-)</p>
+
+</body>
+
+</html>

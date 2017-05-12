@@ -1,0 +1,25 @@
+WWW::PostalMethods
+====================
+
+Interface to the PostalMethods API
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    SOAP::Lite
+    MIME::Base64
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 OHPA Software. All rights reserved.
+

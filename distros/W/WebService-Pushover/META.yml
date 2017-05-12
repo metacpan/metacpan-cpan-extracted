@@ -1,0 +1,43 @@
+---
+abstract: 'interface to Pushover API'
+author:
+  - 'Steve Huff <shuff@cpan.org>'
+build_requires:
+  JSON: '0'
+  Module::Build::Pluggable::ReadmeMarkdownFromPod: '0.04'
+  Module::Build::Pluggable::Repository: '0.10'
+  Pod::Markdown: '0'
+  Test::Deep: '0'
+  Test::Fake::HTTPD: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+  Module::Build::Pluggable::ReadmeMarkdownFromPod: '0.04'
+  Module::Build::Pluggable::Repository: '0.10'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Pushover
+provides:
+  WebService::Pushover:
+    file: lib/WebService/Pushover.pm
+    version: v1.0.0
+requires:
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  File::Spec: '0'
+  Moo: '0'
+  Params::Validate: '0'
+  Readonly: '0'
+  URI: '0'
+  WebService::Simple: '0'
+  WebService::Simple::Parser::JSON: '0'
+  perl: '5.008'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hakamadare/webservice-pushover.git
+version: v1.0.0

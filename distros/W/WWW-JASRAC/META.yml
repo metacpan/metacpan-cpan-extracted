@@ -1,0 +1,20 @@
+---
+name: WWW-JASRAC
+version: 0.01
+author:
+  - |-
+    Daisuke Maki E<lt>dmaki@cpan.orgE<gt>
+    All rights reserved.
+abstract: Interact With JASRAC Search Interface
+license: perl
+requires:
+  Encode: 0
+  HTML::TreeBuilder: 0
+  LWP::UserAgent: 0
+provides:
+  WWW::JASRAC:
+    file: lib/WWW/JASRAC.pm
+    version: 0.01
+  WWW::JASRAC::Result:
+    file: lib/WWW/JASRAC/Result.pm
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,259 @@
+NAME
+    WWW::Pastebin::PastebinCa::Create - create new pastes on
+    http://pastebin.ca/ from Perl
+
+SYNOPSYS
+        use strict;
+        use warnings;
+
+        use WWW::Pastebin::PastebinCa::Create;
+
+        my $paster = WWW::Pastebin::PastebinCa::Create->new;
+
+        $paster->paste('testing')
+            or die $paster->error;
+
+        print "Your paste can be found on $paster\n";
+
+DESCRIPTION
+    The module provides means of pasting large texts into
+    <http://pastebin.ca/> pastebin site.
+
+CONSTRUCTOR
+  new
+        my $paster = WWW::Pastebin::PastebinCa::Create->new;
+
+        my $paster = WWW::Pastebin::PastebinCa::Create->new( timeout => 10 );
+
+        my $paster = WWW::Pastebin::PastebinCa::Create->new(
+            mech => WWW::Mechanize->new( agent => '007', timeout => 10 ),
+        );
+
+    Bakes and returns a fresh WWW::Pastebin::PastebinCa::Create object.
+    Takes two *optional* arguments which are as follows:
+
+   timeout
+        my $paster = WWW::Pastebin::PastebinCa::Create->new( timeout => 10 );
+
+    Takes a scalar as a value which is the value that will be passed to the
+    WWW::Mechanize object to indicate connection timeout in seconds.
+    Defaults to: 30 seconds
+
+   mech
+        my $paster = WWW::Pastebin::PastebinCa::Create->new(
+            mech => WWW::Mechanize->new( agent => '007', timeout => 10 ),
+        );
+
+    If a simple timeout is not enough for your needs feel free to specify
+    the "mech" argument which takes a WWW::Mechanize object as a value.
+    Defaults to: plain WWW::Mechanize object with "timeout" argument set to
+    whatever WWW::Pastebin::PastebinCa::Create's "timeout" argument is set
+    to as well as "agent" argument is set to mimic FireFox.
+
+METHODS
+  paste
+        my $uri = $paster->paste('some long text')
+            or die $paster->error;
+
+        my $uri2 = $paster->paste(
+            'some long text',
+            name    => 'Zoffix',
+            lang    => 6, # perl syntax highlights
+            expire  => '5 minutes',
+            desc    => 'some codes',
+            tags    => 'some space separated tags',
+        ) or die $paster->error;
+
+    Instructs the object to create a new paste. If an error occured during
+    pasting the method will return either "undef" or an empty list depending
+    on the context and the error will be available via "error()" method. On
+    success returns a URI object poiting to the newly created paste (see
+    also "uri()" method). The first argument is *mandatory* content of your
+    paste. The rest are optional arguments which are passed in a key/value
+    pairs. The optional arguments are as follows:
+
+   name
+        { name    => 'Zoffix' }
+
+    Optional. Takes a scalar as an argument which specifies the name of the
+    poster or the titles of the paste. Defaults to: empty string, which in
+    turn results to word "Stuff" being the title of the paste. Defaults to:
+    empty string.
+
+  lang
+        { lang    => 6 }
+
+    Optional. Takes an integer value from 1 to 34 representing the
+    (computer) language of the paste, or, in other words, the syntax
+    highlights to turn on. Defaults to: 1 (Raw). The integer "lang" codes
+    are as follows:
+
+             1 => 'Raw',
+             2 => 'Asterisk Configuration',
+             3 => 'C Source',
+             4 => 'C++ Source',
+             5 => 'PHP Source',
+             6 => 'Perl Source',
+             7 => 'Java Source',
+             8 => 'Visual Basic Source',
+             9 => 'C# Source',
+            10 => 'Ruby Source',
+            11 => 'Python Source',
+            12 => 'Pascal Source',
+            13 => 'mIRC Script',
+            14 => 'PL/I Source',
+            15 => 'XML Document',
+            16 => 'SQL Statement',
+            17 => 'Scheme Source',
+            18 => 'Action Script',
+            19 => 'Ada Source',
+            20 => 'Apache Configuration',
+            21 => 'Assembly (NASM)',
+            22 => 'ASP',
+            23 => 'BASH Script',
+            24 => 'CSS',
+            25 => 'Delphi Source',
+            26 => 'HTML 4.0 Strict',
+            27 => 'JavaScript',
+            28 => 'LISP Source',
+            29 => 'Lua Source',
+            30 => 'Microprocessor ASM',
+            31 => 'Objective C',
+            32 => 'Visual Basic .NET',
+            33 => 'Script Log',
+            34 => 'Diff / Patch',
+
+   expire
+        { expire  => '5 minutes' }
+
+    Optional. Takes a "valid expire string" as an argument. Specifies when
+    the paste should expire. If the value is set to an empty string, the
+    paste will be set to never expire. Defaults to: empty string (Never).
+    Possible "valid expire string"s are as follows:
+
+        '2 hours'
+        '4 hours'
+        '1 year'
+        '2 weeks'
+        '45 minutes'
+        '2 months'
+        '30 minutes'
+        '1 week'
+        '1 hour'
+        '15 minutes'
+        '10 minutes'
+        '3 days'
+        '5 months'
+        '4 months'
+        '5 minutes'
+        '8 hours'
+        '2 days'
+        '3 months'
+        '1 day'
+        '12 hours'
+        '3 weeks'
+        '6 months'
+        '1 month'
+
+   desc
+        { desc => 'some codes' }
+
+    Optional. Takes a scalar string representing the description of the
+    paste. Defaults to: empty string.
+
+   tags
+        { tags => 'some space separated tags' }
+
+    Optional. Takes a scalar string which should be space separated "tags"
+    to tag the paste with. Defaults to: empty string.
+
+  error
+        my $uri = $paster->paste('some long text')
+            or die $paster->error;
+
+    If an error occured during a call to "paste()" it will return either
+    "undef" or an empty list depending on the context and the error will be
+    available via "error()" method. Takes no arguments, returns an error
+    message explaining why "paste()" failed.
+
+  paste_uri
+        my $paste_uri = $paster->paste_uri;
+
+        print "Paste was pasted on $paster\n";
+
+    Must be called after a successfull call to "paste()". Takes no
+    arguments, returns a URI object pointing to a newly created paste. This
+    method is overloaded with "q|""|", thus you can simply interpolate your
+    object in a string to obtain the URI of newly created paste.
+
+  valid_langs
+        my %valid_lang_codes_and_descriptions = $paster->valid_langs;
+        use Data::Dumper;
+        print Dumper \%valid_lang_codes_and_descriptions;
+
+    Takes no arguments. Returns a flatened hash of valid language codes to
+    use in "lang" argument to "paste()" method as keys and the language
+    descriptions as values.
+
+  valid_expires
+        print "'$_' is a valid expire value\n"
+            for $paster->valid_expires;
+
+    Takes no arguments. Returns a list of valid values for "expire" argument
+    to "paste()" method
+
+  mech
+        my $old_mech = $paster->mech;
+
+        $paster->mech( WWW::Mechanize->new( agent => '007' ) );
+
+    Returns a WWW::Mechanize object used internally for pasting. When called
+    with an optional argument (which must be a WWW::Mechanize object) will
+    use it for pasting.
+
+NO SPAM
+    Please note that pastebin.ca has a spam protection and will ban you for
+    pasting too much. So don't abuse it, ktnx.
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-pastebin-pastebinca-create at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Pastebin-PastebinCa-
+    Create>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Pastebin::PastebinCa::Create
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Pastebin-PastebinCa-Cr
+        eate>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Pastebin-PastebinCa-Create>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Pastebin-PastebinCa-Create>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Pastebin-PastebinCa-Create>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

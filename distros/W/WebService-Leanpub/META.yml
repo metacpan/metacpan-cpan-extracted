@@ -1,0 +1,28 @@
+---
+abstract: 'Access the Leanpub API.'
+author:
+  - 'Mathias Weidner <mamawe@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Leanpub
+provides:
+  WebService::Leanpub:
+    file: lib/WebService/Leanpub.pm
+    version: v0.3.0
+requires:
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI::Escape: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.3.0

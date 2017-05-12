@@ -1,0 +1,26 @@
+---
+abstract: "A Perl client for the Constructor.io API. Constructor.io provides a lightning-fast, typo-tolerant autocomplete service that ranks your users' queries by popularity to let them find what they're looking for as quickly as possible."
+author:
+  - 'Dan McCormick <dan@constructor.io>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-ConstructorIO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Method::Signatures: '0'
+  Moo: '1.006000'
+  WebService::Client: '0'
+  perl: '5.006'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,18 @@
+# Put all local overrides/modifications to the config/* files in this
+# file. Do not modify any of the files under the config/ directory as
+# they will be overwritten by subsequent upgrades to Kwiki modules.
+# See: http://www.kwiki.org/?ChangingConfigDotYaml
+#
+logo_image: logo_sm.png
+main_page: PortlandPerlMongers
+
+# Kwiki::RecentChanges::Atom
+atom_title: Portland Perl Mongers
+
+# Kwiki::RecentChangesRSS
+rss_title: Portland Perl Mongers
+rss_description: a gaggle of geeks
+rss_link: http://pdx.pm.org/kwiki/
+rss_depth: 7
+rss_icon: xml.png
+rss_display_page: 1

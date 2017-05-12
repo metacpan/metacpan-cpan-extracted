@@ -1,0 +1,78 @@
+{
+   "abstract" : "Perl client library for SeatGeek's Sixpack A/B testing framework http://sixpack.seatgeek.com/",
+   "author" : [
+      "Menno Blom, C<< <blom at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "p5-WWW-Sixpack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.038"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::UUID" : "0",
+            "JSON::Any" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/b10m/p5-WWW-Sixpack/issues"
+      },
+      "homepage" : "https://github.com/b10m/p5-WWW-Sixpack",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/b10m/p5-WWW-Sixpack.git",
+         "web" : "https://github.com/b10m/p5-WWW-Sixpack"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "B10m <menno@b10m.net>"
+   ]
+}
+

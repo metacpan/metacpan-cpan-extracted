@@ -1,0 +1,367 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_existing">_new_existing</a></li>
+      <li><a href="#new_existing1">_new_existing</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#description">description</a></li>
+      <li><a href="#expire">expire</a></li>
+      <li><a href="#read_only">read_only</a></li>
+      <li><a href="#change">change</a></li>
+      <li><a href="#is_valid">is_valid</a></li>
+      <li><a href="#is_valid1">_is_valid</a></li>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#id">id</a></li>
+      <li><a href="#offers_domain">offers_domain</a></li>
+      <li><a href="#offers_domain1">offers_domain</a></li>
+      <li><a href="#offers_domain_transfer">offers_domain_transfer</a></li>
+      <li><a href="#offers_domain2">offers_domain</a></li>
+      <li><a href="#info_checkout">info_checkout</a></li>
+      <li><a href="#checkout">checkout</a></li>
+      <li><a href="#items">items</a></li>
+      <li><a href="#item">item</a></li>
+      <li><a href="#item1">item</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order::Cart</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $cart = $ovh-&gt;order-&gt;new_cart(ovh_subsidiary =&gt; &#39;DE&#39;);</p>
+
+<p>$cart-&gt;add_domain(&#39;www.domain.com&#39;);</p>
+
+<p>$cart-&gt;delete;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides methods to manage shopping carts.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_existing">_new_existing</h2>
+
+<p>Internal Method to create the Cart object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $cart_id - api id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Cart-&gt;_new($ovh_api_wrapper, $cart_id, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="new_existing1">_new_existing</h2>
+
+<p>Internal Method to create the Cart object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object - api id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Cart-&gt;_new($ovh_api_wrapper, $module, ovhSubsidiary =&gt; &#39;DE&#39;, decription =&gt; &#39;Shopping&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Retrieves properties. This method updates the intern property variable.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $cart-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="description">description</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $description = $cart-&gt;description;</p>
+
+</li>
+</ul>
+
+<h2 id="expire">expire</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $expire = $cart-&gt;expire;</p>
+
+</li>
+</ul>
+
+<h2 id="read_only">read_only</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $read_only = $cart-&gt;read_only;</p>
+
+</li>
+</ul>
+
+<h2 id="change">change</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value description expire</p>
+
+</li>
+<li><p>Synopsis: my $change = $cart-&gt;change(description =&gt; &#39;Shopping!&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid">is_valid</h2>
+
+<p>When this cart is deleted on the api side, this method returns 0.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;Valid&quot; if $cart-&gt;is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid1">_is_valid</h2>
+
+<p>Intern method to check validity. Difference is that this method carps an error.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: $cart-&gt;_is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="delete">delete</h2>
+
+<p>Deletes the cart api sided and sets this object invalid.</p>
+
+<ul>
+
+<li><p>Synopsis: $cart-&gt;delete;</p>
+
+</li>
+</ul>
+
+<h2 id="id">id</h2>
+
+<p>Returns the api id.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $id = $cart-&gt;id;</p>
+
+</li>
+</ul>
+
+<h2 id="offers_domain">offers_domain</h2>
+
+<p>Returns an Array of hashs with offers.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - domain name</p>
+
+</li>
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $offers = $cart-&gt;offers_domain(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="offers_domain1">offers_domain</h2>
+
+<p>Adds a domain request to a cart.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - domain name, %params - key =&gt; value duration offer_id quantity</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart/Item.html">Webservice::OVH::Order::Cart::Item</a></p>
+
+</li>
+<li><p>Synopsis: my $item = $cart-&gt;add_domain(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="offers_domain_transfer">offers_domain_transfer</h2>
+
+<p>Returns an Array of hashes with offers.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - domain name</p>
+
+</li>
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $offers = $cart-&gt;offers_domain_transfer(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="offers_domain2">offers_domain</h2>
+
+<p>Adds a domain transfer request to a cart.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - domain name, %params - key =&gt; value duration offer_id quantity</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart/Item.html">Webservice::OVH::Order::Cart::Item</a></p>
+
+</li>
+<li><p>Synopsis: my $item = $cart-&gt;add_transfer(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="info_checkout">info_checkout</h2>
+
+<p>Returns checkout without generating an order.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $checkout = $cart-&gt;info_checkout;</p>
+
+</li>
+</ul>
+
+<h2 id="checkout">checkout</h2>
+
+<p>Generates an order. Makes the cart invalid. Returns the order.</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Order.html">Webservice::OVH::Me::Order</a></p>
+
+</li>
+<li><p>Synopsis: my $order = $cart-&gt;checkout;</p>
+
+</li>
+</ul>
+
+<h2 id="items">items</h2>
+
+<p>Produces an Array of Item Objects.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $items = $cart-&gt;items;</p>
+
+</li>
+</ul>
+
+<h2 id="item">item</h2>
+
+<p>Returns a single item by id</p>
+
+<ul>
+
+<li><p>Parameter: $item_id - api id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart/Item.html">Webservice::OVH::Order::Cart::Item</a></p>
+
+</li>
+<li><p>Synopsis: my $item = $ovh-&gt;order-&gt;cart-&gt;item(123456);</p>
+
+</li>
+</ul>
+
+<h2 id="item1">item</h2>
+
+<p>Deletes all items from the cart.</p>
+
+<ul>
+
+<li><p>Synopsis: $cart-&gt;clear;</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

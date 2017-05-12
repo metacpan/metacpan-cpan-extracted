@@ -1,0 +1,69 @@
+NAME
+    WWW::Yahoo::KeywordExtractor - Get keywords from summary text via the
+    Yahoo API
+
+SYNOPSIS
+    This module will submit content to the Yahoo keyword extractor API to
+    return a list of relevant keywords.
+
+      use WWW::Yahoo::KeywordExtractor;
+      my $yke = WWW::Yahoo::KeywordExtractor->new();
+      my $keywords = $yke->extract(content => 'My wife and I love to cook together. Carolyn surprises me with new things to love about her everyday.');
+      print join q{}. 'Keyword 1: ', $keywords->[0], "\n";
+
+SUBROUTINES/METHOD
+  new
+    The new subroutine creates and returns a WWW:Yahoo::KeywordExtractor
+    object.
+
+  extract
+    This method will return a list of keywords based on sample data. It will
+    die if there is no 'content' arg given.
+
+CACHING
+    This module will attempt to cache its data locally. It does this by
+    creating content cache keys which are md5 hashes of content. Sooner or
+    later I will update this module to also provide a list of content cache
+    keys.
+
+AUTHOR
+    Nick Gerakines, "<nick at socklabs.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-yahoo-keywordextractor at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Yahoo-KeywordExtract
+    or>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Yahoo::KeywordExtractor
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/WWW-Yahoo-KeywordExtractor>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/WWW-Yahoo-KeywordExtractor>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Yahoo-KeywordExtractor
+        >
+
+    * Search CPAN
+        <http://search.cpan.org/dist/WWW-Yahoo-KeywordExtractor>
+
+ACKNOWLEDGEMENTS
+    Thanks to the bright developers at Yahoo for creating a nifty keyword
+    API.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Nick Gerakines, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

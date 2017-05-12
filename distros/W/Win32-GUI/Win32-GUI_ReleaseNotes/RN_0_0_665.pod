@@ -1,0 +1,36 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_0_0_665 - This is the release notes for Version 0.0.665 of Win32::GUI
+
+=head1 Release Date
+
+26th February, 2002
+
+=head1 Summary of Changes
+
+This release of Win32::GUI introduces many new features, the most important 
+being:
+
+  - the NEM (New Event Model), which allows for something like:
+
+  $Window->AddButton(
+      -text => 'say hello',
+      -onClick => sub { print "hello, world!\n"; },
+  );
+
+  - tooltips are now supported on most controls with the -tip => STRING option.
+
+  - ListView checkboxes can now be managed with the ItemCheck() method;
+    there's also a new ItemCheck event for ListViews that gets fired when you
+    toggle an item's checkbox.
+
+The biggest changes are in the codebase, which is now split in several files.
+Please note that something - particularly the NEM - may be broken in this 
+release (you already knew it, huh? ;-)
+
+
+=head1 Contributors to this release
+
+Unknown
+
+=cut

@@ -1,0 +1,227 @@
+Revision history for Perl extension WebDAO.
+
+2.25 17 Dec 2015
+  * add upload method to WebDAO::CV
+
+2.24 25 Aug 2015
+  * fix warnings
+
+2.23 12 Apr 2015
+  * fix warnings
+
+2.22 24 March 2015
+  * change process name to webdao-fcgi
+
+2.21 07 March 2015
+  * remove deprecated
+  * mk_route now autoload classes
+  * _log* not methods
+
+2.20 14 Jun 2015
+  * fix deps
+
+2.19 13 Jun 2015
+  * fix cpan builds
+
+2.18 13 Jun 2015
+  * add VERSION
+
+2.17 13 Jun 2015
+  * fix deps
+  * add routes
+  * remove depreaced code
+
+2.16 20 Nov 2014
+  * add -u opt (set auth headers) for wd_shell.pl
+
+2.15 16 Nov 2014
+  * remove session attributes
+  * fix wdSessionPar under PSGI
+  * fix wrn if empty HTTP body
+  * fix defined(@array) is deprecated 
+  * add -c /config.ini alias for -wdEnginePar config=[/config.ini] (wd_shell.pl)
+
+2.14 03 Oct 2012
+  * add -d opt to wd_shell.pl
+2.12 26 Sep 2012
+  * clean deprecated code
+2.11 26 Sep 2012
+  * move request, response and url_method to Element.pm (WebDAO::Component - deprecated)
+  * add root element for xget (Test.pm)
+2.09 06 Aug 2012
+  * fix issues on windows (https://rt.cpan.org/Ticket/Display.html?id=78783)
+
+2.08 30 Jul 2012
+  * add "request" method to Component class
+
+2.07 13 Jul 2012
+  * fix sessions cookie init
+  * fix path_info_elments
+
+2.06 18 Jun 2012
+  * add param wdEnginePar (wd_shell.pl)
+  * getEngine -> _root_ (rename method)
+
+2.05 29 May 2012
+  -  use params from command line (wd_shell.pl)
+
+2.04 16 May 2012
+  -  support special value "-" ( minus ) for  wdIndexFile;
+
+2.03 27 Mar 2012
+  - fix "Use of qw(...) as parentheses"
+ 
+2.2.2 2 Mar 2012
+  - fix parse body under FastCGI
+
+2.2.1 2 Mar 2012
+  - CV::get_body, CV::body
+2.2.0 28 Feb 2012
+  - fix dep
+2.1 25 Feb 2012
+  - remove mod_perl2 support
+  - add httpcode table to Util
+  - clean some depreacted code
+
+2.0 25 Feb 2012
+  - remove mod_perl, CGI support
+  - add PSGI handler
+  - remove CGI.pm
+  - fix mod deps for wd_shell.pl
+
+2.0_14
+   - convert pod to pod6
+   - rewrite lexer (use XML::Flow instead XML::LibXML)
+   - add mod  WebDAO::Config ( from MetaStore::Config )
+
+2.0_13 
+    - rename events methods to __XXX___
+    
+2.0_12
+    - add "empty" state for Response objects
+2.0_11
+    - fix WebDAO::Container __any_path
+    - fix traverse for Modal elements
+2.0_10
+    - fix warnings
+    - delete deprecated __get_objects_by_path, __get_object_by_path
+    - del  Engine:: : resolve_path, execute, _get_obj_by_path (deprecated)
+    - fix tests for api changes
+2.0_9
+    - fix traverse for containers methods
+
+2.0_8
+    - enhance work with cookie headers
+
+2.0_7
+    - fix empty index page
+
+2.0_6
+    - code clean
+2.0_5
+    - wrap raw text answers to response object
+    - handle response object as return value
+2.0_4
+    - handle pre/post_fetch methods when Element come in answer
+    - use __extra_path only for childs pathes
+    - fix cpan distr [#63562]
+
+2.0_3
+    - add wantformat() method for deremine desired output context
+    - adopt <method> tag to new traverse scheme
+    
+2.0_2
+    - fix // in path
+2.0_1
+    - traverse method
+    - rename core mothods to form _METHOD_
+    - modal components
+    -  pre-, fetch- and post- fetch objects
+
+    
+1.06
+    - add set_* methods for output format's
+1.05
+    - make wd_shell.pl possible for run query under shell
+    - fix encode utf-8 data (only if set utf-8 flag)
+1.04
+    - fix utf-8 in output stream due update FCGI module ( >0.68)
+1.03
+    - enhance traverse through object tree (__any_method hook)
+    - check if defined() method in url
+    - add mk_attr ,  mk_sess_attr for create accessors
+    - fix Container::_add_childs for support ref to array
+1.02
+    - fix memleaks
+    - clean deprecated code
+    - add method access  control
+1.01
+    - fix docs
+1.00
+    - add examples
+    - add debug levels; wdEngine Env var;
+    - fix: generate session id in constructor( SessionSH)
+    - rename namespace to WebDAO
+0.91
+   - fix str number in logs message (HTML::WebDAO::Base::_log)
+0.90
+   - add relative path
+0.89
+   - fix empty accept hash in session object
+0.88
+   -  workaround for CGI.pm: http://rt.cpan.org/Ticket/Display.html?id=36435
+0.87
+   - clean ( register 'HTML::WebDAO::Comp::ListEnv') from scripts
+0.86 
+   - add status 302 for redirect
+0.85
+    - add standalone FastCGI server
+0.84
+    - adopt Lexer::Lmethod to use _get_object_by_path
+    - handle __extra_path attribute
+    - check loaded mods
+    - add resolve_path method
+    - add html context to response class
+    - add _get_object_by_path methods to Container, Element
+0.83
+    - clean deprecated code
+    - add set_absolute_url (Session.pm)
+0.82
+    - add error404 response method
+    - call_path parse custom url (Session)
+0.81
+    - create default controller ( Session )
+    - create Response class
+
+0.80
+    - ENV{wdFCGIreq} - count request per fcgi process
+    - fix mem leaks
+    - unicode
+0.79
+    - fix Session.pm (add strict)
+    - add caching and fix load session attributes
+    - use default ENV when fastcgi
+    - use additional parametr for WebDAO::CVcgi under fastcgi
+0.78
+    - customize fastcgi by SetEnv
+0.77
+    -fix path_info_elments
+0.76    20070508
+    add lexical command method;
+    add support for url_method in shell environment;
+
+0.75    20070329
+    fix CGI.pm bug http://rt.cpan.org/Ticket/Display.html?id=25908
+    improve cockie generate 
+0.04	20040815
+	- fix cpan module prereq
+0.03	20040810
+	- fix perl version
+0.02	20040615
+	-comment Graph
+
+0.01	20031216
+	- original version; created by h2xs 1.22
+	- import into sf.net cvs
+
+#$Id$

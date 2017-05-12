@@ -1,0 +1,38 @@
+NAME
+    WebService::Autotask - Interface to the Autotask webservices API.
+
+DESCRIPTION
+    "WebService::Autotask" is a module that provides an interface to the Autotask
+    webservices API. Using this method and your Autotask login credentials
+    you can access and manage your Autotask items using this interface. You
+    should read the Autotask API documentation prior to using this module.
+
+INSTALLATION
+
+	 To install this module, run the following commands:
+
+	 perl Makefile.PL
+	 make
+	 make test
+	 make install
+
+SUPPORT AND DOCUMENTATION
+
+	 After installing you can find documentation for this module using the perldoc command.
+
+	 perldoc WebService::Autotask
+
+DEPENDENCIES
+    SOAP::Lite
+
+AUTHOR
+    Derek Wueppelmann (derek@roaringpenguin.com)
+    Attachment support added by Chris Adams (cmadams@hiwaay.net)
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2010 Roaring Penguin Software, Inc.
+    Attachment support Copyright (c) 2013 HiWAAY Information Services, Inc.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

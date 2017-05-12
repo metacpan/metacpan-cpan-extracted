@@ -1,0 +1,112 @@
+#!/usr/local/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+partition.monitor - monitor disk partition usage via SNMP
+
+=head1 SYNOPSIS
+
+partition.monitor [ --community=community ] --mount=mount_point 
+[ --percent=p ] host [...]
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --community=community
+
+SNMP community (default=public)
+
+=item --mount=mount_point
+
+The mount point of the filesystem to monitor.
+
+=item --percent=p
+
+The monitor is deemed to fail if the disk utilisation of
+B<mount_point> is >= p (default=75).
+
+=item host [...]
+
+Space separated list of hosts to monitor.
+
+=back
+
+=head1 DESCRIPTION
+
+B<partition.monitor> monitors disk partition usage via the UCSD SNMP
+agent.  It is designed to be used as a monitor for the B<mon> package.
+As such if any host's partition is >= a particular percentage it will
+return 1 and output the hostnames that failed and the percentage of
+the partition in use.  If all hosts meet the utilisation criteria 0 is
+returned.
+
+=head1 SEE ALSO
+
+I<http://consult.ml.org/~trockij/mon/>
+I<http://www.ece.ucdavis.edu/ucd-snmp/>
+
+=head1 AUTHOR
+
+Paul Sharpe E<lt>paul@miraclefish.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998 Paul Sharpe. England.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use Pod::Usage;
+use SNMP;
+use Getopt::Long;
+
+$opt_community = $opt_mount = $opt_percent = undef;
+pod2usage("") unless GetOptions("community=s","mount=s","percent=i");
+pod2usage("") unless @ARGV && defined($opt_mount);
+$community = $opt_community || 'public';
+$percent   = $opt_percent   || 75;
+
+# don't load the whole mib
+$dskPath    = '.1.3.6.1.4.1.2021.9.1.2';
+$dskPercent = '.1.3.6.1.4.1.2021.9.1.9';
+$ENV{'MIBS'} = '';
+$SNMP::use_long_names = 1;
+
+for $host (@ARGV) {
+  $session = new SNMP::Session(DestHost => $host,
+			       Community => $community);
+  $var = new SNMP::Varbind([$dskPath]);
+
+  $match = 0;
+  for($mount = $session->getnext($var);
+      $var->tag =~ /$dskPath/           # still in table
+      and not $session->{ErrorStr};     # and not end of mib or other error
+      $mount = $session->getnext($var)
+     ) {
+    $match = 1, last if $opt_mount eq $mount;
+  }
+
+  if ( $session->{ErrorNum} ) {
+    push(@failures,"$host $session->{ErrorStr}");
+  } elsif ( $match ) {
+    my($suffix) = $var->tag =~ /\.(\d+)$/;
+    my $var     = new SNMP::Varbind(["$dskPercent.$suffix"]);
+    my $p       = $session->get($var);
+    push(@failures,"$host $mount is $p% full") if $p >= $percent;
+  } else {
+    push(@failures,"$host SNMP agent isn't monitoring $opt_mount");
+  }
+  
+}
+
+if (@failures) {
+  print join (", ", @failures), "\n";
+  exit 1;
+}
+
+exit 0;
+

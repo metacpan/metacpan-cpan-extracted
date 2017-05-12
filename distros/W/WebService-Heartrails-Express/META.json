@@ -1,0 +1,90 @@
+{
+   "abstract" : "API client for Heartrails Express API",
+   "author" : [
+      "sue7ga <sue77ga@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Heartrails-Express",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "0",
+            "Mouse" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Heartrails::Express" : {
+         "file" : "lib/WebService/Heartrails/Express.pm",
+         "version" : "0.01"
+      },
+      "WebService::Heartrails::Express::Provider" : {
+         "file" : "lib/WebService/Heartrails/Express/Provider.pm"
+      },
+      "WebService::Heartrails::Express::Provider::Common" : {
+         "file" : "lib/WebService/Heartrails/Express/Provider/Common.pm"
+      },
+      "WebService::Heartrails::Express::Provider::Line" : {
+         "file" : "lib/WebService/Heartrails/Express/Provider/Line.pm"
+      },
+      "WebService::Heartrails::Express::Provider::Near" : {
+         "file" : "lib/WebService/Heartrails/Express/Provider/Near.pm"
+      },
+      "WebService::Heartrails::Express::Provider::Station" : {
+         "file" : "lib/WebService/Heartrails/Express/Provider/Station.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sue7ga/WebService-Heartrails-Express/issues"
+      },
+      "homepage" : "https://github.com/sue7ga/WebService-Heartrails-Express",
+      "repository" : {
+         "url" : "git://github.com/sue7ga/WebService-Heartrails-Express.git",
+         "web" : "https://github.com/sue7ga/WebService-Heartrails-Express"
+      }
+   },
+   "version" : "0.01"
+}

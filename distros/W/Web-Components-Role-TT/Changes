@@ -1,0 +1,32 @@
+Revision history for Web::Components::Role::TT
+
+0.8.1     2017-04-01 09:11:41
+          - Toolchain update CVE-2016-1238
+
+0.7.1     2016-05-07 23:16:07
+          - Prefer vardir over root for templates
+
+0.6.1     2016-04-08 22:17:30
+          - Will test for templates in prefered and config skin dirs
+          - Restructured configuration attributes
+            Deprecate stash page layout in favour of stash template layout
+
+0.5.1     2016-01-29 13:21:57
+          - Added coverage badge
+          - Can pass template in stash, page, layout
+          - Adding badges to documentation
+
+0.4.1     2015-09-04 19:03:10
+          - Fixed exception throwing right class
+          - Dropped dependency on Class::Usul
+
+0.3.1     2015-09-03 10:08:04
+          - Removed pre hook bad API design
+          - Improved naming for pre hook method
+
+0.2.1     2015-09-02 15:21:52
+          - Imported code, wrote POD, and added tests
+
+0.1.1     2015-09-02 13:38:39
+          - Added project files to master branch
+

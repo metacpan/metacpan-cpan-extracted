@@ -1,0 +1,6 @@
+name = "WebService-SetlistFM"
+# badges = ["travis"]
+authority="cpan:HONDALLIC"
+
+module_maker="ModuleBuildTiny"
+

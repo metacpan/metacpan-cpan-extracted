@@ -1,0 +1,22 @@
+WWW::Promotion - CHANGES HISTORY
+================================
+
+v5.20 - 01-DEC-2001
+
+- GetInternalPromotionCategories() removed. Use @internal_promotion_categories.
+
+- A lot of improvments / bugfixes.
+
+
+v5.10 - 27-NOV-2001
+===================
+
+- WWW::Promotion has been tested under ActivePerl for Win9x/WinNT/Win2k.
+
+- A lot of improvments / bugfixes.
+
+
+v5.00 - 01-OCT-2001
+===================
+
+- Best submit module around the world.

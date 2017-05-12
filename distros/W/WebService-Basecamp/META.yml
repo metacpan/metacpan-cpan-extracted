@@ -1,0 +1,17 @@
+---
+name: WebService-Basecamp
+version: 0.1.4
+author:
+  - 'David Baxter <david@sitesuite.com.au>'
+abstract: Perl interface to the Basecamp API webservice
+license: perl
+requires:
+  LWP::UserAgent: 0
+  XML::Simple: 0
+build_requires:
+  Test::More: 0
+provides:
+  WebService::Basecamp:
+    file: lib/WebService/Basecamp.pm
+    version: 0.1
+generated_by: Module::Build version 0.2612

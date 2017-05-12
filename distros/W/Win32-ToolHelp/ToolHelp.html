@@ -1,0 +1,231 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::ToolHelp - Perl extension for obtaining information about currently executing applications</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:prantl@host.sk">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::ToolHelp - Perl extension for obtaining information about currently executing applications</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#@processes = getprocesses()"><STRONG>@processes = GetProcesses()</STRONG></A></LI>
+		<LI><A HREF="#@modules = getprocessmodules($pid)"><STRONG>@modules = GetProcessModules($pid)</STRONG></A></LI>
+		<LI><A HREF="#($ucnt, $pid, $hid, $mid, $tcnt, $aid, $prio, $flgs, $nam) = getprocess($pid)"><STRONG>($ucnt, $pid, $hid, $mid, $tcnt, $aid, $prio, $flgs, $nam) = GetProcess($pid)</STRONG></A></LI>
+		<LI><A HREF="#($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = getprocessmodule($pid, $mid)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = GetProcessModule($pid, $mid)</STRONG></A></LI>
+		<LI><A HREF="#($mid, $pid, $gc, $pc, $ad, $sz, $h, $nam, $pth) = getprocessmainmodule($pid)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nam, $pth) = GetProcessMainModule($pid)</STRONG></A></LI>
+		<LI><A HREF="#($uct, $pid, $hid, $mid, $tct, $aid, $pri, $fls, $nm) = searchprocess($pname)"><STRONG>($uct, $pid, $hid, $mid, $tct, $aid, $pri, $fls, $nm) = SearchProcess($pname)</STRONG></A></LI>
+		<LI><A HREF="#($mid, $pid, $gc, $pc, $ad, $sz, $h, $n, $p) = searchprocessmodule($pid, $m)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $n, $p) = SearchProcessModule($pid, $m)</STRONG></A></LI>
+		<LI><A HREF="#($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = searchprocessmainmodule($p)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = SearchProcessMainModule($p)</STRONG></A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::ToolHelp - Perl extension for obtaining information about currently
+                  executing applications (using the ToolHelp API on Win32)</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32::ToolHelp;</PRE>
+<PRE>
+  # --- prints names of all processes
+  my @ps = Win32::ToolHelp::GetProcesses();
+  foreach my $p (@ps)
+  { print $$p[8], &quot;\n&quot;; }</PRE>
+<PRE>
+  # --- prints names of the modules used by the current process
+  my @ms = Win32::ToolHelp::GetProcessModules($$);
+  foreach my $m (@ms)
+  { print $$m[7], &quot;\n&quot;; }</PRE>
+<PRE>
+  # --- prints name of the current process
+  my @cp = Win32::ToolHelp::GetProcess($$);
+  print $cp[8], &quot;\n&quot;;</PRE>
+<PRE>
+  # --- prints full path to the executable of the current process
+  my @cm = Win32::ToolHelp::GetProcessMainModule($$);
+  print $cm[8], &quot;\n&quot;;</PRE>
+<PRE>
+  # --- prints full path to the executable of the first running perl
+  my @pl = Win32::ToolHelp::SearchProcessMainModule(&quot;perl.exe&quot;);
+  print $pl[8], &quot;\n&quot;;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <EM>Win32::ToolHelp</EM> module provides a Perl interface to the <EM>ToolHelp</EM>
+API that is present on Windows 95 or higher or Windows 2000 or higher.</P>
+<P>The module exposes functionality for obtaining information about currently
+executing applications (processes and modules used by the processes).</P>
+<P>
+<H2><A NAME="@processes = getprocesses()"><STRONG>@processes = GetProcesses()</STRONG></A></H2>
+<P>Retrieves list of all processes currently running on the system. The list
+is returned as an array or array references. See <CODE>GetProcess</CODE>
+for the description of a nested array (information about a single process).</P>
+<P>
+<H2><A NAME="@modules = getprocessmodules($pid)"><STRONG>@modules = GetProcessModules($pid)</STRONG></A></H2>
+<P>Retrieves list of all modules currently loaded and used by the processes
+identified by the process id (<STRONG>pid</STRONG>) passed into. The list is returned
+as an array or array references. See <CODE>GetProcessModule</CODE> for the description
+of a nested array (information about a single module).</P>
+<P>
+<H2><A NAME="($ucnt, $pid, $hid, $mid, $tcnt, $aid, $prio, $flgs, $nam) = getprocess($pid)"><STRONG>($ucnt, $pid, $hid, $mid, $tcnt, $aid, $prio, $flgs, $nam) = GetProcess($pid)</STRONG></A></H2>
+<P>Retrieves information about the process identified by the process id (<STRONG>pid</STRONG>)
+passed into. The information is returned as an array of these scalars:</P>
+<DL>
+<DT><STRONG><A NAME="item_cnt"><STRONG>cnt</STRONG></A></STRONG><BR>
+<DD>
+number of references to the process
+<P></P>
+<DT><STRONG><A NAME="item_pid"><STRONG>pid</STRONG></A></STRONG><BR>
+<DD>
+identifier of the process
+<P></P>
+<DT><STRONG><A NAME="item_hid"><STRONG>hid</STRONG></A></STRONG><BR>
+<DD>
+identifier of the default heap for the process
+<P></P>
+<DT><STRONG><A NAME="item_mid"><STRONG>mid</STRONG></A></STRONG><BR>
+<DD>
+module identifier of the process
+<P></P>
+<DT><STRONG><A NAME="item_tcnt"><STRONG>tcnt</STRONG></A></STRONG><BR>
+<DD>
+number of execution threads started by the process
+<P></P>
+<DT><STRONG><A NAME="item_aid"><STRONG>aid</STRONG></A></STRONG><BR>
+<DD>
+identifier of the process that created the process being examined
+<P></P>
+<DT><STRONG><A NAME="item_prio"><STRONG>prio</STRONG></A></STRONG><BR>
+<DD>
+base priority of any threads created by this process
+<P></P>
+<DT><STRONG><A NAME="item_flgs"><STRONG>flgs</STRONG></A></STRONG><BR>
+<DD>
+reserved; do not use
+<P></P>
+<DT><STRONG><A NAME="item_nam"><STRONG>nam</STRONG></A></STRONG><BR>
+<DD>
+path and filename of the executable file for the process
+<P></P></DL>
+<P>The information is the same as in the structure <CODE>PROCESSENTRY32</CODE>
+filled by the ToolHelp API functions <CODE>Process32First</CODE> and <CODE>Process32Next</CODE>.</P>
+<P>
+<H2><A NAME="($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = getprocessmodule($pid, $mid)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = GetProcessModule($pid, $mid)</STRONG></A></H2>
+<P>Retrieves information about a module of the process identified by the process
+id (<STRONG>pid</STRONG>) and the module id (<STRONG>mid</STRONG>) passed into. The information is
+returned as an array of these scalars:</P>
+<DL>
+<DT><STRONG><STRONG>mid</STRONG></STRONG><BR>
+<DD>
+module identifier in the context of the owning process
+<P></P>
+<DT><STRONG><STRONG>pid</STRONG></STRONG><BR>
+<DD>
+identifier of the process being examined
+<P></P>
+<DT><STRONG><A NAME="item_gc"><STRONG>gc</STRONG></A></STRONG><BR>
+<DD>
+global usage count on the module
+<P></P>
+<DT><STRONG><A NAME="item_pc"><STRONG>pc</STRONG></A></STRONG><BR>
+<DD>
+module usage count in the context of the owning process
+<P></P>
+<DT><STRONG><A NAME="item_ad"><STRONG>ad</STRONG></A></STRONG><BR>
+<DD>
+base address of the module in the context of the owning process
+<P></P>
+<DT><STRONG><A NAME="item_sz"><STRONG>sz</STRONG></A></STRONG><BR>
+<DD>
+size, in bytes, of the module
+<P></P>
+<DT><STRONG><A NAME="item_h"><STRONG>h</STRONG></A></STRONG><BR>
+<DD>
+handle to the module in the context of the owning process
+<P></P>
+<DT><STRONG><A NAME="item_nm"><STRONG>nm</STRONG></A></STRONG><BR>
+<DD>
+string containing the module name
+<P></P>
+<DT><STRONG><A NAME="item_pt"><STRONG>pt</STRONG></A></STRONG><BR>
+<DD>
+string containing the location (path) of the module
+<P></P></DL>
+<P>The information is the same as in the structure <CODE>MODULEENTRY32</CODE>
+filled by the ToolHelp API functions <CODE>Module32First</CODE> and <CODE>Module32Next</CODE>.</P>
+<P>
+<H2><A NAME="($mid, $pid, $gc, $pc, $ad, $sz, $h, $nam, $pth) = getprocessmainmodule($pid)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nam, $pth) = GetProcessMainModule($pid)</STRONG></A></H2>
+<P>Retrieves information about the main executable module of the process
+identified by the process id (<STRONG>pid</STRONG>) passed into. The information is
+returned as an array of scalars. See <CODE>GetProcessModule</CODE> for the description
+of the array.</P>
+<P>
+<H2><A NAME="($uct, $pid, $hid, $mid, $tct, $aid, $pri, $fls, $nm) = searchprocess($pname)"><STRONG>($uct, $pid, $hid, $mid, $tct, $aid, $pri, $fls, $nm) = SearchProcess($pname)</STRONG></A></H2>
+<P>Retrieves information about the process identified by the process executable
+name (<STRONG>pname</STRONG>) passed into. The information is returned as an array
+of scalars. See <CODE>GetProcess</CODE> for the description of the array.</P>
+<P>
+<H2><A NAME="($mid, $pid, $gc, $pc, $ad, $sz, $h, $n, $p) = searchprocessmodule($pid, $m)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $n, $p) = SearchProcessModule($pid, $m)</STRONG></A></H2>
+<P>Retrieves information about a module of the process identified by
+the process id (<STRONG>pid</STRONG>) and the module name (<STRONG>m</STRONG>) passed into.
+The information is returned as an array of scalars.  See <CODE>GetProcessModule</CODE>
+for the description of the array.</P>
+<P>
+<H2><A NAME="($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = searchprocessmainmodule($p)"><STRONG>($mid, $pid, $gc, $pc, $ad, $sz, $h, $nm, $pt) = SearchProcessMainModule($p)</STRONG></A></H2>
+<P>Retrieves information about the main executable module of the process
+identified by the process executable name (<STRONG>p</STRONG>) passed into.
+The information is returned as an array of scalars.  See <CODE>GetProcessModule</CODE>
+for the description of the array.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ferdinand Prantl &lt;<EM><A HREF="mailto:prantl@host.sk">prantl@host.sk</A></EM>&gt;</P>
+<P>See <EM><A HREF="http://prantl.host.sk/perl/modules/Win32/ToolHelp">http://prantl.host.sk/perl/modules/Win32/ToolHelp</A></EM>
+for the most recent version.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2002, Ferdinand Prantl. All rights reserved.</P>
+<P>Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided ``as is'' without express or implied warranty.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="Process.html">the Win32::Process manpage</A> and
+<A HREF="Job.html">the Win32::Job manpage</A>.</P>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::ToolHelp - Perl extension for obtaining information about currently executing applications</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+</BODY>
+
+</HTML>

@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW:Adblock.
+
+0.02  Wed Sep 08 2010
+    - regular expressions are now compiled when filters are initialised
+
+0.01
+    - packaged for CPAN for the first time

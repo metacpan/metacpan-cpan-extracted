@@ -1,0 +1,56 @@
+Revision history for WWW-Scraper-ISBN-ISBNdb_Driver
+===================================================
+
+0.11    2014-11-17
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+        - fixed license fields in META.json to be lists.
+
+0.10    2014-07-20
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - removed deprecated v1 fields.
+        - extended test suite.
+
+0.09    2014-03-26
+        - added standalone LICENSE file.
+
+0.08    2013-09-01
+        - New Maintainer: Barbie.
+        - change file dates changed to meet W3CDTF standards.
+        - updated Makefile.PL.
+        - added META.json and updated META.yml.
+        - extended test suite.
+        - fixed calls to API v1.
+        - extended results stored in book hash from API data.
+        - enabled access to API v2.
+        - Fixed RT#48005 (thanks to Jess 'castaway' Robinson (JROBINSON)).
+        - added trim function.
+
+0.07    2009-03-12
+        - added missing XML::LibXML requirement in Makefile.PL
+        - add perl license to Makefile.PL
+
+0.06    2008-12-22
+        - noticed that WWW::Mechanize requirement was missing from Makefile.PL
+        - removed WWW::Mechanize requirement (use LWP::UserAgent instead)
+
+0.05    2008-12-17
+        - adding missing requirement, WWW::Scraper::ISBN
+        - now uses XML::LibXML instead of XML::DOM
+        - now uses WWW::Mechanize to fetch URLs (a bit heavy-handed, I know)
+
+0.04    2006-07-14
+        - add check to ensure that we obtained book data (with thanks to Robert A. Schmeid for the patch)
+
+0.03    2006-06-13
+        - change WWW::Scraper::ISBN prereq to WWW::Scraper::ISBN::Driver (just like ISBNnu_Driver.pm)
+        - add missing XML::DOM prereq
+        - add 'description' and 'see also' sections to docs
+
+0.02    2006-06-06
+        - add missing WWW::Scraper::ISBN prereq
+        - add missing t/01-isbndb.t test file
+        - yamlize Changes file
+
+0.01    2006-06-03
+        - initial release

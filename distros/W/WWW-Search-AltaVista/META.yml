@@ -1,0 +1,29 @@
+---
+abstract: 'class for searching www.altavista.com'
+author:
+  - 'Written by John Heidemann, C<johnh@isi.edu>;'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::AltaVista
+name: WWW-Search-AltaVista
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Date::Manip: 0
+  HTML::TokeParser: 0
+  WWW::Search: 2.561
+  WWW::Search::Test: 2.284
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.154

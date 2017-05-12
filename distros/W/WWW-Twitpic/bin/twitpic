@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+use WWW::Twitpic;
+
+our $VERSION = '0.02';
+
+my $username = undef;
+my $password = undef;
+my $file     = undef;
+my $message  = '';
+my $upload   = 0;
+
+GetOptions(
+    "username|u=s" => \$username,
+    "password=s" => \$password,
+    "message=s"  => \$message,
+    "file=s"     => \$file,
+    "upload"     => \$upload
+);
+
+$file = shift unless $file;
+
+pod2usage(1) unless ( $username && $password && $file );
+
+my $client = WWW::Twitpic->new(
+    username => $username,
+    password => $password
+);
+
+my $pic;
+if ( $upload ) {
+    eval { $pic = $client->upload( $file ) };
+}
+else {
+    eval { $pic = $client->post( $file => $message ) };
+}
+die $@ if $@;
+
+if ( $@ ) {
+    print "Net error: $@\n";
+}
+elsif ( $pic->is_success ) {
+    print 'Image ID: ', $pic->id, "\n";
+    print 'Url:   ', $pic->url, "\n";
+    print 'Thumb: ', $pic->url_thumb, "\n";
+    print 'Mini:  ', $pic->url_mini, "\n";
+}
+else {
+    print "Error: ", $pic->error, "\n";
+}
+
+1;
+
+=head1 NAME
+
+twitpic - Post image to twitter/twitpic from the command-line
+
+=head1 SYNOPSIS
+
+twitpic [options] filename
+
+twitpic -f filename [options]
+
+ Options:
+   -v -verbose        Show progress details
+   -? -help           display this help and exits
+   -f -file           Image file to be uploaded
+   -u -username       Your twitter username
+   -p -password       Your twitter password
+   -m -message        A message to be posted with the image link.
+                      (Optional)
+   -upload            Only upload the image to Twitpic
+                      (By default the image will also be posted to twitter)
+
+=head1 EXAMPLES
+
+ twitpic -u username -p password -m 'Look at this picture!' /path/to/image.jpg
+
+=head1 AUTHOR
+
+Diego Kuperman
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

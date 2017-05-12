@@ -1,0 +1,31 @@
+{
+   "abstract" : "Interface to IMultiLanguage I18N routines",
+   "author" : [
+      "Bjoern Hoehrmann <bjoern@hoehrmann.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-MultiLanguage",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hoehrmann/Win32-MultiLanguage.git",
+         "web" : "https://github.com/hoehrmann/Win32-MultiLanguage"
+      }
+   },
+   "version" : "0.73"
+}

@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               WWW-Myspace
+version:            0.92
+abstract:           Access MySpace.com profile information from Perl
+author:
+    - Grant Grueninger <grantg@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Config::General:      0
+    Contextual::Return:   0
+    Crypt::SSLeay:        0.53
+    File::Spec::Functions:  0
+    Locale::SubCountry:   1.38
+    Params::Validate:     0
+    Spiffy:               0.24
+    Test::More:           0
+    Time::ParseDate:      100.010301
+    URI::Escape:          0
+    WWW::Mechanize:       1.2
+    YAML:                 0.39
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

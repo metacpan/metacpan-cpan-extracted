@@ -1,0 +1,39 @@
+0.02 2006-07-30
+
+    - Added call to env_proxy for web access. [rt.cpan.org #17083, thanks to Gary Ashton-Jones]
+    - Changed web source to use HTTPS URLs. [rt.cpan.org #20762, thanks to Graham Stead]
+
+1.0 2006-08-07
+
+    - Added README.
+    - Added POD and POD coverage tests.
+    - Fixed 0.02 release date in Changes.
+    - Bumped version to 1.0, because 0.0x just gets silly after a while.
+
+1.1 2007-03-02
+
+    - Fixed some HTTP URLs I'd missed (mostly in POD). [Thanks to Robert Henniger]
+    - Fixed distribution tar file.
+    - Added some examples, shipped POD tests, and other Kwalitee-improving changes.
+
+1.2 2007-06-03
+
+    - Fixed URLs (Factbook had moved).
+    - Added $WebService::CIA::base_url and changed modules to use it.
+    - Added tests for generated URLs (flag URL, etc.)
+    - Renamed some tests.
+    - Fixed typo, email address, and copyright.
+
+1.3 2007-12-03
+
+    - Minor tweaks from Perl::Critic
+    - Added "use warnings" to WebService::CIA::Source::DBM
+    - Fixed error in documentation for WebService::CIA::Source::DBM
+
+1.4 2008-01-16
+
+    - Fixed incorrect print URLs
+    - Added last_response() method to WebService::CIA::Source::Web
+    - Added option to submit own user agent for web source
+    - Restructured tests to use TEST_INTERNET env var rather than build option
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Hotmail
+version:      0.10
+version_from: Hotmail.pm
+installdirs:  site
+requires:
+    Crypt::SSLeay:                 0
+    Mail::Audit:                   2.1
+    Mail::Internet:                0
+    WWW::Mechanize:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

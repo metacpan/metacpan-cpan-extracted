@@ -1,0 +1,142 @@
+Revision history for WWW-Google-Contacts
+
+0.39    2015.11.02
+        Put warning message in documentation stating the module is currently not working.
+        It needs to be updated to use new authentication system used by Google.
+
+0.38	2013.11.25
+	Bit of documentation for how to deal with photos
+
+0.37    2013.09.04
+        Fix utf8 handling [RT#88339]. Thanks to Daniel for reporting
+
+0.36    2013.04.01
+        Allow using protocol https. Thanks to Jarrod Makin for suggesting
+
+0.35    2012.08.03
+        Handle Yomi values for full names. Thanks to Masanori Hara for reporting
+        Ensure we handle all relationship types. Thanks to Rhesa Rozendaal for reporting
+        
+0.34    2012.04.05
+        Handle names with Yomi values. Thanks to Andreas Mielke for reporting
+
+0.33    2011.10.27
+	Create useful error message on coercion failure
+	Bugfix for language. Thanks to Kirby James for reporting
+
+0.32	2011.08.03
+	Bugfix for organization/where
+
+0.31	2011.07.09
+	More Contact attribute tests
+
+0.30	2011.06.29
+	Bugfix, country can have both name and/or code.
+
+0.29    2011.06.22
+	Bugfix, in handing of priority [RT#68774]. Thanks to Harvey G. Payne for reporting
+
+0.28    2011.02.05
+	Remove shit from cpan tarball
+
+0.27	2011.02.04
+	Bugfix, when contact list only contains 1 entry. Thanks to Chris Hobbs for reporting
+
+0.26	2011.02.01
+	Bugfix, some times it would fail to update contact due to 'link' getting included in the xml
+
+0.25    2010.12.20
+	While my flights out of London are being cancelled..
+	Minor updates to contact->group interaction
+	A bit of POD to show contact->group interaction
+
+0.24    2010.12.15
+	If type is set to '', use default value
+	Require at least version 1.09 of Class::MOP
+	
+0.23	2010.12.12
+	Set default types in the type definitions
+	Minor bug fixes
+	
+0.22    2010.12.11
+	Bug fix for empty contact list. Thanks to Mathias Ewald for reporting
+	For types that have ref and label - ensure given value goes to correct attribute
+	More verbosity when failing
+
+0.21	2010.12.02
+	POD updates
+	
+0.20    2010.11.29
+	Bug fixes around contact events. Thanks to Oliver Enzmann for bug report
+	
+0.19	2010.11.24
+	A slight improvement in Contact -> Group membership handing
+
+0.18	2010.11.19
+	Refactor xml handling
+	Bug fix, utf8 chars got messed up [RT#63112]. Thanks to Lucas B.
+
+0.17	2010.11.06
+	Handle multiple user defined values [RT#62718]. Thanks to Mike Baas
+	Access all group members via $group->member
+
+0.16	2010.10.26
+	Add File::Slurp to prereqs [RT#62396]. Thanks to Gonéri
+
+0.15    2010.10.13
+	Bugfix, support custom types for phone numbers. Thanks to Eric Poulsen for reporting
+
+0.14    2010.10.06
+	Bugfix, some code was still trying to call Server->instance. Bug reported and fixed by Andrew Sterling Hanenkamp
+	
+0.13	2010.10.06
+	Remove coercion directive on Str [RT#61413] - thanks to Andreas Koenig
+	Server is no longer a singleton [RT#61804] - thanks to Andrew Sterling Hanenkamp
+	Typo fix [RT#61803]
+	
+0.12    2010.09.06
+	Update prereqs - Need MooseX::Singleton version 0.25
+	
+0.11    2010.09.01
+        Hiding didn't do what I expected :-/
+
+0.10    2010.09.01
+        Bugfix - contact id lost when searching
+	Hide a bunch of modules from pause
+
+0.09    2010.08.08
+	Use ETags when updating contacts
+	Basic getting/setting photos for contacts
+	
+0.08
+        add Crypt::SSLeay as requirement (reported by Willem de Groot)
+
+0.07    2010.7.8
+        Remove things that shouldn't be in distribution
+
+0.06    2010.7.8
+        Big rewrite. Now using Moose.
+        Contacts and groups are now proper objects
+
+0.05    2010.3.5
+        make create|update_contact secondaryMail as optional (reported by Logan Hansen)
+
+0.04    2010.2.19
+        *** API Change ***
+        fix get_contacts error (RT 54781)
+
+0.03    2010.1.4
+        update_contact, update_group
+
+0.02    2010.1.3
+        fix the XML::Simple preq
+        fix wrong URL (John Clyde)
+
+0.01    2010.1.2
+        fix create_group error
+
+0.01_02 2010.1.2
+        fix GData-Version header
+
+0.01_01 2009.12.30
+        First version, released on an unsuspecting world.

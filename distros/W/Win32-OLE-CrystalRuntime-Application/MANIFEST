@@ -1,0 +1,21 @@
+Changes
+lib/Win32/OLE/CrystalRuntime/Application.pm
+lib/Win32/OLE/CrystalRuntime/Application/Report.pm
+lib/Win32/OLE/CrystalRuntime/Application/Base.pm
+lib/Win32/OLE/CrystalRuntime/Application/Constants.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001_load.t
+t/002_contants-all.t
+t/002_contants-group.t
+t/002_contants-list.t
+t/hello.rpt
+Todo
+scripts/Win32-OLE-CrystalRuntime-Application-data-to-code.pl
+scripts/Win32-OLE-CrystalRuntime-Application-Example.pl
+scripts/Win32-OLE-CrystalRuntime-Application-Parameters.pl
+scripts/Win32-OLE-CrystalRuntime-Application-Information.pl
+META.yml                                 Module meta-data (added by MakeMaker)

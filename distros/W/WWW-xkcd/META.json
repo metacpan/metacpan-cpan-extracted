@@ -1,0 +1,70 @@
+{
+   "abstract" : "Synchronous and asynchronous interfaces to xkcd comics",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-xkcd",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "Try::Tiny" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/xsawyerx/www-xkcd/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/xsawyerx/www-xkcd"
+      }
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

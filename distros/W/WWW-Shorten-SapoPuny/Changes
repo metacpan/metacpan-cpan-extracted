@@ -1,0 +1,13 @@
+Revision history for WWW-Shorten-SapoPuny
+
+0.04    2016.08.02
+        Remove unused module dependencies. 
+
+0.03    2016.05.06
+		Updated to new (?) url: xsl.pt instead of sl.pt
+
+0.02    2016.03.21
+		Add git info metadata.
+ 
+0.01    2016.03.17
+        First version, needing tests.

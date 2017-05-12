@@ -1,0 +1,23 @@
+verbose   = 8
+severity  = 3
+theme     = (pbp || security) && bugs
+include   = NamingConventions ClassHierarchies Subroutines::ProhibitExcessComplexity
+exclude   = Variables  Modules::RequirePackage  Subroutines::RequireArgUnpacking  Subroutines::ProhibitBuiltinHomonyms NamingConventions::Capitalization
+color     = 1
+
+[Documentation::RequirePodSections]
+lib_sections	  = NAME | SYNOPSIS | DESCRIPTION | AUTHOR | LICENSE
+script_sections	= NAME | SYNOPSIS | DESCRIPTION | AUTHOR | LICENSE
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+[Subroutines::ProhibitExplicitReturnUndef]
+severity = 5
+
+[Subroutines::ProhibitSubroutinePrototypes]
+severity = 5
+

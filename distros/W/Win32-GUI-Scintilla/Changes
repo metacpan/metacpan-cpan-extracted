@@ -1,0 +1,34 @@
+Revision history for Perl extension Scintilla.
+
+1.7  28/02/2004
+        - Use Scintilla 1.59
+
+1.6  30/11/2003
+        - Use Scintilla 1.57
+	- Rewrite Makefile.pl
+
+1.5  28/10/2003
+        - Use Scintilla 1.56
+
+1.4  28/09/2003
+        - Correct -visible and -tabstop option (thank to Johan Lindström)
+        - Use Scintilla 1.55
+
+1.3  27/05/2003
+        - [UPDATE] Add Perl2Exe support (Automaticly add Scilexer.dll from current directory)
+          Copy SciLexer.dll in script directory before run perl2exe.
+
+1.2  26/05/2003
+        - [BUG] Correct some bugs (thank to Jeremy White again)
+        - Add Win32::GUI::Scintilla::Perl (thank to Johan Lindström)
+        - Add FindAndSelect method for simplify text search.
+        - Add Perl2Exe support (Automaticly add Scilexer.dll from current directory)
+        - Use Scintilla 1.53
+
+1.1  14/03/2003
+        - [BUG] Correct LineLength call (thank to Jeremy White)
+        - Add Change, LostFocus and GotFocus Events.
+        - Use Scintilla 1.51
+
+1.0  24/01/2003
+        - First release

@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Web/Util/DBIC/Paging.pm
+t/basic.t
+t/lib/TestApp/Schema.pm
+t/lib/TestApp/Schema/Result/MultiPk.pm
+t/lib/TestApp/Schema/Result/Stations.pm
+t/lib/TestApp/Schema/ResultSet/Stations.pm
+t/release-pod-syntax.t

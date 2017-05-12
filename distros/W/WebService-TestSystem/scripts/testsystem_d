@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+use strict;
+
+use SOAP::Transport::HTTP;
+use WebService::TestSystem;
+use Getopt::Long;
+
+our $opt_user;
+our $opt_ssl;
+
+# Handle commandline options
+Getopt::Long::Configure ('bundling', 'no_ignore_case');
+GetOptions(
+           'user|u',
+           'ssl',
+           );
+
+my $opt_ssl_key_file  = '/etc/webservice_testsystem/certs/testsystem-request.pem';
+my $opt_ssl_cert_file = '/etc/webservice_testsystem/certs/testsystem-cert.pem';
+
+if ($opt_user) {
+    my ($login,$pass,$uid,$gid) = getpwnam('testsys');
+
+    $( = $gid;
+    $) = $gid;
+    $< = $uid;
+    $> = $uid;
+
+    ## Check that we managed to change Group/User IDs properly...
+    ## Change warn to die if it's important to you
+    if (  ((split(/ /,$)))[0] ne $gid) || ((split(/ /,$())[0] ne $gid)  ) {
+        warn "Couldn't Change Group ID!\n";
+    }
+
+    if (  ($> ne $uid) || ($< ne $uid)  ) {
+        warn "Couldn't Change User ID!\n";
+    }
+
+    undef($login);
+    undef($pass);
+    undef($uid);
+    undef($gid);
+
+    # Make program actually RUN as this user
+    fork and exit;
+}
+
+# don't want to die on 'Broken pipe' or Ctrl-C
+$SIG{PIPE} = $SIG{INT} = 'IGNORE';
+
+# Make unbuffered
+$|=1;
+
+my %args;
+$args{'LocalPort'} = 8081;
+$args{'ReuseAddr'} = 1;
+$args{'Listen'}    = 5;
+if ($opt_ssl) {
+    $args{'SSL_key_file'} = $opt_ssl_key_file;
+    $args{'SSL_cert_file'} = $opt_ssl_cert_file;
+}
+
+my $daemon = SOAP::Transport::HTTP::Daemon
+    -> new ( %args )
+    -> dispatch_to('WebService::TestSystem')
+    -> options({compress_threshold => 10000})
+    ;
+
+print "Contact to SOAP server at ", $daemon->url, "\n";
+$daemon->handle;

@@ -1,0 +1,35 @@
+WWW-Compete version 0.01
+========================
+
+This module is a simple OO wrapper around the Compete Site Analytcs API.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+  XML::Simple
+
+This module also requires a Compete API key.  Details available here:
+
+http://developer.compete.com/
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2009 by Chris Mills
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

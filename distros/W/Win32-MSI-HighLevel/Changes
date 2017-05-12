@@ -1,0 +1,75 @@
+Revision history for Perl module Win32::MSI::HighLevel (oldest first)
+
+1.000000 Tue Jan 22 21:52:52 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+1.0001 Wed Jan 30 19:35:00 2008
+    - Fixed 01_HighLevel.t test file to work with current test framework (issue
+        reported by CPAN testers)
+    - Cleaned various silliness in HighLevel.pm POD
+    - Added POD to helper modules
+
+1.0002 Thu Feb 07 19:14:00 2008
+    - Added strictures to ErrorTable.pm
+    - Fixed parameter order and handling for Win32::MSI::HighLevel::importTable
+    - Added Test::Pod::Coverage and Test::Pod to prerequisites (used by tests)
+    - Added complete installer sample script
+    - Fixed omitted errorMsg -> _errorMsg in various places
+
+1.0003 Sun Oct 5 10:15:23 2008
+    - Added new table support: ControlCondition, CreateFolder, Signature,
+      DrLocator, Storage, Upgrade
+    - Fixed various documentation errors
+    - Improved addComponent. Now adds a CreateFolder row when appropriate
+    - Added JScript CustomActions support
+    - Improved table update management
+    - Added automatic management of SecureCustomProperties for the Upgrade table
+    - Added Storage management
+    - Improved various error reporting
+
+1.0004 Fri Aug 7 21:30:00 2009
+    - Add ControlCondition table handling
+    - Fix features management for addComponent, addCreateFolder and getComponentIdForDirId
+    - Add addFeatureComponents
+    - Add VBScript support
+    - Suppress update noise (logging) unless asked for.
+    - Avoid creating duplicate table entries for addCreateFolder and addFeatureComponents
+    - Add attribute management for Components
+    - Add selfReg support
+    - Fix CommonFiles64Folder system folders entry
+    - Add attribute management for Components
+    - Add selfReg support
+    - Fix conditional component handling
+    - Allow condition with addFile to be passed through to addComponent
+    - Add a little more sanity checking
+    - Expose noise level management
+    - Fix record management for new rows in _deleteRow
+    - Fixed bug RT 48504
+
+1.0005 Mon Sep 21 22:15:30 2009
+    - Correct handling of file name characters. RT #49635
+    - Add unit tests for directory table manipulation
+    - Improve documentation for addDirectory
+
+1.0006
+    - Remove dependencies on Test::Pod::Coverage and Test::Pod
+    - Added support for non-file installing installers
+    - Various file name and path checking bugs fixed
+    - Fixed various POD documentation errors
+    - Fixed handling of default target directory in addFile
+    - Add check for bogus requested ids in id generation for components etc.
+    - Ensure setProduct has been called before the upgrade code GUID is required
+
+1.0007 Thu Sep 15 22:32:00 2011
+    - Allow a file to be specified as the key file when added to a component
+    - Move POD related tests out of distribution tests
+    - Minor POD tidying
+
+1.0008 Wed Mar 14 19:59:00 2012
+    - Clean up version handling
+    - Support installing services
+    - Document use of -secureProperties in various places
+    - Add -secureProperties parameter in various places
+    - Clean up various spelling errors and typos
+    - Add option method and fixExtraSep parameter to address bogus id generation
+        issue

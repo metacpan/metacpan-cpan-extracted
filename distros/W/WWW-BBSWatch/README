@@ -1,0 +1,37 @@
+DESCRIPTION
+-----------
+WWW::BBSWatch - Send via email messages posted to a WWW bulletin board
+
+This module allows you to monitor a World Wide Web Bulletin Board and email
+new postings to you. The email headers are as correct as possible,
+including reasonable I<From>, I<Subject>, I<Date>, I<Message-Id> and
+I<References> entries.
+
+PREREQUISITES
+-------------
+LWP::UserAgent
+MIME::Lite
+
+INSTALLATION
+------------
+This is a simple module. The typical installation routine should work fine.
+
+  perl Makefile.PL
+  make test
+  make install
+
+PROBLEMS
+--------
+If the test fails, the most likely reason is that you access the internet
+thru a firewall. Set the environment variable 'http_proxy' to your
+firewall. For example for sh/ksh/bash
+  export http_proxy=http://httpproxy:411
+or in csh
+  setenv http_proxy http://httpproxy:411
+
+COPYRIGHT
+---------
+Copyright (c) 2000,2001,2003 Tim R. Ayers. All rights reserved. This program 
+is free software; you can redistribute it and/or modify it under the same 
+terms as Perl itself.
+

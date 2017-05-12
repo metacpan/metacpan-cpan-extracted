@@ -1,0 +1,4 @@
+Beer/NN is/VBZ a/DT pleasing/JJ drink/NN that/WDT has/VBZ been/VBN popular/JJ for/IN ages/NNS 
+Beer/NN is/VBZ made/VBN by/IN fermenting/VBG a/DT mixture/NN of/IN barley/NN hops/VBZ yeast/NN and/CC water/NN 
+Some/DT people/NNS believe/VBP that/IN true/JJ beer/NN consists/VBZ only/RB of/IN barley/NN hops/VBZ yeast/NN and/CC water/NN 
+Most/JJS mass-produced/JJ American/JJ beers/NNS have/VBP other/JJ ingredients/NNS 

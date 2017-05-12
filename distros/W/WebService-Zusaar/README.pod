@@ -1,0 +1,136 @@
+=head1 NAME
+
+WebService::Zusaar - The Zusaar API wrapper module for perl
+
+=head1 SYNOPSIS
+
+  use WebService::Zusaar;
+  
+  my $zusaar = WebService::Zusaar->new( encoding => 'utf8' );
+  
+  # Request event
+  $zusaar->fetch( 'event', keyword => 'Kansai.pm' );
+  
+  # Print each events title
+  while ( my $event = $zusaar->next ){
+        print $event->title . "(id:". $event->event_id .")\n";
+  }
+
+  # Request event/user
+  $zusaar->fetch( 'event/user', event_id => '476003' );
+
+  while ( my $event = $zusaar->next ){
+    # Print each users of event
+    foreach my $user( @{$event->users} ){
+        print $user->nickname . "\n";
+    }
+  }
+
+=head1 INSTALLATION (from GitHub)
+
+  $ git clone git://github.com/mugifly/p5-WebService-Zusaar.git
+  $ cpanm ./p5-WebService-Zusaar
+
+=head1 METHODS
+
+=head2 new ( [%params] )
+
+Create an instance of WebService::Zusaar.
+
+%params = (optional) LWP::UserAgent options, and encoding (example: encoding => 'utf8').
+
+=head2 fetch ( $api_path [, %params] )
+
+Send request to Zusaar API.
+Also, this method has supported a fetch like 'Auto-Pager'.
+
+=over 4
+
+=item * $api_path = Path of request to Zusaar API. Currently available: "event" or "event/user".
+
+=item * %params = Query parameter.
+
+=back
+
+About the query, please see: http://www.zusaar.com/doc/api.html
+
+=head3 About the fetch like 'AutoPager' 
+
+You can fetch all search results, by such as this code:
+
+  # Request event
+  $zusaar->fetch( 'event' );
+  
+  # Print each events title
+  while ( my $event = $zusaar->next ){
+        print $event->title . "\n";
+  }
+
+In the case of default, you can fetch max 10 items by single request to Zusaar API.
+However, this module is able to fetch all results by repeat request, automatically.
+
+Also, you can disable this function, by specifying an option(disable_nextpage_fetch => 1) when call a constructor:
+
+  my $zusaar = WebService::Zusaar->new(disable_nextpage_fetch => 1);
+
+  # Request event
+  $zusaar->fetch( 'event' );
+  
+  # Print each events title
+  while ( my $event = $zusaar->next ){
+        print $event->title . "\n";
+  }
+
+In this case, you can fetch max 10 items.
+
+But also, you can fetch more items by causing a 'fetch' method again with 'start' parameter:
+
+  # Request the event of the remaining again
+  $zusaar->fetch( 'event', start => 10 ); # Fetch continue after 10th items.
+
+=head2 next
+
+Get a next item, from the fetched items in instance.
+
+The item that you got is an object.
+
+You can use the getter-methods (same as a API response fields name, such as: 'title', 'event_id', 'catch', etc...) 
+
+ my $event = $zusaar->next; # Get a next one item
+ print $event->title . "\n"; # Output a 'title' (included in this item)
+
+In addition, you can also use a following getter-methods : 'started', 'ended', 'updated'.
+
+So, these methods return the each object as the 'DateTime::Format::ISO8601', from 'started_at', 'ended_at' and 'updated_at' field.
+
+=head2 prev
+
+Get a previous item, from the fetched items in instance.
+
+=head2 iter
+
+set or get a position of iterator.
+
+=head1 SEE ALSO
+
+L<https://github.com/mugifly/p5-WebService-Zusaar/> - Your feedback is highly appreciated.
+
+L<DateTime::Format::ISO8601>
+
+L<Hash::AsObject>
+
+L<LWP::UserAgent>
+
+L<WebService::ATND> - https://github.com/ytnobody/WebService-ATND/
+(Maybe you can use this library with an almost similar code.)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Masanori Ohgita (http://ohgita.info/).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+I wrote this library with referred to the library that was written by L<ytnobody|https://github.com/ytnobody>. Thank you.
+
+Thanks, Perl Mongers & CPAN authors. 

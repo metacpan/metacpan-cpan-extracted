@@ -1,0 +1,48 @@
+# NAME
+
+Win32::Symlink - Symlink support on Windows
+
+# VERSION
+
+This document describes version 0.06 of Win32::Symlink, released
+April 13, 2015.
+
+# SYNOPSIS
+
+    use Win32::Symlink;
+
+    # Assuming D: is a NTFS volume...
+    mkdir 'D:\from';
+    symlink( 'D:\from' => 'D:\to' );
+    print readlink( 'D:\to' ); # 'D:\from'
+    rmdir 'D:\from', 'D\to';
+
+# DESCRIPTION
+
+This module implements the built-in `symlink` and `readlink` functions for
+Microsoft Windows.  Currently, it only works on NTFS filesystems.
+
+# SEE ALSO
+
+[Win32::Hardlink](https://metacpan.org/pod/Win32::Hardlink)
+
+# AUTHORS
+
+Audrey Tang <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Win32-Symlink.
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 56:
+
+    Non-ASCII character seen before =encoding in '唐鳳'. Assuming UTF-8

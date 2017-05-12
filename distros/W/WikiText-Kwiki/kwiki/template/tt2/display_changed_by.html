@@ -1,0 +1,10 @@
+<!-- BEGIN display_changed_by -->
+[% IF self.preferences.display_changed_by.value %]
+[% page = hub.pages.current %]
+<div style="background-color: #eee">
+<em>
+Last changed by [% page.edit_by_link %] at [% page.edit_time %]
+</em>
+</div>
+[% END %]
+<!-- END display_changed_by -->

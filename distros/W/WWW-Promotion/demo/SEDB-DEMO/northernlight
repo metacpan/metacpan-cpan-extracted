@@ -1,0 +1,4 @@
+POST http://urls.northernlight.com/cgi-bin/urlsubmit.pl HTTP/1.0
+Referer: http://www.northernlight.com/docs/regurl_help.html
+Content: page=<***URL***>&email=<***EMAIL***>&contact=<***CONTACTNAME***>
+SEname: northernlight

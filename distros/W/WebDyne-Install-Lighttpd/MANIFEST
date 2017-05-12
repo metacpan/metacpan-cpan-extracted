@@ -1,0 +1,12 @@
+ChangeLog
+MANIFEST
+LICENSE
+Makefile.PL
+lib/WebDyne/Install/Lighttpd/webdyne.conf.inc
+lib/WebDyne/Install/Lighttpd/lighttpd.conf.inc
+lib/WebDyne/Install/Lighttpd/Constant.pm
+lib/WebDyne/Install/Lighttpd.pm
+bin/wdlighttpdinit
+t/00-load.t
+README
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,25 @@
+.shipit
+ChangeLog
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeMarkdownFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Pod/Markdown.pm
+lib/Web/API/Mapper.pm
+lib/Web/API/Mapper/RuleSet.pm
+lib/Web/API/Mapper/Test.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.mkdn
+t/01-load.t
+t/auto-router.t

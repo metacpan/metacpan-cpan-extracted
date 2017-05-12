@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Set - how to configure value sets
+
+=head1 SYNOPSIS
+
+This page describes the role that value sets play in the Web::DataService
+framework, and how to configure them.  It includes a list of the attributes
+that you can use to define them.
+
+=head1 SET DEFINITIONS
+
+Each data service may define one or more sets of elements, which can be used
+to specify parameter values or output field values, to establish a mapping
+from one set of values to another, or to specify sets of optional output
+blocks.  These are defined using the L<define_set|Web::DataService/define_set>
+method of a data service object, or its alias
+L<define_output_map|Web::DataService/define_output_map>.
+
+The first argument to C<define_set> (or C<define_output_map>) must be a string
+that provides the name of the set.  This must be unique among all of the sets
+defined for this data service.  The remaining arguments must be either
+hashrefs or strings: the hashrefs define the elements of the set, and the
+strings provide documentation.  For example:
+
+    $ds->define_set('size_values',
+        { value => 'small' }, "Selects only small items",
+        { value => 'medium' }, "Selects only medium items",
+        { value => 'large' }, "Selects only large items");
+
+=head1 SET ELEMENT ATTRIBUTES
+
+Each element in a set definition must be a hashref specifying one or more of
+the following attributes.  With the exception of C<value>, each of these is
+optional.
+
+=head2 value
+
+This attribute is required for each element.  Its value must be a string, and
+must be unique within the set.  This string will be included in the list of
+values that make up the set.
+
+=head2 maps_to
+
+The value of this attribute must be a string.  This attribute is used when
+defining output maps.  You can also use it in order to establish a mapping
+from one set of values to another, for example to convert output field values
+from one vocabulary to another.
+
+=head2 disabled
+
+If this attribute is given a true value, then this element will be left out of
+the list of values.  You can use this to define "placeholder" elements that
+will be enabled later.
+
+=head2 undocumented
+
+If this attribute is given a true value, then the element is accepted as a
+valid value for the set in which it is defined.  However, it will not appear
+in any auto-generated documentation about the set.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

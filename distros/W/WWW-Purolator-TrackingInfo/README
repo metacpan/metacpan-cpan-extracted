@@ -1,0 +1,182 @@
+NAME
+    WWW::Purolator::TrackingInfo - access Purolator's tracking information
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use WWW::Purolator::TrackingInfo;
+
+        my $t = WWW::Purolator::TrackingInfo->new;
+
+        my $info = $t->track('320698592781')
+            or die "Error: " . $t->error;
+
+        if ( $info->{status} eq 'delivered' ) {
+            print "The package has been delivered! YEY!\n";
+        }
+        else {
+            print "Package's latest update is: $info->{history}[0]{comment}\n";
+        }
+
+DESCRIPTION
+    The module accesses www.purolator.com <http://www.purolator.com> and
+    gets tracking information for the package, using the provided PIN
+    (tracking number, e.g. 320698592781).
+
+CONSTRUCTOR
+        my $t = WWW::Purolator::TrackingInfo->new;
+
+    Creates and returns a new "WWW::Purolator::TrackingInfo" object. Does
+    not take any arguments.
+
+METHODS/ACCESSORS
+  "track"
+        my $info = $t->track('320698592781')
+            or die $t->error;
+
+    Instructs the object to obtain tracking information from Purolator using
+    a PIN. Takes one mandatory argument: Purolator's PIN for the package (or
+    "tracking number"; years after dealing with Purolator, I'm still unclear
+    on their terminology). On failure returns "undef" or an empty list,
+    depending on the context, and the reason for failure will be available
+    via "->error" method. On success returns a hashref with the following
+    keys/values (sample abridged data):
+
+        {
+            'status' => 'delivered'
+            'pin' => '320698611680',
+            'history' => [
+                {
+                    'comment' => 'Shipping label created with reference(s): 2509543',
+                    'location' => 'Purolator',
+                    'scan_time' => '11:09:00',
+                    'scan_date' => '2014-01-16'
+                }
+            ],
+        };
+
+   "status"
+        'in transit',
+        'package picked up',
+        'shipping label created',
+        'attention',
+        'delivered',
+
+    The "status" value will be one of the above values, with a possible
+    additional one 'unknown status code', though the unknown code likely
+    would mean this module is broken. The values are self-explanatory, with
+    exception of 'attention', which means some unforseen event has happened
+    with the delivery and the package status requires attention.
+
+   "pin"
+        'pin' => '320698611680',
+
+    This is the PIN/tracking number that was used to call "->track" with.
+
+   "history"
+        'history' => [
+            {
+                'comment' => 'Shipment delivered to MARY at: RECEPTION',
+                'location' => 'Saskatoon, SK',
+                'scan_time' => '10:44:00',
+                'scan_date' => '2014-01-17'
+            },
+            {
+                'comment' => 'On vehicle for delivery',
+                'location' => 'Saskatoon, SK',
+                'scan_time' => '09:57:00',
+                'scan_date' => '2014-01-17'
+            },
+            {
+                'comment' => 'Arrived at sort facility',
+                'location' => 'Saskatoon, SK',
+                'scan_time' => '06:57:00',
+                'scan_date' => '2014-01-17'
+            },
+            {
+                'comment' => 'Picked up by Purolator at  CALGARY AB ',
+                'location' => 'Calgary, AB',
+                'scan_time' => '15:23:00',
+                'scan_date' => '2014-01-16'
+            },
+            {
+                'comment' => 'Shipping label created with reference(s): 2509543',
+                'location' => 'Purolator',
+                'scan_time' => '11:09:00',
+                'scan_date' => '2014-01-16'
+            }
+        ];
+
+    The value is an arrayref of hashrefs. Each hashref specifies a line in
+    package's tracking history, most recent first. Each hashref contains
+    four keys:
+
+   "scan_date"
+        'scan_date' => '2014-01-17'
+
+    The date of this particular update.
+
+   "scan_time"
+        'scan_time' => '15:23:00',
+
+    The time of this particular update.
+
+   "location"
+        'location' => 'Calgary, AB',
+
+    Location of where the update happened.
+
+   "comment"
+        'comment' => 'Shipping label created with reference(s): 2509543',
+
+    The comment/description of the update.
+
+  "error"
+        $t->track('320698592781')
+            or die $t->error;
+
+    Takes no arguments. Returns a human readable reason for why "->track"
+    method failed.
+
+AUTHOR
+    'Zoffix, "<'zoffix at cpan.org'>" (<http://haslayout.net/>,
+    <http://zoffix.com/>, <http://zofdesign.com/>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-purolator-trackinginfo at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Purolator-TrackingIn
+    fo>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Purolator::TrackingInfo
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker LWP::UserAgent->new( agent => 'Opera
+        9.5', timeout => 30 )
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Purolator-TrackingInfo
+        >
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Purolator-TrackingInfo>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Purolator-TrackingInfo>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Purolator-TrackingInfo/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 'Zoffix, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

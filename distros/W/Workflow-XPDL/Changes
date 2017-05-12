@@ -1,0 +1,6 @@
+Revision history for Perl extension Workflow::XPDL.
+
+0.01  Thu Jan 17 07:46:46 2008
+	- original version; created by h2xs 1.23 with options
+		-X -O -n Workflow::XPDL
+

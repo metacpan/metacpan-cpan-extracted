@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::PlaceEngine.
+
+0.03  Sun Jun 24 12:49:00 2007
+        - Add get_local_location method to ask location to local DB
+
+0.02  Sun Jan 14 12:10:00 2007
+        - Rebuild all module to suit for Official PlaceeEngine API
+
+0.01  Sat Nov 25 21:12:11 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A WWW::PlaceEngine
+

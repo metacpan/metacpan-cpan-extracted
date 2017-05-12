@@ -1,0 +1,19 @@
+5 cards 5 rows 4 holes
+/////
+/////
+/|///
+/|///
+/////
+ABCDA
+SSSSS
+0,1,2,3
+0,1,2,3
+0,1,2,3
+0,1,2,3
+0,1,2,3
+red
+green
+blue
+black
+yellow
+white

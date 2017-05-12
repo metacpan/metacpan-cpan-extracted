@@ -1,0 +1,155 @@
+
+
+HOWTO - set up a load-balancing web services framework in the REST style.
+You can very quickly deploy new resources to the network, for all to use.
+
+
+
+# INSTALL PREREQUISITES
+
+# on gentoo:
+emerge lighttpd
+emerge expat
+
+
+# on any unix:
+
+# perl-compatible regular expressions
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-6.6.tar.gz
+tar zxvf pcre-6.6.tar.gz
+cd pcre-6.6.tar.gz
+./configure
+make test
+sudo make install
+cd ..
+
+# lighttpd load balancer
+wget http://lighttpd.net/download/lighttpd-1.4.11.tar.gz
+tar zxvf lighttpd-1.4.11.tar.gz
+cd lighttpd-1.4.11.tar.gz
+./configure --with-openssl
+make
+sudo make install
+cd ..
+
+# xml manipulation lib
+wget http://umn.dl.sourceforge.net/sourceforge/expat/expat-2.0.0.tar.gz
+tar zxvf expat-2.0.0.tar.gz
+cd expat-2.0.0
+make
+sudo make install
+cd ..
+
+
+# PERL MODULES
+sudo cpan
+ install FCGI
+ install XML::Dumper
+ install JSON
+ install WWW::Resource
+
+
+
+# CREATE ROOT
+
+mkdir webroot
+mkdir webroot/conf
+mkdir webroot/log
+mkdir webroot/bin
+mkdir webroot/keys
+
+
+
+
+# GENERATE SELF-SIGNED KEY/CERTIFICATE PAIR for HTTPS
+
+openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
+# (answer with a single period '.' for each question if you want total anonymity)
+mv server.pem webroot/keys/.
+
+
+
+
+# CONFIGURE LOAD BALANCER
+
+edit webroot/conf/lighttpd.conf
+
+# contents of lighttpd.conf (this one is on MacOSX; edit for your location):
+=========================================================
+server.modules              = (
+                               "mod_access",
+                               "mod_status",
+                               "mod_fastcgi",
+                               "mod_accesslog" )
+
+server.document-root        = "/Users/ira/webroot"
+accesslog.filename          = "/Users/ira/webroot/logs/access.log"
+server.errorlog             = "/Users/ira/webroot/logs/error.log"
+status.status-url          = "/server-status"
+status.config-url          = "/server-config"
+
+ssl.engine                 = "enable"
+ssl.pemfile                = "/Users/ira/webroot/keys/server.pem"
+
+server.bind                = "localhost"
+server.port                = 3000
+
+# MAKE a new entry here for each new service
+ fastcgi.server = (
+        "/env" => 
+           ((
+                "socket"       => "/tmp/env.socket",
+                "check-local"  => "disable",
+                "bin-path"     => "/Users/ira/webroot/bin/env",
+                "min-procs"    => 1,
+                "max-procs"    => 5,
+                "max-load-per-proc" => 1,
+                "idle-timeout" => 10,
+           ))
+    )
+
+=========================================================
+
+
+
+
+
+# CREATE TEST RESOURCE
+# This will be a server-environment-variable viewer, very helpful
+# for development.
+
+edit webroot/bin/env
+
+# contents of webroot/bin/env:
+=========================================================
+#!/usr/bin/perl
+package EnvResource;
+
+use HTTP::Status;
+use Resource;
+@ISA = qw( Resource );
+
+sub GET {
+  return ( RC_OK, \%ENV );
+}
+
+EnvResource->run();
+=========================================================
+
+# make executable
+chmod +x webroot/bin/env
+
+
+# START SYSTEM
+/usr/local/sbin -D -f webroot/conf/lighttpd.conf
+
+
+# TEST
+https://localhost:3000/env?format=browser
+
+# other formats: xml, json
+
+
+Congratulations. Happy deploying!
+
+

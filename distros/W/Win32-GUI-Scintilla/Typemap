@@ -1,0 +1,28 @@
+TYPEMAP
+HWND         T_HANDLE
+HTREEITEM    T_IV
+LONG         T_IV
+LPCTSTR      T_PV
+LPTSTR       T_PV
+DWORD        T_IV
+UINT         T_IV
+BOOL         T_IV
+WPARAM       T_IV
+LPARAM       T_IV
+LRESULT      T_IV
+HINSTANCE    T_IV
+COLORREF     T_COLOR
+LPCSTR       T_PV
+FLOAT        T_FLOAT
+LPVOID       T_PV
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        if(hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0) != NULL)
+            $var = ($type) SvIV(*(hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0)));
+        else
+            $var = NULL;
+    } else
+        $var = ($type) SvIV($arg);

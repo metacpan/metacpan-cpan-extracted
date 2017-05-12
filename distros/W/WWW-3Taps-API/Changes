@@ -1,0 +1,15 @@
+Revision history for WWW-3Taps-API
+
+0.05    2011-05-16 11:17 (UTC)  
+        * Doc fix
+
+0.04    2011-05-13 20:57 (UTC)  
+        * Fixed some API methods' parameters
+
+0.03    2011-03-29 06:23 (UTC)  
+	* New features/Changes
+          - All 3Taps API is now implemented and supported
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,22 @@
+.gitattributes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeMarkdownFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Pod/Markdown.pm
+lib/Weather/TW.pm
+lib/Weather/TW/Forecast.pm
+lib/Weather/TW/README.mkdn
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.mkdn
+t/000_load.t
+t/001_short_forecast.t
+t/002_weekly_forecasts.t
+t/Weather-TW.t

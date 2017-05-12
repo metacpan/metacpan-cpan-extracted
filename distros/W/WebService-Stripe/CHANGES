@@ -1,0 +1,582 @@
+==================================================
+Changes from 2006-02-05 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 1.0300 at 2016-02-03 07:09:56 +0000
+-------------------------------------------
+
+  Change: bd5bc8566755e73255bff7278afcc775c31a7200
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-02-03 02:03:26 +0000
+
+    v1.0300 
+
+  Change: 2b058629821d7925fce67e90ba1d3fcdc0d92d97
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-02-03 01:56:06 +0000
+
+    Merge pull request #37 from ironcamel/reverse_transfer
+
+    added reverse_transfer method + fixed bank tests 
+
+  Change: 0f8e8d9c23e47aff0f5d6f96aac7e6313f2a7187
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-02-03 01:32:05 +0000
+
+    added reverse_transfer method + fixed bank tests 
+
+-------------------------------------------
+version 1.0200 at 2016-02-03 04:53:43 +0000
+-------------------------------------------
+
+  Change: d169b1721040447b814df1f6ef43a99ec3f6a79f
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-02-02 23:53:43 +0000
+
+    v1.0200 
+
+  Change: 8035d9253e62658177e1efb5e5d8604b716c8aed
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-01-29 16:55:30 +0000
+
+    Merge pull request #36 from ironcamel/create_access_token
+
+    added create_access_token method to support the stripe connect oauth
+    flow 
+
+  Change: cdca3df2314dac7d8d58c963950c03739af85701
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-01-29 16:53:22 +0000
+
+    added create_access_token method to support the stripe connect oauth
+    flow 
+
+-------------------------------------------
+version 1.0100 at 2015-09-11 21:02:54 +0000
+-------------------------------------------
+
+  Change: 7677fc48985305a19741d66fe9a47b9a8f5fe581
+  Author: William Wolf <throughnothing@users.noreply.github.com>
+  Date : 2015-09-11 14:02:54 +0000
+
+    Merge pull request #34 from Crowdtilt/unreferenced-refunds
+
+    Recipient Support 
+
+  Change: 2c4a8e6bad84b47a7ce6c1a353ea28b825e3706e
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2015-09-11 13:59:08 +0000
+
+    Version bump 
+
+  Change: e8148baaaede20f0010fba4b1aefa729f1421135
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2015-09-11 13:51:31 +0000
+
+    Recipient Support 
+
+  Change: 8a11b69ee8375247b974c17fbc90beab435becc0
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-09-01 17:45:40 +0000
+
+    Merge pull request #33 from Crowdtilt/BetterCircleCI
+
+    CI: Faster build process 
+
+  Change: 948e1d1209d61efe454590cf09e0def6d6316b05
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-09-01 17:27:53 +0000
+
+    CI: Faster build process
+
+    This improves the build process by avoiding unnecessary dependency
+    installs, and by caching the results of previous installs. The effect
+    is that test times drop from ~2m to ~25-30s. 
+
+  Change: f2a5d0d231fb0cb6fcff757f4d00ccf88ee534c4
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-08-31 15:35:05 +0000
+
+    Merge pull request #32 from Crowdtilt/CircleCIBadge
+
+    Adds CircleCI build status badge 
+
+  Change: 0305271b4076181ef0f0a606840d0399511310eb
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-08-31 15:23:17 +0000
+
+    Adds CircleCI build status badge 
+
+  Change: 59f1d086bdb736ffd7f130003b2ccc1f9a589d0c
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-08-31 15:20:55 +0000
+
+    Merge pull request #31 from Crowdtilt/CircleCI
+
+    Integrate CircleCI 
+
+  Change: 977f0779e30316becdd6606306d7514155b1fb37
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-08-31 15:13:24 +0000
+
+    Integrate CircleCI
+
+    Adds circle.yml to the root directory, so we can get continuous
+    integration (mainly, testing) using CircleCI.
+
+    The Stripe test key is managed by Circle itself to avoid having to
+    check that into the repo. 
+
+  Change: 4393a1af8a57ab3587b1544ebefaad26f79ccfaa
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-08-23 02:27:39 +0000
+
+    Merge pull request #30 from ironcamel/events
+
+    added support for getting events 
+
+  Change: 253e0873b4f35a7d3b8ab3213fb727a72c8f906a
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-22 03:33:40 +0000
+
+    added support for getting events 
+
+  Change: 8d40d0d07c472da3901b15973c1b498a48b9c37f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-08-21 13:35:07 +0000
+
+    Merge pull request #29 from ironcamel/fix-serializer
+
+    fixed serializer 
+
+  Change: b8d68a1d9f560308fe9a2fc5f8ec48f1ef7732bb
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-21 03:35:08 +0000
+
+    fixed serializer 
+
+  Change: 5d7b77a0b546b43bf87d9a232f5034a7a9614dda
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-08-21 03:27:48 +0000
+
+    Merge pull request #27 from rizen/patch-1
+
+    support hashes in posts 
+
+  Change: 668531825b3fa4914b09e2c99f0fffa7f1bf4372
+  Author: JT Smith <jt@plainblack.com>
+  Date : 2015-08-15 15:36:40 +0000
+
+    support hashes in posts
+
+    Some requests, such as update_account require the posting of hash
+    data. For example:
+
+    my $response = $stripe->update_account($user_id, data => {
+
+    debit_negative_balances => 'true',
+
+    decline_charge_on => {
+
+    avs_failure => 'true',
+
+    cvc_failure => 'true',
+
+    }, });
+
+    And that data must be formatted using a nested has syntax like Ruby
+    on Rails. For example, the request above becomes:
+
+    debit_negative_balances=true&decline_charge_on[avs_failure]&decline_c
+    harge_on[cvc_failure]=true
+
+    The Data::NestedParams module does this formatting. Since Stripe
+    requires this, it seems like it should be the built in serializer,
+    rather than the one in WebService::Client. 
+
+  Change: c872d4ff896105564a59e15b47e81bdb65961e42
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-08-03 14:22:34 +0000
+
+    Merge pull request #25 from ironcamel/interface-cleanup
+
+    made interface consistent 
+
+  Change: 23264b6001734491b4261852855b23a5d24b6ddc
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-03 14:21:02 +0000
+
+    made interface consistent
+
+    This is a breaking change. This makes the $data param of the
+    update_charge and update_customer methods a named parameter. This
+    makes all of the update_* methods consistent wrt how the $data param
+    is passed in. 
+
+  Change: cfff7adebc0e876a9689b1ebd6b927d268d6db39
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-07-20 14:44:18 +0000
+
+    Merge pull request #24 from ironcamel/get-my-account
+
+    added get_platform_account method to retrive the /v1/account resource 
+
+  Change: 79f5c64f09feca038eb0d45925ee75db83096da2
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-07-20 14:00:44 +0000
+
+    added get_my_account method to retrive the /v1/account resource 
+
+  Change: 27efbcb50035620a4549da22a2c606e39180f4f1
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-07-14 12:05:30 +0000
+
+    Merge pull request #21 from Crowdtilt/Reversals
+
+    Support Transfer Reversals (#20) 
+
+  Change: 1d7b1925e4d440780677a7ddb2d791375c6a8b19
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-07-14 10:37:00 +0000
+
+    Support Transfer Reversals (#20)
+
+    Adds support for reversing existing transfers via a new
+    create_reversal method. 
+
+-------------------------------------------
+version 0.1100 at 2015-07-07 16:23:28 +0000
+-------------------------------------------
+
+  Change: 9d0a6bfef44a29c072488ebb37031b7d6b80772f
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-07-07 12:23:28 +0000
+
+    v0.1100 
+
+  Change: 8e6b1de47c91a77c2fdd4a1b7371ba9e95bdbd98
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-07-06 14:31:21 +0000
+
+    Merge pull request #19 from ironcamel/refund_app_fee
+
+    added refund_app_fee method 
+
+  Change: 943198cb3790811bd92245eb0a69d97045574da3
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-07-06 02:45:50 +0000
+
+    added refund_app_fee method 
+
+-------------------------------------------
+version 0.1000 at 2015-05-30 00:32:22 +0000
+-------------------------------------------
+
+  Change: eef283b0aec0197e9a745a94cc8118fb48d1ab1d
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-05-29 17:32:22 +0000
+
+    Merge pull request #18 from Crowdtilt/version_bump
+
+    Version Bump 
+
+  Change: be4a4cfb411cb2b5a9707d72ff4a4f06ac0a5219
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-05-29 17:30:29 +0000
+
+    0.1000 Version Bump 
+
+  Change: c86816b15e21a37f8afff32b687da8ceaa539a26
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-05-29 17:19:41 +0000
+
+    Merge pull request #17 from Crowdtilt/upload_photo_id
+
+    Add upload_identity_document method 
+
+  Change: 5660c0fa9d1fa94d100cae856433da79b12c935c
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-05-29 17:17:02 +0000
+
+    Add upload_identity_document method
+
+    Adds a upload_identity_document method for updating a photo document.
+    Clients specify the file location via its *path* - not by passing the
+    file contents. 
+
+  Change: a8205ec67c29141dc275e9960c4eb021afd04ae3
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-07 11:30:08 +0000
+
+    Merge pull request #16 from aanari/master
+
+    added get_application_fee 
+
+  Change: 6f5be4f0b574d62f629e74a61d7ac78d3c24930f
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-07 09:42:57 +0000
+
+    added get_application_fee 
+
+  Change: 9dab16b27b348274178660c43cc9b81571f44899
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2015-03-31 14:43:47 +0000
+
+    Merge pull request #15 from Crowdtilt/next-headers
+
+    Allow headers to next() 
+
+  Change: 5136e0e8a082e359f640e66cb2ff5e58a294e02a
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2015-03-31 10:13:53 +0000
+
+    Allow headers to next() 
+
+-------------------------------------------
+version 0.0900 at 2015-03-04 02:55:08 +0000
+-------------------------------------------
+
+  Change: bdc7f1ccc72b739fefb2075fa41391c63d538730
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-03 21:55:08 +0000
+
+    v0.0900 
+
+  Change: 9d240f3fe23d63a2b6fdd529b38bc281d7cd5fe9
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-03-03 15:43:06 +0000
+
+    Merge pull request #13 from Crowdtilt/NewMethods
+
+    update_charge, get_charge, and add_source 
+
+  Change: 50469441ef605f3bb2133aef415510e2e1b49469
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-03-03 15:40:20 +0000
+
+    update_charge, get_charge, and add_source 
+
+  Change: 8c7e730b0d763389897ee11ea87b996b46edc1b5
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-03-03 14:30:53 +0000
+
+    Merge pull request #14 from Crowdtilt/TestConstants
+
+    Add Testing Constants 
+
+  Change: 04eefdbc4dc3a9980ca55a3e7feba672bebded8f
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-03-03 14:25:12 +0000
+
+    Add Testing Constants
+
+    Adds constants for all of Stripe's documented test cards, bank
+    accounts, etc. See: https://stripe.com/docs/testing. 
+
+  Change: 4d02299372e2f87ff052693ad595fe3d1755e61b
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-21 01:42:18 +0000
+
+    fixed tests 
+
+-------------------------------------------
+version 0.0800 at 2015-02-21 06:30:53 +0000
+-------------------------------------------
+
+  Change: c0a3fd815a48f80c7a6d9136c3aea6dd3fd95820
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-21 01:30:53 +0000
+
+    v0.0800 
+
+  Change: f658293d8a67906d1acf210338193d5a82698950
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-02-21 01:15:57 +0000
+
+    Merge pull request #12 from ironcamel/bitcoin
+
+    added support for bitcoin endpoints 
+
+  Change: e75de8a965d95d615bfefe1426c2cdb0f5389b32
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-20 22:53:52 +0000
+
+    added support for bitcoin endpoints 
+
+-------------------------------------------
+version 0.0700 at 2015-01-26 22:47:29 +0000
+-------------------------------------------
+
+  Change: ff01bd5281e79480984eb678059acb941b5b523e
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-26 17:47:29 +0000
+
+    v0.0700 
+
+  Change: 112b3a0bbb15d26ead3ed84fe24adff6b374be17
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-26 17:39:43 +0000
+
+    Merge pull request #10 from Crowdtilt/headers
+
+    added optional headers param to all methods 
+
+  Change: 0f129820af5d832e9360e313ee130bdd5e945eae
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-26 17:37:15 +0000
+
+    added optional headers param to all methods + tests 
+
+  Change: 42858d0926a9ae62af4fe71683c1f9214f20df64
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-01-24 13:23:16 +0000
+
+    Merge pull request #5 from Crowdtilt/ISSUE-4-BalanceEndpoint
+
+    Issue 4: Support GET /balance 
+
+  Change: c67afd11d85f2a52c4aed1ef51d4a75fc17c3b92
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-01-24 13:11:30 +0000
+
+    Issue 4: Support GET /balance
+
+    Adds support for the `GET /v1/balance` endpoint, with a test.
+    Requires ability to set the Stripe-Account header to be useful in all
+    contexts. 
+
+  Change: d31fd48f5d9f2d78a1a6530c89a57e36b174e7e4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-24 16:08:17 +0000
+
+    Merge pull request #7 from Crowdtilt/ISSUE-6-UrlVsJSON
+
+    Issue 6: URL / JSON Mismatch in Tests 
+
+  Change: 7140153ad0f5588ce9e216c86dd33bff14686795
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-01-24 13:07:24 +0000
+
+    Issue 6: URL / JSON Mismatch in Tests 
+
+  Change: db8663d85926f82aac226b0c38aff3acc2581546
+  Author: Dan Schmidt <danschmidt5189@users.noreply.github.com>
+  Date : 2015-01-24 12:58:25 +0000
+
+    Merge pull request #3 from Crowdtilt/ISSUE-2-BetterAttributeInjection
+
+    #2: Fixes Version/Account Headers 
+
+  Change: 91d59d230bf660902ba9ecf091794cd3cd9828ea
+  Author: Dan Schmidt <danschmidt5189@gmail.com>
+  Date : 2015-01-24 12:52:20 +0000
+
+    Issue 2: Fixes Version Header
+
+    - Correctly sets Stripe-Version header to the ->version attribute
+    value - Uses constant MARKETPLACES_MIN_VERSION instead of bare
+    '2014-11-05' string 
+
+  Change: ca8ae6f6466beb2c3cb5b722b7290204f8d4eb6e
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-05 18:07:10 +0000
+
+    added tests for transfers 
+
+  Change: defa147f1f71fd38653d7efc3bd6477e1f1c0379
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-05 05:08:02 +0000
+
+    v0.0600 added support for transfers 
+
+-------------------------------------------
+version 0.0500 at 2014-12-04 08:40:31 +0000
+-------------------------------------------
+
+  Change: da82027dfbbd44b7c5cb205e1fcf15096fc3b41c
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-04 03:40:31 +0000
+
+    added more bank methods 
+
+-------------------------------------------
+version 0.0400 at 2014-12-01 10:52:32 +0000
+-------------------------------------------
+
+  Change: 5beeefac1cd62b8de7220a00ba0346342099eaf5
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-01 05:52:32 +0000
+
+    v0.0400 added support for the new marketplace api accounts and banks
+
+    Added get_token, create_account, get_account, update_account, and
+    add_bank. 
+
+  Change: b723faa726f885c74518d03d458e5e81f65e4b4e
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-11-29 08:26:02 +0000
+
+    v0.0300 added the refund_charge method 
+
+-------------------------------------------
+version 0.0200 at 2014-11-21 08:50:48 +0000
+-------------------------------------------
+
+  Change: a43ecabdccfb11ef6456ef6df063c44b342f8803
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-21 03:50:48 +0000
+
+    v0.0200 added get_charge and capture_charge 
+
+  Change: f447aa1533acde96ce1c0cac6746b1cb1c1d86ef
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-19 02:39:16 +0000
+
+    v0.0100 
+
+  Change: d028e7f0f6936cbfa5206823366e38c0fe43babe
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-19 01:23:11 +0000
+
+    create_card 
+
+  Change: 84b05c98dc988ec5bca3587e4eb3966d048e1540
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-18 10:35:37 +0000
+
+    stripe_account header 
+
+  Change: 1bbc1123cff98ce96786520a6b601a593a6a78aa
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 04:09:51 +0000
+
+    added create_charge and create_token 
+
+  Change: 94e7c217b79fc2a0a5ed4d74a73f64cf1da5a660
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-13 23:37:22 +0000
+
+    next 
+
+  Change: d3a3df93b931a840100e269fdb29319b48f2bc6a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 17:12:44 +0000
+
+    require newer WebService::Client 
+
+  Change: 951e23fdd2f768757dc39937a0da0824cc8676e5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 16:00:10 +0000
+
+    added create_customer and update_customer and tests 
+
+  Change: 2507c608bfd38e8411d513d70130ecd13ec73bf9
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-11 17:57:45 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

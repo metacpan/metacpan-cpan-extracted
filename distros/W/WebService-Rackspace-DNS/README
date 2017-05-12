@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution WebService-Rackspace-DNS,
+version 0.1:
+
+  WebService::Rackspace::DNS - an interface to rackspace.com's RESTful Cloud DNS API using Web::API
+
+This software is Copyright (c) 2013 by Tobias Kirschstein.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+

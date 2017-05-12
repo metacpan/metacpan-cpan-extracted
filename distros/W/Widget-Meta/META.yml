@@ -1,0 +1,28 @@
+---
+abstract: 'Metadata for user interface widgets'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Widget-Meta
+provides:
+  Widget::Meta:
+    file: lib/Widget/Meta.pm
+    version: 0.06
+recommends:
+  Test::Pod: 1.41
+resources:
+  bugtracker: http://github.com/theory/widget-meta/issues/
+  homepage: http://search.cpan.org/dist/Widget-Meta/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/widget-meta/
+version: 0.06

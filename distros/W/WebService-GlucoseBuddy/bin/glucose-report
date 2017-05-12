@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+# PODNAME: glucose-report
+
+use WebService::GlucoseBuddy;
+use Text::ASCIITable 0.20;
+use Modern::Perl 1.03;
+use DateTime 0.70;
+use Getopt::Long 2.38;
+use MIME::Lite 3.027;
+
+my %option;
+
+{
+    my %options = (
+        'username=s'    => 'GlucoseBuddy username',
+        'password=s'    => 'GlucoseBuddy password',
+        'email-to=s'    => 'Email address to send to',
+        'email-from=s'  => 'Email address to send from',
+    );
+
+    GetOptions(\%option, keys %options) or exit;
+}
+
+die '--username and -password must be supplied'
+    unless ($option{username} && $option{password});
+
+my $gb = WebService::GlucoseBuddy->new(
+    username    => $option{username},
+    password    => $option{password},
+);
+
+my $end_date = DateTime->today;
+
+my $log_set = $gb->logs(
+    from    => $end_date->clone->subtract(days => 7),
+    to      => $end_date,
+);
+
+my %data;
+while (my $log = $log_set->next) {
+    my $reading = $log->reading;
+    next unless $reading && ($reading->type eq 'BG') && ($reading->unit eq 'mmol/L');
+
+    $data{ $log->time->strftime('%a') }->{ $log->event } = $reading->value;
+}
+
+my @days = qw(Mon Tue Wed Thu Fri Sat Sun);
+my @events = (
+    'Before `Breakfast',
+    'After Breakfast',
+    'Before Lunch',
+    'After Lunch',
+    'Before Dinner',
+    'After Dinner',
+    'Before Bed',
+);
+
+my $table = Text::ASCIITable->new;
+$table->setCols(' ', @days);
+
+for my $event (@events) {
+    $table->addRow($event, map { $data{ $_ }->{ $event } || '-' } @days);
+}
+
+if ($option{'email-to'}) {
+    die 'Email from address must be supplied if sending email'
+        unless $option{'email-from'};
+
+    my $mail = MIME::Lite->new(
+        To      => $option{'email-to'},
+        From    => $option{'email-from'},
+        Subject => 'Blood Glucose summary for last week',
+        Type    => 'text/plain; charset=UTF-8',
+        Data    => $table,
+    );
+
+    $mail->send;
+}
+else {
+    print $table;
+}
+
+
+__END__
+=pod
+
+=head1 NAME
+
+glucose-report
+
+=head1 VERSION
+
+version 1.113540
+
+=head1 AUTHOR
+
+Pete Smith <pete@cubabit.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Pete Smith.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

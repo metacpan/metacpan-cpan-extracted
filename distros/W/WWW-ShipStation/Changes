@@ -1,0 +1,19 @@
+Revision history for WWW-ShipStation
+
+0.06  2016-03-04 08:34:46 CST
+        - remove debug line
+
+0.05  2015-08-01 11:46:10 CST
+        - change for new API endpoint, API IS ALL CHANGED!
+
+0.04  2014-07-03 13:37:22 CST
+        - add createOrder and createOrderItem, deleteOrder
+
+0.03  2014-07-01 10:30:37 CST
+        - small code changes.
+
+0.02  2014-06-27 17:22:38 CST
+        - fix name description
+
+0.01  2014-06-27 17:02:32 CST
+        - Initial release

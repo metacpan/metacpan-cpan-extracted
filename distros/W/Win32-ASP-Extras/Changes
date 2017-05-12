@@ -1,0 +1,8 @@
+Revision history for Perl extension Win32::ASP::Extras.
+
+1.01  Tue Feb  8 2000
+        - Modified namespace approach to put everything in Win32::ASP::Extras
+          and then pull symbol table tricks to insert stuff into Win32::ASP.
+
+1.00  Tue Feb  8 2000
+        - First release

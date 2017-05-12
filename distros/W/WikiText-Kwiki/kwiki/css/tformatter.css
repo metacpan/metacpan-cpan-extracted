@@ -1,0 +1,25 @@
+pre.formatter_pre {
+    font-family: monospace;
+    background-color: #eee;
+    padding: 2px;
+    padding-left: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+table.formatter_table {
+    border-collapse: collapse;
+    margin-bottom: .2em;
+}
+
+table.formatter_table td {
+    border: 1px;
+    border-style: solid;
+    padding: .2em;
+    vertical-align: top;
+}
+
+span.wafl_error {
+    color: #f00;
+    text-decoration: underline;
+

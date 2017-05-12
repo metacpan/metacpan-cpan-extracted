@@ -1,0 +1,1342 @@
+Revision history for Perl module Win32::GUI
+
+1.13 2017-07-26
+
+    * fix for SF#85 Win32::GUI test fail on Win 7 Strawberry Perl 5.24.0.1 and 5.22.2.1
+    * fix for SF#84 Win32::GUI does not build on Cygwin if caseinsensitive=0 
+
+1.12 2015-06-03
+
+    * fix for "loadable library and perl binaries are mismatched (got handshake key .., needed ..)" seen at perl-5.22
+
+1.11 2014-11-08
+
+    * fixing Default Window Background Colour (regression)
+    * v1.10 intentionally skipped
+
+1.09 2014-11-05
+
+    * tuning POD to be correctly published on metacpan.org and search.cpan.org
+    * fix for gcc3 failure http://www.cpantesters.org/cpan/report/af62eb6b-6bfa-1014-83e1-562a373b20f7
+    * better handling of deprecated cygwin_conv_to_win32_path() & co.
+    * dwData changed from void* to IV
+    * tuning pointer casting to properly handle 32/64bit on both win/cygwin platforms
+    * fix for -accel failure http://www.cpantesters.org/cpan/report/02fddc46-74e9-1014-b226-8b42afe32da0
+    * introducing ENV variables: SKIP_WIN32_GUI_AXWINDOW, SKIP_WIN32_GUI_GRID, SKIP_WIN32_GUI_DIBITMAP
+    * fix for strcmpi failure http://www.cpantesters.org/cpan/report/8952733e-6e36-1014-a6c4-79d25cf4dae8
+
+1.08   2014-10-13
+
+    * 64bit cygwin support
+    * 64bit MSVC support
+    * [IMPORTANT] removed deprecated constants autoloading in Win32::GUI
+      'use Win32::GUI' and 'use Win32::GUI()' now works the same (no warnings, no constants)
+      'use Win32::GUI qw(CONSTANT_NAME)' still works
+    * [IMPORTANT] removed deprecated Win32::GUI::constant()
+      use Win32::GUI::Constants::constant() instead
+      or  Win32::GUI::_constant() for WIN32__GUI__* constants
+    * Win32::GUI::AxWindow + Win32::GUI::DIBitmap disabled on 64bit MSVC (it fails to compile)
+    * Under some circumstances ExtUtils::MakeMaker ignores Makefile.PL files in Win32-GUI-* subdirectories
+      the failure looks like this: http://www.cpantesters.org/cpan/report/cab5df3f-6c00-1014-ad8f-34fbb365f02c
+      renaming these dirs to Win32-GUI_* seems to fix the issue
+    * fix for http://sourceforge.net/p/perl-win32-gui/bugs/78/
+    * CHANGELOG renamed to Changes + format changed to be compatible with CPAN::Changes::Spec
+
+1.07   2014-10-08
+
+    * [kmx] : 8 October 2014
+       - CVS > GIT migration
+       - merging strawberry perl related fixes
+
+    * [Aldo Calpini] : 16 July 2011 - Fixed -background GDI object leak, added -newui option for BrowseForFolder
+       - GUI.h
+       - GUI.xs
+       - GUI_Helpers.cpp
+       - GUI_Options.cpp
+
+    * [Jeremy White] : 08 April 2010 - Initial change to build with a 64bit compiler
+       - DC.xs
+       - Font.xs
+       - GUI.h
+       - GUI.xs
+       - GUI_Events.cpp
+       - GUI_Helpers.cpp
+       - GUI_MessageLoops.cpp
+       - GUI_Options.cpp
+       - Header.xs
+       - ListView.xs
+       - MDI.xs
+       - Rebar.xs
+       - RichEdit.xs
+       - Splitter.xs
+       - TabStrip.xs
+       - Textfield.xs
+       - Toolbar.xs
+       - Tooltip.xs
+       - TreeView.xs
+       - Window.xs
+       - Scintilla.xs
+
+    * [Jeremy White] : 22 February 2010 - Added methods to DC.xs
+       - DC.xs - added GradientFillTriangle and GradientFillRectangle
+       - Makefile.PL - added lib lmsimg32
+       - GradientFill.pl - added sample showing how to use new methods
+
+    * [Jeremy White] : 20 February 2010 - Bug fix
+       - GUI_Helpers.cpp fix of bug #1941264 causing crash with menus
+
+1.06   2008-02-08
+
+    * [Robert May] : 13 February 2008 - 1.06 Release
+        - Up version numbers to 1.06
+
+    * [Robert May] : 9 February 2008 - Tweaks
+        --- Win32::GUI::Scintilla ---
+        - Scintilla.PL - fix SendMessageNN to SendMessage [Jeremy White]
+
+    * [Robert May] : 9 February 2008 - Tweaks
+        - build_tools/SrcParser.pm - minor change for perl 5.6.1
+        --- Win32::GUI::Constants ---
+        - Constants.pm - update version
+
+    * [Robert May] : 8 February 2008 - Add progress bar styles and messages
+        --- Win32::GUI::Constants ---
+        - Constants.PL, Tags.pm, 52_tags.t - add PBS_ and PBM_ constants
+
+    * [Robert May] : 8 February 2008 - Get GUI.rc updated correctly
+        - Makefile.PL - make GUI.rc dependent on GUI.rc
+        - Add tests to all XS modules that the RC version number matches the
+          module
+        - MANIFEST - add new test files
+
+    * [Robert May] : 8 February 2008 - Correct number of tests
+        - t\GUI_Helpers.cpp - fix another spot where we could be calling
+          handle_From() with a weak (and already freed) SV.
+
+    * [Robert May] : 8 February 2008 - Correct number of tests
+        - t\02_window.t - correct test count for new test added
+
+    * [Robert May] : 8 February 2008 - Prepare for 1.06 RC2
+        - GUI.pm - up version to 1.05_91 in preparation for 1.06 RC2
+
+    * [Robert May] : 8 February 2008 - Fix $w->{-handle} availability
+        - GUI_Messageloops.cpp - when using WS_POPUP we discover that
+          we're not setting {-handle} early enough.  Fix this.
+        - t\02_window.t - add test for above problem
+
+    * [Robert May] : 2 February 2008 - Fix make PPM on 5.10
+        - MANIFEST - add new Scintilla test files.
+
+    * [Robert May] : 2 February 2008 - Fix make PPM on 5.10
+        - Makefile.PL - change how we generate the version for PPM to fix for 5.10
+          and remove dependency on File::Spec 0.9, as is messes PPM installs
+
+    * [Robert May] : 1 February 2008 - Sample handling
+        - Makefile.PL - change how we handle build of the samples
+
+    * [Robert May] : 1 February 2008 - Prepare for 1.06 release
+        - Increment version numbers of changed modules. Set Win32::GUI version
+          to 1.05_90 in preparation for RC1
+
+    * [Robert May] : 1 February 2008 -  Fix compile with MinGW
+        - Update most Makefile.PLs, add build_tools/MMUtil.pm and update
+          MANIFEST to add -mms-bitfields support for mingw-gcc.
+
+    * [Robert May] : 31 January 2008 -  Misc Fixes
+        - Makefile.PL - another attempt to prevent spurous CPAN tester reports
+          from linux testers.
+        - TreeView.xs - GetItem()/ItemInfo() return empty list rather than undef
+          on failure.
+        - GUI.xs - allow LoadImage to cope with cygwin paths
+        - Update ppport.h to the latest version to silence some compiler warnings
+        - Toolbar.xs - allow AddBitmap to be called multiple times
+        --- Win32::GUI::BitmapInline ---
+        - BitmapInline.pm - fix tained problem with tmpfile under perl 5.6.1
+        --- Win32::GUI::Scintilla ---
+        - Scintilla.xs - remove NO_GET_PERL_CONTEXT, as this is picked up from
+          GUI.h when needed, and was causing crash in cygwin (Reini Urban)
+        - t/02_new.t,03_LoadFile.t,55_crash.t - new tests added
+        --- Win32::GUI::ReleaseNotes ---
+        - RN_1_06.pod brought up to date.
+
+    * [Reini Urban] : 13 January 2008 -  Fixes to build under Perl 5.10.0
+        - Changes to GUI.pm and Win32-GUI-Constants/Constants.pm to get
+          build and test to be successful with Perl 5.10.0
+
+    * [Robert May] : 13 January 2008 -  Bug Fixes
+        - ListView.xs - SelectedItems now returns empty list (rather than
+          undef) if there are no selected items.
+
+    * [Robert May] : 13 January 2008 -  Bug fixes/code re-org for BitmapInline
+        - BitmapInline.pm - move to its own subdirectory.
+        - Makefile.PL - change to reflect BitmapInline.pm move.
+        --- Win32::GUI::BitmapInline ---
+        - use a writable temporary directory instead of the current directory
+          (Tracker: 1586643)
+        - make it threadsafe
+        - add Makefile.PL and tests
+
+    * [Robert May] : 30 July 2007 -  Bug Fixes
+        - build_tools/updateRC, Makefile - fix problem with GUI.rc being readonly
+          on cygwin, only re-write GUI.rc if it changes [Reini Urban]
+        - Makefile.PL - fix warnings from gcc 3.4 with
+          -Wdeclaration-after-statement [Reini Urban]
+
+    * [Robert May] : 16 July 2007 -  Bug Fixes
+        - GUI.pm - fix Win32::GUI::Imagelist::AddMasked (Tracker: 1734697)
+        - GUI.pm - fix -prompt option to Textfield (Tracker: 1734697)
+        - GUI.pm - remove constants from AcceptFiles() [Joseph Cordero]
+        - Treeview.xs - fix GetParent() method to get the parent window, rather
+          than the parent node if called with no arguements. [Salvador Oritz]
+        - GUI.xs - modify Dialog() and DoEvents() to allow for dialog navigation
+          to work within MDI child windows. [Salvador Oritz]
+        --- Win32::GUI::ReleaseNotes ---
+        - RN_1_06.pod - bring up to date with new changes
+
+    * [Robert May] : 15 July 2007 -  Bug Fixes
+        - GUI.pm - fix bltr direction in Animate Window [Tim Hansell]
+        - Comboxbox.xs, GUI.pm - fix options so use of -simple, -dropdown and
+          -dropdownlist together have a more predictable result.
+          Update docs. [Glenn Linderman]
+        - DC.xs - Fix Polygon(), PolyBezier(), PolyBezierTo(), PolyLine(),
+          PolyLineTo(). [George]
+        - DC.xs - Fix DrawText() documentation
+        - DC.xs - Rework DrawFrameControl() to allow DFCS_ADJUSTRECT to modify
+          input parameters
+        - GUI_Events.cpp, GUI_MessageLoops.cpp - handle window being destroyed in
+          callback by checking validity with IsWindow(hwnd) in many places
+        - Listview.xs - Correct second arg to OnBeginLabelEdit
+          [Glenn Munroe: Tracker 1706901]
+        - RichEdit.xs - add alias LimitText() to correct spelling of LimiteText()
+        - TYPEMAP - correct UINT to be T_UV
+        - Toolbar.xs - LoadImages() correct typo in docs
+        - GUI.xs - tidy up the implementation of the Scroll() function, make it
+          really return UNDEF on failure, and improve documentation.
+        --- Win32::GUI::Constants ---
+        - Constants.PL, Tags.pm, 52_tags.t - add a whole bunch more constants (mainly control
+          notification codes), and update tests
+        --- Win32::GUI::Scintilla ---
+        - Scintilla.PL - fix line count in SaveFile(). Fix buffer sizes in various
+          places.
+
+    * [Robert May] : 20 January 2007 - Restore Original WndProc
+        - GUI_Helpers.cpp - restore the window's original wndproc
+          when freeing PERLUD, so that WM_NCDESTROY messages get
+          to the original wndproc, rather than DefwindowProc
+
+    * [Robert May] : 20 January 2007 - Bug Fixes
+        - Tooltip.xs - SetTitle method had warning and info icons
+          swapped. [Brian Millham]
+        - GUI_Helpers.cpp, GUI.pm - fix deleting from parent during global
+          destruction.
+        - Textfield.xs - re-write GetLine() to fix truncation caused by
+          line number being used as a character index, and to correctly
+          return zero length lines
+
+1.05    2006-11-05
+
+    * [Robert May] : 5 November 2006 - 1.05 Release
+        - docs/GUI.pod - update references to v1.05 to v1.06, and v1.06
+          to v1.07
+        - GUI.pm up version to 1.05
+        - MANIFEST - add ReleaseNotes/RN_1_05.pod
+        - Tag HEAD as Win32-GUI-1_05
+        --- Win32::GUI::ReleaseNotes ---
+        - RN_1_05.pod - add final info
+
+    * [Robert May] : 2 November 2006 - Include POD docs in PPM
+        - Makefile.PL - remove --exclude="*.pod" switch from tar
+          command that packs the PPM in the ppm target
+        --- Win32::GUI::UserGuide ---
+        - FAQ.pod -  update freeimage website and version
+
+    * [Robert May] : 30 October 2006 - Bug Fixes
+        - GUI.pm - up version to 1.04_01
+        - GUI.pm - Fix NEM events for NotifyIcon class (Tracker: 1585293)
+        - Combobox.xs - Fix SetEditSel method (Tracker: 1586617)
+        - GUI.xs - Fix AbsLeft and AbsTop method (Tracker: 1578492)
+        --- Win32::GUI::ReleaseNotes ---
+        - RN_1_05.pod - add file
+        - ReleaseNotes.pod - add 1.05 release notes
+
+1.04    2006-10-15
+
+    * [Robert May] : 15 October 2006 - 1.04 Release
+        - Win32::GUI 1.04 release.  Up versions, fix docs etc.
+        - Tagged head as Win32-GUI-1_04
+
+    * [Robert May] : 15 October 2006 - Fix dist build
+        --- Win32::GUI::Constants ---
+        - Rename MFCGrid/Makefile to MFCGrid/Makefile.mfcgrid so that
+          it is not excluded by 'nmake manifest'.
+        - Makefile.PL - update to reflect new makefile name
+
+    * [Robert May] : 15 October 2006 - Bugfix NotifyIcon Delete method
+        - GUI.pm - fix Win32::GUI::NotifyIcon::Delete
+
+    * [Robert May] : 15 October 2006 - Fix build under Perl 5.6
+        - Makefile.PL - Need EU:MM 6/06 or higher
+        - Constants.PL, Scintilla.PL - stop using ':crlf' layer to avoid line
+          end problems and do it manually
+
+    * [Robert May] : 15 October 2006 - keyboard navigation for win32-gui-demos
+        - scripts/win32-gui-demos.pl - fix TAB nagigation out of SCintilla
+          control, add menu accelerators, About box dismissed with ESC key.
+        --- Win32::GUI::Constants ---
+        - Constants.PL - add DLGC_ constants
+
+    * [Robert May] : 30 August 2006 - remove legacy GUI namespace
+        - GUI.pm - remove legacy aliasing between Win32::GUI
+          namespace and GUI namespace.
+
+    * [Robert May] : 30 August 2006 - Cygwin build fixes
+        - GUI_Helpers.cpp - SelectObject cast to HFONT
+        - Tooltip.xs - use PTR2IV() for casting pointers to IV
+        - GUI.h - add missing SETTITLE definition for MinGW headers
+
+    * [Robert May] : 3 August 2006 - Bug Fixes
+        - GUI_Helpers.cpp - fix potential memory leak in CalcControlSize
+        --- Win32::GUI::DIBitmap ---
+        - DIBitmap.xs - fix memory leak in AlphaCopyToDC
+
+    * [Robert May] : 3 August 2006 - Rework Tooltip class
+        - GUI.pm, Tooltip.xs - add -noanimate and -nofade window
+          options.  Document, along with -balloon option.
+        - Tooltip.xs - add methods: SetTitle, GetBubbleSize,
+          AdjustRect.  Update documentation.
+        - GUI_Options.cpp - modify ParseTooltipOptions to allow
+          using -window and -id options together, whilst maintaining
+          backwards comatibility with using -id on its own.
+        - Tooltip.xs - change all ID fields to TOOL (backwards compatible),
+          NeedText, Pop and Show events now have an extra flag indicating
+          whether the first parameter is hwnd or id, update all documentation,
+          make TTF_SUBCLASS on by default.
+        - GUI.pm - Add AddTooltip() method to Win32::GUI::Window, mirroring other
+          Add* methods.
+        - GUI_Events.cpp - fix DoEvent_NeedText so that it doesn't crash if
+          only a string is returned from the NeedText event
+        --- Win32::GUI::Constants ---
+       - Constants.PL - add TTF_, TTM_ and TTN_ constants
+
+    * [Robert May] : 16 July 2006 - LoadLibrary and Scintilla
+        - GUI.xs - modify LoadLibrary to convert provided path
+          to Win32 style seperators, and under cygwin to convert
+          cygwin paths to Win32 paths.
+        - MANIFEST - correct and update MANIFEST
+        --- Win32::GUI::ReleaseNotes ---
+        - RN_1_04.pod - add information about new LoadLibrary
+          semantics
+        --- Win32::GUI::Scintilla ---
+        - Scintilla.PL - re-write SciLexer.dll loading code to
+          utilise new Win32::GUI::LoadLibrary semantics, and
+          report better diagnostics (Reini Urban).
+
+    * [Robert May] : 16 July 2006 - Doc updates and add ReleaseNotes
+        - various documentation updates
+        - buildtools\doHTMLdocs.pl re-written to find and convert
+          all POD documentation
+        - Add Package Win32::GUI::ReleaseNotes and add historic
+          release information
+        - Initial version of 1.04 release notes drafted
+
+    * [Robert May] : 26 June 2006 - win32-gui-demos.pl
+        - added new file scripts\win32-gui-demos.pl
+        - Makefile.PL - updated to install new win32-gui-demos script
+
+    * [Robert May] : 26 June 2006 - Rename ExtCreateRgn and GetRgnData
+        - DC.xs - rename ExtCreateRgn and GetRgnData to ExtCreateRegion
+          and GetRegionData to match win32 API names
+
+    * [Robert May] : 24 June 2006 - ExtCreateRgn and GetRgnData
+        - DC.xs - added new region construction ExtCreateRgn and
+          new region method GetRgnData (Tracker: 1469648)
+
+    * [Robert May] : 23 June 2006 - -wantreturn and AnimateWindow
+        - GUI.pm, Textfield.xs - add -wantreturn option to constructor
+          for Textfield (and RichEdit), along with documentation
+        - GUI.pm, GUI.xs, samples/AnimateWindow.pl - add Animate() window
+          method.
+        --- Win32::GUI::Constants ---
+        - add AnimateWindow AW_* constants
+
+    * [Robert May] : 23 June 2006 - ClassData method and memory leak fixes
+        - GUI.pm, GUI.xs, GUI_Helpers.cpp - change implementation of
+          UserData() method, and add ClassData() method.
+        - GUI_Helpers.cpp, GUI.xs, GUI_Options.cpp, MonthCal.xs - change av_undef
+          and hv_undef calls to SvREFCNT_dec to correct memory leaks
+        - samples\Tutorial* - change to use Win32::GUI(); to eliminate warning
+
+    * [Robert May] : 14 June 2006 - Fix Cygwin build
+        - GUI.pm - fix docs; fix NotifyIcon->new to not modify parent if
+          failure on creation
+        - GUI_MessageLoops.cpp - fix documentation
+        - MANIFEST - corrected
+        --- Win32::GUI::Scintilla ---
+        - Perl.pm - fixed default styles
+        - Scintilla.pod - typos
+        --- Win32::GUI::Constants ---
+        - add Changes and TODO
+
+    * [Robert May] : 11 June 2006 - Fix Cygwin build
+        - All Makefile.PL: add MY::special_targets to add .rc and .res to
+          .SUFFIXES
+        - All Makefile.PL: turn off warnings, to prevent spurious
+          'redefinition' of MY package subroutine warnings.
+        - GUI.xs - add casts in LoadImage to assist gcc.
+        - GUI.pm - up version to 1.03_04
+        - MANIFEST: update
+        --- Win32::GUI::Constants ---
+        - Constants.PL - fix line endings for cygwin
+        - Makefile.PL  - fix directory seperators
+        - Constants.xs - fix a cast
+        - hash/Makefile.PL - close the output filehandle
+        - t/52_tags.t  - fix icon, cursor and bitmap tag definitions
+        --- Win32::GUI::Scintilla ---
+        - Scintilla.PL   - fix line endings when reading Scintilla.iface; fix
+          path fo loading SciLexer.dll under Cygwin
+
+    * [Robert May] : 11 June 2006 - Merge AxWindow/DIBitmap/Grid/SCintilla
+        - Move Win32::GUI::AxWindow code into core
+        - Move Win32::GUI::DIBitmap code into core
+        - Move Win32::GUI::Grid code into core
+        - Move Win32::GUI::Scintilla code into core
+
+    * [Robert May] : 01 June 2006 - Icon/Cursor/Bitmap enhancement
+        --- Win32::GUI core ---
+        - GUI.xs,GUI.pm enhanced LoadImage to search more files for
+          resources, and to allow passing a resource ID.  Update
+          documentation for Icon, Cursor and Bitmap constructors
+          to reflect additions.
+        - samples/standard_images.pl add sample that allows browsing of
+          all the standard resources.
+        --- Win32::GUI::Constants ---
+        - Constants.PL add IDI_, IDC_, OBM_, OCR_ and OIC_ constants
+          to load pre-defined resources.
+
+    * [Robert May] : 16 May 2006 - More Win32::GUI::Constants
+        --- Win32::GUI core ---
+        - GUI_constants.cpp removed
+        - Makefile.PL remove GUI_Constants.cpp
+        - GUI.xs change constants() to _constants and support only
+          the Win32__GUI__ constants here
+        - GUI.pm remove EXPORTER and @EXPORT_OK, replace with import()
+          that delegates to Win32::GUI::Constants. Fix AUTOLOAD() to
+          delegate to Win32::GUI::Constants.  Introduce
+          Win32::GUI::constant() that delegates to Win32::GUI::Constants
+          for backwards compatibility.  Changes to Win32::GUI::AUTOLOAD()
+          required removal of unnecessary inheritance on some
+          Win32::GUI::Menu::* classes
+        - t\01_constants.t new tests that Win32::GUI delegates to Win32::GUI::Constants
+        - samples\* Fix all samples not to warn under new constants
+        support.  Fix terrrible resource leaks inDraw.pl and region.pl.
+        use $FindBin::Dir where we use local files, so that they are
+        found even if the samples directory is not the working directory.
+        Add SPLASH.bmp so that the SplashScreen example does something.
+        - up version to 1.03_03
+        --- Win32::GUI::Constants ---
+        - Constants.PL add more constants: LVSIL_, LVIR_, THT_
+        - Tags.pm add new constants to suitable tags
+        - t\* fix tests not to warn under new constants support. Minor
+          typo corrections, add new constants to 52_tags.t
+
+    * [Robert May] : 13 May 2006 - Add Win32::GUI::Constants
+        - add Win32-GUI-Constants directory and new files
+        - update MANIFEST
+
+    * [Robert May] : 25 Apr 2006 - Add Win32::GUI::DropFiles
+        - add Win32-GUI-DropFiles directory and new files
+        - update MANIFEST
+
+    * [Robert May] : 25 Apr 2006 - Fix build under cygwin/MSVC7
+        - RichEdit.xs fix precedence warning under VC7
+        - Makefile.PL fix LIBS under cygwin (add -lversion); fix
+          pasthru target under cygwin
+
+    * [Robert May] : 20 Apr 2006 - Fix build under MinGW
+        - GUI.xs correct typo in type definition (LPCTSTR vs LPTSTR);
+          use 0xFFFFFFFF instead of -1 to avoid gcc warning when assigning
+          to UINT.
+
+    * [Robert May] : 14 Apr 2006 - Fix build/test on Perl 5.6.1
+        - GUI.h GUI.xs add GetDllVersion call to replace use of
+          Win32::GetFileVersion that is not available in perl 5.6 (or
+          cygwin perl 5.8)
+        - GUI.pm Change use of Win32::GetFileVersion to
+          Win32::GUI::GetDllVersion.  Change position of bootstrap for
+          Win32::GUI so that we can call Win32::GUI::GetDllVersion
+        - t/05_NotifyIcon_01_Constructor.t add test to ensure that
+          $Win32::GUI::NotifyIcon::SHELLDLL_VERSION is set
+        - samples/NotifyIcon.pl Use new Win32::GUI::GetDllVersion and
+          a couple of minor bug-fixes under perl 5.6
+
+    * [Robert May] : 13 Apr 2006 - Clean build under Cygwin
+        - TYPEMAP corrected various entries to use INT2PTR and PTR2INT
+          macros to eliminate warnings of casting to/from pointers with
+          different sizes.
+        - DC.xs, GUI.xs, GUI_Helpers.cpp, GUI_Options.cpp, TreeView.xs
+          used INT2PTR and PTR2INT wherever necessary to silence
+          compiler warnings.
+        - Makefile.PL corrected location of demos target, so that demos
+          are installed under cygwin
+
+    * [Robert May] : 12 Apr 2006 - Start of DropFiles integration
+        - GUI.pm Add Acceptfiles method and documentation.
+        - GUI_Events.cpp Fix OEM callback to allow passing SV.
+        - GUI_MessageLoops.cpp modify WM_DROPFILES handling to pass
+          a Win32::GUI::DropFiles object, and update event documentation.
+        - GUI_Options.cpp Add -acceptfiles option for windows
+        - Makefile.PL set up W32G_CORE variable so that sub directories
+          can know if they arebeing called from a higher level Makefile,
+          and so that tests know how they are being run.
+        - docs/GUI/Reference/Options.pod added -acceptfiles documentation
+
+    * [Robert May] : 12 Apr 2006 - Fix GetKeyState
+        - GUI.xs Changed stack macros in GetKeyStae to those that exist
+          in Perl 5.6
+
+    * [Robert May] : 16 Mar 2006 - Changes from Reini Urban
+        - GUI.xs Add more options to DoEvents().  Add SetWindowPos().
+        - GUI.xs enhance LoadImage to try OEM resources
+        - ImageList.xs additional documentation
+        - other documentation typos
+
+    * [Robert May] : 16 Mar 2006 - bug fix and addition of GetKeyState
+        - Added Win32::GUI::GetKeyState
+        - Listbox.xs fix to indexing error in SetTabStops().
+
+    * [Robert May] : 11 Jan 2006 - bug fixes and add balloon tips for Notify Icon
+        - Label.xs correct -truncate option processing, as SS_.*ELLIPSIS.*
+          styles are not single bits
+        - NotifyIcon.xs, GUI_Options.cpp, GUI.pm re-work NofifyIcon
+        class. Add balloon tooltips. Add support for message behaviour. Add
+        support for setfocus.  Add documentation. (Tracker: 1065072)
+        - t\05_NotifyIcon*.t, MANIFEST Notify Icon Tests added
+        - samples\NotifyIcon.pl, MANIFEST add demo app
+        - GUI.pm Changed initial value of $Win32::GUI::MenuIdCounter to avoid ID
+          clash with predefined WM_COMMAND values (IDOK, IDCANCEL,  etc.)
+        - GUI.xs Fix SendMessageTimeout to match documentation and return
+          undef on failure. (XSRETURN_UNDEF rather than XSRETURN_NO).
+        - GUI.pm corrected documentation of default values for autohscroll
+          and autovscroll in Textfield documentation
+        - GUI_MessageLoops.cpp added processing of WM_NEXTDLGCTL to
+          CommonMessageLoop to allow for tabbing out of multiline Textfields
+          when using -dialogui
+        - GUI_MessageLoops.cpp fixed WM_ERASEBACKGROUND (Tracker:1363141)
+        - Splitter.xs, GUI_Helpers.cpp, GUI.h re-worked splitter class.
+          (Tracker:1363141)
+        - RichEdit.xs made -background and -foreground work
+        - GUI_MessageLoops.cpp made -background work for Splitter windows
+        - GUI_Helpers.cpp removed an unnecessary dTHX, replacing it with
+          PERLUD_FETCH
+        - Upped version to 1.03_02
+
+    * [Robert May] : 3 Dec 2005 - bug fixes
+        - GUI.h change order of instructions in PERLUD_FREE macro to prevent
+          crashes (Trackers 1243378 and 1248578)
+        - GUI.pm up version to 1.03_01 and tidy up
+        - GUI.xs change logic in all message loops (Dialog, DoEvents, DoModal) to
+          prevent memory leak (Tracker: 1201190)
+        - Listbox.xs add documentation to differentiate between SetCurSel and
+          SetSel (Tracker: 1177898)
+
+1.03    2005-11-22
+
+    * [Robert May] : 22 Nov 2005 - 1.03 release
+        - Tagged head as Win32-GUI-1_03
+
+    * [Robert May] : 21 Nov 2005 - 1.03 release candidate
+        - t\05_Timer_*.t change interval test to use milli-seconds using
+          Win32::GetTickCount() rather than time().
+        - t\01_basic.t add tests for Test::More availability and correct OS.
+        - t\98_Pod.t new test of POD syntax
+        - various minor documentation edits to correct POD syntax
+        - Makefile.PL added test for presence of compiler to stop us failing CPAN
+          Smoke tests in test environments with no compilers.
+        - Up version to 1.03
+
+    * [Robert May] : 13 Nov 2005 - Bug fixes and preparing for 1.03 release
+        - Makefile.PL added code to remove Test::More dependence from PPD
+        - GUI_MessageLoops.cpp, Window.xs change all mouse related handlers to
+          use GET_X_LPARAM and GET_Y_LPARAM rather than HIWORD and LOWORD
+          (Tracker: 1262098)
+        - GUI.xs added INTERNAL function GetWindowObject to get the perl window
+          object from a window handle
+        - GUI.pm, t\05_Timer*.t, docs\GUI\Tutorial\Part4.pod - re-wrote
+          Win32::GUI::Timer implementation and updated docs to make it all
+          consistent, and to make destruction happen correctly.  Added full tests
+          for the package.
+        - GUI.xs fixed GetAsyncKeyState(), which was checking the wrong bit of
+          window's return value. Updated documentation.
+        - MANIFEST updated with new samples and new tests
+        - GUI.pm upped version to 1.02_03
+
+    * [Jeremy White] : Bug fix - not enough space malloc'ed for strings
+        - Combobox.xs: added 1 to safemalloc
+        - Listbox.xs: added 1 to safemalloc
+
+    * [Robert May] : 4 Oct 2005 - Bug fixes and preparing for 1.03 release
+        - Makefile.PL added 'demos' target as dependancy for 'all', so that
+          samples get included in ActiveState PPM
+        - GUI_Constants.cpp: correct TMP_NONOTIFY to TPM_NONOTIFY (aschwarz1309)
+        - GUI.pm, RichEdit.xs: added documentation for SetEventMask method
+          (Tracker: 1242808)
+        - GUI.pm upped version to 1.02_02
+        - GUI.h, ImageList.xs allowed missing ImageList_* functions to be compiled
+          in under MinGW and Cygwin, if w32api package has high enough version
+        - GUI.xs: Changed DoModal's use of GetParent to GetWindow(hwnd, GW_OWNER).
+          See http://support.microsoft.com/default.aspx?scid=kb;en-us;84190 for
+          more information (Tracker: 1165626)
+        - Updated all the Tutorial documentation and added tutorial examples to
+          the samples directory.
+
+    * [Robert May] :
+        - GUI.h added GET_X_LPARAM and GET_Y_LPARAM macros (from windowsX.h)
+        - GUI_MessageLoops.cpp change WM_MOUSEMOVE handler to use GET_X_LPARAM
+          and GET_Y_LPARAM rather than HIWORD and LOWORD (Tracker: 1262098)
+        - GUI.xs fixed UnHook() to resolve perl 5.6/5.8 differences in av_delete,
+          causing a warning in perl 5.8 (Tracker: 1164766)
+
+    * [Robert May] :
+        - DC.xs added StretchBlt method.
+        - GUI.pm fixed Win32::GUI::DC::new() with no params to return a correct object
+        - Tooltip.xs, GUI.xs fixed Tooltip styles (Tracker: 1273134)
+
+    * [Jeremy White] : Added GetParent and UserData methods
+        - GUI.h Added userData to tagPERLWIN32GUI_USERDATA
+        - GUI.xs Added GetParent and UserData
+        - GUI_Helpers Added ref dec to Perlud_Free
+
+    * [Robert May] : MinGW fixes
+        - ListView.xs change __MINGW__ to __MINGW32__
+        - GUI_MessageLoops.cpp correct evaluation of return type of GetClassLong
+        - MANIFEST remove spurious entries
+
+    * [Robert May, Reini Uran, Dan Dascalescu] : Bugfixes, tests and documentation changes
+        - Added VERSIONINFO resource to GUI.rc
+        - Added build process to update version automatically in VERSIONINFO Structure
+        - GUI.h, button.xs, datetime.xs, GUI.xs, GUI_options.cpp, Label.xs, Listview.xs,
+          Richedit.xs, Splitter.xs, Textfield.xs, Updown.xs, Window.xs: Added new macro
+          W32G_DOWARN and W32G_DOWARN_DEPRECATED to repace use of PL_dowarm, fixing inability
+          to turn off Win32::GUI warnings when lexical warnings are in use. By default
+          behaviour is as before, pass -DW32G_NEWWARN to enable this.
+        - Makefile.PL, GUI.h: now use __MINGW32__ guard blocks rather than __MINGW__, as
+          compiler defines first automatically; reduced variations between build environments
+        - GUI.pm Fix to logic in Win32::GUI::Class::new for perl 5.8.6 and above. Tracker:1236053
+        - GUI.pm fixed Win32::GUI::Brush to return undef on failure
+        - GUI.pm upped version to v1.02_01
+        - GUI_messageloops.cpp: Tracker 1246429 fixed WM_CTLCOLORSTATIC for handling readonly Edit controls
+        - GUI_messageloops.cpp: Fixed WM_CTLCOLOR* to use window class background brush if there is one
+        - GUI_messageloops.cpp: Tracker:1236283 Change to WM_ERASEBACKGROUND to allow -background to work with windows
+        - sourceParser.pm Fix to solve over agressive removal of blank lines.
+        - various minor documentation corrections/enhancements
+        - Richedit.xs fix SetCharCofmat/GetCharFormat option and new documentation (thanks to Dan Dascalescu)
+        - GUI.pm Timer fixes (Reini Urban)
+        - many tests added, and MANIFEST updated (Reini Urban, Dan Dascalescu, Robert May)
+        - GUI.xs re-wote logic for TrackPopupMenu to make it (slightly) more maintainable
+        - added listvew_drag_drop.pl to the samples
+
+    * [Robert May]
+        - Fix to 4 item call to TrackPopupMenu.  Tracker 1241830
+
+1.02    2005-07-11
+
+    * [Robert May] : v1.02 release
+        - Listview.xs: Corrected prototype for GetOrigin.
+        - GUI.pm upped version to 1.02
+        - tagged HEAD as Win32-GUI-1_02
+
+    * [Robert May] : more MSVC6 fixes
+        - Hopefully fixed build issues introduced wth last changes
+        - Fixed Makefile.PL so that GUI.res depends on GUI.rc
+        - Changes for MSVC6 build environment
+
+    * [Robert May] : cygwin patches, build process
+        - Merged cygwin patches from Reini Urban (includes new cygwin.c file)
+        - Merged Makefile_m.pl and Makefile.PL to give a consistent build
+          procedure regardless of environment.  Now supports MSWin32 with VC++ and MinGW compilers,
+          and cygwin.
+        - ToolTip.xs renamed to Tooltip.xs (for cygwin)
+        - Merged MSVC6 patches from Reini Urban for early SDK.
+        - build_tools that use pod2html now tidy up the pod2html cache files
+        - version upped to 1.01_03
+
+    * [Robert May] : Documentation re-work
+        - new documentation structure
+        - new build_tools directory with scripts for building the documentation
+        - additions to makefiles to build docs as part of a standard build
+        - removal of old, superceeded scripts
+        - addition of ppm target to makefiles, including building of HTML docs
+        - auto generation of Readme and Readme.html from Win32::GUI::UserGuide::Readme POD
+        - upped version to 1.01_02
+        - tidied up MANIFEST.SKIP
+        - new MANIFEST to reflect changes
+        - added Id ident to documentation files
+
+    * [Robert May] : Changes for release 1.01
+        - GUI.pm :
+          + Upped version to 1.01_01
+          + Modified VERSION code as recommended by perldoc perlmodstyle
+        - README.txt
+          + Upped version and set dates
+          + added text for installing from PPM
+
+    * [Robert May] :
+        - Label.xs: Tracker 1164780: fix to -bitmap option for labels
+          + Fixed test for icon/bitmap in Label_onPostCreate
+        - Richedit.xs:
+          + Minor documentation changes
+        - docs/dohtml.pl:
+          + change to CSS path for correct install location .../html/site/lib/Win32/GUI
+
+    * [Alexander Romanenko]
+        - GridLayout.pm
+          + Fix for alignment into multi-cells
+
+    * [Robert May] : Fixes for Toolbars:
+        - Toolbar.xs:
+          + Fixed message processing to switch on lparam->code, rather than HIWORD(wparam)
+          + Various documentation changes where functions take command identifier, rather than button index
+          + Fixed GetButtonInfo test for error conditions
+          + Fixed GetButtonInfo returned flags to be 0 or 1 only.
+          + Added missing GetString method
+          + Fixed SetButtonInfo to set required cbsize element of button structure.
+        - GUI.h
+          + Added define for TB_GETSTRING for MinGW.
+
+    * [Robert May] : Support for Coolmenu
+        - GUI.h
+          + Added prototype for ProcessEventError so it can be called from GUI_Helpers.cpp
+          + Added 'message' WM_TRACKPOPUP_MSGHOOK to use as a callback handle in the hooks array (see TrackPopupMenu, GUI.xs)
+
+        - GUI_Helpers.cpp
+          + Added WindowsHookMsgProc callback to be used by SetWindowsHookEx in TrackPopupMenu (GUI.xs)
+
+        - GUI.xs
+          +  Re-worked TrackPopupMenu to:
+            (1) allow X,Y to be optional, and use current cursor position if not provided.
+            (2) use TrackPopupMenuEx, rather than TrackPopupMenu, and allow an (optional) excluded rectangle to be provided
+            (3) to allow a (optional) code reference to a callback funtion to be provided that will be called for events
+                occuring while the menu is displayed.
+          + Added RemoveMenu() to Win32::GUI::Menu
+
+    * [Robert May] : Support for chevrons in rebars
+        - GUI.h
+          + Added define for RBN_CHEVRONPUSHED for MinGW.
+        - GUI_Options.cpp:
+          + Added -idealwidth to ParseRebarBandOptions
+        - Rebar.xs
+          + Added ChevronPushed event: Rebar_onParseEvent, Rebar_onEvent
+          + Added -idealwidth to GetBandInfo, InsertBand, and SetBandInfo (via ParseRebarBandOptions), including documentation
+          + Documented RBBS_USECHEVRON style
+
+    * [Robert May] :
+        - GUI_MessageLoops.cpp
+          + Fixed second parameter to DoHook() during WM_NOTIFY messages to be lparam->code, rather than HIWORD(wparam).
+
+    * [Robert May] :
+        - GUI.pm (Fix for Richedit crash. Tracker: 1064828, 1153899)
+          + Moved LoadLibrary for richedit.dll to constructor to prevent loading library unnecessarily
+          + Removed end block to FreeLibrary*(), as not necessary (and can get executed before Richedit's DESTROY method)
+
+    * [Robert May] :
+        - Trackbar.xs
+          + Modifed Pos() to get one argument call have correct default for second argument.
+          + Modifed Min() to get one argument call have correct default for second argument.
+          + Modifed Max() to get one argument call have correct default for second argument.
+          + Modifed SelStart() to get one argument call have correct default for second argument.
+          + Modifed SelEnd() to get one argument call have correct default for second argument.
+
+    * [Jeremy White] :
+        - GUI.xs
+           + Added SetWindowRgn method
+        - DC.xs
+           + Added CombineRgn method
+
+    * [Jeremy White] :
+        - ListView.xs:
+           + Improved documentation for SetImageList
+
+    * [Alexander Romanenko]
+        - GridLayout.pm
+          + Fixes and enhancements
+
+    * [Jeremy White] :
+        - GUI.xs:
+          + Added WaitMessage
+          + Fixed EnumMyWindows
+        - GUI_Helpers.cpp
+          + Fixed EnumMyWindows
+
+    * [Jeremy White] :
+        - GUI.xs:
+          + Added GetCapture,LoadCursor and ShellExecute
+
+    * [Jeremy White] :
+        - GUI_Events.cpp:
+          + Hooked events now report errors, also moved a strncmp function in ProcessEventError to
+            be only performed when there is an error.
+
+    * [Jeremy White] :
+        - Combobox.xs:
+          + Added CloseUp and DropDown events.
+
+    * [Jeremy White & Chris Wearn] :
+        - ListView.xs
+            + Added the BeginDrag event
+        - GUI.xs
+            + Added the ClientToScreen method
+
+    * [Jeremy White] :
+        - UpDown.xs, GUI.pm :
+            + Fixed the crash when using the SetBuddy, Buddy and GetBuddy methods
+              Improvements still needed.
+
+1.00    2004-11-12
+
+    * [Laurent Rocher] :
+        - GUI.pm, GUI.xs, Readme.txt, Readme
+            + VERSION 1.0
+
+    * [Jeremy White] :
+        - GUI.xs :
+            + Fix SetEvent
+
+    * [Laurent Rocher] :
+        - GUI.xs :
+            + Fix MessageBeep XS interface.
+        - Button.xs
+            + Fix -align option
+
+    * [Laurent Rocher] :
+        - Readme.txt, readme, GUI.pm, GUI.xs
+            + VERSION to 0.99_1 for first release candidate to 1.0
+        - Add somes samples
+
+    * [Glenn W Munroe] :
+        - ListView.xs :
+            + Add more events and new style flag.
+
+    * [Glenn Linderman] :
+        - GUI.pm
+            + Bump VERSION to 0.0.682
+        - GUI.xs :
+            + Minor fix to -multisel handling for GetOpenFileName
+            + Fix to Scroll to support 32 bit range for SB_THUMBTRACK and SB_THUMBPOSITION
+        - samples/BitmapScroll.pl
+            + Enhancements.
+
+    * [Laurent Rocher] :
+        - MakeFile.pl, MakeFile_m.pl
+            + Use tab as space in rule for use with dmake
+        - GUI.pm, GUI.xs
+            + Add -brush option for Win32::GUI::Class.
+        - GUI_Helper.cpp
+            + classname_From and handle_From : Replace strlen as static string length.
+        - Window.xs, GUI_MessageLoops.cpp, Samples\BitmpaScroll.pl :
+            + Move Paint event in Window_onEvent.
+            + Use DoEvent_Paint function like Graphic
+        - ToolTip.xs :
+            + Add -balloon option
+
+    * [Glenn Linderman] :
+        - GUI.xs :
+            + Deprecate  -overdriveprompt  in favor of  -overwriteprompt  in
+              GetSaveFileName
+
+    * [Glenn Linderman] :
+        - GUI.xs :
+            + Add extra, optional parameter to Win32::GUI::Scroll to better
+              support dynamic display of windows when scrolling.  The internals
+              add support for the SB_THUMBTRACK event.
+
+    * [Glenn Linderman] :
+        - GUI.pm :
+            + Add definition of @acc to Win32::GUI::AcceleratorTable::new
+              to avoid cumulative accelerator key references among windows
+
+    * [Jeremy White] : Added -onPaint event for windows
+        - Window.xs, GUI_MessageLoops.cpp
+            + Added -onPaint event for windows
+
+    * [Laurent Rocher] :
+        - GUI.pm, GUI_Constants.cpp :
+            + Add MessageBox return value constants.
+        - GUI.xs :
+            + Create : Force a window name for all control.
+            + Add MessageBeep.
+            + ChooseFont : Change -size by -pointsize option and return value.
+        - GUI_Events.cpp :
+            + DoEvent_Menu : Add Self for NEM event.
+        - GUI_Helpers.cpp :
+            + Perlud_Free : Check if svSelf is a valid SV before use it.
+        - GUI_MessageLoops.cpp :
+            + WindowMsgLoop : Add WM_INITMENU event.
+        - Textfield.xs :
+            + Fix EN_UPDATE event handler name.
+            + New Methods : CanPaste & HaveSel.
+        - Window.xs:
+            + New InitMenu event.
+        - Samples\Notepad.pl : New file
+
+    * [Jeremy White] : Added example and new function
+        - samples\BitmapScroll.pl
+        - GUI.xs
+            + Added LoadString Function
+
+    * [Glenn Linderman] : Fix GetOpenFileName
+        - GUI.h:
+            + change VERSION
+        - GUI.xs:
+            + change  GetOpenFileName to  support -multisel =>  N, where  N is
+              multiplied  by 4000  to  obtain the  results  buffer size.   The
+              minimum results buffer size is 256 for N <= 0, and 4000 for N ==
+              1.
+
+    * [Laurent Rocher] : Add MonthCal Control
+        - MonthCall.xs : New file
+        - GUI.h :
+            + Add new event argtype for SV*.
+            + New MonthCall control callback function and constant.
+        - GUI.pm :
+            + Add MonthCall control.
+        - GUI_Constants.cpp :
+            + Add MonthCall class constant.
+        - GUI_Events.cpp :
+            + DoEvent : Add new type argument for SV*.
+        - GUI_Helpers.cpp :
+            + Add MonthCall control.
+        - Makefile.pl, Makefile_m.pl :
+            + Add MonthCall.xs
+        - Samples\MonthCal.pl : New file
+        - Docs\DoDoc.pl :
+            + Add MonthCall.xs
+
+    * [Steven M. Martin] : Fix TextField -prompt option.
+        - GUI.pm :
+            +  Win32::GUI::Textfield new : Fix TextField -prompt option when prompt left was negative.
+
+    * [Jeremy White] : New Events for Treeview control
+        - TreeView.xs
+           + Added BeginLabelEdit Event
+           + Added EndLabelEdit Event
+
+    * [Laurent Rocher] : Fix IdFirstChild option for MDIClient.
+        - GUI.pm :
+            + Remove registered class for MDIClient.
+        - GUI.xs :
+            + RegisterClassEx : Remove MDIClient value for -widget option.
+            + Create : SubClass MDIClient window.
+            + Added SetActiveWindow.
+        - GUI_MessageLoops.cpp :
+            + MDIClientMsgLoop: Rewrite as simple subclass MsgLoop.
+        - MDI.xs :
+            + MDIClient_onPreCreate : Change classname.
+            + MDIChild_onPreCreate  : Change default style.
+
+    * [Laurent Rocher] : Restore AUTOLOAD
+        - GUI.pm :
+            + Uncomment AUTOLOAD
+            + Add AUTOLOAD to MDIFrame, MDIClient.
+
+    * [Laurent Rocher] : Add MDI Window Support and Fix Tied property & Window Destruction.
+        - GUI.h :
+            + Added new MDI Constants and Callback functions.
+            + Added a dwData field in PERLWIN32GUI_USERDATA.
+        - GUI.pm :
+            + _new : Fix tied hash property.
+            + Comment AUTOLOAD in Win32::GUI::Window : Is usefull ?
+            + New Win32::GUI::MDIFrame, Win32::GUI::MDIClient, Win32::GUI::MDIChild class.
+            + Win32::GUI::WindowProps : Fix Destroy managing.
+            + Register new class for MDI.
+        - GUI.xs :
+            + In GetKeyboardState : Use a stack array for key.
+            + In RegisterClassEx :
+                + Added MDIFrame, MDIClient, MDIChild widget option.
+                + Avoid reccursive Window Msg Loop call.
+            + In Create :
+                + Use a weaken reference for perlpud->SvSelf for clean reference count and memory free.
+                + Added MDI support.
+                + Added dwData field support.
+            + In Change : Added MDI support.
+            + In Dialog, DoEvents, DoModal : Added MDI event loop support.
+            + LockWindowUpdate : Rewrite shorter.
+        - GUI_Constants.cpp :
+            + Added MDI class constants.
+        - GUI_Helpers.cpp :
+            + Addes MDI class callback.
+            + Perlud_Free : Correct destruction problem.
+        - GUI_MessageLoops.cpp :
+            + In CommonMsgLoop : Don't manage WM_GETMINMAXINFO for MDI Child.
+            + In WindowMsgLoop :
+                + Added support for WndProc call.
+                + For WM_DESTROY, call default MsgLoop before free perlud.
+                + Handle WM_MDIACTIVATE & WM_SETFOCUS for MDI Window.
+            + Added DefMDIFrameLoop and MDIFrameMsgLoop for MDIFrame Window.
+            + Added MDIClientMsgLoop for MDICLient window.
+            + Added DefMDIChildLoop and MDIChildMsgLoop for MDIChild Window.
+        - GUI_Options.cpp :
+            + In ParseWindowOptions : Added a missing else for class specific option parsing.
+        - Makefile.pl &  Makefile_m.pl : Add new MDI.xs file.
+        - MDI.xs : Manage MDI window.
+        - Window.xs : Remove MDI class and add MDI event documentation.
+        - Samples\MDI.pl : New Sample form MDI use.
+        - Docs\DoDoc.pl : Add new MDI.xs file.
+
+    * [Jeremy White] : DoModal bug fix (windows would flicker)
+
+    * [Jeremy White] : New methods/functions (from Adhoc.pm by Johan Lindström).
+        - DC.xs
+            + Added SetBrushOrgEx Method
+            + Added GetBrushOrgEx Method
+        - GUI.xs
+            + Added LockWindowUpdate Method
+            + Added GetKeyboardState Function
+            + Added GetAsyncKeyState Function
+
+    * [Jeremy White] : New DC method
+        - DC.xs
+            + Added DrawIcon Method
+
+    * [Jeremy White] : New Window method
+        - GUI.pm
+            + Added Center method (Code from Adhoc.pm by Johan Lindström).
+
+    * [Jeremy White] : Improvements in Windows GDI support.
+        - DC.xs
+            + Changed Region constructors to use object calling convention
+
+    * [Jeremy White] : Improvements in Windows GDI support.
+        - DC.xs
+            + CreateCompatibleDC method now returns a DC object
+            + Added CreateCompatibleBitmap method
+            + Added Line method (combination of MoveTo and LineTo)
+            + Added Win32::GUI::Region object (used for clipping)
+               + Added CreateRectRgn
+               + Added CreateEllipticRgn
+               + Added CreateRoundRectRgn
+               + Added PtInRegion
+               + Added RectInRegion
+               + Added SetRectRgn
+               + Added OffsetRgn
+               + Added GetRgnBox
+               + Added EqualRgn
+            + Added SelectClipRgn
+            + Added FillRgn
+            + Added FrameRgn
+            + Added InvertRgn
+            + Added PaintRgn
+
+    * [Laurent Rocher] : Add new options and documentation.
+        - Button.xs :
+            + Add new style option and documentation.
+        - Combobox.xs
+            + Add new style option and documentation.
+        - Header.xs
+            + Add new style option and documentation.
+        - GUI_Helper.cpp :
+            + CreateObjectWithHandle : Fix memory leak
+        - GUI.pm :
+            + Add documentation.
+        - Label.xs :
+            + Add new option.
+        - Rebar.xs :
+            + Add new option.
+        - Trackbar.xs :
+            + Add documentation.
+        - Window.xs :
+            + Add documentation.
+
+    * [Laurent Rocher] : Complet ImageList and TabStrip API.
+        - Font.xs :
+            + Improve parsing font options.
+        - GUI.h :
+            + Add new prototype.
+        - GUI.pm :
+            + Add method AddMasked for ImageList.
+            + Add method Change for NotifyIcon.
+        - ImageList.xs:
+            + Add new methods and documentation.
+        - StatusBar.xs:
+            + Add new style option.
+        - TabStrip.xs:
+            + Add new methods, styles options and documentation.
+        - Trackbar.xs :
+            + Change styles name options.
+        - Todo :
+            + Complete todo
+
+    * [Laurent Rocher] : Complet Tooltip API.
+        - GUI.h :
+            + Add new prototype.
+        - GUI_Options.cpp :
+            + Add ParseTooltipOptions.
+        - ToolTip.xs :
+            + Complet API.
+
+    * [Laurent Rocher] : Fix some build problem with perl5.6 and remove some MinGW warning.
+
+    * [Laurent Rocher] : Complet API and documentation
+
+        - Combobox.xs, DateTime.xs, GUI.pm, GUI.xs :
+            + Add some documentation
+        - DC.xs :
+            + Add lot of new methods
+        - GUI.h :
+            + Add some new prototype
+        - GUI_Options.cpp
+            + Add new parse options function.
+        - Header.xs :
+            + Add new methods and styles options.
+        - Label.xs :
+            + Add new styles options.
+        - Listbox.xs :
+            + Add new styles options and documentation.
+        - ListView.xs :
+            + Add new methods, styles options and documentation.
+        - Rebar.xs :
+            + Add new methods, styles options and documentation.
+        - Toolbar.xs :
+            + Add new methods, styles options and documentation.
+        - Trackbar.xs :
+            + Add new styles options and documentation.
+        - TreeView.xs :
+            + Add new styles options and documentation.
+        - TYPEMAP
+            + Add HRGN.
+
+    * [Laurent Rocher] : New Accelerator event NEM code.
+
+        - GUI.h :
+            + Add FindChildWindowsProc prototype and search typedef struct.
+        - GUI_Events.cpp :
+            + Rewrite DoEvent_Accelerator.
+        -  GUI_Helpers.cpp :
+            + Add FindChildWindowsProc for search a child with specific name.
+
+    * [Laurent Rocher]
+
+        - GUI.h :
+            + Add Animate_OpenEx macro for MinGW
+            + Add a IS_MODAL dwPlStyle flag.
+            + Add EnableWindowsProc callback.
+        - GUI.xs :
+            + DoModal() :
+                - Return false if function already in DoModal.
+                - Add a boolean parameter for disable all Top Window and not only parent/caller.
+        - GUI_Helpers.cpp :
+            + Add EnableWindowsProc : Activate or Deactivate current thread top window.
+        - GUI.pm :
+            + Remove Win32::GUI::Window::DESTROY because unecessary and conflic with Win32::GUI::WindowProps.
+
+    * [Laurent Rocher]
+
+        - UpDown :
+            + Fix Scroll event.
+        - GUI_Events.cpp :
+            + In DoEvent_* functions : PERLWIN32GUI_EVENTHANDLING is set after event call.
+
+    * [Laurent Rocher]
+        [#627779] : Not able use with embedded perl
+        [#918896] : No [Dbl]RightClick events in NEM
+        [#921170] : 670: DC Circle strange arguments
+        [#918899] : No NotifyIcon support in NEM
+        [#880798] : Accelerators don't work with NEM
+
+        Add destroy window mechanism and free perlud ressource when windows destroy
+        Add NEM support for notifyIcon.
+        Add full mouse support (left/middle/right mousedown, mouseup, mouseDblClick)
+
+        - Annimation.xs :
+            + Correct Event handling and add OpenEx method.
+        - Button.xs :
+            + Use dwFlags & dwFlagsMask in perlcs for set check state.
+            + Fix GetCheck and SetCheck Alias.
+        - Combobox.xs :
+            + Add ComboboxEx ExtendedStyle.
+            + Add some documentation and missing methods.
+        - DC.xs :
+            + Fix Circle method.
+        - GUI.h :
+            + Add new dwFlagsMask value in PERLWIN32GUI_CREATESTRUCT and a BitmaskOptionValueMask macro
+            + Add PERLUD_FREE macro calling new Perlud_Free function.
+            + Add new common Event constant.
+        - GUI.pm :
+            + Win32::GUI::_new : Use tie return value for safe.
+            + Win32::GUI::Window::DESTROY : Change timer/notifyicon clean up (probably no more need).
+            + Win32::GUI::Timer : Change new and Destroy method.
+              We store timer name in -timers parent hash, and Timer object only 1 time as parent child.
+              We don't store window parent reference in Timer object for avoid circular reference.
+            + Win32::GUI::NotifyIcon : Change new and Destroy method.
+              Same mechanism than Timer.
+            + In Win32::GUI::WindowProps HASH mechanism :
+              Add a DESTROY method and call DestroyWindow for remove Self Window.
+        - GUI.xs :
+            + RegisterClassEx() : Unregister class if first register fail, and re-try to register.
+            + Create : Increment self reference when add to parent hash.
+            + DoModal : Remove a forget printf.
+        - GUI_Events.cpp :
+            + DoEvent_Timer() : Change timer name search (related new method change)
+            + DoEvent_NotifyIcon() : Change NotifiIcon name and object search (related new method change)
+              and add NEM event support.
+        - GUI_Helpers.cpp :
+            + Add Perlud_Free : Free all allocated data in perlud (hvEvent, avHooks, svSelf and perlpud).
+              Use PERLUD_FREE macro for call it.
+        - GUI_MessageLoops.cpp :
+            + Add PERLUD_FREE on WN_DESTROY event.
+            + Add new standard event : MouseDblClick, MouseRightDown, MouseRightUp, MouseRightDblClick,
+                                       MouseMiddleDown, MouseMiddleUp, MouseMiddleDblClick, Char.
+            + Add new NotifyIcon event : DblClick, RightDblClick, MiddleClick, MiddleDblClick.
+            + In CustomMsgLoop : Call ControlMsgLoop if PERLWIN32GUI_INTERACTIVE style flag is set.
+        - GUI_Options.cpp :
+            + ParseNEMEvent : Add new standard event.
+            + Add ParseNotifyIconOptions and ParseNEMNotifyIconEvent : add NEM support for NotifyIcon.
+        - NotifyIcon.xs :
+            + Use ParseNotifyIconOptions for parsing option and NEM event.
+        - Splitter.xs :
+            + Splitter_onEvent : Fix PerlResult return.
+        - Window.xs :
+            + Graphic_onEvent & Graphic_onParseEvent : Clean Interactive graphics event handling.
+              Now, CustomMsgLoop call ControlMsgLoop if PERLWIN32GUI_INTERACTIVE style flag is set.
+
+    * [Laurent Rocher]
+        - GUI.h : PERLUD_FROM_WND macro return now 0 (MingW Warning).
+        - GUI.pm :
+            + new Graphic method use standard _new creation (and replace hard coded constant)
+            + Fix timer DESTROY
+        - Window.xs : Graphic_onEvent return Perlresult (and not 0).
+
+    * [Laurent Rocher]
+        [#673252] : Win32::GUI and PERL_CONTEXT
+        [#879424] : Modal Window Support
+        - New Base code :
+            + Separate each control in a specific XS file.
+            + Add callback function for each control (onPreCreate, onParseOption, onPostCreate, onParseEvent, OnEvent).
+            + Rewrite Event Loop.
+            + Merge all event firing code in on function (DoEvent) for OEM and NEM.
+            + New DoModal function.
+            + Improve Change method.
+            + Add lot of control Win32 API method. (Keep alphabetical order and standard API name).
+            + Add new events for control.
+            + Some Clean Up.
+            + Reduce size of allocate structure per window.
+            + Add Perl context handling.
+        - Fix doc tools generator (DoDoc.pl and DoHtml.pl)
+
+    Before return to MAIN branch
+
+    * [Laurent Rocher]
+        - GUI_MessageLoops.cpp : Fix multiple problem with NEM event and painting problem.
+        - GUI.xs : Correct problem with wndprocPreNEM changed two time.
+        - GUI_Options.cpp : Correct uninitialised variable problem.
+
+    * [Laurent Rocher]
+        - GUI.pm : Change version to 0.0.671
+        - GUI.xs : Change version to 0.0.671
+        - README : Change version to 0.0.671
+        - Readme.txt : Change version to 0.0.671
+        - GUI.h : Add av_delete macro for perl 5.005
+        - GUI_Events.cpp : In DoEvent_NEM_Menu correct event test (use SvOK).
+        - MANIFEST : Update file
+
+    * [Steve Pick]
+        - GUI.xs : LoadImage() now tries to find resources in the exe first, and only if that fails does it look on-disk. This means you can use ResHacker or some similar resource editor to add resources to your distributed exe.
+        - GUI.xs : Win32::GUI::LoadResource(NAME) added - loads a resource from the current executable and returns it as a scalar. Resource type must be RCDATA (i.e. raw data).
+
+    * [Steve Pick]
+        - ListView.xs : Made ListViews aware of the -background option.
+        - Toolbar.xs : Implemented all of Ramy's perl toolbar extension in XS code. Added constants as well.
+        - GUI_Constants.cpp : Added tons of toolbar-related constants. Note that you should probably use the TBSTYLE_xxx constants instead of the BTNS_xxx constants for toolbar button styles right now as the latter doesnt work depending on your compiler.
+        - GUI.pm : Added constants
+        - GUI_Events.cpp : Fixed NeedText so it doesnt crash on exit (needed to extend memory reserved by one byte). Modified the way ButtonClick is handled for toolbars - If a dropdown menu should be expanded, there is a new second argument to ButtonClick which is set to 1.
+        - TreeView.xs : Fix in InsertItem. Wasn't reserving enough memory for the strings form the -text option.
+        - StatusBar.xs : Parts method now detects scalar/array context and returns # parts / list of parts as appropriate
+        - GUI_MessageLoops.cpp : Fix for noflicker (previously, the whole client area was not validated - now it is), also added onPaint event to NEM (for graphic objects).
+        - GUI.xs : Added GetEvent() and SetEvent() methods. GetEvent(EVENTNAME) will return a coderef to the handler for the specified NEM event name (e.g. "Resize"), SetEvent(EVENTNAME,CODEREF) will set a handler for the event. Made AbsLeft() and AbsTop() accept co-ordinates.
+
+    * [Laurent Rocher]
+        - GUI_MessageLoops.cpp : Revrite WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC, WM_CTLCOLORBTN, WM_CTLCOLORLISTBOX event handling in CommonMsgLoop. Correct Both event handling in NEM_WindowMsgLoop.
+
+    * [Jez White & Laurent Rocher]
+        - Rebar.xs : Added documentation for all the methods .
+                 New methods : ShowBand, HideBand, MoveBand, GetBandBorder, GetBarHeight.
+                 Fix BandInfo crash.
+
+    * [Steve Pick & Laurent Rocher]
+        - GUI.xs : Extended support for scrollbars in a window's non-client area. Added NEM event "onScroll" and OEM event "_Scroll" for Window and DialogBox. New functions for Window/Dialog: $w->ScrollRange(SCROLLBAR,[MIN,MAX]), $w->ScrollPos(SCROLLBAR,[POS]), $w->ScrollPage(SCROLLBAR,[PAGESIZE]), $w->Scroll(SCROLLBAR, OPERATION, POSITION). Docs in source as usual. Check GUI.xs.
+        - GUI_Events and GUI.h : Support for _Scroll and onScroll events for windows / dialogs
+        - GUI_MessageLoops : Fix for $object->Result(x) method, [thanks go to Glenn Linderman for pointing the problem out]
+        - StatusBar.xs : Various fixes and optimizations by Laurent Rocher.
+        - GUI_Constants.cpp : Added Scrollbar constants (SB_*) and statusbar constants (SBT_*)
+
+    * [Steve Pick]
+        - Added StatusBar.xs to handle new StatusBar methods. Each method is documented in this file, but the documentation has not been re-generated.
+
+    * [Steve Pick]
+        - GUI.xs : Made ProgressBar aware of -foreground and -background colour settings
+        - GUI.xs : Added Result(handle, code) call for explicitly setting the returned LRESULT from a handler. (normally the value returned from Perl handlers was not returned from their calling wndproc, this allows you to specify a result that will be returned.)
+        - GUI_MessageLoops.cpp : If CommonMsgLoop must be called then it is called before any Hook handlers are called.
+
+    * [Steve Pick]
+        - GUI.xs : Huge update to Hook() and UnHook(). You can now add multiple hooks per message, catch WM_NOTIFY and WM_COMMAND messages, and it works with both New and Old Event Models. Documentation for both functions is present.
+        - GUI_MessageLoops.cpp : Addition of DoHook() function and DoHook() calls in NEM_WindowMsgLoop, WindowMsgLoop, and NEM_ChildMsgLoop. DoHook is internal.
+
+    * [Glenn Linderman]
+        - GUI.pm : In MakeMenu, Set a default event name to every item with an empty string.
+        - GUI_Options.cpp : Added new menu options.
+
+    * [Jeremy White & Laurent Rocher]
+        - TabStip.xs : Add new methods and some documentation.
+
+    * [Steve Pick]
+        - GUI_MessageLoops.cpp : Added anti-flicker code.
+        - GUI_Options.cpp : Added -noflicker option to window/dialogbox.
+        - GUI.h : Added flickerFree property to USERDATA and CREATESTRUCT structs
+        - GUI.pm : Added documentation line for -noflicker option
+
+    * [Steve Pick & Laurent Rocher]
+        - GUI.xs : Left() and Top() now not perform ScreenToClient() on the rectangle for non child window.
+
+    Win32-GUI-0_0_670 :
+
+    * [Laurent Rocher]
+        - GUI.pm : Change version to 0.0.670
+        - GUI.h  : Set NO_XSLOCKS for perl 5.005
+        - GUI_MessageLoops.cpp : Fix for perl 5.005
+    * [Steve Pick]
+        - GUI.xs : Update to Hook() - now returns previous handler coderef on hook reassignment, 0 if no previous assignment, and undef if error.
+        - GUI_MessageLoops.cpp : Added code to call Hook()ed handlers to NEM_ChildMsgLoop
+    * [Laurent Rocher]
+        - GUI.pm : Add AddDatetime, AddGraphics methods
+        - GUI.xs : Fix DoEvents double event, add some DateTime methods (GetTime, SetTime, SetNone, IsNone).
+        - GUI_Options.cpp : Add option parsing for DateTime control (-align, -format, -shownone, -updown)
+        - Typemap : LPARAM handle as string or integer.
+    * [Steve Pick]
+        - GUI.xs : Added Hook and UnHook methods. These let you do $win->Hook(MsgID, \&somesub); to hook a message to a sub. The sub must be a coderef, and is called with self, wparam and lparam args when the message is received by the window.
+        - GUI.h  : Addition of avHooks to PERLWIN32GUI_CREATESTRUCT and PERLWIN32GUI_USERDATA.
+        - GUI_MessageLoops.cpp : Addition of hook-calling code to NEM_WindowMsgLoop.
+    * [Laurent Rocher]
+        - GUI.pm : Fix -prompt option for TextField, correct color option for class (Win98SE).
+        - GUI_Options.cpp : Correct -popstyle and -popexstyle like options.
+    * [Glenn Linderman] GUI_Options.cpp : Correct menu -enabled option.
+    * [Steve Pick] GUI.h : Added PERLWIN32GUI_NEM_TIMER event.
+        - GUI.pm: fixed Win32::GUI::Class::new to avoid the "white background" syndrome on Windows 2000. Fixed conditional so that all operating systems with version above and including 5.1 have the no-white-background fix.
+        - GUI_MessageLoops.cpp: added WM_TIMER event to NEM_WindowMsgLoop, now NEM handler -onTimer will be called whenever a timer added to the window triggers. The NAME of the timer is provided as an argument to the handler.
+        - GUI_Options.cpp: Fix to allow -onTimer.
+        - GUI_Events.cpp: NEM Events always returned PerlResult of -2, even if a handler was found and called for the event. Now it returns 0 if everything was successful, as it should judging by the rest of the code.
+    * [Laurent Rocher] Add build with MinGW and ExtUtils-FakeConfig support.
+      You can build Win32-GUI for ActiveState Perl with Free MingW Compiler.
+      See HowTo : http://perso.club-internet.fr/rocherl/Win32GUI.html
+    * [Steve Pick] GUI.pm: Fix ImageList bug
+    * [Glenn Linderman] MessageLoops.cpp: Fix Window Cursor bug (Without return FALSE statement)
+    * [Steve Pick] GUI.xs : Fix PeekMessage (move SvROK in inner if and remove sv_2mortal)
+    * [Aldo Calpini] GUI.pm
+        - fixed Win32::GUI::Class::new to avoid the "white background" syndrome on XP)
+        - fixed a bug with options parsing in Win32::GUI::Textfield::new
+        - reworked a little the code for Win32::GUI::AcceleratorTable
+    * [Glenn Linderman] Accelerator key patch, Correct NotifyIcon DESTROY, add PM_* constants for use with TrackPopupMenu.
+    * [Laurent Rocher] Fix some warnings, Remove unused variables, remove constants.c file.
+    * [Trevor Garside] Add new RichEdit methods.
+    * [Steve Pick & Laurent Rocher] Add parameters for WM_KEYDOWN and WM_KEYUP NEM events in NEM_ChildMsgLoop.
+    * [Johan Lindstrom] Add WM_DROPFILES event in WindowMsgLoop.
+    * [Laurent Rocher] Add new options for GetOpenFileName and GetSaveFileName.
+    * [Jeremy White & Laurent Rocher] Add new datetime control methods and DTS_* styles constants.

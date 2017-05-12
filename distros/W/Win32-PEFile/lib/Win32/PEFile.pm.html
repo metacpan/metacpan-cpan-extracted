@@ -1,0 +1,283 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Win32::PEFile - Portable Executable File parser</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#methods">Methods</a></li>
+	<li><a href="#section_methods">Section methods</a></li>
+	<ul>
+
+		<li><a href="#_rsrc">.rsrc</a></li>
+		<li><a href="#_edata">.edata</a></li>
+		<li><a href="#_idata">.idata</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<ul>
+
+		<li><a href="#related_documentation">Related documentation</a></li>
+		<li><a href="#win32__exe_and_win32__pefile">Win32::Exe and Win32::PEFile</a></li>
+	</ul>
+
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    <span class="keyword">use</span> <span class="variable">Win32::PEFile</span><span class="operator">;</span>
+</pre>
+<pre>
+    <span class="keyword">my</span> <span class="variable">$pe</span> <span class="operator">=</span> <span class="variable">Win32::PEFile</span><span class="operator">-&gt;</span><span class="variable">new</span> <span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'someFile.exe'</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">print</span> <span class="string">"someFile.exe has a entry point for EntryPoint1"</span>
+        <span class="keyword">if</span> <span class="variable">$pe</span><span class="operator">-&gt;</span><span class="variable">getEntryPoint</span> <span class="operator">(</span><span class="string">"EntryPoint1"</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">my</span> <span class="variable">$strings</span> <span class="operator">=</span> <span class="variable">$pe</span><span class="operator">-&gt;</span><span class="variable">getVersionStrings</span> <span class="operator">();</span>
+    <span class="keyword">print</span> <span class="string">"someFile.exe version </span><span class="variable">$strings</span><span class="string">-&gt;{'ProductVersion'}\n"</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">Methods</a></h1>
+<p>Win32::PEFile provides the following public methods.</p>
+<dl>
+<dt><strong><a name="new" class="item"><code>new (%parameters)</code></a></strong></dt>
+
+<dd>
+<p>Parses a PE file and returns an object used to access the results. The following
+parameters may be passed:</p>
+<dl>
+<dt><strong><a name="file_file_name_required" class="item"><em>-file</em>: file name, required</a></strong></dt>
+
+<dd>
+<p>The file name (and path if required) of the PE file to process.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong><a name="getsectionnames" class="item"><code>getSectionNames()</code></a></strong></dt>
+
+<dd>
+<p>Return the list of named sections present in the PEFile.</p>
+</dd>
+<dt><strong><a name="getmsdosstub" class="item"><code>getMSDOSStub()</code></a></strong></dt>
+
+<dd>
+<p>Return a string containing MS-DOS stub code as a raw binary blob.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="section_methods">Section methods</a></h1>
+<p>The helper module Win32::PEFile::SectionHandlers provides handlers for various
+sections. At present only a few of the standard sections are handled and
+documented here. If there are sections that you would like to be able to
+manipulate that are not currently handled enter a ticket using CPAN's request
+tracker (see below).</p>
+<p>
+</p>
+<h2><a name="_rsrc">.rsrc</a></h2>
+<p>Resource section. At present only access to the version resource is provided,
+although the other resources are parsed internally.</p>
+<dl>
+<dt><strong><a name="getversionstrings" class="item"><code>getVersionStrings ($language)</code></a></strong></dt>
+
+<dd>
+<p>Returns a hash reference containing the strings in the version resource keyed
+by string name.</p>
+<dl>
+<dt><strong><a name="_language_" class="item"><em>$language</em>: optional</a></strong></dt>
+
+<dd>
+<p>Preferred language for the strings specified as a MicroSoft LangID. US English
+is preferred by default.</p>
+<p>If the preferred language is not available one of the available languages will
+be used instead.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong><a name="getfixedversionvalues" class="item"><code>getFixedVersionValues ($language)</code></a></strong></dt>
+
+<dd>
+<p>Returns a hash reference containing the fixed version resource values keyed
+by value name.</p>
+</dd>
+<dt><strong><a name="getresourcedata" class="item"><code>getResourceData ($type, $name, $language)</code></a></strong></dt>
+
+<dd>
+<p>Returns a string containg the raw data for the specified resource or undef if
+the resource doesn't exist.</p>
+<dl>
+<dt><strong><em>$language</em>: optional</strong></dt>
+
+<dd>
+<p>Preferred language for the strings specified as a MicroSoft LangID. US English
+is preferred by default.</p>
+<p>If the preferred language is not available one of the available languages will
+be used instead.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="_edata">.edata</a></h2>
+<p>Exports section.</p>
+<dl>
+<dt><strong><a name="getexportnames" class="item"><code>getExportNames ()</code></a></strong></dt>
+
+<dd>
+<p>Returns a list of all the named entry points.</p>
+</dd>
+<dt><strong><a name="getexportordinalscount" class="item"><code>getExportOrdinalsCount ()</code></a></strong></dt>
+
+<dd>
+<p>Returns the count of all the ordinal entry points.</p>
+</dd>
+<dt><strong><a name="haveexportentry" class="item"><code>haveExportEntry ($entryPointName)</code></a></strong></dt>
+
+<dd>
+<p>Returns true if the given entry point exists in the exports table. For
+compatibility with previous versions of the module <code>getEntryPoint
+($entryPointName)</code> is provided as an alias for <a href="#haveexportentry"><code>haveExportEntry
+($entryPointName)</code></a>.</p>
+<dl>
+<dt><strong><a name="_entrypointname_" class="item"><em>$entryPointName</em>: required</a></strong></dt>
+
+<dd>
+<p>Name of the entry point to search for in the Exports table of the PE file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="_idata">.idata</a></h2>
+<dl>
+<dt><strong><a name="getimportnames" class="item"><code>getImportNames ()</code></a></strong></dt>
+
+<dd>
+<p>Returns a list of all the named entry points.</p>
+</dd>
+<dt><strong><a name="haveimportentry" class="item"><code>haveImportEntry ($entryPath)</code></a></strong></dt>
+
+<dd>
+<p>Returns true if the given entry point exists in the imports table.</p>
+<dl>
+<dt><strong><a name="_entrypath_" class="item"><em>$entryPath</em>: required</a></strong></dt>
+
+<dd>
+<p>Path to the entry point to search for in the Imorts table of the PE file. The
+path is in the form <code>'dll name/entry name'</code>. For example:</p>
+<pre>
+    <span class="keyword">my</span> <span class="variable">$havePrintf</span> <span class="operator">=</span> <span class="variable">$pe</span><span class="operator">-&gt;</span><span class="variable">haveImportEntry</span><span class="operator">(</span><span class="string">'MSVCR80.dll/printf'</span><span class="operator">);</span>
+</pre>
+<p>would set <code>$havePrintf</code> true if the PE file has an import entry for the
+MicroSoft C standard library version of printf.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Please report any bugs or feature requests to
+<code>bug-Win32-PEFile at rt.cpan.org</code>, or through the web interface at
+<a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-PEFile">http://rt.cpan.org/NoAuth/ReportBug.html</a>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>This module is supported by the author through CPAN. The following links may be
+of assistance:</p>
+<ul>
+<li><strong><a name="annocpan_annotated_cpan_documentation" class="item">AnnoCPAN: Annotated CPAN documentation</a></strong>
+
+<p><a href="http://annocpan.org/dist/Win32-PEFile">http://annocpan.org/dist/Win32-PEFile</a></p>
+</li>
+<li><strong><a name="cpan_ratings" class="item">CPAN Ratings</a></strong>
+
+<p><a href="http://cpanratings.perl.org/d/Win32-PEFile">http://cpanratings.perl.org/d/Win32-PEFile</a></p>
+</li>
+<li><strong><a name="rt_cpan_s_request_tracker" class="item">RT: CPAN's request tracker</a></strong>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-PEFile">http://rt.cpan.org/NoAuth/Bugs.html</a></p>
+</li>
+<li><strong><a name="search_cpan" class="item">Search CPAN</a></strong>
+
+<p><a href="http://search.cpan.org/dist/Win32-PEFile">http://search.cpan.org/dist/Win32-PEFile</a></p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>
+</p>
+<h2><a name="related_documentation">Related documentation</a></h2>
+<p><a href="http://kishorekumar.net/pecoff_v8.1.htm">http://kishorekumar.net/pecoff_v8.1.htm</a></p>
+<p>
+</p>
+<h2><a name="win32__exe_and_win32__pefile">Win32::Exe and Win32::PEFile</a></h2>
+<p>Win32::PEFile overlaps in functionality with Win32::Exe. Win32::Exe is a much
+more mature module and is more comprehensive. The only current (small)
+disadvantages of Win32::Exe are that it is not pure Perl and that has a larger
+dependency tree than Win32::PEFile.</p>
+<p>For some applications a larger problem with Win32::Exe is that some file editing
+operations are not portable across systems.</p>
+<p>The intent is that Win32::PEFile will remain pure Perl and low dependency. Over
+time PEFile will acquire various editing functions and will remain both cross-
+platform and endien agnostic.</p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+    Peter Jaquiery
+    CPAN ID: GRANDPA
+    grandpa@cpan.org</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.</p>
+<p>The full text of the license can be found in the
+LICENSE file included with this module.</p>
+
+</body>
+
+</html>

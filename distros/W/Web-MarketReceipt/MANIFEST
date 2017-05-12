@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Web/MarketReceipt.pm
+lib/Web/MarketReceipt/Order.pm
+lib/Web/MarketReceipt/Verifier.pm
+lib/Web/MarketReceipt/Verifier/AppStore.pm
+lib/Web/MarketReceipt/Verifier/GooglePlay.pm
+minil.toml
+t/00_compile.t
+t/01_verify_appstore.t
+t/02_verify_google_play.t
+META.yml
+MANIFEST

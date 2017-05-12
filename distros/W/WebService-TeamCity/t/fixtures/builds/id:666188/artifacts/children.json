@@ -1,0 +1,14 @@
+{
+   "count" : 1,
+   "file" : [
+      {
+         "content" : {
+            "href" : "/httpAuth/app/rest/builds/id:666188/artifacts/content/jetbrains.git.zip"
+         },
+         "href" : "/httpAuth/app/rest/builds/id:666188/artifacts/metadata/jetbrains.git.zip",
+         "modificationTime" : "20160111T223914+0300",
+         "name" : "jetbrains.git.zip",
+         "size" : 12441654
+      }
+   ]
+}

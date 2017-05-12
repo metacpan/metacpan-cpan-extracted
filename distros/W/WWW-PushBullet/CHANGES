@@ -1,0 +1,69 @@
+Revision history for WWW-PushBullet Distribution
+
+1.4.0   2014-10-28 22:30
+
+  * Many changes to handle new PushBullet API
+
+
+1.2.4	2014-10-12 22:30
+
+  * Improving distribution Kwalitee
+
+
+1.2.2   2014-10-08 10:30
+
+  * Fixing device_id/device_iden issue 
+  reported on RT CPAN (https://rt.cpan.org/Public/Bug/Display.html?id=99178)
+
+
+1.2.0   2014-09-27 01:30
+
+  * migration to PushBullet API v2
+
+
+1.0.3	2014-06-18 01:30
+
+  * Trying to improve Kwalitee
+
+
+1.0.2	2014-03-19 00:10
+
+  * Trying to improve Kwalitee
+
+ 
+1.0.1   2014-02-10 00:00
+
+  * Fixing CHANGES to Changes
+
+
+1.0     2014-01-23 01:45
+
+  * Proxy support added (-x/--proxy)
+  * Improved Test suite
+
+
+0.9     2014-01-22 01:00
+  
+  * better program options handling
+  * debug mode added
+
+
+0.8.2   2014-01-17 22:30
+
+    * Code cleaning and documentation
+    
+    
+0.8     2014-01-17 01:00
+
+    * 'pusbullet devices' & 'pushbullet file -f filename' features added
+
+
+0.6     2014-01-14 23:30
+
+    * 'CHANGES', 'LICENSE' & 'README.md' files added
+    * 'PushBullet.pm' & 'pushbullet' POD Documentation updated
+
+
+0.4     2014-01-14 13:00
+
+    * Initial commit

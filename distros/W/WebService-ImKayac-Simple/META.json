@@ -1,0 +1,79 @@
+{
+   "abstract" : "Simple message sender for im.kayac",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-ImKayac-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "Encode" : "2.57",
+            "Furl" : "0",
+            "JSON" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::ImKayac::Simple" : {
+         "file" : "lib/WebService/ImKayac/Simple.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/WebService-ImKayac-Simple/issues"
+      },
+      "homepage" : "https://github.com/moznion/WebService-ImKayac-Simple",
+      "repository" : {
+         "url" : "git://github.com/moznion/WebService-ImKayac-Simple.git",
+         "web" : "https://github.com/moznion/WebService-ImKayac-Simple"
+      }
+   },
+   "version" : "0.10"
+}

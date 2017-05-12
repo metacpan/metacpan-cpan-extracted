@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Win32/Outlook/IAF.pm
+t/test.iaf
+t/00-load.t
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

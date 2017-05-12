@@ -1,0 +1,16 @@
+Revision history for Perl extension Win32::PingICMP.
+
+0.51  Sun Nov 5 2006
+  - Fixed duplicate my on line 138
+
+0.50  Fri Aug 27 2004
+  - Overhaul of code - isolation of Win32::API calls
+  - Support for asynchronous pings
+  - Switch to Module::Build
+
+0.02  Tue Nov 26 2002
+  - First release.
+
+0.01  Tue Nov 12 2002
+  - Started work on module.
+

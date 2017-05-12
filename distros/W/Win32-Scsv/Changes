@@ -1,0 +1,285 @@
+Revision history for Win32-Scsv
+
+0.39 - 2017-02-09 20:01:13+01:00
+
+  [ENHANCEMENTS]
+
+  - Better parameter for function open_excel()
+
+0.38 - 2017-02-07 21:50:20+01:00
+
+  [ENHANCEMENTS]
+
+  - Remove the square brackets that used to be around the sheet name
+
+0.37 - 2017-02-03 20:57:39+01:00
+
+  [ENHANCEMENTS]
+
+  - for functions xls_2_csv() and xls_all_csv() --> add options:
+    { rmc => 1 } remove CRLF from all cells...
+    { clc => 1 } force recalculation...
+
+0.36 - 2017-01-16 20:14:18+01:00
+
+  [CPANTS]
+
+  - Add minimum perl version using dzil plugin [MinimumPerlFast].
+  - Auto generate META.json  using dzil plugin [MetaJSON]
+
+0.35 - 2017-01-15 18:09:04+01:00
+
+  [ENHANCEMENTS]
+
+  - getting rid of the '%*' in xls_all_csv('Abc%*.xls' => ...);
+
+0.34 - 2017-01-15 14:55:54+01:00
+
+  [ENHANCEMENTS]
+
+  - Add flexible option { 'cpy' => 'all' / 'val' } to xls_2_csv()
+
+0.33 - 2017-01-14 14:27:22+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow converting multiple sheets *.xls to *.csv in one go
+
+0.32 - 2016-10-01 20:54:13+01:00
+
+  [ENHANCEMENTS]
+
+  - Implements the French language style L1C1.
+
+0.31 - 2016-10-01 16:30:44+01:00
+
+  [ENHANCEMENTS]
+
+  - I have added 3 new functions set_style_R1C1(), restore_style() and ftranslate()
+    plus some refactoring of Excel constants...
+
+0.30 - 2016-10-02T13:01:45+01:00
+
+  [REVERT]
+
+  - The previous revision was a mistake -- therefore I am reverting back to
+    the revision before that, i.e. 0.28
+
+0.29 - 2016-10-01T18:16:30+01:00
+
+  [BUG FIX]
+
+  - We have problems with Excel.exe staying open in task manager, it is
+    not garbage collected after the end of the program.
+    Therefore, we get rid of the get_excel() function and we allocate
+    one single object $ole_global at the beginning.
+
+0.28 - 2016-06-12T13:03:27+01:00
+
+  [BUG FIX]
+
+  - methods get_last_row() and get_last_col() should return zero for an empty
+    Excel sheet.
+
+0.27 - 2016-04-11 20:51:30+01:00
+
+  [ENHANCEMENTS]
+
+  - Force xls_abs to be RW -- i.e. remove the RO flag, if any...
+
+0.26 - 2016-04-10 18:07:54+01:00
+
+  [ENHANCEMENTS]
+
+  - XLRef() allow 3 character column numbers
+
+0.25 - 2016-03-30 21:33:27+01:00
+
+  [ENHANCEMENTS]
+
+  - Disable AutoFilter when converting to Csv
+
+0.24 - 2016-03-22 14:21:50+01:00
+
+  [ENHANCEMENTS]
+
+  - Do not import Excel Constants anymore
+
+0.23 - 2016-03-21 20:47:12+01:00
+
+  [ENHANCEMENTS]
+
+  - add new function XLRef() to convert col/line coordinates into "A1"
+    style references, for example, XLRef(28, 22) = "AB22"
+
+0.22 - 2015-04-11 18:36:25+01:00
+
+  [ENHANCEMENTS]
+
+  - add new function get_lang()
+    returns either 'EN', 'DE' or 'FR'.
+
+0.21 - 2015-03-07 17:43:01+01:00
+
+  [ENHANCEMENTS]
+
+  - new subroutines set_calc_manual(0|1) and set_calc_befsave(0|1)
+    introduce office 2013 -> ver 15.0
+    clean up whitespaces
+
+0.20 - 2015-02-12 20:24:41+01:00
+
+  [ENHANCEMENTS]
+
+  - allow formats when writing xls_2_csv()
+
+0.19 - 2015-01-25 16:59:12+01:00
+
+  [ENHANCEMENTS]
+
+  - also disable (Calculate_Before_Save)
+    $ole_global->{CalculateBeforeSave} = $vtfalse;
+
+0.18 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.17 - 2014-12-03T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Activate manual recalculation in sub get_excel()
+    $ole_global->{Calculation} = xlCalculationManual;
+
+0.16 - 2014-11-17T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - get rid of number formats when converting to CSV
+
+0.15 - 2014-09-07T20:01:32+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+
+  - In Makefile.PL ==> meta files link to repository
+
+0.14 - 2014-07-26T12:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - Add a check 'my $avail = xlCSV' into build.pm / Makefile.pl
+
+0.13 - 2014-07-25T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - New function open_excel()
+
+0.12 - 2014-05-19T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Add instruction "Sheets("Zzzz").Visible = True" to xls_2_csv()
+
+0.11 - 2014-01-12T12:00:00+01:00
+
+  [REFACTORING]
+
+  - refactor sub slurp_vbs()
+    new sub import_vbs_book()
+    new sub tmp_book()
+    new sub save_pdf()
+
+0.10 - 2013-10-22T12:00:00+01:00
+
+  [REFACTORING]
+
+  - Refactor open_xls_book(), open_xls_sheet():
+    my $ob = get_book('Test01.xls');
+    my $os = $ob->Worksheets('Sheet5') or die "Can't find Sheet";
+    $ob->Close;
+
+0.09 - 2013-10-21T14:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - use Win32::OLE::Const 'Microsoft Excel';
+    Add subroutines: open_xls_book(), open_xls_sheet(), get_lat_row(), get_last_col()
+
+0.08 - 2013-08-21T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - In subroutine csv_2_xls():
+    Replace the one old line "$xls_sheet->Range('A1')->Select;"
+    by several, multiple new lines:
+    $ole_excel->ActiveWindow->{ScrollColumn} = 1;
+    $ole_excel->ActiveWindow->{ScrollRow}    = 1;
+    my $pos_row = $ole_excel->ActiveWindow->{ScrollRow};
+    my $pos_col = $ole_excel->ActiveWindow->{ScrollColumn};
+    $xls_sheet->Cells($pos_row, $pos_col)->Select;
+
+0.07 - 2013-04-20T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - add a new function xls_2_vbs() to extract macros from an xls file
+
+0.06 - 2013-04-10T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - add an option { 'prot' => 1 } to protect the sheet *after* it has been
+    written to
+
+0.05 - 2013-04-09T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Share a global instance of Win32::OLE->GetActiveObject('Excel.Application')
+
+0.04 - 2013-04-08T12:00:00+01:00
+
+  [BUG FIX]
+
+  - replace use Win32::OLE::Const 'Microsoft Excel'; by hardcoded constants
+    to resolve problems where the constant "xlExcel8" wouldn't compile for Excel 2000
+    add function get_xver()
+
+0.03 - 2013-04-06T12:00:00+01:00
+
+  [RENAMING]
+
+  - rename convcsv()  into xls_2_csv()
+
+  - rename convxls()  into csv_2_xls()
+
+  - rename emptyxls() into empty_xls()
+
+  [ENHANCEMENTS]
+
+  - allow csv_2_xls() without template, also allow more formatting of columns
+
+0.02 - 2013-04-05T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - Add a function convxls to import a csv file into an existing xls file
+
+0.01 - 2012-02-11T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.

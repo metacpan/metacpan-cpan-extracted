@@ -1,0 +1,374 @@
+---
+abstract: 'Main object representing acess to a particular Shopify store.'
+author:
+  - 'Adam Harrison (adamdharrison@gmail.com)'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shopify
+provides:
+  WWW::Shopify:
+    file: lib/WWW/Shopify.pm
+    version: '1.02'
+  WWW::Shopify::Exception:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::CallLimit:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::DBError:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::InvalidKey:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Exception::NotFound:
+    file: lib/WWW/Shopify/Exception.pm
+  WWW::Shopify::Field:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::BigInt:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Boolean:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Currency:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Date:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Float:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Freeform:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Freeform::Array:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Freeform::Hash:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Hook:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Identifier:
+    file: lib/WWW/Shopify/Field/Identifier.pm
+  WWW::Shopify::Field::Identifier::String:
+    file: lib/WWW/Shopify/Field/Identifier.pm
+  WWW::Shopify::Field::Int:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Money:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Money::USD:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Relation:
+    file: lib/WWW/Shopify/Field/Relation.pm
+  WWW::Shopify::Field::Relation::Many:
+    file: lib/WWW/Shopify/Field/Relation.pm
+  WWW::Shopify::Field::Relation::OwnOne:
+    file: lib/WWW/Shopify/Field/Relation.pm
+  WWW::Shopify::Field::Relation::Parent:
+    file: lib/WWW/Shopify/Field/Relation.pm
+  WWW::Shopify::Field::Relation::ReferenceOne:
+    file: lib/WWW/Shopify/Field/Relation.pm
+  WWW::Shopify::Field::String:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Address:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Base64:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::City:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Country:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::CountryCode:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Custom:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Email:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Enum:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::FirstName:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::HTML:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Handle:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Hash:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Hex32:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Hostname:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Hostname::Shopify:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::IPAddress:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::LastName:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Name:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Password:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Phone:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Postal:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Province:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::ProvinceCode:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Regex:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::URL:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::URL::Image:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::URL::Shopify:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Words:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::String::Zip:
+    file: lib/WWW/Shopify/Field/String.pm
+  WWW::Shopify::Field::Text:
+    file: lib/WWW/Shopify/Field/Text.pm
+  WWW::Shopify::Field::Text::HTML:
+    file: lib/WWW/Shopify/Field/Text.pm
+  WWW::Shopify::Field::Timestamp:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Timezone:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Field::Timezone::IANA:
+    file: lib/WWW/Shopify/Field.pm
+  WWW::Shopify::Login:
+    file: lib/WWW/Shopify/Login.pm
+  WWW::Shopify::Model::APIClient:
+    file: lib/WWW/Shopify/Model/APIClient.pm
+  WWW::Shopify::Model::APIPermission:
+    file: lib/WWW/Shopify/Model/APIPermission.pm
+  WWW::Shopify::Model::Address:
+    file: lib/WWW/Shopify/Model/Address.pm
+  WWW::Shopify::Model::ApplicationCharge:
+    file: lib/WWW/Shopify/Model/ApplicationCharge.pm
+  WWW::Shopify::Model::Article:
+    file: lib/WWW/Shopify/Model/Article.pm
+  WWW::Shopify::Model::Asset:
+    file: lib/WWW/Shopify/Model/Asset.pm
+  WWW::Shopify::Model::Blog:
+    file: lib/WWW/Shopify/Model/Blog.pm
+  WWW::Shopify::Model::CarrierService:
+    file: lib/WWW/Shopify/Model/CarrierService.pm
+  WWW::Shopify::Model::Cart:
+    file: lib/WWW/Shopify/Model/Cart.pm
+  WWW::Shopify::Model::Cart::LineItem:
+    file: lib/WWW/Shopify/Model/Cart/LineItem.pm
+  WWW::Shopify::Model::Checkout:
+    file: lib/WWW/Shopify/Model/Checkout.pm
+  WWW::Shopify::Model::Checkout::DiscountCode:
+    file: lib/WWW/Shopify/Model/Checkout/DiscountCode.pm
+  WWW::Shopify::Model::Checkout::LineItem:
+    file: lib/WWW/Shopify/Model/Checkout/LineItem.pm
+  WWW::Shopify::Model::Checkout::LineItem::Property:
+    file: lib/WWW/Shopify/Model/Checkout/LineItem/Property.pm
+  WWW::Shopify::Model::Checkout::NoteAttribute:
+    file: lib/WWW/Shopify/Model/Checkout/NoteAttribute.pm
+  WWW::Shopify::Model::Checkout::ShippingLine:
+    file: lib/WWW/Shopify/Model/Checkout/ShippingLine.pm
+  WWW::Shopify::Model::Checkout::TaxLine:
+    file: lib/WWW/Shopify/Model/Checkout/TaxLine.pm
+  WWW::Shopify::Model::Collection:
+    file: lib/WWW/Shopify/Model/Collection.pm
+  WWW::Shopify::Model::Collection::Image:
+    file: lib/WWW/Shopify/Model/Collection/Image.pm
+  WWW::Shopify::Model::Comment:
+    file: lib/WWW/Shopify/Model/Comment.pm
+  WWW::Shopify::Model::Country:
+    file: lib/WWW/Shopify/Model/Country.pm
+  WWW::Shopify::Model::Country::Province:
+    file: lib/WWW/Shopify/Model/Country/Province.pm
+  WWW::Shopify::Model::CustomCollection:
+    file: lib/WWW/Shopify/Model/CustomCollection.pm
+  WWW::Shopify::Model::CustomCollection::Collect:
+    file: lib/WWW/Shopify/Model/CustomCollection/Collect.pm
+  WWW::Shopify::Model::CustomCollection::Image:
+    file: lib/WWW/Shopify/Model/CustomCollection/Image.pm
+  WWW::Shopify::Model::Customer:
+    file: lib/WWW/Shopify/Model/Customer.pm
+  WWW::Shopify::Model::CustomerGroup:
+    file: lib/WWW/Shopify/Model/CustomerGroup.pm
+  WWW::Shopify::Model::Discount:
+    file: lib/WWW/Shopify/Model/Discount.pm
+  WWW::Shopify::Model::EmailTemplate:
+    file: lib/WWW/Shopify/Model/EmailTemplate.pm
+  WWW::Shopify::Model::Event:
+    file: lib/WWW/Shopify/Model/Event.pm
+  WWW::Shopify::Model::File:
+    file: lib/WWW/Shopify/Model/File.pm
+  WWW::Shopify::Model::FulfillmentService:
+    file: lib/WWW/Shopify/Model/FulfillmentService.pm
+  WWW::Shopify::Model::GiftCard:
+    file: lib/WWW/Shopify/Model/GiftCard.pm
+  WWW::Shopify::Model::Item:
+    file: lib/WWW/Shopify/Model/Item.pm
+  WWW::Shopify::Model::LinkList:
+    file: lib/WWW/Shopify/Model/LinkList.pm
+  WWW::Shopify::Model::LinkList::Link:
+    file: lib/WWW/Shopify/Model/LinkList/Link.pm
+  WWW::Shopify::Model::Locale:
+    file: lib/WWW/Shopify/Model/Locale.pm
+  WWW::Shopify::Model::Locale::Authorship:
+    file: lib/WWW/Shopify/Model/Locale/Authorship.pm
+  WWW::Shopify::Model::LocaleTranslation:
+    file: lib/WWW/Shopify/Model/LocaleTranslation.pm
+  WWW::Shopify::Model::Location:
+    file: lib/WWW/Shopify/Model/Location.pm
+  WWW::Shopify::Model::Metafield:
+    file: lib/WWW/Shopify/Model/Metafield.pm
+  WWW::Shopify::Model::NestedItem:
+    file: lib/WWW/Shopify/Model/NestedItem.pm
+  WWW::Shopify::Model::Order:
+    file: lib/WWW/Shopify/Model/Order.pm
+  WWW::Shopify::Model::Order::BillingAddress:
+    file: lib/WWW/Shopify/Model/Order/BillingAddress.pm
+  WWW::Shopify::Model::Order::ClientDetails:
+    file: lib/WWW/Shopify/Model/Order/ClientDetails.pm
+  WWW::Shopify::Model::Order::DiscountCode:
+    file: lib/WWW/Shopify/Model/Order/DiscountCode.pm
+  WWW::Shopify::Model::Order::Fulfillment:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment.pm
+  WWW::Shopify::Model::Order::Fulfillment::FulfillmentEvent:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/FulfillmentEvent.pm
+  WWW::Shopify::Model::Order::Fulfillment::LineItem:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem.pm
+  WWW::Shopify::Model::Order::Fulfillment::LineItem::Location:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/Location.pm
+  WWW::Shopify::Model::Order::Fulfillment::LineItem::Property:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/Property.pm
+  WWW::Shopify::Model::Order::Fulfillment::LineItem::TaxLine:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/LineItem/TaxLine.pm
+  WWW::Shopify::Model::Order::Fulfillment::Receipt:
+    file: lib/WWW/Shopify/Model/Order/Fulfillment/Receipt.pm
+  WWW::Shopify::Model::Order::LineItem:
+    file: lib/WWW/Shopify/Model/Order/LineItem.pm
+  WWW::Shopify::Model::Order::LineItem::Location:
+    file: lib/WWW/Shopify/Model/Order/LineItem/Location.pm
+  WWW::Shopify::Model::Order::LineItem::Property:
+    file: lib/WWW/Shopify/Model/Order/LineItem/Property.pm
+  WWW::Shopify::Model::Order::LineItem::TaxLine:
+    file: lib/WWW/Shopify/Model/Order/LineItem/TaxLine.pm
+  WWW::Shopify::Model::Order::NoteAttribute:
+    file: lib/WWW/Shopify/Model/Order/NoteAttribute.pm
+  WWW::Shopify::Model::Order::PaymentDetails:
+    file: lib/WWW/Shopify/Model/Order/PaymentDetails.pm
+  WWW::Shopify::Model::Order::Risk:
+    file: lib/WWW/Shopify/Model/Order/Risk.pm
+  WWW::Shopify::Model::Order::ShippingAddress:
+    file: lib/WWW/Shopify/Model/Order/ShippingAddress.pm
+  WWW::Shopify::Model::Order::ShippingLine:
+    file: lib/WWW/Shopify/Model/Order/ShippingLine.pm
+  WWW::Shopify::Model::Order::ShippingLine::TaxLine:
+    file: lib/WWW/Shopify/Model/Order/ShippingLine/TaxLine.pm
+  WWW::Shopify::Model::Order::TaxLine:
+    file: lib/WWW/Shopify/Model/Order/TaxLine.pm
+  WWW::Shopify::Model::Page:
+    file: lib/WWW/Shopify/Model/Page.pm
+  WWW::Shopify::Model::Policy:
+    file: lib/WWW/Shopify/Model/Policy.pm
+  WWW::Shopify::Model::Product:
+    file: lib/WWW/Shopify/Model/Product.pm
+  WWW::Shopify::Model::Product::Image:
+    file: lib/WWW/Shopify/Model/Product/Image.pm
+  WWW::Shopify::Model::Product::Option:
+    file: lib/WWW/Shopify/Model/Product/Option.pm
+  WWW::Shopify::Model::Product::Variant:
+    file: lib/WWW/Shopify/Model/Product/Variant.pm
+  WWW::Shopify::Model::ProductSearchEngine:
+    file: lib/WWW/Shopify/Model/ProductSearchEngine.pm
+  WWW::Shopify::Model::RecurringApplicationCharge:
+    file: lib/WWW/Shopify/Model/RecurringApplicationCharge.pm
+  WWW::Shopify::Model::Redirect:
+    file: lib/WWW/Shopify/Model/Redirect.pm
+  WWW::Shopify::Model::Refund:
+    file: lib/WWW/Shopify/Model/Refund.pm
+  WWW::Shopify::Model::Refund::LineItem:
+    file: lib/WWW/Shopify/Model/Refund/LineItem.pm
+  WWW::Shopify::Model::Refund::Transaction:
+    file: lib/WWW/Shopify/Model/Refund/Transaction.pm
+  WWW::Shopify::Model::Refund::Transaction::PaymentDetails:
+    file: lib/WWW/Shopify/Model/Refund/Transaction/PaymentDetails.pm
+  WWW::Shopify::Model::Refund::Transaction::Receipt:
+    file: lib/WWW/Shopify/Model/Refund/Transaction/Receipt.pm
+  WWW::Shopify::Model::ScriptTag:
+    file: lib/WWW/Shopify/Model/ScriptTag.pm
+  WWW::Shopify::Model::ShippingZone:
+    file: lib/WWW/Shopify/Model/ShippingZone.pm
+  WWW::Shopify::Model::ShippingZone::CarrierServiceShippingRateProvider:
+    file: lib/WWW/Shopify/Model/ShippingZone/CarrierServiceShippingRateProvider.pm
+  WWW::Shopify::Model::ShippingZone::PriceBasedShippingRate:
+    file: lib/WWW/Shopify/Model/ShippingZone/PriceBasedShippingRate.pm
+  WWW::Shopify::Model::ShippingZone::WeightBasedShippingRate:
+    file: lib/WWW/Shopify/Model/ShippingZone/WeightBasedShippingRate.pm
+  WWW::Shopify::Model::Shop:
+    file: lib/WWW/Shopify/Model/Shop.pm
+  WWW::Shopify::Model::SmartCollection:
+    file: lib/WWW/Shopify/Model/SmartCollection.pm
+  WWW::Shopify::Model::SmartCollection::Image:
+    file: lib/WWW/Shopify/Model/SmartCollection/Image.pm
+  WWW::Shopify::Model::SmartCollection::Rule:
+    file: lib/WWW/Shopify/Model/SmartCollection/Rule.pm
+  WWW::Shopify::Model::Theme:
+    file: lib/WWW/Shopify/Model/Theme.pm
+  WWW::Shopify::Model::Transaction:
+    file: lib/WWW/Shopify/Model/Transaction.pm
+  WWW::Shopify::Model::Transaction::PaymentDetails:
+    file: lib/WWW/Shopify/Model/Transaction/PaymentDetails.pm
+  WWW::Shopify::Model::Transaction::Receipt:
+    file: lib/WWW/Shopify/Model/Transaction/Receipt.pm
+  WWW::Shopify::Model::Transfer:
+    file: lib/WWW/Shopify/Model/Transfer.pm
+  WWW::Shopify::Model::Transfer::LineItem:
+    file: lib/WWW/Shopify/Model/Transfer/LineItem.pm
+  WWW::Shopify::Model::User:
+    file: lib/WWW/Shopify/Model/User.pm
+  WWW::Shopify::Model::Webhook:
+    file: lib/WWW/Shopify/Model/Webhook.pm
+  WWW::Shopify::Nest:
+    file: lib/WWW/Shopify/Nest.pm
+  WWW::Shopify::Private:
+    file: lib/WWW/Shopify/Private.pm
+  WWW::Shopify::Public:
+    file: lib/WWW/Shopify/Public.pm
+  WWW::Shopify::Query:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::Custom:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::Enum:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::LowerBound:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::Match:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::Query::UpperBound:
+    file: lib/WWW/Shopify/Query.pm
+  WWW::Shopify::URLHandler:
+    file: lib/WWW/Shopify/URLHandler.pm
+  WWW::Shopify::URLHandler::Queued:
+    file: lib/WWW/Shopify/URLHandler/Queued.pm
+requires:
+  Clone: '0'
+  Convert::Base32: '0'
+  Data::Random: '0.08'
+  Date::Calc: '0'
+  Date::Parse: '0'
+  DateTime: '0.78'
+  Devel::StackTrace: '1.30'
+  HTTP::Request::Common: '6.04'
+  JSON: '2.53'
+  LWP::Protocol::https: '6.03'
+  LWP::UserAgent: '6.04'
+  MIME::Base64: '3.13'
+  Math::Round: '0'
+  Scalar::Util: '0'
+  String::Numeric: '0.9'
+  String::Random: '0.22'
+  URI::Escape: '3.31'
+resources:
+  repository: https://bitbucket.org/bengmn/perl-shopify-api
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

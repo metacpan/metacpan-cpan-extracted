@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               WWW-Scrape-Mailman-RSS
+version:            0.12
+abstract:           Parse mailman listserve archives, format as an rss feed
+author:
+    - Hugh Esco <hesco@campaignfoundations.com>
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:         0
+    HTML::TableExtract:   0
+    HTML::TokeParser::Simple:  0
+    Test::More:           0
+    WWW::Mechanize:       0
+    XML::RSS:             0
+    XML::Twig:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

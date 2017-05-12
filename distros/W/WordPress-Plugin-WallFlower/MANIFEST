@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+wallflower.php
+license.php
+readme.txt
+README
+lib/WordPress/Plugin/WallFlower.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/wallflower.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Wiki/Toolkit/Formatter/Pod.pm
+t/01_formatting.t
+t/02_extended_links.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

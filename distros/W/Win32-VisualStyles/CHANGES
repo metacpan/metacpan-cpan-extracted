@@ -1,0 +1,27 @@
+0.02    14 Jul 2009 - * 'OS Unsupported' unless Win32 or Cygwin to assist
+                        smokers reporting something more useful.
+                      * Add LICENCE file.
+                      * Add INSTALL file. Split README.
+                      * Better automate VERSIONINFO resource
+                      * Add build date to VERSIONINFO resource
+                      * Add more information to META.yml
+
+0.01    16 May 2009 - * Removed processorArchitecture from assemblyIdentity
+                        and changed it to "*" in the dependentAssembly
+                        in the manifset.  This should make building on
+                        x64 not require a dynamically generated manifest.
+                      * Add TODO file
+                      * Documentation clean up
+                      * First CPAN release
+
+0.00_02 05 May 2009 - Comments incorporated;
+                      * LoadLibraryW changed to LoadLibraryA.
+                      * manifest now generated to get processorArchitecture
+                        set correctly.
+                      * version resource generated and added to dll.
+                      * Synopsis modified to correctly show unqualified used of
+                        subs needs an import.
+                      * Code modified to build clean with VC6 SP2, without
+                        requiring a more recent PSDK installation.
+
+0.00_01 03 May 2009 - Initial beta release for comment

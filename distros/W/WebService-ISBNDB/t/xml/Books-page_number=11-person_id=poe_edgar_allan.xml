@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:37Z">
+<BookList total_results="252" page_size="10" page_number="11" shown_results="10">
+<BookData book_id="silence_a_fable" isbn="0585052255">
+<Title>Silence, a fable</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C.: Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:40Z" price_time="2006-10-08T07:58:26Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086021 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="demonology_fiction">Demonology -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-silence_a_fable-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="some_words_with_a_mummy" isbn="0585052263">
+<Title>Some words with a mummy</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:44Z" price_time="2006-10-08T07:58:29Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086022 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="mummies_fiction">Mummies -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:44Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-some_words_with_a_mummy-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="spirits_of_the_dead_tales_and_poems" isbn="014062239X">
+<Title>Spirits of the Dead: Tales and Poems</Title>
+<TitleLong>Spirits of the Dead: Tales and Poems (Penguin Popular Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="penguin_books_ltd">Penguin Books Ltd</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Paperback; 1997-03-27" dewey_decimal_normalized="" lcc_number="" change_time="2005-04-06T01:04:45Z" price_time="2006-10-08T07:58:33Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Spirits of the Dead (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/spirits_of_the_dead_tales_and_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="2.1" />
+<Price store_isbn="" store_title="Selected Tales and Poems" store_url="http://isbndb.com/x/book/spirits_of_the_dead_tales_and_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="Spirits of the Dead Selected Tales and Poems" store_url="http://isbndb.com/x/book/spirits_of_the_dead_tales_and_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="Spirits of the Dead (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/spirits_of_the_dead_tales_and_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="Spirits of the Dead" store_url="http://isbndb.com/x/book/spirits_of_the_dead_tales_and_poems/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:33Z" currency_rate="1" price="1" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="stories_by_poe" isbn="1578400287">
+<Title>Stories by Poe</Title>
+<TitleLong>Stories by Poe (Classics Illustrated)</TitleLong>
+<AuthorsText>Samuel Willensky, Edgar Allan Poe, John O'Rourke, Gregory Feeley, H. C. Kiefer (Illustrator)</AuthorsText>
+<PublisherText publisher_id="acclaim_books">Acclaim Books</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Paperback; 1997-06" dewey_decimal_normalized="" lcc_number="" change_time="2006-01-17T11:37:53Z" price_time="2006-10-08T07:58:36Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=41833953&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-17T11:38:06Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/stories_by_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-17T11:38:07Z" currency_rate="1" price="3.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9781578400287" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-17T11:38:09Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Stories by Poe (Classics Illustrated)" store_url="http://isbndb.com/x/book/stories_by_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="0.29" />
+<Price store_isbn="" store_title="Stories By Poe" store_url="http://isbndb.com/x/book/stories_by_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Stories by Poe (Classics Illustrated)" store_url="http://isbndb.com/x/book/stories_by_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="0.69" />
+<Price store_isbn="" store_title="Stories by Poe (Classics Illustrated)" store_url="http://isbndb.com/x/book/stories_by_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:33Z" currency_rate="1" price="1" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="samuel_willensky">Samuel Willensky</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="orourke_john_j">O'Rourke, John J.</Person>
+<Person person_id="gregory_feeley">Gregory Feeley</Person>
+</Authors>
+</BookData>
+<BookData book_id="story_into_film" isbn="0440983681">
+<Title>Story into film</Title>
+<TitleLong>Story into film: three tales of the supernatural go from page to screen</TitleLong>
+<AuthorsText>[ed. by] Ulrich Ruchti and Sybil Taylor</AuthorsText>
+<PublisherText publisher_id="dell_publishing">New York : Dell Publishing, c1978.</PublisherText>
+<Details dewey_decimal="" physical_description_text="255 p. : ill. ; 18 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-10-12T10:40:48Z" price_time="2006-10-08T07:58:39Z" />
+<Summary></Summary>
+<Notes>Includes original stories with screenplays.
+
+Bierce, A. An occurrence at Owl Creek Bridge.--Poe, E. A. The masque of the Red Death.--Dickens, C. The signalman.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780440983682" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T23:43:46Z" currency_rate="1" price="5.62" />
+<Price store_isbn="" store_title="Story into Film" store_url="http://www.biblio.com/details.php?dcx=83036370&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T23:43:46Z" currency_rate="1" price="12.5" />
+<Price store_isbn="" store_title="Story into Film" store_url="http://isbndb.com/x/book/story_into_film/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:31Z" currency_rate="1" price="6.62" />
+<Price store_isbn="" store_title="Story Into Film" store_url="http://isbndb.com/x/book/story_into_film/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:31Z" currency_rate="1" price="5.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/story_into_film/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:34Z" currency_rate="1" price="4.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="film_adaptations">Film adaptations</Subject>
+<Subject subject_id="supernatural_in_motion_pictures">Supernatural in motion pictures</Subject>
+<Subject subject_id="supernatural_in_literature">Supernatural in literature</Subject>
+<Subject subject_id="motion_pictures_and_literature">Motion pictures and literature</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Colorado, Boulder" last_update="2005-10-12T10:40:48Z" marc_url="http://isbndb.com/x/libdata/isbndb-311-story_into_film-20051012.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="dickens_charles">Dickens, Charles</Person>
+<Person person_id="bierce_ambrose">Bierce, Ambrose</Person>
+<Person person_id="taylor_sybil">Taylor, Sybil</Person>
+<Person person_id="ruchti_ulrich">Ruchti, Ulrich</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_and_sketches" isbn="0252069226">
+<Title>Tales and sketches</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited by Thomas Ollive Mabbott with the assistance of Eleanor D. Kewer and Maureen C. Mabbott</AuthorsText>
+<PublisherText publisher_id="university_of_illinois_press">Urbana : University of Illinois Press, 2000.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="2 v. (xxxii, 1451 p.) : ill. ; 23 cm." language="eng" edition_info="(v. 1 : alk. paper)" dewey_decimal_normalized="813.3" lcc_number="" change_time="2003-11-20T19:28:40Z" price_time="2006-10-08T07:58:46Z" />
+<Summary></Summary>
+<Notes>Originally published as v. 2-3 of: Collected works of Edgar Allan Poe. Cambridge, Mass. : Belknap Press of Harvard University Press, 1978.
+
+Includes bibliographical references and index.
+
+v. 1. 1831-1842 -- v. 2. 1843-1849.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales and Sketches by Edgar Allan Poe (2000) NEW BOOK" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-29T07:02:28Z" currency_rate="1" price="2.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-29T07:02:28Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780252069222" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-29T07:02:29Z" currency_rate="1" price="8.41" />
+<Price store_isbn="" store_title="Tales and Sketches: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-29T07:02:29Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:31Z" currency_rate="1" price="18.75" />
+<Price store_isbn="" store_title="Tales and Sketches, vol. 1: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="5.39" />
+<Price store_isbn="" store_title="Tales and Sketches, vol. 1: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="19.12" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="13.2" />
+<Price store_isbn="" store_title="Tales and Sketches, 1826-1849: Volume 1; 1826-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:33Z" currency_rate="1" price="20.95" />
+<Price store_isbn="" store_title="Tales and Sketches: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:33Z" currency_rate="1" price="6.69" />
+<Price store_isbn="" store_title="Tales and Sketches: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="5.93" />
+<Price store_isbn="" store_title="Tales and Sketches, 1826-1849: Volume 1; 1826-1842" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30629147%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:51Z" currency_rate="1" price="22.5" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0252069226&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:31Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="Tales and Sketches: 1831-1842" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:35Z" currency_rate="1" price="18.75" />
+<Price store_isbn="" store_title="Tales and Sketches, 1826-1849" store_url="http://isbndb.com/x/book/tales_and_sketches/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:58:46Z" currency_rate="1" price="25" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_literature_american">Fantasy literature, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Washington University (St. Louis, MO)" last_update="2003-11-20T19:28:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-115-tales_and_sketches-20031120.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="mabbott_thomas_ollive">Mabbott, Thomas Ollive</Person>
+<Person person_id="kewer_eleanor_d">Kewer, Eleanor D.</Person>
+<Person person_id="mabbott_maureen_cobb">Mabbott, Maureen Cobb</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_and_sketches_a01" isbn="0252069234">
+<Title>Tales and sketches</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited by Thomas Ollive Mabbott with the assistance of Eleanor D. Kewer and Maureen C. Mabbott</AuthorsText>
+<PublisherText publisher_id="university_of_illinois_press">Urbana : University of Illinois Press, 2000.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="2 v. (xxxii, 1451 p.) : ill. ; 23 cm." language="eng" edition_info="(v. 2 : alk. paper)" dewey_decimal_normalized="813.3" lcc_number="" change_time="2003-11-20T19:28:40Z" price_time="2005-08-13T11:34:45Z" />
+<Summary></Summary>
+<Notes>Originally published as v. 2-3 of: Collected works of Edgar Allan Poe. Cambridge, Mass. : Belknap Press of Harvard University Press, 1978.
+
+Includes bibliographical references and index.
+
+v. 1. 1831-1842 -- v. 2. 1843-1849.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-25T12:27:47Z" currency_rate="1" price="13.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="17.5" />
+<Price store_isbn="" store_title="Tales and Sketches: 1843-1849." store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="10.31" />
+<Price store_isbn="" store_title="Tales and Sketches, 1943-1949" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="22.5" />
+<Price store_isbn="" store_title="Tales and Sketches: 1843-1849" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="16.37" />
+<Price store_isbn="" store_title="Tales and Sketches: 1843-1849" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="16.5" />
+<Price store_isbn="" store_title="Tales and Sketches: 1843-1849" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-13T11:34:06Z" currency_rate="1" price="18.07" />
+<Price store_isbn="" store_title="Tales and Sketches, 1943-1949" store_url="http://isbndb.com/x/book/tales_and_sketches_a01/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-08-13T11:34:07Z" currency_rate="1" price="17.5" />
+<Price store_isbn="" store_title="Tales and Sketches: 1843-1849" store_url="http://www.biblio.com/details.php?dcx=43438127&amp;aid=isbndb" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-13T11:34:45Z" currency_rate="1" price="36.19" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_literature_american">Fantasy literature, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Washington University (St. Louis, MO)" last_update="2003-11-20T19:28:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-115-tales_and_sketches_a01-20031120.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="mabbott_thomas_ollive">Mabbott, Thomas Ollive</Person>
+<Person person_id="kewer_eleanor_d">Kewer, Eleanor D.</Person>
+<Person person_id="mabbott_maureen_cobb">Mabbott, Maureen Cobb</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_edgar_alan_poe" isbn="0780778537">
+<Title>Tales of Edgar Alan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>L. L. Owens, Michael A. Aspengren, Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="perfection_learning">Perfection Learning</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.6&quot;x7.9&quot;x0.4&quot;; 68 pages; 0.4 lb" language="" edition_info="Library Binding; 1999-08-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-14T12:06:53Z" price_time="2006-10-05T08:12:14Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-23T16:30:54Z" currency_rate="1" price="10.67" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe(Cover-To-Cover Books)" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-08-05T10:22:43Z" currency_rate="1" price="13.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-05T03:27:06Z" currency_rate="1" price="13.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-05T03:27:06Z" currency_rate="1" price="22.47" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe (Cover-To-Cover Books)" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-05T03:27:06Z" currency_rate="1" price="22.47" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-05T03:27:06Z" currency_rate="1" price="10.5" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-05T03:27:07Z" currency_rate="1" price="38.8" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-05T03:27:07Z" currency_rate="1" price="38.8" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-05T03:27:13Z" currency_rate="1" price="13.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-05T03:27:15Z" currency_rate="1" price="10.46" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0780778537&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-05T03:27:17Z" currency_rate="1" price="17.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_alan_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-05T08:12:14Z" currency_rate="1" price="13.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_childrens_books_literature_classics_by_age_genera">Amazon.com -- Children's Books -- Literature -- Classics by Age -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_short_story_collection">Amazon.com -- Children's Books -- Literature -- Short Story Collections</Subject>
+<Subject subject_id="amazon_com_horror_united_states">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_childrens_books_ages_9_12_general">Amazon.com -- Children's Books -- Ages 9-12 -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="aspengren_michael_a">Aspengren, Michael A.</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_edgar_allan_poe" isbn="0681409991">
+<Title>Tales of Edgar Allan Poe</Title>
+<TitleLong>Tales of Edgar Allan Poe (Leatherbound Classics Series)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="longmeadow_press">Longmeadow Press</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Hardcover; 1990-09" dewey_decimal_normalized="" lcc_number="" change_time="2005-10-23T21:37:04Z" price_time="2006-10-08T08:04:37Z" />
+<Summary>Afterword by Peter Glassman. This deluxe illustrated edition features a selection of vivid tales, including "The Tell-Tale Heart" and "The Pit and the Pendulum." "Moser's watercolor paintings...are both macabre and understated. The best of them make us further imagine the terrible things beyond the edge."--Booklist. A Books of wonder Classic.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_edgar_allan_poe_a01" isbn="0688075096">
+<Title>The tales of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>illustrated by Barry Moser; afterword by Peter Glassman</AuthorsText>
+<PublisherText publisher_id="books_of_wonder">New York : Books of Wonder, c1991.</PublisherText>
+<Details dewey_decimal="" physical_description_text="308 p., [18] leaves of plates : col. ill. ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2006-03-15T22:25:41Z" price_time="2006-05-12T16:15:33Z" />
+<Summary>An illustrated collection of stories by the well-known horror author, including "The Gold Bug," "The Tell-tale Heart," "The Fall of the House of Usher," and "The Pit and the Pendulum."</Summary>
+<Notes>The imp of the perverse -- The tell-tale heart -- A descent into the maelstrom -- The cask of Amontillado -- The premature burial -- Hop-frog -- The pit and the pendulum -- The masque of the Red Death -- The fall of the house of Usher -- Ms. found in a bottle.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe (Books of Wonder)" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-15T22:25:57Z" currency_rate="1" price="15.74" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe (Books of Wonder)" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-15T22:25:57Z" currency_rate="1" price="0.39" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-15T22:25:57Z" currency_rate="1" price="24.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-15T22:25:57Z" currency_rate="1" price="3.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-15T22:25:57Z" currency_rate="1" price="17.21" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="18.74" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="24.24" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="18.74" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe (Books of Wonder)" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-12T16:15:32Z" currency_rate="1" price="17.35" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780688075095" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-12T16:15:33Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=3040749" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-12T16:15:33Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe Product 373231" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.373231&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-12T16:15:33Z" currency_rate="1" price="15.41" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe (Books of Wonder)" store_url="http://isbndb.com/x/book/tales_of_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-12T16:15:33Z" currency_rate="1" price="1.58" />
+<Price store_isbn="" store_title="Tales of Edgar Allan Poe " store_url="http://www.biblio.com/details.php?dcx=78868253&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-12T16:15:33Z" currency_rate="1" price="2.1" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+<Subject subject_id="short_stories_american">Short stories, American</Subject>
+<Subject subject_id="childrens_stories_american">Children's stories, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Milwaukee Public Library" last_update="2006-03-15T22:25:41Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-tales_of_edgar_allan_poe_a01-20060315.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="moser_barry">Moser, Barry</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

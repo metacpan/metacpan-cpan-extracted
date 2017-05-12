@@ -1,0 +1,18 @@
+= June2010Meeting
+
+Wed. June 9th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+== C'Dent, the Acmeism, and Everyone
+
+speaker: IngyDotNet
+
+Ingy will give a talk about:
+
+* [Acmeism http://acmeism.org] - Programming above programming languages
+* [C'Dent http://cdent.org] - A portable module programming language
+* [Stardoc http://stardoc.org] - An Acmeist documentation system
+* [TestML http://testml.org] - An Acmeist unit test language
+
+Imagine writing a Perl module, and then uploading it to RubyGems and PyPi and a dozen other language repositories as a native module for that language. C'Dent compiles modules Perl, Python, Ruby and JavaScript modules to many languages. Stardoc reformats POD to many other formats. TestML lets you write one set of tests that all the compiled modules must pass before shipping.
+
+This is the future. This is Acmeism.

@@ -1,0 +1,162 @@
+{
+   "abstract" : "Ohloh API implementation",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Ohloh-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod::Snippets" : "v0.4.1"
+         },
+         "requires" : {
+            "Date::Parse" : "0",
+            "Digest::MD5" : "0",
+            "HTML::HeadParser" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Object::InsideOut" : "0",
+            "Params::Validate" : "0",
+            "Readonly" : "0",
+            "Test::More" : "0",
+            "Time::Piece" : "0",
+            "URI" : "0",
+            "XML::LibXML" : "0",
+            "XML::Writer" : "0",
+            "perl" : "v5.8.0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Ohloh::API" : {
+         "file" : "lib/WWW/Ohloh/API.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Account" : {
+         "file" : "lib/WWW/Ohloh/API/Account.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::ActivityFact" : {
+         "file" : "lib/WWW/Ohloh/API/ActivityFact.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::ActivityFacts" : {
+         "file" : "lib/WWW/Ohloh/API/ActivityFacts.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Analysis" : {
+         "file" : "lib/WWW/Ohloh/API/Analysis.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Collection" : {
+         "file" : "lib/WWW/Ohloh/API/Collection.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::ContributorFact" : {
+         "file" : "lib/WWW/Ohloh/API/ContributorFact.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::ContributorLanguageFact" : {
+         "file" : "lib/WWW/Ohloh/API/ContributorLanguageFact.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Enlistment" : {
+         "file" : "lib/WWW/Ohloh/API/Enlistment.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Enlistments" : {
+         "file" : "lib/WWW/Ohloh/API/Enlistments.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Factoid" : {
+         "file" : "lib/WWW/Ohloh/API/Factoid.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Kudo" : {
+         "file" : "lib/WWW/Ohloh/API/Kudo.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::KudoScore" : {
+         "file" : "lib/WWW/Ohloh/API/KudoScore.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Kudos" : {
+         "file" : "lib/WWW/Ohloh/API/Kudos.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Language" : {
+         "file" : "lib/WWW/Ohloh/API/Language.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Languages" : {
+         "file" : "lib/WWW/Ohloh/API/Languages.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Message" : {
+         "file" : "lib/WWW/Ohloh/API/Message.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Message::Tag" : {
+         "file" : "lib/WWW/Ohloh/API/Message/Tag.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Messages" : {
+         "file" : "lib/WWW/Ohloh/API/Messages.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Project" : {
+         "file" : "lib/WWW/Ohloh/API/Project.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Projects" : {
+         "file" : "lib/WWW/Ohloh/API/Projects.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Repository" : {
+         "file" : "lib/WWW/Ohloh/API/Repository.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Role::Fetchable" : {
+         "file" : "lib/WWW/Ohloh/API/Role/Fetchable.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Role::LoadXML" : {
+         "file" : "lib/WWW/Ohloh/API/Role/LoadXML.pm",
+         "version" : 0
+      },
+      "WWW::Ohloh::API::SizeFact" : {
+         "file" : "lib/WWW/Ohloh/API/SizeFact.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::Stack" : {
+         "file" : "lib/WWW/Ohloh/API/Stack.pm",
+         "version" : "v0.3.2"
+      },
+      "WWW::Ohloh::API::StackEntry" : {
+         "file" : "lib/WWW/Ohloh/API/StackEntry.pm",
+         "version" : "v0.3.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.3.2"
+}

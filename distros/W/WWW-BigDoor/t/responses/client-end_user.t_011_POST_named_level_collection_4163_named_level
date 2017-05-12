@@ -1,0 +1,19 @@
+201[
+    {
+        "end_user_description": "you kinda know something", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259732, 
+        "pub_title": "level2", 
+        "collection_uri": "/api/publisher/a4a546d5fc3143bd9d38c98a35050e3a/named_level_collection/4163", 
+        "created_timestamp": 1294259732, 
+        "resource_name": "named_level", 
+        "urls": [], 
+        "attributes": [], 
+        "threshold": null, 
+        "pub_description": "level2 description", 
+        "end_user_title": "Neophyte", 
+        "named_level_collection_id": 4163, 
+        "id": 22583
+    }, 
+    {}
+]

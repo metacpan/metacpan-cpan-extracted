@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:35:46,858]  ERROR - ggers.vcs.git.FetchCommandImpl - Error while pruning removed branches \norg.eclipse.jgit.errors.TransportException: git://some.org/repository: Connection timed out\n\tat org.eclipse.jgit.transport.TransportGitAnon.openConnection(TransportGitAnon.java:151)\n\tat org.eclipse.jgit.transport.TransportGitAnon$TcpFetchConnection.<init>(TransportGitAnon.java:180)\n\tat org.eclipse.jgit.transport.TransportGitAnon.openFetch(TransportGitAnon.java:120)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.GitServerUtil.pruneRemovedBranches(GitServerUtil.java:289)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.FetchCommandImpl.pruneRemovedBranches(FetchCommandImpl.java:284)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.FetchCommandImpl.fetchInSameProcess(FetchCommandImpl.java:257)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.FetchCommandImpl.fetch(FetchCommandImpl.java:85)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.CommitLoaderImpl.fetch(CommitLoaderImpl.java:105)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.CommitLoaderImpl.fetchBranchData(CommitLoaderImpl.java:142)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.CommitLoaderImpl.loadCommit(CommitLoaderImpl.java:74)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.GitCollectChangesPolicy.collectChanges(GitCollectChangesPolicy.java:167)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.GitVcsSupport.collectChanges(GitVcsSupport.java:124)\n\tat jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_throw_exception_for_anonymous_git_url_with_username(TestConnectionTest.java:115)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)\n\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)\n\tat java.lang.reflect.Method.invoke(Method.java:597)\n\tat org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:80)\n\tat org.testng.internal.Invoker.invokeMethod(Invoker.java:714)\n\tat org.testng.internal.Invoker.invokeTestMethod(Invoker.java:901)\n\tat org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1231)\n\tat org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:127)\n\tat org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:111)\n\tat org.testng.TestRunner.privateRun(TestRunner.java:767)\n\tat org.testng.TestRunner.run(TestRunner.java:617)\n\tat org.testng.SuiteRunner.runTest(SuiteRunner.java:334)\n\tat org.testng.SuiteRunner.runSequentially(SuiteRunner.java:329)\n\tat org.testng.SuiteRunner.privateRun(SuiteRunner.java:291)\n\tat org.testng.SuiteRunner.run(SuiteRunner.java:240)\n\tat org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)\n\tat org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)\n\tat org.testng.TestNG.runSuitesSequentially(TestNG.java:1198)\n\tat org.testng.TestNG.runSuitesLocally(TestNG.java:1123)\n\tat org.testng.TestNG.run(TestNG.java:1031)\n\tat jetbrains.buildServer.agent.ideaRunner.testng.TestNGLauncher.main(TestNGLauncher.java:73)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)\n\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)\n\tat java.lang.reflect.Method.invoke(Method.java:597)\n\tat org.jetbrains.jps.runConf.java.MainClassLauncher.main(MainClassLauncher.java:38)\n",
+   "duration" : 254536,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:666,build:(id:667885)",
+   "id" : "id:666,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_throw_exception_for_anonymous_git_url_with_username",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-4260927089268744937",
+      "id" : -4260927089268744937,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_throw_exception_for_anonymous_git_url_with_username"
+   }
+}

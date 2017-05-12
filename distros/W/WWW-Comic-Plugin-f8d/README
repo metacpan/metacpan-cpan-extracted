@@ -1,0 +1,43 @@
+WWW-Comic-Plugin-f8d
+
+A plugin for Nicola Worthington's excellent WWW::Comic module, to fetch the
+f8d comic from www.f8d.org
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Comic::Plugin::f8d
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Comic-Plugin-f8d
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Comic-Plugin-f8d
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Comic-Plugin-f8d
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Comic-Plugin-f8d
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David Precious
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

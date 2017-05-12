@@ -1,0 +1,7 @@
+Revision history for WebService-OkiLab-ExtractPlace
+
+0.01  Fri Nov 30 02:26:34 2007
+       Initial release.
+
+0.02  Mon Dec 24 19:19:26 2007
+       Pass all test such as perlcritic.t, pod-coverage.t, pod.t

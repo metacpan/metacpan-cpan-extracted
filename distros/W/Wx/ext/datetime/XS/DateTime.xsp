@@ -1,0 +1,240 @@
+#############################################################################
+## Name:        ext/datetime/XS/DateTime.xsp
+## Purpose:     XS++ for Wx::DateTime
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     22/09/2002
+## RCS-ID:      $Id: DateTime.xsp 2983 2010-10-09 01:44:20Z mdootson $
+## Copyright:   (c) 2002, 2006, 2009-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+#include <wx/datetime.h>
+
+%module{Wx};
+
+%{
+#define wxDateTime__TimeZone wxDateTime::TimeZone
+#define Month wxDateTime::Month
+#define WeekDay wxDateTime::WeekDay
+#define WeekFlags wxDateTime::WeekFlags
+#define NameFlags wxDateTime::NameFlags
+#define wxDateTime_t wxDateTime::wxDateTime_t
+#define Monday_First wxDateTime::Monday_First
+#define Name_Full wxDateTime::Name_Full
+#define Name_Abbr wxDateTime::Name_Abbr
+#define Calendar wxDateTime::Calendar
+#define Gregorian wxDateTime::Gregorian
+#define Inv_Year wxDateTime::Inv_Year
+#define Inv_Month wxDateTime::Inv_Month
+#define wxDefaultDateTimePtr (wxDateTime*)&wxDefaultDateTime
+
+#if WXPERL_W_VERSION_LT( 2, 5, 4 )
+#define wxDefaultDateTimeFormat _T("%c")
+#endif
+%}
+
+%typemap{Month}{simple};
+%typemap{WeekDay}{simple};
+%typemap{WeekFlags}{simple};
+%typemap{wxDateTime_t}{simple};
+%typemap{Calendar}{simple};
+%typemap{wxDefaultDateTime}{simple};
+%typemap{wxDefaultDateTimeFormat}{simple};
+
+%typemap{const wxDateTime::TimeZone&}{parsed}{
+    %cpp_type{%wxDateTime::TimeZone%};
+};
+
+%typemap{wxDateTime&}{parsed}{
+    %cpp_type{%SV*%};
+    %call_function_code{%$Call%};
+    %output_code{%$CVar = $PerlVar; SvREFCNT_inc( $PerlVar )%};
+};
+
+%name{Wx::DateTime} class wxDateTime
+{
+    wxDateTime();
+    %name{newFromTimeT} wxDateTime( time_t time );
+    %name{newFromDMY} wxDateTime( wxDateTime_t day,
+        Month month = Inv_Month,
+        int year = Inv_Year, wxDateTime_t hour = 0,
+        wxDateTime_t minute = 0, wxDateTime_t second = 0,
+        wxDateTime_t millisec = 0 );
+
+%{
+static void
+wxDateTime::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxDateTime()
+        %code{% wxPli_thread_sv_unregister( aTHX_ "Wx::DateTime", THIS, ST(0) );
+                delete THIS;
+                %};
+
+#define wxPL_DATETIME_FORMAT wxT("%c")
+
+    wxString Format( const wxChar* format = wxPL_DATETIME_FORMAT,
+                     const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxString FormatDate();
+
+    int GetYear( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    Month GetMonth( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetDay( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    WeekDay GetWeekDay( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetHour( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetMinute( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetSecond( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetMillisecond( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetDayOfYear( const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetWeekOfYear( WeekFlags flags = Monday_First, const wxDateTime::TimeZone& tz = wxDateTime::Local );
+    wxDateTime_t GetWeekOfMonth( WeekFlags flags = Monday_First, const wxDateTime::TimeZone& tz = wxDateTime::Local );
+
+    %name{SetTimeT} wxDateTime& Set( time_t time );
+    %name{SetJDN} wxDateTime& Set( double jdn );
+    %name{SetHMS} wxDateTime& Set( wxDateTime_t hour, wxDateTime_t minute = 0,
+                                   wxDateTime_t second = 0,
+                                   wxDateTime_t msec = 0 );
+    %name{Set} wxDateTime& Set( wxDateTime_t day,
+                                Month month = Inv_Month,
+                                int year = Inv_Year,
+                                wxDateTime_t hour, wxDateTime_t minute = 0,
+                                wxDateTime_t second = 0,
+                                wxDateTime_t msec = 0 );
+    
+    wxDateTime& SetYear( int year );
+    wxDateTime& SetMonth( Month month );
+    wxDateTime& SetDay( wxDateTime_t day );
+    wxDateTime& SetHour( wxDateTime_t hour );
+    wxDateTime& SetMinute( wxDateTime_t minute );
+    wxDateTime& SetSecond( wxDateTime_t second );
+    wxDateTime& SetMillisecond( wxDateTime_t millisecond );
+
+    wxString FormatISODate();
+    wxString FormatTime();
+    wxString FormatISOTime();
+
+#if WXPERL_W_VERSION_LT( 2, 9, 0 )
+    wxString ParseFormat( wxString date,
+		wxString format = wxDefaultDateTimeFormat,
+		const wxDateTime& dateDef = wxDefaultDateTimePtr );
+    wxString ParseDate( wxString date);
+    wxString ParseDateTime( wxString date);
+    wxString ParseTime( wxString date);
+    wxString ParseRfc822Date( wxString date);
+#endif
+
+    wxDateTime& SetToCurrent( );
+    wxDateTime& ResetTime( );
+
+	bool IsEqualTo( const wxDateTime& dt );
+	bool IsEarlierThan( const wxDateTime& dt );
+	bool IsLaterThan( const wxDateTime& dt );
+	bool IsBetween( const wxDateTime& dt1, const wxDateTime& dt2 );
+	bool IsStrictlyBetween( const wxDateTime& dt1, const wxDateTime& dt2 );
+	bool IsSameDate( const wxDateTime& dt );
+	bool IsSameTime( const wxDateTime& dt );
+	bool IsValid( );
+
+	# all Add & Subtract methods for Time and Date parts
+	%name{AddDate} wxDateTime& Add( wxDateSpan& ds );
+	%name{AddTime} wxDateTime& Add( wxTimeSpan& ds );
+	# TimeSpan and all needed functions
+	# DateSpan and all needed functions
+};
+
+%{
+
+void
+wxDateTime::GetAmPmStrings()
+  PPCODE:
+    wxString am, pm;
+    THIS->GetAmPmStrings( &am, &pm );
+    SV* ams = wxPli_wxString_2_sv( aTHX_ am, sv_newmortal() ),
+      * pms = wxPli_wxString_2_sv( aTHX_ pm, sv_newmortal() );
+    EXTEND( SP, 2 );
+    PUSHs( ams );
+    PUSHs( pms );    
+
+
+wxDateTime*
+Today()
+  CODE:
+    RETVAL = new wxDateTime( wxDateTime::Today() );
+  OUTPUT:
+    RETVAL
+
+wxDateTime*
+Now()
+  CODE:
+    RETVAL = new wxDateTime( wxDateTime::Now() );
+  OUTPUT:
+    RETVAL
+
+wxDateTime*
+UNow()
+  CODE:
+    RETVAL = new wxDateTime( wxDateTime::UNow() );
+  OUTPUT:
+    RETVAL
+
+bool
+IsLeapYear( int year, Calendar cal = Gregorian)
+  CODE:
+    RETVAL = wxDateTime::IsLeapYear( year, cal );
+  OUTPUT:
+    RETVAL
+
+wxString
+GetMonthName( Month month, NameFlags flags = Name_Full )
+  CODE:
+    RETVAL = wxDateTime::GetMonthName( month, flags );
+  OUTPUT:
+    RETVAL
+
+wxString
+GetWeekDayName( WeekDay weekday, NameFlags flags = Name_Full )
+  CODE:
+    RETVAL = wxDateTime::GetWeekDayName( weekday, flags );
+  OUTPUT:
+    RETVAL
+
+wxDateTime_t
+GetNumberOfDaysInYear( int year = Inv_Year, Calendar cal = Gregorian )
+  CODE:
+    RETVAL = wxDateTime::GetNumberOfDays( year, cal );
+  OUTPUT:
+    RETVAL
+
+wxDateTime_t
+GetNumberOfDaysInMonth( Month month, int year = Inv_Year, Calendar cal = Gregorian )
+  CODE:
+    RETVAL = wxDateTime::GetNumberOfDays( month, year, cal );
+  OUTPUT:
+    RETVAL
+
+int
+GetCentury( int year = Inv_Year )
+  CODE:
+    RETVAL = wxDateTime::GetCentury( year );
+  OUTPUT:
+    RETVAL
+
+int
+GetCurrentYear( Calendar cal = Gregorian )
+  CODE:
+    RETVAL = wxDateTime::GetCurrentYear( cal );
+  OUTPUT:
+    RETVAL
+
+int
+GetCurrentMonth( Calendar cal = Gregorian )
+  CODE:
+    RETVAL = wxDateTime::GetCurrentMonth( cal );
+  OUTPUT:
+    RETVAL
+
+%}

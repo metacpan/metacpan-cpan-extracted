@@ -1,0 +1,48 @@
+0.07     2017-02-08
+
+- Re-release with latest dzil bundle to fix documentation. Reported by Dave
+  Rolsky. GitHub #5.
+
+
+0.06     2016-12-12
+
+- Fixed usage of Params::ValidationCompiler. The previous version would not
+  compile with newer versions of this module due to incorrectly using a type
+  where a specification was expected.
+
+
+0.05     2016-07-03
+
+- Params::CheckCompiler was renamed to Params::ValidationCompiler. Updated
+  deps accordingly.
+
+
+0.04     2016-06-14
+
+- Fixed typo in attribute creation that caused compilation failures with
+  Moo 2.002_000. Reported by andk. GitHub #2.
+
+- Added new classes for Project and ProjectIteration.
+
+- Added WS::PT->projects, ->project_iterations, and ->create_story.
+
+
+0.03     2016-05-31
+
+- Made the person_id parameter to Story->add_comment optional. By default, the
+  person is determined from the token used to submit the comment.
+
+- Made Story->update work (currently only can update the story current_state).
+
+
+0.02     2016-05-31
+
+- Added Story->add_label method.
+
+- Fixed warning from too many sprintf arguments. Reported by Slaven
+  Resiz. GitHub #1.
+
+
+0.01     2016-05-26
+
+- First release upon an unsuspecting world.

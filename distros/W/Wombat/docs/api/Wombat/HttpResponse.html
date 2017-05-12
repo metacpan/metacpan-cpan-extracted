@@ -1,0 +1,88 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::HttpResponse - internal http response interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::HttpResponse - internal http response interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface extends <STRONG>Servlet::Http::HttpServletResponse</STRONG> and
+<STRONG>Wombat::Response</STRONG> to provide fields and methods accessible only to
+the container.</P>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getCookies"><CODE>getCookies()</CODE></A></STRONG><BR>
+<DD>
+Return the list of Cookies for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value for the first occurrence of the named response
+header. For all values, use <A HREF="#item_getHeaderValues"><CODE>getHeaderValues()</CODE></A>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Return a list of all the header names set for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderValues"><CODE>getHeaderValues($name)</CODE></A></STRONG><BR>
+<DD>
+Return the list of values for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getMessage"><CODE>getMessage()</CODE></A></STRONG><BR>
+<DD>
+Return the status message for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getStatus"><CODE>getStatus()</CODE></A></STRONG><BR>
+<DD>
+Return the HTTP status code for this Response.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Wombat/Response.html">the Wombat::Response manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

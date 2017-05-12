@@ -1,0 +1,1 @@
+Ingy is a Perl, JavaScript and Python module author (so far). Ingy is an Acmeist. He believes that programming languages act as barriers to hacker collaboration, but great hackers push their ideas over the language walls.

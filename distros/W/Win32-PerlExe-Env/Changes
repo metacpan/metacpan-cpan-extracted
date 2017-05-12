@@ -1,0 +1,19 @@
+Revision history for Perl extension Win32::PerlExe::Env.
+
+0.01  Thu Aug 24 16:42:28 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Win32::PerlExe::Env
+                
+0.02  Mon Aug 28 10:37:00 2006
+	- update _get_vars() mapping
+        - update documentation
+
+0.03  XXX Sep 28 10:37:00 2006
+	- rename exe dir to win32
+	- create examples dir and join with win32
+	- change automation concept for $VERSION 
+                
+0.04  Sat Sep 09 20:55:10 2006
+	- update documentation 
+              
+

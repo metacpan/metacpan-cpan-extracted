@@ -1,0 +1,1005 @@
+{
+   "build" : [
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Zinbra",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711914",
+         "id" : 711914,
+         "number" : "960",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711914&buildTypeId=Epigenome_Zinbra"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_GemlBee",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711913",
+         "id" : 711913,
+         "number" : "859",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711913&buildTypeId=Epigenome_GemlBee"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Tools_Integration",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711912",
+         "id" : 711912,
+         "number" : "679",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711912&buildTypeId=Epigenome_Tools_Integration"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Cmeth",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711911",
+         "id" : 711911,
+         "number" : "1772",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711911&buildTypeId=Epigenome_Cmeth"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "bt345",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711907",
+         "id" : 711907,
+         "number" : "1.0.2-dev-339",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711907&buildTypeId=bt345"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Pipeline",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711910",
+         "id" : 711910,
+         "number" : "1837",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711910&buildTypeId=Epigenome_Pipeline"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Kotlin_Java8Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711899",
+         "id" : 711899,
+         "number" : ".7615",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711899&buildTypeId=Kotlin_Java8Tests"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Kotlin_CompilerAndPluginBootstrapNoTests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711898",
+         "id" : 711898,
+         "number" : "bootstrap-(1.0.2-dev-243).17115",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711898&buildTypeId=Kotlin_CompilerAndPluginBootstrapNoTests"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "bt345",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711852",
+         "id" : 711852,
+         "number" : "1.0.2-dev-336",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711852&buildTypeId=bt345"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Kotlin_Java8Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711840",
+         "id" : 711840,
+         "number" : ".7612",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711840&buildTypeId=Kotlin_Java8Tests"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Kotlin_CompilerAndPluginBootstrapNoTests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711839",
+         "id" : 711839,
+         "number" : "bootstrap-(1.0.2-dev-243).17113",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711839&buildTypeId=Kotlin_CompilerAndPluginBootstrapNoTests"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "IntellijIdeaPlugins_Rust_Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711838",
+         "id" : 711838,
+         "number" : "308",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711838&buildTypeId=IntellijIdeaPlugins_Rust_Tests"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_Build",
+         "href" : "/httpAuth/app/rest/builds/id:711774",
+         "id" : 711774,
+         "number" : "0.3.52",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711774&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_Build"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711770",
+         "id" : 711770,
+         "number" : "6014",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711770&buildTypeId=Epigenome_Tests"
+      },
+      {
+         "buildTypeId" : "bt212",
+         "href" : "/httpAuth/app/rest/builds/id:711764",
+         "id" : 711764,
+         "number" : "656",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711764&buildTypeId=bt212"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_Build143eapSnapshot",
+         "href" : "/httpAuth/app/rest/builds/id:711772",
+         "id" : 711772,
+         "number" : "0.3.52",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711772&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_Build143eapSnapshot"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_BuildNumber",
+         "href" : "/httpAuth/app/rest/builds/id:711773",
+         "id" : 711773,
+         "number" : "0.3.52",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711773&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_BuildNumber"
+      },
+      {
+         "buildTypeId" : "bt213",
+         "href" : "/httpAuth/app/rest/builds/id:711763",
+         "id" : 711763,
+         "number" : "1184",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711763&buildTypeId=bt213"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Zinbra",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711769",
+         "id" : 711769,
+         "number" : "959",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711769&buildTypeId=Epigenome_Zinbra"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_GemlBee",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711768",
+         "id" : 711768,
+         "number" : "858",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711768&buildTypeId=Epigenome_GemlBee"
+      },
+      {
+         "buildTypeId" : "bt209",
+         "href" : "/httpAuth/app/rest/builds/id:711762",
+         "id" : 711762,
+         "number" : "1905",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711762&buildTypeId=bt209"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Tools_Integration",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711767",
+         "id" : 711767,
+         "number" : "678",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711767&buildTypeId=Epigenome_Tools_Integration"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Cmeth",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711766",
+         "id" : 711766,
+         "number" : "1771",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711766&buildTypeId=Epigenome_Cmeth"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Pipeline",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711765",
+         "id" : 711765,
+         "number" : "1836",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711765&buildTypeId=Epigenome_Pipeline"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_LongTests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711761",
+         "id" : 711761,
+         "number" : "809",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711761&buildTypeId=Epigenome_LongTests"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_Build",
+         "href" : "/httpAuth/app/rest/builds/id:711757",
+         "id" : 711757,
+         "number" : "0.3.51",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711757&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_Build"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_Build143eapSnapshot",
+         "href" : "/httpAuth/app/rest/builds/id:711759",
+         "id" : 711759,
+         "number" : "0.3.51",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711759&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_Build143eapSnapshot"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Idea_14_15_BuildNumber",
+         "href" : "/httpAuth/app/rest/builds/id:711758",
+         "id" : 711758,
+         "number" : "0.3.51",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711758&buildTypeId=IdeaAwsCloudFormation_Idea_14_15_BuildNumber"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Master_Build",
+         "href" : "/httpAuth/app/rest/builds/id:711755",
+         "id" : 711755,
+         "number" : "0.4.13",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711755&buildTypeId=IdeaAwsCloudFormation_Master_Build"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Master_BuildLatestTrunkSnapshot",
+         "href" : "/httpAuth/app/rest/builds/id:711751",
+         "id" : 711751,
+         "number" : "0.4.13",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711751&buildTypeId=IdeaAwsCloudFormation_Master_BuildLatestTrunkSnapshot"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Master_BuildLatestEapSnapshot",
+         "href" : "/httpAuth/app/rest/builds/id:711753",
+         "id" : 711753,
+         "number" : "0.4.13",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711753&buildTypeId=IdeaAwsCloudFormation_Master_BuildLatestEapSnapshot"
+      },
+      {
+         "buildTypeId" : "IdeaAwsCloudFormation_Master_BuildNumber",
+         "href" : "/httpAuth/app/rest/builds/id:711752",
+         "id" : 711752,
+         "number" : "0.4.13",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711752&buildTypeId=IdeaAwsCloudFormation_Master_BuildNumber"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_Benchmarks",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711745",
+         "id" : 711745,
+         "number" : "2165",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711745&buildTypeId=Xodus_Benchmarks"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_PublishLatestBuildToHttpRepositoryJetbrainsCom",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711743",
+         "id" : 711743,
+         "number" : "2165",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711743&buildTypeId=Xodus_PublishLatestBuildToHttpRepositoryJetbrainsCom"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_PublishSnapshotToHttpRepositoryJetbrainsCom",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711741",
+         "id" : 711741,
+         "number" : "2165",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711741&buildTypeId=Xodus_PublishSnapshotToHttpRepositoryJetbrainsCom"
+      },
+      {
+         "buildTypeId" : "ProjectsWrittenInKotlin_SysKotlin",
+         "href" : "/httpAuth/app/rest/builds/id:711739",
+         "id" : 711739,
+         "number" : "824 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711739&buildTypeId=ProjectsWrittenInKotlin_SysKotlin"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_Benchmarks",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711736",
+         "id" : 711736,
+         "number" : "2164",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711736&buildTypeId=Xodus_Benchmarks"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_PublishLatestBuildToHttpRepositoryJetbrainsCom",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711734",
+         "id" : 711734,
+         "number" : "2164",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711734&buildTypeId=Xodus_PublishLatestBuildToHttpRepositoryJetbrainsCom"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_PublishSnapshotToHttpRepositoryJetbrainsCom",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711732",
+         "id" : 711732,
+         "number" : "2164",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711732&buildTypeId=Xodus_PublishSnapshotToHttpRepositoryJetbrainsCom"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711730",
+         "id" : 711730,
+         "number" : "2165",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711730&buildTypeId=Xodus_Build"
+      },
+      {
+         "buildTypeId" : "VMprofPython_BuildForWindows",
+         "href" : "/httpAuth/app/rest/builds/id:711726",
+         "id" : 711726,
+         "number" : "10",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711726&buildTypeId=VMprofPython_BuildForWindows"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPy27Win",
+         "href" : "/httpAuth/app/rest/builds/id:711724",
+         "id" : 711724,
+         "number" : "82",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711724&buildTypeId=VMprofPython_TestsPy27Win"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython35onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711729",
+         "id" : 711729,
+         "number" : "9",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711729&buildTypeId=VMprofPython_TestsPython35onLinux"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython34onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711727",
+         "id" : 711727,
+         "number" : "8",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711727&buildTypeId=VMprofPython_TestsPython34onLinux"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython27onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711725",
+         "id" : 711725,
+         "number" : "24",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711725&buildTypeId=VMprofPython_TestsPython27onLinux"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Xodus_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711722",
+         "id" : 711722,
+         "number" : "2164",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711722&buildTypeId=Xodus_Build"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython27onMac",
+         "href" : "/httpAuth/app/rest/builds/id:711728",
+         "id" : 711728,
+         "number" : "9",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711728&buildTypeId=VMprofPython_TestsPython27onMac"
+      },
+      {
+         "buildTypeId" : "bt209",
+         "href" : "/httpAuth/app/rest/builds/id:711706",
+         "id" : 711706,
+         "number" : "1904",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711706&buildTypeId=bt209"
+      },
+      {
+         "buildTypeId" : "bt213",
+         "href" : "/httpAuth/app/rest/builds/id:711705",
+         "id" : 711705,
+         "number" : "1183",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711705&buildTypeId=bt213"
+      },
+      {
+         "buildTypeId" : "bt217",
+         "href" : "/httpAuth/app/rest/builds/id:711704",
+         "id" : 711704,
+         "number" : "796",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711704&buildTypeId=bt217"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "Checkstyle_IdeaInspectionsPullRequest",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711663",
+         "id" : 711663,
+         "number" : "1884",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711663&buildTypeId=Checkstyle_IdeaInspectionsPullRequest"
+      },
+      {
+         "buildTypeId" : "Checkstyle_IdeaInspectionsMaster",
+         "href" : "/httpAuth/app/rest/builds/id:711662",
+         "id" : 711662,
+         "number" : "640",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711662&buildTypeId=Checkstyle_IdeaInspectionsMaster"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "IntellijIdeaPlugins_Rust_UploadNightly",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711648",
+         "id" : 711648,
+         "number" : "307",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711648&buildTypeId=IntellijIdeaPlugins_Rust_UploadNightly"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "NUnit_NUnit3_BuildAndTest",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711595",
+         "id" : 711595,
+         "number" : "1317",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711595&buildTypeId=NUnit_NUnit3_BuildAndTest"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "NUnit_NUnit3_BuildAndTest_WindowsNet20",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711594",
+         "id" : 711594,
+         "number" : "1314",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711594&buildTypeId=NUnit_NUnit3_BuildAndTest_WindowsNet20"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "NUnit_NUnit3_BuildAndTest_WindowsNet45",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711593",
+         "id" : 711593,
+         "number" : "1322",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711593&buildTypeId=NUnit_NUnit3_BuildAndTest_WindowsNet45"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "NUnit_NUnit3_BuildAndTest_WindowsNetAllFrameworks",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711592",
+         "id" : 711592,
+         "number" : "1324",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711592&buildTypeId=NUnit_NUnit3_BuildAndTest_WindowsNetAllFrameworks"
+      },
+      {
+         "buildTypeId" : "Scala_Tests",
+         "href" : "/httpAuth/app/rest/builds/id:711601",
+         "id" : 711601,
+         "number" : "2.1.305",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711601&buildTypeId=Scala_Tests"
+      },
+      {
+         "buildTypeId" : "Scala_Package",
+         "href" : "/httpAuth/app/rest/builds/id:711591",
+         "id" : 711591,
+         "number" : "2.1.305",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711591&buildTypeId=Scala_Package"
+      },
+      {
+         "buildTypeId" : "IntelliJIdeaCe_JavaDecompilerEngineTests",
+         "href" : "/httpAuth/app/rest/builds/id:711569",
+         "id" : 711569,
+         "number" : "127",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711569&buildTypeId=IntelliJIdeaCe_JavaDecompilerEngineTests"
+      },
+      {
+         "branchName" : "refs/heads/master",
+         "buildTypeId" : "IntellijIdeaPlugins_Rust_Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711523",
+         "id" : 711523,
+         "number" : "307",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711523&buildTypeId=IntellijIdeaPlugins_Rust_Tests"
+      },
+      {
+         "buildTypeId" : "TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk",
+         "href" : "/httpAuth/app/rest/builds/id:711506",
+         "id" : 711506,
+         "number" : "6",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711506&buildTypeId=TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk"
+      },
+      {
+         "buildTypeId" : "TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk",
+         "href" : "/httpAuth/app/rest/builds/id:711505",
+         "id" : 711505,
+         "number" : "5",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711505&buildTypeId=TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk"
+      },
+      {
+         "buildTypeId" : "bt446",
+         "href" : "/httpAuth/app/rest/builds/id:711503",
+         "id" : 711503,
+         "number" : "2045",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711503&buildTypeId=bt446"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "KotlinTools_KotlinxDom_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711504",
+         "id" : 711504,
+         "number" : "350",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711504&buildTypeId=KotlinTools_KotlinxDom_Build"
+      },
+      {
+         "buildTypeId" : "bt440",
+         "href" : "/httpAuth/app/rest/builds/id:711502",
+         "id" : 711502,
+         "number" : "2042",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711502&buildTypeId=bt440"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "KotlinTools_Exposed_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711501",
+         "id" : 711501,
+         "number" : "133",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711501&buildTypeId=KotlinTools_Exposed_Build"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "KotlinTools_KotlinxReflectLite_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711500",
+         "id" : 711500,
+         "number" : "462",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711500&buildTypeId=KotlinTools_KotlinxReflectLite_Build"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "KotlinTools_KotlinxHtml_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711499",
+         "id" : 711499,
+         "number" : "0.5.8-SNAPSHOT 992",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711499&buildTypeId=KotlinTools_KotlinxHtml_Build"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "KotlinTools_Ktor_Build",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711498",
+         "id" : 711498,
+         "number" : "837",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711498&buildTypeId=KotlinTools_Ktor_Build"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython35onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711497",
+         "id" : 711497,
+         "number" : "8",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711497&buildTypeId=VMprofPython_TestsPython35onLinux"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "bt438",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711320",
+         "id" : 711320,
+         "number" : "1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711320&buildTypeId=bt438"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython27onMac",
+         "href" : "/httpAuth/app/rest/builds/id:711496",
+         "id" : 711496,
+         "number" : "8",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711496&buildTypeId=VMprofPython_TestsPython27onMac"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython34onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711495",
+         "id" : 711495,
+         "number" : "7",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711495&buildTypeId=VMprofPython_TestsPython34onLinux"
+      },
+      {
+         "buildTypeId" : "VMprofPython_BuildForWindows",
+         "href" : "/httpAuth/app/rest/builds/id:711494",
+         "id" : 711494,
+         "number" : "9",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711494&buildTypeId=VMprofPython_BuildForWindows"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPython27onLinux",
+         "href" : "/httpAuth/app/rest/builds/id:711493",
+         "id" : 711493,
+         "number" : "23",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711493&buildTypeId=VMprofPython_TestsPython27onLinux"
+      },
+      {
+         "buildTypeId" : "VMprofPython_TestsPy27Win",
+         "href" : "/httpAuth/app/rest/builds/id:711492",
+         "id" : 711492,
+         "number" : "81",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711492&buildTypeId=VMprofPython_TestsPy27Win"
+      },
+      {
+         "buildTypeId" : "IntelliJMarkdownParser_Build",
+         "href" : "/httpAuth/app/rest/builds/id:711428",
+         "id" : 711428,
+         "number" : "3925 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711428&buildTypeId=IntelliJMarkdownParser_Build"
+      },
+      {
+         "buildTypeId" : "bt423",
+         "href" : "/httpAuth/app/rest/builds/id:711398",
+         "id" : 711398,
+         "number" : "8026 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711398&buildTypeId=bt423"
+      },
+      {
+         "buildTypeId" : "ProjectsWrittenInKotlin_KotlinWorkshop",
+         "href" : "/httpAuth/app/rest/builds/id:711422",
+         "id" : 711422,
+         "number" : "4393 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711422&buildTypeId=ProjectsWrittenInKotlin_KotlinWorkshop"
+      },
+      {
+         "buildTypeId" : "ProjectsWrittenInKotlin_ts2kt",
+         "href" : "/httpAuth/app/rest/builds/id:711416",
+         "id" : 711416,
+         "number" : "6597 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711416&buildTypeId=ProjectsWrittenInKotlin_ts2kt"
+      },
+      {
+         "buildTypeId" : "bt420",
+         "href" : "/httpAuth/app/rest/builds/id:711410",
+         "id" : 711410,
+         "number" : "8208 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711410&buildTypeId=bt420"
+      },
+      {
+         "buildTypeId" : "bt419",
+         "href" : "/httpAuth/app/rest/builds/id:711404",
+         "id" : 711404,
+         "number" : "8276 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711404&buildTypeId=bt419"
+      },
+      {
+         "buildTypeId" : "bt421",
+         "href" : "/httpAuth/app/rest/builds/id:711392",
+         "id" : 711392,
+         "number" : "8211 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711392&buildTypeId=bt421"
+      },
+      {
+         "buildTypeId" : "bt425",
+         "href" : "/httpAuth/app/rest/builds/id:711380",
+         "id" : 711380,
+         "number" : "8042 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711380&buildTypeId=bt425"
+      },
+      {
+         "buildTypeId" : "bt422",
+         "href" : "/httpAuth/app/rest/builds/id:711386",
+         "id" : 711386,
+         "number" : "8221 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711386&buildTypeId=bt422"
+      },
+      {
+         "buildTypeId" : "ProjectsWrittenInKotlin_SamplesForSpring",
+         "href" : "/httpAuth/app/rest/builds/id:711374",
+         "id" : 711374,
+         "number" : "7802 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711374&buildTypeId=ProjectsWrittenInKotlin_SamplesForSpring"
+      },
+      {
+         "buildTypeId" : "ProjectsWrittenInKotlin_SysKotlin",
+         "href" : "/httpAuth/app/rest/builds/id:711368",
+         "id" : 711368,
+         "number" : "819 - Kotlin 1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711368&buildTypeId=ProjectsWrittenInKotlin_SysKotlin"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "bt390",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711319",
+         "id" : 711319,
+         "number" : "1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711319&buildTypeId=bt390"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Zinbra",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711356",
+         "id" : 711356,
+         "number" : "958",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711356&buildTypeId=Epigenome_Zinbra"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_GemlBee",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711355",
+         "id" : 711355,
+         "number" : "857",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711355&buildTypeId=Epigenome_GemlBee"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Tools_Integration",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711354",
+         "id" : 711354,
+         "number" : "677",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711354&buildTypeId=Epigenome_Tools_Integration"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Cmeth",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711353",
+         "id" : 711353,
+         "number" : "1770",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711353&buildTypeId=Epigenome_Cmeth"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Pipeline",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711352",
+         "id" : 711352,
+         "number" : "1835",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711352&buildTypeId=Epigenome_Pipeline"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Epigenome_Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711351",
+         "id" : 711351,
+         "number" : "6013",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711351&buildTypeId=Epigenome_Tests"
+      },
+      {
+         "buildTypeId" : "TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk",
+         "href" : "/httpAuth/app/rest/builds/id:711344",
+         "id" : 711344,
+         "number" : "4",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711344&buildTypeId=TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk"
+      },
+      {
+         "buildTypeId" : "TeamCityDotnetCorePluginBuild",
+         "href" : "/httpAuth/app/rest/builds/id:711342",
+         "id" : 711342,
+         "number" : "0.3.2",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711342&buildTypeId=TeamCityDotnetCorePluginBuild"
+      },
+      {
+         "buildTypeId" : "TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk",
+         "href" : "/httpAuth/app/rest/builds/id:711333",
+         "id" : 711333,
+         "number" : "3",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711333&buildTypeId=TeamCityPluginsByJetBrains_AwsCodeDeployPlugin_AgainstTeamCityTrunk"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "Kotlin_Java8Tests",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711314",
+         "id" : 711314,
+         "number" : ".7601",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711314&buildTypeId=Kotlin_Java8Tests"
+      },
+      {
+         "branchName" : "master",
+         "buildTypeId" : "bt345",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:711318",
+         "id" : 711318,
+         "number" : "1.0.2-dev-325",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=711318&buildTypeId=bt345"
+      }
+   ],
+   "count" : 100,
+   "href" : "/httpAuth/app/rest/builds/?locator=count:100,start:100",
+   "prevHref" : "/httpAuth/app/rest/builds/?locator=count:100,start:0"
+}

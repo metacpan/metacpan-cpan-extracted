@@ -1,0 +1,9 @@
+Revision history for Perl module WebService::Geograph::API
+
+0.01 Fri Nov  3 16:28:21 2006
+    - (internal realease) basic functionality
+
+0.02 CPAN here we go !
+0.03 Seriously increasing the kwalitee.
+0.04 Updated META.yml specs
+0.05 Updated META.yml specs once more, added lisence field

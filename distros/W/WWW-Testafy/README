@@ -1,0 +1,22 @@
+WWW-Testafy version 0.01
+========================
+
+Testafy's Perl API wrapper
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  JSON
+  LWP::UserAgent
+

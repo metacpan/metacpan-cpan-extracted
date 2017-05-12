@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::Search::Tv::Sweden::TvDotNu.
+
+0.01  Fri May  2 22:16:33 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n WWW::Search::Tv::Sweden::TvDotNu
+
+1.00  Sun May 4 00:09:00 2003
+	- Version 1.00 ready for release
+
+1.01  Wed Mar 31 22:32:00 2004
+        - Fixed duplicate subroutine declaration.
+	  Thanks to Kim Ahlström for finding this bug.

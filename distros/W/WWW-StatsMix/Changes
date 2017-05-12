@@ -1,0 +1,35 @@
+Revision history for WWW-StatsMix
+
+0.07  Tue Jul 21 12:00:00 2015
+      - Added LICENSE file.
+
+0.06  Wed Feb 04 11:12:00 2015
+      - Removed redundant unit test t/signature.t.
+      - Tidied up pod document of WWW::StatsMix.
+
+0.05  Sat Jan 17 11:00:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.04  Fri Sep 12 23:03:00 2014
+      - Removed un-unsed import of $FIELDS into the package WWW::StatsMix.
+
+0.03  Fri Sep 12 16:49:10 2014
+      - Updated method WWW::StatsMix::Params::validate() to validate every data passed.
+      - Updated unit test 02-create_metric.t, 03-update_metric.t, 07-get_stat.t, 08-update_stat.t and 09-delete_stat.t
+      - Updated pod documentation about parameters specification of each methods in the package WWW::StatsMix.
+
+0.02  Mon Sep 08 23:08:01 2014
+      - Deleted un-used package WWW::StatsMix::Track.
+      - Updated unit test 00-load.t to test all new packages.
+      - Added new unit test signature.t
+      - Updated WWW::StatsMix pod to have correct link to helper package.
+      - Added section 'REPOSITORY' to the WWW::StatsMix::Metric pod.
+      - Added section 'REPOSITORY' to the WWW::StatsMix::Stat pod.
+      - Added section 'REPOSITORY' to the WWW::StatsMix::Params pod.
+      - Added section 'REPOSITORY' to the WWW::StatsMix::UserAgent pod.
+      - Added section 'REPOSITORY' to the WWW::StatsMix::UserAgent::Exception pod.
+
+0.01  Sun Sep 07 22:40:10 2014
+      - First version, released.

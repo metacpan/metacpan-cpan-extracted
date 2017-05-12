@@ -1,0 +1,258 @@
+<HTML>
+<HEAD>
+<TITLE>Categories</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#syntax">SYNTAX</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Categories - Create and process categories within MySQL DB</P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Categories.pm ver.1.0</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Categories allows you to create and process categories (for products/directories/shops and etc...)</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ There is an example that you may use in your own CGI scripts:</PRE>
+<PRE>
+ # --- Script begin here ---
+ use Categories;</PRE>
+<PRE>
+ # NOTE: new() method will create needed DB structure in MySQL (database &amp; tables) if they not exist!
+ #       Please create database before execute this script or DB USER must have privilege to create DBs!
+</PRE>
+<PRE>
+
+ $obj = Categories-&gt;new(database =&gt; 'catsdb', user =&gt; 'db_user', pass =&gt; 'db_pass', host =&gt; 'localhost');
+      # OR
+      # $obj = Categories-&gt;new(dbh =&gt; $mysql_dbh_handler);</PRE>
+<PRE>
+
+ if($obj)
+  {
+   my $comp_id = $obj-&gt;add(type=&gt;'category',name=&gt;'Computers',category=&gt;0);
+   my $film_id = $obj-&gt;add(type=&gt;'category',name=&gt;'Films',category=&gt;0);
+   my $matr_id = $obj-&gt;add(type=&gt;'item',name=&gt;'The Matrix',category=&gt;$film_id);
+   my $one_id  = $obj-&gt;add(type=&gt;'item',name=&gt;'The One',category=&gt;$film_id);
+   my $cpu_id  = $obj-&gt;add(type=&gt;'category',name=&gt;'CPU',category=&gt;$comp_id);
+   my $hdd_id  = $obj-&gt;add(type=&gt;'category',name=&gt;'HDD',category=&gt;$comp_id);
+   my $xp18_id = $obj-&gt;add(type=&gt;'item',name=&gt;'Athlon XP 1800+',category=&gt;$cpu_id);
+   my $xp20_id = $obj-&gt;add(type=&gt;'item',name=&gt;'Athlon XP 2000+',category=&gt;$cpu_id);
+   my $xp21_id = $obj-&gt;add(type=&gt;'item',name=&gt;'Athlon XP 2100+',category=&gt;$cpu_id);
+   my $hdd1_id = $obj-&gt;add(type=&gt;'item',name=&gt;'Maxtor 80 GB',category=&gt;$hdd_id);
+   my $hdd2_id = $obj-&gt;add(type=&gt;'item',name=&gt;'Maxtor 120 GB',category=&gt;$hdd_id);</PRE>
+<PRE>
+
+   # Find categories and items (filter=&gt;ALL) that has NAME (by=&gt;NAME) 'The Matrix' order by ID (sort=&gt;ID)
+   # and return multiple results (multiple=&gt;YES) if available, also return rout path to this element 
+   # (route=&gt;YES) using category cache (preload=&gt;YES) to speed up searching. However 'preload' option may be
+   # worse if categories table is too long, because script load whole table and may crush if not enough memmory!</PRE>
+<PRE>
+
+   my @res = $obj-&gt;find('search'=&gt;'The Matrix','sort'=&gt;'ID','by'=&gt;'NAME','filter'=&gt;'ALL','multiple'=&gt;YES,
+                        'route'=&gt;YES,'preload'=&gt;YES,'partial'=&gt;NO,'reverse'=&gt;NO,'sort'=&gt;'NAME');
+   if(scalar(@res))
+     {
+      foreach $l (@res)
+       {
+         my ($type,$id,$parent_category,$name,$route_path) = @$l;
+         print &quot;Type:   $type&lt;BR&gt;\n&quot;;
+         print &quot;ID:     $id&lt;BR&gt;\n&quot;;
+         print &quot;PARENT: $parent_category&lt;BR&gt;\n&quot;;
+         print &quot;NAME:   $name&lt;BR&gt;\n&quot;;
+         $route_path =~ s~//~\\~sgi;
+         $route_path =~ s~\\(.*?)\x0~\\~sgi;
+         print &quot;PATH:   $route_path&lt;BR&gt;\n&quot;;
+       }
+     }
+    print &quot;&lt;HR&gt;&quot;;</PRE>
+<PRE>
+
+    # Modify: Change PARENT/CID and/or NAME
+    $obj-&gt;modify(id=&gt;$xp21_id,type=&gt;'item',name=&gt;'Duron 1300 MHz');
+    $obj-&gt;modify(id=&gt;$comp_id,type=&gt;'category',name=&gt;'PC');
+    $obj-&gt;modify(id=&gt;$cpu_id,type=&gt;'category',newcid=&gt;0);</PRE>
+<PRE>
+
+    $obj-&gt;deep_traverse('preload'=&gt;Y,'id'=&gt;0,'level'=&gt;0,'path'=&gt;'//','eval'=&gt;\&amp;Walk,'sort'=&gt;'NAME');</PRE>
+<PRE>
+
+    # Delete ROOT category, so all items/categories are deleted!
+    $obj-&gt;del(type=&gt;'category',id=&gt;0);
+   }
+  else
+   {
+    print $Categories::error;
+   }</PRE>
+<PRE>
+
+ sub Walk
+ {
+  my $self = shift;
+  my %inp  = @_;</PRE>
+<PRE>
+
+  my $id              = $inp{'id'};
+  my $level           = $inp{'level'};
+  my $separator       = $inp{'separator'};
+  my $path            = $inp{'path'};
+  my $name            = $inp{'name'};
+  my $type            = $inp{'type'};</PRE>
+<PRE>
+
+  $path =~ s~$separator~\\~sgi;
+  $path =~ s~\\(.*?)\x0~\\~sgi;
+  print $path.&quot;$name&lt;BR&gt;&quot;;
+ }
+ # --- Script ends here ---</PRE>
+<P>
+<HR>
+<H1><A NAME="syntax">SYNTAX</A></H1>
+<PRE>
+ That is simple function reference:
+</PRE>
+<PRE>
+
+ $object = Categories-&gt;new(database=&gt;'catsdb', user=&gt;'db_user', pass=&gt;'db_pass', host=&gt;'localhost', 
+                           port=&gt;'3306', create=&gt;'Y', checkdb=&gt;'Y', name=&gt;'catdb', dbh=&gt;$connect_db_handler);
+    Where:
+    database  - is your DB where categories (tables) will be placed. If database not exist module
+                will try to create one for you, using supplied user and password. [REQUIRED if $dbh empty]
+    user/pass - is your DB user and password [REQUIRED if $dbh empty]
+    host      - MySQL DB host
+    port      - your MySQL port
+    create    - module will attempt to create DB and/or tables
+    checkdb   - module will try to check DB structure
+    name      - name of category object
+    dbh       - you can supply already connected database handler instead of database/user/pass/host/port!</PRE>
+<PRE>
+
+ $state = $object-&gt;is_tables_exists(name=&gt;'name_of_category_object');
+    Check database structure only.</PRE>
+<PRE>
+
+ $state = $object-&gt;create_tables(name=&gt;'name_of_category_object');
+    Create table structure (database should exist!)</PRE>
+<PRE>
+
+ $state = $object-&gt;clear_cache();
+    Clear categories cache.</PRE>
+<PRE>
+
+ @cats = $object-&gt;preload_categories(name=&gt;'name_of_category_object', sort=&gt;'NAME', reverse=&gt;'N');
+    Create categories cache and return array of all categories. @cats is array of references to hashes;
+    Where:
+           sort      - is name of column (order by),
+           reverse   - reverse results (DESC)
+    HINT: $ref = $cats[0]; %hash = %$ref; $name = $hash{'NAME'}; $id = $hash{'ID'}; $parent = $hash{'PARENT'};</PRE>
+<PRE>
+
+ @res = $object-&gt;find(caseinsensitive=&gt;'Y', filter=&gt;'ITEMS', multiple=&gt;'Y', by=&gt;'ID', sort=&gt;'NAME',
+                      reverse=&gt;'N', partial=&gt;'N', search=&gt;'keyword', check=&gt;'N', route=&gt;'N',
+                      separator=&gt;'//', preload=&gt;'Y');
+    Where:
+          caseinsensitive  - search is caseinsensitive,
+          filter           - define where sub must search (ITEMS,CATEGORIES,ALL),
+          multiple         - allows muliple results,
+          by               - search BY column,
+          sort             - 'order by' all results,
+          reverse          - reverse all results,
+          partial          - allows partial search ( LIKE %something%),
+          search           - search keyword,
+          check            - test tables structure,
+          route            - find path to root,
+          separator        - use follow separator to separate categories in route path,
+          preload          - allows categories cache.
+    @res is array of reference to arrays. Every element of array (dereferenced is array too) has follow structure:
+          [0] - 'I' or 'C' (Item or Category),
+          [1] - ID of Item/Category,
+          [2] - PARENT (category ID),
+          [3] - NAME of Item/Category,
+          [4] - If route=&gt;'Y' this will be full path to this Item/Category (//id\x0Computers//id\x0CPU...)
+                where respective ID is separated from respective NAME with \x0 !</PRE>
+<PRE>
+ $id = $object-&gt;add(type=&gt;'ITEM', category=&gt;'0', name=&gt;'Name_Of_Element', check=&gt;'N');
+     Where:
+           type      - is type of element ('ITEM' and 'CATEGORY'),
+           category  - is ID of parent (0 is root),
+           name      - name of new item/category,
+           check     - test tables structure.
+           $id is ID of created element.</PRE>
+<PRE>
+ $cnt = $object-&gt;del(type=&gt;'ITEM', id=&gt;'0', check=&gt;'N', preload=&gt;'Y');
+      Where:
+            type      - is type of element ('ITEM' and 'CATEGORY'),
+            id        - is ID of Item/Category (0 is root),
+            check     - test tables structure,
+            preload   - allows categories cache.
+            $cnt is number of affected(deleted) rows.</PRE>
+<PRE>
+ $cnt = $object-&gt;modify(type=&gt;'ITEM', id=&gt;'id_of_element', newcid=&gt;'id_of_new_parent', check=&gt;'N',
+                        name=&gt;'new_name_of_element', preload=&gt;'Y');
+      Where:
+            type      - is type of element ('ITEM' and 'CATEGORY'),
+            id        - is ID of Item/Category,
+            check     - test tables structure,
+            name      - new name item/category (if you dismiss filed, NAME will not be affected!),
+            newcid    - new Parent category ID (if you dismiss filed, PARENT will not be affected!),
+            preload   - allows categories cache.
+            $cnt is number of affected(deleted) rows.
+</PRE>
+<PRE>
+
+ $cnt = $object-&gt;traverse(cid=&gt;'id_of_category', eval=&gt;\&amp;callback_sub', check=&gt;'N',
+                          sort=&gt;'NAME', reverse=&gt;'N', preload=&gt;'Y');
+      This sub traverse in width.
+      Where:
+            cid      - ID of category that should be traversed,
+            eval     - reference to sub that will be called for every category,
+                       it will be called as: &amp;$eval($self,'id'=&gt;$current,'parent'=&gt;$cid);</PRE>
+<PRE>
+ $cnt = $object-&gt;deep_traverse(id=&gt;'id_of_category', level=&gt;'0', separator=&gt;'//', path=&gt;'//',
+                               eval=&gt;\&amp;callback_sub', sort=&gt;'NAME', reverse=&gt;'N', check=&gt;'N',
+                               preload=&gt;'Y');
+      deep_traverse is recursive sub and it traverse in deep. At fist step level should be '0' and
+      path '//' (like separator); eval is also reference to callback sub and it will be called as:
+</PRE>
+<PRE>
+
+      &amp;$evala($self,'id'=&gt;$id,'level'=&gt;$level,'type'=&gt;$whereis,'path'=&gt;$path,
+              'name'=&gt;$item_name,'separator'=&gt;$separator);
+      where 'name' will be available only for Items (type=&gt;'I'), but not for categories (type=&gt;'C')</PRE>
+<PRE>
+ $cnt = $object-&gt;load_category(cid=&gt;'id_of_category', sort=&gt;'NAME', reverse=&gt;'N', preload=&gt;'Y');
+      This method will load only Items/Categories of 'cid' category (without recurse)!</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+ Julian Lishev - Bulgaria, Sofia, 
+ e-mail: julian@proscriptum.com, 
+ www.proscriptum.com</PRE>
+
+</BODY>
+
+</HTML>

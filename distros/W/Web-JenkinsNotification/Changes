@@ -1,0 +1,16 @@
+Revision history for Perl extension Web::JenkinsNotification
+
+0.05    日  5/27 14:31:50 2012
+        - Rename as Web::JenkinsNotification
+
+0.04    日  5/27 14:03:09 2012
+        - Might migrate this module to Jenkins::NotificationListener::App
+
+0.03    六  5/26 16:24:12 2012
+        - Rename App:: to Middleware::
+
+0.02    六  5/26 11:47:30 2012
+        - Return JSON on success.
+
+0.01    Sat May 26 11:25:07 2012
+        - original version

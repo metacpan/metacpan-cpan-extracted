@@ -1,0 +1,19 @@
+201[
+    {
+        "end_user_description": "something you can purchase", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259778, 
+        "pub_title": "example good", 
+        "named_good_collection_id": 443, 
+        "collection_uri": "/api/publisher/a4a546d5fc3143bd9d38c98a35050e3a/named_good_collection/443", 
+        "resource_name": "named_good", 
+        "urls": [], 
+        "attributes": [], 
+        "created_timestamp": 1294259778, 
+        "pub_description": "something you can purchase", 
+        "end_user_title": "example good", 
+        "relative_weight": "1", 
+        "id": 1042
+    }, 
+    {}
+]

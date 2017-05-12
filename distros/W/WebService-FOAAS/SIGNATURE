@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2ecfeedc64859e8bd38c65e7154b029e111e3785 Changes
+SHA1 061c55345eb5b9fb86c51d54954192b94b02c34e MANIFEST
+SHA1 d8a9f998a6efb75cbe85c1b06223ceb18bab9bbf META.json
+SHA1 2fdb1778bd8191fbd84d4d226970a661ab5a90d6 META.yml
+SHA1 6aba177b34dc0212cf5e43fd3bfde329ef0cea40 Makefile.PL
+SHA1 383328ed98178253549a2a60205c2e00d2f11c19 README
+SHA1 8eb978fcad38535ba95f5749046dab37279f7313 codegen
+SHA1 c25d184fa515a82d9dc168f1853cd20b20fb8046 lib/WebService/FOAAS.pm
+SHA1 ef4e01093533fce28e87cb88371f1fb3a84fc32d lib/WebService/FOAAS/Codegen.pm
+SHA1 3b5095c2e95cb6abcccca4c48b2e4ffb1a922ab2 t/WebService-FOAAS.t
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYngAGEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2I/oQ//
+aWh8dGUVBIplBK4KXLBZ2oWhdA3K8Hx7vPglgrPyDMWAWvptlCQctOOIDvZ0VnmV
+f4reHL3XXV6NhY877WpDD6+7v0abGByTfohhNlETGZCJceqQe5vMH2dFI245st1G
+if3U/9BKyr4kcElUxDyQzIqDEHlokwp1E1OHrkivFaOVXc6WtqR4BUP/SVsr0Z2Z
+bZ/HlrwsDehCZ2x/QhLfeaNW0GKyevdN0EImYunzxyJPVt+UMsxHTc7+5FPmwBK8
+OSBLJLCFcfQUnaoIvbgIAbfKKgBqU6cBLK+4Sxvq6HZ07FiHfGPo82ZvpyTZdgk4
+P0PfQlGv6/dZl57CVxXtneMW1e9pR678mbIR89ocsqrriQzTYlq9ZYHaWiFi6aUp
+kzEsXGGgeSr1CcwGRwK3rDqI0fkNDSB1C1aQwxkyQpS22z1OIbg+P4Gg2nXirraU
+nHj60P4XEyDgx62fGdabtUUdmf9n6GnEgrjIwITL7XVhucY3Yhpp+/uBLZS9qIZz
+vjQ7/QGiHsgc8YxHpQuymIsJ2pPt0r6OMIysc0RtM6Fup0ZBAqAtcP9wZjkpiWIj
+g9mWYBCfKY1i7iQ4KssXpSpnI3X+jByyQH8Q5lMm9ztQGntXb5HEzRxF+3dKarsI
+bRx1KUPdcYw2DHclzlb6CYQwDcSVIYD1tmCKMjKS3WY=
+=mCWe
+-----END PGP SIGNATURE-----

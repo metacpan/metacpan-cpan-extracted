@@ -1,0 +1,131 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use vars '$VERSION';
+$VERSION = 0.01;
+
+use Getopt::Std;
+use WWW::Velib::Map;
+
+getopts('d:f:n:sv', \my %opt);
+
+$opt{v} and do {print "$0 v$VERSION\n" and exit};
+
+my %init;
+$opt{f} and $init{file} = $opt{f};
+my $m = WWW::Velib::Map->new(%init);
+
+my $origin = shift; # 2017 3011
+
+(!$opt{d} and !$opt{n}) and $opt{n} = 8;
+my $status = $opt{s} ? 0 : 1;
+
+my @station;
+if ($opt{n}) {
+    @station = $m->search( station => $origin, status => $status, n => $opt{n});
+}
+elsif ($opt{d}) {
+    @station = $m->search( station => $origin, status => $status, distance => $opt{d});
+}
+
+for my $s (@station) {
+    print "station $s->{number} ($s->{dist}m)\n    $s->{fullAddress}\n";
+    if ($status) {
+        my $free      = '_' x $s->free;
+        my $available = '%' x $s->available;
+        my $disabled  = 'x' x $s->disabled;
+        print "    $available$free$disabled\n";
+    }
+    print "\n";
+}
+
+$m->save("velib-map-" . time . ".txt");
+
+__END__
+
+=head1 NAME
+
+velistat - Velib' station status report
+
+=head1 SYNOPSIS
+
+B<velistat> [B<-f file>] [-s] [-d nnn] [-n nnn] station
+
+=head1 DESCRIPTION
+
+Report on the stations nearest a given station, optionally reporting bike
+availability.
+
+Takes the station number (I<e.g.> 2007, 4004, ...) as an argument, and
+the following optional command line switches.
+
+=head1 EXAMPLE
+
+Find all stations within 450m of station 1001
+
+ % velistat -d 450 1001
+ station 1001 (0m)
+     41 QUAI DE L'HORLOGE - 75001 PARIS
+     %%%%_________xxx
+
+ station 1101 (180m)
+     2 PLACE DE L'ECOLE - 75001 PARIS
+     %%%%_______________________
+
+ station 6014 (275m)
+     7 RUE DU PONT DE LODI - 75006 PARIS
+     %%%_______
+
+ station 1011 (350m)
+     46 RUE DE L'ARBRE SEC - 75001 PARIS
+     %___________________
+
+ station 1010 (405m)
+     10 RUE DU PONT NEUF - 75001 PARIS
+     %_______________________x
+
+ station 1009 (445m)
+     14 RUE DU PONT NEUF - 75001 PARIS
+     %%_______________x
+
+Legend: % is a bicycle (mnemonic: looks like a bike), _ is a free slot, and x
+represents a broken bicycle or slot.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f> file
+
+Use a cached map file instead of downloading a map.
+
+=item B<-d> nnn
+
+Find all stations within nnn metres of given station.
+
+=item B<-n> nnn
+
+Find the nnn closest stations (if C<-d> and C<-n> are not given,
+defaults to 1).
+
+=item B<-s>
+
+Download the status of each station (available bikes, available slots).
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Velib>
+
+=head1 AUTHOR
+
+Copyright (C) 2007 David Landgren. All rights reserved.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

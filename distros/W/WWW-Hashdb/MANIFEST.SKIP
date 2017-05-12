@@ -1,0 +1,6 @@
+\.DS_Store
+.*.old
+.*.bak
+tmp
+Makefile$
+Debian_CPANTS.txt

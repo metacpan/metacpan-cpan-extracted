@@ -1,0 +1,137 @@
+use strict;
+use warnings;
+use vars '$VERSION';
+
+$VERSION = '0.02';
+
+use Getopt::Std;
+
+use WWW::Velib;
+
+getopts( 'a:c:eLl:m:p:', \my %opt );
+
+my ($login, $pin, $cache);
+
+if ($opt{e}) {
+    $login = $ENV{VELIB_LOGIN};
+    $pin   = $ENV{VELIB_PIN};
+}
+exists $opt{l} and $login = $opt{l};
+exists $opt{p} and $pin   = $opt{p};
+
+my %arg;
+
+if (defined $login and defined $pin) {
+    $arg{login} = $login;
+    $arg{pin}   = $pin;
+}
+else {
+    $arg{defer} = 1;
+}
+
+exists $opt{a} and $arg{myaccount} = $opt{a};
+exists $opt{c} and $arg{cache_dir} = $opt{c};
+
+if ($opt{a}) {
+    $arg{myaccount} = $opt{a};
+    if (!-f $opt{a} and $opt{c}) {
+        my $file = "$opt{c}/$opt{a}";
+        $arg{myaccount} = $file if -f $file;
+    }
+}
+
+if ($opt{m}) {
+    $arg{month} = $opt{m};
+    if (!-f $opt{m} and $opt{c}) {
+        my $file = "$opt{c}/$opt{m}";
+        $arg{month} = $file if -f $file;
+    }
+}
+
+if ($opt{L} and $arg{cache_dir}) {
+    my $dir = $arg{cache_dir};
+    opendir D, $dir or die "Cannot open directory $dir: $!\n";
+    my $month_epoch = 0;
+    my $acct_epoch = 0;
+    while (defined(my $entry = readdir D)) {
+        next if $entry eq '.' or $entry eq '..';
+        if ($entry =~ /^month\./) {
+            my $file = "$dir/$entry";
+            my $mtime = (stat $file)[9];
+            if ($month_epoch < $mtime) {
+                $month_epoch = $mtime;
+                $arg{month} = $file;
+            }
+        }
+        elsif ($entry =~ /^myaccount\./) {
+            my $file = "$dir/$entry";
+            my $mtime = (stat $file)[9];
+            if ($acct_epoch < $mtime) {
+                $acct_epoch = $mtime;
+                $arg{myaccount} = $file;
+            }
+        }
+    }
+    closedir D;
+}
+
+my $v = WWW::Velib->new(%arg);
+$v->get_month unless $arg{defer};
+
+if ($opt{b}) {
+    print $v->conso_bal, "\n";
+    exit;
+}
+
+defined $v->end_date and print
+    'end_date    = ', $v->end_date, "\n",
+    'remain      = ', $v->remain, "\n",
+    'in use      = ', $v->in_use, "\n",
+    'conso_bal   = ', $v->conso_bal,  " (balance = ", $v->balance, ")\n",
+    'conso_month = ', $v->conso_month, "\n",
+    'conso_year  = ', $v->conso_year, "\n",
+    'conso_trips = ', $v->conso_trips, "\n",
+    'conso_time  = ', $v->conso_time, "\n",
+;
+
+while (my $trip = $v->next_trip) {
+    print "$trip->{date} $trip->{duration}m from $trip->{from} to $trip->{to}\n";
+}
+
+__END__
+
+=head1 NAME
+
+velib - Velib' web information
+
+=head1 SYNOPSIS
+
+B<velib>
+
+=head1 DESCRIPTION
+
+=head1 EXAMPLE
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f> file
+
+Use a cached map file instead of downloading a map.
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Velib>
+
+=head1 AUTHOR
+
+Copyright (C) 2007 David Landgren. All rights reserved.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

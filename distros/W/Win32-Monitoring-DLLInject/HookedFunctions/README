@@ -1,0 +1,28 @@
+README
+------
+
+At the time of writing (25-08-2008) only the build system with ming32
+works correctly. I assume that the preprocessor syntax is different
+in Visual C, so this has to be forked/fixed for working with that
+framework.
+
+-- Roman Plessl
+
+* ********************************************************************** 
+* Win32::Monitoring::DllInject - 
+*    Injects code into Win32 programs to overloaded functions
+* **********************************************************************
+* README:  for DLLInjector.dll
+* ********************************************************************** 
+* Authors: Tobias Oetiker
+*          Roman Plessl  
+*
+* Copyright (c) 2008 by OETIKER+PARTNER AG. All rights reserved.
+* 
+* Win32::Monitoring::DllInject is free software: you can redistribute 
+* it and/or modify it under the terms of the GNU General Public License 
+* as published by the Free Software Foundation, either version 3 of the 
+* License, or (at your option) any later version.
+*
+* $Id: README 203 2009-07-23 09:09:58Z rplessl $ 
+* **********************************************************************

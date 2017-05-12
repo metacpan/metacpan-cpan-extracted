@@ -1,0 +1,7 @@
+bin/findacronym.pl
+AcronymFinder.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl

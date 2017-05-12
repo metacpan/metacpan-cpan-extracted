@@ -1,0 +1,23 @@
+---
+abstract: 'recursively examine an Active Directory structure'
+author:
+  - "Chris 'BinGOs' Williams <bingos@cpan.org>"
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-ADRecurse
+requires:
+  Exporter: 0
+  Win32::OLE: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/win32-adrecurse
+  repository: https://github.com/bingos/win32-adrecurse.git
+version: 0.04

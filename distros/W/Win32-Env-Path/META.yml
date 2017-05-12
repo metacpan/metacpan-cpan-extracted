@@ -1,0 +1,32 @@
+---
+abstract: 'Manipulate environment PATH strings'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+  Test::Script: 1.03
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Win32::Env::Path
+name: Win32-Env-Path
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Spec: 0.80
+  Params::Util: 0.10
+  Win32::TieRegistry: 0.03
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Win32-Env-Path
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Win32-Env-Path
+version: 0.03

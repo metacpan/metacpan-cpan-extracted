@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README.md
+cpanfile
+lib/WebService/Diffbot.pm
+t/00-compile.t
+t/00-report-prereqs.t
+t/basic.t
+t/release-distmeta.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

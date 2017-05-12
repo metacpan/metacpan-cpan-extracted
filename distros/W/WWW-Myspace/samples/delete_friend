@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w -I../lib
+# Delete a friend
+#
+# usage: delete_friend friendID
+
+use WWW::Myspace;
+
+my ( $friend_id ) = @ARGV;
+
+unless ( ( defined $friend_id ) && ( $friend_id =~ /^[0-9]+$/ ) ) {
+	die "usage: delete_friend friendID\n";
+}
+
+my $myspace = new WWW::Myspace;
+die "Login failed\n" unless $myspace->logged_in;
+
+if ( $myspace->delete_friend( $friend_id ) ) {
+	print "Deleted\n";
+} else {
+	print "Delete failed\n";
+}

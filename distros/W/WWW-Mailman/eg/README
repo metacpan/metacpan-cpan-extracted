@@ -1,0 +1,19 @@
+All scripts in this directory assume the following:
+- all files are stored in the current working directory
+- the default mailman configuration file is mailman.yml
+- the cookies are read/stored in mailman.cookies
+
+Supported command-line options:
+--config <YAML config file>
+--cookie <cookie file>
+
+
+The mailman.yml file has the following stucture:
+
+---
+example:
+  uri: http://lists.example.com/mailman/listinfo/example
+  email: user@example.com
+  password: s3kr3t
+  admin_password: b1gs3kr3t
+  moderator_password: s3kr3t

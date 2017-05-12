@@ -1,0 +1,32 @@
+201[
+    {
+        "end_user_description": "end user description", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259825, 
+        "pub_title": "Test URL", 
+        "url": "http://example.com/", 
+        "is_media_url": null, 
+        "is_for_end_user_ui": null, 
+        "created_timestamp": 1294259825, 
+        "pub_description": "test description", 
+        "end_user_title": "end user title", 
+        "attributes": [
+            {
+                "end_user_description": "end user description", 
+                "read_only": 0, 
+                "modified_timestamp": 1294259822, 
+                "pub_title": "Test Attirubute", 
+                "resource_name": "attribute", 
+                "friendly_id": "8ceeed54190b11e0a1e71434627823de", 
+                "attributes": [], 
+                "created_timestamp": 1294259822, 
+                "pub_description": "test description", 
+                "end_user_title": "end user title", 
+                "id": 15496
+            }
+        ], 
+        "id": 20452, 
+        "resource_name": "url"
+    }, 
+    {}
+]

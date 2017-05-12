@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Window name='W1'
+		dim='100, 100, 200, 80'
+		title='Window 1'
+	>
+		<Button
+			text='Open modal window...'
+			dim='20, $self->{W1}->Height-70, 150, 20'
+			onClick='sub { $self->{W1}->Disable; $self->{W2}->Show; }'
+		/>
+	</Window>
+	
+	<Window name='W2'
+		dim='350, 100, 200, 80'
+		title='Window 2'
+		parent='$self->{W1}'
+		show='0'
+		onTerminate='sub { $self->{W2}->Hide; $self->{W1}->Enable; $self->{W1}->BringWindowToTop; return 0; }'
+	/>
+	
+</GUI>

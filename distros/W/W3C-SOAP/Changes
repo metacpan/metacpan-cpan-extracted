@@ -1,0 +1,434 @@
+Revision history for W3C-SOAP
+
+0.14   2015-09-04
+        Updating for release of version 0.14
+        Removed creation of makefile (Ivan Wills)
+
+0.13   2015-07-20
+        Updating for release of version 0.13
+        Converted to Path::Tiny (Ivan Wills)
+        Starting to remove Path::Class (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+        Updating for release of version 0.12 (Ivan Wills)
+
+0.12   2015-05-20
+        Updating for release of version 0.12
+        Updated manifest (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Fixed incorrect version number (Ivan Wills)
+        Added two missing files (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        New test for security headders (Ivan Wills)
+        Removed unused modules (Ivan Wills)
+        Fixed XPath (Ivan Wills)
+        Improved test coverage (Ivan Wills)
+        Moved die before the skip so it wasn't skipped (Ivan Wills)
+        Changed test TODOs to be more specific and only mark the expected tests (Ivan Wills)
+        Planned talk (Ivan Wills)
+        Added skipping docs directory for deployment to CPAN (Ivan Wills)
+        Changed the xmethods.t to be more flexable and reusable (Ivan Wills)
+        Current list of what works and doesn't external URLs (Ivan Wills)
+        Added fallback to use namespace if schemaLocation not given for included/imported documents (Ivan Wills)
+        Removed "version" dependency (Ivan Wills)
+        Added ignoring test reports (Ivan Wills)
+        Added ignoring test reports (Ivan Wills)
+        fixed executable state (Ivan Wills)
+
+0.11   2015-02-28
+        Updating for release of version 0.11
+        Changed dependency (Ivan Wills)
+        Added missed test (Ivan Wills)
+        Added missing tests (Ivan Wills)
+        Updated the documentation (Ivan Wills)
+        Updated licence (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Merge pull request #13 from BrianMowrey/fix_tests (Ivan Wills)
+        2nd part of parent_module config (Brian Mowrey)
+        	-	added parent_module config entry to XSD Parser 		when creating modules.  The generated module was not extending from 		Base.pm which was causing the subtype/coercion to be missed, 		failing a test. (Brian Mowrey)
+        	-	moved simple_list coercion to after 		list coercion so list takes precedence (otherwise just ArrayRef 		gets used, instead of ArrayRef[HashRef] (Brian Mowrey)
+        Added correct file extension (Ivan Wills)
+        More tests (Ivan Wills)
+        Adding list type (Ivan Wills)
+        Added group-git tag files (Ivan Wills)
+        Turned license creation back on (Ivan Wills)
+        Removed doubled up test (Ivan Wills)
+        Made the test slightly more robust (Ivan Wills)
+        Updating for release of version 0.10 (Ivan Wills)
+        Fixed spelling test (Ivan Wills)
+
+0.10   2014-09-05
+        Lots of documentation cleaning up (Ivan Wills)
+        Fixed test to be more througher (Ivan Wills)
+        Fixed issue with restrictions with no type but enumerations (Ivan Wills)
+        Updating for release of version 0.09 (Ivan Wills)
+
+0.09   2014-08-30
+        Added skip if Test::XML isn't installed (Ivan Wills)
+        Fixed perl 5.10 dependency (Ivan Wills)
+        dch (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+        Removed temporary files (Ivan Wills)
+        Updating for next release (Ivan Wills)
+        Synced manafest.skip (Ivan Wills)
+
+0.08   2014-08-20
+        Synced manafest.skip (Ivan Wills)
+        Added new files (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP (Ivan Wills)
+        Merge pull request #11 from jonathanstowe/unusual-names (Ivan Wills)
+        Added note about which xsd tests are about (Ivan Wills)
+        Got the sense of the comparison wrong (Jonathan Stowe)
+        Trying to get this working (Ivan Wills)
+        Adding the nillable config (Ivan Wills)
+        Merge pull request #10 from jonathanstowe/unusual-names (Ivan Wills)
+        Fixed awkward locution in _perl_names Fixed indentation (Jonathan Stowe)
+        Merge branch 'master' into unusual-names (Jonathan Stowe)
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP (Ivan Wills)
+        Tests to check elements that are explicitly not nillable (Ivan Wills)
+        Tests to check elements that are nillable (Ivan Wills)
+        Trying to get null parameters working (Ivan Wills)
+        Prevent duplicate names after they have been treated (Jonathan Stowe)
+        Don't create invalid perl names when XML has unusual names (Jonathan Stowe)
+        Formatting cleanup (Ivan Wills)
+        Merge pull request #8 from jonathanstowe/use-try-tiny (Ivan Wills)
+        More test data (Ivan Wills)
+        Fixed tests, added todo option (Ivan Wills)
+        Fixed test data (Ivan Wills)
+        Added more files to ignore (Ivan Wills)
+        Added new dependency Test::XML (Ivan Wills)
+        Getting the test more correct/better (Ivan Wills)
+        Fixed test data (Ivan Wills)
+        Ignoring more (Ivan Wills)
+        Working on tests (Ivan Wills)
+        More xsd tests (Ivan Wills)
+        Added new directory to ignore (Ivan Wills)
+        Started to work on the dynamic tests (Ivan Wills)
+        Added data (Ivan Wills)
+        Developing better/easier test structure (Ivan Wills)
+        Fixed names that aren't perl compatible (Ivan Wills)
+        Temporary solution to bad names (Ivan Wills)
+        Trying to get XSDs that don't use namespaces to work (Ivan Wills)
+        removed return from try block (Jonathan Stowe)
+        Merge branch 'wsdl-parser-no-faults' into use-try-tiny (Jonathan Stowe)
+        Fix indentation (Jonathan Stowe)
+        Swapped Try::Tiny for TryCatch (Jonathan Stowe)
+        If a header is defined for an operation include it (Jonathan Stowe)
+        update MANIFEST (Jonathan Stowe)
+        Parse operation in/out headers and add to method metadata (Jonathan Stowe)
+        wsdl-parser won't fail in absence of faults on an operation (Jonathan Stowe)
+        from git dch --auto (Ivan Wills)
+        Ignoring BaseClass (Ivan Wills)
+        Updated for version 0.07 release (Ivan Wills)
+        Merge pull request #5 from jonathanstowe/5.18.1-fix (Ivan Wills)
+        Move complex type name fixup into complex_types builder (Jonathan Stowe)
+        Added sufficient laziness for it to work on 5.18.1 (Jonathan Stowe)
+        Revert "Merge branch 'perl5.18-fix-lazy' of github.com:jonathanstowe/W3C-SOAP into 5.18.1-fix" (Jonathan Stowe)
+
+0.07   2014-06-29
+        Merge pull request #5 from jonathanstowe/5.18.1-fix (Ivan Wills)
+        Move complex type name fixup into complex_types builder (Jonathan Stowe)
+        Added sufficient laziness for it to work on 5.18.1 (Jonathan Stowe)
+        Revert "Merge branch 'perl5.18-fix-lazy' of github.com:jonathanstowe/W3C-SOAP into 5.18.1-fix" (Jonathan Stowe)
+        Merge branch 'perl5.18-fix-lazy' of github.com:jonathanstowe/W3C-SOAP into 5.18.1-fix (Jonathan Stowe)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        work on Rabbit (Ivan Wills)
+        Fixed whitespace (Ivan Wills)
+        merged in master (Ivan Wills)
+        Removed to unused attributes (Ivan Wills)
+        Removed unused function (Ivan Wills)
+        Added test to confirm that unqualified and qualified elements are correctly re-inflated (Ivan Wills)
+        Minor code tidy up (Ivan Wills)
+
+0.06   2013-09-01
+        Added correct version number (Ivan Wills)
+        Updated some of the documentation (Ivan Wills)
+        Updated some of the wording (Ivan Wills)
+        Added missing files to manifest (Ivan Wills)
+        Added cleaning up generated modules (Ivan Wills)
+        Fixed generating complex types (Ivan Wills)
+        Got these tests working (Ivan Wills)
+        Fixed calling extends twice, rather than once with multiple arguments (Ivan Wills)
+        Test elementFormDefault with dynamic code (Ivan Wills)
+        Getting closer to working ComplexContent (Ivan Wills)
+        Changed complex_type template to always generate extension to base class even if there is a extension class (Ivan Wills)
+        Trying to get complexContent elements working (Ivan Wills)
+        Got unqualified element parameters to be actually unqualified (Ivan Wills)
+        Fixed missing variable declaration (Ivan Wills)
+        Fixed templates so that attribute namespaces can be set (Ivan Wills)
+        Added error in xml document is not passed in (Ivan Wills)
+        Added element_form_default attribute (Ivan Wills)
+        Exposing the xsd_parser object as attribute (Ivan Wills)
+        Improved error message (Ivan Wills)
+        #2 : Starting to try to get namespace handling under control (Ivan Wills)
+        #3 fixed the tests to work with decoded_content (Ivan Wills)
+        #3 - Fixed using content rather than decoded_content (Ivan Wills)
+
+0.05   2013-08-21
+        Fixed accedentially changed dependency version (Ivan Wills)
+        Fixed not creating coercions for list sub types of builtin types (Ivan Wills)
+        Added storing the version of the Parser that WSDL and XSD files are created by (Ivan Wills)
+        Updated changed log for next release (Ivan Wills)
+        Updated changelog for 0.04 release (Ivan Wills)
+        Added lib/W3C/SOAP/Parser.pm (Ivan Wills)
+        78875 - Fixed issues mentioned in bug (Ivan Wills)
+        Fixed some POD quoting issues (Ivan Wills)
+        Fixed module version (Ivan Wills)
+
+0.04   2013-08-19
+        Cleaned up author tests (Ivan Wills)
+        Fixed issue when fault does not have one parameter - Kim (Ivan Wills)
+        Fixed nanoseconds -> nanosecond (Ivan Wills)
+        Changed _post to post as it's the only provided method so it probably shouldn't be considered private, also documented the attributes (Ivan Wills)
+        Removed documentation of methods that moved to W3C::SOAP::WSDL (Ivan Wills)
+        Updated module descriptions (Ivan Wills)
+        Fixed sub-second handling - From Kim (Ivan Wills)
+        Working on documentation on WSDLs (Ivan Wills)
+        Working on documentation (Ivan Wills)
+        Added preserving milli-seconds in DateTimes (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Fixed handling of dateTime values with milliseconds but without timezones (Ivan Wills)
+        Fixed SOAP Fault handling (Ivan Wills)
+        Made content_type an attribute rather than being hard coded (Ivan Wills)
+        Fixed writing attributes namespace (Ivan Wills)
+        Attempting to fix issue with extended complex types not setting the correct namespace on parent elements (Ivan Wills)
+        Perlcritic Level 3 fixes (Ivan Wills)
+        Changes to make perlcritic level 4 happier (Ivan Wills)
+
+0.03   2013-08-14
+        More spelling (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Added missing POD documentation for written_modules (Ivan Wills)
+        Added more description on how to use the parser (Ivan Wills)
+        Added check that dynamic xsd type has not already been built (Ivan Wills)
+        Changed WSDL handling to better match the new documentation and added a --test option that allows the testing of all written modules and added --verbose output stating what has been done (Ivan Wills)
+        Fixed using target namespace rather than passed in namespace (Ivan Wills)
+        Changed to return all written modules (Ivan Wills)
+        Added method to return all written modules (Ivan Wills)
+        Lots of extra documentation on how to use wsdl-parser (Ivan Wills)
+        Added documentation for get_module_name (Ivan Wills)
+        Moved the get_module_base to W3C::SOAP::Document and renamed get_module_name so that it's function is clearer (Ivan Wills)
+        Fixed wrong attribute name and not setting it if not already defined (Ivan Wills)
+        Added setting up missing mappings when module_base is set (Ivan Wills)
+        Started using module_base correctly (Ivan Wills)
+        Updated help to make operation clearer (Ivan Wills)
+        Fixed missing warning about why the program is dieing (Ivan Wills)
+        Fixed max and min lengths pointing to wrong constructors (Ivan Wills)
+        Added missing tests to MANIFEST (Ivan Wills)
+
+0.02   2013-07-18
+        Added missing load test (Ivan Wills)
+        Fixed spelling mistake (Ivan Wills)
+        Fixed loading local XSD files that are relative to local other files (Ivan Wills)
+        Fixed template list (Ivan Wills)
+        Moved operation helper to lib/W3C/SOAP/WSDL/Utils.pm as it's WSDL specific (Ivan Wills)
+        Changed lazy_builder to lazy to reduce warnings (not sure why nessesary as other modules are not producing warnings) (Ivan Wills)
+        Cleaning up output (Ivan Wills)
+        Trying to cope with relative locations (Ivan Wills)
+        Added that the useragent should be required and that it should be lazy built (Ivan Wills)
+
+0.01    2013-06-22
+        Added skipping vrc.yml when building CPAN dist
+        Documented recently moved methods
+        Added skipping debian files when building CPAN dist - kim
+        Use native source format since we didn't let dh-make-perl create a pristine-tar branch. - kim
+        Removed more generated files. - kim
+        Add missed debian files. - kim
+        Debianise. - kim
+        Changed so that AnyEvent::HTTP isn't required by default - kim
+        Changed version number to old-style decimal: 0.01
+        Moved AnyEvent deps from 'requires' to 'recommends'.
+        Changed load test to explicitly list all modules (for Windows)
+        Upped version number to 0.1.0 for next release
+        Added configure requires section
+        Cleaned up white space
+        Moved location back to client as it is used by multiple client types
+        Relaxed the type for the ua attribute, added deprecation warning
+        Moved WSDL specific code from the Client object to to the WSDL object
+        Started the conversion to be event handlable
+        Added more things to work on
+        Cleaned up the author tests
+        Merged quick fix back to master
+        Reverted commit 48df39a
+        Changed tests to use http URI's so tests are not as messy
+        Changed the way module names are auto generated from name spaces
+        Reorganised templates into sub directories, split out common parser code into separate template and added new WSDL Node object
+
+0.0.7   2013-04-11
+        Updated manifests
+        Updated manifests
+        Fixed spelling mistakes
+        Fixed writing a namespace when not supplied one
+        New changes for next release
+        Updated for next version
+
+0.0.6   2012-10-29
+        Added long and decimal local types (realy need to work out how to get MooseX::Types::XMLSchema coercion working!)
+        Fixed using eq in template
+        Fixed not getting parent attributes when parsing XML
+        Fixed not getting elements with out a namespace prefix
+        Again turned on executable bit
+        Added checking for namespace collissions
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP
+        Added building static clients with name aliases via env variable, started to change fault_element to faults list
+        Started documenting architecture
+        Added new TODO
+        Continuing with the implementation of fault handling
+        Documentation improvements
+        Added in the ability to control the name style via an environment variable $W3C_SOAP_NAME_STYLE
+        Documented some of the debugging features
+        Fixed spelling, Changed dump to vary dump size put a prefix on request & response dumps
+        Cleaned up namespace normalisations
+        Added the ability to pass in a logging object
+
+0.0.5   2012-10-09
+        Fixed spelling
+        Added documentation for cmp_ns function
+        Worked on the quick start documentation
+        Don't try to load dynamically created modules
+        Style cleanup
+        fully qualify operation in SOAPAction header NB some soap servers require the SOAPAction to be fully qualified e.g. http://www.xmlme.com/WSShakespeare.asmx?WSDL REQ: SOAPAction: "GetSpeech" RES: SoapException: Server did not recognize the value of HTTP Header SOAPAction: GetSpeech http://ws.cdyne.com/ip2geo/ip2geo.asmx?wsdl REQ: SOAPAction: "ResolveIP" RES: <faultstring>Server did not recognize the value of HTTP Header SOAPAction: ResolveIP http://www.ebob42.com/cgi-bin/NumberToWordsInDutch.exe/wsdl/IDutch REQ: SOAPAction: "NumToStr" RES: <faultstring>No interface registered for soap action '"NumToStr"'</faultstring>
+        Style clean up and adding missing semi colon
+        Furthered Danny's to includes and added descriptive warning so any problems can be more easily debugged
+        don't have import fallback to namespace when there's no schemaLocation otherwise on sharepoint 2010, this <s:import namespace="http://microsoft.com/wsdl/types/" /> results in Could not create file parser context for file "http://microsoft.com/wsdl/types/": Resource temporarily unavailable I'm guessing that import is just for the namespace when the contents have been merged in
+        From 28dfcef860ae8fff98e55e74db7edf0ce67b9490 Mon Sep 17 00:00:00 2001 From: Danny Thomas <d.thomas@its.uq.edu.au> Date: Tue, 25 Sep 2012 17:16:34 +1000 Subject: [PATCH] allow '=' in ns map file just like command-line, be tolerant  of empty lines rather than display uninitialized variable   warning
+        From 6c87b9a2666c2b28084492246cf564c87df45b15 Mon Sep 17 00:00:00 2001 From: Danny Thomas <d.thomas@its.uq.edu.au> Date: Tue, 25 Sep 2012 08:57:43 +1000 Subject: [PATCH] some WSDLs were failing to parse No mapping specified for  the namespace http://broadhop.com/unifiedapi/soap/types!  at  /opt/perl/uq.cis.perl-dmt-toys.rhel5-5.14.2-20120731/lib/site_perl/5.14.2/W3C/SOAP/Document.pm  line 149  W3C::SOAP::Document::_module('W3C::SOAP::XSD::Document=HASH(0xf442198)')  called at accessor W3C::SOAP::XSD::Document::module  (defined at  /opt/perl/uq.cis.perl-dmt-toys.rhel5-5.14.2-20120731/lib/site_perl/5.14.2/W3C/SOAP/XSD/Document.pm  line 106) line 10
+        Merge pull request #1 from bacek/master
+        Propograte coercion to parent type for any generated types.
+        Started to add fault handling
+        Fixed trying to compare namespaces with non-normalized domain names
+        Cleaned up ns generation
+        Spelling fixes from Danny
+        Fixed defaults and documentation
+        Added dumping request & response xml - baised on Danny Thomas patch
+        Started to make config externally modifiable
+        More things todo
+        Fixed dieing when no part is found
+        Realised I wasn't handling nillable correctly, need to work out how make it part of type not (Maybe`)
+        Fixed typo, thanks Danny Thomas
+        Fixed missing delegation
+        Started implementing static module name auto generation
+        Moved some common code from XSD & WSDL Documents to the base Document
+        Fixed no execute flag
+        Fixed getting document element
+        Fixed calling to_string instead of as_string
+        Fixed URI warnings for fake URI strings
+        Added version to test lib
+        Changed implicit stringification to explicit
+
+0.0.4   2012-07-31
+        Fixed undef warnings
+        Moved more WSDLs to end of test data not sure they are valid and/or useful
+        Uppded version number
+        Uncommented out WSDLs that previously failed to load as xmethods.t test can now cope with that, moved to the end of file WSDLs with unsupported XSD features
+        Better fix of issue due to no namespace name
+        Fixed issue due to no namespace name
+        Changed so that wsdls that can't be tested now have a skip called on them rather than silently being skipped
+        Added getting default namespace name
+        Updated changed file name
+        Fixed issue with generated namespace name
+        Fixed calls to get_module_base when module would be simpler
+        Removed completed items, added new tasks
+        Fixed calls to get_module_base when module would be simpler
+        Made deciding on weather to run tests against a WSDL smarter to reduce the number of false negatives
+        Moved some WSDLs to the end of the file so that they can be worked on later
+        Added skipping passing "http://www.w3.org/2001/XMLSchema", Added normalising namespace hostnames
+        Renamed script to more accurately reflect its function
+        Fixed minimum perl version (looks like the code itself can run in perl 5.6), added more missing modules
+        Commented out more sites where the WSDLs are not valid
+        Fixed missing prereq
+        Fixed issue with default type
+        Added skipping initial tests
+        Changed die()s to confess()es
+        Added making sure complex types are loaded after the types they depend on
+        Cleaned up variable names
+        Updated changes
+        Fixed test cleanup
+        Changed version to 0.0.3
+        Removed sites that either don't connect or XML::LibXML can't parse
+        Cleaned up some exceptions
+        Fixed not using the XPathContext object to search
+        Fixed namespace name in XPath
+        Added setting the location so that relative links can work
+        Fixed issue with getting namespace uri when it's not defined in the root element
+        Made type upgrade logic more sane
+        Changed to using [aA]non for simple/complex type names only if their parent has no name
+
+0.0.3   2012-07-27
+        Fixed test cleanup
+        Changed version to 0.0.3
+        Removed sites that either don't connect or XML::LibXML can't parse
+        Cleaned up some exceptions
+        Fixed not using the XPathContext object to search
+        Fixed namespace name in XPath
+        Added setting the location so that relative links can work
+        Fixed issue with getting namespace uri when it's not defined in the root element
+        Made type upgrade logic more sane
+        Changed to using [aA]non for simple/complex type names only if their parent has no name
+        New script to help with downloading of resources for debugging
+        Cleaned debug messages
+        Changed  to auto stringification as some versions of URI don't seem to have to_string method
+        Fixed never "seeing" extensions
+        Changed getting the schema location to fall back to using the namespace attribute when schemaLocation is not specified
+        Improved the documentation
+        Added in new files
+        Added new tests that would take too long to run under normal conditions (also currently fail ~50% of the WSDLs)
+        Changed to loading linked XSDs to make user that they are absolute
+        Made errors more obvious to their cause
+        Changed schema object creation to merge in the WSDLs namespaces into the XMLSchemas tag
+        Added use warnings to all modules
+        Changed error to a warning and return
+        Changed elements to default to xs:string if no types can be found, if no namespace is found using $self->location instead, fixed lots of warnings
+        Fixed generating deeply nested complex types and elements
+        Added more complex type nesting
+        Moved copyright POD to own file, removed the optus mentions
+        Fixed when firstChild is a comment (from Danny Thomas)
+        Added more recommends
+        Added release change log
+        Upped version number
+        Upped version number
+        Added documentation about xml_error sub
+        Added in new files
+        Fixed spelling
+        Removed unused file
+
+0.0.2   2012-07-21
+        Added documentation about xml_error sub
+        Added in new files
+        Fixed spelling
+        Removed unused file
+        Got test working, removed debugging
+        Fixed wrong bracked
+        Trying to work out bug
+        Started on policy work
+        Added policy ns
+        Added missing version info
+        Added xml_error helper sub
+        Added more complexity to XSDs
+        Added option to save downloaded files (helps with debugging)
+        Added documentation about operation Moose helper
+        Fixed walking through inheritance tree
+        Fixed issue with not checking inheritance
+        Created helper method so that operation's now look/act like data
+        Made static test perform a request
+        Fixed error handling
+        Fixed removing of temporary files
+        Fixed not loading all required modules for a complex type
+        Fixed dynamic WSDL creation, got tests working for example data
+        Fixed getting an elements mobile
+        Worked on documentation
+        Increased the default verbosity for soap errprs
+        Starting on abstracting action methods
+        Fixed excessibly removed export
+        Removed non-Moose export mechanisims
+        Fixed exporting load_wsdl & load_xsd
+        Fixed package module
+        Improved POD, added missing sub definitions
+
+0.0.1   2012-07-12
+        First version, released on an unsuspecting world.
+

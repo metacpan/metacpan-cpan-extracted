@@ -1,0 +1,42 @@
+---
+abstract: "Perl module to access Amazon's Glacier service."
+author:
+  - 'Charles A. Wimmer <charles@wimmer.net>'
+build_requires:
+  Pod::Coverage::TrustPod: 0
+  TAP::Formatter::JUnit: 0
+  TAP::Harness::JUnit: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Amazon-Glacier
+requires:
+  Data::Dumper: 0
+  Digest::SHA: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::App: 0
+  MooseX::App::Command: 0
+  Net::Amazon::SignatureVersion4: 0
+  POSIX: 0
+  TryCatch: 0
+  URI::Encode: 0
+  YAML::XS: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/cwimmer/WebService-Amazon-Glacier.git
+version: 0.001

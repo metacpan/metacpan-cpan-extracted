@@ -1,0 +1,14 @@
+CREATE TABLE countries(
+  "countryid" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "country" TEXT,
+  "mainlangid" INTEGER
+);
+CREATE TABLE langues(
+  "langid"  INTEGER PRIMARY KEY AUTOINCREMENT,
+  "langue" TEXT
+);
+CREATE TABLE speaks (
+  "countryid"  INTEGER NOT NULL,
+  "langid" INTEGER NOT NULL,
+  PRIMARY KEY ("countryid", "langid")
+);

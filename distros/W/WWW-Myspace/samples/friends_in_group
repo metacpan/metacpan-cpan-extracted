@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w -I../lib
+# friends_in_group groupID
+# Returns your friends or the friends from the profile identified by
+# friendID
+#
+# Example:
+# 
+# friends_in_group 100009984  # Perl Group
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace;
+unless ( $myspace->logged_in ) { die "Login failed\n" }
+
+
+my @friends;
+
+if ( @ARGV ) {
+  @friends = $myspace->friends_in_group( @ARGV );
+} else {
+  die "usage: friends_in_group groupID\n";
+}
+warn $myspace->error if ( $myspace->error );
+
+print "Got " . @friends . " friends:\n";
+
+foreach ( @friends ) {
+	print;
+	print "\n";
+}

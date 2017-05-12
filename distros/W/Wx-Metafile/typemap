@@ -1,0 +1,3 @@
+TYPEMAP
+wxMetafile * O_WXOBJECT
+wxEnhMetaFile * O_WXOBJECT

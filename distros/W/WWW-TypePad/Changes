@@ -1,0 +1,37 @@
+Revision history for Perl extension WWW::TypePad
+
+0.4002 Wed Jun 15 13:39:12 PDT 2011
+       - Move the SSL substitution into the OAuth handler.
+
+0.4001 Thu Mar 24 11:05:13 PDT 2011
+       - Make all of the author tests succeed.
+
+0.4000 Thu Mar 24 10:29:46 PDT 2011
+       - Updated the mappings and auto-generated code (skimbrel)
+       - Remove the old-style method names entirely (skimbrel)
+
+0.3001 Sat Aug 21 14:34:16 PDT 2010
+       - Fixed packaging (miyagawa)
+
+0.3000 Fri Aug 20 11:50:22 PDT 2010
+       - Updated the mapping file (matkins)
+       - Let nouns classes register accessors (matkins)
+
+0.2000 Wed Jul 28 14:19:25 PDT 2010
+       - Changed the API method mapping scheme to match with other language bindings (miyagawa, matkins)
+       - Auto generating POD documents using the mapping-methods.json (miyagawa)
+       - Support PUT and DELETE methods for properties (miyagawa)
+       - You can now specify TypePad API endpoint hostnames, for internal development (miyagawa)
+       - Added missing upload_media_asset function (paololim)
+       - Forces anonymous requests to use HTTP (paololim)
+
+0.1000 Fri Apr 16 14:08:13 PDT 2010
+       - Upped Net::OAuth::Simple prereq (antoine)
+       - Improved error handling (btrott)
+       - Improved support for uploading files (btrott)
+       - Allows the caller to override the UserAgent (btrott)
+       - Removed links array for oauth (btrott)
+       - Fixed a conflicting key in the auth req (yannk)
+
+0.009_01 Fri Mar 12 17:55:03 JST 2010
+        - original version

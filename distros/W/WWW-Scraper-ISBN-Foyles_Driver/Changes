@@ -1,0 +1,70 @@
+Revision history for WWW-Scraper-ISBN-Foyles_Driver
+===================================================
+
+0.18    2015-02-25
+        - test data updated, due to site changes.
+
+0.17    2014-12-17
+        - updated test data, as previous books now out of print.
+
+0.16    2014-11-08
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+        - fixed license fields in META.json to be lists.
+
+0.15    2014-07-26
+        - allow skip when website unavailable, catch other errors.
+
+0.14    2014-07-16
+        - website has new error message when book not found.
+        - extended test suite.
+
+0.13    2014-07-01
+        - changed error handling if missing form.
+
+0.12    2014-06-17
+        - accidentally updated the wrong line in Makefile.PL.
+
+0.11    2014-06-15
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - reworked test failure checks
+
+0.10    2013-11-08
+        - added git repository links to metadata.
+        - updated links for Touching From A Distance.
+
+0.09    2013-06-16
+        - added check if the website returns an error.
+
+0.08    2013-05-19
+        - fixed return of ISBN-13 values.
+        - updated patterns for binding, publisher and pubdatre following
+          website changes.
+
+0.07    2013-04-21
+        - updated tests following data change on website.
+
+0.06    2013-03-29
+        - added Data::Dumper as a test prerequisite.
+
+0.05    2013-03-03
+        - patterns updated following site update.
+        - added isbn-check.pl to examples.
+        - change file dates changed to meet W3CDTF standards.
+        - reworked Makefile.PL for clarity.
+        - updated test suite.
+
+0.04    2011-06-28
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - additional test in the event of record creation failure.
+
+0.03    2010-12-09
+        - added missing website access check.
+
+0.02    2010-11-29
+        - fix to field cleanup code for non-existent field values.
+        - update to carry through cookie information.
+
+0.01    2010-11-18
+        - initial release

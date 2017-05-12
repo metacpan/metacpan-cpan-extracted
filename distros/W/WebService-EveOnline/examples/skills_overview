@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use WebService::EveOnline;
+
+my $API_KEY = $ENV{EVE_API_KEY};
+my $USER_ID = $ENV{EVE_USER_ID};
+
+unless ($API_KEY && $USER_ID) {
+    print "Please export EVE_API_KEY and EVE_USER_ID before running\n";
+    exit;
+}
+
+my $eve = WebService::EveOnline->new( { user_id => $USER_ID, api_key => $API_KEY } );
+
+my $wanted = $ARGV[0] || undef;
+
+foreach my $character ($eve->characters) {
+    next if $wanted && $wanted ne $character->name;
+    
+    my @skills = $character->skills;
+    my $num_skills = scalar(@skills);
+    
+    my $t = $character->skill->in_training;
+    
+    print $character->name . " has " . $num_skills . " skills and is currently training " . 
+                             ($t ? $t->name . " " . $t->level . ", completing in " . $t->time_remaining 
+                           : "nothing" ) . ".\n";
+}

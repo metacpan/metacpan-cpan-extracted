@@ -1,0 +1,91 @@
+Revision history for Perl extension WWW::Babelfish.
+
+0.01  Tue Apr 20 20:43:40 1999
+	- original version; created by h2xs 1.18
+
+0.02	Thu May  6 20:42:35 1999  
+	- added code to break up source text by paragraph
+	and reassemble it. This looks nicer in the output
+	and Babelfish seems to like it better.
+
+0.03	Tue May 18 20:04:45 1999
+	- bug fixes for accidental appending of source text, 
+	multiple linefeeds, and timeouts. Also added demo code
+	to test.pl
+
+0.04	Wed Jan  5 16:33:11 2000
+	- Added proxy support and support for input/output filehandles
+	using IO::String to maintain backwards compatibility; now we
+	can translate whole novels! Added support for user-specified
+	paragraph delimiters. Some code clean-up.
+
+0.05	Thu Feb 10 14:48:10 2000
+	- Added improved test code and changed "deliminators" to
+	"delimiters" so I look like less of an idiot.
+
+0.06	Fri Feb 11 12:06:02 2000
+	- Fixed test to chomp() proxy so it doesn't fail in non-proxied 
+	environments. Duh.
+
+0.07	Fri Feb 25 16:31:38 2000
+	- Incorporated patch from Brian Raven <brianr@liffe.com> to
+	avoid "use of undefined" warning when source text doesn't
+	start with white space.
+
+0.08	Mon Jun 12 22:09:32 2000
+	- Added patch from Peter Tirsek <peter@tirsek.com> to fix bug
+	in whitespace handling at beginning of paragraph and new
+	Babelfish URL and format. Patches for URL and format were also
+	submitted by Wolfgang Schlueschen
+	<wolfgang.schlueschen@philips.com> and Daniel van Balen
+	<vdaniel@trompo.com>.
+                                        
+0.09	Sun Aug 13 20:38:11 2000
+	- Added patch from Olivier Scherler
+	<olivier.scherler@urbanet.ch> for subtle whitespace handling
+	bug. 
+
+0.10	Mon Oct 15 21:43:07 EDT 2001                           
+	- Patch from Brett T Warden <bwarden@wgz.com> to do non-Roman 
+	alphabet languages. Also fixed test.pl to get language list
+	and added PREREQ_PM hash to Makefile.PL
+
+0.11	Mon Nov 18 23:41:42 EST 2002
+	- Fixed new Babelfish url and result page format, which is
+	much simpler; Babelfish now claims it will translate "up to
+	150 words"; I'm not sure if this is a change from the ~1000
+	characters it did before. I *think* the new format may not
+	need the whitespace cleanup code anymore.
+
+0.12	Sat Oct 18 22:06:03 MDT 2003
+	- Changed $BABELFISH_URL so default input language is English,
+	on a tip from Ivica Letunic <Ivica.Letunic@EMBL-Heidelberg.de>
+	Patch from Martin K. Sluka <martin@sluka.de> to add
+	languagepairs method. Removed line that closes output
+	filehandle. Added preliminary support for Google translation
+	engine (ugly and hacky, but very easy since the interface is
+	almost identical to Babelfish; so are the translations, hmmm).
+	Changed Makefile.PL so it prompts to run translation test;
+	this way it can be automatically installed via CPAN. All 
+	strings are now encoded/decoded utf8 using the Encode module; 
+	this means perl 5.8 is required.
+
+0.13	Sat Aug  6 20:59:23 MDT 2005
+	-Patch from Eric R. Meyers <ermeyers@adelphia.net> to fix
+	corruption of main package space. Fixed parsing of Babelfish's
+	language pairs. Fixed test.pl to ask for service (Babelfish or
+	Google).
+
+0.14	Mon May 15 21:58:45 MDT 2006
+	-Patch from Jan Willamowius <jan@willamowius.de> to add Yahoo
+	translation service. Also added new "services" method to
+	provide list of services and changed test.pl to use this.
+
+0.15	Wed Jun  7 22:21:28 MDT 2006
+	-A couple of patches from <FANY@cpan.org> for the Babelfish engine,
+	to fix umlauts and to work around an inconsistency in the way 
+	Babelfish returns the translation for some texts.
+
+0.16	Fri Dec 15 20:50:38 MST 2006
+	-Patch from Djihed Afifi <djihed@gmail.com> for a change in
+	the Google results page format

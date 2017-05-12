@@ -1,0 +1,23 @@
+---
+abstract: 'A Perl interface to Geocod.io'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Geocodio
+requires:
+  JSON: 2.90
+  Moo::Lax: 0.15
+  perl: 5.014
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Geocodio
+  homepage: https://metacpan.org/dist/WebService-Geocodio
+  repository: git://github.com/mrallen1/WebService-Geocodio.git
+version: 0.04

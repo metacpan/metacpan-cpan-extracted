@@ -1,0 +1,87 @@
+==================================================
+Changes from 2013-12-19 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.8 at 2014-12-19 23:19:55 +0000
+----------------------------------------
+
+  Change: 7f2d443417f3ea6aec781a499e44caa593c048bb
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-20 12:19:45 +0000
+
+    version bump 
+
+  Change: 5d107f40f34804beedfd8220f7c66bab35785568
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-20 12:19:18 +0000
+
+    perltidy 
+
+  Change: 4622404389c4435b652bc013840624d74759ba99
+  Author: Tobias Kirschstein <lev@cpan.org>
+  Date : 2014-12-20 12:08:49 +0000
+
+    Merge pull request #7 from ahollandECS/master
+
+    API Methods 
+
+  Change: 88f477c1b1211b45d5953270b4489eac978c457f
+  Author: ahollandECS <aholland@ecstuning.com>
+  Date : 2014-12-19 16:31:39 +0000
+
+    API Methods
+
+    Adding some missing API methods for scheduled emails and data exports 
+
+----------------------------------------
+version 0.7 at 2014-12-18 10:54:07 +0000
+----------------------------------------
+
+  Change: ab731ea92ccaaff63fa46b3b503ad828d2395450
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:54:07 +0000
+
+    version bump 
+
+  Change: 87864d72b78794da44f7b1d2f296dad4edeb5482
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:54:00 +0000
+
+    make use of error keys feature in Web::API 2.2 
+
+  Change: 27bebc50687c9af92328623f84a44fe5ec27a321
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:53:32 +0000
+
+    removed old ping command because it does not return JSON and violates
+    the content type header 
+
+  Change: b7c7d690d7297c65ac0004189117da21855ff6b6
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:48:39 +0000
+
+    use Modern::Perl instead of 5.10 
+
+----------------------------------------
+version 0.6 at 2014-05-22 03:39:49 +0000
+----------------------------------------
+
+  Change: 645abd0df549675a601e44c30a2ec2be75a0ca5d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-05-22 15:39:49 +0000
+
+    added missing time_series_template command 
+
+  Change: c91a66d0bf27909c10abf581b556325cf50b40e1
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-02 23:06:58 +0000
+
+    Add support for additional Mandrill API methods dealing with
+    templates.
+
+    Update README.pod with new methods 
+
+================================================
+Plus 5 releases after 2013-12-19 00:00:00 +0000.
+================================================

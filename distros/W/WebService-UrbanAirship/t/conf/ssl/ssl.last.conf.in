@@ -1,0 +1,34 @@
+<IfModule @ssl_module@>
+  <VirtualHost TestLive>
+    SSLEngine on
+    SSLCertificateFile @SSLCA@/asf/certs/server.crt
+    SSLCertificateKeyFile @SSLCA@/asf/keys/server.pem
+    LogLevel info
+
+    Alias /cgi-bin @ServerRoot@/cgi-bin
+    <Directory @ServerRoot@/cgi-bin>
+      Options +ExecCGI
+      SetHandler cgi-script
+    </Directory>
+
+
+    RewriteEngine On
+    RewriteLog @ServerRoot@/logs/rewrite_log
+    RewriteLogLevel 9
+
+    RewriteRule (/api/device.*) /cgi-bin/echo.cgi?$1 [N,NS,QSA]
+
+    RewriteCond %{HTTP:Authorization} (.*)
+    RewriteRule .* - [PT,NS,E=WSAUTH:%1] [NS,N]
+
+    Script PUT /cgi-bin/echo.cgi
+    Script GET /cgi-bin/echo.cgi
+    Script POST /cgi-bin/echo.cgi
+
+  </VirtualHost>
+</IfModule>
+
+# pass these to modperl_extra.pl
+PassEnv HARNESS_PERL_SWITCHES
+PassEnv APACHE_TEST_NO_STICKY_PREFERENCES
+

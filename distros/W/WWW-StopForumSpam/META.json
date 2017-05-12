@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl extension for the StopForumSpam.com API",
+   "author" : [
+      "Günter Grodotzki <guenter@perlhipster.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-StopForumSpam",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "JSON" : "0",
+            "Socket" : "0",
+            "URI::Escape" : "0",
+            "WWW::Curl::Easy" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bugs@perlhipster.com",
+         "web" : "https://github.com/lifeofguenter/p5-stopforumspam/issues"
+      },
+      "homepage" : "http://www.perlhipster.com/p5-stopforumspam",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lifeofguenter/p5-stopforumspam.git",
+         "web" : "https://github.com/lifeofguenter/p5-stopforumspam"
+      }
+   },
+   "version" : "0.02"
+}

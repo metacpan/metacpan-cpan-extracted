@@ -1,0 +1,63 @@
+NAME
+    Win32::Autoglob -- expand globs in @ARGV when the shell doesn't
+
+SYNOPSIS
+    In a Perl program:
+
+      use Win32::Autoglob;
+      foreach my $thing (@ARGV) {
+        print "And also $thing\n";
+      }
+
+    Or from the command line:
+
+      perl -MWin32::Autoglob
+
+DESCRIPTION
+    Normal MSWindows shells are exceptional in that they don't do globbing for you -- i.e., if
+    you enter:
+
+      C:\stuff> perl thing.pl whatever.bin *.txt thing.dat
+
+    then thing.pl's @ARGV will consist of just `('whatever.bin', '*.txt', 'thing.dat')'.
+
+    If you just add `use Win32::Autoglob;' in your program, this module will alter @ARGV by
+    performing globbing. I.e., `'*.txt'' will be expanded to whatever *.txt matches, like
+    `('whatever.bin', 'junk.txt', 'stuff.txt', 'thing.dat')' -- or if there are no *.txt
+    files, you'll just get an @ARGV of `('whatever.bin', 'thing.dat')'.
+
+    Under Cygwin or under anything but MSWin, this module has no effect, so you can use `use
+    Win32::Autoglob;' in any program, and the globbing will happen only when it's running
+    under MSWin (and not Cygwin, because Cygwin *does* do globbing).
+
+FUNCTIONS
+    None.
+
+VARIABLES
+    None. (But it can affect @ARGV.)
+
+THANKS
+    Thanks to Citizen X and Dave Adler for help.
+
+HINT
+    If you have a program called funkify.pl written for under Unix, consider putting it in a
+    directory in your path, and just creating a funkify.bat along with it, consisting of just
+    this:
+
+      @echo off
+      perl -MWin32::Autoglob -S funkify.pl %1 %2 %3 %4 %5 %6 %7 %8 %9
+
+COPYRIGHT AND DISCLAIMERS
+    Copyright (c) 2002 Sean M. Burke. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    This program is distributed in the hope that it will be useful, but without any warranty;
+    without even the implied warranty of merchantability or fitness for a particular purpose.
+
+    But let me know if it gives you any problems, OK?
+
+AUTHOR
+    Sean M. Burke `sburke@cpan.org'
+

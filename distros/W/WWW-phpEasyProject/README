@@ -1,0 +1,54 @@
+SYNOPSIS
+
+     use WWW::phpEasyProject;
+    
+     my $pep = WWW::phpEasyProject->new(
+         url      => 'http://project.example.com/',
+         username => 'foo',
+         password => 'secret',
+         #agent   => '...', # passed to WWW::Mechanize
+     );
+    
+     $pep->add_task(
+    
+     );
+
+METHODS
+
+ new
+
+ login
+
+ logout
+
+ add_task
+
+    Usage: $pep->add_task(%args) => 1 (or die)
+
+    Known arguments:
+
+      * title => str
+
+      * project => int
+
+      * start_date => str (e.g. "12-25-2017")
+
+      * finish_date => str (e.g. "12-25-2017")
+
+      * priority => int (e.g. 2)
+
+      * warn_period => int (e.g. 86400 to mean 1 day)
+
+      * degree_of_completion => int (0..4, 0 means 0%, 1 means 25%, 2 means
+      50%, 3 means 75%, 4 means 100%)
+
+      * comment => str
+
+      * is_private => bool
+
+      * is_agreed => bool
+
+SEE ALSO
+
+    http://www.phpeasyproject.com/
+

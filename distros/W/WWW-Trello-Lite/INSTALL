@@ -1,0 +1,5 @@
+Enter these commands to install:
+  perl Makefile.PL
+  make
+  make test
+  make install

@@ -1,0 +1,19 @@
+abstract: Handle WikipediaAPI of SimpleAPI
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: WebService-SimpleAPI-Wikipedia
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  DateTime::Format::W3CDTF: 0
+  LWP::UserAgent: 0
+  URI: 0
+  XML::Simple: 0
+version: 0.01

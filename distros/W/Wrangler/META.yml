@@ -1,0 +1,19 @@
+---
+abstract: 'File manager with sophisticated metadata handling capabilities'
+author:
+  - 'Clipland (clipland@cpan.org)'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wrangler
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/clipland/wrangler.git
+version: '2.15'

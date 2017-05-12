@@ -1,0 +1,78 @@
+#! /usr/bin/perl -T
+use strict;
+use warnings;
+
+use Log::Log4perl qw/:easy/;
+
+Log::Log4perl->easy_init($INFO);
+
+use Getopt::Long;
+use Devel::REPL;
+use Term::ReadKey;
+
+use WebService::ReutersConnect;
+
+my $uname;
+my $password;
+GetOptions( "u=s" => \$uname );
+
+if( $uname ){
+  ## Prompt for password
+  print "Password:";
+  ReadMode('noecho');
+  $password = ReadLine(0);
+  ReadMode('restore');
+  chomp($password);
+  print "\n";
+}else{
+  WARN("Will try to use the demo account. Use '$0 -u <username>' to login as a specific user");
+}
+ReadMode('normal');
+
+## Skip output buffering
+$| = 1;
+
+binmode STDOUT , ':utf8';
+
+our $rc;
+
+unless( $uname ){
+  $rc = WebService::ReutersConnect->new();
+}else{
+  $rc = WebService::ReutersConnect->new({ username => $uname , password => $password });
+}
+my @channels = $rc->channels();
+
+INFO("Granted access to ".scalar(@channels)." channels");
+
+## Shell code
+my $repl = Devel::REPL->new;
+
+## Inject the instance of bob in the shell lexical environment.
+$repl->load_plugin('LexEnv');
+$repl->lexical_environment->do(q|my $rc = $main::rc ;|);
+
+## Tell something useful in the prompt
+$repl->load_plugin('FancyPrompt');
+$repl->fancy_prompt(sub {
+ my $self = shift;
+ sprintf ('%s@reutersconnect.com> ',
+          $rc->username() // $rc->authToken()
+         );
+});
+
+## Various autocompletion.
+$repl->load_plugin('CompletionDriver::LexEnv');
+$repl->load_plugin('CompletionDriver::Methods');
+$repl->load_plugin('CompletionDriver::INC');
+
+## Allow multiline statements.
+$repl->load_plugin('MultiLine::PPI');
+
+INFO("Starting shell. ReutersConnect object is '\$rc'");
+
+# And run!
+$repl->run();
+
+print "\n";
+INFO("Bye.\n");

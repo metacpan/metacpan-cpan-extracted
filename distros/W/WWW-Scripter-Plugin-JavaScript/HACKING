@@ -1,0 +1,40 @@
+
+This file contains a random assortment of notes that might be helpful to
+someone hacking on wspjs and related modules.
+
+STYLE GUIDE (minimalist)
+
+• Write code that works
+• All bug fixes should be accompanied by comments* and tests
+• Be reasonably paranoid and try to keep extensibility in mind
+• Don’t ‘fix’ code that already works
+
+* Try to not split any infinitives or use a preposition like it’s a
+  conjunction.
+
+THE RANDOM NOTES
+
+When the JavaScript plugin is loaded,  it installs itself as a script
+handler as well.  (The same object serves  both  purposes.)  The same
+plugin object is shared by frames and any new  windows  derived  from
+the WWW::Scripter object.
+
+When you call  $w->get(...),  WWW::Scripter  fetches and  parses  the
+HTML.  During parsing,  it runs any scripts it comes across  (via the
+script handler’s  eval  method)  and creates event handlers  (via the
+event2sub method).
+
+Whenever the JS plugin needs access to the back end  (e.g.,  when run-
+ning code), it retrieves it via its own back_end method, which, if it
+does not already exist,  creates a  new  JavaScript  environment  cor-
+responding to the  current  page  (response  object)  of  the  window
+(WWW::Scripter object) passed to it.
+
+The JE back end  (wspjsje)  is itself a subclass of JE,  so it is the
+global object. It knows to which window it belongs (with a weak refer-
+ence), and delegates to it.  Whenever a window object is passed to it,
+if it is its own window,  it substitutes itself in its  place.  Other-
+wise it creates a wrapper,  or proxy object,  for  that  window.  The
+proxy uses  AUTOLOAD  to delegate to the  wspjsje  object,  which  is
+retrieved via the plugin’s  back_end  method,  and hence  is  created
+on demand.

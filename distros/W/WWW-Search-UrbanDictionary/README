@@ -1,0 +1,43 @@
+NAME
+    WWW::Search::UrbanDictionary - Search the Urban Dictionary via SOAP
+
+SYNOPSIS
+      use WWW::Search;
+
+      my $key = 'abcdefghijklmnop1234567890';
+
+      my $search = WWW::Search->new('UrbanDictionary', key => $key);
+
+      $search->native_query("emo");
+
+      while (my $result = $search->next_result() ) {
+        print $result->{definition}, "\n";
+        print $result->{author}, "\n";
+        print $result->{example}, "\n";
+        print $result->url, "\n";
+        print "\n";
+      }
+
+DESCRIPTION
+    This class is an Urban Dictionary specialization of WWW::Search. It
+    handles searching Urban Dictionary http://www.urbandictionary.com/ using
+    its new SOAP API http://api.urbandictionary.com/.
+
+    All interaction should be done through WWW::Search objects.
+
+    Note that you must register for an API account and have a valid Urban
+    Dictionary API license key before using this module.
+
+    This module reports errors via croak().
+
+    This module uses SOAP::Life to do all the dirty work.
+
+AUTHOR
+    Nick Gerakines <nick@socklabs.com>
+
+COPYRIGHT
+    Copyright (C) 2005, Nick Gerakines
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,21 @@
+# This is the main configuration file of your Dancer app
+# env-related settings should go to environments/$env.yml
+# all the settings in this file will be loaded at Dancer's startup.
+
+# Your application's name
+appname: "WWW::Hashbang::Pastebin"
+
+# The default layout to use for your application (located in
+# views/layouts/main.tt)
+layout: "main"
+charset: "UTF-8"
+
+# template engine
+template: template_toolkit
+# template: xslate
+# engines:
+    # xslate:
+        # cache_dir: .xslate_cache/
+        # extension: tx
+        # input_layer: :encoding(UTF-8)
+        # syntax: TTerse

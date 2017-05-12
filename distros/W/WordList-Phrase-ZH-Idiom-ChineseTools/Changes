@@ -1,0 +1,18 @@
+Revision history for WordList-Phrase-ZH-Idiom-ChineseTools
+
+0.03    2016-02-10 (PERLANCAR)
+
+        - Rename module/dist from WordList-Phrase-ZH-Proverb-ChineseTools to
+          WordList-Phrase-ZH-Idiom-ChineseTools.
+
+
+0.02    2016-02-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Abstract.
+
+
+0.01    2016-02-04 (PERLANCAR)
+
+        - First release.

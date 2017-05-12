@@ -1,0 +1,14 @@
+Cpipe.cpp
+Cpipe.hpp
+MANIFEST
+META.yml
+Makefile.PL
+Pipe.h
+Pipe.pm
+Pipe.xs
+README
+eg/Client.pl
+eg/Server.pl
+eg/test.bat
+hints/cygwin.pl
+ppport.h

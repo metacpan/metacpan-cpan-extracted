@@ -1,0 +1,50 @@
+---
+abstract: 'Interface to Google JSON/Atom Custom Search.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Google-CustomSearch
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  WWW::Google::CustomSearch:
+    file: lib/WWW/Google/CustomSearch.pm
+    version: '0.34'
+  WWW::Google::CustomSearch::Item:
+    file: lib/WWW/Google/CustomSearch/Item.pm
+    version: '0.34'
+  WWW::Google::CustomSearch::Page:
+    file: lib/WWW/Google/CustomSearch/Page.pm
+    version: '0.34'
+  WWW::Google::CustomSearch::Params:
+    file: lib/WWW/Google/CustomSearch/Params.pm
+    version: '0.34'
+  WWW::Google::CustomSearch::Request:
+    file: lib/WWW/Google/CustomSearch/Request.pm
+    version: '0.34'
+  WWW::Google::CustomSearch::Result:
+    file: lib/WWW/Google/CustomSearch/Result.pm
+    version: '0.34'
+requires:
+  JSON: '2.53'
+  Moo: '2.000000'
+  Type::Tiny: '1.000005'
+  URI: '1.65'
+  WWW::Google::UserAgent: '0.20'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/WWW-Google-CustomSearch.git
+version: '0.34'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

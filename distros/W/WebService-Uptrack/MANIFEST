@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/WebService/Uptrack.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/01.init.t
+t/02.ua.t
+t/03.json.t
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+TODO
+SIGNATURE    Added here by Module::Build

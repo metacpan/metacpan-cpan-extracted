@@ -1,0 +1,36 @@
+Revision history for Perl extension Win32API::ProcessStatus.
+
+0.05  2015-04-01
+  - Fixed meta data for bug tracker (thanks karenetheridge gh#1, mishin gh#2)
+    (mishap with git merge on my part
+  - Perhaps it was an April Fools release
+
+0.04  2015-04-01
+  - Fixed meta data for bug tracker (thanks karenetheridge gh#1, mishin gh#2)
+  - Not an April Fools release
+
+0.03  2015-03-25
+  - Do not attempt install on non-Windows systems
+
+0.02  2015-03-25
+  - Add Win32API::Process as an explicit dependency
+  - Add support for cygwin
+  - Fix Documentation (POD) error
+
+0.01  Sun Jul 14 11:18:03 2002
+	* original version; created by h2xs 1.21 with options
+		-A -n Win32API::ProcessStatus
+
+	  it comes with a subset of the functions in the Win32 ProcessStatus API
+	  in the meanwhile fo enumerating the processes and their modules,
+	  structures returned as hashes:
+
+	+ BOOL EnumProcesses(LPDWORD lpidProcess DWORD cb, LPDWORD cbNeeded);
+	+ BOOL EnumProcessModules(HANDLE hProcess, LPHMODULE lphModule,
+		DWORD cb, LPDWORD lpcbNeeded);
+	+ BOOL GetModuleBaseName(HANDLE hProcess, HMODULE hModule,
+		LPTSTR lpBaseName, DWORD nSize);
+	+ BOOL GetModuleFileNameEx(HANDLE hProcess, HMODULE hModule,
+		LPTSTR lpFilename, DWORD nSize);
+	+ BOOL GetModuleInformation(HANDLE hProcess, HMODULE hModule,
+		LPMODULEINFO lpmodinfo, DWORD cb);

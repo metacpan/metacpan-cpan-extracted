@@ -1,0 +1,970 @@
+'\" t
+.\"     Title: WebDyne
+.\"    Author: [see the "Author" section]
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 04/11/2010
+.\"    Manual: [FIXME: manual]
+.\"    Source: [FIXME: source]
+.\"  Language: English
+.\"
+.TH "WEBDYNE" "3" "04/11/2010" "[FIXME: source]" "[FIXME: manual]"
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+WebDyne \- create web pages with embedded Perl
+.SH "SYNOPSIS"
+.sp
+.nf
+\fB # Example 1\&. Available syntaxes for embedding Perl code in HTML using WebDyne\&.
+ #\fR
+ <html><body><pre>
+ Hello World time is: <perl> localtime() </perl>
+ Hello World time is: <? localtime() ?>
+ Hello World time is !{! localtime() !}
+
+
+\fB # Example 2\&. Calling a Perl subroutine located at the end of the HTML file\&.
+ #\fR
+ <html><body><pre>
+ Hello World time is: <? &gettime ?>
+ </pre></body></html>
+ __PERL__
+ sub gettime { localtime() }
+
+
+\fB # Or
+ #
+\fR <html><body><pre>
+ Hello World time is: <perl method="gettime"/>
+ </pre></body></html>
+ __PERL__
+ sub gettime { localtime() }
+
+
+\fB # Example 3\&. Rendering text or HTML with embedded variables from Perl block\&.
+ #
+\fR <html><body><pre>
+ <perl method=gettime>
+ Hello World time is ${timenow}
+ </perl>
+ __PERL__
+ sub gettime { 
+     my $self=shift();
+     my $time=localtime(); 
+     $self\->render( timenow=>$time )
+ }
+
+
+\fB # Example 4 \- using CGI\&.pm pseudo\-tags and array, hash values and Perl attributes\&.
+ #\fR
+ <start_html title="Example">
+ <start_form>
+ <popup_menu name=foo values="@{1,2}">
+ <popup_menu name=bar values="%{red=>red, blue=>blue}">
+ <popup_menu name=baz values="!{! my @val=(3,4); \e@val !}">
+ <submit>
+ You chose foo=+{foo}, bar=+{bar}, baz=+{baz}
+
+
+\fB # Example 5 \- Blocks 1
+ #
+\fR <start_html>
+ <perl method="greeting"/>
+ <block name="morning">
+ Good Morning
+ </block>
+ <block name="afternoon">
+ Good Afternoon
+ </block>
+ __PERL__
+ sub greeting {
+   my $self=shift();
+   if ([localtime]\->[2] > 12) { $self\->render_block("afternoon") }
+   else { $self\->render_block("morning") }
+ }
+ 
+
+ \fB# Example 6 \- Blocks 2
+ #\fR
+ <start_html>
+ <perl method="greeting">
+ What a fine day\&. I say unto you at ${timenow}:
+ <block name="morning">
+ Good Morning
+ </block>
+ <block name="afternoon">
+ Good Afternoon
+ </block>
+ </perl>
+ __PERL__
+ sub greeting {
+   my $self=shift();
+   if ([localtime]\->[2] > 12) { $seld\->render_block("afternoon") }
+   else { $self\->render_block("morning") }
+   $self\->render( timenow=>scalar localtime );
+ }
+  
+
+\fB # Example 7 \- CGI forms and params
+ #\fR
+ <start_html>
+ <start_form>
+ <popup_menu name=foo values="@{1,2}">
+ <popup_menu name=bar values="@{3,4}">
+ <submit>
+ <end_form>
+ <perl method="result">
+ You chose option foo:${foo} bar:${bar}
+ </perl>
+ __PERL__
+ sub result {
+   my $self=shift();
+   # Simple
+   my $foo=$_{"foo"};
+   # Longer
+   my $CGI=$self\->CGI();
+   my $bar=$CGI\->param("bar");
+   return $self\->render( foo=>$foo, bar=>$bar )
+ }
+ 
+ 
+.fi
+.SH "DESCRIPTION"
+.PP
+WebDyne is a Perl based dynamic HTML engine\&. It works with web servers (or from the command line) to render HTML documents with embedded Perl code\&.
+.PP
+Once WebDyne is installed and initialised to work with a web server, any file with a
+\&.psp
+extension is treated as a WebDyne source file\&. It is parsed for WebDyne or CGI\&.pm pseudo\-tags (such as
+\fB<perl>\fR
+and
+\fB<block>\fR
+for WebDyne, or
+\fB<start_html>\fR,\fB <popup_menu>\fR
+for CGI\&.pm) which are interpreted and executed on the server\&. The resulting output is then sent to the browser\&.
+.PP
+Pages are parsed once, then optionally stored in a partially compiled format \- speeding up subsequent processing by avoiding the need to re\-parse a page each time it is loaded\&. WebDyne works with common web server persistant/resident Perl modules such as mod_perl and FastCGI to provide fast dynamic content\&.
+.SH "DOCUMENTATION"
+.PP
+This man page containes only a subset of information about how to use the WebDyne module\&. For more complete information and examples see the documentation at
+\m[blue]\fBhttp://webdyne\&.org\fR\m[]\&\s-2\u[1]\d\s+2
+.SH "INITIALISATION"
+.PP
+Web servers must be configured to pass \&.psp pages to the WebDyne module for processing\&. WebDyne comes with an installer for the Apache web server,
+\fBwdapacheinit\fR, which will modify the Apache configuration files appropriately\&. Installers for selected other web servers are available separately from CPAN\&. If you do not wish to run
+\fBwdapacheinit\fR
+\- or it does not work as expected \- the following is a minimal Apache 2\&.x config file (which assumes you already have mod_perl installed and activated in Apache)
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ PerlModule      WebDyne
+ AddHandler      perl\-script     \&.psp
+ PerlHandler     WebDyne
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+This is a bare\-bones config which does not enable such features as caching \- see the documentation located at
+\m[blue]\fBhttp://webdyne\&.org\fR\m[]
+for further configuration details for Apache and other web servers\&.
+.SH "EMBEDDING PERL INTO HTML"
+.PP
+Perl can be embedded into HTML in one of two ways \- inline intermingled with HTML, or at the end of the HTML document (non\-inline)\&.
+.PP
+\fIInline Perl\fR
+.PP
+Inline code is intermingled within the HTML code and can be triggered using one of three syntaxes:
+.PP
+.RS 4
+.ie n \{\
+\h'-04' 1.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  1." 4.2
+.\}
+Between
+\fB<perl> \&.\&. </perl>\fR
+tags
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 2.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  2." 4.2
+.\}
+Betwen Processing Instruction (PI)
+\fB<? \&.\&. ?>\fR
+tags
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04' 3.\h'+01'\c
+.\}
+.el \{\
+.sp -1
+.IP "  3." 4.2
+.\}
+Between a custom curly brace
+\fB!{! \&.\&. !}\fR
+syntax
+.RE
+.sp
+.RE
+Example:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <html><body><pre>
+ Hello World time is: <perl> localtime() </perl>
+ Hello World time is: <? localtime() ?>
+ Hello World time is !{! localtime() !}
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+All of these syntax alternatives are equivalent, however the curly brace format
+!{! \&.\&. !}
+has the advantage of working everywhere, including in standard HTML tag attributes, e\&.g\&.:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <html><body><pre>
+ <img src="!{! &img_height("foo\&.jpg") !}" width=\&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBImportant\fR
+.ps -1
+.br
+.PP
+Any embedded Perl code must return a non\-null value \- i\&.e\&. it must return
+\fIsomething\fR\&. If you want the Perl code to run without rendering any output then return a reference to undef, e\&.g\&.:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ # These are OK
+ #
+ <perl> &do_something; return "Done !"</perl>
+ <perl> &do_nothing; return \eundef </perl>
+
+ # These are not
+ #
+ <perl> \&.\&.\&.; return undef; </perl>
+ <perl> \&.\&.\&.; return 0 </perl>
+ <perl> \&.\&.\&.; return "" </perl>
+.fi
+.if n \{\
+.RE
+.\}
+.sp .5v
+.RE
+.PP
+\fInon\-Inline Perl\fR
+.PP
+Non\-inline code is Perl code located either in an external module (e\&.g\&.
+Country::Locale), or at the bottom of the HTML document in a special
+__PERL__
+section that is not intermingled within the HTML of the page\&. Non\-inline Perl is called when a
+method
+attribute is supplied with a perl tag\&. Example:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <html><body>
+ <perl method="Foo::Bar::baz"/> # Assumes Foo::Bar is available in @INC path
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Calling a method in a
+__PERL__
+block at the end of the document
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <html><body>
+ <perl method="hello"/>
+ World
+ __PERL__
+ sub hello { return "Hello" }
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+\fIPassing parameters to Perl\fR
+.PP
+You can pass parameters to a Perl routine:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ #  Pass param to inline Perl \- not that useful
+ #
+ <perl param="foo">
+   my $self=shift;     #  First param is always self ref to WebDyne object
+   my $param=shift;    #  Tag attribute params, i\&.e\&. "foo" in this case\&.
+   if ($param eq "foo") { do something
+   \&.\&.\&.
+ </perl>
+
+ #  Pass params to non\-inline Perl \- very useful
+ #
+ <perl method="display_image" param="foo\&.jpg/>
+ Above is a picture of the mysterious foo object
+ \&.\&.
+ <perl method="display_image" param="bar\&.jpg/>
+ And here we have the equally enegmatic bar subspecies
+ \&.\&.
+ __PERL__
+ sub display_image {
+   my $self=shift;    #  Self ref
+   my $image=shift;   #  Param passed to perl routine as per param attriute
+
+ #  Also possible to pass array or hash references (see later)
+ <perl method="foo" param="@{1,2}">  # Pass array ref
+ <perl method="foo" param="%{a=>1, b=>2}"> # Pass hash ref\&.
+   
+.fi
+.if n \{\
+.RE
+.\}
+.SH "BLOCKS"
+.PP
+Blocks are discrete chunks of HTML code located within the document which may be rendered (multiple times if needed) or left invisible\&. There are two types of blocks available on a WebDyne page:
+.PP
+Within non\-Inline Perl tags a block is implicit\&. e,g,:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <perl method="agent">
+ Time to upgrade ?
+ </perl>
+ __PERL__
+ sub agent {
+   my $self=shift();
+   if ($ENV{"HTTP_USER_AGENT"}=~/Mosaic/i) {
+     return $self\->render(); # Print what\'s between the <perl>\&.\&.</perl> tags
+   else {
+     return \eundef; # Don\'t print anyting "Time to upgrade ?" will not be seen\&.
+   }
+ }
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Or a block can be declared explicitly with the
+<block> \&.\&. </block>
+tags:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <perl>
+   my $self=shift();
+   if ((my $agent=$ENV{"HTTP_USER_AGENT"})=~/Explorer/i) {
+     $self\->render_block("ie");
+   }
+   elsif ($agent=~/Firefox/) {
+     $self\->render_block("firefox")
+   }
+ </perl>
+ \&.\&.
+ <block name="ie">
+   Welcome IE User
+ </block>
+ <block name="firefox">
+   Welcome Netscape User
+ </block>
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.PP
+blocks should be declared
+\fIafter\fR
+the Perl code that renders them \- e\&.g\&. the following will
+\fInot\fR
+work:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <block name="foo">
+ Hello World
+ </block>
+ <perl> shift()\->render_block("foo") </perl>
+.fi
+.if n \{\
+.RE
+.\}
+.sp .5v
+.RE
+.SH "VARIABLES AND SUBSTITUTION"
+.PP
+Text within
+<perl>
+and
+<block>
+tags can be modified by the use of variables\&. Standard scalar variables are represented by the syntax
+${varname}, and are populared bt paramaters supplied to the
+render
+and
+render_block
+methods\&. E\&.g\&.:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ #  Within a perl block
+ <perl method="hello">
+ Hello World, the time is ${timenow}
+ <perl>
+ __PERL__
+ sub hello {
+   my $self=shift();
+   $self\->render( timenow=>scalar localtime }
+ }
+
+
+ #  Within a named block
+ #
+ <perl method="hello"/>
+ <block name="foo">
+ Hello World, the time is ${timenow}
+ </block>
+ __PERL__
+ sub hello {
+   my $self=shift();
+   $self\->render_block( "foo", timenow=>scalar locatime );
+ }
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Other variables/substitutions available:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI@{var,var,\&.\&.}\fR
+for arrays, e\&.g\&.
+\fI@{"foo", "bar"}\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI%{key=>value, key=>value, \&.\&.}\fR
+for hashes e\&.g\&.\fI %{ a=>1, b=>2 }\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI+{varname}\fR
+for CGI form parameters, e\&.g\&.
+\fI+{firstname}\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI*{varname} \fRfor environment variables, e\&.g\&.
+\fI*{HTTP_USER_AGENT}\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI ^{requestmethod}\fR
+for Apache request (\fI$r=Apache\->request\fR) object methods, e\&.g\&.
+\fI^{protocol}\fR\&. Only available for in Apache/mod_perl, and only useful for request methods that return a scalar value
+.RE
+.PP
+Some examples:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <start_html>
+ <start_form>
+ <popup_menu name="foo" values="@{ 1,2 }">
+ <popup_menu name="bar" values="%{ 1=>red, 2=>blue }">
+ <submit>
+ <end_form>
+ Your results:
+ <pre>
+ You chose values +{foo} and +{bar}
+ Your user agent is *{HTTP_USER_AGENT}
+ Your request protocol is ^{protocol}
+ 
+.fi
+.if n \{\
+.RE
+.\}
+.SH "INTEGRATION WITH CGI.PM"
+.PP
+Any
+CGI\&.pm
+method that generates HTML tags or code can be used as a pseudo\-tag,e\&.g:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ <start_html> # From CGI\&.pm
+ <start_form>
+ <popup_menu name="foo">
+ <textfield name="bar" size="20">
+ <submit>
+ <end_form>
+.fi
+.if n \{\
+.RE
+.\}
+.SH "WEBDYNE TAGS REFERENCE"
+.PP
+Reference of WebDyne tags and supported attributes
+.PP
+\fB<perl>\fR
+.RS 4
+Run Perl code either in\-line (between the <perl>\&.\&.</perl>) tags, or non\-inline via the method attribute
+.PP
+method=[Module::Name::]method
+.RS 4
+\fIOptional\fR\&. Call an external perl subroutine in a pre\-loaded module, or a subroutine in a __PERL__ block at the end of the HTML file
+.RE
+.PP
+param=scalar|array|hash
+.RS 4
+\fIOptional\fR\&. Parameters to be supplied to perl routine\&. Supply array and hash using @{1,2} and %{a=>1, b=>2} conventions respectively\&.
+.RE
+.PP
+static=1
+.RS 4
+\fIOptional\fR\&. This Perl code to be run once only and the output cached for all subsequent requests\&.
+.RE
+.RE
+.PP
+\fB<block>\fR
+.RS 4
+Block of HTML code to be optionally rendered if desired by call to
+render_block
+Webdyne method\&.
+.PP
+name=identifier
+.RS 4
+\fIMandatory\fR\&. The name for this block of HTML\&. You can have more than one block with the same name \- all blocks matching the name supplied to
+render_block
+will be displayed\&.
+.RE
+.PP
+display=1
+.RS 4
+\fIOptional\&.\fR
+Force display of this block even if not invoked by
+render_block
+WebDyne method\&. Useful for prototyping\&.
+.RE
+.PP
+static=1
+.RS 4
+\fIOptional\fR\&. This block rendered once only and the output cached for all subsequent requests
+.RE
+.RE
+.PP
+\fB<include>\fR
+.RS 4
+Include HTML or text from an external file\&. Include sections are static by default \- they are loaded once at compile time and not refreshed until the Perl process (e\&.g\&. Apache) is restarted\&.
+.PP
+file=filename
+.RS 4
+\fIMandatory\fR\&. Name of file we want to include\&. Can be relative to current directory or absolute path\&.
+.RE
+.PP
+head=1
+.RS 4
+\fIOptional\fR\&. File is an HTML file and we want to include just the
+\fB<head>\fR
+section
+.RE
+.PP
+body=1
+.RS 4
+\fIOptional\fR\&. File is an HTML file and we want to include just the
+\fB<body>\fR
+section\&.
+.RE
+.PP
+block=blockname
+.RS 4
+\fIOptional\fR\&. File is a \&.psp file and we want to include a
+\fB<block>\fR
+section from that file\&.
+.RE
+.RE
+.PP
+\fB<dump>\fR
+.RS 4
+Display CGI paramters in dump format via CGI\->Dump call\&. Useful for debugging\&. Only rendered if
+\fI$WEBDYNE_DUMP_FLAG\fR
+global set to 1 in WebDyne constants (see below)
+.PP
+display=1
+.RS 4
+\fIOptional\&.\fR
+Force display even if
+\fI$WEBDYNE_DUMP_FLAG\fR
+global not set\&. Useful when debugging a single page\&.
+.RE
+.RE
+.SH "WEBDYNE API REFERENCE"
+.PP
+When running Perl code within a WebDyne page the very first parameter passed to any routine (in\-line or in a
+__PERL__
+block) is an instance of the WebDyne page object (referred to as
+\fI$self\fR
+in most of the examples)\&. All methods return
+undef
+on failure, and raise an error using the
+\fBerr()\fR
+function\&. The following methods are available to any instance of the WebDyne object:
+.PP
+CGI()
+.RS 4
+Returns an instance of the CGI\&.pm object for the current request\&.
+.RE
+.PP
+r(), request()
+.RS 4
+Returns an instance of the Apache request object if running under mod_perl, or a reference to an WebDyne::Request::Fake instance if not running under Apache/mod_perl\&.
+.RE
+.PP
+render( \fIkey=>value, key=>value\fR, \&.\&. )
+.RS 4
+Called to render the text or HTML between <perl>\&.\&.</perl> tags\&. Optional key and value pairs will be substituted into the output as per the variable section\&. Returns a scalar ref of the resulting HTML\&.
+.RE
+.PP
+render_block( blockname, \fIkey=>value, key=>value, \&.\&.\fR)\&.
+.RS 4
+Called to render a block of text or HTML between <block>\&.\&.</block> tags\&. Optional key and value pairs will be substituted into the output as per the variable section\&. Returns scalar ref of resulting HTML if called with from <perl>\&.\&.</perl> section containing the block to be rendered, or true (\eundef) if the block is not within the <perl>\&.\&.</perl> section (e\&.g\&. further into the document, see the block section for an example)\&.
+.RE
+.PP
+redirect({ uri=>uri | file=>filename | html=>\ehtml_text })
+.RS 4
+Will redirect to URI or file nominated, or display only nominated text\&. Any rendering done to prior to this method is abandoned\&.
+.RE
+.PP
+cache_inode( \fIseed\fR )
+.RS 4
+Returns the page unique ID (UID)\&. Called inode for legacy reasons, as that is what the UID used to be based on\&. If a seed value is supplied a new UID will be generated based on an MD5 of the seed\&. Seed only needs to be supplied if using advanced cache handlers\&.
+.RE
+.PP
+cache_mtime( \fIuid\fR )
+.RS 4
+Returns the mtime (modification time) of the cache file associated with the optionally supplied UID\&. If no UID supplied the current one will be used\&. Can be used to make cache compile decisions by WebDyne::Cache code (e\&.g if page > x minutes old, recompile)\&.
+.RE
+.PP
+cache_compile( )
+.RS 4
+Force recompilation of cache file\&. Can be used in cache code to force recompilation of a page, even if it is flagged static\&. Returns current value if no parameters supplied, or sets if parameter supplied\&.
+.RE
+.PP
+no_cache()
+.RS 4
+Send headers indicating that the page is not be cached by the browser or intermediate proxies\&. By default WebDyne pages automatically set the no\-cache headers, although this behaviour can be modified by clearing the
+\fI$WEBDYNE_NO_CACHE\fR
+variable and using this function
+.RE
+.PP
+meta()
+.RS 4
+Return a hash ref containing the meta data for this page\&. Alterations to meta data are persistent for this process, and carry across Apache requests (although not across different Apache processes)
+.RE
+.SH "WEBDYNE GLOBAL CONSTANTS"
+.PP
+Constants can be set to modify the behaviour of the WebDyne module\&. Constants can be set in Apache (via the PerSerVar directive), in a system file (/etc/webdyne\&.pm in *nix, %WINDIR%/webdyne\&.pm in Windows) or via environment variables\&. See the documentation at webdyne\&.org for specific examples of how to set these variables The following constants are available:
+.PP
+\fI$WEBDYNE_CACHE_DN\fR
+.RS 4
+The name of the directory that will hold partially compiled WebDyne cache files\&. Must exist and be writable by the Apache process
+.RE
+.PP
+\fI$WEBDYNE_STARTUP_CACHE_FLUSH_DN\fR
+.RS 4
+Remove all existing disk cache files at Apache startup\&. 1=yes (default), 0=no\&. By default all disk cache files are removed at startup, and thus pages must be recompiled again the first time they are viewed\&. If you set this to 0 (no) then disk cache files will be saved between startups and pages will not need to be re\-compiled if Apache is restarted\&.
+.RE
+.PP
+\fI$WEBDYNE_CACHE_CHECK_FREQ\fR
+.RS 4
+Check the memory cache after this many request (per\-process counter)\&. default=256\&. After this many requests a housekeeping function will check compiled pages that are stored in memory and remove old ones according to the criteria below\&.
+.RE
+.PP
+\fI$WEBDYNE_CACHE_HIGH_WATER\fR
+.RS 4
+Remove compiled from pages from memory when we have more than this many\&. default=64
+.RE
+.PP
+\fI$WEBDYNE_CACHE_LOW_WATER\fR
+.RS 4
+After reaching HIGH_WATER delete until we get down to this amount\&. default=32
+.RE
+.PP
+\fI$WEBDYNE_CACHE_CLEAN_METHOD\fR
+.RS 4
+Clean algorithm\&. default=1, means least used cleaned first, 0 means oldest last view cleaned first
+.RE
+.PP
+\fI$WEBDYNE_EVAL_SAFE\fR
+.RS 4
+default=0 (no), If set to 1 means eval in a Safe\&.pm container\&.
+.RE
+.PP
+\fI$WEBDYNE_EVAL_SAFE_OPCODE_AR\fR
+.RS 4
+The opcode set to use in Safe\&.pm evals (see the Safe man page)\&. Defaults to "[:default]"\&. Use [&Opcode::full_opset()] for the full opset\&. CAUTION Use of WebDyne with Safe\&.pm not comprehensively tested\&.
+.RE
+.PP
+\fI$WEBDYNE_EVAL_USE_STRICT\fR
+.RS 4
+The string to use before each eval\&. Defaults to "use strict qw(vars);"\&. Set to undef if you do not want strict\&.pm\&. In Safe mode this becomes a flag only \- set undef for "no strict", and non\-undef for "use strict" equivalence in a Safe mode (checked under Perl 5\&.8\&.6 only, results in earlier versions of Perl may vary)\&.
+.RE
+.PP
+\fI$WEBDYNE_STRICT_VARS\fR
+.RS 4
+Check if a var is declared in a render block (e\&.g $ {foo}) but not supplied as a render parameter\&. If so will throw an error\&. Set to 0 to ignore\&. default=1
+.RE
+.PP
+\fI$WEBDYNE_DUMP_FLAG\fR
+.RS 4
+If 1, any instance of the special <dump> tag will print out results from CGI\->dump()\&. Use when debugging forms\&. default=0
+.RE
+.PP
+\fI$WEBDYNE_DTD\fR
+.RS 4
+The DTD to place at the top of a rendered page\&. Defaults to: <!DOCTYPE html PUBLIC "\-//W3C//DTD HTML 4\&.01 Transitional//EN" "http://www\&.w3\&.org/TR/html4/loose\&.dtd">
+.RE
+.PP
+\fI$WEBDYNE_HTML_PARAM\fR
+.RS 4
+Default attributes for the <html> tag, e\&.g\&. { lang =>"en\-US" }\&. undef by default
+.RE
+.PP
+\fI$WEBDYNE_COMPILE_IGNORE_WHITESPACE\fR
+.RS 4
+Ignore source file whitespace as per HTML::TreeBuilder ignore_ignorable_whitespace function\&. Defaults to 1
+.RE
+.PP
+\fI$WEBDYNE_COMPILE_NO_SPACE_COMPACTING\fR
+.RS 4
+Do not compact source file whitespace as per HTML::TreeBuilder no_space_compacting function\&. Defaults to 0
+.RE
+.PP
+\fI$WEBDYNE_STORE_COMMENTS\fR
+.RS 4
+By default comments are not rendered\&. Set to 1 to store and display comments from source files\&. Defaults to 0
+.RE
+.PP
+\fI$WEBDYNE_NO_CACHE\fR\&.
+.RS 4
+WebDyne should send no\-cache HTTP headers\&. Set to 0 to not send such headers\&. Defaults to 1
+.RE
+.PP
+\fI$WEBDYNE_DELAYED_BLOCK_RENDER\fR
+.RS 4
+By default WebDyne will render blocks targeted by a render_block() call, even those that are outside the originating <perl>\&.\&.</perl> section that made the call\&. Set to 0 to not render such blocks\&. Defaults to 1
+.RE
+.PP
+\fI$WEBDYNE_WARNINGS_FATAL\fR
+.RS 4
+If a programs issues a warning via warn() this constant determines if it will be treated as a fatal error\&. Default is 0 (warnings not fatal)\&. Set to 1 if you want any warn() to behave as if die() had been called\&.\&.
+.RE
+.PP
+\fI$WEBDYNE_CGI_DISABLE_UPLOADS\fR
+.RS 4
+Disable CGI\&.pm file uploads\&. Defaults to 1 (true \- do not allow uploads)\&.
+.RE
+.PP
+\fI$WEBDYNE_CGI_POST_MAX\fR
+.RS 4
+Maximum size of a POST request\&. Defaults to 512Kb
+.RE
+.PP
+\fI$WEBDYNE_ERROR_TEXT\fR
+.RS 4
+Display simplified errors in plain text rather than using HTML\&. Useful in interal WebDyne development only\&. By default this is 0 => the HTML error handler will be used\&.
+.RE
+.PP
+\fI$WEBDYNE_ERROR_SHOW\fR
+.RS 4
+Display the error message\&. Only applicable in the HTML error handler, as are all the following
+\fIWEBDYNE_ERROR_SOURCE\fR
+variables
+.RE
+.PP
+\fI$WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW\fR
+.RS 4
+Display a fragment of the \&.psp source file around where the error occurred to give some context of where the error happened\&. Set to 0 to not display context\&.
+.RE
+.PP
+\fI$WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_PRE\fR
+.RS 4
+Number of lines of the source file before the error occurred to display\&. Defaults to 4
+.RE
+.PP
+\fI$WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_POST\fR
+.RS 4
+Number of lines of the source file after the error occurred to display\&. Defaults to 4
+.RE
+.PP
+\fI$WEBDYNE_ERROR_SOURCE_CONTEXT_LINE_FRAGMENT_MAX\fR
+.RS 4
+Max line length to show\&. Defaults to 80 characters\&.
+.RE
+.PP
+\fI$WEBDYNE_ERROR_BACKTRACE_SHOW\fR
+.RS 4
+Show a backtrace of modules through which the error propagated\&. On by default, set to 0 to disable,
+.RE
+.PP
+\fI$WEBDYNE_ERROR_BACKTRACE_SHORT\fR
+.RS 4
+Remove WebDyne internal modules from backtrace\&. Off by default, set to 1 to enable\&.
+.RE
+.PP
+\fI$WEBDYNE_AUTOLOAD_POLLUTE\fR
+.RS 4
+When a method is called from a
+\fB<perl>\fR
+routine the WebDyne AUTOLOAD method must search multiple modules for the method owner\&. Setting this flag to 1 will pollute the WebDyne name space with the method name so that AUTOLOAD is not called if that method is used again (for the duration of the Perl process, not just that call to the page)\&. This is dangerous and can cause confusion if different modules use the same name\&. In very strictly controlled environments \- and even then only in some cases \- it can result is faster throughput\&. Off by default, set to 1 to enable\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\m[blue]\fBhttp://webdyne\&.org/\fR\m[]
+.SH "COPYRIGHT AND LICENSE"
+.PP
+WebDyne is Copyright \(co Andrew Speer 2006\-2010\&. Webdyne is dual licensed\&. It is released as free software released under the
+\m[blue]\fBGnu Public License (GPL)\fR\m[]\&\s-2\u[2]\d\s+2, but is also available for commercial use under a proprietary license \- please contact the author for further information\&.
+.PP
+WebDyne is written in Perl and uses modules from
+\m[blue]\fBCPAN\fR\m[]\&\s-2\u[3]\d\s+2
+(the Comprehensive Perl Archive Network)\&. CPAN modules are Copyright \(co the owner/author, and are available in source from CPAN directly\&. All CPAN modules used are covered by the
+\m[blue]\fBPerl Artistic License\fR\m[]\&\s-2\u[4]\d\s+2
+.SH "CREDITS"
+.PP
+WebDyne relies heavily on modules and code developed and open\-sourced by other authors\&. Without Perl, and Perl modules such as mod_perl/FCGI, CGI\&.pm, HTML::TreeBuilder and Storable, WebDyne would not be possible\&. To the authors of those modules \- and all the other modules used to a lesser extent by WebDyne \- I convey my thanks\&.
+.SH "AUTHOR"
+.PP
+Written by Andrew Speer,
+andrew@webdyne\&.org
+.SH "BUGS"
+.PP
+Please report any bugs or feature requests to "bug\-webdyne at rt\&.cpan\&.org", or via
+\m[blue]\fBhttp://rt\&.cpan\&.org/NoAuth/ReportBug\&.html?Queue=WebDyne\fR\m[]
+.SH "NOTES"
+.IP " 1." 4
+http://webdyne.org
+.RS 4
+\%http://webdyne.org/
+.RE
+.IP " 2." 4
+Gnu Public License (GPL)
+.RS 4
+\%http://www.gnu.org/copyleft/gpl.html
+.RE
+.IP " 3." 4
+CPAN
+.RS 4
+\%http://www.cpan.org
+.RE
+.IP " 4." 4
+Perl Artistic License
+.RS 4
+\%http://www.perl.com/pub/a/language/misc/Artistic.html
+.RE

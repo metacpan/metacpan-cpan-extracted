@@ -1,0 +1,27 @@
+This is Perl module WWW::GoogleAnalytics::Mobile
+
+INSTALLATION
+
+WWW::GoogleAnalytics::Mobile installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan WWW::GoogleAnalytics::Mobile
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+WWW::GoogleAnalytics::Mobile documentation is available as in POD. So you can do:
+
+    % perldoc WWW::GoogleAnalytics::Mobile
+
+to read the documentation online with your favorite pager.
+
+Masahiro Nagano

@@ -1,0 +1,21 @@
+2015-09-06 Webqq::Encryption v1.5
+1）去掉默认依赖模块JE，改为Crypt::RSA
+2）测试脚本中增加多种模块可选择的提示
+
+2015-08-25 Webqq::Encryption v1.4
+1）修复一些warning报警
+2）完善Makefile.PL文件
+3）完善pod文档
+
+2015-07-08 Webqq::Encryption v1.3
+1）新增算法依赖模块测试文件
+2）重新实现了TEA算法
+
+2015-04-24 Webqq::Encryption v1.2
+1）Crypt::RSA变更为可选模块而不是必须模块
+
+2015-04-24 Webqq::Encryption v1.1
+1）修复文档细节
+
+2015-04-24 Webqq::Encryption v1.0
+1）版本初始化

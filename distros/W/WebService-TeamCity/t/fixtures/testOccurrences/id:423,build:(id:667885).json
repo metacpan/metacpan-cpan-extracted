@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:30:30,808]   WARN - cs.git.GitCollectChangesPolicy - From version 2b9fbfbb43e7edfad018b482e15e7f93cca4e69f is not found, collect last 10 commits \n",
+   "duration" : 2904,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:423,build:(id:667885)",
+   "id" : "id:423,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.all_changes_should_have_parents",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-8623174303901471539",
+      "id" : -8623174303901471539,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.all_changes_should_have_parents"
+   }
+}

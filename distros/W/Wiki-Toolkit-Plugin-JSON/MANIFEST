@@ -1,0 +1,10 @@
+Build.PL
+CHANGES
+lib/Wiki/Toolkit/Plugin/JSON.pm
+MANIFEST
+Makefile.PL
+META.yml
+t/001_load.t
+t/002_basic_invocation.t
+META.json
+SIGNATURE    Added here by Module::Build

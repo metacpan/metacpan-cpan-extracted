@@ -1,0 +1,119 @@
+Revision history for WWW::Sitebase
+
+0.15    2016-06-27
+        - WWW::Sitebase::Navigator's submit_form method now uses the
+          action and fields_ref arguments even if the form is provided
+          via the form argument instead of read from a page.
+0.14    2016-02-03
+        - Added "use_defaults" option to WWW::Sitebase::Navigator to allow
+          skipping the login prompts if a cached username and password
+          already exists.  This allows scripts to only prompt once.
+0.13    2016-01-18
+        - WWW::Sitebase::Navigator now hides passwords as they're
+          typed at the Password prompt.
+        - WWW::Sitebase::Navigator now sets permissions on username/password
+          cache file to 0600 when writing username and password (chmod
+          is done after file is created/clobbered before data is written).
+          The _get_acct method will also croak if the cache file cannot be
+          closed.
+0.12    2016-01-11
+        - WWW::SiteBase::Navigator now hides password when displaying
+          cached login and password information when prompting for
+          username and password.
+0.11    2016-01-07
+        - WWW::Sitebase::Navigator's site_login method now leaves the
+          current page set to the page that's reached after posting the
+          login form instead of navigating to the site's home page.
+          Navigating to the home page before completing
+          login would in some cases return the module to a home page that is
+          outside of the login area, making a login appear to fail when it had
+          in fact succeeded.  If you experience difficulties logging in after
+          upgrading to WWW:Sitebase v0.11, make sure your site_info's
+          "login_verify_re" is testing for the page you land on after logging
+          in, not the site's home page (although, if your script works,
+          the home page is probably the page you land on after logging in).
+
+0.10    2014-01-18
+        - Added Mozilla::CA prerequisite so that SSL works with
+          LWP::UserAgent 6.0 defaults.
+        - Changed "agent" setting in WWW::Sitebase::Navigator to report
+          the browser as Safari running on MacOS 10.9.1.
+        - When checking pages against regexps, WWW::Sitebase::Navigator
+          now uses /ism instead of /i as the flags.  This means a regexp
+          like "Sign Out.*My Accounts" will properly return true if the
+          page contains "Sign Out" on one line and "My Accounts" on another.
+
+0.09    2009-09-02
+        - Improved handling of default_options to allow sub-classes
+          more flexibility and backwards-compatibility when
+          adding options.
+        - Fixed examples in docs in Sitebase::Navigator to refer to
+          using decoded_content instead of content method.
+        - Fixed some Sitebase::Navigator docs that referred to Bebo.
+
+0.08    2009-08-10
+        - Fixed handling and documentation of default_options
+        - Fixed bug in Sitebase::save method to make it work as
+          documented
+
+0.07    2009-08-08
+        - Updated Navigor to use decoded_content instead of content method
+          when checking pages for regular expressions. This solves
+          problems that can occur when scanning pages with UTF-8
+          encoding.
+
+0.06    2007-08-04
+        - Added use tests for Navigator and Poster in 01-load.t
+
+0.05    2007-08-03
+        - Added prerequisites to Makefile.PL
+        - Updated Navigator docs to mention adding Crypt::SSLEay for
+          subclasses that navigate SSL pages.
+
+0.04    2007-08-02
+        - Fixed capitalization of Sitebase module name.
+
+0.03    2007-07-31
+        - Corrected version 0.02 release date
+        - Added "login_form_no" and "login_form_name" fields to site_info hash.
+          This fixes an obvious bug in which logins would fail if the login form
+          wasn't the second one on the page (which, oddly, it usually is...).
+        - Added _submit_login method which can be overridden if needed to
+          provide more control over the login form.
+        - Fixed docs for submit_form.
+        - Included Navigator and Poster in the distribution...
+
+0.02    2007-07-31
+        - get_page now returns undef if it can't get the page or
+          if the page doesn't match the provided RE after retrying
+          20 times.
+        - Added follow_to and follow_link methods.
+        - _go_home method now goes to site's homepage if not
+          logged in.
+        - Fixed bugs in submit_form and _get_home.
+        - Added debug method.
+        - Cleaned Bebo-specific code from Base.pm
+        - Changed "site" method name to "browser" in Sitebase.pm and
+          Base.pm
+        - Added Poster.pm (needs debugging).
+        - Debugged Poster.pm. :)
+        - Fixed max_count bug in Poster.pm (0.2).
+        - Added post_count method to Poster.pm (0.3)
+        - Renamed Sitebase::Base -> Sitebase.
+        - Renamed Sitebase -> Sitebase::Navigator.
+          - Structure now is:
+            - Sitebase contains basic param validation, etc. It really
+              could be used for almost any module.
+            - Sitebase::Navigator is the base class for navigating
+              web sites
+            - Sitebase::Poster is an iterator for calling a posting method
+              and remembering who was posted to.
+        - Fixed documentation and package names
+        - Updated Changes file with previous changes.
+
+0.01    2006-09-30
+        First version.
+        Includes WWW::Sitebase and WWW::Sitebase::Base, which
+        is my general base class with handy generic parsing and
+        load/save methods and should probably be renamed to
+        "BaseClass" or something.

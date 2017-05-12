@@ -1,0 +1,92 @@
+WWW-Scripter-Plugin-JavaScript-0.009 (alpha)
+
+A plugin for  WWW::Scripter  that provides JavaScript support
+
+This distribution contains:
+WWW::Scripter::Plugin::JavaScript     0.009 — The JavaScript plugin
+WWW::Scripter::Plugin::JavaScript::JE 0.009 — A back end for JE
+
+
+RECENT CHANGES
+
+(See the Changes file for the long version.)
+
+0.009
+-----
+• Destructors no longer clobber $@ (RT #108646). Thanks to Oleg G for
+  the patch.
+
+0.008a
+-----
+• LWP 6 supports perl 5.8.7 once  more,  so  we  no  longer  require
+  Bundle::LWP5_837.
+
+• The JE back end now binds window methods properly, eliminating err-
+  ors with JE::Object::Proxy objects  (RT #79855).  Thanks to Nathan
+  Chaney for the report.
+
+0.008
+-----
+• The JavaScript plugin now tells back ends when it has finished with
+  them, so they have a chance to break circular references.
+• The  JE  back end takes advantage of that,  to avoid  memory  leaks.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install WWW::Scripter::Plugin::JavaScript"
+
+    [sudo] cpan WWW::Scripter::Plugin::JavaScript
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires:
+
+- perl 5.8.4 or higher
+
+- JE 0.056 or higher
+
+- HTML::DOM 0.032 or higher
+
+- CSS::DOM
+
+- WWW::Scripter 0.022 or higher
+
+- Hash::Util::FieldHash::Compat
+
+- URI
+
+- LWP 5.815 or higher
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc WWW::Scripter::Plugin::JavaScript
+    perldoc WWW::Scripter::Plugin::JavaScript::JE
+
+Or try using man (it's faster, in my experience):
+
+    man WWW::Scripter::Plugin::JavaScript
+    man WWW::Scripter::Plugin::JavaScript::JE
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2009-16 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

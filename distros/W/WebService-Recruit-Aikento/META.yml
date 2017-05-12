@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Recruit-Aikento
+version:      0.0.1
+version_from: lib/WebService/Recruit/Aikento.pm
+installdirs:  site
+requires:
+    Class::Accessor:               0
+    Class::Accessor::Children:     0
+    Test::More:                    0
+    XML::OverHTTP:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,8 @@
+0.03  26th January 2009
+      - Added MANIFEST.SKIP
+0.02  26th January 2009
+      - added pod tests in pod.t
+      - added a call to Test::Kwalitee
+
+0.01  17th February 2006
+      - initial release

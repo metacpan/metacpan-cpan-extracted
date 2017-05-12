@@ -1,0 +1,366 @@
+=head1 NAME
+
+WebService::FileCloud - filecloud.io WebService API
+
+=head1 SYNOPSIS
+
+  use WebService::FileCloud;
+
+  $websvc = WebService::FileCloud->new( akey => 'apikey',
+                                        username => 'username',
+                                        password => 'password' );
+
+  $result = $websvc->fetch_apikey();
+
+  # you should check for HTTP request / usage errors first
+  if ( !$result ) {
+
+    die( $websvc->error() );
+  }
+
+  # check for filecloud.io errors in response
+  if ( $result->{'status'} eq 'error' ) {
+
+    die( $result->{'message'} );
+  }
+
+  $akey = $result->{'akey'};
+
+  # determine filecloud.io availabiity
+  $result = $websvc->ping();
+
+  if ( !$result ) {
+
+    die( $websvc->error() );
+  }
+
+  if ( $result->{'message'} eq 'pong' ) {
+
+    print "filecloud.io is available\n";
+  }
+
+  # retrieve a URL to upload a file to
+  $result = $websvc->fetch_upload_url();
+
+  if ( !$result ) {
+
+    die( $websvc->error() );
+  }
+
+  # check if filecloud.io couldn't give us a URL
+  if ( $result->{'status'} eq 'error' ) {
+
+    die( $result->{'message'} );
+  }
+
+  $url = $result->{'upload_url'};
+
+  # attempt to upload a file
+  $result = $websvc->upload_file( filename => 'me.png',
+                                  url => $url );
+
+  if ( !$result ) {
+
+    die( $websvc->error() );
+  }
+
+  # check for filecloud.io upload error
+  if ( $result->{'status'} eq 'error' ) {
+
+    die( $result->{'message'} );
+  }
+
+  $ukey = $result->{'ukey'};
+
+=head1 DESCRIPTION
+
+B<WebService::FileCloud> is a module to communicate with the L<http://filecloud.io> API.
+Documentation for their API is available at L<https://code.google.com/p/filecloud/>.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new
+
+Creates a new B<WebService::FileCloud> object with the arguments given.  All arguments
+are optional, but may be required depending upon the API methods executed.
+
+  $websvc = WebService::FileCloud->new( akey => 'apikey',
+                                        username => 'username',
+                                        password => 'password',
+                                        timeout => 30 );
+
+=over 4
+
+=item akey =E<gt> APIKEY
+
+The API key provided to your account by filecloud.io.  This can be determined via the
+B<fetch_apikey()> method if you provided your B<username> and B<password> of the
+account.  Many methods require this argument to be specified.
+
+=item username =E<gt> USERNAME
+
+The username for your account.  The only method that requires this is
+B<fetch_apikey()>.  Must also be provided with B<password>.
+
+=item password =E<gt> PASSWORD
+
+The password for your account.  The only method that requires this is
+B<fetch_apikey()>.  Must also be provided with B<username>.
+
+=item timeout =E<gt> N
+
+The number of seconds until the request is timed out.  This option is passed to
+the underlying B<LWP::UserAgent> object.  This argument is optional.
+
+=back
+
+=back
+
+=head1 METHODS
+
+All methods will return a false value if they were called incorrectly (missing
+required parameters), or if there was an HTTP or other internal error issuing the
+request.  Use the B<error()> method to get an error message as to why it failed.
+Otherwise, they should return a JSON-decoded hashref as is directly from
+filecloud.io (which may also contain an error).
+
+=head2 fetch_apikey
+
+Returns the API key associated to the account.  Both the B<username> and
+B<password> options must be given in the constructor.
+
+  $result = $websvc->fetch_apikey();
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $akey = $result->{'akey'};  
+
+=head2 fetch_account_details
+
+Returns the details of the account.  The B<akey> option must be given in the
+constructor to execute this method.
+
+  $result = $websvc->fetch_account_details();
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $is_premium = $result->{'is_premium'};
+  $user_email = $result->{'user_email'};
+  $premium_until = $result->{'premium_until'};
+  $user_id = $result->{'user_id'};
+  $user_name = $result->{'user_name'};
+
+=head2 ping
+
+Determines if the filecloud.io API is operational.  No arguments are necessary
+in the constructor to execute this method.
+
+  $result = $websvc->ping();
+
+  die( $websvc->error() ) if ( !$result );
+  $is_available = $result->{'message'} eq 'pong';
+
+=head2 fetch_upload_url
+
+Returns a URL to use when uploading a file.  No arguments are necessary in the
+constructor to execute this method.
+
+  $result = $websvc->fetch_upload_url();
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $url = $result->{'upload_url'};
+
+=head2 check_file
+
+Determines if a file is available and returns basic information.  No arguments
+are necessary in the constructor to execute this method, but the B<ukey> option
+must be provided to this method.
+
+  $result = $websvc->check_file( ukey => 'filekey' );
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $ukey = $result->{'ukey'};
+  $name = $result->{'name'};
+  $size = $result->{'size'};
+
+=over 4
+
+=item ukey =E<gt> FILEKEY
+
+The unique key of the file.  This argument is required.
+
+=back
+
+=head2 fetch_file_details
+
+Returns the full details for a particular file.  The B<akey> option must be
+given in the constructor, and the B<ukey> option described below must be
+provided to this method.
+
+  $result = $websvc->fetch_file_details( ukey => 'filekey' );
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $ukey = $result->{'ukey'};
+  $name = $result->{'name'};
+  $size = $result->{'size'};  
+  $mime = $result->{'mime'};
+
+=over 4
+
+=item ukey =E<gt> FILEKEY
+
+The unique key of the file.  This argument is required.
+
+=back
+
+=head2 fetch_download_url
+
+Returns the URL to use in order to download the specified file.  The B<akey>
+option must be given in the constructor, and the B<ukey> option described
+below must be provided to this method.  This method is only available to
+premium account holders of filecloud.io.
+
+  $result = $websvc->fetch_download_url( ukey => 'filekey' );
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $url = $result->{'download_url'};
+
+=over 4
+
+=item ukey =E<gt> FILEKEY
+
+The unique key of the file.  This argument is required.
+
+=back
+
+=head2 upload_file
+
+Uploads a file to the URL specified.  An upload url can be determined via
+the B<fetch_upload_url()> method.  The B<akey> option must be given in the
+constructor, and the B<filename> and B<url> options described below must be
+provided to this method.
+
+  $result = $websvc->upload_file( filename => '/path/to/file',
+                                  url => 'uploadurl' );
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $ukey = $result->{'ukey'};
+  $name = $result->{'name'};
+  $size = $result->{'size'};
+  $mime = $result->{'mime'};
+  $icon = $result->{'icon'};
+
+=over 4
+
+=item filename =E<gt> PATH
+
+The location of the file to upload.  This argument is required.
+
+=item url =E<gt> URL
+
+The URL to upload the file to.  This argument is required.
+
+=back
+
+=head2 fetch_tag_details
+
+Returns the details of the tag specified.  The B<akey> option must be
+given in the constructor, and the B<tkey> option described below must be
+provided to this method.
+
+  $result = $websvc->fetch_tag_details( tkey => 'tagkey' );
+
+  die( $websvc->error() ) if ( !$result );
+  die( $result->{'message'} ) if ( $result->{'status'} eq 'error' );
+
+  $tkey = $result->{'tag'}{'tkey'};
+  $name = $result->{'tag'}{'name'};
+  $id = $result->{'tag'}{'id'};
+  $user_id = $result->{'tag'}{'user_id'};
+  $ttype = $result->{'tag'}{'ttype'};
+  $ts_created = $result->{'tag'}{'ts_created'};
+
+  @files = values( %{$result->{'files'}} );
+
+  foreach $file ( @files ) {
+
+    $ukey = $file->{'ukey'};
+    $name = $file->{'name'};
+    $size = $file->{'size'};
+    $mime = $file->{'mime'};
+    $url = $file->{'url'};
+    $atype = $file->{'atype'};
+    $order = $file->{'order'};
+    $dl = $file->{'dl'};
+    $ts_created = $file->{'ts_created'};
+  }
+
+=over 4
+
+=item tkey =E<gt> TAGKEY
+
+The unique key of the tag.  This argument is required.
+
+=back
+
+=head2 error
+
+Returns an error string for the last error encountered.  This only
+contains internal errors related to HTTP requests and not errors from
+the filecloud.io API itself.
+
+  $error = $websvc->error() if ( !$result );
+
+=head1 SEE ALSO
+
+L<LWP::UserAgent>,
+L<JSON>
+
+L<http://filecloud.io> and L<https://code.google.com/p/filecloud/>
+
+=head1 AUTHOR
+
+Mitch McCracken E<lt>mrmccrac@gmail.comE<gt>
+
+=head1 LICENSE
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to L<http://unlicense.org/>
+
+=cut

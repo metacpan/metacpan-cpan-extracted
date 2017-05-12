@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Window
+		dim='100, 100, 200, 80'
+		title='Window 1'
+	/>
+	<Window
+		dim='350, 100, 200, 80'
+		title='Window 2'
+	/>
+	<Window
+		dim='100, 200, 200, 80'
+		title='Window 3'
+	/>
+	<Window
+		dim='350, 200, 200, 80'
+		title='Window 4'
+	/>
+</GUI>

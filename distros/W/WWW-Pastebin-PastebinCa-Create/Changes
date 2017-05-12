@@ -1,0 +1,17 @@
+Revision history for WWW-Pastebin-PastebinCa-Create
+
+0.004   2013-12-27
+        - Fixed a bug that caused death when Mech encountered
+          network errors
+
+0.003   2013-12-07
+        - Fixed broken test (fixes RT#91236)
+
+0.002   2013-11-25
+        - Stopped using deprecated Class::Data::Accessor
+        - Got rid of "Use of qw(..." warning
+        - Minor fixes to comply with the specs and Kwalitee game
+
+0.001   2008-03-23
+        - First version, released on an unsuspecting world.
+

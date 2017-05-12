@@ -1,0 +1,142 @@
+#!/usr/bin/perl -I .
+
+=head1 NAME
+
+ws-query : Execute a Web extraction task described by a Web Source
+           Description.
+
+=head1 DESCRIPTION
+
+This tool allows to execute a task described in a wsd file. The parameters of
+the task can be given on the command line.
+
+Type C<ws-query -h> to learn how to call ws-query.
+
+=cut
+use WebSource;
+use Getopt::Mixed;
+use WebSource::Logger;
+use Carp;
+use sigtrap qw(die normal-signals);
+
+use strict;
+use warnings;
+
+my $REVSTR = '$Revision: 1.5 $';
+$REVSTR =~ m/Revision: ([^ ]+)/;
+my $REVISION = $1;
+my $VERSION = '2.3';
+
+sub usage {
+  return <<USAGE;
+Usage : $0 [options] -s <src desc file> [src-options]
+where option are :
+  -m <value>    or --max=<value>         set the maximum result count to value
+  -l            or --split               make more clearly seperated output
+  -v <level>    or --verbose=<level>     make output more verbose
+  -h            or --help                give this help message
+  -p            or --params              gives the sources parameter list
+  -c <dir>      or --cache-dir=<dir>     sets cache direcory
+  -t <template> or --template=<template> sets cache template
+  -V            or --version             get version information
+  -q            or --query               consider parameters as a unique query
+  -x		or --split-xml		 generate start and end xml element using the given value
+and src-options are source specific parameters
+USAGE
+}
+
+my @optdecl = (
+                 "s=s source>s",
+                 "m=i max>m",
+                 "l split",
+                 "v:i verbose>v",
+                 "h help>h",
+                 "p params>p",
+                 "c=s cache-dir>c",
+                 "t=s template>t",
+                 "V version>V",
+                 "q query>q",
+                 "x=s split-xml>x",
+               );
+
+Getopt::Mixed::init(@optdecl);
+
+my $ws = undef;
+my $mode = "normal";
+my %params;
+my $xlist = "";
+
+my ($opt,$val) = Getopt::Mixed::nextOption;
+while(!$params{wsd} && $opt) {
+  SWITCH : {
+    if($opt eq "V") {
+      print "$0 version $VERSION (revision $REVISION)\n";
+      print "WebSource version $WebSource::VERSION (revision $WebSource::REVISION)\n";
+      exit(0);
+    }
+    if($opt eq "h") {
+      print usage;
+      exit(0);
+    }
+    if($opt eq "x") {
+      $xlist = $val;
+    }
+    if($opt eq "v") {
+      defined($val) or $val = 3;
+      $params{logger} = WebSource::Logger->new(level => $val);
+      $params{logger}->log(1,"Set verbosity level to $val\n");
+      last SWITCH;
+    }
+    if($opt eq "m") {
+      $params{max_results} = $val;
+      last SWITCH;
+    }
+    if($opt eq "t") {
+      $params{cachetemp} = $val;
+      last SWITCH;
+    }
+    if($opt eq "c") {
+      $params{cache} = 1;
+      $params{cachedir} = $val;
+      last SWITCH;
+    }
+    if($opt eq "q") {
+      $mode = "query";
+      last SWITCH;
+    }
+    if($opt eq "p") {
+      $mode = "param";
+      last SWITCH;
+    }
+    if($opt eq "s") {
+      $params{wsd} = $val;
+      last SWITCH;
+    }
+  }
+  $params{wsd} or ($opt,$val) = Getopt::Mixed::nextOption;
+}
+
+$ws = WebSource->new(%params);
+$ws or croak("No source description given");
+Getopt::Mixed::init($ws->option_spec);
+while(($opt,$val) = Getopt::Mixed::nextOption) {
+  $ws->set_option($opt,$val);
+}
+
+if($mode eq "query") {
+  $ws->query(@ARGV);
+} elsif($mode eq "params") {
+  my %eparams = $ws->parameters;
+  foreach my $key (keys(%eparams)) {
+    print $key , $eparams{$key} ? " (" . $eparams{$key} . ")" : "" , "\n";
+  }
+  exit(0);
+} else {
+  $ws->push(@ARGV);
+}
+
+while($_ = $ws->next_result) {
+  $xlist and print STDOUT "<$xlist>\n";
+  print STDOUT $_->dataString, "\n";
+  $xlist and print STDOUT "</$xlist>\n";
+};

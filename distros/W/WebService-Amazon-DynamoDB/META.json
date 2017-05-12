@@ -1,0 +1,73 @@
+{
+   "abstract" : "Abstract API support for Amazon DynamoDB",
+   "author" : [
+      "Tom Molesworth <cpan@perlsite.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Amazon-DynamoDB",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.012000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "1",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.30",
+            "HTTP::Request" : "0",
+            "JSON::MaybeXS" : "0",
+            "Mixin::Event::Dispatch" : "1.006",
+            "Module::Load" : "0",
+            "Time::Moment" : "0",
+            "WebService::Amazon::IAM" : "0.002",
+            "WebService::Amazon::Signature" : "0.002",
+            "WebService::Async::UserAgent" : "0.002",
+            "curry" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-webservice-amazon-dynamodb at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Amazon-DynamoDB"
+      },
+      "homepage" : "http://search.cpan.org/dist/WebService-Amazon-DynamoDB/"
+   },
+   "version" : "0.005"
+}
+

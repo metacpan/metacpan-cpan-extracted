@@ -1,0 +1,20 @@
+---
+abstract: 'Weasel extension set testing Dojo-based web apps (tag matchers and widgets)'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Weasel-Widgets-Dojo
+requires:
+  Weasel: '0'
+resources:
+  bugtracker: https://github.com/perl-weasel/weasel-widgets-dojo/issues
+  repository: https://github.com/perl-weasel/weasel-widgets-dojo.git
+version: '0.02'

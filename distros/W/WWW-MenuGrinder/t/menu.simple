@@ -1,0 +1,38 @@
+menu {
+  item "Home" { 
+    location "" 
+    target "/" 
+    item "Directory" { location "directory" }
+  }
+  item "_User Manager" {
+    need_role "it"
+    location "user"
+    target "/user/search"
+    item "Your name is ${username}" { }
+    item "Search" { location "user/search" }
+    item "View" {
+      need_var "current_user"
+      location "user/view"
+    }
+  }
+  item "_Hardware Manager" {
+    need_role "it"
+    location "hardware"
+    target "/hardware/search"
+    item "Search" { location "hardware" }
+    item "Add" { location "hardware/add" }
+  }
+  item "_CSR Manager" {
+    need_role "csr_manager"
+    location "csr"
+    item "CSR Performance" { location "csr_perf" }
+  }
+  item "Log Out" {
+    need_var "logged_in"
+    location "logout"
+  }
+  Item "Log In" {
+    no_var "logged_in"
+    location "login"
+  }
+}

@@ -1,0 +1,39 @@
+WWW-Offliberty version 1.000004
+===============================
+
+Offliberty is a service that takes a URL to some media (for example a
+YouTube video, a Vimeo video, a SoundCloud song) and returns one or
+more download links.
+
+WWW::Offliberty is a simple interface to this service. The dist also
+includes a command-line script called "off" that has the same
+functionality as the module.
+
+See http://offliberty.com and the documentation of WWW::Offliberty for
+more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ * HTML::TreeBuilder
+ * HTTP::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

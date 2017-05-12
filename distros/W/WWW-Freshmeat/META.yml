@@ -1,0 +1,44 @@
+---
+abstract: automates usage of Freshmeat.net
+author:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+build_requires:
+  File::Slurp: 0
+  LWP::Online: 1.06
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - freshmeat
+  - API
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Freshmeat
+provides:
+  WWW::Freshmeat:
+    file: lib/WWW/Freshmeat.pm
+    version: 0.22
+  WWW::Freshmeat::Project:
+    file: lib/WWW/Freshmeat/Project.pm
+    version: 0.22
+  WWW::Freshmeat::Project::URL:
+    file: lib/WWW/Freshmeat/Project/URL.pm
+    version: 0.22
+  WWW::Freshmeat::User:
+    file: lib/WWW/Freshmeat/User.pm
+    version: 0.22
+requires:
+  LWP::UserAgent: 0
+  Mouse: 0.24
+  XML::Parser: 0
+  XML::Simple: 0
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chorny/WWW-Freshmeat
+  x_Ohloh: https://www.ohloh.net/p/WWW-Freshmeat
+version: 0.22

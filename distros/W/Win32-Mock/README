@@ -1,0 +1,58 @@
+NAME
+
+    Win32::Mock - Mock Win32 modules
+
+
+DESCRIPTION
+
+    Win32::Mock provides mocked version of Win32 modules and functions so
+    programs and modules with Win32 specific code can be tested on any
+    operating system.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the 
+    perldoc command.
+
+        perldoc Win32::Mock
+
+    You can also look for information at:
+
+        Search CPAN
+            http://search.cpan.org/dist/Win32-Mock
+
+        CPAN Request Tracker:
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-Mock
+
+        AnnoCPAN, annotated CPAN documentation:
+            http://annocpan.org/dist/Win32-Mock
+
+        CPAN Ratings:
+            http://cpanratings.perl.org/d/Win32-Mock
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2007, 2008 Sébastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

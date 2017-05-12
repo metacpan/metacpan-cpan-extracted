@@ -1,0 +1,36 @@
+---
+abstract: 'Perl interface to CMIS-compliant document management systems'
+author:
+  - 'Michael Daum <daum@michaeldaumconsulting.com>'
+build_requires:
+  Cache::FileCache: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Class: 0
+  Test::DistManifest: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Signature: 0
+  XML::SemanticDiff: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Cmis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Error: 0
+  File::MMagic: 0
+  LWP::UserAgent: 0
+  REST::Client: 0
+  URI: 0
+  XML::LibXML: 0
+  perl: 5.012001
+version: 0.09

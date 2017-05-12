@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-RobotRules-DBIC
+version:      0.01
+version_from: lib/WWW/RobotRules/DBIC.pm
+installdirs:  site
+requires:
+    DBIx::Class:                   0.07
+    Test::More:                    0
+    WWW::RobotRules:               1.33
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

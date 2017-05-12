@@ -1,0 +1,76 @@
+<!-- PERL: Hide Perl`s script
+<?perl 
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');  # HTTP Content-type header
+?>
+//-->
+
+<HTML>
+  <HEAD>
+     <TITLE>Global Variables Test</TITLE>
+  </HEAD>
+<BODY TEXT="white" BGCOLOR="black" LINK="yellow" VLINK="yellow">
+<FONT FACE="Verdana" SIZE=2><B>
+<CENTER>Global Var Test</CENTER><BR>
+<!-- PERL: Hide Perl`s script
+<?perl
+ if ($method eq 'get') 
+   {
+    print "Method is GET";
+    print "<BR> and greetings is: <I>$greet</I><BR>";
+   }
+ if ($method eq 'post') 
+   {
+    print "Method is POST";
+    print "<BR> and greetings is: <I>$greet</I><BR>";
+   }
+ if ($method eq 'multipart') 
+   {
+    print "Method is Multipart";
+    print "<BR> and greetings is: <I>$greet</I><BR>";
+    print "<HR>\n";
+    print "The content of file is:<BR>\n";
+    print "<HR>\n";
+    $fn = $uploaded_files{'myfile'};        # %uploaded_files is a global var.
+    if (open (FILE, $fn))
+      {
+       undef $/;
+       $source = <FILE>;
+       close FILE;
+       unlink($fn);
+       $source =~ s/</&lt;/g;
+       $source =~ s/>/&gt;/g;
+       $source =~ s/\r/<BR>/gs;
+       $source =~ s/\n/<BR>/gs;
+       print $source;
+       $/ = "\n";
+      }
+    else { print "Error: Transfer problem!<BR>"; }
+    print "<HR>\n";
+   }
+ if ($method eq '')
+   {
+    ?>
+    //-->
+    This is GET method test: <A href="/cgi-bin/webtools/process.cgi?file=global/glob.html&method=get&greet=Hello from GET part of script">/cgi-bin/webtools/process.cgi?file=global/glob.html&method=get&greet=Hello from GET part of script</A><BR><BR>
+    <HR>
+    <FORM ACTION="/cgi-bin/webtools/process.cgi?file=global/glob.html" METHOD=POST NAME="TEST">
+      <INPUT TYPE="hidden" NAME="greet" VALUE="Hello from POST part of script">
+      <INPUT TYPE="hidden" NAME="method" VALUE="post">
+      This is POST method test: <INPUT TYPE="submit" NAME="subm" VALUE="Send Via POST Form">
+    </FORM>
+    <HR>
+    <FORM enctype='multipart/form-data' ACTION="/cgi-bin/webtools/process.cgi?file=global/glob.html" METHOD="POST">
+      This is Multipart method test: <BR>
+      Input File:<INPUT TYPE=FILE NAME=myfile> 
+      <INPUT TYPE="hidden" NAME="greet" VALUE="Hello from Multipart">
+      <INPUT TYPE="hidden" NAME="method" VALUE="multipart">
+      <INPUT TYPE="submit" NAME="subm" VALUE="Upload File">
+    </FORM>
+    <!-- PERL: Hide Perl`s script
+    <?perl
+   }
+?>
+//-->
+</B></FONT>
+</BODY>
+</HTML>

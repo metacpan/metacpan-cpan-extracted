@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SimpleRobot.pm
+test.pl
+eg/stresstest.pl
+eg/blinks.pl

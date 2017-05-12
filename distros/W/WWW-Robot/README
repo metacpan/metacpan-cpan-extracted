@@ -1,0 +1,31 @@
+
+				WWW::Robot Module
+				     v0.011
+
+This distribution contains a module which provides a web traversal engine
+for use in web robots and the like. This is a beta release; the API is
+open to change until a 1.000 release.
+
+To install these modules, you should just have to run the following:
+
+	% perl Makefile.PL
+	% make install
+
+The module is documented using pod. When you "make install", you
+will get a man-page: WWW::Robot. You can also generate HTML using pod2html:
+
+	% pod2html Robot.pm
+
+There is a simple example robot, poacher, in the examples/ directory of
+this distribution. Poacher is a basic site validation robot, mainly to
+illustrate use of the module.
+
+Please let me know if you experience any problems with this module,
+or have any ideas for additions.
+
+
+Neil Bowers <neilb@cre.canon.co.uk>
+
+Solutions Applications Services
+Canon Research Centre Europe
+http://www.cre.canon.co.uk/

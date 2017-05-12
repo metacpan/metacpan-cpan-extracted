@@ -1,0 +1,81 @@
+Win32API-File-Time is Copyright (C) 2004-2005 E. I. DuPont de Nemours
+and Company, Inc. Copyright (C) 2007, 2010, 2016 by Thomas R.  Wyant, III.
+
+DESCRIPTION
+
+This package exposes the Windows file creation time for access and
+modification. It also allows the access, update, and creation times
+to be modified even if the file is open, or read-only. In fact, the
+porting of functionality from a system where the Perl utime build-in
+would change the date of an open file (VMS) to one where it wouldn't
+(MSWin32) was the motivation for the module.
+
+This module exports nothing by default, but is capable of exporting
+the following subroutines:
+    GetFileTime and SetFileTime (to get and set all file times)
+    utime (to override the built-in).
+Unlike the Microsoft Kernel32 subroutines of the same name, these take
+a file name (not a handle), and work in terms of Perl times, not
+Microsoft file times. Specifically:
+
+  ($atime, $mtime, $ctime) = GetFileTime ($filename);
+  SetFileTime ($filename, $atime, $mtime, $ctime) or die $^E;
+
+This module has the following prerequisites:
+  Time::Local
+  Win32::API
+  Win32API::File
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of either
+'cpan' or 'cpanp'. For either of these, installing Astro::Coord::ECI
+gets you everything. ActivePerl users will want to use ActiveState's
+'ppi', and install Astro-satpass.
+
+If for some reason neither of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Win32API-File-Time-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the Win32/Process/Info directory (creating it if
+necessary) in the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

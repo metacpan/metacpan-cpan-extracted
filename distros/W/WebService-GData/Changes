@@ -1,0 +1,560 @@
+Revision history for Perl extension WebService::GData.
+
+0.06 2013-10-18
+
+    - Fix RT #88899 warning on each in perl 5.18
+    - New maintainer
+
+0.05_01 2011-11-13
+        
+    - NEW
+    
+    - YOUTUBE RELATED
+     
+    - WebService::GData::YouTube
+         - get_user_playlists
+           you can now loop through it in order to get all the playlists in a channel (above the limit of 50)
+  
+     
+    - playslits: WebService::GData::YouTube::Feed::PlaylistLink
+         - new method:
+           - add_video        
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_09 2011-08-18
+        
+    - NEW
+    
+    - GDATA RELATED
+    
+    - XML now avoids to output unnecessary namespaces and empty tags
+      This modification could lead to errors, feel free to contact me if you meet any problem!   
+    
+    - YOUTUBE RELATED
+     
+    - WebService::GData::YouTube
+         - DOC: listed get_user_profile twice instead of get_user_contacts
+         
+         - new methods:
+         
+           - get_user_inbox
+           - message
+           
+           
+    - WebService::GData::YouTube::Feed::VideoMessage
+        A new feed  to access logged in user inbox (video messages only)         
+
+            
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+
+0.04_08 2011-06-28
+        
+    - NEW
+    
+     YOUTUBE RELATED
+     
+      - WebService::GData::YouTube
+         - added the following methods:
+         
+            get_user_contacts
+            contact
+           
+           
+      - WebService::GData::YouTube::Feed::Friend
+        A new feed representation to access contact/friend data.
+         
+      - few minor doc changes
+            
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_07 2011-05-06
+
+    - fix some doc problem for the YouTube packages...
+
+0.04_06 2011-05-05
+
+    - fix some doc problem for the YouTube packages...
+
+
+0.04_05 2011-05-03
+        
+    - NEW
+    
+     YOUTUBE RELATED
+     
+      - WebService::GData::YouTube
+         - added the following methods:
+         
+            get_recommended_videos
+            add_video_response
+            delete_video_response
+            add_favorite_video
+           
+         - get_user_playlist_by_id can now be looped over to get all the videos within a playlist
+           Other methods returning multiple result shall behave this way in up-coming releases.
+           
+           
+      - WebService::GData::YouTube::Video
+         - added the following methods:
+            add_video_response 
+            delete_video_response 
+            add_favorite_video
+            rating (available since 0.04_04 but not listed)
+            uploader
+            recorded
+            genre (returns the youtube video category name)
+            is_read_only
+         - delete method tries first to use the feed edit link if set
+           and else reverse to the usual system.
+         
+      - new general overview documentation (in progress)
+      
+    - BUG FIX
+    
+      YOUTUBE RELATED
+      
+       - WebService::GData::YouTube 
+         - get_user_favorite_videos refers to Favorite package not Video
+           but there wasn't any Favorite package....
+           
+        - WebService::GData::YouTube::Video
+          - fix the content method (bug in the youtube node) so that you can access the format value
+          
+    - new tests
+        
+      
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_04 2011-04-17
+        
+    - NEW
+    
+     YOUTUBE RELATED
+     
+      - WebService::GData::YouTube
+         - added like_video and dislike_video to rate a video
+         - added a complaint method
+         
+      - WebService::GData::YouTube::Video
+         - added rating method to access num_likes, num_dislikes
+         - added rate method to save a rating value
+         
+      - new WebService::GData::YouTube::Feed::Complaint
+         - used with the complaint method factory to add a complaint on a video
+        
+      - new tests
+      
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_03 2011-03-10
+
+    - NON BACKWARD COMPATIBLE
+    
+      - WebService::GData::YouTube
+        get_watch_on_mobile_videos is not supported anymore by YouTube
+        
+    - NEW
+    
+     YOUTUBE RELATED
+     
+      - WebService::GData::YouTube
+         - 2 new standard feeds: most_shared and on_the_web.
+         - new method:get_user_profile to access user profile information
+         
+      - WebService::GData::YouTube::Query
+         - caption parameter should now be set to either true or false (not setting a value will revert to true)    
+           
+      - WebService::GData::YouTube::Feed::Video
+        - restriction method added to handle media:restriction tag
+		- denied_countries is a shortcut sending back the list of countries that are denied access to the video
+		
+      - new WebService::GData::YouTube::StagingServer 
+        - switch to staging server
+      
+      - new WebService::GData::YouTube::Feed::UserProfile
+        - get information about a user 
+           
+      - WebService::GData::Node::Media::GroupContent
+        - added the Restriction tag
+        - force Collection context for some tags(content thumbnails restriction,etc)
+        
+      - new tests
+      
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_02 2011-01-30
+    
+    - NON BACKWARD COMPATIBLE
+    
+      - You must pass a hash ref in order to access attributes for nodes that contain both text&attributes 
+        ie: $feed->generator("perl");
+            $feed->generator({})->uri("http://www.perl.org")
+            $feed->content({})->src or $feed->content_src
+      - WebService::GData::Base 
+        get_user_agent_name is now user_agent_name and works as both getter/setter
+
+    - BUG FIX
+    
+       - ClientLogin was warning for the YouTube key not being set when used with an other service.
+         #reported by Larry
+       - force Test::Mock::LWP is compulsory,again...
+       - Reorganized the tests a bit
+        
+    - NEW
+      - new tests
+      - Atom Title node has now the type attribute
+      - The default __to_string does not use Data::Dumper anymore(simple stub).
+      - GData doc updated 
+      - The XML serializer only outputs elements set (instead of empty tags)
+      - WebService::GData::Base 
+        - enable_compression will try to get gzip data from Google if your environment allows it
+        - unknown methods calls are first dispatch to the user agent instance before dying (agent method is forbidden)
+      - WebService::GData::YouTube 
+        - connection returns the WebService::GData::Base instance
+      
+    - NEXT RELEASE
+    
+      - start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.04_01  2011-01-23
+        
+    - NEW
+    
+      - YouTube PlaylistLink package
+        - you can save create or edit an existing playlist meta data.
+          #warning: not tested very thoroughly... need to write a test suite.
+        - added some doc about this package
+      - YouTube package
+        - added  a playlists method, helper to instantiate a PlaylistLink class.
+      - GData/YouTube
+        - doc updated 
+      
+    - NEXT RELEASE
+    
+      - need to clean up the tests and start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_09  2011-01-17
+
+    - BUG FIX
+        
+      - YouTube Video package
+        - keywords setting was not working
+      - Collection 
+        - was warning when matching against an empty list
+      - AtomEntity
+        - force Collection context even for an empty instance to get a coherent result for link, category nodes
+        
+    - NEW
+    
+      - YouTube Comment package
+        - added comment_id,video_id,in_reply_to and a save method (you can now add comments from perl)
+          #warning: not tested very thoroughly... need to write a test suite.
+        - added some doc about this package
+      - YouTube package
+        - added  a comment method, helper to instantiate a Comment class.
+      - Base
+        - doc updated 
+      - a test added for Video
+      
+    - NEXT RELEASE
+    
+      - need to clean up the tests and start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_08  2011-01-03
+
+    - BUG FIX
+    
+        Even if am focusing on the core, I get many emails regarding the YouTube service.
+        I therefore mainly focused on fixing the bug reports I got so far.
+        
+      - YouTube Video package
+        - aspect_ratio was not pointing to the right value
+        - is_xxx_allowed subs did not use the right order. rewritten to be a base name based setting.
+          (Thanks Brian for the numerous reports)
+      - YouTube package
+        - change a typo in the code for get_comments_for_video_id()
+      - BaseCollection is erased for now as it was not working as I expected and had a circular reference anyway.
+        
+    - NEW
+    
+      - YouTube Video package
+         - change the is_xxx_allowed methods behavior. should update your code if necessary!
+           look at the documentation for further explanation
+      - YouTube Comment package
+        - added a content method
+      - YouTube package
+        - documented the get_comments_for_video_id  
+      - an entity has been changed to behave in a lazy manner and will expand little by little
+        -> need to ensure that data required for serialization is called before hand!
+      - more tests
+      
+    - NEXT RELEASE
+    
+      - need to clean up the tests and start mocking some of the live tests I use on my side...
+      - lazy up thing more and get rid of old variables that take up memory for nothing...
+      - add a bit of doc for YouTube package
+      
+    - YouTube service may not work properly right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_07  2010-12-19
+
+    small update for bug fix.
+	- YouTube Video access_control could not be edited (only newly created)
+	- Collection class was loosing its binding to the array
+    - YouTube service may not work right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_06  2010-12-17
+
+    small update for bug fix.
+	- The XML serializer now encode html entities (querying YouTube then updating the queried result failed)
+	  -> quick fix for now.
+	- The XML serializer now adds the namespace on the root node for any attributes containing an extra namespace
+	  even if the attribute itself is empty (until now it was discarded but could lead to error by not including the gd namespace)
+    - YouTube service may not work right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_05  2010-12-05
+
+    - the Collection serialize method has been removed 
+      and the class now inherits from BaseCollection which implements Iterator, tie array.
+      The mechanism will check for only allowed class and create them in a lazy fashion (next release)
+    - doc update 
+    - some packages version number updated as it should have been done in 0.03_04.
+    - FIX:YouTube service Video package failed to set some parameters (videoid,location)
+    - tests added for the YouTube service Video package.
+    - YouTube service may not work right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_04  2010-11-03
+
+    This update contains many changes that would be hard to list...
+    The next update should deal with lazy loading the classes that are for now loaded in bunch...
+    and separate the storage layers/serialization formats available
+    Below is a short overview for this version:
+    - the Node serialize method has been moved to its own package
+    - the Base package does not handle any namespace related functions (get/add/clean/_namespaces)
+    - added new constants for the prefix and the uri of the namespaces in WebService::GData::Constants
+    - the Node serialize method now discovers all the namespaces and apply them to the root element
+    - Added Atom,OpenSearch,GD namespaces in Node::*
+	- switch to Module::Install
+    - YouTube service may not work right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_03 2010-11-01
+
+	- I messed up with subversion and upload the wrong package it seems. should be ok.
+    - YouTube service may not work entirely right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_02 2010-10-30
+
+    - Created a Collection class and related tests
+    - WebService::GData::Node can understand camelCase and hyphen based functions
+    - Added YouTube browser upload mechanism documentation
+    - rewrite of some parts of the WebService::GData::YouTube::Feed::Video
+    - renamed WebService::GData::YouTube::Node:: to WebService::GData::YouTube::YT:: to follow the core convention
+    - added a helper video method in WebService::GData::YouTube to create a WebService::GData::YouTube::Feed::Video
+    - YouTube service may not work entirely right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.03_01 2010-10-24
+
+    - Added __set and __get autoload methods in WebService::GData
+    - Created the abstract Node package and implemented some nodes. 
+    - Added the youtube nodes
+    - Added new tests for nodes
+    - Erased all the tags in Feed:: and moved them in Nodes:: as Entity representation.
+    - YouTube service may not work right now!
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_09 2010-10-11
+
+    - Documented a bit more the WebService::GData::Feed entry sub.
+    - the above sub now loads a package only once 
+    - Added a new test for the above sub and the package itself
+    - updated the doc here and there
+    - documented the YouTube::Constants package and added a test
+    - Feed and Entry doc was specifying a auth object where it should have been a Base request object.
+    - will start rewriting the YouTube service which certainly does not work now.
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_08 2010-10-10
+
+    - Moved disable sub to WebService::GData and add doc about it.
+    - Fixed small typo in WebService::GData::Query doc
+    - Updated the doc for WebService::GData::Feed::Link which was a bad copy/paste from an other package.
+    - Added WebService::GData::Feed::Entry::Content
+    - Added new tests for the above package and for WebService::GData::Feed::Entry
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_07 2010-10-03
+
+    - Modified WebService::GData::Feed so that complex data return an object
+    - Added 3 classes: WebService::GData::Feed::Author,WebService::GData::Feed::Link,WebService::GData::Feed::Category
+    - Updated the doc for WebService::GData::Feed
+    - Added tests for the above 3 classes and for WebService::GData::Feed.
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_06 2010-09-18
+
+    - updated/fix WebService::GData::ClientLogin doc
+    - ClientLogin throws an error if the password/email is not set before querying the service.
+    - ClientLogin set the error code from the server in the code method instead of always returning 403.
+    - added live tests on the command line for WebService::GData::ClientLogin.
+      The user can enter its own account information and try to connect.
+      Might not work in all platforms and might disappear in the next release...
+    - updated WebService::GData::Feed to explain a little bit more what is what.
+    - created a load instance test for WebService::GData::Feed.
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_05 2010-09-18
+
+    - updated/fix WebService::GData::ClientLogin doc
+    - ClientLogin throws an error if the password/email is not set before querying the service.
+    - added tests for ClientLogin.
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_04 2010-09-17
+
+    - updated/fix WebService::GData::YouTube doc
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_03 2010-09-17
+
+    - updated/fix WebService::GData::YouTube where $auth was required where it should be optional
+    - fix WebService::GData::YouTube the standard feed functions not in sync with doc
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_02 2010-09-12
+
+    - updated/fix the doc for WebService::GData::ClientLogin
+    - added a loading test for the above package.
+    - revert back the dependencies to Test::Mock::LWP to being required for now...
+      will see if I can fix.
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.02_01 2010-09-12
+
+    - updated/fix the doc
+    - added new tests for WebService::GData::Base
+    - added get_uri and get_user_agent_name in WebService::GData::Base
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_09 2010-09-09
+
+    - updated/fix the doc
+    - added some tests for WebService::GData::Base
+    - modified some behavior in WebService::GData::Base
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_08 2010-09-08
+
+    - updated/fix the doc
+    - fix http status code in WebService::GData::Constants
+    - added override_method in WebService::GData::Base
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_07 2010-09-05
+
+    - updated/fix the doc
+    - added http status code in WebService::GData::Constants
+    - added a basic date format validation logic in WebService::GData::Query
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+	
+0.01_06 2010-09-05
+
+    - updated/fix the doc
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_05 2010-09-05
+
+    - updated/fix the doc
+    - created new tests
+    - created new doc
+    - added some new feature to WebService::GData: private
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_04 2010-09-02
+
+    - updated/fix the doc
+    - created new tests
+    - created new doc
+    - added some new feature to WebService::GData::Query: install/disable
+      These functions will be used in sub classes to create easily the methods.
+      It will also try to call _FUNC_NAME_is_valid before setting the value.
+    - modified install_in_package to accept an optional package
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_03 2010-09-02
+
+    - updated the doc
+    - created new tests
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_02 2010-09-02
+
+    - updated the doc
+    - created tests for WebService::GData
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+
+0.01_01 2010-09-01
+
+    - original version; created by h2xs 1.23 with options
+    -AX -n WebService::GData -b 5.8.8
+    - !DEVELOPER RELEASE! Please feel free to try it and send me feedbacks!
+

@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w -I../lib
+# Display the specified message
+#
+# usage: read_message messageID
+
+use WWW::Myspace;
+
+my ( $message_id ) = @ARGV;
+
+$myspace = new WWW::Myspace;
+
+print "Getting message...\n";
+my $message = $myspace->read_message( $message_id );
+
+foreach $key ( keys( %$message ) ) {
+	print $key . ": " . $message->{$key} . "\n";
+}
+
+#print "Sender: " . $message->{sender} . "\n";
+#print "Status: " . $message->{status} . "\n";
+#print "messageID: " . $message->{message_id} . "\n";
+#print "Subject: " . $message->{subject} . "\n\n";

@@ -1,0 +1,14 @@
+#############################################################################
+## Name:        typemap
+## Purpose:     typemap for Wx::GLCanvas.pm
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     26/07/2003
+## RCS-ID:      $Id: typemap,v 1.2 2003/09/12 21:35:54 mbarbon Exp $
+## Copyright:   (c) 2003, 2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+wxGLCanvas*             O_WXEVTHANDLER
+wxGLContext*            O_NON_WXOBJECT

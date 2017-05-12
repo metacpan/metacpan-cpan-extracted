@@ -1,0 +1,15 @@
+README
+ChangeLog
+MANIFEST
+Makefile.PL
+WebCache/ICP.pm
+doc/rfc2187.txt
+doc/rfc2186.txt
+scripts/README
+scripts/jellyfish.pl
+scripts/starfish.pl
+scripts/mirrors/openldap
+scripts/mirrors/gnome
+scripts/mirrors/kde
+scripts/mirrors/openssl
+scripts/mirrors/squid

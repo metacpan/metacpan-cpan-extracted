@@ -1,0 +1,130 @@
+Revision history for Perl extension WWW::Twilio::API.
+
+release: 0.21
+
+commit 5b4c5d9876e0d08a3fb0d79c1f65682f598d77af
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Tue Sep 6 16:29:58 2016 -0600
+
+    remove Crypt::SSLeay build dependency (rt#96683)
+
+release: 0.20
+
+commit 485849c0e4eaac54454fc31f48e910d6f18eac50
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Aug 1 23:34:26 2016 -0600
+
+    set minimum Perl version to 5.10.1; minimum List::Util to 1.29
+
+release: 0.19
+
+commit af21199241a128bcde144700bb7942648a8902ab
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Aug 1 14:13:27 2016 -0600
+
+    allow multiple keys
+
+commit e0e58049b9397cbff5cca5a6e6ad72d97c0ebdac
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Aug 1 11:19:52 2016 -0600
+
+    indent code sections
+
+commit b0f3e88d7ba121aff5a05cec6da139f12f93592e
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Aug 1 11:18:51 2016 -0600
+
+    version bump
+
+commit b6ce5d7eb23c49283e02c272e573b4422e57349b
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Aug 1 11:06:01 2016 -0600
+
+    fix RT #115706: clean up lwp_callback and utf8 object attributes at object destruction time (Nigel Gregoire)
+
+release: 0.18
+
+r24 | scott | 2014-10-13 10:24:23 -0600 (Mon, 13 Oct 2014) | 1 line
+
+- document utf8 argument
+------------------------------------------------------------------------
+r23 | scott | 2014-10-13 10:17:31 -0600 (Mon, 13 Oct 2014) | 1 line
+
+- version bump: 0.18
+------------------------------------------------------------------------
+r22 | scott | 2014-10-13 10:17:07 -0600 (Mon, 13 Oct 2014) | 1 line
+
+- enable utf8 support [Kris Matthews] [rt#98963]
+
+
+0.17 - LWP callback support (thanks: Preston Gilchrist)
+------------------------------------------------------------------------
+r20 | scott | 2012-07-14 21:17:56 -0600 (Sat, 14 Jul 2012) | 1 line
+
+- LWP callback added (Preston Gilchrist)
+------------------------------------------------------------------------
+
+
+0.16 - GET parameters (e.g., SMS/Messages) are now passed correctly
+------------------------------------------------------------------------
+r17 | scott | 2011-10-10 20:47:27 -0600 (Mon, 10 Oct 2011) | 2 lines
+
+- fixes for GET parameters
+
+------------------------------------------------------------------------
+
+
+0.15 - default Twilio API is now 2010-04-01; DO NOT UPGRADE unless you
+understand how to make your code compatible. See documentation for
+details.
+------------------------------------------------------------------------
+r14 | scott | 2011-08-19 22:53:22 -0600 (Fri, 19 Aug 2011) | 4 lines
+
+- COMPATIBILITY NOTICE: Default API is now '2010-04-01'. See
+  documentation for details.
+- updated documentation
+
+------------------------------------------------------------------------
+
+
+0.14 - documentation updates
+------------------------------------------------------------------------
+r12 | scott | 2010-02-10 06:59:14 -0700 (Wed, 10 Feb 2010) | 3 lines
+
+- additional debugging
+- some SMS examples
+
+------------------------------------------------------------------------
+
+
+0.13 - documentation updates
+------------------------------------------------------------------------
+r10 | scott | 2009-09-19 09:44:32 -0600 (Sat, 19 Sep 2009) | 2 lines
+
+- documentation fixes
+
+------------------------------------------------------------------------
+
+
+0.12 - first public release
+------------------------------------------------------------------------
+r6 | scott | 2009-09-19 00:07:23 -0600 (Sat, 19 Sep 2009) | 2 lines
+
+- dependency cleanup, examples, documentation
+
+------------------------------------------------------------------------
+r4 | scott | 2009-09-18 23:41:59 -0600 (Fri, 18 Sep 2009) | 2 lines
+
+- sticking a fork in it
+
+------------------------------------------------------------------------
+r3 | scott | 2009-09-18 13:06:14 -0600 (Fri, 18 Sep 2009) | 2 lines
+
+- some documentation updates
+
+------------------------------------------------------------------------
+r2 | scott | 2009-09-18 11:51:58 -0600 (Fri, 18 Sep 2009) | 2 lines
+
+- initial import of WWW::Twilio::API
+
+------------------------------------------------------------------------

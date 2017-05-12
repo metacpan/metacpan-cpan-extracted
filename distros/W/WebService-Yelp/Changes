@@ -1,0 +1,16 @@
+Revision history for Perl extension WebService::Yelp.
+
+0.03  Tue Feb 19 09:25:00 2008
+        - splitting up tests, adding pod and pod-coverage
+        - add TODO
+        - update this Changes file
+
+0.02  Sun Feb 17 21:06:00 2008
+        - change return value of search functions to use a 
+                WebService::Yelp::Result type
+        - add a lot more documentation
+
+0.01  Thu Feb 14 19:13:28 2008
+	- original version; created by h2xs 1.23 with options
+		-AfX --skip-exporter --skip-autoloader -n WebService::Yelp
+

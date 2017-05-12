@@ -1,0 +1,27 @@
+This is Perl module WebService::Simple::Yahoo::JP::API.
+
+INSTALLATION
+
+WebService::Simple::Yahoo::JP::API installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan WebService::Simple::Yahoo::JP::API
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+WebService::Simple::Yahoo::JP::API documentation is available as in POD. So you can do:
+
+    % perldoc WebService::Simple::Yahoo::JP::API
+
+to read the documentation online with your favorite pager.
+
+AYANOKOUZI, Ryuunosuke

@@ -1,0 +1,215 @@
+
+=head1 NAME
+
+Win32::GUI::Region - A Win32::GUI package
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CombineRgn
+
+B<CombineRgn(source1,source2,CombineMode)>
+
+The CombineRgn method combines two regions. The two regions are
+combined according to the specified mode.
+
+CombineMode:
+
+ RGN_AND  (1) Creates the intersection of the two combined regions.
+ RGN_COPY (5) Creates a copy of the region identified by source1.
+ RGN_DIFF (4) Combines the parts of source1 that are not part of source2.
+ RGN_OR   (2) Creates the union of two combined regions.
+ RGN_XOR  (3) Creates the union of two combined regions except for any
+              overlapping areas.
+
+Return Values:
+
+ NULLREGION    (1) The region is empty.
+ SIMPLEREGION  (2) The region is a single rectangle.
+ COMPLEXREGION (3) The region is more than a single rectangle.
+ ERROR         (0) No region is created.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateEllipticRgn
+
+B<CreateEllipticRgn(LEFT, TOP, RIGHT, BOTTOM)>
+
+The CreateEllipticRgn function creates an elliptical region,
+returning a region object.
+
+The bounding rectangle defines the size, shape, and orientation of
+the region: The long sides of the rectangle define the length of the
+ellipse's major axis; the short sides define the length of the
+ellipse's minor axis; and the center of the rectangle defines
+the intersection of the major and minor axes.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateRectRgn
+
+B<CreateRectRgn(LEFT, TOP, RIGHT, BOTTOM)>
+
+The CreateRectRgn function creates a rectangular region, returning a
+region object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateRoundRectRgn
+
+B<CreateRoundRectRgn(LEFT, TOP, RIGHT, BOTTOM , WIDTH, HEIGHT)>
+
+The CreateRoundRectRgn function creates a rectangular region with
+rounded corners, returning a region object.
+
+The width and height is of the ellipse used to create the rounded
+corners.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EqualRgn
+
+B<EqualRgn(Region)>
+
+The EqualRgn function checks the two specified regions to determine
+whether they are identical. The method considers two regions identical
+if they are equal in size and shape.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ExtCreateRegion
+
+B<ExtCreateRegion(RGNDATA)>
+
+The ExtCreateRgn function creates a region from data held in memory.
+The data is a win32 RGNDATA structure (See MSDN) that can be created by
+packing the appropriate structure, or more easily by using the
+L<GetRgnData()|Win32::GUI::Region/GetRegionData> method.
+
+  my $rgn = Win32::GUI::Region->CreateRoundRectRgn(0,0,100,100,50,50);
+  my $rgndata = $rgn->GetRegionData();
+  my $newrgn = Win32::GUI::Region->ExtCreateRegion($rgndata);
+
+Returns a Win32::GUI::Region object on success or undef on failure
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRegionData
+
+B<GetRegionData()>
+
+The GetRegionData functions returns a representation of the region as a
+string of bytes that can be used to re-create an identical region using
+the L<ExtCreateRgn()|Win32::GUI::Region/ExtCreateRegion> method.
+
+Returns a string of bytes on success or undef on failure
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRgnBox
+
+B<GetRgnBox()>
+
+The GetRgnBox function retrieves the bounding rectangle of the specified
+region.
+Returns the rectangle (as a four-element array containing left, top,
+right, bottom coordinates)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 OffsetRgn
+
+B<OffsetRgn(X,Y)>
+
+The OffsetRgn function moves a region by the specified offsets.
+
+The return value specifies the new region's complexity. It can be
+one of the following values.
+
+1 (NULLREGION)    Region is empty.
+2 (SIMPLEREGION)  Region is a single rectangle.
+3 (COMPLEXREGION) Region is more than one rectangle.
+0 (ERROR)         An error occurred; region is unaffected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PtInRegion
+
+B<PtInRegion(X,Y)>
+
+The PtInRegion method determines whether the specified point is inside
+the specified region.
+
+If the specified point is in the region, the return value is nonzero.
+If the specified point is not in the region, the return value is zero.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RectInRegion
+
+B<RectInRegion(left, top, right, bottom)>
+
+The RectInRegion method determines whether any part of the specified
+rectangle is within the boundaries of a region.
+
+If any part of the specified rectangle lies within the boundaries of
+the region, the return value is nonzero.
+
+If no part of the specified rectangle lies within the boundaries of
+the region, the return value is zero.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRectRgn
+
+B<SetRectRgn(left, top, right, bottom)>
+
+The SetRectRgn function converts a region into a rectangular region
+with the specified coordinates.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

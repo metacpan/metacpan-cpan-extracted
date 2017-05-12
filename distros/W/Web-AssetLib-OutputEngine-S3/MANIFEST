@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Web/AssetLib/OutputEngine/S3.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

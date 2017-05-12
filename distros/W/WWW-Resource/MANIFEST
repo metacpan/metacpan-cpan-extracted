@@ -1,0 +1,8 @@
+Changes
+INSTALL.REST-FRAMEWORK
+Makefile.PL
+MANIFEST
+README
+t/WWW-Resource.t
+lib/WWW/Resource.pm
+META.yml                                 Module meta-data (added by MakeMaker)

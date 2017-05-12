@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Eventful
+version:      1.0
+version_from: 
+installdirs:  site
+requires:
+    Carp:                          0
+    Data::Dumper:                  0
+    Digest::MD5:                   0.1
+    LWP::UserAgent:                0.1
+    Oauth::Lite::Consumer:         0
+    Module::Pluggable::Object:     0
+    Test::More:                    0
+    XML::Simple:                   0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

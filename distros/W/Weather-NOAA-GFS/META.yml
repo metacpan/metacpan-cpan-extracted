@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Weather-NOAA-GFS
+version:      0.10
+version_from: lib/Weather/NOAA/GFS.pm
+installdirs:  site
+requires:
+    Cwd:                           0
+    Data::Dumper:                  0
+    HTML::LinkExtractor:           0
+    LWP::UserAgent:                0
+    Net::FTP:                      0
+    Time::Local:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,27 @@
+Revision history for Perl extension WebService::Aladdin
+
+0.08    Fri May  3 12:00:00 2013 KST
+    - Fix RT #84281: Packaging bug: inc directory missing
+
+0.0706  Wed Feb  8 23:00:00 2011 KST
+    - Added repository on resouces
+
+0.0705  Fri Dec 30 01:30:00 2011 KST
+    - Fixed test fails
+    - Fixed POD
+
+0.0703  Fri Jul 16 20:30:00 2010 KST
+    - Fixed test fails
+
+0.0701  Thu Mar 25 19:00:00 2010 KST
+    - Fixed pod typos (@keedi++)
+ 
+0.07  Thu Mar 25 18:30:00 2010 KST
+    - Fixed some bugs (@keedi++)
+    - Fixed pod description
+
+0.06  Thu Jul  3 12:00:00 2008
+    - added product method
+
+0.01  Wed Jul  2 17:40:28 2008
+	- original version

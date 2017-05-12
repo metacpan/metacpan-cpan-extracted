@@ -1,0 +1,15 @@
+Changes
+examples/example.pl
+lib/WebService/Tagzania/API.pm
+lib/WebService/Tagzania/Request.pm
+lib/WebService/Tagzania/Response.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/api.t
+t/kwalitee.t
+t/pod-coverage.t
+t/pod.t

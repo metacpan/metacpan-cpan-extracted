@@ -1,0 +1,23 @@
+0.06 20110422
+    . Add some documentation
+    . Rename the keys
+        dot11_default_auth_algorithm => default_auth_algorithm
+        dot11_default_cipher_algorithm => default_cipher_algorithm
+    . WlanCurrentConnection() now also decodes and returns
+      the "security" status and encryption algorithm for the
+      current connection
+
+0.05 20110320
+    . Fix ->connected to return false if WLAN is switched off
+
+0.04 20110307
+    . Fix t/06-synopsis-api.t, spotted by Thomas Fahle
+
+0.03 20110222
+    . Fix missing prerequisite, thanks to the CPAN testers
+
+0.02 20110220
+    . Pass tests on more platforms by making them more robust
+
+0.01 20110220
+    . Released unto a propably suspecting audience

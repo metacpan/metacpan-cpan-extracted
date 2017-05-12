@@ -1,0 +1,120 @@
+Revision history for Perl extension Win32::EventLog::Carp.  (Note:
+Potential incompatabilities are marked with '*'.)
+
+1.42 2007-05-27
+    - A better attempt to make the module get through the ActiveState
+      build process (the box in questions seems rather locked down).
+      No changes in the implementation itself, only t/01-basic.t
+    - Added an eg/ directory and example script.
+
+1.41 2007-05-19
+    - Some public routines were not documented.
+
+1.40 2006-10-06
+    - Maintenance taken over by David Landgren
+    - No functional changes, this release serves only to bring
+      bug reports to the attention of the current maintainer
+    - Removed SIGNATURE infrastructure
+    - Perltidied and detabbed the source
+    - Added pod tests
+
+1.39  Mon Dec 20 2004
+    - corrected SIGNATURE issue
+
+1.38  Fri Dec 17 2004
+    - removed extraneous "ignoring event" message in tests
+    - fixed issue with tests failing on machines w/full logs
+    - added SIGNATURE to distribution
+    - added warning in README about WinZip and tests
+
+1.37  Fri Aug  6 2004
+    - corrected how unregistered logs are opened
+    - corrected opening new error log in 01-basic.t test
+    - updated KNOWN ISSUES section of POD
+
+1.36  Tue Jul 27 2004
+    - removed 'use warnings' (min Perl 5.006, not Perl 5.005)
+    - removed Test::Exception from build_requires
+    - added tests for event source registration
+    - fixed event source registration
+    - corrected tests (in line with Log::Dispatch::Win32EventLog)
+    - event log is opened to $Source rather than "Application"
+
+1.35  Mon Jul 26 2004
+    - rebuilt distribution with proper META.yml
+    - build requires Test::Exception
+    - minor changes to documentation
+
+1.34  Wed Jun 30 2004
+    - added note about using Test::Exception
+    - fixed warning posted to log when unable to read event log
+    - moved Test::More to build_requires parameter
+
+1.33  Sat Jun  5 2004
+    - corrected typo (IsWinNT instead of WinNT)
+
+1.32  Sat Jun  5 2004 
+    - documented how to use with Windows 95/98/ME
+    - use Win32::NodeName instead of $ENV{COMPUTERNAME}
+    - minor changes to how modules are imported
+    - corrected Build.PL to require Test::More and Win32
+    - Build.PL will die on non-NT machines
+
+1.31  Fri Jun  4 2004
+    - LogEvals can now be set outside of the module
+    - fixed bug with LogEvals being ignored if another function is
+      hooked onto __DIE__ signal (RT#6508)
+    - rewrote tests to test writing every function, and to read 
+      the events back
+
+1.30  Thu Jun  3 2004
+    - added tests
+    - fixed issue with uninitialized values (RT#5408).
+    - added Build.PL as alternative to Makefile.PL
+    - added META.yml to distribution
+    * source registration disabled by default; must be enabled in import
+    - renamed global variables with initial caps
+    - added note in POD about Windows 2003/IIS security policy
+    - added require for Carp::Heavy because of longmess_heavy and
+      shortmess_heavy routines
+    - added note in POD about warnings from Win32::EventLog
+
+1.21  23 Jul 2001
+    - removed warning message when an attempt to register a custom event
+      source (using Win32::EventLog::Message) fails
+
+1.20  12 Jul 2001
+    - added test for die within an eval; death in an eval is no longer
+      reported in the event log by default
+    - added LogEvals option to report failed evals in the event log
+    - added note about forcing a stack trace in POD
+
+1.11  20 Jun 2001
+    - tested with Carp::Assert
+    - added register_source() function
+
+1.10   7 Feb 2001
+    - uses Win32::EventLog::Message to register the source,
+      if the module is installed on the system
+    - the registration and initialization of the event log handle
+      will be done in the _report() function
+    - the event text now begins with the script's absolute path
+    - the 'Source' in the event log is now the script's basename
+    - NUL characters in event text are treated like newlines
+
+1.00  10 Jan 2001
+        - This version is a serious re-write!
+    - Win32 events are posted by trapping __WARN__ and __DIE__ signals
+      (which means warnings and errors from most other modules used by
+      the calling program will be posted to the event log)
+    - @ISA Carp
+    * changed behavior of 'click' to use Carp::shortmess
+    - carriage-return/newline combinations handled better in event text
+    - blank lines in event text are ignored
+
+0.04  7 Mar 2000
+    - added a 'click' function for information messages
+    - newlines in event strings converted to spaces
+
+0.02  6 Mar 2000
+    - original version

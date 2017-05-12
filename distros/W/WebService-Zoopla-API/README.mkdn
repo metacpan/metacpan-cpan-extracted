@@ -1,0 +1,394 @@
+# NAME
+
+WebService::Zoopla::API - Perl interface to the Zoopla API
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+use WebService::Zoopla::API;
+
+my $zoopla = WebService::Zoopla::API->new(
+            api_key         => 'xxxxxx');
+
+my $result = $zoopla->zed_index({area=>'SE4', output_type=>"outcode"});
+
+# Constructor
+
+## new()
+
+Creates and returns a new WebService::Zoopla::API object
+
+    my $zoopla = WebService::Zoopla::API->new(
+                api_key         => 'xxxxxx');
+
+- * `api_key => 'xxxxx'`
+
+Set the api key. This can be set up at:
+http://developer.zoopla.com
+
+# METHODS
+
+## arrange_viewing
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `listing_id`
+
+    - * `name`
+
+    - * `email`
+
+    - * `phone`
+
+    - * `phone_type`
+
+    - * `best_time_to_call`
+
+    - * `message`
+
+    - * `session_id`
+
+## average_area_sold_price
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `output_type`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+## richlist
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `output_type`
+
+    - * `area_type`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+## property_listings
+
+Required Parameters
+
+    - * `api_key`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `property_type`
+
+    - * `radius`
+
+    - * `order_by`
+
+    - * `ordering`
+
+    - * `page_number`
+
+    - * `page_size`
+
+    - * `output_type`
+
+    - * `listing_status`
+
+    - * `include_sold`
+
+    - * `include_rented`
+
+    - * `minimum_price`
+
+    - * `maximum_price`
+
+    - * `minimum_beds`
+
+    - * `maximum_beds`
+
+    - * `furnished`
+
+    - * `keywords`
+
+    - * `listing_id`
+
+## area_value_graphs
+
+Required Parameters
+
+    - * `api_key`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `size`
+
+    - * `output_type`
+
+## zed_index
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `output_type`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+## get_session_id
+
+Required Parameters
+
+    - * `api_key`
+
+## zoopla_estimates
+
+Required Parameters
+
+    - * `api_key`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `property_id`
+
+    - * `order_by`
+
+    - * `ordering`
+
+    - * `page_number`
+
+    - * `page_size`
+
+    - * `output_type`
+
+## average_sold_prices
+
+Required Parameters
+
+    - * `api_key`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `area_type`
+
+    - * `page_number`
+
+    - * `page_size`
+
+    - * `ordering`
+
+    - * `output_type`
+
+## refine_estimate
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `property_id`
+
+    - * `property_type`
+
+    - * `tenure`
+
+    - * `num_bedrooms`
+
+    - * `num_bathrooms`
+
+    - * `num_receptions`
+
+    - * `session_id`
+
+Optional Parameters
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `output_type`
+
+## zed_indices
+
+Required Parameters
+
+    - * `api_key`
+
+    - * `output_type`
+
+    - * `area_type`
+
+Optional Parameters
+
+    - * `session_id`
+
+    - * `area`
+
+    - * `street`
+
+    - * `town`
+
+    - * `postcode`
+
+    - * `county`
+
+    - * `latitude`
+
+    - * `longitude`
+
+    - * `ordering`
+
+    - * `page_number`
+
+    - * `page_size`
+
+# SEE ALSO
+
+[Net::HTTP::Spore](http://search.cpan.org/perldoc?Net::HTTP::Spore)
+
+# INTERNAL METHODS
+
+## _call($args)
+
+General method for calling the methods on the api
+You don't need to call this directly
+
+## _need_session($method)
+
+Internal method to check if a method needs a session id
+
+# AUTHOR
+
+Willem Basson <willem.basson@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Willem Basson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

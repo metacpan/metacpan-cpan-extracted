@@ -1,0 +1,21 @@
+---
+abstract: 'Perl bindings for the Vultr API'
+author:
+  - 'Eivin Giske Skaaren <eskaaren@yahoo.no>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Vultr
+requires:
+  Carp: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.12'

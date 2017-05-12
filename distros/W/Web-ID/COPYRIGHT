@@ -1,0 +1,70 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Web-ID
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Web-ID
+
+Files: README
+ lib/Plack/Middleware/Auth/WebID.pm
+ lib/Web/ID.pm
+ lib/Web/ID/Certificate.pm
+ lib/Web/ID/Certificate/Generator.pm
+ lib/Web/ID/FAQ.pod
+ lib/Web/ID/RSAKey.pm
+ lib/Web/ID/SAN.pm
+ lib/Web/ID/SAN/Email.pm
+ lib/Web/ID/SAN/URI.pm
+ lib/Web/ID/Types.pm
+ lib/Web/ID/Util.pm
+ t/01mouse.t
+ t/02moose.t
+ t/03certificate.t
+ t/04webid.t
+Copyright: This software is copyright (c) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ Makefile.PL
+ examples/certificate-generation.pl
+ examples/certificate-parsing.pl
+ examples/fingerpoint-test.pl
+ examples/web-id-validation.pl
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Web/ID/Util/FindOpenSSL.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/lib/Test/HTTP/Server.pm
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

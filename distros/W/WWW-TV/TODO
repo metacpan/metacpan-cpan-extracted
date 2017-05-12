@@ -1,0 +1,2 @@
+Wishful:
+ - use a proper HTML parser rather than regex hackery

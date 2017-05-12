@@ -1,0 +1,16 @@
+Revision history for Perl extension WWW-Asg.
+
+0.05  Fri Aug 31 13:52:25 JST 2012 
+    - remove download_flv 
+
+0.04  Thu Aug 30 23:24:53 JST 2012 
+    - bug fixed 
+
+0.03  Thu Aug 30 21:27:34 JST 2012
+    - add embed 
+
+0.02  Thu Aug 30 19:14:38 JST 2012
+    - make dist 
+
+0.01  Thu Aug 30 14:54:32 JST 2012
+    - first release

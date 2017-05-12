@@ -1,0 +1,34 @@
+[%- BLOCK link -%]
+  [%- IF page < 2 -%]
+[% c.uri_for('authors/') %]
+  [%- ELSE -%]
+[% c.uri_for('authors/', page => page) %]
+  [%- END -%]
+[%- END -%]
+
+<div class="container">
+
+<div class="row">
+
+<div class="span12">
+[% IF pageset.current_page == 1 %]
+<h1>All authors</h1>
+[% page.title = 'use.perl.org authors' %]
+[% ELSE %]
+<h1>All authors (page [% pageset.current_page %])</h1>
+[% page.title = 'use.perl.org authors (page ' _ pageset.current_page _ ')' %]
+[% END %]
+
+<ul>
+[% FOREACH user IN users %]
+<li><a href="[% c.uri_for('~' _ user.nickname _ '/' ) %]">[% user.nickname | html %]</a></li>
+[% END %]
+</ul>
+
+[% INCLUDE lib/pagination.tt %]
+
+</div> <!-- /span8 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

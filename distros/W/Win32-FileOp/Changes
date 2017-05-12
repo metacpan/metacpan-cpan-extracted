@@ -1,0 +1,42 @@
+Revision history for Perl extension Win32::FileOp.
+
+0.01  Wed Dec 23 09:45:53 1998
+	- original version; created by h2xs 1.18
+
+
+0.11.3 Tue Apr 10 2001
+	- fixed problem with BrowseForFolder in Perl 5.6
+
+0.12	Sat Feb 9 2002
+	- Using Data::Lazy instead of Lazy (because of CPAN regulation)
+	- added "GetLargeFileSize" function.
+
+0.12.1 Wed Feb 27 2002
+	- added "GetDiskFreeSpace" function
+
+0.12.4	Fri Jun 7 2002
+	- added GetLargeFileSize
+
+0.12.5	Thu Jun 20 2002
+	- fixed bugs in GetLargeFileSize
+	- fixed a minor error reporting bug
+
+0.13.0	Mon Feb 17 2003
+	- fixed a bug in Map()
+	- added interactive=> and prompt=> to Map()
+
+0.14.0	Sun May 04 2003
+	- added ShellExecute
+
+0.14.1	Sat Jul 19 2003
+	- fixed GetDesktopHandle to work with the newest Win32::API
+		['V'] is no longer a valid way to specify that the function doesn't want any parameters
+	- interactive tests should be skipped under automated build scripts
+
+0.16.00	Jan 07 2011
+	?
+
+0.16.02
+	- fix for INI related functions
+	- ShellExecute accepts a list of actions to attempt
+	- ShellExecuteEx added

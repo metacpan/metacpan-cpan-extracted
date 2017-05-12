@@ -1,0 +1,32 @@
+---
+abstract: 'Web service API to MusicBrainz database'
+author:
+  - 'Bob Faist <bob.faist@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - musicbrainz
+  - webservice
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-MusicBrainz
+provides:
+  WebService::MusicBrainz:
+    file: lib/WebService/MusicBrainz.pm
+    version: v1.0.1
+  WebService::MusicBrainz::Request:
+    file: lib/WebService/MusicBrainz/Request.pm
+    version: '1.0'
+requires:
+  Mojolicious: '7.13'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bfaist/webservice-musicbrainz.git
+version: v1.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

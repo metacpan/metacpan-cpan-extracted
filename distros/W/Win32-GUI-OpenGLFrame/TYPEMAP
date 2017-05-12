@@ -1,0 +1,26 @@
+# $Id$
+TYPEMAP
+HWND         T_HANDLE
+HDC          T_HANDLE
+HGLRC        T_HANDLE
+BOOL         T_BOOL
+GLint        T_IV
+GLsizei      T_IV
+GLbitfield   T_IV
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));
+################################################################################
+OUTPUT
+T_HANDLE
+    sv_setiv($arg, (IV) $var);
+

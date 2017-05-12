@@ -1,0 +1,326 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use v5.10;
+use Data::Dumper;
+use IO::File;
+use XML::Flow;
+my ( $help, $man, $template, $prefix );
+my %opt = (
+    help     => \$help,
+    man      => \$man,
+    template => \$template,
+    prefix   => \$prefix
+);
+GetOptions( \%opt, 'help|?', 'man', "template|t:s", "prefix|p:s" )
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+unless ($template) {
+#    pod2usage( -exitstatus => 2, -message => 'Need -template [file]!' );
+      { local $/ = undef;
+      $template = <DATA>
+      }
+     $template = \"$template";
+} else {
+    unless ( -e $template ) {
+    pod2usage( -exitstatus => 2, -message => "Not exists template: $template" );
+    }
+}
+
+{
+    my $infile = shift;
+    my $in_fd;
+    if ($infile) {
+        $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+    }
+    else {
+        $in_fd = \*STDIN;
+    }
+
+}
+
+=head2  parse_feed \*STDIN, sub handler {}
+
+=cut
+
+sub parse_feed {
+    my ( $data, $sub_ref ) = @_;
+    my $rd   = new XML::Flow:: $data;
+    my @category_tmp=();
+    my %tags = (
+        entry => sub {
+            shift;
+	    my @category = @category_tmp;
+	    @category_tmp = ();
+	    my %uniq;
+	    push @_, category=>[ grep {! $uniq{$_}++ } @category];
+            if   ($sub_ref) { $sub_ref->(@_) }
+            else            { print "Item:" . Dumper( {@_} ) }
+        },
+        'content' => sub {
+            my $attr = shift;
+            return content => join "", @_;
+        },
+        'category' => sub {
+            my $attr = shift;
+	    push @category_tmp, join "", @_;
+            return category => \@category_tmp
+        },
+        'link' => sub { my $attr = shift; return ( 'link' => $attr ) },
+        '*' => sub {
+            my ( $name, $attr, @text ) = @_;
+            return $name => join "",
+              @text;
+        },
+    );
+    $rd->read( \%tags );
+    $rd->close;
+}
+
+my $source = \*STDIN;
+my $i      = 0;
+my @nodes  = ();
+&parse_feed(
+    $source,
+    sub {
+        my %record = @_;
+        unshift @nodes, \%record;
+    }
+);
+
+# setup next and previus keys   
+my $size = scalar(@nodes);
+for ( my $i = 0 ; $i < $size ; $i++ ) {
+    my $n = $nodes[$i];
+    $n->{prev} = $nodes[$i-1] if $i;
+    $n->{next} = $nodes[ $i + 1 ] if $i < ( $size - 1 );
+}
+
+#call template
+foreach my $node (@nodes) {
+    my $link = $node->{link}->{href}
+      or die "Can't read link's href: id= $node->{id}";
+
+    #split url into path and filename
+    #remove http://hostname.com/
+    $link =~ s%[^\/]+//[^\/]+/%%;
+    my ( $path, $file_name ) = ( '', $link );
+    if ( $link =~ /(.+)\/([^\/]+)$/ ) {
+        ( $path, $file_name ) = ( $1, $2 );
+    }
+    my $file_path = ( $prefix || '.' ) . "/" . $path;
+
+    #make path
+    use File::Path;
+    mkpath( $file_path, 0 );
+    use Template;
+    my $tt = Template->new( { INTERPOLATE => 0, ABSOLUTE => 1 } );
+
+    #process input template, substituting variables
+    $tt->process( $template, $node, "$file_path/$file_name" )
+      || die $tt->error();
+    #$tt->process( $template, $node, "$file_path/index.html" )
+    #  || die $tt->error();
+}
+
+ if (1 and scalar(@nodes )) {
+    #make index page
+    use Template;
+    my $tt = Template->new( { INTERPOLATE => 0, ABSOLUTE => 1 } );
+
+    #process input template, substituting variables
+    $tt->process( $template, $nodes[-1], ( $prefix || '.' ) . "/index.htm" )
+      || die $tt->error();
+ }
+
+
+1;
+
+=head1 NAME
+
+  atom2file  - render html files from atom file
+
+=head1 SYNOPSIS
+
+  atom2file -template contrib/template.tmpl < atom.xml
+ 
+
+   [options]:
+
+    -help  - print help message
+    -man   - print man page
+    -template file - TT2 template file
+    -prefix path - directory path for store files to
+
+=head1 TEMPLATE
+
+Template call with the following keys for each atom entry:
+
+          {
+            'published' => '2012-11-27T09:39:19Z',
+            'link' => {
+                        'rel' => 'alternate',
+                        'href' => 'http://example.com/Test-chapter.htm',
+                        'type' => 'text/html',
+                        'title' => 'Test chapter'
+                      },
+            'category' => [
+                        'perl',
+                        'install',
+                        'linux'
+                        ],
+            'content' => 'HTML text',
+            'updated' => '2012-12-17T13:29:08Z',
+            'id' => 'http://example.com;Test chapter',
+            'title' => 'Test chapter'
+            'next' =>{ next atom node},
+            'prev' =>{ previus atom node}
+
+          }
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exit
+
+=item B<-man>
+
+Prints manual page and exit
+
+=back
+
+=head1 DESCRIPTION
+
+    atom2file - render html files from atom file 
+
+=head1 EXAMPLE
+
+    atom2file -template contrib/template.tmpl -prefix /tmp < atom.xml
+
+
+    writeat -t atom - -- -baseurl "." -as_entry head1< test.pod6 >test.atom
+    atom2file  -prefix 1 < test.atom
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zahatski@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__DATA__
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>[%title%]</title>
+    <!-- Global Stylesheets -->
+    <link rel="stylesheet" href="http://www.angrycreative.se/wp-content/themes/angry-less/reset.css" media="all" />
+    <link rel="stylesheet" href="http://www.angrycreative.se/wp-content/themes/angry-less/fonts.css" media="all" />
+    <link rel="stylesheet" href="http://www.angrycreative.se/wp-content/themes/angry-less/style.css" media="all" />
+    <style type="text/css">
+
+div.navig {
+ float:right;
+ line-height:1.2; 
+}
+
+ul.prevnext { float:right;list-style:none;margin:0;padding:0; }
+.prevnext li { display:inline }
+.prevnext li>*, .prevnext li abbr {
+  color:#666;
+}
+.prevnext li>* {
+  line-height:1.2;
+  text-align:center;
+  float:left; 
+  width:5.5em; 
+  height:4.7em;
+  padding:1.8em .5em 0;
+  margin-right:.3em;
+  border:.1em solid #fff;
+  cursor:default;
+  background:#eee;
+}
+.prevnext li a { 
+  width:4.4em;
+  height:1.5em;
+  line-height:2.5em;
+  padding:2em 0.1em 3em 0;
+  color:#333;
+  background:#d5d5d5;
+  border-radius:1em; -moz-border-radius:1em; -webkit-border-radius:1em; 
+  border: .1em solid #CCC;
+  cursor: pointer;
+}
+.prevnext li:first-child a { padding: 2em 0 3em 0.1em; }
+.prevnext li abbr {
+  font-size:5em; font-family:Courier New,monospace;
+}
+.prevnext a:hover,.prevnext a.active {
+  background: #aaa;
+  text-decoration:none;
+}
+
+:link, :visited, ins {
+text-decoration: none;
+}
+.prevnext a:hover abbr,.prevnext a.active abbr {
+  color:#333;
+}
+.post-content {
+    margin-top: 1em;
+}
+.post-content p {
+    text-indent: 1em;
+text-align: justify;
+}
+.post-content h1, .post-content h2, .post-content h3 {
+clear: both;
+margin-top: 0.5em;
+}
+    
+    </style>
+  </head>
+
+  <body>
+
+  <div class="navig">
+    <ul class="prevnext">
+        <li>
+        [% IF prev %]
+        <a href="[%prev.link.href%]" id="previtem" title="[%prev.link.title%]" rel="prev"><abbr title="Previous">&#x2190;</abbr></a> 
+        [% ELSE %]
+        <span>No older items</span>
+        [% END %]
+        </li>
+        <li>
+        [% IF next %]
+        <a href="[%next.link.href%]" id="nextitem" title="[%next.link.title%]" rel="next"><abbr title="Next">&#x2192;</abbr></a>
+        [% ELSE %]
+        <span>No new items</span>
+        [% END%]
+        </li>
+   </ul>
+  </div>
+  <div style="width: 30em;margin: 1em auto;">
+      <!-- page content -->
+      <h1>[%title%]</h1>
+      <div  class="post-content" >[%content%]</div>
+      <div><p style="color: #444;font-size: 0.9em; margin-top:1em;">[%published%]</p></div>
+  </div>
+  </body>
+</html>
+

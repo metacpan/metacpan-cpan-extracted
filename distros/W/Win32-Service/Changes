@@ -1,0 +1,31 @@
+Revision history for Perl extension Win32::Service.
+
+0.07  Fri Dec 6 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+
+0.06  Tue Apr 15 2008
+	- version 0.06 for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- added ppport.h
+	- casts to suppress compiler warnings under Win64
+
+0.05  Mon May 22 21:54:50 2000
+	- support for passing Unicode strings to methods (thanks to
+	  Doug Lankshear <doug@lankshear.net>)
+
+0.04  Thu Sep 10 17:18:25 1998
+	- fix doc bug about GetServices()
+
+0.03  Thu Mar 19 22:10:06 1998
+	- report stopped services like ActiveState version
+
+0.02  Sun Dec 14 23:55:12 1997
+	- make all routines @EXPORT_OK
+	- cosmetic changes
+
+0.01  Sat Apr  5 14:24:41 1997
+	- original version; created by h2xs 1.18
+	- imported Activeware version

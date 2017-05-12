@@ -1,0 +1,120 @@
+#############################################################################
+## Name:        ext/print/XS/PaperDatabase.xsp
+## Purpose:     XS++ for Wx::PaperDatabase
+## Author:      Mark Dootsson
+## Modified by:
+## Created:     23/05/2004
+## RCS-ID:      $Id: PrintFactory.xsp 2079 2007-07-08 21:18:04Z mbarbon $
+## Copyright:   (c) 2005 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxPaperSize}{simple};
+
+%{
+#include <wx/paper.h>
+%}
+
+%name{Wx::PrintPaperType} class wxPrintPaperType: public %name{Wx::Object} wxObject
+{
+public:
+    wxString GetName() const;
+    wxPaperSize GetId() const;
+    int GetPlatformId() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    wxSize GetSize() const;
+    wxSize GetSizeMM() const;
+    wxSize GetSizeDeviceUnits() const;
+};
+
+%{
+
+MODULE=Wx PACKAGE=Wx::PrintPaperDatabase
+    
+void
+wxPrintPaperDatabase::AddPaperType(paperId, platformId, name, w, h)
+    wxPaperSize paperId
+    int platformId
+    wxString name
+    int w
+    int h
+
+void
+FindPaperType( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, FindPaperTypeBySize )
+        MATCH_REDISP( wxPliOvl_n, FindPaperTypeById )
+        MATCH_REDISP( wxPliOvl_s, FindPaperTypeByName )
+    END_OVERLOAD( "Wx::PrintPaperDatabase::FindPaperType" )
+
+wxPrintPaperType*
+wxPrintPaperDatabase::FindPaperTypeByName(name)
+    wxString name
+  CODE:
+    RETVAL = THIS->FindPaperType(name);
+  OUTPUT: RETVAL
+
+wxPrintPaperType*
+wxPrintPaperDatabase::FindPaperTypeById(id)
+    wxPaperSize id
+  CODE:
+    RETVAL = THIS->FindPaperType(id); 
+  OUTPUT: RETVAL
+
+wxPrintPaperType*
+wxPrintPaperDatabase::FindPaperTypeBySize( size )
+    wxSize size
+  CODE:
+    RETVAL = THIS->FindPaperType(size); 
+  OUTPUT: RETVAL
+
+
+wxPrintPaperType*
+wxPrintPaperDatabase::FindPaperTypeByPlatformId(id)
+    int id
+
+wxPaperSize
+wxPrintPaperDatabase::ConvertNameToId(name)
+    wxString name
+
+wxString
+wxPrintPaperDatabase::ConvertIdToName(paperId)
+    wxPaperSize paperId
+
+
+void
+GetSize( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP( wxPliOvl_wsiz, GetPaperSize )
+        MATCH_REDISP( wxPliOvl_n, GetSizeSize )
+    END_OVERLOAD( "Wx::PrintPaperDatabase::GetSize" )
+
+wxSize
+wxPrintPaperDatabase::GetSizeSize(paperId)
+    int paperId
+  CODE:
+    RETVAL = THIS->GetSize((wxPaperSize)paperId);
+  OUTPUT: RETVAL
+
+wxPaperSize
+wxPrintPaperDatabase::GetPaperSize(size)
+    wxSize size
+  CODE:
+    RETVAL = THIS->GetSize(size); 
+  OUTPUT: RETVAL
+   
+wxPrintPaperType*
+wxPrintPaperDatabase::Item(index)
+    size_t index
+
+size_t
+wxPrintPaperDatabase::GetCount()
+
+
+%}

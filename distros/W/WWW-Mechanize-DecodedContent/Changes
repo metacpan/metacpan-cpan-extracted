@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::Mechanize::DecodedContent
+
+0.02  Sat Nov 22 17:33:39 PST 2008
+        - WWW::Mechanize 1.50 changed its API to return Unicode
+          strings in ->content() which obsoletes this module.
+          (Thanks to hsbt)
+
+0.01  Wed May  9 16:18:10 2007
+        - original version

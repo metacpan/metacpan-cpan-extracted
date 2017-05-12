@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#web">web</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order::Hosting</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $info = $ovh-&gt;hosting-&gt;web-&gt;free_email_info;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Only Helper Object to Web Api Sub-Object.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Hosting object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $type - intern type</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Task.html">Webservice::OVH::Me::Task</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Me::Task-&gt;_new($ovh_api_wrapper, $type, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="web">web</h2>
+
+<p>Gives acces to the /order/hosting/web methods of the ovh api</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Hosting/Web.html">Webservice::OVH::Order::Hosting::Web</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;order-&gt;hosting-&gt;web</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

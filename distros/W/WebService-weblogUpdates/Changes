@@ -1,0 +1,80 @@
+Revision history for Perl extension WebService::weblogUpdates.
+
+0.35	 Thu Oct 31 2002
+
+	 - Updated proxy URL for 'rssUpdate' method
+
+	 - Added t/004-transport.t
+
+	 - Updated POD
+
+0.34	 Mon Oct 28 2002
+
+	 - Added $pkg->rssUpdate() - so far XMLRPC is the only supported transport
+
+	 - Deprecated $pkg->ping_message() in favour of $pkg->LastMessage()
+
+	 - Updated .t files accordingly
+
+	 - Updated Makefile.PL to require Test::More and use CPAN::MakeMaker
+
+	 - Updated POD
+
+0.33	 Mon Oct 28 2002
+
+	 - Added hooks to use XMLRPC::Lite if Frontier::Client is not installed
+
+	 - Updated POD
+
+0.32	 Fri Oct 25 2002
+
+	 - Renamed as WebService::weblogUpdates
+
+	 - Replaced args array in &ping, with hash reference 
+
+	 - Added support for REST interface
+
+	 - Added support for RPC catgory hooks
+
+	 - Added ping_message method
+
+	 - Removed old function methods since they don't seem to work anymore. Dunno
+
+	 - Added real tests
+
+	 - Updated POD
+
+0.3.1	 Dec 03 2001
+
+	 - Added &Zeldman function
+
+	 - Added optional arguments hash and bobo-style memoization for &Categories
+
+0.3
+
+	 - Added &Categories function
+
+0.2
+
+	 - Added SOAP support
+
+	 - Added private &_require, &_soap, &_xmlrpc methods to load transport specific package(s) only when needed.
+
+	 - Added private &_client and &_do methods for performing transport specific actions.
+
+	 - Set the proper package name. (gah!)
+
+	 - Updated POD
+
+0.1.1
+
+	 - Added $VERSION (duh)
+
+	 - Updated the UserLand reference link
+
+	 - Updated POD
+
+0.1	 Thu Apr 11 2001
+
+	 - Intial revision
+

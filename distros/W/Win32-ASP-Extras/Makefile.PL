@@ -1,0 +1,15 @@
+use ExtUtils::MakeMaker;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+WriteMakefile(
+  'NAME'  => 'Win32::ASP::Extras',
+  'VERSION_FROM' => 'Extras.pm', # finds $VERSION
+  'dist' => {
+    'COMPRESS' => 'gzip',
+    'SUFFIX' => '.gz',
+    'PREOP' => 'perl -MPod::Text -e "pod2text q(Extras.pm)" > README',
+  },
+  'AUTHOR' => 'Toby Everett',
+  'ABSTRACT' => 'Utility Functions for ASP Programming',
+  'BINARY_LOCATION' => 'Win32-ASP-Extras.tar.gz',
+);

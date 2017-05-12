@@ -1,0 +1,32 @@
+Revision history for Perl extension Win32::Process::List.
+
+
+0.09  May   2007
+	- fixed POD documentation
+
+0.08  April 2007
+	- fixed missing right curly or square bracket
+
+0.07  Feb 18 2007
+	- added 2 functions to XS and pm code: ProcessAliveP, ProcessAliveN
+	  
+
+0.06  Feb 8 2007
+	- XS code changed to write the PID for the key and the processname as the value
+	  Had also to change the List.pm to use it in the GetProcessPid() function.
+	  Update of the POD regarding this.
+
+0.05  Sat Jan 27 2007
+	- XS code rewriten, now it uses tlhelp32 to get the process list
+
+0.04  Sat Dez 17 2006
+	- changed error message to show PID's which can not accessed.
+
+0.03  Wed Aug 30 2006
+	- corrected README and CHANGES
+	
+
+0.01  Tue Aug 31 13:44:09 2004
+	- original version; created by h2xs 1.21 with options
+		-n Win32::Process::List -s GetProcesses
+		First Release by Reinhard Pagitsch

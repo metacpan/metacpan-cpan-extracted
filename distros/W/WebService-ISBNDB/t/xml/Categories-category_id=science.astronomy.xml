@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:12">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.astronomy" parent_id="science">
+<Name>Astronomy</Name>
+<Details summary="" depth="1" element_count="285" />
+<SubCategories>
+<SubCategory id="science.astronomy.dictionaries" />
+<SubCategory id="science.astronomy.encyclopedias" />
+<SubCategory id="science.astronomy.charts_diagrams" />
+<SubCategory id="science.astronomy.research" />
+<SubCategory id="science.astronomy.study_and_teaching" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

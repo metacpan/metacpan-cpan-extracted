@@ -1,0 +1,8 @@
+MANIFEST			This list of files
+Makefile.PL
+lib/WWW/Auth.pm
+lib/WWW/Auth/Base.pm
+lib/WWW/Auth/Config.pm
+lib/WWW/Auth/DB.pm
+lib/WWW/Auth/FTP.pm
+lib/WWW/Auth/Template.pm

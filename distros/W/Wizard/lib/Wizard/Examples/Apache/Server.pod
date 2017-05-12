@@ -1,0 +1,76 @@
+=pod
+
+=head1 Server Menu
+
+Hier werden die WWW server konfiguriert. Beim Anlegen
+eines neuen Servers wird automatisch ein Virtueller Server
+angelegt der den angelegten WWW server beschreibt.
+Beim anlegen des Virtuellen Severs wird automatisch ein
+Directory angelegt, dass das Root Verzeichnis des virtuellen
+Servers beschreibt. Naeheres in der Sektion VirtualServer Menu
+und Directory Menu.
+Im folgenden werden nur noch die Attribute beschrieben.
+Die Menupunkte und deren Funktion ist analog zum Host Menu.
+
+=head2 Attribute eines Servers
+
+=over 4
+
+=item I<apache_server_name> Server descriptive name.
+
+Eindeutiger Name des Servers (analog zu Hosts)
+
+=item I<apache_server_ip> Server DNS name or IP adress
+
+DNS Name oder IP Adresse des Servers, analog zu Hosts.
+
+=item I<apache_server_vserver_root> Default directory for VirtualServers
+
+Standardprefix fuer die Rootverzeichnisse der virtuellen
+Sever. Zum Beispiel '/usr/local/www'. Beim Anlegen
+eines virtuellen Servers 'www.test.de' wird dann als
+root verzeichnis '/usr/local/www/www.test.de' vorgeschlagen..
+Naeheres finden Sie in der Sektion VirtualServer Menue.
+
+=item I<apache_server_admin> Server Administrator
+
+Email adresse des Webmasters des Webservers.
+
+=item I<apache_server_http_port> HTTP
+
+Default HTTP port der als Standard fuer die 
+virtuellen Server verwendet wird.
+
+=item I<apache_server_https_port> HTTP, HTTPS Port
+
+Default HTTPS Port der als Standard fuer die 
+virtuellen Server verwendet wird.
+
+=back
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+                         Phone: +49 7123 14887
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+                         Phone: +49 7072 920696
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+=cut

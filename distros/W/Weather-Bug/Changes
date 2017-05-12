@@ -1,0 +1,22 @@
+Revision history for Weather-Bug
+
+0.25  Thu Sep 16 22:50:00 2010
+        Gordon Child provided a patch for a Moose warning issue that began
+        appearing sometime since the last release. In the process, he replaced
+        the dependency injection approach used for changing the request code
+        with an inheritance-based approach.
+0.24  Wed Mar 25 19:30:00 2009
+       Joseph Hull reported that WeatherBug had apparently modified the
+       format of the date string in the getFullForecast response. Used this
+       opportunity to move from a regex hack to DateTime::Format::Builder.
+       Code now supports new format and old, in case they move back to the
+       old format.
+0.23  Sun Aug 17 22:04:00 2008
+       Correct more installation errors: missing dependencies on what
+       I believed to be core modules. CPAN Testing corrected.
+0.22  Thu Aug 07 20:18:00 2008
+       Correct installation errors: missing test files and dependency.
+0.20  Tue Aug 05 21:15:00 2008
+       Support for new WeatherBug API
+       Thanks to Mike Rosulek <mike@mikero.com> fo initial version.
+

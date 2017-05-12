@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/stationjp.pl
+lib/WWW/StationJp/API.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

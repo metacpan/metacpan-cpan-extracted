@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+Changes.txt
+lib/Win32/GetDefaultBrowser.pm
+
+examples/resolvebrowser.pl

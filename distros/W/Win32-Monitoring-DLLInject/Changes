@@ -1,0 +1,33 @@
+Revision history for Perl extension Win32::Monitoring::DLLInject.
+
+Win32-Monitoring-DllInject-0.06, Thu 2008-09-23
+-----------------------------------------------
+- Fix Documentation
+
+Win32-Monitoring-DllInject-0.05, Mon 2008-08-27
+-----------------------------------------------
+- Renamed DllInject to DLLInject
+- Added README at HookedFunctions
+
+Win32-Monitoring-DllInject-0.04, Mon 2008-08-25
+-----------------------------------------------
+- Improve monitoring example and code of the injecting DLL
+- Fix correct handling of time stamps in DlInjector example code
+- moved test.pl to example.pl 
+- added more documentation 
+
+Win32-Monitoring-DllInject-0.03, Wed 2008-08-13 
+-----------------------------------------------
+- bugfixing of XS module and perl test program
+- added license informations
+
+Win32-Monitoring-DllInject-0.02, Thu 2008-07-22
+----------------------------------------------- 
+- XS code rewritten, now it does not use DllInject.h and DllInject.c anymore
+- Changed Loading Interface of DllInject.pm
+- Changed Makefile.PL
+
+Win32-Monitoring-DllInject-0.01, Wed 2008-07-21
+----------------------------------------------- 
+- original version; created by h2xs 1.23 with options
+  -Oan Win32::Monitoring::DllInject DllInject.h

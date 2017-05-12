@@ -1,0 +1,12 @@
+Revision history for WWW-Myki
+
+0.01    Fri 5 Oct 2012 ltp@cpan.org
+        Initial release.
+
+0.02    Sat 6 Oct 2012 ltp@cpan.org
+	Fixed Makefile.PL
+
+0.04	Mon 16 Dec 2013 ltp@cpan.org
+	- Disabled SSL hostname verification by default
+	- Changed login page name
+	- WWW::Myki::Card::transactions() now returns an empty list for cards with no recent transactions.

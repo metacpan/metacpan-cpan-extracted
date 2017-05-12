@@ -1,0 +1,34 @@
+---
+abstract: 'Laughably incomplete Perl client for Pusher WS API'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  AnyEvent: '0'
+  Test::Fatal: '0'
+  Test::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Pusher-Client
+requires:
+  AnyEvent::WebSocket::Client: '0'
+  Carp: '0'
+  Digest::SHA: '0'
+  JSON: '0'
+  Moo: '0'
+  perl: 5.010_001
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/honeydew-sc/WWW-Pusher-Client/issues
+  homepage: https://github.com/honeydew-sc/WWW-Pusher-Client
+  repository: https://github.com/honeydew-sc/WWW-Pusher-Client.git
+version: '0.04'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'gempesaw <gempesaw@gmail.com>'

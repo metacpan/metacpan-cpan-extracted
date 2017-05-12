@@ -1,0 +1,25 @@
+---
+abstract: 'DreamHost Web Panel API'
+author:
+  - 'Serguei Trouchelle <stro@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-DreamHost-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::UUID: '0'
+  LWP::Protocol::https: '6.02'
+  LWP::UserAgent: '0'
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

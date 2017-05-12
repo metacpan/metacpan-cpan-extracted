@@ -1,0 +1,41 @@
+---
+abstract: 'Perl Interface of 256locks maker (http://maker-256locks.herokuapp.com/)'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.2, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-256locksMaker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  WWW::256locksMaker:
+    file: lib/WWW/256locksMaker.pm
+    version: 0.03
+requires:
+  Class::Accessor::Lite: 0
+  Furl: 0
+  Imager: 0
+  URI: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ytnobody/WWW-256locksMaker/issues
+  homepage: https://github.com/ytnobody/WWW-256locksMaker
+  repository: git://github.com/ytnobody/WWW-256locksMaker.git
+version: 0.03

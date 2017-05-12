@@ -1,0 +1,14 @@
+Revision history for WWW-Anonymouse
+
+0.04  Sat Dec 1 16:19:39 UTC 2007
+    - Required URI.
+
+0.03  Sat Dec 1 03:02:42 UTC 2007
+    - Used warnings for better kwalitee.
+
+0.02  Tue Oct 16 01:32:30 GMT 2007
+    - Removed referer header and caught mixmaster errors, as suggested by
+      Alex from Anonymouse.
+
+0.01  Sun Sep 2 04:29:43 GMT 2007
+    - Initial distribution.

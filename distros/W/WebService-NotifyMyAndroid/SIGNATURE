@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 255b42f326142356552947e5a747dd66e27c8605 Changes
+SHA1 20a111f37382cd1957ca05c8ab4b85d526679129 LICENSE
+SHA1 e18107cdedd8f70b9f68a0ac34b49737cfc20ba8 MANIFEST
+SHA1 1e0659c107b391ff94e2bf4abcbd45422f729d30 META.yml
+SHA1 146b50839f1d8baf99d7a79cccbd64464f861ec0 Makefile.PL
+SHA1 9b1edcc3da204f0701979ef50c3d70b0e732287e README
+SHA1 1fa12a5a85398018576b70b179c02d28fdbf364a README.cpan
+SHA1 72e469528e9028534069040899957685924fb609 README.install
+SHA1 9eae33a03ab0c2da153f4fff9987bfb490551921 README.mkdn
+SHA1 b0f3db740d025f00cd703db90382a224eefcf3cf dist.ini
+SHA1 e95d3125d7dd4637b840bf4e20d787451854a77b ignore.txt
+SHA1 03539362429522d5dacfada25beea49bc09c2c4c lib/WebService/NotifyMyAndroid.pm
+SHA1 bfa43b6de01efd4c79f35398a4b155cb7545de1b script/notify-my-android
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 54f1ef1ef8761bdfc0d2d3fc236443e5669d005f t/00.load.t
+SHA1 443ea36f6ef9078f7fee7aab5bff0fba36919ab9 t/01.verify.t
+SHA1 75aeb0b184e0242acb79e2ebea442e1cc3b8b5b3 t/02.notify.t
+SHA1 421182bfe58038f8e5a675b9ad2ecb86dd80e34b t/perlcritic.t
+SHA1 452bdb1dfce4ac4ef584d024024a06a6f5b884ea t/perlcriticrc
+SHA1 d685a1a9d85b958c0ee2490af1865ae383898efb t/pod-coverage.t
+SHA1 a6d25bdba403963935cdbd7a8b58fe23c06db3af t/pod.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlEJuygACgkQh4j7xTiFuxFq0QCdFlVzqloS1PRdTtpe+227GTXF
+3XcAn1r8vOTITo8/TDGAxCYs5aYTfb8K
+=Knbt
+-----END PGP SIGNATURE-----

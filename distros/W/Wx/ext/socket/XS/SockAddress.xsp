@@ -1,0 +1,85 @@
+#############################################################################
+## Name:        ext/socket/XS/SockAddress.xsp
+## Purpose:     XS++ for Wx::SockAddress and derived classes
+## Author:      Mattia Barbon
+## Created:     24/01/2004
+## RCS-ID:      $Id: SockAddress.xsp 2565 2009-05-17 13:34:37Z mbarbon $
+## Copyright:   (c) 2004, 2007, 2009 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxSockAddress*}{simple};
+%typemap{wxIPaddress*}{simple};
+%typemap{wxIPV4address*}{simple};
+%typemap{wxIPV6address*}{simple};
+%typemap{wxUNIXaddress*}{simple};
+
+%name{Wx::SockAddress} class wxSockAddress
+{
+%{
+static void
+wxSockAddress::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxSockAddress()
+        %code{% wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+                delete THIS;
+                %};
+
+    void Clear();
+    int Type();
+};
+
+#if WXPERL_W_VERSION_GE( 2, 5, 1 )
+
+%name{Wx::IPaddress} class wxIPaddress
+{
+    %name{SetHostname} bool Hostname(const wxString& name);
+    %name{SetService} bool Service(const wxString& port);
+    bool IsLocalHost();
+
+    %name{SetAnyAddress} bool AnyAddress();
+    %name{GetIPAddress} wxString IPAddress();
+
+    %name{GetHostname} wxString Hostname();
+    %name{GetService} unsigned short Service();
+};
+
+#endif
+
+%name{Wx::IPV4address} class wxIPV4address
+{
+    wxIPV4address();
+
+    %name{GetOrigHostname} wxString OrigHostname();
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    %name{SetBroadcastAddress} bool BroadcastAddress();
+#endif
+};
+
+#if wxUSE_IPV6
+
+%name{Wx::IPV6address} class wxIPV6address
+{
+    wxIPV6address();
+};
+
+#endif
+
+#ifdef __UNIX__
+
+%name{Wx::UNIXaddress} class wxUNIXaddress
+{
+    wxUNIXaddress();
+
+    %name{GetFilename} wxString Filename();
+    %name{SetFilename} void Filename(const wxString& filename);
+};
+
+#endif

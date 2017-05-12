@@ -1,0 +1,20 @@
+Revision history for Perl extension WebService::CaptchasDotNet
+
+0.01  05.25.2005
+	- original version
+
+0.02  06.01.2005
+	- clean up implementation
+
+0.03  07.08.2005
+        - implement file cache, per request from the captchas.net team
+
+0.04  09.23.2005
+	- intelligently untaint cache files so we can run under -T
+          thanks to Michael Krypel for the spot
+
+0.05  09.26.2005
+	- hmph, another taint fix.  time to make a better test suite...
+
+0.06  03.30.2006
+	- test harness tweaks - nothing major

@@ -1,0 +1,81 @@
+Revision history for WWW::TinySong
+==================================
+
+June 26, 2009
+-------------
+ * search() and link() importable now
+ * increased verbosity of tests
+ * improved documentation
+ * released version 1.01
+
+June 22, 2009
+-------------
+ * added retries() to combat read timeouts (and possibly other server errors)
+ * tests are slightly better now
+ * released version 0.06
+ * integrated the new API
+ * released transitional version 0.50
+ * released version 1.00 which breaks backward compatibility
+
+June 21, 2009
+-------------
+ * updated scraping in light of the web service's updates
+
+January 20, 2009
+----------------
+ * problem with perl 5.6 seems fixed in version 0.04_05, let's hope it is
+ * couple more tweaks to the interface, it now seems like a good way to
+   do things, at least until I become a better programmer
+ * improved tests
+ * released version 0.05
+
+January 19, 2009
+----------------
+ * problem with perl 5.6.2 appears to be in reading the page content
+ * released version 0.04_03
+ * decided that there's a better way to allow customizing the user agent
+   and did away with the object-oriented approach
+ * released version 0.04_04
+
+January 18, 2009
+----------------
+ * minor code tweaks and fixes to documentation
+ * looking into failed tests with perl 5.6.2
+ * released version 0.04_02
+
+January 17, 2009
+----------------
+ * updated documentation
+ * testing for unexpected results was broken through no fault of this
+   module: I guess the Grooveshark/TinySong team wanted to minimize
+   rickrolling because there's no more Rick Astley in the top ten
+   search results for "Never Gonna Give You Up"; changed tests to use
+   "We Are The Champions" instead, does anyone besides Queen have such
+   a song?
+ * released version 0.04_01
+
+January 13, 2009
+----------------
+ * apparently request URL wasn't working with proxies, hopefully fixed
+   now thanks to Sebastian Holzner
+ * released version 0.04
+
+January 4, 2009
+---------------
+ * network-related tests now conditional
+ * executed "make dist" with upgraded ExtUtils::MakeMaker
+ * improved documentation with examples
+ * added (simpler) function-oriented interface in addition to the existing
+   object-oriented one
+ * released version 0.02
+ * minor code tweaks and documentation improvements
+ * released version 0.03
+
+January 3, 2009
+---------------
+ * relaxed dependencies
+ * some cosmetic changes
+
+January 2, 2009
+---------------
+ * original version created by h2xs 1.23

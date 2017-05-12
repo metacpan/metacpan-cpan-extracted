@@ -1,0 +1,1188 @@
+=pod
+
+=head1 URLToys for Perl
+
+Version 1.28 - Last Updated 6/19/2004
+
+I<Note: This documentation and program make heavy references to "regexes", or "Regular Expressions." If you are unfamiliar with what these are, I urge you to read about them. At least a brief tutorial/explanation. >
+
+The most current, official version of URLToys (in all forms) is always available at:
+
+http://www.urltoys.com/
+
+And the most official version of this Perl file is here:
+
+http://www.urltoys.com/urltoys
+
+And the Windows Standalone Installer is available here:
+
+http://www.urltoys.com/URLToysPerlSA.exe
+
+Its possible that the script bundled with the standalone version of the installer might be slightly out of date, but this is a good time to note that once you've installed the Standalone version, updating the "urltoys" file in your Standalone installation folder from the "official version of this Perl file" link will keep things nice and fresh. B<You do NOT need to reinstall the Standalone installer for new versions unless specifically told.> Simply update that single "urltoys" file from the above mentioned site.
+
+This is the text-based, Perl version of URLToys. It takes a slightly different approach to URLToys, being that instead of clicking on a link, you type in a command at the command line instead. It's great for batch operations and when you don't have GUI access to the machine you want to download from. Most all operations are supported via the command line, including a few new ones. Let's start with an example of what a typical session would look like:
+
+	[joe@marge joe]$ urltoys
+	urltoys for Perl
+
+	urltoys (0)> add http://www.urltoys.com/coolpictures/coolpictures.html
+	urltoys (1)> make
+	Searching "http://www.urltoys.com/coolpictures/coolpictures.html"...6 found.
+	urltoys (6)> show
+	http://www.urltoys.com/coolpictures/picture1.jpg
+	http://www.urltoys.com/coolpictures/picture2.jpg
+	http://www.urltoys.com/coolpictures/picture3.jpg
+	http://www.urltoys.com/coolpictures/picture4.jpg
+	http://www.urltoys.com/coolpictures/picture5.jpg
+	http://www.urltoys.com/coolpictures/linktosomeotherplace.htm
+	urltoys (6)> keep \.jpg
+	urltoys (5)> get
+	Downloading "http://www.urltoys.com/coolpictures/picture1.jpg"...
+	[*************************] (1418 of 1418)
+	Downloading "http://www.urltoys.com/coolpictures/picture2.jpg"...
+	[*************************] (1418 of 1418)
+	Downloading "http://www.urltoys.com/coolpictures/picture3.jpg"...
+	[*************************] (1418 of 1418)
+	Downloading "http://www.urltoys.com/coolpictures/picture4.jpg"...
+	[*************************] (1418 of 1418)
+	Downloading "http://www.urltoys.com/coolpictures/picture5.jpg"...
+	[*************************] (1418 of 1418)
+	urltoys (5)> exit
+	[joe@marge joe]$
+
+I<If your POD reader makes those links, pretend they aren't. :-)>
+
+What's going on in this session is pretty simple. I run urltoys on my favorite server (Marge ... sitting right next to Homer). I start with a single URL, and add it with the B<add> command. Note that after adding it, it shows a "1" in the prompt. This is showing how many URLs are currently in the "list". Next, I typed B<make>. This command grabs the links off the pages represented by the list (this is a -huge- simplification of what happens here). On this particular (test) URL, it has a link to six places, five of them being JPEG files. I use the B<show> command to check what I have in the list. I decide that I am going to keep only the URLs that have ".jpg" in them, and I use the B<keep> command to do this. Once I have my final list of files I want, I say B<get>, and it creates a new folder in the current directory and downloads each URL, one by one. Of course, there's a bunch of things that you can set behind the scenes, but we'll get to that. Let's go over the possible commands you can type at the prompt.
+
+I<Note: Saint Marck (Saint_Marck@yahoo.com) from SE deserves all credit for the fusker and seq code in this script.>
+
+=head2 Available Commands
+
+=head3 exit
+
+The exit command will quit URLToys. It seems a little backwards to give you this command first, but hey, I wrote this documentation for you, so deal with it. After seeing the prompt, you might just say "screw it" and leave anyway. At least you'd know how. :-)
+
+=head3 help, h
+
+Syntax:
+
+	help
+	h
+
+Displays a really simple list of the available commands on the screen. It's nothing as detailed as this documentation, but it might help jog your brain if you feel stupid for a second.
+
+=head3 add 
+
+Syntax:
+
+	add [URL]
+
+The add command will add a URL to the list. This command is not completely necessary, however, since you can just type in a full URL (http://...) to the prompt and it will assume you wish to add it. 
+
+=head3 del, keep
+
+Syntax:
+
+	del [regex]
+	keep [regex]
+
+The B<del> command will remove all URLs from the list that match against the regex listed. For example, if you type in "B<del \.jpg$>", it will remove all URLs that end in a lowercase JPG extension.
+
+B<keep>, on the other hand does exactly the opposite of B<del>. It will remove all entries from the list that do NOT match the regex you specify.
+
+=head3 show, list, ls
+
+Syntax:
+
+	ls
+	ls [regex]
+	show
+	show [regex]
+	list
+	list [regex]
+
+The show command will list either all or a subset of the list to you. If you just type in B<show> by itself, You will see a list of every URL in the list. However, you can choose to list only the URLs that match a particular regex, which helps out a lot if you are looking at a list that has a few thousand entries.
+
+=head3 make, href, img
+
+Syntax:
+
+	href
+	img
+	make
+	make [regex]
+
+The essence of URLToys is its ability to download web pages and tear out their links. The links people tend to want are either the real links that one would click on (known as A or "anchor" tags), and the sources of IMG (or "image") tags. Because of this, URLToys has a built in mechanism and default regex for these. If you want to use the built-in version of these, use either the B<href> or B<img> command. Typing in either of these will go through each URL in the list, download the HTML and find the links that match this regex. 
+
+Remember the differences between these commands. B<href> will find all of the "links", and B<img> will find all of the displayed images. If you use B<img> on a thumbnail gallery, you'll get a list of the thumbnails instead of the original images, since it is the thumbnails that you are displaying. However, if you are looking at a gallery and end up (after using B<href> a few times) with a bunch of "/image250.htm" looking HTML pages, using the B<img> command on all of those might give you the real image. 
+
+If you are a l33t dude and have a special regex you'd like to use, use the B<make> command. Specifying a regex with the make command, you can pull out whatever portions of the file you want. This is great when attempting to pull a gallery of Javascripted images or the like. 
+
+This will only use URLs that have the extension matching the ExtensionRegex. See B<set> to change it.
+
+This will only use URLs that have the extension NOT matching the ExtensionIgnore. See B<set> to change it.
+
+This will also only use the URLs matching the B<makeregex> (see the command's documentation). 
+
+You can customize exactly what B<href> and B<img> grab (what regex they use) in your configuration. See the B<set> command. 
+
+I<Note: Using make by itself will act exactly like href.>
+
+=head3 nodupes
+
+Syntax:
+
+	nodupes
+
+The B<nodupes> command will remove all duplicate entries in the list. I recommend doing this before performing a B<get> or any of the B<make>-style operations. It gets rid of unnecessary work and traffic.
+
+=head3 save, load
+
+Syntax:
+
+	save [filename]
+	load [filename]
+
+These commands will write the list to a file, and load a file into the list. Loading a list will remove all entries in the list before filling it. The file created contains one URL per line, with a standard line break in between them. 
+
+=head3 saveflux
+
+Syntax:
+
+	saveflux [fluxfile name]
+
+This command is similar to the B<save> command, except it will attempt to look over the current URL list and condense all possible fusker line combinations into their fusker command equivalent. For example, if I had:
+
+	http://www.example.com/pic01.jpg
+	http://www.example.com/pic02.jpg
+	http://www.example.com/pic03.jpg
+
+The B<save> command would save it exactly like that, where B<saveflux> would save it as:
+
+	fusk http://www.example.com/pic[01-03].jpg
+
+This greatly improves on the efficiency of a raw list of URLs, and is recommended over a raw URL list, but not over a better solution that might take a server hit or two. Read http://urltoys.com/efficiency.php For more details on the Efficiency Index that B<saveflux> reports.
+
+=head3 set
+
+Syntax:
+
+	set
+	set [configentry]=[value]
+
+The B<set> command by itself will list all of the currently set configuration variables. This is similar to vim's set command. For example, if I type B<set verbose=0>, it will make URLToys in non-verbose mode, or if I type B<set useragent=URLToys Perl-style>, it will report that to all of the browsers. Use the B<set> command by itself to understand exactly what you can possibly set. Also see Configuration later. Do not use excessive spaces or quotes. There should be no spaces before or after the equal sign, although you may use spaces in the [value].
+
+=head3 config
+
+Syntax:
+
+	config
+	config save
+	config load
+
+The B<config> command by itself will show the current configuration, exactly like B<set> by itself will. B<config save> will write the current configuration to the global settings file, which as of this writing is B<[HOME]/.urltoys/config>. B<config load> will read the configuration from the global settings file into memory, overwriting the current settings. You can manually edit the configuration file outside of URLToys, this command is just for convenience. 
+
+=head3 get
+
+Syntax:
+
+	get
+	get +100k
+	get -1000k
+
+This command downloads the entire list of URLs to the local machine. The entire process starts with checking the existence of "nextdir.txt" first. If it exists, it reads a single number from the file, increments it, and saves file back. It then creates a folder in the current directory based on that number (such as "00004"), and downloads the files following the name template's format. To set the name template, use the B<set> command. Also, whether or not URLToys is in "verbose" mode affects this command quite a bit.
+
+The two latter syntax choices are new since 1.19. They allow you to set an arbitrary size limitation on the files you keep. See the B<size> command for more details on how to specify a size requirement.
+
+=head3 fixparents
+
+Syntax:
+
+	fixparents
+
+This command will fix URLs that contain parent (../) type portions. Urltoys should automatically account for this when creating links, but just in case you have an older list that already has them, this has been provided as a convenience. And example would show each of these pairs before and after the B<fixparents> call:
+
+	http://somesite.url/dir/../1.img
+	http://somesite.url/1.img
+
+	http://somesite.url/a/b/c/d/../../../1.img
+	http://somesite.url/a/1.img
+
+=head3 makeregex
+
+Syntax:
+
+	makeregex
+	makeregex [new makeregex]
+
+The concept of the makeregex is to apply a regex to all "B<make/href/img>" style commands. It defaults to ".*" on startup, which will basically match anything. However, it's possible that you might want to "make" a list using only a subset of the commands. You can set this variable with the B<makeregex> command, however, it is not saved during a B<config save> due to the ever-changing nature of this variable. 
+
+An use of this would be if you had a list of links from a gallery. Let's say the list from the gallery looked like this:
+
+	http://somesite.url/picture1.htm
+	http://somesite.url/picture2.htm
+	http://somesite.url/picture3.htm
+	http://somesite.url/index2.htm
+	http://somesite.url/picture4.htm
+	http://somesite.url/picture5.htm
+	http://somesite.url/picture6.htm
+	http://somesite.url/index3.htm
+
+If you were to "make" a list using this, the picture.htm files would also be looked at. In this case, you want to only view/dig through the index based files. Using B<makeregex index> before doing a B<href> on this will skip over the picture.htm files during the "make" process. After doing this command, be sure to reset the makeregex back to its original state!
+
+=head3 clear
+
+Syntax:
+
+	clear
+
+Clears the screen. This command unix-centric, so it's probably going to get dropped in a future release. I left it in just in case someone really wanted it, they could go in and update the "system" call manually. 
+
+=head3 seq,zeq
+
+Syntax:
+
+	seq [URL with numbers in it]
+	zeq [URL with numbers in it]
+
+These commands add a list of URLs to your main list, based on a URL you give it. The best way to explain is by example:
+
+	seq http://somesite.url/somedir/35.jpg
+	
+would produce 
+
+	http://somesite.url/somedir/1.jpg
+	http://somesite.url/somedir/2.jpg
+	http://somesite.url/somedir/3.jpg
+	...
+	http://somesite.url/somedir/35.jpg
+
+... and ...
+
+	zeq http://somesite.url/somedir/35.jpg
+
+would produce
+
+	http://somesite.url/somedir/01.jpg
+	http://somesite.url/somedir/02.jpg
+	http://somesite.url/somedir/03.jpg
+	...
+	http://somesite.url/somedir/35.jpg
+
+The commands do roughly the same thing. They take the last number in the URL and attempt to make a list based on it. The only difference between the two commands is that B<zeq> accounts for the leading zeros, and B<seq> ignores them.
+
+=head3 fusker,fusk
+
+Syntax:
+
+	fusk [fusker string]
+	fusker [fusker string]
+
+Fusker is a program that was originally created by Carthag Tuek, designed to take a specially written URL and turn it into a list of URLs. In a way, it's a much more powerful version of the seq / zeq command. The difference is that it requires modifying the URL instead of just copying/pasting. An example ... adding this URL:
+
+	fusker http://somesite.url/fusker[003-103].jpg
+
+Should create a list similar to this:
+
+	http://somesite.url/fusker003.jpg
+	http://somesite.url/fusker004.jpg
+	http://somesite.url/fusker005.jpg
+	...
+	http://somesite.url/fusker103.jpg
+
+And a fusker line like this:
+
+	fusker http://www.somesite.url/test[3-5][6-8].jpg
+
+would create a list like this:
+
+	http://www.somesite.url/test36.jpg
+	http://www.somesite.url/test37.jpg
+	http://www.somesite.url/test38.jpg
+	http://www.somesite.url/test46.jpg
+	http://www.somesite.url/test47.jpg
+	http://www.somesite.url/test48.jpg
+	http://www.somesite.url/test56.jpg
+	http://www.somesite.url/test57.jpg
+	http://www.somesite.url/test58.jpg
+
+Finally, another possibility is to use a list of entries:
+
+	fusker http://www.somesite.url/{images,pics}/image[01-02].jpg
+
+creates:
+
+	http://www.somesite.url/images/image01.jpg
+	http://www.somesite.url/images/image02.jpg
+	http://www.somesite.url/pics/image01.jpg
+	http://www.somesite.url/pics/image02.jpg
+
+These are just basic examples, but the finer details are out of the scope of this documentation. Those familiar with fusker should already have a working knowledge of all of fusker's tricks. :-)
+
+=head3 sort
+
+Syntax:
+
+	sort
+
+This command sorts the list. Duh?
+
+=head3 nsort
+
+Syntax:
+
+	nsort
+
+This command sorts the list, but instead of just doing a simple sort, sorts using the last number in the URL as a real number instead of its text equivalent. For example, normally this list:
+
+	http://www.somesite/1.jpg
+	http://www.somesite/20.jpg
+	http://www.somesite/2.jpg
+	http://www.somesite/10.jpg
+	http://www.somesite/30.jpg
+	http://www.somesite/3.jpg
+
+would be sorted by "sort" as:
+
+	http://www.somesite/1.jpg
+	http://www.somesite/10.jpg
+	http://www.somesite/2.jpg
+	http://www.somesite/20.jpg
+	http://www.somesite/3.jpg
+	http://www.somesite/30.jpg
+
+nsort sorts it like this:
+
+	http://www.somesite/1.jpg
+	http://www.somesite/2.jpg
+	http://www.somesite/3.jpg
+	http://www.somesite/10.jpg
+	http://www.somesite/20.jpg
+	http://www.somesite/30.jpg
+
+=head3 resume
+
+Syntax:
+
+	resume [directory name]
+
+This command will attempt to load [directory-name]/url_list, and upon finding it, will continue to download the list into this folder. It will assume that you have not changed the naming convention (see NameTemplate) when searching for existing files. It will also not modify your current list. If you decide that you'll NEVER use this command, you can disable the list saving with SaveURLList (see SaveURLList).
+
+=head3 version
+
+Syntax:
+
+	version
+
+Prints the current version of URLToys. Why this wasn't in the 1.0 release of URLToys, I don't know.
+
+=head3 lip
+
+Syntax:
+
+	lip
+
+This is short for "Last In Prefix." This command performs an B<nsort> first, and then takes the last entry of each prefix. If you had a list that looked like this:
+
+	http://somesite.url/01.htm
+	http://somesite.url/02.htm
+	http://somesite.url/03.htm
+	http://somesite.url/04.htm
+	http://someothersite.url/01.htm
+	http://someothersite.url/02.htm
+	http://someothersite.url/03.htm
+
+It'll create a list like this:
+
+	http://somesite.url/04.htm
+	http://someothersite.url/03.htm
+
+This is nice for gathering images from a web gallery. You might have a list of .htm pages that each have a single image on it, but the images are just sequential as the .htm pages. Gathering the list of all of the .htm files, then running this will minimize the amount of pages you must download in order to generate the list of images. You can take the result list, run "img" on them, and then funnel the list back in with B<zeq> commands.
+
+=head3 undo
+
+Syntax:
+
+	undo
+	u
+
+This undoes whatever the last potentially list-modifying operation was. Commands like "show" or "config" cannot be undone. This has one level of undo, and can be disabled with the UseUndo setting.
+
+=head3 needparam
+
+Syntax:
+
+	needparam [which param] [why]
+
+This command is for Custom Commands (See Custom Commands and Batch Work). When you are creating a script with custom parameters, you may use this command to warn the user that they must supply certain parameters in order to run the command. For example, this command at the beginning of a script:
+
+	needparam 1 Syntax: cmdname [URL]
+
+Would instruct those typing in "cmdname" without a URL following it that they need to pass a URL as a parameter. 
+
+=head3 append
+
+Syntax:
+
+	append [filename]
+
+Append works identically to the B<load> command, except it doesn't empty the list before loading. This is convenient for loading a bunch of files together.
+
+=head3 print
+
+Syntax:
+
+	print
+	print [sometext]
+
+Print writes text to output. This is usually used for custom scripts. Using B<print> by itself will print a blank line.
+
+=head3 replace
+
+Syntax:
+
+	replace [tofind] [replacewith]
+
+This allows you to replace text in a URL. For example, if I had these URLs in the list:
+
+	http://www.somesite.url/image1.jpg
+	http://www.somesite.url/image2.jpg
+	http://www.somesite.url/image3.jpg
+
+If I typed in "replace image pic", I'd get 
+
+	http://www.somesite.url/pic1.jpg
+	http://www.somesite.url/pic2.jpg
+	http://www.somesite.url/pic3.jpg
+
+You can use the B<rreplace> for more complicated replacements and strips.
+
+=head3 rreplace
+
+Syntax:
+
+	rreplace /regextomatch/replacement/
+
+NOTE: rreplace does not yet support backreferencing.
+
+You can use the B<replace> and B<strip> for simple replacements and strips.
+
+=head3 keepuni
+
+Syntax:
+
+	keepuni
+
+This command is similar to B<nodupes>, except with this one, it removes any URL that is listed more than once, including the first one. B<nodupes> gives you a unique list, and B<keepuni> gives you the list of URLs that have no duplicate. 
+
+=head3 head
+
+Syntax:
+
+	head
+	head [count]
+
+This command shows the first [count] records in your list. If no count is listed, 10 is assumed.
+
+=head3 tail
+
+Syntax:
+
+	tail
+	tail [count]
+
+This command shows the last [count] records in your list. If no count is listed, 10 is assumed.
+
+=head3 title
+
+Syntax:
+
+	title [text]
+
+This command sets the title bar of your window, provided you have xttitle installed on your machine. Please see the UseXTTitle section of this documentation for details on this program.
+
+=head3 system,systemw,systemu
+
+Syntax:
+
+	system [command]
+	systemu [unix only command]
+	systemw [windows only command]
+
+These three commands execute a shell command on your machine. The m and u versions will only execute the command if you are in the proper operating system. The latter two commands are used mainly in custom scripts, for things such as:
+
+	systemu cp somefile /here
+	systemw copy somefile \here
+
+If these two lines were in a custom script, only one would be executed, depending on the OS.
+
+=head3 keeph, keept, delh,  delt
+
+Syntax:
+
+	keeph [number]
+	keept [number]
+	delh [number]
+	delt [number]
+
+These commands were suggested by Jaxon as a nice way to trim the edges of the list.  These commands all do almost the same thing... they remove entries from either the beginning or the end of the list. For example, "keeph 10" will remove all entries from the list except the first ten, and "delt 10" will delete the first ten entries from the list. 
+
+=head3 strip
+
+Syntax:
+
+	strip [text to strip]
+
+This command works similar to the B<replace> command, except it replaces the found text with nothing. Use B<rreplace> for more complicated replacements.
+
+=head3 history
+
+Syntax:
+
+	history show
+	history show [number]
+	history clear
+	history save [filename]
+	history save [filename] [number]
+
+This command will allow to you view the history of commands you've typed in, so its easy to remember exactly what you typed. This is useful for creating custom scripts. The history should only log the commands that actually modify the list, so commands like B<show> and B<history> will never actually appear in the history itself.
+
+=head3 password
+
+Syntax:
+
+	password show
+	password clear
+	password [domain] [username] [password]
+
+This will allow you to use a Basic Authorization password on a web server. A possible example:
+
+	password somesite.url joe joespassword
+	add http://www.somesite.url/someprotectedfile.zip
+	get
+
+This would use "joe:joespassword" as an encoded HTTP header to somesite.url to retrieve this file. "password show" Will allow you to see the list of current passwords remembered. "password clear" will remove the list of known passwords. 
+
+=head3 batch
+
+Syntax:
+
+	batch command
+	batch command ~
+	batch command prefix~
+
+Just when you thought you read the entire documentation, I go in and add another command. This one is for the power users, as it is the first multiple line command. This is for those that type in the same command over and over, but with a slightly different part, and want to make that faster. I'll paint an example for you...
+
+Let's say you have a list of URLs that you already plan to use the "zeq" command on. Normally, you'd have to either copy them one at a time into URLToys after manually typing in "zeq ". Either that, or you'd have to add "zeq " to the front of them in your favorite text editor before pasting the full list into URLToys. Not anymore!
+
+	URLToys(0)> batch zeq
+	[batch][0] http://somesite.url/05.jpg
+	[batch][1] http://someothersite.url/05.jpg
+	[batch][2] end
+	URLToys(10)>show
+	http://somesite.url/01.jpg
+	http://somesite.url/02.jpg
+	http://somesite.url/03.jpg
+	http://somesite.url/04.jpg
+	http://somesite.url/05.jpg
+	http://someothersite.url/01.jpg
+	http://someothersite.url/02.jpg
+	http://someothersite.url/03.jpg
+	http://someothersite.url/04.jpg
+	http://someothersite.url/05.jpg
+
+What URLToys did here is took the "zeq" command (listed after batch on the command line), and ran it with each parameter listed here. It was akin to typing in:
+
+	zeq http://somesite.url/05.jpg
+	zeq http://someothersite.url/05.jpg
+
+I'll let your mind wander with the possibilities ("batch fusker", etc). But what if you want to place the batched word somewhere specific? Simple ... use the tilde! ("~") Typing in "batch zeq" is a shortcut for typing in "batch zeq ~". If you don't use a tilde on the batch line, it'll assume you wished to add a space and a tilde after it, otherwise it'll leave it alone and craft your commands exactly as you wish. HAVE FUN!
+
+=head3 batchcurrent
+
+Syntax:
+
+	batchcurrent command
+	batchcurrent command ~
+	batchcurrent command prefix~
+
+Just like B<batch>, except it uses the current list instead of asking you for entries.
+
+=head3 size
+
+Syntax:
+
+	size 11000
+	size 100k
+	size +100k
+	size -1000k
+
+This command was added after De_Wr0ng (from SE) gave me enough attitude about URLToys missing the command that I had to add it. :-) This will ask the URLs in the list for their size (from the web server), and if there's a reply, it'll filter out the list if it matches what size you are looking for. For example, if you were looking to keep all of the files in the list greater than 100k in size, use:
+
+	size +100k
+
+If you wanted to not download anything larger than one megabyte, do:
+
+	size -1000k
+
+Etc. This can be used instead of the B<get> command if you are looking to make a perfect, filtered-by-size list. 
+
+=head3 cd
+
+Syntax:
+
+	cd [directory]
+
+Changes the current working directory. This affects commands like B<load>, B<save>, B<get>, B<resume>, etc. It's a convenience command. 
+
+=head3 pwd
+
+Syntax:
+
+	pwd
+
+Prints the current working directory. In case you forget where you are. 
+
+=head3 autorun
+
+Syntax:
+
+	autorun somefile.flux
+
+This command will run each line in the file as a command. This is for the Windows version for automatically running commands via the web. Using a command line such as:
+
+	urltoys autorun somefile.flux
+
+... you can run whatever you want if you hook that into your browser. The Windows installer should automatically associate .flux files with URLToys.
+
+=head3 header
+
+Syntax:
+
+	header
+	header SomeHeader: SomeValue
+	header -d SomeHeader
+
+This is a relatively advanced command to use, but very powerful. This will allow you to temporarily override any regular HTTP headers you send to the web server (including overriding those in B<CustomHeader>). I expect this to be used in .flux files quite a bit. For example, if you wanted to tell the web server that you were browsing with ScoobyDoo 1.0 instead of Internet Explorer, you could do this:
+
+	header User-Agent: ScoobyDoo 1.0
+
+This has other possibilities, such as sending cookies (Cookie: ), logins and password (Authorization: ... although I recommend using URLToys B<password> command instead), and other special headers. This is for those that understand HTTP conversations, and shouldn't be used lightly. B<Note:> This will never be saved in your configuration permanently. To permanently save a custom header, use the B<CustomHeader> preference. 
+
+=head3 cookies
+
+Syntax:
+
+	cookies
+	cookies on
+	cookies off
+	cookies clear
+
+This command will allow you to automatically have cookie conversations with web servers. If you turn this on, it'll automatically keep track of all cookies each web server gives you, and give them back as appropriate. B<cookies clear> removes all cookies from the cookie jar.
+
+=head3 hrefimg
+
+Syntax:
+
+	hrefimg
+
+This command (like href, make, and img) will hit every link once in the list, but will grab all IMG links and A links at the same time. It is the core command in the B<spider> command.
+
+=head3 spider
+
+Syntax:
+
+	spider
+
+This command is probably one of those commands that should have never been added to URLToys, as it goes against everything it stands for (efficiency of link gathering, hands-on, etc). This will take every URL currently in the list and dig through all allowed sub-pages, recording all IMG and A tags it sees. It will only hit the same link once, and when the spider command is done, you have a comprehensive list of all possible URLs that this parent URL could generate (in theory). As the author of URLToys, I strongly suggest that you use this command sparingly, and that no fluxes use this command (its a complete waste to be used en-masse).
+
+It was written for the sheer challenge of it, and to be one step closer to feature-completeness as far as an HTTP client goes. This command, coupled with an effective NameTemplate/DirSlashes setting combo should mirror a site in its entirety. 
+
+=head2 Configuration
+
+The configuration file is used to permanently customize how URLToys acts. Right now, the configuration file is in its infancy, but as URLToys has features added, it could stand to be really helpful. Each entry in the configuration file is a variable name followed immediately by an equal sign, followed immediately by the value. These can all be set with the B<set> command, and permanently saved with a B<config save>. Here is the list of variables that can be set:
+
+=head3 UserAgent
+
+This variable sets what URLToys identifies itself as to the web server. At the time of this documentation's writing, URLToys identifies itself as a very common version of Internet Explorer. 
+
+=head3 ExtensionRegex
+
+This is a very simple regex matched against the extension (.htm, .jpg, etc) of a URL to see if it is worth even trying to read HTML from it. I've got many possible extensions listed already, but you might come across one or have a need to tweak this in the future. 
+
+=head3 ExtensionIgnore
+
+This will match in inverse against the extension. List all extensions here that you don't EVER want to consider HTML, such as MPEG files, JPEGs, etc.
+
+=head3 CustomHeaders
+
+This is a list of custom HTTP headers you'd like to send to the server, separated by the pipe ('|') symbol. It defaults to just sending the Referer URL as the same URL you are visiting. Other possible CustomHeaders you might wish to send might be Authorization lines or Cookie lines, as well as modifying the the Referer one. All headers will have %URL replaced with the current URL being worked on. More variables might be added later.
+
+=head3 HrefRegex
+
+This is the regex that the B<href> command uses to tear links out of the page. I'm sure there's a better one. If you think of it, change it here. If it's WAY better, email me and I'll update it as the default regex.
+
+=head3 ImgRegex
+
+This is the regex that the B<img> command uses to tear image sources out of the page. See the HrefRegex setting.
+
+=head3 Prompt
+
+This represents the prompt URLToys shows when it is interactive. Possible variable choices:
+
+	%COUNT - Number of URLs in current list
+	%CWD - Current Working Directory
+	%HOUR - Current hour
+	%24HR - Current hour in military time
+	%MIN - Current minute
+	%SEC - Current Second
+	%DAY - Current day of month
+	%MONTH - Current month (1..12)
+	%YEAR - Current Year (4 digits)
+
+=head3 NameTemplate
+
+This represents the naming convention of the filename saved during the B<get> operations. As of this writing, %COUNT is replaced by a unique number, and %NAME is replaced by URLToys' understanding of what the file should be named. 
+
+	%COUNT - Incrementing number, one per file starting with 00001
+	%DOMAIN - Domain name (www.urltoys.com)
+	%DIR - Directory of URL (can be empty)
+	$EXT - Extension of file (can be empty)
+	$CEXT - Capitalized version of extension
+	%LEXT - Lowercase version of extension
+	%HOUR - Current hour
+	%24HR - Current hour in military time
+	%MIN - Current minute
+	%SEC - Current Second
+	%DAY - Current day of month
+	%MONTH - Current month (1..12)
+	%YEAR - Current Year (4 digits)
+
+Note: You should use forward slashes (/) for all directory boundaries, even if you are in Windows. Perl will understand what you mean. Also, if you do something that'd accidentally double up the slashes (//), URLToys will correct that before attempting to open the file, so don't worry!
+
+An example:
+
+Let's say you are downloading http://www.urltoys.com/coolpictures/picture1.jpg, and the next download directory for you is 00005. If you made your NameTemplate:
+
+	set NameTemplate=%EXT/%DOMAIN/%DIR/%NAME
+
+Your file (picture1.jpg) would be saved in the current directory, under:
+
+	00005/jpg/www.urltoys.com/coolpictures/picture1.jpg
+
+It's almost a mirroring effect. Almost. You can arrange by extension, domain, etc. Or you can just always go with the standard "%COUNT-%NAME". 
+
+See B<DirSlashes> for details on %DIR. 
+
+=head3 Verbose
+
+Should be set to a 1 or a 0 (True or False, respectively). If 1, URLToys will be chatty. If 0, it will keep its mouth shut as much as possible. This defaults to verbose, since URLToys' original intent was to be interactive. This is definitely something to turn off during batch sessions. 
+
+=head3 SaveURLList
+
+As of version 1.04, you can now resume a partially downloaded list. In order to do this, URLToys saves a copy of the list into each folder it downloads to. If you decide that you never want to resume a list, save your self the few kilobytes by setting SaveURLList to 0.
+
+=head3 ExplainRegexError
+
+As of verion 1.07, typed in regexes (used with the make command and such) are now checked for errors beforehand by Perl to help alleviate unexpected quits. If you type in a poorly designed regex (by Perl's discretion), you may set this to 1 to allow Perl to explain the details of the error. Most seasoned enough to create a complicated enough regex to bomb out Perl should realize their typo on first glance, but this will clarify things. This is set to zero by default.
+
+=head3 UseUndo
+
+As of version 1.08, you can do a simple undo. This preference will disable the ability to use undo, for memory-saving and speed reasons. 
+
+=head3 UseXTTitle
+
+As of version 1.10, you can use the xttitle system call to change the title bar's text. If you are running this in a unix variant, you must get a copy of xttitle. If you are running Windows, I have written a program for Windows that does the same thing, and named it xttitle so URLToys knows where to look. Here are the relevant URLs:
+
+	Unix Versions:
+
+	Main Site: http://www.jarvis.com/xttitle/
+	Local Mirror: http://www.urltoys.com/xttitle-1.0.tar.gz
+
+	Windows Version: 
+
+	Local Mirror: http://www.urltoys.com/xttitle_win32.zip
+	Local Mirror (Source): http://www.urltoys.com/xttitle_win32src.zip
+
+You may also use the B<title> command to change the title bar in your custom scripts. In order for this to work, you must take the file "xttitle.exe" and place it somewhere in your PATH, such as C:\WINDOWS or C:\WINNT (or /usr/bin or /usr/local/bin if you are in Unix). Once its there, you can type in:
+
+	set UseXTTitle=1
+	config save
+
+To permanently have URLToys update your title bar with status updates.
+
+=head3 PauseTime
+
+Allan Hsu sent in an update which allows you to set a delay in between downloads, so that certain web sites that throttle a connection would do it. It's in here for those that might need it. Setting it to zero disables (that's the default), but setting it to a positive value will sleep for that many seconds between files. 
+
+=head3 DownloadDir
+
+Let's you specify the directory URLToys starts in, which is typically the directory it downloads in. If left blank, it'll use the current directory.
+
+=head3 SeqWarningSize
+
+This value is how many URLs a single B<seq> or B<zeq> line would want to generate before it disallows it to happen. This is a failsafe in case you try to do "zeq 1000000101.jpg" when you meant to do "fusk 1000000[001-101].jpg". 
+
+=head3 DirSlashes
+
+When you use the NameTemplate, you can choose "%DIR" as one of the variables, which represents the directory structure of the URL. For example, if I had this URL:
+
+	http://www.example.com/1/2/3/4/picture1.jpg
+
+In this case, %DOMAIN would be "www.example.com", %NAME would be "picture1.jpg", and %DIR would be "1/2/3/4" (no slashes on the ends). If you told NameTemplate to use %DIR somewhere, you'd get stuck with 4 levels deep of directories on your home machine for no real reason. If you want to change this, you can do something like:
+
+	set DirSlashes=-
+
+Which will save the file as "1-2-3-4/picture1.jpg" instead of "1/2/3/4/picture1.jpg". You can make it not put anything between the directory names by just leaving it blank after the equal sign in the B<set> command.
+
+=head3 Proxy
+
+Proxy support has been added as of version 1.25. To use this you need to set your proxy in one of these simple ways:
+
+	set Proxy=http://proxyserver/
+	set Proxy=http://proxyserver:PORT/
+	set Proxy=http://username:password@proxyserver/
+	set Proxy=http://username:password@proxyserver:PORT/
+
+For example, if my proxy server was example.com port 3128, and my login was 'joe' and password was 'mypass', it'd look like:
+
+	set Proxy=http://joe:mypass@example.com:3128/
+
+That's it! if this line is on, all HTTP requests are proxied. Be sure to use B<config save> if you are going to keep this setting permanently.
+
+=head2 Command Line Parameters
+
+There are only a couple of command line parameters...here's the syntax of urltoys:
+
+Syntax:
+
+	urltoys [options] [command or URL]
+
+The possible options are:
+
+=head3 -d
+
+"Defaults." Does not load the global configuration file. You can perform a B<config save> immediately after this to reset all settings to defaults.
+
+=head3 -h
+
+"Help." Prints a basic syntax and quits out.
+
+=head3 -q
+
+"Quiet." Starts urltoys in non-verbose (quiet) mode.  If it's already set in the config, this is irrelevant. 
+
+=head3 command or URL
+
+You can specify one command or URL on the command line, which will be added to the empty list. 
+
+=head2 Custom Commands and Batch Work
+
+Custom commands are the coolest thing since sliced bread! They provide a way to take the existing commands and mesh them together into the equivalent of a batch file. To create one, choose a word that is not already a command. Let's say we wanted to create a command called "mng", which is short for "Make and Get". Create a new text file inside of [HOME]/.urltoys/ called "mng.u". Inside this file, write the list of commands you'd normally type at the prompt, in order:
+
+	href
+	keep \.jpg|\.JPG|\.jpeg|\.JPEG
+	get
+
+Once this file exists, run urltoys. Add a URL that contains a link to a .jpg file to the list, and then type B<mng> at the prompt. Immediately, these three commands will happen in order, as if you just typed them! What'd I say about that sliced bread!?
+
+Using this, coupled with some crafty "make" and "set" commands could make for some wonderful automation. Did you know you could pipe commands directly into urltoys? You made it all the way to here in the documentation, so you probably do, but, hey...
+
+Using this notion, One could type this at a prompt to automatically batch a download:
+
+	echo mng | urltoys http://somesite.url/
+
+That's some cool stuff. 
+
+As of 1.09, you may supply a helpful line of text that explains what your command does. To do this, just add a comment at the beginnign of your .u file that looks like this:
+
+	# Some helpful text
+
+And when someone types in B<help>, your command will also be listed there, like this:
+
+	yourcommand    : Some helpful text
+
+Also, as of version 1.09, you may create custom parameters to a command. For example, let's make a command that writes a URL to the screen, then adds it to the list. We'll call it B<printadd>. First, create "printadd.u" in your .urltoys folder. In there, add these lines:
+
+	# Prints URL to screen, then adds to list
+	needparam 1 printadd [URL]
+	print URL: ~1
+	add ~1
+
+If you save this file, then run URLToys, you'll see this appear in the help menu:
+
+	printadd    : Prints URL to screen, then adds to list
+
+If you type in B<printadd> without a URL after it, it'll complain by showing you that you need a URL after it. If you type in a URL after printadd, you'll see what you expect to see. To refer to a parameter, just use the tilde, followed by a number (~1, ~2, ~3). To refer to ALL parameters at once, use ~0. 
+
+=head2 ChangeLog
+
+=head3 Version 1.28
+
+	- Added 'saveflux' command, automatically condensing URLs into fusker strings
+	- Added 'rreplace' command
+	- Added HTTP keep-alive support, based on a patch from fforw (thanks!)
+	- fixed replace and strip to do multiple replaces per command (s///g)
+	- fixed/updated help system text
+	- removed ReplaceWithRegex, use rreplace instead
+	- added 'spider' command to warning list
+
+=head3 Version 1.27
+
+	- Added 'hrefimg' command
+	- Added 'spider' command
+	- fixed Tk INC for Unix users, now web-able (install docs coming soon)
+	- fixed internal makedir trailing slash bug
+	- fixed cb_warnuser: calls ut_getnextline now
+	- fixed extension checking bug (query string)
+	- fixed 'batch' command's behavior in a flux
+	- export ut_getnextline
+	- export $ut_term for overriding / replacing with own term var
+	- only creates Term::ReadLine on first need (if not existing)
+	- urltoysw: "25 files" instead of "--" in upper right corner
+
+=head3 Version 1.26
+
+	- * This version requires a full Windows install
+	- Renamed exec_command to ut_exec_command
+	- Renamed commandloop to ut_command_loop
+	- Removed silly use vars declaration
+	- Created ut_get_dir
+	- Created GUI version for flux downloading
+	- Split code into multiple files
+	- Complete rewrite of 'help' command
+	- URLToys runs in Idle priority in Windows, for CPU saving
+	- Added Config setting in Windows install for GUI downloader option
+
+=head3 Version 1.25
+
+	- * This version requires a full Windows install
+	- Added Proxy preference
+	- Added automatic cookie support
+	- Added 'cookie' command
+	- 'get' doesn't create hd_list or pw_list if not needed
+	- (Windows installer Update, not in script: Creates DownloadDir if needed)
+
+=head3 Version 1.24
+
+	- Added 'header' command
+	- Added DirSlashes preference
+	- Added SeqWarningSize Preference
+	- Added 'jsp' to ExtensionRegex's default
+	- Added %DOMAIN as a possible variable in a custom header
+	- Added zeq/seq bailouts
+	- Added zeq/seq warnings for autorun
+	- Records hd_list and cf_list on 'get', to remember headers and configs
+	- Fixed autorun Unix CR bug from using files made in Windows
+
+=head3 Version 1.23
+
+	- Replaced .ua with .flux for marketing reasons (thanks to C1P and Marck)
+
+=head3 Version 1.22
+
+	- * This version requires a full Windows install
+	- Added 'autorun' command and .ua support
+	- Made $term (readline) global to fix segfaults
+	- 'set' command allows null values to be set
+	- Added 'DownloadDir' preference
+
+=head3 Version 1.21
+
+	- * This version requires a full Windows install
+	- Added Prompt Choices: %CWD, %24HR, %HOUR, %MIN, %SEC, %DAY, %MONTH, %YEAR
+	- Added NameTemplate Choices: %DOMAIN, %DIR, %EXT, %CEXT, %LEXT, %24HR, %HOUR, %MIN, %SEC, %DAY, %MONTH, %YEAR
+	- Added 'pwd' command
+	- Added 'cd' command
+
+=head3 Version 1.20
+
+	- Beta: Adding file resuming support (!!) ... We'll see :-D
+
+=head3 Version 1.19
+
+	- added 'size' command
+	- added parameter to 'get' command for size requirement
+
+=head3 Version 1.18a
+
+	- added 'batchcurrent'
+	- Fixed / changed undo behavior during batch
+
+=head3 Version 1.18
+
+	- added 'batch'
+
+=head3 Version 1.17
+
+	- added ExtensionIgnore preference
+	- Fixed 'help' syntax
+
+=head3 Version 1.16
+
+	- Added 'password show' syntax
+	- Added 'password clear' syntax
+	- Added pw_list for resuming passworded sites
+
+=head3 Version 1.15
+
+	- Added 'password'
+
+=head3 Version 1.14
+
+	- Added "PauseTime" preference (From Allan Hsu)
+	- Directory being downloaded to is now displayed
+
+=head3 Version 1.13
+
+	- Keeps track of command history now
+	- Added 'history'
+	- Added 'strip'
+	- 'replace' is no longer listed twice in 'help' (thanks Jaxon)
+
+=head3 Version 1.12
+
+	- Added 'keeph'
+	- Added 'keept'
+	- Added 'delh'
+	- Added 'delt'
+
+=head3 Version 1.11
+
+	- Uses Term::ReadLine now to have a history and edit stuff
+
+=head3 Version 1.10a
+
+	- Fixed look of resume command's progress to match 'get'
+
+=head3 Version 1.10
+
+	- Added 'head' command
+	- Added 'tail' command
+	- Added 'title' command
+	- Added 'cls' command
+	- Added 'systemw' command
+	- Added 'systemu' command
+	- Deletes downloaded files if they are zero bytes in size
+	- Shows total count during list download
+	- Clear name of file after download properly
+	- Should be able to break (interrupt) the 'show' command
+	- Fixed help command
+	- Added UseXTTitle preference
+	- Fixed 'clear' command for Win32 systems
+
+=head3 Version 1.09d
+
+	- Added 'keepuni' command to appease Jaxon
+
+=head3 Version 1.09c
+
+	- Break (Control+C) stays in program, but kills current command
+
+=head3 Version 1.09b
+
+	- fixed "replace" command (NASTY bug)
+
+=head3 Version 1.09a
+
+	- added "replace" command
+	- added ReplaceWithRegex preference
+
+=head3 Version 1.09
+
+	- added "append" command
+	- added "print" command
+	- added "needparam" command
+	- help for custom commands (comment at top of line)
+	- parameters allowed for custom commands ~1
+
+=head3 Version 1.08b
+
+	- Made keep / del commands case insensitive
+
+=head3 Version 1.08a
+
+	- Fixed problem with absolute links on main sites
+
+=head3 Version 1.08
+
+	- Added undo support for Chop
+	- Added "undo" command
+	- Added UseUndo preference
+
+=head3 Version 1.07
+
+	- Fixed regex on config line parsing
+	- Added error checking to hand-typed regexes
+	- Polished command parsing regexes a little
+	- Added "ExplainRegexError" config setting
+
+=head3 Version 1.06a
+
+	- Fixed stupid error with the set command
+
+=head3 Version 1.06
+
+	- Added "version" command
+	- Added "lip" command
+	- replaced "handlecommands" with "commandloop" and "exec_command"
+	- Made parameters sent to urltoys an actual command
+	- changed exit command's behavior to "exit"
+
+=head3 Version 1.05
+
+	- Added "nsort" command
+
+=head3 Version 1.04a
+
+	- Added "system" command (Undocumented)
+
+=head3 Version 1.04
+
+	- Slightly modified "fusk" command to handle letters
+	- Added 'resume' command and ability to resume lists
+	- Added SIGINT handler to remove partially downloaded file (for resuming list)
+
+=head3 Version 1.03a
+
+	- Reverting the reverted keep_by_regex due to a /o removal
+
+=head3 Version 1.03
+
+	- Added 'sort' command
+	- reverting to old keep_by_regex until keep command is solved
+	- fixed makeregex bug
+
+=head3 Version 1.02
+
+	- Saint Marck rewrote keep_by_regex
+	- Changed array entries to use the "push" command
+	- Added credit/email to Marck
+
+=head3 Version 1.01
+
+	- Added "fusk(er)" commands. 
+
+=head3 Version 1.0
+
+	- Initial Commands: help,h,exit,add,show,list,ls,del,keep,make,href,img,nodupes,save,load,config,set,get,fixparents,makeregex,seq,zeq
+	- ChangeLog Created.
+
+=head2 Copyright
+
+Copyright (c) 2004, Joe Drago <joe@urltoys.com>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted
+provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+* Neither the name of the URLToys creator nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+

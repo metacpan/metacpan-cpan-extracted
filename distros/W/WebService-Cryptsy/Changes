@@ -1,0 +1,50 @@
+Revision history for WebService-Cryptsy
+
+1.008007   2015-03-24
+        - Fixed failing tests
+
+1.008006   2015-03-23
+        - Fixed failing test due to new data
+        - Re-enabled t/API/public/01-marketdata.t and 02-marketdatav2.t
+          tests, but only on interactive installs
+
+1.008005   2014-10-08
+        - Disabled t/API/public/01-marketdata.t and 02-marketdatav2.t
+            tests, as they recently started pulling in a ton of data
+            that causes problems with smokers and makes the tests
+            take forever to complete.
+
+1.008004   2014-10-05
+        - Fixed failing tests (Cryptsy made small updates to what some
+          API calls return and the tests weren't expecting that data)
+
+1.008003   2014-02-04
+        - Had to explicitly specify newer Moo in prereqs
+
+1.008002   2014-02-02
+        - Added LWP::Protocol::https into Prereqs, as it's not
+          auto-detected by dzil
+
+1.008001   2014-02-01
+        - Updated Cryptsy's new private API URL
+        - Converted to dzil
+
+1.007   2014-01-17
+        - Fixed a broken test
+
+1.006   2014-01-11
+        - Fixed a broken test
+
+1.005   2014-01-05
+        - Improved the tests to handle some previously-unaccounted-for cases
+
+1.003   2013-12-27
+        - Fixed unhandled error condition
+
+1.002   2013-12-26
+        - Added examples/api.pl that was left out from the previous version
+        - Fixed a minor POD issue
+
+1.001   2013-12-26
+        - First version, released on an unsuspecting world.
+

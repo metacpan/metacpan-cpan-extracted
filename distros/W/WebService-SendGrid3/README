@@ -1,0 +1,81 @@
+NAME
+
+    WebService::SendGrid3 - Client library for SendGrid API v3
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+      use WebService::SendGrid3;
+      my $SendGrid = WebService::SendGrid3->new(
+        username => 'user',
+        password => 'pass'
+      );
+    
+      my $response = $SendGrid->get_stats_global(
+         query => {
+                start_date => '2015-01-01',
+                end_date => '2015-01-03',
+                aggregated_by => 'day',
+         }
+      );
+
+DESCRIPTION
+
+    Simple client for talking to SendGrid API v3.
+
+METHODS
+
+ username
+
+ password
+
+ BUILD
+
+CATEGORIES
+
+ get_categories
+
+SETTINGS
+
+ get_enforced_tls
+
+STATISTICS
+
+ get_stats_global
+
+ get_stats_category
+
+ get_stats_category_sums
+
+ get_stats_subusers
+
+ get_stats_subusers_sums
+
+ get_stats_geo
+
+ get_stats_devices
+
+ get_stats_clients
+
+ get_stats_for_client
+
+ get_stats_esp
+
+ get_stats_browsers
+
+ get_stats_parse
+
+AUTHOR
+
+    Chris Hughes <chrisjh@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Chris Hughes.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

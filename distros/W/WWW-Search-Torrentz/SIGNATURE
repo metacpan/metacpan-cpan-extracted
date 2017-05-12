@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 9b4b09cfae4f0ee468846c32397dd41b08424d24 Changes
+SHA1 ad29bd0d3d84d20190d4ef02f8c7b08a87664b97 MANIFEST
+SHA1 bb6f36422d8deef90acc162e622f7bb5e90de2c1 META.json
+SHA1 91b5a96506b9c3603d280010351464ced5dd77ac META.yml
+SHA1 4b633df6e701c22a5ee5d3926ca706d582ea44de Makefile.PL
+SHA1 0b118cc382006fc9b0f3dc4d220410cda145df11 README
+SHA1 0af75b9432d66def6ccf20ac099d8faa7ff747ef lib/WWW/Search/Torrentz.pm
+SHA1 9e162f52d52a31325b88fd8c847d0afef57ac7a1 lib/WWW/Search/Torrentz/Result.pm
+SHA1 82825b9d1219e03f1e02a517da4f57b95b230498 t/WWW-Search-Torrentz-Result.t
+SHA1 4a3558eaedc4ea249fb87ce80ef6e7ee247cbc38 t/WWW-Search-Torrentz.t
+SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
+SHA1 5d7d973829c379a25fdb0f2db0dfd1c9f23a7538 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJX+RfKAAoJEMoENb5ewbNiBYsP/1fJrf6u/09YSRMfxQmkO5Cr
+KKLWKviAQ+yORALZR4656mUSKi6iIVXnLMLmnUfbayA/Xlh1cpklFuXOPRp7PdMW
+seRqjgCw+7/DApTFW/RsUf+Gtm1DyHdYrRDu/ho/GG1alIIUqcfTg3T//nZKxZ/y
+K3I2eEhoQnL/AIsc5JSZvYou3U7rbXAZCJN/X7lh7SJuJqBa6GC4YlDj0EQ/hlp5
+Xyx9R9s+VviJv18Uyap1tQifWBw1QTHz8j6B1bDawn4xlTWLXiyEETLjL/SsK+AF
+1qLRnZU12W1eWxc6ZgYG3+a7SyOydHv6GY2uG8AXXyJMnwfN8Ly+Sdw9fVf+XcUb
+8eSj5f8tguxJqnEzKQNmee56v1CN8ki1UJlFU+2LBlF5KjsPN5XLsxBB3JXaw/qV
+f8FbHkZYts0pW/pWhVSdae/LumwSXocxlgLUS4TDaUGqsH5fiswmCeL/PbQ7n8PS
++EEh1IjDOx61JfXPUY7w/r28fgISOZ6N7j0M2Mj9VDB95J/FOEQt/GWZBC1tOJHl
+sKr4gvKoFh7Xjeb5KuBkrdw7hXIpmWj5l1RrvMtZWcu+2fNh94fpdhgdQy1Kt0FS
+Krh7xXquEJDhH0uX/q/n/96+yDK51Om2T+xd1hHyj6YjHWQoKlLLyd7oQz3B77dR
+S7+9CGUVIIZr/3sui7TP
+=w1CM
+-----END PGP SIGNATURE-----

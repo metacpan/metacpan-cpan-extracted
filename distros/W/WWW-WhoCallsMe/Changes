@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::WhoCallsMe.
+
+0.02  Fri Feb  6 00:01:48 2009
+	- Fixed POD formatting errors
+
+0.01  Thu Feb  5 11:18:48 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::WhoCallsMe

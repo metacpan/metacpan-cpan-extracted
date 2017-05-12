@@ -1,0 +1,11 @@
+This diagram shows all the files in the example web site. Note that for
+<b>Home</b> there is not a column one (Home.c1) file. Web::Scaffold
+inserts a &lt;blank&gt; if a file does not exist. 
+<p>
+If you examine the
+LINK<#pages.cgi> file, and the %pages entry for <b>Home</b> you will see
+three columns specified. Web::Scaffold pads the first 20px column out with a
+&lt;blank&gt; to neatly format the page.
+<p>
+Click on the links to the left to examine the source for each page or use
+the drop down menu under <b>Page-Source</b> on the menu bar above.

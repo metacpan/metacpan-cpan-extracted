@@ -1,0 +1,25 @@
+---
+abstract: "Perl interface to www.qqchaoren.com ä½¿ç�¨QQè¶\Näººç��éª�è¯�ç �ä»£æ��æ��å�¡"
+author:
+  - 'MC Cheung <mc.cheung@aol.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-SuperMan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Slurp: '0'
+  perl: '5.006'
+version: '0.01'

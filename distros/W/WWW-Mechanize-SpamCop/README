@@ -1,0 +1,25 @@
+WWW/Mechanize/SpamCop version 0.08
+==================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003,2007 Mathieu Arnold, Aleksander Adamowski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,446 @@
+版本更新记录:
+2015-09-24 Webqq::Client v8.5.3
+1）该模块停止使用和开发
+2）修复代码产生的警告
+2015-09-17 Webqq::Client v8.5.2
+1）修复add_job无法执行回调函数的bug 感谢 林海
+
+2015-09-14 Webqq::Client v8.5.1
+1）BUG修复rt.cpan.org#107067
+
+2015-06-19 Webqq::Client v8.5.0
+1）修复pfqq版本号错误
+2）修复Webqq/Message.pm文件代码拼写错误 感谢 arrow.wang 的反馈
+
+2015-06-02 Webqq::Client v8.4.9
+1）修复登录死循环问题
+2）MsgSync插件对发送到irc的消息进行截断防止大量发送被服务器踢下线
+
+2015-05-28 Webqq::Client v8.4.8
+1）Perlcode插件执行代码时默认导入say函数
+2）客户端登录加密算法默认使用纯Perl计算方式，当出现失败时或错误时会自动使用js的方式重试
+3）客户端增加一个encrypt_method的属性，支持设置默认的登录加密算法方式
+4）修复长时间登录导致客户端无法更新好友信息、群信息的bug
+5）完善MsgSync模块
+
+2015-04-23 Webqq::Client v8.4.7
+1）修复依赖模块信息
+
+2015-04-23 Webqq::Client v8.4.6
+1）修复Makefile.PL错误
+2）将Webqq::Encryption单独发布
+
+2015-04-23 Webqq::Client v8.4.5
+1）修复输入正确验证码仍然提示验证码错误的bug 感谢[PERL学习交流 @乀﹒安乐，仅此那么一分钟]的反馈
+2）修复测试脚本注释错误
+3）增加模块的别名pfqq
+4）修复获取qq号，群号等信息如果存在多个相同昵称导致错误的bug
+
+2015-04-18 Webqq::Client v8.4.4
+1）修复客户端定时更新群组信息未生效的bug
+
+2015-04-17 Webqq::Client v8.4.3
+1）支持利用Webqq::Qun来获取群号码、群成员QQ号、好友QQ号
+2）Openqq的api接口支持使用群号码和好友qq号码来指定发送对象
+3）修复Openqq的api自己给自己发送消息导致死循环的bug
+4）修复SmartReply的识别逻辑错误，感谢[perl技术 @kk]反馈
+
+2015-03-31 Webqq::Client v8.4.2
+1）新增Webqq::Encryption::TEA::Perl模块，TEA算法纯perl实现
+
+2015-03-31 Webqq::Client v8.4.1
+1）支持Crypt:::RSA模块进行RSA计算，该模块是纯Perl编写，更易安装
+
+2015-03-31 Webqq::Client v8.4
+1）新增Webqq::Encryption模块，将登录加密中涉及到的TEA/RSA算法进行了分离
+2）可以通过安装Crypt::OpenSSL::RSA/Crypt::OpenSSL::Bignum/MIME::Base64模块来提升计算速度10倍以上
+
+2015-03-11 Webqq::Client v8.3.1
+1）修复少了文档错误
+
+2015-03-11 Webqq::Client v8.3
+1）Plugin函数使用eval执行，防止插件出错导致整个程序退出
+2）更新获取好友列表和群列表的hash函数
+由于腾讯更新了hash算法，导致旧版本无法获取到好友信息和群信息，请尽快更新到此版本
+
+2015-03-10 Webqq::Client v8.2.1
+1）使用git tag进行版本号管理
+2）修复pod文档错误 感谢 @wxg 反馈
+3）修复SmartReply插件api接口获取数据失败后导致主程序退出的bug
+
+2015-02-22 Webqq::Client v8.2
+1）Openqq插件进一步完善，提供获取信息、发送消息完整api
+2）pod文档增加Openqq api的详细说明
+
+2015-02-10 Webqq::Client v8.1
+1）新增Webqq::Client::Plugin::Openqq插件，使用PSGI+Twiggy框架，提供RESTful API
+2）新增$client->ready()/stop()/exit()/Webqq::Client::RUN()来支持单进程多账号模式
+3）新增on_ready()回调，在多账号模式下替代原有的on_run()回调
+
+2015-02-10 Webqq::Client v8.0
+1）new()/login()新增security参数，security=>1表示发送/接收消息使用https加密
+
+2015-02-09 Webqq::Client v7.9
+1）新增最近联系人列表功能 感谢@wxg的补丁
+2）用户、好友、群、讨论组增加客户端类型(client_type)属性 感谢@wxg的补丁
+3）修复CpanRecentModule模块当发现新模块时进入死循环的bug
+
+2015-02-07 Webqq::Client v7.8
+1）个人、群、讨论组成员增加状态属性(state)
+2）新增对buddies_status_change消息类型的处理
+2）新增on_friend_change_state回调，好友状态变化实时提醒
+
+2015-02-06 Webqq::Client v7.7
+1）修复发送中文消息时严重bug导致发送消息为空
+
+2015-02-04 Webqq::Client v7.6
+1）修复表情消息处理错误
+2）使用List::Util 提供的first函数优化代码逻辑
+
+2015-02-04 Webqq::Client v7.5
+1）大量bug修复和代码逻辑优化
+2）新增讨论组功能支持（由于腾讯限制，目前仅能接收讨论组消息，无法发送）
+3）支持讨论组临时消息
+4）增加设置在线状态功能，感谢@wxg的补丁
+
+2015-01-26 Webqq::Client v7.4
+1）新增$client->{is_first_login}属性，用于识别是否是首次登录
+2）修复relogin清空cookie时严重错误，该错误可能会导致程序异常退出
+3）修复on_new_group在错误的时机被执行的bug
+4）新增客户端接收消息失败次数限制，超过失败次数自动重连
+5）$client->_relink()方法重新连接失败后会改为重新登录
+
+2015-01-23 Webqq::Client v7.3
+1）新增$client->_relink()方法，区分重新登录、重新连接两种行为
+2）修复on_login回调在login之后不能马上发送消息的缺陷
+3）完善$client->_recv_message()对异常响应的处理
+4）$client->_cookie_proxy()方法嵌入到$client->_login2()中执行
+5）修复$client->_login2()请求参数错误
+
+2015-01-22 Webqq::Client v7.2
+1）修复relogin时on_new_group回调存在的bug
+2）新增Webqq::UserAgent代替AnyEvent::UserAgent减少模块依赖
+
+2015-01-16 Webqq::Client v7.1
+1）Webqq::Client::Cache新增->delete()的方法
+2）新增_detect_new_group_member2方法，用于发现新增成员
+3）新增_detect_loss_group_member方法，用于发现退群成员
+4）客户端定时更新群信息
+5）新增on_loss_group_member回调
+
+2015-01-12 Webqq::Client v7.0
+1）新增cookie跨域私有方法$client->_cookie_proxy()
+2）新增下载好友自定义图片私有方法$client->_get_offpic()
+3）新增下载好友自定义图片回调$client->on_receive_offpic
+4）$msg->{raw_content}将cface和offpic进行区分
+5）修复Perlcode插件空白命令仍然执行的bug
+6）修复SmartReply空白内容仍然执行api查询的bug
+
+2015-01-03 Webqq::Client v6.9
+1）CpanRecentModule插件bug修复
+2）客户端消息发送间隔默认修改为2s
+3）增加$client->get_dwz()方法，生成url对应的短地址
+
+2014-12-31 Webqq::Client v6.8
+1）修复Webqq::Client::Cron变量重复声明的错误
+
+2014-12-31 Webqq::Client v6.7
+1）完善客户端消息发送间隔控制，可以设置$client->{send_interval}，默认1s
+
+2014-12-29 Webqq::Client v6.6
+1）进一步完善文档
+2）修复update_group_info多次调用导致群信息重复的bug
+
+2014-12-28 Webqq::Client v6.5
+1）MakeFile.PL增加Time::Piece/Time::Seconds依赖模块
+
+2014-12-28 Webqq::Client v6.4
+1）客户端search_group/search_friend/search_member_in_group功能进行优化
+2）客户端on_new_friend/on_new_group/on_new_group_member回调优化
+
+2014-12-24 Webqq::Client v6.3
+1）修复add_job会导致程序出现死循环的严重bug
+
+2014-12-24 Webqq::Client v6.2
+1）修复on_input_img_verifycode文档错误
+
+2014-12-24 Webqq::Client v6.1
+1）取消MakeFile中的DateTime依赖
+
+2014-12-24 Webqq::Client v6.0
+1）修改登陆异常时的报错信息
+2）_login1()返回异常时，打印错误原因
+3）Webqq::Client::Cron取消对DateTime的依赖，改为Time::Piece和Time::Seconds
+
+2014-12-23 Webqq::Client v5.9
+1）发送消息方法调用更加便捷
+2）调整一些demo示例代码
+
+2014-12-23 Webqq::Client v5.8
+1）create_sess_msg()方法修复主动发送群临时消息的bug
+2）ShowMsg插件可以打印群临时消息所属的群名称
+3）PostImgVerifycode修复提交验证码后页面响应为空的bug
+4）修复pod里密码md5加密容易引起歧义的描述
+
+2014-12-19 Webqq::Client v5.7
+1）修复LinkInfo/SmartReply插件的多出bug
+2）完善Perlcode插件的资源限制
+3）新增$msg->{raw_conent}属性用于获取更多原始消息内容
+4）新增javascript运行测试脚本
+5）优化javascript加载速度
+
+2014-12-17 Webqq::Client v5.6
+1）客户端验证码输错会进行多次重试
+2）支持smartqq登录密码加密算法
+   webqq采用的只是多重md5带盐加密
+   而smartqq采用的是 md5带盐加密+RSA+Base64 三重组合
+   采用了JE模块直接perl中运行javascript代码
+   要运行客户端请确保你已经安装了该模块
+3）新增LinkInfo的插件，获取url的标题和正文内容
+
+2014-12-15 Webqq::Client v5.5
+1）查询增加缓存机制，提高查询速度
+2）修复on_new_group_member/on_new_friend回调在某些情况下无法正常触发的bug
+3）增加get_single_long_nick()的方法用于获取指定qq用户的个性签名
+
+2014-12-09 Webqq::Client v5.4
+1）登录过程增加请求失败重试机制
+2）新增Webqq::Client::Plugin::PicLimit插件，对群里发图数量太多警告
+
+2014-12-09 Webqq::Client v5.3
+1）修复ShowMsg插件bug
+2）修复发送消息重试机制失效的bug
+
+2014-12-09 Webqq::Client v5.2
+1）修复search_member_in_group()存在的bug导致无法正常获取新入群成员信息
+2）_get_group_info()在debug模式下打印的调试信息进行了精简
+
+2014-12-09 Webqq::Client v5.1
+1）调整pod文档格式
+2）回调函数使用eval包裹
+
+2014-12-06 Webqq::Client v5.0
+1）Webqq::Client::App::*重新更名为Webqq::Client::Plugin::
+2）新增Webqq::Client::Plugin模块，用于管理插件
+3）新增$msg->{allow_plugin}属性用于插件之间协作
+4）更新对应的pod文档
+5）demo示例代码更新
+
+2014-12-04 Webqq::Client v4.9
+1）插件支持执行链的功能，在插件链上的每一个插件
+   都可以选择是否要继续执行后续的插件
+2）少量细节完善
+
+2014-12-04 Webqq::Client v4.8
+1）完善on_new_gropu_memner相关的pod文档
+2）新增Webqq::Client::App::HelloGril插件
+3）修复on_new_gropu_memner回调的bug
+4）修复无法获取群成员信息时导致反复获取的bug
+
+2014-11-28 Webqq::Client v4.7
+1）完善pod文档
+2）Webqq::Client::App::SmartReply限制条件更加严格
+3）删除$client->_get_msg_tip()
+4）接收到的好友消息增加$msg->from_city()
+
+2014-11-28 Webqq::Client v4.6
+1）修复客户端发送消息失败无法正常返回状态的bug
+2）cpan模块信息查询支持显示SYNOPSIS
+3）perlcode的执行方式更加自由灵活，支持perl -e ''
+4）每个$msg都增加一个ttl值，在消息发送过程中ttl值会递减
+   当减少到0则会被消息队列丢弃
+5）智能回复会增加消息发送者所在城市信息
+6）修复perlcode识别代码错误的bug
+7）Webqq::Client::App::SmartReply增加每分钟次数限制
+
+2014-11-26 Webqq::Client v4.5
+1）正确处理客户端收到的陌生人消息
+2）只有在群消息时才进行截断
+3）系统开启关闭消息时也通过回复消息进行状态反馈
+4）修复模块查询信息细节
+5）Webqq::Client::App::Perldoc指令进行优化
+
+2014-11-26 Webqq::Client v4.4
+1）为配合Perl的MakeFile，src文件夹重命名为lib
+2）完善make test测试脚本
+
+2014-11-26 Webqq::Client v4.3
+1）整合webqq和smartqq，现在可以通过$client->new(type=>...);进行选择
+   type=>"smartqq"或者type=>"webqq"
+2）目前api接口获取群信息时会出现无法获取到群成员情况，代码进行了适配处理
+3）修复了Webqq::Client::App::Perldoc中关于模块查询信息bug
+4）Webqq::Client::App::SmartReply回复消息时会按照80%的概率先@对方
+
+2014-11-24 Webqq::Client v4.2
+1）修复Makefile错误，感谢[perl技术 @kk]
+2）版本号形式从 v4.2 改为 "4.2";
+3）新增Webqq::Client::App::SendMsgControl
+   可以通过"-shutdown","-reactive"指令来关闭和开启消息发生功能
+4）模块信息查询功能5分钟内只提醒一次
+
+2014-11-24 Webqq::Client v4.1
+1）支持perldoc 模块名查询cpan模块信息
+2）支持自动识别聊天记录中的模块名 查询相关信息
+3）识别perldoc指令不再要求精确匹配/^perldoc/ 
+4）增加模块查询信息缓存机制，提高响应速度
+
+2014-11-23 Webqq::Client v4.0
+1）客户端支持探测新成员或新好友，并自动更新客户端数据库
+2）新增on_new_group() on_new_group_member on_new_friend() 回调
+
+2014-11-21 Webqq::Client v3.9
+1）新增Webqq::Client::App::SmartReply模块，智能回复消息
+
+2014-11-21 Webqq::Client v3.8
+1）修复客户端数据库存储bug
+2）新增Webqq::Client::App::ClientStore模块，便于将客户端数据库存储到文件
+3）修复Webqq::Client::App::PostImgVerfcode提交验证码后没有给出任何提示的bug
+
+2014-11-21 Webqq::Client v3.7
+1）增加系统表情文字显示支持，系统表情会以类似[微笑]的形式打印
+2）修复查询信息无法正常缓存的bug
+
+2014-11-20 Webqq::Client v3.6
+1）修复客户端接收到临时消息后停止接收消息的bug
+2）修复临时消息查找陌生人信息无法缓存问题
+
+2014-11-20 Webqq::Client v3.5
+1）demo/console_message.pl中的fromat_msg使用Webqq::Client::App::ShowMsg替换
+2）Webqq::Client::App::ShowMsg进一步完善
+3）延长拉去消息时间间隔
+
+2014-11-19 Webqq::Client v3.4
+1）修复Webqq::Message::_mk_ro_accessors严重bug，此bug会导致客户端获取到的消息信息错乱
+   新增Webqq::Message::_load_extra_accessor方法，客户端会在run()开始时执行
+2）修改Webqq::Client::App::Msgstat::Report()排序算法
+3）修改-Msgstat指令权限，只允许指定帐号使用
+
+2014-11-19 Webqq::Client v3.3
+1）修复-msgstat错误
+2）增加大量文档说明,参加doc/Client.pod
+
+2014-11-17 Webqq::Client v3.2
+1）一定程度上屏蔽perlcode无限fork攻击，感谢[PERL学习交流 @Achilles/kl]指导
+2）Webqq::Client::App::Perlcode/Webqq::Client::App::Perldoc不再执行超过一定时效的消息指令
+3）Webqq::Client::App::ShowMsg使用qq号取代uin作为hash的key
+
+2014-11-17 Webqq::Client v3.1
+1）新增Webqq::Client::App::Msgstat统计群消息发言排行
+2）修复图片、表情和文字混合的消息无法正常处理的bug
+3）修复发送消息打印报错bug
+4）修复Webqq::Client::App::Msgstat统计bug
+5）完善Webqq::Client::App::Msgstat::Report()的输出格式
+6）完善Webqq::Client::App::Msgstat::Report()群名片显示问题
+7）增强-msgstat指令，支持-msgstat 数字 群名称调用形式
+
+2014-11-17 Webqq::Client v3.0
+1）Webqq::Client::App::ShowMsg支持打印发送和接收消息
+2）文档结构调整，增加了一些MakeFile和POD支持(未完善)
+3）修复format_msg()打印结果不对齐的bug
+
+2014-11-07 Webqq::Client v2.9
+1）修复收到下线通知消息时客户端处理错误，感谢[perl技术 @路人丙]的测试反馈
+2）增加Webqq::Client::App::ShowMsg应用，可以方便打印收到的消息
+
+2014-11-07 Webqq::Client v2.8
+1）Webqq::Client::App::Perlcode支持自动查找本机perldoc路径
+2）Webqq::Client::App::Perldoc支持自动查找本机perl路径
+3）Webqq::Client::App::Perldoc/Webqq::Client::App::Perlcode运行在非linux系统报错退出
+
+2014-11-03 Webqq::Client v2.7
+1）新增Webqq::Client::Cron模块，支持定时执行回调
+2）新增Webqq::Client::App::Msgstat应用，统计群内成员发送消息数量
+
+2014-11-03 Webqq::Client v2.6
+1）支持从本地socket接收发送消息指令
+2）支持从QQ消息接收发送消息指令
+
+2014-10-31 Webqq::Client v2.5
+1）使用深拷贝彻底修复重新登录异常问题 
+
+2014-10-29 Webqq::Client v2.4
+1）修复重新登录异常问题
+
+2014-10-27 Webqq::Client v2.3
+1）增加登录成功、输入验证码回调函数
+2）支持在未连接TTY时将验证码通过邮件形式发送到指定邮箱，
+   可以在邮箱中点击链接直接完成验证码输入（方便在手机上随时收邮件输验证码）
+   通过这种方式可以避免QQ每隔一段时间被强迫下线无法在电脑前再次输入验证码的缺点
+
+2014-10-23 Webqq::Client v2.2
+1）修复因临时目录不存在出现chroot失败，导致有权限执行危险系统命令
+2）其他少量细节完善
+
+2014-09-28 Webqq::Client v2.1
+1）增加定时更新群列表信息，群信息
+2）群信息查询结果进行缓存
+3）数据查询和数据更新进行了分离
+4）消息发送添加发送间隔，腾讯webqq不允许短时间内发送次数过于频繁
+
+2014-09-28 Webqq::Client v2.0
+1）支持获取临时消息联系人信息
+2）$msg消息结构采用AAG(Automated Accessor Generation)技术，
+   每个hash的key都自动产生一个对应的的方法，
+   即，你可以使用$msg->{key}或者$msg->key任意一种方式获取你想要的数据
+   如感兴趣，可以参见cpan Class::Accessor模块
+3）修复更新导致无法正常发送消息问题
+
+2014-09-27 Webqq::Client v1.9
+1）修复获取好友信息列表时，如果设置了好友备注名称会导致程序抛出异常的bug
+   感谢来自[perl技术 @阳]的反馈
+2）完善了一些感谢人员信息
+
+2014-09-26 Webqq::Client v1.8
+1）增加->relogin()方法，在系统提示需要重新登录时尝试自动重新登录或者重新连接
+2）修复客户端login_state设置bug
+3）修复perlcode可以写入和读取系统文件问题
+
+2014-09-26 Webqq::Client v1.7
+1）支持接收和回复群临时消息(sess_message)
+2）由于机器人大部分情况下都是根据接收的消息进行回复，因此增加reply_message()
+   使得消息处理，更加便捷，传统的方式，你需要自己create_msg，再send_message
+   这种方式更适合主动发送消息，采用reply_message($msg,$content)
+   只需要传入接收消息结构和要发送的内容，即可回复消息，且不需要关心消息的具体类型
+3）根据聊天信息中的perldoc和perlcode指令进行文档查询和执行perl代码，源码公布
+   有兴趣可以参考:
+       Webqq::Client::App::Perldoc
+       Webqq::Client::App::Perlcode
+   后续会考虑形成中间件的开发框架，让更多的人参与,开发更多有趣的中间件
+
+2014-09-18 Webqq::Client v1.6
+1）修改发送消息数据编码，提高发送消息可靠些
+
+2014-09-18 Webqq::Client v1.5
+1）增加心跳检测
+2）发送群消息增加一个Origin的HTTP请求头希望可以解决群消息偶尔发送不成功问题
+
+2014-09-17 Webqq::Client v1.4
+1）修复图片和表情无法正常显示问题，现在图片和表情会被转为文本形式 [图片][系统表情]
+2）改进发送群消息机制，通过群消息group_code对应的gid再进行群消息发送
+3）增加Webqq::Client::Cache模块，用于缓存一些经常需要使用的信息，避免时时查询
+4）增加获取个人信息、好友信息、群信息、群成员信息功能
+5）增加查询好友QQ号码功能
+6）增加注销功能，程序运行后使用CTRL+C退出时，会自动完成注销
+7）增加对强迫下线消息的处理
+----
+当前发现的一些BUG：
+1）再一次消息接收中如果包含多个消息，可能会导致只处理第一个消息，其他消息丢失
+2）偶尔会出现发送群消息提示成功，但对方无法接收到的问题（可能和JSON编码有关）
+
+2014-09-14 Webqq::Client v1.3
+1）添加一些代码注释
+2）demo/*.pl示例代码为防止打印乱码，添加终端编码自适应
+3）添加Webqq::Message::Queue消息队列，实现接收消息、处理消息、发送消息等函数解耦
+
+2014-09-14 Webqq::Client v1.2
+1）源码改为UTF8编写，git commit亦采用UTF8字符集，以兼容github显示
+2）优化JSON数据和perl内部数据格式之间转换，更好的兼容中文
+3）修复debug下的打印错误（感谢 [PERL学习交流 @卖茶叶perl高手] 的bug反馈）
+4）新增demo/console_message.pl示例代码，把接收到的普通消息和群消息打印到终端
+
+2014-09-12 Webqq::Client v1.1
+1）debug模式下支持打印send_message，send_group_message的POST提交数据，方便调试
+2）修复了无法正常发送中文问题
+3）修复了无法正常发送包含换行符的内容
+4) on_receive_message/on_send_message改为是lvalue方法，以支持getter和setter方式
+

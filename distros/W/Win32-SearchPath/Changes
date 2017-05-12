@@ -1,0 +1,14 @@
+Revision history for Perl extension Win32::SearchPath.
+
+0.01  Mon Nov  8 20:12:28 2004
+	- original version; created by h2xs 1.22 with options
+		-cn Win32::SearchPath
+0.02  Wed Nov 11 10:10:10 2004
+	- documentation corrections
+	- Makefile.PL prevent execution on non-Windows
+0.03	Wed Nov 17 10:10:10 2004
+	- New tests
+	- Added optional argument to specify 'other' search path
+	- Fix for Microsoft bug Q115826
+
+

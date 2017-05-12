@@ -1,0 +1,15 @@
+This file describes, how you have to setup your LDAP server (openldap)
+for the use of Wizard::LDAP.
+
+1. Append the content of the file slapd.oc.conf.APPEND to the
+   slapd.oc.conf file of your ldap server.
+
+2. Edit the topics.ldif file and replace <YOUR_BASE> to the
+   base you want the software to use (Note that this must be the same base
+   you are going to enter in the preferences)
+
+3. Use "ldapadd" to apply the changes describe in the topics.ldif file,
+   for example:
+     /usr/sbin/ldapadd -D "cn=root, dc=ispsoft, c=de" -w secret -f topics.ldif
+
+4. Hope, that everythings run fully compliant to your expectations... ;-)

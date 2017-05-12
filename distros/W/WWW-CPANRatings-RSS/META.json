@@ -1,0 +1,50 @@
+{
+   "abstract" : "get information from RSS feed on http://cpanratings.perl.org/",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-CPANRatings-RSS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Data::Accessor" : "0.04001",
+            "LWP::UserAgent" : "2.036",
+            "Storable" : "2.18",
+            "XML::Simple" : "2.18",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::CPANRatings::RSS" : {
+         "file" : "lib/WWW/CPANRatings/RSS.pm",
+         "version" : "0.0307"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0307"
+}

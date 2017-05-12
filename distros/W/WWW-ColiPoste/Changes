@@ -1,0 +1,14 @@
+Revision history for WWW-ColiPoste
+
+0.03    2011.04.18  (SAPER)
+        [CODE] CPAN-RT #66933: Fix failure under 5.13 (Slaven Rezic,
+        Andreas Koenig).
+        [DOC] Indicate that this module is no longer useful, thanks to
+        La Poste corporate thinking.
+
+0.02    2008.09.11  (SAPER)
+        [DIST] Restored a true Makefile.PL
+        [DIST] Added URI.pm as a prerequisite.
+
+0.01    2008.04.20  (SAPER)
+        First version, released on an unsuspecting world.

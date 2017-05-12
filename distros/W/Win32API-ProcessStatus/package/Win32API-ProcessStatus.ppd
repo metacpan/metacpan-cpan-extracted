@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Win32API-ProcessStatus" VERSION="0,01,0,0">
+	<TITLE>Win32API-ProcessStatus</TITLE>
+	<ABSTRACT>Perl extension for obtaining information about processes using the plain Win32 PSAPI</ABSTRACT>
+	<AUTHOR>Ferdinand Prantl &lt;prantl@host.sk&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/Win32API-ProcessStatus.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

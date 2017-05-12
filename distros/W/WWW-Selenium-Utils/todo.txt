@@ -1,0 +1,3 @@
+- bundle selenium itself?  
+  - selenium-regen --install /dir/to/selenium
+- bug: don't count extra empty fields checking for correct # of args

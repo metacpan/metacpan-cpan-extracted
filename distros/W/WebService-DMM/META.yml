@@ -1,0 +1,65 @@
+---
+abstract: 'DMM webservice module'
+author:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-DMM
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::DMM:
+    file: lib/WebService/DMM.pm
+    version: '0.11'
+  WebService::DMM::Delivery:
+    file: lib/WebService/DMM/Delivery.pm
+  WebService::DMM::Item:
+    file: lib/WebService/DMM/Item.pm
+  WebService::DMM::Label:
+    file: lib/WebService/DMM/Label.pm
+  WebService::DMM::Maker:
+    file: lib/WebService/DMM/Maker.pm
+  WebService::DMM::Person:
+    file: lib/WebService/DMM/Person.pm
+  WebService::DMM::Person::Actor:
+    file: lib/WebService/DMM/Person/Actor.pm
+  WebService::DMM::Person::Author:
+    file: lib/WebService/DMM/Person/Author.pm
+  WebService::DMM::Person::Director:
+    file: lib/WebService/DMM/Person/Director.pm
+  WebService::DMM::Person::Fighter:
+    file: lib/WebService/DMM/Person/Fighter.pm
+  WebService::DMM::Response:
+    file: lib/WebService/DMM/Response.pm
+  WebService::DMM::Series:
+    file: lib/WebService/DMM/Series.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  Furl: '0.41'
+  URI: '0'
+  XML::LibXML: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/syohex/p5-WebService-DMM/issues
+  homepage: https://github.com/syohex/p5-WebService-DMM
+  repository: git://github.com/syohex/p5-WebService-DMM.git
+version: '0.11'

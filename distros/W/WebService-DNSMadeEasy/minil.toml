@@ -1,0 +1,6 @@
+name = "WebService-DNSMadeEasy"
+# badges = ["travis"]
+authority="cpan:KABLAMO"
+
+module_maker="ModuleBuildTiny"
+

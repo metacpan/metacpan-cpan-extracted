@@ -1,0 +1,102 @@
+# Revision history for WWW-Wikipedia-TemplateFiller
+
+version: 0.13
+date:    2009-05-14
+changes:n
+  - shifting more parameters to output()-time in PubmedId.pm
+  - add "omit_url_if_doi_filled" parameter in PubmedId.pm
+  - add missing period to "et al." in PubmedId.pm
+  - improved (but currently unused) data structure for parameters in
+    WebApp.pm
+
+version: 0.12
+date:    2009-04-16
+changes:
+  - add "full_journal_title" fill-time option to PubmedId.pm
+    (requires Lingua::EN::Titlecase)
+  - suppress 'no isbndb_access_key provided' warning during 'make test'
+  - fix problem in which the journal 'Science' was expanded to the
+    aberration 'Science (journal)'
+  - only if 'link_journal' is enabled is 'Science' expanded to
+    'Science (journal)'. And even then, it is used to specify the
+    first portion of "[[Science (journal)|Science]]".
+
+version: 0.11
+date:    2009-02-20
+changes:
+  - add "add_iupac_name" fill-time option to PubchemId.pm (see
+    http://tinyurl.com/dm3hot)
+
+version: 0.10
+date:    2009-01-29
+changes:
+  - (bug #42908) rename "chembox new" to "chembox"
+  - Ugly hack for Mac OS X's case-insensitive but case-preserving
+    filesystem
+
+version: 0.09
+date:    2008-11-25
+changes:
+  - (bug #41162) another attempt to fix 'make test' in perl 5.10.x
+  - this entailed removing references to sprintf() in the code, as
+    sprintf() is currently complaining about the use of tainted
+    values.
+    (cf. http://rt.cpan.org/Ticket/Display.html?id=41162#txn-537097)
+
+version: 0.08
+date:    2008-11-23
+changes:
+  - (bug #41162) fix 'make test' in perl 5.10.x
+  - in fixing above, switched template parameter descriptions from
+    older 'field', '-field', and '+field' notation to using more
+    descriptive names in a hash (eg, "field => { value => 'foo', show
+    => 'if-extended' }", etc.)
+
+version: 0.07
+date:    2008-11-18
+changes:
+  - (bug #41053) get() now dies if $id is undefined
+  - in fixing this bug, change W::W::TF::S::PubmedcentralId.pm to no
+    longer inherit from PubmedId; now calls to get() are routed
+    through $self->filler->get() to ensure that W::W::TF's get()
+    (which appropriately handles empty IDs) is called
+  - WebApp.pm now traps errors thrown during template filling and
+    issues error message appropriately, preventing the die() from
+    being propagated to Apache
+
+version: 0.06
+date:    2008-11-17
+changes:
+  - (bug #41005) vertical pipes in HTML page titles are escaped to
+    &#124; to avoid conflict with Wikipedia template syntax
+
+version: 0.05
+date:    2008-11-16
+changes:
+  - proper handling of dont_use_etal attribute
+
+version: 0.04
+date:    2008-11-15
+changes:
+  - (bug #40960) update test suite to work if NCBI error 803 appears
+    while pmc_ids are being fetched
+  - require WWW::Search::PubMedLite version 0.05 for better error
+    handling in case pmc_id cannot be fetched
+  - better ISBNdb access key support
+
+version: 0.03
+date:    2008-11-09
+changes:
+  - fix tests to be compatible with latest version of WWW::Search::PubMedLite
+
+version: 0.02
+date:    2008-11-09
+changes:
+  - add description to README and TemplateFiller.pm
+  - bugfix: if title cannot be found for URL, the URL's host is used instead
+
+version: 0.01
+date:    2008-05-18
+changes:
+  - initial revision
+

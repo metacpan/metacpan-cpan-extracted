@@ -1,0 +1,71 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 090b1d4f8657588185b5140997056ab68fc8c39b Changes
+SHA1 c178a0ca1f27fe49ca744c3b030bcea26a278634 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 9120af948e4414f39563feb445db367e89304855 MANIFEST
+SHA1 1c135dc34e344dc4555f19c8e086de143fcde8be META.json
+SHA1 61ea7287e8890d9b14b407c79ecf12e12dc2cedb META.yml
+SHA1 776e99b9118be6d5e4c0954548b5c5680d353bdd Makefile.PL
+SHA1 8be74dbdc373e552570147b66096f657ae3613b2 README
+SHA1 0d5343bf668e27a4c32a9701c53a94e237c19b9b bin/dynamodb-server
+SHA1 2d0b7246a3ba173af38106e9dd6fa3e2f8fb4e60 bin/dynamodb-tan-client
+SHA1 43662e691d1e92079bf8f7819985f95ed1e6005d bin/dynamodb-tickit-client
+SHA1 01140f1ccc706d4eaa55bd7e50d9a4aa12b61b18 cpanfile
+SHA1 60a2f8e868c1ca6f8d2cb9e8781c977e283057d3 dist.ini
+SHA1 7884fbbb0b75329c0ad822a58ea70ab01f0b4e7a examples/async.pl
+SHA1 41b1167a0e593516d5b8b7543cf2c64e3e9e4771 examples/list.pl
+SHA1 039420934b3322c95d5377533c3911c3172a5534 examples/lwp.pl
+SHA1 60349b1d74870dc798f91ed411ec44812add9cdb examples/mojo.pl
+SHA1 3bd325685fb116ff590bb1f5396f7cf8caa0719c lib/Test/WebService/Amazon/DynamoDB/Server.pm
+SHA1 cd9d8c3eebb99a7c6aeb25cce53311c990fc9231 lib/Test/WebService/Amazon/DynamoDB/Server.pod
+SHA1 130d3e5ff3971838b84aa9d23c61d9286f2034a2 lib/WebService/Amazon/DynamoDB/Server.pm
+SHA1 2c6e16b56c340417a09f6cf2b94a3e5dcaba1f6b lib/WebService/Amazon/DynamoDB/Server/Item.pm
+SHA1 c30bdc93b7fa1eca293bcffb4da7a1982ec550a0 lib/WebService/Amazon/DynamoDB/Server/Table.pm
+SHA1 b9327c5e025737115ed4c2f765558e7d9f1479dc scripts/latest-errors.pl
+SHA1 9ee407b79b7080543a8196aa83f13fbf936bd889 scripts/latest-regions.pl
+SHA1 8b0b01f6232118a9192a03d671248d9f4deea820 share/dynamodb.tan
+SHA1 5ccc06e245064e3e0af2699017f8a4714359a5ae share/errors.json
+SHA1 24eadfb0b56baf68fe5a3c6cd0adac2d27f2649e share/regions.json
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 5e126afc7893dbe348adaa6bbd8c7cea935a629b t/00-compile.t
+SHA1 be2176110adab780a06eb2fba656820bd66fd548 t/000-report-versions-tiny.t
+SHA1 fcc24772b365c91b9ea89c6a034a2755d1007cff t/server/create_table.t
+SHA1 6f768b179b7ec0530567bd2fc559cb0350f6f8bd t/server/delete_table.t
+SHA1 2cda291475de57156a6033f61675f6ca32588eb0 t/server/describe_table.t
+SHA1 5b082cde5ff80384b438fc0053de858e776d80e5 t/server/get_item.t
+SHA1 90c3e8cade9ba9b545e82b6fca2ae57f6aa3bad7 t/server/item.t
+SHA1 1aa5cbed84f50a96ed60d1cafd7def4488a0ba9a t/server/list_tables.t
+SHA1 688023a08bbb42276076c5da6b21209da8fb4b9f t/server/put_item.t
+SHA1 06eab3cc9597d124d14788d83c53debf6677f855 t/server/table.t
+SHA1 5f0c62b8dc2b360e7cb12430465155199de88a54 t/server/update_table.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUzg8OAAoJEFKElMNpjtyDfgEIAJHp6looic7OffLZCDS8KHKu
+yukYrpxSQ+qXNr3os/kItxwXK7++VHBVvXOtCxxDt3iK5H5vTFxwIq1JZCvQulD4
+j/EoZ9hu6TpcZK98TBQVQBcgeIxbB1mSRvpiL82QGI2E8FWLc+AJbNSm7LnZdYql
+0d5EpMTQxzIWr3xyxRoKynnYI2OTv3c92750gkCaXHf2t6pAXZRTPolhCYlzVOCn
+jXtQ6/vLJu2K/Ew+7iIBwfbnRuwbtOdGUIUBZPRG4e0Rjez+CdRxv4rOfy60a5B5
+b77esz9YmOjE+HeIIEwXHqfDw1cX4h/kMelmlAG7tch7usuuez7ssbRFArTPQDE=
+=VVgk
+-----END PGP SIGNATURE-----

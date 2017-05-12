@@ -1,0 +1,5 @@
+name = "Webservice-OVH"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+abstract_from="lib/Webservice/OVH.pm"
+

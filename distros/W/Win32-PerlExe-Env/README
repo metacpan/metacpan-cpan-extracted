@@ -1,0 +1,44 @@
+Win32-PerlExe-Env version 0.04
+==============================
+
+NAME
+
+Win32::PerlExe::Env - Get environment informations of Win32 Perl executables
+
+DESCRIPTION
+
+Win32::PerlExe::Env provides special 'build-in' environment informations of
+Perl .exe files.
+
+The main goal of this module version is to receive the internal temporary
+directory of packed Perl executables regardless of the used packer.
+
+Additional packer specific environment informations like version, packername,
+etc. will be supported.
+
+This version assists ActiveState PDK packers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ActiveState PDK 6.0.2 executables.
+
+Warning: This is an alpha release.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Thomas Walloschke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

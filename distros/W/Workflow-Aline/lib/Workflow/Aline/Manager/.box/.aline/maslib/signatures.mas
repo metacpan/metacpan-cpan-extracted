@@ -1,0 +1,9 @@
+<%method author_as_pod>
+=head1 CONTACT
+
+Sourceforge L<http://sf.net/projects/datatype> is hosting a project dedicated to this module. And I enjoy receiving your comments/suggestion/reports also via L<http://rt.cpan.org> or L<http://testers.cpan.org>. 
+
+=head1 AUTHOR
+
+<& /maslib/defaults.mas:author &>, <<& /maslib/defaults.mas:email &>>
+</%method>

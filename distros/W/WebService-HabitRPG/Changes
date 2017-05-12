@@ -1,0 +1,230 @@
+Revision history for WebService::HabitRPG
+
+0.28      2016-07-07 08:19:39-05:00 America/Chicago
+
+0.27      2016-06-25 09:28:55-05:00 America/Chicago (TRIAL RELEASE)
+    * Bumped up to v3 API.  The v3 API should work exactly
+      the same as before, except when querying tasks by
+      type, a plural form of the type (ie. dailys, not
+      daily) must now be used.  Singular forms will be
+      supported through the module over the next release
+      or so, but a warning will occur.
+
+0.26      2016-04-04 19:39:31-05:00 America/Chicago
+    * BUGFIX: Fix off-by-one errors for daily repeats
+
+0.25      2016-03-30 22:48:56-05:00 America/Chicago
+
+    * BUGFIX: Use new v2 API URL instead of (now broken) v1 one
+
+    * BUGFIX: Fix day of the week in certain time zones
+
+    * TESTS: Fix time zone bug for tests
+
+0.24      2015-11-29 15:31:54-06:00 America/Chicago
+
+    * TESTS: Make sure tests pass under Cpanel::JSON::XS
+
+    * DOCUMENTATION: Mention Habitica in the main POD
+
+0.23      2015-10-28 07:38:27-05:00 America/Chicago
+
+    * BUGFIX: Task::active_today returns true when used on
+              called on a task that repeats over an
+              interval (GH #35).
+
+    * FEATURE: A task's streak is now available via an
+               accessor (GH #36).
+
+0.22      2014-05-20 12:21:42+10:00 Australia/Melbourne
+
+    * BUGFIX:   _get_tasks() with a single task ID no longer
+                produces a 'Not an ARRAY reference' error.
+
+    * BUGFIX:   Fewer experimental warnings about given/when on
+                more recent perls (Courtesy Rob Hoelz in GH #34)
+
+    * TESTS:    Disabled a bit-rotted live test in t/99_online.t
+
+0.21      2013-09-13 19:47:58 Australia/Melbourne
+
+    * FEATURE:  _get_tasks() now sorts by task type (todo/daily/etc).
+                This emulates the behaviour provided by the older
+                HabitRPG server codebase.
+
+0.20      2013-08-14 13:37:36 PST8PDT
+
+    * DEBUG:    Settng HRPG_DEBUG=1 in the environment now shows
+                arguments used to construct a task, *before* that
+                task is actually constructed.
+
+0.19      2013-05-08 15:31:02 Australia/Melbourne
+
+    * FEATURE:  `hrpg tasks` and `hrpg [daily|todo|habit]` now support
+                an optional search parameter.
+
+    * FEATURE:  Experimental tag support. Add a [tags] section to your
+                ~/.habitrpgrc file with tag => uuid pairs. All searches
+                starting with a '^' will match all tasks with that
+                tag.  (Eg: `hrpg daily ^home`)
+
+    * FEATURE:  Experimental tag prefix support. Add a [config]
+                section to your ~/.habitrpg file and a
+                `tag_prefix = whatever` section if you don't like the
+                default tag character of '^'.
+
+0.18      2013-04-29 14:52:14 Australia/Melbourne
+
+    * BUGFIX:   Detect drops from upstream and direct user to web
+                interface. Kludges GH #32 and lefnire/habitrpg#815 .
+
+    * BUILD:    New dependency: Try::Tiny.
+
+    * FEATURE:  `hrpg help` now provides a help screen.
+
+0.17      2013-04-10 22:08:08 Australia/Melbourne
+
+    * BUILD:    Make sure Mozilla::CA certs are installed in case
+                LWP::UserAgent can't/won't find the system
+                ones.
+
+    * BUGFIX:   The value parameter when creating new tasks
+                is no longer ignored. GH #31, thanks @toddgrotenhuis
+
+    * DOCS:     Fix install instructions in hrpg. Closes GH #29
+
+0.16      2013-04-09 15:18:22 Australia/Melbourne
+
+    * BUGFIX:   Task ids are now once properly shown when a command
+                is unsure which task you're referring to.
+
+0.15      2013-04-09 04:53:30 Australia/Melbourne
+
+    * BUILD:    No longer falsely require WS::Idonethis.
+                (Thanks @wizonesolutions)
+
+    * FEATURE:  Added a simple 'hrpg version' command.
+
+    * INTERNAL: Tasks are now fully fledged objects.
+
+    * TEST:     More tests for tasks.
+
+    * FEATURE:  Passing a 'keep_alive' parameter to
+                WS::HRPG->new will allow the LWP::UserAgent
+                keep-alive behaviour to be specified.
+
+    * CONFIG:   You can now set keep_alive = 0 in the
+                [connection] section of ~/.habitrpgrc to
+                disable keep-alives.  GH #25
+
+    * DEBUG:    Set environment HRPG_DEBUG=1 for debugging.
+
+    * BUGFIX:   Detect and skip undef/null values returned by
+                the /task endpoint.  GH #27
+
+0.14      2013-04-06 16:58:45 Australia/Melbourne
+
+    * OPTIMISE: Connections to the habitrpg server are now kept-alive
+                for faster network ops.
+
+0.13      2013-04-05 17:38:56 Australia/Melbourne
+
+    * FEATURE:  Allow +n and -n to update a habit multiple times.
+                Eg `hrpg +2 pomodoro`. Thanks @claudinec (GH #24)
+
+0.12      2013-04-03 00:46:02 Australia/Melbourne
+
+    * FEATURE:  Added hrpg support for unicode task names and input.
+                (Now requires utf8::all)
+
+    * BUGFIX:   Fixed bug where new_task() could fail when not
+                supplied with an extend parameter.
+
+0.11      2013-04-02 22:38:08 Australia/Melbourne
+
+    * DOCS:    hrpg help screen now mentions history command
+               (Thanks @claudinec, GH #20)
+
+    * FEATURE: Added 'hrpg show' to give detailed stats about a task.
+
+    * FEATURE: Added 'hrpg clear daily' to force unchecking of all daily
+               tasks. This is useful if the web server fails to
+               uncheck them, or if you never use the web version. (GH #16)
+
+    * FEATURE: Added --beta switch to 'hrpg', which uses the beta API
+               server.
+
+    * FEATURE: Added --dev switch to 'hrpg', to use localhost:3000 .
+
+    * FEATURE: WS::HRPG::new_task() supports the 'extend' parameter for
+               setting extended attributes.
+
+    * FEATURE: hrpg supports setting extended parameters on task creation.
+
+    * FEATURE: EXPERIMENTAL: _update in WS::HRPG and hrpg. This uses the
+               PUT API, and allows for setting arbitrary attributes via
+               the API.
+
+    * FEATURE: EXPERIMENTAL: [auth-beta] and [auth-dev] sections may be
+               added to the ~/.habitrpgrc file, and their details will
+               be used when using the --beta or --dev switches.
+
+0.10      2013-03-27 15:54:27 Australia/Melbourne
+
+    * BUGFIX:  'hrpg history' with no args gives a more useful error message.
+
+0.09      2013-03-27 15:50:52 Australia/Melbourne
+
+    * DOCS:    hrpg help screen now mentions `perldoc hrpg`.
+    * DOCS:    Updated the help display for `hrpg +` (GH #9)
+    * BUILD:   Explicitly require a Method::Signatures 20121201 or later.
+    * FEATURE: search_tasks() now allows an 'all' argument.
+    * FEATURE: hrpg now supports the 'history' command.
+
+0.08      2013-03-24 14:58:01 Australia/Melbourne
+
+    * FEATURE: Current XP/HP/GP (with deltas) are shown when completing tasks with +/-
+
+0.07      2013-03-23 16:22:16 Australia/Melbourne
+
+    * DOCS:    Updated links from github.com/pfenwick -> github.com/pjf
+    * BUGFIX:  Completed tasks are no longer considered for `hrpg +` (GH #6)
+
+0.06      2013-03-23 10:11:49 Australia/Melbourne
+
+    * FEATURE: General beautification of hrpg output.
+    * BUGFIX:  Fixed spurious 'comment ignored' message in hrpg.
+
+0.05      2013-03-22 14:18:25 Australia/Melbourne
+
+    * FEATURE: Integration with WebService::Idonethis (GH #3)
+
+0.04      2013-03-22 12:46:54 Australia/Melbourne
+
+    * FEATURE: Can specify API base when creating objects.
+
+    * FEATURE: hrpg will honour ENV{HRPG_API_BASE} if set.
+               (For debugging lefnire/habitrpg#680)
+
+    * FEATURE: `hrpg status` has a nicer gold display (GH #4, ta @taryneast)
+
+0.03      2013-03-22 00:14:12 Australia/Melbourne
+
+    * BUGFIX: `hrpg status` no longer displays a warning when
+              it can't figure out the user's name (GH #1).
+
+    * FEATURE: `hrpg status` will use the user's facebook name
+               if available (GH #1). Thanks @oneandoneis2.
+
+    * DOCUMENTATION: Install instructions for hrpg.
+
+    * DOCUMENTATION: Fixed typo in README.md (GH #3)
+                     Thanks @taryneast.
+
+0.02      2013-03-21 17:43:12 Australia/Melbourne
+
+    * DOCUMENTATION: Added setup instructions to `hrpg`.
+
+0.01      2013-03-21 17:36:52 Australia/Melbourne
+
+    * First release!

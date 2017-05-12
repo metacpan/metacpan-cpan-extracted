@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Mechanize::Plugin::phpBB.
+
+0.02 10/06/2009
+  (ms) Removed version() call at compile time that tripped an error
+       in strict refs mode.
+
+0.01 03/12/2006
+  (ms) Where it all started.

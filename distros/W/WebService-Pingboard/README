@@ -1,0 +1,220 @@
+NAME
+
+    WebService::Pingboard
+
+DESCRIPTION
+
+    Interaction with Pingboard
+
+    This module uses MooseX::Log::Log4perl for logging - be sure to
+    initialize!
+
+ATTRIBUTES
+
+    cache
+
+      Optional.
+
+      Provided by MooseX::WithX - optionally pass a Cache::FileCache object
+      to cache and avoid unnecessary requests
+
+    refresh_token
+
+    password
+
+    username
+
+    client_id
+
+    client_secret
+
+    credentials_file
+
+    timeout
+
+      Timeout when communicating with Pingboard in seconds. Optional.
+      Default: 10 Will only be in effect if you allow the useragent to be
+      built in this module.
+
+    default_backoff
+
+      Optional. Default: 10 Time in seconds to back off before retrying
+      request. If a 429 response is given and the Retry-Time header is
+      provided by the api this will be overridden.
+
+    default_page_size
+
+      Optional. Default: 100
+
+    retry_on_status
+
+      Optional. Default: [ 429, 500, 502, 503, 504 ] Which http response
+      codes should we retry on?
+
+    max_tries
+
+      Optional. Default: undef
+
+      Limit maximum number of times a query should be attempted before
+      failing. If undefined then unlimited retries
+
+    api_url
+
+      Default: https://app.pingboard.com/api/v2/
+
+    user_agent
+
+      Optional. A new LWP::UserAgent will be created for you if you don't
+      already have one you'd like to reuse.
+
+    loglevel
+
+      Optionally override the global loglevel for this module
+
+METHODS
+
+    valid_access_token
+
+      Will return a valid access token.
+
+    access_token_is_valid
+
+      Returns true if a valid access token exists (with at least 5 seconds
+      validity remaining).
+
+    headers
+
+      Returns a HTTP::Headers object with the Authorization header set with
+      a valid access token
+
+API METHODS
+
+    This is a module in development - only a subset of all of the API
+    endpoints have been implemented yet. The full documentation is
+    available here: http://docs.pingboard.apiary.io/#
+
+ Generic parameters
+
+    Any of the methods below which return paged content accept the
+    parameters:
+
+      limit
+
+	Optional. Maximum number of entries to fetch.
+
+      page_size
+
+	Optional. Page size to use when fetching.
+
+      options
+
+	Optional. Additional url options to add
+
+    get_users
+
+      Retrieve a list of users
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/users/users-collection/get
+      -users
+
+    get_groups
+
+      Get list of user groups
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/groups/groups-collection/g
+      et-groups
+
+    get_custom_fields
+
+      Get list of custom fields
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/custom-fields/custom-field
+      s-collection/get-custom-fields
+
+    get_linked_accounts
+
+      Get linked accounts
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/linked-accounts/linked-acc
+      ount/get-linked-account
+
+    get_linked_account_providers
+
+      Get linked account providers
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/linked-account-providers/l
+      inked-account-providers-collection/get-linked-account-providers
+
+    get_status_types
+
+      Get status types
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/status-types/status-types-
+      collection/get-status-types
+
+    get_statuses
+
+      Get statuses
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/statuses/status/update-sta
+      tus
+
+    update_status
+
+      Update a Status resource.
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/statuses/status/get-status
+
+      status
+
+	HashRef object of the status - only fields being changed must be
+	defined
+
+    delete_status
+
+      delete a Status resource.
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/statuses/status/delete-sta
+      tus
+
+    create_status
+
+      Create a new Status resource.
+
+      Details:
+      http://docs.pingboard.apiary.io/#reference/statuses/statuses-collecti
+      on/create-status
+
+      status
+
+	HashRef of the new status
+
+    clear_cache_object_id
+
+      Clears an object from the cache.
+
+      object_id
+
+	Required. Object id to clear from the cache.
+
+      Returns whether cache_del was successful or not
+
+COPYRIGHT
+
+    Copyright 2015, Robin Clarke
+
+AUTHOR
+
+    Robin Clarke <robin@robinclarke.net>
+
+    Jeremy Falling <projects@falling.se>
+

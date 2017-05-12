@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Bleep.t
+lib/WWW/Bleep.pm
+META.yml                                 Module meta-data (added by MakeMaker)

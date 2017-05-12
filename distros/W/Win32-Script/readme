@@ -1,0 +1,46 @@
+NOTE
+        The old name of this module is 'Script'. It was renamed 30/11/2001,
+        thanks to Jonathan Stowe <gellyfish@gellyfish.com> 
+
+DESCRIPTION
+
+	Win32::Script - system administrator`s library.
+
+	At primary this module was written for system administrator needs in 
+	centralised administration of Win32 clients: logon and application 
+	startup scripts, etc. Later some functions useful in Windows NT server 
+	scripts was added. Now many functions may run on UNIX or may be 
+	developed for it. But area of Win32 servers and clients is very 
+	specific.
+
+SYNOPSIS
+
+	use Win32::Script;
+	$a =FileRead('c:\\autoexec.bat');
+	FileDelete('-r','c:\\tmp\\*');
+	FileEdit('c:\\autoexec.bat',sub{s/(SET *TMP *= *)/${1}c:\\tmp/i});
+
+AUTHOR
+
+	Andrew V Makarow <makarow@mail.com>, Denis E Medveduyk <demed@mail.com>
+	
+COPYRIGHT
+	
+	This program is free software; you can redistribute it and/or modify 
+	it under the same terms as Perl itself.
+	
+PREREQUISITES
+
+	Developed and tested with Active Perl 5.005 (builds 508,509,522,623).
+	Function 'GUIMsg' developed and tested with Tk 800.012,800.013,800.022
+	800.019.
+
+HOW TO BUILD AND INSTALL
+
+	Just type:
+	
+		perl Makefile.PL
+		make
+		make install
+	Or:
+		copy ./lib/* into perl/site/lib

@@ -1,0 +1,46 @@
+WebService-Bloglines-Blogroll version 0.02
+==========================================
+
+WebService-Bloglines-Blogrollis Perl extension to get a blogroll from 
+Bloglines. 
+
+For more details please read documentation of the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   	perl Makefile.PL
+   	make
+   	make test
+   	make install
+
+To install this module in the specific path use:
+	
+	perl Makefile.PL PREFIX=/path/to/your/lib
+
+To install the module in your home directory use that command:
+
+	perl Makefile.PL PREFIX=YOU_HOME/path/to/your/lib
+
+You don't need to have a root privileges to do that!	
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  	LWP::Simple
+	Carp
+
+SEE ALSO
+
+WebService::Bloglines
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Michael Stepanov <stepanov.michael@gmail.com>. 
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

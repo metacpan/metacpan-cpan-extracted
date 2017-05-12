@@ -1,0 +1,49 @@
+The scripts in this directory are for use with the ServiceGroup example
+service distributed with WSRF::Lite. To create a new ServiceGroup use
+the wsrf_createServiceGroup.pl script, it just takes a URL as an argument:
+
+  wsrf_createServiceGroup.pl http://localhost:50000/Session/myServiceGroup/myServiceGroup
+
+This will return a WS-Address End Point Refence (EPR) which contains 
+a URL which is the endpoint of the service.
+
+To find all the services that have been registered in a ServiceGroup use
+the GetResourceProperty operation, requesting the Resource Property
+"Entry". eg
+
+ wsrf_getResourceProperties.pl http://localhost:50000/Session/myServiceGroup/myServiceGroup/2345235463546 Entry
+
+If the ServiceGroup has just been created there will be no entries in it.
+To add a service to the new ServiceGroup use the wsrf_ServiceGroupAdd.pl script:
+
+  wsrf_ServiceGroupAdd.pl http://localhost:50000/Session/myServiceGroup/myServiceGroup/2345235463546
+
+The first argument is the endpoint of the ServiceGroup. When adding a service
+to a ServiceGroup you must provide an EPR of the Service you wish to 
+register, some meta-data on the service you are adding called the Content
+and optionally a lifetime for which the Entry should exist for. 
+Because so much information is required to register a service it is hard coded
+in the script rather than pass in using command line arguments.
+
+The service should return another EPR, this is for the ServiceGroupEntry that 
+represents the Entry in the ServiceGroup - if you destroy the ServiceGroupEntry
+using the Destroy operation (eg with the wsrf_destroyResource.pl script) then
+the Entry will disappear from the ServiceGroup. You can also control the liefetime
+of the Entry by controlling the lifetime of the ServiceGroupEntry.
+
+The ServiceGroupEntry has the following ResourceProperties that can be
+examined with GetResourceProperty: ServiceGroupEPR - the EPR of the ServiceGroup
+whose Entry it is modelling, MemberEPR - the EPR of the service that has
+been registered and whose Entry this ServiceGroupEntry models, TerminationTime -
+the lifetime of this ServiceGroupEntry and thus the lifetime of the Entry in 
+the ServiceGroup and Content - the meta-data associated with the service that
+has been registered in the ServiceGroup. Non of these ResourceProperties
+can be modified or deleted by SetResourceProperties in WSRF::Lite - though
+TerminationTime can be set using SetTerminationTime.
+
+If you want to change an Entry for a service you should delete it from
+the ServiceGroup by destroying it's corresponding ServiceGrouEntry and
+add a new Entry. A service may be registered more than once in a ServiceGroup.
+
+ 
+

@@ -1,0 +1,113 @@
+# Skip List RegExps for MANIFEST
+# each line is a regular expression which will exclude any matching files from entry into the MANIFEST
+
+# NOTE: AVOID trailing comments because of the trailing comment bug noted. It causes incorrect results from other programs, notably 'cpansign', which doesn't collect the correct file names.
+
+# NOTE: some regexps here may depend on being matched against the _full_ file path (the standard ExtUtils::Manifest only gives relative paths on Win32)
+# NOTE: scripts/modules using the default ExtUtils::Manifest code (eg, 'cpansign') will not interpret lines with ${dist_<X>} correctly and may complain
+# NOTE: some regexps assume paths have canonical path format with '/' characters as path dividers
+# NOTE: regexps all assume no embedded newlines
+
+# NOTE: REMINDER: \w == "word character" == (alphanumeric + '_'); \b == boundary between word characters
+
+# TODO: ExtUtils::Manifest - Submit bug report regarding trailing comments (trailing comments are interpreted incorrectly as part of the regexp [see BUGFIX in Build.PL code])
+# TODO: ExtUtils::Manifest - Submit bug report(?) regarding regexps starting with \b used as defaults when MANIFEST.SKIP is missing in ExtUtils::Manifest (suggest below alternatives using "(?:^|/)" as an improvement)
+
+# Avoid PACKAGE DISTRIBUTION FILES
+# :: ${dist_<X>} used; ok since these are BUILD generated files and 'clean'ed up (simply 'build clean' prior to running tools [such as 'cpansign'] using the default ExtUtils::Manifest code)
+##^${dist_path}/${dist_name}-${dist_version}\.tar\.gz$
+##^${dist_path}/${dist_name}-${dist_version}-PPM\.tar\.gz$
+##^${dist_path}/${dist_name}-${dist_version}\.tgz$
+##^${dist_path}/${dist_name}\.ppd$
+##^${dist_path}/${dist_name}-${dist_version}-[^/]*\.par$
+##^${dist_path}/${dist_name}-${dist_version}/
+^${dist_name}-${dist_version}\.tar\.gz$
+^${dist_name}-${dist_version}-PPM\.tar\.gz$
+^${dist_name}-${dist_version}\.tgz$
+^${dist_name}\.ppd$
+^${dist_name}-${dist_version}-[^/]*\.par$
+^${dist_name}-${dist_version}/
+
+# :: Avoid VERSION
+^VERSION$
+
+# :: compiler detrus in the lib directory
+^lib/.*\.(bs|c|def|obj|o|pdb|base|exp|lds|lib|ccs)$
+# :: MSVC compiler detrus
+(?:^|/)vc[1-9][0-9]+\.pdb$
+# :: Module::Build->find_dist_packages detrus
+^compilet.base$
+^compilet.def$
+^compilet.exp$
+^compilet.lds$
+
+# Avoid Module::Build generated and utility files
+^Build$
+^Build.bat$
+^_build/
+# avoid MYMETA.yml  [ for Module::Build v0.35+ (August 2009); URLref: http://www.dagolden.com/index.php/479/mymeta-yml-in-the-wild @@ http://www.webcitation.org/66RIzfRJd ]
+^MYMETA.yml$
+# avoid MYMETA.json [ for Module::Build v0.38+ (March 2011); URLref: http://www.dagolden.com/index.php/1378/announcing-modulebuild-0-3800 @@ http://www.webcitation.org/66RJ9oZ1X ]
+^MYMETA.json$
+
+# Avoid Makemaker generated and utility files
+^MANIFEST\.bak$
+^Makefile$
+^blib/
+^MakeMaker-\d
+^pm_to_blib\.ts$
+^pm_to_blib$
+# :: 6.18 through 6.25 generated 'blibdirs\.ts'
+^blibdirs\.ts$
+
+# Avoid META-build files (ANT/NANT)
+# :: regexp matches .build/.build.xml/.build.xml* ONLY the main directory
+^\.build$
+^\.build\.xml[^/]*$
+
+# Avoid version control files
+# :: TODO: check on correcting the trailing '\b' to a '/' for the SCS directories
+(?:^|/)RCS\b
+(?:^|/)CVS\b
+(?:^|/)SCCS\b
+,v$
+(?:^|/)\.svn\b
+(?:^|/)_darcs\b
+# :: mercurial
+(?:^|/)\.hg/
+(?:^|/)\.hgtags$
+(?:^|/)\.hgignore$
+(?:^|/)\.hgrc
+# :: git
+(?:^|/)\.git/
+(?:^|/)\.gitattributes$
+(?:^|/)\.gitignore$
+
+# Avoid signature GPG configuration files
+(?:^|/)\.gpg/
+(?:^|/)\.gpg.conf
+
+# Avoid temp and backup files
+~$
+\.old$
+\#$
+(?:^|/)\.#
+\.bak$
+\.tmp$
+
+# Avoid weird file detrus
+(?:^|/)null$
+
+# Avoid Devel::Cover files.
+(?:^|/)cover_db/
+
+# Avoid local configuration files
+(?:^|/)\.perltidyrc$
+
+# Avoid folders specified as non-manifest or tagged as no-distribute
+(?:^|/)@non-manifest/
+(?:^|/)#non-manifest/
+
+# Avoid folders tagged as no-distribute
+\.@no-dist/
+\.#no-dist/

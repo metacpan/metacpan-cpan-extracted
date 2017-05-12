@@ -1,0 +1,27 @@
+--- 
+abstract: Tie into WorldLingo's subscription based translation service.
+author: Ashley Pond V, C<< <ashley@cpan.org> >>.
+build_requires: 
+  IO::Socket: 0
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.670
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WWW-WorldLingo
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  LWPx::ParanoidAgent: 0
+requires: 
+  Carp: 0
+  Class::Accessor::Fast: 0
+  HTTP::Request::Common: 0
+  HTTP::Response: 0
+  LWP::UserAgent: 0
+  constant: 0
+version: 0.03

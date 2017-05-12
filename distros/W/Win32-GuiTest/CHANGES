@@ -1,0 +1,316 @@
+0.01  Wed Aug 12 21:58:13 1998
+
+    - original version; created by h2xs 1.18
+
+0.02  Sun Oct 25 20:18:17 1998
+
+    - Added several Win32 API functions (typemap courtesy 
+      of Win32::APIRegistry):
+        SetForegroundWindow
+	GetDesktopWindow 
+	GetWindow 
+	GetWindowText 
+	GetClassName 
+	GetParent
+	GetWindowLong
+	SetFocus
+
+    - Ported FindWindowLike (MS-KB, Article ID: Q147659) from VB to
+      Perl. Instead of using VB's "like", I used Perl regexps.
+	
+0.03  Sun Oct 31 18:31:52 1999
+
+    - Perhaps first version released thru CPAN (user: erngui).
+
+    - Changed name from Win32::Test to Win32::GuiTest
+
+    - Fixed bug: using strdup resulted in using system malloc and 
+      perl's free, resulting in a runtime error.  
+      This way we always use perl's malloc. Got the idea from
+      'ext\Dynaloader\dl_aix.xs:calloc'.
+
+0.04  Fri Jan 7 17:44:00 2000
+
+    - Fixed Compatibility with ActivePerl 522. Thanks to
+      Johannes Maehner <johanm@camline.com> for the initial patch.
+      There were two main issues: 
+        /1/ ActivePerl (without CAPI=TRUE) compiles extensions in C++ mode 
+            (some casts from void*, etc.. were needed).
+        /2/ The old typemap + buffers.h I was using had been rendered
+            incompatible by changes in ActivePerl. As the incompatible typemaps
+            were redundant, I deleted them. 
+      Now it works on ActivePerl (both using 'perl makefile.pl' 
+      and 'perl makefile.pl CAPI=TRUE') and on CPAN perl 
+      (http://www.perl.com/CPAN/src/stable.zip). 
+
+    - As requests for changes keep comming in, I've decided to put it all
+      under version control (cvs if you're curious about it).	
+
+0.05 Sat Mar 11 23:11:42 2000
+
+    - Added support for sending function keys (e.g. "%{F4}"). A new test 
+      script is added to the distribution (eg\notepad.pl) to test
+      this functionality.
+
+    - Code cleanup to make adding new keywords easier.
+
+0.06 Sun Mar 12 01:51:18 2000
+
+    - Added support for sending mouse events.
+      Thanks to Ben Shern <shernbj@louisville.stortek.com> for the idea 
+      and original code. Also added 'eg\paint.pl' to the distribution to
+      test this functionality.
+
+    - Code cleanup.
+
+
+0.07 Sun Nov 19 13:02:00 2000
+
+    - Added MouseMoveAbsPix to allow moving the mouse to an absolute pixel 
+      coordinate instead of using mouse_event's (0, 0) to (65535, 65535) 
+      coordinates.
+      Thanks to Phill Wolf <pbwolf@bellatlantic.net> for the idea 
+      and original code. Also added 'eg\paint_abs.pl' to the distribution 
+      to test this functionality.
+
+    - Added binaries for the ActivePerl distribution. 
+
+0.08 Sun Dec 17 19:33:07 2000
+
+    - Added WMGetText to allow getting the content of an EDIT window. See 
+      'eg\notepad_text.pl' for more details. 
+      Thanks to Mauro <m_servizi@yahoo.it> from Italy for the idea. 
+
+0.09 Thu Jan 4 22:30:50 2001
+
+    - Added {SPC} action to sendkeys to simulate hitting the spacebar.
+      Thanks to Sohrab Niramwalla <sohrab.niramwalla@utoronto.ca> for the 
+      idea. 
+
+1.00 Sun May 13 22:02:01 2001
+
+    - Fixed a bug in FindWindowLike that caused duplicated window handles to
+      be returned.
+
+    - Simplified the logic in FindWindowLike.
+
+    - Added IsChild and GetChildDepth functions. Exported GetChildWindows.
+
+    - Added more tests (tightening the net in XP-speak)
+
+    - Added 'eg\spy--.pl' to the distribution.
+
+1.10 Sun Jun 17 19:54:27 2001
+
+    - Added GetWindowRect, GetScreenRes, ScreenToNorm and NormToScreen,
+      following suggestion and code from Frank van Dijk <fvdijk@oke.nl>.
+
+    - Added SendMessage, PostMessage, GetCursorPos, AttachWin,
+      additional SendKeys flags (Windows keys and context menu),
+      WMSetText, GetCaretPos, GetFocus, GetActiveWindow, GetForegroundWindow,
+      SetActiveWindow, EnableWindow, IsWindowEnabled, IsWindowVisible and
+      ShowWindow (+ constants to use it).
+
+      Thanks to Jarek Jurasz <jurasz@imb.uni-karlsruhe.de> for all of them.
+
+      Jarek also provided two scripts: 'eg\showmouse.pl' and 'eg\showwin.pl'.
+      I found showwin very interesting (if somewhat dangerous!).
+
+      He also fixed an export list problem (WMGetKey was mentioned instead
+      of WMGetText) and added export tags :ALL and :SW, so that full module
+      functionality can be imported with
+
+                   use Win32::GuiTest qw(:ALL :SW);
+
+    - Added IsWindow, ScreenToClient, ClientToScreen, IsCheckedButton and
+      IsGrayedButton.
+
+    - SendKeys now takes an optional parameter to change the default 50 ms
+      delay between keystrokes. Suggested by Wilson P. Snyder II
+      <wsnyder@world.std.com>.
+
+1.20 Wed Jul 18 20:44:11  2001
+
+    - Added GetComboText, GetComboContents, GetListText and GetListContents
+      to allow easy extraction of data from list and combo boxes.
+
+    - Added 'eg\fonts.pl' to show the new functionality. This script opens
+      the Notepad "Font" dialog and prints to stdout the contents of the Font
+      combobox.
+
+    - Fixed bug in SendMessage (and others), where the return value was lost
+      Caused by a missing OUTPUT tag.
+
+    - Added IsKeyPressed function. Suggested by Rudi Farkas.
+      See 'eg\keypress.pl' for a demo. Works even if the script
+      is running in the background.
+
+1.30 Sat Dec  1 20:50:02 2001
+
+    - Fixed bad POD formating. Added podchecker and html pod generation to makedist.bat.
+
+    - Added PushButton and PushChildButton. Based on code from an anonymous contributor. Thanks!
+      See 'eg\pushbutton.pl' for an example.
+
+    - Fixed a problem when building with Active State, build 526.
+
+1.40 --- ---  - --:--:-- ----
+
+    Big thanks to an anonymous contributor for the following pieces:
+
+    - Added WaitWindowLike and WaitWindow. See 'eg\WaitWindow.pl' for an example.
+      The test.pl code changed as a consequence as I now use WaitWindowLike instead
+      of sleep+FindWindowLike. 
+
+    - Added IsWindowStyle and IsWindowStyleEx and 'eg/IsWindowStyle.pl'.
+
+    - Added SelectTabItem and 'eg/selecttabitem.pl'.
+
+    - Added MenuSelect and 'eg/menuselect.pl'.
+
+    - Refactored the test code.
+
+    - Fixed a couple of PPCODE bugs reported by a nice contributor.
+
+    - Added SetWindowPos (thanks to Paul Covington).
+
+    - Several TabCtrl functions (also courtesy of Paul Covington).
+
+1.49 Wed May 08 23:08:09 2002
+
+    - Added Win32::GuiTest::Cmd module to simplify command-line type tasks.
+
+    - Added DibSect module (writen by Jarek Jurasz) that allows screen-shot 
+      type functionality.
+
+    - Added some pod documentation submitted by Jarek Jurasz.
+
+    - Cleaned-up the pod docs.
+ 
+    - Moved all constants into Win32/GuiTest/GuiTest.pc to allow them 
+      to be autogenerated in the future.
+ 
+    - Rationalized EXPORT_OK.
+
+    - Changed makefile.pl to include author info in the ppd file.
+
+1.49.1 Wed May 22 00:00:00 2002
+
+    - Improved IsKeyPressed.
+
+1.49.2 Tue Jun 04 15:39:23 2002
+
+    - Improved IsKeyPressed (again).
+
+    - Added VK_* constants and KEYEVENTF_* flags.
+
+    - Added SendRawKey function.
+
+1.50 (Test Version) Sun Jun 22 ??:??:?? 2003
+
+    - Added use of AttachWin() for those functions that require the
+      window to be attached to the calling thread's message queue.
+
+1.50.1-ad Thu Apr 08 20:45:00 2004
+
+    - Fixed crash with MenuSelect when used on MDI applications with documents
+      maximized. (CTRONDLP)
+
+    - Implemented pertinent parts of Jonathan A's patch for CygWin Perl. (CTRONDLP)
+
+    - Added WindowFromPoint function and wptr.pl example script. (CTRONDLP)
+
+    - Added the MouseClick function and documentation. (CTRONDLP)
+
+1.50.2-ad Sun May 30 12:40:00 2004
+
+    - Push*Button() functions will now correctly not manipulate disabled
+      buttons. (CTRONDLP)
+
+    - Fixed various compiler warnings. (CTRONDLP)
+
+    - Minor updates to the documentation. (CTRONDLP)
+
+    - Included initial script recording application; which is still a
+      work-in-progress. (CTRONDLP)
+
+1.50.3-ad Wed Feb 02 17:42:00 2005
+
+     - Add more examles in eg directory (SZABGAB)
+     - Tests using Test::More now (SZABGAB)
+     - Some more documentation (SZABGAB)
+     - Explanation how to setup development environment (SZABGAB)
+     - A number of new exported methods regarding Menu items
+       such as GetMenuItemInfo 
+     - Added support for some 32bit controls: GetListViewContents, 
+       SelListViewItem, SelListViewItemText, GetTabItems,
+       SelTabItem, SelTabItemText, SelTreeViewItemPath (CTRONDLP)
+     - Added basic mouse wheel support: MouseMoveWheel (CTRONDLP)
+     - Added IsListViewItemSel and IsTabItemSel (CTRONDLP)
+     - Updated SetFocus routine with AttachWin code (CTRONDLP)
+
+1.50.4 Sun Oct 02 15:00:00 2005
+
+     - Added some code to Makefile.PL to help with environments
+       where file name case is of concern. (CTRONDLP)
+     - Fixed case of GetMenuItemID
+     - FindWindowLike will now handle control Ids = 0.
+     - Added following functions:
+        * AllocateVirtualBuffer
+        * FreeVirtualBuffer
+        * ReadFromVirtualBuffer
+        * WriteToVirtualBuffer
+       All those functions can be implementing marshaling when sending
+       messages to advanced controls
+        * WaitForReady
+        * SelComboString
+        * PushChildById
+     - Rewriten function SelTreeViewItemPath
+     - Modified POD in GuiTest.pm in INSTALLATION section. Added SEE ALSO
+     - Added Rafe Lafrance's GetPopupHandle
+
+1.50.5 Tue Nov 29 15:00:00 2005
+
+     - Added multicolumn GetListViewContents, implemented by Denis Howe.
+       Thanks to Charles Kuo for testing this
+
+1.51 Fri Sep 28 10:58:05 CEST 2007
+
+     - Compile and pass tests under cygwin; file cases and locations rearranged
+     - Calculator test fixed
+     - Add POD tests, remove explicit podchecker and pod2html calls
+     - Remove various obsolete targets (ppm,Build.PL,readme.html) and shape up Makefile.PL
+       for modern ExtUtils::MakeMaker 
+
+1.52 Fri Oct 5 16:00 CEST 2007
+     - IsKeyPressed and SendKeys recognize integers as VK codes
+
+
+1.53 Sat Oct 6 14:00 CEST 2007
+     - Add UnicodeSemantics()
+     - GetWindowText and its called (FindWindowLike etc) can operate in Unicode now
+
+1.54 Tue Oct 9 10:00 CEST 2007
+     - SendKeys rewritten in Perl to allow more powerful grouping and to understand
+       unicode.
+
+1.55 Tue Dec 15 22:00 CEST 2007
+     - First attempts to make Win32::GuiTest object oriented. FindWindowLike
+       modified (changes are backward compatible)
+
+1.56 Wed Oct  1 13:28:34 CEST 2008
+     - Allow 'make dist' and limited 'make test' on non-Win32 platforms
+     - Screen to mickey conversion patch by Tony Skelding
+
+1.57 Jun 13 2010
+     - Build on strawberry perl
+
+1.58 Oct 31 2010
+     - Build on x64 systems 
+     - Hooks fix by Oleg Prokhorov 
+
+1.60 Jul 24 2012
+     - Fixes in tests and pod
+
+1.63 Jan 29 2016
+     - Minor accumulated fixes

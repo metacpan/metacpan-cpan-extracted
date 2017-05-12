@@ -1,0 +1,111 @@
+Win32-Process-Info is Copyright (C) 2001-2005 E. I. DuPont de Nemours
+and Company, Inc. Copyright (C) 2007-2011 by Thomas R.  Wyant, III.
+
+DESCRIPTION
+
+This module is intended to partly plug a perceived gap in Perl's Win32
+functionality: the inability to traverse all (or nearly all) the processes
+on the system, and get information on them. In a futile effort to be all
+things to all people, it has several variants, which are (semi-) trans-
+parantly selected among on the fly, depending on the environment in which
+it finds itself:
+* WMI - used if WMI is found on the machine;
+* NT - used if WMI is not found, but Win32::IsWinNT () is TRUE;
+* PT - used if none of the above is found, but Proc::ProcessTable is.
+If none of these obtains (e.g. you're running Windows 95), I'm afraid
+you're out of luck. You actually have control of which variant is used,
+should you choose to exercise it. See the docs for more detail.
+
+Because of Windows NT's security, it may not in fact be possible to see
+literally every process; and some (e.g. process ID 0, the idle process)
+may not have anything worth seeing. But this module does the best it can
+with the rest.
+
+Win32::Process::Info.pm contains POD documentation, which I do not
+intend to repeat here. The following sample will give a flavor for how
+it works.
+
+use Win32::Process::Info;
+my $pi = Win32::Process::Info->new ();
+foreach $proc ($pi->GetProcInfo ()) {
+    print "\n";
+    foreach (sort keys %$proc) {
+        print "$_ => $proc->{$_}\n";
+        }
+    }
+
+That is to say, GetProcInfo returns a list of anonymous hashes
+containing whatever information can be gleaned. The kit includes
+a slightly more extensive script, ProcessInfo.pl, which produces
+very slightly friendlier output.
+
+Win32::Process::Info uses other modules which are not part of the
+standard Perl distribution (or weren't last time I looked!) Some are
+only used under certain conditions, but you may see degraded
+performance if you don't have them. The libraries used are
+* Win32 - Required under Windows.
+* Win32::API - Required only by the NT variant.
+* Win32API::Registry - Used only by the NT variant. It's optional
+    there, but if you don't have it you may get somewhat less
+    information, because the debug privilege can't be set.
+* Win32::OLE - Required only by the WMI variant.
+* Proc::ProcessTable - Required by the PT variant, which will run under
+    operating systems other than Windows.
+
+With the exception of Proc::ProcessTable and (maybe) Win32::API, the
+above are believed to be standard with the Windows version of
+ActivePerl.
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of either
+'cpan' or 'cpanp'. For either of these, installing Astro::Coord::ECI
+gets you everything. ActivePerl users will want to use ActiveState's
+'ppi', and install Astro-satpass.
+
+If for some reason neither of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Win32-Process-Info-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the Win32/Process/Info directory (creating it if
+necessary) in the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

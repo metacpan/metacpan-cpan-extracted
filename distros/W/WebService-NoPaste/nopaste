@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+use strict;
+use WebService::NoPaste;
+sub run {
+    my $np = WebService::NoPaste->new(
+        # These two are special...
+        host => 'http://rafb.net',
+        post_path => '/paste/paste.php',
+        # ...and the rest are directly passed as POST variables:
+        cvt_tabs => 'No',
+        lang => 'Perl', # affects syntax highlighting in HTML view
+        nick => $ENV{USER}, # shows up in "Recent pastes" list
+        desc => '',
+    );
+    my $text = hasopt('c') ? $np->read_from_clipboard : $np->read_from_stdin;
+    print "Sending to server...\n";
+    $np->send($text);
+    print "Paste successfully posted to:\n" . join "\n", $np->payload_urls;
+    if (hasopt('p')) {
+        $np->save_to_clipboard(($np->payload_urls)[-1]);
+        print " <-- now in the clipboard.\n";
+    } else {
+        print "\n";
+    }
+}
+if (hasopt('h')) {
+    # this will need updating if we end up supporting more than just "xclip"
+    print <<"...";
+nopaste [cph]
+    c  copies data from xclip instead of STDIN
+    p  pastes result URL to xclip
+    h  You're readin' it.
+...
+    exit 0;
+}
+sub hasopt {
+    my $c = shift;
+    my $str = join '', @ARGV;
+    return $str =~ $c;
+}
+run;

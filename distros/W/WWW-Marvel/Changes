@@ -1,0 +1,17 @@
+Revision history for Perl module WWW::Marvel
+
+0.04 Sun May 31 15:48:02 CEST 2015
+    - Response object
+    - Entity::Character object
+    - Factory::Entity to auto-identify the data
+    - one more example
+
+0.03 Sat May 30 17:02:43 CEST 2015
+    - add WWW::Marvel::Config feature
+
+0.02 Tue May 26 00:31:08 2015 +0200
+    - useragent methods
+
+0.01 Sun May 10 21:04:26 2015
+    - original version; created by ExtUtils::ModuleMaker 0.54
+

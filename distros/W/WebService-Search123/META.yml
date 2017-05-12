@@ -1,0 +1,23 @@
+---
+abstract: 'Interface to the Search123 XML API.'
+author:
+  - 'Rob Brown <rob@intelcompute.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Search123
+requires:
+  Digest::MD5: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Time::HiRes: 0
+  URI: 0
+  XML::LibXML: 0
+  namespace::autoclean: 0
+version: 0.09

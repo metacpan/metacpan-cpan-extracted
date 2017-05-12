@@ -1,0 +1,14 @@
+users
+title:<en 1>All users</en><nl 1>Alle gebruikers</nl>
+query:select id,login,password,superuser from users where status='1' [and id like '$params{id}'|] [and login like '%$params{login}%'|] order by login
+captions:login=<en 2>Login</en><nl 2>Login</nl>|password=<en 3>Password</en><nl 3>Paswoord</nl>|superuser=<en 4>Superuser</en><nl 4>Supergebruiker</nl>
+pagehead:<center><h2><en 5>List of Users</en><nl 5>Gebruikerslijst</nl></h2></center>
+pagefoot:<center><en 6>&nbsp;</en><nl 6>&nbsp;</nl></center><br>
+replace:login=<a href=jdetails.wsql?id=$id&view=user><en 7>$login</en><nl 7>$login</nl></a>
+replace:superuser=perl;return ($superuser==1?"<en>Yes</en><nl>Ja</nl>":"<en>No</en><nl>Nee</nl>");
+replace:email=<a href=mailto:$email><en 8>$email</en><nl 8>$email</nl></a>
+recordsperpage:20
+appendnoresults:<center><a href=jform.wsql?id=new&view=user&editdest=jlist.wsql%3Fview%3Dusers____from%3D[$params{from}|0]><en 9>Add</en><nl 9>Voeg toe</nl></a></center>
+appendresults:<center><a href=jform.wsql?id=new&view=user&editdest=jlist.wsql%3Fview%3Dusers____from%3D[$params{from}|0]><en 10>Add</en><nl 10>Voeg toe</nl></a></center>
+hide:id
+align:password=center|superuser=right

@@ -1,0 +1,45 @@
+0.9.6
+    [ BUG FIXES ]
+    * returned request in callback handler uses correct base
+
+    [ DOCUMENTATION ]
+    * fix typo
+
+0.9.5
+    [ BUG FIXES]
+    * large puts results in hanging requests
+
+    [ DOCUMENTATION ]
+    * fix example in synopsis
+
+0.9.4
+    [ BUG FIXES ]
+    * move integration tests to release tests
+    * ensure less dependencies for package building
+
+0.9.3
+    [ ENHANCEMENTS ]
+    * added configuration 'followlocation' to enable following redirects
+    * added configuration 'max_redirects' to set a maximum of automated redirects
+    * more tests
+
+    [ BUG FIXES ]
+    * fix requirement of external webserver for tests
+    * fix receiving continue with HTTP 1.0
+
+    [ DOCUMENTATION ]
+    * fix typo in synopsis
+    * describe 'followlocation' and 'max_redirects'
+
+0.9.2
+    [ BUG FIXES ]
+    * ensure version to be current version
+
+    [ DOCUMENTATION ]
+    * hint for production usage on xing.com
+    * fix meta resouces
+    * cleanup
+
+0.9.1
+    [ ENHANCEMENTS ]
+    * less looping while waiting for response

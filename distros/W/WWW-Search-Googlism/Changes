@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::Search::Googlism.
+
+0.01  Sun Dec  1 13:51:17 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n WWW::Search::Googlism
+

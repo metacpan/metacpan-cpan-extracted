@@ -1,0 +1,428 @@
+
+=head1 NAME
+
+Win32::GUI::Tutorial::Part1 - Our first Win32::GUI Program
+
+=head1 Win32::GUI Tutorial - Part 1
+
+=head2 Hello, GUI world
+
+OK, let's begin. The traditional "first program" for any programming
+environment prints "Hello, world", so let's go with that.
+
+To start with, we load Win32::GUI.
+
+    use Win32::GUI();
+
+We are working in a windowing environment, so we need a window. Main windows
+are created using Win32::GUI::Window->new(). The parameters to new() are a
+list of key => value pairs, which define the properties of the window. For our
+simple example, all we need are a width and a height (if we don't specify the
+window size, the default is to make the window as small as possible - so there
+is no space for the text!).
+
+   $main = Win32::GUI::Window->new(-width => 100, -height => 100);
+
+We save the window in the variable $main so that we can refer to it later.
+
+Now, what about the text? Text can be put into a window using a "label"
+control. To add a label to a window, use the AddLabel() method. AddLabel()
+takes a list of options, similar to the new() call above. In this case, the
+only option we need is C<-text>, which specifies the text to display. By
+default, the label's size is just big enough to fit its text, and its position
+is in the top left of its containing window. This is fine for us.
+
+    $main->AddLabel(-text => "Hello, world");
+
+OK, now we need make sure the window will be displayed. By default, windows
+start hidden, so they won't be visible on screen. To make them visible, we
+need to use the Show() method.
+
+    $main->Show();
+
+Finally, we need to start up a Windows "message loop". This shows the
+application windows, and waits for user interaction. The Win32::GUI message
+loop is implemented in the Win32::GUI::Dialog() function. All that is needed
+is to call that function, and wait for it to return.
+
+    Win32::GUI::Dialog();
+
+One thing remains. At the moment, we are displaying the window, and waiting
+for user interaction. However, we haven't said what to do if any user
+interaction (called an I<event>) occurs! Worse still, we haven't even said what
+to do when the window closes, so the message loop keeps on spinning, even
+after the window closes - so we never return from Win32::GUI::Dialog...
+
+So we need to react to events. How do we do that? Well, the first thing we
+need is for any window or control which is to react to events to have a name.
+This name is specified using the C<-name> option. So we change the statement
+which creates our main window as follows
+
+    $main = Win32::GUI::Window->new(
+		-name   => 'Main',
+		-width  => 100,
+		-height => 100,
+	);
+
+Now, we define I<event handlers> for the window. Event handlers are simply
+Perl subroutines with specific names - <window name>_<event name>. For
+example, the event which happens when the window is closed is the C<Terminate>
+event, so the event handler we need for our main window is C<Main_Terminate>.
+
+Event handlers should return one of three specific values:
+
+=over
+
+=item *
+
+1: Proceed, taking the default action defined for the event.
+
+=item *
+
+0: Proceed, but B<do not> take the default action.
+
+=item *
+
+-1: Terminate the message loop.
+
+=back
+
+Obviously, what we want for the Main_Terminate event is to return -1
+(terminate the message loop). So, we have
+
+    sub Main_Terminate {
+        -1;
+    }
+
+More generally, we could do some processing before returning from the event
+handler, but we don't need to here.
+
+So, let's put it all together.
+
+    use Win32::GUI();
+    $main = Win32::GUI::Window->new(
+		-name   => 'Main',
+		-width  => 100,
+		-height => 100,
+	);
+    $main->AddLabel(-text => "Hello, world");
+    $main->Show();
+    Win32::GUI::Dialog();
+
+    sub Main_Terminate {
+        -1;
+    }
+
+Put that in a file (say, hello.pl) and run it using C<perl hello.pl>. 
+
+=for html <br /><center><img src="part1-1.gif" /></center>
+
+Notice how you can resize and move the window, maximize and minimize it, 
+just like any other application window.
+
+So that's it. Ten lines of code to produce a fully working Windows
+application.
+
+=head2 Some extra touches
+
+Now, we'll add some simple improvements to make our application look more
+polished.
+
+You will notice that the application window has no title. To include a title,
+all we need is to add a C<-text> option to the main window.
+
+    $main = Win32::GUI::Window->new(
+		-name   => 'Main',
+		-width  => 100,
+		-height => 100,
+		-text   => 'Perl',
+	);
+
+Now, suppose we want the window to be just big enough to hold the label,
+rather than being a fixed size. This is a bit more complicated, because we
+need to take note of the difference between the total window size, and the
+I<client area>, which is the area of the window excluding the title bar, the
+system, minimize, maximize, and close icons, and the window border. In other
+words, it is the area in which we can actually display information.
+
+We can get the window size using the Height() and Width() methods, and
+we can get the client area size using the ScaleHeight() and ScaleWidth()
+methods.
+
+We can get the label size similarly, using Height() and Width() (labels do not
+have borders, so the label area and its client area are the same).
+
+To get the dimensions of the non-client area of the main window, we just need
+
+    $ncw = $main->Width() - $main->ScaleWidth();
+    $nch = $main->Height() - $main->ScaleHeight();
+
+Now, we get the required size as
+
+    $w = $label->Width() + $ncw;
+    $h = $label->Height() + $nch;
+
+As we are getting properties of the label, we should save the return value of
+the AddLabel() call - which is a reference to the label - in a variable
+$label.
+
+And we set the main window's size using Resize()
+
+    $main->Resize($w, $h);
+
+We have to resize after we have created the window, because we need to create
+the window first in order to calculate the non-client dimensions. But we do it
+before we show the window, to avoid any flicker.
+
+OK, let's put all this together. We'll add the ability to specify the label
+text on the command line, just to be fancy (it also shows that the values of
+options can be set using variables, not just constant values).
+
+    use Win32::GUI();
+
+    $text = defined($ARGV[0]) ? $ARGV[0] : "Hello, world";
+
+    $main = Win32::GUI::Window->new(-name => 'Main', -text => 'Perl');
+    $label = $main->AddLabel(-text => $text);
+
+    $ncw = $main->Width()  - $main->ScaleWidth();
+    $nch = $main->Height() - $main->ScaleHeight();
+    $w = $label->Width()  + $ncw;
+    $h = $label->Height() + $nch;
+
+    $main->Resize($w, $h);
+    $main->Show();
+    Win32::GUI::Dialog();
+
+    sub Main_Terminate {
+        -1;
+    }
+
+Run this version and see the results. Note that if you supply a short string,
+the window will not shrink beyond a minimum size sufficient to show the window
+icons.
+
+=for html <br /><center><img src="part1-2.gif" /></center>
+
+=head2 Changing the appearance of the text
+
+Now, suppose we want to change the colour in which the text is displayed. This
+is easy. You just specify the colour as the value of the C<-foreground>
+attribute of the label. Colours can be specified either as hex values in the
+format 0xBBGGRR, or as list references in the format [ R, G, B ].
+
+So, to make the text red, use C<< -foreground => 0x0000FF >>
+or C<< -foreground => [ 255, 0, 0 ] >>.
+
+To change the font, you need to specify the C<-font> attribute. But in this
+case, the value of the attribute is a Win32::GUI::Font object. To create a
+font object, use
+
+    $font = Win32::GUI::Font->new(...);
+
+As usual, the parameters to new() are a set of options. The most important
+ones are
+
+=over
+
+=item B<-size>
+
+The font size in points.
+
+=item B<-name>
+
+The font name, such as "Times New Roman", "Arial", "Verdana" or
+"Comic Sans MS".
+
+=item B<-bold>
+
+One for bold, zero (the default) for non-bold.
+
+=item B<-italic>
+
+One for italic, zero (the default) for non-italic.
+
+=back
+
+So, to change the format of our label, all we need is
+
+    $font = Win32::GUI::Font->new(
+		-name => "Comic Sans MS", 
+		-size => 24,
+	);
+    $label = $main->AddLabel(
+		-text       => $text,
+		-font       => $font,
+		-foreground => [255, 0, 0],
+	);
+
+=for html <br /><center><img src="part1-3.gif" /></center>
+
+Simple, isn't it?
+
+=head2 Centring the window and the text
+
+To centre the main window on the screen, we need to know the screen size. We
+get this using the I<desktop window>. You can get the handle of the desktop
+window using Win32::GUI::GetDesktopWindow(). One point to note is that window
+handles are B<not> Win32::GUI::Window objects, so they cannot be used to call
+Win32::GUI methods like Height(). However, these methods are overloaded so
+that they can be called directly (as Win32::GUI::Height()) with a window
+handle as an extra first parameter. See the code below for an example.
+
+The rest of the work is just arithmetic. To reposition the main window, use
+the Move() method.
+
+    # Assume we have the main window size in ($w, $h) as before
+    $desk = Win32::GUI::GetDesktopWindow();
+    $dw = Win32::GUI::Width($desk);
+    $dh = Win32::GUI::Height($desk);
+    $x = ($dw - $w) / 2;
+    $y = ($dh - $h) / 2;
+    $main->Move($x, $y);
+
+Now, we will look at centring the label in the window (you will notice that if
+you increase the size of the window, the text stays at the top left of the
+window).
+
+The process is similar to the calculations for centring the window above.
+There are two main differences. First of all, the label needs to be recentred
+every time the window changes size - so we need to do the calculations in a
+Resize event handler. The second difference (which in theory applies to the
+window as well, but which we ignored above), is that we need to watch out for
+the case where the window is too small to contain the label. Just to make
+things interesting, we'll stop the main window getting that small, by resizing
+it in the event handler if that is about to happen. As the width could be too
+small while the height is OK, we have to reset the width and height
+individually. We can do this using variations on the Width() and Height()
+methods, with a single parameter which specifies the value to set.
+
+OK, let's just do it.
+
+    sub Main_Resize {
+        my $mw = $main->ScaleWidth();
+        my $mh = $main->ScaleHeight();
+        my $lw = $label->Width();
+        my $lh = $label->Height();
+        if ($lw > $mw) {
+            $main->Width($lw + $ncw); # Remember the non-client width!
+        }
+        else {
+            $label->Left(($mw - $lw) / 2);
+        }
+        if ($lh > $mh) {
+            $main->Height($lh + $nch); # Remember the non-client height!
+        }
+        else {
+            $label->Top(($mh - $lh) / 2);
+        }
+    }
+
+Note that co-ordinates are calculated from the top left of the enclosing
+window.
+
+=head2 Restricting the minimum size of the window
+
+Suppose we wanto to ensure that our main window never gets smaller than
+100x100 pixels. We could include code in a resize event, like we did in the
+previous section to make sure the window never got smaller than the label.
+However, this can result in fairly bad flickering. A better solution is to use
+the C<-minsize> option.
+
+    $main = Win32::GUI::Window->new(
+		-name => 'Main',
+		-text => 'Perl',
+		-minsize => [100, 100],
+	);
+
+Simple! But in the previous example, we wanted to restrict the window size to
+the size of the label. We can't do this when we create the window, because we
+haven't created the label yet. But we can still do this - we just have to set
+the window's C<-minsize> option after the label has been created. We do this
+with the Change() method. We just specify this before resizing the window, in
+our initial setup.
+
+    $main->Change(-minsize => [$w, $h]);
+
+=head2 Putting it all together
+
+OK, we now have a nice, fully working GUI application. Here it is, in all its
+glory.
+
+    use Win32::GUI();
+
+    $text = defined($ARGV[0]) ? $ARGV[0] : "Hello, world";
+
+    $main = Win32::GUI::Window->new(
+		-name => 'Main',
+		-text => 'Perl',
+	);
+    $font = Win32::GUI::Font->new(
+		-name => "Comic Sans MS", 
+		-size => 24,
+	);
+    $label = $main->AddLabel(
+		-text => $text,
+		-font => $font,
+		-foreground => [255, 0, 0],
+	);
+
+    $ncw = $main->Width() -  $main->ScaleWidth();
+    $nch = $main->Height() - $main->ScaleHeight();
+    $w = $label->Width()  + $ncw;
+    $h = $label->Height() + $nch;
+
+    $desk = Win32::GUI::GetDesktopWindow();
+    $dw = Win32::GUI::Width($desk);
+    $dh = Win32::GUI::Height($desk);
+    $x = ($dw - $w) / 2;
+    $y = ($dh - $h) / 2;
+
+    $main->Change(-minsize => [$w, $h]);
+    $main->Resize($w, $h);
+    $main->Move($x, $y);
+    $main->Show();
+
+    Win32::GUI::Dialog();
+
+    sub Main_Terminate {
+	-1;
+    }
+
+    sub Main_Resize {
+        my $mw = $main->ScaleWidth();
+        my $mh = $main->ScaleHeight();
+        my $lw = $label->Width();
+        my $lh = $label->Height();
+
+	$label->Left(int(($mw - $lw) / 2));
+	$label->Top(int(($mh - $lh) / 2));
+    }
+
+That's it for this tutorial. In L<part 2|Win32::GUI::Tutorial::Part2> , we will start looking at some other
+controls.
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/Tutorial/Part1.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

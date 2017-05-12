@@ -1,0 +1,47 @@
+==================================================
+Changes from 2012-05-02 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.3 at 2013-05-02 16:47:01 +0000
+----------------------------------------
+
+  Change: 17b84e36e1b0185001379670a577199c77c24723
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:46:46 +0000
+
+    added README.pod for github 
+
+  Change: 95494a3d488b4d30e6ac2762cb0e1d7206840d4f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:45:50 +0000
+
+    removed old Changes file 
+
+  Change: 25ff184d007d4329c8cc6badbd1aea73ee499719
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:41:30 +0000
+
+    migration to dist::zilla 
+
+----------------------------------------
+version 0.2 at 2013-02-28 02:22:50 +0000
+----------------------------------------
+
+  Change: 7f7ebfb1fb20e617c03800819f8bd1699fc38468
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-02-28 15:22:50 +0000
+
+    Checking in changes prior to tagging of version 0.2.
+
+    Changelog diff is: 
+
+  Change: 91c02f0a81136f1e493fcdb4d3d5452066cb59c7
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-02-28 15:22:13 +0000
+
+    initial import 
+
+================
+End of releases.
+================

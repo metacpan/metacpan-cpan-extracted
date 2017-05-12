@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00agent.t
+t/01goldcoast.t
+t/04director.t
+t/log.conf
+lib/WWW/Agent.pm
+lib/WWW/Agent/Zombie.pm
+lib/WWW/Agent/Plugins.pm
+lib/WWW/Agent/Plugins/Director.pm
+lib/WWW/Agent/Plugins/GoldCoasting.pm
+lib/WWW/Agent/Plugins/Focus.pm
+META.yml                                 Module meta-data (added by MakeMaker)

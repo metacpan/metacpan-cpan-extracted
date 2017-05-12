@@ -1,0 +1,38 @@
+Revision history for WWW-Correios-SRO
+
+0.10    2014-09-15
+    - New sub: sro_sigla, wich discovers the meaning of a sro prefix (RLOPES)
+    - Previous existance of the SRO prefix in the 'sigla' hash is no longer 
+         needed. It will check only the numbers and the validation digit before
+         going to Correios' website to get infos about the SRO. (RLOPES)
+
+0.09    2014-08-13
+    - Updating the list of valid tracking code identifiers (RLOPES).
+
+0.08    2014-06-24
+    - Updating the list of valid tracking code identifiers (JALOPES)
+
+0.07	2014-04-15
+	- Removing cruft that shipped on the previous release (RLOPES)
+
+0.06	2014-04-14
+	- Updating the list of valid tracking code identifiers (RLOPES).
+
+0.05    2013-01-31
+        - Updating the list of valid tracking code identifiers (BBUSS).
+
+0.04    2012-03-30
+        - new exportable sro_ok() function to do proper SRO
+          code validation (without url queries)
+
+0.03    2012-03-30
+        - Updating Changes file for compliance against latest
+        CPAN::Changes specification
+
+0.02    2011-09-09
+        - Fixed bug where certain items were not being properly fetched
+        (thanks MANTOVANI for the report)
+
+0.01    2010-06-07
+        - First version, released on an unsuspecting world.
+

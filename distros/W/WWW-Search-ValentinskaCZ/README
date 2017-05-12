@@ -1,0 +1,81 @@
+NAME
+    WWW::Search::ValentinskaCZ - Class for searching http://valentinska.cz .
+
+SYNOPSIS
+     use WWW::Search::ValentinskaCZ;
+     my $obj = WWW::Search->new('ValentinskaCZ');
+     $obj->native_query($query);
+     my $maintainer = $obj->maintainer; 
+     my $res_hr = $obj->next_result;
+     my $version = $obj->version;
+
+METHODS
+    "native_setup_search($query)"
+             Setup.
+
+    "native_retrieve_some()"
+             Get data.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Data::Printer;
+     use WWW::Search::ValentinskaCZ;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 match\n";
+             exit 1;
+     }
+     my $match = $ARGV[0];
+
+     # Object.
+     my $obj = WWW::Search->new('ValentinskaCZ');
+     $obj->maximum_to_retrieve(1);
+
+     # Search.
+     $obj->native_query($match);
+     while (my $result_hr = $obj->next_result) {
+            p $result_hr;
+     }
+
+     # Output like:
+     # Usage: /tmp/1Ytv23doz5 match
+
+     # Output with 'Čapek' argument like:
+     # \ {
+     #     author   "Larbaud, Valery; obálka: J. Čapek",
+     #     image    "http://www.valentinska.cz/image/cache/data/valentinska/book_144061_1-1024x1024.jpg",
+     #     price    "450Kč",
+     #     title    "A. O. Barnbooth. Jeho důvěrný deník",
+     #     url      "http://www.valentinska.cz/144061-a-o-barnbooth-jeho-duverny-denik"
+     # }
+
+DEPENDENCIES
+    Encode, LWP::UserAgent, Readonly, URI, Web::Scraper, WWW::Search.
+
+SEE ALSO
+    WWW::Search
+        Virtual base class for WWW searches
+
+    Task::WWW::Search::Antiquarian::Czech
+        Install the WWW::Search modules for Czech antiquarian bookstores.
+
+REPOSITORY
+    <https://github.com/tupinek/WWW-Search-ValentinskaCZ>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2014-2015
+     BSD 2-Clause License
+
+VERSION
+    0.03
+

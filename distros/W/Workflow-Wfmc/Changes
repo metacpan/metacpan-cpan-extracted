@@ -1,0 +1,6 @@
+Revision history for Perl extension Workflow::Wfmc.
+
+0.01  Sun Jul 10 20:30:27 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Workflow::Wfmc
+

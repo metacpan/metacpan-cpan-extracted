@@ -1,0 +1,38 @@
+{
+   "abstract" : "File manager with sophisticated metadata handling capabilities",
+   "author" : [
+      "Clipland (clipland@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "restricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wrangler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "test" : {
+         "recommends" : {
+            "File::HomeDir" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/clipland/wrangler.git",
+         "web" : "https://github.com/clipland/wrangler"
+      }
+   },
+   "version" : "2.15"
+}

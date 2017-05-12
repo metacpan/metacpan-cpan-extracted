@@ -1,0 +1,163 @@
+0.17     2016-06-23
+
+* Fixed bind_path() from Web::Machine::Util to handle path parts which
+  evaluated to false, like "/user/0". Patch by Stevan Little. GH #34.
+
+
+0.16     2015-07-05
+
+[MISC]
+
+* Made the state machine only called allowed_methods() on your resource class
+  once. RT #101203. Implemented by Nathan Cutler.
+* Noted in the docs that resource methods may be called more than once and
+  that they should therefore by idempotent. RT #101219. Implemented by Nathan
+  Cutler.
+* Removed the CAVEAT section of the docs warning people not to use this
+  module. RT #97534. Implemented by Nathan Cutler.
+* Setting the WM_DEBUG environtment variable to "diag" now sends debugging
+  output to Test::More::diag() instead of printing directly to STDERR.
+* Resource classes were being passed a string for known_content_type() instead
+  of an HTTP::Headers::ActionPack::MediaType object. Reported by Robert
+  Rothenberg. GH #27.
+
+[BUG FIXES]
+
+* Fixed the docs for the valid_content_headers() method. This defaults to
+  true, not false, as the docs previously said. Fixed by Nathan Cutler.
+
+0.15     2014-06-26
+
+[MISC]
+
+* The Web::Machine class now accepts an addition parameter,
+  request_class. This allows you to use a custom subclass of
+  Plack::Request. (Mike Raynham)
+
+* Documented the request and response methods in
+  Web::Machine::Resource. Requested by Olaf Alders.
+
+0.14     2014-04-14
+
+[MISC]
+
+* Automatically load resources (Arthur Axel fREW Schmidt)
+* Ensure closed-over $resource variable is weak in
+  Web::Machine::Util::BodyEncoding::encode_body (Carlos Fernando Avila Gratz)
+* The n11 state was not taking into account any query parameters that might
+  have been passed back from `create_path`, this is fixed now (Stevan Little)
+* Errors from $resource->finish_request are now logged (Greg Oschwald)
+
+0.12     2013-08-01
+
+[BUG FIX]
+
+* Calculate Content-Length of the filtered body (Thomas Sibley)
+
+[MISC]
+
+* Link state machine diagram (Andreas Marienborg)
+* Fix a POD link to PSGI (Andreas Marienborg)
+
+0.11     2013-05-01
+
+[NEW FEATURES]
+
+* A resource class can now provide a default_charset() sub. This is called if
+  the client does not pass an Accept-Charset header, allowing you to ensure
+  that responses are always encoded as bytes. (Dave Rolsky)
+* Both charsets_provided and default_charset can return string, rather that
+  key/value hashref pairs. These strings are assumed to be character set
+  names, and Web::Machine will use Encode::encode() to turn the body into
+  bytes with that string. (Dave Rolsky)
+* Started working on a new Web::Machine::Manual document, and tweaked some of
+  the other docs in the distro. (Dave Rolsky)
+
+[MISC]
+
+* Fix test failures on 5.17.x. (Dave Rolsky)
+* Tests on older Perls would fail when trying to parse a date in
+  2112. Reported by Bernhard Graf. (Dave Rolsky)
+
+
+0.10     2013-04-15
+
+[MISC]
+
+* Requests with an If-None-Match error caused an undef warning if your
+  resource did not return a value from the generate_etag() sub (Dave Rolsky)
+* Content negotiation is generally smarter. If a client asks for "utf8" and
+  your resources provides "UTF-8", this will be considered a match. This is
+  all implemented in HTTP::Headers::ActionPack 0.05 but it affects
+  Web::Machine. (Dave Rolsky)
+* If you actually implemented charsets_provided in a resource this would cause
+  Web::Machine to die with an error like 'Can't locate object method
+  "HASH(0x2f613f8)" via package My::Resource'. (Dave Rolsky)
+* None of the body filtering code for applying encodings or charset encoding
+  actually work when the body was returned as an arrayref. (Dave Rolsky)
+
+0.09     2013-03-27
+
+[MISC]
+
+* Malformed headers no longer cause a 500 error (Greg Oschwald)
+
+0.08     2013-02-12
+
+[NEW FEATURES]
+
+* It is now possible to have the create_path resource method fire *after* the
+  entity is processed. This resolves RT #78631, which also has an excellent
+  description of the problem in it.
+
+0.07     2013-01-24
+
+[MISC]
+
+* Fixing some broken test dependencies
+
+0.06     2013-01-23
+
+[COMPATABILITY BREAKAGE]
+
+* Removed the $metadata variable in the FSM and moved this into the PSGI $env
+  instead (blame Jesse Luehrs if this is a problem)
+* Content-Type is a required header (Jesse Luehrs)
+
+[NEW FEATURES]
+
+* Implement PSGI style streaming responses (Jesse Luehrs)
+* Allow IO handle responses (Jesse Luehrs)
+
+[MISC]
+
+* Fix some tests (Jesse Luehrs)
+* When a resource throws an error, log this to the logger defined in the
+  Plack::Request object if one is available (Dave Rolsky)
+
+0.05     2012-10-29
+
+* If a resource returned undef from is_authorized this caused an uninitialized
+  value warning (Dave Rolsky)
+
+0.04     2012-09-09
+
+* Move all the content negotation code to HTTP::Headers::ActionPack
+* Improve the bind_path function in Util
+* Improve existing and add more tests for this
+* Improve the docs on this too
+
+0.03     2012-06-19
+
+* Fix a missing semicolon (thanks to bricas)
+* Fix missing $VERSION numbers (also thanks to bricas)
+* Allow the resource to choose how to handle exceptions instead of always
+  writing them to the body
+
+0.02     2012-06-17
+
+* Add missing dependencies
+
+0.01     2012-06-12
+
+* First release

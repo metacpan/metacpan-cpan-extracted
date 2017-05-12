@@ -1,0 +1,34 @@
+Revision history for Revision history for perl module WWW-Shorten-Bitly
+
+2.001     2017-02-06
+    - Fix an error in the constructor (GH#1)
+    - Fix a change in ReadmeAnyFromPod
+
+2.000     2016-09-16
+    - MAJOR CHANGES!!!!!
+    - Cleaned up the object-oriented interface.
+    - Removed errors function
+    - Removed qr_code function
+    - Removed validate function
+    - Removed version function
+    - Converted to Dist::Zilla
+    - Added proper attributes
+    - Aliased any old pseudo-attributes to the new proper ones
+    - Re-documented every method call
+    - All method calls use parameters matching their actual Bitly.com calls
+    - All method calls return a hash reference or die (Try::Tiny)
+    - All method calls use JSON-only
+    - Got rid of any and all XML-related code
+    - Make use of JSON::MaybeXS instead
+    - Cleaned up the requirements list in a cpanfile
+    - Added quite a bit more tests
+
+1.11    2009-08-12/15:45IST
+    - Implemented a few patches provided by other PAUSE
+    - contributors to fail gracefully, use post instead of get on bit.ly.
+
+0.78    2009-01-25/21:12IST
+    - Working version, fixed some documentation issues.
+
+0.01    2009-01-01/00:00
+    - First version, released on an unsuspecting world.

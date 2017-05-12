@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Webalizer/Hist.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00basic.t
+t/90pod-test.t
+t/91pod-coverage.t
+t/data/testfile.data

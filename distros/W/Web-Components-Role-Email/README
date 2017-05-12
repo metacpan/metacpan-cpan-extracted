@@ -1,0 +1,157 @@
+Name
+
+    Web::Components::Role::Email - Role for sending emails
+
+Synopsis
+
+       use Moo;
+    
+       with 'Web::Components::Role::Email';
+    
+       my $post = { attributes      => {
+                       charset      => 'UTF-8',
+                       content_type => 'text/html' },
+                    body            => 'Message body text',
+                    from            => 'Senders email address',
+                    host            => 'localhost',
+                    mailer          => 'SMTP',
+                    subject         => 'Email subject string',
+                    to              => 'Recipients email address' };
+    
+       $recipient = $self->send_email( $post );
+
+Description
+
+    Supports multiple transports, attachments and multilingual templates
+    for message bodies
+
+Configuration and Environment
+
+    Defines no attributes
+
+Subroutines/Methods
+
+ send_email
+
+       $result_message = $self->send_email( @args );
+
+    Sends emails. Returns the recipient address, throws on error. The @args
+    can be a list of keys and values or a hash reference. The attributes
+    defined are;
+
+    attachments
+
+      A hash reference whose key / value pairs are the attachment name and
+      path name. Encoding and content type are derived from the file name
+      extension
+
+    attributes
+
+      A hash reference that is applied to the email when it is created.
+      Typical keys are; content_type and charset. See Email::MIME. This is
+      merged onto the email_attr configuration hash reference if it exists
+
+    body
+
+      Text for the body of the email message
+
+    from
+
+      Email address of the sender
+
+    host
+
+      Which host should send the email. Defaults to localhost
+
+    mailer
+
+      Which mailer should be used to send the email. Defaults to SMTP
+
+    stash
+
+      Hash reference used by the template rendering to supply values for
+      variable replacement
+
+    subject
+
+      Subject string. Defaults to No Subject
+
+    subprovider
+
+      If this object reference exists and an email is generated from a
+      template then it is expected to provide a loc function which will be
+      make callable from the template
+
+    functions
+
+      A list of functions provided by the "subprovider" object. This list
+      of functions will be bound into the stash instead of the default loc
+      function
+
+    template
+
+      If it exists then the template is rendered and used as the body
+      contents. See the layout attribute
+
+    to
+
+      Email address of the recipient
+
+    transport_attr
+
+      A hash reference passed to the transport constructor. This is merged
+      in with the transport_attr configuration hash reference if it exists
+
+ try_to_send_email
+
+    Just like "send_email" but logs at the error level instead of throwing
+
+Diagnostics
+
+    None
+
+Dependencies
+
+    Email::MIME
+
+    Email::Sender
+
+    Encode
+
+    MIME::Types
+
+    Moo
+
+    Unexpected
+
+    Web::Components::Role::TT
+
+Incompatibilities
+
+    There are no known incompatibilities in this module
+
+Bugs and Limitations
+
+    There are no known bugs in this module. Please report problems to
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Web-Components-Role-Email.
+    Patches are welcome
+
+Acknowledgements
+
+    Larry Wall - For the Perl programming language
+
+Author
+
+    Peter Flanigan, <pjfl@cpan.org>
+
+License and Copyright
+
+    Copyright (c) 2017 Peter Flanigan. All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE
+

@@ -1,0 +1,102 @@
+=head1 NAME
+
+CHANGES - Revision history for WordNet::SenseRelate::WordToSet
+
+=head1 DESCRIPTION
+
+=item 0.04
+
+Released April 6, 2008 (all changes by TDP)
+
+=over
+
+=item
+
+Cleaned up some formatting issues for CPAN display
+
+=back
+
+=item 0.03
+
+Released March 21, 2008 (all changes by TDP)
+
+=over
+
+=item
+
+added some general comments to README.pod
+
+=item
+
+modified wordtoset.pl to show the glosses of the word senses, in 
+addition to the wps form
+
+=item
+
+expanded scope of test cases
+
+=item
+
+updated snyposis of WordToSet.pm with a cut, paste, and run example
+
+=item
+
+moved /util to /bin created /doc for .pod
+
+=back
+
+=item 0.02
+
+Released June 12, 2005 (All changes by JM)
+
+=over
+
+=item
+
+fixed documentation to make it clear which options are required 
+
+=item 
+
+added PREREQ statement to Makefile.PL 
+
+=back
+
+=item 0.01
+
+Released Thursday May 12, 2005 (All changes by JM)
+
+=over
+
+=item 
+
+original version; created by h2xs 1.23 with options -X WordNet::SenseRelate::WordToSet -b 5.6.0
+
+=back
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by :
+$Id: CHANGES.pod,v 1.4 2008/04/07 03:28:36 tpederse Exp $
+
+=head1 SEE ALSO
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2004-2008 Ted Pedersen
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut
+
+

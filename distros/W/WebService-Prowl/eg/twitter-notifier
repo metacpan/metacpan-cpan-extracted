@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use AnyEvent::Twitter::Stream;
+use WebService::Prowl::AnyEventHTTP;
+use Encode ();
+use DateTime;
+use Getopt::Long;
+
+GetOptions(
+    'username|u=s'    => \my $username,
+    'password|p=s'    => \my $password,
+    'apikey|a=s'      => \my $apikey,
+);
+
+die "Usage: $0 -a apikey -u username -p password " unless $username && $password && $apikey;
+
+my $application = 'Twitter';
+my $event = 'mentioned';
+
+my $ws = WebService::Prowl::AnyEventHTTP->new(apikey => $apikey, on_error => sub { warn $_[0] });
+my $tz = DateTime::TimeZone->new(name => 'local');
+
+AnyEvent::Twitter::Stream->new(
+    username => $username,
+    password => $password,
+    method => 'track',
+    track => '@' . $username,
+    on_tweet => sub {
+        my $dt = DateTime->now->set_time_zone($tz);
+        if (8 <= $dt->hour && $dt->hour <= 23) {
+            my $tweet = shift;
+            my $screen_name = Encode::decode_utf8($tweet->{user}{screen_name});
+            my $text        = Encode::decode_utf8($tweet->{text});
+            my $description = "$screen_name: $text";
+            $ws->add('event' => $event, application => $application, description => $description);
+        }
+    }
+);
+AnyEvent->condvar->recv;

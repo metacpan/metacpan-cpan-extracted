@@ -1,0 +1,11 @@
+Revision history for Perl extension Win32::SecretFile.
+
+0.02  Jan 1, 2015
+	- Fix compilation with MSVC (BrowserUk)
+	- Set flags and attributes on CreateFile call correctly
+	- Fix several compilation warnings
+
+0.01  Sun Dec 21 01:18:12 2014
+	- original version; created by h2xs 1.23 with options
+		-An Win32::SecretFile
+

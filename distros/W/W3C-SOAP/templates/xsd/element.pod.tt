@@ -1,0 +1,11 @@
+[%
+    simple = element.simple_type;
+    is_array = element.max_occurs == 'unbounded'
+        || ( element.max_occurs && element.max_occurs > 1 )
+        || ( element.min_occurs && element.min_occurs > 1 );
+    type_name = simple || element.type_module;
+-%]
+=item [% element.perl_name %]
+
+Is stores the value for the XML [% element.name %] which is a
+[% IF simple %]L<[% simple %]>[% ELSE %]L<[% type_name %]>[% END %]

@@ -1,0 +1,6 @@
+LIBRARY      PERLSHELLEXT
+DESCRIPTION  'Perl Host Shell Extension'
+
+EXPORTS
+    DllCanUnloadNow private
+    DllGetClassObject private

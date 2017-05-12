@@ -1,0 +1,22 @@
+Revision history for Perl extension Wx::Perl::Throbber.
+$Id: Changes,v 1.4 2005/03/25 13:38:17 simonflack Exp $
+
+v1.05  2005-03-25
+    - Add t/pod.t & t/pod_coverage.t
+
+v1.04  2004-04-27
+    - Correct POD in line with some of the API changes
+    - Animation cycle incorrectly included the 'rest frame'
+
+v1.02  2004-03-17
+    - add throbber demo
+    - Extend API - original python API doesn't let you change certain
+      aspects of the throbber, such as the text label, bitmap or framedelay
+    - move code out of constructor into various new Set* methods
+    - Add Set/Get methods for FrameDelay, AutoReverse, Overlay, Label
+    - Add &GetCurrentFrame, &GetFrameCount, &SetBitmap, and &IsRunning
+    - Replace Toggle* methods with Show* methods
+
+v0.01  2004-03-16
+    - Initial revision
+    - Perl port of Python library wx.throbber by Cliff Wells

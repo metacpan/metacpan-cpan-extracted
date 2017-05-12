@@ -1,0 +1,9 @@
+CHANGELOG
+Makefile.PL
+MANIFEST
+README
+lib/WebService/MoviePosterDB.pm
+lib/WebService/MoviePosterDB/Movie.pm
+lib/WebService/MoviePosterDB/Poster.pm
+t/movieposterdb.t
+META.yml                                 Module meta-data (added by MakeMaker)

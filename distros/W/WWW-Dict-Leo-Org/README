@@ -1,0 +1,48 @@
+INTRODUCTION
+
+ WWW::Dict::Leo::Org - Interface module to http://dict.leo.org/
+
+ leo - commandline interface to WWW::Dict::Leo::Org.
+
+INSTALLATION
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+
+DOCUMENTATION
+
+ man leo
+ perldoc WWW::Dict::Leo::Org
+
+
+HISTORY
+
+ WWW::Dict::Leo::Org exists as the script "leo" since 1999,
+ which is used widely on earth. Begining with version 1.28 I
+ extracted the most significant code into an extra perlmodule
+ (WWW::Dict::Leo::Org), so that the translation feature can
+ be used from perl too.
+
+ However, the commandline script "leo" still exists, it will
+ be installed together with the module.
+
+ Please note, that the script from 1.28 on is no more usable
+ in standalone form, in fact it uses the module to do the
+ job now.
+
+
+COPYRIGHT
+
+ WWW::Dict::Leo::Org + leo
+   Copyright (c) 2007-2016 by Thomas v.D. <tlinden@cpan.org>
+
+ http://dict.leo.org/
+   Copyright (c) 1995-2016 LEO Dictionary Team.
+
+ The search results returned by leo are based on the work of the people
+ at LEO.org. Thanks for the great work.
+
+

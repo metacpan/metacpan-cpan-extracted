@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+Changes
+
+lib/WWW/Automate.pm
+
+t/embedded-WWW-Automate.t
+META.yml                                 Module meta-data (added by MakeMaker)

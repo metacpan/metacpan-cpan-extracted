@@ -1,0 +1,26 @@
+---
+abstract: 'check validity of an email address using verify-email.org'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-VerifyEmail
+requires:
+  JSON: '0'
+  Moo: '0'
+  Net::HTTP::Tiny: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/neilb/WebService-VerifyEmail
+  repository: https://github.com/neilb/WebService-VerifyEmail.git
+version: '0.03'

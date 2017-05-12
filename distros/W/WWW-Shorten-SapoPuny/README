@@ -1,0 +1,51 @@
+NAME
+
+    WWW::Shorten::SapoPuny - Perl interface to xsl.pt
+
+SYNOPSIS
+
+      use WWW::Shorten::SapoPuny;
+      use WWW::Shorten 'SapoPuny';
+    
+      $short_url = makeashorterlink($long_url);
+    
+      $long_url  = makealongerlink($short_url);
+
+DESCRIPTION
+
+    A Perl interface to the web site xsl.pt. SapoPuny simply maintains a
+    database of long URLs, each of which has a unique identifier.
+
+Functions
+
+ makeashorterlink
+
+    The function makeashorterlink will call the SapoPuny web site passing
+    it your long URL and will return the shorter SapoPuny version.
+
+ makealongerlink
+
+    The function makealongerlink does the reverse. makealongerlink will
+    accept as an ONLY the full SapoPuny URL.
+
+    If anything goes wrong, then either function will return undef.
+
+ EXPORT
+
+    makeashorterlink, makealongerlink
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015 Alberto Simões, all rights reserved.
+
+    This module is free software and is published under the same terms as
+    Perl itself.
+
+AUTHOR
+
+    Alberto Simões <ambs@cpan.org>
+
+SEE ALSO
+
+    WWW::Shorten, perl, http://xsl.pt/
+

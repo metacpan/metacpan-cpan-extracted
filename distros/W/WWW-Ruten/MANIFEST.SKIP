@@ -1,0 +1,4 @@
+.shipit
+MANIFEST.bak
+Makefile.old
+^Makefile$

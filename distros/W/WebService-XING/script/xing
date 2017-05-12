@@ -1,0 +1,339 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Encode qw(decode decode_utf8);
+use Encode::StdIO;
+use Errno qw(ENOENT);
+use Fcntl qw(:DEFAULT);
+use File::Basename qw(fileparse);
+use File::HomeDir qw(home);
+use File::Spec::Functions qw(catdir catfile splitdir);
+use Getopt::Long qw(GetOptions :config no_ignore_case pass_through);
+use Term::Encoding qw(term_encoding);
+use YAML::Any qw(Dump);
+
+my $Program = __FILE__;
+my (@BasePath, $Path, $BaseName, $Suffix, $Me);
+
+BEGIN {
+    ($BaseName, $Path, $Suffix) = fileparse __FILE__, qr/\.[^.]*/;
+    $Me = $BaseName . $Suffix;
+    @BasePath = splitdir($Path . '..');
+
+    my $lib = join '/', @BasePath, 'lib';
+    -e catdir(@BasePath, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
+}
+
+use WebService::XING;
+
+sub function ($$);
+sub login ($$$);
+sub read_config_file($$);
+sub create_config_file($$);
+sub get_help($);
+
+my $help;
+
+GetOptions 'help|h' => \$help;
+
+my $command = shift // 'help';
+
+if (not $help and lc $command eq 'help') {
+    $help = 1;
+    $command = shift;
+}
+
+get_help $command and exit if $help;
+
+
+my $config = read_config_file home, $BaseName
+    or do {
+        create_config_file home, $BaseName;
+        exit;
+    };
+my $client = $config->{client}
+    or die "Client data missing in config file\n";
+my $xing = WebService::XING->new(key => $client->{id}, secret => $client->{secret});
+
+if ($command eq 'login') {
+    login $xing, home, $BaseName;
+}
+else {
+    my $access = $config->{access}
+        or die <<_EOT_;
+Access credential data missing in config file. Try
+
+  $Program login
+
+_EOT_
+
+    $xing->access_credentials(@$access{qw(token secret user_id)});
+
+    function $xing, $command;
+}
+
+
+sub function ($$) {
+    my ($xing, $s) = @_;
+    (my $cmd = $s) =~ s/-/_/g;
+    my $function = WebService::XING::function($cmd)
+        or die qq'Unknown XING command: $s\n';
+    my (%opts, @pattern);
+
+    for (@{$function->params}) {
+        (my $param = $_->name) =~ s/_/-/g;
+
+        if ($_->is_boolean) {
+            push @pattern, $param . '!';
+        }
+        else {
+            push @pattern, $param . '=s' . ($_->is_list ? '@' : '');
+        }
+    }
+
+    GetOptions(\%opts, @pattern);
+
+    die "$Me $s: unknown options: @ARGV\n" if @ARGV;
+
+    my @miss;
+
+    for (@{$function->params}) {
+        (my $param = $_->name) =~ s/_/-/g;
+
+        push @miss, $param
+            if $_->is_required and not exists $opts{$param};
+    }
+
+    die "$Me $s: missing options: " . join(', ', map { "--$_" } @miss) . "\n"
+        if @miss;
+
+    my $encoding = term_encoding;
+    my @args;
+
+    while (my ($k, $v) = each %opts) {
+        $k =~ s/-/_/g;
+        push @args, $k, ref $v ? [map {decode $encoding, $_} @$v] : decode $encoding, $v;
+    }
+
+    my $res = $function->code->($xing, @args);
+        
+    unless ($res) {
+        my $msg = $res->message;
+        die $res == 401 ? <<_EOT_ : "$msg\n";
+$msg. Try
+
+  $Program login
+
+_EOT_
+    }
+
+    print decode_utf8 Dump $res->content;
+}
+
+sub login ($$$) {
+    my ($xing, $home, $basename) = @_;
+    my $config = catfile $home, '.' . $basename . 'rc';
+    my $res; $res = $xing->login or die $res;
+    my $c = $res->content;
+    my ($auth_url, $rtoken, $rsecret) = @$c{qw(url token token_secret)};
+
+    print qq'Open\n\n  $auth_url\n\nClick "OK" and enter the displayed PIN\nhere > ';
+
+    my $pin = <STDIN>;
+
+    chomp $pin;
+    $res = $xing->auth(
+        token => $rtoken, token_secret => $rsecret, verifier => $pin
+    ) or die $res;
+
+    $c = $res->content;
+
+    print <<_EOT_;
+Please edit the config file $config and set:
+
+-- snip --------------------------------------------------------
+
+[access]
+; The access token
+token = $c->{token}
+
+; The access token secret
+secret = $c->{token_secret}
+
+; The user id
+user_id = $c->{user_id}
+
+-- snap --------------------------------------------------------
+
+When done, you are ready to use XING from the shell. Start with
+
+  $Program help
+
+_EOT_
+}
+
+sub read_config_file ($$) {
+    my ($home, $basename) = @_;
+    my $config = catfile $home, '.' . $basename . 'rc';
+    my %data;
+
+    sysopen my $fh, $config, O_RDONLY
+        or do {
+            return undef if $! == ENOENT;
+            die "Can't read $config: $!\n";
+        };
+
+    my $lineno = 0;
+    my $section = '_';
+    while (<$fh>) {
+        ++$lineno;
+        /^\s*(?:;|#|$)/ and next;
+        s/\s+(?:;|#);.*$//g;
+        /^\s*\[\s*(.+?)\s*\]\s*$/
+            and $section = $1, next;
+        /^\s*([^=\s][^=]*?)\s*=\s*(.*?)\s*$/
+            or die "Invalid formatted data in line $lineno: $_\n";
+        $data{$section}{$1} = $2;
+    }
+    close $fh;
+
+    return \%data;
+}
+
+
+sub create_config_file ($$) {
+    my ($home, $basename) = @_;
+    my $config = catfile $home, '.' . $basename . 'rc';
+    my $nonce = WebService::XING::nonce;
+
+    print <<'_EOT_';
+
+Configuration file does not exist yet.
+
+_EOT_
+
+    sysopen my $fh, $config, O_WRONLY | O_CREAT | O_EXCL, 0600
+        or die "Can't create $config: $!\n";
+    print $fh <<_EOF_;
+; $Me configuration
+;
+; This is an INI file - http://en.wikipedia.org/wiki/INI_file
+;
+; Comments and empty lines are ignored.
+; Comments begin with either a semicolon ';' or a hash mark '#'.
+
+[client]
+; The client identifier, a.k.a. "consumer key"
+id = CONSUMER_KEY_HERE
+
+; The client shared secret, a.k.a. "consumer secret"
+secret = CONSUMER_SECRET_HERE
+
+[access]
+; The access token
+token = 
+
+; The access token secret
+secret = 
+
+; The user id
+user_id = 
+
+_EOF_
+    close $fh;
+
+    print <<"_EOT_";
+I have created one for you:
+
+  $config
+
+Please edit the file in order to insert client id and shared secret.
+
+Then run
+
+  $Program login
+
+_EOT_
+
+}
+
+sub get_help ($) {
+    my $s = shift;
+
+    if ($s) {
+        (my $cmd = $s) =~ s/-/_/g;
+        my $function = WebService::XING::function($cmd)
+            or die qq'Unknown XING command: $s\n';
+
+        print <<_EOT_;
+
+Usage: $Me $s <options>
+
+Valid options:
+_EOT_
+
+        for my $p (@{$function->params}) {
+            (my $param = $p->name) =~ s/_/-/g;
+
+            if ($p->is_boolean) {
+                printf "   %-41s (default: --%s%s)\n",
+                       '--' . $param . ' / --no-' . $param,
+                       ($p->default ? '' : 'no-'), $param;
+            }
+            else {
+                printf "   %-41s (%s)\n",
+                       '--' . $param .
+                       ($p->is_list ? '=value1,value2,value3,...' : '=value'),
+                       $p->is_required ? 'required' : 'optional';
+            }
+        }
+    }
+    else {
+        print <<_EOT_;
+Usage: $Me <command> <args>
+
+Valid commands:
+_EOT_
+
+        print map { s/_/-/g; "   $_\n" } @{WebService::XING::functions()};
+
+        print <<_EOT_;
+
+See '$Me help <command>' for more information on a specific command.
+
+_EOT_
+    }
+
+    return 1;
+}
+
+__END__
+
+=head1 NAME
+
+xing - Control XING from the Shell
+
+=head1 SYNOPSIS
+
+  $ xing
+  $ xing login
+  $ xing get-user-details --id=me
+  $ xing create-status-message --id=me --message="I Can Has Hamburger"
+
+=head1 DESCRIPTION
+
+The C<xing> command brings XING to the command line. Type
+
+  xing
+
+for more information.
+
+The returned data ist formatted in C<YAML>.
+
+=head1 SEE ALSO
+
+L<WebService::XING>, L<https://dev.xing.com/>, L<http://yaml.org/>.
+

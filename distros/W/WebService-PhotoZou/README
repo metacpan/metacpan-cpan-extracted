@@ -1,0 +1,219 @@
+NAME
+    WebService::PhotoZou - Easy-to-use Interface for PhotoZou Web Services
+
+SYNOPSIS
+      use WebService::PhotoZou;
+
+      my $api = WebService::PhotoZou->new(
+          username => $username,
+          password => $password,
+          site     => 'jp',      # if you use photozou.com, set 'com'.
+      );
+
+      my $photo_id = $api->photo_add(
+          photo       => $filename, # required
+          album_id    => $album_id, # required
+          photo_title => $title,
+          tag         => $tag,
+          comment     => $comment,
+          date_type   => 'date',    # 'exif' or 'date'
+          year        => $year,     # required when date_type is 'date'
+          month       => $month,    # required when date_type is 'date'
+          day         => $day,      # required when date_type is 'date'
+      ) or die $api->errormsg;
+
+      my $album_id = $api->photo_add_album(
+          name                   => $name,        # required
+          description            => $description,
+          perm_type              => 'allow',      # 'allow' or 'deny'
+          perm_type2             => 'user_group', # 'net' or 'everyone' or 'all or 'user_group'
+          perm_id                => $perm_id,     # you can set it when you set perm_type2 'user_group'
+          order_type             => 'upload',     # 'upload' or 'date' or 'comment' or 'file_name'
+          copyright_type         => 'normal',     # 'normal' or 'creativecommons'
+          copyright_commercial   => 'yes',        # 'yes' or 'no'
+          copyright_modification => 'yes',        # 'yes' or 'no' or 'share'
+      ) or die $api->errormsg;
+
+      my $albums = $api->photo_album or die $api->errormsg;
+      for my $album (@{$albums}) {
+          $album->{album_id};
+          $album->{user_id};
+          $album->{name};
+          $album->{description};
+          $album->{perm_type};
+          $album->{perm_type2};
+          $album->{perm_id};
+          $album->{order_type};
+          $album->{photo_num};
+      }
+
+      my $photos = $api->search_public(
+          type                    => 'photo',  # 'photo' or 'video' or 'all'
+          order_type              => 'date',   # 'date' or 'favorite'
+          keyword                 => $keyword,
+          copyright               => 'normal', # 'normal' or 'creativecommons' or 'all'
+          copyright_commercial    => 'yes',    # you can set 'yes' or 'no' when you set copyright 'creativecommons'
+          copyright_modifications => 'yes',    # you can set 'yes' or 'no' or 'share' when you set copyright 'creativecommons'
+          limit                   => 1000,
+          offset                  => 0,
+      ) or die $api->errormsg;
+      for my $photo (@{$photos}) {
+          $photo->{photo_id};
+          $photo->{user_id};
+          $photo->{album_id};
+          $photo->{photo_title};
+          $photo->{favorite_num};
+          $photo->{comment_num};
+          $photo->{copyright};
+          $photo->{copyright_commercial};
+          $photo->{copyright_modifications};
+          $photo->{regist_time};
+          $photo->{url};
+          $photo->{image_url};
+          $photo->{original_image_url};
+          $photo->{thumbnail_image_url};
+      }
+
+      my $groups = $api->user_group or die $api->errormsg;
+      for my $group (@{$groups}) {
+          $group->{group_id};
+          $group->{name};
+          $group->{user_num};
+      }
+
+DESCRIPTION
+    This module priovides you an Object Oriented interface for PhotoZou Web
+    Services.
+
+    PhotoZou (http://photozou.jp/) is a Internet-based service that can
+    easily share photo and album.
+
+METHODS
+    All API methods returns undef on failure. You can get error objects by
+    errors or get formatted message by errormsg.
+
+  new([%options])
+    Returns an instance of this module. The following option can be set:
+
+      username
+      password
+      site     # 'jp' or 'com'
+
+  ua([$ua])
+    Set or get an LWP::UserAgent instance.
+
+  username([$username])
+    Accessor for username.
+
+  password([$password])
+    Accessor for password.
+
+  photo_add(%options)
+    Add photo/movie. Returns added photo/movie's id. The following option
+    can be set:
+
+      photo       # must be set filename.
+      album_id    # required
+      photo_title
+      tag
+      comment
+      date_type   # 'exif' or 'date'
+      year        # required when date_type is 'date'
+      month       # required when date_type is 'date'
+      day         # required when date_type is 'date'
+
+    See the official API documents about detail of options and return
+    values.
+
+  photo_add_album(%options)
+    Add album. Returns added album's id. The following option can be set:
+
+      name                   # required
+      description
+      perm_type              # 'allow' or 'deny'
+      perm_type2             # 'net' or 'everyone' or 'all or 'user_group'
+      perm_id                # you can set when you set perm_type2 'user_group'
+      order_type             # 'upload' or 'date' or 'comment' or 'file_name'
+      copyright_type         # 'normal' or 'creativecommons'
+      copyright_commercial   # 'yes' or 'no'
+      copyright_modification # 'yes' or 'no' or 'share'
+
+  photo_album
+    Returns your albums list. The hashref contains the following fields:
+
+      album_id
+      user_id
+      name
+      description
+      perm_type
+      perm_type2
+      perm_id
+      order_type
+      photo_num
+
+  search_public(%options)
+    Search public photo/movie. The following option can be set:
+
+      type                    # 'photo' or 'video' or 'all'
+      order_type              # 'date' or 'favorite'
+      keyword
+      copyright               # 'normal' or 'creativecommons' or 'all'
+      copyright_commercial    # you can set 'yes' or 'no' when you set copyright 'creativecommons'
+      copyright_modifications # you can set 'yes' or 'no' or 'share' when you set copyright 'creativecommons'
+      limit
+      offset
+
+    Returns result objects as arrayref. The hashref contains the following
+    fields:
+
+      photo_id
+      user_id
+      album_id
+      photo_title
+      favorite_num
+      comment_num
+      copyright
+      copyright_commercial
+      copyright_modifications
+      regist_time
+      url
+      image_url
+      original_image_url
+      thumbnail_image_url
+
+  user_group
+    Returns your user groups as arrayref. The hashref contains the following
+    fields:
+
+      group_id
+      name
+      user_num
+
+  errors
+    Returns hashref of error objects as arrayref. The hashref contains the
+    following fields:
+
+      code
+      msg
+
+  errormsg
+    Returns formatted error message.
+
+  nop
+    API test method.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   http://photozou.jp/
+
+    *   http://photozou.jp/basic/api
+
+    *   http://photozou.com/
+
+    *   http://photozou.com/basic/api
+

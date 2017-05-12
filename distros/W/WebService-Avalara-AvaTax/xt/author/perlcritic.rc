@@ -1,0 +1,30 @@
+severity = brutal
+verbose = 8
+exclude = CodeLayout::ProhibitHashBarewords Perl::Critic::Policy::Documentation::RequirePODUseEncodingUTF8 Editor::RequireEmacsFileVariables Modules::RequirePerlVersion Tics::ProhibitLongLines
+
+[Bangs::ProhibitCommentedOutCode]
+commentedcoderegex = pod\s+\K\$[A-Za-z_].*=
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.008
+[Compatibility::PodMinimumVersion]
+above_version = 5.008
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = carp cluck confess croak die exit goto warn throw
+
+[Documentation::PodSpelling]
+stop_words = AvaTax Avalara username boolean uri URI WSDL wsdl Perldoc perldoc API hashref ish DOM UTC ApplyPayment TaxSvc PaymentDate adaptors ReconcileTaxHistory ERP AccountSvc DocumentFetch AVALARA untrusted WSS
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Const::Fast::const Log::Report::dispatcher Moo::has Moo::with Moo::Role::around Moo::Role::has Sys::Hostname::hostname
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+

@@ -1,0 +1,303 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Request - internal request interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Request - internal request interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface extends <STRONG>Servlet::ServletRequest</STRONG> to provide
+fields and methods accessible only to the container.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getApplication"><CODE>getApplication()</CODE></A></STRONG><BR>
+<DD>
+Return the Application within which this Request is being processed.
+<P></P>
+<DT><STRONG><A NAME="item_setApplication"><CODE>setApplication($application)</CODE></A></STRONG><BR>
+<DD>
+Set the Application within which this Request is being processed. This
+must be called as soon as the appropriate Application is identified,
+because it enables parsing of the request URI.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24application">$application</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Application</STRONG> within which the Request is being processed
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAuthorization"><CODE>getAuthorization()</CODE></A></STRONG><BR>
+<DD>
+Return the authorization credentials sent with this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthorization"><CODE>setAuthorization($authorization)</CODE></A></STRONG><BR>
+<DD>
+Sets the authorization credentials sent with this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24authorization">$authorization</A></STRONG><BR>
+<DD>
+the authorization credentials
+<P></P></DL>
+<DT><STRONG><A NAME="item_getConnector"><CODE>getConnector()</CODE></A></STRONG><BR>
+<DD>
+Return the Connector through which this Request was received.
+<P></P>
+<DT><STRONG><A NAME="item_setConnector"><CODE>setConnector($connector)</CODE></A></STRONG><BR>
+<DD>
+Set the Connector through which this request was received.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connector">$connector</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Connector</STRONG> that received the request
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHandle"><CODE>getHandle()</CODE></A></STRONG><BR>
+<DD>
+Return the input handle associated with this Request. Usually the
+Socket and Handle for the Request are the same object, but this is not
+required.
+<P></P>
+<DT><STRONG><A NAME="item_setHandle"><CODE>setHandle($handle)</CODE></A></STRONG><BR>
+<DD>
+Set the input handle ssociated with this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24handle">$handle</A></STRONG><BR>
+<DD>
+the <STRONG>IO::Handle</STRONG> associated with this Request
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequest"><CODE>getRequest()</CODE></A></STRONG><BR>
+<DD>
+Return the ServletRequest which acts as a facade for this Request to
+servlet applications.
+<P></P>
+<DT><STRONG><A NAME="item_getResponse"><CODE>getResponse()</CODE></A></STRONG><BR>
+<DD>
+Return the Response with which this Request is associated.
+<P></P>
+<DT><STRONG><A NAME="item_setResponse"><CODE>setResponse($response)</CODE></A></STRONG><BR>
+<DD>
+Set the Response with which this Request is associated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Response</STRONG> with which this Request is associated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSocket"><CODE>getSocket()</CODE></A></STRONG><BR>
+<DD>
+Return the Socket (if any) through which this Request was
+received. This should <STRONG>only</STRONG> be used to access underlying state
+information about the Socket, such as the SSL information of a
+<STRONG>IO::Socket::SSL</STRONG>.
+<P></P>
+<DT><STRONG><A NAME="item_setSocket"><CODE>setSocket($socket)</CODE></A></STRONG><BR>
+<DD>
+Set the Socket (if any) through which this Request was received.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24socket">$socket</A></STRONG><BR>
+<DD>
+the <STRONG>IO::Socket</STRONG> through which this Request was received
+<P></P></DL>
+<DT><STRONG><A NAME="item_getWrapper"><CODE>getWrapper()</CODE></A></STRONG><BR>
+<DD>
+Returns the Wrapper within which this Request is being processed.
+<P></P>
+<DT><STRONG><A NAME="item_setWrapper"><CODE>setWrapper($wrapper)</CODE></A></STRONG><BR>
+<DD>
+Set the Wrapper within which this Request is being processed. This
+must be called as soon as the appropriate Wrapper is identified, and
+before the Request is ultimately passed to an application servlet.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24wrapper">$wrapper</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Wrapper</STRONG> associated with this Request
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addLocale"><CODE>addLocale($loc)</CODE></A></STRONG><BR>
+<DD>
+Add a locale to the set of preferred Locales for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24loc">$loc</A></STRONG><BR>
+<DD>
+the locale to add
+<P></P></DL>
+<DT><STRONG><A NAME="item_addParameter">addParameter($name, @values)</A></STRONG><BR>
+<DD>
+Add a named parameter with one or more values to this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the parameter to add
+<P></P>
+<DT><STRONG><A NAME="item_%40values">@values</A></STRONG><BR>
+<DD>
+a list of one or more parameter values, scalar or <CODE>undef</CODE>
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearLocales"><CODE>clearLocales()</CODE></A></STRONG><BR>
+<DD>
+Clear the list of locales for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_clearParameters"><CODE>clearParameters()</CODE></A></STRONG><BR>
+<DD>
+Clear the set of parameters for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_createInputHandle"><CODE>createInputHandle()</CODE></A></STRONG><BR>
+<DD>
+Create and return a <STRONG>Servlet::ServletInputHandle</STRONG> to read the content
+associated with this Request.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException">Servlet::Util::IOException</A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_finishRequest"><CODE>finishRequest()</CODE></A></STRONG><BR>
+<DD>
+Perform whatever actions are required to flush and close the input
+handle or reader.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG>Servlet::Util::IOException</STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_setContentLength"><CODE>setContentLength($length)</CODE></A></STRONG><BR>
+<DD>
+Set the length, in bytes, of the request body provided by the input
+handle.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24length">$length</A></STRONG><BR>
+<DD>
+the content length in bytes
+<P></P></DL>
+<DT><STRONG><A NAME="item_setContentType"><CODE>setContentType($type)</CODE></A></STRONG><BR>
+<DD>
+Set the MIME type of the body of the body of the request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24type">$type</A></STRONG><BR>
+<DD>
+the MIME type
+<P></P></DL>
+<DT><STRONG><A NAME="item_setProtocol"><CODE>setProtocol($protocol)</CODE></A></STRONG><BR>
+<DD>
+Set the name and version of the protocol used for the request in the
+form <EM>protocol/majorVersion.minorVersion</EM>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24protocol">$protocol</A></STRONG><BR>
+<DD>
+the name and version of the protocol
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRemoteAddr"><CODE>setRemoteAddr($remote)</CODE></A></STRONG><BR>
+<DD>
+Set the remote IP address associated with this Request. This value
+will be used to resolve the name of the remote host if necessary.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24remote">$remote</A></STRONG><BR>
+<DD>
+the remote IP address
+<P></P></DL>
+<DT><STRONG><A NAME="item_setScheme"><CODE>setScheme($scheme)</CODE></A></STRONG><BR>
+<DD>
+Set the name of the scheme used to make this request, for example
+<EM>http</EM>, <EM>https</EM>, or <EM>ftp</EM>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24scheme">$scheme</A></STRONG><BR>
+<DD>
+the name of the scheme
+<P></P></DL>
+<DT><STRONG><A NAME="item_setSecure"><CODE>setSecure($secure)</CODE></A></STRONG><BR>
+<DD>
+Set a value indicating whether or not the request was made using a
+secure channel.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24secure">$secure</A></STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setServerName"><CODE>setServerName($name)</CODE></A></STRONG><BR>
+<DD>
+Set the host name of the server which received this request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the host name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setServerPort"><CODE>setServerPort($port)</CODE></A></STRONG><BR>
+<DD>
+Set the port number on which this request was received.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24port">$port</A></STRONG><BR>
+<DD>
+the port number
+<P></P></DL>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/IO/Handle.html">the IO::Handle manpage</A>,
+<A HREF="../../api/IO/Socket.html">the IO::Socket manpage</A>,
+<A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/ServletServletInputHandle.html">the Servlet::ServletServletInputHandle manpage</A>,
+<A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../api/Wombat/Application.html">the Wombat::Application manpage</A>,
+<A HREF="../../api/Wombat/Connector.html">the Wombat::Connector manpage</A>,
+<A HREF="../../api/Wombat/Response.html">the Wombat::Response manpage</A>,
+<A HREF="../../api/Wombat/Wrapper.html">the Wombat::Wrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

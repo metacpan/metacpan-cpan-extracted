@@ -1,0 +1,56 @@
+Revision history for Perl extension Win32::GUI::AxWindow.
+
+0.09  15/10/2006
+    - Win32::GUI 1.04 release. See CHANGELOG
+
+0.08  27/05/2006
+    - Merge into Win32::GUI core build
+    - new build process (re-write Makefile.PL)
+    - tidy documentation
+    - tidy and correct demos
+    - Introduce sub-classes:
+    - Methods that return lists now use XSRETURN_EMPTY rather than
+      XSRETURN_UNDEF when there is nothing to return
+
+0.07  03/02/2004
+    - Correct GetOLE() method when using PAR and PerlApp.
+
+0.06  28/09/2003
+    - Rewrite creation method (Remove AttachControl method).
+    - No more need to call Release Method before exit.
+    - Correct bug in GetPropertyInfo with VARTYPE property.
+    - Correct -heigth option.
+    - Update and add samples.
+
+0.05  15/10/2002
+    - Add GetOLE method (return a Win32::OLE object of Hosted ActiveX Control).
+    - Add TestOle.pl Sample.
+
+0.04  14/09/2002
+    - Add indexed property support.
+    - Change code organisation (Invoke method, CProperty child of CMethod).
+    - Add MSFlexGrid Sample.
+
+0.03  30/05/2002
+    - Add VARTYPE property support.
+    - Add output parameter for event support.
+    - Accept control without event.
+    - Correct DHTMLEdit.pm wrapper class.
+
+0.02  25/03/2002
+    - Correct ReadOnly value for Properties.
+    - Add =value for Enum string list for Properties.
+    - Test ReadOnly attribut in SetProperty.
+    - SetProperty handle Enum property by value or string constant.
+    - Add a Release method for clean ActiveX reference before window destroy.
+    - Manage VT_USERDEFINED as enum in CallMethod.
+    - Add some documentation (sorry for my english ;-).
+    - Add DHTML Edit sample (basic and a wrapper class).
+
+0.01  22/03/2002
+    - original version; created by h2xs 1.19
+    - ActiveX control information (Properties, Metods, Events).
+    - Set/Get property.
+    - Call a Method.
+    - Event Support.
+    - Support of basic variant type.

@@ -1,0 +1,59 @@
+inherit:../layout.cf
+
+liststarttable1
+<hr width=760>
+<center>
+<table width="752" border="0" cellspacing="0" cellpadding="1">
+<tr><td bgcolor="#000000">
+<table width="750" border="0" cellspacing="2" cellpadding="1" bgcolor="#888800">
+<tr>
+<td align=left valign=top width=200>
+<a href="index.wsql"><en 1>Home</en><nl 1>Thuispagina</nl></a>
+</td>
+<td align=center width=350><font color="#FFFFFF"><b>
+
+liststarttable2
+</b></font></td>
+<td width=200 valign=top align=right><a href="http://wesql.org">WeSQL</a></td>
+</tr>
+</table>
+</td></tr>
+</table>
+<center>
+&nbsp;
+<table width="752" border="0" cellspacing="0" cellpadding="1">
+<tr><td bgcolor="#000000">
+<table width="750" border="0" cellspacing="0" cellpadding="5" bgcolor="#e8e8e8">
+<tr><td align=center>
+<table cellspacing="5">
+
+listfooter
+</center>
+<center>
+<!-- EVAL PRE
+	my $retval = "";
+  $retval .= "</center><p>";
+  if (defined($cookies{id})) {
+    my @login = &sqlSelect($dbh,"select id from logins where uid='$cookies{id}' and hash='$cookies{hash}' and status='1'");
+    $retval .= '<center>[<a href="jlogout.wsql?redirdest=index.wsql"><en 3>Logout</en><nl 3>Uitloggen</nl></a>]</center><p>' if (defined($login[0]));
+  }
+	return $retval;
+/EVAL PRE -->
+<font size=-1>
+<en 4>
+<center>This page has been generated dynamically with <a href=http://wesql.org>WeSQL v0.53</a><br>
+Copyright (c) 2000-2002 by <a href=mailto:w@wesql.org>Ward Vandewege</a>.<br>
+This program is free software; you can redistribute it and/or modify it under the terms of the GPL.<br>
+Dear Bill, this site is best viewed with ANY browser on ANY platform, unlike your MSN!</center>
+</en>
+<nl 4>
+<center>Deze pagina is dynamisch gegenereerd met <a href=http://wesql.org>WeSQL v0.53</a><br>
+Copyright (c) 2000-2002 by <a href=mailto:w@wesql.org>Ward Vandewege</a>.<br>
+Dit programma is 'free software'; u kan het verdelen en/of aanpassen onder de voorwaarden van de GPL.<br>
+Beste Bill, deze site kan best bekeken worden met GELIJK WELKE browser op GELIJK WELK platform, niet zoals uw MSN!</center>
+</nl>
+</font>
+</body>
+</html>
+
+

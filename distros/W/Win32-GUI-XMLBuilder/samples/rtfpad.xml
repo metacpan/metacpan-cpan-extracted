@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<Class name='RE' extends='RichEdit' widget='RichEdit'/>
+	<MakeMenu name='M'>
+		<Item name='File' text='&amp;File'/>
+		<Item text='>New'/>
+		<Item name='Open' text='>Open...'/>
+		<WGXPre><![CDATA[
+			sub Open_Click {
+				my $f = GUI::GetOpenFileName(-title=>'Open...',-directory=>'.',-filter=>["Rich Text (*.rtf)"=>"*.rtf","All files","*.*"]);
+				$self->{R}->Load($f) if -f $f;
+			}
+		]]></WGXPre>
+		<Item text='>Save'/>
+		<Item name='SaveAs' text='>Save As...'/>
+		<WGXPre><![CDATA[
+			sub SaveAs_Click {
+				my $f = GUI::GetSaveFileName(-title=>'Save As...',-directory=>'.',-file=>"\0"." "x256,-filter=>["Rich Text (*.rtf)"=>"*.rtf","All files","*.*"]);
+				$self->{R}->Save($f) if -f $f;
+			}
+		]]></WGXPre>
+		<Item text='>-'/>
+		<Item text='>Page Setup...'/>
+		<Item text='>Print...'/>
+		<Item text='>-'/>
+		<Item name='Exit' text='>Exit'/>
+		<Item name='Edit' text='&amp;Edit'/>
+		<Item text='>Undo'/>
+		<Item text='>-'/>
+		<Item text='>Cut'/>
+		<Item text='>Copy'/>
+		<Item text='>Paste'/>
+		<Item text='>Delete'/>
+		<Item name='Format' text='&amp;Format'/>
+		<Item name='Font' text='>Font...'/>
+		<WGXPre><![CDATA[
+			sub Font_Click {
+				my @f = Win32::GUI::ChooseFont();
+				if ($#f > 0) {
+					my %f = @f;
+					delete $f{-size}; # ??
+					$self->{F} = new Win32::GUI::Font(%f);
+					$self->{R}->SetFont($self->{F});
+				}
+			}
+		]]></WGXPre>
+	</MakeMenu>
+	<Window name='W' dim='0, 0, 1024, 768' class='$self->{C}' menu='$self->{M}' title='Untitled - RTFpad'>
+		<StatusBar name='S' text='exec:$Win32::GUI::XMLBuilder::AUTHOR' 
+			top='exec:$self->{W}->ScaleHeight - $self->{S}->Height if defined $self->{S}'
+			height='exec:$self->{S}->Height if defined $self->{S}'
+		/>
+		<RichEdit name='R'
+			height='$self->{W}->ScaleHeight - $self->{S}->Height'
+			pushstyle='exec:WS_VSCROLL|ES_LEFT|ES_MULTILINE|ES_AUTOVSCROLL' popstyle='exec:WS_EX_CLIENTEDGE'
+			class='$self->{RE}'
+			onRightClick='sub { print "hello right click\n"; }'
+		/>
+		<WGXPost><![CDATA[
+			$self->{R}->SendMessage(1093, 0, 1);
+			$self->{R}->SetEventMask(ENM_MOUSEEVENTS);
+    	sub R_RightClick { # broken because of bug in RichEdit 
+				my ($x, $y) = Win32::GUI::GetCursorPos();
+				$self->{W}->TrackPopupMenu($self->{P}->{PopupMenu}, $x, $y-50);
+			}
+		]]></WGXPost>
+	</Window>
+	<MakeMenu name='P'>
+		<Item name='PopupMenu' text='PopupMenuFunctions'/>
+		<Item text='>Undo'/>
+		<Item text='>-'/>
+		<Item text='>Cut'/>
+		<Item text='>Copy'/>
+		<Item text='>Paste'/>
+		<Item text='>Delete'/>
+		<Item text='>-'/>
+		<Item text='>Select All'/>
+	</MakeMenu>
+</GUI>
+

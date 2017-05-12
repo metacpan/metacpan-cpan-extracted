@@ -1,0 +1,62 @@
+Revision history for WWW-Analytics-MultiTouch
+
+0.01    2010-06-23
+        First version.
+
+0.02	2010-06-23
+	Added missing file bin/multitouch_report.pl
+
+0.03	2010-06-26
+	Added missing dependencies to Makefile.PL
+
+0.04	2010-07-06
+	Re-ordered rows/columns to place largest contributors first.
+
+0.05	2010-07-15
+	New reports - first/last/fifty-fifty, transaction distribution, channel
+	overlap, even distribution.
+
+0.06	2010-08-03
+	Updated documentation for release.
+
+0.07    2010-09-22
+        Added condition_entry, split_events and set_data to MulitTouch.pm.
+        Added --class_name option to multitouch_report.pl
+        Added multitouch_report.pl to list of executables to install in Makefile.PL
+
+0.08    2010-09-24
+        Added parse_config
+
+0.09	2010-09-28
+	Added support for adjustments in summarise().
+
+0.10	2010-12-11
+	Added extra debug.
+	Added strict_integer_values option.
+
+0.11	2010-12-11
+	Fixed bug in debug output.
+
+0.12	2010-12-20
+	Attempted fix for test failures on Win32
+
+0.13	2010-12-22
+	Further fix for test failures on Win32
+
+0.30    2012-08-05
+        Upgraded to use Net::Google::Analytics version 3.00 (new API) including OAuth2.
+
+0.32    2012-08-06
+        Post-upgrade fixes
+ 
+0.33    2012-08-07
+        Potential divide-by-zero fixes.
+ 
+0.34    2012-08-29
+        Fixed logical error that required the --conf option, otherwise the auth_file would be ignored.
+
+0.35    2012-12-11
+        Adjusted tests to work with perl 5.17.6 (relaxed requirement on output sorting), rt.cpan.org #81877
+
+0.36	2014-06-19
+	Fixed XLS encoding problem on perl 5.16.

@@ -1,0 +1,66 @@
+NAME 
+
+Win32::DriveInfo - drives on Win32 systems 
+
+
+ABSTRACT 
+
+With this module you can get total/free space on Win32 drives,
+volume names, architecture, filesystem type, drive attributes, list
+of all available drives and free drive-letters. Additional function
+to determine Windows version info. 
+
+The intention was to have a part of Dave Roth's Win32::AdminMisc
+functionality on Win95/98. 
+
+The current version of Win32::DriveInfo is available at: 
+
+  http://base.dux.ru/guest/fno/perl/
+
+INSTALLATION
+
+As this is just a plain module no special installation is needed.
+Just put it into /Win32 subdir somewhere in your @INC. The standard 
+
+ Makefile.PL
+ make
+ make test
+ make install
+
+installation procedure is provided. In addition 
+
+ make html
+
+will produce the HTML-docs. 
+
+This module requires 
+
+Win32::API module by Aldo Calpini 
+
+CAVEATS 
+
+This module has been created and tested in a Win95 environment
+on GS port of Perl 5.004_02. As it uses Win32::API module I expect
+it would work fine with other ports like ActiveState if Win32::API
+(API.dll) is compiled for this port. 
+
+VERSION 
+
+This man page documents Win32::DriveInfo version 0.06 
+
+March 12, 2000. 
+
+AUTHOR 
+
+Mike Blazer <blazer@mail.nevalink.ru> 
+
+http://base.dux.ru/guest/fno/perl/
+
+COPYRIGHT 
+
+Copyright (C) 1998-2000 by Mike Blazer. All rights reserved. 
+
+LICENSE 
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

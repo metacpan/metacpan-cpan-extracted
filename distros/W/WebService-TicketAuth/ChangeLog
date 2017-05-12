@@ -1,0 +1,27 @@
+Revision history for WebService::TicketAuth
+
+1.05  Jan 7, 2005  Bryce Harrington
+	- Re-fixing inheritance behavior.  I'll get it figured out one of
+	  these days...
+	
+1.04  Jan 5, 2005  Bryce Harrington
+	- Fixed inheritance behavior & added login() accessor funciton
+	- Documenting how to use SSL with login
+	- Adding example logout script
+	- In DBI example, switching to use connect_cached instead of
+ 	  connect
+
+1.03  Dec 1, 2005  Bryce Harrington
+	- Fixes to packaging / rpm generation
+	- Adding basic example files forgotten in previous release
+	
+1.02  Nov 18, 2004  Bryce Harrington
+	- Improvements to packaging and functionality
+	
+1.01  Nov 10, 2004  Bryce Harrington
+	- Added WebService::TicketAuth::DBI
+	
+1.00  original version; created by sdist 1.9
+	- WebService::TicketAuth
+
+

@@ -1,0 +1,38 @@
+---
+abstract: 'Get and set file times in Windows - including open files'
+author:
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32API-File-Time
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Win32API::File::Time:
+    file: lib/Win32API/File/Time.pm
+    version: '0.008'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Time::Local: '0'
+  Win32::API: '0.01'
+  Win32API::File: '0.08'
+  perl: '5.006002'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Win32API-File-Time.git
+version: '0.008'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

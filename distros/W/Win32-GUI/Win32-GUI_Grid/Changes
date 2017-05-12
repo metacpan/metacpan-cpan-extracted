@@ -1,0 +1,49 @@
+
+Revision history for Perl extension Win32::GUI::Grid.
+
+0.08  24/05/2006
+    - Merge into Win32::GUI core distribution
+    - Minor fix to constants() XS and AUTOLOAD() functions ( not re-setting $! )
+
+0.07  14/02/2004
+    - Use MFC Grid control 2.25
+    - Correct EnsureCellVisible methods ( bad name in XS, but keep EnsureVisible for compatibility)
+    - Fix locale setting problem.
+
+0.06  14/02/2004
+    - Fix Clipboard error (Ctrl+C) [Thank to Andrew St. Denis]
+    - Fix some Grid draw problem
+    - Add WM_PRINTCLIENT support for new Win32::GUI -noflicker option.
+    - New Cell Type (Calendar, URL)
+    - SetCellOptions : New options
+
+0.05  07/09/2003
+    - Add SetCellEditable method.
+    - Add List cell editing.
+    - New event _ChangedEdit for COMBO and LIST edit control when select change in list.
+
+0.04  07/08/2003
+    - Correct -heigth option.
+    - In InsertColumn, set last parameter optional.
+    - Add Column Perl Sort method.
+
+0.03  03/06/2003
+    - Correct Abnormal termination when multiple grid instance
+
+0.02  03/06/2003
+    - Correct crash when destroy grid during cell edit.
+    - Virtual Mode support.
+    - New cell editing support.
+        + Numeric
+        + Date
+        + Time
+        + Check
+        + Combo
+    - Add Perl Sort method.
+
+0.01  28/05/2003
+    - First build Win32::GUI::Grid
+    - Use MFC Grid control 2.24
+
+TODO
+    - Printing support (???)

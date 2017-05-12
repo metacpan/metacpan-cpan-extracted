@@ -1,0 +1,56 @@
+Weather-NOAA-GFS version 0.07
+=============================
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   
+   
+   
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+HTML::LinkExtractor
+LWP::UserAgent
+Net::FTP
+Data::Dumper
+Time::Local
+Cwd
+
+Extra Software:
+GrADS - http://grads.iges.org/grads/grads.html
+used: wgrib, gradsc. Need cbarn.gs to show palette in PNG output
+
+R - http://www.r-project.org/
+add module GStat
+
+
+
+
+
+TO DO
+
+1) parameters in function to allow process of single or selected climate vectors (es: only rain and temperature).
+2) enlarge temperature palette for PNG output
+3) working dir parameter.
+4) caching the server response if positive to prevent multiple request not needed
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Lorenzo Becchi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+

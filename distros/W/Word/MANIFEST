@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Word-Anagram.t
+lib/Word/Anagram.pm

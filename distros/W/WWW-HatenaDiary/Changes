@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::HatenaDiary
+
+0.02    Tue Jan 30 01:18:09 2008
+        - This module now uses WWW::HatenaLogin to login to Hatena::Diary.
+        (Thanks to Yappo++)
+        - Fixed a bug: creating/updating entry fails if diary is under private.
+
+0.01    Tue Jan  1 22:45:04 2008
+        - original version

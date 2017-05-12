@@ -1,0 +1,31 @@
+---
+abstract: 'Perl interface to http://shorl.com'
+author:
+  - 'Iain Truskett <spoon@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-Shorl
+requires:
+  Carp: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  WWW::Shorten: '3.08'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/p5-shorten/www-shorten-shorl/issues
+  homepage: https://github.com/p5-shorten/www-shorten-shorl
+  repository: https://github.com/p5-shorten/www-shorten-shorl.git
+version: '2.101'
+x_contributors:
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Dave Cross <davecross@cpan.org>'

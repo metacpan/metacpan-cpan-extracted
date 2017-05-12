@@ -1,0 +1,162 @@
+NAME
+    Win32::ASP::Extras - a extension to Win32::ASP that provides
+    more methods
+
+SYNOPSIS
+      use Win32::ASP::Extras;
+
+      Win32::ASP::Set('my_hash',
+          { fullname => 'Toby Everett',
+            username => 'EverettT',
+            role => 'Editor'
+          } );
+
+      Win32::ASP::Redirect('userinfo.asp', reason => "I just feel like redirecting.");
+
+      exit;
+
+      use Win32::ASP::Extras;
+
+      my $userinfo = Win32::ASP::Get('my_hash');
+
+      foreach my $i (sort keys %{$userinfo}) {
+        $main::Response->Write("$i $userinfo->{$i}<P>\n");
+      }
+
+      exit;
+
+DESCRIPTION
+  Installation instructions
+
+    This installs with MakeMaker.
+
+    To install via MakeMaker, it's the usual procedure - download
+    from CPAN, extract, type "perl Makefile.PL", "nmake" then "nmake
+    install". Don't do an "nmake test" because the ASP objects won't
+    be available and so won't work properly.
+
+Function Reference
+  use Win32::ASP::Extras;
+
+    This imports the following methods into the Win32::ASP
+    namespace. There is no need to `use Win32::ASP;' in order to
+    `use Win32::ASP::Extras;'. The modules are independent of each
+    other and only share a namespace.
+
+    To be more precise, `use Win32::ASP::Extras'' loads everything
+    into `Win32::ASP::Extras' and then aliases the symbol table
+    entries over into `Win32::ASP'. This is to avoid any weirdness
+    with respect to AutoLoader.
+
+  FormatURL Url [, HASH]
+
+    This is designed to take a base URL and a hash of parameters and
+    return the properly assembled URL. It does, however, have some
+    weird behavior.
+
+    If the first character of the URL is not a forward slash and
+    `$main::WEBROOT' is defined, the function will automatically
+    prepend `$main::WEBROOT/' to the URL. This has the side effect
+    of making 95% of URLs absolute relative to `$main::WEBROOT', if
+    it is defined. This makes it easier to move Webs around just by
+    changing `$main::WEBROOT'.
+
+    If the first character of the URL is a forward slash, the URL is
+    left unchanged.
+
+    If the first characters are "`./'", the "`./'" is stripped off
+    and the URL left unchanged. This allows one to specify relative
+    URLs - just put a "`./'" in front of it.
+
+    The parameters are URLEncoded, but the keys for them are not.
+    The resultant parameter list is HTML encoded so that
+    `&timestamp' doesn't become `xtamp' (`&times;' encodes a
+    multiplication symbol).
+
+  QueryStringList
+
+    This returns a list of QueryString keys and values. It does not
+    deal with multi-valued parameters.
+
+  Redirect Url [, HASH]
+
+    A safe redirect that redirects and then absolutely and
+    positively terminates your program. If you thought `$Response-
+    'Redirect> behaved liked die and were disappointed to discover
+    it didn't, mourn no longer.
+
+    It takes a base URL and a hash of parameters. The URL will be
+    built using `FormatURL'.
+
+  MyURL
+
+    This return the URL used to access the current page, including
+    its QueryString. Because it uses QueryStringList, it doesn't
+    properly deal with multi-valued parameters.
+
+  CreatePassURLPair
+
+    The function returns both `passurl' and the result from calling
+    `MyURL'. The return values are suitable for inclusion in a hash
+    for passing to `FormatURL'. The PassURL functions are generally
+    used for dealing with expired sessions. If the session expires,
+    the `Redirect' is passed `CreatePassURLPair' for the parameters.
+    That page then explains to the user what is going on and has a
+    link back to the login page along with `PassURLPair'. The login
+    page can then use `GetPassURL' to extract the URL from the
+    QueryString and redirect to that URL.
+
+  GetPassURL
+
+    This extracts the `passurl' value from the QueryString.
+
+  PassURLPair
+
+    This returns `passurl' along with the result from calling
+    `GetPassURL'. The return values are suitable for inclusion in a
+    hash for passing to `FormatURL'.
+
+  StampPage
+
+    This returns HTML that says:
+
+      Refresh this page.
+
+    The text `this page' is a link to the results of `MyURL'.
+
+  Set
+
+    `Set' and `Get' can be used to store arbitrary Perl objects in
+    `$Session'. It uses `Data::Dumper' to store things and `eval' to
+    retrieve them. Notice that this is safe only because we are the
+    only ones who can store stuff in `$Session'.
+
+    <LECTURE_MODE>
+
+    Do NOT, I repeat, do NOT use `Data::Dumper' to serialize a Perl
+    object and then stuff it in a user's cookie, presuming that you
+    can then use `eval' to extract it when they pass it back to you.
+    If you do, you deserve to have someone stuff `system("del /s
+    *.*")' or some such funny Perl code in that cookie and then
+    visit your web site. Never, ever, ever use `eval' on code that
+    comes from an untrusted source. If you need to do so for some
+    strange reason, take a look at the Safe module, but be careful.
+
+    </LECTURE_MODE>
+
+    Oh, the call takes two parameters, the name to store it under
+    and the thing to store (can be a reference to a hash or some
+    other neat goodie). Keep in mind that references to `CODE'
+    objects (i.e. anonymous subroutines) or `Win32::OLE' objects or
+    anything like that will not make it.
+
+  Get
+
+    Takes a parameter and returns the thing. Both `Set' and `Get'
+    use the same memoization cache to improve performance. Take care
+    if you modify the thing you get back from `Get' - future calls
+    to `Get' will return the modified thing (even though it hasn't
+    been changed in `$Session'). Calls to `Set' empty the
+    memoization cache so that the next call to `Get' will reload it
+    from `$Session' and add it to the cache.
+

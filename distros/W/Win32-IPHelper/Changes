@@ -1,0 +1,29 @@
+Revision history for Perl extension Win32::IPHelper.
+
+0.01  Wed Aug 21 11:50:15 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Win32::IPHelper
+
+0.02  Fri Jan 31 18:33:25 2003
+	- moved Win32::API constructors in module global namespace
+		to fix a handler leakage
+
+0.03  Fri Aug 6 17:30:00 2004
+	- added GetTcpTable(), GetUdpTable(), AllocateAndGetTcpExTableFromStack() and AllocateAndGetUdpExTableFromStack() functions
+	- added _GetProcessHeap() private function to support AllocateAndGetTcpExTableFromStack() and AllocateAndGetUdpExTableFromStack()
+	- modified _shiftunpack() private function to support multiple values decoding in a single call
+
+0.04  Fri Mar 11 15:54:00 2005
+	- fixed AllocateAndGetTcpExTableFromStack() and AllocateAndGetUdpExTableFromStack() functions, no more failire on "nmake test" under Windows 2000 and earlier platforms.
+
+0.05  Tue May 23 07:25:00 2006
+	- added GetNetworkParams() and _FIXED_INFO(), thanks to Hanno Stock (HANSTO).
+
+0.06  Wed Jul 23 23:04:00 2008
+	- added GetExtendedTcpTable(), GetExtendedUdpTable() GetTcpTableAuto() and GetUdpTableAuto(), thanks to Peter Arnhold.
+
+0.07  Mon Oct 17 08:48:00 2011
+	- fix for Bug #59790 (A few functions are not valid in a Perl64 environment), as proposed by contributors in the thread. Thanks.
+
+0.08  Mon Oct 24 09:19:00 2011
+	- fix for CPAN tester (http://www.cpantesters.org/cpan/report/007efdfa-6c0e-1014-8ca5-0789a94ceed8)

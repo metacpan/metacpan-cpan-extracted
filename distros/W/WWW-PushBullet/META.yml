@@ -1,0 +1,37 @@
+---
+abstract: 'Module giving easy access to PushBullet API'
+author:
+  - 'Sebastien Thebert <www-pushbullet@onetool.pm>'
+build_requires:
+  FindBin: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-PushBullet
+provides:
+  WWW::PushBullet:
+    file: lib/WWW/PushBullet.pm
+    version: v1.4.0
+requires:
+  Data::Dump: '0'
+  File::Slurp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Types: '0'
+  Pod::Usage: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/sebthebert/WWW-PushBullet/issues
+  repository: git://github.com/sebthebert/WWW-PushBullet.git
+version: 1.4.0

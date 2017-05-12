@@ -1,0 +1,16 @@
+DESCRIPTION
+
+    This is the list of words for the Hanyu Shuiping Kaoshi (Chinese
+    Proficiency Test), as of September 2012, sorted alphabetically.
+
+    For per-level words, see: WordList::ZH::HSK1 to WordList::ZH::HSK6.
+
+    For list of characters, see: WordList::Char::ZH::HSK.
+
+SEE ALSO
+
+    Hanban which administers the test and publishes the list,
+    http://chinesetest.cn
+
+    About HSK, https://en.wikipedia.org/wiki/Hanyu_Shuiping_Kaoshi
+

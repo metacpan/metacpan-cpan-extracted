@@ -1,0 +1,48 @@
+NAME
+    Snartemo::Tk - Tk user interface to Snartemo designer
+
+SYNOPSIS
+      use Snartemo::Tk;
+      use Tk;
+      my $pattern = Snartemo::Tk->new_pattern(mw => $mw, file => $file);
+      my $pattern2 = Snartemo::Tk->new_pattern(mw => $mw, cards => $cards, rows => $rows);
+  
+      $pattern->canvas # get the drawing area
+      $pattern->window # get the toplevel window
+  
+      MainLoop;
+
+DESCRIPTION
+    Snartemo::Tk wraps a Tk user interface around the core routines in
+    Snartemo.
+
+    Snartemo::Tk is a subclass of Snartemo.
+
+  new
+
+    The new function expects arguments as key/value pairs.
+
+    The key "mw" is always expected. If not present, a new MainWindow is
+    created. If present, it is the parent for a new Toplevel window.
+
+    The key "file" identifies a pattern file to be loaded. If a pattern
+    cannot be loaded from that file, undef is returned.
+
+    The keys "cards" and "rows" specify the size of a new, blank pattern.
+
+    If the "file" key is not provided, a blank pattern is created, with a
+    default size of 1 row by 1 card.
+
+    The window and the drawing canvas are available via member functions.
+
+  Member Functions
+
+    You can retrieve the Toplevel window via the "window" member. You can
+    retrieve the drawing canvas via the "canvas" member.
+
+AUTHOR
+    Michael Houghton
+
+SEE ALSO
+    perl(1).
+

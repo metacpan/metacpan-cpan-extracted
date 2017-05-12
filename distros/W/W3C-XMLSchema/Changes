@@ -1,0 +1,13 @@
+Revision history for W3C-XMLSchema
+
+0.0.4     2013-03-15 15:12:12 Europe/Oslo
+        - Added HelpWanted information
+
+0.0.3     2011-10-23 13:53:09 Europe/Oslo
+        - Migrated to XML::Rabbit sugar functions
+
+0.0.2     2010-07-04 14:18:45 Europe/Oslo
+        - Bumped required XML::Rabbit version
+
+0.0.1     2010-06-13 13:34:21 Europe/Oslo
+        - Initial version

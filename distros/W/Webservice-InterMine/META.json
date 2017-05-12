@@ -1,0 +1,313 @@
+{
+   "abstract" : "Modules for interacting with InterMine Webservice APIs",
+   "author" : [
+      "Alex Kalderimis <dev@intermine.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Webservice-InterMine",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.36",
+            "Set::CrossProduct" : "0",
+            "Test::Class" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0.9",
+            "Test::XML" : "0",
+            "XML::Compare" : "0.04",
+            "XML::Rules" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Perl::Tidy" : "20070801",
+            "Spreadsheet::WriteExcel" : "0",
+            "Test::Warn" : "0",
+            "YAML::Syck" : "1.07"
+         },
+         "requires" : {
+            "AppConfig" : "0",
+            "Class::InsideOut" : "1.04",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "InterMine::Model" : "0.9901",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "LWP" : "5.8",
+            "List::MoreUtils" : "0.22",
+            "MIME::Base64" : "0",
+            "Module::Build" : "0",
+            "Module::Find" : "0.05",
+            "Moose" : "0.95",
+            "MooseX::Role::WithOverloading" : "0.03",
+            "MooseX::Types" : "0.34",
+            "Perl6::Junction" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Set::Object" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "1.37",
+            "XML::DOM" : "0",
+            "XML::Parser::PerlSAX" : "0.08",
+            "perl" : "v5.8.3"
+         }
+      }
+   },
+   "provides" : {
+      "Webservice::InterMine" : {
+         "file" : "lib/Webservice/InterMine.pm",
+         "version" : "1.0405"
+      },
+      "Webservice::InterMine::Constraint" : {
+         "file" : "lib/Webservice/InterMine/Constraint.pm"
+      },
+      "Webservice::InterMine::Constraint::Binary" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Binary.pm"
+      },
+      "Webservice::InterMine::Constraint::List" : {
+         "file" : "lib/Webservice/InterMine/Constraint/List.pm"
+      },
+      "Webservice::InterMine::Constraint::Loop" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Loop.pm"
+      },
+      "Webservice::InterMine::Constraint::Multi" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Multi.pm"
+      },
+      "Webservice::InterMine::Constraint::Range" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Range.pm"
+      },
+      "Webservice::InterMine::Constraint::Role::Logical" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Role/Logical.pm"
+      },
+      "Webservice::InterMine::Constraint::Role::Operator" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Role/Operator.pm"
+      },
+      "Webservice::InterMine::Constraint::Role::Template" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Role/Template.pm"
+      },
+      "Webservice::InterMine::Constraint::Role::Templated" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Role/Templated.pm"
+      },
+      "Webservice::InterMine::Constraint::SubClass" : {
+         "file" : "lib/Webservice/InterMine/Constraint/SubClass.pm"
+      },
+      "Webservice::InterMine::Constraint::Ternary" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Ternary.pm"
+      },
+      "Webservice::InterMine::Constraint::Unary" : {
+         "file" : "lib/Webservice/InterMine/Constraint/Unary.pm"
+      },
+      "Webservice::InterMine::ConstraintFactory" : {
+         "file" : "lib/Webservice/InterMine/ConstraintFactory.pm"
+      },
+      "Webservice::InterMine::IDResolutionJob" : {
+         "file" : "lib/Webservice/InterMine/IDResolutionJob.pm"
+      },
+      "Webservice::InterMine::Join" : {
+         "file" : "lib/Webservice/InterMine/Join.pm"
+      },
+      "Webservice::InterMine::List" : {
+         "file" : "lib/Webservice/InterMine/List.pm"
+      },
+      "Webservice::InterMine::ListFactory" : {
+         "file" : "lib/Webservice/InterMine/ListFactory.pm"
+      },
+      "Webservice::InterMine::LogicParser" : {
+         "file" : "lib/Webservice/InterMine/LogicParser.pm"
+      },
+      "Webservice::InterMine::LogicalOperator" : {
+         "file" : "lib/Webservice/InterMine/LogicalOperator.pm"
+      },
+      "Webservice::InterMine::LogicalSet" : {
+         "file" : "lib/Webservice/InterMine/LogicalSet.pm"
+      },
+      "Webservice::InterMine::Model" : {
+         "file" : "lib/Webservice/InterMine/Model.pm"
+      },
+      "Webservice::InterMine::Parser" : {
+         "file" : "lib/Webservice/InterMine/Parser.pm"
+      },
+      "Webservice::InterMine::Parser::FlatFile" : {
+         "file" : "lib/Webservice/InterMine/Parser/FlatFile.pm"
+      },
+      "Webservice::InterMine::Parser::JSON" : {
+         "file" : "lib/Webservice/InterMine/Parser/JSON.pm"
+      },
+      "Webservice::InterMine::Parser::JSON::ArrayRefs" : {
+         "file" : "lib/Webservice/InterMine/Parser/JSON/ArrayRefs.pm"
+      },
+      "Webservice::InterMine::Parser::JSON::HashRefs" : {
+         "file" : "lib/Webservice/InterMine/Parser/JSON/HashRefs.pm"
+      },
+      "Webservice::InterMine::Parser::JSON::ResultRows" : {
+         "file" : "lib/Webservice/InterMine/Parser/JSON/ResultRows.pm"
+      },
+      "Webservice::InterMine::Path" : {
+         "file" : "lib/Webservice/InterMine/Path.pm"
+      },
+      "Webservice::InterMine::PathDescription" : {
+         "file" : "lib/Webservice/InterMine/PathDescription.pm"
+      },
+      "Webservice::InterMine::PathFeature" : {
+         "file" : "lib/Webservice/InterMine/PathFeature.pm"
+      },
+      "Webservice::InterMine::Query" : {
+         "file" : "lib/Webservice/InterMine/Query.pm"
+      },
+      "Webservice::InterMine::Query::Core" : {
+         "file" : "lib/Webservice/InterMine/Query/Core.pm"
+      },
+      "Webservice::InterMine::Query::Handler" : {
+         "file" : "lib/Webservice/InterMine/Query/Handler.pm"
+      },
+      "Webservice::InterMine::Query::Roles::ExtendedQuery" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/ExtendedQuery.pm"
+      },
+      "Webservice::InterMine::Query::Roles::HTMLTable" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/HTMLTable.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Listable" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Listable.pm"
+      },
+      "Webservice::InterMine::Query::Roles::QueryParameters" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/QueryParameters.pm"
+      },
+      "Webservice::InterMine::Query::Roles::QueryUrl" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/QueryUrl.pm"
+      },
+      "Webservice::InterMine::Query::Roles::ReadInAble" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/ReadInAble.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Runnable" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Runnable.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Saved" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Saved.pm"
+      },
+      "Webservice::InterMine::Query::Roles::ScriptAble" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/ScriptAble.pm"
+      },
+      "Webservice::InterMine::Query::Roles::TemplateParameters" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/TemplateParameters.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Templateable" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Templateable.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Templated" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Templated.pm"
+      },
+      "Webservice::InterMine::Query::Roles::Uploadable" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/Uploadable.pm"
+      },
+      "Webservice::InterMine::Query::Roles::WriteExcel" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/WriteExcel.pm"
+      },
+      "Webservice::InterMine::Query::Roles::WriteOutAble" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/WriteOutAble.pm"
+      },
+      "Webservice::InterMine::Query::Roles::WriteOutLegacy" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/WriteOutLegacy.pm"
+      },
+      "Webservice::InterMine::Query::Roles::WriteOutYaml" : {
+         "file" : "lib/Webservice/InterMine/Query/Roles/WriteOutYaml.pm"
+      },
+      "Webservice::InterMine::Query::Saved" : {
+         "file" : "lib/Webservice/InterMine/Query/Saved.pm"
+      },
+      "Webservice::InterMine::Query::SavedHandler" : {
+         "file" : "lib/Webservice/InterMine/Query/SavedHandler.pm"
+      },
+      "Webservice::InterMine::Query::Scripted" : {
+         "file" : "lib/Webservice/InterMine/Query/Scripted.pm"
+      },
+      "Webservice::InterMine::Query::Template" : {
+         "file" : "lib/Webservice/InterMine/Query/Template.pm"
+      },
+      "Webservice::InterMine::Query::TemplateHandler" : {
+         "file" : "lib/Webservice/InterMine/Query/TemplateHandler.pm"
+      },
+      "Webservice::InterMine::ResultIterator" : {
+         "file" : "lib/Webservice/InterMine/ResultIterator.pm"
+      },
+      "Webservice::InterMine::ResultIterator::Role::HTMLTableRow" : {
+         "file" : "lib/Webservice/InterMine/ResultIterator/Role/HTMLTableRow.pm"
+      },
+      "Webservice::InterMine::ResultObject" : {
+         "file" : "lib/Webservice/InterMine/ResultObject.pm"
+      },
+      "Webservice::InterMine::ResultRow" : {
+         "file" : "lib/Webservice/InterMine/ResultRow.pm"
+      },
+      "Webservice::InterMine::Role::Described" : {
+         "file" : "lib/Webservice/InterMine/Role/Described.pm"
+      },
+      "Webservice::InterMine::Role::HasQuery" : {
+         "file" : "lib/Webservice/InterMine/Role/HasQuery.pm"
+      },
+      "Webservice::InterMine::Role::KnowsJSON" : {
+         "file" : "lib/Webservice/InterMine/Role/KnowsJSON.pm"
+      },
+      "Webservice::InterMine::Role::Listable" : {
+         "file" : "lib/Webservice/InterMine/Role/Listable.pm"
+      },
+      "Webservice::InterMine::Role::Logical" : {
+         "file" : "lib/Webservice/InterMine/Role/Logical.pm"
+      },
+      "Webservice::InterMine::Role::ModelOwner" : {
+         "file" : "lib/Webservice/InterMine/Role/ModelOwner.pm"
+      },
+      "Webservice::InterMine::Role::Named" : {
+         "file" : "lib/Webservice/InterMine/Role/Named.pm"
+      },
+      "Webservice::InterMine::Role::Serviced" : {
+         "file" : "lib/Webservice/InterMine/Role/Serviced.pm"
+      },
+      "Webservice::InterMine::Role::Showable" : {
+         "file" : "lib/Webservice/InterMine/Role/Showable.pm"
+      },
+      "Webservice::InterMine::Service" : {
+         "file" : "lib/Webservice/InterMine/Service.pm"
+      },
+      "Webservice::InterMine::ServiceResolver" : {
+         "file" : "lib/Webservice/InterMine/ServiceResolver.pm"
+      },
+      "Webservice::InterMine::SortOrder" : {
+         "file" : "lib/Webservice/InterMine/SortOrder.pm"
+      },
+      "Webservice::InterMine::TemplateConstraintFactory" : {
+         "file" : "lib/Webservice/InterMine/TemplateConstraintFactory.pm"
+      },
+      "Webservice::InterMine::TemplateFactory" : {
+         "file" : "lib/Webservice/InterMine/TemplateFactory.pm"
+      },
+      "Webservice::InterMine::Types" : {
+         "file" : "lib/Webservice/InterMine/Types.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.0405"
+}

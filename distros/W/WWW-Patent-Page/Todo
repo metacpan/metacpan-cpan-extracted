@@ -1,0 +1,33 @@
+TODO list for Perl module WWW::Patent::Page
+
+-add Open Patent Service module
+
+-make a PDF (image + text) object to allow text-searching and image printout
+
+-POE compatibility and utility:  write helper methods for fetching things 
+like multiple tiff images, pdf single pages, gifs, in parallel and then 
+continuing when all are assembled.
+
+-make this work with accessors instead of accessing variables directly
+
+-be more neat about LWP::UserAgent; have a better means of storing data in object
+
+-rewrite the use of LWP $self->request( HTTP::Request-object ) to a method
+that makes repeated requests if proxy can not contact the website, 
+deals with certain errors, and can use as 
+method either an LWP or POE request to avoid blocking.
+
+-change to model of "die"ing (dying) with confess of Carp.pm, rewrite examples in 
+if eval( ) {} else { print $@ } form. 
+
+-make loading of Page/office.pm optional on use of office
+
+- there seems to be a bug in at least MICROPATENT_pdf where the fetching
+is not successful, but a HTTP::Response object is not returned so that the
+->is_success method is not available, which is a fatal error. 
+
+- the interpretation of doc_id should probably be a function of office;
+	since ESPACE and USPTO do it different for plant and such
+- more error reporting, when patent retrieval is refused by office
+
+

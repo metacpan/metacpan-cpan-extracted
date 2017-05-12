@@ -1,0 +1,25 @@
+---
+abstract: 'Paginate DBIx::Class::ResultSets for ExtJS consumption'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  DBIx::Class: '0.0825'
+  SQL::Translator: '0.11016'
+  Test::Deep: '0.11'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-Util-ExtPaging
+requires:
+  Sub::Exporter::Progressive: '0.00101'
+resources:
+  bugtracker: https://github.com/frioux/Web-Util-ExtPaging/issues
+  homepage: https://github.com/frioux/Web-Util-ExtPaging
+  repository: https://github.com/frioux/Web-Util-ExtPaging.git
+version: '0.001003'

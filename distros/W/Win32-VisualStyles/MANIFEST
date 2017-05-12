@@ -1,0 +1,15 @@
+CHANGES
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+script/themes.pl
+t/01_load.t
+t/02_public_api.t
+TYPEMAP
+VisualStyles.manifest.PL
+VisualStyles.pm
+VisualStyles.rc
+VisualStyles.version.PL
+VisualStyles.xs
+META.yml                                 Module meta-data (added by MakeMaker)

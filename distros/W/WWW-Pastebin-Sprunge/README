@@ -1,0 +1,164 @@
+NAME
+    WWW::Pastebin::Sprunge::Create - create new pastes on sprunge.us
+
+VERSION
+    version 0.010
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use WWW::Pastebin::Sprunge::Create;
+
+        my $sprunge = WWW::Pastebin::Sprunge::Create->new;
+
+        $sprunge->paste('large text to paste')
+            or die $sprunge->error();
+
+        print "Your paste is located at $sprunge\n";
+
+DESCRIPTION
+    The module provides interface to paste large texts or files to
+    <http://sprunge.us>
+
+METHODS
+  new
+        my $sprunge = WWW::Pastebin::Sprunge::Create->new;
+
+        my $sprunge = WWW::Pastebin::Sprunge::Create->new(
+            timeout => 10,
+        );
+
+        my $sprunge = WWW::Pastebin::Sprunge::Create->new(
+            ua => LWP::UserAgent->new(
+                timeout => 10,
+                agent   => 'PasterUA',
+            ),
+        );
+
+    Constructs and returns a new WWW::Pastebin::Sprunge::Create object.
+    Takes two arguments, both are *optional*. Possible arguments are as
+    follows:
+
+   timeout
+        ->new( timeout => 10 );
+
+    Optional. Specifies the "timeout" argument of LWP::UserAgent's
+    constructor, which is used for pasting. Defaults to: 30 seconds.
+
+   ua
+        ->new( ua => LWP::UserAgent->new( agent => 'Foos!' ) );
+
+    Optional. If the "timeout" argument is not enough for your needs of
+    mutilating the LWP::UserAgent object used for pasting, feel free to
+    specify the "ua" argument which takes an LWP::UserAgent object as a
+    value. Note: the "timeout" argument to the constructor will not do
+    anything if you specify the "ua" argument as well. Defaults to: plain
+    boring default LWP::UserAgent object with "timeout" argument set to
+    whatever "WWW::Pastebin::Sprunge::Create"'s "timeout" argument is set to
+    as well as "agent" argument is set to mimic Firefox.
+
+  paste
+        my $paste_uri = $sprunge->paste('lots and lots of text')
+            or die $sprunge->error;
+
+        $sprunge->paste(
+            'paste.txt',
+            file    => 1,
+            nick    => 'Zoffix',
+            desc    => 'paste from file',
+            lang    => 'perl',
+        ) or die $sprunge->error;
+
+    Instructs the object to create a new paste. If an error occured during
+    pasting will return either "undef" or an empty list depending on the
+    context and the reason for the error will be available via "error()"
+    method. On success returns a URI object pointing to a newly created
+    paste. The first argument is mandatory and must be either a scalar
+    containing the text to paste or a filename. The rest of the arguments
+    are optional and are passed in a key/value fashion. Possible arguments
+    are as follows:
+
+   file
+        $sprunge->paste( 'paste.txt', file => 1 );
+
+    Optional. When set to a true valu filename of the file containing the
+    text to paste. When set to a false value the object will treat the first
+    argument as a scalar containing the text to be pasted. Defaults to: 0
+
+   nick
+        $sprunge->paste( 'some text', nick => 'Zoffix' );
+
+    Optional. Takes a scalar as a value which specifies the nick of the
+    person creating the paste. Defaults to: empty string (no nick)
+
+   desc
+        $sprunge->paste( 'some text', desc => 'some l33t codez' );
+
+    Optional. Takes a scalar as a value which specifies the description of
+    the paste. Defaults to: empty string (no description)
+
+   lang
+        $sprunge->paste( 'some text', lang => 'perl' );
+
+    Optional. Takes a scalar as a value which must be one of predefined
+    language codes and specifies (computer) language of the paste, in other
+    words which syntax highlighting to use. Since sprunge.us uses Pygments
+    for syntax highlighting, available languages are
+    <http://pygments.org/languages/>.
+
+  error
+        my $paste_
+            or die $sprunge->error;
+
+    If an error occured during the call to "paste()" it will return either
+    "undef" or an empty list depending on the context and the reason for the
+    error will be available via "error()" method. Takes no arguments,
+    returns a human parsable error message explaining why we failed.
+
+  paste_uri
+        my $last_paste_uri = $sprunge->paste_uri;
+
+        print "Paste can be found on $sprunge\n";
+
+    Must be called after a successfull call to "paste()". Takes no
+    arguments, returns a URI object pointing to a paste created by the last
+    call to "paste()", i.e. the return value of the last "paste()" call.
+    This method is overloaded as "q|""" thus you can simply interpolate your
+    object in a string to obtain the paste URI.
+
+  ua
+        my $old_LWP_UA_obj = $sprunge->ua;
+
+        $sprunge->ua( LWP::UserAgent->new( timeout => 10, agent => 'foos' );
+
+    Returns a currently used LWP::UserAgent object. Takes one optional
+    argument which must be an LWP::UserAgent object, and the object you
+    specify will be used in any subsequent calls to "paste()".
+
+AVAILABILITY
+    The project homepage is
+    <http://metacpan.org/release/WWW-Pastebin-Sprunge/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/WWW::Pastebin::Sprunge/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/WWW-Pastebin-Sprunge> and may be cloned from
+    <git://github.com/doherty/WWW-Pastebin-Sprunge.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/WWW-Pastebin-Sprunge/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

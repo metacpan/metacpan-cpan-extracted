@@ -1,0 +1,38 @@
+Working-Daemon version 0.29
+===========================
+
+This is a modular Daemon wrapper. It handles forking, master session, chroot
+pidfiles, and command line parsing.
+
+While it isn't perfect yet, it works better than any existing
+on CPAN. Notably it doesn't force itself on you unconditionally.
+
+The commandline parsing uses Getopt::Long
+
+It also supports start,stop,status and restart. So you can symlink your
+daemon directly into init.d
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Artur Bergman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

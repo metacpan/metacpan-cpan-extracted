@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<!DOCTYPE www-meta-xml-browser SYSTEM "http://www.boksa.de/pub/xml/dtd/www-meta-xml-browser_v0.08.dtd">
+<www-meta-xml-browser>
+	<request url="http://www2.hoerzu.de/text/tv-programm/sender.php" method="get" stylesheet="information.xsl"/>
+	<request url="http://www2.hoerzu.de/text/tv-programm/sender.php" method="post" stylesheet="uebersicht.xsl">
+		<content><![CDATA[timeday=ganztags&newday=#{0:0:/information/days/day/@timestamp}&tvchannelid=#{0:0:/information/programs/program/@id}&submit=Anzeigen]]></content>
+	</request>
+</www-meta-xml-browser>

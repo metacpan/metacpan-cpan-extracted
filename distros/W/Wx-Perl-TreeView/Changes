@@ -1,0 +1,7 @@
+Revision history for Perl extension Wx::Perl::TreeView.
+
+0.02  Sat Apr 28 12:30:18 CEST 2007
+	- Fix for wxWidgets 2.8.x.
+
+0.01  Sun Apr 15 13:14:45 CEST 2007
+	- First public release.

@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: pocket
+# ABSTRACT: interact with the Pocket API from the command line
+
+
+use WWW::Pocket::Script;
+WWW::Pocket::Script->new->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pocket - interact with the Pocket API from the command line
+
+=head1 VERSION
+
+version 0.03
+
+=head1 SYNOPSIS
+
+pocket [command] [options ...]
+
+Commands:
+
+ help               Displays this synopsis.
+ man                Displays full documentation.
+ list               Print all unread URLs in your account.
+ search <string>    Print all URLs whose title or URL contains C<string>.
+ favorites          Print all unread, favorite URLs.
+ add <url [title]>  Add URL, optionally with title.
+ archive <url>      Archive URL.
+ readd <url>        Unread/unarchive URL.
+ favorite <url>     Favorite URL.
+ delete <url>       Delete URL.
+ words              Print the number of words in all unread articles.
+ authenticate       Authenticate and store credentials in C<~/.pocket>.
+                    (all commands will do this automatically)
+
+Example usage:
+
+  $ pocket list
+  Enter your consumer key: ...
+  Visit https://getpocket.com/auth/authorize?request_token=...&redirect_uri=https://getpocket.com/ and log in. When you're done, press enter to continue.
+
+  http://the-toast.net/2015/04/27/looking-back-fragments-from-womens-shelters-1981-1996/view-all/
+  https://modelviewculture.com/pieces/dreaming-holding-onto-the-hope-of-justice-in-technology-and-america
+  [...]
+
+  $ pocket words --archive
+  2233913
+
+=head1 DESCRIPTION
+
+This program provides several subcommands to allow you to interact with your
+Pocket list from the command line. It will automatically authenticate as
+needed, prompting you for your consumer key, and will store the returned
+credentials in C<~/.pocket>.
+
+=head1 NAME
+
+pocket - A command-line tool for Pocket (http://www.getpocket.com/)
+
+=head1 COMMANDS
+
+=head2 authenticate
+
+Authenticates you with the Pocket API and does nothing else. Not usually
+necessary, since all of the following commands will automatically authenticate
+as necessary.
+
+=head2 list
+
+Prints the URLs in your list. By default, prints unread URLs, but also takes options to adjust the list that is returned:
+
+=over 4
+
+=item --unread
+
+Return only unread links. This is the default, but can be provided for
+explicitness.
+
+=item --archive
+
+Return only archived links.
+
+=item --all
+
+Return both unread and archived links.
+
+=item --tag=<tag>
+
+Return links with the given tag. This option can be passed multiple times, and
+may be combined with the above options.
+
+=back
+
+=head2 words
+
+Takes the same options as C<list>, but instead of printing the URLs of the
+articles, prints the number of words in all of those articles combined.
+
+=head2 search <string>
+
+Returns a list of URLs whose title or URL contains C<string>. Takes the same
+options as C<list> to limit the search.
+
+=head2 favorites
+
+Returns a list of favorited URLs. Takes the same options as C<list>.
+
+=head2 add <url> [title]
+
+Adds C<url> to your list, optionally with the given C<title>.
+
+=head2 archive <url>
+
+Moves C<url> from your list to your archive.
+
+=head2 readd <url>
+
+Moves C<url> from your archive to your list.
+
+=head2 favorite <url>
+
+Marks C<url> as a favorite.
+
+=head2 unfavorite <url>
+
+Unmarks C<url> as a favorite.
+
+=head2 delete <url>
+
+Deletes C<url> from your list and/or archive entirely.
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -1,0 +1,50 @@
+WWW::Live::Auth
+---------------
+
+This package provides a Perl interface to the Windows Live delegated
+authentication API.
+
+This package is designed to support other applications or libraries
+that use the Windows Live Data APIs (such as the Contacts API). It handles
+the delegated authentication procedures.
+
+NOTE: Microsoft have deprecated the Windows Live Data APIs in favour of
+      Windows Live Messenger Connect.
+
+See the Microsoft documentation for further details:
+http://msdn.microsoft.com/en-us/library/cc305075.aspx
+
+Licensing:
+
+This package is copyrighted and licensed under the terms of the GNU Lesser GPL.
+You are free to modify and distribute modified version of the software under its
+terms.
+
+Requirements:
+
+This module requires the following Perl modules, which are available
+from CPAN:
+ - LWP
+ - Carp
+ - Digest::SHA
+ - MIME::Base64
+ - Crypt::Rijndael
+ - Crypt::SSLeay
+
+Installation:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Usage:
+
+In order to use this package you must obtain an Application ID and Secret Key
+for your application from Microsoft. To do this, register your application at:
+https://manage.dev.live.com/
+
+For full usage instructions, see the documentation for the WWW::Live::Contacts
+module.
+
+

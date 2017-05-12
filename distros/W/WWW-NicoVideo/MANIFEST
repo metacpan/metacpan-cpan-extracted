@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-NicoVideo.t
+lib/WWW/NicoVideo.pm
+lib/WWW/NicoVideo/Entry.pm
+lib/WWW/NicoVideo/Scraper.pm
+lib/WWW/NicoVideo/URL.pm
+examples/ritsuko.pl
+META.yml                                 Module meta-data (added by MakeMaker)

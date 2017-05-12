@@ -1,0 +1,15 @@
+author:
+  - 'Takeshi Kobayashi <koba206@gmail.com>'
+distribution_type: module
+license: perl
+name:         WebService-Ustream-API
+version:      0.03
+version_from: lib/WebService/Ustream/API.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast: 0
+    LWP::UserAgent: 0
+    XML::Simple: 0
+    perl: 5.6.0
+    version: 0
+generated_by: ExtUtils::MakeMaker version 6.30

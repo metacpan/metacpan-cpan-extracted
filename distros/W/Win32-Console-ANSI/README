@@ -1,0 +1,45 @@
+Win32::Console::ANSI version 1.10
+=================================
+
+Windows NT/2000/XP/2003/Vista does not support ANSI escape sequences in
+Win32 Console applications.
+This module emulate an ANSI console for the script which uses it.
+
+This module can convert the characters from Windows code page
+to DOS code page (the so-called ANSI to OEM conversion).
+This conversion permits the display of the accented characters
+in the console like in a Windows-based editor.
+
+It works on all Win32 platforms:
+Win98, Win98SE, Win2000, WinXP, Windows Server 2003, Vista (32 and 64 bits)
+Windows 7 (32 and 64 bits), Windows 8 (32 and 64 bits)
+
+All suggestion or remark is welcome.
+
+DEPENDENCIES
+
+Win32::Pipe and Win32::Process are necessary only for the tests.
+
+INSTALLATION
+
+A recent SDK is necessary to compile this module.
+
+If your SDK is too old the compiler emit the fatal error C1189 with the
+message: "your SDK is too old... (see the README file in the distro)"
+Download and install the last SDK for your platform from Microsoft:
+
+http://windows.microsoft.com/en-us/windows/service-packs-download
+
+To install this module, just follow the usual procedure:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2015 J-L Morel. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

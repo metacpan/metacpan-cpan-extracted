@@ -1,0 +1,57 @@
+---
+name: WebService-ISBNDB
+version: 0.34
+author:
+  - 'Randy J. Ray <rjray@blackperl.com>'
+abstract: Data and communication classes for talking to isbndb.com
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Business::ISBN: 2.0
+  Class::Std: 0.0.8
+  Error: 0.17
+  LWP: 5.801
+  XML::LibXML: 1.58
+  perl: 5.006
+build_requires:
+  Test::More: 0
+recommends:
+  Date::Parse: 2.27
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  WebService::ISBNDB:
+    file: lib/WebService/ISBNDB.pm
+    version: 0.34
+  WebService::ISBNDB::API:
+    file: lib/WebService/ISBNDB/API.pm
+    version: 0.23
+  WebService::ISBNDB::API::Authors:
+    file: lib/WebService/ISBNDB/API/Authors.pm
+    version: 0.21
+  WebService::ISBNDB::API::Books:
+    file: lib/WebService/ISBNDB/API/Books.pm
+    version: 0.33
+  WebService::ISBNDB::API::Categories:
+    file: lib/WebService/ISBNDB/API/Categories.pm
+    version: 0.21
+  WebService::ISBNDB::API::Publishers:
+    file: lib/WebService/ISBNDB/API/Publishers.pm
+    version: 0.21
+  WebService::ISBNDB::API::Subjects:
+    file: lib/WebService/ISBNDB/API/Subjects.pm
+    version: 0.21
+  WebService::ISBNDB::Agent:
+    file: lib/WebService/ISBNDB/Agent.pm
+    version: 0.30
+  WebService::ISBNDB::Agent::REST:
+    file: lib/WebService/ISBNDB/Agent/REST.pm
+    version: 0.31
+  WebService::ISBNDB::Iterator:
+    file: lib/WebService/ISBNDB/Iterator.pm
+    version: 0.10
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

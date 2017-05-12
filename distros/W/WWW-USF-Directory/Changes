@@ -1,0 +1,31 @@
+Revision history for perl distribution WWW-USF-Directory
+
+0.003001 2011-10-22
+ [OTHER]
+ - Change from Readonly to Cost::Fast.
+ - Change from Test::Exception to Test::Fatal.
+ - Use Class::Load for loading exception classes dynamically.
+
+0.003 2010-09-13
+ [ENHANCEMENTS]
+ - Allow for searching campus/college/department by any value.
+ - Work around directory results having an e-mail address of "null" or
+   "undefined" and list entry as having no e-mail address.
+
+ [BUG FIXES]
+ - Changed regular expressions to work in Perl 5.8.
+
+ [OTHER]
+ - Added basic tests.
+ - Added new auto complete example.
+ - Change from Module::Install to Module::Build.
+ - Remove dependency on Encode and bump version of HTML::HTML5::Parser
+   required to 0.101 since the UTF-8 bug was fixed.
+
+0.002 2010-03-07
+ [OTHER]
+ - Added missing dependency information for Readonly 1.03.
+ - Add an example of a CGI directory repeater in CGI::Application in ex/.
+
+0.001 2010-01-24
+ - First release.

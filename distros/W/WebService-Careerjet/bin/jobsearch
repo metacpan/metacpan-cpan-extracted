@@ -1,0 +1,134 @@
+#! /usr/bin/perl
+
+use strict ;
+
+use Encode ;
+use Getopt::Std ;
+use WebService::Careerjet ;
+
+use Text::Wrap;
+$Text::Wrap::columns = 72 ;
+
+our ( $opt_k , $opt_l , $opt_L  ,  $opt_n , $opt_h , $opt_p , $opt_d  ) ;
+
+# default values.
+( $opt_L )  =  ( $ENV{'LANG'} =~ m/(\w\w_\w\w)/ )  ;
+$opt_n = 3 ;
+$opt_p = 1 ;
+$opt_d ||= 0 ;
+
+# get arguments
+getopts('Adp:l:L:n:h');
+
+if ( $opt_h ){
+    print <<EOT ;
+Copyright 2007-2012 Careerjet Ltd. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Synopsis:
+
+jobsearch [ -L <lang> ] [ -p <pagenum> ] [ -n <num offers> ] [ -l <location> ] [ -d ] <keywords>
+
+Performs a search in Careerjet jobs database.
+
+Command line arguments are UTF-8 decoded.
+
+Results are output on STDOUT , encoded in UTF-8.
+
+Options:    
+
+    -l : Location of the jobs to search.
+    Default:  Your whole country ( from LANG env variable )
+    
+    -L : Language and country of the job database to search in.
+    Default : LANG env variable
+
+    -n : Num of offers to display in one query.
+    Default: 3
+
+    -p : Num of page to display. 
+    Default: 1
+    
+    -d : Flag for debug mode.
+
+        
+Example:
+
+    jobsearch -l london perl developer
+
+
+EOT
+
+exit(0) ;    
+}
+
+# rest of args are keywords
+$opt_k = join(' ', @ARGV ) ;
+
+#print " $opt_k , $opt_l , $opt_L , $opt_n \n" ;
+
+
+my $location =  Encode::decode_utf8($opt_l) ;
+my $location_id  = '' ;
+if ( $location =~ /\[[0-9]+\]/ ){
+    ( $location_id ) = ( $location =~ /\[([0-9]+)\]/ );
+    $location =~ s/\[[^\]]*\]// ;
+}
+
+# Create Perl interface to API
+my $careerjet = WebService::Careerjet->new($opt_L);
+$careerjet->debug($opt_d) ;
+
+# performs the search
+
+# Perform a search
+my $result = $careerjet->search( {
+    'keywords' => Encode::decode_utf8($opt_k) ,
+    'location' => Encode::decode_utf8($location) ,
+    'location_id' => $location_id ,
+    'pagesize' => $opt_n ,
+    'page'     => $opt_p ,
+    } ) ;
+
+binmode STDOUT , 'UTF-8' ;
+
+# The result is a job list if the location is not ambiguous
+if ( $result->{'type'} eq 'JOBS' ){
+    print "Found ".$result->{'hits'}." jobs on ".$result->{'pages'}." pages\n\n";
+    my $jobs = $result->{'jobs'} ;
+    foreach my $j ( @$jobs ){
+        print "[ ".$j->{'title'}." ]\n";
+        print $j->{'url'}."\n\n" ;
+        print "     ".$j->{'company'}." - ".$j->{'locations'}."\n";
+        print wrap("       " , "     " , $j->{'description'})."\n" ;
+        print "     ".$j->{'date'}." - ".$j->{'salary'}."\n";
+        print "\n";
+        
+        
+#         print "URL         :".$j->{'url'}."\n" ;
+#         print "TITLE       :".$j->{'title'}."\n" ;
+#         print "COMPANY     :".$j->{'company'}."\n" ;
+#         print "SALARY      :".$j->{'salary'}."\n" ;
+#         print "DATE        :".$j->{'date'}."\n";
+#         print "DESCRIPTION :".$j->{'description'}."\n" ;
+#         print "SITE        :".$j->{'site'}."\n" ;
+#         print "LOCATION    :".$j->{'locations'}."\n" ;
+#         print "\n" ;
+    }
+    
+}
+
+# If the location is ambiguous, a list of suggest locations
+# is returned
+if ( $result->{'type'} eq 'LOCATIONS' ){
+    print "Please specify location:\n" ;
+    my $locations = $result->{'solveLocations'} ;
+    foreach my $l ( @$locations ){
+        print $l->{'name'}." [".$l->{'location_id'}."]\n" ;
+    }
+    
+}
+
+
+
+

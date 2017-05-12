@@ -1,0 +1,175 @@
+#!perl
+
+use 5.006;
+use strict;
+use warnings;
+use Getopt::Long 'GetOptions';
+use Try::Tiny qw(try catch);
+use utf8;
+
+# modernize Getopt::Long
+Getopt::Long::Configure(qw(default gnu_getopt no_auto_abbrev no_ignore_case));
+GetOptions('s|service=s' => \my $service, 'l' => \my $long,);
+
+# eval in case we don't have Config::Auto installed
+my $config = try {
+    require Config::Auto;
+    return Config::Auto::parse();
+}
+catch {
+    warn "You must have Config::Auto in order to use a config file\n"
+        unless $_ =~ /No config file/;
+    {};
+};
+
+# Determine our service, default is TinyURL
+$service = $service || $ENV{SHORTEN_SERVICE} || $config->{service} || 'TinyURL';
+$service = "WWW::Shorten::$service" unless $service =~ /^WWW::Shorten/;
+
+# Import it
+try {
+    (my $mod = $service) =~ s/::/\//g;
+    require "$mod.pm";
+}
+catch {
+    die "Error trying to use $service: $_\n";
+};
+
+# determine the method to use;
+my $method = $long ? 'makealongerlink' : 'makeashorterlink';
+die "Sorry, $service can't $method\n"
+    unless (my $call = $service->can($method));
+
+# Get argument
+my $url = shift(@ARGV) || '';
+die "No URL specified!\n" unless $url;
+unless ($long) {
+    $url = "http://$url" unless $url =~ m[^\w+://];
+}
+
+my $out = try {
+    $call->($url);
+}
+catch {
+    die "Error: $_\n";
+};
+
+# Output
+$out = $out || 'Error';
+print "$out\n";
+
+__END__
+
+=head1 NAME
+
+shorten - CLI program to demonstrate use of WWW::Shorten
+
+=head1 SYNOPSIS
+
+    # Default shortening service is Metamark
+    $ shorten books.perl.org/book/171
+    http://xrl.us/dv8
+
+    # Change with an environment variable
+    $ SHORTEN_SERVICE=TinyURL shorten books.perl.org/book/171
+    http://tinyurl.com/ye7gjf4
+
+    # Change with command line option
+    $ shorten --service=TinyURL books.perl.org/book/171
+    http://tinyurl.com/ye7gjf4
+
+    # Change using config file
+    $ cat ~/.shortenrc
+    service = TinyURL
+    $ shorten books.perl.org/book/171
+    http://tinyurl.com/ye7gjf4
+
+    # Lengthen a URL
+    $ shorten -l http://tinyurl.com/ye7gjf4
+
+=head1 CONFIGURATION
+
+The service used can be controlled in various ways. The program will
+use the first of the following values that it finds:
+
+=over
+
+=item *
+
+The value of the C<--service> command line option.
+
+=item *
+
+The value of the C<SHORTEN_SERVICE> environment variable.
+
+=item *
+
+The value of the C<service> option from the configuration file (see
+below).
+
+=item *
+
+If none of the above options is found, the program defaults to using
+Metamark.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+As we use the C<Config::Auto> module for configuration, shorten's
+fairly flexible when it comes to format.
+
+Configuration will be found in whichever of the following files
+comes first.
+
+    shortenconfig
+    ~/shortenconfig
+    /etc/shortenconfig
+    shorten.config
+    ~/shorten.config
+    /etc/shorten.config
+    shortenrc
+    ~/shortenrc
+    /etc/shortenrc
+    .shortenrc
+    ~/.shortenrc
+    /etc/.shortenrc
+
+Generally, I use the format:
+
+    service = MakeAShorterLink
+
+which is simple and works. C<service> is the only configuration keyword
+at present. Its value should be a correctly capitalized service name as
+per L<WWW::Shorten>'s documentation.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2002 - 2010, Magnum Solutions Ltd. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Iain Truskett <spoon@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Chase Whitener C<capoeirab@cpan.org>
+
+=item *
+
+Dave Cross <davecross@cpan.org>
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Shorten>
+
+=cut

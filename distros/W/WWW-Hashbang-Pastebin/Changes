@@ -1,0 +1,19 @@
+Changelog for WWW-Hashbang-Pastebin
+
+0.004     2012-04-15
+ * Add a Daemon::Control script
+
+0.003     2012-03-31
+ * Add missing Template::Toolkit dependency
+ * Simplify HTML output mode - now append a + to get line numbering
+    * The selected line number will be highlighted
+ * Get line numbers right
+
+0.002     2012-03-22
+ * Add missing YAML dependency
+ * Use Test::DBIx::Class for in-memory SQLite DB
+ * Escaping in templates
+ * Fix off-by-one error in line numbering
+
+0.001     2012-03-16
+ * Initial version

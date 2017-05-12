@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/WebService/YQL.pm
+t/001_load.t
+t/002_live.t
+META.yml                                 Module meta-data (added by MakeMaker)

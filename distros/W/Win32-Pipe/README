@@ -1,0 +1,252 @@
+
+	  +============================================================+
+	  |                                                            |
+	  |                                                            |
+	  |               Pipe extension for Win32 Perl                |
+	  |               -----------------------------                |
+	  |                                                            |
+	  |               Version v960610 (Jun 10 1996)                |
+	  |               by Dave Roth <rothd@roth.net>                |
+	  |                                                            |
+	  |                          Credits:                          |
+	  |                          --------                          |
+	  |               Copyright (c) 1996 Dave Roth.                |
+	  |     Copyright (c) 1996 Dave Roth. All rights reserved.     |
+	  |    This program is free software; you can redistribute     |
+	  |  it and/or modify it under the same terms as Perl itself.  |
+	  |                                                            |
+	  +============================================================+
+
+
+ Use under GNU General Public License or Larry Wall's "Artistic License"
+
+This extension gives Win32 Perl the ability to use Named Pipes. Why? Well
+considering that Win32 Perl does not (yet) have the ability to fork() I 
+could not see what good the pipe(X,Y) was. Besides, where I am an admin
+I must have several perl daemons running on several NT Servers. It dawned
+on me one day that if I could pipe all these daemons' output to my 
+workstation (accross the net) then it would much easier to monitor. This 
+was the impetus for an extension using Named Pipes. I think that they are
+kinda cool. :)
+
+PIPE.PM HISTORY:
+---------------
+96.06.10 Dave Roth <rothd@roth.net>
+         -Original release. Very buggy and very beta. No guarantees on
+		  this stuff, kids!
+99.09.25 Gurusamy Sarathy <gsar@cpan.org> (v0.021)
+	 - minor fixes for Perl 5.005xx compatibility
+	 - delete[] things that got new[]-ed
+
+2000.05.22 Gurusamy Sarathy <gsar@cpan.org> (v0.022)
+	 - documentation in POD format included (thanks to David Rosinger
+	   <drosing@ingr.com>
+	 - support for building under Perl v5.6.0 and for passing
+	   Unicode strings to methods (Doug Lankshear <doug@lankshear.net>)
+
+2008.04.15 Jan Dubois <jand@activestate.com> (v0.023)
+	- new version for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- added ppport.h
+	- added casts to suppress compiler warnings on Win64
+
+2008.06.13 Jan Dubois <jand@activestate.com> (v0.024)
+	- move test.bat, Client.pl and Server.pl into eg/ subdirectory to
+	  prevent the scripts from being installed
+
+2013.12.04 Jan Dubois <jand@activestate.com> (v0.025)
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+
+PIPE.PLL HISTORY:
+----------------
+96.06.10 Dave Roth <rothd@roth.net>
+         -Original release. Just about as bad as the .PM file.
+                 
+
+Following in tradition...
+*****************************************************************************
+*                                                                           *
+*  Use under GNU General Public License or Larry Wall's "Artistic License"  *
+*                                                                           *
+*****************************************************************************
+
+        ----------------------------------------------------------------
+NOTICE: I do not guarantee ANYTHING  with this package. If you use it
+        you are doing so AT YOUR OWN RISK! I may or may not support this
+        depending on my time schedule and I am neither an SQL or ODBC
+        guru so do not ask me questions regarding them!
+        ----------------------------------------------------------------
+
+
+I compiled this using MSVC++ 2.2 on an Intel machine. I do not have access to
+other platforms to compile on so I will not be doing so. If someone else does,
+all the best!
+
+
+What is the deal with this?
+	- You may create as many named pipes as you want (uh, well, as many
+	  as your resources will allow).
+
+	- Currently there is a limit of 256 instances of a named pipe (once a
+	  pipe is created you can have 256 client/server connections to that
+	  name).
+
+	- The default buffer size is 512 bytes, this can be altered by the
+	  ResizeBuffer(xxx) method.
+
+	- All named pipes are byte streams. There is currently no way to 
+	  alter a pipe to be message based.
+
+    - Other things that I can not think of right now.... :)
+
+
+What known problems does this thing have?
+	- If someone is waiting on a Read() and the other end terminates then
+	  you will wait for one REALLY long time! (if anyone has an idea on how 
+	  I can detect the termination of the other end let me know!)
+
+	- All pipes are blocking. I am considering using threads and callbacks 
+	  into Perl to perform async IO but this may be too much for my time
+	  stress. ;)
+
+	- There is no security placed on these pipes.
+
+    - This has not been neither optimized for speed nor optimized for memory
+      consumption. This may run into memory bloat.
+
+
+To test out this ODBC.PLL, install it then run the TEST.PL included with this
+archive. You must first, however alter TEST.PL:
+
+
+** I use a directory structure of \Perl\lib for my library files and this doc is
+** assuming you do too. You will, of course, have to compensate for deviations.
+
+
+    T O   I N S T A L L   T H I S   B E A S T :
+    =========================================
+
+1) You will need to dump the PIPE.PM file into the \PERL\LIB\WIN32\ directory.
+
+2) You need to copy either PIPE105.PLL or PIPE106.PLL (depending on your
+   version of Win32 Perl's build number. Run:  perl -v   to check which build
+   you have) into \PERL\LIB\AUTO\WIN32\PIPE\ directory and rename it to 
+   PIPE.PLL.
+   
+   ---------------------------------------------------------
+
+You are now ready to create named pipes like crazy people!
+
+
+	T O   T E S T   T H I S   B E A S T :
+    ===================================
+
+This package comes equiped with three test files:
+  1) SERVER.PL
+  2) CLIENT.PL
+  3) TEST.BAT
+Change to the directory where these three files are and run TEST.BAT.
+You can now enter stuff into the Client window and watch the output 
+on the Server window. This *should* work accross a network (client on
+machine A and server on machine B) but I have not yet tested that.
+
+
+    T O   U S E   T H I S   B E A S T :
+    =================================
+
+Your script will need to have the following line:
+
+    use Win32::Pipe;
+
+Then you need to create a server side of a named pipe:
+
+    $Pipe = new Win32::Pipe("My Pipe Name");
+
+or if you are going to connect to pipe that has already been created:
+
+	$Pipe = new Win32::Pipe("\\\\server\\pipe\\My Pipe Name");
+
+	NOTE: The "\\\\server\\pipe\\" is necessary when connecting to an existing
+	      pipe! If you are accessing the same machine you could use
+		  "\\\\.\\pipe\\" but either way works fine.
+
+You should check to see if $Pipe is indeed defined otherwise there has been an
+error.
+
+Whichever end is the server, it must now wait for a connection...
+	
+	$Result = $Pipe->Connect();
+
+	NOTE: The client end does not do this! When the client creates the pipe
+	      it has already connected!
+
+Now you can read and write data from either end of the pipe:
+
+	$Data = $Pipe->Read();
+
+	$Result = $Pipe->Write("Howdy! This is cool!");
+
+When the server is finished it must disconnect:
+	
+	$Pipe->Disconnect();
+
+Now the server could Connect() again (and wait for another client) or it could
+destroy the named pipe...
+
+    $Data->Close();
+
+The client should Close() in order to properly end the session.
+
+
+    L I S T   O F   F U N C T I O N S :
+    =================================
+
+The PIPE.PM Package supports the following functions:
+
+BufferSize()
+	Returns the size of the instance of the named pipe's buffer.
+	returns: $BufferSize
+
+Connect()
+	Tells the named pipe to create an instance of the named pipe and wait 
+	until a client connects.
+	returns: TRUE if success
+	         FALSE if failure
+
+Disconnect()
+	Disconnects (and destroys) the instance of the named pipe from the client.
+	returns: TRUE if success
+	         FALSE if failure
+
+Error()
+	Returns the last error messages pertaining to the named pipe. If used 
+	in context to the package.
+	returns: ($ErrorNumber, $ErrorText)
+
+new($Name)
+	Creates a named pipe if used in server context or a connection to the
+	specified named pipe if used in client context.
+	Client context is determined by prepending $Name with "\\\\".
+	returns: TRUE if success
+	         FALSE if failure
+
+Read()
+	Reads from the named pipe.
+	returns: data read from the pipe if success
+	         undef if failure
+
+ResizeBuffer($Size)
+	Sets the instance of the named pipe's buffer to $Size.
+	returns: $BufferSize if success
+	         FALSE if failure
+
+Write($Data)
+	Writes $Data to the named pipe.
+	returns: TRUE if success
+	         FALSE if failure
+
+
+

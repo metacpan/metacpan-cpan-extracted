@@ -1,0 +1,87 @@
+use strict;
+use Webservice::InterMine;
+use Data::Dumper;
+
+my $service = Webservice::InterMine->get_service('www.flymine.org/query');
+
+my $job = $service->resolve_ids(
+    identifiers => [qw/eve zen r bib Mad h/],
+    type => 'Gene',
+    extra => 'D. melanogaster',
+    caseSensitive => 1
+);
+
+$job->poll until ($job->completed);
+
+print Dumper($job->results);
+
+=pod 
+
+=head1 NAME
+
+Webservice::InterMine::Cookbook::IdResolution - Resolving Identifiers
+
+=head1 SYNOPSIS
+
+    use strict;
+    use Webservice::InterMine;
+    use Data::Dumper;
+
+    my $service = Webservice::InterMine->get_service('www.flymine.org/query', $TOKEN);
+
+    my $job = $service->resolve_ids(
+        identifiers => [qw/eve zen r bib Mad h/],
+        type => 'Gene',
+        extra => 'D. melanogaster',
+        caseSensitive => 1
+    );
+
+    $job->poll until ($job->completed);
+
+    print Dumper($job->results);
+
+=head1 DESCRIPTION
+
+The ID resolution service allows users to send arbitrary lists of identifiers for resolution to
+objects within a database. This method of database searching provides access to the full power
+and complexity of identifier resolution, and is recommended for advanced users needing full
+control over issues such as duplicates and type conversions.
+
+Due to the nature of the kinds of queries that can be run when resolving many identifiers, these
+queries are run as asynchronous jobs, and require polling to access their results. You may wish
+to run the polling in a separate background thread.
+
+Once you have results, you can then easily save the resolved objects as a list on the server:
+
+    my $query = $service->new_query(class => 'Gene');
+    $query->add_constraint(
+        path => 'Gene.id',
+        op => 'ONE OF,
+        values => [ keys %{ $job->results } ]
+    );
+    my $list = $service->new_list(
+        name => "All Resolved Genes",
+        content => $query
+    );
+
+You may wish to examine the resolved genes however to exclude low quality matches such as 
+duplicates and synonymns however.
+
+=head1 CONCLUSION
+
+The ID Resolution service provides the most flexibility and control when it comes to identifier
+resolution.
+
+=head1 SEE ALSO
+
+=over 
+
+=item L<Webservice::InterMine::Service>
+
+=item L<Webservice::InterMine::IDResolutionJob>
+
+=back
+
+=cut
+
+

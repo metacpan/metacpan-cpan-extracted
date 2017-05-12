@@ -1,0 +1,627 @@
+{
+   "abstract" : "Fully featured liquid preprocessor with shopify tags & filters added in.",
+   "author" : [
+      "Adam Harrison (adamdharrison@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Shopify-Liquid",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::Compare" : "0",
+            "Date::Parse" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Devel::StackTrace" : "0",
+            "Digest::MD5" : "0",
+            "File::Slurp" : "0",
+            "HTML::Entities" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Module::Find" : "0",
+            "Scalar::Util" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Shopify::Liquid" : {
+         "file" : "lib/WWW/Shopify/Liquid.pm",
+         "version" : "0.06"
+      },
+      "WWW::Shopify::Liquid::Beautifier" : {
+         "file" : "lib/WWW/Shopify/Liquid/Beautifier.pm"
+      },
+      "WWW::Shopify::Liquid::Dialect::Shopify" : {
+         "file" : "lib/WWW/Shopify/Liquid/Dialect/Shopify.pm"
+      },
+      "WWW::Shopify::Liquid::Element" : {
+         "file" : "lib/WWW/Shopify/Liquid.pm"
+      },
+      "WWW::Shopify::Liquid::Exception" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Control" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Control::Break" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Control::Continue" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::InvalidSeparator" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::Tag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedBrace" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedDoubleQuote" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedLexingHalt" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedOutputTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedSingleQuote" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Lexer::UnbalancedTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Optimizer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::Arguments" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::NakedInnerTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::NoClose" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::NoOpen" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::Operands" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::UnknownFilter" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Parser::UnknownTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Renderer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Renderer::Arguments" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Renderer::Unimplemented" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Security" : {
+         "file" : "lib/WWW/Shopify/Liquid/Security.pm"
+      },
+      "WWW::Shopify::Liquid::Exception::Timeout" : {
+         "file" : "lib/WWW/Shopify/Liquid/Exception.pm"
+      },
+      "WWW::Shopify::Liquid::Filter" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Abs" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Abs.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Append" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Append.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::AssetUrl" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/AssetUrl.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Camelize" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Camelize.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Capitalize" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Capitalize.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Ceil" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Ceil.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::CollectionImgUrl" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/CollectionImgUrl.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::CustomerLoginLink" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/CustomerLoginLink.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Date" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Date.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DateMath" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DateMath.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DateParse" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DateParse.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DateSetTimeZone" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DateSetTimeZone.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DefaultErrors" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DefaultErrors.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DefaultPagination" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DefaultPagination.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::DividedBy" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/DividedBy.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Downcase" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Downcase.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Escape" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Escape.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::EscapeCSS" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/EscapeCSS.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::EscapeHTML" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/EscapeHTML.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::EscapeJS" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/EscapeJS.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::First" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/First.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Floor" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Floor.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Grep" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Grep.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Handle" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Handle.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Handleize" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Handleize.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::ImgTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/ImgTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::IsArray" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/IsArray.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::IsHash" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/IsHash.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::IsUtf8" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/IsUtf8.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::JSON" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/JSON.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Join" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Join.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Keys" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Keys.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Last" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Last.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkTo" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkTo.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkToAddTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkToAddTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkToRemoveTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkToRemoveTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkToTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkToTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkToType" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkToType.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::LinkToVendor" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/LinkToVendor.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Lstrip" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Lstrip.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::MD5" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/MD5.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Map" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Map.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Megumin" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Megumin.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Minus" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Minus.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Money" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Money.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::MoneyWithCurrency" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/MoneyWithCurrency.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::MoneyWithoutCurrency" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/MoneyWithoutCurrency.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::MoneyWithoutTrailingZeros" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/MoneyWithoutTrailingZeros.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::NewlineToBr" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/NewlineToBr.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Pluralize" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Pluralize.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Plus" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Plus.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Prepend" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Prepend.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::ProductImgUrl" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/ProductImgUrl.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Remove" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Remove.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::RemoveFirst" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/RemoveFirst.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Replace" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Replace.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Round" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Round.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Rstrip" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Rstrip.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::ScriptTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/ScriptTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::ShopifyAssetUrl" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/ShopifyAssetUrl.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Size" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Size.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Slice" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Slice.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Sort" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Sort.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Split" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Split.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Sprintf" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Sprintf.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::StripHtml" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/StripHtml.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::StripNewlines" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/StripNewlines.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::StylesheetTag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/StylesheetTag.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Sum" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Sum.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::T" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/T.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::ThemeUrl" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/ThemeUrl.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Times" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Times.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Truncate" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Truncate.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Truncatewords" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Truncatewords.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Unknown" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Upcase" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Upcase.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::UrlEscape" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/UrlEscape.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::UrlForProduct" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/UrlForProduct.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::UrlForType" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/UrlForType.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::UrlForVendor" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/UrlForVendor.pm"
+      },
+      "WWW::Shopify::Liquid::Filter::Within" : {
+         "file" : "lib/WWW/Shopify/Liquid/Filter/Within.pm"
+      },
+      "WWW::Shopify::Liquid::Lexer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Operator" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::And" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/And.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Array" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Array.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Assignment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Assignment.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::By" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/By.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Concatenate" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Concatenate.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Contains" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Contains.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Divide" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Divide.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::DivideAssignment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/DivideAssignment.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Equals" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Equals.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Greater" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Greater.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::GreaterEquals" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/GreaterEquals.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::In" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/In.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Less" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Less.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::LessEquals" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/LessEquals.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Minus" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Minus.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::MinusAssignment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/MinusAssignment.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Modulo" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Modulo.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Multiply" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Multiply.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::MultiplyAssignment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/MultiplyAssignment.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Not" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Not.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::NotEquals" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/NotEquals.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::NotRegex" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/NotRegex.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Or" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Or.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Pipe" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Pipe.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Plus" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Plus.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::PlusAssignment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/PlusAssignment.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::Regex" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/Regex.pm"
+      },
+      "WWW::Shopify::Liquid::Operator::With" : {
+         "file" : "lib/WWW/Shopify/Liquid/Operator/With.pm"
+      },
+      "WWW::Shopify::Liquid::Optimizer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Optimizer.pm"
+      },
+      "WWW::Shopify::Liquid::Parser" : {
+         "file" : "lib/WWW/Shopify/Liquid/Parser.pm"
+      },
+      "WWW::Shopify::Liquid::Pipeline" : {
+         "file" : "lib/WWW/Shopify/Liquid.pm"
+      },
+      "WWW::Shopify::Liquid::Renderer" : {
+         "file" : "lib/WWW/Shopify/Liquid/Renderer.pm"
+      },
+      "WWW::Shopify::Liquid::Renderer::NoClone" : {
+         "file" : "lib/WWW/Shopify/Liquid/Renderer.pm"
+      },
+      "WWW::Shopify::Liquid::Security" : {
+         "file" : "lib/WWW/Shopify/Liquid/Security.pm"
+      },
+      "WWW::Shopify::Liquid::Security::None" : {
+         "file" : "lib/WWW/Shopify/Liquid/Security.pm"
+      },
+      "WWW::Shopify::Liquid::Security::Strict" : {
+         "file" : "lib/WWW/Shopify/Liquid/Security.pm"
+      },
+      "WWW::Shopify::Liquid::Tag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Assign" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Assign.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Break" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Break.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Capture" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Capture.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Case" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Case.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Comment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Comment.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Continue" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Continue.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Cycle" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Cycle.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Decrement" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Decrement.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Enclosing" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Enclosing.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::For" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/For.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Form" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Form.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Free" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Free.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::If" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/If.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Include" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Include.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Increment" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Increment.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Layout" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Layout.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Output" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Paginate" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Paginate.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Raw" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Raw.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Tablerow" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Tablerow.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Unless" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Unless.pm"
+      },
+      "WWW::Shopify::Liquid::Tag::Whitespace" : {
+         "file" : "lib/WWW/Shopify/Liquid/Tag/Whitespace.pm"
+      },
+      "WWW::Shopify::Liquid::Token" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Array" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Bool" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Grouping" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Grouping::Parenthetical" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Hash" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::NULL" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Number" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Operand" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Operator" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Output" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Separator" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::String" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Tag" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Text" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Text::Whitespace" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Variable" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Variable::Named" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      },
+      "WWW::Shopify::Liquid::Token::Variable::Processing" : {
+         "file" : "lib/WWW/Shopify/Liquid/Lexer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

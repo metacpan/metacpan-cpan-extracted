@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                W3C-LogValidator
+version:             1.4
+abstract:            The W3C Log Validator
+license:             ~
+author:              
+    - Olivier Thereaux <ot@w3.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::General:               0
+    DB_File:                       0
+    Exporter:                      0
+    File::Temp:                    0
+    LWP::UserAgent:                0
+    Mail::Sendmail:                0
+    Sys::Hostname:                 0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

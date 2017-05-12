@@ -1,0 +1,31 @@
+WWW-Sucksub-Vostfree
+
+SuckSub::Vostfree is a web robot based on the WWW::Mechanize Module.
+This module search and collect distant result on the vostfree.fr web database( only french subtitles availables).
+Subtitles Files urls and associated titles are cumulated in a local dbm file.
+Distant and local subtitles search are possible and simple html generated repport allow you to browse searches results.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Timothée Foucart
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,9 @@
+NAME
+    WWW::KeenIO - Perl interface for Keen.IO analytics API
+
+VERSION
+    Version 0.1
+
+DESCRIPTION
+    Allows sending and retrieval of events from KeenIO
+    https://keen.io/docs/api/

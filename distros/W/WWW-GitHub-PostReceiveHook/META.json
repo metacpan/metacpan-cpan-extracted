@@ -1,0 +1,70 @@
+{
+   "abstract" : "A simple Web::Simple wrapper for GitHub's PostReceive hooks",
+   "author" : [
+      "Matt Phillips <mattp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-GitHub-PostReceiveHook",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "JSON" : "0",
+            "Try::Tiny" : "0",
+            "Web::Simple" : "0.008",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::GitHub::PostReceiveHook" : {
+         "file" : "lib/WWW/GitHub/PostReceiveHook.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-www-github-postreceivehook at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-GitHub-PostReceiveHook"
+      },
+      "homepage" : "https://github.com/mattp-/WWW-GitHub-PostReceiveHook",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mattp-/WWW-GitHub-PostReceiveHook.git",
+         "web" : "https://github.com/mattp-/WWW-GitHub-PostReceiveHook"
+      }
+   },
+   "version" : "0.004"
+}
+

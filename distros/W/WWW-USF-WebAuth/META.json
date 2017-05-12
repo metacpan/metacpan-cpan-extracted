@@ -1,0 +1,66 @@
+{
+   "abstract" : "Access to USF's WebAuth system",
+   "author" : [
+      "Douglas Christopher Wilson <doug@somethingdoug.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-USF-WebAuth",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : 0,
+            "Test::More" : 0,
+            "Test::Requires" : "0.02"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::CAS::External" : "0.05",
+            "LWP::Protocol::https" : 0,
+            "Moose" : "1.03",
+            "MooseX::Aliases" : "0.05",
+            "MooseX::StrictConstructor" : "0.09",
+            "MooseX::Types" : "0.08",
+            "namespace::clean" : "0.04",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::USF::WebAuth" : {
+         "file" : "lib/WWW/USF/WebAuth.pm",
+         "version" : "0.003001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dougwilson/perl5-www-usf-webauth/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/dougwilson/perl5-www-usf-webauth.git"
+      }
+   },
+   "version" : "0.003001"
+}

@@ -1,0 +1,122 @@
+200[
+    [
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1263933875, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Redeemable Purchase Currency", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 1, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1263933875, 
+            "has_dollar_exchange_rate_integrity": 1, 
+            "id": 1
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1263933875, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Redeemable Reward Currency", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 1, 
+            "created_timestamp": 1263933875, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 2
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1264002256, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Redeemable Hybrid Currency", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 1, 
+            "can_be_rewarded": 1, 
+            "created_timestamp": 1263933875, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 3
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1263933875, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Redeemable Über Currency", 
+            "can_be_cross_publisher": 1, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1263933875, 
+            "has_dollar_exchange_rate_integrity": 1, 
+            "id": 4
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1281721854, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Non-Redeemable Experience Points (XP)", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1281721854, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 5
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1281721978, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Non-Redeemable Social Points", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1281721978, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 6
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1281722015, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Redeemable Social Points", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1281722015, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 7
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1281722073, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Non-Redeemable Tracking Points", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1281722073, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 8
+        }, 
+        {
+            "read_only": 0, 
+            "modified_timestamp": 1281722190, 
+            "resource_name": "currency_type", 
+            "description": "", 
+            "title": "Skill Points", 
+            "can_be_cross_publisher": 0, 
+            "can_be_purchased": 0, 
+            "can_be_rewarded": 0, 
+            "created_timestamp": 1281722190, 
+            "has_dollar_exchange_rate_integrity": 0, 
+            "id": 9
+        }
+    ], 
+    {}
+]

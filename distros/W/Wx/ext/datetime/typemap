@@ -1,0 +1,29 @@
+#############################################################################
+## Name:        ext/datetime/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     22/09/2002
+## RCS-ID:      $Id: typemap 2562 2009-05-17 08:57:33Z mbarbon $
+## Copyright:   (c) 2002-2004, 2006, 2008-2009 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxDateTime_t            T_ENUM
+Month                   T_ENUM
+Year                    T_ENUM
+WeekDay                 T_ENUM
+WeekFlags               T_ENUM
+NameFlags               T_ENUM
+Calendar                T_ENUM
+
+wxDateTime *            O_NON_WXOBJECT_THR
+wxDateSpan *            O_NON_WXOBJECT
+wxTimeSpan *            O_NON_WXOBJECT
+wxDateTime::TimeZone    T_TIMEZONE
+
+INPUT
+T_TIMEZONE
+    $var = (wxDateTime::TZ)SvIV($arg);

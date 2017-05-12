@@ -1,0 +1,20 @@
+---
+abstract: 'Perl interface to xsl.pt'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-SapoPuny
+requires:
+  WWW::Shorten: '1.98'
+resources:
+  repository: git://github.com/ambs/WWW-Shorten-SapoPuny.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+lib/WebService/JotForm.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+README
+META.json
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/live_author.t
+t/kwalitee.t
+t/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)

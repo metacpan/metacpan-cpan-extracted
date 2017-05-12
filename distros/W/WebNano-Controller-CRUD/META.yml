@@ -1,0 +1,51 @@
+---
+abstract: 'A base controller implementing CRUD operations (EXPERIMENTAL!)'
+author:
+  - 'Zbigniew Lukasiak <zby@cpan.org>'
+build_requires:
+  Config::Any: 0
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  DateTime: 0
+  File::Copy: 0
+  HTML::FormHandler::Model::DBIC: 0
+  HTML::FormHandler::Moose: 0
+  HTML::FormHandler::Render::Simple: 0
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Test::More: 0
+  WebNano: 0
+  WebNano::Renderer::TT: 0
+  base: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebNano-Controller-CRUD
+no_index:
+  directory:
+    - t/lib
+requires:
+  Class::MOP: 0
+  Config::General: 0
+  Cwd: 0
+  DBIx::Class: 0
+  DateTime::Format::SQLite: 0
+  File::Spec::Functions: 0
+  HTML::FormHandler::Model::DBIC: 0
+  HTML::FormHandler::Moose: 0
+  Moose: 0
+  MooseX::NonMoose: 0
+  WebNano: 0.007
+  WebNano::Controller: 0
+  WebNano::Renderer::TT: 0
+resources:
+  repository: http://github.com/zby/WebNano-Controller-CRUD
+version: 0.007

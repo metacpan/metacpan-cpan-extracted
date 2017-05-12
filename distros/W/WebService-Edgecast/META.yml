@@ -1,0 +1,34 @@
+---
+abstract: "Perl interface to Edgecast's SOAP API"
+author:
+  - 'James Conerly <jconerly@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Edgecast
+requires:
+  Carp: 0
+  Class::Std::Fast::Storable: 0
+  Module::Pluggable: 0
+  Moose: 0
+  SOAP::WSDL::Client::Base: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::double: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::int: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::long: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::short: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::string: 0
+  SOAP::WSDL::XSD::Typelib::Builtin::unsignedInt: 0
+  SOAP::WSDL::XSD::Typelib::ComplexType: 0
+  SOAP::WSDL::XSD::Typelib::Element: 0
+  Scalar::Util: 0
+  XML::Simple: 0
+version: 0.01.00

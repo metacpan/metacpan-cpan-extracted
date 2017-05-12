@@ -1,0 +1,198 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/WWW-Finger/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2009-12-14"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.01.tar.gz> ;
+	rdfs:label      "Initial release"@en .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2009-12-14"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-01 ;
+		dcs:item   [ a dcs:Bugfix; rdfs:label "Fixed problems with build."@en ]
+	] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2009-12-15"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Fixed package signature."@en ] ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "WWW::Finger::Webfinger now provides an ->endpoint method."@en ]
+	] .
+
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2009-12-16"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "Bundle a command-line query tool."@en ] ;
+		dcs:item   [ a dcs:Change ;    rdfs:label "Change default scheme for Webfinger from 'acct://' to 'acct:'."@en ] ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Fingerpoint bugfix in ->graph()."@en ] ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Unimplemented methods return empty arrays properly."@en ]
+	] .
+
+my:project :release my:v_0-05 .
+my:v_0-05
+	a               :Version ;
+	dc:issued       "2009-12-16"^^xsd:date ;
+	:revision       "0.05"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.05.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Mini bug-fixes."@en ] ;
+		dcs:item   [ a dcs:Update ;    rdfs:label "use XRD::Parser 0.04."@en ]
+	] .
+
+my:project :release my:v_0-06 .
+my:v_0-06
+	a               :Version ;
+	dc:issued       "2009-01-06"^^xsd:date ;
+	:revision       "0.06"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.06.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-05 ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "Support Joe Gregorio's alternative to current Webfinger protocol."@en ] ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "Allow fingerw command-line client to load additional modules."@en ] ;
+		dcs:item   [ a dcs:Update ;    rdfs:label "Improve fingerw's debugging (verbose) messages."@en ] ;
+		dcs:item   [ a dcs:Change ;    rdfs:label "Refactor some code from WWW::Finger::Webfinger to allow it to be used elsewhere."@en ] ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "Follow rdf:seeAlso and ianalink:describedby links found in Webfinger account profiles."@en ] ;
+		dcs:item   [ a dcs:Addition ;  rdfs:label "Support semantics of foaf:account and foaf:holdsAccount."@en ] ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Fix duplicated mbox in WWW::Finger::CPAN."@en ] ;
+		dcs:item   [ a dcs:Update ;    rdfs:label "Use Turtle for Changes file."@en ]
+	] .
+
+my:project :release my:v_0-07 .
+my:v_0-07
+	a               :Version ;
+	dc:issued       "2009-01-06"^^xsd:date ;
+	:revision       "0.07"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.07.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-06 ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Include BitworkingFingerProtocol.pm in MANIFEST."@en ] ;
+		dcs:item   [ a dcs:Update ;    rdfs:label "Update copyright noticed to 2010."@en ]
+	] .
+
+my:project :release my:v_0-08 .
+my:v_0-08
+	a               :Version ;
+	dc:issued       "2010-01-06"^^xsd:date ;
+	:revision       "0.08"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.08.tar.gz> ;
+	rdfs:comment    "Too many releases today!"@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-07 ;
+		dcs:item   [ a dcs:Bugfix ;    rdfs:label "Documentation improvements."@en ]
+	] .
+
+my:project :release my:v_0-09 .
+my:v_0-09
+	a               :Version ;
+	dc:issued       "2010-04-26"^^xsd:date ;
+	:revision       "0.09"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.09.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-08 ;
+		dcs:item   [ a dcs:Update ; dcs:checkin "r104"^^xsd:string ; rdfs:label "Switch Changes file from Aaron Cope's changefile vocab to my own DOAP Change Sets vocab."@en ] ;
+		dcs:item   [ rdfs:label "Various cleanups."@en ]
+	] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-07-25"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-09 ;
+		dcs:item   [ rdfs:label "Use the somewhat more complete (albeit slower) HTTP::LRDD module to perform LRDD for Webfinger rather than a home-grown method."@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "CPAN module now has webid method."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-101 .
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2010-07-31"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-100 ;
+		dcs:item   [ rdfs:label "Webfinger and Fingerpoint modules provide a 'get' method to easily access additional data."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-102 .
+my:v_0-102
+	a               :Version ;
+	dc:issued       "2011-11-27"^^xsd:date ;
+	:revision       "0.102"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.102.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-101 ;
+		dcs:item   [ rdfs:label "Rewrite of WWW::Finger::CPAN using MetaCPAN API."@en ; rdfs:seeAlso <https://metacpan.org/> ] ;
+		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "Use Module::Pluggable instead of homebrew plugin system." ] ;
+		dcs:item   [ rdfs:label "Cleanup." ]
+	] .
+
+my:project :release my:v_0-103 .
+my:v_0-103
+	a               :Version ;
+	dc:issued       "2011-12-04"^^xsd:date ;
+	:revision       "0.103"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.103.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-102 ;
+		dcs:item   [ rdfs:label "Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY." ] ;
+		dcs:item   [ rdfs:label "Newer version of Module::Package::RDF."@en ; a dcs:Packaging, dcs:Bugfix ]
+	] .
+
+_:florian
+	a foaf:Person;
+	foaf:name "Florian Schlichting";
+	foaf:mbox_sha1sum "befe575e73de52033ed8e2c7b409fae5388a8fb7".
+
+my:project :release my:v_0-104 .
+my:v_0-104
+	a               :Version ;
+	dc:issued       "2012-02-23"^^xsd:date ;
+	:revision       "0.104"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.104.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-103 ;
+		dcs:item   [ a dcs:Packaging,dcs:Bugfix; rdfs:label "Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY in META.yml too."@en; dcs:blame _:florian; dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75122> ] ;
+		dcs:item   [ a dcs:Update; rdfs:label "s/Digest::SHA1/Digest::SHA/"@en; rdfs:comment "The latter is in Perl core now."@en; dcs:blame _:florian; dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75123> ]
+	] .
+
+my:project :release my:v_0-105 .
+my:v_0-105
+	a               :Version ;
+	dc:issued       "2013-07-17"^^xsd:date ;
+	:revision       "0.105"^^xsd:string ;
+	:file-release   <http://backpan.perl.org/authors/id/T/TO/TOBYINK/WWW-Finger-0.105.tar.gz> ;
+	dcs:changeset [
+		dcs:versus :v_0-104 ;
+		dcs:item   [ a dcs:Packaging, dcs:Bugfix; rdfs:label "Stop bundling prehistoric version of Scalar::Util in 'inc'."; dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86567> ] ;
+	] .
+	

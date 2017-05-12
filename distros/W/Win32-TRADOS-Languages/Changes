@@ -1,0 +1,5 @@
+Revision history for perl module Win32::TRADOS::Languages
+
+0.01 2014-05-05
+
+ - Initial CPAN-worthy version (refactored from an existing prototype)

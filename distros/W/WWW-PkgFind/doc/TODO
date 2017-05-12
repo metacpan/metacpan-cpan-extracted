@@ -1,0 +1,14 @@
+TODO
+----
+
+1.1
+   * (DONE) Allow pull from SourceForge mirror system, given $MIRROR
+     - http://prdownloads.sourceforge.net/$project/$package?use_mirror=$MIRROR
+   * (DONE) Test pkgfind against SF to find & retrieve packages
+
+1.2
+   * Tune how often retrievals occur
+   * Create script using XML::RSS to generate feeds of test metadata
+     (See http://www.gelato.unsw.edu.au/kerncomp/rss.php)
+   * Reactivate rename functionality
+   * Review/strip out portions of API that aren't really needed

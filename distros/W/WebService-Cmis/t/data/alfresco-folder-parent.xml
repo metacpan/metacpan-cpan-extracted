@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:cmisra="http://docs.oasis-open.org/ns/cmis/restatom/200908/" xmlns:cmis="http://docs.oasis-open.org/ns/cmis/core/200908/" xmlns:alf="http://www.alfresco.org">
+  <author>
+    <name>admin</name>
+  </author>
+  <content src="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/content"/>
+  <id>urn:uuid:3a7639b8-bea4-458c-8851-5c514d27598d</id>
+  <link rel="self" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d"/>
+  <link rel="edit" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/allowableactions" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/allowableactions"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/relationships" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/rels"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/policies" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/pols"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/acl" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/acl"/>
+  <link rel="up" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/9ae7d4d5-dddb-41ce-94df-c3fef0b7dfc5" type="application/atom+xml;type=entry"/>
+  <link rel="down" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/children" type="application/atom+xml;type=feed"/>
+  <link rel="down" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/descendants" type="application/cmistree+xml"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/foldertree" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/3a7639b8-bea4-458c-8851-5c514d27598d/tree" type="application/atom+xml;type=feed"/>
+  <link rel="describedby" href="http://localhost:8080/alfresco/service/cmis/type/cmis:folder"/>
+  <link rel="service" href="http://localhost:8080/alfresco/service/cmis"/>
+  <published>2012-08-15T11:52:08.760+02:00</published>
+  <summary/>
+  <title>proxy</title>
+  <updated>2012-10-04T14:48:24.985+02:00</updated>
+  <app:edited>2012-10-04T14:48:24.985+02:00</app:edited>
+  <alf:icon>http://localhost:8080/alfresco/images/icons/space-icon-default-16.gif</alf:icon>
+  <cmisra:object>
+    <cmis:properties>
+      <cmis:propertyId propertyDefinitionId="cmis:allowedChildObjectTypeIds" displayName="Allowed Child Object Types Ids" queryName="cmis:allowedChildObjectTypeIds"/>
+      <cmis:propertyId propertyDefinitionId="cmis:objectTypeId" displayName="Object Type Id" queryName="cmis:objectTypeId">
+        <cmis:value>cmis:folder</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyString propertyDefinitionId="cmis:path" displayName="Path" queryName="cmis:path">
+        <cmis:value>/User Homes/proxy</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:name" displayName="Name" queryName="cmis:name">
+        <cmis:value>proxy</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:creationDate" displayName="Creation Date" queryName="cmis:creationDate">
+        <cmis:value>2012-08-15T11:52:08.760+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="cmis:changeToken" displayName="Change token" queryName="cmis:changeToken"/>
+      <cmis:propertyString propertyDefinitionId="cmis:lastModifiedBy" displayName="Last Modified By" queryName="cmis:lastModifiedBy">
+        <cmis:value>proxy</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:createdBy" displayName="Created by" queryName="cmis:createdBy">
+        <cmis:value>admin</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="cmis:objectId" displayName="Object Id" queryName="cmis:objectId">
+        <cmis:value>workspace://SpacesStore/3a7639b8-bea4-458c-8851-5c514d27598d</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="alfcmis:nodeRef" displayName="Alfresco Node Ref" queryName="alfcmis:nodeRef"/>
+      <cmis:propertyId propertyDefinitionId="cmis:baseTypeId" displayName="Base Type Id" queryName="cmis:baseTypeId">
+        <cmis:value>cmis:folder</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="cmis:parentId" displayName="Parent Id" queryName="cmis:parentId">
+        <cmis:value>workspace://SpacesStore/9ae7d4d5-dddb-41ce-94df-c3fef0b7dfc5</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:lastModificationDate" displayName="Last Modified Date" queryName="cmis:lastModificationDate">
+        <cmis:value>2012-10-04T14:48:24.985+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <alf:aspects>
+        <alf:appliedAspects>P:sys:localized</alf:appliedAspects>
+        <alf:appliedAspects>P:cm:titled</alf:appliedAspects>
+        <alf:appliedAspects>P:cm:ownable</alf:appliedAspects>
+        <alf:properties>
+          <cmis:propertyString propertyDefinitionId="cm:description" displayName="Description" queryName="cm:description">
+            <cmis:value/>
+          </cmis:propertyString>
+          <cmis:propertyString propertyDefinitionId="cm:title" displayName="Title" queryName="cm:title"/>
+          <cmis:propertyString propertyDefinitionId="cm:owner" displayName="Owner" queryName="cm:owner">
+            <cmis:value>proxy</cmis:value>
+          </cmis:propertyString>
+        </alf:properties>
+      </alf:aspects>
+    </cmis:properties>
+  </cmisra:object>
+  <cmisra:pathSegment>proxy</cmisra:pathSegment>
+</entry>

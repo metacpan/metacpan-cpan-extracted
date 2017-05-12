@@ -1,0 +1,25 @@
+Revision history for Win32-Outlook-IAF
+
+0.96  Sat Dec 22 18:00:00
+        - Updated module metadata (description)
+
+0.95  Mon Dec 17 18:00:00 2007
+        - Added IMAPFullList method
+        - Fixed POP3ExpireDays and POP3SecureConnection field id's
+        - Increased MAX_FIELD_LENGTH
+
+0.93  Sat Nov 17 20:00:00 2007
+        - Fixed ConnectionType (IAF_CT_*) enumeration values
+
+0.92  Sun Nov 11 23:30:00 2007
+        - Added support for HTTP an other fields
+
+0.9   Sat Nov 10 20:00:00 2007
+        - Object properties turned into AUTOLOAD proxy methods
+        - Added support for IMAP and NNTP fields
+        - Some updates to documentation
+        - More test cases
+
+0.01  Sun Nov 4 15:30:00 2007
+        First version, released on an unsuspecting world.
+

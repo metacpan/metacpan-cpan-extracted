@@ -1,0 +1,4 @@
+POST http://www.excite.com/cgi/add_url_new.cgi HTTP/1.0
+Referer: http://magellan.excite.com/info/add_url/
+Content: url=<***URL***>&email=<***EMAIL***>&channel=Computers/Internet&Service=magellan&look=excite
+SEname: Magellan

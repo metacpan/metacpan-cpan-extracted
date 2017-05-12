@@ -1,0 +1,46 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wiki-Toolkit-Formatter-UseMod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::PullParser" : "0",
+            "Test::More" : "0",
+            "Text::WikiFormat" : "0.71",
+            "URI::Escape" : "0",
+            "URI::Find::Delimited" : "0.02",
+            "Wiki::Toolkit" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.25"
+}

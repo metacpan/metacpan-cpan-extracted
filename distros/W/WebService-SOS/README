@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution WebService-SOS,
+version 0.01:
+
+  A module for interfacing with an OpenGIS Sensor Observation Service (SOS)
+
+This software is copyright (c) 2011 by James C. Davis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

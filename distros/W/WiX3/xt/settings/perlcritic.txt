@@ -1,0 +1,33 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Modules::PerlMinimumVersion]
+version = 5.008003
+
+# Temporary exclusions - used as I work on cleaning up other errors.
+#[-CodeLayout::RequireTidyCode]
+#[-CodeLayout::ProhibitTrailingWhitespace]
+
+# Exclusions
+[-CodeLayout::ProhibitHardTabs]
+[-Miscellanea::RequireRcsKeywords]
+[-Subroutines::RequireArgUnpacking]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+[-Editor::RequireEmacsFileVariables]

@@ -1,0 +1,104 @@
+Revision history for Perl application Wx::Demo.
+
+0.22  Mon Mar 31 2014
+    - compatibility with Wx 0.9923 and wxWidgets 3.0.0
+
+0.21  Mon Apr 22 2013
+    - Added wxCommandLinkButton demo
+    - Fixes as per rt#84591
+
+0.20  Wed Apr 03 2013
+    - Added wxFontEnumerator demo
+    - demostrate switching off Ubuntu scrollbar overlay
+
+0.19  Tue Oct 02 2012
+    - Updated for wxRibbonControl changes in Wx 0.9912
+    - Demo for wxRearrangeCtrl and friends added
+
+0.18  Fri Aug 24 2012
+    - Added Wx::TreeEvent::GetKeyEvent example
+
+0.17  Thu May 31 2012
+    - Added Wx::PrintPaperDatabase
+
+0.16  Tue Mar 27 2012
+    - Prettier load fail for modules not supported by host Wx / wxWidgets 
+    - Added wxWebView
+    - Added wxTimePickerCtrl
+    - Added wxRichToolTip
+    - Added wxBannerWindow
+    - Added wxInfoBar ( minimally )
+
+0.15  Fri Mar 16 2012
+    - Added wxTreeListCtrl
+    - Added wxRibbonControl
+    - Added wxPropertyGrid
+
+0.14  Tue Feb 28 2012
+    - Fix wxOverlay font on MSW + mingw + gdiplus
+    - Add wxDF_UNICODETEXT handling in wxClipboard demo
+    - several wxWidgets 2.9.3 compatibility fixes
+
+0.13  Thu May 05 08:00:00 BST 2011
+    - Wx::PlVlistBox example expanded
+    - Add bitmap features of Wx::Button
+    - Add Wx::GridTableBase - GetAttr
+
+0.12  Wed Feb  2 13:30:00 CEST 2011    
+    - don't use wxPerl on MacOSX if >= 0.98
+    - Tests can pass if wxMediaCtrl is missing
+    - Some Makefile.PL improvements (Gabor Szabo)
+    - Added demo for wxHeaderCtrl and wxHeaderCtrlSimple.
+    - Added demo for wxOverlay.
+
+0.11  Fri Apr  2 18:34:04 CEST 2010
+    - Allow searching inside the source code (Gabor Szabo).
+    - Add another tab with the list of all wxPerl classes/events
+      used in the demo (Gabor Szabo).
+    - Added demo for wxSpinCtrlDouble.
+
+0.10  Sun Jun 29 21:51:39 CEST 2008
+    - Fixed wxListCtrl report mode demo latent bug.
+    - Fixed running under Perl 5.10.
+
+0.09  Sun Aug 26 01:10:56 CEST 2007
+    - Added demo for wxHyperlinkCtrl.
+    - Added demo for wxTipDialog.
+    - Added demo for wxPasswordEntryDialog.
+
+0.08  Thu Aug 23 21:56:10 CEST 2007
+    - Added "New" category for demos new since last version.
+    - Added demo for wxVScrolledWindow and wxHVScrolledWindow.
+    - Added demo for wxComboCtrl.
+    - Added demo for wxAboutDialog.
+    - Added demo for wxCollapsiblePane.
+    - Added demo for wxSearchControl.
+
+0.07  Wed Mar 28 22:57:39 CEST 2007
+    - Added demo for some of the wxWidgets help classes.
+
+0.06  Thu Mar 22 00:08:44 CET 2007
+    - Added demo for wxToolBar (moved the code from the wxPerl one).
+    - Added demo for wxCaret (moved the code from the wxPerl one).
+    - Added demo for wxArtProvider (moved the code from the wxPerl one).
+    - Added demo for Document/View framework (contributed by Simon Flack
+      in 2002).
+
+0.05  Sun Nov 26 18:23:54 CET 2006
+    - Added wxAuiNotebook to the AUI demo.
+    - Added examples for more wxGrid editors/renderers.
+    - Added demo for wxTreeCtrl.
+
+0.04  Sun Nov 12 18:20:32 CET 2006
+    - Added demo for Advanced User Interface (AUI).
+    - Improved the wxRichTextCtrl demo.
+
+0.03  Sat Nov 11 16:50:00 CET 2006
+    - Added demos for the book and picker controls.
+    - Added demo for wxRichTextCtrl.
+
+0.02  Tue Aug 29 21:24:53 CEST 2006
+    - Work with wxWidgets 2.5.3.
+
+0.01  Sun Aug 27 17:30:34 CEST 2006
+    - First public release.

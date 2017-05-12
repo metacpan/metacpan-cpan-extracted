@@ -1,0 +1,9 @@
+Wurst - wonderful universal remedial structure terminator
+
+DESCRIPTION:
+This program does sequence to sequence or structure alignments
+and might do things like rank the consequent models.
+The philosophy is that there is a set of low level routines
+coded in C. These are called from perl. To do anything useful,
+you write a little perl script which calls the functions you
+want.

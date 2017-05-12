@@ -1,0 +1,615 @@
+NAME
+
+    WebService::Avalara::AvaTax - Avalara SOAP interface as compiled Perl
+    methods
+
+VERSION
+
+    version 0.020
+
+SYNOPSIS
+
+        use WebService::Avalara::AvaTax;
+        my $avatax = WebService::Avalara::AvaTax->new(
+            username => 'avalara@example.com',
+            password => 'sekrit',
+        );
+        my $answer_ref = $avatax->ping;
+
+DESCRIPTION
+
+    This class provides a Perl method API for Avalara AvaTax
+    (http://developer.avalara.com/api-docs/soap) web services. The first
+    call to any AvaTax SOAP operation uses XML::Compile::WSDL11 to compile
+    and execute against the specified Avalara AvaTax service; subsequent
+    calls can vary the parameters but will use the same compiled code.
+
+METHODS
+
+    Aside from the "new" method, "services" attribute and other attributes
+    and methods consumed from
+    WebService::Avalara::AvaTax::Role::Connection, available method names
+    are dynamically loaded from each "services"' wsdl attribute and can be
+    passed either a hash or reference to a hash with the necessary
+    parameters. In scalar context they return a reference to a hash
+    containing the results of the SOAP call; in list context they return
+    the results hashref and an XML::Compile::SOAP::Trace object suitable
+    for debugging and exception handling.
+
+    If there is no result then you should check the trace object for why.
+
+    Please consult the Avalara SOAP API reference
+    (http://developer.avalara.com/api-reference) for semantic details on
+    the methods, parameters and results available for each of the methods
+    listed below. Note that in order to make this interface easier and more
+    Perl-ish, the following changes have been made:
+
+      * SOAP operation names have been transformed from CamelCase to
+      lowercase_with_underscores. For example, GetTax is now "get_tax". If
+      you do not like this behavior then use orthodox => 1 when calling
+      "new".
+
+      * Parameters do not need to be enclosed in {parameters}{FooRequest}{
+      ... } hashes of hashes. These will be automatically added for you,
+      along with all necessary SOAP headers. The examples below reflect
+      this.
+
+      * Similarly, results are not enclosed in {parameters}{FooResult}{ ...
+      } hashes of hashes. They are, however, returned as a hash reference,
+      not a simple hash. If you want access to other aspects of the SOAP
+      response, make the call in list context and the second value in the
+      list will be an XML::Compile::SOAP::Trace instance with methods for
+      retrieving the full request and response as HTTP::Request and
+      HTTP::Response objects, along with other methods for doing things
+      like retrieving the parsed XML::LibXML::Document DOM node of the
+      response.
+
+ new
+
+    Builds a new AvaTax web service client. Since this class consumes the
+    WebService::Avalara::AvaTax::Role::Connection role, please consult that
+    module's documentation for a full list of attributes that can be set at
+    construction.
+
+ get_tax
+
+    (SOAP operation: GetTax)
+
+    As a convenience to Business::Tax::Avalara users (and others), the
+    DocDate element below will default to today's date in the UTC time
+    zone.
+
+    Constructing and making an example request:
+
+        my %get_tax_request = (
+            CompanyCode         => 'APITrialCompany',
+            DocType             => 'SalesInvoice',
+            DocCode             => 'INV001',
+            DocDate             => '2014-01-01',
+            CustomerCode        => 'ABC4335',
+            Discount            => 0,
+            OriginCode          => 0,
+            DestinationCode     => 1,
+            DetailLevel         => 'Tax',
+            HashCode            => 0,
+            Commit              => 'false',
+            ServiceMode         => 'Automatic',
+            PaymentDate         => '1900-01-01',
+            ExchangeRate        => 1,
+            ExchangeRateEffDate => '1900-01-01',
+        );
+    
+        my @addresses = (
+            {   Line1       => '45 Fremont Street',
+                City        => 'San Francisco',
+                Region      => 'CA',
+                PostalCode  => '94105-2204',
+                Country     => 'US',
+                TaxRegionId => 0,
+            },
+            {   Line1       => '118 N Clark St',
+                Line2       => 'ATTN Accounts Payable',
+                City        => 'Chicago',
+                Region      => 'IL',
+                PostalCode  => '60602-1304',
+                Country     => 'US',
+                TaxRegionId => 0,
+            },
+            {   Line1       => '100 Ravine Lane',
+                City        => 'Bainbridge Island',
+                Region      => 'WA',
+                PostalCode  => '98110',
+                Country     => 'US',
+                TaxRegionId => 0,
+            },
+        );
+        for my $address_code (0 .. $#addresses) {
+            push @{$get_tax_request{Addresses}{BaseAddress}} => {
+                AddressCode => $address_code,
+                %{ $addresses[$address_code] },
+            };
+        }
+    
+        my @lines = (
+            {   OriginCode      => 0,
+                DestinationCode => 1,
+                ItemCode        => 'N543',
+                TaxCode         => 'NT',
+                Qty             => 1,
+                Amount          => 10,
+                Discounted      => 'false',
+                Description     => 'Red Size 7 Widget',
+            },
+            {   OriginCode      => 0,
+                DestinationCode => 2,
+                ItemCode        => 'T345',
+                TaxCode         => 'PC030147',
+                Qty             => 3,
+                Amount          => 150,
+                Discounted      => 'false',
+                Description     => 'Size 10 Green Running Shoe',
+            },
+            {   OriginCode      => 0,
+                DestinationCode => 2,
+                ItemCode        => 'FREIGHT',
+                TaxCode         => 'FR',
+                Qty             => 1,
+                Amount          => 15,
+                Discounted      => 'false',
+                Description     => 'Shipping Charge',
+            },
+        );
+        for my $line_no (1 .. @lines) {
+            push @{$get_tax_request{Lines}{Line}} => {
+                No => $line_no,
+                %{ $lines[$line_no - 1] },
+            };
+        }
+    
+        my ( $answer_ref, $trace ) = $avatax->get_tax(%get_tax_request);
+
+ post_tax
+
+    (SOAP operation: PostTax)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->post_tax(
+            CompanyCode => 'APITrialCompany',
+            DocType     => 'SalesInvoice',
+            DocCode     => 'INV001',
+            Commit      => 0,
+            DocDate     => '2014-01-01',
+            TotalTax    => '14.27',
+            TotalAmount => 175,
+            NewDocCode  => 'INV001-1',
+        );
+
+ commit_tax
+
+    (SOAP operation: CommitTax)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->commit_tax(
+            DocCode     => 'INV001',
+            DocType     => 'SalesInvoice',
+            CompanyCode => 'APITrialCompany',
+            NewDocCode  => 'INV001-1',
+        );
+
+ cancel_tax
+
+    (SOAP operation: CancelTax)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->cancel_tax(
+            CompanyCode => 'APITrialCompany',
+            DocType     => 'SalesInvoice',
+            DocCode     => 'INV001',
+            CancelCode  => 'DocVoided',
+        );
+
+ adjust_tax
+
+    (SOAP operation: AdjustTax)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->adjust_tax(
+            AdjustmentReason      => 4,
+            AdjustmentDescription => 'Transaction Adjusted for Testing',
+            GetTaxRequest => {
+                CustomerCode => 'ABC4335',
+                DocDate      => '2014-01-01',
+                CompanyCode  => 'APITrialCompany',
+                DocCode      => 'INV001',
+                DetailLevel  => 'Tax',
+                Commit       => 0,
+                DocType      => 'SalesInvoice',
+                # BusinessIdentificationNo => '234243',
+                # CustomerUsageType        => 'G',
+                # ExemptionNo              => '12345',
+                # Discount                 => 50,
+                # LocationCode             => '01',
+                # TaxOverride => [
+                #    {   TaxOverrideType => 'TaxDate',
+                #        Reason          => 'Adjustment for return',
+                #        TaxDate         => '2013-07-01',
+                #        TaxAmount       => 0,
+                #    },
+                # ],
+                # ServiceMode => 'Automatic',
+                PurchaseOrderNo     => 'PO123456',
+                ReferenceCode       => 'ref123456',
+                PosLaneCode         => '09',
+                CurrencyCode        => 'USD',
+                ExchangeRate        => '1.0',
+                ExchangeRateEffDate => '2013-01-01',
+                SalespersonCode     => 'Bill Sales',
+                Addresses => { BaseAddress => [
+                    {   AddressCode => '01',
+                        Line1       => '45 Fremont Street',
+                        City        => 'San Francisco',
+                        Region      => 'CA',
+                    },
+                    {   AddressCode => '02',
+                        Line1       => '118 N Clark St',
+                        Line2       => 'Suite 100',
+                        Line3       => 'ATTN Accounts Payable',
+                        City        => 'Chicago',
+                        Region      => 'IL',
+                        Country     => 'US',
+                        PostalCode  => '60602',
+                    },
+                    {   AddressCode => '03',
+                        Latitude    => '47.627935',
+                        Longitude   => '-122.51702',
+                    },
+                ] },
+                Lines => { Line => [
+                    {   No              => '01',
+                        ItemCode        => 'N543',
+                        Qty             => 1,
+                        Amount          => 10,
+                        TaxCode         => 'NT',
+                        Description     => 'Red Size 7 Widget',
+                        OriginCode      => '01',
+                        DestinationCode => '02',
+                        # CustomerUsageType => 'L',
+                        # ExemptionNo       => '12345',
+                        # Discounted        => 1,
+                        # TaxIncluded       => 1,
+                        # TaxOverride => {
+                        #     TaxOverrideType => 'TaxDate',
+                        #     Reason          => 'Adjustment for return',
+                        #     TaxDate         => '2013-07-01',
+                        #     TaxAmount       => 0,
+                        # },
+                        Ref1 => 'ref123',
+                        Ref2 => 'ref456',
+                    },
+                    {   No              => '02',
+                        ItemCode        => 'T345',
+                        Qty             => 3,
+                        Amount          => 150,
+                        OriginCode      => '01',
+                        DestinationCode => '03',
+                        Description     => 'Size 10 Green Running Shoe',
+                        TaxCode         => 'PC30147',
+                    },
+                    {   No              => '02-FR',
+                        ItemCode        => 'FREIGHT',
+                        Qty             => 1,
+                        Amount          => 15,
+                        OriginCode      => '01',
+                        DestinationCode => '03',
+                        Description     => 'Shipping Charge',
+                        TaxCode         => 'FR',
+                    },
+                ] },
+            },
+        );
+
+ get_tax_history
+
+    (SOAP operation: GetTaxHistory)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->get_tax_history(
+            CompanyCode => 'APITrialCompany',
+            DocType     => 'SalesInvoice',
+            DocCode     => 'INV001',
+            DetailLevel => 'Tax',
+        );
+
+ validate
+
+    (SOAP operation: Validate)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->validate(
+            Address => {
+                Line1      => '118 N Clark St',
+                Line2      => 'Suite 100',
+                Line3      => 'ATTN Accounts Payable',
+                City       => 'Chicago',
+                Region     => 'IL',
+                PostalCode => '60602',
+            },
+            Coordinates => 1,
+            Taxability  => 1,
+            TextCase    => 'Upper',
+        );
+
+ is_authorized
+
+    (SOAP operation: IsAuthorized)
+
+    Both WebService::Avalara::AvaTax::Service::Address and
+    WebService::Avalara::AvaTax::Service::Tax provide IsAuthorized
+    operations. However, since the latter is loaded last, only its version
+    is called when you call this method. If you need to specifically call a
+    particular service's IsAuthorized, use the call method on its wsdl
+    attribute.
+
+    Note that the parameter passed to this call is a comma-delimited list
+    of SOAP operation names in CamelCase, not lowercase_with_underscores.
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->is_authorized(
+            join ', ' => qw(
+                Ping
+                IsAuthorized
+                GetTax
+                PostTax
+                GetTaxHistory
+                CommitTax
+                CancelTax
+                AdjustTax
+            ),
+        );
+
+ ping
+
+    (SOAP operation: Ping)
+
+    Both WebService::Avalara::AvaTax::Service::Address and
+    WebService::Avalara::AvaTax::Service::Tax provide Ping operations.
+    However, since the latter is loaded last, only its version is called
+    when you call this method. If you need to specifically call a
+    particular service's Ping, use the call method on its wsdl attribute.
+
+    Note that this method does support a single string as a message
+    parameter; this is effectively ignored though.
+
+    Example:
+
+        use List::Util 1.33 'any';
+        my ( $answer_ref, $trace ) = $avatax->ping;
+        for my $code ( $answer_ref->{ResultCode} ) {
+            if ( $code eq 'Success' ) { say $code;                    last }
+            if ( $code eq 'Warning' ) { warn $answer_ref->{Messages}; last }
+    
+            die $answer_ref->{Messages} if any {$code eq $_} qw(Error Exception);
+        }
+
+ tax_summary_fetch
+
+    (SOAP operation: TaxSummaryFetch)
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->tax_summary_fetch(
+            MerchantCode => 'example',
+            StartDate    => '2014-01-01',
+            EndDate      => '2014-01-31',
+        );
+
+ apply_payment (DEPRECATED)
+
+    (SOAP operation: ApplyPayment)
+
+    From Avalara API documentation
+    (http://developer.avalara.com/api-docs/soap/applypayment):
+
+      The ApplyPayment method of the TaxSvc was originally designed to
+      update an existing document record with a PaymentDate value. This
+      function (and cash-basis accounting in general) is no longer
+      supported, and will not work on new or existing accounts, but remains
+      in the TaxSvc WSDL and some automatically built adaptors for
+      backwards compatibility.
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->apply_payment(
+            DocId       => 'example',
+            CompanyCode => 'APITrialCompany',
+            DocType     => 'SalesInvoice',
+            DocCode     => 'INV001',
+            PaymentDate => '2014-01-01',
+        );
+
+ reconcile_tax_history (LEGACY API)
+
+    (SOAP operation: ReconcileTaxHistory)
+
+    From Avalara API documentation
+    (http://developer.avalara.com/api-docs/soap/reconciletaxhistory):
+
+      The ReconcileTaxHistory method of the TaxSvc was designed to allow
+      users to pull a range of documents for reconciliation against a
+      document of record (i.e. in the ERP), and then flag the reconciled
+      documents as completed. Those flagged documents would then be omitted
+      from subsequent ReconcileTaxHistory calls. This method no longer
+      changes the "reconciled" document flag, but can be used to retrieve
+      ranges of document data (much like the AccountSvc DocumentFetch
+      (http://developer.avalara.com/api-docs/soap/accountsvc/document-elements)),
+      and remains in the TaxSvc WSDL and some automatically built adaptors
+      for backwards compatibility.
+
+    Example:
+
+        my ( $answer_ref, $trace ) = $avatax->reconcile_tax_history(
+            CompanyCode => 'APITrialCompany',
+            LastDocId   => 'example',
+            Reconciled  => 1,
+            StartDate   => '2014-01-01',
+            EndDate     => '2014-01-31',
+            DocStatus   => 'Temporary',
+            DocType     => 'SalesOrder',
+            LastDocCode => 'example',
+            PageSize    => 10,
+        );
+
+ATTRIBUTES
+
+ services
+
+    This module is really just a convenience wrapper around instances of
+    WebService::Avalara::AvaTax::Service::Address and
+    WebService::Avalara::AvaTax::Service::Tax modules. As such this
+    attribute is used to keep an array reference to instances of both
+    classes, with the following attributes from "new" passed to both:
+
+    username
+
+    password
+
+    use_wss
+
+    is_production
+
+    user_agent
+
+    debug
+
+ orthodox
+
+    When set to true at construction, the generated methods will exactly
+    match their CamelCase SOAP operation names.
+
+SEE ALSO
+
+    Avalara Developer Network (http://developer.avalara.com/)
+
+      Official source for Avalara developer information, including API
+      references, technical articles and more.
+
+    Business::Tax::Avalara
+
+      An alternative that uses Avalara's REST API.
+
+    XML::Compile::SOAP and XML::Compile::WSDL11
+
+      Part of the XML::Compile suite and the basis for this distribution.
+      It's helpful to understand these in order to debug or extend this
+      module.
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc WebService::Avalara::AvaTax
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/WebService-Avalara-AvaTax
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/WebService-Avalara-AvaTax
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/WebService-Avalara-AvaTax
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/WebService-Avalara-AvaTax
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/WebService-Avalara-AvaTax
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/WebService-Avalara-AvaTax
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/W/WebService-Avalara-AvaTax
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=WebService-Avalara-AvaTax
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=WebService::Avalara::AvaTax
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the web interface at
+    https://github.com/mjgardner/WebService-Avalara-AvaTax/issues. You will
+    be automatically notified of any progress on the request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/mjgardner/WebService-Avalara-AvaTax
+
+      git clone git://github.com/mjgardner/WebService-Avalara-AvaTax.git
+
+AUTHOR
+
+    Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by ZipRecruiter.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

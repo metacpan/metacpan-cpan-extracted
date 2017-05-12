@@ -1,0 +1,86 @@
+#############################################################################
+## Name:        ext/richtext/typemap.xsp
+## Purpose:     typemap file for xsubppp.pl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     05/11/2006
+## RCS-ID:      $Id: typemap.xsp 2962 2010-08-23 19:33:35Z mbarbon $
+## Copyright:   (c) 2006-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%typemap{wxFontStyle}{simple};
+%typemap{wxFontWeight}{simple};
+%typemap{wxBitmapType}{simple};
+%typemap{wxPliRichTextStyleType}{simple};
+%typemap{wxRichTextOddEvenPage}{simple};
+%typemap{wxRichTextPageLocation}{simple};
+%typemap{const wxRichTextAttr&}{reference};
+%typemap{wxRichTextAttr&}{reference};
+%typemap{const wxRichTextRange&}{reference};
+%typemap{const wxTextAttr&}{reference};
+%typemap{const wxTextAttrEx&}{reference};
+%typemap{wxRichTextAttr*}{simple};
+%typemap{wxRichTextAttrDisown*}{parsed}{
+    %cpp_type{%wxRichTextAttr*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{wxRichTextBuffer*}{simple};
+%typemap{wxRichTextCtrl*}{simple};
+%typemap{wxRichTextStyleListBox*}{simple};
+%typemap{wxRichTextStyleListCtrl*}{simple};
+%typemap{wxRichTextStyleComboCtrl*}{simple};
+%typemap{wxRichTextEvent*}{simple};
+%typemap{wxRichTextRange*}{simple};
+%typemap{wxRichTextStyleSheet*}{simple};
+%typemap{wxRichTextStyleSheetDisown*}{parsed}{
+    %cpp_type{%wxRichTextStyleSheet*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{const wxRichTextStyleSheet&}{reference};
+%typemap{wxTextAttrAlignment}{simple};
+%typemap{wxTextAttrEx*}{simple};
+%typemap{wxRichTextRange}{reference};
+%typemap{const wxImage&}{reference};
+%typemap{wxRichTextStyleDefinition*}{simple};
+%typemap{wxRichTextStyleDefinition*}{simple};
+%typemap{wxRichTextStyleDefinitionDisown*}{parsed}{
+    %cpp_type{%wxRichTextStyleDefinition*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{const wxRichTextStyleDefinition&}{reference};
+%typemap{wxRichTextCharacterStyleDefinition*}{simple};
+%typemap{wxRichTextCharacterStyleDefinitionDisown*}{parsed}{
+    %cpp_type{%wxRichTextCharacterStyleDefinition*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{wxRichTextParagraphStyleDefinition*}{simple};
+%typemap{wxRichTextParagraphStyleDefinitionDisown*}{parsed}{
+    %cpp_type{%wxRichTextParagraphStyleDefinition*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{const wxRichTextParagraphStyleDefinition&}{reference};
+%typemap{wxRichTextListStyleDefinition*}{simple};
+%typemap{wxRichTextListStyleDefinitionDisown*}{parsed}{
+    %cpp_type{%wxRichTextListStyleDefinition*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{const wxRichTextListStyleDefinition&}{reference};
+%typemap{wxRichTextFormattingDialog*}{simple};
+%typemap{wxRichTextFileHandler*}{simple};
+%typemap{wxPlRichTextFileHandler*}{simple};
+%typemap{wxPrintData*}{simple};
+%typemap{const wxPrintData&}{reference};
+%typemap{const wxRichTextBuffer&}{reference};
+%typemap{wxRichTextPrinting*}{simple};
+%typemap{const wxPageSetupDialogData&}{reference};
+%typemap{wxPageSetupDialogData*}{simple};
+%typemap{wxRichTextHeaderFooterData*}{simple};
+%typemap{const wxRichTextHeaderFooterData&}{reference};
+
+%typemap{wxRect&}{reference};

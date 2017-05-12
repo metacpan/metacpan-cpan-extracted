@@ -1,0 +1,102 @@
+{
+   "abstract" : "Make working with JSON Web API's as painless as possible",
+   "author" : [
+      "Joe Papperello <antipasta@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-JSON",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : "2.33",
+            "LWP::UserAgent" : "0",
+            "Moo" : "1.001",
+            "Net::OAuth" : "0.28",
+            "Safe::Isa" : "1.000003",
+            "Try::Tiny" : "0.12",
+            "URI" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::LWP::Dispatch" : "0.06",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::JSON" : {
+         "file" : "lib/WWW/JSON.pm",
+         "version" : "1.02"
+      },
+      "WWW::JSON::Response" : {
+         "file" : "lib/WWW/JSON/Response.pm"
+      },
+      "WWW::JSON::Role::Authentication" : {
+         "file" : "lib/WWW/JSON/Role/Authentication.pm"
+      },
+      "WWW::JSON::Role::Authentication::Basic" : {
+         "file" : "lib/WWW/JSON/Role/Authentication/Basic.pm"
+      },
+      "WWW::JSON::Role::Authentication::Header" : {
+         "file" : "lib/WWW/JSON/Role/Authentication/Header.pm"
+      },
+      "WWW::JSON::Role::Authentication::OAuth1" : {
+         "file" : "lib/WWW/JSON/Role/Authentication/OAuth1.pm"
+      },
+      "WWW::JSON::Role::Authentication::OAuth2" : {
+         "file" : "lib/WWW/JSON/Role/Authentication/OAuth2.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/antipasta/WWW-JSON/issues"
+      },
+      "homepage" : "https://github.com/antipasta/WWW-JSON",
+      "repository" : {
+         "url" : "git://github.com/antipasta/WWW-JSON.git",
+         "web" : "https://github.com/antipasta/WWW-JSON"
+      }
+   },
+   "version" : "1.02",
+   "x_contributors" : [
+      "Joe Papperello <joeyis@gmail.com>",
+      "Joe Papperello <joe@socialflow.com>"
+   ]
+}

@@ -1,0 +1,32 @@
+CHANGES
+
+0.05	August 3, 2011
+
+	Internal revisions to compensate for disappearance of Embedly's patterns
+	endpoint; added default API key for Embedly and method to change it. 
+
+
+0.04	November 5, 2010
+
+	Fixed package POD name line to improve CPAN indexing.
+	Adjusted test scripts to report failed oembed calls instead of dying. 
+
+
+0.03	November 3, 2010
+
+	Discard exceptions when loading remote URL lists so that temporary
+	  provider error conditions don't cause run-time failures.
+	Changed definition for Embed.ly to use new services API.
+	Added provider definition for oohembed.com.
+	Copied some additional provider definitions from ruby-oembed.
+	Added change history file.
+
+
+0.02	May 3, 2010
+
+	Improved documentation.
+	
+
+0.01	May 2, 2010
+
+	Initially created.

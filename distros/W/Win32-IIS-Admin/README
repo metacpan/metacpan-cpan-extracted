@@ -1,0 +1,12 @@
+Perl Module Win32::IIS::Admin
+
+by Martin Thurn
+
+Lets you do a few simple administrative tasks on a Windows IIS server.  
+
+Actually, the only task it can do is create a virtual directory.
+
+If you want it to do be able to do more,
+send me a patch, or a donation to my children's college fund!
+
+mthurn at cpan.org

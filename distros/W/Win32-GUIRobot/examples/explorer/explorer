@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+=pod
+
+NOTE!!! This example will not work on your machine!!!
+
+Because your icons and fonts and color are different. Take screendumps of the
+corresponding parts of the screen and the explorer window, and save as png
+files (see names below).
+
+=cut
+
+use strict;
+use warnings;
+use Win32::GUIRobot qw(:all);
+
+my %icons;
+
+for my $fn ( 
+	'1-explorer.png',
+	'2-newwindow.png',
+	'3-loaded.png',
+) {
+	my $icon = LoadImage( $fn);
+	die "Cannot load '$fn':$@" unless $icon;
+
+	die "Image '$fn' is of different depth than the screen" 
+		if ImageDepth( $icon) != ScreenDepth;
+	die "Image '$fn' is wider than the screen" 
+		if ImageWidth( $icon) > ScreenWidth;
+	die "Image '$fn' is higher than the screen" 
+		if ImageHeight( $icon) > ScreenHeight;
+
+	my $f = $fn;
+	$f =~ s/.png$//;
+	$icons{$_} = $icon for split '-', $f;
+}
+
+# start
+MouseMove(0,0);
+
+# click on explorer
+my ($x, $y) = WaitForImage( $icons{1}, 0.0);
+die "Icon #1 is not found on the screen" unless defined $x;
+print "Icon #1 found at $x,$y\n";
+
+$x += ImageWidth( $icons{1}) / 2;
+$y += ImageHeight( $icons{1}) / 2;
+
+SendMouseClick( $x, $y, 'Left');
+
+# click on address bar
+( $x, $y) = WaitForImage( $icons{2}, 3.0 );
+die "Icon #2 is not found on the screen" unless defined $x;
+print "Icon #2 found at $x,$y\n";
+
+$x += ImageWidth( $icons{2}) / 2; 
+$y += ImageHeight( $icons{2}) / 2;
+SendMouseClick( $x, $y, 'Left');
+
+
+# get window handle
+my $explorer = GetForegroundWindow();
+die "Cannot get to explorer window" unless $explorer;
+my @window = GetWindowRect( $explorer);
+printf "Explorer window: 0x%08x [@window]\n", $explorer;
+$SIG{__DIE__} = sub { CloseWindow( $explorer) };
+
+# go to address
+SendKeys('www.google.com~');
+( $x, $y) = WaitForImage( 
+	$icons{3}, 3.0, undef, 
+	$window[0], $window[3] - ImageHeight( $icons{3}) * 2,
+	ImageWidth( $icons{3}) * 2,
+	ImageHeight( $icons{3}) * 2,
+);
+die "Icon #3 is not found on the screen" unless defined $x;
+print "Site loaded ok\n";
+
+# done
+CloseWindow( $explorer);
+Sleep(0.1);
+my $g = ScreenGrab(
+	$window[0], $window[3] - ImageHeight( $icons{3}) * 2,
+	ImageWidth( $icons{3}) * 2,
+	ImageHeight( $icons{3}) * 2,
+);
+die "Cannot close explorer\n" if FindImage( $g, $icons{3});
+print "Done.\n";

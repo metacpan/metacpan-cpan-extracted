@@ -1,0 +1,27 @@
+The Win32::OLE module provides OLE Automation capabilities to Perl.
+It is based on the OLE module distributed by ActiveState with
+their "Perl for Win32" port of Perl 5.003_07. Win32::OLE replaces
+the older OLE module, which is now considered obsolete. Win32::OLE
+is already included in the ActivePerl binary distribution.
+
+This module is compatible with Perl 5.004_01 and above. Compilation
+requires either Microsoft Visual C++ 4.2b or later, or Borland C++
+version 4.02 or above.
+
+Do:
+
+   perl Makefile.PL
+   $make
+   $make test
+   $make install
+
+where $make is either "nmake" or "dmake".
+
+See the pod documentation for details of usage.
+
+The file NEWS.pod contains a history of user visible changes against the
+previous version.
+
+***WARNING*** This version of the module contains ALPHA level support for
+OLE events. This support doesn't work yet for some OLE controls and the
+user interface is still subject to change!

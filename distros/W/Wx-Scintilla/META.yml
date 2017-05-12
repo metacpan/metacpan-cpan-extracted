@@ -1,0 +1,51 @@
+---
+abstract: 'Scintilla source code editing for wxWidgets'
+author:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  Alien::wxWidgets: 0
+  ExtUtils::XSpp: 0.1602
+  Test::More: 0
+  Wx: 0
+configure_requires:
+  Module::Build: 0.36
+  perl: 5.006
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wx-Scintilla
+no_index:
+  directory:
+    - tools
+    - wx-scintilla
+    - cpp
+    - inc
+provides:
+  Wx::Scintilla:
+    file: lib/Wx/Scintilla.pm
+    version: 0.39
+  Wx::Scintilla::Constant:
+    file: lib/Wx/Scintilla/Constant.pm
+    version: 0.39
+  Wx::Scintilla::TextCtrl:
+    file: lib/Wx/Scintilla/TextCtrl.pm
+    version: 0.39
+  Wx::Scintilla::TextEvent:
+    file: lib/Wx/Scintilla/TextEvent.pm
+    version: 0.39
+  Wx::ScintillaTextCtrl:
+    file: lib/Wx/Scintilla.pm
+    version: 0.39
+  Wx::ScintillaTextEvent:
+    file: lib/Wx/Scintilla.pm
+    version: 0.39
+requires:
+  perl: 5.008
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Wx-Scintilla/
+version: 0.39

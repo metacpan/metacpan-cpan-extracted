@@ -1,0 +1,61 @@
+{
+   "abstract" : "Multi-touch web analytics, using Google Analytics",
+   "author" : [
+      "Jon Schutz <jon at jschutz.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Analytics-MultiTouch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "Digest::MD5" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Hash::Merge" : "0",
+            "IO::File" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Net::Google::Analytics" : "3",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Path::Class" : "0",
+            "Pod::Usage" : "0",
+            "Spreadsheet::WriteExcel" : "2.37",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Text::CSV_XS" : "0.73",
+            "Text::Table" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.36"
+}

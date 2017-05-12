@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/bbgames
+lib/WWW/Baseball/NPB.pm
+lib/WWW/Baseball/NPB/Game.pm
+t/00_compile.t
+t/01_baseball.t
+t/02_pre.t
+t/03_live.t
+t/20020330.html
+t/20020331-live.html
+t/20020331-pre.html

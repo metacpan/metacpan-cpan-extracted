@@ -1,0 +1,41 @@
+Revision history for Perl extension Wx::Perl::TreeChecker.
+$Id: Changes,v 1.5 2005/03/25 13:44:30 simonflack Exp $
+
+1.13  Fri Mar 25 2005
+    - Added t/pod.t
+    - Fixed skip tests in t/03__xrc.t
+
+1.12  Mon Aug 09 2004
+    - Add UnSelectItem()
+    - Add TC_SEL_COMPACT selection style
+
+1.11  Sun Apr 18 2004
+    - Add Wx::Perl::TreeChecker::XmlHandler
+
+1.08  Fri Sep  5 2003
+    - double-clicking on treeitem icons now acts like single-click
+        (it no longer expands the branch)
+
+1.07  Sun Jul 13 2003
+    - Hitting SPACE key selects/unselects current item
+    - Remove wxTR_MULTIPLE flag (if set)
+
+1.06  Tue Jun 10 2003
+    - Fix typo
+
+1.05  Sun Apr 13 2003
+    - First release to CPAN
+    - Add missing methods: PrependItem(), InsertItem(), SelectItem()
+    - rename Reset() to UnselectAll()
+
+1.04  Sat Apr 12 2003
+    - Add containers to list returned by GetSelection()
+    - croak unless IsSelected(), IsContainer() passed a Wx::TreeItemId
+    - make Reset() public method
+    - update POD, license, add sample
+
+1.03  Wed Apr  9 2003
+    - Change event from double-click right mouse to single click on icon
+
+1.00  Wed Dec  4 2002
+    - Initial revision

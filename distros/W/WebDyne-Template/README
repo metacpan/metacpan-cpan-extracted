@@ -1,0 +1,9 @@
+WebDyne::Template is part of the WebDyne suite of modules. It works with the
+WebDyne::Chain module to allow web sites to be created around a template
+framework, e.g.  stardard menus, headers etc for each page.
+
+WebDyne::Template will only work within WebDyne and will not function as a
+stand-alone module.
+
+See the Webdyne documentation (http://webdyne.org) for more information
+about this module.

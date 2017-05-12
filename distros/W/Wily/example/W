@@ -1,0 +1,12 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+use Cwd 'abs_path';
+
+use Wily;
+use Wily::Message;
+
+my $wily = Wily->new();
+$wily->win(abs_path($_), 1) for (@ARGV);
+
+

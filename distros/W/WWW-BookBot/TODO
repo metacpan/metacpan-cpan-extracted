@@ -1,0 +1,157 @@
+1. more document is needed.
+2. some interface may be changed in future.
+
+----------------------- cut of sources
+	$self->{Url_Last} = $url;
+	$self->{Url_Base} = $res->base->as_string;
+	$self->{Url_Code} = $res->code;
+	$self->{Url_Title} = $res->headers->title;
+	$self->{Url_Content_Type} = $res->headers->content_type;
+	$self->{Url_Last_Modified} = $res->headers->last_modified;
+	$self->{Url_Last_Modified_Iso} = HTTP::Date::time2iso($res->headers->last_modified);
+$res->content
+$res->is_success
+
+$str="<Test>\nThis is a Test\r\n;<!-- Abc\r \n-->";
+is($bot->get_url_textok($str), "<ln> <Test><ln>This is a Test<ln>;<!-- Abc--><ln>", "function get_url_text_ok");
+
+$bot=&recreate($testdir);
+$str=<<STR;
+Before <!---
+Test of mark <font>FONTS</font>
+---> Inner
+<script src="Test">display();</script>
+Another   Space
+STR
+$str=~s/(\r\n|\n|\r)/<ln>/g;
+is($bot->parse_empty($str), "Before Inner<ln><ln>Another Space<ln>", "function parse_empty");
+$bot->{REMOVE_LEADING_SPACES}=1;
+$str="<ln>    a good<ln>  dog<ln>  must<ln>  be<ln>  good.<ln>";
+is($bot->parse_leadingspace($str), "<ln>  a good<ln>dog<ln>must<ln>be<ln>good.<ln>", "function parse_leadingspace");
+use WWW::BookBot::Chinese;
+$bot=new WWW::BookBot::Chinese;
+$bot->initialize;
+$bot->{TEXTREMOVEINNERSPACE}=1;
+$str="A b o u t  a  中great 国 是 一 个 and  w o n d e r f u l  i d e a.<ln>";
+is($bot->parse_innerspace($str), "About a great and wonderful idea.<ln>", "function parse_innerspace");
+
+
+#print Dumper($bot);
+
+
+
+#-----------------------------------------------
+# get_url_ok: prepare received contents
+#-----------------------------------------------
+# $str			contents
+#---RETURN contents
+#-----------------------------------------------
+sub get_url_ok {
+	my $self = shift;
+	return ($self->{Url_Content_Type} eq 'text/html'
+			or $self->{Url_Content_Type} eq 'text/plain') ?
+		$self->get_url_textok(@_) : $self->get_url_binok(@_);
+}
+
+#-----------------------------------------------
+# get_url_textok: prepare received text contents by replace \r\n as <ln>
+#-----------------------------------------------
+# $str			contents
+#---RETURN contents
+#-----------------------------------------------
+sub get_url_textok {
+	my $self = shift;
+	my $str=$self->de_code($_[0]);
+	$str=~s/(\r\n|\r|\n)/<ln>/g;
+	$str=~s/(<[^<>]*)(?: *<ln>)+([^<>]*>)/$1$2/g;	#prepare <> in different lines
+	return "<ln>$str<ln>";
+}
+
+#-----------------------------------------------
+# parse_img: parser images
+#-----------------------------------------------
+# $base			base url
+# $contents		html contents
+#-----------------------------------------------
+sub parse_img {
+	my $self = shift;
+	my $base = shift;
+	my ($html, $src);
+	while($_[0]=~/<img([^<>]*>)/ig) {
+		$html=$1;
+		$src='';
+		if( $html=~/src *= *\"([^\">]*)\"/ ) {
+			$src=$1;
+		} elsif( $html=~/src *= *\'([^\'>]*)\'/ ) {
+			$src=$1;
+		} elsif( $html=~/src *= *([^ >]*)( |>)/ ) {
+			$src=$1;
+		}
+		$self->parse_img_ok($self->url_rel2abs($src, $base));
+	}
+}
+
+#-----------------------------------------------
+# parse_img_ok: found good image url
+#-----------------------------------------------
+# $url			image url
+#-----------------------------------------------
+sub parse_img_ok {
+	my $self = shift;
+	my ($url) = @_;
+	# not finished
+}
+
+
+application/octet-stream
+text/plain
+
+
+$p1="\$str=~\/^(?:$p1\)\$/x";
+
+$str=$found if eval($p1);
+
+	$str=$self->parse_removespace($str);
+	if( $str=~/\n +[^ \n][^\n]*\n[^ \n][^\n]*\n[^ \n][^\n]*\n/sg ) {
+		# "\n " -> <br>, "\n" -> no use
+		$str=~s/\n +(?=[^ \n])/<br> /sg;
+		$str=~s/\n//sg;
+		$str=~s/<br>/\n/g;
+	}
+
+
+#-----------------------------------------------
+# parse_innerspace: remove inner space
+#-----------------------------------------------
+# $content		contents
+#---RETURN contents
+#-----------------------------------------------
+sub parse_innerspace {
+	my $self = shift;
+	return $_[0] if not $self->{TEXTREMOVEINNERSPACE};
+
+	my $pattern_sub="[^ <>]($self->{Pattern_Mark})* ";
+	my $pattern="";
+	for(my $i=0; $i<7; $i++) {
+		$pattern.=$pattern_sub;
+	}
+	return $_[0] if not $_[0]=~/$pattern/;
+
+	my $str1=$_[0];
+	$str1=~s/([0-9a-zA-Z]($self->{Pattern_Mark})) [0-9a-zA-Z][0-9a-zA-Z]//g;
+	my $str="";
+	foreach (split /(<ln>| {2,})/, $_[0]) {
+		print "($_) ";
+		if(/^  /) {
+			$str.=" ";
+			next;
+		}
+		
+		$_=~s/ //g if $_=~/^[^ ]($self->{Pattern_Mark})*( [^ ]($self->{Pattern_Mark})*)+$/;
+		$str.=$_;
+	}
+
+	return $str;
+}
+
+WWW::BookBot is a bot to fetch web e-texts with catalog, books and chapters. It can fetch and reformat multiple html pages into a single text file, which can be readed in .

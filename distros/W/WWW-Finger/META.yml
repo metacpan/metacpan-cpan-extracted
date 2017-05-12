@@ -1,0 +1,55 @@
+---
+abstract: 'get useful data from e-mail addresses'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Finger
+name: WWW-Finger
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Digest::MD5: 0
+  Digest::SHA: 0
+  HTTP::LRDD: 0.104
+  HTTP::Link::Parser: 0.102
+  JSON: 2.00
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  Module::Pluggable: 0
+  Object::AUTHORITY: 0
+  RDF::Query: 2.900
+  RDF::Query::Client: 0.106
+  RDF::Trine: 0.135
+  URI: 0
+  URI::Escape: 0
+  XRD::Parser: 0.102
+  common::sense: 0
+  namespace::clean: 0
+  parent: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=WWW-Finger
+  homepage: https://metacpan.org/release/WWW-Finger
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-www-finger
+version: 0.105
+x_contributors:
+  - 'Florian Schlichting'
+  - TOBYINK
+  - Nobody

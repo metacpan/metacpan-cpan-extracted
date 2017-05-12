@@ -1,0 +1,24 @@
+WWW-Mechanize-Plugin-Retry
+
+This plugin adds retry handling to WWW::Mechanize::Pluggable.
+
+You can set a retry count and a retry interval, and any get() or
+submit_form() that fails will be retried either until it succeeds, 
+or the number or retries is exceeded.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Joe McMahon and Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

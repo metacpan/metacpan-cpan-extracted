@@ -1,0 +1,40 @@
+---
+abstract: 'Manager for wrappers around client-side libraries'
+author:
+  - 'The following person is the author of all the files provided in'
+build_requires:
+  Test::Differences: 0
+  Test::More: 0.94
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Web-Library
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Load: 0
+  Cwd: 0
+  File::ShareDir: 0
+  File::Spec: 0
+  Moose: 0
+  MooseX::Singleton: 0
+  Params::Validate: 0
+  perl: 5.014000
+resources:
+  bugtracker: https://github.com/marcelgruenauer/Web-Library/issues
+  homepage: https://github.com/marcelgruenauer/Web-Library
+  repository: https://github.com/marcelgruenauer/Web-Library.git
+version: 0.06
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

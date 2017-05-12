@@ -1,0 +1,14 @@
+Build.PL
+Changes
+demo/cli_runner
+lib/Wetware/CLI.pm
+lib/Wetware/CLI/TestSuite.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01_test_classes.t
+t/02_perlcritic/perlcritic.t
+t/02_perlcritic/perlcriticrc
+t/pod.t

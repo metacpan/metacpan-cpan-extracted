@@ -1,0 +1,115 @@
+=pod
+
+=head1 Host Menu
+
+Die Administration der Hosts ist vom gleichen Ablauf wie
+die Administration weiterer Punkte.
+
+=head2 CreateHost
+
+Attribute fuer den neuen Host eingeben. Informationen ueber
+die Attribute befinden sich weiter unten. Danach erhalten
+sie folgende Auswahl
+
+=over 4
+
+=item HostSave Save these settings
+
+Den neuen Host abspeichern
+
+=back
+
+=head2 EditHost
+
+=head2 ModifyHost
+
+Hier muessen Sie zuerst einen vorhanden Host auswaehlen,
+der geaendert werden soll. Danach wird dieser geladen und kann
+mittels der Eingabemaske, die auch zum Anlegen von Hosts verwendet
+wird, abgeandert und anschliessend gespeichert werden. 
+Hier verhaelt sich bis auf die Hostauswahl alles genau wie
+beim Anlegen von Hosts.
+
+=head2 DeleteHost
+
+Hier werden Sie mittels einer Auswahlliste gebeten eine
+Host auszuwaehlen. Anschliessend wird dieser geladen und
+dessen Daten werden angezeigt. Nun gibt es drei Moeglichkeiten
+fortzufahren.
+
+=over 4
+
+=item Yes, delete it
+
+Den Host loeschen, aber das Datenverzeichnis in dem sich die
+alle Daten die zu diesem Host gehoeren, nicht loeschen.
+
+=item Yes, delete it, including data directory
+
+Dasselbe wie oben, wobei aber das Datenverzeichnis
+auch geloescht wird.
+
+=item Return to Host Menu/Top Menu
+
+Zu dem  Host Menu bzw. zu dem Anfangsmenue zurueckkehren
+ohne den Host oder dessen Datenverzeichnis zu loeschen.
+
+=back
+
+=head2 Attribute eines Hosts
+
+=over 4
+
+=item I<apache_host_name> short descriptive name
+
+Eindeutiger Name, der dem Host zugeordnet ist. Falls Sie
+einen neuen Host anlegen wollen der den selben Namen
+hat wie ein bereits vorhandener, wird ein Fehler ausgeloest.
+Beispiel: wwwhost1
+
+=item I<apache_host_descr> informative description
+
+Beschreibung des Hosts. 
+Beispiel: My webserver machine
+
+=item I<apache_host_arch> architecture
+
+Die Host Architektur.
+Beispiel: linux-i586
+
+=item I<apache_host_ip> DNS name or ip address
+
+Gueltige IP Adresse oder DNS name des Hosts. Falls
+eine ungueltiger DNS Name oder IP Adresse eingegeben wird,
+wird ein Fehler ausgeloest.
+Beispiel: iss12.neckar-alb.de
+
+=back
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+                         Phone: +49 7123 14887
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+                         Phone: +49 7072 920696
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+=cut
+

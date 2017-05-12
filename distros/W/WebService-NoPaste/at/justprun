@@ -1,0 +1,5 @@
+#!/bin/sh
+nopaste p < `which nopaste`
+echo xclip -o yields:
+xclip -o
+echo

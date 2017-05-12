@@ -1,0 +1,226 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WebService::Jamendo::RSS - Perl extension for the Web::Service::Jamendo::RSS name space.  Can be use to download
+and process all XML-formatted RSS feeds provided by the popular site jamendo.com.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:hevenerg@marshall.edu" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#getting_started">Getting Started</a></li>
+		<li><a href="#download_popular_albums_this_week_xml">download_popular_albums_this_week_xml</a></li>
+		<li><a href="#get_popular_albums_this_week">get_popular_albums_this_week</a></li>
+		<li><a href="#download_latest_albums_xml">download_latest_albums_xml</a></li>
+		<li><a href="#get_latest_albums">get_latest_albums</a></li>
+		<li><a href="#download_latest_albums_usa_xml">download_latest_albums_usa_xml</a></li>
+		<li><a href="#get_latest_albums_usa">get_latest_albums_usa</a></li>
+		<li><a href="#download_this_week_most_100_listened_to_xml">download_this_week_most_100_listened_to_xml</a></li>
+		<li><a href="#get_this_week_most_100_listened_to">get_this_week_most_100_listened_to</a></li>
+		<li><a href="#download_jamendo_blog_xml">download_jamendo_blog_xml</a></li>
+		<li><a href="#get_jamendo_blog">get_jamendo_blog</a></li>
+		<li><a href="#download_jamendo_forums_xml">download_jamendo_forums_xml</a></li>
+		<li><a href="#get_jamendo_forums">get_jamendo_forums</a></li>
+		<li><a href="#download_jamendo_news_xml">download_jamendo_news_xml</a></li>
+		<li><a href="#get_jamendo_news">get_jamendo_news</a></li>
+		<li><a href="#see_also">SEE ALSO</a></li>
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+	<li><a href="#disclaimer_of_warrenty">DISCLAIMER OF WARRENTY</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>WebService::Jamendo::RSS - Perl extension for the Web::Service::Jamendo::RSS name space.  Can be use to download
+and process all XML-formatted RSS feeds provided by the popular site jamendo.com.</p>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>WebService::Jamendo::RSS will download and process XML-formatted RSS feeds provided by jamendo.com.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use strict;
+  use warnings;
+  use WebService::Jamendo::RSS qw(
+                get_popular_albums_this_week get_latest_albums get_latest_albums_usa get_this_week_most_100_listened
+                get_jamendo_blog get_jamendo_forums download_popular_albums_this_week_xml get_jamendo_news
+                download_latest_albums_xml download_latest_albums_usa_xml download_this_week_most_100_listened_xml
+                download_jamendo_blog_xml download_jamendo_forums_xml download_jamendo_news_xml
+                );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>WebService::Jamendo::RSS provides methods to download all XML-formatted RSS feeds provided by jamendo.com and 
+then return a data structure to the user containing the Data from the RSS feeds.</p>
+<p>The following methods will download RSS feeds from jamendo.com to directory where RSS.pm is installed.
+Method download_popular_albums_this_week_xml will download RSS feed for popular albums this week.
+Method download_latest_albums_xml will download RSS feed for latest albums.
+Method download_latest_albums_usa_xml will download RSS feed for latest albums in the USA.
+Method download_this_week_most_100_listened_xml will download RSS feed for most 100 listened albums this week.
+Method download_jamendo_blog_xml will download RSS feed for Jamendo's primary blog.
+Method download_jamendo_forums_xml will download RSS feed for Jamendo's forums.
+Method download_jamendo_news_xml will download Jamendo's RSS news feed.</p>
+<p>The following methods will process all RSS feeds provided by jamendo.com.
+Method get_popular_albmus_this_week returns a list of popular albums this week to the user.
+Method get_latest_albmus returns a list of latest albums to the user.
+Method get_latest_albums_usa returns a list of latest albums in the USA to the user.
+Method get_this_week_most_100_listened returns a list of most 100 listened albums this week to the user.
+Method get_jamendo_blog returns a list of updates for Jamendo's primary blog to the user.
+Method get_jamendo_forums_feeds returns a list of updates for Jamendo's forums to the user.
+Method get_jamendo_news</p>
+<p>
+</p>
+<h2><a name="getting_started">Getting Started</a></h2>
+<p>The following code will download all the XML-formatted RSS feeds provided by jamendo.com,
+process their content, and print the results for the user.</p>
+<pre>
+   use strict;
+   use warnings;
+   use WebService::Jamendo::RSS qw(
+                get_popular_albums_this_week get_latest_albums get_latest_albums_usa get_this_week_most_100_listened
+                get_jamendo_blog get_jamendo_forums download_popular_albums_this_week_xml get_jamendo_news
+                download_latest_albums_xml download_latest_albums_usa_xml download_this_week_most_100_listened_xml
+                download_jamendo_blog_xml download_jamendo_forums_xml download_jamendo_news_xml
+                );
+  
+  download_popular_albums_this_week_xml();
+  get_popular_albums_this_week();</pre>
+<pre>
+  download_latest_albums_xml();
+  get_latest_albums();</pre>
+<pre>
+  download_latest_albums_usa_xml();
+  get_latest_albums_usa();</pre>
+<pre>
+  download_this_week_most_100_listened_to_xml();
+  get_this_week_most_100_listened_to();</pre>
+<pre>
+  download_jamendo_blog_xml();
+  get_jamendo_blog();</pre>
+<pre>
+  download_jamendo_forums_xml();
+  get_jamendo_forums();</pre>
+<pre>
+  download_jamendo_news_xml();
+  get_jamendo_news();</pre>
+<p>
+</p>
+<h2><a name="download_popular_albums_this_week_xml">download_popular_albums_this_week_xml</a></h2>
+<p>The subroutine download_popular_albums_this_week_xml will download <a href="http://www.jamendo.com/en/rss/popular-albums">http://www.jamendo.com/en/rss/popular-albums</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_popular_albums_this_week">get_popular_albums_this_week</a></h2>
+<p>The subroutine get_recent_videos will return a list of popular albums this week for the user.</p>
+<p>
+</p>
+<h2><a name="download_latest_albums_xml">download_latest_albums_xml</a></h2>
+<p>The subroutine download_latest_albums_xml will download <a href="http://www.jamendo.com/en/rss/last-albums">http://www.jamendo.com/en/rss/last-albums</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_latest_albums">get_latest_albums</a></h2>
+<p>The subroutine get_latest_albums will return a list of latest albums for the user.</p>
+<p>
+</p>
+<h2><a name="download_latest_albums_usa_xml">download_latest_albums_usa_xml</a></h2>
+<p>The subroutine download_latest_albums_usa_xml will download <a href="http://www.jamendo.com/en/rss/last-albums/USA">http://www.jamendo.com/en/rss/last-albums/USA</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_latest_albums_usa">get_latest_albums_usa</a></h2>
+<p>The subroutine get_latest_albums_usa will return a list of latest albums in the USA for the user.</p>
+<p>
+</p>
+<h2><a name="download_this_week_most_100_listened_to_xml">download_this_week_most_100_listened_to_xml</a></h2>
+<p>The subroutine download_this_week_most_100_listened_to_xml will download <a href="http://www.jamendo.com/en/rss/top-track-week">http://www.jamendo.com/en/rss/top-track-week</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_this_week_most_100_listened_to">get_this_week_most_100_listened_to</a></h2>
+<p>The subroutine get_this_week_most_100_listened_to will return a list of most 100 listened to albums this week to the user.</p>
+<p>
+</p>
+<h2><a name="download_jamendo_blog_xml">download_jamendo_blog_xml</a></h2>
+<p>The subroutine download_jamendo_blog_xml will download <a href="http://feeds.feedburner.com/JamendoBlogEnglish?format=xml">http://feeds.feedburner.com/JamendoBlogEnglish?format=xml</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_jamendo_blog">get_jamendo_blog</a></h2>
+<p>The subroutine get_jamendo_blog will return a list of updates for Jamendo's primary blog.</p>
+<p>
+</p>
+<h2><a name="download_jamendo_forums_xml">download_jamendo_forums_xml</a></h2>
+<p>The subroutine download_jamendo_forums_xml will download <a href="http://www.jamendo.com/fr/forums/discussions/?Feed=RSS2">http://www.jamendo.com/fr/forums/discussions/?Feed=RSS2</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_jamendo_forums">get_jamendo_forums</a></h2>
+<p>The subroutine get_jamendo_forums will return a list of updates for Jamendo's forums for the user.</p>
+<p>
+</p>
+<h2><a name="download_jamendo_news_xml">download_jamendo_news_xml</a></h2>
+<p>The subroutine download_jamendo_news_xml will download <a href="http://www.jamendo.com/en/rss/newsfeed/bf0b52ca330f6ca9e88801e3f0c26c68775909">http://www.jamendo.com/en/rss/newsfeed/bf0b52ca330f6ca9e88801e3f0c26c68775909</a>
+to the directory where RSS.pm is installed.</p>
+<p>
+</p>
+<h2><a name="get_jamendo_news">get_jamendo_news</a></h2>
+<p>The subroutine get_jamendo_news will return a list of updates for Jamendo's news feed.</p>
+<p>
+</p>
+<h2><a name="see_also">SEE ALSO</a></h2>
+<p>Please see the documentation for the Perl modules XML::Twig an LWP::Simple
+for details on how WebService::Jamendo::RSS downloads and processes the XML-formatted
+RSS feeds provided by jamendo.com.</p>
+<p>Please send all bug reports to the maintainer's email address hevenerg {[at]} marshall {[dot]} edu.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>WebService::Jamendo::RSS was written and is currently maintained by Gerald L. Hevener, M.S..</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2009 by Gerald L. Hevener, M.S. &lt;hevenerg {[at]} marshall {[dot]} edu.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.</p>
+<p>
+</p>
+<hr />
+<h1><a name="disclaimer_of_warrenty">DISCLAIMER OF WARRENTY</a></h1>
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIESOR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+=cut</p>
+
+</body>
+
+</html>

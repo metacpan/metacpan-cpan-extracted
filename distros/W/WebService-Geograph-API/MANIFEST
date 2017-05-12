@@ -1,0 +1,14 @@
+Changes
+lib/WebService/Geograph/API.pm
+lib/WebService/Geograph/Request.pm
+lib/WebService/Geograph/Response.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001_load.t
+t/api.t
+t/kwalitee.t
+t/pod-coverage.t
+t/pod.t

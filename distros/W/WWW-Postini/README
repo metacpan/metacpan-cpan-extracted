@@ -1,0 +1,40 @@
+WWW-Postini version 0.01
+========================
+
+This set of modules provides an API for interacting with the administration
+interface of the Postini mail filtering service (http://www.postini.com/).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Crypt::SSLeay
+  Exception::Class
+  Exporter  
+  HTML::TokeParser
+  HTTP::Cookies
+  HTTP::Request
+  HTTP::Status 
+  LWP::UserAgent
+  URI::Escape
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Peter Guzis
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+Postini, the Postini logo, Postini Perimeter Manager and preEMPT are
+trademarks, registered trademarks or service marks of Postini, Inc. All
+other trademarks are the property of their respective owners.

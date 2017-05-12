@@ -1,0 +1,98 @@
+=encoding utf8
+
+=head1 NAME
+
+WWW::CheckPad::Cookbook - WWW::CheckPadのクックブック
+
+=head1 DESCRIPTION
+
+このドキュメントにはWWW::CheckPadの典型的な使い方を示すいくつかのサンプルが入っています。
+
+=head1 基本操作
+
+現在、すべての処理は最初にログインしてあることを前提に作られています。
+ログイン済みでない場合、dieしてしまいますので、あなたのアプリケーションの中で
+最初にログイン処理を実行してください。
+
+なお、将来のバージョンでログインせずに実行できる機能が実装される可能性があります。
+例えば、公開されたリストへのアクセス等が考えられるでしょう。
+
+=head2 ログイン
+
+check*padへのログインはWWW::CheckPad->connectで完了します。それが成功したかの判断を
+含めて次の例のように書くのが一般的でしょう。
+
+  my $checkpad_conenction = WWW::CheckPad->connect(
+    email => 'your@email.com',
+    password => 'password'
+  );
+
+  if (not $checkpad_connection->has_logged_in()) {
+     die "ログインに失敗しました。";
+  }
+
+=head2 すべてのチェックリストを取得する。
+
+これだけです。
+
+  my @checklists = WWW::CheckList->retrieve_all();
+
+  foreach my $checklist (@checklists) {
+    printf ">> %s\n", $checklist->title;
+  }
+
+=head2 あるチェックリストとそれに含まれるチェック項目が欲しいんだけど…
+
+C<retrieve_all>ではすべてが取得されてしまいますが、C<retrieve>を使えば、特定の
+チェックリストのみを取得できます。
+
+  my $checklist = WWW::CheckList->retrieve(111111); # IDを指定する。
+
+  # このチェックリストに含まれる、チェック項目を取得する。
+  my @checkitems = $checklist->checkitems();
+
+  # 表示しよう
+  printf "CheckList : %s\n", $checklist->title;
+  foreach my $checkitem (@checkitems) {
+    printf "\t> %s\n", $checkitem->title;
+  }
+
+
+=head2 まだ終了していないチェック項目をすべて取得する。
+
+  my $checklist = WWW::CheckList->retrieve(111111); # IDを指定する。
+  my @unfinished_items = grep { not $_->is_finished() } $checklist->checkitems();
+
+ソースコードを見れば分かるようにチェック項目にはC<is_finished()>というメソッドが
+あるので、それを利用して、C<grep>することが出来る。逆に終了済み一覧が欲しければもちろん
+こうやって書く事が出来る。
+
+  my @finished_items = grep { $_->is_finished() } $checklist->checkitems();
+
+=head2 終了していないチェック項目をすべて終了させる。
+
+もう、何もかもが嫌になったとしよう。Todoなんて糞食らえだ。全部終わった事にしてしまおう。
+（作者注：クックブックなんてみてないて、人生をやり直す事を考える事をお勧めする。）
+
+  my @checkitems = $checklist->checkitems();
+
+  foreach my $checkitem (grep { not $_->is_finished() } @checkitems) {
+    $checkitem->finish();
+  }
+
+人生をやり直す事以外のアドバイスとしては、C<finish>メソッドを終了済みのチェック項目
+に対して呼び出すとエラーとしてdieするので、前もって調べるか、この例のように
+最初にC<grep>することをお勧めする。
+
+=head1 SEE ALSO
+
+L<WWW::CheckPad>, L<WWW::CheckPad::CheckList>, L<WWW::CheckPad::CheckItem>
+
+=head1 COPYRIGHT
+
+Copyright 2006 Ken Takeshige
+
+This text is free document; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

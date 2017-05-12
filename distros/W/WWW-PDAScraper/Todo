@@ -1,0 +1,15 @@
+TODO list for Perl module WWW::PDAScraper
+
+    The user-agent should really be part of the object, I guess. That would
+    be neater.
+
+    And it should actually use WWW::Robot instead of LWP so it doesn't
+    hammer servers.
+
+    And we could either add arbitrary numbers of regexes for fixing up the
+    pages of sites which don't have a print-friendly version of the page, or
+    add a second level of parsing to find the print-friendly link, for sites
+    which don't have a logical relationship between the regular link and the
+    print-friendly.
+
+

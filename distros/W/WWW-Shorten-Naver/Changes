@@ -1,0 +1,11 @@
+Revision history for Perl extension WWW-Shorten-Naver
+
+0.03 2017-02-08T07:52:23Z
+    - Add dependencies on cpanfile, `makealongerurl` function 
+0.02 2017-02-06T06:38:03Z
+    - Fix an dependency error
+
+0.01 2017-02-06T03:22:23Z
+
+    - original version
+

@@ -1,0 +1,12 @@
+Changes
+Groups.pm
+Groups/Article.pm
+Groups/NewsGroup.pm
+Groups/Search.pm
+Groups/SearchResult.pm
+Groups/Thread.pm
+Groups/Vars.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+test.pl

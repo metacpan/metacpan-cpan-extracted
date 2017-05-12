@@ -1,0 +1,64 @@
+WWW::Grooveshark version 0.02
+=============================
+
+Grooveshark is an internationally-available online music search, streaming,
+and recommendation service.  WWW::Grooveshark wraps this service's API in
+an object-oriented Perl interface, allowing you to programmatically search
+for songs, artists, albums, or playlists; browse popular music; get song
+recommendations; manage playlists; and more.
+
+This version wraps a few more API methods, fixes some documentation errors,
+and increases laziness potential: response objects can be used as booleans
+to check if an API call was successful and WWW::Grooveshark objects will
+end their session, if any, when garbage collected.
+
+INSTALLATION
+
+To install this module, open a terminal in the directory containing the
+unarchived source and type:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This should work on most modern systems assuming you have Perl and a Make
+utility installed and configured in the usual way.  The most likely change
+you might need to make to the above is replacing the first line with
+
+    perl Makefile.PL PREFIX=~
+
+if you're on a Unix-like OS and wish to install the module in your home
+directory.
+
+The `make test' step is optional but recommended to verify that the code
+works as expected on your system before proceeding with the install.  To
+run all the tests, you will need a valid Grooveshark API key as well as a
+Grooveshark username and password.  Take a look at test_config.example to
+find out how to specify these.
+
+DEPENDENCIES
+
+This module requires the following other modules:
+
+  Carp
+  Digest::MD5
+  Exporter
+  JSON::Any
+  LWP::UserAgent
+  NEXT (at least version 0.61)
+  URI::Escape
+
+CONTACT
+
+You can reach me by e-mail at <mlpalii@gmail.com>.  My Google Profile at
+http://www.google.com/profiles/mlpalii should list additional ways of getting
+in touch.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Miorel-Lucian Palii
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

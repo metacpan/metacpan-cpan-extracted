@@ -1,0 +1,15 @@
+Revision history for Perl module WebService::FileCloud
+
+0.3 2013-09-26
+ - avoid reading entire file into memory in upload_file()
+ - added ABSTRACT info to Makefile.PL
+ - POD improvements, including more examples
+
+0.2 2013-09-23
+ - no code changes
+ - renamed CHANGES to Changes (sergeyromanov)
+ - added README
+ - improved POD, META information
+
+0.1 2013-09-22
+ - First Release!

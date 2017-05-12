@@ -1,0 +1,21 @@
+Revision history for WSDL-Compile
+
+0.03    Sat Mar 27 22:13:33 2010
+        Remove WSDL::Compile::Serialize as it is not compatible
+        with latest version of XML::Compile.
+
+0.02.1  2009-12-29 15:37
+        Add example usage in Synopsis
+        Fix support for ArrayRefs of ComplexTypes
+        Add missing required modules in Build.PL
+
+0.02    2009-12-27 14:44
+        Create tests with full coverage.
+
+0.01_2  2009-11-28 13:59
+        Switch to Module::Build.
+        Add example usage of WSDL::Compile::Serialize with XML::Compile::SOAP.
+
+0.01_1  2009-07-24 11:34
+        First version.
+

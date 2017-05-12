@@ -1,0 +1,12 @@
+Revision history for WWW-Mechanize-GZip
+
+0.12    2009-06-24
+        - fixed warning on undefined 'content-encoding' - thanks to Edward Smirnov
+
+0.11    2009-06-16
+        - added comments to pass POD-Coverage - thanks to Jesse Vincent
+        - added 'use warnings;' - thanks to Jesse Vincent too
+
+0.10    2007-02-18
+        First version.
+

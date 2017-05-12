@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-IndexParser.t
+lib/WWW/IndexParser.pm
+lib/WWW/IndexParser/Entry.pm
+META.yml                                 Module meta-data (added by MakeMaker)

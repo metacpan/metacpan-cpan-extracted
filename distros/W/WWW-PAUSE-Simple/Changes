@@ -1,0 +1,295 @@
+0.37    2017-02-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [ux] Tweak error messages to be clearer.
+
+
+0.36    2017-02-11 (PERLANCAR)
+
+	- [Bugfix] list_modules: fix scraping regex (owner might be empty).
+
+
+0.35    2017-01-15 (PERLANCAR)
+
+	- [Removed feature] Remove group_delay option to simplify things.
+
+
+0.34    2017-01-12 (PERLANCAR)
+
+	- Search default value of username/password in ~/.pause, rendering
+	  Perinci::CmdLine::pause unnecessary (this is done for easier
+	  generation of Perinci::CmdLine::Inline script).
+
+	- [Removed] Remove deprecated function name 'upload_file' (use
+	  upload_files instead).
+
+	- Several small fixes.
+
+
+0.33    2017-01-04 (PERLANCAR)
+
+        - [Bugfix] Logic was reversed when replacing Version::Util with
+          version->parse which caused newer dists to be deleted/cleaned up
+          instead of older ones.
+
+
+0.32    2017-01-03 (PERLANCAR)
+
+	- UPDATE 2017-01-04: this release contains bug, don't use.
+
+        - No functional changes.
+
+	- Remove usage of Version::Util to reduce dependencies.
+
+	- Replace Log::Any::IfLOG with Log::Any to make it easier to
+	  package in Debian.
+
+
+0.31    2016-07-13 (PERLANCAR)
+
+	- Add `retries` and `retry-delay` common options, by default retry twice
+	  due to recent PAUSE random 500 errors.
+
+	- Tweak result metadata: add table.field_formats to format
+	  timestamps.
+
+
+0.30    2016-06-02 (PERLANCAR)
+
+	- Show warning when a file fails to be uploaded.
+
+	- Update to Data::Sah 0.76+ (duration by default already coerced to
+	  float(secs)).
+
+
+0.29    2016-01-17 (PERLANCAR)
+
+	- delete/cleanup: Add option --protect-files.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+	- upload: Make group & group_delay of type duration, to allow
+	  specifying e.g. PT10S or '10 seconds' etc.
+
+
+0.28    2015-09-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq String::Wildcard::Bash to 0.03 (which first
+	  contains convert_wildcard_to_sql).
+
+
+0.27    2015-09-10 (PERLANCAR)
+
+	- Handle empty result from peek_perms.
+
+
+0.26    2015-09-10 (PERLANCAR)
+
+	- Add function: list_modules to view permissions.
+
+	- Add x.no_index to Rinci metadata of functions that are not yet
+	  implemented.
+
+
+0.25    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.24    2015-07-07 (PERLANCAR)
+
+	- [Bugfix] Fix logic bug that caused undef warnings.
+
+
+0.23    2015-07-07 (PERLANCAR)
+
+        - upload: Add option --group-delay.
+
+        - upload: Add --dry_run support.
+
+        - [Incompatible change] Rename upload_file -> upload_files to be
+          consistent with the other functions. Old name is still provided, but
+          deprecated and not documented.
+
+
+0.22    2015-06-14 (PERLANCAR)
+
+	- upload_files: Add option delay.
+
+
+0.21    2015-04-15 (PERLANCAR)
+
+	- Replace DateTime::Format::DateParse with Date::Parse directly to
+	  reduce deps.
+
+	- Split CLI to another distribution (App-pause) so it can be
+	  fatpacked to reduce dependencies.
+
+	- Add a tip on deleting developer releases using delete_files.
+
+
+0.20    2015-04-07 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Rebuild with newer Pod::Weaver::Plugin::Rinci for producing
+          Configuration POD section.
+
+
+0.19    2015-04-07 (PERLANCAR)
+
+	- [Bugfix] Forgot to adjust argument name (file -> files).
+
+
+0.18    2015-04-04 (PERLANCAR)
+
+	- [Bugfix] list: multiple files mentioned should be evaluated in OR
+	  logic, not AND.
+
+	- [ux] Rename 'file' argument to 'files'.
+
+
+0.17    2015-04-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention ~/.pause in FILES section.
+
+
+0.16    2015-04-01 (PERLANCAR)
+
+	- Read .pause config file, suggested by Ivan Wills [RT#103236].
+
+
+0.15    2015-03-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Rebuild with newer DZP:GenShellCompletion (0.09) which fixes a
+          bug where Perl::osnames prereq was not registered.
+
+
+0.14    2015-03-25 (PERLANCAR)
+
+	- [doc] Add a link to blog post.
+
+	- Update/fix exports.
+
+	- [Bugfix] Forgot to add 'require Regexp::Wildcards' in one place.
+
+
+0.13    2015-03-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add empty module to ease installation: App::pause.
+
+
+0.12    2015-03-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Forgot to uniq-ify list-dists result when not --detail.
+
+
+0.11    2015-03-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - A small bug fix & tweak.
+
+        - [Build] Rebuild with newer version of DZP:Rinci::Wrap, the old version
+          contains a bug which caused line numbers to shift.
+
+
+0.10    2015-03-18 (PERLANCAR)
+
+        - Add --dry-run option for rm, undelete, reindex.
+
+        - Add command: cleanup (to clean older releases, like
+          WWW::PAUSE::CleanUpHomeDir).
+
+        - Add command: list-dists.
+
+        - [Incompatible change] ls: Rename field scheduled_for_deletion ->
+          is_scheduled_for_deletion so autoformatting works nicer
+
+        - Other bug fixes and tweaks.
+
+
+0.09    2015-03-08 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Rinci that skips
+          showing (the same) description & options for alias subcommands ('rm'
+          for 'delete', 'ls' for 'list').
+
+
+0.08    2015-03-05 (PERLANCAR)
+
+        - Allow 'pause ls -l' (alias for 'pause ls --detail') for convenience
+          and for the Unix die-hards.
+
+
+0.07    2015-02-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Rebuild with newer DZP:Rinci::Wrap (0.08) which generates code
+          to update Rinci metadata in source code.
+
+
+0.06    2015-02-25 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Rebuild with newer DZP:Rinci::Wrap which peppers '## this line
+          put by DZP:Rinci::Wrap' markers.
+
+
+0.05    2015-02-21 (PERLANCAR)
+
+        - No functional changes.
+
+        - Update Synopsis and Changes.
+
+
+0.04    2015-02-21 (PERLANCAR)
+
+        - upload: Accept multiple files.
+
+        - list/delete/undelete/reindex: Accept filename/wildcard patterns as
+          arguments. Note that you might want to quote them first to avoid the
+          patterns being interpreted by your shell.
+
+        [REMOVED FEATURES]
+
+        - delete/undelete/reindex: remove option --all (you can now specify '*'
+          instead).
+
+
+0.03    2015-02-19 (PERLANCAR)
+
+	- [dzil] Test using DZP::Rinci::Wrap.
+
+	- Add aliases: ls for list, rm for delete.
+
+
+0.02    2015-02-06 (PERLANCAR)
+
+        - Implement 'delete', 'undelete', and 'reindex' subcommands.
+
+        - list: Add options --(no-)del and --query.
+
+
+0.01    2015-02-05 (PERLANCAR)
+
+        - First early release, only 'list' and 'upload' have been implemented.

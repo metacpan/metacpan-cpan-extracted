@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 13e55099d7847792c9817a8dd334c559d87c95fb Changes
+SHA1 16dbc65a05c35133917c77e79f53fa79ac411f14 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 2b368e37b46a85b963f11f3de8da3500dae2b5ff MANIFEST
+SHA1 193a4223c97176bc2df92da9663f5496a797358c META.json
+SHA1 34c82dd0883a706f1ddf97a65934b4858bb96c00 META.yml
+SHA1 5f7e405d2d836e94c76479b840c89b394111c7b7 Makefile.PL
+SHA1 26581072a5cbed4678f4c0adddec0c80c98bbb4e README
+SHA1 59adfad96fe7a4447e99c1cfb88ea3f66ecc91d2 cpanfile
+SHA1 ddfdeb21b5bd0ca0200437d38a5c20d7aa56b627 dist.ini
+SHA1 7884fbbb0b75329c0ad822a58ea70ab01f0b4e7a examples/async.pl
+SHA1 41b1167a0e593516d5b8b7543cf2c64e3e9e4771 examples/list.pl
+SHA1 039420934b3322c95d5377533c3911c3172a5534 examples/lwp.pl
+SHA1 60349b1d74870dc798f91ed411ec44812add9cdb examples/mojo.pl
+SHA1 8cf2811ec4ce4a8cc1587e47c71aed339ea7d414 lib/WebService/Amazon/DynamoDB.pm
+SHA1 37b0ce75e2a01709e8f37262f27b9b4a7c26611a lib/WebService/Amazon/DynamoDB/20120810.pm
+SHA1 e385f9d5ee8f3ca0e17813ae4002f693022d2159 lib/WebService/Amazon/DynamoDB/20120810.pod
+SHA1 b9327c5e025737115ed4c2f765558e7d9f1479dc scripts/latest-errors.pl
+SHA1 9ee407b79b7080543a8196aa83f13fbf936bd889 scripts/latest-regions.pl
+SHA1 5ccc06e245064e3e0af2699017f8a4714359a5ae share/errors.json
+SHA1 24eadfb0b56baf68fe5a3c6cd0adac2d27f2649e share/regions.json
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 be1cd2f0f2f36b8a87d41f799ea7d9229f1a48ac t/00-compile.t
+SHA1 8dc9583472546bce29bc1e909167df3c741d6ce8 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU29d6AAoJEFKElMNpjtyD6eMIAM46AYcl2aWq4PjICuUYLHsD
+zH8glcPk7OoXLqKMe+SNSAW6j6Bn3UrYvssTM0K8yA6KnfYQK6uvChjcEJQXtHeo
+/ohM8uMEeB7qx5o84sqw/DhdygcD6qLym8TyXK+SxFbiYzSbTgOCNceIZQPMMYIL
+2FfU2xiwhEsmQIB6R+ebP30Dz60E6qbto592mw1VE0RRkQCcBhh5mg7teN+Vjmde
+r93u1Edq1QkflXhJyB6u3sxLz4umR3W1b2DY4YqB5pBDTEBoxZyGyE46E9VDR7Pa
+DftS1a6wC6vOMVe3Q8h36RQmeqczbXC7BuCOTnfzxYo59RG2N+xmTBXlsMtUkQU=
+=CgWB
+-----END PGP SIGNATURE-----

@@ -1,0 +1,175 @@
+NAME
+    W3C::XMLSchema - Parser for W3C XML Schema Definition (XSD)
+
+VERSION
+    version 0.0.4
+
+SYNOPSIS
+        use W3C::XMLSchema;
+
+        my $xsd = W3C::XMLSchema->new( file => shift );
+        print "Target namespace: " . $xsd->target_namespace . "\n";
+
+        print "Attribute groups:\n";
+        foreach my $attr_group ( @{ $xsd->attribute_groups } ) {
+            print $attr_group->name . "\n";
+            foreach my $attr ( @{ $attr_group->attributes } ) {
+                print "\t"
+                     . $attr->name
+                     . " (" . $attr->type . ") "
+                     . ( $attr->use eq 'required' ? '*' : '-' )
+                     . "\n";
+            }
+        }
+
+DESCRIPTION
+    This is a module that makes it easy to iterate over and extract
+    information from an XML Schema definition (aka XSD), as defined by the
+    W3C.
+
+ATTRIBUTES
+  target_namespace
+    The namespace the schema definition targets.
+
+  attribute_groups
+    A list of all the attribute groups defined. Instances of
+    W3C::XMLSchema::AttributeGroup.
+
+  groups
+    A list of all the groups defined. Instances of W3C::XMLSchema::Group.
+
+  complex_types
+    A list of all the complex types defined. Instances of
+    W3C::XMLSchema::ComplexType.
+
+  elements
+    A list of all the elements defined. Instances of
+    W3C::XMLSchema::Element.
+
+INCOMPLETE IMPLEMENTATION / WORK-IN-PROGRESS
+    This implementation is incomplete and should be considered a
+    work-in-progress. Please file bug reports (or provide patches) if
+    something you need is not extractable with the current API.
+
+SEMANTIC VERSIONING
+    This module uses semantic versioning concepts from <http://semver.org/>.
+
+ACKNOWLEDGEMENTS
+    The following people have helped to review or otherwise encourage me to
+    work on this module.
+
+    Chris Prather (perigrin)
+
+SEE ALSO
+    *   XML::Rabbit
+
+    *   XML::Toolkit
+
+    *   Moose
+
+    *   XML::LibXML
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc W3C::XMLSchema
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   MetaCPAN
+
+        A modern, open-source CPAN search engine, useful to view POD in HTML
+        format.
+
+        <http://metacpan.org/release/W3C-XMLSchema>
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/W3C-XMLSchema>
+
+    *   RT: CPAN's Bug Tracker
+
+        The RT ( Request Tracker ) website is the default bug/issue tracking
+        system for CPAN.
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=W3C-XMLSchema>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annotations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/W3C-XMLSchema>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/W3C-XMLSchema>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/W3C-XMLSchema>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/W3C-XMLSchema>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/W/W3C-XMLSchema>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual overview
+        of the test results for a distribution on various Perls/platforms.
+
+        <http://matrix.cpantesters.org/?dist=W3C-XMLSchema>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=W3C::XMLSchema>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-w3c-xmlschema at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=W3C-XMLSchema>. You will
+    be automatically notified of any progress on the request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <http://github.com/robinsmidsrod/W3C-XMLSchema>
+
+      git clone git://github.com/robinsmidsrod/W3C-XMLSchema.git
+
+AUTHOR
+    Robin Smidsrød <robin@smidsrod.no>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Robin Smidsrød.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

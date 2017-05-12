@@ -1,0 +1,12 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Technorati
+version:      0.04
+version_from: lib/WebService/Technorati.pm
+installdirs:  site
+requires:
+    Test::Simple:                  0.44
+    XML::XPath:                    1.13
+    Exception::Class:              1.19
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

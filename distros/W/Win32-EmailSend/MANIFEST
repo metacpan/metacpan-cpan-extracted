@@ -1,0 +1,8 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/Win32-EmailSend.t
+lib/Win32/EmailSend.pm
+META.yml                                 Module meta-data (added by MakeMaker)

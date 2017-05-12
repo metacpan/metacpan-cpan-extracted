@@ -1,0 +1,614 @@
+#!/usr/bin/perl
+use v5.10.0;
+use strict;
+use warnings;
+use WebService::HabitRPG;
+use Config::Tiny;
+use Data::Dumper;
+use File::Spec;
+use IO::Handle;
+use POSIX qw(strftime);
+use Try::Tiny;
+use utf8::all;
+
+# Idonethis detection code.
+my $IDT_VERSION = 0;
+
+eval {
+    require WebService::Idonethis; 
+    $IDT_VERSION = WebService::Idonethis->VERSION;
+};
+
+# PODNAME: hrpg
+
+# ABSTRACT: hrpg - Command line interface to HabitRPG
+
+our $VERSION = '0.28'; # VERSION
+
+
+if (not @ARGV or $ARGV[0] eq 'help') {
+    say q{
+    Usage:
+
+    hrpg status                           : Show current HP/XP/GP
+    hrpg tasks [search]                   : Show current tasks
+    hrpg habit|daily|reward|todo [search] : Show tasks of current type
+    hrpg new                              : Create new task 'hrpg new' for help.
+    hrpg [+-][num] [task]                 : Increment/decrement a task or habit
+    hrpg history [task]                   : Show the history of a task
+    hrpg clear daily                      : Uncheck all daily tasks
+
+    Debugging commands:
+    
+    hrpg version                          : Show version information
+    hrpg show [task]                      : Show detailed info about a task
+    hrpg dump                             : Dump entire user info
+    hrpg dump tasks                       : Dump task info
+
+    For more documentation, use `perldoc hrpg`.
+    };
+
+    exit 1;
+}
+
+# $progname is just a nicer-formatted version of $0 (our command name)
+
+my $PROGNAME = (File::Spec->splitpath($0))[2];
+$PROGNAME ||= 'hrpg';
+
+# TODO: Support XDG?
+my $config_file = "$ENV{HOME}/.habitrpgrc";
+
+my $config = Config::Tiny->read( $config_file );
+
+unless ($config->{auth}{api_token}) {
+    die <<"END_DIE";
+Cannot find user credentials in $config_file
+
+You'll probably find it useful to have a $config_file file that
+looks like the following:
+
+    [auth]
+    user_id   = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    api_token = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+You can get these values by going to Settings -> API in HabitRPG.
+END_DIE
+}
+
+my @bonus_constructor_args;
+
+if ($ENV{HRPG_API_BASE}) {
+    @bonus_constructor_args = ( api_base => $ENV{HRPG_API_BASE} );
+}
+
+# Options handling.
+# We could use Getopt::Long, but it gets confused by + and -
+# being commands.
+
+if ($ARGV[0] eq "--beta") { 
+    shift @ARGV;
+    @bonus_constructor_args = ( api_base => 'https://beta.habitrpg.com/api/v1' );
+
+    # If we see auth details for beta, add those to our bonus options.
+
+    if ($config->{'auth-beta'}) {
+        push(@bonus_constructor_args,
+            api_token => $config->{'auth-beta'}{api_token},
+            user_id   => $config->{'auth-beta'}{user_id},
+        );
+    }
+}
+elsif ($ARGV[0] eq "--dev") {
+    shift @ARGV;
+    @bonus_constructor_args = ( api_base => 'http://localhost:3000/api/v1' );
+
+    # If we see auth details for beta, add those to our bonus options.
+
+    if ($config->{'auth-dev'}) {
+        push(@bonus_constructor_args,
+            api_token => $config->{'auth-dev'}{api_token},
+            user_id   => $config->{'auth-dev'}{user_id},
+        );
+    }
+}
+
+# Add tags if in config file.
+
+if ($config->{tags}) {
+    push @bonus_constructor_args, tags => $config->{tags};
+};
+
+# Figure out our tag prefix character.
+
+if ($config->{config}{tag_prefix}) {
+    push @bonus_constructor_args, tag_prefix => $config->{config}{tag_prefix};
+}
+
+# Build our HRPG object
+
+my $hrpg = WebService::HabitRPG->new(
+    api_token  => $config->{auth}{api_token},
+    user_id    => $config->{auth}{user_id},
+    keep_alive => $config->{connection}{keep_alive} // 1,
+    @bonus_constructor_args,
+);
+
+my $cmd = shift @ARGV;
+
+if ($cmd eq 'version') {
+    $::VERSION ||= "Unreleased";
+    say "hrpg version                 : $::VERSION";
+    say "WebService::HabitRPG version : ", $hrpg->VERSION;
+}
+elsif ($cmd eq 'dump') {
+    my ($option) = @ARGV;
+
+    if (not $option) {
+        say Dumper $hrpg->user; 
+    }
+    elsif ($option eq 'tasks') {
+        say Dumper $hrpg->tasks;
+    }
+    else {
+        say "Did you mean `$PROGNAME dump tasks`?";
+        exit 1;
+    }
+}
+elsif ($cmd eq 'status') {
+    my $user = $hrpg->user;
+
+    my $name =  $user->{profile}{name}
+             || $user->{auth}{facebook}{displayName}
+             || $user->{auth}{local}{username}
+             || 'adventurer';
+
+    say "\nHark, $name! (Lv $user->{stats}{lvl})\n";
+
+    say "HP: $user->{stats}{hp} / $user->{stats}{maxHealth}";
+    say "XP: $user->{stats}{exp} / $user->{stats}{toNextLevel}";
+
+    # Pretty-printing of money
+    my $raw_gp = sprintf("%.4f", $user->{stats}{gp});
+    ($raw_gp =~ /^(?<gp>\d+)\.(?<sp>\d{2})(?<cp>\d{2})$/);
+
+    printf "GP: %d | SP: %2d | CP: %2d\n\n",$+{gp}, $+{sp}, $+{cp};
+}
+elsif ($cmd =~ /^(?<type>habit|todo|daily|reward)$/) {
+    my ($search) = @ARGV;
+    my $tasks;
+
+    if (not $search) {
+        $tasks = $hrpg->tasks($+{type});
+    }
+    else {
+        $tasks = [ $hrpg->search_tasks($search) ];
+    }
+
+    foreach my $task (@$tasks) {
+        next if $task->type eq 'todo' and $task->completed;
+        say $task->format_task;
+    }
+}
+elsif ($cmd eq 'tasks') {
+    my ($search) = @ARGV;
+    my $tasks;
+
+    if (not $search) {
+        $tasks = $hrpg->tasks();
+    }
+    else {
+        $tasks = [ $hrpg->search_tasks($search) ];
+    }
+
+    my $last_type = "";
+
+    foreach my $task (@$tasks) {
+        next if $task->type eq 'reward';
+        next if $task->type eq 'todo' and $task->completed;
+
+        if ($task->{type} ne $last_type) {
+            say "\n === \u$task->{type} ===\n";
+        }
+        say $task->format_task;
+        $last_type = $task->type;
+    }
+}
+elsif ($cmd eq 'show') {
+    # TODO: Integrate history/show search routines.
+
+    my ($task_name) = @ARGV;
+
+    if (not $task_name) {
+        die "Usage: $PROGNAME show taskname\n";
+    }
+
+    my @tasks = $hrpg->search_tasks($task_name, all => 1);
+
+    if (not @tasks) {
+        die "Sorry, no tasks found!\n";
+    }
+
+    foreach my $task (@tasks) {
+        say Dumper $task->_raw;
+    }
+}
+elsif ($cmd eq 'history') {
+    my ($task_name) = @ARGV;
+
+    if (not $task_name) {
+        die "Usage: $PROGNAME history taskname\n";
+    }
+
+    my @tasks = $hrpg->search_tasks($task_name, all => 1);
+
+    if (not @tasks) {
+        die "Sorry, no tasks found!\n";
+    }
+
+    foreach my $task (@tasks) {
+        say "\n = ", $task->{text}, " =\n";
+
+        foreach my $hist ( @{ $task->_raw->{history} }) {
+
+            # Substr is to work around lefnire/habitrpg#716
+            # This will break in a few thousand years time.
+            my $timestamp = substr($hist->{date},0,10);
+
+            print strftime("[%Y-%m-%d %H:%M]", localtime($timestamp));
+            printf("\t%6.2f\n", $hist->{value});
+        }
+    }
+}
+elsif ($cmd =~ /^(?<dir>[+-])(?<qty>\d*)$/) {
+    my ($task_name, @comment) = @ARGV;
+
+    my $direction = $+{dir} eq '+' ? 'up' : 'down';
+    my $qty       = $+{qty} || 1;
+
+    die "Usage: $PROGNAME $direction\[num] task [comment]\n"
+        if not $task_name;
+
+    my @candidates = $hrpg->search_tasks($task_name);
+
+    if (@candidates == 1) {
+        my $task = $candidates[0];
+        say "Updating $task->{text} (x$qty) (",$task->id,")\n";
+
+        # TODO: We really need an object model behind
+        # this, so we're not digging out hash keys.
+
+        my $stats = $hrpg->user->{stats};
+        
+        my $result;
+
+        foreach (1..$qty) {
+
+            # Kludge to catch upstream errors from dropping items.
+            # pjf/WebService-HabitRPG#32 lefire/habitrpg#815
+
+            # TODO: Remove once lefnire/habitrpg#815 is resolved.
+
+            try {
+                $result = $hrpg->updown($task->id, $direction);
+            }
+            catch {
+                # TODO: Figure out if we actually got a dropped item,
+                # or if upstream is just dead or broken.
+
+                say "Looks like an item dropped! "
+                    ."Check http://habitrpg.com/ to see what it is.";
+                $result = undef;
+            };
+        }
+
+        # If our last call resulted in a drop-error, then we have
+        # to go get our user data to see what actually happened.
+
+        if (not defined $result) {
+            # Grab our current user stats.
+            $result = $hrpg->user->{stats};
+        }
+
+        # Display stats delta.
+        # TODO: Detect level ups and handle appropriately.
+
+        printf "HP: %d/%d (%+.2f)\n", $result->{hp}, $stats->{maxHealth},  $result->{hp}  - $stats->{hp}; 
+        printf "XP: %d/%d (%+.2f)\n", $result->{exp},$stats->{toNextLevel},$result->{exp} - $stats->{exp};
+        printf "GP: %.2f (%+.2f)\n",  $result->{gp} ,                      $result->{gp}  - $stats->{gp};
+
+        if (@comment) {
+            if ($IDT_VERSION) {
+                system('idone',@comment);
+            }
+            else {
+                say "Comment ignored, WebService::Idonethis not installed.";
+            }
+        }
+    }
+    elsif (@candidates == 0) {
+        say "No task matching '$task_name' found";
+    }
+    else {
+        say "Did you mean...";
+
+        foreach my $task (@candidates) {
+            say "* $task->{text} (",$task->id,")";
+        }
+    }
+}
+elsif ($cmd eq 'new') {
+    my ($type, $direction, $text, $note, $value, @rest) = @ARGV;
+    my ($up, $down) = (0, 0);
+
+    # TODO: Support rewards (which have 'value')
+
+    my $usage_text = qq{Usage: $PROGNAME new [habit|todo|daily] +- "name" ["note"] [value]\n};
+
+    unless ($type and $direction and $text  ) { die $usage_text; }
+    if     ($type !~ /^(?:habit|todo|daily)/) { die $usage_text; }
+    if     ($direction !~ /^[+-]+$/         ) { die $usage_text; }
+
+    if ($direction =~ /\+/) { $up   = 1; }
+    if ($direction =~ /\-/) { $down = 1; }
+
+    $note //= "";
+
+    my $result = $hrpg->new_task(
+        type => $type,
+        text => $text,
+        note => $note,
+        up   => $up,
+        down => $down,
+        value => $value,
+        extend => { @rest },
+    );
+
+    say Dumper $result;
+}
+elsif ($cmd eq 'clear') {
+    my (@args) = @ARGV;
+
+    if ($args[0] ne 'daily') {
+        die "Only '$PROGNAME clear daily' is supported.\n";
+    }
+
+    my $dailies = $hrpg->tasks("daily");
+
+    foreach my $task (@$dailies) {
+        if ($task->{completed}) {
+            say "Clearing $task->{text}...";
+
+            # \0 converts into magic JSON false
+            $hrpg->_update($task->id, { completed => \0 });
+        }
+    }
+
+    say "All daily tasks cleared!\n";
+}
+elsif ($cmd eq '↑↑↓↓←→←→BA') {
+    print "\nAuto-leveller enabled. Please wait.";
+    STDOUT->flush;
+
+    my $start_level = $hrpg->user->{stats}{lvl}
+        or die "Cannot determine player level";
+
+    my $leveller = $hrpg->new_task(
+        type => 'habit',
+        text => '',
+        up   => 1,
+    );
+
+    my $id = $leveller->{id};
+
+    while ($hrpg->user->{stats}{lvl} <= $start_level) {
+        print ".";
+        STDOUT->flush;
+        $hrpg->up($id);
+        print ".";
+        STDOUT->flush;
+        $hrpg->_update($id, { value => 0 });
+        print ".";
+        STDOUT->flush;
+    }
+
+    print "DING!\n";
+
+    # Oh dear, I guess we need a way to delete that task now.
+
+}
+# EXPERIMENTAL
+elsif ($cmd eq '_update') {
+    my ($task, @args) = @ARGV;
+
+    my @candidates = $hrpg->search_tasks($task);
+
+    if (@candidates != 1) {
+        die "Found ".@candidates." matche(s). There can be only one.\n";
+    }
+
+    say Dumper $hrpg->_update($candidates[0]{id}, { @args } );
+}
+else {
+    say "\nSorry, I didn't understand what you were asking for!";
+    say "Try $PROGNAME with no arguments for help.\n";
+    exit 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hrpg - hrpg - Command line interface to HabitRPG
+
+=head1 VERSION
+
+version 0.28
+
+=head1 SYNOPSIS
+
+Usage:
+
+    hrpg status                           : Show current HP/XP/GP
+    hrpg tasks [search]                   : Show current tasks
+    hrpg habit|daily|reward|todo [search] : Show tasks of current type
+    hrpg new                              : Create new task 'hrpg new' for help.
+    hrpg [+-][num] [task]                 : Increment/decrement a task or habit
+    hrpg history [task]                   : Show the history of a task
+    hrpg clear daily                      : Uncheck all daily tasks
+
+    Debugging commands:
+    
+    hrpg version                          : Show version information
+    hrpg show [task]                      : Show detailed info about a task
+    hrpg dump                             : Dump entire user info
+    hrpg dump tasks                       : Dump task info
+
+=head1 DESCRIPTION
+
+This is a command-line client for the L<HabitRPG|http://habitrpg.com/>
+service.  Use C<hrpg> with no arguments for help.
+
+When using the C<+> and C<-> commands, any unique shortening of a
+task name can be used. When using C<history> and C<show>, all
+tasks matching the name specified will be displayed.
+
+The C<--beta> switch may be provided as a first argument to use
+the beta API server.  The C<--dev> switch may be used to use
+C<http://localhost:3000/api/v1> as the server.
+
+=head1 SETUP
+
+=head2 Installation
+
+If you have not already installed this software, the easiest way
+is to use L<cpanm> and L<local::lib>. If you don't have them installed,
+it's easy with:
+
+    curl -L http://cpanmin.us/ | perl - --self-upgrade
+    ~/perl5/bin/cpanm -L ~/perl5 App::local::lib::helper
+    source ~/perl5/bin/localenv-bashrc
+
+You might want to put that last line in your F<~/.bashrc> file.
+
+You can then install C<hrpg> and related utilities with:
+
+    cpanm WebService::HabitRPG
+
+=head2 Configuration
+
+Create a F<.habitrpgrc> file in your home directory. Place in it
+the following lines:
+
+    [auth]
+    user_id   = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    api_token = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+Replace the long strings of 'x's with the values you obtain by
+going to I<Settings -> API> in the HabitRPG web interface.
+
+You may also have an C<[auth-dev]> and/or C<[auth-beta]> section,
+if you use a development or beta server and have different credentials
+there.  Most users will never need this.
+
+On some systems, the default-behaviour of using keep-alives (which
+normally improve performance) causes troubles.  You can disable
+keep-alives by adding the following to your F<.habitrpgrc>:
+
+    [connection]
+    keep_alive = 0
+
+=head1 EXPERIMENTAL FEATURES
+
+These features are considered experimental, and may change in
+the future.
+
+=head2 TAGS
+
+As there is no API for tags yet, you need to include them in your
+configuration file if you wish to be able to use them. The syntax is:
+
+    [tags]
+    study = 96681445-0e8a-43f7-85ac-9b7f1cb130ee
+    home  = 1b832ec1-a87c-4c11-9b54-e1c24c27313f
+    qs    = 63bc4f62-aaa4-4207-887b-95254bcbcfff
+
+To find out the uuid of a tag, use `hrpg show` on a task having
+that tag, and examine the resulting data structure. Once the upstream
+tag API is finished, this process will be obsolete.
+
+Tags can be used in any search by prefixing them with the 
+I<tag prefix character>, which defaults to caret (^).  For
+example:
+
+    hrpg daily ^work      # Show daily tasks tagged with 'work'
+    hrpg tasks ^code      # Show all tasks tagged with 'code'
+
+If you don't like the tag prefix character, you can change it
+in your configuration file. Simply add:
+
+    [config]
+    tag_prefix = @
+
+This might be handy if you tend to use location tags. You could write:
+C<hrpg daily @home> and C<hrpg daily @work> to show daily tasks
+with the I<home> and I<work> tags respectively.
+
+=head2 INTEGRATION WITH IDONETHIS
+
+If you have L<WebService::Idonethis> installed, then you can add
+items to your done-list at the same time as you complete habits.
+This is done by adding an extra argument to the C<+> or C<->
+calls to hrpg:
+
+    hrpg + bugfix   "Recalibrated the flux capacitor."
+    hrpg - junkfood "Won the local doughnut eating competition."
+
+This integration is extraordinarily simple for now. We simply
+call out to the L<idone> command-line tool with all additional
+arugments given. If you're an C<idone> power user, this means
+you can use switches like C<-l>.
+
+If L<WebService::Idonethis> is not installed, any additional arguments
+to habit reporting are ignored.
+
+=head2 CUSTOM ATTRIBUTES
+
+Additional arguments after the I<value> to C<hrpg new> are considered
+to be custom arguments that are sent to the API.  These must be
+key/value pairs, which are encoded into JSON and passed directly
+as-is, without any sanity checking. These can allow tasks to be
+created that may hook into new features on the server, or which contain
+additional information which is not used by the main HabitRPG servers.
+
+=head1 ENVIRONMENT
+
+If the C<HRPG_API_BASE> environment variable is set, it will be used as
+the API base URL. This may be useful in testing, or when working with
+other servers.
+
+=head1 BUGS
+
+I'm sure there are plenty! Please view and/or record them at
+L<https://github.com/pjf/WebService-HabitRPG/issues> .
+
+=head1 SEE ALSO
+
+L<WebService::HabitRPG>
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

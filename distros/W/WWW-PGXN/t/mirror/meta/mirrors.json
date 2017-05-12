@@ -1,0 +1,26 @@
+[
+   {
+      "uri": "http://pgxn.depesz.com/",
+      "frequency": "every 6 hours",
+      "location": "Nürnberg, Germany",
+      "organization": "depesz Software",
+      "timezone": "CEST",
+      "email": "depesz.com|web_pgxn",
+      "bandwidth": "100Mbps",
+      "src": "rsync://my.pgxn.org/",
+      "rsync": "",
+      "notes": "access via http only"
+   },
+   {
+      "uri": "http://www.postgres-support.ch/pgxn/",
+      "frequency": "hourly",
+      "location": "Basel, Switzerland, Europe",
+      "organization": "micro systems",
+      "timezone": "CEST",
+      "email": "msys.ch|marc",
+      "bandwidth": "10Mbps",
+      "src": "rsync://master.pgxn.org/pgxn",
+      "rsync": "",
+      "notes": ""
+   }
+]

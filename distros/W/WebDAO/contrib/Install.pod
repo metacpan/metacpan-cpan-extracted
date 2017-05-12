@@ -1,0 +1,20 @@
+=begin pod
+=CHAPTER Install Webdao
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install WebDAO'
+
+Alternately, you may retrieve this package from CPAN.
+
+   http://search.cpan.org/dist/WebDAO/
+
+After downloading the distribution, follow the normal procedure to unpack and install it, using the commands shown below or their local equivalents on your system:
+
+  tar xzf WebDAO-*.tar.gz
+  cd WebDAO-*
+  perl Makefile.PL
+  make test && sudo make install
+
+
+=end pod

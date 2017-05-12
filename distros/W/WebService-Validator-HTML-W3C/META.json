@@ -1,0 +1,55 @@
+{
+   "abstract" : "Access the W3Cs online HTML validator",
+   "author" : [
+      "Struan Donald E<lt>struan@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Validator-HTML-W3C",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : 0,
+            "LWP" : 0
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Validator::HTML::W3C" : {
+         "file" : "lib/WebService/Validator/HTML/W3C.pm",
+         "version" : "0.28"
+      },
+      "WebService::Validator::HTML::W3C::Error" : {
+         "file" : "lib/WebService/Validator/HTML/W3C/Error.pm",
+         "version" : 0
+      },
+      "WebService::Validator::HTML::W3C::Warning" : {
+         "file" : "lib/WebService/Validator/HTML/W3C/Warning.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.28"
+}

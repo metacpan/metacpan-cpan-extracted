@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Deezer.t
+t/WWW-Deezer-Album.t
+t/WWW-Deezer-Artist.t
+t/WWW-Deezer-SearchResult.t
+t/WWW-Deezer-Track.t
+lib/WWW/Deezer.pm
+lib/WWW/Deezer/Album.pm
+lib/WWW/Deezer/Artist.pm
+lib/WWW/Deezer/Obj.pm
+lib/WWW/Deezer/SearchResult.pm
+lib/WWW/Deezer/Track.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

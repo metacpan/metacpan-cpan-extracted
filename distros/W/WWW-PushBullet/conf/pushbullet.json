@@ -1,0 +1,10 @@
+{
+	"apikey":"",
+	"proxy":"",
+	"default_device_id":[],
+	"default_address":"1600 Amphitheatre Pkwy, Mountain View, CA 94043, Etats-Unis",
+	"default_body":"This is a default body",
+	"default_name":"GooglePlex",
+	"default_title":"This is a default title",
+	"default_url":"https://github.com/sebthebert/WWW-PushBullet"
+}

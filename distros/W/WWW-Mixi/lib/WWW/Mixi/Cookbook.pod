@@ -1,0 +1,503 @@
+=encoding utf8
+
+=head1 NAME
+
+WWW::Mixi::Cookbook - WWW::Mixiのクックブック
+
+=head1 DESCRIPTION
+
+このドキュメントにはWWW::Mixiの典型的な使い方を示すいくつかのサンプルが入っています。
+
+=head1 mixiからのデータ取得
+
+WWW::Mixiモジュールには、ログイン用のloginメソッドと、それから1メソッドで直接コメントなどを取得できるデータ取得メソッドがあります。
+これらを使うと、mixiへのアクセスは非常に簡単です。
+
+=head2 ログイン
+
+mixiへのログインは、loginコマンド一つで完了します。
+ログイン後には、LWP::UserAgentスタイルでのRequestメソッドやget、postメソッドでのmixiアクセスも、mixiからのデータ取得メソッドでのデータ取得も可能になります。
+
+ use WWW::Mixi;
+ use HTTP::Request::Common;
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ 
+ print "ログインします。\n";
+ my $response = $mixi->login;
+
+=head2 マイミクシイ最新日記の取得
+
+mixiからの情報取得も、私がデータ取得メソッドと読んでいるいくつかの便利なメソッドで簡単に済ませることができます。
+すべてのデータ取得に対応しているわけではありませんが、それを使うのが一番簡単な方法です。
+
+まず、マイミクシイ最新日記用のデータ取得メソッド"get_new_friend_diary"を紹介しましょう。
+このメソッドは、次のような配列のリファレンスを返します。
+
+ {
+ 	'subject' => 'mixiの本。',
+ 	'link' => 'http://mixi.jp/list_item_review.pl?reviewer_id=xxxx&item_id=xxxxx',
+ 	'name' => '塚本牧生',
+ 	'time' => '2004/08/18 13:18'
+ }
+
+例として、マイミクシイ最新日記をテキストで出力するスクリプトを挙げましょう。
+
+ use WWW::Mixi;
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ 
+ print "ログインします。\n";
+ my $response = $mixi->login;
+ 
+ print "マイミクシイ最新日記を取得します。\n";
+ my =item get_new_friend_diary;
+ print "マイミクシイ最新日記を出力します。\n";
+ foreach my $item (@items) {
+ 	my $subject = $item->{'subject'};
+ 	my $link = $item->{'link'};
+ 	my $name = $item->{'name'};
+ 	my $time = $item->{'time'};
+ 	print "■ $subject\n[日時] $time\n[名前] $name\n[Link] $link\n\n";
+ }
+
+ちょっと気を付けておきたいのは、mixiの文字コードがEUCだということです。
+Windowsのコマンドラインなどで使う時には、文字コードをSJISにしてやる必要があるでしょうから、その時はJcodeモジュールなども組合わせてみてください。
+
+=head2 その他のデータ取得メソッド
+
+マイミクシイ最新日記用のget_new_friend_diaryの他にも、いくつかのデータ取得メソッドがあります。
+以下は0.21版で利用できるデータ取得メソッドの一部ですが、基本的には後述の「parse_～」というメソッドには、対応する「get_～」メソッドがあると思ってまず間違いはありません。
+正確で完全な一覧は、ドキュメントを確認してください。
+
+多くのデータ取得メソッドは、get_new_friend_diaryと同じように引数なしで実行でき、それぞれ決まった形式の（でもget_new_friend_diaryと似た感じの）ハッシュリファレンスを複数返します。
+
+=over 4
+
+=item get_information
+
+ホームに表示される「管理者からのお知らせ」を取得します。
+
+=item get_list_comment
+
+最近のコメントに表示される「最近のコメント一覧」を取得します。
+
+=item get_list_message
+
+メッセージに表示される「受信箱」を取得します。
+
+=item get_new_bbs
+
+コミュニティ最新書き込みを取得します。
+
+=item get_new_comment
+
+日記コメント記入履歴を取得します。
+
+=item get_new_friend_diary
+
+マイミクシイ最新日記を取得します。
+
+=item get_new_review
+
+マイミクシイ最新レビューを取得します。
+
+=item get_show_log
+
+あしあとを取得します。
+
+=back
+
+例外として、メインメニュー項目を取得するget_main_menu、バナーを取得するget_banner、ツールバー項目を取得するget_tool_barの3つは、引数でURLを指定できます。
+これらはどのページにでもあるからです。
+URLは"home.pl"のように、ページ名の部分だけでも構いません。
+
+ my =item get_main_menu("home.pl");
+
+URLを省略した時には、最後にデータ取得メソッドか、getまたはpostメソッドで取得したページになります。
+
+=over 4
+
+=item get_main_menu
+
+ページ先頭部のメインメニューを取得します。
+
+=item get_banner
+
+バナーを取得します。
+
+=item get_tool_bar
+
+メインメニューの下に標示されるツールバーを取得します。
+
+=back
+
+また、別の例外としてget_show_log_countはあしあと数を返します。
+同様に、get_self_idは自分のIDを返します。
+これらの返り値は配列でも、ハッシュリファレンスでもなく、単なるスカラです。
+
+ my $count = $mixi->get_show_log_count;
+ my $id = $mixi->get_self_id;
+
+=over 4
+
+=item get_show_log_count
+
+あしあとを取得します。
+
+=item get_self_id
+
+自分のIDを取得します。
+
+=back
+
+=head1 LWP::UserAgentスタイルでのアクセス
+
+ログインとデータ取得メソッドを使ったコーディングは簡単ですが、取得できるデータは限られますし、エラーハンドリングの弱さが泣き所です。
+もう少し細かい制御と自由な利用を考えるのであれば、これをLWP::UserAgentだと思って使ってみてください。
+
+実際に、WWW::MixiのスーパークラスはLWP::RobotUAで、さらにそのスーパークラスはLWP::UserAgentです。
+多くのメソッドがLWP：：UserAgentから継承されており、それほど違いを感じることはないでしょう。
+
+=head2 ログイン
+
+LWP::UserAgentスタイルでコーディングするにしても、ログインはloginメソッドを使ってしまって良いでしょう。
+
+LWP::UserAgentを使う時のログイン作業は、POSTのHTTP::Requestオブジェクトを生成し、Cookieを有効にし、ログインページにアクセスするといった手順になります。
+ログインメソッドは、内部的には単にこれを順番に行います。
+その後はCookieでセッションIDが自動的に送受信されますので、LWP::UserAgentでするようにrequestやsimple_requestメソッドで各ページにアクセスできます。
+
+例えば、ログイン後にホームのHTML部分を出力するには以下のようにします。
+
+ use WWW::Mixi;
+ use HTTP::Request::Common;
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ 
+ print "ログインします。\n";
+ my $response = $mixi->login;
+ 
+ print "ホームを取得します。\n";
+ $request = &HTTP::Request::Common::GET('http://mixi.jp/home.pl');
+ $response = $mixi->request($request);
+ print $response->content;
+
+=head2 getメソッド
+
+LWP::UserAgentモジュールでの標準的なページ取得は(1)HTTP::Requestオブジェクトの生成、(2)requestメソッドでリクエストの処理の手順になります。
+WWW::Mixiモジュールでは、この他にgetとpostという簡易的なメソッドを用意しており、これを使うこともできます。
+
+例えば、上では次の様にしてホームを取得しました。
+
+ use WWW::Mixi;
+ use HTTP::Request::Common;
+ 
+ (略)
+ 
+ print "ホームを取得します。\n";
+ $request = &HTTP::Request::Common::GET('http://mixi.jp/home.pl');
+ $response = $mixi->request($request);
+ print $response->content;
+
+getを使うと、HTTP::Request::Commonモジュールなどを使ったリクエストの生成をせずに、直接URLを指定すれば済みます。
+また、URLも'http://'から始まる絶対URLではなく、最後のファイル名（またはそこから拡張子の'.pl'を省いたもの）を指定すれば十分です。
+つまり、下のように書けば同じ事ができます。
+
+ use WWW::Mixi;
+ 
+ (略)
+ 
+ print "ホームを取得します。\n";
+ $response = $mixi->get('home.pl');
+ print $response->content;
+
+=head2 postメソッド
+
+簡単にGETでページを取得するためのメソッドとして、WWW::Mixiにはgetというメソッドが用意されていました。
+
+同様にPOSTでフォームの入力値を送信するには、postという簡易的なメソッドを使うことができます。
+postでは、URLの他にフォームデータを引数で渡します。
+例えば、次のようにすれば日記の投稿ができます。
+
+ use WWW::Mixi;
+ 
+ my %diary = (
+ 	'submit'      => 'confirm',                  # プレビュー:main、作成:confirm、修正:cancel
+ 	'diary_title' => 'WWW::Mixiで日記の投稿',
+ 	'diary_body'  => "WWW::Mixiモジュールで日記を投稿してみます。\nPOSTメソッドの試験です。",
+ 	'photo1'      => '',
+ 	'photo2'      => '',
+ 	'photo3'      => '',
+ );
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ 
+ print "ログインします。\n";
+ my ($result, $response) = $mixi->login;
+ 
+ print "日記を投稿します。\n";
+ $response = $mixi->post('add_diary.pl', %diary);
+
+フォームの値は、送信前に自動的にエンコードされます。
+意識的にエンコードやエスケープをする必要はありません。
+
+=head2 ファイルの送信
+
+postメソッドでは写真など、ファイルを送信することも考慮されています（が、まったく試験されていません。ぜひ試験して、結果を教えてください）。
+
+例えば、日記のプレビューを表示するためのアクションでは、日記に貼付する写真を「photo1」「photo2」「photo3」の3つのフィールドに入れてやることができます。
+フィールド値にファイルを指定したい時は、ファイルパスだけを持つ配列リファレンスを指定します。
+
+ use WWW::Mixi;
+ 
+ my %diary = (
+ 	'submit'      => 'main',                  # プレビュー:main、作成:confirm、修正:cancel
+ 	'diary_title' => 'WWW::Mixiで日記の投稿',
+ 	'diary_body'  => "WWW::Mixiモジュールで日記を投稿してみます。\nPOSTメソッドの試験です。",
+ 	'photo1'      => ['c:\My Documents\photos\walrus.png'],
+ 	'photo2'      => '',
+ 	'photo3'      => '',
+ );
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ 
+ print "ログインします。\n";
+ my ($result, $response) = $mixi->login;
+ 
+ print "日記を投稿します。\n";
+ $response = $mixi->post('add_diary.pl', %diary);
+
+=head2 メインメニューの解析メソッド
+
+コンテンツの取得が済めば、次は必要なデータを取り出すための解析をするでしょう。
+WWW::Mixiモジュールには、いくつかのページ用の解析メソッドがあります。
+
+解析系で一番簡単な（そして最初に作られた）解析メソッドがメインメニュー（ページ先頭のmixiのログと一緒に「ホーム」「検索」等のボタンが埋め込まれたメニューです）を解析するparse_main_menuメソッドです。
+このメソッドは、次のような配列のリファレンスを返します。
+
+ {
+ 	'subject' => 'ホーム',
+ 	'link' => 'http://mixi.jp/home.pl'
+ }
+
+例として、ホームを取得してメインメニューの各項目を出力するスクリプトを挙げましょう。
+ただしホームの取得までの部分は、「ページの取得」の項で出てきたものと同じなのでざっくり済ませています。
+
+ use WWW::Mixi;
+ 
+ my $mixi = WWW::Mixi->new('me@mixi.user', 'mixi_password');
+ print "ログインします。\n";
+ my $response = $mixi->login;
+ print "ホームを取得します。\n";
+ $response = $mixi->get('home.pl');
+ 
+ print "メインメニューを出力します。\n";
+ my =item parse_main_menu($response);
+ foreach my $item (@items) {
+ 	my $subject = $item->{'subject'};
+ 	my $link = $item->{'link'};
+ 	print "$subject -> $link\n";
+ }
+
+なお、$responseを指定しなかった時は、最後にgetまたはpostメソッドで取得したデータを解析します（requestやsimple_requestは対象外です）。
+上の例では、解析しているのは最後にgetで取得したデータなので、下のように$responseの指定は省いても構いません。
+
+ my =item parse_main_menu();
+
+=head2 その他の解析メソッド
+
+メインメニュー用のparse_main_methodの他にも、いくつかの解析メソッドが設けられています。
+
+解析メソッドはいずれも$responseを引数に取り、ほとんどはハッシュリファレンスの配列を返します。
+$responseを指定しなかった時の解析対象は、最後にgetまたはpostメソッドで取得したデータです。
+ハッシュリファレンスの持つキー項目は、メソッドごとに違います。
+
+以下は0.21版で利用できる解析用メソッドの一覧です。
+最新版ではメソッドが追加されていたり変更されていたりするかも知れませんので、詳細はドキュメントを確認してください。
+
+=over 4
+
+=item parse_main_menu
+
+ページ先頭部のメインメニューを解析します。
+
+=item parse_banner
+
+メインメニューに埋め込まれているバナーを解析します。
+
+=item parse_tool_bar
+
+メインメニューの下に標示されるツールバーを解析します。
+
+=item parse_information
+
+ホーム（home.pl）に表示される「管理者からのお知らせ」を解析します。
+
+=item parse_community_id
+
+コミュニティトップ（view_community.pl）、トピック一覧（list_bbs.pl）、トピック（view_bbs.plのメイン部）などを解析します。
+
+=item parse_list_bbs
+
+トピック一覧（list_bbs.plのメイン部）を解析します。
+
+=item parse_list_bbs_next
+
+トピック一覧（list_bbs.plのメイン部）の「次のページ」へのリンクを解析します。
+
+=item parse_list_bbs_previous
+
+トピック一覧（list_bbs.plのメイン部）の「前のページ」へのリンクを解析します。
+
+=item parse_list_bookmark
+
+お気に入り（list_bookmark.pl）を解析します。
+
+=item parse_calendar
+
+カレンダー（calendar.pl）上のイベント（参加イベント、不参加イベント、マイミクシィの誕生日）を解析します。
+
+=item parse_calendar_term
+
+カレンダー（calendar.pl）が表示している期間（年月）を解析します。
+
+=item parse_calendar_next
+
+カレンダー（calendar.pl）の「次の月」へのリンクを解析します。
+
+=item parse_calendar_previous
+
+カレンダー（calendar.pl）の「前の月」へのリンクを解析します。
+
+=item parse_list_comment
+
+最近のコメント（list_comment.pl）に表示される「最近のコメント一覧」を解析します。
+
+=item parse_list_community
+
+コミュニティ一覧（list_community.pl）に表示されるコミュニティを解析します。
+
+=item parse_list_community_next
+
+コミュニティ一覧（list_community.pl）の「次のページ」へのリンクを解析します。
+
+=item parse_list_community_previous
+
+コミュニティ一覧（list_community.pl）の「前のページ」へのリンクを解析します。
+
+=item parse_list_diary
+
+日記（list_diary.pl）の日記項目を解析します。
+
+=item parse_list_diary_next
+
+日記（list_diary.pl）の「次のxx件」へのリンクを解析します。
+
+=item parse_list_diary_previous
+
+日記（list_diary.pl）の「前のxx件」へのリンクを解析します。
+
+=item parse_list_friend
+
+友人・知人一覧（list_friend.pl）の友人・知人を解析します。
+
+=item parse_list_friend_next
+
+友人・知人一覧（list_friend.pl）の「次のページ」へのリンクを解析します。
+
+=item parse_list_friend_previous
+
+友人・知人一覧（list_friend.pl）の「前のページ」へのリンクを解析します。
+
+=item parse_list_member
+
+メンバー一覧（list_member.plのメイン部）を解析します。
+
+=item parse_list_member_next
+
+メンバー一覧（list_member.plのメイン部））の「次を表示」へのリンクを解析します。
+
+=item parse_list_member_previous
+
+メンバー一覧（list_member.plのメイン部））の「前を表示」へのリンクを解析します。
+
+=item parse_list_message
+
+メッセージ（list_message.pl）に表示される「受信箱」を解析します。
+
+=item parse_list_request
+
+承認待ち一覧（list_request.plのメイン部）を解析します。
+
+=item parse_new_bbs
+
+コミュニティ最新書き込み（new_bbs.pl）を解析します。
+
+=item parse_new_bbs_next
+
+コミュニティ最新書き込み（new_bbs.pl）の「次を表示」へのリンクを解析します。
+
+=item parse_new_bbs_previous
+
+コミュニティ最新書き込み（new_bbs.pl）の「前を表示」へのリンクを解析します。
+
+=item parse_new_comment
+
+日記コメント記入履歴（new_comment.pl）を解析します。
+
+=item parse_new_friend_diary
+
+マイミクシイ最新日記（new_friend_diary.pl）を解析します。
+
+=item parse_new_friend_diary_next
+
+マイミクシィ最新日記（new_friend_diary.pl）の「次のページ」へのリンクを解析します。
+
+=item parse_new_friend_diary_previous
+
+マイミクシィ最新日記（new_friend_diary.pl）の「前のページ」へのリンクを解析します。
+
+=item parse_new_review
+
+マイミクシイ最新レビュー（new_review.pl）を解析します。
+
+=item parse_release_info
+
+リリース情報・障害情報（release_info.pl）を解析します。
+
+=item parse_show_log
+
+あしあと（show_log.pl）を解析します。
+
+=item parse_show_log_count
+
+あしあと（show_log.pl）の「ページ全体のアクセス数」を解析します。
+このメソッドの返り値はアクセス数で、ハッシュリファレンスの配列ではありません。
+
+=item parse_view_bbs
+
+トピック（view_bbs.plのメイン部）を解析します。
+
+=item parse_add_diary_preview
+
+日記作成のプレビュー（add_diary.pl）を解析し、各ボタンに相当するフォームの値を返します。
+
+=item parse_self_id
+
+おすすめレビュー（list_review.pl）を解析し、自分のIDを返します。
+このメソッドの返り値はIDで、ハッシュリファレンスの配列ではありません。
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Mixi>, L<LWP::UserAgent>, L<WWW::RobotUA>, L<HTTP::Request::Common>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2004 TSUKAMOTO Makio.
+
+This text is free document; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

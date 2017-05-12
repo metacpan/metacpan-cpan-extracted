@@ -1,0 +1,13 @@
+ChangeLog
+Clipboard.pm
+Clipboard.xs
+MANIFEST
+META.yml
+Makefile.PL
+README
+ppport.h
+samples/bitmap.pl
+samples/monitor.pl
+samples/test-tie.pl
+samples/test.pl
+t/test.t

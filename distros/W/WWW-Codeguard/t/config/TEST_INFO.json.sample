@@ -1,0 +1,50 @@
+{
+	"api_url": null,
+	"partner_api": {
+		"partner_key": null
+	},
+	"user_api": {
+		"api_key": null,
+		"api_secret": null,
+		"access_secret": null,
+		"access_token": null
+	},
+	"create_website": {
+		"username": null,
+		"password": null,
+		"ssh_key": null,
+		"server_name": null,
+		"ftp_port": null,
+		"ssh_port": null,
+		"domain_name": null,
+		"dir_path": null
+	},
+	"create_database": {
+		"mysql_username": null,
+		"mysql_password": null,
+		"server_name": null,
+		"database_name": null,
+		"mysql_port": null,
+		"ssh_username": null,
+		"ssh_password": null,
+	}
+	"edit_website": {
+		"website_id": null,
+		"dir_path": null,
+		"url": null,
+		"monitor_frequency": null,
+		"account": null,
+		"password": null,
+		"key": null,
+		"hostname": null
+	},
+	"edit_database": {
+		"database_id": null,
+		"website_id": null,
+		"server_address": null,
+		"account": null,
+		"password": null,
+		"port": null,
+		"database_name": null
+	}
+}

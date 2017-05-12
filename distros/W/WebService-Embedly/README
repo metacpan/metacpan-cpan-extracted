@@ -1,0 +1,223 @@
+NAME
+    WebService::Embedly - Perl interface to the Embedly API
+
+VERSION
+    Version 0.10
+
+SYNOPSIS
+        use WebService::Embedly;
+        use Ouch qw(:traditional);
+
+        my $embedly = WebService::Embedly->new({ api_key => 'get_your_key_at_embed.ly',
+                                                 maxwidth => 500 });
+
+        my $oembed_ref;
+        my $e = try {
+          $oembed_ref = $embedly->oembed('http://youtu.be/I8CSt7a7gWY');
+        };
+
+        if ( catch_all, $e) {
+           warn("embedly api failed: ".$e);
+           return;
+        }
+
+        #made it here, everything good.
+        my $embed_html = $oembed_ref->{html};
+
+DESCRIPTION
+    The "WebService::Embedly" is a class implementing for querying the
+    Embed.ly web service. Prior to using this module you should go to
+    <http://embed.ly> and sign up for an api_key.
+
+    You can quickly try out the API by executing: ./sample/usage.pl --apikey
+    you_api_key_from_embed.ly
+
+    "WebService::Embedly" exposes three methods: oembed, preview, objectify.
+    Each method has additional bits of metadata about the request URL.
+    oembed method follows the oembed standard documented here
+    <http://oembed.com/>
+
+    Refer to <http://embed.ly> to learn more about the data that is returned
+    for preview <http://embed.ly/docs/endpoints/1/preview> and objectify
+    <http://embed.ly/docs/endpoints/2/objectify>
+
+    Exception handling is used to expose failures. The Ouch module
+    (:traditional) is used to handle try/catch blocks. See the Exception
+    block below for all the possible catches. Example:
+
+        my $e = try {
+          $oembed_ref = $embedly->oembed('http://youtu.be/I8CSt7a7gWY');
+        };
+
+        if ( catch 500, $e) {
+           #Server is down
+           return;
+        }
+        if ( catch 401, $e) {
+           #Your API key has used all its credits
+           return;
+        }
+        elsif ( catch_all, $e) {
+           #I hate the individual exception catching, lets get this over with it.
+           return;
+        }
+
+    "WebService::Embedly" uses Mouse (lighter version of Moose) to handle
+    its object management.
+
+CONSTRUCTOR
+    You must pass the api_key into the constructor:
+
+        my $embedly = WebService::Embedly->new({ api_key => 'get_your_key_at_embed.ly'});
+
+    "WebService::Embedly" uses LWP::UserAgent to handle its web requests.
+    You have the option to pass in your own LWP object in case of special
+    requirements, like a proxy server:
+
+        my $ua = LWP::UserAgent->new();
+        $ua->proxy('http', 'http://proxy.sn.no:8001/');
+
+        my $embedly = WebService::Embedly->new({ api_key => 'get_your_key_at_embed.ly',
+                                          ua => $ua
+                                        });
+
+  Optional Params
+    "WebService::Embedly" supports all optional parameters at the time of
+    this writing <http://embed.ly/docs/endpoints/arguments>. Refer to the
+    embedly documentation for the complete description. In the majority of
+    cases you only need to pay attention to the maxwidth param. It is highly
+    recommended to specify maxwidth since the embed html could overflow the
+    space you provide for it.
+
+   maxwidth
+    This is the maximum width of the embed in pixels. maxwidth is used for
+    scaling down embeds so they fit into a certain width. If the container
+    for an embed is 500px you should pass maxwidth=500 in the query
+    parameters.
+
+   maxheight
+    This is the maximum height of the embed in pixels.
+
+   width
+    Will scale embeds type rich and video to the exact width that a
+    developer specifies in pixels.
+
+   format (default: json)
+    The response format - Accepted values: (xml, json)
+
+   callback
+    Returns a (jsonp) response format. The callback is the name of the
+    javascript function to execute.
+
+   wmode
+    Will append the wmode value to the flash object. Possible values include
+    window, opaque and transparent.
+
+   allowscripts (default: false)
+    By default Embedly does not return script embeds for jsonp requests.
+    They just don’t work and cause lots of issues. In some cases, you may
+    need the script tag for saving and displaying later. Accepted values:
+    (true, false)
+
+   nostyle (default: false)
+    There are a number of embeds that Embedly has created including
+    Amazon.com, Foursquare, and Formspring. These all have style elements
+    and inline styles associated with them that make the embeds look good.
+    Accepted values: (true, false)
+
+   autoplay (default: false)
+    This will tell the video/rich media to automatically play when the media
+    is loaded. Accepted values: (true, false)
+
+   videosrc (default: false)
+    Either true Embedly will use the video_src meta or Open Graph tag to
+    create a video object to embed. Accepted values: (true, false)
+
+   words
+    The words parameter has a default value of 50 and works by trying to
+    split the description at the closest sentence to that word count.
+
+   chars
+    chars is much simpler than words. Embedly will blindly truncate a
+    description to the number of characters you specify adding ... at the
+    end when needed.
+
+EXCEPTIONS
+    All exceptions are thrown in terms of http status codes. Exceptions from
+    the web service are passed through directly. For example
+    <http://embed.ly/docs/endpoints/1/oembed> and scroll down to view the
+    Error Codes. For most situations you can simply do this:
+
+        my $e = try {
+          $oembed_ref = $embedly->oembed('http://youtu.be/I8CSt7a7gWY');
+        };
+
+        if ( catch_all, $e) {
+           warn("embedly api failed: ".$e);
+           #do something...
+        }
+
+METHODS
+  oembed;
+  preview;
+  objectify;
+    Embed.ly provide three different methods: oembed, preview, objectify
+    depending on the amount of information/access you need each take the
+    same parameters. However different data is returned depending on which
+    method used.
+
+    There are three ways to call each method
+
+   Single URL
+    Fetch metadata about a single URL - call method with full url as a
+    string
+
+        $oembed_ref = $embedly->oembed('http://youtu.be/I8CSt7a7gWY');
+
+   Multiple URLs
+    Fetch metadata about multiple URLs - call method with array ref of urls
+
+       my @urls = qw(http://yfrog.com/ng41306327j http://twitter.com/embedly/status/29481593334 http://blog.embed.ly/31814817 http://soundcloud.com/mrenti/merenti-la-karambaa);
+       $oembed_ref = $embedly->oembed(\@urls);
+
+   Extra Information
+    Fetch metadata about URL(s) and include additional query arguments
+    <http://embed.ly/docs/endpoints/arguments> - call methods with with hash
+    ref of attributes
+
+       my $query_ref = {
+
+    Can throw an exception (ouch) so wrap in an eval or use Ouch module and
+    refer to its syntax
+
+AUTHOR
+    Jason Wieland "jwieland@cpan.org"
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/jwieland/embedly-perl/issues>. I will be notified,
+    and then you'll automatically be notified of progress on your bug as I
+    make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WebService::Embedly
+
+    You can also look for information at:
+    https://github.com/jwieland/embedly-perl
+
+    *   View source / report bugs
+
+        <https://github.com/jwieland/embedly-perl>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2012 Jason Wieland and 12engines LLC
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

@@ -1,0 +1,246 @@
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+
+//----------------------------------------------------------------------------
+// wxPdfPrintData
+//----------------------------------------------------------------------------
+
+%name{Wx::PdfPrintData} class wxPdfPrintData : public %name{Wx::Object} wxObject
+
+{
+public:
+    %name{newDefault} wxPdfPrintData() %Overload;
+    %name{newPdfPrintData} wxPdfPrintData(wxPdfPrintData* pdfPrintData) %Overload;
+    %name{newPrintData} wxPdfPrintData(wxPrintData* printData) %Overload;
+    %name{newPrintDialogData} wxPdfPrintData(wxPrintDialogData* printDialogData) %Overload;
+
+    bool Ok() const;
+    bool IsOk() const;
+    
+    // wxPrintData compatibility
+    
+%{
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+wxPrintOrientation
+wxPdfPrintData::GetOrientation()
+
+void
+wxPdfPrintData::SetOrientation( orient);
+    wxPrintOrientation orient
+    
+#else
+int
+wxPdfPrintData::GetOrientation()
+
+void
+wxPdfPrintData::SetOrientation( orient);
+    int orient
+
+#endif
+
+%}
+   
+    wxPaperSize GetPaperId() const;
+    void SetPaperId(wxPaperSize sizeId);
+    
+    wxPrintQuality GetQuality() const;
+    void SetQuality(wxPrintQuality quality);
+
+    wxString GetFilename() const;
+    void SetFilename( const wxString &filename );
+    
+    // wxPrintDialogData compatibility
+    
+    int GetFromPage() const;
+    int GetToPage() const;
+    int GetMinPage() const;
+    int GetMaxPage() const;
+    void SetFromPage(int v);
+    void SetToPage(int v);
+    void SetMinPage(int v);
+    void SetMaxPage(int v);
+    
+    // wxPdfPrintDialog flags
+    
+    int GetPrintDialogFlags() const;
+    void SetPrintDialogFlags(int flags);
+    
+    // wxPdfDocument specific
+    
+    void SetTemplate( wxPdfDocument* pdfDocument, double templateWidth, double templateHeight );
+    wxPdfDocument* GetTemplateDocument() const;
+    double GetTemplateWidth() const;
+    double GetTemplateHeight() const;
+    bool GetTemplateMode() const;
+    
+    int GetPrintResolution() const;
+    void SetPrintResolution( int resolution );
+    
+    bool GetLaunchDocumentViewer() const;
+    void SetLaunchDocumentViewer( bool enable );
+    
+    const wxString& GetDocumentTitle() const;
+    const wxString& GetDocumentSubject() const;
+    const wxString& GetDocumentAuthor() const;
+    const wxString& GetDocumentKeywords() const;
+    const wxString& GetDocumentCreator() const;
+
+    void SetDocumentTitle(const wxString& title);
+    void SetDocumentSubject(const wxString& subject);
+    void SetDocumentAuthor(const wxString& author);
+    void SetDocumentKeywords(const wxString& keywords);
+    void SetDocumentCreator(const wxString& creator);
+    
+    bool IsProtectionEnabled() const;
+    
+    void SetDocumentProtection(int permissions,
+                       const wxString& userPassword = wxEmptyString,
+                       const wxString& ownerPassword = wxEmptyString,
+                       wxPdfEncryptionMethod encryptionMethod = wxPDF_ENCRYPTION_RC4V1,
+                       int keyLength = 0);
+    
+    const wxString& GetUserPassword() const;
+    const wxString& GetOwnerPassword() const;
+    int GetPermissions() const;
+    wxPdfEncryptionMethod GetEncryptionMethod() const;
+    int GetKeyLength() const;
+    
+    void ClearDocumentProtection();
+    
+    void UpdateDocument( wxPdfDocument *pdfDoc );
+    
+    wxPrintData* CreatePrintData() const;
+    
+    
+};
+
+//----------------------------------------------------------------------------
+// wxPdfPrinter
+//----------------------------------------------------------------------------
+
+%name{Wx::PdfPrinter} class wxPdfPrinter: public %name{Wx::Printer} wxPrinter
+
+{
+public:
+    %name{newDefault} wxPdfPrinter() %Overload;
+    %name{newPdfPrintData} wxPdfPrinter(wxPdfPrintData* pdfPrintData) %Overload;
+    %name{newPrintData} wxPdfPrinter(wxPrintData* printData) %Overload;
+    %name{newPrintDialogData} wxPdfPrinter(wxPrintDialogData* printDialogData) %Overload;
+    
+    // base virtual implementation
+    virtual bool Print(wxWindow *parent, wxPrintout *printout, bool prompt = true);
+    virtual wxDC* PrintDialog(wxWindow *parent);
+    virtual bool Setup(wxWindow *parent);
+    
+    // our additions
+    void ShowProgressDialog( bool show );
+    
+};
+
+//----------------------------------------------------------------------------
+// wxPdfPrintPreview
+//----------------------------------------------------------------------------
+
+%name{Wx::PdfPrintPreview} class wxPdfPrintPreview : public %name{Wx::PrintPreview} wxPrintPreview
+{
+public:
+    %name{newNoData} wxPdfPrintPreview(wxPrintout *printout, wxPrintout *printoutForPrinting) %Overload;
+    
+    %name{newDialogData} wxPdfPrintPreview(wxPrintout *printout, wxPrintout *printoutForPrinting, wxPrintDialogData *data) %Overload;
+    
+    %name{newPrintData} wxPdfPrintPreview(wxPrintout *printout, wxPrintout *printoutForPrinting, wxPrintData *data) %Overload;
+    
+    %name{newPdfPrintData} wxPdfPrintPreview(wxPrintout *printout, wxPrintout *printoutForPrinting, wxPdfPrintData *data) %Overload;
+    
+    %name{Destroy} ~wxPdfPrintPreview()
+      %code%{ delete THIS; %};
+
+    virtual bool SetCurrentPage(int pageNum);
+    virtual int GetCurrentPage() const;
+    virtual void SetPrintout(wxPrintout *printout);
+    virtual wxPrintout *GetPrintout() const;
+    virtual wxPrintout *GetPrintoutForPrinting() const;
+    virtual void SetFrame(wxFrame *frame);
+    virtual void SetCanvas(wxPreviewCanvas *canvas);
+
+    virtual wxFrame *GetFrame() const;
+    virtual wxPreviewCanvas *GetCanvas() const;
+    virtual bool PaintPage(wxPreviewCanvas *canvas, wxDC& dc);
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    virtual bool UpdatePageRendering();
+#endif
+    virtual bool DrawBlankPage(wxPreviewCanvas *canvas, wxDC& dc);
+    virtual void AdjustScrollbars(wxPreviewCanvas *canvas);
+    virtual bool RenderPage(int pageNum);
+    virtual void SetZoom(int percent);
+    virtual int GetZoom() const;
+
+    virtual bool Print(bool interactive);
+    virtual void DetermineScaling();
+
+    virtual wxPrintDialogData& GetPrintDialogData();
+
+    virtual int GetMaxPage() const;
+    virtual int GetMinPage() const;
+
+    virtual bool Ok() const;
+    virtual bool IsOk() const;
+    virtual void SetOk(bool ok);
+};
+
+
+//----------------------------------------------------------------------------
+// wxPdfPageSetupDialog
+//----------------------------------------------------------------------------
+
+%name{Wx::PdfPageSetupDialog} class wxPdfPageSetupDialog : public %name{Wx::Dialog} wxDialog
+{
+
+public:
+    wxPdfPageSetupDialog(wxWindow *parent,
+                         wxPageSetupDialogData* data,
+                         const wxString& title = wxEmptyString);
+    
+    %name{Destroy} virtual ~wxPdfPageSetupDialog()
+        %code%{ delete THIS; %};
+
+    virtual bool TransferDataFromWindow();
+    virtual bool TransferDataToWindow();
+    
+    virtual wxPageSetupDialogData& GetPageSetupDialogData();
+    // support old name used in wxPageSetupDialog
+    wxPageSetupDialogData& GetPageSetupData();
+};
+
+
+// -------------------------------------------------------------------------
+// wxPdfPrintDialog
+// -------------------------------------------------------------------------
+
+%name{Wx::PdfPrintDialog} class wxPdfPrintDialog : public %name{Wx::Dialog} wxDialog
+
+{
+public:
+    
+    wxPdfPrintDialog(wxWindow *parent, wxPdfPrintData* data);
+
+    %name{Destroy} virtual ~wxPdfPrintDialog()
+        %code%{ delete THIS; %};
+
+    virtual bool TransferDataFromWindow();
+    virtual bool TransferDataToWindow();
+
+    virtual int ShowModal();
+    
+    wxPdfDC *GetPrintDC();
+    
+    wxPrintData& GetPrintData();
+
+    wxPrintDialogData& GetPrintDialogData();
+    
+    wxPdfPrintData& GetPdfPrintData();
+    
+};

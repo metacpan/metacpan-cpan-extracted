@@ -1,0 +1,14 @@
+<% BLOCK line_num -%>
+<a href="#l<% lineno %>" id="l<% lineno %>" class="lineno"><pre><% lineno %></pre></a>
+<% END %>
+
+<table>
+<tr>
+<td>
+<% PROCESS line_num lineno=loop.count FOREACH line IN lines %>
+</td>
+<td>
+<pre id="paste"><% content %></pre>
+</td>
+</tr>
+</table>

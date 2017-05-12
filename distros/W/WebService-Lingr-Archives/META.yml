@@ -1,0 +1,40 @@
+---
+abstract: 'load archived messages from lingr.com'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  Exporter: '0'
+  List::Util: '0'
+  Test::Exception: '0.31'
+  Test::MockObject: '1.20120301'
+  Test::More: '0.98'
+  Try::Tiny: '0.16'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Lingr-Archives
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+  file:
+    - README.pod
+requires:
+  Carp: '0'
+  JSON: '2.53'
+  LWP::UserAgent: '0'
+  URI: '1.59'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/debug-ito/WebService-Lingr-Archives/issues
+  repository: git://github.com/debug-ito/WebService-Lingr-Archives.git
+version: '0.03'

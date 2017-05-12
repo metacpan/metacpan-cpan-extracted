@@ -1,0 +1,35 @@
+WWW::Poll, version 0.01
+
+STATUS
+======
+This is ALPHA right now. 
+
+Comments, bug reports, etc. are appreciated.
+
+DESCRIPTION
+===========
+This module is a simple perl module to allow folks to easily run those oh, so popular polls one sees nowadays.  It requires only that you create a world-writable (or server-writable) directory called "data" with a few files to seed the poll.  I also have a couple of example files included (poll.pl & poll_admin.pl).  If you run the script and get an error just run poll_admin.pl first to get it going.  
+
+I'll be ironing out as much of this as I can.  I hope to have IPs logged in the future to prevent redundant votes.    
+
+INSTALLATION
+============
+
+After unpacking the tar file, do the usual:
+
+        perl Makefile.PL 
+        make
+        make test 
+        make install
+
+There is embedded POD documentation in Poll.pm with description on how to use. 
+
+There are example scripts located within the demo/ directory of this distribution. It contains most files needed to get a web-based poll up and running.
+
+COPYRIGHT
+=========
+Copyright (c) 1999 Mike Gammon. All rights reserved.  This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+--
+Mike Gammon
+mgammon@interport.net

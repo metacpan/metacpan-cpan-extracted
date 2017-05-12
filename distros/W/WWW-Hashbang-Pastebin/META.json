@@ -1,0 +1,81 @@
+{
+   "abstract" : "command line pastebin",
+   "author" : [
+      "Mike Doherty <doherty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300012, CPAN::Meta::Converter version 2.120900",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Hashbang-Pastebin",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Daemon::Control" : "0",
+            "Dancer" : "0",
+            "Dancer::Plugin::DBIC" : "0",
+            "Dancer::Plugin::EscapeHTML" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::MySQL" : "0",
+            "DateTime::Format::SQLite" : "0",
+            "Integer::Tiny" : "0",
+            "Plack" : "0",
+            "SQL::Translator" : "0.11006",
+            "Starman" : "0",
+            "Template" : "0",
+            "Try::Tiny" : "0",
+            "YAML" : "0",
+            "base" : "0",
+            "perl" : "5.014000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::Test" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::DBIx::Class" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doherty/WWW-Hashbang-Pastebin/issues"
+      },
+      "homepage" : "http://metacpan.org/release/WWW-Hashbang-Pastebin/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/WWW-Hashbang-Pastebin.git",
+         "web" : "https://github.com/doherty/WWW-Hashbang-Pastebin"
+      }
+   },
+   "version" : "0.004"
+}
+

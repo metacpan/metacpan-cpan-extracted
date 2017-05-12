@@ -1,0 +1,10 @@
+# $Id: typemap 109 2008-07-25 08:55:33Z rplessl $
+TYPEMAP
+HANDLE       T_IV
+HMODULE      T_IV
+DWORD        T_IV
+LPSTR        T_PV
+LPWSTR       T_PV
+LPCSTR       T_PV
+LPCWSTR      T_PV
+

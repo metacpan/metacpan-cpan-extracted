@@ -1,0 +1,24 @@
+= October2010Meeting
+
+Wed. October 13th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+== Practical Lists / Utilities pulled from Fennec
+
+speaker: Chad Granum
+
+Chad will give 2 shorter talks in a row. The first talk will deal with lists, what they are, how to use them. The second talk is a short presentation on several useful tools/utilities that started as part of the Fennec project but have been pulled out for general use.
+
+=== Practical Lists
+
+Chad will define what a list is and how it differs from an array. He will cover tools such as grep and map, as well as some List::Util functions. He will explain how you may start using lists in more places when you understand how they work.
+
+=== Utilities pulled from Fennec
+
+Fennec was a large undertaking, it also required implementing a few new ideas. Many of the new ideas are useful outside of the Fennec project. Chad will cover
+the following until he runs out of time:
+
+* Exporter::Declare
+* Method::Workflow
+* Child
+* Exodist::Util
+* Devel::CallerStack

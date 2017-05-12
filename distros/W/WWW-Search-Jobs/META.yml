@@ -1,0 +1,28 @@
+---
+abstract: 'Query job-related web search engines'
+author:
+  - 'Martin Thurn <mthurn@cpan.org>'
+build_requires:
+  ExtUtils::testlib: 0
+  Test::More: 0
+  Test::Pod: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Search-Jobs
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::TokeParser: 0
+  HTTP::Request::Common: 0
+  WWW::Search: 0
+  WWW::SearchResult: 0
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.028

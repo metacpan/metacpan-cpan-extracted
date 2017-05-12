@@ -1,0 +1,370 @@
+
+WWW::Search and AutoSearch and WebSearch
+========================================
+
+
+WHAT IS NEW IN WWW::Search 2.507?  (2008-11-29)
+-----------------------------------------------
+
+Overview of changes: 
+
+ * tweaked WWW::Search::Test
+
+For details, see the Changes file (updates after 2008-11-27) and/or
+the pod of each affected module.
+
+
+WHAT IS WWW::Search?
+--------------------
+
+WWW::Search is a collection of Perl modules which provide an API to
+search engines on the world-wide web (and similar HTTP-based search
+engines).  Backends for many specific engines can be obtained
+separately, such as AltaVista, Ebay, HotBot, and Yahoo.  This
+distribution includes two applications built from this library:
+AutoSearch, a program to automate tracking of search results over
+time; and WebSearch, a small demonstration program to drive the
+library.
+
+By default, WWW::Search does NOT try to emulate the default search
+that you would get with each search engine's GUI.  I.e. WWW::Search
+does NOT necessarily return the same results you would get by visiting
+the search engine's web page.  WWW::Search performs the search in a
+way that is efficient and convenient for text processing.  This might
+include using the "advanced search" interface; getting "text-only"
+pages; making "OR" the default query term operator instead of "AND";
+ungrouping same-site results; making sure descriptions are turned on;
+and increasing the number of hits per page, among other tricks.  A few
+backends implement the method gui_query(), which does attempt to get
+the same results as searches from the engine's default web page; after
+installation, see `perldoc WWW::Search::<Backend>` for details.
+
+Because WWW::Search depends on parsing the HTML output of web search
+engines, it will fail if the search engine operators change their
+format.
+
+This base WWW::Search distribution contains a few backends that can be
+used for testing.  The backend Null::Empty always returns no results;
+Null::Error always returns an error condition; and Null::Count returns
+a number of sample results that you can specify.  After installation,
+consult `perldoc WWW::Search::Null::Count` et al. for details.
+
+The following real, working backends (and more!) are registered at
+CPAN independently (not included with this WWW::Search distribution):
+
+AltaVista       http://www.perl.com/CPAN/modules/by-module/WWW/MTHURN/
+AP              in the WWW::Search::News distribution
+Ebay            http://www.perl.com/CPAN/modules/by-module/WWW/MTHURN/
+Ebay::Motors    in the Ebay distribution
+Ebay::Complete  in the WWW-Ebay distribution
+Ebay::Mature    in the WWW-Ebay distribution
+Euroseek        http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER/
+Go              http://www.perl.com/CPAN/modules/by-module/WWW
+GoTo            http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER/
+HotBot          http://www.perl.com/CPAN/modules/by-module/WWW/
+LookSmart       http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER
+Lycos           http://www.perl.com/CPAN/modules/by-module/WWW/MTHURN/
+Magellan        http://www.perl.com/CPAN/modules/by-module/WWW/MTHURN/
+Monster         http://www.perl.com/CPAN/modules/by-module/WWW
+Nomade          http://www.perl.com/CPAN/modules/by-module/WWW
+NorthernLight   http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER/
+OpenDirectory   http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER/
+PRWire          http://www.perl.com/CPAN/modules/by-module/WWW
+Pubmed          http://www.perl.com/CPAN/modules/by-module/WWW
+Yahoo           http://www.perl.com/CPAN/modules/by-module/WWW
+ZDNet           http://www.perl.com/CPAN/modules/by-module/WWW/JSMYSER/
+WashPost        in the WWW::Search::News distribution
+
+There are several backends which I don't even know if they work or
+not; I put them in a distribution called WWW::Search::Backends which
+you can find at http://www.perl.com/CPAN/modules/by-module/WWW
+
+There are even more backends available for manual download and
+installation at http://www.idexer.com/backends/ (thanks to Jim Smyser).
+
+
+REQUIREMENTS
+------------
+
+WWW::Search requires Perl5, the libwww-perl module suite, the URI
+module, the HTML::Parser module, and several other modules (see
+Makefile.PL for a complete list).  For information on Perl5, see
+<http://www.perl.com>.  For modules, see
+<http://www.perl.com/CPAN/modules>.
+
+
+AVAILABILITY
+------------
+
+The latest version of WWW::Search is always available on CPAN.  Here
+is a good URL for finding it:
+http://www.perl.com/CPAN/modules/by-module/WWW
+
+
+INSTALLATION
+------------
+
+It is highly recommended that you use CPAN.pm to install WWW::Search.
+It will automatically install all the prerequisite modules and put
+everything in the right places.  While connected to the internet, just
+type
+
+   perl -MCPAN -e 'install WWW::Search'
+
+Otherwise, you can install WWW::Search as you would any perl module
+library, by running the following commands in the WWW-Search-x.xx
+directory after unpacking the archive (and after installing all the
+prerequisite modules):
+
+    perl Makefile.PL
+    make test
+    make install
+
+On Win32, use 'nmake' instead of 'make' in the above sequence of
+commands.
+
+If you want to install a private copy of WWW::Search in your home
+directory, then you should do the installation with something like
+these commands:
+
+    perl Makefile.PL INSTALLDIRS=perl PREFIX=/my/perl/lib 
+    make test
+    make pure_perl_install UNINST=1
+
+Don't forget to add /my/perl/lib to your PERL5LIB environment variable
+(or use lib '/my/perl/lib'; or unshift @INC, '/my/perl/lib')!
+
+
+WHAT IS AutoSearch?
+-------------------
+
+The WWW::Search distribution includes a search client called
+AutoSearch.  AutoSearch performs a web-based search and puts the
+results set into a series of web pages.  It periodically updates this
+web page, indicating how the search changes over time.  Sample output
+from AutoSearch can be found at
+<http://www.isi.edu/lsam/tools/autosearch/>.  Output format is
+configurable.
+
+See `perldoc AutoSearch` for details, or the DEMONSTRATION section
+below for quick-start instructions.
+
+
+DISCUSSION, BUG REPORTS, AND IMPROVEMENTS
+-----------------------------------------
+
+When submitting a bug report or request for help, please remember to
+include:
+  - the operating system name and version
+  - the version of perl (this can be found from `perl -v`)
+  - the version of WWW::Search (this can be found from `WebSearch -V`)
+  - the version of the backend (this can be found from `WebSearch -e Yahoo -V`)
+  - the code you ran to produce the error (PLEASE cut-and-paste, do not just summarize!)
+  - actual output showing the error (PLEASE cut-and-paste, do not just summarize!)
+
+There is a mailing list for WWW::Search discussion.  To subscribe,
+send "subscribe info-www-search" as the body of a message to
+<info-www-search-request@isi.edu>.  If you use WWW::Search at all, you
+should subscribe to the mailing list.
+
+Feedback about WWW::Search is encouraged.  If you're using it for a
+neat application, please let us know.  If you'd like to (or have
+already) implement and publish a new backend for WWW::Search, let us
+know so we don't duplicate work.  <mthurn@cpan.org>
+
+Backend-related bug reports ("backend ABC doesn't work") should be
+sent to the author/maintainer of the backend (backend maintainers are
+identified in the corresponding man page).
+
+All other feedback, bug reports, fixes, and new backends (if you are
+unwilling or unable to publish them on CPAN yourself) should be sent
+to Martin Thurn <mthurn@cpan.org>.  When sending e-mail, please please
+put [WWW-Search] in the subject line (or risk me losing the message
+among the spam).
+
+
+DEMONSTRATION
+-------------
+
+After installing the distribution, connect to the internet and type:
+
+	# WebSearch '"Your Name Here"'
+
+or, if you are on Win32:
+
+        C:\> WebSearch "\"Your Name Here\""
+
+to see where your name is mentioned on the web.  Then try:
+
+	# AutoSearch -n me_on_the_web -s '"Your Name Here"' me
+        # netscape me/index.html &
+
+or, if you are on Win32:
+
+	C:\> AutoSearch -n me_on_the_web -s "\"Your Name Here\"" me
+        C:\> netscape me\index.html
+
+If you are on UNIX you can add
+
+	0 3 * * 1 /usr/local/bin/AutoSearch /path/to/me
+
+to your crontab to update this search every week at 3:00 Monday
+morning.  If you install WWW::Search::Ebay, and add the --mail option
+to AutoSearch, you'll have your own private replacement for Ebay's
+personal search service... WITHOUT the three-query limit!
+
+
+DOCUMENTATION
+-------------
+
+See `perldoc WWW::Search` after installation for an overview of the
+library.  POD-style documentation is also included in all modules and
+programs, so you can do `perldoc WebSearch` and `perldoc AutoSearch`
+after installation.
+
+
+FUTURE PLANS
+------------
+
+Some things we need, and ideas for new features:
+
+ - more robust test mechanism (i.e. more than just counting the number
+of URLs returned) (e.g. look at the various values and make sure
+they're being parsed correctly) (e.g. change_date() is really a date,
+URL is really a URL, URL is not double-encoded, results are not
+duplicated, etc.)  Contact <mthurn@cpan.org>
+
+ - updates to each backend to implement the submit() method.  Contact
+each backend's maintainer.
+
+ - updates to each backend that will force WWW::Search to perform the
+same search as the engine's default web GUI (I'm looking for
+contributions of the precise arguments that will produce such a search
+for each engine; i.e. the hash that should be passed as the second
+argument to native_query).  Contact <mthurn@cpan.org>
+
+ - test cases for WebSearch.  Contact <mthurn@cpan.org>
+
+ - test cases for AutoSearch.  Contact <mthurn@cpan.org>
+
+ - use LWP::ParallelUA to speed up multiple backend search requests
+(I'm trying to decide what the API interface will look like; please
+send suggestions).  Contact <mthurn@cpan.org>
+
+ - add a "language" parameter to the WWW::Search object?  We would
+need a critical mass of backends/engines that can search multiple
+languages before this would be useful.
+
+ - more widespread use of result tags such as description, date, size,
+etc. across all backends.  Contact backend maintainers.
+
+ - a freeze/restore interface to suspend and resume in-progress queries.
+
+ - more backends!
+
+Contributions are always welcome.  Send me e-mail if you plan a new
+backend, or to discuss architectural changes (to avoid duplicating
+work).  Contact <mthurn@cpan.org>
+
+
+SUPPORT AND CREDITS
+-------------------
+
+For more information about Martin Thurn's Perl Modules, 
+visit http://www.sandcrawler.com/SWB/cpan-modules.html
+
+The WWW::Search architecture was originally written by John Heidemann,
+with feedback from other contributors listed below.  NOTE: This list
+is no longer updated; consult the on-line documentation (i.e. man
+pages) to find out who is currently maintaining each component.
+
+PLATFORM SUPPORT:
+	Unix			John Heidemann <johnh(at)isi.edu>
+	Windows			Jim Smyser <jsmyser(at)bigfoot.com>
+                		(see <http://members.xoom.com/WWW_Search>)
+
+COOKIE & HTTP_REFERER TESTING:  Jerry Hermel <jerryxh(at)earthlink.net>
+
+APPLICATIONS:
+	WebSearch		John Heidemann
+	AutoSearch 		William Scheding <wls(at)isi.edu>
+
+BACKENDS:
+	AltaVista		John Heidemann
+	Dejanews		Cesare Feroldi de Rosa <C.Feroldi(at)it.net>
+				and Martin Thurn <mthurn@cpan.org>
+	Crawler			Andreas Borchert
+	Excite			GLen Pringle <pringle(at)cs.monash.edu.au>
+				and Martin Thurn
+	ExciteForWebServers	Paul Lindner <lindner(at)reliefweb.int>
+	Fireball		Andreas Borchert
+	FolioViews		Paul Lindner
+	Gopher			Paul Lindner
+	HotBot			William Scheding and Martin Thurn
+	HotFiles		Jim Smyser
+	Infoseek		Cesare Feroldi de Rosa and Martin Thurn
+	Livelink		Paul Lindner
+	Lycos			William Scheding and John Heidemann,
+				Martin Thurn
+	Magellan		Martin Thurn
+	MSIndexServer		Paul Lindner
+	NorthernLight		Jim Smyser
+	Null			Paul Lindner
+	OpenDirectory		Jim Smyser
+	PLWeb			Paul Lindner
+	Profusion		Jim Smyser
+	Search97		Paul Lindner
+	SFgate			Paul Lindner
+	Simple			Paul Lindner
+	Snap			Jim Smyser
+	Verity			Paul Lindner
+	WebCrawler		Martin Thurn
+	Yahoo			William Scheding and Martin Thurn
+	ZDNet			Jim Smyser
+
+AutoSearch is based on an earlier implementation by Kedar Jog
+<jog(at)isi.edu> with advice from Joe Touch <touch(at)isi.edu>.
+
+Bugs and extensions (to the software and documentation) have been
+identified by William Scheding <wls(at)isi.edu>, T. V. Raman
+<raman(at)adobe.com> (proxy support), C. Feroldi
+<C.Feroldi(at)it.net>, Larry Virden <lvirden(at)cas.org>, Paul Lindner
+<paul.lindner(at)itu.int>, Guy Decoux <decoux(at)moulon.inra.fr>, R
+Chandrasekar (Mickey) <mickeyc(at)linc.cis.upenn.edu>, Martin Thurn
+<mthurn(at)cpan.org>, Chris Nandor <pudge(at)pobox.com>, Martin
+Valldeby <martin.valldeby(at)pakom.se>, Jim Smyser
+<jsmyser(at)bigfoot.com>, Darren Stalder <darren(at)u.washington.edu>,
+Neil Bowers <neilb(at)cre.canon.co.uk>, Ave Wrigley
+<wrigley(at)cre.canon.co.uk>, Andreas Borchert
+<borchert(at)mathematik.uni-ulm.de>, Jim Smyser
+<jsmyser(at)bigfoot.com>.
+
+Bugs have reported by Joseph McDonald <joe(at)smartlink.net>, Juan
+Jose Amor <jjamor(at)infor.es>, Bowen Dwelle <bowen(at)hotwired.com>,
+Vassilis Papadimos <vpapad(at)dblab.ece.ntua.gr>, Vidyut Luther
+<vluther(at)hpctc.org>, Chris P. Acantilado
+<cacantil(at)spawar.navy.mil>.
+
+
+COPYRIGHT
+---------
+
+Copyright (c) 1996 University of Southern California.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation, advertising
+materials, and other materials related to such distribution and use
+acknowledge that the software was developed by the University of
+Southern California, Information Sciences Institute.  The name of the
+University may not be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Portions of this README were derived from the README for libwww-perl.
+

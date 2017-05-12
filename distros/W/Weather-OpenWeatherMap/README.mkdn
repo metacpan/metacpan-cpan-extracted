@@ -1,0 +1,178 @@
+# NAME
+
+Weather::OpenWeatherMap - Interface to the OpenWeatherMap API
+
+# SYNOPSIS
+
+    use Weather::OpenWeatherMap;
+
+    my $api_key = 'foo';
+
+    my $wx = Weather::OpenWeatherMap->new(
+      api_key => $api_key,
+    );
+
+    # Current conditions:
+    # (see Weather::OpenWeatherMap::Result::Current)
+    my $current = $wx->get_weather(
+      location => 'Manchester, NH',
+    );
+    my $tempf = $current->temp_f;
+    my $wind  = $current->wind_speed_mph;
+
+    # Daily forecast conditions:
+    # (see Weather::OpenWeatherMap::Result::Forecast)
+    my $forecast = $wx->get_weather(
+      location => 'Manchester, NH',
+      forecast => 1,
+      days     => 3,
+    );
+    for my $day ($forecast->list) {
+      my $date    = $day->dt->mdy;
+      my $temp_lo = $day->temp_min_f,
+      my $temp_hi = $day->temp_max_f,
+      # (see Weather::OpenWeatherMap::Result::Forecast::Day)
+    }
+
+    # Hourly (3-hr blocks) forecast conditions:
+    my $forecast = $wx->get_weather(
+      location => 'Manchester, NH',
+      forecast => 1,
+      hourly   => 1,
+      days     => 3,
+    );
+    for my $block ($forecast->list) {
+      my $time = $block->dt_txt;
+      my $temp = $block->temp;
+      # (see Weather::OpenWeatherMap::Result::Forecast::Hour)
+    }
+
+    # Find a city:
+    # (see Weather::OpenWeatherMap::Result::Find)
+    my $search = $wx->get_weather(
+      location => 'Manchester',
+      find     => 1,
+      max      => 5,
+    );
+    for my $place ($search->list) {
+      my $region = $place->country;
+      # ...
+    }
+
+# DESCRIPTION
+
+An object-oriented interface to retrieving weather conditions & forecasts from
+**OpenWeatherMap** ([http://www.openweathermap.org/](http://www.openweathermap.org/)) for a given city,
+latitude/longitude, or OpenWeatherMap city code.
+
+This module provides a simple blocking ([LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)) interface to
+weather retrieval; if you have an event loop handy, the included
+[Weather::OpenWeatherMap::Request](https://metacpan.org/pod/Weather::OpenWeatherMap::Request) & [Weather::OpenWeatherMap::Result](https://metacpan.org/pod/Weather::OpenWeatherMap::Result)
+classes can be used to create appropriate [HTTP::Request](https://metacpan.org/pod/HTTP::Request) instances and parse
+responses from non-blocking HTTP clients.
+
+See [POEx::Weather::OpenWeatherMap](https://metacpan.org/pod/POEx::Weather::OpenWeatherMap) for a non-blocking implementation using
+the [POE](https://metacpan.org/pod/POE) ecosystem.
+
+## ATTRIBUTES
+
+### api\_key
+
+Your [OpenWeatherMap](http://www.openweathermap.org/) API key.
+
+(See [http://www.openweathermap.org/api](http://www.openweathermap.org/api) to register for free.)
+
+`api_key` can be set after object construction via **set\_api\_key**; if the key
+is invalid, requests will likely fail with `401 Unauthorized` errors.
+
+### cache
+
+A boolean value indicating whether successful results should be cached to
+disk via [Weather::OpenWeatherMap::Cache](https://metacpan.org/pod/Weather::OpenWeatherMap::Cache).
+
+Defaults to false. This may change in a future release.
+
+### cache\_dir
+
+The directory in which cache files are saved. The default may be fine; see
+[Weather::OpenWeatherMap::Cache](https://metacpan.org/pod/Weather::OpenWeatherMap::Cache).
+
+### cache\_expiry
+
+The duration (in seconds) for which cache files are considered valid; see
+[Weather::OpenWeatherMap::Cache](https://metacpan.org/pod/Weather::OpenWeatherMap::Cache).
+
+### ua
+
+The [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) instance used to issue HTTP requests; can be used to
+control LWP options:
+
+    my $wx = Weather::OpenWeatherMap->new(
+      api_key => $my_api_key,
+      ua => LWP::UserAgent->new(%lwp_opts),  
+    );
+
+## METHODS
+
+### get\_weather
+
+    $wx->get_weather(
+      # 'location =>' is mandatory.
+      #  These are all valid location strings:
+      #  By name:
+      #   'Manchester, NH'
+      #   'London, UK'
+      #  By OpenWeatherMap city code:
+      #   5089178
+      #  By latitude/longitude:
+      #   'lat 42, long -71'
+      location => 'Manchester, NH',
+
+      # Set 'forecast => 1' to get the forecast,
+      # omit or set to false for current weather:
+      forecast => 1,
+
+      # If 'forecast' is true, you can ask for an hourly (rather than daily)
+      # forecast report:
+      hourly => 1,
+
+      # If 'forecast' is true, you can specify the number of days to fetch
+      # (up to 16 for daily reports, 5 for hourly reports):
+      days => 3,
+
+      # Optional tag for identifying the response to this request:
+      tag  => 'foo',
+    );
+
+Request a weather report (in the form of a [Weather::OpenWeatherMap::Result](https://metacpan.org/pod/Weather::OpenWeatherMap::Result)
+object) for the given `location =>`.
+
+The location can be a 'City, State' or 'City, Country' string, an
+[OpenWeatherMap](http://www.openweathermap.org/) city code, or a 'lat X, long
+Y' string.
+
+Requests the current weather by default (see
+[Weather::OpenWeatherMap::Request::Current](https://metacpan.org/pod/Weather::OpenWeatherMap::Request::Current) and
+[Weather::OpenWeatherMap::Result::Current](https://metacpan.org/pod/Weather::OpenWeatherMap::Result::Current)).
+
+If passed `forecast => 1`, requests a weather forecast (see
+[Weather::OpenWeatherMap::Request::Forecast](https://metacpan.org/pod/Weather::OpenWeatherMap::Request::Forecast) and
+[Weather::OpenWeatherMap::Result::Forecast](https://metacpan.org/pod/Weather::OpenWeatherMap::Result::Forecast)), in which case `days =>
+$count` and/or `hourly => $bool` can be specified.
+
+If passed `find => 1`, requests search results for a given location name
+or latitude & longitude; see [Weather::OpenWeatherMap::Request::Find](https://metacpan.org/pod/Weather::OpenWeatherMap::Request::Find) and
+[Weather::OpenWeatherMap::Result::Find](https://metacpan.org/pod/Weather::OpenWeatherMap::Result::Find).
+
+Any extra arguments are passed to the constructor for the appropriate Request
+subclass; see [Weather::OpenWeatherMap::Request](https://metacpan.org/pod/Weather::OpenWeatherMap::Request).
+
+# SEE ALSO
+
+[Weather::OpenWeatherMap::Result](https://metacpan.org/pod/Weather::OpenWeatherMap::Result)
+
+[POEx::Weather::OpenWeatherMap](https://metacpan.org/pod/POEx::Weather::OpenWeatherMap)
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

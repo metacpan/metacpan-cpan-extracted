@@ -1,0 +1,45 @@
+Revision history for WebService-Amazon-DynamoDB
+
+0.005     2015-02-11 22:27:57+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* perl 5.12, for ... syntax (RT101903)
+
+0.004     2015-02-01 08:26:14+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* All numeric values are now sent as strings, to conform with AWS expectations.
+	e.g.
+	 { "N": 123 }
+	should be
+	 { "N": "123" }
+
+	Dependencies:
+	* WebService::Async::UserAgent 0.002, mostly for dependency fixes
+
+0.003     2015-01-26 17:10:37+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* No longer overrides the default IAM endpoint
+
+	Dependencies:
+	* WebService::Amazon::IAM added
+
+0.002     2015-01-26 16:36:17+00:00 Europe/London
+	Note that you should be using Amazon::DynamoDB unless you *really* have
+	a good reason to be looking at this module. Most of the current development
+	here is only intended to support the DynamoDB server implementation.
+
+	New features:
+	* Role support (security=iam)
+	* Updated signature handling (should work on dynamodb-local and real AWS,
+	plus the DynamoDB perl implementation)
+	
+	Dependencies:
+	* Basic logging goes through Log::Any 
+
+0.001     2013-11-01 08:17:19 Europe/London
+	Initial CPAN release

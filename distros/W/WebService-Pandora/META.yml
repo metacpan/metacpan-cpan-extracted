@@ -1,0 +1,30 @@
+---
+abstract: 'Pandora WebService API'
+author:
+  - 'Mitch McCracken <mrmccrac@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Pandora
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::Blowfish: '0'
+  Crypt::ECB: '2.15'
+  Data::Dumper: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  perl: '5.006000'
+version: '0.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

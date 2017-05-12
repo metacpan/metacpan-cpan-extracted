@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use lib './lib';
+
+use WWW::LiveDepartureBoards;
+
+my $farringdon = WWW::LiveDepartureBoards->new({station_code => 'ZFD'});
+
+my @details = $farringdon->departures(['Wimbledon','Sutton (Surrey)']);
+
+foreach my $detail (@details) {
+    print $detail->{datetime}->datetime(),"\t",$detail->{destination},"\n";
+}
+
+#print $farringdon->{last_content};

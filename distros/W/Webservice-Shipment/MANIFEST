@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Webservice/Shipment.pm
+lib/Webservice/Shipment/Carrier.pm
+lib/Webservice/Shipment/Carrier/UPS.pm
+lib/Webservice/Shipment/Carrier/USPS.pm
+lib/Webservice/Shipment/MockUserAgent.pm
+MANIFEST			This list of files
+t/shipment.t
+t/ups.t
+t/usps.t
+META.yml
+META.json

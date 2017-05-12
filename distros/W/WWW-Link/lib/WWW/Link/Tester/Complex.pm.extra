@@ -1,0 +1,42 @@
+sub config {
+  
+  ###########################################
+  #  Configurable parameters
+  ###########################################
+
+  # In seconds, time for http agent to wait. 10 secs is often too
+  # short, leads to spurious reports of server errors. Longer than
+  # 30 secs not usually helpful.
+  $self->{agent_timeout} = 30;
+
+  # In bytes, max response to accept. Mainly want to
+  # avoid being swamped by something huge.
+  $self->{agent_max_response} = 2**19;
+  # Number of redirects to tolerate before giving up. Should never hit
+  # this limit; it's here to avoid infinite loop.
+
+  $self->{http_default_port} = 80;
+  $self->{http_version} = 'HTTP/1.0'; # Perl's HTTP module defaults to 0.9
+
+  $self->{verbose} = 1; # If 1, print processing status to stdout
+  $self->{debug} = 0; # If 1, provides additional output to stdout; mainly HTTP headers.
+  $self->{logging} = 1; # Enable logging to $ADMIN_LOGFILE.
+
+  ###########################################
+  #  Misc. initializations
+  ###########################################
+
+  $TMP_FILE = "tmp.txt";
+  $TELNET_LOGFILE = "telnet_logfile.txt"; # Used internally to buffer data.
+
+  # Response codes. All successful response codes have the form: 2xx.
+  $REDIRECT_LIMIT_EXCEEDED = 'REDIRECT_LIMIT_EXCEEDED';
+  $UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL';
+  $MALFORMED_URL = 'MALFORMED_URL';
+  $TELNET_FAILURE = 'TELNET_FAILURE';
+  $HTTP_0_9_FAIL = 'HTTP_0_9_FAIL';
+  $UNKNOWN_ERROR = 'UNKNOWN_ERROR';
+  $TELNET_SUCCESS = 299; # Mimic a successful HTTP code
+  $HTTP_0_9_OKAY = 298;
+
+}

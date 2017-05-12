@@ -1,0 +1,42 @@
+{
+   "abstract" : "Binarization of XML file used by Wireless Application Protocol",
+   "author" : [
+      "Francois PERRAD (francois.perrad@gadz.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WAP-wbxml",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "I18N::Charset" : "1.15",
+            "XML::DOM" : "1.25"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.14"
+}

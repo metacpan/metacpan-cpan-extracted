@@ -1,0 +1,6 @@
+Revision history for Perl extension Win32::TSA::Notify.
+
+0.01  Wed Aug 30 07:19:40 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Win32::TSA::Notify
+

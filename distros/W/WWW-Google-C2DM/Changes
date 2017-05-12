@@ -1,0 +1,26 @@
+Revision history for Perl extension WWW::Google::C2DM
+
+0.08  Sat Jun 23 15:47:58 2012
+    - allow collapse_key = 0 (reported by Kareem Daker)
+
+0.07  Fri Mar 16 02:42:36 2012
+    - oops! forgot add deps
+
+0.06  Fri Mar 16 02:25:17 2012
+    - added WWW::Google::C2DM::Constants
+    - fixed doc
+
+0.05  Tue Mar 13 20:51:16 2012
+    - fixed a problem that grabled in multi byte.
+
+0.04  Mon Mar 12 17:57:31 2012
+    - fixed problem that broken on older LWP::UserAgent
+
+0.03  Wed Feb 15 01:23:45 2012
+    - added is_error method on WWW::Google::C2DM::Response
+
+0.02  Tue Jan 31 00:37:29 2012
+    - fixed $res->code and $res->message (tomi-ru++)
+
+0.01  Thu Jan  5 20:13:07 2012
+    - first release

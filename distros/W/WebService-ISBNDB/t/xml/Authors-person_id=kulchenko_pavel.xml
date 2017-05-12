@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:29">
+<AuthorList total_results="1" page_size="10" page_number="1" shown_results="1">
+<AuthorData person_id="kulchenko_pavel">
+<Name>Kulchenko, Pavel</Name>
+<Details first_name="Pavel" last_name="Kulchenko" dates="" has_books="1" />
+<Categories>
+<Category category_id="alphabetically.authors.k.u.l">L</Category>
+</Categories>
+<Subjects>
+<Subject subject_id="computer_network_protocols" book_count="1">Computer network protocols</Subject>
+<Subject subject_id="electronic_books" book_count="1">Electronic books</Subject>
+<Subject subject_id="internet_programming" book_count="2">Internet programming</Subject>
+<Subject subject_id="object_oriented_programming_computer_science" book_count="1">Object-oriented programming (Computer science)</Subject>
+<Subject subject_id="perl_computer_program_language" book_count="1">Perl (Computer program language)</Subject>
+<Subject subject_id="web_servers_computer_programs" book_count="1">Web servers -- Computer programs</Subject>
+<Subject subject_id="xml_document_markup_language" book_count="1">XML (Document markup language)</Subject>
+</Subjects>
+</AuthorData>
+</AuthorList>
+</ISBNdb>

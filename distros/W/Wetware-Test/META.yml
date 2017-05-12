@@ -1,0 +1,38 @@
+---
+name: Wetware-Test
+version: 0.07
+author:
+  - '"drieux" <"drieux [AT] @wetware.com">'
+abstract: Wetware Test::Class extensions
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Basename: 0
+  File::Spec: 0
+  FindBin: 0
+  Test::Class::Load: 0
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Wetware::Test:
+    file: lib/Wetware/Test.pm
+    version: 0.07
+  Wetware::Test::Class:
+    file: lib/Wetware/Test/Class.pm
+    version: 0.02
+  Wetware::Test::Class::Load:
+    file: lib/Wetware/Test/Class/Load.pm
+  Wetware::Test::Mock:
+    file: lib/Wetware/Test/Mock.pm
+    version: 0.01
+  Wetware::Test::Suite:
+    file: lib/Wetware/Test/Suite.pm
+    version: 0.04
+  Wetware::Test::Utilities:
+    file: lib/Wetware/Test/Utilities.pm
+    version: 0.03
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

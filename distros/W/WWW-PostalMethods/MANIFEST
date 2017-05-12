@@ -1,0 +1,7 @@
+Changes
+lib/WWW/PostalMethods.pm
+t/01.t
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

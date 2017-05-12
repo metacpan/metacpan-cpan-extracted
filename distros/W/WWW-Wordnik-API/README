@@ -1,0 +1,309 @@
+NAME
+    WWW::Wordnik::API - Wordnik API implementation
+
+VERSION
+    This document describes WWW::Wordnik::API version 0.0.5.
+
+    The latest development revision is available at
+    <git://github.com/pedros/WWW-Wordnik-API.git>.
+
+SYNOPSIS
+        use WWW::Wordnik::API;
+
+        my $p = WWW::Wordnik::API->new();
+
+        $p->api_key('your api key here');
+        $p->debug(1);
+        $p->cache(100);
+        $p->format('perl');
+
+        $p->word('Perl');
+        $p->word( 'Perl', useSuggest => 'true' );
+        $p->word( 'Perl', literal    => 'false' );
+
+        $p->phrases('Python');
+        $p->phrases( 'Python', count => 10 );
+
+        $p->definitions('Ruby');
+        $p->definitions( 'Ruby', count => 20 );
+        $p->definitions('Ruby',
+                        partOfSpeech => [
+                            qw/noun verb adjective adverb idiom article abbreviation preposition prefix interjection suffix/
+                        ]
+        );
+
+        $p->examples('Java');
+
+        $p->related('Lisp');
+        $p->related('Lisp', type => [qw/synonym antonym form hyponym variant verb-stem verb-form cross-reference same-context/]);
+
+        $p->frequency('Scheme');
+
+        $p->punctuationFactor('Prolog');
+
+        $p->suggest('C');
+        $p->suggest('C', count => 4);
+        $p->suggest('C', startAt => 6);
+
+        $p->wordoftheday,
+
+        $p->randomWord(hasDictionaryDef => 'true');
+
+DESCRIPTION
+    This module implements version 4.0 of the Wordnik API
+    (<http://developer.wordnik.com/api>). It provides a simple
+    object-oriented interface with methods named after the REST ones
+    provided by Wordnik. You should therefore be able to follow their
+    documentation only and still work with this module.
+
+    At this point, this module builds request URIs and ship them out as GET
+    methods to LWP::UserAgent. Response headers are checked for error codes
+    (specifically, throw exception on headers anything other than 2/3xx).
+    Response data is not post-processed in any way, other than optionally
+    being parsed from "JSON" to "Perl" data structures. Data::Dumper should
+    be of help there.
+
+INTERFACE
+  CLASS METHODS
+    new(%args)
+            my %args = (
+                server_uri => 'http://api.wordnik.com/v4',
+                api_key    => 'your key',
+                version    => '4',
+                format     => 'json', # json | xml | perl
+            );
+
+            my $WN = WWW::Wordnik::API->new(%args);
+
+  SELECTOR METHODS
+    All selector methods can be assigned to, or retrieved from, as follows:
+
+        $WN->method($value) # assign
+        $WN->method         # retrieve
+
+    server_uri()
+    server_uri($uri)
+        Default $uri: <http://api.wordnik.com/v4>
+
+    api_key()
+    api_key($key)
+        Required $key: Your API key, which can be requested at
+        <http://api.wordnik.com/signup/>.
+
+    version()
+    version($version)
+        Default $version: *4*. This module supports API version 3 and 4
+        (default).
+
+    format()
+    format($format)
+        Default $format: *json*. Other accepted formats are *xml* and
+        *perl*.
+
+    cache()
+    cache($cache)
+        Default $cache: *10*. Number of requests to cache. Deletes the
+        oldest request if cache fills up.
+
+    debug()
+    debug($debug)
+        Default $debug: *0*. Don't sent GET requests to Wordnik. Return the
+        actual request as a string.
+
+  OBJECT METHODS
+    word($word, %args)
+        This returns the word you requested, assuming it is found in our
+        corpus. See <http://docs.wordnik.com/api/methods#words>.
+
+        $word is the word to look up. %args accepts:
+
+        Default "useSuggest": *false*. Return an array of suggestions, if
+        available.
+
+        Default "literal": *true*. Return non-literal matches.
+
+        If the suggester is enabled, you can tell it to return the best
+        match with "useSuggest=true" and "literal=false".
+
+    phrases($word, %args)
+        You can fetch interesting bi-gram phrases containing a word. The
+        "mi" and "wlmi" elements refer to "mutual information" and "weighted
+        mutual information" and will be explained in detail via future blog
+        post. See <http://docs.wordnik.com/api/methods#phrases>.
+
+        $word is the word to look up. %args accepts:
+
+        Default "count": *5*. Specify the number of results returned.
+
+    definitions($word, %args)
+        Definitions for words are available from Wordnik's keying of the
+        Century Dictionary and parse of the Webster GCIDE. The Dictionary
+        Model XSD is available in
+        <http://github.com/wordnik/api-examples/blob/master/docs/dictionary.
+        xsd> in GitHub. See
+        <http://docs.wordnik.com/api/methods#definitions>.
+
+        $word is the word to look up. %args accepts:
+
+        Default "count": *5*. Specify the number of results returned.
+
+        Default "partOfSpeech": *empty*. Specify one or many part-of-speech
+        types for which to return definitions. Pass multiple types as an
+        array reference.
+
+        The available partOfSpeech values are:
+
+            [noun, verb, adjective, adverb, idiom, article, abbreviation, preposition, prefix, interjection, suffix]
+
+    examples($word)
+        You can retrieve 5 example sentences for a words in Wordnik's alpha
+        corpus. Each example contains the source document and a source URL,
+        if it exists. See <http://docs.wordnik.com/api/methods#examples>.
+
+        $word is the word to look up.
+
+    related($word, %args)
+        You retrieve related words for a particular word. See
+        <http://docs.wordnik.com/api/methods#relateds>.
+
+        $word is the word to look up. %args accepts:
+
+        Default "type": *empty*. Return one or many relationship types. Pass
+        multiple types as an array reference.
+
+        The available type values are:
+
+            [synonym, antonym, form, hyponym, variant, verb-stem, verb-form, cross-reference, same-context]
+
+    frequency($word)
+        You can see how common particular words occur in Wordnik's alpha
+        corpus, ordered by year. See
+        <http://docs.wordnik.com/api/methods#freq>.
+
+        $word is the word to look up.
+
+    punctuationFactor($word)
+        You can see how common particular words are used with punctuation.
+        See <http://docs.wordnik.com/api/methods#punc>.
+
+        $word is the word to look up.
+
+    suggest($word, %args)
+        The autocomplete service gives you the opportunity to take a word
+        fragment (start of a word) and show what other words start with the
+        same letters. The results are based on corpus frequency, not static
+        word lists, so you have access to more dynamic words in the
+        language. See <http://docs.wordnik.com/api/methods#auto>.
+
+        $word is the word to look up. %args accepts:
+
+        Default "count": *5*. Specify the number of results returned.
+
+        Default "startAt": *0*. You can also specify the starting index for
+        the results returned. This allows you to paginate through the
+        matching values.
+
+    wordoftheday
+        You can fetch Wordnik's word-of-the day which contains definitions
+        and example sentences. See
+        <http://docs.wordnik.com/api/methods#wotd>.
+
+    randomWord(%args)
+        You can fetch a random word from the Alpha Corpus. See
+        <http://http://developer.wordnik.com/docs>.
+
+        %args accepts:
+
+        Default "hasDictionaryDef": *true*. You can ask the API to return
+        only words where there is a definition available.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Build.PL
+       Build
+       Build test
+       Build install
+
+    or
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DIAGNOSTICS
+    "Can't access '$key' field in class $class"
+        Private or inexistent member variable.
+
+    "Invalid argument key or value: '$type'"
+        Inexistent query parameter, or wrong value passed to existing
+        parameter.
+
+    "Parameter 'partOfSpeech' requires a reference to an array"
+        partOfSpeech => [qw/.../].
+
+    "Parameter 'type' requires a reference to an array"
+        type => [qw/.../].
+
+    "The operation you requested requires JSON to be installed"
+        perl -MCPAN -e 'install JSON'.
+
+    "Unsupported api format: '$format'"
+        Supported formats are 'perl', 'json', 'xml'.
+
+    "Unsupported api version: '$version'"
+        The only API version supported by this module is 3.
+
+CONFIGURATION AND ENVIRONMENT
+    WWW::Wordnik::API requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    This module requires the core modules "Test::More", "version" and
+    "Carp", and "LWP::UserAgent" from "CPAN". Additionally, it
+    recommends-requires "JSON" from "CPAN" for getting data in Perl data
+    structures.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    On versions 0.0.1 and 0.0.2, creation of a second object would clobber
+    the first object's instance variables, resulting in unexpected
+    behaviour. This is fixed in 0.0.3.
+
+    Response data is not post-processed in any way, other than optionally
+    being parsed from "JSON" to "Perl" data structures. Data::Dumper should
+    be of help there.
+
+    Please report any bugs or feature requests to
+    "bug-www-wordnik-api@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+TODO
+    Post-processing
+        Add filtering methods on response data.
+
+    Implement WWW::Wordnik::API::Response class to handle the above
+
+AUTHOR
+    Pedro Silva "<pedros@berkeley.edu>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010, Pedro Silva "<pedros@berkeley.edu>". All rights
+    reserved.
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

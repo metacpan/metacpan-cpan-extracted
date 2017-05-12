@@ -1,0 +1,488 @@
+# NAME
+
+Wurm - Simple.  Easy.  Crawls in your teeth.  Web framework.
+Did I mention it was a web framework?  Another one.
+
+# SYNOPSIS
+
+```perl
+use Wurm;
+use Data::Dumper;
+
+# Wurm applications are defined by a structure of anonymous
+# sub-routines that get called based on the incoming request
+# and where they live within the application tree.
+
+# When a request is received it is first packaged into a
+# C<$meal> which is then dispatched to a series of handlers.
+# Handlers are expected to inspect, filter, and otherwise
+# act on the request until a PSGI response is generated.
+# Once a response is generated, dispatching halts and the
+# response is returned back up the Plack chain.
+# This process is called "folding".
+
+# The internet really can be a series of tubes.
+sub build_tube {
+  my ($name) = @_;
+
+  # Here we create a basic component skeleton which we will use
+  # to build our application.  We use closures to capture
+  # $name but sub-routines can also simply be copied throughout
+  # the dispatch tree to duplicate behavior without creating
+  # new sub-routines, modules, classes, or objects.
+
+  return ({
+    # Gate handlers are always called first when folding.
+    # They are primarily meant for inspection, filtering,
+    # and resource setup.
+
+    # They will be called as Wurm traverses the URL path from
+    # the request.  Wurm maintains C<PATH_INFO> information in
+    # C<$meal->{tube}>.  As a request is dispatched, non-C<'/'>
+    # atoms and a trailing C<'/'> are removed and concatenated
+    # to C<$meal->{seen}>.  You can check C<$meal->{tube} eq ''>
+    # to see if this component will be targeted for further dispatch.
+    gate => sub {
+      my $meal = shift;
+      $meal->{log}->({level => 'debug',
+        message => "$name ))) $meal->{tube}"});
+      $meal->{vent}{to} = ucfirst $name
+        if $meal->{tube} eq '';
+      push @{$meal->{grit}{path}}, $name. '/gate';
+      return;
+    },
+
+    # What is not seen here are Tube handlers.  Tube handlers are
+    # what define the path ways within your application for dispatching
+    # down C<PATH_INFO>.  Since this is just a skeleton, we will tie the
+    # application together with tube handlers later.
+
+    # Neck handlers are called when C<$meal->{tube} eq ''>.
+    # Unless more advanced dispatching is performed at run-time,
+    # this starts the final dispatch chain.
+    neck => sub {
+      my $meal = shift;
+      push @{$meal->{grit}{path}}, $name. '/neck';
+      return;
+    },
+
+    # Body handlers are used to dispatch based on the request method.
+    # Unlike gate, neck, and tail handlers these require a slightly
+    # more complex structure.  You must provide a C<HASH> that
+    # contains handlers keyed off of the lower cased request method
+    # you would like that code to process.
+    body => {
+      get => sub {
+        my $meal = shift;
+        push @{$meal->{grit}{path}}, $name. '/body:get';
+        return;
+      },
+    },
+
+    # Tail handlers are the final possible step in a dispatch chain
+    # before a C<404> is generated.  While you can easily return a
+    # response from a body handler, tail handlers give you the option
+    # of tying multiple body response handling paths into a single spot.
+    tail => sub {
+      my $meal = shift;
+      push @{$meal->{grit}{path}}, $name. '/tail';
+      return wrap_it_up($meal);
+    },
+  })
+};
+
+# Look ma... modularity.
+# More advanced applications might have a template engine or other
+# data transformers contained in C<$meal->{mind}>.  C<$meal->{grit}>
+# and C<$meal->{vent}> data areas are for your application to use
+# as needed on a per-request basis.
+sub wrap_it_up {
+  my $meal = shift;
+
+  my $path = join ', ', @{$meal->{grit}{path}};
+
+  my $text = '';
+  $text .= "$meal->{mind}{intro} $meal->{vent}{to},\n";
+  $text .= "This is the path I took: $path\n";
+  $text .= "This is what is in the tube: $meal->{tube}\n";
+  $text .= "This is what I've seen: $meal->{seen}\n";
+
+  # Wurm provides some easy response handlers.
+  # They are probably too simple to be useful.
+  # Good luck.
+  return Wurm::_200('text/plain', $text);
+}
+
+
+# Now let's build the app!
+
+
+# This is the root "controller".
+my $wurm = build_tube('root');
+
+# The case routine can be defined to munge the request meal.
+# It is only called once at request entry.
+$wurm->{case} = sub {
+  my $meal = shift;
+  $meal->{vent}{to}   = 'Nobody';
+  $meal->{grit}{path} = [ ];
+  return $meal;
+};
+
+# The pore routine can be defined to munge the response.
+# It is only ever called once at request exit.
+$wurm->{pore} = sub {
+  my ($res, $meal) = @_;
+  $res->[2][0] = $res->[2][0]
+    . ($res->[0] == 200 ? '' : "\n")
+    . 'PSGI env: '. Dumper($meal->{env})
+  ;
+  return $res;
+};
+
+
+# Tinker-tubes!
+
+# Tubes are sub-tree structures that Wurm will re-dispatch to
+# during a request based on elements in the URL path.  They
+# have the exact same structure as described above with the
+# exception that C<case()> and C<pore()> handlers are ignored.
+
+# When a request begins, the HTTP C<PATH_INFO> information is
+# copied to C<$meal->{tube}> with a leading C<'/'> removed.
+# Wurm will remove a non-C<'/'> atom and trailing C<'/'> from
+# C<$meal->{tube}> during each dispatch cycle and will
+# re-dispatch the request to the folding tree defined under
+# that atom.  If no folding tree is found for a particular atom,
+# a C<404> is returned.
+
+# This builds a path route for 'wurm/' and 'wurm'.
+$wurm->{tube}{wurm} = build_tube('wurm');
+
+# This builds more path routes ('wurm/{foo,bar,baz,qux}/').
+$wurm->{tube}{wurm}{tube}{$_} = build_tube($_)
+  for qw(foo bar baz qux);
+
+# Now we have 'foo/' and 'baz/'.
+$wurm->{tube}{$_} = $wurm->{tube}{wurm}{tube}{$_}
+  for qw(foo baz);
+
+# qux is special.
+# It has a gate handler that will always return a 200.
+# This will act like a catch all for 'wurm/qux/*'.
+$wurm->{tube}{wurm}{tube}{qux}{gate} = sub {
+  my $meal = shift;
+  $meal->{vent}{to} = 'Lord Qux';
+  push @{$meal->{grit}{path}}, '*/gate';
+  return wrap_it_up($meal);
+};
+
+# Now turn the closure nightmare into a PSGI application.
+# The second argument to wrapp() is the C<$meal->{mind}>.
+# You can use it to store application-wide state like
+# configuration or other global resources.
+my $app = Wurm::wrapp($wurm, {intro => 'Hello'});
+$app
+```
+
+# DESCRIPTION
+
+Wurm implements a fold-r Plack web application container.  It is meant
+for quickly building PSGI-based applications using a multiple dispatch
+pattern that is driven by anonymous sub-routines.  Requests are passed
+down a set of handlers based on `PATH_INFO` and `REQUEST_METHOD`.
+The dispatch chain is canceled as soon as a response is generated.
+
+Applications are defined by a data structure that provides callback
+handlers.  Request handlers are called with a context object known
+as a `meal` that contains request and application state.  Handlers
+are expected to either return `undef` if dispatching should continue
+or a PSGI response.
+
+# MEALS
+
+Life feeds on life.
+
+When requests to your application are dispatched, they are first encased
+as a `meal`.  The `meal` is a simple `HASH` reference with request and
+application state.  It can be upgraded with fancier OO-related features
+when using [Wurm::mob](https://metacpan.org/pod/Wurm::mob).  See the relevant documentation there for more.
+In its simplest form, it will contain the following:
+
+```perl
+{
+  env  => $env,
+  log  => $log,
+  tube => $env->{PATH_INFO},
+  seen => '',
+  mind => $mind,
+  grit => { },
+  vent => { },
+}
+```
+
+- env
+
+    `env` is the PSGI `$env` as received.
+
+- log
+
+    `log` is the PSGI logger in `$env->{'psgix.logger'}`.  If one is
+    not present, a stub routine is put in place.  This allows you to call
+    `$meal->{log}->({...})` without checking for a logger first.
+
+- tube
+
+    `tube` is the current series of tubes to traverse.  As the request
+    is dispatched, non-`'/'` atoms are removed with the trailing slash.
+    The default is set to the `PATH_INFO` in the request with the leading
+    `'/'` removed.
+
+- seen
+
+    `seen` is the opposite of `tube`.  As atoms are removed from `tube`,
+    they are concatenated back onto `seen`.  The combination of these should
+    give you an idea of where the request is going and where it has been.
+
+- mind
+
+    `mind` is an application-specific data structure that is passed to
+    every request.  The value is set when calling `wrapp()` to generate
+    a PSGI application.  This is typically where things like configuration
+    or handles to application-wide resources should be kept.
+
+- grit
+
+    `grit` is a per-request data area that is used for maintaining state.
+    It is meant to be a "clean" area for building up data that may be
+    passed to a template engine or data models.
+
+- vent
+
+    `vent` is a per-request data area that is used for maintaining state.
+    It differs from `grit` in that it is meant to house per-request data
+    that is typically thrown away at the end of a request.  This might
+    include things like formatting flags or temporary information that
+    should never be applied to a template or data model.
+
+# DISPATCHING
+
+A fully dispatched request flows as follows:
+
+```
+case ->
+
+  gate -> tube -> neck -> body -> tail -> 404
+  ^       +-> 404
+  +------ +
+
+-> pore
+```
+
+The entry point for a request (`case`) converts a PSGI request into
+a `meal`.  The `meal` is then passed as a single parameter to
+callback handlers that may be defined for the named stages above.  Each
+stage represents a different type of routing logic or step within
+the dispatch chain.
+
+Applications may define their own `case` callback which will be called
+after the default one.  This allows per-request inspection and filtering
+before any dispatching. It is required that it return a `meal`.
+
+```perl
+sub case {
+  my $meal = shift;
+  # fix stuff in $meal here
+  return $meal;
+}
+
+...
+
+Wurm::wrap({case => \&case, ...});
+```
+
+After a request has been cased, it is dispatched according to the folding
+logic embedded in the application structure.  If `undef` is returned from
+a handler, dispatching continues.  Anything else is treated as a PSGI
+response that will be passed back up the Plack call chain.
+
+All callback handlers have the same signature which is:
+
+```perl
+sub callback {
+  my $meal = shift;
+  return
+    if $dispatching_should_continue;
+  return $locally_defined_PSGI_response;
+}
+```
+
+The following callback handlers may be defined for an application:
+
+- gate
+
+    Gate handlers are always called when present in the dispatch chain.
+    This will include handlers for which the `PATH_INFO` may not
+    apply directly since these will be called as the path is traversed.
+    If `$meal->{tube}` is `''`, this is the last gate that will be called.
+
+    ```perl
+    Wurm::wrapp({..., gate => \&handler, ...});
+    ```
+
+- tube
+
+    Tube handlers are called when there are tubes to navigate.  If
+    `$meal->{tube}` is not `''`, it will be stripped of a leading
+    non-`'/'` atom which will be used as a key for further delegation.
+    If a dispatch structure exists for the path element, the request
+    will be re-dispatched using this new structure thereby providing
+    path folding.  If no structure exists, a `404` is generated.
+
+    ```perl
+    Wurm::wrapp({...,
+      tube => {
+        funky  => {gate => sub { }, ...},
+        mondo  => {..., body => {get => sub { }}, ...},
+        gnarly => {..., tail => sub { }},
+      }
+    ...});
+    ```
+
+- neck
+
+    Neck handlers are run in between path matching and request method
+    delegation.  While multiple gate handlers can be called, only one
+    neck handler should be called for any given request chain.  It
+    can be used for filtering or setting up requests prior to dispatching
+    the request to body handlers.
+
+    ```perl
+    Wurm::wrapp({..., neck => \&handler, ...});
+    ```
+
+- body
+
+    Body handlers represent `REQUEST_METHOD` dispatching.  The lower-cased
+    value of the current request's method is used to choose which handler
+    is used for delegatation.  No restriction is made on the name so even
+    esoteric methods like `OPTIONS` and `CONNECT` can be defined.
+
+    ```perl
+    Wurm::wrapp({...,
+      body => {
+        get  => \&handler,
+        lost => \&handler,
+        head => \&handler,
+        post => \&handler,
+        man  => \&handler,
+      }
+    ...});
+    ```
+
+- tail
+
+    Tail handlers are the last possible handler to be called in any dispatch
+    chain.  They can be used to bundle the response packaging logic of a
+    busy chain into a single place.  If a tail handler does not generate a
+    response, a `404` response is returned.
+
+    ```perl
+    Wurm::wrapp({..., tail => \&handler, ...});
+    ```
+
+The exit point (`pore`) is responsible for the final packaging of
+a proper PSGI response that is then passed back up the Plack call
+chain.  The default will check for blessed response objects and
+call `finalize()` on them for you.  Applications may define their
+own which will be called prior to the default:
+
+```perl
+sub pore {
+  my ($cast, $meal) = @_;
+  # $cast is the PSGI response generated by the dispatch
+  # $meal is what generated $cast and is probably filthy
+  return $cast;
+}
+
+...
+
+Wurm::wrapp({..., pore => \&pore});
+```
+
+# FUNCTIONS
+
+- Wurm::wrapp($wurm, $mind)
+
+    Converts a set of folding rules into a PSGI application.  The `$wurm`
+    parameter must be a `HASH` reference which can be configured according
+    to the dispatch principles outlined above.  If `$mind` is provided, it
+    will be attached to each incoming request as `$meal->{mind}`.
+
+- Wurm::fold($meal, $wurm)
+
+    Dispatches a `meal` according to a set of folding rules.  This is
+    what performs all the work and is not meant to be called directly.
+    Unless of course you need that much power.  Use it wisely.
+
+- Wurm::bend($meal)
+
+    Removes a non-`'/'` atom and `'/'` from `$meal->{tube}`.
+    If no atom is available, `undef` is returned.  Otherwise the atom
+    and a `'/'` are concatenated to `$meal->{seen}` and the atom
+    is returned.
+
+- Wurm::\_200($content\_type, $content)
+
+    Very simplistic status code `200` generator.  Sets the `'Content-Type'`
+    header and body content to the values provided and not much else.
+
+- Wurm::\_201($location)
+
+    Generates a `201` redirect response with the location header set to
+    the given value.
+
+- Wurm::\_204()
+
+    Generates an empty `204` (No Content) response.
+
+- Wurm::\_301($location)
+
+    Generates a `301` redirect response with the location header set to
+    the given value.
+
+- Wurm::\_302($location)
+
+    Generates a `302` redirect response with the location header set to
+    the given value.
+
+- Wurm::\_400()
+
+    Generates an empty `400` (Bad Request) response.
+
+- Wurm::\_404()
+
+    Generates an empty `404` (Not Found) response.
+
+- Wurm::\_500()
+
+    Generates an empty `500` (Internal Server Error) response.
+
+# SEE ALSO
+
+- [Wurm::mob](https://metacpan.org/pod/Wurm::mob)
+- [Wurm::let](https://metacpan.org/pod/Wurm::let)
+- [Wurm::Grub::REST](https://metacpan.org/pod/Wurm::Grub::REST)
+
+# DISCLAIMER
+
+This software is known to The State of California to be experimental.
+
+# AUTHOR
+
+jason hord <pravus@cpan.org>
+
+# LICENSE
+
+This software is information.
+It is subject only to local laws of physics.

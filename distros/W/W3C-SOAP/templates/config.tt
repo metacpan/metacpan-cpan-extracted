@@ -1,0 +1,16 @@
+[%
+    IF ENV.W3C_SOAP_NAME_STYLE == 'both';
+        alias = 1;
+    ELSE;
+        alias = config.alias || 0;
+    END;
+    config = {
+        xsd  => {
+            parent_module => config.xsd.parent_module || 'W3C::SOAP::XSD',
+        },
+        wsdl => {
+            parent_module => config.wsdl.parent_module || 'W3C::SOAP::WSDL',
+        },
+        alias => alias,
+    };
+-%]

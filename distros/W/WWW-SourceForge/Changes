@@ -1,0 +1,19 @@
+Revision history for Perl module SourceForge::API
+
+0.01 Thu Jul  5 15:58:15 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.02
+    - Added SourceForge::API, SourceForge::User, and
+      SourceForge::Project modules to model the base data objects. Will
+      no doubt need more as we progress, but this is a good start. Goal
+      of first release is to be able to fetch a User object from the
+      API, and a Project object from the API, which have basic details.
+      Possibly a command-line script or two that demonstrate the
+      functionality.
+
+0.10
+    - Big step towards milestone 1. Project returns basic project info.
+      Could probably use this for actual useful things now.
+
+

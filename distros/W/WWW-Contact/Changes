@@ -1,0 +1,159 @@
+Revision history for WWW-Contact
+
+0.50    2015.09.19
+        - code is not working well but the build is OK now
+
+0.47    2011.10.27
+        GoogleContactsAPI: ignore google api group_name errors (Rhesa Rozendaal)
+        AOL: skip data update form
+
+0.46    2011.09.02
+        Yahoo utf8 fixes
+        Hotmail fixes
+        AOL fixes
+
+0.44    2010.10.05
+        Return most Google contact fields instead of just name and email by Denis Howe
+
+0.43    2010.09.13
+        add support google corporate mail with Net::DNS::Resolver by sharifulin (Анатолий Шарифулин)
+
+0.42    2010.08.21
+        supplier_args (undocumented)
+
+0.41    2010.08.05
+        Hotmail bug fixes by Ahmad Anbar
+
+0.40    2010.07.28
+        Hotmail fix
+
+0.39    2010.07.23
+        webmail.aol.com to mail.aol.com
+
+0.38    2010.06.08
+        AOL fix
+
+0.37    2010.02.23
+        MSN login fix && add live.co.uk (Reported by Gez Hall)
+
+0.36    2010.01.27
+        AOL fix
+
+0.35    2009.12.11
+        Hotmail fix
+
+0.34    2009.12.11
+        Yahoo! Account Recovery Issue
+
+0.33    2009.12.11
+        fix Yahoo!
+
+0.32    2009.09.24
+        Hotmail fix
+
+0.31    2009.09.11
+        MSN login fix
+
+0.30    2009.09.10
+        fix rediffmail
+
+0.29    2009.09.07
+        yahoo fix
+
+0.28    2009.08.10
+        AOL logout issue fix
+        163 mail fix
+
+0.27    2009.07.19
+        POD improvements by Anirvan Chatterjee
+        Hotmail: multi-pages contact (by Quan Sun)
+
+0.26    2009.05.22
+        Funky encoding of some non-alphanumberic chars in Hotmail names fix
+            by Mark Jubenville (RT 46280)
+
+0.25    2009.05.22
+        add 'use Data::Dumper;' in POD (thanks to oalders, http://annocpan.org/~FAYLAND/WWW-Contact-0.24/lib/WWW/Contact/GoogleContactsAPI.pm#note_2307)
+        Funky encoding of some non-alphanumberic chars in Hotmail names fix by OALDERS (RT 46280)
+
+0.24    2009.05.14
+        make Gmail DEPRECATED, use GoogleContactsAPI
+        L<WWW::Contact::BG::Abv> By Dimitar Petrov
+        L<WWW::Contact::BG::Mail> By Dimitar Petrov
+
+0.23    2009.05.04
+        add Google Contacts API implemention
+
+0.22    2009.04.02
+        fix Gmail contact name bug (RT 44729)
+
+0.21    2009.03.23
+        fix Hotmail
+
+0.20    2009.02.01
+        add Hotmail/Gmail into social_network (RT 42924)
+        fix Hotmail wacky results by David Moreno (RT 42925)
+        fix Hotmail "You spoke, Hotmail listened" bug by FAYLAND
+
+0.19    2009.01.03
+        no code change
+        try to fix CPAN install
+
+0.18    2008.12.23
+        add Moose '0.57' as deps (VERSION added)
+
+0.17    2008.11.08
+        fix "Gmail Contacts with no email cause incorrect matchup" (RT 40756)
+
+0.16    2008.11.02
+        Bug fix on Gmail module to handle fancy names(like R@j@n).
+        Clean up quotes(that surround name and email) when importing data from Rediffmail.
+
+0.15    2008.10.30
+        added WWW::Contact::Plaxo by Sachin Sebastian
+
+0.14    2008.10.28
+        added WWW::Contact::Lycos by Sachin Sebastian
+
+0.13    2008.10.28
+        added WWW::Contact::Indiatimes by Sachin Sebastian
+        remove google.com check and wrong password check from test files.
+
+0.12    2008.10.27
+        Edited synopsis for all derived modules.
+
+0.11    2008.10.27
+        no change
+
+0.10    2008.10.27
+        bump version up to PAUSE
+
+0.09    2008.10.27
+        add WWW::Contact::Hotmail by Fayland
+
+0.08    2008.10.27
+        added WWW::Contact::Mail by Sachin Sebastian
+
+0.07    2008.10.27
+        add WWW::Contact::AOL by Fayland
+
+0.06    2008.10.26
+        known_supplier hash
+        t/999-author.t
+        add WWW::Contact::CN::163 for mail.163.com
+
+0.05    2008.10.26
+        pod tweak
+
+0.04    2008.10.26
+        add Rediffmail supplier by Sachin Sebastian, C<< <sachinjsk at cpan.org> >>
+
+0.03    2008.10.16
+        add @ymail.com @rocketmail.com support
+
+0.02    2008.10.11
+        clean code and better doc.
+
+0.01    2008.10.3
+        First version, released on an unsuspecting world.
+

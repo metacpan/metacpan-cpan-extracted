@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Simpy
+version:      1.015
+version_from: lib/WWW/Simpy.pm
+installdirs:  site
+requires:
+    AutoLoader:                    5.6
+    constant:                      1.05
+    Data::Dumper:                  2.121
+    Exporter:                      5.58
+    LWP::UserAgent:                2.033
+    strict:                        1.03
+    URI:                           1.35
+    XML::Parser:                   2.34
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WWW/Google/Notebook.pm
+lib/WWW/Google/Notebook/Notebook.pm
+lib/WWW/Google/Notebook/Note.pm
+t/00_compile.t
+t/01_simple.t

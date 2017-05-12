@@ -1,0 +1,33 @@
+---
+abstract: 'interface to the API for BambooHR.com'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  LWP::Online: '0'
+  Test::More: '0.88'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-BambooHR
+requires:
+  HTTP::Tiny: '0.045'
+  JSON::MaybeXS: '1.003003'
+  MIME::Base64: '0'
+  Moo: '2.000000'
+  Moo::Role: '0'
+  Throwable: '0'
+  Try::Tiny: '0.13'
+  overload: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/neilbowers/WebService-BambooHR
+  repository: https://github.com/neilbowers/WebService-BambooHR.git
+version: '0.07'

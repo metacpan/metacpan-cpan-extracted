@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/export-yahoo360-blog.pl
+t/WWW-Scraper-Yahoo360.t
+t/blog.html
+t/blog2.html
+t/blog3.html
+t/blog4.html
+t/blogpost_with_1_comment.html
+t/blogpost_with_many_comments.html
+lib/WWW/Scraper/Yahoo360.pm
+META.yml                                 Module meta-data (added by MakeMaker)

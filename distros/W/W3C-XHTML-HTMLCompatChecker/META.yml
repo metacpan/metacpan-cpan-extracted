@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         W3C-XHTML-HTMLCompatChecker
+version:      0.10
+version_from: 
+installdirs:  site
+requires:
+    CGI:                           0
+    CGI::Carp:                     0
+    Exporter:                      0
+    LWP::Simple:                   0
+    URI:                           0
+    XML::Parser:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

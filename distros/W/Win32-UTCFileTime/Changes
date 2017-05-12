@@ -1,0 +1,524 @@
+________________________________________________________________________________
+
+                        Win32::UTCFileTime, Version 1.58
+________________________________________________________________________________
+
+Revision history for Perl extension Win32::UTCFileTime.
+_________________
+
+v1.58 30 May 2014
+
+    - Simplified repository metadata for cleaner appearance on search.cpan.org.
+_________________
+
+v1.57 16 May 2014
+
+    - Avoided possible test failures in t/02_file_times.t and t/12_errstr.t by
+      avoiding the problem of trying to open a file with a pending delete.
+
+    - Documented a new problem with the _utime() function in Visual Studio 2013
+      (VC12)'s C RTL DLL, which this module's replacement utime() function also
+      fixes.
+
+    - Incorporated an improvement to the stat(), lstat() and alt_stat()
+      functions that was introduced in Perl 5.8.9: These functions now work
+      correctly on directories specified with trailing slashses or backslashes,
+      even when using an older version of Perl.
+
+    - Incorporated perl's special handling of the file mode field returned by
+      stat() when compiled with Borland C++ into alt_stat() so that the field is
+      no longer set differently to perl for that compiler.
+
+    - Changed the Microsoft C library function call _get_osfhandle() to Perl's
+      exported function win32_get_osfhandle() so that it should not fail due to
+      the file descriptor passed to it being unrecognized.  This could
+      previously happen if this module was built by a compiler that used a
+      different C RTL DLL to that used by the compiler used to build perl.  This
+      restores support for such configurations, which was added in version 1.33,
+      but was broken if Visual Studio 2005 (VC8) or later was used to build this
+      module because the failing _get_osfhandle() call would actually crash the
+      program due to the new default invalid parameter handler.
+
+      It appears that using different compilers (and hence potentially different
+      C RTL DLLs) is safe now that the potential problem in doing so has been
+      removed, so the rudimentary checks on the compiler versions in Makefile.PL
+      have been removed too.  Note, however, that there is still a compatibility
+      problem when building this module with Visual Studio .NET 2002/2003 (VC7)
+      or earlier if your perl was built with Visual Studio 2005 (VC8) or later:
+      see [perl #121448].  However, that is quite an unlikely scenario, so it is
+      not worth checking for in Makefile.PL.
+
+    - Changed all PerlLIO_*() function calls to the corresponding lowio
+      functions: they should be redefined as necessary by perl's header files
+      anyway, which is indeed the case in perl-5.8.1 and above, at least -- see
+      the exchanges between myself and Jan Dubois on the "perl5-porters" mailing
+      list, 04-05 Mar 2010, for more details on this.
+
+    - Uploaded source code to GitHub and included repository URLs in metadata.
+
+    - Included META.json file in addition to META.yml.
+
+    - Simplified Makefile.PL commands for making a new distribution archive.
+
+    - Bumped minimum required ExtUtils::MakeMaker version to 6.66 to allow
+      building with 64-bit perl (otherwise the build fails with errors about
+      fakethr.h and perlsfio.h).
+
+    - Reverted to plain old ExtUtils::MakeMaker for building, now that that's
+      more fully maintained again.  Module::Install has virtually died a death,
+      and Module::Build is no better either.  Require a fairly recent version
+      (6.64) to ensure that all parameters used are supported, to save jumping
+      through hoops to support earlier versions.  (This should not be a problem
+      since ExtUtils::MakeMaker 6.64 is easily installed into Perl 5.8.1 and
+      above, that being the whole point of the new choice of minimum supported
+      Perl version.)
+
+    - Bumped minimum required Perl version from 5.6.0 to 5.8.1.  This is in line
+      with the minimum requirement of the "Perl Toolchain".
+_________________
+
+v1.56 08 Jul 2013
+
+    - Corrected typo in a comment.  (Fixes [cpan #86749].  Thanks to
+      <dsteinbrunner@pobox.com> for the patch.) 
+_________________
+
+v1.55 20 Mar 2012
+
+    - Updated Module::Install::PRIVATE to version 1.07.
+
+    - Updated Module::Install components from version 1.06 of that distribution.
+_________________
+
+v1.54 05 Mar 2012
+
+    - Fixed a bug in the Win32UTCFileTime_SetUTCFileTimes() C function (used by
+      the replacement utime() function) in which a file descriptor was wrongly
+      being left open, with only its underlying file object handle being closed.
+      Added new test scripts to check that none of the functions are now leaking
+      filehandles.  (Fixes [cpan #65095].)
+_________________
+
+v1.53 28 Feb 2012
+
+    - Updated Module::Install components from version 1.04 of that distribution.
+
+    - Updated ppport.h using version 3.20 of the Devel::PPPort distribution.
+_________________
+
+v1.52 25 Oct 2009
+
+    - Updated Module::Install components from version 0.91 of that distribution.
+
+    - Updated ppport.h using version 3.19 of the Devel::PPPort distribution.
+_________________
+
+v1.51 11 Oct 2009
+
+    - Declare all core module dependencies in the Makefile.PL as well as the
+      existing CPAN module dependencies.  (Cf. [cpan #50107].)
+_________________
+
+v1.50 25 Aug 2008
+
+    - Silenced a warning from Visual Studio 2005 (VC8) onwards, which now
+      defines time_t as a 64-bit integer by default.  A better solution to take
+      advantage of the larger time_t size may be forthcoming.
+
+    - Updated Module::Install components from version 0.77 of that distribution.
+
+    - Changed the use of "eval { ... };" to test the return value rather than $@
+      since under certain circumstances $@ can end up undefined after a failed
+      eval.
+_________________
+
+v1.49 09 Jul 2008
+
+    - Changed dwDesiredAccess and dwShareMode flags in the CreateFile() calls in
+      stat() and alt_stat() from GENERIC_READ and FILE_SHARE_READ to 0 and 0 as
+      per the CreateFile() call in Perl's own win32_stat().  This allows those
+      functions to operate on a file that is opened by another process that is
+      denying access to other processes trying to read the file.  (Fixes
+      [cpan #37535].)
+_________________
+
+v1.48 06 Jul 2008
+
+    - Updated Module::Install::PRIVATE to version 1.06 for Makefile.PL
+      improvements:
+
+      * Added the magic "OS unsupported" phrase to Makefile.PL's die() message
+        so that CPAN Testers report "N/A" rather than "FAIL" on OSes where the
+        appropriate C compiler cannot be found.
+
+    - Updated Module::Install components from version 0.75 of that distribution.
+      Changed Makefile.PL appropriately to cope with a non-backwards-compatible
+      change in the (undocumented) recommends() method.
+
+    - Added full paths to Cygwin tools used when creating the distribution.
+_________________
+
+v1.47 30 Jun 2008
+
+    - Added the magic "OS unsupported" phrase to Makefile.PL's die() message so
+      that CPAN Testers report "N/A" rather than "FAIL" on non-Win32 OSes.
+
+    - Updated ppport.h using version 3.14 of the Devel::PPPort distribution.
+_________________
+
+v1.46 10 Jul 2007
+
+    - Updated Module::Install::PRIVATE to version 1.05 for Makefile.PL
+      improvements:
+
+      * Fixed the compiler version checking on Win32 for Visual Studio 2005
+        (VC8), which now uses four numbers separated by dots for its compiler
+        version.
+        
+    - Updated Module::Install components from version 0.65 of that distribution.
+
+    - Updated ppport.h using version 3.11 of the Devel::PPPort distribution.
+
+    - Added comments to MANIFEST file.
+_________________
+
+v1.45 14 Feb 2006
+
+    - Fixed all the functions so that they work correctly on FAT drives.
+
+      Previous versions of this module made some erroneous assumptions about the
+      behaviour of certain Win32 API functions that were used in the solutions
+      implemented here, leading to incorrect behaviour on FAT drives.  In fact,
+      the test suite did not even pass all tests on FAT drives.
+
+      The new solutions are much simpler, and all tests now pass on both NTFS
+      and FAT drives, on Windows NT 4.0 Workstation, Windows 2000 Professional
+      and Windows XP Professional (at least).
+
+      Many thanks to Wayne Scott <wsc9tt@gmail.com> for drawing attention to
+      these errors and for suggesting what the correct solution is.
+
+    - Fixes for building with Borland C++:
+
+      * Used <dos.h> instead of <direct.h> for the declaration of _getdrive();
+
+      * Added definition of _dev_t, which Borland C++ omits;
+
+      * Skipped some directory mode tests because Borland's stat(2) sets the
+        mode differently to Microsoft's stat(2), emulated by alt_stat().
+
+      This module should now build (and test) cleanly with perls built using
+      Borland C++ and dmake.
+
+    - Changed various "use MODULE;" lines to be explicit about what is being
+      imported, and in particular to not import things that are not required.
+
+    - Updated Module::Install::PRIVATE to version 1.04 for Makefile.PL
+      improvements:
+
+      * Fixed the handling of user-input relative directory paths so that they
+        are converted to absolute paths before use in case the Makefile.PL has
+        changed to another directory in the meantime;
+
+      * Renamed lots of methods for a better naming convention.
+
+    - Updated Module::Install components from version 0.56 of that distribution.
+      This includes Module::AutoInstall, which supersedes ExtUtils::AutoInstall.
+      Changed Makefile.PL appropriately to take advantage of the new features.
+
+    - Updated ppport.h using version 3.08 of the Devel::PPPort distribution.
+
+    - Modified PREOP key in the dist option in Makefile.PL to ensure files are
+      all Windows end-of-line format.
+
+    - Corrected spelling mistakes and improved the grammar in some of the
+      documentation.
+_________________
+
+v1.44 02 Sep 2005
+
+    - Changed test scripts from using Test to Test::More for better diagnostic
+      output in case of failures.
+
+    - Updated Module::Install::PRIVATE to version 1.03 for Makefile.PL
+      improvements:
+
+      * Relaxed the compiler version checking so that only the major version
+        numbers have to match (and also the minor version numbers for Visual
+        Studio .NET 2002/2003 (VC7) and later, which use C RTL DLLs named
+        msvcr70.dll, msvcr71.dll, etc)
+        
+        (Thanks to Sisyphus <sisyphus1@optusnet.com.au> for drawing attention to
+        this problem via the PAR mailing list (par@perl.org));
+
+      * Fixed the parsing of bcc32's output as per perl change #24855.
+
+    - Dropped the use of I<> for Perl variables in POD, in line with changes
+      made (some time ago) to the perlpod manpage (perl change #12542).
+
+    - Corrected spelling mistake: INITIALISATION should be INITIALIZATION.
+
+    - Updated Module::Install and ExtUtils::AutoInstall components from versions
+      0.37 and 0.62 of those distributions respectively.
+_________________
+
+v1.43 01 Jun 2005
+
+    - Updated Module::Install::PRIVATE to version 1.02 for Makefile.PL
+      improvements:
+
+      * ExtUtils::AutoInstall command-line options are now better supported,
+        fixing problems with custom option handling that did not recognize them;
+
+      * Errors now croak() rather than die() so that the error messages look a
+        little more friendly;
+
+      * If the "auto install" checks loaded Test::Builder then that module's
+        cleanup diagnostic code is now skipped, which suppresses the somewhat
+        confusing (given the context) message
+
+          # Looks like your test died before it could output anything.
+
+        in the event of any subsequent error that causes Makefile.PL to croak().
+_________________
+
+v1.42 03 Mar 2005
+
+    - Included Module::Install::PRIVATE version 1.01 for Makefile.PL
+      improvements:
+
+      * Added code to try to check that on Win32 the same compiler is being used
+        to build this module as was used to build perl itself to avoid problems
+        with binaries built by different compiler versions loading different C
+        RTL DLLs.
+
+    - Added a recommendation for Test::Pod to Makefile.PL to test the POD when
+      building these modules.  Included ExtUtils::AutoInstall to facilitate
+      this.
+
+    - Updated ppport.h using version 3.06 of the Devel::PPPort distribution.
+
+    - Corrected spelling mistakes: categorise, emphasise, initialise, realise,
+      specialise, summarise and synchronise are more properly spelled
+      categorize, emphasize, initialize, realize, specialize, summarize and
+      synchronize respectively.
+
+    - Corrected "daylight savings time" to "daylight saving time" (except in
+      Microsoft Knowledge Base article titles) in the POD.
+
+    - Fixed up copyright years in all files to reflect which files actually
+      changed in each year.
+_________________
+
+v1.41 12 Dec 2004
+
+    - Moved XSLoader::load() call inside BEGIN subroutine as recommended by the
+      XSLoader manpage.  This means that the XSUBs are now installed before the
+      rest of the Perl module is compiled, and hence their prototypes are now
+      known, and can be checked, during the remaining compilation.
+_________________
+
+v1.40 31 Oct 2004
+
+    - Removed $Debug variable and introduced new $ErrStr variable.
+
+      Instead of callers having no clue as to why a function failed unless an
+      error happens to be in $! and/or $^E or they had $Debug set to a true
+      value, they can now inspect the $ErrStr variable to obtain the reason for
+      the failure, much like the use of $! and $^E themselves, except that
+      $ErrStr will always be set when a function fails, even if the last error
+      did not relate to a system call or Win32 API call.
+
+      Note that $! and/or $^E will continue to be set as well wherever they were
+      previously being set, so existing code that inspects those variables will
+      not be affected.  Callers should simply consider inspecting $ErrStr
+      instead in the future.
+
+      The only backwards compatibility issue here is the removal of the $Debug
+      variable, which is unlikely to affect most production systems.
+
+    - Updated documentation and tests for these changes.
+
+    - Renamed some functions, macros and external variables in the XS and C code
+      to use names that are more likely to be unique to this code, namely
+      Win32UTCFileTime_*() for functions, WIN32_UTCFILETIME_* for macros and
+      win32_utcfiletime_* for external variables.
+
+    - Introduced use of *MY_CXT* macros etc for handling static data in the C
+      code to make the module thread-safe.
+
+    - Reinstated ppport.h to provide *MY_CXT* macros etc for Perls older than
+      5.7.3 (or 5.9.2 in the case of MY_CXT_CLONE).
+
+    - Updated Module::Install components from version 0.36 of that distribution.
+_________________
+
+v1.33 08 Aug 2004
+
+    - Added a check to the return value from the _get_osfhandle() call in the
+      _SetUTCFileTimes() C function (used by the replacement utime() function)
+      so that we do not try to continue with an invalid handle.
+
+    - Also added an extra attempt at continuing in the above scenario by closing
+      the previously opened file descriptor and trying to open an operating-
+      system file handle directly instead, and modified the similar existing
+      case intended to cover directories to always retry rather than only when
+      errno was set to EACCES because (a) the debug message was misleading
+      (errno is set to EACCES for read-only files too) and (b) errno is not
+      always reliably set (see below).
+
+      This module now appears to function correctly when built using the free
+      Visual C++ Toolkit 2003 compiler in conjunction with a perl (e.g.
+      ActivePerl Build 810) that was built using Visual C++ 6.0.  (Passing file
+      descriptors, errno and other such resources between the different C RTL
+      DLLs used by those compilers (msvcr71.dll and msvcrt.dll respectively)
+      does not work.)
+
+      Using such mismatched C RTL DLLs, however, has to be seen as undesirable
+      and may not always work.
+
+      Added a note to the INSTALL file that if possible the same compiler should
+      be used to build this module as was used to build perl itself.
+
+      Thanks to Robert Rothenberg <rrwo@cpan.org> for drawing attention to this
+      problem via CPAN Testers Reports (http://www.cpantesters.org/).
+_________________
+
+v1.32 01 Aug 2004
+
+    - Removed standard modules from the list of pre-requisites in Makefile.PL
+      (since a minimum required Perl version is given anyway).
+
+    - Updated Module::Install components from version 0.35 of that distribution
+      and changed Makefile.PL to use abstract_from() now that it is fixed.
+
+    - Changed INSTALL document and Makefile.PL to remove requirement for Visual
+      C++, and mention dmake.
+
+    - This module should now build cleanly with perls built using MinGW / dmake.
+
+    - Changed various standard C library function calls to their Perl
+      replacement functions.
+
+    - Improved warning and error messages to include the message string for the
+      relevant standard C library errno or Win32 API last-error code where
+      appropriate.
+
+    - Fixed a bug in the _SetUTCFileTimes() C function (used by the replacement
+      utime() function) in which a file handle was wrongly being closed twice.
+      The inevitable failure of the second attempted closure had gone unnoticed
+      because the error checking code was also faulty :(
+
+    - Changed return value from the private _set_utc_file_times() XSUB so that
+      if it fails when called in list context then it returns an empty list
+      rather than a single "false" value (which would be seen as "true" in list
+      context).  (It is not currently called in list context anyway; this is
+      just defensive programming.)
+_________________
+
+v1.31 26 Feb 2004
+
+    - Use Module::Install as a front-end to ExtUtils::MakeMaker.  The same build
+      script can also be used as a front-end to Module::Build in due course
+      (once problems building XS modules with Module::Build are ironed out), and
+      it also creates a META.yml file that contains a "license" key, which
+      http://search.cpan.org/ makes use of.
+
+    - Added new test to check for POD errors if Test::Pod is available.
+_________________
+
+v1.30 22 Feb 2004
+
+    - Changed stat(), lstat() and alt_stat() to use $_ if no argument is given,
+      as per the Perl built-in functions.
+
+    - Added new test script to exercise this new feature.
+
+    - Clarified licence and warranty for the module, and included relevant
+      licence files in the distribution.
+
+    - Moved installation instructions to a separate INSTALL file.
+
+    - Added PREOP to the dist option in Makefile.PL to ensure permissions are
+      set correctly within the distdir (since they often are not set correctly
+      in the top-level directory when working on Windows) to stop CPANTS from
+      complaining about bad permissions.
+
+    - Added COMPRESS (and SUFFIX) and ZIPFLAGS to the dist option in Makefile.PL
+      to enable "best compression" for gzip when running "nmake dist" and for
+      zip when running "nmake zipdist" respectively.
+
+    - Added clean option to Makefile.PL to have the const-c.inc and const-xs.inc
+      files deleted by "nmake clean".
+
+    - Added MANIFEST.SKIP to stop "nmake distcheck" from producing bogus
+      warnings.
+
+    - Moved UTCFileTime.pm into lib/Win32/ sub-directory within distribution.
+      This is the new layout style produced by h2xs as of version 1.23.
+
+    - Removed ppport.h since no use was being made of it.  (This module builds
+      on Perl installations back to 5.6.0, both with and without ithreads,
+      without needing any portability fixups.)
+_________________
+
+v1.20 24 Sep 2003
+
+    - Introduced an alternative C stat(2) function from CVSNT and Perl code that
+      can succeed in some cases where Microsoft's implementation fails.  A Perl
+      interface, alt_stat(), is optionally exported, and can be automatically
+      tried by the replacement stat() and lstat() functions if the built-in
+      functions that they call first fail.
+
+    - Changed the replacement utime()'s use of Perl's trick for making it work
+      on directories too.  The trick only works under Windows NT platforms, so
+      it is more appropriate to try a more natural approach first and only fall
+      back on the trick if that fails.  This is the approach that Perl uses too.
+
+    - Improved the replacement stat() and lstat() functions by having them fall
+      back on CreateFile() if FindFirstFile() fails when getting the correct UTC
+      file times.  The file times can now be retrieved under Windows NT
+      platforms for root (drive or UNC) directories, and for directories
+      specified with a trailing slash or backslash.
+
+    - Improved the detection of the filesystem when determining whether it
+      stores UTC file times.
+
+    - Cached the conversion of the base SYSTEMTIME to FILETIME for a minor
+      speed-up.
+
+    - Changed the output of debug information to use warn() rather than simply
+      print()ing to STDERR to enable the information to be captured by a
+      $SIG{__WARN__} handler if required.
+
+    - Added new test scripts to exercise the new and improved features.
+
+    - Renamed some functions in the XS and C code.
+
+    - Reverted the typemap for "const char *" back to the default T_PV.  There
+      did not seem to be any point in the custom typemap.
+
+    - Changed tabs to spaces (via "expand -t 4 infile > outfile") to avoid
+      irritation when switching between editors that use 4- or 8-space tabs.
+
+    - Added META.yml (courtesy of ExtUtils::MakeMaker 6.17).
+_________________
+
+v1.10 23 Jun 2003
+
+    - Incorporated improvements to the underlying C code from CVSNT code.  The
+      DST season transition dates are now correctly calculated (assuming that
+      they are not determined by year-specific clues), rather than assuming the
+      United States' rule applies.
+_________________
+
+v1.00 05 Jun 2003
+
+    - First released version.
+_________________
+
+v0.01 20 May 2003
+
+    - Original version; created by h2xs 1.22 with options:
+      -n Win32::UTCFileTime -b 5.6.0
+________________________________________________________________________________

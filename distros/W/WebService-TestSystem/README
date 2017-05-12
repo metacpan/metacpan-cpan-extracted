@@ -1,0 +1,35 @@
+
+This is the README file for WebService::TestSystem, a program that
+implements a distributed testing system using the SOAP protocol.  This
+system is designed to provide a uniform API that multiple kinds of
+front ends can access (web, commandline, GUI, email, etc.) that provides
+access to various testing services (STP, PLM, Tinderbox, etc.) 
+
+See the INSTALL file for information on installing it (pretty much just
+the usual - perl Makefile.PL; make; make install).
+
+After installation, run the daemon in one window as follows:
+
+   $ scripts/testsystem_d
+
+In another window, run the scripts like this:
+
+   $ scripts/stp-lstest -s http://localhost:8081
+
+   $ scripts/stp-metrics -s http://localhost:8081
+
+   $ scripts/stp-trsearch -s http://localhost:8081
+
+etc.
+
+The documentation for each script is available via man or perldoc, e.g.: 
+
+   $ perldoc scripts/stp-lstest
+
+Copyright (c) 2004, by Open Source Development Labs.
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

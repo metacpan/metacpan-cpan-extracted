@@ -1,0 +1,31 @@
+---
+abstract: 'Kwiki WikiText Utilities'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WikiText::Kwiki
+name: WikiText-Kwiki
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.10.0
+resources:
+  homepage: https://github.com/ingydotnet/wikitext-kwiki-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/ingydotnet/wikitext-kwiki-pm.git
+    web: https://github.com/ingydotnet/wikitext-kwiki-pm/tree
+version: 0.01

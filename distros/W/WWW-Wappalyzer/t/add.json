@@ -1,0 +1,21 @@
+{
+	"categories": {
+		 "100": "parkings"
+	},
+	"apps": {
+		"sedoparking": {
+			"cats": [ 100 ],
+			"html": "<a href=\"http://www.sedo.com/services/parking.php3",
+			"script": "(sedoparking.com/js/jquery|sedoparking.com/jspartner/google.js|sedoparking.com/r/ads/adcode.js)"
+		},
+        "open_curly_bracket": {
+            "cats": [ 100 ],
+            "html": "aaa \\{ b{3}"
+        },
+        "1reg.online": {
+            "cats": [ 100 ],
+            "meta": { "copyright": "1'st Domain Name Service\\;confidence:50" },
+            "html": "<TITLE>[^<>]*регистрация доменов\\;confidence:50"
+        }
+	}
+}

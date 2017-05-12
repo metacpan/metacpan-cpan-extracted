@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+our $VERSION = '0.11';
+
+use Getopt::Long qw(:config pass_through);
+use WWW::BookBot::Alias;
+use Carp;
+
+# parse class related arguments
+my $pargsbot={};
+GetOptions($pargsbot, 'bot=s', 'work_dir=s',
+	'process_all=i',
+	'book_has_chapters=i',
+	'book_max_levels=i',
+	'book_max_chapters=i',
+	'catalog_max_pages=i',
+	'get_agent_name=s',
+	'get_agent_proxy=s',
+	'get_delay_second=i',
+	'get_delay_second_rand=i',
+	'get_fail_showtype=s',
+	'get_file_directory=s',
+	'get_from_file=i',
+	'get_language=s',
+	'get_max_retries=i',
+	'get_save_file=i',
+	'get_skip_zip=i',
+	'get_skip_media=i',
+	'get_timeout=i',
+	'get_trunk_size=i',
+	'get_trunk_fresh_size=i',
+	'get_visited_url_num=i',
+	'language_decode=s',
+	'language_encode=s',
+	'process_all=i',
+	'result_no_crlf=i',
+	'space_leading_remove=i',
+	'space_leading_max=i',
+	'space_inner_remove=i',
+	'space_inner_min_words=i',
+	'text_paragraph_type=s',
+	'screen_limit_trunk=i',
+	'screen_limit_title=i',
+);
+
+# usefull shortcut
+GetOptions(
+	savefile	=> sub {$pargsbot->{get_save_file}=1},
+	readfile	=> sub {$pargsbot->{get_from_file}=1},
+);
+
+# find right class to run
+my $class=$pargsbot->{bot};
+undef $pargsbot->{bot};
+croak "default bot is missing" if $class eq '';
+$class=alias2class($class)
+	if defined(alias2class($class));
+
+# load class
+my $sub="use $class;";
+eval $sub;
+croak "fail to load $class" if $@;
+
+# parse bot related argumnts
+my $bot=$class->new($pargsbot);
+my $pargsget={};
+my @argv_default=$bot->argv_default();
+GetOptions($pargsget, @argv_default) if scalar(@argv_default)>0;
+
+# process all or not
+if($ARGV[0] eq 'all') {
+	$bot->{process_all}=1;
+	shift @ARGV;
+}
+
+# direct argv
+foreach (@argv_default) {
+	last if scalar(@ARGV)==0;
+	my ($var)=split(/=/);
+	$pargsget->{$var}=shift(@ARGV);
+}
+
+# process all or not
+if($ARGV[0] eq 'all') {
+	$bot->{process_all}=1;
+	shift @ARGV;
+}
+
+# do process
+if($bot->{process_all}) {
+	$bot->argv_process_all($pargsget);
+}else{
+	$bot->argv_process($pargsget);
+}
+
+__END__
+
+=head1 NAME
+
+bookbot - Laucher of bot to fetch web e-texts with catalogs,books,chapters
+
+=head1 SYNOPSIS
+
+B<bookbot> --bot=<bot alias or name> ...
+
+bookbot --bot=dragonsky --work_dir=/output all
+bookbot --bot=shuku NewNovel 0 1
+
+=head1 DESCRIPTION
+
+bookbot will lauch a bot to fetch web e-texts with catalogs, books, chapters.
+
+to be added.
+
+=head1 BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-BookBot
+
+=head1 AUTHORS
+
+Qing-Jie Zhou E<lt>qjzhou@hotmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<WWW::BookBot>, L<WWW::BookBot::Alias>
+
+=cut

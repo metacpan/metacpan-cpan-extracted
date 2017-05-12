@@ -1,0 +1,28 @@
+Revision history for Perl module WWW::Google::Calculator
+
+0.07 2010-12-24T10:08:28+09:00
+     - Fixed broken currency calculations (Danijel Tasov)
+
+0.06 2010-12-15T10:46:15+09:00
+     - Update for latest Google pages
+       (Reported and fixed by Zok, Mike Heise)
+
+0.05 2008-02-27T10:34:16+09:00
+     - Added missing inc directory. I wrote ^inc in MANIFEST.SKIP.. poke me
+       (Reported by rjbs)
+
+0.04 2006-12-04T14:04:56+09:00
+     - Added live test with real network
+     - Fixed module break answer when it has multiplier (Reported by Torkild Retvedt)
+     - Fixed none ascii operator (&#215;) to *
+     - Changed module builder Module::Build to Module::Install
+
+0.03 2006-06-10T17:38:23+09:00
+     - Fixed typo s/Class::Accessors::Fast/Class::Accessor::Fast/ in Build.PL
+       (rt.cpan.org #19811)
+
+0.02 2006-05-16T02:29:47+09:00
+     - Added missing dependency Class::Accessors::Fast to META.yml
+
+0.01 2006-05-15T07:26:50+09:00
+     - initial release;

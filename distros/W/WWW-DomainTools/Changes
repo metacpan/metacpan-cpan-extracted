@@ -1,0 +1,25 @@
+Revision history for Perl module WWW::DomainTools (formerly Net::DomainTools::API)
+
+0.11 Thr May 22 12:48:15 2008
+    - You can now pass your own instance of LWP::UserAgent into the 
+      constructor of the api as the 'lwp_ua' parameter to allow for
+      using things such as proxy servers
+      
+      Thanks to Tim Wright for the suggestion.
+
+0.10 Sun Apr  6 10:17:34 2008
+    - Added the missing functions search_engine and name_spinner as documented
+      in WWW::DomainTools
+    - Fixed typos in the documentation
+
+0.09 Thr Apr  3 19:43:15 2008
+    - Change the package name from Net::Domaintools::API::* to WWW::DomainTools
+
+0.08 Tue Feb 12 01:43:13 2008
+    - finished the base API module which may be subclassed
+    - implemented the search engine application subclass
+    - implemented the name spinner application subclass
+    - added very basic test cases
+
+0.01 Fri Feb  8 22:26:28 2008
+    - original skeleton created with ExtUtils::ModuleMaker::TT

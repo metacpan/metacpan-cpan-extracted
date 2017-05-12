@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e207aa599d30bb8ecfecdb8af39db20c18ca9f96 Build.PL
+SHA1 9d83e61549e49c7b2d46319f8fea87433cd0a531 Changes
+SHA1 e7cd8b7fa01d1417817fb54c7d3ba8534b931bf5 MANIFEST
+SHA1 1ebd2f0a2008546d3fbad5a41ed189d946ed3c4e MANIFEST.SKIP
+SHA1 2743e4d00692ebd281546d8ba1d98fedd11f57d8 META.yml
+SHA1 76bf15c43c824ac2430784e5e823a3670d526a8e Makefile.PL
+SHA1 e42d7dd7c04fc217885aadb22c6b041ce30c8c71 README
+SHA1 d7ee5041beffbfe9780fe608f3aea0ccbe1696b0 debian/changelog
+SHA1 bb928272d6d3ad30be21760edbf7161f1b197a73 debian/control
+SHA1 4b0dd7fc41aef3ac18f58b3d61d68763087898f4 debian/copyright
+SHA1 688d794c9f32180a986779b6dff9c969e7e57ca1 debian/rules
+SHA1 087c2757a5e11c11fb839aa6578187269916c8ed lib/WebService/Advogato.pm
+SHA1 0f25a2d86f8f5eda690df8da9964f0b3c3bca15c t/0-signature.t
+SHA1 eaa3a821fd38560b5a4732d7711659c96c42b292 t/1.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFAcaTtogwpTl2CN6gRAoSjAKDUFnBKQ2gTIvS68f37UZ6efeLkYQCfeHdC
+v7Hk9LZeeEKBn00eFe5ymco=
+=Huwt
+-----END PGP SIGNATURE-----

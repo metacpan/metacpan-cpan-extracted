@@ -1,0 +1,11 @@
+codegen
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-FOAAS.t
+lib/WebService/FOAAS.pm
+lib/WebService/FOAAS/Codegen.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

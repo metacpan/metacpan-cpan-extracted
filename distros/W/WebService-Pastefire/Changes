@@ -1,0 +1,8 @@
+Revision history for Perl extension WebService::Pastefire
+
+0.02    Wed Sep  8 12:42:00 2012
+        - fix test
+        - add sample script
+
+0.01    Wed Sep  8 09:27:00 2012
+        - original version

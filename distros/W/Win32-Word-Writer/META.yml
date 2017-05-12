@@ -1,0 +1,30 @@
+---
+name: Win32-Word-Writer
+version: 0.03
+author: []
+abstract: Create Microsoft Word documents
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Class::MethodMaker: 1.12
+  Data::Dumper: 0
+  File::Spec: 0.87
+  File::Temp: 0.14
+  Test::Exception: 0.2
+  Test::More: 0.54
+  Win32::OLE: 0.17
+  Win32::OLE::Const: 0
+  perl: 5.6.0
+provides:
+  Win32::Word::Writer:
+    file: lib/Win32/Word/Writer.pm
+    version: 0.03
+  Win32::Word::Writer::Table:
+    file: lib/Win32/Word/Writer/Table.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

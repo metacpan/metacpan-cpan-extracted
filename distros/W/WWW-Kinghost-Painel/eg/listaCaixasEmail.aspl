@@ -1,0 +1,15 @@
+<%@LANGUAGE="PerlScript" CODEPAGE="65001"%>
+<%
+use Win32::ASP;
+use WWW::Kinghost::Painel;
+
+$Response->{charset}="utf-8";
+
+my $painel = WWW::Kinghost::Painel->new();
+
+$painel->logar('email@revenda.com.br','xxxxxxx');
+	
+	
+my $idDominio = "000000";
+print $painel->listaCaixasEmail( $idDominio );
+%>

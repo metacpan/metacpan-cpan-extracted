@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+		<title>Unit testing of DTS packages - results</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<link rel="stylesheet" type="text/css" href="/style/test_result.css" />
+</head>
+<body>
+<TMPL_LOOP NAME=RESULTS>
+<div class="result">
+		<h3>Results of the teste of package "<TMPL_VAR NAME=PACKAGE>"</h3>
+		<table>
+				<tr>
+						<td>Total of tests:</td>
+						<td><TMPL_VAR NAME=MAX></td>
+				</tr>
+				<tr>
+						<td>Total of tests OK:</td>
+						<td><TMPL_VAR NAME=OK></td>
+				</tr>
+				<tr>
+						<td>Total of tests that failed:</td>
+						<td><TMPL_VAR NAME=FAILED></td>
+				</tr>
+		</table>
+<TMPL_IF NAME=FAILED_TESTS>
+<p>Tests that failed:
+<PRE class='code'>
+<TMPL_LOOP NAME=FAILED_TESTS>
+<TMPL_VAR NAME=TEST></TMPL_LOOP>
+</PRE>
+</TMPL_IF>
+</div>
+<br>
+</TMPL_LOOP>
+<p><a href="<TMPL_VAR NAME=MYSELF>">Back</a></p>
+</body>
+</html>
+

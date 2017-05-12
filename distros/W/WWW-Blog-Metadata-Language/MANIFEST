@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Blog/Metadata/Language.pm
+t/00.load.t
+t/01.extract.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

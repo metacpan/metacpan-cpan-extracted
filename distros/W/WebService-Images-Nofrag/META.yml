@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                WebService-Images-Nofrag
+version:             0.06
+abstract:            upload an image to http://pix.nofrag.com
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    Image::Magick:                 0
+    Image::Magick::Info:           0
+    LWP::Simple:                   0
+    Test::More:                    0
+    Test::Perl::Critic:            0
+    version:                       0
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - franck cuny <franck.cuny@gmail.com>

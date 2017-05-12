@@ -1,0 +1,33 @@
+Revision history for WWW-Sitemapper
+
+1.121160    Wed Apr 25 23:18:10 2012
+            [rt#72738]: test fails with libwww-6.03 - fix parsing title from
+            response
+
+1.110340    Thu Feb  3 14:51:45 2011
+            Bug fix: allow method modifiers work with Hook'ed methods
+
+1.103360    Thu Dec  2 15:57:35 2010
+            protect from non-resolving local host names (test change)
+
+1.103280    Wed Nov 24 11:01:35 2010
+            Switch to Dist::Zilla
+            Drop dependency on Search::Sitemap in favour of WWW::Sitemap::XML.
+
+0.04        Sun Oct 31 21:14:15 2010
+            Require Search::Sitemap in version 2.11 from github to stop
+            tests failures.
+            Strip host name from test files (localhost
+                vs. localhost.localdomain).
+
+0.03        Sun Mar 28 14:46:21 2010
+            Documentation improvements.
+            Add missing required modules into Build.PL.
+
+0.02        Fri Mar 26 20:46:11 2010
+            Add missing required modules into Build.PL.
+            Cleanup documentation.
+
+0.01        Fri Mar 26 15:53:10 2010
+            First version released.
+

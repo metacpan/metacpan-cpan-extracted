@@ -1,0 +1,13 @@
+Revision history for perl module WWW::Ruler
+
+0.12 2013-09-01
+    - Update of the Changes file to follow the CPAN::Changes::Spec specification
+    - The small fix in doc
+
+0.11 2012-11-15
+    - Added WWW::Ruler::Piece::outside method
+    - Updated documentation
+    - Added first tests
+
+0.1 2012-09-27
+    - First release

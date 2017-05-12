@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+ex/demo.pl
+ex/save.xpm
+lib/Wx/WidgetMaker.pm
+t/01-compile.t
+t/02-widgets.t

@@ -1,0 +1,383 @@
+NAME
+
+    WWW::Shorten::Bitly - Interface to shortening URLs using
+    http://bitly.com
+
+SYNOPSIS
+
+    The traditional way, using the WWW::Shorten interface:
+
+        use strict;
+        use warnings;
+    
+        use WWW::Shorten::Bitly;
+        # use WWW::Shorten 'Bitly';  # or, this way
+    
+        # if you have a config file with your credentials:
+        my $short_url = makeashorterlink('http://www.foo.com/some/long/url');
+        my $long_url  = makealongerlink($short_url);
+    
+        # otherwise
+        my $short = makeashorterlink('http://www.foo.com/some/long/url', {
+            username => 'username',
+            password => 'password',
+            ...
+        });
+
+    Or, the Object-Oriented way:
+
+        use strict;
+        use warnings;
+        use Data::Dumper;
+        use Try::Tiny qw(try catch);
+        use WWW::Shorten::Bitly;
+    
+        my $bitly = WWW::Shorten::Bitly->new(
+            username => 'username',
+            password => 'password',
+            client_id => 'adflkdgalgka',
+            client_secret => 'sldfkjasdflg',
+        );
+    
+        try {
+            my $res = $bitly->shorten(longUrl => 'http://google.com/');
+            say Dumper $res;
+            # {
+            #   global_hash => "900913",
+            #   hash => "ze6poY",
+            #   long_url => "http://google.com/",
+            #   new_hash => 0,
+            #   url => "http://bit.ly/ze6poY"
+            # }
+        }
+        catch {
+            die("Oh, no! $_");
+        };
+
+DESCRIPTION
+
+    A Perl interface to the Bitly.com API <https://dev.bitly.com/api.html>.
+
+    You can either use the traditional (non-OO) interface provided by
+    WWW::Shorten. Or, you can use the OO interface that provides you with
+    more functionality.
+
+FUNCTIONS
+
+    In the non-OO form, WWW::Shorten::Bitly makes the following functions
+    available.
+
+ makeashorterlink
+
+        my $short_url = makeashorterlink('https://some_long_link.com');
+        # OR
+        my $short_url = makeashorterlink('https://some_long_link.com', {
+            username => 'foo',
+            password => 'bar',
+            # any other attribute can be set as well.
+        });
+
+    The function makeashorterlink will call the http://bitly.com web site,
+    passing it your long URL and will return the shorter version.
+
+    http://bitly.com requires the use of a user id and API key to shorten
+    links.
+
+ makealongerlink
+
+        my $long_url = makealongerlink('http://bit.ly/ze6poY');
+        # OR
+        my $long_url = makealongerlink('http://bit.ly/ze6poY', {
+            username => 'foo',
+            password => 'bar',
+            # any other attribute can be set as well.
+        });
+
+    The function makealongerlink does the reverse. makealongerlink will
+    accept as an argument either the full URL or just the identifier.
+
+    If anything goes wrong, either function will die.
+
+ATTRIBUTES
+
+    In the OO form, each WWW::Shorten::Bitly instance makes the following
+    attributes available. Please note that changing any attribute will
+    unset the "access_token" in WWW::Shorten::Bitly attribute and
+    effectively log you out.
+
+ access_token
+
+        my $token = $bitly->access_token;
+        $bitly = $bitly->access_token('some_access_token'); # method chaining
+
+    Gets or sets the access_token. If the token is set, then we won't try
+    to login. You can set this ahead of time if you like, or it will be set
+    on the first method call or on "login" in WWW::Shorten::Bitly.
+
+ client_id
+
+        my $id = $bitly->client_id;
+        $bitly = $bitly->client_id('some_client_id'); # method chaining
+
+    Gets or sets the client_id. This is used in the Resource Owner
+    Credentials Grants
+    <https://dev.bitly.com/authentication.html#resource_owner_credentials>
+    login method along with the "client_secret" in WWW::Shorten::Bitly
+    attribute.
+
+ client_secret
+
+        my $secret = $bitly->client_secret;
+        $bitly = $bitly->client_secret('some_secret'); # method chaining
+
+    Gets or sets the client_secret. This is used in the Resource Owner
+    Credentials Grants
+    <https://dev.bitly.com/authentication.html#resource_owner_credentials>
+    login method along with the "client_id" in WWW::Shorten::Bitly
+    attribute.
+
+ password
+
+        my $password = $bitly->password;
+        $bitly = $bitly->password('some_secret'); # method chaining
+
+    Gets or sets the password. This is used in both the Resource Owner
+    Credentials Grants
+    <https://dev.bitly.com/authentication.html#resource_owner_credentials>
+    and the HTTP Basic Authentication
+    <https://dev.bitly.com/authentication.html#basicauth> login methods.
+
+ username
+
+        my $username = $bitly->username;
+        $bitly = $bitly->username('my_username'); # method chaining
+
+    Gets or sets the username. This is used in both the Resource Owner
+    Credentials Grants
+    <https://dev.bitly.com/authentication.html#resource_owner_credentials>
+    and the HTTP Basic Authentication
+    <https://dev.bitly.com/authentication.html#basicauth> login methods.
+
+METHODS
+
+    In the OO form, WWW::Shorten::Bitly makes the following methods
+    available.
+
+ new
+
+        my $bitly = WWW::Shorten::Bitly->new(
+            access_token => 'sometokenIalreadyreceived24123123512451',
+            client_id => 'some id here',
+            client_secret => 'some super secret thing',
+            password => 'my password',
+            username => 'my_username@foobar.com'
+        );
+
+    The constructor can take any of the attributes above as parameters. If
+    you've logged in using some other form (OAuth2, etc.) then all you need
+    to do is provide the access_token.
+
+    Any or all of the attributes can be set in your configuration file. If
+    you have a configuration file and you pass parameters to new, the
+    parameters passed in will take precedence.
+
+ bitly_pro_domain
+
+        my $bpd = $bitly->bitly_pro_domain(domain => 'http://nyti.ms');
+        say Dumper $bpd;
+    
+        my $bpd2 = $bitly->bitly_pro_domain(domain => 'http://example.com');
+        say Dumper $bpd2;
+
+    Query whether a given domain is a valid Bitly pro domain. Returns a
+    hash reference with the information or dies on error.
+
+ clicks
+
+        my $clicks = $bitly->clicks(
+            link => "http://bit.ly/1RmnUT",
+            unit => 'day',
+            units => -1,
+            timezone => 'America/New_York',
+            rollup => 'false', # or 'true'
+            limit => 100, # from 1 to 1000
+            unit_reference_ts => 'now', # epoch timestamp
+        );
+        say Dumper $clicks;
+
+    Get the number of clicks
+    <https://dev.bitly.com/link_metrics.html#v3_link_clicks> on a single
+    link. Returns a hash reference of information or dies.
+
+ clicks_by_day
+
+        my $clicks = $bitly->clicks_by_day(
+            link => "http://bit.ly/1RmnUT",
+            timezone => 'America/New_York',
+            rollup => 'false', # or 'true'
+            limit => 100, # from 1 to 1000
+            unit_reference_ts => 'now', # epoch timestamp
+        );
+        say Dumper $clicks;
+
+    This call used to exist, but now is merely an alias to the "clicks" in
+    WWW::Shorten::Bitly method that hard-sets the unit to 'day' and the
+    units to 7. Returns a hash reference of information or dies.
+
+ countries
+
+        my $countries = $bitly->countries(
+            unit => 'day',
+            units => -1,
+            timezone => 'America/New_York',
+            rollup => 'false', # or 'true'
+            limit => 100, # from 1 to 1000
+            unit_reference_ts => 'now', # epoch timestamp
+        );
+        say Dumper $countries;
+
+    Returns a hash reference of aggregate metrics about the countries
+    referring click traffic
+    <https://dev.bitly.com/user_metrics.html#v3_user_countries> to all of
+    the authenticated user's links. Dies on failure.
+
+ expand
+
+        my $long = $bitly->expand(
+            shortUrl => "http://bit.ly/1RmnUT", # OR
+            hash => '1RmnUT', # or: 'custom-name'
+        );
+        say $long->{long_url};
+
+    Expand a URL using https://dev.bitly.com/links.html#v3_expand. Older
+    versions of this library required you to pass a URL parameter. That
+    parameter has been aliased for your convenience. However, we urge you
+    to stick with the parameters in the API. Returns a hash reference or
+    dies.
+
+ info
+
+        my $info = $bitly->info(
+            shortUrl => 'http://bitly.com/jmv6', # OR
+            hash => 'jmv6',
+            expand_user => 'false', # or 'true'
+        );
+        say Dumper $info;
+
+    Get info about a shorter URL using the info method call
+    <https://dev.bitly.com/links.html#v3_info>. This will return a hash
+    reference full of information about the given short URL or hash. It
+    will die on failure.
+
+ login
+
+        use Try::Tiny qw(try catch);
+    
+        try {
+            $bitly->login();
+            say "yay, logged in!";
+        }
+        catch {
+            warn "Crap! Our login failed! $_";
+        };
+
+    This method will just return your object instance if your access_token
+    is already set. Otherwise, it will make use of one of the two login
+    methods depending on how much information you've supplied. On success,
+    the access_token attribute will be set and your instance will be
+    returned (method-chaining). On failure, an exception with relevant
+    information will be thrown.
+
+    If you would prefer, you can use one of the other two forms of logging
+    in:
+
+      * Resource Owner Credentials Grants
+      <https://dev.bitly.com/authentication.html#resource_owner_credentials>
+
+      * HTTP Basic Authentication
+      <https://dev.bitly.com/authentication.html#basicauth>
+
+    These two forms require at least the username and password parameters.
+
+ lookup
+
+        my $info = $bitly->lookup(url => "http://www.google.com/");
+        say $info;
+
+    Use this lookup method call
+    <https://dev.bitly.com/links.html#v3_link_lookup> to query for a short
+    URL based on a long URL. Returns a hash reference or dies.
+
+ referrers
+
+        my $refs = $bitly->referrers(
+            link => "http://bit.ly/1RmnUT",
+            unit => 'day',
+            units => -1,
+            timezone => 'America/New_York',
+            rollup => 'false', # or 'true'
+            limit => 100, # from 1 to 1000
+            unit_reference_ts => 'now', # epoch timestamp
+        );
+        say Dumper $refs;
+
+    Use the referrers API call
+    <https://dev.bitly.com/link_metrics.html#v3_link_referrers> to get
+    metrics about the pages referring click traffic to a single short URL.
+    Returns a hash reference or dies.
+
+ shorten
+
+        my $short = $bitly->shorten(
+            longUrl => "http://www.example.com", # required.
+            domain => 'bit.ly', # or: 'j.mp' or 'bitly.com'
+        );
+        say $short->{url};
+
+    Shorten a URL using https://dev.bitly.com/links.html#v3_shorten. Older
+    versions of this library required you to pass a URL parameter. That
+    parameter has been aliased for your convenience. However, we urge you
+    to stick with the parameters in the API. Returns a hash reference or
+    dies.
+
+CONFIG FILES
+
+    $HOME/.bitly or _bitly on Windows Systems.
+
+        username=username
+        password=some_password_here
+        client_id=foobarbaz
+        client_secret=asdlfkjadslkgj34t34talkgjag
+
+    Set any or all "ATTRIBUTES" in WWW::Shorten::Bitly in your config file
+    in your home directory. Each key=val setting should be on its own line.
+    If any parameters are then passed to the "new" in WWW::Shorten::Bitly
+    constructor, those parameter values will take precedence over these.
+
+AUTHOR
+
+    Pankaj Jain <pjain@cpan.org>
+
+CONTRIBUTORS
+
+      * Chase Whitener <capoeirab@cpan.org>
+
+      * Joerg Meltzer <joerg@joergmeltzer.de>
+
+      * Mizar <mizar.jp@gmail.com>
+
+      * Peter Edwards <pedwards@cpan.org>
+
+      * Thai Thanh Nguyen <thai@thaiandhien.com>
+
+COPYRIGHT & LICENSE
+
+    Copyright (c) 2009 Pankaj Jain, All Rights Reserved
+    http://blog.pjain.me.
+
+    Copyright (c) 2009 Teknatus Solutions LLC, All Rights Reserved
+    http://teknatus.com.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

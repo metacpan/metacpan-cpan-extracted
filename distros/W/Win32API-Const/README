@@ -1,0 +1,127 @@
+Win32API::Const -- Win32 API Constants
+
+LOCATION
+--------
+http://www.perl.com/CPAN/modules/by-module/Win32API/
+
+
+SYNOPSIS
+--------
+
+Win32API::Const -- contains all of the Win32 constants, such as
+WM_CLOSE, SW_SHOWMAXIMIZED, etc
+
+
+SETUP
+-----
+
+You must have a compiler such as Borland or VC to compile and install
+Win32API::Const. If you are using VC, during the installation it asked if you
+wanted to register environment variables (default was off/unchecked). If you
+did not turn this on, you must run vcvars32.bat to set up these variables.
+
+In the following steps, $MAKE represents the name of your make utility. This
+is "nmake" for VC. Borland users should download Gurusamy Sarathy's port of
+dmake from http://www-personal.umich.edu/~gsar/.
+
+1)  If you're using ActivePerl, you first need to fix one of its bugs. See below.
+
+2)  Expand the .gz file (using, for example, WinZip) and its folders. Switch to
+    the directory you expanded it into.
+
+3)  perl Makefile.PL
+
+4)  $MAKE
+
+5)  $MAKE test
+    (this step uses the English version of Notepad to test the modules. You can skip
+	the test if you're installing on a foreign language OS, or overwrite notepad.exe
+	with an English version).
+
+6)  $MAKE install
+
+Ta da! Them's the basic steps for installing any perl module.
+
+To reinstall, run "$MAKE realclean", then skip back up to step #3.
+
+
+ACTIVEPERL
+----------
+
+The Perl installation program (MakeMaker) uses Config.pm (located in one of
+your Perl subdirs) to install Perl modules. Unfortunately, when ActivePerl is
+installed, it does not set up Config.pm correctly.
+
+To fix it:
+
+1)   Find Config.pm. If you installed ActivePerl into C:\Perl (the default) it
+     will be in "C:\Perl\5.00502\lib\MSWin32-x86-object\Config.pm".
+
+2)   attrib -r Config.pm
+
+3)   Open Config.pm in notepad.
+
+4)   Change the "libpth=" line to include your lib dir for VC as well as the
+     directory where ActivePerl installed perlcrt.lib to (by default,
+	 "C:\Perl\5.00502\bin\MSWin32-x86-object")
+
+	 For example, my "libpth=" line looks like this:
+
+     libpth='C:\Perl\5.00502\bin\MSWin32-x86-object "C:\Program Files\dev\vs\VC98\Lib"'
+
+	 Your libpth will *definitely* look different since I didn't install VC into
+	 the default directory.
+
+5)   The last item in the "libs=" line is perlcrt.lib, without a path. Put the
+     full path on perlcrt.lib.
+
+	 For example, my "libs=" line looks like this:
+
+	 libs=' oldnames.lib kernel32.lib user32.lib gdi32.lib  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib  oleaut32.lib netapi32.lib uuid.lib wsock32.lib mpr.lib winmm.lib  version.lib odbc32.lib odbccp32.lib C:\Perl\5.00502\bin\MSWin32-x86-object\perlcrt.lib'
+
+Whew! That should work.
+
+
+DOCUMENTATION
+-------------
+
+All the documentation is stored in the .pm files, in POD format. To view the documentation:
+
+1)  Switch to the directory containing a .pm file, such as Const.pm.
+
+2)  Run "pod2html Foo.pm > Foo.html" where Foo is the name of the module.
+
+3)  View Foo.html in your web browser.
+
+
+BUGS
+----
+Send bug reports to Brian Dellert: <aspider@pobox.com>
+
+
+COPYRIGHT
+---------
+Copyright (c) 1998 Brian Dellert <aspider@pobox.com>,
+<http://applespider.com>. All rights reserved.
+
+Constants parsed from the egcs 1.1 header files Defines.h, Messages.h,
+Errors.h, Base.h, & Sockets.h, which are licensed under the GNU
+Library General Public License (LGPL).
+
+Because the aforementioned header files are licensed under the GNU LGPL,
+this module is also licensed under the GNU LGPL.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; see the file lgpl.license.txt.
+If not, write to the Free Software Foundation,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.

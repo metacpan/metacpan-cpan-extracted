@@ -1,0 +1,23 @@
+WWW-Netflix version 0.05 README.test
+==================================
+
+
+HOW TO CREATE A TEST ACCOUNT
+
+In order to run the WWW-Netflix tests, you need to have a test Netflix 
+profile where you do not care about the ratings. You can create a profile 
+that has 0 movies allotted to it, so it won't affect your normal Netflix 
+operations. To create one, 
+ 1) Log into your main Netflix account.
+ 2) Click the "Your Account" link at the top. 
+ 3) In the "Account Preferences" area, click "Add Profile." 
+
+Next, set some environment variables that point to this account.
+ 4) export NETFLIX_TEST_USER='login name'
+ 5) export NETFLIX_TEST_PASS='login password'
+
+Now, we are ready to run tests.
+ 6) make test
+
+Occassionally, some tests seem to fail due to sluggish updates of 
+modified ratings or queue on the Netflix pages. 

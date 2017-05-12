@@ -1,0 +1,379 @@
+NAME
+    WWW::GoDaddy::REST - Work with services conforming to the GDAPI spec
+
+SYNOPSIS
+     use WWW::GoDaddy::REST;
+
+     my $client = WWW::GoDaddy::REST->new({
+       url => 'https://example.com/v1',
+       basic_username => 'theuser',
+       basic_password => 'notsosecret'
+     });
+
+     # see docs for WWW::GoDaddy::REST::Resource for more info
+     my $auto  = $client->query_by_id('autos',$vehicle_id_number);
+
+     print $auto->f('make');        # get a field
+     print $auto->f('model','S');   # set a field
+     $saved_auto = $auto->save();
+
+     my $resource = $auto->follow_link('link_name');
+     my $resource = $auto->do_action('drive', { lat => ..., lon => ...});
+
+     my $new = $client->create('autos', { 'make' => 'Tesla', 'model' => 'S' });
+
+     $auto->delete();
+
+     my @autos = $client->query('autos',{ 'make' => 'tesla' });
+
+DESCRIPTION
+    This client makes it easy to code against a REST API that is created
+    using the Go Daddy (r) API Specification (GDAPI)
+    https://github.com/godaddy/gdapi.
+
+    You will typically only need three pieces of information: - base url of
+    the api (this must include the version number) - username - password
+
+SEARCHING AND FILTERS
+    There are two methods that deal with searching: `query' and
+    `query_by_id'.
+
+  SEARCH BY ID
+    Example:
+
+      # GET /v1/how_the_schema_defines/the_resource/url/id
+      $resource = $client->query_by_id('the_schema','the_id');
+
+      # GET /v1/how_the_schema_defines/the_resource/url/id?other=param
+      $resource = $client->query_by_id('the_schema','the_id', { other => 'param' });
+
+  SEARCH WITH FILTER
+    Filters are hash references. The first level key is the field name that
+    you are searching on. The value of the field is an array reference that
+    has a list of hash references.
+
+    Full Syntax Example:
+
+      @items = $client->query( 'the_schema_name', 
+        {
+            'your_field_name' => [
+            {
+                'modifier' => 'your modifier like "eq" or "ne"',
+                'value'    => 'your search value'
+            },
+            {
+                #...
+            },
+            ],
+            'another_field' => ...
+        }
+      );
+
+    Now there are shortcuts as well.
+
+    Single Field Equality Example:
+
+      @items = $client->query( 'the_schema_name', 
+        { 'your_field_name' => 'your search value' }
+      );
+
+    Assumed Equality Example:
+
+      @items = $client->query( 'the_schema_name', 
+        {
+            'your_field_name' => [
+            {
+                # notice the missing 'modifier' key
+                'value' => 'your search value',
+            }
+            ],
+            'another_field' => 'equality search too'
+        }
+      );
+
+    Pass Through to query_by_id VS Search
+
+      $resource = $client->query( 'the_schema_name', 'id' );
+
+ATTRIBUTES
+    Attributes can be provided in the `new' method and have corresponding
+    methods to get/set the values.
+
+    url Base URL for the web service. This must include the version portion
+        of the URL as well.
+
+        Trailing slash can be present or left out.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new( {
+                   url => 'https://example.com/v1'
+               } );
+
+    basic_username
+        The username or key you were assigned for the web service.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new( {
+                   url => '...',
+                   basic_username => 'me',
+                   basic_password => '...'
+               } );
+
+        NOTE: not all web services authenticate using HTTP Basic Auth. In
+        this case, you will need to provide your own `user_agent' with
+        default headers to accomplish authentication on your own.
+
+    basic_password
+        The password or secret you were assigned for the web service.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new( {
+                   url => '...',
+                   basic_username => '...',
+                   basic_password => 'very_secret'
+               } );
+
+        NOTE: not all web services authenticate using HTTP Basic Auth. In
+        this case, you will need to provide your own `user_agent' with
+        default headers to accomplish authentication on your own.
+
+    user_agent
+        The instance of LWP::UserAgent that is used for all HTTP(S)
+        interraction.
+
+        This has a sane default if you do not provide an instance yourself.
+
+        You may override this if you wish in the constructor or later on at
+        runtime.
+
+        See the `default_user_agent' in "CLASS METHODS".
+
+        Example:
+
+          $ua = LWP::UserAgent->new();
+          $ua->default_headers->push_header(
+            'Authorization' => 'MyCustom ASDFDAFFASFASFSAFSDFAS=='
+          );
+          $c = WWW::GoDaddy::REST->new({
+                 url => '...',
+                 user_agent => $ua
+          });
+
+    schemas_file
+        Optional path to a file containing the JSON for all of the schemas
+        for this web service (from the schemas collection). If you would
+        like to avoid a round trip to the server at runtime, this is the way
+        to do it.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({
+                 url => '...',
+                 schemas_file => '/my/app/schema.json'
+          });
+
+        See the GDAPI Specification for more information about schemas and
+        collections.
+        https://github.com/godaddy/gdapi/blob/master/specification.md
+
+    raise_http_errors
+        Boolean value that indicates whether a `die()' will occur in the
+        event of a non successful HTTP response (4xx 5xx etc).
+
+        It defaults to True. Set to a false value if you wish to check the
+        HTTP response code in the resultant resource on your own.
+
+METHODS
+    query
+        Search for a list of resources given a schema name and a filter.
+
+        If the second parameter is a scalar, is assumes you are not
+        searching but rather trying to load a specific resource.
+
+        See the documentation for `query_by_id'.
+
+        In scalar context, this returns a Collection object.
+
+        In list context, this returns a list of Resource objects (or
+        subclasses).
+
+        Example:
+
+          @items      = $client->query('schema_name',{ 'field' => 'value' });
+          $collection = $client->query('schema_name',{ 'field' => 'value' });
+          $item       = $client->query('schema_name','1234');
+          $item       = $client->query('schema_name','1234',{ 'field' => 'value' });
+          $item       = $client->query('schema_name','1234',undef,{ timeout => 15 });
+
+        See "SEARCHING AND FILTERS" for more information.
+
+    query_by_id
+        Search for a single instance of a resource by its primary id.
+        Optionally specify a hash for additional query params to append to
+        the resource URL.
+
+        This returns a Resource (or a subclass).
+
+        Example:
+
+          # GET /v1/how_the_schema_defines/the_resource/url/the_id
+          $resource = $client->query_by_id('the_schema','the_id');
+          $resource = $client->query_by_id('the_schema','the_id',undef,{ timeout => 15 });
+
+          # GET /v1/how_the_schema_defines/the_resource/url/the_id?other=param
+          $resource = $client->query_by_id('the_schema','the_id', { other => 'param' });
+          $resource = $client->query_by_id('the_schema','the_id', { other => 'param' }, { timeout => 15 });
+
+    create
+        Given a schema and a resource (or hashref), a POST will be made
+        against the collection url of the schema to create the resource.
+
+        This returns a WWW::GoDaddy::REST::Resource (or a subclass).
+
+        Example:
+
+           $car = $client->create('autos', { 'make' => 'Tesla', 'model' => 'S' });
+           $car = $client->create('autos', { 'make' => 'Tesla', 'model' => 'S' }, { timeout => 30 });
+
+    schema
+        Given a schema name, return a WWW::GoDaddy::REST::Schema object or
+        undef if it is not found.
+
+        Example:
+
+          $schema_resource = $client->schema('the_schema');
+
+    schemas_url
+        If no schema name is provided, return the schema collection url
+        where you can retrieve the collection of all schemas.
+
+        If a schema name is provided, return the URL where you can retrieve
+        the schema with the given name.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({url => 'http://example.com/v1/'});
+          $c->schemas_url();        # http://example.com/v1/schemas/
+          $c->schemas_url('error'); # http://example.com/v1/schemas/error
+
+    http_request
+        Perform the HTTP request and return a hashref of the decoded JSON
+        response.
+
+        If this is called in list context, it returns the decoded JSON
+        response and the associated HTTP::Response object.
+
+        This takes the following parameters (similar but not the same as
+        HTTP::Request): - HTTP method - URL relative to the web service base
+        `url' - Optional hashref of data to send as JSON content
+
+        The url provided will be rooted to the base url, `url'.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({
+                 url => 'http://example.com/v1/'
+          });
+
+          # GET http://example.com/v1/servers/Asdf
+          $data_hashref = $c->http_request('GET','/servers/Asdf')
+
+          ($hash,$http_response) = $c->http_request('GET','/servers/Asdf');
+
+    http_request_as_resource
+        Perform the HTTP request and return a WWW::GoDaddy::REST::Resource
+        instance.
+
+        This takes the following parameters (similar but not the same as
+        HTTP::Request): - HTTP method - URL relative to the web service base
+        `url' - Optional hashref of data to send as JSON content
+
+        The url provided will be rooted to the base url, `url'.
+
+        The url provided will be rooted to the base url, `url'.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({
+                 url => 'http://example.com/v1/'
+          });
+
+          # GET http://example.com/v1/servers/Asdf
+          $resource = $c->http_request_as_resource('GET','/servers/Asdf')
+
+    http_request_schemas_json
+        Retrieve the JSON string for the schemas collection.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({
+                 url => 'http://example.com/v1/'
+          });
+
+          $schemas_json = $c->http_request_schemas_json();
+          # write this out to a file for later use
+          # with the 'schemas_file' parameter for example
+
+    build_http_request
+        Given parameters for a HTTP::Request object, return an instance of
+        this object with certain defaults filled in.
+
+        As of this writing the defaults filled in are:
+
+         - HTTP basic auth headers if auth is provided
+
+        Unlike other methods such as `http_request', the `url' is not rooted
+        to the base url.
+
+        Example:
+
+          $c = WWW::GoDaddy::REST->new({
+                 url => 'http://example.com/v1/'
+          });
+
+          $request = $c->build_http_request('GET','http://example.com/v1/test');
+
+CLASS METHODS
+    default_user_agent
+        Generate a default LWP::UserAgent. See `user_agent'.
+
+        Example:
+
+          $ua = WWW::GoDaddy::REST->default_user_agent();
+          $ua->default_headers->push('X-Custom' => 'thing');
+          $c = WWW::GoDaddy::REST->new({
+                 user_agent => $ua,
+                 url => '...'
+          });
+
+SEE ALSO
+    `gdapi-shell' command line program.
+
+AUTHOR
+    David Bartle, `<davidb@mediatemple.net>'
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2014 Go Daddy Operating Company, LLC
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

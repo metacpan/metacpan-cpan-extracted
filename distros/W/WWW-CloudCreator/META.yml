@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: WWW-CloudCreator
+version: 1.1
+author:
+  - Nick Gerakines <nick@socklabs.com>
+abstract: A weighted cloud creator
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

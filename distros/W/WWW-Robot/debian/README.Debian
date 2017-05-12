@@ -1,0 +1,14 @@
+libwww-robot-perl for Debian
+----------------------------
+
+Comments regarding the Package
+
+The WWW::Robot module provides a web traversal engine for use in web 
+robots and the like.
+
+Originally written by:
+Neil Bowers <neilb@cre.canon.co.uk> and
+Ave Wrigley <wrigley@cre.canon.co.uk>
+
+Now maintained by:
+Konstantin Matyukhin <kmatyukhin@gmail.com>

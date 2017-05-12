@@ -1,0 +1,13 @@
+Source: libwww-robot-perl
+Section: interpreters
+Priority: optional
+Maintainer: Konstantin Matyukhin <kmatyukhin@gmail.com>
+Build-Depends: debhelper (>> 3.0.0), perl (>= 5.6.0-16), cdbs
+Standards-Version: 3.5.2
+
+Package: libwww-robot-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${perl:Depends}, libwww-perl, libhtml-tree-perl
+Description: WWW::Robot perl module
+ The WWW::Robot module provides a web traversal engine 
+ for use in web robots and the like.

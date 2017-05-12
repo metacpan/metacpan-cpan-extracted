@@ -1,0 +1,9 @@
+WebDyne::Request::FastCGI is part of the WebDyne suite of modules. It
+provides a FastCGI responder wrapper so WebDyne will work with FastCGI
+servers such as Lighttpd.
+
+It should also work with other FastCGI servers such as Litespeed and Zeus,
+and works with the Windows IIS FastCGI module.
+
+WebDyne::Request::FastCGI will only work within WebDyne and will not
+function as a stand-alone module.

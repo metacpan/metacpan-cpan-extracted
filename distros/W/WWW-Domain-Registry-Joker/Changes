@@ -1,0 +1,98 @@
+Revision history for Perl extension WWW::Domain::Registry::Joker,
+the Joker.com DMAPI interface module.
+
+0.11	2017/01/04
+	- fix the podcheck test with recent versions of Pod::Checker.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=117538
+	  Thanks to Slaven Rezic for filing a bug report and prompting
+	  me to actually look into the CPAN Testers failures!
+	- remove the obsolete $CNsys version control tags
+	- bump the year of my copyright notice
+	- add the cpanfile and META.json files
+
+0.10	2009/06/26
+	- README
+	  - update the copyright years
+	- WWW::Domain::Registry::Joker
+	  - only send "!@!" for object modification requests; no need
+	    to register contacts and domains with "!@!" in the empty
+	    address parts
+	  - update the copyright years
+
+0.09	2008/11/14
+	- Makefile.PL
+	  - do not regenerate the META.yml each time, thus actually
+	    making use of my updated version in 0.06!
+
+0.08	2008/11/14
+	- belatedly bump the copyright year on README, Makefile.PL,
+	  and Joker.pm
+	- WWW::Domain::Registry::Joker
+	  - send "!@!" instead of an empty string, since the DMAPI
+	    treats an empty string as "no change requested".
+	    Hoster ticket #750
+
+0.07	2008/10/17
+	- add the META.yml file to the packing manifest
+
+0.06	2008/10/17
+	- add a META.yml file
+	- Makefile.PL
+	  - specify the Perl license for newer MakeMaker versions
+
+0.05	2007/11/26
+	- WWW::Domain::Registry::Joker
+	  - change web hyperlinks to italics instead of POD links for
+	    compatibility with Perl 5.6.x.
+	- WWW::Domain::Registry::Joker::Response
+	  - change web hyperlinks to italics instead of POD links for
+	    compatibility with Perl 5.6.x.
+	- t/WWW-Domain-Registry-Joker-podcheck.t
+	  - fix the number of tests planned
+	  - skip the num_warnings() test on early versions of Pod::Checker
+	- bump module versions:
+	  WWW::Domain::Registry::Joker::Response 0.04
+
+0.04	2007/11/21
+	- WWW::Domain::Registry::Joker::Loggish
+	  - rename the err() method to error() to avoid clashes with
+	    my own convention of an err() getter/setter method in
+	    other classes
+	  - append the newline in the log() method, not in debug() or
+	    error()
+	  - fix the error() POD documentation syntax
+	- scripts/test.pl
+	  - add usage info, thereby eliminating the last FIXME item
+	    left in the code :)
+	- t/WWW-Domain-Registry-Joker-coverage.t
+	  - add a new test file running Test::Pod::Coverage tests
+	- t/WWW-Domain-Registry-Joker-podcheck.t
+	  - add a new test file running Pod::Checker tests
+
+0.03	2007/11/14
+	- fix the POD syntax of the Joker::Response class
+	- remove the hooks for fake response parsing, always use
+	  a real HTTP::Response object
+	- properly check if the response passed in is indeed an object
+	  before invoking OO methods on it
+	- properly parse multiline response headers - they appear as
+	  "duplicate" headers, so keep the old value, append the new one
+	- fully perl-document the Joker::Response class
+	- implement Joker->query_domain_list() properly
+	- remove the Joker->checkavailability() misintended stub
+	- remove the method prototypes in the Joker class, since they
+	  serve absolutely no purpose in OOP classes
+	- fully perl-document the WWW::Domain::Registry::Joker class
+	- bump module versions:
+	  WWW::Domain::Registry::Joker::Response 0.03
+
+0.02	2007/11/09
+	- remove a leftover copyright statement from Joker.pm.
+	- add some perldoc documentation
+	- Joker.pm checks if the lwp() parameter is a LWP::UserAgent
+	- bump module versions:
+	  WWW::Domain::Registry::Joker::Loggish 0.02
+	  WWW::Domain::Registry::Joker::Response 0.02
+
+0.01	2007/11/07
+	- Initial semi-public release.

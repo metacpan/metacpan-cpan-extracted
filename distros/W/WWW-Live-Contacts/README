@@ -1,0 +1,50 @@
+WWW::Live::Contacts
+-------------------
+
+This package provides a Perl interface to the Windows Live Contacts API.
+
+NOTE: Microsoft have deprecated the Windows Live Contacts API in favour of
+      Windows Live Messenger Connect.
+
+Licensing:
+
+This package is copyrighted and licensed under the terms of the GNU Lesser GPL.
+You are free to modify and distribute modified version of the software under its
+terms.
+
+Requirements:
+
+The "WWW::Live::Auth" package is required for performing delegated
+authentication. This allows users to grant access to their contacts data for
+your application.
+
+Installation:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Example Application:
+
+An example CGI script "live_contacts.cgi" is included in the "eg" directory,
+designed to run in conjunction with the "live_auth.cgi" example script supplied
+with the WWW::Live::Auth CPAN module.
+
+To run the application, you must:
+  1. Register a web application with Microsoft at the following URL:
+     https://manage.dev.live.com/AddApplication.aspx
+  2. Add the application ID and secret key to the "example.key" file provided
+     with the WWW::Live::Auth package.
+  3. Place the key file, along with live_contacts.cgi AND live_auth.cgi in the
+     same web server directory. The web server does not need to be
+     internet-accessible for the purposes of the example, but CGI scripts must
+     of course be enabled.
+  4. Point your browser at the live_contacts.cgi script on your web server.
+  5. At first usage, your browser should be redirected to Windows Live for you
+     to login and grant access to the example application.
+  6. After granting consent, you should be redirected to live_auth.cgi, which
+     should in turn redirect you to live_contacts.cgi, which will list all your
+     contacts.
+  7. Subsequent visits to live_contacts.cgi will not require redirection and
+     authentication, provided the user's consent has not expired.

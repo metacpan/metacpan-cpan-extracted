@@ -1,0 +1,52 @@
+WWW::GoDaddy::REST history
+
+Release 0.10.0 - 11th February 2015
+ - global timeout on client - default to 10 seconds
+ - http related methods also have a per call timeout 
+   parameter to override the global.  see docs for
+   save, delete, query, query_by_id, etc.
+
+Release 0.9.0 - 26th January 2015
+ - to_string bug fix found when using Devel::Cover
+
+Release 0.8.0 - 17th December 2014
+ - fix query url when querying resources with an 'id' search filter
+   that also need extra url parameters
+ - gdapi-shell now accepts the 'basic_username' and 'basic_password'
+   keys in config files
+
+Release 0.7.0 - 9th July 2014
+ - fix collection search to return appropriate resource objects
+
+Release 0.6.0 - 24th February 2014
+ - do_action falls back to schema if action can not be
+   found in action hash
+
+Release 0.5.0 - 20th January 2014
+ - Better testing
+
+Release 0.4 - 17th January 2014
+ - LWP honors environmental proxy settings now
+ - Death in some gdapi-shell commands does not cause an exit
+
+Release 0.3 - 13th January 2014
+ - If 'type' is missing, f_as_resources will attempt to 
+   fill in the information from the schema
+ - save/delete resource works without 'self' link
+ - ability to register Resource subclasses that will be
+   used as the implemented subclass for a given schema
+   type.
+
+Release 0.2 - 9th January 2014
+ - f_as_resources method added
+ - Returned values from some APIs are not always resources.
+   Sometimes they are raw strings, null, integers etc.  Methods
+   were added to the Resource class so that you can get at the
+   decoded json directly (see the Resource->data method)
+ - If 'schemas' link is missing in a resource, it falls back
+   on the client base URL and concatenation "/schemas"
+ - Honor the X-API-Schemas header
+ - Honor the raise_http_errors flag when fetching the schemas
+
+Release 0.1 - 6th January 2014
+ - initial release

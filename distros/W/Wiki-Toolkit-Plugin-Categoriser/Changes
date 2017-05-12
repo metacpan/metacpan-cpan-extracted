@@ -1,0 +1,25 @@
+0.08    25 October 2009
+        Add t/pod.t to MANIFEST
+
+0.07    25 October 2009
+        Add POD tests and fix some broken POD
+
+0.06    31 January 2009
+        Explicitly skip tests if no backends configured, to avoid spurious
+        test failure reports.
+        Sign distribution
+
+0.05    8 March 2007
+        Fix bug - ->categories was picking up out-of-date categories.
+
+0.04    13 May 2006
+        Renamed Wiki::Toolkit::Plugin::Categoriser
+
+0.03
+        Updated tests.
+
+0.02    23 June 2003
+        Made a start at subcategory support.
+
+0.01    10 May 2003
+        Initial release.

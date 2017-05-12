@@ -1,0 +1,91 @@
+---
+abstract: 'Module for work with Wargaming.net Public API'
+author:
+  - 'cynovg , C<< <cynovg at cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WG-API
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WG::API:
+    file: lib/WG/API.pm
+    version: v0.8.1
+  WG::API::Auth:
+    file: lib/WG/API/Auth.pm
+    version: v0.8.1
+  WG::API::Error:
+    file: lib/WG/API/Error.pm
+    version: v0.8.1
+  WG::API::NET:
+    file: lib/WG/API/NET.pm
+    version: v0.8.1
+  WG::API::NET::Accounts:
+    file: lib/WG/API/NET/Accounts.pm
+    version: v0.8.1
+  WG::API::NET::Clans:
+    file: lib/WG/API/NET/Clans.pm
+    version: v0.8.1
+  WG::API::NET::Servers:
+    file: lib/WG/API/NET/Servers.pm
+    version: v0.8.1
+  WG::API::WoT:
+    file: lib/WG/API/WoT.pm
+    version: v0.8.1
+  WG::API::WoT::Account:
+    file: lib/WG/API/WoT/Account.pm
+    version: v0.8.1
+  WG::API::WoT::Ratings:
+    file: lib/WG/API/WoT/Ratings.pm
+    version: v0.8.1
+  WG::API::WoT::Tanks:
+    file: lib/WG/API/WoT/Tanks.pm
+    version: v0.8.1
+  WG::API::WoWp:
+    file: lib/WG/API/WoWp.pm
+    version: v0.8.1
+  WG::API::WoWp::Account:
+    file: lib/WG/API/WoWp/Account.pm
+    version: v0.8.1
+  WG::API::WoWp::Ratings:
+    file: lib/WG/API/WoWp/Ratings.pm
+    version: v0.8.1
+  WG::API::WoWs:
+    file: lib/WG/API/WoWs.pm
+    version: v0.8.1
+  WG::API::WoWs::Account:
+    file: lib/WG/API/WoWs/Account.pm
+    version: v0.8.1
+  WG::API::WoWs::Warships:
+    file: lib/WG/API/WoWs/Warships.pm
+    version: v0.8.1
+requires:
+  JSON: '2.61'
+  LWP: '6.08'
+  Moo: '2.00'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/cynovg/WG-API/issues
+  homepage: https://github.com/cynovg/WG-API
+  repository: git://github.com/cynovg/WG-API.git
+version: v0.8.1
+x_contributors:
+  - 'root <root@cynovg-debian.local>'
+  - 'Cyrill Novgorodcev <cynovg@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

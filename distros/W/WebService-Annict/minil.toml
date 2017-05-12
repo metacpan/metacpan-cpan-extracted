@@ -1,0 +1,5 @@
+name = "WebService-Annict"
+authority = "cpan:NUKOSUKE"
+module_maker = "ModuleBuildTiny"
+license = "mit"
+badges = ["travis"]

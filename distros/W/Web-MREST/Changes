@@ -1,0 +1,518 @@
+Revision history for Web::MREST
+
+0.01  2014-12-19 21:01 CET
+- basic module setup with code (mainly Resource.pm) taken from
+  App::Dochazka::REST version 0.356
+- MREST.pm: write POD
+
+0.02  2014-12-22 09:52 CET
+- remove auto-generated build files that I committed accidentally
+- MREST.pm: work on POD
+- Resource.pm: get rid of is_authorized and associated routines
+
+0.03  2014-12-22 16:03 CET
+- start development
+
+0.04  2014-12-23 11:42 CET
+- rename from App::MREST to Web::MREST
+- get t/503-Service-Unavailable.t to work as desired
+
+0.05  2014-12-23 16:50 CET
+- no longer dying in allowed_methods
+
+0.06  2014-12-23 21:34 CET
+- Build.PL: add Module::Runtime dependency
+- MREST_Config.pm: add MREST_APPLICATION_MODULE
+- dispatch_MetaConfig.pm: document format of resource definitions; re-structure
+  the resources to illustrate how individual resources can have subresources
+  for a tree structure; add MREST_ROOT_RESOURCE
+- Resource.pm: fix bugs in resource initialization routines
+- t/405-Method-Not-Allowed.t: now that allowed_methods is doing something, add
+  some tests
+
+0.07  2014-12-29 15:39 CET
+- bin/mrest: now takes app distro as parameter
+- config/dispatch_MetaConfig.pm: minor fixes; add root resource definition
+- MREST.pm: work on POD, make init take a PARAMHASH so application can 
+  get its own meta and site parameters loaded
+- Resource.pm: remove Clone dependency; adapt to flat structure of resource
+  definitions
+- t/405-Method-Not-Allowed.t: fix tests
+- t/method_not_allowed_override.t: demonstrate how a unit can define its own
+  resources and generate HTTP requests against them
+
+0.08  2014-12-30 15:30 CET
+- config/HTTP_Status_Message_en.conf: add HTTP status codes
+- MREST.pm: work on POD
+- Resource.pm: implement 'mrest_declare_error' method; use it in
+  allowed_methods; change all instances of $self->response->body to
+  $self->response->content; add error-handling code to 'finish_request' method;
+  start declaring HTTP errors using the new method
+- Test.pm: in 'status_from_json' we call 'from_json' which might die - handle
+  this situation more gracefully
+
+0.09  2014-12-30 18:35 CET
+- implement malformed_request, is_authorized, forbidden
+- rename "mrest_declare_error" to "mrest_declare_status" so we
+  can "declare" a successful status, too
+- try to figure out why CLI parser dies when we return a "declared" 500 status
+  (something strange is afoot)
+
+0.10  2014-12-31 09:54 CET
+- add dispatch-specific config files and module
+- bin/mrest: disable StackTrace middleware as it was making it difficult
+  to return sensible 500 error entities
+- Resource.pm: turn warnings into errors; add 'mrest_resource_exists' method;
+  "GET bugreport" works
+
+0.11  2014-12-31 16:11 CET
+- bin/mrest: turn on Web::Machine tracing
+- HTTP_Status_Message_en.conf: add 501
+- MREST_Config.pm: support OPTIONS method
+- get rid of bogus dispatch_Config.pm innards
+- MREST.pm: work on POD
+- Resource.pm: too much work to describe here
+
+0.12  2014-12-31 23:24 CET
+- Resource.pm: expand 'status_declared' method; work on 'malformed_request' method;
+  call handler in a try block
+- config/MREST_Config.pm: expand supported options - break tests
+- t/request_body_read.t: write what seem to be some sensible tests that pass
+- t/: address some of the brokenness
+
+0.13  2015-01-02 14:33 CET
+- Util.pm: for pod_to_html
+- Dispatch/Docu.pm: handlers for docu resources
+- t/: new units t/resources/docu.t and t/4xx/415-Unsupported-Media-Type.t
+- get HTML responses to work
+- get docu resources to work
+- MREST.pm: POD checked up to B5
+- Dispatch.pm: add 'noop' handler
+- Resource.pm: basic handling/checking of 'Content-Length' and 'Content-Type'
+  headers
+
+0.14  2015-01-02 15:19 CET
+- in valid_content_headers, actually check the headers against the valid
+  set (taken from RFC2616)
+
+0.15  2015-01-03 22:15 CET
+- handle and test 406 Not Acceptable
+- work on POD
+- take "content types provided" from configuration
+
+0.16  2015-01-05 16:01 CET
+- dispatch_MetaConfig.pm, Dispatch.pm: add 'test/post_is_create/:bool' resource
+- MREST.pm: work on POD
+- Resource.pm: implement 'post_is_create' and 'create_path' methods
+- t/2xx/201.t: basic unit tests for 'post_is_create'
+
+0.17  2015-01-06 08:28 CET
+- resource handlers are now method names
+- bin/mrest: take distro name and name of module to bless the application object into
+- dispatch_MetaConfig.pm: work on documentation; remove module name from handler property;
+  generalize 'test' resource 
+- MREST.pm: work on POD
+- Dispatch.pm: inherit from Web::MREST::Resource; work on 'echo' handler; generalize
+  'test' handler so it works for GET, POST, PUT and DELETE
+- Resource.pm: execute handler via method call instead of function call
+- Test.pm, t/: start adapting tests to current state
+
+0.18  2015-01-06 13:44 CET
+- add 'forbidden' resource and test for 403 Forbidden
+- add site params to control "cache disablement" headers
+- call handlers 'handler_foo' to distinguish them from resource names
+- get rid of 'help' resource; rename 'not_implemented' to 'noop'
+
+0.19  2015-01-07 16:38 CET
+- work on POD
+- change how resource handlers are called
+- start adapting the resource handlers (WIP)
+- debug Resources.pm (WIP)
+
+0.20  2015-01-07 21:43 CET
+- Resource.pm: call resource targets twice (once to determine resource
+  existence and a second time - as part of response generation - to get the
+  status)
+- Dispatch.pm: adapt 'bugreport' and 'docu/..' resources to the latest change
+  in how resource targets are called
+
+0.21  2015-01-08 09:49 CET
+- add t/2xx/200-OK.t
+- Dispatch.pm, Resource.pm: fix post_is_create, create_path
+- Test.pm, t/: add low-level 'llreq' routine; make req use it
+
+0.211  2015-01-10 08:28 CET
+- standardize terminology ("request entity" instead of "request body")
+- remove 'forbidden' resource definition and handler: they are not 
+  necessary to test 403 Forbidden response
+- add new modules that override 'forbidden' and 'is_authorized' methods
+  and associated unit tests 
+- work on POD
+- clarify how resource_exists is supposed to work and adapt 'handler_test'
+- Resource.pm: remove bogus forbidden handling code, clean up
+  'known_content_type', push content type onto context; add
+  'web_machine_metadata' accessor; work on process_post method
+
+0.212  2015-01-12 09:01 CET
+- Resource.pm: add 'documentation' to hard-coded list of not-to-be-expanded
+  properties
+- Test.pm: make 'llreq' handle headers argument properly, including assigning
+  default headers if no arguments are provided
+- t/: adapt tests in 2xx, 4xx, and 5xx to current code state
+
+0.213  2015-01-12 16:00 CET
+- config/: define resources in a site, rather than meta, config file
+- MANIFEST: fix omissions
+- Dispatch.pm: fix 'handler_echo'
+- t/method_not_allowed_override.t: broken unit - skip it for now
+
+0.214  2015-01-12 19:37 CET
+- Resource.pm: split off init_router stuff into a separate module
+- Test.pm: make req really use llreq; fix a warning
+
+0.215  2015-01-13 08:53 CET
+- Test.pm, t/: make initialize_unit take a PARAMHASH and prepare it to take a
+  sitedir option
+
+0.216  2015-01-13 10:05 CET
+- Resource.pm: split off "Web Services introduction" into a separate module
+- MREST.pm: work on POD
+
+0.217  2015-01-13 12:03 CET
+- find and fix some lingering instances of 'request_body' (renamed to 'request_entity')
+- t/dispatch/docu.t: 'documentation_format' property renamed to 'format'
+- test suite running cleanly
+
+0.218  2015-01-13 15:05 CET
+- InitRouter.pm: take list of non-expandable properties from a config param
+- MREST.pm: make 'init' take 'sitedir' property instead of inappropriately
+  named 'path'
+- t/method_not_allowed_override.t: revive the unit
+
+0.219  2015-01-14 06:20 CET
+- dispatch_Config.pm: add 'docu/text' resource
+- Dispatch.pm: resource handlers now called with ordinal number of pass - adapt
+  and clean up; make 'handler_param_get' handle second pass properly; in
+  'handler_docu', return 400 if request entity missing, improve error explanations;
+  adapt 'handler_echo' to current state
+- Util.pm: fix a glaring oversight  
+
+0.220  2015-01-14 16:43 CET
+- Build.PL, bin/mrest: use Plack::Middleware::LogErrors to redirect psgix.error
+  to our logger object
+- Resource.pm: use the new 'get_acceptable_content_type_handler' method from
+  https://github.com/stevan/webmachine-perl/pull/32
+
+0.221  2015-01-15 09:14 CET
+- Dispatch.pm: have only one handler for all 'param/...' requests
+- Resource.pm: add accessor for declared status code; add methods for running
+  request handler and response generator; make request handler call the
+  response generator; properly handle empty requests in request handler;
+  process_post just calls the _run_request_handler method; remove deprecated
+  web_machine_metadata method
+
+0.222  2015-01-15 16:14 CET
+- Resource.pm: clarify possible return values from request handler and response
+  generator; rearrange various routines so the order in which they appear in the
+  source file matches more closely the order in which requests propagate through
+  the FSM
+
+0.223  2015-01-16 08:09 CET
+- split off Entity.pm from Resource.pm
+- MREST.pm: work on POD
+- Resource.pm: provide a means to muffle debug-level log messages;
+  start organizing methods according to which "part" of the FSM they
+  belong to; move _make_json to Util.pm
+
+0.224  2015-01-16 09:36 CET
+- Entity.pm: add boilerplate
+- Resource.pm: make 'context' initialize the context property, if needed, even
+  when called as an accessor; do not decode_utf8 the path_info for now
+- Util.pm: use and export $JSON singleton; comment out 'make_json' routine as
+  it might not be needed
+
+0.225  2015-01-16 11:28 CET
+- dispatch_Config.pm, Dispatch.pm: allow DELETE method on 'param/...' resource
+- Entity.pm: implement get_acceptable_content_type_handler method for which
+  patch is pending upstream; rationalize PUT/POST request processing
+- Resource.pm: streamline process_post
+
+0.226  2015-01-16 14:26 CET
+- MREST_Config.pm: remove MREST_CONTENT_TYPES_PROVIDED
+- Entity.pm: rename _render_response_html -> mrest_generate_response_html;
+  rename _render_response_json -> mrest_generate_response_json; add 
+  generic mrest_generate_response method
+
+0.227  2015-01-16 14:35 CET
+- Resource.pm: include entity in responses to DELETE requests
+
+0.228  2015-01-16 14:58 CET
+t/dispatch/param.t: add test cases for 'param/...' resource
+
+0.229  2015-01-16 15:33 CET
+- Resource.pm: make declared status be an App::CELL::Status object 
+  from the very beginning - this simplifies finish_request
+- t/: adapt tests
+
+0.230  2015-01-16 15:46 CET
+- Resource.pm: make mrest_declare_status optionally take a ready-made
+  App::CELL::Status object
+
+0.231  2015-01-16 16:02 CET
+- t/dispatch/noop.t: add test cases for 'noop' resource
+- dispatch_Config.pm: cleanup
+- Dispatch.pm: fix up the 'handler_noop' method
+
+0.232  2015-01-16 22:00 CET
+- Dispatch.pm, t/dispatch/version.t: add handler and test cases for the
+  'version' resource
+- MREST.pm: add a 'version' method to provide access to $VERSION package variable
+
+0.233  2015-01-18 16:19 CET
+- bring in CLI from App::Dochazka::CLI (0.076)
+
+0.234  2015-01-18 23:09 CET
+- dispatch_Config.pm: fix 'param/..' resource definition; make root handler
+  be 'handle_noop'
+- InitRouter.pm: work on POD; find some kind of weird race condition - needs
+  a closer look
+
+0.235  2015-01-20 07:22 CET
+- Build.PL: add Web::MREST::CLI::Parser module directory and move
+  CLI configuration files to it
+- bin/mrest-cli: re-enable logging, add some print statements for
+  better orientation, change prompt to Web::MREST::CLI::Parser
+- config_cli/: log to mrest-cli.log in home directory
+- CLI/UserAgent.pm: add some comments
+- InitRouter.pm: add debug log messages
+
+0.236  2015-01-20 17:53 CET
+- Resource.pm, InitRouter.pm: get root resource to work
+- t/dispatch/root_resource.t: tests for the root resource
+
+0.237  2015-01-26 15:51 CET
+- Test.pm: do not add content-length in llreq
+- MREST.pm: work on POD
+- bin/mrest-cli: load config parameters only once
+
+0.238  2015-01-28 18:04 CET
+- Build.PL, config/: consolidate server and CLI configuration files
+- implement new 'configinfo' resource for displaying contents of
+  CELL_META_SITEDIR_LIST
+
+0.239  2015-01-29 09:57 CET
+- define root resource in (almost) the same way as all the other resources,
+- the name of the root resource is '/'
+- definitions of top-level resources must include parent => '/'
+
+0.240  2015-01-29 14:42 CET
+- Dispatch.pm: bring in resource definitions from dispatch_Config.pm,
+  and init_router function from InitRouter.pm
+- eliminate all references to $meta->RESOURCES - this data is now stored in the
+  $resources package variable in InitRouter.pm
+- remove obsoleted dispatch_Config.pm (integrate documentation into MREST.pm)
+- t/: remove two units broken by this round of modifications
+
+0.241  2015-01-29 17:43 CET
+- 503.pm: add file needed for test
+- Resource.pm: call init_router earlier
+
+0.242  2015-01-30 07:50 CET
+- CLI/UserAgent.pm: handle exceptions more gracefully
+
+0.243  2015-02-02 10:11 CET
+- bin/mrest: disable StackTrace by default since we are catching exceptions now
+- bin/mrest-cli: tweak how responses are displayed
+- InitRouter.pm: fix to handle case when a resource property is set to undef
+- Resource.pm: when Web::Machine catches an exception, trigger a 500 and provide
+  a response entity with the text of the exception
+
+0.244  2015-02-02 16:46 CET
+- report HTTP method in declared statuses
+- improve documentation of docu resource
+
+0.245  2015-02-02 21:24 CET
+- Resource.pm: add explicit 'create_path_after_handler' method
+
+0.246  2015-02-03 07:24 CET
+- Entity.pm: declare status when response generator is not OK
+- InitRouter.pm: tweak log messages
+
+0.247  2015-02-04 17:55 CET
+- Resource.pm: be careful that create_path always returns a string
+
+0.248  2015-02-11 10:18 CET
+- Resource.pm: add 'nullify_declared_status' method
+
+0.249  2015-02-11 14:04 CET
+- Entity.pm: insert Location header only if resource does not exist
+- Test.pm: put Location header in return value (App::CELL::Status object) so we
+  can test for it
+- t/dispatch/param.t: test for correct response code (201 or 200) and Location
+  header in PUT requests that create/modify a resource; add more test cases
+
+0.250  2015-02-12 07:32 CET
+- InitRouter.pm: make debug message more useful
+
+0.251  2015-02-12 09:19 CET
+- CLI/UserAgent.pm: use URI::Escape to escape % characters 
+- Resource.pm: make 'mrest_declare_status' take optional 'args' property 
+  so we can specify explanation as a message code
+
+0.252  2015-02-16 21:45 CET
+- InitRouter.pm: expand list of non-expandable properties
+
+0.253  2015-02-17 18:25 CET
+- MREST.pm: prep POD for release (WIP)
+- CLI/Parser.pm: enable root resource
+- MREST/Dispatch.pm: eliminate setting of 'resource_exists' in the response
+  generator as I am not sure if this is useful (needs more investigation)
+
+0.254  2015-02-18 07:06 CET
+- MREST.pm: mention 'curl' in SYNOPSIS
+- Entity.pm: handle possible \415 from get_acceptable_content_type_handler
+- Resource.pm: do not return scalar refs from 'process_post'
+
+0.255  2015-02-18 07:25 CET
+- MREST.pm: work on POD; fix syntax error
+
+0.256  2015-02-18 08:44 CET
+- implement normalize_filespec (in Util.pm) and use it to convert relative
+  paths to absolute
+- eliminate all references to %ENV (for portability)
+
+0.257  2015-02-18 16:46 CET
+- work on POD
+
+0.258  2015-02-21 08:09 CET
+- CLI/UserAgent.pm: add 'http_code' property to return status object
+
+0.259  2015-02-21 18:59 CET
+- Resource.pm: make 'known_content_type' tolerate undefined/empty content type
+
+0.260  2015-04-06 13:42 CEST
+- Resource.pm: mrest_declare_status method could nominally take an
+  App::CELL::Status object, but this functionality was not tested and, of
+  course, didn't work properly -> fix
+
+0.261  2015-04-06 14:59 CEST
+- Resource.pm: refactor 'mrest_declared_status_code' accessor, add
+  'mrest_declared_status_explanation' and 'declared_status' accessors
+- t/mrest_declared_status.t: add unit tests
+
+0.262  2015-04-13 09:35 CEST
+- tweak dependencies in an attempt to fix 'Can't locate object method "create"
+  via package "Plack::Test"' error in certain smoke tests
+
+0.263  2015-04-13 10:06 CEST
+- stop generating massive README, replace it with link to metacpan.org
+
+0.264  2015-07-04 19:03 CEST
+- bin/mrest: take local sitedir as a third argument
+
+0.265  2015-07-04 19:59 CEST
+- bin/mrest: really load the local site configuration directory
+
+0.266  2015-07-04 20:17 CEST
+- MREST.pm: make init() honor all parameters, instead of just one
+
+0.267  2015-07-13 09:42 CEST
+- Test.pm: make initialize_unit() more verbose
+
+0.268  2015-07-13 09:45 CEST
+- tweak release scripts
+
+0.269  2015-07-16 11:45 CEST
+- bin/mrest-cli: fix version number
+
+0.270  2015-07-16 11:48 CEST
+- Test.pm: make is_deeply check handle case when the value is undef?
+
+0.271  2015-07-21 19:36 CEST
+- Update copyright statement to 2015
+- set $VERSION in top-level module only
+- new release script
+
+0.272  2015-07-22 14:42 CEST
+- Make MREST_CLI_URI_BASE a meta param
+- bin/mrest: take $VERSION from top-level module
+
+0.273  2015-07-23 17:45 CEST
+- Build.PL: require recent versions of LWP::UserAgent and LWP::Protocol::https
+- No longer generate Makefile.PL
+- UserAgent.pm: enable SSL connections
+
+0.274  2015-07-25 11:49 CEST
+- bin/mrest: use options instead of positional parameters
+- release scripting modifications
+- Build.PL: make LWP::Protocol::https a BuildRequires as well as a Requires
+
+0.275  2015-07-26 21:21 CEST
+- Add missing "use Pod::Usage" to bin/mrest
+- Entity.pm: declare error statuses properly in mrest_generate_response_json()
+  (fixes Github issue #6)
+- CLI/UserAgent.pm: in send_req(), be more careful when modifying the response
+- Build.PL: add Cwd and File::Basename to BuildRequires
+- bin/mrest-standalone: add wrapper for starting server in standalone mode
+- update documentation of standalone mode in MREST.pm
+
+0.276  2015-07-27
+- Include descriptive text with DISPATCH_VERSION and MREST_CLI_SERVER_ERROR message codes
+- Build.PL, MANIFEST.SKIP: release scripting modifications
+- Test.pm: change diag() to note() in initialize_unit()
+
+0.277  2015-07-28 17:09 CEST
+- finish splitting off Web::MREST::CLI into a separate distro
+  - bin/mrest: import normalize_filespec() from Web::MREST::CLI::UserAgent
+  - Util.pm: drop normalize_filespec(); has been moved to Web::MREST::CLI
+  - lib/Web/MREST/: drop entire CLI/ subtree (just two files, actually)
+  - config/: drop all CLI-related files and keep server-related ones
+  - Build.PL: require Web::MREST::CLI >= 0.276
+
+0.278  2015-07-30 14:29 CEST
+- Early debugging feature
+- MREST.pm: do not call $CELL->load() with debug_mode param
+- bin/mrest: import normalize_filespec() from Web::MREST::CLI
+
+0.279  2015-07-30 14:36 CEST
+- bin/mrest: fix a silly typo
+
+0.280  2015-08-05 15:35 CEST
+- MREST.pm->init(): be more careful about early debugging filespec provided
+  by user
+
+0.281 2015-07-11 12:07 CET
+- config/: rename messages that might clash with application
+- global: do not convert warnings into errors
+- tests: use Test::Warnings to check for unexpected warnings
+- update release and prerelease scripts
+
+0.282 2016-01-02 01:17 CET
+- bin/mrest: call app's init() function if it exists
+
+0.283 2016-08-24 10:08 CET
+- Display application module in HTML header, not Web::MREST
+- add POD caveat: request entity not available until 2nd handler pass
+- release.sh: automate attachment of version number to OBS commit
+
+0.284 2016-07-31 20:07 CET
+- Dispatch.pm: fix POD on _first_pass_always_exists
+- bin/mrest: drop deprecated comments
+- bin/mrest: document how to pass arguments to Plack::Runner
+
+0.285 2016-09-05 09:02 CEST
+- bin/mrest: comment out a useless message
+- Travis CI
+- Merge README files into single README.rst
+- Add helper files for release automation scripting
+
+0.286 2016-09-24 14:35 CEST
+- Drop deprecated local release scripts
+- cleanup: drop unused _get_sharedir() argument in bin/mrest
+- cleanup: fix copyright header in bin/mrest
+- Add get_session() function to Util.pm
+
+0.287 2017-02-25 09:38 CET
+- Refrain from munging Plack::Session object
+- script: store sessions in a dedicated directory in /tmp
+

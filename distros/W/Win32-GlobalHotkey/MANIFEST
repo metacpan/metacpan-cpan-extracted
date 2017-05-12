@@ -1,0 +1,14 @@
+Changes
+GlobalHotkey.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00-load.t
+t/01.t
+t/02-auto.t
+t/03-warn-cb.t
+t/04-constant.t
+lib/Win32/GlobalHotkey.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

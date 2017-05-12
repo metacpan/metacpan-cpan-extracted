@@ -1,0 +1,22 @@
+Revision history for WWW-XKCD-AsText
+
+0.005   2017-02-26
+        - Move back to LWP::UserAgent
+        - Use Moose
+        - Make it compatible with POE::Component::WWW::XKCD::AsText
+
+0.004   2016-11-26
+        - Move to Dist::Zilla and Furl
+        - Use XKCD instead of OhNoRobot
+        - No more text, uri, ua, timeout
+
+0.003   2013-11-01
+        - Fixed "qw() as parentheses is deprecated" warning
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.002   2010-12-26
+        - Updated test suit
+
+0.001   2008-03-07
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Win32::RunAsAdmin;
+
+exit if Win32::RunAsAdmin::check;
+Win32::RunAsAdmin::run (shift @ARGV, Win32::RunAsAdmin::escape_args(@ARGV));

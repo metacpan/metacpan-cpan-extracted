@@ -1,0 +1,35 @@
+0.11 2016.09.11
+    - Minor changes
+
+0.10 2016.09.03
+    - Another tweak on the date format.
+
+0.09 2016.09.03
+    - Demand prerequisites added in 0.08.
+ 
+0.08 2016.09.03
+    - pubDate format is now "Wed, 03 Nov 2015 19:18:00 GMT"
+      https://github.com/szabgab/code-maven.com/issues/39
+
+0.07 2016.08.23
+    - Add several new fields
+
+0.06 2014.12.05
+    - Eliminate warning
+
+0.05 2014.12.02
+    - updated => update to eliminate a stupid warning
+
+0.04 2014.11.28
+    - Provide Default id and content.
+
+0.03 2014.08.26
+    - Link to GitHub.
+    - Min Perl version is 5.010.
+
+0.02 2014.03.20
+    - First public release
+
+0.01 2014.02.12
+    - First internal releae.
+

@@ -1,0 +1,117 @@
+NAME
+    Win32::Security::EFS - Perl interface to functions that assist in
+    working with EFS (Encrypted File System) under Windows plattforms.
+
+SYNOPSIS
+            use Win32::Security::EFS;
+
+            if(Win32::Security::EFS->supported()) {
+                    Win32::Security::EFS->encrypt('some/file');
+                    Win32::Security::EFS->decrypt('some/file');
+            }
+
+DESCRIPTION
+    The Encrypted File System, or EFS, was introduced in version 5 of NTFS
+    to provide an additional level of security for files and directories. It
+    provides cryptographic protection of individual files on NTFS volumes
+    using a public-key system. Typically, the access control to file and
+    directory objects provided by the Windows security model is sufficient
+    to protect unauthorized access to sensitive information. However, if a
+    laptop containing sensitive data is lost or stolen, the security
+    protection of that data may be compromised. Encrypting the files
+    increases security in this scenario.
+
+  METHODS
+    supported()
+        Returns *true* iff the underlaying filesystem supports EFS
+
+    constant_names()
+    encrypt($filename)
+        The *encrypt* function encrypts a file or directory. All data
+        streams in a file are encrypted. All new files created in an
+        encrypted directory are encrypted.
+
+    decrypt($filename)
+        The *decrypt* function decrypts an encrypted file or directory.
+
+    encryption_status($filename)
+        The *encryption_status* function retrieves the encryption status of
+        the specified file.
+
+        If the function succeeds, it will return one of the following values
+        see the "CONSTANTS" section.
+
+    encryption_disable($dirpath)
+        The *encryption_disable* function disables encryption of the
+        specified directory and the files in it. It does not affect
+        encryption of subdirectories below the indicated directory.
+
+    encryption_enable($dirpath)
+        The *encryption_enable* function enables encryption of the specified
+        directory and the files in it. It does not affect encryption of
+        subdirectories below the indicated directory.
+
+  FUNCTIONS
+    You have the possibility to access the plain API directly. Therefore the
+    following functions can be exported:
+
+        use Win32::Security::EFS ':api';
+
+    EncryptFile($filename)
+            BOOL EncryptFile(
+                LPCTSTR lpFileName  // file name
+            );
+
+    DecryptFile($filename, $reserved)
+            BOOL DecryptFile(
+                LPCTSTR lpFileName,  // file name
+                DWORD dwReserved     // reserved; must be zero
+            );
+
+    FileEncryptionStatus($filename, \$status)
+            BOOL FileEncryptionStatus(
+                LPCTSTR lpFileName,  // file name
+                LPDWORD lpStatus     // encryption status
+            );
+
+    EncryptionDisable($filename, $disable)
+            BOOL EncryptionDisable(
+                LPCWSTR lpDirPath,
+                BOOL fDisable
+            );
+
+    QueryUsersOnEncryptedFile( ... )
+        Not yet implemented.
+
+CONSTANTS
+    You can import all constants by importing Win32::Security::EFS like
+
+            use Win32::Security::EFS ':consts';
+
+    * encryption_status constants
+
+        * *FILE_DIR_DISALLOWED:* Reserved for future use.
+        * *FILE_ENCRYPTABLE:* The file can be encrypted.
+        * *FILE_IS_ENCRYPTED:* The file is encrypted.
+        * *FILE_READ_ONLY:* The file is a read-only file.
+        * *FILE_ROOT_DIR:* The file is a root directory. Root directories
+        cannot be encrypted.
+        * *FILE_SYSTEM_ATTR:* The file is a system file. System files cannot
+        be encrypted.
+        * *FILE_SYSTEM_DIR:* The file is a system directory. System
+        directories cannot be encrypted.
+        * *FILE_SYSTEM_NOT_SUPPORT:* The file system does not support file
+        encryption.
+        * *FILE_UNKNOWN:* The encryption status is unknown. The file may be
+        encrypted.
+        * *FILE_USER_DISALLOWED:* Reserved for future use.
+
+AUTHOR
+    Sascha Kiefer, esskar@cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Sascha Kiefer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

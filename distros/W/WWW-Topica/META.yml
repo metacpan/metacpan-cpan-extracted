@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Topica
+version:      0.6
+version_from: lib/WWW/Topica.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Date::Parse:                   0
+    Email::Date:                   0
+    Email::LocalDelivery:          0
+    Email::Simple:                 0
+    Email::Simple::Creator:        0
+    File::Basename:                0
+    HTML::Scrubber:                0
+    LWP::UserAgent:                0
+    Time::Piece:                   0
+    URI:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

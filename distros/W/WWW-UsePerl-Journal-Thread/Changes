@@ -1,0 +1,89 @@
+Changes for WWW-UsePerl-Journal-Thread
+======================================
+
+0.16    2015-02-19
+        - fixed broken JSON file.
+
+0.15    2015-02-15
+        - added resources to META files.
+        - created GitHub repositories.
+
+0.14    2012-08-30
+        - fixed test count on skip.
+
+0.13    2012-08-26
+        - use.perl.org is now read only.
+        - thread id no longer supported.
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - spelling fixes. (thanks to Nicholas Bamber, Florian Schlichting &
+          Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - implemented Perl::Critic suggestions.
+        - added META.json
+        - change file dates changed to meet W3CDTF standards.
+
+0.12    2010-09-30
+        - fixed useperl.pl (v0.02) script in examples.
+        - fixed META.yml - distribution name
+        - this version was not released
+
+0.11    2008-09-29
+        - updated optional tests.
+        - upgraded WWW-UsePerl-Journal required version to 0.22.
+        - fixed regex to match comments for updated use.perl pages.
+        - added a useperl.pl script to examples, which can extract all the
+          journal posts and associated comments, for a given user.
+
+0.10    2007-11-07
+        - several fails pointed at bad error handling in the event of a webpage
+          not being returned. Further validation in the event of a page not
+          being found. Thanks to David Cantrell for the diagnostics.
+        - bumped several prerequite versions in META.yml
+        - incorporated internal debugging as per WUJ.
+
+0.09    2007-10-31
+        - relaxed date testing, as timezones can affect the date/time value
+          returned.
+        - This is mostly a documentation and license update release.
+        - Upped some of the versions of required modules.
+        - New META.yml and associated tests added
+        - Changed all instances of LICENCE to LICENSE.
+        - Added LICENSE file.
+        - Added an examples directory
+        - POD/README updates.
+        - UsePerl has changed its comment formatting.
+        - simplified thread and comment storage respectively.
+        - added error methods to access faults rather than die-ing.
+
+0.08    2005-04-05
+        - Updated test to reflect changes in use.perl
+        - Added test scripts
+        - Aligned version numbers
+
+0.07    2004-04-22
+        - Date in comment wasn't ... d'oh!
+        - Date regex was balking. Fixed it up to be more economical and faster
+
+0.06    2004-04-20
+        - date/time testing removed due to odd behaviour with use.perl times
+
+0.05    2004-04-19
+        - Test::More added as a prerequisites for PPMs
+        - Fixed Abstract in Makefile.PL
+
+0.04    2003-11-10
+        - Updated Test::Pod requirement
+        - Between releases a few comments seem to have
+          gone back an hour on use.perl!!!
+
+0.03    2003-10-08T13:04:18+01:00
+        - META.yml added to distribution
+        - POD updates
+
+0.02    2003-08-14T12:23:02+01:00
+        - POD updates and fixes
+
+0.01    2003-08-13T09:26:53+01:00
+        - original version; based upon WWW::UsePerl::Journal

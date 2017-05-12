@@ -1,0 +1,12 @@
+Revision history for WebService-MCBouncer
+
+0.03    2015-04-15
+        Remove POD tests from dist
+        Add github repo meta info
+
+0.02    2015-04-10
+        Handle reponses more sanely, and more user-friendly return 
+
+0.01    2015-04-10
+        First version, released on an unsuspecting world.
+

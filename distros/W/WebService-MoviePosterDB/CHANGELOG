@@ -1,0 +1,12 @@
+0.18 2011-06-21
+	- Fix spurious test failures.
+
+0.17 2011-06-13
+	- Removed code relating to the deprecated version 1 API.
+	- Added support for demo credentials.
+
+0.15 2009-03-09
+	- Added PREREQ, LICENSE, AUTHOR and ABSTRACT to META.yml.
+
+0.14 2010-03-09
+	- First public release.

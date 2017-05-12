@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/WWW/Sucksub/Extratitles.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+eg/extratitles.test.pl

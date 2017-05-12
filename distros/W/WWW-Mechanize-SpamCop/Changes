@@ -1,0 +1,27 @@
+Revision history for Perl extension WWW::Mechanize::SpamCop.
+
+0.08  Tue, 13 May 2008 13:40:52 +0200 cpan@olo.org.pl
+        - changed maintainer address
+
+0.07  Mon May 07 21:49:55 2007 aleksander.adamowski@gmail.com
+        - implement remove_unreported()
+
+0.06  Mon Apr 23 00:38:31 2007 aleksander.adamowski@gmail.com
+        - fix WWW::Mechanize warning about nonexistent form when dropping old spam
+
+0.05  Mon Apr 02 01:06:40 2007 aleksander.adamowski@gmail.com
+        - only added new maintainer contact
+
+0.04  Tue Mar 27 12:37:48 2007 aleksander.adamowski@gmail.com
+        - switch to form-based authentication and accomodate latest SpamCop service version
+
+0.03  Tue Aug  5 16:26:12 2003
+        - correct a few things and first world release
+
+0.02  Tue Aug  5 15:14:07 2003
+        - correct a few things and first world release
+
+0.01  Tue Aug  5 12:29:17 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n WWW::Mechanize::SpamCop
+

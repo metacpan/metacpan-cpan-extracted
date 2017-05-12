@@ -1,0 +1,17 @@
+Revision history for WebService-Moodle-Simple
+
+0.05  2016-10-01 22:56:55 UTC
+        - reduce dependency on non-core Moodle API methods
+
+0.04  2014-09-20 23:14:15 UTC
+        - More documentation
+        - add suspend_user
+
+0.03  2014-02-28 18:23:22 UTC
+        - Add documentation
+
+0.02  2014-02-28 18:02:41 UTC
+        - Port from ExtUtils::MakeMaker to Dist::Milla
+
+0.01  2014-02-28 16:54:35 UTC
+        - Initial release

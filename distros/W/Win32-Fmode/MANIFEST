@@ -1,0 +1,9 @@
+Changes
+Fmode.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Win32-Fmode.t
+lib/Win32/Fmode.pm
+META.yml                                 Module meta-data (added by MakeMaker)

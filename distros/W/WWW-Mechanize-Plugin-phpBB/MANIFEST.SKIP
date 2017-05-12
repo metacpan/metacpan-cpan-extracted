@@ -1,0 +1,10 @@
+blib
+^Makefile$
+^Makefile.old$
+^modules
+CVS
+.cvsignore
+docs
+MANIFEST.bak
+adm
+.git

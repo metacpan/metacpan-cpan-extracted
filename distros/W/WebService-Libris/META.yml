@@ -1,0 +1,39 @@
+---
+abstract: 'Programmatic access to book meta data from libris.kb.se'
+author:
+  - 'Moritz Lenz'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Libris
+provides:
+  WebService::Libris:
+    file: lib/WebService/Libris.pm
+    version: 0.08
+  WebService::Libris::Author:
+    file: lib/WebService/Libris/Author.pm
+    version: 0
+  WebService::Libris::Book:
+    file: lib/WebService/Libris/Book.pm
+    version: 0
+  WebService::Libris::FileCache:
+    file: lib/WebService/Libris/FileCache.pm
+    version: 0
+  WebService::Libris::Library:
+    file: lib/WebService/Libris/Library.pm
+    version: 0
+  WebService::Libris::Utils:
+    file: lib/WebService/Libris/Utils.pm
+    version: 0
+requires:
+  Mojolicious: 4.063
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

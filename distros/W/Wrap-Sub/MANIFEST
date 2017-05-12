@@ -1,0 +1,34 @@
+Changes
+ignore.txt
+lib/Wrap/Sub.pm
+lib/Wrap/Sub/Child.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-instantiate.t
+t/02-name.t
+t/03-wrap.t
+t/04-hooks.t
+t/05-reset.t
+t/06-called_with.t
+t/07-void_context.t
+t/08-unwrap.t
+t/09-rewrap.t
+t/10-state.t
+t/11-wrapped_subs.t
+t/12-wrapped_objects.t
+t/14-core_subs.t
+t/15-caller.t
+t/16-module.t
+t/17-local_vars.t
+t/18-results.t
+t/data/One.pm
+t/data/Three.pm
+t/data/Two.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+This package contains Web::App framework for easy web development.
+
+This module uses some other *::Easy modules, so you must
+have it if you want to use this module.
+
+Installation is simple:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Deployment of Web::App framework project:
+
+  cd /your/devel/directory/
+  mkdir test_project
+  cd test_project/
+  project-easy AppName                            # Create project directory structure
+  perl -MWeb::App::Helper -e '::entangle AppName' # Create Web::App configuration files
+  ./bin/backend start                             # Start Web::App! Now point your browser to http://127.0.0.1:50000/
+
+If you have questions mail to dot.and.thing@gmail.com.
+
+Copyright 2003-2009, Ivan Baktsheev
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

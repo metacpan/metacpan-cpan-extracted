@@ -1,0 +1,13 @@
+# Contributions to the Web-API module
+
+## Creator & Maintainer
+
+* Tobias Kirschstein <lev@cpan.org>
+
+
+## Contributors
+
+In chronological order:
+
+* Robert Norris <https://github.com/robn>
+  * Support mandatory deep hash params

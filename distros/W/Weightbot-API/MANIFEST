@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+TODO
+dist.ini
+lib/Weightbot/API.pm
+t/00-load.t
+t/weightbot-api-data.t

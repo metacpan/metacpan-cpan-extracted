@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Win32-IPConfig
+version:             0.10
+abstract:            IP Configuration Settings for Windows NT/2000/XP/2003
+license:             perl
+author:              
+    - James Macfarlane
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Win32::TieRegistry:            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

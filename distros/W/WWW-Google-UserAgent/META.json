@@ -1,0 +1,69 @@
+{
+   "abstract" : "Low-level HTTP request handler for Google API.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Google-UserAgent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.043",
+            "IO::Socket::SSL" : "1.56",
+            "Moo" : "2.000000",
+            "Net::SSLeay" : "1.49",
+            "Throwable" : "0.200011",
+            "Type::Tiny" : "1.000005",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Google::UserAgent" : {
+         "file" : "lib/WWW/Google/UserAgent.pm",
+         "version" : "0.20"
+      },
+      "WWW::Google::UserAgent::DataTypes" : {
+         "file" : "lib/WWW/Google/UserAgent/DataTypes.pm",
+         "version" : "0.20"
+      },
+      "WWW::Google::UserAgent::Exception" : {
+         "file" : "lib/WWW/Google/UserAgent/Exception.pm",
+         "version" : "0.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Manwar/WWW-Google-UserAgent.git",
+         "web" : "https://github.com/Manwar/WWW-Google-UserAgent"
+      }
+   },
+   "version" : "0.20"
+}

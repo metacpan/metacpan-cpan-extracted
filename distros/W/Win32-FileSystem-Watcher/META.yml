@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Win32-FileSystem-Watcher
+version:             0.1.0
+abstract:            ~
+license:             perl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Scalar::Util:                  0
+    Test::Exception:               0
+    Win32:                         0
+    Win32::API:                    0
+    Win32::MMF::Shareable:         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+# ABSTRACT: Download images from rajce.net.
+# PODNAME: rajce-get
+
+use warnings;
+use strict;
+use WWW::Mechanize;
+use File::Basename;
+use File::Path 2.06_05 qw(make_path);
+use Pod::Usage;
+use POSIX;
+use WebService::Rajce;
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt);
+
+my $url_pattern="^http:\/\/(.*)\.rajce\.idnes\.cz\/(.*)";
+
+$|++;
+
+my %opt;
+
+GetOptions(
+	'u|url=s' => \$opt{u},
+	's|sorted' => \$opt{s},
+	'v|verbose' => \$opt{v},
+	'V|version' => \$opt{V},
+	'h|help' => \$opt{h},
+);
+
+my $version = $WebService::Rajce::VERSION;
+
+if($opt{h}){
+	pod2usage(-verbose => 2, -output => '-');
+	exit;
+}
+
+if($opt{V}){
+	print "$version\n";
+	exit;
+}
+
+if(!$opt{u} or $opt{u} !~ /$url_pattern/ or $opt{h}){
+	pod2usage(-verbose => 1, -output => '-');
+	exit;
+}
+
+my ($username,$album) = $opt{u} =~ $url_pattern;
+
+my $url = "http://$username.rajce.idnes.cz/$album";
+
+my $bot = WWW::Mechanize->new(autocheck => 1, agent => 'rajce-get/'.$version);
+$bot->env_proxy();
+$bot->add_header('Accept-Encoding'=>'text/html');
+$bot->cookie_jar(HTTP::Cookies->new());
+
+my $gal = $bot->get($url);
+
+my $storageurl = $gal->content();
+$storageurl =~ s/.*var storage = "([^"]*)";.*/$1/s;
+
+my @images = $bot->find_all_links(tag => "a", url_regex => qr/$storageurl/ );
+
+my $outdir = "$username/$album";
+
+info("Creating directory $outdir\n",%opt);
+make_path($outdir);
+
+# required number of base-10 digits for output name prefix
+my $prefixlen = 0;
+for (split //, scalar @images) {
+	$prefixlen++;
+}
+
+my $outidx = 0;
+foreach my $imglink (@images){
+	my $outname = basename($imglink->url());
+	if($opt{s}){
+		$outname = sprintf("%0".$prefixlen."d", $outidx)."_".$outname;
+	}
+	info("Downloading ".basename($imglink->url())." ...",%opt);
+	$bot->get($imglink->url, ':content_file' => "$outdir/".$outname);
+	$outidx++;
+	sleep 1;
+	info(" OK\n",%opt);
+}
+
+sub info{
+	my ($message,%opt) = @_;
+	if($opt{v}){
+		print "$message";
+	}
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rajce-get - Download images from rajce.net.
+
+=head1 VERSION
+
+version 1.152450
+
+=head1 SYNOPSIS
+
+rajce-get [OPTIONS]
+
+=head1 DESCRIPTION
+
+This program will download images from rajce.net. Images are saved in
+directory username/album
+
+Behind proxy server try:
+
+export http_proxy=http://login:password@proxyserver:port
+
+=head1 OPTIONS AND ARGUMENTS
+
+	 -u, --url http://username.rajce.idnes.cz/album
+			Address of requested album
+
+	 -v, --verbose
+			Verbose mode
+
+	 -s, --sorted
+			Sort output file names in the same order as they
+			appear in album
+
+	 -V, --version
+			Show version and exit
+
+	 -h, --help
+			Show help
+
+=head1 EXAMPLES
+
+rajce-get --sorted --verbose --url http://username.rajce.idnes.cz/album
+
+=head1 SEE ALSO
+
+https://metacpan.org/module/WebService::Rajce
+
+=head1 AUTHOR
+
+Petr Kletecka <pek@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Petr Kletecka.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

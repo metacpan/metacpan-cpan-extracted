@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Jamendo.t
+lib/WebService/Jamendo.pm

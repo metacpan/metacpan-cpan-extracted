@@ -1,0 +1,388 @@
+package WebService::NetSuite::Config;
+
+use strict;
+
+sub SearchTypes {
+
+    return {
+    [% FOREACH searchType IN searchFieldTypes %]
+        [% searchType.name %] => {[% FOREACH searchField IN searchType.fields %]
+            '[% searchField.name %]' => '[% searchField.type %]',[% END %]
+        },
+    [% END %]
+    };
+
+}
+
+sub RecordTypes {
+
+    return {
+    [% FOREACH searchType IN searchRecordTypes %]
+        [% searchType.name %] => {[% FOREACH searchField IN searchType.types %]
+            '[% searchField.name %]' => '[% searchField.type %]',[% END %]
+        },
+    [% END %]
+    };
+    
+}
+
+sub RecordFields {
+
+    return {
+    [% FOREACH recordType IN recordFields %]
+        [% recordType.name %] => {[% FOREACH recordField IN recordType.types %]
+            '[% recordField.name %]' => '[% recordField.type %]',[% END %]
+        },
+    [% END %]
+    };
+    
+}
+
+sub RecordNamespaces {
+
+    return {[% FOREACH record IN recordNamespaces %]
+        '[% record.type %]' => '[% record.namespace %]',[% END %]
+    };
+
+}
+
+sub SearchNamespaces {
+
+    return {[% FOREACH record IN searchNamespaces %]
+        '[% record.type %]' => '[% record.namespace %]',[% END %]
+    };
+
+}
+
+sub SystemNamespaces {
+
+    return {[% FOREACH record IN systemNamespaces %]
+        '[% record.mapping %]' => '[% record.namespace %]',[% END %]
+    };
+
+}
+
+sub StateEnumerations {
+
+    return {
+        'AL' => 'Alabama', 
+        'AK' => 'Alaska', 
+        'AB' => 'Alberta', 
+        'AR' => 'Arizona', 
+        'AZ' => 'Arkansas', 
+        'BC' => 'British Columbia', 
+        'CA' => 'California', 
+        'CO' => 'Colorado', 
+        'CT' => 'Connecticut', 
+        'DE' => 'Delaware', 
+        'DC' => 'District of Columbia', 
+        'FL' => 'Florida', 
+        'GA' => 'Georgia', 
+        'HI' => 'Hawaii', 
+        'ID' => 'Idaho', 
+        'IL' => 'Illinois', 
+        'IN' => 'Indiana', 
+        'IA' => 'Iowa', 
+        'KS' => 'Kansas', 
+        'KY' => 'Kentucky', 
+        'LA' => 'Louisiana', 
+        'ME' => 'Maine', 
+        'MB' => 'Manitoba', 
+        'MD' => 'Maryland', 
+        'MA' => 'Massachusetts', 
+        'MI' => 'Michigan', 
+        'MN' => 'Minnesota', 
+        'MS' => 'Mississippi', 
+        'MO' => 'Missouri', 
+        'MT' => 'Montana', 
+        'NE' => 'Nebraska', 
+        'NV' => 'Nevada', 
+        'NB' => 'New Brunswick', 
+        'NH' => 'New Hampshire', 
+        'NJ' => 'New Jersey', 
+        'NM' => 'New Mexico', 
+        'NY' => 'New York', 
+        'NL' => 'Newfoundland', 
+        'NC' => 'North Carolina', 
+        'ND' => 'North Dakota', 
+        'NT' => 'North West Territories', 
+        'NS' => 'Nova Scotia', 
+        'NU' => 'Nunavut', 
+        'OH' => 'Ohio', 
+        'OK' => 'Oklahoma', 
+        'ON' => 'Ontario', 
+        'OR' => 'Oregon', 
+        'PA' => 'Pennsylvania', 
+        'PE' => 'Prince Edward Island', 
+        'PR' => 'Puertorico', 
+        'QC' => 'Quebec', 
+        'RI' => 'Rhode Island', 
+        'SK' => 'Saskatchewan', 
+        'SC' => 'South Carolina', 
+        'SD' => 'South Dakota', 
+        'TN' => 'Tennessee', 
+        'TX' => 'Texas', 
+        'UT' => 'Utah', 
+        'VT' => 'Vermont', 
+        'VA' => 'Virginia', 
+        'WA' => 'Washington', 
+        'WV' => 'West Virginia', 
+        'WI' => 'Wisconsin', 
+        'WY' => 'Wyoming', 
+        'YT' => 'Yukon'
+    };
+
+
+}
+
+sub CountryEnumerations {
+
+    return {
+        '_afghanistan' => 'Afghanistan', 
+        '_albania' => 'Albania', 
+        '_algeria' => 'Algeria', 
+        '_americanSamoa' => 'American Samoa', 
+        '_andorra' => 'Andorra', 
+        '_angola' => 'Angola', 
+        '_anguilla' => 'Anguilla', 
+        '_antarctica' => 'Antarctica', 
+        '_antiguaAndBarbuda' => 'Antigua and Barbuda', 
+        '_argentina' => 'Argentina', 
+        '_armenia' => 'Armenia', 
+        '_aruba' => 'Aruba', 
+        '_australia' => 'Austrailia', 
+        '_austria' => 'Austria', 
+        '_azerbaijan' => 'Azerbaijan', 
+        '_bahamas' => 'Bahamas', 
+        '_bahrain' => 'Bahrain', 
+        '_bangladesh' => 'Bangladesh', 
+        '_barbados' => 'Barbados', 
+        '_belarus' => 'Belarus', 
+        '_belgium' => 'Belgium', 
+        '_belize' => 'Belize', 
+        '_benin' => 'Benin', 
+        '_bermuda' => 'Bermuda', 
+        '_bhutan' => 'Bhutan', 
+        '_bolivia' => 'Bolivia', 
+        '_bosniaAndHerzegovina' => 'Bosnia and Herzegobina', 
+        '_botswana' => 'Botswana', 
+        '_bouvetIsland' => 'Bouvet Island', 
+        '_brazil' => 'Brazil', 
+        '_britishIndianOceanTerritory' => 'British Indian Ocean Territory', 
+        '_bruneiDarussalam' => 'Brunei Darussalam', 
+        '_bulgaria' => 'Bulgaria', 
+        '_burkinaFaso' => 'Burkina Faso', 
+        '_burundi' => 'Burundi', 
+        '_cambodia' => 'Cambodia', 
+        '_cameroon' => 'Cameroon', 
+        '_canada' => 'Canada', 
+        '_capVerde' => 'Cap Verde', 
+        '_caymanIslands' => 'Cayman Islands', 
+        '_centralAfricanRepublic' => 'Central African Republic', 
+        '_chad' => 'Chad', 
+        '_chile' => 'Chile', 
+        '_china' => 'China', 
+        '_christmasIsland' => 'Christmas Island', 
+        '_cocosKeelingIslands' => 'Cocos (Keeling) Islands', 
+        '_colombia' => 'Colombia', 
+        '_comoros' => 'Comoros', 
+        '_congoDemocraticPeoplesRepublic' => 'Congo, Democratic People.s Republic', 
+        '_congoRepublicOf' => 'Congo, Republic of', 
+        '_cookIslands' => 'Cook Islands', 
+        '_costaRica' => 'Costa Rica', 
+        '_coteDIvoire' => 'Cote d.Ivoire', 
+        '_croatiaHrvatska' => 'Croatia/Hrvatska', 
+        '_cuba' => 'Cuba', 
+        '_cyprus' => 'Cyprus', 
+        '_czechRepublic' => 'Czech Republic', 
+        '_denmark' => 'Denmark', 
+        '_djibouti' => 'Djibouti', 
+        '_dominica' => 'Domenica', 
+        '_dominicanRepublic' => 'Dominican Republic', 
+        '_eastTimor' => 'East Timor', 
+        '_ecuador' => 'Ecuador', 
+        '_egypt' => 'Egypt', 
+        '_elSalvador' => 'El Salvador', 
+        '_equatorialGuinea' => 'Equatorial Guinea', 
+        '_eritrea' => 'Eritrea', 
+        '_estonia' => 'Estonia', 
+        '_ethiopia' => 'Ethiopia', 
+        '_falklandIslandsMalvina' => 'Falkland Islands (Malvina)', 
+        '_faroeIslands' => 'Faroe Islands', 
+        '_fiji' => 'Fiji', 
+        '_finland' => 'Finland', 
+        '_france' => 'France', 
+        '_frenchGuiana' => 'French Guiana', 
+        '_frenchPolynesia' => 'French Polynesia', 
+        '_frenchSouthernTerritories' => 'French Southern Territories', 
+        '_gabon' => 'Gabon', 
+        '_gambia' => 'Gambia', 
+        '_georgia' => 'Georgia', 
+        '_germany' => 'Germany', 
+        '_ghana' => 'Ghana', 
+        '_gibraltar' => 'Gibraltar', 
+        '_greece' => 'Greece', 
+        '_greenland' => 'Greenland', 
+        '_grenada' => 'Grenada', 
+        '_guadeloupe' => 'Guadeloupe', 
+        '_guam' => 'Guam', 
+        '_guatemala' => 'Guatemala', 
+        '_guernsey' => 'Guernsey', 
+        '_guinea' => 'Guinea', 
+        '_guineaBissau' => 'Guinea-Bissau', 
+        '_guyana' => 'Guyana', 
+        '_haiti' => 'Haiti', 
+        '_heardAndMcDonaldIslands' => 'Heard and McDonald Is.', 
+        '_holySeeCityVaticanState' => 'Holy See (City Vatican State)', 
+        '_honduras' => 'Honduras', 
+        '_hongKong' => 'Hong Kong', 
+        '_hungary' => 'Hungary', 
+        '_iceland' => 'Iceland', 
+        '_india' => 'India', 
+        '_indonesia' => 'Indonesia', 
+        '_iranIslamicRepublicOf' => 'Iran, Islamic Republic of', 
+        '_iraq' => 'Iraq', 
+        '_ireland' => 'Ireland', 
+        '_isleOfMan' => 'Isle of Man', 
+        '_israel' => 'Israel', 
+        '_italy' => 'Italy', 
+        '_jamaica' => 'Jamaica', 
+        '_japan' => 'Japan', 
+        '_jersey' => 'Jersey', 
+        '_jordan' => 'Jordan', 
+        '_kazakhstan' => 'Kazakhstan', 
+        '_kenya' => 'Kenya', 
+        '_kiribati' => 'Kiribati', 
+        '_koreaDemocraticPeoplesRepublic' => 'Korea, Democratic People.s Republic', 
+        '_koreaRepublicOf' => 'Korea, Republic of', 
+        '_kuwait' => 'Kuwait', 
+        '_kyrgyzstan' => 'Krgyzstan', 
+        '_laoPeoplesDemocraticRepublic' => 'Lao, People.s Democratic Republic', 
+        '_latvia' => 'Latvia', 
+        '_lebanon' => 'Lebanon', 
+        '_lesotho' => 'Lesotho', 
+        '_liberia' => 'Liberia', 
+        '_libyanArabJamahiriya' => 'Libyan Arab Jamahiriya', 
+        '_liechtenstein' => 'Liechtenstein', 
+        '_lithuania' => 'Lithuania', 
+        '_luxembourg' => 'Luxembourg', 
+        '_macau' => 'Macau', 
+        '_macedonia' => 'Macedonia', 
+        '_madagascar' => 'Madagascar', 
+        '_malawi' => 'Malawi', 
+        '_malaysia' => 'Malaysia', 
+        '_maldives' => 'Maldives', 
+        '_mali' => 'Mali', 
+        '_malta' => 'Malta', 
+        '_marshallIslands' => 'Marshall Islands', 
+        '_martinique' => 'Martinique', 
+        '_mauritania' => 'Mauritania', 
+        '_mauritius' => 'Mauritius', 
+        '_mayotte' => 'Mayotte', 
+        '_mexico' => 'Mexico', 
+        '_micronesiaFederalStateOf' => 'Micronesia, Federal State of', 
+        '_moldovaRepublicOf' => 'Moldova, Republic of', 
+        '_monaco' => 'Monaco', 
+        '_mongolia' => 'Mongolia', 
+        '_montserrat' => 'Montserrat', 
+        '_morocco' => 'Morocco', 
+        '_mozambique' => 'Mozambique', 
+        '_myanmar' => 'Myanmar', 
+        '_namibia' => 'Namibia', 
+        '_nauru' => 'Nauru', 
+        '_nepal' => 'Nepal', 
+        '_netherlands' => 'Netherlands', 
+        '_netherlandsAntilles' => 'Netherlands Antilles', 
+        '_newCaledonia' => 'New Caledonia', 
+        '_newZealand' => 'New Zealand', 
+        '_nicaragua' => 'Nicaragua', 
+        '_niger' => 'Niger', 
+        '_nigeria' => 'Nigeria', 
+        '_niue' => 'Niue', 
+        '_norfolkIsland' => 'Norfolk Island', 
+        '_northernMarianaIslands' => 'Northern Mariana Islands', 
+        '_norway' => 'Norway', 
+        '_oman' => 'Oman', 
+        '_pakistan' => 'Pakistan', 
+        '_palau' => 'Palau', 
+        '_palestinianTerritories' => 'Palestinian Territories', 
+        '_panama' => 'Panama', 
+        '_papuaNewGuinea' => 'Papua New Guinea', 
+        '_paraguay' => 'Paraguay', 
+        '_peru' => 'Peru', 
+        '_philippines' => 'Philppines', 
+        '_pitcairnIsland' => 'Pitcairn Island', 
+        '_poland' => 'Poland', 
+        '_portugal' => 'Portugal', 
+        '_puertoRico' => 'Puerto Rico', 
+        '_qatar' => 'Qatar', 
+        '_reunionIsland' => 'Reunion Island', 
+        '_romania' => 'Romania', 
+        '_russianFederation' => 'Russian Federation', 
+        '_rwanda' => 'Rwanda', 
+        '_saintKittsAndNevis' => 'Saint Kitts and Nevis', 
+        '_saintLucia' => 'Saint Lucia', 
+        '_saintVincentAndTheGrenadines' => 'Saint Vincent and the Grenadines', 
+        '_sanMarino' => 'San Marino', 
+        '_saoTomeAndPrincipe' => 'Sao Tome and Principe', 
+        '_saudiArabia' => 'Saudi Arabia', 
+        '_senegal' => 'Senegal', 
+        '_serbiaAndMontenegro' => 'Serbia And Montenegro', 
+        '_seychelles' => 'Seychelles', 
+        '_sierraLeone' => 'Sierra Leone', 
+        '_singapore' => 'Singapore', 
+        '_slovakRepublic' => 'Slovak Republic', 
+        '_slovenia' => 'Slovenia', 
+        '_solomonIslands' => 'Solomon Islands', 
+        '_somalia' => 'Somalia', 
+        '_southAfrica' => 'South Africa', 
+        '_southGeorgia' => 'South Georgia', 
+        '_spain' => 'Spain', 
+        '_sriLanka' => 'Sri Lanka', 
+        '_stHelena' => 'St. Helena', 
+        '_stPierreAndMiquelon' => 'St. Pierre and Miquelon', 
+        '_sudan' => 'Sudan', 
+        '_suriname' => 'Suriname', 
+        '_svalbardAndJanMayenIslands' => 'Svalbard and Jan Mayen Islands', 
+        '_swaziland' => 'Swaziland', 
+        '_sweden' => 'Sweden', 
+        '_switzerland' => 'Switzerland', 
+        '_syrianArabRepublic' => 'Syrian Arab Republic', 
+        '_taiwan' => 'Taiwan', 
+        '_tajikistan' => 'Tajikistan', 
+        '_tanzania' => 'Tanzania', 
+        '_thailand' => 'Thailand', 
+        '_togo' => 'Togo', 
+        '_tokelau' => 'Tokelau', 
+        '_tonga' => 'Tonga', 
+        '_trinidadAndTobago' => 'Trinidad and Tobago', 
+        '_tunisia' => 'Tunisia', 
+        '_turkey' => 'Turkey', 
+        '_turkmenistan' => 'Turkmenistan', 
+        '_turksAndCiacosIslands' => 'Turks and Ciacos Islands', 
+        '_tuvalu' => 'Tuvalu', 
+        '_uganda' => 'Uganda', 
+        '_ukraine' => 'Ukraine', 
+        '_unitedArabEmirates' => 'United Arab Emirates', 
+        '_unitedKingdom' => 'United Kingdom', 
+        '_unitedKingdomGB' => 'United Kingdom (GB)', 
+        '_unitedStates' => 'United States', 
+        '_uruguay' => 'Uruguay', 
+        '_uSMinorOutlyingIslands' => 'US Minor Outlying Islands', 
+        '_uzbekistan' => 'Uzbekistan', 
+        '_vanuatu' => 'Vanuatu', 
+        '_venezuela' => 'Venezuela', 
+        '_vietnam' => 'Vietnam', 
+        '_virginIslandsBritish' => 'Virgin Islands, British', 
+        '_virginIslandsUSA' => 'Virgin Islands, USA', 
+        '_wallisAndFutunaIslands' => 'Wallis and Futuna Islands', 
+        '_westernSahara' => 'Western Sahara', 
+        '_westernSamoa' => 'Western Samoa', 
+        '_yemen' => 'Yemen', 
+        '_yugoslavia' => 'Yugoslavia', 
+        '_zambia' => 'Zambia', 
+        '_zimbabwe' => 'Zimbabwe'
+    };
+
+}
+1;

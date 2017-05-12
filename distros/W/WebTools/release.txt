@@ -1,0 +1,7 @@
+WebTools Version: 1.27
+
+Platform: Unix/Linux/Win
+Compiler: Perl 5.005_03 or newer.
+
+Author: Julian Lishev,
+E-mail: julian@proscriptum.com

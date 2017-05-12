@@ -1,0 +1,13 @@
+Revision history for WWW::Mechanize::Firefox::Extended
+
+0.03    20 May 2015
+        Skip tests if unable to connect to Mozrepl on port 4242
+
+0.02    17 May 2015
+        Add required module WWW::Mechanize::Firefox
+
+0.01    04-May-2015
+        First version, released on an unsuspecting world.
+        Include two (2) functions that checks selector existence.
+        Include two (2) functions that waits for selector existence.
+

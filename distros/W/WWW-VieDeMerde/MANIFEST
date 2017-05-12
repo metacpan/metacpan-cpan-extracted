@@ -1,0 +1,24 @@
+Changes
+doc/documentation.html
+examples/categories.pl
+examples/comments.pl
+examples/dump.pl
+examples/fml.pl
+examples/last.pl
+examples/vdm.pl
+lib/WWW/VieDeMerde.pm
+lib/WWW/VieDeMerde/Comment.pm
+lib/WWW/VieDeMerde/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/errors.t
+t/fmylife.t
+t/message.t
+t/new.t
+t/pod-coverage.t
+t/pod.t
+t/viedemerde.t
+META.yml                                 Module meta-data (added by MakeMaker)

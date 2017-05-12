@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Ivan Baktsheev <dot.and.thing@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Web-App
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Minimal: 1.29
+  Class::Easy: 0.09
+  Data::Dump::XML: 1
+  Project::Easy: 0.18
+  XML::LibXSLT: 1.60
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Web-App
+  homepage: http://perlhug.com
+  license: http://dev.perl.org/licenses/
+  repository: git://web-app.git.sourceforge.net/gitroot/web-app/web-app
+version: 1.21

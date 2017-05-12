@@ -1,0 +1,8 @@
+TODO for WWW::Namecheap::API
+
+* Add API commands
+  * getRegistrarLock
+  * setRegistrarLock
+  * getInfo
+
+* Support NS, SSL, Users

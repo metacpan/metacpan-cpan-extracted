@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution WebPrototypes-ResetPass,
+version 0.002:
+
+  (Experimental) Plack application for sending a 'Reset password link' via email
+
+This software is Copyright (c) 2011 by Zbigniew Lukasiak <zby@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+

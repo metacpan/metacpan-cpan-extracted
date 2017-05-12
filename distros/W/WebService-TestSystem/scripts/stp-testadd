@@ -1,0 +1,29 @@
+
+# stp-testadd - adds a new test to STP
+#
+# params:  
+#    * test code tarball or bk location
+#    * name of the test
+#    * Valid options allowed
+#       + description
+#       + default
+#       + format
+#    * Additional documents, such as the test's website
+#    * Name of the person maintaining the test
+#    * Author's name
+
+# ALGORITHM:
+# If user provided it as a tarball
+#   Need to add it to bk...?  TODO
+
+# At this point we assume the test code is in bk marked with
+# tag 'stp_deploy'.  Probably we should investigate pulling tests 
+# from PLM or something...
+
+# Submit the test information to the database
+#  $soap->add_test($testsys, $testname, \%properties);
+
+# print "Test '$testname' has been successfully added to STP\n";
+
+
+

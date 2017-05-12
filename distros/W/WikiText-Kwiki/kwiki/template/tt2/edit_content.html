@@ -1,0 +1,25 @@
+<!-- BEGIN edit_content -->
+<script language="JavaScript" type="text/JavaScript"><!--
+function clear_default_content(content_box) {
+    if (content_box.value == '[% default_content %]') {
+        content_box.value = '';
+    }
+}
+--></script>
+[% IF button == edit_preview_button_text %]
+[% preview_content %]
+<hr />
+[% END %]
+<form method="POST">
+<input type="submit" name="button" value="[% edit_save_button_text %]" />
+<input type="submit" name="button" value="[% edit_preview_button_text %]" />
+<br />
+<br />
+<input type="hidden" name="action" value="edit" />
+<input type="hidden" name="page_name" value="[% page_uri %]" />
+<input type="hidden" name="page_time" value="[% page_time %]" />
+<textarea name="page_content" rows="25" cols="80" onfocus="clear_default_content(this)">
+[%- page_content -%]
+</textarea>
+</form>
+<!-- END edit_content -->

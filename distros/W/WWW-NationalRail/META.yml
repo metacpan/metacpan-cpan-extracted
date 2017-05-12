@@ -1,0 +1,18 @@
+---
+name: WWW-NationalRail
+version: 0.1
+author:
+  - Edward Betts <edward@debian.org>
+abstract: Perl interface to the UK rail timetable
+license: perl
+requires:
+  Class::Accessor: 0.16
+  HTML::TableExtract: 1.03
+  Test::More: 0
+  WWW::Mechanize: 1.0
+  perl: 5.6.1
+provides:
+  WWW::NationalRail:
+    file: lib/WWW/NationalRail.pm
+    version: 0.1
+generated_by: Module::Build version 0.26

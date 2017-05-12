@@ -1,0 +1,17 @@
+<%@LANGUAGE="PerlScript" CODEPAGE="65001"%>
+<%
+use Win32::ASP;
+use WWW::Kinghost::Painel;
+
+$Response->{charset}="utf-8";
+
+my $painel = WWW::Kinghost::Painel->new();
+
+$painel->logar('email@revenda.com.br','xxxxxxx');
+	
+	
+my $idDominio = "000000";
+my $email = 'caixa@topjeca.com.br';
+my $senha = "xxxxxx";
+print $painel->editaSenhaCaixaEmail( $idDominio, $email, $senha );
+%>

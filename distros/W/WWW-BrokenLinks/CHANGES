@@ -1,0 +1,355 @@
+==================================================
+Changes from 2013-05-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.04 at 2014-05-11 14:07:50 +0000
+-----------------------------------------
+
+  Change: cae590fbe008e2c539fa40c24c449d9cbb44b3ff
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-05-11 15:07:28 +0000
+
+    Bump version to 0.04 
+
+  Change: f158ecdc8ff11c3f84d69a42530a698fcb528226
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-05-11 15:07:09 +0000
+
+    Output file is now required. 
+
+  Change: e19c3b9a2d83e12481baf0740e6b2ccbb418ec9f
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-09 13:26:42 +0000
+
+    Bump version to 0.03 
+
+  Change: cefc2864f0e116b0b6de982dd420d19ca6b57a1c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-09 13:24:11 +0000
+
+    Document excluded_urls parameter 
+
+  Change: 4a2807ec5af276d4effb2fd778e93881d242ce36
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-08 10:46:28 +0000
+
+    Check final URL as well as initial absolute URL 
+
+  Change: 2d8a87f8d3a195a4f07cbac26a7845d6ecce14e9
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-07 16:28:46 +0000
+
+    Allow URLs to be excluded
+
+    Required feature otherwise the link checker can get stuck on pages
+    which have a huge number of self-referencing links (e.g. calendars). 
+
+  Change: 9cd5c75a2e5650051bfca20ea129c683b4b29c9e
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-06 12:46:10 +0000
+
+    Automatically flush STDOUT
+
+    Need to do this otherwise we cannot monitor progress (e.g. with
+    ./script.pl | tee output.txt) 
+
+  Change: 71f2d63ff15a015f963c7e20a7b44bb4cf17bfb3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-06 12:27:18 +0000
+
+    Extra debugging 
+
+  Change: ffd37475471353bd385ecd5a434f59e6972bdf80
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-06 12:18:03 +0000
+
+    Convert say to print 
+
+  Change: a33befee109fbf4a17aa640b11c723a3d4af79fa
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-06 11:37:36 +0000
+
+    Ignore *.txt files 
+
+  Change: 7e3b1fec5d6d016d15edcbc5417f80b0975e35fc
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-02 15:52:47 +0000
+
+    Ignore broken URLs which appear more than 10 times
+
+    Chances are that if we encounter a broken URL more than 10 times, it
+    will be part of the site's header or footer, and therefore there is
+    no point in reporting it on every single page. 
+
+  Change: f6079f91b0bb106ad7a5811c80e059feb4271a0b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-02 14:57:37 +0000
+
+    Prune Perl and CSV files from distribution 
+
+  Change: cf1fae20c4777f100b2c311a65fbea7f3c1e68a6
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-02 10:43:39 +0000
+
+    Bump version to 0.02 
+
+  Change: 4d5df83e0ae84b257a2918d9080f06d3c764bdb9
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-05-01 13:14:11 +0000
+
+    Ignore CSV files 
+
+  Change: 864be37d5e4ac55629055d2ef5624fbfc615d155
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 13:21:00 +0000
+
+    Adding documentation 
+
+  Change: 1d9c520550bfca3533894b9727566f8866e93107
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:51:46 +0000
+
+    Fix syntax error 
+
+  Change: 01ca1992d75758827496839b1b9011b30dad735d
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:50:29 +0000
+
+    Check images as well as links
+
+    This should detect images where the src URL results in an error 
+
+  Change: 9f4aeb336223b98a82b8f923685bf12e6ee50a15
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:44:46 +0000
+
+    Add headings to CSV file 
+
+  Change: 96acf43ce082adbe5148d9776fda3b38bfd55850
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:40:00 +0000
+
+    Move CSV options into separate variable 
+
+  Change: e72289c899393cdaf12a98aef1e24cb2a5764edd
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:37:32 +0000
+
+    Configure Text::CSV
+
+    Always quote (makes importing into other applications easier).
+
+    Explicitly set end of line character as Text::CSV default does not
+    appear to work. 
+
+  Change: 5439144f395e66d0e0b8df59f77617b390d13efa
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:10:03 +0000
+
+    Use Text::CSV for output
+
+    Much easier to use this module than to try and remember correct
+    encodings, quotations etc. 
+
+  Change: a06eadf6007692a7511052f84481efb46fb5ec15
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 12:01:43 +0000
+
+    Print to specified output file or STDOUT 
+
+  Change: 25605a712e770390dfd169dcb65eca7f44b818b3
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:20:01 +0000
+
+    Change newline to tab 
+
+  Change: 2a5b173d8f75fcc392da9cc879eb7cb7b19fdf3b
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:18:28 +0000
+
+    Remove debugging info 
+
+  Change: aab491a63bff7974ebc6c99983de25c7e7c4e0a7
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:14:01 +0000
+
+    Use index to search for substring instead of regex 
+
+  Change: 9a0bca7da020ff793a1257fa11e329bf88ddb072
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:11:20 +0000
+
+    Correct regex 
+
+  Change: 6055a3f4e880045820d93198e31e5bfe2e062cb2
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:10:29 +0000
+
+    Extra debugging info 
+
+  Change: a2e04c26ee78e45947c44629d2d271cf4d63bcba
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 11:04:52 +0000
+
+    Don't check URLs which we have previously scanned
+
+    This check needs to be further up to prevent unnecessary HEAD
+    requests. 
+
+  Change: 813614ec9093ace30d61248bad3ecebbde5df853
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 10:59:53 +0000
+
+    Remove URL fragment
+
+    This prevents us from making a HEAD request for the same page
+    multiple times. 
+
+  Change: c06587623535e20ffe5196da2fc06b176316861c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 10:49:35 +0000
+
+    Correct variable name 
+
+  Change: 5f12686437d4917984684c4f66539d4ba6750c32
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 10:48:16 +0000
+
+    Only check http(s) links
+
+    Don't need to check javascript, mailto etc.
+
+    Also move sleep gaps to immediately after get/head is called, so we
+    definitely pause after each request. 
+
+  Change: 654b93024554aa4300209a842915bc99d46a06ce
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 10:40:19 +0000
+
+    Issue HEAD request and check content-type
+
+    Prevents fetching and parsing URLs which are not HTML and therefore
+    will not contain links - especially important to avoid this for large
+    binary files. 
+
+  Change: 26de2a6b84e5a6b2dd848a72451ca1ac500ea42a
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-29 10:39:23 +0000
+
+    Ignore todo.txt 
+
+  Change: de68d4d9c839952e8390faec624221456f7868bc
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:36:43 +0000
+
+    Stop Mechanize from dying on errors
+
+    We want to check if a URL is not found and handle it gracefully,
+    whereas default behaviour in WWW::Mechanize is to die() immediately. 
+
+  Change: 25abdd48411d4e22c9d19f2c40052b2bb53b7bbc
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:09:16 +0000
+
+    Correct variable name 
+
+  Change: 3fcb89b408bf7cfa0866df295c50f5960602df17
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:08:27 +0000
+
+    Configurable request gap
+
+    Sleep for this number of seconds between requests 
+
+  Change: b69ee875031d5f582f7a70d16a9177ce6b59b10e
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:06:02 +0000
+
+    Debugging info 
+
+  Change: 7a3b92edf1a9f5be0b54770290e3d362d57f1bed
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:03:13 +0000
+
+    Change false to 0 
+
+  Change: 5db58cc1ccdda95d02ddd289743c95ae6d77173c
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 16:02:08 +0000
+
+    Correct variable name 
+
+  Change: 49377fd0f4c6661d8b88d85483e3c03ef5e18c74
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:57:25 +0000
+
+    Initial module code
+
+    Should be enough here to run and test 
+
+  Change: 98915b9f5c369b1f908ab1bf4718132b49c78182
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:42:45 +0000
+
+    Instance variable and method 
+
+  Change: 19acfb039b9c1efd11147fe1bf25ccf4b1402e69
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:40:23 +0000
+
+    Ignore build and test files 
+
+  Change: 4d61cd6c5dd32ddadc9838c7c8b3b55f08f8b377
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:38:38 +0000
+
+    Rename module to match package name 
+
+  Change: 84bff4e62880df73d0a383849e3e2466345d3fde
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:27:58 +0000
+
+    Initial dist.ini
+
+    Allows distribution to be built using Dist::Zilla 
+
+  Change: 8a083dec8bcc8cc131e3fcf9d10a0ce5b6a6d646
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:27:38 +0000
+
+    Initial version number 
+
+  Change: 935fcc5cfd71d28ff24434a6ac5b7a650a18cefb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:23:48 +0000
+
+    End of file newline 
+
+  Change: b56655d52db01a003feda0ccf338a0216292f3eb
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:23:28 +0000
+
+    Basic documentation 
+
+  Change: f0104e4d2febfd73874c813641a0eb9a60cacc42
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:22:35 +0000
+
+    Moose code in line with best practice 
+
+  Change: 6191482426f94d0ee032a6f64284f30db9479b20
+  Author: Paul Waring <paul.waring@manchester.ac.uk>
+  Date : 2014-04-28 15:19:34 +0000
+
+    Skeleton module 
+
+  Change: de67745ed3adedb5a435bf05d51d8caa931b354a
+  Author: Paul Waring <paul@xk7.net>
+  Date : 2014-04-28 07:14:05 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

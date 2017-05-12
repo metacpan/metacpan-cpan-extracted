@@ -1,0 +1,122 @@
+{
+   "agent" : {
+      "name" : "ubuntu-12.04-v4-i-0d2de1be",
+      "typeId" : 176
+   },
+   "artifact-dependencies" : {
+      "build" : [
+         {
+            "buildTypeId" : "JetBrainsDependencyRetrieve_TeamCity91x",
+            "href" : "/httpAuth/app/rest/builds/id:536378",
+            "id" : 536378,
+            "number" : "1-37036",
+            "state" : "finished",
+            "status" : "SUCCESS",
+            "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=536378&buildTypeId=JetBrainsDependencyRetrieve_TeamCity91x"
+         }
+      ],
+      "count" : 1
+   },
+   "artifacts" : {
+      "href" : "/httpAuth/app/rest/builds/id:661984/artifacts/children/"
+   },
+   "branchName" : "refs/heads/Hajipur-9.1.x",
+   "buildType" : {
+      "href" : "/httpAuth/app/rest/buildTypes/id:TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "id" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "name" : "JetBrains Git Plugin (TeamCity 9.1.x)",
+      "projectId" : "TeamCityPluginsByJetBrains_Git",
+      "projectName" : "TeamCity Plugins by JetBrains :: Git",
+      "webUrl" : "https://teamcity.jetbrains.com/viewType.html?buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+   "changes" : {
+      "href" : "/httpAuth/app/rest/changes?locator=build:(id:661984)"
+   },
+   "defaultBranch" : true,
+   "finishDate" : "20151228T130320+0300",
+   "href" : "/httpAuth/app/rest/builds/id:661984",
+   "id" : 661984,
+   "lastChanges" : {
+      "change" : [
+         {
+            "date" : "20151228T125449+0300",
+            "href" : "/httpAuth/app/rest/changes/id:2241127",
+            "id" : 2241127,
+            "username" : "dmitry.neverov",
+            "version" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649",
+            "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2241127&personal=false"
+         }
+      ],
+      "count" : 1
+   },
+   "number" : "snapshot-41",
+   "properties" : {
+      "count" : 5,
+      "property" : [
+         {
+            "name" : "additional.branches",
+            "value" : "+:refs/heads/for.Hajipur-9.1.x/(*)"
+         },
+         {
+            "name" : "default.branch",
+            "value" : "refs/heads/Hajipur-9.1.x"
+         },
+         {
+            "name" : "system.ant.build.javac.target",
+            "value" : "1.5"
+         },
+         {
+            "name" : "system.jdk.home.1.6",
+            "value" : "%env.JDK_16%"
+         },
+         {
+            "name" : "system.path.macro.TeamCityDistribution",
+            "value" : "%teamcity.build.checkoutDir%/teamcity-dist"
+         }
+      ]
+   },
+   "queuedDate" : "20151228T125526+0300",
+   "relatedIssues" : {
+      "href" : "/httpAuth/app/rest/builds/id:661984/relatedIssues"
+   },
+   "revisions" : {
+      "count" : 1,
+      "revision" : [
+         {
+            "vcs-root-instance" : {
+               "href" : "/httpAuth/app/rest/vcs-root-instances/id:2495",
+               "id" : "2495",
+               "name" : "ssh://git.labs.intellij.net/teamcity/git-plugin.git#%default.branch%",
+               "vcs-root-id" : "TeamCityPluginsByJetBrains_Git_SshGitLabsIntellijNetTeamcityGitPluginGitDefaultB"
+            },
+            "version" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649"
+         }
+      ]
+   },
+   "startDate" : "20151228T125539+0300",
+   "state" : "finished",
+   "statistics" : {
+      "href" : "/httpAuth/app/rest/builds/id:661984/statistics"
+   },
+   "status" : "SUCCESS",
+   "statusText" : "Tests passed: 223, ignored: 1",
+   "testOccurrences" : {
+      "count" : 224,
+      "default" : false,
+      "href" : "/httpAuth/app/rest/testOccurrences?locator=build:(id:661984)",
+      "ignored" : 1,
+      "passed" : 223
+   },
+   "triggered" : {
+      "date" : "20151228T125526+0300",
+      "type" : "user",
+      "user" : {
+         "href" : "/httpAuth/app/rest/users/id:787",
+         "id" : 787,
+         "name" : "Neverov",
+         "username" : "neverov"
+      }
+   },
+   "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=661984&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+}

@@ -1,0 +1,55 @@
+{
+   "abstract" : "A Marvel Comics API",
+   "author" : [
+      "Simone Tampieri (simotrone@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Marvel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Config::Tiny" : "0",
+            "Cwd" : "0",
+            "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Module::Load" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.44",
+            "URI" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

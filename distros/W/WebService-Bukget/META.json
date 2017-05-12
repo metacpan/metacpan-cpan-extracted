@@ -1,0 +1,58 @@
+{
+   "abstract" : "Provides access to the v3 Bukget API",
+   "author" : [
+      "Ben van Staveren <madcat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Bukget",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojo::JSON" : "0",
+            "Mojo::UserAgent" : "0",
+            "Try::Tiny" : "0",
+            "boolean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benvanstaveren/WebService-Bukget/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benvanstaveren/WebService-Bukget.git",
+         "web" : "https://github.com/benvanstaveren/WebService-Bukget"
+      }
+   },
+   "version" : "1.00"
+}
+

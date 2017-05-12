@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    name="EgService"
+    targetNamespace="http://eg.schema.org/v1"
+    xmlns:wssec="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:eg="http://eg.schema.org/v1"
+    xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+    >
+  <wsp:UsingPolicy wsdl:Required="true"/>
+  <wsp:Policy wssec:Id="Auth.xml">
+    <wssp:Identity xmlns:wssp="http://www.bea.com/wls90/security/policy">
+      <wssp:SupportedTokens>
+        <wssp:SecurityToken TokenType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken">
+          <wssp:UsePassword Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"/>
+        </wssp:SecurityToken>
+      </wssp:SupportedTokens>
+    </wssp:Identity>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema
+        targetNamespace="http://eg.schema.org/v1"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        >
+      <xsd:include schemaLocation="t/eg.xsd" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="firstActionRequest">
+    <wsdl:part element="eg:el4" name="firstActionRequestParam"/>
+  </wsdl:message>
+  <wsdl:message name="firstActionResponse">
+    <wsdl:part element="eg:el2" name="firstActionResponseParam"/>
+  </wsdl:message>
+  <wsdl:portType name="EgService">
+    <wsdl:operation name="firstAction" style="document">
+      <wsdl:input message="eg:firstActionRequest"/>
+      <wsdl:output message="eg:firstActionResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EgServiceBinding" type="eg:EgService">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="firstAction">
+      <wsdlsoap:operation soapAction="http://localhost:3030/firstAction"/>
+      <wsdl:input>
+        <wsp:Policy>
+          <wsp:PolicyReference URI="#Auth.xml"/>
+        </wsp:Policy>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EgService">
+    <wsdl:port binding="eg:EgServiceBinding" name="EgServicePort">
+      <wsdlsoap:address location="http://localhost:3030/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

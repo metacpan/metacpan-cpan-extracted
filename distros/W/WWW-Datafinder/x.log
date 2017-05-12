@@ -1,0 +1,755 @@
+worker #6 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-02T16:44:06Z',
+          '_id' => '8FAA6756-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '002-4449920-0979413',
+          'ShipmentServiceLevelCategory' => 'SecondDay',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-02T16:40:40Z',
+          'LatestShipDate' => '2016-12-02T16:40:40Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Set - 2 Collapsible Colanders (Strainers) Set By Comfify - Includes 2 Folding Strainers Sizes 8" - 2 Quart and 9.5" - 3 Quart Red and Grey',
+                      'OrderItemId' => '40178964762146',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00L3QWJBI',
+                      'SellerSKU' => 'CM201411',
+                      'ItemPrice' => {
+                                       'Amount' => '9.98',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '9.98'
+                                     },
+                      'QuantityShipped' => 1,
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T19:20:30Z',
+          'ShipServiceLevel' => 'SecondDay',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '9.98',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Velvet',
+          'ShippingAddress' => {
+                                 'PostalCode' => '44305-3764',
+                                 'AddressLine1' => '472 Larkin Ave',
+                                 'StateOrRegion' => 'OH',
+                                 'BuyerName' => 'Velvet',
+                                 'City' => 'Akron',
+                                 'Name' => 'Velvet Arthurs',
+                                 'CountryCode' => 'US'
+                               },
+          'BuyerEmail' => '0mrb5zzz38jkfzq@marketplace.amazon.com',
+          'AmazonOrderId' => '002-4449920-0979413'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=44305&d_last=Velvet&d_city=Akron&service=email&d_state=OH&k2=XXX&d_first=Velvet&d_fulladdr=472+Larkin+Ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=44305&d_last=Velvet&d_city=Akron&service=email&d_state=OH&k2=XXX&d_first=Velvet&d_fulladdr=472+Larkin+Ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=44305&d_last=Velvet&d_city=Akron&service=email&d_state=OH&k2=XXX&d_first=Velvet&d_fulladdr=472+Larkin+Ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=44305&d_last=Velvet&d_city=Akron&service=email&d_state=OH&k2=XXX&d_first=Velvet&d_fulladdr=472+Larkin+Ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=44305&d_last=Velvet&d_city=Akron&service=email&d_state=OH&k2=XXX&d_first=Velvet&d_fulladdr=472+Larkin+Ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"e824e45d312225e226aad3cd35cb2b57","results":[],"input-query":{"PostalCode":"44305","LastName":"Velvet","City":"Akron","State":"OH","FirstName":"Velvet","Address":"472 LARKIN AVE","HouseNum":"472","Street":"LARKIN AVE"},"num-results":0,"query-time":"0.407","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Velvet',
+                                               'PostalCode' => '44305',
+                                               'Street' => 'LARKIN AVE',
+                                               'Address' => '472 LARKIN AVE',
+                                               'City' => 'Akron',
+                                               'State' => 'OH',
+                                               'HouseNum' => '472',
+                                               'LastName' => 'Velvet'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => 'e824e45d312225e226aad3cd35cb2b57',
+                            'query-time' => '0.407',
+                            'num-results' => 0,
+                            'results' => []
+                          }
+        };
+worker #6  could not find email for 002-4449920-0979413
+worker #4 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-05T21:45:22Z',
+          '_id' => '8FAA106C-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '107-4925605-2548248',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-05T21:21:18Z',
+          'LatestShipDate' => '2016-12-05T21:21:18Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '23960550225778',
+                      'ShippingDiscount' => {
+                                              'Amount' => '2.30',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'PromotionIds' => {
+                                          'PromotionId' => 'US Core Free Shipping'
+                                        },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '2.30',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T18:59:31Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Mindy Jo West',
+          'ShippingAddress' => {
+                                 'PostalCode' => '80510',
+                                 'AddressLine1' => '219 Ski Road',
+                                 'StateOrRegion' => 'CO',
+                                 'AddressLine2' => 'PO Box 452',
+                                 'City' => 'Allenspark',
+                                 'BuyerName' => 'Mindy Jo West',
+                                 'Name' => 'Frank West',
+                                 'CountryCode' => 'US'
+                               },
+          'BuyerEmail' => 'tn9vzv404z4gt4d@marketplace.amazon.com',
+          'AmazonOrderId' => '107-4925605-2548248'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80510&d_last=West&d_city=Allenspark&service=email&d_state=CO&k2=XXX&d_first=Mindy&d_fulladdr=219+Ski+Road+PO+Box+452
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80510&d_last=West&d_city=Allenspark&service=email&d_state=CO&k2=XXX&d_first=Mindy&d_fulladdr=219+Ski+Road+PO+Box+452
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80510&d_last=West&d_city=Allenspark&service=email&d_state=CO&k2=XXX&d_first=Mindy&d_fulladdr=219+Ski+Road+PO+Box+452
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80510&d_last=West&d_city=Allenspark&service=email&d_state=CO&k2=XXX&d_first=Mindy&d_fulladdr=219+Ski+Road+PO+Box+452
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80510&d_last=West&d_city=Allenspark&service=email&d_state=CO&k2=XXX&d_first=Mindy&d_fulladdr=219+Ski+Road+PO+Box+452
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"034486886297e31865897a14d16d408b","input-query":{"PostalCode":"80510","LastName":"West","City":"Allenspark","State":"CO","FirstName":"Mindy","Address":"219 SKI RD BOX 452","HouseNum":"219","Street":"SKI RD","Unit":"BOX 452"},"num-results":0,"query-time":"0.622","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Mindy',
+                                               'PostalCode' => '80510',
+                                               'Street' => 'SKI RD',
+                                               'Address' => '219 SKI RD BOX 452',
+                                               'City' => 'Allenspark',
+                                               'State' => 'CO',
+                                               'HouseNum' => '219',
+                                               'LastName' => 'West',
+                                               'Unit' => 'BOX 452'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => '034486886297e31865897a14d16d408b',
+                            'query-time' => '0.622',
+                            'num-results' => 0
+                          }
+        };
+worker #4  could not find email for 107-4925605-2548248
+worker #10 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T20:55:22Z',
+          '_id' => '8FA381A2-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '114-3375704-0081021',
+          'ShipmentServiceLevelCategory' => 'SecondDay',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T20:54:26Z',
+          'LatestShipDate' => '2016-11-30T20:54:26Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '34214842867194',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'QuantityShipped' => 1,
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T16:59:03Z',
+          'ShipServiceLevel' => 'SecondDay',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Sean M Hart',
+          'ShippingAddress' => {
+                                 'PostalCode' => '80303-4318',
+                                 'AddressLine1' => '6610 S BOULDER RD',
+                                 'StateOrRegion' => 'CO',
+                                 'BuyerName' => 'Sean M Hart',
+                                 'City' => 'BOULDER',
+                                 'Name' => 'Sean Hart',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '114-3375704-0081021',
+          'BuyerEmail' => 'slwzhtyd51ky1v0@marketplace.amazon.com'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80303&d_last=Hart&d_city=BOULDER&service=email&d_state=CO&k2=XXX&d_first=Sean&d_fulladdr=6610+S+BOULDER+RD
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80303&d_last=Hart&d_city=BOULDER&service=email&d_state=CO&k2=XXX&d_first=Sean&d_fulladdr=6610+S+BOULDER+RD
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80303&d_last=Hart&d_city=BOULDER&service=email&d_state=CO&k2=XXX&d_first=Sean&d_fulladdr=6610+S+BOULDER+RD
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80303&d_last=Hart&d_city=BOULDER&service=email&d_state=CO&k2=XXX&d_first=Sean&d_fulladdr=6610+S+BOULDER+RD
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=80303&d_last=Hart&d_city=BOULDER&service=email&d_state=CO&k2=XXX&d_first=Sean&d_fulladdr=6610+S+BOULDER+RD
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"1d41aeb2a75dd28a4b16f18ff83b70ab","input-query":{"PostalCode":"80303","LastName":"Hart","City":"BOULDER","State":"CO","FirstName":"Sean","Address":"6610 S BOULDER RD","HouseNum":"6610","Street":"S BOULDER RD"},"num-results":0,"query-time":"1.253","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Sean',
+                                               'PostalCode' => '80303',
+                                               'Street' => 'S BOULDER RD',
+                                               'Address' => '6610 S BOULDER RD',
+                                               'City' => 'BOULDER',
+                                               'State' => 'CO',
+                                               'HouseNum' => '6610',
+                                               'LastName' => 'Hart'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => '1d41aeb2a75dd28a4b16f18ff83b70ab',
+                            'query-time' => '1.253',
+                            'num-results' => 0
+                          }
+        };
+worker #10  could not find email for 114-3375704-0081021
+worker #9 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T22:24:57Z',
+          '_id' => '8FA1623C-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '107-1639400-4465812',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T22:22:12Z',
+          'LatestShipDate' => '2016-11-30T22:22:12Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Aromatherapy Necklace -Mandala Design with Crystals -Essential Oils Diffuser Jewelry 25mm Diameter Surgical Stainless Steel Locket/ Pendant w/ 24" Cha',
+                      'OrderItemId' => '45394155898122',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B01CUZ8J3C',
+                      'SellerSKU' => 'CN-0316-01',
+                      'ItemPrice' => {
+                                       'Amount' => '14.99',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '14.99'
+                                     },
+                      'QuantityShipped' => 1,
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T14:48:47Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '14.99',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'jennifer brockway',
+          'ShippingAddress' => {
+                                 'PostalCode' => '85208',
+                                 'AddressLine1' => '10531 e carol ave',
+                                 'StateOrRegion' => 'az',
+                                 'BuyerName' => 'jennifer brockway',
+                                 'City' => 'mesa',
+                                 'Name' => 'jennifer thomas',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '107-1639400-4465812',
+          'BuyerEmail' => 'ktpyzz9z7twjbwv@marketplace.amazon.com'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=85208&d_last=brockway&d_city=mesa&service=email&d_state=az&k2=XXX&d_first=jennifer&d_fulladdr=10531+e+carol+ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=85208&d_last=brockway&d_city=mesa&service=email&d_state=az&k2=XXX&d_first=jennifer&d_fulladdr=10531+e+carol+ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=85208&d_last=brockway&d_city=mesa&service=email&d_state=az&k2=XXX&d_first=jennifer&d_fulladdr=10531+e+carol+ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=85208&d_last=brockway&d_city=mesa&service=email&d_state=az&k2=XXX&d_first=jennifer&d_fulladdr=10531+e+carol+ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=85208&d_last=brockway&d_city=mesa&service=email&d_state=az&k2=XXX&d_first=jennifer&d_fulladdr=10531+e+carol+ave
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"7d1046146769efd46221867e68f748b6","input-query":{"PostalCode":"85208","LastName":"brockway","City":"mesa","State":"AZ","FirstName":"jennifer","Address":"10531 E CAROL AVE","HouseNum":"10531","Street":"E CAROL AVE"},"num-results":0,"query-time":"0.426","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'jennifer',
+                                               'PostalCode' => '85208',
+                                               'Street' => 'E CAROL AVE',
+                                               'Address' => '10531 E CAROL AVE',
+                                               'City' => 'mesa',
+                                               'State' => 'AZ',
+                                               'HouseNum' => '10531',
+                                               'LastName' => 'brockway'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => '7d1046146769efd46221867e68f748b6',
+                            'query-time' => '0.426',
+                            'num-results' => 0
+                          }
+        };
+worker #9  could not find email for 107-1639400-4465812
+worker #1 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-12T17:58:20Z',
+          '_id' => '8F9AFC30-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '002-3526683-3179466',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-12T17:38:05Z',
+          'LatestShipDate' => '2016-12-12T17:38:05Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '58162792895490',
+                      'ShippingDiscount' => {
+                                              'Amount' => '2.34',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'PromotionIds' => {
+                                          'PromotionId' => 'US Core Free Shipping'
+                                        },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '2.34',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T09:25:54Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Melanie',
+          'ShippingAddress' => {
+                                 'PostalCode' => '96706',
+                                 'AddressLine1' => '911136 Paeheulu St.',
+                                 'StateOrRegion' => 'Hawaii',
+                                 'BuyerName' => 'Melanie',
+                                 'City' => 'Ewa',
+                                 'Name' => 'Melanie',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '002-3526683-3179466',
+          'BuyerEmail' => '07tpklbm280njtl@marketplace.amazon.com'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=96706&d_last=Melanie&d_city=Ewa&service=email&d_state=Hawaii&k2=XXX&d_first=Melanie&d_fulladdr=911136+Paeheulu+St.
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=96706&d_last=Melanie&d_city=Ewa&service=email&d_state=Hawaii&k2=XXX&d_first=Melanie&d_fulladdr=911136+Paeheulu+St.
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=96706&d_last=Melanie&d_city=Ewa&service=email&d_state=Hawaii&k2=XXX&d_first=Melanie&d_fulladdr=911136+Paeheulu+St.
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=96706&d_last=Melanie&d_city=Ewa&service=email&d_state=Hawaii&k2=XXX&d_first=Melanie&d_fulladdr=911136+Paeheulu+St.
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=96706&d_last=Melanie&d_city=Ewa&service=email&d_state=Hawaii&k2=XXX&d_first=Melanie&d_fulladdr=911136+Paeheulu+St.
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"51661c635cf9efb121455fee184b967c","results":[],"input-query":{"PostalCode":"96706","LastName":"Melanie","City":"Ewa","State":"HI","FirstName":"Melanie","Address":"911136 PAEHEULU ST","HouseNum":"911136","Street":"PAEHEULU ST"},"num-results":0,"query-time":"0.441","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Melanie',
+                                               'PostalCode' => '96706',
+                                               'Street' => 'PAEHEULU ST',
+                                               'Address' => '911136 PAEHEULU ST',
+                                               'City' => 'Ewa',
+                                               'State' => 'HI',
+                                               'HouseNum' => '911136',
+                                               'LastName' => 'Melanie'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => '51661c635cf9efb121455fee184b967c',
+                            'query-time' => '0.441',
+                            'num-results' => 0,
+                            'results' => []
+                          }
+        };
+worker #1  could not find email for 002-3526683-3179466
+worker #5 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T01:31:14Z',
+          '_id' => '8FA95AE6-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '111-6205090-4074635',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T01:30:23Z',
+          'LatestShipDate' => '2016-11-30T01:30:23Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'GiftWrapTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Cast Iron Mouse \\ Rustic Door Stop',
+                      'OrderItemId' => '05247701369970',
+                      'ShippingDiscount' => {
+                                              'Amount' => '0.00',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ASIN' => 'B00HFD0QTK',
+                      'SellerSKU' => 'CM201558',
+                      'GiftWrapPrice' => {
+                                           'Amount' => '3.49',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ItemPrice' => {
+                                       'Amount' => '14.99',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '14.99'
+                                     },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '7.49',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'GiftMessageText' => 'Hi Mary Ann
+Have a Very Merry Christmas
+ We miss you.  Love Marianne and Ray',
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T18:10:43Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '25.97',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'marianne brown',
+          'ShippingAddress' => {
+                                 'PostalCode' => '97504-8814',
+                                 'AddressLine1' => '1499 LA LOMA DR',
+                                 'StateOrRegion' => 'OR',
+                                 'BuyerName' => 'marianne brown',
+                                 'City' => 'MEDFORD',
+                                 'Name' => 'Mary Ann Blinkhorn',
+                                 'CountryCode' => 'US'
+                               },
+          'BuyerEmail' => 'xjb3n6q20jq4bth@marketplace.amazon.com',
+          'AmazonOrderId' => '111-6205090-4074635'
+        };
+Sent request to http://api.datafinder.com/qdf.php?d_zip=97504&d_last=brown&d_city=MEDFORD&service=email&d_state=OR&k2=XXX&d_first=marianne&d_fulladdr=1499+LA+LOMA+DR
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=97504&d_last=brown&d_city=MEDFORD&service=email&d_state=OR&k2=XXX&d_first=marianne&d_fulladdr=1499+LA+LOMA+DR
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=97504&d_last=brown&d_city=MEDFORD&service=email&d_state=OR&k2=XXX&d_first=marianne&d_fulladdr=1499+LA+LOMA+DR
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=97504&d_last=brown&d_city=MEDFORD&service=email&d_state=OR&k2=XXX&d_first=marianne&d_fulladdr=1499+LA+LOMA+DR
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Sent request to http://api.datafinder.com/qdf.php?d_zip=97504&d_last=brown&d_city=MEDFORD&service=email&d_state=OR&k2=XXX&d_first=marianne&d_fulladdr=1499+LA+LOMA+DR
+Headers: {
+   "Content-Type" : "application/json"
+}
+
+Post data: {}
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"0a80c3eab2d7e8e05fb9afd9c872ff7c","input-query":{"PostalCode":"97504","LastName":"brown","City":"MEDFORD","State":"OR","FirstName":"marianne","Address":"1499 LA LOMA DR","HouseNum":"1499","Street":"LA LOMA DR"},"num-results":0,"query-time":"0.849","errors":["Please include a valid key and service."]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'marianne',
+                                               'PostalCode' => '97504',
+                                               'Street' => 'LA LOMA DR',
+                                               'Address' => '1499 LA LOMA DR',
+                                               'City' => 'MEDFORD',
+                                               'State' => 'OR',
+                                               'HouseNum' => '1499',
+                                               'LastName' => 'brown'
+                                             },
+                            'errors' => [
+                                          'Please include a valid key and service.'
+                                        ],
+                            'version' => '2.0',
+                            'query-id' => '0a80c3eab2d7e8e05fb9afd9c872ff7c',
+                            'query-time' => '0.849',
+                            'num-results' => 0
+                          }
+        };
+worker #5  could not find email for 111-6205090-4074635
+Returning 002-3526683-3179466
+Returning 107-1639400-4465812
+Returning 114-3375704-0081021
+Returning 111-6205090-4074635
+Returning 107-4925605-2548248
+Returning 002-4449920-0979413
+Reindexing 8FAA6756-DE9B-11E6-8569-85DAD7440A36 002-4449920-0979413 1
+Reindexing 8FA1623C-DE9B-11E6-8569-85DAD7440A36 107-1639400-4465812 2
+Reindexing 8F9AFC30-DE9B-11E6-8569-85DAD7440A36 002-3526683-3179466 3
+Reindexing 8FAA106C-DE9B-11E6-8569-85DAD7440A36 107-4925605-2548248 4
+Reindexing 8FA95AE6-DE9B-11E6-8569-85DAD7440A36 111-6205090-4074635 5
+Reindexing 8FA381A2-DE9B-11E6-8569-85DAD7440A36 114-3375704-0081021 6
+Flushing buffer
+6 total records

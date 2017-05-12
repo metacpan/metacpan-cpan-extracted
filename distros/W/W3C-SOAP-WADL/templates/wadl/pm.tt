@@ -1,0 +1,83 @@
+[% PROCESS config.tt -%]
+[% modules_loaded = {} -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moose;
+use warnings;
+use version;
+use namespace::autoclean;
+use Data::Dumper qw/Dumper/;
+use W3C::SOAP::WADL::Utils;
+[% FOR method IN methods -%]
+[%     used = method.value.request -%]
+[%     'use ' _ used _ ";\n" IF !modules_loaded.$used -%]
+[%-    modules_loaded.$used = 1 -%]
+[%-    FOR response IN method.value.response -%]
+[%-        used = response.value -%]
+[%         'use ' _ used _ ";\n" IF !modules_loaded.$used -%]
+[%-        modules_loaded.$used = 1 -%]
+[%-    END -%]
+[% END %]
+
+extends 'W3C::SOAP::WADL';
+
+our $VERSION = version->new('0.0.1');
+
+has '+location' => (
+    default => '[% location %]',
+);
+
+[% FOR method IN methods %]
+operation [% method.key %] => (
+    path         => '[% method.value.path     %]',
+    method       => '[% method.value.method   %]',
+    request      => '[% method.value.request  %]',
+    response     => {
+[%-    FOR response IN method.value.response %]
+        '[% response.key %]' => '[% response.value %]',
+[%-    END %]
+    },
+);
+[% END %]
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] -
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+This WADL client code was extracted from L<[% location %]>;
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+[% FOR method IN methods %]
+=item C<[% method.key %] ()>
+[% END %]
+=back
+
+[% INCLUDE pod.tt -%]

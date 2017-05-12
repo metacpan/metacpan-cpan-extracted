@@ -1,0 +1,37 @@
+Revision history for Perl extension WWW::Authen::Simple.
+
+0.01  Sun Dec 14 01:10:11 2003
+	- original version; created by h2xs 1.19
+
+1.15  Mon Dec 22 15:41:37 2003
+	- Initial release
+
+1.18  Mon Dec 16 06:28:35 2004
+	- Make the md5 hash to md5_base64
+	- Fixed documentation errors
+
+1.19  Sat May 08 21:43:02 2004
+	- Major changes.
+	- Removed DBIx::PDlib requirement
+	- Abstracted backend database layout
+	- Removed contactid(), theme(), send_notifications() methods
+	  (they're too application specific)
+	- Updated documentation
+	- Moved to static VERSION setting, as opposed to using CVS Revision
+
+1.20  Sun May 09 19:32:11 2004
+	- Added 49 tests, covering all important aspects
+	- Fixed a few minor bugs that popped up during the major changes
+	  (had some bad sql statements)
+	- Fixed flawed logic in in_group statement. A user with read-only 
+	  access to a group, if checked for read-write access, would pass.
+	  Checking only for read or only for write access was unaffected.
+
+1.21  Tue May 11 23:10:07 2004
+	- Added 14 more tests, improved cookie responce tests
+	- Added examples (db schema, cgi script, add users script)
+	- Cleaned up test comments
+
+1.22  Sun Jan 27 23:16:00 2008
+	- Fixed SKIP section in tests.
+

@@ -1,0 +1,46 @@
+Revision history for Perl extension WebService-Yahoo-BOSS.
+
+1.03  Mon Nov 10 2015
+    - Added support for image search [Runar Buvik]
+    - Minor documentation tweaks [Runar Buvik]
+    - Removed broken test [Runar Buvik]
+
+1.02  Thu Apr 25 2013
+    - Added http_response method to allow instrospection e.g., of errors
+    - Added Test::Most prerequisite.
+    - Minor documentation tweaks.
+
+1.01  Thu Apr 24 2013
+    - Updated MANIFEST and added MANIFEST.SKIP
+
+1.00  Thu Apr 24 2013
+    - Fixed breaking bug in 0.08 [Tim Bunce]
+    - Significant refactoring [Tim Bunce]
+    - Optimizations, including caching connection [Tim Bunce]
+    - Switched from Any::Moose (deprecated) to Moo [Tim Bunce]
+    - Implement PlaceFinder service [Tim Bunce]
+
+0.08  Thu Jan 24 2013
+    - Allow count to be passed via args [Achim Ruopp]
+
+0.07  Sun Nov 06 2011
+    - Fix error in query method introduced with V2 compat update.
+
+0.06  Fri Oct 07 2011
+    - add Net::OAuth dependency
+
+0.05  Fri Oct 07 2011
+    - Yahoo BOSS V2 compatibility. The V1 web service was deprecated
+      a couple days ago so I updated this module to V2.  Incompatible
+      changes from 0.4, please read the BOSS API docs.
+
+0.04  Wed Jan 19 18:37 2011
+    - added LWP::UserAgent prereq
+
+0.03  Mon Jan 17 15:55 2011
+    - released to open source by Silver Lining Networks Inc.
+
+0.01  Tue May 25 14:35 2010
+	- original version; created by h2xs 1.23 with options
+		-X WebService-Yahoo-BOSS
+

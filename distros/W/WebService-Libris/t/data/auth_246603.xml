@@ -1,0 +1,220 @@
+<rdf:rdf xmlns:dbpedia="http://dbpedia.org/property/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:libris="http://libris.kb.se/vocabulary/experimental#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:skos="http://www.w3.org/2004/02/skos/core#"> 
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11687868">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11956285">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11524086">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10485918">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11396558">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12031465">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12060201">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10070582">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11777008">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11713642">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11487587">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10909586">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/9604288">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10327123">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11446601">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12038929">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11691805">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11528189">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/9979096">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10722604">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11264900">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10185625">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/9840379">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11232231">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11521447">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/auth/246603">
+    <owl:sameas rdf:resource="http://viaf.org/viaf/72579864/#foaf:Person" />
+    <libris:key>Ajvide Lindqvist, John, 1968-</libris:key>
+    <dbpedia:birthyear>1968</dbpedia:birthyear>
+    <foaf:name>Ajvide Lindkvist, Jun, 1968-</foaf:name>
+    <foaf:name>John Ajvide Lindqvist</foaf:name>
+    <foaf:name>Jon Ajvide Lindkvist</foaf:name>
+    <foaf:name>Lindqvist, John Ajvide, 1968-</foaf:name>
+    <foaf:name>Lindkvist, Jon Ajvide, 1968-</foaf:name>
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+    <foaf:name>Ajvide Lindqvist, John, 1968-</foaf:name>
+    <foaf:name>Jun Ajvide Lindkvist</foaf:name>
+    <rdfs:isdefinedby rdf:resource="http://libris.kb.se/data/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12199381">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11868492">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10943436">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10597326">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12062078">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11855070">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10871095">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11230519">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11307472">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10951070">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12095434">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11516979">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/9718010">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11864985">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10341515">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10254865">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10043593">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11454378">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12133166">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11787981">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10924856">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11816704">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10740648">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10141461">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10654128">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11448083">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11829092">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11675483">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12041362">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11854543">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/auth/246603#concept">
+    <skos:altlabel>Ajvide Lindqvist, John, 1968-</skos:altlabel>
+    <skos:altlabel>Jon Ajvide Lindkvist</skos:altlabel>
+    <skos:altlabel>John Ajvide Lindqvist</skos:altlabel>
+    <skos:altlabel>Lindkvist, Jon Ajvide, 1968-</skos:altlabel>
+    <foaf:focus rdf:resource="http://libris.kb.se/resource/auth/246603" />
+    <skos:altlabel>Lindqvist, John Ajvide, 1968-</skos:altlabel>
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#Concept" />
+    <skos:altlabel>Jun Ajvide Lindkvist</skos:altlabel>
+    <skos:exactmatch rdf:resource="http://viaf.org/viaf/72579864/#skos:Concept" />
+    <skos:altlabel>Ajvide Lindkvist, Jun, 1968-</skos:altlabel>
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12062107">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11330658">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10230530">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10043585">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11852034">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11527757">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/12031469">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/10114909">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/11606725">
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+  </rdf:description>
+</rdf:rdf>

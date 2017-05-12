@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+eg/append_to_twiki_topic.pl
+eg/migrate_vqwiki2twiki.pl
+INSTALL
+lib/WWW/TWikiClient.pm
+lib/WWW/TWikiClient.pod
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/distribution.t
+t/pod-coverage.t

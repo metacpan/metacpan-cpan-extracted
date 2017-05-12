@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a1f0bce74aef2204401e4bef99f85d600ca8800a .gitignore
+SHA1 6ff6f880e3baeb75b221b8a187408635bc5d8aae Changes
+SHA1 2171b5639aa370e89faebd744d26d7548e4e7477 MANIFEST
+SHA1 66800f40525aa08625d6e761a54dc53faf91c6ed MANIFEST.SKIP
+SHA1 41ab65f28ad3359e57838ec47796e7a77f3e5355 META.yml
+SHA1 42a124fcefe1a47367623947825e9f63346473d6 Makefile.PL
+SHA1 52d3398b9dc2a0072572b6d5d63eec4e2cf02746 README
+SHA1 e39e658272012295f92df56b36db1ac93b9df4c1 bin/svtplay
+SHA1 8055aa485373c76953ef8238212b1ad02a3539a2 lib/WWW/SVT/Play.pod
+SHA1 aa6a303f2b3b9c72e96f44e04e956a836f2b7339 lib/WWW/SVT/Play/Utils.pm
+SHA1 fed71d0182067026eb573d12ebcb7b6ade6d2c94 lib/WWW/SVT/Play/Video.pm
+SHA1 ed52f01ecc8727ce0a8e55ead5c704315cae1465 lib/WWW/SVT/Play/Video/Stream.pm
+SHA1 d997f18e2aade8846b356b9a246b7f9d167f8914 lib/WWW/SVT/Play/Video/Stream/HDS.pm
+SHA1 c3d4154407b4120da887752b9ffb3083def34c80 lib/WWW/SVT/Play/Video/Stream/HLS.pm
+SHA1 ef7aa526a159cba6d60763a6fe54484782b43628 lib/WWW/SVT/Play/Video/Stream/HTTP.pm
+SHA1 a31fa5475668f30545b5b657cecd1d35bdb9501b lib/WWW/SVT/Play/Video/Stream/RTMP.pm
+SHA1 1e446f60b8ff394319b8ee98def331ef0aa0dd93 t/01-distribution.t
+SHA1 691f871177631b8fbf373e8903b2ab52ac784b57 t/data/0.json
+SHA1 31d7b799d37604aca7ff069c2d706f367725d13c t/data/948447.json
+SHA1 0d24668d7698f9ff77e06406ff78e9f0c669ce13 t/data/979684.json
+SHA1 ba1d21e52e3c37f7867feb13a18d727ae2b9c263 t/data/aliases.json
+SHA1 7d8303811e3a17e0fa236eed5fb6fc96b9dd63d5 t/data/ref/0.json
+SHA1 c6945ba3ade16c6935935d172c5ac0e86d34053d t/data/ref/948447.json
+SHA1 6154a2ab23677c47f71de5c311de3b446a95880e t/data/ref/979684.json
+SHA1 7eeac37b6aa624e98eaa3a2b20ff559138cb16ff t/lib/LWP/UserAgent.pm
+SHA1 d7d75ec8fdc6c775390a82e68a440906e7dfdf63 t/utils/gen_ref_data.pl
+SHA1 87b70f0216c7bdacb282582e6a3532d53d276a11 t/video.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRTZgSAAoJEPoSOGhqL2inlewIAKaMe3h2GWMZHgpOfvbvIc05
+FVEechh5gUHVUCHyDYuo41L6hhdwbow66HKJE8asMQB1aj7jWw5NZ8r5a0vzP0SF
+0WUSDtSAt631lGrCMy8ywxAnvRcy2GxdKCsUUtTQMS+WeDt21+a6xAUfzyJkk6O+
+Y82YClq1WDMrynOMR8kW2rN5tVdyO1FvjO18QLFVjfRnpH2nKR9RRN9WC7anSoee
+KRaGaorioBpSZkogP9Lm78rPqhqXUdbsZ+NCGuMXw3zro6TUFyMezUa6CRKUABAa
+9TZJbldWKWqky+6tKzmnJllzzgQP8mYSSwwkjUTuKR3oH8tckfhqJYRuD5AjvmM=
+=FcvR
+-----END PGP SIGNATURE-----

@@ -1,0 +1,127 @@
+Revision history for Perl extension WebService::Solr.
+
+0.42    Tue Apr 25 16:59:02 CDT 2017
+ - No changes since 0.41_01
+
+0.41_01 Wed Apr 19 17:21:29 CDT 2017
+ - No functionality changes.
+ - Added a missing Carp.  Thanks, Luke Closs.
+ - Stopped using Module::Install and switched to ExtUtils::MakeMaker
+
+0.40    Wed Dec 11 21:32:17 CST 2017
+ - No functionality changes.
+ - New maintainer: Andy Lester
+ - Big jump in version number to show a new numbering scheme.
+
+0.24_01 Fri Dec  9 22:45:03 CST 2016 *DEVELOPER RELEASE*
+ - Switch from the deprecated Any::Moose to Moo + Types::Standard.
+   Thanks, ilmari.
+
+
+# Before this point, Brian Cassidy was the maintainer.  The version
+numbering scheme was different from what it is now.
+
+0.23 2014-02-07 16:58
+ - Fix a bug in Webservice::Solr::Query::stringify() where it would
+   sometimes modify the query argument structure passed in.  This would
+   make subsequent calls to stringify be broken and wrong, or even blow up.
+ - The ::Query module no longer loads Data::Dumper automatically.
+
+0.22 2013-04-02 17:03
+ - Speed up ->value_for() to lazily find the first field, rather than
+   processing all of ->values_for() and taking the first value.
+
+0.21 2012-11-29
+ - Get rid of use_ok() in the tests.
+ - Minor documentation fixes.
+
+0.20 2012-11-29
+ - Avoid random hash key ordering issues (perl 5.17.6) when testing
+   WebService::Solr::Query (RT #81527)
+
+0.19 2012-05-25
+ - Merge default_params in with other params in the post body
+
+0.18 2012-05-24
+ - Force previous switch to a post request to be utf-8 encoded
+
+0.17 2012-03-29
+ - Changed the solr search to use a post request (Robert Ward)
+
+0.16 2011-10-11
+ - Switch to Any::Moose so that Mouse may be used (Kevin Goess)
+
+0.15 2011-07-14
+ - Add a last_response accessor to get the most recent 
+   WebService::Solr::Response object (Dan Brook)
+
+0.14 2011-06-13
+ - Fix broken logic for figuring out rows per page when not explicitly
+   specified. It was broken on the last page when the number of rows
+   returned was less than the default. We now just assume 10 rows which
+   is the default in Solr.
+
+0.13 2011-05-05
+ - Replace XML::Generator with XML::Easy and de-mooseify the Document and
+   Field classes to help speed up (about 3x) document creation and
+   serialization.
+
+0.12 2011-04-12
+ - Clean up docs in relation to autocommit
+ - Handle blessed field values (Dan Brook)
+
+0.11 2010-10-27
+ - Add a note about enabling Keep-Alive connections (Stijn Prompers)
+ - Add field_names method to Document (Cory Watson, Craig Hall)
+
+0.10 2010-03-17
+ - Add spellcheck() convenience method to Response object
+ - Fix exception when response contained no documents
+
+0.09 2009-12-04
+ - Return undef in pager/pageset special case when we explicitly return 0
+   rows
+ - Add rollback() from Solr 1.4
+ - Add generic delete() from Solr 1.4
+ - Update docs to match Solr 1.4 options
+ - Fix ping() to check only the HTTP status
+
+0.08 2009-10-14
+ - Allow scalar ref value in WebService::Solr::Query, which works like
+   SQL::Abstract (literal query)
+ - Fix status_message and status_code in Response
+ - Add Data::Pageset capabilities to Response (Jos Boumans)
+ - Ensure compatibility with older versions of Encode by making sure we
+   pass a string to encode() (Gert Brinkmann)
+
+0.07 2009-06-26
+ - Trap JSON::XS exceptions (Jos Boumans)
+ - Provide an abstract query generator: WebService::Solr::Query (Jos
+   Boumans, Brian Cassidy)
+
+0.06 2009-05-07
+ - Add auto_suggest to hit the new Solr 1.4 /autoSuggest API (RT #45798)
+ - Refactor a basic GET request into its own public method
+   (generic_solr_request)
+
+0.05 2009-04-13
+ - Confess upon HTTP error (Leon Brocard)
+ - Send UTF-8 requests to keep new LWP happy (Leon Brocard)
+
+0.04 2009-03-02
+ - add make_immutable to Solr.pm
+ - be paranoid about XML escaping (Gert Brinkmann)
+
+0.03 2009-01-15
+ - fix typo (Thanks cog)
+ - pod fixes
+ - try to work around old LWP versions when setting HTTP headers
+ - require URI >= 1.28
+ - require XML::Generator >= 0.94
+
+0.02 2008-10-09
+ - fix pager creation, missing prereq
+ - add a simple facet_counts() shortcut method
+
+0.01 2008-10-07
+ - original version;

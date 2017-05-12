@@ -1,0 +1,16 @@
+bin/indexer
+bin/validator
+Changes
+lib/WWW/Scraper/Lite.pm
+Makefile
+MANIFEST
+README
+t/00-critic.t
+t/00-distribution.t
+t/00-podcoverage.t
+t/00-pod.t
+t/10-scraper.t
+Build.PL
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

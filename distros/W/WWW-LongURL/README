@@ -1,0 +1,29 @@
+WWW::LongURL
+============
+
+Perl interface to the LongURL API (http://longurl.org/api).
+
+REPOSITORY
+
+Development is on-going at:
+https://github.com/kevinspencer/WWW-LongURL
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+A list of dependencies is maintained in Makefile.PL; they should be
+automatically installed if they are missing.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Kevin Spencer (kspencer@cpan.org)
+
+License: Perl Artistic License 2.0

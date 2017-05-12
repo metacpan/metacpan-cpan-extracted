@@ -1,0 +1,15 @@
+Revision history for Perl module WWW::Search::UrbanDictionary: 
+
+0.4 2007-04-30
+ - Code cleanup
+ - Test cleanup
+ - Added examples/
+
+0.2 2006-08-18 11:49
+ - Moved to Module::Build
+ - Updated tests
+ - Brought test coverage up to 88%
+ - General code cleanup
+
+0.1 Fri Jul 15 16:20:59 BST 2005
+ - first released version

@@ -1,0 +1,45 @@
+WWW-Shorten-Safe
+
+WWW::Shorten::Safe allows users to shorten URLs using http://safe.mn/, http://clic.gs/, http://go2.gs/ or http://cliks.fr/
+
+
+WWW::Shorten::Safe requires WWW::Shorten to be installed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Shorten::Safe
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Shorten-Safe
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Shorten-Safe
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Shorten-Safe
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Shorten-Safe/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Julien Sobrier
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

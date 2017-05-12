@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 11b02d8401533b0ff077ba215610199c397c7349 Changes
+SHA1 b61f70df5130a064aa4f389f0e8476ec2de4920e INSTALL
+SHA1 062871100d8097d0f764471ee3465d2cb30dcc11 LICENSE
+SHA1 87ce4c06f26cfbdb1e33242d28866c29d1c3183d MANIFEST
+SHA1 2ecde0538d56217182e6ad3ba8422dcc417fa80b MANIFEST.SKIP
+SHA1 2734b6fd2a41cffc35798bce0a366dd7d7db7d21 META.json
+SHA1 be5f00c887e0fe162af918ef35022803a0a04e85 META.yml
+SHA1 d48a31171925e9a8a83869f75f067c7181a47d34 Makefile.PL
+SHA1 c181c08399d1b07601388bd0776e084da42122c6 README
+SHA1 88ad7cc99976362c63b51d4fa7cda5d9fc1df673 README.md
+SHA1 1ca6e8f3e28e308877db0867a9c96979930dab59 dist.ini
+SHA1 0b975f4d9b790af917fbff8e0b1b20a90ed7ee77 lib/WWW/Postmark.pm
+SHA1 f4bb0ee9aae34ee1883e599fb96e8f928a27d934 t/00-load.t
+SHA1 a149cf3ded4199b316baf7db826a96b79907f3e9 t/01-sending.t
+SHA1 c3afae2fc4f5b5389302f3bfb4d65f3b7d364bdf t/02-spam_score.t
+SHA1 af69727a39e2d3edb24fd59c2b7cce39b6c70137 t/document.txt
+SHA1 7b1d8efb0a651b8840cd20a55ba953e34c3a7358 t/image.jpg
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEAREIAB0WIQTYtJGMHsdqxHuiCD1rg4dAAUzXRwUCWJji9AAKCRBrg4dAAUzX
+R22sAP92qfgFhTN2q0pnLD1HypSw+bB7W6brY/aSS4cdDizI0gD/Q56silYy6ZKS
+6qrKW2EMYNAc+im5YARsb1Hff8E1U6o=
+=T0Sl
+-----END PGP SIGNATURE-----

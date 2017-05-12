@@ -1,0 +1,8 @@
+#!perl
+# This file is managed by /Users/handle/.plenv/versions/5.16.2/bin//dim.
+{
+  dist => 'Warn::Colorful',
+  distdir => 'Warn-Colorful',
+  module => 'Warn::Colorful',
+  template => 'Default'
+}

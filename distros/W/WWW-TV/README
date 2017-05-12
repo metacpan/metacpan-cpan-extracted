@@ -1,0 +1,53 @@
+WWW-TV
+======================
+
+WWW::TV is OO Perl interface to the database of series/episodes
+at TV.com (www.tv.com). It allows to retrieve information
+about tv shows by its TV.com code.
+
+For more details please read POD of that module.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To install this module in the specific path use:
+
+    perl Makefile.PL PREFIX=/path/to/your/lib
+
+To install the module in your home directory use that command:
+
+    perl Makefile.PL PREFIX=YOU_HOME/path/to/your/lib
+
+Note: you don't need to have a root privileges to do that!
+
+Also, you can use CPAN shell:
+
+    > perl -MCPAN -e shell
+    cpan> install WWW::TV
+
+or use command 'cpan':
+
+    > cpan install WWW::TV
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    LWP::UserAgent
+
+AUTHOR
+
+Danial Pearce (cpan@tigris.id.au)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 by Danial Pearce.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

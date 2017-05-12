@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::IdentifyFile.
+
+1.00  Tue Jan 29 16:09:45 2008
+	- original version; created by h2xs 1.23 with options
+		-n Win32::IdentifyFile
+
+1.01  Wed Jan 30 13:25:00 2008
+	- change to Makefile.PL to prevent testing on non-Win32 OS
+

@@ -1,0 +1,38 @@
+0.05 -- 06/18/2005
+------------------
+* Added XML::Parser::Lite as first-choice XML parser, fall back to
+  XML::Mini::Document if it's not available
+* Removed no-longer-used _find() method
+
+0.04 -- 06/17/2005
+------------------
+* Work around an empty-attribute bug in XML::Mini
+* Added 'tags' to list of Event attributes
+
+0.03 -- 06/15/2005
+------------------
+* Added query() and parse() methods to Upcoming object, to allow for
+  client-side caching -- call() reimplemented as serial calls to these
+* t/test.t now pulls test Upcoming API key from file instead of requiring
+  test code to be edited
+* Switch from XML::Parser::Lite::Tree to XML::Mini::Document, to avoid
+  prerequisite problems on machines that don't have libexpat.so installed
+* Reformatted response-object creation and method-and-request-type
+  declarations to make them easier to read
+* Replaced response-attribute quoting -- qw() with ('','',...) -- in each
+  response-object to avoid triggering (spurious?) warning on various OS's
+* Corrected scalar @ISA assignments in Upcoming.pm and in various response-
+  object files
+* Um... Removed a debugging profanity
+
+0.02 -- 04/__/2005
+------------------
+* Changed module name from WWW::Service::Upcoming::API to WebService::Upcoming
+  to fit existing module conventions
+* Added version numbers and @ISA information Object::State and Object::Venue 
+* Changed the module name in README from development name
+* Fixed "$upco-\call()" mistakes in the documentation for API.pm
+
+0.01 -- 04/18/2005
+------------------
+* Initial release

@@ -1,0 +1,14 @@
+---
+
+WebService-Hatena-BookmarkCount-0.07 (2010/10/31):
+  - tests updated.
+
+WebService-Hatena-BookmarkCount-0.06 (2006/10/15):
+  - supports bookmark.getTotalCount method.
+  - http://hatena.g.hatena.ne.jp/hatenabookmark/20061004/1159944160
+
+WebService-Hatena-BookmarkCount-0.05 (2006/05/21):
+  - allows more than 50 URLs on a call.
+
+WebService-Hatena-BookmarkCount-0.04 (2006/02/26):
+  - first version released.

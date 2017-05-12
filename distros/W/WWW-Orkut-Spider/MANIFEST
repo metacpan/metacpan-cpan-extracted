@@ -1,0 +1,9 @@
+Changes
+examples/spiderhim.pl
+examples/spiderme.pl
+lib/WWW/Orkut/Spider.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/WWW-Orkut-Spider.t

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <items_returned>1</items_returned>
+  <items_available>1</items_available>
+  <first_item_position>0</first_item_position>
+  <result>
+    <contributor_fact>
+      <analysis_id>100430</analysis_id>
+      <contributor_id>51860</contributor_id>
+      <contributor_name>Yanick Champoux</contributor_name>
+      <account_id>12933</account_id>
+      <account_name>Yanick</account_name>
+      <primary_language_id>8</primary_language_id>
+      <primary_language_nice_name>Perl</primary_language_nice_name>
+      <comment_ratio>0.0410958904109589</comment_ratio>
+      <first_commit_time>2008-01-02T21:26:27Z</first_commit_time>
+      <last_commit_time>2008-01-03T21:00:03Z</last_commit_time>
+      <man_months>1</man_months>
+      <commits>8</commits>
+      <median_commits>8</median_commits>
+    </contributor_fact>
+  </result>
+</response>

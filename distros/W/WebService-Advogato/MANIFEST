@@ -1,0 +1,16 @@
+Build.PL
+Changes
+debian/changelog
+debian/control
+debian/copyright
+debian/rules
+lib/WebService/Advogato.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/0-signature.t
+t/1.t
+
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,27 @@
+Revision history for Perl extension WWW::BackpackTF.
+
+0.002001 2017-01-21T18:27+00:00
+ - Fix POD errors (makes module CPANTS-clean)
+
+0.002 2016-12-17T20:35+02:00
+ - Implement IGetMarketPrices and IGetUserListings APIs
+
+0.001001 2016-08-12T22:45-04:00
+ - Fix failing test (RT #116705)
+ - Default $user->notifications to 0
+
+0.001 2015-06-06T22:42+03:00
+ - First stable release
+ - Do not depend on LWP
+ - Add CSGO constant
+ - Add perlcritic test
+
+0.000_003 2014-10-12T01:38+03:00
+ - Switch from JSON to JSON::MaybeXS
+ - Add a network test for get_users
+
+0.000_002 2014-06-22T02:21+03:00
+ - Add IGetPrices and IGetCurrencies calls
+
+0.000_001 2014-06-15T02:35+03:00
+ - Initial release

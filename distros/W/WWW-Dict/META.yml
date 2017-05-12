@@ -1,0 +1,17 @@
+abstract: Base class for WWW::Dict::* modules.
+author: Kang-min Liu  C<< <gugod@gugod.org> >>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: WWW-Dict
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  UNIVERSAL::require: 0
+  perl: 5.8.0
+  version: 0
+version: 0.0.1

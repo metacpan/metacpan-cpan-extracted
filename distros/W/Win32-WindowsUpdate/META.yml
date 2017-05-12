@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Win32-WindowsUpdate
+version:             0.04
+abstract:            ~
+license:             ~
+author:              
+    - Dusty Wilson <dusty#megagram:com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Win32::OLE:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

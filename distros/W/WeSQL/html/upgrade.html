@@ -1,0 +1,243 @@
+<html>
+<head>
+<title>WeSQL Upgrade Path</title>
+</head>
+<body bgcolor=#FFFFFF>
+<h1>WeSQL Upgrade Path</h1>
+<table width=800>
+<tr>
+<td>
+<b>v0.52 -> v0.53:</b><p>
+</td>
+</tr>
+<tr>
+<td>
+You need to do nothing at all!!
+</td>
+</tr>
+<tr>
+<td>
+<b>v0.51 -> v0.52:</b><p>
+</td>
+</tr>
+<tr><td>
+<ol>
+<li>In MySQL, execute: alter table sessiondata change value text default '' not null;<p>
+<li>In the file(s) details.cf, replace all occurencies of $key by $data{key}. I've removed this extra bit of syntactic sugar to simplify things (and to sanitize them, as it only worked in details.cf, and not in the other .cf files).
+<li>In the file(s) details.cf, replace all occurencies of $Apache::WeSQL::params{...} by $params{...}. I've removed this extra bit of syntactic sugar to simplify things (and to sanitize them, as it only worked in details.cf, and not in the other .cf files).
+<li>Change all occurrencies of replace:select(something) to form:select(something) in details.cf and list.cf
+<li>Change all occurrencies of formfooter: to append: in details.cf, form.cf and list.cf
+<li>Replace your old copies of AppHandler.pm files with new ones from this version. This is necessary for the multi-language support, and for a session-support bugfix.
+<li>Update your WeSQL.pl file as follows:
+
+<pre>
+@commandlist = ( 
+      'dolayouttags($body)',
+      'dolanguages($body)',					<<<<< Add this line
+      'dosubst($body,"PR_",%params)',
+      'dosubst($body,"ENV_",%ENV)',
+</pre>
+And add this line too:
+<pre>
+$defaultlanguage='';
+</pre>
+Change the value to something else if you have a multi-language site. In that case, set it to the language you would like to be the default.
+
+<li>In your layout.cf file, add the following lines:
+<pre>
+listrowstart
+&lt;tr&gt;
+
+listrowstop
+&lt;/tr&gt;
+
+listcolumnstart
+&lt;td$align[$cnt]&gt;
+
+listcolumnstop
+&lt;/td&gt;
+
+listappendstart
+&lt;tr&gt;&lt;td colspan=$visiblecols&gt;
+
+listappendnoresultsstart
+&lt;tr&gt;&lt;td align=center&gt;
+
+formrowstart
+&lt;tr&gt;
+
+formrowstop
+&lt;/tr&gt;
+
+formkeycolumnstart
+&lt;td$alignkey&gt;
+
+formvalcolumnstart
+&lt;td$alignval&gt;
+
+formcolumnstop
+&lt;/td&gt;
+
+formboldstart
+&lt;b&gt;
+
+formboldstop
+&lt;/b&gt;
+
+formnoresults
+&lt;tr&gt;
+&lt;td colspan=2&gt;&lt;center&gt;No results found.&lt;/center&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+formupdatebutton
+Update
+
+formaddbutton
+Add
+
+formappendcolumnstart
+&lt;td colspan=2 align=center&gt;
+
+formtablestop
+&lt;/table&gt;
+
+detailscenterstart
+&lt;center&gt;
+
+detailscenterstop
+&lt;/center&gt;
+
+detailsdeletemessage
+&nbsp;&lt;br&gt;
+Are you &lt;b&gt;sure&lt;/b&gt; you want to delete this entry?
+&lt;br&gt;
+
+detailskeycolumnstart
+&lt;td$alignkey&gt;
+
+detailsvalcolumnstart
+&lt;td$alignval&gt;
+
+detailscolumnstop
+&lt;/td&gt;
+
+detailsboldstart
+&lt;b&gt;
+
+detailsboldstop
+&lt;/b&gt;
+
+detailsappendcolumnstart
+&lt;td colspan=2 align=center&gt;
+
+detailsrowstart
+&lt;tr&gt;
+
+detailsrowstop
+&lt;/tr&gt;
+
+</pre>
+<li>In your layout.cf file, update liststarttable1, liststarttable2 and liststoptable to:
+<pre>
+liststarttable1
+&lt;hr width=760&gt;
+&lt;center&gt;
+&lt;table width="752" border="0" cellspacing="0" cellpadding="1"&gt;
+&lt;tr&gt;&lt;td bgcolor="#000000"&gt;
+&lt;table width="750" border="0" cellspacing="2" cellpadding="1" bgcolor="#000000"&gt;
+&lt;tr&gt;
+&lt;td align=left valign=top width=200&gt;
+&lt;a href="index.wsql"&gt;Home&lt;/a&gt; 
+&lt;/td&gt;
+&lt;td align=center width=350&gt;&lt;font color="#FFFFFF"&gt;&lt;b&gt;
+
+liststarttable2
+&lt;/b&gt;&lt;/font&gt;&lt;/td&gt;
+&lt;td width=200 valign=top align=right&gt;&lt;a href="viewcart.wsql"&gt;View cart&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;center&gt;
+&nbsp;
+&lt;table width="752" border="0" cellspacing="0" cellpadding="1"&gt;
+&lt;tr&gt;&lt;td bgcolor="#000000"&gt;
+&lt;table width="750" border="0" cellspacing="0" cellpadding="5" bgcolor="#e8e8e8"&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;table align=center cellpadding="2" cellspacing="1"&gt;
+&lt;tr&gt;
+
+liststoptable
+&lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;hr width=760&gt;
+</pre>
+</ol>
+</td></tr>
+<tr>
+<td>
+<b>v0.50 -> v0.51:</b><p>
+</td>
+</tr>
+<tr><td>
+<ol>
+<li>In your database, add (MySQL definition, see the Addressbook application for a PostgreSQL definition):
+<p>
+create table sessions (<br>
+&nbsp;&nbsp;pkey bigint(20) unsigned not null auto_increment,<br>
+&nbsp;&nbsp;id bigint(20) unsigned not null,<p>
+
+&nbsp;&nbsp;uid bigint(20) unsigned not null,<br>
+&nbsp;&nbsp;suid bigint(20) unsigned not null default '0',<br>
+&nbsp;&nbsp;epoch bigint unsigned not null,<br>
+&nbsp;&nbsp;status tinyint default '1' not null,<p>
+
+&nbsp;&nbsp;hash varchar(16) default '' not null,<br>
+&nbsp;&nbsp;primary key (pkey)<br>
+);<p>
+
+And execute:<p>
+
+alter table sessiondata change loginid sessionid bigint(20) unsigned not null;<p>
+
+Also, don't forget to make new copies for any copies of AppHandler.pm you have made!!
+<li>In the file(s) details.cf, replace all occurencies of $key by $data{key}. I've removed this extra bit of syntactic sugar to simplify things (and to sanitize them, as it only worked in details.cf, and not in the other .cf files).
+<li>Make sure to add something sensible for the following keys in the layout.cf file(s):<p>
+loginform1<br>
+loginform2<br>
+loginform3<p>
+These are used in the login forms. The default values are:<p>
+loginform1<br>
+&lt;tr&gt;<br>
+&lt;td align=center valign=top&gt;<br>
+&lt;br&gt;<br>
+&lt;center&gt;<br>
+&lt;form action="jlogin.wsql" method=post&gt;<br>
+&lt;table width=400&gt;<br>
+&lt;tr&gt;&lt;td align=right&gt;&lt;b&gt;Login:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;INPUT name="login"&gt;&lt;/td&gt;&lt;/tr&gt;<br>
+&lt;tr&gt;&lt;td align=right&gt;&lt;b&gt;Password:&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;INPUT name="passwd" type=password&gt;&lt;/td&gt;&lt;/tr&gt;<br>
+&lt;tr&gt;&lt;td colspan=2 align=center&gt;<p>
+
+loginform2<br>
+&lt;input type="submit" value="Log in"&gt;&lt;/td&gt;&lt;/tr&gt;<p>
+
+loginform3<br>
+&lt;/table&gt;<br>
+&lt;/form&gt;<br>
+&lt;/td&gt;&lt;/tr&gt;<br>
+&lt;tr&gt;<br>
+&lt;td align=center&gt;<br>
+&lt;b&gt;If you get this page time and again, your browser does not support cookies.&lt;br&gt;Enable cookies and try again!&lt;/b&gt;<br>
+&lt;/td&gt;<br>
+&lt;/tr&gt;<br>
+&lt;/form&gt;<br>
+
+</pre>
+</ol>
+</td></tr>
+</table>
+</body>
+</html>

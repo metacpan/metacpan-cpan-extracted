@@ -1,0 +1,39 @@
+#!perl
+use strict;
+use warnings;
+
+use FindBin::libs;
+
+use WebService::NotifyMyAndroid;
+
+my $nma = WebService::NotifyMyAndroid->new;
+
+my $my_api_key = $ARGV[0];
+
+if (not $my_api_key) {
+    die "usage: $0 [apikey]\n";
+}
+
+# verify an existing API key
+my $result;
+eval {
+    $result = $nma->verify( apikey => $my_api_key );
+};
+if(my $e=$@) {
+    warn $e;
+    warn $result || 'no result returned';
+    exit;
+}
+use Data::Printer alias=>'dpp';warn dpp($result);
+defined( $result->{success} ) or die( $result->{error}->{content} );
+
+# send a message
+my $message = $nma->notify(
+    apikey      => [ $my_api_key ],
+    application => 'NotifyMyAndroid demo',
+    event       => q{Testing Perl Library},
+    description => q{Hello there, I'm writing a message to you},
+    priority    => 0,
+);
+defined( $message->{success} ) or die( $message->{error}->{content} );
+

@@ -1,0 +1,116 @@
+Revision history for Perl module Weather-OpenWeatherMap
+
+0.005004 2016-01-03
+
+  - Fix lack of consistency regarding 'temp/temp_f' accessors between Current
+    and Hourly reports
+
+  - confess() if attempting to construct a Request::Find for a city code
+
+  - Force Request->url related exceptions to take place at object construction
+    time
+
+  - Drop Test::Memory::Cycle dependency
+
+0.005003 2015-12-30
+
+  - Missing dependency on strictures-2+
+
+  - Missing 'api_key' should warn at construction time
+    (mistakenly built lazily)
+
+0.005002 2015-12-29
+
+  - Fix documentation regarding rain/snow totals
+
+  - Fix missing documentation regarding Find->iter($count)
+
+  - carp() about it if constructed without an 'api_key'
+
+  - Add 'set_api_key' writer for changing API key on an instance
+
+  - Fix a bug related to reattaching Request objects to cached Results when
+    calling ->retrieve on a Result object (rather than Request)
+
+    (This is a dubious thing to do anyway, but Cache allows it)
+
+  - Test expansion
+
+0.005001 2015-12-29
+
+  - Fix for potentially stale Request objects attached to cached Results
+
+    A Request may have the same 'location =>' as the cached Result's
+    '->request' object but different tags or other data.
+
+    Cache->retrieve will now reattach the supplied Request to the returned
+    cached Result.
+
+  - Find->iter($count) now behaves like Forecast->iter($count)
+
+  - Round off reported rain/snow totals for hourly report blocks; the
+    precision returned by OpenWeatherMap is a bit ludicrous
+
+  - Improve corrupted cache checks
+
+  - Test suite fixes and cleanups
+
+0.004001 2015-12-28
+
+  - Fix orphaned cache items for Find & hourly Forecast results
+
+  - Add support for returning multiple items at a time from a Forecast
+    iterator
+
+0.003001 2015-12-28
+
+  - Add hourly (3-hr blocks) forecast support
+
+  - Documentation fixes
+
+0.002004 2015-09-18
+
+  - use strictures 2 for saner fatal warnings behavior
+
+  - use Test::File::ShareDir for Result tests
+
+0.002003 2014-08-16
+
+  - Fix Path object coercion in cache handler
+
+0.002002 2014-05-17
+
+  - Fix missing File::ShareDir dependency
+
+0.002001 2014-05-16
+
+  - Add support for OpenWeatherMap's 'find' interface
+
+  - Caching-related optimizations
+
+  - Use JSON::MaybeXS over JSON::Tiny (for the potential speed boost)
+
+0.001005 2014-05-09
+
+  - Cache-related fixes
+
+0.001004 2014-05-08
+
+  - Add support for caching results via Weather::OpenWeatherMap::Cache
+
+0.001003 2014-05-03
+
+  - Fix Result::Forecast::Day->wind_speed_kph to return a correctly converted
+    value
+
+  - Provide Storable's 'freeze' as a method (on Request & Result objects)
+
+  - Expanded tests
+
+0.001002 2014-04-23
+
+  - POD & t/ fixes
+
+0.001001 2014-04-20
+
+  - Initial release

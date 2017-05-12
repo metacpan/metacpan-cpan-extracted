@@ -1,0 +1,327 @@
+Revision history for WWW-Shorten
+
+3.093     2016-03-25 12:16:08-04:00 America/New_York
+    - lin.kz no longer exists, so WWW::Shorten::Linkz is deprecated
+    - added deprecation/removal notices in accordance with issue #8
+    - Folded ::Qurl into the deprecated modules
+    - Folded ::Qwer into the deprecated modules
+    - Temporarily hault live testing against TinyURL with ugly hack
+    - Bump Perl requirement to 5.8.1
+
+3.092     2016-03-20
+    - Clear note about how to contribute other shorten services. Thanks, @ambs
+    - Updated shorten CLI app to add a lengthen option.  #9
+    - Pared down the requirements
+    - re-release with GNU tar
+
+3.091     2016-03-17
+    - Fixed typo on ::_dead (Thanks, @neilb)
+    - Add synopsis to ::_dead
+    - Cleaned up contributors, alphabetized
+    - Cleaned up the copyright and license confusion
+
+3.090     2016-03-16
+    - changed to Dist::Zilla
+    - added author tests
+    - Cleaned up documentation
+    - Cleaned up Changes file
+    - added deprecation notices
+    - Cleaned up the Readme.md quite a bit
+
+3.08    2015-12-15
+    - Dave Cross (DAVECROSS)
+    - added .gitignore
+    - fix some formatting
+    - Devel::Cover
+    - fix tinurl tests a bit
+    - Corrected INSTALL instructions
+
+3.06    2014-09-15
+    - Dave Cross (DAVECROSS)
+    - removed metamark as it's dead
+
+3.05    2014-05-06
+    - Dave Cross (DAVECROSS)
+    - Documentation typo
+    - TinyURL test fix
+    - added TravisCI
+    - Modernized Readme
+
+3.04    2013-08-22
+    - Dave Cross (DAVECROSS)
+    - removed remnants of SnipURL
+    - finished moving shorl to a separate dist
+    - Config::Auto dep added
+    - default to supported service
+    - bin/shorten better examples
+
+    - (YAPPO)
+    - shorl POST verb
+
+3.03    2012-04-06
+    - Dave Cross (DAVECROSS)
+    - License cleanup
+    - Added META.json
+
+3.02    2010-12-06
+    - Dave Cross (DAVECROSS)
+    - bin/shorten: service choice is now smarter
+    - added MYMETA.yml to MANIFEST.SKIP
+
+3.01    2010-12-06
+    - Dave Cross (DAVECROSS)
+    - bin/shorten: Default to using a service that we currently support
+
+3.00    2010-01-20
+    - Dave Cross (DAVECROSS)
+    - shorl.com now uses POST verb
+    - removed ::Shorl in prep for a separate dist
+
+2.06    2009-11-21
+    - Dave Cross (DAVECROSS)
+    - removed NotLong in prep for a separate dist
+    - Removed OneShortLink in prep for a separate dist
+
+2.05    2009-09-18
+    - Dave Cross (DAVECROSS)
+    - finished up removing SnipURL
+
+2.04    2009-09-08
+    - Dave Cross (DAVECROSS)
+    - Removed WWW::Shorten::SnipURL to prep for a separate dist
+    - Doc improvements
+    - added $DEFAULT_SERVICE
+    - removed a number of no longer in service modules
+
+2.03    2009-03-19
+    - Dave Cross (DAVECROSS)
+    - fix tinyurl tests
+    - fix shorl tests
+    - remove signing from Build.PL
+
+2.02    2009-02-02
+    - Dave Cross (DAVECROSS)
+    - fix perl 5.006 requirement
+
+2.01    2008-06-30
+    - Dave Cross (DAVECROSS)
+    - build fixes
+
+2.00    2008-06-28
+    - Dave Cross (DAVECROSS)
+    - mark tinylink as dead until we can fix the problem
+
+1.100   2008-04-20
+    - Dave Cross (DAVECROSS)
+    - fixed tests for snipurl
+
+1.99    2008-04-19
+    - Dave Cross (DAVECROSS)
+    - removed sample config for bin/shorten
+    - add script_files to Build.PL
+
+1.98    2008-04-14
+    - Dave Cross (DAVECROSS)
+    - Added WWW::Shorten::LinkToolbot
+    - added tests for linktoolbot
+    - Switched to Build.PL
+    - Fixed ::Shorl to mimick their changes
+    - Fixed lots of documentation
+    - removed tinyclick.com support
+    - removed makeashorterlink.com support
+    - removed babyurl support
+    - manual versioning
+    - fixed email and copyright in docs
+
+1.97    2005-10-10
+    - Dave Cross (DAVECROSS)
+    - Re-add support for 1sl.net
+
+1.95    2005-05-24
+    - Dave Cross (DAVECROSS)
+    - skip broken lin.kz tests
+    - fix pod
+
+1.94    2005-05-19
+    - Dave Cross (DAVECROSS)
+    - removed some dead services
+    - Fixed ::Shorl to accomodate their changes
+    - Removed v3 service
+    - Removed 1sl service
+
+1.88    2004-10-30
+    - Dave Cross (DAVECROSS)
+    - Improve coverage in tests
+    - new test files
+    - removed some dead services
+
+1.88    2004-10-25
+    - Dave Cross (DAVECROSS)
+    - Fix VERSION
+    - remove no strict 'refs'
+    - generate SIGNATURE
+    - fix tests
+    - fix regular expression
+
+1.88    2004-10-24
+    - Dave Cross (DAVECROSS)
+    - Changed author info
+    - Get Version from tags
+    - Removed Changes file to get them from CVS
+
+1.88    2003-11-12
+    - Iain Truskett (SPOON)
+    - Tidied up return values and authorship
+    - EkDk service removed.
+    - ShortLink service removed.
+    - qURL service removed
+    - TinyClick made their URLs slightly harder to find
+    - Test fixes
+    - Added OneShortLink, http://1sl.net/
+    - fix change in SmLnk ID scheme
+    - Mention CGI::Shorten
+    - Added links to search.cpan.org and backpan
+    - Use Class::Factory::Util to provide randomised selection
+
+1.87    2003-09-07
+    - Iain Truskett (SPOON)
+    - Better abstract
+    - Added lin.kz
+
+1.86    2003-09-02
+    - Iain Truskett (SPOON)
+    - Assorted documentation nit fixing
+    - Fixed Eric's email
+    - Added BabyURL.com
+    - Fixed wrong URL in docs.
+    - Removed trailing slash in deparse URL
+    - Added URLjr.com
+
+1.85    2003-08-29
+    - Iain Truskett (SPOON)
+    - Added v3.net
+
+1.84    2003-08-29
+    - Iain Truskett (SPOON)
+    - Fixed qURL documentation
+    - Added TinyLink.com support
+    - SmLnk.pm now uses the SmLnk API
+    - changed URL for shorlfilter
+
+1.83    2003-08-26
+    - Iain Truskett (SPOON)
+    - Added qurl.net
+    - Mentioned shorlfilter.
+
+1.82    2003-07-23
+    - Iain Truskett (SPOON)
+    - Removed Fcol support
+    - QuickOnes.org doesn't exist any more
+    - Now using RT.cpan.org
+    - Cleaned up some tests
+    - Unified version numbers
+    - Added ShortLink.us
+
+1.5.8   2003-03-11
+    - Iain Truskett (SPOON)
+    - Improved tests
+    - Added BUGS section to all PODs
+    - shorten script souped up. Can now be configured
+    - shorten now configurable
+    - sample config file provided
+
+1.5.7   2003-03-09
+    - Iain Truskett (SPOON)
+    - Modules return undef with any error
+    - MakeAShorterLink.pm has minor POD fixups.
+    - MASL now returns the original URL if it was too short.
+    - Added link to NotLong's comparison page to WWW::Shorten.
+    - Revised BUGS section of WWW::Shorten. Others will be done.
+
+1.5.6   2003-03-05
+    - Iain Truskett (SPOON)
+    - Metamark uses POST rather than GET now.
+    - Ask mentioned in various bits.
+    - Added 'bin/shorten' to the manifest (it was left out)
+    - Added TinyClick.com
+    - Remove redundant tests
+    - Added Test::Pod
+    - Added SERVICES section
+
+1.5.5   2003-01-07
+    - Iain Truskett (SPOON)
+    - Build chain fix
+
+1.5.4   3003-01-07
+    - Iain Truskett (SPOON)
+    - Tests no longer use a dave.org in favor of perl.dellah.org
+    - AUTHORS list added.
+    - ChangeLog added
+    - Added Ask's Metamark service.
+    - Module::Build uses META.yml now rather than .yaml
+    - Smlnk test added
+    - SnipURL.com modified their API. Code updated.
+    - Added 'shorten'. A useful little program.
+    - Added Metamark and 'shorten' to the docs.
+
+1.5.2   2002-11-01
+    - Iain Truskett (SPOON)
+    - Versions moved to x.yy, and aren't taken from CVS ids
+    - New tests added
+    - import() for WWW::Shorten simplified by shunting stuff to the base class.
+    - Added SmLnk.com
+    - Updated Shorten.pm to mention the EdDk, Fcol and SmLnk.
+
+1.5.1   2002-10-29
+    - Iain Truskett (SPOON)
+    - Build.PL fix
+    - ::SnipURL $debug mode
+
+1.5.0   2002-10-25
+    - Iain Truskett (SPOON)
+    - Moved to Module::Build
+    - SIGNATURE added.
+    - Default style is 'MakeAShorterLink'.
+    - THANKS section added.
+    - LICENSE AND COPYRIGHT section added.
+    - SnipURL.pm uses the API interface.
+    - Auxiliary files cleaned up.
+    - Basic tests added.
+    - Fcol.org and add.redir.ek.dk added.
+    - Tests for Fcol and EkDk added.
+
+1.4.2   2002-09-21
+    - Iain Truskett (SPOON)
+    - Fixed a Makefile.PL problem
+
+1.4.1   2002-09-21
+    - Iain Truskett (SPOON)
+    - ::SnipURL - Remove mention of ($url,$password) syntax
+    - Updated tests
+    - fixed scoping problems
+
+1.4     2002-09-20
+    - Iain Truskett (SPOON)
+    - refactored WWW::Shorten::generic
+    - refactored masl
+    - Added NotLong, QuickOnes, SnipURL
+    - Refactored ::TinyURL to use the ::generic interface
+    - Added lots of tests
+
+1.3.2   2002-09-16
+    - Iain Truskett (SPOON)
+    - Added bug report location
+    - Fixed Readme
+    - Fixed TinyURL
+    - Fixed MakeAShorterLink
+    - Fixed Shorl
+
+1.3.1   2002-09-04
+    - Iain Truskett (SPOON)
+    - Fixed versioning
+    - Fixed Readme
+    - Added/updated documentation
+
+1.2     2002-08-29
+    - Iain Truskett (SPOON)
+    - Original Release

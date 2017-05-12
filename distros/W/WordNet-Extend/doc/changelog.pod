@@ -1,0 +1,141 @@
+=head1 NAME
+
+CHANGES - Revision history for WordNet::Extend
+
+=head1 DESCRIPTION
+
+=head2 Version 0.051 (Released 01/16/2017)
+
+=over
+
+=item (1)
+
+Fixed locate tests causing failure.
+
+=back
+
+=head2 Version 0.050 (Released 01/16/2017)
+
+=over
+
+=item (1)
+
+Added Similarity scoring method to Locate.pm
+
+=item (2) 
+
+Added corresponding Sim test in WN-Locate.t
+
+=back
+
+=head2 Version 0.040 (Released 11/08/2016)
+
+=over
+
+=item (1)
+
+Added BwS (baseline with stemming) scoring method to Locate.pm
+
+=item (2)
+
+Added corresponding BwS test in WN-Locate.t
+
+=back
+
+=head2 Version 0.030 (Released 10/13/2016)
+
+=over
+
+=item (1)
+
+Fixed insertion error causing command line 'wn' to seg fault. 
+
+=item (2)
+
+Fixed error preventing user from inserting multiple new lemmas at once.
+
+=back
+
+=head2 Version 0.020 (Released 09/29/2016)
+
+=over
+
+=item (1)
+
+Fixed documentation for Extend, Insert, and Locate.
+
+=item (2)
+
+Added new error check for Insert to make sure the user is not specifying a non existing lemma for a location.
+
+=item (3)
+
+Added new revertLastChange() function which allows the user to take back only the most recent insert.
+
+=back
+
+=head2 Version 0.014 (Released 09/19/2016)
+
+=over
+
+=item (1)
+
+Added pod for README and Changes.
+
+=item (2)
+
+Fixed synopsis example to allow user to copy and paste right out of the box.
+
+=item (3)
+
+Separated the insert functionality from the locate functionality. Insert exists in Insert.pm and locate in Locate.pm. This results in WordNet::Insert becoming WordNet::Extend.
+
+=item (4)
+
+Added attach() and merge() function into Insert.pm which inserts lemma into specified location in WordNet. The old insert() function, which locates where they should be inserted, has been changed to locate(). insertFile() has also been changed to locateFile().
+
+=item (5)
+
+Added test case for inserting item into WordNet.
+
+=back
+
+=head2 Version 0.02 (Released 05/26/2016)
+
+=over 
+
+=item (1)
+
+Fixed test file to properly use Test::More.
+
+=back
+
+=head2 Version 0.01 (Released 05/24/2016)
+
+=head1 AUTHORS
+
+  Ted Pedersen, University of Minnesota, Duluth
+  tpederse at d.umn.edu
+
+  Jon Rusert, University of Minnesota, Duluth
+  ruse0008 at d.umn.edu
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016, Ted Pedersen, Jonathan D Rusert
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+=cut

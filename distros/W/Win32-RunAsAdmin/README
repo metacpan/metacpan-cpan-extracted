@@ -1,0 +1,13 @@
+Win32::RunAsAdmin
+
+The Windows Vista/7/8 UAC system (User Account Control) is poorly designed for a scripting
+language. Win32::RunAsAdmin provides a simple way to request elevation right at the start
+of the script, like this:
+
+   use Win32::RunAsAdmin qw(force);
+
+Put that at the beginning of your script, and the "Do you want to let this program make
+changes to your system" box will pop up, after which your script will restart in a new
+console with elevated privileges. Simple as that.
+
+Install using the usual CPAN tools.

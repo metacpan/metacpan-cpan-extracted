@@ -1,0 +1,96 @@
+#!perl
+use strict;
+use warnings;
+# PODNAME: pinboard_export
+# ABSTRACT: data exporter for pinboard
+
+use DBI;
+use Getopt::Long qw(:config pass_through);
+use WWW::Pinboard;
+
+my ($dsn, $token, $refresh);
+GetOptions(
+    'dsn=s'   => \$dsn,
+    'token=s' => \$token,
+    'refresh' => \$refresh,
+);
+die "--dsn is required" unless $dsn;
+die "--token is required" unless $token;
+
+my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1, AutoCommit => 0 });
+if ($refresh) {
+    $dbh->do('DROP TABLE `posts`;');
+}
+my $fromdt = '1970-01-01T00:00:00Z';
+if (!$dbh->tables(undef, undef, 'posts')) {
+    $dbh->do(<<'');
+    CREATE TABLE `posts` (
+        href TEXT NOT NULL,
+        description TEXT NOT NULL,
+        extended TEXT NOT NULL,
+        tags TEXT NOT NULL,
+        time TEXT NOT NULL,
+        toread TEXT NOT NULL
+    );
+
+}
+else {
+    ($fromdt) = $dbh->selectrow_array(
+        'SELECT time FROM posts ORDER BY strftime("%s", time) DESC LIMIT 1'
+    );
+}
+
+my $api = WWW::Pinboard->new(token => $token);
+
+if ($fromdt ge $api->update->{update_time}) {
+    $dbh->disconnect;
+    exit(0);
+}
+
+my $sth = $dbh->prepare(
+    'INSERT INTO posts (href, description, extended, tags, time, toread) VALUES (?, ?, ?, ?, ?, ?)'
+);
+
+my $posts = $api->all(fromdt => $fromdt);
+
+for my $post (@$posts) {
+    $sth->execute(
+        $post->{href},
+        $post->{description},
+        $post->{extended},
+        $post->{tags},
+        $post->{time},
+        $post->{toread},
+    );
+}
+
+$dbh->commit;
+$dbh->disconnect;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pinboard_export - data exporter for pinboard
+
+=head1 VERSION
+
+version 0.02
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy@tozt.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Jesse Luehrs.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

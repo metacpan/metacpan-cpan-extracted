@@ -1,0 +1,104 @@
+==================================================
+Changes from 2013-05-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.5 at 2014-05-02 12:17:33 +0000
+------------------------------------------
+
+  Change: 5fe2c4f6f7761daa3cf829252b10fe8fbcf271ee
+  Author: Konrad Borowski <x.fix@o2.pl>
+  Date : 2014-05-02 14:15:56 +0000
+
+    Release 0.1.5. 
+
+  Change: 6f5c6f6d5443ea694f41d74b7ddc8f2315dd92b0
+  Author: Konrad Borowski <GlitchMr@users.noreply.github.com>
+  Date : 2014-05-02 12:15:05 +0000
+
+    Merge pull request #1 from MartinMcGrath/patch-2
+
+    Target URLs have changed - Update 
+
+  Change: a3baf059228d5e4915c0b521dfb0287a98566b46
+  Author: Martin McGrath <mcgrath.martin@gmail.com>
+  Date : 2014-05-02 11:08:13 +0000
+
+    Target URLs have changed - Update
+
+    Hi, thanks for your work on this module.
+
+    Some of the URLs have changed, I've updated the test to cater for new
+    URLs:
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=95262 
+
+  Change: b470cc8be6064c62415b668f9692b5b671f6df4d
+  Author: Konrad Borowski <GlitchMr@users.noreply.github.com>
+  Date : 2014-01-14 22:04:24 +0000
+
+    Put funky module return value. 
+
+  Change: fdcd317981c434fe113b010355752b56d5337518
+  Author: Konrad Borowski <GlitchMr@users.noreply.github.com>
+  Date : 2014-01-03 21:19:26 +0000
+
+    Update e-mail address. 
+
+  Change: 490457e4724337b845f43eea1ac0dbd43374088f
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-09-05 15:13:26 +0000
+
+    Release 0.1.4 
+
+  Change: 86e66b4ce548a2c6a891133efb3c25f368369f39
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-09-05 15:12:57 +0000
+
+    Use head requests instead of get. 
+
+  Change: 68d7ab2aee4f06517d175947e5ae46492adbc3a7
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-08-03 11:18:01 +0000
+
+    Release 0.1.3 
+
+  Change: 619570141d24f105e70e959131ef7fc2739bf236
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-08-03 11:17:13 +0000
+
+    Fix useragent in WWW::Expand 
+
+  Change: eb67446437622ae736b11dec7c241005d982807f
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-07-04 17:26:22 +0000
+
+    Release 0.1.2 
+
+  Change: 51ec6891bb6efa9c6013958e04fef4ebe1620e35
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-07-04 17:10:45 +0000
+
+    Remove some useless modules from dist.ini 
+
+  Change: a7d4a87c8f1bb6b0610a77a512ab7cac37ad5883
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-01-19 13:34:58 +0000
+
+    Release 0.1.1 
+
+  Change: 358095361b842b768ff052ad9f41c1d8553fdfa3
+  Author: Konrad Borowski <glitchmr@myopera.com>
+  Date : 2013-01-19 10:40:49 +0000
+
+    Remove often failing TinyURL test 
+
+  Change: 1b3f63dd10bfa59684e0e5470cd3ecee0bbf895f
+  Author: GlitchMr <glitchmr@myopera.com>
+  Date : 2012-11-30 15:19:30 +0000
+
+    Release 0.1.0 
+
+================
+End of releases.
+================

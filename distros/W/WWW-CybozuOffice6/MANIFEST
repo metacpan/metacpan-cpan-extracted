@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-CybozuOffice6.t
+t/externalAPINotify.dat
+lib/WWW/CybozuOffice6.pm
+META.yml                                 Module meta-data (added by MakeMaker)

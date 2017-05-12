@@ -1,0 +1,81 @@
+NAME
+    WWW::SpinnerChief - SpinnerChief API
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use WWW::SpinnerChief;
+
+        my $sc = WWW::SpinnerChief->new(
+            apikey => 'blabla',
+            username => 'fayland',
+            password => 'password',
+        );
+
+        my $x = $sc->quota_left() or die $sc->errstr;
+        print "quota_left: $x\n";
+
+        my $spintax = $sc->text_with_spintax('Hello, what is your name? - �  ♣ ♦ ‾ ←') or die $sc->errstr;
+        print "spintax: $spintax\n";
+
+        my $unique_variation = $sc->unique_variation('This is a great software') or die $sc->errstr;
+        print "unique_variation: $unique_variation\n";
+
+DESCRIPTION
+    <http://developer.spinnerchief.com/API_Document.aspx>
+
+  METHODS
+   CONSTRUCTION
+        use WWW::SpinnerChief;
+
+        my $sc = WWW::SpinnerChief->new(
+            apikey => 'blabla',
+            username => 'fayland',
+            password => 'password',
+        );
+
+    *   apikey
+
+    *   username
+
+    *   password
+
+        required
+
+   quota_used
+   quota_left
+        # querytimes=1
+        my $x = $sc->quota_used() or die $sc->errstr;
+        print "quota_used: $x\n";
+
+        # querytimes=2
+        my $x = $sc->quota_left() or die $sc->errstr;
+        print "quota_left: $x\n";
+
+   text_with_spintax($text, $params)
+    spintype = 0
+
+        my $spintax = $sc->text_with_spintax('Hello, what is your name? - �  ♣ ♦ ‾ ←') or die $sc->errstr;
+        print "spintax: $spintax\n";
+
+   unique_variation($text, $params)
+    spintype = 1
+
+        my $unique_variation = $sc->unique_variation('This is a great software') or die $sc->errstr;
+        print "unique_variation: $unique_variation\n";
+
+        my $new_text = $sc->unique_variation($text, {
+            tagprotect => '[]',
+            spinhtml => 1,
+        }) or die $sc->errstr;
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

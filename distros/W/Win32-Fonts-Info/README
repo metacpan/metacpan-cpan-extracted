@@ -1,0 +1,49 @@
+                                   Win32-Fonts-Info
+                                      Version 0.01
+                                      8 May 2006
+				     
+                Copyright (C) 2006 Reinhard Pagitsch.  All Rights Reserved
+                          Homepage: http://members.aon.at/rpagitsch/
+
+                   This is free software; you can redistribute it and/or
+                        modify it under the same terms as Perl itself.
+
+Win32::Fonts::Info is a module to get informations about installed font families.
+The module was tested with Windows XP and Windows 2000.
+
+For more informations on how to use it please see POD documentation.
+
+My intention to create this module was that someone in a Perl win32 user group 
+asked how to find out which fonts are installed on a Windows system. A resaerch
+in the Platform SDK showed me that there are some different methods to do it
+(GDI, GDI+, Registry, WMI). Each of them are showing me different number of
+of fonts. So I preferred to use the GDI API. The number of font files which can be found in
+the %Windir%\fonts directory is different to the number of font families calculated by
+the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The Gdi32.lib is required to compile the module
+There are no other Perl modules required.
+
+
+  
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 Reinhard Pagitsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,34 @@
+Revision history for Win32-SDDL
+
+0.07 June 14, 2016
+
+	* New maintainer (HYDAHY). Clean-up release to address some Kwalitee and
+	  PerlCritic requirements. Moved to Dist::Zilla for packaging.
+
+0.06 August 17, 2006
+
+	* I screwed up the last distro, so this is mostly the same as the last one, 
+	  only it actually works.
+
+0.05	August 16, 2006
+
+	* Removed inheritance to Win32::SDDL, since it only needed it for the 
+	  _translateSID method. I'll reconsider whether inheritance is important 
+          later if I decide to add more methods to the Win32::SDDL::ACE objects
+	
+	* Added requirement for Win32::OLE to distro.
+
+0.04	August 14, 2006
+
+	* Added sample script SvcInfo.pl
+
+0.02	August 13, 2006
+
+        * Added Win32::SDDL::ACE package and fixed bugs with the constants
+
+0.02 July 20, 2006 
+
+	* Fixed various documentation problems.  This is the first draft of the module 
+          for CPAN.
+
+

@@ -1,0 +1,3770 @@
+{
+   "entries" : [
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "api-keys",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "ApiKey",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "The actual API key string. Use this as the consumer key when making an OAuth request.",
+                  "name" : "apiKey",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The application that owns this API key.",
+                  "name" : "owner",
+                  "type" : "Application"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected API key, including what application it belongs to."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [
+            {
+               "formatSensitive" : true,
+               "name" : "create-external-feed-subscription",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The URL which will receive notifications of new content in the subscribed feeds.",
+                        "name" : "calllbackUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A list of rules for filtering notifications to this subscription; each rule is a query string using the search API's syntax.",
+                        "name" : "filterRules",
+                        "type" : "List<string>"
+                     },
+                     {
+                        "docString" : "A list of identifiers of the initial set of feeds to be subscribed to.",
+                        "name" : "feedIdents",
+                        "type" : "List<string>"
+                     },
+                     {
+                        "docString" : "A subscriber-provided opaque token that will be echoed back in the verification request to assist the subscriber in identifying which subscription request is being verified.",
+                        "name" : "verifyToken",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "responseObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The subscription object that was created.",
+                        "name" : "subscription",
+                        "type" : "ExternalFeedSubscription"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Subscribe the application to one or more external feeds."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "applications",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "external-feed-subscriptions",
+               "resourceObjectType" : {
+                  "name" : "List<ExternalFeedSubscription>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<ExternalFeedSubscription>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of the application's active external feed subscriptions."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "Application",
+            "parentType" : "Entity",
+            "properties" : [
+               {
+                  "docString" : "The name of the application as provided by its developer.",
+                  "name" : "name",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> The object types for this object. This set will contain the string C<tag:api.typepad.com,2009:Application> for an Application object.",
+                  "name" : "objectTypes",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "The keyword identifying the type of object this is. For an Application object, M<objectType> will be C<Application>.",
+                  "name" : "objectType",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL of the OAuth request token endpoint for this application.",
+                  "name" : "oauthRequestTokenUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL to send the user's browser to for the user authorization step.",
+                  "name" : "oauthAuthorizationUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL of the OAuth access token endpoint for this application.",
+                  "name" : "oauthAccessTokenUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL to send the user's browser to in order to identify who is logged in (that is, the \"sign in\" link).",
+                  "name" : "oauthIdentificationUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL of the session sync script.",
+                  "name" : "sessionSyncScriptUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL to send the user's browser to in order to sign them out of TypePad.",
+                  "name" : "signoutUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL of a script to embed to enable the user flyouts functionality.",
+                  "name" : "userFlyoutsScriptUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the object. This can be used to recognise where the same user is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the C<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected application."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [
+            {
+               "formatSensitive" : true,
+               "name" : "remove-category",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The category to remove",
+                        "name" : "category",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Send label argument to remove a category from an asset"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "add-category",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The category to add",
+                        "name" : "category",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Send label argument to add a category to an asset"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "make-comment-preview",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The body of the comment.",
+                        "name" : "content",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "responseObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "A mockup of the future comment.",
+                        "name" : "comment",
+                        "type" : "Asset"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Send relevant data to get back a model of what the submitted comment will look like."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "canHaveId" : true,
+         "canOmitId" : true,
+         "formatSensitive" : true,
+         "name" : "assets",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "favorites",
+               "resourceObjectType" : {
+                  "name" : "List<Favorite>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Favorite>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of favorites that have been created for the selected asset."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "feedback-status",
+               "resourceObjectType" : {
+                  "name" : "FeedbackStatus",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "C<true> if new comments may be posted to the related asset, or C<false> if no new comments are accepted.",
+                        "name" : "allowComments",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if comments should be displayed on the related asset's permalink page, or C<false> if they should be hidden.",
+                        "name" : "showComments",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if new trackback pings may be posted to the related asset, or C<false> if no new pings are accepted.",
+                        "name" : "allowTrackback",
+                        "type" : "boolean"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get the feedback status of selected asset",
+                  "PUT" : "Set the feedback status of selected asset"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "publication-status",
+               "resourceObjectType" : {
+                  "name" : "PublicationStatus",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The time at which the related asset was (or will be) published, as a W3CDTF timestamp. If the related asset has been scheduled to be posted later, this property's timestamp will be in the future.",
+                        "name" : "publicationDate",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is private (not yet published), or C<false> if it has been published.",
+                        "name" : "draft",
+                        "type" : "boolean"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get the publication status of selected asset",
+                  "PUT" : "Set the publication status of selected asset"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "reblogs",
+               "resourceObjectType" : {
+                  "name" : "List<Post>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Post>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of posts that were posted as reblogs of the selected asset."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "categories",
+               "resourceObjectType" : {
+                  "name" : "List<string>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of categories into which this asset has been placed within its blog. Currently supported only for O<Post> assets that are posted within a blog."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "comments",
+               "resourceObjectType" : {
+                  "name" : "List<Comment>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Comment>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of assets that were posted in response to the selected asset.",
+                  "POST" : "Create a new Comment asset as a response to the selected asset."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "selected-item",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "media-assets",
+               "resourceObjectType" : {
+                  "name" : "List<Asset>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Asset>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of media assets that are embedded in the content of the selected asset."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "comment-tree",
+               "resourceObjectType" : {
+                  "name" : "List<CommentTreeItem>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<CommentTreeItem>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of assets that were posted in response to the selected asset and their depth in the response tree"
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "selected-item",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "Asset",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the user.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                  "name" : "permalinkUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The user who created the selected asset.",
+                  "name" : "author",
+                  "type" : "User"
+               },
+               {
+                  "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                  "name" : "published",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                  "name" : "content",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                  "name" : "renderedContent",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                  "name" : "excerpt",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                  "name" : "textFormat",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                  "name" : "groups",
+                  "type" : "array<string>"
+               },
+               {
+                  "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                  "name" : "source",
+                  "type" : "AssetSource"
+               },
+               {
+                  "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                  "name" : "objectTypes",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "The keyword identifying the type of asset this is.",
+                  "name" : "objectType",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                  "name" : "isFavoriteForCurrentUser",
+                  "type" : "boolean"
+               },
+               {
+                  "docString" : "The number of distinct users who have added this asset as a favorite.",
+                  "name" : "favoriteCount",
+                  "type" : "integer"
+               },
+               {
+                  "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                  "name" : "commentCount",
+                  "type" : "integer"
+               },
+               {
+                  "docString" : "The title of the asset.",
+                  "name" : "title",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The description of the asset.",
+                  "name" : "description",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "An object describing the group or blog to which this asset belongs.",
+                  "name" : "container",
+                  "type" : "ContainerRef"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "DELETE" : "Delete the selected asset and its associated events, comments and favorites.",
+            "GET" : "Get basic information about the selected asset.",
+            "PUT" : "Update the selected asset."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "auth-tokens",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "AuthToken",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "The actual auth token string. Use this as the access token when making an OAuth request.",
+                  "name" : "authToken",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> The root object to which this auth token grants access. This is a legacy field maintained for backwards compatibility with older clients, as auth tokens are no longer scoped to specific objects.",
+                  "name" : "targetObject",
+                  "type" : "Base"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected auth token, including what object it grants access to."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : false,
+         "canOmitId" : true,
+         "formatSensitive" : false,
+         "name" : "batch-processor",
+         "propertyEndpoints" : [],
+         "supportedMethods" : {
+            "POST" : "Submit a selection of API requests to be performed as a batch job."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [
+            {
+               "formatSensitive" : true,
+               "name" : "remove-category",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The category to remove",
+                        "name" : "category",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Send label argument to remove a category from the blog"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "add-category",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The category to add",
+                        "name" : "category",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Send label argument to remove a category from the blog"
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "discover-external-post-asset",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The URL of the page whose external post stub is being retrieved.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "responseObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The asset that acts as a stub for the given permalink.",
+                        "name" : "asset",
+                        "type" : "Asset"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "If the selected blog is a connected blog, create or retrieve the external post stub for the given permalink."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "blogs",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-user",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "PostByEmailAddress",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "A private email address for posting via email.",
+                              "name" : "emailAddress",
+                              "type" : "string"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get the selected user's post-by-email address"
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "post-by-email-settings",
+               "resourceObjectType" : {
+                  "name" : "PostByEmailAddress",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "A private email address for posting via email.",
+                        "name" : "emailAddress",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {},
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "stats",
+               "resourceObjectType" : {
+                  "name" : "BlogStats",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of page views received by the blog for all time.",
+                        "name" : "totalPageViews",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "A map containing the daily page views on the blog for the last 120 days. The keys of the map are dates in W3CDTF format, and the values are the integer number of page views on the blog for that date.",
+                        "name" : "dailyPageViews",
+                        "type" : "map<integer>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get data about the pageviews for the selected blog."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "categories",
+               "resourceObjectType" : {
+                  "name" : "List<string>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of categories which are defined for the selected blog."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "recent",
+                           "parameterized" : false,
+                           "resourceObjectType" : {
+                              "name" : "List<Comment>",
+                              "parentType" : "Base",
+                              "properties" : [
+                                 {
+                                    "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                                    "name" : "totalResults",
+                                    "type" : "integer"
+                                 },
+                                 {
+                                    "docString" : "The items within the selected slice of the list.",
+                                    "name" : "entries",
+                                    "type" : "array<Comment>"
+                                 }
+                              ]
+                           },
+                           "supportedMethods" : {
+                              "GET" : "Return the fifty most recent published comments associated with the selected blog"
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        }
+                     ],
+                     "formatSensitive" : true,
+                     "name" : "published",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Comment>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Comment>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Return a pageable list of published comments associated with the selected blog"
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "comments",
+               "supportedMethods" : {
+                  "GET" : ""
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "crosspost-accounts",
+               "resourceObjectType" : {
+                  "name" : "List<Account>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Account>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get  a list of accounts that can be used for crossposting with this blog."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "commenting-settings",
+               "resourceObjectType" : {
+                  "name" : "BlogCommentingSettings",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "C<true> if this blog allows users to sign in to comment, or C<false> if all new comments are anonymous.",
+                        "name" : "signinAllowed",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if this blog requires users to be logged in in order to leave a comment, or C<false> if anonymous comments will be rejected.",
+                        "name" : "signinRequired",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if this blog requires anonymous comments to be submitted with an email address, or C<false> otherwise.",
+                        "name" : "emailAddressRequired",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if this blog requires anonymous commenters to pass a CAPTCHA before submitting a comment, or C<false> otherwise.",
+                        "name" : "captchaRequired",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if this blog places new comments into a moderation queue for approval before they are displayed, or C<false> if new comments may be available immediately.",
+                        "name" : "moderationEnabled",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "Number of days after a post is published that comments will be allowed. If the blog has no time limit for comments, this property will be omitted.",
+                        "name" : "timeLimit",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "C<true> if this blog allows commenters to use basic HTML formatting in comments, or C<false> if HTML will be removed.",
+                        "name" : "htmlAllowed",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "C<true> if comments in this blog will automatically have any bare URLs turned into links, or C<false> if URLs will be shown unlinked.",
+                        "name" : "urlsAutoLinked",
+                        "type" : "boolean"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get the commenting-related settings for this blog."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "media-assets",
+               "postObjectType" : {
+                  "name" : "Asset",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Asset>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Asset>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Add a new media asset to the account that owns this blog."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "page-assets",
+               "postObjectType" : {
+                  "name" : "Page",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "T<Editable> The base name of the page, used to create the M<permalinkUrl>.",
+                        "name" : "filename",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A list of links to the images that are embedded within the content of this page.",
+                        "name" : "embeddedImageLinks",
+                        "type" : "array<ImageLink>"
+                     },
+                     {
+                        "docString" : "T<Editable> The title of the page.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The description of the page.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> A keyword that indicates what formatting mode to use for the content of this page. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the draft status and publication date for this page.",
+                        "name" : "publicationStatus",
+                        "type" : "PublicationStatus"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the comment and trackback behavior for this page.",
+                        "name" : "feedbackStatus",
+                        "type" : "FeedbackStatus"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Page>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Page>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of pages associated with the selected blog.",
+                  "POST" : "Add a new page to a blog"
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "by-category",
+                           "parameterized" : true,
+                           "supportedMethods" : {
+                              "GET" : "Get the published posts in the selected blog that have been assigned to the given category."
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        },
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "by-month",
+                           "parameterized" : true,
+                           "supportedMethods" : {
+                              "GET" : "Get the posts that were published within the selected month (YYYY-MM) from the selected blog."
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        },
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "recent",
+                           "parameterized" : false,
+                           "supportedMethods" : {
+                              "GET" : "Get the most recent 50 published posts in the selected blog."
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        }
+                     ],
+                     "formatSensitive" : true,
+                     "name" : "published",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Post>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Post>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {},
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-category",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Post>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Post>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get all visibile posts in the selected blog that have been assigned to the given category."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-month",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Post>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Post>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get all visible posts in the selected blog that have a publication date within the selected month, specified as a string of the form \"YYYY-MM\"."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "recent",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Post>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Post>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get the most recent 50 posts in the selected blog, including draft and scheduled posts."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "post-assets",
+               "postObjectType" : {
+                  "name" : "Post",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "T<Editable> A list of categories associated with the post.",
+                        "name" : "categories",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "A list of links to the images that are embedded within the content of this post.",
+                        "name" : "embeddedImageLinks",
+                        "type" : "array<ImageLink>"
+                     },
+                     {
+                        "docString" : "A list of links to the videos that are embedded within the content of this post.",
+                        "name" : "embeddedVideoLinks",
+                        "type" : "array<VideoLink>"
+                     },
+                     {
+                        "docString" : "A list of links to the audio streams that are embedded within the content of this post.",
+                        "name" : "embeddedAudioLinks",
+                        "type" : "array<AudioLink>"
+                     },
+                     {
+                        "docString" : "T<Editable> The title of the post.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The description of the post.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The base name of the post to use when creating its M<permalinkUrl>.",
+                        "name" : "filename",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The raw post content. The M<textFormat> property defines what format this data is in.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> A keyword that indicates what formatting mode to use for the content of this post. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the draft status and publication date for this post.",
+                        "name" : "publicationStatus",
+                        "type" : "PublicationStatus"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the comment and trackback behavior for this post.",
+                        "name" : "feedbackStatus",
+                        "type" : "FeedbackStatus"
+                     },
+                     {
+                        "docString" : "The number of times this post has been reblogged by other people.",
+                        "name" : "reblogCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "A reference to a post of which this post is a reblog.",
+                        "name" : "reblogOf",
+                        "type" : "AssetRef"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Post>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Post>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of posts associated with the selected blog.",
+                  "POST" : "Add a new post to a blog"
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "Blog",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the object. This can be used to recognise where the same user is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The title of the blog.",
+                  "name" : "title",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL of the blog's home page.",
+                  "name" : "homeUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The user who owns the blog.",
+                  "name" : "owner",
+                  "type" : "User"
+               },
+               {
+                  "docString" : "The description of the blog as provided by its owner.",
+                  "name" : "description",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> An array of object type identifier URIs. This set will contain the string C<tag:api.typepad.com,2009:Blog> for a Blog object.",
+                  "name" : "objectTypes",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "The keyword identifying the type of object this is. For a Blog object, M<objectType> will be C<Blog>.",
+                  "name" : "objectType",
+                  "type" : "string"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected blog."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : false,
+         "canOmitId" : true,
+         "formatSensitive" : true,
+         "name" : "browser-upload",
+         "propertyEndpoints" : [],
+         "supportedMethods" : {
+            "POST" : "Submit an asset to a particular URL in the form of a multipart/form-data message with a file attachment."
+         },
+         "supportedQueryArguments" : [
+            "oauth_consumer_key",
+            "oauth_nonce",
+            "oauth_signature",
+            "oauth_signature_method",
+            "oauth_timestamp",
+            "oauth_token",
+            "oauth_version"
+         ]
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "client-library-helpers",
+         "propertyEndpoints" : [],
+         "supportedMethods" : {
+            "GET" : "Retrieve some data intended to be used for code generation in client libraries."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "events",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "Event",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the user. This can be used to recognise where the same user is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A keyword identifying the type of event this is.",
+                  "name" : "verb",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "T<Deprecated> An array of verb identifier URIs. This set will contain one verb identifier URI.",
+                  "name" : "verbs",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "The user who performed the action described by this event.",
+                  "name" : "actor",
+                  "type" : "Entity"
+               },
+               {
+                  "docString" : "The object to which the action described by this event was performed.",
+                  "name" : "object",
+                  "type" : "Base"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected event."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [
+            {
+               "formatSensitive" : true,
+               "name" : "add-feeds",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "A list of identifiers to be added to the subscription's set of feeds.",
+                        "name" : "feedIdents",
+                        "type" : "List<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Add one or more feed identifiers to the subscription."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "update-user",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "the urlId of the user who will own the assets and events posted into the group's stream by this subscription. The user must be an administrator of the group.",
+                        "name" : "postAsUser",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Change the \"post as\" user for a subscription owned by a group."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "update-filters",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The new list of rules for filtering notifications to this subscription; this will replace the subscription's existing rules.",
+                        "name" : "filterRules",
+                        "type" : "List<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Change the filtering rules for the subscription."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "remove-feeds",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "A list of identifiers to be removed from the subscription's set of feeds.",
+                        "name" : "feedIdents",
+                        "type" : "List<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Remove one or more feed identifiers from the subscription."
+               },
+               "supportedQueryArguments" : []
+            },
+            {
+               "formatSensitive" : true,
+               "name" : "update-notification-settings",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The new callback URL to receive notifications of new content in this subscription's feeds.",
+                        "name" : "callbackUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A subscriber-provided opaque token that will be echoed back in the verification request to assist the subscriber in identifying which subscription request is being verified.",
+                        "name" : "verifyToken",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Change the callback URL for the subscription."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "external-feed-subscriptions",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "feeds",
+               "resourceObjectType" : {
+                  "name" : "List<string>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of strings containing the identifiers of the feeds to which this subscription is subscribed."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "ExternalFeedSubscription",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs.",
+                  "name" : "urlId",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The URL to which to send notifications of new items in this subscription's feeds.",
+                  "name" : "callbackUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "TODO",
+                  "name" : "callbackStatus",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A list of rules for filtering notifications to this subscription. Each rule is an asset search query string as used with L<http://www.typepad.com/services/apidocs/endpoints/assets#full-text_search|the assets endpoint>. An item will be delivered to the M<callbackUrl> if it matches any one of these query strings.",
+                  "name" : "filterRules",
+                  "type" : "array<string>"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "DELETE" : "Remove the selected subscription.",
+            "GET" : "Get basic information about the selected subscription."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "favorites",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "Favorite",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the favorite. This can be used to recognise where the same favorite is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this favorite in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server such as the development server; use the M<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The user who saved this favorite. That is, this property is the user who saved the target asset as a favorite, not the creator of that asset.",
+                  "name" : "author",
+                  "type" : "User"
+               },
+               {
+                  "docString" : "A reference to the target asset that has been marked as a favorite.",
+                  "name" : "inReplyTo",
+                  "type" : "AssetRef"
+               },
+               {
+                  "docString" : "The time that the favorite was created, as an RFC3339 timestamp.",
+                  "name" : "published",
+                  "type" : "string"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "DELETE" : "Delete the selected favorite.",
+            "GET" : "Get basic information about the selected favorite, including its owner and the target asset."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [
+            {
+               "formatSensitive" : true,
+               "name" : "create-external-feed-subscription",
+               "postObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "A list of rules for filtering notifications to this subscription; each rule is a query string using the search API's syntax.",
+                        "name" : "filterRules",
+                        "type" : "List<string>"
+                     },
+                     {
+                        "docString" : "the urlId of the user who will own the assets and events posted into the group's stream by this subscription. The user must be an administrator of the group.",
+                        "name" : "postAsUser",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A list of identifiers of the initial set of feeds to be subscribed to.",
+                        "name" : "feedIdents",
+                        "type" : "List<string>"
+                     }
+                  ]
+               },
+               "responseObjectType" : {
+                  "properties" : [
+                     {
+                        "docString" : "The subscription object that was created.",
+                        "name" : "subscription",
+                        "type" : "ExternalFeedSubscription"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Subscribe the group to one or more external feeds."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "groups",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "admin",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have the Admin type between users and the selected group."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "member",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have the Member type between users and the selected group."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "blocked",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have the Blocked type between users and the selected groups. (Restricted to group admin.)"
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "memberships",
+               "resourceObjectType" : {
+                  "name" : "List<Relationship>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Relationship>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of relationships between users and the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "video-assets",
+               "postObjectType" : {
+                  "name" : "Video",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "A link to the video that is this Video asset's content.",
+                        "name" : "videoLink",
+                        "type" : "VideoLink"
+                     },
+                     {
+                        "docString" : "A link to a preview image or poster frame for this video. This property is omitted if no such image is available.",
+                        "name" : "previewImageLink",
+                        "type" : "ImageLink"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Video>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Video>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Create a new Video asset within the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "audio-assets",
+               "postObjectType" : {
+                  "name" : "Audio",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "A link to the audio stream that is this Audio asset's content.",
+                        "name" : "audioLink",
+                        "type" : "AudioLink"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Audio>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Audio>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Create a new Audio asset within the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "external-feed-subscriptions",
+               "resourceObjectType" : {
+                  "name" : "List<ExternalFeedSubscription>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<ExternalFeedSubscription>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of the group's active external feed subscriptions."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "photo-assets",
+               "postObjectType" : {
+                  "name" : "Photo",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "A link to the image that is this Photo asset's content.",
+                        "name" : "imageLink",
+                        "type" : "ImageLink"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Photo>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Photo>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Create a new Photo asset within the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "events",
+               "resourceObjectType" : {
+                  "name" : "List<Event>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Event>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of events describing actions performed in the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "link-assets",
+               "postObjectType" : {
+                  "name" : "Link",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "The URL that is the target of this link.",
+                        "name" : "targetUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Link>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Link>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Create a new Link asset within the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "post-assets",
+               "postObjectType" : {
+                  "name" : "Post",
+                  "parentType" : "Asset",
+                  "properties" : [
+                     {
+                        "docString" : "T<Editable> A list of categories associated with the post.",
+                        "name" : "categories",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "A list of links to the images that are embedded within the content of this post.",
+                        "name" : "embeddedImageLinks",
+                        "type" : "array<ImageLink>"
+                     },
+                     {
+                        "docString" : "A list of links to the videos that are embedded within the content of this post.",
+                        "name" : "embeddedVideoLinks",
+                        "type" : "array<VideoLink>"
+                     },
+                     {
+                        "docString" : "A list of links to the audio streams that are embedded within the content of this post.",
+                        "name" : "embeddedAudioLinks",
+                        "type" : "array<AudioLink>"
+                     },
+                     {
+                        "docString" : "T<Editable> The title of the post.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The description of the post.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The base name of the post to use when creating its M<permalinkUrl>.",
+                        "name" : "filename",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> The raw post content. The M<textFormat> property defines what format this data is in.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> A keyword that indicates what formatting mode to use for the content of this post. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the draft status and publication date for this post.",
+                        "name" : "publicationStatus",
+                        "type" : "PublicationStatus"
+                     },
+                     {
+                        "docString" : "T<Editable> An object describing the comment and trackback behavior for this post.",
+                        "name" : "feedbackStatus",
+                        "type" : "FeedbackStatus"
+                     },
+                     {
+                        "docString" : "The number of times this post has been reblogged by other people.",
+                        "name" : "reblogCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "A reference to a post of which this post is a reblog.",
+                        "name" : "reblogOf",
+                        "type" : "AssetRef"
+                     },
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the user.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL that is this asset's permalink. This will be omitted if the asset does not have a permalink of its own (for example, if it's embedded in another asset) or if TypePad does not know its permalink.",
+                        "name" : "permalinkUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who created the selected asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "The time at which the asset was created, as an L<http://www.ietf.org/rfc/rfc3339.txt|RFC3339> timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The raw asset content. The M<textFormat> property describes how to format this data. Use this property to set the asset content in write operations. An asset posted in a group may have a M<content> value up to 10,000 bytes long, while a O<Post> asset in a blog may have up to 65,000 bytes of content.",
+                        "name" : "content",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The content of this asset rendered to HTML. This is currently available only for O<Post> and O<Page> assets.",
+                        "name" : "renderedContent",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A short, plain-text excerpt of the entry content. This is currently available only for O<Post> assets.",
+                        "name" : "excerpt",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A keyword that indicates what formatting mode to use for the content of this asset. This can be C<html> for assets the content of which is HTML, C<html_convert_linebreaks> for assets the content of which is HTML but where paragraph tags should be added automatically, or C<markdown> for assets the content of which is Markdown source. Other formatting modes may be added in future. Applications that present assets for editing should use this property to present an appropriate editor.",
+                        "name" : "textFormat",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An array of strings containing the M<id> URIs of the groups that this asset is mapped into, if any. At present an asset can only be added to one group, but this may change in future.",
+                        "name" : "groups",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "An object describing the site from which this asset was retrieved, if the asset was obtained from an external source.",
+                        "name" : "source",
+                        "type" : "AssetSource"
+                     },
+                     {
+                        "docString" : "T<Deprecated> An array of object type identifier URIs identifying the type of this asset. Only the one object type URI for the particular type of asset this asset is will be present.",
+                        "name" : "objectTypes",
+                        "type" : "set<string>"
+                     },
+                     {
+                        "docString" : "The keyword identifying the type of asset this is.",
+                        "name" : "objectType",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "C<true> if this asset is a favorite for the currently authenticated user, or C<false> otherwise. This property is omitted from responses to anonymous requests.",
+                        "name" : "isFavoriteForCurrentUser",
+                        "type" : "boolean"
+                     },
+                     {
+                        "docString" : "The number of distinct users who have added this asset as a favorite.",
+                        "name" : "favoriteCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The number of comments that have been posted in reply to this asset. This number includes comments that have been posted in response to other comments.",
+                        "name" : "commentCount",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The title of the asset.",
+                        "name" : "title",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The description of the asset.",
+                        "name" : "description",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "An object describing the group or blog to which this asset belongs.",
+                        "name" : "container",
+                        "type" : "ContainerRef"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Post>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Post>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "POST" : "Create a new Post asset within the selected group."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "Group",
+            "parentType" : "Entity",
+            "properties" : [
+               {
+                  "docString" : "The display name set by the group's owner.",
+                  "name" : "displayName",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A tagline describing the group, as set by the group's owner.",
+                  "name" : "tagline",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> An array of object type identifier URIs.",
+                  "name" : "objectTypes",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "A keyword describing the type of this object. For a group object, M<objectType> will be C<Group>.",
+                  "name" : "objectType",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A link to an image representing this group.",
+                  "name" : "avatarLink",
+                  "type" : "ImageLink"
+               },
+               {
+                  "docString" : "The URL to the front page of the group website.",
+                  "name" : "siteUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the object. This can be used to recognise where the same user is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the C<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected group."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : true,
+         "formatSensitive" : true,
+         "name" : "nouns",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "Endpoint",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "The name of the noun, as it appears in URLs.",
+                  "name" : "name",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A mapping of the HTTP methods that this endpoint accepts to the docstrings describing the result of each method.",
+                  "name" : "supportedMethods",
+                  "type" : "map<string>"
+               },
+               {
+                  "docString" : "The names of the query string arguments that this endpoint accepts.",
+                  "name" : "supportedQueryArguments",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "C<true> if this endpoint requires a format suffix, or C<false> otherwise.",
+                  "name" : "formatSensitive",
+                  "type" : "boolean"
+               },
+               {
+                  "docString" : "For noun endpoints, an array of property endpoints that it supports.",
+                  "name" : "propertyEndpoints",
+                  "type" : "array<Endpoint>"
+               },
+               {
+                  "docString" : "For noun endpoints, an array of action endpoints that it supports.",
+                  "name" : "actionEndpoints",
+                  "type" : "array<Endpoint>"
+               },
+               {
+                  "docString" : "For noun endpoints, C<true> if an id part is accepted, or C<false> if the noun may only be used alone.",
+                  "name" : "canHaveId",
+                  "type" : "boolean"
+               },
+               {
+                  "docString" : "For noun endpoints, C<true> if the id part can be ommitted, or C<false> if it is always required.",
+                  "name" : "canOmitId",
+                  "type" : "boolean"
+               },
+               {
+                  "docString" : "For filter endpoints, C<true> if a parameter is required on the filter, or C<false> if it's a boolean filter.",
+                  "name" : "parameterized",
+                  "type" : "boolean"
+               },
+               {
+                  "docString" : "For endpoints that return lists, an array of filters that can be appended to the endpoint.",
+                  "name" : "filterEndpoints",
+                  "type" : "array<Endpoint>"
+               },
+               {
+                  "docString" : "The type of object that this endpoint represents for C<GET>, C<PUT> and C<DELETE> operations. This property is omitted for action endpoints, as they do not represent resources.",
+                  "name" : "resourceObjectType",
+                  "type" : "ObjectType"
+               },
+               {
+                  "docString" : "The type of object that this endpoint accepts for C<POST> operations. This property is omitted if this endpoint does not accept C<POST> requests.",
+                  "name" : "postObjectType",
+                  "type" : "ObjectType"
+               },
+               {
+                  "docString" : "For action endpoints, the type of object that this endpoint returns on success. If the endpoint returns no payload on success, or if this is not an action endpoint, this property is omitted.",
+                  "name" : "responseObjectType",
+                  "type" : "ObjectType"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get information about the selected noun, its sub-resources and their filters."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : true,
+         "formatSensitive" : true,
+         "name" : "object-types",
+         "propertyEndpoints" : [],
+         "resourceObjectType" : {
+            "name" : "ObjectType",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "The name of this object type. If this is an anonymous type representing the request or response of an action endpoint, this property is omitted.",
+                  "name" : "name",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The name of the parent type. This property is omitted if this object type has no parent type.",
+                  "name" : "parentType",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "The properties belonging to objects of this object type.",
+                  "name" : "properties",
+                  "type" : "array<ObjectProperty>"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get information about the selected object type and its properties."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "relationships",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "status",
+               "resourceObjectType" : {
+                  "name" : "RelationshipStatus",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "A list of relationship type URIs describing the types of the related relationship.",
+                        "name" : "types",
+                        "type" : "array<string>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get the status information for the selected relationship, including its types.",
+                  "PUT" : "Change the status information for the selected relationship, including its types."
+               },
+               "supportedQueryArguments" : []
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "List<Relationship>",
+            "parentType" : "Base",
+            "properties" : [
+               {
+                  "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                  "name" : "totalResults",
+                  "type" : "integer"
+               },
+               {
+                  "docString" : "The items within the selected slice of the list.",
+                  "name" : "entries",
+                  "type" : "array<Relationship>"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected relationship."
+         },
+         "supportedQueryArguments" : []
+      },
+      {
+         "actionEndpoints" : [],
+         "canHaveId" : true,
+         "canOmitId" : false,
+         "formatSensitive" : true,
+         "name" : "users",
+         "propertyEndpoints" : [
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "profile",
+               "resourceObjectType" : {
+                  "name" : "UserProfile",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The user's chosen display name.",
+                        "name" : "displayName",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user's location, as a free-form string they provided.",
+                        "name" : "location",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user's long description or biography, as a free-form string they provided.",
+                        "name" : "aboutMe",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A list of interests provided by the user and displayed on their profile page.",
+                        "name" : "interests",
+                        "type" : "array<string>"
+                     },
+                     {
+                        "docString" : "The name the user has chosen for use in the URL of their TypePad profile page. This property can be used to select this user in URLs, although it is not a persistent key, as the user can change it at any time.",
+                        "name" : "preferredUsername",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A link to an image representing this user.",
+                        "name" : "avatarLink",
+                        "type" : "ImageLink"
+                     },
+                     {
+                        "docString" : "The URL of the user's TypePad profile page.",
+                        "name" : "profilePageUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL of a widget that, when rendered in an C<iframe>, allows viewers to follow this user. Render this widget in an C<iframe> 300 pixels wide and 125 pixels high.",
+                        "name" : "followFrameContentUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL of a page where this user can edit their profile information. If this is not the authenticated user's UserProfile object, this property is omitted.",
+                        "name" : "profileEditPageUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The URL of a page where this user can manage their group memberships. If this is not the authenticated user's UserProfile object, this property is omitted.",
+                        "name" : "membershipManagementPageUrl",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The address of the user's homepage, as a URL they provided. This property is omitted if the user has not provided a homepage.",
+                        "name" : "homepageUrl",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a more extensive set of user properties that can be used to build a user profile page."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "admin",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have an Admin type that the selected user has with groups."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "member",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have a Member type that the selected user has with groups."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-group",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list containing only the relationship between the selected user and a particular group, or an empty list if the user has no relationship with the group."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "memberships",
+               "resourceObjectType" : {
+                  "name" : "List<Relationship>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Relationship>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of relationships that the selected user has with groups."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "favorites",
+               "postObjectType" : {
+                  "name" : "Favorite",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "A URI that serves as a globally unique identifier for the favorite. This can be used to recognise where the same favorite is returned in response to different requests, and as a mapping key for an application's local data store.",
+                        "name" : "id",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A string containing the canonical identifier that can be used to identify this favorite in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server such as the development server; use the M<id> property instead.",
+                        "name" : "urlId",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "The user who saved this favorite. That is, this property is the user who saved the target asset as a favorite, not the creator of that asset.",
+                        "name" : "author",
+                        "type" : "User"
+                     },
+                     {
+                        "docString" : "A reference to the target asset that has been marked as a favorite.",
+                        "name" : "inReplyTo",
+                        "type" : "AssetRef"
+                     },
+                     {
+                        "docString" : "The time that the favorite was created, as an RFC3339 timestamp.",
+                        "name" : "published",
+                        "type" : "string"
+                     }
+                  ]
+               },
+               "resourceObjectType" : {
+                  "name" : "List<Favorite>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Favorite>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of favorites that were listed by the selected user.",
+                  "POST" : "Create a new favorite in the selected user's list of favorites."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "blogs",
+               "resourceObjectType" : {
+                  "name" : "List<Blog>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Blog>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of blogs that the selected user has access to."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "by-group",
+                           "parameterized" : true,
+                           "supportedMethods" : {
+                              "GET" : "Get a list of relationships that have the Contact type that the selected user has with other users, constrained to members of a particular group."
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        }
+                     ],
+                     "formatSensitive" : true,
+                     "name" : "follower",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have the Contact type that the selected user has with other users."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-group",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that the selected user has with other users, and that other users have with the selected user, constrained to members of a particular group."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-user",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that the selected user has with a single other user."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  },
+                  {
+                     "filterEndpoints" : [
+                        {
+                           "filterEndpoints" : [],
+                           "formatSensitive" : true,
+                           "name" : "by-group",
+                           "parameterized" : true,
+                           "supportedMethods" : {
+                              "GET" : "Get a list of relationships that have the Contact type that other users have with the selected user, constrained to members of a particular group."
+                           },
+                           "supportedQueryArguments" : [
+                              "max-results",
+                              "start-index"
+                           ]
+                        }
+                     ],
+                     "formatSensitive" : true,
+                     "name" : "following",
+                     "parameterized" : false,
+                     "resourceObjectType" : {
+                        "name" : "List<Relationship>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Relationship>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of relationships that have the Contact type that other users have with the selected user."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "relationships",
+               "resourceObjectType" : {
+                  "name" : "List<Relationship>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Relationship>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of relationships that the selected user has with other users, and that other users have with the selected user."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [],
+               "formatSensitive" : true,
+               "name" : "elsewhere-accounts",
+               "resourceObjectType" : {
+                  "name" : "List<Account>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Account>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of elsewhere accounts for the selected user."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-group",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Event>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Event>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of events describing actions that the selected user performed in a particular group."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "events",
+               "resourceObjectType" : {
+                  "name" : "Stream<Event>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole stream of which this response contains a subset. C<null> if an exact count cannot be determined.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "An estimate of the total number of items in the whole list of which this response contains a subset. C<null> if a count cannot be determined at all, or if an exact count is returned in C<totalResults>.",
+                        "name" : "estimatedTotalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "An opaque token that can be used as the C<start-token> parameter of a followup request to retrieve additional results. C<null> if there are no more results to retrieve, but the presence of this token does not guarantee that the response to a followup request will actually contain results.",
+                        "name" : "moreResultsToken",
+                        "type" : "string"
+                     },
+                     {
+                        "docString" : "A selection of items from the underlying stream.",
+                        "name" : "entries",
+                        "type" : "array<Event>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of events describing actions that the selected user performed."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-token"
+               ]
+            },
+            {
+               "filterEndpoints" : [
+                  {
+                     "filterEndpoints" : [],
+                     "formatSensitive" : true,
+                     "name" : "by-group",
+                     "parameterized" : true,
+                     "resourceObjectType" : {
+                        "name" : "List<Event>",
+                        "parentType" : "Base",
+                        "properties" : [
+                           {
+                              "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                              "name" : "totalResults",
+                              "type" : "integer"
+                           },
+                           {
+                              "docString" : "The items within the selected slice of the list.",
+                              "name" : "entries",
+                              "type" : "array<Event>"
+                           }
+                        ]
+                     },
+                     "supportedMethods" : {
+                        "GET" : "Get a list of events describing actions in a particular group by users that the selected user is following."
+                     },
+                     "supportedQueryArguments" : [
+                        "max-results",
+                        "start-index"
+                     ]
+                  }
+               ],
+               "formatSensitive" : true,
+               "name" : "notifications",
+               "resourceObjectType" : {
+                  "name" : "List<Event>",
+                  "parentType" : "Base",
+                  "properties" : [
+                     {
+                        "docString" : "The total number of items in the whole list of which this list object is a paginated view.",
+                        "name" : "totalResults",
+                        "type" : "integer"
+                     },
+                     {
+                        "docString" : "The items within the selected slice of the list.",
+                        "name" : "entries",
+                        "type" : "array<Event>"
+                     }
+                  ]
+               },
+               "supportedMethods" : {
+                  "GET" : "Get a list of events describing actions by users that the selected user is following."
+               },
+               "supportedQueryArguments" : [
+                  "max-results",
+                  "start-index"
+               ]
+            }
+         ],
+         "resourceObjectType" : {
+            "name" : "User",
+            "parentType" : "Entity",
+            "properties" : [
+               {
+                  "docString" : "The user's chosen display name.",
+                  "name" : "displayName",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> The user's location, as a free-form string provided by them. Use the the M<location> property of the related O<UserProfile> object, which can be retrieved from the N</users/{id}/profile> endpoint.",
+                  "name" : "location",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> A list of interests provided by the user and displayed on the user's profile page. Use the M<interests> property of the O<UserProfile> object, which can be retrieved from the N</users/{id}/profile> endpoint.",
+                  "name" : "interests",
+                  "type" : "array<string>"
+               },
+               {
+                  "docString" : "The name the user has chosen for use in the URL of their TypePad profile page. This property can be used to select this user in URLs, although it is not a persistent key, as the user can change it at any time.",
+                  "name" : "preferredUsername",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A link to an image representing this user.",
+                  "name" : "avatarLink",
+                  "type" : "ImageLink"
+               },
+               {
+                  "docString" : "The URL of the user's TypePad profile page.",
+                  "name" : "profilePageUrl",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "T<Deprecated> An array of object type identifier URIs.",
+                  "name" : "objectTypes",
+                  "type" : "set<string>"
+               },
+               {
+                  "docString" : "The keyword identifying the type of object this is. For a User object, M<objectType> will be C<User>.",
+                  "name" : "objectType",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A URI that serves as a globally unique identifier for the object. This can be used to recognise where the same user is returned in response to different requests, and as a mapping key for an application's local data store.",
+                  "name" : "id",
+                  "type" : "string"
+               },
+               {
+                  "docString" : "A string containing the canonical identifier that can be used to identify this object in URLs. However, this should not be used as a database key to avoid collisions when an application is switched to a different backend server; use the C<id> property instead.",
+                  "name" : "urlId",
+                  "type" : "string"
+               }
+            ]
+         },
+         "supportedMethods" : {
+            "GET" : "Get basic information about the selected user."
+         },
+         "supportedQueryArguments" : []
+      }
+   ],
+   "totalResults" : 16
+}

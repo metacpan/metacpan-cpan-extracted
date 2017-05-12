@@ -1,0 +1,31 @@
+{
+   "abstract" : "Perl interface to JotForm's API -- currently only the read operations are fully supported.",
+   "author" : [
+      "Tim Vroom <vroom@blockstackers.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-JotForm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tvroom/WebService-JotForm",
+         "web" : "https://github.com/tvroom/WebService-JotForm.git"
+      }
+   },
+   "version" : "0.020"
+}

@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::Agent.
+
+0.03  Sat Mar 19 14:45:02 EST 2005
+	prepared for first public release (writing docs)
+
+0.02  Tue Mar 15 20:12:03 2005
+	integrated Director plugin, got most of the test cases working
+	added test cases for the agent itself
+
+0.01  Sun Mar 13 14:32:50 2005
+	first experimental version
+

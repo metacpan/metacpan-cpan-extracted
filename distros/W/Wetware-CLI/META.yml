@@ -1,0 +1,27 @@
+---
+name: Wetware-CLI
+version: 0.06
+author:
+  - '"drieux" <"drieux [AT] @wetware.com">'
+abstract: A base class wrapper on Getopt::Long::GetOptions()
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Getopt::Long: 0
+build_requires:
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Wetware::Test: 0.04
+  Wetware::Test::Suite: 0.04
+  Wetware::Test::Utilities: 0.02
+provides:
+  Wetware::CLI:
+    file: lib/Wetware/CLI.pm
+    version: 0.06
+  Wetware::CLI::TestSuite:
+    file: lib/Wetware/CLI/TestSuite.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

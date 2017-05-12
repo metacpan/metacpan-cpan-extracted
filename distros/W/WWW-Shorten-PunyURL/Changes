@@ -1,0 +1,12 @@
+Revision history for WWW::Shorten::PunyURL
+
+0.03    2009/04/12
+        Changed to inherit from WWW::Shorten::generic and add a procedural
+        interface according to the WWW::Shorten standard
+        
+0.02    2009/03/18
+        Support for preview
+        
+0.01    2009/03/14
+        First version.
+

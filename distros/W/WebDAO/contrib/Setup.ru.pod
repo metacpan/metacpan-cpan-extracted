@@ -1,0 +1,253 @@
+=begin pod
+=CHAPTER Конфигурирование  Webdao
+
+
+Конфигурирование производится с помощью переменных окружения.
+Предопределены следующие переменные:
+
+=begin table :caption('Конфигурационные параметры')
+Имя                  описание            пример 
+------------|--------------------------|-------------------
+wdIndexFile |" index.html - наименование файла, который будет обрабатываться при поступлении запросов. В качестве значения возможны: полный путь, или путь относительно C<DOCUMENT_ROOT>. По умолчанию: C<$ENV{DOCUMENT_ROOT}/index.xhtml> "|  index.html
+wdEngine | наименование пакета основного модуля. Этот модуль обслуживает все запросы поступающие к I</>. По умолчанию: I<WebDAO::Engine> | ShowPrice
+wdEnginePar |" параметры инициализации при создании основного модуля. Значение - строка, содержащая пары I<ключ=значние>. Пары отделяются друг от друга I<;>. По умолчанию: I<undef> "| config=/home/zag/showprice.ini
+wdSession |" имя пакета модуля, обслуживающего сессионность. Этот модуль используется для идентификации web сессии. По умолчанию: I<WebDAO::Session> "| WebDAO::Sessionco 
+wdFCGIreq  | количество запросов на I<FastCGI> процесс. Параметр используется при работе в режиме I<FastCGi>. По умолчанию: -1 - unlimited | 1000
+wdDebug  |" уровень отладки. 1 - критические ошибки, 2 .. n - warns, info.  По умолчанию: 0 - отключен "| 2
+
+=end table
+
+Для сервера lighttpd используются имена соответвенно: WD_INDEXFILE, WD_ENGINE, WD_ENGINE_PAR, WD_SESSION, WD_STORE, WD_STORE_PAR, WD_DEBUG.
+
+
+=head2 Конфигурирование Web сервера
+
+Поддерживаются все распространенные Web  сервера: IIS (isapi_fcgi.dll), nginx, lighttpd, apache. 
+
+I<WebDAO> поддерживает режимы I<cgi>, I<FastCGi>, I<mod_perl>. Наиболее производительным является режим I<FastCGI>.
+
+В описании используются следующие исходные условия.
+
+=begin table :caption('Исходные данные')
+Наименование параметра                            | Значение
+--------------------------------------------------|----------------
+Web root                                          | /usr/zag/www
+Временный каталог                                 | /tmp        
+Каталог для записи логов                          | /var/log/   
+Наименование домена                               | example.org 
+Расположение файлового сокета для FastCGI сервера | /tmp/myapp.socket
+
+=end table
+
+=head3 Настройка Standalone сервера FastCGI
+
+В состав пакета I<WebDAO> входит скрипт C<wd_fcgi.fpl> ( C</usr/local/bin/wd_fcgi.fpl> for example).
+Для запуска самостоятельного сервера используется следующая строка :
+
+    #!/bin/sh
+    /usr/local/bin/wd_fcgi.fpl -d -l /tmp/myapp.socket -n 5 -maxreq 1000
+
+Для получения справки используется параметр I<--help>:
+
+        /usr/local/bin/wd_fcgi.fpl --help
+
+Вывод:
+
+    Usage:
+    wd_fcgi.fpl [options]
+
+        -d -daemon     Daemonize the server.
+        -p -pidfile    Write a pidfile with the pid of the process manager.
+        -l -listen     Listen on a socket path, hostname:port, or :port.
+        -n -nproc      The number of processes started to handle requests.
+        -m -maxreq     Number of request before process will be restarted 
+                       -1 - unlimited. (defailt: -1)
+
+
+=head4 nginx ( standalone FastCGI)
+
+=item  Простой пример
+
+
+    server {
+        listen       80;
+        server_name  example.org;
+
+        charset utf-8;
+
+        access_log  /var/log/nginx/example.org-access.log ;
+	error_log  /var/log/nginx/example.org-error.log  debug;
+        root   /home/zag/www/;
+        location ~ / {
+            include        fastcgi_params;
+            fastcgi_pass   unix:/tmp/webdao.sock;
+            fastcgi_param wdSession WebDAO::Sessionco;
+            fastcgi_param wdIndexFile index.xhtm;
+        }
+
+    }
+
+=item  Пример с использованием собственного пакета основного модуля
+
+Для примера пусть используется в качестве имени модуля: I<MySite>. Конструктор этого класса в качестве параметра принимает I<config> - путь к конфигурационному файлу.
+
+
+    server {
+        listen       80;
+        server_name  example.org;
+
+        charset utf-8;
+
+        access_log  /var/log/nginx/example.org-access.log;
+	error_log  /var/log/nginx/example.org-error.log  debug;
+        root   /home/zag/www/;
+        #sample for static data
+        #location ~* ^/(js|imag|img|data|data2|css|static|images)/ {
+        #}
+        location ~ / {
+            include        fastcgi_params;
+            fastcgi_pass   unix:/tmp/webdao.sock;
+            fastcgi_param wdSession WebDAO::Sessionco;
+            fastcgi_param wdIndexFile index.xhtm;
+    	    fastcgi_param wdEngine MySite;
+	    fastcgi_param wdEnginePar config=/home/zag/www/mysite.ini;
+        }
+
+    }
+
+=head4 apache (static + standalone  FastCGI)
+
+Возможны два режима. Когда используется собственный менеджер I<FCGI>( I<FastCgiServer> ) и
+кода подключение производится через FCGI сокет.
+
+Требуется установка модуля I<mod_fastcgi>:
+
+        mod_fastcgi-2.4.2
+
+В глобальной части C<httpd.conf> требуется добавить одну из необходимых секций:
+
+=item 1 Static (FastCgiServer)
+
+     <LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+        <IfModule mod_fastcgi.c>
+        AddHandler fastcgi-script fpl fcgi
+        FastCgiServer /usr/local/bin/wd_fcgi.fpl \
+            -idle-timeout 3000 -flush -restart-delay 5 \
+            -initial-env wdFCGIreq=1000 -processes 4 \
+    </IfModule>
+
+=item 2 Standalone ( FastCgiExternalServer )
+
+     <LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+      <IfModule mod_fastcgi.c>
+      # Connect via net socket
+      # FastCgiExternalServer /usr/local/bin/wd_fcgi.fpl -host localhost:60000
+       FastCgiExternalServer /usr/local/bin/wd_fcgi.fpl -socket /tmp/myapp.socket
+      </IfModule>
+
+Настройки секции B<VirtualHost>:
+
+ <VirtualHost>
+    DocumentRoot /usr/zag/www
+    ServerName example.org
+    ErrorLog /var/log/example.org-error_log
+    CustomLog /var/log/example.org-access_log common
+    SetEnv wdEngine WedDAO::Kern
+    SetEnv wdIndexFile index.xhtml
+    SetEnv wdSession WebDAO::Sessionco
+
+    RewriteEngine on
+    AddDefaultCharset UTF-8
+    RewriteCond     %{HTTP:Authorization}   ^(.*)$ [NC]
+    RewriteRule     /.*             -       [E=HTTP_AUTHORIZATION:%1]
+    <IfModule mod_fastcgi.c>
+        RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+        RewriteRule ^/(.*) /usr/local/bin/wd_fcgi.fpl?$1 [QSA]
+    </IfModule>
+ </VirtualHost>
+
+
+
+=head4 lighttpd (standalone FastCGI)
+
+    var.engine = "ZagSite"
+    var.defaults = (
+        "WD_SESSION"=>"WebDAO::Sessionco",
+        "WD_INDEXFILE"=>"index.xhtm"
+    )
+    $HTTP["host"] == "example.org" {
+    server.document-root    = "/home/zag/www/"
+    setenv.add-environment =  var.defaults 
+    }
+    #use custom root class - MySite
+    $HTTP["host"] == "example.com" {
+    server.document-root    = "/home/zag/www/"
+    setenv.add-environment =  var.defaults + (  
+        "WD_ENGINE" => "MySite",
+        "WD_ENGINE_PAR"=>"config=/home/zag/www/mysite.ini" 
+        )
+    }
+    #skip static 
+    $HTTP["url"] !~ "^/(js|imag|img|css|static)" {
+       fastcgi.server = (
+        "" => (
+            "" => (
+                "socket"      => "/tmp/webdao.sock",
+                "check-local" => "disable"
+                    )
+                )
+            )
+
+    }
+
+
+=head3 Настройка cgi сервера 
+
+Для работы I<WebDAO> как  I<CGI> приложения используется скрипт I<wd_cgi.pl>.
+
+
+=head4 apache ( CGI )
+
+ <VirtualHost *>
+    DocumentRoot /usr/zag/www
+    ServerName example.org
+    ErrorLog /var/log/example.org-error_log
+    CustomLog /var/log/example.org-access_log common
+    
+    SetEnv wdIndexFile index.xhtm
+    SetEnv wdEngine WebDAO::Engine
+    SetEnv wdSession WebDAO::Sessionco
+    
+    RewriteEngine on
+    RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+    RewriteRule ^/(.*) /usr/local/bin/wd_cgi.pl?$1 [QSA]
+    <Directory "/usr/local/bin/wd_cgi.pl">
+      AddHandler cgi-script cgi pl
+      Options Indexes FollowSymLinks ExecCGI
+    </Directory>
+ </VirtualHost>
+
+=head4 Запуск из I<shell>
+
+Для запуска из командной строки используется скрипт I<wd_shell.pl>. В процессе выполнения используются переменные окружения.
+
+  Usage:
+      wd_shell.pl [options] file.pl
+
+       options:
+
+        -help  - print help message
+        -man   - print man page
+        -f file    - set root [x]html file 
+  
+  Options:
+
+    -help   Print a brief help message and exits
+    -man    Prints manual page and exits
+    -f filename
+            Set filename set root [x]html file for load domain
+
+Для написания тестов используется C<WebDAO::Test>.
+
+=end pod
+

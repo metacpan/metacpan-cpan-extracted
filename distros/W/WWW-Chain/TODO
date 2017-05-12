@@ -1,0 +1,54 @@
+[17:43:11] <Getty> mst: WWW::Chain, you should actually give a (destructive) comment
+[17:45:05] <mst> Getty: stash seems pointless. just close over a hash.
+[17:45:24] <mst> concept is neat.
+[17:45:51] <mst> CPS::Future would simplify the implementation
+[17:46:08] <mst> __PACKAGE__ should be ref($self)
+[17:46:33] <Getty> mst: i thought of that
+[17:46:45] <mst> BUILDARGS should allow a hashref for easier custom crack usage
+[17:47:08] <Getty> mst: but i dont feel well by that, the stash is actually just a helper, in the concept you extend WWW::Chain more to your needs
+[17:47:18] <Getty> i will add that you can give function name instead of coderef
+[17:47:31] <Getty> then you can make a MyAPI::Chain::ComplexRequest extends WWW::Chain
+[17:47:33] <Getty> that was my idea
+[17:47:53] <Getty> what you suggested was something i wanted to add on top as wrapper (easy usage)
+[17:47:57] <Getty> definitly on plan
+[17:47:58] <mst> $self->next_coderef->($self, @responses);
+[17:48:01] <mst> replace that with
+[17:48:09] <mst> $self->${\$self->next_coderef}(@responses);
+[17:48:13] <mst> now it'll accept a method name.
+[17:48:21] <Getty> LOL
+[17:48:36] <Getty> ok thanks :)
+[17:48:42] <mst> I do that all the time for coderef-or-method-name
+[17:48:44] <mst> nice and simple
+[17:48:50] <mst> for mst values of simple :)
+[17:48:52] <Getty> btw thats the first time i use this ->isa thing, i'm still kinda confused of all this
+[17:49:03] <mst> ->isa thing?
+[17:49:08] <mst> oh
+[17:49:12] <Getty> yeah, i never did it before
+[17:49:18] <mst> use Safe::Isa;
+[17:49:22] <Getty> i did (even tho i know it was wrong) always just the ref thing
+[17:49:28] <mst> if ($arg->$_isa('HTTP::Request')) { # simpler
+[17:49:31] <Getty> ah ok, thanks, does that also covers HASH and stuff?
+[17:49:48] <Getty> wait i dont get $arg->$_isa 8-)
+[17:49:58] <mst> that's because you didn't read http://p3rl.org/Safe::Isa yet
+[17:50:01] <Getty> also about the blessing, this is so annoying
+[17:50:05] <mst> another in the Import::Into series of crack
+[17:50:13] <mst> you might also like http://p3rl.org/curry btw
+[17:50:45] <mst> anyway, just got back from IPW, be back once I put some coffee on and take a shit
+[17:50:49] * Getty feels like getting productive
+[17:50:53] <Getty> yeah sure, no hurry :)
+[17:50:55] <Getty> thanks for that stuff
+[17:51:00] <Getty> implementing it in some minutes after my first joint ;)
+[17:53:15] <Getty> mst: just for later read: i want to abstract that concept to a module "Chain" which takes like anything ::Request (or whatever) and you can make a mapping table how to handle which kind of ::Request
+[17:53:31] <Getty> mst: (also will add HashRef giving of request, so that you get a hashref of responses, for labeled requests)
+[17:53:52] <Getty> mst: i just want to "checkout" the concept in reality with WWW::Chain and then out of the learning from there make Chain :)
+[17:56:12] <mst> also look at http://p3rl.org/Object::Deferred
+[17:56:22] <mst> I think Chain should be that, rewritten atop CPS::Future, with more sugar
+[17:56:59] <Getty> AH! cool yeah that looks similar
+[17:57:18] <mst> right. and CPS::Future is a better base implementation
+[17:57:26] <mst> also - the Object::Remote start:: stuff is build using CPS::Future
+[17:57:32] <mst> so you can re-use that once it gets split out
+[17:57:46] <Getty> yeah, nice nice
+[17:58:40] <Getty> even tho i must say that simplicity was a key point (for using it also in highspeed context)
+[17:58:48] <Getty> i hope CPS::Future is very very light
+[17:59:03] <mst> zero dep.
+[17:59:07] <mst> hence why O::R uses it

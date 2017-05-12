@@ -1,0 +1,597 @@
+
+=head1 NAME
+
+Win32::GUI::Reference::Options - Common Options
+
+=head1 INTRODUCTION
+
+This page details the options that are common to all 
+packages, and may be used in most object's C<new()>
+and L<Change()|Win32::GUI::Reference::Methods/Change>
+mthods.
+
+This document illustrates the options available when creating
+an object (in particular, windows and controls).
+Here you'll find the general options, the ones that apply to
+every window class; for class-specific options, refer to that
+package reference.
+
+=head1 OPTIONS
+
+=head2 -acceptfiles
+
+=over
+
+=item B<-acceptfiles> => 0/1
+
+=back
+
+Allow the window or control to act as a drop target for files
+dragged from the shell.
+
+=head2 -addexstyle
+
+=over
+
+=item B<-addexstyle> => NUMBER
+
+=back
+
+See L<-pushexstyle|/-pushexstyle>
+
+=head2 -addstyle
+
+=over
+
+=item B<-addstyle> => NUMBER
+
+=back
+
+See L<-pushstyle|/-pushstyle>
+
+=head2 -background
+
+=over
+
+=item B<-background> => COLOR
+
+=back
+
+Defines the background color for the control.
+Note that not all controls support background and foreground
+colors.
+
+=head2 -caption
+
+=over
+
+=item B<-caption> => STRING
+
+=back
+
+See L<-text|/-text>
+
+=head2 -class
+
+=over
+
+=item B<-class> => CLASS
+
+=back
+
+Specifies the window class (which is different
+from the Perl's object class, eg. Win32::GUI::Button) for
+the window; all the predefined objects have hardcoded class
+names (eg. "BUTTON" for Win32::GUI::Button), so you shouldn't
+want to pick a different one unless you are familiar with
+window classes and you want to subclass an existing one.
+This technique is documented in the Microsoft Platform SDK 
+Reference.  The CLASS parameter can be either a name or a reference
+to a L<Win32::GUI::Class|Win32::GUI::Class> object. 
+
+=head2 -container
+
+=over
+
+=item B<-container> => 0/1
+
+=back
+
+[TBD]
+
+=head2 -cursor
+
+=over
+
+=item B<-cursor> => CURSOR
+
+=back
+
+Defines the default cursor for the control; must be a L<Win32::GUI::Cursor|Win32::GUI::Cursor>
+object, or a windows HCURSOR handle.
+
+=head2 -disabled
+
+=over
+
+=item B<-disabled> => 0/1
+
+=back
+
+Sets the initial enabled state for the control; by default
+this option is 0 (the control is enabled). Set it to 1
+to create a control which is initially disabled.
+
+=head2 -eventmodel
+
+=over
+
+=item B<-eventmodel> => STRING
+
+=back
+
+Sets the event model from the window or control. Can be one of the following
+values:
+  "byname" - the default.  Set the OEM (old event model) where events cause
+             callback to the subroutine named OBJECTNAME_EVENTNAME()
+  "byref"  - Set automatically when one of the L<-on*|/-onEVENT> event handlers is used.
+             Sets the NEM (new event model) where the L<-on*|/-onEVENT> option
+             is used to specify the callback subroutine explicitly.
+  "both"   - Sets both OEM and NEM.  USeful if you want to handle one event with the NEM,
+             and another event with OEM.
+
+=head2 -events
+
+=over
+
+=item B<-events> => NUMBER
+
+=back
+
+[TBD]
+
+=head2 -exstyle
+
+=over
+
+=item B<-exstyle> => NUMBER
+
+=back
+
+Sets the extended style for the window.  Use of this option is
+deprecated.  Use L<-pushexstyle|/-pushexstyle> or L<-popexstyle|/-popexstyle>
+(or one of their alternatives) instead.
+
+=head2 -font
+
+=over
+
+=item B<-font> => FONT
+
+=back
+
+Defines the default font for the control; must be a L<Win32::GUI::Font|Win32::GUI::Font>
+object, or a windows HFONT handle.
+
+=head2 -foreground
+
+=over
+
+=item B<-foreground> => COLOR
+
+=back
+
+Defines the foreground color for the control.
+Note that not all controls support background and foreground
+colors.
+
+=head2 -group
+
+=over
+
+=item B<-group> => 0/1
+
+=back
+
+[TBD]
+
+=head2 -height
+
+=over
+
+=item B<-height> => NUMBER
+
+=back
+
+Specifies the height of the window or control in pixels.
+
+=head2 -hscroll
+
+=over
+
+=item B<-hscroll> => 0/1
+
+=back
+
+[TBD]
+
+=head2 -instance
+
+=over
+
+=item B<-instance> => HINSTANCE
+
+=back
+
+[TBD]
+
+=head2 -left
+
+=over
+
+=item B<-left> => NUMBER
+
+=back
+
+Specifies the left position (X coordinate) for the window,
+in pixels. For Windows and DialogBoxes is absolute (screen
+position), while for controls is relative to the client
+area of their parent window.
+
+=head2 -menu
+
+=over
+
+=item B<-menu> => MENU
+
+=back
+
+Specifies a L<Win32::GUI::Menu|Win32::GUI::Menu> object or a
+Windows HMENU handle for a window menu to be associated with the
+window.  Only top-level windows can display window menus
+
+=head2 -name
+
+=over
+
+=item B<-name> => STRING
+
+=back
+
+Defines the name for the window or control. The name is used to callback its events and 
+to access its methods, so it is absolutely B<necessary> when using the OEM.
+If not supplied, a system generated value will be used.  If supplied each
+name must be unique in your application. 
+
+Example: 
+
+    $Window->AddButton(
+        -name => "Button1",
+        # ...
+    );
+
+    # methods...
+    $Window->Button1->Hide();
+
+
+    # events...
+    sub Button1_Click {
+        # ...
+    }
+
+=head2 -negexstyle
+
+=over
+
+=item B<-negexstyle> => NUMBER
+
+=back
+
+See L<-popexstyle|/-popexstyle>
+
+=head2 -negstyle
+
+=over
+
+=item B<-negstyle> => NUMBER
+
+=back
+
+See L<-popstyle|/-popstyle>
+
+=head2 -notexstyle
+
+=over
+
+=item B<-notexstyle> => NUMBER
+
+=back
+
+See L<-popexstyle|/-popexstyle>
+
+=head2 -notstyle
+
+=over
+
+=item B<-notstyle> => NUMBER
+
+=back
+
+See L<-popstyle|/-popstyle>
+
+=head2 -onEVENT
+
+=over
+
+=item B<-onEVENT> => SUB
+
+=back
+
+Sets the NEM (new event model) where the subroutine called when
+an event occurs is explicitly given to this option.
+
+B<SUB> is a subroutine name or a reference to a subroutine.
+
+B<EVENT> is one of the events supported by the window/control.
+(e.g. 'Click', 'Terminate', ...)
+
+Setting this option prevents this control calling subroutines of the form
+OBJECTNAME_EVENTNAME() - See L<-eventmodel|/-eventmodel>.
+
+The first parameter passed to the subroutine is a reference to the object
+on which the event occured.
+
+Eample:
+
+  ...
+  my $button = Win32::GUI::Button->new(
+    -text = "Click me!",
+    -onClick => sub { print "Button Clicked\n"; },
+  );
+  ...
+
+=head2 -parent
+
+=over
+
+=item B<-parent> => WINDOW
+
+=back
+
+Sets the parent window of the window/control being created.
+WINDOW must be a Win32::GUI Window or Control object, or
+a windows HWND handle.
+
+=head2 -popexstyle
+
+=over
+
+=item B<-popexstyle> => NUMBER
+
+=back
+
+Remove the specified extended styles from the window's extended style mask.
+This option can be repeated multiple times, or values can be
+'or'ed together.
+
+=head2 -popstyle
+
+=over
+
+=item B<-popstyle> => NUMBER
+
+=back
+
+Remove the specified styles from the window's style mask.
+This option can be repeated multiple times, or values can be
+'or'ed together.
+
+=head2 -pos
+
+=over
+
+=item B<-pos> => [ X, Y ]
+
+=back
+
+Defines the position for the window or control; note that X and Y must be passed in an
+array reference, eg:
+
+    -pos => [ 100, 100 ],    # correct
+    -pos =>   100, 100,      # WRONG
+    -pos => @coords,         # WRONG
+    -pos => \@coors,         # correct
+
+=head2 -pushexstyle
+
+=over
+
+=item B<-pushexstyle> => NUMBER
+
+=back
+
+Add the specified extended styles to the window's extended style mask.
+This option can be repeated multiple times, or values can be
+'or'ed together.
+
+=head2 -pushstyle
+
+=over
+
+=item B<-pushstyle> => NUMBER
+
+=back
+
+Add the specified styles to the window's style mask.
+This option can be repeated multiple times, or values can be
+'or'ed together.
+
+=head2 -remexstyle
+
+=over
+
+=item B<-remexstyle> => NUMBER
+
+=back
+
+See L<-popexstyle|/-popexstyle>
+
+=head2 -remstyle
+
+=over
+
+=item B<-remstyle> => NUMBER
+
+=back
+
+See L<-popstyle|/-popstyle>
+
+=head2 -size
+
+=over
+
+=item B<-size> => [ X, Y ]
+
+=back
+
+Defines the size for the window; note that X and Y must be passed in an
+array reference, eg:
+
+    -size => [ 100, 100 ],    # correct
+    -size =>   100, 100,      # WRONG
+    -size => @coords,         # WRONG
+    -size => \@coors,         # correct
+
+=head2 -style
+
+=over
+
+=item B<-style> => NUMBER
+
+=back
+
+Sets the style for the window.  Use of this option is
+deprecated.  Use L<-pushstyle|/-pushstyle> or L<-popstyle|/-popstyle>
+(or one of their alternatives) instead.
+
+=head2 -tabstop
+
+=over
+
+=item B<-tabstop> => 0/1
+
+=back
+
+If 1, the control can be enabled by pressing
+the TAB key to switch between controls.
+Note that this functionality is available
+in dialog objects only,
+so the control must be child of a DialogBox
+or a Window with the C<-dialogui> option set
+for this option to be effective.
+
+=head2 -text
+
+=over
+
+=item B<-text> => STRING
+
+=back
+
+Specifies the STRING that will appear on
+the window's caption or in the control's body (eg. a
+Label text, a Button caption, a Textfield content, and
+so on). Its use depends of course on the control type;
+some controls, like ProgressBars, makes no use of it
+at all.
+
+=head2 -tip
+
+=over
+
+=item B<-tip> => STRING
+
+=back
+
+B<STRING> specifies the text that will appear in a tooltip when the
+mouse hovers over the window/control.  This option provides a simple,
+but non-flexible way to add tooltips to windows.  For better
+flexibility see L<Win32::GUI::Tooltip|Win32::GUI::Tooltip>.
+
+=head2 -title
+
+=over
+
+=item B<-title> => STRING
+
+=back
+
+See L<-text|/-text>
+
+=head2 -top
+
+=over
+
+=item B<-top> => NUMBER
+
+=back
+
+Specifies the top position (Y coordinate) for the window,
+in pixels. For Windows and DialogBoxes is absolute (screen
+position), while for controls is relative to the client
+area of their parent window.
+
+=head2 -visible
+
+=over
+
+=item B<-visible> => 0/1
+
+=back
+
+Sets the visibility of a window/control (and its children).
+
+=head2 -vscroll
+
+=over
+
+=item B<-vscroll> => 0/1
+
+=back
+
+[TBD]
+
+=head2 -width
+
+=over
+
+=item B<-width> => NUMBER
+
+=back
+
+Specifies the width of the window or control in pixels.
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/Reference/Options.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

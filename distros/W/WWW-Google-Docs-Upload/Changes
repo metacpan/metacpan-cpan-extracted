@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Google::Docs::Upload
+
+0.02 2008-05-12T12:43:01+09:00
+     - fixed a bug in example script
+     - no lib code changes
+
+0.01 2008-05-12T11:57:31+09:00
+     - initial version

@@ -1,0 +1,37 @@
+---
+name: WWW-FreshMeat-API
+version: 0.03
+author:
+  - 'Barry Walsh <draegtun@cpan.org>'
+abstract: inspect & update your freshmeat.net projects
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/draegtun/WWW-FreshMeat-API
+build_requires:
+  Test::More: 0
+requires:
+  Moose: 0.4
+  XML::RPC: 0.8
+configure_requires:
+  Module::Build: 0.35
+provides:
+  WWW::FreshMeat::API:
+    file: lib/WWW/FreshMeat/API.pm
+    version: 0.03
+  WWW::FreshMeat::API::Agent::XML::RPC:
+    file: lib/WWW/FreshMeat/API/Agent/XML/RPC.pm
+    version: 0.01
+  WWW::FreshMeat::API::Pub:
+    file: lib/WWW/FreshMeat/API/Pub.pm
+    version: 0.01
+  WWW::FreshMeat::API::Pub::V1_03:
+    file: lib/WWW/FreshMeat/API/Pub/V1_03.pm
+    version: 0.01
+  WWW::FreshMeat::API::Session:
+    file: lib/WWW/FreshMeat/API/Session.pm
+    version: 0.01
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

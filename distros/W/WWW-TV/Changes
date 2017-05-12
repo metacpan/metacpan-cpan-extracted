@@ -1,0 +1,66 @@
+Revision history for Perl extension WWW::TV.
+
+0.14  Fri Mar 13 10:07:29 2009
+	- More HTML changes from TV.com breaking stuff. Thanks to Marshall McMullen for the report.
+
+0.13  Fri Feb 06 10:31:29 2009
+	- Yet another HTML change from TV.com breaking stuff. Thanks to Jason Johnston-Mcleod for the report.
+
+0.12  Mon Jan 12 17:58:29 2009
+	- Fix bug with first_aired, not quite sure what was causing it.
+	- Fix issue with image capturing, TV.com made some slight template changes.
+	- Fix issue with "all" episodes, previously 0 was the way to ask for all,
+      now it's as simple as "All".
+
+0.11  Wed Oct 08 16:29:07 2008 (Stephen Steneker)
+	- Add option to use country-specific tv.com urls
+	  (default www.tv.com is geotargeted based on IP addresses)
+	- Add methods to get/set agent() and site()
+	- Increase test coverage for format_details specifiers
+
+0.10  Fri Oct 03 17:40:28 2008
+	- TV.com updated their design, nothing was working.
+
+0.09  Mon Mar 10 11:42:28 2008
+	- Fixed a bug caused by TV.com no longer encoding &'s and what not.
+
+0.08  Fri Mar 09 00:42:28 2007
+	- Fixed a bug with the "series_id" field, cos TV.com changed templates.
+		- Thanks to Anatoliy Dmytriyev for the report.
+
+0.07  Thu Feb 29 09:08:28 2007
+	- Remove a test placeholder that I'd retardedly left in the wrong spot.
+
+0.06  Wed Feb 28 10:32:28 2007 (Stephen Steneker)
+	- Can restrict $series->episodes to a specific season
+	- Add $episode->format_details for creating a compact summary of details
+	- Add $episode->season to return all episodes from same season
+	- Add $episode->series_id to return series ID
+	- Add support for setting user-agent in constructors
+	- $series->genres, $series->cast now return array if appropriate
+	- Fix for parsing episodes that haven't been aired yet
+		[RT#21161: Ulrich MŸller]
+
+0.05  Fri Feb 16 21:55:28 2007
+	- Fix failing test due to HTML content changes.
+
+0.04  Sun Aug 09 21:38:28 2006
+	- Remove the "video" div from episodes summary parsing.
+
+0.03  Sun Jul 30 14:50:28 2006
+	- Fix bug with directors/writers in previous release
+	- Fix bug with genres that must have never been really tested properly.
+
+0.02  Sun Jul 30 10:05:28 2006
+	- Added LICENSE file.
+	- Added version numbers to all perl modules.
+	- Dropped the requirement for perl 5.8 down to perl 5.6.1.
+	- Fixed a bug with the "name" field, cos TV.com changed templates.
+	- first_aired now returns an ISO format.
+	- Added episode support for cast/guest_stars/recurring_roles/director/writer
+	- Added tests for the new supported fields.
+
+0.01  Tue Jun 27 14:33:28 2006
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::TV
+

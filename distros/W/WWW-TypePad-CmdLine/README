@@ -1,0 +1,72 @@
+NAME
+    WWW::TypePad::CmdLine - Helper library for writing WWW::TypePad apps
+
+SYNOPSIS
+        use WWW::TypePad::CmdLine;
+    
+        # Returns a WWW::TypePad instance, initialized with the necessary
+        # consumer key/secret and access token/secret.
+        my $tp = WWW::TypePad::CmdLine->initialize( requires_auth => 1 );
+
+        # Then, you can do something like this:
+        my $user = $tp->users->get( '@self' );
+
+DESCRIPTION
+    *WWW::TypePad::CmdLine* is a helper library for writing command-line
+    applications that use *WWW::TypePad*. It handles the one-time OAuth
+    authentication flow, config file setup, and storage of access tokens.
+
+    Tokens and configuration are stored between runs of your application in
+    a config file. By default, that config file will be located at:
+
+        File::Spec->catfile( File::HomeDir->my_data, '.www-typepad-info' )
+
+    *File::HomeDir->my_data* is an OS-aware data directory. On OS X, for
+    example, it's ~/Library/Application Support.
+
+    *WWW::TypePad::CmdLine* automatically adds a "--config" command-line
+    option for your application, so that it's easy to support different
+    locations for configuration files.
+
+    On the first execution of a script using *WWW::TypePad::CmdLine*, you'll
+    need to set the "TP_CONSUMER_KEY" and "TP_CONSUMER_SECRET" environment
+    variables to the consumer key and secret for your TypePad application,
+    respectively. You can also set "TP_HOST" to a host other than
+    "api.typepad.com". Once the configuration file is saved after the first
+    call to *initialize*, future runs of your script won't require these
+    environment variables.
+
+USAGE
+  WWW::TypePad::CmdLine->initialize( %param )
+    Initializes and returns a new *WWW::TypePad* object, initialized with
+    all of the necessary information to start using it for authenticated
+    requests (see "requires_auth").
+
+    The configuration and tokens are stored between runs of your application
+    in a config file (see above). If the config file doesn't exist, and your
+    application requires authentication (see "requires_auth"), *initialize*
+    will send the user through the OAuth authentication flow.
+
+    When control returns to your application from calling *initialize*,
+    you'll have a *WWW::TypePad* object initialized with everything you need
+    to make authenticated (or non-authenticated) requests.
+
+    *%param* can contain:
+
+    *   requires_auth
+
+        Controls whether or not your application requires an authenticated
+        user in order to function. This controls whether, in the absence of
+        a configuration file, *initialize* will send the user through the
+        OAuth authentication flow.
+
+AUTHOR
+    Benjamin Trott <ben@sixapart.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    WWW::TypePad
+

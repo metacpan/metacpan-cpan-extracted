@@ -1,0 +1,45 @@
+Win32-HTA version 1.02
+======================
+
+HTML Applications are an easy way to build simple and not so simple
+GUI applications using HTML with script languages supported by Internet
+Explorer (Javascript, VBScript and even PerlScript if you are using
+ActivePerl).
+
+As I am using Strawberry Perl, I thought launching mshta.exe from inside perl
+and then communicating via AJAX could be interesting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The module only uses the standard modules
+   - Carp
+   - File::Temp
+   - Storable
+   - Win32
+
+With this you will be able to pass a single string back to the perl
+script. For Ajax functions you will need:
+
+   - Win32::Process
+   - JSON
+
+And you should run on Windows and have mshta.exe, of course.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2016 by Thomas Kratz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16 or,
+at your option, any later version of Perl 5 you may have available.

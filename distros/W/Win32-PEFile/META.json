@@ -1,0 +1,78 @@
+{
+   "abstract" : "Portable Executable File parser",
+   "author" : [
+      "Peter Jaquiery <grandpa@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-PEFile",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "v5.8.8"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Win32::LangId" : {
+         "file" : "lib/Win32/LangId.pm"
+      },
+      "Win32::PEFile" : {
+         "file" : "lib/Win32/PEFile.pm",
+         "version" : "0.7007"
+      },
+      "Win32::PEFile::PEBase" : {
+         "file" : "lib/Win32/PEFile/PEBase.pm"
+      },
+      "Win32::PEFile::PEConstants" : {
+         "file" : "lib/Win32/PEFile/PEConstants.pm"
+      },
+      "Win32::PEFile::PEReader" : {
+         "file" : "lib/Win32/PEFile/PEReader.pm"
+      },
+      "Win32::PEFile::PEWriter" : {
+         "file" : "lib/Win32/PEFile/PEWriter.pm"
+      },
+      "Win32::PEFile::Resource" : {
+         "file" : "lib/Win32/PEFile/Resource.pm"
+      },
+      "Win32::PEFile::SectionHandlers" : {
+         "file" : "lib/Win32/PEFile/SectionHandlers.pm"
+      },
+      "Win32::PEFile::VersionResource" : {
+         "file" : "lib/Win32/PEFile/Resource.pm"
+      },
+      "Win32::PEFile::certHandler" : {
+         "file" : "lib/Win32/PEFile/SectionHandlers.pm"
+      },
+      "Win32::PEFile::edataHandler" : {
+         "file" : "lib/Win32/PEFile/SectionHandlers.pm"
+      },
+      "Win32::PEFile::idataHandler" : {
+         "file" : "lib/Win32/PEFile/SectionHandlers.pm"
+      },
+      "Win32::PEFile::rsrcHandler" : {
+         "file" : "lib/Win32/PEFile/SectionHandlers.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.7007"
+}

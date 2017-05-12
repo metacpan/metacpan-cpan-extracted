@@ -1,0 +1,50 @@
+WebService-Rakuten version 0.05
+===============================
+
+This fills an empty niche for interfacing with the Rakuten
+webservice detailed here.
+
+http://webservice.rakuten.co.jp/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALLING VIA CPAN TOOL
+
+Ordinarily you might:
+
+ cpan[1]> install WebService::Rakuten
+
+Due to multiple authors having permission on the namespace,
+you will instead need to do this:
+
+ cpan[1]> install DYLAN/WebService-Rakuten-0.05.tar.gz
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    JSON
+    LWP::UserAgent
+    Readonly
+    Test::More
+    Unicode::Japanese
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

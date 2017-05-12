@@ -1,0 +1,367 @@
+<HTML>
+<HEAD>
+<TITLE>Win32API::ProcessStatus - Perl extension for obtaining information
+                          about processes using the plain Win32 PSAPI</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:prantl@host.sk">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::ProcessStatus - Perl extension for obtaining information                          about processes using the plain Win32 PSAPI</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#exports">EXPORTS</A></LI>
+		<LI><A HREF="#structures">STRUCTURES</A></LI>
+		<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32API::ProcessStatus - Perl extension for obtaining information
+                          about processes using the plain Win32 PSAPI</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32API::ProcessStatus ':All';</PRE>
+<PRE>
+  # --- prints IDs of all processes
+  my $IDs;
+  EnumerateProceses($IDs);
+  foreach my $ID (@$IDs) {
+    print &quot;$ID &quot;;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The <EM>ProcessStatus</EM> helper functions make it easier for you to obtain
+information about processes.</P>
+<P>It covers enumerating the currently running processes and their modules.
+The results are return in a form as close as possible to the original Win32
+API (simple types are returned as scalars of the same type, arrays
+as references to arrays and structures as references to hashes with keys
+of the same names as the members of the original structures have). There are
+only process and module handling functions of the <EM>ProcessStatus</EM> helper
+implemented in this module (in the meanwhile).</P>
+<P>These functions are available in Psapi.dll, which is included
+in Windows 2000 or higher. To use these functions on Windows NT, you must
+obtain the redistributable version of this DLL. It is not included
+in Windows 95 or higher. See the module Win32API::ToolHelp for the similar
+functionality for Windows 95 or higher.</P>
+<P>(Note that much of the following documentation refers to the behavior
+of the underlying Win32 <EM>ProcessStatus</EM> API calls which may vary in its
+current and future versions without any changes to this module. Therefore you
+should check the Win32 <EM>ProcessStatus</EM> API documentation in MSDN directly
+when needed.)</P>
+<P>
+<H2><A NAME="exports">EXPORTS</A></H2>
+<P>Nothing is exported by default. The following tags can be used to have sets
+of symbols exported:</P>
+<DL>
+<DT><STRONG><A NAME="item_%3AFunc">:Func</A></STRONG><BR>
+<DD>
+The basic function names: EnumProcesses EnumProcessModules GetModuleBaseName
+GetModuleFileNameEx GetModuleInformation.
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncA">:FuncA</A></STRONG><BR>
+<DD>
+The ANSI function names: GetModuleBaseNameA GetModuleFileNameExA.
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncW">:FuncW</A></STRONG><BR>
+<DD>
+The Unicode function names: GetModuleBaseNameW GetModuleFileNameExW.
+<P></P></DL>
+<P>
+<H2><A NAME="structures">STRUCTURES</A></H2>
+<P>The structures that act as input and ouput parameters are handled as hashes
+with keys of the same names as the members in the original structures have.
+It allows those already familiar with the Win32 API to get off to a quick
+start and occasionally use the original MSDN documentation to the API.</P>
+<DL>
+<DT><STRONG><A NAME="item_MODULEINFO">MODULEINFO</A></STRONG><BR>
+<DD>
+Contains the module load address, size, and entry point.
+<DL>
+<DT><STRONG><A NAME="item_lpBaseOfDll">lpBaseOfDll</A></STRONG><BR>
+<DD>
+The load address of the module.
+<P></P>
+<DT><STRONG><A NAME="item_SizeOfImage">SizeOfImage</A></STRONG><BR>
+<DD>
+The size, in bytes, of the linear space that the module occupies.
+<P></P>
+<DT><STRONG><A NAME="item_EntryPoint">EntryPoint</A></STRONG><BR>
+<DD>
+The entry point of the module.
+<P></P></DL>
+<P>The load address of a module is the same as the <CODE>HMODULE</CODE> value.
+The information returned in the <A HREF="#item_SizeOfImage"><CODE>SizeOfImage</CODE></A> and <A HREF="#item_EntryPoint"><CODE>EntryPoint</CODE></A> members
+comes from the module's <EM>Portable Executable (PE)</EM> header. The module entry
+point is the location called during process startup, thread startup, process
+shutdown, and thread shutdown. While this is not the address of the <CODE>DllMain</CODE>
+function, it should be close enough for most purposes.</P>
+</DL>
+<P>
+<H2><A NAME="functions">FUNCTIONS</A></H2>
+<P><EM>ProcessStatus</EM> functions return either a boolean status of the function's
+result or a number of characters filled into the output buffer. To retrieve
+an extended information about the error if it occurs use
+the <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A> function. If no error happens
+<A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A> still returns the last occured error code
+(successful calls do not modify the last stored error code). You can set
+or reset the internally stored error code explicitely by the function
+<A HREF="#item_SetLastProcessStatusError"><CODE>SetLastProcessStatusError</CODE></A>.</P>
+<P>To use something more convenient than numbers for comparisons of return
+values and error codes see the module <CODE>Win32API::Const</CODE>.</P>
+<P>There are couple of functions that are implemented as ANSI versions
+on Windows 95 or higher and as both ANSI and Unicode versions on Windows 2000
+or higher. ANSI versions are named XxxA and Unicode versions XxxW
+just like the Win32 <EM>ProcessStatus</EM> originals. If you omit the last A/W letter
+the ANSI version is used as strings are ANSI in Perl's internals. Results
+of Unicode functions are converted into ANSI before returned.</P>
+<DL>
+<DT><STRONG><A NAME="item_EnumProcesses">EnumProcesses($lpidProcess, $cb, $lpcbNeeded)</A></STRONG><BR>
+<DD>
+Retrieves the process identifier for each process object in the system.
+<DL>
+<DT><STRONG><A NAME="item_lpidProcess_%5BOUT%5D">lpidProcess [OUT]</A></STRONG><BR>
+<DD>
+Reference to an array that receives the list of process identifiers.
+<P></P>
+<DT><STRONG><A NAME="item_cb_%5BIN%5D">cb [IN]</A></STRONG><BR>
+<DD>
+Specifies the size, in bytes, of the lpidProcess array. It defaults
+to <CODE>4096 (1024 * sizeof(DWORD))</CODE> if omitted.
+<P></P>
+<DT><STRONG><A NAME="item_lpcbNeeded_%5BOUT%5D">lpcbNeeded [OUT]</A></STRONG><BR>
+<DD>
+Receives the number of bytes returned in the <CODE>lpidProcess</CODE> array. It can be
+omitted if not needed.
+<P></P>
+<DT><STRONG><A NAME="item_%5BRETVAL%5D">[RETVAL]</A></STRONG><BR>
+<DD>
+If the function succeeds, the return value is nonzero. If the function fails,
+the return value is zero. To get extended error information, call
+<A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>.
+<P></P></DL>
+<P>It is a good idea to give <A HREF="#item_EnumProcesses"><CODE>EnumProcesses</CODE></A> a large array of <CODE>DWORD</CODE> values,
+because it is hard to predict how many processes there will be at the time
+you call <A HREF="#item_EnumProcesses"><CODE>EnumProcesses</CODE></A>. To determine how many processes were enumerated
+by the call to <A HREF="#item_EnumProcesses"><CODE>EnumProcesses</CODE></A>, divide the resulting value in the <CODE>cbNeeded</CODE>
+parameter by <CODE>sizeof(DWORD)</CODE>. There is no indication given when the buffer
+is too small to store all process identifiers.</P>
+<P>To obtain process handles for the processes whose identifiers you have just
+obtained, call the <CODE>OpenProcess</CODE> function.</P>
+<DT><STRONG><A NAME="item_EnumProcessModules">EnumProcessModules($hProcess, $lphModule, $cb, $lpcbNeeded)</A></STRONG><BR>
+<DD>
+Retrieves a handle for each module in the specified process.
+<DL>
+<DT><STRONG><A NAME="item_hProcess_%5BIN%5D">hProcess [IN]</A></STRONG><BR>
+<DD>
+Handle to the process.
+<P></P>
+<DT><STRONG><A NAME="item_lphModule_%5BOUT%5D">lphModule [OUT]</A></STRONG><BR>
+<DD>
+Reference to the array that receives the list of module handles.
+<P></P>
+<DT><STRONG>cb [IN]</STRONG><BR>
+<DD>
+Specifies the size, in bytes, of the <CODE>lphModule</CODE> array. It defaults
+to <CODE>4096 (1024 * sizeof(DWORD))</CODE> if omitted.
+<P></P>
+<DT><STRONG>lpcbNeeded [OUT]</STRONG><BR>
+<DD>
+Receives the number of bytes required to store all module handles
+in the <CODE>lphModule</CODE> array. It can be omitted if not needed.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+If the function succeeds, the return value is nonzero. If the function fails,
+the return value is zero. To get extended error information, call
+<A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>.
+<P></P></DL>
+<P>It is a good idea to give <A HREF="#item_EnumProcessModules"><CODE>EnumProcessModules</CODE></A> a large array of <CODE>HMODULE</CODE>
+values, because it is hard to predict how many modules there will be
+in the process at the time you call <A HREF="#item_EnumProcessModules"><CODE>EnumProcessModules</CODE></A>. To determine if
+the <CODE>lphModule</CODE> array is too small to hold all module handles
+for the process, compare the value returned in <CODE>lpcbNeeded</CODE> with the value
+specified in <CODE>cb</CODE>. If <CODE>lpcbNeeded</CODE> is greater than <CODE>cb</CODE>, increase the size
+of the array and call <A HREF="#item_EnumProcessModules"><CODE>EnumProcessModules</CODE></A> again.</P>
+<P>To determine how many modules were enumerated by the call
+to <A HREF="#item_EnumProcessModules"><CODE>EnumProcessModules</CODE></A>, divide the resulting value in the <CODE>lpcbNeeded</CODE>
+parameter by <CODE>sizeof(HMODULE)</CODE>.</P>
+<DT><STRONG><A NAME="item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError()</CODE></A></STRONG><BR>
+<DD>
+Retrieves the last-error code value of the <EM>ProcessStatus</EM> functions.
+The last-error code is stored if a function fails and remembered until
+another function calls when it is overwritten by the new error code.
+Successful calls do not modify this internally stored last-error code value.
+<DL>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+The return value is the last-error code value. Functions set this value
+by calling the <A HREF="#item_SetLastProcessStatusError"><CODE>SetLastProcessStatusError</CODE></A> function if they fail.
+<P></P></DL>
+<P>To obtain an error string for system error codes, use
+the <CODE>FormatMessage</CODE> function. For a complete list of error codes, see
+the System Error Codes section in MSDN. There are pre-defined constants
+for the Win32 system error codes in the module &lt;Win32API::Const&gt;.</P>
+<P>You should call the <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A> function immediately when
+a function's return value indicates that such a call will return useful data.
+A subsequent call to another <EM>ProcessStatus</EM> function could fail as well
+and <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A> would return its error code instead
+of the former one.</P>
+<P>Function failure is typically indicated by a return value such as zero,
+undefined, or –1 (0xffffffff).</P>
+<P>Error codes returned are 32-bit values with the most significant bit set
+to 1 (bit 31 is the most significant bit). Zero code is <CODE>ERROR_SUCCESS</CODE>.</P>
+<DT><STRONG><A NAME="item_GetModuleBaseName">GetModuleBaseName($hProcess, $hModule, $lpBaseName, $nSize)</A></STRONG><BR>
+<DD>
+Retrieves the base name of the specified module.
+<DL>
+<DT><STRONG>hProcess [IN]</STRONG><BR>
+<DD>
+Handle to the process that contains the module.
+<P></P>
+<DT><STRONG><A NAME="item_hModule_%5BIN%5D">hModule [IN]</A></STRONG><BR>
+<DD>
+Handle to the module.
+<P></P>
+<DT><STRONG><A NAME="item_lpBaseName_%5BOUT%5D">lpBaseName [OUT]</A></STRONG><BR>
+<DD>
+Reference to the buffer that receives the base name of the module. If the base
+name is longer than maximum number of characters specified by the <CODE>nSize</CODE>
+parameter, the base name is truncated.
+<P></P>
+<DT><STRONG><A NAME="item_nSize_%5BIN%5D">nSize [IN]</A></STRONG><BR>
+<DD>
+Specifies the maximum number of characters to copy to the <CODE>lpBaseName</CODE>
+buffer. It defaults to <CODE>MAX_PATH</CODE> if omitted.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+If the function succeeds, the return value specifies the length of the string
+copied to the buffer. If the function fails, the return value is zero. To get
+extended error information, call <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>.
+<P></P></DL>
+<DT><STRONG><A NAME="item_GetModuleFileNameEx">GetModuleFileNameEx($hProcess, $hModule, $lpFilename, $nSize)</A></STRONG><BR>
+<DD>
+Retrieves the fully qualified path for the specified module.
+<DL>
+<DT><STRONG>hProcess [IN]</STRONG><BR>
+<DD>
+Handle to the process that contains the module.
+<P></P>
+<DT><STRONG>hModule [IN]</STRONG><BR>
+<DD>
+Handle to the module.
+<P></P>
+<DT><STRONG><A NAME="item_lpFilename_%5BOUT%5D">lpFilename [OUT]</A></STRONG><BR>
+<DD>
+Reference to the buffer that receives the fully qualified path to the module.
+If the file name is longer than maximum number of characters specified
+by the <CODE>nSize</CODE> parameter, the file name is truncated.
+<P></P>
+<DT><STRONG>nSize [IN]</STRONG><BR>
+<DD>
+Specifies the maximum number of characters to copy to the <CODE>lpFilename</CODE>
+buffer. It defaults to <CODE>MAX_PATH</CODE> if omitted.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+If the function succeeds, the return value specifies the length of the string
+copied to the buffer. If the function fails, the return value is zero. To get
+extended error information, call <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>.
+<P></P></DL>
+<DT><STRONG><A NAME="item_GetModuleInformation">GetModuleInformation($hProcess, $hModule, $lpmodinfo)</A></STRONG><BR>
+<DD>
+Retrieves information about the specified module in the <A HREF="#item_MODULEINFO"><CODE>MODULEINFO</CODE></A>
+structure.
+<DL>
+<DT><STRONG>hProcess [IN]</STRONG><BR>
+<DD>
+Handle to the process that contains the module.
+<P></P>
+<DT><STRONG>hModule [IN]</STRONG><BR>
+<DD>
+Handle to the module.
+<P></P>
+<DT><STRONG><A NAME="item_lpmodinfo_%5BOUT%5D">lpmodinfo [OUT]</A></STRONG><BR>
+<DD>
+Reference to the <A HREF="#item_MODULEINFO"><CODE>MODULEINFO</CODE></A> structure that receives information
+about the module.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+If the function succeeds, the return value is nonzero. If the function fails,
+the return value is zero. To get extended error information, call
+<A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>.
+<P></P></DL>
+<P>(Obviously the parameter <CODE>cbSize</CODE> from the original Win32 function is omitted
+as there is no need to specify the size of the <A HREF="#item_MODULEINFO"><CODE>MODULEINFO</CODE></A> structure
+returned as a hash in Perl.)</P>
+<DT><STRONG><A NAME="item_SetLastProcessStatusError"><CODE>SetLastProcessStatusError($dwError)</CODE></A></STRONG><BR>
+<DD>
+Sets the last-error code value of the <EM>ProcessStatus</EM> functions.
+<DL>
+<DT><STRONG><A NAME="item_dwError_%5BIN%5D">dwError [IN]</A></STRONG><BR>
+<DD>
+Specifies the last-error code.
+<P></P></DL>
+<P>Error codes returned are 32-bit values with the most significant bit set
+to 1 (bit 31 is the most significant bit). Zero code is <CODE>ERROR_SUCCESS</CODE>.</P>
+<P>Applications can retrieve the value saved by this function by using
+the <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A> function. The use of <A HREF="#item_GetLastProcessStatusError"><CODE>GetLastProcessStatusError</CODE></A>
+is optional; an application can call it to find out the specific reason
+for a function failure.</P>
+</DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ferdinand Prantl &lt;<EM><A HREF="mailto:prantl@host.sk">prantl@host.sk</A></EM>&gt;</P>
+<P>See <EM><A HREF="http://prantl.host.sk/perl/modules/Win32API/ProcessStatus">http://prantl.host.sk/perl/modules/Win32API/ProcessStatus</A></EM>
+for the most recent version.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2002, Ferdinand Prantl. All rights reserved.</P>
+<P>Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided ``as is'' without express or implied warranty.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="ToolHelp.html">the Win32API::ToolHelp manpage</A>, <A HREF="../Win32/Process.html">the Win32::Process manpage</A>, <A HREF="../Win32/Job.html">the Win32::Job manpage</A> and <A HREF="Const.html">the Win32API::Const manpage</A>.</P>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::ProcessStatus - Perl extension for obtaining information                          about processes using the plain Win32 PSAPI</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+</BODY>
+
+</HTML>

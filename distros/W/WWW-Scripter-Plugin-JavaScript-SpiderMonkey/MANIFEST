@@ -1,0 +1,9 @@
+Changes
+lib/WWW/Scripter/Plugin/JavaScript/SpiderMonkey.pm
+Makefile.PL
+MANIFEST
+README
+t/blank.html
+t/sm.t
+t/tests.pm
+META.yml                                 Module meta-data (added by MakeMaker)

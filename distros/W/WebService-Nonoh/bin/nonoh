@@ -1,0 +1,74 @@
+#!/bin/sh
+#! -*- perl -*-
+eval 'exec perl -x -CA -S $0 ${1+"$@"}'
+	if 0;
+
+# nonoh call script (c) Nei<anti.teamidiot.de>
+
+=head1 NAME
+
+nonoh - connect nonoh calls and and other betamax providers
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+    # check balance:
+    nonoh SERVICE USER PASS
+
+    # connect call
+    nonoh SERVICE USER PASS FROM TO
+
+    # send SMS
+    nonoh SERVICE USER PASS FROM TO MESSAGE
+
+=head1 DETAILED USAGE
+
+I<SERVICE> must be the servername of the provider, e.g. C<nonoh.net>
+or C<voipbuster.com>
+
+I<USER> and I<PASS> are your username and password with them.
+
+I<FROM> and I<TO> should be given in international format, e.g
+C<+49123456> or C<+33456789>
+
+I<MESSAGE> must be quoted to protect it from the shell argument
+splitting!
+
+to set some defaults, you can create a F<~/.nonohrc> file with the
+following content:
+
+    qw{ nonoh.net yourusername yourpassword }
+
+this file is loaded in as Perl code B<if> you specify the first
+argument as empty string, like this:
+
+    # check balance, using credentials from ~/.nonohrc
+    nonoh ''
+
+    # make call
+    nonoh '' +49123456 +33456789
+
+=cut
+
+use strict;
+use warnings;
+use open qw(:std :utf8);
+use WebService::Nonoh;
+WebService::Nonoh::run
+    ;
+
+=head1 AUTHOR
+
+Ailin Nemui E<lt>ailin at devio dot usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Ailin Nemui.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,36 @@
+NAME
+    INSTALL - how to install WordNet::Similarity::Visual
+
+SYNOPSIS
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install
+
+DESCRIPTION
+  Prerequisites
+    You need to have WordNet::Similarity (version 0.14),
+    WordNet::QueryData (version 1.30 or later), and Gtk2
+    (version 2-1.00 or later) installed.
+
+    WordNet::Similarity is available from
+    http://search.cpan.org/~tpederse/WordNet-Similarity-0.15/
+    WordNet::QueryData is available from
+    http://search.cpan.org/dist/WordNet-QueryData/.
+    Gtk2 is available from
+    http://search.cpan.org/~tsch/Gtk2-1.081/Gtk2.pm
+
+
+  Installing
+    The usual way to install the package is to run the following commands:
+
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install

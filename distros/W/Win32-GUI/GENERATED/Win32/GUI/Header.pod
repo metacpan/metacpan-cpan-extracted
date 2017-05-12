@@ -1,0 +1,327 @@
+
+=head1 NAME
+
+Win32::GUI::Header - Create and manipulate list header controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Header object;
+can also be called as PARENT->AddHeader(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -buttons => 0/1 (default 0)
+    Set/Unset buttons style.
+    Header items look like push buttons and can be clicked.
+  -dragdrop => 0/1 (default 0)
+    Set/Unset dragdrop style.
+  -fulldrag => 0/1 (default 0)
+    Set/Unset fulldrag style.
+  -hidden => 0/1 (default 0)
+    Set/Unset hidden style.
+  -horizontal => 0/1 (default 0)
+    Set/Unset horizontal style.
+  -hottrack => 0/1 (default 0)
+    Set/Unset hottrack style.
+  -hottrack => 0/1 (default 0)
+    Set/Unset hottrack style.
+  -imagelist => Win32::GUI::ImageList object.
+    Set imagelist.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeItem
+
+B<ChangeItem(INDEX, %OPTIONS)>
+
+Changes the options for an item in the Header control. Returns nonzero
+if successful, zero otherwise.
+For a list of the available options see L<InsertItem()|Win32::GUI::Header/InsertItem>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear()>
+
+Deletes all items from the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+See L<GetItemCount()|Win32::GUI::Header/GetItemCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateDragImage
+
+B<CreateDragImage(INDEX)>
+
+Creates a transparent version of an item image within an existing Header.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteItem
+
+B<DeleteItem(INDEX)>
+
+Deletes the zero-based B<INDEX> item from the Header.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList()>
+
+Retrieves the handle to the image list that has been set for an existing header control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItem
+
+B<GetItem(INDEX)>
+
+Retrieves information about an item in a Header control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemCount
+
+B<GetItemCount()>
+
+Returns the number of items in the Header control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(INDEX)>
+
+Returns a four element array defining the rectangle of the specified
+zero-based B<INDEX> item; the array contains (left, top, right, bottom).
+If not succesful returns undef.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetOrderArray
+
+B<GetOrderArray()>
+
+Returns an array defining left-to-right of items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X, Y)>
+
+Checks if the specified point is on an Header item;
+it returns the index of the found item or -1 if none was found.
+If called in an array context, it returns an additional value containing
+more info about the position of the specified point.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(%OPTIONS)>
+
+Inserts a new item in the Header control. Returns the newly created
+item zero-based index or -1 on errors.
+%OPTIONS can be:
+
+  -index => position
+  -image => index of an image from the associated ImageList
+  -bitmap => Win32::GUI::Bitmap object
+  -width => pixels
+  -height => pixels
+  -text => string
+  -align => left|center|right
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemRect
+
+B<ItemRect(INDEX)>
+
+See L<GetItemRect()|Win32::GUI::Header/GetItemRect>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 OrderToIndex
+
+B<OrderToIndex()>
+
+Retrieves an index value for an item based on its order in the Header.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Reset
+
+B<Reset()>
+
+See L<Clear()|Win32::GUI::Header/Clear>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(flag)>
+
+Assigns an image list to an Header.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItem
+
+B<SetItem(INDEX, %OPTIONS)>
+
+Set the options for an item in the Header control. Returns nonzero
+if successful, zero otherwise.
+For a list of the available options see L<InsertItem()|Win32::GUI::Header/InsertItem>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetOrderArray
+
+B<SetOrderArray(...)>
+
+Sets the left-to-right order of Header items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(flag)>
+
+Sets the UNICODE character format flag for the control.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginTrack
+
+B<BeginTrack(INDEX, WIDTH)>
+
+Sent when a divider of the Header control
+is being moved; the event must return 0 to
+prevent moving the divider, 1 to allow it.
+Passes the zero-based INDEX
+of the item being resized and its current
+WIDTH.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DividerDblClick
+
+B<DividerDblClick(INDEX)>
+
+Sent when the user double-clicked on a
+divider of the Header control.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndTrack
+
+B<EndTrack(INDEX, WIDTH)>
+
+Sent when a divider of the Header control
+has been moved. Passes the zero-based INDEX
+of the item being resized and its current
+WIDTH.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemClick
+
+B<ItemClick(INDEX)>
+
+Sent when the user clicked on a Header
+item.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemDblClick
+
+B<ItemDblClick(INDEX)>
+
+Sent when the user double-clicked on a Header
+item.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Track
+
+B<Track(INDEX, WIDTH)>
+
+Sent while a divider of the Header control
+is being moved; the event must return 1 to
+continue moving the divider, 0 to end its
+movement.
+Passes the zero-based INDEX
+of the item being resized and its current
+WIDTH.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

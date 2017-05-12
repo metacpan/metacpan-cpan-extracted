@@ -1,0 +1,29 @@
+---
+abstract: "Shorten GitHub URLs using GitHub's URL shortener - git.io"
+author:
+  - 'James Aitken <jaitken@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  WWW::Shorten: '1.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-GitHub
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.11'
+  Exporter: '5.65'
+  LWP::Protocol::https: '0'
+  URI: '1.38'
+  WWW::Shorten::generic: '1.92'
+  base: '2.14'
+version: v0.1.7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

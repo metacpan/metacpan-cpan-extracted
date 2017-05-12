@@ -1,0 +1,125 @@
+=head1 NAME
+
+Win32-ProcFarm - system for parallelization of code under Win32
+
+=head1 OVERVIEW
+
+=head2 What is Win32::ProcFarm?
+
+C<Win32::ProcFarm> is the  code I wrote to speed up tasks that are limited by
+network latency, but not by network bandwidth or local computer power.  For
+instance, say you want to ping every address on a subnet.  The simple approach
+(excluding pinging the broadcast address) is to sequentially ping every
+address on the subnet.  If only 30% of the addresses are in use and you wait 1
+second before deciding an address is not in use, it will take roughly 3
+minutes to ping a class C subnet.  The limitation here is obviously not the
+local CPU or even network bandwidth, but rather latency.  One solution would
+be to break up the task.  Unfortunately, the thread support in Perl doesn't
+work with ActivePerl, and in any event the support is currently experimental.
+Another approach would be to spin off 10 processes, have each take 25
+addresses, and funnel the information back into a single process for
+reporting.
+
+This is the approach C<Win32::ProcFarm> takes, but it is somewhat more
+sophisticated.  A "pool" of processes is created that communicate with the
+parent process using TCP sockets.  The parent process communicates with the
+child processes using a "RPC" style library to assign tasks to the child
+processes and to retrieve the return data from those tasks.
+
+Each child process is comprised of a library file that includes the
+communications routines, as well as whatever subroutines pertain to the
+problem at hand.  The parent process spins off the child process, which then
+connects back to the parent process through a TCP port.  The parent process
+uses C<Data::Dumper> to package up the desired subroutine name along with any
+associated parameters and ships it off to the child process. The child process
+then executes that subroutine and uses C<Data::Dumper> to package up the
+return values and send them back to the parent.  What makes the library useful
+is that the child process can operate asynchronously from the parent; the
+parent simply calls C<execute> to instruct the child process to execute a
+subroutine.  The parent process can then periodically call C<get_state>, which
+will return C<wait> while the child process is still executing the subroutine.
+When the child process finishes and ships the return values back up the
+socket, the C<get_state> method call on the parent object will return the
+C<fin> state.  The parent then calls C<get_retval> to obtain the returned
+values, and the child process can then be used to execute another task.
+
+The pool system is based upon this simplistic "RPC" system.  To use the
+C<Win32::ProcFarm::Pool> object, one simply creates a new pool, passing it the
+number of child processes to start as well as the name of the child process
+and a few other parameters.  Once the pool has been created, one adds jobs to
+the waiting pool. This might be a list of IP addresses to ping, for instance.
+Then one tells the C<Win32::ProcFarm::Pool> object to execute all the jobs.
+The pool assigns a job to each of the child processes until all the child
+processes are busy.  It then checks the child processes periodically to see if
+they have finished with the task.  If they have, it places the return values
+into a hash, identified by an ID passed when the job was created, and sends
+the child process another job. When all the jobs have finished, one simply
+requests the hash of return values and proceeds on.
+
+=head2 Process Farm Advantages
+
+=over 4
+
+=item Speed
+
+By farming the work out over a large number of processes (I typically use from
+5 to 30), large speedup factors can be achieved fairly easily.
+
+=item Reuse
+
+The process farm system is designed to be fairly easy to use.  Simply write
+the function of use, include it in a child process, and add roughly 10 lines
+of boilerplate code to the parent.
+
+=item Efficiency in face of variable length jobs
+
+Because jobs are assigned one-by-one to the child processes as they come free,
+jobs are allocated as efficiently as possible B<given> the constraint that the
+job execution time cannot be predicted.
+
+=item Low probability of child process orphaning
+
+Because the code to kill the child processes when everything is over is
+implemented in the C<DESTROY> for the parent, orphaning is a rare event.
+
+=back
+
+=head2 Process Farm Limitations
+
+The Process Farm code is very useful in certain situations, but it has a
+number of limitations that should be kept in mind.
+
+=over 4
+
+=item Child Process Startup Time
+
+On a dual Pent-Pro/200 with 128MB of RAM, child process startup time is
+roughly 1/3rd of a second.  This means spinning off 30 child processes takes
+10 seconds.  The code already uses asynchronous startup, and I believe the
+major limitation remaining is the time necessary to start up a Perl
+process and create the TCP socket.
+
+=item Child Process Memory Utilization
+
+By keeping an eye on total memory utilization, it appears that each B<bare>
+child process uses roughly 2.3MB of memory.  A child process that also uses
+C<Net::Ping> to implement a ping function uses roughly 2.6MB of memory.  If
+you spin off 30 of these processes, that's 75MB of RAM.  If you start
+swapping, the thrash of 30 processes running simultaneously is going to kill
+any speed benefit, so keep memory utilization in mind when selecting the
+number of child processes to use.
+
+=back
+
+=head2 Real World Results
+
+Despite the limitations, I have found the Process Farm system to be very
+useful.  In the previous example of pinging a range of IP addresses, with
+roughly 10% coverage on a Class C, and 31 child processes, total ping time
+runs roughly 21 seconds, a speed up of a factor of 10 on a problem that
+otherwise takes an obnoxious amount of time.
+
+=head2 Further Information
+
+Please see the "tutorial" in C<Docs/tutorial.pod> for more information, as
+well as the POD contained within the actual Perl modules.

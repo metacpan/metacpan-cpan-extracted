@@ -1,0 +1,82 @@
+<!-- LAYOUT listheader -->
+<!-- LAYOUT listbody -->
+<en 1></en><nl 1></nl>
+<center>
+<h1><en 2>Sample WeSQL application</en><nl 2>Voorbeeld WeSQL applicatie</nl></h1>
+<!-- LAYOUT liststarttable1 -->
+<en 3>User Management</en><nl 3>Gebruikersbeheer</nl>
+<!-- LAYOUT liststarttable2 -->
+<tr><td align=center colspan=2>
+<!-- EVAL PRELIST
+  my $retval = "";
+  my @userinfo = sqlSelect($dbh,"select login,superuser from users where status='1' and id='COOKIE_ID'");
+  if ('COOKIE_SU' ne '') {
+    my @suinfo = sqlSelect($dbh,"select login,superuser from users where status='1' and id='COOKIE_SU'");
+      if (!defined($suinfo[0])) {
+          return "<b><en 18>Something is very, very wrong</en><nl 18>Iets is heel, heel erg fout</nl></b>";
+      }
+    $retval = "<en 19>You are superuser</en><nl 19>U bent supergebruiker</nl> <b>$suinfo[0]</b>";
+		if (('COOKIE_SU' ne 'COOKIE_ID') && defined($userinfo[0])) {
+			$retval .= ", <en 20>cloaked as user</en><nl 20>en u doet zich voor als gebruiker</nl> <b>$userinfo[0]</b>.<br>\n [<a href=uncloak.wsql><en 21>Uncloak</en><nl 21>Stop voordoen</nl></a>]";
+		} else {
+			$retval .= ".<br>\n";
+		}
+  }
+  if (defined($userinfo[0])  && ($userinfo[1] eq "1")) {
+		$retval =~ s/cloaked as user/cloaked as superuser/;
+		$retval =~ s/voor als gebruiker/voor als supergebruiker/;
+  }
+  return $retval;
+/EVAL PRELIST -->
+<en 4></en><nl 4></nl>
+<p>
+<en 5>You are in the administrative part of the site.<br>Here you can add and remove users, and change their settings.</en>
+<nl 5>U bevindt zich in het administratieve deel van de site.<br>Hier kan u gebruikers toevoegen en verwijderen, en hun instellingen wijzigen.</nl>
+<br>
+<en 6>You can also cloak as another user and go to the non-administrative part of the site.</en>
+<nl 6>U kan u ook voordoen als een gebruiker in het niet-administratieve deel van de site.</nl>
+</td></tr>
+<form action=jlist.wsql method=get name=one>
+<input type=hidden name=view value=users>
+<tr>
+<td><b><en 7>Login:</en><nl 7>Gebruiker:</nl></b></td>
+<td><input type=textbox name=login>
+<input type=submit name=button value=<en 22>Search</en><nl 22>Zoeken</nl>>
+</td>
+</form>
+</tr><tr>
+<td><b><en 8>Login:</en><nl 8>Gebruiker:</nl></b></td>
+<td>
+<form action=jlist.wsql method=get name=two>
+<input type=hidden name=view value=users>
+<select name=id>
+<!-- LIST A select id,login from users where status='1' order by login -->
+<option value=A_ID><en 9>A_LOGIN</en><nl 9>A_LOGIN</nl></option>
+<!-- /LIST A -->
+</select>
+<input type=submit name=button value=<en 23>Search</en><nl 23>Zoeken</nl>>
+</form>
+</td>
+</tr><tr>
+<td><b><en 10>Cloak:</en><nl 10>Doe u voor als:</nl></b></td>
+<td>
+<form action=cloak.wsql method=get>
+<select name=id>
+<!-- LIST A select id,login from users where status='1' order by login -->
+<option value=A_ID><en 11>A_LOGIN</en><nl 11>A_LOGIN</nl></option>
+<!-- /LIST A -->
+</select>
+<input type=submit name=button value=<en 24>Now</en><nl 24>Nu</nl>>
+</td>
+</tr><tr>
+<td colspan=2 align=center>
+</td>
+</tr>
+</form>
+<tr><td align=center colspan=2>
+<en 12>[</en><nl 12>[</nl><a href=jform.wsql?view=user&id=new&editdest=index.wsql><en 13>Add User</en><nl 13>Voeg gebruiker toe</nl></a><en 14>]
+[</en><nl 14>]</nl> <en 25>[</en><nl 25>[</nl><a href=jlist.wsql?view=users><en 15>List Users</en><nl 15>Gebruikerslijst</nl></a><en 16>]</en><nl 16>]</nl>
+</td></tr>
+</center>
+<!-- LAYOUT liststoptable -->
+<!-- LAYOUT listfooter -->

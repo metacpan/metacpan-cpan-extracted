@@ -1,0 +1,89 @@
+SYNOPSIS
+      use WebService::30Boxes::API;
+
+      # You always have to provide your api_key
+      my $boxes  = WebService::30Boxes::API->(api_key => 'your_api_key');
+
+      # Then you might want to lookup a user and print some info
+      my $result = $boxes->call('user.FindById', { id => 47 });
+      if($result->{'success'}) {
+         my $user   = $result->reply->{'user'};
+  
+         print $user->{'firstName'}, " ",
+               $user->{'lastName'}, " joined 30Boxes at ",
+               $user->{'createDate'},"\n";
+      } else {
+         print "An error occured ($result->{'error_code'}: ".
+               "$result->{'error_msg'})";
+      }
+  
+      # If authorization is needed, you need to get permission first:
+      my $redirect = $boxes->request_auth_url({
+         applicationName    => '30Boxes cool application',
+         applicationLogoUrl => 'http://wherever/your/logo/is-stored.png',
+         returnUrl          => 'http://wherever/you/want/the/client_to_return/'
+      }); 
+  
+      print CGI::redirect($redirect);
+
+      # After that, you may call the 'call' method as described above
+
+DESCRIPTION
+    "WebService::30Boxes::API" - Perl interface to the 30boxes.com REST API
+
+  METHODS
+    The following methods can be used
+
+   new
+    "new" create a new "WebService::30Boxes::API" object
+
+   options
+    api_key
+         The API key is required and this module will croak if you do not
+         set one here. A fresh key can be obtained at
+         <http://30boxes.com/api/api.php?method=getKeyForUser>
+
+   call
+    With this method, you can call one of the available methods as described
+    on <http://30boxes.com/api/>.
+
+    "call" accepts a method name followed by a hashref with the values to
+    pass on to 30Boxes. It returns a WebService::30Boxes::API::Response
+    object.
+
+   request_auth_url
+    Some API methods require authentication (permission by the user). This
+    is done by sending the user to a specific URL where permission can be
+    granted or denied. This method accepts a hashref with these three
+    values:
+
+    applicationName
+         (Mandatory) applicationName sets the well, application name you
+         want to show to the user.
+
+    applicationLogoUrl
+         (Mandatory) The URI to your logo.
+
+    returnUrl
+         (Optional) This is where you want the user to return too after
+         permission is granted.
+
+SEE ALSO
+    <http://30boxes.com/>, <http://30boxes.com/api/>
+
+    WebService::30Boxes::API::Response
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Ticket/Create.html?Queue=WebService::30Boxes::API>.
+
+AUTHOR
+    M. Blom, <blom@cpan.org>, <http://menno.b10m.net/perl/>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

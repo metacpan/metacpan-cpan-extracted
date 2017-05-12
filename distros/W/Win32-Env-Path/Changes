@@ -1,0 +1,13 @@
+Changes for Perl extension Win32-Env-Path
+
+0.03 Mon 27 Apr 2009
+	- Fixing the use of Test::Script in 01_compile.t
+
+0.02 Wed 21 Apr 2009
+	- Updating to Module::Install::DSL 0.85
+	- Updating to support ADAMK's release.pl
+	- Fixed bad use of push in win32envpath
+	- Adding the push and unshift functionality
+
+0.01 Mon 24 Mar 2008
+	- Created initial release

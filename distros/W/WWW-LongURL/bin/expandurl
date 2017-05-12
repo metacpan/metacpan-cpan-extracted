@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+use WWW::LongURL;
+use strict;
+use warnings;
+
+my $shorturl = shift;
+$shorturl ||= 'http://is.gd/w';
+
+my $expander  = WWW::LongURL->new();
+my $longerurl = $expander->expand($shorturl);
+print $longerurl, "\n";

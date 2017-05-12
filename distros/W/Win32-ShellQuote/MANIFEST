@@ -1,0 +1,16 @@
+Changes
+lib/Win32/ShellQuote.pm
+LICENSE
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/dump_args.pl
+t/dump_cmdline.pl
+t/lib/TestUtil.pm
+t/quote_system.t
+t/quoting.t
+t/unescape_cmd.t
+t/unquoting.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

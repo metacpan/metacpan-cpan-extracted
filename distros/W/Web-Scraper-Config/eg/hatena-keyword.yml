@@ -1,0 +1,17 @@
+---
+scraper:
+  - process:
+    - 'span.title > a:first-child'
+    - title
+    - TEXT
+    - url
+    - @href
+  - process:
+    - span.furigana
+    - furigana
+    - TEXT
+  - process:
+    - 'ul.list-circle > li:first-child > a'
+    - category
+    - TEXT
+

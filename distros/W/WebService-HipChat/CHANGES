@@ -1,0 +1,440 @@
+==================================================
+Changes from 2007-04-20 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.2000 at 2017-04-17 17:41:53 +0000
+-------------------------------------------
+
+  Change: e374e6acc463356597864b1c5a7b7ab8137c9ee5
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-04-17 13:40:04 +0000
+
+    v0.2000 
+
+  Change: 1fe1fd431c562c080961e6f82ddfab77b7aa8ff6
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-04-17 13:17:16 +0000
+
+    Remove Email::Valid dependency. 
+
+  Change: 1dc0fcba50fa9f2e13a3474b4c974bad19509621
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-04-17 13:12:02 +0000
+
+    Merge pull request #15 from troglodyne/expand_filesharing_capability
+
+    Add ablity to share_file with users as well 
+
+  Change: b36043b44ef21f2fb48547b56538f31f80d87414
+  Author: Thomas A. Baugh <thomas.baugh@cpanel.net>
+  Date : 2017-01-19 22:00:32 +0000
+
+    Add ablity to share_file with users as well
+
+    Fixes #14. I have already tested this change *functionally* using
+    Atlassian's HipChat API endpoint. 
+
+-------------------------------------------
+version 0.1002 at 2016-09-21 21:46:49 +0000
+-------------------------------------------
+
+  Change: c4388e9932095e65a7b334786fcb3efd247f1d0e
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-09-21 17:46:49 +0000
+
+    v0.1002 
+
+  Change: ee42ac35866b6e3418fcbfbe48f06f181d90af1e
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-09-21 17:44:41 +0000
+
+    updated contributor links 
+
+-------------------------------------------
+version 0.1001 at 2016-09-21 21:29:47 +0000
+-------------------------------------------
+
+  Change: aa282376c1e901a084ddfab306927457597dbb8b
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-09-21 17:29:47 +0000
+
+    v0.1001 added github repo metadata 
+
+-------------------------------------------
+version 0.1000 at 2016-09-21 21:23:16 +0000
+-------------------------------------------
+
+  Change: 6fb33ab562abfb64a0517cdeb6cd1dcd854ca2f4
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-09-21 17:23:16 +0000
+
+    v0.1000 
+
+  Change: 2a5c74cf63b21a75e17a177e7f528f87598f86d0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-09-21 17:02:14 +0000
+
+    Merge pull request #13 from centreti/master
+
+    added send_room_msg 
+
+  Change: b26dc0708e254e8d449ddeb55269e95666adf447
+  Author: Chris C <ccastillo@alertlogic.com>
+  Date : 2016-09-21 15:43:08 +0000
+
+    added send_room_msg
+
+    send messages to rooms rather than only users 
+
+  Change: fa33a082a4f2e7be232daa400306b39d5b3251e0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-07-05 11:24:05 +0000
+
+    Merge pull request #12 from mittyorz/delete_user
+
+    add method delete_user and POD 
+
+  Change: f21249b62cc3fca093e6056b0f8788571bf0df11
+  Author: Kenichi Mito <kenichi-mito@cookpad.com>
+  Date : 2016-06-27 22:51:07 +0000
+
+    add method delete_user and POD 
+
+  Change: cd5cbf23607cbde1a47ab8838c765da1cde66b45
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-06-25 23:42:15 +0000
+
+    Merge pull request #11 from mittyorz/PR-get_private_msg
+
+    add method get_private_msg and POD 
+
+  Change: a3cff2ab5212533d19578978551c347e8c1829f6
+  Author: Kenichi Mito <kenichi-mito@cookpad.com>
+  Date : 2016-06-18 18:38:22 +0000
+
+    change method name to get_private_history 
+
+  Change: 49c8873c9bee00295abd2b920681049dd537a61f
+  Author: Kenichi Mito <kenichi-mito@cookpad.com>
+  Date : 2016-06-18 14:02:52 +0000
+
+    add method get_private_msg and POD
+
+    * get private chat history of individual user 
+
+-------------------------------------------
+version 0.0900 at 2016-01-05 20:15:11 +0000
+-------------------------------------------
+
+  Change: 1c3f56497dfaa6871cbf5bdc4d3265fe621d54c8
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-01-05 15:15:11 +0000
+
+    v0.0900 
+
+  Change: 59ce461f1e0cfdbd99dd20b7c60f3cfdd542ca19
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-01-05 15:06:34 +0000
+
+    Merge pull request #10 from teebszet/master
+
+    add notify and message format options to hipchat-send 
+
+  Change: 0b021ec1e50529cf5432d6c329a86d9e0dc1a928
+  Author: Tim Man <tim@lokku.com>
+  Date : 2016-01-05 12:23:05 +0000
+
+    add notify and message format options to hipchat-send 
+
+  Change: d674d720bd29989c323e3859f55f813c9a6bc364
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-20 21:11:08 +0000
+
+    Merge pull request #9 from chrisspang/master
+
+    Add hipchat-api script 
+
+  Change: e0ffce52adb1265279d83f84fc4a50976e818891
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-20 19:21:32 +0000
+
+    Add hipchat-api script 
+
+-------------------------------------------
+version 0.0800 at 2015-01-18 04:17:51 +0000
+-------------------------------------------
+
+  Change: 734f673a83d570b7565b217914d69e072ab6aaa2
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-17 23:17:51 +0000
+
+    v0.0800 
+
+  Change: 7efdffddd514d768f6dcd0d36f1903681473675c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-17 23:18:07 +0000
+
+    Merge pull request #8 from chrisspang/master
+
+    add method get_webhook and POD 
+
+  Change: 99a534e1f03a485618ed7a6667431f4e2361d01e
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2015-01-18 02:43:08 +0000
+
+    Merge remote-tracking branch 'upstream/master' 
+
+  Change: de3b91b725493f7e5afa50cc6cf85d4ab5cd5f9a
+  Author: Chris Hughes <chris-git@fysh.org>
+  Date : 2015-01-18 02:23:38 +0000
+
+    add method get_webhook and POD 
+
+-------------------------------------------
+version 0.0700 at 2015-01-18 04:02:28 +0000
+-------------------------------------------
+
+  Change: 16a65520a51b4fdf077b4099d8fe9e17385c7df0
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-17 23:02:28 +0000
+
+    v0.0700 
+
+  Change: c7f1bc1b70bec27cba8b258547006f4586e8f521
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-17 14:29:33 +0000
+
+    Merge pull request #7 from chrisspang/master
+
+    add method delete_webhook 
+
+  Change: 4d87652756af9f5a1b67bc19ef4e747d12d0533b
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2015-01-17 19:21:50 +0000
+
+    add method delete_webhook 
+
+  Change: 74119649e5c83b443750f99e1451f4a21320959e
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-02 02:35:33 +0000
+
+    fix share_file() issue by requiring latest WebService::Client 
+
+-------------------------------------------
+version 0.0600 at 2014-11-21 19:07:03 +0000
+-------------------------------------------
+
+  Change: d932b4437663b4ae22418c4210b23214ea9cc8d2
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-21 14:07:03 +0000
+
+    v0.0600 added Chris Hughes to CONTRIBUTORS 
+
+  Change: 78bca094696c62f0a9dc5ce85dd0d99072c701f5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-21 13:56:56 +0000
+
+    Merge pull request #6 from chrisspang/master
+
+    Use WebService::Client new features to build request 
+
+  Change: f0624ec9f3b9273a08d4f7b48a186658d8e9bb78
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2014-11-20 13:45:51 +0000
+
+    Use WebService::Client new features to build request 
+
+  Change: 41981e629a5be2cd752c3d9e203829e29d16ddf8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 14:30:02 +0000
+
+    Merge pull request #4 from chrisspang/master
+
+    Add share_file() 
+
+  Change: 196cc1d3d2d7b3d8cf5bd196fd2d66283a146ceb
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2014-11-14 12:26:44 +0000
+
+    Add share_file() 
+
+-------------------------------------------
+version 0.0500 at 2014-11-13 16:25:34 +0000
+-------------------------------------------
+
+  Change: 5714e0c68a9b099906d82cf6fa1e709944f7bc2a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-13 11:25:34 +0000
+
+    v0.0500 
+
+  Change: 6ee488da01b74a050f062fc43d14655bafe7f0f9
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-13 11:23:41 +0000
+
+    Merge pull request #3 from chrisspang/master
+
+    Switch to WebService::Client 
+
+  Change: ba31f78d963ac19d0e1b07f66379dfc4f22c23de
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2014-11-13 11:09:20 +0000
+
+    Added share_link() get_room_history() 
+
+  Change: 1901fb36d133f1de4496fa4745b5121d2a344db9
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2014-11-13 10:34:14 +0000
+
+    Switch to WebService::Client 
+
+-------------------------------------------
+version 0.0402 at 2014-11-13 08:01:30 +0000
+-------------------------------------------
+
+  Change: 1030abbb8feb155cf869e91a3523f98bbe0af56d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-13 03:01:30 +0000
+
+    v0.0402 switched to WebService::Client 
+
+  Change: 26ec34eb1dbcd21728bd57adbe5663db4adf0e11
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 12:26:15 +0000
+
+    Merge pull request #1 from chrisspang/master
+
+    Simple usage documentation fix 
+
+  Change: 439e594546ebcc1ba89b5778ce48a2d3861fc849
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2014-11-12 17:05:33 +0000
+
+    Simple usage documentation fix 
+
+  Change: aefc5c74169b7169164bcfe5638876becaf6818a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-01 14:56:19 +0000
+
+    fixed get_users documentation 
+
+-------------------------------------------
+version 0.0400 at 2014-11-01 10:13:18 +0000
+-------------------------------------------
+
+  Change: 7d646a3a71b529838b8db506e9636cb692c1ece0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-01 06:13:18 +0000
+
+    v0.0400 added support for providing query params for getting
+    collections 
+
+-------------------------------------------
+version 0.0301 at 2014-10-28 23:44:17 +0000
+-------------------------------------------
+
+  Change: ce1f7326aaf0309f4c7ec3615df12b088043c9a8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-28 19:44:17 +0000
+
+    v0.0301 fixed pagination 
+
+-------------------------------------------
+version 0.0300 at 2014-10-28 23:29:21 +0000
+-------------------------------------------
+
+  Change: 1aebb704929275ee436bdacf32716bce65bf4baf
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-28 19:29:21 +0000
+
+    added support for pagination via next() 
+
+-------------------------------------------
+version 0.0201 at 2014-07-26 09:06:34 +0000
+-------------------------------------------
+
+  Change: 48058a6280676bf27d7d4c73df11ac5326bb8d4d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-26 05:06:34 +0000
+
+    v0.0201 updated long options to hipchat-send 
+
+  Change: 25521b26fc2458352297cebf23e425f766535654
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-26 04:03:02 +0000
+
+    v0.0200 added hipchat-send command line utility for sending messages 
+
+-------------------------------------------
+version 0.0100 at 2014-07-21 08:58:00 +0000
+-------------------------------------------
+
+  Change: 6c4477b9e15d5d3213873011b000182ec24fcb66
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:58:00 +0000
+
+    v0.0100 
+
+  Change: 6f22456cae51b164955abba8f4e4a803033037d0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:55:37 +0000
+
+    updated WebService::BaseClientRole requirement version 
+
+  Change: b278b6c7645ad1c3176b8234aaac466830d1cc0e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:54:04 +0000
+
+    added set_topic 
+
+  Change: abdcf3b10db13f729071d94bbf06b3aab8449eec
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:46:37 +0000
+
+    added methods get_members, add_member, and remove_member 
+
+  Change: 41429daaac2a5fbed432ebb727494a79eef848bf
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:20:41 +0000
+
+    added methods create_room, update_room, and delete_room 
+
+  Change: d6ca762f21bd9b7f99262c5183d88857dfaef3e8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 03:34:47 +0000
+
+    added example of getting paged results 
+
+-------------------------------------------
+version 0.0001 at 2014-07-21 03:56:40 +0000
+-------------------------------------------
+
+  Change: 4ecf63dc6fc98fc8177c726302ac9f4fa6efa74c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-20 23:56:40 +0000
+
+    releasing v0.0001 
+
+  Change: 08bb9ed84aef06aec85ef2f57238632b1c88ded0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-19 18:01:49 +0000
+
+    added get_users, get_user, send_private_msg, get_emoticons,
+    get_emoticon 
+
+  Change: 4118feefdb0903242ed2a9b72c51df74e77be750
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-19 16:12:17 +0000
+
+    added send_notification 
+
+  Change: 50017679eca475909894bb0712df1636788fc422
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-19 02:27:27 +0000
+
+    first commit 
+
+================
+End of releases.
+================

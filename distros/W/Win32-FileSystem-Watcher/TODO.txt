@@ -1,0 +1,8 @@
+TODO
+----
+
+- Add documentation
+- Add proper sync and async tests
+- Watch multiple dirs at once.
+- Add NTFS change journal support - http://msdn.microsoft.com/en-us/library/aa363803(VS.85).aspx
+- Improve on child_pid kill.

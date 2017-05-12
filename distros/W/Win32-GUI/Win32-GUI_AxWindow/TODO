@@ -1,0 +1,14 @@
+ - It would be nice if you were trying to create a control using an AxtiveX
+   object that does not exist on the running PC that you got a control
+   failure rather than a Shell.Explorer control showing an error.  For eaxmple
+   running the MSFlexGrid demo on a PC that does not have a registered version
+   of msflxgrd.ocx, results in a window showing an IE Error, at it the
+   underlying framework has fallen back to using 'MSFlexGridLib.MSFlexGrid'
+   as a URL ('http://MSFlexGridLib.MSFlexGrid/', which, of course, does
+   not exist).  See InfoControl.pl example for a fairly heavy-handed
+   way to do it.
+
+- Investigate why SetProperty('uiMode' ...) doesn't work in WMPlayer.pl
+  demo.  Is this a bug with AxWindow?
+
+- Complete the 'Uncomplete' demos.  Make DHtmlEdit.pm and MsFlexGrid.pm installed modules?

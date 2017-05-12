@@ -1,0 +1,155 @@
+NAME
+    WebService::Plotly - access plot.ly programmatically
+
+VERSION
+    version 1.133400
+
+SYNOPSIS
+        use WebService::Plotly;
+    
+        my $user = USERNAME_HERE;
+        my $login = WebService::Plotly->signup( $user, EMAIL_HERE );
+        warn "temp password is $login->{tmp_pw}";
+    
+        my $plotly = WebService::Plotly->new( un => $user, key => $login->{api_key} );
+
+        my $x0 = [ 1,  2,  3,  4 ];
+        my $y0 = [ 10, 15, 13, 17 ];
+        my $x1 = [ 2,  3,  4,  5 ];
+        my $y1 = [ 16, 5,  11, 9 ];
+        my $response = $plotly->plot( $x0, $y0, $x1, $y1 );
+    
+        print "url is: $response->{url}";
+        print "filename on our server is: $response->{filename}";
+
+DESCRIPTION
+    This module provides a smooth interface to the REST API of
+    <http://plot.ly>. It will take both plain perl data as well as PDL
+    objects and transform them as needed.
+
+    Note that WS::Plotly caches the filename on the plotly server inside the
+    object, so that further plot/style/layout calls can be used to modified
+    an existing plot.
+
+EXAMPLES
+    You can find examples plots at <https://plot.ly/api/perl/>.
+
+    A sample of the plots available are shown below (if you don't see images
+    below, view this documentation on MetaCPAN
+    <https://metacpan.org/pod/WebService::Plotly>). To view the example
+    code, follow the links.
+
+    * Fishschool Scatter Graph
+      <https://plot.ly/perl/script-demos/fishschool>
+
+    * Histogram Area Plot <https://plot.ly/perl/script-demos/histarea>
+
+    * Math Scores <https://plot.ly/perl/script-demos/math>
+
+CONSTRUCTOR
+    WS::Plotly uses a standard Moo constructor.
+
+ATTRIBUTES
+  un
+    Expects a string containing the username to be sent to the API for
+    authentification.
+
+    Required attribute.
+
+  key
+    Expects a string containing the API key to be sent to the API for
+    authentification.
+
+    Required attribute.
+
+  fileopt
+    Expects a string containing options sent to the API with every data
+    call, concerning usage of the filename parameter. See the bottom of
+    <https://plot.ly/api/>.
+
+  filename
+    Expects a string containing options sent to the API with every data
+    call, determining the name for the plot resulting of the call, or a name
+    of the plot to be reused for this call.
+
+  verbose
+    Boolean that determines whether the server message (containing the plot
+    url and filename) will be printed to the console. Defaults to 1.
+
+METHODS
+  version
+    Returns the version of the API object, which will be sent to the API.
+
+  my $response = $plotly->signup( $username, $email )
+    Creates a new account on the server, if possible. Returns a hash
+    containing the temporary password of the new account, as well as the api
+    key.
+
+   DATA CALLS
+    All of these calls take arguments in this fashion:
+
+        $plotly->plot( @data, %options );
+
+    Beginning from the start of the argument list all elements will be
+    slurped into a data array (they're generally expected to be array
+    references or PDL objects) until the first scalar with a ref() value is
+    reached.
+
+    This is assumed to be a hash key and it along with all following scalars
+    will be slurped into an option hash.
+
+    This means that the data calls generally do not care if they are sent an
+    array reference containing a list of data array referencess as the first
+    argument, or a flat list of data array references.
+
+    All of the data calls return a response hash containing the keys url,
+    message, warning, filename and error. Normally only url and filename
+    will be interesting to you; however message can contain extra
+    information and will be printed if verbose is set to 1, warning can
+    contain warnings from the server and is always printed with warn(),
+    while a value in the error key triggers the module to die.
+
+    These data calls exist and reading the documentation at the bottom of
+    <https://plot.ly/api/> is recommended.
+
+  plot
+    This sends data to Plotly to be plotted and stored.
+
+  style
+    This call is used to style the data sets sent to the server with the
+    plot call.
+
+  layout
+    This call customizes the style of the layout, the axes, and the legend.
+
+THANKS
+    Many thanks for Christopher Parmer specifically and Plotly, Inc. in
+    general for providing much support and help in creating this module, as
+    well as footing the bill for it.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/plotly/Perl-API/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/plotly/Perl-API>
+
+      git clone https://github.com/plotly/Perl-API.git
+
+AUTHORS
+    *   Christian Walde <walde.christian@gmail.com>
+
+    *   Christopher Parmer <chris@plot.ly>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Plotly, Inc..
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

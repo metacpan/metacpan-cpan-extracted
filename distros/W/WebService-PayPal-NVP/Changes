@@ -1,0 +1,27 @@
+Revision history for Perl module WebService::PayPal::NVP
+
+0.006     2017-03-13 16:51:00-04:00 America/Toronto
+ - Fix broken build
+
+0.005 2017-03-09
+ - Fix response parsing to decode all data UTF-8 (Dave Rolsky)
+ - Use UserAgent directly for POST requests (Olaf Alders)
+
+0.004 2015-02-23
+ - Allow a custom UserAgent to be provided to constructor (Olaf Alders)
+ - Add get_recurring_payments_profile_details() method (Olaf Alders)
+ - Add has_errors() methods to NVP and Response objects (Olaf Alders)
+
+0.003 2015-01-10
+ - Using ExtUtils::MakeMaker now
+ - Converted readme to markdown
+ - Fixed typo in pod (Olaf Alders)
+ - Add create_recurring_payments_profile(),
+   manage_recurring_payments_profile_status(), mass_pay() and
+   refund_transaction() methods (Olaf Alders)
+ - Thanks for the new methods, Olaf!
+
+0.002 2013-09-26
+
+0.001 2013-09-23
+ - First version, released on an unsuspecting world.

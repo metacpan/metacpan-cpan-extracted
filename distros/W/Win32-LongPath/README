@@ -1,0 +1,61 @@
+README for Win32::LongPath
+
+PREREQUISITES
+=============
+This module was developed for the Windows environment. It was tested in
+WinXP and Win7 (64-bit) but should work in anything from WinXP to Win8.
+It was also tested in the Cygwin 1.7.25 environment.
+
+It was developed in ActivePerl 5.16 but should work with Perl 5.8.0 or later.
+
+Install a C compiler. It has been successfully compiled using MinGW 4.6.2,
+MinGW64 4.5.4 or Visual C++ 2010 Express. Please note the following:
+
+  1. It is best to use the same compiler that was used to compile Perl itself.
+
+  2. MinGW 3.4.5 created a DLL that did not work in the WinXP environment.
+
+INSTALLATION
+============
+Make the source code directory the current directory and type the following
+commands to create the module, test it and install it. NOTE: Use dmake
+instead of nmake if you are using MinGW.
+
+  perl Makefile.PL
+  nmake
+  nmake test
+  nmake install
+
+The test code will do the following:
+
+  1. Create a very long path in the source directory that includes Unicode
+    names. If the path already exists a warning will be displayed.
+
+  2. Create a Unicode file in that directory.
+
+  3. Copy and rename the file.
+
+  4. If the file system, operating system and user privileges support it,
+    it will create a hard link, relative symbolic link to a directory,
+    and a fullpath symbolic link to a file. A diagnostic message will be
+    printed if these conditions are not met. NOTE: Symbolic links require
+    Administrator privileges.
+
+  5. Change the read, hidden, system and FANCI attributes of file. A
+    diagnostic message will be displayed if the FANCI attribute is not
+    supported and it will not test this feature.
+
+  6. The file access and modification times will be changed to 24 hours
+    earlier and will be tested for that time. Since some file systems
+    do not have 1-second resolution (i.e. FAT) a diagnostic warning will
+    be displayed if the access time is not the same and less than a day
+    or the modification time is not the same and is less than 2 seconds.
+
+  7. The contents of the directory will be examined using the opendirL
+    function.
+
+  8. The files and created path will be removed.
+
+NOTE: If the process fails it may leave the long path and files behind.
+  Most likely Windows Explorer will not be able to remove it due to its
+  length.

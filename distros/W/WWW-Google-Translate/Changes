@@ -1,0 +1,42 @@
+Revision history for Perl extension WWW::Google::Translate.
+
+0.09  Fri Jan 06 20:12:45 2017
+    - updated POD 
+
+0.08  Sun Dec 28 22:33:17 2014
+    - Added support for the 'headers' constructor parameter
+    - Improved error messaging on translate failure
+    - Improved constructor parameter validation
+
+0.07  Sat Aug 04 23:36:42 2012
+    - Added the cache_results constructor option
+
+0.06  Sun Apr 29 08:14:01 2012
+    - Support for the 'format' paramter
+    - Support for the 'prettyprint' paramter
+    - Improved example program
+
+0.05  Mon Mar 26 21:18:15 2012
+    - Revised handling of UTF-8
+    - Allow source parameters to be optional for auto-detect lanaguage
+    - patch from perlover@perlover.com
+
+0.04  Sat Mar 25 00:38:12 2012
+    - Fixed bug for detect method
+    - Improved error response messages
+    - Added force_post constructor parameter
+    - Improved POD
+
+0.03  Tue Mar 13 23:22:16 2012
+    - Use the X-HTTP-Method-Override to support translate queries over 2K.
+        (The total limit is still capped at 5K.)
+    - Added transform_result parameter in case the utf8::decode transforms
+        are unwanted.
+
+0.02  Sat Feb 04 11:04:24 2012
+    - on HTTP 400 error die with message suggesting this could be due to API
+      access for the current host IP with the URL to the APIs console
+
+0.01  Fri Nov 25 15:57:14 2011
+    - original version; created by h2xs 1.23 with options
+        -XA -n WWW::Google::Translate

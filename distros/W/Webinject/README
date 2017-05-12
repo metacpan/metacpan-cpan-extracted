@@ -1,0 +1,195 @@
+NAME
+    Webinject - Perl Module for testing web services
+
+SYNOPSIS
+        use Webinject;
+        my $webinject = Webinject->new();
+        $webinject->engine();
+
+DESCRIPTION
+    WebInject is a free tool for automated testing of web applications and
+    web services. It can be used to test individual system components that
+    have HTTP interfaces (JSP, ASP, CGI, PHP, AJAX, Servlets, HTML Forms,
+    XML/SOAP Web Services, REST, etc), and can be used as a test harness to
+    create a suite of [HTTP level] automated functional, acceptance, and
+    regression tests. A test harness allows you to run many test cases and
+    collect/report your results. WebInject offers real-time results display
+    and may also be used for monitoring system response times.
+
+CONSTRUCTOR
+  new ( [ARGS] )
+    Creates an "Webinject" object.
+
+    reporttype
+        possible values are 'standard', 'nagios', 'nagios2', 'mrtg' or
+        'external:'
+
+    nooutput
+        suppress all output to STDOUT, create only logilfes
+
+    break_on_errors
+        stop after the first testcase fails, otherwise Webinject would go on
+        and execute all tests regardless of the previous case.
+
+    timeout
+        Default timeout is 180seconds. Timeout starts again for every
+        testcase.
+
+    useragent
+        Set the useragent used in HTTP requests. Default is 'Webinject'.
+
+    max_redirect
+        Set maximum number of HTTP redirects. Default is 0.
+
+    proxy
+        Sets a proxy which is then used for http and https requests.
+
+         ex.: http://proxy.company.net:3128
+
+        with authentication:
+
+         ex.: http://user:password@proxy.company.net:3128
+
+    output_dir
+        Output directory where all logfiles will go to. Defaults to current
+        directory.
+
+    globalhttplog
+        Can be 'yes' or 'onfail'. Will log the http request and response to
+        a http.log file.
+
+    httpauth
+        Provides credentials for webserver authentications. The format is:
+
+          ['servername', 'portnumber', 'realm-name', 'username', 'password']
+
+    baseurl
+        the value can be used as {BASEURL} in the test cases
+
+    baseurl1
+        the value can be used as {BASEURL1} in the test cases
+
+    baseurl2
+        the value can be used as {BASEURL2} in the test cases
+
+    standaloneplot
+        can be "on" or "off". Default is off. Create gnuplot graphs when
+        enabled.
+
+    graphtype
+        Defaults to 'lines'
+
+    gnuplot
+        Defines the path to your gnuplot binary.
+
+METHODS
+  engine
+    start the engine of webinject
+
+TEST CASES
+  Parameters
+    addcookie
+        When added to a test case, this adds a cookie to the cookie jar
+        prior to the test case request being sent (i.e. the test case this
+        is attached to will include any cookies specified in this
+        parameter). This is useful for cases where a cookie is set outside
+        of a Set-Cookie directive in the response header. This parameter
+        takes a comma-delimited list of fields that configure the cookie;
+        the fields for this parameter are a direct one-to-one correllation
+        with the parameters to the HTTP::Cookies::set_cookie method. As
+        well, multiple cookies can be defined by separating with a '|'
+        character as with the addheader parameter.
+
+        The comma-delimited list of fields are as follows.
+
+        addcookie="version,name,value,path,domain,port,path_spec,secure,maxa
+        ge,discard"
+
+        version - Cookie-spec version number
+
+        name - Cookie name.
+
+        value - Cookie value.
+
+        path - The URL path where the cookie is set.
+
+        domain - The domain under which the cookie is set.
+
+        port - The port on which the cookie is set.
+
+        path_spec - Boolean. Set if the cookie is valid only under 'path' or
+        the entire domain.
+
+        secure - Boolean. If true (1), the cookie is only sent over secure
+        connections
+
+        maxage - The time in seconds the cookie is valid for.
+
+        discard - Boolean. Do not send in future requests and destroy upon
+        the next cookie jar save.
+
+    parseresponse
+        Parse a string from the HTTP response for use in subsequent
+        requests. This is mostly used for passing Session ID's, but can be
+        applied to any case where you need to pass a dynamically generated
+        value. It takes the arguments in the format
+        "leftboundary|rightboundary", and an optional third argument
+        "leftboundary|rightboundary|escape|decode" when you want to force
+        escaping of all non-alphanumeric characters (in case there is a
+        wrong configuration of Apache server it will push encoded HTML
+        characters (&#47; = /, &#58; = :, ... ) to the Webinject and decode
+        serve to translate them into normal characters. See the "Session
+        Handling and State Management - Parsing Response Data & Embedded
+        Session ID's" section of this manual for details and examples on how
+        to use this parameter.
+
+        Note: You may need to prepend a backslash before certain reserved
+        characters when parsing (sorry that is rather vague).
+
+        Note: Newlines (\n) are also valid boundaries and are useful when
+        you need to use the end of the line as a boundary.
+
+        parseresponse1 Additional parameter for response parsing.
+
+        parseresponse2 Additional parameter for response parsing.
+
+        parseresponse3 Additional parameter for response parsing.
+
+        parseresponse4 Additional parameter for response parsing.
+
+        parseresponse5 Additional parameter for response parsing.
+
+EXAMPLE TEST CASE
+      <testcases>
+        <case
+          id             = "1"
+          description1   = "Sample Test Case"
+          method         = "get"
+          url            = "{BASEURL}/test.jsp"
+          verifypositive = "All tests succeded"
+          warning        = "5"
+          critical       = "15"
+          label          = "testpage"
+          errormessage   = "got error: {PARSERESPONSE}"
+        />
+      </testcases>
+
+    detailed description about the syntax of testcases can be found on the
+    Webinject homepage.
+
+SEE ALSO
+    For more information about webinject visit http://www.webinject.org
+
+AUTHOR
+    Corey Goldberg, <corey@goldb.org>
+
+    Sven Nierlein, <nierlein@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Sven Nierlein
+
+    Copyright (C) 2004-2006 by Corey Goldberg
+
+    This library is free software; you can redistribute it under the GPL2
+    license.
+

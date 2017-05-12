@@ -1,0 +1,295 @@
+=pod
+
+=head1 NAME
+
+Wizard::LDAP - Administration interface for your LDAP server
+
+
+=head1 SYNOPSIS
+
+  # From the shell:
+  ldapWizard
+
+  # Or, from the WWW:
+  <a href="ldap.ep">LDAP administration</a>
+
+
+=head1 DESCRIPTION
+
+This is a package for administration of an LDAP server. It allows to
+feed users, hosts and networks into the server.
+
+
+=head1 INSTALLATION
+
+First of all, you have to install the prerequisites. There are lots
+of:
+
+=over
+
+=item An LDAP Server
+
+You need some LDAP server. We are using the OpenLDAP server, see
+
+  http://www.openldap.org/
+
+In theory any other LDAP server should do, but the servers configuration
+might be different.
+
+A source RPM for Red Hat Linux is available on demand.
+
+To configure the LDAP server, edit the file F<topics.ldif> from the
+distribution. Currently it looks like
+
+  dc=ispsoft, dc=de
+  objectclass: organization
+  o: My Organization Name
+
+  dn: topic=user, dc=ispsoft, dc=de
+  name: user 
+  objectclass: topic
+
+  dn: topic=net, dc=ispsoft, dc=de
+  name: net 
+  objectclass: topic
+
+Change "dc=ispsoft, dc=de" and the organization name to reflect your local
+settings. For example, if you are using the mail domain "mycompany.com",
+then you might choose
+
+  dc=mycompany, dc=com
+
+Import the file into your LDAP server by using the command
+
+  ldif2ldbm -i topics.ldif
+
+(The above command will trash an existing LDAP database! Use ldapadd
+if you want to avoid this.)
+
+Append the files F<slapd.at.conf.APPEND> and F<slapd.oc.conf.APPEND>
+to your F</etc/openldap/slapd.at.conf> and F</etc/openldap/slapd.oc.conf>
+and restart the OpenLDAP server.
+
+=item IO::AtomicFile
+
+This is a Perl package for atomic operations on important files.
+
+=item HTML::EP
+
+If you like to use the WWW administration interface, you need the
+embedded Perl system HTML::EP.
+
+=item Wizard
+
+Another Perl module, available at the same place.
+
+=item Convert::BER
+
+=item Net::LDAP
+
+To talk to the LDAP server, we use Graham Barr's Net::LDAP package.
+It is written in 100% Perl, no underlying C library required.
+
+=item Net::Netmask
+
+Used to determine conformance of host IP´s to a network.
+
+=back
+
+All the above packages are available on any CPAN mirror, for example
+
+  ftp://ftp.funet.fi/pub/languages/perl/CPAN/authors/id
+
+or perhaps at the same place where you found this file. :-)
+
+Note that some of the packages have their own requirements. For
+example, HTML::EP depends on libwww and the MailTools. If so, you
+will be told while installing the modules. See below for the
+installation of the Perl modules.
+
+
+=head2 Installing the Perl modules
+
+Installing a Perl module is always the same:
+
+  gzip -cd Wizard-LDAP-0.1005.tar.gz | tar xf -
+  cd Wizard-LDAP-0.1005
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you might try using the automatic installation that the
+CPAN module offers you:
+
+  perl -MCPAN -e shell
+  install Bundle::Wizard::LDAP
+
+Note that some of the modules, in particular HTML::EP, need additional
+configuration tasks, for example modifying the web servers configuration
+files.
+
+
+=head2 Some final tasks
+
+You have to create a directory F</etc/Wizard-LDAP> and make it owned
+by the httpd user, so that CGI binaries can write into this directory.
+
+Copy the file F<ldap.ep> and the file F<gethelp.ep> from the Wizard
+distribution into your web servers root directory. (I choose
+F</home/httpd/html/admin/ldap.ep> on my Red Hat Linux box.)
+
+Point your browser too the corresponding location, for example
+
+  http://localhost/admin/ldap.ep
+
+Start with modifying the preferences. See L<THE LDAP-WIZARD PREFERENCES>.
+
+
+=head1 THE LDAP-WIZARD PREFERENCES
+
+The system wide preferences are accessible via the web form ldap.ep.
+The following items can be configured:
+
+=head2 item_ldap_prefs_serverip
+
+This is the IP address of the LDAP server being used, typically
+
+  127.0.0.1.
+
+No default is set.
+
+=head2 item_ldap_prefs_serverport
+
+Likewise, this is the LDAP servers port number. The default is
+
+  389
+
+=head2 item_ldap_prefs_adminDN
+
+This is the distinguished name to use for accessing the LDAP server
+as root. No default is set. Example:
+
+  cn=root, dc=ispsoft, dc=de
+
+=head2 item_ldap_prefs_adminPassword
+
+This is the password to use for binding to the LDAP server as root.
+Currently the password *must* be stored in clear text. (This is subject
+to change.)
+
+=head2 item_ldap_prefs_nextuid
+
+This the next numeric UID, that will assigned to a new user. By default
+the value
+
+  500
+
+is choosen. The value is incremented with any new user, so after inserting
+the next users it will be 501, 502, 503 and so on. You typically should
+reserve some block of Unix UID's for users managed by the LDAP server.
+
+=head2 item_ldap_prefs_gid
+
+This is the numeric GID, that your LDAP users will have under Unix.
+The default is
+
+  500
+
+=head2 item_ldap_prefs_home
+
+This is the prefix to use for the users home directories, for example
+
+  /home
+
+(the default). The users login names will be appended.
+
+=head2 item_ldap_prefs_userbase
+
+This is a suffix for constructing the distinguished names of your
+users. Example:
+
+  dc=ispsoft, dc=de
+
+=head2 item_ldap_prefs_netbase
+
+A similar suffix for constructing the distinguished names of nets.
+Example:
+
+  dc=ispsoft, dc=de
+
+
+=head2 item_ldap_prefs_domain
+
+The mail domain appended to unclassified email adresses. For example,
+if you have a user "joe" and the domain is "ispsoft.de", then its
+email adress will be joe@ispsoft.de.
+
+
+=head2 item_ldap_prefs_prefschange
+
+If you enter a shell command here, then this command will be launched
+after any change of the preferences. Example:
+
+  /usr/bin/ldapAdmin --prefs
+
+=head2 item_ldap_prefs_hostchange
+
+This is a similar shell command that will be called after hosts have
+changed. Example:
+
+  /usr/bin/ldapAdmin --hosts
+
+=head2 item_ldap_prefs_netchange
+
+A shell command to issue after network definitions have changed. Example:
+
+  /usr/bin/ldapAdmin --nets
+
+=head2 item_ldap_prefs_userchange_new
+
+This is a special case of the command for changing users. If defined, it
+will be issued after a user was created. The users name will be appended
+as the last argument. If not defined, the above and more generic command
+will be executed.
+
+=head2 item_ldap_prefs_userchange_modify
+
+Similar to item_ldap_prefs_userchange_new, but for modified users. Again,
+the users name will be appended as a last argument.
+
+=head2 item_ldap_prefs_userchange_delete
+
+Finally a shell command being executed after a user has been deleted.
+The users name will be appended as a last argument.
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU
+General Public License or the Artistic License, as
+specified in the Perl README file.
+
+
+=head1 SEE ALSO
+
+L<Wizard>, L<ldapWizard>, L<HTML::EP>, L<Net::LDAP>
+
+=cut

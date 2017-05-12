@@ -1,0 +1,4 @@
+name = "WebService-Bandcamp"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

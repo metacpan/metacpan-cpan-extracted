@@ -1,0 +1,42 @@
+
+body { font-family: arial,sans-serif; font-size:12pt }
+
+h1 { font-size: 16pt }
+h2 { font-size: 14pt }
+
+#wrapper {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ccccff;
+  background: #eeeeff;
+}
+
+#error {
+  padding: 3px;
+  margin-bottom: 5px;
+  color: #ff3333;
+  height: 17em;
+}
+
+#markup {
+  border-top: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+}
+
+#markup textarea {
+  padding: 3px;
+  height: 15em;
+}
+
+#options.result { }
+
+#wrapper { }
+
+.example, .from {
+  font-style: italic;
+  font-size: smaller;
+}
+
+#notes { border-top: 2px solid #ccc }
+
+fieldset.hidden { display:none }

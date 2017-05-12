@@ -1,0 +1,13 @@
+Things to do, or just a wish list?
+
+General:
+ * Add examples in the POD
+ * Allow logging to a file handle
+
+Server:
+ * Allow client access in many formats: Hostname IP IP/netmask Pattern
+ * TK API
+ * Event API
+
+Client:
+ * Nonblocking version

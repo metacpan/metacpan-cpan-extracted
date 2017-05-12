@@ -1,0 +1,19 @@
+1.123160  2012-11-11 18:13:16 Europe/London
+    Add LWP::Protocol::https as dependency.
+    Use HTTP::Online to test for internet connection when running tests.
+
+1.120730  2012-03-13 12:41:33 Europe/London
+    Need at least Net::Ping 2.33 for testing.
+
+1.120580  2012-02-27 13:58:37 Europe/London
+    Ensure gamercard.xbox.com is available before doing live tests.
+
+1.120260  2012-01-25 22:21:20 America/Los_Angeles
+    Fix live unit tests, making them more resilient.
+
+1.120030  2012-01-03 07:40:23 Europe/London
+    Doc fixes.
+    Slightly better and more efficient way to parse the recent games.
+
+1.120020  2012-01-02 12:23:25 Europe/London
+    Initial version.

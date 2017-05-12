@@ -1,0 +1,9 @@
+Revision history for Perl extension Web::MicroID.
+
+0.02  Tue Jul 31 2007
+    - Fixed a bug w/settings arguments in new()
+    - Changed namespace from MicroID to Web::MicroID
+
+0.01  Wed Jul 25 2007
+    - original version
+

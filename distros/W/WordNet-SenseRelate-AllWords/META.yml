@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                WordNet-SenseRelate-AllWords
+version:             0.19
+abstract:            Disambiguate All Words in a Text based on semantic similarity and relatedness in WordNet 
+license:             gpl
+author:              
+    - Ted Pedersen <tpederse at d.umn.edu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    WordNet::Similarity:           0.16
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

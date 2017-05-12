@@ -1,0 +1,36 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/keedi/WebService-Yes24"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "version" : "0.100980",
+   "name" : "WebService-Yes24",
+   "author" : [
+      "Keedi Kim - \u00ea\u00b9\u0080\u00eb\u008f\u0084\u00ed\u0098\u0095 <keedi at cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "Test::Base" : "0",
+      "URI" : "0",
+      "namespace::autoclean" : "0",
+      "URI::Escape" : "0",
+      "Moose::Util::TypeConstraints" : "0",
+      "Encode" : "0",
+      "Test::More" : "0",
+      "perl" : "5.010",
+      "Web::Scraper" : "0",
+      "common::sense" : "0",
+      "LWP::Simple" : "0",
+      "Moose" : "0"
+   },
+   "abstract" : "Yes24 Web Service API Module",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

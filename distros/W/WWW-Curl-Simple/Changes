@@ -1,0 +1,87 @@
+Revision history for WWW-Curl-Simple
+0.100191  2013-12-13 11:34:55 Asia/Bangkok
+        - Fix #10: Update pod to reflect changed default value
+
+0.100190  2013-10-28 21:11:09 America/Lima
+        - Use immutable classes, thanks @haarg
+
+0.100189  2013-09-02 11:19:11 Asia/Bangkok
+        - No longer use new constants, use variables instead. Properly fix it for
+          older libcurls I hope :P
+
+0.100188  2013-08-28 09:12:03 Asia/Bangkok
+        - Check for existance of CURLPROTO_HTTP before attempting to use it, should
+          fix us so we work better with older libcurls again.
+
+0.100187  2013-08-10 17:53:22 Asia/Bangkok
+        - Change SYNOPSIS to work with Test::Synopsis
+        - Fix #8 by reformating some old changelogs
+
+0.100186  2013-07-15 16:10:09 Asia/Bangkok
+        - Make it possible to turn OFF ssl peer verification
+          The default is still to be secure, but it is now possible to be
+          insecure if you want (neilbowers)
+        - Default to follow 5 redirects
+          The number can be changed, and redirect follows can be disabled
+          (neilbowers)
+
+0.100185  2012-02-23 11:08:36 Europe/Oslo
+        - Merge more doc fixes from chromatic - fixes RT#70782
+        - Test can run in parallel now (no shared port number)
+
+0.100184  2011-05-06 20:58:31 Asia/Bangkok
+        - Merge pull request from chromatic to hopefully fix RT#60074
+
+0.100183  2011-02-19 07:59:03 Europe/Oslo
+        - Fix busy looping by nanosleeping in perform [thanks Eugene Y Jen for report]
+
+0.100182  2011-01-19 05:30:33 Europe/Oslo
+        - Documentation fixes [thanks chromatic]
+
+0.100181  2010-01-18 09:28:41 Europe/Oslo
+        - Note to self: Do not release when sleepy. Properly fix test-skipping.
+          There is no such module as Net::Server::Base damnit.
+
+0.100180  2010-01-18 08:50:01 Europe/Oslo
+        - Skip one test if we don't have Net::Server::Base installed
+
+0.100171  2010-01-17 12:05:39 Europe/Oslo
+        - Attempt to support older versions of libcurl trough some magic
+
+0.100170  2010-01-17 09:56:48 Europe/Oslo
+        - Adjust a test that fails on some versions of libcurl
+
+0.100160  2010-01-16 06:10:12 Europe/Oslo
+        - Switch to filehandles for storing data, should perform better
+        - Better documentation about return values [Marcus Ramberg]
+        INCOMPAT: The return value for add_request is changed. It now returns
+                  the WWW::Curl::Simple::Request-object that was added.
+        - Added has_request and delete_request to help with multi-request
+          handling [RT#46293]
+
+0.05    2009-06-10 07:44:00+0200
+        New options:
+          - timeout: Set timeout for content in seconds
+          - connection_timeout: Set timeout for connection in seconds
+          - fatal: (defaults to true), if false, will carp, not croak, on errors.
+
+0.04    2009-05-25 13:06:00+0200
+        Set a default UserAgent header, since some services seem to require a
+        UserAgent header.
+
+0.03    2009-04-20 09:32:00+0200
+        Bump version.
+
+0.02    2009-04-20 09:11:00+0200
+        INCOMPAT: Fix some compat issues with LWP::Parallel::UserAgent.
+                  We now return an hash like they do, with objects that have the
+                  same methods
+        INCOMPAT: $curl->perform on a multi-request now returns objects that have
+                  ->request and ->response methods, instead of the ->response
+                  directly.
+
+        Fix really bad response-fuckup.
+
+0.01    2009-04-14 09:37:00+0200
+        First version, very basic interface. Does not support everything yet
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+BUGS
+t/Win32-FTDI-FTD2XX.t
+bin/instp5dll.pl
+lib/Win32/FTDI/FTD2XX.pm
+lib/Win32/FTDI/p5ftd2xx.dll

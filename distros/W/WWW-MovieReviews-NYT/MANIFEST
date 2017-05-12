@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/WWW/MovieReviews/NYT.pm
+t/00-load.t
+t/00-unit-test.t
+t/01-unit-test.t
+t/02-unit-test.t
+t/03-unit-test.t
+t/04-unit-test.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

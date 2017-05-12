@@ -1,0 +1,46 @@
+Revision history for Perl extension WWW::Hotmail.
+
+0.10 Tue aug 09 2005
+	- hotmail format changed again
+
+0.09 Sun May 22 11:00:00 2005
+	- patch applied from Peter Pezaris
+
+0.08 Thu Dec 16 12:02:00 2004
+	- added errstr, errhtml, and croak_on_error
+	- improved docs
+
+0.07 Sun Dec 12 17:27:46 2004
+	- added compose method to enable sending e-mails through Hotmail
+	- fixed a regex for login method
+	- removed croaks in favor of returning undef and setting $@ with
+		the error html for more graceful error checking
+	
+0.06 Wed Aug 18 10:31:46 2004
+	- removed a debug print
+	
+0.05 Mon Aug 16 14:46:42 2004
+	- fixed the delete method
+	- added prereq for Mail::Internet even though Mail::Audit
+		does this already!
+
+0.04 Sun Aug 15 10:35:21 2004
+	- fixed warning when deleting messages
+
+0.03 Sun Aug 15 09:51:44 2004
+	- turns out M$ encodes & into &amp; too - fixed
+
+0.02 Sun Aug 15 08:48:32 2004
+	- with permission from Scott, I've taken ownership of
+		this module - David Davis
+	- fixed everything (hotmail changed somewhat)
+	- added support for the suite of domains hotmail controls
+	- messages are now converted correctly
+	- set noexit(1) flag on Mail::Audit object before it
+		is returned with retrieve()
+	- removed SIGNATURE until I can install PGP
+
+0.01 Wed Jan  8 16:01:52 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -AX -n WWW::Hotmail
+

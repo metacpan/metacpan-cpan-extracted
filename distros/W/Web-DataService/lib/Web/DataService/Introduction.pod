@@ -1,0 +1,327 @@
+
+
+=head1 NAME
+
+Web::DataService::Introduction - introduction to Web::DataService and how to use it
+
+=head1 SYNOPSIS
+
+This document provides a basic introduction to L<Web::DataService>, a
+framework for implementing data services for the World Wide Web.
+
+=head1 INTRODUCTION
+
+The purpose of Web::DataService is to provide a comprehensive framework on
+which to implement web data services.  By this, we mean web services that are
+primarily oriented toward fetching and storing data, including what are
+usually called "APIs".  Such a service can provide controlled access to a
+backend data system via HTTP requests and responses.
+
+In order to implement a capable web data service (or API), a server needs to be
+able to handle the following tasks:
+
+=over
+
+=item 1.
+
+Parse HTTP requests
+
+=item 2.
+
+Validate parameters
+
+=item 3.
+
+Talk to the backend system (whether it be a data store, instrument, control
+system, etc.)
+
+=item 4.
+
+Assemble representations of data
+
+=item 5.
+
+Serialize those representations in formats such as JSON, XML, etc.
+
+=item 6.
+
+Set HTTP response headers
+
+=item 7.
+
+Generate appropriate error messages
+
+=item 8.
+
+Provide documentation about itself
+
+=back
+
+Most people who implement data services in Perl base them on web application
+frameworks such as Dancer, Catalyst, etc.  These frameworks provide a good
+start, but then the authors must then implement most or all of the
+functionality listed above.  The basic idea behind this module is the
+realization that all of the steps listed above except (3) can be handled by a
+common code base, configured according to the requirements of a particular
+data service by a common set of directives.  This leaves "Talk to the backend
+system" as the only part that must be implemented using code directly written
+by the data service author.
+
+The remainder of this document describes the various concepts behind
+Web::DataService.  It is true that this framework is a complicated one, and
+that is because the problem it attempts to solve is a complicated problem.  In
+order to make sense of these concepts, you may wish to examine the example
+data service discussed in L<Web::DataService::Tutorial>.  This example
+application demonstrates the full power of Web::DataService, and can be used
+as a basis for your own projects.
+
+=head2 Principles
+
+The Web::DataService framework is based on the following fundamental concepts:
+
+=head3 Configurability
+
+It is designed to allow you to create a data service that will provide exactly
+the functionality you desire.  The behavior of the data service is extremely
+configurable, and also includes a number of hooks that you can use if
+necessary to further modify the behavior.  For more information, see
+L<Web::DataService::Configuration>.
+
+=head3 Extensibility
+
+In a similar vein, the service is designed to be extensible, with plug-in
+modules that can be added to provide additional output formats, backend
+systems, etc.
+
+=head3 Orthogonality of output formats
+
+One basic principle of this framework is that data output is organized around
+the abstract idea of a "record" defined by a set of data fields.  A request is
+satisfied by generating one or more records, each of which is a hash of field
+names and values.  These records are then passed to a seprate module, which
+serializes them in the selected output format.  This de-coupling of data
+generation from data serialization simplifies the data generation code
+immensely, and allows a user of the service to ask for their output in any of
+the available formats.  It also makes it easy for the data service developer
+to add new output formats as needed.
+
+=head3 Automatically generated documentation
+
+Documentation is an extremely important part of the functionality provided by
+this framework.  To a great extent, the documentation pages for a web data
+service can be auto-generated.  While defining the various elements of a data
+service (see below) you have the ability to include documentation strings that
+will be used as the basis for the generated documentation sections.  This
+makes it easy to keep the documentation up-to-date as the configuration of the
+data service changes over time.
+
+=head2 Elements of a data service
+
+A data service implemented under the Web::DataService framework is composed of
+the following elements.  See L<Web::DataService::Tutorial> for an example of
+how they fit together in an actual application.
+
+=head3 Foundation framework
+
+A Web::DataService application is built on top of a I<foundation framework>,
+which provides the basic functionality for a web service such as receiving and
+assembling HTTP messages.  Currently, the only such framework that can be used
+with Web::DataService is L<Dancer>.  We hope to expand this set in the future.
+(Please let us know if you are interested in creating a plugin module to work
+with one of the other available frameworks).
+
+=head3 Data service instance
+
+Each data service is represented by an instance of the class Web::DataService.
+The basic attributes of the data service are either provided at the time of
+instantiation, or are read from the application configuration file provided by
+the foundation framework.  These attributes are documented in
+L<Web::DataService::Configuration|Web::DataService::Configuration/"Data
+service attributes">.
+
+A data service application starts by creating a new data service instance and
+then calling its methods to define the other elements discussed below.  Once
+this is done, control is turned over to the foundation framework until a data
+service request arrives and is recognized.  For more information about this
+process, see L<Web::DataService::Tutorial>.
+
+=head3 Data service nodes
+
+Each distinct data service operation or documentation page is associated with
+a I<data service node>, generated at startup time by the C<define_node> method
+of the data service instance.  Each node is keyed by a unique I<path>, which
+in a typical data service will correspond to one of the request URL
+paths accepted by the service.
+
+The space of nodes is hierarchical, in the same sense that the set of paths
+is.  If your application creates the nodes "a", "a/b", and "a/c", then any
+attribute values you define for "a" will be inherited by "a/b" and "a/c"
+unless specifically overridden.  Any attribute values assigned to the root
+node "/" will be inherited by all other nodes except where specifically
+overridden.
+
+Each node in a data service definition will correspond to one of the following:
+
+=over
+
+=item 1.
+
+A data service operation and its associated documentation page.
+
+=item 2.
+
+A standalone documentation page.
+
+=item 3.
+
+A file or directory of files that can be retrieved upon request (e.g. a
+stylesheet for the documentation pages).
+
+=back
+
+=head3 Output blocks
+
+The data records returned by a Web::DataService application are built from a
+set of I<output blocks>.  These are defined at startup time by the
+C<define_block> method of the data service application.  Each output block
+consists of a list of field definitions, processing steps, and other auxiliary
+declarations.  Each data service node that represents a data-producing
+operation must select one or more of these output blocks, which are then used
+to generate the output records whenever this operation is requested.
+
+=head3 Formats
+
+A data service application must also define one or more I<output formats>,
+using the C<define_format> method of the data service instance.  Each of these
+format definitions configures one of the available serialization modules so
+that it can transform sets of data records into HTTP response bodies.
+
+The Web::DataService installation includes two built-in serialization modules:
+C<JSON>, which serializes responses using the
+L<JSON|https://en.wikipedia.org/JSON> format, and C<Text>, which can generate
+either tab-separated or comma-separated text responses.  If you wish your data
+service to generate output in other formats, you can easily implement your own
+plug-in modules (see L<Web::DataService::Plugins>).
+
+If your data service provides multiple formats, clients can then choose which
+format best meets their needs and can vary the format from request to request
+as they choose.
+
+=head3 Vocabularies
+
+A data service application may also define one or more I<vocabularies> in
+which to express the output data.  These are created by using the
+C<define_vocab> method of the data service instance.  The output field
+definitions mentioned above can each include multiple field names, one for
+each relevant vocabulary.  An output block can also include processing steps as
+necessary to transform the data values into the proper range for each
+vocabulary.
+
+In this way, you can arrange for a single result to be expressed according to
+different data interchange standards.  Each output format can be assigned a
+default vocabulary, and the users of the data service can override this if
+they wish by means of a special request parameter.
+
+If no vocabularies are defined, a "null" vocabulary consisting of the field
+names and values provided by the backend system will be used.
+
+=head3 Rulesets
+
+A data service application may also define one or more I<rulesets> for use in
+validating request parameters.  These are created using the C<define_ruleset>
+method of the data service instance, which in turn calls the identically named
+method from L<HTTP::Validate>.  See the documentation of the latter module for
+more information, along with
+L<Web::DataService::Configuration|Web::DataService::Configuration/Ruleset definitions>.
+
+=head3 Sets and maps
+
+A data service application may also define I<named sets of values> using the
+C<define_set> method of the data service instance.  These have a number of
+different uses.  A set can be used in a ruleset definition, to specify the
+acceptable range of values of some parameter.  A set can include a mapping of
+each value to some other value, and can thus be used to translate data values
+from one output vocabulary to another.  Sets are also used to indicate
+optional output blocks that can be added to the basic output of a data service
+operation according to the value of a special request parameter.
+
+=head2 Documentation
+
+When defining each of the elements listed above, you may follow each
+definition with one or more documentation strings.  These strings are then
+used to auto-generate documentation pages for the operations provided by your
+data service.  By documenting each data service element right where it is
+defined, you will be able to make sure that the documentation of each element
+reflects its actual definition, and you can easily adjust the documentation
+whenever you change the definition.  The author of Web::DataService has not
+found any other strategy that works better for keeping the documentation of a
+data service up-to-date with what the data service actually accepts and
+produces.
+
+This documentation is always generated in POD format, and is then translated
+into HTML by the module L<Web::DataService::PodParser>.  The documentation
+strings that you provide may contain POD markup and command paragraphs, and
+each command paragraph that you provide will be treated properly
+(i.e. preceded and followed by a blank line) in the generated documentation.
+The documentation engine will also auto-close any open lists, and does some
+other cleanup as well to make the documentation process as easy as possible.
+
+=head2 Multiple data services
+
+You may want to arrange for your application to provide multiple data services
+through a single server.  Reasons for doing this include:
+
+=over
+
+=item *
+
+Over time, you may wish to introduce a new protocol version (i.e. a new
+specification for parameter values and result fields) while still keeping the
+old version active so that older client software will not break.
+
+=item *
+
+You may wish to provide both a "production" and a "development" data service.
+
+=back
+
+In either case, you can simply create multiple instances of Web::DataService,
+instantiate the necessary data service elements for each, and select between
+them using whatever criteria make the most sense for your application.
+Ways of doing this include:
+
+=over
+
+=item *
+
+Different URL path prefixes, i.e. "/data1.0/my/operation.json" vs. "/data2.0/my/operation.json"
+
+=item *
+
+A version parameter, i.e. "/my/operation.json?v=1.0"
+vs. "/my/operation.json?v=2.0" 
+
+=back
+
+The section on L<VERSIONING|Web::DataService::Tutorial/"VERSIONING">
+in L<Web::DataService::Tutorial> talks about how to do this.
+
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

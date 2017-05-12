@@ -1,0 +1,47 @@
+#!D:\Programme\ActiveState Perl Dev Kit 6.0\bin\lib\pai.exe
+PAP-Version: 1.0
+Packer: D:\Programme\ActiveState Perl Dev Kit 6.0\bin\perlapp.exe
+Script: Win32-TSA-Notify.pl
+Cwd: D:\REPOSITORY\~\CPAN\deploy\dependent\Win32-TSA-Notify\exe
+Bind: Win32-TSA-Notify_App.ico[file=res\icons\Win32-TSA-Notify_App.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Delete.ico[file=res\icons\Win32-TSA-Notify_Delete.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Error.ico[file=res\icons\Win32-TSA-Notify_Error.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Public.ico[file=res\icons\Win32-TSA-Notify_Public.ico,extract,mode=666]
+Bind: Copyright[data=Copyright (c) 2006 Thomas Walloschke. All rights reserved.,extract]
+Bind: PerlExe[data=PerlExe]
+Bind: Win32-TSA-Notify_Find.ico[file=res\icons\Win32-TSA-Notify_Find.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Help.ico[file=res\icons\Win32-TSA-Notify_Help.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Info.ico[file=res\icons\Win32-TSA-Notify_Info.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Info.ico[file=res\icons\Win32-TSA-Notify_Info.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_None.ico[file=res\icons\Win32-TSA-Notify_None.ico,extract,mode=666]
+Bind: Win32-TSA-Notify_Warning.ico[file=res\icons\Win32-TSA-Notify_Warning.ico,extract,mode=666]
+Bind: Get_Info.ico[file=res\icons\Get_Info.ico,mode=666]
+Clean: 1
+Date: 2006-08-30 19:33:03
+Debug: 
+Dependent: 1
+Dyndll: 1
+Exe: Win32-TSA-Notify.exe
+Force: 1
+Gui: 0
+Hostname: hbg000qm
+Icon: res\icons\Get_Info.ico
+Lib: lib:..\lib
+Lib: lib:..
+No-Compress: 0
+No-Logo: 1
+Runlib: 
+Shared: none
+Tmpdir: 
+Verbose: 0
+Version-Comments: 
+Version-CompanyName: 
+Version-FileDescription: Testing Win32::TSA::Notify
+Version-FileVersion: 0.1.0
+Version-InternalName: Win32-TSA-Notify.exe
+Version-LegalCopyright: Copyright (c) 2006 Thomas Walloschke (thw@cpan.org). All rights reserved.
+Version-LegalTrademarks: 
+Version-OriginalFilename: Win32-TSA-Notify.exe
+Version-ProductName: Win32 TSA Notify Test
+Version-ProductVersion: 0.1.0
+Xclude: 1

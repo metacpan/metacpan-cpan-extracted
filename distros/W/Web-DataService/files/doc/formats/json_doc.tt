@@ -1,0 +1,216 @@
+=head2 DESCRIPTION
+
+This page describes the JSON response format in detail.
+
+=head2 SYNOPSIS
+
+The JSON (L<JavaScript Object Notation|http://en.wikipedia.org/wiki/Json>)
+format is selected by ending a URL path with the suffix C<.json>.  This format
+is very flexible, and is intended for use by web applications built on top of
+this data service as well as for transmitting content to and from other
+databases.  JSON responses are always encoded in UTF-8.
+
+The body of a response in this format consists of a single JSON object,
+containing one or more of the following fields:
+
+=for wds_table_no_header Field* | Description
+
+=over
+
+=item C<records>
+
+The value of this field is an array of objects, each representing a record
+from the database.
+
+This field will always be present if the URL path and parameters are
+interpreted to be a valid query, but the array may be empty if the query does
+not match any records.
+
+=item C<records_found>
+
+This field will be present if the parameter L<count|node:special> was specified.  Its
+value will be the number of records matched by the main query.
+
+=item C<records_returned>
+
+This field will be present if the paramter L<count|node:special> was specified.  Its
+value will be the number of records actually returned.
+<%- IF request.default_limit %>
+This may be less than the total number of records found, because the
+size of the result set is limited by default to <% request.default_limit %>.
+You can override this using the L<limit|node:special> parameter.
+<%- END %>
+
+=item C<record_offset>
+
+This field will be present if the parameter L<count|node:special> was specified, and if
+the parameter L<offset|node:special> was specified with a value greater than zero.  The
+value in the second column will be the number of records that were skipped at the beginning
+of the result set.
+
+=item C<data_source>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the name of this data source.
+
+=item C<documentation_url>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be a URL that provides documentation about the URL path
+used to fetch this data.  This URL will document both the parameters and the response fields.
+This information may be helpful in guiding the later interpretation of this data.
+
+=item C<data_url>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the actual URL that was used to fetch this data.
+If this dataset is saved to disk, the included field will allow someone to later repeat this query.
+
+=item C<access_time>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the date and time time (GMT) at which this data
+was accessed.  If this dataset is saved to disk, the included field will enable it to be
+compared with other datasets on the basis of access time.
+
+=item C<parameters>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.  Its
+value will be an object whose fields represent the parameters and values that were used to 
+generate this result.  If this dataset is saved to disk, the parameter information may be 
+helpful in documenting how the data was selected, what it includes, and what it does not include.
+
+=item C<warnings>
+
+This field will be present if any warnings were generated during the execution
+of the query.  Its value will be an array of strings, each representing a
+warning message.
+
+=item C<errors>
+
+This field will be present if a fatal error condition was encountered.  Its
+value will be an array of strings, each representing an error message.  In general,
+if this field is present then none of the others will be.
+
+=item C<status_code>
+
+This field will be present if the HTTP status code is anything other than
+200.  Its value will be one of the following:
+
+=over
+
+=item 400
+
+One or more of the URL parameters was invalid.  The reasons will be given by
+the field C<errors>.  This request should not be repeated without
+modification.
+
+=item 401
+
+This request requires authentication.  Note that the authentication module has
+not yet been added to the data service, so you should not be seeing this yet. 
+
+=item 404
+
+The URL path was invalid.  This request should not be repeated without
+modification.
+
+=item 500
+
+An internal error occurred.  If this condition persists, you should contact
+the server administrator.  Otherwise, the request may be resubmitted later.
+
+=back
+
+=back
+
+For example, consider the following URL path:
+
+=over
+
+=item *
+
+L<op:single.json?state=WI>
+
+=back
+
+The body of the response is as follows:
+
+    {
+	"records": [
+	    {
+		"name": "Wisconsin",
+		"abbrev": "WI",
+		"region": "MW",
+		"pop2010": 5686986
+	    }
+	]
+    }
+
+This body is made up of an object containing the field "records", whose value is an array.
+Each element of the array represents a single record fetched from the
+database.  The definitions of the various fields can be found on the
+documentation page for this URL path: L<node:single#RESPONSE>.
+
+Many URL paths will, of course, return multiple records.  For example:
+
+=over
+
+=item *
+
+L<op:list.json?state=wi,mn,il&count>
+
+=back
+
+    {
+	"elapsed_time": 0.000283,
+	"records_found": 3,
+	"records_returned": 3,
+	"records": [
+	    {
+		"name": "Illinois",
+		"abbrev": "IL",
+		"region": "MW",
+		"pop2010": 12830632
+	    },
+	    {
+		"name": "Minnesota",
+		"abbrev": "MN",
+		"region": "MW",
+		"pop2010": 5303925
+	    },
+	    {
+		"name": "Wisconsin",
+		"abbrev": "WI",
+		"region": "MW",
+		"pop2010": 5686986
+	    }
+	]
+    }
+
+This response body contains multiple records, but is otherwise structured
+identically.  Note the presence of the C<count> parameter, which causes the
+inclusion of the fields C<elapsed_time>, C<records_found>, and C<records_returned>.
+
+Finally, consider the following URL:
+
+=over
+
+=item *
+
+L<op:list.json?state=WI,IX&foo=1>
+
+=back
+
+    {
+	"status_code": 400,
+	"errors": [
+	    "unknown parameter 'foo'"
+	],
+	"warnings": [
+	    "the value of 'state' must be a valid state name or abbreviation"
+	]
+    }
+
+This response body conveys both an error and a warning, along with a status
+code of 400 (Bad Request) which indicates a problem with the URL parameters.

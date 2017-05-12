@@ -1,0 +1,8 @@
+---
+scraper:
+  - process:
+    - a[href]
+    - urls[]
+    - @href
+  - result: urls
+

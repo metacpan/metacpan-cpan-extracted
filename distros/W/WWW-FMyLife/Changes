@@ -1,0 +1,69 @@
+Revision history for WWW-FMyLife
+(format of DD/MM/YY)
+
+0.15    01.04.10
+        - patch allowing get_id and last of categories by Gavin Hanover!
+
+0.14    29.01.10
+        - disabled error tests
+
+0.13    18.01.10
+        - FML gave me a private key, i'm using fixed xml data i got using it
+
+0.12    17.12.09
+        - this time fixed tests number in 01-mixed_time.t for real
+
+0.11    15.12.09
+        - comment is now Int|EmptyComment, which is an empty hash
+        - correct tests number in t/view/01-mixed_time.t
+        - removed testing_done() in t/view/01-mixed_time.t
+
+0.10    13.12.09
+        - recompiled some tests, mixed them together
+        - added more flags for skipping if item not defined
+        - updated README (apparently not updated since 0.08)
+
+0.09    05.12.09
+        - fixed erred test to check for a general error
+        - skip item if it's not defined in view/04-top_day.t
+
+0.08    02.12.09
+        - added "vote" attribute to Item
+          (hopefully that will fix the failing tests)
+
+0.07    13.09.09
+        - fixed bug in test
+        - fixed bug in top day/week/month
+        - added flop and flop day/week/month + tests
+        - removed hardcoded "no critic"s
+        - fixed critic test to only run on RELEASE_TESTING
+        - adding and fixing POD for Perl::Critic
+
+0.06    07.09.09
+        - added no critic for weird critic fails
+        - changed AUTHORS section to AUTHOR (critic)
+        - fixed spelling error
+
+0.05    04.09.09
+        - made immutable
+
+0.04    03.09.09
+        - adding top and top variations
+         (top_day, top_week, top_month
+        - adding random
+        - adding tests for them
+        - updating pod and fixing it up
+        - refactored a lot
+        - correcting repository in resources in META.yml
+
+0.03    23.08.09
+        - Some POD changes (also including link to WWW::VieDeMerde)
+
+0.02    28.08.09
+        - Fixing MANIFEST, META.yml files
+
+0.01    28.08.09 w00t!
+        - Created the basic skeleton
+        - Added a lot of tests
+        - Currently supports last()
+

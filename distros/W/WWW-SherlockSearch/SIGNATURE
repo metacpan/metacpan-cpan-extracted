@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dc6b78504926f94dcf94abeb3ad8ab0753c65caf Build.PL
+SHA1 cf02efd66fc9ae7156f9927cab000fd92f4e49c4 Changes
+SHA1 1845ebee1dfe419df24d6b19c54501ac2f6d73b4 MANIFEST
+SHA1 c87154580248fba54cdee0477bf82516b4878b18 MANIFEST.SKIP
+SHA1 3ccdc0f3366018ee68fdf9aeec560d1423557a13 META.yml
+SHA1 c9a1a7bf90fa4004bcf4a60333d76c407c741fb9 Makefile.PL
+SHA1 aa9aed652f1dfbef943b721bb5468e295e93cec5 README
+SHA1 2b65fc08c268c16ae7097d800bacccc7b8c9c905 inc/Module/Install.pm
+SHA1 fd56d5c793014bccac2cd1e61926c4da8538ef99 inc/Module/Install/Base.pm
+SHA1 bbbff3a31911f37d7445b4f20a29597a0a648886 inc/Module/Install/Build.pm
+SHA1 9ce6768a7b8f7032ec89594b773fafd58c6feb1d inc/Module/Install/Can.pm
+SHA1 b6c8f0f22c4c8ba48a7bac2c5e4bd61803a7b097 inc/Module/Install/Fetch.pm
+SHA1 aabcd47178e4e7b27e340ff5273269c93697c9c1 inc/Module/Install/Makefile.pm
+SHA1 207dfa13341a374fc78325fbeb99bc36659aef2d inc/Module/Install/Metadata.pm
+SHA1 aff9341a15c04faec47089851e43d9d4061337e7 inc/Module/Install/Win32.pm
+SHA1 8e0d347ca21bc18b380d9d1aa5910b8d078a76b7 inc/Module/Install/WriteAll.pm
+SHA1 28e34a2accf70e8ceaf0e9dfa8bbfa4b73557620 lib/WWW/SherlockSearch.pm
+SHA1 cb64787caafd667b697177fa622a94bcf7c09f2c lib/WWW/SherlockSearch/Results.pm
+SHA1 e05720a68e033f0299784e5debdd1465414197a7 plugins/clkao.src
+SHA1 34adf8961aaa10271e498cc31fc0ec4ec4da1bba plugins/googlenews.src
+SHA1 b7671bb805f2097cbec944c8edd3b7c86b160822 script/sherch
+SHA1 3fc293e7c21f0508282708b9e225f7173f0c4768 t/0-signature.t
+SHA1 ee83f0a1ec7456f20d9ba44d881aaf69ef22d24e t/1-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQFArwp4tLPdNzw1AaARAnF3AJ9F4Uct5rYcVSkTq6g8OYb+0UlhmACeJxH/
+6ck7hriJsrTkag4iw3UcVvI=
+=BrxS
+-----END PGP SIGNATURE-----

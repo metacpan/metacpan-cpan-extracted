@@ -1,0 +1,157 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_05 - release notes for v1.05 of Win32::GUI
+
+=head1 Release Date
+
+5th November, 2006
+
+=head1 Summary of Changes
+
+This is a summary of changes between V1.04 and V1.05
+See the CHANGELOG file in the distribution for the
+full detail.
+
+This release is a bug-fix release addressing the issues
+below.
+
+=head2 New Features
+
+There are no new features in this release.
+
+=head2 Bug Fixes
+
+=over
+
+=item NEM Events for NotifyIcon broken
+
+Fix NEM events for the NotifyIcon Class (Tracker: 1585293)
+
+=item Combobox SetEditSel method
+
+Fix bug preventing setting the starting index to anything
+other than 0, and add documentation. (Tracker: 1586617)
+
+=item Fix AbsLeft and AbsTop methods
+
+Fix a bug where AbsLeft and AbsTop were not correctly
+being converted to client co-ordinates for child windows
+(Tracker: 1578492)
+
+=item Include POD documentation in PPM
+
+Some time ago it was decided that in order to keep the size of
+the PPM distributions as small as possible we would exclude
+the POD documentation from the PPM files, and only include
+the HTML documentation.  From this release both POD and
+HTML documentation is included in the PPM.  This fixes a
+problem with ActiveState Perl PPM V4, which re-generates
+the documentation from the enclosed POD documents, apparently
+ignorig the included HTML documentation.
+
+=back
+
+=head1 Deprecated feature status
+
+This section documents features that have been deprecated
+in this release, or in recent releases, and feature that
+will be deprecated in up-coming releases.
+
+=head2 Win32::GUI::Constants
+
+The introduction of Win32::GUI::Constants in v1.04 means
+that we now have access to a very large number of constants,
+so the current behaviour of Win32::GUI to export all
+constants to the calling namespace by default is no longer
+appropriate. So, a bare
+
+  use Win32::GUI;
+
+now generates a warning that the old default behaviour will
+be deprecated - although the export behaviour of
+Win32::GUI v1.03 is maintained except for this
+warning.
+
+To eliminate this warning and correct your script, do one
+of the following:
+
+=over
+
+=item If you don't need any constants, use the empty list:
+
+  use Win32::GUI();
+
+=item If you need some constants, name them explicitly:
+
+  use Win32::GUI qw(ES_WANTRETURN CW_USEDEFAULT); # Two constants exported
+  use Win32::GUI qw(/^MB_/);   # Export all constants starting with MB_
+
+=back
+
+See the L<Win32::GUI::Constants|Win32::GUI::Constants> documentation
+for the full allowable syntax.
+
+You are advised to fix your scripts now, as a future version will stop
+exporting any constants by default.
+
+Although not advised, you can suppress the warnings by turning deprecated
+warnings off:
+
+  no warnings 'deprecated';
+
+Additionally accessing constants from within the Win32::GUI namespace
+is deprecated.  I.e.
+
+   -addstyle => Win32::GUI::WS_BORDER,
+
+will generate a warning with this release, and will stop working with
+a future release.  Use one of the following methods instead:
+
+=over
+
+=item use the Win32::GUI::Constants namespace instead
+
+  -addstyle => Win32::GUI::Constants::WS_BORDER(),
+
+=item use any other namespace you fancy
+
+  use Win32::GUI qw(-exportpkg => A::B -autoload);
+  ...
+  -addstyle => A::B::WS_BORDER(),
+
+=item maintain compatibility of existing scripts
+
+  use Win32::GUI::Constants qw(-exportpkg => Win32::GUI :compatibility_win32_gui);
+  ...
+  -addstyle => Win32::GUI::WS_BORDER,
+
+=back
+
+=head2 Win32::GUI::NotifyIcon
+
+It is no longer necessary to use the '-id' option to any of the
+Win32::GUI::NotifyIcon methods.  The ID is now entirely handled
+internally.  You will receive deprecated warnings if you use it.
+
+In particular, removing Icons from the system tray should be done
+using
+
+  $NI->Remove();
+
+and not by the (now deprecated)
+
+  $NI->Delete(-id => 1);
+
+Use of the C<-id> option will generate a warning.
+
+=head1 Contributors to this release
+
+=over
+
+=item Robert May
+
+=item Uwe Kind
+
+=back
+
+=cut

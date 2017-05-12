@@ -1,0 +1,5 @@
+You'll need to generate these cert files - see WebService::TicketAuth
+for details.
+
+   * testsystem-cert.pem     - your public key
+   * testsystem-request.pem  - your private key

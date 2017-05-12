@@ -1,0 +1,56 @@
+{
+   "abstract" : "[OBSOLETE] Get torrent info from the now-discontinued getstrike.net API",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Strike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::RequiresInternet" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "HTTP::Tiny" : "0.014",
+            "IO::Socket::SSL" : "1.56",
+            "JSON::MaybeXS" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::ByExample" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=webservice-strike.git"
+      }
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

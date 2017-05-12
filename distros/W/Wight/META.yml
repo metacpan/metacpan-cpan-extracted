@@ -1,0 +1,49 @@
+---
+abstract: 'Communicate with PhantomJS'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wight
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  AnyEvent::Util: 0
+  Carp: 0
+  Class::Accessor::Lite::Lazy: 0
+  Coro: 0
+  Coro::AnyEvent: 0
+  File::Basename: 0
+  File::ShareDir: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  HTML::Selector::XPath: 0
+  HTTP::Cookies: 0
+  JSON: 0
+  Plack::Runner: 0
+  Protocol::WebSocket: 0
+  Sub::Name: 0
+  Test::Builder: 0
+  Test::TCP: 0
+  Twiggy: 0
+  URI: 0
+  perl: 5.8.1
+resources:
+  repository: git://github.com/motemen/Wight
+version: 0.02

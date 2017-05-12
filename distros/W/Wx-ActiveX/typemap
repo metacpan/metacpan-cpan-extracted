@@ -1,0 +1,17 @@
+#############################################################################
+## Name:        typemap
+## Purpose:     typemap for Wx::ActiveX
+## Author:      Graciliano M. P.
+## Modified by: 
+## SVN-ID:      $Id: typemap 2355 2008-04-07 07:03:52Z mdootson $
+## Copyright:   (c) 2002 - 2007 Graciliano M. P. and Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxActiveX *              O_WXOBJECT
+wxActiveXEvent *         O_WXOBJECT
+wxIEHtmlWin *            O_WXOBJECT
+wxMozillaHtmlWin *            O_WXOBJECT
+

@@ -1,0 +1,153 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_03 - This is the release notes for Version 1.03 of Win32::GUI
+
+=head1 Release Date
+
+22nd November, 2005
+
+=head1 Summary of Changes
+
+This is a summary of changes between V1.02 and V1.03
+See the CHANGELOG file in the distribution for the
+full detail.
+
+V1.03 is primarily a bug-fix release.
+
+=head2 New Features
+
+=head3 New Methods
+
+=over
+
+=item Win32::GUI
+
+GetParent, UserData
+
+=item Win32::GUI::DC
+
+StretchBlt
+
+=back
+
+=head3 New Events
+
+None.
+
+=head3 New Documentation
+
+As well as various minor documentation corrections and enhancements:
+
+=over
+
+=item Win32::GUI
+
+GetAsyncKeyState
+
+=item Win32::GUI::RichEdit
+
+SetCharFormat, GetCharFormat, SetEventMask
+
+=item Win32::GUI::Timer
+
+New documentation for Win32::GUI::Timer and all Timer methods.
+
+=item Win32::GUI::Tutorial
+
+Updated all the Tutorial documentation and added tutorial
+examples to the demos directory.
+
+=back
+
+=head3 Other Features
+
+=over
+
+=item Version information in GUI.dll
+
+Right-click the DLL to see Version information on the version tab.
+
+=item New tests
+
+Many tests added
+
+=item New samples
+
+Added listvew_drag_drop.pl to the samples demonstrating the use
+of drag/drop with a ListView
+
+=item Update ImageList support
+
+ImageList support is now complete under MinGW and Cygwin if
+headers are recent enough (w32api V3.2 or higher)
+
+=back
+
+=head2 Bug Fixes
+
+=head3 Reported Bugs
+
+Fix to 4 item call to TrackPopupMenu.  Tracker 1241830
+
+GUI.pm Fix to logic in Win32::GUI::Class::new for perl 5.8.6
+and above. Tracker:1236053
+
+GUI.pm fixed Win32::GUI::Brush to return undef on failure
+
+GUI_messageloops.cpp: Tracker 1246429 fixed WM_CTLCOLORSTATIC
+for handling readonly Edit controls
+
+Tooltip.xs, GUI.xs fixed Tooltip styles (Tracker: 1273134)
+
+GUI_MessageLoops.cpp change all mouse event handlers to use
+GET_X_LPARAM and GET_Y_LPARAM rather than HIWORD and LOWORD (Tracker: 1262098)
+
+GUI.xs fixed UnHook() to resolve perl 5.6/5.8 differences in
+av_delete, causing a warning in perl 5.8 (Tracker: 1164766)
+
+GUI.xs: Changed DoModal's use of GetParent to
+GetWindow(hwnd, GW_OWNER).  (Tracker: 1165626)
+
+GUI_messageloops.cpp: Tracker:1236283 Change to WM_ERASEBACKGROUND
+to allow -background to work with windows
+
+=head3 Other Bugs
+
+GUI_messageloops.cpp: Fixed WM_CTLCOLOR* to use window class
+background brush if there is one
+
+Richedit.xs fix SetCharFormat/GetCharFormat option
+
+GUI.pm Timer fixes (Reini Urban)
+
+GUI.pm fixed Win32::GUI::DC::new() with no params to return a
+correct object
+
+GUI_Constants.cpp: correct TMP_NONOTIFY to TPM_NONOTIFY (aschwarz1309)
+
+Listbox.xs: fixed buffer overrun in GetText causing crash (Jez White)
+
+Combobox.xs: fixed buffer overrun in GetLBText causing crash (Jez White)
+
+GUI.xs: fixed return value of GetAsyncKeyState
+
+Re-worked Win32::GUI::Timer package implementation.  Now destruction
+works correctly.
+
+=head1 Contributors to this release
+
+=over
+
+=item Dan Dascalescu
+
+=item Reini Urban
+
+=item Jeremy White
+
+=item aschwarz1309
+
+=item Robert May
+
+=back
+
+=cut

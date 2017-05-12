@@ -1,0 +1,319 @@
+<html>
+<head>
+<title>Templates: INLINE/INPERL and INLUDE</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#3300CC" vlink="#3300CC" alink="#3300CC" leftmargin="10" topmargin="5" marginwidth="10" marginheight="5">
+<table width="100%" border="0" cellspacing="3" cellpadding="3" background="bgimage.jpg"> 
+<tr> <td bordercolor="#0000FF"> <p align="center"><font face="Times New Roman, Times, serif" size="4"><b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#000000">WebTools 
+Templates:<font color="#0000CC"> Page 2.1</font></font></b></font></p>
+      <p><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><font face="Courier New, Courier, mono" size="4" color="#000000">2.1. 
+        Templates and INLINE/INPERL templates: Syntax comparison&nbsp;</font><br>
+        <br>
+        &nbsp;&nbsp;With couple of words I will explain syntax of INLINE/INPERL 
+        templates and after that I will &quot;copy&quot; syntax of normal templates 
+        in this document :-)). &quot;Common&quot; style of templates will be with 
+        &quot;<FONT COLOR="#9900CC">purple</FONT>&quot; color.<br>
+        <br>
+        INLINE syntax:<br>
+        <br>
+        &nbsp;&nbsp;<br>
+        &nbsp;&nbsp;<font color="#0000CC">&lt;!--<font color="#006633">&copy;</font>INLINE<font color="#006633">&copy;</font>&gt; 
+        inline functions &lt;/<font color="#006633">&copy;</font>INLINE<font color="#006633">&copy;</font>--&gt;</font><br>
+        <br>
+        &nbsp;&nbsp;OR <br>
+        <br>
+        &nbsp;&nbsp;<font color="#0000CC">&lt;!--<font color="#006633">&copy;</font>INPERL<font color="#006633">&copy;</font>&gt; 
+        inline functions &lt;/<font color="#006633">&copy;</font>INPERL<font color="#006633">&copy;</font>--&gt; 
+        <br>
+        <br>
+        </font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><font color="#FF0066">&nbsp;If 
+        you want use alternative style of INILINE/INPERL:<br>
+        </font><br>
+        &nbsp;&nbsp;<font color="#0000CC">%%%INLINE%%% inline functions %%%/INLINE%%%</font><br>
+        <br>
+        &nbsp;&nbsp;OR <br>
+        <br>
+        <font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><font color="#0000CC">&nbsp;&nbsp;%%%INPERL%%% 
+        inline functions %%%/INPERL%%%</font></b></font><font color="#0000CC"><br>
+        </font></b></font><font color="#0000CC"> <br>
+        </font><br>
+        &nbsp; &lt;!--&copy;INLINE&copy;&gt;&lt;/&copy;INLINE&copy;--&gt; is used 
+        to excape HTML (and repectively PERL code), so code between these &quot;tags&quot; 
+        will be parsed from WebTools engine. However in normal templates we use 
+        &quot;begin&quot; and &quot;end&quot; parts to mark begin and respective 
+        end of every template. In &quot;INLINE&quot; version we don't use same 
+        tag, for example:<BR>
+        <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#333333"><BR>
+        <FONT COLOR="#9900CC">&lt;&copy;N&reg;1&reg;1&reg;&reg;&copy;&gt;<BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;My name is <B>&lt;&sect;VAR&sect;&gt;</B> 
+        and I'm <B>&lt;&sect;VAR&sect;&gt;</B> years old.</FONT></FONT></FONT></b><FONT COLOR="#9900CC"><BR>
+        <B><FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE="2">&lt;&#152;&copy;&#152;&gt;</FONT></B></FONT><b><BR>
+        <BR>
+        BUT we use: &nbsp;&nbsp;<FONT COLOR="#0000CC">&lt;!--<FONT COLOR="#006633">&copy;</FONT>INLINE<FONT COLOR="#006633">&copy;</FONT>&gt; 
+        inline functions &lt;/<FONT COLOR="#006633">&copy;</FONT>INLINE<FONT COLOR="#006633">&copy;</FONT>--&gt;</FONT> 
+        tag for all INLINE (and respective tag for INPERL)<BR>
+        These &quot;separators&quot; successfully escape perl/html context and 
+        parser engine of WebTools parse all INLINE/INPERL templates!&nbsp;Of course 
+        you can't use absolutly same syntax to convert &quot;normal&quot; templates 
+        in INLINE variant.<br>
+        <br>
+        &nbsp;&nbsp;Supported inline functions are:<br>
+        <br>
+        <font color="#0000CC">&lt;<font color="#006633">&sect;</font>TEMPLATE<font color="#FF0000">:</font>number_of_templates_variable<font color="#FF0000">:</font>$variable<font color="#FF0000">:</font><font color="#006633">&sect;</font>&gt; 
+        <br>
+        <br>
+        &lt;XREADER<font color="#FF0000">:</font>number_of_template_in_file<font color="#FF0000">:</font>template_file.jhtml<font color="#FF0000">:</font>$first_param,$second_param,...&gt;<br>
+        <br>
+        &lt;S<font color="#006633">&copy;</font>L<font color="#FF0000">:</font>number_of_SQL_query<font color="#FF0000">:</font>&quot;SQL 
+        query;&quot;<font color="#FF0000">:</font>used_query<font color="#FF0000">:</font>row_number<font color="#FF0000">:</font>col_number<font color="#FF0000">:</font>should_be_printed?<font color="#FF0000">:</font>S<font color="#006633">&copy;</font>L&gt;<br>
+        <br>
+        &lt;S<font color="#006633">&copy;</font>LVAR<font color="#FF0000">:</font>number_of_template_variable<font color="#FF0000">:</font>S<font color="#006633">&copy;</font>L&gt;<br>
+        <br>
+        &lt;MENUSELECT<font color="#FF0000">:</font>$html_source<font color="#FF0000">:</font>&quot;SQL 
+        query&quot;<font color="#FF0000">:</font>$ref_DB<font color="#FF0000">:</font>$ref_TEMPLATE<font color="#FF0000">:</font>$ref_HTML<font color="#FF0000">:</font>$dbh<font color="#FF0000">:</font>&gt; 
+        <br>
+        </font><BR>
+        <BR>
+        NOTE: <FONT COLOR="#FF0000">Every INLINE template after it's execution 
+        will be substituted with respective evaluated value in place of itself!<BR>
+        Every INPERL template after it's execution will be substituted with NULL 
+        value in place where it's being, BUT evaluated value will appear in default 
+        variable $_ Please remember this fact!</FONT><BR>
+        <BR>
+        <font color="#0000CC"><font color="#FF0066"><br>
+        &nbsp;&nbsp;<font color="#006600">If prefer you can use alternative syntax 
+        for all templates!</font></font></font><br>
+        <br>
+        &nbsp;&nbsp;Supported inline functions with alternative syntax (in any 
+        other aspect they are same):<br>
+        <br>
+        <font color="#0000CC">%%TEMPLATE<font color="#FF0000">:</font>number_of_templates_variable<font color="#FF0000">:</font>$variable<font color="#FF0000">:</font>%%<br>
+        <br>
+        %%XREADER<font color="#FF0000">:</font>number_of_template_in_file<font color="#FF0000">:</font>template_file.jhtml<font color="#FF0000">:</font>$first_param,$second_param,...%%<br>
+        <br>
+        %%SQL<font color="#FF0000">:</font>number_of_SQL_query<font color="#FF0000">:</font>&quot;SQL 
+        query;&quot;<font color="#FF0000">:</font>used_query<font color="#FF0000">:</font>row_number<font color="#FF0000">:</font>col_number<font color="#FF0000">:</font>should_be_printed?<font color="#FF0000">:</font>SQL%%<br>
+        <br>
+        %%SQLVAR<font color="#FF0000">:</font>number_of_template_variable%%<br>
+        <br>
+        %%MENUSELECT<font color="#FF0000">:</font>$html_source<font color="#FF0000">:</font>&quot;SQL 
+        query&quot;<font color="#FF0000">:</font>$ref_DB<font color="#FF0000">:</font>$ref_TEMPLATE<font color="#FF0000">:</font>$ref_HTML<font color="#FF0000">:</font>$dbh<font color="#FF0000">:</font>%%</font><br>
+        <br>
+        <BR>
+        <FONT SIZE="3">&nbsp;*</FONT>&nbsp;&nbsp;Now we look at INLINE templates 
+        in detail, so arm with patience.<BR>
+        <BR>
+        <FONT COLOR="#0000CC" SIZE="3">&lt;<FONT COLOR="#006633">&sect;</FONT>TEMPLATE<FONT COLOR="#FF0000">:</FONT>number_of_templates_variable<FONT COLOR="#FF0000">:</FONT>$variable<FONT COLOR="#FF0000">:</FONT><FONT COLOR="#006633">&sect;</FONT>&gt;</FONT><FONT COLOR="#0000CC"><BR>
+        <BR>
+        <FONT COLOR="#000000">If you want to put some data directly in your HTML 
+        or Perl code, you can use this INLINE &quot;function&quot;, so your data 
+        will appear in place of this template.&nbsp;This template you can look 
+        as normal &quot;template variable&quot;!<BR>
+        As I described before &quot;</FONT></FONT><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#0000CC"><B>number_of_templates_variable</B></FONT><FONT COLOR="#000000">&quot;</FONT> 
+        is symbolic number of current template.<BR>
+        More interesting part of this template is <FONT COLOR="#0000CC">$variable</FONT> 
+        because you can use some PERL variable name instead of constant value.<BR>
+        &quot;Normal&quot; style of this variable is:<FONT COLOR="#FFFFFF"> <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><B><FONT COLOR="#9900CC">&lt;&sect;VAR&sect;</FONT></B></FONT></FONT><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#9900CC"><B>&gt;</B></FONT><BR>
+        <BR>
+        <BR>
+        <BR>
+        <FONT COLOR="#0000CC" SIZE="3">&lt;XREADER<FONT COLOR="#FF0000">:</FONT>number_of_template_in_file<FONT COLOR="#FF0000">:</FONT>template_file.jhtml<FONT COLOR="#FF0000">:</FONT>$first_param,$second_param,...&gt;</FONT><BR>
+        <BR>
+        Excellence way to use normal templates with INLINE/INPERL is using of 
+        this &quot;function&quot;!<BR>
+        Normal form of xreader() function is shown below:<BR>
+        <BR>
+        <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#9900CC">$result_data 
+        = xreader($number_of_template, $template_file.jhtml , @substitute_variables);</FONT><BR>
+        <BR>
+        Result of XREADER execution will appear in perl/html document (on place 
+        of XREADER template).<BR>
+        <FONT COLOR="#0000CC">number_of_template_in_file</FONT> coincide with 
+        <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#9900CC">$number_of_template</FONT>, 
+        <FONT COLOR="#0000CC">template_file.jhtml</FONT> is same as <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#9900CC">$template_file.jhtml</FONT> 
+        and of cource you can consider any set of two or more scalars like one 
+        array: <BR>
+        <FONT COLOR="#0000CC">($first_param,$second_param,...)</FONT> is absolutely 
+        equivalent with meaning of <FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#9900CC">@substitute_variables</FONT><BR>
+        NOTE: <FONT COLOR="#0000CC">$first_param, $second_param and so on</FONT> 
+        should be Perl variables!<BR>
+        <BR>
+        <BR>
+        <BR>
+        <FONT COLOR="#0000CC" SIZE="3">&lt;S<FONT COLOR="#006633">&copy;</FONT>L<FONT COLOR="#FF0000">:</FONT>number_of_SQL_query<FONT COLOR="#FF0000">:</FONT>&quot;SQL 
+        query;&quot;<FONT COLOR="#FF0000">:</FONT>used_query<FONT COLOR="#FF0000">:</FONT>row_number<FONT COLOR="#FF0000">:</FONT>col_number<FONT COLOR="#FF0000">:</FONT>should_be_printed?<FONT COLOR="#FF0000">:</FONT>S<FONT COLOR="#006633">&copy;</FONT>L&gt;</FONT><BR>
+        <BR>
+        This template is absolutely equivalent to normal templates, so I will 
+        not lose any time.<BR>
+        &quot;Normal&quot; syntax:<BR>
+        <FONT COLOR="#9900CC">&lt;S&copy;L:number_of_sql_query:&quot;select_SQL_query;&quot;:used_sql_query:number_of_row:number_of_column:should_print?:S&copy;L&gt;</FONT><BR>
+        NOTE: In <FONT COLOR="#0000CC">SQL_query</FONT> you can use Perl variables, 
+        so this template get realy dynamic for you! <BR>
+        <BR>
+        </b></font><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><BR>
+        <BR>
+        <B><FONT COLOR="#0000CC" SIZE="3">&lt;S<FONT COLOR="#006633">&copy;</FONT>LVAR<FONT COLOR="#FF0000">:</FONT>number_of_template_variable<FONT COLOR="#FF0000">:</FONT>S<FONT COLOR="#006633">&copy;</FONT>L&gt;</FONT></B><BR>
+        <BR>
+        You can assume same fact, that SQL variables are absolutely same such 
+        &quot;normal&quot; one.<BR>
+        &quot;Normal&quot; syntax:<BR>
+        <B><FONT COLOR="#9900CC">&lt;S&copy;LVAR:respective_number_of_SQL_query:S&copy;L&gt;</FONT></B><BR>
+        <BR>
+        <BR>
+        <BR>
+        <B><FONT COLOR="#0000CC" SIZE="3">&lt;MENUSELECT<FONT COLOR="#FF0000">:</FONT>$html_source<FONT COLOR="#FF0000">:</FONT>&quot;SQL 
+        query&quot;<FONT COLOR="#FF0000">:</FONT>$ref_DB<FONT COLOR="#FF0000">:</FONT>$ref_TEMPLATE<FONT COLOR="#FF0000">:</FONT>$ref_HTML<FONT COLOR="#FF0000">:</FONT>$dbh<FONT COLOR="#FF0000">:</FONT>&gt;</FONT></B><BR>
+        <BR>
+        You may suppose that this &quot;funcion&quot; is new and specific for 
+        INLINE world, but you may want to use as normal function via follow syntax(this 
+        function is part of xreader.pl library):<BR>
+        <BR>
+        <FONT COLOR="#9900CC">$result = MenuSelect($html_source,&quot;SQL_query&quot;,$ref_DB,$ref_TEMPLATE,$ref_HTML,$dbh);</FONT><BR>
+        <BR>
+        You should notice that &quot;normal&quot; and INLINE form is equivalent, 
+        so I will explain only one of them. Also you see hard terms in one place 
+        (as SQL,DB,TEMPLATES,HTML) , so I suppose you understand that this function 
+        is hard to use (that is not true) but it make serious work for us. <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;What is religion here? <BR>
+        Let imagine that situation: You have one check box in your $html_source 
+        (for example one HTML page loaded in $html_source variable) and this check 
+        box has 5 states (in fact 5 check boxes with same names but only one of 
+        them can be checked (selected)!) Also active state of this check box is 
+        saved in database and when you need to print that html page on browser's 
+        screen you should fetch from database active state of check box and you 
+        will need to mark respective check box as active. All my words can be 
+        illustrated with follow example:<BR>
+        <BR>
+        </font><FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">How 
+        old are you? &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;1&quot; 
+        &lt;&sect;TEMPLATE:10&sect;&gt;&gt;1-14<BR>
+        &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;2&quot; 
+        &lt;&sect;TEMPLATE:11&sect;&gt;&gt;15-20<BR>
+        &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;3&quot; 
+        &lt;&sect;TEMPLATE:12&sect;&gt;&gt;21-30</FONT></FONT></B></FONT><FONT COLOR="#993366"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><BR>
+        </FONT><FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">&lt;input 
+        type=&quot;radio&quot; name=&quot;years&quot; value=&quot;4&quot; &lt;&sect;TEMPLATE:13&sect;&gt;&gt;31-50</FONT></FONT></B></FONT><BR>
+        <FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">&lt;input 
+        type=&quot;radio&quot; name=&quot;years&quot; value=&quot;5&quot; &lt;&sect;TEMPLATE:14&sect;&gt;&gt;51 
+        or older</FONT></FONT></B></FONT><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><BR>
+        </FONT></B></FONT><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><BR>
+        Let make balance of this example:&nbsp;We have 5 check boxes with name 
+        &quot;<FONT COLOR="#FF0000">years</FONT>&quot; and every check box can 
+        accept values (<FONT COLOR="#FF0000">1</FONT>,<FONT COLOR="#FF0000">2</FONT>,<FONT COLOR="#FF0000">3</FONT>,<FONT COLOR="#FF0000">4</FONT> 
+        and <FONT COLOR="#FF0000">5</FONT>), also we have `special`select template 
+        (</font><FONT COLOR="#993366"><B><FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#006633">&lt;&sect;TEMPLATE:number_of_template&sect;&gt;</FONT></FONT></B></FONT></B></FONT><font size="2" face="Verdana, Arial, Helvetica, sans-serif">) 
+        that should be used from MenuSelect function! Ok, let get closer to the 
+        bottom of things:<br>
+        <BR>
+        <B><FONT COLOR="#0000CC">$ref_DB</FONT></B> is a reference to array with 
+        possible values fetched from database. In our example that could be: <BR>
+        (1,2,3,4,5)<BR>
+        <B><FONT COLOR="#0000CC">$ref_TEMPLATE</FONT></B> is a reference to array 
+        with numbers of respective templates. In our case: (10,11,12,13,14)<BR>
+        <B><FONT COLOR="#0000CC">$ref_HTML</FONT></B> that is a reference to array, 
+        consist of two elements. First element should be string that mark given 
+        HTML element as active and second should be string that mark respective 
+        element as non-active element! In other words template on active check 
+        box will be substituted with string that mark element as active (for check 
+        boxes you should use &quot;checked&quot;) and for not active elements 
+        WebTools will substitute with second array's element (for check boxes 
+        that should be empty string)<BR>
+        ('checked','')<BR>
+        <B><FONT COLOR="#0000CC">$dbh</FONT></B> is database handler that will 
+        be used to select active state from DB table.<BR>
+        &nbsp;&nbsp;Also this function can be used with multi-select menus (i.e. 
+        you can have two or more active elements)<BR>
+        <B><FONT COLOR="#0000CC">SQL query</FONT></B> should be SQL query that 
+        return as result one or more valid rows with acceptable values (specified 
+        from $ref_DB). That result will determinate state of given (check box, 
+        select menu, radio button and etc.)<BR>
+        <BR>
+        NOTE: <FONT COLOR="#0000CC">SQL query</FONT> can be used in follow format: 
+        &quot;<FONT COLOR="#006633">!active_value1,active_value2,....</FONT>&quot;, 
+        where &quot;!&quot; show that SQL query is not actualy query. active_value1 
+        and etc. are values on active check boxex, this form of SQL query can 
+        be applied when you haven't DB or you don't like to save state of these 
+        &quot;select menu&quot; elements! Example: &quot;!3&quot; &nbsp;i.e 21-30 
+        years old :)<BR>
+        For multiple select menus this example can be: &quot;!2,4&quot; and so 
+        on...<BR>
+        <BR>
+        Finaly our example could be parsed on follow way:<BR>
+        <BR>
+        - Let<FONT COLOR="#0000CC"> SQL query</FONT> has value &quot;!3&quot;<BR>
+        - Let <FONT COLOR="#0000CC">$ref_DB</FONT> point to array of (1,2,3,4,5) 
+        elements<BR>
+        - Let <FONT COLOR="#0000CC">$ref_TEMPLATE</FONT> point to array of (10,11,12,13,14) 
+        elements<BR>
+        - Let <FONT COLOR="#0000CC">$ref_HTML</FONT> point to array of (&quot;checked&quot;,&quot;&quot;)<BR>
+        - Let <FONT COLOR="#0000CC">$dbh</FONT> is empty or has undef value<BR>
+        <BR>
+        After parsing of follow inline template with our <FONT COLOR="#0000CC">$html_source</FONT>:<BR>
+        <B><FONT COLOR="#0000CC">&lt;MENUSELECT<FONT COLOR="#FF0000">:</FONT>$html_source<FONT COLOR="#FF0000">:</FONT>&quot;SQL 
+        query&quot;<FONT COLOR="#FF0000">:</FONT>$ref_DB<FONT COLOR="#FF0000">:</FONT>$ref_TEMPLATE<FONT COLOR="#FF0000">:</FONT>$ref_HTML<FONT COLOR="#FF0000">:</FONT>$dbh<FONT COLOR="#FF0000">:</FONT>&gt;</FONT></B> 
+        <BR>
+        we will get follow result:<BR>
+        <br>
+        </font><FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">How 
+        old are you? &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;1&quot; 
+        &gt;1-14<BR>
+        &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;2&quot; 
+        &gt;15-20<BR>
+        &lt;input type=&quot;radio&quot; name=&quot;years&quot; value=&quot;3&quot; 
+        checked&gt;21-30</FONT></FONT></B></FONT><FONT COLOR="#993366"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><BR>
+        </FONT><FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">&lt;input 
+        type=&quot;radio&quot; name=&quot;years&quot; value=&quot;4&quot; &gt;31-50</FONT></FONT></B></FONT><BR>
+        <FONT COLOR="#000000"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif"><FONT COLOR="#993366">&lt;input 
+        type=&quot;radio&quot; name=&quot;years&quot; value=&quot;5&quot; &gt;51 
+        or older</FONT></FONT></B></FONT></B></FONT><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        <BR>
+        <BR>
+        <BR>
+        <FONT SIZE="3" COLOR="#0000CC">&nbsp;INCLUDE a external file in WebTools 
+        perl/html files</FONT><BR>
+        <BR>
+        If you dream ever to have &quot;function&quot; that could include html 
+        or perl code in your WebTools script, now you can stop dreaming and have 
+        a look at this easy to use feature!<BR>
+        Inlude syntax:<BR>
+        <BR>
+        </font><FONT COLOR="#993366"><B><FONT SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif" COLOR="#0000CC">&nbsp;&nbsp;&lt;!--<FONT COLOR="#006633">&copy;</FONT>INCLUDE<FONT COLOR="#006633">&copy;</FONT>file_to_be_included.ext<FONT COLOR="#006633">&copy;</FONT>--&gt;</FONT></B></FONT><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><BR>
+        <br>
+        and alternative syntaxes:<br>
+        <br>
+        <b><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#0000CC">&nbsp;&nbsp;&lt;!--</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><font color="#006633">%</font><font color="#0000CC">INCLUDE</font><font color="#006633">%</font><font color="#0000CC">file.ext</font><font color="#006633">%</font><font color="#0000CC">--&gt;</font></font></b></font></b> 
+        <br>
+        <b><br>
+        OR<br>
+        <br>
+        <font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;<font color="#006633">%%%</font><font color="#0000CC">INCLUDE</font><font color="#006633">%</font><font color="#0000CC">file.ext</font><font color="#006633">%%%</font></font></b></font> 
+        </b> <br>
+        <BR>
+        This tag you can place wherever you want (no matter whether you are in 
+        perl code (&lt;?perl ?&gt;) or you are in HTML). However if you want to 
+        include Perl code in your HTML, your file should have &quot;&lt;?perl&quot;,&quot;?&gt;&quot; 
+        pair between every piece of Perl code! Just remember: This tag include 
+        file in place of INCLUDE tag, without care what exacly you put in and 
+        without care of file location (you can also include /etc/passwd !) Please 
+        remember that!<BR>
+        <br>
+        <br>
+        Time for example:<br>
+        ------------------- <br>
+        At the end of <a href="inline.html#example">Page 2</a> you can find complex 
+        example of INLINE/INPERL templates. Also example with common templates 
+        you can find at the end of <a href="index.html#example">Page 1</a>. Don't 
+        missed!<BR>
+        <BR>
+        At last I want to share with all of you that I'm realy happy to see you 
+        reading this &quot;help&quot;, so ENJOY WebTools and I hope to see you 
+        again at&nbsp;<a href="http://www.proscriptum.com/">www.proscriptum.com 
+        </a><br>
+        <br>
+        Author:&nbsp;Julian Lishev (<a href="mailto:julian@proscriptum.com">julian@proscriptum.com</a>)<br>
+        </font></b></p>
+    </td></tr> </table>
+</body>
+</html>

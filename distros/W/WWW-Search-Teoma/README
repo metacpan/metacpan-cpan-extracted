@@ -1,0 +1,16 @@
+
+This is a backend for use with the WWW::Search module, for searching the
+Teoma.com server.
+
+Please read the README for WWW::Search for general information.
+
+(One place to find it is
+http://www.perl.com/CPAN-local/modules/by-module/WWW/WWW-Search-2.33.readme
+)
+
+Use the standard:
+	perl Makefile.PL
+	make
+	make test
+	make install
+to install this package.

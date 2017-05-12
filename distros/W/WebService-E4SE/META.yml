@@ -1,0 +1,46 @@
+---
+abstract: 'Communicate with the various Epicor E4SE web services.'
+author:
+  - 'Chase Whitener <capoeirab@cpan.org>'
+build_requires:
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-E4SE
+provides:
+  WebService::E4SE:
+    file: lib/WebService/E4SE.pm
+    version: '0.050'
+requires:
+  Authen::NTLM: '1.0'
+  Carp: '0'
+  File::Slurper: '0'
+  HTTP::Headers: '6.0'
+  HTTP::Request: '6.0'
+  LWP::UserAgent: '6.0'
+  Moo: '2.0'
+  Try::Tiny: '0.24'
+  URI: '1.6'
+  XML::Compile::Licensed: '0.01'
+  XML::Compile::SOAP: '3.12'
+  XML::Compile::SOAP11: '3.12'
+  XML::Compile::SOAP12: '3.03'
+  XML::Compile::WSDL11: '3.03'
+  XML::LibXML: '2.0'
+  namespace::clean: '0'
+  perl: '5.010001'
+  strict: '0'
+  strictures: '2.0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/genio/webservice-e4se/issues
+  homepage: https://github.com/genio/webservice-e4se
+  repository: https://github.com/genio/webservice-e4se.git
+version: '0.050'

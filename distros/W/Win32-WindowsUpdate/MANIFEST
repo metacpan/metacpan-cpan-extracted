@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Win32-WindowsUpdate.t
+lib/Win32/WindowsUpdate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

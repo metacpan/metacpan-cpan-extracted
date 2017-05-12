@@ -1,0 +1,15 @@
+# We start off with a test title
+
+| WWW-Selenium-Utils Website Basic Sanity Check (WSUWBSC) |
+
+# Now we have our tests.  The third column is optional
+
+| open | /selutils |
+| verifyLocation | /selutils/ |
+| verifyTitle | WWW-Selenium-Utils Fan Club |
+| verifyTextPresent | WSU is a perl package that helps you use selenium more effectively. |
+| verifyText | id=self-test | To self-test this page using Selenium |
+| verifyText | id=self-test | To view the easy to read |
+| clickAndWait | click here |
+| verifyLocation | /selutils/selenium/tests/sanity.wiki |
+| verifyTextPresent | this very phrase |

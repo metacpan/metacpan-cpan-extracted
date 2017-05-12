@@ -1,0 +1,53 @@
+
+     ########################################################################
+     # webmon.conf.example - Yaron Kahanovitch - Feb 2007                   #
+     #                                                                      #
+     #                                                                      #
+     # Example for webmon configuration file                                #
+     ########################################################################
+
+     #cache_root - Cache repository Root directory.	
+     cache_root=/var/cache/monitor
+
+     #log_mail_dir - optional -Every notification will be kept under that directory
+     log_mail_dir=/var/log/monitor
+
+     #from - mail address to be filed in the from field. <More than one
+     from=user1@host1
+     from=user2@host2
+
+     #subject - A subject line for mail messages.
+     subject=Web alert, web page changed!!!
+
+     #leftmaring, rightmargin - left and right margins for text generated diffs.
+     leftmaring=0
+     rightmargin=120
+
+     #query start - start a new query
+     query start
+
+          #url - One or more targets url to be monitored.
+	  url=http://www.target1.org
+	  url=http://another.one/any_web_page.html
+	  #sampling_rate=  (Taken from crontab(5), "Vixie" cron) 
+          #               specification of the scheduled time in crontab
+	  #               format (crontab(5)) which contains five mandatory time and
+	  #               date fields and an optional 6th column. fields are:
+          #               minute         0-59
+          #               hour           0-23
+          #               day of month   1-31 
+          #               month          1-12 (or as names)
+          #               day of week    0-7 (0 or 7 is Sunday, or as names )
+          #               seconds        0-59 (optional)
+          #               A field may be an asterisk (*), which always stands for
+          #               ``first-last''. For details please visit 
+          #              for details visit 
+          #              http://search.cpan.org/~roland/Schedule-Cron-0.97/Cron.pm
+          #
+	  #               In the following example the query is being executed every minute
+	  sampling_rate=0-59/1 * * * *
+
+	  #mailto - specify mail addresses to be notify upon query notification
+	  mailto=user1@host1
+          mailto=user2@host2
+     end

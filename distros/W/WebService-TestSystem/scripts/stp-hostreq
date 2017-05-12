@@ -1,0 +1,197 @@
+#!/usr/bin/perl -w
+
+# hostreq   - requests/schedules login access to a host machine
+#             + checkout
+#             + release
+#             + schedule
+
+use Pod::Usage;
+use Getopt::Long;
+use SOAP::Lite;
+use strict;
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_resource     = 'http://www.osdl.org/WebService/TestSystem';
+our $opt_server       = 'http://localhost:8081/';
+our $opt_host         = 0;
+our $opt_debug        = 0;
+
+# Handle commandline options
+warn "Parsing cmdline options\n" if ($opt_debug>3);
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           'version|V'    => \$opt_version,
+           'help|h'       => \$opt_help,
+           'man'          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+	   'host=s'       => \$opt_host,
+           "debug=i"      => \$opt_debug
+           );
+
+# Handle -V or --version
+if ($opt_version) {
+    print q($0: $Revision: 1.4 $ ), "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+exit main();
+
+
+########################################################################
+# Do the SOAP calls
+#
+sub main {
+    warn "Initiating SOAP call\n" if $opt_debug>3;
+    my $soap = create_soap_instance($opt_resource, $opt_server);
+
+    warn "Creating SOAP response object\n" if $opt_debug>3;
+    my $response = $soap->call(new => 0);
+    soap_assert($response);
+    my $testsys = $response->result;
+    
+    my $command = 'checkout';
+    # Checkout
+    if ($command eq 'checkout') {
+	my %host_criteria = ( id => 'stp1-000' );
+	my %notification = ( email => 'stp-devel\@lists.sf.net' );
+	my %preparation = ( );
+	
+	$response = $soap->checkout_host($testsys,
+				       \%host_criteria,
+				       \%notification,
+				       \%preparation);
+	
+	# Release
+    } elsif ($command eq 'release') {
+	$response = $soap->change_host_reservation($testsys,
+						 $opt_host,
+						 0);
+	
+	# Schedule					     
+    } elsif ($command eq 'schedule') {
+	my $schedule_date = "8 hours";
+	$response = $soap->change_host_reservation($testsys,
+						 $opt_host,
+						 $schedule_date
+						 );
+    } else {
+	warn "Unknown command '$command'\n";
+	exit -1;
+    }
+    
+    soap_assert($response);
+    print "Result:  ". $response->result ."\n";
+
+    return 0;
+}
+
+# Convenience function to create the soap instance
+sub create_soap_instance {
+    my $resource = shift || return undef;
+    my $server = shift || return undef;
+
+    my $soap = SOAP::Lite
+        -> uri($resource)
+        -> proxy($server,
+                 options => {compress_threshold => 10000});
+    return $soap;
+};
+
+# Convenience function to print out any errors encountered in a soap call
+# and exit.
+sub soap_assert {
+    my $response = shift;
+    if ($response->fault) {
+        print join ', ',
+        $response->faultcode,
+        $response->faultstring;
+        return undef;
+    }
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+stp-tradd - submits a test request to the system
+
+=head1 SYNOPSIS
+
+stp-tradd [options] < myrequest.xml
+
+
+=head1 DESCRIPTION
+
+B<stp-tradd> submits a test request to the system from the commandline,
+by parsing an input file into a hash record and submitting the hash to
+the WebService::TestSystem daemon server.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the WebService::TestSystem server to connect to.  By default,
+it uses 'http://localhost:8081'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.osdl.org/WebService/TestSystem'.  Users should not typically
+need to alter this setting.
+
+=item B<debug> = I<NUM>
+
+Print debug messages.  The larger the number, the more verbose the debug
+messages will be (typical range is 0-5).
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@osdl.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Open Source Development Labs
+All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.4 $
+
+=cut
+
+
+

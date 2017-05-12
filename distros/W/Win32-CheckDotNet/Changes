@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::CheckDotNet.
+
+0.02  Mon Aug 26 19:09:34 2013
+	- fixed some typos
+
+0.01  Mon Aug 26 19:09:34 2013
+	- original version; created by h2xs 1.23 with options
+		-b 5.16.3 -XA Win32::CheckDotNet
+

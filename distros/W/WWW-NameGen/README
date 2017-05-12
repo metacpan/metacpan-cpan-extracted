@@ -1,0 +1,104 @@
+NAME
+    WWW::NameGen - A website polling random name generator
+
+SYNOPSIS
+    This module polls an online name generator for x many random names,
+    caches internally and returns the results.
+
+      use WWW::NameGen;
+      my $namegen = WWW::NameGen->new();
+      my @names = $namegen->generate(min => 30);
+      @morenames = $namegen->generate(min => 350);
+      @evenmorenames = $namegen->generate(min => 350); # returns cached results as above
+
+WHY
+    You are probably thinking to yourself right now something like this:
+
+      Why did he decided to get the list from a website instead of doing internal
+      an internal sort of thing?
+
+    There are a few reasons:
+
+    I'm lazy
+        I'm lazy and it was a quick hack for something more important than a
+        random name generator.
+
+    name lists are big
+        I could of included the US Census data and done an internal sort and
+        what-not but the data is over a meg and I don't want to deal with
+        it.
+
+    someone else already did it
+        There are already a half dozen (more maybe?) modules that do all
+        sorts of random word stuff from dictionaries and lists. This website
+        has also already created a clean and simple random name generator.
+        There is no point in me rewriting stuff that has already been done.
+        See point "I'm lazy" for more information.
+
+SUBROUTINES/METHODS
+  new
+    Creates and returns a new WWW::NameGen object.
+
+  generate
+    Performs the post request to get a random name list.
+
+    This can take several arguments.
+
+    min The 'min' value is the minimum count of random names to fetch.
+
+    obscurity
+        The 'obscurity' value is the obscurity of the names to fetch.
+
+    type
+        The 'type' argument is either 1, 2 or 3. One for only males, Two for
+        only females, or Three for both males and females.
+
+    nocache
+        When the 'nocache' arg is set is will tell the generate function to
+        ignore the cache and create a new set of names.
+
+  get_chunks
+    Takes a count breaks it into chunks of x.
+
+AUTHOR
+    Nick Gerakines, "<nick at socklabs.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-namegen at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-NameGen>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::NameGen
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/WWW-NameGen>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/WWW-NameGen>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-NameGen>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/WWW-NameGen>
+
+ACKNOWLEDGEMENTS
+    Thanks to whoever runs and owns http://www.kleimo.com/random/name.cfm
+    for providing the service that this module calls.
+
+    And please, don't waste his bandwidth or be generally rude. Respect the
+    site so that it will stay up.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Nick Gerakines, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

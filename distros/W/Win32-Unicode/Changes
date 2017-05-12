@@ -1,0 +1,265 @@
+Revision history for Perl extension Win32::Unicode
+
+0.38    Wed Aug  8 01:31:58 2012
+        [NEW FEATURES]
+        - added same IO::Handle like methods (suggested by bokutin++)
+
+        [CHANGES]
+        - Win32::Unicode::File::slurp more like File::Slurp::slurp.
+
+0.37    Tue Jul 9 02:37:07 2012
+        [BUG FIXES]
+        - fixed Win32::Unicode::File::read methods was crashing (reported by Thomas Eckardt)
+        - added Win32::Unicode::File::flush method (suggested by Thomas Eckardt)
+
+0.36    Tue Jul  3 01:44:48 2012
+        [BUG FIXES]
+        - fixed Win32::Unicode::Error::_set_errno problem that
+          Errno::ERROR_FILE_EXISTS is not defined on ActivePerl. (reported by Yutaka SAITO)
+
+0.35    Mon Jun  4 01:27:16 2012
+        [BUG FIXES]
+        - fixed may fail to determine the console.
+        - fixed cannot read binary file on read file.
+        - fixed memory leak on read file.
+        - fixed parse arguments logic on Win32::Unicode::Native.
+
+        [NEW FEATURES]
+        - support offset on read().
+
+0.34    Mon Nov  7 02:00:06 2011
+        [BUG FIXES]
+        - fixed broken touchW()
+
+0.33    Mon Nov  7 01:14:46 2011
+        [CHANGES]
+        - startup faster
+        - remove dependent on Win32API::File
+
+0.32    Sun Oct 30 22:33:48 2011
+        [BUG FIXES]
+        - Win32::Unicode::File
+            - fixed a problem that not accept more than one arguments
+                (reported by Yukio Sadamatsu)
+
+        [NEW FEATURES]
+        - Win32::Unicode::File
+            - support say $wfh @args
+
+0.31    Fri Sep 23 19:20:19 2011
+        - oops! packing miss!
+
+0.30    Fri Sep 23 19:07:49 2011
+        [BUG FIXES]
+        - ExtUtils::ParseXS is required at configure time
+
+0.29    Fri Sep 23 16:34:04 2011
+        [BUG FIXES]
+        - removed auto_include in Makefile.PL (rt: 69719)
+
+0.28    Sat Jul 23 01:05:59 2011
+        [BUG FIXES]
+        - Win32::Unicode::Console
+            - fixed a problem that did not use $_ in sayW. 
+        - maybe fixed test
+
+0.27    Sun Jul 17 16:40:25 2011
+        [NEW FEATURES]
+        - Win32::Unicode::File
+            - Added utimeW() method.
+
+0.26    Sun Jul 17 01:49:50 2011
+        [BUG FIXES]
+        - Win32::Unicode::Console
+            - fixed warnings message.
+        
+        [CHANGES]
+        - Win32::Unicode::File
+            - statW() supported directory. (request by ManInBlack)
+        
+0.25    Sun Jan  9 17:51:14 2011
+        [BUG FIXES]
+        - Win32::Unicode::Error
+            - Some minor bug fixes.
+        
+        [CHANGES]
+        - slurp() now works as a function.
+        
+        [NEW FEATURES]
+        - Win32::Unicode::File
+            - Added fileno() and path() method.
+
+0.24    Sat Aug 21 16:07:24 2010
+        [BUG FIXES]
+        - Fixed the test failture was likely.
+        
+        [CHANGES]
+        - Remove Test::SharedFork and parent dependence.
+
+0.23    Sat Aug 21 03:11:10 2010
+        [BUG FIXES]
+        - Win32::Unicode::File
+            - Fixed flock not working.
+        - Win32::Unicode::Dir
+            - dir_list and file_list, If the current directory is not specified, it did not work.
+        
+        [CHANGES]
+        - Win32::Unicode::Util
+            - Removed use bigint (thanks gfx)
+        - Win32::Unicode::Dir
+            - cptreeW and mvtreeW changed behavior.
+        
+        [NEW FEATURES]
+        - Win32::Unicode::Dir
+            - Added $Win32::Unicode::Dir::dir global valiable.
+            - findW supported `bydepth`, `no_chdir`, `preprocess` and `postprocess` options.
+        - Win32::Unicode::File
+            - Implemented statW.
+        - Win32::Unicode::Native
+            - Added flock and filename_normalize functions.
+
+0.22    Tue Jul 20 01:29:37 2010 (+900)
+        [BUG FIXES]
+        - Fixed the test fails.
+
+0.21    Mon Jun 28 23:49:12 2010 (+900)
+        [BUG FIXES]
+        - Fixed the test fails.
+        
+        [CHANGES]
+        - Win32::Unicode::Constant
+            - Remove unused constants.
+        - Win32::Unicode::File
+            - Implemented DESTROY
+            - Changed this object to IO::Scalar like.
+              But api do not change.
+        
+        [NEW FEATURES]
+        - Win32::Unicode::File
+            - Added flock function. But alpha level.
+
+0.20    Sat Jun  5 00:52:31 2010 (+900)
+        - Whole
+            - Win32::API to eliminate, XS changed.
+              Added Win32::Unicode::XS.
+        
+        - Win32::Unicode::Process
+            - to receive the exit code (thanks Chris Pirazzi)
+        
+        - Win32::Unicode::Console
+            - Fixed a bug that can not be `0` print.
+            - $SIG{__WARN__} and $SIG{__DIE__} compatible.
+            - When I was trailing newline, the number of lines not to print.
+        
+        - Win32::Unicode::File
+            - `seek`, `file_size` work with big file.
+        
+        - Win32::Unicode::Native
+            - can use Unicode, including arguments.
+              @ARGV contains the characters in the utf8 decode.
+        
+        - Win32::Unicode::Define
+            - deleted.
+
+0.19    Fri May  7 00:31:59 2010 (+900)
+        - Whole
+            - Supported for cygwin.
+            - Created Win32::Unicode::Process.
+              BUT ALPHA LEVEL.
+            - Moved Win32::Unicode::Encode to Win32::Unicode::Util
+        - Win32::Unicode::File
+            - file_size is supported large file.
+        - Win32::Unicode::Dir
+            - Added file_list, dir_list
+
+0.18    Sat Apr 10 17:29:54 2010 (+900)
+        - Win32::Unicode::File
+            Accelerated "file_type f => $file".
+        - Win32::Unicode::Dir
+            bug fixed.
+                while (defined(my $file = $wdir->fetch)) {
+                    # snip ...
+                }
+            now works.
+
+0.17    Fri Apr  2 15:26:18 2010 (+900)
+        - Win32::Unicode::Console
+            Added output record separator (allow $\).
+            Add to redirect standard output compatible.
+
+0.16    Thu Apr  1 23:35:56 2010 (+900)
+        - Win32::Unicode::Console
+            supported for redirecting STDERR.
+        - tests
+            Suppress the warnings
+
+0.15    Thu Mar 18 16:53:26 2010 (+900)
+        - Win32::Unicode::Console
+            supported console-redirect.
+
+0.14    Sun Feb 28 14:46:56 2010 (+900)
+        - Win32::Unicode::Console
+            print 'foo', 'bar' ... had stopped working
+            because the modified.
+
+0.13    Mon Feb 22 00:52:37 2010 (+900)
+        - Win32::Unicode::Console
+            When the console steering wheel changed,
+            the bug that was not output was corrected.
+
+0.12    Sun Feb 21 19:04:39 2010 (+900)
+        - Win32::Unicode::Dir
+            little bug fix. # thx report Stefan
+            added DESTROY
+        - Win32::Unicode::Console
+            deep recursive bug fix.
+            print $fh $str support.
+
+0.11    Wed Dec 23 03:55:38 2009 (+900)
+        - Win32::Unicode::File binmode bug fix.
+
+0.10    Sun Dec 20 18:39:39 2009 (+900)
+        - bug fix
+        - wrote document.
+
+0.09    Tue Nov  3 21:05:29 2009 (+900)
+        - make Win32::Unicode::Native
+
+0.08    Sun Apr  5 01:27:14 2009 (+900)
+        - Win32::Unicode::File::filename_normalize added.
+        - Win32::Unicode::Dir buffer bug fix
+
+0.07    Sat Mar 28 17:47:28 2009 (+900)
+        - many many changes
+
+0.06    forget :P
+        - Win32::Unicode::Console
+            warnW change @_ -> Carp::shortmess(@_).
+            Added a sayW function.
+        - Win32::Unicode::FileUtil
+            Added file_size, file_type functions.
+        - All
+            use base Exporter -> use Exporter 'import'
+            use Carp qw(...)  -> use Carp ();
+        - make Win32::Unicode::Util
+        - Win32::Unicode::Dir
+            Added mkdirW, rmdirW functions;
+
+0.05    Wed Feb 25 03:53:12 2009 (+900)
+        - Win32::Unicode::Console buffer overload bug fix.
+        - make Win32::Unicode::FileUtil.
+            Win32::Unicode::Dir and Win32::Unicode::File use.
+        
+0.04    forget :P
+        - make Win32::Unicode::Console.
+            Win32::Unicode feature of the Win32::Unicode::Console yielded.
+        
+0.03    forget :P
+        - make Win32::Unicode::Encode.
+            Encoding feature of the Win32::Unicode::Encode yielded.
+        
+0.02    forget :P
+        - make Win32::Unicode::Dir.
+
+0.01    Sat Feb  7 15:37:40 2009 (+900)
+        - original version

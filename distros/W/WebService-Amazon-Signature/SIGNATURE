@@ -1,0 +1,200 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3ab2f82e8f8822948270391a99b64a93fa9ad373 Changes
+SHA1 5acfcb7202bf6dd10e20232996fa9104c41d4752 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 3e4007f0fefe803532a399ac5e499320a12b0053 MANIFEST
+SHA1 d45c967b4d4bb32046858c6c510466e5148c20b4 META.json
+SHA1 8c7ed98c2f89d8464ccba09c57567289f69ebb16 META.yml
+SHA1 a61c5aa9ff91b39cded4353a947ae66f114a79fb Makefile.PL
+SHA1 ea06c3c5f187ae40cf4d2552d8a2f7986b7255b0 README
+SHA1 8bc4271abdc7ce135ca2d34b78dbe451420f2d47 cpanfile
+SHA1 f6f6c11416b45d2bb6f34e56c52dd5fb9d433b8c dist.ini
+SHA1 d08358bb00b562fa77bf3675cc37a0bb0a710142 lib/WebService/Amazon/Signature.pm
+SHA1 fe24a4e5d7d3736b3cc234127c776ac610fa23e9 lib/WebService/Amazon/Signature/v4.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 f7c3c2121e846d7521dbd149c5de35b2955bf979 t/00-compile.t
+SHA1 027b5be3a94bb4b3aafbe6d66428d7a8c14c07e3 t/aws4.t
+SHA1 5a18eb237f3033d4de036914ab25cce1c64b57d0 t/aws4_testsuite/get-header-key-duplicate.authz
+SHA1 9692a72b2dc9e20dcd028bb6452c9a66fee26f0d t/aws4_testsuite/get-header-key-duplicate.creq
+SHA1 5807e3c5c5a461eed0fd30c9d7529905658968fa t/aws4_testsuite/get-header-key-duplicate.req
+SHA1 82416fd4a7d7e6f667a2a56a6b212fe171497c15 t/aws4_testsuite/get-header-key-duplicate.sreq
+SHA1 ae467d004110e00ecc203d457749b8249d8d770c t/aws4_testsuite/get-header-key-duplicate.sts
+SHA1 cb86038cbec26cb3e93f2457b434352a60c7af47 t/aws4_testsuite/get-header-value-multiline.req
+SHA1 15fa6732172eafc0cf66221722ea7c9190678ce4 t/aws4_testsuite/get-header-value-order.authz
+SHA1 e6875ba3fb3c173d7b3aa1a4565a9b3b58691399 t/aws4_testsuite/get-header-value-order.creq
+SHA1 4879c52bf6669dd8591acca36c5a38ecd317fb13 t/aws4_testsuite/get-header-value-order.req
+SHA1 2038dfd20504ba8184d71d3d8c228e00f2709baf t/aws4_testsuite/get-header-value-order.sreq
+SHA1 a5efc40905e45d66c192b143a42eecaffd7e93d6 t/aws4_testsuite/get-header-value-order.sts
+SHA1 46939f50b9557dae4206fce709190a793d3b70cc t/aws4_testsuite/get-header-value-trim.authz
+SHA1 e25a68a659f24aa86e2fcc9e5c2b93b4d9fb0d55 t/aws4_testsuite/get-header-value-trim.creq
+SHA1 98664f85347bc0a317820d46557fda392d450ef0 t/aws4_testsuite/get-header-value-trim.req
+SHA1 995ad32acf91b2f3a727ddbd53e8ebe7bb9aa1bf t/aws4_testsuite/get-header-value-trim.sreq
+SHA1 84bab0a31629642ad33a8197aadad7ba7848848c t/aws4_testsuite/get-header-value-trim.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-relative-relative.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-relative-relative.creq
+SHA1 cb4b625a0b26a7f049db10204528be26ae72fca1 t/aws4_testsuite/get-relative-relative.req
+SHA1 eb0a496b2848890e4435cfb463e04b4eb5d87c64 t/aws4_testsuite/get-relative-relative.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-relative-relative.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-relative.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-relative.creq
+SHA1 711b1f9991760cd53be760e44d1bb0383b8ac0e0 t/aws4_testsuite/get-relative.req
+SHA1 2fb588f6c24ca1a156f89131392d5efa0a8fb38a t/aws4_testsuite/get-relative.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-relative.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-slash-dot-slash.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-slash-dot-slash.creq
+SHA1 7e6879d82be075c98cbe2476c869cc3643fdf59c t/aws4_testsuite/get-slash-dot-slash.req
+SHA1 b288879c64a1c14bb7aa2a1f5449a57d06ea13c5 t/aws4_testsuite/get-slash-dot-slash.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-slash-dot-slash.sts
+SHA1 611b12615a86e1d8fd0666d97280d014ee2454cf t/aws4_testsuite/get-slash-pointless-dot.authz
+SHA1 018c1070a0a0147776e0765d761b145f19d47df9 t/aws4_testsuite/get-slash-pointless-dot.creq
+SHA1 d8ffbd2bc7e1ec48a84355eb828a4ef3c42eb6c3 t/aws4_testsuite/get-slash-pointless-dot.req
+SHA1 68439ccd6dcd40ea25fd3257142713f7e9fea32f t/aws4_testsuite/get-slash-pointless-dot.sreq
+SHA1 31ba50f414f05ebc76f137e070f69150c1ee5145 t/aws4_testsuite/get-slash-pointless-dot.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-slash.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-slash.creq
+SHA1 c6c6099e31cc6b71d548e732fa1e3190c71e166e t/aws4_testsuite/get-slash.req
+SHA1 362b1ae6e801b32e51c2cd43679e85b5ea730290 t/aws4_testsuite/get-slash.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-slash.sts
+SHA1 7a162ec8fe728d02a823e27eecececde7b065a4d t/aws4_testsuite/get-slashes.authz
+SHA1 4e9662c616543c8d98393e01194c7630a1004948 t/aws4_testsuite/get-slashes.creq
+SHA1 ee22ab20fea7d60f535909a9147c3cc89aa8bb8e t/aws4_testsuite/get-slashes.req
+SHA1 0a44a5e482b5282498276e9438f1c51ed642fdb9 t/aws4_testsuite/get-slashes.sreq
+SHA1 7dff1c9017887fc9244f0b127247c3659220f18b t/aws4_testsuite/get-slashes.sts
+SHA1 9ee28000c734ce222f0f9f32296bd3f665ee5404 t/aws4_testsuite/get-space.authz
+SHA1 e517708d5760b64b5c0306de7a0cc2da57c84807 t/aws4_testsuite/get-space.creq
+SHA1 c9818f61707932fc64d72f9c4bc34f11a161560f t/aws4_testsuite/get-space.req
+SHA1 8d655186e62a3b29a67923c4b06dba22fb2bd879 t/aws4_testsuite/get-space.sreq
+SHA1 370dc565d83f1e12d6d5d656f8319aa519a8aaf7 t/aws4_testsuite/get-space.sts
+SHA1 0e3923b16681cc3bf9cdc5fdd703c303b76b1849 t/aws4_testsuite/get-unreserved.authz
+SHA1 5e710e23e03bd1a96e63132a2d12f291a4a8aeea t/aws4_testsuite/get-unreserved.creq
+SHA1 2bcc98e3de6fe45dadee8ff1b8bdf377c522d07c t/aws4_testsuite/get-unreserved.req
+SHA1 d40a640f97db4d805d59b1a57c2c11f8affd4d67 t/aws4_testsuite/get-unreserved.sreq
+SHA1 096a350858f8810eb1659ec245458e56ee85f04f t/aws4_testsuite/get-unreserved.sts
+SHA1 d593c74456eb3160a86909fe5fff8c1b5b449601 t/aws4_testsuite/get-utf8.authz
+SHA1 e8bc47ce0b52aa5c9f5d4d027dfb21388d63676f t/aws4_testsuite/get-utf8.creq
+SHA1 00690acd3ab66b7264e8059587312d2faa84a731 t/aws4_testsuite/get-utf8.req
+SHA1 418b1a7c35dd716079b6e381405f6457a0b9fe81 t/aws4_testsuite/get-utf8.sreq
+SHA1 4a04c12646eba6ead47984e63e15ad1a5e186264 t/aws4_testsuite/get-utf8.sts
+SHA1 51c045c8923acea26be29514ed5b57eb792b3e54 t/aws4_testsuite/get-vanilla-empty-query-key.authz
+SHA1 58710061ec2ee2524119934fc469210ef1c58325 t/aws4_testsuite/get-vanilla-empty-query-key.creq
+SHA1 506deec7455be396bdea137cf8d51e545a89454f t/aws4_testsuite/get-vanilla-empty-query-key.req
+SHA1 9fd34c9d3dedc7a6f9f80c0a756a5417264058a0 t/aws4_testsuite/get-vanilla-empty-query-key.sreq
+SHA1 0d09ba2e5354957fe44ee57e17bfc6863dc1cecd t/aws4_testsuite/get-vanilla-empty-query-key.sts
+SHA1 b4f5bcfc439013de1ca00b40ad2d1d83d1f78b7f t/aws4_testsuite/get-vanilla-query-order-key-case.authz
+SHA1 10576a8d09736e03a60939f8f11971441a32f12d t/aws4_testsuite/get-vanilla-query-order-key-case.creq
+SHA1 ecc2afcff4e0cd388b0f4ed0fca84240c9503b22 t/aws4_testsuite/get-vanilla-query-order-key-case.req
+SHA1 d3c94b96855ebd572676d870aab19e428e6adea4 t/aws4_testsuite/get-vanilla-query-order-key-case.sreq
+SHA1 a99f38759b7088c8050b69a60c75b63776383f2b t/aws4_testsuite/get-vanilla-query-order-key-case.sts
+SHA1 9b1c2c2f9d1b70c549e5e90a3a2b1c2ce1504386 t/aws4_testsuite/get-vanilla-query-order-key.authz
+SHA1 4dbc6d643600fb70b5b144deb2465d5166306c3e t/aws4_testsuite/get-vanilla-query-order-key.creq
+SHA1 b9e1c5c2051f689041036fb040f1c787ab2e0d51 t/aws4_testsuite/get-vanilla-query-order-key.req
+SHA1 f49d04ff3082a4e56299ded1e96f35113b6bc1cc t/aws4_testsuite/get-vanilla-query-order-key.sreq
+SHA1 d5045193f590f3cdbe1c1bf8606fc575cdcf503c t/aws4_testsuite/get-vanilla-query-order-key.sts
+SHA1 99536c296c0dc9919c357f75ce041f4ffdec906e t/aws4_testsuite/get-vanilla-query-order-value.authz
+SHA1 3c66a0c5f8f2c56c0d5d955d7ddd5b2241514a01 t/aws4_testsuite/get-vanilla-query-order-value.creq
+SHA1 d0b1aaf8bb681a8eb772040c64eb1bdeac9b3aa1 t/aws4_testsuite/get-vanilla-query-order-value.req
+SHA1 ab7d8da6df56efc165d6da76ab69d567f661ef00 t/aws4_testsuite/get-vanilla-query-order-value.sreq
+SHA1 cf6eecac4b85d37f227c1617087678d7f93e24b0 t/aws4_testsuite/get-vanilla-query-order-value.sts
+SHA1 435ac99946c12093674b57a587b2d62eba7589b1 t/aws4_testsuite/get-vanilla-query-unreserved.authz
+SHA1 f165d203f91f70896ef4b42e6aab931a3c6881ad t/aws4_testsuite/get-vanilla-query-unreserved.creq
+SHA1 97fc957f98fac7f968d4a64e93db1e1368ce16ea t/aws4_testsuite/get-vanilla-query-unreserved.req
+SHA1 2122f26b97264384b1c157871ec59f77adfabcfa t/aws4_testsuite/get-vanilla-query-unreserved.sreq
+SHA1 44ca2167688cc3eba0037453d79131f919e02281 t/aws4_testsuite/get-vanilla-query-unreserved.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-vanilla-query.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-vanilla-query.creq
+SHA1 6cc8ef4f2544e2a63fa8d739b51c1e486b8bd0ef t/aws4_testsuite/get-vanilla-query.req
+SHA1 7929ad39e5fe76727f075fdfb94c4e97f09f5c7a t/aws4_testsuite/get-vanilla-query.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-vanilla-query.sts
+SHA1 8ae340089c5c193e8ffeb1aca58a10b6443b1b50 t/aws4_testsuite/get-vanilla-ut8-query.authz
+SHA1 b8cd378a05672bff5818ca932024ce8eae1867f2 t/aws4_testsuite/get-vanilla-ut8-query.creq
+SHA1 43fa726de376d9ab8e8e76ccf2a2c220da5f032f t/aws4_testsuite/get-vanilla-ut8-query.req
+SHA1 6f1c434cb63ace17121f24dfaae36f71f15e49d0 t/aws4_testsuite/get-vanilla-ut8-query.sreq
+SHA1 a7f964e3fabe4425d981a8f18b7a4e28c2a86593 t/aws4_testsuite/get-vanilla-ut8-query.sts
+SHA1 816714838ac820b1a4797fc5422bf45f8d978162 t/aws4_testsuite/get-vanilla.authz
+SHA1 0bb89635dc94efc6c5e4b9d217fddb941753bc30 t/aws4_testsuite/get-vanilla.creq
+SHA1 6cc8ef4f2544e2a63fa8d739b51c1e486b8bd0ef t/aws4_testsuite/get-vanilla.req
+SHA1 7929ad39e5fe76727f075fdfb94c4e97f09f5c7a t/aws4_testsuite/get-vanilla.sreq
+SHA1 e00370c61390fb6e985055f929790d44f15d743c t/aws4_testsuite/get-vanilla.sts
+SHA1 0ef38797ee9c94648077c10c54de3e2349a4ebe1 t/aws4_testsuite/post-header-key-case.authz
+SHA1 7f1297b1e2eb2857e58ae0f4ae01e4c6ff8cd209 t/aws4_testsuite/post-header-key-case.creq
+SHA1 3a2b81807ece76215463fff2e8ac7f1884860d6e t/aws4_testsuite/post-header-key-case.req
+SHA1 5622460cf6cdaaeb45e98e645c9ab4d14aab2136 t/aws4_testsuite/post-header-key-case.sreq
+SHA1 8f2915b9a9ab6dd3d0309ab88ef8d51d7ecdbe72 t/aws4_testsuite/post-header-key-case.sts
+SHA1 882674809efaadf6bebfaa30fda8e8959498b77e t/aws4_testsuite/post-header-key-sort.authz
+SHA1 bccdc1c79520be57ebc68f4900b23204166e9453 t/aws4_testsuite/post-header-key-sort.creq
+SHA1 3f5b0038e717dc694a2d91e88e504e595a156168 t/aws4_testsuite/post-header-key-sort.req
+SHA1 3c19c6df6fbf9f3dd3db3ba4691c877165d98c89 t/aws4_testsuite/post-header-key-sort.sreq
+SHA1 bd9d3509a3bfebd1e349dd48bcc2de44eea9b153 t/aws4_testsuite/post-header-key-sort.sts
+SHA1 02f5cbb3760d8a3c8c9b8ae0350c0baf8ed0b7cb t/aws4_testsuite/post-header-value-case.authz
+SHA1 a1d158206ef8a8c940c7e923cd38c911c99ec07d t/aws4_testsuite/post-header-value-case.creq
+SHA1 8530376e60e88e7e7a8e172e8ade09a2b3d096e3 t/aws4_testsuite/post-header-value-case.req
+SHA1 8e221ad51a8cc5a94a0b583a0cdc0c2959395ce7 t/aws4_testsuite/post-header-value-case.sreq
+SHA1 9f8713938c2bbcdfa5a243ac86621da229bac906 t/aws4_testsuite/post-header-value-case.sts
+SHA1 32ed089bcf2243e544059365761022857a755b31 t/aws4_testsuite/post-vanilla-empty-query-value.authz
+SHA1 f7f3bb2b79e732d2fbfe446114651b2dbf19ca72 t/aws4_testsuite/post-vanilla-empty-query-value.creq
+SHA1 d24aaef4b8e2d35598f98f3a60e7145dcf606ad8 t/aws4_testsuite/post-vanilla-empty-query-value.req
+SHA1 b3e5b097a165ed098c382ee6e552802049f7ef6a t/aws4_testsuite/post-vanilla-empty-query-value.sreq
+SHA1 a7e100e9b01bb7e57f62010c041b3c1765dd7526 t/aws4_testsuite/post-vanilla-empty-query-value.sts
+SHA1 4ac2f21a770c17ad05ee9484850e6abc1aed433f t/aws4_testsuite/post-vanilla-query-nonunreserved.authz
+SHA1 020f3f0fbac3c506e7a3378d1fe9985898dcd07c t/aws4_testsuite/post-vanilla-query-nonunreserved.creq
+SHA1 d2fe7b79ca7ff655c65738b5ca375764a9ea8e12 t/aws4_testsuite/post-vanilla-query-nonunreserved.req
+SHA1 133a3b66a268dfcc20cc6a4e75b70029237ad64e t/aws4_testsuite/post-vanilla-query-nonunreserved.sreq
+SHA1 3d81938fa9f6c5be8911e9354a4965127e522758 t/aws4_testsuite/post-vanilla-query-nonunreserved.sts
+SHA1 ae2c62885f2cdd1dd4fb0f21236614573faa98a7 t/aws4_testsuite/post-vanilla-query-space.authz
+SHA1 6551ddb4f2f89d8935ee2d6803041aabaff541b9 t/aws4_testsuite/post-vanilla-query-space.creq
+SHA1 6f69e9b25ae6a39dcbb387ea1bc981c49ca1a2df t/aws4_testsuite/post-vanilla-query-space.req
+SHA1 fa3a044453d31373b089269717e1833f27b4cf5f t/aws4_testsuite/post-vanilla-query-space.sreq
+SHA1 9f410578666eefe0cad95a0078cabb5862a4b809 t/aws4_testsuite/post-vanilla-query-space.sts
+SHA1 32ed089bcf2243e544059365761022857a755b31 t/aws4_testsuite/post-vanilla-query.authz
+SHA1 f7f3bb2b79e732d2fbfe446114651b2dbf19ca72 t/aws4_testsuite/post-vanilla-query.creq
+SHA1 d24aaef4b8e2d35598f98f3a60e7145dcf606ad8 t/aws4_testsuite/post-vanilla-query.req
+SHA1 b3e5b097a165ed098c382ee6e552802049f7ef6a t/aws4_testsuite/post-vanilla-query.sreq
+SHA1 a7e100e9b01bb7e57f62010c041b3c1765dd7526 t/aws4_testsuite/post-vanilla-query.sts
+SHA1 0ef38797ee9c94648077c10c54de3e2349a4ebe1 t/aws4_testsuite/post-vanilla.authz
+SHA1 7f1297b1e2eb2857e58ae0f4ae01e4c6ff8cd209 t/aws4_testsuite/post-vanilla.creq
+SHA1 fc9e915b88e90126e2b8d3139e572279560298e9 t/aws4_testsuite/post-vanilla.req
+SHA1 625cb1bb52b5ebba4619a827e16644c75e76c1f9 t/aws4_testsuite/post-vanilla.sreq
+SHA1 8f2915b9a9ab6dd3d0309ab88ef8d51d7ecdbe72 t/aws4_testsuite/post-vanilla.sts
+SHA1 3e9d66f11a2ad1393b99f9c720f73b0166010caf t/aws4_testsuite/post-x-www-form-urlencoded-parameters.authz
+SHA1 aa67697d222b05281c471007fa8fe58cfff834f2 t/aws4_testsuite/post-x-www-form-urlencoded-parameters.creq
+SHA1 93805d404abcb22d0453418005e3c939d5fc02a9 t/aws4_testsuite/post-x-www-form-urlencoded-parameters.req
+SHA1 be4ae4bc40f256aa9b575933a6d41f415dce20a0 t/aws4_testsuite/post-x-www-form-urlencoded-parameters.sreq
+SHA1 a00852dde053f6c3111554f85da1e60863e746c7 t/aws4_testsuite/post-x-www-form-urlencoded-parameters.sts
+SHA1 b0a41819410e5ec2ab5df45de6445d7f746dc7bf t/aws4_testsuite/post-x-www-form-urlencoded.authz
+SHA1 8da7629857179e4efe0057d5625d4b54dbc0a197 t/aws4_testsuite/post-x-www-form-urlencoded.creq
+SHA1 c27b701680f35a999d34107f3a7df41ac60e4811 t/aws4_testsuite/post-x-www-form-urlencoded.req
+SHA1 1645f7a66d03ffbc736a723a350735000a634a6d t/aws4_testsuite/post-x-www-form-urlencoded.sreq
+SHA1 76f1936e3df2a819e9ded7de94438dcfaf3a9b46 t/aws4_testsuite/post-x-www-form-urlencoded.sts
+SHA1 f09e96f46ac2364307142838d68b4f1953b5919d xt/author/eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 a6d8370909ec0e0755d4bd691eb81d722cf94430 xt/release/pod-coverage.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUxmfyAAoJEFKElMNpjtyDPOUIANgpfSH7IrD0PV5C1ffFUfvT
+0nrRsnlANs0b4kocUUnY/wb76B4B5Bl9tZTg5pxBW7WkfqET107tt4VPL8e4YVT4
+gezXB8yZTDrzGiU85M2WaNSFFalyUXDhW7eFpAQ7T7gDGe80R5kpfSGK1s3Tl98X
+zAUU5WdwUTwA9g2N2UNXpQeoMzahjzAbM+c135dKtZJjRueWXXGow24UqufaJRlK
+IU2xPz4R+jY+zkw75GuzSgSz9VcOydMVRHsXoQ3DT6omWE0UQFpl9UpcxmYNnyoh
+fPhdO7rckKLWnYnmKAqUPanE75n4rZy20ok9tSn8hInJFtGwBqo4s3Y81YEVgEM=
+=lDSG
+-----END PGP SIGNATURE-----

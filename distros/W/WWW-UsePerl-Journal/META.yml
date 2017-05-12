@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:                   WWW-UsePerl-Journal
+version:                0.26
+abstract:               Handles the retrieval of UsePerl journal entries
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Class::Accessor::Fast:  0
+  HTTP::Cookies:          0
+  HTTP::Request::Common:  0
+  LWP::UserAgent:         0
+  Time::Piece:            1.07
+  Time::Seconds:          0
+recommends:
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  IO::File:               0
+  Test::Exception:        0
+  Test::More:             0.70
+
+provides:
+  WWW::UsePerl::Journal:
+    file:     lib/WWW/UsePerl/Journal.pm
+    version:  0.26
+  WWW::UsePerl::Journal::Entry:
+    file:     lib/WWW/UsePerl/Journal/Entry.pm
+    version:  0.26
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-UsePerl-Journal
+  repository: http://github.com/barbie/www-useperl-journal
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

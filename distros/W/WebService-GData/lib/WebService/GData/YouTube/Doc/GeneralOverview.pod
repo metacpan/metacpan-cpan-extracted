@@ -1,0 +1,530 @@
+=head1 NAME
+
+WebService::GData::YouTube::Doc::GeneralOverview - General use of the YouTube API Perl client 
+
+=head1 About this document
+
+!!!!!!!!!!!!!WORK IN PROGRESS!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!WORK IN PROGRESS!!!!!!!!!!!!!
+
+This document is basically the same as the one you can find for each YouTube client(Java,.NET,PHP,etc) existing actually on the code.google.com website.
+
+It is mainly modified to reflect the Perl Client library way of interacting with the YouTube API.
+
+Even if all the titles of the original document are listed, only implemented elements are 
+described with a basic example code. 
+
+Not all implemented elements are yet documented. Refers to L<WebService::GData::YouTube> for further informations.
+
+
+=head2   Audience
+
+This document is intended for programmers who want to write client applications that can interact with YouTube using the Perl client library. It provides a series of examples of basic data API interactions.
+
+For YouTube Data API reference information, including expected latencies for data updates, please see the reference guide.
+
+L<http://code.google.com/intl/ja/apis/youtube/2.0/reference.html>
+
+This document assumes that you understand the general ideas behind the Google Data APIs protocol, and that you know Perl.
+
+For reference information about the Perl classes and methods, see the client library's API guide.
+
+http://search.cpan.org/dist/WebService-GData/lib/WebService/GData/YouTube.pm
+
+
+=head2   Document structure
+
+This document contains the following sections:
+
+The L<Authentication> section describes the two different authentication methods available 
+for associating API operations with a specific user account. 
+This section also outlines the differences between authentication for the YouTube Data API and other Google Data APIs. 
+Throughout this document, the explanations of specific API functions will clearly indicate whether the function requires user authentication. 
+In general, all requests that modify video or feed data need to be authenticated. 
+Read-only requests to retrieve public videos do not require authentication.
+
+The L<Understanding video feeds and entries> section provides a sample API response and explains how to extract information 
+about a single video from a list of videos or a set of search results. 
+This section also explains how to access metadata about a specific video entry.
+
+The L<Retrieving and searching for videos> section explains how to fetch a list of videos. 
+The YouTube Data API defines several types of standard feeds, such as top-rated or most-viewed videos. 
+This section explains how also to retrieve a list of videos uploaded by a specific user or a list of related videos. 
+Finally, this section explains how to use the API to let users search through YouTube's video library for videos matching
+specific search terms or categories.
+
+The L<Uploading videos> section briefly explains two ways that you can allow users to upload videos to YouTube from your application. 
+This section also explains how to let users delete videos from your application. 
+These solutions are explained in more detail in the Protocol Guide. 
+You may need to let users upload videos to use certain other API functions. 
+For example, the API provides a function for adding a video response to a video. 
+If the user is uploading a new video as a video response, then your client will need to follow the video uploading instructions
+to add the video to YouTube before identifying the new video as a response.
+
+The L<Updating and deleting videos> section describes how to use the API to update information about a YouTube video. 
+It also describes how a video can be removed using the API.
+
+The L<Using community features> section describes API functions that allow your users to interact with YouTube videos.
+These functions explain requests for posting a rating, comment, video response or complaint to an existing video. 
+You can also use the API to retrieve lists of video comments or video responses or to delete a video response.
+
+The L<Saving and collecting videos> section explains how to use the API to access, create and update favorite videos, 
+video playlists and subscriptions to YouTube channels. 
+It also explains how to modify video playlists and favorites by adding and removing videos.
+
+The L<Enabling user interaction> section explains how to use the API to retrieve and update user profiles. 
+This section also explains how to retrieve, add, update and delete user contacts as well as how to retrieve, send and delete messages.
+
+
+=head1 Getting Started
+
+To use the Perl client library, you must be running Perl >= 5.8.8. 
+
+You also need to use LWP and JSON >=2.0
+
+The snippets of sample code in this document can be copied and pasted into your code and then modified to fit the needs of your application. 
+
+Before you can perform any operations with the YouTube Data API, you must initialize a WebService::GData::YouTube
+ object as shown in the following example. (Most of the method examples in this guide also operate on an instance of WebService::GData::YouTube.) 
+ Please note that all API operations that do not involve retrieving public content will require authentication.
+ 
+   use strict;
+   use warnings;
+   use WebService::GData::YouTube; 
+   #WebService::GData must in the Perl path
+   #installed via cpan, it should be there already.
+   my $yt = new WebService::GData::YouTube();
+
+To use API functionality that requires user authentication, you will also need to include one of the following helper classes, 
+depending on whether you plan to use AuthSub(NOT IMPLEMENTED),OAuth(NOT IMPLEMENTED YET) or ClientLogin authentication.
+
+    use WebService::GData::ClientLogin;
+    
+
+=head1 Authentication
+
+The Perl client library can be used to retrieve public feeds or to execute authenticated operations. 
+All public feeds are read-only and do not require any authentication. 
+Authenticated operations, on the other hand, include the retrieval of private feeds, such as a user's inbox feed, as well as write, 
+upload, update and delete operations. You will need to sign up for a developer key to be able to execute authenticated operations.
+
+L<http://code.google.com/apis/youtube/dashboard/>
+
+You can authenticate requests using either AuthSub proxy authentication(NOT IMPLEMENTED),OAuth(NOT IMPLEMENT YET) or ClientLogin username/password authentication.
+
+Please see the Protocol Guide and the authentication documentation for Google Data APIs for more information about AuthSub,OAuth and ClientLogin.
+
+L<http://code.google.com/intl/ja/apis/gdata/docs/auth/overview.html>
+
+L<http://code.google.com/intl/en/apis/youtube/2.0/developers_guide_protocol.html#Authentication>
+
+=head2   AuthSub for web applications
+
+    NOT IMPLEMENTED AND WILL NOT BE (OAuth being favored).
+
+=head2   OAuth for web applications
+
+    NOT IMPLEMENTED YET.
+
+=head2   ClientLogin for installed applications
+
+ClientLogin authentication is used in installed applications that store the user's email address (username) and password. 
+
+To use ClientLogin authentication, instantiate a L<WebService::GData::ClientLogin> by specifying the email and password of the user associated with the authentication request
+and then set it to the YouTube instance.
+
+    Note: ClientLogin authentication should not be used in Web applications, which should use AuthSub/OAuth authentication instead.
+
+The following code demonstrates how to use ClientLogin to authenticate a user. 
+Note that your authentication request must specify a developer key to retrieve private feeds, upload videos, or submit API requests for write operations. 
+
+Please visit L<http://code.google.com/apis/youtube/dashboard> to obtain a developer key.
+
+    use WebService::GData::YouTube;
+    use WebService::GData::ClientLogin;
+    
+    my $auth;
+
+    eval {
+        $auth = new WebService::GData::ClientLogin(
+            email    => '...',
+            password => '...',
+            key      => '...'
+        );
+    };
+    if(my $error = $@){
+        #$error->code,$error->content...
+    }
+    
+    my $yt = new WebService::GData::YouTube($auth);
+
+
+
+=head1 Understanding video feeds and entries
+
+The YouTube Data API provides several video feeds that represent lists of videos, 
+such as standard feeds, uploads, subscriptions, and favorite videos. The URL for each feed is documented in the reference guide.
+
+=head2   Displaying a feed of videos
+
+Many feeds in the YouTube API consist of video entries. 
+These feeds can be modeled most simply as VideoFeed objects, each of which contains a number of VideoEntry objects. 
+Each video entry corresponds to exactly one YouTube video and contains information about that video.
+
+The following code retrieves a video feed and then prints information about each entry in the feed:
+
+    my $videos = $yt->get_user_videos();#add a channel name if you are not logged in
+    display_videos($videos);
+
+    sub display_videos {
+        my $videos = shift;
+        foreach my $video ( @$videos ) {
+            display_video($video);#implemented below in the documentation
+        }
+    }
+
+The L<Retrieving and searching for videos> section describes different types of video feeds and provides the URLs
+ and instructions for retrieving those feeds.
+
+=head2   Retrieving a specific video entry
+
+Each entry in a video feed contains a link element for which the rel attribute value is self. 
+
+This tag identifies the URL for a feed of information about that particular video. The URL has the following format:
+
+    http://gdata.youtube.com/feeds/api/videos/videoID
+
+The following code retrieves a WebService::GData::YouTube::Feed::Video object, which corresponds to a particular YouTube video, 
+and then prints the metadata for the video:
+
+    my $video = $yt->get_video_by_id('video_id_goes_here');
+    display_video($video);#implemented below in the documentation
+
+
+=head2   Video entry contents
+
+A L<WebService::GData::YouTube::Feed::Video> object, which corresponds to an entry in an Atom feed, 
+contains many different pieces of metadata about a video, ranging from video player URLs to thumbnail images 
+to details like the video's duration and keywords.
+
+The following code demonstrates how to print a variety of details about a video. 
+Many important data fields for a Video object are specified by the children of the <media:group> element. 
+The client library contains many helper methods that facilitate easy access to the child elements of mediaGroup 
+and that can be called directly from the Video object. 
+For a complete list of all of the information that a Video object contains, 
+please refer to the <entry> tag definition in the API Reference Guide. 
+Specifically, refer to the <entry> tag's subtags for retrieving a video entry.
+
+L<http://code.google.com/intl/ja/apis/youtube/2.0/reference.html#youtube_data_api_tag_entry>
+
+    sub display_video {
+        my $video  = shift;
+           say 'Video Id:',$video->video_id;
+           say 'Title:',$video->title;
+           say 'Description:',$video->description;
+           say 'Updated:',$video->updated;
+           say 'Published:',$video->published;
+           say 'Uploaded:',$video->uploaded; 
+           say 'Favorite Count:',$video->favorite_count;
+           say 'View Count:',$video->view_count;
+           say 'Duration:',$video->duration; 
+           say 'Keywords:',$video->keywords;
+           say 'Author Name:',$video->author->[0]->name;
+           say 'Author Uri:',$video->author->[0]->uri;
+           say 'Geo Location:',$video->location;
+           say 'Denied Countries:',$video->denied_countries;
+           say 'Media Player URL:',$video->media_player;
+           say 'Is Private:',$video->is_private;
+           
+           #content
+           say $video->content->type('flash')->[0]->url;#retrieve the flash application url
+           say $video->content->format(1)->[0]->url;#3gpp rtsp
+           #loop over it:
+           my $contents = $video->content;
+           foreach my $content (@$contents){
+                say $content->url;
+                say $content->type;
+                say $content->duration;
+                say $thumb->format;          
+           }
+           
+           say $video->rating->num_dislikes;
+           say $video->rating->num_likes;
+           my $thumbs =$video->thumbnails;
+           foreach my $thumb (@$thumbs) {
+                say $thumb->url;
+                say $thumb->time;
+                say $thumb->width;
+                say $thumb->height;
+           }
+    }
+    
+    Note: For more information about how to generate the information required to embed a video with a player 
+    in your page please refer to the protocol guide.
+    http://code.google.com/intl/en/apis/youtube/2.0/developers_guide_protocol_displaying_video_information.html
+
+=head3     Determining whether a user can edit a video entry
+
+You can determine whether the currently authenticated user is the owner of a particular video entry by calling the is_read_only method on that entry. 
+The sample code below demonstrates how to determine whether a video entry is editable.
+
+    if(!$video->is_read_only) {
+        say 'Video can be edited by current user.';
+    }
+
+=head1 Retrieving and searching for videos
+
+=head2   Retrieving standard feeds
+
+The YouTube Data API provides standard feeds selected based on a variety of criteria. 
+Standard feeds are sitewide rather than user-specific. 
+They contain lists of videos that either reflect YouTube user behavior, such as top-rated and most viewed video feeds, 
+or were selected by YouTube staff, such as recently featured. Standard feeds are updated every few minutes.
+
+The URLs for all standard feeds have the following format:
+
+http://gdata.youtube.com/feeds/api/standardfeeds/FEED_IDENTIFIER
+
+The following lists the standard feeds available through the YouTube Data API.
+
+
+     get_top_rated_videos
+
+     get_top_favorites_videos
+
+     get_most_viewed_videos
+
+     get_most_shared_videos
+
+     get_most_popular_videos
+
+     get_most_recent_videos
+
+     get_most_discussed_videos
+
+     get_most_responded_videos 
+
+     get_recently_featured_videos
+
+     get_on_the_web_videos
+
+You can also retrieve region-specific standard feeds and category-specific standard feeds by specifying either a regionID, 
+a category name, or both in the feed URL. The URL for a region- and category-specific standard feed has the following format:
+
+    http://gdata.youtube.com/feeds/api/standardfeeds/localeID/feedID_CATEGORY_NAME
+
+For example, the following shows the feed URL for a list of the top-rated comedies in Japan:
+
+http://gdata.youtube.com/feeds/api/standardfeeds/JP/top_rated_Comedy
+
+Please refer to the reference guide for more information about standard feeds, region-specific standard feeds and category-specific standard feeds.
+
+The following example demonstrates how to retrieve a standard feed and 
+print information about the videos in that feed. 
+
+Note that you do not need to be authenticated to retrieve standard feeds. 
+
+    sub display_standard_feeds {
+ 
+        my $yt = new WebService::GData::YouTube();
+
+        my $videos = $yt->get_recently_featured_videos();
+  
+        foreach my $video (@$videos){
+            display_video($video);
+        }
+
+        #adding some constraints on the returned data
+        $videos = $yt->get_top_rated_videos('JP');#top rated videos in Japan
+        $videos = $yt->get_top_rated_videos('JP','Comedy');#top rated videos in Japanese Comedy 
+        $videos = $yt->get_top_rated_videos('JP','Comedy','today');#top rated videos of the day in Japanese Comedy 
+    }
+
+=head2   Videos uploaded by a specific user
+
+For each YouTube user, the YouTube Data API defines a video feed that lists the videos that the user has uploaded. 
+
+The video feed for a user's uploaded videos can be retrieved from the following URL:
+
+http://gdata.youtube.com/feeds/api/users/username/uploads
+
+The following code demonstrates how to retrieve a feed of videos uploaded by a particular user:
+
+    my $videos = get_user_videos('channel_name');
+    foreach my $video (@$videos){
+        display_video($video);    
+    }
+
+    sub get_user_videos {     
+        my $channel = shift;
+        my $yt = new WebService::GData::YouTube();
+        return $yt->get_user_videos($channel);
+    }  
+
+Note: In the feed URL, you can substitute the string default instead of a username to retrieve
+      the videos uploaded by the currently authenticated user. 
+      In this case, you would retrieve the feed located at http://gdata.youtube.com/feeds/api/users/default/uploads.
+      In such a case, you must pass an authentication object to the YouTube constructor and there is no need to set a channel.
+
+=head2  Retrieving related videos
+
+Each video entry in a video feed identifies the URL for another video feed that contains videos related to the entry, 
+as determined by YouTube. 
+To retrieve the related videos feed for a video, pass the video id to the get_related_for_video_id method. 
+
+The following code shows how to retrieve and print information about the related videos for a particular video.
+
+    my $videos = $yt->get_related_for_video_id($video->video_id);
+    foreach my $video (@$videos) {
+        display_video($video);
+    }
+
+=head2  Searching for videos
+
+=head3     Searching for videos using categories and keywords
+
+=head3     Searching for videos using developer tags
+
+NOT IMPLEMENTED YET.
+
+=head1 Paging through results
+
+=head1 Uploading videos
+
+=head2  Direct upload
+
+NOT IMPLEMENTED YET.
+
+=head2  Browser-based upload
+
+See L<WebService::GData::YouTube::Doc::BrowserBasedUpload>
+
+=head2 Resumable uploads
+
+NOT IMPLEMENTED YET.
+
+=head2  Checking upload status
+
+=head1 Updating and deleting videos
+
+=head2  Updating video information
+
+=head2  Deleting a video
+
+=head1 Using community features
+
+=head2  Adding a rating
+
+=head2  Comments
+
+=head3     Retrieving video comments
+
+=head3     Adding a comment
+
+=head2   Video Responses
+
+=head3     Retrieving video responses for a video
+
+=head3     Adding a video response
+
+=head3     Deleting a video response
+
+=head2 Flagging a video
+
+=head1 Saving and collecting videos
+
+=head2  Favorite videos
+
+=head3     Retrieving a user's favorite videos
+
+=head3     Adding a favorite video
+
+=head3     Deleting a favorite video
+
+=head2  Playlists
+
+=head3     Retrieving a user's playlists
+
+=head3     Retrieving playlist information
+
+The playlist related write methods below are not implemented yet.
+
+=head3     Adding a playlist
+
+=head3     Updating a playlist
+
+=head4       Adding a video to a playlist
+
+=head4       Editing information for a playlist video
+
+=head4       Removing a video from a playlist
+
+=head3     Deleting a playlist
+
+=head2  Subscriptions
+
+SECTION NOT IMPLEMENTED YET.
+
+=head3     Retrieving a user's subscriptions
+
+=head3     Adding a subscription
+
+=head3     Deleting a subscription
+
+=head2  Video Recommendations
+
+=head1 Enabling user interaction
+
+=head2  Profiles
+
+=head3     Retrieving a user's profile
+
+=head2  Contacts
+
+SECTION NOT IMPLEMENTED YET.
+
+=head3     Retrieving a user's contacts
+
+=head3     Adding a contact
+
+=head3     Accepting or rejecting a contact
+
+=head3     Deleting a contact
+
+=head2  Messages
+
+SECTION NOT IMPLEMENTED YET.
+
+=head3     Retrieving messages
+
+=head3     Sending a message
+
+=head3     Deleting a message
+
+=head1  Activity feeds
+
+SECTION NOT IMPLEMENTED YET.
+
+=head2   User activity feeds
+
+=head2   Friend activity feeds
+
+=head1 Batch processing
+
+SECTION NOT IMPLEMENTED YET.
+
+=head1 Conclusion
+
+
+
+=head1 AUTHOR
+
+shiriru E<lt>shirirulestheworld[arobas]gmail.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

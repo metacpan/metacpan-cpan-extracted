@@ -1,0 +1,55 @@
+{
+   "abstract" : "Wx gui building part of DbLinker.",
+   "author" : [
+      "FranE<ccedil>ois Rappaz (rappazf@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wx-Perl-DbLinker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::InsideOut" : "1.13",
+            "DBD::SQLite" : "1.46",
+            "Data::Dumper" : "2.154",
+            "DateTime::Format::Strptime" : "1.5",
+            "Gtk2::Ex::DbLinker::DbTools" : "0.11",
+            "Log::Log4perl" : "1.41",
+            "Scalar::Util" : "1.45",
+            "Test::More" : "1",
+            "Wx" : "0.9"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://sourceforge.net/projects/wx-perl-dblinker/"
+      }
+   },
+   "version" : "0.012",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

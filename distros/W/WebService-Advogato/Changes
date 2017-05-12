@@ -1,0 +1,12 @@
+Revision history for Perl extension WebService::Advogato.
+
+1.1.0 Sun Apr 04 2004
+	- Added a function for the user.exists RPC function.
+	- Added a function for the cert.get RPC function.
+	- Updated documentation.
+	- Switched to Module::Build.
+
+1.00  Fri Apr 11 2003
+	- First Public release. 
+
+$Id: Changes,v 1.2 2004/04/04 06:18:19 jaldhar Exp $

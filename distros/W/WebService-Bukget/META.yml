@@ -1,0 +1,29 @@
+---
+abstract: 'Provides access to the v3 Bukget API'
+author:
+  - 'Ben van Staveren <madcat@cpan.org>'
+build_requires:
+  Module::Build: 0.38
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Bukget
+requires:
+  Mojo::Base: 0
+  Mojo::JSON: 0
+  Mojo::UserAgent: 0
+  Try::Tiny: 0
+  boolean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/benvanstaveren/WebService-Bukget/issues
+  repository: git://github.com/benvanstaveren/WebService-Bukget.git
+version: 1.00

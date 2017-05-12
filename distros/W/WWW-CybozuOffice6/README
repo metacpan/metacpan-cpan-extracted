@@ -1,0 +1,27 @@
+WWW-CybozuOffice6 version 0.04
+==============================
+
+WWW::CybozuOffice6 is a perl extension for accessing Cybozu Office 6.
+
+    !!! ATTENTION !!!
+    This package is NOT a product of Cybozu, Inc.
+    DO NOT CONTACT CYBOZU, INC. for the use of the software.
+    For support, please visit http://labs.cybozu.co.jp/blog/kazuho/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT
+
+Copyright (C) 2005  Cybozu Labs, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

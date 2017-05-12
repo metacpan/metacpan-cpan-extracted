@@ -1,0 +1,15 @@
+<%if EXIF %>
+	<%switch TYPE %>
+		<%case Image,Folder %>
+	<span class='tiny'>
+		<%if EXIF.ISO %>ISO <%= EXIF.ISO %>,<%/if %>
+		<%if EXIF.FocalLength %><%= EXIF.FocalLength %>,<%/if %>
+		<%if EXIF.FNumber %><%= EXIF.FNumber %><%/if %>
+		<%if EXIF.ExposureTime %><%= EXIF.ExposureTime %>s<%/if %>
+		<%if EXIF.ExposureCompensation %>(<%= EXIF.ExposureCompensation %>)<%/if %>
+	</span>
+		<%case Audio %>
+		<%if EXIF.Artist %><%= EXIF.Artist %> - <%/if %><%if EXIF.Title %><%= EXIF.Title %><%/if %>
+		(<%if EXIF.Artist %><%= EXIF.Album %>, <%/if %><%if EXIF.Year %><%= EXIF.Year %><%/if %>)
+	<%/switch %>
+<%/if %>

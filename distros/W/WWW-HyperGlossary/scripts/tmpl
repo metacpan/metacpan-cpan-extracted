@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+use strict;
+use warnings;
+
+our $verbose  = 0;
+our $function = '';
+our $tmpl_name = '';
+
+our $features = { new    => \&new_tmpl,
+                  clean  => \&clean_tmpl,
+                  delete => \&delete_tmpl,
+		};
+
+get_options();
+
+$features->{ $function }->();
+
+exit;
+
+
+sub new_tmpl {
+	print "new_tmpl $tmpl_name \n";
+}
+sub clean_tmpl {
+	print "clean_tmpl $tmpl_name \n";
+}
+sub delete_tmpl {
+	print "delete_tmpl $tmpl_name \n";
+}
+
+sub get_options {
+	my $opt_string = 'n:c:d:vh';
+	my %opt        = ();
+
+	getopts( "$opt_string", \%opt ) or usage();
+	
+	# Handle "immediate" switches
+	usage() if $opt{h};
+	$verbose    = 1 if defined $opt{v};
+
+	# Handle assigned switches
+	if    ( $opt{n} ) { $function = 'new';    $tmpl_name = $opt{n}; }
+	elsif ( $opt{c} ) { $function = 'clean';  $tmpl_name = $opt{c}; }
+	elsif ( $opt{d} ) { $function = 'delete'; $tmpl_name = $opt{d}; }
+	else              { usage(); exit; }
+
+	if ( $verbose ) { print STDERR "  Function '$function' called.\n"; }
+}
+
+sub usage {
+	print STDERR << "EOF";
+
+usage: tmpl [-vh] -[n|c|d] tmpl_name
+
+ -n tmpl_name   : name of your data file name in the current directory
+ -c tmpl_name   : result files will start with this prefix (default: "results")
+ -v               : verbose output (when available)
+ -h               : this (help) message
+
+example: tmpl -n EnglishMedical
+         tmpl -c EnglishMedical
+         tmpl -d EnglishMedical
+         tmpl -v -n EnglishMedical
+         tmpl -h
+
+EOF
+    exit;
+}
+
+

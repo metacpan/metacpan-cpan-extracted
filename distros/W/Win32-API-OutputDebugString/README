@@ -1,0 +1,32 @@
+
+DESCRIPTION:
+
+This is a trivial extension that supports the OutputDebugString
+Win32 API call. Trivial though it is, it appears nobody has ever thought
+of making it into a module, so I did.
+It is very bare, so if anybody has ideas on what else could benefit it,
+feel free to write.
+
+To take advantge of this, you'll need dbmon.exe or equivalent (check at 
+sysinternals.com).
+
+COPYRIGHT:
+
+Copyright (c) 2001 Alessandro Forghieri. 
+All rights reserved. This program is free software; 
+you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+INSTALLING:
+
+Building from source requires a development system (Visual C++ or the moral
+equivalent):
+
+perl Makefile.PL
+nmake 
+nmake install
+
+I am making a ppm package avaiable from my CPAN directory for those lacking a
+C compiler.
+
+Alessandro Forghieri
+March 23, 2001

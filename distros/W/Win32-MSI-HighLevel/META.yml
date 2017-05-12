@@ -1,0 +1,22 @@
+---
+abstract: 'Perl wrapper for Windows Installer API'
+author:
+  - 'Peter Jaquiery (grandpa@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-MSI-HighLevel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Win32::API: 0.46
+version: 1.0008

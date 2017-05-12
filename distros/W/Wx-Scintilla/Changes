@@ -1,0 +1,377 @@
+Revision history for Wx-Scintilla
+
+0.39  2012.9.4
+    - Build fixes for MSVC on Windows and OSX  (MARKD)
+    - Fix 2.9.4 build on Linux (MARKD)
+    - Fixes for expanded Config values (MARKD)
+    - Removed unused vars from inc/Module/Build/Scintilla.pm - build_xs (MARKD)
+
+0.3801 2012.3.26
+    - Added MoveSelectedLinesUp and MoveSelectedLinesDown (AZAWAWI)
+
+0.38  2012.3.12
+    - Released 0.37_06 as stable 0.38 (AZAWAWI)
+
+0.37_06 2012.3.9
+    - Updated Wx::Scintilla::Constant (AZAWAWI)
+    - In MacOSX, include CoreFoundation when doing a cocoa build (MARKD)
+    - Better determination of wxWidgets architectures (MARKD)
+    - Fix for Lion users who recently upgraded to Xcode 4.3 (MARKD)
+
+0.37_05 2012.3.8
+    - Wrap STC specific implementations of LineUp / LineDown. This should move
+      the caret one line up or down (MARKD).
+    - Updated to Scintilla 3.0.4 (AZAWAWI):
+        - ECL lexer added.
+        - CPP lexer fixes styling after document comment keywords.
+        - Pascal folder improves handling of some constructs.
+        - XML lexer avoids entering a bad mode due to complex preprocessor
+          instructions.
+        - Duplicate command is always remembered as a distinct command for undo.
+        - Fix bug where setting an indicator for the whole document would fail.
+        - Crash fixed for SCI_MOVESELECTEDLINESDOWN with empty vertical
+          selection.
+        - Fractional widths used for line numbers, character markers and other
+          situations.
+        - RGBA markers are drawn centred when taller than line.
+        - Image marker drawing problem fixed for markers taller than line.
+        - Markers are drawn horizontally off-centre based on margin type instead
+          of dimensions.
+        - Fold tail markers drawn vertically centred.
+        - Fixed problems with multiple clicks in margin and with mouse actions
+          combined with virtual space.
+        - Fixed bug with using page up and down and not returning to original
+          line.
+        - Down arrow with wrapped text no longer skips lines.
+        - Fix problem with dwell ending immediately due to word wrap.
+        - Wrapped lines are rewrapped more consistently while resizing window.
+        - Selected line ends are highlighted more consistently.
+        - Redrawing reduced for some marker calls.
+    - No more CPAN indexing of inc directory (AZAWAWI)
+
+0.37_04 2012.2.6
+    - Fixed linking issue with 0.37_03 (AZAWAWI)
+
+0.37_03 2012.2.6
+    - Minor update to Wx::Scintilla::Constant (AZAWAWI)
+
+0.37_02 2012.2.6
+    - Updated to Scintilla 3.0.3 (AZAWAWI):
+        - Scintilla 3.0.3 is a minor bug fix release.
+        - Fractional character positioning was extended to more areas.
+        - Lexers were added for the AviSynth and Take Command
+                  languages and the CSS lexer was extended to support SCSS.
+
+0.37_01 2011.12.22
+    - Updated wx-scintilla\src\scintilla\README.txt to
+      fix packaging issues (AZAWAWI)
+
+0.36 2011.12.21
+    - Released 0.33_05 as stable 0.36 (AZAWAWI)
+
+0.35_05 2011.12.11
+    - Upgraded to Scintilla 3.0.2 (AZAWAWI)
+
+0.35_04 2011.11.14
+    - Fix SurfaceImpl::Polygon drawing bug that caused some markers to not be
+      drawn at all. This was introduced in 0.35_01 (AZAWAWI)
+
+0.35_03 2011.11.13
+    - Updated Scintilla to 3.0.1 pre-release (AZAWAWI). Relevant changes are:
+        - Highlight "else" as a keyword for TCL in the same way as other
+          languages.
+        - Ensure pixmaps allocated before painting as there was a crash
+          when Scintilla drew without common initialisation calls.
+
+0.35_02 2011.11.3
+    - Fixed bold font bug reported by Kevin Dawson [BOWTIE] (AZAWAWI)
+
+0.35_01 2011.11.2
+    - Wx::ScintillaTextCtrl -> Wx::Scintilla::TextCtrl in tools/ (AZAWAWI)
+    - Upgrade to Scintilla 3.0 (AZAWAWI). The following are the related changes:
+        - Paletted display support removed.
+        - New API to see if all lines are visible which can be used to
+          optimize processing fold structure notifications.
+        - Scrolling optimized by avoiding invalidation of fold margin when
+          redrawing whole window.
+        - Optimized SCI_MARKERNEXT.
+        - C++ lexer supports Pike hash quoted strings when turned on with
+          lexer.cpp.hashquoted.strings.
+        - Fixed incorrect line height with annotations in wrapped mode when
+          there are multiple views. Bug #3388159.
+        - Calltips may be displayed above the text as well as below.
+          Bug #3410830.
+
+0.34 2011.11.2
+    - Released 0.33_03 as stable 0.34 (AZAWAWI)
+
+0.33_03 2011.11.2
+    Fixed 0.33_02 regressions regarding Wx constants support (AZAWAWI)
+
+0.33_02 2011.11.2
+    ** BAD RELEASE **
+    - Removed wxSTC_CMD_ internal constants and CmdKeyExecute method (AZAWAWI)
+    - Removed unused st_constants.cpp (AZAWAWI)
+    - Fixed tests, tools and SYNOPSIS to fully use Wx::Scintilla constants
+      (AZAWAWI)
+
+0.33_01 2011.11.2
+    - Moved Wx::ScintillaTextCtrl to Wx::Scintilla::TextCtrl (ADAMK)
+    - Moved Wx::ScintillaTextEvent to Wx::Scintilla::TextEvent (ADAMK)
+    - Moved Wx::Event::EVT_STC_XXXXXX to Wx::Scintilla::EVT_XXXXXX (ADAMK)
+    - Generate Wx::Scintilla::Constant that contains the same
+      Scintilla constant names along with their POD documentation from
+      Scintilla.iface (AZAWAWI)
+    - Add $VERSION to all modules (ADAMK)
+    - Add use 5.008 to all modules (ADAMK)
+    - Added 'Meta: no_index' for 'tools', 'cpp' and 'wx-scintilla'
+      directories (DOLMEN)
+
+0.32 2011.10.11
+    - Released 0.31_02 as stable 0.32 (AZAWAWI)
+
+0.31_02 2011.10.11
+    - Wx::Scintilla contains now Wx::wxSTC_XYZ as Wx::Scintilla::XYZ constants 
+      (AZAWAWI)
+
+0.31_01 2011.10.9
+    - Croak about deprecated EVT_STC_POSCHANGED (SUBMERSIBLE_TOASTER, AZAWAWI)
+    - Fix ticket:1341 'Wx-Scintilla build fails on wxWidgets 2.8.10' (MARKD)
+
+0.30 2011.9.18
+    - Released 0.29_03 as stable 0.30 (AZAWAWI)
+
+0.29_03 2011.9.17
+    - Updated to Scintilla 2.29 released on 16th September 2011 (AZAWAWI):
+        - LaTeX lexer improved with more states and fixes to most outstanding
+          bugs. Bug #1493111. Bug #1856356. Bug #3081692.
+        - Lua lexer updates for Lua 5.2 beta with goto labels and "\z" string
+          escape.
+        - Perl string styling highlights interpolated variables.
+        - Perl lexer updated for Perl 5.14.0 with 0X and 0B numeric literal
+          prefixes, break keyword and "+" supported in subroutine prototypes.
+        - Perl bug fixed with CRLF line endings.
+        - Markdown lexer fixed to not change state with "_" in middle of word.
+        - Mouse pointer changes over selection to an arrow near start when
+          scrolled horizontally.
+        - Indicators that finish at the end of the document no longer expand
+          when text is appended.
+        - On Windows, autocompletion lists will scroll instead of document when
+          mouse wheel spun.
+
+0.29_02 2011.9.14
+    - More missing wxSTC indicator constants: wxSTC_INDIC_DASH,
+      wxSTC_INDIC_DOTS, wxSTC_INDIC_DOTBOX, wxSTC_INDIC_STRAIGHTBOX (AZAWAWI)
+    - Add missing SetEmptySelection to remove any selection and sets the caret
+      at position without scrolling into view (AZAWAWI)
+
+0.29_01 2011.9.11
+    - Updated to Scintilla 2.29 prerelease (AZAWAWI)
+
+0.28 2011.9.10
+    - Released 0.27_01 as stable 0.28 (AZAWAWI)
+
+0.27_01 2011.9.8
+    - Fixed ExtUtils::Parse 3.03_02+ warnings about missing
+    'OUTPUT: RETVAL' sections (AZAWAWI)
+
+0.26 2011.9.8
+    - Released 0.23_01 as stable 0.24 (AZAWAWI)
+    - Fix RT #70662: cpanm Wx::Scintilla fails on Ubuntu Lucid
+      by requiring ExtUtils::XSpp 0.1602 (KAARE, AZAWAWI)
+    - Drop Makefile.PL generation in Build.PL (AZAWAWI)
+
+0.25_03 2011.9.7
+    - Removed stale yellowbrain.com parsed POD documentation (AZAWAWI)
+    - wxSTC_ANNOTATION_BOXED border was not being drawn (AZAWAWI)
+
+0.25_02 2011.9.6
+    - Exposed annotations API (AZAWAWI)
+
+0.25_01 2011.8.29
+    - Exposed wxEVT_STC_INDICATOR_CLICK, wxEVT_STC_INDICATOR_RELEASE,
+      wxEVT_STC_AUTOCOMP_CANCELLED and wxEVT_STC_AUTOCOMP_CHAR_DELETED events
+      (AZAWAWI)
+    - Cleaned up the source code from unused SWIG defines (AZAWAWI)
+    - Expose Scintilla's modern indicator API (AZAWAWI)
+
+0.24  2011.8.29
+    - Released 0.23_01 as stable 0.24 (AZAWAWI)
+
+0.23_01  2011.8.21
+    - Updated the string variable interpolation Perl lexer to the latest (KHMAN,
+      AZAWAWI)
+
+0.22  2011.8.17
+    - 0.21_08 is now released as stable 0.22 to the *unsuspecting* world
+      (AZAWAWI)
+
+0.21_08  2011.8.17
+    - The following variable interpolation patterns are now
+      highlighted correctly (KHMAN, AZAWAWI):
+          ${word} @{word} and things like $${word}
+          $#{word} @#{word} and things like $#${word}
+          ${digit} @{digit}
+          $$ and most special variables with operator characters
+          $0 to $9 and things like $123
+          $^A and other control character special variables
+
+0.21_07  2011.8.16
+    - Added variable interpolation for here-docs (KHMAN, AZAWAWI)
+
+0.21_06  2011.8.15
+    - Added variable interpolation for:  "" qq{} `` qx{} // m{} qr{} s{}{}
+      (KHMAN, AZAWAWI)
+    - Fix build failure on wxWidgets 2.8.10 (MARKD, AZAWAWI)
+
+0.21_05  2011.8.12
+    - Integrated Perl variable interpolation patch by Kein-Hong Man
+      from Scintilla interest group (KHMAN, AZAWAWI)
+
+0.21_04  2011.8.9
+    - The rebirth of the experimental Perl 6 lexer (AZAWAWI)
+    - Expose IndicatorSetAlpha, IndicatorGetAlpha, IndicatorSetUnder
+      and IndicatorGetUnder (AZAWAWI)
+    - Fixed a drawing bug for transparent boxed indicators (AZAWAWI,Reported by
+      ADAMK)
+
+0.21_03  2011.8.3
+    - Test and install Module::Build actions invoke build first (AZAWAWI)
+    - Build or link like make *only* when one of the output files is not
+      up to date (AZAWAWI)
+
+0.21_02  2011.8.2
+    - Fix OSX compilation error (TOME++)
+    - Updated editor.pl to include the perl 5.10 // scintilla test (AZAWAWI)
+
+0.21_01  2011.8.2
+    - Upgraded to Scintilla 2.28 which was released on 1st August 2011 (AZAWAWI)
+    - Switched to building Scintilla 2.x by default (AZAWAWI)
+    - Removed Scintilla 1.79 support (AZAWAWI)
+
+0.20  2011.8.1
+    - The editor doesn't need to be visible to pass tests (ADAMK)
+    - Added 'perl Build.PL --stc2' to build experimental Scintilla 2.03
+      (AZAWAWI). This is a back port from wxWidgets 2.9.2 development branch for
+      wxWidgets 2.8.10+. Please test and let me know if it works for you or not.
+
+0.19  2011.7.4
+    - Handle MinGW link to MS style perl5xx.lib (MARKD)
+
+0.18  2011.6.29
+    - Reformatted Changes file (AZAWAWI)
+    - Fix RT #69176 Unrecognized command line option "-Wno-strict-overflow"
+      (AZAWAWI)
+
+0.17  2011.6.28
+    - Wx::Scintilla cannot exist with Wx::STC (MARKD)
+    - More simplified user-friendly build logs (AZAWAWI)
+    - Less warnings noise while compiling Scintilla on GTK, MSWgcc and OSX
+      (AZAWAWI)
+
+0.16  2011.6.28
+    - Show a simplified version of commands and show the actual command when it
+      fails or interrupted with Ctrl-C unless perl Build.PL verbose=1 is used
+      (AZAWAWI)
+    - Fix RT #69115: Building Wx::Scintilla fails in relocatable perl (AZAWAWI)
+
+0.15  2011.6.21
+    - Minor POD fix (AZAWAWI)
+
+0.14  2011.6.21
+    - Ubuntu 11.04+ scrolling redraw fix http://trac.wxwidgets.org/ticket/13229
+      (MARKD)
+    - Added initial version of Wx::Scintilla::Manual (AZAWAWI)
+    - Removed File::ShareDir lookup as scintilla DLL is now side by side with
+      the XS DLL (MARKD)
+    - Fixed the bad soname in Linux GTK build (MARKD)
+    - Stop linking libperl on non-MSWin32 platforms. Relative -rpath for GTK
+      ensures the current scintilla dll is always loaded (MARKD)
+    - Removed File::ShareDir dependency (AZAWAWI)
+
+0.13  2011.6.20
+    - EVT_SCINTILLA* is now EVT_STC* for backward compatibility with Wx::STC
+      (AZAWAWI)
+    - POD updates (AZAWAWI)
+    - Added Perl 6 lexer to linked lexers (AZAWAWI)
+
+0.12  2011.6.17
+    - Updated POD (AZAWAWI)
+    - Don't set global Wx::Event version (MARKD)
+    - Pre-build check for GTK development library (MARKD)
+    - Static Perl linking fix (MARKD)
+    - Totally experimental Perl 6 syntax higlighting that is made only
+      for the brave of heart (AZAWAWI)
+
+0.11  2011.6.16
+    - OS compatibility patch (Big thanks to Mark Dootson++) (MARKD)
+      CentOS 3 32 bit - custom built Perl
+      CentOS 5 32/64 bit - custom built Perl
+      Fedora 14 32 Bit - system Perl & Wx
+      Ubuntu 10/11 32 Bit - system Perl & Wx
+      Mac OS X Snow Leopard - 32 bit custom Perl
+      Windows XP 32 bit custom Perl & Wx
+      Windows Vista 32/64 bit custom Perl & Wx
+      Windows 7 64 bit custom Perl & Wx
+
+0.10  2011.6.15
+    - Added Makefile.PL support through Module::Build::Compat (AZAWAWI)
+
+0.09  2011.6.13
+    - Experimental support 64-bit Ubuntu 10.10 (SZABGAB, AZAWAWI)
+    - Defeat the indexer by splitting the package declaration on two lines for
+      Wx::Event (MARKD, AZAWAWI)
+
+0.08  2011.6.10
+    - Proper ActivePerl + MS VC Compiler support in Wx::Scintilla (AZAWAWI)
+    - Updated POD documentation about supported platforms (AZAWAWI)
+
+0.07 2011.6.10
+    - Removed the 'OS unsupported' test in Build.PL; i want it to fail on other
+      platforms so i can learn more from failures (AZAWAWI)
+
+0.06 2011.6.9
+    - Added t/03_editor.t to begin testing Scintilla editor functionality
+      (AZAWAWI)
+    - More POD updates (AZAWAWI)
+    - Removed Makefile.PL because of weird compilation failures while using it
+      (AZAWAWI)
+    - Handled compilation failures and the user's control-c (AZAWAWI)
+    - Removed a few Alien::wxWidgets dependencies in Build.PL which causes a lot
+      of false UNKNOWNs in CPAN testers reports (AZAWAWI)
+    - Reuse Module::Build API to use Config (AZAWAWI)
+    - Fixed shared library loading problems on Linux by setting runtime link
+      paths (AZAWAWI)
+
+0.05  2011.6.8
+    - Updated POD documentation (AZAWAWI)
+    - Experimental linux gtk support (AZAWAWI)
+
+0.042  2011.6.6
+    - Quick version to handle packages with undefined versions
+
+0.04  2011.6.6
+    - Better handling of File::ShareDir death (AZAWAWI)
+    - Fixed XS loader version mismatch bug in Wx::boot by replacing it by
+      XSLoader::load (AZAWAWI)
+    - File::Sharedir is not used to locate shared libs when the test harness is
+      active (AZAWAWI)
+    - Updated POD documentation (AZAWAWI)
+    - Added a minimal demo Perl editor application in the SYNOPSIS section
+      (AZAWAWI)
+
+0.03  2011.6.6
+    - The package version is extracted correctly to prevent test failures 
+      (AZAWAWI)
+    - Wx::Event is no longer subclassed to prevent the permission error for now
+      (AZAWAWI)
+    - Include the important and missing Scintilla.xs (AZAWAWI)
+    - More POD documentation (AZAWAWI)
+    - Fixed missing dist_abstract warning in Build.PL (AZAWAWI, Reported by
+      SZABGAB)
+
+0.02  2011.6.5
+    - Attempt to fix the Wx::Event-subclass-upload-permission error (AZAWAWI)
+
+0.01  2011.6.5
+    - First version, released on an unsuspecting world  (AZAWAWI)

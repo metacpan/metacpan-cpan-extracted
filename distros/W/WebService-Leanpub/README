@@ -1,0 +1,43 @@
+WebService-Leanpub version 0.0.1
+
+This module provides a Perl interface to the web API of the publisher Leanpub.
+
+To use the Leanpub API and therefore to use this module you need an API key
+from Leanpub. To get an API key you have to sign in to leanpub and follow the
+instruction at https://leanpub.com/help/api.
+
+Using this perl module you are able to
+
+* create book previews
+* publish books
+* query the job status of a preview or a publishing command
+* get the summary sales data and
+* get data about individual purchases
+* create, list and update coupons for your book
+
+from your perl program.
+
+There is a accompanying command line program that allows you to use the
+capabilities of this module from the command line and may serve you as an
+example for your own code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Mathias Weidner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

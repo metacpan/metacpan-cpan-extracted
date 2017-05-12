@@ -1,0 +1,32 @@
+---
+abstract: 'A client library for ChatWork API'
+author:
+  - 'Kuniyoshi Kouji <kuniyoshi@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-ChatWorkApi
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Data::Dumper: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Mouse: '0'
+  Readonly: '0'
+  Smart::Args: '0'
+  String::CamelCase: '0'
+  URI: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'

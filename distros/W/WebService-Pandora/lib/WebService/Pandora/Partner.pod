@@ -1,0 +1,108 @@
+=head1 NAME
+
+WebService::Pandora::Partner - Pandora WebService API Partner
+
+=head1 SYNOPSIS
+
+  # creating a new Partner object
+
+  package WebService::Pandora::Partner::MyPartner;
+
+  use base 'WebService::Pandora::Partner';
+
+  sub new {
+
+    my $caller = shift;
+
+    my $class = ref( $caller );
+    $class = $caller if ( !$class );
+
+    my $self = $class->SUPER::new( username => 'username',
+                                   password => 'password',
+                                   deviceModel => 'model',
+                                   decryption_key => 'key',
+                                   encryption_key => 'key',
+                                   host => 'tuner.pandora.com' );
+
+    return $self;
+  }
+
+  # using a partner object
+
+  $partner = WebService::Pandora::Partner::MyPartner->new();
+  $result = $partner->login() or die( $partner->error() );
+
+=head1 DESCRIPTION
+
+This module is a base class that should be inherited and not used directly.
+When logging in to the Pandora API, you must first login using a particular
+partner, such as an Apple iOS or Android device.  Each partner has its own
+credentials and encryption/decryption keys, and some use different HTTP hosts
+than others to query the API.  The B<WebService::Pandora> package provides
+modules for several known partners and will default to using
+B<WebService::Pandora::Partner::iOS> if one isn't provided.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Creates a new B<WebService::Pandora::Partner> object with the arguments given.
+All of the options are required and used by the B<login()> method.
+
+=over 4
+
+=item username =E<gt> STRING [required]
+
+The username of the partner to use when logging in.
+
+=item password =E<gt> STRING [required]
+
+The password of the partner to use when logging in.
+
+=item deviceModel =E<gt> STRING [required]
+
+The device model name to use when logging in.
+
+=item encryption_key =E<gt> STRING [required]
+
+The encryption key to use when encrypting the JSON data being sent to the
+Pandora API method.
+
+=item decryption_key =E<gt> STRING [required]
+
+The decryption key to use when decrypting the JSON data send back from the
+Pandora API method.
+
+=item host =E<gt> STRING [required]
+
+The host portion of the URL to use when issuing the HTTP request to the
+Pandora API method.
+
+=back
+
+=head1 METHODS
+
+=head2 login
+
+Returns a hashref containing the information from the login request when the
+login was successful, or a false value on failure.  Internally, this will
+execute the B<auth.partnerLogin> Pandora API method using the
+B<WebService::Pandora::Method> library.
+
+  $result = $partner->login() or die( $partner->error() );
+
+=head2 error
+
+Returns a string containing a message about why the login call failed.  The error string may
+come from internally in the module, from a failed HTTP request, or from the Pandora API itself.
+
+=head1 SEE ALSO
+
+L<WebService::Pandora>
+L<WebService::Pandora::Method>
+
+=head1 AUTHOR
+
+Mitch McCracken E<lt>mrmccrac@gmail.comE<gt>
+
+=cut

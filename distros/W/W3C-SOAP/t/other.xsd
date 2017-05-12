@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    targetNamespace="http://other.schema.org/v1/"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://other.schema.org/v1/"
+    >
+
+    <xs:complexType name="otherComplexThing">
+        <xs:sequence>
+            <xs:element name="otherOne" type="xs:string"  minOccurs="1"/>
+            <xs:element name="otherTwo" type="xs:int"     minOccurs="1"/>
+            <xs:element name="el10">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="el11">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:length value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="el13">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="el13_1" type="xs:string"  minOccurs="1"/>
+                        <xs:element name="el13_2" type="xs:int"     minOccurs="1"/>
+                        <xs:element name="el13_3">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="el13_4">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="el13_4_1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

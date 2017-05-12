@@ -1,0 +1,9 @@
+Revision history for Win32::ParseWords
+
+0.01 - 2017-01-29T09:21:43+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.
+  - This module has been copied almost verbatim from Text::ParseWords.
+  - Only the quote character \ has been replaced by ^

@@ -1,0 +1,45 @@
+==================================================
+Changes from 2013-09-27 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.2 at 2014-09-27 13:01:29 +0000
+----------------------------------------
+
+  Change: b32f5881ba5a0bf0e614a12497ba1dd8b641a924
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 01:01:19 +0000
+
+    documentation 
+
+  Change: fe722d3c8135b832428edc3b11b7576315d55798
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:46:57 +0000
+
+    added generated POD 
+
+----------------------------------------
+version 0.1 at 2014-09-27 12:33:16 +0000
+----------------------------------------
+
+  Change: 8483a6b436a1fcece941a445d1d528ca72142326
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:33:16 +0000
+
+    first version supporting events, score and label API 
+
+  Change: 829066c75b644cde06fba7ac5aef10289c136e38
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:32:16 +0000
+
+    don't deploy via puppet 
+
+  Change: dd4c21dd187ce09c6a1763ce7dbf05aa318729bd
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-24 12:24:43 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

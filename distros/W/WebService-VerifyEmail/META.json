@@ -1,0 +1,49 @@
+{
+   "abstract" : "check validity of an email address using verify-email.org",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-VerifyEmail",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Moo" : "0",
+            "Net::HTTP::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/WebService-VerifyEmail",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/WebService-VerifyEmail.git",
+         "web" : "https://github.com/neilb/WebService-VerifyEmail"
+      }
+   },
+   "version" : "0.03"
+}
+

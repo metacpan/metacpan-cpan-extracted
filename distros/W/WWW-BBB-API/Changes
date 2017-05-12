@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::BBB::API.
+
+0.02  Wed Feb  2 16:28:41 CET 2011
+	- First public release
+
+0.01  Thu Nov 25 15:41:33 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc WWW::BBB::API
+

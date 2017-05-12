@@ -1,0 +1,7 @@
+Revision history for WebService-Viddler
+
+0.01    March 15, 2010
+        First version, released on an unsuspecting world. Proof of concept outlining a basic layout for the module with a few implemented Viddler API methods for guidance and testing.
+
+0.10	May 7, 2010
+	Added support for most API methods, started adding param verification for optional arguments and passing error codes if method failed. Started testing against personal Viddler account.

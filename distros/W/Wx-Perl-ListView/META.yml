@@ -1,0 +1,24 @@
+---
+name: Wx-Perl-ListView
+version: 0.01
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: virtual list control interface
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0.5
+  Wx: 0.26
+provides:
+  Wx::Perl::ListView:
+    file: lib/Wx/Perl/ListView.pm
+    version: 0.01
+  Wx::Perl::ListView::Model:
+    file: lib/Wx/Perl/ListView/Model.pm
+  Wx::Perl::ListView::SimpleModel:
+    file: lib/Wx/Perl/ListView/SimpleModel.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

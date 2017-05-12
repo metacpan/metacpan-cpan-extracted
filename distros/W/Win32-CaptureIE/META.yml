@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Win32-CaptureIE
+version:      1.30
+version_from: CaptureIE.pm
+installdirs:  site
+requires:
+    Image::Magick:                 0
+    Win32::OLE:                    0
+    Win32::Screenshot:             1.2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

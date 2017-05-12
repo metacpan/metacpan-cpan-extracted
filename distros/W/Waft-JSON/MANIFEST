@@ -1,0 +1,8 @@
+Changes
+lib/Waft/JSON.pm
+Makefile.PL
+MANIFEST
+README
+t/compile_template.t
+t/convert_json.t
+META.yml                                 Module meta-data (added by MakeMaker)

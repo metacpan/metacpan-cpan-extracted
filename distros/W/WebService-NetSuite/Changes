@@ -1,0 +1,34 @@
+Revision history for Perl extension WebService::NetSuite.
+
+0.04 2014-02-22
+    - All 0.04 fixes by github/dbeusee
+    - Fixed getSelectValue usage for correct 2013_2 usage.
+    - Fixed get usage for second arg (changed to accept hash so you can pass externalId instead if you want, like this: $ns->get('customer', {externalId => 5678});
+    - Fixed get to copy original record hash since it's copied during parsing, which prevents calling again with same hash.
+    - Fixed get: don't die on error - return error instead like all other routines.
+    - Fixed searchMore to use searchMoreWithId so that it works now that login/logout are not used.
+    - Fixed searchNext to call searchMore with next page# based on pageIndex from previous search results.
+    - Fixed delete to accept hash or internal id in case you want to pass externalId, like get() above.
+    - Fixed add & upsert usage so third arg (recordAttrs) matches that of the other routines.
+    - Fixed update to add third arg (recordAttrs) like add/upsert.
+    - Fixed attach/detach to share the same code.
+    - Fixed _parseRequest to try to find a xxxxList field type, as not all of them have the same name as record element name without "List". If we cannot find the field definition, we fall back in same name as record element without "List". This fixes error with assigneeList on projectTask record.
+    - Fixed _parseRequest to accept scriptId for custom field reference.
+    - Fixed _parseRequest to accept externalId for a recordRef.
+
+0.03 2014-01-23
+    - Changed usage to use names instead of IDs [github/dbeusee]
+    - Look up correct netsuite domain (datacenter) to use (netsuite.com, na1.netsuite.com, sandbox.netsuite.com, etc). Old usage still supported for backward
+compatibility, but new usage is recommended. [github/dbeusee]
+    - Use more fully qualified namespaces so that things like ExpenseReport request can work. [github/dbeusee]
+    - Better error handling [github/dbeusee]
+    - Added options for debugging - send debug info to a file (NetSuite.dbg by default) including SOAP request and reply and some additional debug messages. [github/dbeusee]
+    - Allow add request to include attributes to the element (ExpenseReport record takes externalId element for instance). [github/dbeusee]
+
+0.02 2013-10-11
+    - add company id parameter to cart url to speed up redirects
+    - RT 88790, updated changes file to conform to CPAN::Changes::Spec
+
+0.01 2013-09-18
+    - initial release with large portions shamelessly stolen from NetSuite.pm found on github
+

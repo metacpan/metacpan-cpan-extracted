@@ -1,0 +1,31 @@
+---
+abstract: 'Perl extention to color warning messages.'
+author:
+  - 'NAGATA Hiroaki <handlename> <handle _at_ cpan _dot_ org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+  Test::Requires: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Warn::Colorful
+name: Warn-Colorful
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Term::ANSIColor: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/handlename/p5-Warn-Colorful.git
+version: 0.01

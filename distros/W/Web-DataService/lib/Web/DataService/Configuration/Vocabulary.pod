@@ -1,0 +1,137 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Vocabulary - how to configure output vocabularies
+
+=head1 SYNOPSIS
+
+This page describes the role that output vocabularies play in the
+Web::DataService framework, and how to configure them.  It includes a list of
+the attributes that you can use to define them.
+
+=head1 VOCABULARY DEFINITIONS
+
+Each data service I<may> define one or more vocabularies.  These are defined
+using the L<define_vocab|Web::DataService/define_vocab> method of a data
+service object.  This must be be done at data service startup time before any
+formats are defined, so that the
+L<default_vocab|Web::DataService::Configuration::Format/default_vocab>
+attribute can be interpreted properly.  These vocabularies can be used, for
+many purposes, including:
+
+=over
+
+=item *
+
+to express the data service output according to some well-known
+standard
+
+=item *
+
+to create shortened field names and values in order to reduce the size of the
+response messages
+
+=back
+
+A vocabulary is selected for each request as follows.  Each output format has
+a default vocabulary, and the vocabulary corresponding to the selected output
+format will always be used unless explicitly overridden.  If the
+special parameter C<vocab> is active, and if it is included in the request
+with a valid value, then that vocabulary is used regardless of the format.
+
+A vocabulary named 'null' is always available unless you explicitly disable
+it.  You do not need to call C<define_vocab> to make it active, unlike with
+the L<predefined formats|Web::DataService::Configuration::Format/Predefined formats>.
+This vocabulary expresses results using the underlying field names used by the
+backend data store.  If you do not wish this vocabulary to be available for
+selection, you can explicitly disable it as follows:
+
+    $ds->define_vocab({ name => 'null', disabled => 1 });
+
+The actual names that make up the vocabulary are specified when defining
+L<output blocks|Web::DataService::Configuration::Output>.  For example, if you
+have defined a vocabulary named "foo", then any output fields you subsequently
+define may contain the attribute "foo_name" whose value will be used as the
+field name in any output rendered with vocabulary "foo".  If no such attribute
+is specified, then that field will be omitted from the output when vocabulary
+"foo" is selected.  You can also include processing rules with an "if_vocab"
+value of "foo", which will be activated only when this vocabulary is selected.
+In this way, you can transform both the field names and values as appropriate
+for this vocabulary, and skip output values that cannot be expressed in that
+vocabulary.
+
+=head1 VOCABULARY ATTRIBUTES
+
+With the exception of C<name>, each of these attributes is optional.  
+
+=head2 name
+
+Each vocabulary defined for a given data service must have a unique name.
+This name can be used as the value of the format attribute
+L<default_vocab|Web::DataService::Configuration::Format/default_vocab>, and
+the processing rule attributes
+L<if_vocab|Web::DataService::Configuration::Output/if_vocab> and
+L<not_vocab|Web::DataService::Configuration::Output/not_vocab>.
+
+In addition, suppose you have defined a vocabulary named "foo".  You can then
+include the attribute C<foo_name> in any of your field definitions.  This is
+how you actually populate the vocabulary.
+
+=head2 title
+
+The value of this attribute is used as the vocabulary's title in documentation
+pages.  It defaults to the name.
+
+=head2 doc_node
+
+The value of this attribute specifies the path of a data service node which
+will provide documentation about this vocabulary.  You must define the node with a
+separate call to C<define_node>.
+
+=head2 use_field_names
+
+If this attribute is given a true value, then the underlying field names used
+by the backend data store will be used by this vocabulary.  It is
+automatically set to true for the predefined vocabulary 'null'.
+
+=head2 doc_string
+
+You can set this attribute either directly or by including one or more
+documentation strings after the format attribute hash in the call to
+C<define_format>.  This value will be used in any auto-generated vocabulary
+lists in the documentation pages.
+
+=head2 disabled
+
+If this attribute is given a true value, then any request that selects it will
+get an HTTP 400 error ("parameter error").  In addition, this vocabulary may
+not be the value of the format attribute
+L<default_vocab|Web::DataService::Configuration::Format/default_vocab>.  You
+can use this to create a placeholder for a vocabulary that is not fully
+implemented yet, or to temporarily disable a vocabulary.  Disabled
+vocabularies will never appear in any auto-generated documentation list.
+
+=head2 undocumented
+
+If this attribute is given a true value, the vocabulary will be available for
+selection in the usual way, but it will never appear in any auto-generated
+documentation list.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

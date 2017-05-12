@@ -1,0 +1,239 @@
+BOOL		T_BOOL
+HANDLE		T_UV
+DWORD		T_UV
+SIZE_T		T_UV
+ULONG_PTR	T_UV
+LPCVOID		T_BUF
+LPVOID		T_BUF
+HEAPENTRY32	T_HEAPENTRY32
+HEAPLIST32	T_HEAPLIST32
+MODULEENTRY32	T_MODULEENTRY32
+MODULEENTRY32W	T_MODULEENTRY32W
+PROCESSENTRY32	T_PROCESSENTRY32
+PROCESSENTRY32W	T_PROCESSENTRY32W
+THREADENTRY32	T_THREADENTRY32
+
+#############################################################################
+INPUT
+T_BOOL
+	$var = null_arg($arg) || !SvTRUE($arg) ? ($type) 0 : looks_like_number($arg) ? ($type) SvIV($arg) : ($type) 1
+T_UV
+	$var = null_arg($arg) ? ($type) 0 : ($type) SvUV($arg)
+T_BUF
+	$var = null_arg($arg) ? ($type) 0 : ($type) SvPV_nolen($arg)
+T_HEAPENTRY32
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.hHandle = (HANDLE) SvUV(*hv_fetch(hv, \"hHandle\", 7, 0));
+		$var.dwAddress = (ULONG_PTR) SvUV(*hv_fetch(hv, \"dwAddress\", 9, 0));
+		$var.dwBlockSize = (SIZE_T) SvUV(*hv_fetch(hv, \"dwBlockSize\", 11, 0));
+		$var.dwFlags = (DWORD) SvUV(*hv_fetch(hv, \"dwFlags\", 7, 0));
+		$var.dwLockCount = (DWORD) SvUV(*hv_fetch(hv, \"dwLockCount\", 11, 0));
+		$var.dwResvd = (DWORD) SvUV(*hv_fetch(hv, \"dwResvd\", 7, 0));
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.th32HeapID = (ULONG_PTR) SvUV(*hv_fetch(hv, \"th32HeapID\", 10, 0));
+	}
+T_HEAPLIST32
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.th32HeapID = (ULONG_PTR) SvUV(*hv_fetch(hv, \"th32HeapID\", 10, 0));
+		$var.dwFlags = (DWORD) SvUV(*hv_fetch(hv, \"dwFlags\", 7, 0));
+	}
+T_MODULEENTRY32
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.th32ModuleID = (DWORD) SvUV(*hv_fetch(hv, \"th32ModuleID\", 12, 0));
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.GlblcntUsage = (DWORD) SvUV(*hv_fetch(hv, \"GlblcntUsage\", 12, 0));
+		$var.ProccntUsage = (DWORD) SvUV(*hv_fetch(hv, \"ProccntUsage\", 12, 0));
+		$var.modBaseAddr = (BYTE*) SvUV(*hv_fetch(hv, \"modBaseAddr\", 11, 0));
+		$var.modBaseSize = (DWORD) SvUV(*hv_fetch(hv, \"modBaseSize\", 11, 0));
+		$var.hModule = (HMODULE) SvUV(*hv_fetch(hv, \"hModule\", 7, 0));
+		strncpy($var.szModule, SvPV_nolen(*hv_fetch(hv, \"szModule\", 8, 0), MAX_MODULE_NAME32);
+		$var.szModule[MAX_MODULE_NAME32] = 0;
+		strncpy($var.szExePath, SvPV_nolen(*hv_fetch(hv, \"szExePath\", 9, 0), MAX_PATH - 1);
+		$var.szExePath[MAX_PATH - 1] = 0;
+	}
+T_MODULEENTRY32W
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		CHAR* szModule;
+		WCHAR wszModule[MAX_MODULE_NAME32 + 1];
+		CHAR* szExePath;
+		WCHAR wszExePath[MAX_PATH];
+		$var.th32ModuleID = (DWORD) SvUV(*hv_fetch(hv, \"th32ModuleID\", 12, 0));
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.GlblcntUsage = (DWORD) SvUV(*hv_fetch(hv, \"GlblcntUsage\", 12, 0));
+		$var.ProccntUsage = (DWORD) SvUV(*hv_fetch(hv, \"ProccntUsage\", 12, 0));
+		$var.modBaseAddr = (BYTE*) SvUV(*hv_fetch(hv, \"modBaseAddr\", 11, 0));
+		$var.modBaseSize = (DWORD) SvUV(*hv_fetch(hv, \"modBaseSize\", 11, 0));
+		$var.hModule = (HMODULE) SvUV(*hv_fetch(hv, \"hModule\", 7, 0));
+		szModule = SvPV_nolen(*hv_fetch(hv, \"szModule\", 8, 0);
+		if (MultiByteToWideChar(CP_ACP, 0, szModule, -1, wszModule, MAX_MODULE_NAME32 + 1) == 0)
+			*wszModule = 0;
+		wcscpy($var.szModule, wszModule);
+		szExePath = SvPV_nolen(*hv_fetch(hv, \"szExePath\", 9, 0);
+		if (MultiByteToWideChar(CP_ACP, 0, szExePath, -1, wszExePath, MAX_PATH) == 0)
+			*wszExePath = 0;
+		wcscpy($var.szExePath, wszExePath);
+	}
+T_PROCESSENTRY32
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.cntUsage = (DWORD) SvUV(*hv_fetch(hv, \"cntUsage\", 8, 0));
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.th32DefaultHeapID = (ULONG_PTR) SvUV(*hv_fetch(hv, \"th32DefaultHeapID\", 17, 0));
+		$var.th32ModuleID = (DWORD) SvUV(*hv_fetch(hv, \"th32ModuleID\", 12, 0));
+		$var.cntThreads = (DWORD) SvIV(*hv_fetch(hv, \"cntThreads\", 10, 0));
+		$var.th32ParentProcessID = (DWORD) SvIV(*hv_fetch(hv, \"th32ParentProcessID\", 19, 0));
+		$var.pcPriClassBase = (LONG) SvIV(*hv_fetch(hv, \"pcPriClassBase\", 14, 0));
+		strncpy($var.szExeFile, SvPV_nolen(*hv_fetch(hv, \"szExeFile\", 9, 0), MAX_PATH - 1);
+		$var.szExeFile[MAX_PATH - 1] = 0;
+	}
+T_PROCESSENTRY32W
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		CHAR* szExeFile;
+		WCHAR wszExeFile[MAX_PATH];
+		$var.cntUsage = (DWORD) SvUV(*hv_fetch(hv, \"cntUsage\", 8, 0));
+		$var.th32ProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32ProcessID\", 13, 0));
+		$var.th32DefaultHeapID = (ULONG_PTR) SvUV(*hv_fetch(hv, \"th32DefaultHeapID\", 17, 0));
+		$var.th32ModuleID = (DWORD) SvUV(*hv_fetch(hv, \"th32ModuleID\", 12, 0));
+		$var.cntThreads = (DWORD) SvIV(*hv_fetch(hv, \"cntThreads\", 10, 0));
+		$var.th32ParentProcessID = (DWORD) SvIV(*hv_fetch(hv, \"th32ParentProcessID\", 19, 0));
+		$var.pcPriClassBase = (LONG) SvIV(*hv_fetch(hv, \"pcPriClassBase\", 14, 0));
+		szExeFile = SvPV_nolen(*hv_fetch(hv, \"szExeFile\", 9, 0);
+		if (MultiByteToWideChar(CP_ACP, 0, szExeFile, -1, wszExeFile, MAX_PATH) == 0)
+			*wszExeFile = 0;
+		wcscpy($var.szExeFile, wszExeFile);
+	}
+T_THREADENTRY32
+	$var.dwSize = sizeof($var);
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.cntUsage = (DWORD) SvUV(*hv_fetch(hv, \"cntUsage\", 8, 0));
+		$var.th32ThreadID = (DWORD) SvUV(*hv_fetch(hv, \"th32ThreadID\", 12, 0));
+		$var.th32OwnerProcessID = (DWORD) SvUV(*hv_fetch(hv, \"th32OwnerProcessID\", 18, 0));
+		$var.tpBasePri = (LONG) SvIV(*hv_fetch(hv, \"tpBasePri\", 9, 0));
+		$var.tpDeltaPri = (LONG) SvIV(*hv_fetch(hv, \"tpDeltaPri\", 10, 0));
+		$var.dwFlags = (DWORD) SvUV(*hv_fetch(hv, \"dwFlags\", 7, 0));
+	}
+
+#############################################################################
+OUTPUT
+T_BOOL
+	if (!null_arg($arg) && !SvREADONLY($arg))
+		if ($var)
+			sv_setiv($arg, (IV) $var);
+		else
+			sv_setsv($arg, &PL_sv_no);
+T_UV
+	if (!null_arg($arg) && !SvREADONLY($arg))
+		sv_setuv($arg, (UV) $var);
+T_BUF
+	if (!null_arg($arg) && !SvREADONLY($arg))
+		sv_setpvn($arg, (const char*) $var, (int) len_$var);
+	if ($var != 0)
+		free($var);
+T_HEAPENTRY32
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"hHandle\", 7, newSVuv((UV) $var.hHandle), 0);
+		hv_store(hv, \"dwAddress\", 9, newSVuv((UV) $var.dwAddress), 0);
+		hv_store(hv, \"dwBlockSize\", 11, newSVuv((UV) $var.dwBlockSize), 0);
+		hv_store(hv, \"dwFlags\", 7, newSVuv((UV) $var.dwFlags), 0);
+		hv_store(hv, \"dwLockCount\", 11, newSVuv((UV) $var.dwLockCount), 0);
+		hv_store(hv, \"dwResvd\", 7, newSVuv((UV) $var.dwResvd), 0);
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"th32HeapID\", 10, newSVuv((UV) $var.th32HeapID), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_HEAPLIST32
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"th32HeapID\", 10, newSVuv((UV) $var.th32HeapID), 0);
+		hv_store(hv, \"dwFlags\", 7, newSVuv((UV) $var.dwFlags), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_MODULEENTRY32
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"th32ModuleID\", 12, newSVuv((UV) $var.th32ModuleID), 0);
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"GlblcntUsage\", 12, newSVuv((UV) $var.GlblcntUsage), 0);
+		hv_store(hv, \"ProccntUsage\", 12, newSVuv((UV) $var.ProccntUsage), 0);
+		hv_store(hv, \"modBaseAddr\", 11, newSVuv((UV) $var.modBaseAddr), 0);
+		hv_store(hv, \"modBaseSize\", 11, newSVuv((UV) $var.modBaseSize), 0);
+		hv_store(hv, \"hModule\", 7, newSViv((UV) $var.hModule), 0);
+		hv_store(hv, \"szModule\", 8, newSVpv($var.szModule, 0), 0);
+		hv_store(hv, \"szExePath\", 9, newSVpv($var.szExePath, 0), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_MODULEENTRY32W
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		CHAR szModule[MAX_MODULE_NAME32 + 1];
+		CHAR szExePath[MAX_PATH];
+		hv_store(hv, \"th32ModuleID\", 12, newSVuv((UV) $var.th32ModuleID), 0);
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"GlblcntUsage\", 12, newSVuv((UV) $var.GlblcntUsage), 0);
+		hv_store(hv, \"ProccntUsage\", 12, newSVuv((UV) $var.ProccntUsage), 0);
+		hv_store(hv, \"modBaseAddr\", 11, newSVuv((UV) $var.modBaseAddr), 0);
+		hv_store(hv, \"modBaseSize\", 11, newSVuv((UV) $var.modBaseSize), 0);
+		hv_store(hv, \"hModule\", 7, newSViv((UV) $var.hModule), 0);
+		if (WideCharToMultiByte(CP_ACP, 0, $var.szModule, -1, szModule, MAX_MODULE_NAME32 + 1, 0, 0) == 0)
+			*szModule = 0;
+		hv_store(hv, \"szModule\", 9, newSVpv(szModule, 0), 0);
+		if (WideCharToMultiByte(CP_ACP, 0, $var.szExePath, -1, szExePath, MAX_PATH, 0, 0) == 0)
+			*szExePath = 0;
+		hv_store(hv, \"szExePath\", 9, newSVpv(szExePath, 0), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_PROCESSENTRY32
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"cntUsage\", 8, newSVuv((UV) $var.cntUsage), 0);
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"th32DefaultHeapID\", 17, newSVuv((UV) $var.th32DefaultHeapID), 0);
+		hv_store(hv, \"th32ModuleID\", 12, newSVuv((UV) $var.th32ModuleID), 0);
+		hv_store(hv, \"cntThreads\", 10, newSVuv((UV) $var.cntThreads), 0);
+		hv_store(hv, \"th32ParentProcessID\", 19, newSVuv((UV) $var.th32ParentProcessID), 0);
+		hv_store(hv, \"pcPriClassBase\", 14, newSViv((IV) $var.pcPriClassBase), 0);
+		hv_store(hv, \"szExeFile\", 9, newSVpv($var.szExeFile, 0), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_PROCESSENTRY32W
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		CHAR szExeFile[MAX_PATH];
+		hv_store(hv, \"cntUsage\", 8, newSVuv((UV) $var.cntUsage), 0);
+		hv_store(hv, \"th32ProcessID\", 13, newSVuv((UV) $var.th32ProcessID), 0);
+		hv_store(hv, \"th32DefaultHeapID\", 17, newSVuv((UV) $var.th32DefaultHeapID), 0);
+		hv_store(hv, \"th32ModuleID\", 12, newSVuv((UV) $var.th32ModuleID), 0);
+		hv_store(hv, \"cntThreads\", 10, newSVuv((UV) $var.cntThreads), 0);
+		hv_store(hv, \"th32ParentProcessID\", 19, newSVuv((UV) $var.th32ParentProcessID), 0);
+		hv_store(hv, \"pcPriClassBase\", 14, newSViv((IV) $var.pcPriClassBase), 0);
+		if (WideCharToMultiByte(CP_ACP, 0, $var.szExeFile, -1, szExeFile, MAX_PATH, 0, 0) == 0)
+			*szExeFile = 0;
+		hv_store(hv, \"szExeFile\", 9, newSVpv(szExeFile, 0), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}
+T_THREADENTRY32
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"cntUsage\", 8, newSVuv((UV) $var.cntUsage), 0);
+		hv_store(hv, \"th32ThreadID\", 12, newSVuv((UV) $var.th32ThreadID), 0);
+		hv_store(hv, \"th32OwnerProcessID\", 18, newSVuv((UV) $var.th32OwnerProcessID), 0);
+		hv_store(hv, \"tpBasePri\", 9, newSViv((IV) $var.tpBasePri), 0);
+		hv_store(hv, \"tpDeltaPri\", 10, newSViv((IV) $var.tpDeltaPri), 0);
+		hv_store(hv, \"dwFlags\", 7, newSVuv((UV) $var.dwFlags), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}

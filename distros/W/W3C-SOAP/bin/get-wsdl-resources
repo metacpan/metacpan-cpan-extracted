@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+
+# Created on: 2012-07-26 21:00:52
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use XML::LibXML;
+use URI;
+
+our $VERSION = 0.14;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+
+    while ( my $url = shift @ARGV ) {
+        get_dependencies($url);
+    }
+
+    return;
+}
+
+sub get_dependencies {
+    my ($url) = @_;
+    my $xml = XML::LibXML->load_xml(location => $url);
+
+    # write the xml
+    my $file = $url;
+    $file =~ s{[\\/:?&'"]}{_}g;
+    open my $pipe, '|-', "xmllint --format - > '$file'" or die $!;
+
+    # look for any xsds imported or included
+    my $xpc = XML::LibXML::XPathContext->new($xml);
+    $xpc->registerNs(xsd  => 'http://www.w3.org/2001/XMLSchema');
+
+    my @xsds = $xpc->findnodes('//xsd:import');
+    push @xsds, $xpc->findnodes('//xsd:include');
+
+    while ( my $xsd = shift @xsds ) {
+        my $loc = $xsd->getAttribute('schemaLocation') || $xsd->getAttribute('namespace');
+        if ( $url && $url =~ m{^(?:https?|ftp)://} ) {
+            $loc = URI->new_abs($loc, $url) . '';
+        }
+        my $file = get_dependencies($loc);
+        $xsd->setAttribute('schemaLocation', $file);
+    }
+    print {$pipe} $xml->toString;
+
+    return $file;
+}
+
+__DATA__
+
+=head1 NAME
+
+get-resources - Get resources of XSD or WSDL document
+
+=head1 VERSION
+
+This documentation refers to get-resources version 0.14.
+
+=head1 SYNOPSIS
+
+   get-resources [option] file_or_url ...
+
+ OPTIONS:
+  -v --verbose       Show more detailed option
+     --version       Prints the version information
+     --help          Prints this help information
+     --man           Prints the full documentation for get-resources
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

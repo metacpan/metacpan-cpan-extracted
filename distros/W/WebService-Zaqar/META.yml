@@ -1,0 +1,52 @@
+---
+abstract: 'SPORE client for Zaqar aka Marconi'
+author:
+  - 'Fabrice Gabolde <fgabolde@weborama.com>'
+build_requires:
+  Test::More: '0'
+  Test::SetupTeardown: '0'
+configure_requires:
+  Module::Build: 0.36_14
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Zaqar
+provides:
+  WebService::Zaqar:
+    file: lib/WebService/Zaqar.pm
+    version: '0.010'
+  WebService::Zaqar::Middleware::Auth::DynamicHeader:
+    file: lib/WebService/Zaqar/Middleware/Auth/DynamicHeader.pm
+  WebService::Zaqar::Middleware::DateHeader:
+    file: lib/WebService/Zaqar/Middleware/DateHeader.pm
+  WebService::Zaqar::Middleware::Format::JSONSometimes:
+    file: lib/WebService/Zaqar/Middleware/Format/JSONSometimes.pm
+  WebService::Zaqar::Middleware::JustCallIt:
+    file: lib/WebService/Zaqar/Middleware/JustCallIt.pm
+requires:
+  Carp: '0'
+  Data::UUID: '0'
+  File::ShareDir: '1.00'
+  HTTP::Date: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  List::Util: '0'
+  Moo: '0'
+  Net::HTTP::Spore: '0'
+  Net::HTTP::Spore::Middleware::Header: '0.03'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  autodie: '0'
+  perl: v5.10.1
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Weborama/WebService-Zaqar/issues
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  repository: https://github.com/Weborama/WebService-Zaqar.git
+version: '0.010'

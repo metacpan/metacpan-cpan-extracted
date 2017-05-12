@@ -1,0 +1,58 @@
+Revision history for Perl extension Win32::NetResource.
+
+0.057 Thu Nov 28 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+
+0.056 Mon Jun 23 2008
+        - Skip tests when not running as an administrator.
+
+0.055 Fri Jun 13 2008
+        - Use T_BOOL instead of T_IV for BOOL typemap entry so that
+	  the code doesn't warn on undef.
+
+0.054 Tue Apr 15 2008
+	- version 0.054 for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+
+0.053 Mon Jul  8 16:44:32 2002
+	- added missing STYPE_* and SHARE_* constants
+	- fixed NetShareCheck() to uppercase the device argument appropriately
+	- functions that took out-parameters weren't setting them correctly
+	- GetUNCName() could fail if forward slashes were used
+	- NetShareCheck() and GetUNCName() are documented a bit better
+	- added an example of using GetSharedResources() to enumerate
+	  resources on a particular host
+
+0.052 Mon Nov 12 23:21:52 2001
+	- NetShareGetInfo() didn't work when passed a hashref as \%share
+	- pointers to various stack variables were being used outside
+	  their scope
+	- Allow GetSharedResources() to accept an optional third argument
+	  that specifies a particular net resource to enumerate; fixes
+	  arbitrary failure of tests (patch from <Luc_St-Louis@lgs.ca>)
+
+0.05  Mon Jun 23 11:01:23 1999
+	- allow GetSharedResources() to continue when there are
+	  "Access denied" errors; it also returns resources seen
+	  until the point of errors
+	- most functions are now EXPORT_OK
+	- minor edits to tests
+	- added example
+
+0.04  Mon Apr 19  7:39:23 1999
+	- fixed _NetShareGetInfo return value if share not found 
+
+0.03  Fri Feb  6 21:11:41 1998
+	- import minor fix from AS build 315
+
+0.02  Sat May  2 10:11:50 1997
+	- un-xsubpp-ed and fixed the horrendous perl and C
+	- fixed all the bugs and warnings. it actually works now
+
+0.01  Sat Apr  5 14:24:36 1997
+	- original version; created by h2xs 1.18
+	- imported from Activeware version
+

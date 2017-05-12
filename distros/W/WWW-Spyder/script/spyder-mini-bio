@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+#=====================================================================
+# DECLARATIONS
+#=====================================================================
+use WWW::Spyder;  # our crawler
+use URI::Escape;  # to properly escape our query for the search engine
+use Text::Wrap;   # to show our results
+#=====================================================================
+# PROGRAM PROPER
+#=====================================================================
+# we want a 'firstname' 'lastname' and an optional page count
+@ARGV == 2 or @ARGV == 3 or usage();
+$ARGV[2] =~ /^\d\d?\d?$/ or usage() if $ARGV[2];
+
+my $spyder = WWW::Spyder->new
+    (sleep_base => 21,
+     exit_on    => { pages => $ARGV[2] ? 
+                         $ARGV[2] + 1 : 10 }); # 1st page is search
+
+$spyder->terms(@ARGV[0,1]);  # to help hit the best pages first
+
+my $name = join(' ',@ARGV[0,1]);
+my $name_rx = qr/\b(?:$ARGV[0]\s+)?$ARGV[1]|$ARGV[0]\b/;
+
+$spyder->seed( 'http://www.google.com/search?q=' . 
+               uri_escape(qq{"$name"}) );
+
+my @info;
+while ( my $page = $spyder->crawl ) {
+
+    print STDERR "Checking-->> ", $page->url, "\n";
+# try to extract the info here ---------------------------
+    push @info, 
+        grep defined, 
+    $page->text =~ 
+        m`($name_rx\s+
+           (?:did|made|sold|was|had|went|is|left|said|became
+            |
+            \w\w\w+ed)\b
+           (?:[A-Z][bcdf-hj-np-tv-xz]{0,4}\.
+            |
+            [^.?!])+[.?!]+['"]?)\s*
+          `xsg
+}
+
+if ( @info ) {
+    s/[\n\r\t]+/ /g, y/ / /s for @info; # clean up spacing
+
+    print "\n Here's what I found about $name:\n\n";
+
+    for my $datum ( @info ) {
+        print wrap('  * ', '       ', $datum), "\n";
+    }
+    print "\n";
+
+} else {
+    print "\n  Sorry, couldn't find much out about $name.\n\n"; 
+}
+
+exit 0;
+#=====================================================================
+# SUBROUTINES
+#=====================================================================
+sub usage {
+    my ( $tool ) = $0 =~ m,([^\/]+)$,;
+    die <<MoreFunThanAbarrelOfVikings;
+----------------------------------------------------------------------
+USAGE:
+         $tool [Proper Name] [# pages to try 1-999]
+
+I can only do two word names right now. Give me the name of someone
+who is at least slightly well-known and I'll try to prepare a mini-bio
+for you. If you don't give a "# pages to try" I will default to 10.
+
+Tip: you can trick me into doing three word names this way,
+
+         $tool ["First Middle" Last]
+----------------------------------------------------------------------
+MoreFunThanAbarrelOfVikings
+}
+#=====================================================================

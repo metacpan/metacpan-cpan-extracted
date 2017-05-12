@@ -1,0 +1,30 @@
+Revision history for Perl extension WWW::Mixi::OO.
+
+0.03 / $Rev: 113 $  $Date: 2005-02-05 20:02:02 +0900 (Sat, 05 Feb 2005) $
+ - fix copyright stub.
+ - add ->{time} for ->{date} alias(WWW::Mixi compat).
+ - fix splice warning.
+ - more documentation.
+ - introduce util->extract_balanced_html_parts.
+ - introduce Util::EntryParserMixin.
+ - util->copy_hash_val be able to copy with rename.
+ - little WWW::Mixi compat stuff to WWW::Mixi::OO.
+ - support list_diary.
+ - fix bug.
+  * parse don't die on parse_body failed.
+
+0.02 / r92   2005-02-04 13:41:39 +0900
+ - fix bug.
+  * add 'use POSIX' to I18N subclass.
+  * pass %options to fetch's second (and later) get (Page->mk_get_method).
+  * fast return on string undefined (Util->{remove_tag,escape,unescape}).
+  * TableListPage->parse_title return only defined value.
+
+ - sync mixi change.
+  * move TableHistoryListPage->_parse_navi to TableListPage->_parse_navi.
+  * remove other _parse_navi.
+
+0.01 / r80   2005-02-02 21:34:32 +0900
+ - original version; created by h2xs 1.23 with options
+   -ABXb 5.6.0 -n WWW::Mixi::OO
+

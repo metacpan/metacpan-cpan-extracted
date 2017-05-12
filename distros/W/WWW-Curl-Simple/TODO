@@ -1,0 +1,2 @@
+- Add posibility for changing $req->agent to WWW::Curl::Simple somehow
+

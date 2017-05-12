@@ -1,0 +1,70 @@
+<?php
+
+[% INCLUDE inc_test_file_header.tmpl file_title="Test case for the class \"${package_name}_Request\"" -%]
+
+require_once 'PEAR.php';
+require_once 'PHPUnit/Framework.php';
+require_once '[% package_dir %]/Factory.php';
+require_once '[% package_dir %]/Request.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Test class for ${package_name}_Request" -%]
+class [% package_name %]_RequestTest extends PHPUnit_Framework_TestCase
+{
+    protected $factory;
+
+    public function setUp()
+    {
+        $this->factory = new [% package_name %]_Factory();
+    }
+
+    public function testNew()
+    {
+        $obj =& $this->factory->createRequest();
+        $this->assertNotNull($obj);
+    }
+
+    public function testGetSetUrl()
+    {
+        $obj =& $this->factory->createRequest();
+        $this->assertNull($obj->getUrl());
+        $obj->setUrl('http://localhost/test');
+        $this->assertEquals('http://localhost/test', $obj->getUrl());
+    }
+
+    public function testGetSetAddParams()
+    {
+        $obj =& $this->factory->createRequest();
+
+        $this->assertEquals(array(), $obj->getParams());
+
+        $obj->setParams(array('val1'=>1, 'val2'=>2));
+        $this->assertEquals(array('val1'=>1, 'val2'=>2), $obj->getParams());
+
+        $obj->addParams(array('val2'=>20, 'val3'=>30));
+        $this->assertEquals(array('val1'=>1, 'val2'=>20, 'val3'=>30), $obj->getParams());
+    }
+
+    public function testGetSetRequestMethod()
+    {
+        $obj =& $this->factory->createRequest();
+        $this->assertEquals('GET', $obj->getRequestMethod());
+        $obj->setRequestMethod('POST');
+        $this->assertEquals('POST', $obj->getRequestMethod());
+    }
+
+    public function testSend()
+    {
+        $obj =& $this->factory->createRequest();
+
+        $res =& $obj->send();
+        $this->assertTrue(PEAR::isError($res));
+
+        $obj->setUrl('http://localhost/test');
+
+        $res =& $obj->send();
+        $this->assertFalse(PEAR::isError($res));
+        $this->assertTrue(($res instanceof [% package_name %]_Response));
+    }
+}
+
+?>

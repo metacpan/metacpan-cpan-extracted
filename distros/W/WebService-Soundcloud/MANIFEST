@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/WebService/Soundcloud.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-modules.t
+t/02-boilerplate.t
+t/03-manifest.t
+t/04-pod.t
+t/06-pod-coverage.t
+t/07-get.t
+t/08-credentials.t
+Makefile.PL
+META.yml

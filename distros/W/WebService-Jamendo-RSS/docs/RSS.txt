@@ -1,0 +1,188 @@
+NAME
+    WebService::Jamendo::RSS - Perl extension for the
+    Web::Service::Jamendo::RSS name space. Can be use to download and
+    process all XML-formatted RSS feeds provided by the popular site
+    jamendo.com.
+
+ABSTRACT
+    WebService::Jamendo::RSS will download and process XML-formatted RSS
+    feeds provided by jamendo.com.
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use WebService::Jamendo::RSS qw(
+                    get_popular_albums_this_week get_latest_albums get_latest_albums_usa get_this_week_most_100_listened
+                    get_jamendo_blog get_jamendo_forums download_popular_albums_this_week_xml get_jamendo_news
+                    download_latest_albums_xml download_latest_albums_usa_xml download_this_week_most_100_listened_xml
+                    download_jamendo_blog_xml download_jamendo_forums_xml download_jamendo_news_xml
+                    );
+
+DESCRIPTION
+    WebService::Jamendo::RSS provides methods to download all XML-formatted
+    RSS feeds provided by jamendo.com and then return a data structure to
+    the user containing the Data from the RSS feeds.
+
+    The following methods will download RSS feeds from jamendo.com to
+    directory where RSS.pm is installed. Method
+    download_popular_albums_this_week_xml will download RSS feed for popular
+    albums this week. Method download_latest_albums_xml will download RSS
+    feed for latest albums. Method download_latest_albums_usa_xml will
+    download RSS feed for latest albums in the USA. Method
+    download_this_week_most_100_listened_xml will download RSS feed for most
+    100 listened albums this week. Method download_jamendo_blog_xml will
+    download RSS feed for Jamendo's primary blog. Method
+    download_jamendo_forums_xml will download RSS feed for Jamendo's forums.
+    Method download_jamendo_news_xml will download Jamendo's RSS news feed.
+
+    The following methods will process all RSS feeds provided by
+    jamendo.com. Method get_popular_albmus_this_week returns a list of
+    popular albums this week to the user. Method get_latest_albmus returns a
+    list of latest albums to the user. Method get_latest_albums_usa returns
+    a list of latest albums in the USA to the user. Method
+    get_this_week_most_100_listened returns a list of most 100 listened
+    albums this week to the user. Method get_jamendo_blog returns a list of
+    updates for Jamendo's primary blog to the user. Method
+    get_jamendo_forums_feeds returns a list of updates for Jamendo's forums
+    to the user. Method get_jamendo_news
+
+  Getting Started
+    The following code will download all the XML-formatted RSS feeds
+    provided by jamendo.com, process their content, and print the results
+    for the user.
+
+       use strict;
+       use warnings;
+       use WebService::Jamendo::RSS qw(
+                    get_popular_albums_this_week get_latest_albums get_latest_albums_usa get_this_week_most_100_listened
+                    get_jamendo_blog get_jamendo_forums download_popular_albums_this_week_xml get_jamendo_news
+                    download_latest_albums_xml download_latest_albums_usa_xml download_this_week_most_100_listened_xml
+                    download_jamendo_blog_xml download_jamendo_forums_xml download_jamendo_news_xml
+                    );
+  
+      download_popular_albums_this_week_xml();
+      get_popular_albums_this_week();
+
+      download_latest_albums_xml();
+      get_latest_albums();
+
+      download_latest_albums_usa_xml();
+      get_latest_albums_usa();
+
+      download_this_week_most_100_listened_to_xml();
+      get_this_week_most_100_listened_to();
+
+      download_jamendo_blog_xml();
+      get_jamendo_blog();
+
+      download_jamendo_forums_xml();
+      get_jamendo_forums();
+
+      download_jamendo_news_xml();
+      get_jamendo_news();
+
+  download_popular_albums_this_week_xml
+    The subroutine download_popular_albums_this_week_xml will download
+    http://www.jamendo.com/en/rss/popular-albums to the directory where
+    RSS.pm is installed.
+
+  get_popular_albums_this_week
+    The subroutine get_recent_videos will return a list of popular albums
+    this week for the user.
+
+  download_latest_albums_xml
+    The subroutine download_latest_albums_xml will download
+    http://www.jamendo.com/en/rss/last-albums to the directory where RSS.pm
+    is installed.
+
+  get_latest_albums
+    The subroutine get_latest_albums will return a list of latest albums for
+    the user.
+
+  download_latest_albums_usa_xml
+    The subroutine download_latest_albums_usa_xml will download
+    http://www.jamendo.com/en/rss/last-albums/USA to the directory where
+    RSS.pm is installed.
+
+  get_latest_albums_usa
+    The subroutine get_latest_albums_usa will return a list of latest albums
+    in the USA for the user.
+
+  download_this_week_most_100_listened_to_xml
+    The subroutine download_this_week_most_100_listened_to_xml will download
+    http://www.jamendo.com/en/rss/top-track-week to the directory where
+    RSS.pm is installed.
+
+  get_this_week_most_100_listened_to
+    The subroutine get_this_week_most_100_listened_to will return a list of
+    most 100 listened to albums this week to the user.
+
+  download_jamendo_blog_xml
+    The subroutine download_jamendo_blog_xml will download
+    http://feeds.feedburner.com/JamendoBlogEnglish?format=xml to the
+    directory where RSS.pm is installed.
+
+  get_jamendo_blog
+    The subroutine get_jamendo_blog will return a list of updates for
+    Jamendo's primary blog.
+
+  download_jamendo_forums_xml
+    The subroutine download_jamendo_forums_xml will download
+    http://www.jamendo.com/fr/forums/discussions/?Feed=RSS2 to the directory
+    where RSS.pm is installed.
+
+  get_jamendo_forums
+    The subroutine get_jamendo_forums will return a list of updates for
+    Jamendo's forums for the user.
+
+  download_jamendo_news_xml
+    The subroutine download_jamendo_news_xml will download
+    http://www.jamendo.com/en/rss/newsfeed/bf0b52ca330f6ca9e88801e3f0c26c687
+    75909 to the directory where RSS.pm is installed.
+
+  get_jamendo_news
+    The subroutine get_jamendo_news will return a list of updates for
+    Jamendo's news feed.
+
+  SEE ALSO
+    Please see the documentation for the Perl modules XML::Twig an
+    LWP::Simple for details on how WebService::Jamendo::RSS downloads and
+    processes the XML-formatted RSS feeds provided by jamendo.com.
+
+    Please send all bug reports to the maintainer's email address hevenerg
+    {[at]} marshall {[dot]} edu.
+
+AUTHOR
+    WebService::Jamendo::RSS was written and is currently maintained by
+    Gerald L. Hevener, M.S..
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Gerald L. Hevener, M.S. <hevenerg {[at]} marshall
+    {[dot]} edu.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRENTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIESOR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

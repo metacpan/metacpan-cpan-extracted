@@ -1,0 +1,33 @@
+Revision history for Perl module WWW::StreetMap
+
+0.18    - Fixed missing build dependency in Build.PL
+
+0.17    - Improve 02_scripts.t. Thanks to David Cantrell for the suggestion.
+
+0.16    - Do not hard code perl binary name in tests
+        - Do not run compilation test on windows/vms
+
+0.15  - Stop signing distribution
+      - Require Test::Distribution for tests
+      - Fixed 02 test to reference $^X rather than hardcode the name of the perl executable
+        (thanks to Slaven Rezic for the tip)
+
+0.14  - POD Updates
+
+0.13  - Removed unused 'use English'
+
+0.12  - Should now work with Perl versions older than 5.6
+      - Minor pod formatting changes
+
+0.11  - Cannot use a temp image file when creating an openoffice_writer doc,
+        the image needs to remain on the filesystem afterwards. Therefore now use the
+				document filename with a .jpg extension.
+			- Added the get_streetmap script
+			- Minor pod fixes
+
+0.10 - Imported code from my get_streetmap program
+
+0.01 Tue Aug 24 21:59:33 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

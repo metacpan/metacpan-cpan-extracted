@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Internet Introduction</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+<A NAME=Top>
+<CENTER><H1>Win32::Internet</H1>
+<FONT FACE=Arial SIZE=2>
+Internet extension for Win32 PERL<BR>
+Version 0.08 (14 Feb 1997)<BR>
+by Aldo Calpini (<A HREF="mailto:dada@perl.it">dada@perl.it</A>)<BR>
+</FONT></CENTER>
+
+<HR>
+
+
+<FONT FACE=Arial><H2><A NAME="Intro">Introduction</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+This extension to Perl implements the Win32 Internet APIs (found in WININET.DLL).
+They give a complete support for HTTP, FTP and GOPHER connections.
+<P>
+See the <A HREF="#History">Version History</A> and the <A HREF="append.html#Functions">Functions Table</A> for a list of the currently supported features.
+You should also get a copy of the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation.
+</FONT>
+<P>
+
+<HR>
+
+<FONT FACE=Arial><H2><A NAME="Disclaimer">Disclaimer</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2><I>
+This program is FREE; you can redistribute, modify, disassemble, or even reverse engineer this software at
+your will. Keep in mind, however, that NOTHING IS GUARANTEED to work and everything you do is
+AT YOUR OWN RISK - I will not take responsability for any damage, loss of money and/or health that may
+arise from the use of this program! 
+</I>
+<P>
+
+This is distributed under the terms of <A HREF="license.html">Larry Wall's Artistic License</A>. 
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME=Credits>Credits</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+Win32::Internet is based on the Win32::Registry code written by Jesse Dougherty.<BR>
+Additional thanks to: <A HREF="mailto:ctichler@cloud9.net">Carl Tichler</A> for his help in the initial development; 
+<A HREF="mailto:tha@INKSERV.SDS.NO">Tore Haraldsen</A>, <A HREF="brian_helterline@hp.com">Brian Helterline</A> for the bugfixes; <A HREF="rothd@roth.net">Dave Roth</A> for
+his great source code examples.
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="History">Version History</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+
+<B>0.08 (14 Feb 1997)</B>
+<UL TYPE=disc>
+  <LI>fixed 2 more bugs in Option(s) related subs (thanks to Brian Helterline!).
+  <LI>Error() now gets error messages directly from WININET.DLL.
+  <LI>The PLL file now comes in 2 versions, one for Perl version 5.001 (build 100)
+      and one for Perl version 5.003 (build 300 and higher). Everybody should be happy now :)
+  <LI>added an installation program.
+</UL>
+
+
+<B>0.07 (10 Feb 1997)</B>
+<UL TYPE=disc>
+  <LI>fixed a bug in Version() introduced with 0.06...
+  <LI>completely reworked PM file, fixed *lots* of minor bugs, and removed almost all the warnings with "perl -w".
+</UL>
+
+
+<B>0.06 (26 Jan 1997)</B>
+<UL TYPE=disc>
+  <LI>fixed another hideous bug in "new" (the 'class' parameter was still missing).
+  <LI>added support for asynchronous operations (work still in embryo).
+  <LI>removed the ending \0 (ASCII zero) from the DLL version returned by "Version".
+  <LI>added a lot of constants.
+  <LI>added safefree() after every safemalloc() in C... wonder why I didn't it before :)
+  <LI>added TimeConvert, which actually works one way only.
+</UL>
+
+
+<B>0.05f (29 Nov 1996)</B>
+<UL TYPE=disc>
+  <LI>fixed a bug in "new" (parameters passed were simply ignored).
+  <LI>fixed another bug: "Chdir" and "Cwd" were aliases of RMDIR instead of CD..
+</UL>
+
+
+<B>0.05 (29 Nov 1996)</B>
+<UL TYPE=disc>
+  <LI>added "CrackURL" and "CreateURL".
+  <LI>corrected an error in TEST.PL (there was a GetUserAgent instead of UserAgent).
+</UL>
+
+
+<B>0.04 (25 Nov 1996)</B>
+<UL TYPE=disc>
+  <LI>added "Version" to retrieve package and DLL versions.
+  <LI>added proxies and other options to "new".
+  <LI>changed "OpenRequest" and "Request" to read parameters from a hash.
+  <LI>added "SetOption/QueryOption" and a lot of relative functions (connect, username, password, useragent, etc.).
+  <LI>added "CanonicalizeURL" and "CombineURL".
+  <LI>"Error" covers a wider spectrum of errors.
+</UL>
+
+<B>0.02 (18 Nov 1996)</B>
+<UL TYPE=disc>
+  <LI>added support for HTTP sessions and requests.
+</UL>
+
+<B>0.01 (11 Nov 1996)</B>
+<UL TYPE=disc>
+  <LI>fetching of HTTP, FTP and GOPHER URLs.
+  <LI>complete set of commands to manage an FTP session.
+</UL>
+
+</FONT>
+<P>
+
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="Install">Installation Instructions</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+<OL>
+    <LI>Make sure you have somewhere in your Windows directory the file WININET.DLL: 
+        it comes with Microsoft Internet Explorer 3.0, or it can be downloaded from
+        <A HREF="http://www.divinf.it/dada/perl/internet/wininet.zip">http://www.divinf.it/dada/perl/internet/wininet.zip</A>.
+    <P>
+    <LI>Run the INSTALL.BAT program.
+    <P>
+    <LI>Run the TEST.PL script to see if everything works.
+    <P>
+    <LI>Have fun.
+</OL>
+</FONT>
+<P>
+
+
+<HR>
+
+<FONT FACE=Arial SIZE=1>
+10 Feb 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;
+</FONT><P>
+
+</BODY>
+</HTML>

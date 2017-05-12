@@ -1,0 +1,29 @@
+Revision history for WebService-HtmlKitCom-FavIconFromImage
+
+1.001001   2015-03-29
+        - Converted to Dist::Zilla
+        - Added GitHub repo/tracker
+        - Prevented mech autodying (which was also messing up tests)
+
+0.003   2013-12-07
+        - Fixed: forgot to swap out Class::Data::Accessor
+          to Class:Accessor::Grouped in prereqs
+
+0.002   2013-12-07
+        [ Changes to core module ]
+        - Removed 'animate' and 'text' parameters due to the changes
+          on the site; currently, I left those two no longer
+          implemented
+        - Fixed the bug that rendered this module not working, due to
+          changes to site's domain name
+
+        [ Cosmetic changes ]
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+        - Switched away from now deprecated Class::Data::Accessor
+          to Class:Accessor::Grouped
+
+0.001   2008-03-23
+        - First version, released on an unsuspecting world.
+

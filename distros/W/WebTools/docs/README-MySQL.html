@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>README-MySQL</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" BORDER="0" BACKGROUND="images/bgimage.jpg">
+  <tr><td>
+<div align="center">
+  <p><b><font color="#000000" size="4">MySQL</font></b></p>
+        <p align="left">&nbsp;&nbsp;&nbsp;<b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">This 
+          README file regards MySQL users and this help is all information that 
+          I can give to you!<br>
+          <br>
+          Installation:<br>
+          &nbsp;&nbsp;&nbsp;Before you can use MySQL server you may need to install 
+          some standart modules:<br>
+          First of all you need: </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/TIMB/DBI-1.21.tar.gz"><font face="Verdana, Arial, Helvetica, sans-serif" size="2">DBI</font></a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+          and also you need MySQL DBD module: </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/JWIED/Msql-Mysql-modules-1.2219.tar.gz"><font face="Verdana, Arial, Helvetica, sans-serif" size="2">MySQL</font></a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          <br>
+          <font color="#000099">Note:</font> You can also use <a href="http://www.cpan.org/authors/id/JWIED/DBD-mysql-2.1011.tar.gz">DBD::Mysql</a> 
+          module (DBI interface) but you need to rename current mysql driver <font color="#006600">./drivers/db_mysql.pl</font> 
+          to <font color="#006600">db_mysql_old.pl</font> and vice versa rename 
+          <font color="#006600">db_mysql_dbi.pl</font> to <font color="#006600">db_mysql.pl</font><BR>
+          <br>
+          After successful installation please run 'mysql' client with your adminstrator 
+          user and make new user for your webtools project (or use some other 
+          older user):<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;<font color="#990000">&gt; mysql -u root_user -p<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;mysql&gt; use mysql;<br>
+          &nbsp;&nbsp;&nbsp;mysql&gt; insert into user values ('localhost', 'webtools_user', 
+          password('its_password'),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N');<br>
+          &nbsp;&nbsp;&nbsp;mysql&gt; exit<br>
+          <br>
+          &nbsp;&nbsp;&nbsp;&gt; mysqladmin reload<br>
+          &nbsp;&nbsp;&nbsp;&gt; cd &nbsp;&nbsp;to_your_<font color="#000066">webtools_db_strutures</font>_directory</font><br>
+          <br>
+          Now, edit '<font color="#006600">mysql-webtoolsdb.sql</font>' (please 
+          coordinate information from '<font color="#006600">config.pl</font>' 
+          and '<font color="#006600">mysql-webtoolsdb.sql</font>' file). <br>
+          Now you can create structure needed by webtools:<br>
+          <br>
+          <font color="#FF0000">STOP: Use Web based script install.cgi introduced 
+          in WebTools ver. 1.16 to manage config.pl file and to create base structure 
+          of MySQL database!</font> <br>
+          <br>
+          &nbsp;&nbsp;&nbsp;<font color="#990000">&gt; mysql -u webtools_user 
+          -p &lt; mysql-webtoolsdb.sql<br>
+          <br>
+          <font color="#000000">Well database is ready! Now don't forget to configure 
+          follow sections of 'config.pl':<br>
+          <br>
+          <font color="#006600">#[Name_Of_Project]<br>
+          $webtools::projectname = '<font color="#990000">webtools</font>'; &nbsp;&nbsp;&nbsp;&nbsp;# 
+          Name of project! (be careful!) </font></font></font></font></b></p>
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[SQL]<br>
+    $webtools::db_support = 'db_mysql';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# MySQL 
+    driver. <br>
+    $webtools::sql_host = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">localhost</font></font>';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Your address to SQL server.<br>
+    $webtools::sql_port = '3306'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Your port of SQL server.<br>
+    $webtools::sql_user = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font>'; 
+    &nbsp;&nbsp;# using user<br>
+    $webtools::sql_pass = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">its_password</font></font>'; 
+    &nbsp;&nbsp;&nbsp;&nbsp;# and password<br>
+    $webtools::mysqlbequiet = '1';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    # MySQL be QUIET?</b></font></p>
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[DataBase]<br>
+    $webtools::sql_database_sessions = <font color="#990000">$webtools::projectname</font>.'db';&nbsp;&nbsp; 
+    &nbsp;&nbsp;&nbsp;&nbsp;# Database name.<br>
+    $webtools::sql_sessions_table = <font color="#990000">$webtools::projectname</font>.'_sessions'; 
+    # Session table.<br>
+    $webtools::sql_user_table = <font color="#990000">$webtools::projectname</font>.'_users'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Contain all users (and admin too).</b></font></p>
+  <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Evrything 
+    is ok and now you can run your tests/examples...enjoy!</font></b><br>
+    <br>
+    <b><font face="Verdana, Arial, Helvetica, sans-serif" size="-1">Author:<br>
+    <a href="mailto:jlishev@cpan.org">julian@proscriptum.com</a></font></b></p>
+  </div>
+  </td></tr></table>
+</body>
+</html>

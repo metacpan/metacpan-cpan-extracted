@@ -1,0 +1,74 @@
+Change history for WWW::DanDomain
+
+Project change log:
+http://logicLAB.jira.com/browse/DAND#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.08 2014-08-28, bug fix release, updated not required
+
+- Upgraded license from Artistic 1.0 to Artistic 2.0
+
+- Migrated build system from Module::Build to Dist::Zilla
+
+- Addressed Github issue #1, eliminating use of explicit use of UNIVERSAL
+
+
+0.07 2014-08-23, maintenance release, updated not required
+
+- Added specification of Perl requirement as 5.8 as pointed out
+  by Perl::Critic
+
+- Added changes.t automatic assertion of the integrity of the
+  Changes file see also DAND-10 [DAND-11]
+
+  https://logiclab.jira.com/browse/MBB-40
+
+
+0.06 2013-07-24, maintenance release, updated not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to
+  the standard described in: CPAN::Changes::Spec [DAND-10]
+
+  Quest:
+  http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/DAND-10
+
+
+0.05 2011-04-17, Feature release, updated not required
+
+- Introducing new parameter to constructor, providing more
+  flexibility in interacting with the class
+
+  http://logicLAB.jira.com/browse/DAND-8 [DAND-8]
+
+
+0.04 2010-02-21, Bug fix release, updated not required
+
+- Addressing failing test report
+
+    WWW-DanDomain-0.03:
+    - i386-freebsd / 5.10.1:
+    - FAIL http://www.cpantesters.org/cpan/report/6848267
+
+
+0.03 2010-02-20, Maintenance release, updated not required
+
+- Implemented handling of DanDomain access scenario where
+  authentication credentials are not needed, since authorization
+  is based on IP validation (feature with DanDomain)
+
+- Improved error handling
+
+
+0.02 2009-09-16, Minor release feature/bug fix release, update not required
+
+- Fixed dependencies, WWW::Mechanize was not listed, so smoke
+  tests were failing
+
+- First shot at caching using WWW::Mechanize::Cached
+
+
+0.01 2009-06-15
+
+- First version, to be released on an unsuspecting world.

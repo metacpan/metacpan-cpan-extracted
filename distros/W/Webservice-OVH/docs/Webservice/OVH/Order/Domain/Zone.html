@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#new1">_new</a></li>
+      <li><a href="#new2">_new</a></li>
+      <li><a href="#new3">_new</a></li>
+      <li><a href="#new4">_new</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order::Domain::Zone</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $existing_zones = $ovh-&gt;order-&gt;domain-&gt;zone-&gt;existing;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides the possibility to order domain zones only.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Zone object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Domain/Zone.html">Webservice::OVH::Order::Domain::Zone</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Domain::Zone-&gt;_new($ovh_api_wrapper, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="new1">_new</h2>
+
+<p>Returns an array with all available zones connected to the active account.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $existing_zones = $ovh-&gt;order-&gt;domain-&gt;zone-&gt;existing;</p>
+
+</li>
+</ul>
+
+<h2 id="new2">_new</h2>
+
+<p>Gets information about a requested zone order.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $existing_zones = $ovh-&gt;order-&gt;domain-&gt;zone-&gt;existing;</p>
+
+</li>
+</ul>
+
+<h2 id="new3">_new</h2>
+
+<p>Gets information about a requested zone order.</p>
+
+<ul>
+
+<li><p>Parameter: $zone_name - desired zone, $minimized - only mandatory record entries</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Order.html">Webservice::OVH::Me::Order</a></p>
+
+</li>
+<li><p>Synopsis: my $oder = $ovh-&gt;order-&gt;domain-&gt;zone-&gt;order(&#39;mydomain.de&#39;, &#39;true&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="new4">_new</h2>
+
+<p>Gets available options for the desired zone order.</p>
+
+<ul>
+
+<li><p>Parameter: $zone_name - desired zone</p>
+
+</li>
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $options = $ovh-&gt;order-&gt;domain-&gt;zone-&gt;options(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

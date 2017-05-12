@@ -1,0 +1,19 @@
+Revision history for Perl extension WWW::Mechanize::Plugin::AutoWrite.
+
+0.06  Wed Feb 23 22:31:52 CET 2011
+	- Unit test fix since search.cpan.org changed it's output.
+
+0.05  Sat Oct 11 09:18:26 CEST 2008
+	- The dependency to Class::Accessor was missing.
+
+0.04  Wed Oct  8 20:58:06 CEST 2008
+	- API change in order to inject less method into WWW::Mechanize.
+
+0.03  Sun Aug 06 19:45:25 2008
+	- Can save the whole HTTP session in a folder, only the last page or both.
+
+0.02  Mon Sep 25 15:52:32 2007
+	- changing ->request instead of ->get so that also submit, submit_form, ... will be affected
+
+0.01  Mon Sep 24 11:48:32 2007
+	- initial version

@@ -1,0 +1,26 @@
+---
+abstract: 'interface to offliberty.com download service'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Offliberty
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::TreeBuilder: '0'
+  HTTP::Tiny: '0.014'
+  perl: '5.008009'
+resources:
+  repository: https://git.ieval.ro/?p=www-offliberty.git
+version: '1.000004'

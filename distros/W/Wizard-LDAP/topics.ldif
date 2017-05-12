@@ -1,0 +1,12 @@
+dn: dc=ness, dc=de
+objectclass: organization
+o: My Organization
+
+dn: topic=user, dc=ness, dc=de
+name: user
+objectclass: topic
+
+dn: topic=net, dc=ness, dc=de
+name: net
+objectclass: topic
+

@@ -1,0 +1,119 @@
+NAME
+
+Win32::RASE - managing dialup entries and network connections on Win32
+
+
+ABSTRACT
+
+This module implements the client part of Win32 RAS API.
+
+It is named RASE(RAS-entry) because it was originally designed to
+create/delete/change/manage RAS/DUN entries. Now it implements
+synchronous dialing, hang up and the wide range of RAS/DUN entry
+manipulations.
+
+The current version of Win32::RASE is available at:
+
+  http://www.dux.ru/guest/fno/perl/
+
+See RASE.pm for full POD documentation.
+
+
+INSTALLATION
+
+As this is just a plain module no special installation is needed.
+Put it into the Win32 subdirectory somewhere in your @INC.
+
+Anyway the usual sequence
+perl Makefile.PL
+make
+make test
+make install
+
+should do. In addition
+
+make html
+
+will convert POD documentation to HTML file.
+
+("make" here means probably "nmake" or "dmake" or "pmake" - whatever
+make-program you use).
+
+
+This module needs Windows Remote Access Service (RAS) or
+DialUp Networking (DUN) to be properly installed including
+dialing properties.
+
+rasapi32.dll, tapi32.dll
+
+Win32::API module by Aldo Calpini.
+
+enum.pm (1.014 or later, no compilations) by Byron Brummer (aka Zenin)
+
+Time::HiRes (0.18 or later) by Douglas E. Wegscheid makes work more precise.
+
+
+
+CAVEATS
+
+This module has been created and tested in a Win95 environment.
+Although I expect it to function correctly on any version
+of Windows NT, that fact has been confirmed for NT 4.0 build 1381 only.
+
+Some of the RAS APIs were not included in the RasAPI32.dll that was shipped
+with the old releases of Windows 95. To use the RAS APIs mentioned here,
+you need to install the at least Dial Up Networking (DUN) 1.2b upgrade.
+This upgrade is available for download on:
+
+http://www.microsoft.com/windows/downloads/contents/Updates/W95DialUpNetw/default.asp
+
+This upgrade was incorporated in Win95 OSR.
+
+From the MS KB# Q157765: Early releases of Windows 95 may require
+an additional RNAPH.DLL that contains some of new phonebook manipulation APIs.
+There currently is no workaround for this situation in this version of the module.
+
+Some APIs may also not work properly on WinNT with old Service Packs.
+Make sure that you are using the last Service Pack available.
+List of Bugs Fixed in Windows NT 4.0 Service Pack 1, 2, and 3 is
+available at
+
+http://support.microsoft.com/support/kb/articles/q224/7/92.asp
+
+What can we do here, guys? That's how it goes...
+
+
+VERSION
+
+This man page documents "Win32::RASE" version 1.01.
+
+January 19, 2000.
+
+
+
+CREDITS
+
+Thanks to Carl Sewell <csewell@hiwaay.net> for his great help
+and patience in testing on NT
+
+Thanks to Jan Dubois <jan.dubois@ibm.net> for numerous great tips
+and explanations.
+
+Guys, you are cool! ;)
+
+
+
+AUTHOR
+
+Mike Blazer, blazer@mail.nevalink.ru
+
+http://www.dux.ru/guest/fno/perl/
+
+
+COPYRIGHT
+
+Copyright (C) 1999 Mike Blazer.
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,64 @@
+{
+   "abstract" : "SiftScience API Bindings",
+   "author" : [
+      "Ali Anari <ali@anari.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-SiftScience",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Method::Signatures" : "0",
+            "Moo" : "1.006000",
+            "WebService::BaseClientRole" : "0.0004",
+            "WebService::Client" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Memoize" : "0",
+            "Test::Modern" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aanari/WebService-SiftScience/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/aanari/WebService-Science.git",
+         "web" : "https://github.com/ananari/WebService-Science"
+      }
+   },
+   "version" : "0.0100"
+}
+

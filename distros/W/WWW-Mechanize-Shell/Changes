@@ -1,0 +1,398 @@
+Revision history for Perl extension WWW::Mechanize::Shell.
+
+Todo:
+  + Think about HTML::FillInForm for displaying changed form values interactively
+  + Check how the new WWW::Mechanize JavaScript handling interacts with the
+    shells own JS blocking (badly, I guess)
+  + Use Scalar::Util::weaken if available
+  + Think how to add other (Xpath) extractions to conveniently
+    display stuff via CSS selectors or XPath selectors. Steal
+    from Web::Scraper.
+  + There is a memory leak between ::FormFiller and ::Shell
+  + Ditch Hook::LexWrap now that LWP::UserAgent has progress callbacks
+  + Add set-cookie and delete-cookie commands
+  + Add (optional) HTTP::Cookies::Find support
+
+0.56 20170425
+  + Send uncompressed output to the browser
+    (contributed by weltonrodrigo)
+  + Fix some warnings caused by links without a text
+  . Fix test suite due to newer version of Test::Without::Module
+  . Upgrade the test HTTP server to work in absence of CGI.pm
+
+0.55 20150426
+  . Fix one more test against new sprintf() warnings in 5.21+
+
+0.54 20150426
+  . Fix test suite against new sprintf() warnings in 5.21+
+  . Fix test suite against calling CGI::param in list context
+    Both analyzed and contributed by Slaven Rezic
+
+0.53 20130810
+  . Add links to repository, contributed by D. Steinbrunner
+
+0.52 20110106
+  . Fix stupid thinko in test (only affects tests on 5.13+)
+
+0.51 20110105
+  . Make a test more robust against 5.14
+  . Streamlined Exporter.pm usage
+  . Rely on parent.pm instead of base.pm
+  . No need to upgrade
+
+0.50 20100821
+  . Remove test file that was just testing LWP functionality and that
+    failed for some weird setups where nonexistent hosts still
+    result in a successful HTTP request.
+  . Added links to repositories
+
+0.49 20100817
+  + Apply [rt.cpan.org #59246] ,
+    thanks to Ansgar Burchardt
+    This fixes another case where API changes in LWP weren't mirrored
+    by this module.
+  + Fix t/14-command-identity.t to not make an external request anymore
+    Addresses [rt.cpan.org #59883]
+
+0.48 20081109
+  + More test fixes for incompatibilities between LWP and Mechanize 1.34+
+  + Removed way to set up authentication for more than one site
+  . WWW::Mechanize monkeypatches LWP::UserAgent and thus you can only ever
+    have one set of user/password in your script.
+
+0.47 20081102
+  + Fix tests to work with libwww 5.815+ which automatically retries
+    with empty user/password
+  + WWW::Mechanize 1.34+ breaks Basic authentication with LWP 5.815+
+    so all auth tests are skipped until Andy Lester and Gisle Aas
+    work out who has to fix their stuff.
+  . Hook::LexWrap is subject to bug [perl #46217], this might
+    cause problems if you're running Perl 5.10.0. All tests pass.
+
+0.46 20071003
+  + Bump version because of borked CPAN upload, retrying
+  * No need to upgrade
+
+0.45 20071003
+  * No library code changes, no need to upgrade
+  - Removed HTML::Display from the distribution
+    as that now lives its own life on CPAN
+  - Fix failing tests if HTTP_PROXY was set. This fixes
+    Debian bug #444634, http://bugs.debian.org/444634
+    and CPAN RT #29455, thanks to Niko Tyni
+
+0.44 20070707
+
+  + Added C<title> and C<headers> commands that print out
+    the title and headers of the page. Suggested by Ed Halley.
+  + Added and documented arguments to the C<< shell >> subroutine
+  + Quieted up some test warnings
+  + IO::Catch now understands C<printf>
+  + Upgrade to Term::Shell v0.02 which now displays the help
+    summary better.
+
+0.43 20070511
+  - fix failures on 5.6.2 with a B::Deparse version that doesn't
+    support ->ambient_pragmas() - they get ignored there now.
+
+0.42 200704..
+  - Test fixes only, no need to upgrade
+  - Patches submitted by MAREKR (RT #26397) and somebody else whose
+    name I cannot find, sorry.
+  - Delete some more proxy settings for the test runs
+
+0.41 20070414
+  - Codeacrobat release
+  - Restore compatibility with WWW::Mechanize 1.22
+    Thanks to Jörg Meltzer who sent in the patch
+
+0.40 20070117
+  - Fixed showstopper bug in prompt method that was hidden
+    by all tests disabling interactive prompts
+    Thanks to all reporters
+
+0.39
+  - Bumped module version
+  - Fix for RT 22121 - shell does not start
+
+0.38 20061214
+  - Bumped module version
+  - Added a test for HTML::TableExtract functionality
+    which went untested so far
+  - Fixed HTML::TableExtract functionality
+        This functionality now requires
+        HTML::TableExtract 2.0 or higher, sorry
+  - This release now needs WWW::Mechanize 1.20, for the update_html
+    method which is used in the tests. Sorry.
+  - Reworked code generation and code execution
+  - ! Think about plugins for other extractions:
+      * Template::Extract
+      * XML::XPath extractions
+  - Think about using a different shell framework provider
+
+0.37
+  - Fixed bug that created invalid code for the C<auth> command
+
+0.36
+  - Fixed the actual bug too.
+
+0.35
+  - Fixed documentation in HTML::Display::Debian about C<x-www-browser>.
+
+0.34
+  - Fixed a bug where C<form 2> resulted in an error. Now selecting a form by
+    number actually works. Thanks for the report via RT.
+
+0.33
+  - The C<form> command now got a life of its own instead of being a lazy abbreviation
+    of the C<forms> command. It takes a form name or form number.
+
+0.32
+  - now WWW::Mechanize::Shell directly uses HTML::TokeParser::Simple. Previously,
+    it was only needed for special cases of HTML::Display.
+  - WWW::Mechanize::Shell now strips all "target" attributes from your HTML.
+
+0.31
+  - test t/13* didn't work when the CPAN build directory contains a space
+  - Added patch by Philippe "BooK" Bruhat to allow downloading big files
+    directly to disk.
+
+  Changed behaviour:
+  - The referrer header now always points to the original page you save from
+    when using the C<save> command.
+
+0.30
+  - Now needs the latest? Test::Harness because otherwise some tests failed
+    from time to time for no apparent reason.
+  - using Devel::Cover. Code coverage of WWW/Mechanize/Shell.pm is now at 75.00%
+    through the test suite
+  - Provide better text for all links (for example when the content is an image)
+  - Now moved to use WWW::Mechanize::Link instead of direct array access
+  - This means it requires WWW::Mechanize 0.57 or higher
+  - added "comment" command, which allows to add comments to both, the shell
+    script and the generated script. (Donated by Alexander Goller)
+  - accomodated for most recent version of LWP, which dosen't die on failing host
+    lookups but returns error 500.
+
+0.29
+  - Fixed bug when autocompletion did crash the shell (S. Rezic)
+  - HTML::Display::Opera does not open a new window anymore (S. Rezic)
+  - Moved private package "Catch" to IO::Catch and made all tests use that package
+
+0.28
+  - Add $PAGER support for multiline output
+  - "referer" command now prints the old referer if no new value is given
+  - added RT bug email address to documentation
+
+0.27
+  - now needs WWW::Mechanize 0.47
+  - added "tick" and "untick" commands (plus tests)
+  - fixed t/14*.t so that now the correct locations are used
+  - removed ::Unwrap class that was not used anywhere
+  - If more than one value is passed to the "value" command, the parameters
+    are concatenated with spaces
+  - added test that all released files are in Unix text format
+  - added "dumpresponses" option
+  - added "verbose" option that prints the commands while sourcing a file (Prakash Kailasa)
+  - "content" now can save the content to a file (Prakash Kailasa)
+  - added "ct" command to print the Context-Type header (Prakash Kailasa)
+  - added "referer" and "referrer" command to change the Referer header (Prakash Kailasa)
+  - added "timeout" command to set the LWP::UserAgent timeout (Prakash Kailasa)
+  - added "response" command to display the complete response (request by Mark Stosberg)
+  - updated tests to accomodate for the new commands
+
+0.26
+  - added RE support to autofill
+  - fixed broken HTML display as the filename was passed doubled
+  - POD fixes
+  - HTML::Display now checks for @ISA before loading a file
+  - Displaying shared files is now tested against
+  - Updated POD to reflect the new RE parsing
+
+0.25
+  - The "versions" command also lists HTML::Display now
+  - hunted down and fixed error in skipping too many tests in t/01-Win32-OLE-fallback.t
+  - fixed redefinition warning in t/00-use.t
+  - updated local server tests
+
+0.24 - fixup release for 0.23
+  - Added $VERSION to all HTML::Display modules
+  - patched handing of BASE tags, so that more cases are caught.
+    This adds HTML::TokeParser::Simple as a prerequisite. Thanks to
+    Mark Stosberg for the initial patch!
+  - fixed loading of classes in HTML::Display. Classes are only required
+    if there is no method "display_html" in that namespace already.
+  - fixed embarassing Linux compatibility bugs
+  - HTML::Display::TempFile now also works under Windows where sharing did not
+    allow another process to read the file while it was being written
+
+0.23
+  - "submit" didn't reload the browser HTML. Thanks to Slaven Rezic.
+  - t/14* now skips instead of fails tests that can't succeed.
+  - fixed test failing if Term::ReadKey was not available
+  - fixed synopsis code not reading the .mechanizerc
+  - made WWW::Mechanize::Shell use the "reload" method of WWW::Mechanize
+    (after all, I asked for that method ...)
+  - Test for multivalues added, but it's not testing the right stuff yet
+    (see https://rt.cpan.org/Ticket/Display.html?id=2700 ). Not in MANIFEST
+    and/or distribution, but the Changes file is also for me :-)
+  - clarified documentation about "watchfiles" and "autoreload" (thanks to
+    Mark Stosberg)
+  - Documentation fixes for "open" and "links" (also courtesy of Mark Stosberg)
+  - The dumprequests feature needs Hook::LexWrap - it didn't work
+    properly before. The feature is tested in t/14
+  - "restart" in a -e oneliner dosen't crash the shell (it also dosen't restart though)
+  - factored out the HTML display into a module of its own (HTML::Display),
+    distributed with this. This breaks existing setups, as the "browsercmd"
+    and "useole" option disappeared. You can configure the used browser
+    class by setting the environment variable PERL_HTML_DISPLAY_CLASS
+    or PERL_HTML_DISPLAY_COMMAND, either in your environment or in your mechanizerc.
+
+    If this feature causes too much grief, I will reimplement the browsercmd
+    stuff again in a later release (but possibly different).
+
+    Please also tell me whether HTML::Display would be worth a release on its own!
+
+0.22
+  - The module now requires WWW::Mechanize v0.43, as the internal
+    API of WWW::Mechanize changed. Mixing W::M::S 0.21 or below with W::M v0.43+
+    will not work as will mixing W::M::S 0.22+ with W::M v0.41-
+  - Added new command "reload", which repeats the last request
+    (intended for testing/modifying server side code)
+  - Altered fillout command - now _all_ fields that aren't predefined
+    via an "autofill" command get asked interactively. Previously fields
+    that already had a value weren't asked. This means that you maybe
+    have to rewrite parts of your scripts if you are using the shell
+    as a testing tool. See t/14* and t/16* for scripts that redefine
+    the interactive asking method to something noninteractive.
+    Field types that do not get asked are : hidden,submit
+  - The "eval" command now takes multiline strings. This is not interesting
+    if you're using the plain shell, as the readline shell dosen't know about
+    about multiline strings, but if you're using the $shell->cmd() feature,
+    it's handy to split your evals over more than one line.
+
+0.21
+  - Fixed error in one-liner usage
+  - Fixed embarassing errors in 'forms' and 'save' commands
+  - other documentation fixes
+  - The history can now be saved directly to a file
+  - The script can now be saved directly to a file
+  - The generated scripts now have a correct shebang line
+  - Fixed redirect behaviour in generated scripts
+  - Manually filled values (via 'fillout') now get created as 'value' commands
+
+0.20
+  - made t/00a*.t a TODO test so that CPAN install (silently) works
+  - updated documentation on how to specify custom callbacks from
+    within the shell (having an interpreter with eval rules!)
+  - various documentation fixes
+  - fixed behaviour of "open" with regard to regular expressions
+  - extensive testing of shell behaviour regarding the navigation added
+  - Fixed t/06* when Test::MockObject is not installed
+
+0.19
+  - Added t/00a*.t to check for a Term::Shell bug to the MANIFEST
+  - renamed the "history" command to "script"
+  - the new "history" command now outputs the "relevant" shell commands
+  - added "versions" command to print out the versions of the installed modules
+  - added "ua" command to easily change the user agent string
+  - added documentation for some more methods
+  - added understanding of "#" as a comment
+  - added a "save" command to save links into files
+  - added "auth" command for basic authentication (suggested by merlyn)
+  - added live test of the auth command against HTTP::Daemon (code provided by merlyn)
+  - added test that 'url' basic authentication also works (http://login:password@example.com)
+  - added convenience "shell" module method :
+      perl -MWWW::Mechanize::Shell -e "shell"
+  - added full end-to-end testing for many commands and their generated scripts
+  - fixed many bugs in the generated scripts
+  - many documentation fixes
+  - Term::ReadLine now gets disabled for the tests
+  - silenced HTML::Form warning for readonly fields
+
+0.18
+  - No functional changes to v0.17
+  - Discovered that and documented how file uploads work
+  - Added BUGS section to documentation
+
+0.17
+  - Fixed a doc bug where "exit" referred to the (nonexistent) "quit" topic (thanks Mark)
+  - Made a test checking the version of Term::Shell and the help summary bug
+  - Fixed t/06*.t - it crashed when Test::MockObject wasn't installed
+
+0.16 20030429
+  - Changed double quotes around parameters to single quotes
+    to allow for urls like http://mark@foo.com (thanks Mark)
+  - Added tests to check that created scripts at least compile
+  - Made the form fillout more robust by wrapping it in an eval block
+
+0.14 20030414
+  - Fixed a bad list bug introduced with my unix-browser patch to the options system. Slaven Rezics
+    submitted patch had nothing to do with this, I only grabbed the idea from him but did botch
+    the implementation myself.
+  - Added a test that all options can be set and reset
+  - Reenabled all warnings in the tests
+  - Removed one warning for an unavailable module
+  - Added first part of JavaScript handling :
+      The shell detects when you want to follow a javascript: link,
+      and says that you can't do that.
+
+0.13 20030404
+  - Slaven Rezic submitted a patch to enable synchronous HTML
+    display under Unix ! Thanks go to Slaven !!
+    All bugs/errors are my fault !
+  - fixed a crash if the url to the get command was invalid
+  - fixed a crash if a browser was launched without a previous request
+  - added tests for those two crashes
+  - moved example shell from examples/shell.pl to bin/wwwshell.pl
+
+0.12 20030320
+  - Added a test to check for the behaviour if HTML::TableExtract is not present
+  - silenced warnings in the tests
+  - No changes to the main module except for the version number
+
+0.11 20030318
+  - Updated the tests so they skip when there is no terminal available
+    (as is the case when the tests are run from cron)
+  - Fixed the inline tests so the synopsis shows again
+
+0.10 20030312
+  - Added the "table" command to display/dump HTML tables using HTML::TableExtract
+  - Added "table" history
+  - Added tests for history
+  - Brought README file up to date with the suggested support modules
+  - Added example showing off tables
+  - Added proxy support to the shell and the produced scripts
+  - Added documentation on proxy
+  - Added table lister
+
+0.09 20030308
+  - I should go back and use the web interface. It was made for people like me.
+
+0.08 20030308
+  - third time's the charm
+
+0.07 20030308
+  - And again, because I am stupid
+
+0.06 20030308
+  - bumped version because I uploaded a partial file to CPAN ...
+
+0.05 20030307
+  - Fixed the dependency on Win32::OLE - the module now handles other
+    environments gracefully
+  - Added some tests for the module fallbacks (these tests need Test::Without::Module)
+  - moved handling over to cvs
+
+0.04 20030301
+  - reupload as the 0.02 and 0.03 upload was broken
+
+0.02 20030228
+  - Made the shell much more robust against wrong parameters and
+    internal failures.
+  - Open /foo/ now goes into the Perl code as "follow(/foo/)",
+    as it should be
+
+0.01  Thu Nov  7 23:04:20 2002
+  - original version; created by h2xs 1.21 with options
+    -X WWW::Mechanize::Shell

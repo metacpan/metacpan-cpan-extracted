@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-TextMarks.t
+lib/WWW/TextMarks.pm
+META.yml                                 Module meta-data (added by MakeMaker)

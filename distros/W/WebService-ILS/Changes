@@ -1,0 +1,36 @@
+Revision history for Perl extension WebService-ILS
+
+0.11 2017-03-27T07:10:22Z
+    - item_metadata()
+    - OneClickDigital: better handling of place_hold(), remove_hold() and return()
+
+0.10 2017-03-07T03:53:48Z
+    - OneClickDigital: Fix patron() call for PartnerPatron
+
+0.09 2017-03-06T02:22:43Z
+    - OneClickDigital: no default for country, reworked domain logic, default domain .com
+
+0.08 2016-09-27T01:23:46Z
+    - OneClickDigital clean-up
+
+0.07 2016-05-04T08:32:09Z
+    - OneClickDigital
+
+0.06 2016-02-25T03:00:45Z
+    - Added item metadata to OverDrive::Patron->holds()
+
+0.05 2016-02-02T04:09:59Z
+    - Changed OverDrive checkout formats - now a hashref with immediate availability
+
+0.04 2015-12-09T05:26:55Z
+    - Prerequisites
+
+0.03 2015-12-08T05:43:07Z
+    - Improved OverDrive checkout format handling
+
+0.02 2015-12-02T03:22:48Z
+    - Better access_token handling
+
+0.01 2015-11-12T02:48:08Z
+    - original version
+

@@ -1,0 +1,13 @@
+Changes
+=======
+
+0.02 - Thu 11 May 2007
+  - s/findnodes/findvalue/ for WebService::Gnavi::SearchResult
+      reported by Takatoshi Ono.
+
+0.011 - Thu 10 May 2007
+  - Forgot Data::Page prereq
+  - Added license
+
+0.01 - Thu 10 May 2007
+  - Initial release

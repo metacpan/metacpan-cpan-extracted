@@ -1,0 +1,131 @@
+NAME
+    WebService::Recruit::AbRoad - An Interface for AB-ROAD Web Service
+
+SYNOPSIS
+        use WebService::Recruit::AbRoad;
+    
+        my $service = WebService::Recruit::AbRoad->new();
+    
+        my $param = {
+            'area' => 'EUR',
+            'key' => $ENV{'WEBSERVICE_RECRUIT_KEY'},
+        };
+        my $res = $service->tour( %$param );
+        my $root = $res->root;
+        printf("api_version: %s\n", $root->api_version);
+        printf("results_available: %s\n", $root->results_available);
+        printf("results_returned: %s\n", $root->results_returned);
+        printf("results_start: %s\n", $root->results_start);
+        printf("tour: %s\n", $root->tour);
+        print "...\n";
+
+DESCRIPTION
+    エイビーロードWebサービスを使うことで、エイビーロ
+    ード(AB-ROAD)に掲載されている、海外旅行ツアー情報に
+    アクセスして、アプリケーションを構築することがで
+    きます。
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $service = WebService::Recruit::AbRoad->new();
+
+    This accepts optional parameters.
+
+        my $conf = {
+            utf8_flag => 1,
+            param => {
+                # common parameters of this web service 
+            },
+        };
+        my $service = WebService::Recruit::AbRoad->new( %$conf );
+
+  add_param
+    Add common parameter of tihs web service.
+
+        $service->add_param( param_key => param_value );
+
+    You can add multiple parameters by calling once.
+
+        $service->add_param( param_key1 => param_value1,
+                             param_key2 => param_value2,
+                             ...);
+
+  get_param
+    Returns common parameter value of the specified key.
+
+        my $param_value = $service->get( 'param_key' );
+
+  tour
+    This makes a request for "tour" API. See
+    WebService::Recruit::AbRoad::Tour for details.
+
+        my $res = $service->tour( %$param );
+
+  area
+    This makes a request for "area" API. See
+    WebService::Recruit::AbRoad::Area for details.
+
+        my $res = $service->area( %$param );
+
+  country
+    This makes a request for "country" API. See
+    WebService::Recruit::AbRoad::Country for details.
+
+        my $res = $service->country( %$param );
+
+  city
+    This makes a request for "city" API. See
+    WebService::Recruit::AbRoad::City for details.
+
+        my $res = $service->city( %$param );
+
+  hotel
+    This makes a request for "hotel" API. See
+    WebService::Recruit::AbRoad::Hotel for details.
+
+        my $res = $service->hotel( %$param );
+
+  airline
+    This makes a request for "airline" API. See
+    WebService::Recruit::AbRoad::Airline for details.
+
+        my $res = $service->airline( %$param );
+
+  kodawari
+    This makes a request for "kodawari" API. See
+    WebService::Recruit::AbRoad::Kodawari for details.
+
+        my $res = $service->kodawari( %$param );
+
+  spot
+    This makes a request for "spot" API. See
+    WebService::Recruit::AbRoad::Spot for details.
+
+        my $res = $service->spot( %$param );
+
+  tour_tally
+    This makes a request for "tour_tally" API. See
+    WebService::Recruit::AbRoad::TourTally for details.
+
+        my $res = $service->tour_tally( %$param );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $service->utf8_flag( 1 );
+        $service->user_agent( 'Foo-Bar/1.0 ' );
+        $service->lwp_useragent( LWP::UserAgent->new() );
+        $service->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://webservice.recruit.co.jp/ab-road/
+
+AUTHOR
+    RECRUIT Media Technology Labs <mtl@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 RECRUIT Media Technology Labs
+

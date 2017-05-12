@@ -1,0 +1,242 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Authenticator::AuthenticatorBase - internal authenticator base
+class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Authenticator::AuthenticatorBase - internal authenticator base
+class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::Valve</STRONG> that enforces the
+<EM>security-constraint</EM> elements in the web application deployment
+descriptor. This functionality is implemented as a Valve so that it
+can be omitted in environments that do not require these
+features. Individual implementations of each supported authentication
+method can subclass this base class as required. Subclasses <STRONG>MUST</STRONG>
+implement <A HREF="#item_authenticate"><CODE>authenticate()</CODE></A> and <A HREF="#item_getName"><CODE>getName()</CODE></A>.</P>
+<P>When this class is utilized, the Application to which it is attached
+must have an associated Realm that can be used for authenticating
+users and enumerating the roles to which they have been assigned.</P>
+<P>This Valve is only useful when processing HTTP requests. Requests of
+any other type will simply be passed through.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Application to which this Authenticator is attached.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Application</STRONG> to which this Authenticator is attached
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+if the Container is not <STRONG>Wombat::Core::Application</STRONG>
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_invoke">invoke ($request, $response, $context)</A></STRONG><BR>
+<DD>
+Perform request processing as required by this Valve.
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> to be processed
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Response</STRONG> to be created
+<P></P>
+<DT><STRONG><A NAME="item_%24context">$context</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::ValveContext</STRONG> allowing access to the next Valve in the
+Pipeline being processed
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if a servlet error occurs or is thrown by a subsequently invoked
+Valve, Filter or Servlet
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_authenticate">authenticate($request, $response, $config)</A></STRONG><BR>
+<DD>
+Authenticate the user making this request, based on the specified
+login configuration. Return true if any specified constraint has been
+satisfied, or false if we have created a response already.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P>
+<DT><STRONG>$response</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpResponse</STRONG> being created
+<P></P>
+<DT><STRONG><A NAME="item_%24constraint">$constraint</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::LoginConfig</STRONG> describing the authentication
+procedure
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_checkAccess">checkAccess($request, $response, $constraint)</A></STRONG><BR>
+<DD>
+Perform access control based on the specified authorization
+constraint. Return true if this constraint was not violated and
+processing should continue, of false if we have created a response
+already.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P>
+<DT><STRONG>$response</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpResponse</STRONG> being created
+<P></P>
+<DT><STRONG>$constraint</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> being checked
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_checkUserData">checkUserData($request, $response, $constraint)</A></STRONG><BR>
+<DD>
+Enforce any user data constraint required by the security constraint
+guarding this request URI. Return true if this constraint was not
+violated and processing should continue, of false if we have created a
+response already.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P>
+<DT><STRONG>$response</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpResponse</STRONG> being created
+<P></P>
+<DT><STRONG>$constraint</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> being checked
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_findConstraint"><CODE>findConstraint($request)</CODE></A></STRONG><BR>
+<DD>
+Return the <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> configured to guard
+the request URI for this request, or <CODE>undef</CODE> if there is no
+constraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return a short name for this Authenticator implementation. Must be
+overridden by subclasses.
+<P></P>
+<DT><STRONG><A NAME="item_register">register($request, $response, $principal, $authType)</A></STRONG><BR>
+<DD>
+Register an authenticated Principal and authentication tyhpe in the
+request and in the current session (if there is one).
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P>
+<DT><STRONG>$response</STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpResponse</STRONG> being created
+<P></P>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the authenticated <STRONG>Servlet::Util::Principal</STRONG> to be registered
+<P></P>
+<DT><STRONG><A NAME="item_%24uathType">$uathType</A></STRONG><BR>
+<DD>
+the authentication type to be registered
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Core/Application.html">the Wombat::Core::Application manpage</A>,
+<A HREF="../../../api/Wombat/Realm.html">the Wombat::Realm manpage</A>,
+<A HREF="../../../api/Wombat/Valve/ValveBase.html">the Wombat::Valve::ValveBase manpage</A>,
+<A HREF="../../../api/Wombat/ValveContext.html">the Wombat::ValveContext manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

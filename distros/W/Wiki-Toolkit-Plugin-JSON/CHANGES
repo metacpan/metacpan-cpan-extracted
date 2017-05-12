@@ -1,0 +1,19 @@
+2013-07-06 0.05
+            * Skip tests if Wiki::Toolkit::Testlib isnt available.
+            * Test the validity of the outputted JSON with Test::JSON
+
+2013-07-01 0.04
+            * Don't attempt to use JSON::Syck any more - JSON now uses
+              JSON::XS where possible, so just use that.
+
+2008-10-26: 0.03
+            * Add missing prerequisites
+
+2008-10-24: 0.02
+            * Fix URL below
+            * Update copyright
+            * Add minimal test suite with use_ok
+
+2008-10-18: 0.01
+            * Initial release, taken from 
+              http://dev.openguides.org/attachment/ticket/154/

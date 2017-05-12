@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+use 5.010;
+use Mojo::URL;
+use WWW::Flatten;
+use Getopt::Long 'GetOptionsFromArray';
+use Pod::Usage;
+use feature();
+use Time::HiRes;
+
+my %options;
+my $bot = WWW::Flatten->new(basedir => './output/');
+my $start_time = time();
+
+GetOptionsFromArray(\@ARGV, \%options,
+    'basedir|b=s' => sub {
+        $bot->basedir($_[1])
+    },
+    'target-single|s' => sub {
+        $bot->is_target(\&target_single);
+    },
+    'target-path|p' => sub {
+        $bot->is_target(\&target_path);
+    },
+    'depth|d=i' => sub {
+        $bot->depth($_[1]); warn $_[1];
+    },
+    'max-retry|r=i' => sub {
+        $bot->max_retry($_[1])
+    },
+    'max-conn|c=i' => sub {
+        $bot->max_conn($_[1])
+    },
+    'max-conn-per-host|ch=i' => sub {
+        $bot->max_conn_per_host($_[1])
+    },
+    'mojo-app|ma',
+    'cookie|ck=s' => sub {
+        my $cookies = Mojo::Cookie::Response->parse($_[1]);
+        $bot->ua->cookie_jar(Mojo::UserAgent::CookieJar->new->add(@$cookies));
+    },
+    'help|?' => sub {
+        pod2usage(1); exit;
+    },
+    "version|v" => sub {
+        say 'WWW::Flatten v'. $WWW::Flatten::VERSION; exit;
+    },
+) or pod2usage(-verbose => 1);
+
+-d $bot->basedir || mkdir($bot->basedir) || die 'basedir is not writable';
+
+my $start = Mojo::URL->new(pop @ARGV);
+$bot->filenames->{$start} = 'index.html';
+$bot->is_target(\&target_single) unless (!$bot->is_target);
+
+if ($options{'mojo-app'}) {
+    my $app_base = $bot->basedir;
+    $bot->basedir($bot->basedir. '/public/');
+    -d $bot->basedir || mkdir($bot->basedir) || die 'basedir is not writable';
+    gen_mojo_app($app_base. 'mojo.pl');
+}
+
+$bot->on(start => sub {
+    shift->say_start;
+});
+
+$bot->crawl;
+
+my $end_time = time();
+say $end_time - $start_time. ' has spent';
+
+sub target_single {
+    my ($job, $context) = @_;
+    return ((ref $context) ne 'Mojo::DOM' || $context->tag !~ qr{^(form|a)$});
+}
+
+sub target_path {
+    my ($job, $context) = @_;
+    my $uri = $job->url;
+    state $ihost = $start->ihost;
+    state $path = $start->path;
+    return 1 if ($uri->ihost eq $ihost) && $uri->path =~ qr{^$path};
+    return ((ref $context) ne 'Mojo::DOM' || $context->tag !~ qr{^(form|a)$});
+}
+
+sub gen_mojo_app {
+    open(my $OUT, '>:utf8', shift);
+    print $OUT <<EOF;
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+get '/' => sub { shift->redirect_to('/index.html') };
+app->start;
+EOF
+    close($OUT);
+}
+
+=head1 NAME
+
+wwwflatten - Command line interface to WWW::Flatten
+
+=head1 SYNOPSIS
+
+wwwflatten [options] <starting URL>
+
+=head1 OPTIONS
+
+    -b, --basedir       : output directory defalts to ./output
+    -s, --target-single : set target uri to single page and assets
+    -p, --target-path   : set target uri under path and assets
+    -d, --depth         : max depth to crawl defaults to 10
+    -r, --max-retry     : max re-try in case server is in-responsible defaults to 3
+    -c, --max-conn      : max connection defaults to 1
+    -ch, --max-conn-per-host : max connection per host defaults to 1
+    -ma, --mojo-app     : output as a mojolicious application
+    -ck, --cookie       : set cookie for every requests
+    -v, --version       : print the version of dancer being used
+    -h, --help          : print what you are currently reading
+
+=head1 DESCRIPTION
+
+WWW-Flatten flattens web pages recursively with assets.
+This crawling covers not only single page but also beyond the links.
+
+=head1 EXAMPLE
+
+    wwwflatten http://github.com/
+    wwwflatten --depth=2 -max-conn=4 http://example.com/
+    wwwflatten --target-single http://example.com/only-this-page.html
+    wwwflatten --target-path http://example.com/under-this-path/
+    wwwflatten --mojo-app http://example.com/
+
+=head1 SEE ALSO
+
+=cut

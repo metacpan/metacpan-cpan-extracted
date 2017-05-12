@@ -1,0 +1,285 @@
+=pod
+
+=head1 NAME
+
+WWW::Mechanize::Firefox::Cookbook - Recipes for using WWW::Mechanize::Firefox
+
+=head1 Introduction
+
+Note that WWW::Mechanize::Firefox is quite similar in its API to L<WWW::Mechanize>,
+so many of the recipes in L<WWW::Mechanize::Cookbook> apply to it as well.
+
+=head1 Basics
+
+=head2 Launch WWW::Mechanize::Firefox
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new();
+  $mech->get('http://google.com');
+
+=head2 Launch WWW::Mechanize::Firefox if Firefox is not running
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      launch => '/path/to/firefox',
+  );
+  $mech->get('http://google.com');
+
+=head2 Use an existing tab
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      tab => qr/^Google/,
+  );
+  $mech->get('http://google.com');
+
+=head2 Use the current tab
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      tab => 'current',
+  );
+  $mech->get('http://google.com');
+
+=head2 Use some other tab if you have it as object
+
+    my $app = Firefox::Application->new();
+    my @tabs =  map { $_->{tab} }
+               grep { $magic eq $_->{title} }
+               $app->openTabs($repl);
+
+    my $synth_mech = WWW::Mechanize::Firefox->new(
+        tab => $tabs[0],
+        app => $app,
+    );
+
+=head2 Bring the tab to the foreground at start
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      activate => 1,
+  );
+  $mech->get('http://google.com');
+
+=head2 Bring the tab to the foreground later
+
+  my $mech = WWW::Mechanize::Firefox->new(
+  );
+  ...
+  $mech->activateTab();
+
+=head2 Fetch a page to a file
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      tab => 'current',
+  );
+  $mech->get('http://google.com',
+      ':content_file' => 'google_com.html' );
+
+=head2 Fetch a page to a file with all images
+
+  use WWW::Mechanize::Firefox;
+  my $mech = WWW::Mechanize::Firefox->new(
+      tab => 'current',
+  );
+  $mech->get('http://google.com');
+  $mech->save_content('google_com.html', 'google_com files');
+
+=head1 Advanced HTML interaction
+
+=head2 Wait until an element appears
+
+Some sites generate content after the C<DOMContentLoaded>
+event has fired. To wait until an element becomes available,
+use the following code:
+
+    # The submit button is generated after the page has loaded
+
+    my $retries = 10;
+    while ($retries-- and ! $mech->is_visible( xpath => '//*[@id="submit"]' )) {
+          sleep 1;
+    };
+    die "Timeout" if 0 > $retries;
+    
+    # Now the element exists
+    $mech->click({xpath => '//*[@id="submit"]'});
+
+=head2 Wait until an element disappears
+
+Some sites display an hourglass or some other indicator to
+tell you to wait. 
+To wait until such an element becomes invisible,
+use the following code:
+
+    my $retries = 10;
+    while ($retries-- and $mech->is_visible( xpath => '//*[@id="hourglass"]' )) {
+          sleep 1;
+    };
+    die "Timeout while waiting for application" if 0 > $retries;
+    
+    # Now the hourglass is not visible anymore
+
+=head1 UI interaction
+
+=head2 Keep the tab open after your program quits
+
+In the case that you want to navigate the user to a specific place and
+then take over manually, you can prevent the automatic closing of the browser
+tab. Either create your C<$mech> object like this:
+
+  my $mech = WWW::Mechanize::Firefox->new(
+      autoclose => 0,
+  );
+
+or decide at runtime whether to close the tab:
+
+  $mech->autoclose_tab(0);
+
+This does currently not work.
+
+=head2 Get notified when the current tab changes
+
+    my $browser = $mech->repl->expr('window.getBrowser()');
+
+    my $eventlistener = progress_listener(
+        $browser,
+        onLocationChange => \&onLocationChange,
+    );
+
+    while (1) {
+        $mech->repl->poll();
+        sleep 1;
+    };
+
+=head1 Images
+
+=head2 Save the current page as PNG
+
+This will take a "screenshot" which also includes plugins like Flash.
+
+  my $png = $mech->content_as_png();
+  open my $fh, '>', 'page.png'
+      or die "Couldn't save to 'page.png': $!";
+  binmode $fh;
+  print {$fh} $png;
+  close $fh;
+
+Also see the file C<screenshot.pl> included and installed through the
+distribution.
+
+=head3 Save top left corner of the current page as PNG
+
+  my $rect = {
+    left  =>    0,
+    top   =>    0,
+    width  => 200,
+    height => 200,
+  };
+  my $png = $mech->content_as_png(undef, $rect);
+  open my $fh, '>', 'page.png'
+      or die "Couldn't save to 'page.png': $!";
+  binmode $fh;
+  print {$fh} $png;
+  close $fh;
+
+=head3 Save a page element of the current page as PNG
+
+  my $shiny = $mech->selector('#shiny', single => 1);
+  my $png = $mech->element_as_png($shiny);
+  open my $fh, '>', 'page.png'
+      or die "Couldn't save to 'page.png': $!";
+  binmode $fh;
+  print {$fh} $png;
+  close $fh;
+
+=head1 HTTP Interaction
+
+=head2 Send a different hostname to the server
+
+If you are testing a new application deployment, it may
+become necessary to lie to the server about the name of
+the webserver you're requesting. You can easily
+switch the name around at the HTTP level by adding a
+custom C<< Host: >> header:
+
+  $mech->add_header(
+      Host => 'http://example.com/',
+  );
+  $mech->get('http://1.2.3.4');
+  # Ask the machine at 1.2.3.4 for the pages of example.com
+
+=head1 Javascript
+
+=head2 Check that your Page has no Javascript compile errors
+
+  $mech->get('mypage');
+  my @errors = map {$_->{message}} $mech->js_errors();
+  if (@errors) {
+      die "Found errors on page: @errors";
+  };
+
+=head3 Override the Javascript C<alert()> function
+
+  $mech->eval_in_page('alert("Hello");',
+      { alert => sub { print "Captured alert: '@_'\n" } }
+  );
+
+=head3 Set a value without triggering Javascript events
+
+Just pass empty lists for the lists of events to invoke
+
+  $mech->field( 'myfield', 'myvalue', [], [] );
+
+=head3 Get the text of an C<onclick> handler (or other attributes)
+
+When developing a web page, you may want to use WWW::Mechanize::Firefox
+to check the text value of the C<onclick> attribute instead of treating
+it as an opaque function. To get at the text attribute, you will
+need the DOM function C<< ->getAttribute() >>.
+
+    #!perl -w
+    use strict;
+    use WWW::Mechanize::Firefox;
+
+    my $mech = WWW::Mechanize::Firefox->new();
+    $mech->update_html(<<HTML);
+    <html>
+    <h1>Test</h1>
+    <a href="http://google.de">Google</a>
+    <a href="asdf.html" onclick="javascript:alert('hello');">Say Hello</a>
+    </html>
+    HTML
+
+    my @links = $mech->find_all_links_dom(url_regex => 'asdf.html');
+    foreach my $link (@links) {
+        print $link->getAttribute('onclick');
+    };
+
+=head1 Not working yet
+
+=head2 Upload a file to an C<ftp> server
+
+B< Not implemented > - this requires instantiating and passing
+a C< nsIURI > object instead of a C< nsILocalFile >.
+
+You can use C<< ->save_url >> to I<transfer> files. C<$localname>
+can be a local filename, a C<file://> URL or any other URL that allows
+uploads, like C<ftp://>.
+
+  $mech->save_url('file://path/to/my/file.txt'
+      => 'ftp://myserver.example/my/file.txt');
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+Contributed examples contain the original author's name.
+
+=head1 COPYRIGHT
+
+Copyright 2009-2014 by Max Maischein C<corion@cpan.org>.
+
+All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
+
+=cut

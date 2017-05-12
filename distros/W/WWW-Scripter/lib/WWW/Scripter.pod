@@ -1,0 +1,691 @@
+
+=head1 NAME
+
+WWW::Scripter - For scripting web sites that have scripts
+
+=head1 VERSION
+
+0.032 (alpha)
+
+=head1 SYNOPSIS
+
+  use WWW::Scripter;
+  $w = new WWW::Scripter;
+
+  $w->use_plugin('Ajax');  # packaged separately
+  
+  $w->get('http://some.site.com/that/relies/on/ajax');
+  $w->eval(' alert("Hello from JavaScript") ');
+  $w->document->getElementsByTagName('div')->[0]->....
+
+  $w->content; # returns the HTML content, possibly modified
+               # by scripts
+
+=head1 DESCRIPTION
+
+This is a subclass of L<WWW::Mechanize> that uses the W3C DOM and provides
+support for scripting.
+
+No actual scripting engines are provided I<with> WWW::Scripter, but are
+available as separate plugins.  (See also the L</SEE ALSO> section below.)
+
+=head1 SINGLE VS MULTIPLE WINDOWS
+
+There are two basic modes in which you can use WWW::Scripter:
+
+If you only
+need a single virtual window (which is usually the case), use WWW::Scripter
+itself, as described below and in L<WWW::Mechanize>.
+
+For multiple windows,
+start with a window group (see
+L<WWW::Scripter::WindowGroup>) and fetch the WWW::Scripter object via its
+C<active_window> method before proceeding.
+
+At any time you can attach an
+existing window (WWW::Scripter object) to a window group using the latter's
+C<attach> method. You can also C<< ->close >> a window to detach it from
+its window group and put it back in single-window mode.
+
+These two modes affect the behaviour of a few methods (C<open>, C<close>,
+C<blur>, C<focus>) and hyperlinks and forms
+with
+explicit targets.
+
+=head1 INTERFACE
+
+See L<WWW::Mechanize> for a vast list of methods that this module inherits.
+(See also the L</Notes About WWW::Mechanize Methods>, below.)
+
+In addition to those, this module implements the well-known Window 
+interface,
+providing also a few routines for attaching scripting engines
+and what-not.
+
+In the descriptions below, C<$w> refers to the WWW::Scripter object. You
+can think of it as short for either 'WWW::Scripter' or 'window'.
+
+=head2 Constructor
+
+ my $w = new WWW::Scripter %args
+
+The constructor accepts named arguments.  There are only two that 
+WWW::Scripter itself deals with directly.  The rest are passed on to the
+superclass.  See L<WWW::Mechanize> and L<LWP::UserAgent> for details on
+what
+other arguments
+the constructor accepts.
+
+The two arguments are:
+
+=over
+
+=item max_docs
+
+The maximum number of document objects to keep in history (along with their
+corresponding request and response objects).  If
+this is omitted, Mech's C<stack_depth> + 1 will be used.  This is off by
+one
+because C<stack_depth> is the number of pages you can go back to, so it is
+one less than the number of recorded pages.  C<max_docs> considers 0 to be
+equivalent to infinity.
+
+=item max_history
+
+If the number of items in history exceeds C<max_docs>, WWW::Scripter will still keep the request objects (so
+you can go back more than C<max_docs> times and previously visited pages
+will reload).  C<max_history> restricts the total number of items in
+history (whether full document objects or just requests).  0 is equivalent
+to 
+infinity.
+
+=back
+
+=head2 The Window Interface
+
+In addition to the methods listed here, see also L<HTML::DOM::View> and
+L<HTML::DOM::EventTarget>.
+
+=over
+
+=item location
+
+Returns the location object (see L<WWW::Scripter::Location>).
+If you pass an argument, it sets the C<href>
+attribute of the location object.
+
+=item alert
+
+=item confirm
+
+=item prompt
+
+Each of these calls the function assigned by one of the C<set_*> methods
+below under L</Window-Related Methods>.
+
+=item navigator
+
+Returns the navigator object.  See L<WWW::Scripter::Navigator>.
+
+=item screen
+
+Returns the screen object.  It currently has no features.
+
+=item setTimeout ( $code_string, $ms );
+
+=item setTimeout ( $coderef, $ms, @args );
+
+This schedules the code to run after C<$ms> milliseconds have elapsed, 
+returning a
+number uniquely identifying the time-out.  If the first argument is a
+coderef or an object with C<&{}> overloading, it will be called as such.
+Otherwise, it is parsed as a string of JavaScript code.  (If the JavaScript
+plugin is not loaded, it will be ignored.)
+
+=item setInterval ( $code_string, $ms );
+
+=item setInterval ( $coderef, $ms, @args );
+
+This method is just like C<setTimeout>, except that, when the code runs,
+it schedules it to run again after C<$ms> milliseconds.
+
+=item clearTimeout ( $timeout_id )
+
+The cancels the time-out corresponding to the C<$timeout_id>.  This only
+works for those registered with C<setTimeout>.
+
+=item clearInterval ( $timer_id )
+
+The cancels the timer corresponding to the C<$timer_id>.  This only
+works for those registered with C<setInterval>.
+
+=item open ( $url, $target, $features, $replace )
+
+If C<$target> is not specified or if there is no window or frame named
+C<$target>, this methods opens the C<$url> in a new
+window in multiple-window mode, or at the top-level window in single-window
+mode.
+
+If there is a window or frame named C<$target>, then the C<$url> is opened
+in that window.  If C<$replace> is true, it replaces the current page.
+
+A relative C<$url> is resolved according to the base URL of the current
+window (the one that C<open> is called on), not the C<$target>.
+
+The C<$features> argument is ignored.
+
+=item close
+
+In multiple-window mode, this detaches this window from its window group.
+In single-window mode (when there is no window group) it goes back to the
+previous entry in history (so that it is the opposite of C<open>).
+
+=item focus
+
+In multiple-window mode, this brings this window to the front.  In
+single-window mode (when there is no window group) it does nothing.
+
+=item blur
+
+In multiple-window mode, this sends this window back one, if it is the
+frontmost window.  In
+single-window mode (when there is no window group) it does nothing.
+
+=item history
+
+Returns the history object. See L<WWW::Scripter::History>.
+
+=item window
+
+=item self
+
+These two return the window object itself.
+
+=item frames
+
+Although the W3C DOM specifies that this return C<$w> (the window itself),
+for efficiency's sake this returns a separate object which one can use as
+a hash or array reference to access its sub-frames.  (The window object 
+itself cannot be used that
+way.)  The frames object (class WWW::Scripter::Frames) also has a C<window> 
+method that returns C<$w>.
+
+In list context a list of frames is returned.
+
+=item length
+
+Returns the number of frames. C<< $w->length >> is equivalent to 
+C<< scalar @{$w->frames} >>.
+
+=item top
+
+Returns the 'top' window, which is the window itself if there are no
+frames.
+
+=item parent
+
+Returns the parent frame, if there is one, or the window object itself
+otherwise.
+
+=item name
+
+This returns the window's name, if applicable.  For a frame, this comes
+from the frame element to which the window belongs.  For a top-level window
+created by C<open>, this is the name that was passed as the second
+argument.
+
+=item scroll
+
+=item scrollTo
+
+=item scrollBy
+
+These exist in case scripts try to call them.  They don't do anything.
+
+=begin comment
+
+=item status
+
+=item defaultStatus
+
+These are simple accessors.  They don't do much apart from storing the
+assigned value as a string.  The value assigned is associated with the
+current page.
+
+=end comment
+
+=back
+
+=head2 Window-Related Methods
+
+These methods are not part of the Window interface, but are closely related
+to the object's window behaviour.
+
+=over
+
+=item set_alert_function
+
+=item set_confirm_function
+
+=item set_prompt_function
+
+Use these to set the functions called by the above methods.  There are no
+default C<confirm> and C<prompt> functions.  The default C<alert> prints to
+the currently selected file handle, with a line break tacked on the end.
+
+=item check_timers
+
+This evaluates the code associated with each timeout registered with 
+the C<setTimeout> method,
+if the appropriate interval has elapsed.
+
+=item count_timers
+
+This returns the number of timers currently registered.
+
+=item wait_for_timers ( %args )
+
+This method waits for any registered timers to finish (calling
+C<check_timers> repeatedly in a loop).  Its C<%args> are as follows:
+
+  max_wait    Number indicating for how many seconds the loop
+              should run before giving up and returning.
+  min_timers  Only run until this many timers are left, not until
+              they have all finished.
+  interval    Number of seconds to wait before each iteration of
+              the loop.  The default is .1.
+
+Some websites have timers running constantly, that are never cleared.  For
+these, you will usually need to set a value for C<min_timers> (or
+C<max_wait>) to avoid an infinite loop.
+
+=item window_group
+
+This returns the window group that owns this window. See
+L</SINGLE VS MULTIPLE WINDOWS>, above.
+
+You can also pass an argument to set it, but you should only do so if you
+know what you are doing, as it does not update the window group's list.
+Consider using L<WWW::Scripter::WindowGroup>'s 
+C<attach> method (which itself uses this method).
+
+=item find_target ( $name )
+
+This finds the WWW::Scripter object (window or frame) in which a link will
+be opened. 
+
+If C<$name> is not an empty string, it returns the window corresponding to
+C<$name>.
+
+If C<$name> is the empty string or undefined, it returns the default target
+for this window,
+based on the first C<< <base target> >> element.
+
+If a named window cannot be found: in multiple-window mode, a new window is
+opened and returned; in single-window mode, C<undef> is returned.
+
+=back
+
+=head2 Methods for Fetching Images
+
+=over
+
+=item fetch_images ( $new_val )
+
+A boolean indicating whether images should be fetched.  Some sites use
+images with special URLs as cookies and refuse to work if those images are
+not fetched.  Most of the time, however, you probably want to leave this
+off, for speed's sake.
+
+Setting this does not affect any pages that are already loaded.
+
+=item image_handler ( $coderef )
+
+A subroutine for handling any images that are fetched.  The subroutine will
+be passed three arguments: 0) the WWW::Scripter object, 1) the image or
+input element and 2) the response object.
+
+=back
+
+=head2 Methods for Plugins, Scripting, etc.
+
+=over
+
+=item eval ( $code [, $scripting_language] )
+
+Evaluates the C<$code> passed to it.  This method dies if there is no
+script
+handler registered for the C<$scripting_language>.
+
+=item use_plugin ( $plugin_name [, @options] )
+
+This will automatically C<require()> the plugin for you, and then
+initialise it.  To pass extra
+options to the plugin after loading it, just use the same syntax again.
+This will return the plugin object if the plugin has one.
+
+=item plugin ( $plugin_name )
+
+This will return the plugin object, if it has one.  Some plugins may
+provide
+this as a way to communicate directly with the plugin.
+
+You can also use the return value as a boolean, to see whether a plugin is
+loaded.
+
+=item dom_enabled ( $new_val )
+
+This returns a boolean indicating whether HTML pages are parsed and turned
+into a DOM tree.  It is true
+by default.  You can disable HTML parsing by passing a false value.  Of
+course, if you are using WWW::Scripter to begin with, you won't want to
+turn this off will you?  Nevertheless, this is useful for fetching files
+behind the scenes when just the file contents are needed.
+
+=item scripts_enabled ( $new_val )
+
+This returns a boolean indicating whether scripts are enabled.  It is true
+by default.  You can disable scripts by passing a false value.  When you
+disable scripts, event handlers are also disabled, as is the registration
+of event handlers by HTML event attributes.
+
+=item script_handler ( $language_re, $object )
+
+A script handler is a special object that knows how to run scripts in a
+particular language.  Use this method to register such an object.
+
+C<$language_re> is a regular expression that will be matched against a
+scripting language name (from a 'language' HTML attribute) or MIME type
+(<script type=...).  You can also use the special value 'default'.
+
+C<$object> is the script handler object.  For its interface, 
+see 
+L</SCRIPT HANDLERS>, below.
+
+=item class_info ( \%interfaces )
+
+With this you can provide information for binding Perl classes to scripting
+languages, so that scripts can
+handle objects of those classes.
+
+You should pass a hash ref that has the
+structure described in L<HTML::DOM::Interface>, except that this method
+also accepts a C<< _constructor >> hash element, which should be set to the
+name of the method to be called when the constructor function is called
+from the scripting language (e.g., C<< _constructor => 'new' >>) or a
+subroutine reference.
+
+The return value is a list of all hashrefs passed to C<class_info> so far
+plus a few that WWW::Scripter has by default (to support the DOM).
+You can call it without any arguments just to get that list.
+
+=back
+
+=head2 Other Methods
+
+=over
+
+=item forward
+
+The equivalent of hitting the 'forward' button in a browser.  This, of
+course, only works after C<back>.
+
+=item clear_history ( $including_current_page )
+
+This clears the history, preventing C<back> from working until after the
+next request, and freeing up some memory.  If supplied with a true
+argument, it also clears the current page.  It returns C<$w>.
+
+=item max_history
+
+=item max_history ( $new_value )
+
+=item max_docs
+
+=item max_docs ( $new_value )
+
+These two return what was passed to the constructor, optionally setting it.
+
+=back
+
+=head2 Notes About WWW::Mechanize Methods
+
+=over
+
+=item links
+
+WWW::Scripter overrides the C<_extract_links> method that C<links>,
+C<find_link> and C<follow_link> use behind the scenes, to make it use the
+HTML DOM tree instead of the source code of the page.
+
+This overridden method tries hard to match WWW::Mechanize as closely as
+possible, which means it includes link tags, (i)frames, and meta tags with
+http-equiv set to 'refresh'.
+
+This is significantly different from C<< $w->document->links >>, an
+HTML::DOM method that follows the W3C DOM spec and returns only 'a' and
+'area' elements.
+
+=back
+
+=head1 EVENTS
+
+=for comment
+This should probably go inside an FAQ instead of here. We can put the
+documentation about timers there, too.
+
+To trigger events (and event handlers), use the C<trigger_event> method of
+the object on which you want to trigger it. For instance:
+
+ $w->trigger_event('resize');  # runs onresize handlers
+ $w->document->links->[0]->trigger_event('mouseover');
+ $w->current_form->trigger_event('submit');  # same as $w->submit
+
+C<trigger_event> accepts more arguments. See L<HTML::DOM> and
+L<HTML::DOM::EventTarget> for details.
+
+=head1 CAVEATS
+
+WWW::Scripter does not implement any event loop, so you have to call
+C<check_timers> or C<wait_for_timers> yourself to trigger any timeouts. If
+you set up a loop like this,
+
+  sleep 1, $w->check_timers  while $w->count_timers;
+
+or if you use C<wait_for_timers>, beware that these may cause an infinite
+loop if a timeout sets another timeout, or if a timer is registered with
+C<setInterval>. You basically have to know what works with the
+pages you are browsing.
+
+=head1 THE C<%WindowInterface> HASH
+
+The hash named C<%WWW::Scripter::WindowInterface> lists the
+interface members for the window object. It follows the same format as
+hashes I<within> L<%HTML::DOM::Interface|HTML::DOM::Interface>, like this:
+
+  (
+      alert => VOID|METHOD,
+      confirm => BOOL|METHOD,
+      ...
+  )
+
+It only includes those methods listed above under L</The Window Interface>.
+
+=head1 SCRIPT HANDLERS
+
+This section is only of interest to those implementing scripting engines.
+If you are not writing one, skip this section (or just read it anyway).
+
+A script handler object must provide the following methods:
+
+=over
+
+=item eval ( $w, $code, $url, $line, $is_inline )
+
+(where C<$w> is the WWW::Scripter object)
+
+This is supposed to run the C<$code> passed to it. It must set C<$@> to a
+true value if there is an error.
+
+=item event2sub ( $w, $elem, $event_name, $code, $url, $line )
+
+This is called for each HTML event attribute (onclick, etc.). It should
+return a coderef that runs the C<$code>.
+
+If it could not create a code ref, it should return C<undef> and put the
+error message, if any, in C<$@>.
+
+=back
+
+=head1 WRITING PLUGINS
+
+Plugins are usually under the WWW::Scripter::Plugin:: namespace. If a
+plugin name has a hyphen (-) in it, the module name will contain a double
+colon (::). If, when you pass a plugin name to C<use_plugin> or C<plugin>,
+it has a double colon in its name, it will be treated as a fully-qualified
+module name (possibly) outside the usual plugin namespace. Here are
+some examples:
+
+    Plugin Name       Module Name
+    -----------       -----------
+    Chef              WWW::Scripter::Plugin::Chef
+    Man-Page          WWW::Scripter::Plugin::Man::Page
+    My::Odd::Plugin   My::Odd::Plugin
+
+This module will need to have an C<init> method, and possibly two more
+named C<options> and C<clone>, respectively:
+
+=over
+
+=item init
+
+C<init> will be called as a class method the first time C<use_plugin>
+is called for a particular plugin. The second argument (C<$_[1]>) will be 
+the WWW::Scripter object. The third argument will be an array ref
+of options (see L</options>, below).
+
+It may return an object if the plugin has one.
+
+=item options
+
+When C<< $w->use_plugin >> is called, if there are any arguments after
+the plugin name, then the plugin object's C<options> method will be called
+with the options themselves as the arguments.
+
+If a plugin does not provide an object, an error will be thrown if options
+are passed to C<use_plugin>.
+
+The C<init> method can override this, however. When I<it> is called, its
+third argument is a reference to an array containing the options passed
+to C<use_plugin>. The contents of that same array will be used when 
+C<options> is called,
+so C<init> can modify it and even prevent C<options> from being called
+altogether, by emptying the array.
+
+=item clone
+
+When the WWW::Scripter object is cloned (via the C<clone> method), every
+plugin that has a clone method (as determined by
+S<<< C<< ->can('clone') >> >>>), will also be cloned. The new clone of the
+WWW::Scripter object is passed as
+its argument.
+
+=back
+
+If the plugin needs to record data pertinent to the
+current page, it can do so by associating them with the document or the
+request via a field hash. See 
+L<Hash::Util::FieldHash> and L<Hash::Util::FieldHash::Compat>.
+
+=head2 Handlers
+
+See LWP's L<Handlers|LWP::UserAgent/Handlers> feature.
+
+From within LWP's C<request_*> and C<response_*> handlers, you can call 
+C<WWW::Scripter::abort> to abort the request 
+and prevent a new entry from being created in browser history. (The
+JavaScript plugin does this with javascript: URLs.)
+
+WWW::Scripter will export this function upon request:
+
+  use WWW::Scripter qw[ abort ];
+
+or you can call it with a fully qualified name:
+
+  WWW::Scripter::abort();
+
+=head1 BUGS
+
+This is still an unfinished work. There are probably scores of bugs
+crawling all over the place. Here are some that are known (apart from the
+fact that so many features are still missing):
+
+=over 4
+
+=item *
+
+There is no support for XHTML, but HTML::Parser can handle most XHTML pages
+anyway, so
+maybe this is not a problem.
+
+=item *
+
+There is nothing to prevent infinite recursion when frames have
+circular references.
+
+=back
+
+To report a bug, please send an e-mail to
+L<bug-WWW-Scripter@rt.cpan.org|mailto:bug-WWW-Scripter@rt.cpan.org>
+or use the web interface at L<http://rt.cpan.org/>.
+
+=head1 PREREQUISITES
+
+L<perl> 5.8.3 or higher (5.8.4 or higher recommended)
+
+L<HTML::DOM> 0.045 or higher
+
+L<LWP> 5.77 or higher
+
+L<URI>
+
+L<WWW::Mechanize> 1.2 or higher
+
+L<Tie::RefHash::Weak> 0.08 or higher for perl 5.8.x.
+
+=head1 AUTHOR & COPYRIGHT
+
+Copyright (C) 2009-16, Father Chrysostomos (sprout at, um, cpan dot org)
+
+This program is free software; you may redistribute or modify it (or both)
+under the same terms as perl.
+
+=head1 CONFESSION
+
+Some of the code in here was stolen from the immediate superclass, 
+WWW::Mechanize, as were some of the tests and test data.
+
+=head1 SEE ALSO
+
+WWW::Scripter sub-modules: L<::Location|WWW::Scripter::Location>,
+L<::History|WWW::Scripter::History> and
+L<::Navigator|WWW::Scripter::Navigator>.
+
+See L<WWW::Mechanize>, of which this is a subclass.
+
+See also the following plugins:
+
+=over
+
+=item L<WWW::Scripter::Plugin::JavaScript>
+
+=item L<WWW::Scripter::Plugin::Ajax>
+
+=back
+
+And, if you are curious, have a look at the plugin version of 
+WWW::Mechanize and WWW::Mechanize::Plugin::DOM (experimental and now 
+deprecated) that this was originally
+based on:
+http://www-mechanize.googlecode.com/svn/wm/branches/plugins/
+

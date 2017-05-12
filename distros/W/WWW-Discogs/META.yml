@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               WWW-Discogs
+version:            0.13
+abstract:           get music related information and images
+author:
+    - Michal Gasek <michal@gasek.eu>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    File::Slurp:          0
+    HTTP::Response:       0
+    Test::Deep:           0
+    Test::Exception:      0
+    Test::Mock::LWP::Dispatch:  0.03
+    Test::More:           0
+requires:
+    JSON::XS:        0
+    LWP::UserAgent:  0
+    NEXT:            0
+    perl:            5.008
+    URI:             0
+    URI::Escape:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

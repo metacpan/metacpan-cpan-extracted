@@ -1,0 +1,10 @@
+name = "WWW-FBX"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+abstract_from="lib/WWW/FBX.pm"
+
+[release]
+pause_config="/home/lke/.pause"
+
+[ReleaseTest]
+MinimumVersion = false

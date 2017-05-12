@@ -1,0 +1,14 @@
+Revision history for Perl extension WWW::Shorten::ptl
+
+0.01    2010-08-20 
+        - first release
+
+0.02		2010-08-20
+				- modify pod
+
+0.03		2010-08-20
+				- recreating package to pass pause's security check
+
+0.04		2010-08-20
+				- add inc/ to tarball
+				- avoid failure of xt/01_podspell.t

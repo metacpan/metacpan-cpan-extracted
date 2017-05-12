@@ -1,0 +1,27 @@
+Win32-JobAdd version 1.00
+=========================
+
+A "job" is a collection of processes which can be controlled as a single unit. 
+For example, you can reliably kill a process and all of its children by launching 
+the process in a job, then telling Windows to kill all processes in the job.
+
+There is another module Win32::Job which is fine when you don't need to do anything 
+with the processes it spawns for you, but is limited otherwise.
+
+With Win32::JobAdd you can create processes in a job environment and e.g. read 
+the STDOUT from them.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2012, BrowserUk <browseruk@cpan.org>, Dirk Joos <dirk@dirkundsari.de>. 
+All Rights Reserved. This program is free software; you may use it and/or redistribute 
+it under the same terms as Perl itself.

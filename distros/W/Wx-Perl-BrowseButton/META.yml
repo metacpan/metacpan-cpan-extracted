@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Wx-Perl-BrowseButton
+version: 0.01
+author:
+  - Mattia Barbon <mbarbon@cpan.org>
+abstract: a file/directory browse control
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

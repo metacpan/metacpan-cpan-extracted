@@ -1,0 +1,19 @@
+<%include header.tmpl %>
+		<div class="items">
+		<h1><%= NAME %></h1>
+		<%loop ITEMS %>
+			<div class="item">
+				<%switch TYPE %>
+					<%case Folder %><a href="?path=<%= PATH_REL %>;size=<%= SIZE %>">
+					<%case %><a href="?path=<%= PATH_REL %>;size=<%= SIZE_IN %>">
+				<%/switch %>
+				<img src="?rm=image;path=<%= PATH_REL %>;size=<%= SIZE %>" alt="<%= NAME %>" /></a>
+				<p class="name"><%if EXIF.Title %> <%= EXIF.Title %><%else %><%= NAME %><%/if %></p>
+				<p class="exif-tiny"><%include "exif/tiny.tmpl" %></p>
+				<%switch TYPE %>
+					<%case Audio,Video,Image %><a href="?rm=image;path=<%= PATH_REL %>">Download</a>
+				<%/switch %>
+			</div>
+		<%/loop %>
+		</div>
+<%include footer.tmpl %>

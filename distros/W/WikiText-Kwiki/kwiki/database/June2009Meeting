@@ -1,0 +1,29 @@
+= !TestML - generic testing meta language =
+
+speaker: Ingy döt Net
+
+[http://search.cpan.org/dist/TestML TestML] is a testing meta language which allows you to create data-driven unit tests that are programming language agnostic.
+
+See http://www.testml.org/ for more information on !TestML.
+
+  # A sample TestML document
+  %TestML: 1.0
+  %Plan: 3
+
+  text.encodeText('x') == result_x;
+  text.encodeText('y') == result_y;
+
+  === Single line text encoding
+  --- text: This is some text
+  --- result_x: Xxxx xx xxxx xxxx
+  --- result_y: Yyyy yy yyyy yyyy
+
+  === Multiline text encoding
+  --- text
+  This is
+  two lines
+  --- result_x
+  Xxxx xx
+  xxx xxxxx
+
+A podcast of this talk is [http://pdxpm.podasp.com/archive.html?pname=meetings.xml here]

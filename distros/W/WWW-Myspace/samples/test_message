@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w -I../lib
+######################################################################
+# test_message
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: test_message,v 1.3 2006/01/18 01:59:34 grant Exp $
+######################################################################
+# Copyright (c) 2006 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+
+use WWW::Myspace;
+use WWW::Myspace::Message;
+
+my $myspace = new WWW::Myspace;
+print "Creating message...\n";
+my $message = new WWW::Myspace::Message(
+	$myspace, '-s', 'test subject',
+	'-m', 'test message', 30204716, 30903772 );
+
+print "Delay time: " . $message->delay_time . "\n";
+$message->save('message.yaml');
+$message->load('message.yaml');
+
+print "Subject: " . $message->subject . "\n";
+
+print "Message: " .  $message->message . "\n";
+
+print "Delay Time: " . $message->delay_time . "\n";
+
+print "Friends: " .
+$message->friend_ids . "\n";
+

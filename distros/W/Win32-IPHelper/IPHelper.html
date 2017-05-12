@@ -1,0 +1,830 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Win32::IPHelper - Perl wrapper for Win32 IP Helper functions and structures.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" style="background-color: #cccccc" valign="middle">
+<big><strong><span class="block">&nbsp;Win32::IPHelper - Perl wrapper for Win32 IP Helper functions and structures.</span></strong></big>
+</td></tr>
+</table>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+	</ul>
+
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<ul>
+
+		<li><a href="#getinterfaceinfo___ip_interface_info_"><code>GetInterfaceInfo(\%IP_INTERFACE_INFO)</code></a></li>
+		<li><a href="#getadaptersinfo___ip_adapter_info_"><code>GetAdaptersInfo(\@IP_ADAPTER_INFO)</code></a></li>
+		<li><a href="#getadapterindex___adaptername___ifindex_"><code>GetAdapterIndex(\$AdapterName,\$IfIndex)</code></a></li>
+		<li><a href="#getifentry__ifindex___mib_ifrow_"><code>GetIfEntry($IfIndex,\%MIB_IFROW)</code></a></li>
+		<li><a href="#addipaddress__address__ipmask__ifindex___ntecontext___nteinstance_"><code>AddIPAddress($Address,$IpMask,$IfIndex,\$NTEContext,\$NTEInstance)</code></a></li>
+		<li><a href="#deleteipaddress__ntecontext_"><code>DeleteIPAddress($NTEContext)</code></a></li>
+		<li><a href="#ipreleaseaddress___adapterinfo_"><code>IpReleaseAddress(\%AdapterInfo)</code></a></li>
+		<li><a href="#iprenewaddress___adapterinfo_"><code>IpRenewAddress(\%AdapterInfo)</code></a></li>
+		<li><a href="#gettcptable___tcp_table__border_"><code>GetTcpTable(\@TCP_TABLE,$bOrder)</code></a></li>
+		<li><a href="#allocateandgettcpextablefromstack___tcp_ex_table__border_"><code>AllocateAndGetTcpExTableFromStack(\@TCP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#getextendedtcptable___tcp_ex_table__border_"><code>GetExtendedTcpTable(\@TCP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#gettcptableauto___tcp_ex_table__border_"><code>GetTcpTableAuto(\@TCP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#getudptable___udp_table__border_"><code>GetUdpTable(\@UDP_TABLE,$bOrder)</code></a></li>
+		<li><a href="#allocateandgetudpextablefromstack___udp_ex_table__border_"><code>AllocateAndGetUdpExTableFromStack(\@UDP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#getextendedudptable___udp_ex_table__border_"><code>GetExtendedUdpTable(\@UDP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#getudptableauto___udp_ex_table__border_"><code>GetUdpTableAuto(\@UDP_EX_TABLE,$bOrder)</code></a></li>
+		<li><a href="#getnetworkparams___fixed_info_"><code>GetNetworkParams(\%FIXED_INFO)</code></a></li>
+	</ul>
+
+	<li><a href="#credits">CREDITS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Win32::IPHelper - Perl wrapper for Win32 IP Helper functions and structures.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetInterfaceInfo</span><span class="operator">(\</span><span class="variable">%IP_INTERFACE_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdaptersInfo</span><span class="operator">(\</span><span class="variable">@IP_ADAPTER_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdapterIndex</span><span class="operator">(\</span><span class="variable">$AdapterName</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$IfIndex</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetIfEntry</span><span class="operator">(</span><span class="variable">$IfIndex</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%MIB_IFROW</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AddIPAddress</span><span class="operator">(</span><span class="variable">$Address</span><span class="operator">,</span> <span class="variable">$IpMask</span><span class="operator">,</span> <span class="variable">$IfIndex</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$NTEContext</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$NTEInstance</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::DeleteIPAddress</span><span class="operator">(</span><span class="variable">$NTEContext</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::IpReleaseAddress</span><span class="operator">(\</span><span class="variable">%AdapterInfo</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::IpRenewAddress</span><span class="operator">(\</span><span class="variable">%AdapterInfo</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetTcpTable</span><span class="operator">(\</span><span class="variable">@TCP_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AllocateAndGetTcpExTableFromStack</span><span class="operator">(\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetExtendedTcpTable</span><span class="operator">(\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetUdpTable</span><span class="operator">(\</span><span class="variable">@UDP_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AllocateAndGetUdpExTableFromStack</span><span class="operator">(\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+ <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetExtendedUdpTable</span><span class="operator">(\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Interface to Win32 IP Helper functions and data structures, needed to retrieve and modify configuration settings for the Transmission Control Protocol/Internet Protocol (TCP/IP) transport on the local computer.</p>
+<p>This module covers a small subset of the functions and data structures provided by the Win32 IP Helper API.</p>
+<p><strong>Purpose</strong></p>
+<p>The Internet Protocol Helper (IP Helper) API enables the retrieval and modification of network configuration settings for the local computer.</p>
+<p><strong>Where Applicable</strong></p>
+<p>The IP Helper API is applicable in any computing environment where programmatically manipulating TCP/IP configuration is useful.
+Typical applications include IP routing protocols and Simple Network Management Protocol (SNMP) agents.</p>
+<p><strong>Developer Audience</strong></p>
+<p>The IP Helper API is designed for use by C/C++ programmers. Programmers should also be familiar with TCP/IP networking concepts.</p>
+<p><strong>Run-time Requirements</strong></p>
+<p>The IP Helper API is supported on:</p>
+<ul>
+<li><strong><a name="microsoft_windows_98" class="item">Microsoft Windows 98</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_millennium_edition" class="item">Microsoft Windows Millennium Edition</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_nt_version_4_0_with_service_pack_4" class="item">Microsoft Windows NT version 4.0 with Service Pack 4</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_2000" class="item">Microsoft Windows 2000</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_xp" class="item">Microsoft Windows XP</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_vista" class="item">Microsoft Windows Vista</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_server_2003_family" class="item">Microsoft Windows Server 2003 family</a></strong>
+
+</li>
+<li><strong><a name="microsoft_windows_server_2008_family" class="item">Microsoft Windows Server 2008 family</a></strong>
+
+</li>
+</ul>
+<p><strong>Note</strong></p>
+<p>Not all operating systems support all functions.
+If an IP Helper function is called on a platform that does not support the function, ERROR_NOT_SUPPORTED is returned.
+For more specific information about which operating systems support a particular function, refer to the Requirements sections in the documentation.</p>
+<p>The complete SDK Reference documentation is available online through Microsoft MSDN Library (http://msdn.microsoft.com/library/default.asp)</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p>None by default.</p>
+<p>
+</p>
+<hr />
+<h1><a name="functions">FUNCTIONS</a></h1>
+<p>
+</p>
+<h2><a name="getinterfaceinfo___ip_interface_info_"><code>GetInterfaceInfo(\%IP_INTERFACE_INFO)</code></a></h2>
+<p>The GetInterfaceInfo function obtains a IP_INTERFACE_INFO structure that contains the list of the network interface adapters on the local system.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">%IP_INTERFACE_INFO</span><span class="operator">;</span>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetInterfaceInfo</span><span class="operator">(\</span><span class="variable">%IP_INTERFACE_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">%IP_INTERFACE_INFO</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(IP_INTERFACE_INFO)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetInterfaceInfo() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetAdaptersInfo and GetInterfaceInfo functions do not return information about the loopback interface</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional, Windows Me, Windows 98.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getadaptersinfo___ip_adapter_info_"><code>GetAdaptersInfo(\@IP_ADAPTER_INFO)</code></a></h2>
+<p>The GetAdaptersInfo function obtains a list of IP_ADAPTER_INFO structures that contains adapter information for the local computer.</p>
+<p><strong>Examples</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@IP_ADAPTER_INFO</span><span class="operator">;</span>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdaptersInfo</span><span class="operator">(\</span><span class="variable">@IP_ADAPTER_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@IP_ADAPTER_INFO</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(IP_ADAPTER_INFO)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetAdaptersInfo() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetAdaptersInfo and GetInterfaceInfo functions do not return information about the loopback interface</p>
+<p>Windows XP/Windows .NET Server 2003 family or later:  The list of adapters returned by GetAdaptersInfo includes unidirectional adapters.
+To generate a list of adapters that can both send and receive data, call <em>GetUniDirectionalAdapterInfo</em>, and exclude the returned adapters from the list returned by GetAdaptersInfo.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional, Windows Me, Windows 98.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getadapterindex___adaptername___ifindex_"><code>GetAdapterIndex(\$AdapterName,\$IfIndex)</code></a></h2>
+<p>The GetAdapterIndex function obtains the index of an adapter, given its name.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$IfIndex</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># the value for AdapterName is found in @IP_ADAPTER_INFO, for example</span>
+  <span class="comment"># $IP_ADAPTER_INFO[0]{'AdapterName'};</span>
+  <span class="keyword">my</span> <span class="variable">$AdapterName</span> <span class="operator">=</span> <span class="string">'{88CE272F-847A-40CF-BFBA-001D9AD97450}'</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdapterIndex</span><span class="operator">(\</span><span class="variable">$AdapterName</span><span class="operator">,\</span><span class="variable">$IfIndex</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"Index for '%s' interface is %u\n"</span><span class="operator">,</span> <span class="variable">$AdapterName</span><span class="operator">,</span> <span class="variable">$IfIndex</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetAdapterIndex() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getifentry__ifindex___mib_ifrow_"><code>GetIfEntry($IfIndex,\%MIB_IFROW)</code></a></h2>
+<p>The GetIfEntry function retrieves a MIB_IFROW structure information for the specified interface on the local computer.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$IfIndex</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># the value for AdapterName is found in @IP_ADAPTER_INFO, for example</span>
+  <span class="comment"># $IP_ADAPTER_INFO[0]{'AdapterName'};</span>
+  <span class="keyword">my</span> <span class="variable">$AdapterName</span> <span class="operator">=</span> <span class="string">'{88CE272F-847A-40CF-BFBA-001D9AD97450}'</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdapterIndex</span><span class="operator">(\</span><span class="variable">$AdapterName</span><span class="operator">,\</span><span class="variable">$IfIndex</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">%MIB_IFROW</span><span class="operator">;</span>
+    <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetIfEntry</span><span class="operator">(</span><span class="variable">$IfIndex</span><span class="operator">,\</span><span class="variable">%MIB_IFROW</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+        <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">%MIB_IFROW</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(MIB_IFROW)</span><span class="operator">]</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    <span class="keyword">else</span>
+    <span class="operator">{</span>
+      <span class="keyword">printf</span> <span class="string">"GetIfEntry() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+    <span class="operator">}</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span>
+      <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetAdapterIndex() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+      <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional, Windows NT Workstation 4.0 SP4 and later, Windows Me, Windows 98.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server, Windows NT Server 4.0 SP4 and later.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="addipaddress__address__ipmask__ifindex___ntecontext___nteinstance_"><code>AddIPAddress($Address,$IpMask,$IfIndex,\$NTEContext,\$NTEInstance)</code></a></h2>
+<p>The AddIPAddress function adds the specified IP address to the specified adapter.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$IfIndex</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># the value for AdapterName is found in @IP_ADAPTER_INFO, for example</span>
+  <span class="comment"># $IP_ADAPTER_INFO[0]{'AdapterName'};</span>
+  <span class="keyword">my</span> <span class="variable">$AdapterName</span> <span class="operator">=</span> <span class="string">'{88CE272F-847A-40CF-BFBA-001D9AD97450}'</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetAdapterIndex</span><span class="operator">(\</span><span class="variable">$AdapterName</span><span class="operator">,\</span><span class="variable">$IfIndex</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$Address</span> <span class="operator">=</span> <span class="string">'192.168.1.10'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$IpMask</span> <span class="operator">=</span> <span class="string">'255.255.255.0'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$NTEContext</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$NTEInstance</span><span class="operator">;</span>
+    <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AddIPAddress</span><span class="operator">(</span><span class="variable">$Address</span><span class="operator">,</span><span class="variable">$IpMask</span><span class="operator">,</span><span class="variable">$IfIndex</span><span class="operator">,\</span><span class="variable">$NTEContext</span><span class="operator">,\</span><span class="variable">$NTEInstance</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+        <span class="operator">{</span>
+      <span class="keyword">printf</span> <span class="string">"Address has been added successfully with Context=%u\n"</span><span class="operator">,</span> <span class="variable">$NTEContext</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">else</span>
+    <span class="operator">{</span>
+      <span class="keyword">printf</span> <span class="string">"AddIPAddress() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+    <span class="operator">}</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span>
+      <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetAdapterIndex() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+      <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The IP address created by <em>AddIPAddress</em> is not persistent.
+The address exists only as long as the adapter object exists.
+Restarting the computer destroys the address, as does manually resetting the network interface card (NIC).
+Also, certain PnP events may destroy the address.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="deleteipaddress__ntecontext_"><code>DeleteIPAddress($NTEContext)</code></a></h2>
+<p>The DeleteIPAddress function deletes an IP address previously added using <em>AddIPAddress</em>.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$NTEContext</span> <span class="operator">=</span> <span class="number">2</span><span class="operator">;</span>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::DeleteIPAddress</span><span class="operator">(</span><span class="variable">$NTEContext</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"Address has been deleted successfully from Context=%u\n"</span><span class="operator">,</span> <span class="variable">$NTEContext</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"DeleteIPAddress() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="ipreleaseaddress___adapterinfo_"><code>IpReleaseAddress(\%AdapterInfo)</code></a></h2>
+<p>The IpReleaseAddress function releases an IP address previously obtained through Dynamic Host Configuration Protocol (DHCP).</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">%IP_INTERFACE_INFO</span><span class="operator">;</span>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetInterfaceInfo</span><span class="operator">(\</span><span class="variable">%IP_INTERFACE_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">%AdapterInfo</span> <span class="operator">=</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$IP_INTERFACE_INFO</span><span class="operator">{</span><span class="string">'Adapters'</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span><span class="operator">;</span>
+</pre>
+<pre>
+    <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::IpReleaseAddress</span><span class="operator">(\</span><span class="variable">%AdapterInfo</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+    <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Address has been released successfully\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+        <span class="keyword">else</span>
+    <span class="operator">{</span>
+      <span class="keyword">printf</span> <span class="string">"IpReleaseAddress() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+    <span class="operator">}</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span>
+      <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetInterfaceInfo() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+      <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional, Windows Me, Windows 98.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="iprenewaddress___adapterinfo_"><code>IpRenewAddress(\%AdapterInfo)</code></a></h2>
+<p>The IpRenewAddress function renews a lease on an IP address previously obtained through Dynamic Host Configuration Protocol (DHCP).</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">%IP_INTERFACE_INFO</span><span class="operator">;</span>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetInterfaceInfo</span><span class="operator">(\</span><span class="variable">%IP_INTERFACE_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">%AdapterInfo</span> <span class="operator">=</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$IP_INTERFACE_INFO</span><span class="operator">{</span><span class="string">'Adapters'</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span><span class="operator">;</span>
+</pre>
+<pre>
+    <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::IpRenewAddress</span><span class="operator">(\</span><span class="variable">%AdapterInfo</span><span class="operator">);</span>
+</pre>
+<pre>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+    <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Address has been renewed successfully\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+        <span class="keyword">else</span>
+    <span class="operator">{</span>
+      <span class="keyword">printf</span> <span class="string">"IpRenewAddress() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+    <span class="operator">}</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span>
+      <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetInterfaceInfo() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+      <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Included in Windows XP, Windows 2000 Professional, Windows Me, Windows 98.
+Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="gettcptable___tcp_table__border_"><code>GetTcpTable(\@TCP_TABLE,$bOrder)</code></a></h2>
+<p>The GetTcpTable function retrieves the TCP connection table.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@TCP_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetTcpTable</span><span class="operator">(\</span><span class="variable">@TCP_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@TCP_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(TCP_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetTcpTable() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP, Windows 2000 Professional, Windows NT Workstation 4.0 SP4 and later, Windows Me, or Windows 98.
+Server: Requires Windows Server 2003, Windows 2000 Server, or Windows NT Server 4.0 SP4 and later.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="allocateandgettcpextablefromstack___tcp_ex_table__border_"><code>AllocateAndGetTcpExTableFromStack(\@TCP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The AllocateAndGetTcpExTableFromStack function retrieves the TCP connection table with the additional ProcessId.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@TCP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AllocateAndGetTcpExTableFromStack</span><span class="operator">(\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(TCP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"AllocateAndGetTcpExTableFromStack() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The AllocateAndGetTcpExTableFromStack function is undocumented and is available only in Windows XP and Windows Server 2003.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP.
+Server: Requires Windows Server 2003.
+Header: Undeclared.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getextendedtcptable___tcp_ex_table__border_"><code>GetExtendedTcpTable(\@TCP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The GetExtendedTcpTable function retrieves the TCP connection table with the additional ProcessId.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@TCP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetExtendedTcpTable</span><span class="operator">(\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span><span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(TCP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetExtendedTcpTable() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetExtendedTcpTable function is available in Windows Server 2003 SP1,
+Sever 2008, XP SP2 and Vista.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP or Vista.
+Server: Requires Windows Server 2003 SP2 or Server 2008.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="gettcptableauto___tcp_ex_table__border_"><code>GetTcpTableAuto(\@TCP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The GetExtendedTcpTable function retrieves the TCP connection table with the additional ProcessId (if supported)</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@TCP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetTcpTableAuto</span><span class="operator">(\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span><span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@TCP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(TCP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetTcpTableAuto() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetTcpTableAuto function is a wrapper to functions GetExtendedTcpTable, AllocateAndGetTcpExTableFromStack
+and GetTcpTable; the first supported function is used to retrieve the best available detail from TCP connection table.</p>
+<p><strong>Requirements</strong></p>
+<p>Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getudptable___udp_table__border_"><code>GetUdpTable(\@UDP_TABLE,$bOrder)</code></a></h2>
+<p>The GetUdpTable function retrieves the User Datagram Protocol (UDP) listener table.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@UDP_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetTcpTable</span><span class="operator">(\</span><span class="variable">@UDP_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@UDP_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(UDP_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetUdpTable() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP, Windows 2000 Professional, Windows NT Workstation 4.0 SP4 and later, Windows Me, or Windows 98.
+Server: Requires Windows Server 2003, Windows 2000 Server, or Windows NT Server 4.0 SP4 and later.
+Header: Declared in Iphlpapi.h.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="allocateandgetudpextablefromstack___udp_ex_table__border_"><code>AllocateAndGetUdpExTableFromStack(\@UDP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The AllocateAndGetTcpExTableFromStack function retrieves the User Datagram Protocol (UDP) listener table with the additional ProcessId.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@TCP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::AllocateAndGetUdpExTableFromStack</span><span class="operator">(\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(UDP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"AllocateAndGetUdpExTableFromStack() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The AllocateAndGetUdpExTableFromStack function is undocumented and is available only in Windows XP and Windows Server 2003.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP.
+Server: Requires Windows Server 2003.
+Header: Undeclared.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getextendedudptable___udp_ex_table__border_"><code>GetExtendedUdpTable(\@UDP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The GetExtendedUdpTable function retrieves the User Datagram Protocol (UDP) listener
+table with the additional ProcessId.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@UDP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetExtendedUdpTable</span><span class="operator">(\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span><span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(UDP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetExtendedUdpTable() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetExtendedUdpTable function is available in Windows Server 2003 SP1,
+Sever 2008, XP SP2 and Vista.</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP or Vista.
+Server: Requires Windows Server 2003 SP2 or Server 2008.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getudptableauto___udp_ex_table__border_"><code>GetUdpTableAuto(\@UDP_EX_TABLE,$bOrder)</code></a></h2>
+<p>The GetUdpTableAuto function retrieves the User Datagram Protocol (UDP) listener
+table with the additional ProcessId (if supported).</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@UDP_EX_TABLE</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$bOrder</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetUdpTableAuto</span><span class="operator">(\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">,</span> <span class="variable">$bOrder</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span><span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">@UDP_EX_TABLE</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(UDP_EX_TABLE)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetUdpTableAuto() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Remarks</strong></p>
+<p>The GetUdpTableAuto function is a wrapper to functions GetExtendedUdpTable, AllocateAndGetUdpExTableFromStack
+and GetUdpTable; the first supported function is used to retrieve the best available detail from UDP listener table.</p>
+<p><strong>Requirements</strong></p>
+<p>Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<h2><a name="getnetworkparams___fixed_info_"><code>GetNetworkParams(\%FIXED_INFO)</code></a></h2>
+<p>The GetNetworkParams function retrieves network parameters for the local computer.</p>
+<p><strong>Example</strong></p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Win32::IPHelper</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">%FIXED_INFO</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="variable">$ret</span> <span class="operator">=</span> <span class="variable">Win32::IPHelper::GetNetworkParams</span><span class="operator">(\</span><span class="variable">%FIXED_INFO</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ret</span> <span class="operator">==</span> <span class="number">0</span><span class="operator">)</span>
+  <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="variable">Data::Dumper</span><span class="operator">-&gt;</span><span class="variable">Dump</span><span class="operator">(</span><span class="operator">[</span><span class="operator">\</span><span class="variable">%FIXED_INFO</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw(FIXED_INFO)</span><span class="operator">]</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+    <span class="keyword">printf</span> <span class="string">"GetNetworkParams() error %u: %s\n"</span><span class="operator">,</span> <span class="variable">$ret</span><span class="operator">,</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$ret</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</pre>
+<p><strong>Return Values</strong></p>
+<p>If the function succeeds, the return value is 0.</p>
+<p>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</p>
+<p><strong>Requirements</strong></p>
+<p>Client: Requires Windows XP, Windows 2000 Professional, Windows Me or Windows 98.
+Server: Requires Windows Server 2003 or Windows 2000 Server.
+Header: Undeclared.
+Library: Iphlpapi.dll.</p>
+<p>
+</p>
+<hr />
+<h1><a name="credits">CREDITS</a></h1>
+<p>Thanks to Aldo Calpini for the powerful Win32::API module that makes this thing work.</p>
+<p>Thanks to Hanno Stock (HANSTO) for the <code>GetNetworkParams()</code> and <code>_FIXED_INFO()</code> wrapper and helper.</p>
+<p>Thanks to Peter Arnhold for the <code>GetExtendedTcpTable()</code> and <code>GetExtendedUdpTable()</code> functions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Luigino Masarati, &lt;lmasarati at hotmail.com&gt;</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" style="background-color: #cccccc" valign="middle">
+<big><strong><span class="block">&nbsp;Win32::IPHelper - Perl wrapper for Win32 IP Helper functions and structures.</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

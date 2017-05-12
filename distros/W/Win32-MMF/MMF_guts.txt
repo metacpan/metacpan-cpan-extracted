@@ -1,0 +1,22 @@
+
++-----------+------+------+--------+ ---+
+| Var1 Name | Type | Size | Offset |    |
++-----------+------+------+--------+    |
+| Var2 Name | Type | Size | Offset |  Variable definitions are allocated
++-----------+------+------+--------+  from the top and goes down
+|                                  |    |
+|                                  |
+|                                  |
+|                                  |
+|                                  |    ^
+|                                  |    |
++----------------------------------+    |
+| Memory Allocated to hold content |  Shared memory is allocated
+| of Var1                          |  from bottom and goes up
++----------------------------------+ ---+
+| MMF Heap Management Info         |    |
++----------------------------------+    |
+| Var Count (no of vars in MMF)    |  MMF Descriptor
++----------------------------------+    |
+| MMF Size (size of this MMF)      |    |
++----------------------------------+ ---+

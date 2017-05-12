@@ -1,0 +1,27 @@
+WWW/Bookmark/Crawler version 0.01
+=================================
+
+   WWW::Bookmark::Crawler is a WWW spider and a search engine for personal bookmark. It first extracts links in either a browser-generated bookmark or a plain html file, then retrieves each page's content online and builds the index file. User can use this module to build a personal bookmark search engine.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ OurNet::FuzzyIndex
+ LWP::UserAgent
+ HTTP::Request::Common
+ HTML::LinkExtor
+ Set::Scalar
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 xern <xern@cpan.org>, The Artistic License
+

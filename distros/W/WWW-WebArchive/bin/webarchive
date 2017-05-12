@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use App::Options (
+    options => [qw(op url)],
+    option => {
+        op => {
+            default => "restore",
+            description => "Operation to perform [restore]",
+        },
+        url => {
+            required => 1,
+            description => "The URL to search for in the web archives",
+        },
+        dir => {
+            default => ".",
+            description => "The directory to restore files to",
+        },
+        verbose => {
+            default => "1",
+            description => "Level of verboseness [0=quiet,1=normal]",
+        },
+    },
+);
+use App::Trace;
+use WWW::WebArchive;
+
+{
+    my %new_options = (
+        verbose => $App::options{verbose},
+    );
+    my %op_options = (
+        url => $App::options{url},
+        dir => $App::options{dir},
+    );
+    my $webarchive = WWW::WebArchive->new(%new_options);
+    foreach my $op (split(/,/,$App::options{op})) {
+        if (!$op) {
+            # do nothing (ignore blank operations)
+        }
+        elsif ($op eq "restore") {
+            $webarchive->restore(\%op_options);
+        }
+        else {
+            warn "Unknown operation: [$op]\n";
+        }
+    }
+}
+

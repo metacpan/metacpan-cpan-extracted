@@ -1,0 +1,37 @@
+Revision history for Perl extension Webservice-OVH
+
+0.3 2016-09-06T06:02:12Z
+
+    - New Method for changing service_infos: change_service_infos (domain renewal)
+    - Fixes for Parameter check in Mailinglist options, checks no with exists
+
+0.25 2016-08-31T09:08:36Z
+
+    - All relevant input parameter are cleaned from trailing and leading whitespaces
+    - Fixed a problem with object creation even if Object is not available on api side
+
+0.24 2016-08-30T14:50:22Z
+
+    - id change ob object not needed. changed
+
+0.23 2016-08-30T09:13:30Z
+
+    - missing module for mailinglists fixed
+
+0.22 2016-08-29T09:18:44Z
+
+    - put JSON in requirements
+
+0.21 2016-08-24T11:44:39Z
+
+    - All Objects call properties on demand not during creation, due to speed issues
+    - Task System for email/domain/{domain}/.../tasks redone
+
+0.2 2016-08-22T10:26:11Z
+
+    - Deleted DDP dependency
+
+0.1 2016-08-18T09:14:15Z
+
+    - original version
+

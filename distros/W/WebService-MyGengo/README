@@ -1,0 +1,21 @@
+NAME
+    WebService::MyGengo - A library for interacting with the myGengo API
+
+DESCRIPTION
+    WebService::MyGengo is a library for accessing the MyGengo
+    (<http://mygengo.com>) API.
+
+    As of this writing, all interaction with the API is handled via the
+    WebService::MyGengo::Client class, in which you will find more
+    enlightening documentation.
+
+AUTHOR
+    Nathaniel Heinrichs
+
+LICENSE
+    Copyright (c) 2011, Nathaniel Heinrichs <nheinric-at-cpan.org>. All
+    rights reserved.
+
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

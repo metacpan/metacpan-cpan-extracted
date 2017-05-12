@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl Interface for SEOGears API.",
+   "author" : [
+      "Rishwanth Yeddula <ryeddula@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-SEOGears",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "0",
+            "HTTP::Tiny" : "0.029",
+            "JSON" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::SEOGears" : {
+         "file" : "lib/WWW/SEOGears.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ryeddula/www-seogears"
+      }
+   },
+   "version" : "0.05"
+}

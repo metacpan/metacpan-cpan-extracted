@@ -1,0 +1,9 @@
+# WebService::Recruit::HotPepper Changes
+
+2007/08/21 version 0.02:
+    - added license: perl in META.yml
+    - changed $api->query_param() method to only return paging param
+
+2007/08/20 version 0.01:
+    - the first release!
+

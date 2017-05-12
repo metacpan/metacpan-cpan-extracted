@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e0ef0f8e57457cd232710e9e368f29943fc820a0 Build.PL
+SHA1 b7f96118569e560bb2b5e382cf45d74e8956a708 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 44cffd827600a339690e10ac7a4dbc1012723916 MANIFEST
+SHA1 807ff5c10a647e9fba64696838f327fbadcdb244 META.json
+SHA1 7574603302c07f4fbc5b9dd8c7f900387045d44c META.yml
+SHA1 782afba116dbaf775da687184cc59fc575d36ee5 README
+SHA1 1b91dde6aff643f1228c6a85e34cf236548552e6 lib/Web/Components/Role/Email.pm
+SHA1 6c86bc33bf8af889e8df526c5e9eebb1d047a441 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
+SHA1 b355898d029fb1dbed81e485f082df16d82f5958 t/07podspelling.t
+SHA1 bca54645ec4b3c7e8430f5d91825168772868b24 t/10test_script.t
+SHA1 196585dd3abdd4c0cbae8bd2b60cb29f4bbbcaba t/boilerplate.pm
+SHA1 a8b447b99c696bfcf29e650c7805c70fd2d0916d t/root/attachment.txt
+SHA1 b4f83cb31fa216abb6008b75b30c3f213d0a020f t/root/templates/default/extended.tt
+SHA1 cdcd377532758267e1d8c9d4fc2bf4e18405ac1b t/root/templates/default/standard.tt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYwy+kAAoJEK492j4Im1BpLJMIAIFQHC94ERpoAXKl597yuQFa
+hvz6avoxbv55v9roqif1fiEFfSl11IQM7R71JCCslihfHvNMNcFNc9k80zkvM3R2
+mEHdLZ4UFsbzND3ectTMs6oFLiB6wPEIexlsarEFJSM/DiaGSMw9GsQpuAzpqs38
+COT7fhc3Mn0ARLrXWLEpV/H/J5YSSLz+ckIVCbjIkqjCJBmxejBgn0o9oHVR46B5
+Miks5JIjPhraRI7b3jjpwk5yA8Ce5bW00f1fwZCNFOQWbx2FdcHXBRysV4EuC84J
+GQWF0noVf0xhekkKFyHFbveRkMA4vKaX3Ikr7SLM5Hn/90a8UzG34LmdIkXexc8=
+=3ars
+-----END PGP SIGNATURE-----

@@ -1,0 +1,64 @@
+WWW::WCAP - Access to a WCAP-enabled calendar server
+
+COPYRIGHT:
+    Copyright (c) 2003 Nathan Bailey.  All rights reserved.
+ 
+LICENSE:
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 1, or (at
+    your option) any later version.
+
+LIMITATIONS:
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+DESCRIPTION:
+    See 'perldoc WWW::WCAP' for more details.
+
+*******************************************************************************
+STATUS:
+    This code should be considered very much as work-in-progress.  Any
+    part of this release could be subject to change.  'Modules list'
+    status is as follows:
+Name               DSLIP  Description                               Info
+-----------------  -----  ----------------------------------------- -----
+WWW::WCAP          adpOg  Access to a WCAP-enabled calendar server  NATE
+
+INSTALLATION:
+    WWW::WCAP uses the following modules/distributions.
+
+	LWP::UserAgent	 - required (for communicating WCAP with server)
+	Date::Calc	 - required (for parsing calendar entries)
+	Benchmark::Timer - optional (for tests)
+
+    First ensure the above modules/distributions are installed (perhaps
+    by using a command such as 'perl -e "use LWP::UserAgent; use \
+    Date::Calc; use Benchmark::Timer;"') then build/test/install WWW::WCAP
+    by doing:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    This module contains documentation on the object and its methods.
+    Once installed you can use the 'perldoc WWW::WCAP' command to
+    obtain the documentation.  This package also includes several
+    test scripts with example code.
+
+*******************************************************************************
+COMPATIBILITY:
+    This module was developed on Mac OS X 10.2.6, and has been tested on
+    Red Hat (v8) Linux (kernel 2.4)
+
+TODO:
+    Change to an object rather than procedural calls
+    Support all WCAP functions
+    Synchronise with other calendar servers and clients (e.g. CS&T,
+    Sunbird (Mozilla calendar), OS X iCal).
+
+BUGS:
+    Bug reports can be sent to the author via his CPAN address.

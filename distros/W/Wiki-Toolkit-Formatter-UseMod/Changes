@@ -1,0 +1,109 @@
+0.25
+        Add "escape_url_commas" option to allow people to choose whether or
+          not to escape commas in URLs to "%2C".  This is switched on by
+          default, to match existing behaviour.
+
+0.24    12 August 2012
+        Add new "external_link_class" option to ->new, for people who prefer
+        to style their external links with CSS.
+
+0.23    1 February 2009
+        Fix POD errors and add POD test (#46)
+
+0.22    18 April 2008
+        Add missing prerequisite of Wiki::Toolkit to aid automated testing.
+        Clean up test sqlite databases correctly
+
+0.21    12 April 2008
+        Made Test::MockObject optional.
+        Skip tests broken by Text::WikiFormat bug
+        (see http://www.wiki-toolkit.org/ticket/12)
+
+0.20    6 June 2006
+        Update copyright notice.
+        Fix bug with badly-formed internal links.
+
+0.19    27 April 2006
+        Rename to Wiki::Toolkit::Formatter::UseMod
+
+0.18    30 November 2004
+        Skip CGI::Wiki-requiring tests if CGI::Wiki not installed (thanks
+          to CPAN tester "nothingmuch" for failure report).
+
+0.17    26 November 2004
+        Removed debugging info accidentally left in last release.
+
+0.16    20 September 2004
+        Added the "pass_wiki_to_macros" flag to let you write more powerful
+          macros - see perldoc for details.
+        Exposed the ->format_link method - see perldoc for details.
+
+0.15    7 August 2004
+        Added very simple table support:
+        || foo || bar ||
+        || bax || quux ||
+        Tables are added with a class of "user_table" so you can manipulate
+          them in your stylesheet without affecting any other tables on
+          your site.
+
+0.14    9 July 2004
+        Allow subclassing to alter hyperlink appearance - see SUBCLASSING
+          in perldoc CGI::Wiki::Formatter::UseMod.
+
+0.13    4 June 2004
+        Leading ':' (which creates a definition list for an indent effect)
+          now has better HTML, plus adds a leading &nbsp; to allow blank
+          lines in the indented text.
+
+0.12    2 June 2004
+        Indentation now causes <pre>, as per the UseMod spec.
+
+0.11    20 November 2003
+        Added (experimental, advanced) "munge_node_name" parameter.
+
+0.10    20 October 2003
+        Fixed bug - ordered lists shouldn't require indent.
+
+0.09    22 September 2003
+        Changed the way we call Text::WikiFormat, to avoid <br / being
+          inserted all over the place.
+
+0.08    12 August 2003
+        Removed temporary tweak and upped Text::WikiFormat version prereq.
+        Added node_suffix and edit_suffix options for Shevek.
+
+0.07    4 August 2003
+        Added t/lists.t to MANIFEST, whoops.
+        Made a small tweak to overcome bug in Text::WikiFormat 0.7 - will
+          take it out when that's fixed (thanks to Sam Vilain for the fix).
+
+0.06    1 August 2003
+        Changes for compatibility with Text::WikiFormat 0.7 - we now have
+        nested lists!
+
+0.05    17 July 2003
+
+        **** INCOMPATIBLE CHANGE ****
+
+        URL munging is *not* now performed by default.  You need to pass
+        a "munge_urls" parameter to ->new in order for this to happen.
+
+        **** RELATED NOTE FOR PEOPLE WITH OPENGUIDES INSTALLS ****
+
+        Do *not* install this version of CGI::Wiki::Formatter::UseMod
+        unless you are using OpenGuides version 0.21 or later.
+
+0.04    14 May 2003
+        ->node_name_to_node_param method now takes notice of the
+        force_ucfirst_nodes attribute.
+
+0.03    28 April 2003
+        Subs in macros are now called with up to nine arguments.  I know this
+        is a bit arbitrary, but I now need it to support two arguments and I
+        might as well allow a few more while I'm at it.
+
+0.02    5 April 2003
+        Macros can now substitute the output of subs as well as plain strings.
+
+0.01    3 March 2003
+        Initial release.

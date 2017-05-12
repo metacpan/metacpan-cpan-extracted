@@ -1,0 +1,13 @@
+Changes                                  Change log
+MANIFEST                                 This file
+META.yml                                 Module meta-data
+Makefile.PL                              Generate Makefile
+README                                   Useful information
+examples/beatles.pl                      (Modified) example from SYNOPSIS
+examples/methods.pl                      List the API methods and parameters
+test_config.example                      Example test configuration
+lib/WWW/Grooveshark.pm                   Source for WWW::Grooveshark
+lib/WWW/Grooveshark/Response.pm          Source for WWW::Grooveshark::Response
+t/WWW-Grooveshark.t                      Test WWW::Grooveshark
+t/pod-coverage.t                         Test POD coverage
+t/pod.t                                  Test POD

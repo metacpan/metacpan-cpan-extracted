@@ -1,0 +1,39 @@
+Win32API::GUID - Perl extension for creating GUID.
+
+/*
+   Description
+*/
+
+Win32API::GUID module provides very simple interface to Windows CoCreateGuid() 
+function and returns a string representation of newly generated GUID.
+
+Win32API::GUID contains the single function CreateGuid() that returns new GUID 
+every time it is called.
+
+/*
+   Installation
+*/
+
+Under Windows you likely will use 'nmake' instead of 'make'. When using Visual Studio 
+run the following commands from its native command prompt (accessible at
+Start->All Programs->Microsoft Visual Studio .NET->Visual Studio .NET Tools->Visual Studio .NET Command Prompt).
+
+perl Makefile.PL
+nmake
+nmake test
+nmake install
+
+/*
+   Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+   Copyright
+*/
+
+Win32API::GUID modude is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl.

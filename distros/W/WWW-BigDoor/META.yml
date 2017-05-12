@@ -1,0 +1,71 @@
+---
+abstract: "provides a perl interface for BigDoor's REST API."
+author:
+  - 'Alex L. Demidov <alexeydemidov@gmail.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-BigDoor
+provides:
+  WWW::BigDoor:
+    file: lib/WWW/BigDoor.pm
+    version: v0.1.1
+  WWW::BigDoor::Attribute:
+    file: lib/WWW/BigDoor/Attribute.pm
+  WWW::BigDoor::Award:
+    file: lib/WWW/BigDoor/Award.pm
+  WWW::BigDoor::Currency:
+    file: lib/WWW/BigDoor/Currency.pm
+  WWW::BigDoor::CurrencyBalance:
+    file: lib/WWW/BigDoor/CurrencyBalance.pm
+  WWW::BigDoor::CurrencyType:
+    file: lib/WWW/BigDoor/CurrencyType.pm
+  WWW::BigDoor::EndUser:
+    file: lib/WWW/BigDoor/EndUser.pm
+  WWW::BigDoor::Good:
+    file: lib/WWW/BigDoor/Good.pm
+  WWW::BigDoor::Leaderboard:
+    file: lib/WWW/BigDoor/Leaderboard.pm
+  WWW::BigDoor::Level:
+    file: lib/WWW/BigDoor/Level.pm
+  WWW::BigDoor::NamedAward:
+    file: lib/WWW/BigDoor/NamedAward.pm
+  WWW::BigDoor::NamedAwardCollection:
+    file: lib/WWW/BigDoor/NamedAwardCollection.pm
+  WWW::BigDoor::NamedGood:
+    file: lib/WWW/BigDoor/NamedGood.pm
+  WWW::BigDoor::NamedGoodCollection:
+    file: lib/WWW/BigDoor/NamedGoodCollection.pm
+  WWW::BigDoor::NamedLevel:
+    file: lib/WWW/BigDoor/NamedLevel.pm
+  WWW::BigDoor::NamedLevelCollection:
+    file: lib/WWW/BigDoor/NamedLevelCollection.pm
+  WWW::BigDoor::NamedTransaction:
+    file: lib/WWW/BigDoor/NamedTransaction.pm
+  WWW::BigDoor::NamedTransactionGroup:
+    file: lib/WWW/BigDoor/NamedTransactionGroup.pm
+  WWW::BigDoor::Profile:
+    file: lib/WWW/BigDoor/Profile.pm
+  WWW::BigDoor::Resource:
+    file: lib/WWW/BigDoor/Resource.pm
+  WWW::BigDoor::URL:
+    file: lib/WWW/BigDoor/URL.pm
+requires:
+  Class::Accessor: 0
+  Digest::SHA: 0
+  File::Slurp: 0
+  Hook::LexWrap: 0
+  JSON: 0
+  REST::Client: 0
+  Test::MockModule: 0
+  Test::MockObject: 0
+  Test::Most: 0
+  Test::NoWarnings: 0
+  URI: 0
+  UUID::Tiny: 0
+  version: 0
+version: v0.1.1

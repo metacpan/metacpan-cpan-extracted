@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               WordPress-CLI
+version:            1.04
+abstract:           command line access to wordpress
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Manip:          5.48
+    Getopt::Std::Strict:  1.01
+    LEOCHARRE::Strings:   1.02
+    Smart::Comments:      0
+    String::ShellQuote:   0
+    Test::Simple:         0
+    WordPress::XMLRPC:    1.23
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,313 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Method" -%]
+
+require_once 'PEAR.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Base class for method" -%]
+class [% package_name %]_Method
+{
+    /**
+     * Factory object
+     * 
+     * @access protected
+     * @var object
+     */
+    var $fac;
+    
+    /**
+     * Request object
+     *
+     * @access private
+     * @var object
+     */
+    var $_request = null;
+
+    /**
+     * Response object
+     *
+     * @access private
+     * @var object
+     */
+    var $_response = null;
+
+    /**
+     * Constructor
+     * 
+     * @param object $fac Factory object
+     */
+    function [% package_name %]_Method(&$fac)
+    {
+        $this->fac =& $fac;
+    }
+    
+    /**
+     * Returns the request object
+     *
+     * @access public
+     * @return object request object
+     */
+    function getRequest()
+    {
+        return $this->_request;
+    }
+    
+    /**
+     * Returns the response object
+     *
+     * @access public
+     * @return object response object
+     */
+    function getResponse()
+    {
+        return $this->_response;
+    }
+    
+    /**
+     * Returns the request data
+     *
+     * @access public
+     * @return object response data
+     */
+    function getData()
+    {
+        return is_null($this->_response) ? null : $this->_response->getData();
+    }
+
+    /**
+     * Returns the URL (must override in subclass)
+     * 
+     * @access public
+     * @return string URL
+     */
+    function getUrl()
+    {
+        return null;
+    }
+
+    /**
+     * Returns request method
+     * 
+     * @access public
+     * @return string request method
+     */
+    function getRequestMethod()
+    {
+        return 'GET';
+    }
+
+    /**
+     * Returns the conf of parameters
+     * 
+     * @access public
+     * @return array conf
+     */
+    function getParamsConf()
+    {
+        return array();
+    }
+    
+    /**
+     * Return the conf of respoonse
+     * 
+     * @access public
+     * @return array conf
+     */
+    function getResponseConf()
+    {
+        return array();
+    }
+    
+    /**
+     * Filter parameters
+     * 
+     * @access public
+     * @param array $params parameters
+     * @return array result
+     */
+    function filterParams($params)
+    {
+        $conf = $this->getParamsConf();
+        if (!$conf) {
+            return $params;
+        }
+    
+        $result = array();
+        
+        if (array_key_exists('keys', $conf) && $conf['keys']) {
+            foreach ($conf['keys'] as $key) {
+                if (array_key_exists($key, $params)) {
+                    $result[$key] = $params[$key];
+                }
+            }
+        } else {
+            $result = $params;
+        }
+        
+        if (array_key_exists('defaults', $conf) && $conf['defaults']) {
+            foreach ($conf['defaults'] as $key => $val) {
+                if (!array_key_exists($key, $params)) {
+                    $result[$key] = $val;
+                }
+            }
+        }
+        
+        if (array_key_exists('fixed', $conf) && $conf['fixed']) {
+            foreach ($conf['fixed'] as $key => $val) {
+                $result[$key] = $val;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Validate parameters
+     * 
+     * @access public
+     * @param array $params parameters
+     * @return array result or false
+     */
+    function validateParams($params)
+    {
+        $conf = $this->getParamsConf();
+        if (!$conf && $conf['notnull']) {
+            return false;
+        }
+    
+        $result = array();
+
+        $notnull = array();
+        foreach ($conf['notnull'] as $key) {
+            if (!$params[$key]) {
+                $notnull[] = $key;
+            }
+        }
+        if ($notnull) {
+            $result[] = "empty parameters - " . implode(' ', $notnull);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Returns true if response data is error
+     *
+     * @access public
+     * @return bool true if response data is error, or false
+     */
+    function isError()
+    {
+        if (!is_null($this->_request) && is_null($this->getData())) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns error message
+     *
+     * @access public
+     * @return string error message
+     */
+    function getErrorMessage()
+    {
+        return $this->isError() ? 'Unknown error' : 'No error';
+    }
+    
+    /**
+     * Returns total entries
+     *
+     * @access public
+     * @return int total entries
+     */
+    function getTotalEntries()
+    {
+        return 0;
+    }
+    
+    /**
+     * Returns entries per page
+     *
+     * @access public
+     * @return int entries per page
+     */
+    function getEntriesPerPage()
+    {
+        return 0;
+    }
+    
+    /**
+     * Returns current page
+     *
+     * @access public
+     * @return int current page
+     */
+    function getCurrentPage()
+    {
+        return 0;
+    }
+    
+    /**
+     * Returns page params
+     *
+     * @access public
+     * @param int $page page num
+     * @param int $size entries per page
+     * @param array $params parameters
+     * @return array parameters that page params was set
+     */
+    function getPageParam($page = null, $size = null, $params = null)
+    {
+        if (is_null($params)) {
+            $params = array();
+        }
+        return $params;
+    }
+    
+    /**
+     * Execute the method
+     *
+     * @access public
+     * @param array $params parameters
+     * @return object [% package_name %]_Response
+     */
+    function &execute($params)
+    {
+        $params = $this->filterParams($params);
+    
+        if ($validate = $this->validateParams($params)) {
+            return PEAR::raiseError('ValidateError: ' . print_r($validate, true));
+        }
+        
+        $this->_request =& $this->fac->createRequest($this);
+        $this->_request->setUrl($this->getUrl());
+        $this->_request->setRequestMethod($this->getRequestMethod());
+        $conf = $this->getResponseConf();
+        if (array_key_exists('error_status', $conf)) {
+            foreach ($conf['error_status'] as $statusCode) {
+                $this->_request->ignoreStatusCode($statusCode);
+            }
+        }
+        $this->_request->addParams($params);
+        
+        $res =& $this->_request->send();
+        if (PEAR::isError($res)) {
+            return $res;
+        }
+        $this->_response =& $res;
+        
+        $status = $res->processData($this->getResponseConf());
+        if (PEAR::isError($status)) {
+            return $status;
+        }
+        
+        if ($this->isError()) {
+            return PEAR::raiseError($this->getErrorMessage());
+        }
+        
+        return $res;
+    }
+}
+
+?>

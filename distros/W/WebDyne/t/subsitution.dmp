@@ -1,0 +1,75 @@
+<html lang="en-US"> @0
+  <head> @0.0
+    <title> @0.0.0
+      "Untitled Document"
+  <body> @0.1
+    <p> @0.1.0
+      "Hello World 0 Hello World 0"
+    <p> @0.1.1
+      "Hello World 1 Hello World 1"
+    <p> @0.1.2
+      "Hello World 2"
+    <p> @0.1.3
+      "Hello World 2"
+    <p> @0.1.4
+      "Hello World 2"
+    <p> @0.1.5
+    <form action="" enctype="application/x-www-form-urlencoded" method="post"> @0.1.6
+      <select name="popup_array"> @0.1.6.0
+        <option value="red"> @0.1.6.0.0
+          "red"
+        <option value="blue"> @0.1.6.0.1
+          "blue"
+      <p> @0.1.6.1
+        <select name="popup_array"> @0.1.6.1.0
+          <option value="red"> @0.1.6.1.0.0
+            "red"
+          <option value="blue"> @0.1.6.1.0.1
+            "blue"
+      <p> @0.1.6.2
+        <select name="popup_hash"> @0.1.6.2.0
+          <option value="red"> @0.1.6.2.0.0
+            "Red"
+          <option value="blue"> @0.1.6.2.0.1
+            "Blue"
+          <option value="green"> @0.1.6.2.0.2
+            "Green"
+      <p> @0.1.6.3
+        <select name="popup_hash"> @0.1.6.3.0
+          <option value="red"> @0.1.6.3.0.0
+            "Red"
+          <option value="blue"> @0.1.6.3.0.1
+            "Blue"
+          <option value="green"> @0.1.6.3.0.2
+            "Green"
+      <p> @0.1.6.4
+        <select name=""> @0.1.6.4.0
+          <option value="green"> @0.1.6.4.0.0
+            "green"
+          <option value="red"> @0.1.6.4.0.1
+            "red"
+      <p> @0.1.6.5
+        <select name="popup0"> @0.1.6.5.0
+          <option value="red"> @0.1.6.5.0.0
+            "red"
+          <option value="blue"> @0.1.6.5.0.1
+            "blue"
+      <p> @0.1.6.6
+        <select name="popup1"> @0.1.6.6.0
+          <option value="blue"> @0.1.6.6.0.0
+            "Blue"
+          <option value="red"> @0.1.6.6.0.1
+            "Red"
+      <p> @0.1.6.7
+        "i 0"
+      <p> @0.1.6.8
+        "i 1"
+      <p> @0.1.6.9
+        "i 2"
+      <input name="foo=bar;car=1;dar=dar" type="submit" value="foo=bar;car=1;dar=dar" /> @0.1.6.10
+      <input name="i=1;dar=dar" type="submit" value="i=1;dar=dar" /> @0.1.6.11
+      <input name="foo=bar&amp;car=1&amp;dar=dar" type="submit" value="foo=bar&amp;car=1&amp;dar=dar" /> @0.1.6.12
+      <input name="i=1&amp;dar=dar" type="submit" value="i=1&amp;dar=dar" /> @0.1.6.13
+      <input name="1=1&amp;dar=dar" type="submit" value="1=1&amp;dar=dar" /> @0.1.6.14
+      <input name="GEFK" type="submit" value="GEFK" /> @0.1.6.15
+      "Text GEFK dar"

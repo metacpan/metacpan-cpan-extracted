@@ -1,0 +1,27 @@
+This is Perl module WWW::Shorten::Durl.
+
+INSTALLATION
+
+WWW::Shorten::Durl installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan WWW::Shorten::Durl
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+WWW::Shorten::Durl documentation is available as in POD. So you can do:
+
+    % perldoc WWW::Shorten::Durl
+
+to read the documentation online with your favorite pager.
+
+JEEN

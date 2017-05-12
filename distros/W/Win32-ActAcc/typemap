@@ -1,0 +1,33 @@
+# Copyright 2000-2003, Phill Wolf.  See README.
+# 
+# Win32::ActAcc (Active Accessibility)
+
+HWND	T_HWND
+ActAcc *	T_PTRACTACC
+EventMonitor * T_EVENTMONITOR
+#############################################################################
+INPUT
+T_HWND
+	$var = ($type)SvUV($arg)
+T_PTRACTACC
+	if (sv_derived_from($arg, \"Win32::ActAcc::AO\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(ActAccPtr,tmp);
+	}
+	else
+	    croak(\"$var is not of type Win32::ActAcc::AO\")
+T_EVENTMONITOR
+	if (sv_derived_from($arg, \"Win32::ActAcc::EventMonitor\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR(EventMonitorPtr,tmp);
+	}
+	else
+	    croak(\"$var is not of type Win32::ActAcc::EventMonitor\")
+#############################################################################
+OUTPUT
+T_HWND
+	sv_setiv($arg, (UV)$var);
+T_PTRACTACC
+	sv_setref_pv($arg, \"Win32::ActAcc::AO\", (void*)$var);
+T_EVENTMONITOR
+	sv_setref_pv($arg, \"Win32::ActAcc::EventMonitor\", (void*)$var);

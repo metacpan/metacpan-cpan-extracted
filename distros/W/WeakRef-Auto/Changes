@@ -1,0 +1,9 @@
+Revision history for Perl extension WeakRef::Auto
+
+0.02 Mon Feb 16 12:50:29 2009
+	- warn autoweaken($tied_scalar) since it doesn't work
+	- fix typo in the document
+	- add tests
+
+0.01 Tue Dec 23 22:30:33 2008
+	- original version; created by Module::Setup

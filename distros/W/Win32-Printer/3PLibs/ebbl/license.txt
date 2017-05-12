@@ -1,0 +1,44 @@
+Non-Commercial License
+
+"ebbl 1.1" License
+Author / Licensor: Edgars Binans
+Copyright (C) 2003-2004 Edgars Binans.
+All Rights Reserved.
+
+--------------------------------------------------------------------------------
+  This License covers software Library "ebbl 1.1" later referred as "Library".
+  By using or distributing Library You become a legal Licensee of the library.
+  Each Licensee is addressed as "You". "Original package" means the set of files
+originally provided by Author/Licensor.
+--------------------------------------------------------------------------------
+
+1. You  may  use  or  redistribute this Library or any software that directly or
+indirectly  uses  any  part  of  this  Library  free of charge only for personal
+non-profit purposes.
+
+2. You  may not add any permissions or restrictions to this License, however You
+may  add  Your own separate license to Your software, that does not violate this
+License.
+
+3. You  may  not  alter  the  original  distribution package of this Library for
+redistribution.
+
+4. You  may  not  change  the  files  contained  in  the original package of this
+Library,  except  if  permissions  to  do  so  are  documented  in  the  original
+documentation  of  the  Library;  This  restriction does not apply to the changes
+made by the Library itself;
+
+5. Any  software  that  directly or indirectly uses any part of this Library must
+carry  proper copyright notices, this License and information where to obtain the
+original  package of this Library; User of such software becomes the user of this
+Library;  Author  or  licensor  of  such  software must inform the end-user about
+terms  and  conditions  of  this  License  and that end-user must agree with this
+License to use the software.
+
+NO WARRANTY
+
+6. BECAUSE  THE LIBRARY  IS  LICENSED  FREE  OF  CHARGE, THERE IS NO WARRANTY FOR
+THE  LIBRARY.  THE  LIBRARY  IS  PROVIDED  "AS IS"  WITHOUT WARRANTY OF ANY KIND,
+EITHER  EXPRESSED  OR  IMPLIED. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+OF  THE  LIBRARY  IS WITH YOU. SHOULD THE LIBRARY PROVE DEFECTIVE, YOU ASSUME THE
+COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.

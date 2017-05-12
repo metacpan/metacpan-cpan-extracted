@@ -1,0 +1,1658 @@
+Revision history for WWW::Myspace
+
+0.92    2009-01-29
+        - Fixed get_inbox 'sender' field again;  was returning undef due to a
+          couple of Myspace HTML changes made since 2008-12-05
+        - Fixed post_blog, which had stopped working after Myspace added new
+          JavaScript to the blog editor (RT#41844)
+        - Fixed friend_url;  was returning 'undef' for some profiles due to
+          Myspace HTML changes
+
+0.91    2008-11-20
+        - Fixed approve_friend_requests which was no longer working as a result
+          of Myspace changes (RT#41074, patch from David Moreno Garza)
+        - Example script samples/approve_friends also fixed by the above change
+
+0.90    2008-11-15
+        - Fixed a new problem in get_inbox and read_message, which were no
+          longer returning the message sender's name or ID due to Myspace
+          changes probably made on 2008-11-15
+
+0.89    2008-11-14
+        - This release replaces a dud re-release of 0.88 made earlier today
+          which had some of the following enhancements but the version
+          number had not been increased
+        - Fixed a problem with get_inbox whereby no messages were returned
+          unless the inbox held more than one page of messages (more than 10
+          messages)
+        - Fixed post_comment, broken by recent Myspace changes
+        - Altered CAPTCHA handling in post_comment such that the configured
+          handler (if any) is now called repeatedly if CAPTCHA responses are
+          rejected
+
+0.88    2008-10-01
+        - Fixed is_band to correctly detect music profiles, which broke due to
+          Myspace changes around 2008-09-30;  this was also causing
+          get_basic_info to fail to work with music profiles
+        - Fixed get_basic_info to return correct timestamps in 'lastlogin'
+          field, both for personal and music profiles
+        - New tests in t/17-get_basic_info.t check that that get_basic_info
+          returns a sensible 'lastlogin' timestamp for personal and music
+          profiles, and a sensible 'profileviews' for a band profile
+        - New tests in t/22-search_music.t check that multiple results pages
+          are read, and that spaces in search terms are properly escaped
+
+0.87    2008-09-12
+        - New method captcha_handler allows a user-defined function to provide
+          captcha responses directly
+        - For backward-compatibility, setting captcha_killer_api_key will
+          automatically enable the built-in Captcha Killer handler
+        - Fixed send_friend_request to submit CAPTCHA responses correctly
+        - Fixed send_message to submit CAPTCHA responses correctly
+        - Fixed post_comment to submit CAPTCHA responses correctly
+        - Fixed the login mechanism to return an error upon a failed login
+          attempt.  An invalid username/password should also now return the
+          appropriate error message.
+        - Added to the documentation of the 'new' method (the constructor) a way
+          to detect an invalid username/password error within a script
+        - Restored the t/11-badlogin.t test
+
+0.86    2008-09-10
+        - Fixed get_friends;  in most cases the method would only have worked
+          the first time it was executed (fixed RT#38716)
+        - Created new tests t/21-get-friends.t for get_friends method
+        - Fixed submit_form flaw;  fields_ref entries were not being submitted
+          where a form input of the same name existed but with the disabled
+          attribute set
+        - Fixed search_music;  searching by keywords was not working due to the
+          above flaw in submit_form, and the method was looking for search
+          results beyond the last page.  Also now croaks if given a parameter
+          which is not a hash ref.
+        - Created new tests t/22-search-music.t for search_music method
+        - Added to send_message documentation a note about line endings and
+          accounts which disable HTML in incoming messages
+
+0.85    2008-08-23
+        - Fixed get_inbox;  method was always returning zero messages due to
+          changes around 2008-08-20 (RT#38639)
+
+0.84    2008-08-16
+        - Fixed last_login to ignore a supplied 'undef' parameter (RT#38457)
+        - Fixed problems in test script t/01-login.t which caused that script to
+          abort without running all tests;  there was inadequate error checking
+          when opening a data file, and the file t/login-forms/latest.html was
+          missing from the MANIFEST in the 0.83 release
+
+0.83    2008-08-15
+        - Fixed send_message, broken by Myspace changes 2008-08-15 (RT#38494)
+        - Fixed send_friend_request, broken by Myspace changes (RT#38385)
+          of Myspace changes
+        - Fixed friends_from_profile;  function was returning friends from
+          the logged-in account, instead of the profile specified (RT#37057)
+        - Removed example documenting the use of the "exclude" option
+          from friends_from_profile method.  This option relied on the
+          "exclude" option in get_friends, which was removed during the
+          re-write of get_friends_on_page in version 0.62.
+        - Fixed get_basic_info
+        - Fixed friend_user_name
+        - Fixed last_login
+        - Fixed last_login_ymd
+        - read_message now cleans the 'gauntlet_tokenizer_reserved' attribute
+          from HTML tags in received messages
+        - Disabled cool_new_people function and tests because the feature has
+          been replaced by Myspace with a similar feature on the homepage;  this
+          may be supported in the future
+        - It should be no longer necessary to change an account's language/
+          location to English/United States;  this is now handled automatically
+          without changing your account settings directly (currently by 
+          modifying the MSCulture cookie)
+        - Much functionality previously worked with language/location set to
+          English/United Kingdom, until changes on 2008-07-18 which broke
+          messaging functions.  That is fixed in this release by way of the
+          change mentioned above
+        - Send Accept-Language HTTP header in anticipation of Myspace one day
+          respecting it when guessing the visitor's language preference
+        - Added a file 'mechanize.patch' which can be used to stop warnings
+          generated by WWW::Mechanize -- refer to KNOWN ISSUES section of the
+          module's documentation for more details
+
+0.82    2008-06-19
+        - New login method adapts to recent changes in Myspace login form;
+          hopefully this will be more robust against future changes
+        - send_message method correctly reporting CAPTCHA responses as 'FC'
+          again;  has recently been wrongly reporting as network failure ('FN')
+        - find_friend adapted to recent changes in Myspace 'People' search
+        - Tests requiring network access in t/01-login.t are now skipped if it
+          appears network access is unavailable
+        - META.yml now declares that WWW::Myspace is licensed under the same
+          conditions as Perl (as was previously documented in the README)
+        - New dependency:  URI::Encode
+
+0.81    2008-06-14
+        - Updated login method to adapt to recent changes in Myspace login form
+        - Minor edits to POD entry for friends_in_group method, to stop
+          podchecker warnings, and a warning when viewing the WWW::Myspace(3)
+          man page generated from it
+
+0.80    2008-05-24
+        - Applied patch from RT#35703 by steven [...] pyro.eu.org
+        - Applied patch from RT#35702 by steven [...] pyro.eu.org
+        - Applied patch from RT#36100 by steven [...] pyro.eu.org
+
+0.79    2008-04-30
+        - Updated get_friends method to work with current myspace paging system.
+        - get_comments now returns the sender's profile "name" in
+          $comments->{'sendername'}.
+        - get_comments sample script displays $comments->{'sendername'}.
+        - Updated get_comments to properly display comment after myspace
+          format change (was displaying a "span" tag around the comment).
+        - Updated get_inbox to use current myspace form values and to
+          work more robustly with changes in the form values.  This
+          fixes a bug that caused get_inbox to return only the first
+          page of messages.
+        - Added sendername to get_inbox sample script output.
+
+0.78    2008-04-14
+        - Applied patch from RT#34921 by steven [...] pyro.eu.org,
+          fixes post_comment and send_message methods to work with current
+          myspace forms.
+
+0.77    2008-04-11
+        - MAINTENANCE RELEASE NOTE:
+          Several methods are still not working due
+          to changes in myspace forms.  As such, the tests will probably fail.
+          Do a "force install" - this version is at least better than what
+          you have now. :)
+          PLEASE SUBMIT PATCHES if you are able as we (the developers) really
+          busy at the moment and I'm not sure when we'll be able to go through
+          and update things.
+          Only through the group effort that is the strength of open source
+          programming can this module evolve as quickly as a site as dynamic
+          as Myspace.
+          Thanks! - Grant
+
+        - send_friend_request now takes either a single message as a string,
+          or an arrayref of messages for the value of $message.  If passed an
+          arrayref, send_friend_request will pick one of the messages at random
+          to include with the friend request.
+        - Applied patch by steven [...] pyro.eu.org that fixes login form
+          change 4/11/08
+
+0.76    2008-04-11
+        - Bad release - patch not applied due to svn problems.
+
+0.75    2008-01-17
+        - Removed badly programmed "die" statement that could cause the module to
+          die if an invalid argument was passed to certain methods.  Now sets error
+          and returns undef as is standard practice throughout the module.
+        - read_message now returns the URL to the message in the message hashref.
+        - Corrected documentation for reply_message.
+        - get_inbox now accepts a "page_no" argument, useful for stepping through
+          and processing messages.
+        - send_message now correctly returns "FI" when it encounters an invalid
+          friendID.  Previously it would return "FL" because it couldn't find the
+          link on the page.
+        - get_inbox now returns the full name of the sender in the message hash
+        - added a subroutine called search_friend_list() that allows you to search
+          for a friend by name.
+        - Fixed bug in _get_friend_id that could cause it to fail under the new "skin".
+        - search_friend_list and find_friend now return with an error if called without
+          arguments.
+        - Fixed "find_friend" method broken by change in myspace code.
+        - got rid of $FRIEND_REGEXP in favor of %regex's friend_link.
+          fixed subroutines that used $FRIEND_REGEXP
+        - removed excessive references to veeRob in comments
+        - changed get_friends_on_page() to use regex very similar to friend_link
+        - changed _get_friend_id() to use %regex's friend_link instead of inline regex 
+        - Added get_friends_images_on_page method.
+        - send_friend_request now accepts a message argument and works with the
+          Add Friend form changed by myspace on 1/25/08.
+
+
+0.74    2007-11-20
+        - Implemented workaround submitted by William in RT issue#30762 - stops
+          get_inbox from hanging on Linux.
+        - Fixed regex used to get Subject line to fix an issue in which
+          a subject line containing an HTML tag would be cut short.
+        - Fixed bug in get_comments that would cause a stream of "uninitialized value"
+          errors.
+        - Fixed a bug in which get_comments would skip the rest of the comments on
+          the page when it reached "last_comment", but continue reading the rest of the
+          comment pages.
+
+0.73    2007-11-13
+        - Updated last_login regex to be more sturdy.
+        - Updated get_profile to use long form of URL when passed a friend_id.
+          This works around a myspace bug that causes a stream of "302 Found" errors
+          when accessing certain profiles.
+        - WARNING: POSSIBLE BACKWARD COMPATIBILITY BREAKAGE.
+          send_friend_request now returns "FU" (Failed, User's settings require
+          you to enter a CAPTCHA to add them as a friend).  This might break your scripts
+          if you're checking for "FC", as some CAPTCHAs will now be "FU" instead.
+          Be sure to check for FC and FU if you're looking for CAPTCHAs.
+          For the record, I picked the code as "Failed, User", but since they're requiring
+          you to enter an annoying captcha code, I think it sounds like they're really
+          saying "FU" anyway, don't you?
+        - Fixed bug in get_birthdays that would cause an error stating "Can't
+          'last' outside a loop block" if more than 5 pages were read.
+        - get_birthdays now safety-exists after 10 pages instead of 5 (this exit
+          is solely to prevent endless loops).
+        - Fixed get_comments, broken by myspace change.
+        - get_comments will now retrieve the logged-in user's comments if no friendID
+          is passed.
+        - send_friend_request now retries captcha 5 times if it guesses it incorrectly,
+          and will properly return "FC" or "FU" instead of "F" if it can't guess correctly.
+        - Added expire time and total attempts count ("attempt 1 of x") to captcha handling
+          output.
+        - get_comments now accepts a hash of options including the new "last_comment_time"
+          argument.
+        - get_comments now returns up to 100 pages (5000 comments) of comments instead of
+          50.
+        - Fixed read_message - body RE broken by myspace change.
+        - get_comments now returns comment_id also.
+        - get_comments accepts "last_comment" argument.
+
+0.72    2007-10-10
+        - Fixed a bug that would cause get_birthdays to enter an endless loop.
+        - Fixed form name in get_birthdays due to change on myspace.
+        - get_photo_ids now errors properly if called when not logged in,
+          even if a friend_id is passed.
+        - Test 14-photos.t now skips both tests if not logged in.
+        - Added get_birthdays and get_basic_info sample scripts
+        - Added bail out to tests in case WWW::Myspace doesn't compile for some reason.
+        - Renamed sample_scripts -> samples for
+          http://cpants.perl.org/kwalitee/WWW-Myspace
+        - Added use warnings and use strict to Myspace.pm, Comment.pm, FriendRequest.pm,
+          Message.pm, MyBase, Promoter. (not sure how those got left out...?)
+        - Updated MANIFEST
+        - Added Catpcha Killer patch from rt#29773
+        - Fixed login method.  Broken by change in "Home" link handling on myspace.
+        - Disabled friend_count test in 01-login.t.
+        - Updated post_comment verification REs; Fixes post_comment method.
+        - Fixed button target handling in send_message; Fixes send_message.
+        - Fixed post_bulletin broken by recent myspace change.
+        - Fixed find_friend URL lookup broken by myspace change.
+
+0.71    2007-09-18
+        - MAINTENANCE RELEASE:
+          This release handles the myspace login form change 9/17/07.
+          post_comment and send_message are failing tests.
+          Other changes in this release are as listed below.
+        - Added end_page and end_msg options to get_inbox.
+        - Updated 05-message test to use get_inbox (instead of inbox)
+          and to use end_page option for speed.
+        - Fixed paging in get_inbox - was only getting the 1st page.
+        - Created test_next_button sample script to ease testing of _next_button
+          method across different paging methods (get_friends, get_inbox, etc).
+        - Updated login method to check for button names Myspace switches between.
+        - get_profile can now take a friend_id or friend_url
+        - Updated _try_login method broken by change in login form 9/17/07.
+        - Updated "View All Friends" URL to account for myspace change.
+          Fixes get_friends.
+        - Updated field names in post_comment due to myspace change.
+        - Updated set_default_photo to work with new button on photo page.
+        - Updated RE used in $FRIEND_REGEXP to include "&amp;" (fixes
+          get_friends_on_page and all other get_friends-style methods).
+        - Removed outdated get_friends_on_page code.
+
+0.70    2007-08-16
+        - Updated captcha handling to stop trying when "FAILURE" is returned by
+          captchakiller.com.
+        - Fixed 0.69 release date.
+        - Added "o" to end of REs in captcha handling routine for efficiency.
+        - Fixed name of login button due to myspace change 8/15/07.
+        - Fixed 19-find_friend.t "skip" warning message.
+        - Updated read_message to work with changed myspace code.
+        - Updated last_login sample script to report error on failure.
+        - Updated last_login method to use Time::ParseDate to better handle
+          UK dates.
+
+0.69    2007-08-14
+        - Added get_real_name sample script
+        - Updated Known Issues in Myspace.pm docs to mention that location
+          must be United States or other location that uses English with
+          month/day/year dates.
+        - Added CAPTCHA Killer patch and updated coding and placement.
+          Currently only handles captcha for send_friend_request.
+        - last_login now sets $myspace->error if it gets an error while
+          parsing the date.
+        - Fixed friend_id test in 01-login to check for friendID passed in a URL
+          as the test comments state.
+        - Added is_comedy method.
+        - get_basic_info now returns undef if it can't match its main regex on the
+          profile page (as will happen on band pages).
+        - get_real_name now only checks from the top of the profile to the "top friends"
+          section to avoid conflicts in the friend names and comments.
+        - get_real_name now properly returns the capitalized name.
+        - is_private now deals with private profiles which don't appear to 
+          have any content
+        - updated friend_id regex to return friend_id on private profiles
+        - Added find_friend method which takes an email address and returns any
+          matching friendIDs.
+        - Added find_friend sample script in sample_scripts
+        - Added 19-find_friend.t test.
+        - updated get_friends to correctly handle profiles with no friends
+          at all (not even Tom)
+        - find_friend now returns friends as a list even if there is only one.
+        - added get_profile_type to for an easy check on type of profile
+        - added tests for get_profile_type in t/01-login.t
+        - fixed get_basic_info (also for band profiles!) and related tests in
+          t/17-get_basic_info.t
+        - fixed comment_count to detect profiles without any comments (eg 76772500),
+          also updated test t/15-profile_views.t
+        - Cleaned up code in captcha handling methods.
+        - Changed temporary file used by _handle_captcha to $self->cache_dir/captcha$$.
+        - Added (untested) captcha handling to post_comment
+        - Removed obsolete "_get_friends" method.
+        - send_friend_request method now returns "FE" status if "user has exceeded
+          daily useage" message is encountered (their spelling error, not mine :)
+        - added "sleep 2" in captcha handling to improve chances of positive match.
+        - is_private now returns 0 rather than undef if the profile does not
+          appear to be private
+        - post_comment now properly returns status code and description in all cases.
+        - send_message now properly returns status code and description in all cases.
+        - Added get_birthdays method.
+        - Added get_birthdays test to 01-login.t
+        - fixed get_comments so that it won't break if a comment contains a form of its
+          own (e.g. page 4 on 18087140)
+        - Applied patch to fix delete_message (Thanks Steven!) from RT issue#28561.
+        - Re-enabled delete_message tests.
+        - Renamed "inbox" to "get_inbox", added "inbox" convenience method for
+          backwards-compatibility.
+        - Removed outdated comments in code before get_friends method.
+        - Disabled delete_message test - still failing.
+        - Added warning message to delete_message but kept method operational.
+        - Fixed bug in friend_request that would cause it to always return FN if
+          there was no form on the page, instead of returning the proper status code.
+        - Moved "captcha_result" initialization closer to top of send_friend_request method.
+        - Fixed a bug where a public, pimped profile with no friends was 
+           returning as "private".
+        - Fixed friend_url regex and moved it to the _apply_regex method.
+        - Added "captcha_tries" accessor method to allow user to change number
+          of attempts at retrieving the captcha from captchakiller.com
+        - Fixed RE for New Photo Comments indicator in get_notifications (Myspace
+          changed from "New Image Comments!" to "New Photo Comments!").
+        - If there are new image comments, get_notifications now reports
+          "New Photo Comments!" instead of "New Image Comments!" to match myspace's
+          output.  Be aware of that if your script is interpreting that output
+          instead of just displaying it.
+        - Added captcha_tries to list of allowed options.
+        - Fixed get_real_name test.
+
+0.68    2007-07-06
+        - Updated post_bulletin method to work with changed myspace forms.
+        - Added 25-30 second random sleep after each group of 25 group invitations
+          is sent in send_group_invitation.
+        - Humanized send_friend_request method (gets profile, clicks "add to friends"
+          button). Added FL return code if button not found on profile page.
+          Updated status codes in docs.
+        - Added "fulltests" config parameter to developer test_config file
+          documentation in README.
+        - Updated bulletin and blog tests to use new "fulltest" config item.
+          If set to 1, blog and bulletin tests will do a full post instead of
+          stopping short of the final confirmation.
+        - Updated prerequisite list to require Locale::SubCountry 1.38
+        - Disabled "use WWW::Myspace::FriendAdder" in 10-myspace test to prevent
+          errors on systems without it installed.
+        - Moved last_login_ymd method to right beneath last_login method for clarity.
+        - Added warning to test for last_login to report if an error occurred to help
+          track down mysterious failure in CPAN testing.
+        - Added additional error message to last_login if the regex isn't found on
+          the profile page.
+        - Moved Locale::Subcountry to an eval statement within cool_new_people to
+          stop warnings when it's loaded.
+        - Added get_real_name method that tries to get the user's real name from their
+          profile page if they say "my real name is ___" or similar.
+        - Added test 17-get_basic_info.t to MANIFEST.
+        - Added test 18-get_real_name.t to distribution and MANIFEST.
+        - Updated internal profile page validation method.
+        - Fixed issue that would cause bulletin test to fail in testing mode.
+        - Fixed error output in submit_form when a form number isn't found on the page.
+
+0.67    2007-07-02
+        - Updated patch submission instructions in CONTRIBUTING section of POD.
+        - Split out FriendAdder and Data into separate modules.
+          This was done to lighten the core WWW::Myspace module for developers
+          not using FriendAdder or Data, which had many dependencies.
+          If you need these modules, simply:
+          cpan -i WWW::Myspace::FriendAdder
+          cpan -i WWW::Myspace::Data
+          They each require WWW::Myspace, so you'll get this module also.
+        - Updated "An error has occurred" error in @ERROR_REGEXPS.
+        - internal method _page_ok now accepts multiple forms of RE, including
+          a key to _regex, so now regex hash keys or quoted REs can be
+          passed to get_page, follow_to, and submit_form.
+        - Fixed NOT_FRIEND_ERROR regexp.
+        - Fixed _apply_regex to return 1 if RE matches but Re has no parenthesis.
+        - Fixed post_comment method.
+        - Disabled MyBase test - uses FriendAdder.
+        - Fixed test names in 16-myspace.t
+        - Login now tests for new (ASP) and old (CFM) login forms in _try_login.
+        - Internal _apply_regex method defaults to current_page if no page or
+          source is specified.
+        - Marked approve_friends tests with TODO blocks to stop them from failing.
+        - Marked delete_friend test (03-delete.t) with TODO block to stop it from failing.
+        - Disabled post_bulletin method and marked with a TODO in 12-bulletin test.
+        - Updated get_photo_ids, set_default_photo, and photos test to work with
+          new album-based photo structure.
+
+0.66    2007-06-29
+        - KNOWN ISSUES IN THIS RELEASE:
+          - post_comment is not working
+          - post_bulletin is not working
+          - approve_friends may or may not be working
+            (test fails because delete_friend is broken)
+          - "make test" run with a full config file will fail (due to the above).
+          - This is a maintenance release that fixes several major issues below.
+        - Added Tobias' get_comments method fix from RT issue #27707.
+          (thanks Tobias!)
+        - Added Tobias' get_basic_info method from RT issue #22707 and
+          updated it.
+        - Added test 17-get_basic_info.t.
+        - Minor typo fixes in docs.
+        - Applied (possibly outdated) change to browse method's sample
+          script in WWW::Myspace POD from RT ticket#25254.
+        - Fixed send_message method
+        - Started implementing a fix for post_comment - still failing testing.
+        - Disabled delete_friend method until/if it can be fixed
+          (myspace form has changed significantly)
+        - Fixed login processing and bad login checking.
+        - Updated documentation for submit_form and contributing sections
+        - Moved several REs into regex hash.
+
+0.65    2007-06-25
+        - KNOWN ISSUES IN THIS RELEASE:
+          - Myspace just made changes that break send_message and post_comment.
+             0.65 was released because it fixes a change to the login form.
+        - Fixed 0.64 release date in Changes file
+        - Changed Myspace.pm to use "decoded_content" method of HTTP::Request
+          instead of "content" method so that charsets are properly decoded
+          when checking regexps, among other things.  See RT issue #27453.
+        - Added note in Myspace::Data about Class::DBI bug as noted in 
+          RT issue #27453
+        - changed regex for is_logged_in to look for a logout URL rather
+          than logout text (this should help for pages in languages
+          other than English)
+        - Updated debug statement in Message and Comment to use decoded_content
+          for consistency.
+        - Updated information in README:
+            Prerequesites
+            Config "Username" info (removed "#" that YAML isn't treating as a comment)
+            Other misc fixes.
+        - De-tabbed "Changes" and "README" files (converted tabs to 4 spaces).
+        - is_private and is_invalid now return "undef" instead of "0" if an error
+          is encountered.
+        - Added example use to documentation for is_private and is_invalid.
+        - Added max_get_attempts and max_post_attempts options and accessors
+          to allow control over the number of times a certain page retrieval
+          or form post is attempted.
+        - Minor internal changes to centralize language handling for possible
+          future internationalization.
+        - Removed table info which may be MySQL-specific from mysql.txt
+        - Updated docs for Myspace::FriendAdder and Myspace::Data
+        - Changed WWW::FriendAdder::_sleep_now to report sleeps in integer
+          seconds
+        - Updated is_band regex
+        - Applied fix from RT issue #27706 to fix login form.
+
+0.64    2007-06-03
+        - Tweaked friend_id regex that FriendAdder uses
+        - Added Myspace::is_private method
+        - Added Myspace::is_invalid method
+        - Added Myspace::Data::post_comment method
+        - Added Myspace::Data::approve_friend_requests method
+        - Added Myspace::Data::send_message method
+        - Myspace::_validate_page_request defaults to $self->current_page if
+          no parameters are passed
+        - Fixed bug in get_friends that caused it to return every other
+          page of friends.
+        - Applied patch from RT issue #27381 (thanks Mike)
+        - Applied patch from RT issue #27390 (thanks Mike)
+        - Updated patch to use "SignOut" RE when loading home page to force
+          more robust checking.
+        - Updated follow_to link to use internal get_page method instead of
+          mech object.
+        - Updated get_page: split random delay so that there will be a delay
+          when retrying a failed URL.
+
+0.63    2007-02-18
+        - Fixed an issue with the logic in Myspace::get_friends.  end_page 
+          and max_count checks would only be reached once all of the friends
+          pages had been spidered.  This was causing get_friends to pull 
+          entire friend lists regardless of limiting parameters.
+        - Added note about cool_new_people being deprecated.
+        - Myspace::last_login now checks to see if $page is defined in order 
+          to prevent dying on "can't call method on undefined value"
+        - Added Myspace::profile_views method
+        - Added Myspace::comment_count
+        - Added Myspace::_validate_page_request
+        - Added Myspace::Data::track_friend
+        - Updated mysql.txt with new table ("tracking") 
+        - Added new test 15-profile_views.t
+        - 'FB' error code once again being returned for accounts which
+           do not accept add requests from bands
+        - Added "firefox" parameter to Myspace::Data
+        - Added Myspace::last_login_ymd
+        - Fixed last_login bug in Myspace::Data::cache_friend
+        - Added private methods Myspace::_regex and Myspace::_apply_regex
+        - Added mysql_changes.txt to make keeping up with db schema changes easier
+        - Moved login verification regex into site_login method.
+        - get_inbox sample script now checks for login problems.
+        - Changed RE in _next_button to look for "Next >" as well as
+          "Next &gt;".  Yes, they're really using an un-escaped greater-than
+          sign...
+        - Updated warning at top of Myspace.pm, Comment.pm, Message.pm,
+          FriendAdder.pm, and README
+
+0.62    2007-01-30
+        - Added date.patch to MANIFEST so it'll appear in the distribution.
+        - Added "HOW TO SUBMIT A PATCH" instructions to Myspace.pm docs and
+          README file.
+        - Added Crypt::SSLeay as a prerequesite.  This fixes ticket#24224: myspace
+          logins fail if Crypt::SSLeay not installed due to recent myspace switch
+          requiring SSL.
+        - Implemented re-written get_friends method. The new method is simpler
+          and acts like a web browser paging through the friends list using
+          the new form-based navigation system implemented by myspace.
+
+          WARNING: There are a few differences in this method:
+          - It no longer supports the "exclude_friends" option.
+          - It returns the friendIDs in the order in which they appear on the
+            friend list (which is, btw, in order of friendID).
+          - It no longer returns additional information if called in a hashref
+            context.  It can only be called in a list context.
+
+        - Re-wrote get_friends_on_page method.
+        - Disabled get_comments for now.  Displays a warning and returns undef.
+          Method needs to be re-written due to change in myspace code.
+        - Disabled friends_from_group for now. Displays a warning and returns undef.
+          Method needs to be separated from get_friends and re-written as the form
+          used in groups is currently different from that used in profile friends list.
+        - "Skipped" friends_from_group test in 01-login.t
+
+0.61    2006-12-20
+        - Added note about:
+            Day too big - 2932896 > 24855
+            Sec too big - 2932896 > 11647
+            Day too big - 2932896 > 24855
+            Sec too big - 2932896 > 11647
+          warnings and about the "date.patch" file included at the root level of
+          the distribution to KNOWN ISSUES and to this Changes file due to questions on
+          CPAN forum.
+        - Removed the extra "._" files that cause installs to fail due to the failure of
+          POD tests.
+        - Added 12-bulletin.t and 14-photos.t tests into the distribution.
+        - Updated prerequisite list to require WWW::Mechanize 1.20.  A user on
+          the CPAN Form reported getting an error:
+          Unrecognized LWP::UserAgent options: stack_depth at C:/Perl/lib/WWW/Myspace.pm line 700
+          while using WWW::Myspace with an earlier version of WWW::Mechanize.
+        - Fixed a bug in which post_comment would fail with an "FN" error instead of an
+          "FF" error when it received the "You must be someone's friend" error.
+        - Fixed a bug in which "This user is away" or "This user's profile is set
+          to private" errors would not be properly recognized when sending a message.
+
+0.60    2006-11-19
+        - Added get_photo_ids method
+        - Added set_default_photo method
+        - Added set_random_photo sample script
+        - _go_home and get_page now return undef if there's an error
+        - Added 14-photos.t test.
+        - Added missing tests 12-bulletin.t and 13-blog.t to distribution.
+        - Added a trace mode by defining a method called "trace_func" which
+          allows detailed user-specifiable tracing of retrieved web pages
+        - Fixed bug in get_comments that could cause a person's image code
+          to be returned as the friendID if the person is online. Reported by
+          Costas.
+        - Updated RE in _get_friend_id to match change in Myspace code. This
+          fixes login errors among other things. (CPAN Ticket 23487 reported by
+          Paul Smith).
+
+0.59    2006-10-18
+        - Added mech_params method to provide greater control over
+          mech object.
+        - Added follow_to method (mostly for internal use) to simulate
+          clicking links.
+        - Updated many methods to use "follow_to".
+        - Fixed inbox method to work with new Myspace "messaging" server.
+        - Updated delete_message to work on new "messaging" server and
+          severly simplified the code.
+        - Updated read_message to work with new server.
+        - Added delete_message sample script.
+        - Added check_notifications and get_login_form sample scripts.
+        - Added get_notifications method which returns a hash of codes
+          and displayable "New" notifications (New Messages!, etc)
+        - Added get_login_form method which returns an HTML login form.
+        - Minor humanization updates in get_friends, friends_in_group,
+          friends_who_emailed, friends_from_profile.
+        - Fixed error checking in get_friends, friends_in_group,
+          friends_who_emailed, friends_from_profile per trouble ticket:
+          http://rt.cpan.org/Ticket/Display.html?id=20354
+        - Added Dave's "date.patch" to distribution directory with
+          instructions for those who want to stop the "Sec too big",
+          "Day too big" warnings on login.
+        - Optimized regular expression handling in the module, specifically
+          precompiling many regular expressions.
+        - Removed "inbox" source from get_friends.
+        - Updated "friends_who_emailed" to use "inbox" method instead
+          of "get_friends" method.
+        - Added semi-internal "follow_link" method.
+        - Added "send_group_invitations" method.
+        - Added send_group_invitations and send_event_invitations
+          sample scripts into distribution.
+        - Changed warnings in "get_friends" to warn if a page has less than
+          30 friends (was 35).
+        - Fixed minor bug in submit_form that could cause unnecessary
+          errors or warnings if a named form was not on the page. It
+          now sets error appropriately and returns 0.
+        - post_bulletin test now properly handles end user tests (i.e.
+          it's skipped because you're not logged in).
+        - Added post_blog method and post_blog sample script.
+        - Fixed send_group_invitations sample script's cache handling.
+        - Removed Poster.pm from distribution.  Moved to separate (currently
+          unreleased) module.
+        - Made send_group_invitations more efficient if called repeatedly
+          (doesn't reload the page).
+        - Reset test count in 00-load.t
+        - Added Class::Factory::Util 1.3 as prereq to account for
+          possible bug in DateTime::Format::MySQL (I believe it's
+          a prereq that isn't listed in the latter module's Build.PL)?
+        - Updated approve_friend_requests to use new button name.
+        - Fixed bug in read_message that would cause blank lines to be
+          stripped from message body.
+        - Updated "From:" RE in read_message so that "from" will be properly
+          read again.
+        - Disabled "delete_message" method and tests.  "Delete" button on Myspace
+          doesn't work (you can only delete from the Inbox, and that's a bit
+          trickier to handle than this method is worth :).
+
+0.58    2006-09-17
+        - Added post_bulletin method and 12-bulletin.t test (don't worry,
+          doesn't confirm the bulletin when testing).
+
+0.57    2006-09-16
+        - Added FL status code to send_message (can't find Send Message
+          link on profile page).
+        - Fixed condition in send_message that would cause "FN" to be
+          returned instead of "FF" (private profile, must be friend to
+          send message).
+        - Updated "post_comment" for new form field names.
+        - Updated RE in friend_user_name to use "nametext" span tag instead
+          of comment link (name attribute was removed from there).
+        - Added WARNING to Myspace.pm, Comment.pm, and Message.pm
+          regarding account crippling.  WARNING: DO NOT USE THIS
+          MODULE FOR MASS MESSAGING OR MASS COMMENTING.  YOUR
+          ACCOUNT WILL BE CRIPPLED OR DISABLED.  See docs for details.
+
+0.56    2006-09-09
+        - Added "FL" response code to post_comment. Returns FL if it
+          can't find the "Add Comment" link on the profile page.
+          (0.55 will die if this condition exists).
+          On a side note, this condition "shouldn't" exist, but does
+          if Myspace incorrectly says a profile is private even though
+          they're your friend.  Yes, it happened and so I had to add this.
+
+0.55    2006-09-05
+        - Changed default value of max_count from 300 to 100 in Message.pm
+          since captcha kicks in around 102.
+        - Added send_event_invite method.
+        - Added send_event_invite sample script.
+        - Tested browse method, updated docs, moved from
+          IN PROGRESS area to FIND PEOPLE area.
+        - Added "quiet" flag to mech object to stop superfluous warnings.
+        - Set "stack_depth => 1" in mech object to save memory. Previously
+          the module would store all page loads, which could eat up
+          huge amounts of memory when dealing with large friend lists
+          or event invitations.
+        - Re-wrote approve_friend_requests method to use the new servers
+          and act super-human.
+        - Added "form" option to submit_form that allows passing a
+          ready-to-post HTML::Form object.
+
+0.54    2006-09-04
+        - Corrected new method docs: replaced "username" parameter in
+          examples with "account_name".
+        - Fixed send_message to properly return "FC" instead of "F" when
+          captcha input requested.
+
+0.53    2006-09-01
+        - Changed RE to identify "away" and "private" mail send errors to
+          allow for profiles with no user names (or myspace database errors).
+          The error would cause this message to appear for private profiles:
+          "You can't send a message to because you must be 's friend to
+          send them a message."
+        - Modified send_message to get the profile, find and click the
+          Send Message link, and compensate for the two different mail
+          forms Myspace now has as they transition to the new messaging
+          servers.  Note that this both acts more naturally and may be more
+          stable, and enables use of the new servers, or the old one that
+          some accounts still apparently use.
+          Note that the new servers do issue CAPTCHA responses for mail. Not
+          sure of the limits yet.
+        - Added "human" option which slows down gets and such.
+          IMPORTANT: THIS IS SET TO 1 (TRUE) BY DEFAULT. THIS WILL SLOW
+          DOWN YOUR SCRIPT. BUT BE SURE YOU READ THE ACCESSOR'S DOCUMENTATION
+          IF YOU WANT TO TURN IT OFF - MYSPACE MAY DISABLE YOUR ACCOUNT.
+          Currently adds a 6-11 second delay after each get, but should get
+          fancier later.
+        - FriendChanges.pm: Now dies if error is set after get_friends is
+          called.
+        - FriendAdder.pm:  Added last_login parameter using the myspace 
+          method of the same name.
+        - send_message now takes named parameters.
+        - Addad "skip_re" option to send_message. Allows you to skip
+          a profile if it matches the RE you specify.
+        - Added skip_re handling to Message.pm.
+        - post_comment now acts more human also.
+        - is_band now looks for the "Upcoming Shows" box instead of
+          "My Bulletin Space" when determining if the logged in account
+          is a band or not.
+        - Changed mech agent to identify itself as IE 6.
+
+0.52    2006-08-08
+        - Message.pm now displays "Sending to friendID" as expected when
+          displaying an inactive account failure instad of just displaying
+          the warning message.
+        - Fixed a condition that would cause Myspace.pm to die if last_login
+          was called on a profile whose last login was in december.
+        - last_login now returns the correct date instead of being
+          a month late.  Corrected last_login sample script to match.
+        - "ADD TO FRIENDS" CODE IN SEND_MESSAGE IS NOW A "VIEW MY PROFILE"
+          LINK DUE TO MYSPACE BREAKING THE "ADD TO FRIENDS" CODE.
+        - Added warning re: broken "Add to friends" code to send_message
+          docs in Myspace.pm and to "add_to_friends" method docs in Message.pm.
+        - Enhanced RE check in post_comment to hopefully make it even more
+          robust.
+        - Fixed bugs in post_comment so that FF and FI return codes should
+          now work instead of "die"ing (note that currently though an invalid
+          ID will return a "must be someone's friend" error or a general
+          error).
+        - Fixed bug in submit_form that, when posting to form number 1,
+          would cause Myspace.pm to die if no forms were on the page
+          instead of returning an error.
+        - Added post_comment sample script
+        - Updated RE in send_message to match myspace change.
+        - Updated RE for Subject field in read_message due to myspace change
+          that caused it to display the date.
+        - Added "if" statement to have subject be left out of hash if
+          the RE can't be matched.
+        - Added read_message and send_friend_request sample scripts.
+
+        PREVIOUS VERSIONS WILL FAIL WHEN SENDING MESSAGES
+
+0.51    2006-08-03
+        - If a value greater than 1 is passed to send_message as the
+          "Add To Friends" flag, the value will be used as the friendID
+          for the button's link.  This allows you to set a friendID that
+          is different from the account from which you're sending the message.
+        - Added message_delay and random_delay accessor methods to
+          Message.pm.  These allow the user to set a delay between messages
+          sent.
+        - Added _is_fresh and _fresh_after to Data.pm
+        - Added ability to set "freshness" parameters to update_friend and
+          update_all_friends in Data.pm
+        - Added DateTime::Format::MySQL to Makefile.PL
+        - Added tests for _is_fresh and _fresh_after to 09-data.t 
+        - Added Params::Validate routines to update_friend and update_all_friends
+        - Added account disable/deletion warning to Message.pm.
+        - friend_user_name will now return the user name from the last page
+          retreived ("$myspace->current_page") if no friend_id is specified.
+        - friend_url will now return the friend URL from the last page
+          retreived ("$myspace->current_page") if no friend_id is specified.
+        - Fixed probable bug in friend_id method. It "shouldn't" have worked.
+        - If "friend_id" method is called without a friend URL it will scan
+          the last page retreived ("$myspace->current_page") for the friendID.
+        - Added new "last_login" method which returns the Last Login date
+          of the specified profile (or the last page retreived) in "time"
+          format.
+        - Added test for last_login to 01-login.t
+        - Removed test for friend_id method that checks for null value
+          when no URL is passed (since this behavior has changed).
+        - Added Time::Local prequisite to Makefile.PL
+        - Fixed RE for _next_button and _previous button methods to be
+          more robust.  This also fixes friends_in_group, which was broken
+          by a change in Myspace formatting so that it would only return the
+          first page of the group's friends.
+        - Message.pm now checks the Last Login date of the friend before
+          messaging.  If the account hasn't been logged into in the last
+          60 days, Message will log "FL" and skip the friend.  The friend
+          will be skipped on future runs also.
+        - Fixed a couple typos in Data.pm's POD.
+        - Added last_login and friends_in_group sample scripts.
+
+0.50    2006-07-06
+        - get_comments sample script now accepts a profile to scan for
+          comments and an optional friendID to use as a filter (i.e. to
+          show only the comments they left).
+        - Created friend_id, to return a user's friend id when passed
+          their custom URL.
+        - Changed return code for get_friends so that calling in any
+          scalar context will return a hashref.  This fixes a bug
+          which would produce an error stating that get_friends cannot
+          be called in a boolean context if the method was called in
+          any means not explicitly a list or a hash dereference.  That is:
+          "$myhashref = $myspace->get_friends" wouldn't work. Now it will.
+
+0.49    2006-06-15
+        - Added cool_new_people to sample_scripts.
+        - Corrected cache_file example in Message.pm docs. Must be
+          complete path.
+        - get_friends/friends_who_emailed no longer displays inaccurate
+          warning messages about page having only 7 friends and duplicate
+          friendIDs.
+        - get_friends now actually checks each friend page loaded to
+          make sure it has the whole page (this was added before but
+          wasn't working).
+        - Fixed a bug in get_friends in which a warning would be generated
+          stating the friend count was low when the "exclude" option was
+          used.
+        - get_friends now returns an error if it encounters a friend
+          page with a duplicate friendID (i.e. if the URL breaks due
+          to a myspace change and the same page of friends loads again).
+        - Fixed bug in get_friends/friends_in_group in which
+          erroneous "Une of initialized value in numeric gt (>)" warnings
+          would be generated when getting friends from a group.
+        - Updated friend_from_profile docs and examples.
+        - Updated page verification RE in search_music to include ".*<\/html>"
+          to make sure the full page is loaded.
+        - Cleaned up code in get_friends, minor internal fixes elsewhere.
+
+0.48    2006-06-15
+        - Added get_comments method.  Returns a list of comments left
+          for the specified profile.
+        - Added get_comments sample script (mainly to test get_comments
+          method).
+        - approve_friends now "die"s if called with an invalid argument
+          instead of displaying an error about calling an undefined
+          subroutine "fail".
+        - Message.pm now checks for consecutive failures and returns
+          "FAILURES" if the message fails due to network error (FN)
+          or unknown error (F) more than 50 times in a row.  This works
+          around an issue discovered in version 0.47 in which a change in
+          Myspace could cause messages to fail, which could cause Message.pm
+          to continue trying to post to every friend on its list.
+        - get_friends now sets $myspace->error if it can't read all of
+          the friend pages.  That is, if there are 205 pages and it, for
+          some reason, stops at page 197 and it's not reported as an
+          error by the "get_page" method, get_friends will set error
+          stating that the friends list is incomplete.  I'd do this
+          with the "friend_count" warning, but I can't because Myspace's
+          friend count is so inaccurate.
+        - Added friends_from_profile, _add_friend_to_account, 
+          _find_or_create_friend to Data.pm (friend lists can now be cached 
+          in Data.pm)
+        - Added get_data_object to FriendAdder.pm
+        - Altered properties in db to allow for caching friend lists
+          of any friend_id on Myspace
+        - send_message and post_comment will now return "FI" if the
+          friend they're sending to has been deleted (that is, the
+          "invalid friend ID" error is encountered).
+        - Message.pm, Comment.pm, and FriendAdder.pm count "FI" posts as
+          items to exclude on subsequent runs.
+        - In Comment.pm: Updated docs for post_comments and post_all,
+          updated copyright, added SEE ALSO section and note about
+          comment_myspace script in SYNOPSIS.
+        - Updated synopsys in comment_myspace docs.
+        - Added "-q" option to add_friends script.  Runs in "quiet" mode
+          (Sets "interactive" to 0 in FriendAdder). 
+        - Expanded cache_friend to cache much more info like last_login,
+          country, region, city, tagline, member_since, age, sex
+        - get_friends does a basic duplicates check and displays
+          a warning if it finds one.
+
+0.47    2006-05-31
+        - send_message REs updated due to change in MySpace site.
+        
+        THE FOLLOWING METHODS WILL NOT WORK WITH PREVIOUS VERSIONS
+        DUE TO MYSPACE CHANGES:
+        - send_message
+        - reply_message
+
+0.46    2006-05-24
+        - get_friends and friends_from_profile now accept an "exclude"
+          option that lets you pass a reference to a list or hash of
+          friendIDs to exclude.  Since friendIDs are excluded as they are
+          read, passing an exclude list along with a max_count is much more
+          efficient (and faster) than reading all friends, then excluding.
+        - get_friends is now documented to accept a "source" option
+          ( group, profile, or inbox ) and "id" option (friendID or groupID
+          as appropriate to the source).  This both makes it possible to
+          use the new features on a group (because friends_from_group doesn't
+          take options yet), and makes the other methods convenience methods
+          (which they really already were, it just wasn't documented).
+        - Changed RE in friend_count to match Myspace formatting change.
+          Made more "robust".
+        - Changed RE in user_name to match Myspace formatting change.
+          Made more "robust".
+        - get_friends now sets $myspace->error if it encounters a page with
+          no friends on it.
+        - Changed RE in is_band to handle whitespace and account for Myspace
+          formatting change.
+        - Added _previous_button internal method.
+        - Updated REs in internal save_friend_info method to check for
+          whitespace instead of single space for robustness.
+        - Updated "private profile" RE in _get_friend_page to check for
+          whitespace instead of single spaces; added check for whitespace
+          after <br>.
+        - message_group will now die if get_friends returns with an error.
+        - get_friends now checks for "View All Friends", a Previous or
+          Next link, and for the </html> tag to make sure it's got a full
+          page, and displays a warning if it encounters a page with less than
+          35 friends on it.
+
+        THE FOLLOWING METHODS WILL NOT WORK WITH PREVIOUS VERSIONS
+        DUE TO MYSPACE CHANGES:
+        - friend_count
+        - user_name
+        - is_band
+
+0.45    2006-05-09
+        - Added note regarding logins to test output.
+        - Fixed bug in FriendAdder.pm that re-cached friend ids even
+          if they already existed in the database
+        - Added methods to FriendAdder.pm and Data.pm to take advantage
+          of caching.  FriendAdder.pm's is_band will first attempt to
+          get is_band info from the database before using the Myspace.pm 
+          method
+        - Cleaned up get_friends code
+        - get_friends now accepts a hash of options.  Current options are
+          max_count and end_page.
+        - friends_from_profile accepts a hash of options like get_friends
+          (same options).  IDs can be passed as an array reference or
+          as a single ID ( id => 12345 ) or ( id => [ 12345, 123456 ] ).
+        - Altered MySQL table structures to make timestamps consistent
+        - add_log table has been dropped in database schema
+        - date_stamp now allows user to provide an epoch value in 
+          Data.pm
+        - accelerated initial sorting of ids in FriendAdder when Data.pm
+          is used
+        - Added debugging code to Comment.pm to help track occasional
+          error that causes the module to die with an error about calling
+          post_comment in a boolean context.
+        - Removed explicit "$self->current_page" from submit_form calls in
+          post_comment method.
+        - site_login now checks for the "You must be logged in" page
+          immediately after submitting the login form.
+          In short, if your password is wrong, it'll try once then
+          return 0 and set $myspace->error.  Once logged in, it will cache
+          the username/password as "valid", and subsequent "You must be
+          logged in" pages will be retried more vigorously.
+        - Added bad login test script.
+        - post_comment now croaks unless friend_id and message are passed.
+        - Fixed bug that would cause incorrect warning from get_friends if
+          called a second time after adding or deleting friends within the
+          same script.
+        - Modified post_comment to check for SCALAR instead of STR in
+          contextual "return" statement.  This hopefully fixes an
+          error which caused WWW::Myspace::Comment::post_comments to fail
+          with "Can't call WWW::Myspace::post_comment in boolean context
+          at /Library/Perl/5.8.6/WWW/Myspace/Comment.pm line 448".
+          (This most notibly affects approve_friends, which would trip this
+          error when posting general comments after approving friends).
+        - Modified send_message and send_friend_request to check for
+          SCALAR instead of STR in contextual "return" statement.
+        - Modularized site_login method code.
+        - Added test to verify logged_in = 1 to 01-login.t.
+
+0.44    2006-04-28
+        - add_friends script now documents a known issue in which friend
+          requests will be re-sent if they are denied.
+        - FriendAdder.pm now reports the number of skipped profiles if 
+          profile_type parameter is not set to 'all' and interactive
+          mode is enabled
+        - Updated docs for is_band to note that one cannot assume that
+          a profile is a personal profile if is_band is false.
+        - Fixed issue that was causing logins to fail.
+        - Updated user_name and friend_count methods to work with new
+          Myspace change.
+        
+        VERSIONS BEFORE 0.44 WILL FAIL LOGIN VERIFICATION as of 4/28/2006.
+
+0.43    2006-04-19
+        - Factored sleep and random sleeping into _sleep_now method
+          in FriendAdder.pm
+        - FriendAdder.pm now sleeps when skipping profile_type profiles
+        - Updated FriendAdder.pm to skip adds if the following errors
+          were encountered on a previous attempt: 'P', 'FA', 'FB', 'FF', 
+          'FP'
+        - post_comment and send_message now return status code and text
+          description if called in a list context.
+        - added cache_friend to Data.pm
+        - added call to cache_friend in FriendAdder.pm
+        - Added "set_options" method to MyBase.pm. Allows you to set options
+          after calling "new".
+        - Added "get_options" method to MyBase.pm. Allows you to get the
+          value of one, more, or all options (generic accessor method).
+        - fixed bug in FriendAdder.pm that returned inaccurate current
+          friends when used with Data.pm
+        - Message.pm no longer displays "Excluding" messages.
+        - Message.pm's friend_ids method now creates an anonymous array
+          when taking a list of friendIDs to avoid possible bugs.
+        - search_music method now uses new format for call to submit_form.
+        - Removed debugging code that limits search_music to 3 pages.
+          Method functional but needs tests written.
+        - search_music moved to the "Contact People" section, out of the
+          development dungeon.
+        - Removed unfinished Poster.pm from distribution.
+
+0.42    2006-04-19
+        - All page loads now check for "You must be logged in" error and
+          re-login if necessary.  This fixes a bug many have reported in
+          which they will start receiving "Failed, Network Error" messages
+          for every post.
+        - Recoded delete_form to allow it to delete more than one
+          friend at a time.
+        - Message.pm now excludes previously posted friends whose profiles
+          were set to "private" or "away".
+        - Message.pm now displays the "counter" value for each message it's
+          sending.
+        - Removed delete_friend note from TODO.
+        - Corrected "Sorry! an unexpected error has occurred" RE check.
+          (Wasn't identifying that error, now it will).
+        - Re-wrote browse function. Returns proper number of friends,
+          needs testing to make sure filters are working, and needs
+          proper docs to make it more useful.
+        - Re-wrote submit_form to use hashref of options and accept some
+          more options needed for browse.
+        - Updated browse sample script. Doesn't require login, displays
+          error if one occurs.
+        - "Detabbed" Myspace.pm code.
+        - get_inbox sample script can now take a friendID as an argument to
+          display messages from that friendID.
+        - Comment.pm no longer prints "Excluding " messages.
+        - Switched Data.pm from add_log to post_log table
+        - Added get_account_id to Data.pm
+        - Added DateTime.pm dependancy to Data.pm 
+        - Added time_zone parameter to FriendAdder
+        - Changed $logged to be true on 'P', 'FF', 'FP' in FriendAdder
+        - Added Class::DBI::AbstractSearch dependancy to FriendAdder
+        - Added profile_type parameter to FriendAdder
+        - Myspace.pm now correctly recognizes "doing some maintenance on the
+          mail for certain users" as an error page.
+        - Changed get_account_id to get_account in Data.pm
+        - Changed add_account to set_account in Data.pm
+        - Myspace object no longer needs to be passed to Data.pm to get
+          account info
+        - FF response code in FriendAdder now automatically logs friends if
+          Data.pm is used 
+        - Added db documenation to Data.pm
+        - Removed add_log from database scheme
+        - Added date_stamp routine to Data.pm
+
+0.41    2006-04-15
+        - Fixed tiny typo in Data.pm docs.
+        - Fixed possible bug in FriendAdder.pm that would cause failed add
+          attempts to never be retried.
+        - Added Poster.pm to MANIFEST.
+
+0.40    2006-04-14
+        - Fixed a bug in FriendAdder.pm that caused an invalid captcha 
+          message to appear
+        - Updated Myspace.pm docs, putting options at top.
+        - Added auto_login option, which turns off auto-login if called
+          with a false value like so: "new WWW::Myspace( auto_login => 0 )".
+        - Added routines to croak if a function that requires login is
+          called when not logged in.
+        - Moved methods and their docs around in an attempt to
+          better organize things.
+        - Added search_music method. Still in testing.
+        - Removed test account logins.  Only tests that don't require login
+          will be run by default.  You can add a config file with personal
+          test accounts if you want to run full tests (see README for more
+          info and sample config file).
+        - Updated TestConfig.pm to use user-specific config file for full test
+          with generic fallback file.
+        - Fixed bug in Data.pm where friend_id was not passed to is_band
+        - add_account and update_friend in Data.pm now croak if database 
+          connection cannot be created 
+        - Fixed bug in send_message that would cause it to delay and return
+          "FN" if it encountered a user whose status was set to "away" or
+          who only accepts messages from friends.  It should now return the
+          appropriate status code.
+        - submit_form now accepts a null URL, meaning it should search the
+          contents of $self->current_page for the form.
+        - Added delete_message method.
+        - Added bug in delete_friends to TODO.
+        - Added cleanup_inbox script to sample_scripts (deletes messages
+          from inbox, leaving most recent 40 messages).
+        - Added mail suite test in 05-message that tests send,
+          read, and delete (not reply yet).
+        - get_friends now displays a warning and sets "error" if it
+          encounters a private profile.
+        - get_friends correctly allows friend viewing when not logged in,
+          but croaks if attempting to view a mailbox or group when not
+          logged in.
+        - Added 99-enduser test script that runs "end-user" test suite
+          after full test suite to make sure everything works in both modes.
+
+0.39    2006-04-08
+        - Fixed bug in MyBase.pm that could cause an error in some
+          cases when the new method was invoked.
+        - Added fatal error in WWW:Myspace::FriendAdder if
+          send_friend_requests is called and a myspace object hasn't
+          been passed to the FriendAdder object.
+        - Rewrote add_friends to use FriendAdder module. Still works the
+          same except for different output format.
+        - Updated FriendAdder to count passed attempts instead of all
+          attempts.
+        - Added save and load methods to MyBase.
+        - Added previously_posted method to Poster.pm, fixed bugs,
+          updated docs.
+        - Poster.pm's friend_ids method can now take a list or arrayref
+          to set its value.
+        - Updated get_friends to start at page 1 when serarching friend
+          lists, 0 for group and inbox due to myspace chage. (Note that this
+          change doesn't seem to affect the results, it was just loading
+          page 1 twice).
+        - Added get_friend_page to sample_scripts
+        - Added delete_friend to sample_scripts
+        - Fixed a bug in submit_form which could cause failures if an error
+          page was encountered on the first submit.
+        - Commented out "An Error Has Occurred" from the errors array in
+          Myspace.pm because it conflicts with the "Exceeded Useage"
+          (their typo, not mine) error message. It should fail, not try
+          again.
+        - Updated TODO with note about proper handling of Mech.
+        - Updated send_message to semi-properly handle Mech. and to use
+          the error method to check for failure from get_page.
+        - Updated sample_scripts/send_message to display any errors
+          encountered.
+        - Added mention of YAML indent to message_group synopsis
+          documentation.
+        - Added usage comments to get_friends sample script.
+        - Changed nomenclature of incrementing internals in FriendAdder.pm
+        - Changed max_attempts param to max_adds in FriendAdder.pm
+        - Fixed wrapping in FriendAdder.pm
+        - Added documentation for _report() and return_params to FriendAdder.pm
+        - Expanded documentation for new() on FriendAdder.pm
+        - Added beta dB schema "mysql.txt"
+        - Changed method update_friends to update_all_friends in Data.pm
+        - Added method update_friend to Data.pm
+        - Added table to schema to distinguish between friends from different accounts
+        - Modified update_friend to add info for is_band, user_name, and url
+        - Data.pm now a subclass of MyBase.pm
+        - Added column my_friend_id to accounts table
+        - Added internal method _die_pretty to Data.pm and FriendAdder.pm
+        - Updated docs for FriendAdder.pm and Data.pm
+        Made several enhancements to Myspace.pm:
+        - Myspace.pm is now a subclass of WWW::Myspace::MyBase.pm, so the
+          new method inherits options processing.
+        - Added logout method.
+        - Made "site_login" method public.
+        - Started changes to not require login for functions that don't need it.
+        - Added account_name and password accessor methods.
+        - Updated docs and reviewed code for proper Mech usage (needs more).
+        - Fixed delete_friends method broken by Myspace security enhancement.
+        - delete_friends is now much more efficient if deleting multiple
+          friends.
+        - delete_friends now croaks if called when not logged in.
+
+        - Added additional diagnostic output for failing "Post Comment" test
+          in 01-login.t
+        - Added test to 03-delete to check return status of delete_friends.
+
+0.38    2006-03-28
+        - Removed extra "&"s from end of URLs in get_friends routines.
+        - get_friends methods (friends_from_profile, etc) will display
+          a warning if it encounters a page with no friendIDs.
+        - get_friends methods will display a warning if the friend count
+          is off of myspace's friend count by more than 5% when getting
+          friends from another user's profile (already did this when
+          getting our friends).
+        - get_friends methods will display a warning and return if they
+          fail to get a page.
+        - Enhanced get_friends sample script
+        - Fixed bug that was making get_page fail too easily.
+        - Added version 0.02 of FriendAdder.pm to the distribution
+        - FriendAdder.pm is now (mostly) documented
+        - FriendAdder->friend_request() renamed to
+          FriendAdder->send_friend_requests()
+        - Added convenience method FriendAdder->add_to_friends() for
+          FriendAdder->send_friend_requests()
+        - Added version 0.01 of Myspace::Data.pm to the distribution
+        - Added test 09-data.t for Myspace::Data
+        - Added test 10-mybase.t for MyBase.pm
+        - FriendAdder.pm now uses MyBase.pm as a base class
+        - Added MyBase.pm to dist (for internal modules to use).
+        - Fixed bug in message_group - docs said to add "delay: 0"
+          to the config file to stop it from sleeping. Correct setting
+          is "delay_time: 0".  Fixed docs, and made "delay: 0" work
+          also so it'll work as expected for people with old config files.
+        - Removed dependency on IO::All in approve_friends, message_group,
+          and Message.pm (no longer required in the distribution, removed
+          from Makefile.PL also).
+        - Updated output in approve_friends to display result of commenting
+          (DONE, CAPTCHA, COUNTER). DONE means you've commented all your
+          friends.
+        - send_friend_request now checks to make sure there's a button
+          before posting to avoid:
+          "Can't call method "click" on an undefined value at
+          /usr/local/ActivePerl-5.8/lib/site_perl/5.8.7/WWW/Mechanize.pm
+          line 1345."
+        - send_friend_request now returns FN if a known error page is returned
+          even after the multiple attempts get_page makes at retreiving the
+          page. Before it could cause the error above also.
+        - Fixed a bug in which get_friends would produce a "use of
+          unitialized value" error if called with no arguments.
+        - Updated VERIFY_COMMENT_POST due to change in myspace.com profile
+          page display.
+        - Added eval around the "click" in submit_form to prevent the error
+          above from all methods.  Failed form load will now just fail,
+          not "die".
+        - Added RE checks to post_comment to strengthen initial load.
+          Helps overcome FN post errors due to network problems.
+          
+          EARLIER VERSIONS WILL REPORT FALSE COMMENT POST FAILURES.
+
+0.37    2006-03-22
+        - Added "We\'re doing some maintenance on the mail for certain users"
+          error message to errors array.
+        - Fixed and added example to friends_from_profile method's docs.
+        - if get_friends is called in a HASHREF context, it returns
+          a hash of info about each friend (currently just the page they're
+          on in the friends list).
+        - Added version 0.01 of FriendAdder.pm to the distribution
+        - Added 07-friend_adder test script
+        - Added cool_new_people method to Myspace.pm
+        - Added 08-cool_new_people test script 
+        comment_myspace:
+        - Added -i flag to comment_myspace.  Causes comment_myspace to ignore
+          duplicates when posting comments.
+        - Added -r flag to comment_myspace.  Reset the exclusions file before
+          running.
+
+0.36    2006-03-22 - maintenance release, replaces 0.35.
+        - Removed signature code - was breaking install.
+
+0.35    2006-03-15
+        - Added inbox method. Returns the contents of your inbox complete
+          with sender, messageID, subject, and status (read, unread, sent,
+          replied).
+        - Removed commented-out libraries deprecated in version 0.34.
+        - Added get_inbox sample script.
+        - submit_form now properly returns a failure code if it can't
+          load the form, instead of letting WWW::Mechanize choke on it.
+          This hopefully fixes bug#18232, where post_comments can fail
+          with no such field 'f_comments' at /.../WWW/Mechanize.pm line 1178.
+          
+
+0.34    2006-03-14
+        - Switched to use WWW::Mechanize
+          - Removed dependency on HTTP::Request::Form
+          - Fixes "Use of initialized value" errors when sending
+            friend requests.
+        - Removed cookie_jar method. Cookies stored in memory only.
+        - Moved login functions to more logical location in the code.
+        - Fixed some docs typos.
+        - logged_in will return false if my_friend_id couldn't be set for
+          some reason.
+        - If already_commented can't load the page, or if my_friend_id
+          isn't set, it will return a false "true" value and set
+          $myspace->error to a message describing the problem.
+        - Added mortality to all "scripts" - if login fails, the script
+          will die with "Login Failed".  This prevents continuing with
+          unpredictable results.
+
+0.33    2006-03-10
+        - Added signature code to Makefile.PL
+        - Added sample code to logged_in method to keep trying forever
+          until logged in.
+        - Added sample_scripts directory to MANIFEST
+        - Converted tabs into spaces in Changes file.
+        - Applied patch in bug#18055 to fix send_friend_request. Now
+          properly returns status code instead of status description
+          when called in a list context.
+        - Added dependency for Contextual::Return to Makefile.PL
+          (used in above bug fix).
+        - Added is_band method. Returns true if the profile is a band profile.
+        - Added code to send_friend_request to return "FB" if the
+          friend we're trying to add doens't accept friend requests from
+          bands, and the account we're sending from is a band.
+        - Added is_band tests to 01-login.t.
+        - Debugged response codes in send_friend_requests. The method
+          returned mostly FN and F before, codes are accurate now.
+        - Added "error" method and removed page-load warnings. They
+          are returned in "error" now and can be displayed by your script if
+          desired. See docs for "error" method.
+        - Added code to friend_request to return "FA" (Short for
+          Failed, Anonomyous adds rejected) if the user requires
+          a last name or email address to add them.
+        add_friends:
+          - Added add_friends to Makefile.PL so it'll actually install.
+          - add_friends will now die if it can't log in.
+          - Converted tabs into spaces in code.
+          - Fixed redundant status_codes code.
+          - Debugged CAPTCHA prompt
+          - Updated text.
+
+0.32    2006-03-08
+        - Added add_friends script to the distribution.  Simple script to
+          help send friend requests to friends list of another profile.
+        - Updated comment test script to skip post_all test if CAPTCHA
+          encountered.
+        - Corrected docs for comment_friends method.
+        - Corrected potential bug in approve_friend_requests which could
+          cause duplicate comments.
+        - Added CAPTCHA check to new friend commenting in
+          approve_friend_requests so it will not try to post any more
+          comments after receiving a CAPTCHA response.
+        - You can now check $myspace->captcha after runing
+          approve_friend_requests to see if it hit a CAPTCHA response or not.
+        - Updated approve test to skip comment testing if CAPTCHA was
+          encountered to prevent unnecessary test failures.
+        - Fixed Tom's ID in docs (it's 6221, not 6229). Note that it
+          -was- correct in the code, just not in the docs.
+        - Fixed test script bug that would cause friends_from_profile
+          method test to fail.
+        Comment.pm:
+          - post_all method now returns CAPTCHA, COUNTER, or DONE like
+            post_comments. (Only useful when delay = 0).
+
+0.31    2006-03-06
+        - Added reply_message method. Not tested.
+        - Added friends_from_profile method which returns a list of
+          one or more other profile's friends.
+        - Updated login test script to work like the others,
+          added tests for friend_from_profile method.
+        - send_friend_request:
+          - Applied patch from Olaf Alders to return human-readable
+            status codes.  Added his CAPTCHA-handling sample code
+            to docs.
+        Message.pm:
+          - send_all method now returns a response code (fixes a bug
+            in message_group in which it would say "Stopped due to "
+            instead of specifying why it had stopped).
+        - approve_friends:
+          - Added "-gc message" argument.  If used, approve_friends, after
+            approving and commenting new friend requests, will leave
+            "message" as a comment for existing friends.
+
+0.30    2006-03-05
+        - Added read_message method to Myspace.pm
+        - Added tests for read_message
+        - Moved Message.pm testing to 05-message.t
+        - Renamed approve.t 04-approve.t
+        - Renamed comment.t 05-comment.
+        - Changed verification RE for get_profile so that
+          profiles marked as "private" won't produce "Page doesn't
+          match verification pattern." warnings.
+        - Fixed bug#17999: Can't modify non-lvalue subroutine call.
+          (When post_comment would return an FC response, the module
+          would produce an error).
+
+0.29    2006-02-27
+        message_group:
+          - Now accepts a reference to a list of groups or a single group.
+
+0.28    2006-02-26
+        - Fixed a bug in post_comment that would cause comments with
+          multiple lines to display "<br>" tags when posted to pages that
+          don't allow HTML comments.
+        - Made same change in send_message, which makes no difference
+          in MacOS X, but might on other platforms that interpret "\n"
+          differently.  Should be "safer".
+        - Updated test scripts to post multi-line messages.
+
+0.27    2006-02-24
+        - Added "An error has occurred trying to send this message" error RE.
+
+        message_group:
+        - Now displays the reason it stopped (CAPTCHA, USAGE, COUNTER, or DONE).
+        
+
+0.26    2006-02-20
+        - Included approve_friends, message_group, and comment scripts
+          in distribution.
+        - Added browse method, but not yet functional.  If you want to
+          help debug, please do. Otherwise, don't use it yet.
+        - Added CAPTCHA handling (alpha stage):
+          - post_comment sets $myspace->captcha and returns FC
+          - Call post_comment with ID, message, captcha response to
+            continue.
+            Note: Using this is a bit tricky, needs better examples.
+        - Fixed "t/02-dual.........Can't open test config file
+          readline() on closed filehandle CONFIG at t/TestConfig.pm
+          line 50." error in test.
+        - CHANGED submit_friend_request. This implements feature request
+          17587, but IS NOT BACKWARDS COMPATIBLE. It will DIE if you call
+          it with more than one friend, so that it can tell you to update
+          your code.  Now returns a status code like post_comment instead
+          of a true/false value.
+        - Added submit_friend_requests method for multiple adds (but see
+          docs for a better example).
+
+0.25    2006-02-20
+        - Added debugging code.
+        - Updated URLs for get_friends sub-methods. Versions before
+          this one will not return all friends.
+        - Added warning if friend_count and number of friends returned
+          by get_friends differs by more than 10 friends or 5% of
+          friend_count.
+        - Added page verification RE to get_friends to help ensure all
+          friends are accounted for.
+
+0.24    2006-02-19
+        - Added logged_in method. Returns true if login was successful.
+        - Added login failure tests to test scripts.
+        - Updated for changes in myspace.com. These fix install test
+          errors and the get_friends method (whose URL relies on
+          friend_count) as well.
+          - user_name now gets name from "Hello, <name>!" line.
+          - Included test for optional "<span>" in friend_count.
+          
+          PREVIOUS VERSION WILL FAIL INSTALL TESTS AND get_friends,
+          user_name, AND friend_count METHODS (and possibly others)
+          WILL NOT WORK.
+
+0.23    2006-02-11
+        - Added "profile undergoing routine maintenance" error RE to
+          list of error pages.
+        - Added add_to_friends convenience method.
+        - Updated URL for inbox friends check. Fixes friends_who_emailed
+          method and tests so install works.
+        - Updated $SEND_MESSAGE_FORM URL. Fixes mail sending and tests.
+        - Fixed POD for add_to_friends.
+
+          PREVIOUS VERSIONS WILL FAIL INSTALL TESTS AND CAN'T SEND
+          MESSAGES.
+
+0.22    2006-02-10
+        - Added regexp for "This user's profile has been temporarily
+          disabled for special maintenance" error.
+        - Added an array of regexps for error page handling.
+        - Added ability to explicitly verify certain pages in get_pages.
+          - Added explicit verify for get_profile method.
+        - Updated known issues.
+        - Added explicit check for verify form for post_comments.
+        - Added dual RE check options for submit_form.
+
+0.21    2006-02-07
+        - Added example and "See also WWW::Myspace::Message" docs for
+            send_message due to a user question.
+        - Added "See also WWW::Myspace::Comment" for post_comment.
+        - Removed unnecessary pre-requesite "IO::All" from Makefile.PL
+        - Fixed condition in 03-delete.t in which test would fail if
+          Perl 2 was not in friend list.
+        - Added code to check for "unexpected error" page.
+        - Made get_page and submit_form functions much more robost.
+        - Updated URLs in send_friend_request, delete_friends,
+          post_comment to use new myspace URLs.
+        - Added flag to send_message to have it attach an "Add to Friends"
+          button. This is mostly to save people having to update their
+          message files manually if the code for this changes again.
+        - Fixed delete_friends method, broken by myspace change.
+        - Numerous other changes and bug fixes from extensive changes at
+          Myspace.com.
+        - Reinforcement of test script items so that tests should pass,
+          so that end-user installations can include auto-update code
+          without forcing install.
+        Message.pm (0.8):
+        - Added add_to_friends method which adds an "Add to friends"
+          button after the message if set to true.
+          If you include an "add to friends" button in your messages,
+          YOU SHOULD UPDATE YOUR CODE TO USE THIS METHOD instead.
+
+          PREVIOUS VERSIONS WILL ENCOUNTER MANY ERRORS:
+          Posting comments, deleting friends, sending friend requests.
+          Install tests will fail.
+
+
+0.20    2006-02-04
+        - Added Tom's friend_user_name method and test for it.
+        - Added more output info to approve.t test.
+
+0.19    2006-02-04
+        Maintenance release
+        - Added missing test files to distribution
+
+0.18    2006-02-02
+        - Added bug reporting note to docs.
+        Message.pm (0.7):
+        - Counter now only counts successful posts.
+        Comment.pm (0.11):
+        - Counter now only counts successful posts.     
+
+0.17    2006-02-01/6:43pm
+        - Updated Login script due to change in myspace.com login form.
+        Unless Myspace.com changes the form back, NO PREVIOUS VERSION
+        WILL WORK as of the date/time of this version above.
+
+0.16    2006-01-26/8:09pm
+        - Set test count correctly in approve.t
+        Comment.pm:
+        - Added post_all method
+        - Added comment.t test.
+        - Fixed a condition which could cause an "undefined variable"
+          warning when reset_exclusions is called.
+        - Fixed a bug that would produce an error:
+          Can't use an undefined value as an ARRAY reference at
+          /path/to/WWW/Myspace/Comment.pm line 124, <STDIN> line 2.
+          if post_comments was called without any friends.
+          (RT Bug 17379: http://rt.cpan.org/Ticket/Display.html?id=17379).
+        - Added test for defaults to comment.t
+
+0.15    2006-01-25/3:12pm
+        - Fixed condition in submit_form so it'll try 5 times with 2
+          second delay if there's a network error.
+        - Updated test suite for new max_count in Message and removed
+          extra "approve_friends" test in 01-login.t
+        - Added handling of private profiles in send_message - returns "FF"
+        - send_message converts literal '\n' into "\n".
+        - Added handling of away messages - returns "FA"
+        - Added handling of excess usage - returns "FE"
+        Message.pm:
+          - Added result code display (i.e. why are we sleeping?) when
+            sleeping and "noisy" is on.
+          - Det default max_count to 300.
+          - Added handling of private profiles and away messages.
+          - Added handling of usage being exceeded - returns "USAGE".
+
+0.14    2006-01-25/11:41am
+        - Added loop code to submit_form - will now try each
+          submit 5 times if the submit fails.
+        - Added optional "message" argument to approve_friend_requests.
+          You can now call approve_friend_requests( message )
+          and message will be posted to each approved friend.
+        - Added TODO and CONTRIBUTING section to docs.
+        - Updated docs for all methods.
+        - Updated get_page to attempt GET 20 times instead of forever.
+        - Added methods:
+            - send_friend_request
+            - add_as_friend
+            - delete_friend
+        Comment.pm (0.9):
+            - Reworked module internals. Made Spiffy.
+            - Numerous minor bug fixes.
+            - Renamed "HTML" accessor "html".
+            - Added "noisy" accessor.
+            - Added "cache_file" to conform to Message and Myspace.
+
+0.13    2006-01-20/7:43pm
+        Fixed approve_friend_requests method. Was skipping valid friend
+        requests.
+
+0.12    2006-01-17/1:20pm
+        Included Comment.pm, FriendChanges.pm, and Message.pm in
+        distribution.
+        Fixed bugs in cache_dir and cache_file handling.
+        Made pathname handling OS-independent using File::Spec.
+        Added friend_count and user_name accessors.
+        Fixed retreival of user's friend list in get_friends.
+        Added make_cache_dir method.
+        Comment.pm:
+            - Added exlusions_file method.
+            - Renamed "set_HTML" method "HTML". Made it a
+              standard accessor method.
+        FriendChanges.pm:
+            - Set default cache file to $myspace->cache_dir/friend_cache.
+            - Added cache_file accessor method.
+            - Obsoleted "set_cache_file" method.
+        Message.pm, Comment.pm, FriendChanges.pm:
+            - When cache_dir method is called to retreive its default
+              value, it calls the make_cache_dir method in the
+              WWW::Myspace object to create cache_dir if it
+              doesn't exist.
+            - File handling done by File::Spec for cross-platform
+              portability.
+        Message.pm:
+            - Added extensive test suite.
+            - Added "messaged" method.
+            - Stabilized code to beta release state. Passes test suite.
+            - Fixed bugs.
+            - Noted obscure known "bugs".
+
+0.11    2006-01-19/3:07am
+        CPAN maintenance release. Removed stray ._ files from dist.
+
+0.10    2006-01-16/8:12pm
+        Fixed setting of HOME_DIR to work if $ENV{HOME} is not
+        set (i.e. if running in a CGI script). Updated docs.
+
+0.09    2006-01-11/10:24pm
+        Chnaged name from "Myspace" to "WWW::Myspace"
+        Made "Spiffy".
+        Updated docs.
+        Changed cache file to use $HOME/.www-myspace/login_cache by default.
+        Fixed bugs:
+        Known issues:
+            - get_friends method does not work if user has > 40 friends
+              (bug introduced by change in myspace site).
+            - post_comment dies if it is told to post to a friendID that
+              is not a friend of the logged-in user. (Myspace displays
+              an error instead of a form).
+        Added test suite.
+
+0.08    2006-01-07/12:52pm
+        *** REQUIRED VERSION AFTER 1/7/2006 ***
+        Added explicit load of "Home" page when logging in.
+        Note that this was done beacuse Myspace added an
+        ad page which breaks any version of this module prior
+        to this one.
+
+0.07    2006-01-03/7:51pm
+        Added CAPTCHA response code "FC" to send_message method. send_message
+        returns FC if the $CAPTCHA regexp is found after submitting a message
+        form.
+
+0.06    2005-12-27/5:04pm
+        Added friends_in_group method. Returns list of "friends" in a
+        Myspace group when passed the group ID.
+
+0.05    2005-12-14/7:49pm
+        Added approve_friends method.
+
+0.04    2005-12-11/9:38pm
+        Minor documentation tweaks: Updated BUGS and Copyright secsions,
+        added "send_messages" method in SYNOPSIS.
+
+0.03    2005-12-11/9:21pm
+        Added send_message method.
+        Added already_commented method.
+        Updated documentation to be in-line in the package file.
+
+0.02    2005-12-08/10:41pm
+        post_comments now adds "<br>" tags to the message
+        like myspace's Javascript does.
+
+0.01    2005-12-05/1:14
+        First version, released on an unsuspecting world.
+

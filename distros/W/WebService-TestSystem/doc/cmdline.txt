@@ -1,0 +1,72 @@
+Commandline testing tools
+-------------------------
+
+Environment
+===========
+ STP_USER         - user account for access to system (default USER)
+ STP_SERVER_URL   - address of the SOAP server to use
+ STP_PREFS        - default options to pass to testing system tools
+
+
+Public Tools
+============
+These tools are available for anyone and everyone to use.  They do not cause
+changes to the state of the testing system nor incur significant loads.  They
+require no login or authentication.
+
+ stp-lstest    - lists the available tests & info about them
+ stp-lshost    - lists the available host machines & info about them
+ stp-lsimage   - lists the available (distro) images & info about them
+ stp-lssw      - lists the available software packages & info about them
+ stp-trqueue   - displays the current test request queue
+ stp-trsearch  - searches test requests
+ stp-trget     - downloads the data & info for a given test
+*stp-patchfind - searches the patch repository
+*stp-patchget  - retrieves a given patch
+
+* - not yet implemented
+
+User Tools
+==========
+These tools require a login but are available to anyone.  They may cause
+changes to the testing system's state.
+
+ stp-request   - allows adding, canceling, tagging, and editing of
+                 test requests
+ stp-patchadd  - adds a patch to the testing system
+ stp-patchedit - edits the info about a given patch
+
+
+Advanced Tools
+==============
+These tools provide powerful access to the system.  Special permission and
+arrangements are generally required in order to access these tools.
+
+ stp-hostadd   - adds/registers a new host machine to the system
+ stp-hostedit  - edits info about a host machine
+ stp-hostrm    - removes a host machine from the testing system
+ stp-hostreq   - requests/schedules login access to a host machine
+	     + checkout
+	     + release
+	     + schedule
+ stp-testadd   - adds a new test to the system
+ stp-testedit  - changes properties of a test in the testing system
+ stp-testrm    - removes a test from the testing system
+ imgmanip  - allows alteration of the distro images in the system
+ stp-swadd     - adds new software to the test system
+ stp-swget     - allows sw owner to retrieve the src/bin sw package
+
+
+Administrative Tools
+====================
+These tools are only available to administrators and are used for managing the
+system.  
+
+ power     - power cycles a host machine
+ stp-hostset   - directly set parameters about the host machine (availability,
+             status, notes, etc.)
+ stp-testset   - set status (availability, etc.) and other parameters for tests 
+ stp-swset     - sets status and other parameters for software
+
+
+

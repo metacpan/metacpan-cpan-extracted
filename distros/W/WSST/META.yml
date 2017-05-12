@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                WSST
+version:             0.1.1
+abstract:            WSST is a tool to generate libraries which manipulate web service.
+license:             BSD
+author:              
+    - Mitsuhisa Oshikawa <mitsuhisa@gmail.com>, Yusuke Kawasaki <u-suke@kawa.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor:               0
+    File::Basename:                0
+    File::Find:                    0
+    File::Path:                    0
+    Getopt::Long:                  0
+    Pod::Usage:                    0
+    Storable:                      0
+    Template:                      0
+    Test::More:                    0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

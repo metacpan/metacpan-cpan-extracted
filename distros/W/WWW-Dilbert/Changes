@@ -1,0 +1,54 @@
+Version 1.19 - 19th February 2006
+    + Added EXPORTS section to POD
+
+    + Fixed unit test to run Test::Pod::Coverage
+      code instead of the Test::Pod module which
+      was what it was incorrectly running before
+
+    + Changed to build with Module::Build from
+      svn instead of cvs repository
+
+Version 1.18 - 7th January 2006
+    + Added Test::Pod and Test::Pod::Coverage
+      unit tests
+
+Version 1.17 - 31st December 2005
+    + Typoed SYNOPSYS in the POD.
+
+    + Added more stuff in to the examples/
+      directory in the distribution tarball.
+
+Version 1.16 - 30th December 2005
+    + Forgot to add the unit test files to the
+      MANIFEST. Added them now so they get shipped
+      in the distrobution.
+
+Version 1.15 - 30th December 2005
+    + Only output warning about invalid image format
+      if perl warnings are enabled.
+
+    + Added $ua->proxy_env to allow http proxies to
+      be picked up from users environment if
+      necessary.
+
+    + Added maximum download size limit of 250Kb to
+      avoid accidental krufty spammage of memory.
+
+Version 1.14 - 30th December 2005
+    + Fixed an uninitialised variable warning that
+      occurs if the LWP request for URL fails with
+      a timeout.
+
+Version 1.13 - 30th December 2005
+    + Changed license to Apache 2.0
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Version 1.11 - 29th December 2005
+    + Complete rewrite so this module is no longer
+      a complete pile of rubbish. See the old tarball
+      in the old/ directory for the old change log
+      file.
+
+    + The interface and functionality has completely
+      changed.
+

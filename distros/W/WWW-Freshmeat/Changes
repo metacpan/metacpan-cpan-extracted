@@ -1,0 +1,61 @@
+Revision history for WWW-Freshmeat
+
+0.22    2012-02-28
+        - 'Mirror site' will map to 'url_mirror'
+        - Compatibility support for old urls that now redirect to freecode.com
+
+0.21    2009-12-29
+        - redir_url will return string, not an URI object
+
+0.20    2009-11-08
+        - Updates for new API
+        - 'retrieve_user' temporarily removed
+        - "url_list", "branches", "trove_id", "real_author", "maintainers", "url", "init_html",
+          "popularity" were removed
+        - 'release_date' temporarily removed
+        - 'languages','tags' methods added
+        - example removed
+
+0.13    not released
+        - method version will return empty string when there is no release
+        - new project methods: release_date, maintainers, date_add, date_updated
+        - WWW::Freshmeat::User added
+        - example added
+
+0.12    2009-02-18
+        - added $WWW::Freshmeat::Project::project_re - regexp for project name
+        - url_list will work with projects containing '.'
+        - added real_author to fetch name of author (not maintainer)
+
+0.11    2009-02-15
+        - url_list has argument to try to follow Freshmeat redirect links
+        - rewrote redir_url not to fetch page it was redirected to
+
+0.10    2009-02-14
+        - 5.008 only (due to 'ISO-8859-1' encoding of XML file)
+        - projectname_short project method for retrieving project string id
+        - HTML::TreeBuilder::XPath is now required
+        - supports fetching branch list
+        - url_list project method for retrieving project URL list
+        - popularity project method for retrieving project popularity data
+        - redir_url in WWW::Freshmeat to fetch url which link will redirect to
+
+0.03    2009-02-03
+        - retrieve_project for project that does not exist will return undef
+        - retrieve_project will die if it would not be able to fetch project record
+        - nonexistingproject.t to test this functionality
+        - method for returning id's of trove categories
+        - project_from_xml class method
+        - tests check for connection with LWP::Online
+        - Build.PL now lists modules in 'requires' section
+
+0.02    2009-01-25
+        new maintainer: Alexandr Ciornii
+        - distribution modernized
+        - "project.t" added, a live test
+        - "boilerplate.t" removed
+        - "all rights reserved" removed (by permission of Cedric Bouvier)
+
+0.01    Wed May 31 13:29:17 CEST 2006
+        First version, only retrieval of known project entry.
+

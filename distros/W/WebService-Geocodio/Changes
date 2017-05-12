@@ -1,0 +1,18 @@
+Change history for WebService-Geocodio
+
+0.04        2014-04-10
+            Support fields as blessed objects rather than naked hashes.
+            See API docs to see what fields and data are available from
+            the service.
+
+0.03        2014-03-25
+            Major code refactor 
+            Add support for reverse geocoding
+            Add rudimentary support for geocod.io fields
+
+0.02        2014-01-23
+            Fix testing failure when an api key isn't in the environment.
+            There are *no* API changes.
+            
+0.01        2014-01-22
+            Initial release

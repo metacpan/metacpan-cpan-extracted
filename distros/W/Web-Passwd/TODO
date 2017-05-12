@@ -1,0 +1,1 @@
+- Determine cause of -- and fix -- spurious warning.  Temporary workaround is to disable warnings in a lexical block.

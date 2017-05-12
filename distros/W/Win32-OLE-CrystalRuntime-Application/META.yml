@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Win32-OLE-CrystalRuntime-Application
+version:      0.12
+version_from: lib/Win32/OLE/CrystalRuntime/Application.pm
+installdirs:  site
+requires:
+    constant:                      0
+    DateTime:                      0
+    strict:                        0
+    Test::Simple:                  0.44
+    vars:                          0
+    Win32::OLE:                    0
+    Win32::OLE::Variant:           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,53 @@
+WWW::TinySong version 1.01
+==========================
+
+tinysong.com is a web app that can be queried for a song and returns a tiny
+URL, allowing you to listen to the song for free online and share it with
+friends.  WWW::TinySong is a Perl interface to this service, allowing you
+to programmatically search its underlying database..
+
+INSTALLATION
+
+To install this module, open a terminal in the directory containing the
+unarchived source and type:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This should work on most modern systems assuming you have Perl and a Make
+utility installed and configured in the usual way.  The most likely change
+you might need to make to the above is replacing the first line with
+
+    perl Makefile.PL PREFIX=~
+
+if you're on a Unix-like OS and wish to install the module in your home
+directory.
+
+The `make test' step is optional but recommended to verify that the code
+works as expected on your system before proceeding with the install.
+
+DEPENDENCIES
+
+This module requires the following other modules:
+
+  Carp
+  Exporter
+  CGI
+  HTML::Parser
+  LWP::UserAgent
+
+CONTACT
+
+You can reach me by e-mail at <mlpalii@gmail.com>.  My Google Profile at
+http://www.google.com/profiles/mlpalii should list additional ways of getting
+in touch.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Miorel-Lucian Palii
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

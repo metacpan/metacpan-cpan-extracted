@@ -1,0 +1,14 @@
+WebService-Pandora
+====================
+
+This Perl module is used to interact with the Pandora JSON webservice API.  In order
+to install the module, you would typically do:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Once installed, documentation is also provided:
+
+  man WebService::Pandora

@@ -1,0 +1,38 @@
+2012-01-12	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.21
+
+	compatibility fix for new Class::Easy
+
+2010-03-02	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.17
+
+	AsIs presenter, really
+
+2010-03-02	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.16
+
+	AsIs presenter
+	EntityRecord now in separate package
+
+2009-11-21	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.14
+
+	more powerful screen scenarios
+	standard upload routine
+	standard entity and collection builders
+	
+	fixes
+
+
+2009-06-08	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.12
+
+	various fixes
+	new screen processing schema
+
+

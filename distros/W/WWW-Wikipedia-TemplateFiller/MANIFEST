@@ -1,0 +1,26 @@
+cgi/index.cgi
+cgi/templates/script.js
+cgi/templates/start.html
+cgi/templates/stylesheet.css
+Changes
+INSTALL
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WWW/Wikipedia/TemplateFiller.pm
+lib/WWW/Wikipedia/TemplateFiller/Source.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/DDB.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/DrugbankId.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/HgncId.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/ISBN.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/PubchemId.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/PubmedId.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/PubmedcentralId.pm
+lib/WWW/Wikipedia/TemplateFiller/Source/URL.pm
+lib/WWW/Wikipedia/TemplateFiller/WebApp.pm
+t/00-load.t
+t/01-fill.t
+t/boilerplate.t
+t/pod.t
+t/pod-coverage.t

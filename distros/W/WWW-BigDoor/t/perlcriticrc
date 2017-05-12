@@ -1,0 +1,5 @@
+severity = 3
+
+#[Subroutines::ProhibitUnusedPrivateSubroutines]
+#allow = _parent_end_point  _parent_id_attr
+

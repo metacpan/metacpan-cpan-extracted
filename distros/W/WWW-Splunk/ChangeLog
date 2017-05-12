@@ -1,0 +1,113 @@
+2.06    Sat Apr 8 00:27:12 2017 +0200
+======================================
+[DOC]
+Add LICENSE file
+Add LICENSE header to doc
+Add minimal version of Perl
+Add README file
+Fix email in doc
+
+2.05    Fri Apr 7 12:17:03 2017 +0200
+======================================
+[FIXES]
+Fix documentation
+Fix get calling
+Proper handling of HTTP 204 response
+Remove extra check for Client-SSL-Warning header
+
+[CODE]
+Add support for Kerberos (e.g. via LWP::Authen::Negotiate)
+Add verbose parameter
+
+[DOC]
+Change maintainer and repository
+
+2.04    Tue Aug 20 17:29:57 2013 +0200
+======================================
+[FIXES]
+Drop META.yml from the repository
+Make parser return the raw XML document if it could not be parsed
+
+2.03	Tue Aug 20 16:07:15 2013 +0200
+======================================
+[FIXES]
+Fix dealing with empty XML responses
+
+[DOC]
+5.0.3 Splunk seems to work
+Update changelog
+
+2.02    Thu Jun 14 10:24:25 2012 +0200
+======================================
+[FIXES]
+Do not attempt to interpret response after request is finished if it was already handled asynchronously
+Sane defaults for host/port API usage
+Fix documentation
+Fix insecure magic
+
+2.01    Thu May 10 11:45:31 2012 +0200
+======================================
+[FIXES]
+Fix a warning
+Fix raw value parsing
+
+2.0     Wed May 9 00:29:47 2012 +0200
+======================================
+[FIXES]
+Remove a debugging leftover
+Kill a warning
+
+[CODE]
+Add utility support for real-time searches
+Add library support for real-time searches
+Drop use of CSV API, replace with XML
+XMLParser: Handle more type of XML documents
+Add support for different output formats
+Extra checking of a response
+
+[DOC]
+Update versioning information.
+
+1.11    Sun Sep 25 17:13:15 2011 +0200
+======================================
+[FIXES]
+HTML responses do not contain response messages
+
+[CODE]
+Add support for limiting the search query with a time frame
+
+[DOC]
+Nicer POD inlining
+
+1.10    Sun Dec 12 13:40:21 2010 +0200
+======================================
+[FIXES]
+WWW::Splunk: Read processed results instead of raw events so that aggregates work [rt#59231]
+WWW::Splunk: Add results_read() method to reliably detect when results are read.
+
+[CODE]
+WWW::Splunk: Read results in bigger batches to improve performance
+
+1.03    Wed May  5 08:21:18 2010 +0200
+======================================
+[FIXES]
+sc: Print the result of the last search iteration as well
+
+[CODE]
+WWW::Splunk::XMLParser: Do not attempt to grok arbitrary XML from Splunk, return XML::LibXML instance instead
+WWW::Splunk: Print error messages from splunk as well
+
+1.02    Wed Apr 28 18:09:52 2010 +0100
+======================================
+[CODE]
+Rename Net::Splunk to WWW::Splunk
+
+1.01    Tue Apr 27 21:04:00 2010 +0100
+======================================
+[FIXES]
+Add a missing shebang to the launcher script.
+
+Initial release with search capability.
+1.00    Tue Apr 27 20:36:54 2010 +0100
+======================================
+Initial release with search capability.

@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-httpBL.t
+t/001-access.t
+t/002-hostent.t
+t/003-fetch.t
+lib/WWW/Honeypot/httpBL.pm
+META.yml                                 Module meta-data (added by MakeMaker)

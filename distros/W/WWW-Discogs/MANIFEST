@@ -1,0 +1,26 @@
+.shipit
+Changes
+lib/WWW/Discogs.pm
+lib/WWW/Discogs/Artist.pm
+lib/WWW/Discogs/HasMedia.pm
+lib/WWW/Discogs/Label.pm
+lib/WWW/Discogs/Master.pm
+lib/WWW/Discogs/Release.pm
+lib/WWW/Discogs/ReleaseBase.pm
+lib/WWW/Discogs/Search.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+requests/artist.res
+requests/error.res
+requests/label.res
+requests/master.res
+requests/release.res
+requests/search.res
+t/02exceptions.t
+t/03release.t
+t/04artist.t
+t/05label.t
+t/06search.t
+t/07master.t
+META.yml                                 Module meta-data (added by MakeMaker)

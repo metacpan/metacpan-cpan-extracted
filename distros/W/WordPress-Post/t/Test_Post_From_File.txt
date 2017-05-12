@@ -1,0 +1,15 @@
+This is the content that will be slurped up.
+This is more bla..
+
+This example will work on client side only. If you want to change prefix
+on server side you should override default serializer. See
+examples/server/soap.* for examples.
+access to any method
+
+If for some reason you want to get access to remote procedures that
+have the same name as methods of SOAP::Lite object these calls
+(obviously) won't be dispatched. In that case you can originate your
+call trough call()
+
+
+More content bla bla.

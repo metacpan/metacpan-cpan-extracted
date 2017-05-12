@@ -1,0 +1,22 @@
+---
+name: WebService-SongLyrics
+version: 0.01
+author:
+  - 'Dean Wilson <dean.wilson@gmail.com>'
+abstract: Retrieve song lyrics from www.songlyrics.com
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  LWP::UserAgent: 0
+  URI::Escape: 0
+build_requires:
+  Test::More: 0
+provides:
+  WebService::SongLyrics:
+    file: lib/WebService/SongLyrics.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

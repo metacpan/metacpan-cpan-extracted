@@ -1,0 +1,25 @@
+Waft-JSON version 0.02
+======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This module requires these other modules and libraries:
+
+  Waft
+  JSON
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Shingo Murata
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

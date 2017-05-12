@@ -1,0 +1,4 @@
+name = "WebService-Slack-WebApi"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuildTiny"
+license="mit"

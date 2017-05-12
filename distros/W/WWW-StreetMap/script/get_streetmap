@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+
+# pragmata
+use strict;
+use warnings;
+
+# Standard Perl Library and CPAN modules
+use Data::Dumper;
+use English;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use WWW::StreetMap;
+
+my($url) = @_;
+
+my(%clo);
+
+GetOptions(\%clo, qw(help|h debug|d=s imagefile|i=s oowfile|o=s)) or pod2usage(2);
+$clo{help} and pod2usage(1);
+
+die "No URL Provided\n" unless $url;
+die "Must specify  at least one of --imagefile|i <file> or --oowfile|o <file>\n" unless($clo{imagefile} or $clo{oowfile});
+
+my $map = WWW::StreetMap->new(url => $url);
+
+$map->build_map_jpg($clo{imagefile}) if $clo{imagefile};
+$map->create_oo_doc($clo{oowfile}) if $clo{oowfile};
+
+=head1 NAME
+
+get_streetmap - Get a map image from Streetmap
+
+=head1 SYNOPSIS
+
+B<get_streetmap>
+[B<--debug|d>]
+[B<--help|-h>]
+[B<--help|-h>]
+[B<--imagefile|o> I<filename>]
+[B<--oowfile|o> I<filename>]
+I<streetmap_url>
+
+=head1 DESCRIPTION
+
+B<get_streetmap> 
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug|-d>
+
+Enable Debugging Output
+
+=item B<--help|-h>
+
+prints out usage information and exits
+
+=item B<--imagefile|-i> I<filename>
+
+Filename to write jpg image to
+
+=item B<--oowfile|-i> I<filename>
+
+Filename to write OpenOffice document to
+
+=back
+
+=head1 AUTHOR
+
+Sagar R. Shah
+
+=cut

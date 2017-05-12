@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               WWW-Mechanize-Query
+version:            0.03
+abstract:           CSS3 selectors support for WWW::Mechanize
+author:
+    - San Kumar (original author)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.31
+    Module::Build:        0.3601
+build_requires:
+    constant:            0
+    Devel::SimpleTrace:  0
+    English:             0
+    File::Spec:          0
+    Find::Lib:           0
+    HTTP::Request:       0
+    Module::Build:       0.3601
+    Path::Class:         0
+    Test::More:          0
+    vars:                0
+requires:
+    Cache::FileCache:     0
+    Carp:                 0
+    Data::Dump:           0
+    Mojo::DOM:            0
+    Moose:                0
+    Storable:             2.21
+    WWW::Mechanize:       0
+    WWW::Mechanize::Cached:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

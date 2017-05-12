@@ -1,0 +1,80 @@
+WebShortcutUtil
+===============
+
+Perl module for reading and writing web shortcut files.
+This module is part of the WebShortcutUtil suite.  For more details
+see the main website at:
+http://beckus.github.io/WebShortcutUtil/
+
+The module is available on CPAN at:
+http://search.cpan.org/~beckus/WebShortcutUtil/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+DEPLOYMENT TO CPAN
+
+- Need to run these commands to set up environment (in Ubuntu):
+  sudo apt-get install libperl-critic-perl libdevel-cover-perl
+- Update version numbers in all pm files.
+  Regenerate the build files: perl Makefile.PL
+- Run unit tests: make test
+- Get test coverage (this is not currently working?):
+    cover -test
+  Check coverage report:
+    xdg-open cover_db/coverage.html
+- Check man pages:
+    make
+    man blib/man3/WebShortcutUtil.3
+    man blib/man3/WebShortcutUtil::Read.3
+    man blib/man3/WebShortcutUtil::Write.3
+- Try running code in documentation SYNOPSIS to make sure it works.
+- Try installing (both in Linux and Windows):
+    sudo make install
+- Regenerate MANIFEST (if no files were added or removed this can be skipped):
+    make manifest
+  Scrub generated MANIFEST
+- Update Changes file
+- Generate the distribution: make dist
+- Login to the PAUSE website https://pause.perl.org/pause/.
+  Upload the "WebShortcutUtil-version.tar.gz" file.
+- Tag the new version in github
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Mac::PropertyList - Only required when reading/writing an Apple ".webloc" shortcut.
+
+The "t/samples" folder contains samples from the following repository:
+  http://github.com/beckus/WebShortcutSamples
+  Notes: - Files with unicode in their names have been renamed to avoid issues with
+           unpacking in Windows.
+         - The files beginning with dots have also been removed (in the webloc folder)
+
+I chose not to use a Git submodule for this - Github does not
+include the submodule when creating the downloadable tar/zip file.
+If the WebShortcutSamples repository is updated, the changes
+need to be manually applied in the local folder.
+Sample files that contain unicode (as well as special characters)
+have been omitted from the MANIFEST file.  This prevents warnings
+when building on a system with limited support for unicode.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Andre Beckus
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the Perl 5 programming language itself.

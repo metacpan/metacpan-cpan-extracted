@@ -1,0 +1,54 @@
+{
+   "abstract" : "ALPHA interface to speech-to-text API from speechmatics.com",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Speechmatics",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "1.006",
+            "Scalar::Util" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/WebService-Speechmatics",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/WebService-Speechmatics.git",
+         "web" : "https://github.com/neilbowers/WebService-Speechmatics"
+      }
+   },
+   "version" : "0.02"
+}
+

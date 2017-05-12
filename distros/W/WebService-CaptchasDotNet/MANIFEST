@@ -1,0 +1,23 @@
+CaptchasDotNet.pm
+Changes
+INSTALL
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01compile.t
+t/02constructor.t
+t/03empty_subclass.t
+t/10verify.t
+t/11random.t
+t/12url.t
+t/13expire.t
+t/60_init.t
+t/61_verify_random_string.t
+t/62_cleanup.t
+t/63_time_to_cleanup.t
+t/80cgi.t
+t/99pod.t
+t/conf/extra.conf.in
+t/lib/My/CommonTestRoutines.pm
+t/lib/My/EmptySubclass.pm

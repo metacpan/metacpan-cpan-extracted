@@ -1,0 +1,28 @@
+== PDX.pm Code Sprints ==
+
+PDX.pm hosts weekly code sprints to work on Perl 5/Perl 6/Parrot, write docs, work on your own projects, whatever.  They're on Thursdays, 6:30pm or so, at the SE [Lucky Lab http://www.luckylab.com].  Check [Calagator http://calagator.org/events/search?query=hackathon] for the latest announcement.
+
+(See http://mail.pm.org/pipermail/pdx-pm-list/2009-June/005535.html for the post that started it all.)
+
+=== Bring: ===
+* laptop
+* power strip if you have one
+* yo bad self
+
+=== Prep: ===
+If you want to work on perl 5, clone the latest repo beforehand:
+  git clone git://perl5.git.perl.org/perl.git
+
+If you want to work on Rakudo (Perl 6 on Parrot)
+  git clone git://github.com/rakudo/rakudo.git
+
+If you want to work on Blizkost (Perl 5 on Parrot)
+  git clone git://github.com/jnthn/blizkost.git
+
+If you want to work on Parrot 
+  svn co https://svn.parrot.org/parrot/trunk parrot
+OR to use a git mirror
+  git clone git://github.com/leto/parrot.git
+  
+
+We're happy to convert^W help you with git if you're not familiar with it. And you are free to work on anything you want, these are just suggestions.

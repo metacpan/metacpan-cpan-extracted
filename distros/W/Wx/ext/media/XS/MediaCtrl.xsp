@@ -1,0 +1,101 @@
+#############################################################################
+## Name:        ext/media/XS/MediaCtrl.xsp
+## Purpose:     XS++ for Wx::MediaCtrl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     04/03/2006
+## RCS-ID:      $Id: MediaCtrl.xsp 3073 2011-06-29 23:02:39Z mdootson $
+## Copyright:   (c) 2006 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#include <wx/setup.h>
+
+#if wxUSE_MEDIACTRL
+
+#include <wx/mediactrl.h>
+#include "cpp/overload.h"
+
+#define wxDefaultValidatorPtr (wxValidator*)&wxDefaultValidator
+
+%typemap{wxMediaCtrl*}{simple};
+%typemap{wxMediaCtrlPlayerControls}{simple};
+%typemap{wxMediaState}{simple};
+%typemap{off_t}{simple};
+%typemap{wxSeekMode}{simple};
+
+%name{Wx::MediaCtrl} class wxMediaCtrl
+{
+    %name{newDefault} wxMediaCtrl();
+    %name{newFull} wxMediaCtrl( wxWindow* parent,
+                                wxWindowID id = wxID_ANY,
+                                const wxString& filename = wxEmptyString,
+                                const wxPoint& pos = wxDefaultPosition,
+                                const wxSize& size = wxDefaultSize,
+                                long style = 0,
+                                const wxString& szBackend = wxEmptyString,
+                                const wxValidator& validator = wxDefaultValidatorPtr,
+                                const wxString& name = wxPanelNameStr );
+
+    bool Create( wxWindow* parent,
+                 wxWindowID id = wxID_ANY,
+                 const wxString& filename = wxEmptyString,
+                 const wxPoint& pos = wxDefaultPosition,
+                 const wxSize& size = wxDefaultSize, long style = 0,
+                 const wxString& szBackend = wxEmptyString,
+                 const wxValidator& validator = wxDefaultValidatorPtr,
+                 const wxString& name = wxPanelNameStr );
+
+    off_t Tell();
+    off_t Length();
+    off_t Seek( off_t where, wxSeekMode whence );
+
+    wxMediaState GetState();
+
+    bool Play();
+    bool Pause();
+    bool Stop();             
+
+    double GetVolume();
+    bool SetVolume( double volume );
+
+    double GetPlaybackRate();
+    bool SetPlaybackRate( double volume );
+    
+    off_t GetDownloadProgress();
+    off_t GetDownloadTotal();
+
+    bool ShowPlayerControls( wxMediaCtrlPlayerControls flags =
+                                 wxMEDIACTRLPLAYERCONTROLS_DEFAULT );
+};
+
+%{
+
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::Button::new" )
+
+bool
+wxMediaCtrl::LoadFile( file )
+    wxString file
+  CODE:
+    RETVAL = THIS->Load( file );
+  OUTPUT: RETVAL
+
+bool
+wxMediaCtrl::LoadURI( uri )
+    wxString uri
+  CODE:
+    RETVAL = THIS->Load( wxURI( uri ) );
+  OUTPUT: RETVAL
+
+%}
+
+#endif

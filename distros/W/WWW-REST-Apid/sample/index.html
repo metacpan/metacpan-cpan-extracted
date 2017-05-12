@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <style type="text/css">
+      body {
+        padding: 10px;
+      }
+
+      table#pslist {
+	  border-collapse: collapse;   
+      }
+      #pslist tr {
+	  background-color: #eee;
+	  border-top: 1px solid #fff;
+      }
+      #pslist tr:hover {
+	  background-color: #ccc;
+      }
+      #pslist th {
+	  background-color: #fff;
+      }
+      #pslist th, #pslist td {
+	  padding: 3px 5px;
+      }
+      #pslist td:hover {
+	  cursor: pointer;
+      }
+    </style>
+
+    <script src="/jquery.js"></script>
+
+    <script type="text/javascript">
+      function showps(data) {
+	  /* clean tables and repaint ps list based on data */
+	  var item;
+	  $("#pslist").find("tr:gt(0)").remove();
+	  $('#det').html("");
+	  $('#pslist tr:last').after(item);
+	  $.each( data, function( id, entry ) {
+	      item = "<tr id=" + entry.PID + "><td>" + entry.PID + "</td><td>" +entry.USER + "</td><td>" + entry.COMMAND + "</td></tr>";
+	      $('#pslist tr:last').after(item);
+	  });
+      }
+
+      $(document).ready(function(){
+	  /* on boot, load full ps list and authenticate using basic authentication */
+          $.ajax({
+	      type: "GET",
+	      dataType: "json",
+	      url: "/ps",
+	      contentType: "application/json; charset=utf-8",
+	      dataType: "json",
+	      beforeSend: function (xhr){ xhr.setRequestHeader('Authorization', "Basic " + btoa("tom:123")); },
+	      success: function(data){
+		  showps(data);
+	      }
+	  });
+
+	  /* user clicked a ps entry, fetch details and show in side table */
+	  $('#pslist').on('click', 'tr', function (event) {
+	      var pid=$(this).attr('id');
+	      $.getJSON( "http://localhost:8080/ps/detail?pid=" + pid, function() {
+		  console.log("got pid");
+	      })
+	      .done(function(data) {
+		  var out = '<h4>Details about process:</h4><table>';
+		  $.each( data, function( id, val ) {
+		      if(id != 'env') {
+			  out += "<tr><th align=left>" + id + ":</th><td>" + val + "</td></tr>";
+		      }
+		  });
+		  out += "<tr><td colspan=2>Environment:</td></tr>";
+		  $.each( data.env , function( id, val ) {
+		      if(id != 'env') {
+			  out += "<tr><th align=left>" + id + ":</th><td>" + val + "</td></tr>";
+		      }
+		  });
+		  out += "</table>";
+		  $('#det').html(out);
+	      });
+	  });
+
+	  /* user entered some expression, post it to service and display result */
+	  $('#search').keypress(function (e) {
+	      if (e.which == 13) {
+		  var val = $('#search').val();
+		  $.ajax({
+		      type: "POST",
+		      url: "/ps/search",
+		      data: JSON.stringify({ expression: val }),
+		      contentType: "application/json; charset=utf-8",
+		      dataType: "json",
+		      success: function(data){
+			  showps(data);
+		      }
+		  });
+		  return false;
+	      }
+	  });
+});
+</script>
+  </head>
+  <body>
+    <h2>Processes</h2>
+    <input type="text" name="search" id="search"/>
+    <table>
+     <tr>
+      <td valign="top">
+        <table id="pslist">
+          <tr><th>PID</th><th>USER</th><th align=left>COMMAND</th></tr>
+        </table>
+      </td>
+      <td valign="top">
+       <div id="det"></div>
+      </td>
+     </tr>
+    </table>
+    </div>
+  </body>
+</html>
+

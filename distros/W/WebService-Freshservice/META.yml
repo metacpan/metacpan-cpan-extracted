@@ -1,0 +1,39 @@
+---
+abstract: 'Abstraction layer to the Freshservice API'
+author:
+  - 'Leon Wright <techman@cpan.org>'
+build_requires:
+  Config::Tiny: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Warnings: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Freshservice
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  MIME::Base64: '0'
+  Method::Signatures: '20140224'
+  Moo: '0'
+  MooX::HandlesVia: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/techman83/WebService-Strava3
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

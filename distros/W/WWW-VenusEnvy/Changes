@@ -1,0 +1,42 @@
+Version 1.10 - 19th February 2006
+    + Added checks in get_url() method to check
+      if the image is a reasonable size, and if
+      not to try and guess if the image has been
+      blocked against hotlinking.
+
+    + Changed to build with Module::Build from
+      svn instead of cvs repository
+
+Version 1.09 - 20th January 2006
+    + Changed the useragent and refer in LWP::UA
+      calls so that the images download on the
+      new Keenspace hostname.
+
+Version 1.08 - 12th January 2006
+    + Added support for the strip URL to be on
+      venusenvy.comicgenesis.com.
+
+    + Added additional POD.
+
+    + Fixed pod_coverage unit test to actually
+      use Test::Pod::Coverage instead of 
+      Test::Pod (which was a mistake)
+
+Version 1.06 - 7th January 2006
+    + Added Test::Pod and Test::Pod::Coverage
+      unit tests.
+
+Version 1.05 - 31st December 2005
+    + Increased the file size download limit from
+      256Kb to 512Kb. (Some of the comic strip images
+      appear to be bigger than the 256Kb limit).
+
+Version 1.04 - 31st December 2005
+    + Fixed typo in header command and in POD.
+
+    + Added more to examples/* in the distribution
+      tarball.
+
+Version 1.02 - 30th December 2005
+    + Initial release.
+

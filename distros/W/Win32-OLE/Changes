@@ -1,0 +1,488 @@
+Revision history for Perl extension Win32::OLE.
+
+Changes in version 0.01-0.03 are by Gurusamy Sarathy. All other changes
+are by Jan Dubois unless attributed otherwise.
+
+0.1712  May, 14th 2014
+        - Make OLE.xs compatible with 64-bit Cygwin.  Thanks to
+          Alexander Stadler [RT #95612]
+
+0.1711  December, 11th 2013
+	- remove EUMM-Update changes to Makefile.PL, which removed
+	  the updated metadata in 0.1710 from META.yml
+
+0.1710  December, 4th 2013
+	- Speedup Win32::OLE::Const by avoiding unneccessary calls to
+	  stat().  Thanks to Eric Roode.
+	- Skip ANSI <-> OEM conversion test unless the OEM code page
+	  is 437 or 850 [RT #53704]
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+	- Typo fixes by David Steinbrunner
+        - Avoid 5.18 bug in t/3_ole.t about AUTOLOAD inheritance failure
+          using SUPER:: [perl #120694]
+
+0.1709  April 17th 2008
+	- Get rid of "package Win32" statement in lib/OLE.pm because
+	  it confuses the CPAN indexer.
+
+0.1708  April 17th 2008
+	- new version for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- additional casts to suppress compiler warnings under Win64
+	- added V_RECORD() and V_RECORDINFO macros for MinGW
+	- changed code to be conformant with ISO for() variable scoping rules
+
+0.1707  unreleased, August 7th 2006
+	- add special support for tlbinf32.dll from Microsoft
+
+0.1706	unreleased, June 8th 2006
+	- add support for receiving VT_RECORD and arrays of VT_RECORD
+	- improve error handling logic
+
+0.1705	unreleased, March 28th 2006
+	- fix memory leak in Win32::OLE::Enum::All() and Win32::OLE::Enum::Next()
+	  (as a side effect collections containing undefined elements,
+	   like VT_NULL or VT_EMPTY variant, will be handled correctly)
+
+0.1704	unreleased, November 28th 2005
+	- in ClearVariantObject() check IDispatch/IUnknown variants
+	  for NULL before calling Release() on them
+	- Win32::OLE::Const: check for 32 bit typelibs even in Win64 mode
+	- Don't load hidden or restricted types in Win32::OLE::Const.
+	  This fixes the "emptyenum redefined" problem with the "Microsoft
+	  Word" type library.
+
+0.1703	September 6th 2005
+	- remove all USING_WIDE() codepaths
+	- use PTR2IV() and INT2PTR() macros
+	- make everything work with current cygwin
+
+0.1702	unreleased, Sun, September 5th 2004
+	- fix freeing of VT_BYREF Win32::OLE::Variant objects
+
+0.1701	unreleased, Thu, August 28th 2003
+	- add Win32::OLE->Option(Variant => 1) support
+
+0.17	Mon, August 11th 2003
+	- add IsNothing and IsNullString predicate methods to
+	  Win32::OLE::Variant
+	- nullstring() variants used to be converted to undef.  They
+	  are now converted to the empty string.
+
+0.1604	unreleased, Thu, July 22nd 2003
+	- fix passing nullstring() as a parameter.  VariantCopy() used
+	  to turn it back into an empty string.
+
+0.1603	unreleased, Thu, March 4th 2003
+	- fix PL_dowarn test to only check the relevant bit
+
+0.1602	unreleased, Thu, February 13th 2003
+	- Work around a Perl problem to support lvalue arguments to OLE
+	  method calls (e.g. substr() expressions).  This will only work
+	  for PV lvalues, and not for IV lvalues (like pos()).
+
+0.1601	Fri, November 22nd, 2002
+	- allow Variant(VT_VARIANT|VT_BYREF) as a shortcut for
+	  Variant(VT_VARIANT|VT_BYREF, Variant(VT_EMPTY))
+
+0.16	Fri, October 18th, 2002
+	- Add Unicode support: passing Unicode strings to methods and
+	  properties as well as returning Unicode back to Perl works now
+	- Unicode::String objects can be passed to methods or assigned
+	  to properties
+	- Make Unicode support compatible with Perl 5.8
+	- Remove prototype checking from Win32::OLE::Forward() so that
+	  it works normally as an automation method too
+	- Fix compatibility problem ($AUTOLOAD munging) with Devel::DProf
+	- Add Win32::OLE::nullstring() method [alias for Variant(VT_BSTR)]
+	- Fix 2_variant.t tests for non-US locales
+	- Fix 3_ole.t test to not require write access to HKCR registry
+
+0.1502	September, 7th 2001
+	- Only turn undef into VT_ERROR/DISP_E_PARAMNOTFOUND when used as a
+	  positional parameter in a method call.  Otherwise turn it into
+	  VT_EMPTY.
+
+0.1501	February, 6th 2001
+	- Don't clobber $1 etc. in AUTOLOAD.  Unfortunately Perl doesn't set
+	  POK on the $1 SV, so we still cannot pass it to OLE methods. :(
+
+0.15	Wed, December 6th, 2000
+	- Make sure the OLE browser works with IE5.5 and the latest ActivePerl
+	- Relax the checks for file existance in Win32::OLE::Const
+
+0.1403	Tue, November 21st, 2000
+	- Win32::OLE::Const: ignore non-existant typelibs (by Richard Letts)
+	- safeguard against access violation in Dispatch()
+	- Work around perl_call_sv() bug in ReportOleError(); use G_EVAL and
+	  rethrow the exception to get the runlevel right
+
+0.1402	Mon, September 25th, 2000
+	- Fix potential crash during global cleanup when _Unique is set
+	  (by Rudi Farkas <rudolf.farkas@lecroy.com>)
+
+0.1401	Mon, September 11th, 2000
+	- fix bug in GetMultiByteEx() sometimes chopping off the last byte
+
+0.14	Tue, August 22th, 2000
+	- remove support for Perl 5.004 & 5.005
+	- don't built for 5.005 Threads (because it won't work anyways)
+	- make sure the other compile options for 5.6 work
+	- support embedded '\0's in BSTR return values
+
+0.1301	Thur, July 13th, 2000 (dougl@ActiveState.com)
+	- patch to fix exported functions
+	- lost UTF-8 support added back in
+
+0.13	Sat, May 6th, 2000
+	- add Win32::OLE::Variant::nothing() function
+	- fix strrev() definition for Borland
+	- changes based on ideas and patches from Rudi Farkas
+          <rudolf.farkas@lecroy.com>:
+	  - add _Unique option to prevent creating duplicate proxy Win32::OLE
+	    objects for the same COM object
+	  - add _NewEnum option to add a visible _NewEnum property to
+	    collection objects.
+
+0.12	Thu, April 13th, 2000
+	- remove call to CoFreeUnusedLibraries from ReleasePerlObject
+	- added Win32::OLE->FreeUnusedLibraries() class method
+	- fix Variant->Put() support for SAFEARRAYs of BSTR/DISPATCH/UNKNOWN
+	- fix error message: "argument %" for Invoke was of by one
+	- support setting Warn option to CODE reference
+	  (suggested by Tobias Martinsson <tobias@100procent.com>)
+	- TPJ article added
+	- add CYGWIN support (by Eric Fifer <EFifer@sanwaint.com>)
+	- changed handling of VT_DATE and VT_ERROR Variants to return a
+	  Win32::OLE::Variant object (by Eric Fifer)
+
+0.1101	libwin32-0.15 / ActivePerl build 520
+	- VarAdd() etc. temporarily removed for VC++ 5.0 compatibility
+
+0.11    on CPAN
+	- reorganization of Win32::OLE::Type* packages
+	- Win32::OLE::Const now uses Win32::OLE::Type* packages
+	- Win32::OLE::Const now uses LoadTypeLibEx to avoid registering
+	  type libraries accidendly
+	- Win32::OLE::Const: EnumTypeLibs() and LoadRegTypeLib() methods
+	- new DHTML typelib browser
+	- new Win32::OLE::GetTypeInfo() method
+	- Forwarder objects
+
+0.1010  (unreleased)
+	- support $obj = CreateObject Win32::OLE 'My.App';
+	- event dispatch by dispid instead of by name
+	  (for controls not providing type information)
+	- allow "empty" Variant(VT_DISPATCH)
+	- misc fixes for VT_BYREF Variants
+
+0.1009	(unreleased)
+	- Additional Variant overloads: Add, Sub, Mul, Div
+	- some additional variant conversion error checking
+	- VT_DECIMAL support
+
+0.1008	ActivePerl 517
+	- new LetProperty() method
+	- new COINIT_NO_INITIALIZE mode
+	- new HRESULT() function
+	- bug fix: SetProperty (incl. hash syntax) now uses PROPERTYPUTREF to
+	  assign a VT_BYREF | VT_DISPATCH object
+
+0.1007	Sun, April 25th, 1999
+	- patches from ActiveState for sample code in OLE.pm POD section
+	- Win32::OLE::Const now correctly treats version numbers as hex
+	- use SvPV_nolen() where appropriate
+	- Win32::OLE::NLS methods: SetLocaleInfo, SendSettingChange
+	- Win32::OLE::Variant::Put returns $self for chaining
+	- Win32::OLE::Variant::Put(ARRAYREF) implemented
+	- Win32::OLE->WithEvents() function
+	- new Win32::OLE::Variant methods: Currency/Date/Number/Time
+	- AssignVariantFromSV() fixes for locale related VT_DATE/VT_CY problems
+	- Win32::OLE::Variant::Get/Put fixed for VARIANT|BYREF pointing to ARRAY
+	- several robustness enhancements to compensate for Perl's indeterminate
+	  sequence of global object destruction
+	- Win32::OLE->EnumAllObjects() function
+	- t/6_event.t tests for WithEvents functionality
+	- DCOM support in Win32::OLE->new() finally documented
+	- GetObject and GetActiveObject now support optional DESTROY argument
+	- OVERLOAD now works in DESTRUCTOR callback too
+	- new file NEWS.pod describes user visible changes
+
+0.1006	(unreleased)
+	- replace many XSRETURN_UNDEFs by XSRETURN_EMPTY
+	- various TypeInfo/TypeLib changes; Win32::OLE::GetTypeInfo() added
+	- trial implementation of Win32::OLE::QueryInterface
+
+0.1005	PRK update, ActivePerl 509
+	- rearrange PL_* definitions for 5.004_05 compatibility
+	- dependency on Win32::Registry removed. Win32::OLE::Const now uses XS
+	  code to search the registry. Now only needs read access to registry.
+	  Also reads the registry only once and caches typelibrary information.
+	- Win32::OLE->GetActiveObject() and Win32::OLE->GetObject() methods now
+	  also support an optional destructor as a 2nd argument.
+	- Export SetSVFromVariantEx from DLL too. Change SetSVFromVariant() to
+	  call SetSVFromVariantEx(..., bByRefObj=FALSE) instead of TRUE.
+	- removed Typeinfo.pm from Makefile.PL/MANIFEST before sending to AS.
+
+0.1004	(unreleased)
+	- SetVariantFromSV calls VariantClear instead of VariantInit
+	- new Win32::OLE::Variant $object->Copy() method
+	- new Win32::OLE->Option() class method for CP/LCID/Warn access
+	- removed COINIT_ALREADYINITIALIZED and __DisableOleInit
+	- Win32::OLE::Variant->LastError added for backward compatibility
+	  (it's now just a proxy for Win32::OLE->LastError)
+
+0.1003	(included with ActivePerl 507)
+	- Win32::OLE::Variant: Support for SAFEARRAYs (VT_ARRAY) added
+	  New methods: Dim/Get/Put
+	- SetSVFromVariantEx() can optionaly convert VT_BYREF variants to
+	  Win32::OLE::Variant objects instead of simply dereferencing them
+	- Win32::OLE::Variant "shares" class variables with Win32::OLE now
+	- Initialize/Uninitialize/SpinMessageLoop reset LastError
+	- EXPERIMENTAL ITypeInfo stuff
+	- CP_MACCP, CP_UTF7, CP_UTF8 constants in OLE.pm
+	- Win32::OLE::Enum::All converted to XS code. Enum.pm is now just POD
+	- New Win32::OLE::Lite module which requires *no* additional modules
+	- New COINIT_ALREADYINITIALIZED mode (and Win32::OLE::__DisableOleInit
+	  constant) to disable COM initialization by Win32::OLE
+	- {Ole|Co}Uninitialize() no longer called when the corresponding
+	  Initialize didn't succeed
+
+0.1002  (released by ActiveState with ActivePerl builds 505 and 506)
+	- contains Win32::OLE::__DisableOleInit stuff ???
+
+0.1001	(unreleased)
+	- No longer needs XSLock(); all C functions now receive a pPerl pointer
+	- Some functions exported for use by embedders (PerlSE, PerlCOM)
+	- PPD entries added into Makefile.PL
+
+0.10	Thu Sep 10 17:32:16 1998 (libwin32-0.14)
+	- memory corruption fix (for ->SetProperty method) by Gurusamy Sarathy
+	- document *nitialize(), SpinMessageLoop()
+
+0.0902	(unreleased)
+	- Allow specification of apartment model to Initialize() method. Special
+	  case is COINIT_OLEINITIALIZE to fall back to OleInitialize(). This
+	  is required to instantiate objects using compound document technology,
+	  like e.g. "MAPI.Session".
+	- Compatibility module now uses OleInitilize()
+
+0.0901	(unreleased)
+	- PL_na replaced by local variables
+	- Dispatch method now accepts [wFlags, 'method'] to specify
+	  various dispatch flags, e.g. DISPATCH_PROPERTYPUT
+	- new $Obj->SetProperty() methods supports setting properties
+	  with parameters
+	- bug fix: the DCOM spec ['host', 'prog.id'] is no longer 'shifted'
+	- more doc tweaks
+
+0.09	(unreleased)
+	- fix conversion from VT_DISPATCH/VT_UNKNOWN Win32::OLE::Variant objects
+	  into Win32::OLE objects (were previously blessed into wrong class)
+	- dynamically load CoInitializeEx to make OLE.dll compatible with 
+	  "Win95 without DCOM" once again
+	- convert Perl globals to PL_xxx form (with defines for Perl 5.004_xx)
+	- minor doc tweaks
+	- call CoFreeUnusedLibraries() whenever an OLE object is released
+
+0.0810  (unreleased, maybe PRK for Win32 version, included by ActivePerl 501)
+	- Removed USE_SV_PERINTERP, perl_atexit() only used for 5.004_68 and up
+
+0.0809  (unreleased) identical to 0.0808
+
+0.0808  (unreleased)
+	- Introduced USE_SV_PERINTERP to switch off perl_atexit() usage
+
+0.0807  (unreleased)
+	- OleInitialize replaced by CoInitializeEx(NULL, COINIT_MULTITHREADED)
+	  (as suggested by James Snyder). This gets rid of the hidden top-level
+	  window problem.
+	- Fixed warning in Win32::OLE::Const when called without arg
+
+0.0806  (unreleased)
+	- Bug fixes for IsLocalMachine()
+	- Free per-interpreter memory area at interpreter-exit
+	- Bootstrap no longer static function
+	- Use MY_VERSION as key/variable name for per-interpreter data
+
+0.0805  (unreleased)
+	- Never do CLSID lookup by registry on local machine
+	- try to use socket APIs too to determine host identity
+	- make all globals per-interpreter variables / remove DllMain
+	- proper per-interpreter cleanup for all Perl versions
+
+0.0804  (unreleased)
+	- Fix breakage in GetOleObject (from 0.0801) for 5.004_04 and earlier
+	- Ignore DCOM hostname if it seems to be the local machine
+
+0.0803  (unreleased)
+	- Rearrange t/3_ole.t to behave nicely when Excel is not installed
+	- Win32::OLE->Dispatch: only warn about unidentifiable method name
+	  when C<use strict "subs"> is in effect (kind of)
+	- Most error msgs and warnings are prefixed with Win32::OLE version#
+
+0.0802  (unreleased)
+	- Win32::OLE->new(['Machine', 'Prog.Id']) does a remote registry lookup
+	  if the Prog.Id is not registered locally.
+	- CLSCTX changed to CLSCTX_REMOTE_SERVER when a machine is specified.
+	  Otherwise OLE would still prefer a local server when available
+
+0.0801  (unreleased)
+	- Win32::OLE::Tie::(FETCH|STORE) now interpret $^H correctly
+	- removed all Perl related stuff from DllMain (for embedded stuff)
+	- Additional checks in GetOleObject for Perl 5.004_05 or later
+
+0.08    Mon May 11 03:36:49 1998
+	- Make sure mg_get() gets called during GetOleObject()
+
+0.0615  (unreleased)
+	- use SvIMMORTAL instead of SvREADONLY where applicable
+	- use newCONSTSUB in Win32::OLE::Const to define inlineable functions
+
+0.0614  (unreleased)
+	- devel/dumprot.cpp removed, use IROTVIEW instead :-)
+	- COSERVERINFO hack removed, requires MSC++ 4.2b or later now
+
+0.0613  (unreleased)
+	- WinOleEnum objects where never Safefree()d before
+	- New Initialize/Uninitialize class methods. Uninitialize zombifies all
+	  OLE objects and then calls OleUninitialize.
+
+0.0612  (unreleased)
+	- new Win32::OLE->SpinMessageLoop() class method
+	- Messageloop will be emptied before OleUnitialize is called
+	  (thanks to Steve Glassman for finding this problem!)
+
+0.0611  (unreleased)
+	- Win32::OLE::Tie::Store use DISPATCH_PROPERTYPUTREF for objects
+	  (as suggested by Steve Biondi)
+	- all OLE calls now automatically reset LastError
+	- added devel/dumprot.cpp tool to distribution
+
+0.0610  (unreleased)
+	- Win32::OLE::Const now loads consts from all TKINDs and not only ENUMs
+	- Win32::OLE::Variants are actually freed during DESTROY now
+	- Misc. robustness fixes (VariantClear etc.)
+
+0.0609  (unreleased)
+	- Win32::OLE::LastError() returns $Win32::OLE::LastError
+	- misc COSERVERINFO fixes
+
+0.0608  (unreleased)
+	- use scode from excepinfo structure when available instead 
+	  of DISP_E_EXCEPTION (as suggested by Steve Glassman)
+	- misc. Get(WideChar|MultiByte) robustness enhancements
+	- Win32::OLE::new now uses CLSTLX_SERVER
+	-         "       allows specification of remote server name
+	-         "          "         "       of numeric class id
+
+0.0607  (unreleased)
+	- enhanced C<in> allows multiple args and supports array refs too
+	- SetSVFromVariant array bug fixes
+	
+0.0606  (unreleased)
+	- use SvTRUE instead of SvIV to convert SV to VARIANT
+	- REFCNT of returned SV for VT_ARRAY variant is now set correctly
+	- SAFEARRAYs of VT_DISPATCH and VT_BSTR (and VT_VARIANT containing
+	  those) are now handled correctly
+	- folding of SAFEARRAYs removed again. Original structure is maintained
+	  t/3_ole.t adjusted accordingly
+	- Win32::OLE::Enum->All doesn't call Reset anymore
+
+0.0605  (unreleased)
+	- Property enumeration now dereferences TKIND_COCLASS etc.
+	- Overloading in Win32::OLE now only enabled by OVERLOAD pseudotarget
+	- Win32::OLE::CreateObject function for compatibility w/"Learning Perl"
+	- Win32::OLE->LastError returns a dual value now (IV and PV)
+	- Removed unsupported TKIND_ and VT_ constants from Win32::OLE::Variant
+	- lcidDefault changed back to LOCALE_SYSTEM_DEFAULT, the language
+	  neutral setting didn't allow portable scripts either
+	- Sample file type converter script in eg/word2xxx.pl
+	- valof uses CP and LCID of arg class for variant conversion
+
+0.0604  (unreleased)
+	- New package variable Win32::OLE::Tie specifies 'Win32::OLE::Tie' class
+	- Win32::OLE::Tie FIRSTENUM/NEXTENUM added for compatibility mode
+	- Win32::OLE::Tie STORE/FETCH renamed. Added default method argument
+	- Default method retries enabled under C<no strict 'subs';> only
+	- New C<in> function; C<With> renamed to C<with>
+	- Const module now defines xlConstant instead of $xlConstant
+	- multi-dimensional arrays are folded to lower dimensions if possible
+	  (e.g. 1x1 array -> scalar, 1x5 array -> list of 5, 5x1 -> unchanged)
+	- new regression tests: unicode, variant
+	- new sample: eg/word2pod.pl
+	- first cut of NLS.pm module
+	- compiles and tests ok with 5.004_60 built with -DUSE_THREADS
+	- new C<valof> function
+	- Win32::OLE objects overloaded conversion to strings and numbers
+
+0.0603  (unreleased)
+	- Win32::OLE::Enum::Count method removed
+	- SetSVFromVariant now works with SAFEARRAYs of non-VARIANT types too
+	- Onedimensional SAFEARRAY of UI1s converted to SvPV
+	- OLE, Enum and Variant objects all linked in g_pObj chain
+	- g_pObj chain protected by critical section to make it thread safe
+	- New package variables $CP,$LCID for Win32::OLE and Win32::OLE::Variant
+	- default lcid changed from LOCALE_SYSTEM_DEFAULT -> language neutral
+	- LastOleError is stored in a package variable $LastError now
+	- Error reporting now controled by $Warn package variable
+	- Win32::OLE::Variant: new As,ChangeType,Type,Unicode,Value methods
+	- Win32::OLE::Variant overloaded "" and 0+ operations
+	- Preliminary Variant BYREF support
+	- Dispatch can return Win32::OLE::Variant objects too
+	- Compatibility package "OLE" created
+	- Invoke method added, supports default method too
+	- Memory leaks
+	- "keys %$object", QueryObjectType and Win32::OLE::Const::Load no
+	  longer croak when the GetTypeInfo is unavailable or returns 0
+	- Enum::new returns undef if object is not a valid collection object
+
+0.06  Fri Feb  6 21:13:20 1998
+	- bugfix: DoCroak uninitialized variable
+	- Multidimensional arrays can now be sent and received
+
+0.05  Sun Dec 14 21:13:11 1997
+	- All OLE errors are caught and a verbose error message is provided
+	  through Carp::croak (if -w is in effect)
+	- Internal errors will no longer be silently ignored; they'll croak now
+	- All hardcoded buffer size limits removed from XS code
+	- Collection support is fixed and moved into Win32::OLE::Enum
+	- C<keys %$object> now enumerates the objects properties
+	- Win32::OLE::Const module imports constants from type libraries
+	- Moniker support through Win32::OLE->GetObject
+	- Win32::OLE->GetActiveObject finds active instance of OLE server
+	- Variants moved to Win32::OLE::Variant module; enhanced functionality
+	- Win32::OLE->QueryObjectType return typelib name and class name of
+	  object
+
+0.04  Sun Oct 12 23:03:32 1997 (unreleased)
+	- support for unnamed default methods (thanks to
+	  Doug Lankshear <DougL@ActiveState.com>)
+	- CreateVariantFromSV is more robust now
+	- support for omitting optional params with "undef"
+	- named arguments can be specified as a hash ref
+	- array elements are now properly typed (used to be always text)
+	- additions to testsuite
+	- With() utility method suggestion
+	- optional DESTROY method arg for Win32::OLE->new
+	- Win32::OLE::CreateObject renamed to Win32::OLE::new
+	  old Perl new() method deleted
+	- Hardcoded package names gone, so inheritance is feasible now
+
+0.03  Sat Jul 12 16:10:07 1997
+	- DllEntryPoint for Borland
+
+0.02  Sat May 10 15:40:52 1997
+	- cleaned up one big memory leakathon (DESTROY actually gets
+	  called now on all the objects)
+	- back to XS
+	- package names are Win32::OLE and Win32::OLE::Tie now
+	- fixed misplaced DESTROY
+	- implemented OLEUninitialize via DllMain
+
+0.01  Sat Apr  5 14:23:42 1997
+	- original version; created by h2xs 1.18
+	- imported Activeware version

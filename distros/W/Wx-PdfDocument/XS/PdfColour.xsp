@@ -1,0 +1,38 @@
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfColour} class wxPdfColour
+{
+
+public:
+  
+  %name{newDefault} wxPdfColour() %Overload;
+
+  %name{newNewGrayscale} wxPdfColour(const unsigned char grayscale) %Overload;
+  
+  %name{newNewColour} wxPdfColour(const wxColour& colour) %Overload;
+
+  %name{newNewRGB} wxPdfColour(const unsigned char red, const unsigned char green, const unsigned char blue) %Overload;
+  
+  %name{newNewCMYB} wxPdfColour(double cyan, double magenta, double yellow, double black) %Overload;
+  
+  %name{newName} wxPdfColour(const wxString& name) %Overload;
+
+  %name{newCopy} wxPdfColour(const wxPdfColour& colour) %Overload;
+
+  %name{SetColourGrayscale} void SetColour(unsigned char grayscale = 0) %Overload;
+  
+  %name{SetColourColour} void SetColour(const wxColour& colour) %Overload;
+  
+  %name{SetColourRGB} void SetColour(const unsigned char red, const unsigned char green, const unsigned char blue) %Overload;
+  
+  %name{SetColourCMYB} void SetColour(double cyan, double magenta, double yellow, double black) %Overload;
+
+  %name{SetColourName} void SetColour(const wxString& name) %Overload;
+
+  wxPdfColourType GetColourType() const;
+
+  bool Equals(const wxPdfColour& colour) const;
+
+};

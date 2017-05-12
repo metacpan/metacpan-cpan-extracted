@@ -1,0 +1,47 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_00 - This is the release notes for Version 1.0 of Win32::GUI
+
+=head1 Release Date
+
+12th November, 2004
+
+=head1 Summary of Changes
+
+This version is a main development branch of Win32::GUI based
+on a rewritten base code.
+
+  - Completely new base code. 
+  - Full NEM/OEM support. 
+  - Lot of control Win32 API method. 
+  - Preserved Perl context. 
+  - New DoModal. 
+  - More documentation. 
+  - MDI application support. 
+  - Add MonthCal control. 
+
+=head1 CHANGELOG from v0.99_1
+
+  + [Laurent Rocher] :
+    - GUI.pm, GUI.xs, Readme.txt, Readme
+        + VERSION 1.0
+  + [Jeremy White] :
+    - GUI.xs :
+        + Fix SetEvent        
+  + [Laurent Rocher] :
+    - GUI.xs :
+        + Fix MessageBeep XS interface.
+    - Button.xs 
+        + Fix -align option
+
+=head1 Contributors to this release
+
+=over
+
+=item Jeremy White
+
+=item Laurent Rocher
+
+=back
+
+=cut

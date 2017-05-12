@@ -1,0 +1,28 @@
+Revision history for Perl extension WWW::Wookie.
+
+0.102 Sat Apr 22 16:06:09 UTC 2017
+    - Fixed RT#121287
+
+0.101 Sun Aug  7 14:26:03 UTC 2016
+    - Retired Wookie http://attic.apache.org/projects/wookie.html
+
+0.100 Fri Apr 1 20:43:37 UTC 2016
+    - independent from MooseX::AttributeHelpers
+    - minimum perl version required 5.20 (mainly due to Readonly having that)
+
+0.03  Thu Nov  25 02:18:04 2010
+    - overloaded stringification of a server connection
+    - added widget service categories
+    - graceful handling of server URL without trailing slash (RT#63231)
+    - added more tests
+
+0.02  Sun Nov   7 12:05:02 2010
+    - added build requirements
+    - WWW::Wookie::Connector::Service method getAvailableWidgets returns an
+      array of widgets instead of a hash reference containing widgets
+    - fixed broken links in POD (RT#62774)
+    - added namespace::autoclean as dependency (RT#62763)
+    - added test for dependencies
+
+0.01  Sat Nov   6 02:05:02 2010
+    - original version

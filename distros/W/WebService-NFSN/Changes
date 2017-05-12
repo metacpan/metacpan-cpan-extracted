@@ -1,0 +1,71 @@
+Revision history for WebService-NFSN
+
+1.03   2014-04-30
+	- Don't use NFSN's internal CA certificate
+	  The API server now uses a Thawte certificate instead.
+
+1.02   2011-12-21
+	- Require correct version of Exporter
+
+	- Fix possible installation problem:
+
+	    Module::Build needs to be at least 0.36
+
+1.01   2011-11-20
+	- Fix possible installation problem:
+
+	    parent needs to be in configure_requires
+
+1.00   2011-11-11
+	- Require libwww-perl 6.00
+
+	- Use parent instead of base
+
+0.10   2011-05-05
+	- If you have LWP 6.00 or better, WebService::NFSN will now
+	  automatically verify the server's certificate to protect you
+	  against man-in-the-middle attacks.
+
+	- Concatenate generated code to use fewer string evals
+
+0.09   2010-11-11
+	- Use Scalar::Util's reftype instead of UNIVERSAL::isa
+
+	- Cleaned up usage of eval and $@ (using Try::Tiny where possible)
+
+	- Changed examples/nfsn.pl to get credentials from .nfsn-api
+
+	- Switched from Digest::SHA1 to Digest::SHA, because the
+	  latter became a core module in Perl 5.10.
+
+0.08   2008-09-28
+	- The constructor now reads login credentials from .nfsn-api
+	  if you don't supply them as parameters.
+
+0.07   2008-09-27
+	- Added the optional ttl parameter to the DNS addRR method.
+
+0.06   2008-08-28
+	- Added the addSite method to Account objects
+
+	- If the authentication timestamp is out of range, appends both
+	  the client's & server's time to the debug field of the error.
+
+0.05   2008-04-25
+	- Now compatible with JSON::XS 2 (but still works with 1.x).
+	  You can also substitute pure-Perl JSON 2, but it's slower.
+
+0.04   2007-12-19
+	- Added the listForwards method to Email objects
+
+0.03   2007-08-09
+	- Added the sites property to Member objects
+
+0.02   2007-07-07
+	- Now does parameter validation on method calls
+
+	    Omitting a required parameter now generates a client-side
+	    error.  Using an unknown parameter generates a warning.
+
+0.01   2007-04-06
+	- Initial release

@@ -1,0 +1,8 @@
+Revision history for Perl extension Weaving::Tablet.
+
+0.8  Tue May 14 15:10:30 2002
+	- original version; created by h2xs 1.21 with options
+		-X -A -v 0.8 -b 5.4.0 Weaving::Tablet
+
+    - copied code from Snartemo 0.6 (old name) and updated ancillary files
+	- first release under this name

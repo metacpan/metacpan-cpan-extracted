@@ -1,0 +1,19 @@
+bin/klicktel.pl
+Changes
+Build.PL
+ignore.txt
+lib/WWW/KlickTel/API.pm
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-operatingsystem.t
+t/02-cache.t
+t/03-connect.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

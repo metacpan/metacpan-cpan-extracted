@@ -1,0 +1,31 @@
+Revision history for Perl extension WWW::Offliberty.
+
+1.000004 2017-01-27T16:34+00:00
+ - Change test video as previous test video was deleted, making tests fail
+
+1.000003 2016-07-14T08:18+01:00
+ - Update OFF_URL
+ - Make OFF_URL easier to override and document this
+
+1.000002 2015-12-19T18:20+02:00
+ - Depend on HTTP::Tiny >= 0.014
+ - Add perlcritic test and make code comply
+
+1.000001 2015-12-06T23:56+02:00
+ - Bypass hotlinking protection (RT #110057)
+ - Add some tests that attempt to catch dummy results
+ - Update OFF_URL and make $http global (making the module easier to jury-rig)
+
+1.000 2015-07-15T17:00+03:00
+ - Replace LWP with HTTP::Tiny + Test::RequiresInternet
+ - Drop perl requirement to 5.8.9+
+ - Improve documentation
+
+0.002 2014-05-04T09:14+03:00
+ - Update service URL
+ - Use LWP::Online in network test
+ - Add command-line interface to offliberty
+ - Update Changes to follow CPAN::Changes::Spec
+
+0.001 2013-09-28T23:48+03:00
+ - Initial release

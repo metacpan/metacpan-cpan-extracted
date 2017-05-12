@@ -1,0 +1,30 @@
+---
+abstract: 'An incomplete, wip perl client to the Saucelabs REST API'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::LWP::UserAgent: '0'
+  Test::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Saucelabs
+requires:
+  Carp: '0'
+  JSON: '0'
+  Moo: '0'
+  Net::HTTP::Knork: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/saucerest-perl/issues
+  homepage: https://github.com/gempesaw/saucerest-perl
+  repository: https://github.com/gempesaw/saucerest-perl.git
+version: '0.0201'

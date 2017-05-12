@@ -1,0 +1,22 @@
+---
+abstract: WebService::MailJet
+author:
+  - 'Anwesh <kanishkablack@gmx.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-MailJet
+requires:
+  MIME::Base64: '0'
+  WebService::Client: '0'
+resources:
+  bugtracker: https://github.com/kanishkablack/WebService-MailJet/issues
+  homepage: http://search.cpan.org/dist/WebService-MailJet/
+  repository: git://github.com/kanishkablack/WebService-MailJet.git
+version: '0.003'

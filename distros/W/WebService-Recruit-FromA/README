@@ -1,0 +1,94 @@
+NAME
+    WebService::Recruit::FromA - An Interface for FromA Navi Web Service
+
+SYNOPSIS
+        use WebService::Recruit::FromA;
+    
+        my $service = WebService::Recruit::FromA->new();
+    
+        my $param = {
+            'api_key' => $ENV{'WEBSERVICE_RECRUIT_FROMA_KEY'},
+            'ksjcd' => '04',
+            'shrt_indx_cd' => '1001',
+        };
+        my $res = $service->jobSearch( %$param );
+        my $root = $res->root;
+        printf("Code: %s\n", $root->Code);
+        printf("TotalOfferAvailable: %s\n", $root->TotalOfferAvailable);
+        printf("TotalOfferReturned: %s\n", $root->TotalOfferReturned);
+        printf("PageNumber: %s\n", $root->PageNumber);
+        printf("EditionName: %s\n", $root->EditionName);
+        print "...\n";
+
+DESCRIPTION
+    お仕事検索webサービスは、フロム・エー
+    ナビ上に登録されているお仕事情報を取得できるAPI
+    です。 リクエストURL にパラメータを付けたHTTP
+    リクエストに対し、XML
+    形式でレスポンスを返します（REST
+    方式）。リクエストパラメータとしては、職種、勤務
+    期間、勤務日数、勤務時間帯、検索パターン、取得件
+    数、データ取得エリア（市区町村レベル）など様々な
+    パラメータを備えています。
+    また、戻り値として返されるXMLには、お仕事に関する
+    基本的な情報だけでなく、勤務地の郵便番号や勤務地
+    の緯度・経度情報、写真画像のURLなども含まれており
+    、様々な情報サービスへの展開が期待できる仕様とな
+    っています。
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $service = WebService::Recruit::FromA->new();
+
+    This accepts optional parameters.
+
+        my $conf = {
+            utf8_flag => 1,
+            param => {
+                # common parameters of this web service 
+            },
+        };
+        my $service = WebService::Recruit::FromA->new( %$conf );
+
+  add_param
+    Add common parameter of tihs web service.
+
+        $service->add_param( param_key => param_value );
+
+    You can add multiple parameters by calling once.
+
+        $service->add_param( param_key1 => param_value1,
+                             param_key2 => param_value2,
+                             ...);
+
+  get_param
+    Returns common parameter value of the specified key.
+
+        my $param_value = $service->get( 'param_key' );
+
+  jobSearch
+    This makes a request for "jobSearch" API. See
+    WebService::Recruit::FromA::JobSearch for details.
+
+        my $res = $service->jobSearch( %$param );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $service->utf8_flag( 1 );
+        $service->user_agent( 'Foo-Bar/1.0 ' );
+        $service->lwp_useragent( LWP::UserAgent->new() );
+        $service->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://froma.yahoo.co.jp/s/contents/info/cont/web_service/index.html
+
+AUTHOR
+    RECRUIT Media Technology Labs <mtl@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 RECRUIT Media Technology Labs
+

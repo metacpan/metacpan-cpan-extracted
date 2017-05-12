@@ -1,0 +1,45 @@
+---
+abstract: 'Diffbot Perl API'
+author:
+  - 'Cesare Gargano <garcer@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Test::Fatal: 0
+  Test::InDistDir: 0
+  Test::More: 0
+  URI: 0
+  perl: 5.006
+  strict: 0
+  strictures: 0
+  version: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Webservice-Diffbot
+provides:
+  WebService::Diffbot:
+    file: lib/WebService/Diffbot.pm
+    version: 0.003
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  Moo: 0
+  namespace::clean: 0
+resources:
+  homepage: https://github.com/garcer/WebService-Diffbot
+  repository: https://github.com/garcer/WebService-Diffbot.git
+version: 0.003

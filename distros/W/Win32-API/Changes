@@ -1,0 +1,517 @@
+History of Win32::API perl extension.
+
+2016-01-21  Win32::API v0.84    bulk88
+   - Fixed RT #80322, after around 8 executions of a Win32::API::Callback
+     callback in a process, all floating point math (x87 FPU state) was
+     corrupted which caused all FP math ops in PP and C later on to be NaNs or
+     other junk results, this lead to "basic math" being broken in pure perl
+     for some people or for me a crash in 03_Jim_Shaw.t
+
+2015-09-29  Win32::API v0.83_01    bulk88
+   - Fixed, VC 6 build broken due to C syntax error since v0.76_02
+     http://git.io/vcZ08
+   - Revised api-test for more binary diff stability between rebuilds
+   - Fixed, RT #92971, WCHAR array inside Struct.pm struct caused memory
+     corruption
+
+2015-05-26  Win32::API v0.82    bulk88
+   - Fixed, missing MANIFEST entry caused GCC 32 bit builds to be broken
+
+2015-05-26  Win32::API v0.81    bulk88
+   - Fixed #104426, GCC 32 bit build uses real assembly code and a real
+     (GNU) assembler instead of inline assembly, Borland C support, if it still
+     worked, has been removed
+   - 30-40% startup time improvement ("timeit perl -e"require Win32::API;
+     Win32::API->import();""), and 632 KB less memory used on startup
+     on 32 bit threaded 5.22 Perl ("perl -e"system 'pause'; require Win32::API;
+     Win32::API->import(); system 'pause'"")
+   - Fixed, setting $DEBUG in a BEGIN block, which is described in the POD
+     but didn't actually work and was ignored from a BEGIN block
+   - Debug mode code is now compiled away using constant folding, undocumented
+     runtime setting of $DEBUG has been removed
+   - Win32::API::Test is no longer installed, it is never needed outside of
+     testing, this saves disk space
+
+2015-05-14  Win32::API v0.80_02    bulk88
+   - Improvements to debugging mode for RT #104426
+
+2015-03-05  Win32::API v0.80_01    bulk88
+   - additional diagnostics for
+     http://www.cpantesters.org/cpan/report/fa1749cc-6bf4-1014-a4f8-5a5c5d380f5a
+
+2015-03-05  Win32::API v0.80    bulk88
+   - Fixed RT #100666, newer Cygwins strnicmp link failure in Callback.xs
+
+2014-08-25  Win32::API v0.79    bulk88
+   - promote to release version
+
+2014-08-04  Win32::API v0.78_02    bulk88
+   - Fixed, trial release for
+     http://www.cpantesters.org/cpan/report/f6bd6af0-1a3b-11e4-b698-db7a2867dcfa
+
+2014-08-02  Win32::API v0.78_01    bulk88
+   - Fixed, trial release for
+     http://www.cpantesters.org/cpan/report/e98d4c80-198a-11e4-b698-db7a2867dcfa
+
+2014-07-29  Win32::API v0.78    bulk88
+   - Fixed, POD (khw, bulk88)
+   - Win32::API::Callback and Cygwin fork incompatibility noted
+   - Fixed, RT #94906, signed integral return values that were shorter than an
+     IV and whose value was negative, were returned as large unsigned numbers
+     in Perl
+
+2014-01-09  Win32::API v0.77    bulk88
+   - Improved, hardened tests for error code returned by API/More's new()
+   - Improved, new() is more resistent to future changes in LastError clearing
+     behaviour in MS's Windows API
+   - Fixed, in some rare cases with very wrong parameters being passed to new()
+     no error code was set
+   - Deprecated, Win32::API uses Win32 error codes, not C/Unix error codes,
+     assigning low numbered Win32 error codes to $!, results in $!
+     stringification to Unix descriptions, not Win32, therefore only $^E and
+     GetLastError may be used to retrieve the error code of a failed API
+     constructor call
+
+2013-11-24  Win32::API v0.76_05    bulk88
+   - Added, Cygwin 64 bit support RT #90597
+
+2013-10-12  Win32::API v0.76_04    bulk88
+   - Fixed, a lie in the POD for Type.pm, about the Type database
+   - Fixed, using Perl 5.6/MakeMaker < ~6.25 caused Makefile.PL to generate
+     a syntax erroring makefile
+   - Added, beginnings of MSYS compatibility (Thanks to Sebastian Schuberth)
+   - Fixed, many POD typos by David Steinbrunner
+   - Fixed, removed use of "package ExtUtils::MM_Win32;" in Makefile.PLs for
+     MSYS compatibility
+   - Fixed, substr bug by Sebastian Schuberth
+   - Fixed, thread_fails.t crashes due to race freeing the callback function
+     stub
+   - Improved, Win32::API::Callback::IATPatch::DESTROY optimization
+
+2013-07-04  Win32::API v0.76_03    bulk88
+   - Fixed, rebuilt API_test64.dll to fix a problem where Debug CRT was required
+     by manifest but not by import table, this caused API_test64.dll to be
+     unloadable on many x64 CPANTesters machines
+   - 2 Makefile.PL files are not executable in the CPAN tarball anymore for
+     Kwalitee reasons
+
+2013-06-27  Win32::API v0.76_02    bulk88
+   - Fixed, on 32 bits, Call_asm since 0.76_01, in Visual Studio, even with
+     symbols loaded, lost the the part of the call stack behind Call_asm in VS
+     debugger, while in the body of Call_asm, in a crash this made debugging
+     harder by showing a corrupt or incomplete call stack, the prologue code was
+     reworked to enable traditional EBP walking
+   - Changed RaiseException/TerminateProcess on ESP inconsistency to a catchable
+     die() if no C debugger is attached, community opinion from PerlMonks, if
+     C debugger is attached, then Win32::API crashes to enable examination of
+     process state
+   - Added, previously (v0.76_01) 32 bit VC-only stack checking/ESP
+     inconsistency now works on 32 bit GCC for __stdcall/__cdecl mixups only,
+     not for wrong number of params (C stack overwritten)
+   - Fixed, iat.t fatally exits after "ok 23" with "Usage:
+     Win32::API::Callback::IATPatch::new(classSV, callback, HookDll,
+     ImportDllName, ImportFunctionName) at t/iat.t line 163." on 32 bit Mingw
+     Perl with 64 bit IVs (all of iat.t is skipped on 32 bit Cygwin Perls with
+     64 bit IVs, so test was never executed before), reported by kmx
+   - Fixed, when using Win32::API::Import, the API object internally created was
+     leaked, now when the sub is freeded, the API object also is destroyed, this
+     might unload the DLL being called, previously the DLL referenced by a
+     ::Import was never unloaded except at interpreter exit
+   - Fixed, Win32::API::More::Import created Win32::API objs,
+     not Win32::API::More
+   - Fixed, POD had erronous commas in code samples, UseMI64 code example didn't
+     match current behaviour
+   - Improved, the internals of a Win32::API obj were reorgranized for more
+     speed
+   - Improved, POD for NULL pointer for letter 'P'
+   - Improved, mangle_simple_struct in API_test*.dll was made less noisy during
+     a make test
+   - Improved, ::Import created subs are now faster than doing $api->Call(,
+     pre 0.76 Import time 0.85us per call, 0.76 alpha pure Perl Import time
+     0.69us, 0.76 XSUB Import (final) 0.34 us, regular ->Call( is 0.40 us, a
+     regular XSUB wrapper of the same C func is 0.22 us for comparison,
+     *internals* The Call() XSUB is not written in XS anymore but plain C. This
+     allows some R/W optimizations to the interp struct in the header of Call()
+     and simplifies Import vs ->Call differences.
+   - API Change, Import now returns a API obj ref, previously it returned a
+     1/0 bool scalar
+   - API Change, new and Import now check to make sure a sane number of params
+     are passed and die otherwise RT#82611 txn-1183194
+   - Under undef-ed NDEBUG and/or DEBUGGING, a wrong assert happened in
+     my_find_mg on old Perls that need my_find_mg
+   - Improved, XSUB Import is down to 0.24 us which is only .02-.03 us longer on
+     benchmark vs regular XSUB.
+     *internals* TARG is now used and sv_set* instead of allocating new SVs,
+     this is the largested drop in time. 2nd biggest time win was getting rid
+     of the inefficient implementation of memcopy in MS CRT. Also cpu uops
+     reduction around the incoming args loop. A bunch of asm shifts, scales,
+     Mod R/Ms, --/++s, and adds were removed by C code modification.
+   - TODO REMOVE TEST CODE, alloca was rewritten for Visual C for speed and not
+     cause extends of the C stack, this is dangerous so rewrite this with push
+     asm ops from template param array in control
+   - Fixed, WIN32_API_DEBUG build option now works on GCC
+   - Fixed, the "Win32::API a function was called with the wrong prototype..."
+     message had a typo
+
+2013-03-26  Win32::API v0.76_01    bulk88
+   - Fixed RT #82611, make tool detection in Makefile.PL didn't work for
+     absolute path make tools, also removed a "dmake:  makefile:  line 276:
+     Warning: -- Macro `CCFLAGS' redefined after use" warning
+   - Fixed RT #83191, C stack not aligned to 16 bytes on x64
+   - Improved, ::API->Call() is much faster now
+   - Added, a limit of ~65K parameters per C function prototype was added
+   - Added, on VC 32bit, Win32::API detects (TODO, dies) __stdcall funcs that
+     were called with the wrong prototype, or __stdcall/__cdecl mixups, similar
+     to VC's stack pointer Run-Time Error Checks feature
+   - Improved, API_test64.dll was rebuilt with a dynamic CRT, dozens of KBs
+     smaller
+   - Fixed, threading_fails.t skipped on unthreaded Perls (Perl 5.6 related) to
+     stop crashes
+   - Fixed, 32 bit Strawberry Perl 5.8.9 with GCC 3.4.5 now builds and passes
+   - Now requires Encode::compat, not Encode::, hopefully will enable
+     automatic building on Perl 5.6
+   - Win32::API is faster on 5.10 than 5.8 (HvNAME related)
+   - Win32::API on 32 bit Windows has a little bit more optimization on Visual C
+     than on Mingw GCC
+
+2013-01-09  Win32::API v0.75    bulk88
+   - Fixed/added, alpha Perl 5.6.2 support has been added, ::API will compile,
+     will not crash except for randomly threading_fails.t . Many tests fail due
+     to prerequities not being met. 00_API.t should pass on 5.6.2 with zero
+     failures WITHOUT prereqs. Other tests require Math::Int64 and
+     Encode::compat.
+   - Removed, distropref workaround for ActiveState's PPM system (AS fixed it)
+
+2012-11-21  Win32::API v0.74    bulk88
+   - Fixed, non threaded Perl fix from Reini Urban
+   - Fixed, Perl 5.8 in Struct.pm syntax error (cpantesters report)
+   - Fixed, LNK 4210 warning on >= VS 2005 fixed
+   - Fixed, misc POD
+
+2012-10-20  Win32::API v0.73    bulk88
+   - Known Issue, IATPatch usually does not work on Cygwin
+   - Fixed, now works on 32 bit Cygwin Perl
+   - Fixed, now works on 32 bit Perl with 64 bit IVs
+   - Fixed, misc POD
+   - Added, check for cygpath tool on ::API for Cygwin 
+   - Fixed, cygpath fix from Jerry D. Hedden
+   - Fixed, ::Callback's DLL failed to load in DynaLoader on newer
+     (Strawberry Perl 5.16.*) Mingws due to newer Mingws starting to always
+     include Static TLS in DLLs
+   - Fixed, ::API on newer 32 bit Mingws (Strawberry Perl 5.16.*) crashed on
+     all cdecl calls due to different optimization defaults in newer Mingws
+   - Improved, some tests were hardened
+   - Fixed, should build on ActiveState's PPM system
+
+2012-10-16  Win32::API v0.72    cosimo
+   - Improved Callback tests by properly detecting native or ithreads
+     fork capability. Thanks to Steve Hay for the patch.
+
+2012-10-15  Win32::API v0.71    bulk88
+   - API Change, UseMI64 changed to always return old value, not old on no
+     setting and new on setting
+   - Added, "in" for ::API and "out" for ::Callback are automatically
+     treated as Math::Int64 objects if they are refs, a call to UseMI64 is
+     recommended but not mandatory now
+   - Half Fixed, on a fork, the child interp free the parent's Win32::API DLL
+     HMODULE causing access violation, though a problem with unicode path names
+     containing characters not in the local CP probably exists
+   - Added, support for forking to Win32::API/Win32::API::More, not ::Callback
+   - Added, support for WINAPI, NTAPI, CALLBACK, WINAPIV calling conventions
+   - Added, Win32::API::Callback::IATPatch
+
+2012-08-16  Win32::API v0.70_02    bulk88
+   - Added, typedef() in ::Struct now aborts and warns when encoutering an
+     unknown type rather than creating a garbage struct definition
+     (http://perlmonks.org/?node_id=978468)
+   - Added, new() in ::Struct now aborts and warns when encoutering an 
+     unknown type, rather than silent failure and a 0 byte long struct buffer
+     being passed to the C func
+   - Fixed/Added, pointers to other ::Struct types now supported in ::Struct
+   - Optimized, trim down 32 bit asm code and Call() in ::API, untested 64 bit
+     IV on 32 bit support in ::API
+   - Optimized APIPARAM struct
+   - Fixed, in Call() some of the callbacks trashed the 1st parameter on the PL
+     stack, which cause no symptoms since it was the ::API object which was read
+     from the PL stack much earlier in Call()
+   - Fixed some no symptoms problems with using a stale local SP in Call()
+     after a callback, which in a million to once chance might have been
+     reallocated during the callback
+   - Added 'void' as a type, it is an alias for VOID, which is a 'c'/char
+     maybe this needs to be revisted one day because a void function does
+     not return a char, but returns garbage on 32 and 64
+   - Added, for C proto API objects, struct type is checked against supplied
+     struct object, dies on failure
+   - Fixed, bug was can not create an alias to char * from ::Type::typedef,
+     the alias is to char instead of char *, C function gets a extended char
+     instead of pointer
+   - Changed, Carp is used in more placed in ::Struct
+   - Added, SafeReadWideCString function
+   - Fixed, a length checking bug in WriteMemory
+   - Fixed, creating an API object, with ::Callback or ::Struct as return type
+     now fatally errors in new() instead of silent failure and being a void
+   - Optimized, removed CRT initialization code on MSVC
+   - Added, 'V' now works for "in" letter protos, it is equivelent to ""
+   - Added, strict, warnings, and pod testing globally
+
+2012-08-16  Win32::API v0.70_01    bulk88
+   - broken CPAN package, useless
+
+2012 never CPAN released  Win32::API v0.70    bulk88
+   - Added, Callback now works on x64
+   - Added, Quads on API and Callback for 32 bit perl, they are
+     8 byte strings or Math::Int64 objs on 32 bit perl 
+   - Added, floats and doubles work in Callback
+   - Callback has been rewritten, much less C and machine code, more Perl
+   - Fixed RT #55660 and #77677, nonvolatile registers were corrupted on x64,
+     especially if more than 4 parameters
+
+2012 never CPAN released  Win32::API v0.69    bulk88
+   - Fixed RT #12057, dll leak if func not found
+     (https://rt.cpan.org/Ticket/Display.html?id=12057)
+   - Fixed RT #77048, shorts and short typedefs crashed since 'S'
+     was mapped wrong to structs, fix in Win32::API::More, struct now 'T'
+     in ::More, 'S'/'s' now dies on Win32::API if not Win32::APU::Sturct objs,
+     not crashes
+     (https://rt.cpan.org/Ticket/Display.html?id=77048)
+   - Fixed RT #77055, returned numbers are always signed, unsigneds
+     fixed in Win32::API::More
+     (https://rt.cpan.org/Ticket/Display.html?id=77055)
+   - Fixed RT #77182, "int* var" works, "int *var" unparsable,
+     fixed in core and ::More
+     (https://rt.cpan.org/Ticket/Display.html?id=77182)
+   - Fixed/Added RT #39810, in Win32::API::More for C proto created objs,
+     pointer to numbers are automatically packed and unpacked, now 1234 or
+     0x04D2 not "\xD2\x04\x00\x00", feature was implemented but broken
+     previously
+   - Fixed, on x64 float "in" params were broken, in 0.68, 4 byte floats were
+     converted to 8 byte doubles of the same (approx) numeric 
+     value when being prepared for XMM register loading, a C func 
+     that takes floats will read 4 bytes from an XMM register, not 8
+   - Fixed, on x64, for msvc builds, the callstack was lost during
+     Call_x64_real
+   - for a func with char * as return type, NULL caused crash, and perl
+     memleak if it didn't crash on 32bit, char * as a return type's handing
+     is still very flawed, signed/unsigned doesn't work, float * doesn't work,
+     if the char * is dynamically allocated by its source, it is leaked
+   - for a func with char as return type, undef was always returned, fixed
+   - void ** and something ** don't parse, now errors out cleanly on a **
+   - stability improvements to Win32::API::Callback, -Od, -O1, -O2 and
+     Incremental Linkings/ILT now ok on MSVC 2003
+   - on 32 bits, funcs with float return type were silently never called, fixed
+   - if a buffer overflow for pointers is detected, a die is thrown, unless env
+     var "WIN32_API_SORRY_I_WAS_AN_IDIOT" is set
+   - Added, adding unsigned or signed prefixes to C prototype for char
+     family (in only, out not implemented) cause numeric treatment for the
+     scalar parameter, not string
+     treatment, previously unsigned/signed were unparsable
+   - Added Win32::API objs from non-DLL function pointers
+     use as "$function = new Win32::API::More(undef, 123456, 'GetHandle',
+            'P', 'I');", 123456 is the function pointer
+
+2012-04-10  Win32::API v0.68    Cosimo
+
+   - Temporarily skip RT#53914 related Callback test that's crashing
+     for everyone and CPAN testers too.
+
+2012-02-14  Win32::API v0.67    Cosimo
+
+   - Fix a problem in 0.66 that prevented successful build and install
+     of Win32::API. In other words, v0.66 is unusable! Stay away.
+     Thanks CPAN testers!
+
+2012-02-13  Win32::API v0.66    Cosimo
+
+   - RT#74578 about structs alignment calculation should be fixed.
+     Thanks to Douglas Wilson (DOUGW) and Reini Urban!
+
+2012-02-12  Win32::API v0.65    Cosimo
+
+   - No changes other than passing all files through perltidy
+
+2011-08-28  Win32::API v0.64    Cosimo
+
+   - Small improvement to Makefile.PLs to build or not build
+     the Callback module depending on architecture (64 bit archs
+     by default don't build Callback, it's known to fail tests).
+
+2011-07-19  Win32::API v0.63    kmx
+
+   - Fix for the strawberry perl 5.14.1/x64
+     the upgraded gcc toolchain (4.4.6) uses different underscoring
+
+2011-03-26  Win32::API v0.62    Cosimo
+
+   - Skip Callback/t/03_Jim_Shaw.t test as it's reported failing
+     on both 32-bit and 64-bit architectures.
+
+2011-03-22  Win32::API v0.61    Cosimo
+
+   - Fixed build process that was failing due to missing *.h
+     and *.asm files in the MANIFEST
+
+2011-03-19  Win32::API v0.60    Cosimo
+
+   - Added *preliminary* x64, 64-bit, support.
+     Now the test dll also ships with a x64 build
+     and an updated VS solution file with Release and Debug x64 builds.
+
+     Many fantastic people helped with 64 bits support:
+     https://rt.cpan.org/Ticket/Display.html?id=55660
+
+   - Fixed RT #48006
+     (https://rt.cpan.org/Ticket/Display.html?id=48006)
+
+   - Added a minimal TODO file, so I can remember where I left off
+
+2009-07-02  Win32::API v0.59     Cosimo
+
+   - Fixed compilation with gcc/mingw 4.4.0, thanks to Reini Urban.
+     (RT#47398, https://rt.cpan.org/Ticket/Display.html?id=47398)
+
+2009-01-17  Win32::API v0.58     Cosimo
+
+   No significant updates for normal users.
+   Developers instead please update to v0.58.
+   Now you can play with the API_test.dll.
+
+   - Test DLL MSVC project files updated to MSVC 2008.
+     Now I will be able to add new tests (__cdecl)
+   - General cleanup of tests and removed some warnings
+
+2008-10-16  Win32::API v0.57     Cosimo
+
+   - Re-added source code for the API_test DLL.
+     Still needs to be adapted to be built with GCC/MinGW
+     and different Makes, but it's a start.
+
+2008-10-03  Win32::API v0.56     Cosimo
+
+   - RT#39730 (http://rt.cpan.org/Ticket/Display.html?id=39730)
+
+     Now passing a Perl undefined value to an API imported with
+     a prototype, automatically turns it into a NULL value.
+     Thanks to Ikegami for his bug report and patch.
+     Added a new test case.
+
+   - Fixed MSVC compiler version detection in Win32::API::Test.
+     Thanks to Salvador Ortiz Garcia (sog at msg com mx)
+
+   - Fixed several compilation warnings on `Callback.xs'
+
+   - Started some work to support double*. Halfway through.
+
+2008-03-23  Win32::API v0.55     Cosimo
+
+   - Integrated patch from Salvador Ortiz Garcia (sog at msg com mx)
+     which fixes RT #14660. There was a bug in arguments type packing
+     unpacking of char* (and other pointer types).
+
+2008-03-04  Win32::API v0.54     Cosimo
+
+   - Try to clean up this big OS check mess.
+
+2008-03-02  Win32::API v0.53     Cosimo
+
+   - Devel::AssertOS came out unauthorized.
+   - META.yml was outdated and wrong.
+
+2008-03-01  Win32::API v0.52     Cosimo
+
+   - Devel::AssertOS was not properly set up in 0.51.
+
+2008-03-01  Win32::API v0.51     Cosimo
+
+   - Cleaned up API.pm pod docs and clearly stated Win32::API license
+   - Fixed $$/pid tests for Cygwin
+   - Now uses Devel::AssertOS to check that we are on a Win32 or Cygwin
+     system. This should ease the work of CPAN testers.
+
+2008-02-23  Win32::API v0.50     Cosimo
+
+   - Fixed RT #31702 (http://rt.cpan.org/Public/Bug/Display.html?id=31702)
+     Thanks to RUrban for supplying the fix.
+
+2008-02-20  Win32::API v0.49     Cosimo
+
+   - Fixed the stack cleanup assembler statements for GCC in API.xs, I hope.
+   - Fixed a Borland C macro definition in API.xs
+   - Fixed META.yml (stupid me)
+
+2008-02-20  Win32::API v0.48     Cosimo
+
+   - Finally applied the cdecl/stdcall patch available since long time
+     from http://www.xs4all.nl/~itsme/projects/perl/.
+     Now Win32::API *can* work with cdecl DLLs.
+     Fixes RT #32424 (http://rt.cpan.org/Public/Bug/Display.html?id=32424)
+       and RT #24685 (http://rt.cpan.org/Public/Bug/Display.html?id=24685)
+     Thanks to Willem Jan Hengeveld (itsme at xs4all.nl) for your great work.
+     Thanks to JimK for a test case and to BrowserUk and others at PerlMonks
+     for providing me useful information and complaints. :-)
+
+     However, still missing some GCC assembler magic for stack cleanup.
+     Any help?
+
+   - Clarified licensing info. Yes, Win32::API is available with
+     GPL 2 / Artistic license.
+
+2007-11-12  Win32::API v0.47     Cosimo
+
+   - Nothing exciting. Fixed warning on DATA filehandle.
+     Reported by Dmitri Karasik. Build passed on Windows Vista.
+     Fixes RT #30674 (http://rt.cpan.org/Ticket/Display.html?id=30674)
+
+2006-12-23  Win32::API v0.46     Cosimo
+
+   - Test suite now passes on MSVC6, MSVC7, GCC/MinGW and Cygwin.
+     A lot of skips and segfaults on doubles/floats should be examined,
+     though. But now it's possible to cleanly install from CPAN!
+
+   - API_test.dll building phase has been removed. Now there is only
+     a prebuilt version of it, suitable for all compilers to link and
+     use, I hope.
+
+     Why does Cygwin gcc compile an entirely different API_test.dll?
+     I checked the tdump of msvc and gcc and the gcc version is
+     missing all the kernel32 imports. I don't know why this happens.
+
+   - Removed README.txt file. Now there's only README.
+
+2006-11-29  Win32::API v0.45     Cosimo
+
+   - What a mess! Restored GCC/MinGW compile that broke with that
+     damned assembler macros...
+
+2006-11-28  Win32::API v0.44     Cosimo
+
+   - Fixed compile under MSVC broken with GCC/MinGW last changes.
+
+2006-11-28  Win32::API v0.43     Cosimo
+
+   - Now Win32::API should cleanly *compile* on GCC / MinGW
+     environment. This has been tested only Vanilla Perl and
+     only with Microsoft nmake.
+     Test suite does not work with GCC. You can only test that
+     Win32::API extension works running manually the t\99_GetProcess.t
+     test script.
+     This improvement comes thanks to the 0.42 patches I found
+     and collected from the internet, though I don't know who
+     is the guy that wrote them first. Anyway, thank you!
+
+   - There are problems with current ExtUtils::MakeMaker (6.31 and
+     also blead, I believe) version and dmake generated Makefiles.
+     I'm trying to understand what to do here.
+
+   - Win32::API::Type now doesn't have a INIT block anymore, that
+     seems to be the cause of all evils on this module.
+     Please you out there report your findings on this.
+
+   - Last but not least. Current maintainer of Win32::API is now
+     Cosimo Streppone (me), cosimo at cpan.org. I'm not very
+     skilled on Win32 development, but I'm trying to to work out the
+     CPAN bugs queue. Thanks to Aldo for handing me his wonderful
+     work maintainance.
+
+
+Previous history had no changes file.
+

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                WordPress-API
+version:             1.10
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          1
+    Cwd:                           3
+    Date::Manip:                   5
+    Exporter:                      5
+    File::Type:                    0.22
+    LEOCHARRE::DEBUG:              1
+    MIME::Base64:                  3
+    Smart::Comments:               1
+    Test::Simple:                  0
+    WordPress::XMLRPC:             1.17
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,3 @@
+Becuase the tests run with the -w option, the copy module complains.
+I think that this is okay and it's just that the File::Copy module
+hasn't been written with -w in mind.  The test passes anyway.

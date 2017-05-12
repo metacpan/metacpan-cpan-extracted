@@ -1,0 +1,8 @@
+Revision history for Perl extension WebService::Redmine (initially RedMiner::API).
+
+Please see full revision history at https://github.com/igelhaus/redminer/releases
+
+0.01  Wed Apr  9 07:44:27 2014
+	- original version; created by h2xs 1.23 with options
+		-X RedMiner::API
+

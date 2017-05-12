@@ -1,0 +1,8 @@
+Memory.xs           C code
+Memory.pm           Module
+t/00base.t          Test file
+Changes             Changlog
+Makefile.PL         Generate Makefile
+MANIFEST            This file
+README              Readme
+META.yml                                 Module meta-data (added by MakeMaker)

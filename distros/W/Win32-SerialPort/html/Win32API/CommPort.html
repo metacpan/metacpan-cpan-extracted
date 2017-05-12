@@ -1,0 +1,729 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Win32API::CommPort - Raw Win32 system API calls for serial communications.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#constructors">Constructors</a></li>
+		<li><a href="#configuration_utility_methods">Configuration Utility Methods</a></li>
+		<li><a href="#capability_methods__read_only_">Capability Methods (read only)</a></li>
+		<li><a href="#configuration_methods">Configuration Methods</a></li>
+		<li><a href="#operating_methods">Operating Methods</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#initialization">Initialization</a></li>
+		<li><a href="#configuration_and_capability_methods">Configuration and Capability Methods</a></li>
+		<li><a href="#exports">Exports</a></li>
+	</ul>
+
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#known_limitations">KNOWN LIMITATIONS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<ul>
+
+		<li><a href="#compatibility">COMPATIBILITY</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Win32API::CommPort - Raw Win32 system API calls for serial communications.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Win32;    ## not required under all circumstances
+  require 5.006;
+  use Win32API::CommPort qw( :PARAM :STAT 0.20 );</pre>
+<pre>
+  ## when available ##  use Win32API::File 0.07 qw( :ALL );</pre>
+<p>
+</p>
+<h2><a name="constructors">Constructors</a></h2>
+<pre>
+  $PortObj = new Win32API::CommPort ($PortName, $quiet)
+       || die &quot;Can't open $PortName: $^E\n&quot;;    # $quiet is optional</pre>
+<pre>
+  @required = qw( BAUD DATA STOP );
+  $faults = $PortObj-&gt;initialize(@required);
+  if ($faults) { die &quot;Required parameters not set before initialize\n&quot;; }</pre>
+<p>
+</p>
+<h2><a name="configuration_utility_methods">Configuration Utility Methods</a></h2>
+<pre>
+  set_no_messages(1);                   # test suite use</pre>
+<pre>
+      # exported by :PARAM
+  nocarp || carp &quot;Something fishy&quot;;
+  $a = SHORTsize;                       # 0xffff
+  $a = LONGsize;                        # 0xffffffff
+  $answer = yes_true(&quot;choice&quot;);         # 1 or 0
+  OS_Error unless ($API_Call_OK);       # prints error</pre>
+<pre>
+  $PortObj-&gt;init_done  || die &quot;Not done&quot;;</pre>
+<pre>
+  $PortObj-&gt;fetch_DCB  || die &quot;Not done&quot;;
+  $PortObj-&gt;update_DCB || die &quot;Not done&quot;;</pre>
+<pre>
+  $milliseconds = $PortObj-&gt;get_tick_count;</pre>
+<p>
+</p>
+<h2><a name="capability_methods__read_only_">Capability Methods (read only)</a></h2>
+<pre>
+     # true/false capabilities
+  $a = $PortObj-&gt;can_baud;      # else fixed
+  $a = $PortObj-&gt;can_databits;
+  $a = $PortObj-&gt;can_stopbits;
+  $a = $PortObj-&gt;can_dtrdsr;
+  $a = $PortObj-&gt;can_handshake;
+  $a = $PortObj-&gt;can_parity_check;
+  $a = $PortObj-&gt;can_parity_config;
+  $a = $PortObj-&gt;can_parity_enable;
+  $a = $PortObj-&gt;can_rlsd;       # receive line signal detect (carrier)
+  $a = $PortObj-&gt;can_rlsd_config;
+  $a = $PortObj-&gt;can_16bitmode;
+  $a = $PortObj-&gt;can_ioctl;     # false, unix only
+  $a = $PortObj-&gt;is_rs232;
+  $a = $PortObj-&gt;is_modem;
+  $a = $PortObj-&gt;can_rtscts;
+  $a = $PortObj-&gt;can_xonxoff;
+  $a = $PortObj-&gt;can_xon_char;
+  $a = $PortObj-&gt;can_spec_char;
+  $a = $PortObj-&gt;can_interval_timeout;
+  $a = $PortObj-&gt;can_total_timeout;</pre>
+<pre>
+     # list output capabilities
+  ($rmax, $wmax) = $PortObj-&gt;buffer_max;
+  ($rbuf, $wbuf) = $PortObj-&gt;are_buffers;       # current
+  @choices = $PortObj-&gt;are_baudrate;            # legal values
+  @choices = $PortObj-&gt;are_handshake;
+  @choices = $PortObj-&gt;are_parity;
+  @choices = $PortObj-&gt;are_databits;
+  @choices = $PortObj-&gt;are_stopbits;</pre>
+<p>
+</p>
+<h2><a name="configuration_methods">Configuration Methods</a></h2>
+<pre>
+     # most methods can be called two ways:
+  $PortObj-&gt;is_handshake(&quot;xoff&quot;);           # set parameter
+  $flowcontrol = $PortObj-&gt;is_handshake;    # current value (scalar)</pre>
+<pre>
+     # similar
+  $PortObj-&gt;is_baudrate(9600);
+  $PortObj-&gt;is_parity(&quot;odd&quot;);
+  $PortObj-&gt;is_databits(8);
+  $PortObj-&gt;is_stopbits(1);
+  $PortObj-&gt;debug_comm(0);
+  $PortObj-&gt;is_xon_limit(100);      # bytes left in buffer
+  $PortObj-&gt;is_xoff_limit(100);     # space left in buffer
+  $PortObj-&gt;is_xon_char(0x11);
+  $PortObj-&gt;is_xoff_char(0x13);
+  $PortObj-&gt;is_eof_char(0x0);
+  $PortObj-&gt;is_event_char(0x0);
+  $PortObj-&gt;is_error_char(0);       # for parity errors</pre>
+<pre>
+  $rbuf = $PortObj-&gt;is_read_buf;    # read_only except internal use
+  $wbuf = $PortObj-&gt;is_write_buf;
+  $size = $PortObj-&gt;internal_buffer;</pre>
+<pre>
+  $PortObj-&gt;is_buffers(4096, 4096);  # read, write
+        # returns current in list context</pre>
+<pre>
+  $PortObj-&gt;is_read_interval(100);    # max time between read char (millisec)
+  $PortObj-&gt;is_read_char_time(5);     # avg time between read char
+  $PortObj-&gt;is_read_const_time(100);  # total = (avg * bytes) + const
+  $PortObj-&gt;is_write_char_time(5);
+  $PortObj-&gt;is_write_const_time(100);</pre>
+<pre>
+  $PortObj-&gt;is_binary(T);               # just say Yes (Win 3.x option)
+  $PortObj-&gt;is_parity_enable(F);        # faults during input</pre>
+<p>
+</p>
+<h2><a name="operating_methods">Operating Methods</a></h2>
+<pre>
+  ($BlockingFlags, $InBytes, $OutBytes, $LatchErrorFlags) = $PortObj-&gt;is_status
+        || warn &quot;could not get port status\n&quot;;</pre>
+<pre>
+  $ClearedErrorFlags = $PortObj-&gt;reset_error;
+        # The API resets errors when reading status, $LatchErrorFlags
+        # is all $ErrorFlags since they were last explicitly cleared</pre>
+<pre>
+  if ($BlockingFlags) { warn &quot;Port is blocked&quot;; }
+  if ($BlockingFlags &amp; BM_fCtsHold) { warn &quot;Waiting for CTS&quot;; }
+  if ($LatchErrorFlags &amp; CE_FRAME) { warn &quot;Framing Error&quot;; }</pre>
+<p>Additional useful constants may be exported eventually.</p>
+<pre>
+  $count_in = $PortObj-&gt;read_bg($InBytes);
+  ($done, $count_in, $string_in) = $PortObj-&gt;read_done(1);
+        # background read with wait until done</pre>
+<pre>
+  $count_out = $PortObj-&gt;write_bg($output_string);      # background write
+  ($done, $count_out) = $PortObj-&gt;write_done(0);</pre>
+<pre>
+  $PortObj-&gt;suspend_tx;                 # output from write buffer
+  $PortObj-&gt;resume_tx;
+  $PortObj-&gt;xmit_imm_char(0x03);        # bypass buffer (and suspend)</pre>
+<pre>
+  $PortObj-&gt;xoff_active;                # simulate received xoff
+  $PortObj-&gt;xon_active;                 # simulate received xon</pre>
+<pre>
+  $PortObj-&gt;purge_all;
+  $PortObj-&gt;purge_rx;
+  $PortObj-&gt;purge_tx;</pre>
+<pre>
+      # controlling outputs from the port
+  $PortObj-&gt;dtr_active(T);              # sends outputs direct to hardware
+  $PortObj-&gt;rts_active(Yes);            # returns status of API call
+  $PortObj-&gt;break_active(N);            # NOT state of bit</pre>
+<pre>
+  $PortObj-&gt;pulse_break_on($milliseconds); # off version is implausible
+  $PortObj-&gt;pulse_rts_on($milliseconds);
+  $PortObj-&gt;pulse_rts_off($milliseconds);
+  $PortObj-&gt;pulse_dtr_on($milliseconds);
+  $PortObj-&gt;pulse_dtr_off($milliseconds);
+      # sets_bit, delays, resets_bit, delays</pre>
+<pre>
+  $ModemStatus = $PortObj-&gt;is_modemlines;
+  if ($ModemStatus &amp; $PortObj-&gt;MS_RLSD_ON) { print &quot;carrier detected&quot;; }</pre>
+<pre>
+  $PortObj-&gt;close || die;
+      # &quot;undef $PortObj&quot; preferred unless reopening port
+      # &quot;close&quot; should precede &quot;undef&quot; if both used</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This provides fairly low-level access to the Win32 System API calls
+dealing with serial ports.</p>
+<p>Uses features of the Win32 API to implement non-blocking I/O, serial
+parameter setting, event-loop operation, and enhanced error handling.</p>
+<p>To pass in <code>NULL</code> as the pointer to an optional buffer, pass in <code>$null=0</code>.
+This is expected to change to an empty list reference, <code>[]</code>, when Perl
+supports that form in this usage.</p>
+<p>Beyond raw access to the API calls and related constants, this module
+will eventually handle smart buffer allocation and translation of return
+codes.</p>
+<p>
+</p>
+<h2><a name="initialization">Initialization</a></h2>
+<p>The constructor is <strong>new</strong> with a <em>PortName</em> (as the Registry
+knows it) specified. This will do a <strong>CreateFile</strong>, get the available
+options and capabilities via the Win32 API, and create the object.
+The port is not yet ready for read/write access. First, the desired
+<em>parameter settings</em> must be established. Since these are tuning
+constants for an underlying hardware driver in the Operating System,
+they should all checked for validity by the method calls that set them.
+The <strong>initialize</strong> method takes a list of required parameters and confirms
+they have been set. For others, it will attempt to deduce defaults from
+the hardware or from other parameters. The <strong>initialize</strong> method returns
+the number of faults (zero if the port is setup ok). The <strong>update_DCB</strong>
+method writes a new <em>Device Control Block</em> to complete the startup and
+allow the port to be used. Ports are opened for binary transfers. A
+separate <code>binmode</code> is not needed. The USER must release the object
+if <strong>initialize</strong> or <strong>update_DCB</strong> does not succeed.</p>
+<p>Version 0.15 adds an optional <code>$quiet</code> parameter to <strong>new</strong>. Failure
+to open a port prints a error message to STDOUT by default. Since only
+one application at a time can ``own'' the port, one source of failure was
+``port in use''. There was previously no way to check this without getting
+a ``fail message''. Setting <code>$quiet</code> disables this built-in message. It
+also returns 0 instead of <code>undef</code> if the port is unavailable (still FALSE,
+used for testing this condition - other faults may still return <code>undef</code>).
+Use of <code>$quiet</code> only applies to <strong>new</strong>.</p>
+<p>The fault checking in <strong>initialize</strong> consists in verifying an <em>_N_$item</em>
+internal variable exists for each <em>$item</em> in the input list. The
+<em>_N_$item</em> is created for each parameter that is set either directly
+or by default. A derived class must create the <em>_N_$items</em> for any
+varibles it adds to the base class if it wants <strong>initialize</strong> to check
+them. Win32API::CommPort supports the following:</p>
+<pre>
+        $item           _N_$item            setting method
+        ------          ---------           --------------
+        BAUD            &quot;_N_BAUD&quot;           is_baudrate
+        BINARY          &quot;_N_BINARY&quot;         is_binary
+        DATA            &quot;_N_DATA&quot;           is_databits
+        EOFCHAR         &quot;_N_EOFCHAR&quot;        is_eof_char
+        ERRCHAR         &quot;_N_ERRCHAR&quot;        is_error_char
+        EVTCHAR         &quot;_N_EVTCHAR&quot;        is_event_char
+        HSHAKE          &quot;_N_HSHAKE&quot;         is_handshake
+        PARITY          &quot;_N_PARITY&quot;         is_parity
+        PARITY_EN       &quot;_N_PARITY_EN&quot;      is_parity_enable
+        RCONST          &quot;_N_RCONST&quot;         is_read_const_time
+        READBUF         &quot;_N_READBUF&quot;        is_read_buf
+        RINT            &quot;_N_RINT&quot;           is_read_interval
+        RTOT            &quot;_N_RTOT&quot;           is_read_char_time
+        STOP            &quot;_N_STOP&quot;           is_stopbits
+        WCONST          &quot;_N_WCONST&quot;         is_write_const_time
+        WRITEBUF        &quot;_N_WRITEBUF&quot;       is_write_buf
+        WTOT            &quot;_N_WTOT&quot;           is_write_char_time
+        XOFFCHAR        &quot;_N_XOFFCHAR&quot;       is_xoff_char
+        XOFFLIM         &quot;_N_XOFFLIM&quot;        is_xoff_limit
+        XONCHAR         &quot;_N_XONCHAR&quot;        is_xon_char
+        XONLIM          &quot;_N_XONLIM&quot;         is_xon_limit</pre>
+<p>Some individual parameters (eg. baudrate) can be changed after the
+initialization is completed. These will automatically update the
+<em>Device Control Block</em> as required. The <em>init_done</em> method indicates
+when <em>initialize</em> has completed successfully.</p>
+<pre>
+  $PortObj = new Win32API::CommPort ($PortName, $quiet)
+       || die &quot;Can't open $PortName: $^E\n&quot;;    # $quiet is optional</pre>
+<pre>
+  if $PortObj-&gt;can_databits { $PortObj-&gt;is_databits(8) };
+  $PortObj-&gt;is_baudrate(9600);
+  $PortObj-&gt;is_parity(&quot;none&quot;);
+  $PortObj-&gt;is_stopbits(1);
+  $PortObj-&gt;is_handshake(&quot;rts&quot;);
+  $PortObj-&gt;is_buffers(4096, 4096);
+  $PortObj-&gt;dtr_active(T);</pre>
+<pre>
+  @required = qw( BAUD DATA STOP PARITY );
+  $PortObj-&gt;initialize(@required) || undef $PortObj;</pre>
+<pre>
+  $PortObj-&gt;dtr_active(f);
+  $PortObj-&gt;is_baudrate(300);</pre>
+<pre>
+  $PortObj-&gt;close || die;
+      # &quot;undef $PortObj&quot; preferred unless reopening port
+      # &quot;close&quot; should precede &quot;undef&quot; if both used</pre>
+<pre>
+  undef $PortObj;  # closes port AND frees memory in perl</pre>
+<p>The <em>PortName</em> maps to both the Registry <em>Device Name</em> and the
+<em>Properties</em> associated with that device. A single <em>Physical</em> port
+can be accessed using two or more <em>Device Names</em>. But the options
+and setup data will differ significantly in the two cases. A typical
+example is a Modem on port ``COM2''. Both of these <em>PortNames</em> open
+the same <em>Physical</em> hardware:</p>
+<pre>
+  $P1 = new Win32API::CommPort (&quot;COM2&quot;);</pre>
+<pre>
+  $P2 = new Win32API::CommPort (&quot;\\\\.\\Nanohertz Modem model K-9&quot;);</pre>
+<p>$P1 is a ``generic'' serial port. $P2 includes all of $P1 plus a variety
+of modem-specific added options and features. The ``raw'' API calls return
+different size configuration structures in the two cases. Win32 uses the
+``\\.\'' prefix to identify ``named'' devices. Since both names use the same
+<em>Physical</em> hardware, they can not both be used at the same time. The OS
+will complain. Consider this A Good Thing.</p>
+<p>Version 0.16 adds <strong>pulse</strong> methods for the <em>RTS, BREAK, and DTR</em> bits. The
+<strong>pulse</strong> methods assume the bit is in the opposite state when the method
+is called. They set the requested state, delay the specified number of
+milliseconds, set the opposite state, and again delay the specified time.
+These methods are designed to support devices, such as the X10 ``FireCracker''
+control and some modems, which require pulses on these lines to signal
+specific events or data.</p>
+<pre>
+  $PortObj-&gt;pulse_break_on($milliseconds);
+  $PortObj-&gt;pulse_rts_on($milliseconds);
+  $PortObj-&gt;pulse_rts_off($milliseconds);
+  $PortObj-&gt;pulse_dtr_on($milliseconds);
+  $PortObj-&gt;pulse_dtr_off($milliseconds);</pre>
+<p>Version 0.16 also adds <em>experimental</em> support for the rest of the option bits
+available through the <em>Device Control Block</em>. They have not been extensively
+tested and these settings are NOT saved in the <strong>configuration file</strong> by
+<em>Win32::SerialPort</em>. Please let me know if one does not work as advertised.
+[Win32 API bit designation]</p>
+<pre>
+  $PortObj-&gt;ignore_null(0);     # discard \000 bytes on input [fNull]</pre>
+<pre>
+  $PortObj-&gt;ignore_no_dsr(0);   # discard input bytes unless DSR
+                                # [fDsrSensitivity]</pre>
+<pre>
+  $PortObj-&gt;subst_pe_char(0);   # replace parity errors with B&lt;is_error_char&gt;
+                                # when B&lt;is_parity_enable&gt; [fErrorChar]</pre>
+<pre>
+  $PortObj-&gt;abort_on_error(0);  # cancel read/write [fAbortOnError]</pre>
+<pre>
+      # next one set by $PortObj-&gt;is_handshake(&quot;dtr&quot;);
+  $PortObj-&gt;output_dsr(0);      # use DSR handshake on output [fOutxDsrFlow]</pre>
+<pre>
+      # next one set by $PortObj-&gt;is_handshake(&quot;rts&quot;);
+  $PortObj-&gt;output_cts(0);      # use CTS handshake on output [fOutxCtsFlow]</pre>
+<pre>
+      # next two set by $PortObj-&gt;is_handshake(&quot;xoff&quot;);
+  $PortObj-&gt;input_xoff(0);      # use Xon/Xoff handshake on input [fInX]
+  $PortObj-&gt;output_xoff(0);     # use Xon/Xoff handshake on output [fOutX]</pre>
+<pre>
+  $PortObj-&gt;tx_on_xoff(0);      # continue output even after input xoff sent
+                                # [fTXContinueOnXoff]</pre>
+<p>The <strong>get_tick_count</strong> method is a wrapper around the <em>Win32::GetTickCount()</em>
+function. It matches a corresponding method in <em>Device::SerialPort</em> which
+does not have access to the <em>Win32::</em> namespace. It still returns time
+in milliseconds - but can be used in cross-platform scripts.</p>
+<p>
+</p>
+<h2><a name="configuration_and_capability_methods">Configuration and Capability Methods</a></h2>
+<p>The Win32 Serial Comm API provides extensive information concerning
+the capabilities and options available for a specific port (and
+instance). ``Modem'' ports have different capabilties than ``RS-232''
+ports - even if they share the same Hardware. Many traditional modem
+actions are handled via TAPI. ``Fax'' ports have another set of options -
+and are accessed via MAPI. Yet many of the same low-level API commands
+and data structures are ``common'' to each type (``Modem'' is implemented
+as an ``RS-232'' superset). In addition, Win95 supports a variety of
+legacy hardware (e.g fixed 134.5 baud) while WinNT has hooks for ISDN,
+16-data-bit paths, and 256Kbaud.</p>
+<p>Binary selections will accept as <em>true</em> any of the following:
+<code>(&quot;YES&quot;, &quot;Y&quot;, &quot;ON&quot;, &quot;TRUE&quot;, &quot;T&quot;, &quot;1&quot;, 1)</code> (upper/lower/mixed case)
+Anything else is <em>false</em>.</p>
+<p>There are a large number of possible configuration and option parameters.
+To facilitate checking option validity in scripts, most configuration
+methods can be used in two different ways:</p>
+<dl>
+<dt><strong><a name="item_method_called_with_an_argument">method called with an argument</a></strong></dt>
+
+<dd>
+<p>The parameter is set to the argument, if valid. An invalid argument
+returns <em>false</em> (undef) and the parameter is unchanged. After <strong>init_done</strong>,
+the port will be updated immediately if allowed. Otherwise, the value
+will be applied when <strong>update_DCB</strong> is called.</p>
+</dd>
+<dt><strong><a name="item_method_called_with_no_argument_in_scalar_context">method called with no argument in scalar context</a></strong></dt>
+
+<dd>
+<p>The current value is returned. If the value is not initialized either
+directly or by default, return ``undef'' which will parse to <em>false</em>.
+For binary selections (true/false), return the current value. All
+current values from ``multivalue'' selections will parse to <em>true</em>.
+Current values may differ from requested values until <strong>init_done</strong>.
+There is no way to see requests which have not yet been applied.
+Setting the same parameter again overwrites the first request. Test
+the return value of the setting method to check ``success''.</p>
+</dd>
+<dt><strong><a name="item_asynchronous">Asynchronous (Background) I/O</a></strong></dt>
+
+<dd>
+<p>This version now handles Polling (do if Ready), Synchronous (block until
+Ready), and Asynchronous Modes (begin and test if Ready) with the timeout
+choices provided by the API. No effort has yet been made to interact with
+Windows events. But background I/O has been used successfully with the
+Perl Tk modules and callbacks from the event loop.</p>
+</dd>
+<dt><strong><a name="item_timeouts">Timeouts</a></strong></dt>
+
+<dd>
+<p>The API provides two timing models. The first applies only to reading and
+essentially determines <em>Read Not Ready</em> by checking the time between
+consecutive characters. The <strong>ReadFile</strong> operation returns if that time
+exceeds the value set by <strong>is_read_interval</strong>. It does this by timestamping
+each character. It appears that at least one character must by received in
+<em>every</em> <strong>read</strong> <em>call to the API</em> to initialize the mechanism. The timer
+is then reset by each succeeding character. If no characters are received,
+the read will block indefinitely.</p>
+<p>Setting <strong>is_read_interval</strong> to <code>0xffffffff</code> will do a non-blocking read.
+The <strong>ReadFile</strong> returns immediately whether or not any characters are
+actually read. This replicates the behavior of the API.</p>
+<p>The other model defines the total time allowed to complete the operation.
+A fixed overhead time is added to the product of bytes and per_byte_time.
+A wide variety of timeout options can be defined by selecting the three
+parameters: fixed, each, and size.</p>
+<p>Read_Total = <strong>is_read_const_time</strong> + (<strong>is_read_char_time</strong> * bytes_to_read)</p>
+<p>Write_Total = <strong>is_write_const_time</strong> + (<strong>is_write_char_time</strong> * bytes_to_write)</p>
+<p>When reading a known number of characters, the <em>Read_Total</em> mechanism is
+recommended. This mechanism <em>MUST</em> be used with
+<em>Win32::SerialPort tied FileHandles</em> because the tie methods can make
+multiple internal API calls. The <em>Read_Interval</em> mechanism is suitable for
+a <strong>read_bg</strong> method that expects a response of variable or unknown size. You
+should then also set a long <em>Read_Total</em> timeout as a ``backup'' in case
+no bytes are received.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="exports">Exports</a></h2>
+<p>Nothing is exported by default. The following tags can be used to have
+large sets of symbols exported:</p>
+<dl>
+<dt><strong><a name="item__3aparam">:PARAM</a></strong></dt>
+
+<dd>
+<p>Utility subroutines and constants for parameter setting and test:</p>
+<pre>
+        LONGsize        SHORTsize       nocarp          yes_true
+        OS_Error        internal_buffer</pre>
+</dd>
+<dt><strong><a name="item__3astat">:STAT</a></strong></dt>
+
+<dd>
+<p>Serial communications status constants. Included are the constants for
+ascertaining why a transmission is blocked:</p>
+<pre>
+        BM_fCtsHold     BM_fDsrHold     BM_fRlsdHold    BM_fXoffHold
+        BM_fXoffSent    BM_fEof         BM_fTxim        BM_AllBits</pre>
+<p>Which incoming bits are active:</p>
+<pre>
+        MS_CTS_ON       MS_DSR_ON       MS_RING_ON      MS_RLSD_ON</pre>
+<p>What hardware errors have been detected:</p>
+<pre>
+        CE_RXOVER       CE_OVERRUN      CE_RXPARITY     CE_FRAME
+        CE_BREAK        CE_TXFULL       CE_MODE</pre>
+<p>Offsets into the array returned by <strong>status:</strong></p>
+<pre>
+        ST_BLOCK        ST_INPUT        ST_OUTPUT       ST_ERROR</pre>
+</dd>
+<dt><strong><a name="item__3araw">:RAW</a></strong></dt>
+
+<dd>
+<p>The constants and wrapper methods for low-level API calls. Details of
+these methods may change with testing. Some may be inherited from
+Win32API::File when that becomes available.</p>
+<pre>
+  $result=ClearCommError($handle, $Error_BitMask_p, $CommStatus);
+  $result=ClearCommBreak($handle);
+  $result=SetCommBreak($handle);
+  $result=GetCommModemStatus($handle, $ModemStatus);
+  $result=GetCommProperties($handle, $CommProperties);
+  $result=GetCommState($handle, $DCB_Buffer);
+  $result=SetCommState($handle, $DCB_Buffer);
+  $result=SetupComm($handle, $in_buf_size, $out_buf_size);
+  $result=ReadFile($handle, $buffer, $wanted, $got, $template);
+  $result=WriteFile($handle, $buffer, $size, $count, $template);</pre>
+<pre>
+  $result=GetCommTimeouts($handle, $CommTimeOuts);
+  $result=SetCommTimeouts($handle, $CommTimeOuts);
+  $result=EscapeCommFunction($handle, $Func_ID);
+  $result=GetCommConfig($handle, $CommConfig, $Size);
+  $result=SetCommConfig($handle, $CommConfig, $Size);
+  $result=PurgeComm($handle, $flags);</pre>
+<pre>
+  $result=GetCommMask($handle, $Event_Bitmask);
+  $result=SetCommMask($handle, $Event_Bitmask);
+  $hEvent=CreateEvent($security, $reset_req, $initial, $name);
+  $handle=CreateFile($file, $access, $share, $security,
+                     $creation, $flags, $template);
+  $result=CloseHandle($handle);
+  $result=ResetEvent($hEvent);
+  $result=TransmitCommChar($handle, $char);
+  $result=WaitCommEvent($handle, $Event_Bitmask, $lpOverlapped);
+  $result=GetOverlappedResult($handle, $lpOverlapped, $count, $bool);</pre>
+<p>Flags used by <strong>PurgeComm:</strong></p>
+<pre>
+        PURGE_TXABORT   PURGE_RXABORT   PURGE_TXCLEAR   PURGE_RXCLEAR</pre>
+<p>Function IDs used by EscapeCommFunction:</p>
+<pre>
+        SETXOFF         SETXON          SETRTS          CLRRTS
+        SETDTR          CLRDTR          SETBREAK        CLRBREAK</pre>
+<p>Events used by <strong>WaitCommEvent:</strong></p>
+<pre>
+        EV_RXCHAR       EV_RXFLAG       EV_TXEMPTY      EV_CTS
+        EV_DSR          EV_RLSD         EV_BREAK        EV_ERR
+        EV_RING         EV_PERR         EV_RX80FULL     EV_EVENT1
+        EV_EVENT2</pre>
+<p>Errors specific to <strong>GetOverlappedResult:</strong></p>
+<pre>
+        ERROR_IO_INCOMPLETE     ERROR_IO_PENDING</pre>
+</dd>
+<dt><strong><a name="item__3acommprop">:COMMPROP</a></strong></dt>
+
+<dd>
+<p>The constants for the <em>CommProperties structure</em> returned by
+<strong>GetCommProperties</strong>. Included mostly for completeness.</p>
+<pre>
+        BAUD_USER       BAUD_075        BAUD_110        BAUD_134_5
+        BAUD_150        BAUD_300        BAUD_600        BAUD_1200
+        BAUD_1800       BAUD_2400       BAUD_4800       BAUD_7200
+        BAUD_9600       BAUD_14400      BAUD_19200      BAUD_38400
+        BAUD_56K        BAUD_57600      BAUD_115200     BAUD_128K</pre>
+<pre>
+        PST_FAX         PST_LAT         PST_MODEM       PST_PARALLELPORT
+        PST_RS232       PST_RS422       PST_X25         PST_NETWORK_BRIDGE
+        PST_RS423       PST_RS449       PST_SCANNER     PST_TCPIP_TELNET
+        PST_UNSPECIFIED</pre>
+<pre>
+        PCF_INTTIMEOUTS         PCF_PARITY_CHECK        PCF_16BITMODE
+        PCF_DTRDSR              PCF_SPECIALCHARS        PCF_RLSD
+        PCF_RTSCTS              PCF_SETXCHAR            PCF_TOTALTIMEOUTS
+        PCF_XONXOFF</pre>
+<pre>
+        SP_BAUD         SP_DATABITS     SP_HANDSHAKING  SP_PARITY
+        SP_RLSD         SP_STOPBITS     SP_SERIALCOMM   SP_PARITY_CHECK</pre>
+<pre>
+        DATABITS_5      DATABITS_6      DATABITS_7      DATABITS_8
+        DATABITS_16     DATABITS_16X</pre>
+<pre>
+        STOPBITS_10     STOPBITS_15     STOPBITS_20</pre>
+<pre>
+        PARITY_SPACE    PARITY_NONE     PARITY_ODD      PARITY_EVEN
+        PARITY_MARK</pre>
+<pre>
+        COMMPROP_INITIALIZED</pre>
+</dd>
+<dt><strong><a name="item__3adcb">:DCB</a></strong></dt>
+
+<dd>
+<p>The constants for the <em>Device Control Block</em> returned by <strong>GetCommState</strong>
+and updated by <strong>SetCommState</strong>. Again, included mostly for completeness.
+But there are some combinations of ``FM_f'' settings which are not currently
+supported by high-level commands. If you need one of those, please report
+the lack as a bug.</p>
+<pre>
+        CBR_110         CBR_300         CBR_600         CBR_1200
+        CBR_2400        CBR_4800        CBR_9600        CBR_14400
+        CBR_19200       CBR_38400       CBR_56000       CBR_57600
+        CBR_115200      CBR_128000      CBR_256000</pre>
+<pre>
+        DTR_CONTROL_DISABLE     DTR_CONTROL_ENABLE      DTR_CONTROL_HANDSHAKE
+        RTS_CONTROL_DISABLE     RTS_CONTROL_ENABLE      RTS_CONTROL_HANDSHAKE
+        RTS_CONTROL_TOGGLE</pre>
+<pre>
+        EVENPARITY      MARKPARITY      NOPARITY        ODDPARITY
+        SPACEPARITY</pre>
+<pre>
+        ONESTOPBIT      ONE5STOPBITS    TWOSTOPBITS</pre>
+<pre>
+        FM_fBinary              FM_fParity              FM_fOutxCtsFlow
+        FM_fOutxDsrFlow         FM_fDtrControl          FM_fDsrSensitivity
+        FM_fTXContinueOnXoff    FM_fOutX                FM_fInX
+        FM_fErrorChar           FM_fNull                FM_fRtsControl
+        FM_fAbortOnError        FM_fDummy2</pre>
+</dd>
+<dt><strong><a name="item__3aall">:ALL</a></strong></dt>
+
+<dd>
+<p>All of the above. Except for the <em>test suite</em>, there is not really a good
+reason to do this.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>The object returned by <strong>new</strong> is NOT a <em>Filehandle</em>. You
+will be disappointed if you try to use it as one.</p>
+<p>e.g. the following is WRONG!!____<code>print $PortObj &quot;some text&quot;;</code></p>
+<p><em>Win32::SerialPort</em> supports accessing ports via <em>Tied Filehandles</em>.</p>
+<p>An important note about Win32 filenames. The reserved device names such
+as <code> COM1, AUX, LPT1, CON, PRN </code> can NOT be used as filenames. Hence
+<em>``COM2.cfg''</em> would not be usable for <strong>$Configuration_File_Name</strong>.</p>
+<p>This module uses Win32::API extensively. The raw API calls are <strong>very</strong>
+unforgiving. You will certainly want to start perl with the <strong>-w</strong> switch.
+If you can, <strong>use strict</strong> as well. Try to ferret out all the syntax and
+usage problems BEFORE issuing the API calls (many of which modify tuning
+constants in hardware device drivers....not where you want to look for bugs).</p>
+<p>Thanks to Ken White for testing on NT.</p>
+<p>
+</p>
+<hr />
+<h1><a name="known_limitations">KNOWN LIMITATIONS</a></h1>
+<p>The current version of the module has been designed for testing using
+the ActiveState and Core (GS 5.004_02) ports of Perl for Win32 without
+requiring a compiler or using XS. In every case, compatibility has been
+selected over performance. Since everything is (sometimes convoluted but
+still pure) Perl, you can fix flaws and change limits if required. But
+please file a bug report if you do. This module has been tested with
+each of the binary perl versions for which Win32::API is supported: AS
+builds 315, 316, and 500-509 and GS 5.004_02. It has only been tested on
+Intel hardware.</p>
+<dl>
+<dt><strong><a name="item_tutorial">Tutorial</a></strong></dt>
+
+<dd>
+<p>With all the options, this module needs a good tutorial. It doesn't
+have a complete one yet. A <em>``How to get started''</em> tutorial appeared
+<strong>The Perl Journal #13</strong> (March 1999). The demo programs are a good
+starting point for additional examples.</p>
+</dd>
+<dt><strong><a name="item_buffers">Buffers</a></strong></dt>
+
+<dd>
+<p>The size of the Win32 buffers are selectable with <strong>is_buffers</strong>. But each read
+method currently uses a fixed internal buffer of 4096 bytes. This can be
+changed in the module source. The read-only <strong>internal_buffer</strong> method will
+give the current size. There are other fixed internal buffers as well. But
+no one has needed to change those. The XS version will support dynamic buffer
+sizing.</p>
+</dd>
+<dt><strong><a name="item_modems">Modems</a></strong></dt>
+
+<dd>
+<p>Lots of modem-specific options are not supported. The same is true of
+TAPI, MAPI. <em>API Wizards</em> are welcome to contribute.</p>
+</dd>
+<dt><strong><a name="item_api_options">API Options</a></strong></dt>
+
+<dd>
+<p>Lots of options are just ``passed through from the API''. Some probably
+shouldn't be used together. The module validates the obvious choices when
+possible. For something really fancy, you may need additional API
+documentation. Available from <em>Micro$oft Pre$$</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>ActiveState ports of Perl for Win32 before build 500 do not support the
+tools for building extensions and so will not support later versions of
+this extension. In particular, the automated install and test scripts in
+this distribution work differently with ActiveState builds 3xx.</p>
+<p>There is no parameter checking on the ``raw'' API calls. You probably should
+be familiar with using the calls in ``C'' before doing much experimenting.</p>
+<p>On Win32, a port must <strong>close</strong> before it can be reopened again by the same
+process. If a physical port can be accessed using more than one name (see
+above), all names are treated as one. The perl script can also be run
+multiple times within a single batch file or shell script. The <em>Makefile.PL</em>
+spawns subshells with backticks to run the test suite on Perl 5.003 - ugly,
+but it works.</p>
+<p>On NT, a <strong>read_done</strong> or <strong>write_done</strong> returns <em>False</em> if a background
+operation is aborted by a purge. Win95 returns <em>True</em>.</p>
+<p>A few NT systems seem to set <strong>can_parity_enable</strong> true, but do not actually
+support setting <strong>is_parity_enable</strong>. This may be a characteristic of certain
+third-party serial drivers. Or a Microsoft bug. I have been able to
+reproduce it on my system, but not identify a specific cause.</p>
+<p>__Please send comments and bug reports to <a href="mailto:wcbirthisel@alum.mit.edu.">wcbirthisel@alum.mit.edu.</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>Bill Birthisel, <a href="mailto:wcbirthisel@alum.mit.edu,">wcbirthisel@alum.mit.edu,</a> <a href="http://members.aol.com/Bbirthisel/.">http://members.aol.com/Bbirthisel/.</a></p>
+<p>Tye McQueen contributed but no longer supports these modules.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Wi32::SerialPort - High-level user interface/front-end for this module</p>
+<p>Win32API::File <em>when available</em></p>
+<p>Win32::API - Aldo Calpini's ``Magic'', <a href="http://www.divinf.it/dada/perl/">http://www.divinf.it/dada/perl/</a></p>
+<p>Perltoot.xxx - Tom (Christiansen)'s Object-Oriented Tutorial</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (C) 2010, Bill Birthisel. All rights reserved.</p>
+<p>This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+<p>
+</p>
+<h2><a name="compatibility">COMPATIBILITY</a></h2>
+<p>Most of the code in this module has been stable since version 0.12.
+Version 0.20 adds explicit support for COM10++ and USB - although the
+functionality existed before. Perl ports before 5.6.0 are no longer
+supported for test or install. The modules themselves work with 5.003.
+1 April 2010.</p>
+
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+Revision history for WWW-Scraper-ISBN-ISBNnu_Driver
+===================================================
+
+0.24    2014-11-18
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.23    2014-08-07
+        - reworked test failure checks.
+
+0.22    2014-07-21
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - removed obsolete documentation.
+        - extended test suite.
+        - updated list of documentated return fields.
+
+0.21    2014-03-27
+        - added standalone LICENSE file.
+
+0.20    2013-08-28
+        - updated pre-requisites.
+
+0.19    2013-08-25
+        - New Maintainer: Barbie.
+        - move module into lib directory structure.
+        - change file dates changed to meet W3CDTF standards.
+        - reworked Makefile.PL for clarity.
+        - added META.json and updated META.yml.
+        - extended test suite.
+        - documentation updates.
+        - switched to WWW::Mechanize.
+        - fixed pattern matching, and updated error handling.
+        - Fixed RT#31030, thanks to G. Allen Morris III (GAM).
+        - Fixed RT#18601, thanks to Ulixes.
+        - Fixed RT#14333, thanks to Menno Blom (BLOM)
+
+0.18    2004-04-13
+        - documentation updates.
+
+0.17    2004-04-06
+	    - Removed Exporter and perl versioning stuff by user request
+
+0.16    2004-03-30
+	    - Started using Changes file ;)
+	    - Cleaned up documentation a bit.

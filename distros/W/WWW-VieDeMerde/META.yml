@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WWW-VieDeMerde
+version:             0.21
+abstract:            A perl module to use the viedemerde.fr API
+license:             perl
+author:              
+    - Olivier Schwander <olivier.schwander@ens-lyon.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP::UserAgent:                2
+    Test::More:                    0
+    XML::Twig:                     3
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

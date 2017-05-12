@@ -1,0 +1,18 @@
+Revision history for Web::Request::Role::JSON
+
+1.003   2017-01-24T09:54:55
+    - fix test fails on Win32 caused by booleans (Thomas Klausner)
+
+
+1.002   2017-01-21T15:53:40
+    - rename decoded_json_content to json_payload
+
+
+1.001   2017-01-21T15:34:10
+    - remove 'new_' from response methods names
+
+
+1.000   2017-01-20T17:08:55
+    - added tests & docs
+    - extracted from Validad::Tools
+

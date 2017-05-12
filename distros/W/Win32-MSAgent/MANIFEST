@@ -1,0 +1,10 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST.SKIP
+lib/Win32/MSAgent.pm
+t/01_ini.t
+MANIFEST
+demo.pl
+META.yml                                 Module meta-data (added by MakeMaker)

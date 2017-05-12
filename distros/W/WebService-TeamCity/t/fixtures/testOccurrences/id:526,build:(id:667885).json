@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\nnext = ModificationData{myUser='constantine.plotnikov', myDescription='merge commit\n', myVcsDate=Thu Mar 26 16:54:10 UTC 2009, myChanges=[VcsChange{myChangeTypeName='null', myFileName='', myRelativeFileName=dir/a.txt, myType=REMOVED, myBeforeChangeRevisionNumber='ee886e4adb70fbe3bdc6f3f6393598b3f02e8009', myAfterChangeRevisionNumber='f3f826ce85d6dad25156b2d7550cedeb1a422f4c', myRelativeIsNotPartOfFull=false}, VcsChange{myChangeTypeName='null', myFileName='', myRelativeFileName=dir/b.txt, myType=CHANGED, myBeforeChangeRevisionNumber='ee886e4adb70fbe3bdc6f3f6393598b3f02e8009', myAfterChangeRevisionNumber='f3f826ce85d6dad25156b2d7550cedeb1a422f4c', myRelativeIsNotPartOfFull=false}, VcsChange{myChangeTypeName='null', myFileName='', myRelativeFileName=dir/q.txt, myType=ADDED, myBeforeChangeRevisionNumber='ee886e4adb70fbe3bdc6f3f6393598b3f02e8009', myAfterChangeRevisionNumber='f3f826ce85d6dad25156b2d7550cedeb1a422f4c', myRelativeIsNotPartOfFull=false}], myVersion='f3f826ce85d6dad25156b2d7550cedeb1a422f4c', myDisplayVersion='f3f826ce85d6dad25156b2d7550cedeb1a422f4c', myChangesCount=3, myCanBeIgnored=true, myParentRevisions=[ee886e4adb70fbe3bdc6f3f6393598b3f02e8009, 6fce8fe45550eb72796704a919dad68dc44be44a]}\r\n\n",
+   "duration" : 114,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:526,build:(id:667885)",
+   "id" : "id:526,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo_MergeCommit",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-502475365567659086",
+      "id" : -502475365567659086,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo_MergeCommit"
+   }
+}

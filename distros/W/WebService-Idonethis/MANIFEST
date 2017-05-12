@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+bin/idone
+bin/idonethis-memories
+dist.ini
+lib/WebService/Idonethis.pm
+t/author-critic.t
+t/load.t
+t/login.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

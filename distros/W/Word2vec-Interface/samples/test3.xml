@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MedlineCitationSet PUBLIC "-//NLM//DTD Medline Citation, 1st January, 2016//EN"
+                                    "https://www.nlm.nih.gov/databases/dtd/nlmmedlinecitationset_160101.dtd">
+<MedlineCitationSet>
+<MedlineCitation Owner="NLM" Status="PubMed-not-MEDLINE">
+<PMID Version="1">16691646</PMID>
+<DateCreated>
+<Year>2006</Year>
+<Month>06</Month>
+<Day>01</Day>
+</DateCreated>
+<DateCompleted>
+<Year>2006</Year>
+<Month>06</Month>
+<Day>01</Day>
+</DateCompleted>
+<DateRevised>
+<Year>2008</Year>
+<Month>11</Month>
+<Day>20</Day>
+</DateRevised>
+<Article PubModel="Print">
+<Journal>
+<ISSN IssnType="Print">0065-9533</ISSN>
+<JournalIssue CitedMedium="Print">
+<Volume>1</Volume>
+<Issue>2</Issue>
+<PubDate>
+<Year>1865</Year>
+</PubDate>
+</JournalIssue>
+<Title>Transactions of the American Ophthalmological Society</Title>
+<ISOAbbreviation>Trans Am Ophthalmol Soc</ISOAbbreviation>
+</Journal>
+<ArticleTitle>Statement of Cases of Gonorrhoeal and Purulent Ophthalmia treated in the Desmarres (U. S. Army) Eye and Ear Hospital, Chicago, Illinois, with Special Report of Treatment Employed. pulmonary edema</ArticleTitle>
+<Pagination>
+<MedlinePgn>12-28</MedlinePgn>
+</Pagination>
+<AuthorList CompleteYN="Y">
+<Author ValidYN="Y">
+<LastName>Hildreth</LastName>
+<ForeName>J S</ForeName>
+<Initials>JS</Initials>
+</Author>
+</AuthorList>
+<Language>eng</Language>
+<PublicationTypeList>
+<PublicationType UI="D016428">Journal Article</PublicationType>
+</PublicationTypeList>
+</Article>
+<MedlineJournalInfo>
+<Country>United States</Country>
+<MedlineTA>Trans Am Ophthalmol Soc</MedlineTA>
+<NlmUniqueID>7506106</NlmUniqueID>
+<ISSNLinking>0065-9533</ISSNLinking>
+</MedlineJournalInfo>
+<OtherID Source="NLM">PMC1361495</OtherID>
+</MedlineCitation>
+</MedlineCitationSet>

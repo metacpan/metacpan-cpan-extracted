@@ -1,0 +1,36 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/WebService/Wikimapia.pm
+lib/WebService/Wikimapia/Params.pm
+lib/WebService/Wikimapia/Place.pm
+lib/WebService/Wikimapia/City.pm
+lib/WebService/Wikimapia/Street.pm
+lib/WebService/Wikimapia/Hotel.pm
+lib/WebService/Wikimapia/Comment.pm
+lib/WebService/Wikimapia/Photo.pm
+lib/WebService/Wikimapia/Language.pm
+lib/WebService/Wikimapia/User.pm
+lib/WebService/Wikimapia/GlobalAdmin.pm
+lib/WebService/Wikimapia/Category.pm
+lib/WebService/Wikimapia/Category/Synonym.pm
+lib/WebService/Wikimapia/Polygon.pm
+lib/WebService/Wikimapia/Tag.pm
+lib/WebService/Wikimapia/Object.pm
+lib/WebService/Wikimapia/Location.pm
+lib/WebService/Wikimapia/UserAgent.pm
+lib/WebService/Wikimapia/UserAgent/Exception.pm
+t/00-load.t
+t/01-new.t
+t/02-search.t
+t/03-box.t
+t/04-object.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

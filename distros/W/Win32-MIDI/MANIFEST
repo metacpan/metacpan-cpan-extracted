@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+MIDI.pm
+MIDI.xs
+midi.html
+README
+test.pl
+Examples/example.pl
+

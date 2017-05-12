@@ -1,0 +1,30 @@
+---
+abstract: 'Perl interface to the Google Closure Javascript compiler service'
+author:
+  - 'Magnus Erixzon <magnus@erixzon.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Google-Closure
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::MOP: '1.09'
+  File::Slurp: '0'
+  JSON: '0'
+  LWP::UserAgent::Mockable: '0'
+  Moose: '0'
+  MooseX::Types: '0'
+  Perl6::Junction: '0'
+  Test::Class: '0'
+  Test::More: '0'
+version: '0.11'

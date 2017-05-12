@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use WorePAN;
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(\my %opts, qw/help version|v verbose cpan_only/);
+
+my $root = pop @ARGV;
+my @targets = @ARGV;
+
+if ($opts{version}) {
+  print $WorePAN::VERSION, "\n";
+  exit;
+}
+
+pod2usage(0) if $opts{help} or !@targets or !$root;
+
+WorePAN->new(
+  cleanup => 0,
+  root => $root,
+  files => \@targets,
+  no_network => 0,
+  use_backpan => !$opts{cpan_only},
+  verbose => $opts{verbose},
+);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+worepan - yet another CLI to create a DarkPAN
+
+=head1 SYNOPSIS
+
+  # Inject a CPAN distribution into a DarkPAN and udpate indices
+  $ worepan AUTHOR/Distribution-0.01.tar.gz path/to/darkpan
+
+=head1 OPTIONS
+
+=head2 cpan_only
+
+If set, WorePAN won't try to fetch a distribution from BackPAN even if it's not found on CPAN.
+
+=head2 verbose
+
+If set, WorePAN will be a bit verbose.
+
+=head2 version
+
+Shows WorePAN version.
+
+=head2 help
+
+Shows usage.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) by Kenichi Ishigaki.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

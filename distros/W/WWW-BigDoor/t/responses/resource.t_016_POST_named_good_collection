@@ -1,0 +1,17 @@
+201[
+    {
+        "end_user_description": "goods", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259958, 
+        "pub_title": "a bunch of goods the user can get", 
+        "resource_name": "named_good_collection", 
+        "urls": [], 
+        "attributes": [], 
+        "created_timestamp": 1294259958, 
+        "pub_description": "some goods", 
+        "end_user_title": "goods you can get", 
+        "id": 445, 
+        "named_goods": []
+    }, 
+    {}
+]

@@ -1,0 +1,14 @@
+Changes
+Console.pm
+Console.xs
+MANIFEST
+META.yml
+Makefile.PL
+README
+docs/index.html
+docs/intro.html
+docs/license.html
+docs/reference.html
+docs/toc.html
+eg/sample.pl
+typemap

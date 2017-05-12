@@ -1,0 +1,79 @@
+[% PROCESS config.tt -%]
+[%- module = xsd.module _ '::Base' -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moose;
+use warnings;
+use namespace::autoclean;
+use Moose::Util::TypeConstraints;
+use MooseX::Types::XMLSchema qw/:all/;
+use W3C::SOAP::XSD::Types qw/:all/;
+[%- IF config.alias %]
+use MooseX::Aliases;
+[%- END %]
+[%- FOREACH import IN xsd.imports %]
+use [% import.module %];
+[%- END %]
+
+extends 'W3C::SOAP::XSD';
+
+our $VERSION = 0.12;
+[% FOREACH subtype IN xsd.simple_types %]
+[%- NEXT IF !subtype.name %]
+[% IF subtype.enumeration.size %]
+enum(
+    '[% subtype.moose_type %]'
+    => ['[% subtype.enumeration.join("', '") %]']
+);
+[%- ELSE %]
+subtype '[% subtype.moose_type %]' =>
+    as      '[% subtype.moose_base_type %]';
+[%- END %]
+coerce '[% subtype.moose_type %]' =>
+    from 'xml_node' =>
+    via { $_->textContent };
+[%- END %]
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] - Talks to the [% end_point %] on the ESB
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+[% FOREACH subtype IN xsd.simple_types %]
+[% NEXT IF !subtype.name %]
+=item subtype C<[% subtype.moose_type %]>
+[% IF subtype.documentation %]
+[% subtype.documentation %]
+[% END %]
+[% END %]
+=back
+
+[% INCLUDE pod.tt %]

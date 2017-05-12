@@ -1,0 +1,26 @@
+Wx-Perl-Imagick
+
+This class is meant to be a replacement for Wx::Image, adding all functionality of Image::Magick. Hence
+the name Wx::Perl::Imagick.
+Most of the API of Wx::Image has been copied for backwards compatibility, but you can also call any method
+of Image::Magick on a constructed Wx::Perl::Magick instance. This will greatly improve the possibilities
+you have with an image in wxPerl.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Wx::Perl::Imagick is released under the same terms as Perl itself
+
+Copyright (C) 2005 Jouke Visser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

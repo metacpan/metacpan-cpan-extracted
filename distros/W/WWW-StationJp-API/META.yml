@@ -1,0 +1,38 @@
+---
+abstract: "It's a StationJP Module."
+author:
+  - 'sue7ga <sue77ga@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-StationJp-API
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::StationJp::API:
+    file: lib/WWW/StationJp/API.pm
+    version: '0.01'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/sue7ga/WWW-StationJp-API/issues
+  homepage: https://github.com/sue7ga/WWW-StationJp-API
+  repository: git://github.com/sue7ga/WWW-StationJp-API.git
+version: '0.01'

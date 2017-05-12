@@ -1,0 +1,16 @@
+<%
+
+use strict;
+BEGIN { eval { require warnings } and 'warnings'->import }
+
+my ($self) = @_;
+
+%>1<%
+
+my $content = $self->get_content( sub {
+    %>3<%
+} );
+
+%>2<%
+
+$self->output($content);

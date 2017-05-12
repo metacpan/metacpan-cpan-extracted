@@ -1,0 +1,81 @@
+Revision history for Perl extension WWW-FBX
+
+0.19 2017-03-26T13:40:34Z
+    Updated script and associated documentation round 2
+
+0.18 2017-03-25T23:15:47Z
+    Updated script and associated documentation
+
+0.17 2016-06-20T19:13:15Z
+    Updated description
+
+0.16 2016-06-08T21:14:57Z
+    Enhanced a bit the script fbx-test.pl to allow
+    - Storage of token
+    - Sending single commands e.g. fbx-test.pl reboot to reboot the freebox
+
+0.15 2016-06-08T19:53:33Z
+    - Fixed dependencies
+    - Added Kwalitee
+
+0.14 2016-06-04T22:40:44Z
+    - Corrected a bug in test script
+
+0.13 2016-05-11T23:12:32Z
+    - Corrected a bug in auth role
+
+0.12 2016-05-11T21:01:01Z
+    - base_url really belongs to FBX
+    - base_url as ro attribute to use WWW::FBX from WAN side
+    - basic logger
+
+0.11 2016-05-09T22:27:22Z
+    - Added RRD
+    - More NAT, Wifi
+    - Slight improve of the POD
+
+0.10 2016-05-08T20:35:14Z
+    - Finished FS
+    - As we now deref result, any method might return undef. 
+    - As such, some tests are not using ok (they will die on error)
+
+0.09 2016-05-08T13:06:19Z
+    - Now dereferencing {result}
+    - Updated API and tests
+
+0.08 2016-05-07T09:06:04Z
+    - Download test specific to maintainer
+    - Corrected api error on download file
+    - Corrected path being kept from call to call
+
+0.07 2016-05-06T00:28:50Z
+    - Allow passing positional arguments in the order of "params"
+    - Upload done
+    - Now download takes care of file handling
+
+0.06 2016-05-04T21:43:34Z
+    - Download API done
+    - Feeds API done
+    - More FS API
+    - Adapted to handle non JSON response from download file service
+
+0.05 2016-05-03T22:32:44Z
+    - Handle form-data
+    - More download API and tests
+    - Document available services in APIv3
+
+0.04 2016-05-02T21:10:40Z
+    - more tests. most of tests need a freebox and setting ENV variables FBX_APP_ID FBX_APP_NAME FBX_APP_VERSION FBX_TRACK_ID FBX_APP_TOKEN
+    - updated APIv3: correction and using for loops
+    - fbx-test.pl is now provided without any default id
+
+0.03 2016-05-01T21:12:14Z
+    - quick GETters all done
+    - remove trailing _ from API sub calls
+
+0.02 2016-05-01T18:47:16Z
+    - added build requirements
+
+0.01 2016-05-01T16:36:29Z
+    - original version
+

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                WWW-Module
+version:             1.00
+abstract:            use modules from CPAN without installing
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Carp:                          0
+    CPAN:                          0
+    Data::Dumper:                  0
+    File::HomeDir:                 0
+    File::Spec:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Nigel Gourlay <nwetters@cpan.org>

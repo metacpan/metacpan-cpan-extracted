@@ -1,0 +1,6 @@
+Revision history for Perl extension Win32::StrictFileNames.
+
+0.01  Wed May 10 19:43:49 2006
+	- original version; created by h2xs 1.23 with options
+		-A -b5.6.0 -n Win32::StrictFileNames
+

@@ -1,0 +1,11 @@
+Revision history for WebService-Ooyala
+
+0.03    2016-05-09
+        Add appropriate prerequisite perl modules to clean up test fails
+
+0.02    2016-05-05
+        Clean up extraneous documentation block, add author api test
+
+0.01    2016-05-04
+        First version, released on an unsuspecting world.
+

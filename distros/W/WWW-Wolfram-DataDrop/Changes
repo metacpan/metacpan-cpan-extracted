@@ -1,0 +1,11 @@
+Revision history for WWW-Wolfram-DataDrop
+
+0.03  2017-01-11 11:53:26 CET
+        - Improve documentation
+        - Add warnings
+
+0.02  2017-01-10 19:48:27 CET
+        - Add LWP::UserAgent to cpanfile
+
+0.01  2017-01-01 18:05:24 CET
+        - Initial release

@@ -1,0 +1,191 @@
+==================================================
+Changes from 2012-11-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2013-11-13 19:32:04 +0000
+------------------------------------------
+
+  Change: ae913f82c38a4d353fe0f1c857e1be87a2ef530c
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-11-13 11:31:42 +0000
+
+    Update README + Makefile 
+
+  Change: 76d4e90d923af996c0db1f0e1b6091ff53eda734
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-11-13 10:53:32 +0000
+
+    Merge pull request #4 from pjf/master
+
+    Lots of minor bugfixes and improvements 
+
+  Change: bde3a7edd688518e488fea4af821f0ff92db242b
+  Author: Paul Fenwick <pjf@perltraining.com.au>
+  Date : 2013-11-13 20:50:49 +0000
+
+    README.md clean-up. Updated Makefile.PL for non-dzil users. 
+
+  Change: ff5132ee6b7588bd8851a30243b7ad3c27910b6c
+  Author: Paul Fenwick <pjf@perltraining.com.au>
+  Date : 2013-10-22 16:43:45 +0000
+
+    Extend the `pocket` script to list pocket items.
+
+    It's super-simple functionality, but it works. :) 
+
+  Change: 1ef23ff3b18d4adc402aaa5b809efe2500e03c02
+  Author: Paul Fenwick <pjf@perltraining.com.au>
+  Date : 2013-10-22 16:41:39 +0000
+
+    Documentation fix: list's state option takes a string
+
+    The v2 API docs suggests using the strings 'read' and 'unread' as
+    options to the 'state' parameter. So we'll adjust the synopsis to
+    show this. 
+
+  Change: 54ffb9e9c786a3dcc1ff3a7921abd3115ac9b9af
+  Author: Paul Fenwick <pjf@perltraining.com.au>
+  Date : 2013-10-22 16:22:00 +0000
+
+    Add explicit pre-req vesions of HTTP::Tiny and Net::SSLeay
+
+    We need SSLeay >= 1.49 for https support We need a recent HTTP::Tiny
+    >= 0.014 for www_form_urlencode() 
+
+------------------------------------------
+version 0.002 at 2013-03-27 20:56:42 +0000
+------------------------------------------
+
+  Change: f1bdd144a060ada8735a612e6d173a92a1a43f7e
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-27 13:56:42 +0000
+
+    Update Makefile + Readme for new release 
+
+  Change: 8008080ea293f5f22500249df9ce6ee8d36f541b
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-27 09:40:48 +0000
+
+    Merge pull request #3 from omega/cmd-line
+
+    Fixes to command line application pull 
+
+  Change: b1a3fbee54a48e744f037c70288e844e1fcbe34e
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-27 09:43:00 +0000
+
+    Add version req for MooseX::Getopt 
+
+  Change: bc03e990d82a15e92dd2830d7d03de0871b36d22
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-27 09:41:01 +0000
+
+    Revert "temporarily fix weaver.ini"
+
+    This reverts commit 323f30c767b2b18802c5b31683b2569c59b47aa8. 
+
+  Change: 5b8ee1d9fe93c3e96a24ea3c7ec8080be1c761d7
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-27 09:40:41 +0000
+
+    Revert "Fix print_usage_text temporarily?"
+
+    This reverts commit 135f8d76be75e74a6bd4c669c23f296d5c662990. 
+
+  Change: f71b2336a61f0acb24c46ccf7df4e47400d94841
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-27 09:35:37 +0000
+
+    Add missing authordep 
+
+  Change: 135f8d76be75e74a6bd4c669c23f296d5c662990
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-26 19:29:00 +0000
+
+    Fix print_usage_text temporarily? 
+
+  Change: 323f30c767b2b18802c5b31683b2569c59b47aa8
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-26 19:24:20 +0000
+
+    temporarily fix weaver.ini 
+
+  Change: 294064ca1da7e6ba51a0f5e5cdcf463532d7ba28
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-26 19:23:38 +0000
+
+    Prepare for version 0.02 
+
+  Change: 6a0478973369a470cc6d90d16953aaaba44b04d6
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-26 19:23:16 +0000
+
+    remove CHANGES file from repo 
+
+  Change: 9ffa8811928b0122ab7c1284f93244806eac434e
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-03-26 19:18:48 +0000
+
+    Merge pull request #2 from omega/cmd-line
+
+    Cmd line "application" 
+
+  Change: ec9b51df4e3f9e85af0d417039f1de0f4a09188e
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-27 08:59:04 +0000
+
+    Code cleanup after review 
+
+  Change: c100280cf1f8ab6110ad4e61e1bd310292af81a4
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-26 17:08:06 +0000
+
+    Add Contributors to the documentation generated
+
+    This will add Contributors to all generated documentation, from git
+    history. 
+
+  Change: 2312aaeeddcf180faf553019fc249fe46b60f834
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-26 17:07:38 +0000
+
+    Add documentation to command line script
+
+    This takes the form mainly of a small blurb in the Script.pm, and
+    hiding attributes from --help.
+
+    Also satisfy some dzil warnings 
+
+  Change: ed750022f3f869e3e026ce9f64f21f083bfc112d
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-26 13:57:27 +0000
+
+    Add beginnings of a command line script
+
+    this script is pretty simple right now, with not documentation. It
+    serves my current need :) 
+
+  Change: 33704a3c7fcd406af589a0c134eaa95b56d86a91
+  Author: Andreas Marienborg <andreas.marienborg@gmail.com>
+  Date : 2013-03-26 13:56:57 +0000
+
+    Add missing use statements 
+
+  Change: 2e6795066cc0c5e695fe9012ce5cd534bc325f74
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-12-12 15:03:55 +0000
+
+    Merge pull request #1 from notbenh/synop_syn_err
+
+    syntax error in example code due to missing semicolon 
+
+  Change: 5522894f5f3deaae8371c4decfb2163412036fff
+  Author: ben hengst <notbenh@cpan.org>
+  Date : 2012-12-12 14:21:26 +0000
+
+    syntax error in example code due to missing semicolon 
+
+===============================================
+Plus 1 release after 2012-11-13 00:00:00 +0000.
+===============================================

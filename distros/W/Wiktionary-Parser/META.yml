@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Wiktionary-Parser
+version:            0.11
+abstract:           Client and Parser of content from the Wiktionary API
+author:
+    - Chris Becker <clbecker@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp::Always:         0
+    File::Path:           0
+    Locale::Codes:        0
+    Locale::Codes::Constants:  0
+    Locale::Codes::Language:  0
+    MediaWiki::API:       0
+    Test::More:           0
+    Text::Unidecode:      0
+resources:
+    homepage:    https://github.com/clbecker/perl-wiktionary-parser/wiki
+    license:     http://dev.perl.org/licenses/
+    repository:  https://github.com/clbecker/perl-wiktionary-parser/
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

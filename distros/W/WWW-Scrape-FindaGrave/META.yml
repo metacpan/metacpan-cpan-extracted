@@ -1,0 +1,30 @@
+---
+abstract: 'Scrape the FindaGrave site'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::URI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Scrape-FindaGrave
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::SimpleLinkExtor: '0'
+  LWP::UserAgent: '0'
+  WWW::Mechanize::GZip: '0'
+  perl: '5.006002'
+resources:
+  repository: git://github.com/nigelhorne/WWW-Scrape-FindaGrave.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::ContainerServlet - internal container servlet interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">accessor METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::ContainerServlet - internal container servlet interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface specifies a servlet that has access to Wombat internal
+functionality. The accessor methods must be called by the Container
+whenever a new instance of the servlet is put into service.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">accessor METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getWrapper"><CODE>getWrapper()</CODE></A></STRONG><BR>
+<DD>
+Return the Wrapper that wraps this Servlet.
+<P></P>
+<DT><STRONG><A NAME="item_setWrapper"><CODE>setWrapper($wrapper)</CODE></A></STRONG><BR>
+<DD>
+Set the Wrapper that wraps this Servlet.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24wrapper">$wrapper</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Wrapper</STRONG> that wraps this Servlet
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Servlet.html">the Servlet::Servlet manpage</A>,
+<A HREF="../../api/Wombat/Core/Wrapper.html">the Wombat::Core::Wrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

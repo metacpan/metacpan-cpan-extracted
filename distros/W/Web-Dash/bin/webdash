@@ -1,0 +1,78 @@
+#!perl
+
+use strict;
+use warnings;
+use Plack::Runner;
+use Web::Dash;
+use Getopt::Long;
+use Pod::Usage;
+
+my $OPT_HOST = "127.0.0.1";
+my $OPT_PORT = 5000;
+my $OPT_HELP = 0;
+
+GetOptions(
+    "o|host=s" => \$OPT_HOST,
+    "p|port=i" => \$OPT_PORT,
+    "h|help"   => \$OPT_HELP,
+);
+
+if($OPT_HELP) {
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit 0;
+}
+
+my $runner = Plack::Runner->new;
+$runner->parse_options(
+    "-s" => "Twiggy",
+    "-o" => $OPT_HOST,
+    "-p" => $OPT_PORT,
+);
+$runner->run(Web::Dash->new->to_app);
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+webdash - Web::Dash daemon runner
+
+=head1 SYNOPSIS
+
+    webdash [OPTIONS]
+    
+    webdash --port 8080
+
+    webdash --host 0.0.0.0 --port 8080
+
+=head1 DESCRIPTION
+
+This command starts a L<Web::Dash> daemon in foreground.
+
+=head1 OPTIONS
+
+=over
+
+=item -o, --host HOST_ADDRESS (default: 127.0.0.1)
+
+The address webdash listens to.
+
+=item -p, --port TCP_PORT (default: 5000)
+
+The TCP port number webdash listens to.
+
+=item -h, --help
+
+Show this message.
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+
+

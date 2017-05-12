@@ -1,0 +1,15 @@
+Revision history for perl module WWW-Pusher-Client
+
+0.04 2015-05-14
+ - Reject invalid formats for channel and socket_id
+
+0.03 2015-05-14
+ - Specify minimum perl version
+ - Update & clean up documentation
+ - Refactor for testability and proper DI
+
+0.02 2015-04-27
+ - Fix authentication to private channels
+
+0.01
+ - Initial Release

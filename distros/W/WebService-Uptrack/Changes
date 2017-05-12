@@ -1,0 +1,10 @@
+Revision history for WebService-Uptrack
+
+0.0.2  Fri Oct  8 14:13:10 2010
+       Create a Makefile.PL for backwards compatibility.
+       Remove type coercion that was generating CPANTS errors.
+       Include the repository metadata properly.
+
+0.0.1  Tue Oct  5 13:21:08 2010
+       Initial release.
+

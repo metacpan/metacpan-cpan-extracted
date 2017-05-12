@@ -1,0 +1,25 @@
+---
+abstract: 'which Unix classic command for Windows'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.3800'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-App-which
+provides:
+  Win32::App::which:
+    file: lib/Win32/App/which.pm
+    version: '1.030'
+requires:
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dolmen/p5-Win32-App-which.git
+version: '1.030'

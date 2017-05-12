@@ -1,0 +1,21 @@
+localhost ESMTP Exim 4.60 Mon, 20 Feb 2006 22:38:53 +0000
+
+localhost ESMTP Postfix (Debian/GNU)
+
+galeb.somedomain.org ESMTP Sendmail 8.13.5/8.13.5/Debian-3; Mon, 20
+Feb 2006 22:41:04 GMT; (No UCE/UBE) logging access from:
+localhost(OK)-localhost [127.0.0.1]
+
+<1140475332.2874633136@mast> [XMail 1.22 ESMTP Server] service ready;
+Mon, 20 Feb 2006 22:42:12 -0000
+
+mast MasqMail 0.2.21 ESMTP
+
+galeb Ok.
+XVERP=Courier
+XEXDATA
+XSECURITY=NONE,STARTTLS
+PIPELINING
+8BITMIME
+SIZE
+DSN

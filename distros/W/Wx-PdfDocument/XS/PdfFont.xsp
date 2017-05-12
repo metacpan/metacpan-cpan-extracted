@@ -1,0 +1,84 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdffont.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2008-08-10
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfFont} class wxPdfFont
+{
+    
+%{
+static void
+wxPdfFont::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public :
+  
+  %name{newDefault} wxPdfFont() %Overload;
+  
+  %name{newCopy} wxPdfFont(const wxPdfFont& font) %Overload;
+  
+  %name{Destroy} virtual ~wxPdfFont()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  bool IsValid() const;
+
+  wxString GetType() const;
+
+  wxString GetFamily() const;
+
+  wxString GetName() const;
+
+  int GetStyle() const;
+
+  wxString GetEncoding() const;
+
+  virtual double GetStringWidth(const wxString& s) const;
+
+  bool EmbedRequired() const;
+
+  bool EmbedSupported() const;
+
+  bool SubsetSupported() const;
+
+  const wxPdfFontDescription GetDescription() const;
+
+  void SetEmbed(bool embed);
+
+  bool GetEmbed() const;
+
+  void SetSubset(bool subset);
+
+  bool GetSubset() const;
+
+  bool SetEncoding(const wxString& encodingName);
+
+  /* bool GetEncoding(wxPdfEncoding& encoding); */
+
+  bool CanShow(const wxString& s);
+  
+  /* TODO
+  bool GetSupportedUnicodeCharacters(wxPdfArrayUint32& unicodeCharacters) const;
+  */
+
+#define WXPERL_DEFAULT_VALID_REPLACE wxT('?')
+
+  wxString ConvertToValid(const wxString& s, wxChar replace = WXPERL_DEFAULT_VALID_REPLACE) const;
+  
+  /* TODO
+  bool GetGlyphNames(wxArrayString& glyphNames) const;
+  */
+
+};
+

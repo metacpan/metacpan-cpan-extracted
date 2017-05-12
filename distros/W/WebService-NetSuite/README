@@ -1,0 +1,779 @@
+NAME
+    WebService::NetSuite - A perl interface to the NetSuite SuiteTalk (Web
+    Services) API
+
+SYNOPSIS
+        use WebService::NetSuite;
+  
+        my $ns = WebService::NetSuite->new({
+            nsemail         => 'blarg@foo.com',
+            nspassword      => 'foobar123',
+            nsroleName      => 'Administrator',
+            nsaccountName   => 'My NS Account',
+        });
+
+        # old 'new' method still supported, but discouraged:
+        #my $ns = WebService::NetSuite->new({
+        #    nsrole     => 3,
+        #    nsemail    => 'blarg@foo.com',
+        #    nspassword => 'foobar123',
+        #    nsaccount  => 123456,
+        #    sandbox    => 1,
+        #});
+
+        my $customer_id = $ns->add( 'customer',
+            { firstName  => 'Gonzo',
+              lastName   => 'Muppet',
+              email      => 'gonzo@muppets.com',
+              entityId   => 'muppet_database_id',
+              subsidiary => 1,
+              isPerson   => 1,
+        });
+
+DESCRIPTION
+    This module is a client to the NetSuite SuiteTalk web service API.
+
+    Initial content shamelessly stolen from
+    https://github.com/gitpan/NetSuite
+
+    Refactored and released as WebService::NetSuite for the 2013 target and
+    updated access methods using the passport data structure instead of
+    login/logout.
+
+    This reboot of the original NetSuite module is still rough and under
+    construction.
+
+    NetSuite Help Center -
+    https://system.sandbox.netsuite.com/app/help/helpcenter.nl
+
+    You'll need a NetSuite login to get to the help center unfortunately.
+    Silly NetSuite.
+
+  new(%options)
+    The new method creates the WebService::NetSuite object and the
+    underlying SOAP object that is used to communicate with NetSuite. The
+    new symtax automatically determines the NetSuite host to communicate
+    with based on your email, password, and account name:
+
+        NEW SYNTAX:
+
+        my $ns = WebService::NetSuite->new({
+            nsemail         => 'blarg@foo.com',
+            nspassword      => 'foobar123',
+            nsroleName      => 'Administrator',
+            nsaccountName   => 'My NS Account',
+            sandbox         => 0,
+            debug           => 1,
+            debugFile       => 'NetSuite.dbg',
+        });
+
+        OLD SYNTAX:
+
+        my $ns = WebService::NetSuite->new({
+            nsrole          => 3,
+            nsemail         => 'blarg@foo.com',
+            nspassword      => 'foobar123',
+            nsaccount       => 123456,
+            sandbox         => 0,
+            debug           => 1,
+            debugFile       => 'NetSuite.dbg',
+        });
+
+  add(recordType, hashReference)
+    The add method submits a new record to NetSuite. It requires a record
+    type, and hash reference containing the data of the record.
+
+    For a boolean value, the request uses a numeric zero to represent false,
+    and the textual word "true" to represent true. I believe this is an
+    error with NetSuite; identified in their last release.
+
+    For a record reference field, like entityStatus, simply pass the numeric
+    internalId of the field. If you are unsure what the internalIds are for
+    a value, check the getSelectValue method.
+
+    For an enumerated value, simply submit a string.
+
+    For a list value, pass an array of hashes.
+
+        my $customer = {
+            isPerson => 0, # meaning false
+            companyName => 'Wolfe Electronics',
+            entityStatus => 13, # notice I only pass in the internalId
+            emailPreference => '_hTML', # enumerated value
+            unsubscribe => 0,
+            addressbookList => [
+              {
+                  defaultShipping => 'true',
+                  defaultBilling => 0,
+                  isResidential => 0,
+                  phone => '650-627-1000',
+                  label => 'United States Office',
+                  addr1 => '2955 Campus Drive',
+                  addr2 => 'Suite 100',
+                  city => 'San Mateo',
+                  state => 'CA',
+                  zip => '94403',
+                  country => '_unitedStates',
+              },
+            ],
+        };
+
+        my $internalId = $ns->add('customer', $customer);
+        print "I have added a customer with internalId $internalId\n";
+
+    If successful this method will return the internalId of the newly
+    generated record. Otherwise, the error details are sent to the
+    errorResults method.
+
+    If you wanted to ensure a record was submitted successfully, I recommend
+    the following syntax:
+
+        if (my $internalId = $ns->add('customer', $customer)) {
+            print "I have added a customer with internalId $internalId\n";
+        }
+        else {
+            print "I failed to add the customer!\n";
+        }
+
+  update(recordType, hashReference)
+    The update method will request an update of an existing record. The only
+    difference with this operation is that the internalId of the record
+    being updated must be present inside the hash reference.
+
+        my $customer = {
+            internalId => 1234, # the internaldId of the record being updated
+            phone => '555-555-5555',
+        };
+
+        my $internalId = $ns->update('customer', $customer);
+        print "I have updated a customer with internalId $internalId\n";
+
+    If successful this method will return the internalId of the updated
+    record Otherwise, the error details are sent to the errorResults method.
+
+  delete(recordType, hashOrInternalId)
+    The delete method very simply deletes a record. It requires the record
+    type and either a hashref indicating the criteria or internalId number
+    for the record.
+
+        The first 2 examples are exactly the same:
+
+        1) my $internalId = $ns->delete('customer', 1234);
+           print "I have deleted a customer with internalId $internalId\n";
+
+        2) my $internalId = $ns->delete('customer', {internalId => 1234});
+           print "I have deleted a customer with internalId $internalId\n";
+
+        3) my $internalId = $ns->delete('customer', {externalId => 5678});
+           print "I have deleted a customer with internalId $internalId\n";
+
+    If successful this method will return the internalId of the deleted
+    record Otherwise, the error details are sent to the errorResults method.
+
+  search(searchType, hashReference, configReference)
+    The search method submits a query to NetSuite. If the query is
+    successful, a true value (1) is returned, otherwise it is undefined.
+
+    To conduct a very basic search for all customers, excluding inactive
+    accounts, I would write:
+
+        my $query = {
+            basic => [
+                { name => 'isInactive', value => 0 } # 0 means false
+            ]
+        };
+    
+        $ns->search('customer', $query);
+
+    Notice that the query is a hash reference of search types. Foreach
+    search type in the hash there is an array of hashes for each field in
+    the criteria.
+
+    Once the query is constructed, I designate the search to use and the
+    query. And submit it to NetSuite.
+
+    This query structure may seem confusing, especially in a simply example.
+    But within NetSuite there are several different searches you can
+    perform. Some examples of these searchs are:
+
+    customer contact supportCase employee calendarEvent item opportunity
+    phoneCall task transaction
+
+    Then within each search, you can also join with other searches to
+    combine information. To demonstrate a more complex search, we will take
+    this example.
+
+    Let's imagine you wanted to see transactions, specifically sales orders,
+    invoices, and cash sales, that have transpired over the last year.
+
+        my $query = {
+            basic => [
+                { name => 'mainline', value => 'true' },
+                { name => 'type', attr => { operator => 'anyOf' }, value => [
+                        { value => '_salesOrder' },
+                        { value => '_invoice' },
+                        { value => '_cashSale' },
+                    ]   
+                },
+                { name => 'tranDate', value => 'previousOneYear', attr => { operator => 'onOrAfter' } },
+            ],
+        };
+
+    From that list, you want to see if the customer associated with each
+    transaction has a valid email address on file, and is not a lead or a
+    prospect. The joined query would look like this:
+
+        my $query = {
+            basic => [
+                { name => 'mainline', value => 'true' },
+                { name => 'type', attr => { operator => 'anyOf' }, value => [
+                        { value => '_salesOrder' },
+                        { value => '_invoice' },
+                        { value => '_cashSale' },
+                    ]   
+                },
+                { name => 'tranDate', value => 'previousOneYear', attr => { operator => 'onOrAfter' } },
+            ],
+            customerJoin => [
+                { name => 'email', attr => { operator => 'notEmpty' } },
+                { name => 'entityStatus', attr => { operator => 'anyOf' }, value => [
+                        { attr => { internalId => '13' } },
+                        { attr => { internalId => '15' } },
+                        { attr => { internalId => '16' } },
+                    ]                                  
+                },
+            ],
+        };
+
+    Notice that each hash reference within either the basic or customerJoin
+    arrays has a "name" and "value" key. In some cases you also have an
+    "attr" key. This "attr" key is another hash reference that contains the
+    operator for a field, or the internalId for a field.
+
+    Also notice that for enumerated search fields, like "entityStatus" or
+    "type", the "value" key contains an array of hashes. Each of these
+    hashes represent one of many possible collections.
+
+    To take this a step further, we may want to search for some custom
+    fields that exists in a customer's record. These custom fields are
+    located in the "customFieldList" field of a record and can be queries
+    like so:
+
+        my $query = {
+            basic => [
+                { name => 'customFieldList', value => [
+                        {
+                            name => 'customField',
+                            attr => {
+                                internalId => 'custentity1',
+                                operator => 'anyOf',
+                                'xsi:type' => namespace('core') . ':SearchMultiSelectCustomField'
+                            },
+                            value => [
+                                { attr => { internalId => 1 } },
+                                { attr => { internalId => 2 } },
+                                { attr => { internalId => 3 } },
+                                { attr => { internalId => 4 } },
+                            ]
+                        },
+                    ],
+                },
+            ],
+        };
+
+    Notice that we have added a new layer to the "attr" key called
+    'xsi:type'. That is because this module cannot determine the custom
+    field types for YOUR particular NetSuite account in real time. Thus, you
+    have to provide them within the query.
+
+    If the search is successful, a true value (1) is returned, otherwise it
+    is undefined. If successful, the results are passed to the searchResults
+    method, otherwise call the errorResults method.
+
+    Also, for this method, you are given special access to the header of the
+    search request. This allows you to designate the number of records to be
+    returned in each set, as well as whether to return just basic
+    information about the results, or extended information about the
+    results.
+
+        # perform a search and only return 10 records per page
+        $ns->search('customer', $query, { pageSize => 10 });
+    
+        # perform a search and only provide basic information about the results
+        $ns->search('customer', $query, { bodyFieldsOnly => 0 });
+
+  searchResults
+    The searchResults method returns the results of a successful search
+    request. It is a hash reference that contains the record list and
+    details of the search.
+
+        {
+            'recordList' => [
+                {
+                    'accessRoleName' => 'Customer Center',
+                    'priceLevelInternalId' => '3',
+                    'unbilledOrders' => '2512.7',
+                    'entityStatusName' => 'CUSTOMER-Closed Won',
+                    'taxItemInternalId' => '-112',
+                    'lastPageVisited' => 'login-register',
+                    'isInactive' => 'false',
+                    'shippingItemName' => 'UPS Ground',
+                    'entityId' => 'A Wolfe',
+                    'entityStatusInternalId' => '13',
+                    'accessRoleInternalId' => '14',
+                    'recordExternalId' => 'entity-5',
+                    'webLead' => 'No',
+                    'territoryName' => 'Default Round-Robin',
+                    'recordType' => 'customer',
+                    'emailPreference' => '_default',
+                    'taxItemName' => 'CA-SAN MATEO',
+                    'taxable' => 'true',
+                    'partnerName' => 'E Auctions Online',
+                    'companyName' => 'Wolfe Electronics',
+                    'shippingItemInternalId' => '92',
+                    'leadSourceName' => 'Accessory Sale',
+                    'creditHoldOverride' => '_auto',
+                    'title' => 'Perl Developer',
+                    'priceLevelName' => 'Employee Price',
+                    'partnerInternalId' => '170',
+                    'giveAccess' => 'true',
+                    'visits' => '150',
+                    'stage' => '_customer',
+                    'termsName' => 'Due on receipt',
+                    'defaultAddress' => 'A Wolfe<br>2955 Campus Drive<br>Suite 100
+    <br>San Mateo CA 94403<br>United States',
+                    'lastVisit' => '2008-03-22T16:40:00.000-07:00',
+                    'isPerson' => 'false',
+                    'recordInternalId' => '-5',
+                    'fax' => '650-627-1001',
+                    'salesRepInternalId' => '23',
+                    'dateCreated' => '2006-07-22T00:00:00.000-07:00',
+                    'termsInternalId' => '4',
+                    'salesRepName' => 'Clark Koozer',
+                    'unsubscribe' => 'false',
+                    'categoryInternalId' => '2',
+                    'phone' => '650-555-9788',
+                    'shipComplete' => 'false',
+                    'lastModifiedDate' => '2008-01-28T19:28:00.000-08:00',
+                    'territoryInternalId' => '-5',
+                    'categoryName' => 'Individual',
+                    'firstVisit' => '2007-03-24T16:13:00.000-07:00',
+                    'leadSourceInternalId' => '100102'
+                },
+            ],
+            'totalPages' => '79', # the total number of pages in the set
+            'totalRecords' => '790', # the total records returned by the search
+            'pageSize' => '10', # the number of records per page
+            'pageIndex' => '1', # the current page
+            'statusIsSuccess' => 'true'
+        }
+
+    The "recordList" field is an array of hashes containing a record's
+    values. Refer to the get method for details on the understanding of a
+    record's data structure.
+
+  searchMore(pageIndex)
+    If your initial search returns several pages of results, you can jump to
+    another result page quickly using the searchMore method.
+
+    For example, if after performing an initial search you are given 1 of
+    100 records, when there are 500 total records. You could quickly jump to
+    the 301-400 block of records by entering the pageIndex value.
+
+        $ns->search('customer', $query);
+    
+        # determine my result set
+        my $totalPages = $ns->searchResults->{totalPages};
+        my $pageIndex = $ns->searchResults->{pageIndex};
+        my $totalRecords = $ns->searchResults->{totalRecords};
+    
+        # output a message
+        print "I found $totalRecords records!\n";
+        print "Displaying page $pageIndex of $totalPages\n";
+    
+        my $jumpToPage = 3;
+        $ns->searchMore($jumpToPage);
+        print "Jumping to page $jumpToPage\n";
+        print "Now displaying page $jumpToPage of $totalPages\n";
+
+  searchNext
+    If your initial search returns several pages of results, you can
+    automatically jump to the next page of results using the searchNext
+    function. This is most useful when downloading sets of more than 1000
+    records. (Which is the limit of an initial search).
+
+        $ns->search('transaction', $query);
+        if ($ns->searchResults->{totalPages} > 1) {
+            while ($ns->searchResults->{pageIndex} != $ns->searchResults->{totalPages}) {
+                for my $record (@{ $ns->searchResults->{recordList} }) {
+                    my $internalId = $record->{recordInternalId};
+                    print "Found record with internalId $internalId\n";
+                }
+                $ns->searchNext;
+            }
+        }
+
+  get(recordType, hashOrInternalId)
+    The get method returns the most complete information for a record. It
+    takes a hash which describes the criteria or an internalId.
+
+    The first 2 examples are identical:
+
+    1) $ns->get('customer', 1234)
+
+    2) $ns->get('customer', {internalId => 1234})
+
+    3) $ns->get('customer', {externalId => 5678})
+
+        # to see an individual field in the response
+        if ($ns->get('customer', 1234)) {
+            my $firstName = $ns->getResults->{firstName};
+            print "I got a customer with the first name $firstName\n";
+        }
+    
+        # to output the complete data structure
+        my $getSuccess = $ns->get('customer', 1234);
+        if ($getSuccess) {
+            print Dumper($ns->getResults);
+        }
+
+    If the operation in successful, a true value (1) is returned, otherwise
+    it is undefined.
+
+    The results will be passed to the getResults method, otherwise call the
+    errorResults method.
+
+  getResults
+    The getResults method returns a hash reference containing all of the
+    information for a given record. (Some fields were omitted)
+
+        {
+            'recordInternalId' => '1234',
+            'recordExternalId' => 'entity-5',
+            'recordType' => 'customer',
+            'isInactive' => 'false',
+            'entityStatusInternalId' => '13',
+            'entityStatusName' => 'CUSTOMER-Closed Won',
+            'entityId' => 'A Wolfe',
+            'emailPreference' => '_default',
+            'fax' => '650-627-1001',
+            'contactList' => [
+                {
+                    'contactInternalId' => '25',
+                    'contactName' => 'Amy Nguyen'
+                },
+            ],
+            'creditCardsList' => [
+                {
+                    'ccDefault' => 'true',
+                    'ccMemo' => 'This is the preferred credit card.',
+                    'paymentMethodName' => 'Visa',
+                    'paymentMethodInternalId' => '5',
+                    'ccNumber' => '************1111',
+                    'ccExpireDate' => '2010-01-01T00:00:00.000-08:00',
+                    'ccName' => 'A Wolfe'
+                }
+            ],
+            'addressbookList' => [
+                {
+                    'country' => '_unitedStates',
+                    'defaultShipping' => 'true',
+                    'internalId' => '244715',
+                    'defaultBilling' => 'true',
+                    'phone' => '650-627-1000',
+                    'state' => 'CA',
+                    'addrText' => 'A Wolfe<br>2955 Campus Drive<br>Suite 100<br>San Mateo CA 94403<br>United States',
+                    'addr2' => 'Suite 100',
+                    'zip' => '94403',
+                    'city' => 'San Mateo',
+                    'isResidential' => 'false',
+                    'addressee' => 'A Wolfe',
+                    'addr1' => '2955 Campus Drive',
+                    'override' => 'false',
+                    'label' => 'Default'
+                }
+            ],
+            'dateCreated' => '2006-07-22T00:00:00.000-07:00',
+            'lastModifiedDate' => '2008-01-28T19:28:00.000-08:00',
+        };
+
+    It is important to note how some of this data is returned.
+
+    Notice that the internalId for the record is labeled "recordInternalId"
+    instead of just "internalId". This is the same for the
+    "recordExternalId".
+
+    For a boolean value, the response the string "true" or "false.
+
+    For a record reference field, like entityStatus, the name of this value
+    and its internalId are returned as two seperate values: entityStatusName
+    and entityStatusInternalId. This appending of the words "Name" and
+    "InternalId" after the field name is the same for all reference fields.
+
+    For an enumerated value, a string is returned.
+
+    For a list, the value is an array of hashes. Even if the list contains
+    only a single hash reference, it will still be returned as an array.
+
+    The easiest way to access an understand this function, is to dump the
+    response and determine the best way to interate through your data. For
+    example, if I wanted to see if the customer had a default credit card
+    selected, I might write:
+
+        if ($ns->get('customer', 1234)) {
+            if (defined $ns->getResults->{creditCardsList}) {
+                if (scalar @{ $ns->getResults->{creditCardsList} } == 1) {
+                    print "This customer has a default credit card!\n";
+                }
+                else { 
+                    for my $creditCard (@{ $ns->getResults->{creditCardsList} }) {
+                        if ($creditCard->{ccDefault} eq 'true') {
+                            print "This customer has a default credit card!\n";
+                        }
+                    }
+                }
+            }
+            else {
+                "There are no credit cards on file!\n";
+            }
+        }
+        else {
+            # my get request failed, better check the errorResults method
+        }
+
+    Or, if I was more concerned with checking this customers last activity,
+    I might write:
+
+        $ns->get('customer', 1234);
+    
+        # assuming the request was successful
+        my $internalId = $ns->getResults->{recordInternalId};
+        my $lastModifiedDate = $ns->getResults->{lastModifiedDate};
+        print "Customer $internalId was last updated on $lastModifiedDate.\n";
+
+  getSelectValue
+    The getSelectValue method returns a list of internalId numbers and names
+    for a record reference field. For instance, if you wanted to know all of
+    the acceptable values for the "terms" field of a customer you could
+    submit a request like:
+
+        $ns->getSelectValue('customer_terms');
+
+    If successful, a call to the getResults method, will return a hash
+    reference that looks like this:
+
+        {
+            'recordRefList' => [
+              {
+                  'recordRefInternalId' => '5',
+                  'recordRefName' => '1% 10 Net 30'
+              },
+              {
+                  'recordRefInternalId' => '6',
+                  'recordRefName' => '2% 10 Net 30'
+              },
+              {
+                  'recordRefInternalId' => '4',
+                  'recordRefName' => 'Due on receipt'
+              },
+              {
+                  'recordRefInternalId' => '1',
+                  'recordRefName' => 'Net 15'
+              },
+              {
+                  'recordRefInternalId' => '2',
+                  'recordRefName' => 'Net 30'
+              },
+              {
+                  'recordRefInternalId' => '3',
+                  'recordRefName' => 'Net 60'
+              }
+            ],
+            'totalRecords' => '6',
+            'statusIsSuccess' => 'true'
+        }
+
+    If the request fails, the error details are sent to the errorResults
+    method.
+
+    From these results, we now know that the "terms" field of a customer can
+    be submitted using any of the recordRefInternalIds. Thus, to update a
+    customer's terms, we might write:
+
+        my $customer = {
+            internalId => 1234,
+            terms => 4, # Due on receipt
+        }
+
+        $ns->update('customer', $customer);
+
+    For a complete list of acceptable values for this operation, visit the
+    coreTypes XSD file for web services version 2.6. Look for the
+    "GetSelectValueType" simpleType.
+
+    <https://webservices.netsuite.com/xsd/platform/v2_6_0/coreTypes.xsd>
+
+  getCustomization
+    The getCustomization retrieves the metadata for Custom Fields, Lists,
+    and Record Types. For instance, if you wanted to know all of the custom
+    fields for the body of a transaction, you might write:
+
+        $ns->getCustomization('transactionBodyCustomField');
+
+    If successful, a call to the getResults method, will return a hash
+    reference that looks like this:
+
+        {
+            'recordList' => [
+              {
+                  'fieldType' => '_phoneNumber',
+                  'sourceFromName' => 'Phone',
+                  'bodyPrintStatement' => 'false',
+                  'bodyAssemblyBuild' => 'false',
+                  'bodySale' => 'true',
+                  'bodyItemReceiptOrder' => 'false',
+                  'isMandatory' => 'false',
+                  'recordType' => 'transactionBodyCustomField',
+                  'bodyPurchase' => 'false',
+                  'bodyPickingTicket' => 'true',
+                  'bodyExpenseReport' => 'false',
+                  'name' => 'Entity',
+                  'bodyItemFulfillmentOrder' => 'false',
+                  'bodyPrintPackingSlip' => 'false',
+                  'isFormula' => 'false',
+                  'sourceFromInternalId' => 'STDENTITYPHONE',
+                  'bodyItemFulfillment' => 'false',
+                  'label' => 'Customer Phone',
+                  'bodyJournal' => 'false',
+                  'showInList' => 'false',
+                  'recordInternalId' => 'CUSTBODY1',
+                  'help' => 'This is the customer\'s phone number from the
+    customer record.  It is generated dynamically every time the form is accessed
+     - so that changes in the customer record will be reflected the next time the
+     transaction is viewed/edited/printed.<br>Note: This is an example of a
+     transaction body field, sourced from a customer standard field.',
+                  'storeValue' => 'false',
+                  'isParent' => 'false',
+                  'defaultChecked' => 'false',
+                  'bodyInventoryAdjustment' => 'false',
+                  'bodyOpportunity' => 'false',
+                  'bodyPrintFlag' => 'true',
+                  'checkSpelling' => 'false',
+                  'displayType' => '_disabled',
+                  'bodyItemReceipt' => 'false',
+                  'sourceListInternalId' => 'STDBODYENTITY',
+                  'bodyStore' => 'false'
+              },
+              'totalRecords' => '1',
+              'statusIsSuccess' => 'true'
+        };
+
+    If the request fails, the error details are sent to the errorResults
+    method.
+
+    For a complete list of acceptable values for this operation, visit the
+    coreTypes XSD file for web services version 2.6. Look for the
+    "RecordType" simpleType.
+
+    <https://webservices.netsuite.com/xsd/platform/v2_6_0/coreTypes.xsd>
+
+  attach(attachRequest)
+=head2 detach(detachRequest)
+    At this time, only a basic reference is supported, Contact reference is
+    not supported yet.
+
+    As an example, to attach a file to an expenseReport, you would do the
+    following:
+
+        sub nsRecRef {
+            my ($rectype, $id) = @_;
+            return  { type => $rectype, internalId => $id };
+        }
+ 
+        my $attachRequest = {
+            attachTo        => nsRecRef('expenseReport', $erId),
+            attachedRecord  => nsRecRef('file',          $fid)
+        };
+        $ns->attach($attachRequest) or nsfatal 'error attaching';
+
+        The detach operation is coded exactly the same.
+
+  errorResults
+    The errorResults method is populated when a request returns an erroneous
+    response from NetSuite. These errors can occur at anytime and with any
+    operation. Always assume your operations will fail, and build your code
+    accordingly.
+
+    The hash reference that is returned looks like this:
+
+        {
+            'message' => 'You have entered an invalid email address or account
+    number. Please try again.',
+            'code' => 'INVALID_LOGIN_CREDENTIALS'
+        };
+
+    If there is something FUNDAMENTALLY wrong with your request (like you
+    have included an invalid field), your errorResults may look like this:
+
+        {
+            'faultcode' => 'soapenv:Server.userException',
+            'detailDetail' => 'partners-java002.svale.netledger.com',
+            'faultstring' => 'com.netledger.common.schemabean.NLSchemaBeanException:
+    <<somefield>> not found on {urn:relationships_2_6.lists.webservices.netsuite.com}Customer'
+        };
+
+    Thus, a typical error-prepared script might look like this:
+
+        $ns->login or die "Can't connect to NetSuite!\n";
+    
+        if ($ns->search('customer', $query)) {
+            for my $record (@{ $ns->searchResults->{recordList} }) {
+                if ($ns->get('customer', $record->{recordInternalId})) {
+                    print Dumper($ns->getResults);
+                }
+                else {
+                    # If an error is encountered while running through
+                    # a list, print a notice and break the loop
+                    print "An error occured!\n";
+                    last;
+                }
+            }
+        }
+        else {
+        
+            # I really want to know why my search would fail
+            # lets output the error and message
+            my $message = $ns->errorResults->{message};
+            my $code = $ns->errorResults->{code};
+        
+            print "Unable to perform search!\n";
+            print "($code): $message\n";
+        
+        }
+    
+        $ns->logout; # no error handling here, if this fails, oh well.
+
+    For a complete listing of errors and associated messages, consult the
+    SuiteTalk (Web Services) Records Guide.
+
+    <http://www.netsuite.com/portal/developers/resources/suitetalk-documenta
+    tion.shtml>
+
+AUTHOR
+    Fred Moyer, fred@redhotpenguin.com
+
+LICENCE AND COPYRIGHT
+    Copyright 2013, iParadigms LLC.
+
+    Original Netsuite module copyright (c) 2008, Jonathan Lloyd. All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+ACKNOWLEDGEMENTS
+    Initial content shamelessly stolen from
+    https://github.com/gitpan/NetSuite
+
+    Thanks to iParadigms LLC for sponsoring the reboot of this module.
+

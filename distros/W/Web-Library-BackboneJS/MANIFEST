@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Web/Library/BackboneJS.pm
+share/1.0.0/js/backbone-min.js
+share/1.1.0/js/backbone-min.js
+t/basic.t
+t/release-pod-syntax.t

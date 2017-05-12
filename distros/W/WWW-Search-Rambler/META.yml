@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               WWW-Search-Rambler
+version:            0.08
+abstract:           class for searching F<http://www.rambler.ru>.
+author:
+    - Artur Penttinen <ARTO@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:             0
+    HTML::TreeBuilder:  3.13
+    HTTP::Cookies:      1.38
+    URI:                1.31
+    URI::Escape:        3.26
+    WWW::Search:        2.528
+    WWW::SearchResult:  2.061
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

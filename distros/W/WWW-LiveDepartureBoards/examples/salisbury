@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use lib './lib';
+
+use WWW::LiveDepartureBoards;
+
+# Starting at Salisbury (SAL)
+my $salisbury = WWW::LiveDepartureBoards->new({station_code => 'SAL'});
+
+# Going to TISBURY (TIS)
+my @details = $salisbury->destination('tis');
+print "Starting at Salisbury (SAL), going to Tisbury (TIS)\n",
+      "DateTime Object\t\tTime\tStatus\t\tFinal Destination\n";
+
+foreach my $detail (@details) {
+        
+    print $detail->{datetime}->datetime(), "\t",
+          $detail->{time}, "\t",
+          $detail->{status}, " \t",
+          $detail->{'TIS'}, "\n";
+}
+
+#
+#   Or as a hash ref
+#
+
+@details = $salisbury->destination({station_code => 'tis'});
+print "\nStarting at Salisbury (SAL), going to Tisbury (TIS)\n",
+      "DateTime Object\t\tTime\tStatus\t\tFinal Destination\n";
+
+foreach my $detail (@details) {
+        
+    print $detail->{datetime}->datetime(), "\t",
+          $detail->{time}, "\t",
+          $detail->{status}, " \t",
+          $detail->{'TIS'}, "\n";
+}

@@ -1,0 +1,32 @@
+---
+abstract: 'Tracking module for Piwik using the Tracking API'
+author:
+  - 'Stefan Hornburg <racke@linuxia.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Piwik-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::MaybeXS: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/WWW-Piwik-API/issues
+  repository: https://github.com/interchange/WWW-Piwik-API.git
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

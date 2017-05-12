@@ -1,0 +1,761 @@
+
+=head1 NAME
+
+Win32::GUI::Tooltip - Create and manipulate Tooltip controls
+
+=head1 DESCRIPTION
+
+Tooltip controls are probably one of the most unintuitave of the Win32
+controls when you first come accross them.  A Tooltip control is a
+single window that supports one or more 'tools'.  A tool is a window,
+or an area of a window that when the mouse hovers over, the tooltip
+window is displayed.  The Tooltip is always a top level window (so
+don't try adding the WS_CHILD window style), and is typically owned
+by the top level window of your application/dialog.
+
+Create a tooltip window:
+
+  my $tt = Win32::GUI::Tooltip->new(
+    $main_window,
+  );
+
+Add a tool to the tooltip:
+
+  $tt->AddTool(
+    -window => $main_window,
+    -text   => "Text that pops up",
+  );
+
+and hover the mouse over an area of your main window.
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Tooltip object.
+Can also be called as PARENT->AddTooltip(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -alwaystip => 0/1 (default: 1)
+     Show the tooltip, even if the window is not active.
+  -noprefix  => 0/1 (default: 0)
+     Prevent the tooltip control stripping '&' prefixes
+  -noanimate => 0/1 (default: 0)
+     Turn off tooltip window animation
+  -nofade    => 0/1 (default: 0)
+     Turn off tooltip window fading effect
+  -balloon   => 0/1 (default: 0)
+     Give the tooltip window 'balloon' style
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Activate
+
+B<Activate([FLAG=TRUE])>
+
+Activates or deactivates a tooltip control. A deactivated tooltip does
+not show it's window when the mouse hovers over a tool.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Add
+
+B<Add(@OPTIONS)>
+
+See L<AddTool()|Win32::GUI::Tooltip/AddTool>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTool
+
+B<AddTool(@OPTIONS)>
+
+Registers a tool with a Tooltip. When the house hovers over a tool, the
+tooltip window is displayed.  A tool is identified either by a window
+(handle) alone, or by a window (handle) and an application defined id.
+If identified by a window (handle) alone, then the associated area for
+the mouse to hover is the whole client area of the window, and adjusts
+automatically if the window changes size.  Otherwise the rect
+is fixed, as provided by the C<-rect> options (in client co-ordinates of
+the window it is associated with) and must be adjusted manually if
+necessary - See L<NewToolRect()|Win32::GUI::Tooltip/NewToolRect>.
+
+B<@OPTIONS>:
+
+ -window => HANDLE (default: owner window of tooltip control)
+    Window object or window handle for the tool.
+ -id => ID
+    application set ID for the tool.
+
+ -rect => [LEFT,TOP,RIGHT,BOTTOM] (defult: client rect of -window)
+    Area of the tool (ignored unless ID is provided)
+ -text   => STRING or ID
+   String containd the Tool text, or a resource ID (see -hinst)
+ -hinst  => HINSTANCE
+   If -text contains a resource ID, then -hinst gives the instance
+   handle from which the string resource is loaded.  Ignored otherwise.
+ -needtext => 0/1 (default: 0)
+    Use NeedText Event. Don't mix this and -text.
+
+ -flags  => FLAGS
+    Set of TTF_ bit flags.  Better set using these options:
+      -absolute => 0/1 (default: 0)
+         Use with -track.  Position the window at the co_ordinates
+         set using the TrackPosition() method.
+      -centertip => 0/1 (default: 0)
+         Center the window below the tool.
+      -idishwnd => 0/1 (default: 0 if -id used, 1 otherwise)
+         indicates that the tool applies to the whole window.
+      -rtlreading => 0/1 (default: 0)
+         indicates that text will be rendered in the opposite direction
+         to text in the parent window
+      -subclass => 0/1 (default: 0 if -track is used, 1 otherwise)
+         the tooltip control will arrange to get mouse messages from the
+         winodw containing the tool automatically.  If this option is not
+         set then the application must relay mouse messages itself.
+      -track => 0/1 (default: 0)
+         Positions the ToolTip window next to the tool to which it
+         corresponds and moves the window according to coordinates
+         supplied by the TrackPosition() method. You must activate
+         this type of tool using the TrackActivate() method.
+      -transparent => 0/1 (default: 0)
+         Causes the ToolTip control to forward mouse event messages to the
+         parent window. This is limited to mouse events that occur within
+         the bounds of the ToolTip window.
+
+Returns true on success, false on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AdjustRect
+
+B<AdjustRect(LEFT, TOP, RIGHT, BOTTOM, [LARGER=1])>
+
+Adjust either a wanted text rect to a window rect (if C<LARGER = 1>) or
+a window rect to a text rect (if C<LARGER = 0>).
+
+C<LEFT>, C<TOP>, C<RIGHT>, C<BOTTOM> identify the corners to the rect to
+convert.
+
+C<LARGER> identifies whether the provided rect is a text rect (to be made
+larger) if true, or a window rect otherwise.
+
+Returns a 4-element list containing the adjusted left, top, right and
+bottom co-ordinates of the window on success, or an empty list on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+Returns the number of tools in the Tooltip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Del
+
+B<Del(TOOL)>
+
+See L<DelTool()|Win32::GUI::Tooltip/DelTool>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DelTool
+
+B<DelTool(TOOL)>
+
+Removes a tool from a Tooltip.
+
+C<TOOL> identifies the tool to use to calculate the window size.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EnumTools
+
+B<EnumTools(ENUM_ID, [BUFSIZE=0])>
+
+Retrieves the information for a tool in a tooltip control, identified by
+an enumerated number C<ENUM_ID>, starting at 0.
+
+Returns a list of options and values on success, or an empty list on
+failure (if C<ENUM_ID> > GetToolCount()-1).  For details of the possible
+options see L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+B<BUFSIZE> sets the size of the buffer for retrieving the text associated
+with the tool.  By default this is zero, and the text is not retrieved.
+As there is no way to automatically determine the size of the buffer
+required, this is a potential security hole, as the text may overrun
+the size of the buffer provided.  B<Only use this if you really need to
+find out the text, and are prepared to live with the consequences>.
+
+Example:
+
+   my $tt = Win32::GUI::Tooltip->new( ... );
+   ....
+   require Data::Dump;
+   my $i=0;
+   while(my %h = $tt->EnumTools($i)) {
+     print "TOOL:$i\n";
+     print Data::Dump::dump(\%h), "\n";
+     ++$i;
+   }
+   my $j = $tt->GetToolCount()-1;
+
+Or:
+
+   for my $k (0 .. $j) {
+     my %h = $tt->EnumTools($k);
+     print "TOOL:$k\n";
+     print Data::Dump::dump(\%h), "\n";
+   }
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBubbleSize
+
+B<GetBubbleSize(TOOL)>
+
+Retrieves the width and height of a tooltip control for a given tool.
+
+C<TOOL> identifies the tool to use to calculate the window size.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+Returns a 2-element list containing the width and height of the tooltip
+window on success, or an empty list on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurrentTool
+
+B<GetCurrentTool([BUFSIZE=0])>
+
+Retrieves the information for the current tool (the one being displayed)
+in a tooltip control.
+
+Returns a list of options and values on success, or an empty list on
+failure (if there is no current tool).  For details of the possible
+options see L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+B<BUFSIZE> sets the size of the buffer for retrieving the text associated
+with the tool.  By default this is zero, and the text is not retrieved.
+As there is no way to automatically determine the size of the buffer
+required, this is a potential security hole, as the text may overrun
+the size of the buffer provided.  B<Only use this if you really need to
+find out the text, and are prepared to live with the consequences>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDelayTime
+
+B<GetDelayTime([FLAG=TTDT_INITIAL])>
+
+Retrieves the initial, pop-up, and reshow durations currently set for a
+tooltip control.
+
+B<FLAG> : Which duration value to retrieve.
+
+  TTDT_RESHOW  = 1 : Length of time it takes for subsequent tooltip
+                     windows to appear as the pointer moves from one
+                     tool to another.
+  TTDT_AUTOPOP = 2 : Length of time the tooltip window remains visible
+                     if the pointer is stationary within a tool's
+                     bounding rectangle.
+  TTDT_INITIAL = 3 : Length of time the pointer must remain stationary
+                     within a tool's bounding rectangle before the
+                     tooltip window appears.
+
+Return value is the requested duration in milliseconds.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMargin
+
+B<GetMargin()>
+
+Retrieves the top, left, bottom, and right margins set for a tooltip
+window. A margin is the distance, in pixels, between the tooltip window
+border and the text contained within the tooltip window.
+
+Returns a 4-element list containing the left, top, right and bottom
+marign values in pixels.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMaxTipWidth
+
+B<GetMaxTipWidth()>
+
+Retrieves the maximum width for a tooltip window.
+
+Returns the maximum width in pixels, or -1 if no maximum width has been
+set.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetText
+
+B<GetText(TOOL, [BUFSIZE=0])>
+
+Retrieves the text associated with a tool.
+
+C<TOOL> identifies the tool whose text is retrieved.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+B<BUFSIZE> sets the size of the buffer for retrieving the text associated
+with the tool.  By default this is zero, and the text is not retrieved.
+As there is no way to automatically determine the size of the buffer
+required, this is a potential security hole, as the text may overrun
+the size of the buffer provided.  B<Only use this if you really need to
+find out the text, and are prepared to live with the consequences>.
+Returns the text associated with the tooltip (if any, and
+C<BUFSIZE> > 0), otherwise FALSE.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTipBkColor
+
+B<GetTipBkColor()>
+
+Retrieves the background color in a tooltip window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTipTextColor
+
+B<GetTipTextColor()>
+
+Retrieves the text color in a tooltip window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolCount
+
+B<GetToolCount()>
+
+See L<Count()|Win32::GUI::Tooltip/Count>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolInfo
+
+B<GetToolInfo(TOOL, [BUFSIZE=0])>
+
+Retrieves the information that a tooltip control maintains about a tool.
+
+C<TOOL> identifies the tool whose info is retrieved.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+B<BUFSIZE> sets the size of the buffer for retrieving the text associated
+with the tool.  By default this is zero, and the text is not retrieved.
+As there is no way to automatically determine the size of the buffer
+required, this is a potential security hole, as the text may overrun
+the size of the buffer provided.  B<Only use this if you really need to
+find out the text, and are prepared to live with the consequences>.
+
+Returns a list of options and values on success, or an empty list on
+failure.  For details of the possible options see L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(WINDOW, X, Y, [BUFSIZE=0])>
+
+Retrieves the information about the tool at C<X,Y> in window C<WINDOW>
+
+C<X> and C<Y> are in client co-ordinates of the C<WINDOW>.
+C<WINDOW> is a window object or window handle
+
+B<BUFSIZE> sets the size of the buffer for retrieving the text associated
+with the tool.  By default this is zero, and the text is not retrieved.
+As there is no way to automatically determine the size of the buffer
+required, this is a potential security hole, as the text may overrun
+the size of the buffer provided.  B<Only use this if you really need to
+find out the text, and are prepared to live with the consequences>.
+
+Returns a list of options and values on success, or an empty list on
+failure (no tool at C<X,Y>).  For details of the possible options see
+AddTool().
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 NewToolRect
+
+B<NewToolRect(TOOL, LEFT, TOP, RIGHT, BOTTOM)>
+
+Sets a new bounding rectangle for a tool.
+
+C<TOOL> identifies the tool to use to calculate the window size.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+C<LEFT,TOP,RIGHT,BOTTOM> identifies the new tool rect.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Pop
+
+B<Pop()>
+
+Removes a displayed tooltip window from view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDelayTime
+
+B<SetDelayTime(TIME,[FLAG=TTDT_INITIAL])>
+
+Sets the initial, pop-up, and reshow durations for a tooltip control.
+
+B<FLAG> :
+
+  TTDT_RESHOW    = 1 : Length of time it takes for subsequent tooltip
+                       windows to appear as the pointer moves from one
+                       tool to another. To reset the reshow duration to
+                       it's default value set TIME to -1.
+  TTDT_AUTOPOP   = 2 : Length of time the tooltip window remains visible
+                       if the pointer is stationary within a tool's
+                       bounding rectangle. To reset the pop-up duration to
+                       it's default value set TIME to -1.
+  TTDT_INITIAL   = 3 : Length of time the pointer must remain stationary
+                       within a tool's bounding rectangle before the
+                       tooltip window appears. To reset the initial duration
+                       to it's default value set TIME to -1.
+  TTDT_AUTOMATIC = 0 : Set all three delay times to default proportions. The
+                       autopop time will be ten times the initial time and
+                       the reshow time will be one fifth the initial time. If
+                       this flag is set, use a positive value of TIME to
+                       specify the initial time, in milliseconds. Set TIME to
+                       a negative value to return all three delay times to
+                       their default values.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMargin
+
+B<SetMargin(LEFT, TOP, RIGHT, BOTTOM)>
+
+Sets the left, top, right, and bottom margins for a tooltip window.
+A margin is the distance, in pixels, between the tooltip window border
+and the text contained within the tooltip window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMaxTipWidth
+
+B<SetMaxTipWidth(WIDTH)>
+
+Sets the maximum width for a tooltip window.
+
+The maximum ToolTip width value does not indicate a ToolTip window's
+actual width. Rather, if a ToolTip string exceeds the maximum width, the
+control breaks the text into multiple lines, using spaces to determine
+line breaks. If the text cannot be segmented into multiple lines, it will
+be displayed on a single line. The length of this line may exceed the
+maximum ToolTip width.
+
+Returns the previous maximum width (-1 if no previous maximum width
+has been set)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTipBkColor
+
+B<SetTipBkColor(COLOR)>
+
+Sets the background color in a tooltip window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTipTextColor
+
+B<SetTipTextColor(COLOR)>
+
+Sets the text color in a tooltip window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTitle
+
+B<SetTitle(TITLE, [ICON])>
+
+Sets the title and icon for a balloon tooltip.
+
+Allowed values for ICON are: error, info, warning, none.
+Defaults to 'none'.
+
+Returns a true value on success, a false value on failure
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolInfo
+
+B<SetToolInfo(@OPTIONS)>
+
+Sets the information that a tooltip control maintains for a tool.
+
+B<@OPTIONS>: See L<Add()|Win32::GUI::Tooltip/Add>.
+
+Some internal properties of a tool are established when the tool is
+created, and are not recomputed when the SetToolInfo() method is used.
+If you simply using SetToolInfo(), setting the required values
+these properties may be lost. Instead, your application should first
+request the tool's current properties using the GetToolInfo() method,
+then, modify the options as needed and pass them back to the ToolTip
+control with SetToolInfo().
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TrackActivate
+
+B<TrackActivate(TOOL, [FLAG=1])>
+
+Activates or deactivates a tracking tooltip.
+See L<AddTool()|Win32::GUI::Tooltip/AddTool>, C<-track> option.
+
+C<TOOL> identifies the tool to use to calculate the window size.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+C<FLAG> identifies whether tracking is activated (1) or deactivated (0)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TrackPosition
+
+B<TrackPosition(X,Y)>
+
+Sets the position of a tracking tooltip.
+C<X> and C<Y> are in screen co-ordinates.
+See L<AddTool()|Win32::GUI::Tooltip/AddTool>, C<-track> and C<-absolute> options.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Update
+
+B<Update()>
+
+Forces the current tool to be redrawn.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 UpdateTipText
+
+B<UpdateTipText(TOOL, STRING_OR_RESID, [HINSTANCE=NULL])>
+
+Sets the tooltip text for a tool.
+
+C<TOOL> identifies the tool whose text is set.
+C<TOOL> may be one of the following:
+
+  ID           - only for backwards compatibility with Win32::GUI v1.03
+                 and earlier. A tool id identifying a tool that occupies
+                 part of a window. The associated window defaults to the
+                 owner window of the tooltip control, as for the default
+                 for the -window option of the AddTool() method.
+                 See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+  WINDOW       - a window object or window handle, identifying a tool
+                 that occupies the whole window.
+  [WINDOW]     - an array reference containing a window object or window
+                 handle, identifying a tool that occupies the whole
+                 window.
+  [WINDOW, ID] - an array reference containing a window object or window
+                 handle and a tool id, identifying a tool that occupies
+                 part of a window.
+
+C<WINDOW> and/or C<ID> are the values used for the C<-window> and/or <-id>
+options used with the AddTool() method.  See L<AddTool()|Win32::GUI::Tooltip/AddTool>.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 NeedText
+
+B<NeedText(TOOL,FLAG)>
+
+Sent when a tooltip window needs to get the text for a tool
+created with C<< -needtext => 1 >>.
+
+TOOL is the identifier of the tool: it is the window handle
+of the tool if FLAG is TRUE, otherwise it is the tool ID.
+
+Return a string from the event handler containing the text
+to be displayed.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Pop
+
+B<Pop(TOOL,FLAG)>
+
+Sent whenever a tooltip window has just been hidden
+
+TOOL is the identifier of the tool: it is the window handle
+of the tool if FLAG is TRUE, otherwise it is the tool ID.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Show
+
+B<Show(TOOL,FLAG)>
+
+Sent whenever a tooltip window is just about to be displayed
+
+TOOL is the identifier of the tool: it is the window handle
+of the tool if FLAG is TRUE, otherwise it is the tool ID.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

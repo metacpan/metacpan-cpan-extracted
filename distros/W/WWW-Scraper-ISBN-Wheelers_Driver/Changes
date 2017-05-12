@@ -1,0 +1,61 @@
+Revision history for WWW-Scraper-ISBN-Wheelers_Driver
+=====================================================
+
+0.14    2014-12-13
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.13    2014-08-10
+        - minor package file updates.
+        - extended test suite.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+
+0.12    2014-04-30
+        - test data update.
+        - fixed distribution name in META.
+
+0.11    2014-03-09
+        - added git repository links to metadata.
+        - site updated, binding pattern changed.
+
+0.10    2013-03-27
+        - added isbn-check.pl to examples.
+        - META updates.
+        - added Data::Dumper as a test prerequisite.
+
+0.09    2012-12-16
+        - fixed broken test.
+        - change file dates changed to meet W3CDTF standards.
+        - License updated consistently to Artistic License v2.0.
+
+0.08    2012-05-13
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.07    2011-02-14
+        - amended pingtest() in network tests.
+        - added further skip test if test books are withdrawn from the site.
+        - updated test due to data change.
+
+0.06    2010-10-06
+        - provided alternate ping test methods.
+
+0.05    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.04    2010-08-10
+        - added better protection from network failures.
+        - updated prerequisite requirements.
+
+0.03    2010-08-02
+        - added connection protection if client or server offline.
+        - documentation updates.
+
+0.02    2010-07-30
+        - documentation fixes.
+
+0.01    2010-07-30
+        - initial release

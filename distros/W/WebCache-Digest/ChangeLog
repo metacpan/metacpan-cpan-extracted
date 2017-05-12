@@ -1,0 +1,9 @@
+1999-03-12  Martin Hamilton  <martin@not-invented-here.lut.ac.uk>
+
+	* Repackaged as WebCache::Digest as per modules@perl.org
+
+1999-01-21  Martin Hamilton  <martin@not-invented-here.lut.ac.uk>
+
+	* Packaged up for first public release
+
+

@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Win32-TSA-Notify.t
+lib/Win32/TSA/Notify.pm
+lib/Win32/TSA/Notify/Alert.pm
+lib/Win32/TSA/Notify/Icon.pm
+lib/Win32/TSA/Notify/PerlExe/ActiveState/PerlTray.pm
+lib/Win32/TSA/Notify/Text.pm
+exe/res/icons/Win32-TSA-Notify_App.ico
+exe/res/icons/Win32-TSA-Notify_Delete.ico
+exe/res/icons/Win32-TSA-Notify_Error.ico
+exe/res/icons/Win32-TSA-Notify_Find.ico
+exe/res/icons/Win32-TSA-Notify_Help.ico
+exe/res/icons/Win32-TSA-Notify_Info.ico
+exe/res/icons/Win32-TSA-Notify_None.ico
+exe/res/icons/Win32-TSA-Notify_Public.ico
+exe/res/icons/Win32-TSA-Notify_Warning.ico
+exe/res/icons/Get_Info.ico
+exe/res/icons/Copyright
+exe/Win32-TSA-Notify.perlapp
+exe/Win32-TSA-Notify.pl
+exe/Win32-TSA-Notify.exe
+exe/Win32-TSA-Notify.bat
+META.yml                                 Module meta-data (added by MakeMaker)

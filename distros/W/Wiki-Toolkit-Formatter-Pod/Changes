@@ -1,0 +1,13 @@
+0.04    28 January 2010
+        Rename to Wiki::Toolkit::Formatter::Pod
+
+0.03    12 October 2003
+        Added note to docs - you need to have CGI::Wiki::Formatter::UseMod
+          installed to use "usemod_extended_links".  Also fixed the README
+          formatting.
+
+0.02    12 October 2003
+        Added "usemod_extended_links" parameter.
+
+0.01    29 January 2003
+        Initial - very simple - release.

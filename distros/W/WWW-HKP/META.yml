@@ -1,0 +1,39 @@
+---
+abstract: 'Interface to HTTP Keyserver Protocol (HKP)'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-HKP
+requires:
+  AnyEvent: '0'
+  AnyEvent::DNS: '0'
+  AnyEvent::HTTP: '0'
+  Carp: '0'
+  Email::Address: '0'
+  List::MoreUtils: '0'
+  URI: '1.60'
+  URI::Escape: '3.31'
+  URL::Encode: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libwww-hkp-perl/issues
+  homepage: https://github.com/zurborg/libwww-hkp-perl
+  repository: https://github.com/zurborg/libwww-hkp-perl.git
+version: '0.041'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'
+  - 'David Zurborg <post@david-zurb.org>'
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'

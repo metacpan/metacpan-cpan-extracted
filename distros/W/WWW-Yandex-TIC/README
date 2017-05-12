@@ -1,0 +1,21 @@
+This package contains WWW::Yandex::TIC module assigned for querying
+Thematic Index of Citing (TIC) for domain in Yandex.
+
+This module uses URI and LWP::UserAgent (libwww-perl), so you must
+have it if you want to use this module.
+
+Installation is simple:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you have questions mail to bashlov@cpan.org.
+
+Copyright 2005, Dmitry Bashlov http://bashlov.ru
+Copyright 2008, Ivan Baktsheev
+
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

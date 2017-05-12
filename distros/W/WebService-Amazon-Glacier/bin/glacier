@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+# PODNAME: listvaults
+use strict;
+use WebService::Amazon::Glacier;
+use 5.010;
+
+my $envelope=WebService::Amazon::Glacier->new_with_command->run();
+if ( $envelope != 0 ){
+    exit(1);
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+listvaults
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Charles A. Wimmer <charles@wimmer.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Charles A. Wimmer.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

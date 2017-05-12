@@ -1,0 +1,157 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Valve::ValveBase - valve base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Valve::ValveBase - valve base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::Valve</STRONG>. Subclasses
+<STRONG>MUST</STRONG> implement <A HREF="#item_invoke"><CODE>invoke()</CODE></A> to provide the required functionality as
+well as <A HREF="#item_getName"><CODE>getName()</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Valve::ValveBase</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container to which this Valve is attached.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container to which this Valve is attached.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> to which this Valve is attached.
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_invoke">invoke ($request, $response, $context)</A></STRONG><BR>
+<DD>
+Perform request processing as required by this Valve.
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> to be processed
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Response</STRONG> to be created
+<P></P>
+<DT><STRONG><A NAME="item_%24context">$context</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::ValveContext</STRONG> allowing access to the next Valve in the
+Pipeline being processed
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if a servlet error occurs or is thrown by a subsequently invoked
+Valve, Filter or Servlet
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return a short name for this Valve implementation. Must be overridden
+by subclasses.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this component. This method should be called
+before any of the public methods of the component are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the component has already been started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this component. Once this method
+has been called, no public methods of the component should be
+utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the component is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../../api/Wombat/Exception.html">the Wombat::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Valve.html">the Wombat::Valve manpage</A>,
+<A HREF="../../../api/Wombat/ValveContext.html">the Wombat::ValveContext manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

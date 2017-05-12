@@ -1,0 +1,130 @@
+#!/bin/perl
+
+#  Init Lighttpd config files
+#
+sub BEGIN {
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+    require File::Spec->catfile($RealBin, 'perl5lib.pl');
+    perl5lib->import(File::Spec->catdir($RealBin, File::Spec->updir()));
+};
+use strict qw(vars);
+use vars qw($VERSION);
+use Cwd qw(realpath);
+use WebDyne::Base;
+use Getopt::Long;
+use Pod::Usage;
+
+
+#  Version info
+#
+$VERSION='1.001';
+
+
+#  Get command line options, add them to environment so picked up
+#  by WebDyne::Install::Apache::Constant module when loaded
+#
+my %option;
+GetOptions(\%option, (
+    'help|?',
+    'man',
+    'lighttpd_uname|uname=s',
+    'lighttpd_gname|gname=s',
+    'file_lighttpd_conf|lighttpd_conf=s',
+    'webdyne_cache_dn|webdyne_cache|cache_dn|cache|dir_webdyne_cache=s',
+    'silent',
+    'uninstall'
+   ) ) ||  pod2usage(2);
+pod2usage(1) if $option{'help'};
+pod2usage(-verbose => 2) if $option{'man'};
+$option{'version'} && do { print "$Script version: $VERSION\n"; exit 0 };
+map { $ENV{uc($_)}=$option{$_} } keys %option;
+
+
+#  By default the WebDyne::Install::Lighttpd::Constant module will issue a
+#  warning if something not found, but will continue. In this case we want
+#  to consider any warning fatal
+#
+local $SIG{'__WARN__'}=sub { 
+  my $warn=shift();
+  my %warn=(
+    LIGHTTPD_UNAME	=>  '--uname',
+    LIGHTTPD_GNAME	=>  '--gname',
+    FILE_LIGHTTPD_CONF	=>  '--file_lighttpd_conf',
+  );
+  
+  #  Translate warning messages from Contants module about setting env vars into
+  #  messages about setting command line options. Crude, but will do for now.
+  #
+  while (my($env,$param)=each %warn) {
+    last if $warn=~s/(.*)$env.*/$1$param option./;
+  }
+  pod2usage(-verbose=>99, -sections =>'Options', -message=>"ERROR: ".ucfirst($warn))
+};
+
+
+
+require WebDyne::Install::Lighttpd;
+
+
+#  Get location prefile, call install/uninstall routine
+#
+my $prefix_dn=realpath(File::Spec->rel2abs(File::Spec->updir(),$RealBin));
+if ($option{'uninstall'}) {
+    exit ${ WebDyne::Install::Lighttpd->uninstall($prefix_dn, $RealBin) || die errstr() }
+}
+else {
+    exit ${ WebDyne::Install::Lighttpd->install($prefix_dn, $RealBin) || die errstr() }
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+wdlighttpdinit [options]
+
+Options:
+
+=over
+
+=item -h|-?|--help
+
+brief help message
+
+=item --silent
+
+do not print any messages during install
+
+=item --uninstall
+
+remove Webdyne config files and any Lighttpd config file changes
+
+=item --uname
+
+user name used by the Lighttpd process
+
+=item --gname
+
+group name used by the Lighttpd process
+
+=item --lighttpd_conf
+
+directory where Lighttpd config file(s) are located
+
+=item --webdyne_cache
+
+directory where you would like the WebDyne cache located (will be created)
+
+=back
+
+The installer will attempt to guess the values of each option above using common defaults. If it cannot determine
+the location of a file or directory it needs you must supply it as a command line or environment variable option.
+
+=head2 EXAMPLE
+
+=over
+
+C<wdlighttpdinit --lighttpd_conf=/etc/lighttpd --webdyne_cache=/var/cache_webdyne>
+

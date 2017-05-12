@@ -1,0 +1,98 @@
+=head1 NAME
+
+WWW::IRail::API - A wrapper for the iRail.be API
+
+=head1 SYNOPSIS
+
+    use WWW::IRail::API;
+    use Data::Dumper;
+
+    ## OO interface ############################################################################
+
+    my $irail = new WWW::IRail::API( dataType => 'YAML' );
+    my $trains_bxl_ost = $irail->lookup_connections(from => 'brussel noord', to => 'oostende');
+    print Dumper($trains_bxl_ost);
+
+    ## functional interface ####################################################################
+    
+    # YAML liveboard with trains departing from *Brussel Noord*
+    print irail from => 'brussel noord' 
+
+    # YAML connections of trains between *Brussel Noord* and *Oostende* for tomorrow at 14:00
+    print irail from => 'brussel noord', to => 'oostende', date => 'tomorrow afternoon'
+
+    # JSON station lookup of all stations matching qr/oost/
+    print irail station => qr/oost/, dataType => 'json'
+
+    # XML vehicle lookup
+    print irail vehicle => 'BE.NMBS.CR2089', dataType => 'XML'
+
+    # perl liveboard lookup
+    my $board = irail from => 'brussel noord', dataType => 'perl';
+
+
+=head1 DESCRIPTION
+
+WWW::IRail::API is a set of modules which allow you to query the
+L<http://dev.irail.be> API for Stations, Connections, Liveboard and Vehicle
+data.
+
+
+=head1 FEATURES
+
+=head2 Multiple output formats
+
+The returned results can be in either XML, JSON or YAML format. You can even
+select between two flavours XML (xml, XML) to suit your taste. Ofcourse, if you
+stay in perl, you can access the return object directly.
+
+=head2 Isolated parsers based on HTTP::[qw/Request Response/]
+
+The internal parsers consist of simply two subs. L<make_request()> which
+takes in arbitrary query parameters and returns a L<HTTP::Request> object. And
+L<parse_response()> which takes a L<HTTP::Response> and builds an object which
+it then returns in the desired output format. 
+
+This makes them isolated pieces of code and ideal for testing or plugging into
+other HTTP aware systems. You can thus safely B<use WWW::IRail::API::Connection>
+in your code without ever using or loading any other of our modules.
+
+=head2 Support for sync or async pluggable clients
+
+Clients take L<HTTP::Request> objects and B<process()> them by a request over
+the wire. They then simply return the L<HTTP::Response> or they will call a callback with
+the response as a first parameter. 
+
+If you are going to write your own client, you only need to implement a process
+sub which will be called with ($http_request, $callback) parameters giving you
+the option to either return from your process call and ignore the callback or
+call the callback and go async from there.
+
+=head2 Natural data parsing
+
+If date matches C</\w/> it will hand over parsing to L<DateTime::Format::Natural>. 
+for example: date => 'friday at 6pm';
+
+=head1 LIMITATIONS
+
+    * fetching the station list is an all or nothing operation, this should be cached
+    * natural date parsing is in english only. It can also not parse 'friday afternoon' (yet)
+
+=head1 TODO
+
+    * implement caching
+    * implement AE/Coro LWP client (in another module)
+
+=head1 EXAMPLES
+
+Example you can run from the commandline to get you started quickly
+
+    # install App::cpanminus the easy way 
+    % curl -L http://cpanmin.us | sudo perl - --self-upgrade
+    
+    # install the WWW::IRail::API modules
+    % cpanm -S WWW::IRail::API
+
+    # run a onliner from the commandline interface
+    % perl -MWWW::IRail::API -e 'print irail from => "brussel noord", to => "oostende", date => "next friday"
+

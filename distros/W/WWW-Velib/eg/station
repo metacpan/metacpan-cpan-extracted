@@ -1,0 +1,14 @@
+use strict;
+use warnings;
+
+use WWW::Velib::Station;
+
+for my $station (@ARGV) {
+    my $s = WWW::Velib::Station->new($station);
+    printf "$station: a:%2d f:%2d d:%2d t:%2d\n",
+        $s->available,
+        $s->free,
+        $s->disabled,
+        $s->total,
+    ;
+}

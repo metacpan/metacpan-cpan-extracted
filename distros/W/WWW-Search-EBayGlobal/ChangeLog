@@ -1,0 +1,84 @@
+2003-02-27  <pilchkinstein@hotmail.com>
+
+3.00  Tue Mar 18 16:30:00 2003
+
+	* VERSION 3.00 Added functionality to enable cross-country ebay searching
+	See POD
+	
+2.01  Mon Mar 17 16:22:54 2003
+
+	* VERSION 2.01 Added extra prerequisites to Makefile.PL
+	
+2.00  Thu Feb 27 16:22:54 2003
+
+	* VERSION 2.00 Added follow_link functionality, new details method and other stuff
+
+2003-02-27  <pilchkinstein@hotmail.com>
+
+	* VERSION 1.00 RELEASED
+
+	* lib/WWW/Search/EbayUK.pm (created): Adapted Ebay.pm to search ebay.co.uk pages
+
+	* lib/WWW/Search/Ebay.pm (parse_tree): Fixed parsing for slightly-changed ebay.com pages
+
+	* test.pl: added some tests to actually look at the results
+
+2002-10-22  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Ebay/ByEndDate.pm (native_setup_search): Fixed hash vs. array bug?
+
+2002-10-21  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Ebay.pm (parse_tree): Fixed parsing for Buy-It-Now prices, and foreign currencies
+
+2002-07-24  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Ebay.pm (parse_tree): fix parsing around new images in table
+
+2001-12-20  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Ebay.pm (native_retrieve_some): handle new ebay.com output format
+	(parse_tree): rewrite using this new method
+
+2001-07-30  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Ebay/ByEndDate.pm: new backend!
+
+2001-06-26  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.05 RELEASED
+
+2001-06-25  Kingpin  <mthurn@tasc.com>
+
+	* Ebay.pm (native_retrieve_some): tweaks to prevent warnings / parse errors
+
+2001-05-08  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.04 RELEASED
+
+2001-05-07  Kingpin  <mthurn@tasc.com>
+
+	* Ebay.pm (native_retrieve_some): updated for new output format
+
+2001-04-21  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.03 RELEASED
+
+2001-04-20  Kingpin  <mthurn@tasc.com>
+
+	* Ebay.pm (native_retrieve_some): result->description now contains bid info
+
+2001-04-14  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.02 RELEASED
+
+2001-04-13  Kingpin  <mthurn@tasc.com>
+
+	* Ebay.pm (native_setup_search): make the user_agent non-robot
+
+2001-04-02  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.01 RELEASED
+
+Revision history for Perl extension WWW::Search::Ebay
+

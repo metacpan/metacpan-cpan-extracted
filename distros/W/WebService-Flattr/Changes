@@ -1,0 +1,24 @@
+Revision history for WebService-Flattr
+
+0.55 2013-03-24
+  - Support Flattr's "X-RateLimit-Reset" HTTP header
+
+0.54 2012-07-23
+  - Add a rate_limit() query method
+
+0.53 2012-03-05
+  - Add a thing_flattrs() query method
+  - Fix get_things() to deal with Flattr's incompatible change
+  - Fix a module's name in its documentation
+
+0.52 2012-02-05
+  - Add things_owned_by() and get_things() query methods
+  - Minor documentation improvements
+
+0.51 2012-02-01
+  - Future proof search queries
+  - Set the LWP::UserAgent name
+  - Minor documentation fix
+
+0.50 2012-01-22
+  - Initial release to CPAN

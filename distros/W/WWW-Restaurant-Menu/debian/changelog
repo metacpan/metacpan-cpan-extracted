@@ -1,0 +1,20 @@
+libwww-restaurant-menu-perl (0.11) unstable; urgency=low
+
+  * Initial Debian release.
+
+  * WWW::Restaurant::DE::Munich::Edison::Menu::Lunch:
+    * Updated to current web page style.
+    * Disabled automatic charset recognition as the Edison-provided charset is
+      wrong.
+    * Completely removed the superfluous "new" constructor.
+    * Properly added the missing "currency" method.
+    * Minor fixes.
+
+ -- Julian Mehnle <julian@mehnle.net>  Sat, 15 Jan 2005 16:55:25 +0100
+
+libwww-restaurant-menu-perl (0.10) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Mon, 12 Apr 2004 13:00:00 +0100
+

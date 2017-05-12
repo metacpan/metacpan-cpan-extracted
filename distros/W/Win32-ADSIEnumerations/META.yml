@@ -1,0 +1,22 @@
+---
+abstract: 'constants for the Active Directory Service Interfaces (ADSI) enumerations'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-ADSIEnumerations
+requires:
+  Exporter: 0
+  constant: 0
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/win32-adsienumerations
+  repository: https://github.com/bingos/win32-adsienumerations.git
+version: 0.02

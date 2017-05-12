@@ -1,0 +1,40 @@
+---
+abstract: 'Get/set UTC file times with stat/utime on Win32'
+author:
+  - 'Steve Hay <shay@cpan.org>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.66'
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-UTCFileTime
+no_index:
+  directory:
+    - t
+    - inc
+optional_features:
+  podtest:
+    description: 'POD testing'
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.008001'
+resources:
+  repository: https://github.com/steve-m-hay/Win32-UTCFileTime.git
+version: '1.58'

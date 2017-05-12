@@ -1,0 +1,154 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_0_0_671 - This is the release notes for Version 0.0.671 of Win32::GUI
+
+=head1 Release Date
+
+21st March, 2004
+
+=head1 Summary of Changes
+
+This release of Win32::GUI introduces many bug fix and new features
+the most important being:
+
+  New :
+    - Add anti-flicker option (-noflicker).
+    - Add new methods and documentation for TabStrip, StatusBar, Rebard, Toolbar.
+    - Add new options for Menu.
+    - Add loading ressources from exe file.
+    - Add SetEvent and GetEvent for NEM event system.
+    - Add support for scrollbar in Window and DialogBox.
+  Fix :
+    - Left() and Top() don't perform translation for non child window.
+    - Update Hook for multiple hooks per message.
+    - Fix some event handling problems.
+    - Fix some doc generation problems.
+
+=head1 CHANGELOG
+
+  + [Laurent Rocher]
+	- GUI.pm : Change version to 0.0.671
+	- GUI.xs : Change version to 0.0.671
+	- README : Change version to 0.0.671
+	- Readme.txt : Change version to 0.0.671
+	- GUI.h : Add av_delete macro for perl 5.005
+	- GUI_Events.cpp : In DoEvent_NEM_Menu correct event test (use SvOK).
+	- MANIFEST : Update file
+
+  + [Steve Pick]
+	- GUI.xs : LoadImage() now tries to find resources in the exe first,
+      and only if that fails does it look on-disk. This means you can
+      use ResHacker or some similar resource editor to add resources to
+      your distributed exe.
+	- GUI.xs : Win32::GUI::LoadResource(NAME) added - loads a resource
+      from the current executable and returns it as a scalar. Resource
+      type must be RCDATA (i.e. raw data).
+
+  + [Steve Pick]
+	- ListView.xs : Made ListViews aware of the -background option.
+	- Toolbar.xs : Implemented all of Ramy's perl toolbar extension in
+      XS code. Added constants as well.
+	- GUI_Constants.cpp : Added tons of toolbar-related constants. Note
+      that you should probably use the TBSTYLE_xxx constants instead of the
+      BTNS_xxx constants for toolbar button styles right now as the latter
+      doesnt work depending on your compiler.
+	- GUI.pm : Added constants
+	- GUI_Events.cpp : Fixed NeedText so it doesnt crash on exit (needed
+      to extend memory reserved by one byte). Modified the way ButtonClick
+      is handled for toolbars - If a dropdown menu should be expanded,
+      there is a new second argument to ButtonClick which is set to 1.
+	- TreeView.xs : Fix in InsertItem. Wasn't reserving enough memory for
+      the strings form the -text option.
+	- StatusBar.xs : Parts method now detects scalar/array context and
+      returns # parts / list of parts as appropriate
+	- GUI_MessageLoops.cpp : Fix for noflicker (previously, the whole
+      client area was not validated - now it is), also added onPaint event
+      to NEM (for graphic objects).
+	- GUI.xs : Added GetEvent() and SetEvent() methods. GetEvent(EVENTNAME)
+      will return a coderef to the handler for the specified NEM event
+      name (e.g. "Resize"), SetEvent(EVENTNAME,CODEREF) will set a handler
+      for the event. Made AbsLeft() and AbsTop() accept co-ordinates.
+
+  + [Laurent Rocher]
+	- GUI_MessageLoops.cpp : Revrite WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC,
+      WM_CTLCOLORBTN, WM_CTLCOLORLISTBOX event handling in CommonMsgLoop.
+      Correct Both event handling in NEM_WindowMsgLoop.
+
+  + [Jez White & Laurent Rocher]
+	- Rebar.xs : Added documentation for all the methods .
+             New methods : ShowBand, HideBand, MoveBand, GetBandBorder,
+               GetBarHeight.
+             Fix BandInfo crash.
+
+  + [Steve Pick & Laurent Rocher]
+	- GUI.xs : Extended support for scrollbars in a window's non-client
+      area. Added NEM event "onScroll" and OEM event "_Scroll" for Window
+      and DialogBox. New functions for Window/Dialog:
+      $w->ScrollRange(SCROLLBAR,[MIN,MAX]), $w->ScrollPos(SCROLLBAR,[POS]),
+      $w->ScrollPage(SCROLLBAR,[PAGESIZE]),
+      $w->Scroll(SCROLLBAR, OPERATION, POSITION). Docs in source as usual.
+      Check GUI.xs.
+	- GUI_Events and GUI.h : Support for _Scroll and onScroll events for
+      windows / dialogs
+	- GUI_MessageLoops : Fix for $object->Result(x) method, [thanks go to
+      Glenn Linderman for pointing the problem out]
+	- StatusBar.xs : Various fixes and optimizations by Laurent Rocher.
+	- GUI_Constants.cpp : Added Scrollbar constants (SB_*) and statusbar
+      constants (SBT_*)
+
+  + [Steve Pick]
+	- Added StatusBar.xs to handle new StatusBar methods. Each method is
+      documented in this file, but the documentation has not been re-generated.
+
+  + [Steve Pick]
+	- GUI.xs : Made ProgressBar aware of -foreground and -background
+      colour settings
+	- GUI.xs : Added Result(handle, code) call for explicitly setting the
+      returned LRESULT from a handler. (normally the value returned from
+      Perl handlers was not returned from their calling wndproc, this
+      allows you to specify a result that will be returned.)
+	- GUI_MessageLoops.cpp : If CommonMsgLoop must be called then it is
+      called before any Hook handlers are called.
+
+  + [Steve Pick]
+	- GUI.xs : Huge update to Hook() and UnHook(). You can now add
+      multiple hooks per message, catch WM_NOTIFY and WM_COMMAND messages,
+      and it works with both New and Old Event Models. Documentation for
+      both functions is present.
+	- GUI_MessageLoops.cpp : Addition of DoHook() function and DoHook()
+      calls in NEM_WindowMsgLoop, WindowMsgLoop, and NEM_ChildMsgLoop.
+      DoHook is internal.
+
+  + [Glenn Linderman]
+	- GUI.pm : In MakeMenu, Set a default event name to every item with
+      an empty string.
+	- GUI_Options.cpp : Added new menu options.
+
+  + [Jeremy White & Laurent Rocher]
+	- TabStip.xs : Add new methods and some documentation.
+
+  + [Steve Pick]
+	- GUI_MessageLoops.cpp : Added anti-flicker code.
+	- GUI_Options.cpp : Added -noflicker option to window/dialogbox.
+	- GUI.h : Added flickerFree property to USERDATA and CREATESTRUCT structs
+	- GUI.pm : Added documentation line for -noflicker option
+
+  + [Steve Pick & Laurent Rocher]
+	- GUI.xs : Left() and Top() now not perform ScreenToClient() on the
+      rectangle for non child window.
+
+=head1 Contributors to this release
+
+=over
+
+=item Steve Pick
+
+=item Laurent Rocher
+
+=item Jez White
+
+=item Glenn Linderman
+
+=back
+
+=cut

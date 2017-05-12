@@ -1,0 +1,13 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+META.yml
+examples/download.pl
+examples/search.pl
+lib/WWW/Newzbin.pm
+lib/WWW/Newzbin/Constants.pm
+t/001_load.t
+t/002_pod.t
+t/003_pod_coverage.t

@@ -1,0 +1,58 @@
+{
+   "abstract" : "connpass API (v1) wrapper module for perl5",
+   "author" : [
+      "Masanori Ohgita (http://ohgita.info)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4002, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Connpass",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Data::Recursive::Encode" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "Hash::AsObject" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Module::Build" : "0",
+            "Plack::Loader" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TCP" : "0",
+            "URI" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Connpass" : {
+         "file" : "lib/WebService/Connpass.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.1"
+}

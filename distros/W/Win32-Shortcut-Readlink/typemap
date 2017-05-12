@@ -1,0 +1,10 @@
+TYPEMAP
+maybe_string   T_MAYBE_STRING
+
+OUTPUT
+T_MAYBE_STRING
+  $var != NULL ? sv_setpv((SV*)$arg, $var) : sv_setsv((SV*)$arg, &PL_sv_undef);
+
+INPUT
+T_MAYBE_STRING
+  $var = SvOK($arg) ? ($type)SvPV_nolen($arg) : NULL;

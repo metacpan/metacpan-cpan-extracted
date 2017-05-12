@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Date: Sun, 16 Dec 2007 14:25:14 GMT
+Server: nginx/RTM
+Vary: Accept-Encoding
+Content-Type: text/xml; charset="utf-8"
+Client-Date: Sun, 16 Dec 2007 14:26:11 GMT
+Client-Peer: 75.126.232.204:80
+Client-Response-Num: 1
+Client-Transfer-Encoding: chunked
+Keep-Alive: timeout=300
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok"><tasks><list id="1977301"><taskseries id="7417459" created="2007-11-10T08:50:20Z" modified="2007-11-10T08:50:20Z" name="GOAT: today's date without time should not be in the pas" source="api" url="" location_id=""><tags/><participants/><notes/><task id="10852109" due="" has_due_time="0" added="2007-11-10T08:50:20Z" completed="" deleted="" priority="N" postponed="0" estimate=""/></taskseries></list></tasks></rsp>
+
+

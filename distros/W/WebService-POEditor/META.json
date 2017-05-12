@@ -1,0 +1,59 @@
+{
+   "abstract" : "POEditor.com API wrapper",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-POEditor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "MooseX::Attribute::ENV" : "0",
+            "Role::REST::Client" : "0",
+            "namespace::clean" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-webservice-poeditor at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-POEditor"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/WebService-POEditor.git",
+         "web" : "https://github.com/moltar/WebService-POEditor"
+      }
+   },
+   "version" : "v1.1.0"
+}
+

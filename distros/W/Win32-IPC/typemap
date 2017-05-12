@@ -1,0 +1,37 @@
+# $Id: typemap 245 2008-02-23 17:23:27 -0600 cmadsn $
+
+BOOL                    T_IV
+TRUEFALSE               T_TRUEFALSE
+DWORD                   T_IV
+LONG                    T_IV
+LPCSTR                  T_PV
+LPCSTR_OPT              T_PV_OPT
+HANDLE                  T_PTROBJ
+TIMEOUT                 T_TIMEOUT
+
+#############################################################################
+INPUT
+T_PTROBJ
+	if (sv_derived_from($arg, \"${Package}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type, tmp);
+	}
+	else
+	    croak(\"$var is not of type ${Package}\")
+
+T_PV_OPT
+	$var = ($type)(SvOK($arg) ? SvPV_nolen($arg) : NULL)
+
+T_TIMEOUT
+	$var = ($type)(SvOK($arg) ? SvIV($arg) : INFINITE)
+
+T_TRUEFALSE
+	$var = SvTRUE($arg)
+
+#############################################################################
+OUTPUT
+T_PTROBJ
+	sv_setref_pv($arg, className, (void*)$var);
+
+T_TRUEFALSE
+	$arg = boolSV($var);

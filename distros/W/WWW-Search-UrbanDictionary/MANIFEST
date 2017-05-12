@@ -1,0 +1,9 @@
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.skip
+README
+META.yml
+lib/WWW/Search/UrbanDictionary.pm
+t/11-compile.t
+examples/search.pl

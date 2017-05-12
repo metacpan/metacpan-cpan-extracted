@@ -1,0 +1,11 @@
+Revision history for WebService-SagawaKyubin
+
+0.0.5  Sun Mar 20 22:50:01 2011
+       Add user_agent in results ( $res->[0]->{user_agent} = __PACKAGE_NAME__; ) .
+
+0.0.2  Sat Jan 29 15:24:46 2011
+       Re-package.(to upload pause)
+
+0.0.1  Sat Jan 29 12:24:46 2011
+       Initial release.
+

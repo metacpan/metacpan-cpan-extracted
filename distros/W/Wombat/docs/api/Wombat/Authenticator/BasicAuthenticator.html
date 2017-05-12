@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Authenticator::BasicAuthenticator - HTTP Basic authenticator</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Authenticator::BasicAuthenticator - HTTP Basic authenticator</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Implementation of HTTP Basic authentication as specified in RFC 2617.</P>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_authenticate">authenticate($request, $response, $config)</A></STRONG><BR>
+<DD>
+Authenticate the user making this request, based on the specified
+login configuration. Return true if any specified constraint has been
+satisfied, or false if we have created a response already.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpRequest</STRONG> being processed
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::HttpResponse</STRONG> being created
+<P></P>
+<DT><STRONG><A NAME="item_%24constraint">$constraint</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::LoginConfig</STRONG> describing the authentication
+procedure
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return a short name for this Authenticator implementation.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Authenticator/AuthenticatorBase.html">the Wombat::Authenticator::AuthenticatorBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

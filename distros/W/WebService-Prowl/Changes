@@ -1,0 +1,31 @@
+Revision history for Perl extension WebService::Prowl
+
+0.08 2016-05-22T04:18:42Z
+        - Module improvements for March 2015 by @jeffblack360
+	- Memoved Crypt::SSLeay from dependencies by @atomicstack
+
+0.07  Wed Feb  9 10:29:07 PST 2011
+        - [rt.cpan.org #65374]: changed endpoint servername to api.prowlapp.com
+        - [rt.cpan.org #65374]: support 'url' parameter in 'add' method
+        - [rt.cpan.org #65374]: support provider token/apikeys methods
+
+0.06  Sun Nov 15 18:06:14 PST 2009
+        - with a non-UTF8-flaged string, use uri_escape() insted of uri_escape_utf8()
+
+0.05  Thu Oct  1 14:42:23 PDT 2009
+        - fixed typo [rt.cpan.org #50158]
+
+0.04  Wed Aug 12 18:59:15 PDT 2009
+        - support providerkey
+
+0.03  Sun Aug  2 16:15:45 PDT 2009
+        - handling query string with URI::Escape
+        - added WebService::Prowl::AnyEvent
+        - added example/twitter-notifier as a example usage of WebService::Prowl::AnyEvent
+
+0.02  Thu Jul  9 12:44:00 PDT 2009
+        - added example/remindme.pl
+        - removed debugging print
+
+0.01  Wed Jul  8 15:02:25 2009
+        - original version

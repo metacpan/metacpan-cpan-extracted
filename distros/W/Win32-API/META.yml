@@ -1,0 +1,40 @@
+---
+abstract: 'Perl Win32 API Import Facility'
+author:
+  - 'Aldo Calpini <dada@perl.it>, Cosimo Streppone <cosimo@cpan.org>, Daniel Dragan <bulkdd@cpan.org>'
+build_requires:
+  Config::Perl::V: '0'
+  Encode::compat: '0'
+  File::Spec: '0'
+  IPC::Open3: '0'
+  Math::Int64: '0'
+  Test::More: '0'
+  Win32: '0'
+  Win32API::File: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - win32
+  - api
+  - dll
+  - libraries
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-API
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Math::Int64: '0'
+requires:
+  Scalar::Util: '0'
+  perl: '5'
+resources:
+  repository: https://github.com/bulk88/perl5-win32-api
+version: '0.84'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

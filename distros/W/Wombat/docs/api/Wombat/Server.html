@@ -1,0 +1,188 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Server - server class</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Server - server class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $wombat = Wombat::Server();
+  $wombat-&gt;setHome('/usr/local/wombat');
+  $wombat-&gt;setConfigFile('conf/server.xml');</PRE>
+<PRE>
+  $wombat-&gt;start();
+  $wombat-&gt;await();
+  $wombat-&gt;stop();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class implements a Wombat server. It uses <EM>server.xml</EM> to
+configure a container hierarchy and provides methods for starting and
+stopping the server. It is meant to be used in both standalone and
+embedded mode, so it does not take care of standard daemon things,
+like processing command line arguments or setting up signal
+handlers. Those are the responsibilities of the surrounding
+environment (eg a control script or mod_perl &lt;Perl&gt; section).</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Create and return an instance, initializing fields to default values.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getConfigFile"><CODE>getConfigFile()</CODE></A></STRONG><BR>
+<DD>
+Return the location of the configuration file for this
+Server. Defaults to <EM>server.xml</EM> in the <EM>conf</EM> subdirectory of
+<A HREF="#item_getHome"><CODE>getHome()</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_setConfigFile"><CODE>setConfigFile($configFile)</CODE></A></STRONG><BR>
+<DD>
+Set the location of the configuration file for this Server. If the
+specified location is relative, then it will be absolutized using
+<A HREF="#item_getHome"><CODE>getHome()</CODE></A>.
+<DL>
+<DT><STRONG><A NAME="item_Parameters%3A"><STRONG>Parameters:</STRONG></A></STRONG><BR>
+<DD>
+<DL>
+<DT><STRONG><A NAME="item_%24configFile">$configFile</A></STRONG><BR>
+<DD>
+the location of the configuration file relative to the server's home
+directory
+<P></P></DL>
+</DL>
+<DT><STRONG><A NAME="item_getHome"><CODE>getHome()</CODE></A></STRONG><BR>
+<DD>
+Return the home directory for this Server.
+<P></P>
+<DT><STRONG><A NAME="item_setHome"><CODE>setHome($home)</CODE></A></STRONG><BR>
+<DD>
+Set the home directory for this Server.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24home">$home</A></STRONG><BR>
+<DD>
+the server home directory, specified absolutely
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+if the specified directory is not specified absolutely
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_await"><CODE>await()</CODE></A></STRONG><BR>
+<DD>
+Direct all defined Services to begin listening for requests. Depending
+on Connector implementations, this method may return immediately (for
+Connectors that execute asynchrously, eg Apache) or may block (eg Http
+Connector).
+<P></P>
+<DT><STRONG><A NAME="item_addService"><CODE>addService($service)</CODE></A></STRONG><BR>
+<DD>
+Add a new Service to the set of defined Services.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24service">$service</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Service</STRONG> to add
+<P></P></DL>
+<DT><STRONG><A NAME="item_getServices"><CODE>getServices()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing all defined Services.
+<P></P>
+<DT><STRONG><A NAME="item_removeService"><CODE>removeService($service)</CODE></A></STRONG><BR>
+<DD>
+Remove a Service from the set of defined Services.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$service</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Service</STRONG> to remove
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this component. This method should be called
+before any of the public methods of the component are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the component has already been started
+<P></P>
+<DT><STRONG><A NAME="item_Wombat%3A%3AXmlException"><STRONG>Wombat::XmlException</STRONG></A></STRONG><BR>
+<DD>
+if a problem occurs while parsing a config file
+<P></P>
+<DT><STRONG><A NAME="item_Wombat%3A%3AConfigException"><STRONG>Wombat::ConfigException</STRONG></A></STRONG><BR>
+<DD>
+if a validity error is detected in a config file
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this component. Once this method
+has been called, no public methods of the component should be
+utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the component is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

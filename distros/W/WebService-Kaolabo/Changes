@@ -1,0 +1,11 @@
+Revision history for WebService-Kaolabo
+
+0.0.3  Tue Apr  20 01:00:00 2008
+       Modified effect_face.
+       (Maybe API Bugs?)
+0.0.2  Tue Apr  17 03:00:00 2008
+       Fixed Makefile.PL Build.PL.
+       Added error message to pod.
+0.0.1  Tue Apr  14 18:29:05 2008
+       Initial release.
+

@@ -1,0 +1,22 @@
+---
+name: WebService-Google-Sets
+version: 0.03
+author:
+  - 'Dean Wilson <dean.wilson@gmail.com>'
+abstract: Perl access to Google Labs Sets site
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 0
+  LWP: 0
+build_requires:
+  Test::More: 0
+provides:
+  WebService::Google::Sets:
+    file: lib/WebService/Google/Sets.pm
+    version: 0.03
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,40 @@
+Revision history for Perl extension WWW::Correios::CEP
+
+1.02
+    - New Correios API
+
+1.01
+    - manual add our $version.
+
+1.0
+    - Changing version because WWW-Correios-CEP-0.0323.tar.gz has a higher version number (0.033)
+
+0.0325 2014-10-10
+    - Fix timeout.t string test to match more than one error 500 type.
+
+0.0324 2014-10-09
+    - new version, added thanks to garu!
+
+0.0323 2014-10-09
+    - refactored some legacy code
+    - removed unnecessary testing methods and internals
+    - improved documentation
+
+0.0322 2013-06-04
+    - changelog fix!
+
+0.032 2013-06-03
+    - revert some commited changes (but not in cpan) but now there is a retrocompatibilidad and working code on github!
+
+0.03 2011-10-28
+    - timeout / bugs
+
+0.02 2011-02-08
+    - Changes on _parseHTML method (thxs gabiruh)
+    - Added support to multiple address to a unique CEP
+    - so you can test with CEP number 69405-000
+
+
+0.01 2011-02-03
+    - original version; created by h2xs 1.23 with options
+        -AX WWW::Correios::CEP

@@ -1,0 +1,25 @@
+WWW::Yahoo::Groups
+
+    Automated access to Yahoo! Groups archives.
+
+For installation details, see INSTALL.
+
+For usage, see the doco. Either use perldoc or view it
+on the web at:
+    <http://search.cpan.org/dist/WWW-Yahoo-Groups/>
+
+Changes for 1.91 (1 Dec 2003)
+   - Demangling removed due to Yahoo changing algorithm.
+   - Requires newer Mech and LWP.
+   - Bug with empty messages fixed.
+   - Bad variable in example program fixed.
+   - Spidering Hacks mentioned.
+   - Documentation updated with some nits fixed.
+   - Documentation shuffled all around.
+   - new() can now take arguments for options.
+
+
+For a complete list of changes, see the Changes file.
+
+
+by Iain Truskett.

@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:30:50,555]   WARN - cs.git.GitCollectChangesPolicy - Ref refs/heads/broken_branch points to a non-commit 1fefad14fba39ac378e4e345e295fa1f90e343ae \n\r\n[2016-01-13 14:30:50,555]   WARN - cs.git.GitCollectChangesPolicy - Ref refs/heads/broken_branch points to a non-commit 1fefad14fba39ac378e4e345e295fa1f90e343ae \n",
+   "duration" : 2076,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:440,build:(id:667885)",
+   "id" : "id:440,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_with_branch_pointing_to_a_non_commit",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:1027942983717404196",
+      "id" : 1027942983717404196,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_with_branch_pointing_to_a_non_commit"
+   }
+}

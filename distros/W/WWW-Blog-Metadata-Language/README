@@ -1,0 +1,34 @@
+WWW-Blog-Metadata-Lang version 0.01
+
+A plugin for WWW::Blog::Metadata that extracts or guesses the language of a blog.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+WWW::Blog::Metadata
+Text::Language::Guess
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Darko Obradovic
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

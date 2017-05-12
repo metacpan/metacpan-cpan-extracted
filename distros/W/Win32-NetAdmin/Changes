@@ -1,0 +1,73 @@
+Revision history for Perl extension Win32::NetAdmin.
+
+0.13  Tue Oct 21 2014
+        - Change resumeHandle variable type to DWORD_PTR
+          (thanks to Mark J Hewitt) [pr#5] [rt#99461]
+          [https://bugs.activestate.com/show_bug.cgi?id=100108]
+
+0.12  Thu Nov 28 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+	- Typo fixes by David Steinbrunner
+	- Add LICENSE section to pod [rt#41181]
+
+0.11  Wed Jul 02 2008
+        - Skip tests when running on Windows 95.
+
+0.10  Mon Jun 23 2008
+        - Skip tests when not running as an administrator.
+
+0.09  Tue Apr 15 2008
+	- version 0.09 for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- added ppport.h
+
+0.08  Mon May 22 21:22:33 2000
+	- move last error variable to interpreter (thanks to
+	  Doug Lankshear <doug@lankshear.net>)
+
+0.07  Mon May 22 21:22:33 2000
+	- support for passing Unicode strings to methods (thanks to
+	  Doug Lankshear <doug@lankshear.net>)
+
+0.062 Wed Aug  4  7:51:33 1999
+	- added docs to EXAMPLE
+
+0.061 (unreleased)
+	- added a NetAdmin example from Robert Spier <rspier@seas.upenn.edu>.
+	- minor changes for Perl 5.005xx compatibility
+
+0.06  Mon Sep  7 19:47:20 1998
+	- fixed GPF in LocalGroupIsMember()
+
+0.05  Sun May 10 22:39:01 1998
+	- removed broken #ifdefs that disabled UserChangePassword() and
+	  other functions
+	- fix broken constants and add new ones (courtesy Dave Roth
+	  <rothd@roth.net>)
+	- export :ALL functions (courtesy Tye McQueen <tye@metronet.com>)
+	- New functions GetAliasFromRID(), GetUserGroupFromRID(), and
+	  GetServerDisks(). LocalGroupGetMembersWithDomain() fixes
+	  (courtesy Jutta M. Klebe <jmk@exc.bybyte.de>)
+
+0.04  (unreleased)
+	- added LocalGroupGetMembersWithDomain() via
+	  David Gardiner <david.gardiner@unisa.edu.au>
+
+0.03  Fri Feb  6 21:02:31 1998
+	- fixes and enhancements courtesy Jutta Klebe <jmk@exc.bybyte.de>
+	   * New functions: LoggedOnUsers(), GetTransports()
+	   * GetUsers() and GetServers() now accept hashrefs
+	- misc. pod fixes
+
+0.02  Sat Dec 13 19:11:52 1997
+	- Fixes for enumeration functions from Joe Doss <jdoss@levi.com>
+	- Various tweaks to the fixes
+	- Added changes in ActiveState version
+
+0.01  Sat Apr  5 14:24:05 1997
+	- original version; created by h2xs 1.18
+	- imported ActiveWare version
+

@@ -1,0 +1,85 @@
+NAME
+    WWW::Bing::Search - Parser of Bing Search Engine search results
+
+VERSION
+    version 0.011
+
+SYNOPSIS
+        my $bing = WWW::Bing::Search->New;
+        $bing->Search('test');
+        while ( my $result = $bing->GetResult ) {
+            print $result."\n";
+        }
+
+    You can also specify additional parameters
+    
+	#add proxy and response timeout (default 10 sec)
+	my $bing = WWW::Bing::Search->New("proxy"=>"http://127.0.0.1:8080","timeout"=>3);
+        #add minimal result pages (10 results per page) and number of first result
+        $bing->Search('query'=>'test','minPages'=>3,'first'=>10);
+    
+    Methods available in the module
+    
+	$result = $bing->GetResult; #Returns a result e.g. http://test.com/
+	@results = $bing->GetResults; #Returns an array with all the results recived
+	$totalFound = $bing->TotalCount; #Returns number of results the proposed search engine
+	$totalParsed = $bing->Count; #Returns number of results parsed with this module
+
+This is Perl module Iterator::Simple.
+
+INSTALLATION
+
+WWW::Bing::Search installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan WWW::Bing::Search
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+USAGE
+  WWW::Bing::Search->new( ... )
+    Prepare a new search object (handle)
+
+    You can configure the search by passing the following to "New":
+
+        proxy           Specifies the proxy server to use when sending the request
+    			The syntax is the same as in the module LWP::UserAgent
+
+	timeout		Specifies the timeout waiting for response in seconds
+
+    Search( "query" )
+    Run query to bing with default values of minimum pages  to parse (1)  and offset (0)
+    
+    You can configure the query by passing the following to "Search":
+
+	query 		Need to specifies when seted not bigger one option
+			In fact, a search query
+	
+	minPages	Number of pages to parse (one page output of Bing containing 10 results)
+			by default this value is 10
+	
+	first		Offset from the first result of output
+			by default (0)
+    
+
+    GetResult 
+    Returns a result e.g. http://test.com/
+    
+    GetResults 
+    Returns an array with all the results recived
+    
+    TotalCount
+    Returns number of results the proposed search engine
+    
+    Count
+    Returns number of results parsed with this module
+AUTHOR
+    Dmitry Vinogradenko <jin@hungosh.net>

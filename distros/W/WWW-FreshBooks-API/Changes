@@ -1,0 +1,15 @@
+Revision history for WWW-FreshBooks-API
+
+0.01    Thu Jun 28 21:51:48 PDT 2007
+		Initial test release.
+
+0.03    Wed Apr 22 11:24:29 PDT 2009
+		Just a few minor updates to coincide with api functionality.
+
+0.10	Thu Apr 23 23:00:42 PDT 2009
+		Was not happy with last update.  Added functionality for better handling of
+		response data, including on the fly creation of response classes and accessors,
+		and a result object iterator for methods returning a list of data.
+
+		TODO: Finish the pager class for results containing multiple pages.  Add logical 
+			  map, grep, and filter features for iterator class.

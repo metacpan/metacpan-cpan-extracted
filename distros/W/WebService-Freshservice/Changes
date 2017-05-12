@@ -1,0 +1,14 @@
+0.003     2016-08-08 14:07:50+08:00 Australia/Perth
+          Minor pod tweaks.
+          Add environment to exec RT #116753 - Slaven Rezic <SREZIC@cpan.org>
+
+0.002     2016-08-08 10:30:01+08:00 Australia/Perth
+          Test scripts shouldn't use system perl.
+
+0.001     2016-08-05 17:04:35+08:00 Australia/Perth
+          Create/Search/Retrieve Requesters
+          Search/Retrieve Agents
+          Get/Set Requester Custom Fields
+          Get Agent Custom Fields
+          Documentation
+          100% Test Coverage

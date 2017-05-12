@@ -1,0 +1,21 @@
+Revision history for Perl extension WWW-Metaweb.
+
+Version 0.02:
+
+  Major changes and additions
+    - We're now using JSON::XS for all Perl-JSON conversions, it's faster and handles quoted numbers as strings better than JSON.
+    - Added single method read and writes via read() and write(), which return the result (or results) directly.
+    - Added a new method raw_result(), which will return the raw json string that was returned from the last read or write operation - useful for further manipulation when using read() and write().
+    - Added a JSON preprocessor call-back. One or more pre-processors can be specified and can modify the final JSON envelope before it undergoes URI encoding and is sent to Metaweb.
+    - Added an anti caching string to every out enveloper that is sent - which should prevent issues with web-proxies and intermediary servers caching read requests.
+    - Added lots more tests.
+    - Documentation should be much easier to read now.
+
+  Minor changes
+    - Now uses Carp were appropriate.
+
+  Bug fixes
+    - Write queries didn't get sent to Metaweb correctly in the last version - this has been fixed.
+    - Specifying a string that contained only digits in a perl structure would result in a json number. This is actually an issue with the JSON module - resolved because JSON::XS, which we're now using, handles this case correctly.
+    - Fixed the bug that caused read and write to treat the format specifier (eg. 'json' or 'perl') as bad json queries themselves.
+

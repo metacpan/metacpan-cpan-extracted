@@ -1,0 +1,17 @@
+These are the people who have been helpful during the creation of WeSQL...
+The fields are: name (N), email (E), and description (D).
+
+-- 2001.12.01 Ward Vandewege (ward@pong.be)
+
+N: Jan Jansen
+E: jan@ba.be
+D: Many (implementation) ideas.
+
+N: Kristof Verniers
+E: kristof@pong.be
+D: Implementation of parts of the early 0.2x versions.
+D: Debugging, beta-testing.
+
+N: Sébastien Delneste
+E: seb@pong.be
+D: Debugging, beta-testing.

@@ -1,0 +1,1 @@
+Richard Fobes is the author of "The Creative Problem Solver's Toolbox", the author of "Ending The Hidden Unfairness In U.S. Elections", the creator of the Dashrep programming language (Language::Dashrep on CPAN), and the developer of VoteFair ranking (Voting::VoteFairRanking on CPAN).

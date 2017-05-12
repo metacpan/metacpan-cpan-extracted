@@ -1,0 +1,41 @@
+---
+abstract: 'A family of modules for querying and manipulating the network insterface of a Windows based PC using the netsh utility'
+author:
+  - 'Paul Durden <alabamapaul@gmail.com>'
+build_requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  Devel::AssertOS: '0'
+  Devel::CheckOS: '1.63'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Netsh
+no_index:
+  directory:
+    - inc
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter::Easy: '0'
+  File::Spec: '0'
+  Readonly: '0'
+  Win32: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/alabamapaul/perl5-Win32-Netsh
+  repository: https://github.com/alabamapaul/perl5-Win32-Netsh.git
+version: '0.04'

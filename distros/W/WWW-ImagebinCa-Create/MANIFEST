@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/WWW/ImagebinCa/Create.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/kwalitee.t
+examples/put_pic.pl
+Makefile.PL
+META.yml

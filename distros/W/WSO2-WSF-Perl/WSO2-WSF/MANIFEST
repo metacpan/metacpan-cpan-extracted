@@ -1,0 +1,12 @@
+Makefile.PL
+README
+MANIFEST
+t/WSO2-WSF.t
+lib/WSO2/WSF.pm
+lib/WSO2/WSF/WSMessage.pm
+lib/WSO2/WSF/WSHeader.pm
+lib/WSO2/WSF/WSClient.pm
+lib/WSO2/WSF/WSSecurityToken.pm
+lib/WSO2/WSF/WSFault.pm
+lib/WSO2/WSF/WSPolicy.pm
+Changes

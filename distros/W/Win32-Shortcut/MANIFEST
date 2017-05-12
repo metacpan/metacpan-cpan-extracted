@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+Shortcut.pm
+Shortcut.xs
+docs/index.html
+docs/intro.html
+docs/license.html
+docs/reference.html
+docs/toc.html
+eg/ln32.bat
+eg/sample.pl
+typemap

@@ -1,0 +1,184 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use curry;
+use Log::Any qw($log);
+use IO::Async::Loop;
+use Net::Async::Tangence::Client;
+
+use POSIX qw(strftime);
+
+use Log::Any::Adapter 'Stdout';
+
+sub status($) { warn "@_\n" }
+
+my $loop = IO::Async::Loop->new;
+$loop->add(
+	my $client = Net::Async::Tangence::Client->new(
+	)
+);
+
+sub subscribe_event(&@) {
+	my ($code, $obj, $ev) = @_;
+	my $f = $loop->new_future;
+	$obj->subscribe_event(
+		event         => $ev,
+		on_fire       => $code,
+		on_subscribed => sub { $f->done($obj) },
+		on_fail       => $f->curry::fail
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+sub call_method(@) {
+	my ($obj, $method, @args) = @_;
+	my $f = $loop->new_future;
+	$obj->call_method(
+		method    => $method,
+		args      => \@args,
+		on_result => sub { $f->done(@_) },
+		on_error  => sub { $f->fail(@_) },
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+use Adapter::Async::OrderedList::Array;
+
+sub property_adapter {
+	my ($obj, $prop, $adapter) = @_;
+	my $f = $loop->new_future;
+	$adapter //= Adapter::Async::OrderedList::Array->new(
+		data => [],
+	);
+
+	$obj->watch_property(
+		property     => $prop,
+		want_initial => 1,
+		on_set       => sub {
+			my ($data) = @_;
+			$adapter->clear->on_done(sub {
+				$adapter->push($data);
+			});
+		},
+		on_push      => sub {
+			my ($item) = @_;
+			$adapter->push($item);
+		},
+		on_splice    => sub {
+			my ($start, $len, $items) = @_;
+			$adapter->splice($start, $len, $items);
+		},
+		on_move      => sub {
+			my ($start, $len, $items) = @_;
+			$adapter->splice($start, $len, $items);
+		},
+		on_shift     => sub {
+			$adapter->shift
+		},
+		on_del       => sub { die "del - unhandled" },
+		on_watched   => sub { $f->done($obj) },
+		on_error     => sub { $f->fail(@_) },
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+$client->connect_url(
+	'tcp://localhost:3008/',
+	on_connected => sub {
+		print "We have connected to the server\n";
+	},
+	on_registry => sub {
+		my $registry = shift;
+		print "We have received the registry: $registry\n";
+		# Tangence::ObjectProxy
+		# Tangence::Object
+	},
+	on_root => sub {
+		my $obj = shift;
+		print "We have received the root: $obj\n";
+		my $watcher = sub {
+			my %args = @_;
+			my $on_add = sub {
+				my ($k, $v) = @_;
+				$args{added}->($k, $v);
+			};
+			my $on_set = sub {
+				my $prop = shift;
+				for my $k (sort keys %$prop) {
+					$on_add->($k, $prop->{$k});
+				}
+			};
+			warn "Watch for " . $args{property} . " on " . $args{object}->id;
+			$args{object}->watch_property(
+				property => $args{property},
+				want_initial => 1,
+				on_set => $on_set,
+				on_add => $on_add,
+				on_del => sub { },
+				on_error => sub {
+					my $err = shift;
+					status "Error: $err";
+				}
+			);
+		};
+		$watcher->(
+			object   => $obj,
+			property => 'regions',
+			added    => sub {
+				my ($k, $v) = @_;
+				status "Had a new region - $k (" . $v->classname . ")";
+				return unless $k =~ /^eu/;
+				$log->debugf("Region [%s] subscribe to error", $k);
+				my $f = (subscribe_event {
+					my ($err) = @_;
+					$log->debugf("Region [%s] reports error [%s]", $k, $err);
+				} $v => 'error')->then(sub {
+					$v->watch_property(
+						property     => 'tables',
+						want_initial => 1,
+						on_set       => sub {
+							my ($data) = @_;
+							status "Have " . @$data. " tables for [$k]";
+						},
+						on_push      => sub {
+							my ($tbl) = @_;
+							status "..!push - @_";
+							status "our new table is [" . $tbl->prop('name') . "]";
+						},
+						on_splice    => sub { status '..!splice' },
+						on_move      => sub { status '..!move' },
+						on_shift     => sub { status '..!hsift' },
+	#					on_add       => $on_add,
+						on_del       => sub { },
+						on_error     => sub {
+							my $err = shift;
+							status "Error: $err";
+						}
+					);
+					call_method(
+						$v,
+						create_table => {
+							TableName => 'test',
+							AttributeDefinitions => [ {
+								AttributeName => 'id',
+								AttributeType => 'S',
+							} ],
+							KeySchema => [ {
+								AttributeName => 'id',
+								KeyType => 'HASH'
+							} ],
+							ProvisionedThroughput => {
+								ReadCapacityUnits => "5",
+								WriteCapacityUnits => "5",
+							}
+						}
+					)
+				});
+				$f->on_ready(sub { undef $f });
+			}
+		);
+	},
+);
+$loop->run;
+

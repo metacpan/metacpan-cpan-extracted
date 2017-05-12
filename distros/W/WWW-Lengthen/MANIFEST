@@ -1,0 +1,15 @@
+Changes
+lib/WWW/Lengthen.pm
+lib/WWW/Lengthen/Cached.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/99_pod.t
+t/99_podcoverage.t
+t_live/basic.t
+t_live/basic_cached.t
+t_live/extra.t
+t_live/urllist.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,59 @@
+README for WebCache::Digest
+by Martin Hamilton <martinh@gnu.org>
+$Id: README,v 1.1 1999/03/12 17:55:33 martin Exp $
+
+
+This Perl module implements the Cache Digest protocol as found in the
+Squid WWW cache server package, documented separately in the file
+cache-digest-v5.txt included here.  The module is self-documenting,
+so do a 'perldoc WebCache::Digest' after installing it for info.
+
+
+
+                           *** WARNING ***
+
+Cache Digests are an unstable, experimental protocol.  Don't build
+them into any production systems unless you are prepared to change
+your implementation at short notice!  Expect the specification to
+change!
+
+                           *** WARNING ***
+
+
+
+If you downloaded this package from CPAN or a CPAN mirror site, you
+may want to check back to its home page to see if there's a newer
+version:  <URL:http://wwwcache.ja.net/dev/perlmod/>
+
+You install the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+Please report any bugs/suggestions to the author at the above address.
+
+
+
+Two sample programs are included to illustrate how the WebCache::Digest
+module may be used in your programs:
+
+  dpeek.pl - lookup URLs in Cache Digest loaded from disk or
+               fetched over HTTP
+  dpoke.pl - create a Cache Digest given a list of URLs, and
+               save it to disk for later processing
+
+These are self-documenting using POD, as with the main WebCache::Digest
+module itself.
+
+
+
+Copyright (c) 1999, Martin Hamilton.  All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+This work was supported by the Joint Informations Systems Committee
+(JISC) of the UK Higher Education funding Councils, as part of the
+JANET Web Cache Service project.
+

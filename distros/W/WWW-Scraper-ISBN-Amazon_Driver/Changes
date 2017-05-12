@@ -1,0 +1,190 @@
+Revision history for WWW-Scraper-ISBN-Amazon_Driver
+===================================================
+
+0.41    2014-11-01
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+        - uninitialized warning fix.
+
+0.40    2014-09-17
+        - fixed license fields in META.json to be lists.
+        - added new title/author pattern.
+
+0.39    2014-08-14
+        - further fixes for UK layout changes.
+
+0.38    2014-08-04
+        - fixed for UK website update.
+        - fixed UK site testing.
+
+0.37    2014-05-29
+        - added conversion routines to obtain EAN13.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - changed to regex test for weight data on US site.
+        - fixed META tests to catch version differences.
+
+0.36    2014-04-28
+        - amazon.com updated HTML output.
+        - fixed distribution name in META.
+
+0.35    2014-04-05
+        - reduce size of test data footprint.
+
+0.34    2014-04-02
+        - getting the size can still fail, if data not available.
+        - extract parse functionality into separate method, to allow testing.
+        - protect against missing values causing undef errors.
+        - extended test suite.
+
+0.33    2014-03-24
+        - added Amazon_Driver.pm, to help with PAUSE permissions.
+
+0.32    2013-11-08
+        - amazon.com updated description for Perl Medic.
+
+0.31    2013-10-19
+        - added git repository links to metadata.
+
+0.30    2013-08-11
+        - added isbn-check.pl to examples.
+        - License updated consistently to Artistic License v2.0.
+        - META updates.
+        - height, width, depth regex reworked, tests simplified.
+        - image, thumb regex reworked, now uses JSON, tests simplified.
+        - UK description regex updated.
+
+0.29    2013-03-03
+        - alternative regexes for AmazonUS titles (thanks to Franck Porcher).
+        - fixed weight calculations.
+        - fixed image pattern matches.
+        - expose depth values.
+
+0.28    2012-12-16
+        - weight extract also accounts for pounds (lbs)
+        - depth extract added
+        - height width and depth order reset.
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.27    2012-05-13
+        - additonal regexes for variations of the data returned by Amazon.com.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.26    2011-05-06
+        - fix to description pattern match.
+
+0.25    2011-03-22
+        - added further skip test if test books are withdrawn from the site.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - Amazon now have a broken ISBN-10 field. ISBN-10 != ISBN-13.
+        - fixed Amazon UK pattern for link from search results page.
+
+0.24    2010-10-29
+        - amended skip test counts.
+
+0.23    2010-10-07
+        - amended pingtest() in network tests.
+
+0.22    2010-10-06
+        - fixed skip count.
+        - provided alternate ping test methods.
+
+0.21    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+        - fixed return value of 'isbn' to be 'isbn13'.
+        - added 'description' to the field set returned.
+
+0.20    2010-09-14
+        - protect against amending undefined strings.
+
+0.19    2010-08-10
+        - added better protection from network failures.
+        - updated prerequisite requirements.
+
+0.18    2010-08-02
+        - added connection protection if client or server offline.
+        - documentation updates.
+
+0.17    2010-07-30
+        - documentation fixes.
+
+0.16    2010-07-29
+        - updates to parses for both Amazon US & UK sites.
+        - added fields (if known) for binding, pages, weight, width & height.
+        - added ean13, which is the industry name for isbn-13.
+        - more tests.
+        - removal of Template::Extract in favour of plain regexes.
+        - various package file changes (inc adding META.json).
+
+0.15    2009-08-14
+        - minor fixes to parsing of both Amazon US & UK sites.
+        - added ping tests, to avoid failing when no network connection.
+        - real failures produce diagnostics not skips now.
+        - added more package tests.
+
+0.14    2008-11-17
+        - minor fix to parsing Amazon US site.
+
+0.13    2008-06-27
+        - added ISBN10 and ISBN13 keys to book data
+        - added tests to check for ISBN10 and ISBN13 searches
+
+0.12    2008-06-27
+        - added checks to only run extra tests under AUTOMATED_TESTING
+        - switched metatest to use Test-CPAN-Meta
+        - upped META.ym spec version and link
+        - fixed US/UK content extraction
+
+0.11    2007-10-29
+        - fixed further pattern matching in tests, thanks to testing by 
+          David Cantrell.
+
+0.10    2007-07-27
+        - fixed image link pattern matching in tests, thanks to testing by 
+          David Cantrell and Chris Williams.
+
+0.09    2007-07-26
+        - Amazon image links have changed again.
+        - Amazon UK full size image link popup has changed again
+        - more tests modified due to the change in text used on pages.
+
+0.08    2007-03-13
+        - Amazon appear to change their URLs on a daily basis, as such the URL
+          tests have been updated ... again!
+
+0.07    2007-03-01
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - Updated the pattern matching code as Amazon UK have changed 
+          their page layouts.
+        - Added better error checking and reporting.
+        - Devel::Cover = 95.6%
+
+0.06    2006-10-11
+        - Fixed US/UK website link changes
+        - Devel::Cover - 89.7%
+
+0.05    2005-03-01
+        - Data & Layout change on both US site
+        - fixed URL test in UK link tests
+        - changed from @ISA to 'use base'
+
+0.04    2005-01-07
+        - handler() moved to WWW::Scraper::ISBN::Driver
+        - test suite updated to peform skips if can't access web pages
+        - fix for stripbook search keyword
+
+0.03    2004-08-31
+        - Data & Layout change on both US & UK sites
+
+0.02    2004-04-19
+        - Test::More added as a prerequisites for PPMs
+
+0.01    2004-04-15
+        - original version

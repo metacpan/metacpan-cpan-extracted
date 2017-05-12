@@ -1,0 +1,31 @@
+Revision history for pkgfind.
+
+SVN Head
+	- Added option to create symlinks of the downloaded patch
+	- Added 's:' to option list so -s will be parsed
+
+1.3  Tue May 30 13:30:00 2006
+	- Altered patch name to include the BRANCH name in it, for
+	  descriptive purposes
+	
+1.2  Fri May 26 17:30:00 2006
+	- Added git-pull script to get patches from git repos
+	
+1.1  Wed Apr 19 19:00:00 2006
+	- Added "use_mirror" capability to download from SourceForge
+	  mirrors 
+	- Various bug fixes to get WWW::PkgFind to run in production.
+	- Restored parent_url (needed by the stdin portion of pkgfind)
+	- Debugging comments
+	- URI capability check (does URI object have host() method?)
+	- Issue error if /usr/bin/curl does not exist
+	
+	
+1.00  Wed Apr 14 17:00:00 2006
+	- First release!
+	
+0.01  Thu Dec  8 17:23:50 2005
+	- original version; created by sdist 1.11
+
+
+

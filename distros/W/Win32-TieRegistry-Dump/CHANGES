@@ -1,0 +1,13 @@
+Revision history for Perl extension Win32::TieRegistry::PMVersionInfo.
+
+0.031 Fri Apr 11 19:16 2003
+	  There was a *horrid* bug
+	  Thanks to Guest via RT <bug-Win32-TieRegistry-Dump@rt.cpan.org>
+	  for spotting it.
+
+0.02  Wed May 15 14:17 2002
+
+0.01  Tue Dec  14 20:01:42 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Win32::TieRegistry::Dump
+

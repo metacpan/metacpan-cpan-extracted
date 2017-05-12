@@ -1,0 +1,94 @@
+word2vec
+    word2vec-interface is a wrapper package built around word2vec, including
+    many useful utilities such as word vector manipulation.
+
+TESTING PLATFORMS
+    Word2vec-interface package has been developed and tested on Windows and
+    Linux primarily using Perl and the Cmd/Bash shell.
+
+REQUIREMENTS
+    Word2vec-interface REQUIRES that the following software be installed.
+    More details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.24.0 or better)
+
+    --CPAN modules <Encode> <XML::Twig> <File::Type> <Class::Struct>
+    <Text::Unidecode> <Sys::CpuAffinity> <IO::Uncompress::Gunzip>
+
+PROGGRAMMING LANGUAGES
+  Perl (version 5.24.0 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+    If you are using a windows environment, it is recommended that you use
+    Strawberry Perl v5.24 or greater. This is the Perl software suite used
+    to develop this package under windows.
+
+CPAN MODULES
+  *Encode*
+    Please see the <http://perldoc.perl.org/Encode.html> documentation.
+
+  *XML::Twig*
+    Please see the <http://search.cpan.org/~mirod/XML-Twig-3.49/> or
+    <http://www.xmltwig.org/xmltwig/> documentation.
+
+  *File::Type*
+    Please see the <http://search.cpan.org/~pmison/File-Type-0.22/>
+    documentation.
+
+  *Class::Struct*
+    Please see the
+    <http://search.cpan.org/~rjbs/perl-5.24.0/lib/Class/Struct.pm>
+    documentation.
+
+  *Text::Unidecode*
+    Please see the <http://search.cpan.org/~sburke/Text-Unidecode-1.27/>
+    documentation.
+
+  *Sys::CpuAffinity*
+    Please see the <http://search.cpan.org/~mob/Sys-CpuAffinity-1.10/>
+    documentation.
+
+  *IO::Uncompress::Gunzip*
+    Please see the
+    <http://search.cpan.org/~pmqs/IO-Compress-2.069/lib/IO/Uncompress/Gunzip
+    .pm> documentation.
+
+INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install word2vec-interface
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install word2vec into
+    system directories via : perl Makefile.PL make make install make clean
+
+    The exact location of where word2vec-interface will be installed depends
+    on your system configuration. A message will be printed out after 'make
+    install' telling your exactly where it was installed.
+
+CONTACT US
+    You may contact me directly if you prefer :
+
+     Bridgett McInnes: btmcinnes at vcu.edu
+     Clint Cuffy: cuffyca at vcu.edu
+

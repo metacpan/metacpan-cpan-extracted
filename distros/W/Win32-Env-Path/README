@@ -1,0 +1,52 @@
+NAME
+    Win32::Env::Path - Manipulate environment PATH strings
+
+SYNOPSIS
+      use Win32::Env::Path;
+      
+  my $path = Win32::Env::Path->new(
+          name => 'PATH',
+      );
+      
+  $path->add('C:\\strawberry');
+      $path->remove('C:\\strawberry');
+
+DESCRIPTION
+    Win32::Env::Path is a simple module for inspecting and manipulating
+    environment path lists on Win32, with a particular focus on the PATH,
+    LIB and INCLUDE environment variables.
+
+    It was designed to allow for intelligent path behaviours during the
+    installation and removal of software applications, and was originally
+    written for use in the the Strawberry Perl installer and other
+    Perl::Dist-derived Perl distribution installers.
+
+METHODS
+    For the moment, the specifics of this class are remaining
+    undocumentated.
+
+    Please read the code for more information, API is subject to change.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-Env-Path>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Win32::Env, Perl::Dist::Inno
+
+COPYRIGHT
+    Copyright 2007 - 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

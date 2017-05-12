@@ -1,0 +1,12 @@
+201[
+    {
+        "first_name": "John", 
+        "last_name": "Doe", 
+        "display_name": "John Doe", 
+        "profile_photo": "http://example.com/image.jpg", 
+        "is_saved": "0", 
+        "example_key": "Example Value", 
+        "email": "end_user@example.com"
+    }, 
+    {}
+]

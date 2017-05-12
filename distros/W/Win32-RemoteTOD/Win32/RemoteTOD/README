@@ -1,0 +1,40 @@
+Win32/RemoteTOD version 1.00
+============================
+
+DESCRIPTION
+
+Win32::RemoteTOD is used to retreive the date, time, and timezone from a
+remote Win32 machine.  There is one function, called "GetTOD()" which 
+returns a hashref.
+
+This module is written using C / XS.  It does not require any other modules,
+but you will need a C compiler to build it.  If you do not have a C compiler,
+you can use the included PPM versions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+If you do not have a C compiler, you can use the PPM version:
+
+   extract ppm.zip to a temporary folder
+   run "ppm install Win32-RemoteTOD.ppd" from the temporary folder
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Author: Adam Rich <arich@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

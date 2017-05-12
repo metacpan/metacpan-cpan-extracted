@@ -1,0 +1,45 @@
+- Add missing Common Controls: 
+    Pager 
+    Ip address
+    Drag List Boxes
+    Property Sheet?
+    HOT Key?
+    Flat Scroll bar?
+- expand support for GDI drawing
+- evtl. support for owner drawn controls
+- also search for "TODO" in the GUI.xs (and other) file
+
+- Documentation:
+  - revise and correct FAQ
+  - any TBD sections
+  - get SrcParser.pm to return info about TBD items.
+  - get SrcParser to compare packages and methods found in files with 
+    documentation found in files
+  - split README into README, INSTALLATION and BUILDING
+  - remove EVENTS section from auto generated package documentation where 
+    it is not relevant
+  - add tutorial for other controls?
+  - add tutorial on NEM
+  - add tutorial on using Hook() and pack/unpack to cope with events and 
+    messages that are not supported.
+
+- Tests
+  - add at least a check for each package that it generates the correct
+    object type
+  - GuiTest: with seperate module or add our own Win32::GUI::Test?
+     - SendKeys, MouseClick, PushButton, WaitWindow
+     - currently I am leaning towards Win32::GUI::Test, especially if it gives
+       us a framework for users to test their GUIs too - Rob.
+
+- Add Win32::GUI::WebBrowser, to give us native HTML support
+
+- Look at seeing if there is a way to prevent PAR (and perl2exe?) packing 
+  package Win32, when it's only required for old perls
+
+- warnings: do something with the tests of PL_dowarn to allow at least perl -X
+  to turn off Win32::GUI warnings. (see -DW32G_NEWWARN)
+
+- Get everything to run under strictures and warnings.
+
+- Start to split into smaller, more manageable pieces - hopefully this might make it
+  easier to add tests.  Look at moving code out of XS and into Perl?

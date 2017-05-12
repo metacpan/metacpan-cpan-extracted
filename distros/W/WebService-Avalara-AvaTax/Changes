@@ -1,0 +1,72 @@
+Revision history for perl distribution WebService-Avalara-AvaTax
+
+0.020     2016-04-18 18:59:12-04:00 America/New_York
+    - OK, support down to 5.8.x for any value x
+0.019     2016-04-18 18:44:44-04:00 America/New_York
+    - fix bug to support non-email address usernames (Jawaid Bazyar++)
+    - support older versions of Perl, down to v5.8.9 (Jawaid Bazyar++)
+    - refactor to better support XML::Compile::Dumper
+    - add use_wss attribute to support Avalara's alternate non-WSS security
+0.018     2015-04-10 11:03:07-04:00 America/New_York
+    - require appropriate version of Moo
+    - remove extraneous namespace declarations from WSDL patch
+    - documentation fixes
+0.017     2015-03-19 13:05:26-04:00 America/New_York (TRIAL RELEASE)
+    - documentation fixes
+    - use a WSDL patch schema rather than janky hooks (MARKOV++)
+0.016     2015-03-19 09:32:34-04:00 America/New_York
+    - move preprocessing hooks to WebService::Avalara::AvaTax::Service::Tax
+0.015     2015-03-18 16:56:50-04:00 America/New_York
+    - documentation fixes
+0.014     2015-03-18 16:12:04-04:00 America/New_York
+    - added reader preprocessing hooks to correct for incorrect placement of
+      TaxIncluded and GeocodingType elements in response to GetTax calls
+0.013     2015-03-17 11:34:04-04:00 America/New_York
+    - Empty results no longer result in dying with a Log::Report::Exception;
+      instead you should check the second return value, which should be
+      an XML::Compile::SOAP::Trace.
+0.012     2015-03-16 22:11:13-04:00 America/New_York
+    - default get_tax's DocDate to today's date in UTC
+    - add basic test for GetTax SOAP operation that matches example from docs
+    - documentation fixes
+0.011     2015-03-16 15:46:39-04:00 America/New_York
+    - added "orthodox" attribute to get CamelCased SOAP operations as
+      method names
+0.010     2015-03-16 14:15:51-04:00 America/New_York
+    - initial non-trial release
+0.009     2015-03-13 14:53:17-04:00 America/New_York (TRIAL RELEASE)
+    - documentation fixes (Peter Sandin++)
+    - use Mozilla::CA to verify HTTPS certificates (MIKEGRB++, Peter Sandin++)
+    - Just return {parameters}{FooResult} hash reference as results, rather
+      than the entire hashref from the call. You can always get full request
+      and response details from the trace.
+0.008     2015-03-12 17:46:27-04:00 America/New_York (TRIAL RELEASE)
+    - ::Role::Connection returns to provide factored out functionality to
+      the new ::Service::Address and ::Service::Tax classes; the main AvaTax
+      class now exists to simply bring the two services together, compile the
+      operations, and wrap them in Perlish method calls
+0.007     2015-03-11 15:32:31-04:00 America/New_York (TRIAL RELEASE)
+    - Added support for Avalara address service validation via validate()
+      method. Since this service also has IsAuthorized and Ping operations,
+      the appropriate methods have been renamed address_svc_is_authorized,
+      address_svc_ping, tax_svc_is_authorized and tax_svc_ping.
+0.006     2015-03-10 11:52:22-04:00 America/New_York (TRIAL RELEASE)
+    - remove extra "FooRequest => {}" around method parameters
+0.005     2015-03-09 21:30:34-04:00 America/New_York (TRIAL RELEASE)
+    - rolled up WebService::Avalara::AvaTax::Role::Connection into main
+      AvaTax class since it wasn't clear keeping it a separate role was
+      offering anything beyond added complexity
+    - made soap_service, soap_port and transport attributes private (i.e.,
+      prefixed with a "_"), again to reduce complexity and API surface area
+    - additional documentation
+0.004     2015-03-09 18:11:51-04:00 America/New_York (TRIAL RELEASE)
+    - no functional changes
+    - fix and complete example method calls in documentation
+0.003     2015-03-09 13:47:22-04:00 America/New_York (TRIAL RELEASE)
+    - no functional changes
+    - update license and add SEE ALSO section to docs
+0.002     2015-03-09 13:02:41-04:00 America/New_York (TRIAL RELEASE)
+    - no functional changes
+    - added/fixed documentation, example scripts
+0.001     2015-03-09 11:27:41-04:00 America/New_York (TRIAL RELEASE)
+    - initial release

@@ -1,0 +1,293 @@
+NAME
+
+Wuala - Interface to the Wuala API
+
+
+SYNOPSIS
+
+    use WWW::Wuala;
+	
+  $wu = WWW::Wuala->new();
+  
+  $counter = $wu->wualaFilescounter();
+  print $counter . "\n";
+
+  @search = $wu->search('Wuala',5,1);
+  foreach $pr (@search) {
+  print $pr . "\n";
+  }
+
+  $wu->server(1) || die "wtf";
+  chomp($fname = <STDIN>);
+  $wu->download('Perforin/Images/WUALA3.JPG',$fname) || die "wtf";
+
+  #$wu->preview_xml("Perforin"); 
+
+  %prev = $wu->preview("Perforin");
+  print "@{ $prev{name} }\n"; # Show only the Name
+  print "@{ $prev{publicGroups_name} }\n"; # Show only the public group names
+  for $all ( keys %prev ) { print "@{ $prev{$all} }\n"; } # Show everything
+
+  
+DESCRIPTION
+
+Wuala is a free social online storage which allows its users to securely store,
+backup, and access files from anywhere and to share files easily with friends,
+groups, and the world.
+
+This moduls allows you to interact with the Wuala API.
+
+Supported API calls:
+
+download
+preview
+search
+metadata
+tops
+mostRecent
+breadcrumb
+publicFiles
+publicFolders
+publicGroups
+commentCount
+comments
+
+Extra:
+
+wualaFilescounter
+
+
+METHODS
+
+___Downloading:
+
+There are at the moment 6 Server from which you can download content.
+I let you decide which one you want to use! If you don´t specifie one
+the module will take the first server. Changing the Server MAY increase
+the download speed.
+
+$wu->server(2) || die "wtf";
+chomp($fname = <STDIN>);
+$wu->download('Perforin/Images/WUALA3.JPG',$fname) || die "wtf";
+
+You can also download password protected content!
+
+$wu->server(2) || die "wtf";
+chomp($fname = <STDIN>);
+$wu->download('Perforin/verysecretandprotectedfolder/lulz.PNG',$fname,'KEY') || die "wtf";
+
+
+___Preview:
+
+%prev = $wu->preview("Perforin");
+for $all ( keys %prev ) {
+print "@{ $prev{$all} }\n";
+}
+
+This example will show us, all of the preview information.
+But we can specifie what exactly we want!
+
+@arguments = qw(name url tag);
+
+%prev = $wu->preview("Perforin",@arguments);
+for $all ( keys %prev ) {
+print "@{ $prev{$all} }\n";
+}
+
+OR
+
+@arguments = qw(name url tag);
+
+%prev = $wu->preview("Perforin",@arguments); # OR %prev = $wu->preview("Perforin");
+print "@{ $prev{name} }\n"; # Show only the name
+print "@{ $prev{url} }\n";  # Show only the url
+print "@{ $prev{tag} }\n";  # Show only the tags
+
+
+Here is the list of all possible values:
+
+type fullname gender birthday contact countrycode prouser name url
+creator creationdate sizestring description tag views links favorites comments
+familyfriendly publicFolders_name publicFolders_url publicGroups_name publicGroups_url
+
+
+___Top Items list:
+
+@top = $wu->tops(6,3,4); # Typus To Period
+foreach $la (@top) {
+print $la . "\n";
+}
+
+Well, this here looks a bit confusing but here is the explanation:
+
+The first number stands for the _type_.
+Here you got 6 possibilities.
+0 Images
+1 Videos
+2 Music
+3 Documents
+4 Other file types
+5 Users
+6 Groups
+
+Then there comes _To_.
+This is just a number higher or equal than 1 which indicate the number of Top
+Items you want to be showed.
+
+And finaly there is the _Period_.
+This one defindes the time period. The following values are possible:
+0 Day
+1 Week
+2 Month
+3 Year
+4 All Time
+
+In this example, we get 3 top Group Items of all time. Not this hard? :-)
+
+
+___Metadata:
+
+@res = $wu->metadata('Wuala/Buttons',folder);
+foreach $lol (@res) {
+print $lol . "\n";
+}
+
+This will show you the Metadata of a folder.
+The second argument can be changed to:
+user
+file
+group
+folder
+
+
+___mostRecent:
+
+@mr = $wu->mostRecent(1,10); # Typus To
+foreach $ma (@mr) {
+print $ma . "\n";
+}
+
+The first number stands for the _type_.
+Here you got 6 possibilities.
+0 Images
+1 Videos
+2 Music
+3 Documents
+4 Other file types
+5 Users
+6 Groups
+
+Then there comes _To_.
+This is just a number higher or equal than 1 which indicate the number of 
+Items you want to be showed.
+
+
+___Search:
+
+@search = $wu->search('Wuala',5,1);
+foreach $pr (@search) {
+print $pr . "\n";
+}
+
+The first value is your searchstring.
+
+The second is just a number higher or equal than 1 which indicate the number of 
+results you want to be showed.
+
+The last value is the search type!
+The possible values are:
+0 Images
+1 Videos
+2 Music
+3 Documents
+4 Other file types
+5 Users
+6 Groups
+
+
+
+And so on and so on. It continues like this ;)
+At least I´ll give you a list where you can use a password:
+
+download
+preview
+metadata
+breadcrumb
+publicFiles
+publicFolgers
+comments
+commentCount
+
+___XML:
+
+All of those API calls can also be called by putting an _xml behind.
+This will give you the XML File send by the Wuala server.
+
+$wu->preview_xml();
+$wu->publicFiles_xml();
+
+And so on and so on...
+
+___wualaFilescounter:
+
+Returns the number shown on the Wuala Webpage.
+
+
+MORE
+
+If there is something unclear on how to use this Module, let me know
+
+admin[At]virii[d0t]lu
+
+or check out the source of the module or, get you a copy of the API documentation
+=> http://www.wuala.com/Wuala%20API/Documentation/documentation.pdf
+
+
+AUTHOR
+
+Perforin <admin[AT]virii[d0t]lu>.
+
+GREETINGS
+
+MereX
+Neo2k8
+Sph1nX
+Rayden
+double_check
+sollniss
+the_janky
+zeco
+katsumi
+SkyOut
+
+EOF-Project
+vx.netlux.org
+vxnet.ws
+
+For all those I forgot to greet, I´m sorry :-P
+
+
+COPYRIGHT
+
+http://creativecommons.org/licenses/by-sa/3.0/lu/deed.de
+
+Creative Commons
+
+Attribution-Share Alike 3.0 Luxembourg
+
+To Share — To copy, distribute, display, and perform the work
+To Remix — To make derivative works
+
+Under the following conditions:
+
+Attribution.
+You must attribute the work in the manner specified by the author or licensor
+(but not in any way that suggests that they endorse you or your use of the work). 
+
+Share Alike.
+If you alter, transform, or build upon this work, you may distribute the resulting
+work only under the same, similar or a compatible license. 
+For any reuse or distribution, you must make clear to others the license terms of this work.
+The best way to do this is with a link to this web page.
+Any of the above conditions can be waived if you get permission from the copyright holder.
+Nothing in this license impairs or restricts the author's moral rights.

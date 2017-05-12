@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use WebService::EveOnline;
+
+my $API_KEY = $ENV{EVE_API_KEY};
+my $USER_ID = $ENV{EVE_USER_ID};
+
+unless ($API_KEY && $USER_ID) {
+    print "Please export EVE_API_KEY and EVE_USER_ID before running\n";
+    exit;
+}
+
+my $eve = WebService::EveOnline->new( { user_id => $USER_ID, api_key => $API_KEY } );
+
+my $wanted = $ARGV[0] || undef;
+my $show_max = $ARGV[1] || 5;
+
+foreach my $char ($eve->characters) {
+    next if $wanted && $wanted ne $char->name;
+
+    my @transactions = $char->transactions;
+    my $num_transactions = scalar(@transactions);
+    my $max = ($num_transactions >= $show_max) ? $show_max : $num_transactions;
+    
+    if ($num_transactions == 0) {
+        print "Sadly, " . $char->name . " has made no recorded transactions\n\n";
+        next;
+    }
+    
+    print $char->name . "'s last " . (($max == 1) ? "transaction:\n" : "$max transactions:\n");
+    foreach my $t (@transactions) {
+        next if $max-- <= 0;
+        print "  " . (($t->type eq "sell") ? $t->client_name : $char->name) . " bought " 
+                   . $t->quantity . " x " . $t->name 
+                   . " for " . ($t->price * $t->quantity) 
+                   . " ISK on " . $t->station_name 
+                   . ", " . $t->evetime . "\n";
+    }
+    print "\n";
+}

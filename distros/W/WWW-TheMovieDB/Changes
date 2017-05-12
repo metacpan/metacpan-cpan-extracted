@@ -1,0 +1,20 @@
+Revision history for Perl extension WWW::TheMovieDB.
+
+0.01  Wed Jun 26 10:01:58 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::TheMovieDB
+
+0.02  Mon Jul 15 11:30:00 2013
+	- Documentation update
+
+0.03  Mon Jul 29 13:00:00 2013
+	- Makefile update
+
+0.04  Mon Jul 29 22:00:00 2013
+	- Update for Perl 10.x
+
+0.05  Fri Sep 13 13:00:00 2013
+,...- Fixed some documentation errors.
+,...- Fixed a couple typos.
+,...- Added a basic test.
+,...- Code cleanup after lashing by Perl::Critic

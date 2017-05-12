@@ -1,0 +1,11 @@
+Revision history for WebService-OANDA-ExchangeRates
+
+0.003     2014-07-16 11:27:11-04:00 America/Toronto
+        - new parameter 'data_set' for use with get_rates and get_currencies
+        - provides access to new European Central Bank rates
+
+0.002     2014-05-08 09:23:52-04:00 America/Toronto
+        - Hopefully fix up failing tests on cpantesters
+
+0.001     2014-05-07 15:38:45-04:00 America/Toronto
+        - Initial release

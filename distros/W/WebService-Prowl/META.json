@@ -1,0 +1,93 @@
+{
+   "abstract" : "a interface to Prowl Public API",
+   "author" : [
+      "Masayoshi Sekimura <sekimura@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Prowl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::Repository" : "0",
+            "Module::Install::TestBase" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "Carp" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "6.02",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Prowl" : {
+         "file" : "lib/WebService/Prowl.pm",
+         "version" : "0.08"
+      },
+      "WebService::Prowl::AnyEventHTTP" : {
+         "file" : "lib/WebService/Prowl/AnyEventHTTP.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sekimura/WebService-Prowl/issues"
+      },
+      "homepage" : "https://github.com/sekimura/WebService-Prowl",
+      "repository" : {
+         "url" : "git://github.com/sekimura/WebService-Prowl.git",
+         "web" : "https://github.com/sekimura/WebService-Prowl"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Masayoshi Sekimura <sekimura@chacha.local>",
+      "Masayoshi Sekimura <sekimura@sixapart.com>",
+      "jeffblack360 <jeffblack360@gmail.com>",
+      "Matt Koscica <matt.koscica@gmail.com>",
+      "Masa Sekimura <sekimura@gmail.com>"
+   ]
+}

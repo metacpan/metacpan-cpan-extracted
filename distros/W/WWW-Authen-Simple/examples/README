@@ -1,0 +1,20 @@
+This directory contains some example scripts and such that should help 
+you get on your way with WWW::Authen::Simple a bit easier.
+
+
+mysql_schema.sql - SQL create table statements to setup database tables
+comptable with the default configuration of WWW::Authen::Simple. They're
+very basic (add any other fields you need). They can also be re-arranged
+in many different ways, you'll just need to pass WWW::Authen::Simple a
+hash that tells it how your tables are structured (see documentation for
+more information).
+
+addusers.pl - Simple script to add some test users, and stick them in some
+groups. It expects the tables to be structured as laid out in
+mysql_schema.sql, and uses the default password encryption, so tweak it
+as needed.
+
+example.pl - example of using WWW::Authen::Simple in a cgi script (will
+also work under mod_perl and similar environments).
+
+

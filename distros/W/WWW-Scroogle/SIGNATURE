@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 efcbe0f1d64376b12018bc6eea66357181b9e532 Build.PL
+SHA1 6f4ca91cf776dfccff7e868e21f4f071d8f34f3e ChangeLog
+SHA1 cdb0fe7a50bfb063d8d2af202139a54c6d3a1e83 MANIFEST
+SHA1 ae219b3f875829cbfdf33ab8233310cba231aed1 META.yml
+SHA1 7fa98bb7c757dfd501a91c351366f135e0520eee Makefile.PL
+SHA1 07ccd6eb112badf841f6db71a3636d9d869d40bb README
+SHA1 708f577c0409663a35ecf6d491f8996ace6a5e98 lib/WWW/Scroogle.pm
+SHA1 a87fd5b48327450cd7d48a3fe3168d79094447e0 lib/WWW/Scroogle/Result.pm
+SHA1 6721d2d24d5c5d44a611ed9a0c5c3f276143241f t/01-WWW-Scroogle-Result.t
+SHA1 bf03abf9b35b727c8a3788383d3743baebb707d5 t/02-WWW-Scroogle.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/pod.t
+SHA1 de1b8a6f043bb49463103b0fc02a65276f790a68 t/pod_coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFIca+ags/d4Xy3FqkRAsyzAJ4lVd+y/OdNQ8zivr8WHUIzmylG4QCgkiJz
+TMXn8dW9B1vxt99zz6R8Rjg=
+=RmNu
+-----END PGP SIGNATURE-----

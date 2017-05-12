@@ -1,0 +1,49 @@
+#############################################################################
+## Name:        ext/richtext/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     05/11/2006
+## RCS-ID:      $Id: typemap 3293 2012-05-16 20:02:24Z mdootson $
+## Copyright:   (c) 2006-2007, 2009-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxFontStyle             T_ENUM
+wxFontWeight            T_ENUM
+wxTextAttrAlignment     T_ENUM
+wxPliRichTextStyleType  T_ENUM
+
+wxRichTextStyleSheet *  O_WXOBJECT_THR
+wxRichTextEvent *       O_WXOBJECT
+wxRichTextCtrl *        O_WXEVTHANDLER
+wxRichTextStyleListBox * O_WXEVTHANDLER
+wxRichTextStyleListCtrl * O_WXEVTHANDLER
+wxRichTextStyleComboCtrl * O_WXEVTHANDLER
+wxRichTextAttr *        O_NON_WXOBJECT_THR
+wxTextAttrEx *          O_NON_WXOBJECT_THR
+wxRichTextRange *       O_NON_WXOBJECT_THR
+wxRichTextStyleDefinition * O_WXOBJECT_THR
+wxRichTextCharacterStyleDefinition * O_WXOBJECT_THR
+wxRichTextParagraphStyleDefinition * O_WXOBJECT_THR
+wxRichTextListStyleDefinition * O_WXOBJECT_THR
+wxRichTextFormattingDialog * O_WXOBJECT
+wxRichTextBuffer *      O_WXOBJECT_THR
+wxRichTextFileHandler * O_WXOBJECT
+wxPlRichTextFileHandler * O_WXOBJECT
+wxRichTextXMLHandler *  O_WXOBJECT
+wxRichTextHTMLHandler * O_WXOBJECT
+wxSymbolPickerDialog *  O_WXOBJECT
+wxRichTextStyleOrganiserDialog * O_WXOBJECT
+
+wxPrintData *           O_WXOBJECT
+wxPageSetupDialogData * O_WXOBJECT
+## no RTTI info for wxRichTextPrinting
+wxRichTextPrinting *    O_NON_WXOBJECT_THR
+wxRichTextPrintout *    O_NON_WXOBJECT
+wxRichTextHeaderFooterData * O_WXOBJECT_THR
+wxRichTextOddEvenPage   T_ENUM
+wxRichTextPageLocation  T_ENUM
+

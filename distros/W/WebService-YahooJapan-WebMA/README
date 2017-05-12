@@ -1,0 +1,64 @@
+NAME
+    WebService::YahooJapan::WebMA - Easy-to-use Interface for Yahoo! Japan
+    Web MA Web Service
+
+SYNOPSIS
+      use WebService::YahooJapan::WebMA;
+
+      my $api = WebService::YahooJapan::WebMA->new(
+          appid => 'your_appid',
+      );
+
+      my $result = $api->parse(sentence => 'sentence here') or die $api->error;
+      my $ma_result = $result->{ma_result};
+      print $ma_result->{total_count};
+      print $ma_result->{filtered_count};
+
+      for my $word (@{$ma_result->{word_list}}) {
+          $word->{surface};
+          $word->{reading};
+          $word->{pos};
+          $word->{baseform};
+      }
+
+DESCRIPTION
+    This module priovides you an Object Oriented interface for Yahoo! Japan
+    Web MA Web Service.
+
+    You can do Japanese language morphological analysis with this module.
+
+METHODS
+  new([%options])
+    Returns an instance of this module. The following option can be set:
+
+      appid # required
+      ua    # optional. LWP::UserAgent instance
+
+  parse(%options)
+    Requests API with options and returns results. The following option can
+    be set:
+
+      sentence # required
+      results
+      response
+      filter
+      ma_response
+      ma_filter
+      uniq_response
+      uniq_by_baseform
+
+    See the official API documents about detail of options and return
+    values.
+
+  error
+    Returns error message.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * http://developer.yahoo.co.jp/jlp/MAService/V1/parse.html
+

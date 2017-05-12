@@ -1,0 +1,380 @@
+NAME
+    WWW::Pastebin::PastebinCom::Create - paste on www.pastebin.com without
+    API keys
+
+WARNING!!!
+    IMPORANT. Please read.
+
+    You kinda, sorta, maybe shouldn't really use this module. Use
+    WWW::Pastebin::PastebinCom::API instead. Pastebin.com switched to a
+    key-based API (which is what "::API" version implements), and using
+    this, keyless, module lets you paste only 10 pastes per day.
+
+    The limit is higher with the WWW::Pastebin::PastebinCom::API module, so
+    check it out.
+
+    This module primarily exists for use with App::Nopaste.
+
+SYNOPSIS
+        use WWW::Pastebin::PastebinCom::Create;
+
+        my $bin = WWW::Pastebin::PastebinCom::Create->new;
+
+        # all options as defaults
+        my $paste_uri = $bin->paste( text => 'Some text to paste' )
+            or die $bin->error;
+
+        # all options as custom (module's defaults are shown)
+        my $paste_uri = $bin->paste(
+            text    => 'Some text to paste',
+            format  => 'none', # no syntax highlights
+            expiry  => 'm',    # expire after a month
+            private => 1,      # make the paste unlisted
+            desc    => '',     # no "title/name" for the paste
+        ) or die $bin->error;
+
+        # object's ->paste_uri() method is overloaded to string interpolation:
+        print "Your paste uri is $bin\n";
+
+DESCRIPTION
+    This module provides the means to paste on www.pastebin.com pastebin,
+    without the need for API keys <http://pastebin.com/api>. See the
+    WARNING!!! section above.
+
+METHODS
+  "new"
+        my $bin = WWW::Pastebin::PastebinCom::Create->new;
+
+    Creates and returns a brand new WWW::Pastebin::PastebinCom::Create
+    object. Does not take any arguments.
+
+  "paste"
+        my $paste_uri = $bin->paste( text => 'Some text to paste' )
+            or die $bin->error;
+
+        $bin->paste(
+            text    => 'Some text to paste',
+            format  => 'perl', # perl syntax highlights
+            expiry  => 'asap', # expire in 10 minutes
+            private => 1,      # make the paste unlisted
+            desc    => 'Some title',  # "title/name" for the paste
+        ) or die $bin->error;
+
+    Pastes to the pastebin. On succcess returns the link to the
+    newly-created paste (see also the overloaded "->paste_uri" method
+    below). On failure returns "undef" or an empty list, depending on the
+    context, and the human-readable error message will be available via the
+    "->error" method. Takes arguments as key/value pairs. Argument "text" is
+    mandatory, the rest are optional. Possible arguments are as follows:
+
+   "text"
+        $bin->paste(
+            text    => 'Some text to paste',
+        ) or die $bin->error;
+
+    Mandatory. Takes a string as a value that contains the text to paste.
+
+   "private"
+        $bin->paste(
+            text    => 'Some text to paste',
+            private => 1,      # make the paste unlisted
+        ) or die $bin->error;
+
+    Optional. This really should be named "unlisted", but for compatibility
+    with old code is still named "private". Takes true or value as a value.
+    If set to a true value, the paste will be "unlisted" (i.e. people will
+    be able to access them if they have a link, but the paste will not be
+    announced on the pastebin.com home page), otherwise the paste will be
+    public and listed on the home page. To make private pastes, you need to
+    be logged in; use WWW::Pastebin::PastebinCom::API if you need that
+    feature. Defaults to: 1 (make pastes unlisted).
+
+   "desc"
+        $bin->paste(
+            text    => 'Some text to paste',
+            desc    => '',     # no "title/name" for the paste
+        ) or die $bin->error;
+
+    Optional. Takes a string as a value that specifies the title/name for
+    the paste. If this string is longer than 60 characters, it will be
+    truncated and "..." will be appended to the end of it. By default is not
+    specified.
+
+   "expiry"
+        $bin->paste(
+            text    => 'Some text to paste',
+            expiry  => 'm',    # expire after a month
+        ) or die $bin->error;
+
+    Optional. Takes an expiry code as a value that specifies when the paste
+    should expire. Defaults to: "m" (expire after a month). Valid expiry
+    codes are as follows (there are multiple possible codes for each
+    duration; they are equivalent):
+
+        # Expire after 10 Minutes
+        10m
+        m10
+        asap
+
+        # Expire after 1 Hour
+        h
+        1h
+
+        # Expire after 1 Day
+        d
+        1d
+        soon
+
+        # Expire after 1 Week
+        w
+        1w
+        awhile
+
+        # Expire after 2 weeks
+        2w
+        w2
+
+        # Expire after 1 Month
+        1m
+        m
+        m1
+        eventually
+
+        # Never expire
+        n
+        never
+
+   "format"
+        $bin->paste(
+            text    => 'Some text to paste',
+            format  => 'C++ (with QT extensions)',
+        ) or die $bin->error;
+
+    Optional. Takes a format code as a value that specifies the paste text
+    format (what syntax highlights to use). Defaults to: "none" (no syntax
+    highlights). Possible values are as follows; they are case-insensitive:
+
+        None
+        Bash
+        C
+        C#
+        C++
+        CSS
+        HTML
+        HTML 5
+        Java
+        JavaScript
+        Lua
+        None
+        Objective C
+        Perl
+        PHP
+        Python
+        Rails
+        4CS
+        6502 ACME Cross Assembler
+        6502 Kick Assembler
+        6502 TASM/64TASS
+        ABAP
+        ActionScript
+        ActionScript 3
+        Ada
+        ALGOL 68
+        Apache Log
+        AppleScript
+        APT Sources
+        ARM
+        ASM (NASM)
+        ASP
+        Asymptote
+        autoconf
+        Autohotkey
+        AutoIt
+        Avisynth
+        Awk
+        BASCOM AVR
+        Bash
+        Basic4GL
+        BibTeX
+        Blitz Basic
+        BNF
+        BOO
+        BrainFuck
+        C
+        C for Macs
+        C Intermediate Language
+        C#
+        C++
+        C++ (with QT extensions)
+        C: Loadrunner
+        CAD DCL
+        CAD Lisp
+        CFDG
+        ChaiScript
+        Clojure
+        Clone C
+        Clone C++
+        CMake
+        COBOL
+        CoffeeScript
+        ColdFusion
+        CSS
+        Cuesheet
+        D
+        DCL
+        DCPU-16
+        DCS
+        Delphi
+        Delphi Prism (Oxygene)
+        Diff
+        DIV
+        DOS
+        DOT
+        E
+        ECMAScript
+        Eiffel
+        Email
+        EPC
+        Erlang
+        F#
+        Falcon
+        FO Language
+        Formula One
+        Fortran
+        FreeBasic
+        FreeSWITCH
+        GAMBAS
+        Game Maker
+        GDB
+        Genero
+        Genie
+        GetText
+        Go
+        Groovy
+        GwBasic
+        Haskell
+        Haxe
+        HicEst
+        HQ9 Plus
+        HTML
+        HTML 5
+        Icon
+        IDL
+        INI file
+        Inno Script
+        INTERCAL
+        IO
+        J
+        Java
+        Java 5
+        JavaScript
+        jQuery
+
+  "error"
+        $bin->paste( text => 'Some text to paste' )
+            or die $bin->error;
+
+    If an error occurs during pasting, the "->paste" method will return an
+    "undef" or an empty list, depending on the context, and the
+    human-readable error message will be available via the "->error" method.
+
+  "paste_uri"
+        $bin->paste( text => 'Some text to paste' )
+            or die $bin->error;
+
+        print "Your paste is at " . $bin->paste_uri . "\n";
+        print "Your paste is at $bin\n";
+
+    Takes no arguments. Will return the link to the newly-created paste,
+    after a successful call to "->paste". This method is overloaded for
+    string interpolation, meaning you can simply interpolate the
+    "WWW::Pastebin::PastebinCom::Create" object in a string to insert the
+    link to the paste.
+
+NOTE ON VERSION 0.004 AND EARLIER
+    At version 0.004, this module was taken out the back and shot in the
+    face, as the www.pastebin.com update completely broke it. As some code
+    still relied on it, it was resurrected and forced to work, but large
+    bits of module's API have changed. If for whatever reason you need the
+    old, non-working, implementation, you can still access it on backpan and
+    can install it using:
+
+        cpan http://backpan.perl.org/authors/id/Z/ZO/ZOFFIX/WWW-Pastebin-PastebinCom-Create-0.004.tar.gz
+
+SEE ALSO
+    WWW::Pastebin::PastebinCom::API, App::Nopaste
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-pastebin-pastebincom-create at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Pastebin-PastebinCom
+    -Create>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Pastebin::PastebinCom::Create
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Pastebin-PastebinCom-C
+        reate>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Pastebin-PastebinCom-Create>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Pastebin-PastebinCom-Create>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Pastebin-PastebinCom-Create/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Zoffix Znet.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

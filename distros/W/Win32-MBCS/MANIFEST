@@ -1,0 +1,9 @@
+MBCS.xs             C code
+MBCS.pm             Module
+proj.kpf            Komodo project file
+t/00base.t          Test file
+Changes             Changlog
+Makefile.PL         Generate Makefile
+MANIFEST            This file
+README              Readme
+META.yml            Module meta-data

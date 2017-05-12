@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/WebService/POEditor.pm
+lib/WebService/POEditor/Response.pm
+t/load.t
+t/release-eol.t
+t/release-no-tabs.t

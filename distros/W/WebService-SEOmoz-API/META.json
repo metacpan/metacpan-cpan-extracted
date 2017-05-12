@@ -1,0 +1,34 @@
+{
+   "abstract" : "SEOmoz API",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-SEOmoz-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : 0,
+            "JSON::Any" : 0,
+            "LWP::UserAgent" : 0,
+            "URI::Escape" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}
+

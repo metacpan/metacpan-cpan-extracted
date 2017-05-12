@@ -1,0 +1,27 @@
+---
+abstract: 'Perl interface to CloudPT API'
+author:
+  - 'Bruno Martins <bruno-martins@telecom.pt>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-CloudPT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: 2.53
+  LWP::Protocol::https: 6.03
+  LWP::UserAgent: 6.04
+  Net::OAuth: 0.28
+  Test::More: 0
+  URI: 1.60
+version: 1.00

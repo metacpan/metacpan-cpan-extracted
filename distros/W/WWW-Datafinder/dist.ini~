@@ -1,0 +1,9 @@
+name    = WWW-Datafinder
+author  = Andrew Zhilenko <perl@putin-huylo.org>
+license = Perl_5
+copyright_holder = Putin Huylo LLC
+copyright_year   = 2017
+
+version = 0.001
+
+[@Basic]

@@ -1,0 +1,31 @@
+{
+    "base_url" : "https://live.kvv.de/webapp",
+    "version" :  "0.2",
+    "methods" : {
+        "stop_by_latlon" : {
+            "path" :   "/stops/bylatlon/:LAT/:LON",
+            "method" : "GET",
+            "required_params" : [ "LAT", "LON" ]
+        },
+        "stop_by_name" : {
+            "path" :   "/stops/byname/:NAME",
+            "method" : "GET",
+            "required_params" : [ "NAME" ]
+        },
+        "stop_by_id" : {
+            "path" :   "/stops/bystop/:ID",
+            "method" : "GET",
+            "required_params" : [ "ID" ]
+        },
+        "departures_by_stop" : {
+            "path" :   "/departures/bystop/:ID",
+            "method" : "GET",
+            "required_params" : [ "ID" ]
+        },
+        "departures_by_route" : {
+            "path" :   "/departures/byroute/:ROUTE/:ID",
+            "method" : "GET",
+            "required_params" : [ "ROUTE", "ID" ]
+        }
+    }
+}

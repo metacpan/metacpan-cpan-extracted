@@ -1,0 +1,41 @@
+Revision history for Web::MREST::CLI
+
+0.275  2015-07-27 13:31 CEST
+- Split off from Web::MREST
+
+0.276  2015-07-27 21:24 CEST
+- UserAgent.pm: validate arguments sent to send_req(), and explicitly set
+  entity body to an empty string if it is undefined
+  ( fixes https://github.com/smithfarm/dochazka-cli/issues/7 )
+- Build.PL: declare Params::Validate dependency
+
+0.277  2015-07-30 15:10 CEST
+- Implement early debugging feature for mrest-cli
+- Implement a generalized init_cli_client() routine in CLI.pm and call it
+  from bin/mrest-cli
+- Drop UserAgent.pm; move contents to Web::MREST::CLI
+- Move normalize_filespec() from Web::MREST::CLI::UserAgent to
+  Web::MREST::CLI
+- Build.PL: declare File::HomeDir dependency
+
+0.278 2016-01-10 16:40 CET
+- CLI.pm: be more careful with early debugging filespec provided by user
+
+0.279 2016-01-12 15:19 CET
+- Changes: manual edit
+- release.sh: tweak release script
+- CLI.pm: fix dochazka-cli bug #26
+
+0.280 2016-01-14 16:05 CET
+- CLI.pm->send_req: do not UTF-8 decode the response
+
+0.281 2016-09-04 19:54 CEST
+- init_cli_client: optionally take arrayref of sitedirs
+- Travis CI
+
+0.282 2016-09-04 19:56 CEST
+- MANIFEST: now we have README.rst only
+
+0.283 2016-09-04 19:58 CEST
+- MANIFEST: add t/001-noop.t
+

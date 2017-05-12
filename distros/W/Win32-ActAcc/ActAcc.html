@@ -1,0 +1,799 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Win32::ActAcc - Active Accessibility client in Perl</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#tools">Tools</a></li>
+		<li><a href="#script_essentials">Script essentials</a></li>
+		<li><a href="#get_accessible_object_from_desktop__point__or_hwnd">Get Accessible Object from Desktop, Point, or HWND</a></li>
+		<li><a href="#invoke_an_app_and_watch_for_its_window_to_appear">Invoke an app and watch for its window to appear</a></li>
+		<li><a href="#accessible_object_properties">Accessible Object properties</a></li>
+		<li><a href="#gui_manipulation">GUI Manipulation</a></li>
+		<li><a href="#parents_and_children">Parents and Children</a></li>
+		<li><a href="#iterators">Iterators</a></li>
+		<li><a href="#tree_of_accessible_objects">Tree of Accessible Objects</a></li>
+		<li><a href="#referring_to_an_object_by_name_or_role">Referring to an object by name or role</a></li>
+		<li><a href="#menus">Menus</a></li>
+		<li><a href="#using_active_accessibility_with_win32__guitest">Using Active Accessibility with Win32::GuiTest</a></li>
+	</ul>
+
+	<li><a href="#details">DETAILS</a></li>
+	<ul>
+
+		<li><a href="#window_tests">Window Tests</a></li>
+		<li><a href="#visible">visible</a></li>
+		<li><a href="#finding_accessible_objects_using__dig_">Finding Accessible Objects using 'dig'</a></li>
+		<li><a href="#more_on_iterators">More on Iterators</a></li>
+		<li><a href="#events">Events</a></li>
+	</ul>
+
+	<li><a href="#sample">SAMPLE</a></li>
+	<li><a href="#troubleshooting">TROUBLESHOOTING</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Win32::ActAcc - Active Accessibility client in Perl</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p><em>Note: We assume you're already familiar with Microsoft's Active
+Accessibility.</em></p>
+<p>
+</p>
+<h2><a name="tools">Tools</a></h2>
+<p>Explore your Active Accessibility world with Win32::ActAcc's utilities:</p>
+<pre>
+ C:\&gt; aadigger    # Explore the window hierarchy (details: perldoc aadigger.pl)
+ C:\&gt; aaWhereAmI  # Mouse around and see the path to each accessible Object.
+ C:\&gt; aaEvents    # Watch WinEvents through Active Accessibility.</pre>
+<p>
+</p>
+<h2><a name="script_essentials">Script essentials</a></h2>
+<p>Now let's write a Perl script. You need this stuff at the top:</p>
+<pre>
+ use Win32::OLE;
+ use Win32::ActAcc qw(:all);
+ Win32::OLE-&gt;Initialize();
+ use Win32::GuiTest; # recommended</pre>
+<p>
+</p>
+<h2><a name="get_accessible_object_from_desktop__point__or_hwnd">Get Accessible Object from Desktop, Point, or HWND</a></h2>
+<p>Get the ``root'' Accessible Object:</p>
+<pre>
+ $ao = Desktop();</pre>
+<dl>
+<dt><strong><a name="item_note">Note</a></strong><br />
+</dt>
+<dd>
+A Perl <code>Win32::ActAcc::AO</code> object contains an <code>IAccessible*</code> and
+<code>childID</code>.
+</dd>
+<dd>
+<p>The object's precise subclass of AO reflects its role (Window, Client, Pushbutton, etc.).</p>
+</dd>
+<p></p></dl>
+<p>Other ways to get an Accessible Object:</p>
+<pre>
+ $ao = AccessibleObjectFromPoint($x, $y); # pixels from upper left
+ $ao = AccessibleObjectFromWindow($hwnd);</pre>
+<p>You can also get an Accessible Object from an event, such as 
+when an application opens..</p>
+<p>
+</p>
+<h2><a name="invoke_an_app_and_watch_for_its_window_to_appear">Invoke an app and watch for its window to appear</a></h2>
+<p>Here's how to invoke an app with <code>system</code> and latch onto its main
+window by listening to events.</p>
+<pre>
+ # Install event hook with first call to &quot;clearEvents&quot;:
+ clearEvents();
+ 
+ # Give event hook time to permeate your computer:
+ # ...
+ 
+ # Start Notepad, but first discard the event backlog:
+ clearEvents();
+ system(&quot;start notepad.exe&quot;);
+ 
+ # Wait for Notepad to appear, as signaled by
+ # an EVENT_OBJECT_SHOW event associated with an
+ # Accessible Object whose name matches qr/Notepad$/,
+ # and make a note of that useful Accessible Object.
+ my $aoNotepad = waitForEvent
+   (
+    +{ 
+      'event'=&gt;EVENT_OBJECT_SHOW(),
+      'ao_profile'=&gt;qr/Notepad$/ # a 'window test': see below
+     }, 
+    # options:
+    +{
+      'timeout'=&gt;30, # seconds
+                     # (an hourglass buys a few more seconds)
+      'trace'=&gt;1 # display events as troubleshooting aid
+      # Tip: Don't turn off 'trace' until your script works!
+     }
+   );
+ # The sentinel event might not be the last in the flurry of events.
+ # Wait for steady state before proceeding.
+ awaitCalm();</pre>
+<p>For jobs too elaborate for <code>waitForEvent</code>, see <a href="#events">Events</a> below.</p>
+<p>
+</p>
+<h2><a name="accessible_object_properties">Accessible Object properties</a></h2>
+<p>Having found an Accessible Object, examine it:</p>
+<pre>
+ my $hwnd = $ao-&gt;WindowFromAccessibleObject();
+ my $roleNumber = $ao-&gt;get_accRole();
+ my $roleText = GetRoleText( $roleNumber );
+ my $stateBits = $ao-&gt;get_accState();
+ my $name = $ao-&gt;get_accName();
+ my $value = $ao-&gt;get_accValue();
+ my $description = $ao-&gt;get_accDescription();
+ my $default_action = $ao-&gt;get_accDefaultAction();
+ my $help = $ao-&gt;get_accHelp();
+ my $f = $ao-&gt;get_accFocus();
+ my ($left, $top, $width, $height) = $ao-&gt;accLocation();
+ my $ks = $ao-&gt;get_accKeyboardShortcut();
+ my $id = $ao-&gt;get_itemID();
+ my $bp = $ao-&gt;get_nativeOM();
+ my @selections = $ao-&gt;get_accSelection();</pre>
+<p><code>visible</code> considers the <code>STATE_SYSTEM_INVISIBLE</code> bit from
+<code>get_accState</code>, among other factors - see <a href="#visible">visible</a>.</p>
+<pre>
+ my $might_be_visible = $ao-&gt;visible();</pre>
+<p>Troubleshoot your script by printing out the Accessible Objects.</p>
+<pre>
+ # Display class, name, state, location, ID, HWND, default action:
+ print &quot;badger/limpid: &quot; . $ao-&gt;describe() . &quot;\n&quot;;
+ print &quot;pilfer/bugle:  $ao\n&quot;; # same thing
+ 
+ # display summary of $ao and all its descendants
+ $ao-&gt;debug_tree();</pre>
+<p>
+</p>
+<h2><a name="gui_manipulation">GUI Manipulation</a></h2>
+<p>Active Accessibility alone is feeble, so be sure to see also <a href="#using_active_accessibility_with_win32__guitest">Using Active Accessibility with Win32::GuiTest</a>.</p>
+<pre>
+ # Selection and focus
+ $ao-&gt;accSelect(SELFLAG_TAKEFOCUS());
+ 
+ # doable action at this moment
+ my $action = $ao-&gt;get_accDefaultAction();
+ $ao-&gt;accDoDefaultAction();</pre>
+<p>If <code>accDoDefaultAction</code> will do, then perhaps there is a
+<em>particular</em> action that the script would like to assert is default
+before executing it.</p>
+<pre>
+ # Perl shortcut: Do named action iff it's the default -- otherwise die.
+ $ao-&gt;doActionIfDefault('Press'); # do-or-die
+ 
+ # Shorthand for the shortcut (for English-language Windows):
+ $ao-&gt;dda_Check();
+ $ao-&gt;dda_Click();
+ $ao-&gt;dda_Close();
+ $ao-&gt;dda_Collapse();
+ $ao-&gt;dda_DoubleClick();
+ $ao-&gt;dda_Execute();
+ $ao-&gt;dda_Expand();
+ $ao-&gt;dda_Press();
+ $ao-&gt;dda_Switch();
+ $ao-&gt;dda_Uncheck();</pre>
+<p>AO can simulate a click using the Windows API.</p>
+<pre>
+ # Simulate click at center of an Accessible Object:
+ $ao-&gt;click(); # there's also $ao-&gt;rightclick()</pre>
+<p>
+</p>
+<h2><a name="parents_and_children">Parents and Children</a></h2>
+<p>Find an Accessible Object's relatives:</p>
+<pre>
+ my $p = $ao-&gt;get_accParent(); # query Active Accessibility
+ $p = $ao-&gt;parent(); # prefer cached weak-ref from iterator, if present
+ 
+ # Get child-count, then one child at a time:
+ my $kk = $ao-&gt;get_accChildCount();
+ my $ak = $ao-&gt;get_accChild(0); # etc.
+ 
+ # Get children in a list:
+ my @likely_visible_children = $ao-&gt;AccessibleChildren();
+ my @all = $ao-&gt;AccessibleChildren(0,0); # state-bits to compare, bit values
+ 
+ # Navigate turtle-style:
+ my $np1 = $ao-&gt;accNavigate(NAVDIR_FIRSTCHILD()); # etc. etc.</pre>
+<dl>
+<dt><strong>Note</strong><br />
+</dt>
+<dd>
+Win32::ActAcc's <code>AccessibleChildren</code>, with no arguments, screens out
+`invisible' and `offscreen' results by assuming the default arguments
+(<code>STATE_SYSTEM_INVISIBLE()|STATE_SYSTEM_OFFSCREEN(), 0</code>).
+</dd>
+<p></p></dl>
+<p>Buggy apps may respond inconsistently to one or another technique of
+enumerating children.  Unfortunately, you must program the
+script differently for each technique, so experimenting with more than
+one is tedious.</p>
+<p>So why not use an Iterator instead?</p>
+<p>
+</p>
+<h2><a name="iterators">Iterators</a></h2>
+<p>Here's how to visit an Accessible Object's children using an iterator:</p>
+<pre>
+ my $iter = $ao-&gt;iterator();
+ $iter-&gt;open();
+ while ( my $aoi = $iter-&gt;nextAO() )
+   {
+     print &quot;$aoi\n&quot;;
+   }
+ $iter-&gt;close();</pre>
+<p>Accessible Objects from iterators keep a weak reference to the
+``parent'' that enumerated them, and can infer some state information
+from the parent's state.</p>
+<pre>
+ my $p = $ao-&gt;iparent(); # parent as noted by iterator...
+ $p = $ao-&gt;parent();     # ... or get_accParent() if iparent=undef
+ 
+ # get state bits, including states implicit from parent
+ # (readonly, offscreen, invisible, unavailable):
+ my $allstate = $ao-&gt;istate();</pre>
+<p>The iterator for most windows uses a slow, but thorough, combination of
+<code>AccessibleChildren</code> and <code>accNavigate</code>.  The iterator for menus and
+outlines can click through them and treat sub-items like children.
+You can select the best child-enumeration technique for each occasion.
+See details at <a href="#more_on_iterators">More on Iterators</a> below.</p>
+<p>Win32::ActAcc's power tools -- <code>dig</code>, <code>tree</code>, <code>menuPick</code> -- use
+iterators so as not to couple their mission to any specific
+child-enumeration technique.</p>
+<p>
+</p>
+<h2><a name="tree_of_accessible_objects">Tree of Accessible Objects</a></h2>
+<p>Use <code>tree</code> to traverse a hierarchy of Accessible Objects
+depth-first, calling a code-ref once for each Accessible Object
+(including the starting object).  The code can control iteration using
+<code>level</code>, <code>prune</code>, <code>stop</code> and <code>pin</code> (see sample).</p>
+<pre>
+ $ao-&gt;tree
+   (
+    sub
+    {
+      my ($ao, $monkey) = @_;
+      # $monkey-&gt;level() returns count of levels from root.
+      # $monkey-&gt;prune() skips this AO's children.
+      # $monkey-&gt;stop() visits NO more Accessible Objects.
+      # $monkey-&gt;pin() prevents closing any menus and outlines
+      #                that tree() opened
+      #                (applies only if flag 'active'=&gt;1)
+      print ' 'x($monkey-&gt;level()).&quot;$ao\n&quot;;
+    },
+    #+{ 'active'=&gt;1 } # optional iterator flags-hash
+   );</pre>
+<p>When <code>tree</code> obtains an iterator for each Accessible Object it visits,
+<code>tree</code> passes its second argument (an optional hash) to the
+iterator's constructor.  (See <a href="#more_on_iterators">More on Iterators</a>.)</p>
+<p>
+</p>
+<h2><a name="referring_to_an_object_by_name_or_role">Referring to an object by name or role</a></h2>
+<p>Supposing <code>$ao</code> is a client area containing a Close button, here's
+how to find and press Close:</p>
+<pre>
+ $aoBtnClose = $ao-&gt;dig
+   ( 
+    +[
+      &quot;{push button}Close&quot; # {role}name
+     ] 
+   ); 
+ $aoBtnClose-&gt;dda_Press();</pre>
+<p>If <code>$ao</code> is a window, containing a client area, containing a Close button, 
+just set forth both steps in the path to reach Close from <code>$ao</code>:</p>
+<pre>
+ $aoBtnClose = $ao-&gt;dig
+   ( 
+    +[
+      &quot;{client}&quot;,  # {role} only, name doesn't matter
+      &quot;{push button}Close&quot;
+     ] 
+   );</pre>
+<p>In a word, <code>dig</code> follows a path of <a href="#window_tests">Window Tests</a>, 
+and returns what it finds.  See details at <a href="#finding_accessible_objects_using__dig_">Finding Accessible Objects using 'dig'</a>.</p>
+<p>You can run <strong>aadigger</strong> or <strong>aaWhereAmI</strong> interactively to
+reconnoiter and figure out a path to the interesting Accessible Object.</p>
+<p>
+</p>
+<h2><a name="menus">Menus</a></h2>
+<p><code>menuPick</code> uses Active Accessibility and Win32::GuiTest to manipulate
+standard Windows menu-bars and context-menus.  Your mileage may vary
+with apps that use custom menus with cockeyed support for Active
+Accessibility.</p>
+<pre>
+ # menuPick takes a ref to a list of window-tests,
+ # tracing a path from menubar to menu to submenu etc.,
+ # plus an optional flags hash.
+ $ao-&gt;menuPick(+[ 'Edit', qr/^Undo/ ], +{'trace'=&gt;1} );</pre>
+<p><code>menuPick</code> can summon and operate a right-clicky context menu:</p>
+<pre>
+ $ao-&gt;context_menu()-&gt;menuPick(+[ 'Paste' ]);</pre>
+<p>If <code>Win32::GuiTest</code> has been loaded (as by <code>use Win32::GuiTest;</code>),
+the active menu iterator closes menus when it's done with them.</p>
+<p>Some menus contain items marked as invisible.  Use the HASH form of
+the window-test to pick such an invisible item; the string and regex
+window-tests match only visible items.</p>
+<p>
+</p>
+<h2><a name="using_active_accessibility_with_win32__guitest">Using Active Accessibility with Win32::GuiTest</a></h2>
+<p>Get an HWND or location from an Accessible Object and manipulate it
+with the Windows API:</p>
+<pre>
+ use Win32::GuiTest;
+ 
+ # use a HWND
+ my $hwnd = $ao-&gt;WindowFromAccessibleObject();
+ my $name = Win32::GuiTest::GetWindowText($hwnd);
+ 
+ # use an (x,y) location
+ my ($left, $top, $width, $height) = $ao-&gt;accLocation();
+ Win32::GuiTest::MouseMoveAbsPix($left, $top);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="details">DETAILS</a></h1>
+<p>
+</p>
+<h2><a name="window_tests">Window Tests</a></h2>
+<p>A window-test examines an Accessible Object and returns a true or
+false value -- like Perl's file tests (-e, -f, etc.). Window-tests are used in <code>waitForEvent</code>,
+<code>dig</code>, <code>menuPick</code>, and <code>match</code>.</p>
+<p>A window-test can take the form of a string, a regex, or a hash.</p>
+<dl>
+<dt><strong><a name="item_string">String</a></strong><br />
+</dt>
+<dd>
+The string must completely match the object's name, {role}, or
+{role}name. Matches <a href="#visible">visible</a> objects only.  You can't use the
+string form of window-test if you need to include a literal brace in
+the name. For the role, use whatever notation is convenient:
+</dd>
+<dd>
+<pre>
+ window                               # role text
+ ROLE_SYSTEM_WINDOW                   # constant name
+ WINDOW                               # last leg of constant name
+ Win32::ActAcc::Window                # Perl package for the role
+ Window                               # last leg of package name
+ value of ROLE_SYSTEM_WINDOW()        # the role number</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_expression">Regular expression (qr/blabla/)</a></strong><br />
+</dt>
+<dd>
+The regex matches the object's name, as in <code>$name=~qr/regex/</code>. 
+Matches <a href="#visible">visible</a> objects only.
+</dd>
+<p></p>
+<dt><strong><a name="item_hash">Hash</a></strong><br />
+</dt>
+<dd>
+Specifying a window-test as a hash is the most flexible way, as it can
+test not only the name and role, but also the state and other
+attributes of the Accessible Object, and even run a custom code-ref.
+</dd>
+<p></p></dl>
+<p>Hash members (all are optional; all present members must match the
+Accessible Object):</p>
+<dl>
+<dt><strong><a name="item_get_accrole_hash_member"><code>get_accRole</code> hash member</a></strong><br />
+</dt>
+<dd>
+role number
+</dd>
+<p></p>
+<dt><strong><a name="item_get_accname_hash_member"><code>get_accName</code> hash member</a></strong><br />
+</dt>
+<dd>
+string (match entire) or regex
+</dd>
+<p></p>
+<dt><strong><a name="item_get_accvalue_hash_member"><code>get_accValue</code> hash member</a></strong><br />
+</dt>
+<dd>
+string (match entire) or regex
+</dd>
+<p></p>
+<dt><strong><a name="item_get_accdescription_hash_member"><code>get_accDescription</code> hash member</a></strong><br />
+</dt>
+<dd>
+string (match entire) or regex
+</dd>
+<p></p>
+<dt><strong><a name="item_get_acchelp_hash_member"><code>get_accHelp</code> hash member</a></strong><br />
+</dt>
+<dd>
+string (match entire) or regex
+</dd>
+<p></p>
+<dt><strong><a name="item_get_accdefaultaction_hash_member"><code>get_accDefaultAction</code> hash member</a></strong><br />
+</dt>
+<dd>
+string (match entire) or regex
+</dd>
+<p></p>
+<dt><strong><a name="item_windowfromaccessibleobject_hash_member"><code>WindowFromAccessibleObject</code> hash member</a></strong><br />
+</dt>
+<dd>
+match an HWND number
+</dd>
+<p></p>
+<dt><strong><a name="item_visible_hash_member"><code>visible</code> hash member</a></strong><br />
+</dt>
+<dd>
+a true value to match only <a href="#visible">visible</a> objects.  (Use a false value
+to match only invisible objects. Omit the 'visible' key if you don't
+care whether the object is visible.)
+</dd>
+<p></p>
+<dt><strong><a name="item_state_has_and_state_lacks_hash_members"><code>state_has</code> and <code>state_lacks</code> hash members</a></strong><br />
+</dt>
+<dd>
+or'd state bits
+</dd>
+<p></p>
+<dt><strong><a name="item_role_in_or_role_not_in_hash_member"><code>role_in</code> or <code>role_not_in</code> hash member</a></strong><br />
+</dt>
+<dd>
+LIST of roles (each item in the list uses any ``{role}'' notation
+(above), but without the braces)
+</dd>
+<p></p>
+<dt><strong><a name="item_code_hash_member"><code>code</code> hash member</a></strong><br />
+</dt>
+<dd>
+a code-ref to call if the other hash keys match.
+Return a true value to indicate a match.
+</dd>
+<p></p></dl>
+<p>Sample window-tests:</p>
+<pre>
+ $b = $ao-&gt;match('Close'); # Is AO's name exactly Close?
+ $b = $ao-&gt;match( +{'get_accName'=&gt;'Close'} ); # ... using a hash.
+ 
+ $b = $ao-&gt;match(qr/Close/); # Does AO's name match that regexp?
+ $b = $ao-&gt;match( +{'get_accName'=&gt;qr/Close/} ); # ... using a hash.
+ 
+ $b = $ao-&gt;match('{ROLE_SYSTEM_PUSHBUTTON}Close'); # Is AO a pushbutton named Close?
+ $b = $ao-&gt;match('{push button}Close'); # ... using localized 'role text'
+ $b = $ao-&gt;match('{Pushbutton}Close'); # ... using ActAcc package name
+ $b = $ao-&gt;match( +{'get_accRole'=&gt;ROLE_SYSTEM_PUSHBUTTON(), 'name'=&gt;'Close'} ); # ...
+ $b = $ao-&gt;match( +{'rolename'=&gt;'Pushbutton', 'get_accName'=&gt;'Close'} ); # ...
+ 
+ $b = $ao-&gt;match
+   ( 
+    +{'code'=&gt;
+      sub
+      { 
+        my $ao = shift; 
+        return $ao-&gt;match( qr/Bankruptcy in progress/ );
+      } 
+     } 
+   ); 
+ 
+ $b = $ao-&gt;match( +{'visible'=&gt;1} );</pre>
+<p>There is more to the 'visible'=&gt;1 test than meets the eye..</p>
+<p>
+</p>
+<h2><a name="visible">visible</a></h2>
+<pre>
+ my $might_be_visible = $ao-&gt;visible();
+ my $same_thing       = $ao-&gt;match( +{'visible'=&gt;1} );</pre>
+<p>The <code>visible</code> function returns a true value if none of these
+reasons-for-being-invisible applies.</p>
+<ul>
+<li></li>
+State bit `invisible' or `offscreen' is set
+<p></p>
+<li></li>
+An ancestor's state includes `invisible' or `offscreen'. Note:
+<code>visible</code> does not call <code>get_accParent</code>, which may lead to a cycle
+in a buggy app, but instead relies on the cached weak-ref from the
+iterator that found this Accessible Object.
+<p></p>
+<li></li>
+Location is undefined (unless state includes 'focusable')
+<p></p>
+<li></li>
+Location is entirely negative
+<p></p>
+<li></li>
+Height or width is zero
+<p></p></ul>
+<p>The algorithm overlooks other reasons-for-being-invisible, such as
+occlusion and inconspicuousness.</p>
+<p>
+</p>
+<h2><a name="finding_accessible_objects_using__dig_">Finding Accessible Objects using 'dig'</a></h2>
+<p><code>dig</code> follows a path of <a href="#window_tests">Window Tests</a>, and returns what it
+finds.</p>
+<p>Depending on its scalar or list context, and <strong>min</strong> and <strong>max</strong> options,
+<code>dig</code> can perform various searches:</p>
+<dl>
+<dt><strong><a name="item_objects">Find all matching Accessible Objects (die if none)</a></strong><br />
+</dt>
+<dd>
+Use <code>dig</code> in array context without specifying options <code>min</code> or <code>max</code>.
+</dd>
+<p></p>
+<dt><strong>Find all matching Accessible Objects (if any)</strong><br />
+</dt>
+<dd>
+Use <code>dig</code> in array context, specifying option <code>min=0</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_object">Find first matching Accessible Object (die if none)</a></strong><br />
+</dt>
+<dd>
+Use <code>dig</code> in scalar context, specifying neither option <code>min</code> nor <code>max</code>, or specifying them both as 1.
+</dd>
+<p></p>
+<dt><strong>Find first matching Accessible Object (if any)</strong><br />
+</dt>
+<dd>
+Use <code>dig</code> in scalar context, specifying <code>min=0</code>.  If it finds no
+matching Accessible Object, <code>dig</code> returns <code>undef</code>.
+</dd>
+<p></p></dl>
+<p>The optional second parameter is a hash of options:</p>
+<dl>
+<dt><strong><a name="item__22min_22_option">``min'' option</a></strong><br />
+</dt>
+<dd>
+Find this many objects, or die.
+</dd>
+<p></p>
+<dt><strong><a name="item__22max_22_option">``max'' option</a></strong><br />
+</dt>
+<dd>
+Stop looking after finding this many objects.
+</dd>
+<p></p>
+<dt><strong><a name="item__22trace_22_option">``trace'' option</a></strong><br />
+</dt>
+<dd>
+If true, display the objects being examined.
+</dd>
+<p></p>
+<dt><strong><a name="item__22active_22_2c__22nav_22_2c_and__22perfunctory_22">``active'', ``nav'', and ``perfunctory'' options</a></strong><br />
+</dt>
+<dd>
+<code>dig</code> passes these along when it obtains an iterator for each
+Accessible Object it traverses.  <code>dig</code> sets the ``active'' flag unless
+the options hash specifies it as a non-true value.
+</dd>
+<p></p></dl>
+<p>Samples using <code>dig</code>:</p>
+<pre>
+ # Find one immediate child of $ao with role &quot;client&quot;; die if not found.
+ my $aoClient = $ao-&gt;dig( +[ '{client}' ] );
+ 
+ # Find one untitled Notepad within the Desktop's client area; die if not found.
+ my $someNewNotepad = Desktop()-&gt;
+   dig(+[ 
+         '{client}',                     # step 1
+         '{window}Untitled - Notepad'    # step 2
+        ]);
+ 
+ # Get results into a list: find *all* untitled Notepad
+ # windows in the Desktop's client area. Die if none found.
+ my @allNewNotepads1 = 
+   Desktop()-&gt;
+     dig(+[ 
+           '{client}',                   # step 12
+           '{window}Untitled - Notepad'  # step 2
+          ]);
+ 
+ # Find all untitled Notepads, using a regex to match their name.
+ my @allNewNotepads2 = 
+   Desktop()-&gt;
+     dig(+[ '{client}',                  # step 1
+            +{                           # step 2:
+              'get_accRole'=&gt;ROLE_SYSTEM_WINDOW(),
+              'get_accName'=&gt;qr/^Untitled - Notepad$/
+             }
+          ]);
+ 
+ # Find all untitled Notepads that contain an Application menubar.
+ my @allNewNotepads3 = 
+   Desktop()-&gt;
+     dig(+[ '{client}',                  # step 1
+            +{                           # step 2:
+              'get_accRole'=&gt;ROLE_SYSTEM_WINDOW(),
+              'get_accName'=&gt;qr/^Untitled - Notepad$/
+             },
+            +{                           # step 3:
+              'get_accRole'=&gt;ROLE_SYSTEM_MENUBAR(),
+              'get_accName'=&gt;'Application'
+             },
+            +{                           # step 4: back up!
+              'axis'=&gt;'parent'
+             },
+          ]);
+ 
+ # Find windows on desktop. Die if fewer than 2. Return at most 42.
+ my @upTo42Windows =
+   Desktop()-&gt;dig( +[
+                     '{client}',         # step 1
+                     '{window}'          # step 2
+                    ], 
+                   +{                    # options
+                     'min'=&gt;2,           #  -die unless at least 2
+                     'max'=&gt;42,          #  -shortcut after 42
+ 
+                     'trace'=&gt;1          #  -for troubleshooting
+                    } 
+                 );</pre>
+<p>The <code>active</code>, <code>nav</code>, and <code>perfunctory</code> options configure the
+iterator with which <code>dig</code> enumerates each Accessible Object's
+children in its quest for potential matches..</p>
+<p>
+</p>
+<h2><a name="more_on_iterators">More on Iterators</a></h2>
+<p>The default iterator uses both <code>AccessibleChildren</code> and <code>accNavigate</code>, 
+which is slow but works with many applications.</p>
+<pre>
+ my $iter = $ao-&gt;iterator();</pre>
+<p>Optional hints convey a preference for an iterator type, if it
+applies to the Accessible Object:</p>
+<pre>
+ # operate menus and outlines, treating consequences as children
+ my $iter = $ao-&gt;iterator( +{ 'active'=&gt;1 } );
+ 
+ # use AccessibleChildren
+ my $iter = $ao-&gt;iterator( +{ 'perfunctory'=&gt;1 } );
+ 
+ # use accNavigate
+ my $iter = $ao-&gt;iterator( +{ 'nav'=&gt;1 } );</pre>
+<p>For completeness, there is an iterator that uses <code>get_accChildCount</code>
+and <code>get_accChild</code>:</p>
+<pre>
+ my $iter = new Win32::ActAcc::get_accChildIterator($ao);</pre>
+<p>
+</p>
+<h2><a name="events">Events</a></h2>
+<p>Win32::ActAcc installs a system-wide in-process event hook upon the
+first call to <code>clearEvents</code>.  Thereafter, events stampede through
+a circular buffer.  You can watch by running <strong>aaEvents</strong>.</p>
+<p>All Perl processes share one event hook and one circular buffer, but
+each Perl process keeps its own independent pointer into the buffer.</p>
+<p><code>getEvent</code> retrieves one event from the circular buffer and
+advances the pointer:</p>
+<pre>
+ # Retrieve one event from circular buffer (if any there be).
+ my $anEvent = getEvent();
+ if (defined($anEvent))
+   {
+     print &quot;Event: $anEvent\n&quot;;
+   }</pre>
+<p>Scripts may <code>getEvent</code> in a loop to watch for a specific sentinel
+event.  Such a loop is included: <code>waitForEvent</code> consumes events
+until one satisfies a hash-of-criteria (sample in the Synopsis) or a
+code-ref:</p>
+<pre>
+ waitForEvent
+   (
+    sub
+    {
+      my $e = shift;
+      if ($$e{'event'} == EVENT_SYSTEM_FOREGROUND())
+        {
+          my $ao = $e-&gt;AccessibleObjectFromEvent(); # or getAO() for short
+          my $name = $ao-&gt;get_accName();
+          return $ao if ($name =~ qr/Notepad$/);
+        }
+      return undef;
+    },
+    # options:
+    +{
+      'timeout'=&gt;30, # seconds
+                     # (an hourglass buys a few more seconds)
+      'trace'=&gt;1 # display events as troubleshooting aid
+      # Tip: Don't turn off 'trace' until your script works!
+     }
+   )
+     or die(&quot;Notepad didn't come to foreground in the allotted time.&quot;);</pre>
+<p>To prevent a stale event from triggering the exit condition, call
+<code>clearEvents</code> before taking the action whose consequences the script
+will be looping in wait for.</p>
+<p>
+</p>
+<hr />
+<h1><a name="sample">SAMPLE</a></h1>
+<p>``eg\playpen.pl'' demonstrates using Active Accessibility to
+inspect and manipulate a menu, a popup menu, a text-entry blank, a
+checkbox, a radio button, a spin button, tabs, a list box, a
+tree-list, a two-column list view, and suchlike.</p>
+<p>Of course, playpen.pl depends on an application that presents such
+widgets.  The applets that come with Windows change too often, so
+playpen.pl uses a simple C# app whose source code is in eg\playpen.</p>
+<p>playpen.pl also depends on Win32::GuiTest.</p>
+<p>Build the playpen C# app, then invoke playpen.pl to explore it:</p>
+<pre>
+ &gt; vcvars32 || rem ember to put 'csc' on the path
+ &gt; cd eg\playpen
+ &gt; build.cmd
+ &gt; cd ..
+ &gt; perl playpen.pl</pre>
+<p>
+</p>
+<hr />
+<h1><a name="troubleshooting">TROUBLESHOOTING</a></h1>
+<p>If an Active Accessibility function unexpectedly returns <code>undef</code>,
+check Perl's Extended OS Error special variable <code>$^E</code> for clues.</p>
+<p>Run your script with ``perl -w''.</p>
+<p>If your script doesn't work, see whether the aadigger sample works.</p>
+<p>If you see Windows error 0x800401f0 (``CoInitialize has not been
+called''), make sure your script starts off with
+Win32::OLE-&gt;Initialize().</p>
+<p>If you get a Windows error number and want to know what it means,
+try using <code>Win32::FormatMessage</code>.</p>
+<p>If your script sometimes misses noticing an event that occurs very
+soon after your script calls <code>clearEvents()</code> for the first time,
+insert a <code>sleep</code> after that first <code>clearEvents()</code>.  Installing a
+WinEvent handler seems to take effect ``soon'', but not synchronously.</p>
+<p>If you are desperate enough to insert ``print'' statements:</p>
+<pre>
+ print &quot;The Accessible Object is: $ao\n&quot;; # shows several attributes
+ print &quot;same as: &quot;. $ao-&gt;describe() . &quot;\n&quot;;</pre>
+<pre>
+ $ao-&gt;debug_tree(); # display $ao and all its descendants</pre>
+<p>If you are struggling to find the right event or window-test for
+use with <code>waitForEvent</code>, <code>dig</code>, <code>tree</code>, or <code>menuPick</code>,
+try using the <code>trace</code> flag to evoke a lot of progress messages.
+Or, embed the interactive aadigger feature into your script:</p>
+<pre>
+ # invoke interactive explorer feature starting at $ao:
+ use Win32::ActAcc::aaExplorer;
+ Win32::ActAcc::aaExplorer::aaExplore($ao);</pre>
+<p>If <code>menuPick</code> doesn't work because your computer is too slow,
+increase the value of <code>$Win32::ActAcc::MENU_SLOWNESS</code>.  <code>menuPick</code>
+relies on a hover delay to give the app a chance to update a menu-item
+object's default action.</p>
+<p>If your script displays gibberish instead of Unicode text on the
+console, try writing to a file instead.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>It doesn't implement <code>get_accHelpTopic</code> and <code>accHitTest</code>.</p>
+<p><code>menuPick</code> doesn't know how to choose commands that hid
+because you seldom use them.</p>
+<p>You can't use a Win32::ActAcc ``Accessible Object'' with Win32::OLE.</p>
+<p>It probably doesn't work multi-threaded.</p>
+<p>Apps with a buggy <code>IAccessible</code> implementation may cause the Perl
+process to crash.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright 2000-2004, Phill Wolf.</p>
+<p><a href="mailto:pbwolf@cpan.org">pbwolf@cpan.org</a></p>
+
+</body>
+
+</html>

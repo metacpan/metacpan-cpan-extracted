@@ -1,0 +1,7 @@
+Revision history for Perl application Wx::App::Mastermind.
+
+0.02  Fri Sep  1 20:54:10 CEST 2006
+	- Adapt to the renaming of Games::Mastermind::Solver.
+
+0.01  Fri Aug 11 23:24:13 CEST 2006
+	- First public release

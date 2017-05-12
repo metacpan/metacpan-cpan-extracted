@@ -1,0 +1,67 @@
+{
+   "abstract" : "Interface for Eksisozluk.com",
+   "author" : [
+      "Kivanc Yazan"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Eksi",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "Mojo::DOM" : "0",
+            "URI" : "0",
+            "WWW::Lengthen" : "0",
+            "experimental" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kyzn/WWW-Eksi/issues"
+      },
+      "homepage" : "https://github.com/kyzn/WWW-Eksi",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kyzn/WWW-Eksi.git",
+         "web" : "https://github.com/kyzn/WWW-Eksi"
+      }
+   },
+   "version" : "0.26",
+   "x_contributors" : [
+      "Kivanc Yazan <kivancyazan@gmail.com>",
+      "Kivanc Yazan <kyzn@users.noreply.github.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

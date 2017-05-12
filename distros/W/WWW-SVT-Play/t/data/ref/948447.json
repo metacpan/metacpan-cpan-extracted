@@ -1,0 +1,21 @@
+{
+   "filename" : "svt-play.kultur-och-nöje.lunds-humorfestival.hela-program.late-night-at-lunds-humorfestival",
+   "streams" : [
+      {
+         "url" : "http://svtplay2k-f.akamaihd.net/z/world/open/20130109/1322834-001A/LUNDS_HUMORFEST-001A-2bc4c7edcd4b202b_,900,320,420,620,1660,2760,.mp4.csmil/manifest.f4m",
+         "type" : "hds"
+      },
+      {
+         "url" : "http://svtplay2k-f.akamaihd.net/i/world/open/20130109/1322834-001A/LUNDS_HUMORFEST-001A-2bc4c7edcd4b202b_,900,320,420,620,1660,2760,.mp4.csmil/master.m3u8",
+         "type" : "hls"
+      }
+   ],
+   "ppurl" : "http://www.svtplay.se/lunds-humorfestival?output=json",
+   "url" : "http://www.svtplay.se/video/948447/",
+   "title" : "Late night at Lunds Humorfestival",
+   "duration" : 3490,
+   "subtitles" : [
+      "http://media.svt.se/download/mcc/wp3/undertexter-wsrt/1322834/EPISOD-1322834-001A-wsrt-2bc4c7edcd4b202b.wsrt"
+   ]
+}
+

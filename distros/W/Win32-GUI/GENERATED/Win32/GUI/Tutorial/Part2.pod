@@ -1,0 +1,167 @@
+
+=head1 NAME
+
+Win32::GUI::Tutorial::Part2 - Adding Functionality
+
+=head1 Win32::GUI Tutorial - Part 2
+
+=head2 Some more control types
+
+In part 1 of this tutorial, we covered the basics of Win32::GUI programming,
+using a simple label control to display information. But real-world
+applications don't just display information as labels. We need to be able to
+obtain information from the user, respond to mouse clicks, etc etc.
+
+Some of the basic Windows controls supported by Win32::GUI include
+
+=over
+
+=item * Buttons, for taking actions.
+
+=item * Edit boxes, for data entry.
+
+=item * Checkboxes, for selecting options from a list.
+
+=item * Radio buttons, for choosing from mutually exclusive options.
+
+=item * Combo boxes and list boxes, for selection from lists.
+
+=item * And many other more complex controls, such as list views, tree views, status bars, tab strips, etc.
+
+=back
+
+We have already covered nearly all of the programming techniques for using
+these controls in our discussion of the label control in part 1. The following
+section summarises the basic controls available, and any important issues
+regarding their use. Armed with this and the main Win32::GUI documentation, it
+should be possible to develop reasonably complex applications.
+
+=head2 Summary of the Available Controls
+
+For this part of the tutorial, we will use a very basic "framework"
+application, to which we can add functionality. We won't worry about issues
+like positioning, layout, resizing, etc, as these will only distract from the
+main point, which is the control handling.
+
+So, our basic application is
+
+    use Win32::GUI();
+
+    $main = Win32::GUI::Window->new(-name => 'Main', -text => 'Perl',
+				    -width => 200, -height => 200);
+
+    $main->Show();
+    Win32::GUI::Dialog();
+
+    sub Main_Terminate {
+	-1;
+    }
+
+Now, the basic approach to adding any control to a window is the same. We saw
+it before, when we added a label. We simply use the window's AddXXX() method,
+where C<XXX> is the control type we want to add. So, we have, AddButton(),
+AddTextfield(), AddCheckbox(), AddCombobox(), AddListbox(), AddRadioButton(),
+etc.
+
+All of these methods work the same way, in that they take a series of options,
+which define the appearance and behaviour of the control. Many of the options
+are common to all Win32::GUI controls (such as C<-width> and C<-height>) but a
+few are control-specific.
+
+The controls themselves support events, much like the main window with its
+C<Terminate> event. Events are control-specific, but tend to be fairly general
+(many controls have a C<Click> event, which occurs when the user clicks the
+mouse on the control, for example).
+
+=head2 Some control-specific issues
+
+=over
+
+=item Labels
+
+None. We saw labels in some detail in the last part of this tutorial. Most of
+what we learnt applies equally to all other controls.
+
+=item Buttons
+
+None. To make a button do something, add a handler for the C<Click> event.
+
+=item Check Boxes
+
+To get or set the "checked" state, use the Checked() method. There are three
+states - unchecked (0), checked (1) and indeterminate or grayed (2). Use the
+C<Click> event to respond to changes in state.
+
+=item Text Fields
+
+To get or set the contents of the text field, use the C<-text> option. The
+C<-multiline> option allows entry of more than one line of text (but beware -
+the C<-text> option contains a CRLF sequence ("\r\n") at the end of each line,
+not just LF ("\n") as is normal for Perl. See the documentation for the
+C<-prompt> option to automatically add a label to a text field.
+
+=item Progress Bars
+
+A display-only control. Set the parameters with the SetRange() and SetStep()
+methods, and update the display using the SetPos() or StepIt() methods.
+
+=item List Boxes
+
+By default, there are no items in the list. Fill the list box using the
+AddString() method. Get the selected item using the SelectedItem() method.
+Multiple-selection listboxes are created using the C<-multisel> option -- in
+that case, use the SelectedItems() method to get a list of all the selected
+items.
+
+=item Combo Boxes
+
+Similar to single-selection list boxes (although they display differently).
+
+=item UpDown Controls
+
+This is the little double-arrow control you often see attached to numeric text
+fields in dialog boxes. Clicking the up arrow increases the value of the text
+field, whereas clicking the down arrow decreases it.
+
+The only significant complication with using an UpDown control is the need to
+associate it with a text box. This is done using the Buddy() method, as
+
+    $updown->Buddy($text)
+
+Methods exist to set the range of values for the control, and to explicitly
+set the value of the control. The control supports a C<Scroll> event, which is
+fired when the control value changes (but not when the associated text box
+changes!) The UpDown control's size is ignored, as it is attached to its buddy
+when it is created.
+
+=back
+
+This covers the basic controls available in Win32::GUI. In L<part 3|Win32::GUI::Tutorial::Part3>, we will
+cover some of the subtleties of dialog boxes and main windows, and then in
+L<part 4|Win32::GUI::Tutorial::Part4>, we will be ready to cover some of the more complex user interface
+options.
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/Tutorial/Part2.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

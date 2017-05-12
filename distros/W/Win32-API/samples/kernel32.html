@@ -1,0 +1,793 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>Win32::kernel32 - Experimental interface to some of the KERNEL32.DLL functions
+
+</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#FUNCTIONS">FUNCTIONS</A>
+	<UL>
+
+				<LI><A HREF="#Beep">Beep</A>
+				<LI><A HREF="#CopyFile">CopyFile</A>
+				<LI><A HREF="#GetBinaryType">GetBinaryType</A>
+				<LI><A HREF="#GetCompressedFileSize">GetCompressedFileSize</A>
+				<LI><A HREF="#GetCommandLine">GetCommandLine</A>
+				<LI><A HREF="#GetCurrencyFormat">GetCurrencyFormat</A>
+				<LI><A HREF="#GetDiskFreeSpace">GetDiskFreeSpace</A>
+				<LI><A HREF="#GetDriveType">GetDriveType</A>
+				<LI><A HREF="#GetTempPath">GetTempPath</A>
+				<LI><A HREF="#GetVolumeInformation">GetVolumeInformation</A>
+				<LI><A HREF="#MultiByteToWideChar">MultiByteToWideChar</A>
+				<LI><A HREF="#QueryPerformanceCounter">QueryPerformanceCounter</A>
+				<LI><A HREF="#QueryPerformanceFrequency">QueryPerformanceFrequency</A>
+				<LI><A HREF="#SearchPath">SearchPath</A>
+				<LI><A HREF="#SetLastError">SetLastError</A>
+				<LI><A HREF="#Sleep">Sleep</A>
+				<LI><A HREF="#VerLanguageName">VerLanguageName</A>
+				<LI><A HREF="#WideCharToMultiByte">WideCharToMultiByte</A>
+				<LI><A HREF="#Yet_to_be_documented">Yet to be documented</A>
+			</UL>
+
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+Win32::kernel32 - Experimental interface to some of the KERNEL32.DLL
+functions
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+<PRE>  use Win32::kernel32;
+</PRE>
+
+<P>
+
+<PRE>  # or
+</PRE>
+
+<P>
+
+<PRE>  use Win32::kernel32 qw( Sleep CopyFile GetVolumeInformation );
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="FUNCTIONS">FUNCTIONS
+
+</A></H1>
+<P>
+<HR>
+<H4><A NAME="Beep">Beep
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::Beep ( [FREQUENCY, DURATION] )
+</PRE>
+
+<P>
+
+Plays a simple tone on the speaker; <CODE>FREQUENCY</CODE> is expressed in hertz and ranges from 37 to 32767, <CODE>DURATION</CODE> is expressed in milliseconds. Note that parameters are relevant only on
+Windows NT; on Windows 95, parameters are ignored and the system plays the
+default sound event (or a standard system beep on the speaker if you have
+no sound card).
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    Win32::Beep(440, 1000);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="CopyFile">CopyFile
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::CopyFile ( SOURCE, TARGET, [SAFE] )
+</PRE>
+
+<P>
+
+Copies the <CODE>SOURCE</CODE> file to <CODE>TARGET</CODE>. By default, it fails if <CODE>TARGET</CODE> already exists; to overwrite the already existing file, the <CODE>SAFE</CODE> flag must be set to 0. Returns a true value if the operation was
+successfull, a false one if it failed.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    if(Win32::CopyFile($from, $to)) {
+        print &quot;Copy OK.\n&quot;;
+    } else {
+        # overwrite the already existing file
+        if(Win32::CopyFile($from, $to, 0)) {
+            print &quot;Copy OK, file replaced.\n&quot;;
+        } else {
+            print &quot;Copy failed.\n&quot;;
+        }
+    }
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetBinaryType">GetBinaryType
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetBinaryType ( FILENAME )
+</PRE>
+
+<P>
+
+Returns the type ot the executable file <CODE>FILENAME</CODE>. Possible values are:
+
+
+<P>
+
+<PRE>    0   A Win32 based application
+    1   An MS-DOS based application
+    2   A 16-bit Windows based application
+    3   A PIF file that executes an MS-DOS based application
+    4   A POSIX based application
+    5   A 16-bit OS/2 based application
+</PRE>
+
+<P>
+
+If the function fails, <CODE>undef</CODE> is returned.
+
+
+<P>
+
+<STRONG>Note</STRONG>: this function is available on Windows NT only.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print &quot;Notepad is a type &quot;, Win32::GetBinaryType(&quot;c:\\winnt\\notepad.exe&quot;), &quot;\n&quot;;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetCompressedFileSize">GetCompressedFileSize
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetCompressedFileSize ( FILENAME )
+</PRE>
+
+<P>
+
+Returns the compressed size of the specified <CODE>FILENAME</CODE>, if the file is compressed; if it's not compressed, it returns the normal
+file size (eg. same as <CODE>-s</CODE>).
+
+
+<P>
+
+<STRONG>Note</STRONG>: this function is available on Windows NT only.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print Win32::GetCompressedFileSize(&quot;c:\\documents\\longlog.txt&quot;);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetCommandLine">GetCommandLine
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetCommandLine ( )
+</PRE>
+
+<P>
+
+Returns the complete command line string, including the full path to the
+program name and its arguments.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print Win32::GetCommandLine();
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetCurrencyFormat">GetCurrencyFormat
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetCurrencyFormat ( NUMBER, [LOCALE] )
+</PRE>
+
+<P>
+
+Returns <CODE>NUMBER</CODE> formatted to your locale's currency settings. You can optionally supply a
+different <CODE>LOCALE</CODE> for foreign currencies.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print &quot;You owe me &quot;, Win32::GetCurrencyFormat(rand()*10000), &quot;\n&quot;;
+</PRE>
+
+<P>
+
+<PRE>    # ten millions italian lires...
+    $LotOfMoney = Win32::GetCurrencyFormat(10000000, 1040);
+</PRE>
+
+<P>
+
+<PRE>    # 1040 is &quot;Italian (Standard)&quot; (see also VerLanguageName)
+    # and it returns: L. 10.000.000
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetDiskFreeSpace">GetDiskFreeSpace
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetDiskFreeSpace ( [ROOT] )
+</PRE>
+
+<P>
+
+Returns the amount of free disk space on the drive indicated by <CODE>ROOT</CODE>; if this is omitted, uses the current drive. To specify a drive, you must
+provide the exact root directory (eg. for drive C: it must be: ``C:\''). In
+a scalar context, it returns the number of free bytes; in a list context,
+it returns the number of free bytes and the total number of bytes on the
+disk.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $free = Win32::GetDiskFreeSpace(&quot;c:\\&quot;);
+    ($free, $total) = Win32::GetDiskFreeSpace();
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetDriveType">GetDriveType
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetDriveType ( [ROOT] )
+</PRE>
+
+<P>
+
+Returns the type ot the drive indicated by <CODE>ROOT</CODE>. If this is omitted, uses the current drive. To specify a drive, you must
+provide the exact root directory (eg. for drive C: it must be: ``C:\'').
+Possible return values are:
+
+
+<P>
+
+<PRE>    0   The drive type cannot be determined
+    1   The root directory does not exist
+    2   The disk can be removed from the drive
+    3   The disk cannot be removed from the drive
+    4   The drive is a remote (network) drive
+    5   The drive is a CD-ROM drive
+    6   The drive is a RAM disk
+</PRE>
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print &quot;C: is a type &quot;, Win32::GetDriveType(&quot;c:\\&quot;), &quot;\n&quot;;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetTempPath">GetTempPath
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetTempPath ( )
+</PRE>
+
+<P>
+
+Returns the path of the directory designated for temporary files, or <CODE>undef</CODE> on errors.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print &quot;Please put your temp files in &quot;, Win32::GetTempPath(), &quot;\n&quot;;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="GetVolumeInformation">GetVolumeInformation
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::GetVolumeInformation ( [ROOT] )
+</PRE>
+
+<P>
+
+Returns a 5-elements array with some information about the drive indicated
+by <CODE>ROOT</CODE>. If this is omitted, uses the current drive. Typically used as follows:
+
+
+<P>
+
+<PRE>    ($label, $serial, $maxlen, $flags, $fstype) = Win32::GetVolumeInformation();
+</PRE>
+
+<P>
+
+Here are the meaning of the fields:
+
+
+<P>
+
+<PRE>    label   the volume label
+    serial  the volume serial number
+    maxlen  the maximum filename length, in chars, supported by the volume
+    flags   a set of flags associated with the file system
+    fstype  the type of the file system (such as FAT or NTFS)
+</PRE>
+
+<P>
+
+For more information about the <CODE>flags</CODE> field, please refer to the <CODE>GetVolumeInformation()</CODE>
+documentation in the Microsoft Win32 SDK Reference.
+
+
+<P>
+
+If called in a scalar context, the function returns only the first element
+(the volume label).
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $volume = Win32::GetVolumeInformation();
+    print &quot;Working on $volume...&quot;;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="MultiByteToWideChar">MultiByteToWideChar
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::MultiByteToWideChar ( STRING, [CODEPAGE] )
+</PRE>
+
+<P>
+
+Converts a <CODE>STRING</CODE> in Unicode format. The additional
+<CODE>CODEPAGE</CODE> parameter can have one of this values:
+
+
+<P>
+
+<PRE>    0   ANSI codepage
+    1   OEM codepage
+    2   MAC codepage
+</PRE>
+
+<P>
+
+Or the number of a codepage installed on your system (eg. 850 for ``MS-DOS
+Multilingual (Latin I)''). The default, if none specified, is the ANSI
+codepage. Returns the converted string or <CODE>undef</CODE> on errors.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $UnicodeString = Win32::MultiByteToWideChar($string);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="QueryPerformanceCounter">QueryPerformanceCounter
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::QueryPerformanceCounter ( )
+</PRE>
+
+<P>
+
+Retrieves the current value of the high-resolution performance counter, if
+it exists. Returns zero if it doesn't. To see how many times per second the
+counter is incremented, use <CODE>QueryPerformanceFrequency</CODE>.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $freq = Win32::QueryPerformanceFrequency();
+    $count1 = Win32::QueryPerformanceCounter();
+    # do something
+    $count2 = Win32::QueryPerformanceCounter();
+    print ($count2-$count1)/$freq , &quot; seconds elapsed.\n&quot;;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="QueryPerformanceFrequency">QueryPerformanceFrequency
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::QueryPerformanceFrequency ( )
+</PRE>
+
+<P>
+
+Returns the frequency of the high-resolution performance counter, if it
+exists. Returns zero if it doesn't. See also <CODE>QueryPerformanceCounter</CODE>.
+
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="SearchPath">SearchPath
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::SearchPath ( FILENAME )
+</PRE>
+
+<P>
+
+Search for the specified <CODE>FILENAME</CODE> in the path. The following directories are searched:
+
+
+<P>
+
+<PRE>    1. the directory from which the application loaded.
+    2. the current directory
+    3. the Windows system directory
+    4. the Windows directory
+    5. the directories in the PATH environment variable
+</PRE>
+
+<P>
+
+Returns the full path to the found file or <CODE>undef</CODE>
+if the file was not found.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    print &quot;Notepad exists&quot; if -f Win32::SearchPath(&quot;notepad.exe&quot;);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="SetLastError">SetLastError
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::SetLastError ( VALUE )
+</PRE>
+
+<P>
+
+Sets the Win32 last error to the specified <CODE>VALUE</CODE>.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    # reset pending errors
+    Win32::SetLastError(0);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="Sleep">Sleep
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::Sleep ( MILLISECONDS )
+</PRE>
+
+<P>
+
+Sleeps for the number of <CODE>MILLISECONDS</CODE> specified.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    # sleep for 1/2 second
+    Win32::Sleep(500);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="VerLanguageName">VerLanguageName
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::VerLanguageName ( LOCALE )
+</PRE>
+
+<P>
+
+Returns a descriptive string for the language associated with the specified <CODE>LOCALE</CODE>.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $ITA = Win32::VerLanguageName(1040);
+    $JAP = Win32::VerLanguageName(1041);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="WideCharToMultiByte">WideCharToMultiByte
+
+</A></H4>
+Syntax:
+
+
+<P>
+
+<PRE>    Win32::WideCharToMultiByte ( STRING, [CODEPAGE] )
+</PRE>
+
+<P>
+
+Converts an Unicode <CODE>STRING</CODE> to a non-Unicode one. The additional
+<CODE>CODEPAGE</CODE> parameter can have one of this values:
+
+
+<P>
+
+<PRE>    0   ANSI codepage
+    1   OEM codepage
+    2   MAC codepage
+</PRE>
+
+<P>
+
+Or the number of a codepage installed on your system (eg. 850 for ``MS-DOS
+Multilingual (Latin I)''). The default, if none specified, is the ANSI
+codepage. Returns the converted string or <CODE>undef</CODE> on errors.
+
+
+<P>
+
+Example:
+
+
+<P>
+
+<PRE>    $string = Win32::WideCharToMultiByte($UnicodeString);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H4><A NAME="Yet_to_be_documented">Yet to be documented
+
+</A></H4>
+<PRE>    GetSystemTime        =&gt; [[P], V],
+    QueryDosDevice       =&gt; [[P, P, N], N],
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+Aldo Calpini ( <EM>dada@divinf.it</EM> ).
+
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

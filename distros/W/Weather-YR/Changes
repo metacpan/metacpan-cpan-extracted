@@ -1,0 +1,75 @@
+Revision history for Perl extension Weather::YR.
+
+0.38  2016-05-27
+    - Fixed an error in the documentation.
+
+0.37  2016-05-27
+    - Changed to use the new end point URL; http://api.met.no/
+    - Replaced XML::Bare with XML::Simple.
+    - Misc. code cleanup.
+
+0.36  2015-04-17
+    - Fix: Pass on the 'ua' parameter to Weather::Yr::Base when instantiating
+      the YR object.
+
+0.35  2015-02-12
+    - The 'ua' parameter can now be anything, as long as it is compatible
+      with the LWP::UserAgent API.
+
+0.34  2015-01-13
+    - Better error-handling when creating datapoints.
+    - Removed alpha status; current API is OK to use in production.
+
+0.33  2015-01-08
+    - Added XML schema validation for location forecast.
+
+0.32  2014-08-25
+    - Improved the documentation.
+
+0.31  2014-08-21
+    - Weather::YR now requires Perl version 5.10 or later.
+    - Added support for accessing wind directions and wind speeds for any
+      given day.
+    - Added support for accessing humidity for any given day.
+    - Added support for accessing (air) pressure for any given day.
+    - Added support for accessing cloudiness for any given day.
+    - Added support for accessing fog for any given day.
+    - Added support for accessing dew point temperature for any given day.
+    - Added support for accessing wind and temperature probability for any
+      given data point.
+
+0.30  2014-08-20
+    - Module rewritten from scratch for better extensibility.
+
+0.25  2012-01-20
+    - Fix: CPAN issue #74112: Misuse of length on array.
+
+0.24  2011-12-18
+    - Fix: YR API Location Forecast updated to version 1.8.
+    - Fix: YR API Text Forecast updated to version 1.5.
+
+0.23  2010-05-13
+    - Fix: Missing dependency declaration on Class::Accessor::Fast.
+    - Fix: Configuration overrides were leaking when multiple forecast modules are used.
+
+0.22  2008-05-29
+    - Fix: Added prerequisites to Makefile.PL.
+
+0.21  2008-05-26
+    - Fix: Wrong package names in SEE ALSO.
+    - Fix: Missing SYNOPSIS of central packages.
+
+0.20  2008-05-24
+    - Rebranded from YR to Weather::YR.
+
+0.11  2008-04-30
+    - Added LICENSE file for GPL2.
+    - Updated README file.
+    - Added YR library version to web client user agent.
+
+0.10  2008-04-30
+    - Support for web service locationforecast.
+    - Support for web service textforecast.
+
+0.01  2008-03-17
+    - Original version.

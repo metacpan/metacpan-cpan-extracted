@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Search-UrbanDictionary
+version:      0.4
+version_from: lib/WWW/Search/UrbanDictionary.pm
+installdirs:  site
+requires:
+    SOAP::Lite:                    0
+    Test::More:                    0
+    WWW::Search:                   0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

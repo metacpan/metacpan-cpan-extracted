@@ -1,0 +1,42 @@
+---
+abstract: "A communication layer for talking to Let's Encrypt"
+author:
+  - 'Michael Ballard <michael.ballard@dreamhost.com>'
+build_requires:
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Mock: '0'
+  Test2::Tools::Exception: '0'
+  Test2::Tools::Mock: '0'
+  Test2::Tools::Subtest: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-LetsEncrypt
+requires:
+  Carp: '0'
+  Crypt::OpenSSL::Bignum: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Digest::SHA: '0'
+  HTTP::Request: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/mjballard/perl-www-letsencrypt/issues
+  repository: https://github.com/mjballard/perl-www-letsencrypt/
+version: '0.002'

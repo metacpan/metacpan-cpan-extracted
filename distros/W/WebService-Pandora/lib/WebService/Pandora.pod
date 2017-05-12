@@ -1,0 +1,515 @@
+=head1 NAME
+
+WebService::Pandora - Pandora WebService API
+
+=head1 SYNOPSIS
+
+  use WebService::Pandora;
+
+  $websvc = WebService::Pandora->new( username => 'emailaddress',
+                                      password => 'password' );
+
+  $websvc->login() or die( $websvc->error() );
+
+  $result = $websvc->getStationList();
+
+  die( $websvc->error() ) if ( !$result );
+
+  $stations = $result->{'stations'};
+
+  foreach $station ( @$stations ) {
+
+    print "stationToken: $station->{'stationToken'}\n";
+  }
+
+  # get a new list of tracks to play from one of my stations
+  $result = $websvc->getPlaylist( stationToken => 'token' );
+
+  die( $websvc->error() if ( !$result );
+
+  $tracks = $result->{'items'};
+
+  foreach $track ( @$tracks ) {
+
+    print "trackToken: $track->{'trackToken'}\n";
+
+    # you can download/play the song at this URL
+    $url = $track->{'audioUrl'};
+  }
+
+  # this track sucked, thumbs down!
+  $result = $websvc->addFeedback( trackToken => 'token',
+                                  isPositive => 0 );
+
+=head1 DESCRIPTION
+
+B<WebService::Pandora> is a module to communicate with the Pandora (L<http://www.pandora.com>) JSON API.
+The API is not officially published, and has a few oddities, but was reverse engineered and documented at
+L<http://pan-do-ra-api.wikia.com/wiki/Pan-do-ra_API_Wiki>.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Creates a new B<WebService::Pandora> object with the arguments given.  The B<username> and B<password>
+arguments are currently required.  The B<partner> option defaults to B<WebService::Pandora::Partner::iOS>,
+but any B<WebService::Pandora::Partner> object may be given.  The B<timeout> option is passed to the
+underlying B<LWP::UserAgent> object, and defaults to 10 (seconds).
+
+  $websvc = WebService::Pandora->new( username => 'emailaddress',
+                                      password => 'password',
+                                      timeout => 10,
+                                      partner => WebService::Pandora::Partner::iOS->new() );
+
+=head1 METHODS
+
+All methods will return a false value if they weren't given the proper arguments, if there was an HTTP
+communication error, or if the Pandora API returned an error.  Use the B<error()> method to get an
+error message describing the failure.
+
+=head2 login
+
+Returns a true or false value if the login was successful.  Internally, this will execute both the
+B<auth.partherLogin> and B<auth.userLogin> API methods.  The provided partner, username, and password
+to the constructor are all used.  This must be called before any other methods will succeed.
+
+  $success = $websvc->login() or die( $websvc->error() );
+
+=head2 error
+
+Returns a string containing a message about why the last method call failed.  The error string may
+come from internally in the module, from a failed HTTP request, or from the Pandora API itself.
+
+=head2 getBookmarks
+
+Executes the B<user.getBookmarks> method, returning a hashref containing the artists and songs that
+the user has bookmarked, or a false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->getBookmarks() or die( $websvc->error() );
+
+  $artists = $result->{'artists'};
+  $songs = $result->{'songs'};  
+
+=head2 getStationList
+
+Executes the B<user.getStationList> method, returning a hashref containing all of the stations of the
+user, or a false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->getStationList() or die( $websvc->error() );
+  $stations = $result->{'stations'};
+
+=head2 getStationListChecksum
+
+Executes the B<user.getStationListChecksum> method, returning a hashref containing a checksum value,
+or a false value on failure.  I do not know what the point of this method is.  Must be called after
+the B<login()> method.
+
+  $result = $websvc->getStationListChecksum() or die( $websvc->error() );
+  $checksum = $result->{'checksum'};
+
+=head2 getStation
+
+Executes the B<station.getStation> method, returning a hashref containing several attributes about
+the station, identified by the provided B<stationToken> argument, or will return a false value on
+failure.  If the B<includeExtendedAttributes> option is given with a true value, additional
+attributes, such as all of the songs that have feedback in this station, will be returned as well.
+Must be called after the B<login()> method.
+
+  $result = $websvc->getStation( stationToken => "token",
+                                 includeExtendedAttributes => 1 ) or die( $websvc->error() );
+  $name = $websvc->{'stationName'};
+
+=over 4
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> method.
+
+=item includeExtendedAttributes =E<gt> BOOLEAN [optional]
+
+Whether or not to include additional information about the station.  Defaults to false.
+
+=back
+
+=head2 getGenreStations
+
+Executes the B<station.getGenreStations> method, returning a hashref containing the information
+about the predefined stations according to genre, or will return a false value on failure.  Must
+be called after the B<login()> method.
+
+  $result = $websvc->getGenreStations() or die( $websvc->error() );
+  $categories = $result->{'categories'};
+
+=head2 getGenreStationsChecksum
+
+Executes the B<station.getGenreStationsChecksum> method, returning a hashref containing a
+checksum value, or a false value on failure.  I do not know what the point of this method is.
+Must be called after the B<login()> method.
+
+  $result = $websvc->getGenreStationsChecksum() or die( $websvc->error() );
+  $checksum = $result->{'checksum'};
+
+=head2 search
+
+Executes the B<music.search> method, returning a hashref containing the songs and artists
+that match the provided B<searchText> argument, or a false value on failure.  Must be called
+after the B<login()> method.
+
+  $result = $websvc->search( searchText => "query" ) or die( $websvc->error() );
+
+  $songs = $result->{'songs'};
+  $artists = $result->{'artists'};
+
+=over 4
+
+=item searchText =E<gt> STRING [required]
+
+The search query to find matching songs and artists for.
+
+=back
+
+=head2 getPlaylist
+
+Executes the B<station.getPlaylist> method, returning a hashref containing the tracks and
+their URLs for the provided B<stationToken>, which can be used to download or play the song,
+or a false value on failure.  Must be called after the B<login()> method.
+
+B<You may only execute this method a certain number of times within a particular timeframe,
+or Pandora will deny the request, and this method will thus return an error.>
+
+  $result = $websvc->getPlaylist( stationToken => "token" ) or die( $websvc->error() );
+  $songs = $result->{'items'};
+
+=over 4
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> method.
+
+=back
+
+=head2 explainTrack
+
+Executes the B<track.explainTrack> method, returning a hashref containing all of the
+explanations of the traits of the song, provided by the B<trackToken> argument, or will
+return a false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->explainTrack( trackToken => 'token' ) or die( $websvc->error() );
+
+=over 4
+
+=item trackToken =E<gt> STRING [required]
+
+The unique token of the track, which can be obtained via the B<getPlaylist()> and other
+methods.
+
+=back
+
+=head2 addArtistBookmark
+
+Executes the B<bookmark.addArtistBookmark> method, returning a hashref containing the
+information of the artist and the new bookmark, provided by the B<trackToken> argument,
+or will return a false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->addArtistBookmark( trackToken => 'token' ) or die( $websvc->error() );
+  $bookmarkToken = $result->{'bookmarkToken'};
+
+=over 4
+
+=item trackToken =E<gt> STRING [required]
+
+The unique token of the track, which can be obtained via the B<getPlaylist()> and other
+methods.
+
+=back
+
+=head2 addSongBookmark
+
+Executes the B<bookmark.addSongBookmark> method, returning a hashref containing the
+information of the song and the new bookmark, provided by the B<trackToken> argument,
+or will return a false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->addSongBookmark( trackToken => 'token' ) or die( $websvc->error() );
+  $bookmarkToken = $result->{'bookmarkToken'};
+
+=over 4
+
+=item trackToken =E<gt> STRING [required]
+
+The unique token of the track, which can be obtained via the B<getPlaylist()> and other
+methods.
+
+=back
+
+=head2 addFeedback
+
+Executes the B<station.addFeedback> method, returning a hashref containing the information
+of the song and the new feedback record, provided by the B<trackToken> argument, or will
+return a false value on failure.  If the given B<isPositive> argument is a true falue, the
+song will be given a "thumbs up", otherwise a false value will give it a "thumbs down."
+Must be called after the B<login()> method.
+
+  $result = $websvc->addFeedback( trackToken => "token",
+                                  isPositive => 1 ) or die( $websvc->error() );
+  $feedbackId = $result->{'feedbackId'};
+
+=over 4
+
+=item trackToken =E<gt> STRING [required]
+
+The unique token of the track, which can be obtained via the B<getPlaylist()> and other
+methods.
+
+=item isPositive =E<gt> BOOLEAN [required]
+
+A true value will give the track a "thumbs up" and a false value will give it a "thumbs
+down."
+
+=back
+
+=head2 sleepSong
+
+Executes the B<user.sleepSong> method, returning a true value if the song was
+successfully put to sleep, provided by the B<trackToken> argument, or will return a false
+value on failure.  This prevents the song from being played again for 30 days.
+
+  $result = $websvc->sleepSong( trackToken => "token" ) or die( $websvc->error() );
+
+=over 4
+
+=item trackToken =E<gt> STRING [required]
+
+The unique token of the track, which can be obtained via the B<getPlaylist()> and other
+methods.
+
+=back
+
+=head2 deleteFeedback
+
+Executes the B<station.deleteFeedback> method, returning a true value if the feedback
+was successfully deleted, or a false value on failure.  Must be called after the
+B<login()> method.
+
+  $result = $websvc->deleteFeedback( feedbackId => "id" ) or die( $websvc->error() );
+
+=over 4
+
+=item feedbackId =E<gt> STRING [required]
+
+The id of the feedback, which can be obtained via the B<getStation()> and other methods.
+
+=back
+
+=head2 addMusic
+
+Executes the B<station.addMusic> method, returning a hashref containing the information of
+the song or artist, provided by the B<musicToken> argument, or will return a false value on
+failure.  The additional music seed is added to the specified station via the
+B<stationToken> argument.  A B<musicToken> can be obtained via the B<search()> method.
+Must be called after the B<login()> method.
+
+  $result = $websvc->addMusic( musicToken => 'token',
+                               stationToken => 'token' ) or die( $websvc->error() );
+  $seedId = $result->{'seedId'};
+
+=over 4
+
+=item musicToken =E<gt> STRING [required]
+
+The unique token of the artist or song, which can be obtained via the B<search()> and
+other methods.
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> and
+other methods.
+
+=back
+
+=head2 deleteMusic
+
+Executes the B<station.deleteMusic> method, returning a true value if the music was
+successfully deleted, or a false value on failure.  Must be called after the B<login()>
+method.
+
+  $result = $websvc->deleteMusic( seedId => 'id' ) or die( $websvc->error() );
+
+=over 4
+
+=item seedId =E<gt> STRING [required]
+
+The id of the music seed associated to the station, which can be obtained via the
+B<getStation()> and other methods.
+
+=back
+
+=head2 canSubscribe
+
+Executes the B<user.canSubscribe> method, returning a hashref containing the information
+about whether the user is able to subscribe to Pandora One or not, or will return a false
+value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->canSubscribe() or die( $websvc->error() );
+
+  $canSubscribe = $result->{'canSubscribe'};
+  $isSubscriber = $result->{'isSubscriber'};
+
+=head2 createStation
+
+Executes the B<station.createStation> method, returning a hashref containing the
+information about the created station, provided by either the B<musicToken> or the
+B<trackToken> arguments, or will return a false value on failure.  A station can be
+created by either a track or an artist, which must be specified via the B<musicType>
+argument.  Must be called after the B<login()> method.
+
+  $result = $websvc->createStation( musicToken => "token",
+                                    musicType => "song" ) or die( $websvc->error() );
+
+  $result = $websvc->createStation( trackToken => "token",
+                                    musicType => "artist" ) or die( $websvc->error() );
+
+=over 4
+
+=item musicType =E<gt> "song" | "artist" [required]
+
+Specifies whether the station should be based upon the provided song or artist via
+either the B<musicToken> or B<trackToken> arguments, whichever is given.
+
+=item musicToken =E<gt> STRING [optional]
+
+The token, generally obtained via the B<search()> method, of either the song or artist
+to create a station from.  Either this or the B<trackToken> argument must be given.
+
+=item trackToken =E<gt> STRING [optional]
+
+The token, generally obtained via the B<getPlaylist()> method, of either the song or
+artist to create a station from.  Either this or the B<musicToken> argument must be
+given.
+
+=back
+
+=head2 renameStation
+
+Executes the B<station.renameStation> method, returning a hashref containing the new
+information about the station, provided by the B<stationToken> argument, or will return
+a false value on failure.  The new name of the station is provided by the B<stationName>
+option.  Must be called after the B<login()> method.
+
+  $result = $websvc->renameStation( stationToken => 'token',
+                                    stationName => 'new name' ) or die( $websvc->error() );
+  $stationName = $result->{'stationName'};
+
+=over 4
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> and
+other methods.
+
+=item stationName =E<gt> STRING [required]
+
+The new name of the station.
+
+=back
+
+=head2 shareStation
+
+Executes the B<station.shareStation> method, returning a true value if the station,
+provided by the B<stationId> and B<stationToken> arguments, was shared successfully, or a
+false value on failure.  Must be called after the B<login()> method.
+
+  $result = $websvc->shareStation( stationId => 'id',
+                                   stationToken => 'token',
+                                   emails => ['foo@bar.com', 'baz@buz.com'] )
+    or die( $websvc->error() );
+
+=over 4
+
+=item stationId =E<gt> STRING [required]
+
+The unique id of the station, which can be obtained via the B<getStationList()> and other
+methods.
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> and
+other methods.
+
+=item emails =E<gt> ARRAY [required]
+
+A list of email addresses to share the station with.
+
+=back
+
+=head2 deleteStation
+
+Executes the B<station.deleteStation> method, returning a true value if the station
+was successfully deleted, or a false value on failure.  Must be called after the
+B<login()> method.
+
+  $result = $websvc->deleteStation( stationToken => 'token' ) or die( $websvc->error() );
+
+=over 4
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> and
+other methods.
+
+=back
+
+=head2 setQuickMix
+
+Executes the B<user.setQuickMix> method, returning a true value if the quick mix was
+successfully set, or a false value on failure.  Must be called after the B<login()>
+method.
+
+  $result = $websvc->setQuickMix( stationIds => ['id1', 'id2'] ) or die( $websvc->error() );
+
+=over 4
+
+=item stationIds =E<gt> ARRAY [required]
+
+A list of station ids that uniquely identify each station, which can be obtained via the
+B<getStationList()> and other methods.
+
+=back
+
+=head2 transformSharedStation
+
+Executes the B<station.transformSharedStation> method, returning a hashref containing the
+information about the station, provided by the B<stationToken> argument, or will return a
+false value on failure.  This method will convert a station that someone has shared to you
+into a station of your own that you are able to modify.  Must be called after the B<login()>
+method.
+
+  $result = $websvc->transformSharedStation( stationToken => "token" ) or die( $websvc->error() );
+  $stationId = $result->{'stationId'};
+
+=over 4
+
+=item stationToken =E<gt> STRING [required]
+
+The unique token of the station, which can be obtained via the B<getStationList()> and
+other methods.
+
+=back
+
+=head1 SEE ALSO
+
+L<WebService::Pandora::Method>
+L<WebService::Pandora::Partner>
+
+=head1 AUTHOR
+
+Mitch McCracken E<lt>mrmccrac@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Mitch McCracken.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

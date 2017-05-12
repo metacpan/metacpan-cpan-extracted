@@ -1,0 +1,45 @@
+{
+   "abstract" : "A Perl interface to Geocod.io",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Geocodio",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.90",
+            "Moo::Lax" : "0.15",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-WebService-Geocodio@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Geocodio"
+      },
+      "homepage" : "https://metacpan.org/dist/WebService-Geocodio",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/WebService-Geocodio.git",
+         "web" : "https://github.com/mrallen1/WebService-Geocodio"
+      }
+   },
+   "version" : "0.04"
+}
+

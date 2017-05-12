@@ -1,0 +1,168 @@
+Revision history for WWW-eNom
+
+v2.6.0   2016-12-07
+    - Workaround issue with old private nameservers having multiple ip addresses
+      (even though this is no longer allowed).  Just use the first ip address.
+
+v2.5.0   2016-11-30
+    - Implemented Support for eNom's DA based IRTP Implementation, introduced
+      WWW::eNom::IRTPDetail
+
+v2.4.1   2016-11-18
+    - If the domain is expired, use false for the autorenew status since
+      eNom refuses to give it to you (and if it's expired, it's pretty
+      obvious that auto renew isn't on)
+
+v2.4.0    2016-11-17
+    - If the domain is expired, use [ ] for the nameservers since eNom
+      refuses to give them to you
+
+v2.3.0    2016-10-05
+    - Better handling of Reseller information used for Contacts
+    - If a domain is not explictly unverified, count is as verified (due to
+      how eNom responds, we have to assume "no news is good news").
+
+v2.2.0    2016-10-02
+    - Implemented method to email a domain's EPP Key to the Registrant
+      Contact assoicated with the domain.
+
+v2.1.0    2016-09-02
+    - Added support for updating the IP of a Private Nameserver
+
+v2.0.0    2016-08-22
+    * MAJOR RELEASE *
+
+    - While preserving backwards compatibility, introduced a new Moose
+      driven architecture.  This abstracts most of eNom API methods behind
+      a set of easy to use Models (instead of Hashes) and a Command
+      Pattern for performing eNom Operations (instead of having to
+      understand exactly how the eNom API Works)
+    - Extensive documentation for working with eNom for Domain Operations
+
+v1.4.0    2016-07-07
+    - Trial Release
+    - Robert Stone (drzigman) new maintainer
+    - Refactored to use Moose over Moo in preperation for major refactor,
+      expansion, and creation of 2.X.X series.
+
+v1.3.3    2016-03-28 12:56:14-05:00 America/Chicago
+    - Removed test of unavailable API call
+
+v1.3.2    2016-02-22 11:35:37-06:00 America/Chicago
+    - Updated test to reflect current state of eNom API.
+
+v1.3.1    2016-01-23 18:19:42-06:00 America/Chicago
+    - Updated whois email in test.
+
+v1.3.0    2016-01-07 13:49:06-06:00 America/Chicago
+    - Added better support for inheritance and general code reuse (RsrchBoy on
+      GitHub).
+
+v1.2.9    2014-11-03 17:29:39-06:00 America/Chicago
+    - Updated integration test to have correct expectation of whois response.
+    - Updated command list to reflect eNom's latest version of its reseller API,
+      8.4 (thanks, ricecake).
+
+v1.2.8    2013-11-13 23:05:14 America/Chicago
+    - Updated tests and POD examples to reflect eNom's dropping of the .us TLD.
+
+v1.2.7    2013-11-07 01:45:37 America/Chicago
+    - Removed version check against a dependency (Mozilla::PublicSuffix)
+      utilizing a vstring.
+
+v1.2.6    2013-11-06 04:35:49 America/Chicago
+    - Removed vstring usage that was breaking compatibility with Perl versions
+      prior to v5.9.
+
+v1.2.5    2013-11-05 12:00:58 America/Chicago
+    - Bumped minimum version of Moo to 1.001000.
+    - Fixed test failure from occurring when Moose isn't installed.
+
+v1.2.4    2013-11-04 16:16:02 America/Chicago
+    - Required minumum version of Moo and Class::Method::Modifiers.
+
+v1.2.3    2013-11-04 14:08:28 America/Chicago
+    - Removed Moose as a testing prerequisite.
+    - Pruned down Type::Tiny-related prerequisites.
+
+v1.2.2    2013-11-04 13:53:29 America/Chicago
+    - Promoted to full release.
+
+v1.2.1    2013-11-01 21:43:19 America/Chicago
+    - Prevented Moo from falling back to Moose by replacing
+      __PACKAGE__->meta->add_method with &Class::Method::Modifiers::fresh.
+
+v1.2.0    2013-05-24 15:40:06 America/Chicago
+    - Updated command list to reflect eNom's latest version of its reseller API
+      version (7.8).
+    - Added new, yet-to-be-documented eNom API command (ryeddula).
+    - Replace Any::Moose dependency with Moo.
+
+v1.1.3    2013-05-16 10:38:19 America/Chicago
+    - Brought tests up to date to match latest eNom response (drzigman).
+
+v1.1.2    2012-06-28 09:20:55 America/Chicago
+    - Untabified all code.
+    - Replaced Test::Most bundle with only the test modules actually used.
+    - Changed license to MIT.
+
+v1.1.1    2012-03-30 20:26:44 America/Chicago
+    - Remove parent.pm dependency
+
+v1.1.0    2012-03-06 19:01:26 America/Chicago
+    - Removed ParseUtil::Domain dependency in favor of Mozilla::PublicSuffix
+    - Fixed POD to show correct license (LGPL v3.0)
+    - Other minor POD fixes
+
+v1.0.6    2012-01-16 08:35:24 America/Chicago
+    - Increased version requirement of ParseUtil::Domain to 2.10
+
+v1.0.5    2012-01-06 21:21:20 America/Chicago
+    - Removed "re" pragma option introduced in Perl v5.14
+    - Add deprecation notice to Net::eNom
+
+v1.0.4    2012-01-05 18:12:08 America/Chicago
+    - Fixed failing test due to contact email change on cpan.org whois
+    - Further reduced depedencies
+    - Traded XML::Simple for XML::LibXML::Simple
+
+v1.0.3    2011-12-31 04:29:09 America/Chicago
+    - Fixed pod
+    - Removed unneeded dependencies
+
+v1.0.2    2011-12-23 21:33:19 America/Chicago
+    - Fixed test failures caused by undocument eNom API changes
+    - Moved distribution from Net-eNom to WWW-eNom
+    - Changed license to LGPL 3.0
+
+v1.0.1    2011-10-23 01:21:53 America/Chicago
+    - Added Mouse version requirement to prevent failing compile test in Perl v5.15
+
+v1.0.0    2011-10-03 23:17:37 America/Chicago
+    - Renamed main module to WWW::eNom
+        -Net::eNom is now a thin wrapper around WWW::eNom
+    - Normalized version number
+    - Improved test coverage
+    - Added version requirement for ParseUtil::Domain to account for new eNom TLD offerings
+
+0.032     2011-09-20
+    - Here-and-there whitespace cleanup
+    - Fixed version number
+    - Taken out of trial mode
+
+v0.3.1    2011-09-19
+    - Added direct access to the eNom response type parameter
+    - Fixed spelling in comments
+    - Removed needless recommended prereq
+
+v0.3.0    2011-09-18
+    - Tested and built with with Dist::Zilla
+        - POD-related tests are now release tests
+    - Added support for eNom API version 6.4
+    - Mo(?:o|u)sified
+
+0.02      2009-12-22
+    Don't separate "Domain" when the command actually wants "Domain"
+
+0.01      2009-12-22
+    First version, released on an unsuspecting world.

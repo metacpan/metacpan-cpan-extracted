@@ -1,0 +1,27 @@
+WWW-Curl-TraceAscii
+
+Make sure sensitive data does not get into your logs.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Curl::TraceAscii
+
+    GitHub, Source Control
+        http://github.com/OaXlin/WWW--Curl--TraceAscii.git
+
+
+COPYRIGHT AND LICENCE
+
+See the LICENSE file included in this package

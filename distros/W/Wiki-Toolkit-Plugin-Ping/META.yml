@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Wiki-Toolkit-Plugin-Ping
+version:             0.03
+abstract:            "ping" various services when nodes are written
+license:             ~
+author:              
+    - Nick Burch (openguides (at) gagravarr [dot] org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP:                           0
+    Wiki::Toolkit:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,6 @@
+name = "WebService-Mailgun"
+badges = ["travis", "coveralls"]
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"
+[no_index]
+file = ["Dockerfile"]

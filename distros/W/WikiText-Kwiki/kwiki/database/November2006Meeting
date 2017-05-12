@@ -1,0 +1,27 @@
+  Wednesday Nov 8th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+=== Crucible ===
+  "An Automatic Slicing, Dicing, and Rebooting Test Harness"
+  with Bryce Harrington
+ 
+Crucible is a test harness in use at OSDL which utilizes several Perl 
+modules, along with a mess of bash scripts, to provide a generalized 
+automated testing system.  They use Crucible for testing NFSv4, Linux 
+CPU and Memory hotplug, Inkscape, Cairo, and GeGL.  It coordinates 
+tests across a collection of different machines of different 
+architectures; it handles automated power cycling to test-boot new 
+kernels; it can reimage, capture console logs, etc.; it can coordinate 
+multi-client/server configurations; it slices; it dices; it'll even CUT 
+THROUGH A TIN CAN!1!!
+
+Most of the Perl components have been uploaded to CPAN, including one 
+set of modules for editing/updating different kinds of bootloader 
+config files, called Linux::Bootloader, another module WWW::PkgFind for 
+downloading software packages from web or ftp sites, or from 
+cvs/git/svn, and another set of modules for parsing test output from 
+different kinds of test programs, called Test::Parser.  We've also 
+recently added a module, Test::Presenter, that employs an XML database 
+to recombobulate parsed test data into forms that Chart::Graph::Gnuplot 
+and similar modules can use for making pretty SVG graphs.
+
+more info:  http://crucible.sourceforge.net/

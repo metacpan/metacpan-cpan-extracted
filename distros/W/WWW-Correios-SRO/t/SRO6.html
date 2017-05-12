@@ -1,0 +1,86 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<title>SRO - Internet</title>
+<script>
+<!-- Hide from old browsers
+var FormType = "Update";
+var NextField = "P_COD_FIN";
+function JSLNotNull(pctl, pmsg){
+   if (pctl.value == "") { alert(pmsg); pctl.focus(); return false; }
+   return true;
+}
+function JSLMakeUpper(pctl) {
+   pctl.value = pctl.value.toUpperCase();
+}
+function BT_NEWP_OnClick(ctl) {
+   document.forms[0].Z_ACTION.value = ctl.value;
+   document.forms[0].submit();
+   return true;
+}
+function BT_VOLTAR_OnClick(ctl) {
+history.back()
+   return true;
+}
+function IMPRIMIR(ctl) {
+  window.print();
+  return true;
+}
+function verfonte() {
+	if (event.button==2) {
+		window.alert("Não Disponível!");
+	}
+}
+function verObjeto(objeto) {
+	if (objeto.length != 13) {
+		window.alert("Objeto Inválido!");
+     return false;
+	}
+return true;
+}
+document.onmousedown=verfonte
+//-->
+</script></head>
+
+<body alink="0FF000" bgcolor="d8e6ed" link="000000" text="0000FF" vlink="800040">
+<form action="txect01$.ResultList" method="POST">
+<input name="Z_START" value="1" type="hidden">
+<input name="P_ITEMCODE" value="PE096907205BR" type="hidden">
+<input name="P_LINGUA" value="001" type="hidden">
+<input name="P_COD_UNI" value="PE096907205BR" type="hidden">
+<input name="P_COD_INI" value="" type="hidden">
+<input name="P_COD_FIN" value="" type="hidden">
+<input name="P_COD_LIS" value="" type="hidden">
+<input name="P_TESTE" value="" type="hidden">
+<input name="P_TIPO" value="001" type="hidden">
+<h1> </h1>
+<img src="SRO6_files/correios.gif" align="absmiddle"><font color="#000000" face="Arial" size="3"><b>
+PE096907205BR
+ - Histórico do Objeto</b></font>
+<font color="black" face="Arial" size="2">
+<br>O horário não indica quando a situação ocorreu, mas sim quando os dados foram recebidos pelo sistema, exceto no caso do <b>SEDEX 10 e do SEDEX Hoje, </b>em que ele  representa o horário real da entrega.<p>
+<table border="" cellpadding="1" hspace="10">
+<colgroup style="font:8pt Tahoma;color=Black" valign="top"></colgroup><colgroup style="font:8pt Tahoma; color=Navy"></colgroup><colgroup style="font:8pt Tahoma;color=Maroon">
+
+</colgroup><tbody><tr>
+<td><font color="#CC0000" face="Tahoma" size="2"><b>Data</b></font></td>
+<td><font color="#CC0000" face="Tahoma" size="2"><b>Local</b></font></td>
+<td><font color="#CC0000" face="Tahoma" size="2"><b>Situação</b></font></td>
+</tr>
+<tr><td rowspan="1">01/08/2014 13:43</td><td>CEE BRASILIA NORTE - BRASILIA/DF</td><td><font color="5F9F9F">Entrega Efetuada</font></td></tr>
+<tr><td rowspan="1">01/08/2014 10:26</td><td>BRASILIA/DF</td><td><font color="007FFF">Saiu para entrega ao destinatário</font></td></tr>
+<tr><td rowspan="2">31/07/2014 13:45</td><td>CTE BRASILIA - BRASILIA/DF</td><td><font color="000000">Encaminhado</font></td></tr>
+<tr><td colspan="2">Em trânsito para CEE BRASILIA NORTE - BRASILIA/DF</td></tr>
+<tr><td rowspan="2">29/07/2014 16:51</td><td>CTE BENFICA - RIO DE JANEIRO/RJ</td><td><font color="000000">Encaminhado</font></td></tr>
+<tr><td colspan="2">Encaminhado para CTE BRASILIA - BRASILIA/DF</td></tr>
+<tr><td rowspan="2">28/07/2014 14:41</td><td>AC ITAIPAVA                              - PETROPOLIS                    /RJ</td><td><font color="000000">Encaminhado</font></td></tr>
+<tr><td colspan="2">Em trânsito para CTE BENFICA - RIO DE JANEIRO/RJ</td></tr>
+<tr><td rowspan="1">28/07/2014 10:02</td><td>AC ITAIPAVA                              - PETROPOLIS                    /RJ</td><td><font color="000000">Postado</font></td></tr>
+</tbody></table>
+</p><hr align="left" color="#FFCC33" size="1" width="500"><font color="black" face="Tahoma" size="2"><center><br><p><a href="http://www.correios.com.br/encomendas/servicos/sedex/contaSedex/default.cfm" target="_blank">Conta SEDEX</a> - saiba como contratar o SEDEX para sua empresa.</p><p>
+</p><p><a href="http://www.correios.com.br/enderecador/default.cfm" target="_blank">Endereçador</a> - conheça o software gratuito dos Correios para geração de etiquetas.
+<input name="Z_ACTION" type="hidden">
+<input name="done" value="Nova Consulta" onclick="BT_NEWP_OnClick(this)" type="button">
+<input name="Print" value="Print" onclick="IMPRIMIR(this)" type="button">
+
+
+</p></center></font></font></form></body></html>

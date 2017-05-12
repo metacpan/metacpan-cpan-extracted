@@ -1,0 +1,11 @@
+Revision history for Perl extension WWW::Mechanize::XML.
+
+0.01  Thu Aug 10 17:01:15 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n WWW::Mechanize::XML
+
+0.02  11/09/2006
+  * rename parser_options to xml_parser_options maintaining backwards
+    compatability.
+  * allow triggering exceptions from xml response values via xml_error_options
+  * fixed dependency versions

@@ -1,0 +1,35 @@
+NAME
+    WWW::Google::Docs::Upload - Upload documents to Google Docs
+
+SYNOPSIS
+        use WWW::Google::Docs::Upload;
+    
+        my $docs = WWW::Google::Docs::Upload->new(
+            email  => 'your email',
+            passwd => 'your password'
+        );
+        $docs->upload('/path/to/yourfile.doc');
+
+DESCRIPTION
+    This module helps you to upload your local document files to Google
+    Docs.
+
+METHODS
+  upload($filename, \%option)
+    Upload document file (named $filename) to Google Docs.
+
+    \%option is hashref and allowed key is:
+
+    name
+        Filename what you want to call (if different than the filename)
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

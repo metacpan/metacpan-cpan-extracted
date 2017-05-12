@@ -1,0 +1,257 @@
+
+=head1 NAME
+
+Win32::GUI::Tutorial::Part5 - More than one Window
+
+=head1 Win32::GUI Tutorial - Part 5
+
+=head2 A simple multi-window program
+
+Before going further into control details, we'll explore the case of
+applications that make use of more than one window.
+
+In principle, Win32::GUI does not limit the number of windows a program
+can have: we've seen that the usual procedure for a program is:
+
+=over
+
+=item 1
+
+create the main window, eg:
+
+	$Window = new Win32::GUI::Window(...);
+
+=item 2
+
+create controls, eg:
+
+	$Window->Add...(...);
+
+=item 3
+
+show the window, eg:
+
+	$Window->Show();
+
+=item 4
+
+call the dialog phase, eg:
+
+	Win32::GUI::Dialog();
+
+=back
+
+Steps 1, 2 and 3 can be repeated how many times you like, to create
+several independent windows:
+
+	use Win32::GUI();
+	
+	$W1 = new Win32::GUI::Window(
+		-name  => "W1",
+		-title => "First Window",
+		-pos   => [ 100, 100 ],
+		-size  => [ 300, 200 ],
+	);
+	$W2 = new Win32::GUI::Window(
+		-name  => "W2",
+		-title => "Second Window",
+		-pos   => [ 150, 150 ],
+		-size  => [ 300, 200 ],
+	);
+
+	$W1->Show();
+	$W2->Show();
+	
+	Win32::GUI::Dialog();
+
+
+the two windows we've created are displayed on the screen and are both 
+able to intercept events and user interaction, with the rather obvious 
+limitation that while the code for a window's event is executing, the
+other one is frozen; whis is due to the single-threaded nature of Perl,
+although work is being done for a full featured multithreaded Perl).
+
+=for HTML <br /><img align="center" src="part5-1.gif" />
+
+One thing to note is that even if the windows are two, they belong to
+the same process and share a single message loop, so when you exit from
+one window (or when the program terminates for whatever reason), they
+both disappear:
+
+	sub W1_Terminate { return -1; }
+
+=head2 Main and popup windows
+
+A much more common case is to have a program using a main window, 
+initially shown, and one or more popup windows (generally DialogBoxes)
+that are shown in response to a precise function; to make an example,
+you can imagine the Windows Explorer as your main window and the File
+Properties dialog as a popup window.
+
+We'll modify our program so that the second window appears when the
+user clicks the button on the first window:
+
+	use Win32::GUI();
+	
+	$W1 = new Win32::GUI::Window(
+		-name  => "W1",
+		-title => "Main Window",
+		-pos   => [ 100, 100 ],
+		-size  => [ 300, 200 ],
+	);
+	$W1->AddButton(
+		-name => "Button1",
+		-text => "Open popup window",
+		-pos  => [ 10, 10 ],
+	);
+	
+	$W2 = new Win32::GUI::Window(
+		-name  => "W2",
+		-title => "Popup Window",
+		-pos   => [ 150, 150 ],
+		-size  => [ 300, 200 ],
+	);
+
+	$W1->Show();
+	
+	Win32::GUI::Dialog();
+
+	sub Button1_Click { $W2->Show(); }
+	
+	sub W1_Terminate { return -1; }
+
+Furthermore, we put a button on the second window to make it go away:
+
+	$W2->AddButton(
+		-name => "Button2",
+		-text => "Close this window",
+		-pos  => [ 10, 10 ],
+	);
+	
+	sub Button2_Click { $W2->Hide(); }
+
+=for HTML <br /><img align="center" src="part5-2.gif" />
+
+This rather basic example shows the skeleton framework for a typical
+multi-window application; but there are still two issues we want to
+address: the mortality of popup windows and their "modal" behaviour.
+
+=head2 Keeping popup windows alive
+
+If you choose to close the second window with the Close (little X)
+button on the upper right corner, you'll notice that all the windows
+disappear.
+
+What's happening here is that we requested a C<W2_Terminate> action,
+and since we didn't provide an event for this, Win32::GUI proceeds
+with the default behaviour for the close button, which is to destroy
+the window, and exit the windows message loop. To let our window survive
+the close action, we need to provide a customary C<Terminate> event:
+
+	sub W2_Terminate {
+		$W2->Hide();
+		return 0;
+	}
+
+The C<return 0> is B<very important> in this case, because it tells
+Windows to avoid the destruction of our window (it is just hidden), so
+that we can show it again using the button in C<$W1>.
+
+=head2 "modal" windows
+
+Here is another very common functionality you may want to implement:
+when a popup window is open, you don't want the user to interact with
+the main window; this is known as using a "modal" window, a window that
+gets all your attention and does not let you go forward with the 
+program unless you have disposed of it.
+
+So, the behaviour of a modal window is to diable interaction with the
+window used to launch it (know as its parent window).  To achieve this
+we first have to tell the window who its parent is.  We do this when we
+create W2, using the C<-parent> option:
+
+	$W2 = new Win32::GUI::Window(
+		...
+		-parent => $W1,
+	);
+
+Now, when we want to display the W2 we use the C<DoModal()> method: this
+disables W2's parent window (W1), and starts a new message loop to
+process events for W2.  When we are done with W2, we return C<-1> from an
+event handler, which causes C<DoModal()> to return, but in this case does
+not cause any of the windows to be destroyed.  Here's the full code:
+
+	use Win32::GUI();
+
+	my $W1 = Win32::GUI::Window->new(
+		-name  => "W1",
+		-title => "First Window",
+		-pos   => [ 100, 100 ],
+		-size  => [ 300, 200 ],
+	);
+
+	$W1->AddButton(
+		-name => "Button1",
+		-text => "Open popup window",
+		-pos  => [ 10, 10 ],
+	);
+
+	my $W2 = Win32::GUI::Window->new(
+		-name  => "W2",
+		-title => "Second Window",
+		-pos   => [ 150, 150 ],
+		-size  => [ 300, 200 ],
+		-parent => $W1,
+	);
+
+	$W2->AddButton(
+		-name => "Button2",
+		-text => "Close this window",
+		-pos  => [ 10, 10 ],
+	);
+
+	$W1->Show();
+	Win32::GUI::Dialog();
+	exit(0);
+
+	sub W1_Terminate {
+		return -1;
+	}
+
+	sub Button1_Click {
+		$W2->DoModal();
+		return 0;
+	}
+
+	sub W2_Terminate {
+		return -1;
+	}
+
+	sub Button2_Click {
+		return -1;
+	}
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/Tutorial/Part5.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

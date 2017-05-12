@@ -1,0 +1,40 @@
+---
+name: WebService-Eulerian-Analytics
+version: 0.8
+author:
+  - 'Mathieu Jondet <mathieu@eulerian.com>'
+abstract: Eulerian Analytics API
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  SOAP::Lite: '>= 0.710.08'
+  perl: '>= 5.10.0'
+configure_requires:
+  Module::Build: 0.35
+provides:
+  WebService::Eulerian::Analytics:
+    file: lib/WebService/Eulerian/Analytics.pm
+    version: 0.8
+  WebService::Eulerian::Analytics::TPOrderInject:
+    file: lib/WebService/Eulerian/Analytics/TPOrderInject.pm
+  WebService::Eulerian::Analytics::Website:
+    file: lib/WebService/Eulerian/Analytics/Website.pm
+  WebService::Eulerian::Analytics::Website::Ope:
+    file: lib/WebService/Eulerian/Analytics/Website/Ope.pm
+  WebService::Eulerian::Analytics::Website::Order:
+    file: lib/WebService/Eulerian/Analytics/Website/Order.pm
+  WebService::Eulerian::Analytics::Website::TPCategory:
+    file: lib/WebService/Eulerian/Analytics/Website/TPCategory.pm
+  WebService::Eulerian::Analytics::Website::TPMedia:
+    file: lib/WebService/Eulerian/Analytics/Website/TPMedia.pm
+  WebService::Eulerian::Analytics::Website::TPOpe:
+    file: lib/WebService/Eulerian/Analytics/Website/TPOpe.pm
+  WebService::Eulerian::Analytics::Website::TPOpedataClick:
+    file: lib/WebService/Eulerian/Analytics/Website/TPOpedataClick.pm
+  WebService::Eulerian::Analytics::Website::TPPublisher:
+    file: lib/WebService/Eulerian/Analytics/Website/TPPublisher.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

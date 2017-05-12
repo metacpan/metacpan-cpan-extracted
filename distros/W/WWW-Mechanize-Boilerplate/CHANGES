@@ -1,0 +1,6 @@
+0.03  - 24-Apr-2012
+    - Removed //=, so should work on earlier Perl
+0.02  - 23-Apr-2012
+    - Unbroke dependencies
+0.01  - 20-Apr-2012
+	- Initial release

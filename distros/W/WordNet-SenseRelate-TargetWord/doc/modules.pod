@@ -1,0 +1,141 @@
+=head1 NAME
+
+WordNet::SenseRelate::TargetWord - modules for performing word sense
+disambiguation.
+
+=head1 DESCRIPTION
+
+In this section, we list the modules provided in the package. A short
+description of each is provided alongside.
+
+=over
+
+=item Preprocessing modules
+
+Currently, only one preprocessing module is provided in the package:
+
+=over
+
+=item WordNet::SenseRelate::Preprocess::Compounds
+
+This module detects collocations within the text, and joins them with
+underscores. For example, a piece of text such as "the board of directors"
+would become "the board_of_directors".
+
+=back
+
+=item Context Selection modules
+
+One context selection module is provided in the package:
+
+=over
+
+=item WordNet::SenseRelate::Context::NearestWords
+
+This modules picks the N words nearest the target word as the context words
+that should be used by the disambiguation algorithm. A stop list can be
+specified to omit words like "a", "an, "the", etc. The value N can be set
+during initialization.
+
+=back
+
+=item Postprocessing modules
+
+As of this vesion, there are no postprocessing modules in the
+package. However, we intend to add some in future releases.
+
+=item Sense Selection Algorithm
+
+Four sense selection algorithm modules are provided in the pacakge:
+
+=over
+
+=item WordNet::SenseRelate::Algorithm::Local
+
+This modules selects that sense of the target word which is most related to
+the senses of the context words. To do this it uses the "Local"
+disambiguation algorithm as described by Banerjee and Pedersen (2002). In
+order to determine the relatedness of senses, the algorithm uses one of the
+WordNet::Similarity measures of relatedness. Using the configuration
+options for this module, the user can specify which measure the algorithm
+should use.
+
+=item WordNet::SenseRelate::Algorithm::Global
+
+This modules selects that sense of the target word which is most related to
+the senses of the context words. To do this it uses the "Global"
+disambiguation algorithm as described by Banerjee and Pedersen (2002). This
+algorithm is somewhat similar to the "Local" algorithm. It differs from the
+"Local" algorithm, in that it forms all possible combinations of the senses
+of the context words, and evaluates the semantic relatedness for each
+combination separately. The combination with the maximum score is is
+selected, and the sense of the target word in that combination is returned
+as the answer.
+
+=item WordNet::SenseRelate::Algorithm::SenseOne
+
+This module provides a baseline for the disambiguation process by always
+returning the first sense of the target word as the answer.
+
+=item WordNet::SenseRelate::Algorithm::Random
+
+This module provides another baseline by randomly selecting one of the
+senses of the target word as the answer.
+
+=back
+
+=back
+
+Apart from all of the modules mentioned above that form the pieces of the
+bigger structure, the package also contains the
+WordNet::SenseRelate::TargetWord module which combines the above pieces.
+
+In order to use these modules in a Perl program for Word Sense
+Disambiguation, we need only create an instance of the
+WordNet::SenseRelate::TargetWord module in our program, and provide it with
+options that indicate which of the above modules (along with configuration
+options) it should use in the disambiguation process.
+
+Additionally, in order to be able to use this package for disambiguating
+instances from the Senseval2 or the Senseval3 data sets, the
+WordNet::SenseRelate::Reader::Senseval2 module has also been provided in
+the package. The reader module reads in an entire Senseval2 formatted XML
+file and builds a list of instances from the file. A Perl program can then
+iterate over these instances and pass them to the
+WordNet::SenseRelate::TargetWord object.
+
+=head1 SEE ALSO
+
+L<http://groups.yahoo.com/group/senserelate>
+
+L<http://search.cpan.org/dist/WordNet-SenseRelate-TargetWord>
+
+L<http://senserelate.sourceforge.net>
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah, Salt Lake City
+ sidd at cs.utah.edu
+
+ Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+ banerjee+ at cs.cmu.edu
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+Banerjee
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

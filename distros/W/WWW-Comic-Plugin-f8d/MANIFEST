@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Comic/Plugin/f8d.pm
+t/00-load.t
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+eg/example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

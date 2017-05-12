@@ -1,0 +1,83 @@
+==================================================
+Changes from 2004-10-05 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0008 at 2014-10-03 08:12:29 +0000
+-------------------------------------------
+
+  Change: 855f5b33866743910f71ee885f95af01d7a11112
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-03 04:11:06 +0000
+
+    v0.0008 deprecated this module in favor of WebService::Client 
+
+  Change: 671abf7359efe843c61ef7e0063bd7285f8be5a7
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-22 13:26:30 +0000
+
+    v0.0007 fixed req() example in the pod docs 
+
+  Change: 94734d7c319108c8f176c9e4456eeabf609b27b6
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-20 03:39:38 +0000
+
+    v0.0006 made req a public method and added more docs and examples 
+
+  Change: ae2795be20b26663900ccdb2a9bfe5d0a70a438f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-23 02:34:49 +0000
+
+    updated abstract 
+
+-------------------------------------------
+version 0.0005 at 2014-08-23 06:14:46 +0000
+-------------------------------------------
+
+  Change: 48caa5ccc9081eeb804a167f5512649ca4920e9e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-23 02:14:46 +0000
+
+    v0.0005 updated docs 
+
+  Change: a1cec95e4b02f5d8f4e8901b2402c18ab141cca5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-26 04:28:00 +0000
+
+    updated synopsis 
+
+  Change: e304f75b4d38b7586c375ba735d83661c400fd8f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-21 04:00:12 +0000
+
+    v0.0004 fixed the delete method 
+
+-------------------------------------------
+version 0.0003 at 2014-07-21 03:53:16 +0000
+-------------------------------------------
+
+  Change: 089325bfa5248248c6b81b86ee258eac92f5fb4a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-20 23:53:16 +0000
+
+    generate README in dist 
+
+  Change: ebe4835024cc4d627d1997c4ea065486bb67fade
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-19 20:20:13 +0000
+
+    v0.0002 
+
+-------------------------------------------
+version 0.0001 at 2014-07-19 21:42:08 +0000
+-------------------------------------------
+
+  Change: 764651803c006754fdaf8cf9c175fd0266165a22
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-07-19 17:42:08 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

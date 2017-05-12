@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!--
+    Example sitemap with some of the changefreqs ucfirst'ed. GH#5
+    Comment within urlset. GH#3
+-->
+  <url>
+<!--
+    Comment within url. GH#3
+-->
+    <loc>http://www.mywebsite.com/32.html?param1=value1&amp;param2=value2</loc>
+    <lastmod>2010-11-19T19:05:01+00:00</lastmod>
+    <changefreq>Weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/2.html</loc>
+    <lastmod>2010-11-19T13:05:01+00:00</lastmod>
+    <changefreq>Daily</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/friendly_url.html?name=Alex%20J.%20G.%20Burzy%C5%84ski</loc>
+    <lastmod>2010-11-19T16:05:01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/31.html</loc>
+    <lastmod>2010-11-19T06:05</lastmod>
+    <changefreq>Daily</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/index.html?param3=value3#fragment</loc>
+    <lastmod>2010-11-19T18:05:01.12-05:00</lastmod>
+    <changefreq>Always</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/21.html</loc>
+    <lastmod>2010-11-19T13:05:01+01:00</lastmod>
+    <changefreq>Weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/3.html</loc>
+    <lastmod>2010-11-19T16:05:01.45Z</lastmod>
+    <changefreq>always</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/22.html</loc>
+    <lastmod>2010</lastmod>
+    <changefreq>Never</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>http://www.mywebsite.com/1.html</loc>
+    <lastmod>2010-11-19</lastmod>
+    <changefreq>Monthly</changefreq>
+    <priority>0.2</priority>
+  </url>
+</urlset>

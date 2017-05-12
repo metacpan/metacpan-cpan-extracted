@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               WWW-Bizowie-API
+version:            0.01
+abstract:           Perl interface to the Bizowie.com API
+author:
+    - Michael Aquilina <aquilina@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    LWP::UserAgent:        0
+    HTTP::Request::Common: 0
+    Try::Tiny:             0
+    JSON:                  0
+    Mo:                    0
+no_index:
+    directory:
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+

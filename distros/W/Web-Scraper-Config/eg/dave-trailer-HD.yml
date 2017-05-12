@@ -1,0 +1,19 @@
+---
+scraper:
+  - process:
+    - td>ul>li
+    - trailers[]
+    - scraper:
+      - process_first:
+        - li>b
+        - title
+        - TEXT
+      - process_first:
+        - ul>li>a[href]
+        - url
+        - @href
+      - process:
+        - ul>li>ul>li>a
+        - movies[]
+        - __callback(process_movie)__
+  - result: trailers

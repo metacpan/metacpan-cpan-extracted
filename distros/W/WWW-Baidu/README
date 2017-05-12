@@ -1,0 +1,124 @@
+NAME
+    WWW::Baidu - Perl interface for the www.baidu.com search engine
+
+VERSION
+    This document describes version 0.06 of "WWW::Baidu", released Jan 21,
+    2007.
+
+SYNOPSIS
+        use WWW::Baidu;
+        my $baidu = WWW::Baidu->new;
+        # ensure the keys are in the GBK/GB2312 encoding if they're Chinese
+        my $count = $baidu->search('Perl "Larry Wall"', 'Audrey');
+        $baidu->limit(200);
+        while (my $record = $baidu->next) {
+            # the results are in GBK/GB2312 encoding
+            print $record->title, "\n",
+                  $record->url, "\n",
+                  $record->summary, "\n",
+                  $record->date, "\n",
+                  $record->size, "\n",
+                  $record->cached_url, "\n\n\n";
+        }
+
+DESCRIPTION
+    Baidu.com is a very popular Chinese search engine which does similar
+    things as Google. This module provides you with a Perl interface to that
+    site.
+
+METHODS
+    "$obj = WWW::Baidu->new()"
+    "$obj = WWW::Baidu->new( cache => $cache )"
+        This is the constructor for "WWW::Baidu". It accepts an optional
+        argument which will must be a Cache::Cache-compatible object.
+        "WWW::Baidu" will use this cache instead of a default
+        "Cache::FileCache" instance.
+
+    "$count = $obj->search($key1, $key2, ...)"
+        Searches Baidu by the given keys and returns the total records
+        reported by Baidu. Note that the return value $count is only an
+        estimation by Baidu. Usually it's not equal to the total number of
+        records that you can fetch by the "next" method.
+
+        It's highly recommended to pass only string keys in the GBK or
+        GB2312 encoding.
+
+        A call of this method will clear the internal search results' buffer
+        and the iterator counter, but the "limit" setting is left intact.
+
+    "$obj->limit($count)"
+        Limits the total number of records WWW::Baidu will try to offer.
+        This method will affect the "next()" method. And the internal
+        counter will also get cleared if the "search" method is called
+        again.
+
+    "$record = $obj->next()"
+        Returns the next search result which is a WWW::Baidu::Record object.
+        "WWW::Baidu" accesses the baidu.com site rather lazily. That is, it
+        only "clicks" the "Next page" link in case that the user has fetched
+        all the records in the internal buffer.
+
+        When there's no more records (due to the capability of Baidu itself
+        or the upper-limit set via the "limit" method), this method will
+        return undef.
+
+CACHING
+    "WWW::Baidu" uses WWW::Mechanize::Cached internally so that your program
+    will run much faster during debugging and will also behave more politely
+    to the Baidu.com site.
+
+CAVEAT
+    *   The values returned by the WWW::Baidu::Record objects' properties
+        are always in the GBK (or GB2312) encoding. If you want unicode
+        semantics, please decode the results using the Encode module
+        yourself. :)
+
+        It's not a bug in WWW::Baidu.
+
+    *   Althogh "WWW::Baidu" has tried very hard to behave politely to
+        Baidu.com via both caching, limiting, and lazy iteration, it's still
+        important for the user not to abuse it.
+
+        During debugging, it's highly recommended to fix your search keys
+        fed into the "search" method, so that "WWW::Baidu" can take
+        advantage of the caching facility and your scripts will also run
+        swiftly without the pain of accessing the web.
+
+        Please don't punish others' sites for your own programming mistakes.
+        :)
+
+CODE COVERAGE
+    I use Devel::Cover to test the code coverage of my tests, below is the
+    Devel::Cover report on this module test suite.
+
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        File                           stmt   bran   cond    sub    pod   time  total
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        blib/lib/WWW/Baidu.pm          98.1   84.6   66.7  100.0  100.0  100.0   93.9
+        blib/lib/WWW/Baidu/Record.pm  100.0    n/a    n/a  100.0    n/a    0.0  100.0
+        Total                          98.2   84.6   66.7  100.0  100.0  100.0   94.3
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+SOURCE CONTROL
+    You can always get the latest source code from the following Subversion
+    repos:
+
+    <https://svn.openfoundry.org/wwwbaidu>
+
+    It has anonymous access to all.
+
+    If you like to get a commit bit, please let me know. I've been trying to
+    follow Audrey's best practices. ;)
+
+AUTHOR
+    Agent Zhang <agentzh@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2007 by Agent Zhang. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    WWW::Baidu::Record, <http://www.baidu.com>, WWW::Mechanize::Cached.
+

@@ -1,0 +1,166 @@
+How To
+  Produce a WSDL schema from a SOAP::Lite/Apache/mod_perl web service.
+
+    In this example a web service that exposes two methods - Hello and
+    GoodBye (Could you respect example that did include Hello World as the
+    basis?). One method, Hello, accepts a string as an argument (presumably
+    the first name of the person to greet) and returns a string with "Hello,
+    " prepended to the argument and "\n" added to the end. The other,
+    GoodBye, accepts a string as an argument (presumably the first name of
+    the person to greet) and returns a string with "Goodbye, " prepended to
+    the argument and "\n" added to the end.
+
+    Because these examples are so short and so you will know exactly what is
+    going on, the complete setup including source code is included here
+    before WSDL::Generator is used to build a WSDL schema.
+
+    Configuration
+
+    In your perl.conf file you should see the following directive:
+
+    <Location /world> SetHandler perl-script PerlHandler CLASS::World
+    </Location>
+
+    Which will point the appropriate CLASS::World.pm file on you system. You
+    could include this module in one of the standard directories searchable
+    by @INC or you could add a "use lib" statement to your startup.pl script
+    to add the directory containing the module to @INC.
+
+    CLASS::World.pm
+
+    package CLASS::World;
+
+    use SOAP::Transport::HTTP;
+
+    my $server = SOAP::Transport::HTTP::Apache ->
+    dispatch_to('WorldFunctions');
+
+    sub handler { $server->handler(@_); }
+
+    package WorldFunctions;
+
+    sub new { bless {}, shift; }
+
+    sub Hello { my ($s, $name) = @_;
+
+            return 'Hello, ' . $name . "\n";
+    }
+
+    sub GoodBye { my ($s, $name) = @_;
+
+            return 'Goodbye, ' . $name . "\n";
+    }
+
+    1;
+
+    As you can see this is a really generic and straightforward service. If
+    everything is configured correctly and you get no errors when you start
+    Apache, you should be able to access the methods in this service with
+    the following client script. Replace *host.your.domain* with the
+    hostname of your SOAP server.
+
+    world_client.pl
+
+    #!/usr/bin/perl
+
+    use SOAP::Lite +autodispatch => uri=>"WorldFunctions",
+    proxy=>'http://host.your.domain/world';
+
+    print Hello('Joe');
+
+    print GoodBye('Joe');
+
+  Generating the WSDL schema.
+
+    Using WSDL::Generator, one can quickly generate the WSDL schema for a
+    particular SOAP service. You will need to copy the Perl module for the
+    service to a directory and modify it as follows.
+
+    SOAP Service Perl module
+
+    # package CLASS::World;
+
+    # use SOAP::Transport::HTTP;
+
+    # my $server = SOAP::Transport::HTTP::Apache
+
+    # -> dispatch_to('WorldFunctions');
+
+    # sub handler {
+
+    # $server->handler(@_);
+
+    # }
+
+    package WorldFunctions;
+
+    sub new { bless {}, shift; }
+
+    sub Hello { my ($s, $name) = @_;
+
+            return 'Hello, ' . $name . "\n";
+    }
+
+    sub GoodBye { my ($s, $name) = @_;
+
+            return 'Goodbye, ' . $name . "\n";
+    }
+
+    1;
+
+    Save this file as WorldFunctions.pm. The following script will call
+    WSDL::Generator, build the WSDL schema and output it to the screen.
+
+    #!/usr/bin/perl
+
+    use WSDL::Generator;
+
+    my $init = {
+
+            'schema_namesp' => 'http://host.your.domain/world/WorldFunctions.xsd',
+
+            'services'      => 'WorldFunctions',
+
+            'service_name'  => 'WorldFunctions',
+
+            'target_namesp' => 'http://host.your.domain/world/',
+
+            'documentation' => 'Simple Hello World SOAP Service.',
+
+            'location'      => 'http://host.your.domain/world'
+
+    };
+
+    my $w = WSDL::Generator->new($init);
+
+    WorldFunctions->Hello('Joe');
+
+    WorldFunctions->GoodBye('Joe');
+
+    print $w->get(WorldFunctions);
+
+    You should save this script in the same directory as the
+    WorldFunctions.pm Perl module file. The $init hash reference above looks
+    a little confusing for those used to SOAP::Lite. That is because
+    SOAP::Lite save the programmer from having to know these types of things
+    in order to build a working SOAP service and/or client. Where to plug
+    the components of the SOAP::Lite constructor into the keys of the $init
+    hashref are explained below:
+
+    * 'schema_namesp' => This is URL of where the WSDL schema will
+    eventually live.
+    * 'services' => This is the uri portion of the SOAP::Lite constructor.
+    * 'service_name' => This is the uri portion of the SOAP::Lite
+    constructor.
+    * 'target_namesp' => This is the proxy portion of the SOAP::Lite
+    constructor.
+    * 'documentation' => A scalar or literal that contains the documentation
+    for your exposed services.
+    * 'location' => This is the proxy portion of the SOAP::Lite constructor.
+  Conclusion
+
+    With a little work, it is possible to build web services with
+    SOAP::Lite/Apache/mod_perl that can be utilized by programming languages
+    other than Perl.
+
+Joe Breeden jbreeden@ena.com

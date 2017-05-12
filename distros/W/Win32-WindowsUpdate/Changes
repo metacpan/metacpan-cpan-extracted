@@ -1,0 +1,21 @@
+Revision history for Perl extension Win32::WindowsUpdate.
+
+0.04  Thu Feb 19 03:33:00 2009
+  - Added "setAutomaticUpdates"
+  - Added "setAutoRebootWhileLoggedOn"
+  - Added "setRebootNag" (currently a NOOP)
+  - Updated POD
+
+0.03  Wed Feb 18 19:30:00 2009
+  - Fixed perl version of "install" (thanks to jand at perlmonks.org)
+    - Removed VBScript version from code, using perl version now.
+  - Updated TODO list
+
+0.02  Wed Feb 18 18:48:00 2009
+  - Added "install" (via VBScript, broken Perl version is commented out)
+  - Added "rebootRequired"
+  - Added "installerBusy"
+
+0.01  Tue Feb 17 16:43:41 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Win32::WindowsUpdate

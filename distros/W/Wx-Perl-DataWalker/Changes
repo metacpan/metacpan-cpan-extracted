@@ -1,0 +1,8 @@
+Revision history for Perl extension Wx::Perl::DataWalker.
+
+0.02  Sun Mar 29 12:05 2009
+  - use overload::StrVal() to disable overloading where appropriate
+
+0.01  Sat Mar 21 14:40 2009
+  - original version
+

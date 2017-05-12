@@ -1,0 +1,59 @@
+Win32API/ProcessStatus
+======================
+
+The ProcessStatus helper functions make it easier for you to obtain
+information about processes.
+
+It covers enumerating the currently running processes and their modules.
+The results are return in a form as close as possible to the original Win32
+API (simple types are returned as scalars of the same type, arrays
+as references to arrays and structures as references to hashes with keys
+of the same names as the members of the original structures have). There are
+only process and module handling functions of the ProcessStatus helper
+implemented in this module (in the meanwhile).
+
+These functions are available in Psapi.dll, which is included
+in Windows 2000 or higher. To use these functions on Windows NT, you must
+obtain the redistributable version of this DLL. It is not included
+in Windows 9x.  See the module Win32API::ToolHelp for the similar
+functionality for Windows 9x.
+
+INSTALLATION
+
+To install this module from the sources type the following:
+
+   perl Makefile.PL
+   dmake
+   dmake test
+   dmake install
+
+If your Perl is configured to use nmake you will need to use nmake
+instead of dmake.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   build of Perl 5.6.1 for Win32 or Cygwin
+   Exporter
+   DynaLoader
+
+To pass successfully the test during the build (if built from sources)
+it requires these extra modules and libraries:
+
+   Win32API::Process
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002  Ferdinand Prantl. All rights reserved.
+
+Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided "as is" without express or implied warranty.
+
+See http://prantl.host.sk/perl/modules/Win32API/ProcessStatus
+for the most recent version.

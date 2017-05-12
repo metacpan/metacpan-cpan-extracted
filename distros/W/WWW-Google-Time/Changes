@@ -1,0 +1,63 @@
+Revision history for WWW-Google-Time
+
+1.001005  2014-12-31
+        - Fixed failing matches for multi-time-zone requests
+
+1.001004  2014-12-31
+        - Fixed a breaking test
+
+1.001003  2014-12-31
+        - Fixed breakage due to google changing their code
+
+1.001002  2014-08-30
+        - removed extraneous file from the dist
+        - removed leftover debugging code that created extra file (out.txt)
+
+1.001001  2014-08-30
+        [Features]
+        - Google now provides the month, date, and year. These are
+          now included as extra keys in the returned hashref.
+
+        [Bug Fixes]
+        - Fixed module breakage due to Google's changes
+
+        [Packaging and Internals]
+        - Converted to dzil
+        - Got rid of Class::Data::Accessor, which is deprecated
+        - Moved author tests to xt/
+        - Cleaned up the 00-load.t a bit and added a few extra tests
+
+0.0119  2013-11-24
+        - Fixed module breakage
+        - Minor fixes to comply with the specs and Kwalitee game
+
+0.0118  2011-12-04
+        - Fixed module breakage
+
+0.0117  2011-12-04
+        - Fixed module breakage
+
+0.0116  2010-06-02
+        - Fixed module breakage again; last fix wasn't complete
+
+0.0115  2010-06-02
+        - Fixed module breakage caused by Google's change of HTML
+
+0.0114  2010-06-02
+        - Fixed module breakage caused by Google's change
+          from <b> to <em>
+
+0.0113  2009-11-07
+        - Fixed module breakage caused by Google's updated markup
+
+0.0103  2008-12-30
+        - Fixed a bug where no data would be parsed
+          when multiple time results are present
+
+0.0102  2008-10-11
+        - Small change in attempt to fix FAIL reports.
+          No change in the interface
+
+0.0101  2008-10-11
+        - First version, released on an unsuspecting world.
+

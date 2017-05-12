@@ -1,0 +1,36 @@
+#include "resource.h"
+
+IDI_DEFAULTICON         ICON    DISCARDABLE     "guiperl.ico"
+IDC_HSPLIT         		CURSOR  DISCARDABLE     "hsplit.cur"
+IDC_VSPLIT         		CURSOR  DISCARDABLE     "vsplit.cur"
+
+#include "winver.h"
+
+1 VERSIONINFO
+FILEVERSION		1,13,0,0
+PRODUCTVERSION	1,13,0,0
+FILEOS	VOS__WINDOWS32
+FILETYPE VFT_DLL
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904E4"
+		{
+			VALUE "Comments" , "Win32::GUI Perl module v1.13"
+			VALUE "CompanyName" , "Open Source"
+			VALUE "FileDescription" , "perl-win32-gui Perl extension"
+			VALUE "FileVersion" , "1.13"
+			VALUE "InternalName" , "GUI.dll"
+			VALUE "LegalCopyright" , "Copyright © Aldo Caplini 1997..2016"
+			VALUE "LegalTrademarks" , "GNU and Artistic licences"
+			VALUE "OriginalFilename" , "GUI.dll"
+			VALUE "ProductName" , "Win32::GUI"
+			VALUE "ProductVersion" , "1.13"
+		}
+	}
+
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409, 0x04E4
+	}
+}

@@ -1,0 +1,2 @@
+GET,/api/xyz
+GET,/api/abc/{id}

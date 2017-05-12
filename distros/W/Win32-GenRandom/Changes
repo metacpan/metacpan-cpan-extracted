@@ -1,0 +1,17 @@
+0.04
+ - Ensure that t/05gen_check.t and t/05gen_check_alt.t use at least version 0.39
+   of Math::GMPz.
+
+ - Add gr(), gr_uv(), gr_32(), cgr_custom(), cgr_custom_uv() and cgr_custom_32()
+   functions. Also add tests for these new additions.
+
+ - Add LICENSE to GenRandom.pm
+
+0.03
+ - Rewrite rgr() so that it's suitable for MS compilers (and other minor rewrites).
+
+0.02
+ - Amend t/04print_error.t to cater for some languages in addition to English.
+
+0.01
+ - First release

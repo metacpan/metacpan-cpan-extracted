@@ -1,0 +1,43 @@
+{
+    "defaults" : {
+	"check" : {
+	    "code_cmp" : ">",
+	    "response_code" : 2,
+	    "min_bytes_code" : 2,
+	    "max_bytes_code" : 1,
+	    "regex_forbid_code" : 2,
+	    "regex_require_code" : 2,
+	    "text_forbid_code" : 2,
+	    "text_require_code" : 2,
+	    "min_elapsed_time_code" : 1,
+	    "max_elapsed_time_code" : 2,
+	    "ignore_case" : true,
+	    "text_forbid" : [
+		"Premature end of script headers",
+		"Error processing directive",
+		"XML Parsing partner document",
+		"sun.io.MalformedInputException",
+		"an error occurred while processing this directive"
+	    ]
+	},
+	"request" : {
+	    "method" : "GET"
+	}
+    },
+    "wtscript_extensions" : [ "txt", "wts", "wtscript" ],
+    "script_dirs" : ["/data/devel/Vodafone/vzapp-nagios/nagios-plugins/check_web_config"],
+    "templating" : {
+	"vars" : {
+	    "CODE_NAMES" : ["OK", "WARNING", "CRITICAL", "UNKNOWN", "DEPENDENT", "EXCEPTION"]
+	},
+    },
+    "summary" : {
+	"template" : "[% CODE_NAMES.$CODE; IF MESSAGES.size > 0 %] - [% MESSAGES.join(', '); END %]\n",
+	"target" : "-"
+    },
+    "report" : {
+	"template" : "[% USE Dumper; Dumper.dump(RESPONSE) %]",
+	"target" : "/tmp/@OPTS_FILE@.log",
+	"append" : true
+    }
+}

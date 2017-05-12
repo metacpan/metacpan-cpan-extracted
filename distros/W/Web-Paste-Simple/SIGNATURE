@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 0281f2d3397cf03f4247280d369ebc300f61fa7a COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 ee5f188cb1abe36b20428674b213e9ea5c02224c Changes
+SHA1 33980c327a7ebc9ebda3f8667b4b0addbbc4e23d INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 a87a8c36fa4954996512be653a2c806c1fecc7fe MANIFEST
+SHA1 7db0a6300b83cc18699d5438f3025e29c01deec9 META.json
+SHA1 ee69fe3f6a39d6dd47cadcef80e65852f94d4086 META.yml
+SHA1 f689b3775d85daa8761c080c26c636d7b39cd964 Makefile.PL
+SHA1 adb30fa902c05366fb653a27a441360c64eff343 README
+SHA1 b52f58012fe7de2fe4f266031a381d64b4bff016 bin/web-paste-simple.psgi
+SHA1 8876c6d84ebb857647913bf6546b9472ca300ad0 dist.ini
+SHA1 61016d73e2f30fdf6abfdf66e8f2c14ec8871215 doap.ttl
+SHA1 c308b57fe250f70d6720f6984513649611d40471 lib/Web/Paste/Simple.pm
+SHA1 b663efb63b7509fdaa536ac99e100ec6e72068e8 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ2nMACgkQzr+BKGoqfTngJACdGXd0T+HBlQ12ApBWugcE1coA
+2wMAn3tMP7eccp3owtvRVLbs+GuGxFgo
+=R1d5
+-----END PGP SIGNATURE-----

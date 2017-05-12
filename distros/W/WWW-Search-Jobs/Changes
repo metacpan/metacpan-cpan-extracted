@@ -1,0 +1,16 @@
+2007-06-11    <Daddy@C-3PO>
+
+	* module HeadHunter delete (website no longer exists)
+
+2007-06-09    <Daddy@C-3PO>
+
+	* module AltaVista::Careers deleted (already exists in WWW-Search-AltaVista distro)
+
+	* add pod test
+
+	* use strict in all modules
+
+2006-05-02    <Daddy@C-3PO>
+
+	* Dice.pm: module resurrected by Brian Sammon
+

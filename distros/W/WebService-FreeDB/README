@@ -1,0 +1,13 @@
+WebService::FreeDB -  A String search interface to FreeDB
+
+WebService::FreeDB is a Module using the Web Interface of 
+the www.freedb.org to search for keywords in the cd database.
+This means you do not have to know an identification number of 
+a CD.
+Comments, suggestions, error-hints are welcome.
+example/cdsearch.pl is a example script for retrieving a cd
+user-interactively
+
+Henning Mersch <hm@mystical.de>
+
+

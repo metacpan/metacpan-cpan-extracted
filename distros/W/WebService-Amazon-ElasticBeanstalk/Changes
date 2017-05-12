@@ -1,0 +1,7 @@
+Revision history for WebService-Amazon-ElasticBeanstalk
+0.08    2015-11-18
+        Fix wrong case for XML::Simple in Makefile. Thanks to SREZIC@cpan.org
+
+0.01    2015-01-27
+        First version, released on an unsuspecting world.
+

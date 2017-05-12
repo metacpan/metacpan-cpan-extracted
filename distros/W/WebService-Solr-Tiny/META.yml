@@ -1,0 +1,27 @@
+---
+abstract: 'Perl interface to Apache Solr'
+author:
+  - 'James Raspass <jraspass@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::MockObject: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Solr-Tiny
+provides:
+  WebService::Solr::Tiny:
+    file: lib/WebService/Solr/Tiny.pm
+    version: '0.001'
+requires:
+  URI::Query::FromHash: '0.003'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/JRaspass/WebService-Solr-Tiny/issues
+  repository: git://github.com/JRaspass/WebService-Solr-Tiny.git
+version: '0.001'

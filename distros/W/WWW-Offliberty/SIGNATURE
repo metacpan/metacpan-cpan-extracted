@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 61f83d4b2d2eed6667ff37b9591612c220a70fe6 Changes
+SHA1 fc0e9f7db3b70258faca81bb1a69a88d7ca230e8 MANIFEST
+SHA1 1925217762c83607ed7b9fecd336df120a7f7317 META.json
+SHA1 afc823f7feafd02814f3a52925bc123b98aabb1a META.yml
+SHA1 8281788d0cb7170f782a64b1ab8f80d2b9ba55e7 Makefile.PL
+SHA1 b876cfc6d3516449ffa9a548bf1581fe0095f3bb README
+SHA1 889fc1f8b7cf293c2d4d28fd689e408bc424eac1 lib/WWW/Offliberty.pm
+SHA1 6044d06b0558bed63d17ffb62713ba0fc01d8e1a off
+SHA1 7749b74256fbddfe170dada7ee7ad2b5a4c642a1 t/00-load.t
+SHA1 1ad27aa02106a581f60e4ee2e7b87c50ebf8d581 t/50-network.t
+SHA1 668edc62795d8e39f03af6fa6bff97f2cfdfba9f t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYi3akEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2JADQ//
+eVjUn6LvSX8ZNot3GMQUZ52jUyRGEf1lBF3flhXbKdEwrxKzdp1q4H5dSTrkbFT/
+oVYuqh0uxL5h2JqhMNHDxpqmo1Nt5F2YSufCz+oFuM9zhC9BEOyYv6swVnuLox44
+eRevwtlkJlK9MTC299B8ngHUp6ENpBLuC1lFgCYDKTOfsrFvOHVPKUhL81xKw5hS
+lhR2XUnHN7jSZaokGCeDYamWJmPjMUU6DKuA0ajxy3e4QlH6GKvxIG7rz9OdUiw7
+RmygGZFWzdKF7B3ZHR0i0xOhSY5rVUmp0pEePYO2F5wYSe+EZH6nWuSaX6aeGkql
+V9ng0X9JEXY2Fc8mIwmm4dmbJ73GSHCVrpsGViXth5yEp+Sn6hQDf2COR5if4ur5
++xS7UUurTm5965SiKH/09uu63wjBB4nYCUqJM0PgMmW9mYKO3CsYOjIiJLQZslkP
+CfVnBQ4EolfZwsS//Kc58Wp0nts87vOIRP5gABUkXeT6b/ONGdHkykH7EhX5VbMt
+wNq9tcbLtezEI4IsNkW4g7pIszT0e59giCs+F/xm7PAyaXHu7koeFBiXi2V5MCqa
+nKZCAP02ZOlOU7Q3sJVqhO7nhNe3w/p5p/rN30o9PKdeAtdIcumQGsnjnIyNkRQF
+x98HO5M9e8ib2lL5vSsCxS0lSFu49UPH+ekX9NmPOLI=
+=FHKV
+-----END PGP SIGNATURE-----

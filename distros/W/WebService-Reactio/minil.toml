@@ -1,0 +1,4 @@
+name = "WebService-Reactio"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

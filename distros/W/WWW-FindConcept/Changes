@@ -1,0 +1,14 @@
+Revision history for Perl extension WWW::FindConcept.
+
+0.01  Mon Jan  5 16:43:12 2004
+	- original version; created by h2xs 1.21 with options
+		-XA WWW::FindConcept
+
+0.02  Tue,  6 Jan 2004 14:40:03 +0800
+	- cache mechanism added
+	- find-concept.pl -r : remove cache
+	- find-concept.pl -u : update concepts
+	- Sources.pm updated
+
+0.03  Tue,  6 Jan 2004 15:35:37 +0800
+	- dump_cache() added

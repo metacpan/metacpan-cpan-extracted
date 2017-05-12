@@ -1,0 +1,13 @@
+Win32::FileOp
+
+Many file related functions for Windows:
+	Copy, move, delete and recycle files with confirmation and progress dialogs
+	Open, SaveAs and BrowseForFolder dialogs
+	NTFS Compression
+	INI files
+	Drive mapping and substitution
+	Recent documents list modification
+
+uses Data::Lazy - available from CPAN
+ and Win32::AbsPath - available from http://Jenda.Krynicky.cz
+  (I plan to move over to File::Spec one day. )

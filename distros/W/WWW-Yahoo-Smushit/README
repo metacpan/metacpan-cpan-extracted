@@ -1,0 +1,39 @@
+NAME
+    WWW::Yahoo::Smushit - Perl interface to Yahoo Smushit image optimizer
+
+SYNOPSIS
+        my $st = new WWW::Yahoo::Smushit;
+
+        if($st->upload_by_url('http://img3.imageshack.us/img3/562/synyrt2.jpg')) {
+            printf("Image url:\t%s\nNew image:\t%s\nNew size:\t%s\nOld size:\t%s\nPercent:\t%s%%\n",
+                $st->src, $st->dest, $st->dest_size, $st->src_size, $st->percent);
+        }
+        else {
+            printf("Oops! Something is wrong...\n\nError:\t%s\n", $st->error);
+        }
+
+DESCRIPTION
+    Smush.it is a service to optimize images, removing some unnecessary
+    data.
+
+METHODS
+  upload_by_url($img_url)
+    Send a request to the Smushit via http and retrieves the JSON object.
+
+INTERNALS
+  _create_attrs_from_json
+    Get the JSON and create the attributes.
+
+  SEE ALSO
+    Smushit <http://smush.it/>.
+
+AUTHOR
+    Junior Moraes <fvox@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Junior Moraes
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

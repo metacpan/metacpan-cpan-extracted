@@ -1,0 +1,203 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+
+my ($dbtype, $dbname, $dbuser, $dbpass, $dbhost, $dbport, $help, $id, $node_name, $version);
+GetOptions( "type=s"         => \$dbtype,
+            "name=s"         => \$dbname,
+            "user=s"         => \$dbuser,
+            "pass=s"         => \$dbpass,
+            "host=s"         => \$dbhost,
+            "port=s"         => \$dbport,
+            "help"           => \$help,
+            "id=s"           => \$id,
+            "nodename=s"     => \$node_name,
+            "version=s"      => \$version,
+          );
+
+unless (defined($dbtype)) {
+    print "You must supply a database type with the --type option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+unless (defined($dbname)) {
+    print "You must supply a database name with the --name option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+if(defined($id) and defined($node_name)) {
+    print "You should supply either a node name, or an id, but not both.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+if(not defined($id) and not defined($node_name)) {
+    print "You must supply the id of the node with the --id option,\n";
+    print " or the node name of the node with the --nodename option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+if ($help) {
+    print "Help can be found by typing 'perldoc $0'\n";
+    exit 0;
+}
+
+my %setup_modules = ( postgres => "Wiki::Toolkit::Store::Pg",
+                      mysql    => "Wiki::Toolkit::Store::MySQL",
+                      sqlite  => "Wiki::Toolkit::Store::SQLite"
+);
+
+unless ( defined($setup_modules{$dbtype}) ) {
+    print "dbtype must be one of 'postgres', 'mysql', and 'sqlite'\n";
+    print "further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+# Load classes
+require Wiki::Toolkit;
+my $class = $setup_modules{$dbtype};
+eval "require $class";
+if ( $@ ) {
+    print "Couldn't 'use' $class: $@\n";
+    exit 1;
+}
+
+# Create a store instance
+my $store;
+my $args = "dbname=>'$dbname', dbuser=>'$dbuser'";
+if($dbpass) {
+    $args .= ", dbpass=>'$dbpass'";
+}
+if($dbhost) {
+    $args .= ", dbhost=>'$dbhost'";
+}
+if($dbport) {
+    $args .= ", dbport=>'$dbport'";
+}
+eval "\$store = $class->new($args);";
+
+# Create a Wiki instance
+my $wiki = Wiki::Toolkit->new(store=>$store);
+
+# If they gave the ID, get the name
+if($id) {
+    $node_name = $wiki->store->node_name_for_id($id);
+    unless($node_name) {
+        die("No node found with id '$id'\n");
+    }
+}
+
+# Report what we're going to do
+print "Deleting node with name '$node_name'";
+if($id) {
+    print " (id $id)";
+}
+if($version) {
+    print " at version $version";
+}
+print "\n";
+
+# Do the delete
+$wiki->delete_node(name => $node_name, version => $version);
+
+# All done
+print "done.\n";
+
+=head1 NAME
+
+wiki-toolkit-delete-node - Delete a node stored in a Wiki::Toolkit instance.
+
+=head1 SYNOPSIS
+
+  # Delete a node in a Wiki::Toolkit instance
+
+  wiki-toolkit-delete-node --type postgres
+           --name mywiki \
+           --user wiki  \
+           --pass wiki \
+           --host 'db.example.com' \
+           --port 1234 \
+           --nodename MyNodeName 
+
+  wiki-toolkit-delete-node --type postgres
+           --name mywiki \
+           --user wiki  \
+           --pass wiki \
+           --host 'db.example.com' \
+           --port 1234 \
+           --id 2 \
+           --version 7
+
+=head1 DESCRIPTION
+
+Takes four mandatory arguments:
+
+=over 4
+
+=item type
+
+The database type.  Should be one of 'postgres', 'mysql' and 'sqlite'.
+
+=item name
+
+The database name.
+
+=item nodename
+
+The name of the node to be deleted.
+
+=item id
+
+The id of the node to be deleted
+
+=back
+
+four optional arguments:
+
+=over 4
+
+=item user
+
+The user that connects to the database. It must have permission
+to create and drop tables in the database.
+
+=item pass
+
+The user's database password.
+
+=item host
+
+The hostname of the machine the database server is running on (omit
+for local databases).
+
+=item port
+
+The port number that the database server is expecting connections to.
+
+=item version
+
+The version number of the node to delete
+
+=back
+
+=head1 AUTHOR
+
+Nick Burch
+
+=head1 COPYRIGHT
+
+     Copyright (C) 2006 Nick Burch.  All Rights Reserved.
+
+This code is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Wiki::Toolkit>
+
+=cut
+
+1;

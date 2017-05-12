@@ -1,0 +1,54 @@
+{
+   "abstract" : "Interface to Google's Blogger service",
+   "author" : [
+      "Kedar Warriner <kedar at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Blogger",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "File::stat" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.22"
+}

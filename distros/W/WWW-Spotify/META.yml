@@ -1,0 +1,52 @@
+---
+abstract: 'Spotify Web API Wrapper'
+author:
+  - 'Aaron Johnson <aaronjjohnson@gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Spotify
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Data::Dumper: '0'
+  File::Basename: '0'
+  HTTP::Headers: '0'
+  IO::CaptureOutput: '0'
+  JSON::MaybeXS: '0'
+  JSON::Path: '0'
+  LWP::Protocol::https: '0'
+  MIME::Base64: '0'
+  Moo: '2.002004'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  URI: '0'
+  URI::Escape: '0'
+  WWW::Mechanize: '0'
+  XML::Simple: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/trs-80/WWW-Spotify/issues
+  homepage: https://github.com/trs-80/WWW-Spotify
+  repository: https://github.com/trs-80/WWW-Spotify.git
+version: '0.009'
+x_contributors:
+  - 'aj <aj@spotify.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

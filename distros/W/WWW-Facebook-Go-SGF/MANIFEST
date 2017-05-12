@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Facebook/Go/SGF.pm
+ARTISTIC.txt
+GPL2.txt
+t/13x13-204405.html
+t/9x9-103128.html
+t/9x9-103128.sgf
+t/mocked.t
+t/handicap-213926.html
+t/nohandicap-148912.html
+t/pod-coverage.t
+t/pod.t
+t/13x13-204405.sgf
+t/handicap-213926.sgf
+t/nohandicap-148912.sgf
+bin/facebook2sgf
+META.yml                                 Module meta-data (added by MakeMaker)

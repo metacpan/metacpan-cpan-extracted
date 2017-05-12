@@ -1,0 +1,39 @@
+Weather-Com Installation Instructions
+=====================================
+
+Installation of Weather-Com is pretty much Perl standard.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test	   # best with Test::MockObject installed
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  - Locale::Maketext
+  - LWP::UserAgent
+  - Storable
+  - Time::Local
+  - Time::Format
+  - URI::Escape
+  - XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2007 by Thomas Schnuecker (thomas@schnuecker.de)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The data provided by weather.com and made accessible by this OO
+interface can be used for free under special terms. 
+
+Please register at http://www.weather.com/services/xmloap.html, download
+the SDK and have a look at the application programming guide for further
+information about legal issues.
+
+

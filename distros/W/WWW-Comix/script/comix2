@@ -1,0 +1,616 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Carp;
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( :config gnu_getopt );
+use version; my $VERSION = qv('0.0.1');
+use English qw( -no_match_vars );
+use Log::Log4perl qw( :easy :no_extra_logdie_message );
+use Storable qw( nstore retrieve );
+use File::Basename qw( basename );
+use Path::Class qw( dir );
+use Fcntl qw( O_RDWR O_CREAT );
+use Config::Tiny;
+
+use lib dir(__FILE__)->parent()->stringify();
+use lib dir(__FILE__)->parent()->subdir('lib')->stringify();
+use lib dir(__FILE__)->parent()->parent()->subdir('lib')->stringify();
+use WWW::Comix;
+
+my %config = (pause => 2, get => 1);
+GetOptions(
+   \%config,     'usage',         'help',      'man',
+   'version',    'directory|d=s', 'pause|p=i', 'get!',
+   'plugin|x=s', 'plugins|P!',    'comics|C!', 'comics-by-plugin',
+   'config|c=s', 'own-config|o=s', 'sample!',  'all|a!',
+   'insist!', 'upto=i', 'errors=i',
+);
+pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => '')
+  if $config{version};
+pod2usage(-verbose => 99, -sections => 'USAGE') if $config{usage};
+pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+  if $config{help};
+pod2usage(-verbose => 2) if $config{man};
+
+# Script implementation here
+Log::Log4perl->easy_init(
+   {
+      level  => $INFO,
+      layout => '[%d %-5p] %m%n',
+   }
+);
+
+if ($config{'comics-by-plugin'}) {
+   my %comics_for = WWW::Comix->get_plugins_capabilities(probe => 'ok');
+   my %priority_for = WWW::Comix->get_plugins_priorities();
+   for my $plugin (
+      sort { $priority_for{$a} <=> $priority_for{$b} }
+      keys %comics_for
+     )
+   {
+      print {*STDOUT} $plugin, "\n";
+      print {*STDOUT} "   $_\n" for @{$comics_for{$plugin}};
+   } ## end for my $plugin (sort { ...
+   exit 0;
+} ## end if ($config{'comics-by-plugin'...
+if ($config{plugins}) {
+   local $\ = "\n";
+   print {*STDOUT} $_ for WWW::Comix->get_plugins();
+   exit 0;
+}
+
+if ($config{all}) {
+   my %plugins_for = WWW::Comix->get_comics_list(probe => 'ok');
+   @ARGV = sort keys %plugins_for;
+}
+
+if ($config{comics} || !scalar(@ARGV)) {
+   my %plugins_for = WWW::Comix->get_comics_list(probe => 'ok');
+   for my $comic (sort keys %plugins_for) {
+      local $" = ', ';
+      my @names = @{$plugins_for{$comic}};
+      print {*STDOUT} $comic, " [@names]\n";
+   }
+   exit 0;
+} ## end if ($config{comics} ||...
+
+INFO 'probing available comics...';
+WWW::Comix->probe();
+
+for my $comic (@ARGV) {
+   eval {
+      get_comic($comic);
+      1;
+   } or ERROR $EVAL_ERROR;
+} ## end for my $comic (@ARGV)
+
+sub set_optionals {
+   my ($opts, $conf) = @_;
+   for my $opt (qw( plugin )) {
+      $opts->{$opt} = $conf->{$opt} if exists $conf->{$opt};
+   }
+   return $opts;
+}
+
+sub get_comic {
+   my ($comic) = @_;
+
+   $comic =~ s{/\z}{}mxs;    # Directory trailing slash, if any...
+
+   # Understand which working class load and get a workhorse
+   INFO "getting an agent for comic '$comic'";
+   my $directory = $config{directory};
+   $directory ||= $comic unless $config{sample};
+   $directory ||= '.';
+
+   my %optional;
+   if ($config{config} || $config{'own-config'}) {
+      my $cfile = $config{config}
+         || dir($directory)->file($config{'own-config'})->stringify();
+      INFO "loading configurations from '$cfile'";
+      if (-r $cfile) {
+         my $conf = Config::Tiny->read($cfile);
+         set_optionals(\%optional, $conf->{$comic})
+            if exists $conf->{$comic};
+      }
+   }
+   set_optionals(\%optional, \%config);
+
+   my $agent = WWW::Comix->new(
+      comic     => $comic,
+      directory => $directory,
+      %optional,
+   );
+   INFO 'selected plugin: ', $agent->get_name();
+
+   # Get list of available strips
+   INFO "getting iterator to available strips...";
+   my $iterator = $agent->get_id_iterator();
+
+   ensure_directory($directory);
+
+   # If a single sample is requested, then do it and exit right away
+   if ($config{sample}) {
+      if (my $id = $iterator->()) {
+         INFO "getting $id\n";
+         $agent->getstore(
+            id => $id, 
+            filename => sub {
+               my ($self, %args) = @_;
+               (my $name = $comic) =~ s{[^\w.-]}{_}gmxs;
+               my $extension = $self->guess_file_extension(%args);
+               return "$name.$extension";
+            },
+         );
+      }
+      else {
+         ERROR 'no available id for this comic';
+      }
+      return;
+   }
+
+   my $history_file = $config{history}
+   || dir($directory)->file(basename(__FILE__) . '.history')
+   ->stringify();
+
+   my %flag_for = load_history($history_file);
+   INFO "checking against history file '$history_file'";
+
+   # A mechanism to skip all strips from now on, but marking them
+   # in the flag hash
+   my $please_download = $config{get};
+   my $please_stop = 0;
+   local $SIG{INT} = sub { 
+      $please_stop = 1;
+      $please_download = 0;
+   };
+
+   my $allowed_repetitions = 2;
+   my $max_consecutive_errors = defined($config{errors}) ? $config{errors} : 2;
+   my $consecutive_errors = 0;
+   my $downloaded_strips = 0;
+STRIP:
+   while ((my $id = $iterator->()) && !$please_stop) {
+      my $marker = $comic . '-' . $id;
+      if ($flag_for{$marker}) {
+         DEBUG "$id already present, skipping";
+         last STRIP if ! $config{insist} && --$allowed_repetitions < 0;
+         next STRIP;
+      }
+
+      INFO "getting $id\n";
+      eval {
+         $agent->getstore(id => $id,) if $please_download;
+         save_history($history_file, %flag_for);
+         $consecutive_errors = 0;
+         ++$downloaded_strips;
+         $flag_for{$marker} = 1;
+
+         1;  # leave this as last statement
+      } or do {
+         ERROR "error getting $marker: $EVAL_ERROR\n";
+         if ($max_consecutive_errors && ++$consecutive_errors > $max_consecutive_errors) {
+            ERROR "too many errors, bailing out with this comic";
+            last STRIP;
+         }
+      };
+
+      last if $config{upto} && $downloaded_strips >= $config{upto};
+
+      if ($config{pause} && $please_download && !$please_stop) {
+         my $pause = $config{pause} + rand $config{pause};
+         DEBUG "taking a rest of $pause s";
+         sleep $pause;
+      }
+   } ## end while (my $id = $iterator...
+
+   # Do this anyway...
+   save_history($history_file, %flag_for);
+
+   INFO "operations completed for comic '$comic'";
+
+   return;
+} ## end sub get_comic
+
+sub ensure_directory {
+   my ($directory) = @_;
+   if (!-e $directory) {
+      INFO "creating directory '$directory'";
+      mkdir $directory or LOGCROAK "mkdir('$directory'): $OS_ERROR";
+   }
+   LOGCROAK "$directory exists but it's not a directory"
+     unless -d $directory;
+   LOGCROAK "$directory is not writeable"
+     unless -w $directory;
+   return;
+} ## end sub ensure_directory
+
+sub load_history {
+   my ($filename) = @_;
+   my $retval = (-e $filename) ? retrieve($filename) : {};
+   return $retval unless wantarray;
+   return %$retval;
+} ## end sub load_history
+
+sub save_history {
+   my $filename = shift;
+   my $history = (scalar(@_) % 2) ? shift: {@_};
+   nstore $history, $filename;
+}
+
+__END__
+
+=head1 NAME
+
+comix2 - download comix for your offline pleasure
+
+=head1 VERSION
+
+Ask the version number to the script itself, calling:
+
+   shell$ comix2 --version
+
+=head1 USAGE
+
+   comix2 [--usage] [--help] [--man] [--version]
+
+   comix2 [--all|-a] [--comics|-C] [--comics-by-plugin]
+          [--config|-c <filename>] [--directory|-d <path>] [--errors <n>]
+          [--get] [--insist] [--own-config|-o <filename>]
+          [--plugin|-x <name>] [--plugins|-P] [--sample] [--upto <n>]
+
+=head1 EXAMPLES
+
+   shell$ comix2
+
+   # Get a sample of all the available comics
+   $ comix2 --sample --all
+
+   # Which comics are available?
+   $ comix2 --comics
+
+   # Which plugin handles which comic?
+   $ comix2 --comics-by-plugin
+
+   # Which comics are handled by each plugin?
+   $ comix2 --plugins
+
+   # Get last available strip of "foo" feature
+   $ comix2 --sample foo
+
+   # Get no more than 5 strips
+   $ comix2 --upto 5 foo
+
+   # Get all available strips for "bar"
+   $ comix2 bar
+
+   # Don't stress the server too much, put some random pauses
+   $ comix2 -p 5 bar
+
+   # Save in "/path/to/bar" instead of default "./bar"
+   $ comix2 -d /path/to/bar bar
+
+   # Force usage of plugin "baz" to download "foo"
+   $ comix2 -x baz foo
+
+=head1 DESCRIPTION
+
+This script eases access to some comix websites by providing a unique
+and consistent interface through WWW::Comix. You can get the list of
+supported comics for the plugin you have in your system, the list of
+plugins themselves, and you can download strips for offline reading
+with a variety of options.
+
+First of all, you can ask the list of available plugins, which will also
+give you the comics that each plugin supports. You can do this very easily:
+
+   $ comix2 --plugins
+
+Once you know, you'd better go to the site that the plugin supports, and
+see which comics you like. Once you know that you're interested into
+comic B<Foo bars> and B<Baz the Great>, for example, you can download 
+strips for offline reading:
+
+   $ comix2 "Foo bars" "Baz the Great"
+
+Note that the quotes are needed by the shell due to the fact that the
+strips has a space in the name.
+
+By default, a subdirectory named C<foo bar> will be created, where the
+downloaded files will be saved. You can force the download to happen
+elsewhere using the C<--directory|-d> option, anyway:
+
+   $comix2 -d /path/to/your/foo-bars "Foo bars"
+
+Each saved strip is associated to an opaque id that varies by plugin but
+that should uniquely identify each strip. Each time a strip is successfully
+downloaded, the id is recorded in a B<history file> inside the directory,
+so that the next time that particular strip will not be downloaded again.
+By default, when mirroring the research for untaken strips stops after the
+program skips two already-downloaded strips. If you know that there's a
+batch of old strips that you haven't fetched yet, you can C<--insist>. The
+history file is saved in the strip's directory with name C<comix2.history>.
+
+When downloading lots of strips, you'd like to be lean on the server, and
+allow for some time betweene each download. If you specify some value
+with C<--pause|-p>, a random time will be waited, ranging from the number
+of seconds passed through the option to the double of that number. Hence,
+if you specify 5 seconds, the pause will be randomly distributed between
+5 and 10 seconds.
+
+Sometimes a given strip could be provided by two or more providers (i.e.
+plugins). Each plugin is weighted depending on the number of strips it
+makes available, but if you want to insist on using a given plugin you can
+specify it with the C<--plugin|-x> option.
+
+If you have some options that you'd like to reuse at each run, you could
+want to save them into a file. For example, if you know that a given strip
+should be handled by a given plugin, a configuration file is an excellent
+place to put your preference. Configuration files resemble Windows C<.ini>
+files, where you can specify global options (inside a "no group" section, or
+a section named C<_>) and feature-specific options (inside a group that
+is named after the strip). For example:
+
+   pause 5
+
+   [foo]
+   plugin = bar
+
+The names of the options are exactly the same of the command-line options,
+in their long format and without the leading dashes. You can either specify
+a full path to the configuration file:
+
+   $ comix2 -c /path/to/config foo
+
+or you can signal that the progam will find some configuration file inside
+the directory that's specific for the strip itself:
+
+   $comix2 --own-config strip.config foo bar baz
+
+=head1 OPTIONS
+
+=over
+
+=item --all | -a
+
+consider all comics instead of those given on the command line. Depending
+on the plugins that you have, you could reach quite a number of comics,
+so use this option with care (might be worth to download a sample of
+each comic and give it a try, anyway).
+
+=item --comics | -C
+
+get a list of all supported comics.
+
+=item --comics-by-plugin
+
+get a list of all supported comics, each with a list of plugins that
+support the given comic. This sublist is sorted by plugin priority, so
+the first plugin is the one that would be used by default.
+
+=item --config | -c <filename>
+
+specify a session-wide configuration file. See also C<--own-config>
+below.
+
+=item --directory | -d <path>
+
+set the directory where the strips will be saved, instead of the default
+one built up from the feature's name.
+
+=item --errors <n>
+
+tolerate up to C<n> consecutive errors, then bail out from current
+feature. If you set to zero, you'll disable this check (this proves
+useful when mirroring). Defaults to 2.
+
+=item --get | --no-get
+
+ask to download the strip. This is actually the default, so this option
+makes sense only in its negated form, to perform a dry run.
+
+=item --help
+
+print a somewhat more verbose help, showing usage, this description of
+the options and some examples from the synopsis.
+
+=item --insist
+
+normally, after finding a couple of strips that have already been taken,
+the quest for new strips is ended. If this option is given, the quest is
+ended only at the very end of the list of strips. This can prove useful
+when performing the initial mirror, because if some strips are skipped due
+to errors you wouldn't get them in the following downloads. When updating
+the offline reading cache, anyway, this option is only likely to make you
+waste band and time.
+
+=item --man
+
+print out the full documentation for the script.
+
+=item --own-config | -o <filename>
+
+signal that the configuration file (with the given filename) will be
+found in the directory used to download the strips. This allows you to
+have a different configuration file for each strip (unless you specify
+a directory, in which case all strips will share the same configuration
+file in that directory).
+
+=item --plugin | -x <name>
+
+set the plugin to use instead of the default one chosen by C<comix2>
+on the base of priority values. You shouldn't usually need it, because
+priorities are calculated in order to privilege providers that give access
+to more strips.
+
+=item --plugins | -P
+
+get the list of installed plugins.
+
+=item --sample
+
+get only a sample for the given strips. If you want to get a sample of
+all the comics, you can do this:
+
+   $ comix2 --sample --all
+
+=item --upto <n>
+
+download at most C<n> strips that aren't already in the local cache. This
+lets you be even more lean on the server, e.g scheduling C<n> downloads
+per day (in this case you'll probably need C<--insist> as well).
+
+=item --usage
+
+print a concise usage line and exit.
+
+=item --version
+
+print the version of the script.
+
+=back
+
+=head1 DIAGNOSTICS
+
+C<comix2> gives you a feedback on what's doing, and each operation
+is visually logged. You won't have difficulties in understanding
+what's going wrong: errors are clearly marked as such!
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+comix2 configurations can be given with either the C<--config|-c>
+option or using the C<--own-config|-o> option.
+
+All options in the L<INTERFACE> section can be given, even though not
+all of them will make sense. The configuration file follows a
+Windows C<.ini> style, where you can have different configuration groups.
+In this case, each group is the name of a different feature. Every option
+outside a configuration group, or in group C<_>, are considered global and
+applied to all features. Comments can be given with the usual hash
+symbol, and must be put in a line by themselves.
+
+Example:
+
+   # Overall pause
+   pause 5
+
+   [Foo bars]
+   plugin = bar
+
+   [Baz the Great]
+   plugin = baz
+
+=head1 DEPENDENCIES
+
+You will need the following modules:
+
+=over
+
+=item *
+
+WWW::Comix
+
+=item *
+
+version
+
+=item *
+
+Log::Log4perl
+
+=item *
+
+Path::Class
+
+=item *
+
+Config::Tiny
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+
+=head1 AUTHOR
+
+Flavio Poletti C<flavio@polettix.it>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, Flavio Poletti C<flavio@polettix.it>. All rights reserved.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>
+and L<perlgpl>.
+
+Questo script è software libero: potete ridistribuirlo e/o
+modificarlo negli stessi termini di Perl stesso. Vedete anche
+L<perlartistic> e L<perlgpl>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=head1 NEGAZIONE DELLA GARANZIA
+
+Poiché questo software viene dato con una licenza gratuita, non
+c'è alcuna garanzia associata ad esso, ai fini e per quanto permesso
+dalle leggi applicabili. A meno di quanto possa essere specificato
+altrove, il proprietario e detentore del copyright fornisce questo
+software "così com'è" senza garanzia di alcun tipo, sia essa espressa
+o implicita, includendo fra l'altro (senza però limitarsi a questo)
+eventuali garanzie implicite di commerciabilità e adeguatezza per
+uno scopo particolare. L'intero rischio riguardo alla qualità ed
+alle prestazioni di questo software rimane a voi. Se il software
+dovesse dimostrarsi difettoso, vi assumete tutte le responsabilità
+ed i costi per tutti i necessari servizi, riparazioni o correzioni.
+
+In nessun caso, a meno che ciò non sia richiesto dalle leggi vigenti
+o sia regolato da un accordo scritto, alcuno dei detentori del diritto
+di copyright, o qualunque altra parte che possa modificare, o redistribuire
+questo software così come consentito dalla licenza di cui sopra, potrà
+essere considerato responsabile nei vostri confronti per danni, ivi
+inclusi danni generali, speciali, incidentali o conseguenziali, derivanti
+dall'utilizzo o dall'incapacità di utilizzo di questo software. Ciò
+include, a puro titolo di esempio e senza limitarsi ad essi, la perdita
+di dati, l'alterazione involontaria o indesiderata di dati, le perdite
+sostenute da voi o da terze parti o un fallimento del software ad
+operare con un qualsivoglia altro software. Tale negazione di garanzia
+rimane in essere anche se i dententori del copyright, o qualsiasi altra
+parte, è stata avvisata della possibilità di tali danneggiamenti.
+
+Se decidete di utilizzare questo software, lo fate a vostro rischio
+e pericolo. Se pensate che i termini di questa negazione di garanzia
+non si confacciano alle vostre esigenze, o al vostro modo di
+considerare un software, o ancora al modo in cui avete sempre trattato
+software di terze parti, non usatelo. Se lo usate, accettate espressamente
+questa negazione di garanzia e la piena responsabilità per qualsiasi
+tipo di danno, di qualsiasi natura, possa derivarne.
+
+=cut

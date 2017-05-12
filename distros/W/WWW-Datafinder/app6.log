@@ -1,0 +1,4 @@
+Elastic error: [Request] ** [http://10.0.2.15:9200]-[500] {"error":{"root_cause":[{"type":"out_of_memory_error","reason":"Java heap space"}],"type":"out_of_memory_error","reason":"Java heap space"},"status":500}, called from sub Search::Elasticsearch::Scroll::next at append-email.pl line 268. With vars: {'request' => {'serialize' => 'std','path' => '/_search/scroll','ignore' => [],'mime_type' => 'application/json','body' => 'c2Nhbjs1OzM4MTpzMTZpZnZLMFJoMnNlQjg5azRpcFlnOzM4MzpzMTZpZnZLMFJoMnNlQjg5azRpcFlnOzM4NTpzMTZpZnZLMFJoMnNlQjg5azRpcFlnOzM4NDpzMTZpZnZLMFJoMnNlQjg5azRpcFlnOzM4MjpzMTZpZnZLMFJoMnNlQjg5azRpcFlnOzE7dG90YWxfaGl0czoxMjQ5NDA7','qs' => {'scroll' => '120m'},'method' => 'GET'},'status_code' => 500}
+
+Flushing buffer
+0 total records

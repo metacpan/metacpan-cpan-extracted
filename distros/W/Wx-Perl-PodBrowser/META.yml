@@ -1,0 +1,40 @@
+---
+abstract: 'POD browser in Wx using wxRichTextCtrl.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wx-Perl-PodBrowser
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+optional_features:
+  maximum_interoperation:
+    description: 'All the optional things with and for Wx-Perl-PodBrowser.'
+    requires:
+      Software::License::GPL_3: '0'
+      Wx::Demo: '0'
+recommends:
+  Pod::Simple: '3.27'
+  Software::License::GPL_3: '0'
+requires:
+  Pod::Simple: '0'
+  Wx: '0'
+  Wx::RichText: '0'
+  perl: '5.008'
+resources:
+  homepage: http://user42.tuxfamily.org/wx-perl-podbrowser/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

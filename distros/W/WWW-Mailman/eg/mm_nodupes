@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use WWW::Mailman;
+use Getopt::Long;
+use YAML::Tiny qw( LoadFile DumpFile Dump );
+
+my %param = (
+    config => 'mailman.yml',
+    cookie => 'mailman.cookie',
+);
+GetOptions( \%param, 'config=s', 'cookie=s' )
+    or die "Usage: $0 [ --config file ] [ --cookie file ]\n";
+
+my $lists = LoadFile( $param{config} );
+my %opt = ( cookie_file => $param{cookie} );
+
+# actual code
+
+# I want to receive duplicates!
+for my $list ( values %$lists ) {
+    my $mm = WWW::Mailman->new( %opt, %$list );
+    $mm->options( { nodupes => 0 } );
+}
+

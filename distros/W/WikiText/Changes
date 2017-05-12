@@ -1,0 +1,47 @@
+0.19 Sun Aug 24 08:30:59 PDT 2014
+ - Add 'inc' for Test::Base inclusion
+
+0.18 Sun Aug 24 07:31:19 PDT 2014
+ - Try some more ::namespace tricks for indexing
+
+0.17 Sun Aug 24 07:10:54 PDT 2014
+ - Try some ::namespace tricks for indexing
+
+0.16 Fri Aug 22 09:25:52 PDT 2014
+ - Switch to Zilla-Dist
+
+0.15 Wed Jun  1 19:52:42 EST 2011
+ - Rerelease with Module::Package 0.19
+
+0.14 Mon May 30 20:40:44 EST 2011
+ - Rerelease with Module::Package 0.18
+
+0.13 Mon May 30 00:03:05 EST 2011
+ - Rerelease with Module::Package 0.16
+
+0.12 Sat May 28 16:47:44 EST 2011
+ - Rerelease with Module::Package 0.14
+
+0.11 Sat May 28 04:49:06 EST 2011
+ - Switch to Module::Package
+ - Allow newlines in text to generate <br>
+
+0.10 Tue Mar  8 12:05:17 EST 2011
+ - Bug fix from audreyt++.
+
+0.09 Tue Jul  8 15:58:12 PDT 2008
+ - Assert newline at the end of wikitext input.
+
+0.08 Thu Feb 14 22:24:18 PST 2008
+ - Account for multiple text events in a row.
+
+0.07 Thu Feb 14 01:44:34 PST 2008
+ - Support '=' in WikiByte
+ - Make reduction errors smaller
+
+0.06 Wed Feb 13 01:47:51 PST 2008
+ - Turn WikiText.pm into a base class
+
+0.05 Mon Feb 11 23:44:02 PST 2008
+ - Maiden voyage
+

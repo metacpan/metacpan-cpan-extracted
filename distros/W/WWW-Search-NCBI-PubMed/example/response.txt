@@ -1,0 +1,529 @@
+      0> <html>
+      1>   <head>
+      2> 		<META name="keywords" content="MEDLINE, NCBI, National Center for Biotechnology 
+      3> 	  Information, National Library of Medicine, NLM, PubMed">
+      4> 	<META name="description" content="PubMed is the National Library of Medicine's 
+      5> 	  search service that provides access to over 11 million citations in MEDLINE, 
+      6> 	  PreMEDLINE, and other related databases, with links to participating online 
+      7> 	  journals.">
+      8> 	<META name="robots" content="index,nofollow,NOARCHIVE">
+      9> 	<title>Entrez PubMed
+     10> </title>
+     11> 	<base href="http://www.ncbi.nlm.nih.gov:80">
+     12> 	<link type="text/css" rel="stylesheet" href="/corehtml/ncbi_test.css">
+     13> 	<script type="text/javascript" language="JavaScript" src="/corehtml/query/query.js"></script>
+     14>     <script type="text/javascript" language="JavaScript">
+     15>     <!--
+     16>         if (document.layers) { origWidth = window.innerWidth; origHeight = window.innerHeight; window.onresize = resizeFix; }
+     17>         function resizeFix() {
+     18>             if (document.layers && (window.innerWidth != origWidth || window.innerHeight != origHeight)) { window.history.go(0); }
+     19>         }
+     20>     // -->
+     21>     </script>  
+     22>     <script language="JavaScript1.2" src="http://www.ncbi.nlm.nih.gov/coreweb/javascript/popupmenu2/popupmenu2_4.js"></script>
+     23> </head>
+     24>     <body bgcolor="#FFFFFF" background="/corehtml/bkgd.gif" text="#000000" link="#0033CC" vlink="#CC3300">
+     25> 	 <form enctype="application/x-www-form-urlencoded" name="frmQueryBox" action="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?SUBMIT=y" method="POST" >
+     26> 		<input name="WebEnv" type="hidden" value="0Blo_pESeMePHLJwRSyY9cA_xA9ycbrq23TaZldmCdaTw0taMHla5t">
+     27> 		<input name="CMD" type="hidden" value="" disabled>
+     28> 		<!--start of first table -->
+     29> 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+     30> 		  <tr>			
+     31> 			 <!-- logo -->
+     32> 			 <td>
+     33> 				<table width="100%" border="0" cellpadding="0" cellspacing="0">
+     34> 				  <tr>
+     35> 					 <td align="left"><a href="http://www.ncbi.nlm.nih.gov"><img src="/corehtml/left.GIF" width="130" height="45" border="0" alt="NCBI"></a>
+     36> 					 </td>
+     37> 					 <td align="left"><IMG SRC="/entrez/query/static/gifs/entrez_pubmed.gif" ALT="PubMed" WIDTH=456 HEIGHT=60 BORDER=0 USEMAP="#map">
+     38> <MAP NAME="map">
+     39> <AREA SHAPE="rect" ALT="NLM" COORDS="321,7,447,52" HREF="http://www.nlm.nih.gov">
+     40> <AREA SHAPE="rect" ALT="PubMed" COORDS="1,1,320,60" HREF="/entrez/query.fcgi?db=PubMed">
+     41> </MAP></td>
+     42>                      <td align="right"></td>
+     43> 				  </tr>
+     44> 				</table>
+     45> 			 </td>
+     46> 		  </tr>
+     47> 		  <tr>
+     48> 			 <!--site map-->
+     49> 			 <td>
+     50> 			 	<table class="TEXT" border="0" cellspacing="0" cellpadding="2" bgcolor="#000000" width="100%">
+     51> <tr class="TEXT" align="CENTER">
+     52> <td><a href="/gquery/gquery.fcgi?itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Entrez</FONT></a></td>
+     53> <td><a href="/entrez/query.fcgi?db=PubMed&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">PubMed</FONT></a></td>
+     54> <td><a href="/entrez/query.fcgi?db=Nucleotide&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Nucleotide</FONT></a></td>
+     55> <td><a href="/entrez/query.fcgi?db=Protein&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Protein</FONT></a></td>
+     56> <td><a href="/entrez/query.fcgi?db=Genome&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Genome</FONT></a></td>
+     57> <td><a href="/entrez/query.fcgi?db=Structure&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Structure</FONT></a></td>
+     58> <td><a href="/entrez/query.fcgi?db=OMIM&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">OMIM</FONT></a></td>
+     59> <td><a href="/entrez/query.fcgi?db=PMC&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">PMC</FONT></a></td>
+     60> <td><a href="/entrez/query.fcgi?db=Journals&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Journals</FONT></a></td>
+     61> <td><a href="/entrez/query.fcgi?db=Books&itool=toolbar" class="GUTTER3"><FONT COLOR="#FFFFFF">Books</FONT></a></td>
+     62> </tr></table>
+     63> 			 </td>
+     64> 		  </tr>
+     65> 		  <tr>
+     66> 			 <!--query box-->
+     67> 			 <td>
+     68> 				<table width="100%" border="0" bgcolor="#CCCCCC" cellspacing="0" cellpadding="1">     
+     69> 				  <tr> 
+     70> 					 <td class="SMALL1" nowrap>&nbsp;Search
+     71> 						<small><select name="db" onChange="DbChange(this);"><option selected value="pubmed">PubMed</option>
+     72> <option value="protein">Protein</option>
+     73> <option value="nucleotide">Nucleotide</option>
+     74> <option value="structure">Structure</option>
+     75> <option value="genome">Genome</option>
+     76> <option value="books">Books</option>
+     77> <option value="cancerchromosomes">CancerChromosomes</option>
+     78> <option value="domains">3D Domains</option>
+     79> <option value="cdd">Domains</option>
+     80> <option value="gene">Gene</option>
+     81> <option value="geo">GEO</option>
+     82> <option value="gds">GEO DataSets</option>
+     83> <option value="homologene">HomoloGene</option>
+     84> <option value="journals">Journals</option>
+     85> <option value="mesh">MeSH</option>
+     86> <option value="ncbisearch">NCBI Web Site</option>
+     87> <option value="omim">OMIM</option>
+     88> <option value="pmc">PMC</option>
+     89> <option value="popset">PopSet</option>
+     90> <option value="snp">SNP</option>
+     91> <option value="taxonomy">Taxonomy</option>
+     92> <option value="unigene">UniGene</option>
+     93> <option value="unists">UniSTS</option>
+     94> </select>
+     95> <input name="orig_db" type="hidden" value="pubmed"></small>
+     96> 						for
+     97> 						<input name="term" size="45" type="TEXT" onKeyPress="KeyPress('Search',event)" value="&quot;Paus R&quot; [AU]">
+     98> 						
+     99> 						<input type="submit" value="Go" onClick="Go('search');">
+    100> 						<input name="Clear" type="button" value="Clear" onClick="this.form.term.value='';this.form.term.focus();">
+    101> 						<input name="cmd" type="hidden" value="Search">
+    102> 					 </td>
+    103> 					 				
+    104> 				  </tr>
+    105> 				</table>
+    106> 			 </td>
+    107> 		  </tr>
+    108> 		  <tr>
+    109> 			 <td>
+    110> 			    <table width="100%" border="0" cellspacing="0" cellpadding="0">  		
+    111> 			        <tr>
+    112> 				    <td width="140">
+    113> 				        <img src="/corehtml/transparent.gif" width="140" height="1" border="0">
+    114> 				    </td>
+    115> 				    <td width="100%" bgcolor="#CCCCCC">
+    116> 					<!-- tabstoolbar -->
+    117> 					<table border="0" bgcolor="#CCCCCC" cellpadding="0" cellspacing="0" width="100%">
+    118>   <tr>
+    119> <td class="tabna" width="5">&nbsp;</td>
+    120> <td class="tabna" nowrap="" width="111"><a class="pmlinkna" href="javascript:Go('Limits')">Limits</a></td>
+    121> <td class="tabna" nowrap="" width="111"><a class="pmlinkna" href="javascript:Go('Index')">Preview/Index</a></td>
+    122> <td class="tabna" nowrap="" width="111"><a class="pmlinkna" href="javascript:Go('History')">History</a></td>
+    123> <td class="tabna" nowrap="" width="111"><a class="pmlinkna" href="javascript:Go('Clipboard')">Clipboard</a></td>
+    124> <td class="tabna" nowrap="" width="111"><a class="pmlinkna" href="javascript:Go('Details')">Details</a></td>
+    125> <td class="tabna" width="5">&nbsp;</td>
+    126> <input name="cmd_current" type="hidden" value="">
+    127> <td bgcolor="#CCCCCC" width="100%">&nbsp;</td>
+    128>   </tr>
+    129> </table>
+    130> 				    </td>
+    131> 		            	</tr>
+    132> 			    </table>
+    133> 			</td>
+    134> 		  </tr>		  
+    135> 		</table>
+    136> 		<!--end of first table -->	
+    137> 		
+    138> 		<!--start of 2nd table -->		
+    139> 		<table border="0" cellspacing="0" cellpadding="0" width="100%">
+    140> 		  <tr valign="TOP"> 
+    141> 			 <!--  left column   -->          
+    142> 			 <td width="125">			
+    143> 				      <!-----edit this.....left column----->
+    144>          <table border="0" width="125" cellspacing="0" cellpadding="0">
+    145>                 <tr valign="bottom">
+    146>                   <td width="120"> <A
+    147> href="http://www.ncbi.nlm.nih.gov/Database/index.html" class="GUTTER3"><FONT COLOR="#FFFFFF">About Entrez</FONT></a><br>
+    148> <img src="/corehtml/transparent.gif"
+    149> width="1" height="4" ALT="spacer gif"></td>
+    150>                   <td width="8" align="right">
+    151> <img src="/corehtml/GoUp1.gif" width="8" height="19" ALT="back to About Entrez"></td>
+    152>                 </tr>
+    153>                 <tr align="right">
+    154>                   <td colspan="2">
+    155> <img src="/corehtml/GoUp2.gif"
+    156> width="125" height="12" ALT="back to About Entrez"></td>
+    157>                 </tr>
+    158>          </table>
+    159> <BR>
+    160> <A HREF="/entrez/queryd.fcgi?linkbar=plain" class="GUTTER3"><FONT COLOR="#FFFFFF">Text Version</FONT></a><BR>
+    161> <BR><span class="GUTTER1"><FONT COLOR="#ffcc66">Entrez PubMed</FONT></span> <br>
+    162> <A HREF="/entrez/query/static/overview.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Overview</FONT></a><BR>
+    163> <A HREF="/entrez/query/static/help/pmhelp.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Help | </FONT></a>
+    164> <A HREF="/entrez/query/static/faq.html" class="GUTTER3"><FONT COLOR="#FFFFFF">FAQ</FONT></a><BR>
+    165> <A HREF="http://www.nlm.nih.gov/bsd/pubmed_tutorial/m1001.html"
+    166> OnClick="window.open('http://www.nlm.nih.gov/bsd/pubmed_tutorial/m1001.html');
+    167> return false;" class="GUTTER3"><FONT
+    168> COLOR="#FFFFFF">Tutorial</FONT></a><br>
+    169> <A HREF="/entrez/query/static/new.html" class="GUTTER3"><FONT COLOR="#FFFFFF">New/Noteworthy</FONT></a><BR>
+    170> <a href="http://eutils.ncbi.nlm.nih.gov/entrez/query/static/eutils_help.html" class="GUTTER3"><FONT COLOR="#FFFFFF">E-Utilities</FONT></a><BR><BR>
+    171> <span class="GUTTER1"><FONT COLOR="#ffcc66">PubMed Services</FONT></span><BR>
+    172> <a href="/entrez/query.fcgi?db=journals" class="GUTTER3"><FONT COLOR="#FFFFFF">Journals Database</FONT></a><BR>
+    173> <a href="/entrez/query.fcgi?db=mesh" class="GUTTER3"><FONT COLOR="#FFFFFF">MeSH Database</FONT></a><BR>
+    174> <a href="/entrez/query/static/citmatch.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Single Citation Matcher</FONT></a><BR>
+    175> <a href="/entrez/getids.cgi" class="GUTTER3"><FONT COLOR="#FFFFFF">Batch Citation Matcher</FONT></a><BR>
+    176> <a href="/entrez/query/static/clinical.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Clinical Queries</FONT></a><BR>
+    177> <a href="/entrez/linkout" class="GUTTER3"><FONT COLOR="#FFFFFF">LinkOut</FONT></a><BR>
+    178> <a href="/entrez/cubby.fcgi?call=QueryExt.Query.last.Show&call=QueryExt.CubbyQuery..ShowAll" class="GUTTER3"><FONT COLOR="#FFFFFF">Cubby</FONT></a><BR><BR>
+    179> <span class="GUTTER1"><FONT COLOR="#ffcc66">Related Resources</FONT></span><BR>
+    180> <a href="http://www.nlm.nih.gov/loansomedoc/loansome_home.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Order Documents</FONT></a><BR>
+    181> <a href="http://gateway.nlm.nih.gov/gw/Cmd" class="GUTTER3"><FONT COLOR="#FFFFFF">NLM Gateway</FONT></a><BR>
+    182> <a href="http://toxnet.nlm.nih.gov" class="GUTTER3"><FONT COLOR="#FFFFFF">TOXNET</FONT></a><BR>
+    183> <a href="http://www.nlm.nih.gov/medlineplus/" class="GUTTER3"><FONT COLOR="#FFFFFF">Consumer Health</FONT></a><BR>
+    184> <a href="http://www.nlm.nih.gov/databases/alerts/clinical_alerts.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Clinical Alerts</FONT></a><BR>
+    185> <a href="http://clinicaltrials.gov/ct/gui" class="GUTTER3"><FONT COLOR="#FFFFFF">ClinicalTrials.gov</FONT></a><BR>
+    186> <a href="http://www.pubmedcentral.nih.gov" class="GUTTER3"><FONT COLOR="#FFFFFF">PubMed Central</FONT></a><BR>
+    187> <BR>
+    188> <A HREF="/entrez/query/static/privacy.html" class="GUTTER3"><FONT COLOR="#FFFFFF">Privacy Policy</FONT></a><BR>
+    189>  
+    190> <!-------end of left column. remove to sidebar.html file------>
+    191> 			 </td>
+    192> 			 <!-- extra column to force things over the gif border --> 
+    193> 			 <td width="15"><img src="/corehtml/transparent.gif" width="15" height="8" border="0"> 
+    194> 			 </td>
+    195> 			 <!-- right content column  --> 
+    196> 			 <td width="100%" bgcolor="#FFFFFF">       
+    197> 				<!-- -------- view --------- -->
+    198> 		   	<br><p></p><p><input name="query_key" type="hidden" value="1"><table bgcolor="#cccccc" cellpadding="0" cellspacing="0" width="100%"><tr><td align="left" nowrap="yes"><small><input name="Display" onClick="Go('Display')" type="BUTTON" VALUE="Display"><select name="dopt" onChange="if(this.options[this.selectedIndex].value.search('_') != -1){form.sort.selectedIndex=0};{form.dopt1.selectedIndex=selectedIndex;}"><option selected value="DocSum">Summary</option>
+    199> <option value="Brief">Brief</option>
+    200> <option value="Abstract">Abstract</option>
+    201> <option value="Citation">Citation</option>
+    202> <option value="ASN1">ASN.1</option>
+    203> <option value="MEDLINE">MEDLINE</option>
+    204> <option value="XML">XML</option>
+    205> <option value="uilist">UI List</option>
+    206> <option value="ExternalLink">LinkOut</option>
+    207> <option value="pubmed_pubmed">Related Articles</option>
+    208> <option value="pubmed_books_refs">Cited in Books</option>
+    209> <option value="pubmed_cancerchromosomes">CancerChrom Links</option>
+    210> <option value="pubmed_cdd">Domain Links</option>
+    211> <option value="pubmed_domains">3D Domain Links</option>
+    212> <option value="pubmed_gds">GEO DataSet Links</option>
+    213> <option value="pubmed_gene">Gene Links</option>
+    214> <option value="pubmed_genome">Genome Links</option>
+    215> <option value="pubmed_geo">GEO Links</option>
+    216> <option value="pubmed_homologene">HomoloGene Links</option>
+    217> <option value="pubmed_nucleotide">Nucleotide Links</option>
+    218> <option value="pubmed_omim">OMIM Links</option>
+    219> <option value="pubmed_pmc">PMC Links</option>
+    220> <option value="pubmed_pmc_refs">Cited in PMC</option>
+    221> <option value="pubmed_popset">PopSet Links</option>
+    222> <option value="pubmed_protein">Protein Links</option>
+    223> <option value="pubmed_snp">SNP Links</option>
+    224> <option value="pubmed_structure">Structure Links</option>
+    225> <option value="pubmed_unists">UniSTS Links</option>
+    226> </select>
+    227> &nbsp;Show:&nbsp;<select name="dispmax" onChange="form.dispmax1.selectedIndex=selectedIndex;"><option>5</option>
+    228> <option selected>10</option>
+    229> <option>20</option>
+    230> <option>50</option>
+    231> <option>100</option>
+    232> <option>200</option>
+    233> <option>500</option>
+    234> </select>
+    235> <select name="sort" onChange="if(form.dopt.options[form.dopt.selectedIndex].value.search('_') != -1){form.dopt.selectedIndex=0};{form.sort1.selectedIndex=selectedIndex;}"><option value="">Sort</option>
+    236> <option value="Authors">Author</option>
+    237> <option value="JournalName">Journal</option>
+    238> <option value="PublicationDate">Pub Date</option>
+    239> </select>
+    240> <input name="" onClick="Go(form.SendTo.options[form.SendTo.selectedIndex].value);" type="BUTTON" value="Send to"><select name="SendTo" onChange="form.SendTo1.selectedIndex=selectedIndex;"><option value="Text">Text</option>
+    241> <option value="File">File</option>
+    242> <option value="Add to Clipboard">Clipboard</option>
+    243> <option value="Mail">E-mail</option>
+    244> <option value="Order">Order</option>
+    245> </select>
+    246> </small></td></tr>
+    247> <tr><td><table cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" width="50%"><div class="medium2">Items 1-10 of 199</div></td>
+HEAD> <tr><td><table cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" width="50%"><div class="medium2">Items 1-10 of 199</div></td>
+    248> <td align="right"><table><tr><td><input class="dblinks" name="GoToPage" onClick="form.cmd.value='';form.inputpage.value=form.textpage.value;Go('Pager');" type="BUTTON" value="Page">&nbsp;<input class="dblinks" name="textpage" onChange="if(form.textpage1){form.textpage1.value=this.value}" onKeyPress="form.inputpage.value=this.value;KeyPress('Pager',event);" size="4" type="text" value="1"></td>
+    249> <td><div class="medium2">&nbsp;of&nbsp;20</div></td>
+    250> <td><input name="inputpage" type="hidden" value=""></td>
+    251> <td><a class="dblinks" href="javascript:var frm = document.frmQueryBox;frm.inputpage.value=2;Go('Pager');">Next</a>&nbsp;&nbsp;</td>
+    252> </tr></table></td>
+    253> </tr></table></td></tr>
+    254> </table>
+    255> <input name="CrntRpt" type="hidden" value="DocSum"><input name="showndispmax" type="hidden" value="10"><input name="page" type="hidden" value="0"><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="15086574"><b>1: </b></td>
+    256> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15086574">Conrad F, Ohnemus U, Bodo E, Bettermann A, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15086574">Conrad F, Ohnemus U, Bodo E, Bettermann A, Paus R.</a></font></td>
+    257> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=15086574">Related Articles,</a><script language="JavaScript1.2">
+    258> <!--
+    259> var Menu15086574 = [
+    260> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15086574&dopt=Books'","",""],
+    261> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15086574&dopt=ExternalLink'","",""],
+    262> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    263> ]
+    264> //-->
+    265> </script>
+    266> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu15086574,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    267> </tr>
+    268> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15086574&itool=iconnoabstr"><img alt="No abstract" Border="0" src="/entrez/query/PubMed/gifs/noabstract_d.gif" Title="No abstract"></a></td>
+    269> <td colspan="2">Estrogens and human scalp hair growth-still more questions than answers.<br><font size="-1">J Invest Dermatol. 2004 Mar;122(3):840-2. No abstract available. <br>PMID: 15086574 [PubMed - in process]</font></td>
+DESC> <td colspan="2">Estrogens and human scalp hair growth-still more questions than answers.<br><font size="-1">J Invest Dermatol. 2004 Mar;122(3):840-2. No abstract available. <br>PMID: 15086574 [PubMed - in process]</font></td>
+    270> </tr>
+    271> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="15009108"><b>2: </b></td>
+    272> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15009108">Luger TA, Christiano AM, Schwarz T, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15009108">Luger TA, Christiano AM, Schwarz T, Paus R.</a></font></td>
+    273> <td align="right" nowrap valign="top"><SPAN><script language="JavaScript1.2">
+    274> <!--
+    275> var Menu15009108 = [
+    276> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15009108&dopt=Books'","",""],
+    277> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15009108&dopt=ExternalLink'","",""],
+    278> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    279> ]
+    280> //-->
+    281> </script>
+    282> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu15009108,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a></SPAN></td>
+    283> </tr>
+    284> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15009108&itool=iconnoabstr"><img alt="No abstract" Border="0" src="/entrez/query/PubMed/gifs/noabstract_d.gif" Title="No abstract"></a></td>
+    285> <td colspan="2">[In Process Citation]<br><font size="-1">Exp Dermatol. 2004 Jan;13(1):1. No abstract available. <br>PMID: 15009108 [PubMed - in process]</font></td>
+DESC> <td colspan="2">[In Process Citation]<br><font size="-1">Exp Dermatol. 2004 Jan;13(1):1. No abstract available. <br>PMID: 15009108 [PubMed - in process]</font></td>
+    286> </tr>
+    287> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="15005744"><b>3: </b></td>
+    288> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15005744">Herz U, Botchkarev VA, Paus R, Renz H.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15005744">Herz U, Botchkarev VA, Paus R, Renz H.</a></font></td>
+    289> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=15005744">Related Articles,</a><script language="JavaScript1.2">
+    290> <!--
+    291> var Menu15005744 = [
+    292> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15005744&dopt=Books'","",""],
+    293> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=15005744&dopt=ExternalLink'","",""],
+    294> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    295> ]
+    296> //-->
+    297> </script>
+    298> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu15005744,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    299> </tr>
+    300> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=15005744&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    301> <td colspan="2">Increased airway responsiveness, allergy-type-I skin responses and systemic anaphylaxis in a humanized-severe combined immuno-deficiency mouse model.<br><font size="-1">Clin Exp Allergy. 2004 Mar;34(3):478-87. <br>PMID: 15005744 [PubMed - in process]</font></td>
+DESC> <td colspan="2">Increased airway responsiveness, allergy-type-I skin responses and systemic anaphylaxis in a humanized-severe combined immuno-deficiency mouse model.<br><font size="-1">Clin Exp Allergy. 2004 Mar;34(3):478-87. <br>PMID: 15005744 [PubMed - in process]</font></td>
+    302> </tr>
+    303> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14962114"><b>4: </b></td>
+    304> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962114">Ito N, Ito T, Betterman A, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962114">Ito N, Ito T, Betterman A, Paus R.</a></font></td>
+    305> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14962114">Related Articles,</a><script language="JavaScript1.2">
+    306> <!--
+    307> var Menu14962114 = [
+    308> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14962114&dopt=Books'","",""],
+    309> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14962114&dopt=ExternalLink'","",""],
+    310> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    311> ]
+    312> //-->
+    313> </script>
+    314> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14962114,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    315> </tr>
+    316> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962114&itool=iconnoabstr"><img alt="No abstract" Border="0" src="/entrez/query/PubMed/gifs/noabstract_d.gif" Title="No abstract"></a></td>
+    317> <td colspan="2">The human hair bulb is a source and target of CRH.<br><font size="-1">J Invest Dermatol. 2004 Jan;122(1):235-7. No abstract available. <br>PMID: 14962114 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">The human hair bulb is a source and target of CRH.<br><font size="-1">J Invest Dermatol. 2004 Jan;122(1):235-7. No abstract available. <br>PMID: 14962114 [PubMed - indexed for MEDLINE]</font></td>
+    318> </tr>
+    319> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14962083"><b>5: </b></td>
+    320> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962083">Ohnemus U, Unalan M, Handjiski B, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962083">Ohnemus U, Unalan M, Handjiski B, Paus R.</a></font></td>
+    321> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14962083">Related Articles,</a><script language="JavaScript1.2">
+    322> <!--
+    323> var Menu14962083 = [
+    324> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14962083&dopt=Books'","",""],
+    325> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14962083&dopt=ExternalLink'","",""],
+    326> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    327> ]
+    328> //-->
+    329> </script>
+    330> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14962083,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    331> </tr>
+    332> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14962083&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    333> <td colspan="2">Topical estrogen accelerates hair regrowth in mice after chemotherapy-induced alopecia by favoring the dystrophic catagen response pathway to damage.<br><font size="-1">J Invest Dermatol. 2004 Jan;122(1):7-13. <br>PMID: 14962083 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">Topical estrogen accelerates hair regrowth in mice after chemotherapy-induced alopecia by favoring the dystrophic catagen response pathway to damage.<br><font size="-1">J Invest Dermatol. 2004 Jan;122(1):7-13. <br>PMID: 14962083 [PubMed - indexed for MEDLINE]</font></td>
+    334> </tr>
+    335> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14742267"><b>6: </b></td>
+    336> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14742267">Ito T, Ito N, Bettermann A, Tokura Y, Takigawa M, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14742267">Ito T, Ito N, Bettermann A, Tokura Y, Takigawa M, Paus R.</a></font></td>
+    337> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14742267">Related Articles,</a><script language="JavaScript1.2">
+    338> <!--
+    339> var Menu14742267 = [
+    340> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14742267&dopt=Books'","",""],
+    341> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14742267&dopt=ExternalLink'","",""],
+    342> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    343> ]
+    344> //-->
+    345> </script>
+    346> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14742267,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    347> </tr>
+    348> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14742267&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    349> <td colspan="2">Collapse and restoration of MHC class-I-dependent immune privilege: exploiting the human hair follicle as a model.<br><font size="-1">Am J Pathol. 2004 Feb;164(2):623-34. <br>PMID: 14742267 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">Collapse and restoration of MHC class-I-dependent immune privilege: exploiting the human hair follicle as a model.<br><font size="-1">Am J Pathol. 2004 Feb;164(2):623-34. <br>PMID: 14742267 [PubMed - indexed for MEDLINE]</font></td>
+    350> </tr>
+    351> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14708595"><b>7: </b></td>
+    352> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14708595">Peters EM, Maurer M, Botchkarev VA, Jensen K, Welker P, Scott GA, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14708595">Peters EM, Maurer M, Botchkarev VA, Jensen K, Welker P, Scott GA, Paus R.</a></font></td>
+    353> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14708595">Related Articles,</a><script language="JavaScript1.2">
+    354> <!--
+    355> var Menu14708595 = [
+    356> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14708595&dopt=Books'","",""],
+    357> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14708595&dopt=ExternalLink'","",""],
+    358> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    359> ]
+    360> //-->
+    361> </script>
+    362> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14708595,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    363> </tr>
+    364> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14708595&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    365> <td colspan="2">Kit is expressed by epithelial cells in vivo.<br><font size="-1">J Invest Dermatol. 2003 Nov;121(5):976-84. <br>PMID: 14708595 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">Kit is expressed by epithelial cells in vivo.<br><font size="-1">J Invest Dermatol. 2003 Nov;121(5):976-84. <br>PMID: 14708595 [PubMed - indexed for MEDLINE]</font></td>
+    366> </tr>
+    367> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14705798"><b>8: </b></td>
+    368> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14705798">Arck PC, Handjiski B, Peters EM, Hagen E, Klapp BF, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14705798">Arck PC, Handjiski B, Peters EM, Hagen E, Klapp BF, Paus R.</a></font></td>
+    369> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14705798">Related Articles,</a><script language="JavaScript1.2">
+    370> <!--
+    371> var Menu14705798 = [
+    372> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14705798&dopt=Books'","",""],
+    373> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14705798&dopt=ExternalLink'","",""],
+    374> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    375> ]
+    376> //-->
+    377> </script>
+    378> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14705798,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    379> </tr>
+    380> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14705798&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    381> <td colspan="2">Topical minoxidil counteracts stress-induced hair growth inhibition in mice.<br><font size="-1">Exp Dermatol. 2003 Oct;12(5):580-90. <br>PMID: 14705798 [PubMed - in process]</font></td>
+DESC> <td colspan="2">Topical minoxidil counteracts stress-induced hair growth inhibition in mice.<br><font size="-1">Exp Dermatol. 2003 Oct;12(5):580-90. <br>PMID: 14705798 [PubMed - in process]</font></td>
+    382> </tr>
+    383> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14699982"><b>9: </b></td>
+    384> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14699982">Botchkarev VA, Botchkareva NV, Peters EM, Paus R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14699982">Botchkarev VA, Botchkareva NV, Peters EM, Paus R.</a></font></td>
+    385> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14699982">Related Articles,</a><script language="JavaScript1.2">
+    386> <!--
+    387> var Menu14699982 = [
+    388> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14699982&dopt=Books'","",""],
+    389> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14699982&dopt=ExternalLink'","",""],
+    390> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    391> ]
+    392> //-->
+    393> </script>
+    394> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14699982,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    395> </tr>
+    396> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14699982&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    397> <td colspan="2">Epithelial growth control by neurotrophins: leads and lessons from the hair follicle.<br><font size="-1">Prog Brain Res. 2004;146:493-513. Review. <br>PMID: 14699982 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">Epithelial growth control by neurotrophins: leads and lessons from the hair follicle.<br><font size="-1">Prog Brain Res. 2004;146:493-513. Review. <br>PMID: 14699982 [PubMed - indexed for MEDLINE]</font></td>
+    398> </tr>
+    399> </table><table cellpadding="0" cellspacing="5" width="100%"><tr><td nowrap valign="top"><input name="uid" type="checkbox" value="14675186"><b>10: </b></td>
+    400> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14675186">Brandt K, Bulfone-Paus S, Jenckel A, Foster DC, Paus R, Ruckert R.</a></font></td>
+AUTH> <td width="100%"><font size="-1"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14675186">Brandt K, Bulfone-Paus S, Jenckel A, Foster DC, Paus R, Ruckert R.</a></font></td>
+    401> <td align="right" nowrap valign="top"><SPAN><a CLASS="dblinks" href="http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_pubmed&from_uid=14675186">Related Articles,</a><script language="JavaScript1.2">
+    402> <!--
+    403> var Menu14675186 = [
+    404> ["Gene","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=pubmed&cmd=Display&dopt=pubmed_gene&from_uid=14675186'","",""],
+    405> ["Books","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14675186&dopt=Books'","",""],
+    406> ["LinkOut","window.top.location='http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?cmd=Retrieve&db=pubmed&list_uids=14675186&dopt=ExternalLink'","",""],
+    407> ["Help","window.open('/entrez/query/static/popup.html','Links_Help','resizable=no,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=500');","",""]
+    408> ]
+    409> //-->
+    410> </script>
+    411> <a CLASS="dblinks" href="javascript:PopUpMenu2_Set(Menu14675186,'','','','','');" onMouseOut="PopUpMenu2_Hide(); return false;" TARGET="_self">Links</a> </SPAN></td>
+    412> </tr>
+    413> <tr><td align="left" valign="top"><a href="/entrez/query.fcgi?cmd=Retrieve&db=pubmed&dopt=Abstract&list_uids=14675186&itool=iconabstr"><img alt="Abstract" Border="0" src="/entrez/query/PubMed/gifs/abstract_d.gif" Title="Abstract"></a></td>
+    414> <td colspan="2">Interleukin-21 inhibits dendritic cell-mediated T cell activation and induction of contact hypersensitivity in vivo.<br><font size="-1">J Invest Dermatol. 2003 Dec;121(6):1379-82. <br>PMID: 14675186 [PubMed - indexed for MEDLINE]</font></td>
+DESC> <td colspan="2">Interleukin-21 inhibits dendritic cell-mediated T cell activation and induction of contact hypersensitivity in vivo.<br><font size="-1">J Invest Dermatol. 2003 Dec;121(6):1379-82. <br>PMID: 14675186 [PubMed - indexed for MEDLINE]</font></td>
+    415> </tr>
+    416> </table><table bgcolor="#cccccc" cellpadding="0" cellspacing="0" width="100%"><tr><td align="left" nowrap="yes"><small><input name="Display" onClick="Go('Display')" type="BUTTON" VALUE="Display"><select name="dopt1" onChange="if(this.options[this.selectedIndex].value.search('_') != -1){form.sort1.selectedIndex=0};{form.dopt.selectedIndex=selectedIndex;}"><option selected value="DocSum">Summary</option>
+    417> <option value="Brief">Brief</option>
+    418> <option value="Abstract">Abstract</option>
+    419> <option value="Citation">Citation</option>
+    420> <option value="ASN1">ASN.1</option>
+    421> <option value="MEDLINE">MEDLINE</option>
+    422> <option value="XML">XML</option>
+    423> <option value="uilist">UI List</option>
+    424> <option value="ExternalLink">LinkOut</option>
+    425> <option value="pubmed_pubmed">Related Articles</option>
+    426> <option value="pubmed_books_refs">Cited in Books</option>
+    427> <option value="pubmed_cancerchromosomes">CancerChrom Links</option>
+    428> <option value="pubmed_cdd">Domain Links</option>
+    429> <option value="pubmed_domains">3D Domain Links</option>
+    430> <option value="pubmed_gds">GEO DataSet Links</option>
+    431> <option value="pubmed_gene">Gene Links</option>
+    432> <option value="pubmed_genome">Genome Links</option>
+    433> <option value="pubmed_geo">GEO Links</option>
+    434> <option value="pubmed_homologene">HomoloGene Links</option>
+    435> <option value="pubmed_nucleotide">Nucleotide Links</option>
+    436> <option value="pubmed_omim">OMIM Links</option>
+    437> <option value="pubmed_pmc">PMC Links</option>
+    438> <option value="pubmed_pmc_refs">Cited in PMC</option>
+    439> <option value="pubmed_popset">PopSet Links</option>
+    440> <option value="pubmed_protein">Protein Links</option>
+    441> <option value="pubmed_snp">SNP Links</option>
+    442> <option value="pubmed_structure">Structure Links</option>
+    443> <option value="pubmed_unists">UniSTS Links</option>
+    444> </select>
+    445> &nbsp;Show:&nbsp;<select name="dispmax1" onChange="form.dispmax.selectedIndex=selectedIndex;"><option>5</option>
+    446> <option selected>10</option>
+    447> <option>20</option>
+    448> <option>50</option>
+    449> <option>100</option>
+    450> <option>200</option>
+    451> <option>500</option>
+    452> </select>
+    453> <select name="sort1" onChange="if(form.dopt1.options[form.dopt1.selectedIndex].value.search('_') != -1){form.dopt1.selectedIndex=0};{form.sort.selectedIndex=selectedIndex;}"><option value="">Sort</option>
+    454> <option value="Authors">Author</option>
+    455> <option value="JournalName">Journal</option>
+    456> <option value="PublicationDate">Pub Date</option>
+    457> </select>
+    458> <input name="" onClick="Go(form.SendTo1.options[form.SendTo1.selectedIndex].value);" type="BUTTON" value="Send to"><select name="SendTo1" onChange="form.SendTo.selectedIndex=selectedIndex;"><option value="Text">Text</option>
+    459> <option value="File">File</option>
+    460> <option value="Add to Clipboard">Clipboard</option>
+    461> <option value="Mail">E-mail</option>
+    462> <option value="Order">Order</option>
+    463> </select>
+    464> </small></td></tr>
+    465> <tr><td><table cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" width="50%"><div class="medium2">Items 1-10 of 199</div></td>
+    466> <td align="right"><table><tr><td><input class="dblinks" name="GoToPage" onClick="form.cmd.value='';form.inputpage.value=form.textpage1.value;Go('Pager');" type="BUTTON" value="Page">&nbsp;<input class="dblinks" name="textpage1" onChange="if(form.textpage){form.textpage.value=this.value}" onKeyPress="form.inputpage.value=this.value;KeyPress('Pager',event);" size="4" type="text" value="1"></td>
+    467> <td><div class="medium2">&nbsp;of&nbsp;20</div></td>
+    468> <td><input name="inputpage1" type="hidden" value=""></td>
+    469> <td><a class="dblinks" href="javascript:var frm = document.frmQueryBox;frm.inputpage.value=2;Go('Pager');">Next</a>&nbsp;&nbsp;</td>
+    470> </tr></table></td>
+    471> </tr></table></td></tr>
+    472> </table>
+    473> </p>		
+    474> 				<!-- -------- end of view --------- -->				
+    475> 			  <!-- end of right content column  --> 			
+    476> 		  </tr>
+    477> 		  <tr valign="TOP"> 
+    478> 		    <td width="125">&nbsp;</td>
+    479> 		    <td width="15">&nbsp;</td>
+    480> 			 <td width="100%">&nbsp;</td>
+    481> 		  </tr>
+    482> 		  <tr valign="TOP"> 
+    483> 			 <td width="125" class="GUTTER2">&nbsp;</td>
+    484> 			 <td width="15">&nbsp;</td>
+    485> 			 <td width="100%"> 
+    486> 				<div class="medium1">&nbsp;</div>
+    487> <div class="medium1">
+    488> <center>&nbsp;<a href="http://www.nlm.nih.gov/contacts/contact_pubmed.html">Write to the
+    489> Help Desk</a>
+    490> <br><a href="http://www.ncbi.nlm.nih.gov">NCBI</a> | <a href="http://www.nlm.nih.gov">NLM</a>
+    491> | <a href="http://www.nih.gov">NIH</a>
+    492> <br><a href="http://www.os.dhhs.gov/">Department of Health &amp; Human
+    493> Services</a>
+    494> <br><a href="http://www.nih.gov/icd/od/foia/index.htm">Freedom of Information
+    495> Act</a> | <a href="http://www.ncbi.nlm.nih.gov/About/disclaimer.html">Disclaimer</a></center>
+    496> </div>
+    497> 			 <p class="dblinks" align="right"><font color="#eeeeee" size="-5">Apr 19 2004 06:53:45</font></p>
+    498> 			 </td>
+    499> 		  </tr>
+    500> 		</table>
+    501> 		<!--  end of content  -->
+    502> 	 	<input type="image" src="/corehtml/transparent.gif" size=0>
+    503> 	 </FORM>	 
+    504> 	 <script type="text/javascript" language="JavaScript">document.frmQueryBox.term.focus();</script>
+    505>      <!-- host:ipubmed21 -->
+    506>   </body>
+    507> </html>

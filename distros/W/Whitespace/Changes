@@ -1,0 +1,13 @@
+Revision history for Perl extension Whitespace.
+
+1.00  Tue May 15 14:12:41 EDT 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Whitespace
+
+1.01  Thu May 17 11:15:10 EDT 2001
+	- Fix the first =head1 per feedback from <jasmith@ntr.net>
+
+1.02  Wed May 23 16:22:26 EDT 2001
+	- Introduce _brinkoftabstop to fix _spctabclean to clean
+	  intelligently on tab boundaries.
+	- Use a more regular perl module approach (with @EXPORTS, etc..)

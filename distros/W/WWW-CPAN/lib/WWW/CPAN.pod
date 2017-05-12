@@ -1,0 +1,145 @@
+
+=head1 NAME
+
+WWW::CPAN - CPAN as a web service
+
+=head1 SYNOPSIS
+
+  use WWW::CPAN;
+
+  $meta = WWW::CPAN->fetch_distmeta('Error');
+
+  $cpan = WWW::CPAN->new;
+  $meta = $cpan->fetch_distmeta('Error');
+  $meta = $cpan->fetch_distmeta({ dist => 'Error' });
+  $meta = $cpan->fetch_distmeta({ dist => 'Error-0.13', });
+  $meta = $cpan->fetch_distmeta({ dist => 'Error', version => '0.13' }); # same as above
+  $meta = $cpan->fetch_distmeta({ dist => 'Error', author => 'GBARR', format => 'json' });
+
+  $result = $cpan->search('WWW-CPAN');
+  $result = $cpan->search({ query => 'WWW-CPAN', mode => 'dist' });
+
+=head1 DESCRIPTION
+
+Once upon a time, Schwern waved his hands
+and Graham implemented a mechanism to get the
+meta data from CPAN distributions at search.cpan.org.
+
+  http://use.perl.org/~schwern/journal/35203
+
+  http://www.mail-archive.com/module-build@perl.org/msg01157.html
+
+This module opportunistically implemented a client
+for this capability. One day, hopefully this
+may be useful.
+
+A further addition to C<WWW::CPAN> API was the
+C<search> method to fetch query data from
+search.cpan.org. This is done by issuing HTTP
+requests like
+
+  http://search.cpan.org/search?query=Romanize&mode=all&format=xml
+
+=head1 METHODS
+
+=over 4
+
+=item B<fetch_distmeta>
+
+  $meta = $cpan->fetch_distmeta($text);
+  $meta = $cpan->fetch_distmeta(\%params);
+
+Fetches the meta data (F<META.yml>) of a CPAN
+distribution.
+
+Supported parameters:
+
+  dist    - the distribution to look for
+  author  - the distribution author
+  version - the distribution version
+
+=item B<search>
+
+  $res = $cpan->search($text);
+  $res = $cpan->search(\%params);
+
+Performs a query at CPAN and returns it as a
+(possibly partial) result set. The structure
+of the result is illustrated by the example below.
+
+  # result of   WWW::CPAN->search({ query => 'CPAN', mode => 'dist', n => 2 })
+  {
+    dist    => [
+                 {
+                   author  => { link => 'http://search.cpan.org/~andk/' },
+                   description
+                           => 'query, download and build perl modules from CPAN sites ',
+                   link    => 'http://search.cpan.org/author/ANDK/CPAN-1.9205/',
+                   name    => 'CPAN',
+                   released
+                           => '11th November 2007',
+                   version => 1.9205
+                 },
+                 {
+                   author  => { link => 'http://search.cpan.org/~dons/' },
+                   description
+                           => 'Download and install CPAN modules upon first use',
+                   link    => 'http://search.cpan.org/author/DONS/CPAN-AutoINC-0.01/',
+                   name    => 'CPAN-AutoINC',
+                   released
+                           => '22nd June 2004',
+                   version => 0.01
+                 }
+               ],
+    matches => 108,
+    start   => 1
+ };
+
+The known parameters of the query are
+
+  query  - what to look for
+  mode   - all | module | dist | author
+  n      - page size (should be <= 100)
+  s      - start
+
+The maximum page size (C<n>) is 100. Larger values
+are reset into 100.
+
+=item B<query>
+
+  $res = $cpan->query($text);
+  $res = $cpan->query(\%params);
+
+This is a method alias to L<search>. It works just
+the same.
+
+=back
+
+=head1 SEE ALSO
+
+  cpanq
+  App::WWW::CPAN
+
+L<cpanq> is a script which illustrates the retrieval capabilities 
+of this module from the command line.
+
+=head1 BUGS
+
+In the distribution test F<t/03meta.t>, when using
+C<< WWW::CPAN->fetch_distmeta >> instead of C<< WWW::CPAN->new->fetch_distmeta >>,
+the script crashes (look for the "FIXME" item).
+Should be fixed in the next releases (after I understood what's going on).
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-CPAN>
+or L<mailto://bugs-WWW-CPAN@rt.cpan.org>.
+
+=head1 AUTHORS
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2016 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

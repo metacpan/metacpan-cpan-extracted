@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/WebService/Embedly.pm
+t/00-load.t
+t/01-basic-usage-live.pl~
+t/01-basic-usage.t
+t/02-complete-oo.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,58 @@
+Revision history for WWW-Correios-PrecoPrazo
+
+0.32    2015-01-08
+            - NEW METHOD: query_multi()
+            - Improved error message parsing
+            - More tests
+
+0.31    2014-10-28
+            - Improved parsing
+            - include error message when there's an error
+            - more tests
+            - more docs
+            - switched back to EUMM
+
+0.3     2014-10-24
+            - only querying the webservice when required parameters are given
+            - basic response parsing
+            - cep_origem and cep_destino can be with or without dashes
+            - improved documentation
+            - more tests
+
+0.2.3   2014-08-29
+            - Copy of args during build. This prevents exceptions
+            when the args are constants.
+
+0.2.2   2013-12-07
+            - MYMETA no longer shipped with dist (dolmen)
+
+0.2.1   2013-02-03
+            - Changing from ExtUtils::MakeMaker to Module::Install
+            - Changing min perl version to 5.8.8
+
+0.2.0   2013-01-28
+            - Reversing keys/values from %OUTPUT_KEYS
+
+0.1.1   2013-01-21
+            - Fix PREREQ version of Const::Fast
+
+0.1.0   2013-01-16
+            - Fix on default user agent args
+            - Constructor args
+            - Documentation
+            - More tests
+
+0.0.4   2013-01-15
+            - Fix on paramenter name nVlPeso
+
+0.0.3   2013-01-06
+            - More documentation
+            - Setting pod encoding to utf8
+
+0.0.2   2012-12-23
+            - Table of output keys
+            - More Perl::Critic compliant
+
+0.0.1   2012-12-20
+            - Initial release.
+

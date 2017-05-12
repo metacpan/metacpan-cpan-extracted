@@ -1,0 +1,208 @@
+=head1 NAME
+
+WWW::Google::Translate - Perl interface for the Google Translate API
+
+=head1 SYNOPSIS
+
+=head2 Use Case 1
+
+  use WWW::Google::Translate;
+
+  my $wgt = WWW::Google::Translate->new(
+      {   key            => '<Your API key here>',
+          default_source => 'en',   # optional
+          default_target => 'ja',   # optional
+      }
+  );
+
+  my $r = $wgt->translate( { q => 'My hovercraft is full of eels' } );
+
+  for my $trans_rh (@{ $r->{data}->{translations} }) {
+
+      print $trans_rh->{translatedText}, "\n";
+  }
+
+=head2 Use Case 2
+
+  use WWW::Google::Translate;
+
+  my $wgt = WWW::Google::Translate->new( { key => '<Your API key here>' } );
+
+  my $r = $wgt->translate(
+      {   q           => 'My hovercraft is full of eels',
+          source      => 'en',
+          target      => 'ja',
+          format      => 'text',
+          prettyprint => 1,
+      }
+  );
+
+  for my $trans_rh (@{ $r->{data}->{translations} }) {
+
+      print $trans_rh->{translatedText}, "\n";
+  }
+
+=head2 Use Case 3
+
+  use WWW::Google::Translate;
+
+  my $wgt = WWW::Google::Translate->new( { key => '<Your API key here>' } );
+
+  my $r = $wgt->translate(
+      {   q      => 'My hovercraft is full of eels',
+          target => 'ja',
+      }
+  );
+
+  for my $trans_rh ( @{ $r->{data}->{translations} } ) {
+
+      print 'detected language: ', $trans_rh->{detectedSourceLanguage}, "\n";
+      print $trans_rh->{translatedText}, "\n";
+  }
+
+=head2 Language Detection
+
+  use WWW::Google::Translate;
+
+  my $wgt = WWW::Google::Translate->new( { key => '<Your API key here>' } );
+
+  my $r = $wgt->detect( { q => 'My hovercraft is full of eels' } );
+
+  my $lang = $r->{data}->{detections}->[0]->[0]->{language};
+
+=head1 DESCRIPTION
+
+This module provides a convenient interface for using the
+Google Translate API.
+
+See:
+https://cloud.google.com/translate/docs/getting-started
+
+
+=head1 METHODS
+
+=over
+
+=item new
+
+The constructor expects a hash ref with the following parameters:
+
+=over
+
+=item key
+
+Your API key. The key must be configured to be used with the machine you're
+running your program on.
+
+=item default_source
+
+This is the source language for any text you'll be submitting with the
+translate method. This is optional if you would rather supply the 'source'
+parameter to the translate method.
+
+=item default_target
+
+This is the target language for any text you'll be submitting with the
+translate method. This is optional if you would rather supply the 'target'
+parameter to the translate method.
+
+=item data_format
+
+This is either 'json' or 'perl'. If you indicate 'json' then you'll get the
+raw JSON as given by the remote API. Otherwise, the JSON::from_json function
+is used to transform the result to a perl data structure. Default is 'perl'.
+
+=item format
+
+Indiate either 'text' or 'html' as the format of the source text. This module
+will attempt to auto-detect if omitted.
+
+=item prettyprint
+
+Indicate a boolean for pretty formatted result. Default is true.
+
+=item timeout
+
+Use this parameter to control the timeout period given to the underlying
+LWP::UserAgent object. Default is 60 seconds.
+
+=item agent
+
+Use this to set the user-agent string used by your program when sending HTTP
+requests to the remote API.
+
+=item force_post
+
+The API docs state that 5K is the size limit per translate request. However
+the GET method limits the size to 2K. This module will force a POST type
+request if the size of your data is more than 2K. However, overvation suggests
+that your mileage may vary. If you find you're getting 414 Request-URI Too
+Large errors then you can try setting this option to 1.
+
+=item headers
+
+You can send custom headers in the HTTP requests to the API.
+
+=back
+
+  my $wgt = WWW::Google::Translate->new(
+      {   key              => '<Your API key here>',
+          default_source   => 'en',
+          default_target   => 'ja',
+          data_format      => 'perl',
+          timeout          => 60,
+          agent            => 'Translate Bot',
+          force_post       => 0,
+          headers          => { Agent => 'My Translation App' },
+      }
+  );
+
+
+=item detect
+
+Use this to auto-detect the language of a given chunk of text. Expects a
+hash ref with a 'q' paramter. Returns the data structure returned from the
+remote API.
+
+  my $d_rh        = $wgt->detect( { q => $text } );
+  my $language    = $d_rh->{data}->{detections}->[0]->[0]->{language};
+  my $is_reliable = $d_rh->{data}->{detections}->[0]->[0]->{isReliable};
+  my $confidence  = $d_rh->{data}->{detections}->[0]->[0]->{confidence};
+
+Note: You can get the benefit of auto-detected source language by simply
+omitting the 'source' and 'default_source' parameters for translate and
+the contructor.
+
+=item translate
+
+Use this to translate a given chunk of text. Expects a hash ref with a 'q'
+paramter. You may also supply 'source' and 'target' parameters. Returns the
+data structure returned from the remote API.
+
+  my $d_rh = $wgt->translate( { q => $text } );
+  $text    = $d_rh->{data}->{translations}->[0]->{translatedText};
+  $lang    = $d_rh->{data}->{translations}->[0]->{detectedSourceLanguage};
+
+The 'detectedSourceLanguage' will be included if you omit the 'source'
+parameter to translate (and also the default_source for the constructor).
+
+=back
+
+
+=head1 AUTHOR
+
+Dylan Doxey, E<lt>dylan@cpan.orgE<gt> 
+
+The author of this module is not affiliated with Google. The author of
+this module assumes no responsibility for activities of the users.
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

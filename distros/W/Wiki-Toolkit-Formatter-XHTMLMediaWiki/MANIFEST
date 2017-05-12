@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Wiki/Toolkit/Formatter/XHTMLMediaWiki.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/parse.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

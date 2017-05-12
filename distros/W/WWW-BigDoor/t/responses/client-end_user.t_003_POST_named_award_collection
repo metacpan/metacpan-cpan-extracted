@@ -1,0 +1,17 @@
+201[
+    {
+        "end_user_description": "things you can get", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259712, 
+        "pub_title": "application achievements", 
+        "named_awards": [], 
+        "non_secure": 0, 
+        "resource_name": "named_award_collection", 
+        "urls": [], 
+        "created_timestamp": 1294259712, 
+        "pub_description": "a set of achievements that the user can earn", 
+        "end_user_title": "achievements", 
+        "id": 829
+    }, 
+    {}
+]

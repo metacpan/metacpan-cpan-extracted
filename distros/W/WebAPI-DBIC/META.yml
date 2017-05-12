@@ -1,0 +1,65 @@
+---
+abstract: 'A composable RESTful JSON API to DBIx::Class schemas using roles and Web::Machine'
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires:
+  Cpanel::JSON::XS: '>= 3.0110, != 3.0112'
+  DBIx::Class::Fixtures: '1.001025'
+  Data::Printer: '0'
+  Module::Pluggable: '0'
+  Sort::Key: '0'
+  Test::Compile: v1.1.0
+  Test::DBIx::Class: '0.43'
+  Test::HTTP::Response: '0'
+  Test::More: '0.98'
+  Test::Most: '0'
+  Test::Pod: '0'
+  ToolSet: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebAPI-DBIC
+requires:
+  Alien::Web::HalBrowser: '0'
+  DBD::SQLite: '1.46'
+  DBIx::Class: '0.08250'
+  Data::Dumper::Concise: '0'
+  HTTP::Headers::ActionPack: '0'
+  HTTP::Throwable: '0'
+  JSON::MaybeXS: '0'
+  Lingua::EN::Inflect: '1.894'
+  Lingua::EN::Inflect::Number: '1.11'
+  List::MoreUtils: '0.408'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moo: '1.001000'
+  MooX::StrictConstructor: '0.006'
+  Path::Router: '0.14'
+  Plack: '1.0033'
+  Plack::App::File: '0'
+  Plack::App::Path::Router: '0.08'
+  SQL::Translator: '0.11018'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  String::CamelCase: '0'
+  Sub::Exporter: '0'
+  Sub::Quote: '0'
+  Sub::Util: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  Web::Machine: '0.15'
+  namespace::clean: '0.25'
+  parent: '0'
+  perl: '5.010'
+resources:
+  IRC: irc://irc.perl.org/#webapi
+  bugtracker: https://github.com/timbunce/WebAPI-DBIC/issues
+  homepage: https://github.com/timbunce/WebAPI-DBIC
+  repository: https://github.com/timbunce/WebAPI-DBIC.git
+version: '0.004002'

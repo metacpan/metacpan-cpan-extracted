@@ -1,0 +1,17 @@
+201[
+    {
+        "end_user_description": "test user description", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259882, 
+        "pub_title": "Test Named Good Collection", 
+        "resource_name": "named_good_collection", 
+        "urls": [], 
+        "attributes": [], 
+        "created_timestamp": 1294259882, 
+        "pub_description": "test description", 
+        "end_user_title": "test user title", 
+        "id": 444, 
+        "named_goods": []
+    }, 
+    {}
+]

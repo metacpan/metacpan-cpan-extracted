@@ -1,0 +1,18 @@
+Build.PL
+Makefile.PL
+Changes
+lib/WWW/Freshmeat.pm
+lib/WWW/Freshmeat/Project.pm
+lib/WWW/Freshmeat/Project/URL.pm
+lib/WWW/Freshmeat/User.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/project.t
+t/project-mojo.t
+t/mojomojo.xml
+t/hook_lexwrap.xml
+META.json

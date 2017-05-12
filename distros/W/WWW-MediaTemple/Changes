@@ -1,0 +1,7 @@
+Revision history for WWW::MediaTemple
+
+0.02      2011-05-01 23:25:08 America/Los_Angeles
+    - update Makefile.pl perl module prereq 
+
+0.01      2011-04-27 16:25:28 America/Los_Angeles
+    - initial release

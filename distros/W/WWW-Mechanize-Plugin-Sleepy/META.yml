@@ -1,0 +1,45 @@
+---
+abstract: 'A WWW::Mechanize plugin to provide the behaviour of WWW::Mechanize::Sleepy while using WWW::Mechanize::Pluggable'
+author:
+  - 'Michael Jemmeson <michael.jemmeson@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Timer: 0
+  WWW::Mechanize::Pluggable: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Mechanize-Plugin-Sleepy
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  WWW::Mechanize::Plugin::Sleepy:
+    file: lib/WWW/Mechanize/Plugin/Sleepy.pm
+    version: 0.003
+requires:
+  Carp: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/mjemmeson/www-mechanize-plugin-sleepy/issues
+  homepage: https://metacpan.org/release/WWW-Mechanize-Plugin-Sleepy
+  repository: git://github.com/mjemmeson/www-mechanize-plugin-sleepy.git
+version: 0.003

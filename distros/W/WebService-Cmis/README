@@ -1,0 +1,91 @@
+NAME
+    WebService::Cmis - Perl interface to CMIS-compliant document management
+    systems
+
+SYNOPSIS
+        use WebService::Cmis;
+
+        my $client = WebService::Cmis::getClient(
+          url => "http://.../alfresco/service/cmis",
+        );
+
+        $client->login(
+          user => "...",
+          password => "..."
+        );
+
+        my $repo = $client->getRepository;
+        my $root = $client->getRootFolder;
+
+DESCRIPTION
+    This library provides a CMIS client library for Perl that can be used to
+    work with CMIS-compliant repositories such as Alfresco, IBM FileNet,
+    Nuxeo and others. CMIS is an OASIS approved specification with backing
+    by major ECM players including those mentioned as well as Microsoft,
+    Oracle, and SAP.
+
+    CMIS providers must expose both Web Services and Restful AtomPub
+    bindings. WebService::Cmis uses the Restful AtomPub binding to
+    communicate with the CMIS repository. All you have to tell
+    WebService::Cmis is the repository's service URL and your credentials.
+    There is nothing to install on the server side.
+
+    See the
+    http://docs.oasis-open.org/cmis/CMIS/v1.0/cs01/cmis-spec-v1.0.html for a
+    full understanding of what CMIS is.
+
+METHODS
+    getClient(%params) -> WebService::Cmis::Client
+        Static method to create a cmis client. The client serves as an agent
+        to fulfill all operations while contacting the document management
+        system.
+
+        While passing on all provided parameters to the real client
+        constructor, the "impl" parameter is used to point to the class that
+        actually implements the client, defaulting to
+        WebService::Cmis::Client::BasicAuthClient.
+
+BUGS
+    Please report any bugs or feature requests to "bug-webservice-cmis at
+    rt.cpan.org", or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Cmis. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WebService::Cmis
+
+    You can also look for information at:
+
+    *   Github
+
+        https://github.com/MichaelDaum/cmis-perl
+
+    *   Meta CPAN
+
+        https://metacpan.org/module/WebService::Cmis
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        http://annocpan.org/dist/WebService-Cmis
+
+    *   CPAN Ratings
+
+        http://cpanratings.perl.org/d/WebService-Cmis
+
+ACKNOWLEDGEMENTS
+    This implementation is inspired by the Pyhton implementation
+    http://code.google.com/p/cmislib written by Jeff Potts.
+
+AUTHOR
+    Michael Daum "<daum@michaeldaumconsulting.com>"
+
+COPYRIGHT AND LICENSE
+    Copyright 2012-2013 Michael Daum
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See
+    http://dev.perl.org/licenses/artistic.html.
+

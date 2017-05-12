@@ -1,0 +1,13 @@
+<SOFTPKG NAME="IBM-WebSphere-Payment" VERSION="1,20,0,0">
+	<TITLE>IBM-WebSphere-Payment</TITLE>
+	<ABSTRACT>Simple Perl API interface to IBM Payment Manager 2.2</ABSTRACT>
+	<AUTHOR>Luis Moreno &lt;luis@cantv.net&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="HTTP-Headers" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="HTTP-Request" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="LWP-UserAgent" VERSION="0,0,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="x86/IBM-WebSphere-Payment.1.2.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,16 @@
+Revision history for WordLists
+
+0.013	2012-07-05
+		Added add_human_tags to WordLists::Tag::Tagger
+		
+0.012	2012-06-25
+		Added collation tools to WordLists::Sort
+
+0.011	2012-06-22
+		Added Definedness checks to WordLists::Sort
+
+0.010	2012-06-13
+		Tidied for CPAN.
+
+0.001	2011-07-22
+		First version.

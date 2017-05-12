@@ -1,0 +1,17 @@
+DESCRIPTION
+
+    From http://www.gtoal.com/scrabble/details/french/: The official French
+    scrabble wordlist is ODS. There have been three major releases of this;
+    ODS2 (aka ODS '94), ODS3 (aka ODS '99) and ODS 2000. ODS 2 and ODS3 are
+    available on the net if you know where to look.
+
+    Well, I've looked but so far have only managed to find the 7- and
+    8-letter ODS3 words from http://chr.amet.perso.infonie.fr/economec.htm.
+    If you know a more complete list, feel free to contact me.
+
+    Also note that words from ODS are unaccented.
+
+SEE ALSO
+
+    WordList::FR::WiktionaryES
+

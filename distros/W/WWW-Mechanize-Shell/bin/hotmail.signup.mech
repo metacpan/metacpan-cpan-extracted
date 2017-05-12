@@ -1,0 +1,24 @@
+auto Dirty Fixed ""
+auto FirstName Fixed Cor
+auto LastName Fixed Blimey
+auto Gender Fixed m
+auto PostalCode Fixed 666
+auto TimeZone Fixed 1096
+auto Month Fixed 2
+auto Day Fixed 18
+auto Year Fixed 1980
+auto SignInName Fixed CorBlimey666
+auto Password Fixed BlimeyCor999
+auto ConfirmedPassword Fixed BlimeyCor999
+auto SecretAnswer Fixed BlimeyCor969
+auto ConsentEmail Fixed ""
+auto ConsentName Fixed ""
+auto ConsentDemographic Fixed ""
+
+get http://www.hotmail.com/
+o "/^Sign Up/"
+form 2
+click
+form 1
+bro
+fill

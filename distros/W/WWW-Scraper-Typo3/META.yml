@@ -1,0 +1,31 @@
+---
+abstract: 'Clean up Typo3-based web site files'
+author:
+  - 'Ron Savage <ron@savage.neet.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Scraper-Typo3
+provides:
+  WWW::Scraper::Typo3:
+    file: lib/WWW/Scraper/Typo3.pm
+    version: 1.01
+requires:
+  File::Copy: 2.11
+  File::Slurp: 9999.13
+  File::Temp: 0
+  File::chdir: 0.1003
+  HTML::TreeBuilder: 3.23
+  LWP::Simple: 5.827
+  Moose: 1.09
+  common::sense: 3
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.01

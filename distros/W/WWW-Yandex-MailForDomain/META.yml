@@ -1,0 +1,24 @@
+---
+abstract: 'Yandex Mail for Domain API'
+author:
+  - 'Oleg Alistratov <zero@cpan.org>'
+build_requires:
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI::Escape: 0
+  XML::Simple: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Yandex-MailForDomain
+provides:
+  WWW::Yandex::MailForDomain:
+    file: lib/WWW/Yandex/MailForDomain.pm
+    version: 0.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.2

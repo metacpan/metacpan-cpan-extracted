@@ -1,0 +1,29 @@
+Revision history for Perl extension WWW::Gittip.
+
+0.07 2014-09-03
+    - Match changes in the service that broke the code.
+    - Start using the new http://www.gratipay.com/ URL.
+
+0.06 2014-05-25
+    - Fixed typo in DESCRIPTION heading, and added a first into paragraph. [NEILB]
+
+0.05 2014-05-21
+    - Add prerequisite HTML::TreeBuilder missed in 0.04
+
+0.04 2014-05-20
+    - Add method user_public
+    - Add method user_tips
+    - Add method community_members
+
+0.03 2014-05-17
+    - Allow user to supply API_KEY and use it to authenticate with the server.
+    - Switch to object methods from class methods.
+    - Start using LWP::UserAgent instead of LWP::Simple
+
+0.02 2014-05-15
+    - some more API methods added.
+    - require LWP::Protocol::https
+
+0.01 2014-05-14
+    - Initial release
+

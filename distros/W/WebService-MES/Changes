@@ -1,0 +1,6 @@
+Revision history for Perl extension WebService::MES.
+
+0.01  Mon Nov  4 11:30:03 2013
+	- original version; created by h2xs 1.23 with options
+		-X WebService::MES
+

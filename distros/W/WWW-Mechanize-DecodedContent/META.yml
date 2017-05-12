@@ -1,0 +1,16 @@
+abstract: decode Mech content using its HTTP response encoding
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: WWW-Mechanize-DecodedContent
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTTP::Response::Encoding: 0
+  WWW::Mechanize: 0
+version: 0.01

@@ -1,0 +1,18 @@
+Revision history for Perl extension Win32::Process::Memory.
+
+0.20  2004.05.01 22:57 Qing-Jie Zhou
+    * methods and documents is changed and improved, see POD
+    * add get_memlist, get_memtotal, hexdump
+    * add get_..., set_..., search_..., search_range_...
+
+0.11  2004.04.23 22:08 Qing-Jie Zhou
+    * Remove debug code
+    * Set buf = "" if buf is passed as empty
+    * Ensure win32 before Makefile.PL
+
+0.10  2004.04.23 21:16 Qing-Jie Zhou
+    * Initial release
+
+0.01  2004.04.22 14:01
+	- original version; created by h2xs 1.23 with options
+		-n Win32::Process::Memory

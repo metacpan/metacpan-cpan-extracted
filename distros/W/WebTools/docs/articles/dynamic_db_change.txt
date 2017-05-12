@@ -1,0 +1,50 @@
+Dynamic change of database
+--------------------------
+
+ WebTools has centralized configuration system and after its installation, 
+commonly you also make database configuration, i.e. make DB user and webtools db structure.
+So when this work is done programmer can run scripts and work with this system.
+Preferred database is MySQL, but how you may know WebTools has build-in Flat DB support
+and when you want to port your scripts to other PC (with installed WebTools) you can
+almost in any case to relay on Flat DB engine. That's mean that you can write your
+scripts with Flat DB. However current/active configuration on 'foreign' computer may be
+set to MySQL. That can be a big problem because your scripts use Flat DB instead of MySQL.
+To solve this problem your scripts can set 'temporary' database to Flat DB and change default
+settings without physically change of config.pl At the end of work with Flat DB you
+can still use default DB driver.
+
+Example:
+
+<?perl 
+ # We assume, that WebTools is configured with MySQL database
+
+ load_database_driver('flat');        # Load Flat DB driver
+
+ $webtools::db_support = 'db_flat';   # Mark 'flat' as default DB driver 
+
+ # Change default values for: $webtools::projectname, $webtools::sql_user,
+ # $webtools::sql_pass, $webtools::sql_database_sessions, 
+ # $webtools::sql_sessions_table, $webtools::sql_user_table ... and so on...
+
+ $db = sql_connect();  # Connect to Flat DB
+ sql_query("Some SQL query to Flat DB",$db);
+
+ $webtools::db_support = 'db_mysql';  # Come back to MySQL DB.
+ load_database_driver('mysql');       # Load 'mysql' driver
+
+ # Return default values for: $webtools::projectname,
+ # $webtools::sql_user, $webtools::sql_pass and so on...
+
+ # At this point you can continue to use your default DB.
+?>
+
+ At this simple script you see, how you can change dynamicly configuration of webtools
+without need to modify config.pl 
+
+Note: These features were entred with WebTools ver 1.21, 1.22
+
+Example: $webtools::sql_user = 'my_db_user';
+
+Author: Julian Lishev,
+e-mail: julian@proscriptum.com
+URL: www.proscriptum.com

@@ -1,0 +1,170 @@
+#############################################################################
+## Name:        XS/Window.xsp
+## Purpose:     XS++ for Wx::PlWindow
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     23/05/2004
+## RCS-ID:      $Id: Window.xsp 3379 2012-09-26 22:35:22Z mdootson $
+## Copyright:   (c) 2000-2002, 2004-2007, 2009-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%loadplugin{build::Wx::XSP::Overload};
+
+%typemap{wxWindowVariant}{simple};
+%typemap{wxMenu&}{reference};
+%typemap{wxWindowBase*}{parsed}{%wxWindow*%};
+
+%name{Wx::Window} class wxWindow {
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    void AlwaysShowScrollbars( bool horz = true, bool vert = true );
+#endif
+
+    bool AcceptsFocus() const;
+    bool AcceptsFocusFromKeyboard() const;
+
+    bool DestroyChildren();
+    bool IsBeingDeleted();
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    %name{GetPopupMenuSelectionFromUserPoint}
+    int GetPopupMenuSelectionFromUser( wxMenu& menu, wxPoint point ) %Overload;
+
+    %name{GetPopupMenuSelectionFromUserXY}
+    int GetPopupMenuSelectionFromUser( wxMenu& menu, int x, int y ) %Overload;
+#endif
+
+#if WXPERL_W_VERSION_LT( 2, 7, 0 )
+    wxSize GetAdjustedBestSize() const;
+#endif
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    wxSize GetEffectiveMinSize() const;
+#endif
+    const wxCursor& GetCursor() const;
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    wxWindow* GetPrevSibling() const;
+    wxWindow* GetNextSibling() const;
+#endif
+
+    wxSize GetVirtualSize() const;
+%{
+void
+wxWindow::GetVirtualSizeWH()
+  PPCODE:
+    int x, y;
+    THIS->GetVirtualSize( &x, &y );
+    wxPli_push_2ints( x, y );
+%}
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    wxPoint* GetScreenPosition() const
+        %code{% RETVAL = new wxPoint( THIS->GetScreenPosition() ); %};
+
+%{
+void
+wxWindow::GetScreenPositionXY()
+  PPCODE:
+    int x, y;
+    THIS->GetPosition( &x, &y );
+    EXTEND( SP, 2 );
+    PUSHs( sv_2mortal( newSViv( (IV) x ) ) );
+    PUSHs( sv_2mortal( newSViv( (IV) y ) ) );
+%}
+    const wxRect& GetScreenRect() const;
+#endif
+
+    bool HasFlag( int flag ) const;
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    bool HasExtraStyle( int exFlag ) const;
+#endif
+    bool HasCapture() const;
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+    bool HasTransparentBackground();
+#endif
+    bool HasScrollbar( int orient ) const;
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    bool IsScrollbarAlwaysShown( int orient );
+#endif
+    bool LineUp();
+    bool LineDown();
+    bool PageUp();
+    bool PageDown();
+    void SetBackgroundColour( const wxColour& colour );
+    void SetOwnBackgroundColour( const wxColour& colour );
+## protected void SetInitialBestSize( wxSize size = wxDefaultSize );
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    void SetCanFocus( bool canFocus );
+#endif
+    void SetForegroundColour( const wxColour& colour );
+    void SetOwnForegroundColour( const wxColour& colour );
+    void SetFont( const wxFont& font );
+    void SetCursor( const wxCursor& cursor );
+    void SetOwnFont( const wxFont& font );
+    wxWindowVariant GetWindowVariant() const;
+    void SetWindowVariant( wxWindowVariant variant );
+#if WXPERL_W_VERSION_GE( 2, 8, 0 )
+    bool ToggleWindowStyle( int flag );
+#endif
+#if WXPERL_W_VERSION_GE( 2, 9, 4 )
+    bool AcceptsFocusRecursively() const;
+    bool HasFocus() const;
+    void SetFocusFromKbd();
+    bool IsDescendant( wxWindowBase *win) const;
+#endif
+
+};
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+
+%typemap{wxEventBlocker*}{simple};
+
+%name{Wx::EventBlocker} class wxEventBlocker
+{
+    wxEventBlocker( wxWindow* win, wxEventType type = wxEVT_ANY );
+
+%{
+static void
+wxEventBlocker::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+    ## // thread OK
+    ~wxEventBlocker()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::EventBlocker", THIS, ST(0) );
+                 delete THIS;
+               %};
+
+    void Block( wxEventType eventType );
+};
+
+#endif
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+
+#include <wx/wupdlock.h>
+
+%typemap{wxWindowUpdateLocker*}{simple};
+
+%name{Wx::WindowUpdateLocker} class wxWindowUpdateLocker
+{
+    wxWindowUpdateLocker( wxWindow* win );
+
+%{
+static void
+wxWindowUpdateLocker::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+    ## // thread OK
+    ~wxWindowUpdateLocker()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::WindowUpdateLocker", THIS, ST(0) );
+                 delete THIS;
+               %};
+};
+
+#endif

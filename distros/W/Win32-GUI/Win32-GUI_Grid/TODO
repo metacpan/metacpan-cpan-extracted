@@ -1,0 +1,22 @@
+- Watch for new versions of MFC grid
+- Is build possible under mingw?
+- Is static build possible, so as not to depend on mfc42.dll?
+- make clean should clean MFCGrid/Build and MFCGrid/Lib
+- more tests!
+- fix 'unreferenced targ' compiler warnings
+
+- Add missing constants to SetCharFormat documentation.
+DT_CHARSTREAM
+DT_DISPFILE
+DT_IDEPREFIX
+DT_METAFILE
+DT_NOFULLWIDTHCHARBREAK
+DT_PLOTTER
+DT_PREFIXONLY
+DT_RASCAMERA
+DT_RASDISPLAY
+DT_RASPRINTER
+- Remove export of DT_ constants, as they are supported by
+  Win32::GUI::Constants?
+
+- nmake clean should remove MFCGrid/Build and MFCGrid/Lib directories

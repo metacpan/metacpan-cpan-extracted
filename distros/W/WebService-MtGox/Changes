@@ -1,0 +1,20 @@
+Revision history for Perl extension WebService::MtGox
+
+0.05 Thu Jun  9 04:46:06 PDT 2011
+  - added a command line client:  bin/mg
+  - switched to ExtUtils::MakeMaker, because Module::Install
+    was giving me weird problems that I didn't want to fix.
+
+0.04 Tue May 31 13:15:31 PDT 2011
+  - added LWP::Protocol::https to dependencies
+
+0.03 Mon May 30 03:42:34 PDT 2011
+  - minor doc updates
+  - added parent to prerequisites
+
+0.02 Fri May 27 01:20:18 PDT 2011
+  - fixed typos
+  - added docs
+
+0.01 Wed May 25 16:43:49 2011
+  - original version

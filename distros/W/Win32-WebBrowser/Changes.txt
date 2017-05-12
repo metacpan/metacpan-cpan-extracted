@@ -1,0 +1,7 @@
+Release 1.02	2007-11-08
+	- remove URL fixups
+	- mention HTML::Display in POD
+
+Release 1.01	2007-11-08
+
+	Coded.

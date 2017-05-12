@@ -1,0 +1,58 @@
+WebService-NFSN version 1.03, released April 30, 2014
+
+
+WebService::NFSN is a client library for NearlyFreeSpeech.NET's member
+API (https://members.nearlyfreespeech.net/wiki/API).  It is only
+useful to people who have websites hosted at NearlyFreeSpeech.NET.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+  Package                Minimum Version
+  ---------------------- ---------------
+  perl                    5.6.0
+  Carp                    
+  Digest::SHA             
+  Exception::Class        
+  Exporter                5.57
+  File::Spec              
+  HTTP::Request::Common   
+  JSON::XS                1  (JSON 2.0 is also acceptable)
+  LWP::Protocol::https    6
+  LWP::UserAgent          6
+  Scalar::Util            1.01
+  Try::Tiny               0.04
+  URI                     1.00
+  parent
+
+Also, some of the example scripts use Data::Dumper to display the results.
+
+
+
+CHANGES
+    Here's what's new in version 1.03 of WebService-NFSN:
+    (See the file "Changes" for the full revision history.)
+
+	- Don't use NFSN's internal CA certificate
+	  The API server now uses a Thawte certificate instead.
+
+
+
+COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

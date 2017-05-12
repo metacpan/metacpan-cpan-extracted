@@ -1,0 +1,99 @@
+{
+   "abstract" : "Interface to Google Places API.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Google-Places",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Internet" : "0.04",
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0.25",
+            "JSON" : "2.53",
+            "Method::ParamValidator" : "0.10",
+            "Moo" : "2.000000",
+            "WWW::Google::UserAgent" : "0.20",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Google::Places" : {
+         "file" : "lib/WWW/Google/Places.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Address" : {
+         "file" : "lib/WWW/Google/Places/Address.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::DetailResult" : {
+         "file" : "lib/WWW/Google/Places/DetailResult.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Geometry" : {
+         "file" : "lib/WWW/Google/Places/Geometry.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Location" : {
+         "file" : "lib/WWW/Google/Places/Location.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Params" : {
+         "file" : "lib/WWW/Google/Places/Params.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Photo" : {
+         "file" : "lib/WWW/Google/Places/Photo.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Review" : {
+         "file" : "lib/WWW/Google/Places/Review.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::Review::Aspect" : {
+         "file" : "lib/WWW/Google/Places/Review/Aspect.pm",
+         "version" : "0.32"
+      },
+      "WWW::Google::Places::SearchResult" : {
+         "file" : "lib/WWW/Google/Places/SearchResult.pm",
+         "version" : "0.32"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/WWW-Google-Places.git",
+         "web" : "https://github.com/manwar/WWW-Google-Places"
+      }
+   },
+   "version" : "0.32",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

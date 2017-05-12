@@ -1,0 +1,11 @@
+Revision history for WWW-NioTV
+
+0.03    2008年09月06日 15時27分55秒 CST
+        Update Pod::Coverage to 0.19 to prevent test fail
+
+0.02    2008-08-24 22:50:56 +0800
+        Modify build_reuiqres
+
+0.01    2008-08-22 00:17:26 +0800
+        First version, released on an unsuspecting world.
+

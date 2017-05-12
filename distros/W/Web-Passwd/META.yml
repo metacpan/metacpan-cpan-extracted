@@ -1,0 +1,21 @@
+---
+name: Web-Passwd
+version: 0.03
+author:
+  - 'Evan Kaufman <evank@cpan.org>'
+abstract: Web-based htpasswd Management
+license: perl
+build_requires:
+  CGI::Application: 0
+  Config::Tiny: 0
+  Test::More: 0
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Web::Passwd:
+    file: lib/Web/Passwd.pm
+    version: 0.03
+resources:
+  license: http://dev.perl.org/licenses/

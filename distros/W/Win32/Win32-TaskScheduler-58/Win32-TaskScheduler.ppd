@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Win32-TaskScheduler" VERSION="2,0,2,0">
+	<TITLE>Win32-TaskScheduler</TITLE>
+	<ABSTRACT>Perl extension for managing Win32 jobs scheduled via Task Scheduler</ABSTRACT>
+	<AUTHOR>Umberto Nicoletti &lt;unicolet@netscape.net&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="http://taskscheduler.sourceforge.net/perl58/win32/Win32-TaskScheduler-58.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,11 @@
+lib/WebService/NetSuite.pm
+lib/WebService/NetSuite/Config.pm
+lib/WebService/NetSuite/Config.pl
+lib/WebService/NetSuite/Config.tmpl
+Makefile.PL
+MANIFEST			This list of files
+README
+Changes
+t/00-connect.t
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

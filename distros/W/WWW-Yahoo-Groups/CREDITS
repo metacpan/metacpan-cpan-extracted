@@ -1,0 +1,26 @@
+CREDITS FOR WWW::Yahoo::Groups 1.91
+
+Simon Hanmer for having problems with the module, thus resulting in
+improved error reporting, param validation and corrected prerequisites.
+Since then, Simon also provided a basis for the lists|/lists and
+last_msg_id|/last_msg_id methods and is causing me to think harder about my
+exceptions.
+
+Aaron Straup Cope (ASCOPE) for writing XML::Filter::YahooGroups
+which uses this module for retrieving message bodies to put into RSS.
+
+Randal Schwartz (MERLYN) for pointing out some problems back in 1.4
+and noting problems caused by the hash randomisation.
+
+Ray Cielencki (SLINKY) for first_msg_id and "Age Restricted" notice
+bypassing.
+
+Vadim Zeitlin for yahoo2mbox from which I blatantly stole
+some features.  (Well, I say _stole_ but yahoo2mbox is
+public domain).
+
+Andy Lester (PETDANCE) for writing about this module in _Spidering Hacks_.
+
+iTerrence Brannon (TBONE) for reporting the example program
+and empty body bugs.
+

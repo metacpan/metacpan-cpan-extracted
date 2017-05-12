@@ -1,0 +1,81 @@
+---
+abstract: 'browser for connpass(R)'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Connpass
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::Connpass:
+    file: lib/WWW/Connpass.pm
+    version: '0.03'
+  WWW::Connpass::Agent:
+    file: lib/WWW/Connpass/Agent.pm
+  WWW::Connpass::Event:
+    file: lib/WWW/Connpass/Event.pm
+  WWW::Connpass::Event::Participant:
+    file: lib/WWW/Connpass/Event/Participant.pm
+  WWW::Connpass::Event::Participants:
+    file: lib/WWW/Connpass/Event/Participants.pm
+  WWW::Connpass::Event::Question:
+    file: lib/WWW/Connpass/Event/Question.pm
+  WWW::Connpass::Event::Question::CheckBox:
+    file: lib/WWW/Connpass/Event/Question/CheckBox.pm
+  WWW::Connpass::Event::Question::FreeText:
+    file: lib/WWW/Connpass/Event/Question/FreeText.pm
+  WWW::Connpass::Event::Question::PullDown:
+    file: lib/WWW/Connpass/Event/Question/PullDown.pm
+  WWW::Connpass::Event::Question::Radio:
+    file: lib/WWW/Connpass/Event/Question/Radio.pm
+  WWW::Connpass::Event::Questionnaire:
+    file: lib/WWW/Connpass/Event/Questionnaire.pm
+  WWW::Connpass::Event::Waitlist:
+    file: lib/WWW/Connpass/Event/Waitlist.pm
+  WWW::Connpass::Event::Waitlist::Fcfs:
+    file: lib/WWW/Connpass/Event/Waitlist/Fcfs.pm
+  WWW::Connpass::Event::Waitlist::Lottery:
+    file: lib/WWW/Connpass/Event/Waitlist/Lottery.pm
+  WWW::Connpass::Group:
+    file: lib/WWW/Connpass/Group.pm
+  WWW::Connpass::Place:
+    file: lib/WWW/Connpass/Place.pm
+  WWW::Connpass::Session:
+    file: lib/WWW/Connpass/Session.pm
+  WWW::Connpass::User:
+    file: lib/WWW/Connpass/User.pm
+requires:
+  HTTP::Request: '0'
+  JSON: '2'
+  Module::Load: '0'
+  Text::CSV_XS: '0'
+  Time::HiRes: '0'
+  URI: '0'
+  WWW::Mechanize: '0'
+  Web::Query: '0'
+  parent: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/karupanerura/WWW-Connpass/issues
+  homepage: https://github.com/karupanerura/WWW-Connpass
+  repository: git://github.com/karupanerura/WWW-Connpass.git
+version: '0.03'
+x_authority: cpan:KARUPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

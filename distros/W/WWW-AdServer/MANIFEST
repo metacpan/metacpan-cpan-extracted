@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/WWW/AdServer.pm
+lib/WWW/AdServer/Database.pm
+lib/WWW/AdServer/Database/YAML.pm
+t/01-adserver.t
+t/files/ads.yml

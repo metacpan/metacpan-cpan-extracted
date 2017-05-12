@@ -1,0 +1,61 @@
+Revision history for Perl extension WWW::BetfairNG.
+
+0.14  Thu Apr 06 19:00:00 2017
+        - Added support for the 'listRunnerBook' method introduced by Betfair
+          on 2017-03-28.
+
+0.13  Tue Jan 10 15:00:00 2017
+        - Removed support for the Australian exchange, removed strict SSL check
+          for login, added minor changes to functionality and enumerations 
+          introduced by Betfair in August and October 2016.
+
+0.12  Thu Oct 29 18:00:00 2015
+        - Added support for the Australian exchange, Heartbeat API functions
+          and Race Status API functions.
+
+0.11  Sat Feb 28 23:50:00 2015
+        - Extended timeout of navigationMenu method to 30 seconds, as busy days
+          were causing this to fail. All other methods remain at 5 sec timeout.
+
+0.10  Sat Jan 31 15:12:00 2015
+        - Bug fixes to parameter checking code for Enumerations.
+
+0.09  Sun Dec 07 14:38:00 2014
+        - Added a parameter-checking method which does a full recursive
+          check of parameter names, existence and data types. (off by default).
+
+0.08  Wed Oct 22 17:57:00 2014
+        - Changed prerequisites versions and added IO::Socket::SSL
+          and Net::SSLeay to the list of prerequisites.
+
+0.07  Tue Oct 21 02:15:00 2014
+        - Fixed typo in META.json.
+
+0.06  Mon Oct 20 15:45:45 2014
+        - Changed framework to use HTTP::Tiny and JSON::MaybeXS instead
+          of REST::Client and JSON, and altered test suite to use an
+          environment variable for live tests instead of prompting the
+          user.
+
+0.05  Tue Sep 30 23:59:00 2014
+        - Made changes for API release on Mon Sep 29
+	  - Australian Wallet operations - getAccountFunds & transferFunds 
+            - This will enable API-NG users to view the Australian wallet 
+              balance & transfer funds between UK and AUS wallets.
+          - Navigation Data For Applications 
+            - Update to include new data fields countryCode, 
+              marketType & numberofWinners.
+
+0.04  Tue Sep 09 01:36:00 2014
+        - Added Navigation Menu functionality.
+
+0.03  Sun Sep 07 01:57:00 2014
+        - Added a test suite.
+
+0.02  Mon Sep 01 17:12:00 2014
+        - Added interactive login so SSL certificates are no longer necessary.
+
+0.01  Mon Aug 18 16:34:55 2014
+	- original version; created by h2xs 1.23 with options
+		-X -n WWW::BetfairNG
+

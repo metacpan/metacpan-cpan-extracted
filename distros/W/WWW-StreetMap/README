@@ -1,0 +1,86 @@
+NAME
+    WWW::StreetMap - Interface to http://www.streetmap.co.uk/
+
+SYNOPSIS
+     use WWW::StreetMap;
+
+DESCRIPTION
+    Interface to http://www.streetmap.co.uk/
+
+    Please respect the terms and conditions of the excellent streetmap
+    website: http://www.streetmap.co.uk/disclaimer.htm
+
+CLASS METHODS
+  new
+     new(url => $url)
+
+OBJECT METHODS
+  build_map_jpg
+     build_map_jpg
+
+    Download the map from streetmap and join it into a single jpeg image.
+
+  create_oo_doc
+     create_oo_doc($filename, $map_filename)
+
+    Create an OpenOffice Writer document containg the map.
+
+    If you do not specify a pre-existing map then $map_filename will default
+    to $filename with the .jpg extension added.
+
+INSTALLATION
+    This module uses Module::Build for its installation. To install this
+    module type the following:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    If you do not have Module::Build type:
+
+      perl Makefile.PL
+
+    to fetch it. Or use CPAN or CPANPLUS and fetch it "manually".
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+     Test::More
+
+    Test::More is only required for testing purposes
+
+    This module has these optional dependencies:
+
+     Test::Distribution
+
+    This is just requried for testing purposes.
+
+TODO
+    *   Construction of URL by user specifying Post Code, London Street etc.
+
+BUGS
+    To report a bug or request an enhancement use CPAN's excellent Request
+    Tracker, either via the web:
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-StreetMap>
+
+    or via email:
+
+    bug-www-streetmap@rt.cpan.org
+
+SOURCE AVAILABILITY
+    This source is part of a SourceForge project which always has the latest
+    sources in svn.
+
+    http://sourceforge.net/projects/sagar-r-shah/
+
+AUTHOR
+    Sagar R. Shah
+
+COPYRIGHT
+    Copyright 2004-7, Sagar R. Shah, All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

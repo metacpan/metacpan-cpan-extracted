@@ -1,0 +1,22 @@
+Revision history for WWW-OpenSVN
+
+0.1.5   2015-12-06
+    - Update old email.
+    - Add configure_requires.
+
+0.1.4   2013-08-17
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=87904
+        - Case problem with metadata.
+
+0.1.3   2008-09-14
+    - Converted to Build.PL (Kwalitee).
+    - Added full POD coverage (Kwalitee) with a test by t/pod-coverage.t.
+    - Added use warnings. (Kwalitee)
+        - Now requirign perl-5.6.0
+    - Fixed a regression with the <title> in the root repository
+    that prevented reading the revision number.
+    - Added the example under examples/ (Kwalitee).
+
+0.1.2    2005-05-08
+    - First CPAN Version.
+

@@ -1,0 +1,95 @@
+Revision history for Perl extension WebService::Dropbox
+
+2.05 2016-07-11T14:57:28Z
+        - Check Furl::VERSION
+
+2.04 2016-07-04T09:49:40Z
+        - Add migration guide
+
+2.03 2016-07-04T09:30:07Z
+        - Support perl 5.8
+
+2.02 2016-07-03T05:07:22Z
+        - Fix CPAN Testers
+
+2.01 2016-07-02T19:06:18Z
+        - Fix document format
+
+2.00 2016-07-02T17:14:48Z
+        - migrate API v2
+
+1.22 2014-10-07T09:12:06Z
+        - support　WebService::Dropbox#files's error
+
+1.21 2013-10-01T04:06:00Z
+        - added HTTP::Message for the cpanfile
+
+1.20 2013-09-30T10:00:21Z
+        - minil migrate
+
+1.19    Mon Sep 30 15:33:45 JST 2013
+        - remove MYMETA and .gitignore (charsbar)
+
+1.18    Thu Jul 25 16:09:16 JST 2013
+        - wrong return precedence (Reini Urban)
+
+1.17    Thu Feb  7 17:35:27 JST 2013
+        - add range header (rosti)
+
+1.16    Tue Jan 15 22:35:58 JST 2013
+        - add binmode (venomo9)
+
+1.15    Mon Jan  7 20:22:12 JST 2013
+        - fix utf8 filename bug
+        - support furl's env_proxy
+
+1.14    Sun Jan  6 07:19:10 JST 2013
+        - No warnings, more security (gfx)
+
+1.13    Thu Oct 18 17:23:40 JST 2012
+        - remove require String::Random
+
+1.12    Tue Oct 16 18:04:23 JST 2012
+        - add require IO::Socket::SSL
+
+1.11    Fri Oct 12 17:42:46 JST 2012
+        - add require URI.pm 1.60 ( include URI::Escape )
+
+1.10    Tue Oct  9 10:26:08 JST 2012
+        - signature_method HMAC-SHA1 to PLAINTEXT ( delete %20.txt bug :/ )
+
+1.09    Mon Aug 27 22:33:01 JST 2012
+        - add files_put_chunked method
+        - add chunked_upload method
+        - add commit_chunked_upload method
+
+1.07    Fri Jun 29 03:58:56 JST 2012
+        - add delta method
+        - add $ua->env_proxy
+
+1.06    Fri Mar 30 13:36:58 JST 2012
+        - do not do decode_json at the time of an error
+
+1.05    Wed Jan 18 12:44:01 JST 2012
+        - default timeout 10sec => 1day
+
+1.04    Fri Jan  6 17:56:59 JST 2012
+        - add root document.
+
+0.06    Thu Dec  1 15:41:20 JST 2011
+        - fix typo, thanks (wata)
+
+0.05    Thu Dec  1 15:41:20 JST 2011
+        - add require Furl or LWP
+
+0.04    Tue Nov 29 11:23:39 JST 2011
+        - add require JSON
+
+0.03    Thu Nov 24 14:58:50 JST 2011
+        - support lwp
+
+0.02    Thu Nov 24 10:43:52 JST 2011
+        - fix pod
+
+0.01    Wed Nov 23 21:10:39 JST 2011
+        - original version

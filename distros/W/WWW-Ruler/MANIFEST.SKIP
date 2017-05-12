@@ -1,0 +1,8 @@
+^WWW-Ruler-\d.*
+\.git
+^blib/
+^Makefile$
+^Makefile.old$
+^pm_to_blib
+^MANIFEST.bak$
+\.komodoproject$

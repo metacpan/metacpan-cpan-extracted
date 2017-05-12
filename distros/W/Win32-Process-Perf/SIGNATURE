@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c591beeb4fd3a77613916e2c3a96f57430f26de6 Changes
+SHA1 71bb964da89d58c692b20ef1eb7b62c173e3b3a0 MANIFEST
+SHA1 8c0fffc5f1b03778f14a3564eff299461aee134c MANIFEST.SKIP
+SHA1 ec2545f4115e86000892d9da6551fd170ab4b5c2 META.yml
+SHA1 5a4d7d18805823af439f6eb76a066c8e0465778e Makefile.PL
+SHA1 75d6259ab555f0ee8c46950e135f4cf815fea13c Perf.xs
+SHA1 470e662d4ea7a854d4422624095d491f08529bd7 README
+SHA1 8ae86a4b4fffadc1f003b741a6b4790e70e70c1d lib/Win32/Process/Perf.pm
+SHA1 54d994b19e63abd7772113a8525d4b434db2ce1b lib/Win32/Process/Perf/de-at.dat
+SHA1 54d994b19e63abd7772113a8525d4b434db2ce1b lib/Win32/Process/Perf/de-de.dat
+SHA1 6a038b985994785c995f253c5483c3ae7f63c03e lib/Win32/Process/Perf/en-gb.dat
+SHA1 6a038b985994785c995f253c5483c3ae7f63c03e lib/Win32/Process/Perf/en-us.dat
+SHA1 93d1e211d11ffed219b3e373481a69e4994871f5 perf.h
+SHA1 add61433ab2c5a49910fd89f80ca2e7e9b1df582 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (MingW32)
+
+iD8DBQFEjCgZ/IcR3cuCBPIRAtQCAJ92u+tkG38xJL1Wl+r7B24QImXuIQCbBsFP
+e4ctqEPowyQkAkufQeAiBCE=
+=2ize
+-----END PGP SIGNATURE-----

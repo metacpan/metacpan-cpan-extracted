@@ -1,0 +1,7 @@
+<!ELEMENT config (package+, credential)>
+<!ELEMENT package (#PCDATA)>
+<!ELEMENT credential (server,(user, password)?,use_trusted_connection)>
+<!ELEMENT server (#PCDATA)>
+<!ELEMENT user (#PCDATA)>
+<!ELEMENT password (#PCDATA)>
+<!ELEMENT use_trusted_connection (#PCDATA)>

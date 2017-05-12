@@ -1,0 +1,182 @@
+#!perl
+
+use strict;
+use warnings;
+# ABSTRACT: build an advent calendar
+# PODNAME:  advcal
+
+use lib 'lib';
+
+use Getopt::Long::Descriptive 0.083;
+
+#pod =head1 USAGE
+#pod
+#pod   advcal [-aot] [long options...]
+#pod     -c --config       the ini file to read for configuration
+#pod     -a --article-dir  the root of articles
+#pod     --share-dir       the root of shared files
+#pod     -o --output-dir   output directory
+#pod     --today           the day we treat as "today"; default to today
+#pod
+#pod     -t --tracker      include Google Analytics; -t TRACKER-ID
+#pod     -y --year-links   place year links at the bottom of the page
+#pod
+#pod For more detailed information, see L<WWW::AdventCalendar>.
+#pod
+#pod =cut
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'config|c=s',      'the ini file to read for configuration'            ],
+  [ 'article-dir|a=s', 'root of articles',     { default => './articles' } ],
+  [ 'share-dir=s',     'root of shared files', { default => './share'    } ],
+  [ 'output-dir|o=s',  'output directory',     { default => './out'      } ],
+  [ 'today=s',         'the day we treat as "today"; default to today'     ],
+  [],
+  [ 'tracker-id|t=s',  'include Google Analytics; -t TRACKER-ID'           ],
+  [ 'uri=s',           'base URI of the calendar, including trailing slash' ],
+  [ 'year-links|y',    'add year links to bottom of index.html'            ],
+);
+
+my $arg = {};
+my $colors = {
+  genericBlack   => '#000',
+  genericWhite   => '#fff',
+  generic00      => '#977',
+  generic01      => '#d9d9d9',
+  generic02      => '#b00',
+  generic03      => '#c0c0c0',
+  generic04      => '#797',
+
+  bodyBG         => 'generic00',
+  bodyFG         => 'genericBlack',
+
+  blotterBG      => 'generic01',
+  blotterBorder  => '#aaa',
+
+  contentBG      => 'genericWhite',
+  contentBorder  => '#aaa',
+
+  feedLinkFG     => '#ff0',
+
+  headerFG       => 'generic02',
+
+  linkFG         => 'generic02',
+
+  linkDisabledFG => 'generic03',
+
+  linkHoverFG    => '#d00',
+  linkHoverBG    => '#ffc',
+
+  quoteBorder    => 'generic04',
+
+  sectionBorder  => 'generic03',
+
+  taglineBG      => 'generic04',
+  taglineFG      => 'genericWhite',
+  taglineBorder  => '#575',
+
+  titleFG        => 'headerFG',
+
+  calendarHeaderCellBorder => '#ddd',
+  calendarHeaderCellBG     => '#f0f0f0',
+
+  calendarIgnoredDayBG  => '#ccc',
+
+  calendarPastDayBG    => '#aea',
+  calendarPastDayFG    => 'genericBlack',
+
+  calendarPastDayHoverBG    => '#f0f0f0',
+  calendarPastDayHoverFG    => 'genericBlack',
+
+  calendarTodayBG => 'generic04',
+  calendarTodayFG => 'genericWhite',
+
+  calendarTodayHoverBG => '#bdb',
+  calendarTodayHoverFG => 'genericBlack',
+
+  calendarFutureDayBG => '#eaa',
+  calendarFutureDayFG => 'genericBlack',
+
+  calendarMissingDayFG => '#f00',
+  calendarMissingDayBG => 'genericBlack',
+
+  codeBG => '#222',
+  codeFG => '#ddd',
+
+  codeNumbersBG => 'generic04',
+  codeNumbersFG => 'genericWhite',
+  codeNumbersBorder => 'generic02',
+};
+
+if (my $file = $opt->config) {
+  die "configuration file '$file' does not exist\n" unless -f $file;
+  require WWW::AdventCalendar::Config;
+
+  my $config = WWW::AdventCalendar::Config->new->read_config($file);
+
+  my $root = $config->section_named('_');
+  $arg = $root->payload;
+
+  my $palette_section = $config->section_named('Palette');
+  %$colors = (%$colors, %{ $palette_section->payload }) if $palette_section;
+}
+
+require Color::Palette;
+require WWW::AdventCalendar;
+require WWW::AdventCalendar::Article;
+
+my %default_opt = %$opt;
+my %specified_opt;
+
+delete $_->{config} for \(%default_opt, %specified_opt);
+
+my $cal = WWW::AdventCalendar->new({
+  %default_opt,   # even command line defaults
+  %$arg,          # but those are overridden by configuration
+  %specified_opt, # which is overridden by *explicit* switches
+  color_palette => Color::Palette->new({ colors => $colors }),
+});
+
+$cal->build;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+advcal - build an advent calendar
+
+=head1 VERSION
+
+version 1.112
+
+=head1 USAGE
+
+  advcal [-aot] [long options...]
+    -c --config       the ini file to read for configuration
+    -a --article-dir  the root of articles
+    --share-dir       the root of shared files
+    -o --output-dir   output directory
+    --today           the day we treat as "today"; default to today
+
+    -t --tracker      include Google Analytics; -t TRACKER-ID
+    -y --year-links   place year links at the bottom of the page
+
+For more detailed information, see L<WWW::AdventCalendar>.
+
+=head1 AUTHOR
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

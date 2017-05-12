@@ -1,0 +1,11 @@
+Revision history for Perl extension WWW::Shorten::RevCanonical
+
+0.03  Mon Apr 13 20:20:53 JST 2009
+        - Switch not to use XML::LibXML and instead use LWP::UserAgent's parse_head()
+          This actually supports Link: <URL>; rev="canonical" header automatically
+
+0.02  Sat Apr 11 17:03:55 PDT 2009
+        - More docs to mention WWW::Shorten::Simple
+
+0.01  Sat Apr 11 13:53:25 2009
+        - original version

@@ -1,0 +1,10 @@
+#!/bin/bash
+perl Makefile.PL 2>&1
+make test 2>&1
+
+perl5.8.0 Makefile.PL 2>&1
+make test 2>&1
+
+perl5.6.1 Makefile.PL 2>&1
+make test 2>&1
+

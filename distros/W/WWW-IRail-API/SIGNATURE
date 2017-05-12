@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 276d1fbbe3152cd69999c1a9f96880fa3e1f0b79 INSTALL
+SHA1 f1acdf8b77d77f37ebf12aaf685c139514cc0e33 LICENSE
+SHA1 d5a7833301f13f95db01ff11e049c62f70c1ae7d MANIFEST
+SHA1 665699768dc916b809e0dde3c9279b9cd369f0d0 META.yml
+SHA1 63074309e2c3a4fbee83b6fa5e83bff70ed6731d Makefile.PL
+SHA1 831e2c965b373d746aa56a628c14dac436e5f874 README
+SHA1 8123947c8399cff669c83a3f396032a718748778 README.pod
+SHA1 7e45eceee25d904012275b5627e3b8961005b8ba devel/realtime_station_list.pl
+SHA1 f3e9154f8d6945ac0bf89406f848ae3e44f9cd33 dist.ini
+SHA1 7d4d7f8b266100699d08b687d8cf25ac648d7b45 lib/WWW/IRail/API.pm
+SHA1 386b5aa109db3f946e98c12e5cde4f4785420522 lib/WWW/IRail/API/Client/LWP.pm
+SHA1 960fecc143b802d7c8c01d8d1637db86c3516118 lib/WWW/IRail/API/Connections.pm
+SHA1 36e84ed55c09936b37fa30a872c52d9a3510a611 lib/WWW/IRail/API/Liveboard.pm
+SHA1 f06a10588b3d87abaef107c023df66249a80e68e lib/WWW/IRail/API/Stations.pm
+SHA1 ad8cbb48587d6da315f40bb45d6ab893a21d2064 lib/WWW/IRail/API/Vehicle.pm
+SHA1 587e307a8ffda492046371316a40b20e8a7aa5ef t/00_use.t
+SHA1 ed24890407d35742adbcd01ae6f672d98674be3d t/10_stations.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 c5ea39e67066c9f1cd20fde3f0e8ee957f129f6f weaver.ini
+SHA1 71c0218f98c150e2bbd5b229cc4cf810b2071b72 xt/11_stations_ref.t
+SHA1 30c1417ea24def059d2ac536632ac560849539b0 xt/data/stationlist.js
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iF4EAREIAAYFAkz5baYACgkQRYEBOuBGfulHXQD/ePNtiCotGXE9x/969Dos3Q3m
+Xvl1Uc+9rP2qom5fbY4A/3iNDK7VlqEfVbhYzylYMXdUZVJCf2KaUXvhB4X/Ntoc
+=Gd+p
+-----END PGP SIGNATURE-----

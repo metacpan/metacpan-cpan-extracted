@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               WebService-ClinicalTrialsdotGov
+version:            0.04
+abstract:           Wrapper around the clinicaltrials.gov API
+author:
+    - Spiros Denaxas <s.denaxas@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             0
+    Class::Accessor:  0
+    Clone:            0
+    HTTP::Request:    0
+    LWP::UserAgent:   0
+    Test::More:       0
+    URI:              0
+    XML::Simple:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

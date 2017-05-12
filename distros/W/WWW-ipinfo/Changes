@@ -1,0 +1,18 @@
+Revision history for WWW::ipinfo
+
+0.05    2014-10-14
+        -Updated POD; contributor name correction
+
+0.04    2014-09-19
+        -Updated POD
+
+0.03    2014-09-18
+        -Updated get_ipinfo method to accept optional ip address argument see https://rt.cpan.org/Public/Bug/Display.html?id=98975
+
+0.02    2014-09-17
+        -Updated POD
+        -Removed tests for data not always returned by ipinfo
+
+0.01    2014-09-17
+        -Initial release
+

@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               WWW-Mechanize-Plugin-phpBB
+version:            0.02
+abstract:           Screen scraper for phpBB installations
+author:
+    - Mike Schilli <mschilli@ms.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:      0.19
+    HTML::TreeBuilder:    0
+    Log::Log4perl:        1
+    Module::Pluggable:    0
+    WWW::Mechanize:       0
+    WWW::Mechanize::Pluggable:  0.1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

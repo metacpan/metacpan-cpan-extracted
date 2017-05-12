@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+README
+lib/WordPress/Base/MediaObject.pm
+t/00.t
+t/02_MediaObject.t
+t/image.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

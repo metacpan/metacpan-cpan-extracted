@@ -1,0 +1,75 @@
+
+# $Id: Changes 3151 2012-02-28 06:33:41Z mdootson $
+
+Revision history for Perl extension Wx::ActiveX.
+
+0.16  2012-02-28
+    - fixes for wxWidgets 2.9.3
+
+
+0.15  2010-03-16
+    - fixes for mingw-w64 / w32 build 
+    - fixes for msvc 64bit builds
+    - fixed datestamp in template output
+
+0.14  2010-01-11
+    - fixed wxactivex_template
+    - fixed VC6 & MinGW builds
+    - fixed pause module parsing
+
+0.13  2010-01-04
+    - compilation fix for mingw headers + select macro
+    - POD update for WMPlayer
+
+0.12  2009-09-26
+    - various minor fixes for cpan release.
+
+0.10  2008-04-12
+    - Added newVersion constructor to wrapped modules
+    - Added QuickTime module
+    - Added Tempate Creator
+
+0.09  2008-04-10
+    - Discovered correct operation of Acrobat ActiveX
+    - Documented AxAcroPDFLib.AxAcroPDF interface from AcroPDF.PDF
+    - Noted in docs that Mozilla ActiveX control may not be being
+      maintained currently.
+    - Refactored Flash module to common format
+    - Replaced all 'demo' scripts with Wx::Demo modules
+
+0.07  2008-04-07
+    - Remove package references to Wx::IEHtmlWin and
+      Wx::MozillaHtmlWin for Pause.
+
+0.06  2008-04-04
+    - First release after co-maintainership granted
+    - Replaced 'HashRef' sub with wxPliActiveX & wxPliIEHtmlWindow
+    - New classes export own events
+    - Added Wx::ActiveX::Document
+    - Implemented wxMozillaHtmlWindow
+    - combined some updates from latest activex at wxPython
+    - added attribution to updated POD for known/remembered contributions
+    - compatibilty removed for pre 5.6 and pre 2.6.1 wxWidgets.
+
+0.0511 2007-09-03
+    - Various updates from various sources added to allow building 
+      with current Wx / wxWidgets. Attribution will be added with 
+      later update.      
+
+0.05  08/2003
+    - Added compatibility with MingW.
+    - Added method GetOLE(), that returns a Win32::OLE object of
+      the Wx::ActiveX control.
+    - New module Wx::ActiveX::Acrobat (Acrobat Reader).
+
+0.04  15/06/2003
+    - Added Print() and PrintPreviw() to Wx::ActiveX::IE
+    - Added ListEvents(), ListProps(), ListMethods(),
+      ListMethods_and_Args(), ListMethods_and_Args_Hash() and
+      ActivexInfos() to Wx::ActiveX.
+    - Added Wx::ActiveX::WMPlayer
+    - Fixed compatibility with wxPerl-0.15!
+
+
+from 0.01 to 0.003 - No "Changes" notes! sorry.
+

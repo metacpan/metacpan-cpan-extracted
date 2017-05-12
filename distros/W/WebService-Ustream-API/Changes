@@ -1,0 +1,12 @@
+Revision history for Perl extension WebService::Ustream::API.
+
+0.03  2009-03-10
+      - Added load,perlcritic,pod,pod-coverage,kwalitee tests
+
+0.02  2009-03-09
+      - Fixed typo on documents
+
+0.01  Sat Mar  7 12:25:58 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n WebService::Ustream::API
+

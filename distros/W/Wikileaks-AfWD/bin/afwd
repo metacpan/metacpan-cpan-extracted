@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+#Copyright (c) 2010, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use warnings;
+use strict;
+use DBI::Wikileaks::AfWD;
+use Getopt::Std;
+
+$Getopt::Std::STANDARD_HELP_VERSION=1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "afwd 0.0.0\n";
+};
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+	      "afwd [options] [SQL]".
+		  "\n".
+	      "-d <DBI connection string>\n".
+		  "-u <user name>\n".
+		  "-p <password>\n".
+		  "-t <table>\n";
+	exit 1;
+};
+
+#gets the options
+my %opts=();
+getopts('d:u:p:', \%opts);
+my %args;
+
+#gets what the specified SQL was
+my $sql=undef;
+if (defined( $ARGV[0] )) {
+	$sql=join(' ', @ARGV);
+}
+
+my $afwd=DBI::Wikileaks::AfWD->new({
+									dbiCS=>$opts{d},
+									dbiUser=>$opts{u},
+									dbiPass=>$opts{p},
+									table=>$opts{t},
+									});
+
+my $sth=$afwd->search($sql);
+
+$afwd->format({ sth=>$sth, print=>1 });
+
+=head1 NAME
+
+afwd - Provides a commandline interface to DBI::Wikileaks::AfWD
+
+=head1 SYNOPSIS
+
+afwd [-d <DBI connection string>] [-u <user name>] [-p <password>] [-t <table>] [<SQL>]
+
+=head1 SWITCHES
+
+=head2 -d <DBI connection string>
+
+This provides a DBI connection string.
+
+=head2 -u <user name>
+
+The user for use with DBI.
+
+=head2 -p <password>
+
+The password for use with DBI.
+
+=head2 -t <table>]
+
+The table to use instead of the default one.
+
+=head1 ENVIRONMENTAL VARIABLES
+
+=head2 AfWD_DBICS
+
+If neither "dbiCS" or "dbh" is specified for the new method, this will be used.
+
+=head2 AfWD_DBIUSER
+
+This if $ENV{AfWD_DBICS} is used, this will be checked for the user.
+
+=head2 AfWD_DBIPASS
+
+This if $ENV{AfWD_DBICS} is used, this will be checked for the password.
+
+=head1 QUICK START GUIDE
+
+For this to work, you will need to install SQLite3 and DBD::SQLite
+
+You will also need the SQL file from "http://wikileaks.org/wiki/Afghan_War_Diary,_2004-2010".
+
+    sqlite3 -init afg_std.sql afwd.sql
+    #if sh/bash
+    export AfWD_DBICS="dbi:SQLite:dbname=afwd.sql"
+    #if tcsh
+    setenv AfWD_DBICS "dbi:SQLite:dbname=afwd.sql"
+    #dump them all to AfWD.txt
+    afwd > AfWD.txt
+    #do the same search with a WHERE of "DColor LIKE 'BLUE'"
+    afwd "DColor LIKE 'BLUE'" > blue.txt
+
+=head1 AUTHOR
+
+Copyright (c) 2010, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Search
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+afwd - Provides a commandline interface to DBI::Wikileaks::AfWD
+
+=cut
+

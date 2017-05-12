@@ -1,0 +1,152 @@
+#                              -*- Mode: Perl -*- 
+# $Basename: index_fortune $
+# $Revision: 1.3 $
+# Author          : Ulrich Pfeifer
+# Created On      : Fri Apr  7 13:45:50 2000
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Mon May  8 21:02:12 2000
+# Language        : CPerl
+# 
+# (C) Copyright 2000, UUNET Deutschland GmbH, Germany
+# 
+
+use strict;
+use File::Path;
+use DB_File;
+use Getopt::Long;
+use Cwd;
+
+require WAIT::Config;
+require WAIT::Database;
+require WAIT::Parse::Base;
+require WAIT::Document::Split;
+require WAIT::InvertedIndex;
+
+
+$DB_BTREE->{'cachesize'} = 200_000 ;
+
+my %OPT = (clean    => 0,
+           database => 'DB',
+           dir      => $WAIT::Config->{WAIT_home} || '/tmp',
+           table    => 'fortune',
+          );
+
+GetOptions(\%OPT,
+           'clean!',
+           'database=s',
+           'dir=s',
+           'table=s',
+          ) || die "Usage: ...\n";
+
+if ($OPT{clean} and -d "$OPT{dir}/$OPT{database}") {
+  my $tmp = WAIT::Database->open(name        => $OPT{database},
+                                 'directory' => $OPT{dir})
+    or die "Could not open table $OPT{table}: $@\n";
+  my $tbl = $tmp->table(name => $OPT{table});
+  $tbl->drop if $tbl;
+  rmtree("$OPT{dir}/$OPT{database}/$OPT{table}", 1, 1)
+    if -d "$OPT{dir}/$OPT{database}/$OPT{table}";
+  $tmp->close;
+}
+
+my $db;
+unless (-d "$OPT{dir}/$OPT{database}") {
+  $db = WAIT::Database->create(name       => $OPT{database},
+                              'directory' => $OPT{dir})
+    or die "Could not open database $OPT{database}: $@\n";
+} else {
+  $db = WAIT::Database->open(name        => $OPT{database},
+                             'directory' => $OPT{dir})
+    or die "Could not open table $OPT{table}: $@\n";
+}
+
+my $layout = new WAIT::Parse::Base;
+
+my $stem  = ['isotr', 'isolc', 'split2', 'stop', 'Stem'];
+my $text  = [{
+              'prefix'    => ['isotr', 'isolc'],
+              'intervall' => ['isotr', 'isolc'],
+             },
+             'isotr', 'isolc', 'split2', 'stop'];
+my $sound = ['isotr', 'isolc', 'split2', 'Soundex'],;
+
+my $cwd = cwd;
+
+my %D;
+my $access = tie %D, 'WAIT::Document::Split', 'sep', '%\n',
+  grep { -T $_ } @ARGV,
+  or die "Couldn't tie to file: $!\n";
+
+my $tb = $db->create_table(name     => $OPT{table},
+                           attr     => ['docid', 'headline', 'text'],
+                           layout   => $layout,
+                           access   => $access,
+                           invindex =>
+                           [
+                            'text' => $stem, 'text' => $text,
+                           ]
+                          );
+die "Couldn't create table $OPT{table}: $@\n" unless $tb;
+
+my ($did, $value);
+while (($did, $value) = each %D) {
+  my $record = $layout->split($value);
+  my $headline = $record->{text};
+  $headline =~ s/\s+/ /sg;
+  printf "%s\n", substr($headline,0,80);
+  $tb->insert('docid'  => $did,
+              headline => $headline,
+              %{$record});
+}
+
+$db->close();
+
+$WAIT::Config = $WAIT::Config; # make perl -w happy
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+index_fortune - generate an WAIT index for fortunes
+
+=head1 SYNOPSIS
+
+B<index_fortune>
+[B<-clean>] [B<-noclean>]
+[B<-database> I<dbname>]
+[B<-dir> I<directory>]
+[B<-table> I<table name>] F</usr/share/games/fortunes/*.dat>
+
+=head1 DESCRIPTION
+
+Either indexes F<$WAIT/t/test.ste> (if called from directory F<$WAIT>)
+or F</usr/local/ls6/tex/bib/bibdb.ste>.
+
+=head1 OPTIONS
+
+=over 5
+
+=item B<-clean> / B<-noclean>
+
+Clean the table before indexing. Default is B<off>.
+
+=item B<-database> I<dbname>
+
+Specify database name. Default is F<DB>.
+
+=item B<-dir> I<directory>
+
+Alternate directory where databases are located. Default is the
+directory specified during configuration of WAIT.
+
+=item B<-table> I<table name>
+
+Specify an alternate table name. Default is C<bibdb>.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@wait>E<gt>

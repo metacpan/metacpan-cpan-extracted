@@ -1,0 +1,53 @@
+---
+abstract: 'Search and manage eBay auctions'
+author:
+  - "Martin 'Kingpin' Thurn, C<mthurn at cpan.org>, L<http://tinyurl.com/nn67z>."
+build_requires:
+  Bit::Vector: 0
+  Data::Dumper: 0
+  Date::Manip: 0
+  ExtUtils::MakeMaker: 6.36
+  IO::Capture::Stderr: 0
+  Test::More: 0
+  WWW::Search::Test: 2.29
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Ebay
+name: WWW-Ebay
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Tk: 800
+requires:
+  Bit::Vector: 0
+  Carp: 0
+  Crypt::SSLeay: 0
+  Data::Dumper: 0
+  Date::Manip: 0
+  File::Glob: 0
+  File::Spec: 0
+  HTML::Form: 0
+  HTML::Parser: 3
+  HTML::TreeBuilder: 0
+  HTTP::Cookies: 0
+  HTTP::Request::Common: 0
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  URI: 0
+  WWW::Search: 2.525
+  WWW::Search::Ebay: 2.267
+  WWW::SearchResult: 2.07
+  perl: '5.005'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.005'

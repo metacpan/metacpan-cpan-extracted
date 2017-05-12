@@ -1,0 +1,42 @@
+#############################################################################
+## Name:        ext/print/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     04/05/2001
+## RCS-ID:      $Id: typemap 3300 2012-05-31 00:58:11Z mdootson $
+## Copyright:   (c) 2001, 2003-2005, 2007-2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxPrintData *           O_WXOBJECT
+wxPageSetupDialogData * O_WXOBJECT
+wxPageSetupDialog *     O_WXOBJECT
+wxPageSetupDialogBase * O_WXOBJECT
+wxPrinter *             O_WXOBJECT_THR
+wxPrinterBase *         O_WXOBJECT
+wxPrintDialogData *     O_WXOBJECT
+wxPrintout *            O_WXOBJECT
+wxPrintPreview *        O_WXOBJECT
+wxPrintPreviewBase *    O_WXOBJECT
+wxPrinterDC *           O_WXOBJECT
+wxPrintDialog *         O_WXOBJECT
+wxPrintDialogBase *     O_WXOBJECT
+wxPreviewControlBar *   O_WXOBJECT
+wxPlPreviewControlBar * O_WXOBJECT
+wxPreviewCanvas *       O_WXOBJECT
+wxPreviewCanvas *       O_WXOBJECT
+wxPreviewFrame *        O_WXOBJECT
+wxPlPreviewFrame *      O_WXOBJECT
+wxPrintFactory *        O_NON_WXOBJECT
+wxPrintPaperType *      O_WXOBJECT
+wxPrintPaperDatabase *  O_NON_WXOBJECT
+
+wxDuplexMode            T_ENUM
+wxPaperSize             T_ENUM
+wxPrintQuality          T_ENUM
+wxPrinterError          T_ENUM
+wxPrintBin              T_ENUM
+wxPrintMode             T_ENUM

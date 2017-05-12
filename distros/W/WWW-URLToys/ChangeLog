@@ -1,0 +1,25 @@
+2004-06-19 Joe Drago <joe@urltoys.com>
+
+	- Version 1.28
+	- Added 'saveflux' command, automatically condensing URLs into fusker strings
+	- Added 'rreplace' command
+	- Added HTTP keep-alive support, based on a patch from fforw (thanks!)
+	- fixed replace and strip to do multiple replaces per command (s///g)
+	- fixed/updated help system text
+	- removed ReplaceWithRegex, use rreplace instead
+	- added 'spider' command to warning list
+
+2004-06-17 Joe Drago <joe@urltoys.com>
+
+	- Version 1.27
+	- Added 'hrefimg' command
+    - Added 'spider' command
+    - fixed Tk INC for Unix users, now web-able (install docs coming soon)
+    - fixed internal makedir trailing slash bug
+    - fixed cb_warnuser: calls ut_getnextline now
+    - fixed extension checking bug (query string)
+    - fixed 'batch' command's behavior in a flux
+    - export ut_getnextline
+    - export $ut_term for overriding / replacing with own term var
+    - only creates Term::ReadLine on first need (if not existing)
+

@@ -1,0 +1,49 @@
+WWW::AdManager
+==============
+
+Description
+-----------
+
+WWW::AdManager is a module which implements a web advert management
+system. This is based around linked images, that are organized into
+"campaigns". Within each campaign, the admanager randomizes the display
+of images, and tracks both "page impressions" - i.e. the number of times
+the image is displayed - and "clickthroughs" - i.e. the number of times
+the image is clicked on.
+
+The module also provides an administration web interface, which can be served
+through a access restricted URL, for creating and updating campaigns and
+adverts, and displaying usage stats.
+
+The interface support implementation both through CGI and mod_perl.
+mod_perl is highly recommended, especially where there are more than one
+adver to display per page.
+
+The insertion of adverts into pages is done using SSI (server side
+includes - see http://httpd.apache.org/docs/mod/mod_include.html, for
+example). The module does both logging of each relevant transaction
+(clickthrough / page impression) and live compilation of stats.
+
+Campaigns can be sub-divided into sub-campaigns for more convenient
+organization of adverts.
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Author
+------
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>

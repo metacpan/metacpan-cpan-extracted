@@ -1,0 +1,32 @@
+Revision history for Perl extension WWW::BookBot.
+
+0.12    2003.06.30 21:48  Qing-Jie Zhou
+    * Reformat all files except *.bat from DOS format into Unix format
+    * Correct version in README
+
+0.11    2003.06.30 21:41  Qing-Jie Zhou
+	* Modify bin/bookbot to support empty argv
+	* Modify BookBot.pm to support empty $pargs
+	* Modify BookBot.pm to test next page without content_head/end limitation
+	* Modify BookBot.pm to add string2time support
+	* Modify BookBot/Chinese/Agriculture/Cast.pm to use string2time provided by BookBot.pm
+	* Add bot agr_cngreen_tech WWW::BookBot::Chinese::Agriculture::GreenHouse::Tech
+	* Add bot agr_cngreen_market WWW::BookBot::Chinese::Agriculture::GreenHouse::Market
+	* Add bot wanfang WWW::BookBot::Chinese::Periodical::WanFang
+	* Modify BookBot.pm parse_patterns function to support \n
+	* Modify BookBot.pm to add paragraph_br_or_p function
+	* Modify BookBot.pm to correct filename in unicode form
+	* Modify BookBot.pm parse_patterns function to support undef input
+	* Modify BookBot.pm to avoid Win32::TieRegistry error in other platform
+	* Modify BookBot.pm alias function -> get_alias function to avoid error
+	* Modify all pm alias function -> get_alias function
+	* Add version to BookBot/Chinese.pm
+	* Add version to BookBot/English.pm
+	* Modify bin/bookbot to correct argv_defalt -> argv_default
+
+0.10    2003.06.29 16:10  Qing-Jie Zhou
+    * First release
+
+0.01    2003.05.26 16:50
+	- original version; created by h2xs 1.22 with options
+		-X -n WWW::BookBot

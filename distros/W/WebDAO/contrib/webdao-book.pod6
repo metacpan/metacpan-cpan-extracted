@@ -1,0 +1,28 @@
+=begin pod
+=begin BOOKINFO
+*TITLE Develop web application in WebDAO
+*SUBTITLE The WebDAO Developers Guide
+*AUTHOR
+firstname: Aliaksandr
+surname: Zahatski
+
+*DESCRIPTION
+A guide to develop web application using WebDAO. Includes a overview of setup 
+process, including sample code and reference  material.
+
+*CHANGES
+Jul 26th 2009(v0.2)[zag]  "Install" chapter, update About.pod
+
+Feb 24th 2009(v0.1)[zag]   Initial document
+
+=end BOOKINFO
+
+=config C<> :allow<E>
+=config code :allow<E>
+
+=Include Preface.pod6
+=Include About.pod
+=Include Install.pod
+=Include Setup.pod
+
+=end pod

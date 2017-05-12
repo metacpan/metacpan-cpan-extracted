@@ -1,0 +1,40 @@
+NAME
+    WWW::RabbitMQ::Broker
+
+SYNOPSIS
+            # Make a call to a RabbitMQ API on a broker...
+            my $broker = WWW::RabbitMQ::Broker->new(
+                    username => 'guest',
+                    password => 'guest,
+                    host     => 'localhost',
+            );
+
+            # get an overview of the system
+            my $overview = $broker->overview;
+
+            # get all nodes in the cluster
+            my $nodes = $broker->nodes;
+
+            # get all open connections
+            my $connections = $broker->connections;
+
+            # publish a message to an exchange
+            my $res = $broker->uriRequestMethod('POST')->exchanges->$vhost->$name->publish({
+                    payload          => "mymessage",
+                    payload_encoding => "string",
+                    properties       => {},
+                    routing_key      => "mykey",
+            });
+
+            # configure a shovel
+            my $res = $broker->uriRequestMethod('PUT')->parameters->shovel->$vhost->$myshovel({
+                    value => {
+                            src-uri    => "amqp://",
+                            src-queue  => "my-queue",
+                            dest-uri   => "amqp://remote-server",
+                            dest-queue => "another-queue",
+                    },
+            });
+
+DESCRIPTION
+    A simple module that generically interacts with the RabbitMQ API

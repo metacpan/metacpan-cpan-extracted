@@ -1,0 +1,38 @@
+Revision history for WebService-KoreanSpeller
+
+0.012  2014-10-18 18:27:32 KST
+       Updated for the new URL.
+
+0.011  2014-08-31 13:16:27 KST
+       Migrating to Dist::Milla.
+
+0.010  2012-12-31
+       deprecate Any::Moose, use Moose.
+
+0.009  2011-11-10
+       Updated for the new URL.
+
+0.008  2011-01-15
+       Code clean.
+
+0.007  2011-01-15
+       Code clean.
+
+0.006  2011-01-11
+       Updated for the new URL.
+
+0.005  2010-07-18
+       Updated for the new URL.
+
+0.004  2009-04-08
+       Fixed regex special character problem.
+
+0.003  2009-04-07
+       Fixed error when there is no misspelled word in the text.
+
+0.002  2009-04-07
+       Fixed pod document.
+
+0.001  2009-04-06
+       Initial release.
+

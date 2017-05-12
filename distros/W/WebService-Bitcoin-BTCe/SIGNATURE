@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0414d7ba9827d575974d98ca0364985c5bd6eaec Changes
+SHA1 68d72699265b9c0e94dd35ea153b8799b5f4bdbf INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 5e61eb90ae96ed8624e3ea0918dac63a648b5651 MANIFEST
+SHA1 0b030bdf1fd8ae153892864b6770f837094800ec META.json
+SHA1 3ac32158fdcd69f3411995178b7500d17dbaca50 META.yml
+SHA1 e973d95ffea2e2ce5a6ea0c0503ba536beec02bb Makefile.PL
+SHA1 ba870a25939ec77b27bcdfc4d363c4a2534ae648 README
+SHA1 29629ae61f5c6f2d2b67c640b48f67a05b9732b7 cpanfile
+SHA1 9c8f8133156d7d0088d5565c62b37da4c322df5a dist.ini
+SHA1 21d16532e0735ca34f907832ad199629e1196ca2 examples/account.pl
+SHA1 fc4f7c1809063a450326b7ded3d896b8a524241d examples/current.pl
+SHA1 723a1b9ff869dca762bdda206eaa103de4a84d86 lib/WebService/Bitcoin/BTCe.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 2f65e1c87764446e34b2a70805d9a62790e089c7 t/00-compile.t
+SHA1 1529ca617f8f90c7df4605953aed73c18130c3f1 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU4OgGAAoJEFKElMNpjtyDdHEH/0nnQX2bqsal3Xwok1MALPdK
+qCbTNDZCeEhHOnI4/cyp78PL3KnDY3pekNJotgg9FcQ3KlwJ6mUQNCFRyDrApQOe
+wn6GjS8paclvkZ/lbpoFBHjhiM6vFRjlYLT4G0tdUGSH/7Q/xTmjclj6RDa0Svi9
+PLSKzmhpjizHrM2K8ixIfahyaMZFw/wSgf098ZY6+9RpYgL7EOjaLGN4elhFXRTd
+6isCsfbX7Sbg1lG/kF7hJVt6/iFAb7sQdSFhjDWTJEFwwYmKwrwO4mex8AeFkRKH
+UTAaFI6H9uPZcQtrNYAlHEpvNRgpcgNm6OFv2XCMeI6HdGudZI/ZPymR1dF0fJI=
+=wdXn
+-----END PGP SIGNATURE-----

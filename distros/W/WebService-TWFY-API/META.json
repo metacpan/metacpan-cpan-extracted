@@ -1,0 +1,46 @@
+{
+   "abstract" : "API interface for TheyWorkForYou.com",
+   "author" : [
+      "Spiros Denaxas (s [dot] denaxas [@] gmail [dot]com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-TWFY-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "HTTP::Request" : 0,
+            "LWP::UserAgent" : 0,
+            "Test::Exception" : "0.24",
+            "Test::Simple" : "0.44",
+            "URI" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.07"
+}

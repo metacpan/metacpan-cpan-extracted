@@ -1,0 +1,35 @@
+---
+abstract: 'Gui part of Webinject'
+author:
+  - 'Corey Goldberg, <corey@goldb.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Webinject-Gui
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Tk: 0
+  Tk::Compound: 0
+  Tk::NoteBook: 0
+  Tk::PNG: 0
+  Tk::ProgressBar::Mac: 0
+  Tk::ROText: 0
+  Tk::Stderr: 0
+  Webinject: 1.50
+  perl: 5.6.0
+resources:
+  bugtracker: http://github.com/sni/Webinject/issues
+  homepage: http://www.webinject.org
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: http://github.com/sni/Webinject
+version: 1.56

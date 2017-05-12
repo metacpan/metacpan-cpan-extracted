@@ -1,0 +1,23 @@
+Revision history for Perl extension WebService::Backlog
+
+0.04     2008-05-07 21:24:53 JST
+         - Impletemt multi "Category|Version|Milestone".
+         
+0.03     2007-12-11 13:45:05 JST
+         - Fixed POD typo. (thanks to Kota Sakoda)
+
+0.02     2007-11-14 22:11:08 JST
+         - Added some tests.
+
+0.01_04  2007-11-12 14:42:24 JST
+         - Added "requires 'Crypt::SSLeay'" to Makefile.PL.
+
+0.01_03  2007-11-08 11:33:16 JST
+         - Removed "build_requires 'Encode'" from Makefile.PL.
+         - Added "use 5.8.5" to WebService::Backlog.
+
+0.01_02  2007-11-06 14:22:11 JST
+         - Implement all methods.
+
+0.01_01  2007-11-05 13:43:01 JST
+         - original version

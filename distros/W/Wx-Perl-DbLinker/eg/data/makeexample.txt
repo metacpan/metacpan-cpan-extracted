@@ -1,0 +1,50 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE countries(
+  "countryid" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "country" TEXT,
+  "mainlangid" INTEGER
+);
+INSERT INTO "countries" ("country", "mainlangid") VALUES('England','1');
+INSERT INTO "countries" ("country", "mainlangid") VALUES('Ireland','1');
+INSERT INTO "countries" ("country", "mainlangid") VALUES('France','4');
+INSERT INTO "countries"  ("country", "mainlangid") VALUES('Switzerland','5');
+INSERT INTO "countries"  ("country", "mainlangid") VALUES('Germany','5');
+INSERT INTO "countries"  ("country", "mainlangid") VALUES('Italy','6');
+INSERT INTO "countries"  ("country", "mainlangid")  VALUES('Belgique','4');
+CREATE TABLE langues(
+  "langid"  INTEGER PRIMARY KEY AUTOINCREMENT,
+  "langue" TEXT
+);
+INSERT INTO "langues" ("langue") VALUES('english');
+INSERT INTO "langues" ("langue") VALUES('gaelic (Scotland)');
+INSERT INTO "langues" ("langue") VALUES('gaelic (Ireland)');
+INSERT INTO "langues" ("langue") VALUES('french');
+INSERT INTO "langues" ("langue") VALUES('german');
+INSERT INTO "langues" ("langue") VALUES('italian');
+INSERT INTO "langues" ("langue") VALUES('romans');
+INSERT INTO "langues" ("langue") VALUES('welsh');
+INSERT INTO "langues" ("langue") VALUES('breton');
+INSERT INTO "langues" ("langue") VALUES('provencal');
+INSERT INTO "langues" ("langue") VALUES('flemish');
+CREATE TABLE speaks (
+  "countryid"  INTEGER NOT NULL,
+  "langid" INTEGER NOT NULL,
+  PRIMARY KEY ("countryid", "langid")
+);
+INSERT INTO "speaks" VALUES('1','1');
+INSERT INTO "speaks" VALUES('1','8');
+INSERT INTO "speaks" VALUES('2','1');
+INSERT INTO "speaks" VALUES('2','3');
+INSERT INTO "speaks" VALUES('3','4');
+INSERT INTO "speaks" VALUES('3','9');
+INSERT INTO "speaks" VALUES('3','10');
+INSERT INTO "speaks" VALUES('4','4');
+INSERT INTO "speaks" VALUES('4','5');
+INSERT INTO "speaks" VALUES('4','6');
+INSERT INTO "speaks" VALUES('4','7');
+INSERT INTO "speaks" VALUES('5','5');
+INSERT INTO "speaks" VALUES('6','6');
+INSERT INTO "speaks" VALUES('7','4');
+INSERT INTO "speaks" VALUES('7','11');
+COMMIT;

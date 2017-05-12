@@ -1,0 +1,36 @@
+WebService-FOAAS version 0.001001
+=================================
+
+FOAAS (Fuck Off As A Service) provides a modern, RESTful, scalable
+solution to the common problem of telling people to fuck off.
+
+C<WebService::FOAAS> is an API client for FOAAS. It provides a series
+of methods for getting data from the service.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* JSON::MaybeXS (only for regenerating the source code)
+* Test::RequiresInternet
+* URI::Escape
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

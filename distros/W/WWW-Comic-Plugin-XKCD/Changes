@@ -1,0 +1,9 @@
+Revision history for WWW-Comic-Plugin-XKCD
+
+0.02    2008/04/07
+        D'oh - copied some of this module from W::C::P::CyanideAndHappiness,
+	and the test suite still tested that module instead - whoops!
+	
+0.01    2008/04/05
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,35 @@
+Module:   Win32::MSI::HighLevel
+Version:  1.0007
+Released: Dec 2011
+
+Short description.
+
+Win32::MSI::HighLevel provides a Perl wrapper and a degree of high level
+management around the API provided by msi.dll for manipulating Windows Installer
+.msi files.
+
+This module is likely to be most useful where a template .msi file is available
+that simply requires files and related entries to be updated to complete an
+installer, or where an existing installer needs to be updated.
+
+Long description
+
+The module provides facilities to open or create an .msi file and to edit the
+contents of the file:
+
+    Tables may be imported, exported, added and removed.
+
+    Table rows may be accessed, added, deleted and edited.
+
+    The components of the Summary Information Stream may be accessed and edited.
+
+Adding files to be installed is a high level operation with most of the required
+table maintenance taken care of by the module. Details of adding files to
+internal .cab files and management of the .cab files are wrapped up by the
+module.
+
+Although this module wraps up a significant amount of the housework required to
+generate a Windows Installer, a substantial knowledge of the Windows Installer
+technology is required to build an installer from scratch.
+
+See the POD documentation for a full description of the module.

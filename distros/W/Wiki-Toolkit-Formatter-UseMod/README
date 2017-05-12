@@ -1,0 +1,326 @@
+NAME
+    Wiki::Toolkit::Formatter::UseMod - UseModWiki-style formatting for Wiki::Toolkit
+
+DESCRIPTION
+    A formatter backend for Wiki::Toolkit that supports UseMod-style formatting.
+
+SYNOPSIS
+      use Wiki::Toolkit::Formatter::UseMod;
+
+      # Instantiate - see below for parameter details.
+      my $formatter = Wiki::Toolkit::Formatter::UseMod->new( %config );
+
+      # Format some text.
+      my $cooked = $formatter->format($raw);
+
+      # Find out which other nodes that text would link to.
+      my @links_to = $formatter->find_internal_links($raw);
+
+METHODS
+    new
+          my $formatter = Wiki::Toolkit::Formatter::UseMod->new(
+                         extended_links      => 0, # $FreeLinks
+                         implicit_links      => 1, # $WikiLinks
+                         force_ucfirst_nodes => 1, # $FreeUpper
+                         use_headings        => 1, # $UseHeadings
+                         allowed_tags        => [qw(b i)], # defaults to none
+                         macros              => {},
+                         pass_wiki_to_macros => 0,
+                         node_prefix         => 'wiki.pl?',
+                         node_suffix         => '',
+                         edit_prefix         => 'wiki.pl?action=edit;id=',
+                         edit_suffix         => '',
+                         munge_urls          => 0,
+          );
+
+        Parameters will default to the values shown above (apart from
+        "allowed_tags", which defaults to allowing no tags).
+
+        Internal links
+            "node_prefix", "node_suffix", "edit_prefix" and "edit_suffix"
+            allow you to control the URLs generated for links to other wiki
+            pages. So for example with the defaults given above, a link to
+            the Home node will have the URL "wiki.pl?Home" and a link to the
+            edit form for the Home node will have the URL
+            "wiki.pl?action=edit;id=Home"
+
+            (Note that of course the URLs that you wish to have generated
+            will depend on how your wiki application processes its CGI
+            parameters - you can't just put random stuff in there and hope
+            it works!)
+
+        Internal links - advanced options
+            If you wish to have greater control over the links, you may use
+            the "munge_node_name" parameter. The value of this should be a
+            subroutine reference. This sub will be called on each internal
+            link after all other formatting and munging *except* URL
+            escaping has been applied. It will be passed the node name as
+            its first parameter and should return a node name. Note that
+            this will affect the URLs of internal links, but not the link
+            text.
+
+            Example:
+
+              # The formatter munges links so node names are ucfirst.
+              # Ensure 'state51' always appears in lower case in node names.
+              munge_node_name => sub {
+                                     my $node_name = shift;
+                                     $node_name =~ s/State51/state51/g;
+                                     return $node_name;
+                                 }
+
+            Note: This is *advanced* usage and you should only do it if you
+            *really* know what you're doing. Consider in particular whether
+            and how your munged nodes are going to be treated by
+            "retrieve_node".
+
+        URL munging
+            If you set "munge_urls" to true, then your URLs will be more
+            user-friendly, for example
+
+              http://example.com/wiki.cgi?Mailing_List_Managers
+
+            rather than
+
+              http://example.com/wiki.cgi?Mailing%20List%20Managers
+
+            The former behaviour is the actual UseMod behaviour, but
+            requires a little fiddling about in your code (see
+            "node_name_to_node_param"), so the default is to not munge URLs.
+
+        Macros
+            Be aware that macros are processed *after* filtering out
+            disallowed HTML tags and *before* transforming from wiki markup
+            into HTML. They are also not called in any particular order.
+
+            The keys of macros should be either regexes or strings. The
+            values can be strings, or, if the corresponding key is a regex,
+            can be coderefs. The coderef will be called with the first nine
+            substrings captured by the regex as arguments. I would like to
+            call it with all captured substrings but apparently this is
+            complicated.
+
+            You may wish to have access to the overall wiki object in the
+            subs defined in your macro. To do this:
+
+            *   Pass the wiki object to the "->formatter" call as described
+                below.
+
+            *   Pass a true value in the "pass_wiki_to_macros" parameter
+                when calling "->new".
+
+            If you do this, then *all* coderefs will be called with the wiki
+            object as the first parameter, followed by the first nine
+            captured substrings as described above. Note therefore that
+            setting "pass_wiki_to_macros" may cause backwards compatibility
+            issues.
+
+        Macro examples:
+
+          # Simple example - substitute a little search box for '@SEARCHBOX'
+
+          macros => {
+
+              '@SEARCHBOX' =>
+                        qq(<form action="wiki.pl" method="get">
+                           <input type="hidden" name="action" value="search">
+                           <input type="text" size="20" name="terms">
+                           <input type="submit"></form>),
+          }
+
+          # More complex example - substitute a list of all nodes in a
+          # category for '@INDEX_LINK [[Category Foo]]'
+
+          pass_wiki_to_macros => 1,
+          macros              => {
+              qr/\@INDEX_LINK\s+\[\[Category\s+([^\]]+)]]/ =>
+                  sub {
+                        my ($wiki, $category) = @_;
+                        my @nodes = $wiki->list_nodes_by_metadata(
+                                metadata_type  => "category",
+                                metadata_value => $category,
+                                ignore_case    => 1,
+                        );
+                        my $return = "\n";
+                        foreach my $node ( @nodes ) {
+                            $return .= "* "
+                                    . $wiki->formatter->format_link(
+                                                               wiki => $wiki,
+                                                               link => $node,
+                                                                   )
+                                    . "\n";
+                         }
+                         return $return;
+                       },
+          }
+
+    format
+          my $html = $formatter->format($submitted_content, $wiki);
+
+        Escapes any tags which weren't specified as allowed on creation,
+        then interpolates any macros, then translates the raw Wiki language
+        supplied into HTML.
+
+        A Wiki::Toolkit object can be supplied as an optional second parameter.
+        This object will be used to determine whether a linked-to node
+        exists or not, and alter the presentation of the link accordingly.
+        This is only really in here for use when this method is being called
+        from within Wiki::Toolkit.
+
+    format_link
+          my $string = $formatter->format_link(
+                                                link => "Home Node",
+                                                wiki => $wiki,
+                                              );
+
+        An internal method exposed to make it easy to go from eg
+
+          * Foo
+          * Bar
+
+        to
+
+          * <a href="index.cgi?Foo">Foo</a>
+          * <a href="index.cgi?Bar">Bar</a>
+
+        See Macro Examples above for why you might find this useful.
+
+        "link" should be something that would go inside your extended link
+        delimiters. "wiki" is optional but should be a Wiki::Toolkit object. If
+        you do supply "wiki" then the method will be able to check whether
+        the node exists yet or not and so will call "->make_edit_link"
+        instead of "->make_internal_link" where appropriate. If you don't
+        supply "wiki" then "->make_internal_link" will be called always.
+
+        This method used to be private so may do unexpected things if you
+        use it in a way that I haven't tested yet.
+
+    find_internal_links
+          my @links_to = $formatter->find_internal_links( $content ); 
+ 
+        Returns a list of all nodes that the supplied content links to.
+
+    node_name_to_node_param
+          use URI::Escape;
+          $param = $formatter->node_name_to_node_param( "Recent Changes" );
+          my $url = "wiki.pl?" . uri_escape($param);
+
+        In usemod, the node name is encoded prior to being used as part of
+        the URL. This method does this encoding (essentially, whitespace is
+        munged into underscores). In addition, if "force_ucfirst_nodes" is
+        in action then the node names will be forced ucfirst if they weren't
+        already.
+
+        Note that unless "munge_urls" was set to true when "new" was called,
+        this method will do nothing.
+
+    node_param_to_node_name
+          my $node = $q->param('node') || "";
+          $node = $formatter->node_param_to_node_name( $node );
+
+        In usemod, the node name is encoded prior to being used as part of
+        the URL, so we must decode it before we can get back the original
+        node name.
+
+        Note that unless "munge_urls" was set to true when "new" was called,
+        this method will do nothing.
+
+SUBCLASSING
+        The following methods can be overridden to provide custom behaviour.
+
+        make_edit_link
+                my $link = $self->make_edit_link(
+                    title => "Home Page",
+                    url   => "http://example.com/?id=Home",
+                                               );
+
+            This method will be passed a title and a url and should return
+            an HTML snippet. For example, you can add a "title" attribute to
+            the link like so:
+
+              sub make_edit_link {
+                  my ($self, %args) = @_;
+                  my $title = $args{title};
+                  my $url = $args{url};
+                  return qq|[$title]<a href="$url" title="create">?</a>|;
+              }
+
+        make_internal_link
+                my $link = $self->make_internal_link(
+                    title => "Home Page",
+                    url   => "http://example.com/?id=Home",
+                                                    );
+
+            This method will be passed a title and a url and should return
+            an HTML snippet. For example, you can add a "class" attribute to
+            the link like so:
+
+              sub make_internal_link {
+                  my ($self, %args) = @_;
+                  my $title = $args{title};
+                  my $url = $args{url};
+                  return qq|<a href="$url" class="internal">$title</a>|;
+              }
+
+        make_external_link
+                my $link = $self->make_external_link(
+                    title => "London Perlmongers",
+                    url   => "http://london.pm.org",
+                                                    );
+
+            This method will be passed a title and a url and should return
+            an HTML snippet. For example, you can add a little icon after
+            each external link like so:
+
+              sub make_external_link {
+                  my ($self, %args) = @_;
+                  my $title = $args{title};
+                  my $url = $args{url};
+                  return qq|<a href="$url">$title</a> <img src="external.gif">|;
+              }
+
+AUTHOR
+        Kake Pugh (kake@earth.li).
+
+COPYRIGHT
+             Copyright (C) 2003-2004 Kake Pugh.  All Rights Reserved.
+
+        This module is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+CREDITS
+        The OpenGuides London team (<http://openguides.org/london/>) sent
+        some very helpful bug reports. A lot of the work of this module is
+        done within chromatic's module, Text::WikiFormat.
+
+CAVEATS
+        This doesn't yet support all of UseMod's formatting features and
+        options, by any means. This really truly *is* a 0.* release. Please
+        send bug reports, omissions, patches, and stuff, to me at
+        "kake@earth.li".
+
+NOTE ON USEMOD COMPATIBILITY
+        UseModWiki "encodes" node names before making them part of a URL, so
+        for example a node about Wombat Defenestration will have a URL like
+
+          http://example.com/wiki.cgi?Wombat_Defenestration
+
+        So if we want to emulate a UseModWiki exactly, we need to munge back
+        and forth between node names as titles, and node names as CGI
+        params.
+
+          my $formatter = Wiki::Toolkit::Formatter::UseMod->new( munge_urls => 1 );
+          my $node_param = $q->param('id') || $q->param('keywords') || "";
+          my $node_name = $formatter->node_param_to_node_name( $node_param );
+
+          use URI::Escape;
+          my $url = "http://example.com/wiki.cgi?"
+            . uri_escape(
+               $formatter->node_name_to_node_param( "Wombat Defenestration" )
+                         );
+
+SEE ALSO
+        * Wiki::Toolkit
+        * Text::WikiFormat
+        * UseModWiki (<http://www.usemod.com/cgi-bin/wiki.pl>)
+

@@ -1,0 +1,21 @@
+---
+name: WWW-VenusEnvy
+version: 1.10
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Retrieve VenusEnvy comic strip images
+license: open_source
+requires:
+  Carp: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+build_requires:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  WWW::VenusEnvy:
+    file: lib/WWW/VenusEnvy.pm
+    version: 1.10
+generated_by: Module::Build version 0.2611

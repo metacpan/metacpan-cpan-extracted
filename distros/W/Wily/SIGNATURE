@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba ARTISTIC
+SHA1 87235a179fa5d09fd4a4354e8a6f9c7370524cc3 Changes
+SHA1 74a8a6531a42e124df07ab5599aad63870fa0bd4 Copying
+SHA1 ad298e2bfaae8c74a17733b3b09afbaf8141d9c5 MANIFEST
+SHA1 83775b6ad422c745c9d2f3d8ddaf2cfc193d2c17 MANIFEST.SKIP
+SHA1 bc97a2e5d1e8e051b4794e4cac9b56552f61686a META.yml
+SHA1 e0875934e53fff38252c5689f8758995d77a87cf Makefile.PL
+SHA1 1ba0eb54b303b9b03bcaf97ebb7393ece314ba17 README
+SHA1 d11b7396bff658e9f49e752f93695559588bcd10 example/Man
+SHA1 b90df8681ac920ea2e6ff1ce7ce3824b4af6011d example/W
+SHA1 9a7156d602ef4271dce5186dc0aab2a406e98666 example/Wname
+SHA1 bfaa6357ac6057d42c748558390d002062952161 example/wedit
+SHA1 215bb0f65e0319e2000f4f9eea30a4c489f49972 lib/Wily.pm
+SHA1 92fa5a9c49e109a3cbec222ea8576af4b22025f9 lib/Wily/Connect.pm
+SHA1 260e92018250bb6fe7c3b0591f770be22a04581a lib/Wily/Message.pm
+SHA1 ae43764309068d19164cdd2974c8ded49ff0d15d lib/Wily/RPC.pm
+SHA1 f430bc027f19a2f50b8b844b0b0bd25f999c89e8 t/0-signature.t
+SHA1 cba8c70abc598325ff0c9aa91d0705c8bf757eda t/Message.t
+SHA1 d9f02cd628074011c7fd73edced5a1672a088605 t/Wily.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFBJgbVSkNDYvuGMnkRAnTHAJ9rBnQkV0NegIsCFofD4wxMbC4VhACfQ0bU
+X+ww/t0Y7sGJgHIHgI/u1OM=
+=PMwk
+-----END PGP SIGNATURE-----

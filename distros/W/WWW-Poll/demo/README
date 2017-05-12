@@ -1,0 +1,7 @@
+Enclosed in this directory are some scripts to get you started in addition to the initial ~/data directory with two "seed" files.  Make sure the data directory can be written to by your web server (if in doubt, "chmod a+w" the directory and enclosed files).  
+
+You'll have to also change $poll->path() to reflect where this directory is located; bar.jpg is used to render the graph of results and just drop it in the same directory as the poll.pl file for now.  I'll be changing this soon, though.
+
+Enjoy,
+Mike Gammon
+mgammon@interport.net 

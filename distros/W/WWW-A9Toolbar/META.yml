@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-A9Toolbar
+version:      0.01
+version_from: lib/WWW/A9Toolbar.pm
+installdirs:  site
+requires:
+    List::MoreUtils:               0
+    Net::DNS:                      0
+    URI:                           0
+    URI::QueryParam:               0
+    URI::URL:                      0
+    WWW::Mechanize:                0
+    WWW::Mechanize::FormFiller:    0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

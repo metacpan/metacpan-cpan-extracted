@@ -1,0 +1,21 @@
+  Wed. May 14, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+Speaker: Wil Cooley
+
+Topic:   IMAP: everything you ever wanted to do with mail except send it
+
+In the open standards world, centralized remote mail stores are usually
+reached through the magic of IMAP, the Internet Mail Access Protocol.
+The convenience of using common tools like grep and procmail, however,
+is lost when relocating one's mail from a local, Berkeley-style mailbox
+to an IMAP server. With a little scripting (and the right IMAP server),
+these conveniences can be regained.
+
+Wil will present an overview of IMAP covering the following topics:
+
+* Anatomy of an IMAP server
+* On the Wire: The protocol itself
+* Sieve, a special-purpose scripting language for mail filtering
+* Scripting on-line mail processing with Perl
+
+[http://nakedape.cc/info/IMAP-Perl/ slides]

@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <title>[% html_title %]</title>
+  <style type="text/css">
+.node3 {
+    padding-left: 1em;
+}
+.node4 {
+    padding-left: 2em;
+}
+.node5 {
+    padding-left: 3em;
+}
+.node6 {
+    padding-left: 4em;
+}
+.node7 {
+    padding-left: 5em;
+}
+.node8 {
+    padding-left: 6em;
+}
+.node9 {
+    padding-left: 7em;
+}
+.node10 {
+    padding-left: 8em;
+}
+  </style>
+</head>
+<body>
+  <a id="wsst_top" name="wsst_top"></a>
+  <div id="wsst_html_title">
+    <h1>[% html_title %]</h1>
+  </div>
+[% IF html_abstract -%]
+  <div id="wsst_html_abstract">
+    [% html_abstract %]
+  </div>
+[% ELSIF abstract -%]
+  <div id="wsst_html_abstract">
+    <div>[% abstract | html | html_line_break %]</div>
+  </div>
+[% END -%]
+  <div id="wsst_html_index">
+    <ol>
+[% FOREACH method = methods -%]
+      <li class="wsst_list_item_[% loop.count %]"><a href="#wsst_method_[% loop.count %]">[% method.title %]</a></li>
+[% END -%]
+    </ol>
+  </div>
+  <div id="wsst_html_methods">
+[% FOREACH method = methods -%]
+[% method_num = loop.count %]
+    <div id="wsst_method_[% loop.count %]" class="wsst_html_method">
+      <h2 id="wsst_method_[% loop.count %]_title">[% method.title %]</h2>
+[% IF method.html_desc -%]
+      <div id="wsst_method_[% loop.count %]_desc">
+        [% method.html_desc %]
+      </div>
+[% ELSIF method.desc -%]
+      <div id="wsst_method_[% loop.count %]_desc">
+        <div>[% method.desc | html | html_line_break %]</div>
+      </div>
+[% END -%]
+      <h3 id="wsst_method_[% loop.count %]_url">リクエストURL</h3>
+      <ul>
+        <li><a href="[% method.url %]">[% method.url %]</a></li>
+      </ul>
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+      <h3 id="wsst_method_[% loop.count %]_params">検索クエリ</h3>
+      <table class="wsst_html_method_params">
+        <thead>
+          <tr>
+            <th width="70">パラメータ</th>
+            <th width="58">項目名</th>
+            <th width="281">説明</th>
+            <th width="20">必須</th>
+            <th>値</th>
+          </tr>
+        </thead>
+        <tbody>
+[% FOREACH param = method.params -%]
+[% footnotes_link = footnotes_link_filter_factory("params", method_num) %]
+          <tr>
+            <td class="wsst_method_params_name">[% param.name | html | html_line_break | $footnotes_link %]</td>
+            <td class="wsst_method_params_title">[% param.title | html | html_line_break | $footnotes_link %]</td>
+            <td class="wsst_method_params_desc">[% param.desc | html | html_line_break | $footnotes_link %]</td>
+            <td class="wsst_method_params_require">[% param.require | $html_bool %]</td>
+            <td class="wsst_method_params_note">[% param.note | html | html_line_break | $footnotes_link %]</td>
+          </tr>
+[% END -%]
+        </tbody>
+      </table>
+[% IF method.params_footnotes -%]
+      <ul>
+[% FOREACH footnote = method.params_footnotes -%]
+        <li id="wsst_method_params_footnotes_[% method_num %]_[% footnote.name %]">*[% footnote.name %]：[% footnote.value | html | html_line_break %]</li>
+[% END -%]
+      </ul>
+[% END -%]
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+[% IF method.sample_query -%]
+      <h3 id="wsst_method_[% loop.count %]_sample_query">サンプルクエリ</h3>
+[% IF method.sample_query.name -%]
+      [% method.sample_query.name | html | html_para %]
+[% END -%]
+      <div class="source">
+        <pre><a href="[% method.sample_query.url %]">[% method.sample_query.url %]</a></pre>
+      </div>
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+[% END -%]
+      <h3 id="wsst_method_[% loop.count %]_return">レスポンスフィールド</h3>
+      <table class="wsst_html_method_return">
+        <thead>
+          <tr class="ref-head">
+            <th width="120">フィールド</th>
+            <th width="360">説明</th>
+            <th width="120">例</th>
+          </tr>
+        </thead>
+        <tbody>
+[% FOREACH node = method.return.to_array -%]
+[% footnotes_link = footnotes_link_filter_factory("return", method_num) %]
+          <tr class="ref-body">
+            <td class="node[% node.depth %]">[% node.name | html | html_line_break | $footnotes_link %]</td>
+            <td>[% node.desc | html | html_line_break | $footnotes_link %]</td>
+            <td>[% node.examples.0 | html | html_line_break | $footnotes_link %]</td>
+          </tr>
+[% END -%]
+        </tbody>
+      </table>
+[% IF method.return_footnotes -%]
+      <ul>
+[% FOREACH footnote = method.return_footnotes -%]
+        <li id="wsst_method_return_footnotes_[% method_num %]_[% footnote.name %]">*[% footnote.name %]：[% footnote.value | html | html_line_break %]</li>
+[% END -%]
+      </ul>
+[% END -%]
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+[% IF method.sample_response -%]
+      <h3 id="wsst_method_[% loop.count %]_sample_response">サンプルレスポンス</h3>
+      <div class="source">
+        <pre>[% method.sample_response | html %]</pre>
+      </div>
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+[% END -%]
+[% IF method.error -%]
+      <h3 id="wsst_method_[% loop.count %]_error">エラー時のレスポンス</h3>
+      <table class="wsst_html_method_error">
+        <thead>
+          <tr class="ref-head">
+            <th width="120">フィールド</th>
+            <th width="360">説明</th>
+            <th width="120">例</th>
+          </tr>
+        </thead>
+        <tbody>
+[% FOREACH node = method.error.to_array -%]
+[% footnotes_link = footnotes_link_filter_factory("error", method_num) %]
+          <tr class="ref-body">
+            <td class="node[% node.depth %]">[% node.name | html | html_line_break | $footnotes_link %]</td>
+            <td>[% node.desc | html | html_line_break | $footnotes_link %]</td>
+            <td>[% node.examples.0 | html | html_line_break | $footnotes_link %]</td>
+          </tr>
+[% END -%]
+        </tbody>
+      </table>
+[% IF method.error_footnotes -%]
+      <ul>
+[% FOREACH footnote = method.error_footnotes -%]
+        <li id="wsst_method_error_footnotes_[% method_num %]_[% footnote.name %]">*[% footnote.name %]：[% footnote.value | html | html_line_break %]</li>
+[% END -%]
+      </ul>
+[% END -%]
+      <div class="wsst_gotop"><a href="#wsst_top">ページトップへ</a></div>
+[% END -%]
+    </div>
+[% END -%]
+    </div>
+</body>
+</html>

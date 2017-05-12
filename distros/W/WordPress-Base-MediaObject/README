@@ -1,0 +1,70 @@
+
+================================================================================
+
+WordPress::Base::MediaObject - create structs to upload media to
+    wordpress
+
+SYNOPSIS
+       use WordPress::Base::MediaObject 'all';
+       my $struct = abs_path_to_media_object_data('/home/my/picture.jpg');
+   
+DESCRIPTION
+    This is for dealing with files, slurping, cleaning up text, whatever.
+    Nothing is exported by default. This is for use with WordPress::XMLRPC
+
+SUBS
+  abs_path_to_media_object_data()
+    Arg is abs path, turns into data structure expected as arg to upload
+    with WordPress::XMLRPC methods. You would normally use a binary file for
+    this.
+
+  get_file_name()
+    Argument is a path. Returns filename part.
+
+  get_file_bits()
+    Argument is abs path, returns file bits in MIME::Base64
+
+  get_mime_type()
+    Argument is abs path, returns mime type
+
+REQUIREMENTS
+    File::Type MIME::Base64
+
+SEE ALSO
+    WordPress::XMLRPC
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    "Artistic License" or the "GNU General Public License".
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the "GNU General Public License" for more details.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Exporter: 5
+File::Type: 0.22
+MIME::Base64: 3.07
+Test::Simple: 0
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+

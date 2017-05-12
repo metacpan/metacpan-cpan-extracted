@@ -1,0 +1,139 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Method_${method.class_name}" -%]
+
+require_once '[% package_dir %]/Method.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Implementation of Method class for accessing \"${method.name}\"" -%]
+class [% package_name %]_Method_[% method.class_name %] extends [% package_name %]_Method
+{
+    /**
+     * Returns the URL
+     * 
+     * @return string URL
+     */
+    function getUrl()
+    {
+        return '[% method.url %]';
+    }
+
+    /**
+     * Returns request method
+     * 
+     * @access public
+     * @return string request method
+     */
+    function getRequestMethod()
+    {
+        return '[% method.request_method or "GET" %]';
+    }
+    
+    /**
+     * Returns the conf of parameters
+     * 
+     * @access public
+     * @return array conf
+     */
+    function getParamsConf()
+    {
+        return [% make_params_conf(method, 2) or "array()" %];
+    }
+    
+    /**
+     * Returns the conf of respoonse
+     * 
+     * @access public
+     * @return array conf
+     */
+    function getResponseConf()
+    {
+        return [% make_response_conf(method, 2) or "array()" %];
+    }
+    
+    /**
+     * Returns true if response data is error
+     *
+     * @access public
+     * @return bool true if response data is error, or false
+     */
+    function isError()
+    {
+        if (!is_null($this->getRequest()) && is_null($this->getData())) {
+            return true;
+        }
+        [% make_is_error(method, 2) %]
+    }
+    
+    /**
+     * Returns error message
+     *
+     * @access public
+     * @return string error message
+     */
+    function getErrorMessage()
+    {
+        if (!$this->isError()) {
+            return 'No error';
+        }
+        [% make_error_message(method, 2) %]
+    }
+    
+    /**
+     * Returns total entries
+     *
+     * @access public
+     * @return int total entries
+     */
+    function getTotalEntries()
+    {
+        [% make_total_entries(method, 2) %]
+    }
+    
+    /**
+     * Returns entries per page
+     *
+     * @access public
+     * @return int entries per page
+     */
+    function getEntriesPerPage()
+    {
+        [% make_entries_per_page(method, 2) %]
+    }
+    
+    /**
+     * Returns current page
+     *
+     * @access public
+     * @return int current page
+     */
+    function getCurrentPage()
+    {
+        [% make_current_page(method, 2) %]
+    }
+    
+    /**
+     * Returns page params
+     *
+     * @access public
+     * @param int $page page num
+     * @param int $size entries per page
+     * @param array $params parameters
+     * @return array parameters that page params was set
+     */
+    function getPageParam($page = null, $size = null, $params = null)
+    {
+        if (is_null($page)) {
+            $page = $this->getCurrentPage();
+        }
+        if (is_null($size)) {
+            $size = $this->getEntriesPerPage();
+        }
+        if (is_null($params)) {
+            $params = array();
+        }
+        [% make_page_param(method, 2) %]
+        return $params;
+    }
+}
+
+?>

@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/WWW/Tracking.pm
+lib/WWW/Tracking/Data.pm
+lib/WWW/Tracking/Data/Plugin/Catalyst.pm
+lib/WWW/Tracking/Data/Plugin/GoogleAnalytics.pm
+lib/WWW/Tracking/Data/Plugin/Headers.pm
+lib/WWW/Tracking/Data/Plugin/Piwik.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_WWW-Tracking.t
+t/02_WWW-Tracking-Data.t
+t/03_WWW-Tracking-Data-Plugin-Headers.t
+t/04_WWW-Tracking-Data-Plugin-GoogleAnalytics.t
+t/05_WWW-Tracking-Data-Plugin-Piwik.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

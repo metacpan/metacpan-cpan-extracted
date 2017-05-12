@@ -1,0 +1,13 @@
+# Contributions to the  module
+
+## Creator & Maintainer
+
+* Tobias Kirschstein <lev@cpan.org>
+
+
+## Contributors
+
+In chronological order:
+
+* your name <url or email to your profile>
+  * what your contribution was about

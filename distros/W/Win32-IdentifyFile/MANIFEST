@@ -1,0 +1,10 @@
+Changes
+IdentifyFile.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Win32-IdentifyFile.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Win32/IdentifyFile.pm

@@ -1,0 +1,20 @@
+
+This is an example data service, built using the Web::DataService framework.  It provides
+information about the historical population of U.S. states, based on data from the
+L<Bureau of the Census|http://www.census.gov/>.
+
+You can use this code as a basis for building your own data services.
+
+=head2 OPERATIONS
+
+The following data service operations are available:
+
+<% NODELIST(opt_usage=1) %>
+
+<% FORMAT_SECTION(opt_extended=1) %>
+
+<% VOCAB_SECTION(opt_extended=1, opt_all=1) %>
+
+
+
+

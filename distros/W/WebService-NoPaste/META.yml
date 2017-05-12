@@ -1,0 +1,14 @@
+name: WebService-NoPaste
+version: 0.01
+abstract: WebService-NoPaste - Post to Paste Web Pages
+author: Ryan King <rking@panoptic.com
+license: perl
+distribution_type: module
+requires:
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  IO::Any: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

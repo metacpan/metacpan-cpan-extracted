@@ -1,0 +1,22 @@
+** 0.05 / 2016-09-09
+   - Add 'get_page_source' API, increasing implementation to 0.02 compat
+
+** 0.04 / 2016-09-04
+   - Declare 'our $VERSION' for version detection by cpanm
+
+** 0.03 / 2016-09-01
+  - Extend the possibility to use an environment variable to others capabilities,
+    such as remote_server_addr, platform and version.
+  - Fix documented port
+  - Add possibility to get page source seen by the driver.
+
+ ** 0.02 / 2016-08-26
+  - Add the possibility to use an environment variable for desired browser
+
+ ** 0.02 / 2016-08-21
+  - Separate author tests (develop tests; xt/ directory) from deployment
+    tests (t/ directory)
+
+ ** 0.01 / 2016-06-23
+  - Initial release to replace LedgerSMB's
+    (https://github.com/ledgersmb/LedgerSMB) test code

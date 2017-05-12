@@ -1,0 +1,37 @@
+Revision history for WWW-Shorten-Yourls
+
+1.001     2017-02-08
+    - Removed errant left-over debug code.
+
+1.000     2017-02-07
+    - MAJOR CHANGES!!!!!
+    - Cleaned up the object-oriented interface.
+    - Removed errors function
+    - Removed version function
+    - Backfilled Changelog as best as possible.
+    - Added tidy, git, mailmap, and travis files.
+    - Added a MANIFEST.SKIP
+    - Cleaned up documentation
+    - DZil-ified
+    - Made the README a github markdown file.
+    - Add LICENSE file to repository
+    - Add CONTRIBUTING.md to repository
+    - Added proper attributes
+    - Aliased any old pseudo-attributes to the new proper ones
+    - Re-documented every method call
+    - All method calls use parameters matching their actual yourls.org calls
+    - All method calls return a hash reference or die (Try::Tiny)
+    - All method calls use JSON-only
+    - Got rid of any and all XML-related code
+    - Make use of JSON::MaybeXS instead
+    - Cleaned up the requirements list in a cpanfile
+    - Added quite a bit more tests
+
+0.06    2010-03-23
+    - Added signature
+
+0.02    2009-09-22
+    - Updated response parsing
+
+0.01    2009-09-13
+    - First version, released on an unsuspecting world.

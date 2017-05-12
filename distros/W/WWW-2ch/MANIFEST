@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-2ch.t
+lib/WWW/2ch.pm
+lib/WWW/2ch/Res.pm
+lib/WWW/2ch/Plugin/Jbbs.pm
+lib/WWW/2ch/Plugin/Base.pm
+lib/WWW/2ch/Setting.pm
+lib/WWW/2ch/UserAgent.pm
+lib/WWW/2ch/Cache.pm
+lib/WWW/2ch/Dat.pm
+lib/WWW/2ch/Subject.pm
+lib/WWW/2ch/Cache/File.pm
+META.yml                                 Module meta-data (added by MakeMaker)

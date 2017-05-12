@@ -1,0 +1,115 @@
+{
+   "abstract" : "Use REST webservices that conform to the GDAPI specification",
+   "author" : [
+      "David Bartle <davidb@mediatemple.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-GoDaddy-REST",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Tiny" : "0",
+            "GraphViz" : "0",
+            "LWP::Protocol::https" : "0",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Config::Any" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Pod::Usage" : "0",
+            "Term::Shell" : "0",
+            "Text::FormatTable" : "0",
+            "Text::Wrap" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::GoDaddy::REST" : {
+         "file" : "lib/WWW/GoDaddy/REST.pm",
+         "version" : "1.00"
+      },
+      "WWW::GoDaddy::REST::Collection" : {
+         "file" : "lib/WWW/GoDaddy/REST/Collection.pm"
+      },
+      "WWW::GoDaddy::REST::Resource" : {
+         "file" : "lib/WWW/GoDaddy/REST/Resource.pm"
+      },
+      "WWW::GoDaddy::REST::Schema" : {
+         "file" : "lib/WWW/GoDaddy/REST/Schema.pm"
+      },
+      "WWW::GoDaddy::REST::Shell" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::DocsCommand" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/DocsCommand.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::GetCommand" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/GetCommand.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::GraphCommand" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/GraphCommand.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::ListCommand" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/ListCommand.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::QueryCommand" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/QueryCommand.pm"
+      },
+      "WWW::GoDaddy::REST::Shell::Util" : {
+         "file" : "lib/WWW/GoDaddy/REST/Shell/Util.pm"
+      },
+      "WWW::GoDaddy::REST::Util" : {
+         "file" : "lib/WWW/GoDaddy/REST/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/godaddy/gdapi-perl/issues"
+      },
+      "homepage" : "https://github.com/godaddy/gdapi-perl",
+      "license" : [
+         "http://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "url" : "https://github.com/godaddy/gdapi-perl.git"
+      }
+   },
+   "version" : "1.00"
+}

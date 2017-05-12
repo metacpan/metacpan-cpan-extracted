@@ -1,0 +1,70 @@
+{
+   "abstract" : "retrieve text versions of comics on www.xkcd.com",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-XKCD-AsText",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "URI" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::XKCD::AsText" : {
+         "file" : "lib/WWW/XKCD/AsText.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kyzn/WWW-XKCD-AsText/issues"
+      },
+      "homepage" : "https://github.com/kyzn/WWW-XKCD-AsText",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kyzn/WWW-XKCD-AsText.git",
+         "web" : "https://github.com/kyzn/WWW-XKCD-AsText"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Kivanc Yazan <kyzn@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

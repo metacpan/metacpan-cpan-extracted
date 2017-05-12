@@ -1,0 +1,10 @@
+=begin pod
+=for CHAPTER :preface
+About
+
+B<WebDAO> - object-oriented system  for easy creation of high-performance and scalable web applications writen in I<perl>.
+
+I<Aliaksabdr Zahatski>
+
+
+=end pod

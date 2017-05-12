@@ -1,0 +1,193 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdflayer.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2009-07-01
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfOcg} class wxPdfOcg
+{
+  
+%{
+static void
+wxPdfOcg::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+  /// Constructor
+  wxPdfOcg();
+
+  %name{Destroy} virtual ~wxPdfOcg()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  /// Set OCG index
+  void SetIndex(int index);
+
+  /// Get OCG index
+  int  GetIndex() const;
+
+  /// Set object index
+  void SetObjIndex(int n);
+
+  /// Get object index
+  int  GetObjIndex() const;
+
+  /// Check whether OCG is initialized
+  bool IsOk() const;
+
+  /// Get 
+  wxPdfOcgType GetType() const;
+
+};
+
+%module{Wx};
+
+%name{Wx::PdfLayer} class wxPdfLayer : public %name{Wx::PdfOcg} wxPdfOcg
+{
+
+%{
+static void
+wxPdfLayer::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+
+public:
+  
+  wxPdfLayer(const wxString& name);
+
+  %name{Destroy} virtual ~wxPdfLayer()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  wxString GetName() const;
+
+  wxString GetTitle() const;
+
+  void SetIntent(const unsigned int intent);
+
+  int GetIntent() const;
+
+  void ClearIntent(const unsigned int intent);
+
+  void SetOn(bool on);
+
+  bool IsOn() const;
+
+  void SetOnPanel(bool onPanel);
+
+  bool IsOnPanel() const;
+
+  bool AddChild(wxPdfLayer* child);
+
+  wxPdfLayer* GetParent() const;
+
+  bool HasChildren() const;
+    
+  /* TODO
+  wxPdfArrayLayer GetChildren() const { return m_children; }
+  */
+
+  void SetCreatorInfo(const wxString& creator, const wxString& subtype);
+
+  void SetLanguage(const wxString& lang, bool preferred);
+
+  void SetExport(bool exportState);
+
+  void SetZoom(double min, double max);
+
+  void SetPrint(const wxString& subtype, bool printState);
+
+  void SetView(bool viewState);
+  
+  /* TODO 
+  wxPdfDictionary* GetUsage() const { return m_usage; }
+  */
+  
+  static wxPdfLayer* CreateTitle(const wxString& title);
+
+};
+
+%module{Wx};
+
+%name{Wx::PdfLayerMembership} class wxPdfLayerMembership : public %name{Wx::PdfOcg} wxPdfOcg
+{
+
+%{
+static void
+wxPdfLayerMembership::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+  /// Constructor
+  wxPdfLayerMembership();
+
+  %name{Destroy} virtual ~wxPdfLayerMembership()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  bool AddMember(wxPdfLayer* layer);
+
+  /// Get a list of the layers
+  /* TODO
+  wxPdfArrayLayer GetMembers() const;
+  */
+
+  void SetVisibilityPolicy(wxPdfOcgPolicy policy);
+
+  /// Get the visibility policy
+  wxPdfOcgPolicy GetVisibilityPolicy() const;
+
+};
+
+
+%module{Wx};
+
+%name{Wx::PdfLayerGroup} class wxPdfLayerGroup
+{
+
+%{
+static void
+wxPdfLayerGroup::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+  /// Constructor
+  %name{newDefault} wxPdfLayerGroup() %Overload;
+
+  %name{Destroy} virtual ~wxPdfLayerGroup()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+  
+  /// Copy constructor
+  %name{newCopy} wxPdfLayerGroup(const wxPdfLayerGroup& layer) %Overload;
+
+  /// Add layer
+  /**
+  * Adds a new member to the layer radio group.
+  * \param layer the new member to the layer radio group
+  */    
+  bool Add(wxPdfLayer* layer);
+
+  /// Get list of group members
+  /* TODO wxPdfArrayLayer GetGroup() const; */
+  
+};

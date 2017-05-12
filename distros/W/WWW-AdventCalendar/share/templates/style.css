@@ -1,0 +1,313 @@
+%# vim:set ft=mason:
+<%args>
+%color
+</%args>
+body {
+  color: <% $color{bodyFG} %>;
+  background: <% $color{bodyBG} %>;
+  font-family: verdana, tahoma, sans-serif;
+}
+
+#contentwrapper {
+  width: 75%;
+  min-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px auto;
+  margin-bottom: 10px;
+  background: <% $color{blotterBG} %>;
+  border: 1px solid <% $color{blotterBorder} %>;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.6em;
+  text-align: center;
+  color: <% $color{headerFG} %>;
+}
+
+#header h1 a {
+  color: <% $color{titleFG} %>;
+}
+
+h1.title {
+  text-align: left;
+  margin-bottom: 0;
+}
+
+h2 {
+  text-align: center;
+  color: <% $color{headerFG} %>;
+}
+
+.subtitle {
+  text-align: right;
+  border-top: 1px black solid;
+}
+
+.feed {
+  float: right;
+  color: <% $color{feedLinkFG} %>;
+  padding-right: 1em;
+  vertical-align: middle;
+  font-weight: bold;
+}
+
+dt {
+  margin: 0.5em 0 0.5em 0;
+}
+
+#content, #tagline, #yearline {
+  font-size: 0.9em;
+  padding: 8px 20px;
+  margin: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+#content {
+  border: 1px solid <% $color{contentBorder} %>;
+  background: <% $color{contentBG} %>;
+}
+
+#tagline, #yearline {
+  background: <% $color{taglineBG} %>;
+  border: 1px solid <% $color{taglineBorder} %>;
+  color: <% $color{taglineFG} %>;
+}
+
+.pod h1, .pod h2 {
+  text-align: left;
+  color: <% $color{headerFG} %>;
+}
+
+a {
+  color: <% $color{linkFG} %>;
+  text-decoration: none;
+}
+
+a:not(.article) {
+  padding-left: .2em;
+  margin-left: -.2em;
+  padding-right: .2em;
+  margin-right: -.2em;
+}
+
+#header a:hover,
+.pod    a:hover
+{
+  color: <% $color{linkHoverFG} %>;
+  background: <% $color{linkHoverBG} %>;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+.pod ul li {
+  margin: .25em 0;
+}
+
+.pod ul li p {
+  display: inline;
+}
+
+.calendar {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1em;
+}
+
+.calendar th {
+  padding: 5px;
+  border: 1px solid <% $color{calendarHeaderCellBorder} %>;
+  background-color: <% $color{calendarHeaderCellBG} %>;
+}
+
+.calendar td {
+  text-align: center;
+  width: 9em;
+  height: 5em;
+  padding: 0;
+}
+
+.calendar td.day {
+  font-size: xx-large;
+  height: 2.5em;
+  background: <% $color{calendarIgnoredDayBG} %>;
+}
+
+.calendar td.day.advent {
+  background: <% $color{calendarPastDayBG} %>;
+}
+
+.calendar td.day.advent a {
+  display: block;
+  color: <% $color{calendarPastDayFG} %>;
+  height: 2.5em;
+  padding: 0;
+  margin: 0;
+  vertical-align: middle;
+  line-height: 2.5em;
+}
+
+.calendar td.day.advent a:hover {
+  background: <% $color{calendarPastDayHoverBG} %>;
+  color: <% $color{calendarPastDayHoverFG} %>;
+}
+
+.calendar td.day.advent.today {
+  background: <% $color{calendarTodayBG} %>;
+}
+
+.calendar td.day.advent.today a {
+  color: <% $color{calendarTodayFG} %>;
+}
+
+.calendar td.day.advent.today a:hover {
+  background: <% $color{calendarTodayHoverBG} %>;
+  color: <% $color{calendarTodayFG} %>;
+}
+
+.calendar td.day.advent.future {
+  background: <% $color{calendarFutureDayBG} %>;
+  color: <% $color{calendarFutureDayFG} %>;
+}
+
+.calendar td.day.advent.missing {
+  color: <% $color{calendarMissingDayFG} %>;
+  background-color: <% $color{calendarMissingDayBG} %>;
+}
+
+a img {
+  border: 0;
+}
+
+blockquote {
+  border-left: thick <% $color{quoteBorder} %> solid;
+  padding-left: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+h2#See-Also {
+  padding-top: 0.4em;
+  border-top: 1px solid <% $color{sectionBorder} %>;
+}
+
+#author {
+  border-top: 1px solid <% $color{sectionBorder} %>;
+  padding-top: 0.4em;
+  text-align: center;
+}
+
+#pager {
+  border-top: 1px solid <% $color{sectionBorder} %>;
+  list-style-type: none;
+  margin-left: 0;
+  padding: 0.4em;
+  position: relative;
+  width: 100%;
+}
+
+#pager li {
+  color: <% $color{linkDisabledFG} %>;
+}
+
+#pager .previous {
+  left: 0.4em;
+  position: absolute;
+  width: 33%;
+}
+
+#pager .next {
+  position: absolute;
+  right: 0.4em;
+  text-align: right;
+  width: 33%;
+}
+
+/* verbatim text and code listings */
+
+pre {
+  line-height: 120%;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-color: <% $color{codeBG} %>;
+  color: <% $color{codeFG} %>;
+  font-family: monospace;
+  width: 100%;
+}
+
+.code-listing {
+  line-height: 120%;
+  background-color: <% $color{codeBG} %>;
+  color: <% $color{codeFG} %>;
+  font-family: monospace;
+  white-space: pre;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.code-listing td {
+  padding: 0;
+  margin: 0
+}
+
+.code-listing .line-numbers {
+  background-color: <% $color{codeNumbersBG} %>;
+  color: <% $color{codeNumbersFG} %>;
+  border-right: 2px <% $color{codeNumbersBorder} %> solid;
+  width: 3.5em;
+  text-align: right;
+}
+
+.code-listing .code {
+  padding-left: 1em;
+}
+
+/* PPI HTML Style */
+
+.code-listing .keyword   { color: #89f; }
+.code-listing .symbol    { color: #0cc; }
+.code-listing .operator  { color: #fff; }
+.code-listing .structure { color: #bf0; }
+.code-listing .word      { color: #dd8; }
+.code-listing .comment   { color: #0f0; }
+.code-listing .pod       { color: #0f0; }
+.code-listing .match     { color: #ff0; }
+.code-listing .readline  { color: #caa; }
+.code-listing .single,
+.code-listing .double    { color: #0cf; }
+
+/* Vim Syntax Style */
+
+.code-listing .synComment    { color: #0f0; }
+.code-listing .synConstant   { color: #0ff; }
+.code-listing .synIdentifier { color: #89f; }
+.code-listing .synStatement  { color: #0aa; }
+.code-listing .synPreProc    { color: #fff; }
+.code-listing .synType       { color: #0aa; }
+.code-listing .synSpecial    { color: #fff; }
+.code-listing .synUnderlined { color: #0a0; }
+.code-listing .synIgnore     { color: #aaa; }
+.code-listing .synError      { color: #f00; }
+.code-listing .synTodo       { color: #aa0; }
+
+/* BEGIN CHRISTMAS:  Move to "extra CSS" */
+
+.calendar td.day.advent.missing,
+.calendar td.day.missing#dec-25,
+.calendar td.day.missing#dec-26 {
+  background: #000;
+  color: #f00;
+}
+
+.calendar td#dec-25 {
+  background: #ffd700;
+  font-weight: bold;
+}
+
+/* END CHRISTMAS:  Move to "extra CSS" */

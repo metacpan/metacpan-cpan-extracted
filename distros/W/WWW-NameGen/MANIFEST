@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/WWW/NameGen.pm
+t/01-pod.t
+t/02-pod_coverage.t
+t/03-perl_critic.t
+t/11-compile.t

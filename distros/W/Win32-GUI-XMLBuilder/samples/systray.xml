@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<Window name='W'
+		dim='100, 100, 400, 150'
+		title='System Tray Example'
+		onMinimize='sub { $_[0]->Disable; $_[0]->Hide; return 1; }'
+		class='$self->{C}'
+		onTerminate='sub { $_[0]->PostQuitMessage(0); $self->{NI}->Remove(); return 0; }'
+	>
+		<NotifyIcon name='NI'
+			icon='exec:$Win32::GUI::XMLBuilder::ICON'
+			tip='System Tray Example'
+			onClick='sub { $self->{W}->Enable; $self->{W}->Show; return 1; }'
+		/>
+	</Window>
+</GUI>

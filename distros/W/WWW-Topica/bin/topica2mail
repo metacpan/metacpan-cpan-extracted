@@ -1,0 +1,141 @@
+#!perl -w
+
+use strict; 
+
+use Time::Piece;
+use Date::Parse;
+
+use WWW::Topica;
+use Email::Simple; 
+use Email::LocalDelivery;
+
+=pod
+
+=head1 NAME
+
+topica2mail - convert a Topica mailing list into a mail box
+
+=head1 USAGE
+
+    topica2mail <list-id> <mailbox> [login] [password] [ -d ] [ -l ] [ -s <start> ] [ -e <end> ]
+
+=head1 OPTIONS
+
+=head2 list-id
+
+The name of the list
+
+=head2 mailbox
+
+The mailbox you want to deliver the mail into. 
+Will automatically prepend the year and the month so
+
+    foo
+
+will turn into
+
+    foo-2004-10
+
+etc etc
+
+=head2 login
+
+Your login email address. 
+
+If you don't pass in your login and password you may not be able to read some lists.
+
+=head2 password
+
+Your password
+
+If you don't pass in your login and password you may not be able to read some lists.
+
+=head2 -d
+
+Debug - print out debug messages where appropriate
+
+=head2 -l 
+
+Local - use the local test files (for testing, obviously)
+
+=head2 -s <start>
+
+Which mail offset to start from
+
+=head2 -e <end>
+
+Which mail offset to end on
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright (c), 2004 - Simon Wistow
+
+Distributed under the same terms as Perl itself
+
+=cut 
+
+
+my $email;
+my $pass;
+my $list  = shift || die "You must pass a list name\n";
+my $out   = shift || die "You must pass a mailbox\n";
+
+if (@ARGV && $ARGV[0] !~ /^-/ && $ARGV[1] !~ /^-/) {
+    $email = shift;
+    $pass  = shift;
+}
+
+my %opts = (
+                list     => $list,
+                email    => $email,
+                password => $pass,
+                debug    => 0,
+                local    => 0,
+            );
+
+while (my $arg = shift @ARGV) {
+    if ($arg eq '-d') {
+        $opts{debug} = 1;
+    } elsif ($arg eq '-l') {
+        $opts{local} = 1;
+    } elsif    ($arg eq '-s') {
+        $opts{first} = shift;
+    } elsif    ($arg eq '-e') {
+        $opts{last} = shift;
+    } else {
+        die "Confused by $arg - bailing out\n";
+    }
+
+
+}
+
+
+
+my $topica = WWW::Topica->new(%opts);
+
+print "\n\n" if $opts{debug};
+
+my $counter  = 1;
+while (my $rfc822 = $topica->mail) {
+    
+    my $mail = Email::Simple->new($rfc822);
+
+    my $date = $mail->header("date");
+    my $time = str2time($date);
+    my $tp   = Time::Piece->new($time);
+
+    my $mbox = sprintf "%s-%.4d-%.2d", $out, $tp->year, $tp->mon;
+
+    print     "\t\t". $counter++.") ".
+               $mail->header("from")." - ". 
+               $mail->header("subject")." - ". 
+               $mail->header("date")." to $mbox\n\n";
+
+    Email::LocalDelivery->deliver($mail->as_string, $mbox) 
+        || die "Couldn't deliver mail to $mbox\n";
+
+}

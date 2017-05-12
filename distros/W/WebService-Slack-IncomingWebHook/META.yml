@@ -1,0 +1,50 @@
+---
+abstract: 'slack incoming webhook client'
+author:
+  - 'SUZUKI Masashi <m15.suzuki.masashi@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Plack: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Slack-IncomingWebHook
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Slack::IncomingWebHook:
+    file: lib/WebService/Slack/IncomingWebHook.pm
+    version: '0.02'
+  WebService::Slack::IncomingWebHook::Script:
+    file: lib/WebService/Slack/IncomingWebHook/Script.pm
+requires:
+  Encode: '0'
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masasuzu/p5-WebService-Slack-IncomingWebHook/issues
+  homepage: https://github.com/masasuzu/p5-WebService-Slack-IncomingWebHook
+  repository: git://github.com/masasuzu/p5-WebService-Slack-IncomingWebHook.git
+version: '0.02'
+x_contributors:
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'SUZUKI Masashi <masasuzu@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

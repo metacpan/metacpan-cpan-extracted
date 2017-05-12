@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/off_channel_list_cache.t
+t/on_channel_list_online.t
+t/on_show_list_parse.t
+t/files/cache
+lib/WWW/BurrpTV.pm
+sample/test.pl

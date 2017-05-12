@@ -1,0 +1,10 @@
+Revision history for WWW-DoingItWrongCom-RandImage
+
+1.01    2013-12-07
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.01    2008-02-06
+        - First version, released on an unsuspecting world.
+

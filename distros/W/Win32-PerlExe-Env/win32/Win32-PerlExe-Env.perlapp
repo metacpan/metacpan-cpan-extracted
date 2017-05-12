@@ -1,0 +1,36 @@
+#!D:\Programme\ActiveState Perl Dev Kit 6.0\bin\lib\pai.exe
+PAP-Version: 1.0
+Packer: D:\Programme\ActiveState Perl Dev Kit 6.0\bin\perlapp.exe
+Script: Win32-PerlExe-Env.pl
+Cwd: D:\REPOSITORY\~\Projects_233\Projects\sysSpy\sysSpy-0.02\app\sysSpySuite2\beta-2\deploy\CPAN\Win32-PerlExe-Env\exe
+Bind: Copyright[data=Copyright (c) 2006 Thomas Walloschke. All rights reserved.,extract]
+Bind: PerlExe[data=PerlExe]
+Bind: Get_Info.ico[file=res\icons\Get_Info.ico,mode=666]
+Bind: Win32[data=Win32]
+Clean: 1
+Date: 2006-09-09 21:43:42
+Debug: 
+Dependent: 1
+Dyndll: 1
+Exe: Win32-PerlExe-Env.exe
+Force: 1
+Gui: 0
+Hostname: hbg000qm
+Icon: res\icons\Get_Info.ico
+No-Compress: 0
+No-Logo: 1
+Runlib: 
+Shared: none
+Tmpdir: 
+Verbose: 0
+Version-Comments: 
+Version-CompanyName: 
+Version-FileDescription: Test of Win32::PerlExe::Env
+Version-FileVersion: 0.4.1
+Version-InternalName: Win32-PerlExe-Env.pl
+Version-LegalCopyright: Copyright (c) 2006 Thomas Walloschke. All rights reserved.
+Version-LegalTrademarks: 
+Version-OriginalFilename: Win32-PerlExe-Env.pl
+Version-ProductName: Test of Win32::PerlExe::Env
+Version-ProductVersion: 0.4.1
+Xclude: 1

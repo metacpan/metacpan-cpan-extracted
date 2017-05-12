@@ -1,0 +1,69 @@
+WWW-Selenium-Utils
+==================
+
+This package contains useful helper libraries and scripts for 
+testing websites using Selenium.
+
+  http://selenium.thoughtworks.com
+
+The selenium-regen script can be used to automatically convert test scripts
+written in a simple wiki-like table markup into the html tables that Selenium
+expects.
+
+Sample .wiki file:
+
+  Test Title
+  | open | /foo |
+  | verifyLocation | /foo | 
+  | verifyTextPresent | id=name | Luke |
+  # Comments are allowed
+
+  # Blank lines are allowed too
+  | clickAndWait | id=main_btn |
+
+  # And you can include other files!  Exciting!
+  include "other_file.tmpl"
+
+This package contains two modules:
+
+  WWW::Selenium::Utils
+    generate_suite() - converts wiki files, creates TestSuite.html
+
+  WWW::Selenium::Utils::CGI
+    run() - runs a command, returns the output
+    cat() - dump the contents of a file
+    state() - query and store simple key/value pairs to keep state
+
+    You will need to wrap these functions in CGI or mod_perl handlers.
+    Example scripts can be found in the scripts/ directory.
+    
+And some example scripts:
+
+  script/postResults.cgi - writes a Selenium result post to disk
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+THANKS TO
+
+Mark Stosberg for early feedback.  Tom Milne for inspiration for state().
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 Luke Closs
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

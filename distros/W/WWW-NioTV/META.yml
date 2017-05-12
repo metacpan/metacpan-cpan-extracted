@@ -1,0 +1,25 @@
+---
+name: WWW-NioTV
+version: v0.04
+author:
+  - 'Alec Chen <alec@cpan.org>'
+abstract: retrieve TV information from http://www.niotv.com/
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTML::SimpleLinkExtor: 1.19
+  HTML::TableExtract: 2.1
+  List::MoreUtils: 0.22
+  Moose: 0.54
+  Test::More: 0.8
+  WWW::Mechanize: 1.34
+  version: 0.76
+provides:
+  WWW::NioTV:
+    file: lib/WWW/NioTV.pm
+    version: v0.04
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

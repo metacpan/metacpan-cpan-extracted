@@ -1,0 +1,251 @@
+Revision history for Perl extension Win32::IPConfig.
+
+** 0.10 2010-07-25
+
+Fixed prereq_pm in Makefile.PL to specify Win32::TieRegistry.
+
+Access to registry now defaults to read-only access, and read-write
+access needs to be explicitly requested to allow the set_domain,
+set_dns, and set_wins methods of Win32::IPConfig::Adapter to work.
+Requested by alabamapaul (who sent patches) and Santeri Paavolainen.
+
+** 0.09 2006-05-25
+
+Changed the way the get_adapter method of Win32::IPConfig looks up adapter
+names to fix a problem where "Local Area Connection 2" was being returned
+when "Local Area Connection" was requested. A case-insensitive comparison
+is performed instead of using the supplied name as a regular expression.
+Thanks to Raoul Thill for pointing this problem out.
+
+** 0.08 2004-08-13
+
+Documented the following Win32::IPConfig methods:
+    is_router
+    is_wins_proxy
+    is_lmhosts_enabled
+    is_dns_enabled_for_netbt
+
+Updated the synopsis to include these methods.
+
+Updated the three examples in the Win32::IPConfig documentation.
+
+Updated the README file description to show that NT/2000/XP/2003
+is supported and that read and write access is required to the registry.
+
+** 0.07 2004-08-11
+
+Updated to support Windows Server 2003. All methods in Win32::IPConfig and
+Win32::IPConfig::Adapter now test for osversion >= 5.0 rather than just 5.0 or
+5.1. For the moment, it assumes that operating systems after Windows 2000 use
+the same TCP/IP registry locations introduced with Windows 2000.
+
+Added the get_name method to Win32::IPConfig::Adapter. Returns the name
+of the network card as it appears in Network Connections on Windows 2000
+and later. On Windows NT it falls back to returning the service name.
+
+Updated the get_adapter method of Win32::IPConfig to allow the name
+of the adapter to be specified as an alternative to its index number.
+So now get_adapter("Local Area Connection") can be used on
+Windows 2000 and later. It will accept the service name for adapters on
+Windows NT systems, although this isn't as useful.
+
+Fixed an error in the Win32::IPConfig::Adapter set_domain method:
+it now accepts "-" as a valid domain character.
+
+The get_nodetype method of Win32::IPConfig now attempts to determine the 
+nodetype of the host. It uses the NodeType value if present; if not, it uses
+the DhcpNodeType value; if neither are present, it returns the default value
+of "Hybrid" H-node for machines with WINS servers set, or "Broadcast" B-node
+for machines with no WINS servers set. Previously get_nodetype would have
+returned only the setting in the NodeType value.
+
+The get_domain method of Win32::IPConfig now returns the host's DhcpDomain
+value if the Domain value is not set. This seems to match up with experiments
+in determining how these settings are actually used. Previously get_domain
+would have returned the host's (statically configured) Domain value in all
+cases.
+
+Similarly, the get_domain method of Win32::IPConfig::Adapter now returns the
+host's DhcpDomain value for a DHCP enabled adapter on Windows NT 4.0.
+Previously it would have returned the host's (statically configured) Domain
+value whether the adapter was DHCP enabled or not. On Windows 2000 and later,
+it continues to return the adapter's own Domain or DhcpDomain value depending
+on the adapter's DHCP setting.
+
+All registry keys and values required by the module are now checked for
+defined-ness, and both Win32::IPConfig and Win32::IPConfig::Adapter will
+abandon a host or adapter if one of the necessary keys or values is missing,
+and return undef to the caller.
+
+Began building a test suite for the module. To do this I had to build fake
+Win32 Registries. It works, although it's untidy, and I don't think it is safe
+for distribution yet.
+
+Expanded the documentation on the get_domain and get_dns to clarify that these
+are host settings on Windows NT systems, and adapter settings on Windows 2000
+and later, but that when run on Windows NT, the methods will fake
+connection-specific values. I feel that this is a more useful approach than
+forcing the programmer to call get_domain/get_dns from Win32::IPConfig on
+Windows NT machines and get_domain/get_dns from Win32::IPConfig::Adapter on
+Windows 2000 and later machines.
+
+Added the undocumented method is_dns_enabled_for_netbt to Win32::IPConfig.
+
+There were a number of other minor improvements and corrections to code and
+documentation. In particular, a number of methods now determine the registry
+key being queried according to the operating system and then query that key for
+the data rather than using an if statement to execute similar code for
+different operating systems. The erroneous reference in the REGISTRY KEYS USED
+section of the documentation to the list of registry keys settings (moved 
+in 0.04) was deleted.
+
+** 0.06 2004-02-08
+
+Fixed the get_adapter method of Win32::IPConfig so that it returns a single
+Win32::IPConfig::Adapter object, as documented. Bug was introduced in 0.05.
+
+Removed dependency on the POSIX::strftime function for formatting
+the time in the Win32::IPConfig::Adapter methods get_dhcp_lease_obtained_time
+and get_dhcp_lease_terminates_time.
+
+** 0.05 2003-09-28
+
+Changed the following methods to return a list in an array context
+and a reference to a list in a scalar context:
+
+  Win32::IPConfig
+    get_adapters
+
+  Win32::IPConfig::Adapter
+    get_ipaddresses
+    get_subnet_masks
+    get_gateways
+    get_dns
+    get_wins
+
+Updated the synopses and examples to use array context for the
+list methods. Changed the internal methods to pass lists instead
+of references to lists.
+
+Added the get_subnet_masks method to Win32::IPConfig::Adapter objects.
+
+** 0.04 2003-05-04
+
+Now tested with Windows XP. Documentation updated to reflect this.
+
+Documented the DHCP methods and fixed them to avoid failing if the
+registry key did not exist. The lease obtained and terminates times
+are now returned in the standard date format YYYY-MM-DD HH-MM.
+Methods documented and updated:
+    get_dhcp_server
+    get_dhcp_lease_obtained_time
+    get_dhcp_lease_terminates_time
+
+Moved the rather long list of registry keys into the code as comments.
+
+Added an example for the set_dns method to the Win32::IPConfig documentation.
+
+** 0.03 2003-02-09
+
+The main change was the introduction of some set_ methods to the
+Win32::IPConfig::Adapter. Then I started refactoring to clean up
+the internal processes and moved the remote registry accesses into
+the accessor methods themselves, so now the Win32::IPConfig::Adapter
+reads information directly from the remote registry rather than
+from a cache in the Win32::IPConfig::Adapter object itself.
+
+The following methods read directly from the remote registry:
+    get_ipaddress
+    get_gateways
+    get_dns
+    get_wins
+    get_domain
+
+The following methods read from the Win32::IPConfig::Adapter cache:
+    get_id
+    get_description
+    is_dhcp_enabled
+
+The following Win32::IPConfig methods now read directly from the
+remote registry:
+    get_hostname
+    get_domain
+    get_nodetype
+
+Added the $ipconfig->get_adapter method to simplify access. Often
+the first adapter will be assumed to be the main network card, so
+now this can be quickly retrieved using $ipconfig->get_adapter(0).
+
+Added documentation for the Win32::IPConfig::Adapter methods
+get_id and get_description.
+
+Updated the documentation on the DHCP registry entries used.
+
+Addition of get_dhcp_server to adapter
+get_dhcp_lease_obtained_time
+get_dhcp_lease_terminates_time
+
+The Win32::IPConfig method get_nodetype now returns a friendly string
+(B-node, ...).
+
+I've now checked that statically configured values override DHCP
+assigned values and updated the following Win32::IPConfig::Adapter
+methods to accurately reflect this:
+    get_gateways
+    get_domain
+    get_dns
+    get_wins
+I must note that so far I have only tested this on Windows 2000.
+
+The following new Win32::IPConfig::Adapter methods were added:
+    $adapter->set_domain
+    $adapter->set_dns
+    $adapter->set_wins
+
+I tested the effects of setting the domain, DNS servers, and WINS
+servers and trying to determine when a reboot was required, and when
+settings would take effect immediately, only to be rewarded with a
+headache trying to figure these things out amongst all the variables
+involved in the Windows Name Resolution process.
+
+With $adapter->set_domain, in testing with ipconfig /all, the setting appeared
+to take effect immediately in both Windows NT and Windows 2000. However,
+testing with start \\server\share on Windows 2000 did not work successfully
+until the DNS Client was restarted.
+
+With $adapter->set_dns, the Windows NT machine needed to be rebooted for the
+change to take effect. On Windows 2000, I had to restart the DNS Client.
+
+With $adapter->set_wins, both Windows NT and 2000 needed a reboot for the
+change to take effect.
+
+Note that if you change these settings through the GUI on Windows 2000,
+you will not need to reboot the machine. But then who wants to walk around
+500 workstations doing that?
+
+Until I've managed to find Windows NT 3.51 and Windows XP machines that
+I can test this module on, I've changed the module to croak if the
+host's operating system is not Windows NT 4.0 or Windows 2000.
+
+Finally, to facilitate a lot of these changes, the registry is opened
+with read/write access instead of just read access.
+
+** 0.02 2003-01-20
+
+Discovered that some NDIS WAN Adapters on NT 4.0 do not have an
+<adapter>\Parameters\Tcpip key. Changed code to skip adapters
+that don't have this key.
+
+Discovered also that a NDIS WAN Adapter on NT 4.0 could have a static
+ip address of 0.0.0.0, so commented out the sanity check for static
+ip addresses.
+
+Discovered that an adapter could be enabled for DHCP but
+not have dhcp values (because it was not connected to the network).
+Changed extraction of dhcp ip address, dhcp dns servers, dhcp wins
+servers, and dhcp gateways to check for the existence of the value
+before assignment.
+
+** 0.01 2003-01-19
+
+Initial release.

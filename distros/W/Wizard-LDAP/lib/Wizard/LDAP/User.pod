@@ -1,0 +1,137 @@
+=pod
+
+=head1 NAME
+
+Wizard::LDAP::User - A base class for implementing users in the LDAP wizard
+
+
+=head1 SYNOPSIS
+
+  # From the shell:
+  ldapWizard
+
+  # Or, from the WWW:
+  <a href="ldap.ep">LDAP administration</a>
+
+  # Follow the "User menu"
+
+
+=head1 DESCRIPTION
+
+This package implements the handling of user objects in the LDAP server.
+It is part of the LDAP wizard.
+
+
+=head1 CREATING OR EDITING USERS
+
+The following items can be edited in the user window:
+
+=head2 item_ldap_user_uid
+
+This is the users login name, for example
+
+  joe
+
+You should restrict login names to 8 characters.
+
+=head2 item_ldap_user_userpassword
+
+This is the users password. You *must* fill in a password.
+
+=head2 item_ldap_user_cn
+
+This is the users real name, for example
+
+  Jochen Wiedmann
+
+=head2 item_ldap_user_description
+
+This is a single-line description of the user.
+
+=head2 item_ldap_user_mail
+
+This is the users email adress, for example
+
+  joe@ispsoft.de
+
+You may omit the domain part in which case the default domain from the
+preferences will automatically be added.
+
+=head2 item_ldap_user_mailforward
+
+If mail for the user must not be stored locally, but forwarded to
+an external email account, then you have to fill in this field,
+the external email address.
+
+=head2 item_ldap_user_mailforwardtype
+
+This select box determines, when email is being forwarded. It is
+ignored, if the mailforward (see above) is empty.
+
+The default is to forward mails always (in other words: Immediately).
+You may however choose to wait 1-5 days before forwarding email.
+The latter option requires support from your mailserver, for example
+by a cron job that takes care of forwarding.
+
+=head2 item_ldap_user_pop3box
+
+If the user has an external POP3 boxes, you may insert them
+here, for example
+
+  username@my.pop3.server
+
+The attribute is used by a cron job that is regularly mail from
+the remote box. The mail is then forwarded to the user.
+
+This option requires support from your mailserver, for example by a cron
+job.
+
+=head2 item_ldap_user_pop3password
+
+Likewise, this is the password being used to fetch mail from the remote
+POP3 box, if any.
+
+=head2 item_ldap_user_status
+
+By default users have a status of "mail": In other words, they may read
+mail only. They may also have a status of "ftp", in which case they
+are accepted to login via FTP or "admin", in which case they have a
+regular shell account.
+
+The users status determines its login shell. The possible shells are
+
+  /bin/mailonly
+  /bin/ftp_mail
+  /bin/bash
+
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU
+General Public License or the Artistic License, as
+specified in the Perl README file.
+
+
+=head1 SEE ALSO
+
+L<Wizard>, L<ldapWizard>, L<HTML::EP>, L<Net::LDAP>
+
+=cut

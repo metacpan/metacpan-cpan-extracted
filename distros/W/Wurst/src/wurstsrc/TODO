@@ -1,0 +1,41 @@
+
+** Structures for scoring
+new_score_mat () will just make an empty score matrix
+score_xxx () will add in the score due to the xxx
+contribution.
+This makes it easy to add in secondary structure, sequence
+info, force field scores and so on. It no longer treats
+secondary structure as a privileged data type.
+* iteration
+This can perhaps be done at the perl level
+Do an initial alignment in the residue non-specific force
+field, followed by a scoring using the residues actually
+present.
+
+* Scoring
+
+** f7
+Adapt to handle profiles.
+*** speedups
+**** precalculate and store phi psi's with templates
+**** precalculate structural class for each site
+
+* Variables
+Things like gap_open and gap_extend should be passed as
+parameters into the alignment. There is no need to have them
+as persistent variables.
+
+* Alignment Code
+
+Introduce general, position-specific gap penalties.
+These would usually come from secondary structure (gap costs
+10 times as much in a recognised secondary structure).
+
+* Profiles
+** structures
+
+Create profiles as a top level data type.
+
+** sequence sequence
+Modify code so as to handle fractional residues.
+Write with and without site specific gap penalties.

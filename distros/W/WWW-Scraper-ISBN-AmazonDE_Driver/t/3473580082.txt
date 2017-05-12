@@ -1,0 +1,7283 @@
+
+    
+    
+    
+
+  
+  
+    
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    
+
+
+
+
+  
+  
+  
+    
+
+
+
+<html>
+<head>
+
+  
+  
+  
+
+
+
+
+
+
+
+<style type="text/css"><!--
+
+body { background-color: #FFFFFF; } 
+* html body { margin-top: 0px; }
+.serif { font-family: times,serif; font-size: medium; } 
+.sans { font-family: verdana,arial,helvetica,sans-serif; font-size: medium; } 
+.small { font-family: verdana,arial,helvetica,sans-serif; font-size: small; } 
+.h1 { font-family: verdana,arial,helvetica,sans-serif; color: #CC6600; font-size: medium; } 
+.h3color { font-family: verdana,arial,helvetica,sans-serif; color: #CC6600; font-size: small; } 
+.tiny { font-family: verdana,arial,helvetica,sans-serif; font-size: x-small; } 
+.listprice { font-family: arial,verdana,helvetica,sans-serif; text-decoration: line-through; } 
+.attention { background-color: #FFFFD5; } 
+.price { font-family: verdana,arial,helvetica,sans-serif; color: #990000; } 
+.tinyprice { font-family: verdana,arial,helvetica,sans-serif; color: #990000; font-size: x-small; } 
+.highlight { font-family: verdana,arial,helvetica,sans-serif; color: #990000; font-size: small; } 
+.alertgreen { color: #009900; font-weight: bold; } 
+.active-nav { background-color: #000000; color: #FFFFFF; } 
+.inactive-nav { background-color: #FFFFFF; color: #000000; } 
+.tigerBox .head { border: 1px solid #CCCC99; border-bottom-width: 0px; background-color: #EEEECC; } 
+.tigerBox .body { border: 1px solid #CCCC99; } 
+.tigerBoxWithEyebrow .head { border-width: 0px; } 
+.tigerBoxWithEyebrow .body { border: 1px solid #CCCC99; } 
+.detailPageTigerBox .head { border-width: 0px; } 
+.detailPageTigerBox .body { border: 1px solid #CCCC99; } 
+.detailPageTigerBox .darkCell { background-color: #EEEECC; } 
+.eyebrow { font-family: verdana,arial,helvetica,sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; text-decoration: none; color: #FFFFFF; } 
+a:active { font-family: verdana,arial,helvetica,sans-serif; color: #FF9933; } 
+a:visited { font-family: verdana,arial,helvetica,sans-serif; color: #996633; } 
+a:link { font-family: verdana,arial,helvetica,sans-serif; color: #003399; } 
+.amabot_right .h1 { color: #c60; font-size: .92em; } 
+.amabot_right .amabot_widget .headline, .amabot_left .amabot_widget .headline { color: #c60; font-size: .92em; display: block; font-weight: bold; } 
+.amabot_widget .headline { color: #c60; font-size: medium; display: block; font-weight: bold; } 
+.amabot_right .amabot_widget { padding-top: 8px;  padding-bottom: 8px; padding-left: 8px;  padding-right: 8px; border-bottom: 1px solid #ADD2E2; border-left: 1px solid #ADD2E2; border-right: 1px solid #ADD2E2; border-top: 1px solid #ADD2E2; } 
+.amabot_left .h1 { color: #c60; font-size: .92em; } 
+.amabot_left .amabot_widget { padding-top: 8px;  padding-bottom: 8px;  padding-left: 8px;  padding-right: 8px; border-bottom: 1px solid #ADD2E2;   border-left: 1px solid #ADD2E2; border-right: 1px solid #ADD2E2;  border-top: 1px solid #ADD2E2; } 
+.amabot_center div.unified_widget, .amabot_center .amabot_widget { font-size: 12px; }
+.amabot_right div.unified_widget, .amabot_right .amabot_widget { font-size: 12px; }
+.amabot_left div.unified_widget, .amabot_left .amabot_widget { font-size: 12px; }
+.nobullet { list-style-type: none; } 
+.homepageTitle { font-size: 28pt; font-family: 'Arial Bold', Arial, sans-serif; font-weight: 800; font-variant: normal; font-style: bold; color: #80B6CE; line-height:1em; } 
+.tigerbox { padding-top: 8px;  padding-bottom: 8px;  padding-left: 8px;  padding-right: 8px;  border-bottom: 1px solid #ADD2E2;   border-left: 1px solid #ADD2E2;  border-right: 1px solid #ADD2E2;  border-top: 1px solid #ADD2E2; } 
+.hr-leftbrowse { border-top-width: 1px;	border-right-width: 1px;	border-bottom-width: 1px; border-left-width: 1px; border-top-style: dashed; border-right-style: none; border-bottom-style: none; border-left-style: none; border-top-color: #999999; border-right-color: #999999; border-bottom-color: #999999; border-left-color: #999999; margin-top: 10px; margin-right: 5px; margin-bottom: 0px; margin-left: 5px; } 
+div.unified_widget p { margin:0 0 0.5em 0; line-height:1.4em; } 
+div.unified_widget h2 { color:#c60; padding:0; } 
+.amabot_right div.unified_widget .headline, .amabot_left div.unified_widget .headline { color: #c60; font-size: .92em; display: block; font-weight: bold; }
+div.unified_widget .headline { color: #c60; font-size: medium; display: block; font-weight: bold;}
+div.unified_widget sup { font-weight:normal; font-size: 75%; } 
+div.unified_widget h2 sup { font-size: 50%; } 
+td.amabot_left div.unified_widget h2, td.amabot_right div.unified_widget h2 { font-size:100%; margin:0 0 0.5em 0; } 
+td.amabot_center div.unified_widget h2 { font-size:135%; font-weight:bold; margin:0 0 0.35em -10px; } 
+td.amabot_center div.unified_widget { margin-left:10px; } 
+td.amabot_center { padding:5px; }
+div.unified_widget ul { margin: 1em 0; padding: 0 0 0 15px; list-style-position:inside; } 
+div.unified_widget ol { margin:0; padding:0 0 0 2.5em; } 
+div.unified_widget a:link, div.unified_widget a:visited { text-decoration:underline; } 
+div.unified_widget a:hover { text-decoration:underline; } 
+div.unified_widget p.seeMore { clear:both; font-family:verdana,arial,helvetica,sans-serif; margin:0; padding-left:1.15em; text-indent: -1.15em; font-size:100%; font-weight:normal; } 
+div.unified_widget p.seeMore a:link, div.unified_widget p.seeMore a:visited { text-decoration:underline; } 
+div.unified_widget p.seeMore a:hover { text-decoration: underline; } 
+div.unified_widget .carat, div.left_nav .carat { font-weight:bold; font-size:120%; font-family:verdana,arial,helvetica,sans-serif; color:#c60; margin-right:0.20em; } 
+div.unified_widget a img { border:0; } 
+div.h_rule { clear:both; } 
+div.unified_widget { margin-bottom:2em; clear:both; } 
+div.unified_widget div.col1 { width: 100%; } 
+div.unified_widget div.col2 { width: 49%; } 
+div.unified_widget div.col3 { width: 32%; } 
+div.unified_widget div.col4 { width: 24%; } 
+div.unified_widget div.col5 { width: 19%; } 
+div.unified_widget table { border:0; border-collapse:collapse; width:100%; } 
+div.unified_widget td { padding:0 8px 8px 0; vertical-align:top; } 
+div.unified_widget table.col1 td { width:100%; } 
+div.unified_widget table.col2 td { width:49%; } 
+div.unified_widget table.col3 td { width:32%; } 
+div.unified_widget table.col4 td { width:24%; } 
+div.unified_widget table.col5 td { width:19%; } 
+div.unified_widget td.bottom { vertical-align:baseline; } 
+div.unified_widget table h4, div.unified_widget h4 { color:#000; font-size:100%; font-weight:normal; margin:0; padding:0; } 
+div.rcmBody div.prodImage, amabot_widget div.prodImage {float:left; margin:0px 0.5em 0.25em 0px;}
+td.amabot_right div.unified_widget, td.amabot_left div.unified_widget { border:1px solid #ADD2E2; padding:8px; margin-bottom:20px; } 
+* html td.amabot_right div.unified_widget { height:100%; }
+* html td.amabot_left div.unified_widget { height:100%; }
+div.rcmBody, amabot_widget div.rcmBody { line-height:1.4em; }
+div.rcmBody a:link, div.rcmBody a:visited { text-decoration: underline; }
+div.rcmBody p.seeMore, amabot_widget div.rcmBody p.seeMore { margin-top:0.5em; }
+div.rcmBody div.bannerImage { text-align:center; }
+div.rcmBody h2 span.homepageTitle { display:block; margin-bottom:-0.3em; margin-top:-0.12em; line-height:1em; }
+div.rcmBody h2 img { float:none; }
+table.coopTable div.rcmBody .headline { font-size: 110%; }
+table.coopTable div.rcmBody h2 { font-size: 110%; font-weight:bold; }
+table.promo div.rcmBody h2 { font-size: 100%; font-weight:bold; }
+div.blurb h4 { font-weight:bold; }
+div.left_nav { font-family: Arial, sans-serif; font-size:100%; margin:0; line-height:1.05em; width:100%; border:1px solid #add2e2; padding-bottom:10px; } 
+div.left_nav h2 { margin:0 0 0 0; color:#000000; font-weight:bold; line-height:1.25em; font-size:100%; font-family:verdana,arial,helvetica,sans-serif; padding: 3px 6px; background-color:#add2e2; } 
+div.left_nav h3 { font-family:verdana,arial,helvetica,sans-serif; margin:0.5em 0 0.4em 0.5em; color:#c60; font-weight:bold; line-height:1em; font-size:100%; padding-right:0.5em; } 
+div.left_nav ul { margin:0; padding:0; } 
+div.left_nav li, div.left_nav p { list-style:none; margin:0.5em 0.5em 0 1em; line-height:1.2em;} 
+div.left_nav hr { margin:1em 0.5em; border-top:0; border-left:0; border-right:0; border-bottom:1px dashed #cccccc; } 
+div.left_nav a:link, div.left_nav a:visited { color:#003399; text-decoration:none; font-family:Arial, sans-serif; } 
+div.left_nav a:hover { color:#2a70fc; text-decoration:underline; } 
+div.left_nav p.seeMore { padding-left:0.9em; text-indent:-0.9em; margin-top:0.35em; margin-bottom:1em; } 
+div.left_nav p.seeMore a:link, div.left_nav p.seeMore a:visited { text-decoration:none; } 
+div.left_nav p.seeMore a:hover { text-decoration:underline; } 
+div.asinItem { float:left; margin-bottom:1em; width:32%; } 
+div.asinTextBlock { padding:0 8px 8px 0; } 
+div.asinItem div.prodImage { height:121px; display:table-cell; vertical-align:bottom; } 
+div.asinItem div.localImage { display:table-cell; vertical-align:bottom; }
+div.asinItem h4 { margin: 0.5em 0 0.25em 0; } 
+div.asinItem ul { margin:0; padding:0 0 0.5em 1.3em; text-indent:-1.3em; font-size:90%; } 
+div.row { clear:both; }
+body.dp {}
+body.dp div.h_rule { clear:none; }
+body.dp div.unified_widget { clear:none; } 
+div.asinCoop div.asinItem { float:none; width:100%;}
+div.asinCoop_header {}
+div.asinCoop_footer {}
+div.newAndFuture div.asinItem ul { font-size:100%; }
+div.newAndFuture div.asinItem li { list-style-position: outside; margin:0 0 0.35em 20px; padding:0; text-indent: 0; }
+div.newAndFuture h3 { font-size:100%; margin:1em 0 ; }
+div.newAndFuture h4 { margin:0; }
+div.newAndFuture a:link, div.newAndFuture a:visited { text-decoration:underline; }
+div.newAndFuture a:hover { text-decoration:underline; }
+div.newAndFuture p.seeMore { margin:-0.75em 0 0 35px; }
+div.unified_widget ol.topList { margin: 0; padding: 0; list-style: none; }
+div.unified_widget ol.topList li { list-style: none; clear: both; display: list-item; padding-top: 6px; }
+div.unified_widget ol.topList .productImage { display: block; float: left;vertical-align: top;text-align: center;width:60px; }
+div.unified_widget ol.topList .productText { display: block; float: left; padding-left:10px; vertical-align: top; }
+div.unified_widget ol.toplist h4 { margin:0; }
+:root div.unified_widget span.productImage { display: table-cell; float: none; }
+:root div.unified_widget span.productText { display: table-cell; float: none; }
+div.unified_widget dl.priceBlock {margin:0 0 0.45em 0;}
+div.unified_widget dl.priceBlock dt {clear:left; font-weight:bold; float:left; margin:0 0.3em 0 0;}
+div.unified_widget dl.priceBlock dd {margin:0 0 0.2em 0;}
+div.unified_widget .bold {font-weight:bold;}
+div.unified_widget .byline {font-size: 95%; font-weight: normal;}
+table.thirdLvlNavContent div.blurb {margin:10px;}
+div.pageBanner h1 { font-family:Arial, Helvetica, sans-serif; font-weight:normal; font-size:200%; color: #e47911; letter-spacing:-0.03em; margin:0; }
+div.pageBanner p { font-size:80%; color:#888888; margin:0; }
+div.pageBanner h1.bkgnd { background-repeat:no-repeat; background-color:#FFFFFF; overflow:hidden; text-indent:-100em; }
+INPUT { font-family: fixed; }
+BODY { font-family: verdana,arial,helvetica,sans-serif; font-size: small; }
+TD { font-family: verdana,arial,helvetica,sans-serif; font-size: small; }
+TH { font-family: verdana,arial,helvetica,sans-serif; font-size: small; }
+--></style>
+
+
+<script language="Javascript1.1" type="text/javascript">
+<!--
+function amz_js_PopWin(url,name,options){
+  var ContextWindow = window.open(url,name,options);
+  ContextWindow.focus();
+  return false;
+}
+//-->
+</script>
+
+
+        
+    
+
+
+
+
+
+
+      
+
+
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+
+<meta name="description" content="Amazon.de: Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging.: Morton Rhue: B&uuml;cher" />
+<meta name="keywords" content="Morton Rhue,Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging.,Ravensburger Buchverlag,3473580082,Fiction,Jugendromane u. -erzählungen,Kinder-,Demokratie,Faschismus; Kinder-/Jugendliteratur,Materialien für Unterrichtsgestaltung,Neofaschismus,Preis der Leseratten des ZDF,Rechtsradikalismus,Unterrichtsgestaltung,Zeitgeschichte,Ab 12 Jahre,Amerikanische Belletristik,Diktator ( Diktatur ),Diktatur - Diktator,Jugendliteratur,Kinder- u. Jugendliteratur" />
+<title>Amazon.de: Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging.: Morton Rhue: B&uuml;cher</title>
+
+
+
+
+
+<style type="text/css">
+  .halfspace { padding-top: 0.5em; }
+  a.product { font-weight: bold; }
+
+  ul { list-style-type: none; margin: 0px; padding: 0px; }
+  ul li { margin: 0.5em 0em; }
+  ul li ul { list-style-type: none; margin-left: 25px; }
+  ul li ul li { margin: 0em; }
+
+  hr { 
+    border-top: 1px dashed #999999;
+    height: 1px;
+    color: #FFFFFF;
+    margin: 3px 0px;
+  }
+  
+  div.bucket { padding: 5px 0em; }
+  div.bucket div.content { margin: 0.5em 0px 0em 25px; }
+ 
+  img.icon { display: none; } 
+</style>
+
+
+
+
+
+<style type="text/css">
+  
+  hr { margin-left: 0px; }
+  a.buyAction { font-weight: bold; }
+
+
+  h2 { color: #CC6600; font-size: medium; margin: 0px 0px 0.25em; }
+
+  .bucket h3 {
+    color: #000;
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0px 0px 0.25em 0px;
+  }
+
+  
+  table.productImageGrid {
+    float:left;
+    margin: 0px 15px 15px 0px;
+    background-color: #FFFFFF;
+    text-align: center;
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/icons/white1px._V45828136_.jpg);
+  }
+
+  table.buyingDetailsGrid {
+    float:right;
+    margin: 0px 0px 15px 15px;
+    background-color: #FFFFFF;
+  }
+
+  .price { font-family: verdana,arial,helvetica,sans-serif; }
+
+  .pricePerUnit { font-family: verdana,arial,helvetica,sans-serif; color: #C48383; white-space: nowrap; }
+
+  div.extendedBuyBox { padding: 4px 0px; }
+  hr.EBBdivider { margin: 0px; }
+ 
+  div.buying { padding: 0.25em 0em; font-size: .86em; }
+  #asinRedirect, #firstDimension { font-size: .95em; width: 215px; }
+
+  div.buying table { font-size: small; }
+  div.buying table td { font-size: .86em; }
+  div.buying table td.tiny { font-size: x-small; }
+
+  .buying .subTitle {
+    font-size: x-small;
+    line-height: 1.45em;
+    margin: .5em 0;
+  }
+  #priceBlock, #priceBlock table td, #primaryUsedAndNew, #primaryClubPrice, #secondaryUsedAndNew, #secondaryClubPrice, #adultWarning, #violenceWarning { font-size: small; }
+
+  #primaryUsedAndNew { padding: 1em 0em; }
+
+  #newAmazonShorts table { font-size: small; }
+  #newAmazonShorts table td.promo { font-size: .86em; }
+  #newAmazonShorts .price { font-size: .86em; }
+
+  #specialContent br, #specialContent img { display: none; }
+
+  #quickPromoBucketContent br, #quickPromoBucketContent img { display: none; }
+  #quickPromoBucketContent object, #quickPromoBucketContent embed { display: none; }
+  #quickPromoBucketContent hr { display: none; }
+  
+  #specialOffers { font-size: .86em; } 
+  #specialOffers table { font-size: small; }
+  #specialOffers table td.promo { font-size: .86em; padding: .25em 0em; }
+  #specialOffers table td.small { font-size: .86em; }
+  #specialOffers font { font-size: .86em; }
+
+  #promoGrid img { display: none; }
+  #promoGrid .amabot_widget img { display: none; }
+
+  #promoGrid .flashPlayer { clear: left; }
+
+  .quickPromo br, .quickPromo img { display: none; }
+
+  .quickPromo .flashPlayer { clear: left; }
+
+  .quickPromo ul li { margin: 0.25em 0em; } 
+  
+  .halfspace { padding-top: 0.5em; }
+
+  #a9message hr { display: none; }
+  #a9message { 
+    padding-top: 6px;
+    width: 190px;
+  }
+  
+  hr.bucketDivider { clear: left; }
+  div.bucket { padding: 5px 0em; }
+
+  td.bucket  { padding: 5px 0em; }
+  td.bucket div.content  { margin: 0.5em 0px 0em 25px; }
+  div.content form { margin: 0px; }
+ 
+  div.endcap div.content { text-align: center; }
+  table.endcapGrid { padding: 1.5em 0em 0.25em; }
+  
+  #bookCitations img { display: none; }
+ 
+  div.looseDiamondBox { clear: both; }
+
+
+  table.buyBox td.topLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-tl._V45782730_.gif);
+    background-repeat: no-repeat;
+    padding-top: 12px;
+    padding-left: 12px;
+  }
+
+  table.buyBox td.topRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-tr._V45782692_.gif);
+    background-repeat: no-repeat;
+  }
+  
+  table.buyBox td.bottomLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-bl._V45781560_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+  
+  table.buyBox td.bottomRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-br._V45784255_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+
+  table.castWithPhotos {
+    margin: 0;
+    padding: 0;
+  }
+
+  table.castWithPhotos td {
+    padding: 0 8px 3px 0;
+    text-align: center;
+    width: 20%;
+  }
+
+  table.castWithPhotos tr.castPhoto {
+    vertical-align: bottom;
+  }
+
+  table.castWithPhotos tr.castName {
+    vertical-align: top;
+  }
+
+  table.moreBuyingChoices td.topLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tl2._V45803718_.gif);
+    background-repeat: no-repeat;
+    padding-top: 6px;
+    padding-left: 12px;
+  }
+
+  table.moreBuyingChoices td.topRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tr2._V45803654_.gif);
+    background-repeat: no-repeat;
+  }
+  
+  table.moreBuyingChoices td.bottomLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-bl._V45803993_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+  
+  table.moreBuyingChoices td.bottomRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-br._V45782987_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+
+
+  table.otherEditions td.topLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tl._V45803622_.gif);
+    background-repeat: no-repeat;
+    padding-top: 12px;
+    padding-left: 12px;
+  }
+
+  table.otherEditions td.topRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tr._V45804114_.gif);
+    background-repeat: no-repeat;
+  }
+  
+  table.otherEditions td.bottomLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-bl._V45803993_.gif);
+    background-repeat: no-repeat;
+  }
+  
+  table.otherEditions td.bottomRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-br._V45782987_.gif);
+    background-repeat: no-repeat;
+  }
+
+  table.otherEditions { margin: 0.25em 0em; }
+  table.otherEditions th { font-size: x-small; text-align: left; padding-right: 10px; }
+  table.otherEditions td { font-size: x-small; }
+  table.otherEditions .listprice { font-size: x-small; }
+  table.otherEditions .price { font-size: x-small; }
+  
+  .caretback {
+    color: #CC6600;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .caretnext {
+    color: #CC6600;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+  }
+    
+  .disabled {
+    color: #666;
+  }
+    
+  .listRowEven {
+    background-color: #FFFFFF;
+    vertical-align: middle;
+  }
+
+  .listRowOdd {
+    background-color: #EEF1F6;
+    vertical-align: middle;
+  }
+
+  .pagination {
+    font-size: .89em;
+    margin-top: 2em;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .pagination a {
+    text-decoration: none;
+  }
+
+  .pagination a:hover {
+    color: #c60;
+    text-decoration: none;
+  }
+
+  .pagination .next {
+    margin-left: 1em;
+  }
+
+  .pagination .numberofresults {
+    margin-bottom: .66em;
+  }
+
+  .pagination .pages {
+    margin-bottom: 1em;
+  }
+
+  .pagination .on {
+    color: #000;
+    font-weight: bold;
+  }
+
+  .pagination .previous {
+    margin-left: 1em;
+  }
+    
+  .productThumbnail { 
+    width: 32px;
+    height: 32px;
+    border: 1px solid #999999;
+    text-align: center;
+  }
+
+  .productThumbnail table {
+    width: 32px;
+    height: 32px;
+  }
+
+  .productThumbnail table td {
+    text-align: center;
+  }
+
+  #purchaseSimilarities .product, #sessionSimilarities .product {
+    font-weight: normal;
+  }
+  
+  #purchaseSimilarities .author, #sessionSimilarities .author {
+    font-style: italic;
+  }
+
+  /* BXGY */
+ .bxgy-text {
+    margin:0 0 .5em 0;
+  }
+  .bxgy-bundle {
+    margin-right:10px;
+  }
+
+  /* Similarities */
+
+  .sims-faceouts {
+    margin:5px 0 10px 0;
+  }
+
+  .sims-faceouts p,
+  .sims-faceouts div {
+    margin:3px 0 0 0; 
+    padding-right: 10px;
+  }
+
+  .sims-faceouts .price {
+    white-space:nowrap; 
+  }
+
+  .sims-faceouts .rating-stars {
+    margin: 0 -3px 0 -5px;
+  }
+
+  .sims-faceouts span.tiny,
+  .cross-product-sims {
+    margin-right:.5em;
+    color:#666;
+    white-space:nowrap;
+  }
+   
+  #productDescription ul, #technicalProductFeatures ul { list-style-type: disc; margin: 1.12em 0; margin-left: 20px; }
+  #productDescription ul li { margin: 0 0 0 20px; }
+  #productDescription ul li ul { list-style-type: disc; margin-left: 20px; }
+  #productDescription ul li ul li { margin: 0 0 0 20px; }
+
+  .smallFontSize { font-size: small; }
+    
+  .amabot_endcap .amabot_widget { text-align: center; }
+  .amabot_endcap .amabot_widget { border: 1px solid #CCCC99; color: #000000; padding-top: 5px;  padding-bottom: 5px;  padding-left: 5px;  padding-right: 5px; }
+  .amabot_endcap .amabot_widget .h1 {color: #000000; font-size: small; }
+
+
+table.offersAndRebates { margin: 0 0 2em 0; }
+table.offersAndRebates th { font-size: small; font-weight: bold; text-align: right; padding-left: 8px; }
+table.offersAndRebates td.offerName { width: 55%; }
+table.offersAndRebates td.offerTotal { text-align: right; font-weight: bold; }
+table.offersAndRebates td.rebateAmount { font-weight: bold; }
+
+table.offersAndRebates td.purchasedBy,
+table.offersAndRebates td.postMarkedBy,
+table.offersAndRebates td.rebateAmount {
+  text-align: right;
+  width: 15%;
+}
+
+.listRowEven {
+  background-color: #FFFFFF;
+  vertical-align: middle;
+}
+
+.listRowOdd {
+  background-color: #EEF1F6;
+  vertical-align: middle;
+}
+
+  div.centerColumnSpace { width: 650px; }
+
+.avgCustReviewDetailPage {
+    margin-right:30px;
+    }
+.avgCustReviewDetailPage img {
+    margin-left:-5px;
+    }
+.rateThisItem {
+    white-space:nowrap;
+    }
+.writeReview {
+    white-space:nowrap;
+    margin-top:.35em;
+    }
+
+.taglpo_count {
+  font-size: 10px;
+  color: #666;
+  margin-left: -4px;
+}
+
+table.alsoRecommended td {
+  padding: 0px 10px 0.5em 0px;
+  text-align: center;
+  width: 180px;
+  vertical-align: middle;
+}
+
+table.alsoRecommended td.productTitle { vertical-align: top; }
+
+.alt_images_thumb
+{
+  display: inline;
+  float: left;
+  margin: 1px;
+  padding: 1px;
+}
+.alt_images_thumb_inner
+{
+  width: 30px;
+  height: 30px;
+}
+
+table td.otherEditions { text-align: left; vertical-align: middle; }
+
+.sd {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  color: #000000;
+}
+
+.style1 {color: #008000;
+  font-weight: bold;
+}
+
+.style2 {PADDING-RIGHT: 0px;
+        PADDING-LEFT: 0px;
+        PADDING-BOTTOM: 4px;
+        PADDING-TOP: 4px;
+        margin-BOTTOM: 6px;
+        BACKGROUND-IMAGE: url(http://g-ecx.images-amazon.com/images/G/03/kitchen/scheduled-delivery/bkgd.gif);
+}
+
+.style3 {PADDING-RIGHT: 0px;
+        PADDING-LEFT: 0px;
+        PADDING-BOTTOM: 4px;
+        PADDING-TOP: 4px;
+}
+
+.greyBorder {border:1px solid #999999; }
+.padding4px {padding:4px; }
+.padLeft4px{padding-left:4px; }
+.calender-title {background-color: #EEEECC; color: #CC6600; text-align: center; font-weight: bold; font-face: arial; font-size: 9pt;}
+.calender-title .month-year-name td{text-align: center; width: 150px; height: 30px;}
+.calender-title .scroll td{text-align: center; width: 30px; height: 30px;}
+.weekday-header {background-color: white; color: #8C8C8C; width: 30px; height: 30px;}
+.empty-date {background-color: white; color: white; width: 30px; height: 30px;}
+td.empty-date {padding-top:4px; padding-bottom:4px; text-align: right; }
+.weekday-date {background-color: #D6DDEA; color: #8C8C8C; width: 30px; height: 30px;}
+.weekday-date-small {background-color: #D6DDEA; color: #8C8C8C; width: 10px; height: 10px;}
+td.weekday-date {text-align: right; padding-top:4px; padding-bottom:4px; font-face: arial; font-size: 9pt;}
+.selected-date {background-color: #FF9900; color: white; width: 30px; height: 30px;}
+td.selected-date {padding-top:4px; padding-bottom:4px; text-align: right; font-face: arial; font-size: 9pt;}
+.highlight-date {background-color: #FFE183; color: #003399; width: 30px; height: 30px;}
+.highlight-date-small {background-color: #FFE183; color: #003399; width: 10px; height: 10px;}
+td.highlight-date {padding-top:4px; padding-bottom:4px; text-align: right; font-face: arial; font-size: 9pt;}
+
+.smallBold { font-size: smaller; font-weight: bold; }
+#swatchTable { margin-right: 5px }
+#swatchTableBorder { border: #9BA9BB 1px solid }
+.swatchRow { border-bottom: 1px solid #e5e5e5 }
+
+ul.linkBullets      { padding-left: 0; }
+ul.linkBullets li   { list-style-type: none; margin-top: 1em; margin-bottom: 1em; }
+ul.noteBullets      { padding-left: 0; }
+ul.noteBullets li   { list-style-type: none; }
+span.darkRedWarning { color: #990000; }
+
+li.bullet { margin-left: -1.5em; }
+
+.list div
+{
+  margin-bottom: 0.25em;
+  text-decoration: none;
+}
+
+
+.dottedtable
+{
+  border: 1px dotted #999999;
+}
+
+.dottedvertical
+{
+  border-left-width: 1px;
+  border-left-style: dotted;
+  border-left-color: #999999;
+}
+
+.dottedhorizontal
+{
+  border-top-width: 1px;
+  border-top-style: dotted;
+  border-top-color: #999999;
+}
+
+a:link .image
+{
+  border-color: #ccc;
+  border-style: solid;
+  border-width: 1px;
+}
+
+a:visited .image
+{
+  border-color: #ccc;
+  border-style: solid;
+  border-width: 1px;
+}
+
+
+a:hover .image
+{
+  border-color: #cc6600;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.imgborderon
+{
+  border: #cc6600 solid 1px;
+}
+
+a:active .image
+{
+  border: 1px solid #cc6600;
+}
+
+a:link
+{
+  color: #003399;
+  text-decoration: underline;
+}
+
+a:hover
+
+{
+  text-decoration : none;
+  color: #cc6600;
+}
+
+.header
+{
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 20px;
+}
+
+.notetext
+{
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  color: #666666;
+}
+
+.iou_cust  { font-weight: bold; color: #cc6600; }
+.iou_div   { background-color: #ffffdd; text-align: center; padding-bottom: 2px; }
+
+td.productLabel { font-weight: bold; text-align: right; white-space: nowrap; vertical-align: top; padding-right: 5px; padding-left: 0px; }
+table.product   { border: 0px; padding: 0px; border-collapse: collapse; }
+td.twisterProductLabel { font-weight: bold; text-align: center; align: center; vertical-align: top; padding-right: 5px; padding-left: 0px}
+td.twisterYourSelectionLabel { font-size: x-small; font-weight: normal; text-align: center; align: center;  vertical-align: top; padding-right: 5px; padding-left: 0px}
+td.twisterInnerYourSelectionLabel { font-weight: normal; text-align: center; align: center;  vertical-align: top; padding-right: 5px; padding-left: 0px}
+table.twisterVariations { margin-right: auto; margin-left: auto; border: 0px; padding: 0px; border-collapse: collapse; align: center}
+
+.twisterBold {
+   font-weight: bold;
+} 
+
+.twisterTiny {
+   font-size: x-small;
+}
+
+#productFeaturesDiv ul {
+  list-style: disc;
+  padding-left: 25px;
+}
+
+.disclaim {
+  margin-top: 3px;
+  font-size: 10px;
+  color:#888;
+}
+
+.plusShippingText {
+  color:#555; 
+  font-family:Arial, Helvetica, sans-serif; 
+  font-size:10px;
+}
+
+.asinTitle {
+  color:#c60; 
+  font-family:Arial, Helvetica, sans-serif; 
+  font-size:1.7em;
+  font-weight:normal;
+}
+
+.priceBlockLabel {
+  padding-right:3px;
+  font-size:0.7em;
+  color:#666;
+  white-space:nowrap;
+  text-align:right;
+  vertical-align:middle;
+}
+.priceBlockLabelPrice {
+  padding-right:3px;
+  font-size:0.7em;
+  color:#666;
+  white-space:nowrap;
+  text-align:right;
+  vertical-align:top;
+  padding-top:0.5em;
+}
+.priceLarge {
+  color:#900; 
+  font-size:1.5em; 
+  letter-spacing:-1px;
+  font-weight:normal;
+}
+.availGreen {
+  color:#090; 
+  font-size:1.4em; 
+  font-weight:bold;
+}
+
+.availOrange {
+  color:#c60; 
+  font-size:1.3em; 
+  font-weight:bold; 
+}
+.availRed {
+  color:#900; 
+  font-size:1.2em; 
+  font-weight:bold; 
+}
+.relatedSearches {
+  color:#666;
+  font-size:0.8em;
+}
+
+
+.alertTableBottom {
+  background-color: #ffd;
+  border-bottom: 1px solid #999;
+}
+.alertTableLeft {
+  background-color: #ffd;
+  border-left: 1px solid #999;
+}
+.alertTableRight {
+  background-color: #ffd;
+  border-right: 1px solid #999;
+}
+.alertTableTop {
+  background-color: #ffd;
+  border-top: 1px solid #999;
+}
+.alertTableCenter {
+  background-color: #ffd;
+  padding: 3px 5px 3px 5px;
+  font-size:1.1em;
+}
+
+.qpTableCenter {
+   padding: 5px 7px 5px 7px;
+   font-size:0.7em;
+}
+.qpTableTop {
+   border-top: 1px solid #ccc;
+}
+.qpTableBottom {
+   border-bottom: 1px solid #ccc;
+}
+.qpTableLeft {
+   border-left: 1px solid #ccc;
+}
+.qpTableRight {
+   border-right: 1px solid #ccc;
+}
+.qpHeadline {
+        color:#c60;
+        font-weight:bold;
+}
+.qpImage {
+        float:left;
+        margin-right:8px;
+}
+.qpUL {
+  padding-left: 25px;
+  list-style-type: disc;
+}
+.spTR {
+        visibility: hidden;
+}
+.hqpDiv {
+        margin-top:0.5em;
+        display:none;
+        visibility: hidden;
+}
+.hqpBold {
+     color:#c60;
+}
+
+
+.raWhatsThisLink {
+    font-size: 10px;
+}
+
+.raSellersLearnLink {
+    padding: 10px 0pt;
+    font-size: 11px;
+    text-align: right;
+}
+
+.raPrice {
+    font-family: arial,verdana,helvetica,sans-serif;
+    color: #990000;
+}
+
+.raMerchantNameLinkDiv {
+    padding-top: 1px;
+    margin-left: 1px;
+    margin-right: 4px;
+}
+
+.raLinkItemUrl {
+    color:black;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.raMerchantNamePriceSeparator1 {
+    position: relative;
+    margin-right: 2px;
+}
+
+.raMerchantNamePriceSeparator2 {
+    position: absolute;
+    background-color: rgb(219, 146, 52);
+    width: 4px;
+    height: 4px;
+    margin-right: 2px;
+    margin-left: 2px;
+    left: 0px;
+    top: 0px;
+    margin-top: 6px;
+}
+
+.raWhatProblemTitle {
+    font-size: 11px;
+}
+
+.raWhatProblemTD {
+    padding-bottom: 5px;
+}
+
+.raRAFTable {
+    padding-top: 0px;
+    margin-top: 10px;
+    font-size: 11px;
+    width: 100%;
+    text-align: left;
+}
+
+.raRAFTableTD {
+   text-align: left;
+   font-size: 11px;
+}
+
+.raWhichWebsiteTable {
+    padding: 8px 0pt;
+}
+
+.raRAFDropDown {
+    text-align: left;
+}
+
+.raRAFSuccessMessage {
+    text-align: left;
+    font-size: 11px;
+}
+
+.whiteGloveDiv{
+  padding-top: 10px; 
+  padding-bottom: 10px;
+}
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="dp">
+
+
+
+
+
+
+
+
+
+
+
+<!-- JSF Bootstrap N/A -->
+
+
+  
+  
+  <!-- HCVSPKMMC -->
+
+  
+
+  
+
+
+
+  
+  
+  <!-- Tilu -->
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css"><!--
+
+.header,
+.header a:link,
+.header a:active,
+.header a:visited,
+.searchtitle,
+.websearch .title,
+.gcwebsearch .title,
+.websearchnosubnav .title {
+  font-family: tahoma,sans-serif;
+  color: #333;
+  font-size: 11px;
+  line-height: 11px;
+}
+
+.header a:link,
+.header a:visited,
+.header a:active {
+  text-decoration: none;
+  text-transform:capitalize;
+  color: #333;
+}
+.header a:hover,
+.header .tabs a:hover,
+.secondary a:hover,
+.secondary .subnavlink a:hover,
+.tertiary a:hover,
+.advsearch a:hover,
+.popover-tiny a:hover {
+  text-decoration: underline;
+}
+
+.navspacer {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 7px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  vertical-align: middle;
+}
+
+.footernavspacer {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.secondary a {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  vertical-align: middle;
+}
+
+.secondary a:link,
+.secondary a:visited,
+.secondary a:active {
+  text-decoration: none;
+  text-transform:uppercase;
+  color: #FFFFFF;
+}
+
+.secondary {
+  background-color: 336633;
+  vertical-align: middle;
+}
+
+.secondary a.on, .tertiary a.on {
+  color: #FFCC66;
+}
+
+
+.lefton,
+.leftoff,
+.middleoffonleft,
+.middleon,
+.middleoff {
+  vertical-align: bottom;
+  height: 33px;
+}
+
+
+.searchbar {
+  vertical-align: top;
+  background-color: #eeeecc;
+}
+
+.tabs a:link, .tabs a:visited, .tabs a:active, .header .navspacer {
+  color: #333;
+  text-decoration: none;
+  vertical-align: bottom;
+}
+
+.tabs {
+  vertical-align: bottom;
+  height: 33px;
+  white-space: nowrap;
+}
+
+.rightseg table,
+.rightseg tr,
+.rightseg td {
+    margin-left:auto; 
+    margin-right:0px;
+    align: right;
+} 
+
+.badge {
+  align: left;
+  vertical-align: top;
+}
+.tools a:link,
+.tools a:visited,
+.tools a:active  {
+  color: #039;
+  font-size: 12px;
+}
+.tools .h3color  {
+  color: #c60;
+  font-size: 12px;
+}
+.tabs .tools a:hover {
+  text-decoration: underline;
+  color: #c60;
+}
+.tools a:link.on, .tools a:visited.on, .tools a:active.on {
+  color: #c60;
+}
+.tools {
+  margin-left:auto; 
+  margin-right:0px;
+  vertical-align: right;
+  white-space: nowrap;
+}
+
+.footerSubnav {
+  color: #000000;
+  text-transform: uppercase;
+}
+
+--></style>
+
+
+
+
+
+
+<img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/transparent-pixel._V42752373_.gif" width="1" alt="" id="navTopMarginSpacer" height="5" border="0" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" valign="bottom">
+  <tr id="classictop" valign="bottom">
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" valign="top">
+        <tr>
+            
+
+
+
+<td align="center" height="33"><a href="/ref=bd_b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/general/de-logo-153x37._V46914763_.gif" width="153" alt="Amazon.de" height="37" border="0" /></a>&nbsp;</td>
+            
+
+
+
+
+<td class="tools" nowrap="nowrap" height="33" align="right">&nbsp;&nbsp;<span class="navtool" id="navtoolitem-1"><a href="/gp/cart/view.html?ie=UTF8/ref=topnav__b/302-1167773-2270446" ><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/nav/tools/navigation-tools-cart._V46873326_.gif" width="29" alt="Einkaufswagen" height="22" border="0" /></a></span><span class="navtool" id="navtoolitem-2"><a href="/gp/registry/wishlist/ref=topnav__b/302-6409046-2744830" ><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/nav/tools/navigation-tools-wishlist._V46871039_.gif" width="97" alt="Wunschzettel" height="22" border="0" /></a></span><span class="navtool" id="navtoolitem-3"><a href="/gp/css/homepage.html?is-secure=true/ref=topnav__b/302-1167773-2270446" ><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/nav/tools/navigation-tools-account._V46895044_.gif" width="104" alt="Mein Konto" height="22" border="0" /></a></span><span class="navtool" id="navtoolitem-4"><a href="/exec/obidos/tg/browse/-/504874/ref=topnav__b/302-6409046-2744830" ><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/nav/tools/navigation-tools-help._V46681155_.gif" width="45" alt="Hilfe" height="22" border="0" /></a></span><span class="navtool" id="navtoolitem-5"><a href="/exec/obidos/tg/browse/-/505050/ref=topnav__b/302-6409046-2744830" ><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/nav/tools/navigation-tools-impressum._V46897901_.gif" width="59" alt="Impressum" height="22" border="0" /></a></span></td>
+        </tr>
+      </table>
+
+      <table border ="0" valign="bottom" cellspacing="0" cellpadding="0" align="center">
+        <tr height="33">
+          
+
+
+
+<td class="leftoff" height="33"><div align="center"><a href="/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/gateway-off-whole._V45803360_.gif" width="39" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/gp/yourstore/ref=topnav_ys_b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/yourstore-unrec-off-sliced._V45802342_.gif" width="62" height="32" border="0" /></a></div></td><td class="middleon" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/299956/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/books-on-whole._V45801857_.gif" width="48" alt="" height="32" border="0" /></a></div></td><td class="middleoffonleft" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/573634/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/books-us-off-whole._V45801555_.gif" width="51" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/562066/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/ce-de-off-whole._V45803103_.gif" width="66" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/290380/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/music-off-whole._V45803194_.gif" width="41" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/284266/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/dvd-buy-rent-tab-off._V45803306_.gif" width="65" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/301928/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/soft-ware-tab-off._V45803826_.gif" width="39" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/301052/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/games-tab-off._V45801722_.gif" width="41" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/10931001/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/house-new-off._V45802371_.gif" width="71" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/exec/obidos/tg/browse/-/12950651/ref=topnav__b/302-6409046-2744830"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/toys-off._V45803261_.gif" width="75" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/b/ref=topnav__b/302-6409046-2744830?%5Fencoding=UTF8&node=16435051"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/sport-freizeit-off._V24692852_.gif" width="52" alt="" height="32" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/b/ref=topnav__b/302-6409046-2744830?%5Fencoding=UTF8&node=327472011"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/uhren-off._V24887846_.gif" width="39" alt="" height="26" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/b/ref=topnav__b/302-6409046-2744830?%5Fencoding=UTF8&node=355007011"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/baby-off._V17467939_.gif" width="35" alt="" height="26" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/b/ref=topnav__b/302-6409046-2744830?%5Fencoding=UTF8&node=355006011"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/schuhe-off-neu._V17662487_.gif" width="73" alt="" height="46" border="0" /></a></div></td><td class="middleoff" height="33"><div align="center"><a href="/b/ref=topnav__b/302-6409046-2744830?%5Fencoding=UTF8&node=64187031"><img src="http://g-ecx.images-amazon.com/images/G/03/portal/top-nav/hpc-off._V7981396_.gif" width="58" alt="" height="26" border="0" /></a></div></td><td class="rightoff" width="15" height="33"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/transparent-pixel._V42752373_.gif" width="15" alt="" height="8" border="0" /></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+
+<style type="text/css"><!--
+
+.header,
+.header a:link,
+.header a:active,
+.header a:visited,
+.searchtitle,
+.websearch .title,
+.gcwebsearch .title,
+.websearchnosubnav .title {
+  font-family: tahoma,sans-serif;
+  color: #333;
+  font-size: 11px;
+  line-height: 11px;
+}
+
+.header a:link,
+.header a:visited,
+.header a:active {
+  text-decoration: none;
+  text-transform:capitalize;
+  color: #333;
+}
+.header a:hover,
+.header .tabs a:hover,
+.secondary a:hover,
+.secondary .subnavlink a:hover,
+.tertiary a:hover,
+.advsearch a:hover,
+.popover-tiny a:hover {
+  text-decoration: underline;
+}
+
+.navspacer {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 7px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  vertical-align: middle;
+}
+
+.footernavspacer {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.secondary a {
+  font-family: osaka, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  vertical-align: middle;
+}
+
+.secondary a:link,
+.secondary a:visited,
+.secondary a:active {
+  text-decoration: none;
+  text-transform:uppercase;
+  color: #FFFFFF;
+}
+
+.secondary {
+  background-color: 336633;
+  vertical-align: middle;
+}
+
+.secondary a.on, .tertiary a.on {
+  color: #FFCC66;
+}
+
+
+.lefton,
+.leftoff,
+.middleoffonleft,
+.middleon,
+.middleoff {
+  vertical-align: bottom;
+  height: 33px;
+}
+
+
+.searchbar {
+  vertical-align: top;
+  background-color: #eeeecc;
+}
+
+.tabs a:link, .tabs a:visited, .tabs a:active, .header .navspacer {
+  color: #333;
+  text-decoration: none;
+  vertical-align: bottom;
+}
+
+.tabs {
+  vertical-align: bottom;
+  height: 33px;
+  white-space: nowrap;
+}
+
+.rightseg table,
+.rightseg tr,
+.rightseg td {
+    margin-left:auto; 
+    margin-right:0px;
+    align: right;
+} 
+
+.badge {
+  align: left;
+  vertical-align: top;
+}
+.tools a:link,
+.tools a:visited,
+.tools a:active  {
+  color: #039;
+  font-size: 12px;
+}
+.tools .h3color  {
+  color: #c60;
+  font-size: 12px;
+}
+.tabs .tools a:hover {
+  text-decoration: underline;
+  color: #c60;
+}
+.tools a:link.on, .tools a:visited.on, .tools a:active.on {
+  color: #c60;
+}
+.tools {
+  margin-left:auto; 
+  margin-right:0px;
+  vertical-align: right;
+  white-space: nowrap;
+}
+
+.footerSubnav {
+  color: #000000;
+  text-transform: uppercase;
+}
+
+--></style>
+
+
+
+
+<table width="100%" valign="top" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td class="secondary" valign="top">
+      
+
+
+
+
+<table width="89%" border="0" cellpadding="0" cellspacing="0" align="center"><tr><td><table id="subnavTable" border="0" cellpadding="0" cellspacing="0" align="center"><tr id="twotabsubnav"><td>&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_0/302-6409046-2744830?%5Fencoding=UTF8&node=124535011" >Erweiterte Suche</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_1/302-6409046-2744830?%5Fencoding=UTF8&node=541686" >Stöbern</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/gp/bestsellers/books/ref=sv_b_2/302-6409046-2744830" >Bestseller</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_3/302-6409046-2744830?%5Fencoding=UTF8&node=408344" >Neuheiten</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_4/302-6409046-2744830?%5Fencoding=UTF8&node=300259" >Hörbücher</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_5/302-6409046-2744830?%5Fencoding=UTF8&node=10683251" >Taschenbücher</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_6/302-6409046-2744830?%5Fencoding=UTF8&node=288100" >Fachbücher</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/b/ref=sv_b_7/302-6409046-2744830?%5Fencoding=UTF8&node=301929" >Preis-Hits</a></div> </div></td><td class="navspacer">&nbsp;&nbsp;|&nbsp;&nbsp;</td><td align="center" height="28" class="subnavlink"><div class="middle-subnav"><div class="inner-subnav"><a href="/gp/seller/sell-your-stuff.html/ref=sv_b_8/302-6409046-2744830" >Bücher verkaufen</a></div> </div></td><td>&nbsp;&nbsp;</td></tr></table></td></tr></table>
+
+    </td>
+  </tr>
+  <tr>
+    <td class="searchbar" valign="top">
+      
+
+
+
+
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr id="twotabsearch">
+    <td align="center" height="34">
+      
+  
+  
+
+
+
+
+<script language="javascript" type="text/javascript"><!--
+  window.sitesearch =
+  {
+    submit: function() { return true },
+    focus: function() { return true },
+    blur: function() { return true }
+  }
+//-->
+</script>
+
+<form style="margin-bottom:0;" method="get" action="/s/ref=nb_ss_b/302-1167773-2270446" name="site-search">
+<input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+  
+  <table border="0" cellpadding="0" cellspacing="0" align="center">
+    <tr>
+      <td class="searchtitle" align="center">Suche&nbsp;</td>
+      <td width="100"><select name="url">
+<option value="search-alias=aps">Amazon.de</option>
+<option value="search-alias=stripbooks" selected="selected">Bücher</option>
+<option value="search-alias=english-books">Englische Bücher</option>
+<option value="search-alias=stripbooks-music">Musiknoten</option>
+<option value="search-alias=stripbooks-used">Gebrauchte Bücher</option>
+<option value="search-alias=magazines">Zeitschriften</option>
+          </select></td>
+      <td width="5">&nbsp;</td>
+      <td width="325">
+        <input type="text" id="twotabsearchtextbox" name="field-keywords" value="" size="25" style="width:100%; background-color: #FFF;" />
+        <img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/transparent-pixel._V42752373_.gif" width="200" alt="" height="1" border="0" /></td>
+      <td width="5">&nbsp;</td>
+      <td><input type="image" src="http://g-ecx.images-amazon.com/images/G/03/books/go-button._V45461508_.gif"  width="25" alt="Go" value="Go" name="Go" height="18" border="0" /></td>
+    </tr>
+  </table>
+</form>
+
+
+   </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+</table><!--Pilu -->
+
+
+
+
+<!--CMMKPSVCH -->
+    
+    
+   
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+    
+
+
+
+
+
+  
+    
+    
+
+
+  
+  
+
+
+  
+
+  
+  
+
+    
+    
+  
+
+    
+    
+    
+  
+
+
+    
+
+
+
+
+
+      
+      
+
+    
+      
+      
+
+    
+    
+
+
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script language="Javascript1.2" type="text/javascript">
+  <!--
+    var countdowns;
+    var actualSeconds;
+
+
+    // Callback function for Twister ASINs
+    function onAjaxUpdate_prime(asin, initialLoad) {
+      updateCountdownMessage();
+    }
+
+
+    // Callback function for Twister ASINs
+    function onCacheUpdate_prime(asin) {
+      updateCountdownMessage();
+    }
+
+
+    function updateCountdownMessage(){
+      countdowns = new Array();
+      for (var i = 0; i < document.getElementsByName('prime_stripe_seconds_left').length; i++) { 
+        var secondsLeft = document.getElementsByName('prime_stripe_seconds_left')[i].value;
+
+        var counterIDs = document.getElementsByName('prime_stripe_counterID')[i].value;
+        var counterArray = new Array();
+	counterArray = counterIDs.split(',');
+
+        var messageIDs = document.getElementsByName('prime_stripe_messageID')[i].value;
+        var messageArray = new Array();
+	messageArray = messageIDs.split(',');
+
+        var actions = document.getElementsByName('prime_stripe_countdown_action')[i].value;
+        var actionArray = new Array();
+        actionArray = actions.split(',');
+
+        addCountdown(secondsLeft, counterArray, messageArray, actionArray);
+      }
+    }
+
+
+    function Countdown(endTime, counterIDs, messageIDs, actions) {
+      this.endTime = endTime;
+      this.counterIDs = counterIDs;
+      this.messageIDs = messageIDs;
+      this.actions = actions;
+      this.done = false;
+    }
+
+
+    function getTime() {
+      var newCurrentTime = new Date();
+      actualSeconds = newCurrentTime.getHours() * 3600 + newCurrentTime.getMinutes() * 60 + newCurrentTime.getSeconds();
+      displayCountdowns();
+    }
+
+
+    function displayCountdowns() { 
+      if (!document.layers && !document.all && !document.getElementById) {
+        return;
+      }
+
+      var timeout = false;
+
+      for (var i = 0; i < countdowns.length; i++) {
+        if (!countdowns[i].done) {
+          displayCountdown(countdowns[i]);
+          timeout = timeout || !(countdowns[i].done);
+        }
+      }
+
+      if (timeout) {
+        window.setTimeout("getTime()", 1000);
+      }
+    }
+
+
+    function displayCountdown(countdown) {
+      var remainSeconds = countdown.endTime - actualSeconds;
+      if ( remainSeconds < 1 ) {
+        for ( var i = 0; i < countdown.messageIDs.length; i++ ) {
+          if (document.getElementById( countdown.messageIDs[i] ) ) {
+            if (countdown.actions[i] == "clear") {
+              document.getElementById( countdown.messageIDs[i] ).style.display = "none";
+            } else {
+              document.getElementById( countdown.messageIDs[i] ).innerHTML = countdown.actions[i];
+            }
+          }
+        }
+        countdown.done = true;
+      }
+
+      var remainMins = Math.floor(remainSeconds / 60);
+      var mins = remainMins % 60;
+      var hours = Math.floor(remainMins / 60);
+
+      var countdownText = getPrimeCountdownText( hours, mins );
+
+      for ( var i = 0; i < countdown.counterIDs.length; i++ ) {
+        if ( document.getElementById( countdown.counterIDs[i] ) ) {
+          document.getElementById( countdown.counterIDs[i] ).innerHTML = countdownText;
+        }
+      }
+    }
+
+
+    function addCountdown(secondsLeft, counterIDs, messageIDs, actions) {
+      var currentTime = new Date();
+      var totalSeconds = currentTime.getHours() * 3600 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
+
+      // multiply secondsLeft * 1 to force conversion to a number
+      var secondsSum = ( secondsLeft * 1 ) + totalSeconds;
+      countdowns.push(new Countdown(secondsSum, counterIDs, messageIDs, actions));
+
+      if(countdowns.length == 1) {
+        getTime();
+      }
+    }
+
+
+    function getPrimeCountdownText( hours, minutes ) {
+      // 'space' is an configurable space between the value for a time and it's label 
+      // e.g. in US we display '5hrs 45mins'
+      // while DE displays '5 hrs 45 mins'
+      var space = document.getElementsByName('prime_stripe_countdown_space')[0].value;
+      var hours_string = document.getElementsByName('prime_stripe_countdown_hours')[0].value;
+      var minutes_string = document.getElementsByName('prime_stripe_countdown_minutes')[0].value;
+
+      var countdownText = hours + space + hours_string + ' ' + minutes + space + minutes_string;
+      return countdownText;
+    }
+  -->
+</script>
+
+
+  
+  
+    
+      
+      
+    <style type="text/css">
+      .nonmemberEnclosure {
+        padding: 2px 0px 5px 0px;
+        background-repeat: repeat-x;
+        background-position: top;
+        font-size: x-small;
+        text-align: center;
+        font-family: verdana,arial,helvetica,sans-serif;
+          background-image: url(http://g-ecx.images-amazon.com/images/G/03/detail/gradated-blue-thin._V4640187_.gif);
+      }
+  </style>
+
+    
+    <div class="nonmemberEnclosure" name="unrecognizedStripe" id="unrecognizedStripe" style="width:100%">
+
+Jetzt bei <a href="/gp/subs/primeclub/signup/main.html/ref=prm_mrk_dpsu_p?ie=UTF8&primeMetadata=mss%5Flocid%5F20080405%3DDETAIL%5FPAGE%2Cmss%5Fmsgid%5F20080405%3Dunrecognized%5Fstripe%5Fexpeditable-B000WHHPL8%2Cmss%5Fmssid%5F20080405%3D6eb2fc48-9328-4f3a-8ef2-407cca1dfdd2"><strong>Amazon Prime</strong></a> anmelden und kostenlose Lieferung am nächsten Tag erhalten oder Overnight-Express für nur 5 EUR pro Artikel nutzen. Bereits Mitglied? <a href="/gp/sign-in.html?ie=UTF8&path=%2Fgp%2Fproduct%2F3473580082&redirectProtocol=http&useRedirectOnSuccess=1&query=s%3Dbooks">Hier einloggen</a>.    
+    </div>
+
+
+
+
+<br />
+
+
+
+
+
+
+<form method="post" id="handleBuy" name="handleBuy" action="/gp/product/handle-buy-box/ref=dp_start-bbf_1_glance" style="margin: 0pt;">
+<input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+<input type="hidden" id="session-id" name="session-id" value="302-6409046-2744830" />
+<input type="hidden" id="ASIN" name="ASIN" value="3473580082" />
+<input type="hidden" id="isMerchantExclusive" name="isMerchantExclusive" value="0" />
+<input type="hidden" id="merchantID" name="merchantID" value="A3JWKAKR8XB7XF" />
+<input type="hidden" id="nodeID" name="nodeID" value="299956" />
+<input type="hidden" id="offerListingID" name="offerListingID" value="aEtEpBySPL5bVvjhGPX6TmIhC2CjyWlTw38XJ4fUZv28mXW6lAMkt07n4TZOWJuvmCTcDEPtwkg00IqPMF088A%3D%3D" />
+<input type="hidden" id="sellingCustomerID" name="sellingCustomerID" value="A3JWKAKR8XB7XF" />
+<input type="hidden" id="sourceCustomerOrgListID" name="sourceCustomerOrgListID" value="" />
+<input type="hidden" id="sourceCustomerOrgListItemID" name="sourceCustomerOrgListItemID" value="" />
+<input type="hidden" id="qid" name="qid" value="1207387722" />
+<input type="hidden" id="sr" name="sr" value="11-1" />
+<input type="hidden" id="storeID" name="storeID" value="books" />
+<input type="hidden" id="tagActionCode" name="tagActionCode" value="" />
+<input type="hidden" id="viewID" name="viewID" value="glance" />
+
+
+
+<table border="0" cellpadding="0" cellspacing="0"  width="215" class="buyingDetailsGrid" align="right">
+
+<tr><td valign="top" width="100%">
+
+    
+    
+    
+
+    
+
+
+  
+
+
+
+  
+    
+    
+
+      
+
+  
+  
+  
+    
+
+
+    
+
+    
+
+  
+
+  
+    
+
+
+
+
+
+  
+    
+    
+
+
+  
+  
+
+    
+
+
+ 
+
+  
+
+  
+  
+  
+  
+
+    
+    
+  
+  
+    
+    
+  
+
+    
+    
+    
+  
+
+
+    
+
+
+
+
+
+    
+
+
+
+    
+      
+      
+
+    
+      
+      
+
+    
+    
+
+  
+
+    
+  
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  
+
+
+
+
+
+
+    
+  
+
+  
+  
+  
+
+  
+  
+
+    
+    
+  
+
+    
+    
+    
+  
+
+
+    
+
+
+
+
+
+      
+      
+
+    
+      
+      
+
+    
+    
+
+
+    
+  
+  
+   
+<div id="buyboxDivId" class="buying" >
+   <table id="buyboxTable" border="0" cellspacing="0" cellpadding="0" class="buyBox" width="215">
+     <tr>
+      <td width="190" class="topLeft">
+
+        <table cellspacing="0" cellpadding="0" border="0" align="center">
+          <tr>
+            <td align="center" style="text-align: center;">
+
+    
+
+
+
+
+
+
+
+
+<div align="center" style="margin-bottom: 4px;"><b class="small">Menge:&nbsp;</b><select name="quantity"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option></select></div><input type="hidden" name="maap_bb_qty_limit" value="30" />
+
+
+
+
+
+
+
+
+
+
+<span id="addToCartSpan">
+<input type="image" src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-atc._V45803833_.gif"  width="160" alt="In den Einkaufswagen" name="submit.add-to-cart" height="27" border="0" />
+</span>
+<br />
+
+
+
+
+
+
+
+
+
+    
+    
+    
+
+      
+      
+      
+      
+  
+    
+  
+    
+  
+
+
+
+
+  
+  
+  
+  
+  
+  
+      
+      
+      
+      
+      
+  
+  
+      
+      
+      
+  
+    
+      
+    
+    
+    
+      
+      
+      
+    
+
+      
+      
+      
+      
+  
+    
+  
+    
+  
+
+
+
+
+  
+  
+  
+  
+  
+  
+      
+      
+      
+      
+      
+  
+  
+      
+      
+      
+  
+    
+      
+    
+    
+    
+      
+      
+      
+    
+
+      
+      
+      
+      
+  
+    
+  
+    
+  
+
+
+
+
+  
+  
+  
+  
+  
+  
+      
+      
+      
+      
+      
+  
+  
+      
+      
+      
+  
+    
+      
+    
+    
+    
+      
+      
+      
+    
+
+      
+      
+      
+      
+  
+    
+  
+    
+  
+
+
+
+
+  
+  
+  
+  
+  
+  
+      
+      
+      
+      
+      
+  
+  
+      
+      
+      
+  
+    
+      
+    
+    
+    
+      
+      
+      
+  
+
+
+
+<div class="oneClickDiv">
+  <b>oder</b><br />
+<div class="tiny" style="padding: 4px 0px;">
+      <a href="https://www.amazon.de/gp/product/utility/edit-one-click-pref.html?ie=UTF8&returnPath=%2Fgp%2Fproduct%2F3473580082">Loggen Sie sich ein</a>, um 1-Click&#174; einzuschalten.
+</div></div>
+
+
+
+
+
+      
+        </td></tr></table>
+      </td>
+      <td width="13" class="topRight">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td class="bottomLeft">&nbsp;</td>
+      <td class="bottomRight" height="12">&nbsp;</td>
+    </tr>   
+  </table>
+</div>
+
+
+
+
+
+
+</td></tr><tr><td valign="top" width="100%">
+
+    
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="buying">
+  <table border="0" cellspacing="0" cellpadding="0" class="moreBuyingChoices" width="215">
+    <tr>
+      <td width="190" class="topLeft">
+        <table cellspacing="0" cellpadding="0" width="100%"><tr><td>
+          <div style="text-align: center;  font-weight: bold; padding-bottom: 5px;">Alle Angebote</div>
+          <div id="more-buying-choice-content-div">
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+<div class="extendedBuyBox" id="secondaryUsedAndNew">
+  
+
+
+
+
+
+
+ 
+
+
+
+
+<a href="http://www.amazon.de/gp/offer-listing/3473580082/ref=dp_olp_1?ie=UTF8&qid=1207387722&sr=11-1" class="buyAction">
+92 Angebote</a> ab <span class="price">EUR 4,92</span>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+  
+
+
+  
+  <hr noshade="noshade" size="1" class="EBBdivider" />
+
+
+
+<div class="extendedBuyBox" align="center" id="SDPBlock">
+  
+    Möchten Sie verkaufen? <br /><a href="http://s1.amazon.de/exec/varzea/sdp/sai-condition/3473580082/ref=dp_sdp_sell?%5Fencoding=UTF8&coliid=&qid=1207387722&sr=11-1&colid="><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/tile-sell-here._V45805261_.gif" width="131" align="absmiddle" alt="Hier verkaufen" height="17" border="0" /></a>
+</div>
+
+
+
+
+
+
+
+
+        </td></tr></table>
+      </td>
+      <td width="13" class="topRight">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td class="bottomLeft">&nbsp;</td>
+      <td class="bottomRight" height="12">&nbsp;</td>
+    </tr>   
+  </table>
+  </div>
+  </div>
+
+</td></tr><tr><td valign="top" width="100%">
+    
+    
+
+
+
+
+
+<div align="center" style="padding: 3px"> <input type="image" src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-wish-list._V45784495_.gif"  width="147" alt="Auf meinen Wunschzettel" name="submit.add-to-registry.wishlist" height="22" border="0" /> </div><div align="center" style="padding: 3px"> <input type="image" src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-wedd-reg._V45805112_.gif"  width="147" alt="Auf die Hochzeitsliste" name="submit.add-to-registry.wedding" height="22" border="0" /> </div>
+</td></tr><tr><td valign="top" width="100%">
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+<!--
+.tellfriend {
+ font-family: Verdana, Arial, Helvetica, sans-serif;
+ font-size: xx-small;
+ border-top: 1px dashed #BEBEBE;
+ border-right: none;
+ border-bottom: 1px dashed #BEBEBE;
+ border-left: none;
+ margin-top: 2em;
+ margin-bottom: 2em;
+ text-align: center;
+ vertical-align:middle;
+ padding-top: .6em;
+ padding-bottom: .6em;
+}
+
+#tafMain .productTitle {
+  font-weight: bold;
+}
+
+.mail {
+ border: none;
+ padding-right: 6px;
+}
+
+.bodyText {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1.25em;
+}
+
+.blueBackground {
+   background-color: #EDF7FC;
+   height: 50px;
+}
+
+.smallGrey {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: xx-small;
+    color: #737373;
+}
+
+.defaultText {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+    color: #737373;
+}
+
+.errorText {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1em;
+    color: red;
+}
+
+.boldErrorText {
+    font-weight: bold;
+    color: red;
+}
+
+.tafPopoverTitle {
+    background-color: #CC6600;
+    height: 18px;
+}
+
+.strongPopTitle {
+    color: #FFFFFF;
+    font-weight: bold;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1em;
+}
+
+.textArea {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+}
+
+.tellfriendConfirmation {
+    padding: 1em 20px 0px;
+    font-size: 1.1em;
+}
+
+.confirmationBox {
+    background-color: #FCF6AD;
+    color: #3C843C;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #3C843C;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 0.5em;
+    margin: 1em -5px;
+}
+
+.confirmationOrangeText {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.25em;
+    font-weight: bold;
+    color: #CC6600;
+}
+
+.errorRedText {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.25em;
+    font-weight: bold;
+    color: red;
+    margin: 0em;
+}
+
+.greyBorder {
+    border-style: solid;
+    border-width: 2px;
+    border-color: #999;
+    
+}
+
+.tellfriendConfirmation .inviteesTitle {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.tellfriendConfirmation .inviteesList {
+    margin: 0em;
+    padding-left: 2.5em;
+}
+
+.inviteesList li {
+    list-style-type: disc;
+}
+
+.tellfriendConfirmation .buttonBox {
+    margin: 0.25em 0px;
+    text-align: right;
+}
+
+.dashedLine {
+    border:dashed black;
+    border-width:1px 0 0;
+    height:0;
+}
+-->
+</style>
+
+
+<div align="center" style="padding:5px;">
+<a href="/gp/pdp/taf/3473580082/ref=cm_taf_dp_button_g"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/people/campaign/tellfriend._V46859418_.gif" width="158" alt="Tell a Friend" align="absmiddle" onload="if (typeof uet =='function') { uet('af'); }" height="22" border="0" /></a>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+</td></tr></table>
+
+
+
+<table border="0" cellpadding="0" cellspacing="0"  width="240" class="productImageGrid" align="left">
+
+<tr><td valign="top" width="100%">
+
+
+
+
+
+
+
+
+
+<script language="Javascript" type="text/javascript">
+  var registeredImages = new Object();
+ 
+  var numberToPreload = 6;
+  var preloadCount = 0;
+
+  function registerImage( id, image, html, caption ) {
+    registeredImages[id] = new Object();
+    registeredImages[id].image = image;
+    registeredImages[id].html = html;
+    registeredImages[id].caption = caption;
+
+    if ( preloadCount < numberToPreload ) {
+      var imagePreloader = new Image();
+      imagePreloader.src = image;
+      preloadCount++;
+    }
+  }
+
+  var allPreloaded = 0;
+  var selectedImageID = "original_image";
+  function displayImage( id ) {
+    if ( id == selectedImageID ) return;
+
+    selectedImageID = id;
+
+    document.getElementById('prodImageCell').innerHTML = registeredImages[id].html;
+    document.getElementById('prodImageCaption').innerHTML = registeredImages[id].caption;
+
+    for ( elementID in registeredImages ) {
+      var imageThumbnail = document.getElementById(elementID);
+      if (imageThumbnail != null) {
+	imageThumbnail.style.border = '1px solid #999999';
+      }
+      if ( !allPreloaded ) {
+        var imagePreloader = new Image();
+        imagePreloader.src = registeredImages[elementID].image;
+      }
+    }
+
+    document.getElementById(id).style.border = '1px solid #990000';
+
+    allPreloaded = 1;
+
+
+  }
+</script>
+
+
+
+<script>
+  registerImage("original_image", "http://ecx.images-amazon.com/images/I/5197M28FXXL._SL500_BO2,204,203,200_PIsitb-dp-500-arrow,TopRight,45,-64_OU03_AA240_SH20_.jpg", "<a href="+'"'+"/gp/reader/3473580082/ref=sib_dp_pt#reader-link"+'"'+"><img src="+'"'+"http://ecx.images-amazon.com/images/I/5197M28FXXL._SL500_BO2,204,203,200_PIsitb-dp-500-arrow,TopRight,45,-64_OU03_AA240_SH20_.jpg"+'"'+" id="+'"'+"prodImage"+'"'+" width="+'"'+"240"+'"'+" height="+'"'+"240"+'"'+" onMouseOver="+'"'+"sitb_showLayer('bookpopover'); return false;"+'"'+" onMouseOut="+'"'+"sitb_doHide('bookpopover'); return false;"+'"'+" border="+'"'+"0"+'"'+" alt="+'"'+"Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging."+'"'+"  /></a>", "<br />");
+</script>
+
+<table style="text-align: center;" border="0" cellpadding="0" cellspacing="0" width="240">
+  <tr>
+    <td id="prodImageCell" height="240" width="240"><a href="/gp/reader/3473580082/ref=sib_dp_pt#reader-link"><img src="http://ecx.images-amazon.com/images/I/5197M28FXXL._SL500_BO2,204,203,200_PIsitb-dp-500-arrow,TopRight,45,-64_OU03_AA240_SH20_.jpg" id="prodImage" width="240" height="240" onMouseOver="sitb_showLayer('bookpopover'); return false;" onMouseOut="sitb_doHide('bookpopover'); return false;" border="0" alt="Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging."  /></a></td>
+  </tr>
+  <tr>
+    <td class="tiny">&nbsp;<span id="prodImageCaption"><br /></span>&nbsp;</td>
+  </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td></tr><tr><td valign="top" width="100%">
+
+
+
+
+
+
+
+    
+    
+
+    
+    
+
+
+
+
+
+ 
+
+
+
+
+
+<div class="tiny" style="padding-top: 6px;">
+  <a href="/gp/customer-images/add-image-to-asin.html/ref=cm_ciu_pdp_add?ie=UTF8&rnd=1207387723&asin=3473580082">Für Kunden: Stellen Sie Ihre eigenen Bilder ein.</a>
+</div>
+
+
+
+
+
+
+
+
+
+
+</td></tr><tr><td valign="top" width="100%">
+
+
+
+
+
+
+
+
+
+
+</td></tr><tr><td valign="top" width="100%">
+
+
+
+<div class="tiny" style="padding-top: 6px;">
+  <a href="/gp/reader/3473580082/ref=sib_dp_pt#reader-link">Hier reinlesen und suchen</a>
+</div>
+</td></tr></table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="buying">
+  <b class="sans"><span id="btAsinTitle">Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging. (Taschenbuch)</span> </b><br />
+  
+
+
+
+von <a href="/exec/obidos/search-handle-url?%5Fencoding=UTF8&search-type=ss&index=books-de&field-author=Morton%20Rhue">Morton Rhue</a> (Autor)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <br />
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="tiny">
+        <script type='text/javascript'>
+          var reviewHistPing =
+            function() {
+              reviewHistDU.requestUpdate('', '', '', null, null, null, false);
+            };
+        </script>
+      
+          <script type='text/javascript'>
+            n2RunThisWhen( 'lastlibraryloaded', 
+                           function() {
+                             reviewHistDU = new N2DynUpObject('reviewHistDU');
+                             reviewHistDU.setHandler('/gp/customer-reviews/common/du/recordHistoPop', 'sd');
+                             reviewHistDU.setTargetElementID('ignoreReviewHistoDiv');
+                             reviewHistDU.cacheResponses(false);
+
+                             return false;
+                           },
+                           'init everything else'
+                         );
+          </script>
+
+          <div id="ignoreReviewHistoDiv" style="display:none;">&nbsp;</div>
+        
+        <script type='text/javascript'>
+          n2RunThisWhen('lastlibraryloaded', 
+                         function() {
+                           // instantiate a popover object
+                           reviewHistoPopObj_3473580082 = new N2SimplePopover();
+
+                           reviewHistoPopObj_3473580082.initialize(
+                             'reviewHistoPop_3473580082',
+                             'reviewHistoPopObj_3473580082'
+                           );
+
+                           // register popup feature with the events framework
+                           goN2Events.registerFeature(
+                             'reviewHistoPop_3473580082',
+                             'reviewHistoPopObj_3473580082',
+                             'n2MouseOverHotspot',
+                             'n2MouseOutHotspot'
+                           );
+
+                           reviewHistoPopObj_3473580082.locateAt('below', 'r', 0);
+                           reviewHistoPopObj_3473580082.configureAnimation(null, null, null, null);
+                           reviewHistoPopObj_3473580082.setCallback('afterShow', reviewHistPing);
+                         },
+                         'review histo rollover'
+                       );
+        </script>
+
+        <div id="reviewHistoPopDivID_3473580082" style="display:none;">
+          <table border="0" cellspacing="5" cellpadding="0" bgcolor="eeeecc"><tr><td>
+            <table border="0" cellspacing="5" cellpadding="5" bgcolor="ffffff"><tr><td>
+              <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="display:block; text-align:center; padding-bottom: 5px;" class="tiny">
+  <b>191 Rezensionen</b>
+</div>
+<table border="0" cellspacing="1" cellpadding="0" align="center">
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_5?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F5&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">5 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="61%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="37" alt="61%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(118)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_4?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F4&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">4 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="20%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="12" alt="20%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(39)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_3?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F3&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">3 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="8%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="5" alt="8%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(17)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_2?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F2&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">2 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="2%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="1" alt="2%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(4)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_1?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">1 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="6%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="4" alt="6%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(13)</td>
+</tr>
+</table>
+<br />
+<span class="tiny"><b><a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_pop_hist_all?ie=UTF8&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/orange-arrow._V46860966_.gif" width="11" height="12" border="0" />Alle 191 Kundenrezensionen ansehen</a></b></span>
+</div>
+              <div class="tiny" id="cdReviewsLinkDiv_3473580082"></div>
+            </td></tr></table>
+          </td></tr></table>
+        </div>
+      <span style="white-space: nowrap;"><a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_img?ie=UTF8&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews" name="reviewHistoPop_3473580082|he|reviewHistoPopDivID_3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-5._V7080947_.gif" width="55" alt="4.3 von 5 Sternen" align="absbottom" height="12" border="0" /></a>&nbsp;<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_img?ie=UTF8&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews" name="reviewHistoPop_3473580082|he|reviewHistoPopDivID_3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/carrot._V29439910_.gif" width="11" align="absbottom" alt="191 Kundenrezensionen" height="11" border="0" /></a>&nbsp;(<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=dp_top_cm_cr_acr_txt?ie=UTF8&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">191 Kundenrezensionen</a>)</span></span><hr noshade="noshade" size="1" />
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" >
+
+<tr><td valign="top" width="100%">
+    
+    
+
+
+
+    
+
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="buying" id="priceBlock">
+
+<table class="product">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <tr>
+    <td class="productLabel">Preis:</td>
+    <td><b class="price">EUR 5,95</b>
+
+    
+
+      
+
+
+
+<span class="tiny" style="color: #cc6600; font-weight: bold;">Kostenlose Lieferung.</span><span class="tiny"> <a href="/exec/obidos/tg/browse/-/504950//ref=gp_dp_fs_1" >Siehe Details.</a></span>
+
+
+</td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</td></tr><tr><td valign="top" width="100%">
+  
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="buying">
+<b>Verfügbarkeit:</b> 
+Auf Lager. Verkauf und Versand durch <b>Amazon.de</b>. Geschenkverpackung verfügbar.
+ Zustellung durch <img src="http://g-ecx.images-amazon.com/images/G/03/general/dhl-logo-square._V46900999_.gif" width="45" height="10" border="0" />.
+</div>
+<br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</td></tr><tr><td valign="top" width="100%"></td></tr><tr><td valign="top" width="100%">
+
+  
+
+  
+  
+  
+  
+
+
+    
+
+
+
+
+
+  
+    
+    
+
+
+  
+  
+
+    
+  
+
+  
+  
+
+    
+    
+  
+
+    
+    
+    
+  
+
+
+    
+
+
+
+
+
+      
+      
+
+    
+      
+      
+
+    
+    
+
+
+    
+  
+  
+      
+    
+    
+  
+
+
+
+
+
+
+
+<div  id="ftMessage" class="buying" >
+
+<b>Lieferung bis Montag, 7. April:</b>
+
+<input type="hidden" name="promise-promised-shipoption.3473580082" value="exp-de-timed" />
+Wählen Sie an der Kasse <b>Overnight-Express</b>.
+
+
+
+
+<a href=/b/ref=ftinfo_dp_?ie=UTF8&node=15993321>Siehe Details.</a>
+
+
+<br />
+<br />
+<input type="hidden" name="promise-type" value="1-click" />
+<input type="hidden" name="promise-item.3473580082" value="1207600200" />
+<input type="hidden" name="promise-cutoff-time.3473580082" value="1207416600" />
+</div>
+    <script language="Javascript1.2" type="text/javascript">  
+    
+  var timerDiv=document.getElementById("ftMessageTimer");
+    if (timerDiv && timerDiv.style)
+		timerDiv.style.display='inline';			   
+    </script>
+    
+
+
+</td></tr><tr><td valign="top" width="100%">
+    </td></tr><tr><td valign="top" width="100%">
+      
+    
+
+
+
+
+
+<div class="buying" id="primaryUsedAndNew">
+  
+
+
+
+
+
+
+ 
+
+
+
+
+<a href="http://www.amazon.de/gp/offer-listing/3473580082/ref=dp_olp_2?ie=UTF8&qid=1207387722&sr=11-1" class="buyAction">
+92 Angebote</a> erhältlich ab <span class="price">EUR 4,92</span><br />
+
+
+
+
+
+
+</div>
+
+</td></tr><tr><td valign="top" width="100%">
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+</td></tr></table>
+
+</form>
+
+
+
+  
+  
+    
+    
+    
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    
+    
+    
+
+    
+    
+    
+
+
+
+
+
+<table border="0" cellspacing="0" cellpadding="0" class="otherEditions">
+ 
+ <tr>
+  <td class="topLeft">
+   <a name="other_editions"/>
+    <table border="0" cellpadding="2" cellspacing="0">
+     <tr bgcolor="#ffffff" valign="top">
+     
+      <td class="tiny" style="font-weight: bold;">Weitere Ausgaben:</td>
+      <td class="tiny" style="font-weight: bold;">Preis:</td>
+      <td class="tiny" style="font-weight: bold;">Weitere Angebote:</td>
+     </tr>
+    <tr bgcolor= #ffffff >
+     <td  class="tiny"  >
+    
+
+
+
+
+<a href="http://www.amazon.de/Welle-Bericht-%C3%BCber-einen-Unterrichtsversuch/dp/347335175X/ref=ed_oe_h?ie=UTF8&qid=1207387722&sr=11-1">Gebundene Ausgabe</a>
+
+    (2. Aufl.)
+     </td>
+     <td class="tinyprice"></td>
+     <td class="tiny"   >
+       <a href="http://s1.amazon.de/exec/varzea/preorder/new/347335175X/ref=oe_order_used">Gebraucht bestellen!</a>
+     </td>
+    </tr>
+    <tr bgcolor= #ffffff >
+     <td  class="tiny"  >
+    
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Morton-Rhue/dp/3473541990/ref=ed_oe_p?ie=UTF8&qid=1207387722&sr=11-1">Taschenbuch</a>
+
+     </td>
+     <td class="tinyprice"></td>
+     <td class="tiny"   >
+       <a href="http://s1.amazon.de/exec/varzea/preorder/new/3473541990/ref=oe_order_used">Gebraucht bestellen!</a>
+     </td>
+    </tr>
+    <tr bgcolor= #ffffff >
+     <td  class="tiny"  >
+    
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-CD-Reinhold-Tritt/dp/3473665517/ref=ed_oe_a?ie=UTF8&qid=1207387722&sr=11-1">Audio CD</a>
+
+     </td>
+     <td class="tinyprice"></td>
+     <td class="tiny"   >
+       <a href="http://s1.amazon.de/exec/varzea/preorder/new/3473665517/ref=oe_order_used">Gebraucht bestellen!</a>
+     </td>
+    </tr>
+    <tr>
+     <td colspan="4" bgcolor="#ffffff" class="tiny">
+      
+
+
+
+
+<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/other-editions/3473580082/ref=dp_ed_all?ie=UTF8&n=299956&s=books&qid=1207387722&sr=11-1">Alle 5 Ausgaben und Formate</a>
+
+     </td>
+    </tr>
+   </table>
+  </td>
+  <td width="13" class="topRight"><div style="width: 13px;">&nbsp;</div></td>
+ </tr>
+ <tr>
+  <td class="bottomLeft"><span style="font-size:4px">&nbsp;</span></td>
+  <td class="bottomRight" height="12"><span style="font-size:4px">&nbsp;</span></td>
+ </tr>             
+</table>
+
+
+
+
+
+
+
+
+
+
+
+      
+    
+
+
+    
+    
+
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+<hr class="bucketDivider" noshade="noshade" size="1" align="left" />
+<div class="bucket" id="AutoBuyXGetY">
+<b class="h1">
+    Unser Vorschlag</b>
+<div class="content">
+<form action="/gp/item-dispatch/ref=pd_bxgy_b_button?ie=UTF8&asin.1=3473580082&bxgyab=1&asin.2=347398311X" method="post" name="BuyXGetYhandleBuy">
+<input name="action" type="hidden" value="addToCart" />
+<input name="session-id" type="hidden" value="302-6409046-2744830" />
+<input name="offeringID.1."
+       type="hidden"
+       value="aEtEpBySPL5bVvjhGPX6TmIhC2CjyWlTw38XJ4fUZv28mXW6lAMkt07n4TZOWJuvmCTcDEPtwkg00IqPMF088A%3D%3D" />
+<input name="offeringID.2"
+       type="hidden"
+       value="TTvSunmElGs922%2F6CEWkY9GU16axO6nyGVqtkAfA1h31rSKvMJZf49lPGNJylOCt%2B%2BEFuQoH7gjTkGqFK9Xcqg%3D%3D" />
+<input name="quantity.1" type="hidden" value="1" />
+<input name="quantity.2" type="hidden" value="1" />
+<p class="bxgy-text">
+Kaufen Sie jetzt diesen Artikel zusammen mit <a href="http://www.amazon.de/Materialien-zur-Unterrichtspraxis-Morton-Welle/dp/347398311X/ref=pd_bxgy_b_text_b?ie=UTF8&qid=1207387722&sr=11-1">Materialien zur Unterrichtspraxis : Morton Rhue 'Die Welle'</a>
+
+
+
+
+
+
+
+von Birgitta Reddig-Korn
+
+
+</p>
+
+
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td>
+<table align="left" border="0" cellpadding="1" cellspacing="2" class="bxgy-bundle">
+<tr align="center">
+<td valign="middle" width="1">
+
+        
+
+
+
+
+<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/3473580082/ref=pd_bxgy_b_img_a?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/5197M28FXXL._SL500_PIsitb-dp-500-arrow,TopRight,45,-64_OU03_SS75_.jpg" alt="Die Welle. Bericht über einen Unterrichtsversuch, der zu weit ging." width="75" height="75" border="0" /></a>
+
+
+</td>
+<td width="1">
+<img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/detail/plus-sign-10x10._V46899395_.gif" width="10" hspace="5" height="10" border="0" />
+</td>
+<td valign="middle" width="1">
+
+        
+
+
+
+
+<a href="http://www.amazon.de/Materialien-zur-Unterrichtspraxis-Morton-Welle/dp/347398311X/ref=pd_bxgy_b_img_b?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/51Z1S8EPXKL._SL500_SS75_.jpg" alt="Materialien zur Unterrichtspraxis : Morton Rhue 'Die Welle'" width="75" height="75" border="0" /></a>
+
+
+</td>
+</tr>
+</table>
+<strong>Amazon-Preis:</strong>
+<span class="price" id="bxgy_buying_price"><strong>EUR 10,90</strong></span><br />
+
+      <input type="image" src="http://g-ecx.images-amazon.com/images/G/03/x-locale/personalization/bxgy/add-both-to-cart-md-pri._V14397068_.gif"  width="183" alt="Beides in den Einkaufswagen" value="addToCart" style="margin-top: 5px; margin-bottom: 5px;" height="22" border="0" />
+
+
+</td>
+</tr>
+</table>
+
+</form>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr noshade="true" size="1" class="bucketDivider" />
+
+<div class="bucket" id="sims.purchase">
+   <a name="similarities"></a>
+   <b class="h1">Kunden, die diesen Artikel gekauft haben, kauften auch:</b>
+
+   <div class="content">
+   
+
+<style>
+  .sims-faceouts .rating-stars {
+    margin: 0 0 0 0;
+    font-size: x-small;
+  }
+
+  .sims-faceouts .rating-stars a,
+  .sims-faceouts .rating-stars a:link {
+    text-decoration: none;
+  }
+
+  .sims-faceouts .rating-stars a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<table class="sims-faceouts"> <tr>
+   <td valign="top" width="20%" id="sims.purchase.3473581720">
+   
+
+
+
+
+<a href="http://www.amazon.de/Ich-knall-euch-Morton-Rhue/dp/3473581720/ref=pd_sim_b_1_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/516XYVNSW5L._SL500_SS90_.jpg" width="90" alt="Ich knall euch ab!" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Ich-knall-euch-Morton-Rhue/dp/3473581720/ref=pd_sim_b_1?ie=UTF8&qid=1207387722&sr=11-1">Ich knall euch ab!</a>
+
+      
+
+
+
+
+
+
+
+von Morton Rhue
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-0._V7080944_.gif" width="55" alt="4.1 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(84)</span>&nbsp;</span>
+   <span class="price">EUR 5,95</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.purchase.3473582557">
+   
+
+
+
+
+<a href="http://www.amazon.de/Boot-Camp-Morton-Rhue/dp/3473582557/ref=pd_sim_b_2_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/51QubnW-J5L._SL500_SS90_.jpg" width="90" alt="Boot Camp" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Boot-Camp-Morton-Rhue/dp/3473582557/ref=pd_sim_b_2?ie=UTF8&qid=1207387722&sr=11-1">Boot Camp</a>
+
+      
+
+
+
+
+
+
+
+von Morton Rhue
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-5-0._V7080946_.gif" width="55" alt="4.8 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(31)</span>&nbsp;</span>
+   <span class="price">EUR 6,95</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.purchase.3150153557">
+   
+
+
+
+
+<a href="http://www.amazon.de/Morton-Rhue-Lekt%C3%BCreschl%C3%BCssel-Kathleen-Ellenrieder/dp/3150153557/ref=pd_sim_b_3_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/314CT1F98TL._SL500_SS90_.jpg" width="90" alt="Morton Rhue: The Wave. Lektüreschlüssel" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Morton-Rhue-Lekt%C3%BCreschl%C3%BCssel-Kathleen-Ellenrieder/dp/3150153557/ref=pd_sim_b_3?ie=UTF8&qid=1207387722&sr=11-1">Morton Rhue: The Wave. Lektüreschlüssel</a>
+
+      
+
+
+
+
+
+
+
+von Kathleen Ellenrieder
+
+
+   </p>
+   <div>
+
+
+
+
+
+   <span class="price">EUR 2,60</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.purchase.3473580147">
+   
+
+
+
+
+<a href="http://www.amazon.de/Die-Wolke-Gudrun-Pausewang/dp/3473580147/ref=pd_sim_b_4_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/5172bzPRi9L._SL500_PIsitb-dp-500-arrow,TopRight,45,-64_OU03_SS90_.jpg" width="90" alt="Die Wolke." height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Die-Wolke-Gudrun-Pausewang/dp/3473580147/ref=pd_sim_b_4?ie=UTF8&qid=1207387722&sr=11-1">Die Wolke.</a>
+
+      
+
+
+
+
+
+
+
+von Gudrun Pausewang
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-0._V7080944_.gif" width="55" alt="4.2 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(110)</span>&nbsp;</span>
+   <span class="price">EUR 5,95</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.purchase.3473582123">
+   
+
+
+
+
+<a href="http://www.amazon.de/Asphalt-Tribe-Kinder-Strasse-Morton/dp/3473582123/ref=pd_sim_b_5_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/51BT2HSNZSL._SL500_SS90_.jpg" width="90" alt="Asphalt Tribe. Kinder der Strasse" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Asphalt-Tribe-Kinder-Strasse-Morton/dp/3473582123/ref=pd_sim_b_5?ie=UTF8&qid=1207387722&sr=11-1">Asphalt Tribe. Kinder der Strasse</a>
+
+      
+
+
+
+
+
+
+
+von Morton Rhue
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-5._V7080947_.gif" width="55" alt="4.7 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(30)</span>&nbsp;</span>
+   <span class="price">EUR 5,95</span>
+   </div>
+   </td>
+</tr> </table>
+
+   
+
+<span class="caretnext">&#155;</span>
+<strong>
+
+
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/1/ref=pd_sexpl_esi">Weitere Artikel entdecken</a>
+:
+</strong>
+
+ <span class="cross-product-sims"> 
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/1/ref=pd_sexpl_s_b?ie=UTF8&pf=book">B&uuml;cher</a>
+ <span class="tiny">(48)</span> </span>  <span class="cross-product-sims"> 
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/1/ref=pd_sexpl_s_m?ie=UTF8&pf=music">Musik</a>
+ <span class="tiny">(2)</span> </span> 
+
+   </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+  
+  
+    
+
+
+
+
+
+
+
+
+    
+
+	
+  	
+    
+
+
+    
+  
+  
+    
+
+
+
+
+    
+    
+    
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+<a name="productDetails" id="productDetails"></a>
+<hr noshade="noshade" size="1" class="bucketDivider" />
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td class="bucket">
+
+<b class="h1">Produktinformation</b><br />
+  <div class="content">
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+
+
+
+<li><b>Taschenbuch:</b> 185 Seiten</li>
+
+
+
+
+
+
+
+<li><b>Verlag:</b> Ravensburger Buchverlag; Auflage: 14., Aufl. (März 1997)</li>
+
+
+
+
+
+
+<li><b>Sprache:</b> Deutsch</li>
+
+
+
+
+
+
+<li><b>ISBN-10:</b> 3473580082</li>
+<li><b>ISBN-13:</b> 978-3473580088</li>
+
+
+
+                                                                                
+
+                                                                                
+<li><b>
+Größe und/oder Gewicht: 
+</b>
+18 x 12,4 x 2 cm
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li><b>Durchschnittliche Kundenbewertung:</b> <span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-5._V7080947_.gif" width="55" alt="4.3 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(191 Kundenrezensionen)</span></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li id="SalesRank">
+<b>Amazon.de Verkaufsrang:</b> #5 in B&uuml;cher (Die <a href="/gp/bestsellers/books/ref=pd_dp_ts_b_1">Bestseller B&uuml;cher</a>)<p style="margin: 5px 0pt 5px 20px;">Beliebt in diesen Kategorien: </p><table style="margin-left: 20px;" border="0" cellpadding="0" cellspacing="0"><tr valign="top"><td align="right"><nobr>#1 in </nobr></td><td align="left">&nbsp;<a href="/gp/bestsellers/books/ref=pd_zg_hrsr_b_1_1">B&uuml;cher</a> &gt; <a href="/gp/bestsellers/books/143/ref=pd_zg_hrsr_b_1_2">Politik & Geschichte</a> &gt; <a href="/gp/bestsellers/books/15777331/ref=pd_zg_hrsr_b_1_3">Politikwissenschaft</a> &gt; <b><a href="/gp/bestsellers/books/15777341/ref=pd_zg_hrsr_b_1_4_last">Politische Theorien</a></b></td></tr><tr valign="top"><td align="right"><nobr>#1 in </nobr></td><td align="left">&nbsp;<a href="/gp/bestsellers/books/ref=pd_zg_hrsr_b_2_1">B&uuml;cher</a> &gt; <a href="/gp/bestsellers/books/280652/ref=pd_zg_hrsr_b_2_2">Kinder- & Jugendbücher</a> &gt; <b><a href="/gp/bestsellers/books/280857/ref=pd_zg_hrsr_b_2_3_last">Romane & Erzählungen</a></b></td></tr><tr valign="top"><td align="right"><nobr>#1 in </nobr></td><td align="left">&nbsp;<a href="/gp/bestsellers/books/ref=pd_zg_hrsr_b_3_1">B&uuml;cher</a> &gt; <a href="/gp/bestsellers/books/280652/ref=pd_zg_hrsr_b_3_2">Kinder- & Jugendbücher</a> &gt; <a href="/gp/bestsellers/books/280686/ref=pd_zg_hrsr_b_3_3">Nach Ländern</a> &gt; <b><a href="/gp/bestsellers/books/280692/ref=pd_zg_hrsr_b_3_4_last">Amerika</a></b></td></tr></table>
+<br />
+<div class="tiny">
+(Verleger und Autoren: <a href="/makemoney">Erhöhen Sie Ihre Verkäufe</a>)
+</div>
+
+</li>
+
+
+
+
+
+
+<li><b>Weitere Ausgaben:</b> 
+
+
+
+
+<a href="http://www.amazon.de/Welle-Bericht-%C3%BCber-einen-Unterrichtsversuch/dp/347335175X/ref=ed_oe_h?ie=UTF8&qid=1207387722&sr=11-1">Gebundene Ausgabe</a>
+ (2. Aufl.)&nbsp;|&nbsp;
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Erl%C3%A4uterungen-Materialien-Lernmaterialien/dp/3804418058/ref=ed_oe_p?ie=UTF8&qid=1207387722&sr=11-1">Taschenbuch</a>
+ (3., unveränd. Aufl.)&nbsp;|&nbsp;
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-CD-Reinhold-Tritt/dp/3473665517/ref=ed_oe_a?ie=UTF8&qid=1207387722&sr=11-1">Audio CD</a>
+&nbsp;|&nbsp;
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Cassette-Reinhold-Tritt/dp/3473661651/ref=ed_oe_a?ie=UTF8&qid=1207387722&sr=11-1">Hörkassette</a>
+&nbsp;|&nbsp;
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Ab-6640-370/dp/3473515019/ref=ed_oe_o?ie=UTF8&qid=1207387722&sr=11-1">Broschiert</a>
+ (13. Aufl.)&nbsp;|&nbsp;
+
+
+
+
+<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/other-editions/3473580082/ref=dp_ed_all?ie=UTF8&qid=1207387722&sr=11-1">Alle Ausgaben</a>
+</li><br />
+
+
+
+
+
+
+        
+    
+        
+    
+        
+    <P><div class="bucket">&nbsp;Möchten Sie die <b><a href="/gp/gfix/welcome.html/ref=idq_product_details?ie=UTF8&storeID=books&ASIN=3473580082&merchantID=A3JWKAKR8XB7XF">Produktinformationen aktualisieren</a></b> oder <b><a href="/gp/gfix/imageCorrection.html/ref=idq_product_details?ie=UTF8&storeID=books&ASIN=3473580082&merchantID=A3JWKAKR8XB7XF">Feedback zu den Produktabbildungen geben</a></b>? (Bitte melden Sie sich an, damit wir Sie ggf. kontaktieren können.)</div></P>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+<li><b>
+
+
+
+
+<a href="http://www.amazon.de/gp/product/toc/3473580082/sr=11-1/qid=1207387722/ref=dp_toc?ie=UTF8&n=299956&qid=1207387722&sr=11-1">Komplettes Inhaltsverzeichnis ansehen</a>
+</b></li>
+
+</ul>
+
+<ul class="linkBullets">
+
+
+
+
+
+
+
+</ul>
+
+<span class="tiny">
+<ul class="noteBullets">
+
+
+
+
+
+
+
+
+
+
+</ul>
+</span>
+
+  </div>
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+<hr noshade="true" size="1" class="bucketDivider" />
+<div class="bucket" id="productDescription">
+ <b class="h1">Produktbeschreibungen</b><br />
+
+<div class="content">
+  
+
+      <b>Aus der Amazon.de-Redaktion</b><br />
+  W&#228;re <i>Die Welle</i> ein Roman, man k&#246;nnte den Inhalt des Buchs kaum glauben. Aber so (oder doch zumindest &#228;hnlich) ist es wirklich passiert, in der Klasse des Lehrers Ron Jones in den USA -- einer Klasse an einer Schule also, die sich so weit weg w&#228;hnte vom deutschen Nazi-Terror, und die dann doch auf schmerzliche Weise am eigenen Leib erfahren musste, dass die Regeln des Faschismus auch heute noch funktionieren und dass es jeden treffen kann.<p>  In <i>Die Welle</i> beginnt alles mit einem Film &#252;ber den Holocaust. Der junge Lehrer Ben Ross zeigt den Sch&#252;lern der Gordon High School Bilder von ausgermergelten Juden im Konzentrationslager. Alle sind angewidert und entsetzt, aber eine Gruppe um Laurie Saunders von der Sch&#252;lerzeitung "Die Ente" kann und will nicht glauben, dass Menschen zu derlei Grausamkeiten &#252;berhaupt f&#228;hig sind. Um sie und andere zu &#252;berzeugen, startet Ross ein Experiment, dass auf fast unbemerkte Art und Weise Methoden der Diktatur installiert. Und pl&#246;tzlich zerf&#228;llt der Klassenverbund in Opfer und T&#228;ter -- bis die Situation auf schreckliche Weise eskaliert.<p>  Inzwischen geh&#246;rt <i>Die Welle</i> des 55-j&#228;hrigen Autors <a href="/exec/obidos/exact-author=Rhue%2c%20Morton/${0}">Morton Rhue</a> (<a href="/exec/obidos/ASIN/3473581720/${0}"><i>Ich knall euch ab!</i></a>, <a href="/exec/obidos/ASIN/3473582123/${0}"><i>Asphalt Tribe</i></a>) zum Kanon auch an deutschen Schulen. Und das ist gut so. Denn das Buch r&#228;umt mit dem weit verbreiteten Vorurteil auf, dass der Nationalsozialismus ein historisches Ph&#228;nomen war, das nicht wiederkommen kann. "Wie kann man Millionen von Menschen abschlachten, ohne dass jemand etwas davon wei&#223;?" Auch wenn <i>Die Welle</i> Fragen wie diese nicht beantworten kann, so wirft der Roman sie doch auf. Umso wichtiger ist seine Lekt&#252;re. <i>--Isa Gerck</i>
+   
+<br /><br />
+      <b><a href="http://www.kulturnews.de/amazon/index.html">kulturnews.de</a></b><br />
+  Im Kino l&auml;uft gerade die Verfilmung von Morton Rhues "Die Welle", dem Lekt&uuml;reklassiker &uuml;ber ein au&szlig;er Kontrolle geratenes Schulprojekt zum Thema Autokratie. Ein guter Zeitpunkt, um die in den 80er-Jahren ver&ouml;ffentlichte Geschichte auch als H&ouml;rst&uuml;ck auf den Markt zu bringen. Dieses Zwei-CD-H&ouml;rspiel ist allerdings keine eigenst&auml;ndige Produktion, sondern ein reines Nebenprodukt des Films: Originale Filmdialoge wurden inklusive der atmosph&auml;rischen Ger&auml;uschkulisse zusammengeschnitten; als Erz&auml;hler fungiert Stefan Kaminski, der die Gespr&auml;chsfetzen miteinander verbindet und Teile der Handlung zusammenfasst. Grunds&auml;tzlich funktioniert das sehr gut, auch wenn man ein wenig braucht, um die Stimmen den Charakteren zuzuordnen. Was nervt, ist der Vortrag Kaminskis: Er klingt so betulich wie die Sprecher alter Kinderh&ouml;rspielkassetten. Da die Story eh eine sehr junge ist, verleiht das dem gesamten H&ouml;rspiel den Anstrich einer Produktion, die allenfalls in Jugend- oder Klassenzimmern Geh&ouml;r findet. (jul)
+   
+<br /><br /><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/orange-arrow._V46860966_.gif" width="11" class="icon" height="12" border="0" /><b>
+
+
+
+
+<a href="http://www.amazon.de/gp/product/product-description/3473580082/sr=11-1/qid=1207387722/ref=dp_proddesc_0?ie=UTF8&n=299956&s=books&qid=1207387722&sr=11-1">Alle Produktbeschreibungen</a>
+</b>  </div>
+</div>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr noshade="true" size="1" class="bucketDivider" />
+
+<div class="bucket" id="sims.session">
+   <a name="similarities"></a>
+   <b class="h1">Kunden, die diesen Artikel angesehen haben, haben auch angesehen:</b>
+
+   <div class="content">
+   
+
+<style>
+  .sims-faceouts .rating-stars {
+    margin: 0 0 0 0;
+    font-size: x-small;
+  }
+
+  .sims-faceouts .rating-stars a,
+  .sims-faceouts .rating-stars a:link {
+    text-decoration: none;
+  }
+
+  .sims-faceouts .rating-stars a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<table class="sims-faceouts"> <tr>
+   <td valign="top" width="20%" id="sims.session.3473582832">
+   
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Roman-zum-Film/dp/3473582832/ref=pd_sbs_b_1_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/31tnq0arnbL._SL500_SS90_.jpg" width="90" alt="Die Welle - Der Roman zum Film." height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Roman-zum-Film/dp/3473582832/ref=pd_sbs_b_1?ie=UTF8&qid=1207387722&sr=11-1">Die Welle - Der Roman zum Film.</a>
+
+      
+
+
+
+
+
+
+
+von Kerstin Winter
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-5-0._V7080946_.gif" width="55" alt="5.0 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(2)</span>&nbsp;</span>
+   <span class="price">EUR 6,95</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.session.3832180575">
+   
+
+
+
+
+<a href="http://www.amazon.de/Feuchtgebiete-Charlotte-Roche/dp/3832180575/ref=pd_sbs_b_2_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/31dmrNZQFTL._SL500_SS90_.jpg" width="90" alt="Feuchtgebiete" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Feuchtgebiete-Charlotte-Roche/dp/3832180575/ref=pd_sbs_b_2?ie=UTF8&qid=1207387722&sr=11-1">Feuchtgebiete</a>
+
+      
+
+
+
+
+
+
+
+von Charlotte Roche
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-2-5._V7080950_.gif" width="55" alt="2.7 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(280)</span>&nbsp;</span>
+   <span class="price">EUR 14,90</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.session.3473543152">
+   
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Jubil%C3%A4umsausgabe-Morton-Rhue/dp/3473543152/ref=pd_sbs_b_3_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/51Sbb9pQ8zL._SL500_SS90_.jpg" width="90" alt="Die Welle, Jubiläumsausgabe" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Die-Welle-Jubil%C3%A4umsausgabe-Morton-Rhue/dp/3473543152/ref=pd_sbs_b_3?ie=UTF8&qid=1207387722&sr=11-1">Die Welle, Jubiläumsausgabe</a>
+
+      
+
+
+
+
+
+
+
+von Morton Rhue
+
+
+   </p>
+   <div>
+
+
+
+
+
+   <span class="price"></span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.session.3404605969">
+   
+
+
+
+
+<a href="http://www.amazon.de/Generation-Doof-Stefan-Bonner/dp/3404605969/ref=pd_sbs_b_4_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/4159zTONfCL._SL500_SS90_.jpg" width="90" alt="Generation Doof" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Generation-Doof-Stefan-Bonner/dp/3404605969/ref=pd_sbs_b_4?ie=UTF8&qid=1207387722&sr=11-1">Generation Doof</a>
+
+      
+
+
+
+
+
+
+
+von Stefan Bonner
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-3-0._V7080945_.gif" width="55" alt="3.1 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(53)</span>&nbsp;</span>
+   <span class="price">EUR 8,95</span>
+   </div>
+   </td>
+   <td valign="top" width="20%" id="sims.session.3785723164">
+   
+
+
+
+
+<a href="http://www.amazon.de/Die-Tore-Welt-Ken-Follett/dp/3785723164/ref=pd_sbs_b_5_img?ie=UTF8&qid=1207387722&sr=11-1"><img src="http://ecx.images-amazon.com/images/I/51GkuQKFt4L._SL500_SS90_.jpg" width="90" alt="Die Tore der Welt" height="90" border="0" /></a>
+
+   <p>
+      
+
+
+
+
+<a href="http://www.amazon.de/Die-Tore-Welt-Ken-Follett/dp/3785723164/ref=pd_sbs_b_5?ie=UTF8&qid=1207387722&sr=11-1">Die Tore der Welt</a>
+
+      
+
+
+
+
+
+
+
+von Ken Follett
+
+
+   </p>
+   <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <span class="rating-stars"><span style="white-space: nowrap;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/ratings/stars-4-0._V7080944_.gif" width="55" alt="4.0 von 5 Sternen" align="absbottom" height="12" border="0" />&nbsp;(48)</span>&nbsp;</span>
+   <span class="price">EUR 24,95</span>
+   </div>
+   </td>
+</tr> </table>
+
+   
+
+<span class="caretnext">&#155;</span>
+<strong>
+
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/2/ref=pd_sexpl_esi">Weitere Artikel entdecken</a>
+:
+</strong>
+
+ <span class="cross-product-sims"> 
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/2/ref=pd_sexpl_s_b?ie=UTF8&pf=book">B&uuml;cher</a>
+ <span class="tiny">(45)</span> </span>  <span class="cross-product-sims"> 
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/2/ref=pd_sexpl_s_d?ie=UTF8&pf=dvd">DVD</a>
+ <span class="tiny">(2)</span> </span>  <span class="cross-product-sims"> 
+
+
+
+
+<a href="/Welle-Bericht-einen-Unterrichtsversuch-ging/sim/3473580082/2/ref=pd_sexpl_s_m?ie=UTF8&pf=music">Musik</a>
+ <span class="tiny">(2)</span> </span> 
+
+   </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+<!--
+.indent { 
+    margin-left: 1em; 
+}
+.spacer {
+    padding: 0px;
+    margin-top:  10px;
+    margin-bottom: 10px;
+}
+-->
+</style>
+
+
+<script language='javascript'>
+<!--
+
+function sitb_showLayer(obj) {
+    return;
+}
+
+function sitb_hideLayer(obj) {
+    return;
+}
+
+function sitb_doHide(obj) {
+    return;
+}
+
+function sitb_getLayer(obj) {
+    return;
+}
+
+//-->
+</script>
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+<div class="bucket">
+<b class="h1">In diesem Buch</b>
+  <span class="tiny">
+   <a href="/exec/obidos/tg/browse/-/14208211">(Mehr dazu</a>)</a> 
+  </span>
+
+
+  <div class="content">
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+
+<b>Ausgewählte Seiten ansehen</b><br />
+<a href="/gp/reader/3473580082/ref=sib_dp_bod_fc?ie=UTF8&p=S001#reader-link">Buchdeckel</a> | <a href="/gp/reader/3473580082/ref=sib_dp_bod_cr?ie=UTF8&p=S006#reader-link">Copyright</a> | <a href="/gp/reader/3473580082/ref=sib_dp_bod_ex?ie=UTF8&p=S009#reader-link">Auszug</a> | <a href="/gp/reader/3473580082/ref=sib_dp_bod_bc?ie=UTF8&p=S05G#reader-link">Rückseite</a>
+<div class="spacer"></div>
+
+    
+
+
+
+
+<style type="text/css">
+<!--
+.strip_form {
+  margin: 0;
+  padding: 0;
+}
+
+.strip_form_button {
+  vertical-align: bottom;
+}
+
+.strip_form_title {
+  margin: 0 0 3px;
+  font-weight: bold;
+}
+-->
+</style>
+
+<form name="strip_form" class="strip_form" method="GET" action="/gp/reader/3473580082/ref=sib_dp_srch_bod">
+  <input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+  <div class="strip_form_title">Hier reinlesen und suchen:</div>
+  <input type="hidden" name="v" value="search-inside" />
+  <input name="keywords" value="" size="22" />
+  <input type="image" src="http://g-ecx.images-amazon.com/images/G/03/buttons/go-t._V45804373_.gif"  width="43" alt="Start!" value="Go!" name="go" class="strip_form_button" height="22" border="0" />
+</form>
+
+  </div>
+</div>
+
+
+ 
+
+
+ 
+
+
+
+
+
+<table border="0" cellpadding="0" cellspacing="0"  align="right">
+
+<tr><td valign="top" width="100%">
+      
+  
+
+
+
+
+
+
+
+
+
+                              
+
+
+
+
+
+
+
+</td></tr></table>
+
+  
+
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+        
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+a.areaLink, a.areaLink:visited {
+        text-decoration: none;
+        color: black;
+        display: block;
+}
+.areaLink .innerLink {
+        white-space: nowrap;
+        text-decoration: underline;
+        color: #039;
+}
+.crBlueBorder-tl {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-tl.jpg) no-repeat top left;
+  width:       1em;
+}
+.crBlueBorder-tc {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-tc.jpg) repeat-x top;
+  height:      1px;
+}
+.crBlueBorder-tr {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-tr.jpg) no-repeat top right;
+  width:       1em;
+}
+.crBlueBorder-bl {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-bl.jpg) no-repeat bottom left;
+  width:       1em;
+}
+.crBlueBorder-bc {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-bc.jpg) repeat-x bottom;
+  height:      1px;
+}
+.crBlueBorder-br {
+  background:  url( http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/border-box-br.jpg) no-repeat bottom right;
+  height:      1em;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr align="left" noshade="true" size="1" class="bucketDivider" />
+<a name="customerReviews">&nbsp;</a>
+<div class="bucket" id="customerReviews">
+  <b class="h1">Kundenrezensionen</b>
+  <div class="content" >
+    <table width="94%" border="0" cellspacing="0" cellpadding="0">
+
+    <tr valign="top">
+    <td align="left">
+      <table border="0" cellspacing="0" cellpadding="0">
+      <tr>
+      <td valign="top">
+        <div style="margin-top:2px; margin-bottom:10px;">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="display:block; text-align:center; padding-bottom: 5px;" class="tiny">
+  <b>191 Rezensionen</b>
+</div>
+<table border="0" cellspacing="1" cellpadding="0" align="left">
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_hist_5?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F5&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">5 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="61%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="37" alt="61%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(118)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_hist_4?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F4&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">4 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="20%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="12" alt="20%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(39)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_hist_3?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F3&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">3 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="8%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="5" alt="8%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(17)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_hist_2?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F2&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">2 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="2%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="1" alt="2%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(4)</td>
+</tr>
+<tr>
+<td align="left" class="tiny" style="padding-right:0.5em;padding-bottom:1px;white-space:nowrap;">
+  <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_hist_1?ie=UTF8&customer-reviews.sort%5Fby=byExactRating%5F1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">1 Stern</a>:
+</td>
+<td style="min-width:60;" width="60" align="left" bgcolor="eeeecc" class="tiny" title="6%"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/1x1-ffcc66._V29439660_.gif" width="4" alt="6%" height="13" border="0" /></td>
+<td align="right" class="tiny">&nbsp;(13)</td>
+</tr>
+<tr><td>&nbsp;</td><td><div style="width:60px;">&nbsp;</div></td><td>&nbsp;</td></tr>
+</table>
+
+        </div>
+      </td>
+      <td width="10%">
+        <div style="width:1em;">&nbsp;</div>
+      </td>
+      <td valign="top">
+        <div style="height:21px;">&nbsp;</div>
+        <div>
+          <b>Durchschnittliche Kundenbewertung</b>
+        </div>
+        <div style="margin-left:-5px; white-space:nowrap;">
+          <img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-4-5._V46906003_.gif" width="64" height="12" border="0" />(<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_all_summary?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1#customerReviews">191 Kundenrezensionen</a>)
+        </div>
+      </td>
+      </tr>
+      </table>&nbsp;
+    </td>
+    <td><div style="width: 12px;">&nbsp;</div></td>
+    <td>
+      <div style="height:21px;">&nbsp;</div>
+      <div class="tiny" style="margin-bottom:3px; white-space:nowrap;">
+        Sagen Sie Ihre Meinung zu diesem Artikel:
+      </div>
+      <div>
+        <a href="http://www.amazon.de/review/create-review/ref=cm_cr_dp_wr_but_right?ie=UTF8&asin=3473580082&store=books"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/btn-write-own-review-md._V32561870_.gif" width="204" align="absmiddle" alt="Schreiben Sie eine Online-Rezension" height="22" border="0" /></a>
+      </div>
+    </td>
+    </tr>
+
+    <tr>
+    <td valign="top">
+      <b class="h3color">Die hilfreichsten Kundenrezensionen</b><br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BOUNDARY -->
+<a name="R39683S2KWAEFO"></a><br />
+
+<table cellpadding="0" cellspacing="0" border="0" >
+  <tr>
+    <td width="0" valign="top" align="right">
+      &nbsp;
+    </td>
+    <td valign="top" align="left" width="100%">
+      <div style="margin-bottom:0.5em;">
+        16 von 18 Kunden fanden die folgende Rezension hilfreich:
+      </div>
+      <div style="margin-bottom:0.5em;">
+        <span style='margin-left: -5px;'><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+        <b>Es hätte uns im Unterricht geholfen</b>, <nobr>12. Dezember 2006</nobr>
+      </div>
+      <div style="margin-bottom:0.5em;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr><td valign="top">Von&nbsp;</td><td><a  href="http://www.amazon.de/gp/pdp/profile/AZGURJDHPS5X9/ref=cm_cr_dp_pdp"><span style = "font-weight: bold;">Countess Culadra "CC"</span></a> (Transilvanien)  - <a href="http://www.amazon.de/gp/cdp/member-reviews/AZGURJDHPS5X9/ref=cm_cr_dp_auth_rev?ie=UTF8&sort%5Fby=MostRecentReview">alle meine Rezensionen ansehen</a></td></tr></table>
+      </div>
+      <div class="tiny" style="margin-bottom:0.5em;">
+        <b><span class="h3color tiny">Diese Rezension stammt von: </span><a href="http://www.amazon.de/gp/product/347354034X/sr=11-1/qid=1207387722/ref=cm_cr_dp_orig_subj?ie=UTF8&qid=1207387722&sr=11-1">Die Welle. ( Ab 13 J.) (Taschenbuch)</a></b>
+      </div>
+
+Als wir in der 10. Klasse die Weltkriege und NS-Zeit behandelten, gab es, ganz wie in der Klasse des Romans hier, einige, die sich fragten: "Wie kam es dazu?" und "Wieso haben so viele einfach mit gemacht?" Ich gehörte nicht zu den Schülern, die das fragten. Aber wohl auch nur deshalb, weil ich zuvor "Die Welle" gelesen hatte und somit zumindest eine Ahnung hatte, was da vor sich ging.<br />"Die Welle" beschreibt die wahren Ereignisse an einer amerikanischen Schule. Es fängt harmlos an, indem auch sie die NS-Zeit durch nehmen und ein Experiment wagt, bei dem jeder einer Gruppe zugeteilt wird und jeder bestimmte Rechte hat (oder sie ihm verwehrt werden). Schnell breitet sich das Experiment auf die ganze Schule aus und scheint zu eskalieren.<br />Ein Ruf: "Stop! Das war nur ein Spiel! Und jetzt sage ich: dass es vorbei ist." hätte nichts genützt. Also muss der Lehrer einen anderen Weg finden, dieses Experiment sinnvoll zu beenden. Seine Lösung ist so einfach wie genial und ich persönlich war trotzdem überrascht.<br />Ein großartiges Buch für den, der mehr erfahren möchten, warum so viele Hitler (scheinbar) willenlos und ohne Fragen gefolgt sind. Bei weitem nicht nur ein Roman für Jugendliche.
+      <div style="padding-top: 10px; clear: both; width: 100%;">
+
+        <a href="http://www.amazon.de/review/R39683S2KWAEFO/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/comment-sm._V22934922_.gif" width="16" alt="Kommentar" hspace="3" align="absmiddle" height="16" border="0" /></a>&nbsp;<a href="http://www.amazon.de/review/R39683S2KWAEFO/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful">Kommentar</a>&nbsp;|&nbsp;<a href="http://www.amazon.de/review/R39683S2KWAEFO/ref=cm_cr_rdp_perm">Kommentar als Link</a>&nbsp;|&nbsp;War diese Rezension für Sie hilfreich?
+
+
+
+
+
+
+
+
+
+<script language="Javascript1.1" type="text/javascript">
+<!--
+
+  function showYesNoCommunityResponse(uId,result,value) {
+    var msgLayer = getElement("thanks" + uId);
+    if ( result == "SUCCESS" ) {
+      msgLayer.innerHTML = "Vielen Dank für Ihre Meinung, die Sie anderen Amazon.de-Lesern und -Rezensenten kundgetan haben. Ihre Stimme wird gezählt und erscheint innerhalb der nächsten 24 Stunden auf der Produktseite";
+    } else {
+      showVoteErrorResponse(msgLayer,result,value);
+    }
+  }
+
+//-->
+</script>
+
+
+
+
+
+<span style="margin-left:-3px;">
+
+
+
+
+
+
+
+<iframe src="" name="YesNoVotingFrame_2115R39683S2KWAEFOHelpfulReviews1" id="YesNoVotingFrame_2115R39683S2KWAEFOHelpfulReviews1" height=0 width=0 style="visibility:hidden;"></iframe>
+<nobr><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&2115%7CR39683S2KWAEFO.contentAssoc.2.id=B000B4FMLW&2115%7CR39683S2KWAEFO.contentAssoc.1.id=AZGURJDHPS5X9&type=pipeline&2115%7CR39683S2KWAEFO.contentAssoc.2.type=ProductSet&uid=2115R39683S2KWAEFOHelpfulReviews1&uri=%2Fgp%2Fproduct%2F3473580082&2115%7CR39683S2KWAEFO.contentAssoc.1.type=AmazonCustomer&2115%7CR39683S2KWAEFO.contentAssoc.1=1&2115%7CR39683S2KWAEFO.contentAssoc.2=1&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR39683S2KWAEFO&label=Helpful&qk=qid%7Cref%5F%7Csr&ifRes=showYesNoCommunityResponse&context=Reviews&needsSignIn=1&voteValue=1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-yes-tiny._V45803865_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Ja" height="14" border="0" /></a><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&2115%7CR39683S2KWAEFO.contentAssoc.2.id=B000B4FMLW&2115%7CR39683S2KWAEFO.contentAssoc.1.id=AZGURJDHPS5X9&type=pipeline&2115%7CR39683S2KWAEFO.contentAssoc.2.type=ProductSet&uid=2115R39683S2KWAEFOHelpfulReviews1&uri=%2Fgp%2Fproduct%2F3473580082&2115%7CR39683S2KWAEFO.contentAssoc.1.type=AmazonCustomer&2115%7CR39683S2KWAEFO.contentAssoc.1=1&2115%7CR39683S2KWAEFO.contentAssoc.2=1&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR39683S2KWAEFO&label=Helpful&qk=qid%7Cref%5F%7Csr&ifRes=showYesNoCommunityResponse&context=Reviews&needsSignIn=1&voteValue=-1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-no-tiny._V45805178_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Nein" height="14" border="0" /></a></nobr>
+
+
+
+
+
+
+</span><span class="tiny"><nobr>
+
+
+
+
+
+
+
+(<a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_inapp?ie=UTF8&2115%7CR39683S2KWAEFO.contentAssoc.2.id=B000B4FMLW&2115%7CR39683S2KWAEFO.contentAssoc.1.id=AZGURJDHPS5X9&type=pipeline&2115%7CR39683S2KWAEFO.contentAssoc.2.type=ProductSet&uri=%2Fgp%2Fproduct%2F3473580082&template=inappropriate&2115%7CR39683S2KWAEFO.contentAssoc.1.type=AmazonCustomer&2115%7CR39683S2KWAEFO.contentAssoc.1=1&2115%7CR39683S2KWAEFO.contentAssoc.2=1&response=report&qv=1207387722%7Csr%5F11%5F1%7C11-1&voteValue=1&contentId=2115%7CR39683S2KWAEFO&label=Inappropriate&qk=qid%7Cref%5F%7Csr&context=Reviews">Rezension unzumutbar?</a>)</nobr></span>
+<br /><br />
+      </div>
+      <br />
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BOUNDARY -->
+<a name="R2G812EMW3LJFS"></a><br />
+
+<table cellpadding="0" cellspacing="0" border="0" >
+  <tr>
+    <td width="0" valign="top" align="right">
+      &nbsp;
+    </td>
+    <td valign="top" align="left" width="100%">
+      <div style="margin-bottom:0.5em;">
+        31 von 36 Kunden fanden die folgende Rezension hilfreich:
+      </div>
+      <div style="margin-bottom:0.5em;">
+        <span style='margin-left: -5px;'><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+        <b>Unbedingt lesen</b>, <nobr>13. Januar 2000</nobr>
+      </div>
+      <div style="margin-bottom:0.5em;">
+        Von <b>Ein Kunde</b><br />
+      </div>
+
+Eine faszinierende und beängstigende Lektüre zugleich ist &bdquo;Die Welle&quot; von Morton Rhue. Kaum jemand kann sich heute noch vorstellen, wie es den Machthabenden im Dritten Reich gelungen ist das Volk dermaßen zu  beeinflussen, daß es in diesem Maße auf deren Parolen hörte. Diese  Geschichte erzählt von einem Lehrer, der in seiner Klasse ein Experiment  durchführt, welches auf ähnliches hinausläuft. Der ganze Unterricht wird  nach strengen Regeln abgehalten und eine bestimmte Rangordnung setzt sich  unter den Schülern fest. Dieses Buch soll den Leser zum Nachdenken anregen.  Die Gefahr, sich von anderen manipulieren zu lassen, ist in einer Zeit der  Massenmedien immer gegeben. Wer schon einmal auf Massenkundgebungen war hat  solche Effekte der Manipulation sicher schon einmal erlebt. Der Autor will  mit seinem Buch andeuten, daß die Manipulation der Massen bei uns jederzeit  wieder möglich ist. Ein Buch das jeder einmal gelesen haben sollte. &lt;font size="-1" face="geneva, arial, helvetica">(Dies ist eine &lt;b>Amazon.de an der Uni&lt;/b>-Studentenrezension.)&lt;/font>
+      <div style="padding-top: 10px; clear: both; width: 100%;">
+
+        <a href="http://www.amazon.de/review/R2G812EMW3LJFS/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/comment-sm._V22934922_.gif" width="16" alt="Kommentar" hspace="3" align="absmiddle" height="16" border="0" /></a>&nbsp;<a href="http://www.amazon.de/review/R2G812EMW3LJFS/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful">Kommentar</a>&nbsp;|&nbsp;<a href="http://www.amazon.de/review/R2G812EMW3LJFS/ref=cm_cr_rdp_perm">Kommentar als Link</a>&nbsp;|&nbsp;War diese Rezension für Sie hilfreich?
+
+
+
+
+
+
+<span style="margin-left:-3px;">
+
+
+
+<iframe src="" name="YesNoVotingFrame_2115R2G812EMW3LJFSHelpfulReviews2" id="YesNoVotingFrame_2115R2G812EMW3LJFSHelpfulReviews2" height=0 width=0 style="visibility:hidden;"></iframe>
+<nobr><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&type=pipeline&uid=2115R2G812EMW3LJFSHelpfulReviews2&uri=%2Fgp%2Fproduct%2F3473580082&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2G812EMW3LJFS&label=Helpful&qk=qid%7Cref%5F%7Csr&ifRes=showYesNoCommunityResponse&context=Reviews&needsSignIn=1&voteValue=1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-yes-tiny._V45803865_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Ja" height="14" border="0" /></a><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&type=pipeline&uid=2115R2G812EMW3LJFSHelpfulReviews2&uri=%2Fgp%2Fproduct%2F3473580082&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2G812EMW3LJFS&label=Helpful&qk=qid%7Cref%5F%7Csr&ifRes=showYesNoCommunityResponse&context=Reviews&needsSignIn=1&voteValue=-1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-no-tiny._V45805178_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Nein" height="14" border="0" /></a></nobr>
+
+
+
+
+
+
+</span><span class="tiny"><nobr>
+
+
+
+(<a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_inapp?ie=UTF8&type=pipeline&uri=%2Fgp%2Fproduct%2F3473580082&template=inappropriate&response=report&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2G812EMW3LJFS&voteValue=1&label=Inappropriate&qk=qid%7Cref%5F%7Csr&context=Reviews">Rezension unzumutbar?</a>)</nobr></span>
+<br /><br />
+      </div>
+      <br />
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BOUNDARY -->
+<a name="R2L8XWCY9S4SG1"></a><br />
+
+<table cellpadding="0" cellspacing="0" border="0" >
+  <tr>
+    <td width="0" valign="top" align="right">
+      &nbsp;
+    </td>
+    <td valign="top" align="left" width="100%">
+      <div style="margin-bottom:0.5em;">
+        24 von 28 Kunden fanden die folgende Rezension hilfreich:
+      </div>
+      <div style="margin-bottom:0.5em;">
+        <span style='margin-left: -5px;'><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+        <b>Standartwerk.</b>, <nobr>25. November 2006</nobr>
+      </div>
+      <div style="margin-bottom:0.5em;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr><td valign="top">Von&nbsp;</td><td><a  href="http://www.amazon.de/gp/pdp/profile/A35EESVON1JNR1/ref=cm_cr_dp_pdp"><span style = "font-weight: bold;">Lauri Lauren</span></a> (Bayern)  - <a href="http://www.amazon.de/gp/cdp/member-reviews/A35EESVON1JNR1/ref=cm_cr_dp_auth_rev?ie=UTF8&sort%5Fby=MostRecentReview">alle meine Rezensionen ansehen</a></td></tr></table>
+      </div>
+
+Das ist definitiv eines der Buecher, die man eben gelesen haben sollte. Ein Stueck Allgemeinbildung und Horizonterweiterung sozusagen. <br />Es ist in sehr einfacher, teils fast schon primitiver Sprache geschrieben und man hat es sehr schnell durchgelesen. Der Inhalt jedoch, gerade weil er auf wahren Tatsachen basiert, verliert deshalb kaum an Wert. <br />Das Buch regt zum Nachdenken an. Zum Ueberdenken, Nichtvergessen und dazu, sich selbst klar zumachen, was "damals" geschehen ist.<br />Es wirkt aber auch ein Stueck weit appelierend und augenoeffnend. Folge nicht blind, denke selbststaendig und hinterfrage Dinge.<br />Auch wenn es eigentlich ein Jugendbuch ist, schadet es keinem Erwachsenen es zu lesen. Sehr Empfehlenswert.
+      <div style="padding-top: 10px; clear: both; width: 100%;">
+
+        <a href="http://www.amazon.de/review/R2L8XWCY9S4SG1/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/comment-sm._V22934922_.gif" width="16" alt="Kommentar" hspace="3" align="absmiddle" height="16" border="0" /></a>&nbsp;<a href="http://www.amazon.de/review/R2L8XWCY9S4SG1/ref=cm_cr_dp_cmt?%5Fencoding=UTF8&ASIN=3473580082#wasThisHelpful">Kommentar</a>&nbsp;|&nbsp;<a href="http://www.amazon.de/review/R2L8XWCY9S4SG1/ref=cm_cr_rdp_perm">Kommentar als Link</a>&nbsp;|&nbsp;War diese Rezension für Sie hilfreich?
+
+
+
+
+
+
+<span style="margin-left:-3px;">
+
+
+
+<iframe src="" name="YesNoVotingFrame_2115R2L8XWCY9S4SG1HelpfulReviews3" id="YesNoVotingFrame_2115R2L8XWCY9S4SG1HelpfulReviews3" height=0 width=0 style="visibility:hidden;"></iframe>
+<nobr><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.id=A35EESVON1JNR1&2115%7CR2L8XWCY9S4SG1.contentAssoc.2=1&2115%7CR2L8XWCY9S4SG1.contentAssoc.1=1&type=pipeline&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.type=AmazonCustomer&uid=2115R2L8XWCY9S4SG1HelpfulReviews3&uri=%2Fgp%2Fproduct%2F3473580082&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2L8XWCY9S4SG1&label=Helpful&qk=qid%7Cref%5F%7Csr&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.type=ProductSet&ifRes=showYesNoCommunityResponse&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.id=B000B4FMLW&context=Reviews&needsSignIn=1&voteValue=1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-yes-tiny._V45803865_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Ja" height="14" border="0" /></a><a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_voteyn?ie=UTF8&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.id=A35EESVON1JNR1&2115%7CR2L8XWCY9S4SG1.contentAssoc.2=1&2115%7CR2L8XWCY9S4SG1.contentAssoc.1=1&type=pipeline&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.type=AmazonCustomer&uid=2115R2L8XWCY9S4SG1HelpfulReviews3&uri=%2Fgp%2Fproduct%2F3473580082&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2L8XWCY9S4SG1&label=Helpful&qk=qid%7Cref%5F%7Csr&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.type=ProductSet&ifRes=showYesNoCommunityResponse&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.id=B000B4FMLW&context=Reviews&needsSignIn=1&voteValue=-1"><img src="http://g-ecx.images-amazon.com/images/G/03/nav2/dp/btn-no-tiny._V45805178_.gif" width="36" vspace="2" align="absmiddle" hspace="2" alt="Nein" height="14" border="0" /></a></nobr>
+
+
+
+
+
+
+</span><span class="tiny"><nobr>
+
+
+
+(<a href="http://www.amazon.de/gp/vote/ref=cm_cr_dp_inapp?ie=UTF8&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.id=A35EESVON1JNR1&2115%7CR2L8XWCY9S4SG1.contentAssoc.2=1&2115%7CR2L8XWCY9S4SG1.contentAssoc.1=1&type=pipeline&2115%7CR2L8XWCY9S4SG1.contentAssoc.1.type=AmazonCustomer&uri=%2Fgp%2Fproduct%2F3473580082&template=inappropriate&response=report&qv=1207387722%7Csr%5F11%5F1%7C11-1&contentId=2115%7CR2L8XWCY9S4SG1&voteValue=1&label=Inappropriate&qk=qid%7Cref%5F%7Csr&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.type=ProductSet&2115%7CR2L8XWCY9S4SG1.contentAssoc.2.id=B000B4FMLW&context=Reviews">Rezension unzumutbar?</a>)</nobr></span>
+<br /><br />
+      </div>
+      <br />
+    </td>
+  </tr>
+</table>
+
+
+
+      <div style="margin-bottom:5px;">
+      <a href="http://www.amazon.de/review/create-review/ref=cm_cr_dp_wr_but_bottom?ie=UTF8&asin=3473580082&store=books"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/reviews/btn-write-own-review-md._V32561870_.gif" width="204" align="absmiddle" alt="Schreiben Sie eine Online-Rezension" height="22" border="0" /></a>
+    </div>
+    <div>
+      <span class="small"><b><b class="h3color">&rsaquo;</b>&nbsp;<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_all_helpful?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&coliid=&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1&colid=#customerReviews">Alle 191 Kundenrezensionen ansehen</a></b></span>
+    </div>
+    </td>
+    <td><div style="width:3em;">&nbsp;</div>&nbsp;</td>
+    <td width="300" valign="top">
+      <b class="h3color">Die neuesten Kundenrezensionen</b><br />
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- BOUNDARY -->
+<a name="RXBHQ7FL73L62"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#RXBHQ7FL73L62" class="areaLink" title="Vollständige Rezension von G. Sandhaus lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-1-0._V46872228_.gif" width="64" alt="1.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Das einzige gute an dem Buch</b><br />
+          ist die Botschaft und die kommt aus dem US-amerikanischen TV Film.<br />Ansonsten ist das Buch schlecht!
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 6 Tagen von G. Sandhaus veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R2KHXWTCW80PUE"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R2KHXWTCW80PUE" class="areaLink" title="Vollständige Rezension von S. Krause lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-3-0._V46892830_.gif" width="64" alt="3.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Gut schon, aber glaubwürdig...?</b><br />
+          Nachdem ich letzte Woche die Neuverfilmung "Die Welle" gesehen habe, war ich daran interessiert, das Buch, auf dem der Film basiert, zu lesen.
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 10 Tagen von S. Krause veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R1E3VVBSNFKBGB"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R1E3VVBSNFKBGB" class="areaLink" title="Vollständige Rezension von P. Walter lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-1-0._V46872228_.gif" width="64" alt="1.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Das dümmste Buch über den Faschismus</b><br />
+          Was mich aktuell - und schon seit längerem - verwundert, ist die Begeisterung so vieler Lehrer-Kollegen für den Film - und für das Buch, das seit Jahrzehnten als...
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 13 Tagen von P. Walter veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R2NLBI1U9B4KXG"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R2NLBI1U9B4KXG" class="areaLink" title="Vollständige Rezension von mimi möller lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Sehr gutes Buch</b><br />
+          Ich finde das Buch sehr gelungen, da es widerspiegelt wie es wirklich mal in Deutschland war und wie soetwas außer Kontrolle geraten kann.
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 19 Tagen von mimi möller veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R9W5DJHQC5B3S"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R9W5DJHQC5B3S" class="areaLink" title="Vollständige Rezension von C. Mensch lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Gutes Buch, lehrreich und auf die allgegenwärtige Gefahr des Faschismus hinweisend</b><br />
+          Habe mir das Buch gestern gekauft und heute in einem Zug durchgelsen, denn es fesselt den Leser ungemein.
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 23 Tagen von C. Mensch veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R1V5HBA2546S7E"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R1V5HBA2546S7E" class="areaLink" title="Vollständige Rezension von KATHARINA KLAGES lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-1-0._V46872228_.gif" width="64" alt="1.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Das Gegenteil von Gut ist nicht Böse, sondern "Gut gemeint".</b><br />
+          Es ist unbestritten wichtig, sich bei der Auseinandersetzung mit dem Thema Nationalsozialismus zu fragen, wie es soweit kommen konnte.
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor  Monaten von KATHARINA KLAGES veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R367D4EIPE5F0W"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R367D4EIPE5F0W" class="areaLink" title="Vollständige Rezension von M. Schwöbel lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Pflichtlektüre!</b><br />
+          ich finde, dieses buch sollte in den schulen zur pflichtlektüre werden.<br />ich habe es in einem durch gelesen. super buch und hoch interessant
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor  Monaten von M. Schwöbel veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R2ITW5YQZPYTL0"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R2ITW5YQZPYTL0" class="areaLink" title="Vollständige Rezension von jane frust lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>unglaublich</b><br />
+          ich finde es unglaublich was aus so einem schulexperiment werden kann. das buch ist sehr einfach geschrieben und auch etwas für leute die etwas langsamer verstehen.
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 2 Monaten von jane frust veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R2S8MP49WYA9VE"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R2S8MP49WYA9VE" class="areaLink" title="Vollständige Rezension von Tom Mikow lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-4-0._V46907120_.gif" width="64" alt="4.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Die Welle</b><br />
+          Autor : 	Morton Rhue<br />ISBN:		978-3-473-58008-8<br />Verlag:		Ravensburger Buchverlag<br /><br />Wie entsteht Faschismus?
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 2 Monaten von Tom Mikow veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+<!-- BOUNDARY -->
+<a name="R1Q0IDQDWSCW98"></a><br />
+
+
+
+
+
+
+
+<table>
+  <tr>
+    <td>
+      <a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_synop?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&customer-reviews.start=1&qid=1207387722&sr=11-1#R1Q0IDQDWSCW98" class="areaLink" title="Vollständige Rezension von Sancho lesen">
+        <div>
+          <span style="margin-left:-5px;"><img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/customer-reviews/stars-5-0._V46895037_.gif" width="64" alt="5.0 von 5 Sternen" height="12" border="0" /> </span>
+          <b>Wenn es Pflicht gäbe, dann wäre dieses Buch eine!</b><br />
+          Eines der wenigen Bücher, die mir in der Schule und darüber hinaus etwas gebracht haben. Klare, verständliche Sprache, angenehme Kürze, die es trotzdem erlaubt ein so brisantes...
+          <span class="innerLink"><b>Lesen Sie weiter...</b></span>
+        </div>
+        <div class="tiny" style="margin-top:5px; clear: both;">
+          Vor 2 Monaten von Sancho veröffentlicht
+        </div>
+      </a>
+    </td>
+  </tr>
+</table>
+
+
+
+
+
+      <br />
+      <div>
+      
+
+
+    
+
+
+
+
+
+
+
+    
+
+
+
+  <FORM method="GET" action="/gp/community-content-search/results/ref=cm_srch_q_rtr/" style="padding:0; margin:0;"> 
+    <table border="0" cellpadding="0" cellspacing="0" style="" width="250">
+        <tr>
+            <td colspan="2" nowrap="nowrap">
+                <b class="h3color">Kundenrezensionen suchen</b>
+            </td>
+        </tr>
+        <tr>
+                <td style="width: 100%">
+                <input class="small" style="width: 100%;" type="text" name="query" value=""/>
+                <input type="hidden" name="search-alias" value="community-reviews"/>
+             <input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+            </td>
+            <td style="padding-left: 5px;"><input type="image" src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/buttons/go._V46669524_.gif"  width="25" alt="Kundenrezensionen suchen" align="absmiddle" title="Kundenrezensionen suchen" height="18" border="0" /></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="checkbox" name="idx.asin" value="3473580082" checked> <span class="tiny">Nur in den Rezensionen zu diesem Produkt suchen</span>
+	  </td>
+	</tr>
+    </table>
+  </FORM>
+
+
+                                                                                                                                                             
+                                                                                                                                                             
+
+
+      </div>
+      <br />
+      <div>
+        <span class="small"><b><b class="h3color">&rsaquo;</b>&nbsp;<a href="http://www.amazon.de/Welle-Bericht-einen-Unterrichtsversuch-ging/dp/customer-reviews/3473580082/ref=cm_cr_dp_all_recent?ie=UTF8&customer-reviews.sort%5Fby=-SubmissionDate&coliid=&showViewpoints=1&customer-reviews.start=1&qid=1207387722&sr=11-1&colid=#customerReviews">Alle 191 Kundenrezensionen ansehen</a></b></span>
+      </div>
+      <div style="height:30px;">&nbsp;</div>
+      
+<div id="cachebust_67566_adcontent" style="display:block; margin-bottom:16px; padding:0px; width:300px; ">
+            <div style="text-align:center; padding-bottom:4px;"><img src="http://g-ecx.images-amazon.com/images/G/03/gateway/iab/advertisement-sm-head._V45803969_.gif" border="0" /></div>
+<iframe id="cachebust_67566" 
+                    name="cachebust_53533" 
+                    title="Ad"
+                    src="http://ad.de.doubleclick.net/adi/amzn.de.dp.books/kinderbuecher;sz=300x250;an=3473580082;s=20;u=7ab7be8aad2449fd9a47876f5cb927c1;z=60;z=76;tile=1;ord=27083?"  
+                    frameborder      ="0" 
+                    scrolling        ="no" 
+                    marginheight     ="0" 
+                    marginwidth      ="0" 
+                    topmargin        ="0" 
+                    leftmargin       ="0" 
+                    allowtransparency="true" 
+                    width            ="300" 
+                    height           ="250"
+            ><a href="http://www.amazon.de/gutscheine" target="_blank"><img border="0" src="http://g-ecx.images-amazon.com/images/G/03/advertising/banners/gc-300x250._V30902819_.gif" /></a></iframe>
+         </div>
+            <script type="text/javascript">
+            {            
+                if ((navigator.userAgent.indexOf("Firefox") > -1) && 
+                    (navigator.userAgent.indexOf("Windows") > -1)) {
+                    var i = document.getElementById("cachebust_67566");
+                    if (i) i.src="http://ad.de.doubleclick.net/adi/amzn.de.dp.books/kinderbuecher;sz=300x250;an=3473580082;s=20;u=7ab7be8aad2449fd9a47876f5cb927c1;z=60;z=76;tile=1;ord=27083?";
+                }
+            }
+
+            </script>
+
+<div class="h_rule"></div>
+    </td>
+    </tr>
+    </table>
+  </div>
+</div>
+<br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    
+
+
+
+
+
+
+
+
+</%perl>
+</%method>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr class="bucketDivider" align="left" noshade="noshade" size="1" />
+
+
+<style type="text/css">
+.cmPage .newness {
+  color: #090;
+  font-weight: bold;
+}
+.cmPage .qty {
+  color: #666;
+}
+
+
+
+
+.cmPage {
+    font-size: 12px;
+}
+.cmPage a {
+  text-decoration:none;
+}
+.cmPage a:hover {
+  text-decoration:underline;
+  color: #c60;
+}
+.cmPage em {
+  font-weight: bold;
+  font-style: normal;
+}
+.cmPage h1 {
+  font-size: 1.5em;
+  margin: 0 0 5px 0;
+}
+.cmPage h1 .subtitle {
+  font-size: .77em;
+  font-weight: normal;
+}
+.cmPage h1 .title {
+  color: #c60;
+}
+.cmPage h3 {
+  font-size: 1.04em;
+  margin: 0;
+}
+.cmPage h5 {
+  color: #036;
+  font-size: 1.04em;
+  font-weight: normal;
+  margin: 0;
+} 
+.cmPage .cmBreadcrumb {
+  font-size: .86em;
+  margin-top: 5px;
+  color: #333;
+}
+.cmPage .content {
+  margin-top:8px;
+}
+.cmPage .helpBlock, 
+.cmPage .reportBlock  {
+  font-size: .86em;
+  text-align:right;
+  float:right;
+  margin-top: 2px;
+}
+.cmPage .helpBlock img {
+  margin-top: 3px;
+}
+.cmPage hr {
+  clear:both;
+}
+.cmPage .productBlock {
+  font-size:.86em;
+  padding: 0 3px 12px 3px;
+}
+.cmPage .topBlock {
+  height:2.5em;
+}
+.cmPage .bottomBlock {
+  height:2.5em;
+}
+.cmPage .pagination {
+  padding:3px 0 3px 0;
+  color: #666;
+}
+.cmPage .pagination a {
+  padding: 3px;
+}
+.cmPage .pagination a.on, .cmPage .pagination a:hover {
+  border: 1px solid #c60;
+  color: #c60;
+  background-color:white;
+  text-decoration:none;
+  padding: 2px;
+}
+.cmPage .pagination a:hover {
+  background-color:transparent;
+}
+.cmPage .twoColumnLeft {
+  float:left;
+  width: 55%;
+  padding-right:10px;
+}
+.cmPage .twoColumnRight {
+  float:left;
+  width: 40%; 
+}
+
+.cmPage ul.photoBlock li {
+  float:left;
+  width: 60px;
+  height: 60px;
+  margin: 0 10px 5px 0;
+  text-align: center;
+}
+.cmPage .bucketFooter {
+  clear: both;
+  margin: 5px 0 5px 0;
+}
+
+.cmPage .newness, .cmPage td.newness {
+  color: #090;
+  font-weight: bold;
+}
+
+.cmPage ul.profileBlock li {
+  float:left;
+  width:17%;
+  height:110px;
+  text-align:center;
+  font-size: .86em;
+  color: #666;
+  margin-right:10px;
+}
+.cmPage ul.profileBlock li .photo {
+  height: 72px;
+}
+
+.cmPage ul.horizListBlock li {
+  font-size: .82em;
+  clear:left;
+}
+.cmPage ul.horizListBlock li .listTitle {
+  font-size: 1.2em;
+}
+.cmPage ul.horizListBlock li .photo {
+  float:left;
+  padding: 0 7px 10px 0;
+
+}
+
+.cmPage .searchHeader {
+  border: 1px solid #5c9ebf;
+  padding:3px;
+  height:21px;
+  background: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/tile-blue-bg._V45805150_.gif)
+  background-repeat: repeat-x;
+  background-color: #b7d7e6;
+}
+
+.tigerTL {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-tl._V45784704_.gif);
+}
+.tigerTC {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-tm._V45803536_.gif);
+  background-repeat: repeat-x;
+  padding-top: 10px;
+}
+.tigerTR {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-tr._V16758927_.gif);
+  font-size: 4px;
+} 
+.tigerBL {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-bl._V45804148_.gif);
+  font-size: 4px;
+}
+.tigerBC {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-bm._V45804433_.gif);
+  background-repeat: repeat-x;
+  font-size: 4px;
+} 
+.tigerBR {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/images/gui/box-gray-br._V16758924_.gif);
+  font-size: 4px;
+}
+.tigerTL td, .tigerTC td, .tigerTR td, .tigerBL td, .tigerBC td, .tigerBR td {
+  background:none;
+  background-color:white;
+}
+
+
+/* START ADDED FROM DETAIL PAGE */
+  table.secondaryBox td.topLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tl2._V45803718_.gif);
+    background-repeat: no-repeat;
+    padding-top: 6px;
+    padding-left: 12px; 
+  }
+
+  table.secondaryBox td.topRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-tr2._V45803654_.gif);
+    background-repeat: no-repeat;
+  }
+  
+  table.secondaryBox td.bottomLeft {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-bl._V45803993_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+  
+  table.secondaryBox td.bottomRight {
+    background-image: url(http://g-ecx.images-amazon.com/images/G/03/nav2/dp/box-line-br._V45782987_.gif);
+    background-repeat: no-repeat;
+    font-size: 4px;
+  }
+
+/* END ADDED FROM DETAIL PAGE */
+
+.cmPage .popover {
+  border:2px solid #EDEDD3;
+  padding: 10px;
+}
+
+.cmPage .popover .title {
+  font-size: .86em;
+  color: #c60;
+}
+
+.cmPage .plink {
+  text-decoration:underline;
+}
+
+
+
+.cdTPop {
+    font-size: 13px;
+}
+.cdTPop .cmPage a {
+    font-size: 1.0em;
+    text-decoration:none;
+}
+.cdTPop .cmPage a:hover {
+    font-size: 1.0em;
+    text-decoration:underline;
+    color: #c60;
+}
+
+
+
+.cmPage .dataGrid td, 
+.cmPage .dataGrid th {
+  text-align:left;
+  font-weight: normal;
+  border-bottom: 1px solid #ccc;
+  padding: 4px 10px 4px 0;
+  font-size: .64em;
+  color: #666;
+}
+.cmPage .dataGrid .lastRowNoSep td {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.cmPage .dataGrid .num {
+  text-align:right;
+  padding-right:20px;
+  white-space: nowrap;
+}
+.cmPage .dataGrid .title {
+  font-size: .82em;
+}
+.cmPage .dataGrid .title .dgSubtitle {
+  font-size: .72em;
+  font-weight: bold;
+}
+.cmPage .dataGrid .icon {
+  text-align:center;
+}
+.cmPage .dataGrid .icon a {
+  display:block;
+  padding: 5px;
+  width:100%;
+}
+.cmPage .dataGrid .iconImg {
+  visibility: hidden;
+}
+.cmPage .dataGrid .newness {
+  color: #090;
+  font-weight: bold;
+}
+
+
+.cmPage .cdPostBox {
+  width: 460px;
+  padding: 0px 0px 0px 7px;
+  margin: 0px 0px 0px 7px;
+}
+.cmPage .cdPostBox a {
+  text-decoration:none;
+}
+.cmPage .cdPostBox a:hover {
+  text-decoration:underline;
+  color: #c60;
+}
+.cmPage .cdPostBox em {
+  font-weight: bold;
+  font-style: normal;
+}
+.cmPage .cdPostBox h5 {
+  color: #c60;
+  font-size: 1.04em;
+  font-weight: normal;
+  margin: 0;
+} 
+.cmPage .cdPostBox .cdPostBoxBucket {
+  background: #cbddf5 url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/gradient-postbox-bottom._V22934758_.gif) repeat-x center;
+  border-bottom: 1px solid #a1bed3;
+  text-align: center;
+  padding: 0.5em 0;
+}
+.cmPage .cdPostBox div.cdFormRow {
+  width: 100%;
+  clear: both;
+  margin: 0;
+}
+.cmPage .cdPostBox .cdPostBoxInputs {
+  width: 100%;
+  margin: 0.5em 0;
+}
+
+.cmPage .cdPostBox .cdPromptWrapper {
+  text-align: center;
+  float: left;
+}
+
+.cmPage .cdPostBox .cdGuidelinesLink {
+  margin: 0.5em 0;
+  font-size: 0.8em;
+}
+
+.cmPage .cdPostBox textarea {
+  height: 8em;
+  font-family: verdana,arial,helvetica,sans-serif;
+  font-size: 1.0em;
+}
+.cmPage .cdPostBox text {
+  font-family: verdana,arial,helvetica,sans-serif;
+  font-size: small;
+}
+
+.cmPage .cdPostBox .cdPostError {
+  color: red;
+}
+
+.cmPage .cdPostBox .cdPromptFor {
+  font-size: 9px;
+}
+
+#cdPostBoxExpander {
+  display: block;
+}
+
+
+
+
+
+
+.cdBox-grayLine {
+  padding:8 0;
+}
+.cdBox-grayLine .cdHEAD {
+  color:#c60;
+  font-weight:bold;
+  text-align:center;
+  padding:4 0;
+}
+.cdBox-grayLine .cdSEP {
+  padding:5 0;
+}
+.cdBox-grayLine .cdSEP hr {
+  display:none;
+}
+.cdBox-grayLine .titleBlock {
+  font-weight:bold;
+  text-align:center;
+}
+.cdBox-grayLine td.cdTL {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-tl._V22935030_.gif);
+  background-repeat:none;
+  font-size:4;
+  width:12;
+}
+.cdBox-grayLine td.cdTC {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-tm._V22935027_.gif);
+  background-repeat:repeat-x;
+  font-size:4;
+}
+.cdBox-grayLine td.cdTR {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-tr._V22935026_.gif);
+  background-repeat:none;
+  font-size:4;
+  width:12;
+  height:12;
+}
+.cdBox-grayLine td.cdML {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-mm._V22935034_.gif);
+  background-repeat:none;
+  font-size:4;
+}
+.cdBox-grayLine td.cdMC {
+}
+.cdBox-grayLine td.cdMR {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-rm._V22934767_.gif);
+  background-repeat:none;
+  font-size:4;
+}
+.cdBox-grayLine td.cdBL {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-bl._V22935039_.gif);
+  font-size:4;
+  width:12;
+  height:12;
+}
+.cdBox-grayLine td.cdBC {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-bm._V22935033_.gif);
+  background-repeat:repeat-x;
+  font-size:4;
+}
+.cdBox-grayLine td.cdBR {
+  background-image:url(http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/box-gray-br._V22935035_.gif);
+  background-repeat:none;
+  font-size:4;
+  width:12;
+}
+.cdBox-grayLine td.cdMC {
+  background:none;
+}
+.cmPage .smQty {
+  color: #666;
+  font-size: .8em;
+}
+.cmPage ul.smallList li {
+  font-size:.86em;
+  padding-top: 2px;
+  padding-bottom: 3px;
+  _padding-bottom: 2px;
+  white-space: normal;
+}
+.cmPage .cdRFList {
+  padding-left: 10px;
+}
+.cmPage .cdRFHeadingWithoutBox {
+  padding: 8px 0 4px 0;
+}
+.cmPage .cdRFHeadingWithBox {
+}
+
+
+
+
+
+
+.cdTPop {
+    font-size: 13px;
+}
+.cdTPop .cmPage a {
+    font-size: 1.0em;
+    text-decoration:none;
+}
+.cdTPop .cmPage a:hover {
+    font-size: 1.0em;
+    text-decoration:underline;
+    color: #c60;
+}
+
+
+
+
+
+
+
+
+
+
+</style>
+
+
+
+
+<script language="Javascript1.1" type="text/javascript">
+<!--
+function PopWin(url,name,options){
+        var ContextWindow = window.open(url,name,options);
+        ContextWindow.opener = this;
+        ContextWindow.focus();
+}
+function RefreshOriginalWindow(url) {
+        if ((window.opener == null) || (window.opener.closed))
+        {
+                var OriginalWindow = window.open(url);
+                OriginalWindow.opener = this;
+        }
+        else{
+                window.opener.location=url;
+        }
+}
+//-->
+</script>
+
+
+
+
+
+
+<div class="cmPage">
+<div class="content">
+  <a name="CustomerDiscussions"></a>
+  <strong class="h1">Kunden diskutieren</strong>
+   <span class="tiny">Beta (<a href="/gp/forum/content/db-guidelines.html/ref=cm_cd_dp_t_whatsthis" target="AmazonHelp" onclick="return PopWin('/gp/forum/content/db-guidelines.html/ref=cm_cd_dp_t_whatsthis', 'AmazonHelp', 'width=500,height=600,resizable=1,scrollbars=1,toolbar=1,status=1');">Was ist das?</a>)</span>
+  </a>
+  <div style="margin-left:20px">
+    <table border="0" cellspacing="0" cellpadding="0" width="94%">
+      <tr valign="top">
+        <td width="65%">
+          
+
+          <div style="margin:4px">
+            <div style="padding: 4px 0 4px 0">
+              <b class="h3color">Das Forum zu diesem Produkt</b> 
+              <span class="qty">(0 Diskussionen)</span>
+            </div>
+          </div>
+
+          
+
+
+    <div style="margin: 4px;">
+      <table width="100%" class="dataGrid" cellspacing="0">
+        <tr>
+          <th width="70%">Diskussion</th>
+          <th width="3%" class="num">Antworten</th>
+          <th width="25%">Jüngster Beitrag</th>
+        </tr>
+
+        <tr>
+          <td class="title" colspan="3">Noch keine Diskussionen</td>
+        <tr>
+
+      </table>
+    </div>
+
+    <br style="line-height:8px"/>
+
+          <h5 style="padding-left: 15px;">Fragen stellen. Meinungen austauschen. Neues erfahren</h5>
+          
+
+
+
+
+
+
+
+
+
+
+<div id="cdPostBox" class="cdPostBox">
+    <a id="CustomerDiscussionsPost" name="CustomerDiscussionsPost"> </a>
+    <form id="cdPostBoxForm" name="cdPostBoxForm" action="https://www.amazon.de/gp/forum/update/create.html"
+        method="POST" onsubmit="return cdCheckPost(this);">
+        <input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+        
+    <input type="hidden" name="ASIN" value="3473580082" />
+    <input type="hidden" name="cdBirth" value="1207387723" />
+    <input type="hidden" name="cdClientIP" value="79.199.77.192" />
+    <input type="hidden" name="cdSFormFields" value="ASIN:cdBirth:cdClientIP:cdSFormFields:originInstanceID:originTypeID:redirectTarget" />
+    <input type="hidden" name="originInstanceID" value="3473580082" />
+    <input type="hidden" name="originTypeID" value="1" />
+    <input type="hidden" name="redirectTarget" value="http%3A%2F%2Fwww.amazon.de%2Fgp%2Fproduct%2F3473580082%3Fie%3DUTF8%26cdPage%3D1" />
+
+        
+    <input type="hidden" name="cdSFormToken" value="B9EF0B3A2B6934E7FE71E3E8E64894A91DC64C5E" />
+
+        <div class="cdFormRow" 
+            style="padding: 0.7em 0 0.2em 0; _padding: 0.35em 0 0.1em 0;">
+
+            <h5><em>Neue Diskussion starten</em></h5>
+        </div>
+        <div class="cdFormRow">
+            
+
+
+        </div>
+        <table class="cdFormRow" cellspacing="0" cellpadding="0"
+            style="padding-top: 0.3em; _padding-top: 0.15em; width: 100%">
+            <tr>
+                <td style="white-space: nowrap; padding-right: 0.7em;">
+                    Thema:
+                </td>
+                <td style="width: 100%;">
+                    <input id="cdPostBoxTitleInput" type="text" 
+                        maxlength="255" name="subjectText"
+                        style="width: 100%; border: 1px solid #a1bed3;"
+                        onclick="cdOpenPostBox();" onfocus="cdOpenPostBox();" />
+                </td>
+            </tr>
+        </table>
+
+        <div id="cdPostBoxExpander">
+            <div class="cdFormRow" style="padding: 0.7em 0 0.2em 0; _padding: 0.35em 0 0.1em 0;">
+              Erster Beitrag:
+            </div>
+            <div class="cdFormRow" 
+                style="padding: 0.3em 0 0.1em 0; _padding: 0.15em 0 0.1em 0;">
+                <textarea id="cdPostBoxBodyInput" name="bodyText" 
+                    style="width: 100%; border: 1px solid #a1bed3;"></textarea>
+            </div>
+            <div class="cdFormRow"
+                style="padding: 0.1em 0 0.3em 0; _padding: 0.1em 0 0.15em 0;">
+
+                <div class="cdPostBoxInputs">
+                    <div style="float: left; text-align: center;">
+                    <div class="cdPromptWrapper">
+                        <input type="image" value="Post"
+                            alt="[Neue Diskussion starten]" 
+                            align="absmiddle" border="0" src="http://g-ecx.images-amazon.com/images/G/03/x-locale/communities/discussion_boards/btn-start-new-discussion._V32606403_.gif" />
+                        <div class="cdPromptFor">
+                            Eingabe des Log-ins
+                        </div>
+                    </div>
+                    &nbsp;
+                    </div>
+                    <div style="float: right;"><a href="/gp/forum/content/db-guidelines.html/ref=cm_cd_dp_t_guidelines" target="AmazonHelp" onclick="return PopWin('/gp/forum/content/db-guidelines.html/ref=cm_cd_dp_t_guidelinesPOP', 'AmazonHelp', 'width=500,height=600,resizable=1,scrollbars=1,toolbar=1,status=1');">Richtlinien</a></div>
+                    <br clear="all" />
+                </div>
+            </div>
+        </div>
+        <input type="text" name="ignoreMe" maxlength="1" style="display: none;" />
+    </form>
+</div>
+
+
+
+
+
+          
+
+          
+
+
+
+
+
+
+
+
+
+<br style="line-height:10px; _line-height:1px"/>
+
+<div class="cdBox-grayLine cdGlobalStyle" >
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+    <tbody>
+      <tr>
+          <td class="cdTL">&nbsp;</td>
+          <td class="cdTC">&nbsp;</td>
+          <td class="cdTR">&nbsp;</td>
+      </tr>
+      <tr>
+          <td class="cdML">&nbsp;</td>
+          <td class="cdMC">
+
+  <strong class="h3color">Aktive Diskussionen in ähnlichen Foren</strong>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div style="margin: 4px;">
+      <table width="100%" class="dataGrid" cellspacing="0">
+        <tr>
+          <th width="70%">Diskussion</th>
+          <th width="3%" class="num">Antworten</th>
+          <th width="25%">Jüngster Beitrag</th>
+        </tr>
+
+
+
+
+
+        <tr>
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx2TF31S5NO2I73">Forum: Englische Bücher</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx2TF31S5NO2I73&cdThread=Tx213TG9HT1TTQY">Tipp für Neuling?</a>
+          </td>
+          <td class="num">6</td>
+          <td style="white-space: nowrap;" class="newness">Vor 11 Stunden</td>
+        </tr>
+
+
+
+
+
+
+        <tr>
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx3AFWYF3B770HX">Forum: Eltern diskutieren</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx3AFWYF3B770HX&cdThread=Tx3G385TB2ARFB5">Bücher für 8-jährige möglichst mit Pferden</a>
+          </td>
+          <td class="num">1</td>
+          <td style="white-space: nowrap;" class="newness">Vor 13 Stunden</td>
+        </tr>
+
+
+
+
+
+
+        <tr>
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx2TF31S5NO2I73">Forum: Englische Bücher</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx2TF31S5NO2I73&cdThread=Tx17BGC4V4LLCMO">Tipps für tolle Filmvorlagen !!!</a>
+          </td>
+          <td class="num">6</td>
+          <td style="white-space: nowrap;" class="newness">Vor 13 Stunden</td>
+        </tr>
+
+
+
+
+
+
+        <tr>
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx2TF31S5NO2I73">Forum: Englische Bücher</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx2TF31S5NO2I73&cdThread=Tx36TWDSPUFFJ1H">Warum sind englische (us-amerikanische) Bücher so schweineteuer?</a>
+          </td>
+          <td class="num">61</td>
+          <td style="white-space: nowrap;" class="newness">Vor 15 Stunden</td>
+        </tr>
+
+
+
+
+
+
+        <tr>
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx3AFWYF3B770HX">Forum: Eltern diskutieren</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx3AFWYF3B770HX&cdThread=Tx1ZLQNE8JSK6F0">Geschichten und Musik</a>
+          </td>
+          <td class="num">3</td>
+          <td style="white-space: nowrap;" class="newness">Vor 18 Stunden</td>
+        </tr>
+
+
+
+
+
+
+        <tr class="lastRowNoSep">
+          <td class="title">
+            <div class="dgSubtitle"><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_rt_tft_fp?ie=UTF8&cdForum=Fx3AFWYF3B770HX">Forum: Eltern diskutieren</a></div>
+            <a href="http://www.amazon.de/gp/forum/cd/discussion.html/ref=cm_cd_dp_rt_tft_tp?ie=UTF8&cdForum=Fx3AFWYF3B770HX&cdThread=Tx2TW23ZB3AY6GM">Gute Nacht Geschichten ab 1Jahr</a>
+          </td>
+          <td class="num">3</td>
+          <td style="white-space: nowrap;" >Gestern</td>
+        </tr>
+
+
+
+
+      </table>
+    </div>
+
+
+          </td>
+          <td class="cdMR">&nbsp;</td>
+      </tr>
+      <tr>
+          <td class="cdBL">&nbsp;</td>
+          <td class="cdBC">&nbsp;</td>
+          <td class="cdBR">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+        </td>
+        <td width="5%">&nbsp;&nbsp;&nbsp;</td>
+        <td width="30%">
+          
+
+
+
+<div class="cdRFHeadingWithoutBox"><b class="h3color">Ähnliche Foren</b></div>
+  <div class="cdRFList">
+
+    <ul>
+      <li><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_gf?ie=UTF8&cdForum=Fx3AFWYF3B770HX&cdPage=1&cdAnchor=3473580082">Forum: Eltern diskutieren</a>
+&nbsp;<span class="smQty">(206 Diskussionen)</span></li>
+      <li><a href="http://www.amazon.de/gp/forum/cd/forum.html/ref=cm_cd_dp_gf?ie=UTF8&cdForum=Fx2TF31S5NO2I73&cdPage=1&cdAnchor=3473580082">Forum: Englische Bücher</a>
+&nbsp;<span class="smQty">(24 Diskussionen)</span></li>
+    </ul>
+
+  </div>
+
+        </td>
+      </tr>
+    </table>
+    <br>
+  </div>
+
+  
+
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+
+<div class="bucket" id="listmania" >
+  <b class="h1">Lieblingslisten</b>
+  <div class="content">
+    <table width="94%" cellpadding="0" cellspacing="0" border="0">
+      <tbody>
+        <tr>
+          <td valign="top">
+            <ul>
+              <li>
+  <table border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="vertical-align: top; width: 60px">
+        <a href="/Meine-Lieblingsb%C3%BCcher/lm/18AAFPLCD4QB3/ref=cm_lmt_dtpa_f_1_rdssss0"><img src="http://ecx.images-amazon.com/images/I/11CFVNKQYKL._AA60_.jpg" width="60" alt="Meine Lieblingsbücher" height="60" border="0" /></a>
+      </td>
+
+      <td width="10">&nbsp;</td>
+
+      <td>
+         <a href="/Meine-Lieblingsb%C3%BCcher/lm/18AAFPLCD4QB3/ref=cm_lmt_dtpa_f_1_rdssss0">Meine Lieblingsbücher</a>: Eine Liste von <a href="/gp/richpub/listmania/byauthor/A320KLCTLFU8JF/ref=cm_lmt_dtpa_p_1">Juliane Köhlmeier "july88"</a>
+      </td>
+    </tr>
+  </table>
+</li>
+<li>
+  <table border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="vertical-align: top; width: 60px">
+        <a href="/F%C3%BCr-Kids/lm/1OLVL6AACHOT4/ref=cm_lmt_dtpa_f_2_rdssss0"><img src="http://ecx.images-amazon.com/images/I/01BJ79H98GL._AA60_.jpg" width="60" alt="Für Kids" height="60" border="0" /></a>
+      </td>
+
+      <td width="10">&nbsp;</td>
+
+      <td>
+         <a href="/F%C3%BCr-Kids/lm/1OLVL6AACHOT4/ref=cm_lmt_dtpa_f_2_rdssss0">Für Kids</a>: Eine Liste von <a href="/gp/richpub/listmania/byauthor/A22X3XRVKIMTCO/ref=cm_lmt_dtpa_p_2">Wolfgang Hager "tobiman"</a>
+      </td>
+    </tr>
+  </table>
+</li>
+<li>
+  <table border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="vertical-align: top; width: 60px">
+        <a href="/B%C3%BCcher-die-bewegen/lm/6LPIJ4RUPTYX/ref=cm_lmt_dtpa_f_3_rdssss0"><img src="http://ecx.images-amazon.com/images/I/01GEEYRTGJL._AA60_.jpg" width="60" alt="&quot;Bücher, die bewegen&quot;" height="60" border="0" /></a>
+      </td>
+
+      <td width="10">&nbsp;</td>
+
+      <td>
+         <a href="/B%C3%BCcher-die-bewegen/lm/6LPIJ4RUPTYX/ref=cm_lmt_dtpa_f_3_rdssss0">"Bücher, die bewegen"</a>: Eine Liste von <a href="/gp/richpub/listmania/byauthor/ATIP48KR3YAXI/ref=cm_lmt_dtpa_p_3">Walter Kern</a>
+      </td>
+    </tr>
+  </table>
+</li>
+
+            </ul>
+            <a href="/gp/richpub/listmania/createpipeline/ref=cm_lmt_dtpa_c">Legen Sie Ihre eigene Lieblingsliste an</a>
+          </td>
+          <td width="300" valign="top">
+            <div>
+
+
+
+  <FORM method="GET" action="/gp/community-content-search/results/ref=cm_srch_q_col_rpli/" style="padding:0; margin:0;"> 
+    <table border="0" cellpadding="0" cellspacing="0" style="clear: both;" width="250">
+        <tr>
+            <td colspan="2" nowrap="nowrap">
+                <b class="h3color">Suche Lieblingslisten</b>
+            </td>
+        </tr>
+        <tr>
+                <td style="width: 100%">
+                <input class="tiny" style="width: 100%;" type="text" name="query" value=""/>
+                <input type="hidden" name="search-alias" value="rp-listmania"/>
+             <input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+            </td>
+            <td style="padding-left: 5px;"><input type="image" src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/buttons/go._V46669524_.gif"  width="25" alt="Suche Lieblingslisten" align="absmiddle" title="Suche Lieblingslisten" height="18" border="0" /></td>
+        </tr>
+    </table>
+  </FORM>
+
+</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+<div class="bucket">
+  <b class="h1">Ähnliche Artikel finden</b><br />
+  <div class="content">
+    
+    <ul>
+    <li><a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=61180011">Children's Books</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=62238011">Literature</a></li>
+<li><a href="http://www.amazon.de/Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280652">Kinder- & Jugendbücher</a> &gt; <a href="http://www.amazon.de/Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280686">Nach Ländern</a> &gt; <a href="http://www.amazon.de/Amerika-Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280692">Amerika</a> &gt; <a href="http://www.amazon.de/USA-Amerika-Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280693">USA</a></li>
+<li><a href="http://www.amazon.de/Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280652">Kinder- & Jugendbücher</a> &gt; <a href="http://www.amazon.de/Romane-Erz%C3%A4hlungen-Kinder-Jugendb%C3%BCcher-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=280857">Romane & Erzählungen</a></li>
+<li><a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=66034011">Literature & Fiction</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=67130011">Foreign Language Fiction</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=67135011">German</a></li>
+<li><a href="http://www.amazon.de/Politik-Geschichte-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=143">Politik & Geschichte</a> &gt; <a href="http://www.amazon.de/Politikwissenschaft-Politik-Geschichte-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=15777331">Politikwissenschaft</a> &gt; <a href="http://www.amazon.de/Politische-Theorien-Politikwissenschaft-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=15777341">Politische Theorien</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=15779151">Faschismus</a></li>
+<li><a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=14126641">Ravensburger</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=345574011">Taschenbücher</a> &gt; <a href="http://www.amazon.de/b/ref=dp_brlad_entry?ie=UTF8&node=345581011">Ab 13 Jahren</a></li>
+<li><a href="http://www.amazon.de/Search-Inside-B%C3%BCcher/b/ref=dp_brlad_entry?ie=UTF8&node=14224751">Search Inside!</a></li>
+</ul>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+  <hr noshade="noshade" size="1" class="bucketDivider" />
+  <div class="bucket">
+  <b class="h1">Anhand des Sachgebietes nach ähnlichen Produkten suchen:</b>
+    <div class="content">
+  <form method="post" action="/exec/obidos/search-handle-form/ref=dp_srsubj_allbutton" style="margin: 0px;">
+  <input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+  <input type="hidden" name="index" value="books-de" />
+<input type="checkbox" name="field+keywords" value="Fiction" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Fiction">Fiction</a><br />
+<input type="checkbox" name="field+keywords" value="Jugendromane u. -erzählungen" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Jugendromane%20u.%20-erz%C3%A4hlungen">Jugendromane u. -erzählungen</a><br />
+<input type="checkbox" name="field+keywords" value="Kinder-" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Kinder-">Kinder-</a><br />
+<input type="checkbox" name="field+keywords" value="Demokratie" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Demokratie">Demokratie</a><br />
+<input type="checkbox" name="field+keywords" value="Faschismus; Kinder-/Jugendliteratur" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Faschismus%3B%20Kinder-%2FJugendliteratur">Faschismus; Kinder-/Jugendliteratur</a><br />
+<input type="checkbox" name="field+keywords" value="Materialien für Unterrichtsgestaltung" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Materialien%20f%C3%BCr%20Unterrichtsgestaltung">Materialien für Unterrichtsgestaltung</a><br />
+<input type="checkbox" name="field+keywords" value="Neofaschismus" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Neofaschismus">Neofaschismus</a><br />
+<input type="checkbox" name="field+keywords" value="Preis der Leseratten des ZDF" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Preis%20der%20Leseratten%20des%20ZDF">Preis der Leseratten des ZDF</a><br />
+<input type="checkbox" name="field+keywords" value="Rechtsradikalismus" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Rechtsradikalismus">Rechtsradikalismus</a><br />
+<input type="checkbox" name="field+keywords" value="Unterrichtsgestaltung" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Unterrichtsgestaltung">Unterrichtsgestaltung</a><br />
+<input type="checkbox" name="field+keywords" value="Zeitgeschichte" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Zeitgeschichte">Zeitgeschichte</a><br />
+<input type="checkbox" name="field+keywords" value="Ab 12 Jahre" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Ab%2012%20Jahre">Ab 12 Jahre</a><br />
+<input type="checkbox" name="field+keywords" value="Amerikanische Belletristik" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Amerikanische%20Belletristik">Amerikanische Belletristik</a><br />
+<input type="checkbox" name="field+keywords" value="Diktator ( Diktatur )" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Diktator%20%28%20Diktatur%20%29">Diktator ( Diktatur )</a><br />
+<input type="checkbox" name="field+keywords" value="Diktatur - Diktator" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Diktatur%20-%20Diktator">Diktatur - Diktator</a><br />
+<input type="checkbox" name="field+keywords" value="Jugendliteratur" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Jugendliteratur">Jugendliteratur</a><br />
+<input type="checkbox" name="field+keywords" value="Kinder- u. Jugendliteratur" /> <a href="/s/ref=dp_srsubj_entry?ie=UTF8&index=books-de&field-keywords=Kinder-%20u.%20Jugendliteratur">Kinder- u. Jugendliteratur</a><br />
+  <br />
+  <input type="submit" value="Titel/Artikel ALLER gewählten Sachgebiete anzeigen." />
+  <br />
+  Das bedeutet, jeder Titel/Artikel muss zu Sachgebiet 1 UND zu Sachgebiet 2 UND... gehören.
+  <br />
+  </form>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+<div class="bucket">
+  <h2>Kommentar</h2>
+
+    <div class="content">Möchten Sie die <b><a href="/gp/gfix/welcome.html/ref=dp_page_bottom_gfix_link?ie=UTF8&storeID=books&ASIN=3473580082">Produktinformationen aktualisieren</a></b> oder <b><a href="/gp/gfix/imageCorrection.html/ref=dp_page_bottom_gfix_link?ie=UTF8&storeID=books&ASIN=3473580082">Feedback zu den Produktabbildungen geben</a></b>? (Bitte melden Sie sich an, damit wir Sie ggf. kontaktieren können.)</div>
+</div>
+
+
+
+
+
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+<div class="bucket">
+  <table cellpadding="5" cellspacing="0" border="0">
+    <tr>
+      <td width="170" align="center" valign="top" class="amabot_endcap"><div class="unified_widget rcmBody"><div class="prodImage"><a href="/b/ref=amb_link_13491755_1?ie=UTF8&node=504950&pf_rd_m=A3JWKAKR8XB7XF&pf_rd_s=left-1&pf_rd_r=0Z448FF8TF05PJ8MK9ZJ&pf_rd_t=201&pf_rd_p=183399091&pf_rd_i=3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/books/icons/160-DHL-2._V8844929_.gif" width="160" align="left" height="90" border="0" /></a></div><div class="h_rule"></div></div>      </td>
+      <td width="15">&nbsp</td>
+      <td width="170" align="center" valign="top" class="amabot_endcap"><div class="unified_widget rcmBody"><div class="bannerImage"><a href="/gp/redirect.html/ref=amb_link_59071965_1?location=http://advantage.amazon.de/gp/vendor/public/join&token=424CFE381D159CF2F096DB9732A46C59EA5367AE&pf_rd_m=A3JWKAKR8XB7XF&pf_rd_s=left-3&pf_rd_r=0Z448FF8TF05PJ8MK9ZJ&pf_rd_t=201&pf_rd_p=181582091&pf_rd_i=3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/books/icons/advantage-160._V11402931_.gif" width="160" align="center" alt="Advantage für Verleger" height="90" border="0" /></a></div><div class="h_rule"></div></div>      </td>
+      <td width="15">&nbsp</td>
+      <td width="170" align="center" valign="top" class="amabot_endcap"><div class="unified_widget rcmBody"><div class="bannerImage"><a href="/gp/seller/sell-your-stuff.html/ref=amb_link_41876765_1?pf_rd_m=A3JWKAKR8XB7XF&pf_rd_s=left-node-2&pf_rd_r=0Z448FF8TF05PJ8MK9ZJ&pf_rd_t=201&pf_rd_p=160257091&pf_rd_i=3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/books/mailings/sellstuff-160._V25105913_.gif" width="160" align="center" height="90" border="0" /></a></div><div class="h_rule"></div></div>      </td>
+      <td width="15">&nbsp</td>
+      <td width="170" align="center" valign="top" class="amabot_endcap"><div class="unified_widget rcmBody"><div class="bannerImage"><a href="/b/ref=amb_link_55545165_1?ie=UTF8&node=343920011&pf_rd_m=A3JWKAKR8XB7XF&pf_rd_s=left-node-3&pf_rd_r=0Z448FF8TF05PJ8MK9ZJ&pf_rd_t=201&pf_rd_p=175294491&pf_rd_i=3473580082"><img src="http://g-ecx.images-amazon.com/images/G/03/books/lpg/LPG-Media-160._V12792833_.gif" width="160" align="center" height="90" border="0" /></a></div><div class="h_rule"></div></div>      </td>
+      <td colspan="4">&nbsp</td>
+    </tr>
+
+  </table>
+</div>  
+
+  
+
+
+
+<hr noshade="noshade" size="1" class="bucketDivider" />
+            <div id="cachebust_72159_adcontent" style="display:block; margin-bottom:16px; padding:0px; width:728px; ">
+            <div style="text-align:center; padding-bottom:4px;"><img src="http://g-ecx.images-amazon.com/images/G/03/gateway/iab/advertisement-sm-head._V45803969_.gif" border="0" /></div>
+<iframe id="cachebust_72159" 
+                    name="cachebust_96543" 
+                    title="Ad"
+                    src="http://ad.de.doubleclick.net/adi/amzn.de.dp.books/kinderbuecher;sz=728x90;an=3473580082;s=20;u=3f3f008c218c4b229e7ab9bc5c9d32ce;z=60;z=76;tile=2;ord=27083?"  
+                    frameborder      ="0" 
+                    scrolling        ="no" 
+                    marginheight     ="0" 
+                    marginwidth      ="0" 
+                    topmargin        ="0" 
+                    leftmargin       ="0" 
+                    allowtransparency="true" 
+                    width            ="728" 
+                    height           ="90"
+            ><a href="http://www.amazon.de/gutscheine" target="_blank"><img border="0" src="http://g-ecx.images-amazon.com/images/G/03/advertising/banners/gc-728x90._V30902845_.gif" /></a></iframe>
+         </div>
+            <script type="text/javascript">
+            {            
+                if ((navigator.userAgent.indexOf("Firefox") > -1) && 
+                    (navigator.userAgent.indexOf("Windows") > -1)) {
+                    var i = document.getElementById("cachebust_72159");
+                    if (i) i.src="http://ad.de.doubleclick.net/adi/amzn.de.dp.books/kinderbuecher;sz=728x90;an=3473580082;s=20;u=3f3f008c218c4b229e7ab9bc5c9d32ce;z=60;z=76;tile=2;ord=27083?";
+                }
+            }
+
+            </script>
+
+<div class="h_rule"></div>
+
+<img src="http://g-ecx.images-amazon.com/images/G/03/x-locale/common/transparent-pixel._V42752373_.gif" width="740" style="clear: left; " height="1" border="0" />
+<br />
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<table width="100%" align="center">
+
+
+
+<style type="text/css">
+.wonderbar-list {
+    margin: 0px;
+    padding: 0pt 0pt 0pt 11pt;
+}
+</style>
+
+<tr><td colspan="2">
+<form method="GET" action="/s/ref=wbnavss">
+<table border="0" width="100%" cellpadding="1" cellspacing="0" bgcolor="#999999">
+<tr><td>
+<table border="0" width="100%" bgcolor="#ffffff" cellspacing="0" cellpadding="5">
+<tr valign="top">
+<td width="33%">
+<b>Wo ist meine Bestellung?</b><br />
+<ul class="wonderbar-list">
+<li>Alle Informationen zu Ihren <a href="https://www.amazon.de/gp/css/history/view.html/ref=hy_f_1?ie=UTF8&is-secure=true&orderFilter=wheres-my-stuff">letzten Bestellungen</a></li>
+<li>Bearbeiten oder überprüfen Sie Ihre offenen Bestellungen in <a href="/gp/css/homepage.html/ref=hy_f_2">"Mein Konto"</a>.</li>
+</ul>
+</td>
+
+<td width="33%">
+<b>Versand & Rücknahme</b><br />
+<ul class="wonderbar-list">
+
+
+
+
+<li>Unsere <a href="/gp/help/customer/display.html/ref=hy_f_3?ie=UTF8&nodeId=504938">Versandbedingungen</a> und unsere <a href="/gp/help/customer/display.html/ref=hy_f_3?ie=UTF8&nodeId=504966">Sicherheitsgarantie</a></li>
+
+
+
+<li>Artikel <a href="/gp/css/returns/homepage.html/ref=hy_f_4"> zurücksenden?</a> &#40;Siehe <a href="/gp/help/customer/display.html?nodeId=504958">Details zur Rücksendung</a>&#41;</li></ul>
+</td>
+
+
+
+
+
+
+<td width="33%">
+<b>Brauchen Sie Hilfe?</b><br />
+<ul class="wonderbar-list">
+<li><a href="https://www.amazon.de/gp/css/account/forgot-password/email.html/ref=hy_f_6">Haben Sie Ihr Passwort vergessen?</a></li>
+<li><a href="/exec/obidos/subst/cards/help/cards-gc-help.html/ref=hy_f_7">Lösen</a> Sie einen Geschenkgutschein ein -- oder <a href="/exec/obidos/tg/stores/static/-/gifts/gift-certificates/ref=hy_f_8">verschenken</a> Sie einen</li>
+
+
+
+
+<li>Besuchen Sie unsere <a href="/gp/help/customer/display.html/ref=hy_f_9">Hilfeseiten</a>.</li></ul>
+</td></tr>
+</table>
+</td></tr>
+<tr><td>
+
+<!-- Search Box --->
+<table border="0" width="100%" bgcolor="#eeeecc" cellspacing="0" cellpadding="5"><tr><td align="center">
+
+<b>Schnellsuche</b>
+
+
+
+
+<select name="url"><option value="index=aps">Alle Produkte</option><option value="index=stripbooks">Bücher</option><option value="index=english-books">English Books</option><option value="index=popular">Musik</option><option value="index=dvd">DVD</option><option value="index=electronics">Elektronik & Foto</option><option value="index=software">Software</option><option value="index=videogames">Games</option><option value="index=kitchen">Küche, Haus & Garten</option><option value="index=toys">Spielwaren</option><option value="index=sports">Sport & Freizeit</option><option value="index=jewelry-watches">Uhren & Schmuck</option><option value="index=baby">Baby</option><option value="index=apparel">Schuhe & Handtaschen</option><option value="index=drugstore">Drogerie & Bad</option></select>
+<input type="text" name="field-keywords" size="15">&nbsp;&nbsp;
+
+<input type="hidden" name="__mk_de_DE" value="ÅMÅZÕÑ" />
+
+<input type="image" src="http://g-ecx.images-amazon.com/images/G/03/books/go-button._V45461508_.gif"  width="25" align="absmiddle" name="Go" height="18" border="0" /></td></tr></table>
+</td></tr>
+</table>
+</form>
+</td></tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<table align="center">
+  <tr height="8"><td></td></tr>
+  
+
+
+
+<tr align="center"><td colspan="2"><img src="http://g-ecx.images-amazon.com/images/G/03/gno/images/general/navAmazonLogoFooter._V28243269_.gif" width="113" alt="Amazon.de" height="28" border="0" />
+
+<a href="/gp/homepage.html">Amazon-Homepage</a></td></tr>
+
+  <tr height="10"><td></td></tr>
+  <tr align="center"><td colspan="2">
+Internationale Seiten:&nbsp;
+<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.com%3Fsite%3Damazon%26tag%3Dintl-defooter-ushome-20&token=3A0F170E7CEFE27BDC730D3D7344512BC1296B83">USA</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.co.uk%3Fsite%3Damazon%26tag%3Dintl-defooter-ukhome-21&token=EDA85A835C0C35E68FBAFD33CEB75576E7B44F1F">Gro&szlig;britannien</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.fr%3Fsite%3Damazon%26tag%3Dintl-defooter-frhome&token=EE1EA6AB57493F5C3DA46E2CE0BE07638B8F6F3F">Frankreich</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.co.jp%3Fsite%3Damazon%26tag%3Dintl-defooter-jphome-22&token=0AE1DFACC954F91986074504F57C1362C85FB6E8">Japan</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.de%3Fsite-redirect%3Dat&token=EBC7637E551C69E801C6B030EF8B5ED613A56E92">Österreich</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.amazon.ca%3Fsite%3Damazon%26tag%3Dintl-defooter-cahome-21&token=AD297DDA0F9D6C887976CD08894B02DB57139A39">Kanada</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?%5Fencoding=UTF8&location=http%3A%2F%2Fwww.joyo.com%3Fsource%3Damazon-defooter&token=0C8F02DAE64B5895BDA317DE0E4110D9A77AA9A2">China</a>
+</td></tr>
+
+  <tr height="10"><td></td></tr>
+  
+
+
+<tr align="center"><td colspan="2">
+
+
+
+
+
+
+
+
+<a href="/gp/help/customer/display.html/ref=gw_m_b_cu?ie=UTF8&nodeId=3961931">Kontaktieren Sie uns</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/help/customer/display.html/ref=gw_m_b_he">Hilfe</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/cart/view.html/ref=gw_m_b_sc?ie=UTF8&%2AVersion%2A=1&%2Aentries%2A=0">Einkaufswagen</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/css/homepage.html/ref=gw_m_b_ya?ie=UTF8&is-secure=true">Mein Konto</a></td></tr>
+
+  <tr height="10"><td></td></tr>
+  <tr align="center"><td colspan="2">
+
+
+
+
+
+
+
+
+<a href="/exec/obidos/tg/browse/-/911764">Über Amazon.de</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/b?ie=UTF8&node=202588011">Karriere bei Amazon</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/gp/redirect.html?location=http://partnernet.amazon.de/gp/associates/join/main.html&token=517F29583481614736D1D07D34706FF3297871B5">Schließen Sie sich den Amazon.de-Partnern an</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/advantage">Advantage</a>
+</td></tr>
+
+  <tr height="10"><td></td></tr>
+</table>
+
+
+
+
+
+
+
+
+
+<table align="center" width="100%">
+
+
+<tr align="center"><td colspan="2">
+<font size="-2">
+
+
+<a href="/gp/help/customer/display.html?ie=UTF8&nodeId=505048">Unsere AGB</a>&nbsp;|&nbsp;
+
+<a href="/gp/help/customer/display.html?ie=UTF8&nodeId=3312401">Datenschutzerkl&auml;rung</a>&nbsp;|&nbsp;
+
+<a href="/gp/help/customer/display.html?ie=UTF8&nodeId=505050">Impressum</a>&nbsp;&nbsp;&#169; 1998-2008, Amazon.com, Inc. und Tochtergesellschaften</font>
+</td></tr>
+<!-- whfh-EVgv6vArtMkpGIXaaAVZ7KBKzYDumcZ06s1J01SoYIo= rid-0Z448FF8TF05PJ8MK9ZJ -->
+</table>
+
+
+
+
+
+</body>
+</html>
+
+
+
+

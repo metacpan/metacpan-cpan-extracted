@@ -1,0 +1,27 @@
+Browser.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t
+examples/cgi.ebay.de_aw_cgi_eBayISAPI.dll/ebay.pl
+examples/cgi.ebay.de_aw_cgi_eBayISAPI.dll/MyeBayItemsBiddingOn-Form.xsl
+examples/cgi.ebay.de_aw_cgi_eBayISAPI.dll/MyeBayItemsBiddingOn.xml
+examples/cgi.ebay.de_aw_cgi_eBayISAPI.dll/MyeBayItemsBiddingOn.xsl
+examples/cgi.ebay.de_aw_cgi_eBayISAPI.dll/MyeBayItemsBiddingOn2pbml.xsl
+examples/rrp.sparkasse-banking.de_sk-koeln/finanzstatus.xsl
+examples/rrp.sparkasse-banking.de_sk-koeln/sparkasse-banking.pl
+examples/rrp.sparkasse-banking.de_sk-koeln/sparkasse-banking.xml
+examples/rrp.sparkasse-banking.de_sk-koeln/umsatz-form.xsl
+examples/rrp.sparkasse-banking.de_sk-koeln/umsatz-frames.xsl
+examples/rrp.sparkasse-banking.de_sk-koeln/umsatz.xsl
+examples/rrp.sparkasse-banking.de_sk-koeln/umsatz2pbml.xsl
+examples/www.wvb-online.de_ligen_liga_aktuell_cfm/liga_aktuell.pl
+examples/www.wvb-online.de_ligen_liga_aktuell_cfm/liga_aktuell.xml
+examples/www.wvb-online.de_ligen_liga_aktuell_cfm/liga_aktuell.xsl
+examples/www.wvb-online.de_ligen_liga_aktuell_cfm/liga_spielplan.xsl
+examples/www2.hoerzu.de_text/hoerzu.pl
+examples/www2.hoerzu.de_text/hoerzu.xml
+examples/www2.hoerzu.de_text/information.xsl
+examples/www2.hoerzu.de_text/uebersicht.xsl
+META.yml                                Module meta-data (added by MakeMaker)

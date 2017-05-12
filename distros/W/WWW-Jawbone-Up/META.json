@@ -1,0 +1,71 @@
+{
+   "abstract" : "Unofficial Jawbone UP API",
+   "author" : [
+      "Alan Berndt <alan@eatabrick.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Jawbone-Up",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "JSON" : "2.0",
+            "LWP::UserAgent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POSIX" : "0",
+            "Test::Approx" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bentglasstube/WWW-Jawbone-Up/issues"
+      },
+      "homepage" : "https://github.com/bentglasstube/WWW-Jawbone-Up",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bentglasstube/WWW-Jawbone-Up.git",
+         "web" : "https://github.com/bentglasstube/WWW-Jawbone-Up"
+      }
+   },
+   "version" : "1.32.4",
+   "x_contributors" : [
+      "Slaven Rezic <slaven@rezic.de>"
+   ]
+}
+

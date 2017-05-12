@@ -1,0 +1,53 @@
+Execute code before Script
+--------------------------
+
+ In 'Dynamic change of database' we found that WebTools has centralized configuration system!
+That's mean that you can't change config.pl dynamicly! Actualy you can but when script is
+already executed (see 'Dynamic change of database').
+ However feature entered in WebTools ver. 1.24 allows you to set some variables in config.pl
+before parsing input,loading libraries (i.e. onStartUp) and just before execution of script
+(i.e. onActivate). Something more...you can execute even Perl code.
+These features can be useful if you need to modify some restricted options
+that commonly is set on default. For example that can be maximum POST size (default 4MB) or
+even if you need to change current temp directory and so on...
+
+Example:
+
+<!--#onStartUp>
+ # You are in "globexport.pm" -> No webtools functins are avaliable here!
+ # If you need to print some messages don't forget "Content-type: text/html\n\n"!
+ # Only available due StartUp process (parsing,loading drivers and so on)
+ $webtools::my_cgi = 8388608;                  # 8MB (if you want load it from external file)
+ $webtools::tmp='/tmp/your_folder/';
+ $webtools::cgi_lib_maxdata=$webtools::my_cgi; # Set new POST limit size (8MB)
+</#onStartUp-->
+
+<!--#onActivate>
+ # You are in "webtools.pm" -> All webtools functins are avaliable here!
+ # If you need to print some messages just go ahead :)
+ # Available through script execution
+ # Currently '$webtools::cgi_lib_maxdata' still has default value (not 8MB)!
+ $webtools::cgi_lib_maxdata=$webtools::my_cgi; # Set new POST limit size again for script!!!
+ $webtools::db_support='db_mysql';             # ...Change default db driver...
+</#onActivate-->
+
+<?perl 
+ # Do what you have to do :)
+
+ print '$tmp = \''.$tmp.'\';<BR>';
+ print '$cgi_lib_maxdata = \''.$cgi_lib_maxdata.'\';<BR>';
+
+?>
+
+ You see that there are available two diferrent "tag"-s for onStartUp (via globexport.pm)
+and onActivate (in webtools.pm)
+NOTE: All changes made in 'webtools' namespace through globexport BEGIN section (i.e.
+ through "onStartUp") will have no affect (because webtools namespace will be not still
+ available!) So if you change for example $webtools::cgi_lib_maxdata in "onStartUp"
+ section default value will be afterware available in script! So set value once again
+ in "onActivate" section if you want "real" value (set in "onStartUp") to be available
+ for script (see example above)!
+
+Author: Julian Lishev,
+e-mail: julian@proscriptum.com
+URL: www.proscriptum.com

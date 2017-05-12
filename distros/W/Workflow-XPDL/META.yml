@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Workflow-XPDL
+version:             0.40
+abstract:            Perl extension for reading XDPL
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Data::Dumper:                  0
+    XML::XPath:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Stephen Rhoton <srhoton@cmu.edu>

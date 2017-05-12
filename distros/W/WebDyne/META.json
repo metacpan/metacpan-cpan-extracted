@@ -1,0 +1,63 @@
+{
+   "abstract" : "create web pages with embedded Perl",
+   "author" : [
+      "Andrew Speer <andrew@webdyne.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebDyne",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Digest::MD5" : "0",
+            "Env::Path" : "0",
+            "HTML::Tagset" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Status" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Text::Template" : "0",
+            "Tie::IxHash" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://webdyne.org",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/WebDyne.git",
+         "web" : "https://github.com/aspeer/WebDyne"
+      }
+   },
+   "version" : "1.246",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,834 @@
+<HTML>
+<HEAD>
+<TITLE>Win32API::ToolHelp - Perl extension for obtaining information about currently
+                     executing applications using the plain Win32 ToolHelp API</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:prantl@host.sk">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::ToolHelp - Perl extension for obtaining information about currently                     executing applications using the plain Win32 ToolHelp API</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#exports">EXPORTS</A></LI>
+		<LI><A HREF="#constants">CONSTANTS</A></LI>
+		<LI><A HREF="#structures">STRUCTURES</A></LI>
+		<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32API::ToolHelp - Perl extension for obtaining information about currently
+                     executing applications using the plain Win32 ToolHelp API</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32API::ToolHelp ':All';</PRE>
+<PRE>
+  # --- prints names of all processes
+  my $handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  my $pe;
+  Process32First($handle, $pe);
+  do {
+    print &quot;$pe-&gt;{th32ProcessID}\t$pe-&gt;{szExeFile}\n&quot;;
+  } while (Process32Next($handle, $pe));
+  CloseToolhelp32Snapshot($handle);</PRE>
+<PRE>
+  # --- prints names of the modules used by the current process
+  my $handle = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, $$);
+  my $me;
+  Module32First($handle, $me);
+  do {
+    print &quot;$me-&gt;{th32ModuleID}\t$me-&gt;{szModule}\n&quot;;
+  } while (Module32Next($handle, $me));
+  CloseToolhelp32Snapshot($handle);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The functions provided by the <EM>ToolHelp</EM> library make it easier for you
+to obtain information about currently executing applications. These functions
+are designed to streamline the creation of tools, specifically debuggers.</P>
+<P>It covers enumerating the currently running processes and their modules,
+traversing heaps, listing threads and taking snapshots of memory
+of the currently running processes. The results are return in a form
+as close as possible to the original Win32 API (simple types are returned
+as scalars of the same type and structures are returned as references to hashes
+with keys of the same names as the members in the original structures have).
+There are all functions of the <EM>ToolHelp</EM> library implemented in this module.</P>
+<P>The support for the <EM>ToolHelp</EM> library API is included in Windows 95
+or higher or in Windows 2000 or higher. It is not included in Windows NT. See
+the module <CODE>Win32API::ProcessStatus</CODE> for the similar functionality
+for Windows NT.</P>
+<P>(Note that much of the following documentation refers to the behavior
+of the underlying Win32 <EM>ToolHelp</EM> API calls which may vary in its current
+and future versions without any changes to this module. Therefore you should
+check the Win32 <EM>ToolHelp</EM> API documentation in MSDN directly when needed.)</P>
+<P>
+<H2><A NAME="exports">EXPORTS</A></H2>
+<P>Nothing is exported by default. The following tags can be used to have sets
+of symbols exported:</P>
+<DL>
+<DT><STRONG><A NAME="item_%3AFunc">:Func</A></STRONG><BR>
+<DD>
+The basic function names: CloseToolhelp32Snapshot CreateToolhelp32Snapshot
+GetLastToolHelpError Heap32First Heap32ListFirst Heap32ListNext Heap32Next
+Module32First Module32Next Process32First Process32Next SetLastToolHelpError
+Thread32First Thread32Next Toolhelp32ReadProcessMemory.
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncA">:FuncA</A></STRONG><BR>
+<DD>
+The ANSI function names: Module32FirstA Module32NextA Process32FirstA
+Process32NextA.
+<P></P>
+<DT><STRONG><A NAME="item_%3AFuncW">:FuncW</A></STRONG><BR>
+<DD>
+The Unicode function names: Module32FirstW Module32NextW Process32FirstW
+Process32NextW.
+<P></P>
+<DT><STRONG><A NAME="item_%3AHF32_">:HF32_</A></STRONG><BR>
+<DD>
+The constants for identifying a heap type: HF32_DEFAULT HF32_SHARED.
+<P></P>
+<DT><STRONG><A NAME="item_%3ALF32_">:LF32_</A></STRONG><BR>
+<DD>
+The constants for finding a type of an allocated memory block: LF32_FIXED
+LF32_FREE LF32_MOVEABLE.
+<P></P>
+<DT><STRONG><A NAME="item_%3ATH32CS_">:TH32CS_</A></STRONG><BR>
+<DD>
+The constants for creating snapshots of a running system: TH32CS_INHERIT
+TH32CS_SNAPALL TH32CS_SNAPHEAPLIST TH32CS_SNAPMODULE TH32CS_SNAPMODULE32
+TH32CS_SNAPPROCESS TH32CS_SNAPTHREAD.
+<P></P>
+<DT><STRONG><A NAME="item_%3ATHREAD_">:THREAD_</A></STRONG><BR>
+<DD>
+The constants defining the thread priority: THREAD_PRIORITY_LOWEST
+THREAD_PRIORITY_BELOW_NORMAL THREAD_PRIORITY_NORMAL THREAD_PRIORITY_HIGHEST
+THREAD_PRIORITY_ABOVE_NORMAL THREAD_PRIORITY_ERROR_RETURN
+THREAD_PRIORITY_TIME_CRITICAL THREAD_PRIORITY_IDLE.
+<P></P></DL>
+<P>
+<H2><A NAME="constants">CONSTANTS</A></H2>
+<P>The constants described here and exported by this module are used only
+in its structures and functions. See the module <CODE>Win32API::Const</CODE>
+for the common Win32 constants.</P>
+<P><CODE>HF32_</CODE> constants are used as flags in the heap list describing structure
+<A HREF="#item_HEAPLIST32"><CODE>HEAPLIST32</CODE></A>.</P>
+<DL>
+<DT><STRONG><A NAME="item_HF32_DEFAULT">HF32_DEFAULT</A></STRONG><BR>
+<DD>
+Process's default heap.
+<P></P>
+<DT><STRONG><A NAME="item_HF32_SHARED">HF32_SHARED</A></STRONG><BR>
+<DD>
+Heap shared among processes.
+<P></P></DL>
+<P><CODE>LF32_</CODE> constants are used as flags in the heap entry describing structure
+<A HREF="#item_HEAPENTRY32"><CODE>HEAPENTRY32</CODE></A>.</P>
+<DL>
+<DT><STRONG><A NAME="item_LF32_FIXED">LF32_FIXED</A></STRONG><BR>
+<DD>
+The memory block has a fixed (unmovable) location.
+<P></P>
+<DT><STRONG><A NAME="item_LF32_FREE">LF32_FREE</A></STRONG><BR>
+<DD>
+The memory block is not used.
+<P></P>
+<DT><STRONG><A NAME="item_LF32_MOVEABLE">LF32_MOVEABLE</A></STRONG><BR>
+<DD>
+The memory block location can be moved.
+<P></P></DL>
+<P><CODE>TH32CS_</CODE> constants are used by the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function
+to specify portions of the system to include in the snapshot.</P>
+<DL>
+<DT><STRONG><A NAME="item_TH32CS_INHERIT">TH32CS_INHERIT</A></STRONG><BR>
+<DD>
+Indicates that the snapshot handle is to be inheritable.
+<P></P>
+<DT><STRONG><A NAME="item_TH32CS_SNAPALL">TH32CS_SNAPALL</A></STRONG><BR>
+<DD>
+Equivalent to specifying <A HREF="#item_TH32CS_SNAPHEAPLIST"><CODE>TH32CS_SNAPHEAPLIST</CODE></A>, <A HREF="#item_TH32CS_SNAPMODULE"><CODE>TH32CS_SNAPMODULE</CODE></A>,
+<A HREF="#item_TH32CS_SNAPPROCESS"><CODE>TH32CS_SNAPPROCESS</CODE></A>, and <A HREF="#item_TH32CS_SNAPTHREAD"><CODE>TH32CS_SNAPTHREAD</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_TH32CS_SNAPHEAPLIST">TH32CS_SNAPHEAPLIST</A></STRONG><BR>
+<DD>
+Includes the heap list of the specified process in the snapshot.
+<P></P>
+<DT><STRONG><A NAME="item_TH32CS_SNAPMODULE">TH32CS_SNAPMODULE</A></STRONG><BR>
+<DD>
+Includes the module list of the specified process in the snapshot.
+<P></P>
+<DT><STRONG><A NAME="item_TH32CS_SNAPPROCESS">TH32CS_SNAPPROCESS</A></STRONG><BR>
+<DD>
+Includes the process list in the snapshot.
+<P></P>
+<DT><STRONG><A NAME="item_TH32CS_SNAPTHREAD">TH32CS_SNAPTHREAD</A></STRONG><BR>
+<DD>
+Includes the thread list in the snapshot.
+<P></P></DL>
+<P><CODE>THREAD_</CODE> constants are used as flags in the thread entry describing
+structure <A HREF="#item_THREADENTRY32"><CODE>THREADENTRY32</CODE></A>.</P>
+<DL>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_IDLE">THREAD_PRIORITY_IDLE</A></STRONG><BR>
+<DD>
+Indicates a base priority level of 1 for <CODE>IDLE_PRIORITY_CLASS</CODE>,
+<CODE>NORMAL_PRIORITY_CLASS</CODE>, or <CODE>HIGH_PRIORITY_CLASS</CODE> processes, and a base
+priority level of 16 for <CODE>REALTIME_PRIORITY_CLASS</CODE> processes.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_LOWEST">THREAD_PRIORITY_LOWEST</A></STRONG><BR>
+<DD>
+Indicates 2 points below normal priority for the priority class.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_BELOW_NORMAL">THREAD_PRIORITY_BELOW_NORMAL</A></STRONG><BR>
+<DD>
+Indicates one point below normal priority for the priority class.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_NORMAL">THREAD_PRIORITY_NORMAL</A></STRONG><BR>
+<DD>
+Indicates normal priority for the priority class.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_ABOVE_NORMAL">THREAD_PRIORITY_ABOVE_NORMAL</A></STRONG><BR>
+<DD>
+Indicates one point above normal priority for the priority class.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_HIGHEST">THREAD_PRIORITY_HIGHEST</A></STRONG><BR>
+<DD>
+Indicates two points above normal priority for the priority class.
+<P></P>
+<DT><STRONG><A NAME="item_THREAD_PRIORITY_TIME_CRITICAL">THREAD_PRIORITY_TIME_CRITICAL</A></STRONG><BR>
+<DD>
+Indicates a base priority level of 15 for <CODE>IDLE_PRIORITY_CLASS</CODE>,
+<CODE>NORMAL_PRIORITY_CLASS</CODE>, or <CODE>HIGH_PRIORITY_CLASS</CODE> processes, and a base
+priority level of 31 for <CODE>REALTIME_PRIORITY_CLASS</CODE> processes.
+<P></P></DL>
+<P>
+<H2><A NAME="structures">STRUCTURES</A></H2>
+<P>The structures that act as input and ouput parameters are handled as hashes
+with keys of the same names as the members in the original structures have.
+It allows those already familiar with the Win32 API to get off to a quick
+start and occasionally use the original MSDN documentation to the API.</P>
+<P>(Obviously the member <CODE>dwSize</CODE> is omitted as there is no need to pre-allocate
+the actual size for the output hash in Perl.)</P>
+<DL>
+<DT><STRONG><A NAME="item_HEAPENTRY32">HEAPENTRY32</A></STRONG><BR>
+<DD>
+Describes one entry (block) of a heap that is being examined.
+<DL>
+<DT><STRONG><A NAME="item_hHandle">hHandle</A></STRONG><BR>
+<DD>
+Handle to the heap block.
+<P></P>
+<DT><STRONG><A NAME="item_dwAddress">dwAddress</A></STRONG><BR>
+<DD>
+Linear address of the start of the block.
+<P></P>
+<DT><STRONG><A NAME="item_dwBlockSize">dwBlockSize</A></STRONG><BR>
+<DD>
+Size, in bytes, of the heap block.
+<P></P>
+<DT><STRONG><A NAME="item_dwFlags">dwFlags</A></STRONG><BR>
+<DD>
+Flags. The values available are listed in the description
+of <CODE>LF32_</CODE> constants.
+<P></P>
+<DT><STRONG><A NAME="item_dwLockCount">dwLockCount</A></STRONG><BR>
+<DD>
+Lock count on the memory block. The lock count is incremented each time
+the <CODE>GlobalLock</CODE> or <CODE>LocalLock</CODE> function is called on the block either
+by the application or the DLL that the heap belongs to.
+<P></P>
+<DT><STRONG><A NAME="item_dwResvd">dwResvd</A></STRONG><BR>
+<DD>
+Reserved; do not use.
+<P></P>
+<DT><STRONG><A NAME="item_th32ProcessID">th32ProcessID</A></STRONG><BR>
+<DD>
+Identifier of the process to examine.
+<P></P>
+<DT><STRONG><A NAME="item_th32HeapID">th32HeapID</A></STRONG><BR>
+<DD>
+Heap identifier in the owning process context. The contents of this member
+has meaning only to the tool help functions. It is not a handle, nor is it
+usable by functions other than the <EM>ToolHelp</EM> functions.
+<P></P></DL>
+<DT><STRONG><A NAME="item_HEAPLIST32">HEAPLIST32</A></STRONG><BR>
+<DD>
+Describes one entry (block) of a heap that is being examined.
+<DL>
+<DT><STRONG><A NAME="item_dwProcessID">dwProcessID</A></STRONG><BR>
+<DD>
+Identifier of the process to examine.
+<P></P>
+<DT><STRONG>th32HeapID</STRONG><BR>
+<DD>
+Heap identifier in the owning process context. The contents of this member
+has meaning only to the tool help functions. It is not a handle, nor is it
+usable by functions other than the <EM>ToolHelp</EM> functions.
+<P></P>
+<DT><STRONG>dwFlags</STRONG><BR>
+<DD>
+Flags. The values available are listed in the description of <CODE>HF32_</CODE>
+constants.
+<P></P></DL>
+<DT><STRONG><A NAME="item_MODULEENTRY32">MODULEENTRY32</A></STRONG><BR>
+<DD>
+Describes an entry from a list that enumerates the modules used
+by a specified process.
+<DL>
+<DT><STRONG><A NAME="item_th32ModuleID">th32ModuleID</A></STRONG><BR>
+<DD>
+Module identifier in the context of the owning process. The contents
+of this member has meaning only to the tool help functions. It is not
+a handle, nor is it usable by functions other than the <EM>ToolHelp</EM> functions.
+<P></P>
+<DT><STRONG>th32ProcessID</STRONG><BR>
+<DD>
+Identifier of the process being examined.
+<P></P>
+<DT><STRONG><A NAME="item_GlblcntUsage">GlblcntUsage</A></STRONG><BR>
+<DD>
+Global usage count on the module.
+<P></P>
+<DT><STRONG><A NAME="item_ProccntUsage">ProccntUsage</A></STRONG><BR>
+<DD>
+Module usage count in the context of the owning process.
+<P></P>
+<DT><STRONG><A NAME="item_modBaseAddr">modBaseAddr</A></STRONG><BR>
+<DD>
+Base address of the module in the context of the owning process.
+<P></P>
+<DT><STRONG><A NAME="item_modBaseSize">modBaseSize</A></STRONG><BR>
+<DD>
+Size, in bytes, of the module.
+<P></P>
+<DT><STRONG><A NAME="item_hModule">hModule</A></STRONG><BR>
+<DD>
+Handle to the module in the context of the owning process.
+<P></P>
+<DT><STRONG><A NAME="item_szModule">szModule</A></STRONG><BR>
+<DD>
+String containing the module name.
+<P></P>
+<DT><STRONG><A NAME="item_szExePath">szExePath</A></STRONG><BR>
+<DD>
+String containing the location (path) of the module.
+<P></P></DL>
+<P>Note: The <A HREF="#item_modBaseAddr"><CODE>modBaseAddr</CODE></A> and <A HREF="#item_hModule"><CODE>hModule</CODE></A> members are valid only
+in the context of the process specified by <A HREF="#item_th32ProcessID"><CODE>th32ProcessID</CODE></A>.</P>
+<DT><STRONG><A NAME="item_PROCESSENTRY32">PROCESSENTRY32</A></STRONG><BR>
+<DD>
+Describes an entry from a list that enumerates the processes residing
+in the system address space when a snapshot was taken.
+<DL>
+<DT><STRONG><A NAME="item_cntUsage">cntUsage</A></STRONG><BR>
+<DD>
+Number of references to the process. A process exists as long as its usage
+count is nonzero. As soon as its usage count becomes zero, a process
+terminates.
+<P></P>
+<DT><STRONG>th32ProcessID</STRONG><BR>
+<DD>
+Identifier of the process.
+<P></P>
+<DT><STRONG><A NAME="item_th32DefaultHeapID">th32DefaultHeapID</A></STRONG><BR>
+<DD>
+Identifier of the default heap for the process. The contents of this member
+has meaning only to the tool help functions. It is not a handle, nor is it
+usable by functions other than the <EM>ToolHelp</EM> functions.
+<P></P>
+<DT><STRONG>th32ModuleID</STRONG><BR>
+<DD>
+Module identifier of the process. The contents of this member has meaning
+only to the tool help functions. It is not a handle, nor is it usable
+by functions other than the <EM>ToolHelp</EM> functions.
+<P></P>
+<DT><STRONG><A NAME="item_cntThreads">cntThreads</A></STRONG><BR>
+<DD>
+Number of execution threads started by the process.
+<P></P>
+<DT><STRONG><A NAME="item_th32ParentProcessID">th32ParentProcessID</A></STRONG><BR>
+<DD>
+Identifier of the process that created the process being examined.
+<P></P>
+<DT><STRONG><A NAME="item_pcPriClassBase">pcPriClassBase</A></STRONG><BR>
+<DD>
+Base priority of any threads created by this process.
+<P></P>
+<DT><STRONG>dwFlags</STRONG><BR>
+<DD>
+Reserved; do not use.
+<P></P>
+<DT><STRONG><A NAME="item_szExeFile">szExeFile</A></STRONG><BR>
+<DD>
+Path and filename of the executable file for the process.
+<P></P></DL>
+<DT><STRONG><A NAME="item_THREADENTRY32">THREADENTRY32</A></STRONG><BR>
+<DD>
+Describes an entry from a list that enumerates the threads executing
+in the system when a snapshot was taken.
+<DL>
+<DT><STRONG>cntUsage</STRONG><BR>
+<DD>
+Number of references to the thread. A thread exists as long as its usage
+count is nonzero. As soon as its usage count becomes zero, a thread
+terminates.
+<P></P>
+<DT><STRONG><A NAME="item_th32ThreadID">th32ThreadID</A></STRONG><BR>
+<DD>
+Identifier of the thread. This identifier is compatible with the thread
+identifier returned by the <CODE>CreateProcess</CODE> function.
+<P></P>
+<DT><STRONG><A NAME="item_th32OwnerProcessID">th32OwnerProcessID</A></STRONG><BR>
+<DD>
+Identifier of the process that created the thread.
+<P></P>
+<DT><STRONG><A NAME="item_tpBasePri">tpBasePri</A></STRONG><BR>
+<DD>
+Initial priority level assigned to a thread. The values available are listed
+in the description of <CODE>THREAD_</CODE> constants.
+<P></P>
+<DT><STRONG><A NAME="item_tpDeltaPri">tpDeltaPri</A></STRONG><BR>
+<DD>
+Change in the priority level of a thread. This value is a signed delta
+from the base priority level assigned to the thread.
+<P></P>
+<DT><STRONG>dwFlags</STRONG><BR>
+<DD>
+Reserved; do not use.
+<P></P></DL>
+</DL>
+<P>
+<H2><A NAME="functions">FUNCTIONS</A></H2>
+<P><EM>ToolHelp</EM> functions return either a handle to access its structures
+or a boolean status of the function's result. To retrieve an extended
+information about the error if it occurs use the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A>
+function. If no error happens <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> still returns
+the last occured error code (successful calls do not modify the last stored
+error code). You can set or reset the internally stored error code
+explicitely by the function <A HREF="#item_SetLastToolHelpError"><CODE>SetLastToolHelpError</CODE></A>.</P>
+<P>To use something more convenient than numbers for comparisons of return
+values and error codes see the module <CODE>Win32API::Const</CODE>.</P>
+<P>There are couple of functions that are implemented as ANSI versions
+on Windows 95 or higher and as both ANSI and Unicode versions on Windows 2000
+or higher. ANSI versions are named XxxA and Unicode versions XxxW
+just like the Win32 <EM>ToolHelp</EM> originals. If you omit the last A/W letter
+the ANSI version is used as strings are ANSI in Perl's internals. Results
+of Unicode functions are converted into ANSI before returned.</P>
+<DL>
+<DT><STRONG><A NAME="item_CloseToolhelp32Snapshot"><CODE>CloseToolhelp32Snapshot($hSnapshot)</CODE></A></STRONG><BR>
+<DD>
+Closes an open system snapshot handle.
+<DL>
+<DT><STRONG><A NAME="item_hSnapshot_%5BIN%5D">hSnapshot [IN]</A></STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG><A NAME="item_%5BRETVAL%5D">[RETVAL]</A></STRONG><BR>
+<DD>
+If the function succeeds, the return value is nonzero. If the function fails,
+the return value is zero. To get extended error information, call
+<A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A>.
+<P>Windows NT/2000/XP: Closing an invalid handle raises an exception
+when the application is running under a debugger. This includes closing
+a handle twice, for example.</P>
+<P></P></DL>
+<P>It invalidates the specified system snapshot handle, decrements the object's
+handle count, and performs object retention checks. After the last handle
+to an object is closed, the object is removed from the system.</P>
+<DT><STRONG><A NAME="item_CreateToolhelp32Snapshot">CreateToolhelp32Snapshot($dwFlags, $th32ProcessID)</A></STRONG><BR>
+<DD>
+Takes a snapshot of the processes and the heaps, modules, and threads used
+by the processes.
+<DL>
+<DT><STRONG><A NAME="item_dwFlags_%5BIN%5D">dwFlags [IN]</A></STRONG><BR>
+<DD>
+Specifies portions of the system to include in the snapshot. The values
+available are listed in the description of <CODE>TH32CS_</CODE> constants.
+<P></P>
+<DT><STRONG><A NAME="item_th32ProcessID_%5BIN%5D">th32ProcessID [IN]</A></STRONG><BR>
+<DD>
+Specifies the process identifier. This parameter can be zero to indicate
+the current process. This parameter is used when the <A HREF="#item_TH32CS_SNAPHEAPLIST"><CODE>TH32CS_SNAPHEAPLIST</CODE></A>
+or <A HREF="#item_TH32CS_SNAPMODULE"><CODE>TH32CS_SNAPMODULE</CODE></A> value is specified. Otherwise, it is ignored.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns an open handle to the specified snapshot if successful
+or 0xffffffff (<CODE>INVALID_HANDLE_VALUE</CODE>) otherwise.
+<P></P></DL>
+<P>The snapshot taken by this function is examined by the other <EM>ToolHelp</EM>
+functions to provide their results. Access to the snapshot is read only.
+The snapshot handle acts like an object handle and is subject to the same
+rules regarding which processes and threads it is valid in.</P>
+<P>To retrieve an extended error status code generated by this function, use
+the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function.</P>
+<P>To destroy the snapshot, use the <A HREF="#item_CloseToolhelp32Snapshot"><CODE>CloseToolhelp32Snapshot</CODE></A> function.
+Alternatively you can use the general <CODE>CloseHandle</CODE> function.</P>
+<DT><STRONG><A NAME="item_GetLastToolHelpError"><CODE>GetLastToolHelpError()</CODE></A></STRONG><BR>
+<DD>
+Retrieves the last-error code value of the <EM>ToolHelp</EM> functions.
+The last-error code is stored if a function fails and remembered until
+another function calls when it is overwritten by the new error code.
+Successful calls do not modify this internally stored last-error code value.
+<DL>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+The return value is the last-error code value. Functions set this value
+by calling the <A HREF="#item_SetLastToolHelpError"><CODE>SetLastToolHelpError</CODE></A> function if they fail.
+<P></P></DL>
+<P>To obtain an error string for system error codes, use
+the <CODE>FormatMessage</CODE> function. For a complete list of error codes, see
+the System Error Codes section in MSDN. There are pre-defined constants
+for the Win32 system error codes in the module &lt;Win32API::Const&gt;.</P>
+<P>You should call the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function immediately when
+a function's return value indicates that such a call will return useful data.
+A subsequent call to another <EM>ToolHelp</EM> function could fail as well
+and <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> would return its error code instead
+of the former one.</P>
+<P>Function failure is typically indicated by a return value such as zero,
+undefined, or –1 (0xffffffff).</P>
+<P>Error codes returned are 32-bit values with the most significant bit set
+to 1 (bit 31 is the most significant bit). Zero code is <CODE>ERROR_SUCCESS</CODE>.</P>
+<DT><STRONG><A NAME="item_Heap32First">Heap32First($lphe, $th32ProcessID, $th32HeapID)</A></STRONG><BR>
+<DD>
+Retrieves information about the first block of a heap that has been
+allocated by a process.
+<DL>
+<DT><STRONG><A NAME="item_lphe_%5BOUT%5D">lphe [OUT]</A></STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_HEAPENTRY32"><CODE>HEAPENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>th32ProcessID [IN]</STRONG><BR>
+<DD>
+Identifier of the process context that owns the heap.
+<P></P>
+<DT><STRONG><A NAME="item_th32HeapID_%5BIN%5D">th32HeapID [IN]</A></STRONG><BR>
+<DD>
+Identifier of the heap to enumerate.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if information for the first heap block has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if the heap is invalid
+or empty.
+<P></P></DL>
+<P>To access subsequent blocks of the same heap, use the <A HREF="#item_Heap32Next"><CODE>Heap32Next</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Heap32ListFirst">Heap32ListFirst($hSnapshot, $lphl)</A></STRONG><BR>
+<DD>
+Retrieves information about the first heap that has been allocated
+by a specified process.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG><A NAME="item_lphl_%5BOUT%5D">lphl [OUT]</A></STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_HEAPLIST32"><CODE>HEAPLIST32</CODE></A> structure to be filled if the function succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the first entry of the heap list has been copied to the buffer
+or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value is returned
+by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function when no heap list exists
+or the snapshot does not contain heap list information.
+<P></P></DL>
+<P>To retrieve information about other heaps in the heap list,
+use the <A HREF="#item_Heap32ListNext"><CODE>Heap32ListNext</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Heap32ListNext">Heap32ListNext($hSnapshot, $lphl)</A></STRONG><BR>
+<DD>
+Retrieves information about the next heap that has been allocated
+by a process.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG>lphl [OUT]</STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_HEAPLIST32"><CODE>HEAPLIST32</CODE></A> structure to be filled if the function succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the next entry of the heap list has been copied to the buffer
+or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value is returned
+by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function when no more entries in the heap
+list exist.
+<P></P></DL>
+<P>To retrieve information about the first heap in a heap list,
+use the <A HREF="#item_Heap32ListFirst"><CODE>Heap32ListFirst</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Heap32Next"><CODE>Heap32Next($lphe)</CODE></A></STRONG><BR>
+<DD>
+Retrieves information about the next block of a heap that has been
+allocated by a process.
+<DL>
+<DT><STRONG><A NAME="item_lphe_%5BIN%2FOUT%5D">lphe [IN/OUT]</A></STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_HEAPENTRY32"><CODE>HEAPENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if information about the next block in the heap has been copied
+to the buffer or FALSE otherwise. The <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function
+returns 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) when no more objects in the heap exist
+and 13 (<CODE>ERROR_INVALID_DATA</CODE>) if the heap appears to be corrupt or is
+modified during the walk in such a way that Heap32Next cannot continue.
+<P></P></DL>
+<P>To retrieve information for the first block of a heap, use the <A HREF="#item_Heap32First"><CODE>Heap32First</CODE></A>
+function.</P>
+<DT><STRONG><A NAME="item_Module32First">Module32First($hSnapshot, $lpme)</A></STRONG><BR>
+<DD>
+Retrieves information about the first module associated with a process.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG><A NAME="item_lpme_%5BOUT%5D">lpme [OUT]</A></STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_MODULEENTRY32"><CODE>MODULEENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the first entry of the module list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no modules exist
+or the snapshot does not contain module information.
+<P></P></DL>
+<P>This method actually calls the ANSI version <CODE>Module32FirstA</CODE>, use
+<CODE>Module32FirstW</CODE> to call the Unicode version instead. To retrieve
+information about other modules associated with the specified process,
+use the <A HREF="#item_Module32Next"><CODE>Module32Next</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Module32Next">Module32Next($hSnapshot, $lpme)</A></STRONG><BR>
+<DD>
+Retrieves information about the next module associated with a process or thread.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG>lpme [OUT]</STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_MODULEENTRY32"><CODE>MODULEENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the next entry of the module list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no more modules exist.
+<P></P></DL>
+<P>This method actually calls the ANSI version <CODE>Module32NextA</CODE>, use
+<CODE>Module32NextW</CODE> to call the Unicode version instead. To retrieve information
+about first module associated with a process, usethe <A HREF="#item_Module32First"><CODE>Module32First</CODE></A>
+function.</P>
+<DT><STRONG><A NAME="item_Process32First">Process32First($hSnapshot, $lppe)</A></STRONG><BR>
+<DD>
+Retrieves information about the first process encountered in a system snapshot.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG><A NAME="item_lppe_%5BOUT%5D">lppe [OUT]</A></STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_PROCESSENTRY32"><CODE>PROCESSENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the first entry of the process list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no processes exist
+or the snapshot does not contain process information.
+<P></P></DL>
+<P>This method actually calls the ANSI version <CODE>Process32FirstA</CODE>, use
+<CODE>Process32FirstW</CODE> to call the Unicode version instead. To retrieve
+information about other processes recorded in the same snapshot, use
+the <A HREF="#item_Process32Next"><CODE>Process32Next</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Process32Next">Process32Next($hSnapshot, $lppe)</A></STRONG><BR>
+<DD>
+Retrieves information about the next process recorded in a system snapshot.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG>lppe [OUT]</STRONG><BR>
+<DD>
+Reference to a <A HREF="#item_PROCESSENTRY32"><CODE>PROCESSENTRY32</CODE></A> structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the next entry of the process list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no processes exist
+or the snapshot does not contain process information.
+<P></P></DL>
+<P>This method actually calls the ANSI version <CODE>Process32NextA</CODE>, use
+<CODE>Process32NextW</CODE> to call the Unicode version instead. To retrieve information
+about the first process recorded in a snapshot, use the <A HREF="#item_Process32First"><CODE>Process32First</CODE></A>
+function.</P>
+<DT><STRONG><A NAME="item_SetLastToolHelpError"><CODE>SetLastToolHelpError($dwError)</CODE></A></STRONG><BR>
+<DD>
+Sets the last-error code value of the <EM>ToolHelp</EM> functions.
+<DL>
+<DT><STRONG><A NAME="item_dwError_%5BIN%5D">dwError [IN]</A></STRONG><BR>
+<DD>
+Specifies the last-error code.
+<P></P></DL>
+<P>Error codes returned are 32-bit values with the most significant bit set
+to 1 (bit 31 is the most significant bit). Zero code is <CODE>ERROR_SUCCESS</CODE>.</P>
+<P>Applications can retrieve the value saved by this function by using
+the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function. The use of <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A>
+is optional; an application can call it to find out the specific reason
+for a function failure.</P>
+<DT><STRONG><A NAME="item_Thread32First">Thread32First($hSnapshot, $lpte)</A></STRONG><BR>
+<DD>
+Retrieves information about the first thread of any process encountered
+in a system snapshot.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG><A NAME="item_lpte_%5BOUT%5D">lpte [OUT]</A></STRONG><BR>
+<DD>
+Reference to a  THREADENTRY32 structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the first entry of the thread list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no threads exist
+or the snapshot does not contain thread information.
+<P></P></DL>
+<P>To retrieve information about other threads recorded in the same snapshot,
+use the <A HREF="#item_Thread32Next"><CODE>Thread32Next</CODE></A> function.</P>
+<DT><STRONG><A NAME="item_Thread32Next">Thread32Next($hSnapshot, $lpte)</A></STRONG><BR>
+<DD>
+Retrieves information about the next thread of any process encountered
+in the system memory snapshot.
+<DL>
+<DT><STRONG>hSnapshot [IN]</STRONG><BR>
+<DD>
+Handle to the snapshot returned from a previous call
+to the <A HREF="#item_CreateToolhelp32Snapshot"><CODE>CreateToolhelp32Snapshot</CODE></A> function.
+<P></P>
+<DT><STRONG>lpte [OUT]</STRONG><BR>
+<DD>
+Reference to a  THREADENTRY32 structure to be filled if the function
+succeedes.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if the next entry of the thread list has been copied
+to the buffer or FALSE otherwise. The 18 (<CODE>ERROR_NO_MORE_FILES</CODE>) error value
+is returned by the <A HREF="#item_GetLastToolHelpError"><CODE>GetLastToolHelpError</CODE></A> function if no threads exist
+or the snapshot does not contain thread information.
+<P></P></DL>
+<P>To retrieve information about the first thread recorded in a snapshot,
+use the Thread32First function.</P>
+<DT><STRONG><A NAME="item_Toolhelp32ReadProcessMemory">Toolhelp32ReadProcessMemory($th32ProcessID, $lpBaseAddress, $lpBuffer,
+                                  $cbRead, $lpNumberOfBytesRead)</A></STRONG><BR>
+<DD>
+Copies memory allocated to another process into an application-supplied
+buffer.
+<DL>
+<DT><STRONG>th32ProcessID [IN]</STRONG><BR>
+<DD>
+Identifier of the process whose memory is being copied. This parameter can be
+zero to copy the memory of the current process.
+<P></P>
+<DT><STRONG><A NAME="item_lpBaseAddress_%5BIN%5D">lpBaseAddress [IN]</A></STRONG><BR>
+<DD>
+Base address in the specified process to read. Before transferring any data,
+the system verifies that all data in the base address and memory
+of the specified size is accessible for read access. If this is the case,
+the function proceeds. Otherwise, the function fails.
+<P></P>
+<DT><STRONG><A NAME="item_lpBuffer_%5BOUT%5D">lpBuffer [OUT]</A></STRONG><BR>
+<DD>
+Reference to a scalar string that receives the contents of the address space
+of the specified process.
+<P></P>
+<DT><STRONG><A NAME="item_bcRead_%5BIN%5D">bcRead [IN]</A></STRONG><BR>
+<DD>
+Number of bytes to read from the specified process.
+<P></P>
+<DT><STRONG><A NAME="item_lpNumberOfBytesRead_%5BOUT%5D">lpNumberOfBytesRead [OUT]</A></STRONG><BR>
+<DD>
+Number of bytes copied to the specified buffer. This parameter can be omitted
+if it is not needed.
+<P></P>
+<DT><STRONG>[RETVAL]</STRONG><BR>
+<DD>
+Returns TRUE if successful.
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ferdinand Prantl &lt;<EM><A HREF="mailto:prantl@host.sk">prantl@host.sk</A></EM>&gt;</P>
+<P>See <EM><A HREF="http://prantl.host.sk/perl/modules/Win32API/ToolHelp">http://prantl.host.sk/perl/modules/Win32API/ToolHelp</A></EM>
+for the most recent version.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2002, Ferdinand Prantl. All rights reserved.</P>
+<P>Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided ``as is'' without express or implied warranty.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="ProcessStatus.html">the Win32API::ProcessStatus manpage</A>, <A HREF="../Win32/Process.html">the Win32::Process manpage</A>, <A HREF="../Win32/Job.html">the Win32::Job manpage</A>
+and <A HREF="Const.html">the Win32API::Const manpage</A>.</P>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32API::ToolHelp - Perl extension for obtaining information about currently                     executing applications using the plain Win32 ToolHelp API</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+</BODY>
+
+</HTML>

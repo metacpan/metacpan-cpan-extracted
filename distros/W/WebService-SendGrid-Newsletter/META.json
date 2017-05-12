@@ -1,0 +1,134 @@
+{
+   "abstract" : "Perl interface to SendGrid Newsletter API",
+   "author" : [
+      "Michal Wojciechowski <odyniec@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-SendGrid-Newsletter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "String::Random" : "0",
+            "Test::Class" : "0",
+            "Test::Exception" : "0",
+            "Test::Mock::HTTP::Tiny" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::SendGrid::Newsletter" : {
+         "file" : "lib/WebService/SendGrid/Newsletter.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Base" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Base.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Categories" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Categories.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Identity" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Identity.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Lists" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Lists.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Lists::Email" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Lists/Email.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Recipients" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Recipients.pm",
+         "version" : "0.02"
+      },
+      "WebService::SendGrid::Newsletter::Schedule" : {
+         "file" : "lib/WebService/SendGrid/Newsletter/Schedule.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Sidnet/p5-WebService-SendGrid-Newsletter/issues"
+      },
+      "homepage" : "https://github.com/Sidnet/p5-WebService-SendGrid-Newsletter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Sidnet/p5-WebService-SendGrid-Newsletter.git",
+         "web" : "https://github.com/Sidnet/p5-WebService-SendGrid-Newsletter"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Michal Wojciechowski <odyniec@odyniec.net>",
+      "Michał Wojciechowski <odyniec@odyniec.eu.org>",
+      "Pattawan Kaewduangdee <pattawan.kaewduangdee@sidnet.info>",
+      "Pattawan Kaewduangdee <pattawanna@gmail.com>",
+      "oiami <pattawanna@gmail.com>"
+   ]
+}
+

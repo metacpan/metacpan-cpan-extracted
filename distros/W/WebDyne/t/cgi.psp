@@ -1,0 +1,42 @@
+<start_html lang="en-US" title="A simple example"/>
+
+<h1>A Simple Example</h1>
+<start_form action=""/>
+<p>
+What's your name ? <textfield name="name"/>
+<p>
+What's the combination ? <checkbox_group 
+	name="words" values="@{qw(eenie meenie minie moe)}" defaults="@{qw(eenie minie)}"/>
+<p>
+What's your favourite color ? <popup_menu 
+	name="color" values="@{qw(red green blue chartreuse)}"/>
+<submit/>
+<end_form/>
+<hr>
+
+<perl method="answers">
+<p>
+Your name is: <em>+{name}</em>
+<p>
+The keywords are: <em>${words}</em>
+<p>
+Your favorite color is: <em>+{color}</em>
+</perl>
+
+<end_html/>
+__PERL__
+
+sub answers {
+
+	my $self=shift();
+	my $cgi_or=$self->CGI();
+	if ($cgi_or->param()) {
+		my $words=join(",", $cgi_or->param('words'));
+		return $self->render( words=>$words )
+	}
+	else {
+		return \undef;
+	}
+
+}
+

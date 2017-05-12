@@ -1,0 +1,12 @@
+Changes
+examples/synopsis.pl
+lib/WWW/WWWJDIC.json
+lib/WWW/WWWJDIC.pm
+lib/WWW/WWWJDIC.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/WWW-WWWJDIC.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

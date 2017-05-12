@@ -1,0 +1,156 @@
+How To Write Fast Scripts?
+--------------------------
+
+In these days Perl interpretator is really fast. Its start in least of 0.05 seconds!
+So your little script can done its job in least of 0.1 sec. - that is good..very good!
+In real life however your script is complicated with DB interactions and lots of tasks.
+Thats mean that if your scripts finish in time of 1 seconds you should be happy.
+Actually that is very important especially if you have heavy web traffic.
+
+Lets see this webtools script example:
+
+
+1.   <!--#onActivate>
+2.    # Set active configuration from 'setup.pl'
+3.    require 'setup.pl';
+4. 
+5.    $webtools::sql_host   = $db_host;
+6.    $webtools::sql_pass   = $db_pass;
+7.    $webtools::sql_user   = $db_user;
+8.    $webtools::tmp        = $tmp_folder;
+9.  
+1.    $webtools::sql_database_sessions =  $db_name;
+11.   $webtools::sql_sessions_table =  $sess_table;
+12.   $webtools::sql_user_table = $user_table;
+13.   
+14.  </#onActivate-->
+15.  <!-- PERL: Hide Perl`s script
+16.  <?perl 
+17.   Header(type=>'content',val=>'text/html; charset='.$char_set);
+18.   Header(type=>'raw',val=>"Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
+19.   Header(type=>'raw',val=>"Cache-Control: no-store, no-cache, must-revalidate\n");
+20.   Header(type=>'raw',val=>"Cache-Control: post-check=0, pre-check=0\n");
+21.   Header(type=>'raw',val=>"Pragma: no-cache\n");
+22.   
+23.   session_set_id_name('ADMIN_SID');
+24.   my $include_path = $perl_html_dir.'scripts/admin/';
+25.  ?>
+26.  //-->
+27.  %%%INLINE%%%%%XREADER:1:admin/structure.jhtml:1,2%%%%%/INLINE%%%
+28.  <?perl
+29.   $dbh = sql_connect();
+30.   my @msg = ();
+31.   require "tools.pl";
+32.   $must_quit = 0;
+33.   
+34.   if($act eq '')
+35.   {
+36.    $empty = (!defined($user)) and (!defined($pass)) ? 1 : 0;
+37.    $user = lc($user);
+38.    $old_sid = GetCurrentSID($dbh);
+39.    if(!($user =~ m/^admin$/si)) {$user='';}
+40.    ($result,$user,$pass,$id,$data) = UserPassword($user,$pass,$empty,$old_sid,$dbh);
+41.  
+42.   if ($result eq 'redirect')
+43.     {
+44.      %%%INPERL%%%%%XREADER:2:admin/structure.jhtml:%%%%%/INPERL%%%
+45.      print;
+46.      $must_quit = 1;
+47.     }
+48.   if ($result eq 'incorect')
+49.     {
+50.      %%%INPERL%%%%%XREADER:3:admin/structure.jhtml:%%%%%/INPERL%%%
+51.      print;
+52.      $must_quit = 1;
+53.     }
+54.   if ($result eq 'new')
+55.     {
+56.      $sid = session_start($dbh,1);  # Start absolutly new session
+57.      $reg_buffer = update_var('scalar','user_loged',$reg_buffer,1);
+58.      $result = 'menu';
+59.     }
+60.   if(!$must_quit)
+61.     {
+62.      if ($action eq 'logout')
+63.        {
+64.         ClearHeader();
+65.         session_destroy($dbh);
+66.         Header(type=>'content',val=>'text/html; charset='.$char_set);
+67.         %%%INPERL%%%%%XREADER:4:admin/structure.jhtml:%%%%%/INPERL%%%
+68.         print;
+69.         $result = '';
+70.        }
+71.     if($result eq 'menu')
+72.      {
+73.        if($script eq 'filemanager')
+74.         {
+75.          %%%INCLUDE%./htmls/scripts/admin/filemanager.inc%%%
+76.         }
+77.       if($script eq 'users')
+78.         {
+79.          %%%INCLUDE%./htmls/scripts/admin/users.inc%%%
+80.         }
+81.      }
+82.    }
+83.  }
+84.  ?>
+85.  %%%INLINE%%%%%XREADER:1:admin/structure.jhtml:2,3%%%%%/INLINE%%%
+86.  <!-- PERL: Hide Perl`s script
+87.  <?perl 
+88.   if ($session_started){session_register($reg_buffer,$dbh);}
+89.  ?>
+90.  //-->
+
+
+ Probably you don't know what this script do? However this script may be a part 
+of real script but before you start writing scripts like this you should notice 
+follow things:
+
+1) Section onActive (from line 1 to line 14) is a work that should be done just
+   before real script start. So over this section WebTools made additional work.
+   Please write as small as it possible onActive sctions (as size and as count)
+
+2) All sections like %%%INPERL%%% ... %%%/INPERL%%% are templates so script will 
+   take more CPU time if you have many of this kind!
+
+3) Take a look at line 71 up to line 81. There you have "choose" (or switch/case)
+   operator! You will execute code "filemanager.inc" or "users.inc" depending
+   of $script variable, but YOU SHOULD NOTE that boot of "filemanager.inc" and
+   "users.inc" will be loaded in memory, templates will be processed (if there are 
+   any avalilable templates) and all use/require clauses will be executed!!!
+   Don't thing that if some of INCLUDE sections will not be executed "this" time
+   that thay will not be loaded and that thay will not take a CPU time!!!
+   So USELESS CODE WILL BE PROCEEDED IF YOU ARE NOT CONCENTRATED! 
+   Please use new feature introduced in WebTools 1.26 called (eval_webtools_script()) 
+   insted of INCLUDE feature and your code will be speedup up to 2-4 times!!!
+
+Example:
+
+71.     if($result eq 'menu')
+72.      {
+73.        if($script eq 'filemanager')
+74.         {
+75.          execute_code('./htmls/scripts/admin/filemanager.inc');
+76.         }
+77.       if($script eq 'users')
+78.         {
+79.          execute_code('./htmls/scripts/admin/users.inc');
+80.         }
+81.      }
+...
+100.    sub execute_code
+101.    {
+102.     local * FF;
+103.     my $code;
+104.     open(FF,shift(@_));
+105.     binmode FF;
+106.     read(FF,$code,-s(FF));
+107.     close FF;
+108.     eval_webtools_code($code);  # New feature introduced in ver 1.26
+109.    }
+
+
+
+Author: Julian Lishev,
+e-mail: julian@proscriptum.com
+URL: www.proscriptum.com

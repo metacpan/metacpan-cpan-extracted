@@ -1,0 +1,24 @@
+---
+abstract: 'Freebox API wrappers.'
+author:
+  - 'Vadim Zeitlin <vz-cpan@zeitlins.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Freebox
+requires:
+  Digest::SHA: 0
+  JSON: 0
+  Mouse: 0
+  REST::Client: 0
+  strict: 0
+  warnings: 0
+version: 0.001

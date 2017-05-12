@@ -1,0 +1,15 @@
+Changes
+lib/WebService/Aladdin.pm
+lib/WebService/Aladdin/Parser.pm
+lib/WebService/Aladdin/Item.pm
+lib/WebService/Aladdin/Items.pm
+lib/WebService/Aladdin/Item/Book.pm
+lib/WebService/Aladdin/Item/Music.pm
+lib/WebService/Aladdin/Item/DVD.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00_compile.t
+t/01_method_search.t
+t/02_method_product.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Wx/Perl/ProcessStream.pm
+t/00-load.t
+t/01-events.t
+t/WxTesting.pm
+t/echo.pl
+t/shelltest.pl
+t/shelltest.sh
+example/psexample.pl
+example/testproc.pl
+META.yml                                 Module meta-data (added by MakeMaker)

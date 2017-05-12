@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "clicks": [
+            {
+                "short_url": "http://tcrn.ch/a4MSUH",
+                "global_hash": "bWw49z",
+                "user_clicks": 0,
+                "user_hash": "a4MSUH",
+                "global_clicks": 1105
+            },
+            {
+                "hash": "a35.",
+                "error": "NOT_FOUND"
+            }
+        ]
+    },
+    "status_txt": "OK"
+}

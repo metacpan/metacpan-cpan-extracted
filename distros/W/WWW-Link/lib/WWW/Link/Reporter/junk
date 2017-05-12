@@ -1,0 +1,94 @@
+
+package HTML::Stream::LinkForm;
+
+@ISA=qw(HTML::Stream::LinkReport);
+
+=head2 page_list
+
+This takes a list of urls as an argument and generates a unnumbered
+html list consisting of those urls inside links to those urls.  It is
+for use for refering to pages on which urls occur.
+
+Obviously, if the URLs are file urls, then the machine they are being
+read on must be the same as the one the file urls refer to.
+
+=cut
+
+sub page_list {
+  $self=shift;
+  $array=shift;
+  $self->UL;
+  foreach (@$array) {
+    $self -> LI
+          -> Link($_)
+	  -> _LI;
+  }
+  $self->_UL;
+  return $self;
+}
+
+=head2 $LR->Link()
+
+This method puts out a url inside a link refering to that url.  I
+don't want to encourage this for general use: it's much better to use
+a description generally.  This program, however, deals directly with
+links so it suits us here.
+
+=cut
+
+sub Link {
+  $self=shift;
+  my $url=shift;
+  $self -> A(HREF=>$url)
+	-> t($url)
+	-> _A  ;
+  return $self;
+}
+
+
+
+
+
+#the following is apparently not used
+
+package HTML::Stream::MailReport;
+
+our @ISA;
+@ISA=qw(HTML::Stream::LinkRepairForm);
+
+use Carp;
+
+#FIXME config
+$downloaddir="newlinks"; #must be 
+#FIXME instance per reporter
+$downloaded={};
+$downloadno=1;
+$gets_running=0;
+sub Link {
+  my $self=shift;
+  my $url=shift;
+  unless ($filename = $downloaded{$url}) {
+    $downloadno++;
+    $filename="$downdir/page_$downloadno.html"; #this must be a relative reference.
+    unless (-d $downloaddir) {
+      mkdir $downloaddir, 0644;
+    }
+    $gets_running++;
+    if ($gets_running < 3) {
+      wait();
+      $gets_running--;
+    }
+    if (fork()) {
+      $downloaded{$url}=$filename;
+    } else {
+      getstore($url, $filename);
+    }
+  }
+  $self -> A(HREF=>$filename)
+	-> t($url)
+	-> _A  ;
+  return $self;
+}
+
+1;
+\

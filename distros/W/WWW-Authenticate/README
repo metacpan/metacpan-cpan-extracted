@@ -1,0 +1,49 @@
+Readme file for Perl Module WWW::Authenticate
+
+The intent of this module is to provide an easy method to authenticate
+web site users utilizing session cookies and a MySQL user table.
+
+Prerequisites:
+CGI::Cookie
+MySQL
+
+This program is copyright 2001 D. Scott Barninger <barninger@fairfieldcomputers.com>
+and Chris Fleizach <chris@fightliteracy.com> and is licensed under the
+GNU General Public License version 2.0. See the accompanying LICENSE file.
+
+Installation:
+
+To install in the usual site library directory do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may specify a different install location by:
+	perl Makefile.PL PREFIX=/my/chosen/dir
+in which case you should modify the shebang line of any scripts calling the module:
+	#!perl -I /my/chosen/dir
+
+You may also install the module manually in the cgi-bin directory of your server. It's
+all pure perl so copy the Authenticate.pm file to a subdirectory WWW in your cgi-bin,
+e.g.
+	/home/mysite/cgi-bin/myscript.cgi
+	/home/mysite/cgi-bin/WWW/Authenticate.pm
+
+After installing the module you must create the user table. The program
+create_user_table.pl in the tools/ subdirectory of this distribution will create the
+table. Use a text editor to edit the configuration variables of the script for your
+MySQL installation, upload it to your web server, chmod 755 and execute it from a shell
+prompt. It will create the following table:
+		id INT(11) DEFAULT '0' NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		user_name CHAR(10),
+		password CHAR(10),
+		session TEXT,
+		email CHAR(40).
+You will have to create any user entries in the table you need. If you want other
+columns for your user table add them to the table definition in the script but don't
+alter id, user_name, password, or session columns.
+
+For guidance in using the module functions see the pod documentation embedded in the
+module and the sample application cgi_authenticate.cgi in the samples/ subdirectory
+of this distribution.

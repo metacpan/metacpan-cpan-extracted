@@ -1,0 +1,44 @@
+# The following items WILL BE done in the near future :-)
+
+- There is a possible memory leak in Win32::OLE::Const::_Load when
+  this function croaks (because $Warn is set to 3) and the croak
+  is catched in a __DIE__ handler.
+
+# This file contains random thoughts and notes about what might be
+# changed in future versions of Win32::OLE.
+# Note: No particular order, no promises!
+
+- Test suite:
+  Enum
+  Compatibility module
+    PUTPROPERTY using "unnamed" method ????
+
+- Provide access to instance data for subclassing.
+  Win32::OLE objects use the tied hash mechanism for set/getproperty,
+  so the standard way of accessing instance data is not available.
+
+- Call SUBCLASS::__new__ for internally created objects, so that the subclass
+  can do additional initialisation? Function name?
+
+- TypeInfo support
+  - Generic Typelib stuff
+  - Validate method/property parameters
+  - Automatically assign new OLE objects to a subclass, if that
+    namespace exists and it "isa" Win32::OLE subclass.
+    (e.g. automaticall assign all Excel chart objects to Excel::Chart)
+
+- Better error messages
+  Use Grahams Error.pm module when it has been accepted by p5p.
+
+- Implement an error API that offers control over exceptional conditions
+  (rather than simply croak()ing, which is considered "bad" for modules)
+  Perhaps this can ride over a standard Exception package when it becomes
+  available.
+
+- Caching of method dispids should be done on class basis, not per object.
+
+- Make OLE.xs thread-safe
+
+- Provide support for OLE events, if possible
+  - Callbacks in a separate thread
+  - Through some kind of event loop

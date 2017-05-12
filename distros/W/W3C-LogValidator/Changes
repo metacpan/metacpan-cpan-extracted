@@ -1,0 +1,103 @@
+Revision history for Perl module W3C::LogValidator
+$Id: Changes,v 1.29 2008/11/21 14:53:32 ot Exp $
+
+1.4 [2008-11-21]
+  - patch for perl 5.10 support, courtesy of Colm Dougan
+    http://www.w3.org/Bugs/Public/show_bug.cgi?id=5665
+  - CSS and HTML validation modules now only take into consideration resources which actually exist
+    counting only the HTTP 200 status code entries, when status code is available
+    http://www.w3.org/Bugs/Public/show_bug.cgi?id=3582
+  - When the log format includes HTTP methods used, keep only the resources accessed via HTTP GET
+    http://www.w3.org/Bugs/Public/show_bug.cgi?id=4334
+  - Adding ExcludeHosts option to filter our log records originating from (a) specific host(s) or IP address(es)
+    patches courtesy of Martin B. Smith
+    http://www.w3.org/Bugs/Public/show_bug.cgi?id=5221
+    
+1.3.1 [2008-05-28]
+  - removed macos-specific files which tend to trip up some systems.
+    No Functional Changes.
+
+1.3 [2008-05-27]
+  - removed dependencies to some currently broken perl modules. No Functional Changes.
+
+1.2 [2007-09-10]
+  - clean tarball - similar in feature to 1.1
+
+1.1 [2007-09-05]
+  - adding options for the HTML and CSS Validator modules to show which 
+    of the valid, invalid and other (non validable) documents should be listed
+    in the final report. As a result, one can decide only to list the top
+    valid, top invalid, or all documents with their validation status, etc.
+  - supporting additional log format used by e.g squid revers proxy
+  - adding ExcludeCGI option to switch on of off filtering of URIs 
+    with query strings, e.g http://www.example.com/script?foo=bar
+  - fixing the "Basic" (counting the most popular resource) module
+    for input formats which do not include the HTTP response code
+  - bug fixes for LinkReferer module
+
+1.06  [2006-06-23]
+	- first version LinkReferer module tracks top referers for 4xx/5xx resources
+	- limiting results of Basic module to actual resources
+
+1.05 [2006-01-18]
+	- "safe pipe open" patch for link checker (courtesy of Slaven Rezic)
+
+1.04 [2006-01-16]
+	- improved detection of link checker program for eponymous module
+	  (patch submitted by Slaven Rezic)
+
+1.03 [2006-01-13]
+	- making dependency to link checker less strict
+	- documenting how to enable the linkchecker module
+
+1.02 [2006-01-06]
+	- fixing a broken dependency
+
+1.01 [2005-09-10]
+	- fixing list of required modules
+
+1.0 [2005-09-09]
+	- adding Link Checker module
+	- updated SurveyEngine Module
+	- bug fixes
+	- documentation improvements
+
+0.5 [2004-11-10]
+	- adding "QuietIfNoReport" option. 
+	If this option is set, the LogValidator skips reports 
+	where the details table is empty (nothing to validate, or nothing invalid)
+
+0.4.1 [2004-09-08]
+	- minor documentation fixes
+
+0.4 [2004-09-06]
+	- improved test suite
+	- improved API documentation (pod)
+	- add option with regexps of areas / documents to ignore
+	- minor fixes / typos corrected
+
+0.3 [2004-06-08]
+	- adding CSSValidator Module
+	- Adding (experimental) SurveyEngine Module
+	- adding support for "w3" log format
+	- changed output for clearer display of results
+	- added an option to set the From: address in Output::Mail
+	- the LogValidator now checks for the actual Content-Type of documents with no extension (format negociated)
+
+0.2 [2003-05-19]
+	- adding support to "plain" log format to process simple lists of URIs
+	- improved HTML output
+
+0.1.1 [2003-05-08]
+	- mostly packaging and documentation issues
+
+0.1 [2003-04-14] 	
+	- first stable release
+
+0.1.beta2 [2003-04-01]
+	- modularized output, with "console output" as default, e-mail and HTML output available
+	- mechanism to avoid parsing too long logfiles
+
+0.1beta1 [2002-08-28]
+	- This first version has 2 modules, Basic and HTMLValidator
+

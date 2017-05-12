@@ -1,0 +1,17 @@
+Revision history for WWW-Mechanize-Meta
+
+0.07    пятница, 27 ноября 2009 г. 17:40:44 (MSK)
+        fixed tests
+        CPANTS
+0.06    пятница, 27 ноября 2009 г. 17:49:46 (MSK)
+0.05    понедельник,  3 августа 2009 г. 17:40:58 (MSD)
+        now WWW::Mechanize::RSS find atom feeds
+0.04	29.09.2007/15:06
+        Fixed bug with utf8-encoded sites, added cleaning headers after previous requests, added rss method,which returns array of rss elements
+0.03	17.09.2007/22:58
+        Fool bug!!! href attribute always was 1
+0.02	17.09.2007/01:10
+        Some changes in documentation. Fixed bug with href attribute
+0.01    16.09.2007/10:00
+        Initial release
+

@@ -1,0 +1,103 @@
+NAME
+    WebService::Bluga::Webthumb - fetch website thumbnails via
+    webthumb.bluga.net
+
+SYNOPSIS
+        use WebService::Bluga::Webthumb;
+        my $wt = WebService::Bluga::Webthumb->new(
+            user    => $user_id,
+            api_key => $api_key,
+            size    => $size,  # small, medium, medium2, large (default: medium)
+            cache   => $cache_days, # optional - default 14
+        );
+
+        # get a thumbnail URL using the default settings
+        my $thumb_url = wt->thumb_url($url);
+
+        # Get a thumbnail URL overriding some settings:
+        my $thumb_url = $wt->thumb_url($url, { size => 'large' });
+
+Class methods
+    new Create a new WebService::Bluga::Webthumb object. Takes the following
+        params:
+
+        user
+            Your webthumb user ID, available from your
+            http://webthumb.bluga.net/user page.
+
+        api_key
+            Your webthumb API key. also available from your user page. (This
+            is used to construct the hash of the thumbnail URL, but not sent
+            directly.)
+
+        size
+            The size of the thumbnail to generate. Size can be:
+
+            * small - 80x60
+            * medium - 160x120
+            * medium2 - 320x240
+            * large - 640x480
+
+        cache
+            How many days a generated thumbnail can be cached on the
+            webthumb servers before a fresh one is generated. Generating a
+            thumbnail uses a credit whereas serving up a cached one uses a
+            fraction of a credit, so don't set this too low.
+
+            If not specified, defaults to 14 days.
+
+Instance methods
+    thumb_url
+        Given an URL, and optionally `size' / `cache' params to override
+        those from the object, returns an URL to the thumbnail, to use in an
+        IMG tag.
+
+    easy_thumb
+        An alias for `thumb_url'. This name was used in 0.01 to reflect the
+        fact that it used the EasyThumb API rather than the full API;
+        however, I think `thumb_url' is rather clearer as to the actual
+        purpose of the method, and the implementation of it is somewhat
+        unimportant, so consider this method somewhat deprecated (but likely
+        to be supported indefinitely.)
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+ACKNOWLEDGEMENTS
+    James Ronan
+
+CONTRIBUTING
+    This module is developed on GitHub at:
+
+    https://github.com/bigpresh/WebService-Bluga-Webthumb
+
+    Bug reports / suggestions / pull requests are all very welcome.
+
+    If you find this module useful, please feel free to rate it on
+    cpanratings
+
+BUGS
+    Bug reports via Issues on GitHub are preferred, as the module is
+    developed on GitHub, and issues can be correlated to commits. Bug
+    reports via the RT queue are still valued though, if you'd prefer that
+    way.
+
+SEE ALSO
+    See the API documentation at http://webthumb.bluga.net/api-easythumb
+
+    For a basic description of the service, see http://webthumb.bluga.net/
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WebService::Bluga::Webthumb
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

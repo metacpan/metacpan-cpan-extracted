@@ -1,0 +1,23 @@
+<SEARCH
+	action="http://news.google.com/news"
+	description="Google News"
+	method="GET"
+	name="GoogleNews"
+	queryCharset="UTF-8"
+>
+<input name="q" user>
+<input name="hl" value="en">
+<input name="btnG" value="Search+News">
+<inputnext name="start" factor="10">
+<inputprev name="start" factor="10">
+<input name="ie" value="utf-8">
+<input name="oe" value="utf-8">
+<input name="scoring" value="d">
+<INTERPRET
+	resultItemEnd="</font><br>"
+	resultItemStart=">"
+	resultListEnd="</div>"
+	resultListStart="</table><br><div"
+>
+</SEARCH>
+

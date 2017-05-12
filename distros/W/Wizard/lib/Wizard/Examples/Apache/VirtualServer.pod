@@ -1,0 +1,96 @@
+
+=head1 VirtualServer Menu
+
+Hier werden die virtuellen Webserver administriert. Die Menuoptionen
+und der Verlauf ist analog zu dem Server Menu. Lediglich die 
+Attributseingabe erfolgt in zwei Schritten, wobei nach dem ersten
+Schritt abgebrochen werden kann. Beim Anlegen eines neuen virtuellen
+Webservers wird automatisch ein Verzeichnis angelegt, dass das 
+root Verzeichnis des angelegten virtuellen Webservers entspricht,
+Naehres finden sie im Abschnitt Directory Menu.
+
+=head2 Attribute eines virtuellen Webservers
+
+=over 4
+
+=item I<apache_virtualserver_name> DNS name or IP address
+
+Gueltiger DNS name oder IP Adresse (siehe analoge Attribute fuer 
+Hosts, Server)
+
+=item I<apache_virtualserver_http_mode> Server type
+
+Hier koennen Sie den Servertyp einstellen, die Auswahl besteht
+aus 'http', 'https' oder 'both'. Falls 'https' oder 'both'
+ausgewaehlt wird, hat das zur Folge das als HTTP version HTTP/1.0
+automatisch eingestellt wird. Falls 'http' ausgewaehlt wird hat
+man die Moeglichkeit zwischen HTTP/1.0 oder HTTP/1.1 auszuwaehlen.
+
+=item I<apache_virtualserver_root> Virtual WWW server root directory
+
+Das root Verzeichnis des virtuellen Webservers.
+
+=item I<apache_virtualserver_admin> Virtual WWW server admin
+
+Email adresse des Webmasters.
+
+=item I<apache_virtualserver_http_port> HTTP port
+
+HTTP Port auf den der virtuelle Server hoeren soll, falls nichts
+eingegeben wird, wird der des Servers, zu dem dieser virtuelle 
+Webserver gehoert, verwendet.
+
+=item I<apache_virtualserver_https_port> HTTPS port
+
+Nur falls 'https' oder 'both' als 'Server type' ausgewaehlt wurde.
+Analog zu HTTP port.
+
+=item I<apache_virtualserver_http_version> HTTP version
+
+Nur falls 'http' als 'Server type' ausgewaehlt wurde.
+
+=item I<apache_virtualserver_interface> Virtual WWW server interface number
+
+Eine eindeutige interface Nummer (Ganzzahl) des virtuellen 
+Webservers. Die Eingabe kann leergelassen werden falls 
+'http' als 'Server type' und HTTP/1.1 als 'HTTP version' 
+ausgwaehlt wurde.
+
+=item I<apache_virtualserver_DirectoryIndex> DirectoryIndex, Options
+
+Analog zu den entsprechenden Apache Konfigurationsoptionen
+(wird mit sinvollen defaults vorbelegt)
+
+=item I<apache_virtualserver_enable_pcgi> PCGI/EP/SSI
+
+Hier koennen Sie einstellen ob der virtuelle Webserver PCGI, EP
+oder SSI (Server Side Includes) unterstuetzen soll.
+
+=back
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+                         Phone: +49 7123 14887
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+                         Phone: +49 7072 920696
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+=cut

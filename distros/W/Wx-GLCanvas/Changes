@@ -1,0 +1,34 @@
+Revision history for Perl extension Wx::GLCanvas.
+
+0.09  Tue Aug 11 21:06:05 CEST 2009
+	- Do not try to autoload DESTROY as if it were a constant.
+
+0.08  Thu Aug  6 20:12:12 CEST 2009
+	- Add attribute list parameter to wxGLCanvas constructor
+	  and wrap WX_GL_* constants.
+
+0.07  Sun Jun 29 21:28:45 CEST 2008
+	- Try to fail gracefully if wxPerl has not been
+	  installed yet.
+
+0.06  Sat Jun 23 22:03:29 CEST 2007
+	- Compatibility with wxWidgets 2.9.x.
+
+0.05  Sat Nov 11 17:14:03 CET 2006
+	- Compilation fixes for wxWidgets 2.7.1 and 2.7.2.
+
+0.04  Sun Aug 27 17:38:24 CEST 2006
+	- Add overloaded Wx::GLCanvas constructors.
+	- Make the cube rotate and have shiny colors.
+	- Use the wxDemo framework for the example.
+
+0.03  Wed Jan  5 07:43:03 CET 2005
+	- Various fixes for wxWidgets 2.5.3 under Windows.
+
+0.02  Fri Sep 12 23:35:08 CEST 2003
+	- Compatibility with wxWindows 2.5.x
+	- Don't depend on OpenGL. Any module providing access to OpenGL
+	  API can be used together with Wx::GLCanvas.
+
+0.01  Tue Aug 26 16:44:26 CEST 2003
+	- First version.

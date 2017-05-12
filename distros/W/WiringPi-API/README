@@ -1,0 +1,1062 @@
+NAME
+
+    WiringPi::API - API for wiringPi, providing access to the Raspberry
+    Pi's board, GPIO and connected peripherals
+
+SYNOPSIS
+
+    No matter which import option you choose, before you can start making
+    calls, you must initialize the software by calling one of the setup*()
+    routines.
+
+        use WiringPi::API qw(:all)
+    
+        # use as a base class with OO functionality
+    
+        use parent 'WiringPi::API';
+    
+        # use in the traditional Perl OO way
+    
+        use WiringPi::API;
+    
+        my $api = WiringPi::API->new;
+
+DESCRIPTION
+
+    This is an XS-based module, and requires wiringPi <http://wiringpi.com>
+    version 2.36+ to be installed. The wiringPiDev shared library is also
+    required (for the LCD functionality), but it's installed by default
+    with wiringPi.
+
+    See the documentation on the wiringPi <http://wiringpi.com> website for
+    a more in-depth description of most of the functions it provides. Some
+    of the functions we've wrapped are not documented, they were just
+    selectively plucked from the C code itself. Each mapped function lists
+    which C function it is responsible for.
+
+EXPORT_OK
+
+    Exported with the :all tag, or individually.
+
+    Perl wrapper functions for the XS functions. Not all of these are
+    direct wrappers; several have additional/modified functionality than
+    the wrapped versions, but are still 100% compatible.
+
+        setup           setup_sys       setup_phys          setup_gpio 
+        pull_up_down    read_pin        write_pin           pwm_write
+        get_alt         gpio_layout     wpi_to_gpio         phys_to_gpio
+        pwm_set_range   lcd_init        lcd_home            lcd_clear
+        lcd_display     lcd_cursor      lcd_cursor_blink    lcd_send_cmd
+        lcd_position    lcd_char_def    lcd_put_char        lcd_puts
+        set_interrupt   soft_pwm_create soft_pwm_write      soft_pwm_stop
+        shift_reg_setup pin_mode        analog_read         analog_write
+        bmp180_setup    bmp180_pressure bmp180_temp         phys_to_wpi
+        ads1115_setup   spi_setup       spi_data
+
+EXPORT_TAGS
+
+    See EXPORT_OK
+
+ :all
+
+    Exports all available exportable functions.
+
+FUNCTION TABLE OF CONTENTS
+
+ CORE
+
+    See "CORE FUNCTIONS".
+
+ BOARD
+
+    See "BOARD FUNCTIONS".
+
+ LCD
+
+    See "LCD FUNCTIONS".
+
+ SOFTWARE PWM
+
+    See "SOFT PWM FUNCTIONS".
+
+ INTERRUPT
+
+    See "INTERRUPT FUNCTIONS".
+
+ ANALOG TO DIGITAL CONVERTER
+
+    See "ADC FUNCTIONS".
+
+ SHIFT REGISTER
+
+    See "SHIFT REGISTER FUNCTIONS".
+
+ I2C
+
+    See "I2C FUNCTIONS"
+
+ SPI
+
+    See "SPI FUNCTIONS"
+
+ BAROMETRIC SENSOR
+
+    See "BMP180 PRESSURE SENSOR FUNCTIONS".
+
+CORE FUNCTIONS
+
+ new()
+
+    NOTE: After an object is created, one of the setup* methods must be
+    called to initialize the Pi board.
+
+    Returns a new WiringPi::API object.
+
+ setup()
+
+    Maps to int wiringPiSetup()
+
+    Sets the pin number mapping scheme to wiringPi.
+
+    See pinout.xyz <https://pinout.xyz/pinout/wiringpi> for a pin number
+    conversion chart, or on the command line, run gpio readall.
+
+    Note that only one of the setup*() methods should be called per program
+    run.
+
+ setup_gpio()
+
+    Maps to int wiringPiSetupGpio()
+
+    Sets the pin numbering scheme to GPIO.
+
+    Personally, this is the setup routine that I always use, due to the
+    GPIO numbers physically printed right on the Pi board.
+
+ setup_phys()
+
+    Maps to int wiringPiSetupPhys()
+
+    Sets the pin mapping to use the physical pin position number on the
+    board.
+
+ setup_sys()
+
+    Maps to int wiringPiSetupSys()
+
+    DEPRECATED.
+
+    This function is here for legacy purposes only, to provide non-root
+    user access to the GPIO. It required exporting the pins manually before
+    use. wiringPi now uses /dev/gpiomem by default, which does not require
+    root level access.
+
+    Sets the pin numbering scheme to GPIO.
+
+ pin_mode($pin, $mode)
+
+    Maps to void pinMode(int pin, int mode)
+
+    Puts the pin in either INPUT or OUTPUT mode.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $mode
+
+    Mandatory: 0 for INPUT, 1 OUTPUT, 2 PWM_OUTPUT and 3 GPIO_CLOCK.
+
+ read_pin($pin);
+
+    Maps to int digitalRead(int pin)
+
+    Returns the current state (HIGH/on, LOW/off) of a given pin.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+ write_pin($pin, $state)
+
+    Maps to void digitalWrite(int pin, int state)
+
+    Sets the state (HIGH/on, LOW/off) of a given pin.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $state
+
+    Mandatory: 1 to turn the pin on (HIGH), and 0 to turn it LOW (off).
+
+ analog_read($pin);
+
+    Maps to int analogRead(int pin)
+
+    Returns the data for an analog pin. Note that the Raspberry Pi doesn't
+    have analog pins, so this is used when connected through an ADC or to
+    pseudo analog pins.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pseudo pin number, in the pin numbering scheme dictated
+    by whichever setup*() routine you used.
+
+ analog_write($pin, $value)
+
+    Maps to void analogWrite(int pin, int value)
+
+    Writes the value to the corresponding analog pseudo pin.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pseudo pin number, in the pin numbering scheme dictated
+    by whichever setup*() routine you used.
+
+        $value
+
+    Mandatory: The data which you want to write to the pseudo pin.
+
+ pull_up_down($pin, $direction)
+
+    Maps to void pullUpDnControl(int pin, int pud)
+
+    Enable/disable the built-in pull up/down resistors for a specified pin.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $direction
+
+    Mandatory: 2 for UP, 1 for DOWN and 0 to disable the resistor.
+
+ pwm_write($pin, $value)
+
+    Maps to void pwmWrite(int pin, int value)
+
+    Sets the Pulse Width Modulation duty cycle (on-time) of the pin.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $value
+
+    Mandatory: 0 to 1023. 0 is 0% (off) and 1023 is 100% (fully on).
+
+ get_alt($pin)
+
+    Maps to int getAlt(int pin)
+
+    This returns the current mode of the pin (using getAlt() C call). Modes
+    are INPUT 0, OUTPUT 1, PWM_OUT 2 and CLOCK 3.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+BOARD FUNCTIONS
+
+ gpio_layout()
+
+    Maps to int piGpioLayout()
+
+    Returns the Raspberry Pi board's GPIO layout (ie. the board revision).
+
+ wpi_to_gpio($pin_num)
+
+    Maps to int wpiPinToGpio(int pin)
+
+    Converts a wiringPi pin number to the Broadcom (GPIO) representation,
+    and returns it.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+ phys_to_gpio($pin_num)
+
+    Maps to int physPinToGpio(int pin)
+
+    Converts the pin number on the physical board to the GPIO
+    representation, and returns it.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory: The pin number on the physical Raspberry Pi board.
+
+ phys_to_wpi($pin_num)
+
+    Maps to int physPinToWpi(int pin)
+
+    Converts the pin number on the physical board to the wiringPi numbering
+    representation, and returns it.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory: The pin number on the physical Raspberry Pi board.
+
+ pwm_set_range($range);
+
+    Maps to void pwmSetRange(int range)
+
+    Sets the range register of the Pulse Width Modulation (PWM)
+    functionality. It defaults to 1024 (0-1023).
+
+    Parameters:
+
+        $range
+
+    Mandatory: An integer between 0 and 1023.
+
+LCD FUNCTIONS
+
+    There are several methods to drive standard Liquid Crystal Displays.
+    See wiringPiDev LCD page <http://wiringpi.com/dev-lib/lcd-library/> for
+    full details.
+
+ lcd_init(%args)
+
+    Maps to:
+
+        int lcdInit(
+            rows, cols, bits, rs, strb,
+            d0, d1, d2, d3, d4, d5, d6, d7
+        );
+
+    Initializes the LCD library, and returns an integer representing the
+    handle (file descriptor) of the device.
+
+    Parameters:
+
+        %args = (
+            rows => $num,       # number of rows. eg: 2 or 4
+            cols => $num,       # number of columns. eg: 16 or 20
+            bits => 4|8,        # width of the interface (4 or 8)
+            rs => $pin_num,     # pin number of the LCD's RS pin
+            strb => $pin_num,   # pin number of the LCD's strobe (E) pin
+            d0 => $pin_num,     # pin number for LCD data pin 1
+            ...
+            d7 => $pin_num,     # pin number for LCD data pin 8
+        );
+
+    Mandatory: All entries must have a value. If you're only using four (4)
+    bit width, d4 through d7 must be set to 0.
+
+    Note: When in 4-bit mode, the d0 through 3 parameters actually map to
+    pins d4 through d7 on the LCD board, so you need to connect those pins
+    to their respective selected GPIO pins.
+
+ lcd_home($fd)
+
+    Maps to void lcdHome(int fd)
+
+    Moves the LCD cursor to the home position (top row, leftmost column).
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+ lcd_clear($fd)
+
+    Maps to void lcdClear(int fd)
+
+    Clears the LCD display.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+ lcd_display($fd, $state)
+
+    Maps to void lcdDisplay(int fd, int state)
+
+    Turns the LCD display on and off.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $state
+
+    Mandatory: 0 to turn the display off, and 1 for on.
+
+ lcd_cursor($fd, $state)
+
+    Maps to void lcdCursor(int fd, int state)
+
+    Turns the LCD cursor on and off.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $state
+
+    Mandatory: 0 to turn the cursor off, 1 for on.
+
+ lcd_cursor_blink($fd, $state)
+
+    Maps to void lcdCursorBlink(int fd, int state)
+
+    Allows you to enable/disable a blinking cursor.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $state
+
+    Mandatory: 0 to turn the cursor blink off, 1 for on. Default is off
+    (0).
+
+ lcd_send_cmd($fd, $command)
+
+    Maps to void lcdSendCommand(int fd, char command)
+
+    Sends any arbitrary command to the LCD.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $command
+
+    Mandatory: A command to submit to the LCD.
+
+ lcd_position($fd, $x, $y)
+
+    Maps to void lcdPosition(int fd, int x, int y)
+
+    Moves the cursor to the specified position on the LCD display.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $x
+
+    Mandatory: Column position. 0 is the left-most edge.
+
+        $y
+
+    Mandatory: Row position. 0 is the top row.
+
+ lcd_char_def($fd, $index, $data)
+
+    Maps to void lcdCharDef(int fd, unsigned char data [8]). This function
+    is
+
+    This allows you to re-define one of the 8 user-definable characters in
+    the display.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $index
+
+    Mandatory: Index of the display character. Values are 0-7. Once the
+    char is stored at this index, it can be used at any time with the
+    lcd_put_char() function.
+
+        $data
+
+    Mandatory: Array reference of exactly 8 elements. Each element is a
+    single unsigned char byte. These bytes represent the character from the
+    top-line to the bottom line.
+
+    Note that the characters are actually 5 x 8, so only the lower 5 bits
+    are of each element are used (ie. `0b11111` or 0b00011111`). The index
+    is from 0 to 7 and you can subsequently print the character defined
+    using the lcdPutchar() call using the same index sent in to this
+    function.
+
+ lcd_put_char($fd, $char)
+
+    Maps to void lcdPutChar(int fd, unsigned char data)
+
+    Writes a single ASCII character to the LCD display, at the current
+    cursor position.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $char
+
+    Mandatory: The character byte to print to the LCD. Note that 0-7 are
+    reserved for custom characters, as defined with lcd_char_def(). To
+    print one of your custom chars, $char should be the same integer of the
+    $index you used to store it in that function.
+
+ lcd_puts($fd, $string)
+
+    Maps to void lcdPuts(int fd, char *string)
+
+    Writes a string to the LCD display, at the current cursor position.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: The file descriptor integer returned by lcd_init().
+
+        $string
+
+    Mandatory: A string to display.
+
+SOFT PWM FUNCTIONS
+
+    Note: The software PWM functionality is experimental, and from what
+    I've tested, not very reliable, so I'd stay away from this at this
+    time.
+
+    Software Pulse Width Modulation is not the same as hardware PWM. It
+    should not be used for critical things as it's frequency isn't 100%
+    stable.
+
+    This software PWM allows you to use PWM on ANY GPIO pin, not just the
+    single hardware pin available.
+
+ soft_pwm_create($pin, $initial_value, $range)
+
+    Creates a new software PWM thread that runs outside of your main
+    application.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $initial_value
+
+    Optional: A value between 0 and $range.
+
+        $range
+
+    Optional: Look at this like a dial. We start at 0 and the dial has
+    turned completely when we hit the $range integer. If not sent in,
+    defaults to 1023.
+
+ soft_pwm_write($pin, $value)
+
+    Sets the HIGH frequency on pin to whatever is in $value. The value must
+    be lower than what was set in the $range parameter to
+    soft_pwm_create().
+
+ soft_pwm_stop($pin)
+
+    Turns off software PWM on the $pin.
+
+INTERRUPT FUNCTIONS
+
+ set_interrupt($pin, $edge, $callback)
+
+    IMPORTANT: The interrupt functionality requires that your Perl can be
+    used in pthreads. If you do not have a threaded Perl, the program will
+    cause a segmentation fault.
+
+    Wrapper around wiringPi's wiringPiISR() that allows you to send in the
+    name of a Perl sub in your own code that will be called if an interrupt
+    is triggered.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $edge
+
+    Mandatory: 1 (lowering), 2 (raising) or 3 (both).
+
+        $callback
+
+    Mandatory: The string name of a subroutine previously written in your
+    user code that will be called when the interrupt is triggered. This is
+    your interrupt handler.
+
+ADC FUNCTIONS
+
+    Analog to digital converters (ADC) allow you to read analog data on the
+    Raspberry Pi, as the Pi doesn't have any analog input pins.
+
+    This section is broken down by type/model.
+
+ ADS1115 MODEL
+
+  ads1115_setup($pin_base, $addr)
+
+    Maps to `ads1115Setup(int pinBase, int addr)`.
+
+    The ADS1115 is a four channel, 16-bit wide ADC.
+
+    Parameters:
+
+        $pin_base
+
+    Mandatory: Signed integer, higher than that of all GPIO pins. This is
+    the base number we'll use to access the pseudo pins on the ADC.
+    Example: If 400 is sent in, ADC pin A0 (or 0) will be pin 400, and AD3
+    (the fourth analog pin) will be 403.
+
+    Parameters:
+
+        $addr
+
+    Mandatory: Signed integer. This parameter depends on how you have the
+    ADDR pin on the ADC connected to the Pi. Below is a chart showing if
+    the ADDR pin is connected to the Pi Pin, you'll get the address. You
+    can also use i2cdetect -y 1 to find out your ADC address.
+
+        Pin     Address
+        ---------------
+        Gnd     0x48
+        VDD     0x49
+        SDA     0x4A
+        SCL     0x4B
+
+SHIFT REGISTER FUNCTIONS
+
+    Shift registers allow you to add extra output pins by multiplexing a
+    small number of GPIO.
+
+    Currently, we support the SR74HC595 unit, which provides eight outputs
+    by using only three GPIO. To further, this particular unit can be daisy
+    chained up to four wide to provide an additional 32 outputs using the
+    same three GPIO pins.
+
+ shift_reg_setup
+
+    This function configures the Raspberry Pi to use a shift register (The
+    SR74HC595 is currently supported).
+
+    Parameters:
+
+        $pin_base
+
+    Mandatory: Signed integer, higher than that of all existing GPIO pins.
+    This parameter registers pin 0 on the shift register to an internal
+    GPIO pin number. For example, setting this to 100, you will be able to
+    access the first output on the register as GPIO 100 in all other
+    functions.
+
+        $num_pins
+
+    Mandatory: Signed integer, the number of outputs on the shift register.
+    For a single SR74HC595, this is eight. If you were to daisy chain two
+    together, this parameter would be 16.
+
+        $data_pin
+
+    Mandatory: Integer, the GPIO pin number connected to the register's DS
+    pin (14). Can be any GPIO pin capable of output.
+
+        $clock_pin
+
+    Mandatory: Integer, the GPIO pin number connected to the register's
+    SHCP pin (11). Can be any GPIO pin capable of output.
+
+        $latch_pin
+
+    Mandatory: Integer, the GPIO pin number connected to the register's
+    STCP pin (12). Can be any GPIO pin capable of output.
+
+I2C FUNCTIONS
+
+    These functions allow you to read and write devices on the
+    Inter-Integrated Circuit (I2C) bus.
+
+ i2c_setup($addr)
+
+    Maps to int wiringPiI2CSetup(int devId)
+
+    Configures the I2C bus in preparation for communicating with a device.
+
+    Parameters:
+
+        $addr
+
+    Mandatory: Integer, the address of your device as seen by running for
+    example: i2cdetect -y 1.
+
+ i2c_interface($device, $addr)
+
+    Maps to iint wiringPiI2CSetupInterface(const char* device, int devId)
+
+    This feature is not implemented currently, and will be used to select
+    different I2C interfaces if the RPi ever receives them.
+
+ i2c_read($fd)
+
+    Performs a quick one-off, one-byte read without needing to specify the
+    register value. Some very simple devices operate without register
+    values needed.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+    Returns: A single byte of data from the device on the I2C bus.
+
+ i2c_read_byte($fd, $reg)
+
+    Reads a single byte from the specified register.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+        $reg
+
+    Mandatory: Integer, the register to read data from.
+
+    Returns: A single byte of data from the device on the I2C bus from the
+    selected register.
+
+ i2c_read_word($fd, $reg)
+
+    Reads two bytes from the specified register.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+        $reg
+
+    Mandatory: Integer, the register to read data from.
+
+    Returns: Integer, two bytes of data from the device on the I2C bus from
+    the selected register.
+
+ i2c_write($fd, $data)
+
+    Performs a quick one-off, one-byte write without needing to specify the
+    register value. Some very simple devices operate without register
+    values needed.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+        $data
+
+    Mandatory: Integer, the value to write to the device.
+
+    Returns: The value of the ioctl() call, 0 on success.
+
+ i2c_write_byte($fd, $reg, $data)
+
+    Writes a single byte to the register specified.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+        $reg
+
+    Mandatory: Integer, the register to write the data to.
+
+        $data
+
+    Mandatory: Integer, the value to write to the device.
+
+    Returns: The value of the ioctl() call, 0 on success.
+
+ i2c_write_word($fd, $reg, $data)
+
+    Writes two bytes to the register specified.
+
+    Parameters:
+
+        $fd
+
+    Mandatory: Integer, the file descriptor that was returned from
+    i2c_setup().
+
+        $reg
+
+    Mandatory: Integer, the register to write the data to.
+
+        $data
+
+    Mandatory: Integer, the value to write to the device.
+
+    Returns: The value of the ioctl() call, 0 on success.
+
+SPI FUNCTIONS
+
+    These functions allow you to set up and read/write to devices on the
+    serial peripheral interface (SPI) bus.
+
+ spi_setup
+
+    Maps to int wiringPiSPISetup(int channel, int speed)
+
+    Configure the SPI bus for use to communicate with its connected
+    devices.
+
+    Parameters:
+
+        $channel
+
+    Mandatory: Integer, the SPI channel the device is connected to. 0 for
+    channel /dev/spidev0.0 and 1 for channel /dev/spidev0.1.
+
+        $speed
+
+    Optional: Integer, the speed for SPI communication. Defaults to 1000000
+    (1MHz).
+
+    Note that it's wise to do some error checking when attempting to open
+    the SPI bus. We return the return value of an ioctl() call, so this
+    does the trick:
+
+        if ((spi_setup(0, 1000000) < 0){
+            die "failed to open the SPI bus...\n";
+        }
+
+ spi_data
+
+    Maps to: int spiDataRW(int channel, AV* data, int len), which calls int
+    wiringPiSPIDataRW(int channel, unsigned char* data, int len).
+
+    Writes, and then reads a block of data over the SPI bus. The read
+    following the write is read into the transmit buffer, so it'll be
+    overwritten and sent back as a Perl array.
+
+    Parameters:
+
+        $channel
+
+    Mandatory: Integer, the SPI channel the device is connected to. 0 for
+    channel /dev/spidev0.0 and 1 for channel /dev/spidev0.1.
+
+        $data
+
+    Mandatory: An array reference, with each element containing a single
+    unsigned 8-bit byte that you want to write to the device. If you want
+    to read-only, send in an aref with all the elements set to 0. These
+    will be overwritten with the read data, and sent back as a Perl array.
+
+        $len
+
+    Mandatory: Integer, the number of bytes contained in the $data
+    parameter array reference that will be sent to the device. I could just
+    count the number of elements, but this keeps things consistent, and
+    ensures the user is fully aware of the data they are sending on the
+    bus.
+
+    Returns a Perl array containing the same number of elements you sent
+    in.
+
+        # read-only... three bytes
+    
+        my $buf = [0x00, 0x00, 0x00];
+    
+        my @ret = spiDataRW($chan, $buf, 3);
+
+BMP180 PRESSURE SENSOR FUNCTIONS
+
+    These functions configure and fetch data from the BMP180 barometric
+    pressure sensor.
+
+ bmp180_setup($pin_base)
+
+    Configures the system to read from a BMP180 pressure sensor.
+
+    These functions can not return the raw values from the sensor. See each
+    function documentation to learn how to do so.
+
+    Parameters:
+
+        $pin_base
+
+    Mandatory: Integer, the number at which to place the pseudo analog pins
+    in the GPIO stack. For example, if you use 200, pin 200 represents the
+    temperature feature of the sensor, and 201 represents the pressure
+    feature.
+
+    Return: undef.
+
+ bmp180_temp($pin, $want)
+
+    Returns the temperature from the sensor.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: Integer, represents the $pin_base used in the setup function
+    + 0.
+
+        $want
+
+    Optional: 'c' for Celcius, and 'f' for Farenheit. Defaults to 'f'.
+
+    Return: A floating point number in the requested conversion.
+
+    NOTE: To get the raw sensor temperature, call the C function
+    bmp180Temp($pin) directly.
+
+ bmp180_pressure($pin)
+
+    Returns the current air pressure in kPa.
+
+    Parameters:
+
+        $pin
+
+    Mandatory: Integer, represents the $pin_base used in the setup function
+    + 1.
+
+    Return: A floating point number that represents the air pressure in
+    kPa.
+
+    NOTE: To get the raw sensor pressure, call the C function
+    bmp180Pressure($pin) directly.
+
+DEVELOPER FUNCTIONS
+
+    These functions are under testing, or don't potentially have a use to
+    the end user. They may be risky to use, so use at your own risk.
+
+    The functions in this section do not have a Perl wrapper equivalent.
+
+ pseudoPinsSetup(int pinBase)
+
+    This function allocates shared memory for the pseudo pins used to
+    communicate with devices that are beyond the reach of the Pi's GPIO
+    (eg: shift registers, ADCs etc).
+
+    Parameters:
+
+        pinBase
+
+    Mandatory: Integer, larger than the highest GPIO pin number. Eg: 500
+    will be the base for the analog pins on an ADS1115 ADC. Pin A0 would be
+    500, and ADC pin A3 would be 503.
+
+ pinModeAlt(int pin, int mode)
+
+    Undocumented function that allows any pin to be set to any mode.
+
+    Parameters:
+
+        pin
+
+    Mandatory: Signed integer, any valid GPIO pin number.
+
+        mode
+
+    Mandatory: Signed integer, any valid wiringPi pin mode.
+
+ digitalWriteByte(const int value)
+
+    Writes an 8-bit byte to the first eight GPIO pins.
+
+    Parameters:
+
+        value
+
+    Mandatory: Unsigned int, the byte value you want to send in.
+
+    Return: void
+
+ digitalWriteByte2(const int value)
+
+    Same as "digitalWriteByte(const int value)", but writes to the second
+    group of eight GPIO pins.
+
+ digitalReadByte()
+
+    Reads an 8-bit byte from the first eight GPIO pins on the Pi.
+
+    Takes no parameters, returns the byte value as an unsigned int.
+
+ digitalReadByte2()
+
+    Same as "digitalReadByte", but reads from the second group of eight
+    GPIO pins.
+
+    head1 AUTHOR
+
+    Steve Bertrand, <steveb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 by Steve Bertrand
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.18.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

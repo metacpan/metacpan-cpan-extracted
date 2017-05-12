@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::ValveContext - internal valve connection interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::ValveContext - internal valve connection interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface specifies a component that allows a Valve to trigger
+the execution of the next Valve in a Pipeline without having to know
+anything about internal implementation mechanisms. An instance of a
+class implementing this interface is passed as a parameter to
+<CODE>invoke()</CODE> for each executed Valve.</P>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_invokeNext">invokeNext ($request, $response)</A></STRONG><BR>
+<DD>
+Cause <CODE>invoke()</CODE> to be called on the next Valve in the Pipeline that
+is currently being processed, passing on the specified Request and
+Response objects plus this ValveContext instance. Exceptions thrown by
+a subsequently executed Valve, Filter or Servlet will be passed on to
+the caller.
+<P>If there are no more Valves to be executed, an appropriate
+ServletException will be thrown by this ValveContext.</P>
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> to be processed
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Response</STRONG> to be created
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if a servlet error occurs or is thrown by a subsequently invoked
+Valve, Filter or Servlet, or if there are no further Valves configured
+in the Pipeline currently being processed
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../api/Wombat/Exception.html">the Wombat::Exception manpage</A>,
+<A HREF="../../api/Wombat/Pipeline.html">the Wombat::Pipeline manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A>,
+<A HREF="../../api/Wombat/Response.html">the Wombat::Response manpage</A>,
+<A HREF="../../api/Wombat/Valve.html">the Wombat::Valve manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

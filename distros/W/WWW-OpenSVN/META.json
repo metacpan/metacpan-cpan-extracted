@@ -1,0 +1,60 @@
+{
+   "abstract" : "An automated interface for OpenSVN.csie.org.",
+   "author" : [
+      "Shlomi Fish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-OpenSVN",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::OpenSVN" : {
+         "file" : "lib/WWW/OpenSVN.pm",
+         "version" : "v0.1.5"
+      },
+      "WWW::OpenSVN::Base" : {
+         "file" : "lib/WWW/OpenSVN.pm"
+      },
+      "WWW::OpenSVN::Error" : {
+         "file" : "lib/WWW/OpenSVN.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.berlios.de/modules/WWW-OpenSVN/",
+      "license" : [
+         "http://en.wikipedia.org/wiki/MIT_License"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-www-opensvn"
+      }
+   },
+   "version" : "v0.1.5",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

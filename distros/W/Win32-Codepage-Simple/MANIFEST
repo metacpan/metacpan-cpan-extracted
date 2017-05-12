@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+lib/Win32/Codepage/Simple.pm
+lib/Win32/Codepage/Simple/JA.pod
+t/00-load.t
+t/boilerplate.t
+t/get.t
+t/pod-coverage.t
+t/pod.t

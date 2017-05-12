@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<WGXPre><![CDATA[
+		use Win32::TieRegistry(Delimiter=>"|", ArrayValues=>0);
+		our $registry = &initRegistry();
+		
+		sub initRegistry {
+			my $registry = $Registry->{"CUser|Software|BlairSutton|XMLBuilder|"};
+			if ($registry eq '') {
+				print STDERR "no BlairSutton|XMLBuilder registry, creating...\n";
+				$Registry->{"CUser|Software|"} = {
+					"BlairSutton|" => {
+						"XMLBuilder|" => {
+							"|top"    => "0",
+							"|left"   => "0",
+							"|width"  => "200",
+							"|height" => "200",
+							"|show" => "1",
+							"|exitprompt" => "1",
+						}
+					}
+				};
+				$registry = $Registry->{"CUser|Software|BlairSutton|XMLBuilder|"};
+			}
+			return $registry;
+		}
+		
+		sub Exit {
+			if (! $_[0]->IsZoomed && ! $_[0]->IsIconic) {
+				$registry->{width}  = $_[0]->ScaleWidth;
+				$registry->{height} = $_[0]->ScaleHeight;
+				$registry->{left}   = $_[0]->Left;
+				$registry->{top}    = $_[0]->Top;
+				$registry->{show}   = 1;
+			} elsif ($_[0]->IsZoomed) {
+				$registry->{show} = 3;
+			} elsif ($_[0]->IsIconic) {
+				$registry->{show} = 6;
+			}
+			$registry->{exitprompt}  = $self->{ExitPrompt}->Checked;
+			my $return;
+			if ($self->{ExitPrompt}->Checked) {
+				$return = Win32::GUI::MessageBox(
+					$_[0],
+					"Exit confirmation",
+					"Are you sure?",
+					MB_OKCANCEL|MB_ICONQUESTION
+				);
+			} else {
+				$return = 1;
+			}
+			if ($return == 1) {
+				$_[0]->PostQuitMessage(0);
+				return -1;
+			}
+		}
+		
+	]]></WGXPre>
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<WGXMenu name="M">
+		<Button name='File' text='&amp;File'>
+			<Button text='New'>
+				<Item text='Type One Document'/>
+				<Item text='Type Two Document'/>
+			</Button>
+			<Item separator='1'/>
+			<Item text='Open...'/>
+			<Item separator='1'/>
+			<Item text='Close'/>
+			<Item separator='1'/>
+			<Item text='Save'/>
+			<Item text='Save As..'/>
+			<Item separator='1'/>
+			<Item name='ExitPrompt' 
+				text='Prompt on Exit'
+				checked='exec:$registry->{exitprompt}'
+				onClick='sub { $self->{ExitPrompt}->Checked(not $self->{ExitPrompt}->Checked); }'
+			/>
+			<Item text='Exit' onClick='sub { Exit($_[0]) }'/>
+		</Button>
+		<Button name='Help' text='&amp;Help'>
+			<Item text='Contents'/>
+			<Item separator='1'/>
+			<Item text='About' onClick='sub {
+				Win32::GUI::MessageBox(
+					$_[0],
+					"Application Template by Blair Sutton 2004",
+					"About Application Template",
+					MB_OK|MB_ICONASTERISK
+				);
+			}'/>
+		</Button>
+	</WGXMenu>
+	<Window
+		dim='exec:$registry->{left}, exec:$registry->{top}, exec:$registry->{width}, exec:$registry->{height}'
+		show='exec:$registry->{show}'
+		title='Application Template'
+		class='$self->{C}'
+		menu="$self->{M}"
+		onTerminate='sub { Exit($_[0]) }'
+	>
+		<StatusBar name='S'
+			top='%P%->ScaleHeight - $self->{S}->Height if defined $self->{S}'
+			height='exec:$self->{S}->Height if defined $self->{S}'
+			text='exec:$Win32::GUI::XMLBuilder::AUTHOR'
+		/>
+	</Window>
+	<WGXPost><![CDATA[
+	]]></WGXPost>
+</GUI>
+

@@ -1,0 +1,14 @@
+Revision history for Perl module WebService::Antispam
+
+1.04    2013-10-02 
+        - Fixed agent name transmits to the servers 
+
+1.03    2013-09-19 
+        - Add one more dependency in Makefile.PL 
+
+1.02    2013-09-18 
+        - Add dependencies in Makefile.PL 
+
+1.01    2013-09-17
+        - First version, released on an unsuspecting world.
+

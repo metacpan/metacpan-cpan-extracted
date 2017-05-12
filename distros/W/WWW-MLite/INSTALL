@@ -1,0 +1,21 @@
+INSTALLATION INSTRUCTIONS
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    mpm
+
+DIST CREATING
+
+    perl Makefile.PL
+    make
+    make test
+    make skel
+    make tardist
+
+CREATE NEW VERSION (FOR DEVELOPER ONLY)
+
+    * README           -- In documentation
+    * CHANGES          -- Result of command: localtime | gclip
+    * lib/WWW/MLite.pm -- In documentation (VERSION) & in code $VERSION

@@ -1,0 +1,101 @@
+<DT><STRONG><A NAME="item_%specs">%specs</A></STRONG><BR>
+<DD>
+The specifications for fonts, menu, links, colors
+<PRE>
+  %specs = (</PRE>
+<PRE>
+  # directory path for 'html pages' relative to the html root
+  # i.e. public_html/        defaults to:
+  #
+        pagedir         =&gt; '../pages',</PRE>
+<PRE>
+  # directory path for 'javascript libraries' relative to html root
+  # defaults to:</PRE>
+<PRE>
+        javascript      =&gt; 'lib',</PRE>
+<PRE>
+  # no search conditions for building the site map. Each
+  # element is evaluated as a perl match condition in the
+  # context of m/element/. Include page names, extensions, etc...
+  #
+  # [OPTIONAL]
+  #</PRE>
+<PRE>
+        nosearch        =&gt; [ 'pdf' ],</PRE>
+<PRE>
+  # Directory path for 'sitemap' page generation relative to the 
+  # html root. This directory must be WRITABLE by the web server.
+  #
+  # NOTE: link the file 'sitemapdir'/sitemaplxml to the 
+  # appropriate location in your web directory.
+  # 
+  # The sitemap.xml file will be generated and updated ONLY if 
+  # the 'sitemapdir' key is present in this configuration file.
+  #
+  # The sitemap page will auto update if you modify pages in
+  # 'pagedir' or in the 'autocheck' list below. If you modify 
+  # static pages elsewhere in the web directory tree that are
+  # not listed in 'autocheck', you must DELETE the sitemap.xml 
+  # file to force an update.
+  #
+  # [OPTIONAL]
+  #
+  #     sitemapdir      =&gt; '../ws_sitemap',</PRE>
+<PRE>
+  # Directories to autocheck for sitemap update.
+  # you can list BOTH directories and individual files
+  # here relative to the web root. The 'sitemapdir' and
+  # 'pagedir' are always checked and do not need to be
+  # listed here.
+  #
+        autocheck       =&gt; ['docs'],</PRE>
+<PRE>
+  # site map &lt;changefreq&gt; hint
+  #
+  # defaults to:
+  #
+        changefreq      =&gt; 'monthly',</PRE>
+<PRE>
+  # font family used throughout the document
+  #
+        face            =&gt; 'VERANDA,ARIAL,HELVETICA,SAN-SERIF',</PRE>
+<PRE>
+  # background color of the web page
+  # this can be a web color like 'white' or number '#ffffff'
+  #
+        backcolor       =&gt; 'white',</PRE>
+<PRE>
+  # Menu specifications
+  #
+        barcolor        =&gt; 'red',
+        menudrop        =&gt; '55',        # drop down position
+        menuwidth       =&gt; '100px',     # width of menu item
+        pagewidth       =&gt; '620px',     # recommended
+  # menu font specifications
+        menucolor       =&gt; 'black',
+        menuhot         =&gt; 'yellow',    # mouse over
+        menucold        =&gt; 'white',     # page selected
+        menustyle       =&gt; 'normal',    # bold, italic
+        menusize        =&gt; '13px',      # font points or pixels
+        sepcolor        =&gt; 'black',     # separator color</PRE>
+<PRE>
+  # Page link font specifications
+  #
+        linkcolor       =&gt; 'blue',
+        linkhot         =&gt; 'green',
+        linkstyle       =&gt; 'normal',    # bold, italic
+        linksize        =&gt; '13px',      # font points or pixels</PRE>
+<PRE>
+  # Page Text font specifications
+  #
+        fontcolor       =&gt; 'black',
+        fontstyle       =&gt; 'normal',
+        fontsize        =&gt; '13px',</PRE>
+<PRE>
+  # Heading font specifications
+  #
+        headcolor       =&gt; 'black',
+        headstyle       =&gt; 'bold',      # normal, italic
+        headsize        =&gt; '16px',
+  );</PRE>
+<P></P>

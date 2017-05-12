@@ -1,0 +1,522 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Output - how to configure output blocks
+
+=head1 SYNOPSIS
+
+This page describes the role that output blocks play in the
+Web::DataService framework, and how to configure them.  It includes a list of
+the attributes that you can use to define them.
+
+=head1 OUTPUT BLOCK DEFINITIONS
+
+Each data service may define one or more groups of output elements, called
+"output blocks".  These are defined by calling the
+L<define_block|Web::DataService/define_block> method of a data service
+object.  These output elements specify which data fields should be included in
+the result, how they should be labeled, and how they should be processed.
+
+The first argument to C<define_block> must be a string that provides the name
+of the output block.  This must be unique among all of the output blocks
+defined for this data service.  The remaining elements must be either hashrefs
+or strings: the hashrefs define the individual elements of the block, and the
+strings provide documentation.  For example:
+
+    $ds->define_block( 'basic' =>
+	{ output => 'name' },
+	    "The name of the state",
+	{ output => 'abbrev' },
+	    "The standard abbreviation for the state",
+	{ output => 'region' },
+	    "The region of the country in which the state is located",
+	{ output => 'pop2010' },
+	    "The population of the state in 2010");
+
+This call defines an output block called 'basic', with four elements.  Each of
+these elements represent output fields.
+
+When a data service request is handled, the data service operation method is
+expected to construct and execute the appropriate query and then pass back a
+either a list of output records (as a listref whose elements are hashes) or a
+DBI statement handle from which the output records can be retrieved.  Each of
+the output records will be processed and included in the data service result
+according to the list of output blocks that have been selected for this
+request, as interpreted by the serialization routine corresponding to the
+selected output format.
+
+There are four categories of output elements, listed below.  Each category is
+defined by the presence of a hash key corresponding to the element type.  Each
+element must contain exactly one of these keys, or else an error will be
+thrown at startup time.
+
+=over
+
+=item output
+
+An "output" element specifies a single data field to be included in a data
+service result.  The value of the key C<output> gives the internal name of
+this field, generally, the name by which the field is known to the backend
+data store.  Other keys may be used to specify the name under which this
+field will be included in the result, and yet other keys can be used to
+specify conditions under which this it will or will not be included in the
+result.  This is the only kind of element that is required in order to produce
+data service output; the others are there for the convenience of the
+application programmer.
+
+=item set
+
+A "process" element indicates a processing step to be carried out on the data
+before it is included in the result.  The value of the key C<set> specifies
+which field's value is to be altered.
+
+=item select
+
+A "select" element specifies a list of strings that can be retrieved by the
+various data service operation methods and used to construct queries on the
+backend data store.  Use of this element is optional.  The value of the key
+C<select> must be an arrayref whose elements are strings that contain field
+specifications, e.g. for an SQL SELECT statement.  The idea is that these
+should include all of the fields that are necessary in order to generate the
+output of this block.  A data service operation method can then call one of
+the methods L<select_list|Web::DataService::Request/select_list>,
+L<select_hash|Web::DataService::Request/select_hash> or
+L<select_string|Web::DataService::Request/select_string> on the request object
+in order to retrieve the entire set of fields (with duplicates removed) that
+will satisfy all of the output blocks that have been selected for this
+particular request.  Other keys (see below) can be used to specify auxiliary
+information such as SQL table names.
+
+=item include
+
+An "include" element can be used to include the definition of one block inside
+another.  The value of the key C<include> must be the name of another output
+block defined for this data service; the "include" element will be replaced by
+a list of all of the elements from the named block.
+
+=back
+
+It is important to note that two lists of elements are generated for each
+request: a list of process ("set") elements, and a list of output elements.
+These are taken from the fixed output block(s) first, and then from any
+optional blocks in the order they were specified (not in the order they were
+defined!)  All of the process elements are applied first, and then the
+output list is used to determine the serialized output for the record.
+
+=head1 OUTPUT BLOCK ATTRIBUTES
+
+The attributes that can be used to configure output are listed in the
+following sections, one section for each element type.
+
+=head2 Output elements
+
+An output element is indicated by the presence of the key C<output>.  For
+example:
+
+    { output => 'foo', dedup => 'bar', long_name => 'foodlerizer' }
+
+This particular element declares that each output record will include the data
+field 'foo', but only if its value differs from the value of the field 'bar'.
+If the vocabulary 'long' has been selected for this request, then the field
+will be labeled 'foodlerizer' in the generated output.  Otherwise, the label
+will default to the field name ('foo').
+
+You may use any of the following attributes in specifying output elements.
+All of the attributes except for 'output' are optional.
+
+=head3 output
+
+This attribute is required, and we recommend that you always specify it first
+in order to make clear the element type.  The attribute value will be used as
+a hash key to look up the value for this field in each output record.  Thus,
+it should always correspond to one of the field names used by the backend data
+store.
+
+=head3 name
+
+The value of this attribute must be a string.  This value will be used as the
+label for this field in the generated result, unless a vocabulary-specific
+name is selected.  If this attribute is not specified, then the label will
+default to the value of C<output>.
+
+=head3 <vocab_name>
+
+An attribute of this form specifies the label which will be used for this
+element in the generated result if the corresponding
+L<vocabulary|Web::DataService::Configuration::Vocabulary> is selected.  For
+example:
+
+    { output => 'occurrence_no', dwc_name => 'occurrenceID', com_name => 'oid' },
+
+If the vocabulary C<dwc> is selected for a request that includes this output
+field, then the field will be labeled as C<occurrenceID>.  On the other hand,
+if the vocabulary C<com> is selected, then the field will be labeled as
+C<oid>.  If neither of these vocabularies is selected, then the field will be
+labeled C<occurrence_no>.  The manner in which this label is expressed depends
+upon the output format.
+
+If the selected vocabulary does not include the attribute
+L<use_field_names|Web::DataService::Configuration::Vocabulary/use_field_names>,
+and if no corresponding C<_name> field is found, then the field will be left
+out of the output.  This provides for the case in which some vocabularies may
+not have any way of expressing some of the data fields.
+
+=head3 value
+
+The value of this attribute must be a string.  If specified, then this value
+will be output as the value of this field in every record, regardless of any
+value retrieved from the backend data store.  The purpose of this attribute is
+to generate constant-valued fields such as record type indicators.
+
+=head3 <vocab_value>
+
+An attribute of this form specifies the value to be used for this element if the
+corresponding vocabulary is selected.  The purpose of such attributes it to
+generate constant-valued fields whose value is appropriate to the selected
+vocabulary.  See L<< /<vocab_name> >>.
+
+=head3 dedup
+
+The value of this attribute must be the name of another data field, which need
+not correspond to any output element.  If the value of the data field named by
+C<output> is identical to the value of the field named by C<dedup>, then this
+output element will be ignored.  You can use this if you wish to prevent two
+different fields with the same value from appearing in a single output
+record. This condition is evaluated independently for each record that is
+output.
+
+=head3 sub_record
+
+The value of this attribute must be the name of another output block defined
+for this data service.  This attribute is only used if the data value is
+itself a hashref, and if the selected output format can express hierarchical
+data (e.g. JSON).  In that case, the hashref will be interpreted as a
+sub-record according to the specified block.
+
+=head3 always
+
+If this attribute is given a true value, then this element will always be
+included in the output even if its value is undefined.  By default, the JSON
+format omits from each record any fields whose values are undefined.  Custom
+output formats may do this as well, depending upon their implementation.
+
+=head3 if_field
+
+The value of this attribute must be the name of another data field, which need
+not correspond to any output element.  If the named field has a defined value,
+then this output element will be included in the current output record.
+Otherwise, it will be omitted.  You can use this to output field B only in
+records where field A has a value.  This attribute is evaluated independently
+for each record that is output.
+
+=head3 not_field
+
+This attribute is the inverse of L</if_field>.  If the named field has a
+defined value, then this output element will be ignored.  You can use this
+to output field B only for those records in which field A does not have a
+value.
+
+=head3 if_vocab
+
+The value of this attribute must be a string containing the names of one or
+more vocabularies (separated by commas and optional whitespace) that have been
+defined for this data service.  This output element will only be included in
+the result if one of the specified vocabularies was selected for the request.
+In contrast to C<if_field>, this attribute is evaluated once for each request
+at the beginning of processing.
+
+=head3 not_vocab
+
+Thie attribute is the inverse of L</if_vocab>.  This element will only be
+included in the result if the selected vocabulary is not one of those
+specified.
+
+=head3 if_format
+
+The value of this attribute must be a string containing the names of one or
+more output formats (separated by commas and optional whitespace) that have
+been defined for this data service.  This element will only be included in the
+result if the selected output format is one of these.  This attribute is
+evaluated once for each request at the beginning of processing.
+
+=head3 not_format
+
+This attribute is the inverse of L</if_format>.  This element will not be
+included in the result if the selected output format is one of these.
+
+=head3 if_block
+
+The value of this attribute must be a string containing the names and/or keys
+of one or more output blocks (separated by commas and optional whitespace)
+that have been defined for this data service.  This element will only be
+included in the result if at least one of those blocks is included.  This
+attribute is evaluated once for each request at the beginning of processing.
+
+=head3 not_block
+
+This attribute is the inverse of L</if_block>.  This element will not be
+included in the result if any of the named blocks is.
+
+=head3 text_join
+
+This attribute is only used when the selected output format is a text-based
+one such as CSV.  Its value must be a string.  When generating the output for
+any record where the value of this element's data field is an array, the
+values will be joined together using the specified string.  If this attribute
+is not specified, it defaults to ", ".
+
+=head3 xml_join
+
+This attribute is similar to L</text_join>, and is used when the selected
+output format is XML.
+
+=head3 show_as_list
+
+This attribute is only used when the selected output format is JSON.  If it is
+given a true value, then this output element will be represented as an array
+even if the data field contains a single value.
+
+=head3 doc_string
+
+You can set this attribute either directly or by including one or more
+documentation strings after the element-definition hash in the call to
+C<define_block>.  This value will be used to auto-generate documentation
+describing the output of the various data service operations whose output can
+include this block.
+
+=head3 undocumented
+
+If this attribute is given a true value, then this element will be left out of
+any auto-generated documentation.  It will still appear in data operation
+results.
+
+=head2 Process elements
+
+An process element is indicated by the presence of the key C<set>.  For
+example:
+
+    { set => 'foo', from => 'bar', code => 'translate' }
+
+This particular element causes the following action to happen before each
+record is output: the method C<translate> of the request object is called and
+is passed the value of the data field C<bar>.  The result is stored in the
+data field C<foo>, which need not have had any value until then.
+
+You may use any of the attributes listed below in specifying process elements.
+The attribute C<set> specifies the target of the operation, while one of the
+attributes C<from> or C<from_each> specifies the source.  If neither of these
+attributes is specified, then the target field is processed in place (i.e. the
+source and target will be the same).  The source and/or target may be
+specified as '*', meaning the entire record.
+
+All attributes except for 'set' are optional.  A single process element may
+have at most one of the attributes C<code>, C<lookup>, C<split> and C<join>.
+
+=head3 set
+
+This attribute is required, and we recommend that you always specify it first
+in order to make clear the element type.  If the value is any non-empty string
+other than '*', the data field named by this string will used as the target
+of this processing step.  If the value is '*', then no target is set.  This
+special value is useful mainly in conjunction with the attribute C<code>,
+causing the specified subroutine to be passed a reference to the record as a
+whole.  It can then modify the record arbitrarily.
+
+=head3 from
+
+The value of this attribute must be a non-empty string.  The value of the data
+field named by this string will be used as the "source value" for this
+processing step.  If the value is '*', then a reference to the entire record
+will be passed as the "source value".
+
+=head3 from_each
+
+The value of this attribute must be a non-empty string.  All values stored in
+the field named by this string will be used as source values for this
+processing step: if the value is an array, the step will be carried out on
+each value in turn.  If the value is a scalar, it will be carried out on that
+value.  If a single value results, the target field will be set to that
+value. If more than one value results, the target field will be set to an
+arrayref whose contents are the result values.  If no values result, the
+target field will be set to C<undef>.  This attribute is not valid if the
+target is '*'.
+
+=head3 code
+
+The value of this attribute must either be the name of a request method
+(almost always one which you have written as part of a data service operation
+role) or a code reference.  It will be called with the request object as the
+first argument, and the source value as the second.  The source value will be
+the value of the source field, if one is specified, or a reference to the entire
+record if C<< set => '*' >> or C<< from => '*' >> is also specified.  The
+result of this subroutine call will be stored in the target field, unless the
+target is '*'.
+
+You can use this powerful functionality to arbitrarily alter the data records
+before they are output.
+
+=head3 lookup
+
+The value of this attribute must be a hashref.  The source value will be
+looked up in this hashref, and the resulting value stored in the target
+field. If the source value does not occur as a hash key, and the attribute
+L</default> was also specified, its value will be used instead.  This
+attribute is not valid if either the source or the target is '*'.
+
+=head3 default
+
+The value of this attribute will be used as the result of this processing step
+if the source value does not appear in the hashref specified by L</lookup>.
+
+=head3 split
+
+The source value will be L<split|perlfunc/split> according to the value of
+this attribute, and the target will be set to the resulting list of values.
+You can use this with either C<from> or C<from_each>; in the latter case all
+of the resulting lists are concatenated together.  This attribute is not valid if
+either the source or the target is '*'.
+
+=head3 join
+
+The source value(s) will be L<joined|perlfunc/join> together using the value
+of this attribute, and the target will be set to the resulting string.  This
+attribute is only valid in conjunction with C<from>, and is not valid if
+either the source or the target is '*'.
+
+=head3 always
+
+If this attribute is given a true value, then the processing step will be
+carried out whether or not the source value is defined.  By default, this step
+is skipped if the source value is not defined.
+
+=head3 if_field
+
+This step will only be carried out if the field named by this attribute has a
+defined value.  This attribute only makes sense if it specifies a field other
+than the source field, because by default a processing step is skipped if its
+source field is undefined.  This attribute is evaluated once for each record.
+
+=head3 not_field
+
+This step will only be carried out if the field named by this attribute does
+not have a defined value.  This is the inverse of C<if_field>, and is also
+evaluated once for each record.
+
+=head3 if_vocab
+
+The value of this attribute must be a string containing the names of one or
+more vocabularies (separated by commas and optional whitespace) that have been
+defined for this data service.  This processing step will only be carried out
+if one of the specified vocabularies was selected for the request.  In
+contrast to C<if_field>, this attribute is evaluated once for each request at
+the beginning of processing.
+
+=head3 not_vocab
+
+Thie attribute is the inverse of L</if_vocab>.  This processing step will
+only be carried out if the selected vocabulary is not one of those specified.
+
+=head3 if_format
+
+The value of this attribute must be a string containing the names of one or
+more output formats (separated by commas and optional whitespace) that have
+been defined for this data service.  This processing step will only be carried
+out if one of the specified formats was selected for the request.  This
+attribute is evaluated once for each request at the beginning of processing.
+
+=head3 not_format
+
+Thie attribute is the inverse of L</if_format>.  This processing step will
+only be carried out if the selected format is not one of those specified.
+
+=head3 if_block
+
+The value of this attribute must be a string containing the names of one or
+more output blocks (separated by commas and optional whitespace) that have
+been defined for this data service.  This processing step will only be carried
+out if one of the specified blocks is included in the request.  This
+attribute is evaluated once for each request at the beginning of processing.
+
+=head3 not_block
+
+Thie attribute is the inverse of L</if_block>.  This processing step will
+only be carried out if any of the named blocks is included in the request.
+
+=head2 Select elements
+
+A select element is indicated by the presence of the key C<select>.  For
+example:
+
+    { select => 'a.foo, b.bar', tables => 'a, b' }
+
+This element adds the values 'a.foo' and 'b.bar' to the "select list" and 'a'
+and 'b' to the "tables list".  The data service operation methods that you
+write can then query the request object to obtain either a list or a hash of
+the unique select values and a hash of the unique table values.
+
+This element was designed with SQL in mind, but you can use it in any way that
+makes sense in constructing queries for the backend data system regardless of
+whether or not it is based on SQL.  The idea is that your operation methods
+can use this mechanism to get a list of the fields and tables (or equivalent
+constructs) necessary for satisfying all of the output blocks that have been
+selected for this particular query.  In this way, a single operation method
+can satisfy a wide variety of requests.
+
+You can use any of the following attributes in defining a select element:
+
+=head3 select
+
+This attribute is required, and we recommend that you always specify it first
+in order to make clear the element type.  The value can be either a string or
+an array of strings.  In the first case, it will be split on the pattern
+C<q{\s*,\s*}>.
+
+From your data service operation subroutines, you can call any of the relevant
+methods of the request object (C<select_list>, C<select_string>,
+C<select_hash>) to retrieve the list of all the C<select> values from all of
+the output blocks selected for this request, with duplicates removed.
+
+=head3 tables
+
+This attribute is optional.  The value can either be a string or an array of
+strings, and is treated exactly like the value of C<select> except that you
+retrieve the values by calling C<tables_hash>.  In most cases, it will make
+sense to list all of the unique tables (or equivalent constructs, depending
+upon the backend data system you are using) used by the elements listed in the
+value of the attribute C<select>.
+
+=head2 Include elements
+
+An include element is indicated by the presence of the attribute C<include>,
+which must be the only attribute in this element definition.  For example:
+
+    { include => 'other_block' }
+
+This definition specifies that all of the elements defined for 'other_block'
+should be included in the block currently being defined.  The value of this
+attribute must be either a block name or else a value from an output map
+defined for this data service.  In other words, you can specify which block to
+include either by its internal name or by the name that clients use to refer
+to it.
+
+If the name does not correspond to any defined block, then this element is
+ignored and a warning is generated in the error log.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

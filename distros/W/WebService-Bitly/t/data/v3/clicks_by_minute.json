@@ -1,0 +1,15 @@
+{
+    "data": {
+        "clicks_by_minute": [
+            {
+                "clicks": [5,10,15],
+                "global_hash": "9DguyN",
+                "short_url": "http://j.mp/9DguyN",
+                "user_hash": "user9Gg"
+            },
+            {"hash": "9N", "error": "NOT_FOUND"}
+        ]
+    },
+    "status_code": 200,
+    "status_txt": "OK"
+}

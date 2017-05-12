@@ -1,0 +1,47 @@
+---
+abstract: 'Implementation of WSRF'
+author:
+  - 'Mark Mc Keown <Mark.McKeown@manchester.ac.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+  Test::Simple: 0.44
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WSRF-Lite
+no_index:
+  Container.pl: []
+  SContainer.pl: []
+  directory:
+    - inc
+    - t
+    - test
+  installer.pl: []
+  preForkContainer.pl: []
+  test: []
+requires:
+  Crypt::OpenSSL::RSA: 0.22
+  Crypt::OpenSSL::X509: 1.7
+  DateTime::Format::Epoch: 0.11
+  DateTime::Format::W3CDTF: 0.04
+  DateTime::Locale: 0.41
+  DateTime::TimeZone: 0.78
+  Digest::SHA1: 2.11
+  HTTP::Daemon: 1.39
+  HTTP::Daemon::SSL: 1.04
+  List::MoreUtils: 0.22
+  MIME::Base64: 3.07
+  Params::Validate: 0.91
+  SOAP::Lite: 0.67
+  Sys::Hostname::Long: 1.4
+  XML::DOM: 1.44
+  XML::LibXML: 1.64
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.8.3.0

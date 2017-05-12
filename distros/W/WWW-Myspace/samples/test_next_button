@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w -I../lib
+# test_next_button
+# usage: test_next_button [filename]
+# Pass content to check for presence of "next" button via
+# STDIN or via a file.
+# This is used to test the internal _next_button method
+# against various pages to make sure it's identifying them
+# properly.  All paging routines use this method and myspace
+# displays the button differently on different pages.
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace( auto_login => 0 );
+
+my $content = "";
+while ( my $line = <> ) { $content .= $line };
+
+if ( $myspace->_next_button( $content ) ) {
+	print "Next button found\n";
+} else {
+	print "Next button not found\n";
+}
+
+if ( $myspace->_previous_button( $content ) ) {
+	print "Previous button found\n";
+} else {
+	print "Previous button not found\n";
+}

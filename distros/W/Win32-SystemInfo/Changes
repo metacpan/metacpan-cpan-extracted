@@ -1,0 +1,46 @@
+Revision history for Perl extension Win32::SystemInfo.
+
+0.01  Mon Sep 11 08:33:22 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X Win32::SystemInfo
+
+0.02  Tues Oct 31 2000
+	- Fixed CPU speed detection bug for Win9x
+
+0.03  Fri Jan 12, 2001
+	- Fixed warning when calling MemoryStatus
+	
+0.04  Mon Feb 5, 2001
+	- Fixed "GetValue" error when running as
+	  non-admin user on WinNT
+	- Fixed documentation error
+	
+0.05  Tues Feb 6, 2001
+	- Fixed bug introduced in 0.03 where the $format parameter
+	  to MemoryStatus was ignored, and all results returned
+	  as bytes.
+
+0.06 - Added new entry to processor information hash to display the name
+          of the processor. WindowsNT and 2K now use the DLL to determine
+          CPU speed as well.
+
+0.07 - Changed contact information. Recompiled DLL to remove some extraneous calls.   
+
+0.08 - Added more definitions for recent CPUs. Added dependency on version 0.40
+          of Win32::API. Reworked Win32::API calls. Changed calls in DLL to
+          eliminate need to pack and unpack arguments.
+
+0.09 - Eliminated cpuspd.dll. Should eliminate some of the headaches associated with
+          using this module. It should now return CPU info for all flavors of 
+          Windows past Win9x without crashing.
+      
+0.10 - Added bug description for Perl Development Kit. Fixed link to ActiveState module
+          location.
+          
+0.11 - Suppress warnings that come from Win32::API when running with the -w switch. Fix bug
+          (http://rt.cpan.org/Public/Bug/Display.html?id=30894) where memory could grow 
+          uncontrollably.
+
+0.12 - Fix some 64 bit related bugs. Use correct SYSTEM_INFO structure 
+ 		  (https://rt.cpan.org/Ticket/Display.html?id=59365) and use correct struct size
+ 		  (https://rt.cpan.org/Ticket/Display.html?id=48008).

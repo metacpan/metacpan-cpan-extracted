@@ -1,0 +1,73 @@
+NAME
+    WWW::VenusEnvy - Retrieve VenusEnvy comic strip images
+
+SYNOPSIS
+     use WWW::VenusEnvy qw(get_strip mirror_strip strip_url);
+     
+ # Get the URL for todays strip
+     my $image_url = strip_url();
+     
+ # Get todays strip
+     my $image_blob = get_strip();
+     
+ # Get a specific strip by specifying the ID
+     my $christmas_kiss = get_strip("20051229");
+     
+ # Write todays strip to local_filename.gif on disk
+     my $filename_written = mirror_strip("local_filename.gif");
+     
+ # Write a specific strip to mystrip.gif on disk
+     my $filename_written = mirror_strip("mystrip.gif","20051229");
+
+DESCRIPTION
+    This module will download the latest VenusEnvy comic strip from the
+    Keenspace website and return a binary blob of the image, or write it to
+    disk.
+
+EXPORTS
+    The following functions can be exported with the ":all" export tag, or
+    individually as is show in the above example.
+
+  strip_url
+     # Return todays strip URL
+     my $url = strip_url();
+     
+ # Return the strip URL for 19th August 2005
+     $url = strip_url("20050819");
+
+    Accepts an optional argument specifying the date of the comic strip in
+    ISO format "YYYYMMDD".
+
+  get_strip
+     # Get todays comic strip image
+     my $image_blob = get_strip();
+
+    Accepts an optional argument specifying the date of the comic strip in
+    ISO format "YYYYMMDD".
+
+  mirror_strip
+     # Write todays comic strip to "mystrip.gif" on disk
+     my $filename_written = mirror_strip("mystrip.gif");
+
+    Accepts two optional arguments. The first is the filename that the comic
+    strip should be written to on disk. The second specifies the date of the
+    comic strip in ISO format "YYYYMMDD".
+
+    Returns the name of the file that was written to disk.
+
+VERSION
+    $Id: VenusEnvy.pm,v 1.10 2006/01/28 13:17:40 nicolaw Exp $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2005,2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

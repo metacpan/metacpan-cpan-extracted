@@ -1,0 +1,12 @@
+Revision history for Win32-Status
+
+0.81    2012-08-04
+
+ - signed with Module::Signature
+ - comply with CPAN::Changes::Spec
+
+0.80    2012-05-07
+
+ - first version.
+ - ported from git://gitorious.org/qt/qtqa b8fd6b71e5049617411f11cb7990a201e696bcd9
+

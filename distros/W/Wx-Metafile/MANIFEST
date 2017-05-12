@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+Metafile.pm
+Metafile.xs
+typemap
+readme
+t/01_load.t
+t/openfile.t
+t/test.emf
+META.yml                                 Module meta-data (added by MakeMaker)

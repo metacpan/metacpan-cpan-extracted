@@ -1,0 +1,39 @@
+---
+abstract: 'Class for searching http://antikvariat11.cz .'
+author:
+  - 'Michal Špaček <skim@cpan.org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.01
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Search-Antikvariat11CZ
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  HTTP::Cookies: 0
+  LWP::UserAgent: 0
+  Readonly: 0
+  WWW::Search: 0
+  Web::Scraper: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Search-Antikvariat11CZ
+  homepage: https://github.com/tupinek/WWW-Search-Antikvariat11CZ
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: git://github.com/tupinek/WWW-Search-Antikvariat11CZ
+version: 0.01

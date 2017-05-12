@@ -1,0 +1,10 @@
+Revision history for Perl extension WWW::LaQuinta::Returns.
+
+0.03  Fri Jun 21 20:56:00 2013
+    - remove bad Mac dot files in the distribution
+
+0.02  Sat May 12 20:30:00 2012
+    - update to support changed lq.com layout
+
+0.01  Fri Nov 27 14:00:00 2010
+    - original version

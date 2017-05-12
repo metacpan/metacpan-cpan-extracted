@@ -1,0 +1,61 @@
+Win32/TieRegistry/PMVersionInfo version 0.01
+============================================
+
+    This module mirrors to the Win32 registry version information from a
+    perl module's heirachy.
+
+    It offers no support for reading the information - for that use the
+    "Win32::TieRegistry" module on which this module is based.
+
+    Version information is ascertained using the same method as in
+    "ExtUtils::MakeMaker" version 5.45. To quote that module's manpage:
+
+            The first line in the file that contains the regular expression
+
+                    /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/
+
+            will be evaluated with eval() and the value of the named variable
+            after the eval() will be assigned to the VERSION attribute of the
+            MakeMaker object. The following lines will be parsed o.k.:
+
+                    $VERSION = '1.00';
+                    *VERSION = \'1.01';
+                    ( $VERSION ) = '$Revision: 1.222 $ ' =~ /\$Revision:\s+([^\s]+)/;
+                    $FOO::VERSION = '1.10';
+                    *FOO::VERSION = \'1.11';
+                    our $VERSION = 1.2.3;       # new for perl5.6.0
+
+            but these will fail:
+
+                    my $VERSION = '1.01';
+                    local $VERSION = '1.02';
+                    local $FOO::VERSION = '1.30';
+
+            (Putting "my" or "local" on the preceding line will work o.k.)
+
+	For further information, please see the PM's inline POD.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make clean
+   perldoc Win32::TieRegistry::PMVersionInfo
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::TieRegistry
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Lee Goddard - All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

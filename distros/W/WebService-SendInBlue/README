@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution WebService-SendInBlue,
+version 0.005:
+
+  Perl API for https://www.sendinblue.com/ REST API 
+
+This software is copyright (c) 2016 by Bruno Tavares.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

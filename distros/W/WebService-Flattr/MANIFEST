@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+examples/get_thing.pl
+examples/thing_exists.pl
+lib/WebService/Flattr.pm
+lib/WebService/Flattr/Response.pm
+t/author-search.t
+t/basic.t
+t/release-cpan-changes.t
+t/release-live_api_calls.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

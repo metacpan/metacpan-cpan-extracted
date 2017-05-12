@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+use v5.10.1;
+use strict;
+use warnings;
+# PODNAME: p
+# ABSTRACT: command-line read-write access to http://p.hashbang.ca
+our $VERSION = '0.003'; # VERSION
+
+use WWW::Hashbang::Pastebin::Client;
+use Getopt::Long;
+use Pod::Usage;
+
+my %opts = ( url => 'http://p.hashbang.ca' );
+GetOptions( \%opts,
+    'help|?',
+    'version',
+    'txt',
+    'url=s',
+);
+
+pod2usage(
+    -verbose => 2,
+) if $opts{help};
+
+
+if (delete $opts{version}) {
+    my $this = __PACKAGE__;
+    my $this_ver = __PACKAGE__->VERSION();
+    say "$this version $this_ver" and exit;
+}
+
+my $client = WWW::Hashbang::Pastebin::Client->new(url => $opts{url});
+
+if (@ARGV) {    # READ
+    my $paste_id = shift(@ARGV);
+    $paste_id =~ s{\.$}{};
+    say $client->get($paste_id);
+}
+else {          # WRITE
+    my $text = do { local $/; <STDIN> };
+    say $client->paste(paste => $text);
+}
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+p - command-line read-write access to http://p.hashbang.ca
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    p < file
+    ps aux | p
+    p --help
+
+=head1 DESCRIPTION
+
+B<p> is a simple command line program to write to (and read from)
+the pastebin L<http://p.hashbang.ca>, which runs L<WWW::Hashbang::Pastebin>.
+
+=head2 Writing
+
+Provide input on stdin to C<p> to paste it to the pastebin. Provide the
+B<--lang> option to specify syntax highlighting to apply.
+
+    ps aux | sprunge
+    sprunge --lang pl < file.pl
+
+=head2 Reading
+
+Run C<p> with a URL or paste ID to output the text to stdout.
+
+    p H2gc | less
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>, -h, -?
+
+Opens this man page and exits.
+
+=item B<--version>
+
+Prints the version of this program and supporting libraries.
+
+=item B<--url>
+
+Set the URL to a different site running L<WWW::Hashbang::Pastebin>.
+
+=back
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/WWW-Hashbang-Pastebin-Client/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/WWW::Hashbang::Pastebin::Client/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/WWW-Hashbang-Pastebin-Client>
+and may be cloned from L<git://github.com/doherty/WWW-Hashbang-Pastebin-Client.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/WWW-Hashbang-Pastebin-Client/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<WGXMenu name='Menu'>
+		<Button name='File' text='&amp;File'>
+			<Item text='&amp;New' onClick='NewChild'/>
+			<Item seperator='1'/>
+			<Item text='E&amp;xit' onClick='sub { -1; }'/>
+		</Button>
+		<Button name='Window' text='&amp;Window'>
+			<Item text='&amp;Next' onClick='sub { $self->{Client}->Next; }'/>
+			<Item text='&amp;Previous' onClick='sub { $self->{Client}->Previous; }'/>
+			<Item seperator='1'/>
+			<Item text='&amp;Cascade' onClick='sub { $self->{Client}->Cascade(); 0; }'/>
+			<Item text='Tile &amp;Horizontally' onClick='sub { $self->{Client}->Tile(1);  }'/>
+			<Item text='Tile &amp;Vertically' onClick='sub { $self->{Client}->Tile(0);  }'/>
+		</Button>
+		<Button name='Help' text='&amp;Help'>
+			<Item text='&amp;About'/>
+		</Button>
+	</WGXMenu>
+	<MDIFrame name='Window'
+		dim='100, 100, 280, 280'
+		title='Win32::GUI MDI Sample'
+		menu='$self->{Menu}'
+	>
+		<MDIClient name='Client'
+			firstchild='100'
+			windowmenu='$self->{Window}->{-handle}'
+		/>
+	</MDIFrame>
+	<WGXPost><![CDATA[
+	my $ChildCount = 0;
+	sub NewChild {
+		my $Child = $self->{Client}->AddMDIChild (
+			-name         => "Child".$ChildCount++,
+			-onActivate   => sub { print "Activate\n"; },
+			-onDeactivate => sub { print "Deactivate\n"; },
+			-onTerminate  => sub { print "Terminate\n";},
+			-onResize => sub { $_[0]->{Edit}->Resize($_[0]->Width, $_[0]->Height) if exists $_[0]->{Edit} }, 
+		) or die "Child";
+		$Child->AddTextfield (
+			-name => "Edit",
+			-multiline => 1,
+			-pos => [0,0],
+			-size => [100,100],      
+		);
+		$Child->{Edit}->Resize($Child->Width, $Child->Height) if exists $Child->{Edit};
+	}
+
+	]]></WGXPost>
+</GUI>

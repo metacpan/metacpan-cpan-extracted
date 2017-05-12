@@ -1,0 +1,18 @@
+TYPEMAP
+ 
+# note that the 64 bit maps will only work
+# all the time where
+# uvsize = ivsize = 8
+# ( perl is configured with -Duse64bitint )
+# This is true for Raspbian Wheezy
+ 
+uint8_t              T_UV
+uint16_t             T_UV
+uint32_t             T_U_LONG
+uint64_t             T_UV
+volatile uint32_t *  T_PTR
+__s32                T_IV
+__u16                T_U_SHORT
+__u8                 T_UV
+__u32                T_UV
+__u64                T_UV

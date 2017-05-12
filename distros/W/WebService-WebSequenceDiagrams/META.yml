@@ -1,0 +1,24 @@
+---
+abstract: 'Simple API for WebSequenceDiagrams'
+author:
+  - 'Takeshi Miki <miki@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-WebSequenceDiagrams
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  Filter::Util::Call: 0
+  WebService::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00001

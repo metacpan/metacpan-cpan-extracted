@@ -1,0 +1,160 @@
+Workflow Sample Application
+========================================
+
+As a sample of the workflow system here is a simple trouble ticket
+system. A *very* simple system. It comes with three interfaces: a
+command-line application, a CGI script, and a simple standalone web
+server. Both are interfaces to the same workflows and tickets.
+
+Initializing the System
+--------------------
+
+The sample application is configured to use a SQLite database, and
+while with a little configuration (in 'workflow_persister.xml') you
+can use a different DBMS, you can get the demo running in less than a
+minute with SQLite. Draw your own conclusions.
+
+To initialize the database just run the command-line application with
+the '--db' switch:
+
+ perl ticket.pl --db
+
+This will create a new database for you. If a database (in the file
+'db/ticket.db') already exists it will be wiped out. Since it's so
+easy to wipe out and reinitialize the system you should have no qualms
+about playing around, putting bad data in to see what happens, etc.
+
+
+Command-line Application
+--------------------
+
+Running the command-line application without the switch will bring you
+to a 'TicketServer: ' prompt:
+
+ perl ticket.pl
+
+Issuing a 'cmd' command will give you a list of valid commands along
+with a description of each. Hopefully you can weave your way to
+something interesting.
+
+
+Web Application: Standalone
+--------------------
+
+Next (and probably more fun), you can manipulate the workflow system
+through the standalone web application:
+
+ perl ticket_web.pl
+
+This will fire up a standalone web server using HTTP::Daemon. Once
+it's started it will report to you the hostname and port it's running
+on:
+
+  $ perl ticket_web.pl
+  Please contact me at [URL: http://shazam.local:57988/]
+
+Paste that URL into your browser and fire away. It's a very simple
+application but looking through the 'ticket_web.pl' script (and
+'App/Web.pm' package) should give you an idea of how to integrate the
+workflow system into your display technology.
+
+Web Application: CGI
+--------------------
+
+For using the CGI script you can configure Apache to run CGI scripts
+in the normal manner. I have a vhost definition that does this:
+
+    Listen 127.0.0.1:80
+    <VirtualHost 127.0.0.1:80>
+        Port 80
+        ServerName my.coolserver.com
+        DocumentRoot /path/to/workflow/eg/ticket
+
+        <Files *.cgi>
+            SetHandler cgi-script
+        </Files>
+
+        <Location />
+            DirectoryIndex index.html index.shtml
+            Options Indexes ExecCGI
+        </Location>
+    </VirtualHost>
+
+Accessing the ticket application is then:
+
+   http://my.coolserver.com/ticket.cgi
+
+Configuring your web server to run CGI scripts in a similar manner
+should be pretty easy.
+
+
+Following Application Progress
+--------------------
+
+No matter which interface you're using you can see what the
+application is doing watch the file 'workflow.log'. This is the
+logfile for all phases of the application, and it's controlled by the
+Log::Log4perl configuration file 'log4perl.conf'. It's very useful to
+watch what's going on with a 'tail -f' or whatever your platform
+supports.
+
+Note that if you run both interfaces at the same time they'll log to
+the same file. This can make for confusing log messages as they may be
+interleaved.
+
+
+Design Overview
+--------------------
+
+The single workflow 'Ticket' is defined in 'workflow.xml'. In that
+file you see a number of references to other objects:
+
+ - persister (e.g., 'TestPersister')
+   - defined and configured in 'workflow_persister.xml'
+ - actions (e.g., 'TIX_NEW', 'TIX_EDIT')
+   - defined in 'workflow_action.xml'
+ - conditions (e.g., 'IsWorker')
+   - defined in 'workflow_condition.xml'
+
+Additionally, in 'workflow_action.xml' you'll see:
+
+ - validators (e.g., 'DateValidator')
+   - defined in 'workflow_validator.xml'
+
+Requests to both the command-line tool ('ticket.pl') and the web
+server ('ticket_web.pl') make data available to the workflow context
+for the actions to use. Because one application is stateful and the
+other stateless they do so in different ways. But one of the features
+of the workflow system is that it doesn't care. Here's an example:
+
+#  Action                     Context 
+-- -----------                ----------------
+0) (none)                     (empty)
+1) context current_user Bob   current_user=Bob
+2) wf Ticket                  current_user=Bob;
+                              workflow={Workflow object}
+3) execute create issue
+   - get data from user       current_user=Bob;
+                              workflow={Workflow object};
+                              ticket={Ticket object}
+4) execute add coment
+   - get data from user       current_user=Bob;
+                              workflow={Workflow object};
+                              ticket={Ticket object}
+ ...
+
+Every request from the user operates with the data in the context
+available to the workflow actions.
+
+To do the same with the web application we need to use cookies and do
+some extra work. As long as you're using a workflow (as set in the
+'workflow_id' cookie) the web dispatching module (App::Web) will fetch
+the workflow and set the 'current_user' cookie in its context.
+
+And because we've configured the persister to fetch extra data
+('ticket_id') associated with the workflow, the dispatcher also
+fetches the associated ticket and assigns it to the context in the
+'ticket' key.
+
+========================================
+$Id$

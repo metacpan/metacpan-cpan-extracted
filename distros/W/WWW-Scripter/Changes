@@ -1,0 +1,266 @@
+Revision history for WWW::Scripter
+
+0.032  17 July, 2016
+     • Minor   documentation  fixes,  with   thanks  to  Jim   Keenan
+       [rt.cpan.org #89070].
+     • Links to fragments on data URL pages now work.
+
+0.031  21 February, 2016
+       WWW::Scripter  no longer fails to load  if  a  sub  named  ‘::’
+       exists.  Thanks to Don Silvia for reporting the bug.
+
+0.030  28 May, 2013
+     • The "content"  method no longer  fails when "dom_enabled"  has
+       been unset [rt.cpan.org #84639].
+     • The "content" method now returns  the correct content when the
+       request chain contains both  server- and client-side redirects
+       [rt.cpan.org #84472].
+
+0.029  13 May, 2012
+     • The  WWW::Mechanize  link methods now  include  meta,
+       link and (i)frame elements, just like WWW::Mechanize
+       [rt.cpan.org #76984].
+     • WWW::Mechanize-style link objects for area elements now return
+       undef for the text  method,  rather than the empty string,  to
+       conform to WWW::Mechanize.
+
+0.028  April Fools’ Day, 2012
+       New fetch_images and image_handler  features,  as suggested by
+       John Hulala [rt.cpan.org #75696].
+
+0.027  18 March, 2012
+     • The navigator object now has a cookieEnabled property.  Thanks
+       to John Hulala for the suggestion.  (I wasn’t aware that brows-
+       ers had this.)
+     • Requests for scripts now use the  right  referrer  instead  of
+       always  about:blank.  Thanks to John  Hulala  for  the  report
+       [rt.cpan.org #75696].
+
+0.026  11 March, 2012
+       The history property is now listed in %WindowInterface,  allow-
+       ing scripts to access it.  Thanks to John Hulala for reporting
+       the issue.
+
+0.025  1 January, 2012
+     • The get, head, post, put and request methods now alias $_ to a
+       new scalar to protect a tied  $_  belonging to the caller from
+       modification by other modules WWW::Scripter depends on.
+     • The status and defaultStatus methods have been removed. status
+       conflicts with a WWW::Mechanize method. defaultStatus makes no
+       sense without status.  These were added for completeness’ sake,
+       for scripts to access,  but no scripts really  use  these  any
+       more.  This removal might be temporary if I think of a way  to
+       reintroduce them without conflicts.
+     • A memory leak in the  ->frames  method has been fixed.  It was
+       creating circular references that kept the window and document
+       objects alive.
+
+0.024  20 November, 2011
+     • Link-fetching methods,  like find_all_links,  no longer die if
+       there is no document,  which  happens  after  browsing  to  an
+       unparsable or unretrievable URL. Thanks to Kengo Tsukamoto for
+       reporting this [rt.cpan.org #72481].
+     • WWW::Mechanize is no longer an optional prerequisite.  The rea-
+       son for avoiding it  (test failures behind  a  firewall)  have
+       been resolved, so there is no reason for WWW::Scripter to work
+       around that.
+
+0.023  4 September, 2011
+     • WWW::Mechanize::Link objects returned by WWW::Scripter  (which
+       are actually tied,  but that is an implementation  detail  sub-
+       ject to change) can now be dumped via Data::Dumper, instead of
+       producing a  ‘Can't  locate  object  method  FETCHSIZE’  error.
+     • /../  at the beginning of a URL path is now stripped out  (and
+       all its variations: /////../ /..//..///, etc.).
+     • The error message displayed when a script cannot be loaded now
+       uses the URL and  line  number  of  the  page  containing  the
+       <script>  tag,  instead of a seemingly random line  number  in
+       HTML/DOM.pm.
+
+0.022  27 March, 2011
+     • New status and defaultStatus window properties
+     • New  screen  method that returns a screen object.  This object
+       currently does nothing, but serves mainly as a placeholder for
+       future use.
+
+0.021  13 March, 2011
+       The ‘open’ method now respects <base href> elements.
+
+0.020  17 November, 2010
+     • There are no longer circular references preventing the  window,
+       document and response objects from being freed.
+     • WWW::Mechanize  is  now  an  optional  prerequisite,  allowing
+       smoother installation.
+
+0.019  29 August, 2010
+       Fix a dependency problem
+
+0.018  22 August, 2010
+       Loading a page that had a <meta>  tag with no http-equiv attri-
+       bute  (e.g.,  <meta charset=utf-7>)  would cause uninitialized
+       warnings in perl 5.12.0 and higher if  a  script  handler  was
+       present. This has been fixed.
+
+0.017  25 July, 2010
+       Fixed an internal bug where  Hash::Util::FieldHash::Compat  is
+       used without being loaded first.  It  just  happened  to  work
+       because HTML::DOM 0.041 and earlier load it.
+
+0.016  18 July, 2010
+     • If a script handler’s event2sub method leaves something in  $@,
+       it is now picked up  and  handed  off  to  the  ->warn  method.
+     • check_timers  used to ignore some code ref timers if the  Java-
+       Script plugin was not loaded.  It is only supposed  to  ignore
+       strings of code. This has been fixed.
+
+0.015  20 June, 2010
+       location->assign has been added.
+
+0.014  13 June, 2010
+     • navigator->platform has been added.
+     • Timers now use Time::HiRes,  instead of rounding to  the  near-
+       est second.
+     • New wait_for_timers method
+     • A new navigator->taintEnabled method that always returns false
+       has been added,  to appease MooTools 1.2,  which makes unrelia-
+       ble assumptions based on the absence of this method.
+
+0.013  2 May, 2010
+       navigator->javaEnabled has been added. It always returns false.
+
+0.012  25 April, 2010
+       setInterval and clearInterval have been added.
+
+0.011  18 April, 2010
+     • Support for multiple ‘windows’:
+       • New WWW::Scripter::WindowGroup class
+       • New window_group, blur, close and focus methods
+       • The open method now opens new windows,  returning the window
+         it opened.
+     • Support for link targets and <base target> tags, including the
+       new find_target and name methods
+     • navigator->appCodeName
+     • follow_link and click now return the response object,  instead
+       of returning nothing. (Thanks to  Hannes  Beinert  for  report-
+       ing this.)
+     • follow_link  no longer dies when autocheck is on  (unless it’s
+       supposed to).
+     • The WWW::Mechanize::Link and ::Image  objects returned by vari-
+       ous methods now update automatically if  the  underlying  HTML
+       element changes.
+     • The history object’s  go  method now  reloads  the  page  with
+       zeroes that are boolean-true (like the strings "00" and "0e0"),
+       instead of just with false zeroes.
+     • The title method now sets the page title if passed an argument.
+     • Script handlers can now use the Mech interface to access forms
+       during parsing.
+     • Fetching a page no longer interferes with a tied $_.
+
+0.010  15 November, 2009
+     • New dom_enabled method that allows HTML parsing to be switched
+       off.
+     • Scripts served with a content type of text/html  are no longer
+       parsed into inaccessible DOM trees. This used to cause warning
+       messages if a JS file  when  read  as  HTML  appeared  to  con-
+       tain scripts.
+     • The document method now returns undef  if the page is not HTML,
+       instead of returning the previous page’s document.
+
+0.009  25 October, 2009
+     • count_timers and check_timers now know about timers in
+       (i)frames.
+     • Adding an inline script to  the  DOM  dynamically  (e.g.,  via
+       appendChild) no longer produces a warning.
+     • Empty script elements with no src attribute  no  longer  cause
+       errors.
+     • The base URL for an about:blank page in a frame is  now  taken
+       from the parent window.
+     • check_timers  now catches script errors and  turns  them  into
+       warnings. It used to die with code refs (introduced in the pre-
+       vious version) and silence them with strings of code.
+     • Location objects are no longer shared between frames  (causing
+       navigation in a frame via the location object to navigate  the
+       top window instead).
+     • Event handlers with  call_with  methods no longer get passed a
+       strange WWW::Scripter::EventTarget object.  (These objects had
+       existed since version 0.005 and  were  *supposed*  to  be  for
+       internal use,  but leaked out.  They were for keeping a  diffe-
+       rent set of window event handlers for each page.)
+
+0.008  19 October, 2009
+     • The base method now uses HTML::DOM’s base method,  in order to
+       work with multiple <base> tags and dynamic changes to the base.
+     • We now include scroll, scrollBy and scrollTo methods,  in case
+       a script tries to call them.  They don’t actually do  anything.
+     • Frames with no  src  element or an empty src element  used  to
+       load the parent page,  resulting in infinite  recursion.  This
+       has been fixed.
+     • setTimeout  now works with a code ref as  the  first  argument.
+     • count_timers no longer clobbers the $_ variable.
+
+0.007  9 October, 2009
+       The  clone  method  now  copies  class_info  over.  class_info
+       no longer dies when  called  on  a  clone  with  no  arguments
+       in list or scalar context.
+
+0.006  30 September, 2009
+       WWW::Scripter now overrides  WWW::Mechanize’s submit method to
+       trigger  onsubmit.  (Thanks to  Steven  Nikkel  for  stumbling
+       across this.)
+
+0.005  17 September, 2009
+     • max_docs and max_history have been added. Mech’s stack_depth
+       is  now  honoured.  (max_docs  is  an  off-by-one  alias  to
+       stack_depth.)
+     • When no  browsing  has  happened,  the  current  page  is  now
+       about:blank.  (It used to be an uninitialised state  in  which
+       some methods, such as uri, would just die.)
+     • URL fragments are now supported.  They are now  stripped  from
+       URLs when the actual request is made (they used to be sent  to
+       the server).  Fetching a URL that differs from the current one
+       only by its fragment does not reload the page,  but does add a
+       history entry.  You can now use the location object to get the
+       URL with its fragment.  Use the uri method to get the real URL.
+     • location->replace now works correctly.  (It used to be a quick-
+       and-dirty ‘back’ followed by ‘get’.)
+     • location->reload  now actually reloads the  page.  In  version
+       0.002,  it would simply refresh the  page  from  the  response
+       object.  Version  0.003  broke  that  by  making  it  a  no-op.
+     • Support for onunload handlers
+     • onload handlers are now called on the window, not the body ele-
+       ment, with the document as the event target.
+     • WWW::Scripter  no longer inherits from  HTML::DOM::EventTarget,
+       but  it  still  provides  the  interface,  so  it  now  has  a
+       DOES method.
+     • Setting the value of the location  object’s  hash  and  search
+       attributes now works.  It used to be a no-op unless it was set
+       to the old value.
+     • The host, hostname, pathname, port, protocol, search and  href
+       methods of the  location  object  now  return  the  old  value
+       upon setting.
+     • The host and hostname methods of the location object have been
+       corrected  such  that  host  now  returns  the  port  as  well,
+       hostname  no longer returns the port,  setting  hostname  to a
+       string containing a port no longer sets the port  and  setting
+       host with a port number now works.  (In other words, they were
+       switched round and were a bit buggy, too.)
+     • I forgot to add the  CSS  interface  to  the  class_info.  Now
+       it’s there.
+
+0.004  16 August, 2009
+       The  frames  method no longer dies when the page is  not  HTML.
+
+0.003  15 August, 2009
+     • When you go back  (or forward)  to a page,  the same  document
+       object is  used  once  more.  It  used  to  be  parsed  afresh.
+     • Detecting the charset now works with LWP 5.827 and later.
+
+0.002  9 April, 2009
+       One bug fix: The credentials method now works.
+
+0.001  5 April, 2009
+       First release. This consists of code copied and pasted from
+       parts of WWW::Mechanize::Plugin::DOM and the experimental
+       plugin version of WWW::Mechanize at
+       <http://www-mechanize.googlecode.com/svn/wm/branches/plugins/>,
+       plus some new code to tape it all together.

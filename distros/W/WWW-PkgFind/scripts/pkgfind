@@ -1,0 +1,354 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use LWP::Simple;
+use WWW::RobotRules;
+use File::Spec::Functions;
+use File::Path;
+use WWW::PkgFind;
+
+use vars qw($VERSION);
+$VERSION = '1.00';
+
+#------------------------------------------------------------------------
+# Config variables
+#------------------------------------------------------------------------
+our $opt_version      = 0;
+our $opt_help         = 0;
+our $opt_man          = 0;
+our $opt_debug        = 1;
+our $opt_destination  = ".";
+our $opt_queue        = undef;
+our $opt_agent_desc   = "";
+our $opt_name         = '';
+our $opt_url          = '';
+our $opt_depth        = 3;
+our $opt_wanted       = '';
+our $opt_notwanted    = '';
+
+#------------------------------------------------------------------------
+# Commandline option processing
+#------------------------------------------------------------------------
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V",         # Prints the version and exits
+           "help|h",            # Prints a brief help message
+           "man",               # Prints a manual page (detailed help)
+           "debug|D=i",         # Prints debug messages
+           "destination|d=s",   # Location to store downloads to
+           "name|n=s",          # package name
+           "url|u=s",           # Url to parse
+           "depth|p=i",         # Depth to follow links for packages 
+           "wanted|w=s",        # Wanted file type
+           "notwanted|W=s",     # Not wanted file types
+	   "queue|q=s",         # Location to create a new download queue
+	   "agent-desc=s",      # Comment for the user agent string
+           ) or pod2usage(-verbose => 1, -exitstatus => 0);
+
+if ($opt_version) {
+    print "$VERSION\n";
+    exit 0;
+}
+
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+die "Error:  No such destination directory '$opt_destination'\n"
+    unless (-d $opt_destination);
+
+if (defined $opt_queue) {
+    die "Error:  No such queue directory '$opt_queue'\n"
+        unless (-d $opt_queue);
+}
+
+my $hostname   = `hostname` || "nameless";  chomp $hostname;
+my $user_agent = "package_retriever/$VERSION $hostname spider $opt_agent_desc";
+my $rules      = WWW::RobotRules->new("$0/$VERSION");
+my %robot_urls;
+
+exit main();
+
+sub main {
+    my $Pkg;
+
+    if ($opt_name and $opt_url) {
+        # try to process anything from commandline first
+        warn "Processing from commandline\n" if $opt_debug>2;
+        $Pkg = new WWW::PkgFind($opt_name);
+
+        $Pkg->depth           ( $opt_depth     );
+        $Pkg->parent_url      ( $opt_url       );
+        $Pkg->active_urls     ( $opt_url       );
+        $Pkg->wanted_regex    ( $opt_wanted    );
+        $Pkg->not_wanted_regex( $opt_notwanted );
+        $Pkg->set_create_queue( $opt_queue     );
+        $Pkg->set_debug       ( $opt_debug     );
+
+        warn "Retrieving...\n" if $opt_debug>2;
+        $Pkg->retrieve($opt_destination);
+        warn "Finished.\n" if $opt_debug>2;
+        return 0;
+    }
+        
+    while (<>) {
+        chomp;
+        if ($_ =~ m|^\s*PACKAGE:\s+(.+)$|i) {
+            my $package_name = $1;
+            if ($Pkg
+                and defined $Pkg->package_name()
+                and         $Pkg->parent_url()) {
+                
+                # Process the package we've loaded so far
+                warn "# Retrieving packages...\n" if $opt_debug>1;
+                $Pkg->retrieve($opt_destination);
+                warn "Finished.\n" if $opt_debug>2;
+            }
+
+            # Start a new package
+            $Pkg = new WWW::PkgFind($package_name);
+            $Pkg->set_debug($opt_debug);
+            $Pkg->set_create_queue( $opt_queue     );
+            $Pkg->depth($opt_depth);
+        }
+           
+        if ($_ =~ m|^\s*URL:\s+(.+)$|i) {
+            my $url = $1;
+            $Pkg->parent_url($url);
+            $Pkg->active_urls($url);
+        }
+        
+        if ($_ =~ m|^\s*DEPTH:\s*(\d+)|i) {
+            $Pkg->depth($1);
+        }
+        
+        # Load the wanted regex's
+        if ($_ =~ m|^\s*WANTED:\s*(.+)$|i) {
+            warn "Found a WANTED regex...\n" if $opt_debug>2;
+            $Pkg->wanted_regex($1);
+        }
+        
+        # Load the not wanted regex's
+        if ($_ =~ m|^\s*NOTWANTED:\s*(.+)$|i) {
+            warn "Found a NOTWANTED regex...\n" if $opt_debug>2;
+            $Pkg->not_wanted_regex($1);
+        }
+       
+        # Load the mirrors, if any
+        if ($_ =~ m|^\s*MIRRORS:\s*(.+)$|i) {
+            warn "Found MIRRORS list...\n" if $opt_debug>2;
+            my @mirrors = split /,/, $1;
+            $Pkg->mirrors(@mirrors);
+        }
+       
+        # Load the mirrors, if any
+        if ($_ =~ m|^\s*MIRROR_URL:\s*(.+)$|i) {
+            warn "Found a MIRROR_URL...\n" if $opt_debug>2;
+            $Pkg->mirror_url($1);
+        }
+       
+        # Load the rename regex's
+        if ($_ =~ m|^\s*RENAME:\s*(.+)$|i) {
+            $Pkg->rename_regex($1);
+        }
+    }
+
+    # Load the last package if it isn't already
+    if ($Pkg->parent_url() && ! $Pkg->processed()) {
+        $Pkg->retrieve($opt_destination);
+    }
+    return 0;
+}
+
+
+
+__END__
+
+
+=head1 NAME
+
+B<pkgfind> - Spiders given URL(s) downloading wanted files
+
+=head1 SYNOPSIS
+
+pkgfind -d /tmp/mydir -n hello -u http://directory.fsf.org/hello.html -p 1 -w "hello-[\d\.]+\.tar\.gz"
+
+
+=head1 DESCRIPTION
+
+package_retriever scans a web or ftp site for newly posted files and
+downloads them to a local filesystem.  It then prints out the file names
+of the files it downloads to stdout, suitable for passing to other tools
+in a pipe.
+
+Specify the conditions to package_retriever's stdin, in this form:
+
+ PACKAGE:     hotplug_cpu
+ URL:         http://sr71.net/patches/
+ DEPTH:       2
+ WANTED:      patch-2\.6.*gz
+ NOTWANTED:   patch-2\.6\.[89].*gz
+ NOTWANTED:   patch-.*test\d*\.gz
+ MIRRORS:     ufpr,jaist,superb-east,surfnet,mesh
+
+
+The parameters allowed are as follows:
+
+PACKAGE - A tag name.  A subdirectory will be created by this name and
+the files placed into it.  This also indicates the start of a new
+package definition, if you wish to define multiple packages in your
+input.
+
+URL - The website or ftp site to scan.
+
+DEPTH - The number of subdirectories to descend during the search.  If
+not specified, a depth of 5 is assumed.
+
+WANTED - A Perl Regular Expression indicating filenames that should be
+accepted.  Multiple WANTED expressions can be used; the file must match
+at least ONE of these.
+
+NOTWANTED - A Perl Regular Expression indicating filenames to ignore.
+Multiple NOTWANTED expressions can be used; the file must not match
+ANY of these.
+
+MIRRORS - Causes MIRROR_URL, or URL if MIRROR_URL is not defined, to be
+modified to include a randomly selected mirror by substituting the
+strings "MIRROR" and "FILENAME".  For example, to download a package
+from SourceForge, set URL to
+"http://prdownloads.sourceforge.net/crucible/FILENAME", then construct
+your MIRROR_URL like
+"http://MIRROR.dl.sourceforge.net/sourceforge/crucible/", and set
+MIRRORS to "switch,kent,mesh,surfnet" or whatever; pkgfind will select
+one of those four mirrors randomly and plug it into the URL.
+
+MIRROR_URL - If this and MIRRORS is defined, will cause WWW::PkgFind to
+download packages from a url constructed by taking MIRROR_URL and
+substituting a randomly selected item from MIRRORS for the string
+"MIRROR".
+
+RENAME - Allows specifying a regular expression to do a rename on the
+package after it is downloaded.
+
+
+The motivation for this script is to poll places where developers post
+patches to software we're testing.  The patches are then placed in a
+directory where other tools can pick them up and invoke regression
+tests on them, as appropriate.
+
+This script was heavily derived from Judith Lebzelter's SourceSync
+module in the OSDL Patch Lifecycle Manager (PLM).  Aside from 
+breaking it out into a stand-alone tool, the other major change is
+the use of a plain text input file rather than a SQL database.
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Prints the version and exits.
+
+=item B<-h>, B<--help>
+
+Prints a brief help message with option summary.
+
+=item B<--man>
+
+Prints a manual page (detailed help).  Same as `perdoc tgen`
+
+=item B<-D> I<N>, B<--debug>=I<N>
+
+Prints debug messages.  This expects a numerical argument corresponding
+to the debug message verbosity.
+
+=item B<-d> I<path>, B<--destination>=I<path>
+
+The directory path to store the downloads.  The current directory is
+assumed by default.  Subdirectories will be created for the packages
+specified in the input file.
+
+=item B<--agent-desc>=I<descriptive-comment>
+
+Allows specification of a user agent comment.  The user agent appears
+in the logs of the site that package_retriever accesses as something
+like:
+
+  package_retriever/1.00 I<hostname> spider I<descriptive-comment>
+
+The descriptive comment is used to communicate the purpose of pulling
+packages from the site.  For example, you may wish to provide a URL to
+the location where the results from testing the package are posted, or
+a page showing contact information about you.
+
+=item B<-n> <packagename>, B<--n>=<packagename>
+
+The name of the package.
+
+=item B<-u> <url>, B<--url>=<url>
+
+The url to parse for packages.
+
+=item B<-p> <depth>, B<--depth>=<depth>
+
+The depth to parse for packages.
+
+=item B<-w> <wanted>, B<--wanted>=<wanted>
+
+The file type you want saved.
+
+=item B<-W> <notwanted>, B<--notwanted>=<notwanted>
+
+The file types you do not want saved.
+
+
+=back
+
+
+=head1 PREREQUISITES
+
+This script requires the following perl modules: 
+C<Pod::Usage>, 
+C<Getopt::Long>,
+C<LWP::Simple>,
+C<File::Spec>.
+
+
+=head1 SCRIPT CATEGORIES
+
+Utilities
+
+=head1 BUGS
+
+None known.
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@osdl.orgE<gt>
+
+L<http://www.osdl.org/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 Bryce Harrington, OSDL.
+Copyright (C) 2005 Jon Phillips.
+All Rights Reserved.
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.4 $
+
+=cut
+

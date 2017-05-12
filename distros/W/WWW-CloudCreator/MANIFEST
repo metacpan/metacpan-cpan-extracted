@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/WWW/CloudCreator.pm
+t/02-pod.t
+t/03-pod_coverage.t
+t/04-perl_critic.t
+t/10-compile.t
+t/11-new.t

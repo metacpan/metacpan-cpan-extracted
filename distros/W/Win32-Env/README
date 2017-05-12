@@ -1,0 +1,37 @@
+Win32-Env
+
+Set and retrieve system/user enviroment variables under Win32.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Win32::Env
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Win32-Env
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-Env
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Win32-Env
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Win32-Env
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Oleg "Rowaa[SR13]" V. Volkov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

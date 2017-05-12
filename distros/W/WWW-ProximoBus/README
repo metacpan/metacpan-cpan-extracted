@@ -1,0 +1,45 @@
+NAME
+    WWW::ProximoBus - A simple client library for the ProximoBus API.
+
+SYNOPSIS
+        my $proximo = WWW::ProximoBus->new();
+        my $agencies = $proximo->agencies();
+        my $agency = $agencies->{items}[0];
+        my $routes = $proximo->routes($agency->{id});
+        for my $route (@{$routes->{items}}) {
+            print $route->{id};
+        }
+
+DESCRIPTION
+    WWW::ProximoBus is a Perl library implementing an interface to the
+    ProximoBus API.
+
+    ProximoBus is a simple alternative API for NextBus' publicly-available
+    data. Read more about it at http://proximobus.appspot.com/docs.html .
+
+WARNINGS
+    From the ProximoBus documentation:
+
+        This API is provided in the hope that it is useful, but there are no
+        availability guarantees nor any warranty about the accuracy of the
+        provided data. Use of this data is at the risk of the user.
+
+        The author reserves the right to deny access to ProximoBus to anyone
+        at any time and for any reason. While backward compatibility will be
+        preserved as much as possible, the author reserves the right to
+        change any aspect of the provided API at any time for any reason and
+        with no notice.
+
+AUTHOR
+    Sam Kimbrel (kimbrel@me.com)
+
+COPYRIGHT
+    Copyright 2011 - Sam Kimbrel
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    http://proximobus.appspot.com/ http://nextbus.com/
+

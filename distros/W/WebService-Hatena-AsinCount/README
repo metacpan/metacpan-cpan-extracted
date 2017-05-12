@@ -1,0 +1,46 @@
+NAME
+    WebService::Hatena::AsinCount -- Interface for Hatena::Bookmark:Asin's
+    getAsinCount XML-RPC API
+
+SYNOPSIS
+        use WebService::Hatena::AsinCount;
+        my @list = (
+            '4774124966',
+            '4886487319'
+        );
+        my $hash = WebService::Hatena::AsinCount->getCount( @list );
+        foreach my $url ( @list ) {
+            printf( "%5d   %s\n", $hash->{$url}, $url );
+        }
+
+DESCRIPTION
+    WebService::Hatena::AsinCount is a interface for "bookmark.getAsinCount"
+    method provided by Hatena::Bookmark:Asin XML-RPC API.
+    This module follows WebService-Hatena-BookmarkCount module.
+    I respect the author very much and want to say 'thank you'.
+
+METHODS
+  $bgc = WebService::Hatena::AsinCount->new();
+    This constructor method creates a instance.
+
+   $hash = $bgc->getCount( @list );
+    This method make a call to "bookmark.getAsinCount" method of the Hatena Web
+    Services. The arguments is list of Asin code to get a number of registrations
+    in Hatena::Bookmark:Asin. This method returns a reference for a hash, which
+    keys are Asin code and which values are counts returned by the Hatena Web
+    Services.
+
+   $hash = WebService::Hatena::AsinCount->getCount( @list );
+    You can call this method directly without creating a instance.
+
+MODULE DEPENDENCIES
+    XML::TreePP LWP::UserAgent
+
+AUTHOR
+    Makoto Tanaka <tanaka.makoto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2006 Makoto Tanaka. All rights reserved.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

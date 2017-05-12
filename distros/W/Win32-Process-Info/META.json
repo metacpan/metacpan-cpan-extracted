@@ -1,0 +1,73 @@
+{
+   "abstract" : "Get information on arbitrary processes in Windows NT",
+   "author" : [
+      "Tom Wyant (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-Process-Info",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Win32::Process::Info" : {
+         "file" : "lib/Win32/Process/Info.pm",
+         "version" : "1.022"
+      },
+      "Win32::Process::Info::NT" : {
+         "file" : "lib/Win32/Process/Info/NT.pm",
+         "version" : "1.022"
+      },
+      "Win32::Process::Info::PT" : {
+         "file" : "lib/Win32/Process/Info/PT.pm",
+         "version" : "1.022"
+      },
+      "Win32::Process::Info::WMI" : {
+         "file" : "lib/Win32/Process/Info/WMI.pm",
+         "version" : "1.022"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Process-Info"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.022"
+}

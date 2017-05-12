@@ -1,0 +1,22 @@
+Revision history for Perl extension WebService-Bandcamp
+
+0.06 2014-11-07T11:07:17Z
+    - Deleted debug code
+
+0.05 2014-10-06T09:11:47Z
+    - Fix document
+
+0.04 2014-09-05T00:01:25Z
+    - Deleted tests
+
+0.03 2014-09-02T10:06:38Z
+    - Fix invalid default api_key
+
+0.02 2014-08-14T13:58:04Z
+
+    - Fix User-Agent
+
+0.01 2014-08-14T08:49:25Z
+
+    - original version
+

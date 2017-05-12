@@ -1,0 +1,8 @@
+Changes
+lib/Web/App/Lib/EntityRecord.pm
+lib/Web/App/Lib/EntityCollection.pm
+Makefile.PL
+MANIFEST
+README
+META.yml			Module meta-data (added by MakeMaker)
+t/000-dummy.t

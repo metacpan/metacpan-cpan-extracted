@@ -1,0 +1,70 @@
+NAME
+    WWW::Search::GalerieIlonkaCZ - Class for searching
+    http://galerie-ilonka.cz .
+
+SYNOPSIS
+     use WWW::Search::GalerieIlonkaCZ;
+     my $obj = WWW::Search->new('GalerieIlonkaCZ');
+     $obj->native_query($query);
+     my $maintainer = $obj->maintainer; 
+     my $res_hr = $obj->next_result;
+     my $version = $obj->version;
+
+METHODS
+    "native_setup_search($query)"
+             Setup.
+
+    "native_retrieve_some()"
+             Get data.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Data::Printer;
+     use WWW::Search::GalerieIlonkaCZ;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 match\n";
+             exit 1;
+     }
+     my $match = $ARGV[0];
+
+     # Object.
+     my $obj = WWW::Search->new('GalerieIlonkaCZ.pm');
+     $obj->maximum_to_retrieve(1);
+
+     # Search.
+     $obj->native_query($match);
+     while (my $result_hr = $obj->next_result) {
+            p $result_hr;
+     }
+
+     # Output:
+     # Usage: /tmp/1Ytv23doz5 match
+
+     # Output with 'Čapek' argument:
+
+DEPENDENCIES
+    HTTP::Cookies, LWP::UserAgent, Readonly, Web::Scraper, WWW::Search.
+
+SEE ALSO
+    WWW::Search.
+
+REPOSITORY
+    <https://github.com/tupinek/WWW-Search-GalerieIlonkaCZ>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    BSD license.
+
+VERSION
+    0.01
+

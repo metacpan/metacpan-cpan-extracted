@@ -1,0 +1,8 @@
+Revision history for WebService-ClinicalTrialsdotGov
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    Fixed typo in Makefile preventing abstract being extracted properly.
+0.03    Fixed error in boilerplate test which caused test to fail when smoked but
+        not locally.
+0.04    Yet another fix in the Makefile

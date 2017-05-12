@@ -1,0 +1,52 @@
+#==============================================================================#
+  Win32::Girder::IEvent::Client
+  Win32::Girder::IEvent::Server
+#==============================================================================#
+
+The Win32::Girder::IEvent modules allow access to the Girder Internet Events
+API. Girder is an application use for Windows automation, originally designed
+for use with IR remote controls. However it is now possible to control Girder
+via TCP IP.
+
+Note that this module is not Win32 specific. It designed to talk to an 
+application running on Win32 but the module itself should run on any platform
+that supports perl 5.6.0 with the 'select()' function. The tests also require
+'fork()'.
+
+#==============================================================================#
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are using Activestate perl, you can also install as a PPM:
+
+   ppm install --location=http://brock-family.org/gavin/perl/ppm Win32-Girder-IEvent
+
+#==============================================================================#
+
+DEPENDENCIES
+
+This module requires at least perl 5.6.0 and these other modules and libraries:
+
+  IO::Socket
+  Digest::MD5
+
+#==============================================================================#
+
+COPYRIGHT AND LICENCE
+
+This module is Copyright (c) 2002 Gavin Brock gbrock@cpan.org. All rights 
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The Girder application is Copyright (c) Ron Bessems. Please see the 
+'copying.txt' that came with your copy of Girder or visit http://www.girder.nl 
+for contact information.
+
+#==============================================================================#

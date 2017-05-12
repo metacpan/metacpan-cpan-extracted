@@ -1,0 +1,20 @@
+WORD                    T_IV
+DWORD                   T_IV
+LPCSTR                  T_PV
+LPCTSTR                 T_PV
+BOOL                    T_BOOL
+LPTSTR                  T_PV
+HINTERNET               T_HINTERNET
+
+
+#############################################################################
+INPUT
+
+T_HINTERNET
+	$var = INT2PTR(HINTERNET, SvIV($arg))
+
+#############################################################################
+OUTPUT
+
+T_HINTERNET
+	sv_setiv($arg, PTR2IV($var));

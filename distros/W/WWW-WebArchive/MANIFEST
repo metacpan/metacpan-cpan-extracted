@@ -1,0 +1,12 @@
+CHANGES
+MANIFEST
+Makefile.PL
+META.yml
+README
+TODO
+bin/webarchive
+lib/WWW/WebArchive.pm
+lib/WWW/WebArchive/Agent.pm
+lib/WWW/WebArchive/WaybackMachine.pm
+t/app.conf
+t/main.t

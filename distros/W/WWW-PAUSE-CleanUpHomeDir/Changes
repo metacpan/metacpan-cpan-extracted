@@ -1,0 +1,30 @@
+Revision history for WWW-PAUSE-CleanUpHomeDir
+
+1.001002   2015-03-24
+        - Fixed failing tests
+
+1.001001   2015-03-24
+        - Repackaged to use Dist::Zilla
+        - Swapped deprecated Class::Data::Accessor
+            to Class::Accessor::Grouped
+        - Made the module skip trial version (RT#94976)
+
+0.004   2013-11-08
+        - Fixed broken tests
+        - Moved release tests to xt/
+
+0.003   2013-10-26
+        - Added use of HTTPS by default
+          with an option to revert back to HTTP
+
+0.002   2013-10-25
+        - Fixed "Changes" file to comply with CPAN::Changes::Spec
+        - Applied version sorting patch from Steven 'SHARYANTO' Haryanto
+        - Added minimum perl version in the requirements
+        - Fixed Test::Kwalitee to be run only with RELEASE_TESTING
+        - Added a LICENSE file to comply with experimental
+          Kwalitee CPANTS game
+
+0.001   2007-03-17
+        - First version, released on an unsuspecting world.
+

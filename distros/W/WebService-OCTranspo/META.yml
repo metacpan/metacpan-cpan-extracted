@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-OCTranspo
+version:      0.027
+version_from: lib/WebService/OCTranspo.pm
+installdirs:  site
+requires:
+    DateTime:                      0
+    HTML::Form::ForceValue:        0
+    HTML::TableExtract:            0
+    HTTP::Status:                  0
+    Test::More:                    0
+    WWW::Mechanize:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

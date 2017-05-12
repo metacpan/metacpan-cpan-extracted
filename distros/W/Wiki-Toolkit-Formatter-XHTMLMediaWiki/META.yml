@@ -1,0 +1,25 @@
+---
+name: Wiki-Toolkit-Formatter-XHTMLMediaWiki
+version: 0.04
+author:
+  - '"G. Allen Morris III" <gam3@gam3.net>'
+abstract: A Mediawiki-style formatter for Wiki::Toolkit.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  XHTML::MediaWiki: 0
+  perl: 5.6.0
+build_requires:
+  Test::More: 0
+  Test::XML: 0
+  Test::XML::Order: 0
+provides:
+  Wiki::Toolkit::Formatter::XHTMLMediaWiki:
+    file: lib/Wiki/Toolkit/Formatter/XHTMLMediaWiki.pm
+    version: 0.04
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

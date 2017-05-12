@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Win32-VisualStyles
+version:             0.02
+abstract:            Apply Win32 Visual (aka XP) Styles to windows
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Robert May <robertmay@cpan.org>

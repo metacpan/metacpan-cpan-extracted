@@ -1,0 +1,93 @@
+---
+abstract: 'Apache Wookie Connector Framework implementation'
+author:
+  - 'Roland van Ipenburg <ipenburg@xs4all.nl>'
+build_requires:
+  Test::More: '0.81'
+  Test::NoWarnings: '0.81'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Wookie
+provides:
+  WWW::Wookie:
+    file: lib/WWW/Wookie.pm
+    version: '0.102'
+  WWW::Wookie::Connector::Exceptions:
+    file: lib/WWW/Wookie/Connector/Exceptions.pm
+    version: '0.102'
+  WWW::Wookie::Connector::Service:
+    file: lib/WWW/Wookie/Connector/Service.pm
+    version: '0.102'
+  WWW::Wookie::Connector::Service::Interface:
+    file: lib/WWW/Wookie/Connector/Service/Interface.pm
+    version: '0.102'
+  WWW::Wookie::Server::Connection:
+    file: lib/WWW/Wookie/Server/Connection.pm
+    version: '0.102'
+  WWW::Wookie::User:
+    file: lib/WWW/Wookie/User.pm
+    version: '0.102'
+  WWW::Wookie::Widget:
+    file: lib/WWW/Wookie/Widget.pm
+    version: '0.102'
+  WWW::Wookie::Widget::Category:
+    file: lib/WWW/Wookie/Widget/Category.pm
+    version: '0.102'
+  WWW::Wookie::Widget::Instance:
+    file: lib/WWW/Wookie/Widget/Instance.pm
+    version: '0.102'
+  WWW::Wookie::Widget::Instances:
+    file: lib/WWW/Wookie/Widget/Instances.pm
+    version: '0.102'
+  WWW::Wookie::Widget::Property:
+    file: lib/WWW/Wookie/Widget/Property.pm
+    version: '0.102'
+recommends:
+  CGI: '0'
+  Getopt::Long: '0'
+  Perl::Critic::Bangs: '0'
+  Perl::Critic::Itch: '0'
+  Perl::Critic::More: '0'
+  Perl::Critic::Nits: '0'
+  Perl::Critic::Pulp: '0'
+  Perl::Critic::StricterSubs: '0'
+  Perl::Critic::Tics: '0'
+  Pod::Usage: '0'
+  Pod::Usage::CommandLine: '0'
+  Test::CheckManifest: '1.01'
+  Test::Kwalitee: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1'
+  Test::Spelling: '0'
+  Test::TestCoverage: '0.08'
+requires:
+  Exception::Class: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Readonly: '0'
+  Regexp::Common: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  perl: v5.20.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ipenburg/WWW-Wookie
+version: '0.102'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

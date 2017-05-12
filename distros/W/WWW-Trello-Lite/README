@@ -1,0 +1,11 @@
+WWW::Trello::Lite
+
+Copyright 2013  Robert Wohlfarth <rbwohlfarth@gmail.com>
+
+You can redistribute and/or modify this module under the same terms as Perl
+itself.
+
+
+Trello (https://www.trello.com) manages lists of stuff. Trello provides an API
+for remote control. WWW::Trello::Lite gives Perl scripts easy access to the
+API. I use it to add cards on my to-do list.

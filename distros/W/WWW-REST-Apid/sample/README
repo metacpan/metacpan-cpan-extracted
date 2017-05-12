@@ -1,0 +1,39 @@
+NAME
+    apid example usage
+
+DESCRIPTION
+    This is a simple API interface to a hosts processes. It uses apid and
+    "ps". It consits of two parts, the apid uri map ps.pm and a client
+    interface index.html which uses Jquery to access the interface.
+
+USAGE
+    Once apid is installed, start the server like this:
+
+     cd sample/
+     apid -c ps.conf -f start
+
+    Then point your browser to <http://localhost:8080/>. The uri / will be
+    served with the mentioned index.html. A process listing should appear
+    immediately. You can click on a process to see more details and you can
+    search for processes.
+
+INTERNALS
+    The uri map uses authentication for some uris (basic authentication),
+    which is transparent if you access it via index.html. The jquery script
+    authenticates to the api with the first request. Since apid returns a
+    session cookie, subsequent requests don't require additional measures.
+
+SECURITY
+    Please don't run this example on an internet facing server. It displays
+    all processes which is dangerous if third parties can view them.
+
+AUTHOR
+    T.v.Dein <tlinden@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2014 by T.v.Dein <tlinden@cpan.org>. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

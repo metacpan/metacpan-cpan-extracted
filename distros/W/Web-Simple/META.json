@@ -1,0 +1,66 @@
+{
+   "abstract" : "A quick and easy way to build simple web applications",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Exporter" : "5.57",
+            "HTTP::Body" : "1.22",
+            "Moo" : "0.009014",
+            "Plack" : "0.9968",
+            "Scalar::Util" : "0",
+            "Syntax::Keyword::Gather" : "1.001",
+            "perl" : "5.006",
+            "strictures" : "1",
+            "warnings::illegalproto" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper::Concise" : "2.020",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Web-Simple@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Web-Simple"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/catagits/Web-Simple.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Web-Simple.git"
+      }
+   },
+   "version" : "0.033",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

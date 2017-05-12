@@ -1,0 +1,100 @@
+{
+   "abstract" : "Interface to DataDog's REST API.",
+   "author" : [
+      "Jennifer Pinkham <jpinkham@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-DataDog",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Data::Dumper" : "0",
+            "Data::Validate::Type" : "1.001000",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::DataDog" : {
+         "file" : "lib/WebService/DataDog.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Alert" : {
+         "file" : "lib/WebService/DataDog/Alert.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Comment" : {
+         "file" : "lib/WebService/DataDog/Comment.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Dashboard" : {
+         "file" : "lib/WebService/DataDog/Dashboard.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Event" : {
+         "file" : "lib/WebService/DataDog/Event.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Graph" : {
+         "file" : "lib/WebService/DataDog/Graph.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Metric" : {
+         "file" : "lib/WebService/DataDog/Metric.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Search" : {
+         "file" : "lib/WebService/DataDog/Search.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::Tag" : {
+         "file" : "lib/WebService/DataDog/Tag.pm",
+         "version" : "v1.0.3"
+      },
+      "WebService::DataDog::User" : {
+         "file" : "lib/WebService/DataDog/User.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jpinkham/webservice-datadog/issues"
+      },
+      "homepage" : "https://metacpan.org/release/WebService-DataDog",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jpinkham/webservice-datadog.git"
+      }
+   },
+   "version" : "v1.0.3"
+}

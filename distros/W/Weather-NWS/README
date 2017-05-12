@@ -1,0 +1,13 @@
+Weather::NWS::NDFDgen and Weather::NWs::NDFDgenByDay
+
+Just a basic install...
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+This installer will attempt to use the NWS web services at the end of each of
+the module-specific test scripts.  If you have failures there, you might want
+to check your internet connection, firewall, etc.
+

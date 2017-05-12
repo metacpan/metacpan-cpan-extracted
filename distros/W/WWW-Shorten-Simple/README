@@ -1,0 +1,78 @@
+NAME
+
+    WWW::Shorten::Simple - Factory wrapper around WWW::Shorten to avoid
+    imports
+
+SYNOPSIS
+
+      use WWW::Shorten::Simple;
+    
+      my $svc = WWW::Shorten::Simple->new('TinyURL');
+      my $short_url = $svc->shorten($long_url);
+      my $canon_url = $svc->unshorten($short_url);
+
+DESCRIPTION
+
+    WWW::Shorten::Simple is a wrapper (factory) around WWW::Shorten so that
+    you can create an object representing each URL shortening service,
+    instead of importing makeashorterlink function into your namespace.
+
+    This allows you to call multiple URL shortening services in one
+    package, for instance to call WWW::Shorten::RevCanonical to extract
+    rev="canonical", fallback to bit.ly if username and API key are
+    present, and then finally to TinyURL.
+
+      use WWW::Shorten::Simple;
+    
+      my @shorteners = (
+          WWW::Shorten::Simple->new('RevCanonical'),
+          WWW::Shorten::Simple->new('Bitly', $bitly_username, $bitly_api_key),
+          WWW::Shorten::Simple->new('TinyURL'),
+      );
+    
+      my $short_url;
+      for my $shortener (@shorteners) {
+          $short_url = eval { $shortener->shorten($long_url) } # eval to ignore errors
+              and last;
+      }
+
+    This wrapper works with most WWW::Shorten implementation that
+    implements the default makeashorterlink and makealongerlink functions.
+    The options should be able to be passed as an optional parameters to
+    makeashorterlink function.
+
+METHODS
+
+    new
+
+        $svc = WWW::Shorten::Simple->new('TinyURL');
+        $svc = WWW::Shorten::Simple->new('Bitly', $bitly_username, $bitly_api_key);
+
+      Creates a new WWW::Shoten::Simple object. Takes a subclass name and
+      optional parameters to makeashorterlink call.
+
+    shorten
+
+        my $short_url = $svc->shorten($url);
+
+      Shortens the given URL. Aliases: makeashorterlink, short_link
+
+    unshorten
+
+        my $long_url = $svc->unshorten($short_url);
+
+      Unshortens the given URL. Aliases: makealongerlink, long_link
+
+AUTHOR
+
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    WWW::Shorten, WWW::Shorten::RevCanonical
+

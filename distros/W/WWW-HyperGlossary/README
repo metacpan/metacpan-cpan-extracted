@@ -1,0 +1,37 @@
+WWW-HyperGlossary version 0.0.1
+
+This software is primarily intended to be run via 
+the CatalystX::HyperGlossary modules and templates.
+
+There is also a limited command line interface (planned).
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+ Class::Std
+ Class::Std::Utils
+ YAML
+ Carp
+ LWP::Simple
+ DBIx::MySperql
+ Digest::MD5
+
+AUTHORS
+
+Feel free to email the authors with questions or concerns. Please be patient for a reply.
+
+Roger Hall (roger@iosea.com), (rahall2@ualr.edu) 
+Michael Bauer (mbkodos@gmail.com), (mabauer@ualr.edu) 
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009, the Authors
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

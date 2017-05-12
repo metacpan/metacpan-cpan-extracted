@@ -1,0 +1,132 @@
+NAME
+    WWW::NationalRail - Perl interface to the UK rail timetable
+
+SYNOPSIS
+      use WWW::NationalRail;
+
+      my $rail = WWW::NationalRail->new({
+        from        => "London",
+        to          => "Cambridge",
+        out_date    => "18/12/05",
+        out_type    => "depart",
+        out_hour    => 9,
+        out_minute  => 0,
+        ret_date    => "18/12/05",
+        ret_type    => "depart",
+        ret_hour    => 17,
+        ret_minute  => 0,
+      });
+
+      $rail->search or die $rail->error();
+
+      my $os = $rail->outward_summary; # array reference
+      my $rs = $rail->return_summary;
+
+      $os->[0]{depart}      # "09:06"
+      $os->[0]{arrive}      # "10:25"
+      $os->[0]{changes}     # "0" 
+      $os->[0]{duration}    # "1:19" 
+
+      my $od = $rail->outward_detail;
+      my $rd = $rail->return_detail;
+
+      $od->[0]->{duration}; # "1:19"
+
+      my $legs = $od->[0]{legs} # array reference
+
+      $legs->[0]{station}   # "LONDON KINGS CROSS"
+      $legs->[0]{arrive}    # undef
+      $legs->[0]{depart}    # "09:06"
+      $legs->[0]{travelby}  # "Train"
+      $legs->[0]{operator}  # "WAGN RAIL"
+
+      $rail->ret_hour(19);  # change search parameters
+      $rail->search();      # and search again
+
+DESCRIPTION
+    WWW::NationalRail is a Perl interface to the UK national rail timetable
+    at http://www.nationalrail.co.uk/planmyjourney/
+
+    new()
+        The constructor accepts the arguments for the search as a has
+        reference. The from and to fields are required, the rest are
+        optional and will use a National Rail supplied default.
+
+        from       Departure station.
+
+        to         Destination station.
+
+        via        Via station.
+
+        out_date   Outbound date in the format "DD/MM/YY". Defaults to
+                   today.
+
+        out_type   Possible values are "depart" to search by outbound
+                   departure time or "arrive" to search by outbound arrival
+                   time. Defaults to "depart".
+
+        out_hour   Outbound hour, 0 to 23. Defaults to sometime in the near
+                   future.
+
+        out_minute Outbound minute, 0 to 59. Defaults to sometime in the
+                   near future.
+
+        ret_date   Return date in the format "DD/MM/YY". Leave blank for
+                   one-way.
+
+        ret_type   Similar to out_type. Either "depart or "arrive". Defaults
+                   to "depart".
+
+        ret_hour   Return hour, 0 to 23. Leave blank for one-way.
+
+        ret_minute Return minute, 0 to 59. Leave blank for one-way.
+
+    search()
+        Object method to run the search and parse the results.
+
+    outbound_summary() and return_summary()
+        Each returns a reference to an array of hashes. For journeys in one
+        direction return_summary() will be undef. The hash representing a
+        summary has four fields:
+
+        depart   Time of departure.
+
+        arrive   Time of arrival.
+
+        changes  Number of changes.
+
+        duration Duration of the journey.
+
+    outbound_details() and return_details()
+        Each returns a reference to an array of hashes. For journeys in one
+        direction return_details() will be undef. The hash representing a
+        journey has four two fields:
+
+        legs     Reference to an array of hashes.
+
+        duration Duration of the journey.
+
+        The legs hash has four five fields:
+
+        station  Name of the station.
+
+        arrive   Time of arrival at this station, undef for the first leg.
+
+        depart   Time of departure from this station, undef for the last
+                 leg.
+
+        travelby Means of transport, will usually be train, but could also
+                 be foot, coach, or tube.
+
+        operator The train operating company.
+
+AUTHOR
+    Edward Betts, "<edward@debian.org>"
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Edward Betts
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

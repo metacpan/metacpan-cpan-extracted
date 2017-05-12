@@ -1,0 +1,78 @@
+Revision history for Perl extension WWW::Translate::interNOSTRUM
+
+0.13  February 18, 2014
+
+    * Added notes to inform that interNOSTRUM will cease to be available on 31.05.2014    
+    * Fixed a bug related to the "invalid value for parameter" message.
+    * Updated the copyright info
+
+0.12  September 7, 2010
+
+    * Changed the contact e-mail address.
+    * Added the BUGS and SUPPORT boilerplate sections.
+    * Updated the license text.
+    * Changed file EOL to Unix.
+
+0.11  September 20, 2007
+
+    * Edited Makefile.PL to include the license field in META.yml
+
+0.10  April 6, 2007
+
+    * Added a See Also section to the documentation
+    * Minor POD changes
+    * Minor Readme changes
+    * Minor fixes in Changes file
+    * META.yml conforms to spec 1.0
+
+0.09  February 14, 2007
+
+    * Added more tests
+    * Changed croaks to carps for the following cases:
+	- The interNOSTRUM server is down => now it shows a warning and returns undef
+	- The user doesn't provide any text to be translated => now it shows a warning
+	  and returns an empty string
+    * Updated the documentation
+
+0.08  December 10, 2006
+    
+    * Added a warning for the case in which the source text sent to the
+      machine translation engine server is too long.
+    * POD fix: Added the missing quotes to a hash value in the Synopsis.
+
+0.07  November 28, 2006
+    
+    * Added a line to get proxy specs from the environment
+
+0.06  November 20, 2006
+    
+    * Changed the asterisk detection regexp (the previous version didn't detect
+      entries where the first character contained a diacritic mark.)
+    * Included the _fix_source internal routine to fix geminated l problems
+      in the source text before translating.
+      Future versions will include other fixes.
+
+0.05  November 14, 2006
+
+    * Minor code and POD fixes
+
+0.04  November 14, 2006
+
+    * Added the store_unknown creation parameter
+    * Added the get_unknown method
+    * Updated the documentation
+
+0.03  November 13, 2006
+    
+    * Changed the processing of arguments
+    * Changed the double space removal regex to use lookahead and lookbehind
+    * Minor POD changes
+
+0.02  November 7, 2006
+
+    * Minor code changes    
+
+0.01  November 6, 2006
+	
+    * First version
+

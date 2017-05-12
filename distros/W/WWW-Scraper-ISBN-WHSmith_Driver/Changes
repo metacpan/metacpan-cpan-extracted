@@ -1,0 +1,43 @@
+Revision history for WWW-Scraper-ISBN-WHSmith_Driver
+====================================================
+
+0.08    2015-03-13
+        - bail if only part of the page is returned.
+
+0.07    2014-12-11
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+        - updated search page logic.
+
+0.06    2014-08-11
+        - test data update.
+        - fixed distribution name in metadata.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - extended test suite.
+        - weights change too frequently, using 'like' tests instead of 'is'.
+
+0.05    2013-11-10
+        - added isbn-check.pl to examples.
+        - META updates.
+        - added git repository links to metadata.
+        - added Data::Dumper to pre-requisites.
+        - updated pattern matching due to page layout changes.
+
+0.04    2012-12-16
+        - fixed broken test.
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.03    2012-06-03
+        - added checks for site error pages.
+
+0.02    2012-05-13
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.01    2010-11-02
+        - initial release.

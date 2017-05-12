@@ -1,0 +1,44 @@
+NAME
+    WWW::Mail15 - Connect to Mail15 service and download messages
+
+SYNOPSIS
+      use WWW::Mail15;
+      my $browser = new WWW::Mail15;
+      $browser->login("foo", "bar");
+      print $browser->folders;
+      $browser->read_folder(0); # usually the inbox
+      print $browser->get_mail(0,0)->subject;
+      #get the data, and audit it
+      print $browser->get_mail(0,0)->retrieve->accept;
+
+DESCRIPTION
+    Create a new "WWW::Mail15" object with "new", and then log in with your
+    Mail15 username and password. This will allow you to use the "folders"
+    method to look at the list of folders, "read_folder" to get messages
+    list inside a folder, and "get_mail" to actually get the message data in
+    form of "WWW::Mail15::Message" which supports these methods: =over 4
+
+    "subject" gives you the subject of the email,
+
+    "from" gives you the sender of the email,
+
+    "retrieve" turns the email into a "Mail::Audit" object - see Mail::Audit
+    for more details.
+
+    "delete" moves it to your trash.
+
+SEE ALSO
+    WWW::Mechanize, Mail::Audit
+
+NOTE
+    Code template is shamelessly stolen from WWW::Hotmail module.
+
+AUTHOR
+    Sir Reflog, <reflog@mail15.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Sir Reflog
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

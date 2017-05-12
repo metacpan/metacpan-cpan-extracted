@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                WebService-Tagzania-API
+version:             0.1
+abstract:            Tagzania API Interface
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    HTTP::Request:                 1.4
+    HTTP::Response:                1.53
+    LWP::UserAgent:                2.033
+    Test::Exception:               0.24
+    Test::Simple:                  0.44
+    URI:                           1.35
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Spiros Denaxas (s [dot] denaxas [@] gmail [dot]com)

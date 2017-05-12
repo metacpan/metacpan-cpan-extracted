@@ -1,0 +1,57 @@
+Revision history for Perl extension Web::Scaffold
+
+0.15  Mon Nov 14 11:57:34 PST 2011
+	include example pages missing from 0.14 MANIFEST
+
+0.14  Fri Dec 10 15:35:50 PST 2010
+	add optional CLASS designator to LINK keyword
+
+0.13  Wed Dec  8 16:16:32 PST 2010
+	add provisions for "drop" shadow image
+	elements on the menu bar and trailer bar
+
+	add provisions for "top" shadow image
+	element on the trailer bar
+
+0.12  Mon Jun 22 13:24:36 PDT 2009
+	Correct sitemap header error
+
+0.11  Tue Apr 10 09:48:33 PDT 2007
+	add "title" statement to all html links
+
+0.10  Tue Feb 20 19:05:18 PST 2007
+	for compatibility with google, yahoo, msn
+	modify the sitemap tag to:
+
+	<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+	http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+	xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+0.09  Tue Feb 20 09:10:17 PST 2007
+	add detailed <lastmod> time to sitemap
+
+0.08  Mon Feb 19 17:10:33 PST 2007
+	add auto sitemap generation
+
+0.07  Sat Jan 20 14:41:24 PST 2007
+	format page to add a little space after page body before trailer
+
+0.06  Sat Nov  4 10:58:48 PST 2006
+	fixed bug in 'get_col' that prevented 'link' syntax from
+	working in a menu bar
+
+0.05  Mon Sep 11 18:54:05 PDT 2006
+	'mkdir' updates for compatability with perl 5.0503
+
+0.04  Tue Sep  5 13:54:46 PDT 2006
+	add link to example web site to POD
+
+0.03  Tue Sep  5 11:58:41 PDT 2006
+	correct behavior of mouseOver for debug links
+
+0.02  Mon Sep  4 18:06:18 PDT 2006
+	add URL capability to MENU and TRAILER
+
+0.01  Sun Sep  3 13:12:06 PDT 2006
+	initial release

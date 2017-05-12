@@ -1,0 +1,34 @@
+[%- BLOCK link -%]
+  [%- IF page < 2 -%]
+[% c.uri_for('~' _ user.nickname _ '/') %]
+  [%- ELSE -%]
+[% c.uri_for('~' _ user.nickname _ '/', page => page) %]
+  [%- END -%]
+[%- END -%]
+
+<div class="container">
+
+<div class="row">
+
+<div class="span8">
+[% IF pageset.current_page == 1 %]
+<h1><a href="[% INCLUDE link %]">[% user.nickname | html %]</a>'s journals</h1>
+[% page.title = 'use.perl.org journals of ' _ user.nickname %]
+[% ELSE %]
+<h1><a href="[% INCLUDE link %]">[% user.nickname | html %]</a>'s journals (page [% pageset.current_page %])</h1>
+[% page.title = 'use.perl.org journals of ' _ user.nickname _ ' (page ' _ pageset.current_page _ ')' %]
+[% END %]
+
+<ul>
+[% FOREACH journal IN journals -%]
+<li><a href="[% c.uri_for('~' _ user.nickname _ '/journal/' _ journal.id ) %]">[% journal.description | html %]</a></li>
+[% END %]
+</ul>
+
+[% INCLUDE lib/pagination.tt %]
+
+</div> <!-- /span8 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

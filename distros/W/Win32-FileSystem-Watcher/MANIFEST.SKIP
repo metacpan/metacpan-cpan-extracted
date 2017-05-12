@@ -1,0 +1,8 @@
+\.git
+\bblib/
+\.bak$
+\.includepath
+\.project
+\.settings
+Makefile\.old
+Makefile

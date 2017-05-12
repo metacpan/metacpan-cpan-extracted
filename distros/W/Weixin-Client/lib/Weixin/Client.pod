@@ -1,0 +1,491 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Weixin::Client - A Weixin Client in Perl Language
+
+=head1 SYNOPSIS
+
+    use Weixin::Client;
+    my $client = Weixin::Client->new(debug=>0);
+
+    #加载ShowMsg插件，用于打印消息
+    $client->load("ShowMsg");
+
+    #客户端登录
+    $client->login();   
+
+    #设置客户端接收消息回调函数
+    $client->on_receive_msg = sub{
+        my $msg = shift ;
+
+        #打印收到的消息
+        $client->call("ShowMsg",$msg);
+
+        #对收到的消息，以相同的内容回复
+        $client->reply_msg($msg,$msg->{Content});
+    };
+    #设置客户端发送消息回调函数
+    $client->on_send_msg = sub {
+        my $msg = shift;    
+        #打印发送的消息
+        $client->call("ShowMsg",$msg);
+    
+    };
+    #客户端进入事件循环，开始运行
+    $client->run();
+
+=head1 PUBLIC CLASS METHOD
+
+=over
+
+=item new()
+   
+初始化一个weixin客户端对象
+
+可选参数 debug 0|1 
+
+可选参数 login_file 设置登录相关cookie保存的文件路径，默认保存在系统临时目录下的 weixin_client_login.dat
+
+    my $client = Weixin::Client->new(debug=>0);
+
+=item on_send_msg() :lvalue 
+
+设置客户端发送消息完成后的回调函数，常用于在回调函数中记录发送消息内容或者判断发送消息状态
+
+这是一个具有lvalue属性的subroutine，你必须赋值一个函数引用
+        
+    $client->on_send_msg() = sub{
+        my ($msg,$is_success,$status) = @_;
+        ...
+    };
+
+或者使用hash的形式
+
+    $client->{on_send_msg} = sub{
+        my ($msg,$is_success,$status) = @_;
+        ...
+    };
+
+你的回调会在发送消息完成后被立即调用，这个回调通常是用来判断消息的发送状态
+
+传递给回调的参数有三个：
+
+        $msg            #原始消息            
+        $is_success     #消息是否发送成功
+        $status         #发送状态 
+
+注意，如果发送消息失败，客户端默认会根据$msg->{TTL}重试多次，
+
+因此你不需要再根据$is_success自己再进行重试
+
+=item on_receive_msg() :lvalue
+    
+设置客户端接收消息回调函数，客户端接收到消息后会调用设置的回调函数，讲接收到的消息
+
+通过hash引用的形式传递给回调函数，你可以在此函数中对接收到的消息进行处理
+
+比如打印接收到的消息，对接收到的消息进行应答等
+
+    $client->on_receive_msg() = sub{
+        my $msg = shift;
+    };
+
+传递给回调函数的唯一参数是一个接收到的消息的hash引用
+
+=item on_login() :lvalue
+    
+设置客户端登录成功后的回调函数，客户端在登录成功后会调用该回调函数
+
+    $client->on_login() = sub{...;};
+
+=item on_run() :lvalue
+
+设置客户端执行run之前的回调
+    
+    $client->on_run() = sub{...;};
+
+=item on_ready() :lvalue
+
+设置客户端执行ready之前的回调
+    
+    $client->on_ready() = sub{...;};
+
+=item login()
+
+客户端登录，登录成功后才能够获取到个人、群组、好友信息、正常收发消息，登录失败客户端会退出
+
+    $client->login();
+
+=item user()
+
+获取登录帐号个人信息，该函数返回一个包含个人信息的hash引用，hash结构如下：
+
+    Uin                 #用户的标识
+    Id                  #用户的Id,对用户的相关操作需要频繁用到该Id
+    NickName            #昵称
+    HeadImgUrl          #头像地址
+    Sex                 #性别 none|male|female
+    Signature           #个性签名
+    PYInitial           #拼音首字母大写
+    PYQuanPin           #姓名完整拼命
+    RemarkName          #备注名称
+    RemarkPYInitial     #备注名称首字母大写
+    RemarkPYQuanPin     #备注名称完整拼音
+
+例如，获取个人昵称
+    
+    $client->user->{NickName};
+
+=item search_friend()
+
+在所有好友中搜索指定的好友，在列表上下文返回匹配搜索条件的所有好友，在标量上下文返回匹配的第一个好友
+
+查询失败返回undef，每一个好友信息使用一个hash引用进行存储，结构如下：
+
+        Sex             =>  #性别 none|male|female
+        Id              =>  #好友Id，查找好友，发送消息等需要用到
+        Uin             =>  #好友唯一标识
+        HeadImgUrl      =>  #头像地址
+        NickName        =>  #昵称
+        PYInitial       =>  #昵称首字母大写
+        PYQuanPin       =>  #昵称完整拼音
+        Alias           =>  #别名
+        City            =>  #城市
+        Province        =>  #省份
+        Signature       =>  #个性签名
+        DisplayName     =>  #
+        RemarkName      =>  #备注名称
+        RemarkPYInitial =>  #备注名称拼音首字母
+        RemarkPYQuanPin =>  #备注名称完整拼音
+
+支持按hash结构中存在的任一一个或多个Key进行过滤，例如:
+
+    my @friends = $client->search_friend(Sex=>"female",City=>"北京");
+    for my $each_friend (@friends){
+        use Data::Dumper;
+        print Dumper $each_friend;
+        print $each_friend->{NickName};
+    }
+
+    my $friend = $client->search_friend(Id=>"xxxxxxx");
+    print $friend->{NickName};
+
+=item search_chatroom()
+
+查询指定的群组，列表上下文返回所以匹配的结果，标量上下文返回第一个匹配的结果，查询失败返回undef
+
+每一个返回结果都是一个hash结构：
+
+    ChatRoomUin     #群组的Uin
+    ChatRoomId      #群组的Id
+    ChatRoomName    #群组的名称
+    OwnerUin        #群组创建者的Uin
+    MemberCount     #群组的成员数量
+
+    my $chatroom = $client->search_chatroom(ChatRoomName=>"红包群");
+
+=item search_chatroom_member()
+
+查询群组的指定群成员，列表上下文返回所以匹配的结果，标量上下文返回第一个匹配的结果，查询失败返回undef
+
+返回的成员是一个hash结构：
+
+        Sex             =>  #性别 none|male|female
+        Id              =>  #群成员Id，发送消息等需要用到
+        Uin             =>  #群成员唯一标识
+        HeadImgUrl      =>  #头像地址
+        NickName        =>  #昵称
+        PYInitial       =>  #昵称首字母大写
+        PYQuanPin       =>  #昵称完整拼音
+        Alias           =>  #别名
+        City            =>  #城市
+        Province        =>  #省份
+        Signature       =>  #个性签名
+        DisplayName     =>  #
+        RemarkName      =>  #备注名称
+        RemarkPYInitial =>  #备注名称拼音首字母
+        RemarkPYQuanPin =>  #备注名称完整拼音
+        ChatRoomUin     =>  #群成员所属群组Uin
+        ChatRoomName    =>  #群成员所属群组的名称
+        ChatRoomId      =>  #群成员所属群组的Id
+        OwnerUin        =>  #群成员所属群组的Uin
+        MemberCount     =>  #群成员所属群组的成员数量
+    
+例如我要在一个叫"红包群"的群组里查找名字叫小灰的群成员的Id
+    
+        my $member = $client->search_chatroom_member(ChatRoomName=>"红包群",NickName=>"小灰");
+        if(defined $member){
+            print $member->{Id};
+        }
+    
+=item send_friend_msg($friend,$content)
+    
+发送好友消息，当前只支持发送文本
+
+    my $friend = $client->search_friend(NickName=>"小灰");
+    $client->send_friend_msg($friend,"hello world");
+
+=item send_chatroom_msg($chatroom,$content)
+
+发送群组消息，当前只支持发送文本
+    
+    my $chatroom = $client->search_chatroom(ChatRoomName=>"红包群");
+    $client->send_chatroom_msg($chatroom,"hello world");
+
+=item reply_msg($msg,$content)
+
+大部分时候，我们都是倾向于收到消息后针对此收到的消息进行回复，这种情况下可以考虑使用
+
+reply_msg(),该方法接收两个参数，第一个参数是接收到的消息，第二个参数是回复的内容,比如：
+
+    $client->on_receive_msg = sub{
+        my $msg = shift;
+        $client->reply_msg($msg,"hello world");
+    };
+    $client->run();
+
+这种方式更为便捷，不需要关心消息的类型，reply_msg()支持回复好友消息，群组消息
+
+=item welcome()
+
+登录成功后，获取个人信息，打印一些欢迎信息
+
+    $client->welcome()
+
+=item logout()
+
+注销登陆
+
+    $client->logout()
+
+=item stop()
+
+如果只运行了一个帐号，调用stop()会导致整个进程退出
+
+如果同时运行多个帐号，调用stop()只会终止当前帐号的运行，不会影响其他帐号
+
+=item run()
+
+=item Weixin::Client::RUN()
+
+客户端运行的流程是
+1、登录 
+2、设置相关的回调函数 
+3、进入事件循环
+
+因此run()往往是放在代码最后执行，且不可缺少
+    
+    $client = Weixin::Client->new;
+    $client->login();
+    
+    $client->on_xxx = sub{...}; 
+    
+    $client->run()
+
+$client->run() 和 Weixin::Client::RUN() 的区别在于:
+
+run()是自身启动了一个事件循环，适合只运行单一帐号的情况
+
+当需要在一个进程中同时运行多个帐号时，可以采用
+
+    $client1 = Weixin::Client->new;
+    $client2 = Weixin::Client->new;
+    $client1->login(...);
+    $client2->login(...);
+
+    $client1->on_xxx = sub {...};
+    $client2->on_xxx = sub {...};
+
+    $client1->ready();
+    $client2->ready();
+    Weixin::Client::RUN();
+
+=item add_job($type,$time,$callback)
+    
+客户端添加定时任务，参数：
+
+    $type       #任意字符串
+    $time       #时间HH:MM::SS
+    $callback   #达到指定时刻后执行的动作
+
+    $client->add_job("定时任务","11:12",sub{...;});
+
+该方法继承自Weixin::Client::Cron更多说明参见下方的Weixin::Client::Cron
+
+=item load($module1,$module2...)
+
+该方法继承自Weixin::Client::Plugin
+
+客户端提供了一个简单的插件管理框架
+
+该方法用于查找并加载一个插件，
+
+    $client->load("ShowMsg");
+
+会自动查找Weixin::Client::Plugin::ShowMsg模块，并提取模块中的call函数
+
+更多说明参加下方的Weixin::Client::Plugin
+
+=item call($module,$param1,$param2...)
+
+=item call([$module1,$module2,...],$param1,$param2...)
+
+该方法继承自Weixin::Client::Plugin，运行一个或多个插件
+
+=item plugin($module)
+
+该方法继承自Weixin::Client::Plugin，返回一个已经加载的模块的call函数引用
+
+    $client->load("ShowMsg");
+    my $code_ref = $client->plugin("ShowMsg");
+    #执行对应的函数，获取函数的返回值
+    my $return = &{$code_ref}(...);
+
+一般情况下，你可以使用$client->call()来执行插件，但call不会关心插件的返回值
+
+当你需要获取插件的返回值，则需要通过$client->plugin()获取到插件函数引用，然后自己执行
+    
+=back
+
+=head1 OTHER MODULE
+
+=over
+
+=item Wexin::UserAgent
+
+一个http异步请求客户端，原本使用AnyEvent::UserAgent
+
+但由于AnyEvent::UserAgent依赖的模块比较多
+
+故将AnyEvent::UserAgent的代码移植到Weixin，减少依赖模块，便于安装
+
+=item Weixin::Client::Cache
+
+一个简单的缓存模块，可以缓存任何内容，支持设置过期时间
+
+    $cache = Weixin::Client::Cache->new;
+    $cache->store('key',{a=>1,b=2,c=>[1,2,3]},30);
+    $cache->retrieve('key');#得到{a=>1,b=2,c=>[1,2,3]}
+    sleep 30;
+    $cache->retrieve('key');#缓存已过期，得到undef
+
+=item Weixin::Util
+
+此模块导出一些常用的函数
+
+=item Weixin::Client::Cron
+
+客户端定时执行任务模块，已被Weixin::Client继承，提供参见$client->add_job()
+
+=item Weixin::Client::Plugin
+
+一个简单的客户端插件管理模块，被Weixin::Client继承，含几个方法：
+
+    1、$client->new()
+    
+    2、$client->load()
+
+    #加载插件，例如$client->load("Test");则会查找Weixin::Client::Plugin::Test模块
+    #并加载模块中的call()函数，因此你开发插件模块应该遵循这样的包命名规则，并且
+    #模块中定义了call方法，例如：
+
+    package Weixin::Client::Plugin::Test;
+    sub call{
+        #$client将是在执行时传入的第一个参数
+        my $client = shift;
+    }
+
+    #如果你的模块不是遵循Weixin::Client::Plugin::前缀，你可以在load的模块名前面添加一个+号
+    #例如：
+        $client->load("+MyPakcag::Test");
+    #则会在@INC里搜索MyPakcag::Test模块
+    
+    3、$client->call()
+    #执行指定插件的call函数，例如：
+    $client->load("Test");
+    $client->call("Test","a","b","c");
+    #相当于执行Weixin::Client::Plugin::Test::call($client,"a","b","c");
+
+    #如果有多个插件要执行，可以使用数组引用的形式
+    $client->call(["Test1","Test2","Test3"],"a","b","c"); 
+    #会顺序执行每一个插件的call函数
+    
+    4、$client->call_all()
+    #按load的顺序依次执行每个插件    
+    $client->load("Test1","Test2","Test3");
+    $client->call_all("a","b","c");
+    #相当于依次执行如下插件
+    Weixin::Client::Plugin::Test1::call($client,"a","b","c");
+    Weixin::Client::Plugin::Test2::call($client,"a","b","c");
+    Weixin::Client::Plugin::Test3::call($client,"a","b","c");
+
+    5、$client->plugin()
+    #返回插件对应的call函数引用
+    package Weixin::Client::Plugin::Test;
+    sub call{
+        #$client将是在执行时传入的第一个参数
+        my $client = shift;
+    }
+    1;
+    $client->load("Test");
+    my $plugin_code_ref = $client->plugin("Test");
+    $plugin_code_ref是Weixin::Client::Plugin::Test::call()的引用
+
+
+    6、$client->clear()
+    卸载客户端所有插件
+
+=item Weixin::Client::Plugin::ShowMsg
+
+打印接收或者发送消息的插件，插件调用时需要传入接收或者发送的$msg
+
+    $client->load("ShowMsg");
+    $client->on_receive_msg = sub{
+        my $msg = shift;
+        $client->call("ShowMsg",$msg);
+    };
+    $client->on_send_msg =sub {
+        my $msg = shift;
+        my $is_success = shift;
+        my $status = shift;
+        $client->call("ShowMsg",$msg,"[$status]");
+    };
+    $client->run();
+
+=back
+
+=head1 SEE ALSO
+
+L<https://github.com/sjdy521/Webqq-Client>
+
+L<https://git.oschina.net/sjdy521/Webqq-Client>
+
+L<https://github.com/sjdy521/Webqq-Qun>
+
+L<https://git.oschina.net/sjdy521/Webqq-Qun>
+
+L<https://github.com/sjdy521/Weixin-Client>
+
+L<https://git.oschina.net/sjdy521/Weixin-Client>
+
+L<Webqq::Qun>
+
+L<Webqq::Client>
+
+=head1 AUTHOR
+
+sjdy521, E<lt>sjdy521@163.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Perfi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

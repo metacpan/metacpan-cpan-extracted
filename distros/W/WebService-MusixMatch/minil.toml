@@ -1,0 +1,6 @@
+name = "WebService-MusixMatch"
+# badges = ["travis"]
+authority="cpan:HONDALLIC"
+
+module_maker="ModuleBuildTiny"
+

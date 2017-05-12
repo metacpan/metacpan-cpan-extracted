@@ -1,0 +1,9 @@
+Installing this CPAN-Module "WebService::FreeDB"
+------------------------------------------------
+simply type:
+> perl Makefile.PL 
+  (maybe with optional parameters like PREFIX=/another/install/dir)
+> make
+> make test 
+  (for testing)
+> make install 

@@ -1,0 +1,45 @@
+--- #YAML:1.0
+name:                   WWW-Scraper-ISBN-WHSmith_Driver
+version:                0.08
+abstract:               Search driver for the WHSmith online book catalog
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                artistic_2
+distribution_type:      module
+installdirs:            site
+
+requires:
+  perl:                         5.006
+  WWW::Mechanize:               1.60
+  WWW::Scraper::ISBN:           1.00
+  WWW::Scraper::ISBN::Driver:   1.00
+recommends:
+  Test::CPAN::Meta:             0
+  Test::CPAN::Meta::JSON:       0
+  Test::Pod:                    1.00
+  Test::Pod::Coverage:          0.08
+build_requires:
+  Data::Dumper:                 0
+  IO::File:                     0
+  Test::More:                   0.70
+
+provides:
+  WWW::Scraper::ISBN::WHSmith_Driver:
+    file:     lib/WWW/Scraper/ISBN/WHSmith_Driver.pm
+    version:  0.08
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Scraper-ISBN-WHSmith_Driver
+  repository: http://github.com/barbie/www-scraper-isbn-whsmith_driver
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 752bf00954e04560d2f8b192ef364de9c9c29b08 Changes
+SHA1 f4325f3662687896f8706afb5d13750b53ee1658 MANIFEST
+SHA1 cd69ba5b98f6272641b9b19de75463c81e935247 META.yml
+SHA1 390e48543b59b5af136cdc3b804bdb97c08f2cb6 Makefile.PL
+SHA1 3d23e470acadcd8b7dcfdd8f963fa136f0b8259e README
+SHA1 dfec05823a662cc26f9c4fd777d6fb63cdb450a6 lib/Wiki/Toolkit/Plugin/Ping.pm
+SHA1 905ef7a6f27f1ef757cd8a276f554f6babf9fdbe t/01_init.t
+SHA1 fe5108b030887ad3e0506916963353735da93840 t/02_call.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFJpHzfYzuFKFF44qURAsvfAJ9Atqnq8UOEmfA4KoXRttcCZ4tDOwCg95Yz
+18hAsPvwQsO9sOWpI6Gvi/Q=
+=S5o1
+-----END PGP SIGNATURE-----

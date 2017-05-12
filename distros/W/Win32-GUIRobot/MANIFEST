@@ -1,0 +1,13 @@
+Makefile.PL
+MANIFEST
+lib/Win32/GUIRobot.pm
+t/01-load.t
+t/pod-coverage.t
+t/pod.t
+README
+META.yml
+Changes
+examples/explorer/1-explorer.png
+examples/explorer/2-newwindow.png
+examples/explorer/3-loaded.png
+examples/explorer/explorer

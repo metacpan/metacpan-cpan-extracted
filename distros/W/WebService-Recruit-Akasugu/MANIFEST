@@ -1,0 +1,23 @@
+lib/WebService/Recruit/Akasugu.pm
+lib/WebService/Recruit/Akasugu/Age.pm
+lib/WebService/Recruit/Akasugu/Base.pm
+lib/WebService/Recruit/Akasugu/Item.pm
+lib/WebService/Recruit/Akasugu/LargeCategory.pm
+lib/WebService/Recruit/Akasugu/MiddleCategory.pm
+lib/WebService/Recruit/Akasugu/SmallCategory.pm
+LICENSE
+make-dist.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_pod.t
+t/01_new.t
+t/02_new_methods.t
+t/03_setget.t
+t/04_Method_Item.t
+t/05_Method_LargeCategory.t
+t/06_Method_MiddleCategory.t
+t/07_Method_SmallCategory.t
+t/08_Method_Age.t
+t/09_Akasugu.t
+META.yml                                 Module meta-data (added by MakeMaker)

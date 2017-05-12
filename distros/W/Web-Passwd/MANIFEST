@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+TODO
+lib/Web/Passwd.pm
+t/00-load.t
+t/pod.t
+example/custom.pl
+example/default.pl
+example/default.conf
+example/templates/index.tmpl
+example/templates/status.tmpl
+example/templates/view.tmpl

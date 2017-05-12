@@ -1,0 +1,8 @@
+<!-- BEGIN edit_button -->
+[% IF hub.pages.current.is_writable %]
+[% rev_id = hub.have_plugin('revisions') ? hub.revisions.revision_id : 0 %]
+<a href="[% script_name %]?action=edit&page_name=[% page_uri %][% IF rev_id %]&revision_id=[% rev_id %][% END %]" accesskey="e" title="Edit This Page">
+[% INCLUDE edit_button_icon.html %]
+</a>
+[% END %]
+<!-- END edit_button -->

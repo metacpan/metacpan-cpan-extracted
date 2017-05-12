@@ -1,0 +1,128 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Core::RequestDispatcher - request dispatcher implementation</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Core::RequestDispatcher - request dispatcher implementation</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Implementation of <STRONG>Servlet::RequestDispatcher</STRONG> that allows a request
+to be forwardd to a different resource to create a response, or to
+include the output of another resource in the response from this
+resource.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($wrapper)</CODE></A></STRONG><BR>
+<DD>
+Construct and return an instance, initializing fields appropriately.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24wrapper">$wrapper</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Wrapper</STRONG> associated with the resource being
+dispatched to
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_forward">forward($request, $response)</A></STRONG><BR>
+<DD>
+Forward the specified Request and Response to another resource for
+processing. Any exception thrown by the called servlet will be
+propagated to the caller.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> to be forwarded
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> to be forwarded
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if a servlet exception occurs
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_include">include($request, $response)</A></STRONG><BR>
+<DD>
+Include the Response from another resource in the current
+Response. Any exception thrown by the called servlet will be
+propagated to the caller.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$request</STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> to be included
+<P></P>
+<DT><STRONG>$response</STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> to be included
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if a servlet exception occurs
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/RequestDispatcher.html">the Servlet::RequestDispatcher manpage</A>,
+<A HREF="../../../api/Servlet/ServletRequestWrapper.html">the Servlet::ServletRequestWrapper manpage</A>,
+<A HREF="../../../api/Servlet/ServletResponseWrapper.html">the Servlet::ServletResponseWrapper manpage</A>,
+<A HREF="../../../api/Wombat/Core/Application.html">the Wombat::Core::Application manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

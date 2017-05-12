@@ -1,0 +1,64 @@
+Apply ihis patch to HTTP::Date.pm to stop the "Sec too big", "Day too big" warnings.
+The following command should do it.  Might need to run it as root.
+cd /path/to/perl/lib/HTTP ; patch </path/to/date.patch
+
+More comprehensively you could do:
+  perl -e 'foreach $k (@INC) { $p = $k."/HTTP/Date.pm"; print "$p\n" if (-f $p); }'
+and this would tell you where this file is
+
+If you're brave (or reckless?), you can just do:
+sh
+for file in `perl -e 'foreach $k (@INC) { $p = $k."/HTTP/Date.pm"; print "$p\n" if (-f $p); }'`
+do
+sudo patch $file date.patch
+done
+
+*** Date.pm	2006/09/28 03:14:57	1.1
+--- Date.pm	2006/09/29 02:27:16
+***************
+*** 30,35 ****
+--- 30,43 ----
+  	    $hour, $min, $sec);
+  }
+  
++ # This will work for 31 more years. A better solution to this problem
++ # would have to presume everyone had 64 bit integer time. This is at
++ # least portable...for 31 more years. 
++ sub __maxyear { 
++   my $year = shift; 
++   $year = 0 unless defined $year;
++   return (($year > 2037) ? 2037 : $year); 
++ }
+  
+  sub str2time ($;$)
+  {
+***************
+*** 38,50 ****
+  
+      # fast exit for strictly conforming string
+      if ($str =~ /^[SMTWF][a-z][a-z], (\d\d) ([JFMAJSOND][a-z][a-z]) (\d\d\d\d) (\d\d):(\d\d):(\d\d) GMT$/) {
+! 	return eval {
+! 	    my $t = Time::Local::timegm($6, $5, $4, $1, $MoY{$2}-1, $3);
+  	    $t < 0 ? undef : $t;
+  	};
+      }
+  
+      my @d = parse_date($str);
+      return undef unless @d;
+      $d[1]--;        # month
+  
+--- 46,59 ----
+  
+      # fast exit for strictly conforming string
+      if ($str =~ /^[SMTWF][a-z][a-z], (\d\d) ([JFMAJSOND][a-z][a-z]) (\d\d\d\d) (\d\d):(\d\d):(\d\d) GMT$/) {
+!         return eval {
+! 	    my $t = Time::Local::timegm($6, $5, $4, $1, $MoY{$2}-1, __maxyear($3));
+  	    $t < 0 ? undef : $t;
+  	};
+      }
+  
+      my @d = parse_date($str);
+      return undef unless @d;
++     $d[0] = __maxyear($d[0]);
+      $d[1]--;        # month
+  

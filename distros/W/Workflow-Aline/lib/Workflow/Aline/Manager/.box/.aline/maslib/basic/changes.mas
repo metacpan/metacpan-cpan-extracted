@@ -1,0 +1,34 @@
+<%init>
+	my $from = '0';
+        my $to;
+        my $since;
+</%init>
+<%method current>
+
+<%perl>
+	my $current_version = $m->scomp( '/maslib/defaults.mas:version' );
+
+	my $flag; 
+
+	my @logpart;
+
+	use Cwd;
+
+	open( CLOG, 'V:\checkout\perl\modules\Data\Type\ChangeLog' ) or die sprintf "$! 'ChangeLog' in %s", cwd();
+	
+	die unless $current_version;
+
+	while( <CLOG> )
+	{		
+		if( /^$current_version/ || $flag )
+		{
+			$flag = 1;
+
+			print;
+		}
+	}
+	
+	close( CLOG );
+</%perl>
+
+</%method>

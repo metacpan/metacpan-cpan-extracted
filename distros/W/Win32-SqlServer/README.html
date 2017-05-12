@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>README for Win32::SqlServer</TITLE>
+<STYLE TYPE="text/css">
+<!--
+small {font-size: 90%;}
+-->
+</STYLE>
+<META HTTP-EQUIV="Content-Language" CONTENT="en-gb" />
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8" />
+<STYLE TYPE="text/css">
+<!--
+.allcaps {font-size: 90%;}
+-->
+</STYLE>
+</HEAD>
+<BODY>
+<H1 ALIGN="center">Win32::SqlServer 2.010</H1>
+<UL>
+<P>
+     This is Win32::SqlServer, a module for calling Microsoft SQL Server from Perl
+     through OLE DB. </P>
+<P>
+     Copyright © 2004-2016 Erland Sommarskog.
+     All rights reserved.</P>
+<P>
+  This program is free software; you can redistribute it and/or modify it under
+  the same terms as Perl itself.
+</P>
+</UL>
+<H3>Brief Overview</H3>
+Win32::SqlServer is a module that permits you to access SQL Server from Perl, by
+using any of the OLE DB providers SQLOLEDB or SQL Server Native Client.
+Win32::SqlServer exposes
+two levels of interface, a high-level interface and a mid-level interface. The
+mid-level interface exposes a few more knobs at the price of somewhat more
+verbose code. A special feature of Win32::SqlServer is the fine-grained control
+of error handling.
+<P>There is no support for DBI. This module does not
+   run on Unix &#8211; or any other non-Windows OS for that matter.</P>
+<H3>What&#39;s in This Kit</H3>
+This is the source-only distribution for CPAN,
+and do not include any binaries for Win32::SqlServer. If you want a binary distribution
+(for x86 or AMD64) please visit <A HREF="http://www.sommarskog.se/mssqlperl/index.html">
+http://www.sommarskog.se/mssqlperl/index.html</A>.
+<H3>Prerequisites</H3>
+<P>To run Win32::SqlServer you need:</P>
+<UL>
+<LI> Perl 5.12 or later.</LI>
+<LI> Windows 2000 and later versions of Windows.</LI>
+<LI> SQL Server 7 or later. Note that I have not run any tests against Windows Azure SQL Database.</LI>
+<LI> MDAC 2.6 or SQL
+Server Native Client.</LI>
+</UL>
+
+<P>For details, see the <A HREF="Win32-SqlServer.html#Prerequisites">Prerequisites</A>
+   section in the Win32::SqlServer manual.</P>
+<P>If you need support for SQL Server 6.5 or Perl 5.8 or 5.10, you can use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer, as I have dropped support for these version in later versions of Win32::SqlServer.</P>
+<P>Prerequisites for building, see below under <A HREF="#build_src">Building from
+   Sources</A>.</P>
+
+<H3>Manual</H3>
+<P>The manual is in <A HREF="Win32-SqlServer.html">Win32-SqlServer.html</A>.
+   There is a POD file as well, but there is no real contents in it, only a
+   pointer to the HTML file.</P>
+<H3>Reporting Bugs or Problems</H3>
+<P>Please mail bug reports and suggestions to <A HREF="mailto:esquel@sommarskog.se">
+esquel@sommarskog.se</A>. Try to make your reports as specific as possible.
+Particularly do not forget to include which versions of Perl, Windows, SQL Server
+etc you are using.</P>
+<P>
+I usually try to respond within 24-48 hours, but if I am on holiday I am.</P>
+<H2><A NAME="build_src">Building from Sources</A></H2>
+<H3>Prerequisites</H3>
+<P>To build Win32::SqlServer you need:</P>
+<UL>
+<LI> The Platform SDK for Windows, more
+   precisely, the Core SDK and the MDAC SDK.
+   The Platform SDK comes with Visual Studio. You can
+   also download the
+<A HREF="http://www.microsoft.com/downloads/details.aspx?FamilyId=F26B1AA4-741A-433A-9BE5-FA919850BDBF&amp;displaylang=en">Windows SDK for Windows Server 2008 and .NET Framework 3.5</A>.
+(The link is the current as of this writing. Microsoft often twitches things
+around, so you have to search for it.)</LI>
+<LI> The SDK (header files and link libraries) for SQL Server Native client that
+comes with SQL 2012. (The SDK for SQL 2008 or earlier will not do.) </LI>
+   <LI> Perl 5.12 or later.</LI>
+<LI>
+    A C++ compiler, preferably Visual C++ 8.0 or later. (The C++ compiler that
+   comes with Visual Studio&nbsp;6 will <B>not</B> work.) If you don&#39;t have
+   Visual Studio, the Windows SDK (see above), comes with one. </LI>
+<LI> A make facility. Microsoft&#39;s NMAKE also
+  comes with the Windows SDK.</LI>
+</UL>
+<P>If you want to try with a different compiler than VC++, for instance GNU CC, you are welcome to try, but it is useless to ask me for advice, because that is way outside my comfort zone. But if you are able to get it to work, I will be interested in your modified makefile.pl. Note that your Perl must be configured for the same compiler as you build Win32::SqlServer with.</P>
+
+<H3>How to Build and Install</H3>
+<P>Text in <KBD>this type face</KBD> indicates command you run from the command
+prompt.</P>
+<OL TYPE=1>
+<LI>Extract the zip file anywhere you like.</LI>
+<LI>Edit <B>makefile.pl</B> so that <CODE>$SQLDIR</CODE> points to where <B>sqlncli.h</B> is
+   located.</LI>
+<LI>If you use a different compiler from Visual C++, you need to review
+makefile.pl more closely as <B>makefile.pl</B> may include options that are specific to Visual C++.</LI>
+<LI>Note that <B>makefile.pl</B> explicitly lists which libraries to link with,
+   and specifies the MT flag for the C compiler. This is to force use of the
+   static C run-time library for Visual C++, which is what I want for the binary
+   distribution. Change this if you like.</LI>
+<LI>Open a Command Prompt, and change directory to where you extracted the
+   files.</LI>
+<LI><KBD>Perl makefile.pl</KBD>. </LI>
+<LI><KBD>MAKE</KBD><BR/>Or <KBD>NMAKE</KBD>, <KBD>DMAKE</KBD> or whatever your
+   MAKE utility you use.</LI>
+<LI><KBD>MAKE test</KBD><BR/>Before you run the tests, please read <B>
+   <A HREF="Tests.html">tests.html</A></B>
+   so that you understand what impact the test scripts have on your server. This
+   document also describes how to set the environment variable
+   OLLEDBTEST, from
+   which the test scripts get information how to log into SQL Server.</LI>
+<LI><KBD>MAKE install</KBD></LI>
+</OL>
+<HR />
+<I>
+Last updated <!--$$Modtime:--> 16-07-12 15:32 <!-- $-->
+</I>
+</BODY>
+</HTML>

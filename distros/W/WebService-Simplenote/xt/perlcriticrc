@@ -1,0 +1,18 @@
+severity = brutal
+color = 1
+theme = 
+
+[-Miscellanea::RequireRcsKeywords]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
+
+[NamingConventions::Capitalization]
+packages = :no_restriction
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 5
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | VERSION | SYNOPSIS | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE | SOURCE

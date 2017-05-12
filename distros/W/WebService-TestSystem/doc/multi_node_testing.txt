@@ -1,0 +1,352 @@
+Checkout System and Multi-Node Prototype Design
+-----------------------------------------------
+
+This design spec identifies changes to be made to STP in order to make
+it support test machine "job selection".  
+
+* Introduction
+* Background
+* Checkout System Concept
+* Multi-Node Checkout System Concept
+* Required DB Changes
+* Required Back End Changes
+* Required Web Interface Changes
+* Future Work
+
+Introduction
+============
+Currently, all STP test machines are initiated with the job "run a
+test".  This change adds a way to specify the type of job to be run.
+This will enable two new capabilities not currently in STP:
+
+   * Ability to specify a machine should be checked out to a developer
+     for troubleshooting purposes.
+
+   * Ability to specify a machine to configure itself as a slave to
+     another machine, for prototyping of test scripts and tools for
+     future use in a network testing environment.
+
+This design is a follow-up to a concept proposed in July.
+
+
+Background
+==========
+We notice when working with dev, that it is extremely convenient to
+check out one of the STP systems for them to do troubleshooting on.  STP
+provides the value of establishing a clean, consistent environment for
+the developer to start from; they can instantly recreate the issue found
+by the STP runs, eliminating the typical frustration of replicating the
+problem on a different system.
+
+The current process of checking out a machine for a developer is tricky,
+because the test engineer must watch the machine until the right
+moment, then login and kill the testing process, and quickly pull the
+machine out of service through a database edit. 
+
+
+Network testing requires hardware we do not currently have within STP.
+However, despite the lack of equipment, we wish to make progress towards
+achieving multi-node testing.  The same system used for doing checkout
+of hardware for developer usage could be leveraged for doing prototyping
+of code used to support network tests.  This would not be usable for
+production-scale testing, however, but within the limits that have been
+set could allow some small scale proof-of-concept testing of network
+test code.
+
+
+Checkout System Concept
+=======================
+This Checkout System Design will provide a formal and straightforward
+mechanism to cause a system to be built and checked out automatically
+for a developer.  
+
+Essentially, we reuse the STP process for building the machine,
+installing a kernel, and rebooting it.  The requested test is also
+downloaded onto the machine, and the usual instrumentation is set up.
+However, we interrupt it right before invoking the ./wrap.sh script, and
+instead send an email to the STP Admin and the developer, with
+information permitting a login.  The machine is then put into state
+'Checked out' and the test request status marked "Checkout".  
+
+When the developer has finished with the machine, they can either run a
+command on the system itself, or notify the STP Admin, who then runs the
+stp_activate script to restore it to regular service.
+
+
+Multi-Node Checkout System Concept
+==================================
+In theory, this system could be used for prepping nodes for use in a
+multi-node testing capacity.  It is doubtful that this could actually be
+used on our current hardware, except perhaps for trivial network
+regression tests or simply testing connections.  However, it may be
+useful for assisting in development of additional testing tools and
+scripts.
+
+Basically, when entering a test request, if the user selects a network
+test, they will select the master machine.  Depending on the test
+selected and/or the options the user specifies, a set of zero or more
+client node machines are identified.  From this point, the master server
+could choose to directly image and/or invoke directly attached clients
+(such as its clients on subnet), or could request 'check out' of other
+clients in the STP pool as described above.  (This latter approach is
+probably not useful for real network testing but may be useful for
+prototyping/development.)
+
+
+Required DB Changes
+===================
+* Add field 'job_type' of type VARCHAR.  This field is for indicating
+  what the client machine should do once it has been set up.  By default
+  it should be set to "Run test".  Another valid value will be
+  "Checkout".  In the future, a job_type will be added that indicates
+  the client should initialize itself as a node for doing networked
+  testing. 
+
+  ALTER TABLE test_request ADD job_type VARCHAR(255) DEFAULT "Run test";
+
+
+Required Back End Changes
+=========================
+* The stp-activate script needs to be tested and/or updated to enable
+  check-in of a machine that has been checked out.  This shall include a
+  notification sent to the admin and the developer that the machine was
+  returned to the general pool.
+
+* Report scripts may also need to be modified to recognize the 'Checked
+  out' state.  This should be treated akin to state 'Maintenance'.  It
+  is possible these scripts may require no change.
+
+* The client scripts for initializing the machine need to be aware of
+  job_type.  On completion of rebooting after kernel install, before
+  invoking the test, the system should check the job type, and act
+  accordingly.  For now, only the 'Run test' and 'Checkout' job types
+  will be implemented.
+
+* For machines with job_type of 'Checkout', ensure that after the kernel
+  reboot, the state is set to 'Checked out' instead of 'Completed',
+  'Failed', etc. 
+
+
+Required Web Interface Changes
+==============================
+* Ensure 'Checked out' machines do not show up as available for running
+  tests against.
+* Ensure that test requests of state 'Checked out' do not display in
+  search results or userpages
+* Display some sort of note on user's userpage if they have a machine in
+  state 'Checked out'.
+
+
+Future Work
+===========
+The following improvements may be worth implementing in the future, but
+are not required for initial deployment of this change.  
+
+* Smarter scheduling - attempt to time multi-node check outs such that
+  few machines will need to sit idle waiting for other machines to
+  become available.  If one required machine will not be available for
+  12 hours, the others could be allowed to run tests that take less than
+  12 hrs in the meantime.
+
+* Authorization - instead of providing access via password login,
+  install the user's ssh key on the machine and control direct login
+  access.  Ensure that only stp admin's can log into non-checked out
+  systems. 
+
+* Client-side checkin - provide a tool for the developer to run from the
+  checked out machine itself that will cause the machine to get checked
+  in. 
+
+* Scheduled timeouts - instead of allowing indefinite checkouts, allow
+  specification of length of time that a machine will remain checked
+  out; once the specified time elapses, the machine will automatically
+  be returned to service and the developer and admin notified.
+
+
+
+From bryce@osdl.org Fri Sep 24 14:46:58 2004
+Date: Wed, 14 Jul 2004 12:15:37 -0700 (PDT)
+From: Bryce Harrington <bryce@osdl.org>
+To: stp-devel@lists.sourceforge.net
+Subject: [Stp-devel] Conceptual Proposal for Multi-Node Testing (plus some)
+
+
+This is a 'kill two birds with one stone' idea (actually *three*
+birds...) for multi-node testing plus a couple other capabilities we
+need, that can be solved with one system:
+
+
+Problem Statement
+=================
+1.  During the recent investigation of the LTP issue, we found it
+    extremely convenient for the engineers to hop directly onto an stp box
+when they found they could not replicate the issue quickly on their dev
+box.  Within an hour of poking around on the stp box they found a way to
+replicate it, and returned the stp system to the queue.
+
+Putting this machine into maintenance mode for an hour probably saved
+several hours of effort.  I think it is highly likely we will find
+similar benefits in the future in doing this.
+
+However, the process for making this happen was not as smooth as it
+could be:
+
+   - System was not configured for the test in question
+   - Required admin involvement; would save time to automate
+
+2.  For LTP, a new test is released each month.  I fortunately have a
+machine I can compile and test out LTP on, but:
+
+   - Project machines are not configured like STP machines, so
+     replicating problems seen in STP can be time consuming
+
+Being able to 'check out' an STP machine for a short period for me to
+log in and investigate LTP compile/run issues would save that setup
+effort.  This is probably true for other test authors as well.
+
+3.  For network tests, we generally need to have multiple machines
+assigned to that test.  For example, many require a server and one or
+more clients.
+
+   - We currently don't have a solid concept for how to work out
+     checking machines out for a given test to use in a 'multi-node'
+     fashion
+
+
+Concept
+=======
+Here is an idea for a 'machine reservation system' that addresses the
+needs of all three cases above, in a (hopefully) straightforward
+fashion:
+
+   * A SOAP call is added to the STP framework that requests a machine
+     be 'checked out'.  The caller can specify some selection criteria,
+     such as that it be 'any 4-way', or 'stp1-003', or some setup
+     requirements such as 'RH9, with the tiobench test suite set up to
+     run with options foo and bar'.  The user can also specify an email
+     address to notify when the system becomes available.
+     Alternatively, they can leave the email blank and use a second SOAP
+     call to poll the checkout status.  We can provide access to these
+     SOAP calls via a cmdline script that users can run from their local
+     machines.
+
+   * When a machine is checked out, it is put on a time-out.  After the
+     time has expired, the machine will automatically return to the
+     queue.  This way if someone checks out a machine but isn't around
+     to use it when it becomes available, it won't sit idly checked out
+     forever.
+
+   * A SOAP call is added to permit reserving the checked-out machine.
+     This allows the user to request to postpone or cancel the above
+     timeout, so that they won't get surprised with the machine
+     returning to the queue all of a sudden while they're working on it.
+     They can either specify a period of time to allocate (e.g., 120
+     min), or a cut-off time (6:00 pm Friday), or cancel it entirely.
+     The maximum amount of time allowed for a given user is controllable
+     at the administrative level, so we can ensure no one user
+     monopolizes machine time (unless we authorize them to).  A script
+     for executing this function would be placed in the /root dir of the
+     machine in question, for them to run as soon as they've logged in.
+
+   * During normal STP execution, tests are always assigned 1 machine
+     and the framework installs and executes the test there, just as we
+     currently do.
+
+   * For multi-node tests, though, the process occurs as normal, but
+     within the 'master' host's wrap.sh script, it also requests one or
+     more client machines, via the aforementioned check-out SOAP call.
+     In this call, the master will indicate what setup work that the
+     framework should do.  The master then uses the polling SOAP call to
+     learn when its clients become ready to use.
+
+   * This gives the master some options.  It can start running with one
+     client immediately on its availability, bringing others online as
+     they become available, or wait until all are ready.  For instance,
+     if it needs to test on 1-ways, 2-ways, and an 8-way, but the 1-ways
+     are in use, it could start with the others first.  The master could
+     also perform additional custom setup work on the clients beyond
+     what the STP framework does, if needed.  Further, the master can
+     dismiss its clients immediately as soon as it no longer needs them,
+     then perform report generation, result upload, etc. subsequently.
+
+   * As the network tests progress, the master will monitor and adjust
+     the reservation times of clients as needed.  The master would never
+     do an indefinite reservation on a client.  This way, if things go
+     horribly wrong for the master, everything will eventually just time
+     out, and all of the clients will be returned to the pool normally.
+     Of course, we could add a proactive check as well, that if the
+     master stops responding to queries, we kill it and all of its
+     children, in one fell swoop.
+
+One of the nice things about this approach is that very little change is
+needed to be done to the STP framework (other than the new SOAP calls)
+to enable it.  Further, it gives the test authors a great deal of
+flexibility in determining how things should work, and allows them to
+alter the behavior without needing any mods to STP itself.  Since it is
+controlled via wrap.sh, this provides a straightforward tie-in with the
+Test Options functionality, thus requiring no changes to the STP test
+request form; the wrap.sh for the network test could simply have a
+--num_clients option, or whatever, for instance.
+
+Here's a couple advanced use cases:
+
+A) The user wants full control over the master, but wants STP to take
+   care of the dirty work of scraping dead clients off the floor and
+   reinitting them.  So each week he checks out the master machine and
+   reserves it until 6pm Friday.  He logs in and runs tests as he
+   wishes, restarting them manually as needed, etc.  STP maintains the
+   client machines for him, so his wrap.sh just checks them out
+   as-needed, and when he's not running tests, they automatically return
+   to the pool to do other work, leaving his master server untouched in
+   the meantime.
+
+B) The user is load-testing different NFS servers, and just wants to
+   quickly pig-pile the NFS servers with a ton of client load.  External
+   to STP she's built a collection of client machines that perform
+   various server requests, activated by a trigger.  She uses STP to set
+   up and invoke the master machine, which when ready sends the clients
+   a message to 'Bring it on!'  The user customizes the way the clients
+   attack the master server as needed; for instance, she can start with
+   1 client operating for a while, while the other clients do stuff for
+   other master servers, gradually ganging them all up on one to
+   complete the big stress tests.  Using STP, she then queues up tests
+   for each of the NFS servers she's comparing on 2, 4, and 8-way
+   machines, and lets everything run over the weekend.
+
+
+Conclusion
+==========
+By implementing a machine check-out and reservation system, this
+approach provides an adequate solution to our network test needs in a
+(hopefully) quick-and-easy-to-implement fashion, that gives us
+flexibility for a huge variety of network testing scenario.
+
+We've been finding SOAP a handy and relatively straightforward way of
+communicating between PLM and STP so far, so we can feel fairly
+confident that building the system around SOAP calls will work well.
+Because SOAP is a standardized network RPC mechanism, it also fits in
+with long-range goals of being able to interoperate with off-site
+machinery, so expanding our use and experience-base with SOAP will make
+it easier to figure out how to tie in external machinery with STP, if
+and when we need to do so.
+
+Further, in addition to providing a scheme for doing multi-node testing,
+this approach adds very useful time-saving capabilities for developers
+(in case #1) and test authors (in case #2), that will make issues easier
+to troubleshoot and address quickly.  Even if we never used the
+multi-node capability, this payoff of this benefit alone could make it
+worth it.
+
+
+
+
+
+-------------------------------------------------------
+This SF.Net email is sponsored by BEA Weblogic Workshop
+FREE Java Enterprise J2EE developer tools!
+Get your free copy of BEA WebLogic Workshop 8.1 today.
+http://ads.osdn.com/?ad_id=4721&alloc_id=10040&op=click
+_______________________________________________
+Stp-devel mailing list
+Stp-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/stp-devel

@@ -1,0 +1,38 @@
+---
+name: WebService-CIA
+version: 1.4
+author:
+  - Ian Malpass (ian-cpan@indecorous.com)
+abstract: Get information from the CIA World Factbook.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::SSLeay: 0
+  DB_File: 1.8
+  LWP::UserAgent: 2.0
+  MLDBM: 2.01
+  Storable: 2.0
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+provides:
+  WebService::CIA:
+    file: lib/WebService/CIA.pm
+    version: 1.4
+  WebService::CIA::Parser:
+    file: lib/WebService/CIA/Parser.pm
+    version: 1.4
+  WebService::CIA::Source:
+    file: lib/WebService/CIA/Source.pm
+    version: 1.4
+  WebService::CIA::Source::DBM:
+    file: lib/WebService/CIA/Source/DBM.pm
+    version: 1.4
+  WebService::CIA::Source::Web:
+    file: lib/WebService/CIA/Source/Web.pm
+    version: 1.4
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

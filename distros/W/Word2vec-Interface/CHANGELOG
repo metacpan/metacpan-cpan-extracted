@@ -1,0 +1,516 @@
+NAME
+    word2vec CHANGES
+
+  version 0.03
+    (04/05/2017)
+     - word2vec-interface.pl - Similarity() - Removed "Finished File" log statement and added parsing error log statements.
+
+    (04/04/2017)
+     - word2vec-interface.pl - Similarity() - Added log statement and check to see if vector data file was read successfully.
+
+    (04/01/2017)
+     - Util.pm - Added missing GetFileHandle() function. ???
+     - word2vec.pm - ReadTrainedVectorDataFromFile - Bug Fix: convert all word vector to lower case. Fixes issue with CUI vectors that start w/ capital letters.
+
+    (03/21/2017)
+     - word2vec-interface.pl - Changed script to set ignore compiler errors by default.
+                             - Similarity() - Added print log statements.
+     - interface.pm - CLSimilarityAvg() - Removed ".sim" from result file name when using directory option.
+                    - CLSimilarityComp() - Removed ".sim" from result file name when using directory option.
+                    - CLSimilaritySum() - Removed ".sim" from result file name when using directory option.
+
+    (03/04/2017)
+     - word2vec-interface.pl - WSD() - Bug Fix: Using "--wsd -dir wsd_path -vectors vector_binary_path" option resulted in double parsing file.
+
+    (02/21/2017)
+     - word2vec-interface.pl - Similarity() - Updated to note user of directory parsing option.
+                             - Updated POD documentation with the above change.
+     - word2vec-interface.pod - Updated with the above changes.
+
+    (02/19/2017)
+     - interface.pm - XTWSaveCompoundWordListToFile() - Added function... Don't know how I missed that one.
+     - xmltow2v.pm - RemoveSpecialCharactersFromString() - Bug Fix: Method didn't remove '|' character from string.
+                   - ReadTextFromFile() - Bug Fix: Updated to include space " " after chomping line and adding to string.
+                   - ReadCompoundWordDataFromFile() - Freed words array after use.
+     - 1xmltow2v.t - Updated line 41 to support latest change listed above.
+
+    (02/16/2017)
+     - interface.pm - WSDParseList() - Added error log when specified stop list not found.
+     - Updated Makefile.PL script
+
+    (02/15/2017)
+     - word2vec-interface.pl - Bug Fix: Changed all "exit" statements to "return" statements. In the event that user has more than one command-line command.
+                             - WSD() - Updated to auto-detect if entered text if a file or directory and handle accordingly.
+                                     - Added checks in the event user specifies options but does not include the option parameter.
+     - interface.pm - WSDParseList() - Added checks in the event stoplist is not defined.
+                                     - Added warning print statement in the event stop list is not defined and debug logging is disabled.
+                                     - More print statements of the same variety as above.
+
+    (02/11/2017)
+     - interface.pod - Updated POD documentation with the latest changes.
+                     - Typo fix.
+     - interface.pm - Updated to POD documentation with the latest changes.
+                    - Typo fix.
+     - util.pod - Updated to include all functions.
+     - util.pm - Updated to include POD documentation.
+     - word2vec.pod - Typo "Word2vec::Xmltow2v" -> "Word2vec::Word2vec"
+     - word2vec.pm - Typo "Word2vec::Xmltow2v" -> "Word2vec::Word2vec"
+
+    (02/07/2017)
+     - word2vec.pm - ComputeCosineSimilarity() - Updated to check and see if vector data is present in memory before proceeding.
+                   - ComputeAvgOfWordsCosineSimilarity() - Updated to check and see if vector data is present in memory before proceeding.
+                   - ComputeMultiWordCosineSimilarity() - Updated to check and see if vector data is present in memory before proceeding.
+                   - CosSimWithUserInput() - Updated to check and see if vector data is present in memory before proceeding.
+                   - MultiWordCosSimWithUserInput() - Updated to check and see if vector data is present in memory before proceeding.
+                   - ComputeAverageOfWords() - Updated to check and see if vector data is present in memory before proceeding.
+                   - AddTwoWords() - Updated to check and see if vector data is present in memory before proceeding.
+                   - SubtractTwoWords() - Updated to check and see if vector data is present in memory before proceeding.
+
+    (02/06/2017)
+     - word2vec-interface.pl - Capitalized first letter of log file name(s).
+                             - Similarity() - Updated to support directory of similarity files using Word2vec::Util::GetFilesInDirectory() function.
+                                              Note: Looks for files with extension ".sim"
+     - interface.pm - Capitalized first letter of log file name(s).
+                    - WriteLog() - Bug Fix: Checking if called from outside module object fixed.
+                    - GetWord2VecHandler() - Bug Fix: Changed calling word2vec->new() to Word2vec::Word2vec->new()
+                    - GetWord2PhraseHandler() - Bug Fix: Changed calling word2phrase->new() to Word2vec::Word2phrase->new()
+                    - GetXmltow2vHandler() - Bug Fix: Changed calling xmltow2v->new() to Word2vec::Xmltow2v->new()
+                    - Added $self->{ _util } module object
+                    - Added IsFileOrDirectory() function
+                    - Added GetUtilHandler() function
+                    - Added GetFilesInDirectory(), Word2vec::Util::GetFilesInDirectory() function
+     - word2phrase.pm - Capitalized first letter of log file name(s).
+                      - WriteLog() - Bug Fix: Checking if called from outside module object fixed.
+     - word2vec.pm - Capitalized first letter of log file name(s).
+                   - WriteLog() - Bug Fix: Checking if called from outside module object fixed.
+     - xmltow2v.pm - Capitalized first letter of log file name(s).
+                   - WriteLog() - Bug Fix: Checking if called from outside module object fixed.
+     - Util.pm - Created utility helper module - Houses a set of useful utility functions.
+
+    (02/05/2017)
+     - word2vec-interface.pl - ShowVersion() - Typo fix
+                             - AskHelp() - Typo fix
+                             - ShowHelp() - Typo fix
+
+    (02/02/2017)
+     - xmltow2v.pm - Added '_' identifying character to beginning of private functions.
+     - interface.pm - Added '_' identifying character to beginning of private functions.
+     - interface.pm - CLMultiWordCosSimWithUserInput() - Added print log statement in the event debug log is disabled.
+     - interface.pm interface.pod & interface-xmltow2v.pod - Updated POD documentation, removing functions not found in the interface.pm module.
+     - interface.pm - CLCompileTextCorpus() - Added log statements and checks for existing save file/path.
+     - word2vec-interface.pl - CompileTextCorpus() - Updated minimal parameter requirements to reflect Interface::CLCompileTextCorpus() function.
+                                                   - Updated default save path.
+                                                  - Updated POD to reflect above changes.
+     - word2vec-interface.pod - Updated to support script changes.
+
+    (01/31/2017)
+     - interface.pm - POD Typo
+     - Updated all scripts and POD documentation to list Dr. McInnes
+
+    (01/30/2017)
+     - Updated POD documentation to support previous changes and fixed typos.
+
+    (01/26/2017)
+     - interface.pm - WSDGenerateAccuracyReport() - Sort results prior to printing.
+     - word2vec-interface.pl - WSD() - User input error checking
+
+    (01/25/2017)
+     - word2vec-interface.pm - SortVectorFile() - Typo
+
+    (01/24/2017)
+     - word2vec.pm - new() - Removed _wordVectorBST variable and associated functions.
+                   - Changed _arrayOfWordVectors to _hashRefOfWordVectors
+                   - ReadTrainedVectorDataFromFile() - Updated parameters to remove $storeAsBST variable
+                                                     - Bug Fix: Remove newline character when reading first header line of vector data file
+                   - SaveTrainedVectorDataToFile() - Updated to support vocabulary hash versus BST/array
+                   - ComputeCosineSimilarity() - Removed references/functions to BST
+                   - IsVectorDataInMemory() - Updated to support vocabulary hash versus BST/array
+                   - IsVectorDataSorted() - Updated to support vocabulary hash versus BST/array
+                   - GetWordVector() - Updated to support hash as vocabulary memory storage location versus BST/array
+                   - GetVocabularyArray() -> GetVocabularyHash() - Updated code to support using hash versus BST/array
+                   - SetVocabularyArray() -> SetVocabularyHash() - Updated code to support using hash versus BST/array
+                   - ClearVocabularyArray() -> ClearVocabularyHash() - Updated code to support using hash versus BST/array
+                   - AddWordVectorToVocabArray() -> AddWordVectorToVocabHash() - Updated code to support using hash versus BST/array
+                   - Removed CreateWordVectorBST()
+                   - Removed GetWordVectorBST()
+                   - Removed SetWordVectorBST()
+                   - Removed ClearWordVectorBST()
+     - interface.pm - CLComputeCosineSimilarity() - Updated to remove word2vec clear BST function
+                    - CLComputeMultiWordCosineSimilarity() - Updated to remove word2vec clear BST function
+                    - CLComputeAvgOfWordsCosineSimilarity() - Updated to remove word2vec clear BST function
+                    - CLMultiWordCosSimWithUserInput() - Updated to remove word2vec clear BST function
+                    - CLAddTwoWordVectors() - Updated to remove word2vec clear BST function
+                    - CLSubtractTwoWordVectors() - Updated to remove word2vec clear BST function
+                    - CLConvertWord2VecVectorFileToText() - Updated code to remove $storeAsBST variable
+                                                          - Updated to remove word2vec clear BST function
+                    - CLConvertWord2VecVectorFileToBinary() - Updated code to remove $storeAsBST variable
+                                                            - Updated to remove word2vec clear BST function
+                    - CLConvertWord2VecVectorFileToSparse() - Updated code to remove $storeAsBST variable
+                                                           - Updated to remove word2vec clear BST function
+                    - CLSortVectorFile() - Updated to support word2vec hash versus BST/array change
+                    - WSDParseList() - Updated to remove word2vec clear BST function
+                    - W2VReadTrainedVectorDataFromFile() - Updated parameters to remove $storeAsBST variable
+                    - W2VSetVocabularyArray() -> W2VSetVocabularyHash()
+                    - W2VClearVocabularyArray() -> W2VClearVocabularyHash()
+                    - W2VAddWordVectorToVocabAry() -> W2VAddWordVectorToVocabHash()
+                    - Removed W2VCreateWordVectorBST()
+                    - Removed W2VGetWordVectorBST()
+                    - Removed W2VSetWordVectorBST()
+                    - Removed W2VClearWordVectorBST()
+     - word2vec-interface.pl - Similarity() - Added checks to see if similarity and vector binary files exist prior to
+                                              continuing.
+                                            - Updated to remove word2vec clear BST function
+     - 1Word2vec.t - Updated to suite the latest changes.
+     - After testing, shows performance increase of x2 loading and completion speeds when relying on word2vec data accessing times.
+     - Memory utilization decreased from x2 times the file size to just above the file size.
+     - MORE TESTING REQUIRED TO ENSURE ACCURACY OF ALL CORE FUNCTIONS
+
+
+    (01/23/2017)
+     - interface.pm - CLComputeCosineSimilarity() - Added log printing
+                    - CLComputeMultiWordCosineSimilarity() - Added log printing
+                    - CLComputeAvgOfWordsCosineSimilarity() - Added log printing
+
+    (01/22/2017)
+     - xmltow2v.pm - Added thread shared word count variables.
+                   - CompoundifyString() - Updated to support counting variables above.
+                   - AppendToTempStr() - Updated to AppendStrToTextCorpus() standards.
+                   - ConvertMedlineXMLToW2V() - Added statistic log statements: compound word count, total word count
+                                              - Log statement typo
+                                              - Now prints word counts after completing a job.
+     - interface.pm - CLCompileTextCorpus() - Updated log statements
+
+    (01/21/2017)
+     - word2vec-interface.pl - Similarity() - Bug Fix: Added clean up after processing data.
+                             - Set --ignorecompileerrors to 0 if --debuglog passed. Changed to reflect setting interface::_ignoreCompileErrors variable to true by default in previous build.
+     - interface.pm - CLSimilaritySum() - Removed un-used $result variable declaration
+                                        - Bug Fix: Updated check(s) for undefined/empty search word variable
+                    - CLSimilarityAvg() - Removed un-used $result variable declaration
+                                        - Bug Fix: Updated check(s) for undefined/empty search word variable
+                    - CLSimilarityComp() - Removed un-used $result variable declaration
+                                         - Bug Fix: Updated check(s) for undefined/empty search word variable
+
+    (01/19/2017)
+     - interface.pm - CLCompoundifyTextInFile() - Cleaned string with Xmltow2v::RemoveSpecialCharactersFromString() method prior to compoundifying text.
+                                                - Added more checks.
+                    - Added ConvertStringLineEndingsToTargetOS() function - Converts passed string parameter to target OS (OS the Word2vec::Interface Package Is Run On).
+     - xmltow2v.pm - Added GetOSType() function.
+                   - RemoveSpecialCharactersFromString() - Updated to re-format string line ending to target OS specifications. (Windows/Linux/OSX)
+                                                         - Updated "tr" regex to let line ending characters remain after parsing string.
+                   - AppendStrToTextCorpus() - Updated space trim regex to trim more than one space in-between string ends.
+                   - ReadCompoundWordDataFromFile() - Included check to see if max compound word length is greater than 100. If so, error out gracefully.
+     - WARNING: Automatic conversion not compatible with legacy MacOS format.
+
+    (01/18/2017)
+     - interface.pm - Set module to ignore compile errors/warnings by default.
+
+    (01/17/2017)
+     - xmltow2v.pm - ReadCompoundWordDataFromFile() - Compound word data now passed through ReadCompoundWordDataFromFile() method to remove special characters and clean string.
+                                                    - Removed string lowercase conversion as this is already done in the ReadCompoundWordDataFromFile() function.
+                   - SaveTextCorpusToFile() - Made thread safe / Well ensured safety.
+                   - AppendStrToTextCorpus() - Made thread safe
+                                             - Re-wrote method, removed unnecessary statements and included trim function to remove spaces at beginning and end of string.
+                   - ParseArticle() - Included chomp() string tag data
+                   - ParseJournal() - Included chomp() string tag data
+                   - ParseOtherAbstract() - Included chomp() string tag data
+                   - QuickParseJournal() - Included chomp() string tag data
+                   - QuickParseArticle() - Included chomp() string tag data
+                   - QuickParseOtherAbstract() - Included chomp() string tag data
+
+    (01/15/2017)
+     - word2vec-interface.pl - GetCommandOptions() -  Bug Fix: Script skips combined commands when using this function. $argIndex decrement error.
+     - xmltow2v.pm - ThreadedConvert() - Bug Fix: Finished job counter incrementing when XML job queue contains no data, resulting in erroneous count result.
+                   - ConvertMedlineXMLToW2V() - Updated to use DateCheck() function only once. Twice was unnecessary.
+                                              - Added log statements.
+                   - ReadXMLDataFromFile() - Corrected log statement typo.
+     - interface.pm - CLCompileTextCorpus() - Updated error checking and added error log statements.
+
+    (01/14/2017)
+     - xmltow2v.pm - Added DateCheck() function - Checks to see if specified begin and end dates are in proper format and if they're sensible. ie begin date year cannot exceed end date year, etc.
+                   - ConvertMedlineXMLToW2V() - Updated to use the above function.
+                   - ConvertMedlineXMLToW2V() / ThreadedConvert() - Updated to display number of parsed files versus number of total files in specified directory, after completion.
+     - word2vec-interface.pl - PrintElapsedTime() - Bug Fix: Updated calculations to display correct estimations.
+                             - Updated POD examples from "interface.pl" to "Word2vec-Interface.pl".
+     - 1xmltow2v.t - Updated to test DateCheck() function.
+     - interface.pm - Added XTWDateCheck() function.
+                    - CLSimilarityAvg() - Bug Fix: Updated to convert all search strings/words to lower case before searching word vectors in memory.
+                    - CLCompileTextCorpus() - Updated and reformatted some log statements.
+     - word2vec.pm - ComputeAverageOfWords() - Bug Fix: Prematurely set @resultAry to empty in the event @foundWords == 1.
+                   - ComputeAvgOfWordsCosineSimilarity() - Updated log statement.
+                   - ComputeMultiWordCosineSimilarity() - Bug Fix: Using function to remove words from word vector strings versus arrays / Word vector array references were being set to empty.
+     - Updated POD documentation with the above changes.
+     - Added missing function to POD documentation.
+     - Recompiled all POD files.
+
+    (01/10/2017)
+     - interface.pm - CLAddTwoWordVectors() - Performance updates. Split array into two elements (word + vector data) instead of splicing all elements and use shift() versus splice
+                                              to remove word from array.
+                    - CLSubtractTwoWordVectors() - Performance updates. Split array into two elements (word + vector data) instead of splicing all elements and use shift() versus splice
+                                              to remove word from array.
+     - w2vbst.pm - CreateBST() - Updated code. Now using array shift() versus splice(). (Neglible performance increases but code is easier to read).
+                               - Performance update - splice() into two array elements (word + vector data) instead of splicing all elements. x2 speed increase seen during tests.
+     - word2vec.pm - RemoveWordFromWordVectorString() - Performance update. Splits string into two array elements (word + vector data), instead of splicing all elements.
+                   - ComputeMultiWordCosineSimilarity() - Updated to use RemoveWordFromWordVectorString() function. Should see a speed increase due to this change.
+                   - AddTwoWords() - Updated to use array shift() versus splice() to remove word from array.
+                   - SubtractTwoWords() - Updated to use array shift() versus splice() to remove word from array.
+                   - ComputeCosineSimilarity() - Updated to use array shift() versus splice() to remove word from array.
+                   - SaveTrainedVectorDataToFile() - Updated to use array shift() versus splice() to remove word from array.
+                   - AverageOfTwoWordVectors() - Typo in log statement.
+                   - SubtractTwoWords() - Typo in log statement.
+                   - CreateWordVectorBST() - Updated to use Word2vec::W2vbst::CreateTree() versus Word2vec::W2vbst::CreateBST().
+                                           - Updated function error checking.
+                                           - Updated log statements.
+                                           - Updated function to return status message (return value: 0 = Success / -1 = Un-successful).
+                   - ReadTrainedVectorDataFromFile() - Updated to use CreateWordVectorBST() return value for error checking.
+     - Updated POD documentation to support the above changes.
+
+    (01/07/2017)
+     - word2vec.pm - IsVectorDataSorted() - Updated to use array reference argument. If not defined, it will try to fetch the vocabulary array in word2vec object.
+                   - ReadTrainedVectorDataFromFile() - Updated to support signed sorted header.
+                   - SaveTrainedVectorDataToFile() - Bug Fix: Removed previous patch. This forced sparse vector word vectors to save in dense word vector format.
+                                                   - Updated to support signed sorted header.
+                   - CheckWord2VecDataFileType() - Updated to support reading signed header file by --sortvectorfile routine.
+     - interface.pm - W2VIsVectorDataSorted() - Updated to support the above change.
+                    - W2VSaveTrainedVectorDataToFile() - Renamed second argument variable name.
+     - Note: Tested --sortvectorfile routine will dense, sparse and binary formatted arrays with success.
+
+    (01/06/2017)
+     - Added ability to sort vector data file and save as new or replace old files. This will be done to eliminate sorting on the fly while processing data/speeds up data loading.
+     - interface.pm - Added CLSortVectorFile()
+                    - Added W2VIsVectorDataSorted()
+     - word2vec.pm - Added function IsVectorDataSorted()
+                   - CreateWordVectorBST() - Updated to support vector data file that are already sorted.
+     - word2vec-interface.pl - SortVectorFile()
+
+  version 0.02
+    (01/05/2017)
+
+     - Clean.t - Implemented to clean up word2vec directory files after testing.
+     - interface.pm - WSDParseList() - Updated to check for existing vector data in memory.
+                                      This update will now overwrite existing data if new vector
+                                      file path is specified or use existing data if vector file path
+                                      is not specified.
+     - inteface.t - Added more tests.
+     - Makefile.PL - Changed required Encoding version from 2.87 to 2.86.
+
+    (01/04/2017)
+
+     - BuildExecutables.t - Implemented this test file to build executable files prior to running other tests.
+     - README.pod - Updated to reflect renamed modules and scripts.
+     - interace.pm - Added missing function: W2VClearWordVectorBST()
+     - interface.t - More advanced function testing.
+
+    (01/03/2017)
+
+     - interface.pm - CLAddTwoWordVectors() - Bug Fix: Return undef when one or more words not found.
+                    - CLSubtractTwoWordVectors() - Bug Fix: Return undef when one or more words not found.
+                    - CLConvertWord2VecBinaryToText() - Renamed to CLConvertWord2VecVectorFileToText()
+                    - CLConvertWord2VecTextToBinary() - Renamed to CLConvertWord2VecVectorFileToBinary()
+                    - CLConvertWord2VecTextToSparse() - Renamed to CLConvertWord2VecVectorFileToSparse()
+                    - CLConvertWord2VecVectorFileToText()- Bug Fix: Resolved condition where this function permanently
+                                                                      sets sparsevectormode variable to true. Subsequent
+                                                                      reading of a dense or binary formatted vector data
+                                                                      will result in reading errors.
+                    - CLConvertWord2VecVectorFileToBinary()- Bug Fix: Resolved condition where this function permanently
+                                                                      sets sparsevectormode variable to true. Subsequent
+                                                                      reading of a dense or binary formatted vector data
+                                                                      will result in reading errors.
+                    - CLConvertWord2VecVectorFileToSparse()- Bug Fix: Resolved condition where this function permanently
+                                                                      sets sparsevectormode variable to true. Subsequent
+                                                                      reading of a dense or binary formatted vector data
+                                                                      will result in reading errors.
+                    - CLSimilarityAvg() - Bug Fix: Check to see if vector data is in memory before continuing.
+                                        - Log typo
+                    - CLSimilarityComp() - Bug Fix: Check to see if vector data is in memory before continuing.
+                                         - Log typo
+                    - CLSimilartiySum() - Bug Fix: Check to see if vector data is in memory before continuing.
+                                        - Log typo
+     - Updated Interface.t, interface.pod & word2vec-interface.pl to support the above changes.
+     - bst.pm - BSTContainsSearch() - Bug Fix: Check to see if $node->data is defined before using contents.
+              - BSTExactSearch() - Bug Fix: Check to see if $node->data is defiend before using contents.
+     - w2vbst.pm - BSTExactSearch() - Bug Fix: Check to see if $node->word is defined before using contents.
+     - word2vec.pm - GetWordVector() - Bug Fix: Check to see if vector data is in memory before continuing.
+     - interface.t - More advanced function testing.
+
+    (01/02/2017)
+
+     - word2vec.pm - GetWordVectorBST() - Bug Fix: w2vbst->new() to Word2vec::W2vbst->new()
+                   - RemoveWordFromWordVectorString() - Use "shift" versus old method. Achieves the same results but much easier to interpret.
+     - word2vec.t - Added more sparse vector data format testing routines.
+     - interface.t - Started basic interface testing routines.
+     - interface.pm - new() - Fixed checking for current working directory and print statement.
+
+    (01/01/2017)
+
+     - word2vec.pm - Incorporated ComputeAvgOfWordsCosineSimilarity() to include calculating averages of words. Now arguments require words to compute, not word vector averages.
+                   - ComputeAvgOfWordsCosineSimilarity() - Returns undef when ComputeAverageOfWords() function returns undef.
+                   - Added AverageOfTwoWordVectors() function.
+                   - Added ComputeCosineSimilarityOfWordVectors() function.
+                   - Updated WSDCalculateCosineAvgSimilarity() to use the new ComputeCosineSimilarityOfWordVectors() function as the old function is no longer compatible.
+                   - new() - Enabled minimize memory usage setting by default.
+                   - GetMinimizeMemoryUsage() - Set to enable if not defined.
+                   - ComputeAverageOfWords() - Correction in printed logs / Log Update
+                   - GetWordVector() - Updated printed log text.
+                   - Added RemoveWordFromWordVectorString() function.
+     - interface.pm - CLSimilarityAvg() - Updated to support the above change.
+                                        - Included print statements when debuglog option is disabled.
+                    - CLComputeCosineSimilarity() - Updated to clear bst in memory.
+                    - CLComputeMultiWordCosineSimilarity() - Updated to clear bst in memory.
+                    - CLComputeAvgOfWordsCosineSimilarity() - Updated to clear bst in memory.
+                    - CLMultiWordCosSimWithUserInput() - Updated to clear bst in memory.
+                    - Added W2VAverageOfTwoWordVectors() function to support the above change.
+                    - Added W2VComputeCosineSimilarityOfWordVectors() function to support the above change.
+     - word2vec-interface.pl - WSD() - Enabled low memory usage by default.
+     - word2vec.t - Finished majority of testing cases for dense/binary arrays.
+     - Updated POD documentation to support the above changes.
+     - Updated depreciated scripts to support the above changes.
+
+    (12/31/2016)
+
+     - xmltow2v.pm - GetCompoundWordBST() - Bug Fix: bst->new() to Word2vec::bst->new();
+     - xmltow2v.t - Finished testing cases.
+     - word2phrase.pm - ExecuteStringTraining() - Bug Fix: Not training on temp file, now fixed.
+     - word2vec.pm - GetBinaryOutput() - Set to return 1 by word2vec package default standards.
+                   - SaveTrainedVectorDataToFile() - Bug Fix: Missing file handle close statements.
+                                                   - Updated to support conversion from sparse vector formatted data.
+                                                   (Conversion would fail if original format was binary converting to sparse or sparse to sparse)
+     - word2phrase.t - Finished testing cases.
+     - word2vec.t - Basic testing done. Advanced testing needs to be completed.
+
+    (12/28/2016)
+
+     - xmltow2v.t - More testing cases.
+
+    (12/27/2016)
+
+     - Updated POD documentation with latest added functions.
+
+    (12/23/2016)
+
+     - word2vec.pm - Reverted change from storing vocabulary as hash back to binary search tree.
+                     (After testing, I found the BST to be much faster than using a Hash vocabulary)
+
+    (12/22/2016)
+
+     - word2vec-interface.pl - PrintElapsedTime() - Bug Fix: Incorrect day calculation
+                                                  - Updates
+     - word2vec.pm - W2vbst.pm - Depreciated, Now storing vocabulary data as hash. Functions affected below:
+                     ComputeAverageOfWords(), GetWordVector(),
+                     ClearVocabularyArray() -> ClearVocabularyHash()
+                     SetVocabularyArray()   -> SetVocabularyHash()
+                     GetVocabularyArray()   -> GetVocabularyHash()
+                   - Removed all W2vbst.pm functions: SetWordVectorBST(), ClearWordVectorBST()
+     - word2vec.pod - Updated to support the above changes.
+     - interface.pm - Updated to support the above changes.
+     - interface.pod - Updated to support the above changes.
+     - Added undocumented functions to POD files.
+
+    (12/18/2016)
+
+     - word2vec-interface.pl - Similarity() - Added return statement status checking.
+     - word2vec.pm - ComputeAverageOfWords() - Updated commenting
+                   - CLSimilarityAvg(), CLSimilarityComp() & CLSimilaritySum() - Added file checking and return statements.
+
+    (12/18/2016)
+
+     - interface.pm - WSDGenerateAccuracyReport() - Bug Fix: Reporting no results files found despite finding files and reporting parsing/saving files when none found.
+                    - WSDParseList() - Bug Fix: Now checks for zero-byte files prior to trying to load them in memory.
+
+    (12/17/2016)
+
+     - word2vec-interface.pl - Changed some command names to more sensible names.
+                             - Added similarity option and related methods.
+                             - Added Similarity() method.
+     - interface.pm - Added CLSimilarityAvg(), CLSimilarityComp() & CLSimilaritySum() methods.
+     - word2vec.pm - Updated clear vocabulary and bst methods to set number of words and vector length variables to zero.
+                   - ReadTrainedVectorDataFromFile - Bug Fix: Updated to check number of words in memory versus vocabulary array before loading trained vector data.
+                   - ReadTrainedVectorDataFromFile - Updated to set NumberOfWords & VectorLength when reading text vector formatted file.
+     - Package update: Added functionality for the ease of computing similarity measures based on changes above.
+
+    (12/15/2016)
+
+     - word2vec.pm - ComputeCosineSimilarity() / ComputeMultiWordCosineSimilarity() - Updated to support GetWordVector() function and its new algorithms.
+                                                                                      Both functions are not compatible with sparse vectors as well as dense vectors.
+                   - ComputeMultiWordCosineSimilarity() - Bug Fixes / Performance updates.
+                   - ComputeAverageOfWords() - Bug Fix: Setting results array to empty if computational average divisor < 1.
+                   - ReadTrainedVectorDataFromFile() - Bug Fix: Attempting to parse uninitialized variable : $buffer.
+
+    (12/13/2016)
+
+     - interface.pm - Re-added: WSDAnalyzeSenseFiles() with better detection of instance/sense id mis-match.
+
+    (12/10/2016)
+
+     - word2vec.pm - Added _minimizeMemoryUsage variable, GetMinimizeMemoryUsage() and SetMinimizeMemoryUsage() methods.
+     - word2vec-interface.pl - Added provisions for setting (-lowmemusage) WSD option. Default is off.
+                             - Bug Fix: -lowmemusage option set to 0 regardless if user desired to set to 1.
+                             - Bug Fix: Checking "n" with '!=' equality operator versus 'ne' operator.
+     - word2vec::ComputeAverageOfWords() - Added a low memory usage algorithm set-able be the above changes.
+                                         - Bug Fix: Attempting to convert undefined variable to hash. Conversion method throwing error.
+     - interface.pm - Added W2VConvertRawSparseTextToVectorDataAry(), W2VConvertRawSparseTextToVectorDataHash(),
+                      W2VGetSparseVectorMode(), W2VGetVectorLength(), W2VGetNumberOfWords(), W2VGetMinimizeMemoryUsage(),
+                      W2VSetSparseVectorMode(), W2VSetVectorLength(), W2VSetNumberOfWords(), W2VSetMinimizeMemoryUsage() methods.
+
+    (12/09/2016)
+
+     - interface.pm - WSDAnalyzeSenseFiles() - Removed as it is no longer necessary.
+     - word2vec.pm - ComputeAverageOfWords() - Hash to Array : Off by one issue resulting in memory leaks.
+                                               Note: My sparse vector format specification consisted of 0 being the first index in the sparse vector.
+                                                     Dr McInnes' sparse vector format specification consisted of 1 being the first index in the sparse vector.
+                                                     This resulted in the last index being off by one / memory leak.
+
+    (12/08/2016)
+
+     - word2vec.pm - ComputeAverageOfWords() - Re-wrote algorithm to be more memory efficient at the cost of speed.
+                   - ComputeAverageOfWords() - Another re-write using hashes (Speed + Memory Efficiency)
+                   - Added ConvertRawSparseTextToVectorDataAry() & ConvertRawSparseTextToVectorDataHash()
+     - interface.pm - WSDCalculateCosineAvgSimilarity() - Bug Fix: Check $cosSimValue is defined prior to utilizing.
+                    - WSDCalculateCosineAvgSimilarity() - Bug Fix: Checking to see if result after calling ComputeAverageOfWords() is defined.
+                    - CLComputeAvgOfWordsCosineSimilarity() - Bug Fix: Checking to see if result after calling ComputeAverageOfWords() is defined.
+                                                            - Bug Fix: Checking $avgAVtrSize and $avgBVtrSize for undefined variables.
+                    - ComputeCosineSimilarity() - Bug Fix: Checking $wordAVtrSize and $wordBVtrSize for undefined variables.
+
+    (12/07/2016)
+
+     - interface.pm - Commenting updates/fixes
+                    - Added W2VAddTwoWords() / W2VSubtractTwoWords() Methods to support previous Word2vec::Word2vec module updates.
+     - word2vec.pm - Efficiency/Speed fix - De-refencing array reference and assigning to array variable versus accessing through
+                                            array reference. Line: 775
+                   - ComputeAverageOfWords() - Bug Fix: Divide by zero (even-though this should never happen, it is just a pre-caution )
+                   - ComputeAverageOfWords() - Bug Fix: Fixed memory leak!!!!!
+                   - GetWordVector() - Included argument to retrieve raw sparse text during "Sparse Vector Format Mode"
+
+    (12/06/2016)
+
+     - Due to memory constraint issues with large sparse vector formatted data, data is now stored as a sparse vector and converted on-the-fly.
+     - word2vec::ReadTrainedVectorDataFromFile() - Updated to store sparse vector data as sparse vector data string.
+     - word2vec::SaveTrainedvectorDataToFile() - Updated to support new "storing sparse formatted vector" data in memory and conversions between formats.
+     - word2vec::GetWordVector() - Missing return statement
+                                 - Updated to convert sparse vector data format to regular vector data format on-the-fly.
+     - interface::WSDParseList() - Debug log statement fixes and updates
+     - Warning: Using large sparse vectors come at an expense of speed. Sparse vectors are converted to standard vectors on-the-fly.
+     - Renamed all associated files to include capitalization of the first letter of each file name.
+     - Updated Makefile.PL, MANIFEST & MANIFEST-org files to support the above naming convention change.
+
+    (12/4/2016)
+
+     - interface::CLCompileTextCorpus() - Bug Fix: Setting overwriteExistingFile if numOfThreads not defined. Corrected to check
+                                                   against correct variable.
+                                        - Updated to support checking current CPU for number of cores. This is utilized to set
+                                          numOfThreads variable when not defined.
+
+    (12/3/2016)
+
+     - word2vec-interface - Removed External in main directory
+     - MANIFEST - Removed "ignore.txt" entry
+     - MAKEFILE - Changed "Class::Struct" to 0.64
+     - README - Updated "authors & copyright" to include Dr. McInnes
+     - INSTALL - Updated "contact list" to include Dr. McInnes
+     - word2vec-interface.pl - Updated help sub-routine. Typos.
+                             - Updated script to ignore compiler warnings when user runs "--test" command.
+                             - ShowVersion() - Typo and added Dr. McInnes to copyright.
+                             - ShowHelp() - Updated formatting to display correctly on smaller windows.
+
+  version 0.01
+    1. Initial package release
+

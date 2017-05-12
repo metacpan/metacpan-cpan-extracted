@@ -1,0 +1,27 @@
+---
+abstract: 'Adds HEAD tag parsing to WWW::Mechanize'
+author:
+  - 'Andrey Kostenko, C<< <andrey@kostenko.name> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Mechanize-Meta
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::HeadParser: 0
+  HTTP::Headers: 0
+  WWW::Mechanize: 1.2
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://developers.rambler.ru/svn/perlmodules/WWW-Mechanize-Meta
+version: 0.07

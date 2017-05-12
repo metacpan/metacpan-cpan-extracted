@@ -1,0 +1,134 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Deploy::LoginConfig - login-config deployment descriptor element
+class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Deploy::LoginConfig - login-config deployment descriptor element
+class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Representation of a login configuration object for a web application,
+as specified in a <EM>login-config</EM> element in the deployment
+descriptor.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Deploy::LoginConfig</STRONG> instance,
+initializing fields appropriately.
+<P></P></DL>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24authMethod">$authMethod</A></STRONG><BR>
+<DD>
+the authentication method
+<P></P>
+<DT><STRONG><A NAME="item_%24realmName">$realmName</A></STRONG><BR>
+<DD>
+the realm name
+<P></P>
+<DT><STRONG><A NAME="item_%24loginPage">$loginPage</A></STRONG><BR>
+<DD>
+the URI of the login page
+<P></P>
+<DT><STRONG><A NAME="item_%24errorPage">$errorPage</A></STRONG><BR>
+<DD>
+the URI of the error page
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAuthMethod"><CODE>getAuthMethod()</CODE></A></STRONG><BR>
+<DD>
+Return the authentication method to use for application login.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthMethod"><CODE>setAuthMethod($authMethod)</CODE></A></STRONG><BR>
+<DD>
+Set the authentication method to use for application login. Must be
+one of <EM>BASIC</EM>, <EM>DIGEST</EM>, <EM>FORM</EM>, or <EM>CLIENT-CERT</EM>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$authMethod</STRONG><BR>
+<DD>
+the authentication method
+<P></P></DL>
+<DT><STRONG><A NAME="item_getErrorPage"><CODE>getErrorPage()</CODE></A></STRONG><BR>
+<DD>
+Return the URI of the error page for form login.
+<P></P>
+<DT><STRONG><A NAME="item_setErrorPage"><CODE>setErrorPage($errorPage)</CODE></A></STRONG><BR>
+<DD>
+Set the URI of the error page for form login. The URI must be
+specified relative to the context (ie beginning with a '/').
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$errorPage</STRONG><BR>
+<DD>
+the error page URI
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLoginPage"><CODE>getLoginPage()</CODE></A></STRONG><BR>
+<DD>
+Return the URI of the login page for form login.
+<P></P>
+<DT><STRONG><A NAME="item_setLoginPage"><CODE>setLoginPage($loginPage)</CODE></A></STRONG><BR>
+<DD>
+Set the URI of the login page for form login. The URI must be
+specified relative to the context (ie beginning with a '/').
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$loginPage</STRONG><BR>
+<DD>
+the login page URI
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRealmName"><CODE>getRealmName()</CODE></A></STRONG><BR>
+<DD>
+Return the name of the realm in which users will be authenticated.
+<P></P>
+<DT><STRONG><A NAME="item_setRealmName"><CODE>setRealmName($realmName)</CODE></A></STRONG><BR>
+<DD>
+Set the name of the realm in which users will be authenticated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$realmName</STRONG><BR>
+<DD>
+the name of the realm
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

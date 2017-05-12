@@ -1,0 +1,32 @@
+---
+abstract: '[DEPRECATED] A base role for quickly and easily creating web service clients'
+author:
+  - 'Naveed Massjouni <naveed@vt.edu>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-BaseClientRole
+requires:
+  HTTP::Request::Common: 0
+  HTTP::Response::Stringable: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moo: 1.005000
+  Moo::Role: 0
+resources:
+  bugtracker: https://github.com/ironcamel/WebService-BaseClientRole/issues
+  repository: git://github.com/ironcamel/WebService-BaseClientRole.git
+version: 0.0008

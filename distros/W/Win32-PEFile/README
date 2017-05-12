@@ -1,0 +1,22 @@
+NAME
+    Win32::PEFile - Microsoft Portable Executable file parser
+
+VERSION
+    Version 0.7007
+
+SYNOPSIS
+    use Win32::PEFile;
+
+    my $pe = Win32::PEFile->new (file => 'someFile.exe');
+
+    print "someFile.exe has a entry point for EntryPoint1"
+        if $pe->getEntryPoint ("EntryPoint1");
+
+    my $strings = $pe->getVersionStrings ();
+    print "someFile.exe version $strings->{'ProductVersion'}\n";
+
+DESCRIPTION
+    Win32::PEFile is a pure Perl module for parsing the Windows version of
+    Portable Executable files. The current version parses the basic file
+    structure to obtain sections information and the data directory. Access is
+    provided to the version resource and the Exports table.

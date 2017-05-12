@@ -1,0 +1,242 @@
+NAME
+    WWW::Sitemap::XML - XML Sitemap protocol
+
+VERSION
+    version 2.02
+
+SYNOPSIS
+        use WWW::Sitemap::XML;
+
+        my $map = WWW::Sitemap::XML->new();
+
+        # add new url
+        $map->add( 'http://mywebsite.com/' );
+
+        # or
+        $map->add(
+            loc => 'http://mywebsite.com/',
+            lastmod => '2010-11-22',
+            changefreq => 'monthly',
+            priority => 1.0,
+            mobile => 1,
+            images => [
+                {
+                    loc => 'http://mywebsite.com/image1.jpg',
+                    caption => 'Caption 1',
+                    title => 'Title 1',
+                    license => 'http://www.mozilla.org/MPL/2.0/',
+                    geo_location => 'Town, Region',
+                },
+                {
+                    loc => 'http://mywebsite.com/image2.jpg',
+                    caption => 'Caption 2',
+                    title => 'Title 2',
+                    license => 'http://www.mozilla.org/MPL/2.0/',
+                    geo_location => 'Town, Region',
+                }
+            ],
+            videos => {
+                content_loc => 'http://mywebsite.com/video1.flv',
+                player => {
+                    loc => 'http://mywebsite.com/video_player.swf?video=1',
+                    allow_embed => "yes",
+                    autoplay => "ap=1",
+                },
+                thumbnail_loc => 'http://mywebsite.com/thumbs/1.jpg',
+                title => 'Video Title 1',
+                description => 'Video Description 1',
+            }
+        );
+
+        # or
+        $map->add(
+            WWW::Sitemap::XML::URL->new(
+                loc => 'http://mywebsite.com/',
+                lastmod => '2010-11-22',
+                changefreq => 'monthly',
+                priority => 1.0,
+                mobile => 1,
+                images => [
+                    WWW::Sitemap::XML::Google::Image->new(
+                        {
+                            loc => 'http://mywebsite.com/image1.jpg',
+                            caption => 'Caption 1',
+                            title => 'Title 1',
+                            license => 'http://www.mozilla.org/MPL/2.0/',
+                            geo_location => 'Town, Region',
+                        },
+                    ),
+                    WWW::Sitemap::XML::Google::Image->new(
+                        {
+                            loc => 'http://mywebsite.com/image2.jpg',
+                            caption => 'Caption 2',
+                            title => 'Title 2',
+                            license => 'http://www.mozilla.org/MPL/2.0/',
+                            geo_location => 'Town, Region',
+                        }
+                    ),
+                ],
+                videos => [
+                    WWW::Sitemap::XML::Google::Video->new(
+                        content_loc => 'http://mywebsite.com/video1.flv',
+                        player => WWW::Sitemap::XML::Google::Video::Player->new(
+                            {
+                                loc => 'http://mywebsite.com/video_player.swf?video=1',
+                                allow_embed => "yes",
+                                autoplay => "ap=1",
+                            }
+                        ),
+                        thumbnail_loc => 'http://mywebsite.com/thumbs/1.jpg',
+                        title => 'Video Title 1',
+                        description => 'Video Description 1',
+                    ),
+                ],
+            )
+        );
+
+        # read URLs from existing sitemap.xml file
+        my @urls = $map->read( location => 'sitemap.xml' );
+
+        # load urls from existing sitemap.xml file
+        $map->load( location => 'sitemap.xml' );
+
+        # get XML::LibXML object
+        my $xml = $map->as_xml;
+
+        print $xml->toString(1);
+
+        # write to file
+        $map->write( 'sitemap.xml', my $pretty_print = 1 );
+
+        # write compressed
+        $map->write( 'sitemap.xml.gz' );
+
+DESCRIPTION
+    Read and write sitemap XML files as defined at
+    <http://www.sitemaps.org/> and with support of Google video, image and
+    mobile extensions described at
+    <https://support.google.com/webmasters/answer/183668>.
+
+METHODS
+  add($url|%attrs)
+        $map->add(
+            WWW::Sitemap::XML::URL->new(
+                loc => 'http://mywebsite.com/',
+                lastmod => '2010-11-22',
+                changefreq => 'monthly',
+                priority => 1.0,
+            )
+        );
+
+    Add the $url object representing single page in the sitemap.
+
+    Accepts blessed objects implementing WWW::Sitemap::XML::URL::Interface.
+
+    Otherwise the arguments %attrs are passed as-is to create new
+    WWW::Sitemap::XML::URL object.
+
+        $map->add(
+            loc => 'http://mywebsite.com/',
+            lastmod => '2010-11-22',
+            changefreq => 'monthly',
+            priority => 1.0,
+        );
+
+        # single url argument
+        $map->add( 'http://mywebsite.com/' );
+
+        # is same as
+        $map->add( loc => 'http://mywebsite.com/' );
+
+    Performs basic validation of URLs added:
+
+    *   maximum of 50 000 URLs in single sitemap
+
+    *   URL no longer then 2048 characters
+
+    *   all URLs should use the same protocol and reside on same host
+
+  urls
+        my @urls = $map->urls;
+
+    Returns a list of all URL objects added to sitemap.
+
+  load(%sitemap_location)
+        $map->load( location => $sitemap_file );
+
+    It is a shortcut for:
+
+        $map->add($_) for $map->read( location => $sitemap_file );
+
+    Please see "read" for details.
+
+  read(%sitemap_location)
+        # file or url to sitemap
+        my @urls = $map->read( location => $file_or_url );
+
+        # file handle
+        my @urls = $map->read( IO => $fh );
+
+        # XML string
+        my @urls = $map->read( string => $xml );
+
+    Read the sitemap from file, URL, open file handle or string and return
+    the list of WWW::Sitemap::XML::URL objects representing "<url>"
+    elements.
+
+  write($file, $format = 0)
+        # write to file
+        $map->write( 'sitemap.xml', my $pretty_print = 1);
+
+        # or
+        my $fh = IO::File->new();
+        $fh->open('sitemap.xml', 'w');
+        $map->write( $fh, my $pretty_print = 1);
+        $cfh->close;
+
+        # write compressed
+        $map->write( 'sitemap.xml.gz' );
+
+    Write XML sitemap to $file - a file name or IO::Handle object.
+
+    If file names ends in ".gz" then the output file will be compressed by
+    setting compression on XML object - please note that it requires
+    *libxml2* to be compiled with *zlib* support.
+
+    Optional $format is passed to "toFH" or "toFile" methods (depending on
+    the type of $file, respectively for file handle and file name) as
+    described in XML::LibXML.
+
+  as_xml
+        my $xml = $map->as_xml;
+
+        # pretty print
+        print $xml->toString(1);
+
+        # write compressed
+        $xml->setCompression(8);
+        $xml->toFile( 'sitemap.xml.gz' );
+
+    Returns XML::LibXML::Document object representing the sitemap in XML
+    format.
+
+    The "<url>" elements are built by calling *as_xml* on all URL objects
+    added into sitemap.
+
+SEE ALSO
+    WWW::SitemapIndex::XML
+
+    <http://www.sitemaps.org/>
+
+    <https://support.google.com/webmasters/answer/183668>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

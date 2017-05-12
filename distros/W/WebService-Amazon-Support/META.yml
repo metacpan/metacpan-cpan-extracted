@@ -1,0 +1,31 @@
+---
+abstract: 'The great new WebService::Amazon::Support!'
+author:
+  - 'Matthew Cox <mcox@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Amazon-Support
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AWS::Signature4: '0'
+  Carp: '0'
+  Encode: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP: '0'
+  Params::Validate: '0'
+  Readonly: '0'
+  WebService::Simple: '0'
+  perl: '5.006'
+version: v0.0.4

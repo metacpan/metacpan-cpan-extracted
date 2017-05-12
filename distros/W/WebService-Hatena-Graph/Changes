@@ -1,0 +1,44 @@
+Revision history for Perl extension WebService::Hatena::Graph
+
+[Changes for 0.08  2013-10-8]
+
+* Added OAuth API support (thanks to id:wakabatan)
+
+[Changes for 0.07  2007-7-13]
+
+* Fixed some errors in the POD.
+
+[Changes for 0.06  2007-6-13]
+
+* Improved the POD: Added explanation of return values which get_*
+  method returns
+
+[Changes for 0.05  2007-6-13]
+
+* Added post_data(), get_data(), post_config(), get_config(), and ua()
+  along with API updates.
+* Now that post() is obsolete, use post_data() instead.
+* Added JSON::Any to pre-required module.
+
+[Changes for 0.04  2006-10-27]
+
+* IMPORTANT CHANGE: new() and post() methods now expect the arguments　
+  to be passed in as a hash. For more, see the documentation.
+* post() now returns HTTP::Response object if request is success.
+* The date param in post() is now optional with the API's update. You
+  can omit to pass it explicitly. In that case, Hatena::Graph will
+  regard as if you pass the date on the day.
+* Added t/01_exception.t
+* Added t/02_post.t
+
+[Changes for 0.03  2006-10-21]
+
+* Fixed a typo on the name of Hatena::Graph.
+
+[Changes for 0.02 - 2006-10-18]
+
+* Added a line to Makefile.PL to indicate pre-required module.
+
+[Changes for 0.01 - 2006-10-17]
+
+* original version.

@@ -1,0 +1,4 @@
+name = "WWW-Shorten-Naver"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:32:56,791]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the '9395143dd6c3e73abf9281be7a772c4d286e72a5' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n\r\n[2016-01-13 14:32:56,800]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the '9395143dd6c3e73abf9281be7a772c4d286e72a5' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n\r\n[2016-01-13 14:32:56,807]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the 'feac610f381e697acf4c1c8ad82b7d76c7643b04' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n\r\n[2016-01-13 14:32:56,814]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the 'feac610f381e697acf4c1c8ad82b7d76c7643b04' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n\r\n[2016-01-13 14:32:56,815]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the '778cc3d0105ca1b6b2587804ebfe89c2557a7e46' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n\r\n[2016-01-13 14:32:56,820]   WARN - les.SubmoduleAwareTreeIterator - Ignore submodule error: \"The repository 'file:////mnt/agent/temp/buildTmp/test-646053178/repo.git' has a submodule in the '778cc3d0105ca1b6b2587804ebfe89c2557a7e46' commit at the 'submodule-wihtout-entry' path, but has no entry for this path in .gitmodules configuration\". It seems to be fixed in one of the later commits. \n",
+   "duration" : 122,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:574,build:(id:667885)",
+   "id" : "id:574,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectChangesWithBrokenSubmoduleOnLastCommitAndUsualFileInsteadOfSubmoduleInPreviousCommit",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-2453281860798799261",
+      "id" : -2453281860798799261,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectChangesWithBrokenSubmoduleOnLastCommitAndUsualFileInsteadOfSubmoduleInPreviousCommit"
+   }
+}

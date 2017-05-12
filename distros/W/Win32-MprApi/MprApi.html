@@ -1,0 +1,223 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::MprApi - Perl wrapper for Win32 Router Configuration functions.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::MprApi - Perl wrapper for Win32 Router Configuration functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#export">EXPORT</A></LI>
+	</UL>
+
+	<LI><A HREF="#functions">FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#mprconfigserverconnect(\$servername, \$hmprconfig)">MprConfigServerConnect(\$ServerName, \$hMprConfig)</A></LI>
+		<LI><A HREF="#mprconfiggetguidname($hmprconfig, \$friendlyname, \$guidname)">MprConfigGetGuidName($hMprConfig, \$FriendlyName, \$GUIDName)</A></LI>
+		<LI><A HREF="#mprconfiggetfriendlyname($hmprconfig, \$guidname, \$friendlyname)">MprConfigGetFriendlyName($hMprConfig, \$GUIDName, \$FriendlyName)</A></LI>
+		<LI><A HREF="#mprconfigserverdisconnect( $hmprconfig )">MprConfigServerDisconnect( $hMprConfig )</A></LI>
+	</UL>
+
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::MprApi - Perl wrapper for Win32 Router Configuration functions.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Win32::MprApi;</PRE>
+<PRE>
+ $ret = Win32::MprApi::MprConfigServerConnect(\$ServerName, \$hMprConfig);</PRE>
+<PRE>
+ $ret = Win32::MprApi::MprConfigGetGuidName($hMprConfig, \$FriendlyName, \$GUIDName);</PRE>
+<PRE>
+ $ret = Win32::MprApi::MprConfigGetFriendlyName($hMprConfig, \$GUIDName, \$FriendlyName);</PRE>
+<PRE>
+ $ret = Win32::MprApi::MprConfigServerDisconnect($hMprConfig);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Interface to Win32 IP Router Configuration useful functions, needed to translate a Friendly Name (like <EM>``Local Area Connection'')</EM> into a GUID (like <EM>``{88CE272F-847A-40CF-BFBA-001D9AD97450}''</EM>) and vice-versa.</P>
+<P>This module covers only a small subset of the functions and data structures provided by the Win32 Router Configuration API.</P>
+<P>The API is supported on platforms where MprApi.dll is available:</P>
+<UL>
+<LI><STRONG><A NAME="item_Microsoft_Windows_2000">Microsoft Windows 2000</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Microsoft_Windows_XP">Microsoft Windows XP</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Microsoft_Windows_%2ENET_Server_2003_family">Microsoft Windows .NET Server 2003 family</A></STRONG><BR>
+
+</UL>
+<P>The complete SDK Reference documentation is available online through Microsoft MSDN Library (http://msdn.microsoft.com/library/default.asp)</P>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="functions">FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="mprconfigserverconnect(\$servername, \$hmprconfig)">MprConfigServerConnect(\$ServerName, \$hMprConfig)</A></H2>
+<P>The MprConfigServerConnect function connects to the Windows 2000 router to be configured.
+Call this function before making any other calls to the server.
+The handle returned by this function is used in subsequent calls to configure interfaces and transports on the server.</P>
+<P><STRONG>Example</STRONG></P>
+<PRE>
+  use Win32::MprApi;</PRE>
+<PRE>
+  my $ServerName; # if no name is defined, local server is used instead
+  my $hMprConfig; # receives the handle to connected server</PRE>
+<PRE>
+  # Connect to the server router
+  $ret = Win32::MprApi::MprConfigServerConnect(\$ServerName, \$hMprConfig);</PRE>
+<PRE>
+  if($ret == 0)
+  {
+    printf &quot;MprConfigServerConnect() Server connected successfuly, handle is %u\n&quot;, $hMprConfig;</PRE>
+<PRE>
+    # Disconnect from the server router
+    Win32::MprApi::MprConfigServerDisconnect($hMprConfig);
+  }
+  else
+  {
+    printf &quot;MprConfigServerConnect() error %u: %s\n&quot;, $ret, Win32::FormatMessage($ret);
+  }</PRE>
+<P><STRONG>Return Values</STRONG></P>
+<P>If the function succeeds, the return value is 0.</P>
+<P>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Mprapi.h.
+Library: Use Mprapi.dll.</P>
+<P>
+<H2><A NAME="mprconfiggetguidname($hmprconfig, \$friendlyname, \$guidname)">MprConfigGetGuidName($hMprConfig, \$FriendlyName, \$GUIDName)</A></H2>
+<P>The MprConfigGetGuidName function returns the GUID name for an interface that corresponds to the specified friendly name.</P>
+<P><STRONG>Example</STRONG></P>
+<PRE>
+  use Win32::MprApi;</PRE>
+<PRE>
+  my $ServerName; # if no name is defined, local server is used instead
+  my $hMprConfig; # receives the handle to connected server
+  my $FriendlyName = 'Local Area Connection';
+  my $GUIDName; # buffer for the translated GUID Name</PRE>
+<PRE>
+  # Connect to the server router
+  $ret = Win32::MprApi::MprConfigServerConnect(\$ServerName, \$hMprConfig);</PRE>
+<PRE>
+  if($ret == 0)
+  {
+    $ret = Win32::MprApi::MprConfigGetGuidName($hMprConfig, \$FriendlyName, \$GUIDName);</PRE>
+<PRE>
+      if($ret == 0)
+      {
+        printf &quot;The GUID Name for connection %s is: %s\n&quot;, $FriendlyName, $GUIDName;
+      }
+      else
+      {
+        printf &quot;MprConfigGetGuidName() error %u: %s\n&quot;, $ret, Win32::FormatMessage($ret);
+      }</PRE>
+<PRE>
+      # Disconnect from the server router
+      Win32::MprApi::MprConfigServerDisconnect($hMprConfig);
+  }
+  else
+  {
+    printf &quot;MprConfigServerConnect() error %u: %s\n&quot;, $ret, Win32::FormatMessage($ret);
+  }</PRE>
+<P><STRONG>Return Values</STRONG></P>
+<P>If the function succeeds, the return value is 0.</P>
+<P>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Mprapi.h.
+Library: Use Mprapi.dll.</P>
+<P>
+<H2><A NAME="mprconfiggetfriendlyname($hmprconfig, \$guidname, \$friendlyname)">MprConfigGetFriendlyName($hMprConfig, \$GUIDName, \$FriendlyName)</A></H2>
+<P>The MprConfigGetFriendlyName function returns the Friendly Name for an interface that corresponds to the specified GUID name.</P>
+<P><STRONG>Example</STRONG></P>
+<PRE>
+  use Win32::MprApi;</PRE>
+<PRE>
+  my $ServerName; # if no name is defined, local server is used instead
+  my $hMprConfig; # receives the handle to connected server
+  my $GUIDName = '{88CE272F-847A-40CF-BFBA-001D9AD97450}';
+  my $FriendlyName; # buffer for the translated Friendly Name</PRE>
+<PRE>
+  # Connect to the server router
+  $ret = Win32::MprApi::MprConfigServerConnect(\$ServerName, \$hMprConfig);</PRE>
+<PRE>
+  if($ret == 0)
+  {
+    $ret = Win32::MprApi::MprConfigGetFriendlyName($hMprConfig, \$GUIDName, \$FriendlyName);</PRE>
+<PRE>
+      if($ret == 0)
+      {
+        printf &quot;The Friendly Name for GUID %s is: %s\n&quot;, $GUIDName, $FriendlyName;
+      }
+      else
+      {
+        printf &quot;MprConfigGetFriendlyName() error %u: %s\n&quot;, $ret, Win32::FormatMessage($ret);
+      }</PRE>
+<PRE>
+      # Disconnect from the server router
+      Win32::MprApi::MprConfigServerDisconnect($hMprConfig);
+  }
+  else
+  {
+    printf &quot;MprConfigServerConnect() error %u: %s\n&quot;, $ret, Win32::FormatMessage($ret);
+  }</PRE>
+<P><STRONG>Return Values</STRONG></P>
+<P>If the function succeeds, the return value is 0.</P>
+<P>If the function fails, the error code can be decoded with Win32::FormatMessage($ret).</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Mprapi.h.
+Library: Use Mprapi.dll.</P>
+<P>
+<H2><A NAME="mprconfigserverdisconnect( $hmprconfig )">MprConfigServerDisconnect( $hMprConfig )</A></H2>
+<P>The MprConfigServerDisconnect function disconnects a connection made by a previous call to MprConfigServerConnect.</P>
+<P><STRONG>Example</STRONG></P>
+<P><EM>See previous examples</EM></P>
+<P><STRONG>Return Values</STRONG></P>
+<P>This function has no return values.</P>
+<P><STRONG>Requirements</STRONG></P>
+<P>Server: Included in Windows .NET Server 2003, Windows 2000 Server.
+Header: Declared in Mprapi.h.
+Library: Use Mprapi.dll.</P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P>Thanks to Aldo Calpini for the powerful Win32::API module that makes this thing work.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Luigino Masarati, &lt;<A HREF="mailto:lmasarati@hotmail.com">lmasarati@hotmail.com</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Win32::MprApi - Perl wrapper for Win32 Router Configuration functions.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

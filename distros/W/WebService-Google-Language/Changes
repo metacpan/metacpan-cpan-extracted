@@ -1,0 +1,83 @@
+Revision history for Perl extension WebService-Google-Language
+
+0.14    Nov 20, 2011
+
+        - Add deprecation warnings
+        - Disable live tests by default
+
+0.13    Dec 31, 2010
+
+        - FIX: URL maximum length for GET is 2073 (+1 octet)
+        - Accessor for referer string
+        - Full test coverage for everything but Perl 5.6
+        - Explicitly require Test::More 0.62 in tests
+        - Switch GitHub URL to https
+
+0.12    Oct 10, 2010
+
+        - Modernized distribution (no functional changes)
+
+0.10    Dec 14, 2009
+
+        - FIX to test suite: 'is_reliable' test started failing due to
+          a change in Google's response. Longer string for language
+          detection provided. To prevent future failures, also changed
+          the test from relying on truth to just checking definedness.
+          (RT #52676, reported by Alan Weir)
+
+0.09    Feb 07, 2009
+
+        - FIX: changed HTTP request method from GET to POST
+          (when necessary and if possible) because of an existing
+          server-side limitation of the length of the URL
+          (reported by Ilya Rubtsov)
+        - URI::Escape not required directly anymore
+
+0.08    Feb 05, 2009
+
+        - FIX: increased limitation of text length from 500 to 5000
+          according to the change of Google's Terms of Use
+          (reported by Ilya Rubtsov)
+
+0.07    Nov 30, 2008
+
+        - FIX: if subclassed, constructor extracts version number
+          for default user agent identification from subclass
+        - Minor code cleanup
+        - Added warranty disclaimer to documentation
+
+0.06    Nov 29, 2008
+
+        - Improved test suite
+        - Added dependency on Perl 5.6
+
+0.05    Nov 11, 2008
+
+        - FIX: declaring multiple constants at once in 0.04
+          broke compatibility with Perl 5.6 standard distribution
+          (constant.pm < 1.03)
+        - FIX: Latin-1 to UTF-8 bytes conversion was broken on Perl 5.6
+
+0.04    Nov 10, 2008
+
+        - Use accessors in constructor and methods
+        - Minor code cleanup
+        - Documentation updated about the setting functionality
+          of the accessors and the formerly unmentioned ping method
+        - Test documentation with Test::Pod and Test::Pod::Coverage
+
+0.03    Sep 30, 2008
+
+        - Accessors can be used as chained mutators
+        - Set HTTP referer header per request
+
+0.02    May 19, 2008
+
+        - FIX: respect proxy environment variables (reported by IZUT)
+
+        - Made accessors for embedded JSON and LWP::UserAgent instances
+        - JSON and LWP::UserAgent instances can be passed to constructor
+
+0.01    May 16, 2008
+
+        - Initial release

@@ -1,0 +1,28 @@
+---
+abstract: 'A Wiki::Toolkit plugin to output RecentChanges JSON.'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wiki-Toolkit-Plugin-JSON
+provides:
+  Wiki::Toolkit::Plugin::JSON:
+    file: lib/Wiki/Toolkit/Plugin/JSON.pm
+    version: 0.05
+recommends:
+  Test::JSON: 0
+  Wiki::Toolkit: 0
+requires:
+  JSON: 0
+  Time::Piece: 0
+  URI::Escape: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

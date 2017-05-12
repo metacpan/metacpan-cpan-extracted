@@ -1,0 +1,109 @@
+
+================================================================================
+
+wordpress-upload-post - upoad post to wordpress
+
+DESCRIPTION
+    If you provide a date, we check for correctness before attempt. If you
+    specify a category or more, we check that they do exist.
+
+  Motivation
+    I've workded on other cli scripts to wordpress- but I found them too
+    complex. This simply allows you to post content to a category in your
+    blog, via the comand line.
+
+USAGE
+    wordpress-upload-post [OPTIONS].. [PATH|DESCRIPTION]
+
+       -d path     simple text/html FILE containing content 
+       -h          help
+       -t string   title *
+       -D string   date
+       -c number   category name or id, can be comma separated 
+       -u string   username *
+       -p string   password *
+       -x url      proxy, xmlrpc address *
+       -n          don't post, just test
+       -k          clean description text
+
+    * Required.
+
+  USAGE EXAMPLES
+    Load the login info from a file: wordpress-upload-post -d ./content.txt
+    -t 'Red House Found' -C ./conf.txt
+
+    Login conf example file:
+
+       -u usenamejim
+       -p passew2t42t
+       -x http://jimmysite.net/xmlrpc.php
+
+    Set a date for the post, also upload to category 'yummy' and 'broke',
+    you can also specify an id for a category instead, we check that the
+    category exists.
+
+       wordpress-upload-post -D 'June 2001' -t 'simple title' -c 'yummy,broke,35' -u leo -p 2g32 -x http://site.com/xmlrpc.php
+
+    You may specify the file with content for the description (the body of
+    the post), via -d argument or via an argument. Not both, and not more
+    than one.
+
+   clean description text flag
+    If you want to clean the description text, use the -k flag. This makes
+    it so
+
+       This is another kind of 
+       break that happens here.
+   
+       As well as this 
+        one.
+
+    Gets turned to
+
+       This is another kind of break that happens here.
+   
+       As well as this 
+        one.
+
+    This is useful if you have as decription input file, properly formatted
+    80 char wide data. This prevents wordpress from inserting breaks where
+    we don't want them. For the web, it's best to have only paragraphs, the
+    user can set the width and.. well. You know the argument.
+
+SEE ALSO
+    WordPress::XMLRPC WordPress::CLI - parent package
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    "Artistic License" or the "GNU General Public License".
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the "GNU General Public License" for more details.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Date::Manip: 5.48
+Getopt::Std::Strict: 1.01
+LEOCHARRE::Strings: 1.02
+Test::Simple: 0
+WordPress::XMLRPC: 1.23
+
+
+INSTALL
+
+See INSTALL
+
+

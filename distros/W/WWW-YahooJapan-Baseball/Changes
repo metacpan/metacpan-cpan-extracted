@@ -1,0 +1,18 @@
+Revision history for Perl extension WWW-YahooJapan-Baseball
+
+0.04 2016-02-07T05:26:00Z
+
+    - Add pitching stats
+
+0.03 2015-11-02T08:30:36Z
+
+    - Split game response to game stats and season stats.
+
+0.02 2015-10-24T10:16:37Z
+
+    - Fix the problem that interleague results contains all-star games, etc.
+
+0.01 2015-10-18T05:30:51Z
+
+    - original version
+

@@ -1,0 +1,82 @@
+{
+   "abstract" : "Scintilla source code editing for wxWidgets",
+   "author" : [
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wx-Scintilla",
+   "no_index" : {
+      "directory" : [
+         "tools",
+         "wx-scintilla",
+         "cpp",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::wxWidgets" : "0",
+            "ExtUtils::XSpp" : "0.1602",
+            "Test::More" : "0",
+            "Wx" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Wx::Scintilla" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : "0.39"
+      },
+      "Wx::Scintilla::Constant" : {
+         "file" : "lib/Wx/Scintilla/Constant.pm",
+         "version" : "0.39"
+      },
+      "Wx::Scintilla::TextCtrl" : {
+         "file" : "lib/Wx/Scintilla/TextCtrl.pm",
+         "version" : "0.39"
+      },
+      "Wx::Scintilla::TextEvent" : {
+         "file" : "lib/Wx/Scintilla/TextEvent.pm",
+         "version" : "0.39"
+      },
+      "Wx::ScintillaTextCtrl" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : "0.39"
+      },
+      "Wx::ScintillaTextEvent" : {
+         "file" : "lib/Wx/Scintilla.pm",
+         "version" : "0.39"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://padre.perlide.org/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.perlide.org/padre/trunk/Wx-Scintilla/"
+      }
+   },
+   "version" : "0.39"
+}

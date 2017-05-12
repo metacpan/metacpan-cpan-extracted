@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Web-MicroID.t
+lib/Web/MicroID.pm
+META.yml                                 Module meta-data (added by MakeMaker)

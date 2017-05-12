@@ -1,0 +1,32 @@
+Revision history for WWW-Session
+
+0.01    2011-04-23
+        First version
+0.02	2011-04-23
+		Improved autosave method
+		POD fixes
+0.03	2011-04-24
+		Fixed test to properly skip Memcache tests unless Cache::Memcached is installed
+		POD fixes
+0.04	2011-04-26
+		Fixed code to work with perl < 5.10 (removed smart operator)
+		POD improvements and fixes
+0.05	2011-04-27
+		Better POD and error messages
+0.06	2011-05-03
+		Fixed bug in TIEHASH interface
+		Fixed POD for storage engines
+0.07	2011-05-04
+		Fixed bug in import method for field settings
+0.08	2013-04-24
+		Fixed bug in MySQL backend
+		Added description for all modules
+0.09	2013-05-10
+		Delete correctly registers a change so autosave can do it's job
+0.10	2013-07-18
+		Fixed Cache::Memcached dependency causing tests to fail on certain environments
+0.11	2014-12-9
+    Implemented triggers on set/delete value
+    Fixed problem with MySQL backend that caused expired session to be kept forever
+0.12	2014-12-9
+    Fixed test for MySQL storage

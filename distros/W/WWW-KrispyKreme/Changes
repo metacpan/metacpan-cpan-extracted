@@ -1,0 +1,10 @@
+Revision history for WWW-KrispyKreme
+
+0.02  2014-02-24 09:36:21 PST
+        - require Test::Pod for testing
+        - update basic.t test
+        - update module description
+        - update dependency versions with Dist::Milla
+
+0.01  2013-05-07 16:09:55 PDT
+        - Initial release

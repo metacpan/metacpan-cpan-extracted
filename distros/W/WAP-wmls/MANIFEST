@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+test.pl
+bin/wmlsc
+bin/wmlsd
+lib/WAP/wmls.pm
+lib/WAP/wmls/parser.yp
+lib/WAP/wmls/parser.pm
+lib/WAP/wmls/lexer.pm
+lib/WAP/wmls/node.pm
+lib/WAP/wmls/optim.pm
+lib/WAP/wmls/gen.pm
+lib/WAP/wmls/wmlslibs.cfg
+lib/WAP/wmls/Makefile.yapp
+README
+META.yml                                 Module meta-data (added by MakeMaker)

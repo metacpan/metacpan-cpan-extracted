@@ -1,0 +1,9 @@
+CHANGES
+Gazetteer.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+t/pod.t
+t/pod_coverage.t
+t/simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

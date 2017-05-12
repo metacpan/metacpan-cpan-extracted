@@ -1,0 +1,30 @@
+Win32/MIDI version 0.01
+=======================
+
+To install this package requires VC++ and nmake.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake install
+
+DEPENDENCIES
+
+This module requires you to have Windows MultiMedia installed as well as
+the module Time::HiRes.  You would want Win32::Sound and perhaps MIDI-Perl as well.
+
+DOWNLOADING
+
+http://www.digitalkoma.com/church/projects/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 C. Church <dolljunkie@digitalkoma.com>
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

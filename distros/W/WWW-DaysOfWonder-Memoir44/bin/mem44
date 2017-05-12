@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+#
+# This file is part of WWW-DaysOfWonder-Memoir44
+#
+# This software is copyright (c) 2009 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use 5.010;
+use strict;
+use warnings;
+
+package mem44;
+# ABSTRACT: download & manage memoir44 scenarios from official website
+$mem44::VERSION = '3.000';
+# terse error messages
+$ENV{MOOSE_ERROR_STYLE} = "croak";
+
+use FindBin               qw{ $Bin };
+use File::Spec::Functions qw{ catdir updir };
+
+use lib catdir( $Bin, updir(), 'lib' ); # for dev purposes
+
+use WWW::DaysOfWonder::Memoir44::App;
+
+$|++; # disabling buffered output
+WWW::DaysOfWonder::Memoir44::App->run;
+
+exit;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mem44 - download & manage memoir44 scenarios from official website
+
+=head1 VERSION
+
+version 3.000
+
+=head1 SYNOPSIS
+
+    mem44 update
+    mem44 list
+
+    # for help purposes
+    mem44 commands
+    mem44 help
+    mem44 help subcommand
+
+=head1 DESCRIPTION
+
+This script is the main entry point to the Perl module
+L<WWW::DaysOfWonder::Memoir44>. It is providing various subcommands -
+which list is available with C<mem44 commands>. Each of the commands
+provides some help when running C<mem44 help subcommand>.
+
+As a general introduction, here's the way to use this program:
+
+=over 4
+
+=item * mem44 update
+
+This will create (if needed) and populate an internal database with the
+list & characteristics of all scenarios available online.
+
+=back
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

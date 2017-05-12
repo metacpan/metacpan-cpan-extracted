@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution WebService-PlayaEvents,
+version 0.1:
+
+  WebService::PlayaEvents - an interface to the burning man PlayaEvents API using Web::API
+
+This software is Copyright (c) 2013 by Tobias Kirschstein.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+

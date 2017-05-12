@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WebService/Booklog.pm
+t/01-get_minishelf.t
+t/02-get_review.t
+t/03-get_shelf.t
+t/author-critic.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

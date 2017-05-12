@@ -1,0 +1,7 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Win32-INET
+version:      0.03
+author: LiloHuang
+installdirs:  site
+requires:
+distribution_type: module

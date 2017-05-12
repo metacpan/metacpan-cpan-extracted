@@ -1,0 +1,7 @@
+ChangeLog
+Locale.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+t/00winlocale.t

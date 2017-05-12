@@ -1,0 +1,21 @@
+Revision history for WebService-Shutterstock
+
+0.006     2013-07-11 12:52:23 CST6CDT
+  - don't override the "new" constructor that's provided by Moo (use BUILD instead) courtesy of arodland
+
+0.005     2013-05-13 09:49:50 CST6CDT
+	- support for licensing/downloading videos
+
+0.004     2013-01-10 20:29:56 CST6CDT
+	- subscriptions now have a price-per-download (if they are for a set price)
+	- support for searching and looking up videos from the Shutterstock footage site
+
+0.003     2012-12-20 17:45:50 CST6CDT
+	- added support for custom metadata fields (if configured)
+
+0.002     2012-12-07 16:19:11 CST6CDT
+	- added example of accessing the download history
+	- docs for download history parameters
+
+0.001     2012-12-04 16:15:42 CST6CDT
+	- Initial release

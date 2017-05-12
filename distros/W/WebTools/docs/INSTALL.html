@@ -1,0 +1,408 @@
+<HTML>
+<title>INSTALL</title>
+<body bgcolor="#FFFFFF" text="#333333" link="#000066" vlink="#660000" alink="#FF0033" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5">
+<table width="100%" BORDER="0" BACKGROUND="images/bgimage.jpg">
+  <tr>
+    <td> 
+      <div align="center"> 
+        <p><b><font face="Times New Roman, Times, serif" size="+3">INSTALL</font></b></p>
+      </div>
+      <p><i><b><font size="4">TERMS AND PRIVACY:</font></b></i></p>
+      <p><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">WebTools</font></b></p>
+      <p><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b>Copyright 
+        (c) 2001, Julian Lishev, Sofia 2002. All rights reserved.<br>
+        This code is free software; you can use it, redistribute it and/or modify 
+        it, but WITHOUT ANY WARRANTY, under the same terms as Perl itself. </b></font></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> Please 
+        keep structure of package and don't modify file names because you may 
+        have problems with next version of this package! Also you can maintain 
+        follow rules:<br>
+        <i><U>You can't add additional variables into 'config.pl' file</U></i>: 
+        Please create your own config file for your private needs. (You can place 
+        your own config files into 'conf' directory)<br>
+        </font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><i><b><U>You 
+        can't add functions into package libs and modules</U></b></i></font><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">: 
+        Please create your own! (You can place your own libs and modules into 
+        'libs/additionals' and 'modules/additionals' respectively)</font></b></p>
+      <p>&nbsp;</p>
+      <p><b><font color="#FF0000">READ THIS! IT IS EXTREAMLY IMPORTANT:</font></b></p>
+      <p><font size="3" face="Verdana, Arial, Helvetica, sans-serif"><b><font color="#000000">&nbsp;&nbsp;Do 
+        NOT discard this document! You must read all this INSTALL.HTML completely. 
+        It exaplain all problems generally in Web/CGI programming and particular 
+        in WebTools installation. This file relate not only with installation 
+        tips but with common security problems and holes! Don't let yourself be 
+        misled with simple &quot;make&quot; installation how it described below, 
+        but take care about directories, files, permissions, apache's configuration 
+        and OS specific.<br>
+        &nbsp;&nbsp;<font color="#FF0000">Note:</font> You can install this package 
+        ONLY one time and after that you can run different scripts via webtools, 
+        so it is extreamly important to install package properly (now I can install 
+        package in few minutes, but you should read all information in this document 
+        and spend time in installation!)</font></b></font></p>
+      <p><font size="4"><b><i>REQUIREMENTS:</i></b></font></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Perl (Perl 
+        5.005_03 or later should work),<br>
+        Unix/Linux or Windows 9x/NT/XP<br>
+        <br>
+        Recomended:<br>
+        Perl 5.6,<br>
+        Unix/Linux OS,<br>
+        MySQL server<br>
+        <br>
+        Prerequirements:<br>
+        Only </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/TIMB/DBI-1.21.tar.gz">DBI</a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+        (for SQL access, respectively for Session/Users support)<br>
+        <br>
+        If you want to use MySQL you also need: </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/JWIED/Msql-Mysql-modules-1.2219.tar.gz">MySQL</a> 
+        </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2">module</font><font color="#000000"> 
+        <br>
+        </font><font size="2" face="Verdana, Arial, Helvetica, sans-serif">For 
+        MS-Access you need </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/J/JU/JURL/DBD-ODBC-0.38.tar.gz">DBD-ODBC</a></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;<br>
+        <br>
+        If you haven't SQL server you can use our build in FLAT DB (based on DBD::Sprite)</font></b></p>
+      <p></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+        </font></b></p>
+      <p><b><font size="2"><i><font size="4">INSTALL NOTES</font></i><font size="4">:</font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">First 
+        of all you must have webtools package. It must be packed into one tar.gz 
+        file.<br>
+        Please copy this .gz file into some directory and run follow commands:</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">tar -zxvf 
+        WebTools-1.27.tar.gz<br>
+        cd WebTools-1.27</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">perl Makefile.PL</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">make<br>
+        make install<br>
+        make permissions<br>
+        make clean</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">If you 
+        are under Win, you must use 'nmake'. In this case please change 'make' 
+        with 'nmake'<br>
+        'nmake' you can download from ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe 
+        (about 50kb). You don't need VC++ to run nmake!<br>
+        <br>
+        When you run command: <font color="#000066">perl Makefile.pl</font>, you 
+        will be asked to specify full path to your future webtools directory. 
+        This directory must be into your cgi-bin directory! <br>
+        On my private server it is:<br>
+        </font></b><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+        <font color="#000099">/var/www/htdocs/cgi-bin/webtools</font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">but on 
+        my Win system it is:</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000099">c:/Apache/cgi-bin/webtools</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">(Please 
+        realize that you need HTTP access to your <font color="#000099">process.cgi</font> 
+        script!)<br>
+        If you don't know where is your cgi-bin directory, you still can install 
+        package...just choose another directory! (after installation you must 
+        move your installed package to your cgi-bin directory and if needed, change 
+        owner of installed webtools and its permissions mode).</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">After 
+        successful 'make' you must check whether evrything is OK!<br>
+        Go to your webtools directory and check file mode of process.cgi it must 
+        be: 0755 <br>
+        Also it must be owned by your user (you don't need root access to install 
+        this package!)</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><i>NOTE</i>: 
+        You may have big problems depending of your OS and security settings! 
+        To void this problem you must be very attentive:</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> - You 
+        have only one real script: process.cgi, so it must be able to read and 
+        write your files! So you must chmod to 0755. If Apache server don't change 
+        user of script to your user, YOU must insure that process.cgi never will 
+        try to read/write on directories where it has not access!<br>
+        To insure this you must know very well structure of Webtools module!</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#FF0000">webtools&nbsp; 
+        </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> ----- 
+        <font color="#000099">conf</font><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#FF0000">db</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#000099">drivers</font><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#000099">htmls</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#000099">jhtmls</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#000099">libs</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#FF0000">logs</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#FF0000">mail</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---- 
+        <font color="#000099"> modules</font> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 
+        <br>
+        <font color="#FF0000">/tmp</font> OR&nbsp;&nbsp;+---- <font color="#FF0000">tmp</font></font></b><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+        <br>
+        For <font color="#000099">'conf','drivers','htmls','jhtmls','libs','modules'</font> 
+        directories you need only '<font color="#000099">read</font>' access.<br>
+        For '<font color="#FF0000">db</font>' directory you need '<font color="#000099">read</font>' 
+        access (and '<font color="#FF0000">write</font>' if you use DB FLAT - 
+        default)<br>
+        For <font color="#FF0000">'logs','mail'</font> you need '<font color="#000099">read</font>' 
+        and '<font color="#000099">write</font>' access (default these directories 
+        are not used)<br>
+        You need also full access to '<font color="#FF0000">tmp</font>' directory 
+        (your system directory or your own)</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Now let 
+        see some examples:<br>
+        ------------------------------------------------------------------------------------------------- 
+        <br>
+        <font color="#FF0000">CASE 1:</font>&nbsp; You are some good user(july) 
+        on some good free host(newald.proscriptum.com) :-)))<br>
+        Let 'july' user has home directory: &nbsp;<font color="#000099">/home/july</font> 
+        (we use virtual host: july.newald.proscriptum.com)<br>
+        His full cgi-bin directory is: <font color="#000099">/home/july/public_html/cgi-bin</font><br>
+        So &nbsp;his webtools directory can be: <font color="#000099">/home/july/public_html/cgi-bin/webtools<br>
+        <font color="#000000">Now we can upload WebTools-1.27.tar.gz to our home 
+        directory and after that to install script.<br>
+        After installation our process.cgi has permission mode set to 0755, directories 
+        have permission modes: 0755 and any other files: 0444<br>
+        Features: <br>
+        - Our host is virtual, so Apache change user to 'july' when we start process.cgi!<br>
+        In other words we are ready to configure package whitout any hidden traps!<br>
+        Evrything is ok, so let run script: perl -c process.cgi<br>
+        <br>
+        -------------------------------------------------------------------------------------------------<br>
+        <font color="#FF0000">CASE 2:</font>&nbsp;&nbsp;You are some user (and 
+        you has not virtual host) under Open BSD OS. <br>
+        User: <font color="#000099">snm</font><br>
+        Server: <font color="#000099">www.jozefina.bg</font><br>
+        User home directory: <font color="#000099">/home/snm</font><br>
+        His full cgi-bin directory: <font color="#000099">/home/snm/http/cgi-bin</font><br>
+        So his webtools directory can be: <font color="#000099">/home/snm/http/cgi-bin/webtools</font> 
+        , <br>
+        please install package into this directory!<br>
+        Now let suppose that your scripts running with Apache's user (i.e. Apache 
+        can't write into your directories when they has 755 permissions!). That 
+        can be a problem, we realy need to write into <font color="#000099">db</font>, 
+        <font color="#000099">logs</font>, <font color="#000099">mail </font>and 
+        <font color="#000099">tmp</font> directories, so we must chmod these directories 
+        to <font color="#FF0000">0777</font> (<font color="#FF6600">BUT THIS IS 
+        UNSECURE</font>). To decide problem we must create these directories in 
+        our home directory, for example:<br>
+        <font color="#000099">/home/snm/webtools/db</font><br>
+        <font color="#000099">/home/snm/webtools/logs</font><br>
+        <font color="#000099">/home/snm/webtools/mail</font><br>
+        <font color="#000099">/home/snm/webtools/tmp</font><br>
+        then we <font color="#339900">can chmod to 0777</font> these directories! 
+        (other user can't read/write '<font color="#000099">snm</font>' directory, 
+        so they can't access and these directories too :))<br>
+        After this you MUST move files from original(installed) directories to 
+        directories we've just created (preserve attributes/permissions when files 
+        are moved). Ok, is evrything done? Actualy not at all, you also need to 
+        edit &quot;config.pl&quot;. Please run 'pico' or some other editor and 
+        change path to new location of <font color="#000066">db</font>, <font color="#000066">logs</font>, 
+        <font color="#000099">mail</font> and <font color="#000099">tmp</font> 
+        directories! </font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000">(or 
+        use install.cgi to modify config.pl file!)</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><br>
+        <br>
+        --------------------------------------------------------------------------------------------------<br>
+        <font color="#FF0000">CASE 3:</font> &nbsp;You have<font color="#FF0000"> 
+        root</font> access! Well is <font color="#FF0000">not a good idea</font> 
+        to install webtools <font color="#FF0000">with root access</font>! You 
+        can <font color="#006600">login with some other user</font> and install 
+        package in directory you want and <font color="#006600">chown/chmod</font> 
+        if need (using root). With root access you can install package on way 
+        you want and can resolve problems very fast (if you want you can run your 
+        scripts with '<font color="#006600">www</font>' user and so on...). You 
+        can create directories (<font color="#000099">db,logs,mail, tmp</font> 
+        ...) into <font color="#006600">some private directory</font> (where nobady 
+        except <font color="#006600">Apache can read/<font color="#FF0000">write</font></font>)...<br>
+        <font color="#FF6600">NOTE:</font> Please be very careful when install 
+        any scripts/modules with root access. You bring responsibilty for your 
+        actions!<br>
+        </font></font></font></b><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000">--------------------------------------------------------------------------------------------------</font></font></font></b></p>
+      <p>&nbsp;</p>
+      <p><b><font size="2"><font color="#000099"><font color="#000000"><i><font size="4">SECURITY 
+        SETTINGS:</font></i></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><br>
+        </font></font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000">Before 
+        you can go life in web you have to check security settings of your web 
+        server!<br>
+        Here we suppose that you haven't root access, so you can't make any changes 
+        to server if any security fixes are required.<br>
+        <font color="#FF00FF"><br>
+        - First of all you have to check ability of externel user to access your 
+        directories:</font><br>
+        (If you are owner of web server and you are the only one user on it e.i. 
+        no body else can access remotely) you can close your eyes and leave this 
+        check unperformed. Other else you have to check whether other user can 
+        &quot;cd&quot; your directory. If that is possible you need to fix that 
+        (contact your system administrator and ask him to protect your directory 
+        of unauthorized access!)<br>
+        <br>
+        <font color="#FF00FF">- Secondry you need to check ability of web users 
+        to access and/or read your datas and/or scripts:</font><br>
+        Immediatly go to your &quot;webtools/htmls&quot; directory and &quot;vdir&quot;(or 
+        &quot;ls -l&quot;) this direcory. It should contain file &quot;env.html&quot; 
+        and it shoultd be with permission: <font color="#009900">644</font> (or 
+        <font color="#009900">444</font>) depending of your OS defaults. <font color="#009900"><U>These 
+        &quot;htmls&quot; actualy are embedded Perl files</U></font>, <font color="#BF3030"><U><font color="#990000">so 
+        it is extreamly important these files (htmls) to be unaccessable and unreadable 
+        from Web interface i.e. line like this: <font color="#0000FF">http://your_server/cgi-bin/webtools/htmls/env.html</font> 
+        should return NOT html page, it MUST return &quot;<font color="#FF0000">Internal 
+        Server Error</font>&quot; because Apache must interpret these files as 
+        scripts!!!</font></U></font> If that is not true, you have to set other 
+        extension for all files in webtools/htmls (<font color="#009900">.whtml</font> 
+        , <font color="#009900">.cgihtml</font> , <font color="#009900">.htm</font> 
+        or <font color="#009900">.cgi </font>are supported) That mean, that you 
+        need to correct all files that access these &quot;.html&quot; files (and 
+        given examples too). Other solution (when you have access to server) is 
+        to forbid &quot;.html&quot; to be read in cgi-bin directory (you need 
+        to edit httpd.conf -&gt; please read Apache's documentation to learn how 
+        to do that).<br>
+        NOTE: You can configure config.pl so extensions .whtml, .cgihtml and so 
+        on to be treated as .html!!!<br>
+        <font color="#FF00FF"><br>
+        - Finnaly solution (and in many cases the best): </font><br>
+        You can install webtools into ../cgi-bin/webtools and after that you can 
+        move all directories and files in your &quot;secure&quot; home directory 
+        where no body except you can read/write these files! Ofcource you must 
+        leave at least &quot;<font color="#FF0000">process.cgi</font>&quot; in 
+        your web based cgi-bin/webtools directory and &quot;<font color="#FF0000">conf</font>&quot; 
+        directory too, after these operations you <font color="#FF0000"><U>must 
+        edit your config.pl file and mark changes of new webtools directory structure</U></font> 
+        (you should edit section &quot;<font color="#0000CC">[PATHS]</font>&quot; 
+        in config.pl). That is all but don't forgot to set variable <font color="#0000CC">$check_module_functions</font> 
+        = &quot;<font color="#006600">on</font>&quot; (that is internal build 
+        way to check your configuration!)<br>
+        NOTE: Please preserve permissions of directories and files in.<br>
+        NOTE: Apache's should handle (in <font color="#FF0000">httpd.conf</font>) 
+        <font color="#FF0000">.cgi</font> and <font color="#FF0000">.pl</font> 
+        file with AddHandler!<br>
+        Example: <font color="#0000CC">AddHandler cgi-script .cgi .pl</font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><br>
+        </font></font></font><font size="2"><font color="#000099"><font color="#000000"><i><font size="4">AFTER 
+        INSTALLATION:</font></i></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><i><br>
+        <br>
+        </i>- Before you can be able to run any srcipt (and examples) you must 
+        configure your 'config.pl' file!<br>
+        For example of configuration please read HELP.doc (found into 'docs' directory)<br>
+        <br>
+        - If evrything is configured properly, then go into telnet(console) and 
+        <font color="#006600">cd</font> to your <font color="#006600">webtools</font> 
+        directory.<br>
+        </font></font></font></b><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000">Execute 
+        follow line: perl -c process.cgi<br>
+        Evrything must be &quot;OK&quot; before you can go ahead. Now open one 
+        browser's window and type follow url: <font color="#000099">www.your_host.com/~your_user/cgi-bin/webtools/process.cgi</font><br>
+        where:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;~<font color="#000099">your_user</font> is your 
+        user name (remove it if you have your own server/virtual host)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<font color="#000099">cgi-bin/webtools</font> 
+        is your http based webtools directory and<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<font color="#000099">process.cgi</font> is your 
+        base (only one) script!<br>
+        <br>
+        Into browser's window you will see your current configuration. Please 
+        check it for problems/errors.<br>
+        Clear them all and then set variable $check_module_functions to '<font color="#009900">off</font>'<br>
+        Now you are ready to lear webtools and run all examples into docs/examples 
+        directory!<br>
+        <br>
+        <br>
+        </font></font></font><font size="2"><font color="#000099"><font color="#000000"><i><font size="4">INSTALL.CGI 
+        (WEB BASED CONFIGURATOR)</font></i></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><i></i></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"><br>
+        <br>
+        At versioin 1.16 of WebTools, proscriptum.com released new feature for 
+        easy making of WebTools configuration. This new feature allow remote configure 
+        of config.pl file via Web interface i.e. you can make different adjustment 
+        to almost every aspect of WebTools configuration. So at this point I will 
+        recommend that script for configuration purposes instead of manual edit 
+        of config.pl. Also with &quot;install.cgi&quot; you have unique chance 
+        to create structure of MySQL and/or Flat DB without any additional work. 
+        (for MS Access you still have to do manual work)!<br>
+        <br>
+        Get started:<br>
+        </font></font></font></b><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000">First 
+        of all you need to insure that install.cgi has proper permissions mode 
+        (755 i.e. must be executable and install.cgi must be able to write/read 
+        ./conf/config.pl and ./db/ directory)!<br>
+        <br>
+        I have to explain: install.cgi need to write/rewrite config.pl file so 
+        please set needed permissions for conf directory and for config.pl file! 
+        Also install.cgi need to create files into database directory (./db/)<br>
+        <br>
+        At last install.cgi must have correct shebang (default it is: /usr/bin/perl) 
+        This rule is important for install.cgi on the same way as it is important 
+        for process.cgi So it is not a bad idea if you change shebang on these 
+        two scripts at once (of course do it in case of wrong Perl location!)<br>
+        <br>
+        For advanced web programmers I will mention that install.cgi script is 
+        not accessable on default (security restriction). So if you want to use 
+        it, then you have to edit install.cgi (see first paragraph of script):<br>
+        &nbsp;- Set $install_script_available to '1' to enable script.<br>
+        &nbsp;- Set proper Admin user and respective password for script access!<br>
+        <br>
+        When you have done with WebTools configuration set again variable $install_script_available 
+        to '0'! That will keep &quot;hackers&quot; away from your server! :-)<br>
+        <br>
+        Work with install.cgi is absolutely clear. Just run script on that way 
+        and enjoy :-)</font></font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000">http://www.your</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000">server.com/cgi-bin/webtools/install.cgi<br>
+        <br>
+        </font></font></font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#FF6633">#-----------------------------------------------------------------------------------------<br>
+        # Step by Step Installation example:<br>
+        #-----------------------------------------------------------------------------------------</font></b></p>
+      <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000099">tar 
+        -zxvf WebTools-1.27.tar.gz<br>
+        cd WebTools-1.27<br>
+        perl Makefile.pl</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000"><br>
+        <font color="#006600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; 
+        /usr/local/apache/cgi-bin/webtools/</font><br>
+        <font color="#000099">make<br>
+        make install<br>
+        make permissions<br>
+        make clean<br>
+        cd ..<br>
+        rm -rf WebTools-1.27<br>
+        cd /usr/local/apache/cgi-bin/webtools<br>
+        ls -l -a<br>
+        perl -c process.cgi &nbsp;&nbsp;&nbsp;&nbsp;# Must be &quot;ok&quot;<br>
+        lynx www.your_server.com/cgi-bin/webtools/process.cgi</font><br>
+        <font color="#FF6633"># Should see webtools in check mode...see your current 
+        configuration and edit where is needful!</font><br>
+        <font color="#000099">pico conf/config.pl</font> (or use install.cgi to 
+        modify config.pl file!)</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000"><br>
+        <font color="#006600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit where 
+        is needful...</font><br>
+        <font color="#000099">lynx www.your_server.com/cgi-bin/webtools/process.cgi 
+        &nbsp;&nbsp;&nbsp;&nbsp;#Check again ...ok?<br>
+        pico conf/config.pl </font>(or use install.cgi to modify config.pl file!)</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#000099"><font color="#000000"></font></font></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#000000"><br>
+        <font color="#006600">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$check_module_functions = 'off'; 
+        &nbsp;&nbsp;&nbsp;&nbsp;# Now evrything is ok, so you could set &quot;off&quot; 
+        value!</font><br>
+        <font color="#000099">lynx www.your_server.com/cgi-bin/webtools/process.cgi?file=env.html</font><br>
+        <br>
+        <font color="#FF6633"># If you want to configure properly your DataBase 
+        driver with webtools please go to docs/<br>
+        # directory to find out how!<br>
+        <br>
+        #With line above you call simple script example...<br>
+        #----------------------------------------- END ------------------------------------------- 
+        </font> </font></b></p>
+      <p><b><font color="#000000" size="4">AUTHOR:</font></b><br>
+        <br>
+        <font size="4"><b><FONT COLOR="#000099" SIZE="2" FACE="Verdana, Arial, Helvetica, sans-serif">Julian 
+        Lishev,<br>
+        e-mail: <a href="mailto:%20julian@proscriptum.com">julian@proscriptum.com</a></FONT></b></font></p>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</body></HTML>

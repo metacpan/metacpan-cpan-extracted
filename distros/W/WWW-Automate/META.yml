@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Automate
+version:      0.21
+version_from: lib/WWW/Automate.pm
+installdirs:  site
+requires:
+    Clone:                         0.13
+    HTML::Form:                    0.03
+    HTML::TokeParser:              2.2
+    HTTP::Request:                 1.2
+    LWP::UserAgent:                1.8
+    Test::More:                    0.34
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

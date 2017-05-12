@@ -1,0 +1,22 @@
+Revision history for WWW-Shorten-NotLong
+
+9.992     2016-03-16 19:57:42-04:00 America/New_York
+    - Fixed POD issues
+    - cleaned up build a bit further
+    - fixed contributors
+    - add the deprecated meta info
+    - added a skip clause for author tests
+
+9.991   2016-03-11
+    - Cleaned up a bit, removed from TravisCI (No need to CI test a dead dist)
+    - Standardized documentation a bit. Made sure links were present.
+    - added contributors
+
+9.99    2015-07-19
+    - Marked as dead. Bumped version for release.
+    - Added .travis.yml
+    - Added .gitignore
+
+2.00    2009-11-22
+    - Changed to working URL in the test
+    - Initial version.

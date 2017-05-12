@@ -1,0 +1,10 @@
+MANIFEST
+README
+Changes                 #History of this package
+META.yml                #Module meta-data
+Makefile.PL             #Module build meta-data 
+bin/appCcheck.pl	#cgi script checking XHTML documents against HTML Compatibility Guidelines
+lib/W3C/XHTML/HTMLCompatChecker.pm	#HTML Compatibility Guidelines checker
+t/0-base.t				test module loading
+t/1-applicable.t		test whether the checker knows which documents to parse/ignore
+t/2-checks.t				test some of the basic checks

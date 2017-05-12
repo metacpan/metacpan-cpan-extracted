@@ -1,0 +1,83 @@
+200[
+    [
+        {
+            "end_user_description": null, 
+            "read_only": 1, 
+            "modified_timestamp": 1265983532, 
+            "pub_title": "Preview", 
+            "resource_name": "attribute", 
+            "friendly_id": "7a0670c7e0cb4bc280cc67276fce5754", 
+            "attributes": [], 
+            "created_timestamp": 1263941758, 
+            "pub_description": "Attribute used to associate preview related URLs", 
+            "end_user_title": null, 
+            "id": 13
+        }, 
+        {
+            "end_user_description": null, 
+            "read_only": 1, 
+            "modified_timestamp": 1265983532, 
+            "pub_title": "Full", 
+            "resource_name": "attribute", 
+            "friendly_id": "86836696b39347c789df0ac06966c724", 
+            "attributes": [], 
+            "created_timestamp": 1263941797, 
+            "pub_description": "Attribute used to associate full image URLs for virtual goods", 
+            "end_user_title": null, 
+            "id": 14
+        }, 
+        {
+            "end_user_description": "", 
+            "read_only": 1, 
+            "modified_timestamp": 1292637738, 
+            "pub_title": "Deal", 
+            "resource_name": "attribute", 
+            "friendly_id": "deal", 
+            "attributes": [], 
+            "created_timestamp": 1292637738, 
+            "pub_description": "", 
+            "end_user_title": "Deal", 
+            "id": 13557
+        }, 
+        {
+            "end_user_description": "", 
+            "read_only": 1, 
+            "modified_timestamp": 1292637640, 
+            "pub_title": "Deal Purchase Currency Sink", 
+            "resource_name": "attribute", 
+            "friendly_id": "deal_purchase_currency_sink", 
+            "attributes": [], 
+            "created_timestamp": 1292637640, 
+            "pub_description": "", 
+            "end_user_title": "Deal Purchase Currency Sink", 
+            "id": 13555
+        }, 
+        {
+            "end_user_description": "", 
+            "read_only": 1, 
+            "modified_timestamp": 1292637678, 
+            "pub_title": "Deal Purchase Currency Source", 
+            "resource_name": "attribute", 
+            "friendly_id": "deal_purchase_currency_source", 
+            "attributes": [], 
+            "created_timestamp": 1292637678, 
+            "pub_description": "", 
+            "end_user_title": "Deal Purchase Currency Source", 
+            "id": 13556
+        }, 
+        {
+            "end_user_description": "", 
+            "read_only": 1, 
+            "modified_timestamp": 1292637594, 
+            "pub_title": "Pilot Purchase Currency", 
+            "resource_name": "attribute", 
+            "friendly_id": "pilot_purchase_currency", 
+            "attributes": [], 
+            "created_timestamp": 1292637594, 
+            "pub_description": "", 
+            "end_user_title": "Pilot Purchase Currency", 
+            "id": 13554
+        }
+    ], 
+    {}
+]

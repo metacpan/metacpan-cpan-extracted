@@ -1,0 +1,39 @@
+1.004 - 23 Dec 2009 - Jonathan Yu <jawnsy@cpan.org>
+
+  + "oops" release to fix name of tarball
+
+1.003 - 22 Dec 2009 - Jonathan Yu <jawnsy@cpan.org>
+
+  + Use a simple string version, per David Golden's article:
+    http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+  + No longer use Perl::Critic to test
+  + Remove modules available in core since Perl 5.6 from
+    requires
+  + Changed my mail address to jawnsy@cpan.org
+  + Update POD
+  + Update MANIFEST.SKIP according to new defaults provided by
+    ExtUtils::Manifest
+  + Remove pass-through Build.PL
+
+1.0.2 - 25 Jul 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Added a generic README
+  + No longer generate one from the POD
+  + Added an example lookup script
+  + Now allows an empty first or last name to be passed in
+  + No longer test Perl::Critic during AUTOMATED_TESTING,
+    only RELEASE_TESTING. Thanks to Elliot Shank for the
+    discussion in a private mail.
+  + Updated perlcriticrc
+  + No longer enforce "one dot only" in filenames. This
+    breaks compatibility with OpenVMS.
+  + Updated lUsed clearer license - PD (fallback on MIT,
+    Artistic-2+, GPL-2+)
+
+1.0.1 - 08 May 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Small fix top t/01compile.t
+
+1.0 - 07 May 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Initial release

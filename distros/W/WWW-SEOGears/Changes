@@ -1,0 +1,15 @@
+Revision history for WWW-SEOGears
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    May 8th, 2013
+        Fixed 07-sanitizers.t test
+0.03    May 24th, 2013
+        Added to github
+0.04    August 2nd, 2013
+        Refactored sanitization code.
+        Dropped LWP::UserAgent for HTTP::Tiny.
+        Updated the tests to use ENV variables for brandname and key instead of hardcoding these values.
+        Addressed a bug with the parameter sanitization, all of the params are uri_escaped when stringifying the URI.
+0.05    February 12th, 2014
+        Update the request handler to return the response status line as an error instead of the full content returned.

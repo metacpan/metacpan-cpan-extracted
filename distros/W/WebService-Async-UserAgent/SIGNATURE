@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 25d3a307e9a1982332a7ef7e1fa4918a8a36216b Changes
+SHA1 41d5a6608b8e33ff3c59f5247497061d4e0b13a1 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 d5f80d8c563bcd76db47c9c8fbf777113b448209 MANIFEST
+SHA1 23aafcc170f467e31cff721add6403c4ca1ae11e META.json
+SHA1 d06871049bdf6782173fdf05b7963fa869fdf8c5 META.yml
+SHA1 ae7a93f47447e6665402173549c17401c2b6af1e Makefile.PL
+SHA1 d07ab7c78980b511f8d956dc2257df5b9625fca0 README
+SHA1 1205d71ed2273951faf7003920d8bcd61eafdbb2 cpanfile
+SHA1 18c7395f36307e1f93aa962961a0a89757ba30f4 dist.ini
+SHA1 58c1b3e3471734b9cf0b42af7bf70ae371bebd3c lib/WebService/Async/UserAgent.pm
+SHA1 e6dcd2e0a99fa4a81929a94918e122ef9788f303 lib/WebService/Async/UserAgent/LWP.pm
+SHA1 c044350d05175b1e694fd27bdb96a45456c3b165 lib/WebService/Async/UserAgent/LWP.pod
+SHA1 4a7e24f6eefa713a86a239ca34a0ebc44437dc65 lib/WebService/Async/UserAgent/MojoUA.pm
+SHA1 3ec8a21858ded06ad7c38e4f8c4e26a271de3553 lib/WebService/Async/UserAgent/MojoUA.pod
+SHA1 c3277f27347cc29fd89b14ac7c1f1fa96d9fcbe4 lib/WebService/Async/UserAgent/NaHTTP.pm
+SHA1 ad46e5978c61cc5cd4fc9475bc3a790eb1568ace lib/WebService/Async/UserAgent/NaHTTP.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 97814c7d5a241553bdd464f514dd114713722b99 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 81fd9d25e1b284ced39086774aba7f03f14c3f6d t/lwp.t
+SHA1 8195c857a646caf2c459490b75429e41eb4ee76d t/mojo.t
+SHA1 facb73c46ba27a13a214af5619fa8baf91cb7b5a t/nahttp.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYa5txAAoJEG2WkcbynxAl+xAP+QHM1TuzTwZUemwmCy/SSd4s
+5C4t0abSsp6CF30fZSDNxCceb3v6Sn2jAxE6HcfbwKF84NjdpQm64X7G9+LdXR6c
+kYA2u1gNp4oQFYYHz68MfBCQKeLFF+ISpp9YYQBTQXRkt7kdvNhB1uACVwd1dH56
+yx3UtFN5dj1n6qVIYl2YxbBsgrQMlR22IAce2nQt5vL64oZxdpc8VYy6+OXmCcjd
+K5g3mN1lfwx5CDplIMH1oHdy4SIZTKRtA4Iy80Vrrup7lLvt2DtMuBfwngYL3s4g
+h+WgPgw0//xWBwCCjxR261eLnpmImcxSRpwnW4j8t3Dt8nHPwvH+NUqxkOndpyaT
+IBr1+gHmWVax3hbxmtnp2mM4zoZkrLRQsyscXqNHwNfWSWwOoopYBIwLlDTRlpv9
+G6SJbzDZ2waM1n0A9fawsgyHl4jTjmxbLM1Nr1zE6JG7TCNz9NfX0u/woFy3dgRN
+pSGtjtlqyxadfaJjWWV+kvhCf9rOtJmy7EU2sBZH8FJ/pNobGz7yPAsC979M3ROe
+sF0lQyNxTcbcLY5GRgX4GEMQdRZRGAzoidw0+XOWyALDJLM5M0W/qeCV82myRj+A
+0zO2sSuik0wOr5YnXoCg1GYiJ/CVbBC1qD0gH7HalercJaSPolEnvrkEU6oEYdHc
+qF5/q3Z4dvH4z04taoUQ
+=LHiQ
+-----END PGP SIGNATURE-----

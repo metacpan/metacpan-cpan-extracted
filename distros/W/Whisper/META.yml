@@ -1,0 +1,24 @@
+---
+abstract: 'Handle Whisper fixed-size database files'
+author:
+  - 'Jean Stebens <cpan.helba@recursor.net>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Whisper
+requires:
+  Exporter: 0
+  POSIX: 0
+  base: 0
+  perl: 5.012
+  strict: 0
+  warnings: 0
+version: 1.035

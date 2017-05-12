@@ -1,0 +1,27 @@
+Tue Jan  3 17:00:14 GMT 2006 - v 0.6
+    - How did I not notice that the list is hardcoded to UKR?
+    - Make it work with anonymous lists
+ 
+Thu Dec 16 16:32:31 GMT 2004 - v 0.5
+    - fix TZ problems
+
+Wed Dec 15 14:17:26 GMT 2004 - v 0.4
+    - add some missing prereqs
+
+Mon Oct 25 15:17:34 BST 2004 - v 0.3
+    - Fix the date handling
+    - Add a message-id
+    - Better docs
+    - Better command line options for topica2mail
+    - Periodic relogging in to defeat session timeout
+    - Strip HTML from subjects
+
+Sat Oct 23 12:15:36 BST 2004 - v 0.2
+    - Force URL to be absolute on redirect
+    - Better recovery from error handling
+    - Add first and last options to new
+    - Turn it into an iterator
+
+Thu Oct 21 14:37:17 BST 2004 - v 0.1
+    - Initial release
+

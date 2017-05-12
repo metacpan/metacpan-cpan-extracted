@@ -1,0 +1,99 @@
+WWW::NOS::Open version 0.101
+============================
+
+This is a framework that makes makes data from the Open NOS REST API
+<http://open.nos.nl/> available in Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+WARNING: Running the test using your API key against the live server will
+temporarily hit your rate limit.
+
+In the ./scripts directory are two scripts that can be used to test the
+implementation:
+
+    ./DummyServer.pl
+    NOSOPEN_SERVER=http://localhost:8888 NOSOPEN_API_KEY=TEST ./TestNOSOpen.pl
+
+An HTML page displaying the test data from the dummy server should then be
+available on localhost port 8081.
+
+* DummyServer.pl
+
+Starts a dummy HTTP server that serves canned requests as described in the
+documentation of Open NOS to test the implementation against a non-live server.
+Defaults to port 18081 when no other port is given using the --port option. The
+API key to use with this server is "TEST" and every 100 requests it returns a
+quota exceeded error.
+
+* TestNOSOpen.pl
+
+Connects to the live Open NOS server, or the dummy server set in a
+NOSOPEN_SERVER environment variable, and serves an HTML page on an HTTP server
+listening on port 8081, or a port specified in the --port option. The API key
+to use can be set in the NOSOPEN_API_KEY environment variable.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Exception::Class
+    HTTP::Headers
+    HTTP::Request
+    HTTP::Request::Common
+    HTTP::Status
+    JSON
+    LWP::UserAgent
+    Log::Log4perl
+    Moose
+    Moose::Role
+    Moose::Util::TypeConstraints
+    MooseX::Types
+    MooseX::AttributeHelpers
+    Readonly
+    Regexp::Common
+    URI
+    URI::Escape
+    XML::Simple
+    namespace::autoclean
+    overload
+    Test::More
+    Test::NoWarnings
+
+COPYRIGHT AND LICENCE
+
+Copyright 2012 Roland van Ipenburg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

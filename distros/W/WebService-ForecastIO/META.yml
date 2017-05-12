@@ -1,0 +1,30 @@
+---
+abstract: 'Perl client for api.forecast.io'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Socket: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-ForecastIO
+requires:
+  HTTP::Tiny: '0'
+  JSON: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Time::Piece: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-ForecastIO
+  homepage: https://metacpan.org/dist/WebService-ForecastIO
+  repository: git://github.com/mrallen1/WebService-ForecastIO.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

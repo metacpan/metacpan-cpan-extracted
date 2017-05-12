@@ -1,0 +1,54 @@
+Win32/SearchPath version 0.02
+=============================
+
+Win32::SearchPath - Perl extension for the Win32 API SearchPath.
+
+SYNOPSIS
+
+  use Win32::SearchPath;
+
+  $FullPath = SearchPath ('perl');
+  $FullPath = SearchPath ('perl', 'C:\\Bin;C:\\Perl\Bin;D:\\Bin');
+
+DESCRIPTION
+
+This module is specifically for use with Win32::Process::Create.  That interface
+requires the full path name of the executable, which SearchPath provides.
+
+   $FULL_PATH = SearchPath(FILENAME)
+
+Search for the specified FILENAME in the standard Windows search path.  
+By default the extension ".exe" is added to FILENAME, but this is ignored 
+if it already has an extension.  
+
+Alternatively a specific 'Path' list may be specified:
+
+   $FULL_PATH = SearchPath(FILENAME,PATHLIST)
+
+PATHLIST must be a list of directory names separated by semi-colons (';').  Only 
+these directory names will be searched for FILENAME, sub-directories are not 
+searched unless they are specifically included in the list.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module will only run on Microsoft Windows, and requires a C compiler, a
+linker, and a 'make' utility for installation.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Clive Darke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

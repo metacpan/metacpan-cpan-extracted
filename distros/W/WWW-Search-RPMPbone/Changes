@@ -1,0 +1,5 @@
+Revision history for WWW::Search::RPMPbone.
+
+1.0 Mar 13 2008
+    - first revision; a new backend using WWW::Search for searching RPMS in rpm.pbone.net
+

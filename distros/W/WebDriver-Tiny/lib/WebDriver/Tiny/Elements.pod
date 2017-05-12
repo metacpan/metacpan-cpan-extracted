@@ -1,0 +1,117 @@
+=head1 NAME
+
+WebDriver::Tiny::Elements
+
+=head1 METHODS
+
+=head2 Actions
+
+=head3 click
+
+ $elems->click;
+
+=head3 clear
+
+ $elems->clear;
+
+=head3 move_to
+
+ $elems->move_to;
+
+=head3 send_keys
+
+ $elems->send_keys('The quick brown fox jumps over the lazy dog');
+
+=head3 submit
+
+=head3 tap
+
+=head2 Attributes
+
+=head3 attr
+
+=head3 css
+
+=head3 enabled
+
+=head3 location
+
+Get an element's location on the page.
+
+Accepts no arguments.
+Returns a hashref containing C<x> and C<y>.
+
+=head3 location_in_view
+
+Get an element's location on the screen once it has been scrolled into view.
+
+Accepts no arguments.
+Returns a hashref containing C<x> and C<y>.
+
+=head3 rect
+
+=head3 selected
+
+=head3 tag
+
+=head3 text
+
+Get the combined text contents of each element in the set of matched elements,
+including their descendants.
+
+=head3 visible
+
+=head2 Manipulation
+
+The following methods merely return information about this collection or
+return a new collection, none of them involve a call to the server.
+
+=head3 append
+
+Returns a new collection containing all the elements in the original plus any
+that were passed as arguments.
+
+=head3 first
+
+Returns a new collection containing only the first element in this collection.
+
+=head3 last
+
+Returns a new collection containing only the last element in this collection.
+
+=head3 size
+
+Returns a count of how many elements are in the collection.
+
+=head3 slice
+
+Returns a new collection containing the elements of the current collection,
+indentified by indices, starting at zero e.g.
+
+ $elems->slice(0);       # Same as first.
+ $elems->slice(1, 2);    # The second and the third elements.
+ $elems->slice(-1);      # Same as last.
+
+=head3 split
+
+Splits a collection into a list of collections, with each collection
+containing one element.
+
+ @elems = $elems->split;
+
+ $elems->split == $elems->size;  # true
+
+=head3 uniq
+
+Returns a new collection containing no duplicate elements, order is not
+preserved.
+
+=head2 Other
+
+=head3 find
+
+=head3 screenshot
+
+=head1 SEE ALSO
+
+L<WebDriver::Tiny>

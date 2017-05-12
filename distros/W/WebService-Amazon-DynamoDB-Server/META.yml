@@ -1,0 +1,37 @@
+---
+abstract: 'Perl implementation of the DynamoDB server API, for testing'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '0'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Amazon-DynamoDB-Server
+requires:
+  Future: '0.30'
+  HTTP::Request: '0'
+  JSON::MaybeXS: '0'
+  Mixin::Event::Dispatch: '1.006'
+  Module::Load: '0'
+  Time::Moment: '0'
+  WebService::Amazon::DynamoDB: '0.004'
+  curry: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Amazon-DynamoDB-Server
+  homepage: http://search.cpan.org/dist/WebService-Amazon-DynamoDB-Server/
+version: '0.001'

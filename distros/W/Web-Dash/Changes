@@ -1,0 +1,21 @@
+Revision history for Perl module Web::Dash
+
+0.041   2014-12-05 TOSHIOITO
+        - No change to the code.
+        - Set consistent version numbers.
+
+0.04    2014-12-05 TOSHIOITO
+        - No change to the code.
+        - Fixed pod error - added UTF-8 encoding (NEILB ++)
+        - Reformatted this file as per CPAN::Changes::Spec (NEILB ++)
+        - Added github repo to pod (NEILB ++)
+
+0.031   2013-05-05 TOSHIOITO
+        - Fix packaging error: JSON was not included in "requires".
+
+0.02    2013-05-01 TOSHIOITO
+        - Add some comments on implementation. This is mainly for myself :)
+
+0.01    2013-05-01 TOSHIOITO
+        - Initial release.
+

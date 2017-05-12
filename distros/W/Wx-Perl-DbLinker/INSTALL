@@ -1,0 +1,44 @@
+NAME
+
+    Wx::Perl::DbLinker - Wx gui building part of DbLinker.
+
+VERSION
+
+    version 0.012 but see version at the end of MYMETA.yml to check that
+    I'm correct here...
+
+INSTALLATION
+
+    To install Wx::Perl::DbLinker, cd to the directory that contains this
+    file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+    Install one of Rose::DB::Object, SQL::Abstract::More or DBIx::Class if
+    you want to use these orm to access your data or run the examples (in
+    ./eg). DBIx::Class is required to get runexample_dbc.pl working.
+    SQL::Abstract::More is required for runexample_sqla.pl.
+    Rose::DB::Object is required for runexample_rdb.pl.
+
+DEPENDENCIES
+
+            Wx      0.9
+            DateTime::Format::Strptime      1.5
+            Test::More      1
+            Data::Dumper    2.154
+            Gtk2::Ex::DbLinker::DbTools     0.11
+            Scalar::Util    1.45
+            DBD::SQLite     1.46
+            Class::InsideOut        1.13
+            Log::Log4perl   1.41
+

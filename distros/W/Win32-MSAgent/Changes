@@ -1,0 +1,35 @@
+Revision history for Perl extension Win32::MSAgent.
+
+0.07  October 13, 2004
+    - Fixed a bug in GetInstalledCharacters. File::Find::Rule searched for .acs files
+      and this turns out to be case-sensitive. On WinXP it finds .acs files, but on
+      Win98 it should find .ACS files... :-/
+0.06  September 30, 2004
+    - Rewrote the module from scratch.
+    - No more wrappers, the constructor loads the OLE object and
+      autoload does the rest
+    - Added GetInstalledLanguages, GetInstalledVoices, Language2LanguageID and
+      Voice2ModeID and GetInstalledCharacters
+0.05  June 25, 2003
+    - no comments
+0.04  May 20, 2003
+    - Added the Win32::MSAgent::PropertySheet class to be able to show the MSAgent 
+      properties and change them.
+	- Corrected the systemroot stuff in the demo.pl too 
+0.03  September 3, 2002
+	- Small modification to Makefile.PL
+    - Corrected the testsuite to look for the character files under the systemroot
+      even if it isn't c:\windows
+0.02  August 30 2002
+    - Added a lot but not all POD documentation, fixed a few minor bugs.
+    - Makefile.PL now checks for MS OS and the presence of the MS Agent control
+      if it fails, we won't create a Makefile. Thanks to Podmaster.
+    - The tests now go and look for installed Character files instead of assuming
+      that a certain character file is installed. The tests will be run using the
+      first Character we find. Thanks to Briac Pilpre.
+    - The Agent control is now loaded only once, when you use Win32::MSAgent, and 
+      not every time you create an instance of the object. Thanks to Stefano Rodighiero.
+    - Added demo.pl for some demonstration of what you can do with this module
+0.01  Thu Aug 29 20:08:22 2002
+	- original version; created by ExtUtils::ModuleMaker 0.204
+

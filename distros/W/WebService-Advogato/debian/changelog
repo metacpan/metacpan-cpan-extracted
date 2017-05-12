@@ -1,0 +1,12 @@
+libwebservice-advogato-perl (1.1.0) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Sun,  4 Apr 2004 00:32:52 -0500
+
+libwebservice-advogato-perl (1.00) unstable; urgency=low
+
+  * First public release.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Fri, 11 Apr 2003 09:41:33 -0400
+

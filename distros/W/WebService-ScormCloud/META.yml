@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               WebService-ScormCloud
+version:            0.03
+abstract:           Interface to cloud.scorm.com
+author:
+    - Larry Leszczynski <larryl@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Data::Dump:           0
+    Digest::MD5:          0
+    File::Spec:           0
+    HTTP::Request::Common:  0
+    LWP::UserAgent:       0
+    Moose:                0
+    Moose::Role:          0
+    Moose::Util::TypeConstraints:  0
+    POSIX:                0
+    Readonly:             0
+    Test::Exception:      0
+    Test::More:           0
+    Time::Local:          0
+    Try::Tiny:            0
+    URI:                  0
+    XML::Simple:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

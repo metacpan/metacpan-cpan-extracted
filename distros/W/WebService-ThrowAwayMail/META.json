@@ -1,0 +1,63 @@
+{
+   "abstract" : "Perl client for throwawaymail.org API",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-ThrowAwayMail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockObject" : "1.20150527",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0.054",
+            "Moo" : "2.003001",
+            "MooX::LazierAttributes" : "0.13",
+            "MooX::ValidateSubs" : "0.08",
+            "Type::Tiny" : "1.000006",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::ThrowAwayMail" : {
+         "file" : "lib/WebService/ThrowAwayMail.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/WebService-ThrowAwayMail.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/WebService-ThrowAwayMail"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

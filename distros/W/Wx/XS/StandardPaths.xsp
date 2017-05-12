@@ -1,0 +1,56 @@
+#############################################################################
+## Name:        XS/StandardPaths.xsp
+## Purpose:     XS++ for Wx::StandardPaths
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     08/10/2007
+## RCS-ID:      $Id: StandardPaths.xsp 2315 2008-01-18 21:47:17Z mbarbon $
+## Copyright:   (c) 2007-2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+
+#include <wx/stdpaths.h>
+
+%typemap{wxStandardPaths*}{simple};
+%typemap{ResourceCat}{simple};
+
+#define ResourceCat wxStandardPathsBase::ResourceCat
+
+%name{Wx::StandardPaths} class wxStandardPaths
+{
+#if WXPERL_W_VERSION_GE( 2, 8, 0 )
+    wxString GetExecutablePath() const;
+#endif
+    wxString GetConfigDir() const;
+    wxString GetUserConfigDir() const;
+    wxString GetDataDir() const;
+    wxString GetLocalDataDir() const;
+    wxString GetUserDataDir() const;
+    wxString GetUserLocalDataDir() const;
+    wxString GetPluginsDir() const;
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    wxString GetResourcesDir() const;
+    wxString GetLocalizedResourcesDir( const wxString& lang,
+                                       ResourceCat category = wxStandardPathsBase::ResourceCat_None );
+    wxString GetDocumentsDir() const;
+    wxString GetTempDir() const;
+#endif
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    void UseAppInfo( int info );
+#endif
+};
+
+%{
+wxStandardPaths*
+Get()
+  CODE:
+    RETVAL = (wxStandardPaths*)&wxStandardPaths::Get();
+  OUTPUT: RETVAL
+%}
+
+#endif

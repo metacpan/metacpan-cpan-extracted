@@ -1,0 +1,56 @@
+{
+   "abstract" : "this class provides a simple abstraction layer between SOAP::Lite and Salesforce.com.",
+   "author" : [
+      "Fred Moyer <fred@redhotpenguin.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Salesforce",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::SSLeay" : "0.56",
+            "SOAP::Lite" : "0.68"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/redhotpenguin/WWW-Salesforce",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/redhotpenguin/WWW-Salesforce.git",
+         "web" : "https://github.com/redhotpenguin/WWW-Salesforce"
+      }
+   },
+   "version" : "0.25"
+}

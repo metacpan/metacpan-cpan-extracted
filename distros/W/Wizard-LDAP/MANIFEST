@@ -1,0 +1,24 @@
+ChangeLog
+MANIFEST			This file
+MANIFEST.SKIP
+README
+README.LDAP
+Makefile.PL			Makefile generator
+lib/Bundle/Wizard/LDAP.pm
+lib/Wizard/LDAP.pm
+lib/Wizard/LDAP.pod
+lib/Wizard/LDAP/Config.pm
+lib/Wizard/LDAP/User.pm
+lib/Wizard/LDAP/User.pod
+lib/Wizard/LDAP/Net.pm
+lib/Wizard/LDAP/Host.pm
+lib/Wizard/SaveAble/LDAP.pm
+ldapAdmin.PL
+ldapWizard.PL
+ldap.ep				HTML::EP based LDAP wizard front-end
+slapd.oc.conf.APPEND		File, that must be appended to slapd.oc.conf
+slapd.at.conf.APPEND		File, that must be appended to slapd.at.conf
+topics.ldif			for using topics 'user', 'net'
+t/base.t
+db.hosts.template
+db.ips.template

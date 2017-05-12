@@ -1,0 +1,82 @@
+{
+   "abstract" : "A simple and fast interface to the Openaura API",
+   "author" : [
+      "Hondallica <hondallica@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Openaura",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::LRU" : "0",
+            "Carp" : "0",
+            "Furl" : "0",
+            "JSON::XS" : "0",
+            "Moo" : "0",
+            "Net::DNS::Lite" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Openaura" : {
+         "file" : "lib/WebService/Openaura.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hondallica/p5-WebService-Openaura/issues"
+      },
+      "homepage" : "https://github.com/hondallica/p5-WebService-Openaura",
+      "repository" : {
+         "url" : "https://github.com/hondallica/p5-WebService-Openaura.git",
+         "web" : "https://github.com/hondallica/p5-WebService-Openaura"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:HONDALLIC"
+}

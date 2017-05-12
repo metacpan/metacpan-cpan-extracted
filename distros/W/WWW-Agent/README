@@ -1,0 +1,74 @@
+WWW::Robot::Agent
+=================
+
+What is it?
+-----------
+
+This suite of packages [ HIGHLY EXPERIMENTAL ] provide basic
+functionality of an 'abstract browser'. The idea is that that
+abstract browser is only capable to load objects (pages) via
+HTTP, FTP, ..., but itself has no other functionality.
+
+It is the tasks of particular plugins to add more specific
+functionality, such as 'Link Checking' or 'Spidering' or 'Having
+headers like Firefox'.
+
+To make that happen, the abstract browser exposes the phases of a
+request to allow plugins (aka modules) to intercept when they feel the
+need. [ If you understand Apache's module concept then you immediately
+get the idea. ]
+
+To make things interesting, and to allow the agent to be run in
+reactive environments, it is written based on POE (Perl Object
+Environment, or similar). The good side of this is, that your
+application is not necessarily blocked when fetching documents off the
+network. The downside is that programming is a bit more, well,
+interesting.
+
+Overview
+--------
+
+Apart from the abstract browser itself
+
+   WWW::Agent
+
+and some plugins in the
+
+   WWW::Agent::Plugins::*
+
+namespace.....
+
+### NOT YET INCLUDED !!!
+###
+###, this package also provides the following off-the-shelf scripts
+###
+###  analyze --help
+###
+###      This program spiders through a web site and collects analytical
+###      and statistical information.
+
+Dependencies
+------------
+
+Nothing CPAN would not handle by itself. If you are not using CPAN, then
+plz consult the Makefile.PL for an up-to-date list.  
+
+Installation
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTE: At this stage I make use of a particular server on the network.
+If you have no network, then some tests may fail.
+
+
+Copyright (C) 2005 by Robert Barta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

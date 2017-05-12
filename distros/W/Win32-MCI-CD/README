@@ -1,0 +1,26 @@
+Win32/MCI/CD version 0.02
+=============================
+
+With this module you can play and control audio cd's via MCI API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Win32::API
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Lennert Ouwerkerk. All rights reserved.
+
+This package is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+

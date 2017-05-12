@@ -1,0 +1,150 @@
+NAME
+    WSDL::Generator - Generate wsdl file automagically
+
+SYNOPSIS
+      use WSDL::Generator;
+      my $wsdl = WSDL::Generator->new($init);
+      Foo->a_method($param);
+      print $wsdl->get('Foo');
+
+DESCRIPTION
+    You know folks out there who use another language than Perl (huh?) and
+    you want to release a SOAP server for them
+
+      1/ that's very kind of you
+      2/ you need to generate a wsdl file
+      3/ this module can help
+    Because Perl is dynamically typed, it is a fantastic language to write SOAP clients,
+    but that makes perl not-so-easy to use as SOAP server queried by statically typed languages
+    such as Delphi, Java, C++, VB...
+    These languages need a WSDL file to communicate with your server.
+    The WSDL file contains all the data structure definition necessary to interact with the server.
+    It contains also the namespace and URL as well.
+
+CONSTRUCTOR
+  new($init)
+      $init = {   'schema_namesp' => 'http://www.acmetravel.com/AcmeTravelServices.xsd',
+                  'services'      => 'AcmeTravel',
+                  'service_name'  => 'BookFlight',
+                  'target_namesp' => 'http://www.acmetravel.com/SOAP/',
+                  'documentation' => 'Service to book tickets online',
+                  'location'      => 'http://www.acmetravel.com/SOAP/BookFlight' };
+    Install a spy which captures all the methods and subs calls to other classes
+
+METHODS
+  get($class)
+    Returns the WSDL code for a specific class
+
+  get_all()
+    Returns all classes available for a WSDL generation
+
+  schema_namesp($value)
+    Get or Set schema name space value
+
+  service($value)
+    Get or Set service name value
+
+  services($value)
+    Get or Set services name value
+
+CAVEATS
+    WSDL doesn't works only on perl 5.6 and not 5.8. UNIVERSAL::AUTOLOAD is
+    broken in perl 5.8 and it is used by Class::Hook upon wich
+    WSDL::Generator depends.
+
+    WSDL is very flexible since it can describe any kind of data structure
+    in a language non dependant description. But that flexibility makes
+    certain things difficult, such as array of inconsistant data types. So,
+    here is the current limitation of WSDL::Generator :
+
+    Rule - "An array must contain elements of the same perl type".
+    Understand perl type as "scalar", "arrayref" or "hashref". So, if you
+    send this:
+
+      [
+          {
+            key1 => 'Hello',
+            key2 => 'world',
+          },
+          {
+            key1 => 'Hi',
+            key3 => 'there',
+          },
+          {
+            key1 => 'Hi',
+          },
+      ]
+    That will do, but if you send:
+
+      [
+          {
+            key1 => 'Hello',
+            key2 => 'world',
+          },
+          {
+            key1 => 'Hi',
+            key3 => 'there',
+          },
+          'a string instead of a hash ref',
+      ]
+    That won't work, since your structure is not "consistent", your array cannot contain both hashref and string.
+
+    Another situation, if you send this:
+
+      [
+          {
+            key1 => 'Hello',
+            key2 => 'world',
+          },
+          {
+            key1 => 'Hi',
+            key3 => 'there',
+          },
+          {
+            key1 => 'Hi',
+          },
+      ]
+    That will do, but if you send:
+
+      [
+          {
+            key1 => 'Hello',
+            key2 => 'world',
+          },
+          {
+            key1 => [1,2,3],
+            key3 => 'there',
+          },
+      ]
+    That won't work either, since your key1 can have two complete different types of value (a string or an arrayref)
+    Finally, if you call several times a method, only the last call will be scanned to produce the WSDL file.
+    I hope these limitations will be lifted in the future.
+
+BUGS
+      This is till n alpha release, so don't expect miracles and don't use it without caution - you've been warned!
+      Feel free to send me your bug reports, contribution and comments about this project.
+
+SEE ALSO
+      SOAP::Lite, Class::Hook
+      http://www.w3.org/TR/SOAP/
+      http://www.w3.org/TR/wsdl
+
+ACKNOWLEDGEMENT
+    A lot of thanks to:
+
+      Paul Kulchenko for his fantastic SOAP::Lite module and his help
+      Patrick Morris, a Delphi wizard, for testing the wsdl generated and investing weird things
+      Joe Breeden for his excellent documentation
+      Yuval Mazor for his patch to make it compatible with .net wsdl compiler
+      Leon Brocard for his code review
+      James Duncan for his support
+
+AUTHOR
+    Pierre Denis, "<pierre@itrelease.net>".
+
+COPYRIGHT
+    Copyright 2009, Pierre Denis, All Rights Reserved.
+
+    You may use, modify, and distribute this package under the same terms as
+    Perl itself.
+

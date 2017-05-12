@@ -1,0 +1,51 @@
+*******
+NB: you probably don't want to try this with production traffic yet!
+*******
+
+Here's how to integrate a mirror server into an ICP based WWW caching
+mesh, in four(-ish!) easy steps:
+
+1) edit or create a set of mirror specifications as per the files
+     in the 'mirrors' subdirectory:
+
+   * create a separate file for each mirrored site, e.g.
+       if you mirrored GNOME you might call the file 'gnome'
+
+   * put all of these specifications in a single directory,
+       called say 'mirrors'
+
+   * the first line of the file should be the URL prefix of
+       the local mirror, e.g. ftp://ftp.net.lut.ac.uk/gnome
+
+   * the second and subsequent lines should be the URL
+       prefixes of the other mirror sites which you would
+       like your server to subsume, e.g.
+         ftp://ftp://ftp.linux.hr/pub/gnome
+         ftp://mirror.aarnet.edu.au/pub/gnome/
+       and so on...
+
+2) install a copy of the Squid WWW cache to front end your mirror
+     service.  If you don't know what Squid is or where to get it,
+     you're probably not ready to play with this stuff (yet).
+
+3) configure Squid to use the starfish.pl program as a redirector
+     - depending on where you put your mirror specification files,
+     you might need to change the reference to "/usr/local/mirrors"
+     at the beginning of starfish.pl
+
+4) run a copy of jellyfish.pl on the same machine (it listens on
+     port 3131 only for now), with a command line like so:
+
+   jellyfish.pl /usr/local/mirrors/*
+
+Now, the people in your caching hierarchy should be able to configure
+their caches to point at your new Squid server.  Make sure they use
+port 3131 for ICP, rather than the normal Squid ICP server (which
+runs by default on port 3130).
+
+This is a first release, and the code is still being developed, so
+don't be surprised if things either don't work or don't work as you'd
+expect them to!
+
+Martin
+

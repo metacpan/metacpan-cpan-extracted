@@ -1,0 +1,53 @@
+Win32/AD/User version 0.02
+==========================
+
+Win32::AD::User will connect to an Active Directory (AD) Server and
+Administer Users. Information on each of the various functions of an 
+AD User object can be found here:
+  http://www.uni.edu/~prefect/devel/ad-user/index.html
+
+This module was designed to create a useful set of AD User 
+administration tools.
+
+This module has been tested and works on a Win2000 Domain Controller.
+I would be intrested to hear how this works with various AD configs.
+
+If you are using this module in Windows (which is what it is designed
+for) you will want to download and install Nmake 1.5 from Microsoft.
+This is available from Microsoft here:
+  http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+
+If you have problems extracting the files in Windows you will either
+want to find a free decompression program like FilZip found here:
+  http://www.filzip.com/ 
+or check out the GNU utilities for Win32 found here:
+  http://www.wzw.tu-muenchen.de/~syring/win32/UnxUtils.html
+
+INSTALLATION
+
+To install this module in Windows:
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+To install this module in *nix type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::OLE
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2004 Aaron Thompson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

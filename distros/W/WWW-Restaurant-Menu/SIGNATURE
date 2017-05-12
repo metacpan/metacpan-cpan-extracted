@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2f68aa64ec817ce78107a7d1f3418136012faa2f Build.PL
+SHA1 a30fdea1a5e8675221256ece6fb9ff53e86b3865 CHANGES
+SHA1 797f9e110f861c7a94e7fc9efe925171fdcdd4ce MANIFEST
+SHA1 3ffd8702b21efb7035193d7ebed15b85dcccbef7 META.yml
+SHA1 a359d4072690a21ce63e4b393bdbc19d72b6be5a Makefile.PL
+SHA1 850c50b63286418cdb20077b2ca12e1edf8ccafe README
+SHA1 9d2b3a3342151b9609a674fe67b3d99be5da13c8 TODO
+SHA1 b55ae2a843f465db42b5c2e4ba2e89df692316bc debian/changelog
+SHA1 9c6b057a2b9d96a4067a749ee3b3b0158d390cf1 debian/compat
+SHA1 34d4da849ce6ae6e6ad036106f29ad286328ea75 debian/control
+SHA1 e828a052b9833e49a89bdd1bc997b7e77cb5aa70 debian/copyright
+SHA1 f07d3cc654d62025ba37a53a83db9cf3aa21fede debian/rules
+SHA1 db13ebae6b7e989296c877f0e4bc7e7906c8602a lib/WWW/Restaurant/DE/Munich/Edison/Menu/Lunch.pm
+SHA1 44495a9d7c02d4e20ade9e545b3b2a77f7dd6960 lib/WWW/Restaurant/Menu.pm
+SHA1 8fbfa32923cde8dd3596ac8474d5c7e2991fce96 lib/WWW/Restaurant/Menu/Item.pm
+SHA1 67f47dacae1eb88be91effb1e887bf111dcab54f lib/WWW/Restaurant/Menu/Overview.pod
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFB6UDqaWlsL2XXXh8RAq7hAJ49oVKgIKGGU6mmXR2GAJgSnp+tegCfWXoe
+/JE7TkA0Kqqcs6XV7ix+BhA=
+=R2Ut
+-----END PGP SIGNATURE-----

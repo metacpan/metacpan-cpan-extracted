@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+SolveMedia.pm
+t/00_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

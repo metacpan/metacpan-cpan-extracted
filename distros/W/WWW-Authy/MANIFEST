@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WWW/Authy.pm
+t/00-load.t
+t/10-requests.t
+t/20-live.t
+t/release-pod-syntax.t

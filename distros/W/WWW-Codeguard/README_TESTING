@@ -1,0 +1,119 @@
+WWW::Codeguard Testing
+======================
+
+In order to run the test suite, you'll need to create the 't/config/TEST_INFO.json' file (simply copy/edit the sample file provided).
+
+All tests require an API url to be specified, so the value for "api_url" in the config, should be the url your test API instance is available on.
+
+Partner Tests
+-------------
+
+In order to run the partner tests (in t/02-partner.t), you'll need to enter your test partner key in the partner_api section of the config file:
+
+	"partner_api": {
+		"partner_key": "123412341234"
+	},
+
+User Tests
+----------
+
+All user tests (in t/*-user-*.t), require the "user_api" section to be filled out:
+
+	"user_api": {
+		"api_key": "123412341234",
+		"api_secret": "1234123412341324",
+		"access_secret": "sdfasdfasdfasfasfdasdfasdf",
+		"access_token": "asdfasdfasdfasdfasdfasdf"
+	},
+
+### Create Websites
+
+There are two ways to create website resources, using FTP (in 03-user-create_website_ftp.t) or using SFTP (04-user-create_website_sftp.t).
+
+Please note that in order for these tests to be successful, you'll have to make sure that the Codeguard servers can reach the specified server on the specified port/service.
+
+In order to run the FTP tests, you'll need to fill out atleast the following:
+
+	"create_website": {
+		"username": "myuser",
+		"password": "mypass",
+		"server_name": "my.host.name.or.ip.address",
+		"ftp_port": "21",
+		"domain_name": "my.domain.name",
+		"dir_path": "/path/to/backup"
+	},
+
+In order to run the SFTP tests, you'll need to fill out at least the following:
+
+	"create_website": {
+		"username": "myuser",
+		"ssh_key": "my_ssh_key",
+		"password": "mypass",
+		"server_name": "my.host.name.or.ip.address",
+		"ssh_port": "22",
+		"domain_name": "my.domain.name",
+		"dir_path": "/path/to/backup"
+	},
+
+You can specify either the 'ssh_key' or the 'password', or both. And the tests will conditionally run depending on what you have entered.
+
+**Please note that since JSON can't have a multi-line string, you'll need to make sure that the 'ssh_key' has all newline chars replaced with "\n" literals.**
+
+### Edit Website
+
+In order to run the edit website test (in 05-user-edit_website.t), you'll need to specify at least the 'website_id', and at least one of the values to alter.
+
+For example, the following will run the edit test by modifying the website resource with id '1111', and changing the dir_path on the resource.
+
+	"edit_website": {
+		"website_id": 1111,
+		"dir_path": "/my/new/path",
+		"url": null,
+		"monitor_frequency": null,
+		"account": null,
+		"password": null,
+		"key": null,
+		"hostname": null
+	},
+
+The values altered by the edit test are reset back to what they were once the test is done.
+
+**IMPORTANT NOTE**: if you edit the password for a resource in the test, it will not be reset as there is no way to determine what the 'old' password for the account within the test.
+
+### Create Databases
+
+There are two ways to create database resources, using the direct authentication method (in 06-user-create_database_direct.t) or using an SSH tunnel (07-user-create_database_ssh.t).
+
+Please note that in order for these tests to be successful, you'll have to make sure that the Codeguard servers can reach the specified server on the specified port/service.
+
+In order to run the 'direct authentication' tests, you'll need to fill out atleast the following:
+
+	"create_database": {
+		"mysql_username": "db_user",
+		"mysql_password": "db_pass",
+		"server_name": "my.host.name.or.ip.address",
+		"database_name": "db_name",
+		"mysql_port": 3306,
+	}
+
+The tests for using the SSH authentication method are currently disabled, as they require a 'parent' package with working SSH connection to be present on the CG account.
+
+### Edit Databases
+
+In order to run the edit database test (in 08-user-edit_database.t), you'll need to specify atleast the 'database_id', and at least one of the values to alter.
+
+For example, the following will run the edit test by modifying the database resource with id '1111', and changing the db user on the resource.
+
+	"edit_database": {
+		"database_id": 1111,
+		"website_id": null,
+		"server_address": null,
+		"account": "new_dbuser",
+		"password": null,
+		"port": null,
+		"database_name": null
+	}
+
+The values altered by the edit test are reset back to what they were once the test is done.
+
+**IMPORTANT NOTE**: if you edit the password for a resource in the test, it will not be reset as there is no way to determine what the 'old' password for the account within the test.

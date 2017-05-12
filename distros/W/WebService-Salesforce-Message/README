@@ -1,0 +1,34 @@
+NAME
+    WebService::Salesforce::Message - Perl extension for Salesforce outbound
+    messages
+
+SYNOPSIS
+      use WebService::Salesforce::Message;
+
+      my $xml = read_in_salesforce_soap_message();
+      my $message = WebService::Salesforce::Message->new( xml => $xml );
+
+      my $attrs = $message->attrs; # Id, other attributes of the object in the message
+      my $object_id = $message->get('Id');
+      my $organization_id = $message->organization_id;
+
+DESCRIPTION
+    Salesforce.com can send outbound SOAP messages on status changes. Use
+    this module to parse those message and inspect the object attributes.
+
+    See the source for available methods. Documentation will be added in
+    0.02, or as patches are provided.
+
+SEE ALSO
+    WWW::Salesforce SOAP::Lite
+
+AUTHOR
+    Fred Moyer<lt>fred@redhotpenguin.com<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by iParadigms LLC
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

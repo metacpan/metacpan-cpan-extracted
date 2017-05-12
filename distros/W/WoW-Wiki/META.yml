@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WoW-Wiki
+version:      0.01
+version_from: lib/WoW/Wiki.pm
+installdirs:  site
+requires:
+    Storable:                      1
+    XML::SimpleObject:             0.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

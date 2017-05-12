@@ -1,0 +1,12 @@
+bin/get_gset
+Build.PL
+Changes
+lib/WebService/Google/Sets.pm
+MANIFEST
+README
+META.yml
+t/pod-coverage.t
+t/WebServiceGoogleSets.t
+t/pod.t
+t/test-kwalitee.t
+Makefile.PL

@@ -1,0 +1,40 @@
+Changelog for WWW::Mechanize::TreeBuilder
+
+1.20000 - 2010 Sep 23
+  - Fix for global destruction where $self->tree has already been deleted
+  - Fix for composing onto classes which already have a DEMOLISH method
+    by providing a method modifier, rather than the DEMOLISH sub itself.
+  - Fix being composed onto non-Moose classes by wrapping the DESTORY
+    method rather than the DEMOLISH method.
+  - Fix bug around delegation of "import" method with custom element class
+
+1.10003 - 2010 Sep 23
+  - Fix for rt: 57723: Tests failing on Test-Simple 0.96 ( Kent Fredric )
+
+1.10002 - 2010 Apr 13
+  - Update example to work properly
+
+1.10001 - 2009 Aug 11
+  - Pod fixes from leto and dandv
+  - Link to repo in META.yml
+
+1.10000 - 2009 Feb 17
+  - Fix delegation with latest Mooses (something seems to have changed along
+    the way) and add tests to it
+  - Bump Moose dep to 0.65 to be on the safe side
+  - Parameterize role to support HTML::TreeBuilder::XPath (and others if they
+    exist)
+
+1.00003 - 2008 Jan 14
+  - Fix delegation of 'clone' and other methods that already exist on Mechanize
+
+1.00002 - 2007 Sep 6
+  - Fix Makefile.PL so that HTML::TreeBuilder is a dependancy, not just 
+    recomended - oops.
+
+1.00001 - 2007 Sep 5
+  - I can't count - fix test count.
+
+1.00000 - 2007 Sep 4
+  - Initial Release
+

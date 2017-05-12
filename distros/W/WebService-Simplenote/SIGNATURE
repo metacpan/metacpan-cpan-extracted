@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 3cd7004d2e748de777c09523f4c4c543da717752 Build.PL
+SHA1 69a8a1259124a0ef32891ec9761d509a3373671d Changes
+SHA1 39e445531501775d4e1ed2908a62bef6cbdd8082 LICENSE
+SHA1 fd6e3d17f1e958ac24cd1132a71ead43487b9120 MANIFEST
+SHA1 a30bf3b2390636474fd61eb8a02827fa887a5b8b META.json
+SHA1 4b86697405f7ad99a7506d4eab506728c12aae9c README.mkdn
+SHA1 2c74a9a44b2b68bbb7e362fe2d03b5edc43d0e19 dist.ini
+SHA1 7ba2e8fe2e77f15b1e477c06ddf8168c4b6458ed eg/simplenote.pl
+SHA1 7a18dfd8a43807a38acd91ec858e891943301410 lib/WebService/Simplenote.pm
+SHA1 d6f2dfbc065ef331135f7a3628e1a2bb967ddbf6 lib/WebService/Simplenote.pm~
+SHA1 2856c7d50de70df32aa50b87cee92ad5c9a5cf46 lib/WebService/Simplenote/Note.pm
+SHA1 eb550d99351dfce123655518a71f8191fbfa3a6e lib/WebService/Simplenote/Note.pm~
+SHA1 8b953232bf8c95b44613230e30b528bae40f7383 lib/WebService/Simplenote/Note/Meta/Attribute/Trait/NotSerialised.pm
+SHA1 f336342f048996154d59fe1cdfd19c65ec0a826e lib/WebService/Simplenote/Note/Meta/Attribute/Trait/NotSerialised.pm~
+SHA1 bb14cb4ad729e5948f3ad6f95d3f872d056aa14f lib/WebService/Simplenote/Note/Meta/Types.pm
+SHA1 c42ca4a933860f45393b25e24d805ef9b062563b lib/WebService/Simplenote/Note/Meta/Types.pm~
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 c82f8a4821bd225942ad5fc9bd5d45ca4c387f2e t/1_simplenote.t
+SHA1 565d18250d0a7585093c4185b91d969119e5883e t/2_note.t
+SHA1 af0d1c06c20d70ceae8348c02434031f89caf0c6 t/notes/test.txt
+SHA1 9e4c8d3c3929dcdd037ce58c83a7976696f3173c t/notes/test1.md
+SHA1 4ecd064972de5144a8d86a74c249aa9f5b062ff8 weaver.ini
+SHA1 b0f2ac0b28f663d98de8369e26c2dc3fd3d4e52d xt/author/critic.t
+SHA1 7f5112b8db067e069909c32d8aacef8bcc681072 xt/perlcriticrc
+SHA1 e560d373352b9d4def0c1a22dd2bfdae31bb8c69 xt/perltidyrc
+SHA1 28ef20a73b7cf9b85585e2b7db6fc80424289134 xt/release/cpan-changes.t
+SHA1 c6cd63148d20bda841ee21381cd6e9a62b7e6863 xt/release/kwalitee.t
+SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
+SHA1 4c599e8a4ebb7a899f90ee3c235a64fdbc7e2c06 xt/release/pod-coverage.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+SHA1 fae7a9531fdd000d4075a378b828a7aa2508491d xt/release/pod-no404s.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCgAGBQJP2q93AAoJEOpmRc2kYGBPoEcP/3Eb5ytsYuNr67Y6PNEOx1xn
+6JLTkQHU5Ph45/6NP/WHIZz04ekJVYoVkt7xcTiClh497K/fjONglcJqstNdjb5Z
+1nzo/WCx70TncYBtFqzSxkLBvIhmPwf38QjSC35QSqeByh5EXinz8D+wjW/tLQan
+Cte4FARYIZA+JN0fd93GpsYfxxnvy0EmwMaGNTlzy0Svm7LMIxu9wWQNyKKn9aFV
+jMMVBiNAn4bnlCWtM3wQUkhykWPUyyxijj6jFsciUERHNMneXSkbveocBMWCP3rN
+lFTduITLy54VcA1x2xyR+kG0hN/m8H1QhmORkZR4MCoQ1KkoT8NAD59U0Tiq7Y9U
+8LJtM0C3//EdP7DKfZh8d6oJYTHO9GSmtNgSKeGFF0wLne3W3n5hDnuiK/WqIYaS
+LPkduYnVLnVKn4Cn61PdrKrkjb3/GZDEbccJVNxTFXYp7aSNg2GccgTEp8tbGc6G
+MbQYrsRHN1I6QFlE/mKK+C71zZGiW20J7mkVsDKfkDXb08PTGGYWrUVXMNefm9f8
+iMhT5ZC6lXkR6+j3yVJFr9hmP1sUfLqa2t4DSq+kGmk7PNF4u3/xWPdFk4EaC3LP
+mXIpMtzUdCWGFqk4jLGQA4WUDuG0GjcGrnhcb6Yb3R0taJKv2fQGpr0ounvQjHZ6
+0xR+PRfFoEKBGPE2klUG
+=TH6x
+-----END PGP SIGNATURE-----

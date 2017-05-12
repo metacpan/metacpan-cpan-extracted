@@ -1,0 +1,410 @@
+2001-11-05 01:42   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, Makefile.PL, docs/wombat.css, docs/api/Wombat.html,
+	docs/api/Wombat/Authenticator.html, docs/api/Wombat/Connector.html,
+	docs/api/Wombat/ContainerServlet.html,
+	docs/api/Wombat/Exception.html, docs/api/Wombat/Globals.html,
+	docs/api/Wombat/HttpRequest.html,
+	docs/api/Wombat/HttpResponse.html, docs/api/Wombat/Mapper.html,
+	docs/api/Wombat/Realm.html, docs/api/Wombat/Request.html,
+	docs/api/Wombat/Response.html, docs/api/Wombat/Server.html,
+	docs/api/Wombat/Session.html, docs/api/Wombat/SessionManager.html,
+	docs/api/Wombat/Valve.html, docs/api/Wombat/ValveContext.html,
+	docs/api/Wombat/Authenticator/AuthenticatorBase.html,
+	docs/api/Wombat/Authenticator/BasicAuthenticator.html,
+	docs/api/Wombat/Connector/HttpRequestBase.html,
+	docs/api/Wombat/Connector/HttpRequestFacade.html,
+	docs/api/Wombat/Connector/HttpResponseBase.html,
+	docs/api/Wombat/Connector/HttpResponseFacade.html,
+	docs/api/Wombat/Connector/RequestBase.html,
+	docs/api/Wombat/Connector/RequestFacade.html,
+	docs/api/Wombat/Connector/RequestHandle.html,
+	docs/api/Wombat/Connector/ResponseBase.html,
+	docs/api/Wombat/Connector/ResponseFacade.html,
+	docs/api/Wombat/Connector/ResponseHandle.html,
+	docs/api/Wombat/Core/Application.html,
+	docs/api/Wombat/Core/ApplicationFacade.html,
+	docs/api/Wombat/Core/ApplicationMapper.html,
+	docs/api/Wombat/Core/ApplicationValve.html,
+	docs/api/Wombat/Core/ContainerBase.html,
+	docs/api/Wombat/Core/Engine.html,
+	docs/api/Wombat/Core/EngineMapper.html,
+	docs/api/Wombat/Core/EngineValve.html,
+	docs/api/Wombat/Core/Host.html,
+	docs/api/Wombat/Core/HostMapper.html,
+	docs/api/Wombat/Core/HostValve.html,
+	docs/api/Wombat/Core/MapperBase.html,
+	docs/api/Wombat/Core/Pipeline.html,
+	docs/api/Wombat/Core/RequestDispatcher.html,
+	docs/api/Wombat/Core/Service.html,
+	docs/api/Wombat/Core/Session.html,
+	docs/api/Wombat/Core/SessionFacade.html,
+	docs/api/Wombat/Core/Wrapper.html,
+	docs/api/Wombat/Core/WrapperFacade.html,
+	docs/api/Wombat/Core/WrapperValve.html,
+	docs/api/Wombat/Deploy/LoginConfig.html,
+	docs/api/Wombat/Deploy/SecurityCollection.html,
+	docs/api/Wombat/Deploy/SecurityConstraint.html,
+	docs/api/Wombat/Logger/FileLogger.html,
+	docs/api/Wombat/Logger/LoggerBase.html,
+	docs/api/Wombat/Realm/DBIRealm.html,
+	docs/api/Wombat/Realm/GenericPrincipal.html,
+	docs/api/Wombat/Realm/RealmBase.html,
+	docs/api/Wombat/Servlet/InvokerServlet.html,
+	docs/api/Wombat/SessionManager/SessionManagerBase.html,
+	docs/api/Wombat/SessionManager/StandardSessionManager.html,
+	docs/api/Wombat/Util/CookieTools.html,
+	docs/api/Wombat/Util/RequestUtil.html,
+	docs/api/Wombat/Util/XmlAction.html,
+	docs/api/Wombat/Util/XmlMapper.html,
+	docs/api/Wombat/Valve/ValveBase.html, lib/Wombat.pm: add api docs
+
+2001-11-05 00:51   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog: sync
+
+2001-11-05 00:50   Brian Moseley <bcm@maz.org>
+
+	* Makefile.PL, lib/Wombat.pm, lib/Wombat/Globals.pm: put
+	$Wombat::VERSION into Wombat.pm so other modules can find it. i
+	don't know why i took it out in the first place.
+
+2001-11-05 00:42   Brian Moseley <bcm@maz.org>
+
+	* bundle/Wombat.pm: bump version number
+
+2001-11-05 00:42   Brian Moseley <bcm@maz.org>
+
+	* bundle/: ChangeLog, ChangeLog: sync
+
+2001-11-05 00:39   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, bundle/MANIFEST.SKIP: sync
+
+2001-11-05 00:38   Brian Moseley <bcm@maz.org>
+
+	* Makefile.PL, README: minor updates
+
+2001-11-05 00:35   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat.pm: added Wombat docs
+
+2001-11-04 20:30   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/ApplicationValve.pm: if we unset the session new
+	status before committing the response, the session cookie will
+	never be set
+
+2001-11-04 19:48   Brian Moseley <bcm@maz.org>
+
+	* Makefile.PL: disable tests until test harness is fixed
+
+2001-11-04 19:46   Brian Moseley <bcm@maz.org>
+
+	* bundle/ChangeLog, MANIFEST: sync
+
+2001-11-04 19:46   Brian Moseley <bcm@maz.org>
+
+	* bundle/Wombat.pm: use the appropriateversion of the libservlet
+	bundle
+
+2001-11-04 19:38   Brian Moseley <bcm@maz.org>
+
+	* CHANGES, ChangeLog, lib/ChangeLog: remove lower level ChangeLog
+	files so that lib/ChangeLog doesn't get installed as a module. use
+	toplevel ChangeLog file instead. use toplevel CHANGES file for
+	summaries of changes between versions.
+
+2001-11-04 19:37   Brian Moseley <bcm@maz.org>
+
+	* Makefile.PL: require latest libservlet
+
+2001-11-04 19:37   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Globals.pm: bump version
+
+2001-11-04 19:36   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Logger/LoggerBase.pm: doc sync
+
+2001-10-25 17:34   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, MANIFEST, TODO, bundle/ChangeLog, t/TEST,
+	lib/ChangeLog: sync
+
+2001-10-25 17:21   Brian Moseley <bcm@maz.org>
+
+	* TODO: sync
+
+2001-10-25 17:03   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/Application.pm: sync
+
+2001-10-25 17:02   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Servlet/InvokerServlet.pm: sometimes exceptions are
+	just strings, for some reason
+
+2001-10-25 17:01   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/ApplicationValve.pm: add some debugging
+	statements
+
+2001-10-25 17:01   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Util/: XmlAction.pm, XmlMapper.pm: move this class
+	into its own module, cos use base was complaining
+
+2001-10-25 15:38   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/SessionManager/SessionManagerBase.pm: remove caching
+	implementations and make them virtual methods. use
+	LifecycleException as appropriate.
+
+2001-10-25 15:36   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Servlet/InvokerServlet.pm: shut off debug output
+
+2001-10-25 15:36   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/ApplicationValve.pm: explicitly handle the case
+	where no session was requested. make sure to cache newly created
+	sessions.
+
+2001-10-25 15:32   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Connector/HttpRequestBase.pm: add setSession to
+	internal http request base class
+
+2001-10-25 15:32   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/HttpRequest.pm: add setSession method to internal http
+	request interface
+
+2001-10-25 15:31   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: sync
+
+2001-10-25 15:31   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/SessionManager/StandardSessionManager.pm: add
+	SessionManager implementation that uses Cache::Cache to cache
+	sessions
+
+2001-07-27 05:49   Brian Moseley <bcm@maz.org>
+
+	* TODO: reprioritize
+
+2001-07-27 05:47   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: sync
+
+2001-07-27 05:43   Brian Moseley <bcm@maz.org>
+
+	* NEWS, README: rm NEWS file
+
+2001-07-27 05:42   Brian Moseley <bcm@maz.org>
+
+	* TODO: add TODO file
+
+2001-07-27 05:41   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Server.pm: sync
+
+2001-07-27 05:41   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Globals.pm: use reasonable version number
+
+2001-07-25 09:55   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: moved webapps to webapps cvs module
+
+2001-07-25 04:51   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, Makefile.PL: move http connector to wombatd cvs module
+
+2001-07-25 04:25   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Logger/FileLogger.pm: don't use
+	IO::Filelib/Wombat/Logger/FileLogger.pm
+
+2001-07-25 04:25   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/ContainerBase.pm: maximize robustness
+
+2001-07-25 04:24   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/Application.pm: turds
+
+2001-07-25 04:24   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Server.pm: don't default to $WOMBAT_HOME or cwd for
+	server home. don't use IO::File. add some docs.
+
+2001-07-25 04:23   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Globals.pm: make parseable by ExtUtils::MakeMaker
+
+2001-07-25 04:22   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, Makefile.PL, bundle/Wombat.pm,
+	lib/Wombat/Logger/ApacheFileLogger.pm,
+	lib/Wombat/Logger/ApacheLogger.pm: move apache connector to apache
+	cvs module
+
+2001-07-14 20:21   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: sync
+
+2001-07-14 20:21   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/Wrapper.pm: nitpick
+
+2001-07-14 20:20   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/ContainerBase.pm: make sure to start children
+	when adding them if necessary, and the same for stopping. this lets
+	servlets that are added by InvokerServlet work without being
+	predefined in the deployment descriptor.
+
+2001-07-14 20:20   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Connector/HttpResponseBase.pm: setMessage() doesn't
+	exist
+
+2001-07-14 18:34   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: sync
+
+2001-07-14 18:34   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Servlet/SnoopServlet.pm: move SnoopServlet to examples
+	lib dir
+
+2001-07-14 18:33   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Core/Application.pm: add /WEB-INF/lib to @INC so
+	application-specific classes can be found. application-specific
+	classloaders sure would be nice!
+
+2001-07-14 17:46   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST: sync
+
+2001-07-14 14:06   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Logger/FileLogger.pm: allow the filename to be
+	specified relative to $WOMBAT_HOME. use IO::File for consistency.
+	better exception handling.
+
+2001-07-14 14:05   Brian Moseley <bcm@maz.org>
+
+	* lib/Wombat/Server.pm: better exception message
+
+2001-07-13 17:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	NEWS, README, bundle/.cvsignore, bundle/ChangeLog, bundle/MANIFEST,
+	bundle/MANIFEST.SKIP, bundle/Makefile.PL, bundle/README,
+	bundle/Wombat.pm, lib/Wombat.pm, lib/Wombat/Authenticator.pm,
+	lib/Wombat/Connector.pm, lib/Wombat/ContainerServlet.pm,
+	lib/Wombat/Exception.pm, lib/Wombat/Globals.pm,
+	lib/Wombat/HttpRequest.pm, lib/Wombat/HttpResponse.pm,
+	lib/Wombat/Mapper.pm, lib/Wombat/Realm.pm, lib/Wombat/Request.pm,
+	lib/Wombat/Response.pm, lib/Wombat/Server.pm,
+	lib/Wombat/Session.pm, lib/Wombat/SessionManager.pm,
+	lib/Wombat/Valve.pm, lib/Wombat/ValveContext.pm,
+	lib/Wombat/Authenticator/AuthenticatorBase.pm,
+	lib/Wombat/Authenticator/BasicAuthenticator.pm,
+	lib/Wombat/Connector/HttpRequestBase.pm,
+	lib/Wombat/Connector/HttpRequestFacade.pm,
+	lib/Wombat/Connector/HttpResponseBase.pm,
+	lib/Wombat/Connector/HttpResponseFacade.pm,
+	lib/Wombat/Connector/RequestBase.pm,
+	lib/Wombat/Connector/RequestFacade.pm,
+	lib/Wombat/Connector/RequestHandle.pm,
+	lib/Wombat/Connector/ResponseBase.pm,
+	lib/Wombat/Connector/ResponseFacade.pm,
+	lib/Wombat/Connector/ResponseHandle.pm,
+	lib/Wombat/Core/Application.pm,
+	lib/Wombat/Core/ApplicationFacade.pm,
+	lib/Wombat/Core/ApplicationMapper.pm,
+	lib/Wombat/Core/ApplicationValve.pm,
+	lib/Wombat/Core/ContainerBase.pm, lib/Wombat/Core/Engine.pm,
+	lib/Wombat/Core/EngineMapper.pm, lib/Wombat/Core/EngineValve.pm,
+	lib/Wombat/Core/Host.pm, lib/Wombat/Core/HostMapper.pm,
+	lib/Wombat/Core/HostValve.pm, lib/Wombat/Core/MapperBase.pm,
+	lib/Wombat/Core/Pipeline.pm, lib/Wombat/Core/RequestDispatcher.pm,
+	lib/Wombat/Core/Service.pm, lib/Wombat/Core/Session.pm,
+	lib/Wombat/Core/SessionFacade.pm, lib/Wombat/Core/Wrapper.pm,
+	lib/Wombat/Core/WrapperFacade.pm, lib/Wombat/Core/WrapperValve.pm,
+	lib/Wombat/Deploy/LoginConfig.pm,
+	lib/Wombat/Deploy/SecurityCollection.pm,
+	lib/Wombat/Deploy/SecurityConstraint.pm,
+	lib/Wombat/Logger/ApacheFileLogger.pm,
+	lib/Wombat/Logger/ApacheLogger.pm, lib/Wombat/Logger/FileLogger.pm,
+	lib/Wombat/Logger/LoggerBase.pm, lib/Wombat/Realm/DBIRealm.pm,
+	lib/Wombat/Realm/GenericPrincipal.pm,
+	lib/Wombat/Realm/RealmBase.pm,
+	lib/Wombat/Servlet/InvokerServlet.pm,
+	lib/Wombat/Servlet/SnoopServlet.pm,
+	lib/Wombat/SessionManager/SessionManagerBase.pm,
+	lib/Wombat/Util/CookieTools.pm, lib/Wombat/Util/RequestUtil.pm,
+	lib/Wombat/Util/XmlMapper.pm, lib/Wombat/Valve/ValveBase.pm,
+	t/TEST, t/connector/request_base.t, t/connector/response_base.t,
+	t/lib/Wombat/Test.pm, t/lib/Wombat/TestFixture.pm: Initial revision
+
+2001-07-13 17:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	NEWS, README, bundle/.cvsignore, bundle/ChangeLog, bundle/MANIFEST,
+	bundle/MANIFEST.SKIP, bundle/Makefile.PL, bundle/README,
+	bundle/Wombat.pm, lib/Wombat.pm, lib/Wombat/Authenticator.pm,
+	lib/Wombat/Connector.pm, lib/Wombat/ContainerServlet.pm,
+	lib/Wombat/Exception.pm, lib/Wombat/Globals.pm,
+	lib/Wombat/HttpRequest.pm, lib/Wombat/HttpResponse.pm,
+	lib/Wombat/Mapper.pm, lib/Wombat/Realm.pm, lib/Wombat/Request.pm,
+	lib/Wombat/Response.pm, lib/Wombat/Server.pm,
+	lib/Wombat/Session.pm, lib/Wombat/SessionManager.pm,
+	lib/Wombat/Valve.pm, lib/Wombat/ValveContext.pm,
+	lib/Wombat/Authenticator/AuthenticatorBase.pm,
+	lib/Wombat/Authenticator/BasicAuthenticator.pm,
+	lib/Wombat/Connector/HttpRequestBase.pm,
+	lib/Wombat/Connector/HttpRequestFacade.pm,
+	lib/Wombat/Connector/HttpResponseBase.pm,
+	lib/Wombat/Connector/HttpResponseFacade.pm,
+	lib/Wombat/Connector/RequestBase.pm,
+	lib/Wombat/Connector/RequestFacade.pm,
+	lib/Wombat/Connector/RequestHandle.pm,
+	lib/Wombat/Connector/ResponseBase.pm,
+	lib/Wombat/Connector/ResponseFacade.pm,
+	lib/Wombat/Connector/ResponseHandle.pm,
+	lib/Wombat/Core/Application.pm,
+	lib/Wombat/Core/ApplicationFacade.pm,
+	lib/Wombat/Core/ApplicationMapper.pm,
+	lib/Wombat/Core/ApplicationValve.pm,
+	lib/Wombat/Core/ContainerBase.pm, lib/Wombat/Core/Engine.pm,
+	lib/Wombat/Core/EngineMapper.pm, lib/Wombat/Core/EngineValve.pm,
+	lib/Wombat/Core/Host.pm, lib/Wombat/Core/HostMapper.pm,
+	lib/Wombat/Core/HostValve.pm, lib/Wombat/Core/MapperBase.pm,
+	lib/Wombat/Core/Pipeline.pm, lib/Wombat/Core/RequestDispatcher.pm,
+	lib/Wombat/Core/Service.pm, lib/Wombat/Core/Session.pm,
+	lib/Wombat/Core/SessionFacade.pm, lib/Wombat/Core/Wrapper.pm,
+	lib/Wombat/Core/WrapperFacade.pm, lib/Wombat/Core/WrapperValve.pm,
+	lib/Wombat/Deploy/LoginConfig.pm,
+	lib/Wombat/Deploy/SecurityCollection.pm,
+	lib/Wombat/Deploy/SecurityConstraint.pm,
+	lib/Wombat/Logger/ApacheFileLogger.pm,
+	lib/Wombat/Logger/ApacheLogger.pm, lib/Wombat/Logger/FileLogger.pm,
+	lib/Wombat/Logger/LoggerBase.pm, lib/Wombat/Realm/DBIRealm.pm,
+	lib/Wombat/Realm/GenericPrincipal.pm,
+	lib/Wombat/Realm/RealmBase.pm,
+	lib/Wombat/Servlet/InvokerServlet.pm,
+	lib/Wombat/Servlet/SnoopServlet.pm,
+	lib/Wombat/SessionManager/SessionManagerBase.pm,
+	lib/Wombat/Util/CookieTools.pm, lib/Wombat/Util/RequestUtil.pm,
+	lib/Wombat/Util/XmlMapper.pm, lib/Wombat/Valve/ValveBase.pm,
+	t/TEST, t/connector/request_base.t, t/connector/response_base.t,
+	t/lib/Wombat/Test.pm, t/lib/Wombat/TestFixture.pm: imported wombat
+	0.8.2 dev
+

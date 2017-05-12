@@ -1,0 +1,14 @@
+Revision history for WebService::Steam
+
+0.4 2012-08-27
+	- Bump Perl to 5.10, 5.8 was failing anyway
+0.3 2012-08-23
+	- Exported methods, steam_group and steam_user
+	- More testing, duck punch IO::All::LWP's LWP::UserAgent
+	- More POD
+0.2 2012-07-14
+	- Basic testing
+	- More POD
+	- WebService::Steam::Group string overloads to the group name
+0.1 2012-07-08
+	- Initial release

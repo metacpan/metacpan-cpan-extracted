@@ -1,0 +1,18 @@
+Revision history for Win32-PrintBox
+
+0.04    25-Jun-2015
+        Check for duplicate calls for Win32-Printbox.  ignore subsequent calls after first.
+        Removed die handler.  END block suffices.
+
+0.03    23-Jan-2015
+        init() is not called when module loaded.  User must call it.
+        Auto calling of init() caused problems in testing or parent modules.
+        Modified t/PrintBox-04.t to avoid having to answer windows prompts.
+
+0.02    13-Jan-2015
+        Fixed bug in test scripts; Needed to add ./blib/lib to @INC for
+        some tests in t/PrintBox-03.t and t/PrintBox-04.t
+
+0.01    23-May-2012
+        Initial Release to CPAN
+

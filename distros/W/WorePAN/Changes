@@ -1,0 +1,67 @@
+Revision history for WorePAN
+
+0.17 2017/04/22
+  - tweak self-made whois index to include has_cpandir
+
+0.16 2017/01/15
+  - suppress a numeric comparison warning of vstring (skaji++)
+
+0.15 2015/03/11
+  - added 'use_minicpan' option
+  - let walk() accept a single code reference as its argument
+
+0.14 2015/01/17
+  - bumped up the required version of Parse::PMFile to 0.35
+    to tolerate version line errors as undef
+
+0.13 2014/09/04
+  - fixed a test that still used Path::Extended (syohex++)
+
+0.12 2014/09/03
+  - improved indexing
+    - developer releases
+    - PAUSE permissions (if provided)
+  - internal cleanup
+    - switched to HTTP::Tiny, Path::Extended::Tiny, JSON::PP
+    - factored out slurp_(whois|mailrc|packages_details) methods
+
+0.11 2014/02/28
+  - oops, forgot to update MANIFEST
+
+0.10 2014/02/27
+  - added a command line tool to add a distribution to a DarkPAN
+  - internal cleanup
+    - use IO::Zlib explicitly
+    - switched to LWP::UserAgent
+
+0.09 2014/01/12
+  - file() now accepts PAUSEID/Distribution.ext (as well as
+    P/PA/PAUSEID/Distribution.ext)
+
+0.08 2013/09/26
+  - dropped CPAN(::Version) dependency
+
+0.07 2013/09/25
+  - fixed to use the same keys as Parse::CPAN::Whois.
+
+0.06 2013/09/25
+  - changed to parse 00whois.xml to get better (accented etc) names.
+    (suggested by dolmen++)
+
+0.05 2013/09/22
+  - do not override 'verbose' option with TEST_VERBOSE
+    if the option is defined explicitly.
+
+0.04 2013/06/22
+  - supported rare ids with a dash or of only two letters.
+
+0.03 2013/05/13
+  - added "no_indices" option
+
+0.02 2013/05/05
+  - improved 02packages.details.txt generation
+  - added "walk" method to walk down the worepan directory
+    and do something for each distribution.
+
+0.01 2012/12/09
+  - initial release

@@ -1,0 +1,111 @@
+
+Release 0.17: 19 July 2011
+
+* Noted that create_resource_section fails on WinXP and below
+
+----------------------------------------------------------------------
+
+
+Release 0.16: 26 May 2011
+
+* Fixed Perl 5.14 Compilation
+
+----------------------------------------------------------------------
+
+
+Release 0.15: 30 November 2010
+
+* Fixed parsing of Windows Object files (thanks to Nicolas Georges)
+
+----------------------------------------------------------------------
+
+Release 0.14: 03 May 2010
+
+* Added support for multiple icons
+* Added support for creating resource section for PE files that
+  have none (Win32 platforms only).
+* Removed Module::Install usage - it does not work on Win32 for
+  sub directory build. Will restore usage once CPAN Module::Install
+  works. (next release according to CPAN reports).
+
+----------------------------------------------------------------------
+Release 0.13:
+
+* Added support for PE+ (x64 64bit executables)
+* Fixed manifest bug caused by 'pack' changes in perl 5.10
+
+----------------------------------------------------------------------
+Release 0.11:
+* Applied patch by Mark Dootson to change the default exe manifest.
+
+----------------------------------------------------------------------
+Release 0.10:
+* Updated Module::Install to 0.64.
+* Applied patch by Mark Dootson to add support for exe manifests.
+
+----------------------------------------------------------------------
+Release 0.09:
+* Updated Module::Install to 0.63.
+* Updated Audrey's contact information.
+
+----------------------------------------------------------------------
+r3715:  autrijus | 2004-03-18T05:06:01.118230Z
+
+* This be 0.08.
+* Load all require submodules with 'use', not 'require', so
+  it can work with 'pp' in PAR 0.80.  Reported by Alan Stewart.
+
+----------------------------------------------------------------------
+r3626:  autrijus | 2004-03-16T11:58:23.873748Z
+
+* This be 0.07.
+* Properly raises exception when loading an invalid file to Win32::Exe.
+  Reported by Macolm Noonings.
+
+----------------------------------------------------------------------
+r3896:  autrijus | 2004-02-17T01:28:40.619691Z
+
+* This be 0.06.
+* conform to Parse::Binary 0.05 API
+* suggestion by alan to retain the original groupname.
+
+----------------------------------------------------------------------
+r3857:  autrijus | 2004-02-16T09:22:40.299320Z
+
+* This be 0.05.
+* add docs for exe_update.pl.
+* Alan Stewart reported that our FindBin magic in tests was not quite good.
+* Also, predeclare test numbers instead of no_plan.
+
+----------------------------------------------------------------------
+r3846:  autrijus | 2004-02-15T22:38:40.264114Z
+
+* This be 0.04.
+* Work with Parse::Binary 0.04 to refresh only when needed.
+  This fixes the case of clobbering the exe twice, as reported
+  by Jouke Visser.
+
+----------------------------------------------------------------------
+r3819:  autrijus | 2004-02-15T00:17:26.298029Z
+
+* This be 0.03.
+* a stupid typo caused all named resource strings to be stripped
+  from the table. oops.
+* tidy up sort a little.
+* depend on newer Parse::Binary.
+
+----------------------------------------------------------------------
+r3807:  autrijus | 2004-02-14T19:43:30.059984Z
+
+* This be 0.02.
+* truncating executables to smaller size now works.
+* properly extend the executable. it should now really work!
+* forgot to refresh data directories after updating exe. bummer
+* fix two gotchas that were probably preventing padding from working
+
+----------------------------------------------------------------------
+r3788:  autrijus | 2004-02-13T23:49:21.521921Z
+
+* This be Win32::Exe, version 0.01.
+
+----------------------------------------------------------------------

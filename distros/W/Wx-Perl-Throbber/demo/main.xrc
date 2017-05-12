@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="main_panel">
+    <size>350,230</size>
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="unknown" name="main_throbber_frame">
+              <size>34,34</size>
+            </object>
+            <flag>wxALIGN_CENTRE</flag>
+          </object>
+          <object class="spacer">
+            <size>48,48</size>
+          </object>
+          <object class="sizeritem">
+            <object class="unknown" name="main_throbber_comp">
+              <size>48,48</size>
+            </object>
+          </object>
+        </object>
+        <flag>wxALIGN_CENTRE</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <label>Gauge driven by an EVT_THROBBER event</label>
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxGauge" name="main_gauge">
+              <style>wxGA_HORIZONTAL|wxGA_SMOOTH</style>
+              <value>0</value>
+            </object>
+            <option>1</option>
+            <flag>wxEXPAND</flag>
+          </object>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Frame delay (ms):</label>
+            </object>
+            <flag>wxALIGN_CENTRE|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxSpinCtrl" name="main_spin_framedelay">
+              <value>120</value>
+              <min>1</min>
+              <max>500</max>
+            </object>
+          </object>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Text label:</label>
+            </object>
+            <flag>wxALIGN_CENTRE|wxALIGN_CENTRE_VERTICAL</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="main_txt_tlabel">
+              <value>wait</value>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="main_btn_tlabel">
+              <label>Set</label>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxCheckBox" name="main_chk_tlabel">
+          <label>Show Text Label</label>
+        </object>
+        <flag>wxALL</flag>
+        <border>2</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxCheckBox" name="main_chk_overlay">
+          <label>Show image overlay</label>
+        </object>
+        <flag>wxALL</flag>
+        <border>2</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxCheckBox" name="main_chk_reverse">
+          <label>Auto-reverse</label>
+        </object>
+        <flag>wxALL</flag>
+        <border>2</border>
+      </object>
+      <object class="spacer">
+        <size>10,10</size>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxButton" name="main_btn_start">
+              <label>Start</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="main_btn_pause">
+              <label>Pause</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="main_btn_stop">
+              <label>Stop</label>
+            </object>
+          </object>
+          <object class="spacer">
+            <size>20,20</size>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="main_btn_reverse">
+              <label>Reverse</label>
+            </object>
+          </object>
+        </object>
+        <option>0</option>
+        <flag>wxALIGN_CENTRE_HORIZONTAL</flag>
+      </object>
+    </object>
+  </object>
+</resource>

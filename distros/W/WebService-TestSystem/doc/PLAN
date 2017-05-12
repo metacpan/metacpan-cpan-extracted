@@ -1,0 +1,176 @@
+
+Phase 0 - Initial usability for searching
+-------
+* (DONE) Consolodate the SOAP testcode into testsystem.pl
+* (DONE) Create basic WebService::TestSystem
+* (DONE) Sketch out a basic API
+* (DONE) Implement object model
+* (DONE) Add support in WebService::TestSystem to pull from mysql on cl004
+* (DONE) Implement some searching routines
+* (DONE) Set up tests, packaging, etc.
+* (DONE) How can client receive the error message?
+* (DONE) Create an initial cmdline tools for querying / searching test results
+  - trqueue & trget
+* (DONE) Add POD for trqueue and trget
+
+
+Phase 1 - Conceptual Questions
+-------
+* (DONE) What should this tool be called?  What's its scope?
+* (DONE) Review machine reservation system
+* (DONE) Where do soap daemons log their error output?
+* (DONE) Should I split up the different classes of functionality? - yes
+* (DONE) Add POD for WebService::TestSystem
+* (DONE) Review existing reporting scripts & plan reporting this should do
+
+Phase 2 - Packaging
+-------
+* (DONE) Set up Makefile.PL / installation stuff
+* (DONE) Set up initscript for the daemon
+* (DONE) Test out init.d/testsystem
+* (DONE) Get cpan2rpm to produce valid rpm
+  - Is installing into / instead of $distdir
+  - Doesn't reliably install /etc/init.d/testsystem
+  - Doesn't install etc files
+  - Reports dependency error for WebService::TestSystem
+  - Does not uninstall the WebService::TestSystem perl module
+
+Phase 3 - Reporting Tools
+-------
+* lshost, lstest
+   + (DONE) Implement functionality + cmdline options
+   + (DONE) POD
+   + (DONE) Package
+   + (DONE) Distribute to users
+* (DONE) lsimages, patches, software
+* (DONE) Test the etc file and order_by fixes
+* (DONE) Extract parts of stp_report.pl
+* (DONE) Figure out why the WebService::TicketAuth module doesn't install pms
+
+* (DONE) In stp-metrics break out the different reports into subroutines
+* (DONE) In stp-metrics provide a general purpose result error handler
+* (DONE) Implement db handling in Metrics.pm for each routine
+* (DONE) Monthly Totals tool
+* (DONE) Consider alternate approaches for doing database queries (STP::DB?)
+
+Phase 4 - Authentication
+-------
+* (DONE) Learn about authentication & access control with SOAP
+* Implement authentication
+   - (DONE) Implement ability to control email/username in stp-login
+   - (DONE) Add opts and pod to stp-login
+   - (DONE) Determine how to best handle password transfer
+   - (DONE) Break out module WebService::TicketAuth w/ overloadable is_valid()
+   - Check username/password on server side against a db
+   - (DONE) Have Kees validate the login auth stuff
+* (DONE) Create an stp_login script that prompts for password & creates authfile
+* (DONE) Investigate MIME-based file upload
+* (DONE) Implement stp-logout tool
+* (DONE) Remove the stpdb_dbi params being passed into stp- scripts
+* (DONE) Remove/replace warn() calls
+* (DONE) Fix the new code in testsystem_d from Kees
+* (DONE) Add synopsis section to WebService::TestSystem
+* (DONE) Write prelim script to submit a test request, stp-tradd
+* (DONE) Hook up the validation code in Request.pm - fix the request object
+* (DONE) Make testsys->get_hosts() return state and type names
+
+* Test out the TestSystem login capabilities
+  - (DONE) Why is stp-login erroring when trying to use $self?
+  - (DONE) Remove the warns added to TicketAuth
+  - (DONE) Should I embed the Auth object into TestSystem instead of inheriting?
+  - Upgrade to SOAP::Lite 0.60 on mercury
+* Test stp-hostreq (is this the best name?)
+* Test stp-request
+* Test stp-testadd
+* Implement the plm soap calls in the validation code
+* In validation code, make it substitute id's for values in user_id, etc.
+* In validation code, implement all of the sql_* routines
+
+Phase 5 - More Packaging
+-------
+* (DONE) Create separate package of client tools
+* (DONE) Break out a config file
+* (DONE) Change as many 'uid's to 'id's as possible without having to alter db
+* (DONE) Ensure the functions in all modules use head2 instead of head3
+* (DONE) Figure out errors being emitted from testsystem_d now
+* Finish rpm for WebService::TestSystem
+* Move get_request_queue() into WebService::TestSystem::Request
+* Set up logging from server
+* Make Makefile.PL able to substitute different etc file locations into pm
+* Make Makefile.PL able to substitute alternate default servernames
+* Convert from fetchrow_hashref to fetchall_arrayref & build struct
+* Move more code out of the main TestSystem module
+* Look at plmsend to include in stp_user_tools
+* Quickie tool stp-hostreq to check out a machine to a given user
+
+Phase 6 - Test Request Submission
+-------
+* (DONE) Pull in logic from Zope for entering a test request
+* (DONE) Implement the validation code from Zope in Perl
+* Implement code to load a test request from a file
+* Finish and test stp-tradd
+* Write a single request submission tool & test out basic functionality
+* Test out bulk-submission of test requests
+* Figure out good way of incrementing the version numbers in each
+  TestSystem module
+* Investigate use of autoload for _metrics and _request
+* Fix WebService::TestSystem & trsearch to handle order_by correct
+
+Phase 7 - Test Editing
+-------
+* (DONE) File format for adding a new test
+* Implement add_test
+* Implement update_test
+* Set available host types for a test
+* Adding/editing wrap.sh parameters & descriptions
+* Editing description info for a test
+* Uploading new code for a test
+
+Phase 8 - Host management
+-------
+* Routines to report detailed info about a given host
+   + add_host
+   + update_host
+   + putting machines into/out of maintenance mode
+   + retrieve logs from a given machine
+
+Phase 9 - Client registration
+-------
+* Add functionality for registering new client machines
+* Add way to direct clients to download & execute given tests
+* Extract parts of linstab internals into testsystem
+* Extract parts of plm_web_report.pl
+* Extract parts of analyze_queue.web.pl
+* Extract parts of stp_daily.pl
+* Extract parts of stp_hosts.pl
+* Extract parts of stp_hourly.pl 
+
+Phase 10 - Test Client Machine Checkout
+--------
+* Invokes configuration of system as requested
+* SOAP call to check out stp machine for short period of time for login
+   + check_out stp4-001 [--username=bob] [--period='5 hrs'] [--notify=me@domain.org]
+   + Allow wildcard specification (check out the first available 4-way)
+   + Waits until condition met, then invokes state change on machine
+   + Insert the expiration date into database, when it'll be
+     automatically returned to the pool
+   + Add a user's ssh key to the machine to allow root login
+   + Sends notice to email address if indicated
+* SOAP call to poll checkout status
+* SOAP call to extend the reservation by another [period]
+* SOAP call to check machine back in
+* Check out two machines at one time and allow them to connect
+   + Create a dummy wrap.sh for the master that checks out a client
+     machine, sleep/polls until it is available, then installs a
+     client-side script on it that communicates with the server.
+   + Once testing is complete, master dismisses client
+
+Phase 11 - Software management
+--------
+* add new software types
+* Update software types
+* Flesh out synopsis sections of modules more thoroughly
+
+Future
+------
+* Query caching

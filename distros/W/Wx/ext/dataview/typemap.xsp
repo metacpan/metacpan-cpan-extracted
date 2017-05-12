@@ -1,0 +1,63 @@
+#############################################################################
+## Name:        ext/dataview/typemap.xsp
+## Purpose:     typemap file for xsubppp.pl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     05/11/2007
+## RCS-ID:      $Id: typemap.xsp 3346 2012-09-16 01:10:42Z mdootson $
+## Copyright:   (c) 2007-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%typemap{wxDataViewCellMode}{simple};
+%typemap{wxDataViewCtrl*}{simple};
+%typemap{wxDataViewModel*}{simple};
+%typemap{wxDataViewModelDisown*}{parsed}{
+    %cpp_type{%wxDataViewModel*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{wxDataViewColumn*}{simple};
+%typemap{const wxDataViewColumn*}{simple};
+%typemap{wxDataViewColumnDisown*}{parsed}{
+    %cpp_type{%wxDataViewColumn*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{const wxDataViewItem &}{reference};
+%typemap{wxDataViewIndexListModel*}{simple};
+%typemap{wxDataViewItem&}{reference};
+%typemap{wxPlDataViewIndexListModel*}{simple};
+%typemap{wxDataViewRenderer*}{simple};
+%typemap{wxDataViewRendererDisown*}{parsed}{
+    %cpp_type{%wxDataViewRenderer*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+%typemap{wxAlignment}{simple};
+%typemap{wxDataViewEvent*}{simple};
+%typemap{wxDataViewItemAttr*}{simple};
+%typemap{wxDataViewModelNotifier*}{simple};
+%typemap{wxDataViewTextRenderer*}{simple};
+%typemap{wxDataViewTextRendererAttr*}{simple};
+%typemap{wxDataViewProgressRenderer*}{simple};
+%typemap{wxDataViewIconTextRenderer*}{simple};
+%typemap{wxDataViewToggleRenderer*}{simple};
+%typemap{wxDataViewBitmapRenderer*}{simple};
+%typemap{wxDataViewDateRenderer*}{simple};
+%typemap{wxDataViewSpinRenderer*}{simple};
+%typemap{wxDataViewIconText*}{simple};
+%typemap{wxDataViewTreeStore*}{simple};
+%typemap{const wxDataViewTreeStore*}{simple};
+%typemap{wxDataViewTreeCtrl*}{simple};
+%typemap{wxDataViewListStore*}{simple};
+%typemap{const wxDataViewListStore*}{simple};
+%typemap{Wx_UserDataO*}{simple};
+
+/*
+%typemap{Wx_UserDataOwxUIntPtr*}{parsed}{
+    %cpp_type{%Wx_UserDataO*%};
+    %precall_code{% reinterpret_cast<wxUIntPtr>($CVar); %};
+};
+*/

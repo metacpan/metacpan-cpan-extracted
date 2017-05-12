@@ -1,0 +1,854 @@
+commit e472d22e8269d94896175b461612b21aaed9efa3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 6 15:50:13 2016 +1030
+
+    VERSION increment: 1.246
+
+commit 5f802d62c7e62af9274739d9a1ba4a8335108f94
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 6 15:49:51 2016 +1030
+
+    VERSION increment: 1.245
+
+commit 828bd58dc9a5002924c2fd16befbb152f0285bea
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 6 15:48:21 2016 +1030
+
+    Fixed <script> tag not terminated when "src" attrib added, included test
+
+commit ca6f80f7667cb2a885037421e72a701e79d979ed
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 23 13:07:54 2016 +0930
+
+    VERSION increment: 1.244
+
+commit 0991f00241cf6add1b0750ff6bf148eb3f9a8fb4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 23 13:07:36 2016 +0930
+
+    Fix compat issue with CGI 4.28, run through perltidy
+
+commit 7e1d80dc8a081d2166c81b604952e13c35670fd0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 22 23:48:37 2016 +0930
+
+    VERSION increment: 1.243
+
+commit bd7339d205ad85dafda61efa2c42306c40f1acc7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 22 23:48:00 2016 +0930
+
+    Added test for explicit and implicit close of submit tag followed by plain text
+
+commit dbc1f6690a198c8806ec8176009fb7f61d1fa142
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 22 23:39:42 2016 +0930
+
+    Added support for tags to be flagged dynamic by external handlers (such as WebDyne::State making form tag dynamic)
+    
+    Fixed minor compile error where <form><submit>Hello</form> gave different results to form><submit/>Hello</form> (note explicit close on submit)
+
+commit 3e9dfcb13bc86712d488b65d4378f015d37377f9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 22 17:08:29 2016 +0930
+
+    Add fix for text below explicit tag (e.g. <submit>) to be compiled properly
+
+commit 66c942b5a04e249407552786c05951a209db6cc6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 12 14:25:14 2016 +0930
+
+    VERSION increment: 1.242
+
+commit 0fb434cc3bbe3ce7b8d997df6a8ae4438bfc3448
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 12 14:24:37 2016 +0930
+
+    Version increment
+
+commit 22a40c1889d992e322f68fd5003de2cde29f0490
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 12 13:50:17 2016 +0930
+
+    Removed global CGI::LIST_CONTEXT_WARN and rely on local() closer to usage
+
+commit ee842499c0fa1bd1c92ba70eba7fd954ebc318b5
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 12 13:46:11 2016 +0930
+
+    Add LIST_CONTEXT_WARN=0 to stop CGI warning. Change init method whe WEBDYNE_CGI_EXPAND enabled
+
+commit 9e9b4dccab859824546b82f471f13c9f8aea5b31
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Dec 10 09:49:00 2015 +1030
+
+    Mute LIST_CONTEXT_WARN warnings from CGI
+
+commit 0ca01b925b1212f46c389d19fc21d6f92d781ea5
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 26 21:46:30 2015 +0930
+
+    VERSION increment: 1.240
+
+commit c5cba1528463b35967cf8fc046e9338321898a1b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 26 21:46:23 2015 +0930
+
+    fix intermittent test failure caused by hash order randomisation
+
+commit fa9896321e3192901ff23480422aaea8e1a416f0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 26 21:24:27 2015 +0930
+
+    VERSION increment: 1.239
+
+commit a002f877947143922a6404f82b1b346ca4eadeb7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 26 21:22:37 2015 +0930
+
+    Overhaul error handling code - try for clearer, more consistant errors with better line numbers
+
+commit 0c4aefbd2547e0ab534b7957b7d76b9f95c7efbd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 25 22:42:41 2015 +0930
+
+    attempt to provide more accurate line numbers for perl code intermingled with HTML
+
+commit d05b25c94a363d6ef118b5a4953e035b2c066c45
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 25 15:46:33 2015 +0930
+
+    Fix end line number on inline <perl> blocks
+
+commit 35cd580c920c178c89fd51c1cdbdc8b9cee9a5e1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 25 11:26:09 2015 +0930
+
+    Added Module::Reload facility to reload .pm modules called by .psp pages
+
+commit 8d37420aaf7a83ee97ea4f290c66bdc785edac69
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 5 11:23:56 2015 +1030
+
+    Fixed regression in render code, updated VERSION to be consistant across all files
+
+commit c0c62786a22f436ab3308ec76da16ce1699447ef
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 18 13:09:05 2014 +0930
+
+    Tag: WebDyne_1.233
+    
+    Version increment
+
+commit b331ca66540a484417ac6d440fc886095ab40721
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Apr 18 13:08:19 2014 +0930
+
+    Tag: WebDyne_1.232
+    
+    Finalise regexps, tweak Fake request handler run method to make calling from command line easier
+
+commit 59ae241ea8572f327d088928c6ad65611c69906f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Apr 14 18:25:49 2014 +0930
+
+    Tag: WebDyne_1.231
+    
+    Version increment
+
+commit 069f5be24f8e32d8e04419a2c85a1e672c044b40
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Apr 14 18:25:03 2014 +0930
+
+    Tag: WebDyne_1.230
+    
+    Another substitution regexp fix, add Data::Dumper as required module is some packages
+
+commit e7a744d5ef3c01d03ae43ff68bbc7d9c7189534e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 13 23:00:01 2014 +0930
+
+    Tag: WebDyne_1.229
+    
+    Version Increment
+
+commit 3d05348cab09ffeb4fab7faf54d59254f4128d6c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 13 16:34:36 2014 +0930
+
+    Improve location finding for perl5lb.pl, implicit add of use Data::Dumper, add self-documenting vars to Apache installer.
+
+commit 3892305eb02558411e9686c95a8615f55f47031d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Apr 10 18:04:45 2014 +0930
+
+    Improve regexp in Compile module
+
+commit 691e88e1c510a7dfdbd91ad2d7a4f475db7f77d3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Apr 9 23:59:30 2014 +0930
+
+    Code cleanup, fixes to test suite for old HTML::TreeBuilder module, WEBDYNE_EVAL_SAFE
+    disabled temporarily
+    
+    Tag: WebDyne_1.228
+
+commit 84e8c64dcd244918ec95647ae26b2076ebd2f833
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Apr 9 22:56:31 2014 +0930
+
+    Fixed tests to be compatible with early version of HTML-Tree (3.13)
+
+commit da08def7ae68291bf5f3016dbd512d102d5bcc20
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Apr 9 15:54:13 2014 +0930
+
+    Interim commit after eval code refactor
+
+commit 0acdf30c974ff03dfde493fed4bfd3a07e6fd437
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Apr 7 12:01:34 2014 +0930
+
+    Tag: WebDyne_1.227 Version Increment
+
+commit bf2b396d71b775b8a9174e13e2b26c7e235e7217
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Apr 7 11:58:32 2014 +0930
+
+    Revert regexp's to preserve Perl 5.8.8 compat
+
+commit aeb0d56cf45a97844271191a7c4e0a6c66b095a8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 6 21:35:31 2014 +0930
+
+    Tag: WebDyne_1.225 - version increment
+
+commit 4c0893cc92804f360e3f1630d6693e2510c2289c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 6 21:32:20 2014 +0930
+
+    Refactor subsitution regexps
+
+commit a27065c5ff43c5bece701f8503a9bd911a769a86
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Apr 5 18:50:50 2014 +1030
+
+    Refactor subst_attr regex to fix broken !{! [qw(a b) !} syntax + clean up regexp.
+    
+    Add CGI->noautoEscape(0) as defauly
+    
+    Add WebDyne->eof to bail out of render if needed
+    
+    Add noheader option to Fake Request
+    
+    New tests to check above work
+    
+    Other minor tweaks
+
+commit 49b2db2ad6422d9d87a78c83b225519c4f45f7fb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Mar 27 00:08:26 2014 +1030
+
+    Tag: WebDyne_1.224
+    
+    Version increment
+
+commit a3cd8cafe44ad2cc98f8169751b76126ec69fa09
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Mar 27 00:06:21 2014 +1030
+
+    Wrap eval around construction of HTML scalar from ref to check for incorrect ref types on build.
+    
+    Update Constant to default CGI param split to on
+    
+    Update wdrender to turn headers on by default
+
+commit 3ef59c303cdfa1c515c3b086cfe4f273cbda34b9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jul 2 00:10:32 2013 +0930
+
+    Tag: WebDyne_1.223
+    
+    Added escape for NULL terminated strings in error handler so displayed properly.
+
+commit 0cfc8d3f567d7cdc695ab9951c02364df71a2208
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jun 15 13:01:42 2013 +0930
+
+    Tag: WebDyne_1.222
+    
+    Version increment before CPAN push
+
+commit 64b9812f10cffdffb862dd1a27af3ac9381eb179
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jun 15 12:55:43 2013 +0930
+
+    Tag: WebDyne_1.221
+    
+    Added __END__ directive/token for .psp files - if seen in .psp file will stop parsing.
+    
+    Added option for wdrender/Fake request handler to output to file, changed tests to make use of new
+    facility.
+    
+    Added extended option documentation into Apache webdyne.conf file - easier to change an option now
+
+commit 0a3a99f9904c59655897dfa081895a000623bd1f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue May 28 02:19:39 2013 +0930
+
+    Tag: WebDyne_1.220
+    
+    Version increment.
+
+commit 94185bf753aa1fe323baa6083a6144860cc5efb0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue May 28 02:17:20 2013 +0930
+
+    Tag: WebDyne_1.219
+    
+    Fix problem with subsitution.t that resulted in random test fails dues to differences in hash ordering when test was run.
+    
+    Add code to add Carp::Heavy::[shormess|longmess}_[heavy|real] stubs if non-existant to fix problems with old/new Carp interaction.
+
+commit 5f3827682b57c8f74037721a10ba9e3d28a88e6c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 25 13:41:32 2013 +0930
+
+    Tag: WebDyne_1.218
+    
+    Fixed deref in PRINTF Tiehandle, consolidated Tiehandle code
+
+commit 03724781e3b240d5092566f90c5a6f99fd524700
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 25 12:28:41 2013 +0930
+
+    Tag: WebDyne_1.217
+    
+    Update version information for CPAN push
+
+commit 3d6d33393613e3e42afc69c54156d25c853d63ba
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 25 12:27:17 2013 +0930
+
+    Tag: WebDyne_1.216
+    
+    Changed defaults for error messages. Short error message now displayed by default.
+
+commit 9fe6fbd3a01c70cf3c3a08214938d10a6c88dbb1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri May 24 22:14:35 2013 +0930
+
+    Tag: WebDyne_1.215
+    
+    Making dist for V1.215
+
+commit 06eb5e9dc08459026453de86a73cc95013d0bf22
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri May 24 22:10:37 2013 +0930
+
+    Tag: WebDyne_1.214
+    
+    Added unrender_block command to uncache blocks if no longer required within <perl> block
+    
+    Added dump of CGI params to error handler
+    
+    Added WEBDYNE_CGI_PARAM_EXPAND to allow expandion of CGI vars like foo&bar=1 to discrete params
+    
+    Fixed print function to be more reliable if user "prints" within <perl> block instead of returning block to render. Also swapped
+    concatenation - printed blocks are renderd *after* rendered HTML now instead of before (but still not a godd ide to mix and match)
+
+commit 17c8291b3dc02f9ea92187a7030c5b2ecac21ba1
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Tue Jul 3 01:02:15 2012 +0930
+
+    Tag: WebDyne_1.213
+
+commit caa4178040d9daecee95efd1107fdf427bb1587b
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Tue Jul 3 00:57:01 2012 +0930
+
+    Tag: WebDyne_1.212
+    
+    Added WEBDYNE_CGI_PARAM_EXPAND option to expand params (not param values) of the format foo;a=b into similarly named parameter values. Off by default so no surprises.
+    
+    Fixed typo in error message.
+
+commit fddb0c61103ada4f1e5e3d94da899f55f2a527bb
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Jul 2 11:27:12 2012 +0930
+
+    Tag: WebDyne_1.211
+    
+    Added erase_block function.
+
+commit 5aaac6e3db44d9a52c32cf6b6eac64bcef3d62cd
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Oct 2 01:42:44 2011 +0930
+
+    Tag: WebDyne_1.210
+    
+    Increment version number
+
+commit 8e148ae4929a08c6779da02b1aa4855a0de1f35d
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Oct 2 01:37:26 2011 +0930
+
+    Tag: WebDyne_1.209
+    
+    Improved error debugging, attempt to print code that caused error.
+    
+    Fixed numerous basic bugs in rendering, particular render_block
+    
+    WEBDYNE_DELAYED_BLOCK_RENDER is not optional anymore - always on now
+    
+    wdrender expanded to print HTTP headers, optionally print HTML errors
+    
+    Added print, printf methods for perl code to use. Fixed code to print output pre-pended to any HTML
+    
+    Improved perl container variable isolation, $self no longer auto defined.
+
+commit 895398083213017868cdc3eb174659468ff3ed4d
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Fri Jul 15 11:23:40 2011 +0930
+
+    Tag: WebDyne_1.208
+    
+    Change versioning so dist version held in main module
+
+commit 49e07cb8affcc39db4b7703d2c0517121cdeabb4
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:02:20 2011 +0930
+
+    Tag: WebDyne_1.207
+    
+    Update version after fixing git checking process.
+
+commit 91912400069631ace731a94420f358473efe61b1
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 13:32:15 2011 +0930
+
+    Tag: WebDyne_1.197
+    
+    Updated installer to work better with SELinux enabled systems.
+    
+    Updated tests to be more compatible with older CGI.pm versions.
+
+commit c9aa7f56725e048cd0f66871ce7d3d386eba24e9
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:38:45 2010 +0930
+
+    Tag: WebDyne_1.196
+    
+    Fixed up issue with meta data not coming across when stacked handlers used,
+    clean mm_ver redundancy in Makefile.PL
+
+commit 0ff6c0052aaf1ee14b7d76cc42fedbaa88217210
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:37:28 2010 +0930
+
+    Tag: WebDyne_1.195
+    
+    Fixed version info in wdapacheinit
+
+commit 6fc9a38be8f640180b4e5409e934965f264cc48b
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:21:38 2010 +0930
+
+    Tag: WebDyne_1.194
+    
+    Update to YAML ver 1.4
+
+commit d9f2f1ed8d45a0c2d721044ae74d5a28aec304d6
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 15:41:34 2010 +0930
+
+    Tag: WebDyne_1.193
+    
+    Updated Makefile.PL to generate better META.yml info
+
+commit 4fc57fc0388bc0327a733614b0a10501bebe8159
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 14:43:05 2010 +0930
+
+    Tag: WebDyne_1.192
+    
+    Cleaned up coptyright and author contact information (again)
+
+commit 910aa36749ff114e71934829c2a29900b64e7cce
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Apr 11 14:28:44 2010 +0930
+
+    Tag: WebDyne_1.191
+
+commit d4b8a6831c30bcb5c5af1e38ccf5588e18997a67
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Apr 11 14:28:44 2010 +0930
+
+    Tag: WebDyne_1.191
+
+commit 14d2c4e39755c9abf098a3590acb8371d075c282
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Thu Apr 8 22:30:40 2010 +0930
+
+    Tag: WebDyne_1.190
+    
+    Minor cleanup, remove some unneeded variables.
+
+commit 4d236001754dece608d19028ba67d96df2d0a1e3
+Author: root <root@copper.isolutions.com.au>
+Date:   Thu Apr 8 21:37:36 2010 +0930
+
+    Tag: WebDyne_1.189
+    
+    Updated documentation
+
+commit c97421d55e07567f484b28f7fa6e1d2aaf3d1684
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Thu Apr 8 10:50:06 2010 +0930
+
+    Tag: WebDyne_1.188
+
+commit 2cd04fc49593cd4c9bfaf7c7d531cd9b27b9a239
+Author: root <root@copper.isolutions.com.au>
+Date:   Wed Apr 7 23:54:13 2010 +0930
+
+    Tag: WebDyne_1.187
+
+commit db6161ebfafa55f430cd4c532992e4bb355d2c85
+Author: root <root@copper.isolutions.com.au>
+Date:   Wed Apr 7 23:51:23 2010 +0930
+
+    Tag: WebDyne_1.186
+    
+    Improved documentation.
+
+commit cee25af0232826ffc547e824931ecef9a3283fde
+Author: root <root@copper.isolutions.com.au>
+Date:   Wed Apr 7 23:39:20 2010 +0930
+
+    Tag: WebDyne_1.185
+    
+    Improved documentation
+
+commit 1ca7e3c03c36418f5aa52a723d3e93c1ee9c722c
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Wed Apr 7 17:47:27 2010 +0930
+
+    Tag: WebDyne_1.184
+    
+    Fixed issue with VERSION information not matching git revisions
+
+commit 12056288692570881aa16a7dd8ae266873653e18
+Author: root <root@copper.isolutions.com.au>
+Date:   Wed Apr 7 17:32:29 2010 +0930
+
+    Tag: WebDyne_1.182
+    
+    Added man page and PDF documentation
+
+commit 4e27b40f6f34eef22f4c645b5ad46458e3a44dc4
+Author: root <root@copper.isolutions.com.au>
+Date:   Wed Apr 7 01:21:00 2010 +0930
+
+    Tag: WebDyne_1.164
+    
+    Rename perl5lib.pm => perl5lib.pl and modify use so not stomping on
+    existing perl5lib.pm module that already exists on CPAN.
+
+commit 88b3221606cd8a5923bb7692dd85ba2ec0914874
+Author: root <root@copper.isolutions.com.au>
+Date:   Tue Apr 6 22:07:58 2010 +0930
+
+    Tag: WebDyne_1.163
+    
+    Updated tests to reflect new versioning scheme.
+
+commit d1782417eec7b1629281119a66ba834165254894
+Author: root <root@copper.isolutions.com.au>
+Date:   Tue Apr 6 22:03:29 2010 +0930
+
+    Tag: WebDyne_1.162
+
+commit 07b53246563e4c9828b987a33436f7d84ea7b102
+Author: root <root@copper.isolutions.com.au>
+Date:   Tue Apr 6 22:02:36 2010 +0930
+
+    Tag: WebDyne_1.161
+    
+    Changed format of $VERSION to make CPAN PAUSE indexer happy.
+
+commit 0a749ee7ed2e410cebf0f6b6b12f27f4665a3f59
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Apr 5 22:04:28 2010 +0930
+
+    Tag: WebDyne_1.160
+    
+    Change way VERSION generated to try and make PAUSE happy
+
+commit 642821f353792cf77dd22e812a2ad258dd48610c
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Apr 5 17:17:00 2010 +0930
+
+    Tag: WebDyne_1.159
+    
+    Updated wdapacheinit man page
+
+commit 53bb3405024f8dee5be6fef369b4ecf3ba0aa951
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Apr 5 17:04:30 2010 +0930
+
+    Tag: WebDyne_1.158
+    
+    Updated README file.
+
+commit f08c892452a981b3ae5b8b87c9ee1293a913901e
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Apr 5 17:01:44 2010 +0930
+
+    Tag: WebDyne_1.157
+    
+    Fixed tests to work with new block render mode
+
+commit f0964b7515a89530b778143c38682de75b1ac69d
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Apr 5 16:55:14 2010 +0930
+
+    Tag: WebDyne_1.156
+    
+    Updated man pages, general bug fixes including better __DIE__ signal
+    handling.
+
+commit 6df7d7cc6e6f76c5f5203de05b426cf6c78ddfbb
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Mar 20 12:33:41 2010 +1030
+
+    Tag: WebDyne_1.155
+
+commit 287308e1bf8a68499859135406e2cdfd52d0a447
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Mar 14 23:34:56 2010 +1030
+
+    Tag: WebDyne_1.154
+    
+    Improved error handling with source context. Added controls around what is shown in
+    HTML error messgages.
+    
+    Improved Compilation - now pre-render start_ CGI tags if possible.
+    
+    Man page for WebDyne updated
+    
+    Fixed junk characters appearing on r_child render, e.g. cached page
+
+commit 9397325d7a06c7b244daf337b418132249b67108
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Wed Mar 3 23:51:55 2010 +1030
+
+    Tag: WebDyne_1.153
+    
+    Added new tests, updated MANIFEST
+
+commit 92cf9d455b57d4eb054178872b8e0b16f26c2489
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Wed Mar 3 01:13:10 2010 +1030
+
+    Tag: WebDyne_1.152
+    
+    Use CGI::EXPORT_TAGS=:form for populating implicit tag list
+    
+    Look for start_ tags (as in start_form etc.) and treat as implicit
+    
+    Auto terminate all HTML once __PERL__ is seen.
+
+commit 0da3763686e5d63ff374a8cc5696d36cbf46b786
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Tue Mar 2 11:30:50 2010 +1030
+
+    Tag: WebDyne_1.151
+    
+    Clean up path handling in perl5lib.pm - cononize paths before output
+    to webdyne.conf so consistant for platform (e.g. Windows)
+
+commit ba6a8bdd23ee2d700feb83272f7551e33aeaf0a8
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Mar 1 01:44:30 2010 +1030
+
+    Tag: WebDyne_1.150
+    
+    Modified tests so render the same across different CGI.pm versions, stops them failing on different platforms with higher/lower CGI version than the dev platform.
+
+commit b7f7301a7422ecf31b85303c7a9e7f1af319c8c7
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Mar 1 00:24:47 2010 +1030
+
+    Tag: WebDyne_1.149
+    
+    Fix error with reading Apache->dir_config in mod_perl 1.x
+    
+    Clean up "local $SIG{__DIE__}" syntax to be correct
+    
+    Extra careful with cache flush at startup - check WEBDYNE_CACHE_DN exists befoe glob
+
+commit c8cad1a9869f084c1da5d884fb2e23a7c63b3912
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 22:45:19 2010 +1030
+
+    Tag: WebDyne_1.148
+    
+    Silenced warnings in bin/* files, trapped SIG{__DIE__} when trying to
+    load Time::HiRes so doesn't trip over when running make test
+
+commit 89467c359da8e0bd1a3518246aa298db8a86b89e
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 17:38:06 2010 +1030
+
+    Tag: WebDyne_1.147
+    
+    Fix stupid bug in default directory choice
+
+commit 1caa42e182b58ea995ff9ade3c0acf7075fa4669
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 17:02:17 2010 +1030
+
+    Tag: WebDyne_1.146
+    
+    Better choice of default cache directory if no PREFIX supplied
+
+commit 812389cf8d3898eee0becda48eddc8d30c83b373
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 15:48:11 2010 +1030
+
+    Tag: WebDyne_1.145
+    
+    More perl5lib tweaking after breaking last change.
+
+commit d731bdf624f4f9fbacd9ceeaa40d005af1eb7059
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 15:32:43 2010 +1030
+
+    Tag: WebDyne_1.144
+    
+    Tweaks to perl5lib to load ExtUtils::MM if library prefix same as Perl standard prefix
+
+commit 72d19abc56154382cb99b0b235b530b8b5557ee9
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sun Feb 28 14:27:27 2010 +1030
+
+    Tag: WebDyne_1.143
+    
+    Improve backwards compatibility with mod_perl 1.99
+
+commit 95049e6215ccccd4f21d83cd704dafe7daf416d3
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 17:34:41 2010 +1030
+
+    Tag: WebDyne_1.142
+    
+    Modify "eval undef" to "eval { undef }" to stop bitching in older Perl versions
+
+commit 8ca4b07441a480dbf32d0fb7652ab3f0c2c96654
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 17:26:57 2010 +1030
+
+    Tag: WebDyne_1.141
+    
+    Removed Time::HiRes as prereq in Makefile.PL
+
+commit 2a9cf3bebfb5e6bbe85c96354dd87b629ad07c30
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 17:24:14 2010 +1030
+
+    Tag: WebDyne_1.140
+    
+    Made Time::HiRes module optional in WebDyne, WebDyne::Compile
+    
+    Made ExtUtils::MM module optional in perl5lib.pm
+    
+    Filtered CR's out when comparing t/*.psp with dump files to accommodate different output created by older versions of CGI.pm
+    
+    Included script to generate .dmp files in test dir
+
+commit 837c6b3bd26b011f589b4c036eb2604e9f3fc119
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 15:23:18 2010 +1030
+
+    Tag: WebDyne_1.139
+    
+    Fix start_html UNIVERSAL::can entry in Compile - put in quotes so works correctly with older versions of Perl/CGI
+
+commit 87a3911fba0e77612e55bed722d416793332debb
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 14:19:12 2010 +1030
+
+    Tag: WebDyne_1.138
+    
+    Fix Compile.pm for backwards compat with older CGI.pm
+
+commit 41b755c0b054699f1941592a09d2190846a1f795
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 27 00:00:29 2010 +1030
+
+    Tag: WebDyne_1.137
+
+commit 14eb60c8f87a96bfe9769ee7eb029ad490eda6d4
+Author: root <root@copper.isolutions.com.au>
+Date:   Tue Feb 23 14:29:16 2010 +1030
+
+    Tag: WebDyne_1.135
+    
+    * Misc bug fixes
+    
+    * Addition of wddebug binary to change debug status
+    
+    * Change Constants file from /etc/constant.pm to /etc/webdyne.pm
+
+commit 5f227c3736a92ef69b23f81fccc3956a7c8ef1ea
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Sat Aug 22 15:18:45 2009 +0930
+
+    Tag: WebDyne_1.134
+    
+    WebDyne::Install::Apache code now updates SELinux attributes for Webdyne cache dir (if SELinux enabled)
+
+commit 32f9c8f36ee477bbf15fddeb6fcd6ae4f95e25e1
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Mon Aug 17 01:21:34 2009 +0930
+
+    Tag: WebDyne_1.133
+    
+    Integrated Apache installer into base module. Enhanced installer to run SELinux commands if needed.
+
+commit c6d9fa713e59ba6cd4da36076696790b5c6d82ca
+Author: Andrew Speer <aspeer@silicon.(none)>
+Date:   Sat Jul 19 16:14:10 2008 +0930
+
+    Tag: WebDyne_1.132
+    
+    Removed legacy RCS/CVS keywords and associated variables - no longer needed
+    in Git
+
+commit 1b9a3b3d173b61925524eba8e3add3de9275e40f
+Author: Andrew Speer <aspeer@silicon.(none)>
+Date:   Tue Jul 15 01:13:37 2008 +0930
+
+    Tag: WebDyne_1.130
+    
+    Add INSTALL file, include POD documentation for files in /bin. Add small
+    optimisation in WebDyne file to no increment cache usage counters if we are
+    not checking the cache file.
+
+commit 3fcd93d32f7a93fc900c6ee1294edf4aa1877a8a
+Author: Andrew Speer <aspeer@silicon.(none)>
+Date:   Sun Jul 13 12:37:11 2008 +0930
+
+    Tag: WebDyne_1.129
+    
+    Clean up Makefile.PL, rename filter that strips out debug commands to .pf
+    instead of .pl so not picked up and installed. Removed unneeded references
+    to error.psp file in constants section.
+
+commit ee532e5c653420cf77f11d1d9bd3f0df7b3ca7e6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 9 01:17:39 2008 +0930
+
+    Initial Import
+

@@ -1,0 +1,66 @@
+{
+   "abstract" : "API for the Postmark mail service for web applications.",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Postmark",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "3.0115",
+            "IO::Socket::SSL" : "2.012",
+            "Net::SSLeay" : "1.68"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Email::Valid" : "0",
+            "File::Basename" : "0",
+            "File::MimeInfo" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.42",
+            "Net::SSLeay" : "1.49",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/WWW-Postmark/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/WWW-Postmark",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/WWW-Postmark.git",
+         "web" : "https://github.com/ido50/WWW-Postmark"
+      }
+   },
+   "version" : "1.000001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0113"
+}
+

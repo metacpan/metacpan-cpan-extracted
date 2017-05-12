@@ -1,0 +1,19 @@
+Revision history for Win32::InternetShortcut.
+
+0.04  Apr 6, 2008
+  - maintenance release: no significant code changes
+  - it seems 'modified' may be blank sometimes.
+    so the test is tentatively skipped.
+
+0.03  Dec 29, 2007
+  - maintenance release: no significant code changes
+  - made MinGW gcc happier; declined Cygwin
+
+0.02  May 27, 2007
+  - maintenance release: no significant code changes
+  - added license info to Makefile.PL
+  - updated META.yml version
+
+0.01  Jun 20, 2006
+  - initial release
+

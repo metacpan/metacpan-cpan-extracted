@@ -1,0 +1,28 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_0_0_588 - This is the release notes for Version 0.0.588 of Win32::GUI
+
+=head1 Release Date
+
+21st January, 2001
+
+=head1 Summary of Changes
+
+This version solves various bugs, including:
+
+  - memory leak
+  - out of memory error with the -filter option in GetOpenFileName and
+    GetSaveFileName
+  - lot of warnings in Win32::GUI::Dialog
+
+B<PLEASE NOTE:> I've made heavy changes in the internal working of
+the module, so I'm not 100% sure that everything works fine. The good
+news is that the module is a lot faster now :-) Please make
+extensive tests, and report anything that used to work and doesn't
+anymore.
+
+=head1 Contributors to this release
+
+Unknown
+
+=cut

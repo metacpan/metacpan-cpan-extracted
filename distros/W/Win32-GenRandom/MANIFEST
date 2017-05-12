@@ -1,0 +1,16 @@
+MANIFEST
+Changes
+README
+GenRandom.pm
+GenRandom.xs
+Makefile.PL
+t/01load.t
+t/02cgr.t
+t/03rgr.t
+t/04print_error.t
+t/05gen_check.t
+t/05gen_check_alt.t
+t/06gr.t
+t/07cgr_custom.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,88 @@
+Revision history for WWW-Scraper-ISBN-BarnesNoble_Driver
+========================================================
+
+0.21    2014-12-25
+        - updated test data, previous examples now out of print.
+
+0.20    2014-11-02
+        - extended META test suite.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.19    2014-10-22
+        - fixed license fields in META.json to be lists.
+
+0.18    2014-05-30
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - reworked test failure checks
+
+0.17    2013-11-17
+        - added git repository links to metadata.
+
+0.16    2013-05-19
+        - updated binding pattern matching due to page layout changes.
+
+0.15    2013-03-17
+        - Data::Dumper used in tests.
+
+0.14    2013-03-10
+        - exposed depth values.
+        - added isbn-check.pl to examples.
+        - License updated consistently to Artistic License v2.0.
+        - META updates.
+        - more error reporting in tests.
+
+0.13    2012-12-31
+        - fixed regex for author.
+        - fixed string match for when book not found.
+        - fixed tests for new image paths.
+
+0.12    2012-12-16
+        - fixed images tests, due to path changes.
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.11    2012-05-20
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.10    2011-06-28
+        - updated due to page reformatting.
+
+0.09    2011-05-23
+        - updated link test again.
+
+0.08    2011-05-06
+        - updated test link due to variations in the link format reported.
+
+0.07    2011-05-04
+        - updated link test due to site changes.
+
+0.06    2011-03-01
+        - updated tests due to changed content, including mispellings on Barnes
+          & Noble site!
+        - fixed test count for skip.
+
+0.05    2011-02-16
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - added test file for convert subs.
+        - updated regex for author & title extraction.
+
+0.04    2011-02-14
+        - removed invalid ISBN test, due to missing Business::ISBN object
+          within WWW::Scraper::ISBN ... though works for my other ISBN 
+          distros!
+
+0.03    2010-12-01
+        - improved validation for ISBN/EAN13.
+
+0.02    2010-11-29
+        - fix to field cleanup code for non-existent field values.
+        - slight alteration to regex for description.
+
+0.01    2010-11-02
+        - initial release

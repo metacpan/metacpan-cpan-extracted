@@ -1,0 +1,145 @@
+Revision history for Web-Simple
+
+0.033 - 2017-03-20
+  - reinstate the right glob in XML::Tags
+
+0.032 - 2016-11-15
+  - add HTTP::Body dep
+  - fix Test::More dep
+  - documention fixes
+
+0.031 - 2015-08-14
+  - rewrite docs to use string form first
+  - handle empty query parameters
+  - produce a sensible error for (GET => undef) on 5.8
+
+0.030 - 2014-08-07
+  - make dispatch_misc.t handle Plack's MockHTTP's on error behaviour changing
+
+0.029 - 2014-07-27
+  - fix repository metadata (Thomas Sibley)
+
+0.028 - 2014-07-11
+  - remove use of 'use base'
+  - lower minimum required version of perl properly down to 5.6
+
+0.027 - 2014-07-11
+  - stable release of 0.026_001
+
+0.026_001 - 2014-07-09
+  - fix prerequisite declarations on older toolchain
+
+0.026 - 2014-07-09
+  - remove erroneous XML::Tags prereq
+
+0.025 - 2014-07-07
+  - fixes a memory leak that occurs when calling
+    Web::Simple::Application::to_psgi_app (Christian Walde)
+  - more complete prerequisite declarations
+
+0.024 - 2014-07-03
+  - small documentation fixes
+
+0.023 - 2014-05-23
+  - Re-dist to fix MANIFEST
+
+0.022 - 2014-05-23
+  - Remove erroneous require of deleted Web::Dispatch::Node
+
+0.021 - 2014-05-20
+  - Handle ) as last character of composite spec
+  - Allow passing method names to dispatcher
+  - Added Web::Simple::Role
+  - Assorted doc updates
+
+0.020 - 2012-08-03
+  - re-dist for botched release
+
+0.019 - 2012-07-30
+  - Add %_ alias if first argument is a hashref
+  - Un-mark upload matches as experimental since they work
+
+0.018 - 2012-07-15
+  - Allow dots in parameter names
+  - Support for basic authentication in test requests
+
+0.017 - 2012-07-05
+  - Don't falsely recognize mod_cgid as FCGI
+
+0.016 - 2012-05-11
+  - Actually import weaken so the 0.015 fix doesn't implode
+
+0.015 - 2012-05-10
+  - Fix a per-application-instance memory leak
+
+0.014 - 2012-04-27
+  - Add named path matching
+  - Allow headers on CLI calls
+
+0.013 - 2012-04-03
+  - Fix a weird interaction between match-spec parsing and module loading
+    that was causing brokenness and test failures with perl 5.8.8
+
+0.012 - 2012-01-30
+  - Added match predicates match_true and match_false
+  - Added '~' to match an empty path
+  - Sub-dispatch via '...' is now permissible without a trailing slash
+  - Only word char sequences with singular periods are parsed as path parts now
+  - Various doc fixes
+  - All query body parameters are now decoded from UTF8
+  - Allow dots in path matches, so you can have sub (/foo.html)
+
+0.011 - 2011-12-23
+  - Add Web::Dispatch::HTTPMethods
+  - Fix [ sub {} ] for async code
+  - Support match_foo(...) => sub {} as a dispatcher return
+
+0.010 - 2011-10-06
+  - Provide $app->run_test_request for use in test scripts
+  - Preserve original env in Web::Dispatch so ParamParser can cache in there
+    (stops HTTP::Body object getting destroyed early thereby losing uploads)
+
+0.009 - 2011-10-03
+  - Complete port from HTTP::Request::AsCGI to Plack::Test
+  - Add experimental upload support
+  - Update Plack usage to call ::Handler:: classes not ::Server::
+  - Assume FastCGI mode if STDIN is a socket (works some places env vars fail)
+  - Change CLI mode to print status line and headers to STDERR and content
+    to STDOUT so that './myapp /foo.html >foo.html' works sanely
+  - Add *.* and **.* dispatch types to keep extension
+  - Add Antiquated Perl slides in a POD document.
+
+0.008 - 2011-02-16
+  - Once more.
+
+0.007 - 2011-02-16
+  - Re-release due to indexing failure
+
+0.006 - 2011-02-15
+  - Fix Content-type issue (ie, Content-type: blah works,
+    but Content-type: blah; charset: blah shits flames)
+  - Make Web::Dispatch return [\$cv] as \$cv to allow subref responses
+  - Stop undef errors killing XML::Tags conversion to string
+  - Fixup dispatcher logic so dispatchers within a /foo/... work correctly
+
+0.005 - Tue Jan 11 2011 22:09 UTC
+  - Redocument to cover changes
+  - Factor dispatcher code out into Web::Dispatch
+  - Support 'use Web::Simple;' to default to current package
+
+0.004 - Thu Jul 08 2010 22:08 UTC
+  - Hide Plack Modules from PAUSE
+
+0.003 - Thu Jul 08 2010 14:48 UTC
+  - Experimentally use $_[ENV] for the PSGI env
+  - Add CSS::Declare
+  - Add more tags to HTML::Tags
+
+0.002 - Tue Dec 01 2009 00:30 UTC
+  - fix dispatcher construction to recognise '' as no proto (we expected undef)
+  - plackup support, as_psgi_app method
+  - Fix SYNOPSIS
+
+0.001 - Tue Nov 24 2009 21:54 UTC
+
+  - Initial release

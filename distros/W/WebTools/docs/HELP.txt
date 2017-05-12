@@ -1,0 +1,855 @@
+      WebTools HELP File
+
+       Contents: 
+
+      1. Overview 
+      2. Web Tools 
+      3. GlobExport 
+      4. STDoutHandle 
+      5. Xreader 
+      6. Config 
+      7. Security and restrictions 
+      8. Various stuff 
+      9. Author 
+
+
+        
+      1. Overview
+
+         WebTools was projected to reduce maximum development work in web 
+      projects! It decide most of common tasks, so you can think about more 
+      important things at all. Note that, this package is not 10-15 kb and you 
+      will need a time to learn everything about it. But don't afraid to start. 
+      I am sure that it will be helpful for you :-) 
+       This document is not a comprehensive help. It is reference! For more 
+      information and help please see examples into docs directory!
+
+
+
+      2. Web Tools 
+         This module capsulate most of functionally that Web developer need for 
+      its projects! 
+      Mainly is support: sessions, user accounts, html-perl code (php like), 
+      Database support, templates and more.. 
+        
+      Exported Variables
+
+
+      *SESSIONSTDOUT 
+         Standard OUTput handler used by webtools to emulate PRINT-like 
+      operators. 
+
+      %SESREG 
+         This hash contain all registered variables with "this" session. 
+
+      %SIGNALS 
+         This hash contained all catched signals from user's script. 
+
+      %sess_cookies 
+         Contain all cookies received from input stream. 
+
+      %uploaded_files 
+           Contain filenames of all uploaded files via multipart form! 
+           They are names of files on local machine (i.e. your web server) 
+           You can open and read these files from your server's tmp directory! 
+           Note that you must to clean up by yourself (please delete these files 
+      after your job)  
+
+      $cpg_priority
+           Show priority of cookies and get/post global variables. This variable 
+      can
+           contain 'cookie' (cookies has higher priority) or 'get/post' 
+(get/post
+           variables rewrite cookies values)
+
+      $sentcontent 
+         Show whether Send_Content() where called! (i.e. data were flushed to 
+      browser) 
+
+      $ip_restrict_mode 
+         Set 'on' or 'off' restriction of session by IP 
+
+      $apacheshtdocs 
+         This is apache`s htdocs directory. 
+
+      $reg_buffer 
+         Contain registered session data! 
+
+      $cookie_path_cgi 
+         That is PATH added to cookies (e.g: /cgi-bin/) 
+
+      $cookie_domain_cgi 
+         That is DOMAIN added to cookies (e.g: .july.bg) 
+
+      $cookie_exp_date_cgi 
+         That is DATE added to cookies 
+
+      $secure_cookie_cgi 
+         That is SECURE atribute added to cookies (e.g: 1 or 0) 
+
+      $session_started 
+         Show whether session_start were started! 
+
+      $print_header_buffer 
+         Here is a place where script holds 'headers' (only!) 
+
+      $print_flush_buffer 
+         Here is a place where script holds 'body'! 
+
+      $sql_host 
+         Variables that contain SQL host from confing.pl 
+
+      $sql_user 
+         Variables that contain user name from confing.pl,  used to access SQL 
+      server. 
+
+      $sql_pass 
+         Variables that contain user pass from confing.pl,  used to access SQL 
+      server. 
+
+      $sql_database_sessions 
+         That is database name of session's table. 
+
+      $sql_sessions_table 
+         That is a name of session's table. 
+
+      $cgi_script_timeout 
+         That is a expiration time of script i.e. maximum running time of 
+      script. Default it's value is 120 seconds! If you  need more time for your 
+      script, please don't change that var directly, please use function 
+      set_script_timeout()  If you thing you need more time for all your scripts 
+      at all, then change this var (it is found into config.pl) 
+
+      $cgi_lib_forbid_mulipart 
+         If you want to protect yourself from multipart spam turn this to 'on' 
+      (Default it is set to 'off')
+         If you disable this variable you will not longer receive Multipart 
+      forms via POST! 
+        
+      Exported Functions
+
+
+      hideerror 
+         Function that will be executed when error occur in SQL server. 
+
+      sql_query 
+         SQL query function. $result = sql_query ($query,$DBHandler); 
+
+      sql_fetchrow 
+         SQL function that fetching rows from SQL server. 
+       @arr = sql_fetchrow ($result_handler); 
+
+      sql_affected_rows 
+         SQL function that show a count of affected rows. 
+         $number = sql_affected_rows ($result_handler); 
+
+      sql_inserted_id 
+         SQL function that show current inserted ID number. 
+         $number = sql_inserted_id ($result_handler); 
+
+      sql_num_rows 
+         SQL function that show a count of affected rows. 
+         $number = sql_ num_rows ($result_handler); 
+
+      sql_quote 
+         Quote one scalari.e. escape special chars and add at both begin and end 
+      parts needed quotes! 
+         $quoted_string = sql_quote ($unquoted,$DBHandler); 
+
+      sql_connect 
+         Connect SQL server. No params needed!
+         Return $DBHandler as result. 
+
+      sql_connect 
+         Connect SQL server. Same as previous but it's take up to 6 parameters.
+         $DBHandler = sql_connect 
+      ($host,$database,$user,$pass,[$port],[$full_path]);
+         $host is needfull only for MySQL DB; $database is DNS for Access DB, 
+      normal DB name for MySQL and file name (without path and without ext eg.: 
+      'july'); 
+         $port is proper only for MySQL DB; $full_path is a path to Flat DB file 
+      (eg.: ./db/)
+         NOTE: You should specify all parameters except these in "[]" (if they 
+      are not applyable) 
+
+      sql_select_db
+        Select new database. 
+         $new_DBHandler = sql_select_db ($new_database,$DBHandler); 
+         As result of this function new database are now activated (selected) 
+      but you  must save (and use) the new one Database Handler instead of 
+      previous one! 
+
+      sql_disconnect 
+         Disconnect SQL server. No params needed! 
+         Return 1 as result.
+
+
+      sql_errmsg 
+        Return error message. 
+         $err_mes = sql_errmsg ($DBHandler); 
+
+      sql_errno
+        Return error number. 
+         $err_numb = sql_errno ($DBHandler); 
+
+      sql_data_seek
+        Move result handler to some row number. 
+         $res = sql_data_seek ($row_number,$result_handler); 
+
+      load_database_driver
+        Load database driver (on runtime) 
+         $res = load_database_driver ($driver_name);
+        Where $driver_name can be 'mysql', 'flat', 'access' and 'sess_flat'! 
+
+      DB_OnDestroy 
+         Event on destroy DB handler! 
+
+      DB_OnExit 
+         Event on script exit! 
+      ________________________________________________ 
+        
+      session_start 
+         Start SESSION. It can be inherited or created as is. 
+         $SID = session_start ($DBHandler,$NewSessionFLAG);
+        Where $NewSessionFLAG can be 1 or 0 (1 - will create absolutely new 
+      session 
+         (old session is ignored), 0 - will inherit old session if any) 
+
+      session_register 
+         Register one buffer (compressed vars) into Session table. 
+         $result = session_register ($Buffer,$DBHandler); 
+
+      session_destroy 
+         Destroy current session 
+         $SID = session_destroy ($DBHandler); 
+
+      session_ip_restrict 
+         Set mode of session restriction by IP. Valid modes are: 'on' and 'off' 
+         session_ip_restrict ($mode); 
+
+      session_id 
+         Return current $SID as result. 
+
+      session_clear_expired 
+         Clear all expired records from database. 
+         $SID = session_clear_expired ($DBHandler); 
+
+      session_id_adder 
+         Add SID ident to all links and forms in source! 
+         $result_source = session_id_adder ($source); 
+
+      session_expire_update 
+         Update current session`s time up to now. 
+         $result = session_expire_update ($DBHandler); 
+
+      action_sid_adder 
+         Add SID indents to all forms in source! 
+         $result_source = action_sid_adder ($source); 
+
+      href_sid_adder 
+         Add SID ident to all links in source! 
+         $result_source = href_sid_adder ($source); 
+
+      convert_ses_time 
+         Convert session time to "codded" integer. 
+         $coded_string = convert_ses_time ($source_time,$count_of_new_str); 
+
+      new_session 
+         Show whether new session were started. 
+
+      GetCurrentSID 
+         Return current Session ID. 
+
+      register_var 
+         Register one variable (scalar , array or hash) into current session. 
+         $coded_buffer = register_var ($type,$name,@val);
+        where $type could be scalar, array or hash, $name can be any permitted 
+      variable name under whom module will save data. 
+         @val is a array that contain data for registration. It could be also 
+      just scalar or even hash 
+
+      unregister_var 
+         UnRegister one variable (scalar, array or hash) 
+         $coded_buffer = unregister_var ($name,$buffer); 
+
+      read_scalar 
+         Read one scalar from DB (Already Registrated!!!) 
+         $scalar = read_scalar ($name); 
+
+      read_array 
+         Read one array from DB (Already Registrated!!!) 
+         @array = read_array ($name); 
+
+      read_hash 
+         Read one hash from DB (Already Registrated!!!) 
+         %hash = read_hash ($name); 
+
+      update_var 
+         Update one variable from $reg_buffer. 
+         $coded_buffer = update_var ($type,$name,$buffer,@new_val); 
+
+      exists_var 
+         Check whether one variable exists into $reg_var! 
+         $bool_result = exists_var ($type,$name,$buffer); 
+
+      session_set_id_name 
+         Set name of session (labeled) (exmpl: 'sid') 
+         session_set_id_name ($new_sid_label); 
+
+      session_id_name 
+         Get current name of sesson (exmpl: 'pid','sid'&#8230;) 
+         session_id_name (); 
+
+      session_expiration 
+         Get current expiration date (exmpl: '+1h') 
+         session_expiration (); 
+
+      session_cookie_path 
+         Get current session cookie`s pat (exmpl: '/cgi-bin/') 
+         session_cookie_path (); 
+
+      ________________________________________________
+
+      attach_var
+          Attach one variable(scalar) with output HTML page.
+          Variable is 'moving' page to page via cookies (or via links 
+          and 'action' if cookies are not accepted)
+          attach_var($var_name,$var_value);
+
+
+      detach_var
+         Detach variable, attached with attach_var()
+         detach_var($var_name);
+      ________________________________________________
+
+
+      delete_cookie 
+         High level delete cookie function. It can get only 1 param! 
+         delete_cookie ($name); 
+
+      write_cookie 
+         High level write cookie function. It can get up to 6 params! 
+         write_cookie ($name,$value,$expr_date,$path,$domain); 
+         Params from 3 to 6 are not required! 
+
+      read_cookie 
+         High level read cookie function. It can get only 1 param! 
+         read_cookie ($name); 
+
+      GetCookies 
+         Get all cookies(or only wished) and put them all into %Cookies. 
+         Don`t call this function directrly! (Use: read_cookie() instead!) 
+
+      SetCookies 
+         Set cookie(or cookies) and return raw cookie string! 
+         Don`t call this function directrly! (Use: write_cookie() instead!) 
+
+      SetCookieExpDate 
+         Set cookie`s expiration for a cookie! 
+
+      SetCookiePath 
+         Set cookie`s path for a cookie! 
+
+      SetCookieDomain 
+         Set cookie`s domain for a cookie! 
+
+      SetSecureCookie 
+         Set cookie`s secure attribute for a cookie! 
+
+      GetCompressedCookies 
+         Get all compressed cookies (like common function) 
+
+      SetCompressedCookies 
+         Set compressed cookies (like common function) 
+      ________________________________________________ 
+        
+      Header 
+         Write one Header filed. 
+         Header (type=>'type' , val=>'value'); 
+         Type can be: 'content',' cookie', 'raw',' modified',' MIME',' window', 
+         'Pragma',' Expires',' Referer'. 
+         And respective example`s values for val are: 
+         'text/html','name=July;Path=/','full featured row field!', 'some DATE', 
+
+         '1.0', 'some window target', 'nocache', 'some DATE'. 
+         Most wanted type is row!!! NOTE: You can`t access HTTP Header 
+         anyway except this Header function!
+         Example: Header (type=>'row' , val=>"Content-type: text/html\n");
+
+
+      Parse_Form 
+           Not implemented (only for back ware compatibility)! 
+
+      b_print 
+           Not implemented (only for back ware compatibility)! 
+
+      ClearBuffer 
+           Clear current printed body data! (use that way only!) 
+
+      ClearHeader 
+           Clear current printed header data! (use that way only!) 
+
+      flush_print 
+           At the end of script this function automatically flush all header's 
+      and body`s data!!! (automatically session, cookies and so on&#8230;)
+        If you call function with parameter "1" you will use function in false 
+      mode! This mode is proper when your script use downloader.pl (module for 
+      cgi downloads)
+
+
+      read_form 
+           Read one var form input form (not need!!! All vars from forms and 
+      cookies are global variables!) 
+
+      read_form_array 
+           Same like previous but reading is from array not from hash! 
+
+      read_var 
+           Read one scalar from browser (via cookie or just via link/form... 
+           - no mater :-))) (Well I sad&#8230;not need anymore :-) 
+      ________________________________________________ 
+        
+      RunScript 
+           Well that is main function at all! :-))) It eval (first compile html 
+           Code into Perl code) all. That function is called from process.cgi 
+
+      set_script_timeout 
+           That function set script's timeout (in seconds), after which scripts 
+           terminate automatically! This prevent from infinitive scripts!
+           $res = set_script_timeout ($time_out_in_sec); 
+      set_variables_dump
+           That function force dump of get/post, cookies, session variables 
+           and uploaded files at the end of result html page. If you want to use
+           this feature call this function wherever you want before end of 
+      script.
+           Call function with parameter '1' if you want to use this feature or 
+      '0' 
+           to turn it off!
+           Note: However, you also need to be in debug mode (see config.pl)
+           before this feature to be useful!
+           Second parameter is debug style view, it can take
+           follow values: 'html', 'popup' and 'layer'. Try it!
+           set_variables_dump (1,'popup'); 
+
+      r_str 
+      rand_srand 
+           Random string generator (and initial sub). Used from WebTools engine. 
+
+      ________________________________________________ 
+        
+      SignUpUser 
+         $res = SignUpUser ($user,$pass,$data,$dbh); 
+         $res can be 1 - success and 0 - :-(
+         $data is user's data that you may whant to save into database. You can 
+      save there up to 1MB!
+
+      SignInUser 
+         ($ID,$DATA) = SignInUser ($user,$pass,$dbh); 
+         $ID is Id on user 
+         $DATA is custom data on same user fetched from DB! 
+      ________________________________________________ 
+
+      *  SIGNALS IN WEBTOOLS
+
+
+         That module support base signals from Unix/Linux and couple customs.
+        So you can handle follow SIGs: 
+        
+      'OnFlush'  - That event will happened when script prepare to print all 
+      data (Header and Body). 
+      'OnError'  - That event will happened when some internal script error 
+      appear. 
+      'OnExit'  - That event will happened when script exit. 
+      'OnTerm'  - You can use this event when connection between server and 
+      browser has been broken (used signals: TERM,STOP,PIPE) 
+      'OnTimeOut' - This event will happened when your scripts lifetime is down 
+      (Default it is 120 seconds) (used signal is: ALRM) 
+      To use these events you must initialize global hash %SIGNALS whit proper 
+      reference to sub. 
+
+      Example: 
+       $SIGNALS{'OnTimeOut'} = \&MyDefaultTimeOutSubroutine; 
+        sub MyDefaultTimeOutSubroutine { print "Timeout!!!"; } 
+      Note: All events are case-sensitive!
+
+
+      *  What libraries are currently loaded?
+
+      That can be difficult question and some time you may need to reUSE or to 
+      reREQUIRE some library. However I decide to introduce simple mechanism 
+      solving that problem. Every library (or almost anyone) have unique number 
+      that exist if given module were loaded. 
+      Number - Library: 
+      1 - Database driver for MySQL (db_mysql.pl)
+      2 - Database driver for MS Access (db_access.pl)
+      4 - Database driver for Flat files (db_flat.pl)
+      8 - Xreader (xreader.pl)
+      16 - Flat support for Sessions (sess_flat.pl)
+      32 - Miscellaneous tools (tools.pl)
+      64 - Mail library (mail.pl)
+      128 - Simple functions for coding/encoding (utl.pl)
+      256 - Download library (downloader.pl)
+      512 - Php simulation library (php.pl)
+      1024 - Simple fork library (fork.pl)
+      2048 - Sub set of JavaScript functions (JavaScript.pl) 
+      If you want to find out whether some library is already loaded in WebTools 
+      (this can speed up all execution process) you can check respective library 
+      on that way: 
+       if (!($webtools::loaded_functions & 8)) {eval "require 'xreader.pl'";} 
+      Follow code will load "xreader.pl" library when it has not been loaded 
+yet.
+      Please use this format with require syntax to prevent double loading of 
+      respective library! 
+        
+      3. GlobExport 
+       This module is used indirect from scripts (included by webtools.pm). It 
+      parses input data from form (POST), from GET and from Cookies. All input 
+      data are exports to global variables! 
+       There aren't support functions for this module (constructor and 
+      destructor are automatically called). 
+        
+      4. STDoutHandle 
+       This module catch standard output (STDOUT) and printed data are buffered 
+      on default. 
+        
+      5. XReader 
+      This module is very cool its supply possibility of script to use extern 
+      templates (html code and SQL inline) 
+           That function read from file HTML data (with some 
+         futures) and substitute SQL queries and vars with 
+         respective values! 
+         $scalar = xreader($N_of_part,$filename); 
+      For more information see docs/examples/Lesson-8-xreader, but first read 
+      Templates lesson in docs/templates ! 
+        
+      6. Config.pl 
+      Typical configuration for "Web Tools"
+      If you want to edit this file via Web just use install.cgi !
+
+
+      #[Name_Of_Project] 
+
+      $webtools::projectname = 'webtools'; # !!! 
+      # This is a name of project. Also this name is a base for other parameters 
+      in this configuration file 
+
+      #[SQL] 
+
+      $webtools::db_support = 'db_flat'; # !!! 
+      # Name of database driver. Can be: db_mysql, db_access, db_flat 
+
+      $webtools::sql_host = 'localhost'; # !!! 
+      # host/ip to DB server (MySQL) 
+
+      $webtools::sql_port = '3306'; 
+      # Port of SQL server 
+
+      $webtools::sql_user = 'me'; # !!! 
+      # User name used to connect SQL server 
+
+      $webtools::sql_pass = 'secret_password'; # !!! 
+      # ... and DB password 
+
+      #[DataBase] 
+
+      $webtools::sql_database_sessions = $webtools::projectname.'db';  # !!! 
+      # Database name (name some like project!?!?!). If need change it! 
+
+      $webtools::sql_sessions_table = $webtools::projectname.'_sessions';  # !!! 
+
+      # Name of session table. 
+
+      $webtools::sql_user_table = $webtools::projectname.'_users'; # !!! 
+      # Table that contain all users (and admin too) 
+
+      #[CHECK] 
+
+      $webtools::check_module_functions = 'on'; # !!! 
+      # SCRIPTS RUN IN CHECK MODE! After first check(test), 
+      # please turn this 'off'! 
+      # YOU CAN ALWAYS TURN THIS ON WHEN YOU WANT TO CHECK 
+      # YOUR CURRENT CONFIGURATION WITHOUT ANY OPPRESSION!!! 
+
+      #[Secure] 
+
+      $webtools::wait_attempt = '4'; 
+      # Count of attempts when database is flocked 
+
+      $webtools::wait_for_open = '2.0'; 
+      # Time between two attempts (in sec)  
+
+      $webtools::sess_time = '2'; # !!! 
+      # Expire time on session: 60 minutes 
+
+      $webtools::sys_conf_d = 'hour'; # !!! 
+      # Type of sess time dimension 
+
+      $webtools::rand_sid_length = '16'; 
+      # Length of SID string! 
+
+      $webtools::sess_cookie = 'sesstime'; 
+      # 'sesstime' - cookie expire when session expired. Enter any other value 
+      to expire cookie when user close browser. 
+
+      $webtools::l_sid = 'sid'; 
+      # Session label ID used by module 
+
+      $webtools::cgi_lib_forbid_mulipart = 'off'; # !!! 
+      # If you want to protect yourself from multipart spam turn this 'on' (you 
+      will be no longer able to use multipart forms)! 
+
+      $webtools::cgi_lib_maxdata = 4194304; # !!! 
+      # Set maximum bytes to accept via POST (some king of multipart 
+      # protection) 
+      # Please note that you can't set this to 0!!! 
+
+      $webtools::cgi_script_timeout = 120; # !!! 
+      # Expiration time of script! (120 seconds default). After expiration 
+      script 
+      # will be terminated! 
+      # Please note that you can't set this to 0!!! You always must know how 
+      much time you need! 
+
+      $webtools::ip_restrict_mode = 'on'; 
+      # Set 'on' to restrict session by IP! If you have proxy problems with 
+      # restricted IPs, please set 'off' or use proper 
+      # function to set mode of this variable! (see: session_ip_restrict 
+      function) 
+      # Allowed values are: "on" and "off". 
+
+      $webtools::run_restrict_mode = 'off'; 
+      # Set 'on' to restrict external web user to your scripts. 
+      # If IP's of user not exists in DB/ips.pl WebTools will 
+      # close script immediately! 
+      # Allowed values are: "on" and "off". 
+        
+      #[Debug] 
+
+      $webtools::debugging = 'on'; 
+      # Set debugging mode 
+      $webtools::debug_mail = 'on'; # !!! 
+      # Show whether real mail must by sent or must by saved into mail 
+      # directory! 
+        
+      #[Mail] 
+
+      $webtools::sendmail = '/usr/sbin/sendmail'; 
+      # Real full path to sendmail 
+        
+      #[Other] 
+
+      $webtools::charset = 
+      'n5b0xzlQWdgfNXytCMAwq1TYu7SVBmUIvcOPZ2aprER9kjh3sHJKL8e4oiDFG6'; 
+      # Please mix well this chars to get higher security of your session ID :-) 
+
+
+      $webtools::cpg_priority = 'cookie'; 
+      # Show order of value fetching! There is 2 values: 'cookie' and 
+      'get/post'. 
+      # 'cookie' means that cookie's variable has higher priority! 
+
+      $webtools::sess_force_flat = 'on'; # !!! 
+      # Session support via DB or via file! (possible values are: 'on' and 
+      'off') 
+      # When you haven't DB support in your hand, you still can use sessions 
+      without DataBase! 
+      # To begin using DB instead of flat files just set "this" variable "off" 
+      (that is more secure and more compatible!) 
+      # Most session functions required "dbh" but you can leave it empty or to 
+      supply real db handler: no matter! 
+      # NOTE: Use flat files when you haven't 500 opened sessions in "tmp" 
+      directory or more! 
+
+      $webtools::support_email = 'support@your_host.com'; 
+      # Support e-mail for unexpected errors! :) 
+
+      $webtools::var_printing_mode = 'buffered'; 
+      # Default output is buffered, 
+      # leave this variable empty if you need output 
+      # of your script to flush immediately! 
+      # Other else for non buffered mode. 
+      # Actually buffering depend of OS, Perl, Apache and socket! 
+
+      @webtools::treat_htmls_ext = ( 
+      # Order of html files location: Default, module first look for: 
+      # "html","htm","whtml" and "cgihtml". If you specify in URL 
+      # ...?file=env.html script will ignore extension and will look for 
+      # file with extension ordered in @treat_htmls_ext array 
+      # If you leave this array empty then no lookups will be made! 
+      # Order of below array is really important! 
+      # Example: 
+      # If your real file is: env.cgi and you want script to 
+      # look for env.html then with array below you will never success! 
+      # That is true because find operation will be broken when script found 
+      # extension you look for i.e. in our case (env.)html and after that it 
+      # won't continue! So if you want to run files that match our example 
+      # file then follow array should look like this: 
+      # ('htm','whtml','cgihtml','cgi','html') 
+       'html', 
+       'htm', 
+       'whtml', 
+       'cgihtml', 
+       'cgi', 
+       ); 
+        
+      #[PATHS] 
+
+      $webtools::tmp = '/tmp/'; # !!! 
+      # Please set full path to your temp directory 
+
+      $webtools::driver_path = './drivers/'; 
+      # Path to your DB Drivers (please keep structure) 
+        
+      $webtools::library_path = './libs/'; 
+      # Path to your Libraries (please keep structure) 
+        
+      $webtools::db_path = './db/'; 
+      # Path to your DBs and tables (please keep structure) 
+        
+      $webtools::mailsender_path = './mail/'; 
+      # Path to your DBs and tables (please keep structure) 
+        
+      $webtools::xreader_path = './jhtml/'; 
+      # Path to your xreader files(jhtml-s) (please keep structure) 
+        
+      $webtools::perl_html_dir = './htmls/'; 
+      # Path to your perl's(webtools scripts) html files 
+        
+      $webtools::apacheshtdocs = '/var/www/htdocs/'; 
+      # Path to your apache htdocs directory('/usr/local/apache/htdocs/') 
+      (please keep structure) 
+        
+      $webtools::cgi_home_path = Get_CGI_Directory(); 
+      # Get webtools cgi-bin directory (exmp: '/cgi-bin/webtools/') 
+      # NOTE: This path is not absolute and is not an HTTP!!! (actualy part of 
+      HTTP) 
+        
+      $webtools::http_home_path = '/webtools/'; 
+      # Please change this to your http path! 
+      # NOTE: This path is not absolute and is not an HTTP!!! (actually part of 
+      HTTP) 
+        
+      7. Security and restrictions 
+
+       If you have been completed read install.html document you probably 
+      already mentioned most security problems in CGI world, so one of all main 
+      targets are security and restrictions. 
+       First of all I want to insure you, that WebTools capture most of CGI 
+      security holes. 
+        
+      *  Safely running of perl/html scripts: 
+         Main script "process.cgi" should run other scripts like "env.html" , so 
+      only way to do it, is using of "file" variable in follow format: 
+       http://your_server/cgi-bin/your_webtools/process.cgi?file=some_script, 
+      where some_script can be located in your "htmls" directory! So it is 
+      extremely important to set your default "htmls" directory (in config.pl) 
+      with care (e.g.: /home/my_domain/my_web/cgi-bin/my_webtools/htmls/) or 
+      (./htmls/ where your current directory is "webtools" directory).
+
+
+      WebTools will care about security problems with script called like this: 
+      http://your_server/cgi-bin/your_webtools/process.cgi?file=/etc/passwd
+
+
+      To prevent security problems, you should follow next rules: 
+      -         Never leave anyone directory variable empty! (like 'htmls', 
+      'db', 'tmp'&#8230;) 
+      -         Never set in these variable ROOT directory. 
+
+
+      No body can write in URL locater (in browser) query like that: 
+      http://your_server/cgi-bin/your_webtools/process.cgi?file=../some_script 
+      You are protected for any kind of FILE crack actions like: 
+      -         ".." one directory down 
+      -         "." Current directory 
+      -         "/" or "\" Root directory 
+      -         "~" Home directory 
+      -         Also you have protected from any "illegal" characters in your 
+      query!
+
+
+      However you can use queries like: 
+      &#8230;/process.cgi?file=/some_local_dir/some_script 
+      where  /some_local_dir/ is directory in your "default htmls" directory. 
+      For example that could be: /home/my_htmls/some_local_dir/  
+
+      So I hope that you are understood how important is not keeping of "htmls" 
+      directory empty or ROOT!!! 
+        
+      Also via "file=" variable in query line you CAN'T call scripts with 
+      whatever you want extension! Only acceptable are: whtml html htm cgihtml 
+      and cgi 
+
+      Please notice that all these files are WEBTOOLS files (HTML plus Perl :-) 
+      )! 
+        
+      * FLOOD protection: 
+         Principle WebTools haven't FLOOD protections but you should know that 
+      all multipart data (I mean uploads) are saved in your TMP directory and if 
+      you don't know about them, after end of your script WebTools will 
+      automatically delete all of them!
+
+         Also you have POST limit size. i.e. you can't accept more data that 
+      specified in confg.pl file ($cgi_lib_maxdata default is 4 MB) 
+        
+      *  TIME protection: 
+         If your script stop to respond (for example stay in infinitive loop) or 
+      wait forever for some event WebTools will "kill" your script immediately 
+      after lifetime specified in config.pl ($cgi_script_timeout default 120 
+      seconds)
+
+
+      To change that time please use set_script_timeout($timeout) function. 
+
+      To capture event "OnTimeOut" please set follow handler: 
+      $SIGNALS{'OnTimeOut'} = \&your_sub; 
+        
+      *  IP restrictions: 
+         If you write web based application for small community you may want to 
+      keep out external web visitors from your site?!? Now you can protect all 
+      your WebTools based applications from external visitors based on IP 
+      restriction. To switch this feature on, you need to fill out db/ips.pl 
+      file with IPs that match your needs. Currently all IPs are allowed to run 
+      your scripts! Please edit or delete lines that not match your protection 
+      policy! 
+        
+      *  Session restriction based on IP 
+         If you use sessions you may want to protect your sessions by IP i.e. 
+      one opened session can be used only by PC, created that session! 
+
+
+      Note: If your visitors use proxy to access your scripts you may need to 
+      switch this feature off (Use follow syntax: session_ip_restrict('off'); )
+
+
+      Also you should know that scripts are never restricted by IP if you use 
+      forced flat file session support! (See config.pl and $sess_force_flat) 
+        
+         All functions and WebTools itself are released to help and to protect 
+      all of us, BUT you should realize that we are not GODs and you will take 
+      all responsibility of WebTools actions on your server and on all world 
+      wide! Please keep that in your mind. 
+      PLEASE SEND ALL SECURITY PROBLEMS THAT YOU MET IN YOUR PRACTICE WITH 
+      WebTools at julian@proscrptum.com 
+      Thank's 
+        
+      8. Various stuff
+
+         That section regards various questions.
+
+        1. Highlighting for UltraEdit text editor. 
+         If you want to have feature of highlighting with UltraEdit please open 
+      your docs/WORDFILE.TXT 
+      Now go to your UltraEdit directory and open WORDFILE.TXT and add to this 
+      file a contain of docs/WORDFILE.TXT file!
+      Edit follow line: 
+      /L7"WebTools" .... 
+      you may need to change number of language supprt (default is 7: /L7....). 
+      Save changes of UltraEdit wordfile. Now UltraEdit will highlight files 
+      with extensions: whtml and cgihtml :-) 
+        
+      9. AUTHOR: 
+      Julian Lishev 
+      email: julian@proscriptum.com 
+      Sofia, Bulgaria      
+

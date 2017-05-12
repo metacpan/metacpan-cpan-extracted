@@ -1,0 +1,38 @@
+WWW-Domain-Registry-Joker version 0.11
+=========================================
+
+The WWW-Domain-Registry-Joker module provides a Perl interface to
+the Domain Management API (DMAPI) used by the Joker.com DNS registrar.
+It is designed to help Joker.com resellers in automating the domain
+registration and all the other relevant actions.
+
+This distribution probably needs a bit more documentation :)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Log::Dispatch
+  LWP
+  Test::More
+
+AUTHOR
+
+Peter Pentchev <roam@ringlet.net>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 - 2009, 2017 by Peter Pentchev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,38 @@
+---
+abstract: 'Bindings for the HipChat API v2'
+author:
+  - 'Naveed Massjouni <naveed@vt.edu>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-HipChat
+requires:
+  Carp: '0'
+  Data::Printer: '0'
+  Encode: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  MIME::Entity: '0'
+  Moo: '1.005000'
+  Pod::Usage: '0'
+  WebService::Client: '0.0203'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ironcamel/WebService-HipChat/issues
+  repository: git://github.com/ironcamel/WebService-HipChat.git
+version: '0.2000'
+x_serialization_backend: 'YAML::Tiny version 1.70'

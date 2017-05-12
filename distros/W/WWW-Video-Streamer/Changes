@@ -1,0 +1,10 @@
+Revision history for WWW-Video-Streamer
+
+0.0.1	2009-08-13/19:20
+		-Minor pod corrections.
+		-Now defaults to not specifing a codec for lavc as flv causes problems with
+			VLC and it removes the need to choose a codec.
+
+0.0.0	2009-08-12/19:30
+		-Initial release.
+

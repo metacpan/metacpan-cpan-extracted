@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.012;
+use WWW::Bugzilla::BugTree;
+use Getopt::Long qw( GetOptions );
+use Pod::Usage qw( pod2usage );
+use URI;
+use Term::ANSIColor;
+
+# PODNAME: bug_tree
+# ABSTRACT: Print a bugzilla tree out to stdout
+our $VERSION = '0.07'; # VERSION
+
+
+# TODO: what to do when server doesn't require basic auth,
+# but there is a protected bug in the queue?
+
+my $url;
+my $bug_id;
+my $ssl = 0;
+
+GetOptions(
+  'bug|b=i'                => \$bug_id,
+  'url|u=s'                => \$url,
+  'ssl-no-verify-hostname' => \$ssl,
+  'help|h'                 => sub { pod2usage({ -verbose => 2}) },
+  'version'                => sub {
+    say 'WWW::Bugzilla::BugTree version ', ($WWW::Bugzilla::BugTree::VERSION // 'dev');
+    exit 1;
+  },
+) || pod2usage(1);
+
+pod2usage(1) unless defined $bug_id;
+
+my $tree = WWW::Bugzilla::BugTree->new(
+  ua  => do {
+    my $ua = LWP::UserAgent::AskForPassword->new(
+      $ssl ? (ssl_opts => { verify_hostname => 0 } ) : () );
+    $ua->env_proxy;
+    $ua;
+  },
+  url => $url,
+);
+
+my $bug = $tree->fetch($bug_id);
+
+recurse($bug, '');
+
+sub recurse
+{
+  my($bug, $indent) = @_;
+
+  if(-t STDOUT)
+  {
+    my $status = $bug->as_hashref->{bug}->{bug_status};
+    if($status eq 'RESOLVED')
+    {
+      print color 'yellow';
+    }
+    elsif($status eq 'VERIFIED')
+    {
+      print color 'green';
+    }
+    elsif($status eq 'CLOSED')
+    {
+      print color 'bold green';
+    }
+    elsif($status eq 'NEW')
+    {
+      print color 'bold red';
+    }
+    else
+    {
+      print color 'red';
+    }
+  }
+  
+  print $indent;
+  
+  print $bug;
+  
+  if(-t STDOUT)
+  {
+    print color 'reset';
+  }
+  
+  print "\n";
+  
+  recurse($_, "$indent  ") for @{ $bug->children };
+}
+
+package LWP::UserAgent::AskForPassword;
+
+use base qw( LWP::UserAgent );
+use Term::Clui qw( ask ask_password );
+
+sub get_basic_credentials
+{
+  my($ua, $realm, $uri, $isproxy) = @_;
+  say STDERR $uri->host, ':', $uri->port;
+  my $user;
+  my $pass;
+  eval {
+    local $SIG{INT} = sub { die };
+    $user = $ENV{BUG_TREE_USER} // ask          "bugzilla user [$realm]:";
+    $pass =                        ask_password "bugzilla password [$realm $user]:";
+  };
+  return () if $@;
+  return ($user, $pass);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bug_tree - Print a bugzilla tree out to stdout
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SYNOPSIS
+
+ % bug_tree --bug bug_id [ --url url ] [ --ssl-no-verify-hostname ]
+ % bug_tree --help | -h
+ % bug_tree --version
+
+=head1 DESCRIPTION
+
+This script prints out a tree (with colors if available) of dependent bugs
+from your Bugzilla server.
+
+This script will prompt you for a username or password if the server requires
+HTTP Basic authentication ( If you set the environment variable
+C<BUG_TREE_USER> to your bugzilla username then it will just prompt you for
+a password).  It will not attempt to login if your server does
+not require you to login to view bugs.
+
+=head1 OPTIONS
+
+=head2 --bug I<bug_id> | -b I<bug_id>
+
+The Bugzilla bug id of the root bug to display.
+
+=head2 --url I<url> | -u I<url>
+
+The URL of the Bugzilla website.  Uses the C<BUG_TREE_URL> environment
+variable if this option not provided, and falls back on this bugzilla
+server provided for testing:
+
+L<https://landfill.bugzilla.org/bugzilla-3.6-branch>
+
+=head2 --ssl-no-verify-hostname
+
+Do not verify the hostname for SSL connections.  This allows for servers
+that use self signed certificates.  If you get a "500 Can't connect" error
+trying to connect to a C<https> server that you know to work, then this
+option may do the trick.
+
+=head2 --help | -h
+
+Display help for this command
+
+=head2 --version
+
+Display the version for this command
+
+=head1 SEE ALSO
+
+L<WWW::Bugzilla::BugTree>, L<WWW::Bugzilla::BugTree::Bug>
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,76 @@
+NAME
+    Win32::ShellQuote - Quote argument lists for Win32
+
+SYNOPSIS
+        use Win32::ShellQuote qw(:all);
+
+        system quote_system('program.exe', '--switch', 'argument with spaces or other special characters');
+
+DESCRIPTION
+    Quotes argument lists to be used in Win32 in several different
+    situations.
+
+    Windows passes its arguments as a single string instead of an array as
+    other platforms do. In almost all cases, the standard Win32
+    CommandLineToArgvW
+    <http://msdn.microsoft.com/en-us/library/ms647232.aspx> function is used
+    to parse this string. cmd.exe has different rules for handling quoting,
+    so extra work has to be done if it is involved. It isn't possible to
+    consistantly create a single string that will be handled the same by
+    cmd.exe and the stardard parsing rules.
+
+    Perl will try to detect if you need the shell by detecting shell
+    metacharacters. The routine that checks that uses different quoting
+    rules from both cmd.exe and the native Win32 parsing. Extra work must
+    therefore be done to protect against this autodetection.
+
+SUBROUTINES
+  quote_native
+    Quotes as a string to pass directly to a program using native methods
+    like Win32::Spawn(). This is the safest option to use if possible.
+
+  quote_cmd
+    Quotes as a string to be run through cmd.exe, such as in a batch file.
+
+  quote_system_list
+    Quotes as a list to be passed to system or exec. This is equally as safe
+    as "quote_native", but you must ensure you have more than one item being
+    quoted for the list to be usable with system.
+
+  quote_system_string
+    Like "quote_system_list", but returns a single string. Some argument
+    lists cannot be properly quoted using this function.
+
+  quote_system
+    Switches between "quote_system_list" and "quote_system_string" based on
+    the number of items quoted.
+
+  quote_system_cmd
+    Quotes as a single string that will always be run with cmd.exe.
+
+  quote_literal
+    Quotes a single parameter in native form.
+
+  cmd_escape
+    Escapes a string to be passed untouched by cmd.exe.
+
+CAVEATS
+    *   Newlines (\n or \r) and null (\0) can't be properly quoted when
+        running through cmd.exe.
+
+    *   This module re-implements some under-specified part of the perl
+        internals to accurately perform its work.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    *       Mithaldu - Christian Walde (cpan:MITHALDU)
+            <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2012 the "AUTHOR" and "CONTRIBUTORS" as listed above.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

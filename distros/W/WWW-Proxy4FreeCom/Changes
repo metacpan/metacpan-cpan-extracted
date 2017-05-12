@@ -1,0 +1,34 @@
+Revision history for WWW-Proxy4FreeCom
+
+1.004002   2015-04-21
+        - BREAKING: made ->get_list behave like an error
+          occured when network errors happen, instead of returning
+          an empty arrayref. Any code that relied on this erroneous
+          behaviour might break.
+        - Updated parser, due to the new format of the site (Issue #2)
+
+1.004001   2015-04-11
+        - Fixed complete breakdown due to new version of
+           the parser released
+
+1.003   2014-01-04
+        - Updated tests to handle an edge case for country key.
+
+1.002   2013-12-30
+        - Fixed broken tests
+
+1.001   2013-12-27
+        [ Major BREAKING Changes ]
+        - This version has a completely new API, due to the website update.
+          Previous version was completely broken.
+        - Filtering (->filter) was removed altogether.
+
+        [ Minor Changes]
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+        - Switched away from now deprecated Class::Data::Accessor
+          to Class::Accessor::Grouped
+
+0.001   2008-03-14
+        - First version, released on an unsuspecting world.

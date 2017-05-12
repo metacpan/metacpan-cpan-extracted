@@ -1,0 +1,44 @@
+---
+abstract: 'Perl interface to L<http://goo.gl/>'
+author:
+  - 'Magnus Erixzon <magnus@erixzon.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  Try::Tiny: '0.24'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-Googl
+provides:
+  WWW::Shorten::Googl:
+    file: lib/WWW/Shorten/Googl.pm
+    version: '1.100'
+requires:
+  Carp: '0'
+  HTTP::Request: '0'
+  JSON::MaybeXS: '1.0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '5.835'
+  URI: '0'
+  WWW::Shorten: '3.09'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/p5-shorten/www-shorten-googl/issues
+  homepage: https://github.com/p5-shorten/www-shorten-googl
+  repository: https://github.com/p5-shorten/www-shorten-googl.git
+version: '1.100'
+x_contributors:
+  - 'bennythejudge <logube@gmail.com>'
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Magnus Erixzon <merixzon@cpan.org>'

@@ -1,0 +1,20 @@
+Revision history for WebService-GarminConnect
+
+1.0.4   2016-12-14
+        - Fix login to reflect changes on Garmin side
+
+1.0.3   2015-05-30
+        - Added optional tests that hit Garmin Connect API
+        - Fixed usage errors in documentation
+        - Added optional pagesize to activities()
+
+1.0.2   2015-05-29
+        - Added tests
+        - Changed bug tracker references to Github
+
+1.0.1   2015-05-13
+        - Switched to Dist::Zilla
+
+1.0.0   2015-05-11
+        - First version, released on an unsuspecting world.
+

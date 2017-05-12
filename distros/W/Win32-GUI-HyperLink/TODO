@@ -1,0 +1,8 @@
+TODO:
+- MouseOut event alreay exists (MouseOver, MouseOut) for TrackMouse()
+- Test suit should be extended to test the GUI itself.  Perhaps with
+  Win32::GUITest?
+- Is it possible to only load Win32::API if we actually need it?
+- Where should we warn about missing functionality?  Module itself
+  or test suite or at installation.  Test and installation don't
+  seem good for PPM distributions.

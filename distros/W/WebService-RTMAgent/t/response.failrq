@@ -1,0 +1,12 @@
+HTTP/1.1 403 Forbidden
+Connection: keep-alive
+Date: Mon, 24 Dec 2007 11:49:10 GMT
+Server: nginx/RTM
+Vary: Accept-Encoding
+Content-Type: text/xml; charset="utf-8"
+Client-Date: Mon, 24 Dec 2007 11:50:39 GMT
+Client-Peer: 75.126.232.204:80
+Client-Response-Num: 1
+Client-Transfer-Encoding: chunked
+Keep-Alive: timeout=300
+

@@ -1,0 +1,42 @@
+{
+   "abstract" : "Interface to shortening URLs using http://safe.mn/, http://clic.gs/, http://go2.gs/ or http://cliks.fr/.",
+   "author" : [
+      "Julien Sobrier <jsobrier@safe.mn>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Shorten-Safe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : 0,
+            "WWW::Shorten" : "3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.22"
+}

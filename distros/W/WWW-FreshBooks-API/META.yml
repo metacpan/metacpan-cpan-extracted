@@ -1,0 +1,27 @@
+---
+abstract: 'Perl Interface to the Freshbooks 2.1 API!'
+author:
+  - 'Anthony Decena <anthony@mindelusions.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.50
+distribution_type: module
+generated_by: 'Module::Install version 0.81'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-FreshBooks-API
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Children::Fast: 0.02
+  Iterator::Simple: 0
+  LWP::UserAgent: 0
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001000

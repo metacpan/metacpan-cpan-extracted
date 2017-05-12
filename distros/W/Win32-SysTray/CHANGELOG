@@ -1,0 +1,17 @@
+2007-08-29
+	VERSION: 0.10 - created distrib for CPAN
+2007-08-31
+	VERSION: 0.11 - corrected test script + adding new test
+2007-09-01
+	VERSION: 0.12 - corrected constructor (tooltip was not working)
+2008-04-11
+	VERSION: 0.14 - added all the Win32::XXX modules to the prereqs
+2008-04-12
+	VERSION: 0.16 - added prereqs_fatal option in Makefile.pl
+2008-04-15
+	VERSION: 0.17 - added META.yml
+2008-04-16
+	VERSION: 0.18 - changed "use Win32::GUI;" to "use Win32::GUI()" in SysTray.pm
+	VERSION: 0.19 - corrected version number
+2008-04-17
+	VERSION: 0.20 - fixed the "use Win32::GUI" statement

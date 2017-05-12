@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Waft/StashAccessor.pm
+t/make_stash_accessor.t
+t/minlen.t

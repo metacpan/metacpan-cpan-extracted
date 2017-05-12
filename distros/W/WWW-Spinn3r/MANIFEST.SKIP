@@ -1,0 +1,7 @@
+mirror
+internal
+.svn
+blib
+dists
+Makefile.old
+MANIFEST.bak

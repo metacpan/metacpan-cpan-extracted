@@ -1,0 +1,322 @@
+#!/usr/bin/perl -w
+######################### -*- Mode: Cperl -*- #########################
+##
+## $Basename: smakewhatis $
+## $Revision: 1.11 $
+##
+## Author           : Ulrich Pfeifer
+## Created On       : Mon Sep  2 12:57:12 1996
+##
+## Last Modified By : Ulrich Pfeifer
+## Last Modified On : Tue May  9 08:52:03 2000
+##
+## Copyright (c) 1996-1997, Ulrich Pfeifer
+##
+##
+######################################################################
+
+use strict;
+
+use FileHandle;
+use File::Path;
+use DB_File;
+use Getopt::Long;
+
+require WAIT::Database;
+require WAIT::Config;
+require WAIT::Parse::Nroff;
+require WAIT::Document::Nroff;
+
+
+my %OPT = (database => 'DB',
+           dir      => $WAIT::Config->{WAIT_home} || '/tmp',
+           table    => 'man',
+           clean    => 0,
+           remove   => 0,
+          );
+
+GetOptions(\%OPT,
+           'database=s',
+           'dir=s',
+           'table=s',
+           'clean!',
+           'remove',
+          ) || die "Usage: ...\n";
+
+if ($OPT{clean}) {
+  if (-d "$OPT{dir}/$OPT{database}") {
+    eval {
+      my $tmp = WAIT::Database->open(name        => $OPT{database},
+				     'directory' => $OPT{dir})
+	  or die "Could not open table $OPT{table}: $@";
+      my $tbl = $tmp->table(name => $OPT{table});
+      $tbl->drop if $tbl;
+      $tmp->close;
+      rmtree("$OPT{dir}/$OPT{database}/$OPT{table}",1,1)
+	  if -d "$OPT{dir}/$OPT{database}/$OPT{table}";
+    };
+    die $@ if $@;
+  } else {
+    die "Database $OPT{dir}/$OPT{database} doesn't exist,
+nothing to clean, nothing done.\n";
+  }
+  exit;
+}
+
+my $db = WAIT::Database->open(
+			      name        => $OPT{database},
+			      'directory' => $OPT{dir},
+			     )
+    ||
+    WAIT::Database->create(
+			   name        => $OPT{database},
+			   'directory' => $OPT{dir},
+			  );
+unless ($db) {
+  require Carp;
+  Carp::croak("Could not open/create database '$OPT{dir}/$OPT{database}': $@");
+}
+
+
+# We need a class that allows the index to access each document.
+# Remember, all documents in this collection are values of a single
+# tied hash. An especially cool feature is that the tie may return the
+# whole document as a single string or as an object or anything that
+# fits into a scalar. WAIT::Document::Nroff illustrates how the tieing
+# class can work. See WAIT::Table for a manpage (W:D:Nroff has none).
+
+my %D;
+my $access = tie %D, 'WAIT::Document::Nroff', 'nroff -man';
+die $@ unless defined $access;
+
+# While WAIT::Document::Nroff ignored the contents of the scalar it
+# accessed, WAIT::Parse::Nroff knows how to understand it. So bear in
+# mind:
+
+#    access    =>   Document
+#    layout    =>   Parse
+
+# The access to a document is provided by a Document class just as
+# the layout of a document is provided by a Parser class. Makes sense?
+
+my $layout= WAIT::Parse::Nroff->new;
+
+# The definition of filters is something that will be tought in the
+# advanced techniques course. For now, just copy and paste the
+# something from here and try out alternatives.
+my $stem = [{
+             'prefix'    => ['unroff', 'isotr', 'isolc'],
+             'intervall' => ['unroff', 'isotr', 'isolc'],
+            },'unroff', 'isolc', 'stop', 'isotr', 'split2', 'Stem'];
+# unroff it as the first because nroff markup isn't very helpful for
+# indexing, turn into lowercase, eliminate the stopwords before isotr
+# because our stopwords contain ticks (isn't, i'm, wouldn't, etc.),
+# replace line noise ith space, eliminate anything left with less than
+# 2 letters, find the word's stem.
+my $text = [{
+             'prefix'    => ['unroff', 'isotr', 'isolc'],
+             'intervall' => ['unroff', 'isotr', 'isolc'],
+            },
+             'unroff', 'isolc', 'stop', 'isotr', 'split2'];
+my $sound = ['unroff', 'isotr', 'isolc', 'split2', 'Soundex'],;
+
+my $tb;
+eval { $tb = $db->table(name => $OPT{table}) };
+$tb ||=
+  $db->create_table
+  (
+
+   name     => $OPT{table},
+   # mandatory argument like a tablename in a relational database
+
+   access   => $access,
+   # see above
+
+   layout   => $layout,
+   # see above
+
+   attr     => ['docid', 'headline', 'size'],
+   # the attr argument determines which attributes WAIT will store for
+   # us for later retrieval. A docid is a must, of course, so that we
+   # can retrieve the document later. The more attributes you name
+   # here, the bigger gets the database. For your first experiences it
+   # is highly recommended to have the two items C<docid> and
+   # C<headline> here, so that you can use sman for debugging as soon
+   # as you are through smakewhatis. In the sman program these two
+   # column names are hardcoded. You have the opportunity to create
+   # the two attributes for every record in the Layout/Parser class
+
+   keyset   => [['docid']],
+   # which keys are necessary to unambiguously identify a record and
+   # access it through $access?
+
+   invindex =>
+   [
+    'name'         => $stem,
+    'synopsis'     => $stem,
+    'bugs'         => $stem,
+    'description'  => $stem,
+    'text'         => $stem,
+    'environment'  => $text,
+    'example'      => $text,  'example' => $stem,
+    'author'       => $sound, 'author'  => $stem,
+   ]
+   # without this argument, WAIT will be able to run a pass through
+   # the indexer but it won't do anything useful. This argument is the
+   # heart of your indexing task and the place where you will start
+   # tuning once your indexes are working. For the impatent user, it's
+   # recommended to just have them all be text.
+
+  );
+
+die unless $tb;
+
+my @DIRS;
+if (@ARGV) {
+  @DIRS = @ARGV;
+} else {
+  @DIRS  = @{$WAIT::Config->{manpath}};
+}
+
+$tb->set(top=>1);
+my $mandir;
+for $mandir (grep -d $_, @DIRS) {
+  opendir(DIR, $mandir) or warn "Could not open dir '$mandir': $!";
+  my @mdir =  grep -d "$mandir/$_", grep /^man/, readdir(DIR);
+  closedir DIR;
+  my $section;
+  for $section (@mdir) {
+    my $file;
+    print STDERR "Scanning '$mandir/$section' ...\n";
+    opendir(DIR, "$mandir/$section")
+      or warn "Could not open dir '$mandir/section': $!";
+    my @files =  grep -f "$mandir/$section/$_", grep $_ !~ /^\./, readdir(DIR);
+    closedir DIR;
+    for $file ( @files ) {
+      print STDERR "Indexing '$mandir/$section/$file' ... ";
+      &index("$mandir/$section/$file");
+    }
+  }
+}
+my $now = time;
+warn "Starting reorg\n";
+$tb->set(top=>1);
+warn sprintf "Finished reorg %d seconds\n", time - $now;
+
+# Do not forget to close the database after the extreme job you just finished.
+
+$db->close();
+exit;
+
+# Now that you have created a database, lean back. To verify that it
+# sort of worked and to understand what you actually did, I'd
+# recommend to run sman through the debugger. Sman has options to
+# choose databases and tables unrelated to its original task. You can
+# run e.g.
+
+# perl -Sd sman -dir /usr/local/yourwaitdir -database yourdatabase -table yourtable
+
+# Step through the debugger to the place where a query object is
+# created. Expect huge, self-referential datastrucures if you dump any
+# of these object with the x command. It's quite instructive to watch
+# the debugger print them for several minutes or hours.
+
+# Once you have established a working querying with sman, you will
+# want to write your own sman.
+
+my $NO;
+sub index {
+  my $did = shift;
+
+  if ($tb->have('docid' => $did)) {
+    #die "$@" if $2 ne '';
+    if (!$OPT{remove}) {
+      print "duplicate\n";
+      return;
+    }
+  } elsif ($OPT{remove}) {
+    print "missing\n";
+    return;
+  }
+
+  if (-s $did < 100) {
+    print "too small\n";
+    return;
+  }
+
+  my $value = $D{$did};
+  unless (defined $value) {
+    print "unavailable\n";
+  }
+  printf STDERR "ok [%d]\n", ++$NO;
+
+  my $record = $layout->split($value);
+  $record->{size} = length($value);
+  my $headline = $record->{name} || $did;
+  $headline =~ s/\s+/ /g; $headline =~ s/^\s+//;
+  printf "%s\n", substr($headline,0,80);
+  if ($OPT{remove}) {
+    $tb->delete('docid' => $did, headline => $headline, %{$record});
+  } else {
+    $tb->insert('docid' => $did, headline => $headline, %{$record});
+  }
+}
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+smakewhatis - generate a manual database for sman
+
+=head1 SYNOPSIS
+
+B<smakewhatis>
+[B<-database> I<database name>]
+[B<-dir> I<database directory>]
+[B<-table> I<name>]
+[B<-remove>]
+[I<mandir> ...]
+
+=head1 DESCRIPTION
+
+B<Smakewhatis> generates/updates databases for B<sman>(1). If
+I<mandir>s are specified, these are used. Otherwise the confiigured
+default directories are indexed.
+
+=head2 OPTIONS
+
+=over 10
+
+=item B<-database> I<database name>
+
+Change the default database name to I<database name>.
+
+=item B<-dir> I<database directory>
+
+Change the default database directory to I<database directory>.
+
+=item B<-table> I<name>
+
+Use I<name> instead of C<man> as table name.
+
+=item B<-clean>
+
+Clean B<database> before indexing.
+
+=item B<-remove>
+
+Remove the selected directories from the database instead of
+adding/updating. This works only for the manuals which are unchanged
+since the indexing.
+
+=head1 SEE ALSO
+
+L<sman>.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@ls6.informatik.uni-dortmund.de>E<gt>

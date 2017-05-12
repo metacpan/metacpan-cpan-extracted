@@ -1,0 +1,103 @@
+Wurst notes 10 nov 2005
+rcsid = $Id: server_notes,v 1.1 2007/09/28 16:57:19 mmundry Exp $
+
+Relevant files
+--------------
+machine                   file              role..
+
+webserver
+(ness/vesuvio/...)   /www/wurst/index.php  provide interface
+                                           very little filtering
+
+webserver            /var/wurst/submit.pl  writes a (/bin/sh)
+                                           shell script to /tmp
+                                           Feeds this to batch system.
+                                           Removes shell script.
+
+student machines
+
+~/wurst_server/wurst/scripts/wurst_server.pl
+                                           Runs the job and
+                                           mails results back to original user.
+
+
+index.php
+---------
+The original script was built by Axel Griewel.
+Working on this script has been full of problems with
+permissions. We are still lacking proper permissions on the
+directory to put test scripts or for editors to write backup
+files. For these kinds of reasons, we keep this script very
+simple and avoid working on it.
+This script provides the interface and returns an error when
+something goes wrong.
+The only jobs it does are
+  * checking for the most obvious errors in the input
+  * check that the email address is valid
+  * executes submit.pl, via a call to ssh.
+After this script, you lose the connection to the web interface,
+so initial error checking must be done here.
+The call to ssh is used to change user id. It is ugly, but our
+sys admins did not want to use sudo or to set permissions.
+This has the consequence that anything created by the script has
+uid "wwwrun".
+
+submit.pl
+---------
+This script writes a batch job and feeds it to the batch
+system. It can only pass success/failure codes back to index.php
+and it is important that it return an error message if the batch
+system seems broken.
+It must write a temporary batch file.
+It must delete that script at the end.
+It is best if it redirect standard out and standard error.
+When feeding a job to the batch system, this script uses options
+to 
+  * specify the batch queue
+  *         the shell
+  * merge stdout and stderr
+  * prevent the batch system from producing empty output files by
+  sending stdout to /dev/null
+
+All the information necessary to run a calculation should be
+encapsulated in command line arguments. These have been generated
+by index.php, so the main work of this script is to loop over the
+elements of ARGV.
+submit.pl is written in perl, but, in principle, one could use
+whatever language one likes as long as it lets you invoke other
+processes, control return codes and manipulate the file handles
+for stdout and stderr. The script is invoked with the uid "wurst".
+
+wurst_server.pl
+---------------
+This script lives on the execution machine, but we do the editing
+on the server, taubenstein.
+The batch system tries to execute the shell script created by
+submit.pl. You never see this script. If all is working, it
+executes out of a spool directory owned by the batch system.
+
+It makes no sense to write to stdout or stderr unless you take
+charge of them. The first thing this script does is grab the file
+handles and redirect them to files with names given by one of the
+mktemp() style functions.
+Any program will encounter errors. Even if the code and input are
+perfect, it is certain that something will be changed on the
+server and something will fail. The code has to be able to exit
+and save any diagnostics to a file. Most of the time, jobs run
+without problems, so any temporary files should be deleted.
+Useful output comes in two forms from the wurst server:
+  1. The human-readable output with a ranking of models.
+  2. The models that are built.
+Both of these types of files have to be sent back. We use
+nail/mailx to send results back:
+The human-readable output is written to a temporary file. This is
+piped to nail which uses it as the message body.
+The model files are sent back as attachments.
+
+
+To start building a server
+-----------------------
+You will need a user id for the server to run on the student
+machines and the same user id on the web server.
+You will need to build and test each step independently.
+All the files used for the wurst server should be world readable.

@@ -1,0 +1,45 @@
+{
+  "appname": "Freshservice Test Cache",
+  "charset": "UTF-8",
+  "session": "Simple",
+  "serializer": "JSON",
+  "content_type": "application/json",
+  "testdata" : {
+    "user": {
+      "active": true,
+      "address": "An Address",
+      "created_at": "2016-07-11T16:02:28+08:00",
+      "custom_field": {
+        "cf_field_name": "field value"
+      },
+      "deleted": false,
+      "department_names": "",
+      "description": "I'm Testy McTestFace",
+      "email": "test@example.com",
+      "external_id": "123456",
+      "helpdesk_agent": false,
+      "id": 1234567890,
+      "job_title": "Tester of Things",
+      "language": "en",
+      "location_name": "Testland",
+      "mobile": "0406000000",
+      "name": "Test",
+      "phone": "0386521453",
+      "time_zone": "Perth",
+      "updated_at": "2016-07-18T09:28:47+08:00"
+    },
+    "agent": {
+      "active_since":"2016-07-18T09:28:47+08:00",
+      "available":true,
+      "created_at":"2015-01-02T22:56:39-10:00",
+      "id":19,
+      "occasional":false,
+      "points":2500,
+      "scoreboard_level_id":5,
+      "signature":"I can haz signature??",
+      "signature_html":"\u003Cp\u003E\u003Cbr\u003E\u003C/p\u003E\r\n",
+      "ticket_permission":1,
+      "updated_at":"2015-01-04T23:09:52-10:00"
+    }
+  }
+}

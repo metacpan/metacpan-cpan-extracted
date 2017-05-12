@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+use strict;
+use File::Basename;
+use Getopt::Long    qw(:config no_auto_abbrev no_ignore_case);
+use WWW::ColiPoste;
+
+
+$::PROGRAM = basename($0);
+$::VERSION = WWW::ColiPoste->VERSION;
+
+MAIN: {
+    run() unless caller();
+}
+
+
+sub run {
+    my %options = ();
+
+    # process command-line options
+    GetOptions(\%options, qw{
+        help|h!  version|V!
+        from|f=s
+    }) or pod2usage(1);
+
+    # handle --help and --version
+    $options{help}    and pod2usage(2);
+    $options{version} and print "$::PROGRAM v$::VERSION\n" and exit;
+
+    my $coliposte = WWW::ColiPoste->new;
+
+    push my @args, from => $options{from} if $options{from};
+
+    for my $id (@ARGV) {
+        my $status = $coliposte->get_status(tracking_id => $id, @args);
+
+        print "tracking log for shipment #$id:\n";
+        for my $line (@$status) {
+            print join(": ", map { $line->{$_} } qw(date site status) ), $/
+        }
+
+        print $/ if @ARGV > 1;
+    }
+}
+
+sub pod2usage {
+    my ($level) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage({ -exitval => 0, -verbose => $level, -noperldoc => 1 });
+}
+
+
+1
+
+__END__
+
+=head1 NAME
+
+coliposte - Fetch and print shipping status from ColiPoste
+
+=head1 SYNOPSIS
+
+    coliposte <tracking ID> ...
+
+    coliposte --help
+    coliposte --version
+
+=head1 OPTIONS
+
+=over
+
+=item B<-f>, B<--from> I<tmpl-uri>
+
+Use the given template URI.
+
+=item B<-h>, B<--help>
+
+Prints this help screen, then exits.
+
+=item B<-V>, B<--version>
+
+Prints the program name and version, then exits.
+
+=back
+
+
+=head1 DESCRIPTION
+
+This program is a simple command-line interface to C<WWW::ColiPoste>. 
+It expects shipping IDs as arguments, and prints the correspond 
+tracking logs. 
+
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, C<< <sebastien at aperghis.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests 
+to C<bug-www-coliposte at rt.cpan.org>, or through the web interface 
+at L<http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-ColiPoste>. 
+I will be notified, and then you'll automatically be notified of 
+progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc WWW::ColiPoste
+
+You can also look for information at:
+
+=over
+
+=item * 
+
+RT CPAN's request tracker:
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-ColiPoste>
+
+=item *
+
+AnnoCPAN: Annotated CPAN documentation:
+L<http://annocpan.org/dist/WWW-ColiPoste>
+
+=item *
+
+CPAN Ratings:
+L<http://cpanratings.perl.org/d/WWW-ColiPoste>
+
+=item *
+
+Search CPAN:
+L<http://search.cpan.org/dist/WWW-ColiPoste>
+
+=item *
+
+Kobes Search:
+L<http://cpan.uwinnipeg.ca/dist/WWW-ColiPoste>
+
+=back
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 SE<eacute>bastien Aperghis-Tramoni, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

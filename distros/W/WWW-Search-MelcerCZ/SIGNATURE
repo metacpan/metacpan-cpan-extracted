@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7950499affdd37805dfce523fc1ad5e6fc75bb83 Changes
+SHA1 5b4c76e0e99c847b819105fa8517af3484c7e996 LICENSE
+SHA1 c53d0cd92bb79b21a8cefc69564dd1a123e7a916 MANIFEST
+SHA1 fcd8125cac60496a2b4950767ef7ef0f51d5fb9d META.yml
+SHA1 1d13e12e5a213c288ff0c349428b44e76b1c157a Makefile.PL
+SHA1 6e5c323448994d7b3e50bff3ab35afed7f057c98 MelcerCZ.pm
+SHA1 42173bcae2436f55b92580e1961da78880f574a1 README
+SHA1 95fb28b82f85992ca54a48fa062cce72119aa5db examples/ex1.pl
+SHA1 4f7982f7e554df23debce735ab343d88d7355140 inc/Module/Install.pm
+SHA1 c68c85ca62ae30d83f633975cd9af2a0789f59e0 inc/Module/Install/Base.pm
+SHA1 4797fd314e2653a427e725104704b0320993ba8c inc/Module/Install/Can.pm
+SHA1 b771d93af2bfc41273f48fa36082bf1bd6f21dbe inc/Module/Install/Fetch.pm
+SHA1 f4f3258a505a432a58cbcdc1fd030ef5e8e90985 inc/Module/Install/Makefile.pm
+SHA1 100a0dd8572f0b40373350fdd6c0a6f035d9dc39 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 4490fed943f4e556db9fd054b7ec8765ca417f7d inc/Module/Install/Win32.pm
+SHA1 8464ddf690b9f7036a0974ff172ec0ced2f6a329 inc/Module/Install/WriteAll.pm
+SHA1 e4a194e4a9c105d2629961a26de3d4fa5aa282ed t/WWW-Search-MelcerCZ/00-use.t
+SHA1 55718b3f2d8abec2d0274813e88f6778608c3249 t/WWW-Search-MelcerCZ/01-version.t
+SHA1 a3cc427d393461b11ffa43bb463132773dd4632e t/WWW-Search-MelcerCZ/02-pod_coverage.t
+SHA1 1068cbd5adfe4f6b46b5fcc594ba0e6ca52b63ea t/WWW-Search-MelcerCZ/03-pod.t
+SHA1 3093e5153232822eedc57714b1208631c77e2830 t/data/melcer_cz-20100411-Bass.html
+SHA1 fa98ba6900f5b566cea6d50ba4fb231a2640a018 t/data/melcer_cz-20110318-Capek.html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUAWMdAAoJEAwa+cf4dLBal38H/1sJafZRK5aa0FIVtdp5Dx9S
+uTIjAsXiroxJmv/UE5plbfl+Vyz0u+X4oVPF0yXv2waHNRfCHfdecmHx0PlgTdOv
+H4JWEB9JfKsqBuJTGScpNmcN4xKm6GJwCa7vw0AGXvVzEfkv9eNPp0Yp7ox2Xqok
+Hkri/Tkzv/O6e7KAGtnpqtj+FFNsApl16UYh/yopjZjVa3k+b6O+fH+X8NEaEPss
+Uvyzr+RTYNCulJ2YnsViinQqI7BKCj3+F1jTn1LSAWtttofBcJQdJXu+slWHUemM
+DGYpk9wEzsrrGMNtpnPZEQUJzXacKVd6AGoLTfO0XIcbb264ARq+6v+eYCLHorQ=
+=Vz78
+-----END PGP SIGNATURE-----

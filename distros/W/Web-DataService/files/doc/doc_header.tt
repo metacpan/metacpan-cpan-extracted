@@ -1,0 +1,6 @@
+=encoding utf8
+
+=head1 <% ds.title %>: <% doc_title %>
+
+<% NAVTRAIL %>
+

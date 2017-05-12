@@ -1,0 +1,107 @@
+=encoding utf8
+
+=head1 NAME
+
+WWW::CheckPad::CheckList - A class to control checklist of check*pad.
+
+=head1 SYNOPSIS
+
+See the WWW::CheckPad
+
+=head1 DESCRIPTION
+
+WWW::CheckPad::CheckListはcheck*padのチェックリストをコントロールするクラス
+です。このクラスを通じて、チェックリストの追加・更新・削除を行うことが可能
+です。現在、対応していない主要な機能として下記があります。
+
+１．公開・非公開機能
+２．公開されたチェックリストの取得
+
+
+=head2 Class Method
+
+=head3 retrieve_all
+
+  my @checklists = WWW::CheckPad::CheckList->retrieve_all();
+
+C<retrieve_all>は現在ログインしているユーザの全チェックリストを返します。
+
+=head3 retrieve
+
+  my $checklist = WWW::CheckPad::CheckList->retrieve($checklist_id);
+
+C<retrieve>は$checklist_idで指定されたチェックリストを返します。ただし、
+この$checklist_idが現在ログインしているユーザのチェックリストを指している
+必要があります。現在ログインしているユーザのチェックリスト内で見つからない
+時はC<undef>を返します。
+
+=head3 insert
+
+  my $checklist = WWW::CheckPad::CheckList->insert({title => 'title of list'});
+新しいチェックリストを作成し、保存します。
+
+=head2 Instance Method
+
+=head3 id
+
+  my $checklist_id = $checklist->id();
+
+チェックリストのIDを返す。
+
+=head3 title
+
+  my $checklist_title = $checklist->title();
+  $checklist->title('title of checklist');
+
+チェックリストのタイトルを返す。引数を与えた時はチェックリストのタイトルを変更する。
+
+=head3 update
+
+  $checklist->update();
+
+チェックリストの情報を更新します。これにより更新される情報はタイトルだけ
+なので、下記のようなコーディングが良く使われます。
+
+  $checklist->title('update title'); ## update the title
+  $checklist->update();
+
+=head3 delete
+
+  $checklist->delete();
+
+チェックリストを削除します。
+
+=head3 add_checkitem
+
+  my $checkitem = $checklist->add_checkitem('new todo item');
+
+新しいTodo項目をこのチェックリストに追加します。
+
+=head3 checkitems
+
+  my @checkitems = $checklist->checkitems();
+
+このチェックリストに属する、すべてのTodo項目を返します。
+
+=head1 SEE ALSO
+
+WWW::CheckPad
+
+WWW::CheckPad::CheckItem
+
+=head1 AUTHOR
+
+Ken Takeshige, E<lt>ken.takeshige@gmail.comE<gt>
+
+http://d.hatena.ne.jp/ya_ken/
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Ken Takeshige
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

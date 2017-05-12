@@ -1,0 +1,8 @@
+## Scintilla typemap
+
+TYPEMAP
+wxDragResult            T_ENUM
+
+wxScintillaTextCtrl *      O_WXOBJECT
+
+wxScintillaTextEvent *     O_WXOBJECT

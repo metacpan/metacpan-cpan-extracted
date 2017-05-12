@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4dd207f520be53c75c9d02cb6082704098eab237 Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 fefc5f0c3f892c507c4a5e210030eb1fc28c9679 MANIFEST
+SHA1 2f7bc529adf8ae9e29f7fccc0af8a0b67abccebd META.yml
+SHA1 ff637f85fdfdcd2c7d312e2c9e81da4a07bc6889 Makefile.PL
+SHA1 4269ace18a522d05ed342ce4ac3c836bcb53e828 MorphIO.pm
+SHA1 4967884306ce642b8e0ababeb49bfed8074237ec README
+SHA1 9717e4f5a95d618672b48b4fae4988735a599bd3 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 0e073ac5aa9d5f9ddf59e6098dbb34a19e71ba19 t/WebService-MorphIO/01-use.t
+SHA1 98340c4075cd50071e25cd67a7b4d80b26919404 t/WebService-MorphIO/02-version.t
+SHA1 a87fcc5c3b3e2bd55638337077a8431a3cb6833f t/WebService-MorphIO/03-new.t
+SHA1 56d572fc02b3e8428f23ed395cee174bcfe89652 xt/WebService-MorphIO/01-pod_coverage.t
+SHA1 4e64a8048bc47440af87dac869aa9bd509525e5e xt/WebService-MorphIO/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWAdCZAAoJEJe+XXKaIuTlcU0H/1IOl+t9MjwMn67NcsU4y2bx
+746fU9Qgx1cq1brh36pyxoTXrQ4ntaWvdEybLexIPalbQC/RaeJYMwv/Prwmajph
+HZZ9oIkmh7QR/XItmzT7H0QKvqQNYkgFsRbw/RSaQcy3+VxSKaFXp+UkRdETVHCp
+KWXae3lmkapwn/x/n0bCyYxjR20h/lOhjgUJYiW+DOJgSkkF/ciaV9XOGQ7hT7l5
+8oJXGdriNknGLRQkXAWceT3cr9qCiVVp0Y1pijzn1UsZCn2mT3OrgNim1mkbnFLj
+dg0c4JqA8ktK6WJ+LCszEYADBQ08DZU32OFNMg4JnYr55UPrUhayTdxVaYpDMIY=
+=Qkbq
+-----END PGP SIGNATURE-----

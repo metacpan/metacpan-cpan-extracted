@@ -1,0 +1,47 @@
+==================================================
+Changes from 1738-12-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2012-10-14 03:03:41 +0000
+------------------------------------------
+
+  Change: 52130a37352bd3da26ce5398dbea88ad0ddd6889
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-14 00:38:14 +0000
+
+    Added method usage to the examples on SYNOPSIS 
+
+  Change: 4e86c5f90a67618d09262598ac616bddc66d1fa0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-14 00:31:47 +0000
+
+    Implemented suggestions of mst, now method calls possible 
+
+  Change: 3fcb3bbdd4a27cfca8cfd0261c6371ee01e29a79
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:32:21 +0000
+
+    Added theoretical non blocking example 
+
+  Change: 1d0a55af8bf833f2f983f21f55b6e26d47452988
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:26:19 +0000
+
+    Hups, fixed SYNOPSIS 
+
+  Change: bf3d9d8b5406301ffb513f2c96850a60b6a4ea03
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-13 07:25:03 +0000
+
+    First implementation, LWP based useragent, test suite 
+
+  Change: 6f359d395a4a1bd8f4170d89c138eeb75e544aa9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-10-12 02:30:11 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

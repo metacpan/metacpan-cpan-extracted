@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:cmis="http://docs.oasis-open.org/ns/cmis/core/200908/" xmlns:cmisra="http://docs.oasis-open.org/ns/cmis/restatom/200908/" xmlns:app="http://www.w3.org/2007/app">
+  <atom:author>
+    <atom:name>proxy</atom:name>
+  </atom:author>
+  <atom:id>http://chemistry.apache.org/NGNhYmY3Y2MtZDJkYy00OTgwLWFjNTMtNmIzMzU1ODZiZGRj</atom:id>
+  <atom:title>Test_default_1349354670</atom:title>
+  <app:edited>2012-10-04T12:44:30Z</app:edited>
+  <atom:updated>2012-10-04T12:44:30Z</atom:updated>
+  <atom:link rel="service" href="http://localhost:8081/nuxeo/atom/cmis/default?repositoryId=default" type="application/atomsvc+xml"/>
+  <atom:link rel="self" href="http://localhost:8081/nuxeo/atom/cmis/default/parents?id=4cabf7cc-d2dc-4980-ac53-6b335586bddc" type="application/atom+xml;type=entry"/>
+  <atom:entry>
+    <atom:author>
+      <atom:name>system</atom:name>
+    </atom:author>
+    <atom:id>http://chemistry.apache.org/OTM0YTg1NzUtZjUxNi00ZGYyLWExYTUtNTg4NWY1NjQ3MWRk</atom:id>
+    <atom:title>Workspaces</atom:title>
+    <app:edited>2012-10-04T10:50:41Z</app:edited>
+    <atom:updated>2012-10-04T10:50:41Z</atom:updated>
+    <cmisra:object xmlns:ns3="http://docs.oasis-open.org/ns/cmis/messaging/200908/">
+      <cmis:properties>
+        <cmis:propertyId propertyDefinitionId="cmis:objectId" localName="cmis:objectId" displayName="Object ID" queryName="cmis:objectId">
+          <cmis:value>934a8575-f516-4df2-a1a5-5885f56471dd</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyId propertyDefinitionId="cmis:objectTypeId" localName="cmis:objectTypeId" displayName="Type ID" queryName="cmis:objectTypeId">
+          <cmis:value>WorkspaceRoot</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyId propertyDefinitionId="cmis:baseTypeId" localName="cmis:baseTypeId" displayName="Base Type ID" queryName="cmis:baseTypeId">
+          <cmis:value>cmis:folder</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyString propertyDefinitionId="cmis:name" localName="cmis:name" displayName="Name" queryName="cmis:name">
+          <cmis:value>Workspaces</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyString propertyDefinitionId="cmis:createdBy" localName="cmis:createdBy" displayName="Created By" queryName="cmis:createdBy">
+          <cmis:value>system</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyDateTime propertyDefinitionId="cmis:creationDate" localName="cmis:creationDate" displayName="Creation Date" queryName="cmis:creationDate">
+          <cmis:value>2012-10-04T12:50:41.337+02:00</cmis:value>
+        </cmis:propertyDateTime>
+        <cmis:propertyString propertyDefinitionId="cmis:lastModifiedBy" localName="cmis:lastModifiedBy" displayName="Last Modified By" queryName="cmis:lastModifiedBy">
+          <cmis:value>system</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyDateTime propertyDefinitionId="cmis:lastModificationDate" localName="cmis:lastModificationDate" displayName="Last Modification Date" queryName="cmis:lastModificationDate">
+          <cmis:value>2012-10-04T12:50:41.000+02:00</cmis:value>
+        </cmis:propertyDateTime>
+        <cmis:propertyString propertyDefinitionId="cmis:changeToken" localName="cmis:changeToken" displayName="Change Token" queryName="cmis:changeToken"/>
+        <cmis:propertyString propertyDefinitionId="nuxeo:lifecycleState" localName="nuxeo:lifecycleState" displayName="Lifecycle State" queryName="nuxeo:lifecycleState">
+          <cmis:value>project</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyId propertyDefinitionId="nuxeo:secondaryObjectTypeIds" localName="nuxeo:secondaryObjectTypeIds" displayName="Facets" queryName="nuxeo:secondaryObjectTypeIds">
+          <cmis:value>Folderish</cmis:value>
+          <cmis:value>SuperSpace</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyId propertyDefinitionId="nuxeo:parentId" localName="nuxeo:parentId" displayName="Nuxeo Parent ID" queryName="nuxeo:parentId">
+          <cmis:value>1ca8d57f-ed2a-43b5-b442-0fd3f1abf530</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyString propertyDefinitionId="nuxeo:pathSegment" localName="nuxeo:pathSegment" displayName="Path Segment" queryName="nuxeo:pathSegment">
+          <cmis:value>workspaces</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyId propertyDefinitionId="cmis:parentId" localName="cmis:parentId" displayName="Parent ID" queryName="cmis:parentId">
+          <cmis:value>1ca8d57f-ed2a-43b5-b442-0fd3f1abf530</cmis:value>
+        </cmis:propertyId>
+        <cmis:propertyString propertyDefinitionId="cmis:path" localName="cmis:path" displayName="Path" queryName="cmis:path">
+          <cmis:value>/default-domain/workspaces</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyId propertyDefinitionId="cmis:allowedChildObjectTypeIds" localName="cmis:allowedChildObjectTypeIds" displayName="Allowed Child Object Type IDs" queryName="cmis:allowedChildObjectTypeIds"/>
+        <cmis:propertyString propertyDefinitionId="dc:creator" localName="dc:creator" displayName="dc:creator" queryName="dc:creator">
+          <cmis:value>system</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyString propertyDefinitionId="dc:source" localName="dc:source" displayName="dc:source" queryName="dc:source"/>
+        <cmis:propertyString propertyDefinitionId="dc:nature" localName="dc:nature" displayName="dc:nature" queryName="dc:nature"/>
+        <cmis:propertyString propertyDefinitionId="dc:contributors" localName="dc:contributors" displayName="dc:contributors" queryName="dc:contributors">
+          <cmis:value>system</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyDateTime propertyDefinitionId="dc:created" localName="dc:created" displayName="dc:created" queryName="dc:created">
+          <cmis:value>2012-10-04T12:50:41.337+02:00</cmis:value>
+        </cmis:propertyDateTime>
+        <cmis:propertyString propertyDefinitionId="dc:description" localName="dc:description" displayName="dc:description" queryName="dc:description"/>
+        <cmis:propertyString propertyDefinitionId="dc:rights" localName="dc:rights" displayName="dc:rights" queryName="dc:rights"/>
+        <cmis:propertyString propertyDefinitionId="dc:subjects" localName="dc:subjects" displayName="dc:subjects" queryName="dc:subjects"/>
+        <cmis:propertyString propertyDefinitionId="dc:publisher" localName="dc:publisher" displayName="dc:publisher" queryName="dc:publisher"/>
+        <cmis:propertyDateTime propertyDefinitionId="dc:valid" localName="dc:valid" displayName="dc:valid" queryName="dc:valid"/>
+        <cmis:propertyString propertyDefinitionId="dc:format" localName="dc:format" displayName="dc:format" queryName="dc:format"/>
+        <cmis:propertyDateTime propertyDefinitionId="dc:issued" localName="dc:issued" displayName="dc:issued" queryName="dc:issued"/>
+        <cmis:propertyDateTime propertyDefinitionId="dc:modified" localName="dc:modified" displayName="dc:modified" queryName="dc:modified">
+          <cmis:value>2012-10-04T12:50:41.000+02:00</cmis:value>
+        </cmis:propertyDateTime>
+        <cmis:propertyString propertyDefinitionId="dc:language" localName="dc:language" displayName="dc:language" queryName="dc:language"/>
+        <cmis:propertyString propertyDefinitionId="dc:coverage" localName="dc:coverage" displayName="dc:coverage" queryName="dc:coverage"/>
+        <cmis:propertyDateTime propertyDefinitionId="dc:expired" localName="dc:expired" displayName="dc:expired" queryName="dc:expired"/>
+        <cmis:propertyString propertyDefinitionId="dc:lastContributor" localName="dc:lastContributor" displayName="dc:lastContributor" queryName="dc:lastContributor">
+          <cmis:value>system</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyString propertyDefinitionId="dc:title" localName="dc:title" displayName="dc:title" queryName="dc:title">
+          <cmis:value>Workspaces</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyString propertyDefinitionId="icon" localName="icon" displayName="icon" queryName="icon">
+          <cmis:value>/icons/workspace.gif</cmis:value>
+        </cmis:propertyString>
+        <cmis:propertyString propertyDefinitionId="icon-expanded" localName="icon-expanded" displayName="icon-expanded" queryName="icon-expanded"/>
+        <cmis:propertyInteger propertyDefinitionId="size" localName="size" displayName="size" queryName="size"/>
+      </cmis:properties>
+      <cmis:rendition>
+        <cmis:streamId>nx:icon</cmis:streamId>
+        <cmis:mimetype>image/gif</cmis:mimetype>
+        <cmis:length>259</cmis:length>
+        <cmis:kind>cmis:thumbnail</cmis:kind>
+        <cmis:title>workspace.gif</cmis:title>
+        <cmis:height>16</cmis:height>
+        <cmis:width>16</cmis:width>
+      </cmis:rendition>
+    </cmisra:object>
+    <atom:link rel="service" href="http://localhost:8081/nuxeo/atom/cmis/default?repositoryId=default" type="application/atomsvc+xml"/>
+    <atom:link rel="self" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=entry" cmisra:id="934a8575-f516-4df2-a1a5-5885f56471dd"/>
+    <atom:link rel="enclosure" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=entry"/>
+    <atom:link rel="edit" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=entry"/>
+    <atom:link rel="describedby" href="http://localhost:8081/nuxeo/atom/cmis/default/type?id=WorkspaceRoot" type="application/atom+xml;type=entry"/>
+    <atom:link rel="http://docs.oasis-open.org/ns/cmis/link/200908/allowableactions" href="http://localhost:8081/nuxeo/atom/cmis/default/allowableactions?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/cmisallowableactions+xml"/>
+    <atom:link rel="up" href="http://localhost:8081/nuxeo/atom/cmis/default/parents?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=feed"/>
+    <atom:link rel="down" href="http://localhost:8081/nuxeo/atom/cmis/default/children?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=feed"/>
+    <atom:link rel="down" href="http://localhost:8081/nuxeo/atom/cmis/default/descendants?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/cmistree+xml"/>
+    <atom:link rel="http://docs.oasis-open.org/ns/cmis/link/200908/foldertree" href="http://localhost:8081/nuxeo/atom/cmis/default/foldertree?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/cmistree+xml"/>
+    <atom:link rel="edit" href="http://localhost:8081/nuxeo/atom/cmis/default/entry?id=934a8575-f516-4df2-a1a5-5885f56471dd&amp;returnVersion=latest" type="application/atom+xml;type=entry"/>
+    <atom:link rel="alternate" href="http://localhost:8081/nuxeo/atom/cmis/default/content?id=934a8575-f516-4df2-a1a5-5885f56471dd&amp;streamId=nx%3Aicon" type="image/gif" cmisra:renditionKind="cmis:thumbnail" title="workspace.gif" length="259"/>
+    <atom:link rel="http://docs.oasis-open.org/ns/cmis/link/200908/relationships" href="http://localhost:8081/nuxeo/atom/cmis/default/relationships?id=934a8575-f516-4df2-a1a5-5885f56471dd" type="application/atom+xml;type=feed"/>
+  </atom:entry>
+</atom:feed>

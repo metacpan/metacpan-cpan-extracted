@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/WebService/Amazon/ElasticBeanstalk.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

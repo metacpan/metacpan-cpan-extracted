@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::Hatena::WanWanWorld.
+
+0.01  Mon Mar 20 11:08:30 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n WWW::Hatena::WanWanWorld
+
+0.02  Fri Mar 31 02:18:00 2006
+        - use Encode Module to character code encoding.
+          With this change, you must set 'charcode' if you use binary string.

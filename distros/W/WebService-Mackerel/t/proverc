@@ -1,0 +1,3 @@
+# Run prove with the following option.
+# $ prove --rc=t/proverc
+-Ilib

@@ -1,0 +1,4 @@
+name = "Web-AssetLib"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

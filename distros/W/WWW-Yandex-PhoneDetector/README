@@ -1,0 +1,25 @@
+WWW-Yandex-PhoneDetector version 1.07
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP::UserAgent;
+	URI::Escape;
+	XML::LibXML;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Kostya Ten
+
+

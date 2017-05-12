@@ -1,0 +1,14 @@
+bin/create_testsuite
+Build.PL
+Changes
+lib/Wetware/Test/CreateTestSuite.pm
+lib/Wetware/Test/CreateTestSuite/TestSuite.pm
+MANIFEST
+README
+t/00-load.t
+t/00_compile_pm.t
+t/00_compile_scripts.t
+t/01_test_classes.t
+t/pod-coverage.t
+t/pod.t
+META.yml

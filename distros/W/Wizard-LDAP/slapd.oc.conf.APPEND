@@ -1,0 +1,49 @@
+objectclass topic
+	requires
+		name
+
+objectclass posixAccount
+	requires
+		objectClass,
+		uid,
+		userPassword,
+		uidnumber,
+		gidnumber,
+		cn,
+		homedirectory,
+		loginshell,		
+		gecos,		
+		description,		
+		mail,
+		status
+	allows
+		mailForward,
+		mailDrop,
+		mailForwardType
+
+objectclass net
+	requires
+		objectClass,
+		netName,
+		mask,
+		domain
+	allows
+		dns,
+		wins,
+		gateway,
+		reservedIPbegin,
+		reservedIPend,
+		timeserver
+
+objectclass host
+	requires
+		objectClass,
+		hostName,
+		dnsname,
+		ip
+	allows
+		mac,
+		timezone
+
+
+		

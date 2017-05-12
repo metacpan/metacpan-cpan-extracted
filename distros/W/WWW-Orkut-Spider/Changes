@@ -1,0 +1,16 @@
+Revision history for Perl extension WWW::Orkut::Spider.
+
+0.03  Tue Oct 12 18:59:00 2004
+    - updated module
+    - supports friends on multiple pages
+    - added documentation
+
+0.02  Sun Feb  9 20:10:36 2004
+	- updated documentation
+        - new script spiderhim.pl in examples, to spider another uids friends
+        - totally untested
+
+0.01  Sun Feb  8 23:33:36 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n WWW::Orkut::Spider
+

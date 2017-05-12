@@ -1,0 +1,76 @@
+Revision history for WWW-CPAN.
+
+0.013   Sat Jan  1 2016
+        - Fixes to Makefile.PL (CPAN #43233)
+        - Move from JSON::Any to JSON::MaybeXS (CPAN #102459)
+
+0.012   Wed Feb 25 2015
+        - Fixed problem with UTF8 content
+        - Fixed t/03meta.t
+
+0.011   Sat Mar  1 2008
+        - try Cache::FileCache rather than Cache::File:
+          it seems to work on Windows (at least more than
+          Cache::File does)
+
+0.010   Sat Mar  1 2008
+        - experiment LWP::UserAgent::Determined to get
+          rid of some failures in live test
+        - dependency on LWP::UserAgent replaced by 
+          L::UA::Determined for now
+        - nope, it won't help: search.cpan.org is playing
+          tricks on me - the META.json of CPAN
+          is auto-generated sometimes instead of
+          being the one extracted from the current dist
+
+0.009   Thu Feb 21 2008
+        - 'search' is now the preferred name of 'query'
+          in WWW:CPAN API
+        - in cpanq, 'search' is now the preferred name
+          of 'query' command
+        - in cpanq, 'distmeta' is a synonym of 'meta'
+          command
+        - cpanq now produces a usage message when
+          no arguments are given
+        - Pod::Usage is now a prereq
+
+0.008   Tue Feb 19 2008
+        - update dependency: Class::Constructor::Factory 
+          renamed to Class::Lego::Constructor
+        - usage pattern of Class::Lego::Constructor updated
+
+0.007   Tue Jan 29 2008
+        - minor internal change to load JSON/XML
+        - cpanq does not display "$VAR1 = undef"
+          on errors anymore
+        - cpanq now uses a cache
+        - the live test t/03meta.t announces itself
+        - t/03meta.t can be skipped (given an argument
+          --no-live-tests)
+        - added t/98pod-coverage.t and t/99pod.t
+        - added forgotten dependency on URI 
+          (thanks, CPANTS!)
+
+0.006    Sun Jan 27 2008
+        - more tests (including a live test)
+
+0.005    Sat Jan 26 2008
+        - included a demo script: cpanq
+
+0.004    Mon Jan 14 2008
+        - query() added to the API
+        - more POD
+        - new dependency on XML::Simple
+
+0.003    Wed Jan  9 2008
+        - new dependency on Class::Lego::Myself
+
+0.002    Thu Dec 27 2007
+        - carp and return undef rather than die
+        - more POD
+        - Class::Constructor::Factory is used for generating
+          the constructor with field default values
+
+0.001    Wed Dec 26 2007
+        - first CPAN release
+        - new() and fetch_distmeta() is the whole API

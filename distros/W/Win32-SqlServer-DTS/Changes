@@ -1,0 +1,26 @@
+==================================================
+Changes from 2015-07-21 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.13 at 2016-07-20 00:21:25 +0000
+-----------------------------------------
+
+  Change: 094a57b439f90269fad9ccfb5f88377b444cd17c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-07-19 21:19:11 +0000
+
+    Moved Pod testing for xt directory (author only tests) Fixed small
+    bug regarding UTF-8 and Dist::Zilla plugin 
+
+  Change: cf96c57c28842799c22a4b326eab245496f93f58
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-07-19 21:00:58 +0000
+
+    Migration to Dist::Zilla Moved extended tests to xt directory as the
+    recommended method to have them distribuited over CPAN Removed files
+    that are unnecessary anymore Added missing dependencies for testing 
+
+===============================================
+Plus 1 release after 2015-07-21 00:00:00 +0000.
+===============================================

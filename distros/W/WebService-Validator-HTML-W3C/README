@@ -1,0 +1,46 @@
+WebService::Validator::HTML::W3C provides access to the W3Cs online HTML
+validator. It's nothing to do with the W3C so please don't report any problems
+with it to them. Also, please use it wisely and don't abuse the W3Cs
+validator service. If you need to do a lot of validation consider
+downloading and installing the Validator on your own machine.
+
+PREREQUISITES
+
+Class::Accessor
+XML::XPath if you want detailed information on errors.
+
+INSTALLATION
+
+You should be able to install WebService::Validator::HTML::W3C in any of the usual ways:
+
+    perl -MCPAN -e 'install WebService::Validator::HTML::W3C'
+
+or
+
+    perl -MCPANPLUS -e 'install WebService::Validator::HTML::W3C'
+
+or 
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or 
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+TESTS
+
+Some of the tests for this module require a live internet connection. If one 
+isn't present then they'll be skipped.
+
+Test::Without:Module is required for one of the tests. If it's
+not there then that test should be skipped.
+
+For everything else see the POD.
+
+$Id$

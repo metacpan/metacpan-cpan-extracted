@@ -1,0 +1,25 @@
+---
+abstract: "PHP's Mink inspired multi-protocol web-testing library for Perl"
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Weasel
+requires:
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/ehuelsmann/weasel/issues
+  repository: https://github.com/ehuelsmann/weasel.git
+version: '0.11'
+x_serialization_backend: 'YAML::Tiny version 1.64'

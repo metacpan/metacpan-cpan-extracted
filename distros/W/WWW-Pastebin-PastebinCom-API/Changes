@@ -1,0 +1,40 @@
+Revision history for WWW-Pastebin-PastebinCom-API
+
+1.001004   2016-12-26
+        - Add META.json (ambs)
+
+1.001003   2015-12-06
+        - Re-upload to fix reset pass/fail counters, because fails
+          were not due to the module, but due to pastebin.com API
+          being broken for a few days. (#2)
+
+1.001002   2015-03-13
+        - Added 'owned' argument to ->paste()
+
+1.001001   2014-10-26
+        - Updated the module to reflect changes on pastebin.com
+        - list_trends no longer has `format_short` and `format_long`
+        - Fixed broken tests (RT#99797)
+        - Updated packaging to DZIL
+
+0.003   2013-10-29
+        - Fixed a broken test
+
+0.002   2013-10-28
+        - Added the "Getting A Users Information And Settings" API
+          feature that I somehow managed to miss the first time around.
+        - Fixed t/kwalitee.t to run only with RELEASE_TESTING
+        - Added examples/get_user_info.pl
+        - Fixed a bug where the user of the module would get strange
+          and confusing errors if they forgot to get a user key or
+          provide an API key
+        - Updated the docs to mention that
+          WWW::Pastebin::PastebinCom::Retrieve provides a more
+          featureful paste grab--relying on HTML parsing-- that
+          pastebin's API doesn't (what would I likely want to know:
+          user's settings or the expiry of the paste? The former is in
+          the API the latter isn't... logic for you ~_~)
+
+0.001   2013-10-26
+        - First version, released on an unsuspecting world.
+

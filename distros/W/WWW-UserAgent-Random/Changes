@@ -1,0 +1,11 @@
+Revision history for Perl extension WWW-UserAgent-Random.
+
+0.03  Sun Feb 27 17:22:05 2011
+	- add new categories : tool, shell, cloud_platforms, wap
+	- add docs/user_agent_list.txt
+
+0.02  Thu Jan 14 00:11:35 2010
+	- add 'browsers' category by Chris Hennick
+
+0.01  Mon Mar  4 11:27:25 2009
+	- first release

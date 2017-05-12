@@ -1,0 +1,49 @@
+Things to improve / things yet to do :
+--------------------------------------
+
+- allow writing of column provider extensions in Perl.
+
+- factorize the code of query_context_menu for shell extensions that only
+work on a specific type of files (.zip,.mp3,.txt ...)
+
+- support property pages & tray icon extensions as well...
+
+- support having several commands per package.
+
+- need a Makefile.PL that knows how to install Win32::ShellExt without the unnecessary .xs, and also knows
+	how to compile perlshellext.dll
+
+- separate the installation stuff that uses Win32::TieRegistry that gets loaded
+       even when running inside Explorer (and never gets used then...).
+
+- change the makefile so that the registry installation only happens for modules that have changed (for
+	now it recreates all the keys each time)
+
+- the first right click to unfold the context menu is very long (most probably because it's loading the
+	perl DLL, as well as pulling in a lot of perl code). maybe we should do it differently?
+
+- Use t/testColumnProvider.cpp to validate this extension
+
+- finish PerlMenu to allow putting commands in sub-menus (and eventually defining
+in one's perl package one's own cascaded menus).
+
+- finish ShellExt/Search.pm
+	PerlCopyHookExt.cpp & ShellExt/CopyHook.pm
+
+- write a QueryInfo::DLL (using Win32::ImageHlp to list the symbols and/or dependencies).
+
+- DragDropHandler
+- ContextMenu for Folder (-> a different registry key)
+- sub-menus in ContextMenu (->PerlMenu), cf IContextMenu3 to allow display of custom icons (this would need
+to be user-definable in the .pm).
+
+- implement the 7 types of extensions:
+http://www.zdnet.com/pcmag/pctech/content/15/03/tu1503.004.html
+
+Context-menu handler IShellExtInit, IContextMenu Adds commands to context menus.  
+Drag-drop handler IShellExtInit, IContextMenu Adds commands to right-drag context menus.  
+Property-sheet handler IShellExtInit, IShellPropSheetExt  Adds pages to property sheets.  
+Icon handler IPersistFile, IExtractIcon  Provides instance-specific icons for files and other objects displayed by the shell.   
+Copy-hook handler ICopyHook Exercises veto power over moves, copies, and other actions performed on folders.  
+Data handler IPersistFile, IDataObject  Exposes an object's data to drop-target objects.  
+Drop handler IPersistFile, IDropTarget Converts icons into drop targets.  

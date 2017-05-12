@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 63265a9a4ea5f16a1861433322d88790ec25996b Changes
+SHA1 7a66ecbc485a9c436cf5087b3264bb2b1e8a9fbb INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 667937611d6e036d18ff8e98119ba1fa5f23353a MANIFEST
+SHA1 7796c539abe666a34043ebafbd62a9d807219c2f META.json
+SHA1 e9e63411873bdeaa77db47ae15a8cdef9ea3b181 META.yml
+SHA1 87fda7e0e5cec2a816d84e8d3e31d75cfcc1f3b7 Makefile.PL
+SHA1 45c8b2c7612b763f32eee9ad4c16f0a735acd4ad README
+SHA1 7b7b37be8c78d2b9cbe4a6eb4b85f59562abcc6c cpanfile
+SHA1 182392c322db2b8d4d0955c02820915dac11bdf3 dist.ini
+SHA1 85e3508d1ae8314e8766ce33ab7dd1bb399b48a4 lib/WebService/Amazon/IAM.pm
+SHA1 3e8a7271723b5adc5d57199363a5252fccd306ee lib/WebService/Amazon/IAM/Client.pm
+SHA1 482023769814e15a836e5d636e128b55b5782a25 lib/WebService/Amazon/IAM/Client.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 b63d8a161e9cbfd7e6709c93a5175a2f6230d923 t/00-compile.t
+SHA1 17afa513a05215a66eb110ffbc3fa749fd652bb6 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUxnBYAAoJEFKElMNpjtyD9bIIAMkcd2oYaCq6JLqKhKGdrbP4
+i5n33Vlx8vSJEhpPf8iQn2WVeyJ0i5ZO1SNemov1YML0y7KPbVvrFJMH2sGwPE7J
+66fVLY9YbeQQi30G14LEjumtxFtpP9L9nmumK1gqWkZgBZeTHtpjmta+DwtuFBxF
+iDdFvtT5FXDMTpGic87DqN6uq+ZWdc6vYikv7xsfKGQDaJccqQbBd3ULOTW/gIe7
+LTXWldYP8VhOEBLMhdlyCB0fRVHsCTaXf67ZyVVASWshPgZRHxEVPzYMtH6QYcUx
+LH5LqPobeHbWEO43evXbWEoXSp3HsO/gdu5tdJZSqvVsDJZQZouGo5VMsSHLEaA=
+=UWLN
+-----END PGP SIGNATURE-----

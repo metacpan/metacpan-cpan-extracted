@@ -1,0 +1,17 @@
+<!-- BEGIN recent_changes_content -->
+<table class="recent_changes">
+[% FOR page = pages %]
+<tr>
+<td class="page_name">
+[% IF recent_changes_action %]
+<a href="[% script_name %]?action=[% recent_changes_action %];page_name=[% page.uri %]">[% page.title %]</a>
+[% ELSE %]
+[% page.kwiki_link %]
+[% END %]
+</td>
+<td class="edit_by">[% page.edit_by_link %]</td>
+<td class="edit_time">[% page.edit_time %]</td>
+</tr>
+[% END %]
+</table>
+<!-- END recent_changes_content -->

@@ -1,0 +1,41 @@
+Revision history for WWW-Scraper-ISBN-PickABook_Driver
+======================================================
+
+0.07    2014-12-09
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.06    2014-08-29
+        - fixed skip in tests.
+        - fixed license fields in META.json to be lists.
+        - removed redundant conversion tests.
+
+0.05    2014-08-20
+        - description pattern updated.
+        - no results pattern updated.
+        - updated test data.
+
+0.04    2014-07-30
+        - added isbn-check.pl to examples.
+        - added git repository links to metadata.
+        - META updates.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - added missing prerequisite; Data::Dumper.
+        - extended test suite.
+        - remove convert_to_ean13 and convert_to_isbn10.
+        - provide html in book details.
+
+0.03    2012-12-16
+        - fixed broken test.
+        - reworked Makefile.PL for clarity.
+        - License updated consistently to Artistic License v2.0.
+        - META tests no longer require specific versions.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - added minimum perl version (5.006).
+        - change file dates changed to meet W3CDTF standards.
+
+0.02    2011-07-01
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - fixed warnings for undefined values.
+
+0.01	2010-11-18
+        - initial release

@@ -1,0 +1,10 @@
+=begin pod
+=for CHAPTER :preface
+Об этой книге
+
+Книга о платформе WebDAO.
+
+I<Александр Загацкий>
+
+
+=end pod

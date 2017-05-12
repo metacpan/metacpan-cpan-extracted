@@ -1,0 +1,76 @@
+NAME
+    WWW::CheckPad - An API to control the check*pad
+    (http://www.checkpad.jp/)
+
+SYNOPSIS
+      use WWW::CheckPad;
+      use WWW::CheckPad::CheckList;
+      use WWW::CheckPad::CheckItem;
+
+      ## Connect and login to the check*pad.
+      WWW::CheckPad->connect({
+        email => 'your email address',
+        password => 'your password'
+      });
+
+      ## Add new checklist.
+      my $new_checklist = WWW::CheckPad::CheckList->insert({
+          title => 'Private Todo List'
+      });
+
+      ## Let's add todo items to the list.
+      my $cut_my_nail = $new_checklist->add_checkitem('Cut my nail.');
+      my $buy_a_cat_food = $new_checklist->add_checkitem('Buy a cat food.');
+
+      ## ... After a few minutes ...
+
+      ## OK! I cut my nail.
+      $cut_my_nail->finish();
+
+      ## Oh! I remember. I don't have a cat but I have a dog.
+      $buy_a_cat_food->title('Buy a dog food');
+      $buy_a_cat_food->update();
+
+      ## I need to see all of my todo list and items which are not finished.
+      foreach my $checklist (WWW::CheckPad::CheckList->retrieve_all) {
+          foreach my $checkitem (grep {not $_->is_finished} $checklist->checkitems) {
+              printf "[%s] %s\n", $checklist->title, $checkitem->title;
+          }
+      }
+
+DESCRIPTION
+    WWW::CheckPad will allow you to control check*pad
+    (http://www.checkpad.jp/) from your program. Before using this module,
+    you need to have your account for the check*pad (see the check*pad web
+    site).
+
+    WWW::CheckPad->connect
+      my $connection = WWW::CheckPad->connect({
+        email => 'your email address',
+        password => 'your password'
+      })
+
+    You have to call this connect method before calling any methods in
+    WWW::CheckPad::CheckList or WWW::CheckPad::CheckItem. You can check the
+    login successed or not by calling has_logged_in method (see below).
+
+    has_logged_in
+      $connection->has_logged_in()
+
+    This will return true if the user logged in to the check*pad.
+
+SEE ALSO
+    WWW::CheckPad::CheckList
+
+    WWW::CheckPad::CheckItem
+
+AUTHOR
+    Ken Takeshige, <ken.takeshige@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Ken Takeshige
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

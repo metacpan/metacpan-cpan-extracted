@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a0cf067b8f496e7c6c3b1d0775f6e28978fe0719 Changes
+SHA1 4c770da2a4142b13f84915e9c2140e87a1c925f7 FreeDB.pm
+SHA1 d44edf6c08983c9afd96d683dc1802fa7842ea17 INSTALL
+SHA1 e6e85102cd0e67b4c29740b8561c8bd0709f4ee0 MANIFEST
+SHA1 582224c9eb2d204f618da9310529c43edc8b9364 META.json
+SHA1 ab7e281b7df3a7a9a83549ab9488efae6af3881e META.yml
+SHA1 cf03030efdb1833a956822e346c7db0ab241244e Makefile.PL
+SHA1 91a705f1e60997356ed0a2e2e9add6791fac4dd6 README
+SHA1 da41a323ca5f55cd9ba14a28d7fa85fb6dcf3ec9 example/cdcollection.dtd
+SHA1 dc3bd2d302e4c50e559b2d3482e27e7557bcbc2c example/cdsearch.pl
+SHA1 97f85bdec9e8cfffe77a6ba702a09a7cc918b3b0 t/freedb.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk9NE68ACgkQmm2SYo/9yUJVDwCfSXFQY/WDQGzha/tp1904gx6H
+cEUAnRIZLS9KXmPthOiiwZMYd6wtSfB+
+=dih2
+-----END PGP SIGNATURE-----

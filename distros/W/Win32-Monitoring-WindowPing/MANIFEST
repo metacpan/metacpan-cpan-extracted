@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+WindowPing.pm
+WindowPing.xs
+example.pl
+ppport.h
+t/Win32-Monitoring-WindowPing.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,601 @@
+=head1 NAME
+
+CHANGES - Revision history for WordNet::SenseRelate::AllWords
+
+=head1 DESCRIPTION
+
+=over
+
+=item 0.19
+
+Date : May 27, 2009 
+
+=over
+
+=item 1) 
+
+Added --backoff option to wsd.pl. This option backs off to WordNet sense1 if the measure 
+can't assign any sense. 
+
+=item 2) 
+
+semcor-reformat.pl used querySense and reformatted the original text that contained the 
+first word in the synset instead of the original word. It no more uses querySense and 
+the formatted text contains the original semcor lemmas. 
+
+=item 3)
+
+Added scripts utils/extract-semcor-plaintext.pl, utils/extract-semcor-contentwords.pl and
+utils/convert-PENN-to-WN.pl. 
+
+utils/extract-semcor-plaintext.pl extracts plain text from a semcor formatted file. 
+The text contains function words, content words as well as punctuation marks. This text is 
+used for part-of-speech tagging. 
+
+utils/extract-semcor-contentwords.pl extracts content words given an answer file (typically 
+a plain text file extracted using extract-semcor-plaintext.pl which has been tagged using 
+a part of speech tagger) and a key file extracted using extract-semcor-plaintext.pl --key 
+option.
+
+utils/convert-PENN-to-WN.pl takes PENN treeb bank tagged text (format word PENNPOS per line) 
+and converts it to WordNet tagged text. 
+
+=item 4)
+
+Added default config files web/cgi-bin/allwords/user_data/lesk-stoplist.conf and 
+web/cgi-bin/allwords/user_data/vector-stoplist.conf to the web folder. 
+This is important because if the default config stoplists are not used for lesk and vector 
+, they end up giving unexpected results. 
+
+=item 5)
+
+Changed scorer2-format.pl to format the string only if it is in word#pos#sense format. 
+
+=back 
+
+
+=item 0.18
+
+Date : April 30, 2009 
+
+=over
+
+=item 1) 
+
+Added following options to wsd.pl
+
+--usemono        enable assigning the only available sense to monosemy words
+
+This is a change in AllWords.pm, where we assign the available sense to monosemy words.
+This results in increased precision and overall fmeasure because many measures can not get 
+these words right as they can't find relatedness with the surrounding words. 
+
+=item 2) Added following options to allwords-scorer2.pl
+
+=over
+
+=item 1. --word               score only this specific instance
+
+=item 2. --exceptword         score all instances except for these instances
+
+=item 3. --score poly         score only polysemes instances
+
+=item 4. --score s1nc         score only the instances where the most frequent sense is not correct
+
+=item 5. --score    n         score only the instances having n number of senses
+
+=back
+
+These options are added in order to carry different experiments.
+
+=item 3) 
+
+Fixed the script calculate-corpus-stats.pl. This is a perl script that gives corpus statistics
+given a semcor-reformatted corpus file. 
+
+=back 
+
+=item 0.17
+
+Date : April 2, 2009 
+
+=over
+
+=item 1) 
+
+Fixed AllWords.pm for window=2.  If it is the first word in a sentence and the window size is 2, 
+we now consider a word at the right of the target word. Otherwise it will not be assigned any sense. 
+In the previous version we were simply doing sense1 for such scenario. 
+
+=item 2) 
+
+Added a script calculate-corpus-stats.pl to utils/ which gives statistics of the reformatted corpus.  
+
+=back 
+
+=item 0.16
+
+Date : March 16, 2009 
+
+=over
+
+=item 1) 
+
+Fixed wsd.pl and the web interface output for multiword compounds ( for example, by_and_large).
+
+=item 2) 
+
+Punctuation fix for the raw format. If the format is raw and if the context contains words 
+i.e. or el_al., then the period is not removed. 
+
+=item 3) 
+
+If format is raw and the context contains user identified compound words (for example St._Petersburg), 
+then the punctuation is not removed. Please refer README for details. 
+
+=item 4) 
+
+Mapped Penn Treebank IN tag to WordNet 'r'(adverb) part of speech tag because most of the words in this
+class have adverb sense in WordNet. 
+
+=back 
+
+=item 0.15
+
+Date : February 14, 2009 
+
+=over
+
+=item 1)
+
+Fixed the links of the default stoplist and nocompoundify option on the web interface.
+
+=back
+
+=item 0.14
+
+Date : February 13, 2009
+
+=over
+
+=item 1)
+
+Added allwords-scorer2.pl script for scoring. This script is modeled after score2 
+C program (http://www.senseval.org/senseval3/scoring). scorer2 C program is no more 
+used for scoring. 
+
+=item 2)
+
+Changed wsd.pl and the web interface output format. The output now displays the 
+original text. For example, if the input text is 'parking_ticket#n are#v expensive#a'
+then the output will be 'parking_tickets#n#1 are#v#1 expensive#a#1'. 
+Modified t/wsd.t for this change. 
+
+=item 3)
+
+Removed config file option from the web interface
+
+=item 4)
+
+Added --nocompoundify option in wsd.pl and the web interface 
+
+=item 5)
+
+Modified the default stoplist used by the web interface 
+(web/cgi-bin/allwords/user_data/default-stoplist-raw.txt) and replicated it to 
+samples/default-stoplist-raw.txt to be used by wsd.pl. 
+
+=item 6)
+
+Fixed the ForcePos option on the webinterface.
+
+=item 7)
+
+Fixed the web interface crash when the user didn't provide any stoplist
+
+=item 8)
+
+Modified scorer2-format.pl to skip the entries where no sense is assigned. 
+
+=item 9)
+
+--scorer2 option is no more provided in wsd-experiments.pl and the script calls 
+utils/allwords-scorer2.pl.
+
+=back
+
+=item 0.13
+
+Date : January 22, 2009 
+
+=over
+
+=item 1)
+
+Setup for wsd.pl experiments. Added 2 scripts scorer2-sort.pl and 
+wsd-experiments.pl. scorer2-sort.pl sorts the output of scorer2-format.pl 
+so that it can be used as input to the Senseval scorer2 program.
+wsd-experiments.pl runs wsd experiments. 
+
+=item 2)
+
+Documentation changes in wsd.pl, scorer2-format.pl, semcor-reformat.pl.
+
+=item 3)
+
+Makefile changes to install newly added perl scripts. 
+
+=back
+
+=item 0.12
+
+Date : November 03, 2008 
+
+=over
+
+=item 1)
+
+Fixed client server model for the web interface. The allwords
+server can run on a different machine, from where your web 
+server is running.
+
+=item 2)
+
+User data is now stored on the client machine so that it is 
+easily accessible to the user.
+
+=item 3)
+
+Added a mandatory --logfile parameter alomg with other optional 
+parameters to allwords_server.pl
+
+=item 4)
+
+Removed --outfile option from wsd.pl and added --glosses options 
+to display glosses
+
+=item 5) 
+
+Moved default-stoplist-raw.txt from 
+WordNet-SenseRelate-AllWords/web/cgi-bin/allwords to
+/WordNet-SenseRelate-AllWords/web/cgi-bin/allwords/user_data
+
+=back
+
+=item 0.11
+
+Date : June 17, 2008 
+
+=over
+
+=item 1)
+
+Removed compounding logic from AllWords.pm. Compounding is now
+done using WordNet::Tools compoundify. The clients, wsd.pl and 
+allwords_server.pl don't call compoundify any more. They creat 
+WordNet::Tools object and pass it as a parameter while creating 
+AllWords object.
+
+=item 2)
+
+Moved sentence splitter from wsd.pl to a util program, 
+sentence_split.pl. All input formats will now assume that input 
+is one sentence per line, one line per sentence. 
+
+=item 3)
+
+Removed parsed format test case from t/wsd.t
+
+=item 4)
+
+Context was considered as a single line if more than one line 
+was entered in the textarea on the web interface.
+Now the input is considered as one sentence per line, one line 
+per sentence.
+
+=back
+
+
+=item 0.10
+
+Date : May 29, 2008 
+
+=over
+
+=item 1)
+
+Added proper error messages for the words which are ignored 
+during disambiguation. A suffix is attached to the word in 
+order to indicate why it is ignored for disambiguation.
+For example, the word 'the' is not defined in WordNet and
+hence is ignored. We attach the#ND to indicate that this 
+word is not defined in WordNet
+
+=item 2)
+
+Added context file and config file option to the Web 
+interface
+
+=item 3)
+
+Removed --compounds option from wsd.pl as we decided to 
+use centralized compoundify module WordNet::Tools
+
+=item 4)
+
+Added compoundify in wsd.pl. This is done using the 
+centralized WordNet::Tools module
+
+=item 5)
+
+Removed WordNet::SenseRelate dependency of the Web interface. 
+Now compoundifying is done using WordNet::Tools
+
+=back
+
+=item 0.09
+
+Date : April 10, 2008 (all changes by TDP)
+
+=over
+
+=item 1)
+
+Modified test cases further to check for WordNet version using 
+WordNet::Tools. Changes introduced in 0.08 testing were based on 
+WordNet::QueryData's deprecated version test. Now skip all tests 
+if we don't find version 2.0, 2.1, or 3.0, and introduce version
+specific tests within those as needed (if results change from
+one version of WordNet to the next). 
+
+=item 2)
+
+Added reference to Jason Michelizzi's MS thesis, which gives many 
+details about the AllWords approach, plus experimental results
+
+=back
+
+=item 0.08
+
+Date : March 20, 2008 (all changes by TDP)
+
+=over
+
+=item 1)
+
+Fixed bug in AllWords.pm that caused disambiguate to fail when window 
+not specified. we now default to window size 3.
+
+=item 2)
+
+Fixed synopsis in AllWords.pm to provide a cut and paste program that 
+should run
+
+=item 3)
+
+Modified Makefile.PL to allow for use of 'make dist' and create META.yml
+
+=item 4)
+
+Changed release procedure, now using 'make dist' in order to avoid CVS 
+export, and also create a directory that unpacks with a version number.
+
+=back 
+
+=item 0.07 
+
+Date : March 17, 2008
+
+=over
+
+=item 1) 
+
+Added web interface support for AllWords (see /web for details) (vk)
+
+=item 2)
+
+Updated version information in AllWords.pm to 0.07 (vk)
+
+=item 3)
+
+changed Changes file to CHANGES.pod (tdp)
+
+=item 4)
+
+added INSTALL.pod to /web (tdp)
+
+=item 5)
+
+updated version, copyright, and author info in README.pod (tdp)
+
+=back
+
+=item 0.06
+
+Thu May 19 14:06:10 2005 (all changes by JM)
+
+=over
+
+=item 1)
+
+added fixed mode
+
+=back
+
+=item 0.05
+
+Mon May 02 16:12:36 2005 (all changes by JM)
+
+=over
+
+=item 1)
+
+changed definition of context window to be total number of words
+
+=item 2)
+
+cleaned up errors in documentation
+
+=item 3)
+
+renamed reformat-for-senseval.pl as scorer2-format.pl
+
+=item 4)
+
+added command-line help to scorer2-format.pl and semcor-reformat.pl and expanded documentation
+
+=item 5)
+
+changed the compound-finding function so that only collocations of 
+length MAX_COMPOUND_LENGTH or less are considered.           
+MAX_COMPOUND_LENGTH is a constant defined in AllWords.pm.
+
+=item 6)
+
+added new wntagged format
+
+=back
+
+=item 0.04
+
+Tue Apr 12 10:40:48 2005 (all changes by JM)
+
+=over
+
+=item 1)
+
+fixed serious bug that often prevented higher numbered senses of target 
+words from being considered
+
+=item 2)
+
+fixed errors in wsd.pl when --format is omitted
+
+=item 3)
+
+added diagnostic messages when stoplist is malformed
+
+=item 4)
+
+fixed bug in windowing that prevented window from expanding under 
+certain circumstances
+
+=item 5)
+
+added new traces levels for displaying semantic relatedness scores and 
+making ouput of zero values optional
+
+=item 6)
+
+fixed bug where sense1 and random schemes would fail when used 
+with a stoplist or tagged text 
+
+=item 7)
+
+clarified description of window in documentation
+
+=item 8)
+
+added sample stoplist
+
+=item 9)
+
+suppress irrelevant configuration information when wsd.pl is run under 
+sense1 or random
+
+=item 10)
+
+updated test scripts to reflect recent changes
+
+=item 11)
+
+renamed as WordNet::SenseRelate::AllWords
+
+=back
+
+=item 0.03
+
+Fri Mar 11 15:25:18 2005 (all changes by JM)
+
+=over
+
+=item 1)
+
+added scripts for converting semcor files and formatting the output for 
+Senseval
+
+=item 2)
+
+added another test script
+
+=item 3)
+
+changed the input format(s) to wsd.pl
+
+=item 4)
+
+expanded documentation
+
+=back
+
+=item 0.02
+
+Mon Jan 17 10:01:00 2005 (all changes by JM)
+
+=over
+
+=item 1)
+
+added part of speech coercion option
+
+=item 2)
+
+expanded discussions in README
+
+=back
+
+=item 0.01
+
+Wed Nov  3 12:52:33 2004 (all changes by JM)
+
+=over
+
+=item 1)
+
+original version; created by h2xs 1.23 with options 
+-n WordNet::SenseRelate -X -b 5.6.0
+
+=back
+
+=back
+
+=head1 AUTHORS
+
+ Varada Kolhatkar, University of Minnesota, Duluth
+ kolha002 at d.umn.edu
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by :
+$Id: CHANGES.pod,v 1.23 2009/05/27 21:18:12 kvarada Exp $
+
+=head1 SEE ALSO
+
+README, INSTALL, TODO
+
+=head1 COPYRIGHT AND LICENSE
+Copyright (c) 2008, Varada Kolhatkar, Ted Pedersen, Jason Michelizzi
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut
+

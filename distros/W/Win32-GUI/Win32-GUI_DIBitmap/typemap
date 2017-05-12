@@ -1,0 +1,36 @@
+# Typemap for Win32::GUI::DIBitmap
+# $Id: TYPEMAP,v 1.2 2006/06/11 16:34:33 robertemay Exp $
+TYPEMAP
+LPCTSTR                   T_PV
+UINT                      T_IV
+BOOL                      T_IV
+FREE_IMAGE_FORMAT         T_IV
+FREE_IMAGE_QUANTIZE       T_IV
+FREE_IMAGE_DITHER         T_IV
+FREE_IMAGE_FILTER         T_IV
+FREE_IMAGE_COLOR_CHANNEL  T_IV
+FREE_IMAGE_TYPE           T_IV
+Win32::GUI::DIBitmap      T_PTROBJ
+Win32::GUI::DIBitmap::Ext T_PTROBJ
+Win32::GUI::MDIBitmap     T_PTROBJ
+HBITMAP                   T_HANDLE
+HDC                       T_HANDLE
+HWND                      T_HANDLE
+GD::Image                 T_PTROBJ
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));
+
+################################################################################
+OUTPUT
+T_HANDLE
+    sv_setiv($arg, PTR2IV($var));

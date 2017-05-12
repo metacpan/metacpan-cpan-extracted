@@ -1,0 +1,26 @@
+---
+abstract: 'Object for hosting automation using Kinghost (www.kinghost.net) v2 Control Panel'
+author:
+  - 'José Eduardo Perotta de Almeida <eduardo@web2solutions.com.br>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Kinghost-Painel
+requires:
+  DBI: 0
+  HTML::Entities: 0
+  HTML::TreeBuilder::XPath: 0
+  JSON: 0
+  Net::FTP: 0
+  WWW::Mechanize: 0
+  strict: 0
+  utf8: 0
+  vars: 0
+  warnings: 0
+version: 0.04

@@ -1,0 +1,32 @@
+Revision history for WebService::SlimTimer.
+
+0.005 2011-07-25
+
+ - Don't fail the simple test if SLIMTIMER_API_KEY is not defined.
+ - Put opening brace on the same line as "method" keyword to
+   work around RT bug #61070 in MooseX::Method::Signatures.
+
+0.004 2011-07-20
+
+ - Define and use WebService::SlimTimer::VERSION.
+ - Change constructor POD to use =method instead of =head1.
+ - Cosmetic fix to slimtimer-report usage message.
+ - Replace debug module with home brewed debug statements.
+ - Fix printing out the report for multiple tasks.
+
+0.003 2011-07-18
+
+ - Allow to restrict output to single task in the report script.
+ - Correct typos in and improve list_tasks() documentation.
+ - Use Getopt::Long::Descriptive for command line options parsing.
+ - Add time stamps to debug log messages.
+
+0.002 2011-07-07
+
+ - Provide examples of methods use in the documentation.
+ - Add include_completed parameter to list_tasks().
+ - Improve the documentation.
+
+0.001 2011-07-06
+
+ - Initial release.

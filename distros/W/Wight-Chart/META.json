@@ -1,0 +1,96 @@
+{
+   "abstract" : "Save charts to images using phantomjs",
+   "author" : [
+      "Simon Elliott <simon@papercreatures.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wight-Chart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Encode" : "0",
+            "File::Share" : "0",
+            "Graphics::Color::RGB" : "0",
+            "JSON::XS" : "0",
+            "Moo" : "0",
+            "Wight" : "0",
+            "perl" : "5.006",
+            "strictures" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Wight::Chart" : {
+         "file" : "lib/Wight/Chart.pm",
+         "version" : "0.003"
+      },
+      "Wight::Chart::ChartJS" : {
+         "file" : "lib/Wight/Chart/ChartJS.pm",
+         "version" : "0.003"
+      },
+      "Wight::Chart::Google" : {
+         "file" : "lib/Wight/Chart/Google.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papercreatures/wight-chart/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Wight-Chart",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/papercreatures/wight-chart.git",
+         "web" : "https://github.com/papercreatures/wight-chart"
+      }
+   },
+   "version" : "0.003"
+}
+

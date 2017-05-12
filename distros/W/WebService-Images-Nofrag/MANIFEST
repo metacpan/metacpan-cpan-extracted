@@ -1,0 +1,15 @@
+Build.PL
+Changes
+examples/upnofrag.pl
+lib/WebService/Images/Nofrag.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/01.upload.t
+t/cpan-10.jpg
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

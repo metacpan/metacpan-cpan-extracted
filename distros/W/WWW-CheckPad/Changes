@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::CheckPad.
+
+0.03  Wed Jul 5 22:48
+      - Reimplemented almost all code to make it similer to Class::DBI.
+
+0.01  Mon Jul  3 20:52:10 2006
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::CheckPad
+

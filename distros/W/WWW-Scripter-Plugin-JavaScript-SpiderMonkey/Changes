@@ -1,0 +1,14 @@
+Revision history for WWW::Scripter::Plugin::JavaScript::SpiderMonkey
+
+0.003  13 March, 2011
+     • A circular reference  preventing  the  window  (WWW::Scripter)
+       object from being freed has been fixed.
+     • Perl 5.8.8 no longer crashes on exit.
+
+0.002  18 July, 2010
+     • event2sub (which is used to compile HTML event attributes) now
+       sets  $@  instead  of  dying,  if  there  is  a  syntax  error.
+     • Those memory leak warnings from SpiderMonkey are gone.
+
+0.001  14 February, 2010
+       First release: a very buggy proof-of-concept.

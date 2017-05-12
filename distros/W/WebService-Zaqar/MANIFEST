@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/WebService/Zaqar.pm
+lib/WebService/Zaqar/Middleware/Auth/DynamicHeader.pm
+lib/WebService/Zaqar/Middleware/DateHeader.pm
+lib/WebService/Zaqar/Middleware/Format/JSONSometimes.pm
+lib/WebService/Zaqar/Middleware/JustCallIt.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+share/marconi.spore.json
+t/001-headers.t
+t/002-followable-links.t
+t/100-refcycle-removed.t
+t/lib/Net/HTTP/Spore/Middleware/DumpToScalar.pm

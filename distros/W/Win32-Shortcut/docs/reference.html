@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Shortcut Reference</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+
+
+<FONT FACE=Arial><H2><A NAME=Reference>Reference Manual</H2></FONT>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=General>General Usage</H3></FONT>
+<FONT FACE=Arial SIZE=2>
+To use this module, first add the following line at the beginning of your script:
+</FONT><PRE> use Win32::Shortcut;</PRE><FONT FACE=Arial SIZE=2>
+
+Then, use this command to create a shortcut object:
+</FONT><PRE> $LINK = new Win32::Shortcut();</PRE><FONT FACE=Arial SIZE=2>
+
+This function will create a </FONT><TT>$LINK</TT><FONT FACE=Arial SIZE=2>
+object on which you can apply the 
+<A HREF="#Methods">Methods</A> and <A HREF="#Properties">Properties</A> explained later.
+<P>
+
+The object is not yet a shortcut file; it is just the definition of a shortcut.
+Basically, you can do 2 things:
+<OL>
+<LI><A HREF="#Load">Load</A> a shortcut file into the object.
+<LI><A HREF="#Save">Save</A> the object into a shortcut file.
+</OL>
+
+For the rest, the object can be accessed as it were a normal associative array reference. 
+It has the following keys (here referred as <A HREF="#Properties">properties</A>):
+</FONT><PRE>
+  $LINK->{'File'}               
+  $LINK->{'Path'}               $LINK->Path()
+  $LINK->{'ShortPath'}
+  $LINK->{'WorkingDirectory'}   $LINK->WorkingDirectory()
+  $LINK->{'Arguments'}          $LINK->Arguments()
+  $LINK->{'Description'}        $LINK->Description()
+  $LINK->{'ShowCmd'}            $LINK->ShowCmd()
+  $LINK->{'Hotkey'}             $LINK->Hotkey()
+  $LINK->{'IconLocation'}       $LINK->IconLocation()
+  $LINK->{'IconNumber'}         $LINK->IconNumber()
+</PRE><FONT FACE=Arial SIZE=2>
+
+Thus, assuming you have a shortcut file named 
+</FONT><TT>test.lnk</TT><FONT FACE=Arial SIZE=2> 
+in your current directory, this simple script will tell you where this shortcut points to:
+</FONT><PRE>
+  use Win32::Shortcut;
+  $LINK=new Win32::Shortcut();
+  $LINK->Load("test.lnk");
+  print "Shortcut to: $LINK->{'Path'} $LINK->{'Arguments'} \n";
+  $LINK->Close();
+</PRE><FONT FACE=Arial SIZE=2>
+
+But you can also modify its values:
+</FONT><PRE>
+  use Win32::Shortcut;
+  $LINK=new Win32::Shortcut();
+  $LINK->Load("test.lnk");
+  $LINK->{'Path'}=~s/C:/D:/i; # move the target from C: to D:
+  $LINK->{'ShowCmd'}=SW_NORMAL; # runs in a normal window
+</PRE><FONT FACE=Arial SIZE=2>
+
+and then you can save your changes to the shortcut file with this command:
+</FONT><PRE>
+  $LINK->Save();
+  $LINK->Close();
+</PRE><FONT FACE=Arial SIZE=2>
+
+or you can save it with another name, creating a new shortcut file:
+</FONT><PRE>
+  $LINK->Save("test2.lnk");
+  $LINK->Close();
+</PRE><FONT FACE=Arial SIZE=2>
+
+Finally, you can create a completely new shortcut:
+</FONT><PRE>
+  $LINK=new Win32::Shortcut();
+  $LINK->{'Path'}="C:\PERL5\BIN\PERL.EXE";
+  $LINK->{'Arguments'}="-v";
+  $LINK->{'WorkingDirectory'}="C:\PERL5\BIN";
+  $LINK->{'Description'}="Prints out the version of Perl";
+  $LINK->{'ShowCmd'}=SW_SHOWMAXIMIZED;
+  $LINK->Save("Perl Version Info.lnk");
+  $LINK->Close();
+</PRE><FONT FACE=Arial SIZE=2>
+
+Note also that in the examples above the two lines:
+</FONT><PRE>
+  $LINK=new Win32::Shortcut();
+  $LINK->Load("test.lnk");
+</PRE><FONT FACE=Arial SIZE=2>
+
+can be collapsed to:
+</FONT><PRE>
+  $LINK=new Win32::Shortcut("test.lnk");
+</PRE><FONT FACE=Arial SIZE=2>
+
+
+</FONT>
+<P>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=Methods>Methods</H3></FONT>
+
+<DL>
+
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Close>
+
+    <B>Close</B>
+
+<DD>Closes a shortcut object. 
+    Note that it is not "strictly" required to close the objects you created, since
+    the Win32::Shortcut objects are automatically closed when the program ends (or when you
+    elsehow destroy such an object).
+    <BR>
+    Note also that a shortcut is not automatically saved when it is closed, 
+    even if you modified it. You have to call <A HREF="#Save">Save</A> in order to
+    apply modifications to a shortcut file.
+    <BR>
+    Example:</FONT>
+<PRE> $LINK->Close();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Load>
+
+    <B>Load</B> <I>file</I>
+
+<DD>Loads the content of the shortcut file named <I>file</I> in a shortcut object
+    and fill the <A HREF="#Properties">properties</A> of 
+    the object with its values.
+    Will return <B>undef</B> on errors, or a true value
+    if everything was successful.
+    <BR>
+    Example:</FONT><PRE> $LINK->Load("test.lnk") or print "test.lnk not found!";
+    
+ print join("\n", $LINK->Path, 
+                  $LINK->ShortPath, 
+                  $LINK->Arguments, 
+                  $LINK->WorkingDirectory,
+                  $LINK->Description,
+                  $LINK->ShowCmd,
+                  $LINK->Hotkey,
+                  $LINK->IconLocation,
+                  $LINK->IconNumber);
+ }</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=new>
+
+    <B>new Win32::Shortcut</B> <I>[file]</I>
+
+<DD>Creates a new shortcut object. If a filename is passed in <I>file</I>, 
+    automatically <A HREF="#Load">Load</A>s this file also.
+    Returns the object created or <B>undef</B> on errors.    
+    <BR>
+    Example:</FONT>
+<PRE> $LINK = new Win32::Shortcut();
+
+ $RegEdit = new Win32::Shortcut("Registry Editor.lnk");
+ die "File not found" if not $RegEdit;</PRE>
+
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Resolve>
+
+    <B>Resolve</B> <I>[flag]</I>
+
+<DD>Attempts to automatically resolve a shortcut and returns the resolved path,
+    or <B>undef</B> on errors;
+    in case no resolution was made, the path is returned unchanged.
+    Note that the path is automatically updated in the <A HREF="#Path">Path</A>
+    property of the shortcut.
+    <BR>
+    By default this method acts quietly, but if you pass a value of 0 (zero) 
+    in the <I>flag</I> parameter, it will eventually 
+    post a dialog box prompting the user for more information.
+    <BR>
+    Example:</FONT>
+<PRE> # if the target doesn't exist...
+ if(! -f $LINK->Path) {
+
+   # save the actual target for comparison
+   $oldpath = $LINK->Path;
+
+   # try to resolve it (with dialog box)
+   $newpath = $LINK->Resolve(0); 
+
+   die "Not resolved..." if $newpath == $oldpath;
+
+ }</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Save>
+
+    <B>Save</B> <I>[file]</I>
+
+<DD>Saves the content of the shortcut object into the file named <I>file</I>.
+    If <I>file</I> is omitted, it is taken from the <A HREF="#File">File</A> property
+    of the object (which, if not changed, is the name of the last <A HREF="#Load">Load</A>ed file).
+    <BR>
+    If no file was loaded and the <A HREF="#File">File</A> property doesn't contain a valid filename,
+    the method will return <B>undef</B>, which will also be returned on errors.
+    A true value will be returned if everything was successful.
+    <BR>
+    Example:</FONT><PRE> $LINK->Save();
+ $LINK->Save("Copy of " . $LINK->{'File'});</PRE>
+<P>
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Set>
+
+    <B>Set</B> <I>path, arguments, workingdirectory, description, showcmd, hotkey, iconlocation, iconnumber</I>
+
+<DD>Sets all the properties of the shortcut 
+    object with a single command.
+    This method is supplied for convenience only, you can also set 
+    those values changing the values of the <A HREF="#Properties">properties</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $LINK->Set("C:\PERL5\BIN\PERL.EXE",
+            "-v", 
+            "C:\PERL5\BIN",
+            "Prints out the version of Perl",
+            SW_SHOWMAXIMIZED,
+            hex('0x0337'),
+            "C:\WINDOWS\SYSTEM\COOL.DLL",
+            1);
+
+ # it is the same of...
+ $LINK->Path("C:\PERL5\BIN\PERL.EXE");
+ $LINK->Arguments("-v");
+ $LINK->WorkingDirectory("C:\PERL5\BIN");
+ $LINK->Description("Prints out the version of Perl");
+ $LINK->ShowCmd(SW_SHOWMAXIMIZED);
+ $LINK->Hotkey(hex('0x0337'));
+ $LINK->IconLocation("C:\WINDOWS\SYSTEM\COOL.DLL");
+ $LINK->IconNumber(1);</PRE>
+<P>
+
+</DL>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=Properties>Properties</H3></FONT>
+
+<FONT FACE=Arial SIZE=2>
+The properties of a shortcut object can be accessed as:
+</FONT><PRE> $<I>OBJECT</I>->{'<I>property</I>'}</PRE><FONT FACE=Arial SIZE=2>
+Eg., assuming that you have created a shortcut object with:
+</FONT><PRE> $LINK=new Win32::Shortcut();</PRE><FONT FACE=Arial SIZE=2>
+you can for example see its <A HREF="#Description">description</A> with:
+</FONT><PRE> print $LINK->{'Description'};</PRE><FONT FACE=Arial SIZE=2>
+You can of course also set it:
+</FONT><PRE> $LINK->{'Description'}="This is a description";</PRE><FONT FACE=Arial SIZE=2>
+From version 0.02, those properties have also a corresponding method (subroutine), so
+you can write the 2 lines above using this syntax too:
+</FONT><PRE> print $LINK->Description;
+ $LINK->Description("This is a description");</PRE><FONT FACE=Arial SIZE=2>
+The properties of a shortcut reflect the content of the Shortcut Properties Dialog Box,
+which can be obtained by clicking the third mouse button on a shortcut file in the 
+Windows 95 (or NT 4.0) Explorer and choosing "Properties" (well, I hope you already knew :). 
+<BR>
+The fields corresponding to 
+the single properties are marked in <B>bold</B> in the following list.
+</FONT>
+<DL>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Arguments>
+
+    <B>Arguments</B>
+
+<DD>The arguments associated with the shell link object.
+    They will be passed to the targeted program (see <A HREF="#Path">Path</A>) 
+    when it gets executed.
+    In fact, joined with <A HREF="#Path">Path</A>, this parameter forms the
+    "<B>Target</B>" field of a Shortcut Properties Dialog Box.
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Description>
+
+    <B>Description</B>
+
+<DD>An optional description given to the shortcut.
+    Seems to be missing in the Shortcut Properties Dialog Box (not yet implemented?).
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=File>
+
+    <B>File</B>
+
+<DD>The filename of the shortcut file opened with <A HREF="#Load">Load</A>, 
+    and/or the filename under which the shortcut will be saved with 
+    <A HREF="#Save">Save</A> (if the <I>file</I> argument is not specified).
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Hotkey>
+
+    <B>Hotkey</B>
+
+<DD>The hotkey associated to the shortcut, in the form
+    of a 2-byte number of which the first byte identifies the modifiers (Ctrl, Alt, Shift...
+    but I didn't find out how it works) and the second is the ASCII code of the character key.
+    Correspond to the "<B>Shortcut key</B>" field of a Shortcut Properties Dialog Box.
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=IconLocation>
+
+    <B>IconLocation</B>
+
+<DD>The file that contain the icon for the shortcut.
+    Seems actually to always return nothing (YMMV, I hope...).
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=IconNumber>
+
+    <B>IconNumber</B>
+
+<DD>The number of the icon for the shortcut in the file pointed by 
+    <A HREF="#IconLocation">IconLocation</A>, in case more that one icon
+    is contained in that file (I suppose this, documentation isn't so clear at this point).
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Path>
+
+    <B>Path</B>
+
+<DD>The target of the shortcut.
+    This is (joined with <A HREF="#Arguments">Arguments</A>) the content 
+    of the "<B>Target</B>" field in a Shortcut Properties Dialog Box.
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ShortPath>
+
+    <B>ShortPath</B>
+
+<DD>Same as <A HREF="#Path">Path</A>, but expressed in a DOS-readable format (8.3 characters filenames).
+    It is available as read-only 
+    (well, you can change it, but it has no effect on the shortcut; change <A HREF="#Path">Path</A> instead)
+    once you <A HREF="#Load">Load</A> a shortcut file.
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ShowCmd>
+
+    <B>ShowCmd</B>
+
+<DD>The condition of the window in which the program will be executed 
+    (can be Normal, Minimized or Maximized).
+    Correspond to the "<B>Run</B>" field of a Shortcut Properties Dialog Box.
+    <BR>
+    Allowed values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Value</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Constant</TD>
+      <TR VALIGN=top>
+      <TD><TT>1</TD>
+      <TD><FONT FACE=Arial SIZE=2>Normal Window</TD>
+      <TD><TT>SW_SHOWNORMAL</TD>
+      <TR VALIGN=top>
+      <TD><TT>3</TD>
+      <TD><FONT FACE=Arial SIZE=2>Maximized</TD>
+      <TD><TT>SW_SHOWMAXIMIZED</TD>
+      <TR VALIGN=top>
+      <TD><TT>7</TD>
+      <TD><FONT FACE=Arial SIZE=2>Minimized</TD>
+      <TD><TT>SW_SHOWMINNOACTIVE</TD>
+    </TABLE>
+    <P>
+
+    Any other value (theoretically should) result in a Normal Window display.
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=WorkingDirectory>
+
+    <B>WorkingDirectory</B>
+
+<DD>The directory in which the targeted program will be executed.
+    Correspond to the "<B>Start in</B>" field of a Shortcut Properties Dialog Box.
+<P>
+
+
+</DL>
+<HR>
+<FONT FACE=Arial><H3><A NAME=Constants>Constants</H3></FONT>
+
+The following constants are exported in the main namespace of your script using Win32::Shortcut:
+</FONT><FONT SIZE=3 FACE=><TT>
+<UL>
+  <LI>SW_SHOWNORMAL
+  <LI>SW_SHOWMAXIMIZED
+  <LI>SW_SHOWMINNOACTIVE
+</UL>
+</TT><FONT FACE=Arial SIZE=2>
+Those constants are the allowed values for the <A HREF="#ShowCmd">ShowCmd</A> property.
+<P>
+
+<HR>
+
+<FONT FACE=Arial SIZE=1>
+08 Apr 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;
+</FONT><P>
+
+</BODY>
+</HTML>

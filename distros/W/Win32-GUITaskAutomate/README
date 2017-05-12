@@ -1,0 +1,447 @@
+NAME
+    Win32::GUITaskAutomate - A module for automating GUI tasks.
+
+SYNOPSIS
+        use Win32::GUITaskAutomate;
+        my $robot = Win32::GUITaskAutomate->new(
+            load => {
+                pic1 => 'pic1.PNG', # load picture
+            }
+        );
+
+        $robot->find_do( 'pic1', # wait for loaded pic to appear
+            [
+                { save => 1 }, # save mouse cursor position
+                \ "ZOMG!!!!.pl",  # put this text into clipboard
+                { rmb => 1, x => 10, y => 20 }, # click right mouse button
+                "{UP}{UP}~^v",  # press UP arrow twice, ENTER and CTRL+V
+                { lmb => 1, x => 100, y => 100 }, # click left mouse button
+                { restore => 1 }, # restore original mouse cursor position
+            ]
+        );
+
+        my $clipboard_contents = $robot->get_clip;
+
+        $robot->set_clip( "New clipboard contents" );
+
+DESCRIPTION
+    I wrote this module because I needed to automate certain GUI tasks in a
+    limited amount of time. Win32::GUIRobot was very helpful to me with
+    that, however I wanted some interface that would allow me to write
+    "robot instructions" more easily and quickly. This is how
+    Win32::GUITaskAutomate came to existance and I want to share it with the
+    world, even though I do not have time to perfect it.
+
+METHODS
+  new
+        my $robot = Win32::GUITaskAutomate->new;
+
+        my $robot = Win32::GUITaskAutomate->new(
+            load => {
+                pic1 => 'pic1.png',
+                pic2 => 'pic2.png',
+                pic3 => 'pic3.png',
+            }
+        );
+
+    This method creates a new Win32::GUITaskAutomate object. You may want to
+    pass it an optional "load" argument which accepts a hashref with keys
+    being the picture names (see "find_do" method below) and values being
+    the filenames of those pictures.
+
+  load
+        $robot->load( { pic1 => 'pic1.png', pic2 => 'pic2.png' } );
+
+    This method loads image(s). It takes a hashref with picure names (see
+    "find_do" method below) as keys and filenames as values. You may want to
+    use "load" argument to the "new" method instead.
+
+  do
+        $robot->do( [
+            { lmb => 1, x => 10, y => 10 }, # click left mouse
+            { rmb => 1, x => -10, y => -10 }, # right click
+            { lmbd => 1, x => 10, y => 10 }, # left double click
+            { mw => 2 }, # move mouse wheel.
+            "{UP}{DOWN}~", # press Up, Down and Enter keys
+            \ "Clip!", # copy text 'Clip!' into the clipboard
+            [ 2 ], # wait for 2 seconds
+        ], 400, 500 );
+
+    This method instructs your robot to do some "stuff". The first argument
+    is an arrayref with instructions (See ROBOT INSTRUCTIONS below for
+    descriptions). The second and third arguments are "x origin" and "y
+    origin" respectively. Those two values will be basically added to any
+    'x' and 'y' values in the mouse related actions, they default to '0'.
+
+  find_do
+        $robot->find_do( 'picture_name', # name of the picture from ->load
+            [
+                { lmb => 1, x => 10, y => 10 }, # left click
+                "foos!" # type "foos!"
+            ],
+            $wait_time
+        );
+
+    This method is similar to ->do method, except it first tries to find a
+    picture on the screen. The ->load method as well as "load" argument to
+    the ->new method is where you'd get your "picture name". The first
+    argument to ->find_do method is picture name. The second argument is an
+    arrayref with instructions (see ROBOT INSTRUCTIONS below). Third
+    *optional* argument is the time in seconds to wait for the picture to
+    appear on the screen, defaults to 100. The instructions will be passed
+    to the ->do method when the picture is found, and 'origin x' and 'origin
+    y' arguments will correspond to coordinates of where the picture was
+    spotted.
+
+ROBOT INSTRUCTIONS
+    Robot instructions are passed to ->do and ->find_do methods in the form
+    of an arrayref, and are executed sequentually.
+
+    Each element of the arrayref can be one of the following:
+
+  A scalar
+        "{UP}^l{DOWN}~"
+
+    When an element is a scalar, the instruction will be interpreted as a
+    request to press some keys, it will be sent directly to SendKeys()
+    subroutine. See Win32::GuiTest "SendKeys" function for explanation of
+    the keys
+
+  A scalar reference
+        \ "Clipper"
+
+    When an element is a scalar reference, the content will be stuffed into
+    the clipboard. If you want your robot to type up a large chunk of text,
+    it will be significantly faster to drop that text into the clipboard and
+    then issue a "^v" (CTRL+V) to paste it instead of asking the robot to
+    type it all out key by key.
+
+  An arrayref
+        [10]
+
+    When an element is an arrayref, it is interpreted as a request to sleep
+    for that number of seconds, the request will be passed to
+    "Win32::GUIRobot::Sleep" subroutine, not perl's "sleep".
+
+  A hashref
+    When an element is a hashref, it is interpreted as a mouse action (so
+    far at least). One of the keys is an action key and the codes for those
+    are:
+
+    lmb  Left Mouse Button
+
+    rmb  Right Mouse Button
+
+    lmbd Left Mouse Button Double (double left click)
+
+    rmbd Right Mouse Button Double (double right click)
+
+    mw   Mouse Wheel
+
+    drag Left mouse button drag
+
+    rdrag
+         Right mouse button drag
+
+    mdrag
+         Middle mouse button drag
+
+    save Save mouse cursor position
+
+    restore
+         Restore mouse cursor position to an earlier save setting ( see
+         "save" )
+
+   General Principal for HashRef Instructions
+    Hashref instructions deal with mouse actions. Some accept several
+    arguments, which default to 0 if not specified. The arguments, unless
+    specified otherwise, are offset coordinates relative to origin. By
+    origin is understood either "origin x", and "origin y" coordinates of
+    the ->do method, or the location where the image was found of the
+    ->find_do method
+
+   lmb (Left Mouse Button)
+        { lmb => 1, x => 10, y => -22 }
+
+    Key "lmb" stands for Left Mouse Button. It instructs the robot to make a
+    left mouse click. The two optional arguments are "x" and "y" are the
+    coordinates relative to the origin. Omitted arguments default to zero.
+    The value for "lmb" key must be a *true value* in order for the
+    instruction to be executed, this allows some dynamic decision making,
+    such as: { lmb => $do_we_need_to_click....
+
+   rmb (Right Mouse Button)
+        { rmb => 1, x => 10, y => -22 }
+
+    Same as "lmb" except this instructs the robot to right click.
+
+   mmb (Middle Mouse Button)
+        { mmb => 1, x => 10, y => -22 }
+
+    Same as "lmb" except this instructs the robot to middle click.
+
+   lmbd (Left Mouse Button Double)
+        { lmbd => 1, x => 10, y => -22 }
+
+    Same as "lmb" except this instructs the robot to double left click.
+
+   rmbd (Right Mouse Button Double)
+        { rmbd => 1, x => 10, y => -22 }
+
+    Same as "lmb" except this instructs the robot to double right click.
+
+   mmbd (Middle Mouse Button Double)
+        { mmbd => 1, x => 10, y => -22 }
+
+    Same as "lmb" except this instructs the robot to double middle click.
+
+   mw (Mouse Wheel)
+        { mw => 2 }
+        { mw => -10 }
+
+    This argument instructs the robot to move the *mouse wheel*. It does not
+    take any extra arguments. Positive values spin the wheel "up" and
+    negative values spin the wheel "down".
+
+   drag (Drag with left mouse button)
+        { drag => 1, x => 1, y => 20, d_x => 100, d_y => -20 }
+        { drag => 1, d_x => -100 }
+        { drag => 1, x => 200, d_y => -200 }
+
+    Instructs the robot to drag with left mouse button (as in left mouse
+    button down => move mouse => left mouse button up). As with "lmb", the
+    value for the "drag" key must be a *true value* in order for the
+    instruction to be executed. Takes *four* optional arguments. They all
+    will default to 0 if not specified. "x" and "y" are the starting point
+    of the drag (relative to the origin) and "d_x" and "d_y" are ending
+    points of the drag (again relative to the origin, not the place of the
+    start of the drag).
+
+   rdrag (Drag with right mouse button)
+        { rdrag => 1, x => 1, y => 20, d_x => 100, d_y => -20 }
+        { rdrag => 1, d_x => -100 }
+        { rdrag => 1, x => 200, d_y => -200 }
+
+    Same as "drag" except drags with right mouse button.
+
+   mdrag (Drag with middle mouse button)
+        { mdrag => 1, x => 1, y => 20, d_x => 100, d_y => -20 }
+        { mdrag => 1, d_x => -100 }
+        { mdrag => 1, x => 200, d_y => -200 }
+
+    Same as "drag" except drags with middle mouse button.
+
+   save
+        { save => 1 }
+
+    Instructs the robot to save current mouse cursor position. This is
+    useful if you want your robot to do some mouse clickety and restore the
+    original cursor position when finished (see "restore" below). The value
+    of the key must be a true value or nothing will happen.
+
+   restore
+        { restore => 1 }
+
+    Instructs the robot to restore saved mouse cursor position. This is
+    useful if you want your robot to do some mouse clickety and restore the
+    original cursor position when finished (see "save" above). The value of
+    the key must be a true value or nothing will happen. If you never saved
+    any positions with "save" (see above) nothing will happen.
+
+OTHER METHODS
+  drag_mouse
+        $robot->drag_mouse( 'Left', $x_from, $y_from, $x_to, $y_to );
+
+    Instructs the robot to make a mouse drag. First argument is the button
+    to use for dragging. It can be either 'Left', 'Right' or 'Middle'. Sub
+    will "croak" if incorrect button is passed (names are case
+    *insensitive*).
+
+    $x_from and $y_from are coordinates of the starting point of the drag
+    and $x_to and $y_to are the endining points of the drag. All will
+    default to zero if are not set.
+
+  click_mouse
+        $robot->click_mouse( $x, $y, $button, $times )
+
+    Instructs the robot to click the mouse. $x and $y are the coordinates of
+    the click. $button is the button to press, can be either 'Left', 'Right'
+    or 'Middle'. Sub will "croak" if incorrect button is passed (names are
+    case *insensitive*). $times is the number of times to press the button,
+    which defaults to 1 if not specified. $x and $y default to 0.
+
+  set_clip
+        $robot->set_clip( 'Text to put into the clipboard' );
+
+    Takes one argument which will be put into the clipboard. Technically
+    this can be anything accepted by the Win32::Clipboard "Set()" method,
+    but was tested only with textual content.
+
+  get_clip
+        my $clipboard_stuff = $robot->get_clip;
+
+    Takes no arguments. Returns clipboard contents. Technically this may be
+    anything returned by Win32::Clipboard "Get()" method, but was tested
+    only with textual content.
+
+  clip
+        my $clipboard = $robot->clip;
+
+    Returns Win32::Clipboard object if you'll ever need it.
+
+  pics
+        my $pics_ref = $robot->pics;
+
+    Returns a hashref of loaded images. It's the one from the "load" option
+    of the ->new methods as well as from the ->load method. You might want
+    to check if a certain picture was already loaded.
+
+  mouse_coords
+        my $mouse_coords_ref = $robot->mouse_coords;
+
+        $robot->mouse_coords( [ 200, 100 ] );
+
+    Returns an arrayref with two elements: x and y coordinates of the mouse
+    cursor which were stored with "save" intruction (see ROBOT INSTRUCTIONS
+    for more info). Will return "undef" if you never saved any positions and
+    never set them with "mouse_coords()" method. Takes one *optional*
+    argument which is an arrayref with two elements: x and y coordinates.
+    *Note:* if you specificly set coordinates with this method they will
+    distroy the ones that were saved with "save" robot instruction and will
+    be used by "restore" robot instruction.
+
+EXAMPLES
+    Here are some examples with explanations of how the robot would behave
+
+  Example 1
+        use Win32::GUITaskAutomate;
+        my $robot = Win32::GUITaskAutomate->new(
+        load => {
+            task  => 'task.png',
+            task2 => 'task2.png',
+        }
+        );
+
+        $robot->find_do( 'task', [
+        { lmb => 1, x => 5, y => 5 },
+        [2],
+        ]);
+
+        $robot->find_do( 'task2', [
+        "^t",
+        [1.1],
+        \ "Hello World!",
+        "^v~",
+        ]);
+
+    The code is interpreted as follows:
+
+    *  Load two images from files 'task.png' and 'task2.png' and name them
+       'task' and 'task2' respectively.
+
+    *  Start watching the screen for 'task' image to appear with the default
+       100 second timeout.
+
+    *  When 'task' image is seen on screen, click left mouse button 5 pixels
+       to the right and 5 pixels to the left of where the image was found
+       (starting at the top left corner of the image)
+
+    *  Sleep for 2 seconds
+
+    *  Start watching the screen for 'task2' image to appear with the
+       default 100 second timeout.
+
+    *  When found -- press "CTRL+T" key, wait for 1.1 seconds.
+
+    *  Push string "Hello World!" intro the clipboard, paste it with
+       "CTRL+V" and press "ENTER" key.
+
+  Example 2
+        use Win32::GUITaskAutomate;
+        my $robot = Win32::GUITaskAutomate->new(
+        load => {
+            pic => 'pic1.png',
+        }
+        );
+
+        $robot->find_do( 'pic',
+        { lmb => $do_click, x => 10, y => 20 },
+        "~{TAB}OH HAI~",
+        { drag => $do_drag, d_x => 100, d_y => 200 },
+        );
+
+        if ( $do_click ) {
+        $robot->load( { pic2 => 'pic2.png } );
+        $robot->find_do(
+            "~~~{TAB}~",
+        );
+        }
+
+    The code is interpreted as follows, consider that $do_click variable is
+    assigned to earlier in the source code from somewhere.
+
+    *  Load up image from file 'pic1.png' and give it name 'pic'
+
+    *  Start looking for 'pic' to appear on the screen.
+
+    *  When found, left click 10 pixels to the right and 20 pixels down
+       relative to the left right corner of where we have spotted 'pic'.
+       Note: the click will not happen if $do_click variable is set to a
+       false value.
+
+    *  Press "ENTER", "TAB", type "OH HAI" and press "ENTER" again.
+
+    *  If variable $do_click is set to true value, load another image from
+       file 'pic2.png' and name it 'pic2'
+
+    *  Start looking for 'pic2' to appear on the screen.
+
+    *  When it's found: press "ENTER" key three times, press "TAB" key and
+       press "ENTER" again.
+
+SEE ALSO
+    Win32::GUIRobot, Win32::GuiTest, Win32::Clipboard
+
+PREREQUISITES
+    This module requires Win32::GUIRobot, Win32::Clipboard as well as
+    Test::More for "make test"
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-win32-guitaskautomate
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-GUITaskAutomate>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Win32::GUITaskAutomate
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-GUITaskAutomate>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Win32-GUITaskAutomate>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Win32-GUITaskAutomate>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Win32-GUITaskAutomate>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

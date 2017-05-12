@@ -1,0 +1,100 @@
+=pod
+
+=head1 NAME
+
+Webservice::InterMine::Cookbook::List::Upload - Uploading Lists
+
+=head1 SYNOPSIS
+
+  use Webservice::InterMine;
+
+  my $service = Webservice::InterMine->get_service('www.flymine.org/query', $TOKEN);
+
+  # From a file on disk containing gene symbols (one per line).
+  my $file = '/path/to/some/file/somewhere.tsv';
+  my $list = $service->new_list(content => $file, type => 'Gene', name => 'an uploaded list');
+
+  # From an array of strings
+  my @symbols = qw/eve zen rudimentary Mad/;
+  my $list = $service->new_list(content => \@symbols, type => 'Gene', name => 'an uploaded list');
+
+  # From a query
+  my $query = $service->new_query(class => 'Gene');
+  $query->add_constraint(
+    path => 'Gene',
+    op   => 'IN',
+    value => 'my other list'
+  );
+  $query->add_constraint(
+    path => 'Gene.length',
+    op => '<',
+    value => 2000
+  );
+  # The type of this list can be inferred
+  my $list = $service->new_list(content => $query, name => 'an uploaded list');
+
+=head1 DESCRIPTION
+
+You can create lists associated with your account in two main ways. Either you can provide
+a collection of identifiers (for example gene symbols) and get the InterMine server try and
+unambiguously resolve them into objects in the database, or you can provide a query that specifies
+exactly what you want.
+
+If you don't specify a name, a default name will be assigned, and unless the query is renamed, the
+list will be deleted when the program terminates.
+
+Notes:
+
+=over
+
+=item Uploading from files
+
+All text in the files will be interpreted as identifiers, so you wouldn't want to, say, try
+to upload a gff3 file directly. Valid separators are spaces, tabs and new-lines, so you will want
+to quote (with either double or single quotes) and identifiers that have these characters.
+
+=item Uploading from an array of strings
+
+These strings will be automatically quoted.
+
+=item Uploading from a query
+
+If the query has no output columns (an empty view) the root of the query will be used to define
+what to save. If there are output columns, they should all be attached to the same object, and that
+will be used to identify the objects to save. ie:
+  
+  # If used this query would save a list of one gene.
+  my $query = $service->new_query(class => 'Gene');
+  $query->add_constraint(path => 'Gene.symbol', op => '=', value => 'eve');
+
+  # Adding this view would make this query save the list of proteins associated with eve.
+  $query->add_view('Gene.proteins.name');
+
+=item Duplicates and Conversions
+
+These will be ignored. See L<Webservice::InterMine::Cookbook::IdResolution> for ways to
+deal with these issues.
+
+=back
+
+=head1 CONCLUSION
+
+Lists can be created from a variety of sources.
+
+=head1 SEE ALSO
+
+=over 
+
+=item L<Webservice::InterMine::Service>
+
+=item L<Webservice::InterMine::List>
+
+=item L<Webservice::InterMine::ListManager>
+
+=item L<Webservice::InterMine::Query>
+
+=item L<Webservice::InterMine::Query::Roles::Listable>
+
+=back
+
+=cut

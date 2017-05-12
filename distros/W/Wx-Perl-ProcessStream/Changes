@@ -1,0 +1,99 @@
+Revision history for Wx-Perl-ProcessStream
+
+0.32    2012-03-28 00:00
+        For wxWidgets 2.9.3 some changes in wxExcute + Yield on some platforms
+        requires different handling
+
+0.31    2012-03-27 00:00
+        Test changes only - Fixes for tests on MSW - pre quoting of params not needed
+
+0.30    2011-02-04 21:00
+        Test changes only - Fixes for tests failing on Mac OS X
+
+0.29    2010-12-02 00:00
+        Makefile changes only - remove Archive::Tar dependency
+
+0.28    2010-09-17 00:00
+        Use function Wx::YieldIfNeeded so now no need for Wx
+        > 0.97
+
+0.27    2010-02-28 00:00
+        Use param to Wx::Yield (Wx 0.9701+) to avoid recursive
+        Yield calls and pass tests with debugging wxWidgets
+        (e.g. pre-installed wxWidgets on OSX);
+
+0.26    2010-02-26 00:00
+        Changed behaviour of $process->IsAlive
+        will now return false if process has
+        already returned an exit code.
+
+0.25    2010-02-25 00:00
+        Continuous stream will hang app rt.cpan.org #54962
+        Fixed by adding SetMaxLines setting with default 1000
+        Added PeekStdErrBuffer, PeekStdOutBuffer
+        Added GetStdErrBufferLineCount GetStdOutBufferLineCount
+        Added EVT_WXP_PROCESS_STREAM_MAXLINES
+        Stopped tests displaying frame (not necessary in this case)
+
+0.24    2010-01-05 00:00
+        Added tests to confirm correct operation of 'print 0;' 
+        
+0.23    2010-01-04 00:00
+        Various test & failure fixes 
+
+0.21    2009-10-13 00:00
+        Fixed test failure on none Win32.
+
+0.20    2009-09-28 00:00
+        Readline method now actually used.
+
+0.19    2009-09-28 00:00
+        Fixed bug where process obj not destroyed if 
+        command fails.
+        
+0.18    2009-09-27 00:00
+        Exit code error in 0.17 ; 
+        schoolboy error (use strict you fool!)
+
+0.17    2009-09-26 00:00
+        Should now run multiple side by side processes OK
+
+0.16    2009-09-26 00:00
+        Added new, Run and GetPid methods to process
+        updated pod
+        
+0.14    2009-09-25 00:00
+        Fixed timing issue with Vista / Win7 
+        ( CPAN RT 44795 et al )
+
+0.11    2007-06-21 06:00
+        Option added to use Wx::InputStream::READLINE
+        for reading process output.
+
+0.10    2007-05-11 14:00
+        wxWidgets version check fixed (try again )
+        stream reads fixed to cope with encodings
+
+0.09    2007-04-01 16:40
+        wxWidgets version check fixed
+        (thanks to Johan Vromans)
+
+0.08    2007-03-31 04:00
+        Documentation Errors.
+
+0.07    2007-03-31 03:00
+        Added 'Set/Get Interval
+        updated documentation
+        first uploaded CPAN version
+
+0.06    2007-03-27 08:00
+        fixed failing tests on *nix
+        
+0.05    2007-03-27 06:00
+        Second pre-release version
+        Reworked interface
+        Added Tests
+
+0.01    2007-03-25 17:00
+        First pre-release version
+

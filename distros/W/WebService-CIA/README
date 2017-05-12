@@ -1,0 +1,42 @@
+WebService::CIA
+---------------
+
+This is the README file for WebService::CIA, a Perl module for
+accessing data from the CIA World Factbook.
+
+Documentation for WebService::CIA is available online at
+
+    http://search.cpan.org/perldoc?WebService::CIA
+
+or by doing
+
+    perldoc WebService::CIA
+
+at the command line.
+
+
+Crypt::SSLeay
+-------------
+
+The most recent version of the CIA World Factbook uses HTTPS to
+access its web pages. As such, WebService::CIA requires Crypt::SSLeay
+which suffers from the usual cryptographic export restriction mumbo
+jumbo. Sorry about that.
+
+Users of ActiveState's ActivePerl should see
+
+    http://aspn.activestate.com/ASPN/Downloads/ActivePerl/PPM/Repository
+
+for instructions on downloading a PPM of Crypt::SSLeay.
+
+
+Installation
+------------
+
+This module uses Module::Build. The installation process is therefore
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+

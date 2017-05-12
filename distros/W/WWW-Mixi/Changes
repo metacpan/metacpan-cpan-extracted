@@ -1,0 +1,305 @@
+Revision history for Perl extension WWW::Mixi.
+
+0.50  Wed Aug  1 14:38:46 2007
+	- mod parse_main_menu
+	- mod parse_tool_bar
+	- mod parse_home_new_album
+	- mod parse_home_new_bbs
+	- mod parse_home_new_comment
+	- mod parse_home_new_friend_diary
+	- mod parse_home_new_review
+	- mod parse_list_bbs
+	- mod parse_list_diary
+	- mod parse_list_diary_monthly_menu
+	- mod parse_show_log
+	- mod parse_view_album
+	- mod parse_view_album_comment
+	- mod parse_view_album_photo
+	- mod parse_view_bbs
+	- mod parse_view_diary
+	- mod parse_view_event
+		- fixed for HTML changes.
+	- mod parse_list_friend
+		- bug fix, faild to parse line which has less than 5 friends.
+	- mod jconv_log
+		- bug fix, loop with log level over 2.
+
+0.49  Sun Apr 15 10:57:20 2007
+	- mod parse_edit_member
+	- mod parse_list_bookmark
+	- mod parse_list_community
+	- mod parse_list_community_next
+	- mod parse_list_community_previous
+	- mod parse_list_diary
+	- mod parse_list_friend
+	- mod parse_list_member
+	- mod parse_list_message
+	- mod parse_list_request
+	- mod parse_search_diary
+	- mod parse_show_calendar
+	- mod parse_show_log
+	- mod parse_view_message
+		- fixed for HTML changes.
+	- mod parse_view_diary
+		- fixed for HTML changes.
+		- 'raw_description' key (for both diary and comment) is added.
+	- mod parse_information
+		- fixed color parsing sometimes fails
+	- mod parse_standard_history
+		- for parse_new_friend_diary, iconed URL is now ".../list_diary.pl".
+	- mod callback_log
+		- use Jcode only it is available.
+		- now don't require Jcode module.
+
+0.48  Thu Nov 23 21:48:10 2006
+	- mod parse_tool_bar
+	- mod parse_main_menu
+	- mod parse_banner (Iframe url only, not follow.)
+	- mod parse_list_community
+	- mod parse_list_friend
+	- mod parse_list_member
+	- mod parse_show_calendar
+	- mod parse_show_calendar_term (thanks pirori)
+	- mod parse_show_log
+		- fixed for HTML changes.
+
+0.47  Mon Mar 30 01:52:10 2006
+	- mod parse_information (thanks memn0ck)
+	- mod parse_calendar_term (thanks pirori)
+	- mod parse_tool_bar
+		- fixed for HTML changes.
+
+0.46  Mon Mar  4 13:05:01 2006
+	- mod callback_log
+		- now W:M->new(mail, pass, '-log' => 0) means quietly, W:M->new(mail, pass, '-log' => 9) means buzzly.
+	- mod remove_tag
+		- convert "<blockqupote>...</blockquote>" to ">..."
+	- add parse_ and get_ home_new_review (which removed on 0.44)
+	- mod parse_list_community_next
+	- mod parse_list_community_previous
+	- mod parse_list_member
+	- mod parse_list_request
+	- mod parse_view_album_comment
+	- mod parse_view_event
+	- mod parse_view_message
+		- fixed for HTML changes.
+
+0.45  Mon Apr 10 00:59:28 2006
+	- add parse_ and get_edit_member (thanks icchan)
+	- add parse_ and get_edit_member_pages
+
+0.44  Sun Feb 19 13:03:14 2006
+	- mod parse_tool_bar
+	- mod parse_information
+	- mod parse_community_id
+		- fixed for HTML changes.
+	- mod parse_self_id
+	- mod get_self_id
+		- use id in session (thanks chaki and memn0ck)
+	- mod post_add_diary
+		- add 'id' and 'news_id' key (thanks chaki and memn0ck)
+		- use id in session as default id
+	- mod post_edit_diary
+		- add 'form_date' key
+	- del parse_ and get_ home_new_review
+		- new review at home page is removed.
+
+0.43  Wed Feb  1 18:18:29 2006
+	- mod parse_standard_history
+		- fixed name pase error for '...(...)' (thanks mizuki)
+
+0.42  Wed Oct 19 11:04:16 2005
+	- add parse_standar_anchor
+	- mod parse_ajax_new_diary
+		- fixed for url with '&type=1' (thanks mizuki)
+	- mod get_ajax_new_diary
+		- fixed default url (thanks mizuki)
+
+0.41  Mon Oct 17 15:29:10 2005
+	- add parse_ and get_ajax_new_diary
+	- add parse_standar_tag
+	- mod parse_standard_history
+		- now result with parse_new_friend_diary includes 'image' for ajax_new_diary.
+		- fix : suppress debug information printing. (thanks yoshy and memn0ck)
+
+0.40  Sat Oct 15 01:20:40 2005
+	- mod parse_standard_history
+		- fixed for HTML changes.
+	- del parse_ and get_calendar
+	- del parse_ and get_calendar_next
+	- del parse_ and get_calendar_previous
+	- del parse_ and get_calendar_term
+		- use *_show_calendar_* instead of them.
+	- del parse_ and get_new_diary
+	- del parse_ and get_new_diary_next
+	- del parse_ and get_new_diary_previous
+	- del parse_ and get_new_diary_term
+		- use *_search_diary_* instead of them.
+
+
+0.39  Thu Oct 13 08:52:40 2005
+	- mod parse_list_diary_monthly_menu
+		- fix : suppress debug information printing.
+	- mod parse_standard_history
+		- subject of deleted diary be '(deleted)' with parse_search_diary
+
+0.38  Sat Oct 03 17:00:18 2005
+	- add parse_ and get_home_new_album (thanks memn0ck)
+	- add parse_ and get_home_new_bbs (thanks memn0ck)
+	- add parse_ and get_home_new_comment (thanks memn0ck)
+	- add parse_ and get_home_new_friend_diary (thanks memn0ck)
+	- add parse_ and get_home_new_review (thanks memn0ck)
+	- add parse_ and get_show_intro (thanks memn0ck)
+	- add parse_ and get_view_album (thanks memn0ck)
+	- add parse_ and get_view_album_comment (thanks memn0ck)
+	- add parse_ and get_view_album_photo (thanks memn0ck)
+	- add parse_ and get_view_event (thanks memn0ck)
+	- mod parse_information
+	- mod parse_list_bbs
+	- mod parse_list_bookmark
+	- mod parse_list_diary_monthly_menu
+	- mod parse_list_request
+	- mod parse_view_bbs
+		- above 6 methods fixed for HTML changes.
+	- mod parse_view_diary
+		- now result includes open level.
+
+0.37  Sat Sep 17 12:01:32 2005
+	- mod parse_information
+		- fix : suppress debug information printing.
+
+0.36  Thu Sep 15 13:26:44 2005
+	- mod parse_information
+		- now its results include 'style' key.
+	- mod unescape
+		- maybe more suit unescaping for mixi style (oh, god!) escaped html.
+
+0.35  Sun Sep 11 21:10:48 2005
+	- add parse_ and get_show_calendar
+	- add parse_ and get_show_calendar_next
+	- add parse_ and get_show_calendar_previous
+	- add parse_ and get_show_calendar_term
+	- mod parse_ and get_calendar
+	- mod parse_ and get_calendar_next
+	- mod parse_ and get_calendar_previous
+	- mod parse_ and get_calendar_term
+		- now they're alias of *_show_calendar_*, and won't be longer exists.
+	- add parse_ and get_search_diary
+	- add parse_ and get_search_diary_next
+	- add parse_ and get_search_diary_previous
+	- add parse_ and get_search_diary_term
+	- mod parse_ and get_new_diary
+	- mod parse_ and get_new_diary_next
+	- mod parse_ and get_new_diary_previous
+	- mod parse_ and get_new_diary_term
+		- now they're alias of *_search_diary_*, and won't be longer exists.
+	- add parse_ and get_community_id (thanks memn0ck)
+	- add parse_ and get_list_bbs (thanks memn0ck)
+	- add parse_ and get_list_bbs_next (thanks memn0ck)
+	- add parse_ and get_list_bbs_previous (thanks memn0ck)
+	- add parse_ and get_list_member (thanks memn0ck)
+	- add parse_ and get_list_member_next (thanks memn0ck)
+	- add parse_ and get_list_member_previous (thanks memn0ck)
+	- add parse_ and get_list_request (thanks memn0ck)
+	- add parse_ and get_release_info (thanks memn0ck)
+	- add parse_ and get_view_bbs (thanks memn0ck)
+	- del parse_diary (use parse_view_diary instead of this method)
+
+0.34  Tue Aug 23 22:28:02 2005
+	- add parse_ and get_new_bbs_next
+	- add parse_ and get_new_bbs_previous
+	- mod new
+		- now pssword is not necessary.
+	- mod login
+		- now it is able to speciied password.
+	- mod session, stam
+		- now it is able to used to speciiy cookie value(BF_SESSION, BF_STAMP).
+	- mod parse_new_friend_diary_next
+	- mod parse_new_friend_diary_previous
+		- now they uses parse_standard_history_next/previous
+	- fix parse_list_friend_previous
+	- fix parse_new_friend_diary_next
+	- fix parse_list_friend
+	- fix get/parse_self_id
+		- now it targets "show_profile.pl".
+	- add parse_standard_history_next
+	- add parse_standard_history_previous
+
+0.33  Mon Jul 18 01:10:19 2005
+
+	- add parse_ and get_list_diary_monthly_menu (thanks DonaDona)
+	- mod request
+		- now it can return code 403 and 503 when contents means that.
+	- fix parse_list_community.
+	- fix parse_list_friend (thanks slash/onigawara)
+	- fix post_delete_diary submitted (thanks Mami Komura)
+
+0.32  Tue Jun 07 01:09:24 2005
+
+	- add parse_ and get_show_friend_outline
+	- add parse_ and get_show_friend_profile
+	- add parse_ and get_new_diary
+	- add parse_ and get_new_diary_next
+	- add parse_ and get_new_diary_previous
+	- add parse_ and get_send_message_preview
+	- add parse_ and get_send_message_confirm
+	- add parse_ and get_show_friend_outline
+	- add parse_ and get_show_friend_detail
+	- mod parse_add_diary_preview
+		- now it uses parse_standard_form
+	- add parse_ and get_delete_diary_preview
+	- add parse_ and get_edit_diary_preview
+	- add parse_ and get_edit_diary_image
+	- add parse_add_diary_confirm
+	- add parse_delete_diary_confirm
+	- add parse_edit_diary_confirm
+	- mod get_add_diary_confirm
+	- mod get_delete_diary_confirm
+	- mod get_edit_diary_confirm
+		- now they returns result with parsing response content
+	- add get_view_diary
+	- rename parse_diary -> parse_view_diary
+		- parse_diary remains as alias of parse_view_diary currently
+	- fix parse_standard_history
+	- del parse_standard_history2
+	- add parse_standard_form
+	- add query_sorted_url
+	- add post_send_message
+
+0.31  Wed May 11 12:44:20 2005
+
+	- add stamp method.
+	- add request method (overwrite LWP::RobotUA::request)
+	- fix parse_list_bookmark returns unsorted array.
+	- fix all request rejected by robots.txt
+
+0.30  Mon May  3 13:00:00 2005
+	- add "enable_cookies".
+	- fix "parse_calender".
+		-  title and name had not "rewrite"d.
+
+0.29  Mon Apr 25 12:00:00 2005
+	- fix "parse_add_diary_preview".
+	- fix "get_add_diary_confirm".
+	- fix "post_add_diary".
+		- they does not work because of 'post_key' required from Apr. 2005.
+	- fix "rewrite".
+		- uninvited double quote in HTML tag is allowed.
+	- PODs are explicitly specified code with "encoding utf8".
+
+0.28  Fri Apr  1 14:13:00 2005
+	- add "parse_list_outbox", "get_list_outbox". (thanks AsO)
+		- allows you to get and parse "message.pl?box=outbox".
+	- fix "parse_message".
+		- allows you to parse "view_message" in outbox.
+	- fix "parse_list_friend_next" and "parse_list_friend_previous".
+		- it does not work because of HTML changes at 05/03/31.
+	- fix "parse_list_bookmark".
+		- it had key "descrption" instead of "description".
+
+0.27  Wed Mar  9 23:56:00 2005
+	- PODs converted to utf-8.
+
+0.26  Wed Mar  9 12:53:00 2005
+	- first CPAN-ed version; created by h2xs 1.23 with options
+		-AX -n WWW::Mixi

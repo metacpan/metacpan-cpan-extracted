@@ -1,0 +1,77 @@
+Revision history for Perl extension Win32::Security
+
+0.50  Sat Mar 20 2004
+  - Moved to using Build.PL (i.e. Module::Build).
+  - Moved utility scripts into script dir so they will install to Perl/bin
+  - Used subclassing in Build.PL to avoid turning them into BAT files
+  - Added package lines to (ACE|ACL|NamedObject|Recursor).pm to get them to
+    show up in META.yml
+  - Changed .t files to PC line endings
+  - Added support to ACTION_distdir in Build.PL to turn off extended tests
+  - Overrode make_tarball in Build.PL to avoid Archive::Tar (which is broken)
+    and use tar and gzip from the command line.  I will remove this when
+    a default install of Archive::Tar and Module::Build under ActivePerl
+    does not result in a flat tar file!
+  - Fixes to error_.* calls in W::S::Recursor::SE_FILE_OBJECT::PermDump
+  - Added PPM support to Build.PL
+  - Removed dacl_noprop from PermChg.pl because of an obscure bug involving
+    inheritance blocking preventing a subsequent dacl update from rippling
+    the updates.
+  - Added test for and fixed bug involving standalone -b passed to PermChg.pl
+
+0.28  Sat Mar 13 2004
+  - Fixed owner code in Win32::Security::Recursor::SE_FILE_OBJECT::PermDump
+  - Looked over PermFix.pl and tidied up some typos in the docs
+  - Added CI, OI, IO, etc. flag aliases to Win32::Security::ACE
+  - Got PermChg.pl working (albeit without owner support)
+  - Developed the first real test suites - extended.t and scripts.t
+  - Tore up and rewrote huge chunks of the inheritance checking code as a
+    result of the above.  The black box that implements permission
+    inheritance is a wiley adversary to understand.
+  - Decided to release with PermFix.pl and PermChg.pl in beta.
+
+0.27  Mon Jan 19 2004
+  - Flattened Recursor into a queue based loop - no more proper recursion
+  - Updated PermDump.pl to function.
+  - Decided to release without PermChg.pl and PermFix.pl, which are both
+    still under development and in testing.
+  - Moved Win32 into lib directory and updated MANIFEST and Makefile.PL
+
+0.26  ??? Dec ?? 2003
+  - Delayed due to flood in downstairs of house.  Highly recommend that
+    people check and replace their washing machine hoses on a regular
+    basis.  Stainless steel braid jacketed ones are worth it.
+  - Another Recursor refactoring
+
+0.25  ??? Nov ?? 2003
+  - I really need to spend the time on this and release it
+  - aclRevision is now largely gone (replaced by routines that DWIW)
+  - Recursor refactoring
+
+0.24  ??? Oct ?? 2003
+  - Implementation of mutable objects via proper
+    flyweight pattern
+  - Addition of SE_REGISTRY_KEY support
+  - Clean-up of mutability support
+
+0.23  ??? Sep 20 2003
+  - Fifth almost:) CPANed release
+  - Implementation of multiple-inheritance via C::P
+
+0.22  ??? Sep 10 2003
+  - Fourth almost:) CPANed release
+  - Recursor.pm becomes a reality
+
+0.21  Wed Sep 3 2003
+  - Third almost:) CPANed release
+  - ACEs are now subclassed on AceType and fake subclassed on objectType
+  - DACL.pm becomes ACL.pm
+
+0.20  Sat Aug 30 2003
+  - second almost:) CPANed release
+  - ACEs are now first-class objects
+  - Lots of bug fixes resulting from that
+
+0.10  Tue Aug 26 2003
+  - first almost:) CPANed release
+

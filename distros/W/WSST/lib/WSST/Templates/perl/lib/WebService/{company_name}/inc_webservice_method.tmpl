@@ -1,0 +1,10 @@
+sub <%[$method{interface_name}]%> {
+    my $self = shift or return;
+    $self = $self->new() unless ref $self;
+    my $api = <%[$package_name]%>::<%[$method{class_name}]%>->new();
+    $self->init_treepp_config( $api );
+    $self->init_query_param( $api );
+    $api->add_param( @_ );
+    $api->request();
+    $api;
+}

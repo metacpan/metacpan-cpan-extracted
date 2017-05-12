@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::Mechanize::Frames.
+
+0.03  Tue Mar 15 00:29:52 2005
+	- original version; created by h2xs 1.23 with options
+		-XA -n WWW::Mechanize::Frames
+

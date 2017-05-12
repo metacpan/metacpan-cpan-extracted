@@ -1,0 +1,8 @@
+Revision history for WWW-Plurk
+
+0.01    2008-06-14
+        - Initial release.
+
+0.02    2008-07-10
+        - Changes to track updated Plurk posting interface.
+        - Added PLURK_TRACE option that outputs HTTP requests to STDERR.

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+perl-wkhtmltox.h
+perl-wkhtmltox-func.c
+perl-wkhtmltox.xs
+ppport.h
+README.md
+t/test_generate_image.t
+t/test_generate_pdf.t
+t/test.html
+lib/WKHTMLTOX/XS.pm

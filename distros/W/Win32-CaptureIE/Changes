@@ -1,0 +1,25 @@
+Revision history for Perl extension Win32::CaptureIE.
+
+1.00  Sun Jan 25 23:40:39 2004
+	- original version
+
+1.10  Tue Feb 17 15:37:23 2004
+        - fix: the window object is no more required, scrolling is done in different way
+        - new: CaptureRows function
+        - new: CaptureThumbshot function
+        - new: advanced customization of border for CaptureElement function
+
+1.11  Mon Feb 23 11:29:47 2004
+        - fix: solution for HTML vs. BODY concept in IE6 if DOCTYPE is specified
+
+1.20  Wed Feb 25 13:44:19 2004
+        - fix: scrollIntoView and scroll a few pixels back to enable capturing of surrounding area
+        - new: GetAll function
+        - new: CaptureArea function
+        - new: CaptureElements function
+        - new: moves cursor to [0,0] position in StartIE function and restores in back in QuitIE
+
+1.30  Mon Mar  4 09:09:00 2004
+        - new: RunJS function
+        - new: Wait function
+        - new: PopUp function and popup window handling

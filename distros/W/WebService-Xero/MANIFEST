@@ -1,0 +1,25 @@
+.gitignore
+Changes
+ignore.txt
+lib/WebService/Xero.pm
+lib/WebService/Xero/Agent.pm
+lib/WebService/Xero/Organisation.pm
+lib/WebService/Xero/Contact.pm
+lib/WebService/Xero/Invoice.pm
+lib/WebService/Xero/Item.pm
+lib/WebService/Xero/Agent/PrivateApplication.pm
+lib/WebService/Xero/Agent/PublicApplication.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/config/test_config.tpl
+t/00-load.t
+t/01-agent.t
+t/02-private_application.t
+t/03-data_objects.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

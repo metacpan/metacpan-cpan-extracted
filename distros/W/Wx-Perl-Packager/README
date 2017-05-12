@@ -1,0 +1,45 @@
+#########################################################
+
+Wx-Perl-Packager
+
+Version 0.20
+
+(c)2006 - 2010 Mark Dootson
+
+#########################################################
+
+Package to ease wxPerl application packaging with PAR and 
+PerlApp/PDK 
+Just use at top of main script.
+
+use Wx::Perl::Packager;
+
+
+INSTALLATION
+
+To install this module
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+On windows just change to nmake or dmake as required.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Wx::Perl::Packager
+
+You can also look for information at:
+
+    http://www.wxperl.co.uk
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 - 2010 Mark Dootson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

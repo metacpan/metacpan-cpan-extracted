@@ -1,0 +1,37 @@
+NAME
+    WWW::Search::Google - Search Google via SOAP
+
+SYNOPSIS
+      use WWW::Search;
+      my $search = WWW::Search->new('Google', key => $key);
+      $search->native_query("leon brocard");
+      while (my $result = $search->next_result()) {
+        print $result->title, "\n";
+        print $result->url, "\n";
+        print $result->description, "\n";
+        print "\n";
+      }
+
+DESCRIPTION
+    This class is a Google specialization of WWW::Search. It handles
+    searching Google http://www.google.com/ using its new SOAP API
+    http://www.google.com/apis/.
+
+    All interaction should be done through WWW::Search objects.
+
+    Note that you must register for a Google Web API account and have a
+    valid Google API license key before using this module.
+
+    This module reports errors via croak().
+
+    This module uses Net::Google to do all the dirty work.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2002, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

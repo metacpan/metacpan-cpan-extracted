@@ -1,0 +1,21 @@
+NAME
+    Access2Text - a module for save Accesstable as Textfile
+
+SYNOPSIS
+      use warnings;
+      use strict;
+      use Access2Text qw( AccTabSaveToText );
+
+      AccTabSaveToText("ourConnectionString", "C:\\DB.mdb", "Table", "C:\\Textfile.txt");
+
+      Example for Connection String: ";Provider=Microsoft.ACE.OLEDB.12.0;Password=\"\""
+
+ABSTRACT
+    Test
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

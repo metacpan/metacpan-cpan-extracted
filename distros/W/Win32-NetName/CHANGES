@@ -1,0 +1,22 @@
+Revision history for Perl extension Win32::NetName
+
+0.3  Tue Jul 08 9:56 2003
+     Corrected the Exporter syntax that prevented the routines from being 
+     exported correctly (thanks to Joel (j.shank@pecorp.com) for pointing this 
+     out).
+     Require version 0.41 of Win32::API in the makefile to get around problems 
+     with Win32::API->Import (thanks again to Joel).
+     Updated the readme file with hints on installing Win32::API.
+
+0.2  Fri Jun 27 4:28 2003
+     Added module Win32::VolumeInformation
+     GetUniversalName will now perform case insensitive path comparisons on
+     volumes that are case insensitive.
+     GetLocalName with now perform case insensitive UNC path comparisons.
+
+0.11 Wed Jun 11 15:30 2003
+     Win32::Lanman is hard to search for on CPAN. A reference to the author 
+     and directory is provided (http://www.cpan.org/authors/id/J/JH/JHELBERG/).
+
+0.1  Fri Jun 06 11:36 2003
+     First release.

@@ -1,0 +1,18 @@
+TYPEMAP
+HWND         T_HANDLE
+UINT         T_IV
+WPARAM       T_IV
+LPVOID       T_PV
+LRESULT      T_IV
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));

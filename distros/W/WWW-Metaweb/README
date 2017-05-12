@@ -1,0 +1,45 @@
+WWW::Metaweb version 0.02
+=========================
+
+** WWW::Metaweb **
+
+WWW::Metaweb provides an interface to a Metaweb database instance. The
+best example currently is Freebase (www.freebase.com). Queries to a
+Metaweb are made through HTTP requests to the Metaweb API.
+
+Qeueries are written in the Metaweb Query Language (MQL), using
+Javascript Object Notation (JSON). WWW::Metaweb allows you to write the
+actual JSON string yourself or provide a Perl array ref / hash ref
+structure to be converted to JSON.
+
+As of this release Freebase required a (free) username and password to
+access, if any of this sounds interesting go check it out at:
+http://www.freebase.com
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+WWW::Metaweb requires:
+	JSON::XS
+	LWP::UserAgent
+	URI::Escape
+	HTTP::Request
+	Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Hayden Stainsby
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

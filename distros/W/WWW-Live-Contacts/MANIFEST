@@ -1,0 +1,13 @@
+eg/live_contacts.cgi
+lib/WWW/Live/Contacts.pm
+lib/WWW/Live/Contacts/Address.pm
+lib/WWW/Live/Contacts/Collection.pm
+lib/WWW/Live/Contacts/Contact.pm
+lib/WWW/Live/Contacts/Email.pm
+lib/WWW/Live/Contacts/PhoneNumber.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-basics.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,178 @@
+Revision history for Perl extension Web::Scraper
+
+0.38  2014-10-19 17:25:53 PDT
+        - Improved documentation #8 (vti)
+        - Add regexp filter #10 (creaktive)
+        - Fix documentation error #16
+
+0.37  Fri Oct 19 15:09:17 PDT 2012
+        - Repack with the latest Module::Install
+
+0.36  Sat Nov 19 12:12:54 PST 2011
+        - Support HTML5 tags by not ignoring unknonw tags (leedo)
+
+0.35  Mon Sep 26 18:40:06 PDT 2011
+        - Added support for comments() XPath #3 (Perlover)
+
+0.34  Thu Feb 24 09:35:12 PST 2011
+        - Skip xml_simple.t if LibXML is not there (omega)
+
+0.33  Thu Feb 17 09:12:55 PST 2011
+        - Remove failing invalid XPath tests        
+
+0.32  Wed Feb  3 22:13:01 PST 2010
+        - Removes poking around charset and LWP's decoded_content
+          (Thanks to flatwhatson)
+        - More docs (jshirley)
+
+0.31  Sun Jul 19 00:43:54 PDT 2009
+        - Use new LWP's content_charset method instead of HTTP::Response::Encoding
+          (Thanks to hanekomu)
+
+0.30  Wed Jul  8 15:47:21 PDT 2009
+        - No warnings when use()d multiple times in the same package
+
+0.29  Wed Jul  8 13:40:14 PDT 2009
+        - Adds Web::Scraper::LibXML which uses HTML::TreeBuilder::LibXML
+          (without the replace_original hack)
+
+0.28  Sat Mar 28 14:31:45 PDT 2009
+        - Call ->eof when parsing with HTML::TreeBuilder
+          (Thanks to Tokuhiro Matsuno)
+
+0.27  Tue Mar 24 12:09:04 PDT 2009
+        - Added tests to use HTML::TreeBuilder::LibXML
+          (Thanks to Tokuhiro Matsuno)
+
+0.26  Thu Jan 15 11:37:56 PST 2009
+        - Fixed an error message when GET request fails
+
+0.25  Sun Jan 11 13:36:44 PST 2009
+        - scrape() now accepts HTTP::Response as well for Remedie/Plagger
+        - repository moved to github http://github.com/miyagawa/web-scraper/tree/master
+
+0.24  Sun Nov 25 15:58:38 PST 2007
+        - Support duck typing in filter args to take object that has 'filter' method
+          This could give Web::Scraper::Filter::Pipe a better interface
+          (Thanks to hanekomu and tokuhirom)
+
+0.23  Sat Nov 24 17:21:14 PST 2007
+        - Upped Web::Scraper dependency
+        - Skip &amp; test until HTML::TreeBuilder::XPath fixes it
+        - removed eg/search-cpan.pl
+
+0.22  Wed Oct 17 17:51:54 PDT 2007
+        - 's' on scraper shell now prints to pager (e.g. less) if PAGER is set
+
+0.21_01 Thu Oct  4 01:05:00 PDT 2007
+        - Added an experimental filter support
+          (Thanks to hirose31, tokuhirom and Yappo for brainstorming)
+
+
+0.21  Wed Oct  3 10:37:13 PDT 2007
+        - Bumped up HTML::TreeBuilder dependency to fix 12_html.t issues
+          [rt.cpan.org #29733]
+
+0.20  Wed Oct  3 00:28:13 PDT 2007
+        - Fixed a bug where URI is not absolutized with a hash reference value
+        - Added eg/jp-playstation-store.pl
+
+0.19  Thu Sep 20 22:42:30 PDT 2007
+        - Try to get HTML encoding from META tags as well, when there's
+          no charset value in HTTP response header.
+
+0.18  Thu Sep 20 19:49:11 PDT 2007
+        - Fixed a bug where URI is not absolutized when scraper is nested
+        - Use as_XML not as_HTML in 'RAW'
+
+0.17  Wed Sep 19 19:12:25 PDT 2007
+        - Reverted Term::Encoding support since it causes segfaults
+          (double utf-8 encoding) in some environment
+
+0.16  Tue Sep 18 04:48:47 PDT 2007
+        - Support 'RAW' and 'TEXT' for TextNode object
+        - Call Term::Encoding from scraper shell if installed
+
+0.15  Sat Sep 15 21:28:10 PDT 2007
+        - Call env_proxy in scraper CLI
+        - Added $Web::Scraper::UserAgent and $scraper->user_agent accessor to deal
+          with UserAgent object
+        - Don't escape non-ASCII characters into &#xXXXX; in scraper shell 's' and WARN
+
+0.14  Fri Sep 14 16:06:20 PDT 2007
+        - Fix bin/scraper to work with older Term::ReadLine.
+          (Thanks to Tina Müller [RT:29079])
+        - Now link elements like img@src and a@href are automatically
+          converted to absolute URI using the current URI as a base.
+          Only effective when you do $s->scrape(URI) or $s->scrape(\$html, URI)
+        - Added 'HTML' and its alias 'RAW' to get the HTML chunk inside the tag
+            process "script", "code" => 'RAW';
+          Handy if you want the raw HTML code inside <script> or <style>.
+          (Thanks to charsbar for the suggestion)
+
+0.13  Sun Sep  2 17:11:08 PDT 2007
+        - Added 'c' and 'c all' command to scraper to generate the
+          code to replay the session
+        - Added 'WARN' as a shortcut to sub { warn $_->as_HTML } on scraper shell like:
+            process "a", WARN; # print 'a' elements as HTML
+        - Added 'search-cpan.pl' and 'rel-tag.pl' to eg/
+
+0.12  Thu Aug 30 02:39:44 PDT 2007
+        - Added 's' command to scraper to get the HTML source
+        - You can use $tree variable to deal with the HTML::Element object in scraper shell
+        - Give a graceful error message if the given Selector/XPath doesn't compile
+        - Give a better error when number of args in process() seems wrong
+
+0.11  Tue Aug 28 02:50:01 PDT 2007
+        - Supported hash-reference in process values, like
+          process "a", "people[]", { link => '@href', name => 'TEXT' };
+          See t/09-process_hash.t for its usage.
+
+0.10  Mon Aug 27 00:53:51 PDT 2007
+        - result now returns the entire stash if called without keys
+        - added bin/scraper CLI
+
+0.09  Wed Aug 15 10:51:14 PDT 2007
+        - remove Devel::Leak use from tests
+
+0.08  Tue Aug 14 13:25:16 PDT 2007
+        - Call $tree->delete after the callback to avoid memory leaks by TreeBuilder.
+          (Thanks to k.daiba for the report)
+
+0.07  Sat May 12 16:23:51 PDT 2007
+        - Updated dependencies for HTML::TreeBuilder::XPath
+
+0.06  Sat May 12 15:47:27 PDT 2007
+        - Now don't use decoded_content to work with new H::R::Encoding
+
+0.05  Wed May  9 18:21:22 PDT 2007
+        - Added (less DSL-ish) Web::Scraper->define(sub { ... }) syntax
+        - Fixed bug where the module dies if there's no encoding found in HTTP response headers
+        - Added more examples in eg/
+        - When we get value using callback, pass HTML::Element object as $_, in addition to $_[0]
+          (Suggested by Matt S. Trout)
+        - If the expression (1st argument to process()) starts with "/", it's
+          treated as a direct XPath and no Selector-to-XPath conversion is done.
+
+0.04  Wed May  9 00:55:32 PDT 2007
+        - *API CHANGE* Now scraper {} returns Web::Scraper object and not closure.
+          You should call ->scrape() to get the response back.
+          (Suggested by Marcus Ramberg)
+
+          I loved the code returning closure, but this is more compatible to
+          scrapi.rb API and hopefully less confusing to people.
+
+0.03  Tue May  8 23:04:13 PDT 2007
+        - use 'TEXT' rather than 'content' to grab text from element
+          to be more compatible with scrapi
+        - Added unit tests using Test::Base
+        - Refactored internal code for easier reading
+        - chained callbacks are now passed HTML::Element, not HTML, to avoid double HTML parsing
+        - Implemented callbacks (iterator) API
+        - Added 'process_first' to be compatible with scrapi
+
+0.02  Tue May  8 20:03:37 PDT 2007
+        - Added dependencies to Makefile.PL
+
+0.01  Tue May  8 04:05:59 2007
+        - original version

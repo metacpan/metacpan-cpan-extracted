@@ -1,0 +1,24 @@
+Revision history for WebService-SQLFormat
+
+0.000007  2017-03-06 11:11:24-05:00 America/Toronto
+    - Adds explicit dependency on LWP::Protocol::https
+
+0.000006  2016-10-04 16:06:18-04:00 America/Toronto
+    - sqlformat.org has switched to SSL. Reported by Slaven Rezić
+      https://github.com/oalders/webservice-sqlformat/issues/2
+    - Now including actual docs.
+
+0.000005  2016-07-05 11:07:49-04:00 America/Toronto
+    - Disable debugging in tests unless it's an author test.
+
+0.000004  2016-06-30 16:44:33-04:00 America/Toronto
+
+0.000003  2016-06-30 16:09:46-04:00 America/Toronto
+    - Renames sqlformat script to sql-webformat.
+
+0.000002  2016-06-30 15:45:10-04:00 America/Toronto
+    - Add sqlformat script.
+    - Return the result key from format_sql() rather than a hashref.
+
+0.000001  2016-06-21 17:05:43-04:00 America/Toronto
+    - Initial release.

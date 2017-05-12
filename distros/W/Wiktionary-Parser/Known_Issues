@@ -1,0 +1,14 @@
+* Some less common languages that appear in Wiktionary don't map exactly to the names or codes 
+  in Locale::Codes::Language.  For these I've tried to manually add mappings for various spelling
+  variations of the same language.  
+
+* In some cases where a language doesn't have an official language code I've tried to default to
+  conventions used in Wiktionary.  Beyond that I've refered the the Linguist List for unofficial 
+  language codes.  
+
+  http://en.wikipedia.org/wiki/Category:Languages_without_ISO_639-3_code_but_with_Linguist_List_code
+
+* Although the parser is successful at parsing the standard Wiktionary templates to extract translations,
+  occasionally it'll fail to parse some entries due to typos or minor variations to the template that 
+  someone added in.  I'll make any necessary additions to account for official Wiktionary templates, 
+  and try to make sure that broken wiki syntax doesn't do Bad Things in this parser.  

@@ -1,0 +1,24 @@
+Revision history for Perl module Wx::Perl::DbLinker
+
+0.1 Wed Sep  2 15:04:59 2015
+    - original version; created by ExtUtils::ModuleMaker 0.54
+0.002 First distribution on cpan
+0.003 Form: : added a inserting flag to display default values added in the dataManager. pos = -1 used to display no data
+      Form: apply on deletion, if the number of rows is 0 an empty row is display. Else it's the first row in the rowset
+      Form: add_combo_values can be call for Wx::ListBox
+      Wxdatasheet: renderer_function can be use to set the value of a column
+0.005 Parameters can be passed as list or hash ref of name => value
+0.006 Added examples with SqlADM and RdbDM. Corrected Makefile.pl to fetch a version of Gtk2::Ex::DbLinker-DbTools >= 0.104
+0.007 Removed common methods to Form and Wxform and created a parent class AbForm to both
+0.008 Wxdatasheet->get_current_row return the row that have been last edited
+      Wxdataseet->apply done with DatasheetHelper->apply common to Gtk2 ... Datasheet 
+0.009 0.108 DatasheetHelper holds common methods to Wxdatasheet and Datasheet
+0.010 Example moved the calls to the dataManagager in a common wraper so that just two form modules are needed (Langues2.pm + Sflang2.pm) 
+      instead of 8 modules (2 form modules for each of xxxDataManager object)
+      Use Class::InsideOut for Wx::Perl::DbLinker::Wxform to enforce encapsulation and to prevent for manipulating Abform properties directly
+0.011 get_combo_ids in Wxform to retrieve a hash ref of the line numbers (keys) and  values of the first column (values)
+      DBGridTable->new takes renderer_function into account to bypass using DataManager->get_field
+0.012 Corrected pod. ./eg : Dumper and log msg. Log4perl->easy_init instead of ->init(file) 
+      logcroak, logconfess etc instead of croak, confess
+      Improved readme file
+

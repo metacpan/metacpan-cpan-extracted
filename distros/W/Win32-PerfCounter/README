@@ -1,0 +1,30 @@
+Win32/PerfCounter
+=================
+
+The Win32 API features a high performance counter that allows 
+measuring extremely short time spans. Depending on your machine, 
+the resolution should be around 1 microsecond (1 second = 1_000_000
+microseconds). This module is an interface to the Win32 API 
+functions QueryPerformanceCounter and QueryperformanceFrequency that
+implement this counter.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   (n)make
+   (n)make test
+   (n)make install
+
+DEPENDENCIES
+
+This module requires a C compiler and will only run on 32-Bit Windows platforms.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005 Christian Renz <crenz@web42.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

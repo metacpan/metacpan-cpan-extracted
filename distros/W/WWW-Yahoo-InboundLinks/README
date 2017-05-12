@@ -1,0 +1,19 @@
+This package contains WWW::Yahoo::Links module assigned for tracking
+inbound links in Yahoo Site Explorer API.
+
+This module uses URI, LWP::UserAgent (libwww-perl) and JSON,
+so you must have it if you want to use this module.
+
+Installation is simple:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you have questions mail to dot.and.thing@gmail.com.
+
+Copyright 2008 Ivan Baktsheev.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

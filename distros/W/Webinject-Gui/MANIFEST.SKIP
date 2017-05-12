@@ -1,0 +1,11 @@
+blib
+.gitignore
+MANIFEST.bak
+http.log
+results.html
+results.xml
+Makefile$
+plot.log
+plot.plt
+plot.png
+.*.gz

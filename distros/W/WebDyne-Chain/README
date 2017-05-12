@@ -1,0 +1,9 @@
+WebDyne::Chain is part of the WebDyne suite of modules. It allows other perl
+modules to be inserted into the WebDyne lifecycle.
+
+WebDyne::Chain will only work within WebDyne and will not function as a
+stand-alone module.
+
+See the Webdyne documentation (http://webdyne.org) for more information
+about this module.
+

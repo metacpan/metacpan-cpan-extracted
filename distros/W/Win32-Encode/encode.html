@@ -1,0 +1,560 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>Win32::Real::Encode - Perl interaction with Progressive Networks ReadEncoder(tm).
+
+</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#Installation">Installation</A>
+	<LI><A HREF="#FUNCTIONS">FUNCTIONS</A>
+	<UL>
+
+		<LI><A HREF="#NOTE_">NOTE:</A>
+		<LI><A HREF="#Encode_Options">Encode Options</A>
+		<LI><A HREF="#NOTE_">NOTE:</A>
+	</UL>
+
+	<LI><A HREF="#Version">Version</A>
+	<LI><A HREF="#Knows_Issues">Knows Issues</A>
+	<LI><A HREF="#REVISION_HISTORY">REVISION_HISTORY</A>
+	<LI><A HREF="#AUTHOR_INFORMATION">AUTHOR INFORMATION</A>
+	<UL>
+
+		<LI><A HREF="#Copyright_Info">Copyright Info</A>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+Real::Encode - Perl interaction with Progressive Networks
+<CODE>ReadEncoder(tm).</CODE>
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+<PRE>        
+        # use it
+        use Real::Encode;
+        or
+        use Real::Encode qw(Merge Set_File); # to use all methods and functions
+</PRE>
+
+<P>
+
+<PRE>        # create the objects
+        $foo = new Real::Encode;
+        $bar = new Real::Encode(&quot;path-to-Real-dir&quot;);
+</PRE>
+
+<P>
+
+<PRE>        # Define current outfile (explained later)
+        $bar-&gt;Set_File(&quot;path-to-file&quot;);
+</PRE>
+
+<P>
+
+<PRE>        # Encode a file
+        $foo-&gt;Encode(INFILE, OUTFILE, [Params]);
+                
+        # Merge 2 files
+        Merge([Params]);
+        
+        # Edit text info within file
+        $foo-&gt;Edit_Text(OUTFILE, [Params]);
+</PRE>
+
+<P>
+
+<PRE>        # Edit flag info within file
+        $foo-&gt;Edit_Flags(OUTFILE, [Params]);
+</PRE>
+
+<P>
+
+<PRE>        # Edit stream info within file
+        $foo-&gt;Edit_Stream(OUTFILE, [Params]);
+</PRE>
+
+<P>
+
+<PRE>        # Dump editing info (don't need to edit before using this)
+        $foo-&gt;Edit_Dump;
+</PRE>
+
+<P>
+
+<PRE>        # Dump of file
+        $foo-&gt;Dump(OUTFILE);
+</PRE>
+
+<P>
+
+<PRE>        # Cut segment from file
+        $foo-&gt;Cut([Params]);
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+This module allows for interaction with the RealEncoder, and thus the
+manipulation of RealMedia files, and encoding to RealMedia format.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Installation">Installation
+
+</A></H1>
+<PRE>        Unzip distribution file.
+        run install.bat
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="FUNCTIONS">FUNCTIONS
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="NOTE_Make_sure_you_write_your_p">NOTE:
+Make sure you write your paths as x:\\dir\\dir\\etc.. (with the double slashes) so that
+the \ is escaped.
+
+</A></H2>
+<DL>
+<DT><STRONG><A NAME="item__foo">$foo = new Win32::Real::Encode[(path-to-dir)];
+
+</A></STRONG><DD>
+<PRE>        'path-to-dir' is the path to the directory on you machine which contains 
+        the encoding executables. You do not need to set this if you used the default
+        install and they are in c:\Real\Encoder\ (the default install).
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Set_File_path_to_file_">$foo->Set_File("path-to-file");
+
+</A></STRONG><DD>
+<PRE>        This would be used on either of 2 cases.
+                1) You are not starting off by encoding a file (object). or
+                2) You wish to reset the current OUTFILE path during your script.
+</PRE>
+
+<P>
+
+<PRE>        Every time you do something with your object, it stores what the last outfile was, which
+        is uses as your most current file. When you encode, it sets this to begin with, but when
+        you do not start by encoding, you will want to set it, so other fucntions, like the Edit_* 
+        functions, know what file to use. If you wish to print out your current outfile, you can 
+        do so by:
+        print $foo-&gt;{out};
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Encode_INFILE_OUTFILE_Par">$foo->Encode(INFILE,OUTFILE,[Params]);
+
+</A></STRONG><DD>
+<PRE>        This takes a multimedia file, with the proper format (.wav, .avi, etc..) and encodes it
+        into a RealMedia file (.rm). INFILE will be your multimedia file, and OUTFILE will be the 
+        name you wish your encoded file to have. OUTFILE must have the proper extention (.rm, .ra).
+        The parameters are the same that you would use for encoding from the command line. Options
+        are given as such:
+        
+        $foo-&gt;Encode(&quot;foobar.wav&quot;,
+                     &quot;foobar-out.rm&quot;,
+                     &quot;-A&quot; =&gt; &quot;dnet 1&quot;,
+                     &quot;-F&quot;  =&gt; &quot;optimal&quot;,
+                     &quot;-B&quot; =&gt; 40,
+                     &quot;-T&quot; =&gt; &quot;My Super Duper Title&quot;,
+                     &quot;-U&quot; =&gt; &quot;Kevin&quot;,
+                     &quot;-C&quot; =&gt; &quot;1998 Foobar Productions&quot;,
+                    );
+</PRE>
+
+<P>
+
+<PRE>        A list of options and what the mean is below:
+</PRE>
+
+<P>
+
+<H2><A NAME="Encode_Options">Encode Options
+
+</A></H2>
+NOTE: This is taken from Progressive Networks help. To get a copy of this,
+type rvbatch rvencode.exe /? in your Encoder directory. Options: ( defaults
+in parenthesis )
+
+
+<P>
+
+<PRE>        /I      infile          - Input File
+        /O      outfile or dir  - Output File Name or Directory ( infile.rm or dir\YYYYMMDDHHMMSS.rm )
+        /L                      - Use Live Input                ( ignores /I )
+        /S      &quot;server[:port]/file&quot; - Server Name, Port and File       ( port defaults to 7070 )
+        /W      password        - Server Password
+        /D      hhh:mm:ss       - Maximum Encoding Duration     ( continuous )
+        /A      audio codec tag - Audio Codec                   ( sipr 1 )
+        /V      video codec num - Video Codec                   ( 0 )
+        /F      framerate       - Frame Rate 0-15 or optimal    ( optimal )
+                                (Note: Optimal available for RealVideo (Standard) only)
+        /B      Kbps            - Total Kbps for clip 1 - 500   ( 100 )
+        /N      index           - Encoding Speed range 1 to 5   ( 1 )
+                          where 1 = Normal, 5 = fastest
+                          Fastest will decrease quality
+        /M      index           - Optimal Framerate Bias        ( 2 )
+                                1 = Sharpest Image
+                                2 = Normal
+                                3 = Smoothest Motion
+                          1 will lower frame rate, 
+                          3 will lower quality
+        /T      title           - Clip Title
+        /U      author          - Clip Author
+        /C      copyright       - Clip Copyright
+        /K      boolean         - Enable Mobile Play 0-1        ( 0 )
+        /R      boolean         - Enable Selective Record 0-1   ( 0 )
+        /X      boolean         - Enable Audio Encoding 0-1     ( 1 )
+        /Y      boolean         - Enable Video Encoding 0-1     ( 1 )
+        /Z      l,t,w,h         - Set Cropping Values : Left,Top,Width,Height (0,0,0,0)
+        /?      Display this help information
+</PRE>
+
+<P>
+
+Audio Codecs:
+
+
+<P>
+
+<PRE>        sipr 0    6500 bps      6.5 Kbps Voice
+        sipr 1    8500 bps      8.5 Kbps Voice
+        sipr 2    5000 bps      5 Kbps Voice
+        sipr 3   16000 bps      16 Kbps Voice - Wideband
+        dnet 0   16000 bps      16 Kbps Music - Low Response
+        dnet 1   16000 bps      16 Kbps Music - Medium Response
+        dnet 2   16000 bps      16 Kbps Music - High Response
+        dnet 3   20000 bps      20 Kbps Music Stereo
+        dnet 4   40000 bps      40 Kbps Music Mono
+        dnet 5   40000 bps      40 Kbps Music Stereo
+        dnet 6   80000 bps      80 Kbps Music Mono
+        dnet 7   80000 bps      80 Kbps Music Stereo
+        dnet 8    8000 bps      8 Kbps Music
+        dnet 9   12000 bps      12 Kbps Music
+        dnet 10  32000 bps      32 Kbps Music Mono
+        dnet 11  32000 bps      32 Kbps Music Stereo
+        28_8 0   15200 bps      15.2 Kbps Voice
+</PRE>
+
+<P>
+
+Video Codecs:
+
+
+<P>
+
+<PRE>        0       RealVideo (Standard)
+        1       RealVideo (Fractal)
+</PRE>
+
+<P>
+
+RVEncode.log is written to the current working directory. (i.e., the dir
+with the executable)
+
+
+<P>
+
+
+<DL>
+<DT><STRONG><A NAME="item_Merge">Merge([Params]);
+
+</A></STRONG><DD>
+<PRE>        This will merge two files together. To merge files, you want to merge a RealVideo file
+        with a RealAudio file. This method is called as:
+</PRE>
+
+<P>
+
+<PRE>          Merge(&quot;-d&quot; =&gt; &quot;c:\\foo&quot;,
+                &quot;-i&quot; =&gt; &quot;d:\\gsperl\\dev\\real\\drums.rm, d:\\gsperl\\dev\\real\\tada.rm&quot;,
+                &quot;-o&quot; =&gt; &quot;foo-out.rm&quot;,
+                &quot;-D&quot; =&gt; &quot;d:\\gsperl\\dev\\real\\&quot;,
+           );
+</PRE>
+
+<P>
+
+<PRE>        -d =&gt; Program directory. This is the path to where your executables are. If omitted
+              c:\Real\Encoder\ is used.
+        
+        -i =&gt; Your two files to merge.
+</PRE>
+
+<P>
+
+<PRE>        -o =&gt; The output file.
+</PRE>
+
+<P>
+
+<PRE>        -D =&gt; The output directory.
+</PRE>
+
+<P>
+
+<PRE>        You can merge together two objects as such:
+                Merge-&gt;(&quot;-d&quot; =&gt; &quot;c:\\foo&quot;,
+                        &quot;-i&quot; =&gt; &quot;$foo-&gt;{out}, $bar-&gt;{out}&quot;,
+                        &quot;-o&quot; =&gt; &quot;foo-out.rm&quot;,
+                        &quot;-D&quot; =&gt; &quot;d:\\gsperl\\dev\\real\\&quot;,
+                );
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Edit_Text_OUTFILE_Params_">$foo->Edit_Text(OUTFILE,[Params]);
+
+</A></STRONG><DD>
+<PRE>        This function allows you to edit the author, title, copyright and comment on a file.
+        
+        $foo-&gt;Edit_Text(&quot;c:\\foo\\baz-out.rm&quot;, #OUTFILE location
+                &quot;-t&quot; =&gt; &quot;New funky Title&quot;,
+                &quot;-a&quot; =&gt; &quot;New Author&quot;,
+                &quot;-c&quot; =&gt; &quot;New copyright info&quot;,
+                &quot;-C&quot; =&gt; &quot;New Comment&quot;,
+        );
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Edit_Flags_OUTFILE_Params">$foo->Edit_Flags(OUTFILE,[Params]);
+
+</A></STRONG><DD>
+<PRE>        This function allows you to edit certain flags on the file. The flags are perfect play mode,
+        mobile playback mode, and selective record mode. 
+</PRE>
+
+<P>
+
+<PRE>        $foo-&gt;Edit_Flags(&quot;d:\\foo\\baz2-out.rm&quot;,
+                &quot;-r&quot; =&gt; &quot;on&quot;,
+                &quot;-b&quot; =&gt; &quot;off&quot;,
+                &quot;-p&quot; =&gt; &quot;on&quot;,
+        );
+        
+        -r =&gt; set/clear selective record (ON|OFF)
+</PRE>
+
+<P>
+
+<PRE>        -b =&gt; set/clear mobile playback mode (ON|OFF)
+</PRE>
+
+<P>
+
+<PRE>        -p =&gt; set/clear perfect play mode (ON|OFF)
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Edit_Stream_OUTFILE_">$foo->Edit_Stream(OUTFILE, [Params]);
+
+</A></STRONG><DD>
+<PRE>        This function allows your to edit stream information on a file.
+</PRE>
+
+<P>
+
+<PRE>        $foo-&gt;Edit_Stream(&quot;d:\\foo\\baz3-out.rm&quot;,
+                &quot;-s&quot; =&gt; &quot;New Streamy Name&quot;,
+                &quot;-m&quot; =&gt; &quot;audio/x-pn-realaudio&quot;,
+                &quot;-S&quot; =&gt; &quot;0&quot;,
+        );
+</PRE>
+
+<P>
+
+<PRE>        -s =&gt; New stream name
+</PRE>
+
+<P>
+
+<PRE>        -m =&gt; New mime type for stream
+</PRE>
+
+<P>
+
+<PRE>        -S =&gt; Which stream (0|1)
+</PRE>
+
+<P>
+
+<H2><A NAME="NOTE_">NOTE:
+
+</A></H2>
+<PRE>        When you wish to edit the text, flags and stream on a file, the output from each
+        (your OUTFILE) will be saved in $foo-&gt;{out} and your final edited file will be the
+        OUTFILE for the last edit function you call.
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Edit_Dump_">$foo->Edit_Dump;
+
+</A></STRONG><DD>
+<PRE>        This will print out the current text, flag and stream info for $foo.
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Dump_OUTFILE_">$foo->Dump(OUTFILE);
+
+</A></STRONG><DD>
+<PRE>        This will give you a complete dump of $foo. OUTFILE should (could) be a text file.
+</PRE>
+
+<P>
+
+<DT><STRONG><A NAME="item__foo_Cut_Params_">$foo->Cut([Params]);
+
+</A></STRONG><DD>
+<PRE>        This function will cut out a segment of a file as specified in the parameters.
+</PRE>
+
+<P>
+
+<PRE>        $foo-&gt;Cut(&quot;-i&quot; =&gt; &quot;foo.rm&quot;,
+                &quot;-o&quot; =&gt; &quot;outt.rm&quot;,
+                &quot;-S&quot; =&gt; &quot;1&quot;,
+                &quot;-s&quot; =&gt; &quot;1.0&quot;
+        );
+</PRE>
+
+<P>
+
+<PRE>        -i =&gt; INput file
+</PRE>
+
+<P>
+
+<PRE>        -o =&gt; Output file
+</PRE>
+
+<P>
+
+<PRE>        -S =&gt; Stream (0|1)
+</PRE>
+
+<P>
+
+<PRE>        -s =&gt; Start time in Days:Hours:Minutes:Seconds.Milliseconds ... This will default to
+                the begining of the file.
+</PRE>
+
+<P>
+
+<PRE>        -e =&gt; End time in Days:Hours:Minutes:Seconds.Milliseconds ... defaults to the end of
+                the start+input length
+</PRE>
+
+<P>
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="Version">Version
+
+</A></H1>
+<PRE>        0.05
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Knows_Issues">Knows Issues
+
+</A></H1>
+<OL>
+<LI><STRONG><A NAME="item_It_is_possible_that_some_errors_">
+	It is possible that some errors are not yet handled in the best way, if you find any
+	please let me know.
+
+</A></STRONG>
+<H1><NAME="REVISION_HISTORY">REVISION HISTORY
+
+</A></H1>
+v. 0.4 (9/14/98) - Original Release to CPAN
+<P>
+v. 0.5 (9/30/98) - No real technical changes. Just some cleaning from 0.4
+<P>
+<H1><A NAME="AUTHOR_INFORMATION">AUTHOR INFORMATION
+
+</A></H1>
+Copyright 1998, Kevin Meltzer. All rights reserved. It may be used and
+modified freely, but I do request that this copyright notice remain
+attached to the file. You may modify this module as you wish, but if you
+redistribute a modified version, please attach a note listing the
+modifications you have made.
+
+
+<P>
+
+Address bug reports and comments to: <A
+HREF="MAILTO:kmeltz@cris.com">kmeltz@cris.com</A>
+
+
+<P>
+
+The author makes no warranties, promises, or gaurentees of this software.
+As with all software, use at your own risk.
+
+
+<P>
+
+<H2><A NAME="Copyright_Info">Copyright Info
+
+</A></H2>
+This module is Copyright 1998, Kevin Meltzer. All rights reserved. Any
+documentation from Progrssive Networks and and trademard of Progressive
+Networks Real products are copyright by Progressive Networks
+(http://www.real.com). They had no part in the creation of this version of
+this module.
+
+
+<P>
+
+</DL>
+</DL>
+    </BODY>
+
+    </HTML>

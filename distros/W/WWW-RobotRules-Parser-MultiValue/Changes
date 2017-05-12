@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW-RobotRules-Parser-MultiValue
+
+0.02 2015-03-12T05:46:04Z
+    - A new option: ignore_default
+0.01 2015-03-09T09:58:40Z
+    - original version
+

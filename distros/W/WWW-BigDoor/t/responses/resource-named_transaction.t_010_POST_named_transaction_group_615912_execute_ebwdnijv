@@ -1,0 +1,37 @@
+201[
+    {
+        "transaction_group_id": "f7d72fafd07b4135a0ef41d8fed56381", 
+        "end_user": {
+            "read_only": 0, 
+            "modified_timestamp": 1294259924, 
+            "resource_name": "end_user", 
+            "award_summaries": [], 
+            "best_guess_profile_img": null, 
+            "level_summaries": [], 
+            "sent_good_summaries": [], 
+            "best_guess_name": "ebwdnijv", 
+            "currency_balances": [
+                {
+                    "end_user_description": "can only be purchased", 
+                    "transaction_group_id": "f7d72fafd07b4135a0ef41d8fed56381", 
+                    "modified_timestamp": 1294259927, 
+                    "pub_title": "Coins", 
+                    "urls": [], 
+                    "current_balance": "100.00", 
+                    "adjustment_amount": "50.00", 
+                    "currency_id": 5806, 
+                    "previous_balance": "50.00", 
+                    "currency_adjusted": true, 
+                    "created_timestamp": 1294259926, 
+                    "pub_description": "an example of the Purchase currency type", 
+                    "end_user_title": "Coins"
+                }
+            ], 
+            "created_timestamp": 1294259924, 
+            "end_user_login": "ebwdnijv", 
+            "guid": "ca3193ee190b11e0987270696dcfa930", 
+            "received_good_summaries": []
+        }
+    }, 
+    {}
+]

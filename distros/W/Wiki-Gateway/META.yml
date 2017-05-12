@@ -1,0 +1,15 @@
+name: Wiki-Gateway
+version: 0.001991
+abstract: API for interaction with wikis
+author: Bayle Shanks
+license: perl
+distribution_type: module
+build_requires:
+  Test::Unit: 0
+requires:
+  Inline::Python: 0
+no_index:
+  directory:
+    - t
+    - inc
+generated_by: Module::Install version 0.35

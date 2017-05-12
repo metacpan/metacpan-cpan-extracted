@@ -1,0 +1,203 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Realm::RealmBase - internal realm base clas</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Realm::RealmBase - internal realm base clas</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::Realm</STRONG>. Subclasses should
+implement <A HREF="#item_getName"><CODE>getName()</CODE></A>, <A HREF="#item_getPassword"><CODE>getPassword()</CODE></A>, and <A HREF="#item_getPrincipal"><CODE>getPrincipal()</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Realm::RealmBase</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAlgorithm"><CODE>getAlgorithm()</CODE></A></STRONG><BR>
+<DD>
+Return the digest algorithm used for authenticating credentials. If no
+algorithm is specified, credentials will be used as submitted.
+<P></P>
+<DT><STRONG><A NAME="item_setAlgorithm"><CODE>setAlgorithm($algorithm)</CODE></A></STRONG><BR>
+<DD>
+Set the digest algorithm used for authenticating
+credentials. Supported algorithms include: MD5, SHA1, HMAC, MD2, and
+anything else provided by the <EM>Digest</EM> library.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24algorithm">$algorithm</A></STRONG><BR>
+<DD>
+the digest algorithm
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container associated with this Realm.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container associated with this Realm.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> associated with this Realm
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_authenticate">authenticate ($username, $credentials)</A></STRONG><BR>
+<DD>
+Return the Principal associated with the specified username and
+credentials, if there is one, or <CODE>undef</CODE> otherwise.
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24username">$username</A></STRONG><BR>
+<DD>
+username of the principal to be looked up
+<P></P>
+<DT><STRONG><A NAME="item_%24credentials">$credentials</A></STRONG><BR>
+<DD>
+password or other credentials to use in authenticating this username
+<P></P></DL>
+<DT><STRONG><A NAME="item_hasRole">hasRole($principal, $role)</A></STRONG><BR>
+<DD>
+Return true if the specified Principal has the specified security
+role within the context of this Realm, or false otherwise.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Realm::Genericrincipal</STRONG> for whom the role is to be
+checked
+<P></P>
+<DT><STRONG><A NAME="item_%24role">$role</A></STRONG><BR>
+<DD>
+the name of the security role to be checked
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_digest"><CODE>digest()</CODE></A></STRONG><BR>
+<DD>
+Digest a submitted password using the configured algorithm and convert
+the result to a corresponding hexadecimal string. If an exception is
+thrown, the plain credentials string is returned.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$credentials</STRONG><BR>
+<DD>
+the password or other credentials to use in authentication
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return a short name for this Realm implementation. Must be overridden
+by subclasses.
+<P></P>
+<DT><STRONG><A NAME="item_getPassword"><CODE>getPassword($username)</CODE></A></STRONG><BR>
+<DD>
+Return the password associated with the given Principal's user
+name. Should be overridden by subclasses.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$username</STRONG><BR>
+<DD>
+the username of the Principal
+<P></P></DL>
+<DT><STRONG><A NAME="item_getPrincipal"><CODE>getPrincipal($username)</CODE></A></STRONG><BR>
+<DD>
+Return the Principal associated with the given user name. Should be
+overridden by subclasses.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$username</STRONG><BR>
+<DD>
+the username of the Principal
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this Realm. This method should be called
+before any of the public methods of the Realm are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the Realm has already been started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this Realm. Once this method
+has been called, no public methods of the Realm should be
+utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the Realm is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>Digest</EM>,
+<A HREF="../../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../../api/Wombat/Exception.html">the Wombat::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Realm.html">the Wombat::Realm manpage</A>,
+<A HREF="../../../api/Wombat/Realm/GenericPrincipal.html">the Wombat::Realm::GenericPrincipal manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,11 @@
+TODO for WWW::FetchStory
+========================
+1. add more tests
+2. add category-parsing to other fetchers
+3. enable Fetcher to grab EPUB files directly from Gutenberg and update their metadata
+4. fix fetching of EPUB from AO3
+5. fix bug Ashwinder characters are coming out as ARRAY
+6. fix docs bug - explain about the HTML parsing error messages
+7. add Published and Updated metadata
+8. enable Fetcher to grab image files and add them to EPUB generation
+

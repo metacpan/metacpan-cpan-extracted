@@ -1,0 +1,5 @@
+TODO list for Perl module Win32::PEFile-0.7004
+
+- add more resource accessors - what do you suggest?
+- allow editing of the PE file to authenticode sign it would be nice
+- allow other editing operations - what do you suggest?

@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW::Tumblr::ThemeParser
+
+0.02  Sun Jan 24 10:42:00 2010
+        - added Class::Accessor::Fast as a prereq.
+
+0.01  Tue Dec  8 10:11:31 2009
+        - original version

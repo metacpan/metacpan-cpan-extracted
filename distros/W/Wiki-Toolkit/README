@@ -1,0 +1,86 @@
+NAME
+    Wiki::Toolkit - A toolkit for building Wikis.
+
+DESCRIPTION
+    Helps you develop Wikis quickly by taking care of the boring bits
+    for you.  You will still need to write some code - this isn't an
+    instant Wiki.
+
+    Wiki::Toolkit used to be called CGI::Wiki.
+
+SEE ALSO
+    Tom Insam's Wiki::Toolkit::Kwiki is however an instant wiki, running
+    on a Wiki::Toolkit backend.
+
+SYNOPSIS
+
+      # Set up a wiki object with an SQLite storage backend, and an
+      # inverted index/DB_File search backend.  This store/search
+      # combination can be used on systems with no access to an actual
+      # database server.
+
+      my $store     = Wiki::Toolkit::Store::SQLite->new(
+          dbname => "/home/wiki/store.db" );
+      my $indexdb   = Search::InvertedIndex::DB::DB_File_SplitHash->new(
+          -map_name  => "/home/wiki/indexes.db",
+          -lock_mode => "EX" );
+      my $search    = Wiki::Toolkit::Search::SII->new(
+          indexdb => $indexdb );
+
+      my $wiki      = Wiki::Toolkit->new( store     => $store,
+                                      search    => $search );
+
+
+MAJOR METHODS
+
+    write_node
+          $wiki->write_node($node_name, $content, $checksum);
+          $wiki->write_node(
+              "Calthorpe Arms",
+              "A rather nice pub on Gray's Inn Road",
+              $checksum,
+              { category => [ "Pub", "Pub Food", "Bloomsbury" ] }
+          );
+
+    format
+          my $cooked = $wiki->format($raw);
+
+    delete_node
+          $wiki->delete_node($node_name);
+
+    list_all_nodes
+          my @node_names = $wiki->list_all_nodes;
+
+    list_backlinks
+          my @links_to_me = $wiki->list_backlinks($node_name);
+
+    list_nodes_by_metadata
+          my @pubs = $wiki->list_nodes_by_metadata(
+              metadata_type  => "category",
+              metadata_value => "Pub" );
+
+    list_recent_changes
+          my @last_week_edits  = $wiki->list_recent_changes( days => 7 );
+          my @last_ten_changes = $wiki->list_recent_changes(
+                                                  last_n_changes => 10 );
+
+    node_exists
+          print "Got wombats" if $wiki->node_exists("Wombats");
+
+    retrieve_node
+          my $homepage_content = $wiki->retrieve_node("Home Page");
+
+          my %node_data = $wiki->retrieve_node( $node_name );
+          print "Last Modified:    $node_data{last_modified}\n";
+          print "Current Version:  $node_data{version}\n";
+          print "Current Checksum: $node_data{checksum}\n";
+          print "Current Content:  $node_data{content}\n";
+          print "Categories:       "
+              . join(", ", @{$node_data{metadata}{category}}) . "\n";
+
+    verify_checksum
+          my $as_i_left_it = $wiki->verify_checksum( $node_name, $checksum );
+
+    search_nodes
+          my @nodes = $search->nodes( "camel" );
+

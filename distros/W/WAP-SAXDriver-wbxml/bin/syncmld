@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use XML::SAX::Writer;
+use WAP::SAXDriver::wbxml;
+
+my %opts;
+getopts('b', \%opts);
+
+my $path = $INC{'WAP/SAXDriver/wbxml.pm'};
+$path =~ s/wbxml\.pm$//i;
+$path .= 'syncml.wbrules2.pl';
+
+my $consumer = new XML::SAX::Writer::StringConsumer();
+my $handler = new XML::SAX::Writer(Writer => 'MyWriterXML',
+                                   Output => $consumer);
+my $error = new MyErrorHandler();
+my $parser = new WAP::SAXDriver::wbxml(Handler => $handler,
+                                       ErrorHandler => $error,
+                                       RulesPath => $path);
+
+my $file = $ARGV[0];
+die "No input.\n"
+        unless ($file);
+my $io = new IO::File($file, 'r');
+die "Can't open $file ($!).\n"
+        unless (defined $io);
+binmode $io, ':raw';
+my $out = $ARGV[1];
+if ($out) {
+    open STDOUT, '>', $out
+            or die "can't open $out ($!).\n";
+}
+
+my $doc = $parser->parse(
+        Source      => {ByteStream => $io}
+);
+
+if ($opts{b}) {
+    print beautify(${$consumer->finalize()});
+}
+else {
+    print ${$consumer->finalize()};
+}
+
+sub beautify {
+    my $out = q{};
+    my @tab;
+    foreach (split /(<[^>']*(?:'[^']*'[^>']*)*>)/, shift) {
+        next unless ($_);
+        pop @tab if (/^<\//);
+        $out .= "@tab$_\n";
+        push @tab, '  ' if (/^<[^\/?!]/ and /[^\/]>$/);
+    }
+    return $out;
+}
+
+package MyErrorHandler;
+
+sub new {
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    return bless {}, $class;
+}
+
+sub fatal_error {
+    my $self = shift;
+    my ($hash) = @_;
+    die __PACKAGE__,": Fatal error\n\tat position $hash->{BytePosition}.\n";
+}
+
+sub error {
+    my $self = shift;
+    my ($hash) = @_;
+    warn __PACKAGE__,": Error: $hash->{Message}\n\tat position $hash->{BytePosition}\n";
+}
+
+sub warning {
+    my $self = shift;
+    my ($hash) = @_;
+    warn __PACKAGE__,": Warning: $hash->{Message}\n\tat position $hash->{BytePosition}\n";
+}
+
+package MyWriterXML;
+
+use base qw(XML::SAX::Writer::XML);
+
+sub characters {
+    my $self = shift;
+    my $data = shift;
+    $self->_output_element;
+
+    my $char = $data->{Data};
+    my $first = ord $char;
+    if ($first <= 03) {
+        # WBXML inner
+        my $consumer = new XML::SAX::Writer::StringConsumer();
+        my $handler = new XML::SAX::Writer(Output => $consumer);
+        my $error = new MyErrorHandler();
+        my $parser = new WAP::SAXDriver::wbxml(Handler => $handler, ErrorHandler => $error, RulesPath => $main::path);
+
+        my $doc = $parser->parse(
+                Source      => {String => $char}
+        );
+
+        if ($main::opts{b}) {
+            $char = '<![CDATA[' . main::beautify(${$consumer->finalize()}) . ']]>';
+        }
+        else {
+            $char = '<![CDATA[' . ${$consumer->finalize()} . ']]>';
+        }
+    }
+    else {
+        if ($self->{InCDATA}) {
+            # we must scan for ]]> in the CDATA and escape it if it
+            # is present by close--opening
+            # we need to have buffer text in front of this...
+            $char = join ']]>]]&lt;<![CDATA[', split ']]>', $char;
+        }
+        else {
+            $char = $self->escape($char);
+        }
+    }
+    $char = $self->{Encoder}->convert($char);
+    $self->{Consumer}->output($char);
+}
+
+__END__
+
+=head1 NAME
+
+syncmld - SyncML Disassembler
+
+=head1 SYNOPSYS
+
+syncmld [B<-b>] I<file>
+
+=head1 OPTIONS
+
+=over 8
+
+=item -b
+
+Beautify
+
+=back
+
+=head1 DESCRIPTION
+
+B<syncmld> is derived from B<wbxmld>.
+
+WAP Specifications, including Binary XML Content Format (WBXML)
+ are available on E<lt>http://www.wapforum.org/E<gt>.
+
+SyncML Specifications are available on E<lt>http://www.syncml.org/E<gt>.
+
+=head1 SEE ALSO
+
+WAP::SAXDriver::wbxml, WAP::wbxml, wbxmlc, wbxmld
+
+=head1 AUTHOR
+
+Francois PERRAD, francois.perrad@gadz.org
+
+=cut
+

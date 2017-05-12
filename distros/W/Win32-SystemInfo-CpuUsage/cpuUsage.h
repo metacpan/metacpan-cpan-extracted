@@ -1,0 +1,3 @@
+int
+getCpuUsage( int interval
+		   );

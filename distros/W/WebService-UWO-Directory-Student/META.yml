@@ -1,0 +1,30 @@
+---
+name: WebService-UWO-Directory-Student
+version: 1.004
+author:
+  - 'Jonathan Yu <jawnsy@cpan.org>'
+abstract: "Perl module for searching the UWO\r\nstudent directory"
+license: unrestricted
+build_requires:
+  Test::NoWarnings: 0.084
+requires:
+  HTML::Entities: 0
+  LWP::UserAgent: 0
+  Test::More: 0.62
+  perl: 5.006
+configure_requires:
+  Module::Build: 0.35
+dynamic_config: 0
+provides:
+  WebService::UWO::Directory::Student:
+    file: lib/WebService/UWO/Directory/Student.pm
+    version: 1.004
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+resources:
+  Ratings: http://cpanratings.perl.org/d/WebService-UWO-Directory-Student
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-UWO-Directory-Student
+  license: http://edwardsamuels.com/copyright/beyond/articles/public.html
+  repository: http://svn.ali.as/cpan/trunk/WebService-UWO-Directory-Student

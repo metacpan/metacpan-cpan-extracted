@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WWW/Dictionary.pm
+t/00-load.t
+t/01-class_and_methods.t
+t/02-basic.t
+t/live/03-live.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+dictionary

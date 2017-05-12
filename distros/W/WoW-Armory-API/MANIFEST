@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WoW/Armory/API.pm
+lib/WoW/Armory/Class.pm
+lib/WoW/Armory/Class/Character.pm
+lib/WoW/Armory/Class/Guild.pm
+lib/WoW/Armory/Class/RealmStatus.pm
+lib/WoW/Armory/Class/Time.pm
+t/api.t
+t/json.t
+t/json/char.json
+t/json/guild.json
+t/json/status.json
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

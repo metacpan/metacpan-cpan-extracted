@@ -1,0 +1,16 @@
+Revision history for Win32-ErrorMode
+
+0.05      2016-05-06 07:52:59 -0400
+  - Add support for MSYS2
+
+0.04      2015-03-03 15:27:47 -0500
+  - Microsoft Visual C++ compatability
+
+0.03      2015-02-19 19:43:04 -0500
+  - Additional diagnostic
+
+0.02      2015-02-19 15:36:27 -0500
+  - use stdcall for windows API functions
+
+0.01      2015-02-19 14:53:45 -0500
+  - initial version

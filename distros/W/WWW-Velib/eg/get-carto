@@ -1,0 +1,31 @@
+#! /usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use XML::Twig;
+use LWP::Simple;
+
+my %station;
+
+my $t = XML::Twig->new(
+    twig_handlers => {
+        marker => sub {
+            my $att = $_->{att};
+            $station{$att->{name}} = {
+                map {($_ => $att->{$_})}
+					qw(number name address fullAddress lat lng open)
+            };
+        }
+    },
+);
+
+my $content = get('http://www.velib.paris.fr/service/carto')
+    or die "cannot fetch carto details\n";
+$t->parse($content);
+
+my $out;
+open $out, '>', 'carto.xml' and print $out $content;
+
+use YAML;
+print Dump(\%station);

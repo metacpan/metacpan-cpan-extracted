@@ -1,0 +1,10 @@
+Revision history for WebService::Qiita
+
+0.04    Thu Oct 17 19:09:11 2012
+        - fix dependencies
+0.03    Thu Oct 14 20:00:21 2012
+        - fix bug
+0.02    Thu Oct 14 20:00:21 2012
+        - fix bug
+0.01    Thu Oct 14 15:13:29 2012
+        - first version

@@ -1,0 +1,2 @@
+GET https://landfill.bugzilla.org/bugzilla-4.2-branch/
+

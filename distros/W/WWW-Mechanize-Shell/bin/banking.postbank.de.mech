@@ -1,0 +1,16 @@
+autofill TAN Keep
+autofill SUBMITPATTERN Keep
+get "https://banking.postbank.de/anfang.jsp"
+value Kontonummer 9999999999
+value PIN 11111
+value FUNCTION ACCOUNTSTATEMENT
+value TAN ""
+value SUBMITPATTERN ""
+fill
+click LOGIN
+value CHOICE COMPLETE
+click SUBMIT
+forms
+form 3
+click DOWNLOAD
+history

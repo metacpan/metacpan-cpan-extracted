@@ -1,0 +1,37 @@
+WWW-Formspring version 0.03
+===========================
+
+This Perl module is to facilitate development of Perl application
+for the popular social networking website www.formspring.me
+
+Currently it uses the beta API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  LWP::UserAgent
+  Moose
+  Net::OAuth
+  URI
+  XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by William Orr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

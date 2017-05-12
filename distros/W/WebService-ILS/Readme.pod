@@ -1,0 +1,151 @@
+=head1 NAME
+
+WebService::ILS - Standardised library discovery/circulation services
+
+=head1 SYNOPSIS
+
+    use WebService::ILS::<Provider Subclass>;
+    my $ils = WebService::ILS::<Provider Subclass>->new({
+        client_id => $client_id,
+        client_secret => $client_secret
+    });
+    my %search_params = (
+        query => "Some keyword",
+        sort => "rating",
+    );
+    my $result = $ils->search(\%search_params);
+    foreach (@{ $result->{items} }) {
+        ...
+    }
+    foreach (2..$result->{pages}) {
+        $search_params{page} = $_;
+        my $next_results = $ils->search(\%search_params);
+        ...
+    }
+
+    or
+
+    my $native_result = $ils->native_search(\%native_search_params);
+
+=head1 DESCRIPTION
+
+WebService::ILS is an attempt to create a standardised interface for
+online library services providers.
+
+In addition, native API interface is provided.
+
+Here we will describe constructor parameters and methods common to all
+service providers. Diversions and native interfaces are documented
+in corresponding modules.
+
+=head2 Supported service providers
+
+=over 4
+
+=item B<WebService::ILS::OverDrive::Library>
+
+OverDrive Library API L<https://developer.overdrive.com/discovery-apis>
+
+=item B<WebService::ILS::OverDrive::Patron>
+
+OverDrive Circulation API L<https://developer.overdrive.com/circulation-apis>
+
+=back
+
+=head1 TESTING ENVIRONMENT
+
+Testing C<WebService::ILS> modules is extremely difficult. It requires
+test accounts with vendors, sometimes special setup for handling
+redirect URLs.
+
+In that respect for building purposes, all tests are skipped by default.
+If you want to run tests for vendor specific modules during the build,
+you need to set the corresponding WEBSERVICE_ILS_TEST_* env vars to true,
+and supply values in vendor specific env vars. Those vendor specific vars
+correspond to L<CONSTRUCTOR> params.
+
+=head1 TESTING OverDrive API
+
+=over 4
+
+=item B<WEBSERVICE_ILS_TEST_OVERDRIVE_LIBRARY>
+
+When set to true turns on tests from t/overdrve_library.t, which test
+C<WebService::ILS::OverDrive::Library> module
+
+=item B<WEBSERVICE_ILS_TEST_OVERDRIVE_PATRON>
+
+When set to true turns on tests from t/overdrve_patron.t, which test
+C<WebService::ILS::OverDrive::Patron> module
+
+=item B<WEBSERVICE_ILS_TEST_OVERDRIVE_AUTH>
+
+When set to true turns on tests from t/overdrve_auth.t, which test
+OverDrive Granted (3-legged) authentication mechanism. It is separated
+because of the challenges it presents
+
+=back
+
+=head2 OverDrive account vars
+
+=over 4
+
+=item B<OVERDRIVE_TEST_CLIENT_ID>
+
+=item B<OVERDRIVE_TEST_CLIENT_SECRET>
+
+=item B<OVERDRIVE_TEST_LIBRARY_ID>          library and auth
+
+=item B<OVERDRIVE_TEST_WEBSITE_ID>          patron only
+
+=item B<OVERDRIVE_TEST_AUTHORIZATION_NAME>  patron only
+
+=item B<OVERDRIVE_TEST_USER_ID>             patron only
+
+=item B<OVERDRIVE_TEST_USER_PASSWORD>       patron only
+
+=item B<OVERDRIVE_TEST_AUTH_REDIRECT_URL>   auth only
+
+=head1 TESTING OneClickDigital API
+
+=over 4
+
+=item B<WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PARTNER>
+
+When set to true turns on tests from t/oneclickdigital.t, which test
+C<WebService::ILS::OneClickDigital::Partner> and
+C<WebService::ILS::OneClickDigital::PartnerPatron> modules
+
+=item B<WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PATRON>
+
+When set to true turns on tests from t/oneclickdigital.t, which test
+C<WebService::ILS::OneClickDigital::Patron> module
+
+=item B<WEBSERVICE_ILS_TEST_ONECLICKDIGITAL>
+
+When set to true turns on all tests from t/overdrve_auth.t.
+Same as C<WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PARTNER> and
+C<WEBSERVICE_ILS_TEST_ONECLICKDIGITAL_PATRON> both set to true.
+
+=back
+
+=head2 OneClickDigital account vars
+
+=over 4
+
+=item B<ONECLICKDIGITAL_TEST_CLIENT_SECRET>
+
+=item B<ONECLICKDIGITAL_TEST_LIBRARY_ID>
+
+=item B<ONECLICKDIGITAL_TEST_USER_ID>             patron only
+
+=item B<ONECLICKDIGITAL_TEST_USER_PASSWORD>       patron only
+
+=item B<ONECLICKDIGITAL_TEST_USER_EMAIL>          partner only
+
+=item B<ONECLICKDIGITAL_TEST_USER_BARCODE>        partner only
+
+=back
+
+Only one of C<ONECLICKDIGITAL_TEST_USER_EMAIL> (preferred) and
+C<ONECLICKDIGITAL_TEST_USER_BARCODE> needs to be supplied.

@@ -1,0 +1,13 @@
+Revision history for Perl module WWW::Page
+
+2.2	25 January 2009
+	Co-update with File::Cache::Persistent and XSLT::Cache
+
+2.02	18 January 2009
+	Caching XML documents with page descriptions
+	Caching XSLT documents
+	Example for mod_perl application
+
+1.0	30 December 2007
+	Initial release
+	CGI-application example

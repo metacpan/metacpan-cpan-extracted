@@ -1,0 +1,8 @@
+Revision history for Perl extension Win32::NetSend
+
+0.2  07 Jan 2003
+	- correct version number of Win32::API
+
+0.1  15 Dec 2002
+	- original version
+

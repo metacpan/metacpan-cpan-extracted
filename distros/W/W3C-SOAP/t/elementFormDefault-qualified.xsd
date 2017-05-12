@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema
+    elementFormDefault="qualified"
+    targetNamespace="http://www.example.com/qualified"
+    xmlns:un="http://www.example.com/unqualified"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:import
+        namespace="http://www.example.com/unqualified"
+        schemaLocation="t/elementFormDefault-unqualified.xsd"
+        />
+
+    <xsd:element name="reProcessRecord">
+        <xsd:complexContent>
+           <xsd:extension base="un:processRecord">
+                <xsd:sequence>
+                    <xsd:element name="billingId" type="xsd:string" />
+                </xsd:sequence>
+           </xsd:extension>
+        </xsd:complexContent>
+    </xsd:element>
+</xsd:schema>

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               WWW-NZPost-Tracking
+version:            0.01
+abstract:           Perl interface to the New Zealand Post tracking service
+author:
+    - Michael Aquilina <aquilina@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    Moose: 0
+    JSON: 0
+    LWP::UserAgent: 0
+    Carp: 0
+build_requires:
+    Moose: 0
+    JSON: 0
+    LWP::UserAgent: 0
+    Carp: 0
+no_index:
+    directory:
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+

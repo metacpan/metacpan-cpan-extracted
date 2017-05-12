@@ -1,0 +1,90 @@
+Build.PL				# Module::Build controller
+ChangeLog
+ChangeLog.xml
+Makefile.PL				# MakeMaker file
+MANIFEST				# This file
+MANIFEST.SKIP				# Things to not package
+README
+etc/ChangeLogML.xsd			# XML schema for ChangeLog.xml
+lib/WebService/ISBNDB.pm		# Code classes from here down
+lib/WebService/ISBNDB/Agent.pm
+lib/WebService/ISBNDB/Agent/REST.pm
+lib/WebService/ISBNDB/API/Authors.pm
+lib/WebService/ISBNDB/API/Books.pm
+lib/WebService/ISBNDB/API/Categories.pm
+lib/WebService/ISBNDB/API.pm
+lib/WebService/ISBNDB/API/Publishers.pm
+lib/WebService/ISBNDB/API/Subjects.pm
+lib/WebService/ISBNDB/Iterator.pm
+t/00_load.t				# Unit tests from here on down.
+t/00_signature.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/05_api_baseclass.t
+t/07_agent_baseclass.t
+t/10_categories.t
+t/20_publishers.t
+t/30_subjects.t
+t/40_authors.t
+t/50_books.t
+t/60_iterator.t
+t/DUMMY.pm				# Agent stub used to read from files
+t/testing.key                           # API key used just for testing
+t/util.pl                               # Functions shared by test suites
+t/xml/Authors-person_id=kulchenko_pavel.xml
+t/xml/Authors-person_id=poe_edgar_allan.xml
+t/xml/Authors-person_id=ray_randy_j.xml
+t/xml/Books-book_id=programming_web_services_with_perl.xml
+t/xml/Books-isbn=0596002068.xml
+t/xml/Books-page_number=10-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=11-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=12-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=13-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=14-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=15-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=16-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=17-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=18-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=19-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=2-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=20-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=21-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=22-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=23-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=24-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=25-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=26-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=3-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=4-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=5-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=6-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=7-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=8-person_id=poe_edgar_allan.xml
+t/xml/Books-page_number=9-person_id=poe_edgar_allan.xml
+t/xml/Books-person_id=poe_edgar_allan.xml
+t/xml/Categories-category_id=alphabetically.authors.r.a.y.xml
+t/xml/Categories-category_id=alphabetically.publishers.o.r.xml
+t/xml/Categories-category_id=computers.programming.languages.perl.xml
+t/xml/Categories-category_id=science.astronomy.xml
+t/xml/Categories-category_id=science.biology.xml
+t/xml/Categories-category_id=science.botany.xml
+t/xml/Categories-category_id=science.chemistry.xml
+t/xml/Categories-category_id=science.computer_science.xml
+t/xml/Categories-category_id=science.earth_sciences.xml
+t/xml/Categories-category_id=science.economics.xml
+t/xml/Categories-category_id=science.geography.xml
+t/xml/Categories-category_id=science.mathematics.xml
+t/xml/Categories-category_id=science.mineralogy.xml
+t/xml/Categories-category_id=science.paleontology.xml
+t/xml/Categories-category_id=science.philosophy.xml
+t/xml/Categories-category_id=science.physics.xml
+t/xml/Categories-category_id=science.political_science.xml
+t/xml/Categories-category_id=science.psychology.xml
+t/xml/Categories-category_id=science.social_sciences.xml
+t/xml/Categories-category_id=science.sociology.xml
+t/xml/Categories-category_id=science.xml
+t/xml/Publishers-publisher_id=oreilly.xml
+t/xml/Subjects-subject_id=internet_programming.xml
+t/xml/Subjects-subject_id=perl_computer_program_language.xml
+META.yml
+SIGNATURE    Added here by Module::Build

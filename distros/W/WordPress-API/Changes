@@ -1,0 +1,53 @@
+2008-07-26 18:20  cvs
+
+	* Changes: Changes file added
+
+2008-07-26 18:18  cvs
+
+	* lib/WordPress/: API/Page.pm, API/Post.pm, Base/Date.pm: Added
+	  some documentation explaining dateCreated() using Date::Manip.
+	  Cleaned up WordPress::Base::Date.
+
+2008-06-20 09:21  cvs
+
+	* MANIFEST, Makefile.PL, README, lib/WordPress/API.pm,
+	  lib/WordPress/API/Category.pm, lib/WordPress/API/Page.pm,
+	  lib/WordPress/API/Post.pm, lib/WordPress/Base/Date.pm,
+	  t/07_WordPress-API-Category.t, t/20_WordPress-Base-Date.t:
+	  cleaning up for distro.
+
+2008-04-14 00:18  cvs
+
+	* t/: 33_data_structures.t, 44_date_posting_test.t: fixed
+	  dateCreated() setget method for page and post
+
+2008-02-05 00:53  cvs
+
+	* MANIFEST, Makefile.PL, t/01.t, t/02_MediaObject.t,
+	  t/02_MediaObject_2.t, t/gencode.pl, t/image.jpg, t/image2.jpg,
+	  t/test.pl, t/wppost, bin/wppost, lib/WordPress/API.pm,
+	  lib/WordPress/API/MediaObject.pm, lib/WordPress/API/Page.pm,
+	  lib/WordPress/API/Post.pm, lib/WordPress/Base/Content.pm,
+	  lib/WordPress/Base/Object.pm, lib/WordPress/Base/Text.pm,
+	  lib/WordPress/Base/Data/Author.pm,
+	  lib/WordPress/Base/Data/Category.pm,
+	  lib/WordPress/Base/Data/MediaObject.pm,
+	  lib/WordPress/Base/Data/Object.pm,
+	  lib/WordPress/Base/Data/Page.pm, lib/WordPress/Base/Data/Post.pm,
+	  t/saved.yml: Initial revision
+
+2008-02-05 00:53  cvs
+
+	* MANIFEST, Makefile.PL, t/01.t, t/02_MediaObject.t,
+	  t/02_MediaObject_2.t, t/gencode.pl, t/image.jpg, t/image2.jpg,
+	  t/test.pl, t/wppost, bin/wppost, lib/WordPress/API.pm,
+	  lib/WordPress/API/MediaObject.pm, lib/WordPress/API/Page.pm,
+	  lib/WordPress/API/Post.pm, lib/WordPress/Base/Content.pm,
+	  lib/WordPress/Base/Object.pm, lib/WordPress/Base/Text.pm,
+	  lib/WordPress/Base/Data/Author.pm,
+	  lib/WordPress/Base/Data/Category.pm,
+	  lib/WordPress/Base/Data/MediaObject.pm,
+	  lib/WordPress/Base/Data/Object.pm,
+	  lib/WordPress/Base/Data/Page.pm, lib/WordPress/Base/Data/Post.pm,
+	  t/saved.yml: init import
+

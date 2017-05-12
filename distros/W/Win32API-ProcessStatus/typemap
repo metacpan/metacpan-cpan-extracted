@@ -1,0 +1,98 @@
+BOOL		T_BOOL
+HANDLE		T_UV
+DWORD		T_UV
+HMODULE		T_UV
+CHAR*		T_PV
+WCHAR*		T_PWV
+DWORD*		T_AUV
+HMODULE*	T_AUV
+MODULEINFO	T_MODULEINFO
+
+#############################################################################
+INPUT
+T_BOOL
+	$var = null_arg($arg) || !SvTRUE($arg) ? ($type) 0 : looks_like_number($arg) ? ($type) SvIV($arg) : ($type) 1
+T_UV
+	$var = null_arg($arg) ? ($type) 0 : ($type) SvUV($arg)
+T_PV
+	$var = null_arg($arg) ? ($type) 0 : ($type) SvPV_nolen($arg)
+T_PWV
+	if (!null_arg($arg) && SvPOKp($arg)) {
+		size_t len;
+		CHAR* szString = SvPV($arg, len);
+		$var = ($type) malloc((len + 1) * sizeof($type*));
+		if (MultiByteToWideChar(CP_ACP, 0, szString, -1, $var, len + 1) == 0)
+			*$var = 0;
+	} else
+		$var = 0;
+T_AUV
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+		AV* av = (AV*) SvRV($arg);
+		I32 len = av_len(av);
+		I32 i;
+		$var = ($type) malloc((len + 1) * sizeof($type*));
+		for (i = 0; i < len; ++i)
+			$var [i] = ($type*) SvUV(*av_fetch(av, i, 0));
+	} else
+		$var = 0;
+T_MODULEINFO
+	if (!null_arg($arg) && SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) {
+		HV* hv = (HV*) SvRV($arg);
+		$var.lpBaseOfDll = (LPVOID) SvUV(*hv_fetch(hv, \"lpBaseOfDll\", 11, 0));
+		$var.SizeOfImage = (DWORD) SvUV(*hv_fetch(hv, \"SizeOfImage\", 11, 0));
+		$var.EntryPoint = (LPVOID) SvUV(*hv_fetch(hv, \"EntryPoint\", 10, 0));
+	}
+
+#############################################################################
+OUTPUT
+T_BOOL
+	if (!null_arg($arg) && !SvREADONLY($arg))
+		if ($var)
+			sv_setiv($arg, (IV) $var);
+		else
+			sv_setsv($arg, &PL_sv_no);
+T_UV
+	if (!null_arg($arg) && !SvREADONLY($arg))
+		sv_setuv($arg, (UV) $var);
+T_PV
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		if ($var != 0)
+			sv_setpv($arg, $var);
+		else
+			sv_setpv($arg, "");
+	}
+	if ($var != 0)
+		free($var);
+T_PWV
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		size_t len = wcslen($var);
+		if (len != 0) {
+			CHAR* szString = (CHAR*) _alloca(len + 1);
+			if (WideCharToMultiByte(CP_ACP, 0, $var, -1, szString, len + 1, 0, 0) == 0)
+				*szString = 0;
+			sv_setpv($arg, szString);
+		} else
+			sv_setpv($arg, "");
+	}
+	if ($var != 0)
+		free($var);
+T_AUV
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		AV* av = (AV*) sv_2mortal((SV*) newAV());
+		if (len_$var != 0) {
+			I32 i;
+			for (i = 0; i < len_$var; ++i)
+				av_store(av, i, newSVuv((UV) $var [i]));
+		}
+		sv_setsv($arg, (SV*) newRV((SV*) av));
+	}
+	if ($var != 0)
+		free($var);
+T_MODULEINFO
+	if (!null_arg($arg) && !SvREADONLY($arg)) {
+		HV* hv = (HV*) sv_2mortal((SV*) newHV());
+		hv_store(hv, \"lpBaseOfDll\", 11, newSVuv((UV) $var.lpBaseOfDll), 0);
+		hv_store(hv, \"SizeOfImage\", 11, newSVuv((UV) $var.SizeOfImage), 0);
+		hv_store(hv, \"EntryPoint\", 10, newSVuv((UV) $var.EntryPoint), 0);
+		sv_setsv($arg, (SV*) newRV((SV*) hv));
+	}

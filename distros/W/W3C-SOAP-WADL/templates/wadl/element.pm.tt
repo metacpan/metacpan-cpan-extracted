@@ -1,0 +1,90 @@
+[% PROCESS config.tt -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moose;
+use warnings;
+use version;
+use namespace::autoclean;
+use Data::Dumper qw/Dumper/;
+use MooseX::Types::Moose qw/Str HashRef/;
+use W3C::SOAP::Utils;
+use W3C::SOAP::WADL::Traits;
+
+extends 'W3C::SOAP::WADL::Element';
+
+our $VERSION = version->new('0.0.1');
+
+has _representations => (
+    is        => 'ro',
+    isa       => HashRef,
+    predicate => 'has_representations',
+    default   => sub {{
+[%- FOR representation IN representations.representation %]
+        '[% representation.media_type || 'text/plain' %]' => {},
+[%- END %]
+    }},
+);
+
+[%- FOR container IN params %]
+[%-     FOR param IN container.param %]
+[%-         name = param.name.replace('\W', '_', 'g') %]
+has [% name %] => (
+    is            => 'rw',
+    isa           => Str, # TODO Get type validation done
+    predicate     => 'has_[% name %]',
+    required      => [% param.required == 'true' ? 1 : 0 %],
+    documentation => '[% param.doc %]',
+    traits        => [qw{ W3C::SOAP::WADL }],
+    style         => '[% param.style %]',
+    real_name     => '[% param.name %]',
+);
+[%-     END %]
+[%- END %]
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] -
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+This WADL client code was extracted from L<[% location %]>;
+
+=head1 ATTRIBUTES
+
+=over 4
+[%- FOR container IN params %]
+[%-     FOR param IN container.param %]
+[%-         name = param.name.replace('\W', '_', 'g') %]
+
+=item [% name %]
+
+C<[% param.name %]> is [% IF param.required %]required [% END %] for the [% param.style %] parameter.
+[%-     END %]
+[%- END %]
+=back
+
+[% INCLUDE pod.tt -%]

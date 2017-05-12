@@ -1,0 +1,15 @@
+bin/mrest-cli
+Build.PL
+Changes
+config/CLI_Config.pm
+config/CLI_Message_en.conf
+config/CLI_MetaConfig.pm
+lib/Web/MREST/CLI.pm
+lib/Web/MREST/CLI/Parser.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README.rst
+t/001-noop.t

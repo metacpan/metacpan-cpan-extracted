@@ -1,0 +1,9 @@
+Revision history for WWW-RobotRules-Extended
+
+0.02    2011-12-24
+	improved documentation near by exported functions
+	if a robots.txt line is only "Disallow:", don't consider it as "Disallow: /"
+	
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

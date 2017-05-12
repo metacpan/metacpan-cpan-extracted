@@ -1,0 +1,34 @@
+---
+abstract: 'Simple wrapper around the Trello web service.'
+author:
+  - 'Robert Wohlfarth <rbwohlfarth@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+  Test::Pod: 1.44
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Trello-Lite
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Tiny: 0.022
+  IO::Socket::SSL: 1.74
+  Moose: 1.21
+  Net::SSLeay: 1.55
+  Role::REST::Client: 0.10
+  Role::REST::Client::Response: 0.10
+  URI::Escape: 3.30
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

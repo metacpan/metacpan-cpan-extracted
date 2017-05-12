@@ -1,0 +1,8 @@
+#!perl
+
+use strict;
+use warnings;
+use WWW::Shorten 'Googl';
+
+my $url = shift or die "Usage: $0 <url to shorten>";
+print makeashorterlink( $url ) . "\n";

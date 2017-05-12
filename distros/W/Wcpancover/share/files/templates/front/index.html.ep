@@ -1,0 +1,20 @@
+% layout 'default';
+% title 'Testpage Cpancover';
+
+<div class="container">                                 
+<div class="row">
+<div class="span12"> 
+
+<h2>Testpage for Cpancover</h2>
+
+<p>It works!</p>
+
+<p><a href="/serverinfo">Serverinfo</a></p>
+
+
+<p>Hi and Ho</p>
+
+
+</div>
+</div>
+</div>

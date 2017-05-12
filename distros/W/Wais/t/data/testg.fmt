@@ -1,0 +1,129 @@
+#                               -*- Mode: Sh -*- 
+# test.fmt -- 
+# ITIID           : $ITI$ $Header $__Header$
+# Author          : Ulrich Pfeifer
+# Created On      : Fri Oct  6 13:27:35 1995
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Sun Apr 21 21:52:13 1996
+# Language        : FMW
+# Update Count    : 26
+# Status          : Unknown, Use with caution!
+# 
+# (C) Copyright 1995, Universität Dortmund, all rights reserved.
+# 
+# $Locker:  $
+# $Log: testg.fmt,v $
+# Revision 1.1  1997/02/14 15:04:30  pfeifer
+# Sources for the two test databases.
+#
+# Revision 2.2  1997/02/04 17:10:42  pfeifer
+# Switched to CVS
+#
+# Revision 2.0.1.5  1996/04/29 15:41:12  pfeifer
+# patch66: Fixed region end for numeric indexing.
+#
+# Revision 2.0.1.4  1995/11/17  14:50:38  pfeifer
+# patch52: Indexing for py was erroneous.
+#
+# Revision 2.0.1.3  1995/11/03  09:46:15  pfeifer
+# patch43: Fixed off-by-one bug in headlines.
+# patch43: Fixed off-by-one bug in skip expressions.
+#
+# Revision 2.0.1.2  1995/10/16  12:29:24  pfeifer
+# patch38:
+#
+# Revision 2.0.1.1  1995/10/06  17:19:55  pfeifer
+# patch24: The format description demonstrated now the use of the date
+# patch24: field. Also a new syntax without the nasty '<...>' is
+# patch24: shown. Added some hopefully useful comments.
+#
+# 
+
+# Remember: indexing and matching is done line by line. Each regular
+# expression can match one line maximum.
+
+# This regular expression should match the line separating documents.
+# The matching line is NOT indexed!  Use /\n\n/ if each file contains
+# only one record.
+
+record-sep: /\f/    # formfeed (alias for \L)
+
+# Now we specify how the headline is constructed.  The date is part of
+# the headline and not searchable.
+layout:
+
+# First me map the regions starting with /^PY: / up to (and excluding)
+# the next /^[A-Z][A-Z]:/ skipping everything from the beginning up after
+# the end of /^PY: */ to the first 4 characters of the headline.
+
+  headline: /^PY: / /^[A-Z][A-Z]:/ 4 /^PY: */
+  headline: /^AU: / /^[A-Z][A-Z]:/ 20 /AU: */
+  headline: /^TI: / /^[A-Z][A-Z]:/ 40 /TI: */
+
+# The date is found on lines matching /^ED: /. The line is kipped up
+# to the end of /^ED: *./. The line is handled to scanf with format
+# string "%d.%d.%d". Day, month, and year are expected in this
+# order. Month may be a string containing the 3 letter abreviation for
+# the name of the month. In this case the keyword "string" must follow
+# "month"
+
+  date: /^ED: / /%d.%d.%d/ day month year /^ED: *./
+
+# Now we define the first region. It starts at /^CK:/. everything up
+# after the end of /^CK: */ is skipped. Region ends at
+# /^[A-Z][A-Z]:/. The match for end is search BEHIND the match for the
+# begin.
+region: /^CK:/ /^CK: */
+
+# All words are transfered in the 'ck' index and the global
+# index. Description of 'ck' is overwritten by "Citation Code".
+
+ck "Citation Code" TEXT BOTH
+end: /^[A-Z][A-Z]:/
+
+# All words in this region will be numeric. They are merge in the 'py'
+# index which will be tagged as nummeric from here on (thats not how
+# it should be - I know). Make sure that you do not pollute 'ck' in
+# the following with non-numeric data.  The "numeric" keyword has it's
+# own skip expression /^PY: [^ ]/ which overwrites the region skip
+# expression. This way you can index the same region nonnumeric (This
+# not ...).
+
+region: /^PY: / /^PY: */
+py "Publication Year" numeric /^[^0-9]*/ 4 TEXT LOCAL
+end: /[^0-9]/
+
+# This region will be indexed plain for the global index and the 'au'
+# index. The 'au' index will also contain the soundex codes for the
+# words.
+
+region: /^AU: / /^AU: */
+au "Author" SOUNDEX LOCAL TEXT BOTH
+end: /^[A-Z][A-Z]:/
+
+# All words in theis reagion will be stemmend before insertion in the
+# global and the 'ti' index'
+
+region: /^TI: / /^TI: */
+ti "Title" stemming TEXT BOTH
+end: /^[A-Z][A-Z]:/
+
+# This region is indexed for multiple local and the global index.
+# Stemming applies for the 'ti' index and the global index.
+
+region: /^JT: / /^JT: */
+jt "Journal Title" ti stemming TEXT BOTH
+end: /^[A-Z][A-Z]:/
+
+# Here we make the data searchable. Format is merely the same as in
+# the layout section. There is no local skip expression. That wasnt a
+# good idea for numerics anyway. The date can be search with the
+# yymmdd format. See test DATE.
+
+region: /^ED: / /^ED: */
+ed "Date of insertion" <date> /%d.%d.%d/ day month year TEXT LOCAL
+end: /$/
+
+region: /^JT: / /^JT: */
+TEXT GLOBAL
+end: /^[A-Z][A-Z]:/

@@ -1,0 +1,23 @@
+$Id: BUGS,v 1.1 2008/11/13 20:49:03 395502 Exp $
+
+RTS# FTD2XX-1.02-01
+-------------------
+Description:
+There is currently no way to free and reopen an FT_HANDLE through the
+FTD2XX object after a CyclePort() operation, without DESTROYING the whole
+object and reinstanciating.
+
+Status: 
+Complete
+
+Patch Detail:
+Modified P5FTD2XX.DLL PFT_CyclePort() interface to properly release the
+trashed FT_HANDLE. However, the inherent behavior of the device after a
+CyclePort requires a wait period of 4-8 seconds, depending on your system,
+for the device to recover. Any API call that talks directly to a device,
+like GetSerialByIndex(), will fail with FT_INVALID_HANDLE if the application
+doesn't take the wait period into account. This was not done in the API Method
+so as not to block the main perl thread during the recovery time. Other bus
+manipulating API calls like Rescan() also seem to require this restabilization
+period.
+

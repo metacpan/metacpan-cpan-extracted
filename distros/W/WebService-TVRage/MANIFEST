@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-TVRage.t
+lib/WebService/TVRage.pm
+lib/WebService/TVRage/EpisodeList.pm
+lib/WebService/TVRage/EpisodeListRequest.pm
+lib/WebService/TVRage/Episode.pm
+lib/WebService/TVRage/ShowList.pm
+lib/WebService/TVRage/Show.pm
+lib/WebService/TVRage/ShowSearchRequest.pm
+META.yml                                 Module meta-data (added by MakeMaker)

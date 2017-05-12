@@ -1,0 +1,437 @@
+
+=head1 NAME
+
+Win32::GUI::TabStrip - Create and manipulate tab strip controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new TabStrip object;
+can also be called as PARENT->AddTabStrip(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -alignright=> 0/1 (default 0)
+  -bottom    => 0/1 (default 0)
+  -buttons   => 0/1 (default 0)
+    if enabled items look like push buttons
+  -hottrack  => 0/1 (default 0)
+  -imagelist => Win32::GUI::ImageList object
+  -justify   => 0/1 (default 0)
+  -forceiconleft => 0/1 (default 0)
+  -forcelabelleft => 0/1 (default 0)
+  -fixedwidth => 0/1 (default 0)
+  -focusbottondown => 0/1 (default 0)
+  -focusnever => 0/1 (default 0)
+  -flat      => 0/1 (default 0)
+  -flatseparator => 0/1 (default 0)
+  -raggedright => 0/1 (default 0)
+  -multiline => 0/1 (default 0)
+    The control can have more than one line
+  -multiselect => 0/1 (default 0)
+  -vertical  => 0/1 (default 0)
+  -tooltip => Win32::GUI::Tooltip object
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AdjustRect
+
+B<AdjustRect(LEFT, TOP, RIGHT, BOTTOM, [FLAG=0])>
+
+Calculates a tab control's display area given a window rectangle, or calculates the window rectangle that would correspond to a specified display area.
+If FLAG is 0, rect specifies a window rectangle and receives the corresponding display area.
+Otherwise, rect specifies a display rectangle and receives the corresponding window rectangle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeItem
+
+B<ChangeItem(ITEM, %OPTIONS)>
+
+Change most of the options used when the item was created
+(see L<InsertItem()|Win32::GUI::TabStrip/InsertItem>).
+Allowed B<%OPTIONS> are:
+
+    -image
+    -text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+Returns the number of items in the TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteAllItems
+
+B<DeleteAllItems()>
+
+See L<Reset()|Win32::GUI::TabStrip/Reset>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteItem
+
+B<DeleteItem(ITEM)>
+
+Removes the specified ITEM from the TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeselectAll
+
+B<DeselectAll([ExcludeFocus=0])>
+
+Resets items in a tab control, clearing any that were set to the TCIS_BUTTONPRESSED state.
+If ExcludeFocus is set to 0, all tab items will be reset. Otherwise, all but the currently selected tab item will be reset.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DisplayArea
+
+B<DisplayArea()>
+
+Retrieve position en size of Display Area.
+Return an array (x, y, width, heigth)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurFocus
+
+B<GetCurFocus()>
+
+Returns the index of the item that has the focus in a tab control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurSel
+
+B<GetCurSel()>
+
+See L<SelectedItem()|Win32::GUI::TabStrip/SelectedItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetExtendedStyle
+
+B<GetExtendedStyle()>
+
+Retrieves the extended styles that are currently in use for TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList()>
+
+Retrieves the image list handle associated with a tab control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItem
+
+B<GetItem(ITEM)>
+
+Retrieves information about an ITEM in the TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemCount
+
+B<GetItemCount()>
+
+See L<Count()|Win32::GUI::TabStrip/Count>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(index)>
+
+Retrieves the bounding rectangle for a tab in a tab control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRowCount
+
+B<GetRowCount()>
+
+See L<RowCount()|Win32::GUI::TabStrip/RowCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetString
+
+B<GetString(ITEM)>
+
+Returns the string associated with the specified ITEM in the TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolTips
+
+B<GetToolTips()>
+
+Retrieves the handle to the tooltip control associated with a tab control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HighlightItem
+
+B<HighlightItem(index, [fHighlight=1])>
+
+Sets the highlight state of a tab item.
+If fHighlight is nonzero, the tab is highlighted. If fHighlight is zero, the tab is set to its default state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X,Y)>
+
+Determines which tab, if any, is at a specified screen position.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(%OPTIONS)>
+
+Adds an item to the TabStrip.
+Allowed %OPTIONS are:
+
+ -image => NUMBER
+   the index of an image from the associated ImageList
+ -index => NUMBER
+   the position for the new item (if not specified, the item
+   is added at the end of the control)
+ -text  => STRING
+   the text that will appear on the item
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MinTabWidth
+
+B<MinTabWidth(WIDTH)>
+
+Sets the minimum width of items in a tab control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Padding
+
+B<Padding(X,Y)>
+
+Sets the amount of space (padding) around each tab's icon and label in a tab control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RemoveImage
+
+B<RemoveImage(iImage)>
+
+Removes an image from a tab control's image list.
+The tab control updates each tab's image index, so each tab remains associated
+with the same image as before. If a tab is using the image being removed,
+the tab will be set to have no image.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Reset
+
+B<Reset()>
+
+Deletes all items from the TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RowCount
+
+B<RowCount()>
+
+Retrieves the current number of rows of tabs in a tab control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(INDEX)>
+
+Selects a tab in a tab control.
+Returns the index of the previously selected tab if successful, or -1 otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItem
+
+B<SelectedItem()>
+
+Returns the zero-based index of the currently selected item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCurFocus
+
+B<SetCurFocus(index)>
+
+Sets the focus to a specified tab in a tab control.
+Returns the index of the previously selected tab if successful, or -1 otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCurSel
+
+B<SetCurSel(INDEX)>
+
+See L<Select()|Win32::GUI::TabStrip/Select>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedStyle
+
+B<SetExtendedStyle(STYLE)>
+
+Sets the extended styles that the TabStrip will use.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(IMAGELIST)>
+
+Assigns an image list to a tab control.
+Return previous imagelist
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItem
+
+B<SetItem(ITEM, %OPTIONS)>
+
+See L<ChangeItem()|Win32::GUI::TabStrip/ChangeItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemSize
+
+B<SetItemSize(STYLE)>
+
+Sets the width and height of tabs in a fixed-width.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMinTabWidth
+
+B<SetMinTabWidth(WIDTH)>
+
+See L<MinTabWidth()|Win32::GUI::TabStrip/MinTabWidth>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPadding
+
+B<SetPadding(X,Y)>
+
+See L<Padding()|Win32::GUI::TabStrip/Padding>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(TOOLTIP)>
+
+Assigns a tooltip to a TabStrip.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Set the UNICODE character format flag.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change()>
+
+Sent when the current
+selection has changed. Use SelectedItem()
+to determine the current selection.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Changing
+
+B<Changing()>
+
+Sent before the current selection changes.
+Use SelectedItem() to determine the
+current selection.
+The event should return 0 to prevent
+the selection changing, 1 to allow it.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

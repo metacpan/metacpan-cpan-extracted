@@ -1,0 +1,48 @@
+Revision history for WebService::Zaqar
+
+0.010 2015-07-09
+
+ - Remove a cyclic reference; fixes flushing messages during client
+   destruction.
+
+0.009 2015-04-09
+
+ - Use a sane default for providing the SPORE spec file.
+ - Depend on a specific version of the Header middleware (fixes
+   conflicts in our Pinto instance)
+
+0.008 2014-11-20
+
+ - De-munge exceptions.  It was a bad idea.
+
+0.007 2014-10-17
+
+ - Munge exceptions to make them clearer.
+ - Fix build script (again...).
+
+0.006 2014-09-26
+
+ - Middlewares now live in their own namespace (and Header middleware
+   is now an external dependency)
+
+0.005 2014-09-26
+
+ - Fix deps, remove obsolete module
+
+0.004 2014-09-26
+
+ - Document new stuff from 0.003
+
+0.003 2014-09-26 Internal
+
+ - Steal do_request auth stuff from both (internal) users of this
+   module
+
+0.002 2014-09-19 Internal
+
+ - Helpers for following links provided by the server
+ - Tests and bugfixes
+
+0.001 2014-08-19 Internal
+
+ - Initial release

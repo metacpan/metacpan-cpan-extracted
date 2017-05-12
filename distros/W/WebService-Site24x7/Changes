@@ -1,0 +1,25 @@
+Revision history for Perl extension WebService-Site24x7
+
+0.06 2016-06-04T23:45:04Z
+    - Added $site24x7->reports->performance
+
+0.05 2016-05-18T16:49:44Z
+    - Added $site24x7->location_template which provides
+      a way to map location ids to location names.
+
+0.04 2016-05-17T21:04:48Z
+    - Removed old $site24x7->monitors method
+    - Added $site24x7->monitors->list
+    - Added $site24x7->location_profiles->list
+    - Added $site24x7->current_status()
+
+0.03 2016-05-17T13:33:25Z
+    - Fixed: was dying when user set user_agent_header attribute.
+
+0.02 2016-05-17T13:22:00Z
+    - Skip most tests so install doesn't fail when token environment variable
+      doesn't exist.
+
+0.01 2016-05-17T02:33:58Z
+    - Initial version
+

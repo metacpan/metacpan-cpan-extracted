@@ -1,0 +1,17 @@
+Source: libwww-restaurant-menu-perl
+Section: perl
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends-Indep: debhelper (>= 4.0.2), perl (>= 5.8.0-7), libmodule-build-perl, libtest-simple-perl
+Standards-Version: 3.6.1
+
+Package: libwww-restaurant-menu-perl
+Architecture: all
+Depends: perl (>= 5.8.0), libwww-perl
+Recommends: libhtml-tableextract-perl
+Description: Perl class collection for querying online menus of restaurants
+ WWW::Restaurant::Menu is a collection of Perl classes for querying online
+ menus of restaurants.
+ .
+ The following menu modules are included (WWW::Restaurant::...):
+   * DE::Munich::Edison::Menu::Lunch

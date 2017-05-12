@@ -1,0 +1,6 @@
+Makefile$
+pm_to_blib
+^blib
+^.git
+^.hg
+t.pl

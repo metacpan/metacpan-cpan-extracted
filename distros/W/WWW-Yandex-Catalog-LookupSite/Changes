@@ -1,0 +1,46 @@
+Revision history for WWW-Yandex-Catalog-LookupSite
+
+0.11  July 27, 2014
+    - Renamed punycode_utf8() to _punycode_utf8() to fix failing POD coverage test.
+
+0.10  July 27, 2014
+    - Change: This module now uses LWP::UserAgent, instead of LWP::Simple
+    - Changed 'search.yaca.yandex.ru/yca/cy/ch/' to 'yaca.yandex.ru/yca/cy/ch/' 
+        as described on Yandex (old address still works, though)
+    - Change: Trailing slash will be added to all addresses, even ending with .html
+        Search results are more consistent this way
+    - Added uri_utf8() function, to convert URI to UTF8
+    - Fixed Defect #2 from GitHub
+    
+0.09  July 16, 2012
+    - Documentation update.
+    - No code changes.
+    
+0.08  July 12, 2012
+    - Added uri() and order_num() to POD so tests do not fail.
+      These will be described in the next version.
+      
+0.07  July 12, 2012
+    - Fixes so it works with new Yandex.Catalog layout.
+    
+0.06  June 28, 2010
+    - Bumped module version. I suck at this :(
+    - No code changes.
+    
+0.05  June 28, 2010
+    - Added LWP::Simple to Makefile.PL's prerequisites list.
+    - No code changes.
+    
+0.04  June 27, 2010
+    - Minor fixes in documentation, as t/pod-coverage.t was failing during installation.
+    - No code changes.
+    
+0.03  Feb 12, 2010
+    - Minor fixes to documentation, still learning to package for CPAN :)
+    - No code changes.
+    
+0.02  Feb 7, 2010
+    - Fixed packaging. No changes to the code.
+    
+0.01  Jan 30, 2010
+    - First version released on an unsuspecting world.

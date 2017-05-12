@@ -1,0 +1,39 @@
+Weather-Underground-StationHistory version 1.0.5
+
+This module provides a URL generator function for retrieving historical data
+for weather stations from Weather Underground (http://wunderground.com).
+
+Additionally, a function to clean up the data retrieved from said URLs is
+provided.  Nominally, the content retrieved from the URLs is in CSV (Comma
+Separated Values) format.  If you enter these URLs into a web browser, the data
+does appear to be in that format.  However, the MIME type given for the data by
+the web server is "text/html" and the data contains <br> tags and HTML comments
+(though no <html>, <head>, or <body> tags that you would expect for an HTML
+document). Thus, if a user copies and pastes the data from the web browser, the
+application receiving the data will get correct CSV, but anything trying to
+directly parse the page content as CSV will encounter problems.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+NON-STANDARD BUILD TARGETS
+
+    ./Build authortest
+
+Runs extra tests that might not pass anywhere other than the author's computer.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008, Elliot Shank
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

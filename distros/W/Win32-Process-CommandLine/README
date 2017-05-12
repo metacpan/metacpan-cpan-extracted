@@ -1,0 +1,112 @@
+Win32-Process-CommandLine version 0.01
+======================================
+
+This module tries to get command line parameters that is passed to when starting
+a program. In windows, there is no existing tool for finding out the process's 
+parameters. From task manager, only process names are displayed. So starting a 
+program with different parameters several times, it's hard to tell a process 
+with what options. This module requires a C compiler.
+
+e.g. from windows Start->Run, type
+notepad c:\boot.ini
+2988 is its process id.
+
+	$pid = 2988;
+	Win32::Process::CommandLine::GetPidCommandLine($pid, $str);
+
+The program name and parameters will be returned to $str.
+In windows 2003 server, value of $str is
+	"C:\WINDOWS\system32\notepad.exe" c:\boot.ini
+
+This module is a good example of how to write C subroutines to extend Perl's ability.
+I have never done this before, so I encountered lots questions probably others will
+have as well. My procedures and advices:
+- Develop the C program and keep the calling interface as simple as possible
+	. Try not to use Win32 data type that don't have corresponding Perl type.
+	  Then you have to come up with type map file.
+
+	. CommandLine.h only has calling interface
+	  int GetPidCommandLine( int pid, char* cmdParameter);
+
+	. CommandLine.c introduces some win32 knowledge:
+	  - The win2k/win2003/winXP are using UTF16 internally and little endian.
+	    Get familiar with wchar_t and its functions
+		ASCII, single byte	    
+		31    32    33    00
+		---------------------
+		1     2     3     \0
+
+		MBCS
+		31 00	32 00	33 00	00 00
+		-----------------------------
+		1 	2 	3 	\0
+
+	  - Convert Unicode string to ANSI(multi-byte) string
+	  	WideCharToMultiByte(CP_OEMCP, 0, wstr, -1, NULL, 0, NULL, NULL);
+
+	  - Write debug log if _DEBUG is defined when compiling.
+	  	hOut = CreateFile("_pidCmdLine.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 
+	  	FILE_ATTRIBUTE_NORMAL, NULL);
+	  	
+	  	WriteFile (hOut, wstr, wcslen(wstr) * 2, &nOut, NULL)
+
+	  - Compile to an win32 executable file
+	  	cd exe
+	  	cl CommandLine.c
+	  	CommandLine.exe 2988	
+
+- Use h2xs to generate module skeleton: h2xs -x -n Win32::Process::CommandLine CommandLine.h
+	. copy 2 C header files to new folder
+	. There're tons of details about Perl internal data types and xs usages, but I just 
+	  use simple things.
+	. Edit CommandLine.xs. h2xs doesn't do following things for you.
+	  - copy essential C code from CommandLine.c, then paste it above 
+	    MODULE = Win32::Process::CommandLine	PACKAGE = Win32::Process::CommandLine
+
+	  - Add infer face declaration. OUTPUT section informs Perl which variables are updated 
+	    after calling.
+		int
+		GetPidCommandLine(pid, cmdParameter)
+			int pid
+			char* cmdParameter
+		OUTPUT:
+			cmdParameter
+- Add file names to MANIFEST that you want to distribute with package.
+
+- Following instruction in INSTALLATION to compile and install
+	A dll is built and install to Perl directory.
+	This module uses win32 APIs, it will be fast to get information.
+
+- Test
+	nmake test		#run test.pl
+	test_one_pid.pl		#ask for one PID 
+	test_all_pid.pl		#try to print all process's parameters
+
+- Pack for Distribution
+	nmake dist	
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you don't have a compiler and you have perl installed at C:\perl, there's a compiled version at 
+http://blog.chinaunix.net/upfile/070815015110.rar
+
+DEPENDENCIES
+
+This module requires these other modules and libraries for testing:
+
+  Win32::Process
+  Win32::Process::Info
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Jing Kang (kxj@hotmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

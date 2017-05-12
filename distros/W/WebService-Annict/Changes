@@ -1,0 +1,11 @@
+Revision history for Perl extension WebService-Annict
+
+0.02 2016-10-11T00:26:30Z
+
+    - add works & records services
+    - bugfix
+
+0.01 2016-10-09T06:20:38Z
+
+    - original version
+

@@ -1,0 +1,1094 @@
+
+=head1 NAME
+
+Win32::GUI::ListView - Create and manipulate listview controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new ListView object;
+can also be called as PARENT->AddListView(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -align => left, top
+  -imagelist => IMAGELIST
+  -report => 0/1
+  -list => 0/1
+  -singlesel => 0/1
+  -showselalways => 0/1
+  -sortascending => 0/1
+  -sortdescending => 0/1
+  -nolabelwrap => 0/1
+  -autoarrange => 0/1
+  -editlabel => 0/1
+  -noscroll => 0/1
+  -alignleft => 0/1
+  -ownerdrawfixed => 0/1
+  -nocolumnheader => 0/1
+  -nosortheader => 0/1
+  -gridlines => 0/1
+  -subitemimages => 0/1
+  -checkboxes => 0/1
+  -hottrack => 0/1
+  -reordercolumns => 0/1
+  -fullrowselect => 0/1
+  -oneclickactivate => 0/1
+  -twoclickactivate => 0/1
+  -flatsb => 0/1
+  -regional => 0/1
+  -infotip => 0/1
+  -underlinehot => 0/1
+  -underlinecold => 0/1
+  -multiworkareas => 0/1
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Add
+
+B<Add(ITEM, ITEM .. ITEM)>
+
+Inserts one or more items in the control; each item must be passed as
+an hash reference. See L<InsertItem()|Win32::GUI::ListView/InsertItem> for a list of the available
+key/values of these hashes.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ApproximateViewRect
+
+B<ApproximateViewRect(cx,cy,icount=-1)>
+
+Calculates the approximate width and height required to display a given number of items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Arrange
+
+B<Arrange([FLAG])>
+
+LVA_ALIGNLEFT = Aligns items along the left edge of the window.
+LVA_ALIGNTOP = Aligns items along the top edge of the window.
+LVA_DEFAULT = Aligns items according to the ListView's current alignment styles (the default value).
+LVA_SNAPTOGRID = Snaps all icons to the nearest grid position.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeItem
+
+B<ChangeItem(%OPTIONS)>
+
+See L<SetItem()|Win32::GUI::ListView/SetItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear()>
+
+See L<DeleteAllItems()|Win32::GUI::ListView/DeleteAllItems>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ColumnWidth
+
+B<ColumnWidth(COLUMN, [WIDTH])>
+
+Gets or sets the width of the specified COLUMN; WIDTH can be the desired
+width in pixels or one of the following special values:
+
+  -1 automatically size the column
+  -2 automatically size the column to fit the header text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+See L<GetItemCount()|Win32::GUI::ListView/GetItemCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateDragImage
+
+B<CreateDragImage(index, xcor, ycor)>
+
+Creates a transparent version of an item image. The xcor and yxcor are the
+initial location of the  upper-left corner of the image.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteAllItems
+
+B<DeleteAllItems()>
+
+Deletes all items from the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteColumn
+
+B<DeleteColumn(INDEX)>
+
+Removes a column from a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteItem
+
+B<DeleteItem(INDEX)>
+
+Removes the zero-based INDEX item from the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Deselect
+
+B<Deselect(INDEX)>
+
+Deselects the zero-based INDEX item from the ListView.
+Use Deselect(-1) to deselect all items.
+Focus is unchanged.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeselectAll
+
+B<DeselectAll()>
+
+Alternate method to deselect all items from the ListView.
+Focus is unchanged.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EditLabel
+
+B<EditLabel(INDEX)>
+
+Begins in-place editing of the specified list view item's text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EnsureVisible
+
+B<EnsureVisible(INDEX, [FLAG])>
+
+Ensures that a list view item is either entirely or partially visible, scrolling the ListView if necessary.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindItem
+
+B<FindItem(FROM, %OPTIONS)>
+
+Searches for a list view item with the specified characteristics.
+
+B<%OPTIONS> :
+
+ -string => STRING
+    Item must exactly match the string.
+ -prefix => 0/1
+    Find item text begins with the string.
+ -wrap   => 0/1
+    Continues the search at the beginning if no match is found.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBkColor
+
+B<GetBkColor()>
+
+Retrieves the background color of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBkImage
+
+B<GetBkImage()>
+
+Retrieves the background image in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCallbackMask
+
+B<GetCallbackMask()>
+
+Retrieves the callback mask for a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCheckState
+
+B<GetCheckState(INDEX)>
+
+Determines if an item in a ListView is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColumn
+
+B<GetColumn(INDEX)>
+
+Retrieves the attributes of a ListView's column.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColumnOrderArray
+
+B<GetColumnOrderArray()>
+
+Retrieves the current left-to-right order of columns in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColumnWidth
+
+B<GetColumnWidth(INDEX)>
+
+Retrieves the width of a column in report or list view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCountPerPage
+
+B<GetCountPerPage()>
+
+See L<VisibleCount()|Win32::GUI::ListView/VisibleCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEditControl
+
+B<GetEditControl()>
+
+Retrieves the handle to the edit control being used to edit a list view item's text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetExtendedListViewStyle
+
+B<GetExtendedListViewStyle()>
+
+Retrieves the extended styles that are currently in use for a given ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHeader
+
+B<GetHeader()>
+
+Retrieves the handle to the header control used by a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHotCursor
+
+B<GetHotCursor()>
+
+Retrieves the cursor used when the pointer is over an item while hot tracking is enabled.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHotItem
+
+B<GetHotItem()>
+
+Retrieves the index of the hot item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHoverTime
+
+B<GetHoverTime()>
+
+Retrieves the amount of time that the mouse cursor must hover over an item before it is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList([TYPE=LVSIL_NORMAL])>
+
+Retrieves the handle to an image list used for drawing list view items.
+Type :
+
+  LVSIL_NORMAL Image list with large icons.
+  LVSIL_SMALL  Image list with small icons.
+  LVSIL_STATE  Image list with state images.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetISearchString
+
+B<GetISearchString(STRING)>
+
+Retrieves the incremental search string of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItem
+
+B<GetItem(INDEX, [SUBINDEX])>
+
+Returns an associative array of information about the given zero-based B<INDEX> item.
+
+Return Hash :
+
+    -image
+    -state
+    -text
+
+Optionally, a B<SUBINDEX> (one-based index) can be given, to get the text
+for the specified column.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemCount
+
+B<GetItemCount()>
+
+Returns the number of items in the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemPosition
+
+B<GetItemPosition(index)>
+
+Retrieves the position of a list view item, in listview co-ordinates.
+See L<GetOrigin()|Win32::GUI::ListView/GetOrigin> to convert to client co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(index,[code=LVIR_BOUNDS])>
+
+Retrieves the bounding rectangle for all or part of an item in the current view,
+in client co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemSpacing
+
+B<GetItemSpacing([flag=FALSE])>
+
+Determines the spacing between items in a ListView. Flag is true to return the
+item spacing for the small icon view, and false to return the icon spacing for large icon view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemState
+
+B<GetItemState(index,mask)>
+
+Determines the spacing between items in a ListView. Index is the listview item for which
+to retrieve information.  mask is a combination of the fllowing flags:
+
+ LVIS_CUT            The item is marked for a cut-and-paste operation.
+ LVIS_DROPHILITED    The item is highlighted as a drag-and-drop target.
+ LVIS_FOCUSED        The item has the focus, so it is surrounded by a standard
+                     focus rectangle. Although more than one item may be selected,
+                     only one item can have the focus.
+ LVIS_SELECTED       The item is selected. The appearance of a selected item depends
+                     on whether it has the focus and also on the system colors used for selection.
+ LVIS_OVERLAYMASK    Use this mask to retrieve the item's overlay image index.
+ LVIS_STATEIMAGEMASK Use this mask to retrieve the item's state image index.
+
+The only valid its in the response are those bits that correspond to bits set in mask.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemText
+
+B<GetItemText(index,[subitem=0])>
+
+Retrieves the text of a ListView item or subitem
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNextItem
+
+B<GetNextItem(index,[mask=LVNI_ALL])>
+
+Searches for a list view item that has the specified properties and bears
+the specified relationship to a specified item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNumberOfWorkAreas
+
+B<GetNumberOfWorkAreas()>
+
+Retrieves the number of working areas in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetOrigin
+
+B<GetOrigin()>
+
+Retrieves the current view origin for a ListView. Use the values returned
+to convert between listview co-ordinates and client co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelectedCount
+
+B<GetSelectedCount()>
+
+Determines the number of selected items in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelectionMark
+
+B<GetSelectionMark()>
+
+Retrieves the selection mark from a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetStringWidth
+
+B<GetStringWidth(STRING)>
+
+Determines the width of a specified string using the specified ListView's
+current font.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSubItemRect
+
+B<GetSubItemRect(iItem, iSubitem,[code=LVIR_BOUNDS])>
+
+Retrieves the bounding rectangle for all or part of an item in the current view,
+in client co-oridinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextBkColor
+
+B<GetTextBkColor()>
+
+Retrieves the text background color of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextColor
+
+B<GetTextColor()>
+
+Retrieves the text color of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolTips
+
+B<GetToolTips()>
+
+Retrieves the tooltip control that the ListView uses to display tooltips.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTopIndex
+
+B<GetTopIndex()>
+
+Retrieves the index of the topmost visible item when in list or report view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetViewRect
+
+B<GetViewRect()>
+
+Retrieves the bounding rectangle of all items in the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X, Y)>
+
+Determine the index of the listview item at X,Y.  X,Y are in client co-ordinates.
+In list context, returns a 2 member list, the first member containing the item index
+of the item under the tested position (or -1 of no such item), and the second member
+containing flags giving information about the result of the test:
+
+ LVHT_ABOVE           The position is above the control's client area.
+ LVHT_BELOW           The position is below the control's client area.
+ LVHT_NOWHERE         The position is inside the list-view control's client window,
+                      but it is not over a list item.
+ LVHT_ONITEMICON      The position is over a list-view item's icon.
+ LVHT_ONITEMLABEL     The position is over a list-view item's text.
+ LVHT_ONITEMSTATEICON The position is over the state image of a list-view item.
+ LVHT_TOLEFT          The position is to the left of the list-view control's client area.
+ LVHT_TORIGHT         The position is to the right of the list-view control's client area.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertColumn
+
+B<InsertColumn(%OPTIONS)>
+
+Inserts a new column in a ListView.
+
+B<%OPTIONS> :
+
+ -text => Column text
+ -align => [right,left,center]
+ -width => width
+ -index | -item => column index
+ -subitem => subitem number
+ -image => image index
+ -bitmaponright => 0/1
+ -order => Column order
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(%OPTIONS)>
+
+Inserts a new item in the control.
+
+B<%OPTIONS> :
+
+ -image => NUMBER
+   index of an image from the associated ImageList
+ -indent => NUMBER
+   how much the item must be indented; one unit is the width of an item image,
+   so 2 is twice the width of the image, and so on.
+ -item => NUMBER
+   zero-based index for the new item; the default is to add the item at the end of the list.
+ -selected => 0/1, default 0
+ -text => STRING
+   the text for the item.  If STRING an array refereence, then the array contains the text for
+   item at position 0, and all other array members are treated as text for subitems.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Item
+
+B<Item(INDEX)>
+
+Return an Win32::GUI::ListView::Item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemCheck
+
+B<ItemCheck(INDEX,[FLAG])>
+
+Set or Get item checked state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemInfo
+
+B<ItemInfo(INDEX, [SUBINDEX])>
+
+See L<GetItem()|Win32::GUI::ListView/GetItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemPosition
+
+B<ItemPosition(INDEX, [X, Y])>
+
+Get or set the position of an item in icon or small icon view.  X,Y are in
+listview co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MoveItem
+
+B<MoveItem(INDEX, X, Y)>
+
+See L<SetItemPosition()|Win32::GUI::ListView/SetItemPosition>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RedrawItems
+
+B<RedrawItems(first,last)>
+
+Forces a ListView to redraw a range of items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(first,last)>
+
+Scrolls the content of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(INDEX)>
+
+Selects and sets focus to the zero-based INDEX item from the ListView.
+Use Select(-1) to select all items and set focus to item 0.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectAll
+
+B<SelectAll()>
+
+Alternate method to select all items. Sets focus to the zero-based
+INDEX item from the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectCount
+
+B<SelectCount()>
+
+See L<GetSelectedCount()|Win32::GUI::ListView/GetSelectedCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItems
+
+B<SelectedItems()>
+
+Returns an array containing the zero-based indexes of selected items, or
+an empty list if no items are selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkColor
+
+B<SetBkColor(color)>
+
+Sets the background color of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkImage
+
+B<SetBkImage(%OPTIONS)>
+
+Sets the background image in a ListView.
+
+B<%OPTIONS> :
+
+ -url => STRING
+   URL of the background image.
+ -tiled => 0/1
+   The background image will be tiled to fill the entire background.
+ -xOffsetPercent => NUMBER
+   Percentage of the control's client area that the image should be offset horizontally.
+ -yOffsetPercent => NUMBER
+   Percentage of the control's client area that the image should be offset vertically.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCallbackMask
+
+B<SetCallbackMask(MASK)>
+
+Changes the callback mask for a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColumn
+
+B<SetColumn(COLUMN, %OPTIONS)>
+
+Change column option in a ListView.
+
+B<%OPTIONS> : See L<InsertColumn()|Win32::GUI::ListView/InsertColumn>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColumnOrderArray
+
+B<SetColumnOrderArray(...)>
+
+Sets the left-to-right order of columns in a ListView .
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColumnWidth
+
+B<SetColumnWidth(COLUMN, [WIDTH])>
+
+Sets the width of the specified COLUMN; WIDTH can be the desired
+width in pixels or one of the following special values:
+
+  -1 automatically size the column
+  -2 automatically size the column to fit the header text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedListViewStyle
+
+B<SetExtendedListViewStyle(EXSTYLE)>
+
+Sets extended styles for ListViews.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedListViewStyleEx
+
+B<SetExtendedListViewStyleEx(MASK, EXSTYLE)>
+
+Sets extended styles for ListView using the style mask
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHotCursor
+
+B<SetHotCursor(CURSOR)>
+
+Sets the HCURSOR that the ListView uses when the pointer is over an item while hot tracking is enabled.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHotItem
+
+B<SetHotItem(index)>
+
+Sets the hot item in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHoverTime
+
+B<SetHoverTime(TIME)>
+
+Sets the amount of time that the mouse cursor must hover over an item before it is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIconSpacing
+
+B<SetIconSpacing(X,Y)>
+
+Sets the spacing between icons in ListView set to the LVS_ICON style.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(IMAGELIST, [TYPE=LVSIL_NORMAL])>
+
+Assigns an image list to a ListView.
+
+Type of image list. This parameter can be one of the following values:
+
+ LVSIL_NORMAL (0) Image list with large icons.
+ LVSIL_SMALL  (1) Image list with small icons.
+ LVSIL_STATE  (2) Image list with state images.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItem
+
+B<SetItem(%OPTIONS)>
+
+Change item options.
+
+B<%OPTIONS> : See L<InsertItem()|Win32::GUI::ListView/InsertItem>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemCount
+
+B<SetItemCount(COUNT)>
+
+Sets the amount of time that the mouse cursor must hover over an item before it is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemCountEx
+
+B<SetItemCountEx(COUNT,FLAG)>
+
+Sets the virtual number of items in a virtual ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemPosition
+
+B<SetItemPosition(INDEX, X, Y)>
+
+Moves an item to a specified position in a ListView (in icon or small icon view).
+X,Y are in listview co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemState
+
+B<SetItemState(INDEX,STATE,MASK)>
+
+Changes the state of an item in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemText
+
+B<SetItemText(INDEX,TEXT,[SUBITEM=0])>
+
+Changes the text of an item in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSelectionMark
+
+B<SetSelectionMark(index)>
+
+Sets the selection mark in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextBkColor
+
+B<SetTextBkColor(COLOR)>
+
+Sets the background color of text in a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextColor
+
+B<SetTextColor(COLOR)>
+
+Sets the text color of a ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(TOOLTIP)>
+
+Sets the tooltip control that the ListView will use to display tooltips.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SubItemHitTest
+
+B<SubItemHitTest(X, Y)>
+
+Test to find which sub-item is at the position X,Y.  X,Y are inclient-co-ordinates.
+Returns a 3 memeber list, giving the item number, subitem number and flags related
+to the test.  the item number is -1 if no item or subitem is under X,Y.
+flags are a combination of:
+
+ LVHT_ABOVE           The position is above the control's client area.
+ LVHT_BELOW           The position is below the control's client area.
+ LVHT_NOWHERE         The position is inside the list-view control's client window,
+                      but it is not over a list item.
+ LVHT_ONITEMICON      The position is over a list-view item's icon.
+ LVHT_ONITEMLABEL     The position is over a list-view item's text.
+ LVHT_ONITEMSTATEICON The position is over the state image of a list-view item.
+ LVHT_TOLEFT          The position is to the left of the list-view control's client area.
+ LVHT_TORIGHT         The position is to the right of the list-view control's client area.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextBkColor
+
+B<TextBkColor([COLOR])>
+
+Gets or sets the background color for the text in the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextColor
+
+B<TextColor([COLOR])>
+
+Gets or sets the text color for the ListView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Update
+
+B<Update(INDEX)>
+
+Updates a list view item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 View
+
+B<View([MODE])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 VisibleCount
+
+B<VisibleCount()>
+
+Calculates the number of items that can fit vertically in the visible area of a ListView when in list or report view.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginDrag
+
+B<BeginDrag(ITEM)>
+
+Notifies a list-view control that a drag-and-drop operation involving the left mouse
+button is being initiated. Passes the item being dragged.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginLabelEdit
+
+B<BeginLabelEdit(ITEM)>
+
+Sent when the user is about to edit the specified item of the ListView
+The event should return 0 to prevent the action, 1 to allow it.
+
+For a ListView to receive this event, -editlabels need to be set to true.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ColumnClick
+
+B<ColumnClick(ITEM)>
+
+Sent when the user clicks on a column header in the
+ListView; ITEM specifies the one-based index of the
+selected column.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndLabelEdit
+
+B<EndLabelEdit(ITEM,TEXT)>
+
+Sent when the user has finished editing a label in the ListView control.
+You have explicitly set the text of the item to reflect the new changes.
+If the user cancels the edit, the text is undef.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemChanged
+
+B<ItemChanged(ITEM, NEWSTATE, OLDSTATE, CHANGED)>
+
+Sent for any change of state of an item in the ListView.
+ITEM specifies the zero-based index of the selected item.
+NEWSTATE specifies the new item state (LVIS_).
+OLDSTATE specifies the old item state (LVIS_).
+CHANGED specifies the item attributes that have changed (LVIF_).
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemChanging
+
+B<ItemChanging(ITEM, NEWSTATE, OLDSTATE, CHANGED)>
+
+Sent when the item is about to change state.
+The event should return 0 to prevent the action, 1 to allow it.
+ITEM specifies the zero-based index of the selected item.
+NEWSTATE specifies the new item state (LVIS_).
+OLDSTATE specifies the old item state (LVIS_).
+CHANGED specifies the item attributes that have changed (LVIF_).
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemCheck
+
+B<ItemCheck(ITEM)>
+
+Sent when the user changes the checkbox of an item in the ListView;
+ITEM specifies the zero-based index of the selected item.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemClick
+
+B<ItemClick(ITEM)>
+
+Sent when the user selects an item in the ListView;
+ITEM specifies the zero-based index of the selected item.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 KeyDown
+
+B<KeyDown(KEY)>
+
+Sent when the user presses a key while the ListView
+control has focus; KEY is the ASCII code of the
+key being pressed.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

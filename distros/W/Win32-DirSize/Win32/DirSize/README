@@ -1,0 +1,37 @@
+Win32/DirSize version 1.13
+==========================
+
+This module is written using C / XS.  It does not require any other modules,
+but you will need a C compiler to build it.  If you do not have a C compiler,
+you can use the included PPM versions.
+
+In my informal tests, this version of Win32::DirSize is 50x faster than 
+calculating sizes via File::Find.
+
+INSTALLATION
+
+To compile this module from source, type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+If you do not have a C compiler, you can use the PPM version:
+
+   extract ppm.zip to a temporary folder
+   run "ppm install Win32-DirSize.ppd" from the temporary folder
+
+These instructions are for the newer versions of PPM.  YMMV.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+None
+
+Author: Adam Rich <arich@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

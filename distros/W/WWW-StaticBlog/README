@@ -1,0 +1,48 @@
+NAME
+    WWW::StaticBlog - Generate a set of static pages for a blog.
+
+VERSION
+    0.02
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SYNOPSIS
+    Generate a set of static pages for a blog.
+
+AUTHOR
+    Jacob Helwig, `<jhelwig at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-www-staticblog at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-StaticBlog. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+    perldoc WWW::StaticBlog You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-StaticBlog
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-StaticBlog
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-StaticBlog
+
+    * Search CPAN
+        http://search.cpan.org/dist/WWW-StaticBlog
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Jacob Helwig, all rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+

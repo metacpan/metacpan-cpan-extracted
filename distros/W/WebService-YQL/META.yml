@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                WebService-YQL
+version:             0.04
+abstract:            Simple interface for Yahoo Query Language
+license:             ~
+author:              
+    - Viorel Stirbu (cpan@stirbu.name)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    JSON::Any:                     0
+    List::MoreUtils:               0
+    LWP::UserAgent:                0
+    Test::Simple:                  0.44
+    URI:                           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

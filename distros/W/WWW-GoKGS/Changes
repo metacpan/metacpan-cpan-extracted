@@ -1,0 +1,232 @@
+Revision history for Perl extension WWW::GoKGS.
+
+0.21 Aug 21st, 2014
+
+  [WWW::GoKGS::Scraper::TournList]
+
+    - Add $tournament->{notes}, where $tournament denotes an element of
+      $result->{tournaments}
+
+  [WWW::GoKGS::Scraper::TournInfo]
+
+    - Add $result->{notes}
+
+0.20 Jul 14th, 2014
+
+  - Add WWW::GoKGS::Scraper::TzList
+  - Add WWW::GoKGS#cookie_jar
+
+  [INCOMPATIBLE CHANGES]
+
+    Remove time zone designators from times for games, i.e.,
+    "2014-07-14T12:34Z" become "2014-07-14T12:34",
+    since we don't know which time zone is used in KGS resources exactly.
+    I mean, although KGS resources contains the abbreviated name of the time
+    zone, such as "GMT" in the game arhchives, there are no standard rules
+    to abbreviate the names. It's ambiguous. For example, "GMT" may be
+    "Greenwich Mean Time" or "Ghana Mean Time".
+
+    Fortunately, the time zone defaults to GMT (Greenwith Mean Time)
+    unless we change our cookie settings by using KGS Time Zone Selector.
+    If you want KGS resources to be stateless, do not use the selector.
+
+0.19 Jul 7th, 2014
+
+  - Add WWW::GoKGS::LibXML
+
+  [INTERNAL]
+
+    - Add WWW::GoKGS::Scraper#_tree_builder_class
+
+  [INCOMPATIBLE CHANGES]
+
+    - WWW::GoKGS does not consult $ENV{WWW_GOKGS_LIBXML} anymore.
+      Use WWW::GoKGS::LibXML instead.
+
+0.18 Jul 6th, 2014
+
+  - Add WWW::GoKGS#get
+
+  [DOCUMENTATION]
+
+    - Add "DIAGNOSTICS"
+    - Add "LIMITATIONS"
+
+  [INTERNAL]
+
+    - Rename WWW::GoKGS::Scrape#_build_scraper to #__build_scraper
+
+0.17 Jul 2nd, 2014
+
+  - WWW::GoKGS uses HTML::TreeBuilder::LibXML instead of
+    HTML::TreeBuilder when $ENV{WWW_GOKGS_LIBXML} is true
+
+  [INTERNAL]
+
+    - Add tests for HTML::TreeBuilder::LibXML
+
+0.16 Jun 30th, 2014
+
+  [INTERNAL]
+
+    - Simplify the BEGIN block of WWW::GoKGS
+    - Rewrite tests under xt/ using Test::Base
+
+0.15 Jun 29th, 2014
+
+  [INCOMPATIBLE CHANGES]
+
+    - Give up implementing incomplete filtering system.
+      Instead, you can use nice modules on CPAN, such as JSON::Path
+      which allows you to search complicated data structure.
+      The following instance methods were removed:
+
+        * WWW::GoKGS#date_filter
+        * WWW::GoKGS#html_filter
+        * WWW::GoKGS::Scraper#add_filter
+        * WWW::GoKGS::Scraper#run_filter
+        * WWW::GoKGS::Scraper::GameArchives#add_filter
+        * WWW::GoKGS::Scraper::TournInfo#add_filter
+        * WWW::GoKGS::Scraper::TournEntrants#add_filter
+        * WWW::GoKGS::Scraper::TournGames#add_filter
+
+    - Give up implementing imperfect class-building system.
+      The following class methods were removed:
+
+        * WWW::GoKGS#mk_accessors
+        * WWW::GoKGS#make_accessor
+        * WWW::GoKGS#accessor_name_for
+        * WWW::GoKGS#builder_name_for
+        * WWW::GoKGS#known_paths
+
+      Besides, the following instance methods become read-only:
+
+        * WWW::GoKGS#game_archives
+        * WWW::GoKGS#top_100
+        * WWW::GoKGS#tourn_list
+        * WWW::GoKGS#tourn_info
+        * WWW::GoKGS#tourn_entrants
+        * WWW::GoKGS#tourn_games
+
+      In addition, the following instance methods were removed:
+
+        * WWW::GoKGS#set_scraper
+
+    - Sorry for your inconvenience. I decided to commit the terrible changes
+      listed above to make this distribution maintainable.
+
+0.14 Jun 26th, 2014
+
+  - Add the following instance methods:
+      * can_scrape
+      * each_scraper
+  - Add the following class methods:
+      * known_paths
+
+  [INCOMPATIBLE CHANGES]
+
+    - Scraper objects are not built lazily anymore,
+      but are built when WWW::GoKGS object is created
+    - Must pass a path included by known_paths() to mk_accessors()
+    - #user_agent doesn't overwrite #user_agent attributes of
+      all the scraper objects as a side effect anymore. You have to overwrite
+      them explicitly by yourself.
+
+0.13 Jun 24th, 2014
+
+  - WWW::GoKGS#user_agent, #from, #date_filter and #html_filter
+    become 'rw'
+  - Add WWW::GoKGS#agent
+
+0.12 Jun 23rd, 2014
+
+  - WWW::GoKGS#user_agent defaults to LWP::RobotUA
+    to avoid overloading the KGS server, while you can still set
+    your own user agent.
+  - Add #from which is used to construct LWP::RobotUA object.
+    This attribute is required.
+
+0.11 Jun 22nd, 2014
+
+  [DOCUMENTATION]
+
+  - Add "ENVIRONMENTAL VARIABLES" to POD
+
+0.10 Jun 16th, 2014
+
+  - Add LICENSE file
+  - Add "paranoid" tests to author tests
+
+0.09 Jun 15th, 2014
+
+  - Switch to Module::Build
+  - Add author tests
+  - Tests require Time::Piece
+  - Remove t/20_static.t since dynamic tests are run by Travis CI:
+      https://travis-ci.org/anazawa/p5-WWW-GoKGS
+
+0.08 Jun 13th, 2014
+
+  [BUGFIX]
+
+    - Parse KGS dates such as "2/13/14 12:14 AM" properly
+
+0.07 Jun 12th, 2014
+
+  - Require Scalar::Util and String::CamelCase
+  - Add the following class methods:
+      * mk_accessors
+      * accessor_name_for
+      * builder_name_for
+      * make_accessor
+  - Add the following instance methods:
+      * get_scraper
+      * set_scraper
+  - The following attributes become 'rw':
+      * game_archives
+      * top100
+      * tourn_list
+      * tourn_info
+      * tourn_entrants
+      * tourn_games
+
+0.06 Jun 10th, 2014
+
+  - Add ACKNOWLEDGE to document
+
+0.05 Jun 8th, 2014
+
+  - Add examples/gokgs.psgi
+  - Add "use warnings FATAL => 'all'" to scrapers
+
+0.04 Jun 7th, 2014
+
+   - Add Scraper#get_filter, #add_filter and #run_filter
+   - Scraper#scrape throws an exception if warnings are caught
+
+  [INCOMPATIBLE CHANGES]
+
+    - Remove GoKGS#result_filter
+    - Remove Scraper::GameArchives#date_filter and #result_filter
+    - Remove Scraper::TournGames#date_filter and #result_filter
+    - Remove Scraper::TournInfo#date_filter and #html_filter
+    - Remove Scraper::TournEntrants#date_filter
+
+0.03 Jun 6th, 2014
+
+  - improve documentation
+
+  [BUGFIX]
+
+    - Scraper::TournGames#scrape parses "Bye" properly
+      ($bye->{type} was invalid)
+
+0.02 Jun 5th, 2014
+
+  - Add Scraper::GameArchives#result_filter
+  - Add Scraper::TournGames#result_filter
+  - Add GoKGS#result_filter
+
+0.01 May 22nd, 2014
+
+  - initial version

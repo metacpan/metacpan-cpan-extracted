@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+package main;
+$main::VERSION = '2.001';
+use strict;
+use warnings;
+use WWW::Shorten::Bitly;
+
+my $bitly = WWW::Shorten::Bitly->new;
+
+print $bitly->shorten(URL => shift @ARGV), $/ while @ARGV;
+
+__END__
+=head1 NAME
+
+C<bitly_url> - Command-line interface to WWW::Shorten::Bitly
+
+
+=head1 SYNOPSIS
+
+    bitly_url http://google.com
+
+    bitly_url http://google.com http://www.youtube.com
+
+=head1 DESCRIPTION
+
+bitly_url shortens URLS supplied on the command-line.
+You have to setup a C<.bitly> config file to use it.
+
+=head1 AUTHOR
+
+Joerg Meltzer <F<joerg@joergmeltzer.de>>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Pankaj Jain, All Rights Reserved L<http://blog.pjain.me>.
+
+Copyright (c) 2009 Teknatus Solutions LLC, All Rights Reserved L<http://teknatus.com>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

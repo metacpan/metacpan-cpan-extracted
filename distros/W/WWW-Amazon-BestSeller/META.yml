@@ -1,0 +1,25 @@
+---
+abstract: 'The great new WWW::Amazon::BestSeller!'
+author:
+  - 'MC Cheung <mc.cheung@aol.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Amazon-BestSeller
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::TreeBuilder: '0'
+  LWP::UserAgent: '0'
+  WWW::UserAgent::Random: '0'
+  perl: '5.006'
+version: '0.01'

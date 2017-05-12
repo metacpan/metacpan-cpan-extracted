@@ -1,0 +1,37 @@
+
+
+Scenarios:
+	-Install a service
+	-Configure an existing service
+	-Delete a service
+	
+	-Running Services
+		-Simple Service:
+			-Service loop calls State() to check if a service state change occurs.
+			-This scenario is being deprecated.
+			
+		-Callback Service 1 (one callback routine):
+			-Service specifies one subroutine for all callbacks.
+			-Validate that callback can either set state by calling State() or by returning state value.
+			-Validate that the callback's context hash is good.
+			-Test without a callback context hash.
+		
+		-Callback Service 2 (multiple callback routines):
+			-Service specifies multiple subroutines for different callbacks.
+			-Validate that callback can either set state by calling State() or by returning state value.
+			-Validate that the callback's context hash is good.
+			-Test without a callback context hash.
+			
+		-Threading:
+			-Run a service that creates worker threads. 
+??			-Test if service works using fork().
+			-Use the "threads" Perl module.
+			-Main Perl process thread MUST be the one that performs calls into Win32::Daemon.
+			 Other threads can be created but all Win32::Daemon interaction must occur on thread 0.
+			 
+	-Validate that CallbackTimer() can be queried and set at any time.
+	-Validate that hearbeat CallbackTimer is paused during a callback and reset when a callback returns.
+	-Validate that events values are proper.
+	-Validate that security works (eg passing in an SD or Win32::Perms object).
+	
+	

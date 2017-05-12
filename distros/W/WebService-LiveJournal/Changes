@@ -1,0 +1,23 @@
+Revision history for WebService-LiveJournal
+
+0.08      2016-04-25 11:20:07 -0400
+  - Add some basic support for DreamWidth
+
+0.07      2014-01-08 08:26:17 -0500
+  - month was off by one (gh#1)
+
+0.06      2013-06-25 16:08:36 EST5EDT
+  - Add get_user_tags method
+
+0.05      2013-06-22 15:19:32 EST5EDT
+  - Documentation
+
+0.04      2013-06-22 08:27:16 EST5EDT
+  - added $client->console_command method
+  - added $client->batch_console_commands method
+
+0.03      2013-06-17 06:33:58 America/New_York
+  - Documentation
+
+0.02      2013-06-16 12:48:49 EST5EDT
+  - added sync_items method

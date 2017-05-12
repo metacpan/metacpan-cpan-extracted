@@ -1,0 +1,83 @@
+{
+   "abstract" : "A WWW::Mechanize plugin to provide the behaviour of WWW::Mechanize::Sleepy while using WWW::Mechanize::Pluggable",
+   "author" : [
+      "Michael Jemmeson <michael.jemmeson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Mechanize-Plugin-Sleepy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Timer" : "0",
+            "WWW::Mechanize::Pluggable" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Mechanize::Plugin::Sleepy" : {
+         "file" : "lib/WWW/Mechanize/Plugin/Sleepy.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjemmeson/www-mechanize-plugin-sleepy/issues"
+      },
+      "homepage" : "https://metacpan.org/release/WWW-Mechanize-Plugin-Sleepy",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mjemmeson/www-mechanize-plugin-sleepy.git",
+         "web" : "https://github.com/mjemmeson/www-mechanize-plugin-sleepy"
+      }
+   },
+   "version" : "0.003"
+}
+

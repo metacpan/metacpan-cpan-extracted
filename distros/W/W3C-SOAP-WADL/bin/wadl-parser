@@ -1,0 +1,259 @@
+#!/usr/bin/perl
+
+# Created on: 2013-04-21 10:43:25
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use W3C::SOAP::WADL::Parser;
+use File::ShareDir qw/dist_dir/;
+use Template;
+
+our $VERSION = version->new('0.007');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    lib           => 'lib',
+    ns_module_map => {},
+    verbose       => 0,
+    man           => 0,
+    help          => 0,
+    VERSION       => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'ns_module_map|ns|namespace-map|n=s%',
+        'ns_module_map_file|map-file|f=s',
+        'module_base|module-base|b=s',
+        'lib|l=s',
+        'show|s',
+        'path|p=s',
+        'save|S',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    if ( $option{ns_module_map_file} && -f $option{ns_module_map_file} ) {
+        $option{ns_module_map} ||= {};
+        my $file = path $option{ns_module_map_file};
+
+        for my $line ($file->slurp) {
+            chomp $line;
+            next if !$line;
+            my ($ns, $mod) = split /=|,|\t/, $line, 2;
+            $option{ns_module_map}{$ns} ||= $mod
+        }
+    }
+    #warn Dumper $option{ns_module_map}, $option{ns_module_map_file};
+    $option{module_base} = 'Static::WADL' if $option{show} && !$option{module_base};
+
+    return show() if $option{show};
+
+    my $template = Template->new(
+        INCLUDE_PATH => ($option{path} ? "$option{path}:" : '') . dist_dir('W3C-SOAP-WADL') . ':' . dist_dir('W3C-SOAP'),
+        INTERPOLATE  => 0,
+        EVAL_PERL    => 1,
+    );
+
+    my ( $module, $wadl_file ) = @ARGV;
+
+    if ( !$wadl_file ) {
+        if ( !$option{module_base} ) {
+            warn "You must specify a package name for your WADL!\n";
+            pod2usage( -verbose => 1 );
+        }
+        $wadl_file = $module;
+        $module = $option{module_base};
+    }
+
+    # check that %map modules don't overlap with $option{ns_module_map} modules
+    if (!$option{module_base} && !$option{ns_module_map}{$module}) {
+        die "The module '$module' is mapped from both the WADL '$wadl_file'"
+            . " and the XMLSchema '$option{ns_module_map}{$module}' namespaces"
+            . " please use different modules!\n";
+    }
+
+    my $wadl = W3C::SOAP::WADL::Parser->new(
+        location => $wadl_file,
+        template => $template,
+        $module ? ( module   => $module ) : (),
+        %option,
+    );
+    $wadl->write_modules;
+    my $generated = $wadl->module;
+    print "Generated WADL client $generated\n";
+
+    if ( $option{save} ) {
+        my $file = $wadl_file;
+        $file =~ s{[/:?&]}{_}g;
+        my $fh = path("$file.wadl")->openw;
+        print {$fh} $wadl->document->xml->toString();
+
+        for my $schema ($wadl->get_xsd->get_schemas) {
+            next if ! $schema->location;
+            my $file = $schema->location;
+            $file =~ s{[/:?&]}{_}g;
+            my $fh = path("$file.xsd")->openw;
+            print {$fh} $schema->xml->toString();
+        }
+    }
+
+    return;
+}
+
+sub show {
+    # do stuff here
+    my %map = $option{module_base} ? ($option{module_base} => @ARGV) : @ARGV;
+    for my $module (keys %map) {
+        my $wadl = W3C::SOAP::WADL::Document->new(
+            %option,
+            file => $map{$module},
+        );
+        print $wadl->target_namespace, "\n";
+        print "Resources :\n";
+        for my $node (@{ $wadl->resources }) {
+            print "\t", $node->path, "\n";
+            print "\tResource :\n";
+            for my $node (@{ $node->resource }) {
+                print "\t\t", $node->path, ' (', $node->id, ")\n";
+                for my $method (@{ $node->method }) {
+                    print "\t\t\t", $method->name, ' (', $method->id, ")\n";
+                    print "\t\t\t\tRequest:\n";
+                    for my $param (@{ $method->request->param }) {
+                        print "\t\t\t\t\t", $param->name, "\n";
+                    }
+                    for my $response (@{ $method->response }) {
+                        print "\t\t\t\tResponse (", $response->status, ")\n";
+                        for my $param (@{ $response->param }) {
+                            print "\t\t\t\t\t\t", $param->name, "\n";
+                        }
+                        eval { $response->representation };
+                        eval { warn Dumper $response->representation->[0]->{_node}->toString };
+                        print "\t\t\t\t\t\tReturns : ", $response->representation->[0]->media_type, "\n"
+                            if %{ $response->representation->[0] };
+                    }
+                }
+            }
+        }
+        #print Dumper $wadl;
+    }
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+wadl-parser - Parses a WADL file to generate a REST client
+
+=head1 VERSION
+
+This documentation refers to wadl-parser version 0.007.
+
+=head1 SYNOPSIS
+
+   wadl-parser [option] package wadl_file_or_url
+
+ OPTIONS:
+  -s --show     Show some info about the passed WADL file
+  -b --module-base[=]str
+                Let the program auto generate package names with this value
+                as the base of the module name. (Note packages names will
+                be valid but not pretty)
+  -n --namespace-map ns=package
+                A mapping of XSD namespaces (ns) to perl package names, it
+                is required when writing XSD files
+  -f --map-file[=]file
+                File that contains mappings of name
+  -l --lib[=]dir
+                Directory where generated modules should be writted, the
+                default is ./lib
+  -p --path[=]str
+                Extra template toolkit directories if you want to override
+                default templates.
+  -S --save     Save all downloaded WADLs & XSDs
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for wadl-parser
+
+=head1 DESCRIPTION
+
+The L<wadl=parser> program generates static WADL clients that can be used
+by your own programs to talk to the WADL service.
+
+The L<wadl-parser> command can also (with the C<--show> flag) be used to
+give you a summary of what a WADL service provides.
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

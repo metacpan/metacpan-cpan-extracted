@@ -1,0 +1,29 @@
+---
+abstract: 'Interface to the Pusher WebSockets API'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Pusher
+no_index:
+  directory:
+    - author.t
+requires:
+  Digest::MD5: 0
+  Digest::SHA: 0
+  JSON: 0
+  LWP: 0
+  Test::Deep: 0
+  Test::More: 0
+  URI: 0
+resources:
+  bugtracker: http://github.com/rizen/WWW-Pusher/issues
+  repository: git://github.com/rizen/WWW-Pusher.git
+version: 0.0701

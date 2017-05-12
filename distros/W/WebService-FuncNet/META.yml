@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               WebService-FuncNet
+version:            0.2
+abstract:           Wrapper around the FuncNet web services
+author:
+    - Spiros Denaxas <s.denaxas at gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    LWP::UserAgent:       0
+    Math::BigFloat:       0
+    Test::Deep:           0
+    Test::More:           0
+    Text::CSV:            0
+    XML::Compile::Schema:  0
+    XML::Compile::SOAP11:  0
+    XML::Compile::Transport::SOAPHTTP:  0
+    XML::Compile::WSDL11:  0
+    XML::Simple:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

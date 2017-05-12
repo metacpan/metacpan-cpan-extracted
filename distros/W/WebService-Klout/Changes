@@ -1,0 +1,7 @@
+Revision history for Perl extension WebService::Klout
+
+1.0.1   Tue Sep 20 17:59:27 JST 2011
+    - Chaged request method from GET to POST
+    - Set HTTP_USER_AGENT "WebService-Klout/$VERSION"
+1.0.0   Wed Sep 14 08:45:30 JST 2011
+    - The first CPAN release

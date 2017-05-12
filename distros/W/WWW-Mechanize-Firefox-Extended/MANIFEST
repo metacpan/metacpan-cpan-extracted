@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+lib/WWW/Mechanize/Firefox/Extended.pm
+Makefile.PL
+LICENSE
+README.pod
+t/00-load.t
+t/10-hasAll-hasAny.html
+t/10-hasAll-hasAny.t
+t/20-waitAll-waitAny.html
+t/20-waitAll-waitAny.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

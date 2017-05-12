@@ -1,0 +1,33 @@
+Revision history for WWW-Shorten-SnipURL
+
+2.023     2017-02-06
+    - Moved to Starter for Dist::Zilla
+    - Added 5.24 to Travis testing
+    - Moved prereqs into cpanfile
+    - Add CONTRIBUTING.md to repository
+    - Add LICENSE to repository
+
+2.022   2016-03-16
+    - updated the author tests
+    - fixed list of contributors
+
+2.021   2016-03-13
+    - Fixed an oversight in the dist.ini
+
+2.020   2016-03-13
+    - Cleaned up a bit
+    - Standardized documentation a bit. Made sure links were present
+    - added contributors
+    - Made our lack of confidence in this service known in the docs.
+    - turned off live testing as their site is too up-and-down to test.
+
+2.01    2015-07-18
+    - Fixed tests.
+    - Added .travis.yml
+    - fixed service to work with latest URL
+
+2.00    2009-09-20
+    - Initial version.
+    - added tests
+    - added readme
+    - fixed service

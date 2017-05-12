@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.0.xsd">
+	<header>
+		<license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+		<title lang="en-gb">Genders</title>
+		<description lang="en-gb"><![CDATA[This MOD will allow your members to specify their Gender. They can chose between "Male", "Female" and "None specified".]]></description>
+		<author-notes lang="en-gb"><![CDATA[This Modification is a phpBB3 version of my phpBB2 genders mod. It does not have the options that the phpBB2 version has, but you can still change the gender image to text in your template.
+
+Another change is that by default this MOD will use the "minigender" imageset that was already in niels' phpBB2 genders mod. However the other imagesets are still included, and can be found in the /contrib/ folder.
+
+Thanks to following people, who created alternative gender images:
+ - "mini" imageset by Vinci
+ - "minigender" imageset from neils gender mod
+ - "default_darkbg" imageset by DreAdeDcoRpSE
+ - "(fe)male-images" imageset by Wout -- w00t
+ - "Planetary" imageset by HCP
+ - "prosilver" imageset by D-Shadow
+
+If you don't know how to run the SQL, simply drop the contrib/db_update.php file into your phpbb_root_path and call it in your browser. The script should do the rest for you. Make sure to delete it after that though.
+
+After installation, you will have to refresh your imagesets and templates in the admin control panel.]]></author-notes>
+		<author-group>
+			<author>
+				<realname>Igor Wiedler</realname>
+				<email>evil@phpbbmodders.net</email>
+				<username>eviL&lt;3</username>
+				<homepage>http://phpbbmodders.net</homepage>
+				<contributions />
+			</author>
+		</author-group>
+		<mod-version>
+			<major>1</major>
+			<minor>0</minor>
+			<revision>0</revision>
+		</mod-version>
+		<installation>
+			<level>easy</level>
+			<time>600</time>
+			<target-version>
+				<target-primary>0</target-primary>
+				<target-major allow="exact">3</target-major>
+				<target-minor allow="exact">0</target-minor>
+			</target-version>
+		</installation>
+		<history>
+			<entry>
+				<date>2007-04-28</date>
+				<rev-version>
+					<major>0</major>
+					<minor>1</minor>
+					<revision>0</revision>
+				</rev-version>
+				<changelog lang="en-gb">
+					<change>Initial release</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2007-05-03</date>
+				<rev-version>
+					<major>0</major>
+					<minor>1</minor>
+					<revision>1</revision>
+				</rev-version>
+				<changelog lang="en-gb">
+					<change>Fixed some typos (prosilver -> subsilver2), thanks to geoffreak!</change>
+					<change>Fixed undefined index with guest posts (thanks geoffreak and A_Jelly_Doughnut)</change>
+					<change>Upgrade script from phpBB2 Genders</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2007-05-21</date>
+				<rev-version>
+					<major>0</major>
+					<minor>1</minor>
+					<revision>2</revision>
+				</rev-version>
+				<changelog lang="en-gb">
+					<change>Fixed malformed xml in install files</change>
+					<change>Updated for RC1</change>
+					<change>New awesome prosilver gender imageset from D-Shadow, those images are so awesome!</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2007-07-30</date>
+				<rev-version>
+					<major>0</major>
+					<minor>1</minor>
+					<revision>3</revision>
+				</rev-version>
+				<changelog lang="en-gb">
+					<change>phpBB 3.0.RC4</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2008-01-01</date>
+				<rev-version>
+					<major>1</major>
+					<minor>0</minor>
+					<revision>0</revision>
+				</rev-version>
+				<changelog lang="en-gb">
+					<change>Gold.</change>
+					<change>Updated install script.</change>
+					<change>Added alf007s cool addon.</change>
+				</changelog>
+			</entry>
+		</history>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/includes/functions_genders.php" to="includes/functions_genders.php" />
+		</copy>
+		<open src="memberlist.php">
+			<edit>
+				<find><![CDATA[include($phpbb_root_path . 'includes/functions_display.' . $phpEx);]]></find>
+				<action type="before-add"><![CDATA[//-- mod : Genders ------------------------------------------------------------
+//-- add
+include($phpbb_root_path . 'includes/functions_genders.' . $phpEx);
+//-- fin mod : Genders --------------------------------------------------------]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[, u.user_allow_pm]]></find>
+				<inline-edit>
+					<inline-find><![CDATA[, u.user_allow_pm]]></inline-find>
+					<inline-action type="after-add"><![CDATA[, u.user_gender]]></inline-action>
+				</inline-edit>
+			</edit>
+			<edit>
+				<find><![CDATA[				'U_VIEW_PROFILE'	=> get_username_string('profile', $row['user_id'], $row['username'], $row['user_colour']),]]></find>
+				<action type="after-add"><![CDATA[//-- mod : Genders ------------------------------------------------------------
+//-- add
+				'USER_GENDER'		=> get_user_gender($row['user_gender']),
+//-- fin mod : Genders --------------------------------------------------------]]></action>
+			</edit>
+			<edit>
+				<find><![CDATA[		'S_JABBER_ENABLED'	=> ($config['jab_enable']) ? true : false,]]></find>
+				<action type="after-add"><![CDATA[//-- mod : Genders ------------------------------------------------------------
+//-- add
+		'USER_GENDER_IMG'	=> get_user_gender($data['user_gender']),
+		'USER_GENDER'		=> get_user_gender($data['user_gender'], true),
+//-- fin mod : Genders --------------------------------------------------------]]></action>
+			</edit>
+		</open>
+	</action-group>
+</mod>

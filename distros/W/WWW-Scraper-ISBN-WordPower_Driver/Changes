@@ -1,0 +1,49 @@
+Revision history for WWW-Scraper-ISBN-WordPower_Driver
+======================================================
+
+0.10    2014-12-19
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.09    2014-09-18
+        - more test data fixed.
+        
+0.08    2014-08-31
+        - test data fixed.
+        - fixed license fields in META.json to be lists.
+
+0.07    2014-08-12
+        - added git repository links to metadata.
+        - fixed distribution name in metadata.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - extended test suite.
+        - site data has changed for text samples.
+        - removed redundant ISBN 10 conversion.
+        - remove trailing decimals if integer is more appropriate.
+        - more test data samples.
+
+0.06    2013-03-10
+        - added isbn-check.pl to examples.
+        - change file dates changed to meet W3CDTF standards.
+        - License updated consistently to Artistic License v2.0.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated test suite.
+
+0.05    2011-05-23
+        - updated image link tests.
+
+0.04    2011-03-01
+        - amended pingtest() in network tests.
+        - added further skip test if test books are withdrawn from the site.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - reduced tests to basic set needed.
+
+0.03    2010-10-06
+        - provided alternate ping test methods.
+
+0.02    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.01	2010-09-06
+        - initial release

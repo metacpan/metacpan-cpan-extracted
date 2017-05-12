@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 93684e563b25cf758cc76ec80349d01afac58ee2 Changes
+SHA1 17386c5178be9b7177f936c21759db6dcbe58fbc MANIFEST
+SHA1 c00a58dee4c784d00a13ec6e7b0ce05216d94681 META.json
+SHA1 cbcfa14f656ff195103439f3e2e5a86e42990a43 META.yml
+SHA1 13f1f08634cabfcbc67922c9924ada7a82d6b088 Makefile.PL
+SHA1 070345f24714cf122fc061da3ffceebee50db525 README
+SHA1 436ed6ecddaa72d9d531fa067a79e637091d5a48 lib/WWW/BackpackTF.pm
+SHA1 5f88459d936c3283ce288280f1e7408b07266971 lib/WWW/BackpackTF/Currency.pm
+SHA1 2ab4d17f371b6a6891e74328193429c10eef19ef lib/WWW/BackpackTF/Item.pm
+SHA1 de9435de9f74349860ff4c4aacc9da113e2a825b lib/WWW/BackpackTF/Listing.pm
+SHA1 67eab75e36a499a58a71cfe696c700bf9e5918e4 lib/WWW/BackpackTF/MarketItem.pm
+SHA1 2f21a6e6927eb880d856497a1ee41ecc9dc08eaf lib/WWW/BackpackTF/User.pm
+SHA1 cc1c04c80225dfc180a5c834fd83a5ab4c6d3538 t/00-load.t
+SHA1 b4af59bb6c6b2d655a2f56b2a2d24ce04f41d6c8 t/50-network.t
+SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQItBAEBCgAXBQJYg6gYEBxtYXJpdXNAaWV2YWwucm8ACgkQygQ1vl7Bs2Lu5g//
+cldpAt1HjUd2a1IwA9xNLdmErMhkoBt7xKkZzB7giyHG+jeQ3spS4Rc3xtf876de
+a0XFgD53FRTdSRkTxBbgw5++nx0psNVFmWX4LI39pIhRF85b4Y1FOjfhaJ3DWOHE
+9BhFjeTclidLUVBzPmFISx9ZqER1UlNVGqtZ6Xep6xMvzqqTIxzP4uilgJt0OB7K
+3Fhskr0XZxmQt2qjsxDA1KVryxUcNX4Xx5cGpZh7/M2mqLZctBkBrvQjXUJVhdfB
+ZwKqdPeIUcisxCM6ZHw6uvfowAYW8fdNFw/1Iva8R1Mf1CBDzP2TU+epdE1WP7xH
+VzX5Q7f5x0xGB8e8CvG/TNV00m+6xJdMiFHE720cG+r3zgto5Iedd3/6vl5CnmNy
+HK6TYYaoaZPqXEc4+z8HSut+udhMFtydsHHq8MM4o/qpLr4FmtoAVNlTXGPP49FB
+8lbIrgEBxvX4BW16JAglR4f6ajn7MnoB7+Tn8kwHypykemgb2remA8Jvj0IJoEH9
+8Qo5q4re7GRMpkbnNi9AhPd5lYaiMQB6iRuH/hHnwDe5PUQ9FVC0qQBX1awjjxQW
+RqoUTn4013tr3ueMcIkWKnPxbB0lUUdnh9R1RTOMcKSKh5mMwXz2tEClR5aZsm7P
+pNi92egQqe6Rm4pci0HDnRtR9YqUD6USeKUhfAliMME=
+=/IRi
+-----END PGP SIGNATURE-----

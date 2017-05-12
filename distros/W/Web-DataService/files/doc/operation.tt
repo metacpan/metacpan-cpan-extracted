@@ -1,0 +1,14 @@
+
+<% DESCRIPTION_SECTION(opt_force=1) %>
+
+<% USAGE_SECTION %>
+
+<% PARAMETER_SECTION(opt_force=1) %>
+
+<% METHOD_SECTION(opt_force=1) %>
+
+<% RESPONSE_SECTION(opt_force=1) %>
+
+<% FORMAT_SECTION %>
+
+<% VOCAB_SECTION %>

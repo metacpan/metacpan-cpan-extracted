@@ -1,0 +1,110 @@
+2016-08-26      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.19
+
+        Fix typo in t/utf8.t
+
+2016-08-26      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.18
+
+        Skip t/utf8.t on perl 5.25 because encoding pragma is no
+        longer supported.
+
+        Thanks to Father Chrysostomos for the patch (rt 117218)
+
+2011-10-29      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.17
+
+        PageRank URL has been changed (rt 71541).
+
+2010-12-07      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.16
+
+        Accept env_proxy parameter in constructor in a way similar to
+        LWP::UserAgent (rt 63705).
+
+2009-03-08      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.15
+
+        Skip utf8.t on perl versions older than 5.8.0 (as "use
+        encoding" is not supported)
+
+2007-08-28      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.14
+
+        New parameter 'timeout' (passed through to LWP::UserAgent)
+
+2007-03-29      Yuri Karaban <ykar@cpan.org>
+
+	Release 0.13
+
+	Now it should work with the "use encoding 'utf8'" in older
+        perl distributions (in 5.8.0 particularly).
+
+        Thanks to Jon Schutz for proposed patch.
+        This release closes rt 18913
+
+2006-04-25	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.12
+
+	Work correctly when specified "use encoding 'utf8'"
+
+2006-03-23	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.11
+
+	Updated example in SYNOPSIS ($gpr->get was called in list
+	context)
+
+	Do not trim query string in url.
+
+2005-05-04	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.10
+
+	Code cleanup (removed unreferenced local variables)
+
+2004-11-16	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.09
+
+	Get PR only handle 'http' urls.
+        Changed to match url m{^https?://}i
+
+2004-11-07	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.08
+
+        if method get called in array context returned value
+        is array from two elements where first element is pagerank and
+        second is HTTP::Response form LWP.
+
+        It is handy to use it to see reason why unable to get pagerank.
+
+2004-09-17	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.07
+
+	Add note into perldoc that algorithm is actually
+        new. Because some people thinks that algorithm is old
+        according to perldoc ;)
+
+2004-09-16	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.06
+
+	Cosmetic change in WWW/Google/PageRank.pm.
+	Added Changes to distribution
+
+
+2004-09-15	Yuri Karaban <ykar@cpan.org>
+
+	Release 0.05
+	Changed algorithm of computing url checksum (as google changed it in toolbar)
+	Function now called _compute_ch_new

@@ -1,0 +1,29 @@
+---
+abstract: 'Perl Interface for SEOGears API.'
+author:
+  - 'Rishwanth Yeddula <ryeddula@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.132140'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-SEOGears
+provides:
+  WWW::SEOGears:
+    file: lib/WWW/SEOGears.pm
+    version: 0.05
+requires:
+  Date::Calc: 0
+  HTTP::Tiny: 0.029
+  JSON: 0
+  Net::SSLeay: 1.49
+  URI::Escape: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/ryeddula/www-seogears
+version: 0.05

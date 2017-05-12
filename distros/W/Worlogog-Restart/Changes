@@ -1,0 +1,11 @@
+Revision history for Worlogog-Restart
+
+0.03    2014-11-29
+        - Don't depend on Moo (hand-written class).
+
+0.02    2014-11-10
+        - Use Exporter::Tiny instead of Sub::Exporter
+
+0.01    2013-01-04
+        - First version, released on an unsuspecting world.
+

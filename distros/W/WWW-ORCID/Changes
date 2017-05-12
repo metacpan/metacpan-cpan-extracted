@@ -1,0 +1,18 @@
+Revision history for WWW-ORCID
+
+0.02  2015-09-01 14:22:11 CEST
+  - more pod
+  - mote tests
+
+0.0102  2015-04-22 14:00:20 CEST
+  - switch to Dist::Milla
+  - update default sandbox uri
+  - update message version to 1.1
+
+0.0101  2013-05-23
+  - update contributors
+  - this Changes file
+
+0.01    2013-05-23
+  - initial release
+

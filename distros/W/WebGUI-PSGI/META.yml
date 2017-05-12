@@ -1,0 +1,21 @@
+---
+abstract: 'Run PSGI apps under WebGUI'
+author:
+  - 'Paul Driver <frodwith@cpan.org>'
+generated_by: 'Dist::Zilla version 1.100160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebGUI-PSGI
+requires:
+  Apache2::Const: 0
+  ExtUtils::MakeMaker: 6.11
+  Plack: 0.9913
+  Plack::App::URLMap: 0
+  Plack::Handler::Apache2: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Response: 0
+  namespace::autoclean: 0
+version: 0.2

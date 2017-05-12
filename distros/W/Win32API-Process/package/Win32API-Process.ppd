@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Win32API-Process" VERSION="0,01,0,0">
+	<TITLE>Win32API-Process</TITLE>
+	<ABSTRACT>Perl extension for handling the processes using the plain Win32 API</ABSTRACT>
+	<AUTHOR>Ferdinand Prantl &lt;prantl@host.sk&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/Win32API-Process.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

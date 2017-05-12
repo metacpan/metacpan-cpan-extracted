@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="liquid-css" _name="Liquid CSS" version="2.0" _section="Others">
+    <metadata>
+      <property name="mimetypes">application/liquid</property>
+      <property name="globs">*.css.liquid</property>
+    </metadata>
+
+    <default-regex-options case-sensitive="false"/>
+
+    <definitions>
+	<context id="liquid-css">
+		<include>
+			<context ref="liquid:comment-liquid"/>
+			<context ref="liquid:full-liquid"/>
+			<context ref="liquid:inline-liquid"/>
+			<context ref="css:css"/>
+		</include>
+	</context>
+    </definitions>
+</language>

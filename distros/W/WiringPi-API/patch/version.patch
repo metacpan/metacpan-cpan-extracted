@@ -1,0 +1,47 @@
+diff --git a/wiringPi/wiringPi.c b/wiringPi/wiringPi.c
+index 5adfe69..762c2a9 100644
+--- a/wiringPi/wiringPi.c
++++ b/wiringPi/wiringPi.c
+@@ -76,6 +76,10 @@
+ 
+ #include "wiringPi.h"
+ 
++// wiringPi Version
++
++#define WPI_VERSION "2.36"
++
+ // Environment Variables
+ 
+ #define	ENV_DEBUG	"WIRINGPI_DEBUG"
+@@ -631,6 +635,16 @@ static uint8_t gpioToClkDiv [] =
+  *********************************************************************************
+  */
+ 
++/*
++ * wiringPiVersion:
++ *  Returns the version defined above
++ *
++ */
++
++char * wiringPiVersion (void)
++{
++    return WPI_VERSION ;
++} 
+ 
+ /*
+  * wiringPiFailure:
+diff --git a/wiringPi/wiringPi.h b/wiringPi/wiringPi.h
+index 7926296..b46462f 100644
+--- a/wiringPi/wiringPi.h
++++ b/wiringPi/wiringPi.h
+@@ -220,6 +220,10 @@ extern void piUnlock            (int key) ;
+ 
+ extern int piHiPri (const int pri) ;
+ 
++// wiringPi Version
++
++extern char * wiringPiVersion (void) ;
++
+ // Extras from arduino land
+ 
+ extern void         delay             (unsigned int howLong) ;

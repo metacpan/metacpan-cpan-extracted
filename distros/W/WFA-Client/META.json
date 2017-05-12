@@ -1,0 +1,62 @@
+{
+   "abstract" : "A perl WFA client for interacting with OnCommand Workflow Automation",
+   "author" : [
+      "Rentrak Corporation"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WFA-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "Test::CPAN::Changes::ReallyStrict" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rentrak/perl-wfa"
+      }
+   },
+   "version" : "0.01",
+   "x_homepage" : "https://github.com/rentrak/perl-wfa"
+}

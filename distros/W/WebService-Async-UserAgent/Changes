@@ -1,0 +1,45 @@
+Revision history for WebService-Async-UserAgent
+
+0.006     2017-01-03 20:39:09+08:00 Asia/Kuala_Lumpur
+	No new features.
+
+	Test fixes:
+	* Don't try to run mojo.t unless we have the dependencies installed
+
+0.005     2016-12-31 20:59:36+08:00 Asia/Kuala_Lumpur
+	New features:
+	* Backend support has been moved into cpanfile "features". I
+	don't know if any CPAN clients actually support this concept yet.
+
+	Deprecation fixes:
+	* Mojo::UserAgent works differently these days - thanks DBOOK
+
+0.004     2015-02-16 21:56:47+00:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* Disable Dist::Zilla compilation test again
+
+0.003     2015-02-15 18:34:20+00:00 Europe/London
+	Features:
+	* ->GET method as a wrapper around ->request
+	* Pass through arguments when making a request
+
+	Test fixes:
+	* Disable invalid synopsis test
+
+0.002     2015-02-01 08:21:23+00:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* ::MojoUA inherits from WebService::Async::UserAgent
+	* URI/HTTP::Request added as deps
+
+	Test fixes:
+	* Tests now only run when modules are available
+	* Default Dist::Zilla compilation test is disabled (we want
+	the implementations to fail on load if the dependencies aren't
+	available, without including all implementations in deps)
+
+0.001     2015-01-26 08:08:05+00:00 Europe/London
+	Initial CPAN release

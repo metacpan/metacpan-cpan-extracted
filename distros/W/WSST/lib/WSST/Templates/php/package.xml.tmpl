@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>[% package_name %]</name>
+ <channel>[% php_channel or "pear.php.net" %]</channel>
+ <summary>An Interface for [% title %]</summary>
+ <description>[% php_description or abstract %]</description>
+[% FOREACH i = author -%]
+ <lead>
+  <name>[% i | $author_name %]</name>
+  <user>[% i | $author_user %]</user>
+  <email>[% i | $author_email %]</email>
+  <active>yes</active>
+ </lead>
+[% END -%]
+ <date>[% now_strftime("%Y-%m-%d") %]</date>
+ <time>[% now_strftime("%H:%M:%S") %]</time>
+ <version>
+  <release>[% php_version_release or version %]</release>
+  <api>[% php_version_api or version %]</api>
+ </version>
+ <stability>
+  <release>[% php_stability_release or "beta" %]</release>
+  <api>[% php_stability_api or "beta" %]</api>
+ </stability>
+ <license uri="[% php_license_uri %]">[% license %]</license>
+ <notes>[% php_notes or "#" %]</notes>
+ <contents>
+  <dir name="/">
+[% make_package_contents() %]
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>4.0.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0b1</min>
+   </pearinstaller>
+   <package>
+    <name>PEAR</name>
+    <channel>pear.php.net</channel>
+   </package>
+   <package>
+    <name>XML_Serializer</name>
+    <channel>pear.php.net</channel>
+   </package>
+  </required>
+  <optional>
+   <package>
+    <name>PHPUnit</name>
+    <channel>pear.phpunit.de</channel>
+    <min>3.2.8</min>
+   </package>
+  </optional>
+ </dependencies>
+ <phprelease />
+ <changelog>
+  <release>
+   <version>
+    <release>[% version %]</release>
+    <api>[% version %]</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>[% now_strftime("%Y-%m-%d") %]</date>
+   <license uri="[% php_license_uri %]">[% license %]</license>
+   <notes>[% php_notes or "#" %]</notes>
+  </release>
+ </changelog>
+</package>

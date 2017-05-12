@@ -1,0 +1,5 @@
+2006-02-24  toni  <toni@irational.org>  (1.00)
+
+	* What.pm: first version, What::MTA implementation for Exim,
+	Postfix, Sendmail, Courier, XMail, MaswMail.
+

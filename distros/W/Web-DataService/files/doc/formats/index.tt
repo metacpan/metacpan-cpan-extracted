@@ -1,0 +1,28 @@
+
+=head2 DESCRIPTION
+
+This data service is capable of returning its results in a variety of formats.  This capability
+provides great flexibility, allowing such diverse activities as:
+
+=over
+
+=item *
+
+Support for client applications written in Javascript
+
+=item *
+
+Downloads of data in text format for use in spreadsheets
+
+=item *
+
+Viewing of data in browser tabs.
+
+=back
+
+Each format has a default vocabulary in which its data is expressed.  The
+available formats and vocabularies are discussed below.
+
+<% FORMAT_SECTION(opt_extended=1) %>
+
+<% VOCAB_SECTION(opt_extended=1, opt_all=1) %>

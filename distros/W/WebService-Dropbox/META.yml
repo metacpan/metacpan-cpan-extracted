@@ -1,0 +1,68 @@
+---
+abstract: 'Perl interface to Dropbox API'
+author:
+  - 'Shinichiro Aska'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Dropbox
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Dropbox:
+    file: lib/WebService/Dropbox.pm
+    version: '2.05'
+  WebService::Dropbox::Auth:
+    file: lib/WebService/Dropbox/Auth.pm
+  WebService::Dropbox::Files:
+    file: lib/WebService/Dropbox/Files.pm
+  WebService::Dropbox::Files::CopyReference:
+    file: lib/WebService/Dropbox/Files/CopyReference.pm
+  WebService::Dropbox::Files::ListFolder:
+    file: lib/WebService/Dropbox/Files/ListFolder.pm
+  WebService::Dropbox::Files::UploadSession:
+    file: lib/WebService/Dropbox/Files/UploadSession.pm
+  WebService::Dropbox::TokenFromOAuth1:
+    file: lib/WebService/Dropbox/TokenFromOAuth1.pm
+  WebService::Dropbox::Users:
+    file: lib/WebService/Dropbox/Users.pm
+recommends:
+  Furl: '2.19'
+  IO::Socket::SSL: '1.954'
+  JSON::XS: '3.02'
+  Software::License: '0'
+requires:
+  HTTP::Message: '6.06'
+  JSON: '2.59'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '6.05'
+  URI: '1.60'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/s-aska/p5-WebService-Dropbox/issues
+  homepage: https://github.com/s-aska/p5-WebService-Dropbox
+  repository: git://github.com/s-aska/p5-WebService-Dropbox.git
+version: '2.05'
+x_authority: cpan:ASKADNA
+x_contributors:
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Rostislav Georgiev <pisaro@mail.bg>'
+  - 'aska <aska@linecorp.com>'
+  - 'Shinichiro Aska <s.aska.org@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

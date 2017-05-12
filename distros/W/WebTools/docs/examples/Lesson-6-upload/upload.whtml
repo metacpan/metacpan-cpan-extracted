@@ -1,0 +1,63 @@
+<!-- PERL: Hide Perl`s script
+<?perl 
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');
+?>
+//-->
+<HTML>
+  <HEAD>
+     <TITLE>Upload/Mail Example</TITLE>
+  </HEAD>
+<BODY TEXT="white" BGCOLOR="black" LINK="yellow" VLINK="yellow">
+<FONT FACE="Verdana" SIZE=2><B>
+<CENTER><H3>Upload/Mail Example</H3></CENTER><BR>
+<!-- PERL: Hide Perl`s script
+<?perl
+ set_script_timeout(5*60);       # Timelife for this script is 5min.
+ if ($subm eq 'upload') 
+   {
+    my $orgfile1 = $uploaded_original_file_names{'file1'};    # Original upload file name.
+    my $orgfile2 = $uploaded_original_file_names{'file2'};    # Original upload file name.
+    my $fn1 = $uploaded_files{'file1'};                       # %uploaded_files is a global var.
+    my $fn2 = $uploaded_files{'file2'};                       # %uploaded_files is a global var.
+    require "mail.pl";       
+    
+    # Proto: set_mail_attachment(Original file name, uploaded file name on server);
+    set_mail_attachment($orgfile1,$fn1);                      # Push first file in attachment list
+    set_mail_attachment($orgfile2,$fn2);                      # and second one
+
+    # Proto: remove_mail_attachment(Original file name);  Remove attached file from attachment list
+
+    
+    set_mail_attachment($orgfile1,$fn1);                      # Push first file in attachment list
+    set_mail_attachment($orgfile2,$fn2);                      # and second one
+    
+    send_mail($from,$to,'Test','<font color="red"> Just a small email test in HTML format!</font>',1);
+    # OR
+    # @results = mail(to=>$to,from=>$from,subject=>'Test',
+    #                 body=>'<font color="red"> Just a small email test in HTML format!</font>',html=>1);
+    # Please see "Lesson-10-mail"
+    
+    print "<HR>";
+    print "E-mail SENT<BR>TO: $to <BR> FROM: $from<BR>\n";
+    print "Attachments: <BR> ".$orgfile1."<BR> ".$orgfile2;
+   }
+ if ($subm eq '')
+   {
+    ?>
+    //-->
+    <FORM enctype='multipart/form-data' ACTION="/cgi-bin/webtools/process.cgi?file=upload/upload.html" METHOD="POST">
+      <H3>Send mail:</H3>
+      <BR>To:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="TEXT" NAME="to" VALUE="">
+      <BR>From:&nbsp;<INPUT TYPE="TEXT" NAME="from" VALUE=""><BR><br>
+      First attachment:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE=FILE NAME="file1"><BR>
+      Second attachment:<INPUT TYPE=FILE NAME="file2"><BR><BR>
+      <INPUT TYPE="submit" NAME="subm" VALUE="upload">
+    </FORM>
+    <!-- PERL: Hide Perl`s script
+    <?perl
+   }
+?>
+//-->
+</B></FONT>
+</BODY>
+</HTML>

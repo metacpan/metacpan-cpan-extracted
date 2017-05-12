@@ -1,0 +1,43 @@
+Revision history for Perl extension WWW::Scraper::Yahoo360.
+
+0.09  Tue Jun 02 14:44:01 2009
+    - Fixed scraper for pages that didn't contain any blog post at all.
+      Now it should work correctly for any case (tm).
+
+0.08  Sun May 31 13:49:00 2009
+    - Fixed scraper for pages with only 1 blog post.
+      Now it should work correctly for any case.
+
+0.07  Sun May 31 08:35:21 2009
+    - Added a debug mode with a global $DEBUG flag, and 
+      added a twin option --debug in the export-yahoo360-blog.pl script.
+    - Fixed parsing of pictures and random hangs (still hangs sometimes...)
+    - Fixed parsing of dates with 3-letter months (May, for example)
+    - Fixed parsing of sharing level when it's private
+    - Fixed failed tests (a test file was missing from MANIFEST)
+
+0.06  Wed May 27 21:15:11 2009
+    - Now blog post contents include the main picture (if any).
+	  Added new test cases.
+
+0.05  Tue May 26 08:53:17 2009
+    - login() method didn't report failures correctly. Not it's fixed.
+    - added a -verbose option to the export blog script.
+
+0.04  Mon May 11 23:55:33 2009
+	- some blog posts could be parsed incorrectly, leading to
+	  truncated content. This is now fixed and test-covered.
+    - now the default export-yahoo360-blog.pl script is installed
+	  in your $PERL/bin folder. (EXE_FILES passed to WriteMakefile()).
+
+0.03  Sat May  9 14:15:28 2009
+	- added optional arguments for get_blog_posts() to be more flexible
+	- improved documentation
+
+0.02  Mon Apr 27 21:13:00 2009
+    - better docs with a saner module description
+
+0.01  Wed Apr 22 13:23:00 2009
+	- original version; created by h2xs 1.23 with options
+		--use-new-tests -n WWW::Scraper::Yahoo360 -X -A
+

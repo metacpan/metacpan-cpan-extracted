@@ -1,0 +1,62 @@
+{
+   "abstract" : "CPAN as a web service",
+   "author" : [
+      "Adriano R. Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-CPAN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::FileCache" : "0",
+            "Carp" : "0",
+            "Class::Accessor" : "0",
+            "Class::Lego::Constructor" : "0.004",
+            "Class::Lego::Myself" : "0.001",
+            "Data::Dump::Streamer" : "0",
+            "File::HomeDir" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent::Determined" : "0",
+            "Path::Class" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0.17",
+            "URI" : "0",
+            "XML::Simple" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/aferreira/cpan-WWW-CPAN"
+      }
+   },
+   "version" : "0.013"
+}

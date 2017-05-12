@@ -1,0 +1,42 @@
+---
+abstract: 'Format SQL via the sqlformat.org API'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Test2::Bundle::More: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-SQLFormat
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  JSON::MaybeXS: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Module::Runtime: '0'
+  Moo: '2.002004'
+  Types::Standard: '0'
+  Types::URI: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/oalders/webservice-sqlformat/issues
+  homepage: https://github.com/oalders/webservice-sqlformat
+  repository: https://github.com/oalders/webservice-sqlformat.git
+version: '0.000007'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

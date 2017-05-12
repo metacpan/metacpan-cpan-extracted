@@ -1,0 +1,107 @@
+==================================================
+Changes from 1738-12-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2012-09-26 01:50:08 +0000
+------------------------------------------
+
+  Change: c48ec190528f723821705e9e297ce2459bc6b111
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 03:49:57 +0000
+
+    Added SUPPORT Block in POD 
+
+  Change: 91897d2ccd6d4d58833c2c7c7efa3cced46dd165
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 03:48:56 +0000
+
+    More examples in SYNOPSIS 
+
+  Change: 3dbf401fa731fcf2806d884c56e6cdd667646406
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 02:59:31 +0000
+
+    Hups, switched to @Author::GETTY 
+
+  Change: e6eed48abe5a474e0225e6f6a669c8747392c9fa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 02:55:13 +0000
+
+    v0.001 
+
+  Change: fcf3ac91a981d7bb3895259158b3e73dc4bd5814
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 02:53:52 +0000
+
+    Added missing abstracts 
+
+  Change: 3954762b9715bec5f33efc51f1c3f74e7acc84cd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 02:52:26 +0000
+
+    Finally.... the masterpiece is ... aehm... functional ;) 
+
+  Change: 69d86cb8705a5eae3876dbbf7b21506876bd5c81
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-25 03:16:23 +0000
+
+    More.... 
+
+  Change: a9da1c1c23964fc5a8b54ee2f3e94f3899809224
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-24 10:43:27 +0000
+
+    None response handling, added add/remove functions 
+
+  Change: 9c6a53b931630d7faa1e3a07f7ffd333f3c42c0b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-24 09:21:33 +0000
+
+    I should sleep... but its all cool now ;) at least for the getting 
+
+  Change: e99036b3d811b8b0bb9ccb2751b964226ec3b7f0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-24 05:56:08 +0000
+
+    Some small fixes, using "Unimplemented" for update 
+
+  Change: b054bab17c6b8de5c72724130ce2d16fdf37520f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-24 05:43:59 +0000
+
+    Oh my god, how much i hate asana... still WIP, much debugging in 
+
+  Change: 35aabcd2937faf95744c5469e2eb22127c7be4d4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-19 07:08:19 +0000
+
+    More documentation, finally splitted up Request/Response/Client 
+
+  Change: 147e982a0f4ceb7e767665fa598303526c8c9064
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-19 05:17:50 +0000
+
+    Finetuning, first mapping to the target classes 
+
+  Change: 9912a0746328f9cda98d86d873f96881f6b76a3a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-19 02:52:00 +0000
+
+    Base load of type classes, client class, request/response classes 
+
+  Change: 58595757e8198298f5a4813f1d164f96abace909
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-12 17:11:39 +0000
+
+    Dont look at me, i'm just a data transfer 
+
+  Change: 8029e0d83af16021d711d03ad63516ee2c5dbc46
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-03 21:30:36 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

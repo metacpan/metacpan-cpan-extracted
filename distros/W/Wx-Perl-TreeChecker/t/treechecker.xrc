@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="xrc_test">
+    <title>Wx::Perl::TreeChecker XRC test</title>
+    <size>500,300</size>
+    <object class="wxPanel">
+      <object class="wxBoxSizer">
+        <orient>wxHORIZONTAL</orient>
+        <object class="sizeritem">
+          <object class="wxStaticBoxSizer">
+            <label>Wx::TreeCtrl (converted)</label>
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+              <object class="wxTreeCtrl" name="test_treectrl"/>
+              <option>1</option>
+              <flag>wxGROW</flag>
+            </object>
+          </object>
+          <option>1</option>
+          <flag>wxGROW</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxStaticBoxSizer">
+            <label>Wx::Perl::TreeChecker</label>
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+              <object class="Wx::Perl::TreeChecker" name="test_treechecker"/>
+              <option>1</option>
+              <flag>wxGROW</flag>
+            </object>
+          </object>
+          <option>1</option>
+          <flag>wxGROW</flag>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

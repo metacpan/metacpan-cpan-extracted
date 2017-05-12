@@ -1,0 +1,29 @@
+---
+abstract: 'The Perl API to access the public-viewpoints geo-webservice.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.86'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-PublicViewpoints
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  LWP::Simple: 0
+  Object::Tiny: 1.06
+  Text::CSV::Slurp: 0
+  URI: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.01

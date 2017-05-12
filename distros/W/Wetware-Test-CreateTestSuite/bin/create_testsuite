@@ -1,0 +1,179 @@
+#!/usr/bin/env perl
+# incase anyone runs perlcritic on this, yes, we have a package name
+# that is not in the Required Filename form that we would demand of
+# an actual perl module.
+#
+# this also demonstrates the idea of allowing this script to subclass
+# the Wetware::CLI and over ride the methods that it needs.
+## no critic (Modules::RequireFilenameMatchesPackage)
+package Wetware::TEST::create_testsuite;
+
+use strict;
+use warnings;
+
+use Wetware::CLI;
+use base q{Wetware::CLI};
+use Wetware::Test::CreateTestSuite;
+
+#------------------------------------------------------------------------------
+
+exit run(@ARGV) unless caller;
+
+#------------------------------------------------------------------------------
+# Folks, matisse enzer had this idea about simply subclassing 
+# and, well, it seems good enough to me...
+
+sub run {
+	my (@args) = @_;
+	
+	my $cli =  __PACKAGE__->new();
+	
+	my $options = $cli->get_options(@args);
+
+    my $test_stuite_creator = Wetware::Test::CreateTestSuite->new( %{$options} );
+
+	return $test_stuite_creator->run();
+}
+
+#------------------------------------------------------------------------------
+
+sub option_specifications {
+	my ($self) = @_;
+	my @default_specifications = $self->SUPER::option_specifications();
+	push @default_specifications, qw( preview overwrite_t_files );
+	return @default_specifications;
+}
+
+sub remaining_argv {
+	my ($self,$opt_ref, @argv) = @_;
+	if ( $self->SUPER::remaining_argv($opt_ref, @argv) ) {
+		$opt_ref->{'search_dir'} = shift @argv;
+	}
+	else {
+		$opt_ref->{'search_dir'} = './lib';
+	}
+	return $self;
+}
+ 
+#------------------------------------------------------------------------------
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+create_testsuite -  creates TestSuite.pm files
+
+=head1 SYNOPSIS
+
+  create_testsuite [ -verbose | -help | -pod ]
+  [ -preview ] [ some_path ]
+
+=head1 DESCRIPTION
+
+The intention is to create a Foo::TestSuite for all Foo modules
+that are found. 
+
+If no other arguments are created, then create_testsuite assumes
+that the modules are to be found in './lib' - assuming that one
+is running it at the top of a new distribution. 
+
+Or a distribution that needs to be updated.
+
+=head1 CHANGE STOCK test files
+
+There are two semi standard .t test scripts that need to
+be changed to work and play well with the TestSuite approach,
+since if one attempts to do the simple Test::Compile of 
+any Module that inherits from a Test::Class based module 
+with the INIT block, they will fail becaue 'it is too
+late for INIT' - this is also true of Pod Coverage.
+
+So the fix is to call a sub.
+
+Modify pod-coverage.t to use:
+
+=over
+
+ all_non_testsuite_pod();
+
+ #-------------------------------------------------------------
+
+ sub all_non_testsuite_pod {
+
+	my @modules = grep { $_ !~ m{::TestSuite$} } all_modules();
+	plan tests => scalar @modules;
+	foreach my $module ( @modules ) {
+		pod_coverage_ok($module);
+	}
+	return;
+ }
+
+=back
+
+And it will filter out the modules *::TestSuite.
+
+The compile_pm script is about the same, except that it runs with
+module file names:
+
+=over
+
+ all_non_testsuite_modules();
+
+ #----------------------------------------------------------------
+
+ sub all_non_testsuite_modules {
+
+	my @modules = grep { $_ !~ m{/TestSuite.pm$} } all_pm_files();
+	plan tests => scalar @modules;
+	foreach my $module ( @modules ) {
+		pm_file_ok
+		($module);
+	}
+	return;
+ }
+
+=back
+
+Remember that you will need to add the 'use Test::More;' so that
+you have access to the plan.
+
+=head1 SEE ALSO
+
+Test::Class
+
+Wetware::Test
+
+Wetware::Test::CreateTestSuite
+
+Wetware::CLI
+
+=head1 ACKNOWLEDGEMENTS
+
+I really have to blame billbill, because we were talking on the
+phone and he was talking about creating templates of test code
+for any given Module Foo....
+
+Soooooo - given the hard lessons learned about what can and can not
+be done with the whole Test::Class::Load - why not do the nice thing.
+
+=head1 TODO
+
+Figure out if it is worth it to be able to differenciate between
+the simple Functional Modules, and the OO style.
+
+Also resolve if we want to work out the inheritence chain, so that
+we know that Foo::TestSuite is the parent of Foo::Bar::TestSuite,
+because Foo::Bar is a subclass of Foo.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 "drieux", all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

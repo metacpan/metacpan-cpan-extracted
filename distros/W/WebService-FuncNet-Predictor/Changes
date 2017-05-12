@@ -1,0 +1,72 @@
+
+
+Revision history for WebService-FuncNet-Predictor
+0.11   Wed May 26 13:11:19 BST 2010
+        - Fixed bug with URI coercion reported by Andy Clegg
+        - Predictor object must be given port, service, binding
+          which is passed on to Operation (bug reported by Andy Clegg)
+
+0.10   Mon Jul  6 16:42:10 BST 2009 (r65)
+        - Changed distribution name and namespace
+        - Minor documentation changes
+
+Revision history for WebService-Cath-FuncNet
+0.08   Tue May 19 11:03:03 BST 2009 (r8105)
+        - Corrected version in docs
+        - Added MooseX::Types to prerequisites
+
+0.07   Fri May  1 16:48:27 BST 2009 (r8005)
+        - Fixed typo in package name (!)
+        - Fixed XML::Compile v2.0 problem requiring XML::Compile::SOAP
+
+0.06   Wed Apr 29 15:13:41 BST 2009 (r7969)
+        - added explicit coercion to Math::BigFloat
+        - corrected WSDL namespace:
+           http://funcnet.eu/ => http://funcnet.eu/FuncNet_1_0/
+
+0.05   Mon Dec  8 11:28:27 GMT 2008 (r6813)
+       Operation::ScorePairwiseRelations::Result
+        - corrected raw_score to Math::BigFloat (thanks Heinz)
+       Corrected MANIFEST listing
+
+0.04   Tue Nov  4 11:57:01 (r6637)
+       Corrected stupid typos in SYNOPSIS
+       Reversed the order of entries in this file
+       
+0.03   Mon Nov  3 16:37:46 (r6634)
+       Corrections to docs, tests, logging and coercions
+       
+  GENERAL:
+    - lib/WebService/Cath/FuncNet.pm
+        - corrected/added docs
+        - corrected coercions of WSDL attr
+        - made wsdl_from_uri more flexible (deals with strings and URI)
+
+  TESTS:
+    - t/perlcritic.t
+        - removed requirement for perlcritic config file
+    - t/00.methods.t
+        - renamed to t/01.methods.t
+    - t/01.methods.t
+        - moved tests requiring remote connection to t/02.remote.t
+    - t/02.remote.t
+        - optional remote tests (based on $ENV{ TEST_FUNCNET_REMOTE })
+    - t/GecoService.wsdl
+        - Added local copy of the WSDL for basic tests
+
+  LOGGING:
+    - lib/WebService/Cath/FuncNet/Logger.pm
+        - This now just uses the Logable role and automatically exports 
+            the 'get_logger' method, e.g.
+
+            package MyClass;
+            use WebService::Cath::FuncNet::Logger;
+            $logger = get_logger();
+
+0.02   Mon Oct 27 10:56:48 (r6611)
+       Changed pre-requisite to Moose 0.51 (require BUILDARGS)
+       Corrected some perlcritic/coverage tests
+
+0.01   Tue Oct 21 14:57:14 2008 (r6608)
+       Initial release
+

@@ -1,0 +1,16 @@
+Revision history for WebService-Google-Voice-SendSMS
+
+1.002  2015-02-21
+	- Fetch https://www.google.com/voice/m/sms to get XSRF token
+	  (This is a smaller page than https://www.google.com/voice/m/)
+
+1.001  2014-11-01
+	- No functional changes
+	- Add Troubleshooting section to docs (RT#99827)
+
+1.000  2014-06-07
+	- No functional changes
+	- Document that you must see a TEXT button in Google Voice (RT#92040)
+
+0.01   2013-02-14
+	- Initial release

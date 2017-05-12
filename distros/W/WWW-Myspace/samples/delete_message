@@ -1,0 +1,7 @@
+#!/usr/bin/perl -I../lib -w
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace;
+
+$myspace->delete_message( @ARGV );

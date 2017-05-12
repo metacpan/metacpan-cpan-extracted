@@ -1,0 +1,59 @@
+Webqq-Client v8.5.3 (该模块已经停止使用和开发 请换用 Mojo::Webqq https://metacpan.org/pod/Mojo::Webqq)
+========================
+使用Perl语言编写的Webqq客户端，并且可通过插件提供基于HTTP协议的api接口供其他语言或系统调用
+
+客户端异步框架
+
+client 
+ | 
+ ->login()
+    |
+    |        +-------------------------<------------------------------+
+    |        |                                                        |
+    |->_recv_message()-[put]-> Webqq::Message::Queue -[get]-> on_receive_message()
+    |
+    |->send_message() -[put]--+                       +-[get]-> _send_message() ---+
+    |                           \                   /                              |
+    |->send_sess_message()-[put]-Webqq::Message::Queue-[get]->_send_sess_message()-|               
+    |                              /              \                                |
+    |->send_group_message()-[put]-+                +-[get]->_send_group_message()--|
+    |                                                                              |
+    |                          on_send_message() ---<---- msg->{cb} -------<-------+
+    +->run()
+
+安装步骤
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+   推荐使用CPAN安装
+
+   cpan -i Webqq::Client
+
+核心依赖模块
+
+  JSON
+  Encode::Locale
+  AnyEvent::HTTP
+  LWP::UserAgent
+  LWP::Protocol::https
+  Webqq::Encryption
+
+可选模块
+
+  Webqq::Qun
+
+版本更新记录
+
+  请参见 Changes 文件
+
+COPYRIGHT 和 LICENCE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

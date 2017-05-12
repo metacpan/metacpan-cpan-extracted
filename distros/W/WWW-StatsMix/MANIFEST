@@ -1,0 +1,28 @@
+Changes
+lib/WWW/StatsMix.pm
+lib/WWW/StatsMix/Metric.pm
+lib/WWW/StatsMix/Stat.pm
+lib/WWW/StatsMix/Params.pm
+lib/WWW/StatsMix/UserAgent.pm
+lib/WWW/StatsMix/UserAgent/Exception.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-new.t
+t/02-create_metric.t
+t/03-update_metric.t
+t/04-delete_metric.t
+t/05-get_metrics.t
+t/06-create_stat.t
+t/07-get_stat.t
+t/08-update_stat.t
+t/09-delete_stat.t
+t/10-get_stats.t
+t/11-track.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

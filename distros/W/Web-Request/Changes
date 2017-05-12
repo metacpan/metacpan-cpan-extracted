@@ -1,0 +1,39 @@
+Revision history for Web-Request
+
+0.11  2013-09-02
+      - fix form parameters (domm, #1)
+      - backport a couple fixes from Plack::Request/Plack::Response
+        - a96a5b6: try harder to buffer the entire input
+        - 39d3a13: more accurate URI escaping for query params
+        - e3d0dde: support 'to_app' on Web::Response
+
+0.10  2013-01-09
+      - fix test on blead (hash order dependency)
+
+0.09  2012-11-12
+      - fix setting up psgi.input in certain cases
+
+0.08  2012-11-07
+      - fix tests with new HTTP::Message
+
+0.07  2012-09-30
+      - switch to using Stream::Buffered
+
+0.06  2012-09-29
+      - forgot to add docs for streaming responses
+
+0.05  2012-09-29
+      - support streaming responses in Web::Response
+
+0.04  2012-09-28
+      - fix reading content multiple times on perls below 5.12
+
+0.03  2012-09-28
+      - add some diagnostics to a test to see if i can get some better feedback
+        from cpantesters failures
+
+0.02  2012-09-27
+      - add 'host' method for accessing the Host header (with a fallback)
+
+0.01  2012-09-24
+      - Initial release

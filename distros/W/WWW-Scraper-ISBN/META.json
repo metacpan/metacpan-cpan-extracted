@@ -1,0 +1,72 @@
+{
+    "name": "WWW-Scraper-ISBN",
+    "version": "1.03",
+    "abstract": "Retrieve information about books from online sources",
+    "author": [
+      "Andy Schamp <andy@schamp.net>",
+      "Barbie <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "isbn",
+        "books"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Carp": "1.00",
+                "Module::Pluggable": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.88"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "WWW::Scraper::ISBN": {
+            "file": "lib/WWW/Scraper/ISBN.pm",
+            "version": "1.03"
+        },
+        "WWW::Scraper::ISBN::Driver": {
+            "file": "lib/WWW/Scraper/ISBN/Driver.pm",
+            "version": "1.03"
+        },
+        "WWW::Scraper::ISBN::Record": {
+            "file": "lib/WWW/Scraper/ISBN/Record.pm",
+            "version": "1.03"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Scraper-ISBN" },
+        "repository": {
+            "url": "git://github.com/barbie/www-scraper-isbn.git",
+            "web": "http://github.com/barbie/www-scraper-isbn",
+            "type": "git"
+        }
+    }
+}

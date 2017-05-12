@@ -1,0 +1,45 @@
+<?perl
+require 'mail.pl';
+
+# Set mail attachment:
+#     set_mail_attachment('downloadble_name','full_path_name_to_file_attachment');
+# Set encoding for 'that' attachment:
+#     set_mime_encoding('downloadble_name',$type);
+# where type can be: 'quoted-printable', '8bit' and 'base64'(default)
+# Remove attachment from list: remove_mail_attachment('downloadble_name');
+
+my @results  =  mail(to=>'foo@bar.com',from=>'someone@somewhere.com',subject=>'Good News!',
+                     body=>'<html><HR>See hello!<HR></html>',html=>1,date=>'10:12:11',
+                     priority=>'High',timeout=>30);
+
+# Available parameters to mail() function:
+# to=>'comma separated e-mails', from=>'E-MAIL', replyto=>'E-MAIL',
+# cc=>'comma separated e-mails', bcc=>'comma separated e-mails',
+# charset=>'Content-type: text/html; charset=us-ascii', html=>'1|0',
+# body=>'some text/html code', text=>'some plain text', subject=>'Some text',
+# date=>'DATE', priority=>'HIGH|NORMAL|LOW', timeout=>'TIMEOUT_IN_SEC',
+# dns=>'YOUR_DNS_IP', nslookup=>'FULL_PATH'
+# NOTE: all parameters are case sensitive! ('to' is different from 'To'!).
+#       if 'dns' field is specified 'host' and 'nslookup' will be skipt!
+# @results contain lines for each e-mail ($to,$cc,$bcc...) with follow structure:
+# $error_code."\t".$email."\t".$error_message
+# Example: "220"."\t".'julian@foo.bar'."",
+# where code '220' means OK (mail sent)! See RFC 821 for complete list of error codes.
+
+my $r;
+foreach $r (@results)
+ {
+  $r =~ m/^(.*?)\t(.*?)\t(.*)$/s;
+  my $code = $1;
+  my $mail = $2;
+  my $errm = $3;
+  if($code == 220)
+    {
+     print "Mail to $mail sent!<BR>";
+    }
+  else
+    {
+     print "Can't send email to: $mail <br>because error code: $code ($errm)<BR>";
+    }
+ }
+?>

@@ -1,0 +1,29 @@
+Revision history for Perl extension Word::Segmenter::Chinese::Lite.
+
+0.01  Sun Jun  8 09:49:59 2014
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.8.8 -n Word::Segmenter::Chinese::Lite
+
+0.02  Fri Jun 13 11:34:40 2014
+    - remove Data::Dump
+
+0.03  Mon Jun 23 23:49:16 2014
+	- Change Dict data from Data::Dumper to JSON
+
+0.04  Tue Jun 24 00:05:42 2014
+	- Modify Doc
+    - Support for specify the maximum word length
+
+0.05  Tue Jun 24 23:24:40 2014
+    - Fix bug
+
+0.06  Thu Jun 26 00:35:34 2014
+    - add "obigram" and "unigram" segment mode
+	- add wscl_set_mode method
+    - encode output automatic
+
+0.07  Thu Jun 26 15:04:48 2014
+    - fix a small error in doc
+
+0.08  Fri Jun 27 11:14:39 2014
+	- remove Data::Dump

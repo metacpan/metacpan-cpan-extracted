@@ -1,0 +1,30 @@
+Revision history for WWW-Kickstarter
+
+1.8.0   2016-05-08
+        - Documented the ability for $ks->projects to search by search term,
+          which was previously left undocumented by accident.
+        - Switched the installer from using Module::Build to using ExtUtils::MakeMaker.
+        - Various minor documentation tweaks.
+
+1.6.0   2014-11-16
+        - $project->category_id is deprecated. Use $project->category->id instead.
+        - $project->category_name is deprecated. Use $project->category->name instead.
+        - Fixed bug in $ks->category_projects and $ks->category_projects_recommended.
+        - Added $project->category.
+        - Added support for reward data.
+        - Added support for location data.
+
+1.4.0   2014-10-07
+        - Always round progress down to avoid saying a project is 100% funded before it is.
+        - $project->goal and $project->pledged aren't in USD as documented.
+          Fixed the documentation and added $project->currency.
+        - Kickstarter's "launch_date" sort order changed. It now sorts by ascending launch date.
+          Use sort order "newest" to projects sorted by descending launch date.
+          $ks->projects_recently_launched was adjusted to return the newest first again.
+
+1.2.0   2014-02-18
+        - Urls to fetch projects were being built incorrectly.
+
+1.0.0   2014-02-15
+        - Initial version
+          Accounts for the backwards-incompatible changes to the API of December 2013.

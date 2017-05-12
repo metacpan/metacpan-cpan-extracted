@@ -1,0 +1,412 @@
+==================================================
+Changes from 2014-09-15 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.37 at 2015-09-15 15:15:10 +0000
+-----------------------------------------
+
+  Change: c227c4a0987bb3fc7a355d9172196709f984f93f
+  Author: thomasminney <tminney@live.com>
+  Date : 2015-09-15 09:40:07 +0000
+
+    Merge pull request #5 from sophos/SubComponentXMLNames
+
+    Sub component xml names 
+
+  Change: 04d493f21650de5a3e635b0f4277982dbc6c6185
+  Author: Amir Shirazi <amir.shirazi@sophos.com>
+  Date : 2015-09-11 16:59:41 +0000
+
+    Removed Custom Label as mapping as including it in deletions manifest
+    needs more work (ref: SCAFCI-498) 
+
+  Change: 9c2f57a29a59679ba1dbcd70d655d9643ac1b055
+  Author: Amir Shirazi <amir.shirazi@sophos.com>
+  Date : 2015-09-10 15:50:04 +0000
+
+    Removed redundant method 
+
+  Change: bd9a0eebd749a631439744b8c6d09167d2943f14
+  Author: Amir Shirazi <amir.shirazi@sophos.com>
+  Date : 2015-09-10 15:43:42 +0000
+
+    Added additional sub components which were not tracked, minor
+    refactoring to private variable convention 
+
+  Change: 45e332c882c00bf3a3c3d9926dc87c894caeed4b
+  Author: amirshirazi <email@amirshirazi.com>
+  Date : 2015-09-10 13:33:30 +0000
+
+    Handle subComponents more effectively - fixes #4
+
+    getName has been modified to transform node names into API names (ie
+    fields => CustomField) rather than leave API names unchanged. This is
+    not backwards-compatible (but that behavior was a bug)
+
+    ...
+
+    Fix syntax errors
+
+    Tidy up
+
+    Added Documentation 
+
+  Change: cdeeb9f74752356b582de3ce9539a981aa58702a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-09-07 12:07:21 +0000
+
+    Implement describeGlobal and describeSObjects calls 
+
+  Change: d1beedfb90985c34c7d274ee745335d1b20df957
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-09-07 12:06:47 +0000
+
+    Added signature to Metadata->listMetadata 
+
+  Change: 811ad441dd3c84b4f224f8514071351e38f127c6
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-09-07 12:06:46 +0000
+
+    Fixed typo in recursive call to _doCall 
+
+-----------------------------------------
+version 0.36 at 2015-08-11 09:44:35 +0000
+-----------------------------------------
+
+  Change: a7c6b7677d414a80edaf41b8a411da40d8dc18a0
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-08-11 10:44:35 +0000
+
+    Remove critic tests: they were producing malformed output 
+
+  Change: c14002413081cfc0cb3086002ba1f3a253dd99fd
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-08-10 14:02:27 +0000
+
+    Fix regressions introduced by single-quoted regex 
+
+  Change: 742cc4dd0fda943034c4151a3d77da8dda808e6b
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-08-10 10:54:17 +0000
+
+    Continue documentation drive 
+
+  Change: 51512e1c3c45e5082e841ec6f2b0333640f8fc86
+  Author: Alexander Brett <alex@alexander-brett.co.uk>
+  Date : 2015-08-10 07:25:00 +0000
+
+    Continue refactoring documentation 
+
+  Change: f82872b717725945fc6c3038c11403a01010030a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-08-05 10:19:47 +0000
+
+    Documentation improvements, including moving CallResult to a separate
+    class, for clarity 
+
+  Change: c8eea45ed817839c69fdbedbac7c7bae74ff7b5f
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 17:30:01 +0000
+
+    Use Method::Signatures in Manifest.pm 
+
+  Change: 66cf1209a094c57f109f0c3c5d312a643d2839b1
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 15:30:11 +0000
+
+    Update Tooling API to use new callResult 
+
+  Change: 9edd83111d4fbb5ac97822dac4168995fb76abd0
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 14:37:47 +0000
+
+    M::S in Metadata API and fixing Constants class 
+
+  Change: fc29314cbfb1278a7720b222eae1dd5624b4b2da
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 13:20:06 +0000
+
+    Refactor Partner to use M::S and the new _call 
+
+  Change: fee4f186ad0679c8d0d10c77150002701fdead0e
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 12:20:15 +0000
+
+    Refactor executeAnonymous and unimplement all other methods
+
+    This is because I don't have enough information to implement the
+    external API properly 
+
+  Change: 1effa67a7c2d6df515f64a39a4615cd82a928a2b
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-28 11:44:34 +0000
+
+    Refactoring basic stuff: Calls now return CallResults, and use
+    Method::Signatures 
+
+  Change: 97bbe29e25542414befbb9f471847e99bb8ca787
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-23 16:08:54 +0000
+
+    _queryMore has been broken thanks to refactoring _call 
+
+-----------------------------------------
+version 0.35 at 2015-07-23 13:59:19 +0000
+-----------------------------------------
+
+  Change: 72b210bc1dae2a402241a3282b9f3093217cd471
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-23 14:59:19 +0000
+
+    When querying, remove the Id element of the results hash if it's
+    undefined 
+
+  Change: 6b62b4750a10d756446e11945766b516e53de961
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-23 11:58:37 +0000
+
+    Refactor query logic to allow callbacks 
+
+  Change: d2052fc6a2299c73a80d7bfd0d0e1c6e2f8d2f90
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-23 11:46:51 +0000
+
+    No need for an executable directory in dist.ini 
+
+-----------------------------------------
+version 0.34 at 2015-07-22 08:56:23 +0000
+-----------------------------------------
+
+  Change: aad559712e7ccee4dde4dc66c8c06db6f871fa1f
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 09:56:23 +0000
+
+    dist.ini modified to include changelog 
+
+  Change: b235a977b10f8d2d6a9de708d764f22c7c62a8a4
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-22 09:14:14 +0000
+
+    Bugfix - _checkDeployment was constructing a DeployResult with 3
+    arguments 
+
+-----------------------------------------
+version 0.33 at 2015-07-20 13:36:42 +0000
+-----------------------------------------
+
+  Change: cba03dda44c79167ecce3ea8438836bf86e5303f
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-20 14:36:42 +0000
+
+    Add documentation and ensure it's obvious that _result and _headers
+    are, in general, private 
+
+  Change: 9c688f96d2388a7c4b2c20326073238a8efbd4bf
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-17 16:39:19 +0000
+
+    Add warning about instability 
+
+  Change: 320d31ba6f829bd41e5ed639f8776f48a52e37c3
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-17 16:37:39 +0000
+
+    Changes to Apex api Execute Anonymous functions for greater win 
+
+-----------------------------------------
+version 0.32 at 2015-07-17 14:48:11 +0000
+-----------------------------------------
+
+  Change: c1f5997f2df45bae2d2ac633d99bb5f68fe4a751
+  Author: Alexander Brett <alex@alexander-brett.co.uk>
+  Date : 2015-07-17 15:48:11 +0000
+
+    Merge pull request #1 from syohex/fix-test
+
+    Correct XML file name 
+
+  Change: 0d253aa329e3c382b0656fa95c974f543c85bdcd
+  Author: Syohei YOSHIDA <syohex@gmail.com>
+  Date : 2015-07-14 18:11:07 +0000
+
+    Correct XML file name 
+
+-----------------------------------------
+version 0.31 at 2015-07-14 16:31:35 +0000
+-----------------------------------------
+
+  Change: 3f2e3680fe30502007094fbcd6a50c2975b5f43e
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-14 17:31:35 +0000
+
+    Update lots of documentation in an attempt to avoid horrible
+    inaccuracy 
+
+-----------------------------------------
+version 0.30 at 2015-07-10 13:55:39 +0000
+-----------------------------------------
+
+  Change: 96006ede94e493f0a5a9ee18da2cce14a651c3d9
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-10 14:55:39 +0000
+
+    Avoid warnings when cleaning up objects 
+
+  Change: a1540162f1a9685f0d97f535234576e927c76b65
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-08 12:28:12 +0000
+
+    Add better diagnostics to deployments via the metadata API 
+
+  Change: 584c58226d04ad0a8354eda5017de7cbf8ba655a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 15:57:16 +0000
+
+    Use Dist::Zilla to set $VERSION in each package 
+
+  Change: ba798e1637d506bcf3786bf30113570b0ae165ab
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 11:08:10 +0000
+
+    Figured out retries for API calls
+
+    If there's a network error, the SOAP::Lite call fails, so we use an
+    eval in _doCall(). If the error is on the server, _doCall will live,
+    so we handle it using $req->fault in call - in which case, there's no
+    point in retries. 
+
+  Change: 4c66fe1da9ff7ddb194a1baabd897d436fddb282
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-07 11:05:41 +0000
+
+    Added exception class for API calls 
+
+-----------------------------------------
+version 0.26 at 2015-07-02 15:19:55 +0000
+-----------------------------------------
+
+  Change: fe3649d5a60961e498a6c434c714c8ae07b0ff78
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 16:19:55 +0000
+
+    Removed non-ascii character 
+
+  Change: 19552dda78f919da9832564a22eba133813ed512
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 16:16:32 +0000
+
+    Refactored unit tests to reflect new reality 
+
+  Change: aae52f82edb2dbcb17ac6c0b0321b5d7f7599c27
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 16:14:41 +0000
+
+    Constants refactoring broke _splitLine on subcomponents 
+
+  Change: 9ee34c58f1599cad36cfd4e4fc6bba3ec497de93
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 15:36:22 +0000
+
+    Fixed a typo, and made the session optional, in Constants 
+
+  Change: 4696f4b92008c4f2c948ac69a0fbe71db95cc7d1
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 14:00:47 +0000
+
+    Ignore criticism in WWW::SFDC 
+
+  Change: af5988a00ca44caa5ca30a322063d727c5f250dc
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-02 09:08:55 +0000
+
+    Rearrange _cleanUpSObject to make it easier to read and remove
+    given/when 
+
+  Change: b721530af3d3a90186b655239cbb9a4db40230b5
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-07-01 12:16:46 +0000
+
+    More careful handling of $baseDir to enable git diff piping 
+
+  Change: 856ba6c1998b1dfb646700412a8109e8a87e7470
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-29 14:23:38 +0000
+
+    Add retry functionality when error code is 500 or higher 
+
+  Change: dfc7a6d6fe5258c2fc7e5cd8e7603ee4764fa4a7
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-17 18:57:27 +0000
+
+    More robust de-blessing of query results 
+
+  Change: 1ddc2b16b98c0fe4ab4d6f0583bc831acd47f812
+  Author: Alexander Brett <alex@alexander-brett.co.uk>
+  Date : 2015-06-14 14:18:40 +0000
+
+    Remove singletons in favour of dependancy injection
+
+    This makes for simpler implementation and management of multiple
+    environments, at the cost of slightly increased construction
+    verbosity 
+
+  Change: b03dec04a48fa1698288e5c2652d107b211cd412
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-13 13:53:51 +0000
+
+    Initial work towards dynamic metadata types 
+
+-----------------------------------------
+version 0.25 at 2015-06-29 10:25:22 +0000
+-----------------------------------------
+
+  Change: 4e9bc64eef2bfddb3412b948187274038eb5b535
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-29 11:25:22 +0000
+
+    Remove given/when because of downgraded status 
+
+-----------------------------------------
+version 0.24 at 2015-06-26 14:51:41 +0000
+-----------------------------------------
+
+  Change: 00cf9db74648091fb04865d1ba0ca5e71185d4ed
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-06-26 15:51:41 +0000
+
+    add retries functionality to WWW::SFDC 
+
+-----------------------------------------
+version 0.23 at 2015-05-29 08:32:35 +0000
+-----------------------------------------
+
+  Change: ef09f50869609dfd4a33f005251068af949e9ae2
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-29 09:32:35 +0000
+
+    Fix some more tests 
+
+-----------------------------------------
+version 0.22 at 2015-05-28 10:40:46 +0000
+-----------------------------------------
+
+  Change: 7dc24f06e1d8316534352084130ecb74cf7e939a
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-28 11:40:46 +0000
+
+    Fix failing tests 
+
+-----------------------------------------
+version 0.21 at 2015-05-26 10:45:47 +0000
+-----------------------------------------
+
+  Change: c58de1a563a256d1f496e3c20da861f2737327b3
+  Author: Alexander Brett <alexander.brett@sophos.com>
+  Date : 2015-05-26 11:45:47 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

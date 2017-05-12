@@ -1,0 +1,114 @@
+{
+   "abstract" : "API client for NHK program API",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-NHKProgram-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Time::Piece" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite::Lazy" : "0",
+            "Encode" : "2.57",
+            "Furl" : "0",
+            "JSON" : "0",
+            "TV::ARIB::ProgramGenre" : "0",
+            "Text::Sprintf::Named" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scope::Guard" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::NHKProgram::API" : {
+         "file" : "lib/WWW/NHKProgram/API.pm",
+         "version" : "0.03"
+      },
+      "WWW::NHKProgram::API::Area" : {
+         "file" : "lib/WWW/NHKProgram/API/Area.pm"
+      },
+      "WWW::NHKProgram::API::Date" : {
+         "file" : "lib/WWW/NHKProgram/API/Date.pm"
+      },
+      "WWW::NHKProgram::API::Genre" : {
+         "file" : "lib/WWW/NHKProgram/API/Genre.pm"
+      },
+      "WWW::NHKProgram::API::Provider" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider.pm"
+      },
+      "WWW::NHKProgram::API::Provider::Common" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider/Common.pm"
+      },
+      "WWW::NHKProgram::API::Provider::Genre" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider/Genre.pm"
+      },
+      "WWW::NHKProgram::API::Provider::Info" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider/Info.pm"
+      },
+      "WWW::NHKProgram::API::Provider::List" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider/List.pm"
+      },
+      "WWW::NHKProgram::API::Provider::Now" : {
+         "file" : "lib/WWW/NHKProgram/API/Provider/Now.pm"
+      },
+      "WWW::NHKProgram::API::Service" : {
+         "file" : "lib/WWW/NHKProgram/API/Service.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/WWW-NHKProgram-API/issues"
+      },
+      "homepage" : "https://github.com/moznion/WWW-NHKProgram-API",
+      "repository" : {
+         "url" : "git://github.com/moznion/WWW-NHKProgram-API.git",
+         "web" : "https://github.com/moznion/WWW-NHKProgram-API"
+      }
+   },
+   "version" : "0.03"
+}

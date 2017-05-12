@@ -1,0 +1,51 @@
+TYPEMAP
+
+Win32_CLR   T_WIN32_CLR
+CLR_Object  T_CLR_OBJECT
+CLR_String  T_CLR_STRING
+CLR_Param1  T_CLR_PARAM
+CLR_Param2  T_CLR_PARAM
+CLR_Param3  T_CLR_PARAM
+CLR_Param4  T_CLR_PARAM
+CLR_Param5  T_CLR_PARAM
+
+bool T_CLR_BOOL
+
+OUTPUT
+
+T_CLR_OBJECT
+    XS::SvSetReturn($arg, $var);
+
+T_CLR_STRING
+    XS::SvSetString($arg, $var);
+
+T_CLR_BOOL
+    $arg = boolSV($var);
+
+INPUT
+
+T_WIN32_CLR
+    if ( sv_isobject($arg) && sv_derived_from($arg, \"Win32::CLR\") ) {
+        $var = XS::SvGetInstance($arg);
+    }
+    else {
+        $var = nullptr;
+    }
+
+T_CLR_OBJECT
+    $var = XS::SvGetInstance($arg);
+
+T_CLR_STRING
+    $var = XS::SvToString($arg);
+
+T_CLR_BOOL
+    $var = Convert::ToBoolean( SvTRUE($arg) );
+
+T_CLR_PARAM
+    {
+        int offset = @{[$type =~ /(\d)$/]};
+        $var = gcnew array<Object^>(items - offset);
+        for (int i = offset; i < items; i++) {
+            ${var}[i - offset] = XS::SvGetInstance( ST(i) );
+        }
+    }

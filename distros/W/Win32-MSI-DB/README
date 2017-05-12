@@ -1,0 +1,50 @@
+Win32/MSI/DB version 1.05
+=========================
+
+This is a object-oriented interface for changing MSI-databases.
+
+For detail please consult the perl online documentation (pod):
+	perldoc DB.pm
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Win32::API
+
+COPYRIGHT AND LICENCE
+
+GPL, see http://www.fsf.org/licenses/gpl.html
+(C)opyright 2003 by pmarek@cpan.org.
+
+
+**** Changes ****
+
+* since 1.05
+	 Bug found and fixed by Peter Jaquiery (GRANDPA). Thank you!
+
+* since 1.04
+	Lots of cleanups by DBH. Thank you!
+
+* since 1.03
+	I've just discovered a bug in the perl package 'Win32::MSI::DB',
+	you've submitted to CPAN. The bug, better to say the type off, is
+	in the "_close" method. The handle is stored in the "$hdk", but
+	MsiCloseHandle is called with non-existing $hdl.
+Thanks to Martin (email protected)
+
+* since 1.02
+Field type "l" added (localized string), which ist used
+in eg. File and Directory tables
+
+

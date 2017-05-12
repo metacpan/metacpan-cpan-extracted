@@ -1,0 +1,40 @@
+2005-04-17  Joseph Wang <joe@confucius.gnacademy.org>
+
+        * Version 0.8
+	* Find pod error
+
+2005-03-15  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Version 0.7
+	* Make the grammar input work with tags
+
+2004-08-30  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Add exact table method to library
+
+2004-08-24  Joseph Wang  <joe@confucius.gnacademy.org>
+	* Version 0.6
+
+2004-05-09  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Added extract grammar and template mode
+
+2004-01-05  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Version 0.5
+	* Fixed bug which caused adjacent items to break
+	* Fixed bug which caused (((tags))) to interfere with finding the
+	  start and stop of sections
+	* Add sample to illustrate expand-hrefs
+
+2004-01-04  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Changed expand_hrefs to actually work
+
+2003-07-11  Joseph Wang  <joe@confucius.gnacademy.org>
+
+	* Version 0.4
+	* Created Change log
+	* Added some example files
+	* Refactored the module so that you can get out hash information
+

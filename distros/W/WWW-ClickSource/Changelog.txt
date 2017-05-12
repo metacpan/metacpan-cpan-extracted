@@ -1,0 +1,12 @@
+v0.8 Handle Google Adwords requests that don't have a referer
+v0.7 Handle android-app:// referals
+     Don't crash on unknown scheme
+v0.6 Fixed dependency on perl 5.10
+     POD fixes
+v0.5 More known sources for organic and social traffic
+     Dependency on perl >= 5.10
+v0.4 Improved traffic detection for social sources
+v0.3 Improved detection of google organic traffic
+     Attempt to fix test for perl 5.8
+v0.2 Fixed issue with CPAN installs
+v0.1 First release

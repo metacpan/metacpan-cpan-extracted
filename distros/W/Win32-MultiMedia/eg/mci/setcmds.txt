@@ -1,0 +1,154 @@
+These are the parameters that can be use with the "set" command.
+see  http://msdn.microsoft.com/library/default.asp?URL=/library/psdk/multimed/mci_04dv.htm
+for more.
+
+
+cdaudio:
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on door closed
+	door open
+	time format milliseconds
+	time format msf
+	time format tmsf 
+	
+digitalvideo: 
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on
+	door closed
+	door open 
+	file format format
+	seek exactly on
+	seek exactly off
+	speed factor
+	still file format format
+	time format frames
+	time format milliseconds
+	video off
+	video on 
+	
+overlay: 
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off 
+	audio right on
+	door closed
+	door open
+	video off
+	video on 
+	
+sequencer: 
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on
+	door closed
+	door open
+	master MIDI
+	master none
+	master SMPTE
+	offset time port mapper
+	port none
+	port port_number
+	slave file
+	slave MIDI
+	slave none
+	slave SMPTE
+	tempo tempo_value
+	time format milliseconds
+	time format SMPTE fps
+	time format SMPTE 30 drop
+	time format song pointer 
+	
+vcr: 
+	assemble record on
+	assemble record off
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on
+	clock time
+	counter format
+	counter value
+	door closed
+	door open
+	index counter
+	index date
+	index time
+	index timecode
+	length duration
+	pause timeout
+	postroll duration -
+	duration power on
+	power off
+	preroll duration duration
+	record format SP
+	record format LP
+	record format EP
+	speed factor
+	time format frames
+	time format hms
+	time format milliseconds
+	time format msf
+	time format SMPTE fps
+	time format SMPTE 30 drop
+	time format tmsf
+	time mode counter
+	time mode detect
+	time mode timecode
+	tracking plus
+	tracking minus
+	tracking reset 
+	
+videodisc: 
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on
+	door closed door open
+	time format frames
+	time format hms
+	time format milliseconds
+	time format track
+	video off
+	video on 
+	
+waveaudio: 
+	alignment integer
+	any input
+	any output
+	audio all off
+	audio all on
+	audio left off
+	audio left on
+	audio right off
+	audio right on
+	bitspersample bit_count
+	bytespersec byte_rate 
+	channels channel_count
+	door closed
+	door open
+	format tag pcm
+	format tag tag
+	input integer
+	output integer
+	samplespersec integer
+	time format bytes
+	time format milliseconds
+	time format samples 
+	

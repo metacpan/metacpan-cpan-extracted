@@ -1,0 +1,5 @@
+DB.pm			Win32::MSI::DB extension
+MANIFEST		Win32::MSI::DB extension aux.file.
+Makefile.PL		Win32::MSI::DB extension aux.file.
+README			Win32::MSI::DB extension README.
+msidb-test.pl		example script. 

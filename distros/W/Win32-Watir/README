@@ -1,0 +1,35 @@
+Win32-Watir version 0.06
+========================
+
+INSTALLATION
+
+To install this module type the following:
+
+ - on Cygwin :
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+ - on ActivePerl :
+   perl Makefile.PL
+   nmake.exe
+   nmake.exe test
+   nmake.exe install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Win32
+ Win32::OLE
+ Config
+
+if you want to use with IE 6.0 requires..
+
+ multipleIE
+ ( http://tredosoft.com/Multiple_IE )
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Kazuhito Shimizu

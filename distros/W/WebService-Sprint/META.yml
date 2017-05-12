@@ -1,0 +1,29 @@
+---
+abstract: "an interface to Sprint's web services"
+author:
+  - 'Brett T. Warden <bwarden@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Sprint
+provides:
+  WebService::Sprint:
+    file: lib/WebService/Sprint.pm
+    version: 0.50
+requires:
+  DateTime: 0
+  Digest::MD5: 0
+  JSON: 0
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.50

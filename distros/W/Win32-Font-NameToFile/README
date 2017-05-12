@@ -1,0 +1,127 @@
+NAME
+    Win32::Font::NameToFile - Return the name of a TrueType font file from a
+    description
+
+SYNOPSIS
+            use Win32::Font::NameToFile qw(get_ttf_abs_path get_ttf_filename get_ttf_matching);
+            use GD;
+            use GD::Text::Wrap;
+
+            #
+            #       using a simple, absolute path font description
+            #
+            my $img = GD::image->new();
+            my $gdtext = GD::Text::Wrap->new($img);
+            $gdtext->set_font(get_ttf_abs_path('Palatino Linotype Bold Italic'), 12);
+            #
+            #       using a simple font description with point size
+            #
+            $gdtext->font_path("$ENV{SYSTEMROOT}\\Fonts");
+            $gdtext->set_font(get_ttf_filename('Palatino Linotype Bold Italic 12');
+            #
+            #       using a font description from a Perl/Tk Tk::Font object
+            #
+            my $img = GD::image->new();
+            my $gdtext = GD::Text::Wrap->new($img);
+            $gdtext->set_font(get_ttf_abs_path($tkfont));
+            #
+            #       using a partial font description
+            #
+            $gdtext->font_path("$ENV{SYSTEMROOT}\\Fonts");
+            my @fonts = get_ttf_matching('Palatino');
+            $gdtext->set_font($fonts[1], 12)
+                    if @fonts;
+
+DESCRIPTION
+    Returns filenames for a TrueType font on Win32 platforms, using either a
+    descriptive name, or a Perl/Tk Font object.
+
+    If the name string does not end with a number, then returns a scalar
+    string for either the absolute path (*for get_abs_path()*), or only the
+    filename without any file qualifier (*for get_filename()*).
+
+    Otherwise, for descriptive text names that end with a number, or for
+    Perl/Tk Tk::Font objects, returns a list of the absolute path (*for
+    get_abs_path()*), or the filename without any file qualifier (*for
+    get_filename()*), and the point size of the font (useful to simplify
+    calls to GD::Text::set_font()).
+
+    Note that all methods are static *(i.e., class)* methods, and are
+    exported.
+
+METHODS
+    get_ttf_abs_path( *font-description* | *Tk::Font object* )
+        Returns the full path to the font file, as described above.
+
+    get_ttf_filename( *font-description* | *Tk::Font object* )
+        Returns the font filename, with any file qualifier removed, as
+        described above.
+
+    get_ttf_bold( *font-description* | *Tk::Font object* )
+    get_ttf_italic( *font-description* | *Tk::Font object* )
+    get_ttf_bold_italic( *font-description* | *Tk::Font object* )
+        Returns true (as the absolute filename) if there is a version of the
+        font that is bold, italic, or both.
+
+    *@allfonts* = get_ttf_list()
+        Returns a list of all available font descriptions. NOTE: the
+        returned descriptions have been normalized to all lower case.
+
+    *%allfonts* = get_ttf_map()
+        Returns a list of all available (font description, filename) pairs
+        (suitable for storing in a hash). NOTE: the returned descriptions
+        have been normalized to all lower case, and the filenames are all
+        upper case, and do not include the full path prefix.
+
+    *%fonts* = get_ttf_matching($string)
+        Returns a list of all available (font description, filename) pairs
+        (suitable for storing in a hash) that begin with $string. NOTE: the
+        returned descriptions have been normalized to all lower case, and
+        the filenames are all upper case, and do not include the full path
+        prefix.
+
+NOTES
+    *   The font registry information is read once when the module is
+        loaded, and the information is stored in a package variable.
+        Therefore, any changes to the font registry after the package is
+        loaded will not be reflected by the module until the application is
+        restarted.
+
+    *   Descriptive font naming can vary significantly, though in most cases
+        the name is followed by the weight (if any) and then the slant (if
+        any). As ever, YMMV.
+
+    *   This module treats "Oblique" slant the same as italic.
+
+    *   In order to normalize lookups, font names are stored internally in
+        all lower case, and the file names are stored in all upper case.
+
+    *   Some fonts do not have explicit fontfiles for their bold or italic
+        versions, but are manipulated by other packages (e.g., Perl/Tk) to
+        implement the weight or slant programmatically.
+
+    *   Some fonts are hidden files, and thus may not show up in either the
+        registry, or in the values return by this module.
+
+    *   When using Perl/Tk Font objects, be aware that the returned size
+        value depends on the "-size" value supplied when the font was
+        created. If a positive "-size" was specified, then the size is in
+        pixels; if negative, the size is in points. This module detects and
+        negates the latter "-size"'s when returning the results. *Alas,
+        there is no simple/perfect method for deriving points from pixels,
+        so caution is advised.*
+
+    *   The test suite assumes the usual Arial font types are available.
+
+PREREQUISITES
+    Win32::TieRegistry
+
+AUTHOR and COPYRIGHT
+    Copyright(C) 2006, Dean Arnold, Presicient Corp., USA. All rights
+    reserved.
+
+    <mailto:darnold@presicient.com>
+
+    You may use this software under the same terms as Perl itself. See the
+    Perl Artistic license for details.
+

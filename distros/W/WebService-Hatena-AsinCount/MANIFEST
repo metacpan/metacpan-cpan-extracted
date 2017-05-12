@@ -1,0 +1,6 @@
+Makefile.PL
+lib/WebService/Hatena/AsinCount.pm
+README
+MANIFEST
+META.yml
+t/webservices.t

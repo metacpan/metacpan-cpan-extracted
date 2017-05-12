@@ -1,0 +1,413 @@
+body
+{
+	margin: 0;
+	padding: 0 0 2em 0;	
+	width: 100%;
+	height: 100%;
+	font-size: 1em;
+	background-color: #FFFFFF;
+	color: #000000;
+	font-family: Times New Roman, serif;
+}
+a
+{
+	color: #3333FF;
+}
+a:visited
+{
+	color: #CC00CC;
+}
+img
+{
+	border-width: 0px;
+}
+table
+{
+	border-width: 0;
+	border-collapse: collapse;
+}
+table.wide
+{
+	width: 100%;
+}
+table.high
+{
+	height: 100%;
+}
+td
+{
+	vertical-align: top;
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+}
+span.ooo
+{
+	padding-left: 2pt;
+}
+span.oo
+{
+	padding-left: 2pt;
+	padding-right: 2pt;
+}
+ul
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+ul li
+{
+	margin: 0 0 0.5em 0;
+	padding: 0;
+}
+span.nobr
+{
+	white-space: nowrap;
+}
+
+div.top
+{
+	background-color: black;
+	font-size: 200%;
+	color: white;
+	padding: 0.5em 100px 0.5em 50px;
+}
+div.top a,
+div.top a:visited
+{
+	color: white;
+	text-decoration: none;
+}
+div.top a:hover
+{
+	color: white;
+	text-decoration: underline;
+}
+div#language-selector
+{
+	position: absolute;
+	top: 5px; 
+	right: 10px;
+	width: 80px;
+	text-align: right;
+	font-size: 0.8em;
+	color: white;
+}
+div#language-selector a
+{
+	color: #CCCCCC;
+}
+div#rss-link
+{
+	position: absolute;
+	top: 5px; 
+	right: 10px;
+	text-align: right;
+	font-size: 0.8em;
+	padding: 2px;
+	background-color: #FF6600;
+}
+div#rss-link a
+{
+	color: white;
+}
+div.content
+{
+	padding: 30px 45px 30px 50px;
+}
+div.message
+{
+	margin-bottom: 40px;
+}
+div.message h1
+{
+	font-size: 1.5em;
+	font-weight: normal;
+	margin: 0 0 0.3em 0;
+	position: relative;
+	top: 0;
+	left: -2px;
+	z-index: 2;
+	font-family: Georgia, serif;
+}
+div.message h1 a,
+div.message h1 a:visited
+{
+	color: black;
+	text-decoration: none;
+}
+div.message h1 a:hover
+{
+	color: black;
+	text-decoration: underline;
+}
+div.message p
+{
+	margin: 0 0 0.7em 0;
+	line-height: 130%;
+	font-size: 0.9em;
+	margin-right: 30%;
+}
+div.footer
+{
+	margin: 1em 50px 3em 50px;
+	border-top: 1px solid #333333;
+	padding-top: 0.5em;
+	font-size: 0.8em;
+}
+div.message p.keywords
+{
+	color: gray;
+	margin: 0;
+	font-size: 0.8em;
+	margin-right: 50%;
+}
+div.message p.keywords a
+{
+	color: gray;
+}
+span.date
+{
+	font-style: italic;
+	font-size: 0.8em;
+}
+div.message p.keywords span.date
+{
+	font-size: 1em;
+}
+div.incut
+{
+	width: 25%;
+	float: right;
+}
+div.incut p
+{
+	font-size: 0.8em;
+	margin: 0 0 0.3em 0;
+}
+div.abc
+{
+	padding-left: 10px;
+	font-size: 300%;
+	color: #333333;
+	width: 1em;
+	float: right;
+}
+div.example table td
+{
+	font-size: 0.9em;
+	padding: 0 1.9em 0.3em 0;
+}
+div.example table th
+{
+	font-size: 0.9em;
+	text-align: left;
+	padding: 0 1.9em 0 0;
+}
+td.x50
+{
+	width: 50%;
+}
+td.x33
+{
+	width: 33%;
+}
+td.x25
+{
+	width: 25%;
+}
+td.x20
+{
+	width: 20%;
+}
+table.inner td,
+table.inner td.x33,
+table.inner td.x50,
+table.inner td.x25,
+table.inner td.x20
+{
+	font-size: 1em;
+	padding: 0 2em 0.5em 0;	
+}
+table.small tr td,
+table.small td.x33,
+table.small td.x50,
+table.small td.x25,
+table.small td.x20
+{
+	font-size: 0.8em;
+	padding: 0 2em 0.5em 0;	
+}
+table.inner td h6
+{
+	font-size: 1em;
+	font-style: italic;
+	border-bottom: 1px solid black;
+	margin: 0;
+	padding: 0;
+	font-weight: normal;
+	font-size: 
+}
+small
+{
+	font-size: 0.8em;
+}
+div.example
+{
+	background-color: #F5F5F5;
+	width: 75%;
+	margin: 0 1.9em 0.5em -1.9em;
+	padding: 0.5em 2em 0.7em 2em;
+}
+div.example p
+{
+	margin-right: 5%;
+}
+div.narrow
+{
+	width: 65%;
+	width: expression('90%');
+}
+div.image
+{
+	margin: 0 0 1em 0;
+}
+img
+{
+	border: 1px solid black;
+}
+div.image p
+{
+	font-size: 0.8em;
+	margin: 0;
+	margin-left: 30%;
+	margin-right: 20%;
+}
+div.image p.place
+{
+	font-style: italic;
+	font-size: 0.8em;		
+}
+div.future *
+{
+	color: gray;
+}
+img.noframe
+{
+	border-width: 0;
+}
+p.quote
+{
+	text-indent: -0.6em;	
+}
+span.gray
+{
+	color: gray;
+}
+div.common-navigation
+{
+	background-color: #F5F5EA;
+	margin: 0 1.9em 0.5em -1.9em;
+	padding: 1em 2em 1.7em 2em;
+}
+div.common-navigation div.tag-cloud
+{
+	margin: 0 30% 2em 0;
+	line-height: 200%;
+}
+div.common-navigation div.calendar
+{
+	margin: 1em 0 1em 0;
+	line-height: 130%;
+}
+div.common-navigation div.calendar div
+{
+	width: 10em;
+	float: left;
+}
+div.common-navigation p
+{
+	line-height: 130%;
+	width: 75%;
+	margin: 0;
+}
+div.tag-cloud a,
+div.tag-cloud a:visited,
+div.calendar a,
+div.calendar a:visited
+{
+	color: black;
+}
+div.tag-cloud a.sz0 {font-size: 70%; color: black}
+div.tag-cloud a.sz1 {font-size: 80%; color: black}
+div.tag-cloud a.sz2 {font-size: 100%; color: black}
+div.tag-cloud a.sz3 {font-size: 105%; color: black}
+div.tag-cloud a.sz4 {font-size: 110%; color: black}
+div.tag-cloud a.sz5 {font-size: 140%; color: black}
+div.tag-cloud a.sz6 {font-size: 145%; color: black}
+div.tag-cloud a.sz7 {font-size: 160%; color: black}
+div.tag-cloud a.sz8 {font-size: 170%; color: black}
+div.tag-cloud a.sz9 {font-size: 180%; color: black}
+div.tag-cloud a.sz10 {font-size: 230%; color: black}
+tr.separate td
+{
+	border-bottom: 1px solid #999999;
+}
+.comment
+{
+	font-size: 85%;
+	color: gray;
+}
+div.quote
+{
+	padding-left: 3em;
+	font-size: 90%;
+}
+input.emptySearch
+{
+	color: gray;
+}
+ul.search-results
+{
+	margin: 0;
+	padding: 0;
+	width: 67%;
+}
+ul.search-results li
+{
+	margin: 0 0 1em 0;
+	padding: 0;
+}
+ul.search-results li h4
+{
+	font-weight: normal;
+	font-size: 100%;
+	margin: 0;
+}
+ul.search-results li p
+{
+	margin: 0 0 0.3em 0;
+	font-size: 85%;
+}
+span.highlight
+{
+	font-weight: bold;
+}
+div.search-keywords
+{
+	background-color: #e5e5fe;
+	padding: 0.5em;
+	width: 40%;
+	margin-bottom: 1em;
+	margin-left: -0.4em;
+}
+#ysearchmod {position:relative;margin-bottom: 2.5em;}   
+#ysearchautocomplete {position:relative;width:75%;}
+#ysearchinput {position:absolute;width:100%;height: 1.6em;}
+#ysearchcontainer {position:absolute;top:1.3em;width:100%;}   
+#ysearchcontainer .yui-ac-content {position:absolute;width:100%;border:1px solid #404040;background:#ffffff;overflow:hidden;z-index:9050;}   
+#ysearchcontainer .yui-ac-shadow {position:absolute;margin:.3em;width:100%;background:#a0a0a0;z-index:9049;}   
+#ysearchcontainer ul {padding:5px 0;width:100%;}   
+#ysearchcontainer li {padding:0 5px;cursor:default;white-space:nowrap;}   
+#ysearchcontainer li.yui-ac-highlight {background:#cbddff;}   

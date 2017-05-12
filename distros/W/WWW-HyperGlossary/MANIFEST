@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/HyperGlossary.pm
+lib/WWW/HyperGlossary/Base.pm
+lib/WWW/HyperGlossary/Word.pm
+lib/WWW/HyperGlossary/Word/Definition.pm
+lib/WWW/HyperGlossary/Utils/YAML.pm
+scripts/tmpl
+t/00.load.t
+t/pod.t

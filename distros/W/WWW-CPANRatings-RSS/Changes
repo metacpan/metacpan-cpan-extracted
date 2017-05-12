@@ -1,0 +1,32 @@
+Revision history for WWW-CPANRatings-RSS
+
+0.0307  2013-11-05
+        - Moved author tests to xt/
+
+0.0306  2013-11-03
+        - Fixed broken Kwalitee test
+
+0.0305  2013-10-24
+        - Fixed Test::Kwalitee to run only with RELEASE_TEST
+        - Fixed warning about deprecated use of qw() without parentheses
+        - Added minimum perl version to requires (for Kwalitee)\
+        - Made "Changes" file comply to the CPAN::Changes::Spec spec
+
+0.0304  2008-10-10
+        - some FAILs on cpantesters
+
+0.0303  2008-08-03
+        - Fixed a bug in fetch_unique() that caused it being not so unique.
+
+0.0203  2008-08-03
+        - Had an obvious bug in fetch_unique()... how did I miss that :/
+
+0.0202  2008-08-03
+        - Fixed missing prerequisite.
+
+0.0201  2008-08-03
+        - Added the fetch_unique() and ratings_unique() methods.
+
+0.0101  2008-08-03
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,82 @@
+Issues with the API:
+
+* /gdc/project is not navigatable
+
+/gdc/project/<project_id> hierarchy exists, but there are no links
+reachable from root that would point into it. On the other hand,
+/gdc/md returns navigatable list of projects and is linked from
+/gdc/projects as well. This list of project should probably be moved from
+/gdc/md to /gdc/projects.
+
+* Some error responses (notably token failures) don't respect Accept
+
+They always return HTML responses, since Apache's auth modules are too
+high in the processing stack. Nothing could probably be done about this.
+
+* Certain errors return different structures than others
+
+Some are { error => { message => ..., parameters => [...] }}, while others
+lack the error key:
+
+'{"parameters":[],"component":"Account::Login::AuthShare",
+        "message":"Bad Login or Password\\"!"}',
+
+* No charset information
+
+Content-Encoding header is not present, nor is MIME type in Content-Type
+(or multipart parts) enriched with charset= key.
+
+* DELETE /gdc/md/<project_id> returns 200
+
+And same contant as GET of the resource.
+
+* 401 Error message without login makes little sense
+
+When requesting authenticated resource without SST, only "/gdc/account/login"
+message is gotten.
+
+* Report without reportdefinitions was seen in real life
+
+URI: /gdc/md/i729zexwpdr03c4hjf1vktrlwa5m590q/obj/7610
+When POSTed to xtab2 executor3: 500 Internal Server Error
+Missing ReportID in Storage.pm-&gt;Register() at /opt/common/lib/XTabLib/Storage.pm line 191.
+
+* Inconsitency in "self" links
+
+{report}{meta}{uri}
+{project}{meta}{self}
+
+* Crappy diagnostics from chart exporter
+
+Exporter worker returned ERROR status at lib/WWW/GoodData/Agent.pm line 146.
+This happened once without a good reason and retry succeeded.
+
+* Invalid structure errors are really hard to grok
+
+Checking 'result_req', result STRUCTURE INVALID - name of structure:'ResultReq'(tag:result_req),  /result_req/ExecuteResult/format: Object  does not match any alternative. Alternatives tried : [STRUCTURE INVALID - name of structure:'ResultReq'(tag:result_req),  /result_req/ExecuteResult/format/case:: Constant 'pdf' expected. at /opt/common/lib/REST/GrammarStructure/Atom.pm line 67.
+, STRUCTURE INVALID - name of structure:'ResultReq'(tag:result_req),  /result_req/ExecuteResult/format/case:: Constant 'xls' expected. at /opt/common/lib/REST/GrammarStructure/Atom.pm line 67.
+, STRUCTURE INVALID - name of structure:'ResultReq'(tag:result_req),  /result_req/ExecuteResult/format/case:: Constant 'png' expected. at /opt/common/lib/REST/GrammarStructure/Atom.pm line 67.
+] at /opt/common/lib/REST/GrammarStructure/Alternative.pm line 116.
+
+* Chart PDF exports have weird title
+
+One from result used should be there instead.
+
+* Nearly all 405 responses lack Allow headers
+
+Plain violation of 2616.
+
+* MAQL can not be 0 characters
+
+Such as empty UpdateMaql from GoodData-CL.
+
+* ;s are insterted into MAQL on line breaks
+
+Renders MAQL "#\n" invalid:
+Detected invalid maql statement(s): got ';' at {"line":2,"column":1}, but ['' | 'IDENTIFIER' | 'SYNCHRONIZE' | 'DROP' | 'DEFINE' | 'OBJECT' | 'ALTER' | 'INCLUDE' | 'CREATE' | 'SELECT'] is expected. at lib/WWW/GoodData/Agent.pm line 144.
+
+* https://secure-di.gooddata.com/gdc/uploads/nonexistent
+
+Returns same as https://secure-di.gooddata.com/gdc/uploads instead of 404
+
+* /gdc/account/domains/ is not navigatable

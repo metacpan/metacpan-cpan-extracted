@@ -1,0 +1,18 @@
+== May Meeting ==
+==== Wednesday, May 11th, 2005 6:30pm at Free Geek, 1741 SE 10th Ave ====
+
+Ovid, talking about Prolog ([slides http://users.easystreet.com/ovid/presentations/logic/])
+
+The "holy grail" of computing, for many, is simply telling the computer
+what you want and have it figure out how to do it.  Prolog is a step in
+this direction.
+
+And are you proud of your refactoring in Perl?  Do you worship DRY?
+(Don't repeat yourself?)  Have you ever cringed when you had to reverse
+map a hash to lookup something by value?  This and other "forced
+duplication" hacks are often unecessary in Prolog.  By the time the
+talk is done, programmers will understand why Prolog is code reuse on
+steroids.
+
+And despite all of that, it's probably one of the easiest languages to
+learn (though it can be rather hard to master.)

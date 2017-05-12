@@ -1,0 +1,24 @@
+---
+abstract: 'class for searching www.search.com'
+author:
+  - 'Martin Thurn <mthurn@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: WWW::Search::Search
+name: WWW-Search-Search
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  URI::Escape: 0
+  WWW::SearchResult: 2.078
+  perl: 5.004
+version: 1.015

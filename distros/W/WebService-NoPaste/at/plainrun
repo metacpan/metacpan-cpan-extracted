@@ -1,0 +1,4 @@
+#!/bin/bash
+nopastebin=`which nopaste`
+result=`nopaste < $nopastebin | tail -1`
+wget -O`tty` $result

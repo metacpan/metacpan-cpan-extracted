@@ -1,0 +1,32 @@
+Revision history for Perl extension Win32::API::Interface
+
+0.03      Wed Aug 09 02:53:11 2006
+    - introducing code references as last parameter of generate
+    - POD changes
+
+0.02      Sun Aug 06 14:03:20 2006
+    - POD changes
+    - internal changes
+
+0.01      Fri Jul 14 12:15:00 2006
+    - first release
+
+0.0001_05 Thu Jul 13 02:12:56 2006
+    - internal experiment advanced
+
+0.0001_04 Thu Jul 07 02:09:11 2006
+    - internal experiment
+
+0.0001_03 Thu Jul 12 01:49:01 2006
+    - internal changes
+    - function generated added
+
+0.0001_02 Thu Jul 07 00:49:01 2006
+    - make methods also class methods
+
+0.0001_01 Thu Jul 06 22:15:28 2006
+    - interface changed
+    - pod added
+
+0.0001    Thu Jul 06 13:15:28 2006
+	- original version.

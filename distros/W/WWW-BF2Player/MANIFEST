@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-BF2Player.t
+lib/WWW/BF2Player.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+Win32-FindFile version 
+===========================
+
+Get folders contents in unicode for Win32 OS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None required except kernel32.dll
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by A. G. Grishaev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

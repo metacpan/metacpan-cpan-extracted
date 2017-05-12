@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<asnJurisdictions>
+   <Jurisdiction xml:id="364662">
+     <organizationName>Cisco</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/Cisco</organizationAlias>
+     <organizationJurisdiction>Cisco</organizationJurisdiction>
+     <organizationClass>Corporation</organizationClass>
+     <DocumentCount>2</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="110">
+     <organizationName>Japan</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/JPN</organizationAlias>
+     <organizationJurisdiction>JPN</organizationJurisdiction>
+     <organizationClass>Country</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="162">
+     <organizationName>American Association for the Advancement of Science</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AAAS</organizationAlias>
+     <organizationJurisdiction>AAAS</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>3</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="163">
+     <organizationName>American Association of School Librarians</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AASL</organizationAlias>
+     <organizationJurisdiction>AASL</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>2</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="362832">
+     <organizationName>Achievement Standards Network</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ASN</organizationAlias>
+     <organizationJurisdiction>ASN</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>6</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="164">
+     <organizationName>Common Core State Standards</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/CCSS</organizationAlias>
+     <organizationJurisdiction>CCSS</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>2</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="165">
+     <organizationName>Interstate School Leaders Licensure Consortium</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ISLLC</organizationAlias>
+     <organizationJurisdiction>ISLLC</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="166">
+     <organizationName>International Technology and Engineering Educators Association</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ITEA</organizationAlias>
+     <organizationJurisdiction>ITEA</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="167">
+     <organizationName>National Assessment of Educational Progress</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NAEP</organizationAlias>
+     <organizationJurisdiction>NAEP</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>2</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="168">
+     <organizationName>National Council on Economic Education</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NCEE</organizationAlias>
+     <organizationJurisdiction>NCEE</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>5</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="169">
+     <organizationName>National Center for History in the Schools</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NCHS</organizationAlias>
+     <organizationJurisdiction>NCHS</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="170">
+     <organizationName>NCTE/IRA Standards for the English Language Arts</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NCTE-IRA</organizationAlias>
+     <organizationJurisdiction>NCTE-IRA</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="171">
+     <organizationName>National Council of Teachers of Mathematics</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NCTM</organizationAlias>
+     <organizationJurisdiction>NCTM</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="174">
+     <organizationName>National Geography Education Standards</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NGES</organizationAlias>
+     <organizationJurisdiction>NGES</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="172">
+     <organizationName>National Standards for Arts Education</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NSAE</organizationAlias>
+     <organizationJurisdiction>NSAE</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="173">
+     <organizationName>National Science Education Standards</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NSES</organizationAlias>
+     <organizationJurisdiction>NSES</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="175">
+     <organizationName>Partnership for 21st Century Skills</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/P21</organizationAlias>
+     <organizationJurisdiction>P21</organizationJurisdiction>
+     <organizationClass>Organization</organizationClass>
+     <DocumentCount>1</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="112">
+     <organizationName>Alaska</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AK</organizationAlias>
+     <organizationJurisdiction>AK</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>12</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="111">
+     <organizationName>Alabama</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AL</organizationAlias>
+     <organizationJurisdiction>AL</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>11</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="114">
+     <organizationName>Arkansas</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AR</organizationAlias>
+     <organizationJurisdiction>AR</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>41</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="113">
+     <organizationName>Arizona</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/AZ</organizationAlias>
+     <organizationJurisdiction>AZ</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>26</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="115">
+     <organizationName>California</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/CA</organizationAlias>
+     <organizationJurisdiction>CA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>13</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="116">
+     <organizationName>Colorado</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/CO</organizationAlias>
+     <organizationJurisdiction>CO</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>26</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="117">
+     <organizationName>Connecticut</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/CT</organizationAlias>
+     <organizationJurisdiction>CT</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>18</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="119">
+     <organizationName>District of Columbia</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/DC</organizationAlias>
+     <organizationJurisdiction>DC</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>5</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="118">
+     <organizationName>Delaware</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/DE</organizationAlias>
+     <organizationJurisdiction>DE</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>17</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="120">
+     <organizationName>Florida</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/FL</organizationAlias>
+     <organizationJurisdiction>FL</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>24</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="121">
+     <organizationName>Georgia</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/GA</organizationAlias>
+     <organizationJurisdiction>GA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>34</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="122">
+     <organizationName>Hawaii</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/HI</organizationAlias>
+     <organizationJurisdiction>HI</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>14</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="126">
+     <organizationName>Iowa</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/IA</organizationAlias>
+     <organizationJurisdiction>IA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>11</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="123">
+     <organizationName>Idaho</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ID</organizationAlias>
+     <organizationJurisdiction>ID</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>41</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="124">
+     <organizationName>Illinois</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/IL</organizationAlias>
+     <organizationJurisdiction>IL</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>18</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="125">
+     <organizationName>Indiana</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/IN</organizationAlias>
+     <organizationJurisdiction>IN</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>28</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="127">
+     <organizationName>Kansas</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/KS</organizationAlias>
+     <organizationJurisdiction>KS</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>20</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="128">
+     <organizationName>Kentucky</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/KY</organizationAlias>
+     <organizationJurisdiction>KY</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>24</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="129">
+     <organizationName>Louisiana</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/LA</organizationAlias>
+     <organizationJurisdiction>LA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>27</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="132">
+     <organizationName>Massachusetts</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MA</organizationAlias>
+     <organizationJurisdiction>MA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>19</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="131">
+     <organizationName>Maryland</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MD</organizationAlias>
+     <organizationJurisdiction>MD</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>19</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="130">
+     <organizationName>Maine</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ME</organizationAlias>
+     <organizationJurisdiction>ME</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>19</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="133">
+     <organizationName>Michigan</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MI</organizationAlias>
+     <organizationJurisdiction>MI</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>34</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="134">
+     <organizationName>Minnesota</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MN</organizationAlias>
+     <organizationJurisdiction>MN</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>18</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="136">
+     <organizationName>Missouri</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MO</organizationAlias>
+     <organizationJurisdiction>MO</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>14</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="135">
+     <organizationName>Mississippi</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MS</organizationAlias>
+     <organizationJurisdiction>MS</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>12</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="137">
+     <organizationName>Montana</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/MT</organizationAlias>
+     <organizationJurisdiction>MT</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>19</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="144">
+     <organizationName>North Carolina</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NC</organizationAlias>
+     <organizationJurisdiction>NC</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>19</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="145">
+     <organizationName>North Dakota</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/ND</organizationAlias>
+     <organizationJurisdiction>ND</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>17</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="138">
+     <organizationName>Nebraska</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NE</organizationAlias>
+     <organizationJurisdiction>NE</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>17</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="139">
+     <organizationName>New Hampshire</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NH</organizationAlias>
+     <organizationJurisdiction>NH</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>16</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="140">
+     <organizationName>New Jersey</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NJ</organizationAlias>
+     <organizationJurisdiction>NJ</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>21</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="141">
+     <organizationName>New Mexico</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NM</organizationAlias>
+     <organizationJurisdiction>NM</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>15</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="143">
+     <organizationName>Nevada</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NV</organizationAlias>
+     <organizationJurisdiction>NV</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>14</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="142">
+     <organizationName>New York</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/NY</organizationAlias>
+     <organizationJurisdiction>NY</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>20</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="146">
+     <organizationName>Ohio</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/OH</organizationAlias>
+     <organizationJurisdiction>OH</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>26</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="147">
+     <organizationName>Oklahoma</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/OK</organizationAlias>
+     <organizationJurisdiction>OK</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>25</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="148">
+     <organizationName>Oregon</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/OR</organizationAlias>
+     <organizationJurisdiction>OR</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>24</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="149">
+     <organizationName>Pennsylvania</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/PA</organizationAlias>
+     <organizationJurisdiction>PA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>15</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="150">
+     <organizationName>Rhode Island</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/RI</organizationAlias>
+     <organizationJurisdiction>RI</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>10</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="151">
+     <organizationName>South Carolina</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/SC</organizationAlias>
+     <organizationJurisdiction>SC</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>11</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="152">
+     <organizationName>South Dakota</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/SD</organizationAlias>
+     <organizationJurisdiction>SD</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>16</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="153">
+     <organizationName>Tennessee</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/TN</organizationAlias>
+     <organizationJurisdiction>TN</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>37</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="154">
+     <organizationName>Texas</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/TX</organizationAlias>
+     <organizationJurisdiction>TX</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>18</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="155">
+     <organizationName>Utah</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/UT</organizationAlias>
+     <organizationJurisdiction>UT</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>13</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="157">
+     <organizationName>Virginia</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/VA</organizationAlias>
+     <organizationJurisdiction>VA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>29</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="156">
+     <organizationName>Vermont</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/VT</organizationAlias>
+     <organizationJurisdiction>VT</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>16</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="158">
+     <organizationName>Washington</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/WA</organizationAlias>
+     <organizationJurisdiction>WA</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>23</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="160">
+     <organizationName>Wisconsin</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/WI</organizationAlias>
+     <organizationJurisdiction>WI</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>14</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="159">
+     <organizationName>West Virginia</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/WV</organizationAlias>
+     <organizationJurisdiction>WV</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>30</DocumentCount>
+   </Jurisdiction>
+   <Jurisdiction xml:id="161">
+     <organizationName>Wyoming</organizationName>
+     <organizationAlias>http://purl.org/ASN/scheme/ASNJurisdiction/WY</organizationAlias>
+     <organizationJurisdiction>WY</organizationJurisdiction>
+     <organizationClass>U.S. States and Territories</organizationClass>
+     <DocumentCount>21</DocumentCount>
+   </Jurisdiction>
+</asnJurisdictions>

@@ -1,0 +1,8 @@
+Changes				History of this package
+MANIFEST			This file
+Makefile.PL			Makefile generator
+README				Get you started with this package
+lib/WWW/WCAP.pm			WCAP module
+t/README			How to run and set up tests
+t/TEST				Run tests
+t/base/wcap.t			Test basic WCAP functionality

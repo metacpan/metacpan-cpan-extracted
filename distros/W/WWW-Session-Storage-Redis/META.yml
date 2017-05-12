@@ -1,0 +1,23 @@
+---
+abstract: 'Redis storage for WWW::Session'
+author:
+  - 'Jeffrey Goff <jeffrey.goff@evozon.com>'
+build_requires:
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Session-Storage-Redis
+requires:
+  Cache::Redis: 0
+  JSON: 0
+  Storable: 0
+  WWW::Session: 0
+version: 0.03

@@ -1,0 +1,65 @@
+NAME
+
+    WebService::KVV::Live::Stop - Arrival times for Trams/Buses in the
+    Karlsruhe metropolitan area
+
+SYNOPSIS
+
+        use WebService::KVV::Live::Stop;
+    
+        my $stop = WebService::KVV::Live::Stop->new("Siemensallee");
+        print "Arrival time: $_->{time} $_->{route} $_->{destination}\n" for $stop->departures;
+
+DESCRIPTION
+
+    API for searching for bus/tram stops in the Karlsruhe Metropolitan Area
+    (Karlsruhe Verkehrsvertriebe network to be exact) and for listing
+    departure times at said stops.
+
+IMPLEMENTATION
+
+    Not really an API, just a client for http://live.kvv.de. See
+    kvvlive.json
+    <https://github.com/athreef/WebService-KVV-Live-Stop/blob/master/share/kvvlive.json>
+    for details.
+
+    The client is based on Net::HTTP::Spore and has some workarounds: It
+    overrides a method from Net::HTTP::Spore  that doesn't handle colons
+    properly and throws a generic message on errors instead of the more
+    specific HTTP error messages.
+
+METHODS AND ARGUMENTS
+
+    new($latitude, $langitude), new($name), new($id)
+
+      Search for matching local transport stops. $id are identifiers
+      starting with "de:". $name need not be an exact match.
+
+      Returns a list of WebService::KVV::Live::Stops in list context. In
+      scalar context returns the best match.
+
+    departures([$route])
+
+      Returns a list of departures for a WebService::KVV::Live::Stop.
+      Results can be restricted to a particular route (Linie) by the
+      optional argument.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/WebService-KVV-Live-Stop
+
+SEE ALSO
+
+    http://live.kvv.de
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

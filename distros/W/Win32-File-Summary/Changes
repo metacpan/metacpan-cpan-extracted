@@ -1,0 +1,21 @@
+Revision history for Perl extension Win32::File::Summary.
+
+1.10 Sunday, August 21, 2005
+	  - Added support for german and english
+	  - For MS compund documents now all summary informations will be returned
+	  - support for output in files and DOS-BOX: umlauts are shown correctly
+
+1.00 Sunday, July 3, 2005
+	  - finished support to read OpenOffice and Star Office files
+	  - changed the POD documentation, regarding the new feature
+
+0.02 Monday, April 25, 2005
+      - changed the Read() method to return proper values
+      - changed the GetError() to return proper values
+      - changed the Pod documentation 
+      - added example to the Pod documentation
+
+0.01  Fri Oct 29 09:14:47 2004
+	- original version; created by h2xs 1.21 with options
+		-n Win32::File::Summary 
+

@@ -1,0 +1,37 @@
+Win32/CryptData version 0.01
+============================
+
+This module is an interface to Win32 CryptProtectData and CryptUnprotectData
+functions and data structures, needed to crypt and decrypt data on the local
+computer without requiring passwords.
+The encrypted data can be successfully decrypted only by the same logged user
+and on the same computer that have previously encrypted it.
+
+This module covers a small subset of the functions and data structures
+provided by the Win32 Crypto API.
+
+The complete SDK Reference documentation is available online through
+Microsoft(R) MSDN Library (http://msdn.microsoft.com/library/default.asp)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::API
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2003 OutSys snc. 
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,23 @@
+people
+title:<en>All people</en><nl>Alle personen</nl>
+query:select id,firstname,lastname,birthday,email,mobile from people where status='1' [and id like '$params{id}'|] [and firstname like '%$params{firstname}%'|] [and lastname like '%$params{lastname}%'|] [and birthday like '%$params{birthday}%'|] order by lastname
+captions:firstname=<en 1>First Name</en><nl 1>Voornaam</nl>|lastname=<en 2>Last Name</en><nl 2>Familienaam</nl>|birthday=<en 3>Birthday</en><nl 3>Geboortedatum</nl>|email=<en 4>E-mail</en><nl 4>E-mail</nl>|mobile=<en 5>Mobile</en><nl 5>GSM</nl>
+align:firstname=right
+replace:birthday=<a href=jdetails.wsql?id=$id&view=person><en 8>$birthday</en><nl 8>$birthday</nl></a>
+replace:email=<a href=mailto:$email><en 9>$email</en><nl 9>$email</nl></a>
+recordsperpage:20
+appendnoresults:<center><a href=jform.wsql?id=new&view=person&editdest=jlist.wsql%3Fview%3Dpeople%26from%3D[$params{from}|0]><en 10>Add</en><nl 10>Voeg toe</nl></a></center>
+appendresults:<center><a href=jform.wsql?id=new&view=person&editdest=jlist.wsql%3Fview%3Dpeople%26from%3D[$params{from}|0]><en 11>Add</en><nl 11>Voeg toe</nl></a></center>
+hide:id
+
+addresses
+title:<en>Addresses</en><nl>Adressen</nl>
+query:select id,peopleid,name,email,phone from addresses where status='1' [and peopleid like '$params{peopleid}'|] order by name
+captions:name=<en 12>Place</en><nl 12>Plaats</nl>|email=<en 13>E-mail</en><nl 13>E-mail</nl>|phone=<en 14>Phone</en><nl 14>Telefoon</nl>
+align:firstname=right
+replace:name=<a href="jform.wsql?id=$id&view=address&editdest=caller"><en 17>$name</en><nl 17>$name</nl></a>
+replace:email=<a href=mailto:$email><en 18>$email</en><nl 18>$email</nl></a>
+recordsperpage:20
+appendnoresults:<center><a href=jform.wsql?id=new&view=address&peopleid=$params{peopleid}&editdest=caller><en 19>Add</en><nl 19>Voeg toe</nl></a></center>
+appendresults:<center><a href=jform.wsql?id=new&view=address&peopleid=$params{peopleid}&editdest=caller><en 20>Add</en><nl 20>Voeg toe</nl></a></center>
+hide:id,peopleid

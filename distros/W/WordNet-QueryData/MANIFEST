@@ -1,0 +1,7 @@
+ChangeLog
+Makefile.PL
+README
+test.pl
+QueryData.pm
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

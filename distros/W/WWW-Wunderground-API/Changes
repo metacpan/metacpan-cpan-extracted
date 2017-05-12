@@ -1,0 +1,38 @@
+Revision history for WWW-Wunderground-API
+
+0.08    2015-04-07
+        Merge jpjordan's lang enhancements
+        cleanup documentation
+        Switch to JSON::MaybeXS
+
+0.07    2014-12-08
+        Merge mschilli's warning fixes
+        Include binary/image pulling
+
+0.06    2013-08-18
+        Documentation and POD test fixes
+
+0.05
+        2013-08-14
+        Lots of changes. Hopefully none breaking, but with waaay more features.
+        Proper forecast support
+        Caching support
+        Move from Any::Moose to Moo
+        And much much more!
+
+0.04
+        2012-10-22
+        Remove buggy Module::Install v1.04
+
+0.03
+        2011-12-28
+        Documentation patches
+        Friendlier tests
+
+0.02    2011-10-17
+        Documentation patches (thanks to wsnyder)
+        Newer key-based JSON API support.
+        Lazier AUTOLOADing of ->data keys
+
+0.01    2011-06-01
+        First version, released on an unsuspecting world.

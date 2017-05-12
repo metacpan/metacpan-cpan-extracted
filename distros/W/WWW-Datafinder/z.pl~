@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+
+use lib (
+      $ENV{'DATAFINDER_HOME'}
+    ? $ENV{'DATAFINDER_HOME'}
+    : $FindBin::Bin
+);
+
+use WWW::Datafinder;

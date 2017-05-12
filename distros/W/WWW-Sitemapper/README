@@ -1,0 +1,460 @@
+NAME
+    WWW::Sitemapper - Create text, html and xml sitemap by scanning a web
+    site.
+
+VERSION
+    version 1.121160
+
+SYNOPSIS
+    WWW::Sitemapper is meant to be subclassed by user:
+
+        package MyWebSite::Map;
+        use Moose;
+
+        use base qw( WWW::Sitemapper );
+
+        # define attributes for your class
+        has 'restricted_pages' => (
+            is => 'ro',
+            isa => 'ArrayRef[RegexpRef]',
+            default => sub {
+                [
+                    qr{^/cat/login},
+                    qr{^/cat/events},
+                    qr{\?_search_string=},
+                ]
+            },
+        );
+
+        # configuration options for WWW::Robot
+        sub _build_robot_config {
+            my $self = shift;
+
+            return {
+                NAME => 'MyRobot',
+                EMAIL => 'me@domain.tld',
+            };
+        }
+
+        # you need to provide a follow-url-test hook in your subclass
+        sub url_test : Hook('follow-url-test') {
+            my $self = shift;
+            my ($robot, $hook_name, $uri) = @_;
+
+            my $url = $uri->path_query;
+
+            if ( $self->site->host eq $uri->host ) {
+                for my $re ( @{ $self->restricted_pages } ) {
+                    if ( $url =~ /$re/ ) {
+                        return 0;
+                    }
+                }
+
+                return 1;
+            }
+
+            return 0;
+        }
+
+        # you can add your own hooks as well
+        sub run_till_first_auto_save : Hook('continue-test') {
+            my $self = shift;
+            my ($robot) = @_;
+
+            if ( $self->run_started_time + $self->auto_save < DateTime->now ) {
+                return 0;
+            }
+            return 1;
+        }
+
+
+        # as this is your class feel free to define your own methods
+        sub ping_google {
+            my $self    = shift;
+
+            my $ua = LWP::UserAgent;
+            return $ua->get( 'http://www.google.com/webmasters/sitemaps/ping',
+                sitemap => $self->site .'google-sitemap.xml.gz'
+            );
+        }
+
+    and then
+
+        package main;
+
+        my $mapper = MyWebSite::Map->new(
+            site => 'http://mywebsite.com/',
+            status_storage => 'sitemap.data',
+            auto_save => 10,
+        );
+
+        $mapper->run;
+
+
+        open(HTML, ">sitemap.html") or die ("Cannot create sitemap.html: $!");
+        print HTML $mapper->html_sitemap;
+        close(HTML);
+
+        my $xml_sitemap = $mapper->xml_sitemap(
+            priority => '0.7',
+            changefreq => 'weekly;
+        );
+
+        $xml_sitemap->write('google-sitemap.xml.gz');
+
+        # call your own method
+        $mapper->ping_google();
+
+    and while mapper is still running take a peek what has been mapped so
+    far
+
+        my $mapper = MyWebSite::Map->new(
+            site => 'http://mywebsite.com/',
+            status_storage => 'sitemap.data',
+        );
+
+        $mapper->restore_state();
+
+        print $mapper->txt_sitemap();
+
+ATTRIBUTES
+  site
+    Home page of the website to be mapped.
+
+    isa: "tURI" in WWW::Sitemapper::Types.
+
+  tree
+    Tree structure of the web site.
+
+    isa: WWW::Sitemapper::Tree.
+
+    Note: each page is mapped only once, so if multiple pages are linking to
+    the same page only the first will be counted as parent.
+
+    Note: beware of pages serving same content under different URLs (eg.
+    using different query string parameters) as it may lead to circular
+    references. Besides this search engines will punish you for so called
+    "duplicate content". Use your subroutine with "Hook('follow-url-test')"
+    to restrict access to those pages.
+
+  robot_config
+    WWW::Robot configuration options.
+
+    isa: "HashRef".
+
+    You need to define in your subclass builder method *_build_robot_config*
+    which needs to return a hashref. Most important options are:
+
+    *   EMAIL
+
+        Your e-mail address - in case someone wishes to complain about the
+        behaviour of your robot.
+
+        mandatory.
+
+    *   DELAY
+
+        Delay between each request in minutes.
+
+        Default: *1*
+
+    For more details and other options please see "ROBOT_ATTRIBUTES" in
+    WWW::Robot.
+
+  status_storage
+    Path of status storage file to be used for saving the result of web
+    crawl. If defined Storable will be used to store the current state.
+
+    isa: "Str".
+
+  auto_save
+    Auto save current status every N minutes (defaults to 0 - do not auto
+    save).
+
+    isa: "tDateTimeDuration" in WWW::Sitemapper::Types.
+
+    Note: "status_storage" has to be defined.
+
+  run_started_time
+    Time when "run" method was called.
+
+    isa: "tDateTime" in WWW::Sitemapper::Types.
+
+  html_sitemap_template
+    Template-Toolkit html sitemap template to be used by helper method
+    "html_sitemap".
+
+    isa: "Str".
+
+    Can be overriden by definining "_build_html_sitemap_template" in your
+    subclass.
+
+    Parameter passed to the template is the main object (*$self*) named as
+    *mapper*.
+
+    Default value:
+
+        <html>
+        <head>
+        <title>Sitemap for [% mapper.site.host %]</title>
+        </head>
+        <body>
+        <ul>
+        [%- INCLUDE branch node = mapper.tree -%]
+        </ul>
+        </body>
+        </html>
+
+        [%- BLOCK branch -%]
+        <li><a href="[% node.loc %]">[% node.title || node.loc %]</a>
+        [%     IF node.children.size -%]
+        <ul>
+        [%-
+                    FOREACH child IN node.children;
+                        INCLUDE branch node = child;
+                    END;
+        -%]
+        </ul>
+        [%     END -%]
+        </li>
+        [% END -%]
+
+METHODS
+  run
+        print $mapper->run();
+
+    Creates a WWW::Robot object and starts to map the website specified by
+    "site".
+
+    Scans your subclass for methods with ":Hook('name-of-the-hook')"
+    attributes to be added to robot object.
+
+    You need to define at least one subroutine with *follow-url-test* hook
+    which will be used to decide if the page should be followed and added to
+    sitemap.
+
+        sub url_test : Hook('follow-url-test') {
+            my $self = shift;
+            my ($robot, $hook_name, $uri) = @_;
+
+            my $should_follow = ...
+
+            return $should_follow;
+        }
+
+    Please see "SUPPORTED_HOOKS" in WWW::Robot for full list of supported
+    hooks.
+
+    Note: you can name your subroutines however you want and add other
+    attributes as well - WWW::Sitemapper looks only for "Hook(...)" ones.
+
+  txt_sitemap
+        print $mapper->txt_sitemap();
+
+    Create plain text sitemap. Example output:
+
+        * http://mywebsite.com/
+          * http://mywebsite.com/page1.html
+            * http://mywebsite.com/page11.html
+            * http://mywebsite.com/page12.html
+          * http://mywebsite.com/page2.html
+
+    Accepts following parameters:
+
+    with_id => 0|1
+            print $mapper->txt_sitemap( with_id => 1 );
+
+        Use id of each node instead of ***.
+
+        Defaults to 0.
+
+    with_title => 0|1
+            print $mapper->txt_sitemap( with_title => 1 );
+
+        Add node title after node location.
+
+        Defaults to 0.
+
+  html_sitemap
+        print $mapper->html_sitemap(%TT_CONF);
+
+    Create HTML sitemap using template defined in "html_sitemap_template".
+
+    Allows to specify Template-Toolkit configuration options, see
+    "CONFIGURATION_SUMMARY" in Template.
+
+  xml_sitemap
+        my $sitemap = $mapper->xml_sitemap();
+
+        # print xml
+        print $sitemap->as_xml->sprint;
+
+        # write to file
+
+        $sitemap->write('sitemap.xml');
+
+    Create XML sitemap <http://www.sitemaps.org>. Returns WWW::Sitemap::XML
+    object.
+
+    Accepts following parameters:
+
+    *   split_by
+
+            my @sitemaps = $mapper->xml_sitemap(
+                split_by => [
+                    '^/doc',
+                    '^/cat',
+                    '^/ila',
+                ],
+            );
+
+        Arrayref of regular expressions used to split the final sitemap
+        based on the page location - "loc" in WWW::Sitemapper::Tree. If this
+        option is supplied the "xml_sitemap" will return an array of
+        WWW::Sitemap::XML objects plus additional one for any urls not
+        matched by conditions provided.
+
+        Note: the first matching condition is used.
+
+        Note: schema and hostname are remove from node uri for condition
+        matching.
+
+        Note: keys could be regexp or strings.
+
+    *   priority
+
+            my $sitemap = $mapper->xml_sitemap(
+                priority => 0.6,
+            );
+
+        or
+
+            my $sitemap = $mapper->xml_sitemap(
+                priority => {
+                    '^/doc/' => '+0.2', # same as 0.7
+                    '^/ila/' => 0.4,
+                    '^/cat/' => 0.9,
+                    '^/$' => 1,
+                },
+            );
+
+        or
+
+            my $sitemap = $mapper->xml_sitemap(
+                priority => [
+                    { '^/doc/' => '+0.2' },
+                    { '^/ila/' => 0.3    },
+                    { '^/cat/' => 0.9    },
+                    { '\.pdf$' => 0.8    }, # all pdfs 0.8 and in /doc/ 1.0
+                ],
+            );
+
+        If priority is a scalar value it will be used as a default for all
+        pages.
+
+        Supports *relative* values which will be added/subtracted to/from
+        final priority.
+
+        If it is a hashref or arrayref all conditions are checked. In case
+        of *relative* values all matching ones are combined and in case of
+        *absolute* ones the last one is used - use arrayref to *chain* your
+        conditions.
+
+        Final priority will be set to 0.0 if the calculated one is negative.
+
+        Final priority will be set to 1.0 if the calculated one is higher
+        then 1.
+
+        Default priority is 0.5.
+
+        Note: schema and hostname are remove from node uri for condition
+        matching.
+
+        Note: keys could be regexp or string objects.
+
+    *   changefreq
+
+            my $sitemap = $mapper->xml_sitemap(
+                changefreq => 'daily',
+            );
+
+        or
+
+            my $sitemap = $mapper->xml_sitemap(
+                changefreq => {
+                    '^/doc/' => 'weekly',
+                    '^/ila/' => 'yearly'
+                    '^/cat/' => 'daily',
+                    '^/$' => 'always',
+                },
+            );
+
+        or
+
+            my $sitemap = $mapper->xml_sitemap(
+                changefreq => [
+                    { '^/doc/' => 'weekly' },
+                    { '^/ila/' => 'yearly' },
+                    { '^/cat/' => 'daily'  },
+                    { '^/$' => 'always'    },
+                    { '\.pdf$' => 'never'  }, # pdfs will never change
+                ],
+            );
+
+        If changefreq is a scalar value it will be used as a default for all
+        pages.
+
+        If it is a hashref or arrayref all conditions are checked and the
+        last matching one is used - use arrayref to *chain* your conditions.
+
+        Valid values are:
+
+        *   always
+
+        *   hourly
+
+        *   daily
+
+        *   weekly
+
+        *   monthly
+
+        *   yearly
+
+        *   never
+
+        Default changefreq is 'weekly'.
+
+        Note: schema and hostname are remove from node uri for condition
+        matching.
+
+        Note: keys could be regexp or string objects.
+
+HOOKED METHODS
+  restore_state
+        $mapper->restore_state();
+
+    Restore state from "status_storage" using "retrieve" in Storable.
+
+    Loads into current object "tree" and internal state of web robot.
+
+    Uses hook "restore-state" in WWW::Robot.
+
+  save_state
+        $mapper->save_state();
+
+    Save into "status_storage" using "store" in Storable current content of
+    "tree" and internal state of web robot.
+
+    Uses hook "save-state" in WWW::Robot.
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

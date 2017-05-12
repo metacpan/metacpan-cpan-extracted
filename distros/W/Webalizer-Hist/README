@@ -1,0 +1,34 @@
+Webalizer::Hist 0.03
+====================
+
+Webalizer::Hist is a module to read and parse the webalizer
+history file, and to perform some basic calculations on the
+data.
+
+INSTALLATION
+
+ To install this module type the following:
+
+   perl Build.pl
+   ./Build
+   ./Build test
+   ./Build install
+   
+ Or, if you're on a platform (like DOS or Windows) that doesn't
+ like  the "./" notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+
+DEPENDENCIES
+
+  perl 5.8 or higher.
+
+COPYRIGHT AND LICENCE
+
+ Copyright (C) 2006-2010 by Y. Heling
+ This library is free software; you can redistribute it
+ and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,21 @@
+Revision history for Perl extension WWW::Search::Torrentz.
+
+0.002 2016-10-09T16:58+01:00
+ - Deprecate module because Torrentz was shut down
+
+0.001003 2014-10-21T18:20+02:00
+ - Add Perl::Critic release test and fix reported problems
+ - Use Test::RequiresInternet
+ - Fix exprimental push on reference warnings
+
+0.001002 2014-04-20T01:17+03:00
+ - Fix incorrect parsing of seeder/leechers count
+ - Update Changes to CPAN::Changes::Spec format
+ - Modernize Makefile.PL
+ - Improve dependency list
+
+0.001001 2013-09-10T09:52:24+03:00
+ - Fix WWW::Search::Torrentz on perl < 5.018
+
+0.001 2013-09-09T15:00:23+03:00
+ - Initial release

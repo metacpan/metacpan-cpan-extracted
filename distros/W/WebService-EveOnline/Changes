@@ -1,0 +1,118 @@
+Revision history for WebService-EveOnline
+
+0.62   3rd September 2008
+       Fixed up skill-in-training following Empyrean Age 1.1 patch
+	   Added a finished_training method to skill object
+	   Updated tests/show_character example
+
+0.61   28th July 2008
+       Removed spurious station_id from Transactions.pm
+
+0.60   28th July 2008
+       Unfortunately due to a dodgy manifest and an error in
+       versioning, I'm moving to a new version number.
+       Sorry for the inconvenience.
+
+0.5.3  25 Jul 2008
+       Fixes the manifest and explicitly names the correct version
+       in several places (thanks CPAN automated testing)
+0.5.2  Fixes a misnamed subroutine in Transaction list.
+0.5.1  Small fix that checks for any prior version of the eve
+       cache database file used for testing, and recreates it 
+       if necessary.
+
+0.5    MAJOR UPDATE : 24 Jul 2008
+       This update breaks compatibility with previous versions.
+       Lots has been reworked; even more added.
+
+       * Object model redone (NOT BACKWARDS COMPATIBLE)
+       * Windows support (tests pass? ship it!)
+       * Fix "Invalid characterID. (105)" for EVE accounts with
+         a single character attached to them
+       * Applied Larry Gilbert's patch to sort out my dubious
+         whitespacing practices (oops, mea culpa)
+       * Corporate wallet balances now accessible
+       * Error reporting now actually reports errors
+       * Numerous bug fixes
+       * More logical in_training method
+       * Better example scripts
+       * Single/Multiple characters per-account now work
+       * Corporation membership list
+
+       The documentation remains shonky. Please help.
+
+       I use the example scripts a lot. They will give you a
+       much better idea of how this stuff works than the
+       current documentation, I promise.
+              
+       Planned for 1.0:
+       
+       * Killlog.xml.aspx
+       * MarketOrders.xml.aspx
+       * MemberTracking.xml.aspx
+       * map/Jumps.xml.aspx
+       * map/Kills.xml.aspx
+       * /map/Sovereignty.xml.aspx
+
+0.04    19 Dec 2007 / 19:00 GMT
+        Yikes. Some of the core documentation bears very little
+        relation to how things actually work now. Oops.
+
+        Caching now doesn't store errors resulting from the
+        Eve API. An additional parameter (user id) is now stored
+        as part of the cache_key, preventing a situation whereby
+        the wrong data is returned if you switch API keys (this
+        only affected returning character data tied to an API
+        key, but now we do this pervasively).
+
+        If EVE_API_KEY and EVE_USER_ID are set in the environment,
+        they are used in lieu of passed-down values. This has
+        proved surprisingly handy in development (for writing one-
+        liner tests), so I've decided to include it as a supported
+        feature (at least for now :-) ).
+
+        A publically available subversion repository for this
+        code has been set up here: 
+
+        http://theantipop.org/eve
+
+0.03    18 Dec 2007 / 21:00 GMT
+        Lots of restructuring, with particular attention paid to
+        making the interface a lot more consistent. Slowly moving
+        the old-style hashref-based datastructures into
+        class-based accessors (with hashref methods added if this
+        is desired).
+
+        This release breaks compatability with the first release,
+        but should provide a firmer basis on which to proceed.
+
+        Transaction history has been added, as well as the
+        beginnings of support for the other parts of the API.
+
+        Caching is now more finely grained, which is particularly
+        important when it comes to wallet functions, which can
+        only be requested once per hour (otherwise generates an
+        API error).
+
+        EVE API check has been updated from Version 1 to Version 2
+        It is unclear what changes have been made to the API at
+        this time.
+
+        Added some example scripts for good measure.
+
+0.02    Dec 2007
+        Slight tinkering, which didn't make it into a release
+        package but is probably in the svn history somewhere.
+
+        This tinkering lead to 0.03.
+
+0.01    11 Dec 2007 / 17:00 GMT
+        First version of WebService::EveOnline.
+        There's still some way to go before this is anything like
+        complete, but it's a start. :-)
+
+<0.0
+        Nov 2007
+        This project started out as a monolithic perl script, which
+        should be obvious if you start poking about under the hood
+        of the codebase...

@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name: Win32-Security
+version: 0.50
+author:
+  - Toby Ovod-Everett, toby@ovod-everett.org
+abstract: Security manipulation for named objects
+license: perl
+requires:
+  Class::Prototyped: 0.98
+  Data::BitMask: 0.13
+  Win32::API: 0
+provides: {}
+generated_by: Module::Build version 0.24

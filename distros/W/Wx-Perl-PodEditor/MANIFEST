@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+
+lib/Wx/Perl/PodEditor.pm
+lib/Wx/Perl/PodEditor/FormatActions.pm
+lib/Wx/Perl/PodEditor/PodParser.pm
+lib/Wx/Perl/PodEditor/XMLParser.pm
+
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/manifest.t

@@ -1,0 +1,98 @@
+
+=head1 NAME
+
+App::WWW::CPAN - The implementation of cpanq program
+
+=head1 SYNOPSIS
+
+  use App::WWW::CPAN ();
+  App::WWW::CPAN->new->run(@ARGV);
+
+=head1 DESCRIPTION
+
+See the documentation of L<cpanq> for the script usage.
+
+This module implements the heart of the F<cpanq>
+script, which is a simple interface to run
+API methods of L<WWW::CPAN> via the command line.
+Currently, this is a work in progress and
+offered more like an example code for C<WWW::CPAN>.
+
+The expected arguments for the script are like:
+
+  command single-arg
+  command key1=val1 key2=val2
+
+where the supported commands by now are B<search>
+and B<meta>. There is also the synonym commands:
+B<query> which is the same as B<search> and
+B<distmeta> an alias of B<meta>.
+
+  search Foo # translates to WWW::CPAN->search('Foo')
+  search query=File::Temp mode=all # WWW::CPAN->search({ query => 'File::Temp', mode => 'all' });
+
+  meta Foo # WWW::CPAN->fetch_distmeta('Foo');
+  meta dist=WWW-CPAN version=0.003 # WWW::CPAN->fetch_distmeta({ dist => 'WWW-CPAN', version => '0.003' })
+
+The results are dumped with the help of
+L<Data::Dump::Streamer> into STDOUT.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>
+
+  $app = App::WWW::CPAN->new;
+
+Creates a brand new instance of B<cpanq> program.
+
+=item B<parse_args>
+
+  $args = $app->parse_args(@args);
+
+Turns a list like C<qw( k1=v1 k2=v2 )> into
+a hash ref C<< { k1 => 'v1', k2 => 'v2' } >>.
+If the first element does not match C</\A [^=]+ = (.*) \z/x>,
+it returns this first element.
+
+=item B<do_cmd>
+
+  $out = $args->do_cmd( $method, $args );
+
+Given C<$method> is one of C<'query'> or
+C<'fetch_distmeta'>, it evaluates
+C<< WWW::CPAN->$method($args) >> and returns
+the dumped result.
+
+Returns C<undef> on failure.
+
+=item B<run>
+
+  $args->run(@args);
+
+Runs the application with the given command line
+arguments.
+
+=back
+
+=head1 SEE ALSO
+
+  cpanq
+  WWW::CPAN
+
+=head1 BUGS
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-CPAN>
+or L<mailto://bugs-WWW-CPAN@rt.cpan.org>.
+
+=head1 AUTHORS
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2016 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

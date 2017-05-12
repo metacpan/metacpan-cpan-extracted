@@ -1,0 +1,8 @@
+
+=head2 CONTACT
+
+If you have questions about this data service, or wish to report a bug, please
+contact <% request.admin_name %> L<<% request.contact_info.name %>|mailto:<% request.contact_info.email %>>
+(put your real contact info here).
+
+

@@ -1,0 +1,56 @@
+---
+abstract: 'Save charts to images using phantomjs'
+author:
+  - 'Simon Elliott <simon@papercreatures.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wight-Chart
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Wight::Chart:
+    file: lib/Wight/Chart.pm
+    version: 0.003
+  Wight::Chart::ChartJS:
+    file: lib/Wight/Chart/ChartJS.pm
+    version: 0.003
+  Wight::Chart::Google:
+    file: lib/Wight/Chart/Google.pm
+    version: 0.003
+requires:
+  Cwd: 0
+  Encode: 0
+  File::Share: 0
+  Graphics::Color::RGB: 0
+  JSON::XS: 0
+  Moo: 0
+  Wight: 0
+  perl: 5.006
+  strictures: 1
+resources:
+  bugtracker: https://github.com/papercreatures/wight-chart/issues
+  homepage: https://metacpan.org/release/Wight-Chart
+  repository: git://github.com/papercreatures/wight-chart.git
+version: 0.003

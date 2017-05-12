@@ -1,0 +1,21 @@
+NAME
+    WWW::KrispyKreme - root namespace for Krisy Kreme modules. This module
+    currently does nothing.
+
+SYNOPSIS
+      use WWW::KrispyKreme;
+
+DESCRIPTION
+    WWW::KrispyKreme is simply the root namespace for Krisy Kreme modules
+
+AUTHOR
+    Curtis Brandt <curtis@cpan.org>
+
+COPYRIGHT
+    Copyright 2013- Curtis Brandt
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

@@ -1,0 +1,9 @@
+# Example ~/.pivotal_tracker.yml
+---
+General:
+    APIKey: 'c0ffe'
+    Me: Jacob Helwig
+    DefaultProject: Testing
+Projects:
+    Testing: 1
+    Another Project: 2

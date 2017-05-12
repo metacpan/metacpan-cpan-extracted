@@ -1,0 +1,3 @@
+wxWebKitCtrl *			O_WXOBJECT
+#wxWebKitStateChangedEvent *	O_WXOBJECT
+#wxValidator		  	O_WXOBJECT

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Drag and drop</title>
+        <script>
+            var dragme;
+            var target;
+
+            window.onload = function() {
+                dragme = document.getElementById('dragme');
+                target = document.getElementById('target');
+                dragme.addEventListener('dragstart', drag_start, false);
+                target.addEventListener('dragover',  drag_over,  false);
+                target.addEventListener('drop',      drop,       false);
+            }
+
+            function drag_start(event) {
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/html', 'data');
+            }
+
+            function drag_over(event) {
+                if (event.preventDefault)
+                    event.preventDefault();
+
+                event.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+                return false;
+            }
+
+            function drop(event) {
+                event.stopPropagation();
+                this.appendChild(dragme.parentNode.removeChild(dragme), this);
+                return false;
+            }
+        </script>
+        <style type="text/css">
+        </style>
+    </head>
+    <body>
+        <div id="target" style="width: 200px; height: 200px; border: 1px solid red;" dropzone="true">
+        </div>
+        <div id="source">
+            <div id="dragme" style="width: 100px; height: 10px; outline: 1px solid green;" draggable="true">
+                dragme
+            </div>
+        </div>
+    </body>
+</html>

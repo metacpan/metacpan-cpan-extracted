@@ -1,0 +1,93 @@
+NAME
+    WebService::Recruit::Aikento - An Interface for Aikento Web Service
+
+SYNOPSIS
+        use WebService::Recruit::Aikento;
+    
+        my $service = WebService::Recruit::Aikento->new();
+    
+        my $param = {
+            'key' => $ENV{'WEBSERVICE_RECRUIT_KEY'},
+            'large_category' => '202',
+        };
+        my $res = $service->item( %$param );
+        my $root = $res->root;
+        printf("api_version: %s\n", $root->api_version);
+        printf("results_available: %s\n", $root->results_available);
+        printf("results_returned: %s\n", $root->results_returned);
+        printf("results_start: %s\n", $root->results_start);
+        printf("item: %s\n", $root->item);
+        print "...\n";
+
+DESCRIPTION
+    アイケントに掲載されている商品をさまざまな検索軸
+    で探せる商品情報APIです。
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $service = WebService::Recruit::Aikento->new();
+
+    This accepts optional parameters.
+
+        my $conf = {
+            utf8_flag => 1,
+            param => {
+                # common parameters of this web service 
+            },
+        };
+        my $service = WebService::Recruit::Aikento->new( %$conf );
+
+  add_param
+    Add common parameter of tihs web service.
+
+        $service->add_param( param_key => param_value );
+
+    You can add multiple parameters by calling once.
+
+        $service->add_param( param_key1 => param_value1,
+                             param_key2 => param_value2,
+                             ...);
+
+  get_param
+    Returns common parameter value of the specified key.
+
+        my $param_value = $service->get( 'param_key' );
+
+  item
+    This makes a request for "item" API. See
+    WebService::Recruit::Aikento::Item for details.
+
+        my $res = $service->item( %$param );
+
+  large_category
+    This makes a request for "large_category" API. See
+    WebService::Recruit::Aikento::LargeCategory for details.
+
+        my $res = $service->large_category( %$param );
+
+  small_category
+    This makes a request for "small_category" API. See
+    WebService::Recruit::Aikento::SmallCategory for details.
+
+        my $res = $service->small_category( %$param );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $service->utf8_flag( 1 );
+        $service->user_agent( 'Foo-Bar/1.0 ' );
+        $service->lwp_useragent( LWP::UserAgent->new() );
+        $service->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://webservice.recruit.co.jp/aikento/
+
+AUTHOR
+    RECRUIT Media Technology Labs <mtl@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 RECRUIT Media Technology Labs
+

@@ -1,0 +1,283 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#service_infos">service_infos</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#dnssec_supported">dnssec_supported</a></li>
+      <li><a href="#has_dns_anycast">has_dns_anycast</a></li>
+      <li><a href="#last_update">last_update</a></li>
+      <li><a href="#name_servers">name_servers</a></li>
+      <li><a href="#records">records</a></li>
+      <li><a href="#record">record</a></li>
+      <li><a href="#new_record">new_record</a></li>
+      <li><a href="#name">name</a></li>
+      <li><a href="#change_contact">change_contact</a></li>
+      <li><a href="#refresh">refresh</a></li>
+      <li><a href="#reset">reset</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Domain::Zone</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $zone = $ovh-&gt;domain-&gt;zone(&quot;myzone.de&quot;);</p>
+
+<p>my $a_record = $zone-&gt;new_record(field_type =&gt; &#39;A&#39;, target =&gt; &#39;0.0.0.0&#39;, ttl =&gt; 1000 ); my $mx_record = $zone-&gt;new_record(field_type =&gt; &#39;MX&#39;, target =&gt; &#39;1 my.mail.server.de.&#39;);</p>
+
+<p>my $records = $zone-&gt;records(filed_type =&gt; &#39;A&#39;, sub_domain =&gt; &#39;www&#39;);</p>
+
+<p>foreach my $record (@$records) {</p>
+
+<pre><code>    $record-&gt;change( target =&gt; &#39;0.0.0.0&#39; );
+}</code></pre>
+
+<p>$zone-&gt;refresh; $zone-&gt;reset;</p>
+
+<p>$zone-&gt;change_contact(contact_billing =&gt; &#39;account-ovh&#39;, contact_tech =&gt; &#39;account-ovh&#39;, contact_admin =&gt; &#39;account-ovh&#39;);</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provieds basic functionality for Zones. Records can be created and fetched. Records can be fetched through a filter. A zone contact_change can be initialized.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the zone object. This method is not ment to be called external.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone.html">Webservice::OVH::Domain::Zone</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Domain::Zone-&gt;_new($ovh_api_wrapper, $zone_name, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="service_infos">service_infos</h2>
+
+<p>Retrieves additional infos about the zone. Infos that are not part of the properties</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $info = $zone-&gt;service_info;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Retrieves properties of the zone. This method updates the intern property variable.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $zone-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="dnssec_supported">dnssec_supported</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $value = $zone-&gt;dnssec_supported;</p>
+
+</li>
+</ul>
+
+<h2 id="has_dns_anycast">has_dns_anycast</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $value = $zone-&gt;has_dns_anycast;</p>
+
+</li>
+</ul>
+
+<h2 id="last_update">last_update</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: DateTime</p>
+
+</li>
+<li><p>Synopsis: my $value = $zone-&gt;last_update;</p>
+
+</li>
+</ul>
+
+<h2 id="name_servers">name_servers</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $value = $zone-&gt;name_servers;</p>
+
+</li>
+</ul>
+
+<h2 id="records">records</h2>
+
+<p>Produces an Array of record Objects. Can be filtered by field_type and sub_domain.</p>
+
+<ul>
+
+<li><p>Parameter: %filter - (optional) - field_type =&gt; record type sub_domain =&gt; subdomain string</p>
+
+</li>
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $records = $zone-&gt;records(field_type =&gt; &#39;A&#39;, sub_domain =&gt; &#39;www&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="record">record</h2>
+
+<p>Returns a single record by id</p>
+
+<ul>
+
+<li><p>Parameter: $record_id - id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone/Record.html">Webservice::OVH::Domain::Zone::Record</a></p>
+
+</li>
+<li><p>Synopsis: my $record = $ovh-&gt;domain-&gt;zone-&gt;record(123456);</p>
+
+</li>
+</ul>
+
+<h2 id="new_record">new_record</h2>
+
+<p>Creates a new record.</p>
+
+<ul>
+
+<li><p>Parameter: %params - refresh =&gt; &#39;true&#39;, &#39;false&#39; - directly refreshes the zone target (required) =&gt; &#39;0.0.0.0&#39; ttl (optional) =&gt; 3000 sub_domain (optional) =&gt; &#39;www&#39; field_type (required) =&gt; &#39;A&#39;</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone/Record.html">Webservice::OVH::Domain::Zone::Record</a></p>
+
+</li>
+<li><p>Synopsis: my $record = $zone-&gt;new_record(field_type =&gt; &#39;MX&#39;, target =&gt; &#39;1 my.mailserver.de.&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="name">name</h2>
+
+<p>Name is the unique identifier.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $name = $zone-&gt;name;</p>
+
+</li>
+</ul>
+
+<h2 id="change_contact">change_contact</h2>
+
+<p>Changes contact information for this zone. Contact must be another ovh account name.</p>
+
+<ul>
+
+<li><p>Parameter: %params - contactBilling (optional) =&gt; &#39;account-ovh&#39; contact_admin (optional) =&gt; &#39;account-ovh&#39; contact_tech (optional) =&gt; &#39;account-ovh&#39;</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Task.html">Webservice::OVH::Me::Task</a></p>
+
+</li>
+<li><p>Synopsis: my $task = $zone-&gt;change_contact(contact_billing =&gt; &#39;another-ovh&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="refresh">refresh</h2>
+
+<p>Refreshes the domain zone and applies changes.</p>
+
+<ul>
+
+<li><p>Synopsis:$zone-&gt;refresh;</p>
+
+</li>
+</ul>
+
+<h2 id="reset">reset</h2>
+
+<p>Deletes all custom records and resetzt to default.</p>
+
+<ul>
+
+<li><p>Parameter: $minimal - only creates nesseccary dns records</p>
+
+</li>
+<li><p>Synopsis: $zone-&gt;reset;</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

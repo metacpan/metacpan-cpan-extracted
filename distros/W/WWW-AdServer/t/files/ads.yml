@@ -1,0 +1,47 @@
+---
+ads:
+  - text: Need an IDE for Perl? <a href=http://padre.perlide.org/>Download Padre</a>
+  - text: <a href=http://www.perlmonks.org/>Get help from the PerlMonks</a>
+  - text: <a href=http://www.perlbuzz.com/>All the Buzz Perl can get</a>
+  - text: Don't miss the <a href=http://perlweekly.com/>Perl Weekly</a> newsletter
+    end_date: 2015-08-14
+  - text: Join the <a href=http://perl.org.il/>Perl community</a> monthly meetings and learn and discuss Perl
+    countries:
+      - IL
+  - text: <a href=http://perl.org.il/>Perl Mongers in Israel</a>
+    countries:
+      - IL
+  - text: <a href=http://www.perlfoundation.org/perl5/index.cgi?french>Ressources Perl en français</a>
+    countries:
+      - FR
+      - CH
+  - text: <a href=http://www.perlfoundation.org/perl5/index.cgi?german>Perl auf Deutsch</a>
+    countries:
+      - DE
+      - AT
+      - CH
+  - text: <a href=http://www.perlfoundation.org/perl5/index.cgi?spanish>Perl en Español</a>
+    countries:
+      - ES
+      - AR
+      - BO
+      - CL
+      - CO
+      - CU
+      - EC
+      - MX
+      - PE
+      - PY
+      - SV
+      - VE
+  - text: <a href=http://yapc.eu/2013>YAPC::EU 2013</a> 12-14 August, Kiev, Ukraine
+    end_date: 2013-08-14
+  - text: <a href=http://yapcna.org/>YAPC::NA - Annual Perl Conference in North America</a>
+    countries:
+      - US
+      - CA
+  - text: <a href=http://yapcna.org/>YAPC NA 2013</a> 3-5 June, Austin, Texas, USA
+    countries:
+      - US
+      - CA
+    end_date: 2013-06-05

@@ -1,0 +1,41 @@
+Win32::ToolHelp version 0.2
+===========================
+
+Perl extension for obtaining information about currently executing
+applications (using the ToolHelp API on Win32).
+
+The I<Win32::ToolHelp> module provides a Perl interface to the I<ToolHelp>
+API that is present on Windows 95 or higher or Windows 2000 or higher.
+
+The module exposes functionality for obtaining information about currently
+executing applications (processes and modules used by the processes).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ActivePerl 5.6.1 build 6xx
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002  Ferdinand Prantl <prantl@host.sk>
+
+Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided "as is" without express or implied warranty.
+
+See http://prantl.host.sk/perl/modules/Win32/ToolHelp
+for the most recent version.

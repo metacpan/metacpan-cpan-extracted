@@ -1,0 +1,39 @@
+WebService-Validator-Feed-W3C version 0.8
+=========================================
+
+This module is an interface to the W3C Feed Validation online
+service <http://validator.w3.org/feed/>, based on its experimental
+SOAP 1.2 support. It helps to find errors in RSS or ATOM feeds.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+  LWP::UserAgent
+  URI::QueryParam
+  SOAP::Lite v 0.65 and up
+  URI
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Written by olivier Thereaux <ot@w3.org> for W3C.
+Patches and tests by Stephen Rushe and David Moreno
+Based on the WebService-Validator-CSS-W3C module
+(c) 2004 by Bjoern Hoehrmann <bjoern@hoehrmann.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+

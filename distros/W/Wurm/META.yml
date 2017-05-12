@@ -1,0 +1,31 @@
+---
+abstract: 'Simple.  Easy.  Crawls in your teeth.  Web framework. Did I mention it was a web framework?  Another one.'
+author:
+  - 'jason hord <pravus@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: nil
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wurm
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Plack: 0
+  Plack::Request: 0
+  Plack::Response: 0
+  Plack::Util::Accessor: 0
+  Scalar::Util: 0
+  parent: 0
+  perl: 5.20.0
+version: 0.0.8

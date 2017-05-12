@@ -1,0 +1,170 @@
+package WWW::MenuGrinder::Extending;
+
+# ABSTRACT: Writing your own grinder plugins.
+
+
+__END__
+=pod
+
+=head1 NAME
+
+WWW::MenuGrinder::Extending - Writing your own grinder plugins.
+
+=head1 VERSION
+
+version 0.06
+
+=head1 DESCRIPTION
+
+This document explains some of the things you will need to know if you want to
+write plugins that extend the functionality of C<WWW::MenuGrinder>.
+
+=head2 Plugins
+
+A C<WWW::MenuGrinder> plugin is a Perl class that uses C<Moose> and consumes the
+role C<WWW::MenuGrinder::Role::Plugin> (or, much more likely, one of its derived
+roles), and conforms to a certain interface. For more in-depth information on a
+given plugin type, see the documentation for the corresponding role.
+
+=head2 Plugin Names
+
+If your plugin is named C<WWW::MenuGrinder::Plugin::Foo> users can easily load
+it by adding C<"Foo"> to their plugins list. However it's not necessary to use
+the global namespace. If you write a plugin that's specific to C<MyApp>, you
+might call it C<MyApp::MenuGrinder::Plugin::Frobnicate>, and indicate it in the
+plugins list by preceding the fully qualified class name with a C<+> sign.
+
+=head2 Plugin Dependencies
+
+A plugin may declare its dependency on another plugin by providing a
+C<plugin_depends> method returning a list of strings. Each string in the list is
+a plugin name and is parsed in the same way as plugins given in the config. If a
+plugin C<A> depends on a plugin C<B>, it is guaranteed that C<B> will be loaded
+before C<A>'s constructor is called (if C<B> can't be loaded, then C<A>'s load
+will fail with a distinctive message), and that C<B> will come before C<A> in
+any processing chains (such as C<mogrify>).
+
+=head2 Control Flow
+
+=head3 Load-Time
+
+=over 4
+
+=item * B<Plugin Initialization>
+
+When the C<init> method is called, the grinder reads its config and loads each
+plugin specified in the config in turn. Plugin dependencies are resolved after
+the requiring plugin's class is loaded, but before the requiring plugin's
+constructor is called.
+
+=item * B<Plugin Verification>
+
+Plugins and Plugin roles may provide a C<verify_plugin> method, to be called
+after the plugin and its dependencies have all been initialized. The purpose of
+this method is to ensure that contracts (such as required methods of the
+MenuGrinder object or of the plugin itself) are met at load time, in order to
+avoid surprises later.
+
+=item * B<Loading>
+
+Once the plugins are loaded, the L<Loader|WWW::MenuGrinder::Role::Loader> plugin
+has its C<load> method called. This method is expected to return a menu
+structure (conventionally a hashref) for all further plugins to work with.
+
+=item * B<Before Pre-Mogrify>
+
+With the menu loaded, each L<PreMogrifier|WWW::MenuGrinder::Role::PreMogrifier>
+plugin is given a chance to do initialization. Each plugin will have its
+C<before_pre_mogrify> method called, if that method exists. No arguments are
+passed and the method isn't permitted to modify the menu structure.
+
+=item * B<Pre-Mogrify>
+
+Next, L<PreMogrifier|WWW::MenuGrinder::Role::PreMogrifier> plugins do initial
+transformation of the menu object. Each plugin has its C<pre_mogrify> method
+called in turn on the menu object. C<pre_mogrify> can modify the menu argument
+in-place, or completely recreate it; in either case it returns the menu object
+for the next plugin to process.
+
+=over 4
+
+=item * B<Item Pre-Mogrify>
+
+The bundled L<Visitor|WWW::MenuGrinder::Plugin::Visitor> plugin does
+tree-traversal, and calls the C<item_pre_mogrify> method on any plugin consuming
+the L<ItemPreMogrifier|WWW::MenuGrinder::ItemPreMogrifier> role. This processing
+happens wherever C<Visitor> is loaded in the plugin chain -- this is immediately
+before the first C<ItemPreMogrifier> plugin, if it's not specified in the
+plugins list explicitly.
+
+XXX write more about how this is called.
+
+=back
+
+=back
+
+=head3 Request Time
+
+=over 4
+
+=item * B<Before Mogrify>
+
+As with C<BeforePreMogrify>, each
+L<Mogrifier|WWW::MenuGrinder::Role::Mogrifier> plugin gets a chance to do
+per-request initialization by implementing the C<before_mogrify> method. This
+method takes no arguments and shouldn't modify the menu object.
+
+=item * B<Mogrify>
+
+Next, each L<Mogrifier|WWW::MenuGrinder::Role::Mogrifier> plugin modifies the
+menu structure using information from the current request. Each C<Mogrifier>
+plugin in turn has its C<mogrify> method called with the menu object; as with
+C<pre_mogrify>, it should modify the menu object in place or copy it, and return
+the new object.
+
+=over 4
+
+=item * B<Item Mogrify>
+
+The bundled L<Visitor|WWW::MenuGrinder::Plugin::Visitor> plugin does
+tree-traversal, and calls the C<item_mogrify> method on any plugin consuming the
+L<ItemMogrifier|WWW::MenuGrinder::ItemMogrifier> role. This processing happens
+wherever C<Visitor> is loaded in the plugin chain -- this is immediately before
+the first C<ItemMogrifier> plugin, if it's not specified in the plugins list
+explicitly.
+
+XXX write more about how this is called.
+
+=back
+
+=item * B<Output>
+
+Lastly in the processing chain, the L<Output|WWW::MenuGrinder::Role::Output>
+plugin is called. There is only one output plugin, and it is always last in the
+chain; therefore its output isn't required to be valid input to any other
+plugin, as with other plugins. The return value of the output plugin's
+C<output> method will be returned from the grinder object's C<get_menu> method.
+
+=item * B<Cleanup>
+
+Finally, the B<cleanup> method is called for each plugin, if it exists, allowing
+the plugin to discard any state data that it no longer needs. Note that due to
+implementation details of web frameworks, the Cleanup phase might happen
+immediately before the request phase of the next request, rather than
+immediately after the current request.
+
+=back
+
+=head1 AUTHOR
+
+Andrew Rodland <andrew@hbslabs.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by HBS Labs, LLC..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

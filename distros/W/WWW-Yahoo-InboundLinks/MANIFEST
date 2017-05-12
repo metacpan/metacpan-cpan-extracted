@@ -1,0 +1,8 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/WWW/Yahoo/InboundLinks.pm
+t/00-use.t
+t/01-fetch.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'George Tsafas <elb0w@elbowrage.com>'
+build_requires:
+  Test::Differences: '0'
+  Test::MockModule: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Mailgun
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA1: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  match::simple: '0'
+version: 0.54
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

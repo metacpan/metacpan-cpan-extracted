@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                WebFetch
+version:             0.13
+abstract:            Perl module to download and save information from the Web
+license:             perl
+author:              
+    - Ian Kluft <ikluft@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  0
+    Date::Calc:                    0
+    HTML::LinkExtor:               0
+    HTTP::Request:                 0
+    Locale::Country:               0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    XML::Parser:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,36 @@
+---
+abstract: 'Modulr API'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-ModulrFinance
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Digest::HMAC_SHA1: '0'
+  HTTP::Date: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fayland/perl-WWW-ModulrFinance/issues
+  homepage: https://github.com/fayland/perl-WWW-ModulrFinance
+  repository: https://github.com/fayland/perl-WWW-ModulrFinance.git
+version: '0.02'

@@ -1,0 +1,11 @@
+WWW::Lk4 - rule- and data-based transformation of URLs
+
+Installation:
+
+    perl Makefile.PL
+    make
+    sudo make install
+
+Documentation:
+
+    perldoc WWW::Lk4

@@ -1,0 +1,8 @@
+WWW::Mechanize::Pliant:
+
+    A subclass of the WWW::Mechanize web browser that crawls 
+    Pliant based websites
+
+For a complete list of changes, see the Changes file.
+
+by Boris Reitman

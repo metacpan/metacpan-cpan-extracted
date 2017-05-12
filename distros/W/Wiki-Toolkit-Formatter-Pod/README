@@ -1,0 +1,58 @@
+NAME
+    Wiki::Toolkit::Formatter::Pod - A Pod to HTML formatter for Wiki::Toolkit.
+
+DESCRIPTION
+    A Pod to HTML formatter backend for Wiki::Toolkit.
+
+SYNOPSIS
+      my $store     = Wiki::Toolkit::Store::SQLite->new( ... );
+      my $formatter = Wiki::Toolkit::Formatter::Pod->new;
+      my $wiki      = Wiki::Toolkit->new( store     => $store,
+                                          formatter => $formatter );
+
+    Go look at Wiki::Toolkit to find out more. This module is distributed
+    separately solely for convenience of testing and maintenance; it's
+    probably not too useful on its own.
+
+METHODS
+    new
+          my $formatter = Wiki::Toolkit::Formatter::Pod->new(
+                               node_prefix           => 'wiki.cgi?node=',
+                               usemod_extended_links => 0,
+          );
+
+        "node_prefix" is optional and defaults to the value shown above.
+
+        If "usemod_extended_links" is supplied and true, then
+        UseModWiki-style extended links "[[like this]]" will be supported -
+        ie
+
+          [[foo bar]]
+
+        will be translated into a link to the node named "Foo Bar". (Node
+        names are forced to ucfirst, ie first letter of each word is
+        capitalised.)
+
+        Note: You must have Wiki::Toolkit::Formatter::UseMod installed if you
+        wish to use the "usemod_extended_links" parameter.
+
+    format
+          my $html = $formatter->format( $content );
+
+        Uses Pod::Tree::HTML to translate the pod supplied in $content into
+        HTML. Links will be treated as links to other wiki pages.
+
+SEE ALSO
+        Wiki::Toolkit, Pod::Tree::HTML.
+
+AUTHOR
+        Kake Pugh (kake@earth.li), idea stolen from Matt Sergeant. Many
+        thanks to Steven W McDougall for extending the capabilities of
+        Pod::Tree::HTML so I could make this work.
+
+COPYRIGHT
+             Copyright (C) 2003 Kake Pugh.  All Rights Reserved.
+
+        This module is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+

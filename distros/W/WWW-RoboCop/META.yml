@@ -1,0 +1,48 @@
+---
+abstract: 'Police your URLs!'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  DDP: '0'
+  Module::Build: '0.28'
+  Plack::Handler::HTTP::Server::Simple: '0.016'
+  Plack::Test::Agent: '0'
+  Test::Fatal: '0'
+  Test::Most: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-RoboCop
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+requires:
+  Carp: '0'
+  Moo: '0'
+  MooX::HandlesVia: '0'
+  MooX::StrictConstructor: '0'
+  Mozilla::CA: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  URI: '0'
+  WWW::Mechanize: '0'
+  feature: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/WWW-RoboCop/issues
+  homepage: https://github.com/oalders/www-robocop
+  repository: https://github.com/oalders/www-robocop.git
+version: '0.000004'

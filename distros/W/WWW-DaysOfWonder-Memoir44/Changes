@@ -1,0 +1,28 @@
+Changelog for WWW-DaysOfWonder-Memoir44
+
+3.000     2014-06-12 13:35:24+02:00 Europe/Paris
+ - migrated to @Author::JQUELIN
+ - adapt to new Moose (rt#90671)
+
+2.120510  2012-02-20 17:48:47 Europe/Paris
+ - update: fetching all scenarios, independantly of languages
+ - list: new filter on id
+ - list: new filter on name
+ - list: new filter on operation
+ - list: new filter on format
+ - list: new filter on front
+ - list: new filter on board
+ - list: new filter on languages
+ - list: new filter on rating
+
+2.110310  2011-01-31 19:10:31 Europe/Paris
+ - using a plain storable file instead of a sqlite db, for faster
+   results and easier programming. this requires to re-run "update"
+   command.
+ - new command available: list (to see available scenarios)
+
+**
+
+1.100140  2010-01-14 14:22:36 Europe/Paris
+ - initial release
+ - update command working

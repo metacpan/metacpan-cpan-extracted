@@ -1,0 +1,34 @@
+Revision history for Perl module Win32::OLE::CrystalRuntime::Application
+
+0.01 Wed Jul 30 10:02:45 2008
+  - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 2008 Jul 30 12:53
+  - Start of testing
+0.03 2008 Jul 31 00:02
+  - support for zip format as my Windows box doesn't have gz
+0.04 2008 Jul 31 14:48
+  - Tests pass on Win32 boxes
+0.05 2008 Jul 31 15:50
+  - Documentation
+  - First Distribution ready for CPAN
+0.06 never packaged
+  - Lost Documentation
+0.07 2008-08-30
+  - setParameters method
+  - Documentation
+0.08 2008-09-02
+  - Cleaned up for CPAN
+0.09 2009-10-10
+  - Changed test skips to support automated testers
+  - Added perl wrappers around common OLE properties
+0.10 2009-12-20
+  - Added example scripts
+  - Separated out Base.pm and lazy load objects
+  - Added Constants.pm
+  - Packages are now DOS \r\n format
+0.11 2009-12-21
+  - All debug prints are now \r\n terminated
+0.12 2009-12-22
+  - Documentation and Constants
+  - Updated Test Skips
+  - Added Constants test to manifest

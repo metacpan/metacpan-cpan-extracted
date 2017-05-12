@@ -1,0 +1,248 @@
+{
+   "build" : [
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:667885",
+         "id" : 667885,
+         "number" : "snapshot-43",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:666188",
+         "id" : 666188,
+         "number" : "snapshot-42",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=666188&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:661984",
+         "id" : 661984,
+         "number" : "snapshot-41",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=661984&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:661982",
+         "id" : 661982,
+         "number" : "snapshot-40",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=661982&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:652852",
+         "id" : 652852,
+         "number" : "snapshot-39",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=652852&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:652530",
+         "id" : 652530,
+         "number" : "snapshot-38",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=652530&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:652508",
+         "id" : 652508,
+         "number" : "snapshot-37",
+         "state" : "finished",
+         "status" : "FAILURE",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=652508&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:636307",
+         "id" : 636307,
+         "number" : "snapshot-36",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=636307&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:635448",
+         "id" : 635448,
+         "number" : "snapshot-35",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=635448&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:627573",
+         "id" : 627573,
+         "number" : "snapshot-34",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=627573&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:623943",
+         "id" : 623943,
+         "number" : "snapshot-33",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=623943&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:623303",
+         "id" : 623303,
+         "number" : "snapshot-32",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=623303&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:622181",
+         "id" : 622181,
+         "number" : "snapshot-31",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=622181&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:610995",
+         "id" : 610995,
+         "number" : "snapshot-29",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=610995&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:610993",
+         "id" : 610993,
+         "number" : "snapshot-28",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=610993&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:610902",
+         "id" : 610902,
+         "number" : "snapshot-27",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=610902&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:605970",
+         "id" : 605970,
+         "number" : "snapshot-26",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=605970&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:592551",
+         "id" : 592551,
+         "number" : "snapshot-25",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=592551&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:580024",
+         "id" : 580024,
+         "number" : "snapshot-24",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=580024&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:577142",
+         "id" : 577142,
+         "number" : "snapshot-23",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=577142&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:573965",
+         "id" : 573965,
+         "number" : "snapshot-22",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=573965&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      },
+      {
+         "branchName" : "refs/heads/Hajipur-9.1.x",
+         "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+         "defaultBranch" : true,
+         "href" : "/httpAuth/app/rest/builds/id:571367",
+         "id" : 571367,
+         "number" : "snapshot-21",
+         "state" : "finished",
+         "status" : "SUCCESS",
+         "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=571367&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+      }
+   ],
+   "count" : 22,
+   "href" : "/httpAuth/app/rest/buildTypes/id:TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x/builds/"
+}

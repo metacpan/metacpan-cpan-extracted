@@ -1,0 +1,12 @@
+
+RM_F=perl -MExtUtils::Command rm_f
+YAPP=yapp -v -m
+
+all: parser.pm
+
+parser.pm: parser.yp
+	$(YAPP) WAP::wmls::parser parser.yp
+
+clean:
+	$(RM_F) parser.pm parser.output
+

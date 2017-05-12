@@ -1,0 +1,58 @@
+NAME
+    What - Find out about running services
+
+SYNOPSIS
+      $what = What->new( 
+                 Host => my.domain.org, 
+                 Port => 28, 
+              );  
+
+      $what->mta;
+      $what->mta_version;
+      $what->mta_banner;
+
+DESCRIPTION
+    The What class is interface to classes providing information about
+    running services. What::MTA is the only implementation so far.
+
+What::MTA
+    MTA's supported are: Exim, Postfix (version only on localhost),
+    Sendmail, Courier (name only), XMail, MasqMail.
+
+    See What::MTA for details.
+
+  METHODS
+    new
+          $obj = What->new( Host => "10.10.10.1", Port => 25 )
+
+    mta()
+        Returns the name of the MTA running.
+
+    mta_banner()
+        Returns the banner message.
+
+    mta_version()
+        Returns the MTA version.
+
+AUTHOR
+    Toni Prug <toni@irational.org>
+
+COPYRIGHT
+    Copyright (c) 2006. Toni Prug. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    See <http://www.gnu.org/licenses/gpl.html>
+

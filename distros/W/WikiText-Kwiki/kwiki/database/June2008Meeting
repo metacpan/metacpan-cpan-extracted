@@ -1,0 +1,30 @@
+  Wed. June 11th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+Speaker: Jay Shirley
+
+Topic: Demystifying !DBIx::Class
+
+!ORMs aren't mystic, and neither is !DBIx::Class. Come to this talk to 
+learn how to do the basics with !DBIx::Class and see some sufficiently 
+advanced technology that is distinguishable from magic.
+
+In this brief talk, attendees will learn how to create a schema and 
+manage the data in their database all without touching a line of SQL. 
+Using only what is available on CPAN, build a database of brewers and 
+their beers complete with a review system.
+
+Demystifying DBIC
+* What's an ORM?
+* Why are !ORMs Scary?
+* What makes DBIC Different
+** Objects
+** Relations
+** Management
+*** In Perl without SQL
+** Deployment
+* A Use Case:
+** Beer!
+** Sit back down. We're only talking about beer in the abstract.
+** Beers are made by brewers and distributed by distributors.  (Lots of good relations here.)
+** Creating the database
+** Writing scripts

@@ -1,0 +1,297 @@
+
+=head1 NAME
+
+Win32::GUI::StatusBar - Create and manipulate status bar controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new StatusBar object;
+can also be called as PARENT->AddStatusBar(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+    -sizegrip   => 0/1 (default 0)
+        Set/Unset size grip style.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBorders
+
+B<GetBorders()>
+
+Gets the border values for the status bar. Returns an array containing
+width of the horizontal border, width of the vertical border, and the
+width of the border between parts.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetIcon
+
+B<GetIcon(PART)>
+
+Retrieves the icon for a part in a status bar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetParts
+
+B<GetParts()>
+
+Retrieves a count of the parts in a status window.
+In Array context, return an list of coordinates for the current parts.
+A value of -1 in the final coordinate means the last part will expand rightwards to fill the statusbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRect
+
+B<GetRect(part)>
+
+Gets the bounding rectangle for the given part of the status bar. Returns
+left, top, right, bottom co-ordinates, or undef on failure. This is useful
+for drawing in the status bar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetText
+
+B<GetText(part)>
+
+Retrieves the text from the specified part of a status window.
+In array context, return an array (TEXT,STYLE)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextLength
+
+B<GetTextLength(part)>
+
+Retrieves the text from the specified part of a status window.
+In array context, return an array (LENGTH,STYLE)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTipText
+
+B<GetTipText(part)>
+
+Retrieves the tooltip text for a part in a status bar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Icon
+
+B<Icon(part,[icon])>
+
+See L<SetIcon()|Win32::GUI::StatusBar/SetIcon>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsSimple
+
+B<IsSimple()>
+
+Checks a status bar control to determine if it is in simple mode.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Parts
+
+B<Parts([x1, x2, x3...])>
+
+Divides the statusbar into sections. The list of co-ordinates define the
+right-hand edge of each part.
+
+This method will return a list of co-ordinates for the current parts.
+A value of -1 in the final co-ordinate means the last part will
+expand rightwards to fill the statusbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PartText
+
+B<PartText(part,[string,[flags]])>
+
+Sets or gets the text in a particular part of the status bar.
+
+Flags are as follows:
+
+  0
+       The text is drawn with a border to appear lower than the plane of
+       the window.
+
+  SBT_NOBORDERS = 256
+       The text is drawn without borders.
+
+  SBT_POPOUT = 512
+       The text is drawn with a border to appear higher than the plane of
+       the window.
+
+  SBT_RTLREADING = 1024
+       The text will be displayed in the opposite direction to the text
+       in the parent window.
+
+  SBT_OWNERDRAW = 4096
+       The text is drawn by the parent window.
+
+When called with no string or flags, in scalar context the method will
+return the text string in the specified part of the status bar. In array
+context, the method will return the text string and the style flags of
+the text in the specified part.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkColor
+
+B<SetBkColor([color])>
+
+Sets the background color of the status bar. If no color is given,
+it sets the background color to the default background color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIcon
+
+B<SetIcon(part,[icon])>
+
+Sets or unsets the icon for a particular part of the status bar. If icon
+is set to 0 or less, the icon for the specified part of the status bar is
+removed. icon should be a Win32::GUI::Icon object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMinHeight
+
+B<SetMinHeight(height)>
+
+Sets the minimum height of a status window's drawing area, and redraws
+the status bar.
+
+The minimum height produced will be: height + (2 * vertical border width)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetParts
+
+B<SetParts(x1,[x2, x3...])>
+
+Sets the number of parts in a status window and the coordinate of the right edge of each part.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetText
+
+B<SetText(part,text,[type=0])>
+
+Sets the text in the specified part of a status window.
+Type of drawing operation :
+
+  0 = The text is drawn with a border to appear lower than the plane of the window.
+  SBT_NOBORDERS = The text is drawn without borders.
+  SBT_OWNERDRAW = The text is drawn by the parent window.
+  SBT_POPOUT = The text is drawn with a border to appear higher than the plane of the window.
+  SBT_RTLREADING = Displays text using right-to-left reading order on Hebrew or Arabic systems.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTipText
+
+B<SetTipText(part,string)>
+
+Sets the tooltip text for a particular part of the status bar.
+
+From SDK documentation:
+This ToolTip text is displayed in two situations:
+When the corresponding pane in the status bar contains only an icon.
+When the corresponding pane in the status bar contains text that is
+truncated due to the size of the pane.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat()>
+
+Sets the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Simple
+
+B<Simple([simplemode])>
+
+If simplemode is not 0, turns simple mode on. Otherwise, turns simple
+mode off. Simple mode means the statusbar just shows text, with only one
+partition.
+
+Returns the status of simple mode (0 = off, non-zero = on)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Tip
+
+B<Tip(part,string)>
+
+See L<SetTipText()|Win32::GUI::StatusBar/SetTipText>
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

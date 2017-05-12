@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 44bf729857913c1c1b2754ae2f35570a2df4ec7e Changes
+SHA1 e2d2020b237cfe6049a9c051334de4c77502a01b KacurCZ.pm
+SHA1 62ea8161d1cc7e68c6aa5a240b42a571037b8c51 LICENSE
+SHA1 b59cc26cb0ff5ff5cec75200a878075253452a9f MANIFEST
+SHA1 25d8c47ce382fd98a4b23108f80db7d7a542d4da META.yml
+SHA1 6e292a44a9904c462188d7532e07992cc2b8b8f4 Makefile.PL
+SHA1 877a45e15319fd2b3e8453d930a88869583b8c4a README
+SHA1 8cde9be7339fc18b8e6e218d35ecf555c628f89d examples/ex1.pl
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 fe385be779abd6384c83c5379a3ab01a9276a8a3 t/WWW-Search-KacurCZ/00-use.t
+SHA1 df0bc8720bda7cf8fb679c3ecfa1ff967b2d6ad7 t/WWW-Search-KacurCZ/01-version.t
+SHA1 39fd7c1164d423c679955d8c9b50cf6da89db494 t/WWW-Search-KacurCZ/02-pod_coverage.t
+SHA1 e00f4d3edd76402cd6c95ccc1df9c009002bd938 t/WWW-Search-KacurCZ/03-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUBjjsAAoJEAwa+cf4dLBamyYH/16axGWTo8qBNHzo70xnEhQp
+wxFadvB+iILlPlAlG/V0ptuVXF40HxLkqFHp38+Ju3rOzxR7+aco5gQB5KBhK4ub
+HQxRAWvK0lnQ6wJToAwnUHMVrVWn4DAyioA56Vwy62K7O2IfUAvdrZlA1YdjJwaE
+f4eK/gmtMt8zKf0o1M/kgXP0F1Qy9GZXSeWaZOXwCswPEBCes1GavK1I4knCB/Gf
+PUduBJH8+WXfKx9tGBCKmw820vzwF7RbRkW/pWGlTRf6dUOXF6UMSJRRdydXqQxd
+HxNt22ztYNeHtGfPoFYEePnSZU/fuQZJX9VPjdLwwhjaYr7xcVBStdSjFg6+hvI=
+=5kTO
+-----END PGP SIGNATURE-----

@@ -1,0 +1,33 @@
+---
+name: Wx-Perl-EntryList
+version: 0.01
+author:
+  - Mattia Barbon <mbarbon@cpan.org>.
+abstract: dynamic list that can be displayed in various controls
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0.27
+  Class::Publisher: 0.2
+  Wx: 0.61
+  Wx::Perl::ListCtrl: 0.02
+  Wx::Perl::ListView: 0.01
+build_requires:
+  Test::UseAllModules: 0
+provides:
+  Wx::Perl::EntryList:
+    file: lib/Wx/Perl/EntryList.pm
+    version: 0.01
+  Wx::Perl::EntryList::FwBwIterator:
+    file: lib/Wx/Perl/EntryList/FwBwIterator.pm
+  Wx::Perl::EntryList::Iterator:
+    file: lib/Wx/Perl/EntryList/Iterator.pm
+  Wx::Perl::EntryList::ListBoxView:
+    file: lib/Wx/Perl/EntryList/ListBoxView.pm
+  Wx::Perl::EntryList::VirtualListCtrlView:
+    file: lib/Wx/Perl/EntryList/VirtualListCtrlView.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

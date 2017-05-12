@@ -1,0 +1,14 @@
+Revision history for W3C::XHTML::HTMLCompatChecker
+==================================================
+
+0.10 Thu 12 June 2008
+---------------------
+
+   * modularized the original cgi script into a perl module proper
+   * added test suite
+
+0.01 Tue 15 August 2006
+-----------------------
+
+   * (15 Aug 2006) initial version, as a CGI script based on an XML　parser
+

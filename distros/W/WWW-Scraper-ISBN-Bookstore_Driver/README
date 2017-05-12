@@ -1,0 +1,45 @@
+WWW-Scraper-ISBN-Bookstore_Driver
+=================================
+
+This module is a Perl extension for ISBN search collection that is provide by
+WWW::Scraper::ISBN.
+
+This driver searches for book information from The Bookstore online catalog.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  WWW::Mechanize
+  WWW::Scraper::ISBN
+  WWW::Scraper::ISBN::Record
+  WWW::Scraper::ISBN::Driver
+
+For testing the module requires these modules:
+
+  Data::Dumper
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

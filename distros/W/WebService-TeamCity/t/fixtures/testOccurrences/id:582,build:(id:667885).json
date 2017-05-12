@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:33:06,537]   WARN - cs.git.GitCollectChangesPolicy - From version ad4528ed5c84f92fdbe9ef5f2163cf8d6e6141e7 is not found, collect last 3 commits \n\r\n[2016-01-13 14:33:19,829]   WARN - cs.git.GitCollectChangesPolicy - From version ad4528ed5c84f92fdbe9ef5f2163cf8d6e6141e7 is not found, collect last 3 commits \n\r\n[2016-01-13 14:33:21,712]   WARN - cs.git.GitCollectChangesPolicy - From version ad4528ed5c84f92fdbe9ef5f2163cf8d6e6141e7 is not found, collect last 3 commits \n\r\n[2016-01-13 14:33:27,393]   WARN - cs.git.GitCollectChangesPolicy - From version ad4528ed5c84f92fdbe9ef5f2163cf8d6e6141e7 is not found, collect last 3 commits \n",
+   "duration" : 30512,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:582,build:(id:667885)",
+   "id" : "id:582,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testConcurrentCollectBuildChanges(true)",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:2488207480217920132",
+      "id" : 2488207480217920132,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testConcurrentCollectBuildChanges(true)"
+   }
+}

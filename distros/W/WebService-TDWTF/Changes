@@ -1,0 +1,12 @@
+Revision history for Perl extension WebService::TDWTF.
+
+0.003 2016-03-19T20:54+02:00
+ - Add tdwtf_series function for new API call
+ - Add a --show-series argument to the tdwtf CLI
+ - Remove a test that is no longer relevant
+
+0.002 2016-01-16T20:56+00:00
+ - Add CLI interface
+
+0.001 2016-01-09T22:45+02:00
+ - Initial release

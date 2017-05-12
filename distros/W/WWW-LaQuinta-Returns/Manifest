@@ -1,0 +1,7 @@
+Changes
+bin/cron_example.pl
+lib/WWW/LaQuinta/Returns.pm
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

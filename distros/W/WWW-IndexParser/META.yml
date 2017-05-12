@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                WWW-IndexParser
+version:             0.91
+abstract:            Fetch and parse the directory index from a web server
+license:             ~
+author:              
+    - James Bromberger <james@rcpt.to>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::Parser:                  3
+    LWP:                           5.6
+    Time::Local:                   1
+    URI:                           1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

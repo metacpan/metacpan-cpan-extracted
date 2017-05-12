@@ -1,0 +1,24 @@
+==================================================
+Changes from 2013-11-26 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.5 at 2014-11-26 16:06:56 +0000
+----------------------------------------
+
+  Change: 37f621433eeaa1d740281eb812e4936863bfac5b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 04:49:02 +0000
+
+    make use of Web::APIs new request retry on http 500, fixed mandatory
+    keys 
+
+  Change: 2372cb2d8949591b06b8e49f88bdf19ec62c6f90
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-30 16:23:23 +0000
+
+    v0.4 
+
+================================================
+Plus 4 releases after 2013-11-26 00:00:00 +0000.
+================================================

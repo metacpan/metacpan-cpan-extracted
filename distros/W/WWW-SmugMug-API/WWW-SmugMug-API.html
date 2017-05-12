@@ -1,0 +1,1335 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WWW::SmugMug::API - Perl wrapper for the SmugMug API</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:Gentoo@shasta.local.marwnad.com" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#subroutines_methods">SUBROUTINES/METHODS</a></li>
+	<ul>
+
+		<li><a href="#new">new</a></li>
+		<li><a href="#albums_applywatermark">albums_applyWatermark</a></li>
+		<li><a href="#albums_changesettings">albums_changeSettings</a></li>
+		<li><a href="#albums_create">albums_create</a></li>
+		<li><a href="#albums_delete">albums_delete</a></li>
+		<li><a href="#albums_get">albums_get</a></li>
+		<li><a href="#albums_getinfo">albums_getInfo</a></li>
+		<li><a href="#albums_getstats">albums_getStats</a></li>
+		<li><a href="#albums_removewatermark">albums_removeWatermark</a></li>
+		<li><a href="#albums_resort">albums_reSort</a></li>
+		<li><a href="#albumtemplates_changesettings">albumtemplates_changeSettings</a></li>
+		<li><a href="#albumtemplates_create">albumtemplates_create</a></li>
+		<li><a href="#albumtemplates_get">albumtemplates_get</a></li>
+		<li><a href="#categories_create">categories_create</a></li>
+		<li><a href="#categories_delete">categories_delete</a></li>
+		<li><a href="#categories_get">categories_get</a></li>
+		<li><a href="#categories_rename">categories_rename</a></li>
+		<li><a href="#family_add">family_add</a></li>
+		<li><a href="#family_get">family_get</a></li>
+		<li><a href="#family_remove">family_remove</a></li>
+		<li><a href="#family_removeall">family_removeAll</a></li>
+		<li><a href="#friends_add">friends_add</a></li>
+		<li><a href="#friends_get">friends_get</a></li>
+		<li><a href="#friends_remove">friends_remove</a></li>
+		<li><a href="#friends_removeall">friends_removeAll</a></li>
+		<li><a href="#images_applywatermark">images_applyWatermark</a></li>
+		<li><a href="#images_changeposition">images_changePosition</a></li>
+		<li><a href="#images_changesettings">images_changeSettings</a></li>
+		<li><a href="#images_crop">images_crop</a></li>
+		<li><a href="#images_delete">images_delete</a></li>
+		<li><a href="#images_getexif">images_getEXIF</a></li>
+		<li><a href="#images_getinfo">images_getInfo</a></li>
+		<li><a href="#images_getstats">images_getStats</a></li>
+		<li><a href="#images_geturls">images_getURLs</a></li>
+		<li><a href="#images_removewatermark">images_removeWatermark</a></li>
+		<li><a href="#images_rotate">images_rotate</a></li>
+		<li><a href="#images_zoomthumbnail">images_zoomThumbnail</a></li>
+		<li><a href="#login_anonymously">login_anonymously</a></li>
+		<li><a href="#products_get">products_get</a></li>
+		<li><a href="#propricing_getportfolio">propricing_getPortfolio</a></li>
+		<li><a href="#propricing_getalbum">propricing_getAlbum</a></li>
+		<li><a href="#propricing_getimage">propricing_getImage</a></li>
+		<li><a href="#sharegroups_addalbum">sharegroups_addAlbum</a></li>
+		<li><a href="#sharegroups_create">sharegroups_create</a></li>
+		<li><a href="#sharegroups_delete">sharegroups_delete</a></li>
+		<li><a href="#sharegroups_get">sharegroups_get</a></li>
+		<li><a href="#sharegroups_getinfo">sharegroups_getInfo</a></li>
+		<li><a href="#sharegroups_removealbum">sharegroups_removeAlbum</a></li>
+		<li><a href="#subcategories_create">subcategories_create</a></li>
+		<li><a href="#subcategories_delete">subcategories_delete</a></li>
+		<li><a href="#subcategories_get">subcategories_get</a></li>
+		<li><a href="#subcategories_getall">subcategories_getAll</a></li>
+		<li><a href="#subcategories_rename">subcategories_rename</a></li>
+		<li><a href="#themes_get">themes_get</a></li>
+		<li><a href="#users_getdisplayname">users_getDisplayName</a></li>
+		<li><a href="#users_gettransferstats">users_getTransferStats</a></li>
+		<li><a href="#users_gettree">users_getTree</a></li>
+		<li><a href="#watermarks_changesettings">watermarks_changeSettings</a></li>
+		<li><a href="#watermarks_create">watermarks_create</a></li>
+		<li><a href="#watermarks_delete">watermarks_delete</a></li>
+		<li><a href="#watermarks_get">watermarks_get</a></li>
+		<li><a href="#watermarks_getinfo">watermarks_getInfo</a></li>
+		<li><a href="#getsessionid">getSessionID</a></li>
+		<li><a href="#images_upload">images_upload</a></li>
+	</ul>
+
+	<li><a href="#diagnostics">DIAGNOSTICS</a></li>
+	<li><a href="#configuration_and_environment">CONFIGURATION AND ENVIRONMENT</a></li>
+	<li><a href="#dependencies">DEPENDENCIES</a></li>
+	<li><a href="#incompatibilities">INCOMPATIBILITIES</a></li>
+	<li><a href="#bugs_and_limitations">BUGS AND LIMITATIONS</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#license_and_copyright">LICENSE AND COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>WWW::SmugMug::API - Perl wrapper for the SmugMug API</p>
+<p>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<p>Version 1.02</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use WWW::SmugMug::API;</pre>
+<pre>
+    my $sm_api = WWW::SmugMug::API-&gt;new(
+        {
+            sm_api_key =&gt; 'changeme',
+            secure     =&gt; 1,
+        }
+    );</pre>
+<pre>
+    $sm_api-&gt;login_withPassword(
+        {
+            EmailAddress =&gt; 'me@privacy.net',
+            Password     =&gt; 'password',
+        }
+    );
+    ...
+    $sm_api-&gt;logout;
+        
+=head1 DESCRIPTION</pre>
+<p>Provides a low-level wrapper for the 1.2.0 version of the SmugMug API.  Calls 
+requiring a SessionID use the one returned from the last successful login call
+(login_anonymously, login_withPassword, or login_withHash), and calls requiring
+the API key use the sm_api_key parameter passed to the constructor; these 
+provided parameters cannot be overridden.  All other required parameters must 
+be provided by the caller.</p>
+<p>The wrapper will silently discard any parameters that it does not recognise.</p>
+<p>Method names are the API methods with the 'smugmug.' prefix removed and '_' 
+substituted for '.' (e.g. 'smugmug.login.withPassword becomes 
+<code>login_withPassword())</code></p>
+<p>Methods return hash references.  The value of the 'stat' key will be 'ok' if
+the call succeeded, 'fail' otherwise.  Fail responses contain three key/value
+pairs: 'stat', 'message', and 'code'.  Message is an informative message 
+about the failure.  The code will be positive for an error thrown by SmugMug
+and negative for one from the wrapper.  The following error codes are known:</p>
+<dl>
+<dt><strong><a name="item__2d3">-3</a></strong>
+
+<dd>
+<p>Session not initialised.  Before calling any other methods, you must 
+successfully call login_anonymously, login_withPassword, or login_withHash.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d2">-2</a></strong>
+
+<dd>
+<p>HTTP error.  Message will be the complete error (e.g. '404 Not Found')</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d1">-1</a></strong>
+
+<dd>
+<p>Missing required parameter.  All parameters listed in the documentation as
+required must be provided, or the wrapper will reject the call.</p>
+</dd>
+</li>
+<li>
+<p>Invalid login.</p>
+</li>
+<li>
+<p>Invalid session.</p>
+</li>
+<li>
+<p>Invalid user.</p>
+</li>
+<li>
+<p>System error.</p>
+</li>
+<li>
+<p>Wrong format.  (Image format when uploading, I believe)</p>
+</li>
+<li>
+<p>Invalid album.</p>
+</li>
+<li>
+<p>Ancient version.</p>
+</li>
+<li>
+<p>Empty set.</p>
+</li>
+<li>
+<p>Invalid API key.</p>
+</li>
+</dl>
+<p>NOTE: While this wrapper does provide a method called images_upload, per the 
+best practices recommendation of the SmugMug developers we use a binary 
+uploading method (HTTP PUT) to upload the image; it is not an implementation
+of the API method smugmug.images.upload.  images_uploadFromURL is not provided.</p>
+<p>
+</p>
+<hr />
+<h1><a name="subroutines_methods">SUBROUTINES/METHODS</a></h1>
+<p>
+</p>
+<h2><a name="new">new</a></h2>
+<p>Create a new client object.  Parameters:</p>
+<dl>
+<dt><strong><a name="item_sm_api_key">sm_api_key</a></strong>
+
+<dd>
+<p>API key</p>
+</dd>
+</li>
+<dt><strong><a name="item_agent">agent</a></strong>
+
+<dd>
+<p>Useragent string.</p>
+</dd>
+</li>
+<dt><strong><a name="item_secure">secure</a></strong>
+
+<dd>
+<p>Set this to <code>1</code> to use SSL.  Defaults to <code>0</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_timeout">timeout</a></strong>
+
+<dd>
+<p>Time (in seconds) to wait for a response.  Defaults to 30.</p>
+</dd>
+</li>
+<dt><strong><a name="item_retry">retry</a></strong>
+
+<dd>
+<p>Set this to <code>1</code> to retry on error.  Defaults to <code>0</code></p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="albums_applywatermark">albums_applyWatermark</a></h2>
+<p>Calls smugmug.albums.applyWatermark.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_albumid">AlbumID (integer) (required)</a></strong>
+
+<dt><strong><a name="item_watermarkid">WatermarkID (integer) (required)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_changesettings">albums_changeSettings</a></h2>
+<p>Calls smugmug.albums.changeSettings.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+<dt><strong><a name="item_title">Title (string)</a></strong>
+
+<dt><strong><a name="item_categoryid">CategoryID (integer)</a></strong>
+
+<dt><strong><a name="item_subcategoryid">SubCategoryID (integer)</a></strong>
+
+<dt><strong><a name="item_description">Description (string)</a></strong>
+
+<dt><strong><a name="item_keywords">Keywords (string)</a></strong>
+
+<dt><strong><a name="item_albumtemplateid">AlbumTemplateID (integer)</a></strong>
+
+<dt><strong><a name="item_geography">Geography (boolean)</a></strong>
+
+<dt><strong><a name="item_highlightid">HighlightID (integer)</a></strong>
+
+<dt><strong><a name="item_position">Position (integer)</a></strong>
+
+<dt><strong><a name="item_header">Header (boolean)</a></strong>
+
+<dt><strong><a name="item_clean">Clean (boolean)</a></strong>
+
+<dt><strong><a name="item_exif">EXIF (boolean)</a></strong>
+
+<dt><strong><a name="item_filenames">Filenames (boolean)</a></strong>
+
+<dt><strong><a name="item_squarethumbs">SquareThumbs (boolean)</a></strong>
+
+<dt><strong><a name="item_templateid">TemplateID (integer)</a></strong>
+
+<dt><strong><a name="item_sortmethod">SortMethod (string)</a></strong>
+
+<dt><strong><a name="item_sortdirection">SortDirection (boolean)</a></strong>
+
+<dt><strong><a name="item_password">Password (string)</a></strong>
+
+<dt><strong><a name="item_passwordhint">PasswordHint (string)</a></strong>
+
+<dt><strong><a name="item_public">Public (boolean)</a></strong>
+
+<dt><strong><a name="item_worldsearchable">WorldSearchable (boolean)</a></strong>
+
+<dt><strong><a name="item_smugsearchable">SmugSearchable (boolean)</a></strong>
+
+<dt><strong><a name="item_external">External (boolean)</a></strong>
+
+<dt><strong><a name="item_protected">Protected (boolean)</a></strong>
+
+<dt><strong><a name="item_watermarking">Watermarking (boolean)</a></strong>
+
+<dt><strong>WatermarkID (integer)</strong>
+
+<dt><strong><a name="item_hideowner">HideOwner (boolean)</a></strong>
+
+<dt><strong><a name="item_larges">Larges (boolean)</a></strong>
+
+<dt><strong><a name="item_xlarges">XLarges (boolean)</a></strong>
+
+<dt><strong><a name="item_x2larges">X2Larges (boolean)</a></strong>
+
+<dt><strong><a name="item_x3larges">X3Larges (boolean)</a></strong>
+
+<dt><strong><a name="item_originals">Originals (boolean)</a></strong>
+
+<dt><strong><a name="item_canrank">CanRank (boolean)</a></strong>
+
+<dt><strong><a name="item_friendedit">FriendEdit (boolean)</a></strong>
+
+<dt><strong><a name="item_familyedit">FamilyEdit (boolean)</a></strong>
+
+<dt><strong><a name="item_comments">Comments (boolean)</a></strong>
+
+<dt><strong><a name="item_share">Share (boolean)</a></strong>
+
+<dt><strong><a name="item_printable">Printable (boolean)</a></strong>
+
+<dt><strong><a name="item_defaultcolor">DefaultColor (boolean)</a></strong>
+
+<dt><strong><a name="item_proofdays">ProofDays (integer)</a></strong>
+
+<dt><strong><a name="item_backprinting">Backprinting (string)</a></strong>
+
+<dt><strong><a name="item_unsharpamount">UnsharpAmount (float)</a></strong>
+
+<dt><strong><a name="item_unsharpradius">UnsharpRadius (float)</a></strong>
+
+<dt><strong><a name="item_unsharpthreshold">UnsharpThreshold (float)</a></strong>
+
+<dt><strong><a name="item_unsharpsigma">UnsharpSigma (float)</a></strong>
+
+<dt><strong><a name="item_communityid">CommunityID (integer)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_create">albums_create</a></h2>
+<p>Calls smugmug.albums.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Title (string) (required)</strong>
+
+<dt><strong>CategoryID (string) (required)</strong>
+
+<dt><strong>SubCategoryID (integer)</strong>
+
+<dt><strong>Description (string)</strong>
+
+<dt><strong>Keywords (string)</strong>
+
+<dt><strong>AlbumTemplateID (integer)</strong>
+
+<dt><strong>Geography (boolean)</strong>
+
+<dt><strong>HighlightID (integer)</strong>
+
+<dt><strong>Position (integer)</strong>
+
+<dt><strong>Header (boolean)</strong>
+
+<dt><strong>Clean (boolean)</strong>
+
+<dt><strong>EXIF (boolean)</strong>
+
+<dt><strong>Filenames (boolean)</strong>
+
+<dt><strong>SquareThumbs (boolean)</strong>
+
+<dt><strong>TemplateID (integer)</strong>
+
+<dt><strong>SortMethod (string)</strong>
+
+<dt><strong>SortDirection (boolean)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>PasswordHint (string)</strong>
+
+<dt><strong>Public (boolean)</strong>
+
+<dt><strong>WorldSearchable (boolean)</strong>
+
+<dt><strong>SmugSearchable (boolean)</strong>
+
+<dt><strong>External (boolean)</strong>
+
+<dt><strong>Protected (boolean)</strong>
+
+<dt><strong>Watermarking (boolean)</strong>
+
+<dt><strong>WatermarkID (integer)</strong>
+
+<dt><strong>HideOwner (boolean)</strong>
+
+<dt><strong>Larges (boolean)</strong>
+
+<dt><strong>XLarges (boolean)</strong>
+
+<dt><strong>X2Larges (boolean)</strong>
+
+<dt><strong>X3Larges (boolean)</strong>
+
+<dt><strong>Originals (boolean)</strong>
+
+<dt><strong>CanRank (boolean)</strong>
+
+<dt><strong>FriendEdit (boolean)</strong>
+
+<dt><strong>FamilyEdit (boolean)</strong>
+
+<dt><strong>Comments (boolean)</strong>
+
+<dt><strong>Share (boolean)</strong>
+
+<dt><strong>Printable (boolean)</strong>
+
+<dt><strong>DefaultColor (boolean)</strong>
+
+<dt><strong>ProofDays (integer)</strong>
+
+<dt><strong>Backprinting (string)</strong>
+
+<dt><strong>UnsharpAmount (float)</strong>
+
+<dt><strong>UnsharpRadius (float)</strong>
+
+<dt><strong>UnsharpThreshold (float)</strong>
+
+<dt><strong>UnsharpSigma (float)</strong>
+
+<dt><strong>CommunityID (integer)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_delete">albums_delete</a></h2>
+<p>Calls smugmug.albums.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_get">albums_get</a></h2>
+<p>Calls smugmug.albums.get.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_nickname">NickName (string)</a></strong>
+
+<dt><strong><a name="item_heavy">Heavy (boolean)</a></strong>
+
+<dt><strong><a name="item_sitepassword">SitePassword (string)</a></strong>
+
+<dt><strong><a name="item_sharegroup">ShareGroup ()</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_getinfo">albums_getInfo</a></h2>
+<p>Calls smugmug.albums.getInfo.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (string) (required)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+<dt><strong><a name="item_albumkey">AlbumKey (string)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_getstats">albums_getStats</a></h2>
+<p>Calls smugmug.albums.getStats.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+<dt><strong><a name="item_month">Month (integer) (required)</a></strong>
+
+<dt><strong><a name="item_year">Year (integer) (required)</a></strong>
+
+<dt><strong>Heavy (boolean)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_removewatermark">albums_removeWatermark</a></h2>
+<p>Calls smugmug.albums.removeWatermark.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albums_resort">albums_reSort</a></h2>
+<p>Calls smugmug.albums.reSort.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+<dt><strong><a name="item_by">By (string) (required)</a></strong>
+
+<dt><strong><a name="item_direction">Direction (string) (required)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albumtemplates_changesettings">albumtemplates_changeSettings</a></h2>
+<p>Calls smugmug.albumtemplates.changeSettings.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumTemplateID (integer) (required)</strong>
+
+<dt><strong><a name="item_name">Name (string)</a></strong>
+
+<dt><strong>HighlightID (integer)</strong>
+
+<dt><strong>SortMethod (string)</strong>
+
+<dt><strong>SortDirection (boolean)</strong>
+
+<dt><strong>Public (boolean)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>PasswordHint (string)</strong>
+
+<dt><strong>Printable (boolean)</strong>
+
+<dt><strong>Filenames (boolean)</strong>
+
+<dt><strong>Comments (boolean)</strong>
+
+<dt><strong>External (boolean)</strong>
+
+<dt><strong>Originals (boolean)</strong>
+
+<dt><strong>EXIF (boolean)</strong>
+
+<dt><strong>Share (boolean)</strong>
+
+<dt><strong>Header (boolean)</strong>
+
+<dt><strong>Larges (boolean)</strong>
+
+<dt><strong>XLarges (boolean)</strong>
+
+<dt><strong>X2Larges (boolean)</strong>
+
+<dt><strong>X3Larges (boolean)</strong>
+
+<dt><strong>Clean (boolean)</strong>
+
+<dt><strong>Protected (boolean)</strong>
+
+<dt><strong>Watermarking (boolean)</strong>
+
+<dt><strong>FamilyEdit (boolean)</strong>
+
+<dt><strong>FriendEdit (boolean)</strong>
+
+<dt><strong>HideOwner (boolean)</strong>
+
+<dt><strong>DefaultColor (boolean)</strong>
+
+<dt><strong>Geography (boolean)</strong>
+
+<dt><strong>CanRank (boolean)</strong>
+
+<dt><strong>ProofDays (integer)</strong>
+
+<dt><strong>Backprinting (string)</strong>
+
+<dt><strong>SmugSearchable (boolean)</strong>
+
+<dt><strong>UnsharpAmount (float)</strong>
+
+<dt><strong>UnsharpRadius (float)</strong>
+
+<dt><strong>UnsharpThreshold (float)</strong>
+
+<dt><strong>UnsharpSigma (float)</strong>
+
+<dt><strong>WorldSearchable (boolean)</strong>
+
+<dt><strong>TemplateID (integer)</strong>
+
+<dt><strong>CommunityID (integer)</strong>
+
+<dt><strong>WatermarkID (integer)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albumtemplates_create">albumtemplates_create</a></h2>
+<p>Calls smugmug.albumtemplates.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Name (string)</strong>
+
+<dt><strong>HighlightID (integer)</strong>
+
+<dt><strong>SortMethod (string)</strong>
+
+<dt><strong>SortDirection (boolean)</strong>
+
+<dt><strong>Public (boolean)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>PasswordHint (string)</strong>
+
+<dt><strong>Printable (boolean)</strong>
+
+<dt><strong>Filenames (boolean)</strong>
+
+<dt><strong>Comments (boolean)</strong>
+
+<dt><strong>External (boolean)</strong>
+
+<dt><strong>Originals (boolean)</strong>
+
+<dt><strong>EXIF (boolean)</strong>
+
+<dt><strong>Share (boolean)</strong>
+
+<dt><strong>Header (boolean)</strong>
+
+<dt><strong>Larges (boolean)</strong>
+
+<dt><strong>XLarges (boolean)</strong>
+
+<dt><strong>X2Larges (boolean)</strong>
+
+<dt><strong>X3Larges (boolean)</strong>
+
+<dt><strong>Clean (boolean)</strong>
+
+<dt><strong>Protected (boolean)</strong>
+
+<dt><strong>Watermarking (boolean)</strong>
+
+<dt><strong>FamilyEdit (boolean)</strong>
+
+<dt><strong>FriendEdit (boolean)</strong>
+
+<dt><strong>HideOwner (boolean)</strong>
+
+<dt><strong>DefaultColor (boolean)</strong>
+
+<dt><strong>Geography (boolean)</strong>
+
+<dt><strong>CanRank (boolean)</strong>
+
+<dt><strong>ProofDays (integer)</strong>
+
+<dt><strong>Backprinting (string)</strong>
+
+<dt><strong>SmugSearchable (boolean)</strong>
+
+<dt><strong>UnsharpAmount (float)</strong>
+
+<dt><strong>UnsharpRadius (float)</strong>
+
+<dt><strong>UnsharpThreshold (float)</strong>
+
+<dt><strong>UnsharpSigma (float)</strong>
+
+<dt><strong>WorldSearchable (boolean)</strong>
+
+<dt><strong>TemplateID (integer)</strong>
+
+<dt><strong>CommunityID (integer)</strong>
+
+<dt><strong>WatermarkID (integer)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="albumtemplates_get">albumtemplates_get</a></h2>
+<p>Calls smugmug.albumtemplates.get.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="categories_create">categories_create</a></h2>
+<p>Calls smugmug.categories.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Name (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="categories_delete">categories_delete</a></h2>
+<p>Calls smugmug.categories.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>CategoryID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="categories_get">categories_get</a></h2>
+<p>Calls smugmug.categories.get.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="categories_rename">categories_rename</a></h2>
+<p>Calls smugmug.categories.rename.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>CategoryID (integer) (required)</strong>
+
+<dt><strong>Name (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="family_add">family_add</a></h2>
+<p>Calls smugmug.family.add.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="family_get">family_get</a></h2>
+<p>Calls smugmug.family.get.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="family_remove">family_remove</a></h2>
+<p>Calls smugmug.family.remove.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="family_removeall">family_removeAll</a></h2>
+<p>Calls smugmug.family.removeAll.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="friends_add">friends_add</a></h2>
+<p>Calls smugmug.friends.add.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="friends_get">friends_get</a></h2>
+<p>Calls smugmug.friends.get.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="friends_remove">friends_remove</a></h2>
+<p>Calls smugmug.friends.remove.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="friends_removeall">friends_removeAll</a></h2>
+<p>Calls smugmug.friends.removeAll.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="images_applywatermark">images_applyWatermark</a></h2>
+<p>Calls smugmug.images.applyWatermark.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_imageid">ImageID (integer) (required)</a></strong>
+
+<dt><strong>WatermarkID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_changeposition">images_changePosition</a></h2>
+<p>Calls smugmug.images.changePosition.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Position (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_changesettings">images_changeSettings</a></h2>
+<p>Calls smugmug.images.changeSettings.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>AlbumID (integer)</strong>
+
+<dt><strong><a name="item_caption">Caption (string)</a></strong>
+
+<dt><strong>Keywords (string)</strong>
+
+<dt><strong><a name="item_hidden">Hidden (boolean)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_crop">images_crop</a></h2>
+<p>Calls smugmug.images.crop.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong><a name="item_width">Width (integer) (required)</a></strong>
+
+<dt><strong><a name="item_height">Height (integer) (required)</a></strong>
+
+<dt><strong><a name="item_x">X (integer) (required)</a></strong>
+
+<dt><strong><a name="item_y">Y (integer) (required)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_delete">images_delete</a></h2>
+<p>Calls smugmug.images.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_getexif">images_getEXIF</a></h2>
+<p>Calls smugmug.images.getEXIF.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+<dt><strong><a name="item_imagekey">ImageKey (string)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_getinfo">images_getInfo</a></h2>
+<p>Calls smugmug.images.getInfo.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+<dt><strong>ImageKey (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_getstats">images_getStats</a></h2>
+<p>Calls smugmug.images.getStats.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Month (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_geturls">images_getURLs</a></h2>
+<p>Calls smugmug.images.getURLs.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>TemplateID (integer)</strong>
+
+<dt><strong>Password (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+<dt><strong>ImageKey (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_removewatermark">images_removeWatermark</a></h2>
+<p>Calls smugmug.images.removeWatermark.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_rotate">images_rotate</a></h2>
+<p>Calls smugmug.images.rotate.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong><a name="item_degrees">Degrees (integer)</a></strong>
+
+<dt><strong><a name="item_flip">Flip (boolean)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="images_zoomthumbnail">images_zoomThumbnail</a></h2>
+<p>Calls smugmug.images.zoomThumbnail.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Width (integer) (required)</strong>
+
+<dt><strong>Height (integer) (required)</strong>
+
+<dt><strong>X (integer) (required)</strong>
+
+<dt><strong>Y (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="login_anonymously">login_anonymously</a></h2>
+<p>Calls smugmug.login.anonymously.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<dl>
+<dt><strong><a name="item_userid">UserID (integer) (required)</a></strong>
+
+<dt><strong><a name="item_passwordhash">PasswordHash (string) (required)</a></strong>
+
+</dl>
+<dl>
+<dt><strong><a name="item_emailaddress">EmailAddress (string) (required)</a></strong>
+
+<dt><strong>Password (string) (required)</strong>
+
+</dl>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="products_get">products_get</a></h2>
+<p>Calls smugmug.products.get.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="propricing_getportfolio">propricing_getPortfolio</a></h2>
+<p>Calls smugmug.propricing.getPortfolio.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_producttype">ProductType (string)</a></strong>
+
+<dt><strong><a name="item_productid">ProductID (integer)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="propricing_getalbum">propricing_getAlbum</a></h2>
+<p>Calls smugmug.propricing.getAlbum.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>AlbumID (integer) (required)</strong>
+
+<dt><strong>ProductType (string)</strong>
+
+<dt><strong>ProductID (integer)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="propricing_getimage">propricing_getImage</a></h2>
+<p>Calls smugmug.propricing.getImage.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>ProductType (string)</strong>
+
+<dt><strong>ProductID (integer)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_addalbum">sharegroups_addAlbum</a></h2>
+<p>Calls smugmug.sharegroups.addAlbum.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_sharegroupid">ShareGroupID (integer) (required)</a></strong>
+
+<dt><strong>AlbumID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_create">sharegroups_create</a></h2>
+<p>Calls smugmug.sharegroups.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Name (string) (required)</strong>
+
+<dt><strong>Description (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_delete">sharegroups_delete</a></h2>
+<p>Calls smugmug.sharegroups.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ShareGroupID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_get">sharegroups_get</a></h2>
+<p>Calls smugmug.sharegroups.get.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Heavy (boolean)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_getinfo">sharegroups_getInfo</a></h2>
+<p>Calls smugmug.sharegroups.getInfo.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ShareGroupID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="sharegroups_removealbum">sharegroups_removeAlbum</a></h2>
+<p>Calls smugmug.sharegroups.removeAlbum.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ShareGroupID (integer) (required)</strong>
+
+<dt><strong>AlbumID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="subcategories_create">subcategories_create</a></h2>
+<p>Calls smugmug.subcategories.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Name (string) (required)</strong>
+
+<dt><strong>CategoryID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="subcategories_delete">subcategories_delete</a></h2>
+<p>Calls smugmug.subcategories.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>SubCategoryID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="subcategories_get">subcategories_get</a></h2>
+<p>Calls smugmug.subcategories.get.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>CategoryID (integer) (required)</strong>
+
+<dt><strong>NickName (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="subcategories_getall">subcategories_getAll</a></h2>
+<p>Calls smugmug.subcategories.getAll.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="subcategories_rename">subcategories_rename</a></h2>
+<p>Calls smugmug.subcategories.rename.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>SubCategoryID (integer) (required)</strong>
+
+<dt><strong>Name (string) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="themes_get">themes_get</a></h2>
+<p>Calls smugmug.themes.get.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="users_getdisplayname">users_getDisplayName</a></h2>
+<p>Calls smugmug.users.getDisplayName.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="users_gettransferstats">users_getTransferStats</a></h2>
+<p>Calls smugmug.users.getTransferStats.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Month (integer) (required)</strong>
+
+<dt><strong>Year (integer) (required)</strong>
+
+<dt><strong>Heavy (boolean)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="users_gettree">users_getTree</a></h2>
+<p>Calls smugmug.users.getTree.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>NickName (string)</strong>
+
+<dt><strong>Heavy (boolean)</strong>
+
+<dt><strong>SitePassword (string)</strong>
+
+<dt><strong><a name="item_sharegroup">Sharegroup ()</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="watermarks_changesettings">watermarks_changeSettings</a></h2>
+<p>Calls smugmug.watermarks.changeSettings.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Name (string)</strong>
+
+<dt><strong><a name="item_pinned">Pinned (string)</a></strong>
+
+<dt><strong><a name="item_dissolved">Dissolved (integer)</a></strong>
+
+<dt><strong><a name="item_thumbs">Thumbs (boolean)</a></strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="watermarks_create">watermarks_create</a></h2>
+<p>Calls smugmug.watermarks.create.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>ImageID (integer) (required)</strong>
+
+<dt><strong>Name (string)</strong>
+
+<dt><strong>Pinned (string)</strong>
+
+<dt><strong>Dissolved (integer)</strong>
+
+<dt><strong>Thumbs (boolean)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="watermarks_delete">watermarks_delete</a></h2>
+<p>Calls smugmug.watermarks.delete.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>WatermarkID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="watermarks_get">watermarks_get</a></h2>
+<p>Calls smugmug.watermarks.get.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>Heavy (boolean)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="watermarks_getinfo">watermarks_getInfo</a></h2>
+<p>Calls smugmug.watermarks.getInfo.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong>WatermarkID (integer) (required)</strong>
+
+</dl>
+<p>
+</p>
+<h2><a name="getsessionid">getSessionID</a></h2>
+<p>Returns the currently cached SessionID.</p>
+<p>Parameters:</p>
+<p>No parameters</p>
+<p>
+</p>
+<h2><a name="images_upload">images_upload</a></h2>
+<p>Uploads an image.</p>
+<p>Parameters:</p>
+<dl>
+<dt><strong><a name="item_imagedata">ImageData (binary) (required)</a></strong>
+
+<dt><strong><a name="item_filename">FileName (string) (required)</a></strong>
+
+<dt><strong>AlbumID (integer)</strong>
+
+<dt><strong>ImageID (integer)</strong>
+
+<dt><strong>Caption (string)</strong>
+
+<dt><strong>Keywords (string)</strong>
+
+<dt><strong><a name="item_latitude">Latitude (float?)</a></strong>
+
+<dt><strong><a name="item_longitude">Longitude (float?)</a></strong>
+
+<dt><strong><a name="item_altitude">Altitude (integer?)</a></strong>
+
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="diagnostics">DIAGNOSTICS</a></h1>
+<p>This section intentionally left blank.</p>
+<p>
+</p>
+<hr />
+<h1><a name="configuration_and_environment">CONFIGURATION AND ENVIRONMENT</a></h1>
+<p>WWW::SmugMUG::API requires no special configuration or environment variables.</p>
+<p>
+</p>
+<hr />
+<h1><a name="dependencies">DEPENDENCIES</a></h1>
+<p>JSON
+LWP::UserAgent</p>
+<p>
+</p>
+<hr />
+<h1><a name="incompatibilities">INCOMPATIBILITIES</a></h1>
+<p>No known incompatibilities.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_and_limitations">BUGS AND LIMITATIONS</a></h1>
+<p>No known bugs.</p>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>You can find documentation for this module with the perldoc command.</p>
+<pre>
+    perldoc WWW::SmugMug::API</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Paul Arthur, <code>&lt;flowerysong00 at yahoo.com&gt;</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>This section intentionally left blank.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license_and_copyright">LICENSE AND COPYRIGHT</a></h1>
+<p>Copyright 2008 Paul Arthur MacIain, all rights reserved.</p>
+<p>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

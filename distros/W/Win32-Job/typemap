@@ -1,0 +1,14 @@
+JOB_T		T_JOB
+
+INPUT
+T_JOB
+        if (sv_derived_from($arg, \"Win32::Job\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type, tmp);
+        }
+        else
+            croak(\"$var is not of type Win32::Job\")
+
+OUTPUT
+T_JOB
+        sv_setref_pv($arg, \"Win32::Job\", (void*)$var);

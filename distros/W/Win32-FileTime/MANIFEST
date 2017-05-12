@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/Win32/FileTime.pm
+t/basic.t
+t/filetime.t

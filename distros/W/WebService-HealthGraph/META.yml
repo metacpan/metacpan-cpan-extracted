@@ -1,0 +1,50 @@
+---
+abstract: 'A thin wrapper around the Runkeeper (Health Graph) API'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Data::Printer: '0'
+  DateTime: '0'
+  List::AllUtils: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Plugin::BailOnFail: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-HealthGraph
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Array::Iterator: '0'
+  JSON::MaybeXS: '1.003005'
+  LWP::ConsoleLogger::Easy: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '6.15'
+  Moo: '2.001001'
+  Type::Tiny: '1.000005'
+  Types::Standard: '0'
+  Types::URI: '0'
+  URI: '1.71'
+  URI::FromHash: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oalders/webservice-healthgraph/issues
+  homepage: https://github.com/oalders/webservice-healthgraph
+  repository: https://github.com/oalders/webservice-healthgraph.git
+version: '0.000004'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

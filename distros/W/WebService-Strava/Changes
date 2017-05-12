@@ -1,0 +1,16 @@
+0.06      2016-07-24 17:46:16+08:00 Australia/Perth
+
+          RT #116416 - Failing on Moo >= 2.002002
+          PR #22 by @OneLastTry - Populate Activity Objects
+          Minor use declaration tidy ups.
+
+0.05      2015-02-26 13:31:07+08:00 Australia/Perth
+          Small Pod Fixes
+          Fix Auth.t testing failures. RT #102362 + Github #18
+
+0.04      2015-02-19 13:00:44+08:00 Australia/Perth
+
+0.03    20140826 - 02:23:22 UTC
+        Ground up rewrite of WebService::Strava. Not backwards
+        compatible with previous releases. Previous release used
+        version 2 of the Strava API which is no longer available.

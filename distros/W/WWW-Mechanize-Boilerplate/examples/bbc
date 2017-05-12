@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use FindBin '$Bin';
+use lib $Bin;
+use WWW::Mechanize::Boilerplate::BBC;
+use WWW::Mechanize;
+
+my $client = WWW::Mechanize::Boilerplate::BBC->new({
+    mech => WWW::Mechanize->new,
+});
+
+$client->indent_note('Bounce around a few pages on the site');
+$client->home
+       ->tv_link
+       ->iplayer_link
+       ->weather(2643743)
+       ->tv;
+
+$client->indent_note('Go to the news page');
+$client->news;
+
+$client->indent_note('Search for news about Doctor Who');
+$client->search_news('Doctor Who');

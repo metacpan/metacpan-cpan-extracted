@@ -1,0 +1,8 @@
+Win32-MessageLoop
+
+Win32::MessageLoop is a drop-in replacement for the message loop in Win32::OLE
+that provides a timeout.
+
+In the future, there are other fancy things we might do with the message loop,
+but a timeout is top priority for workability with Win32::IE::Mechanize, so
+here we are.

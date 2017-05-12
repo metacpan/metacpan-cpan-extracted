@@ -1,0 +1,20 @@
+Win32::NetName - A more universal way of obtaining the UNC names of local paths
+
+To install the module:
+
+    perl Makefile.PL;
+    make;
+    make test;
+    make install;
+
+Prerequisites are;
+
+Win32::API
+Win32::Lanman
+
+Win32::API is easiest installed with Activestate's ppm tool.
+It can also be found at http://dada.perl.it, see the ppm instructions at
+the bottom of the page.
+
+Win32::Lanman can be hard to find on CPAN. 
+It is located at http://www.cpan.org/authors/id/J/JH/JHELBERG/

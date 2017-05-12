@@ -1,0 +1,30 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+test.pl
+lib/WAP/wbxml.pm
+lib/WAP/wbxml/WbRules.pm
+lib/WAP/wbxml/wap.wbrules.xml
+lib/WAP/wbxml/syncml.wbrules.xml
+lib/WAP/wbxml/wv.wbrules.xml
+lib/WAP/wbxml/activesync.wbrules.xml
+bin/wbxmlc
+README
+samples/makefile
+samples/sample_10.wml
+samples/sample_11.wml
+samples/sample_12.wml
+samples/sample_13.wml
+samples/sample_12.wta-wml
+samples/sample_10.si
+samples/sample_10.sl
+samples/sample_10.co
+samples/sample_11.channel
+samples/sample_12.channel
+samples/basic_10.html
+samples/strict_10.html
+samples/personal.xml
+samples/airsync.xml
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,23 @@
+Revision history for perl module WebService::Spotify
+
+1.003 2016-11-06
+
+  - Merge pull requests
+     https://github.com/nicklangridge/WebService-Spotify/pull/5
+     https://github.com/nicklangridge/WebService-Spotify/pull/2
+     https://github.com/nicklangridge/WebService-Spotify/pull/1
+  - Fix failing test https://github.com/nicklangridge/WebService-Spotify/issues/3
+  - Fix possible precedence issue https://github.com/nicklangridge/WebService-Spotify/issues/4
+
+1.002 2014-07-01
+
+  - Fix module usage in examples
+
+1.001 2014-07-01
+
+  - Minor documentation changes
+  - Removed old files
+
+1.000 2014-06-30
+
+  - Initial release

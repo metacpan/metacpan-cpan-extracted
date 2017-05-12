@@ -1,0 +1,539 @@
+------------------------------------------------------------------------
+rev 208:  spoon | 2003-09-12 13:08:25 +1000 (Fri, 12 Sep 2003) | 1 line
+
+  - Corrected our mission
+------------------------------------------------------------------------
+rev 207:  spoon | 2003-09-12 00:07:20 +1000 (Fri, 12 Sep 2003) | 1 line
+
+  - Damn inflections
+------------------------------------------------------------------------
+rev 204:  spoon | 2003-09-11 23:48:49 +1000 (Thu, 11 Sep 2003) | 1 line
+
+  - Default sleep changed to 1 second.
+------------------------------------------------------------------------
+rev 203:  spoon | 2003-09-11 23:45:03 +1000 (Thu, 11 Sep 2003) | 1 line
+
+  - Look, documentation!
+------------------------------------------------------------------------
+rev 202:  spoon | 2003-09-11 22:14:16 +1000 (Thu, 11 Sep 2003) | 1 line
+
+  - Mention new sleep default in docs
+------------------------------------------------------------------------
+rev 201:  spoon | 2003-09-11 22:09:42 +1000 (Thu, 11 Sep 2003) | 1 line
+
+(1.88)
+------------------------------------------------------------------------
+rev 200:  spoon | 2003-09-11 22:04:03 +1000 (Thu, 11 Sep 2003) | 2 lines
+
+  - updated mangling table.
+
+------------------------------------------------------------------------
+rev 199:  spoon | 2003-09-11 17:50:04 +1000 (Thu, 11 Sep 2003) | 2 lines
+
+  - Decode case added. [pabs]
+
+------------------------------------------------------------------------
+rev 191:  spoon | 2003-08-26 22:40:06 +1000 (Tue, 26 Aug 2003) | 1 line
+
+(1.87)
+------------------------------------------------------------------------
+rev 190:  spoon | 2003-08-26 22:30:02 +1000 (Tue, 26 Aug 2003) | 1 line
+
+  - Made sure modules would be picked up
+------------------------------------------------------------------------
+rev 189:  spoon | 2003-08-26 22:29:48 +1000 (Tue, 26 Aug 2003) | 1 line
+
+  - Extended license section
+------------------------------------------------------------------------
+rev 188:  spoon | 2003-08-26 22:19:30 +1000 (Tue, 26 Aug 2003) | 1 line
+
+  - Hash randomisation problems fixed
+------------------------------------------------------------------------
+rev 186:  spoon | 2003-08-26 13:22:24 +1000 (Tue, 26 Aug 2003) | 1 line
+
+  - Spelling variance. To determine later
+------------------------------------------------------------------------
+rev 185:  spoon | 2003-08-22 11:55:54 +1000 (Fri, 22 Aug 2003) | 2 lines
+
+(1.86 updates)
+
+------------------------------------------------------------------------
+rev 184:  spoon | 2003-08-22 11:50:00 +1000 (Fri, 22 Aug 2003) | 1 line
+
+  - Disable default debugging
+------------------------------------------------------------------------
+rev 183:  spoon | 2003-08-22 11:48:01 +1000 (Fri, 22 Aug 2003) | 2 lines
+
+  - Yahoo are using RSS 2 now.
+
+------------------------------------------------------------------------
+rev 182:  spoon | 2003-08-22 11:36:22 +1000 (Fri, 22 Aug 2003) | 5 lines
+
+  - Header reformatting now integrated
+  - Default sleep is 5 seconds (yahoo are throttling).
+  - Revised agent name back.
+  - Content extraction rejigged as Yahoo changed their pages.
+
+------------------------------------------------------------------------
+rev 181:  spoon | 2003-08-22 11:25:47 +1000 (Fri, 22 Aug 2003) | 3 lines
+
+  - Strip trailing newlines from messages.
+  - Reformat headers as that's now a standard action.
+
+------------------------------------------------------------------------
+rev 180:  spoon | 2003-08-22 10:03:24 +1000 (Fri, 22 Aug 2003) | 2 lines
+
+  - Better header/non-header distinction.
+
+------------------------------------------------------------------------
+rev 164:  spoon | 2003-08-07 23:20:10 +1000 (Thu, 07 Aug 2003) | 1 line
+
+  - Use proxies if available
+------------------------------------------------------------------------
+rev 158:  spoon | 2003-08-07 12:44:24 +1000 (Thu, 07 Aug 2003) | 1 line
+
+  - Tweaks to the demangling
+------------------------------------------------------------------------
+rev 155:  spoon | 2003-08-07 00:46:17 +1000 (Thu, 07 Aug 2003) | 1 line
+
+(1.86 version bump)
+------------------------------------------------------------------------
+rev 153:  spoon | 2003-08-07 00:40:02 +1000 (Thu, 07 Aug 2003) | 2 lines
+
+  - Automatic address demunging integrated.
+
+------------------------------------------------------------------------
+rev 133:  iain | 2003-08-01 14:48:14 +1000 (Fri, 01 Aug 2003) | 1 line
+
+(1.85)
+------------------------------------------------------------------------
+rev 132:  iain | 2003-08-01 14:44:36 +1000 (Fri, 01 Aug 2003) | 1 line
+
+  - Use agent_alias instead of our specific agent
+------------------------------------------------------------------------
+rev 115:  iain | 2003-07-30 11:11:14 +1000 (Wed, 30 Jul 2003) | 1 line
+
+  - Sometimes, the uri is not defined
+------------------------------------------------------------------------
+rev 114:  spoon | 2003-07-30 10:31:06 +1000 (Wed, 30 Jul 2003) | 1 line
+
+(1.85 changes)
+------------------------------------------------------------------------
+rev 113:  spoon | 2003-07-30 10:30:16 +1000 (Wed, 30 Jul 2003) | 2 lines
+
+  - Added preliminary reformatter.
+  - Fixed minor code nits.
+------------------------------------------------------------------------
+rev 112:  spoon | 2003-07-30 10:28:49 +1000 (Wed, 30 Jul 2003) | 1 line
+
+  - Added versions.
+------------------------------------------------------------------------
+rev 111:  spoon | 2003-07-30 10:27:44 +1000 (Wed, 30 Jul 2003) | 1 line
+
+  - Removed File::Slurp usage.
+------------------------------------------------------------------------
+rev 110:  iain | 2003-07-28 17:19:06 +1000 (Mon, 28 Jul 2003) | 1 line
+
+  - Messages now not embedded in tests
+------------------------------------------------------------------------
+rev 106:  iain | 2003-07-28 16:51:29 +1000 (Mon, 28 Jul 2003) | 3 lines
+
+  - Adult confirmation pass through.
+  - Long text based tests use Test::Differences
+
+------------------------------------------------------------------------
+rev 81:  iain | 2003-07-24 17:33:07 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+ - 1.84
+
+------------------------------------------------------------------------
+rev 80:  iain | 2003-07-24 17:30:33 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+(Integrate)
+
+------------------------------------------------------------------------
+rev 78:  iain | 2003-07-24 17:14:14 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+  - Fix tests
+
+------------------------------------------------------------------------
+rev 77:  iain | 2003-07-24 17:10:46 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+(Integrate)
+
+------------------------------------------------------------------------
+rev 75:  iain | 2003-07-24 15:40:37 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+ - Cleaning up
+
+------------------------------------------------------------------------
+rev 74:  iain | 2003-07-24 15:29:28 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+ - 1.84
+
+------------------------------------------------------------------------
+rev 73:  iain | 2003-07-24 15:26:02 +1000 (Thu, 24 Jul 2003) | 2 lines
+
+  - More i18n
+
+------------------------------------------------------------------------
+rev 72:  iain | 2003-07-23 17:43:52 +1000 (Wed, 23 Jul 2003) | 2 lines
+
+  - More i18n of page title parsing
+
+------------------------------------------------------------------------
+rev 71:  iain | 2003-07-03 15:12:49 +1000 (Thu, 03 Jul 2003) | 2 lines
+
+ - 1.83
+
+------------------------------------------------------------------------
+rev 70:  iain | 2003-07-03 15:11:01 +1000 (Thu, 03 Jul 2003) | 2 lines
+
+  - No more Advanced Technology.
+
+------------------------------------------------------------------------
+rev 69:  iain | 2003-05-31 14:59:10 +1000 (Sat, 31 May 2003) | 2 lines
+
+ - 1.8.2
+
+------------------------------------------------------------------------
+rev 68:  iain | 2003-05-31 14:58:46 +1000 (Sat, 31 May 2003) | 2 lines
+
+  - VERSIONs added.
+
+------------------------------------------------------------------------
+rev 67:  iain | 2003-05-31 14:58:39 +1000 (Sat, 31 May 2003) | 2 lines
+
+  - Version updated.
+
+------------------------------------------------------------------------
+rev 66:  iain | 2003-05-31 14:56:09 +1000 (Sat, 31 May 2003) | 3 lines
+
+  - Some 'use' statements to get the right modules in requirements.
+  - Fix to allow adult confirmations to be automatically handled.
+
+------------------------------------------------------------------------
+rev 65:  iain | 2003-05-22 13:46:57 +1000 (Thu, 22 May 2003) | 2 lines
+
+  - Some simple agent testing.
+
+------------------------------------------------------------------------
+rev 64:  iain | 2003-05-22 13:44:49 +1000 (Thu, 22 May 2003) | 2 lines
+
+  - Refactoring Mechanize.
+
+------------------------------------------------------------------------
+rev 63:  iain | 2003-05-22 13:44:41 +1000 (Thu, 22 May 2003) | 2 lines
+
+  - Refactoring Mechanize and Errors usage.
+
+------------------------------------------------------------------------
+rev 62:  iain | 2003-05-22 13:44:36 +1000 (Thu, 22 May 2003) | 3 lines
+
+  - Refactoring Mechanize and Errors usage.
+  - Added CPAN IDs of 'thanks'.
+
+------------------------------------------------------------------------
+rev 61:  iain | 2003-05-22 13:44:09 +1000 (Thu, 22 May 2003) | 2 lines
+
+  - 1.8.1
+
+------------------------------------------------------------------------
+rev 60:  iain | 2003-05-22 13:40:47 +1000 (Thu, 22 May 2003) | 2 lines
+
+  - Generated these days.
+
+------------------------------------------------------------------------
+rev 59:  iain | 2003-05-16 11:53:37 +1000 (Fri, 16 May 2003) | 2 lines
+
+  - 1.79
+
+------------------------------------------------------------------------
+rev 58:  iain | 2003-05-16 11:42:04 +1000 (Fri, 16 May 2003) | 2 lines
+
+  + 1.7.8
+
+------------------------------------------------------------------------
+rev 57:  iain | 2003-05-16 11:27:04 +1000 (Fri, 16 May 2003) | 2 lines
+
+  - first_msg_id to match last_msg_id for lists with incomlpete archives.
+
+------------------------------------------------------------------------
+rev 56:  iain | 2003-05-05 13:41:48 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - META.yml now.
+
+------------------------------------------------------------------------
+rev 55:  iain | 2003-05-05 13:37:48 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - 1.7.8
+
+------------------------------------------------------------------------
+rev 54:  iain | 2003-05-05 13:37:17 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - Cleaned.
+
+------------------------------------------------------------------------
+rev 53:  iain | 2003-05-05 13:37:12 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - See self.
+
+------------------------------------------------------------------------
+rev 52:  iain | 2003-05-05 13:36:55 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - Updated for new error behaviour.
+
+------------------------------------------------------------------------
+rev 51:  iain | 2003-05-05 13:37:04 +1000 (Mon, 05 May 2003) | 2 lines
+
+  - See 'Changes' file.
+
+------------------------------------------------------------------------
+rev 50:  iain | 2002-10-14 13:53:04 +1000 (Mon, 14 Oct 2002) | 8 lines
+
+   - Added Module::Signature test, for those with said module.
+   - Made it so Test::Prereq would not barf that Module::Signature is
+     not actually required. We just require a particular version of
+     Module::Signature if it is actually installed.
+   - Remove Test::Prereq since it was having major problems.
+   - Added Test::Signature
+   - Skip YAML tests if YAML is not installed.
+
+------------------------------------------------------------------------
+rev 49:  iain | 2002-10-14 13:52:44 +1000 (Mon, 14 Oct 2002) | 3 lines
+
+   - I18N and L10N!
+   - Thus lots of new files and Build.PL extended massively.
+
+------------------------------------------------------------------------
+rev 48:  iain | 2002-10-14 13:52:26 +1000 (Mon, 14 Oct 2002) | 12 lines
+
+   - Changes file mentions the lines at which CPAN/BACKPAN are drawn.
+   - Aligned items in Build.PL =)
+   - Added Module::Signature test, for those with said module.
+   - Made it so Test::Prereq would not barf that Module::Signature is
+     not actually required. We just require a particular version of
+     Module::Signature if it is actually installed.
+   - I18N and L10N!
+   - Thus lots of new files and Build.PL extended massively.
+   - Remove Test::Prereq since it was having major problems.
+   - Added Test::Signature
+   - Skip YAML tests if YAML is not installed.
+
+------------------------------------------------------------------------
+rev 47:  iain | 2002-10-10 12:35:16 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+ + 1.7.6
+
+------------------------------------------------------------------------
+rev 46:  iain | 2002-10-10 12:28:34 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+ + 1.7.6
+
+------------------------------------------------------------------------
+rev 45:  iain | 2002-10-10 12:26:13 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+  + logout() added.
+
+------------------------------------------------------------------------
+rev 44:  iain | 2002-10-10 12:26:06 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+  + Tests for logout() added.
+
+------------------------------------------------------------------------
+rev 43:  iain | 2002-10-10 11:44:56 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+  + 1.7.5
+
+------------------------------------------------------------------------
+rev 42:  iain | 2002-10-10 11:43:55 +1000 (Thu, 10 Oct 2002) | 2 lines
+
+  + CREDITS added to ignore list.
+
+------------------------------------------------------------------------
+rev 41:  iain | 2002-10-10 11:43:34 +1000 (Thu, 10 Oct 2002) | 5 lines
+
+    - last_msg_id() added. Based on code from Simon Hanmer.
+    - Brief note about being a well behaved bot added.
+    - list() ensures appropriate characters in list name.
+    - Automatically sleep() in get(), courtesy autosleep().
+
+------------------------------------------------------------------------
+rev 40:  iain | 2002-10-10 11:43:05 +1000 (Thu, 10 Oct 2002) | 4 lines
+
+    - Tests for last_msg_id() added.
+    - list() ensures appropriate characters in list name.
+    - Tests for sleep() added.
+
+------------------------------------------------------------------------
+rev 39:  iain | 2002-10-10 11:42:26 +1000 (Thu, 10 Oct 2002) | 3 lines
+
+  + 1.7.5
+  + Renamed GPL to COPYING (for search.cpan.org)
+
+------------------------------------------------------------------------
+rev 38:  iain | 2002-10-10 01:19:53 +1000 (Thu, 10 Oct 2002) | 3 lines
+
+    - Tests for lists() and loggedin() added.
+    - login() throws an exception if one is already logged in.
+
+------------------------------------------------------------------------
+rev 37:  iain | 2002-10-10 01:19:39 +1000 (Thu, 10 Oct 2002) | 7 lines
+
+    - loggedin() added. Returns if one is logged in or not.
+    - lists() added. Based on code from Simon Hanmer.
+    - Documentation for list() clarified.
+    - New exceptions 'NotLoggedIn' and 'AlreadyLoggedIn'.
+    - Typo of 'gruop' instead of 'group' fixed.
+    - login() throws an exception if one is already logged in.
+
+------------------------------------------------------------------------
+rev 36:  iain | 2002-10-10 01:19:22 +1000 (Thu, 10 Oct 2002) | 4 lines
+
+    - Tabs in MANIFEST now spaces.
+    - TODO list expanded for better re-login() handling.
+    - 1.7.4
+
+------------------------------------------------------------------------
+rev 35:  iain | 2002-10-09 13:49:56 +1000 (Wed, 09 Oct 2002) | 6 lines
+
+  + fetch_rss() supports variable number of items.
+  + Appropriate tests added.
+  + Some routines in test file abstracted.
+  + Parameter checking testing for fetch_rss() updated.
+  + Parameter checking testing corrected for fetch_message().
+
+------------------------------------------------------------------------
+rev 34:  iain | 2002-10-09 13:48:47 +1000 (Wed, 09 Oct 2002) | 2 lines
+
+  + Supports variable number of items in fetch_rss
+
+------------------------------------------------------------------------
+rev 33:  iain | 2002-10-09 13:48:28 +1000 (Wed, 09 Oct 2002) | 2 lines
+
+  + 1.7.2
+
+------------------------------------------------------------------------
+rev 32:  iain | 2002-10-08 18:30:58 +1000 (Tue, 08 Oct 2002) | 4 lines
+
+  + s/Prereq::ModuleBuild/Prereq::Build/
+  + Check for Test::Prereq 0.11 since brian d foy didn't increment
+    the version of Test::Prereq::Build
+
+------------------------------------------------------------------------
+rev 31:  iain | 2002-10-08 15:28:00 +1000 (Tue, 08 Oct 2002) | 26 lines
+
+    - Added Test::Prereq::ModuleBuild to tests.
+    - Throw exception if message missing from archive.
+    - This file now in YAML =)  [Hi Ingy]
+    - Assorted build checks in tests.
+    - INSTALL added. Gives a nice rundown of how to install the module.
+    - New tests to verify YAML files are valid and up to date.
+    - Mention search.cpan.org URL in README
+    - Example program improved for new exceptions, and tidied.
+    - Mention message number of message failing anything.
+    - Fix exception type in fetching test.
+    - Add test to fetch a message that doesn't exist.
+    - Added MANIFEST.SKIP with appropriate entries.
+    - Added .cvsignore (not that most people will see it).
+    - Added TODO file (also YAML).
+    - Added comments to test files.
+    - >
+      Test suite reports information on the installed modules.
+      Useful for when debugging failed tests on other machines.
+    - Exceptions appropriately documented.
+    - Mentioned a few other bits in the SEE ALSO part of the POD.
+    - LICENSE and COPYRIGHT section added to POD.
+    - INSTALL, LICENSE and README files generated from templates.
+    - GPL and Artistic license files included.
+    - MANIFEST file given comments on the purpose of each file.
+    - It's been a fun release, hasn't it?
+
+------------------------------------------------------------------------
+rev 30:  iain | 2002-10-08 11:34:54 +1000 (Tue, 08 Oct 2002) | 2 lines
+
+  + Abolished.
+
+------------------------------------------------------------------------
+rev 29:  iain | 2002-10-04 10:38:20 +1000 (Fri, 04 Oct 2002) | 2 lines
+
+  + Matching test too specific.
+
+------------------------------------------------------------------------
+rev 28:  iain | 2002-10-04 10:34:51 +1000 (Fri, 04 Oct 2002) | 4 lines
+
+  + Added error for badfetch, and use it in the get method.
+  + Added fetch_rss to retrieve a list's RSS.
+  + Added more thanks.
+
+------------------------------------------------------------------------
+rev 27:  iain | 2002-10-04 10:33:27 +1000 (Fri, 04 Oct 2002) | 2 lines
+
+  + 1.6, with new 04rss.t file.
+
+------------------------------------------------------------------------
+rev 26:  iain | 2002-10-04 10:35:17 +1000 (Fri, 04 Oct 2002) | 4 lines
+
+    + 02badparam has fetch_rss added.
+    + 03message was looking for the wrong exception.
+    + 04rss added.
+
+------------------------------------------------------------------------
+rev 25:  iain | 2002-10-03 10:12:38 +1000 (Thu, 03 Oct 2002) | 3 lines
+
+  + 1.5
+  + Correcting missing bits.
+
+------------------------------------------------------------------------
+rev 24:  iain | 2002-10-02 18:49:04 +1000 (Wed, 02 Oct 2002) | 2 lines
+
+  + Module::Build wrapper now.
+
+------------------------------------------------------------------------
+rev 23:  iain | 2002-10-02 15:18:03 +1000 (Wed, 02 Oct 2002) | 2 lines
+
+  - Dashes, not :
+
+------------------------------------------------------------------------
+rev 22:  iain | 2002-10-02 15:15:23 +1000 (Wed, 02 Oct 2002) | 2 lines
+
+  + Look! Build.PL!
+
+------------------------------------------------------------------------
+rev 21:  iain | 2002-10-02 12:34:51 +1000 (Wed, 02 Oct 2002) | 2 lines
+
+  + Erm. $VERSION !
+
+------------------------------------------------------------------------
+rev 20:  iain | 2002-10-02 12:33:05 +1000 (Wed, 02 Oct 2002) | 2 lines
+
+  + Added example.
+
+------------------------------------------------------------------------
+rev 19:  iain | 2002-10-02 12:33:01 +1000 (Wed, 02 Oct 2002) | 4 lines
+
+  + 1.3
+  + Improved doco.
+  + Added example.
+
+------------------------------------------------------------------------
+rev 18:  iain | 2002-10-01 21:53:48 +1000 (Tue, 01 Oct 2002) | 2 lines
+
+  + 1.2
+
+------------------------------------------------------------------------
+rev 17:  iain | 2002-10-01 21:53:06 +1000 (Tue, 01 Oct 2002) | 2 lines
+
+  + More tests.
+
+------------------------------------------------------------------------
+rev 16:  iain | 2002-10-01 21:52:57 +1000 (Tue, 01 Oct 2002) | 2 lines
+
+  + More tests, mroe prereqs, exceptions, param validation.
+
+------------------------------------------------------------------------
+rev 14:  iain | 2002-10-01 21:50:24 +1000 (Tue, 01 Oct 2002) | 2 lines
+
+Initial revision
+
+------------------------------------------------------------------------

@@ -1,0 +1,97 @@
+NAME
+    Win32::API::Interface - Object oriented interface generation
+
+SYNOPSIS
+        package MyModule;
+            use base qw/Win32::API::Interface/;
+
+            __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+            __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", 'get_pid' );
+
+            1;
+
+            my $obj = MyModule->new );
+            print "PID: " . $obj->GetCurrentProcessId . "\n";
+            print "PID: " . $obj->get_pid . "\n";
+
+DESCRIPTION
+    This module provides functions for generating a object oriented
+    interface to Win32 API functions.
+
+METHODS
+  new
+        my $obj = Module->new;
+
+    Win32::API::Interface provides a basic constructor. It generates a
+    hash-based object and can be called as either a class method or an
+    object method.
+
+  self
+        my $self = $obj->self;
+
+    Returns itself. Acutally useless and mainly used internally. Can also be
+    called as a object method.
+
+        Win32::API::Interface->self
+
+  generate
+        __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+
+    This generates a method called *GetCurrentProcessId* which is exported
+    by *kernel32.dll*. It does not take any input parameters but returns a
+    value of type *long*.
+
+        __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", "get_pid" );
+
+    Actually the same as above, but this will generate a method called
+    *get_pid*. This is useful if you do not want to rely on the API function
+    name.
+
+        __PACKAGE__->generare(
+            "advapi32",
+            "EncryptFile",
+            "P", "I", "",
+            sub {
+                my ( $self, $filename ) = @_;
+                return $self->Call( File::Spec->canonpath($filename) );
+            }
+        );
+
+    As the seventh and last parameter you may provide a function reference
+    for modifying the input to and output from the API function.
+
+        __PACKAGE__->generate(
+            [ "kernel32", "GetTempPath",         "NP", "N" ],
+            [ "kernel32", "GetCurrentProcessId", "",   "N", "get_pid" ],
+            [ "advapi32" ,"EncryptFile",         "P",  "I", "",       $coderef ],
+        );
+
+    You may call *generate* passing an hash reference of array references.
+
+        __PACKAGE__->generate( {
+            "kernel32" => [
+                [ "GetTempPath",         "NP", "N" ],
+                [ "GetCurrentProcessId", "",   "N", "get_pid" ],
+            ],
+            "user32" => [
+                [ "GetCursorPos",        "P",  "I"]
+            ],
+            "advapi32" => [
+                [ "EncryptFile",         "P",  "I", "",       $coderef ],
+            ].
+        } );
+
+  generated
+    Returns a list of all real generated API function names
+
+        __PACKAGE__->generated( );
+
+AUTHOR
+    Sascha Kiefer, esskar@cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Sascha Kiefer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

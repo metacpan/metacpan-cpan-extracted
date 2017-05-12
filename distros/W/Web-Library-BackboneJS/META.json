@@ -1,0 +1,68 @@
+{
+   "abstract" : "Distribution wrapper around Backbone.js",
+   "author" : [
+      "The following person is the author of all the files provided in"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Library-BackboneJS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.030"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Web::Library" : "0.05",
+            "Web::Library::UnderscoreJS" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcelgruenauer/Web-Library-BackboneJS/issues"
+      },
+      "homepage" : "https://github.com/marcelgruenauer/Web-Library-BackboneJS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marcelgruenauer/Web-Library-BackboneJS.git",
+         "web" : "https://github.com/marcelgruenauer/Web-Library-BackboneJS"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Marcel Gruenauer <hanekomu@gmail.com>"
+   ]
+}
+

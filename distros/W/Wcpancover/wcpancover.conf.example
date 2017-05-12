@@ -1,0 +1,13 @@
+
+{
+          'db_connect' => [
+                            'dbi:SQLite:dbname=wcpancover.db',
+                            undef,
+                            undef,
+                            {
+                             'sqlite_unicode' => 1
+                            }
+                         ],
+          'db_schema' => 'Wcpancover::DB::Schema',
+          'secret' => 'app_secret'
+        }

@@ -1,0 +1,38 @@
+---
+abstract: 'access the API of europeana.eu'
+author:
+  - 'Peter Mayr <pmayr@cpan.org>'
+build_requires:
+  Pod::Markdown: 3.003
+  Test::More: 0
+  Test::Pod: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.006
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Europeana
+provides:
+  WebService::Europeana:
+    file: lib/WebService/Europeana.pm
+    version: v0.0.2
+requires:
+  JSON: 2.90
+  LWP::UserAgent: 6.15
+  Log::Any: 1.032
+  Method::Signatures: 20141021
+  Moo: 2.000002
+  Try::Tiny: 0.22
+  URL::Encode: 0.03
+  perl: 5.006
+  version: 0
+resources:
+  bugtracker: https://github.com/hatorikibble/webservice-europeana/issues
+  homepage: https://github.com/hatorikibble/webservice-europeana
+  repository: https://github.com/hatorikibble/webservice-europeana.git
+version: 0.0.2

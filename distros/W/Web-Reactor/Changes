@@ -1,0 +1,34 @@
+Revision history for Perl extension Web::Reactor
+
+2.06  2017.04.10
+
+    1. return to 'main' page if no referer found
+
+0.05  2013.08.13
+
+    1. more docs
+    2. fixed github url
+
+0.04  2013.07.09
+
+    1. code cleanup, actions sets, config changes ACTION_DIRS, ACTIONS_SETS
+    2. file upload support, fixed forms enctype, added file upload info
+    3. added Base/expire_hint action to the demo app
+    4. actions caching (avoids package reloading)
+    5. direct actions (instead of page loading) as option
+    6. moved to name-inherited actions, not file based anymore
+
+0.03  2013.05.29
+
+    1. fixed perl package
+
+0.02  2013.05.29
+
+    1. fixed pod
+
+0.01  2013.05.24
+
+    1. history lost... initial public commit, initial CPAN release
+
+    
+    

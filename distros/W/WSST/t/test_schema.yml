@@ -1,0 +1,62 @@
+---
+company_name: Test
+service_name: TestService
+version: 0.0.1
+title: Test Web Service
+abstract: Test Web Service Schema
+license: BSD
+author:
+  - author name <author@example.com>
+see_also: http://example.com/service/
+copyright: Copyright 2008 WSS Project Team
+
+methods:
+  - name: doSomething
+    title: Do something and return response
+    url: http://example.com/service/doSomething
+    params:
+      - name: param1
+        title: The parameter 1
+        desc: This parameter is XXXXX
+        require: true
+      - name: param2
+        title: The parameter 2
+        desc: This parameter is XXXXX
+        multiple: true
+        examples:
+          - TEST
+    return:
+      name: root
+      children:
+        - name: val1
+          desc: Value 1
+          examples:
+            - 1.0
+        - name: val2
+          desc: Value 2
+          multiple: true
+          children:
+            - name: val2_1
+              desc: Value 2.1
+              examples:
+                - TEST
+    error:
+      name: root
+      children:
+        - name: status
+        - name: error
+          children:
+            - name: message
+    tests:
+      - type: good
+        params:
+          param1: $ENV_VALUE
+          param2: XXXXX
+      - type: error
+        params:
+          param1: $ENV_VALUE
+      - type: lib_error
+
+meta-spec:
+  version: 1.0
+

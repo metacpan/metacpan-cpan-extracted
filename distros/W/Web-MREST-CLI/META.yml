@@ -1,0 +1,48 @@
+---
+abstract: 'CLI components for Web::MEST-based applications'
+author:
+  - 'Nathan Cutler <ncutler@suse.cz>'
+build_requires:
+  File::Basename: '0'
+  File::HomeDir: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-MREST-CLI
+no_index:
+  directory:
+    - config
+provides:
+  Web::MREST::CLI:
+    file: lib/Web/MREST/CLI.pm
+    version: '0.283'
+  Web::MREST::CLI::Parser:
+    file: lib/Web/MREST/CLI/Parser.pm
+requires:
+  App::CELL: '0.205'
+  Data::Dumper: '0'
+  Encode: '0'
+  File::HomeDir: '0'
+  File::ShareDir: '1.00'
+  Getopt::Long: '2.32'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '6.05'
+  Log::Any::Adapter: '0'
+  Params::Validate: '0'
+  Pod::Usage: '0'
+  Term::ReadLine: '0'
+  Test::Deep: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  perl: '5.012'
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: '0.283'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

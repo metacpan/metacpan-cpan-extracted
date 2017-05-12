@@ -1,0 +1,29 @@
+Revision history for Perl extension WebService::iThenticate.
+
+0.16 Fri May 16 2014
+    - password no longer required for user.add
+
+0.15 Thu Nov 15 2012
+    - fix version and add 0.13 changes back in. branched dev resulted in 0.14 errors
+
+0.14 Tue Nov 13 2012
+    - add non_blocking_upload option
+    - code cleanup, move eg to bin
+
+0.13 Mar 26 2012
+    - disable compression instead of bundling patched rpc client, thanks to
+      Christoph Jokubonis for the spot
+
+0.12 Mar 26 2012
+    - include embedded RPC-XML client library with fix for
+        https://rt.cpan.org/Public/Bug/Display.html?id=53448
+
+0.11 Sat Jul 23 2011
+    - add tii for admissions example program
+
+0.10 Thu Oct 23 15:57:55 2008 PST
+
+    - some small bugfixes identified in previous libraries
+    - libraries migrated from iThenticate::API::Client 0.09 and
+      iThenticate::API::Request 0.07
+

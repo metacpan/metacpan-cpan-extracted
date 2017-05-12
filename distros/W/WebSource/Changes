@@ -1,0 +1,20 @@
+Revision history for Perl extension WebSource.
+
+2.5   Unreleased
+        - Corrected problems with encodings in XMLParser
+        - XPath matching now uses a XPath context with prefix html attached
+          to the XHTML namespace. XPath expressions on HTML documents
+          passed to the Extract module require using this prefix for HTML 
+
+2.4   Dec 30 2004
+        - Tranfering everything to the sourceforge cvs (hopefully this
+          file will be maintained a bit more regularly)
+
+2.03  Dec 01 2003
+        - Corrected zero-production bug in Module
+
+1.00  Jan 09 2003
+        - first real release
+
+0.01  Nov 27 2002
+	- original version; created by h2xs 1.22 with options -AX -n WebSource

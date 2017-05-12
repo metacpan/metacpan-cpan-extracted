@@ -1,0 +1,19 @@
+1.005 - 15 Jan 2010 - Jonathan Yu <jawnsy@cpan.org>
+
+  + Bug fix to ignore leading spaces in power figure
+
+1.004 - 10 Jan 2010 - Jonathan Yu <jawnsy@cpan.org>
+
+  + Replace the WWW::OPG implementation with one based
+    on an API graciously offered by OPG
+  + Rename the old implementation to WWW::OPG::Scraper
+
+1.003 - 31 Dec 2009 - Jonathan Yu <jawnsy@cpan.org>
+
+  + First proper release of WWW::OPG, fixes dependencies,
+    provides many more working examples, better tests
+
+1.000 - 25 Dec 2009 - Jonathan Yu <jawnsy@cpan.org>
+
+  + Initial release (note: this release was broken and
+    withdrawn from CPAN shortly thereafter)

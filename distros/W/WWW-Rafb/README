@@ -1,0 +1,58 @@
+WWW::Rafb - Perl interface for rafb pasting site ( rafb.net/paste ) 
+
+= Copyright =
+
+    Copyright (c) 2006 Amit Sides. All rights reserved.
+
+= LICENSE =
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 1, or (at
+    your option) any later version.
+
+= LIMITATIONS =
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+= DESCRIPTION =
+
+    "WWW::Rafb" provides object interface for pasting any text file/source file
+    into the the rafb site with the needed information.
+
+= INSTALL =
+
+    WWW::Rafb uses the following modules:
+
+	URI::Escape - to escape the args before sending.
+	LWP::UserAgent 	- to create the post of the paste.
+ 
+    Before installing make sure you have this modules: URI::Escape , LWP::UserAgent.
+    If you dont: enter cpan command shell (`cpan`) and run install LWP::Simple
+							   install URI::Escape (if isnt installed)
+    After that run this commands:
+	
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    then perldoc WWW::Rafb.
+
+========================================================================================
+
+= COMPATIBILITY =
+    
+    This module was developed under Dapper ubunut linux ( 2.6.15-25-386 ) and been tested 
+    with couple of file types and sizes.
+
+= Bugs =
+
+    for bug reports and comments < amit.sides@gmail.com > 
+
+========================================================================================
+
+EOF

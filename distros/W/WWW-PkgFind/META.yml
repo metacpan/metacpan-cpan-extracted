@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-PkgFind
+version:      1.3.1
+version_from: 
+installdirs:  site
+requires:
+    File::Path:                    0
+    File::Spec:                    0
+    Getopt::Long:                  0
+    LWP::Simple:                   0
+    Pod::Usage:                    0
+    WWW::RobotRules:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

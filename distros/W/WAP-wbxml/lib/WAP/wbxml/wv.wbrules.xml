@@ -1,0 +1,1414 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<!DOCTYPE wbxml [
+  <!ELEMENT wbxml (PublicIdentifiers,App+)>
+  <!ATTLIST wbxml version NMTOKEN #REQUIRED>
+  <!ELEMENT PublicIdentifiers (PublicIdentifier)*>
+  <!ELEMENT PublicIdentifier EMPTY>
+  <!ATTLIST PublicIdentifier value NMTOKEN #REQUIRED>
+  <!ATTLIST PublicIdentifier name CDATA #REQUIRED>
+  <!ELEMENT App (TagTokens?,AttrStartTokens?,AttrValueTokens?,Ext0Values?,Ext1Values?,Ext2Values?,CharacterEntities?)>
+  <!ATTLIST App publicid CDATA #REQUIRED>
+  <!ATTLIST App systemid CDATA #IMPLIED>
+  <!ATTLIST App use-default (no|yes) #IMPLIED>
+  <!ATTLIST App variable-subs (no|yes) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST App textual-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App tokenised-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App xml-space (default|preserve) #IMPLIED>
+  <!ELEMENT TagTokens (TAG)*>
+  <!ELEMENT TAG EMPTY>
+  <!ATTLIST TAG token NMTOKEN #REQUIRED>
+  <!ATTLIST TAG name NMTOKEN #REQUIRED>
+  <!ATTLIST TAG codepage NMTOKEN #IMPLIED>
+  <!ATTLIST TAG encoding (base64|datetime|integer) #IMPLIED>	<!-- WV -->
+  <!ELEMENT AttrStartTokens (ATTRSTART)*>
+  <!ELEMENT ATTRSTART EMPTY>
+  <!ATTLIST ATTRSTART token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART name NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART value CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART codepage NMTOKEN #IMPLIED>
+  <!ATTLIST ATTRSTART default CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART fixed CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART validate (std|length|vdata) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST ATTRSTART encoding (std|iso-8601) #IMPLIED>		<!-- WAP -->
+  <!ELEMENT AttrValueTokens (ATTRVALUE)*>
+  <!ELEMENT ATTRVALUE EMPTY>
+  <!ATTLIST ATTRVALUE token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRVALUE value CDATA #REQUIRED>
+  <!ATTLIST ATTRVALUE codepage NMTOKEN #IMPLIED>
+  <!ELEMENT Ext0Values (EXTVALUE)*>	<!-- WV -->
+  <!ELEMENT Ext1Values (EXTVALUE)*>
+  <!ELEMENT Ext2Values (EXTVALUE)*>
+  <!ELEMENT EXTVALUE EMPTY>
+  <!ATTLIST EXTVALUE index NMTOKEN #REQUIRED>
+  <!ATTLIST EXTVALUE value CDATA #REQUIRED>
+  <!ELEMENT CharacterEntities (CharacterEntity)*>
+  <!ELEMENT CharacterEntity EMPTY>
+  <!ATTLIST CharacterEntity name NMTOKEN #REQUIRED>
+  <!ATTLIST CharacterEntity code NMTOKEN #REQUIRED>
+  <!ENTITY quot "&#34;">
+  <!ENTITY amp "&#38;#38;">
+  <!ENTITY apos "&#39;">
+  <!ENTITY lt "&#38;#60;">
+  <!ENTITY gt ">">
+]>
+<wbxml version="1.3">
+  <!--  see: Binary XML Content Format, Version 1.3 -->
+  <!--       WAP-192-WBXML-20010725-a -->
+  <PublicIdentifiers>
+    <!-- The normative list of well known public identifiers issued, and maintained,
+         by the OMNA (Open Mobile Naming Authority) SHALL be found
+         at http://www.openmobilealliance.org/tech/omna/omna-wbxml-public-docid.htm -->
+    <!-- value="1"  Unknown or missing public identifier
+         if no value, publicid is encoding as string -->
+    <PublicIdentifier value="2"  name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <!--   DEPRECATED       value="3"  name="-//WAPFORUM//DTD WTA 1.0//EN" -->
+    <PublicIdentifier value="4"  name="-//WAPFORUM//DTD WML 1.1//EN"/>
+    <PublicIdentifier value="5"  name="-//WAPFORUM//DTD SI 1.0//EN"/>
+    <PublicIdentifier value="6"  name="-//WAPFORUM//DTD SL 1.0//EN"/>
+    <PublicIdentifier value="7"  name="-//WAPFORUM//DTD CO 1.0//EN"/>
+    <PublicIdentifier value="8"  name="-//WAPFORUM//DTD CHANNEL 1.1//EN"/>
+    <PublicIdentifier value="9"  name="-//WAPFORUM//DTD WML 1.2//EN"/>
+    <PublicIdentifier value="A"  name="-//WAPFORUM//DTD WML 1.3//EN"/>
+    <PublicIdentifier value="B"  name="-//WAPFORUM//DTD PROV 1.0//EN"/>
+    <PublicIdentifier value="C"  name="-//WAPFORUM//DTD WTA-WML 1.2//EN"/>
+    <PublicIdentifier value="D"  name="-//WAPFORUM//DTD EMN 1.0//EN"/>
+    <PublicIdentifier value="E"  name="-//OMA//DTD DRMREL 1.0//EN"/>
+    <PublicIdentifier value="F"  name="-//WIRELESSVILLAGE//DTD CSP 1.0//EN"/>
+    <PublicIdentifier value="10" name="-//WIRELESSVILLAGE//DTD CSP 1.1//EN"/>
+    <PublicIdentifier value="11" name="-//OMA//DTD WV-CSP 1.2//EN"/>
+    <!-- values 12-7F : Reserved -->
+    <PublicIdentifier value="1201" name="-//SYNCML//DTD SyncML 1.2//EN"/>
+    <PublicIdentifier value="1202" name="-//SYNCML//DTD MetaInf 1.2//EN"/>
+    <PublicIdentifier value="1203" name="-//SYNCML//DTD DevInf 1.2//EN"/>
+  </PublicIdentifiers>
+  <!--
+       OMA IMPS - www.openmobilealliance.org
+  -->
+  <App publicid="-//OMA//DTD WV-CSP 1.2//EN"
+     xml-space="default" >
+    <!-- see: Client-Server Protocol
+              Binary XML definition and Examples,
+              version 1.2, 2003-Feb-21, WV-047 -->
+    <TagTokens>
+      <!-- the common tag code page (0x00) -->
+      <TAG token="05" name="Acceptance" />
+      <TAG token="06" name="AddList" />
+      <TAG token="07" name="AddNickList" />
+      <TAG token="08" name="SName" />
+      <TAG token="09" name="WV-CSP-Message" />
+      <TAG token="0A" name="ClientID" />
+      <TAG token="0B" name="Code" />
+      <TAG token="0C" name="ContactList" />
+      <TAG token="0D" name="ContentData" />
+      <TAG token="0E" name="ContentEncoding" />
+      <TAG token="0F" name="ContentSize" />
+      <TAG token="10" name="ContentType" />
+      <TAG token="11" name="DateTime" />
+      <TAG token="12" name="Description" />
+      <TAG token="13" name="DetailedResult" />
+      <TAG token="14" name="EntityList" />
+      <TAG token="15" name="Group" />
+      <TAG token="16" name="GroupID" />
+      <TAG token="17" name="GroupList" />
+      <TAG token="18" name="InUse" />
+      <TAG token="19" name="Logo" />
+      <TAG token="1A" name="MessageCount" />
+      <TAG token="1B" name="MessageID" />
+      <TAG token="1C" name="MessageURI" />
+      <TAG token="1D" name="MSISDN" />
+      <TAG token="1E" name="Name" />
+      <TAG token="1F" name="NickList" />
+      <TAG token="20" name="NickName" />
+      <TAG token="21" name="Poll" />
+      <TAG token="22" name="Presence" />
+      <TAG token="23" name="PresenceSubList" />
+      <TAG token="24" name="PresenceValue" />
+      <TAG token="25" name="Property" />
+      <TAG token="26" name="Qualifier" />
+      <TAG token="27" name="Recipient" />
+      <TAG token="28" name="RemoveList" />
+      <TAG token="29" name="RemoveNickList" />
+      <TAG token="2A" name="Result" />
+      <TAG token="2B" name="ScreenName" />
+      <TAG token="2C" name="Sender" />
+      <TAG token="2D" name="Session" />
+      <TAG token="2E" name="SessionDescriptor" />
+      <TAG token="2F" name="SessionID" />
+      <TAG token="30" name="SessionType" />
+      <TAG token="31" name="Status" />
+      <TAG token="32" name="Transaction" />
+      <TAG token="33" name="TransactionContent" />
+      <TAG token="34" name="TransactionDescriptor" />
+      <TAG token="35" name="TransactionID" />
+      <TAG token="36" name="TransactionMode" />
+      <TAG token="37" name="URL" />
+      <TAG token="38" name="URLList" />
+      <TAG token="39" name="User" />
+      <TAG token="3A" name="UserID" />
+      <TAG token="3B" name="UserList" />
+      <TAG token="3C" name="Validity" />
+      <TAG token="3D" name="Value" />
+      <!-- the service access tag code page (0x01) -->
+      <TAG token="05" codepage="01" name="AllFunctions" />
+      <TAG token="06" codepage="01" name="AllFunctionsRequest" />
+      <TAG token="07" codepage="01" name="CancelInvite-Request" />
+      <TAG token="08" codepage="01" name="CancelInviteUser-Request" />
+      <TAG token="09" codepage="01" name="Capability" />
+      <TAG token="0A" codepage="01" name="CapabilityList" />
+      <TAG token="0B" codepage="01" name="CapabilityRequest" />
+      <TAG token="0C" codepage="01" name="ClientCapability-Request" />
+      <TAG token="0D" codepage="01" name="ClientCapability-Response" />
+      <TAG token="0E" codepage="01" name="DigestBytes" />
+      <TAG token="0F" codepage="01" name="DigestSchema" />
+      <TAG token="10" codepage="01" name="Disconnect" />
+      <TAG token="11" codepage="01" name="Functions" />
+      <TAG token="12" codepage="01" name="GetSPInfo-Request" />
+      <TAG token="13" codepage="01" name="GetSPInfo-Response" />
+      <TAG token="14" codepage="01" name="InviteID" />
+      <TAG token="15" codepage="01" name="InviteNote" />
+      <TAG token="16" codepage="01" name="Invite-Request" />
+      <TAG token="17" codepage="01" name="Invite-Response" />
+      <TAG token="18" codepage="01" name="InviteType" />
+      <TAG token="19" codepage="01" name="InviteUser-Request" />
+      <TAG token="1A" codepage="01" name="InviteUser-Response" />
+      <TAG token="1B" codepage="01" name="KeepAlive-Request" />
+      <TAG token="1C" codepage="01" name="KeepAliveTime" />
+      <TAG token="1D" codepage="01" name="Login-Request" />
+      <TAG token="1E" codepage="01" name="Login-Response" />
+      <TAG token="1F" codepage="01" name="Logout-Request" />
+      <TAG token="20" codepage="01" name="Nonce" />
+      <TAG token="21" codepage="01" name="Password" />
+      <TAG token="22" codepage="01" name="Polling-Request" />
+      <TAG token="23" codepage="01" name="ResponseNote" />
+      <TAG token="24" codepage="01" name="SearchElement" />
+      <TAG token="25" codepage="01" name="SearchFindings" />
+      <TAG token="26" codepage="01" name="SearchID" />
+      <TAG token="27" codepage="01" name="SearchIndex" />
+      <TAG token="28" codepage="01" name="SearchLimit" />
+      <TAG token="29" codepage="01" name="KeepAlive-Response" />
+      <TAG token="2A" codepage="01" name="SearchPairList" />
+      <TAG token="2B" codepage="01" name="Search-Request" />
+      <TAG token="2C" codepage="01" name="Search-Response" />
+      <TAG token="2D" codepage="01" name="SearchResult" />
+      <TAG token="2E" codepage="01" name="Service-Request" />
+      <TAG token="2F" codepage="01" name="Service-Response" />
+      <TAG token="30" codepage="01" name="SessionCookie" />
+      <TAG token="31" codepage="01" name="StopSearch-Request" />
+      <TAG token="32" codepage="01" name="TimeToLive" />
+      <TAG token="33" codepage="01" name="SearchString" />
+      <TAG token="34" codepage="01" name="CompletionFlag" />
+      <TAG token="36" codepage="01" name="ReceiveList" />
+      <TAG token="37" codepage="01" name="VerifyID-Request" />
+      <TAG token="38" codepage="01" name="Extended-Request" />
+      <TAG token="39" codepage="01" name="Extended-Response" />
+      <TAG token="3A" codepage="01" name="AgreedCapabilityList" />
+      <TAG token="3B" codepage="01" name="ExtendedData" />
+      <TAG token="3C" codepage="01" name="OtherServer" />
+      <TAG token="3D" codepage="01" name="PresenceAttributeNSName" />
+      <TAG token="3E" codepage="01" name="SessionNSName" />
+      <TAG token="3F" codepage="01" name="TransactionNSName" />
+      <!-- the service negotiation tag code page (0x02) -->
+      <TAG token="05" codepage="02" name="ADDGM" />
+      <TAG token="06" codepage="02" name="AttListFunc" />
+      <TAG token="07" codepage="02" name="BLENT" />
+      <TAG token="08" codepage="02" name="CAAUT" />
+      <TAG token="09" codepage="02" name="CAINV" />
+      <TAG token="0A" codepage="02" name="CALI" />
+      <TAG token="0B" codepage="02" name="CCLI" />
+      <TAG token="0C" codepage="02" name="ContListFunc" />
+      <TAG token="0D" codepage="02" name="CREAG" />
+      <TAG token="0E" codepage="02" name="DALI" />
+      <TAG token="0F" codepage="02" name="DCLI" />
+      <TAG token="10" codepage="02" name="DELGR" />
+      <TAG token="11" codepage="02" name="FundamentalFeat" />
+      <TAG token="12" codepage="02" name="FWMSG" />
+      <TAG token="13" codepage="02" name="GALS" />
+      <TAG token="14" codepage="02" name="GCLI" />
+      <TAG token="15" codepage="02" name="GETGM" />
+      <TAG token="16" codepage="02" name="GETGP" />
+      <TAG token="17" codepage="02" name="GETLM" />
+      <TAG token="18" codepage="02" name="GETM" />
+      <TAG token="19" codepage="02" name="GETPR" />
+      <TAG token="1A" codepage="02" name="GETSPI" />
+      <TAG token="1B" codepage="02" name="GETWL" />
+      <TAG token="1C" codepage="02" name="GLBLU" />
+      <TAG token="1D" codepage="02" name="GRCHN" />
+      <TAG token="1E" codepage="02" name="GroupAuthFunc" />
+      <TAG token="1F" codepage="02" name="GroupFeat" />
+      <TAG token="20" codepage="02" name="GroupMgmtFunc" />
+      <TAG token="21" codepage="02" name="GroupUseFunc" />
+      <TAG token="22" codepage="02" name="IMAuthFunc" />
+      <TAG token="23" codepage="02" name="IMFeat" />
+      <TAG token="24" codepage="02" name="IMReceiveFunc" />
+      <TAG token="25" codepage="02" name="IMSendFunc" />
+      <TAG token="26" codepage="02" name="INVIT" />
+      <TAG token="27" codepage="02" name="InviteFunc" />
+      <TAG token="28" codepage="02" name="MBRAC" />
+      <TAG token="29" codepage="02" name="MCLS" />
+      <TAG token="2A" codepage="02" name="MDELIV" />
+      <TAG token="2B" codepage="02" name="NEWM" />
+      <TAG token="2C" codepage="02" name="NOTIF" />
+      <TAG token="2D" codepage="02" name="PresenceAuthFunc" />
+      <TAG token="2E" codepage="02" name="PresenceDeliverFunc" />
+      <TAG token="2F" codepage="02" name="PresenceFeat" />
+      <TAG token="30" codepage="02" name="REACT" />
+      <TAG token="31" codepage="02" name="REJCM" />
+      <TAG token="32" codepage="02" name="REJEC" />
+      <TAG token="33" codepage="02" name="RMVGM" />
+      <TAG token="34" codepage="02" name="SearchFunc" />
+      <TAG token="35" codepage="02" name="ServiceFunc" />
+      <TAG token="36" codepage="02" name="SETD" />
+      <TAG token="37" codepage="02" name="SETGP" />
+      <TAG token="38" codepage="02" name="SRCH" />
+      <TAG token="39" codepage="02" name="STSRC" />
+      <TAG token="3A" codepage="02" name="SUBGCN" />
+      <TAG token="3B" codepage="02" name="UPDPR" />
+      <TAG token="3C" codepage="02" name="WVCSPFeat" />
+      <TAG token="3D" codepage="02" name="MF" />
+      <TAG token="3E" codepage="02" name="MG" />
+      <TAG token="3F" codepage="02" name="MM" />
+      <!-- the client capability tag code page (0x03) -->
+      <TAG token="05" codepage="03" name="AcceptedCharset" />
+      <TAG token="06" codepage="03" name="AcceptedContentLength" />
+      <TAG token="07" codepage="03" name="AcceptedContentType" />
+      <TAG token="08" codepage="03" name="AcceptedTransferEncoding" />
+      <TAG token="09" codepage="03" name="AnyContent" />
+      <TAG token="0A" codepage="03" name="DefaultLanguage" />
+      <TAG token="0B" codepage="03" name="InitialDeliveryMethod" />
+      <TAG token="0C" codepage="03" name="MultiTrans" />
+      <TAG token="0D" codepage="03" name="ParserSize" />
+      <TAG token="0E" codepage="03" name="ServerPollMin" />
+      <TAG token="0F" codepage="03" name="SupportedBearer" />
+      <TAG token="10" codepage="03" name="SupportedCIRMethod" />
+      <TAG token="11" codepage="03" name="TCPAddress" />
+      <TAG token="12" codepage="03" name="TCPPort" />
+      <TAG token="13" codepage="03" name="UDPPort" />
+      <!-- the presence primitive tag code page (0x04) -->
+      <TAG token="05" codepage="04" name="CancelAuth-Request" />
+      <TAG token="06" codepage="04" name="ContactListProperties" />
+      <TAG token="07" codepage="04" name="CreateAttributeList-Request" />
+      <TAG token="08" codepage="04" name="CreateList-Request" />
+      <TAG token="09" codepage="04" name="DefaultAttributeList" />
+      <TAG token="0A" codepage="04" name="DefaultContactList" />
+      <TAG token="0B" codepage="04" name="DefaultList" />
+      <TAG token="0C" codepage="04" name="DeleteAttributeList-Request" />
+      <TAG token="0D" codepage="04" name="DeleteList-Request" />
+      <TAG token="0E" codepage="04" name="GetAttributeList-Request" />
+      <TAG token="0F" codepage="04" name="GetAttributeList-Response" />
+      <TAG token="10" codepage="04" name="GetList-Request" />
+      <TAG token="11" codepage="04" name="GetList-Response" />
+      <TAG token="12" codepage="04" name="GetPresence-Request" />
+      <TAG token="13" codepage="04" name="GetPresence-Response" />
+      <TAG token="14" codepage="04" name="GetWatcherList-Request" />
+      <TAG token="15" codepage="04" name="GetWatcherList-Response" />
+      <TAG token="16" codepage="04" name="ListManage-Request" />
+      <TAG token="17" codepage="04" name="ListManage-Response" />
+      <TAG token="18" codepage="04" name="UnsubscribePresence-Request" />
+      <TAG token="19" codepage="04" name="PresenceAuth-Request" />
+      <TAG token="1A" codepage="04" name="PresenceAuth-User" />
+      <TAG token="1B" codepage="04" name="PresenceNotification-Request" />
+      <TAG token="1C" codepage="04" name="UpdatePresence-Request" />
+      <TAG token="1D" codepage="04" name="SubscribePresence-Request" />
+      <TAG token="1E" codepage="04" name="Auto-Subscribe" />
+      <TAG token="1F" codepage="04" name="GetReactiveAuthStatus-Request" />
+      <TAG token="20" codepage="04" name="GetReactiveAuthStatus-Response" />
+      <!-- the presence attribute tag code page (0x05) -->
+      <TAG token="05" codepage="05" name="Accuracy" />
+      <TAG token="06" codepage="05" name="Address" />
+      <TAG token="07" codepage="05" name="AddrPref" />
+      <TAG token="08" codepage="05" name="Alias" />
+      <TAG token="09" codepage="05" name="Altitude" />
+      <TAG token="0A" codepage="05" name="Building" />
+      <TAG token="0B" codepage="05" name="Caddr" />
+      <TAG token="0C" codepage="05" name="City" />
+      <TAG token="0D" codepage="05" name="ClientInfo" />
+      <TAG token="0E" codepage="05" name="ClientProducer" />
+      <TAG token="0F" codepage="05" name="ClientType" />
+      <TAG token="10" codepage="05" name="ClientVersion" />
+      <TAG token="11" codepage="05" name="CommC" />
+      <TAG token="12" codepage="05" name="CommCap" />
+      <TAG token="13" codepage="05" name="ContactInfo" />
+      <TAG token="14" codepage="05" name="ContainedvCard" />
+      <TAG token="15" codepage="05" name="Country" />
+      <TAG token="16" codepage="05" name="Crossing1" />
+      <TAG token="17" codepage="05" name="Crossing2" />
+      <TAG token="18" codepage="05" name="DevManufacturer" />
+      <TAG token="19" codepage="05" name="DirectContent" />
+      <TAG token="1A" codepage="05" name="FreeTextLocation" />
+      <TAG token="1B" codepage="05" name="GeoLocation" />
+      <TAG token="1C" codepage="05" name="Language" />
+      <TAG token="1D" codepage="05" name="Latitude" />
+      <TAG token="1E" codepage="05" name="Longitude" />
+      <TAG token="1F" codepage="05" name="Model" />
+      <TAG token="20" codepage="05" name="NamedArea" />
+      <TAG token="21" codepage="05" name="OnlineStatus" />
+      <TAG token="22" codepage="05" name="PLMN" />
+      <TAG token="23" codepage="05" name="PrefC" />
+      <TAG token="24" codepage="05" name="PreferredContacts" />
+      <TAG token="25" codepage="05" name="PreferredLanguage" />
+      <TAG token="26" codepage="05" name="ReferredContent" />
+      <TAG token="27" codepage="05" name="ReferredvCard" />
+      <TAG token="28" codepage="05" name="Registration" />
+      <TAG token="29" codepage="05" name="StatusContent" />
+      <TAG token="2A" codepage="05" name="StatusMood" />
+      <TAG token="2B" codepage="05" name="StatusText" />
+      <TAG token="2C" codepage="05" name="Street" />
+      <TAG token="2D" codepage="05" name="TimeZone" />
+      <TAG token="2E" codepage="05" name="UserAvailability" />
+      <TAG token="2F" codepage="05" name="Cap" />
+      <TAG token="30" codepage="05" name="Cname" />
+      <TAG token="31" codepage="05" name="Contact" />
+      <TAG token="32" codepage="05" name="Cpriority" />
+      <TAG token="33" codepage="05" name="Cstatus" />
+      <TAG token="34" codepage="05" name="Note" />
+      <TAG token="35" codepage="05" name="Zone" />
+      <TAG token="36" codepage="05" name="ContentType" />
+      <TAG token="37" codepage="05" name="Inf_link" />
+      <TAG token="38" codepage="05" name="InfoLink" />
+      <TAG token="39" codepage="05" name="Link" />
+      <TAG token="3A" codepage="05" name="Text" />
+      <!-- the messaging service tag code page (0x06) -->
+      <TAG token="05" codepage="06" name="BlockList" />
+      <TAG token="06" codepage="06" name="BlockEntity-Request" />
+      <TAG token="07" codepage="06" name="DeliveryMethod" />
+      <TAG token="08" codepage="06" name="DeliveryReport" />
+      <TAG token="09" codepage="06" name="DeliveryReport-Request" />
+      <TAG token="0A" codepage="06" name="ForwardMessage-Request" />
+      <TAG token="0B" codepage="06" name="GetBlockedList-Request" />
+      <TAG token="0C" codepage="06" name="GetBlockedList-Response" />
+      <TAG token="0D" codepage="06" name="GetMessageList-Request" />
+      <TAG token="0E" codepage="06" name="GetMessageList-Response" />
+      <TAG token="0F" codepage="06" name="GetMessage-Request" />
+      <TAG token="10" codepage="06" name="GetMessage-Response" />
+      <TAG token="11" codepage="06" name="GrantList" />
+      <TAG token="12" codepage="06" name="MessageDelivered" />
+      <TAG token="13" codepage="06" name="MessageInfo" />
+      <TAG token="14" codepage="06" name="MessageNotification" />
+      <TAG token="15" codepage="06" name="NewMessage" />
+      <TAG token="16" codepage="06" name="RejectMessage-Request" />
+      <TAG token="17" codepage="06" name="SendMessage-Request" />
+      <TAG token="18" codepage="06" name="SendMessage-Response" />
+      <TAG token="19" codepage="06" name="SetDeliveryMethod-Request" />
+      <TAG token="1A" codepage="06" name="DeliveryTime" />
+      <!-- the group service tag code page (0x07) -->
+      <TAG token="05" codepage="07" name="AddGroupMembers-Request" />
+      <TAG token="06" codepage="07" name="Admin" />
+      <TAG token="07" codepage="07" name="CreateGroup-Request" />
+      <TAG token="08" codepage="07" name="DeleteGroup-Request" />
+      <TAG token="09" codepage="07" name="GetGroupMembers-Request" />
+      <TAG token="0A" codepage="07" name="GetGroupMembers-Response" />
+      <TAG token="0B" codepage="07" name="GetGroupProps-Request" />
+      <TAG token="0C" codepage="07" name="GetGroupProps-Response" />
+      <TAG token="0D" codepage="07" name="GroupChangeNotice" />
+      <TAG token="0E" codepage="07" name="GroupProperties" />
+      <TAG token="0F" codepage="07" name="Joined" />
+      <TAG token="10" codepage="07" name="JoinedRequest" />
+      <TAG token="11" codepage="07" name="JoinGroup-Request" />
+      <TAG token="12" codepage="07" name="JoinGroup-Response" />
+      <TAG token="13" codepage="07" name="LeaveGroup-Request" />
+      <TAG token="14" codepage="07" name="LeaveGroup-Response" />
+      <TAG token="15" codepage="07" name="Left" />
+      <TAG token="16" codepage="07" name="MemberAccess-Request" />
+      <TAG token="17" codepage="07" name="Mod" />
+      <TAG token="18" codepage="07" name="OwnProperties" />
+      <TAG token="19" codepage="07" name="RejectList-Request" />
+      <TAG token="1A" codepage="07" name="RejectList-Response" />
+      <TAG token="1B" codepage="07" name="RemoveGroupMembers-Request" />
+      <TAG token="1C" codepage="07" name="SetGroupProps-Request" />
+      <TAG token="1D" codepage="07" name="SubscribeGroupNotice-Request" />
+      <TAG token="1E" codepage="07" name="SubscribeGroupNotice-Response" />
+      <TAG token="1F" codepage="07" name="Users" />
+      <TAG token="20" codepage="07" name="WelcomeNote" />
+      <TAG token="21" codepage="07" name="JoinGroup" />
+      <TAG token="22" codepage="07" name="SubscribeNotification" />
+      <TAG token="23" codepage="07" name="SubscribeType" />
+      <TAG token="24" codepage="07" name="GetJoinedUsers-Request" />
+      <TAG token="25" codepage="07" name="GetJoinedUsers-Response" />
+      <TAG token="26" codepage="07" name="AdminMapList" />
+      <TAG token="27" codepage="07" name="AdminMapping" />
+      <TAG token="28" codepage="07" name="Mapping" />
+      <TAG token="29" codepage="07" name="ModMapping" />
+      <TAG token="2A" codepage="07" name="UserMapList" />
+      <TAG token="2B" codepage="07" name="UserMapping" />
+      <!-- the service negotiation (continued) tag code page (0x08) -->
+      <TAG token="05" codepage="08" name="MP" />
+      <TAG token="06" codepage="08" name="GETAUT" />
+      <TAG token="07" codepage="08" name="GETJU" />
+      <!-- the common (continued) tag code page (0x09) -->
+      <TAG token="05" codepage="09" name="CIR" />
+      <TAG token="06" codepage="09" name="Domain" />
+      <TAG token="07" codepage="09" name="ExtBlock" />
+      <TAG token="08" codepage="09" name="HistoryPeriod" />
+      <TAG token="09" codepage="09" name="IDList" />
+      <TAG token="0A" codepage="09" name="MaxWatcherList" />
+      <TAG token="0B" codepage="09" name="ReactiveAuthState" />
+      <TAG token="0C" codepage="09" name="ReactiveAuthStatus" />
+      <TAG token="0D" codepage="09" name="ReactiveAuthStatusList" />
+      <TAG token="0E" codepage="09" name="Watcher" />
+      <TAG token="0F" codepage="09" name="WatcherStatus" />
+      <!-- the access (continued) tag code page (0x0A) -->
+      <TAG token="05" codepage="0A" name="WV-CSP-NSDiscovery-Request" />
+      <TAG token="06" codepage="0A" name="WV-CSP-NSDiscovery-Response" />
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="xmlns" value="http://www.wireless-village.org/CSP" />
+      <ATTRSTART token="06" name="xmlns" value="http://www.wireless-village.org/PA" />
+      <ATTRSTART token="07" name="xmlns" value="http://www.wireless-village.org/TRC" />
+      <ATTRSTART token="08" name="xmlns" value="http://www.openmobilealliance.org/DTD/WV-CSP" />
+      <ATTRSTART token="09" name="xmlns" value="http://www.openmobilealliance.org/DTD/WV-PA" />
+      <ATTRSTART token="0A" name="xmlns" value="http://www.openmobilealliance.org/DTD/WV-TRC" />
+    </AttrStartTokens>
+    <Ext0Values>
+      <!-- Common values -->
+      <EXTVALUE index="00" value="AccessType" />
+      <EXTVALUE index="01" value="ActiveUsers" />
+      <EXTVALUE index="02" value="Admin" />
+      <EXTVALUE index="03" value="application/" />
+      <EXTVALUE index="04" value="application/vnd.wap.mms-message" />
+      <EXTVALUE index="05" value="application/x-sms" />
+      <EXTVALUE index="06" value="AutoJoin" />
+      <EXTVALUE index="07" value="BASE64" />
+      <EXTVALUE index="08" value="Closed" />
+      <EXTVALUE index="09" value="Default" />
+      <EXTVALUE index="0A" value="DisplayName" />
+      <EXTVALUE index="0B" value="F" />		<!-- False -->
+      <EXTVALUE index="0C" value="G" />		<!-- Get -->
+      <EXTVALUE index="0D" value="GR" />	<!-- Group -->
+      <EXTVALUE index="0E" value="http://" />
+      <EXTVALUE index="0F" value="https://" />
+      <EXTVALUE index="10" value="image/" />
+      <EXTVALUE index="11" value="Inband" />
+      <EXTVALUE index="12" value="IM" />	<!-- Instant Messaging -->
+      <EXTVALUE index="13" value="MaxActiveUsers" />
+      <EXTVALUE index="14" value="Mod" />
+      <EXTVALUE index="15" value="Name" />
+      <EXTVALUE index="16" value="None" />
+      <EXTVALUE index="17" value="N" />		<!-- Notify/Get -->
+      <EXTVALUE index="18" value="Open" />
+      <EXTVALUE index="19" value="Outband" />
+      <EXTVALUE index="1A" value="PR" />	<!-- Presence -->
+      <EXTVALUE index="1B" value="Private" />
+      <EXTVALUE index="1C" value="PrivateMessaging" />
+      <EXTVALUE index="1D" value="PrivilegeLevel" />
+      <EXTVALUE index="1E" value="Public" />
+      <EXTVALUE index="1F" value="P" />		<!-- Push -->
+      <EXTVALUE index="20" value="Request" />
+      <EXTVALUE index="21" value="Response" />
+      <EXTVALUE index="22" value="Restricted" />
+      <EXTVALUE index="23" value="ScreenName" />
+      <EXTVALUE index="24" value="Searchable" />
+      <EXTVALUE index="25" value="S" />		<!-- Set -->
+      <EXTVALUE index="26" value="SC" />	<!-- Shared Content -->
+      <EXTVALUE index="27" value="text/" />
+      <EXTVALUE index="28" value="text/plain" />
+      <EXTVALUE index="29" value="text/x-vCalendar" />
+      <EXTVALUE index="2A" value="text/x-vCard" />
+      <EXTVALUE index="2B" value="Topic" />
+      <EXTVALUE index="2C" value="T" />		<!-- True -->
+      <EXTVALUE index="2D" value="Type" />
+      <EXTVALUE index="2E" value="U" />		<!-- Unset -->
+      <EXTVALUE index="2F" value="US" />	<!-- User -->
+      <EXTVALUE index="30" value="www.wireless-village.org" />
+      <EXTVALUE index="31" value="AutoDelete" />
+      <EXTVALUE index="32" value="GM" />	<!-- Group membership -->
+      <EXTVALUE index="33" value="Validity" />
+      <EXTVALUE index="34" value="DENIED" />
+      <EXTVALUE index="35" value="GRANTED" />
+      <EXTVALUE index="36" value="PENDING" />
+      <!-- Access values -->
+      <EXTVALUE index="3D" value="GROUP_ID" />
+      <EXTVALUE index="3E" value="GROUP_NAME" />
+      <EXTVALUE index="3F" value="GROUP_TOPIC" />
+      <EXTVALUE index="40" value="GROUP_USER_ID_JOINED" />
+      <EXTVALUE index="41" value="GROUP_USER_ID_OWNER" />
+      <EXTVALUE index="42" value="HTTP" />
+      <EXTVALUE index="43" value="SMS" />
+      <EXTVALUE index="44" value="STCP" />
+      <EXTVALUE index="45" value="SUDP" />
+      <EXTVALUE index="46" value="USER_ALIAS" />
+      <EXTVALUE index="47" value="USER_EMAIL_ADDRESS" />
+      <EXTVALUE index="48" value="USER_FIRST_NAME" />
+      <EXTVALUE index="49" value="USER_ID" />
+      <EXTVALUE index="4A" value="USER_LAST_NAME" />
+      <EXTVALUE index="4B" value="USER_MOBILE_NUMBER" />
+      <EXTVALUE index="4C" value="USER_ONLINE_STATUS" />
+      <EXTVALUE index="4D" value="WAPSMS" />
+      <EXTVALUE index="4E" value="WAPUDP" />
+      <EXTVALUE index="4F" value="WSP" />
+      <EXTVALUE index="50" value="GROUP_USER_ID_AUTOJOIN" />
+      <!-- Presence values -->
+      <EXTVALUE index="5B" value="ANGRY" />
+      <EXTVALUE index="5C" value="ANXIOUS" />
+      <EXTVALUE index="5D" value="ASHAMED" />
+      <EXTVALUE index="5E" value="AUDIO_CALL" />
+      <EXTVALUE index="5F" value="AVAILABLE" />
+      <EXTVALUE index="60" value="BORED" />
+      <EXTVALUE index="61" value="CALL" />
+      <EXTVALUE index="62" value="CLI" />
+      <EXTVALUE index="63" value="COMPUTER" />
+      <EXTVALUE index="64" value="DISCREET" />
+      <EXTVALUE index="65" value="EMAIL" />
+      <EXTVALUE index="66" value="EXCITED" />
+      <EXTVALUE index="67" value="HAPPY" />
+      <EXTVALUE index="68" value="IM" />
+      <EXTVALUE index="69" value="IM_OFFLINE" />
+      <EXTVALUE index="6A" value="IM_ONLINE" />
+      <EXTVALUE index="6B" value="IN_LOVE" />
+      <EXTVALUE index="6C" value="INVINCIBLE" />
+      <EXTVALUE index="6D" value="JEALOUS" />
+      <EXTVALUE index="6E" value="MMS" />
+      <EXTVALUE index="6F" value="MOBILE_PHONE" />
+      <EXTVALUE index="70" value="NOT_AVAILABLE" />
+      <EXTVALUE index="71" value="OTHER" />
+      <EXTVALUE index="72" value="PDA" />
+      <EXTVALUE index="73" value="SAD" />
+      <EXTVALUE index="74" value="SLEEPY" />
+      <EXTVALUE index="75" value="SMS" />
+      <EXTVALUE index="76" value="VIDEO_CALL" />
+      <EXTVALUE index="77" value="VIDEO_STREAM" />
+    </Ext0Values>
+  </App>
+  <!--
+       Wireless Village - www.wireless-village.org
+  -->
+  <App publicid="-//WIRELESSVILLAGE//DTD CSP 1.1//EN"
+     xml-space="default" >
+    <!-- see: Wireless Village
+              Client-Server Protocol
+              Binary XML definition and Examples,
+              version 1.1, WV-027 -->
+    <TagTokens>
+      <!-- the common tag code page (0x00) -->
+      <TAG token="05" name="Acceptance" />
+      <TAG token="06" name="AddList" />
+      <TAG token="07" name="AddNickList" />
+      <TAG token="08" name="SName" />
+      <TAG token="09" name="WV-CSP-Message" />
+      <TAG token="0A" name="ClientID" />
+      <TAG token="0B" name="Code" encoding="integer" />
+      <TAG token="0C" name="ContactList" />
+      <TAG token="0D" name="ContentData" />
+      <TAG token="0E" name="ContentEncoding" />
+      <TAG token="0F" name="ContentSize" encoding="integer" />
+      <TAG token="10" name="ContentType" />
+      <TAG token="11" name="DateTime" encoding="datetime" />
+      <TAG token="12" name="Description" />
+      <TAG token="13" name="DetailedResult" />
+      <TAG token="14" name="EntityList" />
+      <TAG token="15" name="Group" />
+      <TAG token="16" name="GroupID" />
+      <TAG token="17" name="GroupList" />
+      <TAG token="18" name="InUse" />
+      <TAG token="19" name="Logo" />
+      <TAG token="1A" name="MessageCount" encoding="integer" />
+      <TAG token="1B" name="MessageID" />
+      <TAG token="1C" name="MessageURI" />
+      <TAG token="1D" name="MSISDN" />
+      <TAG token="1E" name="Name" />
+      <TAG token="1F" name="NickList" />
+      <TAG token="20" name="NickName" />
+      <TAG token="21" name="Poll" />
+      <TAG token="22" name="Presence" />
+      <TAG token="23" name="PresenceSubList" />
+      <TAG token="24" name="PresenceValue" />
+      <TAG token="25" name="Property" />
+      <TAG token="26" name="Qualifier" />
+      <TAG token="27" name="Recipient" />
+      <TAG token="28" name="RemoveList" />
+      <TAG token="29" name="RemoveNickList" />
+      <TAG token="2A" name="Result" />
+      <TAG token="2B" name="ScreenName" />
+      <TAG token="2C" name="Sender" />
+      <TAG token="2D" name="Session" />
+      <TAG token="2E" name="SessionDescriptor" />
+      <TAG token="2F" name="SessionID" />
+      <TAG token="30" name="SessionType" />
+      <TAG token="31" name="Status" />
+      <TAG token="32" name="Transaction" />
+      <TAG token="33" name="TransactionContent" />
+      <TAG token="34" name="TransactionDescriptor" />
+      <TAG token="35" name="TransactionID" />
+      <TAG token="36" name="TransactionMode" />
+      <TAG token="37" name="URL" />
+      <TAG token="38" name="URLList" />
+      <TAG token="39" name="User" />
+      <TAG token="3A" name="UserID" />
+      <TAG token="3B" name="UserList" />
+      <TAG token="3C" name="Validity" encoding="integer" />
+      <TAG token="3D" name="Value" />
+      <!-- the service access tag code page (0x01) -->
+      <TAG token="05" codepage="01" name="AllFunctions" />
+      <TAG token="06" codepage="01" name="AllFunctionsRequest" />
+      <TAG token="07" codepage="01" name="CancelInvite-Request" />
+      <TAG token="08" codepage="01" name="CancelInviteUser-Request" />
+      <TAG token="09" codepage="01" name="Capability" />
+      <TAG token="0A" codepage="01" name="CapabilityList" />
+      <TAG token="0B" codepage="01" name="CapabilityRequest" />
+      <TAG token="0C" codepage="01" name="ClientCapability-Request" />
+      <TAG token="0D" codepage="01" name="ClientCapability-Response" />
+      <TAG token="0E" codepage="01" name="DigestBytes" encoding="base64" />
+      <TAG token="0E" codepage="01" name="DigestSchema" />
+      <TAG token="10" codepage="01" name="Disconnect" />
+      <TAG token="11" codepage="01" name="Functions" />
+      <TAG token="12" codepage="01" name="GetSPInfo-Request" />
+      <TAG token="13" codepage="01" name="GetSPInfo-Response" />
+      <TAG token="14" codepage="01" name="InviteID" />
+      <TAG token="15" codepage="01" name="InviteNote" />
+      <TAG token="16" codepage="01" name="Invite-Request" />
+      <TAG token="17" codepage="01" name="Invite-Response" />
+      <TAG token="18" codepage="01" name="InviteType" />
+      <TAG token="19" codepage="01" name="InviteUser-Request" />
+      <TAG token="1A" codepage="01" name="InviteUser-Response" />
+      <TAG token="1B" codepage="01" name="KeepAlive-Request" />
+      <TAG token="1C" codepage="01" name="KeepAliveTime" encoding="integer" />
+      <TAG token="1D" codepage="01" name="Login-Request" />
+      <TAG token="1E" codepage="01" name="Login-Response" />
+      <TAG token="1F" codepage="01" name="Logout-Request" />
+      <TAG token="20" codepage="01" name="Nonce" />
+      <TAG token="21" codepage="01" name="Password" />
+      <TAG token="22" codepage="01" name="Polling-Request" />
+      <TAG token="23" codepage="01" name="ResponseNote" />
+      <TAG token="24" codepage="01" name="SearchElement" />
+      <TAG token="25" codepage="01" name="SearchFindings" encoding="integer" />
+      <TAG token="26" codepage="01" name="SearchID" encoding="integer" />
+      <TAG token="27" codepage="01" name="SearchIndex" encoding="integer" />
+      <TAG token="28" codepage="01" name="SearchLimit" encoding="integer" />
+      <TAG token="29" codepage="01" name="KeepAlive-Response" />
+      <TAG token="2A" codepage="01" name="SearchPairList" />
+      <TAG token="2B" codepage="01" name="Search-Request" />
+      <TAG token="2C" codepage="01" name="Search-Response" />
+      <TAG token="2D" codepage="01" name="SearchResult" />
+      <TAG token="2E" codepage="01" name="Service-Request" />
+      <TAG token="2F" codepage="01" name="Service-Response" />
+      <TAG token="30" codepage="01" name="SessionCookie" />
+      <TAG token="31" codepage="01" name="StopSearch-Request" />
+      <TAG token="32" codepage="01" name="TimeToLive" encoding="integer" />
+      <TAG token="33" codepage="01" name="SearchString" />
+      <TAG token="34" codepage="01" name="CompletionFlag" />
+      <!-- the service negotiation tag code page (0x02) -->
+      <TAG token="05" codepage="02" name="ADDGM" />
+      <TAG token="06" codepage="02" name="AttListFunc" />
+      <TAG token="07" codepage="02" name="BLENT" />
+      <TAG token="08" codepage="02" name="CAAUT" />
+      <TAG token="09" codepage="02" name="CAINV" />
+      <TAG token="0A" codepage="02" name="CALI" />
+      <TAG token="0B" codepage="02" name="CCLI" />
+      <TAG token="0C" codepage="02" name="ContListFunc" />
+      <TAG token="0D" codepage="02" name="CREAG" />
+      <TAG token="0E" codepage="02" name="DALI" />
+      <TAG token="0F" codepage="02" name="DCLI" />
+      <TAG token="10" codepage="02" name="DELGR" />
+      <TAG token="11" codepage="02" name="FundamentalFeat" />
+      <TAG token="12" codepage="02" name="FWMSG" />
+      <TAG token="13" codepage="02" name="GALS" />
+      <TAG token="14" codepage="02" name="GCLI" />
+      <TAG token="15" codepage="02" name="GETGM" />
+      <TAG token="16" codepage="02" name="GETGP" />
+      <TAG token="17" codepage="02" name="GETLM" />
+      <TAG token="18" codepage="02" name="GETM" />
+      <TAG token="19" codepage="02" name="GETPR" />
+      <TAG token="1A" codepage="02" name="GETSPI" />
+      <TAG token="1B" codepage="02" name="GETWL" />
+      <TAG token="1C" codepage="02" name="GLBLU" />
+      <TAG token="1D" codepage="02" name="GRCHN" />
+      <TAG token="1E" codepage="02" name="GroupAuthFunc" />
+      <TAG token="1F" codepage="02" name="GroupFeat" />
+      <TAG token="20" codepage="02" name="GroupMgmtFunc" />
+      <TAG token="21" codepage="02" name="GroupUseFunc" />
+      <TAG token="22" codepage="02" name="IMAuthFunc" />
+      <TAG token="23" codepage="02" name="IMFeat" />
+      <TAG token="24" codepage="02" name="IMReceiveFunc" />
+      <TAG token="25" codepage="02" name="IMSendFunc" />
+      <TAG token="26" codepage="02" name="INVIT" />
+      <TAG token="27" codepage="02" name="InviteFunc" />
+      <TAG token="28" codepage="02" name="MBRAC" />
+      <TAG token="29" codepage="02" name="MCLS" />
+      <TAG token="2A" codepage="02" name="MDELIV" />
+      <TAG token="2B" codepage="02" name="NEWM" />
+      <TAG token="2C" codepage="02" name="NOTIF" />
+      <TAG token="2D" codepage="02" name="PresenceAuthFunc" />
+      <TAG token="2E" codepage="02" name="PresenceDeliverFunc" />
+      <TAG token="2F" codepage="02" name="PresenceFeat" />
+      <TAG token="30" codepage="02" name="REACT" />
+      <TAG token="31" codepage="02" name="REJCM" />
+      <TAG token="32" codepage="02" name="REJEC" />
+      <TAG token="33" codepage="02" name="RMVGM" />
+      <TAG token="34" codepage="02" name="SearchFunc" />
+      <TAG token="35" codepage="02" name="ServiceFunc" />
+      <TAG token="36" codepage="02" name="SETD" />
+      <TAG token="37" codepage="02" name="SETGP" />
+      <TAG token="38" codepage="02" name="SRCH" />
+      <TAG token="39" codepage="02" name="STSRC" />
+      <TAG token="3A" codepage="02" name="SUBGCN" />
+      <TAG token="3B" codepage="02" name="UPDPR" />
+      <TAG token="3C" codepage="02" name="WVCSPFeat" />
+      <!-- the client capability tag code page (0x03) -->
+      <TAG token="05" codepage="03" name="AcceptedCharset" encoding="integer" />
+      <TAG token="06" codepage="03" name="AcceptedContentLength" encoding="integer" />
+      <TAG token="07" codepage="03" name="AcceptedContentType" />
+      <TAG token="08" codepage="03" name="AcceptedTransferEncoding" />
+      <TAG token="09" codepage="03" name="AnyContent" />
+      <TAG token="0A" codepage="03" name="DefaultLanguage" />
+      <TAG token="0B" codepage="03" name="InitialDeliveryMethod" />
+      <TAG token="0C" codepage="03" name="MultiTrans" encoding="integer" />
+      <TAG token="0D" codepage="03" name="ParserSize" encoding="integer" />
+      <TAG token="0E" codepage="03" name="ServerPollMin" encoding="integer" />
+      <TAG token="0F" codepage="03" name="SupportedBearer" />
+      <TAG token="10" codepage="03" name="SupportedCIRMethod" />
+      <TAG token="11" codepage="03" name="TCPAddress" />
+      <TAG token="12" codepage="03" name="TCPPort" encoding="integer" />
+      <TAG token="13" codepage="03" name="UDPPort" encoding="integer" />
+      <!-- the presence primitive tag code page (0x04) -->
+      <TAG token="05" codepage="04" name="CancelAuth-Request" />
+      <TAG token="06" codepage="04" name="ContactListProperties" />
+      <TAG token="07" codepage="04" name="CreateAttributeList-Request" />
+      <TAG token="08" codepage="04" name="CreateList-Request" />
+      <TAG token="09" codepage="04" name="DefaultAttributeList" />
+      <TAG token="0A" codepage="04" name="DefaultContactList" />
+      <TAG token="0B" codepage="04" name="DefaultList" />
+      <TAG token="0C" codepage="04" name="DeleteAttributeList-Request" />
+      <TAG token="0D" codepage="04" name="DeleteList-Request" />
+      <TAG token="0E" codepage="04" name="GetAttributeList-Request" />
+      <TAG token="0F" codepage="04" name="GetAttributeList-Response" />
+      <TAG token="10" codepage="04" name="GetList-Request" />
+      <TAG token="11" codepage="04" name="GetList-Response" />
+      <TAG token="12" codepage="04" name="GetPresence-Request" />
+      <TAG token="13" codepage="04" name="GetPresence-Response" />
+      <TAG token="14" codepage="04" name="GetWatcherList-Request" />
+      <TAG token="15" codepage="04" name="GetWatcherList-Response" />
+      <TAG token="16" codepage="04" name="ListManage-Request" />
+      <TAG token="17" codepage="04" name="ListManage-Response" />
+      <TAG token="18" codepage="04" name="UnsubscribePresence-Request" />
+      <TAG token="19" codepage="04" name="PresenceAuth-Request" />
+      <TAG token="1A" codepage="04" name="PresenceAuth-User" />
+      <TAG token="1B" codepage="04" name="PresenceNotification-Request" />
+      <TAG token="1C" codepage="04" name="UpdatePresence-Request" />
+      <TAG token="1D" codepage="04" name="SubscribePresence-Request" />
+      <!-- the presence attribute tag code page (0x05) -->
+      <TAG token="05" codepage="05" name="Accuracy" />
+      <TAG token="06" codepage="05" name="Address" />
+      <TAG token="07" codepage="05" name="AddrPref" />
+      <TAG token="08" codepage="05" name="Alias" />
+      <TAG token="09" codepage="05" name="Altitude" />
+      <TAG token="0A" codepage="05" name="Building" />
+      <TAG token="0B" codepage="05" name="Caddr" />
+      <TAG token="0C" codepage="05" name="City" />
+      <TAG token="0D" codepage="05" name="ClientInfo" />
+      <TAG token="0E" codepage="05" name="ClientProducer" />
+      <TAG token="0F" codepage="05" name="ClientType" />
+      <TAG token="10" codepage="05" name="ClientVersion" />
+      <TAG token="11" codepage="05" name="CommC" />
+      <TAG token="12" codepage="05" name="CommCap" />
+      <TAG token="13" codepage="05" name="ContactInfo" />
+      <TAG token="14" codepage="05" name="ContainedvCard" />
+      <TAG token="15" codepage="05" name="Country" />
+      <TAG token="16" codepage="05" name="Crossing1" />
+      <TAG token="17" codepage="05" name="Crossing2" />
+      <TAG token="18" codepage="05" name="DevManufacturer" />
+      <TAG token="19" codepage="05" name="DirectContent" />
+      <TAG token="1A" codepage="05" name="FreeTextLocation" />
+      <TAG token="1B" codepage="05" name="GeoLocation" />
+      <TAG token="1C" codepage="05" name="Language" />
+      <TAG token="1D" codepage="05" name="Latitude" />
+      <TAG token="1E" codepage="05" name="Longitude" />
+      <TAG token="1F" codepage="05" name="Model" />
+      <TAG token="20" codepage="05" name="NamedArea" />
+      <TAG token="21" codepage="05" name="OnlineStatus" />
+      <TAG token="22" codepage="05" name="PLMN" />
+      <TAG token="23" codepage="05" name="PrefC" />
+      <TAG token="24" codepage="05" name="PreferredContacts" />
+      <TAG token="25" codepage="05" name="PreferredLanguage" />
+      <TAG token="26" codepage="05" name="ReferredContent" />
+      <TAG token="27" codepage="05" name="ReferredvCard" />
+      <TAG token="28" codepage="05" name="Registration" />
+      <TAG token="29" codepage="05" name="StatusContent" />
+      <TAG token="2A" codepage="05" name="StatusMood" />
+      <TAG token="2B" codepage="05" name="StatusText" />
+      <TAG token="2C" codepage="05" name="Street" />
+      <TAG token="2D" codepage="05" name="TimeZone" />
+      <TAG token="2E" codepage="05" name="UserAvailability" />
+      <TAG token="2F" codepage="05" name="Cap" />
+      <TAG token="30" codepage="05" name="Cname" />
+      <TAG token="31" codepage="05" name="Contact" />
+      <TAG token="32" codepage="05" name="Cpriority" />
+      <TAG token="33" codepage="05" name="Cstatus" />
+      <TAG token="34" codepage="05" name="Note" />
+      <TAG token="35" codepage="05" name="Zone" />
+      <!-- the messaging service tag code page (0x06) -->
+      <TAG token="05" codepage="06" name="BlockList" />
+      <TAG token="06" codepage="06" name="BlockUser-Request" />
+      <TAG token="07" codepage="06" name="DeliveryMethod" />
+      <TAG token="08" codepage="06" name="DeliveryReport" />
+      <TAG token="09" codepage="06" name="DeliveryReport-Request" />
+      <TAG token="0A" codepage="06" name="ForwardMessage-Request" />
+      <TAG token="0B" codepage="06" name="GetBlockedList-Request" />
+      <TAG token="0C" codepage="06" name="GetBlockedList-Response" />
+      <TAG token="0D" codepage="06" name="GetMessageList-Request" />
+      <TAG token="0E" codepage="06" name="GetMessageList-Response" />
+      <TAG token="0F" codepage="06" name="GetMessage-Request" />
+      <TAG token="10" codepage="06" name="GetMessage-Response" />
+      <TAG token="11" codepage="06" name="GrantList" />
+      <TAG token="12" codepage="06" name="MessageDelivered" />
+      <TAG token="13" codepage="06" name="MessageInfo" />
+      <TAG token="14" codepage="06" name="MessageNotification" />
+      <TAG token="15" codepage="06" name="NewMessage" />
+      <TAG token="16" codepage="06" name="RejectMessage-Request" />
+      <TAG token="17" codepage="06" name="SendMessage-Request" />
+      <TAG token="18" codepage="06" name="SendMessage-Response" />
+      <TAG token="19" codepage="06" name="SetDeliveryMethod-Request" />
+      <TAG token="1A" codepage="06" name="DeliveryTime" encoding="datetime" />
+      <!-- the group service tag code page (0x07) -->
+      <TAG token="05" codepage="07" name="AddGroupMembers-Request" />
+      <TAG token="06" codepage="07" name="Admin" />
+      <TAG token="07" codepage="07" name="CreateGroup-Request" />
+      <TAG token="08" codepage="07" name="DeleteGroup-Request" />
+      <TAG token="09" codepage="07" name="GetGroupMembers-Request" />
+      <TAG token="0A" codepage="07" name="GetGroupMembers-Response" />
+      <TAG token="0B" codepage="07" name="GetGroupProps-Request" />
+      <TAG token="0C" codepage="07" name="GetGroupProps-Response" />
+      <TAG token="0D" codepage="07" name="GroupChangeNotice" />
+      <TAG token="0E" codepage="07" name="GroupProperties" />
+      <TAG token="0F" codepage="07" name="Joined" />
+      <TAG token="10" codepage="07" name="JoinedRequest" />
+      <TAG token="11" codepage="07" name="JoinGroup-Request" />
+      <TAG token="12" codepage="07" name="JoinGroup-Response" />
+      <TAG token="13" codepage="07" name="LeaveGroup-Request" />
+      <TAG token="14" codepage="07" name="LeaveGroup-Response" />
+      <TAG token="15" codepage="07" name="Left" />
+      <TAG token="16" codepage="07" name="MemberAccess-Request" />
+      <TAG token="17" codepage="07" name="Mod" />
+      <TAG token="18" codepage="07" name="OwnProperties" />
+      <TAG token="19" codepage="07" name="RejectList-Request" />
+      <TAG token="1A" codepage="07" name="RejectList-Response" />
+      <TAG token="1B" codepage="07" name="RemoveGroupMembers-Request" />
+      <TAG token="1C" codepage="07" name="SetGroupProps-Request" />
+      <TAG token="1D" codepage="07" name="SubscribeGroupNotice-Request" />
+      <TAG token="1E" codepage="07" name="SubscribeGroupNotice-Response" />
+      <TAG token="1F" codepage="07" name="Users" />
+      <TAG token="20" codepage="07" name="WelcomeNote" />
+      <TAG token="21" codepage="07" name="JoinGroup" />
+      <TAG token="22" codepage="07" name="SubscribeNotification" />
+      <TAG token="23" codepage="07" name="SubscribeType" />
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="xmlns" value="http://www.wireless-village.org/CSP" />
+      <ATTRSTART token="06" name="xmlns" value="http://www.wireless-village.org/PA" />
+      <ATTRSTART token="07" name="xmlns" value="http://www.wireless-village.org/TRC" />
+    </AttrStartTokens>
+    <Ext0Values>
+      <!-- Common values -->
+      <EXTVALUE index="00" value="AccessType" />
+      <EXTVALUE index="01" value="ActiveUsers" />
+      <EXTVALUE index="02" value="Admin" />
+      <EXTVALUE index="03" value="application/" />
+      <EXTVALUE index="04" value="application/vnd.wap.mms-message" />
+      <EXTVALUE index="05" value="application/x-sms" />
+      <EXTVALUE index="06" value="AutoJoin" />
+      <EXTVALUE index="07" value="BASE64" />
+      <EXTVALUE index="08" value="Closed" />
+      <EXTVALUE index="09" value="Default" />
+      <EXTVALUE index="0A" value="DisplayName" />
+      <EXTVALUE index="0B" value="F" />		<!-- False -->
+      <EXTVALUE index="0C" value="G" />		<!-- Get -->
+      <EXTVALUE index="0D" value="GR" />	<!-- Group -->
+      <EXTVALUE index="0E" value="http://" />
+      <EXTVALUE index="0F" value="https://" />
+      <EXTVALUE index="10" value="image/" />
+      <EXTVALUE index="11" value="Inband" />
+      <EXTVALUE index="12" value="IM" />	<!-- Instant Messaging -->
+      <EXTVALUE index="13" value="MaxActiveUsers" />
+      <EXTVALUE index="14" value="Mod" />
+      <EXTVALUE index="15" value="Name" />
+      <EXTVALUE index="16" value="None" />
+      <EXTVALUE index="17" value="N" />		<!-- Notify/Get -->
+      <EXTVALUE index="18" value="Open" />
+      <EXTVALUE index="19" value="Outband" />
+      <EXTVALUE index="1A" value="PR" />	<!-- Presence -->
+      <EXTVALUE index="1B" value="Private" />
+      <EXTVALUE index="1C" value="PrivateMessaging" />
+      <EXTVALUE index="1D" value="PrivilegeLevel" />
+      <EXTVALUE index="1E" value="Public" />
+      <EXTVALUE index="1F" value="P" />		<!-- Push -->
+      <EXTVALUE index="20" value="Request" />
+      <EXTVALUE index="21" value="Response" />
+      <EXTVALUE index="22" value="Restricted" />
+      <EXTVALUE index="23" value="ScreenName" />
+      <EXTVALUE index="24" value="Searchable" />
+      <EXTVALUE index="25" value="S" />		<!-- Set -->
+      <EXTVALUE index="26" value="SC" />	<!-- Shared Content -->
+      <EXTVALUE index="27" value="text/" />
+      <EXTVALUE index="28" value="text/plain" />
+      <EXTVALUE index="29" value="text/x-vCalendar" />
+      <EXTVALUE index="2A" value="text/x-vCard" />
+      <EXTVALUE index="2B" value="Topic" />
+      <EXTVALUE index="2C" value="T" />		<!-- True -->
+      <EXTVALUE index="2D" value="Type" />
+      <EXTVALUE index="2E" value="U" />		<!-- Unset -->
+      <EXTVALUE index="2F" value="US" />	<!-- User -->
+      <EXTVALUE index="30" value="www.wireless-village.org" />
+      <!-- Access values -->
+      <EXTVALUE index="3D" value="GROUP_ID" />
+      <EXTVALUE index="3E" value="GROUP_NAME" />
+      <EXTVALUE index="3F" value="GROUP_TOPIC" />
+      <EXTVALUE index="40" value="GROUP_USER_ID_JOINED" />
+      <EXTVALUE index="41" value="GROUP_USER_ID_OWNER" />
+      <EXTVALUE index="42" value="HTTP" />
+      <EXTVALUE index="43" value="SMS" />
+      <EXTVALUE index="44" value="STCP" />
+      <EXTVALUE index="45" value="SUDP" />
+      <EXTVALUE index="46" value="USER_ALIAS" />
+      <EXTVALUE index="47" value="USER_EMAIL_ADDRESS" />
+      <EXTVALUE index="48" value="USER_FIRST_NAME" />
+      <EXTVALUE index="49" value="USER_ID" />
+      <EXTVALUE index="4A" value="USER_LAST_NAME" />
+      <EXTVALUE index="4B" value="USER_MOBILE_NUMBER" />
+      <EXTVALUE index="4C" value="USER_ONLINE_STATUS" />
+      <EXTVALUE index="4D" value="WAPSMS" />
+      <EXTVALUE index="4E" value="WAPUDP" />
+      <EXTVALUE index="4F" value="WSP" />
+      <!-- Presence values -->
+      <EXTVALUE index="5B" value="ANGRY" />
+      <EXTVALUE index="5C" value="ANXIOUS" />
+      <EXTVALUE index="5D" value="ASHAMED" />
+      <EXTVALUE index="5E" value="AUDIO_CALL" />
+      <EXTVALUE index="5F" value="AVAILABLE" />
+      <EXTVALUE index="60" value="BORED" />
+      <EXTVALUE index="61" value="CALL" />
+      <EXTVALUE index="62" value="CLI" />
+      <EXTVALUE index="63" value="COMPUTER" />
+      <EXTVALUE index="64" value="DISCREET" />
+      <EXTVALUE index="65" value="EMAIL" />
+      <EXTVALUE index="66" value="EXCITED" />
+      <EXTVALUE index="67" value="HAPPY" />
+      <EXTVALUE index="68" value="IM" />
+      <EXTVALUE index="69" value="IM_OFFLINE" />
+      <EXTVALUE index="6A" value="IM_ONLINE" />
+      <EXTVALUE index="6B" value="IN_LOVE" />
+      <EXTVALUE index="6C" value="INVINCIBLE" />
+      <EXTVALUE index="6D" value="JEALOUS" />
+      <EXTVALUE index="6E" value="MMS" />
+      <EXTVALUE index="6F" value="MOBILE_PHONE" />
+      <EXTVALUE index="70" value="NOT_AVAILABLE" />
+      <EXTVALUE index="71" value="OTHER" />
+      <EXTVALUE index="72" value="PDA" />
+      <EXTVALUE index="73" value="SAD" />
+      <EXTVALUE index="74" value="SLEEPY" />
+      <EXTVALUE index="75" value="SMS" />
+      <EXTVALUE index="76" value="VIDEO_CALL" />
+      <EXTVALUE index="77" value="VIDEO_STREAM" />
+    </Ext0Values>
+  </App>
+  <App publicid="-//WIRELESSVILLAGE//DTD CSP 1.0//EN"
+     xml-space="default" >
+    <!-- see: Wireless Village
+              Client-Server Protocol
+              Binary XML definition and Examples,
+              version 1.0, WV-008 -->
+    <TagTokens>
+      <!-- the common tag code page (0x00) -->
+      <TAG token="05" name="Acceptance" />
+      <TAG token="06" name="AddList" />
+      <TAG token="07" name="AddNickList" />
+      <TAG token="08" name="Attribute" />
+      <TAG token="09" name="AttributeList" />
+      <TAG token="0A" name="ClientID" />
+      <TAG token="0B" name="Code" encoding="integer" />
+      <TAG token="0C" name="ContactList" />
+      <TAG token="0D" name="ContentData" />
+      <TAG token="0E" name="ContentEncoding" />
+      <TAG token="0F" name="ContentSize" encoding="integer" />
+      <TAG token="10" name="ContentType" />
+      <TAG token="11" name="DateTime" encoding="datetime" />
+      <TAG token="12" name="Description" />
+      <TAG token="13" name="DetailedResult" />
+      <TAG token="14" name="EntityList" />
+      <TAG token="15" name="Group" />
+      <TAG token="16" name="GroupID" />
+      <TAG token="17" name="GroupList" />
+      <TAG token="18" name="InUse" />
+      <TAG token="19" name="Logo" />
+      <TAG token="1A" name="MessageCount" encoding="integer" />
+      <TAG token="1B" name="MessageID" />
+      <TAG token="1C" name="MessageURI" />
+      <TAG token="1D" name="MSISDN" />
+      <TAG token="1E" name="Name" />
+      <TAG token="1F" name="NickList" />
+      <TAG token="20" name="NickName" />
+      <TAG token="21" name="Poll" />
+      <TAG token="22" name="Presence" />
+      <TAG token="23" name="PresenceSubList" />
+      <TAG token="24" name="PresenceValue" />
+      <TAG token="25" name="Property" />
+      <TAG token="26" name="Qualifier" />
+      <TAG token="27" name="Recipient" />
+      <TAG token="28" name="RemoveList" />
+      <TAG token="29" name="RemoveNickList" />
+      <TAG token="2A" name="Result" />
+      <TAG token="2B" name="ScreenName" />
+      <TAG token="2C" name="Sender" />
+      <TAG token="2D" name="Session" />
+      <TAG token="2E" name="SessionDescriptor" />
+      <TAG token="2F" name="SessionID" />
+      <TAG token="30" name="SessionType" />
+      <TAG token="31" name="Status" />
+      <TAG token="32" name="Transaction" />
+      <TAG token="33" name="TransactionContent" />
+      <TAG token="34" name="TransactionDescriptor" />
+      <TAG token="35" name="TransactionID" />
+      <TAG token="36" name="TransactionMode" />
+      <TAG token="37" name="URL" />
+      <TAG token="38" name="URLList" />
+      <TAG token="39" name="User" />
+      <TAG token="3A" name="UserID" />
+      <TAG token="3B" name="UserList" />
+      <TAG token="3C" name="Validity" encoding="integer" />
+      <TAG token="3D" name="Value" />
+      <TAG token="3E" name="WV-CSP-Message" />
+      <!-- the service access tag code page (0x01) -->
+      <TAG token="05" codepage="01" name="AllFunctions" />
+      <TAG token="06" codepage="01" name="AllFunctionsRequest" />
+      <TAG token="07" codepage="01" name="CancelInvite-Request" />
+      <TAG token="08" codepage="01" name="CancelInviteUser-Request" />
+      <TAG token="09" codepage="01" name="Capability" />
+      <TAG token="0A" codepage="01" name="CapabilityList" />
+      <TAG token="0B" codepage="01" name="CapabilityRequest" />
+      <TAG token="0C" codepage="01" name="ClientCapability-Request" />
+      <TAG token="0D" codepage="01" name="ClientCapability-Response" />
+      <TAG token="0E" codepage="01" name="DigestBytes" encoding="base64" />
+      <TAG token="0F" codepage="01" name="DigestSchema" />
+      <TAG token="10" codepage="01" name="Disconnect" />
+      <TAG token="11" codepage="01" name="Functions" />
+      <TAG token="12" codepage="01" name="GetSPInfo-Request" />
+      <TAG token="13" codepage="01" name="GetSPInfo-Response" />
+      <TAG token="14" codepage="01" name="InviteID" />
+      <TAG token="15" codepage="01" name="InviteNote" />
+      <TAG token="16" codepage="01" name="Invite-Request" />
+      <TAG token="17" codepage="01" name="Invite-Response" />
+      <TAG token="18" codepage="01" name="InviteType" />
+      <TAG token="19" codepage="01" name="InviteUser-Request" />
+      <TAG token="1A" codepage="01" name="InviteUser-Response" />
+      <TAG token="1B" codepage="01" name="KeepAlive-Request" />
+      <TAG token="1C" codepage="01" name="KeepAliveTime" encoding="integer" />
+      <TAG token="1D" codepage="01" name="Login-Request" />
+      <TAG token="1E" codepage="01" name="Login-Response" />
+      <TAG token="1F" codepage="01" name="Logout-Request" />
+      <TAG token="20" codepage="01" name="Nonce" />
+      <TAG token="21" codepage="01" name="Password" />
+      <TAG token="22" codepage="01" name="Polling-Request" />
+      <TAG token="23" codepage="01" name="ResponseNote" />
+      <TAG token="24" codepage="01" name="SearchElement" />
+      <TAG token="25" codepage="01" name="SearchFindings" encoding="integer" />
+      <TAG token="26" codepage="01" name="SearchID" encoding="integer" />
+      <TAG token="27" codepage="01" name="SearchIndex" encoding="integer" />
+      <TAG token="28" codepage="01" name="SearchLimit" encoding="integer" />
+      <TAG token="29" codepage="01" name="SearchOnlineStatus" />
+      <TAG token="2A" codepage="01" name="SearchPairList" />
+      <TAG token="2B" codepage="01" name="Search-Request" />
+      <TAG token="2C" codepage="01" name="Search-Response" />
+      <TAG token="2D" codepage="01" name="SearchResult" />
+      <TAG token="2E" codepage="01" name="Service-Request" />
+      <TAG token="2F" codepage="01" name="Service-Response" />
+      <TAG token="30" codepage="01" name="SessionCookie" />
+      <TAG token="31" codepage="01" name="StopSearch-Request" />
+      <TAG token="32" codepage="01" name="TimeToLive" encoding="integer" />
+      <!-- the service negotiation tag code page (0x02) -->
+      <TAG token="05" codepage="02" name="ADDGM" />
+      <TAG token="06" codepage="02" name="AttListFunc" />
+      <TAG token="07" codepage="02" name="BLENT" />
+      <TAG token="08" codepage="02" name="CAAUT" />
+      <TAG token="09" codepage="02" name="CAINV" />
+      <TAG token="0A" codepage="02" name="CALI" />
+      <TAG token="0B" codepage="02" name="CCLI" />
+      <TAG token="0C" codepage="02" name="ContListFunc" />
+      <TAG token="0D" codepage="02" name="CREAG" />
+      <TAG token="0E" codepage="02" name="DALI" />
+      <TAG token="0F" codepage="02" name="DCLI" />
+      <TAG token="10" codepage="02" name="DELGR" />
+      <TAG token="11" codepage="02" name="FundamentalFeat" />
+      <TAG token="12" codepage="02" name="FWMSG" />
+      <TAG token="13" codepage="02" name="GALS" />
+      <TAG token="14" codepage="02" name="GCLI" />
+      <TAG token="15" codepage="02" name="GETGM" />
+      <TAG token="16" codepage="02" name="GETGP" />
+      <TAG token="17" codepage="02" name="GETLM" />
+      <TAG token="18" codepage="02" name="GETM" />
+      <TAG token="19" codepage="02" name="GETPR" />
+      <TAG token="1A" codepage="02" name="GETSPI" />
+      <TAG token="1B" codepage="02" name="GETWL" />
+      <TAG token="1C" codepage="02" name="GLBLU" />
+      <TAG token="1D" codepage="02" name="GRCHN" />
+      <TAG token="1E" codepage="02" name="GroupAuthFunc" />
+      <TAG token="1F" codepage="02" name="GroupFeat" />
+      <TAG token="20" codepage="02" name="GroupMgmtFunc" />
+      <TAG token="21" codepage="02" name="GroupUseFunc" />
+      <TAG token="22" codepage="02" name="IMAuthFunc" />
+      <TAG token="23" codepage="02" name="IMFeat" />
+      <TAG token="24" codepage="02" name="IMReceiveFunc" />
+      <TAG token="25" codepage="02" name="IMSendFunc" />
+      <TAG token="26" codepage="02" name="INVIT" />
+      <TAG token="27" codepage="02" name="InviteFunc" />
+      <TAG token="28" codepage="02" name="MBRAC" />
+      <TAG token="29" codepage="02" name="MCLS" />
+      <TAG token="2A" codepage="02" name="MDELIV" />
+      <TAG token="2B" codepage="02" name="NEWM" />
+      <TAG token="2C" codepage="02" name="NOTIF" />
+      <TAG token="2D" codepage="02" name="PresenceAuthFunc" />
+      <TAG token="2E" codepage="02" name="PresenceDeliverFunc" />
+      <TAG token="2F" codepage="02" name="PresenceFeat" />
+      <TAG token="30" codepage="02" name="REACT" />
+      <TAG token="31" codepage="02" name="REJCM" />
+      <TAG token="32" codepage="02" name="REJEC" />
+      <TAG token="33" codepage="02" name="RMVGM" />
+      <TAG token="34" codepage="02" name="SearchFunc" />
+      <TAG token="35" codepage="02" name="ServiceFunc" />
+      <TAG token="36" codepage="02" name="SETD" />
+      <TAG token="37" codepage="02" name="SETGP" />
+      <TAG token="38" codepage="02" name="SRCH" />
+      <TAG token="39" codepage="02" name="STSRC" />
+      <TAG token="3A" codepage="02" name="SUBGCN" />
+      <TAG token="3B" codepage="02" name="UPDPR" />
+      <TAG token="3C" codepage="02" name="WVCSPFeat" />
+      <!-- the client capability tag code page (0x03) -->
+      <TAG token="05" codepage="03" name="AcceptedCharset" />
+      <TAG token="06" codepage="03" name="AcceptedContentLength" />
+      <TAG token="07" codepage="03" name="AcceptedContentType" />
+      <TAG token="08" codepage="03" name="AcceptedTransferEncoding" />
+      <TAG token="09" codepage="03" name="AnyContent" />
+      <TAG token="0A" codepage="03" name="ClientType" />
+      <TAG token="0B" codepage="03" name="InitialDeliveryMethod" />
+      <TAG token="0C" codepage="03" name="MultiTrans" encoding="integer" />
+      <TAG token="0D" codepage="03" name="ParserSize" encoding="integer" />
+      <TAG token="0E" codepage="03" name="ServerPollMin" encoding="integer" />
+      <TAG token="0F" codepage="03" name="SupportedBearer" />
+      <TAG token="10" codepage="03" name="SupportedCIRMethod" />
+      <TAG token="11" codepage="03" name="TCPAddress" />
+      <TAG token="12" codepage="03" name="TCPPort" encoding="integer" />
+      <TAG token="13" codepage="03" name="UDPPort" encoding="integer" />
+      <!-- the presence primitive tag code page (0x04) -->
+      <TAG token="05" codepage="04" name="CancelAuth-Request" />
+      <TAG token="06" codepage="04" name="ContactListProperties" />
+      <TAG token="07" codepage="04" name="CreateAttributeList-Request" />
+      <TAG token="08" codepage="04" name="CreateList-Request" />
+      <TAG token="09" codepage="04" name="DefaultAttributeList" />
+      <TAG token="0A" codepage="04" name="DefaultContactList" />
+      <TAG token="0B" codepage="04" name="DefaultList" />
+      <TAG token="0C" codepage="04" name="DeleteAttributeList-Request" />
+      <TAG token="0D" codepage="04" name="DeleteList-Request" />
+      <TAG token="0E" codepage="04" name="GetAttributeList-Request" />
+      <TAG token="0F" codepage="04" name="GetAttributeList-Response" />
+      <TAG token="10" codepage="04" name="GetList-Request" />
+      <TAG token="11" codepage="04" name="GetList-Response" />
+      <TAG token="12" codepage="04" name="GetPresence-Request" />
+      <TAG token="13" codepage="04" name="GetPresence-Response" />
+      <TAG token="14" codepage="04" name="GetWatcherList-Request" />
+      <TAG token="15" codepage="04" name="GetWatcherList-Response" />
+      <TAG token="16" codepage="04" name="ListManage-Request" />
+      <TAG token="17" codepage="04" name="ListManage-Response" />
+      <TAG token="18" codepage="04" name="Presence" />
+      <TAG token="19" codepage="04" name="PresenceAuth-Request" />
+      <TAG token="1A" codepage="04" name="PresenceAuth-Response" />
+      <TAG token="1B" codepage="04" name="PresenceNotification-Request" />
+      <TAG token="1C" codepage="04" name="PresenceValueList" />
+      <TAG token="1D" codepage="04" name="SubscribePresence-Request" />
+      <TAG token="1E" codepage="04" name="UnsubscribePresence-Request" />
+      <TAG token="1F" codepage="04" name="UpdatePresence-Request" />
+      <!-- the presence attribute tag code page (0x05) -->
+      <TAG token="05" codepage="05" name="Accuracy" />
+      <TAG token="06" codepage="05" name="Address" />
+      <TAG token="07" codepage="05" name="AddrPref" />
+      <TAG token="08" codepage="05" name="Alias" />
+      <TAG token="09" codepage="05" name="Altitude" />
+      <TAG token="0A" codepage="05" name="Building" />
+      <TAG token="0B" codepage="05" name="CAddr" />
+      <TAG token="0C" codepage="05" name="City" />
+      <TAG token="0D" codepage="05" name="ClientInfo" />
+      <TAG token="0E" codepage="05" name="ClientProducer" />
+      <TAG token="0F" codepage="05" name="ClientType" />
+      <TAG token="10" codepage="05" name="ClientVersion" />
+      <TAG token="11" codepage="05" name="CommC" />
+      <TAG token="12" codepage="05" name="CommCap" />
+      <TAG token="13" codepage="05" name="ContactInfo" />
+      <TAG token="14" codepage="05" name="ContainedvCard" />
+      <TAG token="15" codepage="05" name="Country" />
+      <TAG token="16" codepage="05" name="Crossing1" />
+      <TAG token="17" codepage="05" name="Crossing2" />
+      <TAG token="18" codepage="05" name="DevManufacturer" />
+      <TAG token="19" codepage="05" name="DirectContent" />
+      <TAG token="1A" codepage="05" name="FreeTextLocation" />
+      <TAG token="1B" codepage="05" name="GeoLocation" />
+      <TAG token="1C" codepage="05" name="Language" />
+      <TAG token="1D" codepage="05" name="Latitude" />
+      <TAG token="1E" codepage="05" name="Longitude" />
+      <TAG token="1F" codepage="05" name="Model" />
+      <TAG token="20" codepage="05" name="NamedArea" />
+      <TAG token="21" codepage="05" name="OnlineStatus" />
+      <TAG token="22" codepage="05" name="PLMN" />
+      <TAG token="23" codepage="05" name="PrefC" />
+      <TAG token="24" codepage="05" name="PreferredContacts" />
+      <TAG token="25" codepage="05" name="PreferredLanguage" />
+      <TAG token="26" codepage="05" name="ReferredContent" />
+      <TAG token="27" codepage="05" name="ReferredvCard" />
+      <TAG token="28" codepage="05" name="Registration" />
+      <TAG token="29" codepage="05" name="StatusContent" />
+      <TAG token="2A" codepage="05" name="StatusMood" />
+      <TAG token="2B" codepage="05" name="StatusText" />
+      <TAG token="2C" codepage="05" name="Street" />
+      <TAG token="2D" codepage="05" name="TimeZone" />
+      <TAG token="2E" codepage="05" name="UserAvailability" />
+      <!-- the messaging service tag code page (0x06) -->
+      <TAG token="05" codepage="06" name="BlockList" />
+      <TAG token="06" codepage="06" name="BlockUser-Request" />
+      <TAG token="07" codepage="06" name="DeliveryMethod" />
+      <TAG token="08" codepage="06" name="DeliveryReport" />
+      <TAG token="09" codepage="06" name="DeliveryReport-Request" />
+      <TAG token="0A" codepage="06" name="ForwardMessage-Request" />
+      <TAG token="0B" codepage="06" name="GetBlockedList-Request" />
+      <TAG token="0C" codepage="06" name="GetBlockedList-Response" />
+      <TAG token="0D" codepage="06" name="GetMessageList-Request" />
+      <TAG token="0E" codepage="06" name="GetMessageList-Response" />
+      <TAG token="0F" codepage="06" name="GetMessage-Request" />
+      <TAG token="10" codepage="06" name="GetMessage-Response" />
+      <TAG token="11" codepage="06" name="GrantList" />
+      <TAG token="12" codepage="06" name="MessageDelivered" />
+      <TAG token="13" codepage="06" name="MessageInfo" />
+      <TAG token="14" codepage="06" name="MessageNotification" />
+      <TAG token="15" codepage="06" name="NewMessage" />
+      <TAG token="16" codepage="06" name="RejectMessage-Request" />
+      <TAG token="17" codepage="06" name="SendMessage-Request" />
+      <TAG token="18" codepage="06" name="SendMessage-Response" />
+      <TAG token="19" codepage="06" name="SetDeliveryMethod-Request" />
+      <!-- the group service tag code page (0x07) -->
+      <TAG token="05" codepage="07" name="AddGroupMembers-Request" />
+      <TAG token="06" codepage="07" name="Admin" />
+      <TAG token="07" codepage="07" name="CreateGroup-Request" />
+      <TAG token="08" codepage="07" name="DeleteGroup-Request" />
+      <TAG token="09" codepage="07" name="GetGroupMembers-Request" />
+      <TAG token="0A" codepage="07" name="GetGroupMembers-Response" />
+      <TAG token="0B" codepage="07" name="GetGroupProps-Request" />
+      <TAG token="0C" codepage="07" name="GetGroupProps-Response" />
+      <TAG token="0D" codepage="07" name="GroupChangeNotice" />
+      <TAG token="0E" codepage="07" name="GroupProperties" />
+      <TAG token="0F" codepage="07" name="Joined" />
+      <TAG token="10" codepage="07" name="JoinedRequest" />
+      <TAG token="11" codepage="07" name="JoinGroup-Request" />
+      <TAG token="12" codepage="07" name="JoinGroup-Response" />
+      <TAG token="13" codepage="07" name="LeaveGroup-Request" />
+      <TAG token="14" codepage="07" name="LeaveGroup-Response" />
+      <TAG token="15" codepage="07" name="Left" />
+      <TAG token="16" codepage="07" name="MemberAccess-Request" />
+      <TAG token="17" codepage="07" name="Mod" />
+      <TAG token="18" codepage="07" name="OwnProperties" />
+      <TAG token="19" codepage="07" name="RejectList-Request" />
+      <TAG token="1A" codepage="07" name="RejectList-Response" />
+      <TAG token="1B" codepage="07" name="RemoveGroupMembers-Request" />
+      <TAG token="1C" codepage="07" name="SetGroupProps-Request" />
+      <TAG token="1D" codepage="07" name="SubscribeGroupNotice-Request" />
+      <TAG token="1D" codepage="07" name="SubscribeGroupNotice-Response" />
+      <TAG token="1F" codepage="07" name="Users" />
+      <TAG token="20" codepage="07" name="WelcomeNote" />
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="xmlns" value="http://www.wireless-village.org/CSP" />
+      <ATTRSTART token="06" name="xmlns" value="http://www.wireless-village.org/PA" />
+      <ATTRSTART token="07" name="xmlns" value="http://www.wireless-village.org/TRC" />
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <!-- the common code page (0x00) -->
+      <ATTRVALUE token="85" value="AccessType" />
+      <ATTRVALUE token="86" value="ActiveUsers" />
+      <ATTRVALUE token="87" value="Admin" />
+      <ATTRVALUE token="88" value="application/" />
+      <ATTRVALUE token="89" value="application/vnd.wap.mms-message" />
+      <ATTRVALUE token="8A" value="application/x-sms" />
+      <ATTRVALUE token="8B" value="BASE64" />
+      <ATTRVALUE token="8C" value="Closed" />
+      <ATTRVALUE token="8D" value="Default" />
+      <ATTRVALUE token="8E" value="DisplayName" />
+      <ATTRVALUE token="8f" value="False" />
+      <ATTRVALUE token="90" value="Get" />
+      <ATTRVALUE token="91" value="Group" />
+      <ATTRVALUE token="92" value="http://" />
+      <ATTRVALUE token="93" value="https://" />
+      <ATTRVALUE token="94" value="image/" />
+      <ATTRVALUE token="95" value="Inband" />
+      <ATTRVALUE token="96" value="Instant Messaging" />
+      <ATTRVALUE token="97" value="MaxActiveUsers" />
+      <ATTRVALUE token="98" value="Mod" />
+      <ATTRVALUE token="99" value="Name" />
+      <ATTRVALUE token="9A" value="None" />
+      <ATTRVALUE token="9B" value="Notify/Get" />
+      <ATTRVALUE token="9C" value="Open" />
+      <ATTRVALUE token="9D" value="Outband" />
+      <ATTRVALUE token="9E" value="Presence" />
+      <ATTRVALUE token="9F" value="Private" />
+      <ATTRVALUE token="A0" value="PrivateMessaging" />
+      <ATTRVALUE token="A1" value="PrivilegeLevel" />
+      <ATTRVALUE token="A2" value="Public" />
+      <ATTRVALUE token="A3" value="Push" />
+      <ATTRVALUE token="A4" value="Request" />
+      <ATTRVALUE token="A5" value="Response" />
+      <ATTRVALUE token="A6" value="ScreenName" />
+      <ATTRVALUE token="A7" value="Searchable" />
+      <ATTRVALUE token="A8" value="Set" />
+      <ATTRVALUE token="A9" value="Shared Content" />
+      <ATTRVALUE token="AA" value="text/" />
+      <ATTRVALUE token="AB" value="text/plain" />
+      <ATTRVALUE token="AC" value="text/x-vCalendar" />
+      <ATTRVALUE token="AD" value="text/x-vCard" />
+      <ATTRVALUE token="AE" value="Topic" />
+      <ATTRVALUE token="AF" value="True" />
+      <ATTRVALUE token="B0" value="Type" />
+      <ATTRVALUE token="B1" value="Unset" />
+      <ATTRVALUE token="B2" value="User" />
+      <ATTRVALUE token="B3" value="www.wireless-village.org" />
+      <!-- the access code page (0x01) -->
+      <ATTRVALUE token="85" codepage="01" value="GROUP_ID" />
+      <ATTRVALUE token="86" codepage="01" value="GROUP_NAME" />
+      <ATTRVALUE token="87" codepage="01" value="GROUP_TOPIC" />
+      <ATTRVALUE token="88" codepage="01" value="GROUP_USER_ID_JOINED" />
+      <ATTRVALUE token="89" codepage="01" value="HTTP" />
+      <ATTRVALUE token="8A" codepage="01" value="SMS" />
+      <ATTRVALUE token="8B" codepage="01" value="STCP" />
+      <ATTRVALUE token="8C" codepage="01" value="SUDP" />
+      <ATTRVALUE token="8D" codepage="01" value="USER_ALIAS" />
+      <ATTRVALUE token="8E" codepage="01" value="USER_EMAIL_ADDRESS" />
+      <ATTRVALUE token="8F" codepage="01" value="USER_FIRST_NAME" />
+      <ATTRVALUE token="90" codepage="01" value="USER_ID" />
+      <ATTRVALUE token="91" codepage="01" value="USER_LAST_NAME" />
+      <ATTRVALUE token="92" codepage="01" value="USER_MOBILE_NUMBER" />
+      <ATTRVALUE token="93" codepage="01" value="WAPSMS" />
+      <ATTRVALUE token="94" codepage="01" value="WAPUDP" />
+      <ATTRVALUE token="95" codepage="01" value="WSP" />
+      <!-- the presence code page (0x05) -->
+      <ATTRVALUE token="85" codepage="05" value="ANGRY" />
+      <ATTRVALUE token="86" codepage="05" value="ANXIOUS" />
+      <ATTRVALUE token="87" codepage="05" value="ASHAMED" />
+      <ATTRVALUE token="88" codepage="05" value="AUDIO_CALL" />
+      <ATTRVALUE token="89" codepage="05" value="AVAILABLE" />
+      <ATTRVALUE token="8A" codepage="05" value="BORED" />
+      <ATTRVALUE token="8B" codepage="05" value="CALL" />
+      <ATTRVALUE token="8C" codepage="05" value="CLI" />
+      <ATTRVALUE token="8D" codepage="05" value="COMPUTER" />
+      <ATTRVALUE token="8E" codepage="05" value="DISCREET" />
+      <ATTRVALUE token="8F" codepage="05" value="EMAIL" />
+      <ATTRVALUE token="90" codepage="05" value="EXCITED" />
+      <ATTRVALUE token="91" codepage="05" value="HAPPY" />
+      <ATTRVALUE token="92" codepage="05" value="IM" />
+      <ATTRVALUE token="93" codepage="05" value="IM_OFFLINE" />
+      <ATTRVALUE token="94" codepage="05" value="IM_ONLINE" />
+      <ATTRVALUE token="95" codepage="05" value="IN_LOVE" />
+      <ATTRVALUE token="96" codepage="05" value="INVINCIBLE" />
+      <ATTRVALUE token="97" codepage="05" value="JEALOUS" />
+      <ATTRVALUE token="98" codepage="05" value="MMS" />
+      <ATTRVALUE token="99" codepage="05" value="MOBILE_PHONE" />
+      <ATTRVALUE token="9A" codepage="05" value="NOT_AVAILABLE" />
+      <ATTRVALUE token="9B" codepage="05" value="OTHER" />
+      <ATTRVALUE token="9C" codepage="05" value="PDA" />
+      <ATTRVALUE token="9D" codepage="05" value="SAD" />
+      <ATTRVALUE token="9E" codepage="05" value="SLEEPY" />
+      <ATTRVALUE token="9F" codepage="05" value="SMS" />
+      <ATTRVALUE token="A0" codepage="05" value="VIDEO_CALL" />
+      <ATTRVALUE token="A1" codepage="05" value="VIDEO_STREAM" />
+    </AttrValueTokens>
+  </App>
+</wbxml>

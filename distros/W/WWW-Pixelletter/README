@@ -1,0 +1,40 @@
+WWW::Pixelletter::API version 0.1
+=====================================
+
+Provides an interface to pixelletter to send fax/post
+
+Pixelletter is a German service which provides an XML interface
+with which documents (pdf, doc, ...) can be sent by post or fax.
+
+You must register an account at Pixelletter, and prices for service
+vary depending on destination and service.
+
+Pixelletter website:
+http://www.pixelletter.de/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use LWP::UserAgent;
+use File::Util;
+use Locale::Country
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Robin Clarke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

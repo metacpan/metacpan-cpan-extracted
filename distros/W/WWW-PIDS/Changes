@@ -1,0 +1,15 @@
+Revision history for WWW-PIDS
+
+0.03    Mon Sep 14 2015 ltp@cpan.org 0.02
+	- Fixed some auto-generated subs.
+	- Updated documentation and code samples.
+
+0.02    Fri Aug 07 2015 ltp@cpan.org 0.02
+	- Spelling, documentation, etc.
+	- Changed SOAP::Lite version requirements in Makefile.PL
+	to 0 because I apparently travelled into the future to 
+	baseline it at 1.7.
+
+0.01    Thu Aug 06 2015 ltp@cpan.org 0.01
+        - First release ;)
+

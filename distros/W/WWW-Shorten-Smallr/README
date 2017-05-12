@@ -1,0 +1,16 @@
+WWW::Shorten::Smallr
+  Provides a Perl interface to the http://smallr.com shortening service.
+
+For documentation please read the modules inline POD.
+  perldoc WWW::Shorten::Smallr
+
+To install, do the usual:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.
+
+For a complete list of changes, see the Changes file.

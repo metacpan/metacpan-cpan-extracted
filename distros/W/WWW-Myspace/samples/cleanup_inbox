@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w -I../lib
+# Deletes messages from inbox, leaving the most recent 40.
+
+use WWW::Myspace;
+use YAML qw'LoadFile DumpFile';
+
+$myspace = new WWW::Myspace;
+
+print "Getting inbox...\n";
+my $messages;
+#if ( -f "cleanup_save.yaml" ) {
+#    $messages = LoadFile( "cleanup_save.yaml", $messages );
+#} else {
+    $messages = $myspace->inbox;
+#    DumpFile( "cleanup_save.yaml", $messages );
+#}
+
+if ( @{ $messages } > 40 ) {
+    print "Found " . @{ $messages } . " messages.\n";
+    print "Cleaning up...\n";
+
+    my $end = @{ $messages }-1;
+    my @to_delete = @{ $messages }[40..$end];
+
+#    print "Deleting " . @to_delete . " messages:\n";
+#    foreach my $msg ( @to_delete ) {
+#	print $msg->{message_id}."\n";
+#    }
+
+    $myspace->delete_message( @to_delete );
+    print $myspace->error if ( $myspace->error );
+#    print $myspace->current_page->content;
+}

@@ -1,0 +1,19 @@
+---
+abstract: "Perl interface to JotForm's API -- currently only the read operations are fully supported."
+author:
+  - 'Tim Vroom <vroom@blockstackers.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-JotForm
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/tvroom/WebService-JotForm
+version: '0.020'

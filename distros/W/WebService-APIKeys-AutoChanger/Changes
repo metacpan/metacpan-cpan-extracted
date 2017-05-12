@@ -1,0 +1,8 @@
+Revision history for Perl extension WebService::APIKeys::AutoChanger
+
+0.00002    2009/10/26
+        - fix a bug( return 'undef' if you have run out of all available keys )
+        - fix a typo at POD ( 'conf' => 'config' )
+
+0.00001    2009/10/26 
+        - original version

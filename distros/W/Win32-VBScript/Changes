@@ -1,0 +1,49 @@
+Revision history for Win32::VBScript
+
+0.07 - 2016-01-21T20:03:17+01:00
+
+  [ENHANCEMENTS]
+
+  - in method _run() : level = 'tn' --> call recursively level 'pl'
+
+0.06 - 2016-01-21T17:57:30+01:00
+
+  [ENHANCEMENTS]
+
+  - going back to old functions (cscript, wscript) and adding (ontop)
+    also adding the async_... variety (async_cscript, async_wscript, async_ontop)
+
+0.05 - 2016-01-21T13:34:28+01:00
+
+  [ENHANCEMENTS]
+
+  - split up old functions (cscript, wscript, async)
+    into (pl_cscript, pl_wscript, pl_async)
+    and  (ms_cscript, ms_wscript, ms_async)
+
+  - remove use Win32::VBScript qw(:all); and
+    replace by Win32::VBScript qw(:ini);
+
+0.04 - 2016-01-16T21:43:59+01:00
+
+  [BUG-FIX]
+
+  - I simply forgot to add async to the list of exported functions
+
+0.03 - 2016-01-16T21:25:14+01:00
+
+  [ENHANCEMENTS]
+
+  - Add an asynchronous mode
+
+0.02 - 2016-01-16T21:04:33+01:00
+
+  [ENHANCEMENTS]
+
+  - Add the possibility to define functions in Visual Basic and in JavaScript
+
+0.01 - 2016-01-14T20:37:12+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.

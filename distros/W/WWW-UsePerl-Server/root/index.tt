@@ -1,0 +1,55 @@
+[% page.title = 'use.perl.org' %]
+
+<div class="container">
+
+[% USE Comma %]
+
+<div class="row">
+
+<div class="span4">
+<h1>[% count_stories | html | comma %] stories</h1>
+<ul>
+[% FOREACH story IN stories %]
+<li><a href="[% c.uri_for('article.pl', { sid => story.sid}) %]">[% story.title | html %]</a></li>
+[% END %]
+</ul>
+<ul class="pager">
+<li>
+<a href="/stories/">See more stories…</a>
+</li>
+</ul>
+</div> <!-- span4 -->
+
+<div class="span4">
+<h1>[% count_users | html | comma %] authors</h1>
+<ul>
+[% FOREACH user IN users %]
+<li><a href="[% c.uri_for('~' _ user.nickname _ '/' ) %]">[% user.nickname | html %]</a></li>
+[% END %]
+</ul>
+<ul class="pager">
+<li>
+<a href="/authors/">See more authors…</a>
+</li>
+</ul>
+</div> <!-- span4 -->
+
+<div class="span4">
+<h1>[% count_journals | html | comma %] journals</h1>
+<ul>
+[% FOREACH journal IN journals %]
+<li><a href="[% c.uri_for('~' _ journal.user.nickname _ '/journal/' _ journal.id )
+    %]">[% journal.user.nickname | html %]: [% journal.description | html %]</a></li>
+[% END %]
+</ul>
+<ul class="pager">
+<li>
+<a href="/journals/">See more journals…</a>
+</li>
+</ul>
+
+</div> <!-- span4 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

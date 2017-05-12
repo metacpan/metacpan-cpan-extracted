@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               WWW-LinkedIn
+version:            0.004
+abstract:           Simple interface to the LinkedIn OAuth API
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            perl
+distribution_type:  module
+test_requires:
+    Test::More:           0
+requires:
+  Carp: 0
+    Net::OAuth: 0
+    LWP::UserAgent: 0
+    HTTP::Request::Common: 0
+    Digest::MD5: 0
+    Digest::HMAC_SHA1: 0
+    MIME::Base64: 0
+    Crypt::SSLeay: 0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       Hand
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

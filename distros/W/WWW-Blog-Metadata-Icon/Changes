@@ -1,0 +1,10 @@
+# $Id: Changes 1818 2005-03-17 01:18:04Z btrott $
+
+Revision history for WWW::Blog::Metadata::Icon
+
+0.02  2006.04.21
+    - Fixed idiotic bug with HEAD of favicon.ico. Thanks to Tatsuhiko
+      Miyagawa for the patch.
+
+0.01  2005.03.16
+    - Initial distribution.

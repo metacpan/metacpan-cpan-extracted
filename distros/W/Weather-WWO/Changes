@@ -1,0 +1,32 @@
+0.07  2013-juliol-3
+      - Correct version number in Weather::WWO
+      - Simplify dependencies
+
+0.06  2013-maig-13
+      - Fix default to coderef style
+
+0.05  2013-maig-11
+      - Allow one to use new API (use_new_api => 1)
+      - Allow city names (thanks to fayland and TheSeparator)
+      - Converted to Moo
+
+0.04  2011-abril-19
+      Corrections:
+       -remove inc/ from distribution (srezic)
+
+      Updates:
+      - API source URL has changed to free.worldweatheronline.com
+
+0.03  2010-dec-21
+      Address Tests:
+      - add Data::Dumper::Concise dependencies.  This really doesn't have to be dep, 
+        but I use it so much and sometimes I forget to pull Dumper code before release 
+        so I'm just adding as a dependency.
+
+0.02  2010-dec-20
+      Improvements: 
+      - More POD
+
+0.01  2010-dec-19
+      - Initial Release
+

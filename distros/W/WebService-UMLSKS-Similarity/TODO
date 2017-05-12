@@ -1,0 +1,13 @@
+Todo items for WebService-UMLSKS-Similarity
+
+1) report back all shortest paths between two CUIs/terms, right now only 
+one is reported
+
+2) allow user to run with terms or CUIs as input
+
+3) update README to customize it to package
+
+4) filter special CUIs from SNOMEDCT that don't provide useful content 
+(and are essentially meta concepts that help to organize SNOMEDCT like 
+ambiguous concept or deprecated concept or reason not stated.
+

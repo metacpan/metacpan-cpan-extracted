@@ -1,0 +1,113 @@
+#
+# WWW::Restaurant::Menu::Overview
+#
+# (C) 2004-2005 Julian Mehnle <julian@mehnle.net>
+# $Id: Overview.pod,v 1.3 2005/01/15 16:04:23 julian Exp $
+#
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+WWW::Restaurant::Menu::Overview - An introduction to the WWW::Restaurant::Menu
+class collection.
+
+=head1 DESCRIPTION
+
+WWW::Restaurant::Menu is a collection of Perl classes for querying online menus
+of restaurants.
+
+=head2 About menus and menu items
+
+A menu class is directly or indirectly derived from B<WWW::Restaurant::Menu>
+and represents a certain type of menu of a restaurant.  Each restaurant's menu
+classes should be in the namespace
+WWW::Restaurant::I<CC>::I<City>::I<Restaurant>::Menu, where:
+
+=over
+
+=item I<CC>
+
+is the ISO 3166 "alpha 2" two-letter country code of the country where the
+restaurant is located.
+
+=item I<City>
+
+is the name of the city where the restaurant is located.
+
+=item I<Restaurant>
+
+is the name of the restaurant (unique within the specified city, if possible).
+
+=back
+
+For example, menu classes for I<John's Pub> in I<London> would be in the
+namespace WWW::Restaurant::GB::London::JohnsPub::Menu.
+
+Every menu consists of menu items.  A menu item class is directly or indirectly
+derived from B<WWW::Restaurant::Menu::Item>.
+
+For how menu objects give access to their menu items, see
+L<WWW::Restaurant::Menu>.  For how menu item objects give access to their
+properties, see L<WWW::Restaurant::Menu::Item>.
+
+=head2 Bundled menu classes
+
+The following prepared menu classes are included with this version of
+B<WWW::Restaurant::Menu> (without the common C<WWW::Restaurant::> prefix):
+
+=over
+
+=item I<DE::Munich::Edison::Menu::Lunch>
+
+The lunch menu of the Munich restaurant B<Edison>, which is available at
+L<http://www.edisonundco.de/mittag.htm>
+
+=back
+
+=head2 Bundled menu item classes
+
+The following prepared menu item classes are included with this version of
+B<WWW::Restaurant::Menu> (without the common C<WWW::Restaurant::Menu::Item::>
+prefix):
+
+=over
+
+=item I<Starter>
+
+=item I<Meal>
+
+=item I<Dessert>
+
+=item I<Drink>
+
+=back
+
+See L<WWW::Restaurant::Menu::Item> for more information.
+
+=head2 Writing menu classes
+
+Just inherit a new class from B<WWW::Restaurant::Menu>, and override the
+B<currency> and B<query> methods.
+
+=head1 SEE ALSO
+
+L<WWW::Restaurant::Menu>, L<WWW::Restaurant::Menu::Item>
+
+=head1 COPYRIGHT and LICENSE
+
+WWW::Restaurant::Menu is Copyright (C) 2004-2005 Julian Mehnle
+<julian@mehnle.net>.  All rights reserved.
+
+WWW::Restaurant::Menu is free software.  You may use, modify, and distribute it
+under the same terms as Perl itself, i.e. under the GNU GPL or the Artistic
+License.
+
+=head1 AUTHOR
+
+Julian Mehnle <julian@mehnle.net>
+
+=cut
+
+# vim:tw=79

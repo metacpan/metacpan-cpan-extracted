@@ -1,0 +1,155 @@
+=head1 NAME
+
+utils.pod - WordNet::SenseRelate::TargetWord supporting utilities
+
+=head1 SYNOPSIS
+
+The '/utils' subdirectory of the package contains supporting Perl
+programs. As part of the standard install, these
+are also installed into the system directories, and can be accessed from
+any working directory if the common system directories (/usr/bin,
+/usr/local/bin, etc.) are in your path.
+
+=head1 DESCRIPTION
+
+The '/utils' directory of the package contains a few support Perl programs,
+that provide command-line and graphical interfaces to the Perl modules are
+provided in the '/utils' directory of the package.
+
+=over
+
+=item disamb.pl
+
+Performs Word Sense Disambiguation on Senseval-2 lexical sample data. It
+uses the WordNet::SenseRelate::Reader::Senseval2 module to read a Senseval2
+lexical sample file, and then disambiguates each of the instances using the
+WordNet::SenseRelate::TargetWord module.
+
+Usage: disamb.pl [ [--config FILE] [--wnpath WNPATH] [--trace] XMLFILE | --help | --version]
+
+B<--config>=I<FILENAME>         
+    Specifies a configuration file (FILENAME) to set up the various
+    configuration options.
+
+B<--wnpath>=I<WNPATH>         
+    WNPATH specifies the path of the WordNet data files. Ordinarily, this
+    path is determined from the $WNHOME environment variable. But this
+    option overides this behavior.
+
+B<--trace>
+    Indicates that trace information be printed.
+
+B<--help>
+    Displays this help screen.
+
+B<--version>
+    Displays version information.
+
+
+Example:
+
+To disambiguate an English lexical sample file using the default options
+
+  disamb.pl eng-lex-samp.xml
+
+To dismabiguate an English lexical sample file, specifying configuration
+options and trace output
+
+  disamb.pl --config config.txt --trace eng-lex-sample.xml
+
+=item wps2sk.pl
+
+Creates a word#pos#sense to sensekey mapping of a Senseval-2 answer file
+(output by disamb.pl). In order to be able to evaluate the output of
+disamb.pl using software provided by the Senseval organizers, we need to
+covert the output of disamb.pl to the "SenseKey" format.
+
+Usage: wps2sk.pl [ [ --wnpath WNPATH] [FILE...] | --help | --version ]
+
+B<--wnpath>=I<WNPATH>
+    WNPATH specifies the path of the WordNet data files. Ordinarily, this
+    path is determined from the $WNHOME environment variable. But this
+    option overides this behavior.
+
+B<--quiet>
+    Run in quiet mode -- does not print informational messages. But it does
+    print warning or error messages if any.
+
+B<--help>
+    Displays this help screen.
+
+B<--version>
+    Displays version information.
+
+Example:
+
+To convert a captured output from disamb.pl
+
+  wps2sk.pl output.txt
+
+Typically used in a pipe with disamb.pl
+
+  disamb.pl xmlfile.xml | wps2sk.pl --quiet
+
+=item disamb-gui.pl
+
+Performs Word Sense Disambiguation on Senseval-2 lexical sample data
+(graphical interface to WordNet::SenseRelate::TargetWord). It uses the
+WordNet::SenseRelate::Reader::Senseval2 module to read a Senseval2 lexical
+sample file, and then allows the user to pick the instances that she wishes
+to disambiguate.
+
+Usage: disamb-gui.pl [ [--config FILE] [--wnpath WNPATH] [XMLFILE] | --help | --version]
+
+B<--config>=I<FILENAME>
+    Specifies a configuration file (FILENAME) to set up the various
+    configuration options.
+
+B<--wnpath>=I<WNPATH>
+    WNPATH specifies the path of the WordNet data files. Ordinarily, this
+    path is determined from the $WNHOME environment variable. But this
+    option overides this behavior.
+
+B<--help>
+    Displays this help screen.
+
+B<--version>
+    Displays version information.
+
+=back
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah, Salt Lake City
+ sidd at cs.utah.edu
+
+ Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+ banerjee+ at cs.cmu.edu
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 ALSO SEE
+
+L<intro.pod>, I<WordNet::SenseRelate::TargetWord>(3pm)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+Banerjee
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

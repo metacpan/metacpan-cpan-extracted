@@ -1,0 +1,20 @@
+# Generated from Makefile.PL
+Makefile
+Makefile.old
+Makefile.bak
+# Ignore distribution files.
+WWW-Wikipedia-LangTitles-[0-9]*/
+WWW-Wikipedia-LangTitles-[0-9]*.tar.gz
+# Ignore outputs of XS compilation.
+LangTitles.c
+LangTitles.bs
+# Ignore Perl compilation files.
+pm_to_blib
+blib/*
+MYMETA.*
+META.*
+ppport.h
+lib/WWW/Wikipedia/LangTitles.pod
+MANIFEST
+README
+examples/*-out.txt

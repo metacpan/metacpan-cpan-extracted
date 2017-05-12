@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+     <!DOCTYPE wta-wml PUBLIC "-//WAPFORUM//DTD WTA-WML 1.2//EN"
+                  "wta-wml12.dtd">
+<wta-wml>
+  <card id="abc" ordered="true">
+    <p>
+      <do type="accept">
+        <go href="http://xyz.org/s"/>
+      </do>
+      X: $(X)<br/>
+      Y: $(&#x59;)<br/>
+      Enter name: <input type="text" name="N"/>
+    </p>
+  </card>
+</wta-wml>

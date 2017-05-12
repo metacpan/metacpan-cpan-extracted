@@ -1,0 +1,21 @@
+Revision history for Perl extension WWW::Twilio::TwiML.
+
+1.05  Wed Nov 30 19:43:24 PST 2011
+    - autoloader inheritance and introspection cleanup (ht: chromatic)
+
+1.04  Tue Nov  8 15:43:33 MST 2011
+    - quiet undef errors
+
+1.03  Thu Sep 29 08:48:08 MDT 2011
+  - documentation fixes only (no code changes)
+
+1.02  Wed Sep 28 23:34:42 MDT 2011
+  - README fixes only (no code changes)
+
+1.01  Wed Sep 28 23:32:32 MDT 2011
+  - initial release
+
+0.01  Tue Aug 30 10:08:48 2011
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::Twilio::TwiML
+

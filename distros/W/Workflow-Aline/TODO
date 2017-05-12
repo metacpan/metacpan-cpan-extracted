@@ -1,0 +1,15 @@
+
+todo(future)
+{
+	further abstraction to waive the fixation on files. The workflow should be applicable also
+	to all kind of data which is in a DAG. 
+
+	New required: Build a Tree::DAG_Node on which Aline operates. The nodes could be data, files, objects, and mixes of all. 
+			The Aline should decide on which nodes it operates.
+
+	Split to
+
+	Workflow::Aline::OnFiles
+
+	Workflow::Aline::OnData
+}

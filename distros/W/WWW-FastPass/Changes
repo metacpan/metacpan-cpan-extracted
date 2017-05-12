@@ -1,0 +1,21 @@
+Revision history for Perl extension WWW::FastPass.
+
+0.05    22 December 2012
+        - More text updates.
+
+0.04    22 December 2012
+        - Minor text/makefile updates.
+
+0.03    13 July 2011
+        - (Changelog update only: the comment for 0.02 states that
+           Digest::SHA1 is core, but it is not. It being a dependency
+           of Net::OAuth is still sufficient reason to use it instead
+           of Digest::SHA, though.) 
+
+0.02    12 July 2011
+        - Incorporated patch from sthoenna@gmail.com to use Digest::SHA1,
+          instead of Digest::SHA, since the former is core and is already a
+          dependency of Net::OAuth.
+
+0.01    17 January 2011
+        - Initial release.

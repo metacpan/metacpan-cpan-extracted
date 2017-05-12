@@ -1,0 +1,16 @@
+# Installation
+
+## CPAN
+ 1. Ensure the cpan client is in your path
+    * `which cpan`
+ 1. cpan -i WebService::MyGengo
+ 1. Wait...
+
+## By-hand
+ 1. `perl Makefile.PL`
+    * When asked whether to install dependencies, select 'yes'
+ 1. `make && make test`
+ 1. `sudo make install`
+
+## Live Sandbox Testing
+ 1. See the TESTING file.

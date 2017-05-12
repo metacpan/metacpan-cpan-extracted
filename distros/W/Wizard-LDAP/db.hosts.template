@@ -1,0 +1,11 @@
+@ IN SOA fw.intern.saacke-pforzheim.de. root.fw.intern.saacke-pforzheim.de. (
+	1999040701 ; Serial
+	28800      ; Refresh
+	14400      ; Retry
+	3600000    ; Expire
+	86400 )    ; Minimum
+
+  IN NS fw.intern.saacke-pforzheim.de.
+
+localhost IN A 127.0.0.1
+

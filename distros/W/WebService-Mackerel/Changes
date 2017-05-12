@@ -1,0 +1,23 @@
+Revision history for Perl extension Webservice-Mackerel
+
+0.04 2017-02-22T07:30:31Z
+    - support to graph annotations api
+
+0.03 2015-08-18T05:23:03Z
+    - support to monitor api
+
+0.02 2015-07-05T08:05:11Z
+    - add the unimplemented methods. thanks @__papix__
+
+0.01 2014-11-28T10:58:14Z
+
+    - first version release
+
+0.01_2 2014-11-11T15:54:36Z
+
+    - change module name
+
+0.01_1 2014-11-11T04:36:44Z
+
+    - original version
+

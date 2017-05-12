@@ -1,0 +1,401 @@
+
+=head1 NAME
+
+Win32::GUI::Trackbar - A Win32::GUI package
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ClearSel
+
+B<ClearSel([REDRAW=1])>
+
+Clears the current selection.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ClearTics
+
+B<ClearTics([REDRAW=1])>
+
+Removes the current tick marks. Does not remove the first and last tick marks.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBuddy
+
+B<GetBuddy(LOCATION)>
+
+Retrieves the handle to a trackbar control buddy window at a given location.
+
+The specified location is relative to the control's orientation (horizontal or vertical).
+
+ B<LOCATION> = FALSE : Retrieves buddy to the right of the trackbar (or below for vertical trackbar)
+ B<LOCATION> = TRUE  : Retrieves buddy to the left of the trackbar (or above for vertical trackbar)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetChannelRect
+
+B<GetChannelRect()>
+
+Retrieves the bounding rectangle for a trackbar's channel.
+The channel is the area over which the slider moves. It contains the highlight when a range is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLineSize
+
+B<GetLineSize()>
+
+Retrieves the number of logical positions the trackbar's slider moves in response to keyboard input from the arrow keys, such as the RIGHT ARROW or DOWN ARROW keys.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNumTics
+
+B<GetNumTics()>
+
+Retrieves the number of logical positions the trackbar's slider moves in response to keyboard input from the arrow keys, such as the RIGHT ARROW or DOWN ARROW keys.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPageSize
+
+B<GetPageSize()>
+
+Retrieves the number of logical positions the trackbar's slider moves in response to keyboard input, such as the PAGE UP or PAGE DOWN keys, or mouse input, such as clicks in the trackbar's channel.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPics
+
+B<GetPics()>
+
+Retrieves an array of logical positions of the trackbar's tick marks, not including the first and last tick.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPos
+
+B<GetPos()>
+
+Retrieves the current logical position of the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRangeMax
+
+B<GetRangeMax()>
+
+Retrieves the maximum position for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRangeMin
+
+B<GetRangeMin()>
+
+Retrieves the minimum position for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelEnd
+
+B<GetSelEnd()>
+
+Retrieves the ending position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelStart
+
+B<GetSelStart()>
+
+Retrieves the starting position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetThumbLength
+
+B<GetThumbLength()>
+
+Retrieves the length of the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetThumbRect
+
+B<GetThumbRect()>
+
+Retrieves the bounding rectangle for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTic
+
+B<GetTic(index)>
+
+Retrieves the logical position of a tick mark in a trackbar or -1 for a valid index.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTicPos
+
+B<GetTicPos(index)>
+
+Retrieves the distance, in client coordinates, from the left or top of the trackbar's client area of a tick mark in a trackbar or -1 for a valid index.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolTips
+
+B<GetToolTips()>
+
+Retrieves the handle to the tooltip control assigned to the trackbar, if any.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Max
+
+B<Max([VALUE],[REDRAW=1])>
+
+Set or Get maximal logical position for the slider in a trackbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Min
+
+B<Min([VALUE],[REDRAW=1])>
+
+Set or Get minimum logical position for the slider in a trackbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Pos
+
+B<Pos([VALUE],[REDRAW=1])>
+
+Set or Get maximum logical position for the slider in a trackbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelEnd
+
+B<SelEnd([VALUE],[REDRAW=1])>
+
+Set or Get the starting logical position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelStart
+
+B<SelStart([VALUE],[REDRAW=1])>
+
+Set or Get the starting logical position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBuddy
+
+B<SetBuddy(LOCATION, HWND)>
+
+Assigns a window as the buddy window for a trackbar control
+Returns the handle to the window that was previously assigned to the control at that location
+The specified location is relative to the control's orientation (horizontal or vertical).
+LOCATION = FALSE : Retrieves buddy to the right of the trackbar (or below for vertical trackbar)
+LOCATION = TRUE  : Retrieves buddy to the left of the trackbar (or above for vertical trackbar)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetLineSize
+
+B<SetLineSize([SIZE=1])>
+
+Sets the number of logical positions the trackbar's slider moves in response to keyboard input from the arrow keys, such as the RIGHT ARROW or DOWN ARROW keys.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPageSize
+
+B<SetPageSize([SIZE=10])>
+
+Sets the number of logical positions the trackbar's slider moves in response to keyboard input, such as the PAGE UP or PAGE DOWN keys, or mouse input, such as clicks in the trackbar's channel.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPos
+
+B<SetPos(POSITION, [REDRAW=TRUE])>
+
+Sets the current logical position of the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRange
+
+B<SetRange([MIN=0], MAX, [REDRAW=TRUE])>
+
+Sets the range of minimum and maximum logical positions for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRangeMax
+
+B<SetRangeMax(MAX, [REDRAW=TRUE])>
+
+Sets the maximum logical position for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRangeMin
+
+B<SetRangeMin(MIN, [REDRAW=TRUE])>
+
+Sets the minimum logical position for the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSel
+
+B<SetSel([MIN=0], MAX, [REDRAW=TRUE])>
+
+Sets the starting and ending logical positions for the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSelEnd
+
+B<SetSelEnd(END, [REDRAW=TRUE])>
+
+Sets the ending logical position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSelStart
+
+B<SetSelStart(START, [REDRAW=TRUE])>
+
+Sets the starting logical position of the current selection range in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetThumbLength
+
+B<SetThumbLength(SIZE)>
+
+Sets the length of the slider in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTic
+
+B<SetTic(POSITION)>
+
+Sets a tick mark in a trackbar at the specified logical position.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTicFreq
+
+B<SetTicFreq(POSITION)>
+
+Sets the interval frequency for tick marks in a trackbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTipSide
+
+B<SetTipSide(LOCATION)>
+
+Positions a tooltip control used by a trackbar control.
+TBTS_TOP : The tooltip control will be positioned above the trackbar. This flag is for use with horizontal trackbars.
+TBTS_LEFT  The tooltip control will be positioned to the left of the trackbar. This flag is for use with vertical trackbars.
+TBTS_BOTTOM  The tooltip control will be positioned below the trackbar. This flag is for use with horizontal trackbars.
+TBTS_RIGHT  The tooltip control will be positioned to the right of the trackbar. This flag is for use with vertical trackbars.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(HWND)>
+
+Assigns a tooltip control to a trackbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. B<SCROLLBAR> identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+B<OPERATION> can be compared against one of the following constants:
+
+ SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+ SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+ SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

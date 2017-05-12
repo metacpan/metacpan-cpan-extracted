@@ -1,0 +1,25 @@
+---
+abstract: 'Extract links from Wikipedia pages'
+author:
+  - 'Moritz Lenz <moritz@faui2k3.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Wikipedia-Links
+provides:
+  WWW::Wikipedia::Links:
+    file: lib/WWW/Wikipedia/Links.pm
+    version: 0.02
+requires:
+  Mojo: 1.034
+  perl: 5.008002
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

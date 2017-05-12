@@ -1,0 +1,55 @@
+#
+# Test case for [% package_name %]::[% method.class_name %]
+#
+
+use strict;
+use Test::More;
+
+[% make_env_params_check(method) %]
+plan tests => [% make_test_count(2, method) %];
+
+use_ok('[% package_name %]::[% method.class_name %]');
+
+my $service = [% package_name %]::[% method.class_name %]->new();
+
+ok( ref $service, 'new [% package_name %]::[% method.class_name %]()' );
+
+[% FOREACH test = method.tests -%]
+[% name = (test.name or "Test[${loop.index}]") -%]
+[% name = "${method.name} / $name" -%]
+[% "# $name" %]
+{
+    my $params = {
+[% FOREACH key = sort_keys(test.params) -%]
+        '[% key %]' => [% test.params.$key | $env_param %],
+[% END -%]
+    };
+
+    my $res = [% package_name %]::[% method.class_name %]->new();
+    $res->add_param(%$params);
+    eval { $res->request(); };
+
+[% SWITCH test.type -%]
+[% CASE "lib_error" -%]
+    ok( $@, '[% name %]: die' );
+[% CASE "error" -%]
+    ok( ! $@, '[% name %]: die' );
+    ok( $res->is_error, '[% name %]: is_error' );
+[% CASE -%]
+    ok( ! $@, '[% name %]: die' );
+    ok( ! $res->is_error, '[% name %]: is_error' );
+    my $root = $res->root;
+    ok( ref $root, '[% name %]: root' );
+[% FOREACH node = method.return.to_array -%]
+[% NEXT IF node.depth < 2 -%]
+[% NEXT IF node_nullable(node) -%]
+    ok( eval { defined $root[% node_access(node) %] }, '[% name %]: [% node.name %]' );
+[% IF node.multiple -%]
+    ok( eval { ref $root[% node_access(node) %] eq 'ARRAY' }, '[% name %]: [% node.name %]' );
+[% END -%]
+[% END -%]
+[% END -%]
+}
+
+[% END -%]
+1;

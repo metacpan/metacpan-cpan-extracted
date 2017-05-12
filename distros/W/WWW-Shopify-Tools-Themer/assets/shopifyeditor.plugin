@@ -1,0 +1,10 @@
+[Plugin]
+Loader=python
+Module=shopifyeditor
+IAge=3
+Name=Shopify Editor
+Description=A plugin that enables theme management with shopify.
+Authors=Adam Harrison <adamdharrison@gmail.com>
+Copyright=Copyright © 2013 Adam Harrison <adamdharrison@gmail.com>
+Icon=shopify-icon
+Website=http://search.cpan.org/~adamdh/WWW-Shopify-Tools-Themer/

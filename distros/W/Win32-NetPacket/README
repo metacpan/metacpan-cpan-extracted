@@ -1,0 +1,77 @@
+Win32/NetPacket version 0.03
+============================
+
+The module Win32::NetPacket provides an Object-Oriented interface
+to the Packet Driver API (packet.dll). packet.dll is a part of
+WinPcap: the Free Packet Capture Architecture for Windows.
+
+packet.dll offers a set of low level functions to sniff the
+network traffic, send packets to the network, obtain the list
+of the available network adapters, retrieve various information
+about an adapter, ...etc
+
+WinPCap is a software developed by the Politecnico di Torino.
+
+PREREQUISITES
+
+In order to use Win32::NetPacket in your Perls scripts, it is
+necessary to install WinPcap on your machine.
+
+* Download WinPcap 3.1:
+
+  http://www.winpcap.org/install/default.htm
+
+file: auto-installer (driver +DLLs), and run the executable.
+
+* For the compilation, download the Developer's pack:
+
+  http://www.winpcap.org/devel.htm
+
+(file: wpdpack_3_1.zip) and unzip it in a directory.
+
+* Because the header file Ntddndis.h in the C:\WpdPack\Include directory is 
+  out-of-date, it is necessary to replace it by the one contained in a 
+  recent SDK or DDK.
+
+  http://www.microsoft.com/downloads/details.aspx?FamilyID=a55b6b43-e24f-4ea3-a93e-40c0ec4f68e5&DisplayLang=en
+
+INSTALLATION
+
+Edit the Makefile.PL and set $WPCAP to the path of the WPcap
+library (default is C:\WpdPack\).
+
+To install the module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+   
+NOTES
+
+* If the compiler prints error messages like that:
+  ... error C2079: 'IPAddress' uses undefined struct 'sockaddr_storage'
+  ... error C2079: 'SubnetMask' uses undefined struct 'sockaddr_storage'
+  ... error C2079: 'Broadcast' uses undefined struct 'sockaddr_storage'
+  (typically with VC6.0), your header files are out-of-date.
+  Download and install the last platform SDK.
+
+* If some tests of t\04_cst.t fail 
+    "#     Failed test (t\04_cst.t at line 25)"
+  you are using the old Ntddndis.h file in WpdPack\Include\. 
+  Replace it by a new one or, if you have installed the platform SDK, 
+  delete it. (The compiler will use the one in the
+  C:\Program Files\Microsoft SDK\include\ directory.)
+  If you use a old Ntddndis.h file, the module will work, but some 
+  OID constants won't be defined.
+
+DEPENDENCIES
+
+This module requires these other modules: Exporter and DynaLoader
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003-2006 J-L Morel. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

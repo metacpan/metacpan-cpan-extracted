@@ -1,0 +1,7 @@
+=== Skimmable Code ===
+
+Speaker: Michael Schwern
+
+"Skimmable" meaning code that you can confidently read and work with just a small part of without having to study the whole.  Why it's important, what the key traits of skimmability are, how you can tell if you have skimmable code and how you can write skimmable code.
+
+A lot of this gets into "lexical encapsulation" which is a term I like to throw around and assume everyone else understands why it's REALLY IMPORTANT but don't actually know if other folks Get It.

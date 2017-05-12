@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-MelissaData-PhoneLocation.t
+lib/WWW/MelissaData/PhoneLocation.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<Window name='W'
+		dim='0, 0, 400, 200'
+		title='Wizard with WGXPanel Example'
+		class='$self->{C}'
+		onTerminate='sub { $_[0]->PostQuitMessage(0); return -1; }'
+	>
+		<WGXExec>$self->{W}->Center</WGXExec>
+		<StatusBar name='S' 
+			top='exec:$self->{W}->ScaleHeight - $self->{S}->Height if defined $self->{S}'
+			height='exec:$self->{S}->Height if defined $self->{S}'
+			text='exec:$Win32::GUI::XMLBuilder::AUTHOR'
+		/>
+
+			<WGXPanel name='P0'>
+				<Label 
+					dim='50, 50, %P%->Width-50, %P%->Height-50'
+					text='Please press "Next" to continue...'
+				/>
+				<Button
+					dim='%P%->Width-100, %P%->Height-40, 60, 20'
+					text='Next >'
+					onClick='sub { %P%->Hide; $self->{P1}->Show; }'
+				/>
+			</WGXPanel>
+			
+			<WGXPanel name='P1' show='0'>
+				<Label 
+					dim='50, 50, %P%->Width-50, %P%->Height-50'
+					text='Page 2 - Please press "Next" to continue...' 
+				/>
+				<Button
+					dim='%P%->Width-170, %P%->Height-40, 60, 20'
+					text='&lt; Back'
+					onClick='sub { %P%->Hide; $self->{P0}->Show; }'
+				/>
+				<Button
+					dim='%P%->Width - 100, %P%->Height-40, 60, 20'
+					text='Next >'
+					onClick='sub { %P%->Hide; $self->{P2}->Show; }'
+				/>
+			</WGXPanel>
+			
+			<WGXPanel name='P2'  show='0'>
+				<Label 
+					dim='50, 50, %P%->Width-50, %P%->Height-50'
+					text='Page 3 - Please press "Next" to continue...' 
+				/>
+				<Button
+					dim='%P%->Width-170, %P%->Height-40, 60, 20'
+					text='&lt; Back'
+					onClick='sub { %P%->Hide; $self->{P1}->Show; }'
+				/>
+				<Button
+					dim='%P%->Width - 100, %P%->Height-40, 60, 20'
+					text='Next >'
+					onClick='sub { %P%->Hide; $self->{P3}->Show; }'
+				/>
+			</WGXPanel>
+			
+			<WGXPanel name='P3'  show='0'>
+				<Label 
+					dim='50, 50, %P%->Width-50, %P%->Height-50'
+					text='Please press "Finish" to complete.' 
+				/>
+				<Button
+					dim='%P%->Width-170, %P%->Height-40, 60, 20'
+					text='&lt; Back'
+					onClick='sub { %P%->Hide; $self->{P2}->Show; }'
+				/>
+				<Button 
+					dim='%P%->Width - 100, %P%->Height-40, 60, 20'
+					text='Finish'
+					onClick='sub { $self->{W}->PostQuitMessage(0); return -1; }'
+				/>
+			</WGXPanel>
+
+	</Window>
+</GUI>

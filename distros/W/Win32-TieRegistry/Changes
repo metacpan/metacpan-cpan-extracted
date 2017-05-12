@@ -1,0 +1,102 @@
+Revision history for Perl extension Win32::TieRegistry.
+
+0.30  2016-02-20 - same as 0.29_03
+
+0.29_03 2016-01-31
+    - 02_main.t should not fail now
+    - use Appveyor
+    - add a test for RT#23328
+
+0.29_02 2015-04-27
+    - Even better diagnostics in case of failure in 02_main.t
+
+0.29_01 2015-04-12
+    - Better diagnostics in case of failure in 02_main.t
+
+0.29  2015-04-05
+    - Fixed error that appeared in 02_main.t when running as regular user
+
+0.28  2015-02-26
+    - Fixed error in sub _enumValues
+
+0.27  2015-02-15
+    - Fixed error that appeared on Strawberry perl 5.20
+    - General distribution maintenance
+
+0.26 Sun 19 Apr 2009
+	- Removing legacy Install.bat
+	- Moving existing test script to t directory
+	- Moving pm files into lib
+	- Cleaned up the legacy Tie::Registry so it has POD
+	  (that mostly just says it is deprecated)
+	- Migrated test to Test::More
+
+0.25  missing
+
+0.24  2001-02-06 19:00
+	- Silenced error that could appear "at random" during "cleanup":
+		(Can't call method "FETCH" on an undefined value)
+	- Added a nearly trivial test suite.
+
+0.23  1999-07-03 00:06
+	- Fixed two embarrassing typographical errors.
+	- Using invalid REG_* or KEY_* constant as string now detected.
+	- With ArrayValues(1), $key->{NonExistantValueName} used to return
+	  C<[]> but now returns C<undef> [or C<()>].  Old code like
+	  C<if( $reg->{value}->[0] )> should still work but now can be
+	  improved to C<if( $reg->{value} )> [which used to always be true
+	  when the ArrayValues option was enabled].
+	- All implicit C<return>s made explicit [C<$val;> to C<return $val;>].
+	- Simplified C<return wantarray ? () : undef> to C<return ()>.
+
+0.22  1999-04-09 22:13
+	- C<new Win32::TieRegistry> and "Win32::TieRegistry->new" now work.
+	- CreateKey()'s "disposition" argument now can get its string value
+	  set to "REG_CREATED_NEW_KEY" or "REG_OPENED_EXISTING_KEY".
+	- GetOptions()'s fancier usages defined.
+	- New documentation section on exports [C<use> and C<import()>].
+	- New documentation section on best ways to use symbolic constants.
+	- New documentation section on probable future directions.
+	- Minor documentation fixes.
+
+0.21  1998-09-17 14:49
+	- Remove a few "harmless" warnings reported by C<-w>.
+
+0.20  1998-07-14 14:14
+	- Renamed to Win32::TieRegistry.
+	- Added options:  SplitMultis, FixSzNulls,
+	    DWordToHex, DualBinVals, and DualTypes.
+	- Added hooks for future option, TieValues.
+	- Most methods now return a tied ref. if called via one:
+	    Open(), Load(), Connect(), and CreateKey().
+	- Changed import() to support setting options.
+	- More options on what to "export" and to where.
+	- Each time you C<use>, you get a _separate copy_ of $Registry.
+	- New methods:  Clone(), GetOptions(), and SetOptions().
+	- Flush() no longer calls RegFlushKey() by default.
+	- Optimize deletes to be faster in void contexts.
+	- If delete OK but fetch of old val failed, have C<delete> return $^E.
+	- "Disposition" option to CreateKey() no longer considered invalid.
+	- CreateKey() always used OS_Delimiter to parse subkey paths.
+	- Load()'s second argument can now be new subkey name.
+	- Load() via remote key w/o specific new subkey name no longer tries
+	    to load into _local_ LMachine.
+	- Finished POD.
+
+0.15  1998-07-14 14:14
+	- "Stub" version of Tie::Registry for backward compatibility only.
+
+0.14  Never released
+	- Added Install.bat for people without a version of "make".
+	- Report key path when STORE fails.
+
+0.13  1998-03-31 20:50
+	- "Delimiter" now spelled correctly throughout (sigh).
+	- SetValue now translates "REG_*" strings to numeric constants.
+	- Removed dependance on $^E being tied to Win32::GetLastError().
+
+0.12  1997-12-29 10:11
+	- misc.
+
+0.10  1997-11-21 15:08
+	- original, limited install, named Tie::Registry.

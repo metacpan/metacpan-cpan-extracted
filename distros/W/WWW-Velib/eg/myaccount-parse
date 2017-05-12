@@ -1,0 +1,68 @@
+use strict;
+use warnings;
+
+my $str = do { local $/ = undef; <> };
+
+my $abo_re = qr{<h2 class="pad_bot2">Mon compte</h2>
+<div class="border_vert">\s*<div class="content">
+\s*<h3 class="titre_top titre_top_compte">Mon abonnement</h3>
+\s*<div class="breaker"></div>
+\s*<div class="info_compte">
+\s*<p><span>Votre compte prend fin le :</span> ([^<]+)</p>
+\s*<p><span>Il vous reste encore (\d+) jours d'abonnement</span></p>
+\s*<p><span>\s+Vous n'avez pas de vélo en cours de location.};
+
+print "abo ", $str =~ /$abo_re/ ? "fin $1 days $2" : 0, "\n";
+
+my $solde_re = qr{<h3 class="titre_top titre_top_compte">
+\s*Mon paiement en ligne</h3>
+\s*<div class="breaker"></div>
+\s*<div class="info_compte">
+\s*<p><span>Solde :</span>(\S+) &euro;</p>};
+
+print "solde ", $str =~ /$solde_re/ ? $1 : '-', "\n";
+
+my $conso_re = qr{<h3 class="titre_top titre_top_compte2">Ma consommation en (\S+) (\d+)</h3>
+\s*<div class="breaker"></div>
+\s*<div class="results">
+\s*<table border="0" summary="tableau de consomation">
+\s*<tr>
+\s*<th scope="col" class="col1">Nbre de trajets</th>
+\s*<th scope="col" class="col4">Temps cumulé</th>
+\s*<th scope="col" class="col4">Montant</th>
+\s*</tr>
+\s*<tr class="pyjama">
+\s*<td>(\d+)</td>
+\s*<td>([^<]+)</td>
+\s*<td>(\S+) &euro;</td>};
+
+print "conso ", $str =~ /$conso_re/
+    ? "mois $1 year $2 trips $3 time $4 solde $5"
+    : 0, "\n";
+
+my $meteo_re = qr{Météo</h2>
+\s*<div class="border">
+\s*<h3><span>Paris, France</span> ([^<]+)</h3>
+\s*<table width="100%" border="0">
+\s*<tr>
+\s*<td>([^<]+)</td>
+\s*<td>([^<]+)</td>
+\s*<td>([^<]+)</td>
+\s*</tr>
+\s*<tr>
+\s*<td><img src="([^"]+)" alt="" class="png" width="48" height="48" /></td>
+\s*<td><img src="([^"]+)" alt="" class="png" width="48" height="48" /></td>
+\s*<td><img src="([^"]+)" alt="" class="png" width="48" height="48" /></td>
+\s*</tr>
+\s*<tr>
+\s*<td>
+(\d+)°</td>
+\s*<td>
+(\d+)°</td>
+\s*<td>
+(\d+)°</td>};
+
+print "meteo ", $str =~ /$meteo_re/
+    ? "date $1 $2:$8 $3:$9 $4:$10\n$5\n$6\n$7"
+    : 0, "\n";
+

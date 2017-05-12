@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:13">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.political_science" parent_id="science">
+<Name>Political Science</Name>
+<Details summary="" depth="1" element_count="883" />
+<SubCategories>
+<SubCategory id="science.political_science.history" />
+<SubCategory id="science.political_science.bibliography" />
+<SubCategory id="science.political_science.congresses" />
+<SubCategory id="science.political_science.right_and_left" />
+<SubCategory id="science.political_science.study_and_teaching" />
+<SubCategory id="science.political_science.views_and_contributions" />
+<SubCategory id="science.political_science.reference" />
+<SubCategory id="science.political_science.regions" />
+<SubCategory id="science.political_science.research" />
+<SubCategory id="science.political_science.decision_making" />
+<SubCategory id="science.political_science.models_and_simulation" />
+<SubCategory id="science.political_science.opposition" />
+<SubCategory id="science.political_science.literature" />
+<SubCategory id="science.political_science.aristocracy" />
+<SubCategory id="science.political_science.international_relations" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

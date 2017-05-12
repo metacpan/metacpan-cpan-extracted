@@ -1,0 +1,15 @@
+NAME
+
+    WebService::Raygun - Connect to the Raygun.io API
+
+DESCRIPTION
+
+    Send error data to Raygun.io <https://raygun.io>
+
+SEE ALSO
+
+    WebService::Raygun::Messenger
+
+      This is the entry point for interfacting with Raygun
+      <https://raygun.io>.
+

@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+#
+# item_extract
+#
+# version 1.01, 9-4-06, michael@bizsystems.com
+#
+# script to extract an "item" from an htmlized POD doc
+#
+# input:	path to pod.html,
+#		item name
+# prints:	item text/html
+
+exit 1 unless @ARGV == 2;
+my($pod,$item) = @ARGV;
+exit 1 unless -e $pod && -r $pod;
+ 
+open(F,$pod);
+
+my $txt;
+my $on = 0;
+while(<F>) {
+  if ($_ =~ /<a name/i) {
+    if ($_ =~ /<a name.+item.*${item}/i) {
+      $txt = $_;
+      $on = 1;
+    } else {
+      $on = 0;
+    }
+  }
+  elsif ($on) {
+      $txt .= $_;
+  }
+}
+close F;
+
+print $txt;

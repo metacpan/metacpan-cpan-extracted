@@ -1,0 +1,12 @@
+Revision history for Win32::CLR
+
+0.03    Tue Jul  1 00:00:34 2008
+        * Added exception handling.
+        * Added SvOK() to quiet "Use of uninitialized value" warnings.
+        * Added document: get_type_name(), get_qualified_type()
+
+0.02    Tue Jan  1 20:23:14 2008
+        * Minor changes: Fixed document typo, code behavior not changed.
+
+0.01    Sun Dec 30 11:17:47 2007
+        * First release.

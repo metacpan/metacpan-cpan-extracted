@@ -1,0 +1,13 @@
+Source: libwebservice-advogato-perl
+Section: perl
+Priority: optional
+Build-Depends-Indep: debhelper (>= 3.0.5), perl (>= 5.8.0-7)
+Maintainer: Jaldhar H. Vyas <jaldhar@debian.org>
+Standards-Version: 3.6.1
+
+Package: libwebservice-advogato-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, librpc-xml-perl
+Description:  XML-RPC interface to www.advogato.org
+ This module implements the XML-RPC interface to the diaries at www.advogato.org
+ a site for developers of free software.

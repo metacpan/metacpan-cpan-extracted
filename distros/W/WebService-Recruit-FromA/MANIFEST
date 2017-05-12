@@ -1,0 +1,15 @@
+lib/WebService/Recruit/FromA.pm
+lib/WebService/Recruit/FromA/Base.pm
+lib/WebService/Recruit/FromA/JobSearch.pm
+LICENSE
+make-dist.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_pod.t
+t/01_new.t
+t/02_new_methods.t
+t/03_setget.t
+t/04_Method_JobSearch.t
+t/05_FromA.t
+META.yml                                 Module meta-data (added by MakeMaker)

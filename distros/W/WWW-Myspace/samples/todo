@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w -I../lib
+######################################################################
+# todo
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: todo,v 1.1 2006/01/28 03:13:41 grant Exp $
+######################################################################
+# Copyright (c) 2004 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+# Prints the list of friends post_comments would post to.
+# It does this by reading all friendIDs, then reading the
+# exclusions list, then going through each friendID. If the friendID
+# is already on the exclusions list, or if WWW::Myspace::already_commented
+# returns true (that is, it checks for a comment on the user's profile),
+# the friendID is not added to the TODO list.
+#
+# usage: todo "username" "password" > file
+#
+# todo prints status info to STDERR and sends its final list to
+# STDOUT. "file" will contain a list of friendIDs, one per line.
+
+#---------------------------------------------------------------------
+# Setup Variables
+
+# Debugging?
+#our $DEBUG=0;
+
+#---------------------------------------------------------------------
+# Libraries
+
+use WWW::Myspace;
+use WWW::Myspace::Comment;
+
+######################################################################
+# Main Program
+
+my $myspace= new WWW::Myspace( @ARGV );
+my $comment = new WWW::Myspace::Comment( $myspace );
+
+my @friends = $myspace->get_friends;
+
+my $exclusions = $comment->commented;
+
+my @todo=();
+my $id;
+
+my $friend_count = @friends;
+my $counter = 0;
+
+foreach $id ( @friends ) {
+	$counter++;
+	warn "Processing $id - $counter of $friend_count\n";
+	unless ( ( defined $exclusions->{"$id"} ) || ( $myspace->already_commented( $id ) ) ) {
+		push ( @todo, $id );
+	}
+}
+
+foreach $id ( @todo ) {
+	print $id . "\n";
+}

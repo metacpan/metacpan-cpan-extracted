@@ -1,0 +1,78 @@
+---
+abstract: 'Perl module for accessing the Echo Nest API.'
+author:
+  - 'Brian Sorahan <bsorahan@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-EchoNest
+provides:
+  WWW::EchoNest:
+    file: lib/WWW/EchoNest.pm
+    version: v0.0.2
+  WWW::EchoNest::Artist:
+    file: lib/WWW/EchoNest/Artist.pm
+  WWW::EchoNest::ArtistProxy:
+    file: lib/WWW/EchoNest/ArtistProxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Build:
+    file: lib/WWW/EchoNest/Build.pm
+    version: v0.0.2
+  WWW::EchoNest::Catalog:
+    file: lib/WWW/EchoNest/Catalog.pm
+  WWW::EchoNest::CatalogProxy:
+    file: lib/WWW/EchoNest/CatalogProxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Config:
+    file: lib/WWW/EchoNest/Config.pm
+    version: v0.0.2
+  WWW::EchoNest::Functional:
+    file: lib/WWW/EchoNest/Functional.pm
+    version: v0.0.2
+  WWW::EchoNest::Id:
+    file: lib/WWW/EchoNest/Id.pm
+    version: v0.0.2
+  WWW::EchoNest::Logger:
+    file: lib/WWW/EchoNest/Logger.pm
+  WWW::EchoNest::Playlist:
+    file: lib/WWW/EchoNest/Playlist.pm
+  WWW::EchoNest::PlaylistProxy:
+    file: lib/WWW/EchoNest/PlaylistProxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Preferences:
+    file: lib/WWW/EchoNest/Preferences.pm
+  WWW::EchoNest::Proxy:
+    file: lib/WWW/EchoNest/Proxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Result::List:
+    file: lib/WWW/EchoNest/Result/List.pm
+    version: v0.0.2
+  WWW::EchoNest::Song:
+    file: lib/WWW/EchoNest/Song.pm
+    version: v0.0.2
+  WWW::EchoNest::SongProxy:
+    file: lib/WWW/EchoNest/SongProxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Track:
+    file: lib/WWW/EchoNest/Track.pm
+  WWW::EchoNest::TrackProxy:
+    file: lib/WWW/EchoNest/TrackProxy.pm
+    version: v0.0.2
+  WWW::EchoNest::Util:
+    file: lib/WWW/EchoNest/Util.pm
+    version: v0.0.2
+recommends:
+  File::Which: 0
+  Log::Log4perl: 0
+requires:
+  JSON: 0
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.2

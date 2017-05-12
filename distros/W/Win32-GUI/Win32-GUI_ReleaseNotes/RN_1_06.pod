@@ -1,0 +1,312 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_06 - release notes for v1.06 of Win32::GUI
+
+=head1 Release Date
+
+13th February, 2008.
+
+=head1 Summary of Changes
+
+This is a summary of changes between V1.05 and V1.06
+See the CHANGELOG file in the distribution for the
+full detail.
+
+This release is a primarily a bug-fix release addressing the issues
+below.  There are a small number of new features. Minor changes have
+been made to enable correct building with the new perl 5.10.0
+
+Please note that this is intended to be the last release that is
+compatible with the Perl 5.6 series.
+
+=head2 New Features
+
+=over
+
+=item More constants
+
+Win32::GUI::Constants now has over 2000 constants. Please keep
+reporting any that you need that are missing.
+
+=item Win32::GUI::DC::DrawFrameControl can DFCS_ADJUSTRECT
+
+DrawFrameControl() will now adjust it's input parameters
+if the DFCS_ADJUSTRECT flag is set and the input parameters
+are not readonly.
+
+=item Dialog navigation for MDI Windows
+
+Salvadore Oritz submitted a patch to allow 'TAB' navigation
+between controls of an MDI child window.  The '-dialogui' is
+now functional on MDI child windows.
+
+=item Confusion with GetParent() and TreeView windows
+
+The GetParent() method usually gets the parent window, but for
+the Treeview class it gets the parent node:
+
+  $parent_node = $tree_view->GetParent($node);
+
+This made it difficult to get the parent window.  Now, if the
+GetParent() method is called without an arguements it returns
+the parent window:
+
+  $parent_window = $tree_view->GetParent();
+
+=back
+
+=head2 Bug Fixes
+
+=over
+
+=item Balloon Tooltip info and warning icons swapped
+
+The info and warning icon for balloon tooltips
+were the wrong way round.  This is fixed. (Tracker: 1709017)
+
+=item Textfield::GetLine() truncates lines
+
+Textfield::GetLine() has been re-written to stop it
+truncating lines, and to correctly return empty
+lines.
+
+=item '-prompt' option to Textfield
+
+The '-prompt' option to the Textfield constructor would
+generate warnings and place the label incorrectly when
+used to supply a label only:
+
+  -prompt => 'Some Label:',
+
+This should now be fixed.  Note that if you were relying on
+the previouly incorrect placement (always against the left
+border), then you may need to re-position your labels.
+(Tracker: 1734697)
+  
+=item Warning During Global Destruction
+
+It was common to get a warning like:
+
+  (in cleanup) Can't call method "DELETE" on an undefined value at C:/Perl
+  /site/lib/Win32/GUI.pm line 3451 during global destruction.
+
+This is now, hopefully, fixed.  Please report if you still see errors
+like this.
+
+=item Memory leaks
+
+Various memory leaks have been resolved.
+
+=item Win32::GUI::Scintilla buffer sizes
+
+There were several places in the Scintilla wrapper
+code where buffers of the wrong sizes were allocated.
+This has been fixed.
+
+=item Win32::GUI::Scroll return value
+
+On failure Win32::GUI::Scroll was supposed to return undef,
+but was returning random garbage.  This has been fixed,
+along with updates to the documentation.
+
+=item Win32::GUI::RichEdit::LimitText()
+
+There was a typo in the function name (LimiteText()). Both
+spellings are now supported.
+
+=item ListView BeginLabelEdit event
+
+The second argument was being set incorrectly when the callback
+was made.  This is now fixed. (Tracker: 1706901)
+
+=item ListView SelectedItems may now return an empty list
+
+Win32::GUI::ListView::SelectedItems used to return C<undef> when
+there were no items selected.  It now returns an empty list, to
+better support things like:
+
+  for my $item ($listview->SelectedItems()) {
+    # do something with the selected $item
+  }
+
+=item TreeView::GetItem may now return an empty list
+
+Win32::GUI::TreeView::GetItem (and Win32::GUI::TreeView::ItemInfo)
+used to return C<undef> when asked about a non-existing
+item.  In now returns an empty list to better support
+things like:
+
+  my %node_info = $treeview->GetItem($item);
+
+=item Crash when destroying a window during a callback
+
+It is possible to write code that destroys a window during one
+of it's one callbacks.  This could crash perl.  Hopefully this
+is now fixed.
+
+=item All Win32::GUI::DC::Poly* drawing functions broken
+
+Polygon(), PolyBezier(), PolyBezierTo(), PolyLine() and
+PolyLineTo() now all work.
+
+=item Comboxbox constructor - using multiple types
+
+The Win32::GUI::Combobox constructor has been updated to handle
+the '-simple', '-dropdown' and '-dropdownlist' options more
+intuatively.  The docuentation has been updated to explain that
+only one of these options should be used, and what happens
+if more than one is used.
+
+=item Win32::GUI::Imagelist::AddMasked broken
+
+This call should now work. (Tracker: 1734697)
+
+=item Win32::GUI::Acceptfiles() generates warning
+
+The AcceptFiles() method was using some undefined constants.
+They have been removed.
+
+=item Build process fixes
+
+A number of warnings when building under cygwin were fixed -
+patches submitted by Reini Urban.
+
+=item Win32::GUI::BitmapInline wasn't using a suitable temporary directory
+
+Win32::GUI::BitmapInline was always using the current directory to create
+temporary files.  This failed when the current directory wasn't writable
+(likely under limited user accounts in Win2K and above).
+It now uses C<< File::Spec->tmpdir() >> to get a writable temporary
+directory. (Tracker: 1586643)
+
+Further, the filename chosen wasn't thread-safe.  This (unlikely)
+race-condition should also be fixed.
+
+=item Toolbar Addbitmap can't be called multiple times
+
+The Win32::GUI::Toolbar::AddBitmap() method failed when called
+a second time, reporting that you couldn't use it when an
+imagelist was already assigned (regardless of whether you had
+assigned an imagelist or not).  It may now be called more
+than once to add individual bitmaps to the toolbar.
+
+=back
+
+=head1 Deprecated feature status
+
+This section documents features that have been deprecated
+in this release, or in recent releases, and feature that
+will be deprecated in up-coming releases.
+
+=head2 Win32::GUI::Constants
+
+The introduction of Win32::GUI::Constants in v1.04 means
+that we now have access to a very large number of constants,
+so the v1.03 behaviour of Win32::GUI to export all
+constants to the calling namespace by default is no longer
+appropriate. So, a bare
+
+  use Win32::GUI;
+
+now generates a warning that the old default behaviour will
+be deprecated - although the export behaviour of
+Win32::GUI v1.03 is maintained except for this
+warning.
+
+To eliminate this warning and correct your script, do one
+of the following:
+
+=over
+
+=item If you don't need any constants, use the empty list:
+
+  use Win32::GUI();
+
+=item If you need some constants, name them explicitly:
+
+  use Win32::GUI qw(ES_WANTRETURN CW_USEDEFAULT); # Two constants exported
+  use Win32::GUI qw(/^MB_/);   # Export all constants starting with MB_
+
+=back
+
+See the L<Win32::GUI::Constants|Win32::GUI::Constants> documentation
+for the full allowable syntax.
+
+You are advised to fix your scripts now, as a future version will stop
+exporting any constants by default.
+
+Although not advised, you can suppress the warnings by turning deprecated
+warnings off:
+
+  no warnings 'deprecated';
+
+Additionally accessing constants from within the Win32::GUI namespace
+is deprecated.  I.e.
+
+   -addstyle => Win32::GUI::WS_BORDER,
+
+will generate a warning with this release, and will stop working with
+a future release.  Use one of the following methods instead:
+
+=over
+
+=item use the Win32::GUI::Constants namespace instead
+
+  -addstyle => Win32::GUI::Constants::WS_BORDER,
+
+=item use any other namespace you fancy
+
+  use Win32::GUI qw(-exportpkg => A::B -autoload);
+  ...
+  -addstyle => A::B::WS_BORDER,
+
+=item maintain compatibility of existing scripts
+
+  use Win32::GUI::Constants qw(-exportpkg => Win32::GUI :compatibility_win32_gui);
+  ...
+  -addstyle => Win32::GUI::WS_BORDER,
+
+=back
+
+=head2 Win32::GUI::NotifyIcon
+
+It is no longer necessary to use the '-id' option to any of the
+Win32::GUI::NotifyIcon methods.  The ID is now entirely handled
+internally.  You will receive deprecated warnings if you use it.
+
+In particular, removing Icons from the system tray should be done
+using
+
+  $NI->Remove();
+
+and not by the (now deprecated)
+
+  $NI->Delete(-id => 1);
+
+Use of the C<-id> option will generate a warning.
+
+=head1 Contributors to this release
+
+=over
+
+=item Robert May
+
+=item Brian Millham
+
+=item Glenn Munroe
+
+=item George
+
+=item Glenn Linderman
+
+=item Salvadore Oritz
+
+=item Joseph Cordero
+
+=item Reini Urban
+
+=item Jeremy White
+
+=back
+
+=cut

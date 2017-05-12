@@ -1,0 +1,19 @@
+<pre>
+pages/
+  . LINK<#Default.meta>
+  . LINK<#Default.head>
+  . LINK<#Default.top>
+  . LINK<#Home.meta>
+  . LINK<#Home.c2>
+  . LINK<#Home.c3>
+  . LINK<#manpage.c1>
+  . LINK<#pages.c2>
+  . LINK<#specs.c2>
+public_html/
+  . LINK<#pages.cgi>
+  . images/webscaffold01.jpg
+  . lib/
+       . LINK<#scaffold.js>
+       . LINK<#winMenus.js>
+       . LINK<#winUtils.js>
+</pre>

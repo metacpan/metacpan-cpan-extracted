@@ -1,0 +1,70 @@
+v1.0.3  2015-04-19
+        Included properly updated META.* files, so new Graph module is visible,
+        and new requirement Test::Most is specified.
+        Added printing of full response if a non-200 code is received.
+
+
+v1.0.2  2015-04-13
+        Added WebService::DataDog::Graph module, with tests.
+        Fixed a few spots I missed previously, regarding change to license to GPL v3.
+        Changed tests to use Test::Most, instead of Test::More.
+
+
+v1.0.1  2015-03-29
+        Cleaned up documentation. Updated license to GPL v3.
+        New modules coming soon!
+
+
+v1.0.0  2013-12-17
+        Added WebService::DataDog::User module, with tests.
+
+
+v0.9.0  2013-06-01
+        Added WebService::DataDog::Comment module, with tests, and examples.
+        Renamed README to README.md, with markdown formatting.
+        Updated README.md to include a NOTES section that contains various
+        'gotchas' I discovered while interacting with the API.
+
+
+v0.8.0  2013-04-05
+        Added WebService::DataDog::Search module, with tests, and examples.
+        Updated WebService::DataDog to properly build destination url when
+        it already contains '?' character, regardless of API endpoint.
+
+
+v0.7.0  2013-02-04
+        Added new WebService::DataDog::Tag module, with tests, and examples.
+
+
+v0.6.0  2013-01-14
+        Added new WebService::DataDog::Alert module,with tests, and examples.
+        Fixed issue with properly capturing 404 response in Dashboard submodule.
+        Fixed issue with properly handling API methods that return empty JSON.
+
+
+v0.5.0  2013-01-12
+        Fix for issue with WebService::DataDog::build() causing submodule object
+        to override the main datadog factory object. Thanks to Guillaume Aubert
+        for the discovery of the issue, and contribution of a fix.
+
+
+v0.4.0  2013-01-11
+        Standardized object methods to use names like create/retrieve/update/delete
+        whereever possible.  Still support all original method names with
+        warning about deprecation.
+
+
+v0.3.1  2013-01-03
+        Documentation updates.  Added more examples to POD and examples/* scripts.
+
+
+v0.3.0  2013-01-01
+        Added WebService::DataDog::Event module, with tests. Added examples/
+        dir with simple example scripts for Event, Metric, Dashboard modules.
+        Updated WebService::DataDog::Dashboard to include create() and delete_dashboard().
+        Documentation changes.
+
+
+v0.2.0  2013-12-24
+        First release. Only metric posting and dashboard interactions are
+        supported currently.

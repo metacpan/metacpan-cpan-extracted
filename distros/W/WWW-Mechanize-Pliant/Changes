@@ -1,0 +1,10 @@
+Revision history for Perl extension WWW::Mechanize::Pliant
+
+0.12   Nov 8, 2006
+       Standardize interface to like that of WWW::Mechanize
+       Using WWW::Mechanize::Pliant::Form is now not recommented,
+       instead use $mech->field, and $mech->click
+
+0.1    Sep 26, 2006
+       Initial version, released by Boris Reitman
+

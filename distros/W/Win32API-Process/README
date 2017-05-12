@@ -1,0 +1,48 @@
+Win32API/Process version 0.01
+=============================
+
+The Process functions exposes the part of Win32 API handling the processes.
+
+It contains just process opening an terminating functionality
+in the meanwhile. It is supposed to be used with the Win32API::ProcessStatus
+module or modules that need handles to processes on their interfaces.
+
+INSTALLATION
+
+To install this module from the sources type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+If you are user of ActivePerl build 6xx you can alternatively run
+the packaging script and then install this module via the package
+manager (it is the preffered way, by the way):
+
+   build
+   cd package
+   ppm install Win32API-Process.ppd
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   build of Perl 5.6.1 for Win32
+   Exporter
+   DynaLoader
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002  Ferdinand Prantl. All rights reserved.
+
+Permission to use, copy, modify, distribute and sell this software
+and its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear
+in supporting documentation. Author makes no representations
+about the suitability of this software for any purpose.  It is
+provided "as is" without express or implied warranty.
+
+See http://prantl.host.sk/perl/modules/Win32API/Process
+for the most recent version.

@@ -1,0 +1,48 @@
+Yes, there are bugs! And some belong to the weather.com servers and
+cannot be fixed with this API (or should not...).
+
+
+BUG 1:
+======
+Tue Apr 14 23:50 2005
+Abstract: Cannot use strings containing a '/' for searches 
+          (like 'New York/Central Park').
+Problem Description:
+--------------------
+The weather.com server does not work with any search string containing
+a '/' - wether it is URL encoded or not!
+Problem.
+
+Problem Solution:
+-----------------
+There's no real solution as long as nobody fixes the server software,
+but there's a workaround.
+The new locations cache as extended with V0.4 does store each location
+found by any search. Therefore, if one searches for 'New York', for
+example, the cache will store the location IDs for the search string
+itself but also for all locations found:
+
+  $locations_cache => {
+  	'new york' => {
+  		'USNY1000' => 'New York/La Guardia Arpt, NY',
+  		'USNY0998' => 'New York/Central Park, NY',
+  		'USNY0999' => 'New York/JFK Intl Arpt, NY',
+  		'USNY0996' => 'New York, NY'
+  	},
+  	'new york/central park, ny' => {
+  		'USNY0998' => 'New York/Central Park, NY'
+  	},
+  	'new york/la guardia arpt, ny' => {
+  		'USNY1000' => 'New York/La Guardia Arpt, NY'
+  	},
+  	'new york, ny' => {
+  		'USNY0996' => 'New York, NY'
+  	},
+  	'new york/jfk intl arpt, ny' => {
+  		'USNY0999' => 'New York/JFK Intl Arpt, NY'
+  	},
+  }
+
+By this way, if one now searches for 'New York/Central Park, NY'
+he'll get the proper response. The search mechanism has been reworked
+in a way that also a search for 'york/central' would return a valid match.

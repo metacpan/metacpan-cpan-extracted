@@ -1,0 +1,42 @@
+WWW-Shorten-PunyURL
+
+PunyURL is a URL shortening service provided by SAPO (http://sapo.pt/). This library provides an interface to the corresponding Web service.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Shorten::PunyURL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Shorten-PunyURL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Shorten-PunyURL
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Shorten-PunyURL
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Shorten-PunyURL/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Pedro Figueiredo
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

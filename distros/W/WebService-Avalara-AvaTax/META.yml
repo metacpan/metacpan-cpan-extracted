@@ -1,0 +1,86 @@
+---
+abstract: 'Avalara SOAP interface as compiled Perl methods'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  List::Util: '1.33'
+  Test::File::ShareDir::Module: '1.000000'
+  Test::More: '0.94'
+  Test::Most: '0'
+  Test::RequiresInternet: '0'
+  XML::Compile::Tester: '0'
+  XML::Compile::Util: '0'
+  blib: '1.01'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Avalara-AvaTax
+provides:
+  WebService::Avalara::AvaTax:
+    file: lib/WebService/Avalara/AvaTax.pm
+    version: '0.020'
+  WebService::Avalara::AvaTax::Role::Connection:
+    file: lib/WebService/Avalara/AvaTax/Role/Connection.pm
+    version: '0.020'
+  WebService::Avalara::AvaTax::Role::Dumper:
+    file: lib/WebService/Avalara/AvaTax/Role/Dumper.pm
+    version: '0.020'
+  WebService::Avalara::AvaTax::Role::Service:
+    file: lib/WebService/Avalara/AvaTax/Role/Service.pm
+    version: '0.020'
+  WebService::Avalara::AvaTax::Service::Address:
+    file: lib/WebService/Avalara/AvaTax/Service/Address.pm
+    version: '0.020'
+  WebService::Avalara::AvaTax::Service::Tax:
+    file: lib/WebService/Avalara/AvaTax/Service/Tax.pm
+    version: '0.020'
+requires:
+  Carp: '0'
+  Const::Fast: '0'
+  DateTime: '0'
+  DateTime::Format::XSD: '0'
+  English: '0'
+  File::ShareDir: '1.00'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  LWPx::UserAgent::Cached: '0'
+  Log::Report: '0'
+  Moo: '1.006000'
+  Moo::Role: '0'
+  Mozilla::CA: '0'
+  Package::Stash: '0'
+  Path::Tiny: '0.018'
+  Scalar::Util: '0'
+  Sys::Hostname: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  URI: '0'
+  XML::Compile::Dumper: '0'
+  XML::Compile::SOAP11: '0'
+  XML::Compile::SOAP12: '0'
+  XML::Compile::SOAP::WSS: '0'
+  XML::Compile::Transport::SOAPHTTP: '0'
+  XML::Compile::WSDL11: '0'
+  XML::Compile::WSS: '0'
+  namespace::clean: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjgardner/WebService-Avalara-AvaTax/issues
+  homepage: http://metacpan.org/release/WebService-Avalara-AvaTax/
+  repository: git://github.com/mjgardner/WebService-Avalara-AvaTax.git
+version: '0.020'

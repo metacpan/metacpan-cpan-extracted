@@ -1,0 +1,104 @@
+NAME
+    WebService::PagerDuty
+
+VERSION
+    version 1.20131219.1627
+
+SYNOPSIS
+        # for Events API, all parameters are optional
+        my $pager_duty = WebService::PagerDuty->new();
+
+
+        # for Incidents API and Schedules API, these are mandatory
+        my $pager_duty2 = WebService::PagerDuty->new(
+            user        => 'test_user',
+            password    => 'test_password',
+            subdomain   => 'test-sub-domain',
+            # always optional, true by default
+            use_ssl     => 1,
+        );
+
+        # if you want to get access to all three APIs via
+        # same $pager_duty variable, then use second form
+
+
+        #
+        # Events API
+        #
+        my $event = $pager_duty->event(
+             service_key  => ... , # required
+             incident_key => ... , # optional
+             %extra_params,
+        );
+        $event->trigger( %extra_params );
+        $event->acknowledge( %extra_params );
+        $event->resolve( %extra_params );
+
+        #
+        # Incidents API
+        #
+        my $incidents = $pager_duty->incidents();
+        $incidents->count( %extra_params );
+        $incidents->list( %extra_params );
+
+        #
+        # Schedules API
+        #
+        my $schedules = $pager_duty->schedules();
+        $schedules->list(
+            schedule_id => ... ,            # required
+            since       => 'ISO8601date',   # required
+            until       => 'ISO8601date',   # required
+            %extra_params,
+        );
+
+DESCRIPTION
+    WebService::PagerDuty - is a client library for http://PagerDuty.com
+
+    For detailed description of %extra_params (including which of them are
+    required or optional), see PagerDuty site:
+
+    Events API
+    <http://www.pagerduty.com/docs/integration-api/integration-api-documenta
+    tion>
+    Incidents API <http://www.pagerduty.com/docs/rest-api/incidents>
+    Schedules API <http://www.pagerduty.com/docs/rest-api/schedules>
+
+    Also, you could explore tests in t/ directory of distribution archive.
+
+NAME
+    WebService::PagerDuty - Module to interface with the
+    http://PagerDuty.com service
+
+SEE ALSO
+    <http://PagerDuty.com>, <http://oDesk.com>
+
+AUTHOR
+    Oleg Kostyuk (cubuanic), "<cub@cpan.org>"
+
+CONTRIBUTORS
+    Ryan Olson (Gimpson), "<gimpson@cpan.org>" - support for api_key
+
+LICENSE
+    Same as Perl.
+
+COPYRIGHT
+    Copyright by oDesk Inc., 2012
+
+    All development sponsored by oDesk.
+
+NO WARRANTY
+    This software is provided "as-is," without any express or implied
+    warranty. In no event shall the author or sponsor be held liable for any
+    damages arising from the use of the software.
+
+AUTHOR
+    Oleg Kostyuk <cub@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Odesk Inc..
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

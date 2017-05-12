@@ -1,0 +1,32 @@
+---
+abstract: 'A simple AdServer that can be stand alone PSGI or be part of a larger system'
+author:
+  - 'Gabor Szabo <szabgab@cpan.org>'
+build_requires:
+  Geo::IP: 0
+  Test::Deep: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-AdServer
+requires:
+  Data::Dumper: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Moo: 0
+  Moo::Role: 0
+  Time::Local: 0
+  YAML: 0
+  perl: 5.010
+resources:
+  homepage: http://pcas.szabgab.com/
+  repository: https://github.com/szabgab/WWW-AdServer.git
+version: 1.01

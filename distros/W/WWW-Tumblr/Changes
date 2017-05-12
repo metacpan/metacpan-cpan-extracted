@@ -1,0 +1,50 @@
+5.2 - Sat Sep 19 13:53:09 CEST 2015
+  - Apparently I'm a moron with the versioning :(
+
+5.1.1 - Sat Sep 19 12:32:40 CEST 2015
+  - Using a different random quote API for the quote test.
+
+5.1 - Sun Jul 13 13:06:05 CEST 2014
+  - Support for single video/audio data:
+    https://github.com/damog/www-tumblr/pull/9
+
+5.00 - Sun Aug 25 15:35:41 CEST 2013
+  - Final 5.00.
+
+5.00_04 - Fri Aug 23 10:06:19 CEST 2013
+  - Dealing with stupid upstream Tumblr API responses.
+
+5.00_03 - Wed Aug 21 11:47:34 CEST 2013
+  - Added note for 5.00_02, since I forgot :)
+
+5.00_02 - Wed Aug 21 11:26:38 CEST 2013
+  - Minor POD syntax fixes.
+  - Using File::Spec on a couple of tests.
+
+5.00_01 - Tue Aug 20 23:52:40 CEST 2013
+  - Added support for Tumblr API v2.
+
+4.1 - Mon Jun 15 12:04:03 EDT 2009
+  - Fixed issue with missing user/passwd on delete/read
+    RT#46716. Thanks to http://suzuki.openid.ne.jp/
+
+4 - Sat May  2 22:54:25 EDT 2009
+  - Up to date with Tumblr's API.
+  - Added information for "edit" and "delete".
+
+3.01.1 - Fri Jan  2 12:52:09 EST 2009
+	- Fix CPAN RT bug 42084
+
+3 To Me You Are A Work Of Art - Thu Mar 20 17:39:00 EDT 2008
+	- File uploads included on the write method.
+
+2 "Island In A Sun"	- Thu Mar 20 12:52:34 EDT 2008
+	- Mostly complete, only file uploads missing.
+
+1 "Heart In A Cage" - Wed Mar 19 20:05:06 EDT 2008
+	- Basic functionality is present, read, read_json and write.
+	- Missing:
+		- documentation
+		- file uploads
+		- the "other actions"
+	

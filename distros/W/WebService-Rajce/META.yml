@@ -1,0 +1,36 @@
+---
+abstract: 'Perl module for rajce.net web API.'
+author:
+  - 'Petr Kletecka <pek@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Rajce
+requires:
+  Carp: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Path: 2.06_05
+  Getopt::Long: '0'
+  Image::Magick: '0'
+  Net::Netrc: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  WWW::Mechanize: '0'
+  XML::Simple: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/petrkle/webservice-rajce/issues
+  repository: git://github.com/petrkle/webservice-rajce.git
+version: '1.152450'

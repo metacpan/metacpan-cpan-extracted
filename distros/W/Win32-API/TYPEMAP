@@ -1,0 +1,40 @@
+# $Id: TYPEMAP,v 1.0 2001/10/30 13:57:31 dada Exp $
+HINSTANCE   T_IV
+HMODULE     T_IV
+LPCSTR      T_PV
+LPCWSTR     T_PV
+long_ptr    T_PTR
+W32AC_T *   T_W32AC_CALLBACK
+W32ACIATP_T * T_W32AC_IATPATCH
+
+INPUT
+
+T_IV
+	{SV * TmpIVSV = $arg;
+    $var = ($type)SvIV(TmpIVSV);};
+T_PV
+	{SV * TmpPVSV = $arg;
+    $var = ($type)SvPV_nolen(TmpPVSV);};
+T_PTR
+	{SV * TmpPtrSV = $arg;
+    $var = INT2PTR($type,SvIV(TmpPtrSV));};
+T_UV
+	{SV * TmpUVSV = $arg;
+    $var = ($type)SvUV(TmpUVSV);};
+T_W32AC_CALLBACK
+    {SV * TmpRV = $arg;
+	if (SvROK(TmpRV) && sv_derived_from(TmpRV, \"Win32::API::Callback\")) {
+	    $var = (HV*)SvRV(TmpRV);
+	}
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			\"$pname\", \"$var\", \"Win32::API::Callback\");};
+            
+T_W32AC_IATPATCH
+    {SV * TmpRV = $arg;
+	if (SvROK(TmpRV) && sv_derived_from(TmpRV, \"Win32::API::Callback::IATPatch\")) {
+	    $var = (HV*)SvRV(TmpRV);
+	}
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			\"$pname\", \"$var\", \"Win32::API::Callback::IATPatch\");};

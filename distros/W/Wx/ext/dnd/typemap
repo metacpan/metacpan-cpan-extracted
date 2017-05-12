@@ -1,0 +1,38 @@
+#############################################################################
+## Name:        ext/dnd/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     12/08/2001
+## RCS-ID:      $Id: typemap 2317 2008-01-18 22:00:14Z mbarbon $
+## Copyright:   (c) 2001, 2003-2004, 2006, 2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+Direction               T_ENUM
+NativeFormat            T_ENUM
+wxDragResult            T_ENUM
+wxDataFormatId          T_ENUM
+
+wxDataObject *          O_NON_WXOBJECT_THR
+wxFileDataObject *      O_NON_WXOBJECT_THR
+wxTextDataObject *      O_NON_WXOBJECT_THR
+wxBitmapDataObject *    O_NON_WXOBJECT_THR
+wxURLDataObject *       O_NON_WXOBJECT_THR
+wxCustomDataObject *    O_NON_WXOBJECT_THR
+wxDataObjectSimple *    O_NON_WXOBJECT_THR
+wxDataObjectComposite * O_NON_WXOBJECT_THR
+wxPlDataObjectSimple *  O_NON_WXOBJECT_THR
+
+wxDataFormat *          O_NON_WXOBJECT_THR
+
+wxDropFilesEvent *      O_NON_WXOBJECT
+
+wxClipboard *           O_WXOBJECT
+
+wxDropSource *          O_NON_WXOBJECT
+wxDropTarget *          O_NON_WXOBJECT
+wxFileDropTarget *      O_NON_WXOBJECT
+wxTextDropTarget *      O_NON_WXOBJECT

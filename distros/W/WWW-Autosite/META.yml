@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Autosite
+version:      1.08
+version_from: lib/WWW/Autosite.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    File::Copy:                    1
+    File::Path:                    1
+    File::PathInfo:                1
+    HTML::Template:                0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

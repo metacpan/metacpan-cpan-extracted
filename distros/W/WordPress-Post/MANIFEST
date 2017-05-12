@@ -1,0 +1,14 @@
+t/99_cleanup.t
+Changes
+README
+t/image.jpg
+t/Test_Post_From_File.txt
+t/02_file_upload.t
+t/01.t
+bin/wppost
+MANIFEST
+lib/WordPress/Base.pm
+lib/WordPress/Post.pm
+lib/WordPress/CLIDeprecated.pm
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

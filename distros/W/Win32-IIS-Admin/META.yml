@@ -1,0 +1,30 @@
+---
+abstract: 'Administer Internet Information Service on Windows'
+author:
+  - 'Martin Thurn C<mthurn@cpan.org>'
+build_requires:
+  IO::Capture::Stderr: 0
+  Test::More: 0
+  Test::Simple: 0.44
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Win32::IIS::Admin
+name: Win32-IIS-Admin
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+recommends:
+  Win32API::File: 0
+requires:
+  Data::Dumper: 0
+  File::Spec: 0
+  IO::String: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.024

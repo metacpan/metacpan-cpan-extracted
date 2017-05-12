@@ -1,0 +1,34 @@
+Revision history for Perl extension Win32::Process::Perf.
+
+1.05 Nov. 2006
+	  Added language files for cz and cs.
+	
+1.04 	Added SIGNATURE  
+
+1.03 Feb. 2006
+	  Changed PAddCounter to use also the machine name. 
+	  For some reasons to collect data from remote machines
+	  it is neccessary to have it also in the counter path
+	  
+1.02 Feb. 2006
+	  Added function PGetPid, returns the PID of the process.
+
+1.01 July 2005
+	  removed sddl.h from the XS source, because it is not needed.	  
+	  
+1.00  April 2005
+	  Added PGetUserName, retrives the user name for the given process
+	  Changed handling for cpu time. It is now an additional function
+
+0.03  Sat Sept 25 2004
+		Changed makefile.pl PREREQ_PM and test.pl to use the environmet variable COMPUTERNAME.
+		Added en-gb.dat for UK
+		Shall now the final release
+
+0.02  Sun Sept 19 2004
+        Added support for cpu time, changes to the documentation
+
+0.01  Tue Aug 31 2004
+		First Release by Reinhard Pagitsch
+		
+	  

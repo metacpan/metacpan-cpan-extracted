@@ -1,0 +1,163 @@
+NAME
+    WebService::Buxfer - Interact with the Buxfer webservice
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use WebService::Buxfer;
+  
+      my $bux = WebService::Buxfer->new(
+          {
+              userid => 'nheinrichs',                 # Required
+              password => 'my password',              # Required
+  
+              preload_accounts => 1,                  # Default
+              inject_account_name => 1,               # Default
+              debug => 0,                             # Default
+              url => 'https://www.buxfer.com/api',    # Default
+          }
+          );
+  
+      my $results = $bux->transactions;
+      print "Transaction: ".Dumper($_)."\n" for (@$results);
+  
+      my $new_transactions = [
+          'coffee 5.45 tags:drinks,coffee',       # Raw, Buxfer SMS format
+          'Pay check +6952.32 status:pending',    # Raw, Buxfer SMS format
+          {                                       # As a hashref
+              description => 'Thai food with friends',
+              amount => -3000,
+              payer => 'me',
+              tags => ['sustenance, 'thai food'],
+              account => 'cash',
+              date => '2009-01-03',
+              status => 'default',
+              participants => [ [andy, 1000], elena ],
+          },
+          ];
+  
+      my @responses = $bux->add_transactions($new_transactions);
+      print "Response: ".($_->buxfer_status)."\n" for (@responses);
+
+DESCRIPTION
+    Buxfer is an online personal finance site: <http://www.buxfer.com>
+
+    WebService::Buxfer provides access to the Buxfer webservices API.
+
+ACCESSORS
+    * preload_accounts - Whether to prefetch account details on login
+    * inject_account_name - Whether to automatically inject an 'accountName'
+    field into results that contain an internal Buxfer 'accountId' field.
+    * debug - Enable debug output
+    * url - The URL of the Buxfer API server. You probably don't need to
+    change this.
+    * _response - The WebService::Buxfer::Response object from the last call
+    * _token - The value of the authentication token received from Buxfer
+
+METHODS
+  new( \%options )
+    Build a new WebService::Buxfer instance.
+
+  GET methods
+   transactions(\%params), analysis(\%params)
+    Retrieve transactions (25 at a time.)
+
+    Results can be restricted using the following parameters (see Buxfer API
+    documentation for details):
+
+    * accountId OR accountName
+    * tagId OR tagName
+    * startDate AND endDate OR month: date can be specified as "10 feb
+    2008", or "2008-02-10". month can be specified as "feb08", "feb 08", or
+    "feb 2008".
+    * budgetId OR budgetName
+    * contactId OR contactName
+    * groupId OR groupName
+    * page - the page of results you want to see ("transactions" only)
+
+    NOTE: On any given day the format of the 'date' field in the
+    transactions seems to change (sometimes I get '3 Jan' and sometimes '3
+    Jan 08'.)
+
+    This package makes no attempt to format or inflate dates or any other
+    information returned from the API.
+
+   analysts(\%params)
+    Get Analysis graph URLs and rawData.
+
+    Takes the same parameters as "transactions".
+
+    Returns a hashref of Analysis information.
+
+   accounts()
+    Retrieve Buxfer accounts.
+
+    In array context returns an array of hashrefs containing account
+    details.
+
+    In scalar context returns a hashref of account details keyed on the
+    internal Buxfer accountId.
+
+    i.e., { $accountId => { name => 'cash', ... }, ... }
+
+   impacts, tags, budgets, groups, contacts
+    Calls the given Buxfer API. See Buxfer docs for details.
+
+    In array context returns an array of results.
+
+    In scalar context returns a reference to the array of results.
+
+  POST methods
+   add_transactions(\@transactions, \%params)
+    Accepts an array of transactions in raw format or as hashrefs and
+    submits them to Buxfer using the "add_transaction" API call.
+
+    Because the Buxfer API allows for submission of multiple transactions in
+    a single API call, this method will combine transactions into batches
+    based on the "max_transactions_per_submit" parameter prior to
+    submission.
+
+    WebService::Buxfer will also wrap tags containing spaces in single
+    quotes. HOWEVER, the quotes themselves will also end up as part of the
+    tag.
+
+    This is the fault of Buxfer's parser: if the single quotes are omitted,
+    the system will fail to parse/import the transaction properly.
+
+    Parameters:
+
+    * max_transactions_per_submit - I was able to submit 1000 transactions
+    in a single call, so that is the default.
+    * format - Currently only 'sms' is supported
+
+    In array context returns an array of responses.
+
+    In scalar context returns a reference to the responses array.
+
+SEE ALSO
+    * Buxfer - <http://www.buxfer.com>
+    * Buxfer API Documentation - <https://www.buxfer.com/api>
+
+TODO
+    Move some of the logic out of here and into
+    WebService::Buxfer::Response.
+
+    Add a pager for flipping through transactions based on 25 results per
+    page and numTransactions in the response.
+
+    Automatically in/deflate DateTime objects
+
+ACKNOWLEDGEMENTS
+    Portions of this package borrowed/adapted from the WebService::Solr
+    code.
+
+    Thanks to Brian Cassidy and Kirk Beers for that package.
+
+AUTHORS
+    Nathaniel Heinrichs <nheinric@cpan.org>
+
+COPYRIGHT AND LICENSE
+     Copyright (c) 2009 Nathaniel Heinrichs.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+

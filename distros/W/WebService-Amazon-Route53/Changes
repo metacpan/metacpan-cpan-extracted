@@ -1,0 +1,27 @@
+Revision history for WebService-Amazon-Route53
+
+0.101     2014-06-29
+          Fixed documentation.
+
+0.100     2014-06-28
+          * Added support for multiple API versions
+          * Added support for API version 2013-04-01
+          * Replaced LWP::UserAgent with HTTP::Tiny
+          * Methods are no longer explicitly returning undef on error
+          * Fixed invalid ChangeResourceRecordSetsRequest XML problem [RT #95870]
+
+0.020     2014-06-15
+          Switched to using Dist::Zilla.
+
+0.013     2012-06-10
+          Fixed infinite loop problem when searching through more than 100 zones.
+          [RT #77407]
+
+0.012     2011-09-07
+          Updated documentation.
+
+0.011     2011-09-04
+          Updated documentation.
+        
+0.01      2011-08-31
+          First version, released on an unsuspecting world.

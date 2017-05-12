@@ -1,0 +1,7 @@
+Revision history for Perl extension WebDAO::Store::MLDBM
+1.01 
+    - fix test
+1.00
+    - move WebDAO::Store::MLDBM to separate pkgs
+
+#$Id: Changes 458 2009-02-15 12:15:18Z zag $

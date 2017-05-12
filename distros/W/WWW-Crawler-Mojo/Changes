@@ -1,0 +1,100 @@
+Revision history for WWW-Crawler-Mojo
+
+0.21 2017/01/17
+  - Added an ability to modify html handlers for scraping.
+  - Improved form submission emulator to respect unnamed submit-type elements.
+
+0.19 2016/05/23
+  - Updated tests in favor of Mojo::Home recent changes
+
+0.18 2016/03/16
+  - Added cap attribute for queue to limit the length
+
+0.17 2016/03/15
+  - Fixed form submition emulation to work
+
+0.16 2016/01/14
+  - Added req event for such as request modification (gfdev).
+
+0.15 2015/11/04
+  - Fixed a bug where Mysql queue has not skipped correctly.
+  - Fixed a bug where form submition emulation has failed on certain condition.
+
+0.14 2015/10/30
+  - Added experimental MySQL support for queue (harshals).
+  - Improved documentations.
+  - Added some example codes.
+  - Improved form submittion emulation on unselected and multi selected options.
+
+0.13 2015/03/25
+  - Removed referrer_url attribute from job class.
+  - Changed scrape API significantly.
+  - Added context option for scrape method.
+  - Improved documentations.
+  - Improved examples.
+
+0.12 2015/02/27
+  - Updated dependency to Mojolicious v6.0.
+
+0.11 2015/02/19
+  - Updated dependency to Mojolicious v5.79.
+  - Fixed a bug where connection count didn't detected for redirected urls.
+  - Fixed a bug on checkbot example.
+  - Fixed small bug on form submittion.
+  - Fixed small bug on base tag detection.
+  - Fixed small bug on charset detection.
+  - Removed refer event in favor of callback for scraper.
+  - Removed peeping server feature at all.
+  - Deprecated resolved_uri attribute of Job class in favor of url.
+  - Deprecated original_uri in favor of original_url.
+  - Improved to crawl sitemap.xml too.
+  - Improved html document detection by accepting more html like mime types.
+  - Improved to use less memory.
+  - Improved internal codes.
+  - Added clock_speed attribute.
+
+0.10 2015/02/08
+  - Removed collect_urls_html method in favor of scrape.
+  - Improved documentaion.
+  - Improved url detection in CSSs.
+  - Improved element handlers that is now well customizable with CSS selectors.
+
+0.09 2015/02/03
+  - Removed depth option.
+  - Changed URL collecting method to instance-methods.
+  - Improved form manipulation for emulating manual submition.
+  - Improved documentation.
+
+0.08 2015/01/29
+  - Renamed browse method to scrape.
+  - Improved documents.
+
+0.07 2015/01/26
+  - Removed additional_props on job class.
+  - Renamed discover method to browse.
+  - Removed peeping attribute in favor of peeping_port.
+  - Improved error event API.
+  - Added a feature for auto stop crawling when queue get empty.
+  - Improved checkbot example.
+  - Improved tests.
+  - Improved documents.
+
+0.06 2014/09/20
+  - Improved URL detection.
+
+0.05 2014/09/15
+  - Fixed a bug on request body generation.
+
+0.04 2014/09/07
+  - Fixed class and method terminology.
+
+0.03 2014/09/07
+  - Improved that resolved URIs are alway a Mojo::URL instance.
+  - Added original_uri to retrieve original uri from redirect history.
+  - Added requeue method to re-try in case an error occured.
+
+0.02 2014/09/07
+  - Recovering failing release
+
+0.01 2014/09/07
+  - initial release

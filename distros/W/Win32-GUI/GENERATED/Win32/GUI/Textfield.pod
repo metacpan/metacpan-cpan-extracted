@@ -1,0 +1,562 @@
+
+=head1 NAME
+
+Win32::GUI::Textfield - Create and manipulate textfield controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Textfield object;
+can also be called as PARENT->AddTextfield(%OPTIONS).
+Class specific %OPTIONS are:
+
+  -align         => left/center/right (default left)
+      aligns the text in the control accordingly.
+  -keepselection => 0/1 (default 0)
+      the selection is not hidden when the control loses focus.
+  -multiline     => 0/1 (default 0)
+      the control can have more than one line (note that newline
+      is "\r\n", not "\n"!).
+  -password      => 0/1 (default 0)
+      masks the user input (like password prompts).
+  -passwordchar  => CHAR (default '*')
+      The specified CHAR that is shown instead of the text with -password => 1
+  -lowercase     => 0/1 (default 0)
+      Convert all caracter into lowercase
+  -uppercase     => 0/1 (default 0)
+      Convert all caracter into uppercase
+  -autohscroll   => 0/1 (default 1 (0 for a multiline Textfield))
+      Automatically scroll to right as text is typed past the right
+      margin;  If 0 for a multiline Textfield, then wrap to the next
+      line.
+  -autovscroll   => 0/1 (default 1)
+      For a multiline Textfiled automatically scroll down as lines
+      pass the bottom of the control.
+  -number        => 0/1 (default 0)
+      Allows only digits to be entered into the edit control
+  -prompt        => (see below)
+  -readonly      => 0/1 (default 0)
+      text can't be changed.
+  -wantreturn    => 0/1 (default 0)
+      when dialogui => 1 is in effect, stops the <ENTER> key
+      behaving as a click on the default button, and allows the
+      key to be entered in a multi-line Textfield
+
+The C<-prompt> option is very special; if a string is passed, a
+Win32::GUI::Label object (with text set to the string passed) is created
+to the left of the Textfield.
+Example:
+
+    $Window->AddTextfield(
+        -name   => "Username",
+        -left   => 75,
+        -top    => 150,
+        -width  => 100,
+        -height => 20,
+        -prompt => "Your name:",
+    );
+
+Furthermore, the value to -prompt can be a reference to a list containing
+the string and an additional parameter, which sets the width for
+the Label (eg. [ STRING, WIDTH ] ). If WIDTH is negative, it is calculated
+relative to the Textfield left coordinate. Example:
+
+    -left => 75,                          (Label left) (Textfield left)
+    -prompt => [ "Your name:", 30 ],       75           105 (75+30)
+
+    -left => 75,
+    -prompt => [ "Your name:", -30 ],      45 (75-30)   75
+
+Note that the Win32::GUI::Label object is named like the Textfield, with
+a "_Prompt" suffix (in the example above, the Label is named
+"Username_Prompt").
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Append
+
+B<Append(TEXT)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CanPaste
+
+B<CanPaste()>
+
+Text data availlable in clibboard for a Paste.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CanUndo
+
+B<CanUndo()>
+
+Determine whether an Textfield can be undone
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CharFromPos
+
+B<CharFromPos(X, Y)>
+
+Returns a two elements array identifying the character nearest to the
+position specified by X and Y.
+The array contains the zero-based index of the character and its line
+index.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Copy
+
+B<Copy()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Cut
+
+B<Cut()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EmptyUndoBuffer
+
+B<EmptyUndoBuffer()>
+
+Reset the undo flag of an Textfield.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FmtLines
+
+B<FmtLines(FLAG)>
+
+Set the inclusion flag of soft line break characters on or off within a multiline TextField.
+A soft line break consists of two carriage returns and a linefeed and is inserted at the end of a line that is broken because of word wrapping.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFirstVisibleLine
+
+B<GetFirstVisibleLine()>
+
+Return the uppermost visible line.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLimitText
+
+B<GetLimitText()>
+
+Return current text limit, in characters.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLine
+
+B<GetLine(LINE)>
+
+Get a line of text.
+
+ LINE: zero based index to the line to be retrieved
+
+Returns the text of the line.  Returns undef if LINE is
+greater than the number of lines in the Textfied.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLineCount
+
+B<GetLineCount()>
+
+Return the number of lines in a multiline Textfield.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMargins
+
+B<GetMargins()>
+
+Return an array with right and left margins.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetModify
+
+B<GetModify()>
+
+Determine whether the content of a Textfield has been modified.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPasswordChar
+
+B<GetPasswordChar()>
+
+Return the password character displayed .
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRect
+
+B<GetRect()>
+
+Return formatting rectangle is the limiting rectangle of the text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSel
+
+B<GetSel()>
+
+Returns a 2 item list giving the index of the start and end of the current
+selection
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetThumb
+
+B<GetThumb()>
+
+Return  the position of the scroll box (thumb) in a multiline Textfield.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HaveSel
+
+B<HaveSel()>
+
+Check if a selection is availlable.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LimitText
+
+B<LimitText([CHARS])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineFromChar
+
+B<LineFromChar(INDEX)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineIndex
+
+B<LineIndex(INDEX)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineLength
+
+B<LineLength(INDEX)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineScroll
+
+B<LineScroll(X,Y)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MaxLength
+
+B<MaxLength([CHARS])>
+
+See L<LimitText()|Win32::GUI::Textfield/LimitText>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Modified
+
+B<Modified([FLAG])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Modify
+
+B<Modify([FLAG])>
+
+See L<Modified()|Win32::GUI::Textfield/Modified>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PasswordChar
+
+B<PasswordChar([CHAR])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Paste
+
+B<Paste()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PosFromChar
+
+B<PosFromChar(INDEX)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ReadOnly
+
+B<ReadOnly([FLAG])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ReplaceSel
+
+B<ReplaceSel(STRING, [FLAG])>
+
+Replaces the current selection with the given STRING.
+The optional FLAG parameter can be set to zero to tell the control that
+the operation cannot be undone; see also L<Undo()|Win32::GUI::Textfield/Undo>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(COMMAND | LINE | HORIZONTAL, VERTICAL)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScrollCaret
+
+B<ScrollCaret()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(START,END)>
+
+See L<SetSel()|Win32::GUI::Textfield/SetSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectAll
+
+B<SelectAll()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Selection
+
+B<Selection()>
+
+See L<GetSel()|Win32::GUI::Textfield/GetSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetLimitText
+
+B<SetLimitText(SIZE)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMargins
+
+B<SetMargins([LEFT],[RIGHT])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetModify
+
+B<SetModify(FLAG)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPasswordChar
+
+B<SetPasswordChar(CHAR)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetReadOnly
+
+B<SetReadOnly(FLAG)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRect
+
+B<SetRect(LEFT,TOP,RIGHT,BOTTOM,[REDRAW])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSel
+
+B<SetSel(START,END)>
+
+Selects the specified range of characters.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTabStops
+
+B<SetTabStops( ...)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Undo
+
+B<Undo()>
+
+[TBD]
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change()>
+
+Sent when the text in the field is changed by the user.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GotFocus
+
+B<GotFocus()>
+
+Sent when the control is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LostFocus
+
+B<LostFocus()>
+
+Sent when the control is deactivated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MaxText
+
+B<MaxText()>
+
+Sent when text has exceeded the specified number of characters
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(SCROLLBAR)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Update
+
+B<Update()>
+
+Sent when an edit control is about to display altered text.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

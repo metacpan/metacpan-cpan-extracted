@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                WebService-CRUST
+version:             0.7
+abstract:            A lightweight Client for making REST calls
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    HTTP::Cookies:                 0
+    HTTP::Request::Common:         0
+    LWP:                           0
+    Test::Simple:                  0
+    URI:                           0
+    URI::QueryParam:               0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Chris Heschong (chris@wiw.org)

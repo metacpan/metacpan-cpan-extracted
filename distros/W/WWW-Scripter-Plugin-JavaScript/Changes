@@ -1,0 +1,367 @@
+Revision history for WWW::Scripter::Plugin::JavaScript
+
+0.009   21 June, 2016
+        The JavaScript plugin:
+        • Destructors no longer clobber  $@  (RT #108646).  Thanks to
+          Oleg G for the patch.
+
+0.008a  21 October, 2012
+        LWP 6 supports perl 5.8.7 once more,  so we no longer require
+        Bundle::LWP5_837.
+        JE back end (0.009):
+        • Window methods are now bound properly,  eliminating  errors
+          with  JE::Object::Proxy  objects  (RT  #79855).  Thanks  to
+          Nathan Chaney for the report.
+
+0.008   4 December, 2011
+        The JavaScript plugin:
+        • The JavaScript plugin now calls  ->destroy  on the back end
+          when it has finished with it.  This gives the  back  end  a
+          chance to destroy any circular  references  it  might  have.
+        JE back end:
+        • It now takes advantage of JE’s new JE::Destroyer module, to
+          eliminate circular references.
+
+0.007   26 March, 2011
+        Makefile.PL now requires Bundle::LWP5_837 instead of LWP on
+        perl 5.8.7 and lower,  since  LWP  6 does not support 5.8.7.
+        The JavaScript plugin:
+        • An internal change that should not affect the  interface:
+          The  JavaScript  plugin no longer implements  the  screen
+          object. WWW::Scripter now implements it, as should always
+          have been the case.
+
+0.006   18 January, 2010
+        The JavaScript plugin:
+        • The docs have  been  updated  to  clarify  that  back  ends’
+          event2sub  and  eval  methods must  set  $@  on  error  and
+          return normally.
+        • Some more doc changes  to  reflect  the  current  state  of
+          SpiderMonkey support.
+        JE back end (0.007):
+        • event2sub  now sets  $@  instead of dying if there is a syn-
+          tax error.
+
+0.005   14 February, 2010
+        The JavaScript plugin:
+        • Incompatible changes:
+          • set  now expects a  WWW::Scripter  object  as  the  first
+            argument.
+          • new_function,  which used to offer no more  functionality
+            than  set,  now adds the function to all JS  environments,
+            including future ones (a bit like bind_classes).
+        • New back_end method
+        • The eval method is now public (it was there all along,  but
+          the docs were removed  in  the  conversion  from  the  Mech
+          plugin  to  the  Scripter  plugin;  the  interface  changed
+          slightly in the process).
+        • JE is now the default back end. SpiderMonkey used to be the
+          back end,  but there was never one available,  so that made
+          no difference.  Now there is a SpiderMonkey back  end  (not
+          included),  but it is so full of bugs we need to wait a bit
+          before flipping the switch back.
+        JE back end (0.006):
+        • A piece of JavaScript code  calling  a  method  on  another
+          global object no longer dies.  This was broken  by  0.004’s
+          multiple-window clean-up.
+        • Modified to make use of the plugin’s  new  back_end  method,
+          to reduce memory usage.
+
+0.004   25 October, 2009
+        The JavaScript Plugin:
+        • Scripts in frames now run in the context of the frame,  not
+          the top-level window.
+        JE back end (0.005):
+        • We now explicitly require version 0.032 of HTML::DOM::Inter-
+          face.  (This should have been added  in  the  previous  ver-
+          sion.)
+
+0.003   9 October, 2009
+        The JavaScript plugin:
+        • Updated to work with  HTML::DOM  0.032’s new event  handler
+          model. This fixes various bugs involving event handler prop-
+          erties (‘theForm.onsubmit’).
+        • Calling  WWW::Scripter’s  eval  method would run  the  Java-
+          Script code always in the main window,  if when called from
+          the WWW::Scripter object corresponding to a frame. This has
+          been fixed. This is part of the solution to the frames prob-
+          lem mentioned below.
+        •‘require WWW::Scripter::Plugin::JavaScript’  no longer  dies
+          if WWW::Scripter is not already loaded.
+        JE back end (0.004):
+        • We now support those utterly useless  HTML-generating  meth-
+          ods of string objects that have  been  part  of  JavaScript
+          since the very beginning,  and which have been added solely
+          for completeness’ sake.
+        • We now override JE’s exists method, so that collection prop-
+          erties of the window object appear in scope and can be seen
+          by hasOwnProperty.
+        • Likewise updated to work with the new event  handler  model.
+        • The scope  of  an  event  handler  now  includes  the  docu-
+          ment object.
+        • For those cases where HTML::DOM  provides UTF-16 methods in
+          addition to the usual ones,  JavaScript now uses the UTF-16
+          versions.  (This makes  textNode.data.length  equivalent to
+          textNode.length.)
+        • It used to be that frames with no scripts in them that were
+          accessed by JavaScript code in the main window would  share
+          the global  object  with  the  main  window.  Also,  window
+          objects,  if referenced by JavaScript variables in  another
+          frame,  would continue to refer to the same  global  object
+          when the frame was navigated.  This mess  has  been  mostly
+          cleaned up. There are a few rough edges that will be ironed
+          out in a future release.
+
+0.002c  27 August, 2009
+        JE back end (0.003):
+        • This release simply fixes a test  to  check  for  JE  0.035
+          instead of  JE  0.034  before deciding not to skip  a  test.
+          (The version has been changed as  the  module’s  docs  have
+          changed.)
+
+0.002b  25 August, 2009
+        JE back end:
+        • It now turns on  JE’s HTML mode  (to support HTML  comments
+          embedded in JavaScript).  Version 0.034 of  JE  is required
+          for this feature to work.
+
+0.002a  16 August, 2009
+        HTML::DOM 0.027 and WWW::Scripter 0.004  are now required.  A
+        bug fix in JE 0.033 causes the tests to trigger bugs in previ-
+        ous versions of those two modules.
+
+0.002   15 August, 2009
+        The JavaScript plugin:
+        • Fixed the init callback interface to  match  the  docs  (it
+          gets passed  the  WWW::Scripter  object,  not  the  plugin).
+        • Fixed  a  bug  introduced  in  0.001  (the  switch  to
+          WWW::Scripter) that caused the same JavaScript environ-
+          ment to be used for all pages
+
+0.001   5 April, 2009
+        First version. Just a renamed and tweaked version of the Mech-
+        anize JavaScript plugin (see below).
+
+
+Revision history for WWW::Mechanize::Plugin::JavaScript and ::DOM
+
+0.009c  11 March, 2009
+        The DOM plugin (0.013):
+        • parent has been added to
+          %WWW::Mechanize::Plugin::DOM::Window::Interface (RT
+          #43582 again).
+
+0.009b  11 March, 2009
+        An upload mistake. Please ignore.
+
+0.009a  5 March, 2009
+        The DOM plugin (0.012):
+        • window->top  now actually returns the  top  window,  rather
+          than the parent.
+        • window->parent has been added (RT #43582 again).
+
+0.009   27 February, 2009
+        The DOM plugin (0.011):
+        • Just doc fixes:  The frame features are listed in  ::Window,
+          and a previously fixed bug has been deleted from  the  list.
+        The JavaScript plugin:
+        • <!-- -->  is supported in external JS libraries (RT #43582)
+          and in javascript: URLs.
+        • Trailing --> no longer requires // (RT #43582).
+        • Line numbers are now correct after  a  <!--  with  multiple
+          line breaks before it.
+
+0.008   23 January, 2009
+        The DOM plugin (0.010):
+        • Scripts that are sent with a  transfer  encoding  (such  as
+          gzip) now work.
+        • navigator->appVersion
+        • count_timers
+        The JavaScript plugin:
+        • check_timeouts has been removed.
+        JE backend (0.007):
+        •‘var x;’  now creates the global var instead of being  a  no-
+          op (broken in 0.006).
+        • Event handlers in an event attribute of a <form> element no
+          longer die when variables are named.  (Thanks to  Imre  Rad
+          for alerting me to this.) (This was broken all the way back
+          in version 0.002.)
+
+0.007a  18 October, 2008
+        The DOM plugin (0.009):
+        • The  location  object’s  hash  method now returns an  empty
+          string when there is no  fragment,  instead  of  ‘#’  (with
+          warnings).
+
+0.007   15 October, 2008
+        The DOM plugin (0.008):
+        • Modifications to comply with recent changes to LWP and Mech.
+        The JavaScript plugin:
+        • Likewise
+
+0.006   25 September, 2008
+        The DOM plugin (0.007):
+        • The window object is now part of the event dispatch chain.
+        • The window method no longer dies when the page is not
+          HTML. As a result, you can now run JS code without an
+          HTML document.
+        • When a link in the DOM is clicked (via trigger_event or the
+          click method), it now goes to another page.
+        • It now provides Mech with handlers for extracting links and
+          images from the DOM.
+        • Scripts are properly decoded and are no longer always
+          treated as Latin 1.
+        • The DOM tree’s charset attribute is now set.
+        • The scripts_enabled method now disables event handlers as
+          well as <script>s.
+        • !doctype declarations are no longer dropped from the HTML
+	  returned by Mech’s ‘content’ method.
+        • Frames (including inline frames) are now supported. The win-
+          dow object now has its ‘top’,  ‘frames’ and  ‘length’  meth-
+          ods; and you can use it as a hash or array to access frames.
+        • The document object now has its location  object set.  This
+          was broken in 0.005. (Thanks to David Williams for noticing
+          the bug.)
+        The JavaScript plugin:
+        • You can now specify custom functions for alert, etc., even
+          after the JS environment has been created.
+        JE back end:
+        • Methods returning window objects now work  properly  instead
+          of returning weird objects that die when you so much as look
+          at them.
+        • The global object can now be used as an array or hash to
+          access frames.
+
+0.005a  7 September, 2008
+        The DOM plugin (0.006):
+        • The  window  object’s  *_function  methods  (alert_function,
+          etc.)  have been renamed to  set_*_function,  which is what
+          the docs already said;  and they actually work  now.  As  a
+          result,  the corresponding options to the JavaScript plugin
+          now work again. (They were broken in the previous release.)
+        JE back end (0.005):
+        • Properties and methods  that  are  supposed  to  return
+          DOMStrings can now return null. They used to return the
+          string ‘undefined’.
+
+0.005   7 September, 2008
+        The DOM plugin:
+        • New scripts_enabled method for enabling/disabling scripts.
+        • The window object has been disentangled from the JavaScript
+          plugin and made its own Perl class, under the DOM namespace.
+          It is accessible via the ‘window’ method.
+          • This allows the window  object  to  inherit
+            from HTML::DOM::EventTarget, which provides
+            addEventListener, onclick, etc.
+          • As a bonus, it has a ‘self’ method.
+        • The JS plugin’s check_timeouts method is now deprecated. Use
+          the DOM plugin’s new check_timers method instead.
+        The JavaScript plugin:
+        • Support for javascript: URLs
+        • The JavaScript back end’s constructor is now called with the
+          window object as its argument.  It has to  make  the  global
+          object delegate to the window.
+        JE back end (0.004):
+        • Modified to conform to the previous item. It does not yet
+          support wrapping global objects when they are  passed  to
+          other JS environments.
+
+0.004   19 August, 2008
+        The DOM plugin:
+        • <body onload=...> now works.
+        • The DOM plugin can now be C<require>d without Mech already
+          loaded, so it works with tools like pmvers.
+        The JavaScript plugin:
+        • The location object now stringifies to its href property
+          instead of [object Location].
+
+0.003   29 July, 2008
+        The DOM plugin:
+        • Event attribute handlers now receive URL and line
+          number info.
+        • On a page that has no Content-Script-Type header, a
+          script element with no language specified no longer
+          causes warnings.
+        • It used to be that,  if multiple script elements  or  event
+          attributes used the same  handler,  and  that  handler  was
+          passed to the plugin with a regexp to select it (as opposed
+          to 'default'),  only every other script/event would be trig-
+          gered  (forgot to clear a couple of hash  iterators).  This
+          has been fixed. 
+        • $mech->content now returns the content in the encoding of
+          the page itself, rather than the encoding of the first page
+          encountered.
+        The JavaScript plugin:
+        • The engine method (experimental and undocumented--read the
+          source) has been added.
+        • clear_timeouts now actually works properly. It used to run
+          the code for each timeout only if the specified  time  had
+          *not* elapsed.
+        • Line numbers for event attributes are now passed to the back
+          end’s event2sub method.
+        JE back end:
+        • Read-only properties are now marked as such in the JS  envi-
+          ronment  (which prevents the setting of a property if a pro-
+          totype has a read-only property of the same name --the only
+          difference it makes) and now have their types (string,  num-
+          ber, etc.) set properly.
+        • Class bindings now use JE’s ‘unwrap’ feature, so version
+          0.022 is now required.
+        • event2sub now supports line numbers.
+
+0.002   23 December, 2007
+        The DOM plugin:
+        • The DOM plugin’s interface has changed.  The  callback  rou-
+          tines passed to it now get a WWW::Mechanize object as their
+          first argument.
+        • Line numbers for inline scripts now work properly.
+        The JavaScript plugin:
+        • You can now set up class bindings before fetching the first
+          page (it used to die).
+        • CSS::DOM is now a prerequisite.
+        • setTimeout and clearTimeout have been added, along with the
+          check_timeouts plugin method.
+        • There is now a ‘screen’ object, but it has no properties.
+          You have to  set  them  yourself  with  an  ‘init’  call-
+          back routine.
+        • There is an  ‘open’  method which simply moves to the  next
+          page, ignoring all arguments except the first. It is just a
+          temporary placeholder.
+        • The navigator object now has an appName property, set to
+          WWW::Mechanize.
+        • Back-ends are now expected to accept a third argument to
+          new_function, indicating the return type (the JE binding
+          supports this of course :-).
+        • JavaScript code referenced in the page itself (as opposed to
+          code passed to the plugin’s eval method)  used to  be  evalu-
+          ated in the same JS environment  for  all  pages.  This  has
+          been fixed.
+        JE back end:
+        • JS event handlers for HTML elements now have the form in the
+          scope chain.  (This applies to  all  elements  that  have  a
+         ‘form’ method.)
+        • JS event handlers now have the ‘this’ value set correctly.
+
+0.001   24 November, 2007
+        First CPAN release
+        • The JavaScript plugin has been completely restructured. It
+          now supports multiple backends.
+        • It now allows one to provide an initialisation function that
+          is run whenever a JavaScript environment is created, as well
+          as custom alert, confirm and prompt functions.
+        • Allows binding of custom Perl classes via 'bind_classes'.
+        • The DOM plugin’s callback routines  for  fetching  the  page
+          content as HTML or text now check to see whether the page is
+          HTML first.
+        • The DOM plugin now overrides extract_forms.
+        • Started work on event-handling.
+        • A few other minor things
+
+0.0.2   19 July, 2007
+        Updated ::DOM to work with a new patch for WWW::Mechanize
+        (modified according to Eric Wilhelm's suggestion) 
+
+0.0.1   17 July, 2007
+        A proof-of-concept sent to Andy Lester and to the LWP mailing
+        list.  Requires a  patch  to  WWW::Mechanize  (also  sent  to
+        the list).

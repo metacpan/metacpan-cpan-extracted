@@ -1,0 +1,50 @@
+Revision history for Perl extension WWW-JSON
+
+1.02 2015-05-27T19:06:16Z
+    - Fixed bug where templating was being done after setting body params
+
+1.01 2015-02-05T18:55:44Z
+    - Use HTTP::Request::Common for POSTs, for file uploads
+
+1.00 2015-02-05T18:43:28Z
+    - PUTs need to work like POSTs, not GETs
+    - Added Header authentication method
+    - get,post etc can now take an additional options hashref as an optional third parameter. currently used to define additional query params
+
+0.08 2013-10-15T18:19:28Z
+    - Turn on utf8 flag for json encode and decode
+
+0.07 2013-09-26T19:50:48Z
+    - Adding EXPERIMENTAL templating in URL paths. Example usage: $wj->get('/users/[% user_id %]/status', { queryparam1 => 'foo', -user_id => 123 });
+    - Removed experimental retry functionality, instead use $wj->http_request($response->request_object) to retry
+
+0.06 2013-09-16T22:07:19Z
+    - HTTP DELETE should pass params in query string
+    - Dont try to JSON decode if you get nothing back
+    - allow_nonref when decoding JSON
+
+0.05 2013-07-18T19:07:02Z
+    - Some code restructuring
+    - http_request method which allows you to past a fully formed HTTP::Request object. Auth is applied and nothing else
+    - Fixed a bug around when relative URI objects are requested
+
+0.04 2013-06-07T16:35:53Z
+    - Added response->error 
+    - Experimental ability for a response to retry itself via resp->retry(), still thinking this through so it's not in the perldoc yet
+    - Create HTTP::Response objects instead of using lwp->get, ->post etc
+    - Refactored how auth roles work, no more using lwp->default_header('Authorization') nonsense
+    - Added a simple example using the metacpan api
+    - Can pass arbitrary options to useragent via ua_options
+
+0.03 2013-06-04T04:26:03Z
+    - 5.08 support, since it was trivial to implement
+    - Added www-json-response->handle
+
+0.02 2013-06-02T00:51:24Z
+
+    - First release on CPAN
+
+0.01 2013-06-02T00:30:11Z
+
+    - First release!
+

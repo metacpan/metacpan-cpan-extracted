@@ -1,0 +1,18 @@
+abstract: Get Google Chart URL and image file
+author: Yusuke Wada <yusuke@kamawada.com>
+build_requires: 
+  Pod::Coverage: 0
+  Test::More: 0
+  Test::Pod: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: WebService-Simple-Google-Chart
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Filter::Util::Call: 0
+  WebService::Simple: 0.12
+version: 0.05

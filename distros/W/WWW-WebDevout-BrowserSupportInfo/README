@@ -1,0 +1,40 @@
+WWW-WebDevout-BrowserSupportInfo
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::WebDevout::BrowserSupportInfo
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-WebDevout-BrowserSupportInfo
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-WebDevout-BrowserSupportInfo
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-WebDevout-BrowserSupportInfo
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-WebDevout-BrowserSupportInfo
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zoffix Znet
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

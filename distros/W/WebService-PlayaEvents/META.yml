@@ -1,0 +1,23 @@
+---
+abstract: 'WebService::PlayaEvents - an interface to the burning man PlayaEvents API using Web::API'
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.130880'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-PlayaEvents
+requires:
+  Mouse: 0
+  Web::API: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/nupfel/WebService-PlayaEvents/issues
+  homepage: https://github.com/nupfel/WebService-PlayaEvents/wiki
+  repository: git://github.com/nupfel/WebService-PlayaEvents.git
+version: 0.1

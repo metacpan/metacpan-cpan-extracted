@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl Win32 API Import Facility",
+   "author" : [
+      "Aldo Calpini <dada@perl.it>, Cosimo Streppone <cosimo@cpan.org>, Daniel Dragan <bulkdd@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "win32",
+      "api",
+      "dll",
+      "libraries"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config::Perl::V" : "0",
+            "Encode::compat" : "0",
+            "File::Spec" : "0",
+            "IPC::Open3" : "0",
+            "Math::Int64" : "0",
+            "Test::More" : "0",
+            "Win32" : "0",
+            "Win32API::File" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::Int64" : "0"
+         },
+         "requires" : {
+            "Scalar::Util" : "0",
+            "perl" : "5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/bulk88/perl5-win32-api"
+      }
+   },
+   "version" : "0.84",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

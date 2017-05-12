@@ -1,0 +1,22 @@
+Revision history for Perl extension Widget::Meta.
+
+0.06  2011-07-16T23:47:26
+      - Fixed test failures on Windows.
+
+0.05  2011-06-26T06:37:56
+      - Moved repostitory to [GitHub](https://github.com/theory/class-meta/).
+      - Switched to a "traditional" `Makefile.PL`.
+
+0.04  2008-05-05T19:22:15
+      - Added the "configure_requires" and "recommends" parameters to Build.PL.
+      - Updated copyright.
+
+0.03  2004-09-18T19:58:04
+      - Changed the "kind" attribute to "type".
+
+0.02  2004-09-17T04:19:30
+      - Added description to README.
+      - Added Test::Simple to build requirements.
+
+0.01  2004-09-17T04:02:27
+      - Initial public release.

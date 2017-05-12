@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema
+    elementFormDefault="unqualified"
+    targetNamespace="http://www.example.com/unqualified"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:element name="processRecord">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="base"          type="xsd:string" />
+                <xsd:element name="timestamp"     type="xsd:string" />
+                <xsd:element name="correlationId" type="xsd:string" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -1,0 +1,38 @@
+NAME
+    WWW::Shorten::Yahooit - Perl interface to y.ahoo.it
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+    use WWW::Shorten::Yahooit; use WWW::Shorten 'Yahooit';
+
+    $short_url = makeashorterlink($long_url);
+
+    $long_url = makealongerlink($short_url);
+
+  DESCRIPTION
+    This module uses YQL to create shortened URLs using the y.ahoo.it URL
+    shortening service from Yahoo!
+
+METHODS
+  makeashorterlink
+    The function makeashorterlink will do an insert on the yahoo.y.ahoo.it
+    table on the Yahoo! YQL service passing it your long URL and will return
+    the shorter version.
+
+  makealongerlink
+    The function makealongerlink will do an select on the yahoo.y.ahoo.it
+    table on the Yahoo! YQL service passing it your short URL and will
+    return the longer version.
+
+AUTHOR
+    Charles A. Wimmer <charles@wimmer.net>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Charles A. Wimmer.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

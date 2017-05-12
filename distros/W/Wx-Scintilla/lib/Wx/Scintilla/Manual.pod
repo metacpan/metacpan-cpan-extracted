@@ -1,0 +1,30 @@
+package Wx::Scintilla::Manual;
+
+# ABSTRACT: What is Wx::Scintilla, and how do I use it?
+
+=pod
+
+=head1 NAME
+
+Wx::Scintilla::Manual - What is Wx::Scintilla, and how do I use it?
+
+=head1 WHAT IS WX::SCINTILLA?
+
+=head2 Constants
+
+Scintilla constants can be here L<Wx::Scintilla::Constant>
+
+=head1 AUTHOR
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Ahmad M. Zawawi.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+__END__

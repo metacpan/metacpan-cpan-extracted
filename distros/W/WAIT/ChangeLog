@@ -1,0 +1,425 @@
+Sat Nov 15 11:32:15 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/WAIT/Table.pm (create_inverted_index): Modified
+ 	documentation according to Andreas Koenig.
+
+Wed Nov 12 20:25:44 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/WAIT.pm: Fixed Typos. New Table construction interface needs
+ 	to be documented.
+
+	* lib/WAIT/Table.pm (create_index, create_inverted_index): move
+ 	parts of the constructor in new funktion.
+
+	* lib/WAIT/InvertedIndex.pm: fail -> croak
+
+	* lib/WAIT/Database.pm (create_table): fail -> croak
+
+Wed Nov  5 16:45:09 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/WAIT/Filter.pm (AUTOLOAD): moved decode_entities to
+ 	AUTOLOAD. Made it use UNIVERSAL->can() to prepare for changes of
+ 	the inheritance.
+
+	* lib/WAIT/Document/Find.pm: -w fixes
+
+	* script/index-html.PL: Created with Andreas König butchering
+ 	smakewhatis.
+
+	* lib/WAIT/Parse/HTML.pm: Created with Andreas König
+
+	* lib/WAIT/Filter.pm (decode_entities): Try importing from
+ 	HTML::Entities on demand.
+
+	* t/client.t: fail grecefully if server cannot be connected.
+
+Thu Sep  4 14:32:22 1997  Norbert Goevert  <goevert@ls6.informatik.uni-dortmund.de>
+
+	* 1.519 is new version
+	
+	* almost all files: minor fixings, clean up 
+
+Tue Aug 12 17:05:54 1997  Norbert Goevert  <goevert@ls6.informatik.uni-dortmund.de>
+
+	* 1.518 is new version
+	
+	* lib/WAIT/Filter.pm lib/WAIT/Server.pm: new $VERSION string
+
+	* synchronized with Ulrichs version
+
+Thu Apr 24 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Table.pm: added a local 'no strict refs'.
+
+	* lib/WAIT/Server.pm: Included new NNML Version. Readded HTML
+	  parsing which still seems to break things.
+
+	* pod.PL: Wrap bugs.
+
+	* cpan.PL: Works with LWP again.
+
+	* t/filter-base.t: Fixed header.
+
+Mon Mar 31 08:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* copyright patchlevel.h pmakewhatis.PL pod.PL smakewhatis.PL
+	  sman.PL lib/WAIT/Filter.pm: Cleanup of version at home
+
+Fri Mar 28 19:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/InvertedIndex.pm: Added caching. This saves half the
+	  elapsed time when indexing CPAN from scratch:
+	  
+		  558.110u 169.270s 22:07.40 54.7% 0+0k 0+0io 44992pf+2993w
+		  470.550u 51.340s 10:50.62 80.2% 0+0k 0+0io 33202pf+1986w
+
+	* lib/WAIT/Table.pm: Fixed strict refs warning.
+
+Sun Mar 23 11:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Server.pm: Fix for broken connections
+
+Wed Feb 26 15:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL waisquery.y lib/WAIT/Query/Wais.pm: fix byacc output
+
+Tue Feb 18 12:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* cpan.PL: Added aliasing stuff
+
+	* lib/WAIT/InvertedIndex.pm lib/WAIT/Table.pm
+	  lib/WAIT/Document/Tar.pm: Some cleanup
+
+Mon Feb 17 09:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL lib/WAIT/Database.pm lib/WAIT/Table.pm
+	  lib/WAIT/Query/Base.pm t/table.t: Fixed untie bug (database.t)
+
+Fri Feb 14 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* cpan.PL pmakewhatis.PL pod.PL smakewhatis.PL sman.PL: Removed
+	  'Log' keyword.
+
+Tue Feb 11 16:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Server.pm: The is now a emulation of the protocol via
+	  HTTP. So poor people behind a firewall should be able to use it
+	  now. If works but is rather slow. Here are the timings:
+	  
+	  WAIT:  3 secs ( 1.46 cusr  0.22 csys =  1.68 cpu) HTTP: 72 secs (
+	  1.51 cusr  0.28 csys =  1.79 cpu)
+	  
+	  I do not know what is so slow here. From sending a request to a
+	  proxy until it reaches the server there pass several seconds. If
+	  someone has suggestion about speeding this up, let me know.
+	  
+	  Maybe you have more luck with your proxy anyway.
+
+Tue Feb 11 14:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: The is now a emulation of the protocol via
+	  HTTP. So poor people behind a firewall should be able to use it
+	  now. If works but is rather slow. Here are the timings:
+	  
+	  WAIT:  3 secs ( 1.46 cusr  0.22 csys =  1.68 cpu) HTTP: 72 secs (
+	  1.51 cusr  0.28 csys =  1.79 cpu)
+	  
+	  I do not know what is so slow here. From sending a request to a
+	  proxy until it reaches the server there pass several seconds. If
+	  someone has suggestion about speeding this up, let me know.
+	  
+	  Maybe you have more luck with your proxy anyway.
+
+Tue Feb 11 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm lib/WAIT/Server.pm: First HTTP version
+
+Mon Feb 10 18:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: Regenerated
+
+Mon Feb 10 17:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Server.pm: cmd_get did not insert a final newline if it
+	  was missing in the document. Also cmd_search, cmd_get, cmd_info
+	  did have a bad off by one bug.
+
+Mon Feb 10 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL copyright: Better "make dist" handling
+
+	* ChangeLog MANIFEST: Added t/client.t
+
+Fri Feb  7 07:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Database.pm: Fixed Storable stuff
+
+Thu Feb  6 08:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* t/client.t: Added t/client.t
+
+Tue Feb  4 16:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL lib/WAIT/Client.pm: Change Net::WAIT back to
+	  WAIT::Client
+
+Tue Feb  4 15:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: Changed WAIT::Client to Net::WAIT
+
+	* lib/WAIT/Client.pm lib/WAIT/Database.pm lib/WAIT/Filter.pm
+	  lib/WAIT/Index.pm lib/WAIT/IndexScan.pm lib/WAIT/InvertedIndex.pm
+	  lib/WAIT/Scan.pm lib/WAIT/Server.pm lib/WAIT/Table.pm
+	  lib/WAIT/Wais.pm: Renamed WAIT::Client to Net::WAIT.
+
+	* Makefile.PL wclient: Fixed Makefile.PL to reflect new path
+	  'lib/WAIT'.
+
+Tue Feb  4 12:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* patchlevel.h: iAdded to CVS repository
+
+Tue Feb  4 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL: Switched to CVS
+
+	* ChangeLog Copyright MANIFEST README WAIT.h WAIT.pod WAIT.xs
+	  bibdb.PL compressed-int-patch cpan.PL levenstein.c levenstein.h
+	  metaphone.c metaphone.h pmakewhatis.PL pod.PL smakewhatis.PL
+	  sman.PL soundex.c soundex.h stemmer.c stemmer.h test.ste
+	  waisquery.y lib/WAIT/Client.pm lib/WAIT/Database.pm
+	  lib/WAIT/Filter.pm lib/WAIT/Index.pm lib/WAIT/IndexScan.pm
+	  lib/WAIT/InvertedIndex.pm lib/WAIT/Scan.pm lib/WAIT/Server.pm
+	  lib/WAIT/Table.pm lib/WAIT/Wais.pm lib/WAIT/Document/Base.pm
+	  lib/WAIT/Document/Find.pm lib/WAIT/Document/Nroff.pm
+	  lib/WAIT/Document/Split.pm lib/WAIT/Document/Tar.pm
+	  lib/WAIT/Format/Base.pm lib/WAIT/Format/CPAN.pm
+	  lib/WAIT/Format/HTML.pm lib/WAIT/Format/Term.pm
+	  lib/WAIT/Parse/Base.pm lib/WAIT/Parse/Bibdb.pm
+	  lib/WAIT/Parse/Nroff.pm lib/WAIT/Parse/Pod.pm
+	  lib/WAIT/Query/Base.pm lib/WAIT/Query/Wais.pm
+	  lib/WAIT/Table/Disjoint.pm lib/WAIT/Table/Independent.pm
+	  t/bibdb.pl t/database.t t/disjoint.t t/document-split.t
+	  t/filter-base.t t/filter-iso.t t/independent.t t/insert.t
+	  t/scan.t t/table.t t/wais.t: switched to CVS
+
+Mon Feb  3 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: Minor WAIT::Client fix.
+
+	* lib/WAIT/Filter.pm: Updated version number.
+
+	* lib/WAIT/Database.pm: Add $Storable::forgive_me = 1.
+
+	* lib/WAIT/Client.pm: Allow array argument for search().
+
+	* lib/WAIT/Server.pm: Fixed welcome message.
+
+Fri Jan 31 14:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* sman.PL: Format method's now are passed a reference instead of an
+	  array.
+
+	* cpan.PL: Fix for relative path names when doing remove.
+	  find-ls.gz expire after 12 hours now. version() can now parse
+	  RAM's verioning scheme.
+
+	* ChangeLog: Client/Server.
+
+Fri Jan 31 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Server.pm: Hacked NNML::Server to act a simple WAIT
+	  Server.
+
+	* lib/WAIT/Document/Find.pm: Removes code reference at close time.
+
+	* lib/WAIT/Table.pm: Added fetch_extern_by_id() method.
+
+	* lib/WAIT/Document/Base.pm: Added close() method.
+
+	* lib/WAIT/Format/Base.pm: Format method's now are passed a
+	  reference instead of an array.
+
+	* lib/WAIT/Client.pm: First alpha version which should go to
+	  CPAN.pm.
+
+	* MANIFEST: Added WAIT::Server and WAIT::Client.
+
+	* lib/WAIT/Wais.pm: Cleaned up the Formatter handling. Moved the
+	  CPAN code to WAIT::Format::CPAN.
+
+	* lib/WAIT/Format/CPAN.pm: Moved CPAN hack from WAIT::Wais to this
+	  new Module.
+
+	* lib/WAIT/Database.pm: Added sync() method.
+
+Fri Jan 31 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Server.pm: Initial revision
+
+Fri Jan 31 09:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* wclient: Initial revision
+
+Thu Jan 16 09:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: Storable.
+
+	* lib/WAIT/Database.pm: Added support for Storable. Currently
+	  Data::Dumper (DB/meta) and Storable (DB/catalog) are used (if
+	  available) for saving the meta information. When loading the
+	  newest version is used (Storable preferred). So editing of
+	  'DB/meta' will cause and update of 'DB/catalog' next time the
+	  Database is opened for writing.
+
+	* lib/WAIT/Document/Split.pm: Added support for gziped input files.
+	  seek() is simulated.
+
+	* lib/WAIT/Wais.pm: Fixed CPAN hack again.
+
+	* lib/WAIT/Filter.pm: Updated $VERSION.
+
+Fri Jan 10 12:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Document/Split.pm: Added support for gzip. Streamlined
+	  file open code.
+
+	* lib/WAIT/Wais.pm: Support for reative document ids.
+
+	* cpan.PL: Various fixes. Added -remove. added $tb->sync calls.
+
+	* ChangeLog: Mostly cpan fixes.
+
+	* lib/WAIT/Filter.pm: Updated Version.
+
+	* sman.PL: Support for relative docid's
+
+	* lib/WAIT/Format/Base.pm: Added text() method. To allow for HTML
+	  escaping.
+
+	* lib/WAIT/Format/HTML.pm: Fixed HTML escaping.
+
+	* lib/WAIT/Parse/Pod.pm: Cleaned $self after parsing.
+
+	* lib/WAIT/Index.pm: Added sync() method.
+
+	* lib/WAIT/Table.pm: Added sync() method. Sanity check for deleted
+	  documents in search result.
+
+Mon Jan  6 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: added The GREAT CPAN Indexer!
+
+	* lib/WAIT/Wais.pm: Added a hack to include links to CPAN. Must
+	  remove that sometime later ;-)
+
+	* lib/WAIT/Table.pm: Make perl -w happy (new warnings in 5.003_19)
+
+	* lib/WAIT/Document/Tar.pm: Tie a hash to a couple of tar archives.
+
+	* MANIFEST: Added WAIT::Document::Tar and cpan.PL
+
+	* lib/WAIT/Filter.pm: Update $VERSION
+
+	* cpan.PL: The GREAT CPAN Indexer!
+
+Mon Dec 30 15:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* ChangeLog: Stripped obsolete bang lines and rcslogs.
+
+	* bibdb.PL: Removed 'use diagnostics'.
+
+	* pmakewhatis.PL smakewhatis.PL: Removed 'use diagnostics'. Fixed
+	  delete stuff.
+
+	* ChangeLog: Changed version to to 1.5*
+
+Mon Dec 30 14:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* stemmer.h: Copyright statement now points to stemmer.c
+
+	* bibdb.PL pmakewhatis.PL pod.PL smakewhatis.PL sman.PL soundex.c
+	  soundex.h test.ste waisquery.y lib/WAIT/Filter.pm
+	  lib/WAIT/Index.pm lib/WAIT/IndexScan.pm lib/WAIT/InvertedIndex.pm
+	  lib/WAIT/Scan.pm lib/WAIT/Wais.pm lib/WAIT/Parse/Bibdb.pm
+	  lib/WAIT/Parse/Nroff.pm t/bibdb.pl t/database.t t/disjoint.t
+	  t/document-split.t t/filter-base.t t/filter-iso.t t/independent.t
+	  t/insert.t t/scan.t t/table.t t/wais.t: dist 3.0 baseline
+
+	* ChangeLog Copyright MANIFEST README WAIT.h WAIT.pod bibdb.PL
+	  compressed-int-patch levenstein.h metaphone.h pmakewhatis.PL
+	  pod.PL smakewhatis.PL sman.PL soundex.c soundex.h stemmer.c
+	  stemmer.h test.ste waisquery.y lib/WAIT/Database.pm
+	  lib/WAIT/Filter.pm lib/WAIT/Index.pm lib/WAIT/IndexScan.pm
+	  lib/WAIT/Scan.pm lib/WAIT/Table.pm lib/WAIT/Wais.pm
+	  lib/WAIT/Document/Base.pm lib/WAIT/Document/Find.pm
+	  lib/WAIT/Document/Nroff.pm lib/WAIT/Document/Split.pm
+	  lib/WAIT/Format/Base.pm lib/WAIT/Format/HTML.pm
+	  lib/WAIT/Format/Term.pm lib/WAIT/Parse/Base.pm
+	  lib/WAIT/Parse/Bibdb.pm lib/WAIT/Parse/Nroff.pm
+	  lib/WAIT/Parse/Pod.pm lib/WAIT/Query/Base.pm
+	  lib/WAIT/Query/Wais.pm lib/WAIT/Table/Disjoint.pm
+	  lib/WAIT/Table/Independent.pm t/bibdb.pl t/database.t
+	  t/disjoint.t t/document-split.t t/filter-base.t t/filter-iso.t
+	  t/independent.t t/insert.t t/scan.t t/table.t t/wais.t: Initial
+	  revision
+
+	* ChangeLog bibdb.PL compressed-int-patch levenstein.c levenstein.h
+	  metaphone.c metaphone.h pmakewhatis.PL lib/WAIT/Filter.pm
+	  lib/WAIT/Index.pm lib/WAIT/IndexScan.pm lib/WAIT/InvertedIndex.pm
+	  lib/WAIT/Scan.pm lib/WAIT/Table.pm lib/WAIT/Wais.pm
+	  lib/WAIT/Document/Nroff.pm lib/WAIT/Document/Split.pm
+	  lib/WAIT/Format/Base.pm lib/WAIT/Format/HTML.pm
+	  lib/WAIT/Format/Term.pm lib/WAIT/Parse/Base.pm
+	  lib/WAIT/Parse/Bibdb.pm lib/WAIT/Parse/Nroff.pm
+	  lib/WAIT/Parse/Pod.pm lib/WAIT/Query/Base.pm
+	  lib/WAIT/Query/Wais.pm lib/WAIT/Table/Disjoint.pm
+	  lib/WAIT/Table/Independent.pm: Added Copyright notice.
+
+	* stemmer.c: Included CNIDR Copyright message.
+
+	* lib/WAIT/Filter.pm: Reverted to plain version number.
+
+	* MANIFEST: Made shure that waisquery.y is packed before
+	  WAIT/Query/Wais.pm.
+
+	* ChangeLog Copyright MANIFEST Makefile.PL README WAIT.h WAIT.pod
+	  WAIT.xs lib/WAIT/Database.pm lib/WAIT/Document/Base.pm
+	  lib/WAIT/Document/Find.pm: Converted to dist-3.0
+
+	* ChangeLog: Fixed CNIDR Copyright stuff.
+
+Mon Dec 16 10:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Config.pm: Initial revision
+
+Tue Oct 15 11:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* WAIT.xs: Will remove dummy Levenstein()
+
+	* Makefile.PL levenstein.c: Initial revision
+
+Tue Oct 15 10:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* distance.c: OK.
+
+Tue Oct 15 09:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* distance.c: Initial revision
+
+Fri Oct 11 11:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* metaphone.c: Initial revision
+
+Thu Oct 10 11:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* WAIT.xs: Initial revision
+
+Wed Oct  9 13:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/InvertedIndex.pm: Initial revision
+
+Fri Oct  4 10:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* query.pl: Initial revision
+

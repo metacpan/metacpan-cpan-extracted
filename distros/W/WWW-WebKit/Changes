@@ -1,0 +1,57 @@
+0.10 2016-12-13 16:45:00 CET
+    * Fix compatibility with libwebkitgtk-3_0-0 version > 2.4.8
+
+0.09 2016-10-27 09:50:00 CEST
+    * Re-enable use of xvfb in tests
+
+0.08 2016-05-31 12:35:00 CEST
+    * Fix JavaScript prompt() handling
+    * Add method to check next alert message
+    * Add attribute to accept/decline confirmations
+    * Add method to answer each confirmation individually
+
+0.07 2014-12-07 12:00:00 CET
+    * New method: disable_plugins
+    * Allow multi-line JS in eval_js
+    * Fix BUILD_REQUIRES syntax in Makefile.PL
+    * Fixes experimental warnings on Perl 5.18
+    * Support capital letters and special character literals in key_press and type_keys
+    * Fix wait_for_pending_requests sometimes waiting for finished requests
+    * Extend Keycodes, Uppercase Characters in type_keys, delete_text
+    * Allow overriding the event processing loops in subclasses
+
+0.06 2013-10-01 22:30:00 CEST
+    * Fix compatability with Glib::Object::Introspection 0.013 and newer
+    * Made starting Xvfb reliable by fixing X display number collisions)
+    * New method wait_for_pending_requests
+    * Support more special keys in key_press
+    * Improved documentation
+
+0.05 2012-11-26 09:30:00 CET
+    * Added missing build_requires
+
+0.04 2012-11-24 10:00:00 CET
+    * New method: wait_for_condition
+    * New method: mouse_up
+    * New method: native_drag_and_drop_to_position
+    * Several fixes to drag&drop
+    * Remove implicit pause(300) from wait_for_page_to_load
+    * Croak on imprecise css selectors like with XPath queries
+    * Allow Gtk3 to be used in Catalyst backends
+    * No longer use X11::GUITest
+    * Add configure dependency information to META.yml and META.json
+
+0.03 2012-05-30 15:45:00 CEST
+    * New method: wait_for_alert
+
+0.02 2012-05-15 15:15:00 CEST
+    * Do not fail tests if Xvfb is not available
+    * Be compatible with XSLoader < 0.14
+    * Implemented check, uncheck, eval_is and is_ordered
+    * Added some tests
+    * Added documentation about implemented methods
+
+0.01 2012-02-23 17:00:00 CET
+    * first public version
+
+# vim: expandtab shiftwidth=4 sts=4:

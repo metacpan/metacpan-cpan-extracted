@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>test</title>
+        <style type="text/css">
+            #invisible { visibility: hidden; }
+            #void { display: none; }
+        </style>
+    </head>
+    <body>
+        <div id="test" class="foo bar"></div>
+        <div id="invisible">
+            I'm invisible!
+            <div id="invisible_child">Parent's invisible, so am I</div>
+        </div>
+        <div id="void">
+            I'm void!
+            <div id="void_child">Parent's void, so am I</div>
+        </div>
+        <a href="#">linktext</a>
+        <a href="#"><span>inner_linktext</span></a>
+        <select name="select">
+            <option>foo</option>
+            <option>bar</option>
+            <option>baz</option>
+        </select>
+        <input name="checkbox" value="1" type="checkbox"/>
+    </body>
+</html>

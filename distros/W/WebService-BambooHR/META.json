@@ -1,0 +1,56 @@
+{
+   "abstract" : "interface to the API for BambooHR.com",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-BambooHR",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.045",
+            "JSON::MaybeXS" : "1.003003",
+            "MIME::Base64" : "0",
+            "Moo" : "2.000000",
+            "Moo::Role" : "0",
+            "Throwable" : "0",
+            "Try::Tiny" : "0.13",
+            "overload" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Online" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/WebService-BambooHR",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/WebService-BambooHR.git",
+         "web" : "https://github.com/neilbowers/WebService-BambooHR"
+      }
+   },
+   "version" : "0.07"
+}
+

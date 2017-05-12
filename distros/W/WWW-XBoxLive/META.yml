@@ -1,0 +1,35 @@
+---
+abstract: 'Get XBox Live Gamercard information'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  HTTP::Online: 0
+  Net::Ping: 2.33
+  Test::More: 0.88
+  Test::WWW::Mechanize: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-XBoxLive
+requires:
+  HTML::TreeBuilder::XPath: 0
+  LWP::Protocol::https: 0
+  LWP::Simple: 0
+  Object::Tiny: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-WWW-XBoxLive/issues
+  homepage: https://github.com/andrewrjones/perl5-WWW-XBoxLive
+  repository: https://github.com/andrewrjones/perl5-WWW-XBoxLive.git
+version: 1.123160

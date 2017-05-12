@@ -1,0 +1,53 @@
+Revision history for Win32-WindowsMedia
+
+0.258	03/08/2010
+	Changes the regex match to allow - and _ characters in publishing point names.
+0.257	11/06/2008
+	Internal change release
+	Release for PPM repository at
+	http://www.shamrock.org.uk/PPM/
+0.256 	10/06/2008
+	Internal change release
+0.255	09/06/2008
+	Added - Not added to documentation as yet
+	Server_ExportXML
+	Publishing_Point_Authorization_ACL_Enable
+	Publishing_Point_Authorization_ACL_Disable
+	Fixed
+	Publishing_Point_Authorization_ACL_Add
+	Publishing_Point_Authorization_ACL_Remove
+0.254   06/06/2008
+	Log_Enable, Log_Disable now fixed
+0.253	03/06/2008
+	Debug wrapper added
+0.252	03/06/2008
+	Added Log_Cycle and modified how Log_Set now works, see documentation, so most
+	options are now available.
+	At present you can not get the logging parameters only set them.
+0.251	03/06/2008
+	Fixed a regex
+	Started to add options for Logging
+	Changed Log function to add parameters
+0.25	02/06/2008
+	Added Logging ( basic )
+0.24	30/05/2008
+	Fixed some typos and fixed List error
+0.23	18/05/2008
+	Added path change ( stop publishing point first)
+0.22	15/04/2008
+	Small bug fix for set_error call.
+0.21 	15/04/2008
+	Change Publishing_Point_Authorization_ACL_Remove from using an array to hash to
+	match the input to Publishing_Point_Authorization_ACL_Add
+	Added Publishing_Point_Authorization_ACL_List to list users defined on a publishing point.
+0.20	08/04/2008 Alpha Release 1
+	All previous modules have been merged into this one.
+	Backward compatiblity to 0.16 or before is not present.
+0.16	22/01/2008 Pre-Alpha Release 2
+	Documented current functions
+	No New Additions
+	Built correct package for CPAN distribution
+0.15	21/01/2008 Pre-Alpha Release
+0.01    1/06/2006 Alpha
+        First version, completely raw
+

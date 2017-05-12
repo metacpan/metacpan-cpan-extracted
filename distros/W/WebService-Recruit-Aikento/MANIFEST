@@ -1,0 +1,19 @@
+lib/WebService/Recruit/Aikento.pm
+lib/WebService/Recruit/Aikento/Base.pm
+lib/WebService/Recruit/Aikento/Item.pm
+lib/WebService/Recruit/Aikento/LargeCategory.pm
+lib/WebService/Recruit/Aikento/SmallCategory.pm
+LICENSE
+make-dist.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_pod.t
+t/01_new.t
+t/02_new_methods.t
+t/03_setget.t
+t/04_Method_Item.t
+t/05_Method_LargeCategory.t
+t/06_Method_SmallCategory.t
+t/07_Aikento.t
+META.yml                                 Module meta-data (added by MakeMaker)

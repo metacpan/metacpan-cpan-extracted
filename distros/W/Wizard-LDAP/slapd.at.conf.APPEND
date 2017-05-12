@@ -1,0 +1,6 @@
+attribute 	login					dn
+attribute 	gid					dn
+attribute 	name					dn
+attribute 	status					dn
+attribute 	mailForward				dn
+

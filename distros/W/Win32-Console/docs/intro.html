@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Console Introduction</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+<A NAME=Top>
+<CENTER><H1>Win32::Console</H1>
+<FONT FACE=Arial SIZE=2>
+Version 0.03 (07 Apr 1997)<BR>
+by Aldo Calpini (<A HREF="mailto:dada@perl.it">dada@perl.it</A>)<BR>
+</FONT></CENTER>
+
+<HR>
+
+
+<FONT FACE=Arial><H2><A NAME="Intro">Introduction</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+This module implements the Win32 console and character mode functions.
+
+They give you full control on the console input and output, including:
+
+<UL COMPACT TYPE=circle>
+<LI>support of off-screen console buffers (eg. multiple screen pages)
+<LI>reading and writing of characters, attributes and whole portions of the screen
+<LI>complete processing of keyboard and mouse events
+<LI>some very funny additional features :)
+</UL>
+
+Those functions should also make possible a port of the Unix's curses library; if there 
+is anyone interested (and/or willing to contribute)
+to this project, <A HREF="mailto:dada@perl.it">e-mail</A> me.
+<I>Thank you</I>.
+
+
+</FONT>
+<P>
+
+<HR>
+
+<FONT FACE=Arial><H2><A NAME="Disclaimer">Disclaimer</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2><I>
+This program is FREE; you can redistribute, modify, disassemble, or even reverse engineer this software at
+your will. Keep in mind, however, that NOTHING IS GUARANTEED to work and everything you do is
+AT YOUR OWN RISK - I will not take responsability for any damage, loss of money and/or health that may
+arise from the use of this program! 
+</I>
+<P>
+
+This is distributed under the terms of <A HREF="license.html">Larry Wall's Artistic License</A>. 
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME=Credits>Credits</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+Thanks to: Jesse Dougherty, Dave Roth, ActiveWare, and the Perl-Win32-Users community.
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="History">Version History</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+
+<B>0.03 (07 Apr 1997)</B>
+<UL TYPE=disc>
+  <LI>Added "GenerateCtrlEvent" method.
+  <LI>The PLL file now comes in 2 versions, one for Perl version 5.001 (build 110)
+      and one for Perl version 5.003 (build 300 and higher, EXCEPT 304).
+  <LI>added an installation program that will automatically copy the right version
+      in the right place.
+</UL>
+
+
+<B>0.01 (09 Feb 1997)</B>
+<UL TYPE=disc>
+  <LI>First public release. 
+</UL>
+
+</FONT>
+<P>
+
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="Install">Installation Instructions</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+<OL>
+    <LI>Run the INSTALL.BAT program.
+    <P>
+    <LI>Run the TEST.PL script to see if everything works.
+    <P>
+</OL>
+</FONT>
+<P>
+
+
+<HR>
+<FONT FACE=Arial SIZE=1>07 Apr 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;</FONT><P>
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,17 @@
+Changes
+idl/1-core1.idl
+idl/idl2interf
+lib/WWW/Scripter/Plugin/Ajax/_xml_stuff.pm
+lib/WWW/Scripter/Plugin/Ajax.pm
+Makefile.PL
+MANIFEST
+README
+#t/async.t
+t/http-test-server
+t/http.t
+t/test.t
+t/textContent.t
+t/tests.pm
+t/threads/shared.pm
+t/threads.pm
+META.yml                                 Module meta-data (added by MakeMaker)

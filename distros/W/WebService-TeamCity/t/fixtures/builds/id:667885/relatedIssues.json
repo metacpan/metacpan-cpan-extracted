@@ -1,0 +1,25 @@
+{
+   "count" : 1,
+   "href" : "/httpAuth/app/rest/builds/id:667885/relatedIssues",
+   "issueUsage" : [
+      {
+         "changes" : {
+            "change" : [
+               {
+                  "date" : "20160113T165909+0300",
+                  "href" : "/httpAuth/app/rest/changes/id:2256115",
+                  "id" : 2256115,
+                  "username" : "dmitry.neverov",
+                  "version" : "dc4130764ceb9737e4a24714dffde753447c7634",
+                  "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2256115&personal=false"
+               }
+            ],
+            "count" : 1
+         },
+         "issue" : {
+            "id" : "TW-43802",
+            "url" : "http://youtrack.jetbrains.net/issue/TW-43802"
+         }
+      }
+   ]
+}

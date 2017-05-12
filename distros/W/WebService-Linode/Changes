@@ -1,0 +1,172 @@
+Revision history for Perl module WebService::Linode
+
+0.28  2015-05-31 21:45:26 EDT
+    - API KVM support:
+      - optional hypervisor argument to linode_clone
+      - linode_config_create & _update helper_xen deprecated in favor of
+        new arg helper_distro
+      - optional virt_mode arg to linode_config_create & linode_config_update
+    - New method group professionalservices_scope
+    - Node balancer health check 'http_body' renamed to 'http' to reflect that
+      it now only checks the first 16K of the response
+
+0.27  2015-02-28 23:49:33 EST
+    - Big changes but not in functionality.  Import more verbose description
+      information for POD via the Linode api.spec method.
+
+0.26  2015-01-06 20:01:46 EST
+    - Patch from James Ottinger for image_update method 74816d
+
+0.25  2014-12-10 12:52:40 PST
+    - Patch from James Ottinger for additional Linode Images support a89bfc
+    - support for network helper in linode_config_create & linode_config_update
+      see <https://forum.linode.com/viewtopic.php?f=26&t=11469>
+
+0.24  2014-10-18 22:43:33 EDT
+    - add explicit section to POD for send_queued_requests
+    - Add Test::Pod::Coverage to cpanfile for develop
+
+0.23  2014-10-14 16:31:36 EDT
+    - Batched API request support by Kevan Benson <kbenson@cpan.org>
+
+0.22  2014-07-24 10:13:47 EDT
+    - support for the Linode Images service, currently in beta
+      see <https://forum.linode.com/viewtopic.php?f=26&t=11180>
+
+0.21  2014-07-01 13:02:10 EDT
+    - new avail_nodebalancers and linode_ip_setrdns methods
+    - linode_disk_create now optionaly takes fromdistributionid, isreadonly,
+      rootpass, and rootsshkey
+    - linode_disk_createfromstackscript now optionally takes rootsshkey
+    - paymentterm is now optional for nodebalancer_create
+
+0.20  2014-03-13 11:42:49 EDT
+    - support for adding new private and public IPs to a Linode
+    - support for swapping/moving an IP between Linodes
+    - moar deprecated WebService::Linode::DNS
+      - all methods carp
+      - most of POD replaced, points to WebService::Linode
+    - add LWP to cpanfile for CPANTS
+
+0.19  2014-02-09 00:28:23 EST
+    - depend on just LWP::Protocol::https instead of LWP::UserAgent,
+      Crypt::SSLeay, & Mozilla::CA, thanks Christopher Meng (cicku)
+    - Update FSF mailing address in LICENSE, thanks Christopher Meng (cicku)
+
+0.18  2014-02-04 11:36:24 EST
+    - API 2 factor authentication support, see:
+    <https://blog.linode.com/2014/02/03/linode-api-multiple-keys-and-two-factor/>
+
+0.17  2014-01-24 09:30:48 EST
+    - remove deprecated getDomainIDbyName & getDomainResourceIDbyName
+    - allow setting API url via ENV var LINODE_API_URL
+    - paymentterm is optional for linode.create and linode.clone
+    - update examples/dyndns.pl to remove use of deprecated functions
+
+0.16  2014-01-06 09:59:02 EST
+    - useragent arg to constructor for custom user agent header
+
+0.15  2013-11-07 12:02:21 EST
+    - Treat error code 0 as OK
+    - Update to latest API spec:
+        - New optional argument for domain_create & domain_update:
+            lpm_displaygroup
+        - New optional arguments for nodebalancer_config_create and
+          nodebalancer_config_update:
+            ssl_cert, ssl_key
+    - Add deprecation warning when calling getDomainIDbyName &
+      getDomainResourceIDbyName
+
+0.14  2013-10-23 11:04:39 EDT
+    - Add Mozilla::CA to dependencies.
+
+0.13  2013-09-28 20:05:23 EDT
+    - No functional changes in this release.
+    - Update link to Linode API docs
+    - Clean up POD a bit, remove required/optional parameter headings when list
+      is empty
+    - https://github.com/mikegrb/WebService-Linode/pull/2 to update older
+      change log entries to CPAN::Changes::Spec, thanks @neilbowers
+
+0.12  2013-09-25 14:58:18 EDT
+    - Upstream API Changes
+        - New methods:
+            - Prefixed by account_: estimateinvoice, paybalance, updatecard
+            - Prefixed by linode_:  mutate, webconsoletoken
+        - New optional args for linode_update:
+            - ms_ssh_disabled, ms_ssh_ip, ms_ssh_port, ms_ssh_user
+    - Bugfix
+        - fix avail_plans requiring optional planid argument
+        - verify domain_resource_create and linode_config_create still require
+          primary key as avail_plans does in api.spec
+    - Dist Creation Changes
+        - converted dist creation to milla
+        - moved helper scripts to
+          https://github.com/mikegrb/WebService-Linode-AuthorUtils
+
+0.11 2012-02-11
+    - fix primary keys marked as required param for domain_resource_create and
+      linode_config_create (thanks Peter Stephan)
+      - note: not fixed upstream yet gen-validation.pl output can not be used
+        directly currently
+
+0.10 2012-20-08
+    - updated API definition from api.spec after Linode fix, closes #79093
+
+0.09 2012-29-07
+    - Forgot to bump version number in DNS.pm and Base.pm
+        this is why all my other modules use Dist::Zilla
+
+0.08 2012-29-07
+    - new upstream API calls added
+        many additions including nodebalancer support
+        see for full changes http://j.mp/MNKKTf
+    - patch from stephon for deprecated DNS.pm (closes rt #71833)
+
+0.07 2012-10-02
+    - Correct typo in resourceid argument to domain_resource->list
+
+0.06 1012-12-01
+    - Correct reference to module name in docs (closes rt #59535 reported
+      by Paul Hansen)
+    - Use direct object notation rather than indirect notation
+    - new upstream API calls added
+
+0.05 2009-09-14
+    - Apikey is no longer a required argument to the base constructor
+    - New method in the base class, apikey for specifying or changing apikey
+      at times other than construction
+    - New method in WebService::Linode, user_getapikey, given a valid Linode
+      username and password, returns $data->{api_key}.  Note: you are
+      currently still responsible for calling $api->apikey($key) after
+      retrieving the key if you wish to use it for subsequent requests.
+    - fix WebService::Linode::DNS domainResourceGet when called with domain
+      name rather than id. (closes #49452 reported by jtmink1)
+
+0.04 2009-08-10 21:45:49 EDT
+    - Update to Linode.com API version 2.0 -- This is a pretty big change,
+      includes support for Linodes now as well as DNS
+    - WebService::Linode::DNS is now deprecated but /should/ continue to work.
+      changing to WebService::Linode should be straight forward with a few
+      method names changed to match the Linode.com methods with dots replaced
+      with under scores.
+
+0.03 2008-12-10
+    - Patch from Pat Hennessy to use $response->status_line for error
+      message when no JSON found in the response (closes #41328)
+    - Include Crypt::SSLeay in Makefile.PL prereqs and note about using
+      IO::Socket::SSL instead in the README
+    - Fix typo in WebService::Linode::DNS docs
+
+0.02 2008-09-15 20:45:20 EDT
+    - Cache last seen pub ip in examples/dyndns.pl
+    - Fix typo in WebService::Linode::DNS (closes #39311)
+    - Add tests that were there and should have caught above but
+      were missing from MANIFEST to MANIFEST
+    - Add MANIFEST.SKIP
+    - Add license to Makefile.PL
+    - Include gpg signed SIGNATURE file for Module::Signature
+
+0.01 2008-06-17 12:21:55 EDT
+    - First version, released on an unsuspecting world.
+

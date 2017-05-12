@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::Process::User.
+
+0.02  Sat Aug 19 2006
+	- changed README
+
+0.01  Fri Aug  4 12:28:42 2006
+	- original version; created by h2xs 1.21 with options
+		-n Win32::Process::User
+

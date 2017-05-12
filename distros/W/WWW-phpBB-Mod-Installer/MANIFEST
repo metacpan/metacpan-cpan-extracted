@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01basic_validation.t
+t/02basic_install.t
+t/96kwalitee.t
+t/97distribution.t
+t/98pod.t
+t/99podCoverage.t
+t/mod/install.xml
+t/mod/root/includes/functions_genders.php
+t/orig_web_root/config.php
+t/orig_web_root/memberlist.php
+lib/WWW/phpBB/Mod/Installer.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,91 @@
+WWW-Comix version 0.1.1
+
+NOTE NOTE NOTE
+
+This module's test suite is virtually not existent. Given the fact that
+this module's goal is interacting with external sites to get stuff,
+I've still to think a set of tests that can be done without actual
+network access to those sites.
+
+NOTE NOTE NOTE
+
+This modules eases the programmatical access to comic publishing sites.
+It deals with the differences in any of them, providing you with an
+abstraction layer that hides all the weird bits. New sites can be added
+easily by means of its plugin system.
+
+The philosophy, and many ideas, have been taken by the excellent
+WWW::Comic by Nicola Worthington. In particular, the idea of "probing"
+and the general organisation of the plugins is more or less the same.
+Why another module then? The main thing that is lacking in WWW::Comic
+is a way to programmatically access the whole list of available comics
+in a site.
+
+In particular, WWW::Comic allows you to specify an id for the feature
+you’re interested into, but when it comes to knowing which ids are
+actually available you’re on your own. WWW::Comix fills this gap.
+
+This module acts as a front-end towards the various plugins that do the
+actual work behind the scenes. To get an "agent" for comic download
+you’ll need to know - ehr - which comic you’re interested into:
+
+   my $comix = WWW::Comix->new(comic => $feature, probe => ’ok’);
+
+Whether you need to probe or not depends on your application. If you
+already probed before, chances are that you don’t need to do that
+again.
+
+AN IMPORTANT NOTE - PLEASE READ
+
+   Beware that there’s a difference between the tool and using the tool.
+
+   Whether you’re allowed to use this module, and the tools that come with
+   it, is entirely up to you. This collection of modules gives you a
+   framework for accessing comics programmatically, shaping it around a
+   metaphor that proves to be effective in the most popular comics sites.
+
+   On the other hand, the fact that these pieces of software are there
+   does not mean that you’re allowed to use them. You should peruse the
+   documentation of every and each site before deciding that you can use
+   it; moreover, when you do it you understand that you’ll be the sole
+   responsible. In poor’s man words, if the rules of the particular site
+   say that you’re not allowed to systematically download features, or
+   access the site with anything different from a web browser, than you
+   should either get permissions or refrain from using the module.  Note
+   that I don’t even support the idea that this module, and the tools that
+   come with it, can be regarded as a browser.
+
+   If you’re even in doubt about your possibility to use it, chances are
+   that you’re not allowed to do, so I urge you NOT to use it. See also
+   the "DISCLAIMER OF WARRANTY" and "NEGAZIONE DELLA GARANZIA" in the
+   module's documentation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+See documentation
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

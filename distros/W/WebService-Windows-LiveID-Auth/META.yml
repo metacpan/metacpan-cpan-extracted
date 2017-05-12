@@ -1,0 +1,26 @@
+--- 
+abstract: Perl implementation of Windows Live ID Web Authentication 1.0
+author: Toru Yamaguchi <zigorou@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WebService-Windows-LiveID-Auth
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  CGI: 0
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  Crypt::Rijndael: 0
+  DateTime: 0
+  Digest::SHA: 0
+  MIME::Base64: 0
+  URI: 0
+  URI::Escape: 0
+  URI::QueryParam: 0
+version: 0.01

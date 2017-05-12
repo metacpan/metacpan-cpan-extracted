@@ -1,0 +1,16 @@
+Internet.pm
+Internet.xs
+MANIFEST
+META.yml
+Makefile.PL
+README
+WININET.H
+docs/append.html
+docs/index.html
+docs/intro.html
+docs/license.html
+docs/reference.html
+docs/toc.html
+eg/sample.pl
+eg/test-async.pl
+typemap

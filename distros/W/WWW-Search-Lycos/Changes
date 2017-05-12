@@ -1,0 +1,121 @@
+2016-02-06  Kingpin  <martin@localhost.localdomain>
+
+	* t/basic.t: updated tests
+
+	* lib/WWW/Search/Lycos.pm (_parse_tree): fixed parser for current HTML
+
+2004-01-17  Kingpin  <mthurn@verizon.net>
+
+	* Lycos.pm (parse_tree): parse size and date for each result; gui_query() is the only query we do now
+
+	* t/basic.t: new tests for new content, etc.
+
+	* t/gui.t: removed file
+
+2003-12-29  Kingpin  <mthurn@verizon.net>
+
+	* t/basic.t: make all tests pass
+
+2003-10-22  Kingpin  <mthurn@verizon.net>
+
+	* Lycos.pm (parse_tree): fix typo which caused blank URLs (thanks to Thomas Busch)
+
+2003-09-20  Kingpin  <mthurn@verizon.net>
+
+	* Lycos.pm (parse_tree): fix parsing for new lycos.com output format
+
+	* t/gui.t: new file
+
+	* t/basic.t: new file
+
+2003-01-27  Kingpin  <mthurn@carbon>
+
+	* Lycos.pm (parse_tree): fix parsing for new lycos.com output format
+
+2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* test.pl: rewrite using Test::More
+
+	* Lycos.pm: overhaul for current www.lycos.com formats
+
+2000-12-20
+
+	* VERSION 2.15 RELEASED
+	
+2000-12-19  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm (native_retrieve_some): rewrite using HTML::TreeBuilder, correcting parsing errors
+
+2000-09-20
+
+	* VERSION 2.14 RELEASED
+	
+2000-09-21  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm (native_retrieve_some): was missing GUI results with no description
+
+2000-09-19
+
+	* VERSION 2.13 RELEASED
+	
+2000-09-18  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm (native_retrieve_some): BUGFIX for missing page count number
+
+2000-09-15
+
+	* VERSION 2.12 RELEASED
+	
+2000-09-15  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm (native_retrieve_some): parse new output format
+
+2000-06-15  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm: new method gui_query, and parse new output format
+
+Revision history for Perl extension WWW::Search::Lycos.
+
+=head1 VERSION HISTORY
+
+For newer changes, see the file ChangeLog in the WWW-Search-Lycos distribution.
+
+=head2 2.09, 1999-12-26
+
+output format fixes, and query string changes for searching Lycos.com (dbradford@bdctechnologies.com)
+
+=head2 2.08, 1999-12-22
+
+point to new path on lycos.com (thanks to David Bradford dbradford@bdctechnologies.com)
+
+=head2 2.07, 1999-12-10
+
+more output format fixes, and missing 'next' link for Sites
+
+=head2 2.05, 1999-12-03
+
+handle new url and new output format for Lycos::Sites.pm
+
+=head2 2.04, 1999-10-22
+
+use strip_tags();
+extract real URL from www.lycos.com's redirection URL
+
+=head2 2.03, 1999-10-05
+
+now uses hash_to_cgi_string()
+
+=head2 2.02, 1999-09-30
+
+Now able to get Web Sites results via child module Sites.pm
+
+=head2 2.01, 1999-07-13
+
+=head2 1.04, 1999-04-30
+
+Now uses lycos.com's advanced query format.
+
+=head2 1.02, 1998-12-10
+
+First public release after being adopted by Martin Thurn.
+

@@ -1,0 +1,6 @@
+LICENSE
+Makefile.PL
+README
+lib/Win32/Capture.pm
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

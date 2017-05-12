@@ -1,0 +1,477 @@
+#
+#  This file is part of WebDyne.
+#
+#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#
+#  This is free software, licensed under:
+#
+#    The GNU General Public License, Version 2, June 1991
+#
+#  Full license text is available at:
+#
+#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#
+<html>
+<head>
+
+
+<!-- Heading section with status code as page title -->
+
+<title>WebDyne Error !{! $_[1]->{'r'}->status !}</title>
+
+
+<!-- Embedded style sheet for formatting -->
+
+<style type="text/css">
+body {font-family:"Verdana"; font-weight:normal; font-size:.7em; color:black;} 
+p    {font-family:"Verdana"; font-weight:normal; color:black; margin-top:-5px}
+b    {font-family:"Verdana"; font-weight:bold; color:black; margin-top:-5px}
+h1   {font-family:"Verdana"; font-weight:normal; font-size:18pt; color:red }
+h2   {font-family:"Verdana"; font-weight:normal; font-size:14pt; color:maroon}
+tt   {font-family:"Lucida Console"; font-size:.9em}
+pre  {font-family:"Lucida Console"; font-size:.9em}
+</style>
+</head>
+
+
+<!-- Begin body -->
+
+<body bgcolor="white">
+
+
+<!-- Status code and server status message -->
+
+<h1>WebDyne Error !{! $_[1]->{'r'}->status !}</h1><hr align="left" width="80%" size="1"><h2><i>!{! \&HTTP::Status::status_message($_[1]->{'r'}->status) !}</i></h2>
+
+
+<!-- Perl section to populate blocks with error messages, backtraces etc. -->
+
+
+<perl param="!{! $_[1] !}">
+
+#  Need WebDyne Constants
+#
+use WebDyne::Constant;
+
+
+#  Get self ref, extract supplied params
+#
+my ($self, $param_hr)=@_;
+
+
+#  Local vars used across all routines
+#
+my $errstr=$param_hr->{'errstr'};
+my @errstack=@{$param_hr->{'errstack_ar'}};
+my $errtrace_ar=pop @errstack;
+
+
+#  Get data block from paramaters and load line numbers and other params
+#
+my $data_ar=$param_hr->{'data_ar'};
+my ($html_line_no_tag_start, $html_line_no_tag_end)=$self->data_ar_html_line_no($data_ar) if $data_ar;
+my $inline=$data_ar->[$WEBDYNE_NODE_ATTR_IX] && $data_ar->[$WEBDYNE_NODE_ATTR_IX]->{'inline'};
+
+
+#  Get any eval text if supplied
+#
+my $eval_text_sr=$param_hr->{'errperl_sr'};
+
+
+#  Source file name and tag start/finish line numbers for this error
+#
+my $srce_fn=$self->data_ar_html_srce_fn($data_ar) if $data_ar;
+my $srce_fn_display=$srce_fn if $WEBDYNE_ERROR_SOURCE_FILENAME_SHOW;
+
+
+#  Try to get line number of eval error 
+#
+my $eval_line_no;
+for (my $i=1; defined($errtrace_ar->[$i]); $i++) {
+    my $method=$errtrace_ar->[$i][0]  ||  last;
+    next unless ($method=~/^WebDyne::\w{32}/);
+    $eval_line_no=$errtrace_ar->[$i][2];
+    last;
+}
+unless ($eval_line_no) {
+    #  Might be syntax error - last resort
+    #
+    if ($errstr=~/syntax error at.*?line\s+(\w+)/) {
+        $eval_line_no=$1;
+    }
+}
+
+
+#  Display error string
+#
+if ($WEBDYNE_ERROR_SHOW) {
+	
+
+	#  Translate CR's to line breaks so errors are formatted somewhat nicely and escape any HTML. Also
+	#  massage line numbers displayed so make more sense in context of source file.
+	#
+	my $errstr_display=$errstr;
+	$errstr_display=&CGI::escapeHTML($errstr_display);
+	$errstr_display=~s/\n/<br>/g;
+	$errstr_display=~s/[\x00]+/./g;
+
+
+	#  Render
+	#
+	$self->render_block('error', errstr=>$errstr_display);
+	
+	
+	#  Return now if full/extended error messages not required
+	#
+	unless ($WEBDYNE_ERROR_SHOW_EXTENDED) {
+	    $self->render_block('error_extended_disabled');
+	    return \undef;
+        }
+
+}
+else {
+
+
+        #  Output generic error message
+        #
+        my $errstr_display=$WEBDYNE_ERROR_SHOW_ALTERNATE;
+	$self->render_block('error', errstr=>$errstr_display);
+	
+	
+	#  Don't do any more - skip display of all other sections by just returning
+	#
+	return \undef;
+	
+}
+
+
+#  Number of pre and post lines, max line length to show.
+#
+my $lines_pre=$WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_PRE;
+my $lines_post=$WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_POST;
+my $line_fragment_max=$WEBDYNE_ERROR_SOURCE_CONTEXT_LINE_FRAGMENT_MAX;
+
+
+#  Pull out the backtrace from the error handler internals and present as nicely as possible
+#
+if ($WEBDYNE_ERROR_BACKTRACE_SHOW) {
+
+
+        #  Iterate through error backtrace
+        #
+	my $webdyne_module_seen;
+	my $webdyne_backtrace_short=$WEBDYNE_ERROR_BACKTRACE_SHORT;
+	for (my $i=1; defined($errtrace_ar->[$i]); $i++) {
+
+		
+		#  Get method
+		#
+		my $method=$errtrace_ar->[$i+1][3] || $errtrace_ar->[$i][0] ||  last;
+		
+
+		#  If brief output look to see if we are in internal stack and quit
+		#
+		if ($method=~/^WebDyne::\w{32}::/) {
+			$webdyne_module_seen++;
+		}
+		elsif ($method=~/^WebDyne::/ && !$webdyne_module_seen) {
+			$webdyne_module_seen++;
+		}
+		elsif ($webdyne_backtrace_short && $webdyne_module_seen) {
+			last;
+		}
+		
+
+		#  Get line no
+		#
+		my $line_no=$errtrace_ar->[$i][2];
+		
+
+		#  Format nicely and render line
+		#
+		my $i_formatted=sprintf('%-2d',$i);
+		$i=~s/ /&nbsp;/;
+		$self->render_block('backtrace_line',
+			i=>$i_formatted, package=>$method, line=>$line_no);
+
+	}
+	
+	
+	#  And render whole block
+	#
+	$self->render_block('backtrace');
+	
+}
+
+
+#  Print source file region that caused error to show context. Only do if show source flag set
+#  and we have found a line number.
+#
+if ($WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW && $html_line_no_tag_start) {
+
+
+	#  Pretty printing
+	#
+	my $sprintf_max=length($html_line_no_tag_start + $lines_post);
+	$sprintf_max=2 if ($sprintf_max<2);
+
+	
+	#  Iterate through source lines till we get to area, then print
+	#
+	if ($srce_fn && $html_line_no_tag_start) {
+            my $fh=IO::File->new($srce_fn, &Fcntl::O_RDONLY) || die;
+            my $line_no;
+            while (my $line=<$fh>) {
+                if ($line_no++ > ($html_line_no_tag_start - $lines_pre)) {
+                    if ($line_fragment_max) {
+                        $line=(length($line) > $line_fragment_max) ?
+                            substr($line,0,$line_fragment_max) . '...' : $line;
+                    }
+                    $line=&CGI::escapeHTML($line);
+                    my $line_no_formatted=sprintf("\%-${sprintf_max}d",$line_no);
+                    $line_no_formatted=~s/ /&nbsp;/g;
+                    my $line_error=($line_no >= $html_line_no_tag_start && $line_no <= $html_line_no_tag_end);
+                    
+                    #  Render line
+                    #
+                    $self->render_block('context_line',
+                        line_no=>$line_no_formatted, line=>$line, line_error=>$line_error)
+                }
+                last if ($line_no > ($html_line_no_tag_end + $lines_post));
+            }
+            $fh->close()
+	}
+	
+	#  Render block
+	#
+	$self->render_block('context', srce_fn=>$srce_fn_display);
+}
+
+
+#  Now any eval backtrace
+#
+if ($WEBDYNE_ERROR_EVAL_CONTEXT_SHOW && $eval_text_sr) {
+
+
+	#  Get message
+	#
+	my $errstr=$param_hr->{'errstr'};
+	
+	
+        #  Get each line of the eval code
+        #	
+        my @eval_line=split(/\n/, ${$eval_text_sr});
+        
+
+        #  Pretty printing
+        #
+        my $sprintf_max=length($eval_line_no + $lines_post);
+        $sprintf_max=2 if ($sprintf_max<2);
+        
+        
+
+        #  Iterate through eval source lines till we get to area, then print
+        #
+        foreach my $line_no ($html_line_no_tag_start .. ($eval_line_no+$lines_post)) {
+            my $line=shift(@eval_line);
+            if ($line_no > ($eval_line_no-$lines_pre)) {
+                if ($line_fragment_max) {
+                    $line=(length($line) > $line_fragment_max) ?
+                        substr($line,0,$line_fragment_max) . '...' : $line;
+                }
+                $line=&CGI::escapeHTML($line);
+                my $line_no_formatted=sprintf("\%-${sprintf_max}d", $line_no );
+                $line_no_formatted=~s/ /&nbsp;/g;
+                my $line_error=($eval_line_no == $line_no);
+                
+                #  Render line
+                #
+                $self->render_block('eval_line',
+                    line_no=>$line_no_formatted, line=>$line, line_error=>$line_error)
+            }
+            #  Don't show excess lines if not needed.
+            last if ($line_no >= ($eval_line_no + scalar @eval_line));
+        }
+        
+        
+        #  Render block
+        #
+        $self->render_block('eval', srce_fn=>$srce_fn_display);
+
+}
+
+
+#  Now any CGI params
+#
+if ($WEBDYNE_ERROR_CGI_PARAM_SHOW && %_) {
+
+
+    #  Get message
+    #
+    local $Data::Dumper::Indent=1;
+    my $cgi_param_dump=Data::Dumper::Dumper(\%_);
+    $cgi_param_dump=&CGI::escapeHTML($cgi_param_dump);
+    $cgi_param_dump=~s/[\x00]+/,/g;
+    $self->render_block('cgi_param', cgi_param_dump=>$cgi_param_dump );
+
+}
+
+
+#  Render version and URI blocks
+#
+$self->render_block('uri') if $WEBDYNE_ERROR_URI_SHOW;
+$self->render_block('version') if $WEBDYNE_ERROR_VERSION_SHOW;
+
+
+
+#  All done
+#
+return \undef;
+
+</perl>
+
+
+<!-- Start of error table -->
+
+<table width="80%">
+
+
+<!-- The error string -->
+
+<block name="error">
+<tr><td><b>Error: </b></tr></td>
+
+<tr><td bgcolor="#eeeeee">
+<br>
+<tt>
+${errstr}
+</tt>
+<br>
+</td></tr>
+</block>
+
+<block name="error_extended_disabled">
+<tr><td>
+<br>
+<br>
+<b>Backtrace: </b></tr></td>
+
+<tr><td bgcolor="#eeeeee">
+<br>
+<tt>
+Set WEBDYNE_ERROR_SHOW_EXTENDED=1 to display backtrace and other information.
+</tt>
+</tr></td>
+</block>
+
+<!-- Module backtrace -->
+
+<block name="backtrace">
+<tr><td>
+<br>
+<br>
+<b>Backtrace: </b>
+</td></tr>
+
+<tr><td bgcolor="#eeeeee">
+<tt>
+<b>#&nbsp;&nbsp;&nbsp;Module</b><br>
+<br>
+<block name="backtrace_line">
+${i}&nbsp;&nbsp;${package}, line ${line}<br>
+</block>
+</tt></td></tr>
+</block>
+
+
+<!-- The HTML source context -->
+
+<block name="context">
+<tr><td>
+<br>
+<br>
+<b>Context: </b>
+</td></tr>
+
+
+<tr><td bgcolor="#eeeeee">
+<tt>
+<b>#&nbsp;&nbsp;&nbsp;Source</b> ${srce_fn}<br>
+<br>
+<block name="context_line">
+<span style="!{! $_[1]->{'line_error'} ? 'color:red' : 'color:black' !}">${line_no}&nbsp;&nbsp;${line}</span><br>
+</block>
+</tt></td></tr>
+</block>
+
+
+<!-- Any Eval context -->
+
+<block name="eval">
+<tr><td>
+<br>
+<br>
+<b>Code: </b>
+</td></tr>
+
+
+<tr><td bgcolor="#eeeeee">
+<tt>
+<b>#&nbsp;&nbsp;&nbsp;Source</b> ${srce_fn}<br>
+<br>
+<block name="eval_line">
+<span style="!{! $_[1]->{'line_error'} ? 'color:red' : 'color:black' !}">${line_no}&nbsp;&nbsp;${line}</span><br>
+</block>
+</tt></td></tr>
+</block>
+
+
+<!-- CGI Paramaters -->
+
+<block name="cgi_param">
+<tr><td>
+<br>
+<br>
+<b>CGI Parameters: </b>
+</td></tr>
+
+<tr><td bgcolor="#eeeeee">
+<br>
+<span style="color:black">
+<pre>
+${cgi_param_dump}
+</pre>
+</span>
+</td></tr>
+</block>
+
+</table>
+
+
+<!-- End of error table. Display requested URI -->
+
+<br>
+
+<block name="uri">
+<b>Requested URI: </b>!{! shift()->r->uri().'' !}
+</block>
+
+<br>
+
+<hr align="left" width="80%" size="1">
+
+
+<!-- And finally WebDyne version information -->
+
+<block name="version">
+<b>Version Information:</b>&nbsp; WebDyne Version:!{! $WebDyne::VERSION !}
+</block>
+
+</body>
+</html>
+
+__PERL__
+
+use HTTP::Status qw(status_message);
+use CGI qw(escapeHTML);
+

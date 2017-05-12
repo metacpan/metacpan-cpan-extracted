@@ -1,0 +1,41 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Factory" -%]
+
+require_once 'PEAR.php';
+
+require_once '[% package_dir %]/Request.php';
+require_once '[% package_dir %]/Response.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Factory class for Request/Response object." -%]
+class [% package_name %]_Factory
+{
+    /**
+     * Create Request object and return
+     * 
+     * @return object [% package_name %]_Request
+     */
+    function &createRequest()
+    {
+        require_once '[% package_dir %]/Request/Default.php';
+        $obj =& new [% package_name %]_Request_Default($this);
+        return $obj;
+    }
+    
+    /**
+     * Create Response object and return
+     * 
+     * @param string $status HTTP status line 
+     * @param string $header HTTP header
+     * @param string $content response message content
+     * @return object [% package_name %]_Response
+     */
+    function &createResponse($status = null, $header = null, $content = null)
+    {
+        require_once '[% package_dir %]/Response/Default.php';
+        $obj =& new [% package_name %]_Response_Default($status, $header, $content);
+        return $obj;
+    }
+}
+
+?>

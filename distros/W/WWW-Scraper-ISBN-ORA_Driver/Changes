@@ -1,0 +1,111 @@
+Revision history for WWW-Scraper-ISBN-ORA_Driver
+================================================
+
+0.22    2014-11-29
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.21    2014-07-28
+        - added git repository links to metadata.
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+
+0.20    2013-03-17
+        - added isbn-check.pl to examples.
+        - change file dates changed to meet W3CDTF standards.
+        - META updates.
+        - updated test suite.
+
+0.19    2012-05-27
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.18    2010-10-29
+        - added further skip test if test books are withdrawn from the site.
+        - fixed skip test count.
+
+0.17    2010-10-07
+        - amended pingtest() in network tests.
+
+0.16    2010-10-06
+        - fixed skip count.
+        - provided alternate ping test methods.
+
+0.15    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.14    2010-08-10
+        - added better protection from network failures.
+        - updated prerequisite requirements.
+
+0.13    2010-08-02
+        - added connection protection if client or server offline.
+        - documentation updates.
+
+0.12    2010-07-30
+        - added fields (if known) for binding, pages, weight, width & height.
+        - added ean13, which is the industry name for isbn-13.
+        - more tests.
+        - removal of Template::Extract in favour of plain regexes.
+        - various package file changes (inc adding META.json).
+
+0.11    2009-11-01
+        - alternative method used to extract data from book page.
+        - 10 character ISBN no longer supported, EAN13 now used as the values
+          for the 'isbn' and 'ean' fields, with both the 'isbn10' and 'isbn13'
+          fields now obsolete.
+        - specified minimum version of WWW::Mechanize in order to ensure we
+          use a more recent version of HTML::Form in LWP.
+
+0.10    2009-08-14
+        - minor fixes to parsing of O'Reilly website.
+        - added ping tests, to avoid failing when no network connection.
+        - real failures produce diagnostics not skips now.
+        - added more package tests.
+
+0.09    2008-06-27
+        - added checks to only run extra tests under AUTOMATED_TESTING
+        - switched metatest to use Test-CPAN-Meta
+        - upped META.ym spec version and link
+        - fixed search and results pages content extraction
+        - added isbn10 and isbn13 as keys for book data
+
+0.08    2007-03-01
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - Updated the pattern matching code now that Yahoo have changed their 
+          page layouts.
+        - Update all reference to company name to O'Reilly Media.
+        - Added better error reporting.
+        - Devel::Cover - 95.4%
+
+0.07    2006-10-11
+        - fixed RT #21851 [thanks to joenio]
+        - fixed RT #20581 [thanks to Peter Scott (PJS)]
+        - Devel::Cover - 95.4%
+    
+0.06    2005-09-12
+        - test failure due to change in to page content
+    
+0.05    2005-01-07  
+        - handler() moved to WWW::Scraper::ISBN::Driver
+        - test suite updated to peform skips if can't access web pages
+
+0.04    2004-08-31
+        - ORA no longer use the safari meta-tag [Alberto Sáez Torres]
+
+0.03    2004-05-10
+        - Added publisher attribute
+
+0.02    2004-04-19
+        - Test::More added as a prerequisite for PPMs
+    
+0.01    2004-04-07
+        - original version

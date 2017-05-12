@@ -1,0 +1,49 @@
+Win32::CaptureIE - Capture web pages or its elements
+                 rendered by Internet Explorer v1.30
+====================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Image::Magick
+   Win32::Screenshot
+   Win32::OLE
+
+SYNOPSIS
+
+      use Win32::CaptureIE;
+
+      StartIE;
+      Navigate('http://my.server/page.html');
+
+      my $img = CaptureElement('tab_user_options');
+      $img->Write("ie-elem.png");
+
+      QuitIE;
+
+DESCRIPTION
+
+The package enables you to automatically create screenshots of your web
+server pages for the user guide or whatever you need it for. The best
+part is that you don't bother yourself with scrolling and object
+localization. Just tell the ID of the element and receive an
+Image::Magick object. The package will do all the scrolling work, it
+will take the screenshots and glue the parts together.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by P.Smejkal
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

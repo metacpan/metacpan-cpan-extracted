@@ -1,0 +1,34 @@
+---
+abstract: 'simple sitemap builder'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.88
+  Test::Output: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Sitemap-Simple
+provides:
+  WWW::Sitemap::Simple:
+    file: lib/WWW/Sitemap/Simple.pm
+    version: 0.05
+requires:
+  Carp: 0
+  Class::Accessor::Lite: 0.05
+  Compress::Zlib: 0
+  Digest::MD5: 0
+  IO::File: 0
+  IO::Zlib: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/WWW-Sitemap-Simple/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/WWW-Sitemap-Simple
+version: 0.05

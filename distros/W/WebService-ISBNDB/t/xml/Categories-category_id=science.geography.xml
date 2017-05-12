@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:12">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.geography" parent_id="science">
+<Name>Geography</Name>
+<Details summary="" depth="1" element_count="967" />
+<SubCategories>
+<SubCategory id="science.geography.agricultural" />
+<SubCategory id="science.geography.discoveries" />
+<SubCategory id="science.geography.economic" />
+<SubCategory id="science.geography.bibliography" />
+<SubCategory id="science.geography.study_and_teaching" />
+<SubCategory id="science.geography.maps" />
+<SubCategory id="science.geography.historical" />
+<SubCategory id="science.geography.political" />
+<SubCategory id="science.geography.physical" />
+<SubCategory id="science.geography.models_and_simulation" />
+<SubCategory id="science.geography.dictionaries" />
+<SubCategory id="science.geography.human" />
+<SubCategory id="science.geography.urban" />
+<SubCategory id="science.geography.population" />
+<SubCategory id="science.geography.military" />
+<SubCategory id="science.geography.united_states" />
+<SubCategory id="science.geography.in_literature" />
+<SubCategory id="science.geography.medical" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

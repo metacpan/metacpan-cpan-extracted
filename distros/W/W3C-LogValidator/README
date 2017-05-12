@@ -1,0 +1,125 @@
+W3C::LogValidator
+=================
+
+A comprehensive, step-by-step validation tool for webmasters and web developers.
+More info, documentation, downloads : http://www.w3.org/QA/Tools/LogValidator/
+
+INSTALLATION
+	See also : DEPENDENCIES below
+
+To configure this module, cd to the directory that contains this README file 
+and type the following:
+	perl Makefile.PL
+
+Alternatively, if you plan to install the W3C libraries somewhere other than
+your system's perl library directory. You can type something like this:
+	perl Makefile.PL PREFIX=/home/me/perl INSTALLDIRS=perl
+
+Then to build you run make.
+	make
+
+You can then test the module by typing:
+	make test
+
+If you have write access to the installation directories, you may then install
+by typing:
+	make install
+It will install the library in the perl tree.
+
+RUNNING THE SCRIPT
+
+Along with the library you should have received a simple script and configuration file
+that allows you to easily use the library.
+
+From the directory where this README is:
+	( cd perl/modules/W3C/LogValidator )
+	cd bin/
+
+Edit the configuration file, using the sample as a basis:
+	cp samples/logprocess.conf path/to/file.conf
+The sample conf is commented with notes and pointers to help you understand 
+the syntax of this file. It should be easy to create a config file for your server.
+	$EDITOR path/to/file.conf
+
+Make the script executable:
+	chmod a+x process.pl
+
+Learn the options:
+	./logprocess.pl -h
+
+Then simply run the script with your favorite options, e.g:
+	./logprocess.pl -f path/to/file.conf [options]
+
+
+DEPENDENCIES
+
+This module requires these other perl modules and libraries:
+    LWP::UserAgent  (libwww-perl)
+    URI::Escape
+    Sys::Hostname (for automatic configuration)
+    Config::General
+    File::Temp
+    DB_File
+    Mail::Sendmail
+    WebService::Validator::CSS::W3C
+    W3C::LinkChecker
+read more about dependencies at http://www.w3.org/QA/Tools/LogValidator/Manual-Install#dep 
+
+COPYRIGHT AND LICENCE
+
+written by Olivier Thereaux <ot@w3.org> for the W3C
+
+* W3C® SOFTWARE NOTICE AND LICENSE *
+
+Copyright © 1994-2005 World Wide Web Consortium, (Massachusetts
+Institute of Technology, European Research Consortium for Informatics 
+and Mathematics, Keio University). All Rights Reserved.
+http://www.w3.org/Consortium/Legal/
+
+____________________________________
+
+This W3C work (including software, documents, or other related items) is
+being provided by the copyright holders under the following license. By
+obtaining, using and/or copying this work, you (the licensee) agree that
+you have read, understood, and will comply with the following terms and
+conditions:
+
+Permission to use, copy, modify, and distribute this software and
+its documentation, with or without modification, for any purpose and
+without fee or royalty is hereby granted, provided that you include the
+following on ALL copies of the software and documentation or portions
+thereof, including modifications, that you make:
+
+   1. The full text of this NOTICE in a location viewable to users of
+the redistributed or derivative work.
+   2. Any pre-existing intellectual property disclaimers, notices,
+or terms and conditions. If none exist, a short notice of the
+following form (hypertext is preferred, text is permitted) should
+be used within the body of any redistributed or derivative code:
+"Copyright © [$date-of-software] World Wide Web Consortium,
+(Massachusetts Institute of Technology, Institut National de Recherche
+en Informatique et en Automatique, Keio University). All Rights
+Reserved. http://www.w3.org/Consortium/Legal/"
+   3. Notice of any changes or modifications to the W3C files, including
+the date changes were made. (We recommend you provide URIs to the
+location from which the code is derived.)
+
+THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT
+HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY OR
+FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE OR
+DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS,
+TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR
+DOCUMENTATION.
+
+The name and trademarks of copyright holders may NOT be used in
+advertising or publicity pertaining to the software without specific,
+written prior permission. Title to copyright in this software and
+any associated documentation will at all times remain with copyright
+holders.
+
+____________________________________
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for obtaining information                           about processes using the plain Win32 PSAPI'
+author:
+  - 'Ferdinand Prantl <prantl@host.sk>'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32API-ProcessStatus
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Win32API::Process: '0'
+resources:
+  bugtracker: http://github.com/plicease/Win32API-ProcessStatus/issues
+  repository: git://github.com/plicease/Win32API-ProcessStatus.git
+version: '0.05'

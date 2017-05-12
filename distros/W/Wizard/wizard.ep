@@ -1,0 +1,26 @@
+<ep-package name="HTML::EP::Wizard">
+
+<ep-session class="HTML::EP::Session::Cookie" id="wizard" expires="+1h"
+            path="/" zlib="1" base64="1">
+
+<ep-wizard class="Wizard::Examples">
+
+<ep-form-object name="Title_1" item="t">
+<TITLE>$t->value$</title>
+</ep-form-object>
+
+<HTML>
+<ep-form-object name="Title_1" item="t">
+	<HR>
+	<h1>$t->value$</h1>
+	<hr>
+</ep-form-object>
+
+
+<form action="wizard.ep" METHOD="POST">
+
+$@htmlbody$
+
+</form>
+</HTML>
+

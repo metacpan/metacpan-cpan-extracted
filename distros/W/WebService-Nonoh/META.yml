@@ -1,0 +1,39 @@
+---
+abstract: 'make nonoh calls from Perl'
+author:
+  - 'Ailin Nemui <ailin at devio dot us>'
+build_requires:
+  Test::More: 0
+  Test::Most: 0
+  ok: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Nonoh
+provides:
+  WebService::Nonoh:
+    file: lib/WebService/Nonoh.pm
+    version: 0.1
+requires:
+  CGI: 0
+  Crypt::CBC: 0
+  Crypt::Rijndael: 0
+  HTML::Parser: 0
+  Hash::Util: 0
+  JSON::PP: 0
+  LWP::ConnCache: 0
+  MIME::Base64: 0
+  Moops: 0
+  Text::Balanced: 0
+  WWW::Mechanize: 0
+  XML::LibXML: 0
+  constant: 0
+  utf8: 0
+  warnings: 0
+version: 0.1

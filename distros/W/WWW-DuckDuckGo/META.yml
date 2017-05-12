@@ -1,0 +1,204 @@
+---
+abstract: 'Access to the DuckDuckGo APIs'
+author:
+  - 'Torsten Raudssus <torsten@raudss.us> L<https://raudss.us/>'
+  - 'Michael Smith <crazedpsyc@duckduckgo.com>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-DuckDuckGo
+requires:
+  JSON: 2.50
+  LWP: 0
+  Moo: 0.009007
+  URI: 1.58
+resources:
+  homepage: https://github.com/duckduckgo/p5-www-duckduckgo
+  repository: git://github.com/duckduckgo/p5-www-duckduckgo.git
+version: 0.016
+x_Dist_Zilla:
+  perl:
+    version: 5.018000
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::ReleaseOnlyWithLatest
+      name: ReleaseOnlyWithLatest
+      version: 0.001
+    -
+      class: Dist::Zilla::Plugin::UploadToDuckPAN
+      name: UploadToDuckPAN
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Basic/GatherDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Basic/MakeMaker'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: 0.42
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: InstallRelease
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: Authority
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+      name: PodWeaver
+      version: 3.102000
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: Git::NextVersion
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Git/Check'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Git/Commit'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Git/Tag'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Git/Push'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300039
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300039
+x_authority: cpan:DDG

@@ -1,0 +1,75 @@
+Revision history for Perl module WWW::Blog::Identify.
+
+0.06  Thu Aug 28
+
+	Added URL checks for:
+		 20six
+		 Typepad
+
+0.05  Mon Jul 28
+
+	Added URL check for Xanga
+	
+0.04  Tue May 27
+
+	Fixed bug where Manila was superseding Radio
+	
+	Added URL checks for:
+		Diaryhub (Thai)
+		Skyblog
+		
+	Added content checks for:
+		WebCrimson
+		
+0.03  Fri May 23 2003 
+
+	Fixed MT test to allow 'MovableType' and 'MoveableType'
+	Fixed meta tag tests for Microsoft and Nucleus to ignore attribute order
+	Fixed barrapunto test to not require initial dot
+	
+	Added META tag checks for:
+		Greymatter
+		Land Down Under
+		
+	Added blog URL checks for:
+		g-blog
+		Harvard Law blogs (Radio)
+		e-blog.pl
+		blogs.it (Radio)
+		babelogue
+		jevon.org
+		Tripod
+		
+	Added content URL checks for:
+		Blogger button bloggertemplate[...].gif
+		XML coffee cup (Radio)
+		
+	Suspect URL test now looks for 'bitacoras' in addition to 'blog'
+		and 'weblog'
+		
+	Added optional colon to 'Powered by Blogger Pro' content test  
+	Added GIF content check for pMachine
+		
+		
+0.02  Thu May 15 2003 
+
+	Added blog URL checks for:
+		u-blog
+		bloggingnetwork
+		blogsky
+		barrapunto
+		blig (Brazil)
+		
+	Set URL detector to check for "weblog", not just "blog"
+	
+	Updated regex in URL detector to consider hyphens and
+		underscore to be a word boundary when looking for
+		'blog' or 'weblog' in the URL
+	
+	
+	
+	
+0.01  Mon May  5 2003 
+	
+	original version
+

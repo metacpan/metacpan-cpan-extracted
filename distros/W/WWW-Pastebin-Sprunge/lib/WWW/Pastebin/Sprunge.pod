@@ -1,0 +1,74 @@
+# ABSTRACT: access the http://sprunge.us pastebin
+# PODNAME: WWW::Pastebin::Sprunge
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+WWW::Pastebin::Sprunge - access the http://sprunge.us pastebin
+
+=head1 VERSION
+
+version 0.010
+
+=head1 SYNOPSIS
+
+    use WWW::Pastebin::Sprunge::Create; # to write
+    my $writer = WWW::Pastebin::Sprunge::Create->new();
+
+    use WWW::Pastebin::Sprunge::Retrieve; # to read
+    my $reader = WWW::Pastebin::Sprunge::Retrieve->new();
+
+=head1 DESCRIPTION
+
+This distribution comes with two modules:
+
+=over 4
+
+=item 1
+
+L<WWW::Pastebin::Sprunge::Create>, which allows you to write
+new pastes on L<http://sprunge.us>.
+
+=item 2
+
+L<WWW::Pastebin::Sprunge::Retrieve>, which allows you to read existing
+pastes from L<http://sprunge.us>.
+
+=back
+
+=head1 AVAILABILITY
+
+The project homepage is L<http://metacpan.org/release/WWW-Pastebin-Sprunge/>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/WWW::Pastebin::Sprunge/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/WWW-Pastebin-Sprunge>
+and may be cloned from L<git://github.com/doherty/WWW-Pastebin-Sprunge.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/WWW-Pastebin-Sprunge/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

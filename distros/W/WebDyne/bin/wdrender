@@ -1,0 +1,309 @@
+#!/usr/bin/perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#
+#  This is free software, licensed under:
+#
+#    The GNU General Public License, Version 2, June 1991
+#
+#  Full license text is available at:
+#
+#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#
+
+#
+#  Compile and/or show compiled version of WebDyne HTML scripts
+#
+package main;
+
+
+#  Compiler pragma
+#
+sub BEGIN {
+
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+}
+use strict qw(vars);
+use vars qw($VERSION);
+
+
+#  Use the base module
+#
+use WebDyne::Base;
+
+
+#  Other external modules
+#
+use WebDyne;
+use WebDyne::Request::Fake;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='1.246';
+
+
+#  Run main
+#
+exit ${&main(\@ARGV) || die errdump()};
+
+#===================================================================================================
+
+
+sub main {
+
+
+    #  Get argv array ref
+    #
+    my $argv_ar=shift();
+
+
+    #  Defaul options
+    #
+    my %opt=(
+
+        handler => $ENV{'WebDyneHandler'} || 'WebDyne',
+        error   => 'text',
+        header  => 1,
+        warn    => 1,
+
+    );
+
+
+    #  Get command line options
+    #
+    GetOptions(
+        \%opt,
+        'help|?',
+        'handler=s',
+        'status=s',
+        'header!',
+        'warn!',
+        'error=s',
+        'header_out=s@',
+        'header_in=s@',
+        'outfile=s',
+        'man',
+        'version'
+    ) || pod2usage(2);
+    pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1) if $opt{'help'};
+    pod2usage(-verbose => 2) if $opt{'man'};
+    $opt{'version'} && do {
+        print "$Script version: $VERSION\n";
+        print "WebDyne version: $WebDyne::VERSION\n";
+        exit 0
+    };
+
+
+    #  Is dest file set ? If so open
+    #
+    my $dest_fh;
+    if (my $dest_fn=$opt{'outfile'}) {
+        $dest_fh=IO::File->new($dest_fn, O_CREAT | O_TRUNC | O_WRONLY) ||
+            return err ("unable to open file $dest_fn for output, $!");
+    }
+
+
+    #  Get srce file, add to options
+    #
+    my $srce_fn=shift(@{$argv_ar}) ||
+        pod2usage("$Script: no source file specified !");
+    (-f $srce_fn) ||
+        pod2usage("$Script: input file not found !");
+
+
+    #  Get new request object
+    #
+    my $r=WebDyne::Request::Fake->new(
+
+        filename => $srce_fn,
+
+        #select          =>  $dest_fh,
+        #status          =>  $opt{'status'},
+
+    ) || return err ();
+
+
+    #  Set headers
+    #
+    foreach my $header_out (@{$opt{'header_out0'}}) {
+        my ($k, $v)=split(/\s*:\s*/, $header_out);
+        $r->headers_out($k, $v);
+    }
+    foreach my $header_in (@{$opt{'header_in0'}}) {
+        my ($k, $v)=split(/\s*:\s*/, $header_in);
+        $r->headers_in($k, $v);
+    }
+
+
+    #  Get handler
+    #
+    my $handler=$opt{'handler'};
+
+
+    #  Load up whichever handler we are using
+    #
+    eval("require $handler") ||
+        return err ("$Script: unable to load handler $handler, $@");
+
+
+    #  Set text errors only
+    #
+    $WebDyne::Err::WEBDYNE_ERROR_TEXT=1 if ($opt{'error'} eq 'text');
+
+
+    #  Set header, warning output
+    #
+    $r->notes('noheader', !$opt{'header'});
+    $r->notes('nowarn',   !$opt{'warn'});
+
+
+    #  Run it and display results, or any error generated
+    #
+    defined($handler->handler($r)) || return err ();
+
+
+    #  Manual cleanup
+    #
+    $r->DESTROY();
+
+
+    #  Done, return success
+    #
+    \undef;
+
+}
+
+
+__END__
+
+=head1 Name
+
+wdrender - parse and render WebDyne pages
+
+=head1 Synopsis
+
+B<wdrender> B<[OPTIONS]> B<FILE>
+
+=head1 Options
+
+-h, --help
+Show brief help message.
+
+-v, --version
+Show version information.
+
+
+=over 5
+
+=item --handler
+
+Use a different WebDyne handler module. Currently the only other
+handler module available is WebDyne::Chain.
+
+=back
+
+=over 5
+
+=item --header
+
+Show HTTP status headers (default). User --noheader to disable.
+
+=back
+
+=over 5
+
+=item --error=text[|html]
+
+Show text error messages. User --error=html to HTML error message.
+
+=back
+
+=item --outfile=<filename>
+
+Send output to <filename> instead of STDOUT
+
+=back
+
+=item --header_in="Header: Value"
+
+Set simulated input header name to value. Can be set multiple times
+
+=back
+
+=item --header_out="Header: Value"
+
+Send output header with value (if header output enabled). Can be set multiple times
+
+=back
+
+=item --status=value
+
+Send status code x (e.g. 200,500,404) with header (if header output enabled)
+
+=back
+
+
+=head1 Description
+
+The B<wdrender> command displays the HTML that would be generated from a
+psp page using the WebDyne perl module.
+
+By default B<wdrender> will use the internal WebDyne handler when building
+the output, but can optionally use other WebDyne modules (such as
+WebDyne::Chain) by using the B<--handler> option..
+
+=head1 Notes
+
+The B<wdrender> command will attempt to build the HTML as faithfully as
+possible from the command line environment, but may not be able to
+exactly duplicate the HTML generated under a real Web Server. As an
+example if a psp page takes advantge of the Apache request handler when
+generating HTML, the B<wdrender> commend will not be able to duplicate
+that environment.
+
+=head1 Examples
+
+B<wdrender> B<widget.psp>
+
+Display the HTML that would be generated by WebDyne from the widget.psp
+file.
+
+B<wdrender> B<--handler=WebDyne::Chain> B<widget.psp>
+
+Display the HTML that would be generated by WebDyne from the widget.psp
+file, but this time using the WebDyne::Chain handler. In this case the
+example would fail, as WebDyne::Chain expects to get a list of modules
+it will chain the page throught. Normally it would get that from the
+Web Server configuration file, but the WebDyne::Chain module can take
+the list of modules from the environment also. So a better example
+would be:
+
+B<WebDyneChain=WebDyne::Session> B<wdrender> B<--handler=WebDyne::Chain>
+B<widget.psp>
+
+=head1 Author
+
+Written by Andrew Speer, andrew@webdyne.org
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+Full license text is available at:
+L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+

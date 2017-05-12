@@ -1,0 +1,25 @@
+Revision history for WWW-Bugzilla-BugTree
+
+0.07      2015-12-17 08:24:12 -0500
+  - Do not test against landfil 4.0 anymore, it is gonners!
+  - Use Ref::Util for ref testing
+
+0.06      2015-11-22 15:42:45 -0500
+  - Pull required Perl back to 0.012
+
+0.05      2015-06-11 13:22:08 -0400
+  - No longer test against 3.6 landfill since it is no longer available
+  - Require Perl 5.14
+
+0.04      2015-03-03 23:44:58 -0500
+  - Require Moo 2.0, as older versions inadvertently turn on
+    fatal warnings
+
+0.03      2013-10-10 10:49:40 -0400
+  - use proxy if http_proxy is set
+
+0.02      2013-08-07 06:42:05 America/New_York
+  - added BUG_TREE_USER environment variable for bug_tree script
+
+0.01      2013-08-07 06:31:21 America/New_York
+  - initial version

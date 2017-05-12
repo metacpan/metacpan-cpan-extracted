@@ -1,0 +1,90 @@
+#!perl
+# $Id$
+
+use strict;
+use warnings;
+
+use WWW::Facebook::Go::SGF qw(facebook2sgf);
+
+my $outfile = '-';
+
+if(!@ARGV) {
+    help();
+} else {
+    while(@ARGV) {
+        my $arg = shift();
+        if($arg eq '-o') {
+            $outfile = shift();
+        } elsif($arg eq '-h') {
+            help();
+        } elsif($arg =~ /^\d+$/) {
+            my $sgf = facebook2sgf($arg);
+            if($outfile ne '-') {
+                open(FILE, ">$outfile") ||
+                    die("Can't write $outfile:\n$!\n");
+                print FILE $sgf;
+                close(FILE);
+            } else {
+                print $sgf;
+            }
+        } else {
+            die("$arg isn't a valid game reference\n");
+        }
+    }
+}
+
+sub help { print qq{
+$0 - extract an SGF recording of a game of Go from Facebook
+
+This script is a simple wrapper around the WWW::Facebook::Go::SGF
+perl module.
+
+$0 123456                      extract SGF and print to STDOUT
+$0 -o 123456.sgf 123456        extract SGF and save to the named file
+
+You can get game IDs by visiting L<http://apps.facebook.com/gothegame/>
+and clicking the "View Full Profile" link.
+};
+exit(0); }
+
+=head1 NAME
+
+facebook2sgf - extract an SGF recording of a game of Go from Facebook
+
+=head1 DESCRIPTION
+
+This script is a simple wrapper around the WWW::Facebook::Go::SGF
+perl module.
+
+=head1 SYNOPSIS
+
+To print an SGF record to STDOUT:
+
+    facebook2sgf 123456
+
+To save an SGF record to a file:
+
+    facebook2sgf -o 123456.sgf 123456
+
+You can get game IDs by visiting L<http://apps.facebook.com/gothegame/>
+and clicking the "View Full Profile" link.
+
+=head1 SEE ALSO
+
+L<WWW::Facebook::Go::SGF>
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Copyright 2009 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence.  It's
+up to you which one you use.  The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This software is also free-as-in-mason.
+
+=cut

@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0f354c9bd427dc06ab998b2f9811adff31c63b34 Changes
+SHA1 cbb906ef235f243dfd60ddfdc7a60b9c285a2954 MANIFEST
+SHA1 5142608e37fe4aa9dc786c1998b82e6674c7e9ec META.yml
+SHA1 f1f458546554fb7f1822b334f33bad60d57d73aa Makefile.PL
+SHA1 0778acdca8c3e2253d25573eb3430f43f6e9b40f README
+SHA1 5dd2959b1f974846c6248dfa8a4bc2003e1cc2a8 lib/WWW/Mixi/OO.pm
+SHA1 c5ef4c8810096921293fbc825a6d290d5a6be9d3 lib/WWW/Mixi/OO/Home.pm
+SHA1 c05b38c67edd8bf79a8f0c2a1ea0d584862c7f78 lib/WWW/Mixi/OO/I18N.pm
+SHA1 fb23d8f153a722042d5570916a52b484a118779a lib/WWW/Mixi/OO/I18N/EUCJP.pm
+SHA1 472b9333788d85d6c4ae319126dd6fa1b9f1c93e lib/WWW/Mixi/OO/I18N/UTF8.pm
+SHA1 4ffd5870a3b7b1a827af8061dc0b4dfb4c1db462 lib/WWW/Mixi/OO/ListComment.pm
+SHA1 39fa33ede62dfeaf746bf4491c7e45128fd23ecf lib/WWW/Mixi/OO/ListCommunity.pm
+SHA1 e7666932c6ab9130ae18f269fb36692bbc59b851 lib/WWW/Mixi/OO/ListDiary.pm
+SHA1 e9628fa415399dfc6cc25d9fbf24f5be514dacd9 lib/WWW/Mixi/OO/ListFriend.pm
+SHA1 8d3bae0c19e4fb1b0bdb73077d8bc7330a435c87 lib/WWW/Mixi/OO/ListMember.pm
+SHA1 622426b5570244241e3442bc871fa95a2379f452 lib/WWW/Mixi/OO/ListMessage.pm
+SHA1 f0101555d010a39b599bdbaa5eb9e034f6a9e0d1 lib/WWW/Mixi/OO/ListPage.pm
+SHA1 45b8b5707a7fafd2ff2ddf4deca427edc5086087 lib/WWW/Mixi/OO/Login.pm
+SHA1 1589c433953e90814dfaf0217d35dd169599fdb8 lib/WWW/Mixi/OO/NewBbs.pm
+SHA1 35da5a7d1a0529468a92132f53bda195d0062a55 lib/WWW/Mixi/OO/NewComment.pm
+SHA1 cc9258765a5a913eecf6e9f7df5c4c9315da1183 lib/WWW/Mixi/OO/NewFriendDiary.pm
+SHA1 aa09decd37e5e06bb257d9453f9c6e2ec4aa2234 lib/WWW/Mixi/OO/Page.pm
+SHA1 5f882f0cbe969d4bfaab4d46a0b0e461b8e1ad86 lib/WWW/Mixi/OO/Session.pm
+SHA1 b28f14f06d7a9356c6ce114821857848ebb216d3 lib/WWW/Mixi/OO/ShowCommunity.pm
+SHA1 cdb558429733633646a6516d3da0ddf7976a7135 lib/WWW/Mixi/OO/ShowFriend.pm
+SHA1 87eb5bee949a67f497b3cc37942969bf05c8629b lib/WWW/Mixi/OO/ShowLog.pm
+SHA1 dccb9345b75f2b974db238426252206832138332 lib/WWW/Mixi/OO/ShowPicture.pm
+SHA1 efd5a5f92804a2facd1df4da9839937bedc46e5d lib/WWW/Mixi/OO/TableHistoryListPage.pm
+SHA1 01c707b1864183430412a2b2d713dfea614d293c lib/WWW/Mixi/OO/TableListPage.pm
+SHA1 32219927f949a6e6444e30399809314b2f81d821 lib/WWW/Mixi/OO/TablePreviewListPage.pm
+SHA1 16f0b0428d8076b1be61d83a819982e2de608e4b lib/WWW/Mixi/OO/Util.pm
+SHA1 0da2be1f9489266fdd0c534727a43107808882de lib/WWW/Mixi/OO/Util/EntryParserMixin.pm
+SHA1 1848051a01506b154c37f20ffa87be7a82ca53ff lib/WWW/Mixi/OO/ViewBbs.pm
+SHA1 cc39e231d4961e6ebe94ae8843c38cdc77b48473 lib/WWW/Mixi/OO/ViewCommunity.pm
+SHA1 632cf1b0afc70ec940b57a109855cb81023ca05c lib/WWW/Mixi/OO/ViewDiary.pm
+SHA1 f350faaa0059c05b5ef474a39e945c82f64c3ac1 lib/WWW/Mixi/OO/ViewEnquete.pm
+SHA1 173c59ee0f9f88f857ad022ae8100446844d30f3 lib/WWW/Mixi/OO/ViewEvent.pm
+SHA1 5dae22e8934ee85f781c8381b4b3173ca3e0a20b lib/WWW/Mixi/OO/ViewMessage.pm
+SHA1 6b58added92ae17d4e8169fb39d12dd1b78c42ca t/00_signature.t
+SHA1 28fa568d97c99939ba8687aed2d1c40780618238 t/01_load.t
+SHA1 6b4264cac662dd456f0f9a5f91fdd72abb3e2c1a t/02_pod.t
+SHA1 5740e7660fc07f4bf9af16bcbc09ec011291a16c t/03_util.t
+SHA1 9a218155982dd3a191351fc8f534687c6eb53657 t/04_session.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFCBKflo8ELuN4TdCsRAjGLAJ9hnyFziD3sAHeZpVXw8N36kwJ5AgCgnEVc
+KB/vTuE8BptG7jtdfDczfhI=
+=OcE6
+-----END PGP SIGNATURE-----

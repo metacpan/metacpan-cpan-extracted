@@ -1,0 +1,62 @@
+WWW-Mailman
+-----------
+
+WWW::Mailman is a module to control Mailman (as a subscriber, moderator or
+administrator) without the need of a web browser.
+
+The module handles authentication transparently and can take advantage
+of stored cookies to speed it up.
+
+It is meant as a building block for your own Mailman-managing scripts,
+and will include more routines in the future.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following
+commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Mailman
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mailman
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Mailman
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Mailman
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Mailman
+
+
+COPYRIGHT
+
+Copyright (C) 2010 Philippe Bruhat (BooK)
+
+LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

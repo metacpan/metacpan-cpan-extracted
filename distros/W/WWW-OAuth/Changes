@@ -1,0 +1,33 @@
+0.006     2016-12-09 23:46:25 EST
+  - Improve the default oauth_nonce algorithm to provide better uniqueness
+  - Removed dependency on MIME::Base64
+  - The signature_method attribute now accepts 'RSA-SHA1' and custom signature
+    methods, but for these signature methods a coderef must be provided to the
+    new signer attribute. RSA-SHA1 signers can no longer be passed directly as
+    signature_method.
+
+0.005     2016-12-08 22:49:18 EST
+  - No longer move parameters starting with oauth_ to the Authorization header
+    from the query or body parameters; the only modification to the request is
+    to add the Authorization header itself, as per the spec. Custom oauth_
+    parameters should be passed directly to the authenticate or
+    authorization_header methods rather than in query or body parameters, so
+    they can be properly sent in the header.
+  - Removed the remove_query_params and remove_body_params methods from the
+    WWW::OAuth::Request role as they are no longer needed.
+  - Added authorization_header method that returns the Authorization header
+    value instead of setting it in the request.
+
+0.004     2016-11-23 17:29:28 EST
+  - Use WWW::Form::UrlEncoded to implement utility functions form_urlencode and form_urldecode
+
+0.003     2016-05-19 00:35:49 EDT
+  - Use Test::TCP for author tests
+  - Use Test::Needs in place of Test::Requires for optional test dependencies
+
+0.002     2016-01-31 23:22:14 EST
+  - Allow RSA-SHA1 signature method to be specified as a coderef
+  - Update dependencies and checks to fix test failures
+
+0.001     2016-01-31 02:53:01 EST
+  - First release

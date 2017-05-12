@@ -1,0 +1,5 @@
+name = "WWW-RobotRules-Parser-MultiValue"
+authority = "cpan:TARAO"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

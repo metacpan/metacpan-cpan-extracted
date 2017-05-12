@@ -1,0 +1,40 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes - release notes for Win32::GUI
+
+=head1 Releases
+
+=over
+
+=item Release L<1.06|Win32::GUI::ReleaseNotes::RN_1_06>
+
+=item Release L<1.05|Win32::GUI::ReleaseNotes::RN_1_05>
+
+=item Release L<1.04|Win32::GUI::ReleaseNotes::RN_1_04>
+
+=item Release L<1.03|Win32::GUI::ReleaseNotes::RN_1_03>
+
+=item Release L<1.02|Win32::GUI::ReleaseNotes::RN_1_02>
+
+=item Release L<1.0|Win32::GUI::ReleaseNotes::RN_1_0>
+
+=item Beta L<0.99_1|Win32::GUI::ReleaseNotes::RN_0_99_1>
+
+=item Release L<0.0.671|Win32::GUI::ReleaseNotes::RN_0_0_671>
+
+=item Release L<0.0.670|Win32::GUI::ReleaseNotes::RN_0_0_670>
+
+=item Release L<0.0.665|Win32::GUI::ReleaseNotes::RN_0_0_665>
+
+=item Release L<0.0.588|Win32::GUI::ReleaseNotes::RN_0_0_588>
+
+=item Release L<0.0.502|Win32::GUI::ReleaseNotes::RN_0_0_502>
+
+
+=back
+
+=head1 Obtaining Win32::GUI
+
+=head1 Support
+
+=cut

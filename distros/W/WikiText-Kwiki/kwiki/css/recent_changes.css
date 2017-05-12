@@ -1,0 +1,19 @@
+table.recent_changes {
+    width: 100%;
+}
+
+table.recent_changes td {
+    white-space: nowrap;
+    padding: .2em 1em .2em 1em;
+}
+
+table.recent_changes td.page_name   { 
+    text-align: left;
+}
+table.recent_changes td.edit_by   { 
+    text-align: center;
+}
+table.recent_changes td.edit_time { 
+    text-align: right;
+}
+form.recent_changes_options { display: inline; }

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Widget/Meta.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/base.t
+t/errors.t
+t/pod-coverage.t
+t/pod.t

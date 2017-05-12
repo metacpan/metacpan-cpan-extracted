@@ -1,0 +1,23 @@
+== April Meeting ==
+
+When: April 14th, 2004 6:30pm
+
+Where: Free Geek, 1741 SE 10th Ave
+
+What: [chromatic], talking about game development with Parrot:
+
+* Parrot, the VM for Perl 6, is an object oriented assembly language with an exceedingly rich vocabulary of primitives -- if "primitives" is the right word.  What happens when you link it to a nice multimedia library such as SDL?  How much code does it take to do something interesting?
+
+* This talk covers Parrot, object-oriented Parrot programming, Parrot's native call interface, the Simple !DirectMedia Library, and, finally, everything in SDL Parrot that works by the day of the talk.
+
+* *Missed the talk?* The slides are online: http://wgz.org/chromatic/talks/parrot_sdl/index.html
+* chromatic has a page about Parrot SDL: http://wgz.org/chromatic/parrot/sdl/
+* Dan Sugalski's new article on Building a Parrot Compiler: http://admin.oreillynet.com/pub/a/onlamp/2004/04/15/parrot_compiler_construction.html
+
+AND: JoeOppegaard, talking about Curses::UI
+
+* Curses::UI is a curses based OO user interface framework, giving many convenient widgets you would expect. This talk will cover using Curses::UI specifically drawn on the experience of writing sysv-rc-conf  (http://sysv-rc-conf.sf.net)
+
+* *Missed the talk?*  The slides are online: http://radiojoe.org/curses_ui/
+
+It sounds like we do have a wireless bridge, courtesy of Perlmonger John Labovitz

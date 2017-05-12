@@ -1,0 +1,76 @@
+# ===========================================================================
+# CHANGES
+# $Id: Changes.txt,v 1.9 2004/02/27 15:52:32 Roger Lee Exp $
+# ===========================================================================
+0.09e
+    [INTERNALS]
+    - Fixed a problem with tied namespace not using provided parameters.
+    - Fixed a broken test case.
+
+0.09d
+    [INTERNALS]
+    - Fixed a broken test case.
+
+0.09c
+    [INTERNALS]
+    - Untie a variable will not erase existing data.
+    - Switched from Win32::Semaphore to use own locking mechanism.
+
+0.09
+    [INTERNALS]
+    - Fixed a problem with ReleaseNamespace that caused Perl to crash randomly
+      when destroying an MMF object
+    - Switched to Win32::Semaphore for locking, fixed problem with locking
+    - Special thanks to extensive Beta testing done by [xiper] at Perl Monks.
+
+    [ENHANCEMENTS]
+    - Added more demo and test cases.
+    - Created separate POD for Win32::MMF::Shareable.
+
+0.08
+    [INTERNALS]
+    - Fixed a bug with STORE not reading the shared variable before storing.
+    
+    [ENHANCEMENTS]
+    - Added ability to explicit lock a logical block of code that accesses
+      critical information, instead of locking on individual fetch and store,
+      which might result in raise condition between several processes.
+
+0.07
+    [ENHANCEMENTS]
+    - Cleaned up namespace initialization in Win32::MMF::Shareable, the
+      Win32::MMF::Shareable module importer will allow named parameters
+      passed in to initialize the namespace.
+
+      use Win32::MMF::Shareable { namespace=>'myshare',
+                                  swapfile=>'c:/private.swp;,
+                                  size=>1024*1024 };
+
+    - Win32::MMF::POD has been updated to reflect the change
+    - Added test cases to ensure correct operation of the module under
+      different Windows environments
+
+0.06
+    [INTERNALS]
+    - A design problem was found in the memory management subsystem. Windows
+      can map the same MMF to different addresses in different processes.
+      Because the original memory manager stores absolute addresses inside
+      the MMF namespace, a pointer created in one process is not valid in
+      another process. The MMF manager is recoded to operate on relative
+      offsets to the beginning of the MMF instead.
+      
+    [ENHANCEMENTS]
+    - The shareable interface has been cleaned up after receiving excellent
+      feedbacks from xiper at Perl monks.
+    - More demos are added.
+
+0.05
+    [INTERNALS]
+    - A bug in variable deletion is fixed
+    - A bug in malloc (and realloc) is fixed
+    - A bug in setvar('varid', '') causes undef warning fixed
+
+    [ENHANCEMENTS]
+    - Added tied variable interface: Win32::MMF::Shareable
+    - Added many demo codes, including shared perl objects
+

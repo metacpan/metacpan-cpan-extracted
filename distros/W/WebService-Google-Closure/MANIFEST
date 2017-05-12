@@ -1,0 +1,22 @@
+bin/closure-compile
+Changes
+ignore.txt
+lib/WebService/Google/Closure.pm
+lib/WebService/Google/Closure/Response.pm
+lib/WebService/Google/Closure/Type/Error.pm
+lib/WebService/Google/Closure/Type/Stats.pm
+lib/WebService/Google/Closure/Type/Warning.pm
+lib/WebService/Google/Closure/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-closure.t
+t/integration_test.t
+t/lib/t/WebService/Google/Closure.pm
+t/manifest.t
+t/meta/bad.js
+t/meta/json2.js
+t/mock/01-closure
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

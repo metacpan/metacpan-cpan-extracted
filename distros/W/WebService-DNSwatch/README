@@ -1,0 +1,44 @@
+WebService-DNSwatch
+
+WebService DNSwatch provides the ability to CREATE, EDIT, ADD, or
+otherwise MODIFY DNS services hosted on DNSwatch (DNSwatch.com).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::DNSwatch
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-DNSwatch
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-DNSwatch
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-DNSwatch
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-DNSwatch
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1985-2013 C Hutchinson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

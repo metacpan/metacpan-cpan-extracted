@@ -1,0 +1,29 @@
+Changes
+lib/WWW/Google/Places.pm
+lib/WWW/Google/Places/Params.pm
+lib/WWW/Google/Places/SearchResult.pm
+lib/WWW/Google/Places/DetailResult.pm
+lib/WWW/Google/Places/Location.pm
+lib/WWW/Google/Places/Geometry.pm
+lib/WWW/Google/Places/Photo.pm
+lib/WWW/Google/Places/Address.pm
+lib/WWW/Google/Places/Review.pm
+lib/WWW/Google/Places/Review/Aspect.pm
+share/method-config.json
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-new.t
+t/02-search_place.t
+t/03-place_detail.t
+t/04-add_place.t
+t/05-paging.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

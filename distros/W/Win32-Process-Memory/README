@@ -1,0 +1,52 @@
+Win32::Process::Memory
+=================================
+
+read and write memory of other windows process
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+SYNOPSIS
+
+  # open process
+  my $proc = Win32::Process::Memory->new({ name=>'cmd.exe' });
+
+  # do debug
+  printf "\nTotal Memory = 0x%X\n", $proc->get_memtotal;
+  print "\nMemory block list:\n";
+  my %memlist = $proc->get_memlist;
+  printf "  %08X -> %08X : Len=0x%X\n", $_, $_+$memlist{$_}, $memlist{$_}
+      foreach (sort {$a <=> $b} keys %memlist);
+  print "\nContent of 0x10004 -> 0x10103\n";
+  print $proc->hexdump(0x10004, 0x100);
+
+  # search a sequence of unsigned int16
+  print "\nFind a sequence of unsinged int16:\n";
+  my @results = $proc->search_u16(92, 87, 105, 110, 51, 50);
+  print $proc->hexdump($_, 0x32)."\n" foreach @results;
+
+  # read and change value
+  printf "\n0x%X [unsigned int16] : %d\n", 0x10004, $proc->get_u16(0x10004);
+  printf "0x%X [unsigned int32] : %d\n", 0x10004, $proc->get_u32(0x10004);
+  #$proc->set_u32(0x10004, 55); # BE CAREFUL, MAY DAMAGE YOUR SYSTEM
+
+  # close process
+  undef $proc;
+
+BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+<http://rt.cpan.org/NoAuth/ReportBug.html?Dist=Win32-Process-Memory>
+
+COPYRIGHT AND LICENSE
+
+Copyright 2004 Qing-Jie Zhou <qjzhou@hotmail.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,90 @@
+JoshHeumann
+
+    " maps save to shift-w
+    map W :w<cr>
+
+    " abbreviations can be used while you're typing
+    abbr ddu die Dumper 
+    abbr pdu print Dumper
+    abbr ddf die Dumper 'fool';
+
+    abbr uddu use Data::Dumper;<CR>die Dumper
+    abbr updu use Data::Dumper;<CR>print Dumper
+    abbr uddf use Data::Dumper;<CR>die Dumper 'fool';
+
+    abbr udd use Data::Dumper;
+
+    " keep me away from that damn command history
+    map q: :q
+    map Q :q
+
+Also, see RandallHansen's bucketize plugin VimRCFileBucketize
+
+----
+
+EricWilhelm
+
+    " I sometimes save with Ctrl+S
+    map <C-s> :w<CR>
+
+    " folding using pod structure (maybe you like it, maybe not)
+    :set foldmethod=marker
+    :set foldmarker=\=head,\=cut
+    :let QuickRepeat = 0
+
+    " Starting new programs (warning: kinda naive if you are not in a blank file)
+    map <S-F2> :normal i#!/bin/sh<CR><ESC>:w<CR>:!chmod 755 %<CR><CR>:e %<CR>
+    map <S-F3> :normal i#!/usr/bin/perl<CR><ESC>:w<CR>:!chmod 755 %<CR><CR>:e %<CR>
+    map <S-F4> :normal i#!/usr/bin/ruby<CR><ESC>:w<CR>:!chmod 755 %<CR><CR>:e %<CR><ESC>
+    map <S-F5> :normal i#!/usr/bin/python<CR><ESC>:w<CR>:!chmod 755 %<CR><CR>:e %<CR><ESC>
+
+    " Toggle non-printing characters.
+    " but first setup their representations:
+    :set lcs=tab:>-,eol:$,trail:s
+    map <F9> :set invlist<CR>
+
+    " my comment tactics (you need the EnhancedCommentify plugin)
+    map ==3 :normal o<ESC>72I#<ESC><CR>
+    map =3 :call EnhancedCommentify('', 'comment')<CR>
+    map -3 :call EnhancedCommentify('', 'decomment')<CR>
+    map ACK :normal I# XXX: <ESC><CR>
+
+    " reusable rewrap
+    function RewrapParagraph ()
+        set nosi
+        let wastextwidth = &textwidth
+        " echo mytextwidth
+        set textwidth=72
+        normal gqip
+        let &textwidth=wastextwidth
+        set si
+    endfunction
+    " and some mappings for it
+    map <S-F12> :call RewrapParagraph()<CR>
+    " don't ask why I didn't reuse it
+    vmap <S-F12> <Esc>:set tw=72<CR>:set nosi<CR>:normal `<gq`><CR>:set si<CR>:set tw=0<CR>
+
+    " a quick de-highlight:
+    map <C-N> :noh<CR>
+
+    " thing that may be in your distro's default setup
+    :au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g'\"" | endif
+
+Aside:  when creating a new subroutine, I always do this:
+
+    :r! printsub -d --obj myobj methodname
+
+That [=-d] makes sure that I get documentation, and with [=--obj] I get the [=my $self = shift;] line for free.  There are some other fun bits in [http://scratchcomputing.com/tmp/printsub printsub] (which, like a lot of daily-use tools, could at this point really use some documentation.)
+
+----
+[chromatic]
+
+    map ,ton  <ESC>:%s/More tests =>/More 'no_plan'; # tests =>/<CR>
+    map ,toff <ESC>:%s/More 'no_plan'; # /More /<CR>$b
+
+    :autocmd BufNewFile *.pl 0r ~/.vim/templates/blank.pl|normal Go
+
+----
+AdamMonsen
+
+I've moved mine [to http://dotfiles.org/~meonkeys/.vimrc dotfiles.org].

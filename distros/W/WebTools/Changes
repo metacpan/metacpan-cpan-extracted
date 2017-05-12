@@ -1,0 +1,121 @@
+Revision history for Perl sub system "WebTools"
+-----------------------------------------------
+
+1.001   9 May 2001
+1.002  27 Oct 2001
+1.003  28 Oct 2001
+
+1.004  29 Oct 2001
+        - Fisrt official release.
+         
+1.005  31 Oct 2001
+	  Last stable (release) version of WebTools and first
+          strongly recommended version.
+	- Library Php.pl were developed with base Php functions.
+	- Flat DB were updated basing on DBD::Sprite 0.26
+	- Were fixed problem with handling of some %SIG-nals in "downloader.pl"
+	
+1.10   24 Dec 2001
+          New features were added and some bugs removed
+        - Enhanced Templates support (INLINE, INPERL)
+        - INCLUDE function (perl/html) were added
+        - Mail client released (html mails, attachments)
+        - Security feature extended
+        - Session data's limit with forced Flat files
+          extended up to 1Mb
+          
+1.11   31 Dec 2001
+          Small bug fixes and documentation updates
+          
+1.12   04 Jan 2002
+        - Mail client now recognize 'host' (Unix/Linux) program
+          instead of 'nslookup'.
+        - Problem with simultaneous work of Flat DB and flat session support
+          was repaired.
+          
+1.13   06 Jan 2002
+        - HTML in Perl code (compile engine of WebTools) was weritten and
+          now it can contain whatever HTML/Perl code.
+        - Global variable parsing was speed up and all global variables
+          are able to contain in self any kind of data.
+        - Currently no bugs wait to be removed! :-)
+
+1.14   08 Jan 2002
+        - Session support was enhanced
+        - config.pl was rearranged
+        - webtools.pm was optimized
+      
+1.15   16 Jan 2002
+        - WebTools export HASH-es to global namespace (global hashes)
+        - Bug in xreader_dbh() removed
+        - Additional php(.pl) functions are now available
+        
+1.16   24 Jan 2002
+        - Configuration script released for easy manage of config.pl file
+          and databases.
+        - Thank's to S. Marinov for some fixed bugs.
+        - Fixed problem with header in 'non-buffered' print mode.
+        - New object oriented module for image (password) generation.
+
+1.20   17 Feb 2002
+        - This is a first version of WebTools that use Errors::Errors module
+          to handle some base errors and signals.
+        - Problem with INLINE/INPERL templates solved.
+        - "User support" extended: DB structure extended.
+        - Improved install.cgi (use session cookies)
+
+1.21   18 Feb 2002
+        - Runtime (pre)configure of config.pl (load config.pl once)
+        - Runtime choice of active DB driver and dynamic selection of
+          DB functions, using AUTOLOAD method.
+        - All "config" variables now "belongs" to webtools module!
+        - Install.cgi now catch $webtools:: variables in config.pl
+        
+1.22   19 Feb 2002
+        - Fixed bug with simultaneous work of different databases
+          (fixed through load_database_driver() function)
+
+1.23   25 Feb 2002
+        - Debug capability added (via html, popup and layer)
+        - Fixed bug with database creation in install.cgi
+        - Fixed bug with session cookies
+        - Fixed bug in mail.pl (with some DNS queries)
+        - Fixed bug related to pipe '|' in webtools.pm
+        - Fixed bug in global export module
+        (All these bugs are made in last versions because,
+         of new features and internal reconstructions!)
+
+1.24   03 Apr 2002
+        - Raw DNS queries (MX,A,SOA,CNAME,NS...)
+          (don't need DNS client anymore)
+        - Improved install.cgi script
+        - Dynamic change of current database engine
+        - Improved mail.pl client. It can send multiple
+          emails, support "banned" list, dns cache and more.
+        - onStartUp and onActivate events in your script.
+          You can run perl code, to change config.pl dynamicly,
+          (db drvers, path, variables...) just before script
+          to be run.
+        - Dynamicly fillout html forms using hash.
+        - Script "firewall". Set allowed IPs and restrict/redirect
+          other.
+
+1.25   01 May 2002
+        - New 'mysql' driver (mysql_dbi) using DBI interface
+        - Improved 'xreader' with simplificated templates
+        - Improved 'webtools' module with simple template support
+        - Removed READLINE operator in place where is needful to
+          speed up execution of scripts
+        - Removed bugs found at: htmlparser.pl and dump.pl
+
+1.26   23 Jun 2002
+        - Speed optimization of WebTools module.
+        - Eval WebTools scripts on runtime.
+
+1.27   24 Aug 2002
+        - 'as html' feature added in globexport and webtools
+        - 'safe' quote-printable in mail.pl and bug with base64 removed
+        - flat session permissions is now secured.
+        - deepwalk library introduced.
+        - base ShopCard module (mysql side support) introduced
+        - base Categories module (mysql side support) introduced

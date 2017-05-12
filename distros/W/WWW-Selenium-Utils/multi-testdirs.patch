@@ -1,0 +1,119 @@
+Index: t/1-regen.t
+===================================================================
+--- t/1-regen.t	(revision 55)
++++ t/1-regen.t	(working copy)
+@@ -177,6 +177,46 @@
+               qr#Can't include $testdir/cantfind -#;
+ }
+ 
++Multiple_test_dirs: {
++    my $testdir = test_setup("multi-dir");
++    my $testdir2 = test_setup("different test dir");
++    isnt $testdir, $testdir2;
++    my $test_dirs = [ { name => 'Foo',
++                        dir  => $testdir,
++                      },
++                      { name => 'Other',
++                        dir  => $testdir2,
++                      },
++                    ];
++    gen_suite( test_dir => $test_dirs, index => "t/index.html" );
++    ok -e "$testdir/TestSuite.html", "TestSuite created";
++    ok -e "$testdir2/TestSuite.html", "TestSuite created";
++    ok -e "$testdir2/foo.html", "Second testdir HTML generated";
++    ok -e "t/index.html";
++    my $index = cat("t/index.html");
++    like $index, qr#<title>Selenium TestSuites</title>#;
++    like $index, qr#<a href="TestRunner\.html\?test=\./tests/TestSuite\.html">Foo TestSuite</a>#;
++    like $index, qr#<a href="TestRunner\.html\?test=\./other/tests/TestSuite\.html">Other TestSuite</a>#;
++}
++
++if (0) {
++Multiple_test_dirs_from_config: {
++    my $testdir = test_setup("multi-dir");
++    my $testdir2 = test_setup("different test dir");
++    isnt $testdir, $testdir2;
++    write_config("multiple test directories");
++    gen_suite();
++    ok -e "$testdir/TestSuite.html", "TestSuite created";
++    ok -e "$testdir2/TestSuite.html", "TestSuite created";
++    ok -e "$testdir2/foo.html", "Second testdir HTML generated";
++    ok -e "t/index.html";
++    my $index = cat("t/index.html");
++    like $index, qr#<title>Selenium TestSuites</title>#;
++    like $index, qr#<a href="TestRunner\.html\?test=\./tests/TestSuite\.html">Foo TestSuite</a>#;
++    like $index, qr#<a href="TestRunner\.html\?test=\./other/tests/TestSuite\.html">Other TestSuite</a>#;
++}
++}
++
+ sub gen_suite {
+     my @opts = @_;
+     lives_ok { generate_suite( @opts, verbose => $verbose ) };
+Index: lib/WWW/Selenium/Utils.pm
+===================================================================
+--- lib/WWW/Selenium/Utils.pm	(revision 57)
++++ lib/WWW/Selenium/Utils.pm	(working copy)
+@@ -10,7 +10,7 @@
+ 
+ require Exporter;
+ our @ISA = qw(Exporter);
+-our @EXPORT_OK = qw(generate_suite cat);
++our @EXPORT_OK = qw(generate_suite cat parse_wikifile);
+ 
+ our $VERSION = '0.08';
+ 
+@@ -25,10 +25,20 @@
+ 
+     croak "Must provide a directory of tests!\n" unless $opts{test_dir};
+ 
+-    _generate_suite( %opts );
++    my @testdirs = ref($opts{test_dir}) eq 'ARRAY' 
++                        ? @{$opts{test_dir}}
++                        : { dir => $opts{test_dir},
++                            name => 'Main',
++                          };
+ 
++    for my $td (@testdirs) {
++        die "Test dirs must be HASH refs\n" unless ref($td) eq 'HASH';
++        $opts{test_dir} = $td->{dir};
++        _generate_suite( %opts );
++    }
++
+     # create a test Suite index
+-    create_suite_index($opts{test_dir}, $opts{index}) if $opts{index};
++    create_suite_index(\@testdirs, $opts{index}) if $opts{index};
+ }
+ 
+ sub _generate_suite {
+@@ -247,18 +257,26 @@
+ }
+ 
+ sub create_suite_index {
+-    my ($testdir, $index) = @_;
++    my ($testdirs, $index) = @_;
+     my @suites;
+-    find( sub { push @suites, $File::Find::name if /TestSuite\.html$/ }, $testdir);
++    for my $td (@$testdirs) {
++        find( sub { push @suites, [ $td->{name} => $File::Find::name ] 
++                        if /TestSuite\.html$/;
++                  }, 
++              $td->{dir},
++            );
++    }
+     return unless @suites;
+     
+     (my $index_dir = $index) =~ s#^(.+)/.+$#$1#;
+     open(my $fh, ">$index.tmp") or croak "Can't open $index.tmp: $!";
+     print $fh html_header(title => "Selenium TestSuites");
+     foreach my $s (@suites) {
+-        my $name = "Main";
+-        $name = $1 if $s =~ m#\Q$testdir\E/(.+)/TestSuite\.html$#;
+-        (my $link = $s) =~ s#\Q$index_dir\E/##;
++        my $name = $s->[0];
++        my $file = $s->[1];
++        warn "file=($file)\n";
++        $name = "$name-$1" if $file =~ m#\Q$file\E/(.+)/TestSuite\.html$#;
++        (my $link = $file) =~ s#\Q$index_dir\E/##;
+         print $fh qq(\t<tr><td><a href="TestRunner.html?test=./$link">$name TestSuite</a></td></tr>\n);
+     }
+     print $fh html_footer;

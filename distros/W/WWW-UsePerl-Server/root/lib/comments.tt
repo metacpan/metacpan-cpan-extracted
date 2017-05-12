@@ -1,0 +1,20 @@
+[% IF comments.size %]
+<hr/>
+[% previous_level = 0 %]
+[% FOREACH comment IN comments %]
+[% IF comment.level > previous_level %]
+<blockquote>
+[% ELSIF comment.level < previous_level %]
+[% levels_back = previous_level - comment.level %]
+[% FOREACH i IN [1..levels_back] %]
+</blockquote>
+[% END %]
+[% END %]
+<h2>[% comment.subject | html %]</h2>
+<h3><a href="[% c.uri_for('~' _ comment.user.nickname _ '/' ) %]">[% comment.user.nickname |
+        html %]</a> on [% comment.date | html %]</h3>
+[% comment.comment_html %]
+[% previous_level = comment.level %]
+[% END %]
+[% ELSE %]
+[% END %]

@@ -1,0 +1,32 @@
+---
+abstract: 'Perl extension for the StopForumSpam.com API'
+author:
+  - 'Günter Grodotzki <guenter@perlhipster.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-StopForumSpam
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Digest::MD5: 0
+  JSON: 0
+  Socket: 0
+  URI::Escape: 0
+  WWW::Curl::Easy: 0
+resources:
+  bugtracker: https://github.com/lifeofguenter/p5-stopforumspam/issues
+  homepage: http://www.perlhipster.com/p5-stopforumspam
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lifeofguenter/p5-stopforumspam.git
+version: 0.02

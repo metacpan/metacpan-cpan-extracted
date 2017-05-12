@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: WWW-Search-ISBNDB
+version: 0.3
+author:
+  - Nick Gerakines <nick@socklabs.com>
+abstract: Search for book information on isbndb.com
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

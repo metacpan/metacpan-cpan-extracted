@@ -1,0 +1,14 @@
+Revision history for Perl extension WebService::BuzzurlAPI.
+
+0.02  Thu May 10 01:25:00 2007
+        - WebService::BuzzurlAPI; 
+              delete $AUTOLOAD valiable
+          WebService::BuzzurlAPI::Request::Base;
+              delete valid_param_prepare subroutine
+          WebService::BuzzurlAPI::Request::KeywordArticles;
+              add $VERSION = 0.02
+
+0.01  Tue May  9 22:20:50 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n WebService::BuzzurlAPI
+

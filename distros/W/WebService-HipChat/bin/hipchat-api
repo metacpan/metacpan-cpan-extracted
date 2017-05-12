@@ -1,0 +1,347 @@
+#!/usr/bin/env perl
+#
+# Simple command line interface to WebService::HipChat.
+# All output is just printed using Data::Printer.
+#
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Data::Printer;
+use Pod::Usage;
+use Encode;
+
+use WebService::HipChat;
+
+## Expect utf8 encoded input/output
+binmode STDOUT, ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)";
+@ARGV = map { Encode::decode("UTF-8", $_) } @ARGV;
+
+# Complete list of API methods
+my @api_cmds = qw( get_rooms get_room create_room update_room set_topic
+                   delete_room send_notification get_webhooks get_webhook
+                   create_webhook
+                   delete_webhook get_members add_member remove_member
+                   get_users get_user send_private_msg get_emoticons
+                   get_emoticon get_room_history share_link share_file
+                   get_private_history delete_user
+             );
+
+# Extra cmds/opts we require for individual API commands
+my @cmds = ( @api_cmds,
+             qw(
+                   help auth-token=s
+
+                   room=s
+                   topic=s privacy=s is_archived=s is_guest_accessible=s owner_id=s
+                   msg=s notify color=s colour=s msg_format=s
+                   hook=s
+                   url=s pattern=s event=s
+                   user=s
+                   type=s
+                   emoticon=s
+                   file=s
+           ) );
+
+my %Options = map { $_ =~ s/=.*//r => undef } @cmds;
+
+GetOptions(\%Options, @cmds)
+    or die "Error: invalid command line arguments\n";
+
+## I'm British
+$Options{color} //= $Options{colour};
+
+pod2usage(0) if ($Options{help});
+
+my $auth_token = $Options{'auth-token'} || $ENV{HIPCHAT_AUTH_TOKEN};
+pod2usage('Error: --auth-token or $HIPCHAT_AUTH_TOKEN env var is required')
+    unless $auth_token;
+
+## Check only one command is given
+my @provided_cmds = map { $Options{$_} ? $_ : () } @api_cmds;
+
+pod2usage('Error: Only provide one and only one command')
+    if (scalar @provided_cmds != 1);
+my $cmd = $provided_cmds[0];
+
+## Create HipChat object and call the command
+my $HC = WebService::HipChat->new(
+    auth_token => $auth_token,
+);
+
+my $rc = \&{ $cmd };
+$rc->();
+
+sub get_rooms {
+    p $HC->get_rooms();
+}
+
+sub get_room {
+    my $room = $Options{room} // die "Error: Require --room\n";
+
+    p $HC->get_room($room);
+}
+
+sub create_room {
+    my $room = $Options{room} // die "Error: Require --room\n";
+
+    p $HC->create_room({ name => $room });
+}
+
+sub update_room {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $topic    = $Options{topic}       // die "Error: Require --topic\n";
+    my $privacy  = $Options{privacy}      // die "Error: Require --privacy\n";
+    my $is_ar    = $Options{is_archived} // die "Error: Require --is_archived\n";
+    my $is_guest = $Options{is_guest_accessible}
+        // die "Error: Require --is_guest_accessible\n";
+    my $owner_id = $Options{owner_id} // die "Error: Require --owner_id\n";
+
+    $privacy = ( lc($privacy) eq 'public' ? 'public' : 'private' );
+
+    $is_ar = ( $is_ar ? 1 : 0 );
+    $is_guest = ( $is_guest ? 1 : 0 );
+
+    p $HC->update_room($room,
+                       { name => $room,
+                         topic => $topic,
+                         privacy => $privacy,
+                         is_archived => \$is_ar,
+                         is_guest_accessible => \$is_guest,
+                         owner => {
+                             id => $owner_id,
+                         },
+                     });
+}
+
+sub set_topic {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $topic    = $Options{topic}       // die "Error: Require --topic\n";
+
+    p $HC->set_topic($room, { topic => $topic });
+}
+
+sub delete_room {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+
+    p $HC->delete_room($room);
+}
+
+sub send_notification {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $msg      = $Options{msg}         // die "Error: Require --msg\n";
+    my $notify   = $Options{notify}      // 0;
+    my $color    = $Options{color}       // 'yellow';
+    my $format   = $Options{msg_format}  // 'text';
+
+    $notify = ( $notify ? 'true' : 'false' );
+
+    p $HC->send_notification($room, {
+        message => $msg,
+        color => $color,
+        notify => $notify,
+        message_format => $format,
+    });
+}
+
+sub get_webhooks {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+
+    p $HC->get_webhooks($room);
+}
+
+sub get_webhook {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $hook     = $Options{hook}        // die "Error: Require --hook\n";
+
+    p $HC->get_webhook($room, $hook);
+}
+
+sub create_webhook {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $hook     = $Options{hook}        // die "Error: Require --hook\n";
+    my $pattern  = $Options{pattern}     // die "Error: Require --pattern\n";
+    my $url      = $Options{url}         // die "Error: Require --url\n";
+    my $event    = $Options{event}       // die "Error: Require --event\n";
+
+    my @events = qw( room_message room_notification room_exit
+                     room_enter room_topic_change );
+    my $events = join(', ', @events);
+    die "Error: event should be one of: $events\n"
+        if (!grep { /^$event$/ } @events);
+
+    p $HC->create_webhook($room, {
+        url => $url,
+        pattern => $pattern,
+        event => $event,
+        name => $hook,
+    });
+}
+
+sub delete_webhook {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $hook     = $Options{hook}        // die "Error: Require --hook\n";
+
+    p $HC->delete_webhook($room, $hook);
+}
+
+sub get_members {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+
+    p $HC->get_members($room, 
+        query => {
+            #        'start-index' => XXX,
+            #        'max-results' => YYY,
+        });
+}
+
+sub add_member {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $user     = $Options{user}        // die "Error: Require --user\n";
+
+    p $HC->add_member($room, $user);
+}
+
+sub remove_member {
+    my $room     = $Options{room}        // die "Error: Require --room\n";
+    my $user     = $Options{user}        // die "Error: Require --user\n";
+
+    p $HC->remove_member($room, $user);
+}
+
+sub get_users {
+    p $HC->get_users(
+        query => {
+            # ...
+        });
+}
+
+sub get_user {
+    my $user     = $Options{user}        // die "Error: Require --user\n";
+
+    p $HC->get_user($user);
+}
+
+sub send_private_msg {
+    my $user     = $Options{user}        // die "Error: Require --user\n";
+    my $msg      = $Options{msg}         // die "Error: Require --msg\n";
+    my $notify   = $Options{notify}      // 0;
+    my $format   = $Options{msg_format}  // 'text';
+
+    $notify = ( $notify ? 'true' : 'false' );
+
+    p $msg;
+    p $HC->send_private_msg($user, {
+        message        => $msg,
+        notify         => $notify,
+        message_format => $format,
+    });
+}
+
+sub get_private_history {
+    my $user = $Options{user} // die "Error: Require --user\n";
+
+    p $HC->get_private_history($user, query => {
+            # ...
+        });
+}
+
+sub get_emoticons {
+    my $type     = $Options{type}        // die "Error: Require --type\n";
+
+    my @types = qw( global group all );
+    my $types = join(', ', @types);
+    die "Error: type should be one of: $types\n"
+        if (!grep { /^$type$/ } @types);
+
+    p $HC->get_emoticons(query => {
+        type => $type,
+    });
+}
+
+sub get_emoticon {
+    my $emoticon = $Options{emoticon}    // die "Error: Require --emoticon\n";
+
+    p $HC->get_emoticon($emoticon);
+}
+
+sub get_room_history {
+    my $room = $Options{room} // die "Error: Require --room\n";
+
+    p $HC->get_room_history($room, query => {
+        # ...
+    });
+}
+
+sub share_link {
+    my $room = $Options{room} // die "Error: Require --room\n";
+    my $url  = $Options{url}         // die "Error: Require --url\n";
+    my $msg  = $Options{msg}         // die "Error: Require --msg\n";
+
+    p $HC->share_link($room, {
+        message => $msg,
+        link    => $url,
+    });
+}
+
+sub share_file {
+    my $room = $Options{room} // die "Error: Require --room\n";
+    my $file = $Options{file} // die "Error: Require --file\n";
+
+    p $HC->share_file($room, {
+        file => $file,
+    });
+}
+
+# PODNAME: hipchat-api
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hipchat-api
+
+=head1 VERSION
+
+version 0.2000
+
+=head1 SYNOPSIS
+
+Provides a command line interface to every API call in the
+WebService::HipChat module.
+
+hipchat-api [OPTIONS] <command>
+
+Examples:
+
+   hipchat-api --get_users
+
+Set authentication via HIPCHAT_AUTH_TOKEN environment variable, or with
+--auth-token option.
+
+=head1 COMMANDS
+
+Too many to list ...
+
+=head1 OPTIONS
+
+Too many to list ...
+
+=head1 AUTHOR
+
+Naveed Massjouni <naveed@vt.edu>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Naveed Massjouni.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

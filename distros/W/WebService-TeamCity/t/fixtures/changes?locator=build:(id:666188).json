@@ -1,0 +1,14 @@
+{
+   "change" : [
+      {
+         "date" : "20160111T221013+0300",
+         "href" : "/httpAuth/app/rest/changes/id:2252908",
+         "id" : 2252908,
+         "username" : "dmitry.neverov",
+         "version" : "251b7bc67b7fd55dbfc0ebeac1ad92265d64b62b",
+         "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2252908&personal=false"
+      }
+   ],
+   "count" : 1,
+   "href" : "/httpAuth/app/rest/changes?locator=build:(id:666188)"
+}

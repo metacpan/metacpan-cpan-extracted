@@ -1,0 +1,104 @@
+NAME
+    WWW::Search::TheITJobBoard - search www.TheITJobBoard.co.uk
+
+SYNOPSIS
+            use WWW::Search::TheITJobBoard;
+            use Data::Dumper;
+            my $oSearch = WWW::Search->new('TheITJobBoard', _debug=>undef);
+            $oSearch->native_query(
+                    WWW::Search::escape_query("perl"),
+                            jobtype => WWW::Search::TheITJobBoard::CONTRACT,
+            );
+            while (my $oResult = $oSearch->next_result){
+                    warn Dumper $oResultr;
+            }
+
+INSTALLATION
+
+	To install this module type the following:
+
+	   perl Makefile.PL
+	   make
+	   make test
+	   make install
+
+DESCRIPTION
+    Gets jobs from the UK IT job site, *The IT Job Board*.
+
+    A sub-class of WWW::Search that uses HTML::TokeParser to return
+    "WWW::SearchResult" objects for each result found when querying
+    "www.theitjobboard.co.uk".
+
+    One frustrating aspect of *The IT Jobboard* is that, unlike *JobServe*
+    (WWW::Search::Jobserve), it doesn't provide an option to list jobs with
+    full descriptions. So this module offers the ability to create such a
+    list: provide the constructor parameter "detailed", with a value of
+    "html" or "text" to get details as HTML or plain text. This will extend
+    the "WWW::SearchResult" objects' "description" field, and also add a
+    "details" key, which is itself a hash with interesting keys such as
+    "location" and "salary" - those keys come directly from the HTML page,
+    so YMMV.
+
+    At the time of writing, valid options for The IT Job Board search are as
+    below. These should be passed to "native_query", as shown in the
+    example.
+
+    keywords
+        THe keywords your target job description should contain. Default is
+        "perl", of course.
+
+    jobtype
+        Valid values are: 1 for contract (our default), 2 for permenant, and
+        0 for either You may use constants:
+        "WWW::Search::TheITJobBoard::CONTRACT",
+        "WWW::Search::TheITJobBoard::PERM",
+        "WWW::Search::TheITJobBoard::ANY".
+
+    days
+        The age of the posting, in days, according to the site's records. A
+        value of 0 represents any age. Our default is 1.
+
+    orderby
+        Not especially relevant for us: valid values are 1 to order by
+        relevance to the keywords; 2 to order by date posted; 3 orders by
+        salary; 4 puts non-agency jobs first, which is the default. You may
+        use constants: "WWW::Search::TheITJobBoard::RELEVANCE",
+        "WWW::Search::TheITJobBoard::DATE",
+        "WWW::Search::TheITJobBoard::SALARY",
+        "WWW::Search::TheITJobBoard::NONAGENCY"
+
+    locations[]
+        This ugly-named entity limits the search by location. The default is
+        to return all jobs, regardless. Valid values are: "undef" to return
+        all jobs; 180 for UK, 124 for Netherlands, 93 for Germany, 69 for
+        France, 308 for Switzerland, 170 for Republic Of Ireland, 3 for
+        Austria, 301 for 'the rest Of the world,' 254 for 'other European.'
+
+        You may supply "location" instead of "location[]", but you will
+        still have to access the value you set via the latter.
+
+    currpage
+        The number of the page to start at, indexed from 1.
+
+    lang
+        Defaults to "en" for English, but you could try other two-letter ISO
+        codes.
+
+DEPENDENCIES
+    WWW::Search, HTML::TokeParser.
+
+SEE ALSO
+    This module was composed after reading WWW::Search, WWW::Search::Yahoo,
+    WWW::Search::Yahoo::Advanced and WWW::Search::Jobserve. If this module
+    is useful to you, check out the latter too.
+
+COPYRIGHT
+    Copyright (C) Lee Goddard, 2006. Some Rights Reserved.
+
+LICENCE
+    This work is licensed under a *Creative Commons
+    Attribution-NonCommercial-ShareAlike 2.0 England &amp; Wales License*:
+    <http://creativecommons.org/licenses/by-nc-sa/2.0/uk|http://creativecomm
+    ons.org/licenses/by-nc-sa/2.0/uk>.
+
+

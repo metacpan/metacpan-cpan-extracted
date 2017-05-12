@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:cmisra="http://docs.oasis-open.org/ns/cmis/restatom/200908/" xmlns:cmis="http://docs.oasis-open.org/ns/cmis/core/200908/" xmlns:alf="http://www.alfresco.org">
+  <author>
+    <name>proxy</name>
+  </author>
+  <content type="image/jpeg" src="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/content.jpg"/>
+  <id>urn:uuid:7b1f4c5a-d46a-458f-bb07-4840a88e8486</id>
+  <link rel="self" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486"/>
+  <link rel="enclosure" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/content.jpg" type="image/jpeg"/>
+  <link rel="edit" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486"/>
+  <link rel="edit-media" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/content.jpg" type="image/jpeg"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/allowableactions" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/allowableactions"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/relationships" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/rels"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/policies" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/pols"/>
+  <link rel="http://docs.oasis-open.org/ns/cmis/link/200908/acl" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/acl"/>
+  <link rel="up" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/parents" type="application/atom+xml;type=feed"/>
+  <link rel="version-history" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486/versions"/>
+  <link rel="current-version" href="http://localhost:8080/alfresco/service/cmis/s/workspace:SpacesStore/i/7b1f4c5a-d46a-458f-bb07-4840a88e8486?returnVersion=latest"/>
+  <link rel="describedby" href="http://localhost:8080/alfresco/service/cmis/type/cmis:document"/>
+  <link rel="service" href="http://localhost:8080/alfresco/service/cmis"/>
+  <published>2012-10-04T09:23:07.733+02:00</published>
+  <summary>free.jpg</summary>
+  <title>free.jpg</title>
+  <updated>2012-10-04T09:23:07.733+02:00</updated>
+  <app:edited>2012-10-04T09:23:07.733+02:00</app:edited>
+  <alf:icon>http://localhost:8080/alfresco/images/filetypes/jpg.gif</alf:icon>
+  <cmisra:object>
+    <cmis:properties>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isLatestMajorVersion" displayName="Is Latest Major Version" queryName="cmis:isLatestMajorVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyInteger propertyDefinitionId="cmis:contentStreamLength" displayName="Content Stream Length" queryName="cmis:contentStreamLength">
+        <cmis:value>63118</cmis:value>
+      </cmis:propertyInteger>
+      <cmis:propertyId propertyDefinitionId="cmis:contentStreamId" displayName="Content Stream Id" queryName="cmis:contentStreamId">
+        <cmis:value>store://2012/10/4/9/23/b49d3d9f-e6cd-4260-b740-4883cad8a500.bin</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyString propertyDefinitionId="cmis:versionSeriesCheckedOutBy" displayName="Version Series Checked Out By" queryName="cmis:versionSeriesCheckedOutBy"/>
+      <cmis:propertyId propertyDefinitionId="cmis:objectTypeId" displayName="Object Type Id" queryName="cmis:objectTypeId">
+        <cmis:value>cmis:document</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="cmis:versionSeriesCheckedOutId" displayName="Version Series Checked Out Id" queryName="cmis:versionSeriesCheckedOutId"/>
+      <cmis:propertyString propertyDefinitionId="cmis:name" displayName="Name" queryName="cmis:name">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:contentStreamMimeType" displayName="Content Stream MIME Type" queryName="cmis:contentStreamMimeType">
+        <cmis:value>image/jpeg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="cmis:versionSeriesId" displayName="Version series id" queryName="cmis:versionSeriesId">
+        <cmis:value>workspace://SpacesStore/7b1f4c5a-d46a-458f-bb07-4840a88e8486</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:creationDate" displayName="Creation Date" queryName="cmis:creationDate">
+        <cmis:value>2012-10-04T09:23:07.733+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <cmis:propertyString propertyDefinitionId="cmis:changeToken" displayName="Change token" queryName="cmis:changeToken"/>
+      <cmis:propertyString propertyDefinitionId="cmis:versionLabel" displayName="Version Label" queryName="cmis:versionLabel">
+        <cmis:value>1.0</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isLatestVersion" displayName="Is Latest Version" queryName="cmis:isLatestVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isVersionSeriesCheckedOut" displayName="Is Version Series Checked Out" queryName="cmis:isVersionSeriesCheckedOut">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyString propertyDefinitionId="cmis:lastModifiedBy" displayName="Last Modified By" queryName="cmis:lastModifiedBy">
+        <cmis:value>proxy</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:createdBy" displayName="Created by" queryName="cmis:createdBy">
+        <cmis:value>proxy</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyString propertyDefinitionId="cmis:checkinComment" displayName="Checkin Comment" queryName="cmis:checkinComment">
+        <cmis:value>Initial Version</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyId propertyDefinitionId="cmis:objectId" displayName="Object Id" queryName="cmis:objectId">
+        <cmis:value>workspace://SpacesStore/7b1f4c5a-d46a-458f-bb07-4840a88e8486</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isImmutable" displayName="Is Immutable" queryName="cmis:isImmutable">
+        <cmis:value>false</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyBoolean propertyDefinitionId="cmis:isMajorVersion" displayName="Is Major Version" queryName="cmis:isMajorVersion">
+        <cmis:value>true</cmis:value>
+      </cmis:propertyBoolean>
+      <cmis:propertyId propertyDefinitionId="cmis:baseTypeId" displayName="Base Type Id" queryName="cmis:baseTypeId">
+        <cmis:value>cmis:document</cmis:value>
+      </cmis:propertyId>
+      <cmis:propertyId propertyDefinitionId="alfcmis:nodeRef" displayName="Alfresco Node Ref" queryName="alfcmis:nodeRef"/>
+      <cmis:propertyString propertyDefinitionId="cmis:contentStreamFileName" displayName="Content Stream Filename" queryName="cmis:contentStreamFileName">
+        <cmis:value>free.jpg</cmis:value>
+      </cmis:propertyString>
+      <cmis:propertyDateTime propertyDefinitionId="cmis:lastModificationDate" displayName="Last Modified Date" queryName="cmis:lastModificationDate">
+        <cmis:value>2012-10-04T09:23:07.733+02:00</cmis:value>
+      </cmis:propertyDateTime>
+      <alf:aspects>
+        <alf:appliedAspects>P:sys:localized</alf:appliedAspects>
+        <alf:properties>
+</alf:properties>
+      </alf:aspects>
+    </cmis:properties>
+    <cmis:allowableActions>
+      <cmis:canDeleteObject>true</cmis:canDeleteObject>
+      <cmis:canUpdateProperties>true</cmis:canUpdateProperties>
+      <cmis:canGetProperties>true</cmis:canGetProperties>
+      <cmis:canGetObjectRelationships>true</cmis:canGetObjectRelationships>
+      <cmis:canGetObjectParents>true</cmis:canGetObjectParents>
+      <cmis:canMoveObject>true</cmis:canMoveObject>
+      <cmis:canDeleteContentStream>true</cmis:canDeleteContentStream>
+      <cmis:canCheckOut>true</cmis:canCheckOut>
+      <cmis:canCancelCheckOut>false</cmis:canCancelCheckOut>
+      <cmis:canCheckIn>false</cmis:canCheckIn>
+      <cmis:canSetContentStream>true</cmis:canSetContentStream>
+      <cmis:canGetAllVersions>true</cmis:canGetAllVersions>
+      <cmis:canAddObjectToFolder>true</cmis:canAddObjectToFolder>
+      <cmis:canRemoveObjectFromFolder>true</cmis:canRemoveObjectFromFolder>
+      <cmis:canGetContentStream>true</cmis:canGetContentStream>
+      <cmis:canApplyPolicy>false</cmis:canApplyPolicy>
+      <cmis:canGetAppliedPolicies>true</cmis:canGetAppliedPolicies>
+      <cmis:canRemovePolicy>false</cmis:canRemovePolicy>
+      <cmis:canCreateRelationship>true</cmis:canCreateRelationship>
+      <cmis:canGetRenditions>true</cmis:canGetRenditions>
+      <cmis:canGetACL>true</cmis:canGetACL>
+      <cmis:canApplyACL>true</cmis:canApplyACL>
+    </cmis:allowableActions>
+  </cmisra:object>
+  <cmisra:pathSegment>free.jpg</cmisra:pathSegment>
+</entry>

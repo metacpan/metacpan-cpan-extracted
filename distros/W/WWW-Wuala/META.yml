@@ -1,0 +1,24 @@
+---
+abstract: ~
+author:
+  - 'Perforin <perforin@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Wuala
+no_index:
+  directory:
+    - inc
+    - examples
+requires:
+  File::Temp: 0.18
+  LWP::Simple: 5.81
+resources:
+  homepage: http://virii.lu
+version: 0.1

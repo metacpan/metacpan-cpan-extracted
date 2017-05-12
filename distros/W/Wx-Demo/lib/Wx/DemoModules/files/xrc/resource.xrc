@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<resource>
+  <object class="wxMenuBar" name="mainmenu">
+    <style>wxMB_DOCKABLE</style>
+    <object class="wxMenu" name="menu_file">
+      <label>$File</label>
+      <style>wxMENU_TEAROFF</style>
+      <object class="wxMenuItem" name="menu_dlg1">
+        <label>Dialog</label>
+      </object>
+      <object class="separator"/>
+      <object class="wxMenuItem" name="menu_quit">
+        <label>E$xit\tAlt-X</label>
+      </object>
+    </object>
+  </object>
+  <object class="wxToolBar" name="toolbar">
+    <style>wxTB_FLAT|wxTB_DOCKABLE</style>
+    <margins>2,2</margins>
+    <object class="tool" name="menu_open">
+      <bitmap>fileopen.gif</bitmap>
+      <tooltip>Open catalog</tooltip>
+    </object>
+    <object class="tool" name="menu_save">
+      <bitmap>filesave.gif</bitmap>
+      <tooltip>Save catalog</tooltip>
+    </object>
+    <object class="tool" name="menu_update">
+      <bitmap>update.gif</bitmap>
+      <tooltip>Update catalog - synchronize it with sources</tooltip>
+    </object>
+    <separator/>
+    <object class="tool" name="menu_quotes">
+      <bitmap>quotes.gif</bitmap>
+      <toggle>1</toggle>
+      <tooltip>Display quotes around the string?</tooltip>
+    </object>
+    <object class="separator"/>
+    <object class="tool" name="menu_fuzzy">
+      <bitmap>fuzzy.gif</bitmap>
+      <tooltip>Toggled if selected string is fuzzy translation</tooltip>
+      <toggle>1</toggle>
+    </object>
+  </object>
+  <object class="wxDialog" name="dlg1">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <flag>wxALL</flag>
+        <border>5</border>
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Bitmap button with focus bitmap</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxLEFT</flag>
+            <border>5</border>
+            <object class="wxBitmapButton" name="bmpbutt">
+              <bitmap>fuzzy.gif</bitmap>
+              <focus>fileopen.gif</focus>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel">
+          <object class="wxStaticText">
+            <label>Static text with sunken border</label>
+          </object>
+          <style>wxSUNKEN_BORDER</style>
+        </object>
+        <flag>wxALIGN_CENTER</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton">
+          <label>A button</label>
+        </object>
+        <border>10d</border>
+        <flag>wxALL</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxNotebook">
+          <object class="notebookpage">
+            <object class="wxPanel">
+              <object class="wxBoxSizer">
+                <object class="sizeritem">
+                  <object class="wxHtmlWindow">
+                    <htmlcode>Hello, we are inside a &lt;u&gt;NOTEBOOK&lt;/u&gt;...</htmlcode>
+                    <size>50,50d</size>
+                  </object>
+                  <option>1</option>
+                </object>
+              </object>
+            </object>
+            <label>Expandable</label>
+          </object>
+          <object class="notebookpage">
+            <object class="wxPanel">
+              <object class="wxBoxSizer">
+                <object class="spacer">
+                  <size>-1,-1</size>
+                  <option>1</option>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxHtmlWindow">
+                    <htmlcode>Hello, we are inside a &lt;u&gt;NOTEBOOK&lt;/u&gt;...</htmlcode>
+                    <size>70,50d</size>
+                  </object>
+                  <option>0</option>
+                  <flag>wxALIGN_CENTER</flag>
+                </object>
+                <object class="spacer">
+                  <size>-1,-1</size>
+                  <option>1</option>
+                </object>
+              </object>
+            </object>
+            <label>Centered</label>
+          </object>
+          <usenotebooksizer>1</usenotebooksizer>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_OK">
+              <label>Ok</label>
+              <default>1</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="wxID_CANCEL">
+              <label>Cancel</label>
+            </object>
+            <border>10</border>
+            <flag>wxLEFT</flag>
+          </object>
+        </object>
+        <flag>wxLEFT|wxRIGHT|wxBOTTOM|wxALIGN_RIGHT</flag>
+        <border>10</border>
+      </object>
+    </object>
+  </object>
+</resource>

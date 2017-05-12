@@ -1,0 +1,25 @@
+=begin pod
+=TITLE Main title
+=SUBTITLE mini subtitle
+=DESCRIPTION
+asd asd 
+=begin CHANGES
+Dec 09th 2012(v0.1)[zag]   Start
+
+=end CHANGES
+=AUTHOR Alex Zahatski
+=for CHAPTER :published<'2012-11-27T09:39:19Z'>
+Test chapter
+
+Ok 
+=for head1 :published<'2013-01-10T09:09:09Z'> 
+Test name
+=head2 test
+
+yes
+
+=head1 Test 1
+
+ok
+
+=end pod

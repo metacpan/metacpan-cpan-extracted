@@ -1,0 +1,98 @@
+NAME
+    WWW::Finger - get useful data from e-mail addresses
+
+SYNOPSIS
+      use WWW::Finger;
+      my $finger = WWW::Finger->new("joe@example.com");
+      if (defined $finger)
+      {
+        print $finger->name . "\n";
+      }
+
+DESCRIPTION
+    This module is *not* an implementation of the finger protocol (RFC
+    1288). Use Net::Finger for that. Instead it is a set of implementations
+    of *other* methods for getting information from an e-mail address, or
+    e-mail like identifier. This package includes four such implementations,
+    and it's pretty easy to create your own additional implementations:
+
+    *       WebFinger
+
+    *       Fingerpoint
+
+    *       MetaCPAN API for cpan.org addresses
+
+    *       Unnamed finger protocol described on bitworking.org
+
+  Constructor
+    *       "new"
+
+              $finger = WWW::Finger->new($identifier);
+
+            Creates a WWW::Finger object for a particular identifier. Will
+            return undef if no implemetation is able to handle the
+            identifier
+
+  Object Methods
+    Any of these methods can return undef if the appropriate information is
+    not available. The "name", "mbox", "homepage", "weblog", "image" and
+    "key" methods work in both scalar and list context. Depending on which
+    implementation was used by "WWW::Finger->new", the object may also have
+    additional methods. Consult the documentation of the various
+    implementations for details.
+
+    "name"
+        The person's name (or handle/nickname).
+
+    "mbox"
+        The person's e-mail address (including "mailto:").
+
+    "homepage"
+        The person's personal homepage.
+
+    "weblog"
+        The person's blog. (There may be some overlap with "homepage".)
+
+    "image"
+        An avatar, photo or other image depicting the person.
+
+    "key"
+        The URL of the person's GPG/PGP public key.
+
+    "webid"
+        A URI uniquely identifying the person. See
+        <http://esw.w3.org/topic/WebID>.
+
+    "endpoint"
+        A SPARQL Protocol endpoint which may provide additional data about
+        the person. (See RDF::Query::Client.)
+
+    "graph"
+        An RDF::Trine::Model object holding data about the person. (See
+        RDF::Trine.)
+
+SEE ALSO
+    Net::Finger.
+
+    <http://code.google.com/p/webfinger/>.
+
+    <http://buzzword.org.uk/2009/fingerpoint/spec>.
+
+    <http://www.perlrdf.org/>.
+
+    fingerw.
+
+AUTHOR
+    Toby Inkster, <tobyink@cpan.org>
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2009-2012 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

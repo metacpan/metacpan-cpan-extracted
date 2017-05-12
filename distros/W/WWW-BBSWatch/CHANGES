@@ -1,0 +1,21 @@
+Version 1.02
+
+05/01/01 - Rearranged the Copyright and License sections of the POD.
+
+*****************************************************************************
+Version 1.01
+
+01/12/01 - Small documentation changes.
+
+*****************************************************************************
+Version 1.00
+
+09/22/00 - Fixed spelling errors in the POD.
+
+*****************************************************************************
+Version 0.02
+
+04/22/00 - Fixed bad reference to $self->addr in _mail_error().
+
+04/29/00 - Fixed spelling error of 'httpproxy' in README.
+*****************************************************************************

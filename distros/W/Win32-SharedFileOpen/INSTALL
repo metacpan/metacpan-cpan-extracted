@@ -1,0 +1,52 @@
+________________________________________________________________________________
+
+                      Win32::SharedFileOpen, Version 4.02
+________________________________________________________________________________
+
+PREREQUISITES
+
+    Microsoft Windows
+
+        This module only works on "native" (i.e. non-Cygwin) Microsoft Windows.
+        (Nothing else has the functions which this module provides emulations of
+        anyway.)
+
+    C Compiler
+
+        You need a C compiler to build this module.
+
+        Ideally you should try to use the same compiler as was used to build
+        your perl itself, although this is not essential.  (However, there is a
+        known compatibility problem when building this module with Visual Studio
+        .NET 2002/2003 (VC7) or earlier if your perl was built with Visual
+        Studio 2005 (VC8) or later: see [perl #121448].)
+
+    Perl
+
+        Perl version 5.8.1 or later.
+        The latest version of Perl is available from http://www.perl.com/.
+
+    Perl Modules
+
+        The only non-standard Perl module required by this module is
+
+            Win32::WinError
+
+        which is available from CPAN (http://www.cpan.org/).
+
+INSTALLATION
+
+    To install this module, cd to the directory that contains this INSTALL file
+    and type the following:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+    Use "dmake" rather than "nmake" in the commands above if that is what your
+    perl was built with.  To determine which make program was used to build your
+    perl type the following:
+
+        perl -V:make
+________________________________________________________________________________

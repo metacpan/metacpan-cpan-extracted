@@ -1,0 +1,12 @@
+html/changelog.html
+Makefile.PL
+MANIFEST
+README
+COPYING
+test.pl
+lib/Apache/WeSQL.pm
+lib/Apache/WeSQL/Journalled.pm
+lib/Apache/WeSQL/SqlFunc.pm
+lib/Apache/WeSQL/Display.pm
+lib/Apache/WeSQL/Auth.pm
+lib/Apache/WeSQL/AppHandler.pm

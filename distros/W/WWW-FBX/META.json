@@ -1,0 +1,101 @@
+{
+   "abstract" : "Freebox v6 OS Perl Interface",
+   "author" : [
+      "Laurent Kislaire <teebeenator@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-FBX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : "0",
+            "Devel::StackTrace" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "HTTP::Request" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::FBX" : {
+         "file" : "lib/WWW/FBX.pm",
+         "version" : "0.19"
+      },
+      "WWW::FBX::API" : {
+         "file" : "lib/WWW/FBX/API.pm"
+      },
+      "WWW::FBX::Error" : {
+         "file" : "lib/WWW/FBX/Error.pm"
+      },
+      "WWW::FBX::Meta::Method" : {
+         "file" : "lib/WWW/FBX/API.pm"
+      },
+      "WWW::FBX::Role::API::APIv3" : {
+         "file" : "lib/WWW/FBX/Role/API/APIv3.pm"
+      },
+      "WWW::FBX::Role::Auth" : {
+         "file" : "lib/WWW/FBX/Role/Auth.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/architek/WWW-FBX/issues"
+      },
+      "homepage" : "https://github.com/architek/WWW-FBX",
+      "repository" : {
+         "url" : "git://github.com/architek/WWW-FBX.git",
+         "web" : "https://github.com/architek/WWW-FBX"
+      }
+   },
+   "version" : "0.19",
+   "x_contributors" : [
+      "root <root@debian-asus>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

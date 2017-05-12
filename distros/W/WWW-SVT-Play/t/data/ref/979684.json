@@ -1,0 +1,21 @@
+{
+   "filename" : "svt-play.kultur-och-nöje.på-spåret.hela-program.del-12-av-13",
+   "streams" : [
+      {
+         "url" : "http://svtplay6p-f.akamaihd.net/z/world/open/20130123/1167692-012A/PA_SPARET_2012-012A-29e84230d235d322_,900,348,564,1680,2800,.mp4.csmil/manifest.f4m",
+         "type" : "hds"
+      },
+      {
+         "url" : "http://svtplay6p-f.akamaihd.net/i/world/open/20130123/1167692-012A/PA_SPARET_2012-012A-29e84230d235d322_,900,348,564,1680,2800,.mp4.csmil/master.m3u8",
+         "type" : "hls"
+      }
+   ],
+   "ppurl" : "http://www.svtplay.se/video/979684/?output=json",
+   "url" : "http://www.svtplay.se/video/979684/",
+   "title" : "Del 12 av 13",
+   "duration" : 3511,
+   "subtitles" : [
+      "http://media.svt.se/download/mcc/wp3/undertexter-wsrt/1167692/EPISOD-1167692-012A-wsrt-29e84230d235d322.wsrt"
+   ]
+}
+

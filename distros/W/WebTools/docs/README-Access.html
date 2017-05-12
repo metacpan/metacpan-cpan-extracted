@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>README-MS ACCESS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" BORDER="0" BACKGROUND="images/bgimage.jpg">
+  <TR><TD> <div align="center"> 
+<p><b><font color="#000000" size="4">MS ACCESS</font></b></p>
+        <p align="left">&nbsp;&nbsp;&nbsp;<b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">This 
+          README file regards Ms Access users and here is information you need 
+          to get Ms Access up!<br>
+          <br>
+          Installation:<br>
+          &nbsp;&nbsp;&nbsp;Before you can use Access DB you may need to install 
+          some standart modules:<br>
+          First you need </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/TIMB/DBI-1.21.tar.gz"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">DBI</font></a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+          (On most systems that module is already installed!), also you need </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/J/JU/JURL/DBD-ODBC-0.38.tar.gz"><font size="2" face="Verdana, Arial, Helvetica, sans-serif">DBD-ODBC</font></a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          After successful installation you have to configure your DSN (Data Source 
+          Name):<br>
+          <br>
+          &nbsp;Run your DSN setup program and enter new data source name and 
+          select location of database (choose file: <font color="#006600">webtoolsdb.mdb</font> 
+          found into webtools/db directory). Also set user and password:<br>
+          <br>
+          &nbsp;DSN: </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#990000">webtoolsdb</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          &nbsp;User: </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font></b></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          &nbsp;Password: </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">its_password</font></font></b></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+          <br>
+          <br>
+          <i>NOTE:</i> You can create your own database and/or tables, but you 
+          must make corrections where is needful (i.e. in config.pl)! If you want 
+          to create new database, you should look structure of <font color="#006600">webtoolsdb.mdb</font> 
+          (be careful: copy all properties from my blank database, or use empty 
+          one located into webtools/db/structures). After DB creation, copy new 
+          database into webtools/db directory.<br>
+          </font></b></p>
+        <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Database 
+          is now ready, and you <font color="#000000">need</font><font color="#990000"><font color="#000000"> 
+          to configure follow section of 'config.pl':<br>
+           <br> <font color="#006600">#[Name_Of_Project]<br>
+          $webtools::projectname = '<font color="#990000">webtools</font>'; &nbsp;&nbsp;&nbsp;&nbsp;# 
+          Name of project! (be careful what exacly you write here!) </font></font></font></font></b></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[SQL]<br> 
+$webtools::db_support = '<font color="#990000">db_access</font>'; &nbsp;&nbsp; &nbsp;# Driver 
+for MS ACCESS<br> $webtools::sql_host = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">localhost</font></font>';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+Your address to SQL server.<br> $webtools::sql_port = '3306'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+Your port of SQL server.<br>
+          $webtools::sql_user = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font>'; 
+          &nbsp;&nbsp;# Don't forget user<br>
+          $webtools::sql_pass = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">its_password</font></font>'; 
+          &nbsp;&nbsp;&nbsp;&nbsp;# and password!<br>
+           $webtools::mysqlbequiet = '1';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+# MySQL be QUIET?</b></font></p><p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[DataBase]<br> 
+$webtools::sql_database_sessions = <font color="#990000">$webtools::projectname</font>.'db';&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp;&nbsp;# Database Source Name (your DSN)<br> $webtools::sql_sessions_table 
+= <font color="#990000">$webtools::projectname</font>.'_sessions'; # Session table.<br> 
+$webtools::sql_user_table = <font color="#990000">$webtools::projectname</font>.'_users'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+Contain all users (and admin too).</b></font></p>
+        <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Evrything 
+          is ok. Now you can run your tests/examples...enjoy!</font></b><br>
+           <br> <b><font face="Verdana, Arial, Helvetica, sans-serif" size="-1">Author:<br> 
+<a href="mailto:jlishev@cpan.org">julian@proscriptum.com</a></font></b></p></div></TD></TR></table>
+</body>
+</html>

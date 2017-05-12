@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+README
+t/WebPresence-Profile.t
+lib/WebPresence/Profile.pm
+lib/WebPresence/Profile/AOL.pm
+lib/WebPresence/Profile/ICQ.pm
+lib/WebPresence/Profile/LJ.pm
+lib/WebPresence/Profile/Tribe.pm
+lib/WebPresence/Profile/Yahoo.pm

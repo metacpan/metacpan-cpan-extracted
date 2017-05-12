@@ -1,0 +1,12 @@
+bin/which.cmd
+Build.PL
+Changes
+lib/which.pod
+lib/Win32/App/which.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/10-bin-chk.t
+xt/90-pod.t
+xt/91-pod-coverage.t

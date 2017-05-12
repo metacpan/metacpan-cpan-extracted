@@ -1,0 +1,61 @@
+Revision history for WWW-Mailman
+
+1.061 2016-07-23 BOOK
+    [FEATURES]
+    - archive_mbox_uri returns the URI for the full mbox archive (if any)
+    [PACKAGING]
+    - switched to dzil for packaging
+
+1.06 2013-05-07 BOOK
+    [TESTS]
+    - fix the test code for perl 5.17
+    - allow for several configuration files for live tests
+    - several minor test improvements
+
+1.05 2011-12-22 BOOK
+    [IMPROVEMENTS]
+    - add support for Mailman installs that do not use /mailman/
+      in their URL (RT #73312)
+    - add a version() method
+    - enforce content-encoding to latin-1 when submitting forms,
+      to fix some double encoding issues
+
+1.04 2010-04-06 BOOK
+    [PACKAGING]
+    - more accurate prerequites
+
+1.03 2010-04-01 BOOK
+    [IMPROVEMENTS]
+    - better support for sites behind HTTP authentication
+    [EXAMPLES]
+    - mm_roster (forgotten in v1.01)
+
+1.02 2010-03-30 BOOK
+    [FEATURES]
+    - new method: admin()
+    - admin() is the entry point for a bunch of other methods:
+      admin_archive(), admin_autoreply(), admin_bounce(),
+      admin_contentfilter(), admin_digest(), admin_gateway(),
+      admin_general(), admin_language(), admin_nondigest(),
+      admin_passwords(), admin_topics()
+    [TESTS]
+    - live test for some admin methods
+
+1.01 2010-03-28 BOOK
+    [FEATURES]
+    - new method: roster()
+    [TESTS]
+    - live test for roster()
+
+1.00 2010-03-25 BOOK
+    [FEATURES]
+    - basic features: constructor, accessors
+    - autologin, cookie management
+    - options(), othersubs(), changepw(), emailpw(), unsub()
+    [EXAMPLES]
+    - mm_othersubs, mm_emailpw, mm_options, mm_nodupes
+    [TESTS]
+    - live tests with working credentials if provided
+    - numerous examples scripts in eg/
+    - 94% coverage (with live tests)
+

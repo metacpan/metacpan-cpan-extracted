@@ -1,0 +1,34 @@
+---
+abstract: 'Search A9 OpenSearch compatible engines'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-OpenSearch
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Page: 2
+  Encode: 0
+  LWP: 5.60
+  URI: 0
+  URI::Template: 0
+  XML::Feed: 0.08
+  XML::LibXML: 1.58
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/www-opensearch
+version: 0.17

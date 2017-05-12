@@ -1,0 +1,225 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WWW::Spinn3r - An interface to the Spinn3r API</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@omen.apple.com" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#obtaining_a_vendor_key">OBTAINING A VENDOR KEY</a></li>
+	<li><a href="#how_to_use">HOW TO USE</a></li>
+	<li><a href="#new__"><strong>new()</strong></a></li>
+	<li><a href="#next__"><strong>next()</strong></a></li>
+	<li><a href="#last_url__"><strong>last_url()</strong></a></li>
+	<li><a href="#mirror__"><strong>mirror()</strong></a></li>
+	<li><a href="#date_string_format">DATE STRING FORMAT</a></li>
+	<li><a href="#reporting_bugs">REPORTING BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<pre>
+
+WWW::Spinn3r - An interface to the Spinn3r API (<a href="http://www.spinn3r.com">http://www.spinn3r.com</a>)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use WWW::Spinn3r;
+ use DateTime;</pre>
+<pre>
+ my $API = { 
+    vendor          =&gt; 'acme',   # required
+    limit           =&gt; 5, 
+    lang            =&gt; 'en',
+    tier            =&gt; '0:5', 
+    after           =&gt; DateTime-&gt;now()-&gt;subtract(hours =&gt; 48),
+ };</pre>
+<pre>
+ my $spnr = new WWW::Spinn3r ( 
+    api =&gt; 'permalink.getDelta', params =&gt; $API, debug =&gt; 1);
+ );</pre>
+<pre>
+ while(1) { 
+     my $item = $spnr-&gt;next;
+     print $item-&gt;{title};
+     print $item-&gt;{link};
+     print $item-&gt;{dc}-&gt;{source};
+     print $item-&gt;{description};
+ }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>WWW::Spinn3r is an iterative interface to the Spinn3r API. The Spinn3r API 
+is implemented over REST and XML and documented at 
+<code>http://spinn3r.com/documentation</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="obtaining_a_vendor_key">OBTAINING A VENDOR KEY</a></h1>
+<p>Spinn3r service is available through a <strong>vendor</strong> key, which you can 
+get from the good folks at Tailrank, <code>http://spinn3r.com/contact</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="how_to_use">HOW TO USE</a></h1>
+<p>Most commonly, you'll need just two functions from this module: <code>new()</code>
+and <code>next()</code>. <code>new()</code> creates a new instance of the API and <code>next()</code>
+returns the next item from the Spinn3r feed, as hashref. Details
+are below.</p>
+<p>
+</p>
+<hr />
+<h1><a name="new__"><strong>new()</strong></a></h1>
+<p>The contructor. This function takes a hash with the following keys:</p>
+<dl>
+<dt><strong><a name="item_api"><strong>api</strong></a></strong>
+
+<dd>
+<p><code>permalink.getDelta</code> or <code>feed.getDelta</code>, one of the two APIs provided 
+by Spinn3r.</p>
+</dd>
+</li>
+<dt><strong><a name="item_params"><strong>params</strong></a></strong>
+
+<dd>
+<p>These are parameters that are passed to the API call. See
+<code>http://spinn3r.com/documentation</code> for a list of available parameters
+and their values.</p>
+</dd>
+<dd>
+<p>The <strong>version</strong> parameter to the API is a function of version of this
+module. and the <strong>version()</strong> accessor method returns the version
+of the API. By default, the version will be set to the version 
+that corresponds to this module.</p>
+</dd>
+<dd>
+<p>If the version of the spinn3r API has changed, you can specify it 
+as a parameter. While the module is not guranteed to work with higher
+versions of the Spinn3r API than it is designed for, it might if the
+underlying formats and encodings have not changed.</p>
+</dd>
+</li>
+<dt><strong><a name="item_want"><strong>want</strong></a></strong>
+
+<dd>
+<p>This parameter defines the type of item returned by the <code>next()</code> call.
+WWW::Spinn3r uses XML::Twig to parse the XML returned by Spinn3r and
+comes with three Twig parsers, <code>WWW::Spinn3r::item</code>,
+<code>WWW::Spinn3r::link</code> and <code>WWW::Spinn3r::next_request_url</code>. The default
+value for <a href="#item_want"><code>want</code></a> is <code>item</code>, which corresponds to the
+<code>WWW::Spinn3r::item</code> module and returns all fields for an item included
+in the Spinn3r feed.</p>
+</dd>
+<dd>
+<p>The motivation for having multiple parsers is speed. If you only want
+certain fields from the feed, for example the link and title, it is
+significantly faster to write a parser that just extracts those two
+fields from the feed with XML::Twig.</p>
+</dd>
+</li>
+<dt><strong><a name="item_debug"><strong>debug</strong></a></strong>
+
+<dd>
+<p>Emits debug noise on STDOUT if set to 1.</p>
+</dd>
+</li>
+<dt><strong><a name="item_retries"><strong>retries</strong></a></strong>
+
+<dd>
+<p>The number of HTTP retries in case of a 5xx failure from the API. 
+The default is 5.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="next__"><strong>next()</strong></a></h1>
+<p>This method returns the next item from the Spinn3r feed. The item is a
+reference to a hash, which contains the various fields of an item
+as parsed by the parser specified in the <a href="#item_want"><code>want</code></a> field of the
+consutructor (<code>item</code> by default).</p>
+<p>The module transparently fetches a new set of results from Spinn3r,
+using the <code>api:next_request_url</code> returned by Spinn3r with every
+request, and caches the result to implement <code>next()</code>.</p>
+<p>You can control the number of results that are fetched with every call
+by changing the <code>limit</code> parameter at <code>new()</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="last_url__"><strong>last_url()</strong></a></h1>
+<p>The last API URL that was fetched.</p>
+<p>
+</p>
+<hr />
+<h1><a name="mirror__"><strong>mirror()</strong></a></h1>
+<p>WWW::Spinn3r supports mirroring of the Spinn3r feed to local files
+and then recreating WWW:Spinn3r objects from these files. This
+is useful if you want to distribute processing of the feeds 
+over multiple processes or computers.</p>
+<p>To mirror feeds to disk, use the alternative constructor <strong>mirror</strong>,
+which takes all the same arguments as <strong>new</strong> plus the 
+<code>path</code> argument, which specifies where the files should saved.</p>
+<pre>
+    my $m = mirror WWW::Spinn3r ( path =&gt; $mirror_dir, ... )
+    $m-&gt;next_mirror();</pre>
+<p>The iteration is done with <strong>next_mirror()</strong> method, which stores the
+next feed to a new file, whose filename is derived from the API url.</p>
+<p>WWW::Spinn3r objects can be created from these disk files when 
+<code>new()</code> is called with the <code>from_file</code> key:</p>
+<pre>
+    my $m = new WWW::Spinn3r ( from_file =&gt; ... );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="date_string_format">DATE STRING FORMAT</a></h1>
+<p>Spinn3r supports ISO 8601 timestamps in the <code>after</code> parameter. To
+create ISO 8601 timestamps, use the DateTime module that returns ISO
+8601 date strings by default. eg:</p>
+<pre>
+ after =&gt; DateTime-&gt;now()-&gt;subtract(hours =&gt; 48),
+ after =&gt; DateTime-&gt;now()-&gt;subtract(days =&gt; 31),</pre>
+<p>
+</p>
+<hr />
+<h1><a name="reporting_bugs">REPORTING BUGS</a></h1>
+<p>Bugs should be reported at <code>http://rt.cpan.org</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>WWW::Spinn3r::Synced</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Vipul Ved Prakash &lt;<a href="mailto:vipul@slaant.com">vipul@slaant.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This software is distributed under the same terms as perl itself.</p>
+
+</body>
+
+</html>

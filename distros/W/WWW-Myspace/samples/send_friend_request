@@ -1,0 +1,9 @@
+#!/usr/bin/perl -w -I../lib
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace;
+
+my $result = $myspace->send_friend_request( @ARGV );
+
+print $result . "\n";

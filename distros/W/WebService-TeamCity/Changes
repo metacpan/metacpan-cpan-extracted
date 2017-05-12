@@ -1,0 +1,21 @@
+0.03     2016-04-04
+
+- Added a new WebService::TeamCity::Entity::Build->artifacts_dir method. This
+  downloads the zip archive of the build's artifacts and extracts it to a
+  temporary directory.
+
+
+0.02     2016-03-31
+
+- Fixed a bug where creating an iterator for a response with no items to
+  iterate over would lead to an error being through when you called
+  $iterator->next. This is now handled sanely, and next() returns undef like
+  it should.
+
+- Added a WebService::TeamCity::Entity::TestOccurrence->unknown method for
+  tests where the status is set to UNKNOWN.
+
+
+0.01     2016-03-07
+
+- First release upon an unsuspecting world.

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Web/Library/D3.pm
+share/3.3.12/js/d3.min.js
+share/3.3.3/js/d3.min.js
+t/basic.t
+t/release-pod-syntax.t

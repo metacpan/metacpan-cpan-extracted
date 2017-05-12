@@ -1,0 +1,937 @@
+
+=head1 NAME
+
+Win32::GUI::Toolbar - Create and manipulate toolbar controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Toolbar object;
+can also be called as PARENT->AddToolbar(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -adjustable => 0/1
+  -altdrag => 0/1
+  -flat => 0/1
+  -list => 0/1
+  -transparent => 0/1
+  -imagelist => IMAGELIST
+  -multiline => 0/1
+    The control can have more than one line
+  -nodivider => 0/1
+  -tooltip => Win32::GUI::Tooltip object
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddBitmap
+
+B<AddBitmap(BITMAP, NUMBUTTONS)>
+
+Adds a buttons-bitmap to the toolbar. BITMAP should be a handle to the
+bitmap containing button images, and NUMBUTTONS should be a number
+specifying the number of button images in the bitmap.
+
+Note that this function will CROAK an error if the toolbar already has an
+imagelist assigned to it and will not perform the bitmap assignment, since
+you should not use AddBitmap on a toolbar that has an imagelist assigned.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddButtons
+
+B<AddButtons(NUMBER, (BITMAP, COMMAND, STATE, STYLE, STRING) ...)>
+
+Adds buttons to the toolbar. Note that BITMAP, COMMAND, STATE, STYLE and
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddString
+
+B<AddString(STRING)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AutoSize
+
+B<AutoSize()>
+
+causes the toolbar to be resized
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ButtonCount
+
+B<ButtonCount()>
+
+returns the number of buttons in the toolbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeBitmap
+
+B<ChangeBitmap(BUTTON, BITMAP)>
+
+Changes the bitmap for a specific button. BITMAP should be a Win32::GUI::Bitmap
+object. Will fail if toolbar currently has an imagelist assigned. Will
+return nonzero on success, zero on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CheckButton
+
+B<CheckButton(BUTTON, CHECKED)>
+
+Checks or unchecks a given button on the toolbar. BUTTON is the index of
+the button to check, CHECKED is 0 to uncheck the button, 1 to check the
+button. When a button is checked, it is displayed in the pressed state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CommandToIndex
+
+B<CommandToIndex(COMMAND)>
+
+Retrieves the zero-based index for the button associated with the specified command identifier.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Customize
+
+B<Customize()>
+
+Displays the Customize Toolbar dialog box.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteButton
+
+B<DeleteButton(BUTTON)>
+
+Removes a button from the toolbar. BUTTON is the index of the button to
+remove. Returns nonzero if successful, zero on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EnableButton
+
+B<EnableButton(BUTTON, ENABLE)>
+
+Enables or disables the specified button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetAnchorHighlight
+
+B<GetAnchorHighlight()>
+
+Retrieves the anchor highlight setting for a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBitmap
+
+B<GetBitmap(COMMAND)>
+
+Retrieves the index of the bitmap associated with the specified command identifier.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBitmapFlags
+
+B<GetBitmapFlags()>
+
+Retrieves the flags for the current bitmap.
+If this value is zero, the toolbar is using a small bitmap. If the TBBF_LARGE flag is set, the toolbar is using a large bitmap.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetButton
+
+B<GetButton(BUTTON)>
+
+Retrieves information about the specified button in a toolbar.
+Return an array (BITMAP, COMMAND, STATE, STYLE, STRING).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetButtonInfo
+
+B<GetButtonInfo(COMMAND)>
+
+Retrieves information about the button associated with the specified command identifier.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetButtonSize
+
+B<GetButtonSize()>
+
+Retrieves the current width and height of toolbar buttons, in pixels.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetButtonText
+
+B<GetButtonText(button)>
+
+Retrieves the text of a button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColorScheme
+
+B<GetColorScheme()>
+
+Retrieves Toolbar color scheme hash information.
+
+ -clrBtnHighlight => COLOR
+   the highlight color of the buttons.
+ -clrBtnShadow => COLOR
+   the shadow color of the buttons.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDisabledImageList
+
+B<GetDisabledImageList()>
+
+Returns the handle to the disabled imagelist currently used by the toolbar,
+or 0 if no disabled imagelist is currently assigned. Note that this
+does not return a blessed imagelist object, just a handle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHotImageList
+
+B<GetHotImageList()>
+
+Returns the handle to the "hot" (rollover) imagelist currently used by
+the toolbar, or 0 if no hot imagelist is currently assigned. Note that this
+does not return a blessed imagelist object, just a handle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHotItem
+
+B<GetHotItem()>
+
+Retrieves the index of the hot item in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList()>
+
+Returns the handle to the imagelist currently used by the toolbar, or 0
+if no imagelist is currently assigned. Note that this does not return a
+blessed imagelist object, just a handle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetInsertMark
+
+B<GetInsertMark()>
+
+Retrieves the current insertion mark for the toolbar. Return an array (BUTTON,FLAGS).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetInsertMarkColor
+
+B<GetInsertMarkColor()>
+
+Retrieves the color used to draw the insertion mark for the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(BUTTON)>
+
+Retrieves the bounding rectangle of a button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMaxSize
+
+B<GetMaxSize()>
+
+returns the total size of all the visible buttons and separators in the
+toolbar (or undef on errors)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPadding
+
+B<GetPadding()>
+
+Retrieves the padding for a toolbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRect
+
+B<GetRect(BUTTON)>
+
+Retrieves the bounding rectangle for a specified toolbar button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRows
+
+B<GetRows()>
+
+Retrieves the number of rows of buttons in a toolbar with the TBSTYLE_WRAPABLE style.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetState
+
+B<GetState(BUTTON)>
+
+Retrieves information about the state of the specified button in a toolbar, such as whether it is enabled, pressed, or checked.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetString
+
+B<GetString(INDEX)>
+
+Retrieves the string from the toolbar's string pool identified by the zero based INDEX
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetStyle
+
+B<GetStyle(STYLE)>
+
+Gets the current style for the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextRows
+
+B<GetTextRows()>
+
+Retrieves the maximum number of text rows that can be displayed on a toolbar button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTooltips
+
+B<GetTooltips()>
+
+Retrieves the handle to the tooltip control, if any, associated with the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HideButton
+
+B<HideButton(BUTTON, SHOW)>
+
+Hides or shows the specified button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X, Y)>
+
+Determines where a point lies in a toolbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Indent
+
+B<Indent(VALUE)>
+
+See L<SetIndent()|Win32::GUI::Toolbar/SetIndent>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Indeterminate
+
+B<Indeterminate(BUTTON, FLAG)>
+
+Sets or clears the indeterminate state of the specified button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertButton
+
+B<InsertButton(BUTTON, BITMAP, COMMAND, STATE, STYLE, ISTRING)>
+
+Insert a new button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertMarkHitTest
+
+B<InsertMarkHitTest(X,Y)>
+
+Retrieves the insertion mark information for a point in a toolbar.
+If (X,Y) point is an insertion mark, return an array (BUTTON,FLAGS).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonChecked
+
+B<IsButtonChecked(BUTTON)>
+
+Determines whether the specified button in a toolbar is checked.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonEnabled
+
+B<IsButtonEnabled(BUTTON)>
+
+Determines whether the specified button in a toolbar is enabled.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonHidden
+
+B<IsButtonHidden(BUTTON)>
+
+Determines whether the specified button in a toolbar is hidden.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonHighlighted
+
+B<IsButtonHighlighted(BUTTON)>
+
+Determines whether the specified button in a toolbar is highlighted.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonIndeterminate
+
+B<IsButtonIndeterminate(BUTTON)>
+
+Determines whether the specified button in a toolbar is indeterminate.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsButtonPressed
+
+B<IsButtonPressed(BUTTON)>
+
+Determines whether the specified button in a toolbar is pressed.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadImages
+
+B<LoadImages([IDBITMAP=IDB_HIST_LARGE_COLOR],[HINSTANCE=HINST_COMMCTRL])>
+
+Loads bitmaps into a toolbar control's image list.
+
+IDBITMAP when HINSTANCE == HINST_COMMCTRL,
+
+  IDB_HIST_LARGE_COLOR = Explorer bitmaps in large size.
+  IDB_HIST_SMALL_COLOR = Explorer bitmaps in small size.
+  IDB_STD_LARGE_COLOR  = Standard bitmaps in large size.
+  IDB_STD_SMALL_COLOR  = Standard bitmaps in small size.
+  IDB_VIEW_LARGE_COLOR = View bitmaps in large size.
+  IDB_VIEW_SMALL_COLOR = View bitmaps in small size.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MapAccelerator
+
+B<MapAccelerator(CHARACTER)>
+
+Maps an accelerator character to a toolbar button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MarkButton
+
+B<MarkButton(BUTTON, FLAG)>
+
+Sets the highlight state of a given button in a toolbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MaxSize
+
+B<MaxSize()>
+
+See L<GetMaxSize()|Win32::GUI::Toolbar/GetMaxSize>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MoveButton
+
+B<MoveButton(BUTTON, TARGET)>
+
+Moves the button specified by BUTTON to the new position TARGET. Returns
+non-zero if successful, or zero on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Padding
+
+B<Padding([X], [Y])>
+
+gets or sets the padding for the toolbar;
+if no value is passed, returns a list containing the current x and y
+padding value, in pixels.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PressButton
+
+B<PressButton(BUTTON, FLAG)>
+
+Presses or releases the specified button in a toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SaveRestore
+
+B<SaveRestore(FLAG, SUBKEY, VALUENAME)>
+
+Saves or restores the state of the toolbar in registry (Use HKEY_CURRENT_USER).
+
+B<FLAG> :
+
+  Save or restore flag. If this parameter is TRUE, the information is saved. If it is FALSE, it is restored.
+
+B<SUBKEY> :
+
+  Subkey registry name.
+
+B<VALUENAME> :
+
+  Value registry name.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetAnchorHighlight
+
+B<SetAnchorHighlight(FLAG)>
+
+Determines whether the specified button in a toolbar is pressed.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBitmapSize
+
+B<SetBitmapSize([X=16, Y=15])>
+
+Sets the size of the bitmapped images to be added to a toolbar.
+The size can be set only before adding any bitmaps to the toolbar.
+If an application does not explicitly set the bitmap size, the size defaults to 16 by 15 pixels.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetButtonInfo
+
+B<SetButtonInfo(COMMAND, %OPTIONS)>
+
+Sets the information for the button associated with the specified command identifier.
+
+B<%OPTIONS> :
+
+ -command => ID
+    Command identifier of the button.
+ -image => INDEX
+    Image index of the button
+ -state => STATE
+    State flags of the button. You can also use :
+    -checked => 0/1
+    -ellipses => 0/1
+    -enabled => 0/1
+    -hidden => 0/1
+    -grayed => 0/1
+    -marked => 0/1
+    -pressed => 0/1
+    -wrapped => 0/1
+ -style => STYLE
+    Style flags of the button. You can also use :
+    -autosize => 0/1
+    -check => 0/1
+    -checkgroup => 0/1
+    -dropdown => 0/1
+    -group => 0/1
+    -noprefix => 0/1
+    -separator => 0/1
+ -width => WIDTH
+    Width of the button, in pixels.
+ -text => STRING
+    Text of the button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetButtonSize
+
+B<SetButtonSize([X=24, Y=22])>
+
+Sets the size of the buttons to be added to a toolbar.
+The size can be set only before adding any bitmaps to the toolbar.
+If an application does not explicitly set the buttons size, the size defaults to 24 by 22 pixels.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetButtonState
+
+B<SetButtonState(BUTTON, STATE)>
+
+Sets the state for the specified toolbar button. STATE should be one or
+more state flags bitwise-ORed together.
+
+State flag constants are as follows:
+
+  TBSTATE_CHECKED
+      The button has the TBSTYLE_CHECK style and is being clicked.
+  TBSTATE_ELLIPSES
+      The button's text is cut off and an ellipsis is displayed.
+  TBSTATE_ENABLED
+      The button accepts user input. A button that doesn't have this state is grayed.
+  TBSTATE_HIDDEN
+      The button is not visible and cannot receive user input.
+  TBSTATE_INDETERMINATE
+      The button is grayed.
+  TBSTATE_MARKED
+      The button is marked. The interpretation of a marked item is dependent upon the application.
+  TBSTATE_PRESSED
+      The button is being clicked.
+  TBSTATE_WRAP
+      The button is followed by a line break. The button must also have the TBSTATE_ENABLED state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetButtonWidth
+
+B<SetButtonWidth(XMIN, XMAX)>
+
+Sets the minimum and maximum button widths in the toolbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCmdId
+
+B<SetCmdId(BUTTON, CMD)>
+
+Sets the command identifier of a toolbar button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColorScheme
+
+B<SetColorScheme(%OPTIONS)>
+
+Sets Toolbar color scheme.
+
+B<%OPTIONS> :
+
+ -clrBtnHighlight => COLOR.
+    the highlight color of the buttons.
+ -clrBtnShadow => COLOR.
+    the shadow color of the buttons.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDisabledImageList
+
+B<SetDisabledImageList(IMAGELIST)>
+
+Sets the image list for disabled button images. Returns a handle
+to the previous disabled imagelist associated with the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDrawTextFlags
+
+B<SetDrawTextFlags(MASK, FLAG)>
+
+Sets the text drawing flags for the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedStyle
+
+B<SetExtendedStyle(STYLE)>
+
+Sets the extended style for the toolbar. STYLE should be one or more
+style flags bitwise-ORed together.
+
+Extended style flag constants are as follows:
+
+ TBSTYLE_EX_DRAWDDARROWS
+   This style allows buttons to have a separate dropdown arrow. Buttons
+   that have the BTNS_DROPDOWN style will be drawn with a drop-down
+   arrow in a separate section, to the right of the button. If the
+   arrow is clicked, only the arrow portion of the button will depress,
+   and the toolbar control will send a TBN_DROPDOWN notification to
+   prompt the application to display the dropdown menu. If the main
+   part of the button is clicked, the toolbar control sends a
+   WM_COMMAND message with the button's ID. The application normally
+   responds by launching the first command on the menu.
+
+   There are many situations where you may want to have only some of the
+   dropdown buttons on a toolbar with separated arrows. To do so, set the
+   TBSTYLE_EX_DRAWDDARROWS extended style. Give those buttons that will
+   not have separated arrows the BTNS_WHOLEDROPDOWN style. Buttons with
+   this style will have an arrow displayed next to the image. However, the
+   arrow will not be separate and when any part of the button is clicked,
+   the toolbar control will send a TBN_DROPDOWN notification. To prevent
+   repainting problems, this style should be set before the toolbar control
+   becomes visible.
+
+ TBSTYLE_EX_HIDECLIPPEDBUTTONS
+   This style hides partially clipped buttons. The most common use of this
+   style is for toolbars that are part of a rebar control. If an adjacent
+   band covers part of a button, the button will not be displayed. However,
+   if the rebar band has the RBBS_USECHEVRON style, the button will be
+   displayed on the chevron's dropdown menu.
+
+ TBSTYLE_EX_MIXEDBUTTONS
+   This style allows you to set text for all buttons, but only display it
+   for those buttons with the BTNS_SHOWTEXT button style. The TBSTYLE_LIST
+   style must also be set. Normally, when a button does not display text,
+   your application must handle TBN_GETINFOTIP to display a ToolTip. With
+   the TBSTYLE_EX_MIXEDBUTTONS extended style, text that is set but not
+   displayed on a button will automatically be used as the button's ToolTip
+   text. Your application only needs to handle TBN_GETINFOTIP if it needs
+   more flexibility in specifying the ToolTip text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHotImageList
+
+B<SetHotImageList(IMAGELIST)>
+
+Sets the image list for "hot" (rollover) button images. Returns a handle
+to the previous hot image list associated with the toolbar.
+
+Toolbars must have the TBSTYLE_FLAT or TBSTYLE_LIST style to have
+hot items.
+
+see also Win32::GUI::Toolbar::SetStyle
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHotItem
+
+B<SetHotItem(BUTTON)>
+
+Sets the hot item in a toolbar. This message is ignored for toolbar controls that do not have the TBSTYLE_FLAT style.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(IMAGELIST)>
+
+Sets the image list for regular button images. Returns a handle
+to the previous image list associated with the toolbar. Note that this
+will CROAK an error if you have previously called AddBitmap() on the
+toolbar - you cannot use SetImageList and AddBitmap on the same toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIndent
+
+B<SetIndent(VALUE)>
+
+sets the indentation value for the toolbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetInsertMark
+
+B<SetInsertMark(BUTTON,[FLAG=0])>
+
+Sets the current insertion mark for the toolbar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetInsertMarkColor
+
+B<SetInsertMarkColor(COLOR)>
+
+sets the indentation value for the toolbar
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMaxTextRows
+
+B<SetMaxTextRows(VALUE)>
+
+Sets the maximum number of text rows displayed on a toolbar button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPadding
+
+B<SetPadding(CX,CY)>
+
+Sets the padding for a toolbar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetParent
+
+B<SetParent(PARENT)>
+
+Sets the window to which the toolbar control sends notification messages.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRows
+
+B<SetRows(ROWS,[FLAG=TRUE])>
+
+Sets the number of rows of buttons in a toolbar.
+Flag that indicates whether to create more rows than requested when the system cannot create the number of rows specified.
+Return the bounding rectangle of the toolbar after the rows are set.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetStyle
+
+B<SetStyle(STYLE)>
+
+Sets the style for the toolbar. STYLE should be one or more style flags
+bitwise-ORed together.
+
+Style flag constants are as follows:
+
+  TBSTYLE_ALTDRAG
+      Allows users to change a toolbar button's position by dragging it
+      while holding down the ALT key. If this style is not specified, the
+      user must hold down the SHIFT key while dragging a button. Note that
+      the CCS_ADJUSTABLE style must be specified to enable toolbar buttons
+      to be dragged.
+  TBSTYLE_CUSTOMERASE
+      Generates NM_CUSTOMDRAW notification messages when the toolbar
+      processes WM_ERASEBKGND messages.
+  TBSTYLE_FLAT
+      Creates a flat toolbar. In a flat toolbar, both the toolbar and the
+      buttons are transparent and hot-tracking is enabled. Button text
+      appears under button bitmaps. To prevent repainting problems, this
+      style should be set before the toolbar control becomes visible.
+  TBSTYLE_LIST
+      Creates a flat toolbar with button text to the right of the bitmap.
+      Otherwise, this style is identical to TBSTYLE_FLAT. To prevent
+      repainting problems, this style should be set before the toolbar
+      control becomes visible.
+  TBSTYLE_REGISTERDROP
+      Generates TBN_GETOBJECT notification messages to request drop
+      target objects when the cursor passes over toolbar buttons.
+  TBSTYLE_TOOLTIPS
+      Creates a ToolTip control that an application can use to display
+      descriptive text for the buttons in the toolbar.
+  TBSTYLE_TRANSPARENT
+      Creates a transparent toolbar. In a transparent toolbar, the toolbar
+      is transparent but the buttons are not. Button text appears under
+      button bitmaps. To prevent repainting problems, this style should
+      be set before the toolbar control becomes visible.
+  TBSTYLE_WRAPABLE
+      Creates a toolbar that can have multiple lines of buttons. Toolbar
+      buttons can "wrap" to the next line when the toolbar becomes too
+      narrow to include all buttons on the same line. When the toolbar is
+      wrapped, the break will occur on either the rightmost separator or
+      the rightmost button if there are no separators on the bar. This
+      style must be set to display a vertical toolbar control when the
+      toolbar is part of a vertical rebar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(TOOLTIP)>
+
+Sets the tooltip object for the toolbar. TOOLTIP should be a Win32::GUI::Tooltip
+object. Note that this should be called before adding buttons, otherwise
+tooltips will not be registered. You can set a tooltips object for the
+toolbar on creation with the -tooltip option.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ButtonClick
+
+B<ButtonClick(INDEX,[DROPDOWN = 1])>
+
+Sent when the user presses a button of the Toolbar
+the INDEX argument identifies the zero-based index of
+the pressed button. If the button clicked should expand a
+dropdown menu, then there is a second argument that is
+set to 1.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

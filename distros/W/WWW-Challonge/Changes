@@ -1,0 +1,37 @@
+Revision history for WWW-Challonge
+
+1.01	2015-05-19
+		* Fixed issues with versions of Perl less than 5.18
+
+1.00	2015-06-18
+		* Changed function names to make sense
+		* Added test files for all packages
+		* Added DateTime validation for creating or updating tournaments
+
+0.31	2015-05-16
+		* Updated MANIFEST
+
+0.30	2015-05-13
+		* Switched to LWP::UserAgent.
+		* Incremented minium Perl version to v5.10.0.
+		* Changed warnings/errors to use Carp.
+		* Added support for file uploads with WWW::Challonge::Match::Attachment
+		* Added author tests
+		* POD fixes
+
+0.20	2015-04-18
+		* Various POD fixes
+		* Added WWW::Challonge::Match::Attachment module. Contains all
+		functionality in the Challonge API except the ability to uplaod files,
+		which is being worked on.
+		* Status is 'testing' for now, as most of the API has been implemented.
+
+0.11	2015-04-13
+		* Updated Makefile, status is 'unstable', added repository.
+
+0.10	2015-04-13
+		* Updated POD
+		* Added WWW::Challonge::Match::attributes
+
+0.01    2015-04-12
+		* First version, released on an unsuspecting world.

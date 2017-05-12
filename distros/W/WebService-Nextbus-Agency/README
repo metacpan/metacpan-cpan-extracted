@@ -1,0 +1,32 @@
+WebService/Nextbus/Agency version 0.12
+======================================
+
+This class provides the data structure for storing information for querying the
+Nextbus website (www.nextbus.com).  The structure can be filled either by a 
+helper subclass, or through the screen scraper WebService::Nextbus.
+
+See WebService::Nextbus or WebService::Nextbus::Agency::SFMUNI.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To install to a non-standard location use one of the following:
+
+	perl Makefile.PL LIB=<MYLIB>
+	perl Makefile.PL PREFIX=<MYPREFIX>
+
+DEPENDENCIES
+
+The tests use Test::More.
+The helper subclasses require Storable to deserialize their agency information.
+
+COPYRIGHT AND LICENSE
+
+Licensed by Creative Commons
+http://creativecommons.org/licenses/by-nc-sa/2.0/

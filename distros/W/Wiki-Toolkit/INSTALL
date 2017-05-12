@@ -1,0 +1,162 @@
+NOTES FOR UPGRADERS:
+
+  I added an index to the metadata table in the postgres setup in
+  version 0.31 and in the MySQL setup in version 0.40 - this really
+  speeds up RecentChanges on larger wikis.  See the 'Changes' file
+  for details on applying the index to existing databases.  I've not
+  done any benchmarks on SQLite yet, so I'm leaving that alone for now.
+
+HOW TO INSTALL THIS:
+
+  This module can be installed just like any other standard Perl module:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  You may wish to use your local version of 'make' (e.g. 'nmake' on
+  Windows.)  On most systems 'make install' requires you to have root
+  privileges.
+
+  'perl Makefile.PL' will ask a few questions about which databases
+  it can use in the 'make test' stage - the default is to only run those
+  tests that don't need external test databases. It is recommended that
+  you test with as many backend combinations as your system will allow.
+
+
+         *****************************************************
+         ****                                             ****
+         ****        THESE TESTS ARE DESTRUCTIVE.         ****
+         **** DO NOT RUN THEM ON A DATABASE THAT CONTAINS ****
+         ****       OR EVER WILL CONTAIN LIVE DATA.       ****
+         ****                                             ****
+         *****************************************************
+
+         *****************************************************
+         ****                                             ****
+         ****  THE DATABASE VALUES YOU GIVE HERE WILL BE  ****
+         ****   STORED IN Wiki::Toolkit::TestConfig AND   ****
+         ****   WILL BE USED FOR FUTURE INSTALLS OF THIS  ****
+         ****            AND RELATED MODULES.             ****
+         ****                                             ****
+         *****************************************************
+
+
+  For noninteractive installation, or to provide defaults for interactive
+  installation, set the following environment variables to suitable values.
+  Leave them blank or explicitly set them to 'undef' if you don't want
+  to test that particular backend.
+
+    WIKI_TOOLKIT_MYSQL_DBNAME   # If 'undef', following two variables are ignored
+    WIKI_TOOLKIT_MYSQL_DBUSER
+    WIKI_TOOLKIT_MYSQL_DBPASS
+    WIKI_TOOLKIT_MYSQL_DBHOST   # Leave blank if database is local
+    WIKI_TOOLKIT_PG_DBNAME      # If 'undef', following two variables are ignored
+    WIKI_TOOLKIT_PG_DBUSER
+    WIKI_TOOLKIT_PG_DBPASS
+    WIKI_TOOLKIT_PG_DBHOST      # Leave blank if database is local
+    WIKI_TOOLKIT_DBIXFTS_MYSQL  # NOTE: Any non-blank value other than 'undef'
+                            # or '0' signifies 'test this'
+
+  Second and subsequent successful runs of 'perl Makefile.PL' will use
+  the testing setup specified in the first run and hence will not ask
+  questions or look for options in environment variables.  To over-ride
+  this behaviour and be asked the questions again, do 'perl Makefile.PL -s'
+  or set the environment variable WIKI_TOOLKIT_RERUN_CONFIG to something
+  non-blank.  If you do this then your previous answers will be offered
+  as defaults.
+
+  When re-running configuration (ie with the '-s' flag or
+  WIKI_TOOLKIT_RERUN_CONFIG set), explicit settings in environment variables
+  will over-ride settings specified during previous runs.
+
+  If you provide settings for a backend that you don't have the drivers
+  installed for (DBD::mysql, DBD::Pg, DBIx::FullTextSearch) then they
+  will be ignored.
+
+POST INSTALL:
+
+  You'll want to run the wiki-toolkit-setupdb script to set up the initial
+  database tables.  This script will have been installed with the rest
+  of the distribution.  There is a hole in this documentation here.
+
+  If you are upgrading from an earlier version of Wiki::Toolkit, and there
+  has been no change to the database schema in the newer releases,
+  wiki-toolkit-setupdb will do nothing. If there has been a change to the
+  schema, it will leave your existing data alone but update the table schema.
+
+    user-setup-mysql-dbixfts.pl
+
+  This final script will, if used, set up DBIx::FullTextSearch indexes and
+  attempt to index any existing data.  Because of this, it must be run *after*
+  user-setup-mysql.pl
+
+  Note that installing Wiki::Toolkit *does* install wiki-toolkit-setupdb for
+  you, but does *not* install user-setup-mysql-dbixfts.pl (this is mainly
+  because the name is really ugly).
+
+TESTING NOTES:
+
+  'perl Makefile.PL' will ask some questions about which backends to run
+  the tests for. You will need to create at least one test database
+  before you run the tests, and your test user will need to be able to
+  create and drop tables in that database.
+
+Postgres notes:
+
+  You can create a database from the shell:
+  shell$ createdb wiki_toolkit_test
+
+  And give a user password access by editing pg_hba.conf (which lives
+  somewhere like /var/lib/postgres/data/pg_hba.conf) to contain the line:
+
+  local        wiki_toolkit_test                            md5
+
+  Then in psql run something like:
+  postgres=# create user wiki with password 'wiki';
+
+  You can give a database to a user by using psql to update the
+  pg_database table -- the datdba UID comes from the pg_user table.)
+
+MySQL notes:
+
+  Something like "grant all privileges on wiki_toolkit_test.* to
+  wiki@localhost identified by 'wiki'" will create a suitable user and
+  give it password access to, and all required privileges on the test
+  database.
+
+PREREQUISITES:
+
+  The following modules *must* be installed before you try to build this:
+
+    * DBI
+    * Digest::MD5
+    * HTML::PullParser
+    * Test::More
+    * Test::Warn
+    * Test::MockObject (version 0.07 or later)
+    * Text::WikiFormat (version 0.45 or later)
+    * Time::Piece
+
+  You will also need the relevant DBD database driver module for whichever
+  storage backend you plan to use, for example one of:
+
+    * DBD::mysql
+    * DBD::Pg
+    * DBD::SQLite (version 0.21 or later)
+
+  In addition, if you want to use the DBIx::FullTextSearch backend, you will
+  need:
+
+    * DBIx::FullTextSearch (version 0.71 or later)
+    * Lingua::Stem
+
+  For the Search::InvertedIndex backend you need:
+
+    * Search::InvertedIndex
+
+  And finally, the Postgres and SQLite backends require the following for
+  testing purposes:
+
+    * Hook::LexWrap

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:13">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.mathematics" parent_id="science">
+<Name>Mathematics</Name>
+<Details summary="" depth="1" element_count="1715" />
+<SubCategories>
+<SubCategory id="science.mathematics.history" />
+<SubCategory id="science.mathematics.congresses" />
+<SubCategory id="science.mathematics.study_and_teaching" />
+<SubCategory id="science.mathematics.bibliography" />
+<SubCategory id="science.mathematics.engineering" />
+<SubCategory id="science.mathematics.juvenile_literature" />
+<SubCategory id="science.mathematics.data_processing" />
+<SubCategory id="science.mathematics.business" />
+<SubCategory id="science.mathematics.handbooks_and_manuals" />
+<SubCategory id="science.mathematics.algebra" />
+<SubCategory id="science.mathematics.geometry" />
+<SubCategory id="science.mathematics.calculus" />
+<SubCategory id="science.mathematics.trigonometry" />
+<SubCategory id="science.mathematics.numerical_analysis" />
+<SubCategory id="science.mathematics.differential_equations" />
+<SubCategory id="science.mathematics.topology" />
+<SubCategory id="science.mathematics.image_processing" />
+<SubCategory id="science.mathematics.regions" />
+<SubCategory id="science.mathematics.applications" />
+<SubCategory id="science.mathematics.theories" />
+<SubCategory id="science.mathematics.statistics" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

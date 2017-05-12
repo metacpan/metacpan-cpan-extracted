@@ -1,0 +1,13 @@
+MANIFEST
+MANIFEST.SKIP
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/WebService/CRUST.pm
+lib/WebService/CRUST/Result.pm
+lib/Catalyst/Model/WebService/CRUST.pm
+lib/Catalyst/Helper/Model/WebService/CRUST.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

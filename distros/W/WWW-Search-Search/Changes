@@ -1,0 +1,12 @@
+2008-03-23    <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Search.pm (parse_tree): FIX for new HTML formatting
+
+2007-03-25    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Search.pm (parse_tree): FIX for URLs containing elipsis
+
+2007-03-23    <Daddy@C-3PO>
+
+	* Search.pm: First releasable version
+

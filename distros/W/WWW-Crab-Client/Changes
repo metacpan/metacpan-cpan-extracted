@@ -1,0 +1,32 @@
+Revision history for WWW::Crab::Client
+
+0.07 2016-01-26
+
+    - Read server response to start message.
+    - Add INHIBITED finish status.
+
+0.06 2014-07-17
+
+    - Add timeout option.
+
+0.05 2013-09-04
+
+    - Declare requirement of Perl 5.8.0.
+
+0.04 2013-08-29
+
+    - Add support for CRABUSERCONFIG variable.
+    - Add WARNING finish status.
+    - Avoid test failure without getpwuid.
+
+0.03 2013-03-28
+
+    - Add ALREADYRUNNING finish status.
+
+0.02 2012-10-19
+
+    - Allow empty configuration files.
+
+0.01 2012-10-04
+
+    - Initial version.

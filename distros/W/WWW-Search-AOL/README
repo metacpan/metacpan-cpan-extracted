@@ -1,0 +1,31 @@
+WWW-Search-AOL
+
+This is a WWW::Search backend for http://search.aol.com/. It was written
+and is maintained by Shlomi Fish and was funded by the following companies:
+
+* deviateMEDIA - http://www.deviatemedia.com/
+* Red Tree Systems - http://www.redtreesystems.com/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+You should probably use your CPAN or CPANPLUS interface like so:
+
+$ perl -MCPAN -e 'install WWW::Search::AOL'
+
+or
+
+$ perl -MCPANPLUS -e 'install WWW::Search::AOL'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the MIT X11 license.
+

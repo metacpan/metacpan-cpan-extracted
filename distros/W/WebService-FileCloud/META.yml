@@ -1,0 +1,26 @@
+---
+abstract: 'filecloud.io WebService API'
+author:
+  - 'Mitch McCracken <mrmccrac@gmail.com>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132620'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-FileCloud
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Message: 0
+  JSON: 0
+  LWP::UserAgent: 0
+version: 0.3

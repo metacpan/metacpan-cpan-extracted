@@ -1,0 +1,21 @@
+bin/wl-draw.pl		Perl Wayland demo
+bin/wl-scanner.pl	Generate Perl bindings for Wayland protocol
+Build.PL		Build script
+lib/WL.pm		Perl Wayland protocol binding
+lib/WL/input_method.pm	Perl Wayland input_method protocol binding
+lib/WL/wl_test.pm	Perl Wayland wl_test protocol binding
+lib/WL/xdg_shell.pm	Perl Wayland xdg_shell protocol binding
+lib/WL/screenshooter.pm	Perl Wayland screenshooter protocol binding
+lib/WL/text_cursor_position.pm	Perl Wayland text_cursor_position protocol binding
+lib/WL/desktop.pm	Perl Wayland desktop protocol binding
+lib/WL/workspaces.pm	Perl Wayland workspaces protocol binding
+lib/WL/scaler.pm	Perl Wayland scaler protocol binding
+lib/WL/fullscreen_shell.pm	Perl Wayland fullscreen_shell protocol binding
+lib/WL/text.pm		Perl Wayland text protocol binding
+lib/WL/gtk.pm		Perl Wayland gtk protocol binding
+lib/WL/Base.pm		Base class for Wayland objects
+lib/WL/Connection.pm	Estabilitsh connection for Wayland protocol
+protocol/wayland.xml	Protocol specification from Wayland distribution
+MANIFEST		This list of files
+META.yml		Package metadata
+META.json		Package metadata

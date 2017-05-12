@@ -1,0 +1,19 @@
+---
+name: Win32-Outlook-IAF
+version: 0.96
+author:
+  - 'Przemek Czerkas <pczerkas@gmail.com>'
+abstract: Internet Account File (*.iaf) management for Outlook Express/2000.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Win32::Outlook::IAF:
+    file: lib/Win32/Outlook/IAF.pm
+    version: 0.96
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

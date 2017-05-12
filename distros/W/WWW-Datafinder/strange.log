@@ -1,0 +1,622 @@
+worker #3 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T20:18:34Z',
+          '_id' => '8F45CC38-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '116-1205154-3408211',
+          'ShipmentServiceLevelCategory' => 'SecondDay',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T20:15:41Z',
+          'LatestShipDate' => '2016-11-30T20:15:41Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 3,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Glass Pendant Light "The Loft" with Vintage Edison Light Bulb ($7 value) - Gorgeous Vintage Light Fixture, Single Bulb Chandelier Lighting - Industria',
+                      'OrderItemId' => '14520886598986',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B01HQFTW00',
+                      'SellerSKU' => 'LA-1606-01',
+                      'ItemPrice' => {
+                                       'Amount' => '119.97',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '119.97'
+                                     },
+                      'QuantityShipped' => 3,
+                      'QuantityOrdered' => 3
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T04:32:02Z',
+          'ShipServiceLevel' => 'SecondDay',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '119.97',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Maureen Kennedy',
+          'ShippingAddress' => {
+                                 'PostalCode' => '70808-1914',
+                                 'AddressLine1' => '1912 AVONDALE DR',
+                                 'StateOrRegion' => 'LA',
+                                 'BuyerName' => 'Maureen Kennedy',
+                                 'City' => 'BATON ROUGE',
+                                 'Name' => 'Maureen Kennedy',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '116-1205154-3408211',
+          'BuyerEmail' => 'sbtqnf3b8yg6ssc@marketplace.amazon.com'
+        };
+Retrieved $VAR1 = {
+          'd_zip' => '70808',
+          'd_last' => 'Kennedy',
+          'd_city' => 'BATON ROUGE',
+          'service' => 'email',
+          'd_state' => 'LA',
+          'k2' => 'gmnglsc3koi5yzmtte5sss6i',
+          'd_first' => 'Maureen',
+          'd_fulladdr' => '1912 AVONDALE DR'
+        };
+$VAR1 = {
+          'input-query' => {
+                             'PostalCode' => '70808',
+                             'FirstName' => 'Maureen',
+                             'Address' => '1912 AVONDALE DR',
+                             'Street' => 'AVONDALE DR',
+                             'City' => 'BATON ROUGE',
+                             'State' => 'LA',
+                             'HouseNum' => '1912',
+                             'LastName' => 'Kennedy'
+                           },
+          'version' => '2.0',
+          'query-id' => '5bee20169b3022ebf4a82b122adae76c',
+          'num-results' => 1,
+          'query-time' => '0.842',
+          'results' => [
+                         {
+                           '#RawMatchCodes' => 'F0,L0,C0,S0,Z4,LF0,CS,-0L,-0CS,PINDIV4,PINDIV3,R1',
+                           'FirstName' => 'MAUREEN',
+                           'TimeStamp' => '20100329',
+                           'Address' => '532 HIGH LAKE DR',
+                           '#WeightedScore' => '170.4375',
+                           'City' => 'BATON ROUGE',
+                           'State' => 'LA',
+                           'URLSource' => 'DOGGY411.COM',
+                           'Zip4' => '4335',
+                           'Country' => 'US',
+                           'LastName' => 'KENNEDY',
+                           'Zip' => '70810',
+                           '#RawScore' => '27.55',
+                           'EmailAddr' => 'JULIEAKENNEDY@HOTMAIL.COM',
+                           'EmailAddrUsable' => 'YES'
+                         }
+                       ]
+        };
+ from cache /var/tmp/datafinder-cache/9a59ff58d1c4d85b15b1100394bdd26b.stor
+worker #3 appended email to 116-1205154-3408211
+worker #9 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-02T18:24:34Z',
+          '_id' => '8F93519C-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '114-1925986-0666633',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-02T18:23:06Z',
+          'LatestShipDate' => '2016-12-02T18:23:06Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '37543452061874',
+                      'ShippingDiscount' => {
+                                              'Amount' => '2.18',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'PromotionIds' => {
+                                          'PromotionId' => 'US Core Free Shipping'
+                                        },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '2.18',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T06:03:46Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Chong Choe',
+          'ShippingAddress' => {
+                                 'PostalCode' => '35758-7556',
+                                 'AddressLine1' => '149 FERNBRIDGE BLVD',
+                                 'StateOrRegion' => 'AL',
+                                 'BuyerName' => 'Chong Choe',
+                                 'City' => 'MADISON',
+                                 'Name' => 'CHOE STATZ CHONG MIN',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '114-1925986-0666633',
+          'BuyerEmail' => 'k351s9ws3s8cv56@marketplace.amazon.com'
+        };
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"bb0f4709904af557b7a9fe75d1cde758","results":[{"#RawScore":"41.8","#WeightedScore":"228.765","#RawMatchCodes":"F0,L0,C0,S0,Z0,LF0,CS,PINDIV4,PINDIV3,PINDIV2,PINDIV1,R1","FirstName":"CHONG","LastName":"CHOE","City":"MADISON","State":"AL","Zip":"35758","Country":"US","EmailAddr":"CHONG.CHOE@SBCGLOBAL.NET","IP":"69.73.82.108","URLSource":"HIGHSTAKESDAILY.COM","EmailAddrUsable":"YES"}],"input-query":{"PostalCode":"35758","LastName":"Choe","City":"MADISON","State":"AL","FirstName":"Chong","Address":"149 FERNBRIDGE BLVD","HouseNum":"149","Street":"FERNBRIDGE BLVD"},"num-results":1,"query-time":"0.342"}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Chong',
+                                               'PostalCode' => '35758',
+                                               'Street' => 'FERNBRIDGE BLVD',
+                                               'Address' => '149 FERNBRIDGE BLVD',
+                                               'City' => 'MADISON',
+                                               'State' => 'AL',
+                                               'HouseNum' => '149',
+                                               'LastName' => 'Choe'
+                                             },
+                            'version' => '2.0',
+                            'query-id' => 'bb0f4709904af557b7a9fe75d1cde758',
+                            'query-time' => '0.342',
+                            'num-results' => 1,
+                            'results' => [
+                                           {
+                                             '#RawMatchCodes' => 'F0,L0,C0,S0,Z0,LF0,CS,PINDIV4,PINDIV3,PINDIV2,PINDIV1,R1',
+                                             'FirstName' => 'CHONG',
+                                             '#WeightedScore' => '228.765',
+                                             'City' => 'MADISON',
+                                             'URLSource' => 'HIGHSTAKESDAILY.COM',
+                                             'State' => 'AL',
+                                             'Country' => 'US',
+                                             'LastName' => 'CHOE',
+                                             'Zip' => '35758',
+                                             'IP' => '69.73.82.108',
+                                             'EmailAddr' => 'CHONG.CHOE@SBCGLOBAL.NET',
+                                             '#RawScore' => '41.8',
+                                             'EmailAddrUsable' => 'YES'
+                                           }
+                                         ]
+                          }
+        };
+Stored result in cache file /var/tmp/datafinder-cache/6d9acd78deac32cdefe819cf7e3464ff.stor
+worker #9 appended email to 114-1925986-0666633
+worker #6 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T20:18:50Z',
+          '_id' => '8F3E9382-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '106-9553458-3285040',
+          'ShipmentServiceLevelCategory' => 'SecondDay',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T20:17:37Z',
+          'LatestShipDate' => '2016-11-30T20:17:37Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '33184069131082',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'QuantityShipped' => 1,
+                      'PromotionIds' => {
+                                          'PromotionId' => 'B2B Free Shipping'
+                                        },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'true',
+          'PurchaseDate' => '2016-11-29T04:21:00Z',
+          'ShipServiceLevel' => 'SecondDay',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Eun Joo',
+          'ShippingAddress' => {
+                                 'PostalCode' => '10036-3470',
+                                 'AddressLine1' => '530 W 45TH ST 2B',
+                                 'StateOrRegion' => 'NY',
+                                 'BuyerName' => 'Eun Joo',
+                                 'City' => 'NEW YORK',
+                                 'Name' => 'Eun Joo',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '106-9553458-3285040',
+          'BuyerEmail' => 'fq2kl1nx7tpgfl4@marketplace.amazon.com'
+        };
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"6a8a225536b850d6543b65c2c58ab8dc","input-query":{"PostalCode":"10036","LastName":"Joo","City":"NEW YORK","State":"NY","FirstName":"Eun","Address":"530 W 45TH ST 2B","HouseNum":"530","Street":"W 45TH ST 2B"},"num-results":0,"query-time":"0.427"}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Eun',
+                                               'PostalCode' => '10036',
+                                               'Street' => 'W 45TH ST 2B',
+                                               'Address' => '530 W 45TH ST 2B',
+                                               'City' => 'NEW YORK',
+                                               'State' => 'NY',
+                                               'HouseNum' => '530',
+                                               'LastName' => 'Joo'
+                                             },
+                            'version' => '2.0',
+                            'query-id' => '6a8a225536b850d6543b65c2c58ab8dc',
+                            'query-time' => '0.427',
+                            'num-results' => 0
+                          }
+        };
+Stored result in cache file /var/tmp/datafinder-cache/88d2d15861ab349ec4790aefd94db0ad.stor
+worker #6  could not find email for 106-9553458-3285040
+worker #2 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-06T16:03:00Z',
+          '_id' => '8F4E7478-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '111-1379207-9945846',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-06T15:48:53Z',
+          'LatestShipDate' => '2016-12-06T15:48:53Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Set - 2 Collapsible Colanders (Strainers) Set By Comfify - Includes 2 Folding Strainers Sizes 8" - 2 Quart and 9.5" - 3 Quart Red and Grey',
+                      'OrderItemId' => '37980528525714',
+                      'ShippingDiscount' => {
+                                              'Amount' => '1.62',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00L3QWJBI',
+                      'SellerSKU' => 'CM201411',
+                      'ItemPrice' => {
+                                       'Amount' => '9.98',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '9.98'
+                                     },
+                      'PromotionIds' => {
+                                          'PromotionId' => 'US Core Free Shipping'
+                                        },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '1.62',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T05:28:39Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '9.98',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'Effie Robinson',
+          'ShippingAddress' => {
+                                 'PostalCode' => '34609-2558',
+                                 'AddressLine1' => '11443 PIKE AVE',
+                                 'StateOrRegion' => 'FL',
+                                 'BuyerName' => 'Effie Robinson',
+                                 'City' => 'SPRING HILL',
+                                 'Name' => 'Effie Robinson',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '111-1379207-9945846',
+          'BuyerEmail' => '9gdxyt7g9bpm3tq@marketplace.amazon.com'
+        };
+Got response:$VAR1 = '200';
+/$VAR1 = '{"datafinder":{"version":"2.0","query-id":"2485d189019e36a9bf93e48ef2100348","input-query":{"PostalCode":"34609","LastName":"Robinson","City":"SPRING HILL","State":"FL","FirstName":"Effie","Address":"11443 PIKE AVE","HouseNum":"11443","Street":"PIKE AVE"},"num-results":0,"query-time":"0.750","results":[]}}';
+
+parsed $VAR1 = {
+          'datafinder' => {
+                            'input-query' => {
+                                               'FirstName' => 'Effie',
+                                               'PostalCode' => '34609',
+                                               'Street' => 'PIKE AVE',
+                                               'Address' => '11443 PIKE AVE',
+                                               'City' => 'SPRING HILL',
+                                               'State' => 'FL',
+                                               'HouseNum' => '11443',
+                                               'LastName' => 'Robinson'
+                                             },
+                            'version' => '2.0',
+                            'query-id' => '2485d189019e36a9bf93e48ef2100348',
+                            'query-time' => '0.750',
+                            'num-results' => 0,
+                            'results' => []
+                          }
+        };
+Stored result in cache file /var/tmp/datafinder-cache/90d3fd15fe6e515d9a914c3e45a992ec.stor
+worker #2  could not find email for 111-1379207-9945846
+worker #8 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-12-04T17:11:37Z',
+          '_id' => '8EDC0D20-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '115-7178763-1483409',
+          'ShipmentServiceLevelCategory' => 'Standard',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-12-04T17:10:45Z',
+          'LatestShipDate' => '2016-12-04T17:10:45Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'ShippingTax' => {
+                                         'Amount' => '0.00',
+                                         'CurrencyCode' => 'USD'
+                                       },
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '03455798729978',
+                      'ShippingDiscount' => {
+                                              'Amount' => '0.00',
+                                              'CurrencyCode' => 'USD'
+                                            },
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'QuantityShipped' => 1,
+                      'ShippingPrice' => {
+                                           'Amount' => '2.23',
+                                           'CurrencyCode' => 'USD'
+                                         },
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T03:21:47Z',
+          'ShipServiceLevel' => 'Standard',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '15.98',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'linda l willette',
+          'ShippingAddress' => {
+                                 'PostalCode' => '62265-1747',
+                                 'AddressLine1' => '207 S RAILWAY ST',
+                                 'StateOrRegion' => 'IL',
+                                 'BuyerName' => 'linda l willette',
+                                 'City' => 'NEW BADEN',
+                                 'Name' => 'Trina Cinotto',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '115-7178763-1483409',
+          'BuyerEmail' => '4vt3bcq5zwnhyvr@marketplace.amazon.com'
+        };
+Retrieved $VAR1 = {
+          'd_zip' => '62265',
+          'd_last' => 'willette',
+          'd_city' => 'NEW BADEN',
+          'service' => 'email',
+          'd_state' => 'IL',
+          'k2' => 'gmnglsc3koi5yzmtte5sss6i',
+          'd_first' => 'linda',
+          'd_fulladdr' => '207 S RAILWAY ST'
+        };
+$VAR1 = {
+          'input-query' => {
+                             'PostalCode' => '62265',
+                             'FirstName' => 'linda',
+                             'Address' => '207 S RAILWAY ST',
+                             'Street' => 'S RAILWAY ST',
+                             'City' => 'NEW BADEN',
+                             'State' => 'IL',
+                             'HouseNum' => '207',
+                             'LastName' => 'willette'
+                           },
+          'version' => '2.0',
+          'query-id' => '48198da225878f0de126555e9b7fbb62',
+          'num-results' => 1,
+          'query-time' => '0.378',
+          'results' => [
+                         {
+                           '#RawMatchCodes' => 'F0,L0,S0,Z4,LF0,-0F,PINDIV3,R1',
+                           'FirstName' => 'LINDA',
+                           'TimeStamp' => '20111001',
+                           'Address' => '548 W SECOND ST',
+                           '#WeightedScore' => '112.514',
+                           'City' => 'TRENTON',
+                           'State' => 'IL',
+                           'URLSource' => 'ROBERTALLENWORKSHOP.COM',
+                           'Country' => 'US',
+                           'LastName' => 'WILLETTE',
+                           'Zip' => '62293',
+                           'IP' => '67.43.127.162',
+                           '#RawScore' => '24.7',
+                           'EmailAddr' => 'LEE.WILLETTE@GMAIL.COM',
+                           'EmailAddrUsable' => 'YES'
+                         }
+                       ]
+        };
+ from cache /var/tmp/datafinder-cache/46936907c96cdf50c55c483b5831d733.stor
+worker #8 appended email to 115-7178763-1483409
+worker #1 got $VAR1 = {
+          'PaymentMethod' => 'Other',
+          'LastUpdateDate' => '2016-11-30T07:17:42Z',
+          '_id' => '8F474982-DE9B-11E6-8569-85DAD7440A36',
+          'SellerOrderId' => '106-5558428-8487427',
+          'ShipmentServiceLevelCategory' => 'SecondDay',
+          'IsPrime' => 'false',
+          'OrderType' => 'StandardOrder',
+          'EarliestShipDate' => '2016-11-30T07:16:18Z',
+          'LatestShipDate' => '2016-11-30T07:16:18Z',
+          'IsPremiumOrder' => 'false',
+          'NumberOfItemsUnshipped' => '0',
+          'NumberOfItemsShipped' => 1,
+          'MarketplaceId' => 'ATVPDKIKX0DER',
+          'Item' => {
+                      'PromotionDiscount' => {
+                                               'Amount' => 0,
+                                               'CurrencyCode' => 'USD',
+                                               'RelativeDiscount' => 0
+                                             },
+                      'Title' => 'Colander Collapsible - Green & Grey - Over the Sink Colander with Handles - Folding Strainer for Kitchen 6-quart Capacity - By Comfify',
+                      'OrderItemId' => '32500634629970',
+                      'ItemTax' => {
+                                     'Amount' => 0,
+                                     'CurrencyCode' => 'USD'
+                                   },
+                      'ASIN' => 'B00PUX0A52',
+                      'SellerSKU' => 'CM201523',
+                      'ItemPrice' => {
+                                       'Amount' => '13.75',
+                                       'CurrencyCode' => 'USD',
+                                       'FinalAmount' => '13.75'
+                                     },
+                      'QuantityShipped' => 1,
+                      'QuantityOrdered' => 1
+                    },
+          'IsBusinessOrder' => 'false',
+          'PurchaseDate' => '2016-11-29T04:46:28Z',
+          'ShipServiceLevel' => 'SecondDay',
+          'SalesChannel' => 'Amazon.com',
+          'FulfillmentChannel' => 'AFN',
+          'OrderStatus' => 'Shipped',
+          'OrderTotal' => {
+                            'Amount' => '13.75',
+                            'CurrencyCode' => 'USD'
+                          },
+          'BuyerName' => 'thomas murdock',
+          'ShippingAddress' => {
+                                 'PostalCode' => '14228-2710',
+                                 'AddressLine1' => 'UB STOR',
+                                 'StateOrRegion' => 'NY',
+                                 'AddressLine2' => '1576 SWEET HOME RD',
+                                 'City' => 'AMHERST',
+                                 'BuyerName' => 'thomas murdock',
+                                 'Name' => 'Thomas Murdock',
+                                 'CountryCode' => 'US'
+                               },
+          'AmazonOrderId' => '106-5558428-8487427',
+          'BuyerEmail' => '0r2n8phm9b6djv4@marketplace.amazon.com'
+        };
+Retrieved $VAR1 = {
+          'd_zip' => '14228',
+          'd_last' => 'murdock',
+          'd_city' => 'AMHERST',
+          'service' => 'email',
+          'd_state' => 'NY',
+          'k2' => 'gmnglsc3koi5yzmtte5sss6i',
+          'd_first' => 'thomas',
+          'd_fulladdr' => 'UB STOR 1576 SWEET HOME RD'
+        };
+$VAR1 = {
+          'input-query' => {
+                             'PostalCode' => '14228',
+                             'FirstName' => 'thomas',
+                             'LastName' => 'murdock',
+                             'Address' => 'UB STOR 1576 SWEET HOME RD',
+                             'Street' => 'UB STOR 1576 SWEET HOME RD',
+                             'City' => 'AMHERST',
+                             'State' => 'NY'
+                           },
+          'version' => '2.0',
+          'query-id' => '3c81b34921757348c7f1522ca435d8e9',
+          'num-results' => 0,
+          'query-time' => '0.340'
+        };
+ from cache /var/tmp/datafinder-cache/00029df993aab3d56114837a615e9c11.stor
+worker #1  could not find email for 106-5558428-8487427
+Returning 115-7178763-1483409
+Returning 106-9553458-3285040
+Returning 116-1205154-3408211
+Returning 106-5558428-8487427
+Returning 111-1379207-9945846
+Returning 114-1925986-0666633
+Reindexing 8F45CC38-DE9B-11E6-8569-85DAD7440A36 116-1205154-3408211 1
+Reindexing 8F474982-DE9B-11E6-8569-85DAD7440A36 106-5558428-8487427 2
+Reindexing 8EDC0D20-DE9B-11E6-8569-85DAD7440A36 115-7178763-1483409 3
+Reindexing 8F3E9382-DE9B-11E6-8569-85DAD7440A36 106-9553458-3285040 4
+Reindexing 8F93519C-DE9B-11E6-8569-85DAD7440A36 114-1925986-0666633 5
+Reindexing 8F4E7478-DE9B-11E6-8569-85DAD7440A36 111-1379207-9945846 6
+Flushing buffer
+6 total records

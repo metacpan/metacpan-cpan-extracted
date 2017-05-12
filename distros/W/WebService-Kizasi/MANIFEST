@@ -1,0 +1,21 @@
+Changes
+lib/WebService/Kizasi.pm
+lib/WebService/Kizasi/Item.pm
+lib/WebService/Kizasi/Items.pm
+lib/WebService/Kizasi/Parser.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/01.c10e_word_1d.t
+t/02.c10e_word_1w.t
+t/03.c10e_word_1m.t
+t/04.keyword_in_context.t
+t/05.ranking_1d.t
+t/06.ranking_1w.t
+t/07.ranking_1m.t
+t/08.utf-8.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,37 @@
+Revision history for Perl extension Web::Hippie
+
+0.40 Thu Feb 23 21:33:52 CST 2012
+        - fix draft-ietf-hybi-17 handshake hanging on win32.
+
+0.39 Sun Aug 28 20:25:56 CST 2011
+        - get request origin from protocol::websocket.
+
+0.38 Wed Aug  3 22:09:55 CST 2011
+        - fix websocket messages for draft-ietf-hybi-00.
+
+0.37 Wed Aug  3 21:38:54 CST 2011
+        - use protocol::websocket, so we can support draft-ietf-hybi-10.
+
+0.36 Sun Feb  6 21:29:11 CST 2011
+        - silence a warning caused by bad use of class::accessor constructor.
+
+0.35 Wed Dec 22 22:40:04 CST 2010
+        - replace moose with class::accessor antlers.
+        - use class::xsaccessor if available.
+
+0.34 Sun Sep 12 13:00:12 CST 2010
+        - support wss.
+
+0.33 Wed Sep  1 07:11:10 CST 2010
+        - allow trusted_origin configuration
+        - allow custom hippie endpoint from hippie.pipe.js
+        - handle websockets closing handshake.
+
+0.32 Tue Jul 20 20:57:44 CST 2010
+        - support websockets draft#76
+
+0.31 Mon Apr 26 11:33:52 CST 2010
+        - fix dependencies
+
+0.30 Fri Apr 23 14:16:29 CST 2010
+        - original version

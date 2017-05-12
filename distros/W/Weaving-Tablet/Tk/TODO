@@ -1,0 +1,21 @@
+User Interface improvements:
+
+make version to handle six and/or eight hole patterns...
+work on redraw speed on large patterns
+
+allow user to select aspect ratio of cell and absolute size
+ - that is, make everything in set_constants editable
+****allow user to see twist
+	prints last row to STDOUT - need^Wwant better and more flexible interface
+allow user to select shape of drawing (square vs parallelogram)
+****allow user to change background color *** done ?
+allow user to opt for no color see /\ only, speeding up redraw (?)
+
+add fill patterns to New... (eg: 3/1 twill, double-face, 4f/4b, etc
+let threading dialog apply threading to all cards
+
+put file_name or "untitled" in title bar - got it!
+
+make color edit dialog and file select dialogs class rather than object
+
+consider a printing method...

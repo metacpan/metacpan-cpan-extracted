@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use WWW::Plurk;
+use Getopt::Long;
+
+use constant CONFIG     => glob '~/.plurk';
+use constant QUALIFIERS => qw(
+  asks feels gives has hates is likes loves says shares thinks wants was
+  will wishes
+);
+
+my %is_qualifier = map { $_ => 1 } QUALIFIERS;
+
+my %config = (
+    user       => undef,
+    pass       => undef,
+    nocomments => 0,
+    lang       => undef,
+    replyto    => undef,
+    quiet      => 0,
+);
+
+my $help = 0;
+
+read_config( \%config, CONFIG ) if -f CONFIG;
+
+if (
+    !GetOptions(
+        'user=s'     => \$config{user},
+        'pass=s'     => \$config{pass},
+        'nocomments' => \$config{nocomments},
+        'lang=s'     => \$config{lang},
+        'replyto=i'  => \$config{replyto},
+        'quiet'      => \$config{quiet},
+        'help'       => \$help,
+    )
+    || $help
+  ) {
+    help();
+    exit 1;
+}
+
+unless ( @ARGV ) {
+    help();
+    exit 1;
+}
+
+my ( $qualifier, $content ) = strip_qualifier( @ARGV );
+
+for my $need ( qw( user pass ) ) {
+    die "Please supply a value for '$need'\n"
+      unless defined $config{$need};
+}
+
+my $plurk = WWW::Plurk->new;
+$plurk->login( $config{user}, $config{pass} );
+if ( defined( my $replyto = $config{replyto} ) ) {
+    my $msg = $plurk->respond_to_plurk(
+        $replyto,
+        content   => $content,
+        qualifier => $qualifier,
+        lang      => $config{lang},
+    );
+    print "Posted reply\n"
+      unless $config{quiet};
+}
+else {
+    my $msg = $plurk->add_plurk(
+        content     => $content,
+        qualifier   => $qualifier,
+        lang        => $config{lang},
+        no_comments => $config{nocomments}
+    );
+    print "Posted plurk ", $msg->plurk_id, "\n"
+      unless $config{quiet};
+}
+
+sub read_config {
+    my ( $hash, $file ) = @_;
+    open my $fh, '<', $file or die "Can't read $file ($!)\n";
+    LINE: while ( <$fh> ) {
+        chomp;
+        s/#.*$//g;    # Strip comments
+        next LINE if /^\s*$/;    # Ignore blank lines
+        die "Bad config directive: $_ ($file, line $.)\n"
+          unless /^(\w+)\s*[:=]\s*(.*)$/;
+        my ( $name, $value ) = ( $1, $2 );
+        $value =~ s/\s+$//;
+        die "Unknown config option: $name ($file, line $.)\n"
+          unless exists $hash->{$name};
+        $hash->{$name} = $value;
+    }
+}
+
+sub strip_qualifier {
+    my $content = join ' ', @_;
+    if ( $content =~ /^(\S+)\s+(.+)$/ ) {
+        my ( $head, $tail ) = ( lc $1, $2 );
+        return ( $head, $tail ) if $is_qualifier{$head};
+    }
+    return ( ':', $content );
+}
+
+sub help {
+    print <<EOH;
+Syntax: plurk [options] msg
+
+Options:
+    -h, --help      Show this text
+    --user=foo      Username
+    --pass=sekrit   Password  
+    --nocomments    Disable comments
+    --lang          Language for Plurk
+    --replyto=id    Post a reply to an exising Plurk
+    --quiet         Shhhh...
+
+EOH
+}

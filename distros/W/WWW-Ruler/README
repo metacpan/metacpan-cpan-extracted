@@ -1,0 +1,83 @@
+NAME
+    WWW::Ruler - a helper for building rulers for visual presentation (in
+    WWW applictions for example)
+
+SYNOPSIS
+    Now this module is beta. Not all documentation is finished yet.
+
+        use WWW::Ruler;
+
+        my $ruler = WWW::Ruler->new( page_size => $page_size, ruler_size => 15 );
+
+        # $page_number - a number of current page
+        # $array_length - a dimension of array of data
+        my $piece = $ruler->cut_off( page_number => $page_number, amount => $array_length );
+
+        # Detail in manual WWW::Ruler::Piece(3)
+        $piece->outside;                    # true if piece are located outside of array of data. You can test before next methods
+        $ruler_array = $piece->ruler;       # An array of ruler items for drawing
+        $start_index = $piece->start;       # A start index of array (a base is zero) for cutting
+        $end_index   = $piece->end;         # An end index  of array (a base is zero) for cutting
+        $size        = $piece->size;        # A size (dimension) of piece of current page.
+
+DESCRIPTION
+    This class will help to make a ruler with a following layouts and
+    calculate start and end indices. Ruler can look like these examples:
+
+    [ << ] [ 1 ] [ ... ] [ 4 ] [ 5 ] ( 6 ) [ 7 ] [ 8 ] [ ... ] [ 999 ]
+    [ >> ]
+
+    [ 1 ] [ 4 ] [ 5 ] ( 6 ) [ 7 ] [ 8 ] [ ... ] [ 999 ] [ >> ]
+
+    [ << ] [ 1 ] [ ... ] [ 4 ] [ 5 ] ( 6 ) [ 7 ] [ 8 ] [ >> ]
+
+    Here ( 1 ) and ( 6 ) are "current" pages. A [ << ], [ >> ] and [ DIGIT ]
+    - linked buttons for other pages for example. And the [ ... ] is an
+    ellipse figure of span between page numbers (not linked).
+
+CONSTRUCTOR
+        $ruler = WWW::Ruler->new( page_size => $page_size, ruler_size => 15 );
+        $ruler = WWW::Ruler->new;
+
+    You can construct object with and without options.
+
+OPTIONS
+    These options can be passed in "new" and "cut_off" methods. Options in
+    "cut_off" method redefine constructor's options.
+
+    page_size
+        Number. How many do you have items in one page?
+
+    ruler_size
+        A desired maximum number of buttons (not included button [<<], [>>]
+        and [...]). It is only desired amount! Please notice that real items
+        in ruler can be up 3-4 items! It option will be improved in next
+        versions.
+
+    page_number
+        A current number of page for which this ruler to be builded. It
+        starts from 1.
+
+    amount
+        An amount of items in whole array.
+
+METHODS
+    new( %opts )
+        The constructor. The %opts are optional. Any options can be
+        redefined in "cut_off" method.
+
+    cut_off ( %opts )
+        This method makes virtual *cut off* of array and contructs array of
+        ruler items. Any options passed into this method redefine options of
+        constructor (to see "SYNOPSIS").
+
+        Returns an instance of WWW::Ruler::Piece object. You can test a
+        validation of piece bounds by "outside" in WWW::Ruler::Piece method.
+
+AUTHOR
+    This module has been written by Perlover <perlover@perlover.com>
+
+LICENSE
+    This module is free software and is published under the same terms as
+    Perl itself.
+

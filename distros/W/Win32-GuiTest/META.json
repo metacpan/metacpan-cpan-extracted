@@ -1,0 +1,50 @@
+{
+   "abstract" : "Perl GUI Test Utilities.",
+   "author" : [
+      "Dennis K. Paulsen (ctrondlp@cpan.org), Ernesto Guisado (erngui@acm.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-GuiTest",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "eg",
+         "Recorder"
+      ],
+      "file" : [
+         "Makefile.PL",
+         "makedist.pl"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/dk/Win32-GuiTest"
+      }
+   },
+   "version" : "1.63"
+}

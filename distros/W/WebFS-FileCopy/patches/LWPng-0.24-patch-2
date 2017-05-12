@@ -1,0 +1,11 @@
+diff -ru ../LWPng-alpha-0.24-orig/lib/LWP/Conn/_Connect.pm ./lib/LWP/Conn/_Connect.pm
+--- ../LWPng-alpha-0.24-orig/lib/LWP/Conn/_Connect.pm	Tue Jul  7 14:36:55 1998
++++ ./lib/LWP/Conn/_Connect.pm	Fri Feb  2 16:07:49 2001
+@@ -24,6 +24,7 @@
+ 	my $O_NONBLOCK = Fcntl::O_NONBLOCK();
+ 	my $F_GETFL    = Fcntl::F_GETFL();
+ 	my $F_SETFL    = Fcntl::F_SETFL();
++	undef *IO::Handle::blocking;
+ 	*IO::Handle::blocking = sub {
+ 	    my $fh = shift;
+ 	    my $dummy = '';

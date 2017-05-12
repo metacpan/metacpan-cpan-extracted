@@ -1,0 +1,26 @@
+---
+abstract: 'Perl interface to BigBlueButton API system'
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  Module::Build: 0.26
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-BBB-API
+provides:
+  WWW::BBB::API:
+    file: lib/WWW/BBB/API.pm
+    version: 0.02
+requires:
+  Digest::SHA: 0
+  LWP::Simple: 0
+  URI: 0
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

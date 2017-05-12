@@ -1,0 +1,19 @@
+Revision history for Perl module WebService::Prismatic::InterestGraph
+
+0.04 2015-02-21 NEILB
+    - Corrected error in documentation, which said you had to pass
+          api_key => $key,
+      But it really wants
+          api_token => $token,
+      Thanks to Jackie Li for pointing this out.
+
+0.03 2015-02-06 NEILB
+    - Incorrect URL in doc: prismatic.com should have been getprismatic.com
+      TOMHUKINS++
+
+0.02 2015-02-06 NEILB
+    - I had used // but then expected it to work on Perl 5.8.9
+
+0.01 2015-02-05 NEILB
+    - First release to CPAN, following the alpha announcement of the API
+

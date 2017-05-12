@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               WebSource
+version:            2.4.5
+abstract:           a general data wrapping tool particularly well suited for online data
+author:
+    - Benjamin Habegger <b@habegger.fr>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Language:     1
+    Getopt::Mixed:      0
+    HTML::TreeBuilder:  3
+    LWP::UserAgent:     5
+    String::Approx:     3
+    XML::LibXML:        1
+    XML::LibXSLT:       1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

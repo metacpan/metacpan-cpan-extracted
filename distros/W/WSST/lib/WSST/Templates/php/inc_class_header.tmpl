@@ -1,0 +1,15 @@
+/**
+ * [% class_title %]
+ *
+ * @category   Services
+ * @package    [% package_name %]
+[% FOREACH i = author -%]
+ * @author     [% i %]
+[% END -%]
+[% IF php_copyright or copyright -%]
+ * @copyright  [% php_copyright or copyright %]
+[% END -%]
+ * @license    [% php_license_uri %] [% license %]
+ * @version    Release: @package_version@
+ * @link       [% php_link %]
+ */

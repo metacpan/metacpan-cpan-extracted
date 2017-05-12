@@ -1,0 +1,20 @@
+Revision history for Perl extension WebService::Validator::Feed::W3C.
+
+0.8 Mon Dec 23, 2013
+  Bug fix (deprecated use of qw) courtesy David Moreno
+0.6 Fri Jan 23, 2009
+  All changes in this version courtesy of Stephen Rushe
+  - using POST instead of GET as a workaround for "Request-URI Too Large" issue
+  - better test suite
+0.5 Fri Jan 19, 2007
+  - workaround for MacOSX tar adding resource files in the dist
+0.4 Thu Jan 18, 2007
+  - removed workaround for old SOAP::Lite versions, 
+  - requiring SOAP::Lite > 0.65
+  - fixed typo in POD
+0.3 Wed Apr 26, 2006
+  - documentation fixes
+0.2 Fri Jan 13, 2006
+  - documentation fixes
+0.1 Fri Oct 28, 2005
+  - original version

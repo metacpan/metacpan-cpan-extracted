@@ -1,0 +1,64 @@
+Revision history for WWW-Wappalyzer
+
+0.20    25 Feb 2017 Oleg Gavrin
+        Make detect() faster and still case insensitive
+
+0.19    14 Feb 2017 Oleg Gavrin
+        Added "confidence" option support
+
+0.18    16 Jul 2016 Alexander Nalobin
+        Bugfix for 0.17
+
+0.17    30 Jun 2016 Alexander Nalobin
+        Updated JSON clues file from Wappalyzer github repo.
+        Fixes Perl 5.25.1 RE compile error (https://rt.cpan.org/Ticket/Display.html?id=115663)
+
+0.16    31 Aug 2015 Alexander Nalobin
+        Updated JSON clues file from Wappalyzer github repo.
+
+0.15    17 Oct 2014 Alexander Nalobin
+        Fixed 'advertizing-networks' value in a list of multi-app categories.
+
+0.14    10 Sep 2014 Alexander Nalobin
+        Added GitHub repo link in docs.
+
+0.13    15 Apr 2014 Alexander Nalobin
+        Added payment-processors categorie to a list of multi-app categories.
+
+0.12    14 Apr 2014 Alexander Nalobin
+        Updated json clues file from Wappalyzer github repo.
+
+0.11    21 Feb 2014 Alexander Nalobin
+        Yandex.Metrica and Google Analytics detection fix.
+
+0.10    04 Feb  2014 Alexander Nalobin
+        MODx CMS detection fix.
+
+0.09    23 Aug  2013 Alexander Nalobin
+        Fixed bug in test.
+
+0.08    21 Aug  2013 Alexander Nalobin
+        Fixed bug with new clues file html entity encoding.
+
+0.07    02 Aug  2013 Alexander Nalobin
+        Updated json clues file from Wappalyzer github repo.
+
+0.06    02 Mar  2013 Alexander Nalobin
+        Simplified meta tag matching.
+
+0.05    28 Feb  2013 Alexander Nalobin
+        Fixed MANIFEST.
+
+0.04    26 Feb  2013 Alexander Nalobin
+        Added add_clues_file() function.
+
+0.03    13 Feb  2013 Alexander Nalobin
+        Fixed "Unescaped left brace in regex is deprecated" in Perl 5.17.7.
+        GA regexp fix.
+
+0.02    11 Feb  2013 Alexander Nalobin
+        POD documentation fixes.
+        Replaced "defined or" operator.
+
+0.01    8 Feb  2013 Alexander Nalobin
+        First version, released on an unsuspecting world.

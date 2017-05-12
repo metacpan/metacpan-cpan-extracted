@@ -1,0 +1,122 @@
+<html>
+
+<head>
+<title>Web Htpasswd Management</title>
+<style>
+body { font-family: Arial }
+table { font-family: Arial }
+</style>
+</head>
+
+<body>
+
+<center>
+
+<h1>Managing Htpasswd File:</h1>
+<h3><TMPL_VAR NAME="HTFILENAME"></h3>
+
+<hr>
+
+<p>
+<form method="<TMPL_VAR NAME="FORM_METHOD" DEFAULT="POST">">
+<input type="hidden" name="htfile" value="<TMPL_VAR NAME="HTFILENAME">">
+<input type="hidden" name="mode" value="adduser">
+<fieldset style="width: 400">
+  <legend style="font-weight: bold">Add User</legend>
+  <table width="350">
+    <tr>
+      <td width="150">Username:&nbsp;&nbsp;</td>
+      <td width="200"><input type="text" name="user" size=255 style="width: 200"></td>
+    </tr>
+    <tr>
+      <td>Password:&nbsp;&nbsp;</td>
+      <td><input type="password" name="pass" size=255 style="width: 200"></td>
+    </tr>
+    <tr>
+      <td>Retype Password:&nbsp;&nbsp;</td>
+      <td><input type="password" name="pass_confirm" size=255 style="width: 200"></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="submit" value="Add User"></td>
+    </tr>
+  </table>
+</fieldset>
+</form>
+</p>
+
+<p>
+<form method="<TMPL_VAR NAME="FORM_METHOD" DEFAULT="POST">">
+<input type="hidden" name="htfile" value="<TMPL_VAR NAME="HTFILENAME">">
+<input type="hidden" name="mode" value="changepw">
+<fieldset style="width: 400">
+  <legend style="font-weight: bold">Modify User</legend>
+  <table width="350">
+    <tr>
+      <td width="150">Username:&nbsp;&nbsp;</td>
+      <td width="200">
+        <select name="user" style="width: 200">
+<TMPL_LOOP NAME="USER_LOOP">
+          <option value="<TMPL_VAR NAME="USERNAME">"><TMPL_VAR NAME="USERNAME"></option>
+</TMPL_LOOP>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Password:&nbsp;&nbsp;</td>
+      <td><input type="password" name="pass" size=255 style="width: 200"></td>
+    </tr>
+    <tr>
+      <td>Retype Password:&nbsp;&nbsp;</td>
+      <td><input type="password" name="pass_confirm" size=255 style="width: 200"></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="submit" value="Change Password"></td>
+    </tr>
+  </table>
+</fieldset>
+</form>
+</p>
+
+<p>
+<form method="<TMPL_VAR NAME="FORM_METHOD" DEFAULT="POST">">
+<input type="hidden" name="htfile" value="<TMPL_VAR NAME="HTFILENAME">">
+<input type="hidden" name="mode" value="deluser">
+<fieldset style="width: 400">
+  <legend style="font-weight: bold">Delete Users</legend>
+  <table width="350">
+    <tr>
+      <td width="150" valign="top">Usernames:&nbsp;&nbsp;</td>
+      <td width="200">
+        <select name="user" size="5" multiple  style="width: 200px">
+<TMPL_LOOP NAME="USER_LOOP">
+          <option value="<TMPL_VAR NAME="USERNAME">" selected><TMPL_VAR NAME="USERNAME"></option>
+</TMPL_LOOP>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="submit" value="Delete User"></td>
+    </tr>
+  </table>
+</fieldset>
+</form>
+</p>
+
+<hr>
+<a href="?">Back to Main</a>
+<TMPL_IF NAME="IS_WARNINGS">
+<hr>
+<span style="color: red">Warnings were encountered...Please check error log.</span>
+</TMPL_IF>
+
+</center>
+
+</body>
+
+</html>
+<!--
+<TMPL_VAR NAME="DEBUG_DUMP" DEFAULT="">
+-->

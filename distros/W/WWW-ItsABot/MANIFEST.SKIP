@@ -1,0 +1,15 @@
+.*\.sw?
+\.git*
+tmp.*
+.*\.o
+\.bak
+_build
+^Build$
+blib/*
+.*\.data
+.*core
+foo*
+.*\.gz
+^tags
+Math-Primality
+\.prove

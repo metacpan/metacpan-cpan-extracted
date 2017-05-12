@@ -1,0 +1,23 @@
+﻿<SOFTPKG NAME="DTS_UT" VERSION="0,01,0,0">
+    <TITLE>DTS_UT</TITLE>
+    <ABSTRACT>Perl distribution of modules to implement DTS packages unit testing in a MVC web application</ABSTRACT>
+    <AUTHOR>Alceu Rodrigues de Freitas Junior &lt;arfreitas@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="CGI-Application" VERSION="4,06,0,0" />
+        <DEPENDENCY NAME="CGI-Application-Plugin-Config-YAML" VERSION="0,01,0,0" />
+        <DEPENDENCY NAME="Class-Accessor" VERSION="0,31,0,0" />
+        <DEPENDENCY NAME="Params-Validate" VERSION="0,89,0,0" />
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+        <CODEBASE HREF="dts_ut-0.01.tar.gz" />
+    </IMPLEMENTATION>
+        <IMPLEMENTATION>
+        <DEPENDENCY NAME="CGI-Application" VERSION="4,06,0,0" />
+        <DEPENDENCY NAME="CGI-Application-Plugin-Config-YAML" VERSION="0,01,0,0" />
+        <DEPENDENCY NAME="Class-Accessor" VERSION="0,31,0,0" />
+        <DEPENDENCY NAME="Params-Validate" VERSION="0,89,0,0" />
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.10" />
+        <CODEBASE HREF="dts_ut-0.01.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

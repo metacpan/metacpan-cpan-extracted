@@ -1,0 +1,8 @@
+name = "WebService-ILS"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+
+readme_from="Readme.pod"
+
+[FileGatherer]
+exclude_match = ['^test.env', '^attic/']

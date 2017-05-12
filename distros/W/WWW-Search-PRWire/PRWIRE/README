@@ -1,0 +1,9 @@
+PRWire
+
+Requires WWW::Search
+
+Backend for WWW::Search for parsing latest press releases.
+
+
+For a list of current working backends see http://members.xoom.com/backends
+

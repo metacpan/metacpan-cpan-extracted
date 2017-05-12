@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:14">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.computer_science" parent_id="science">
+<Name>Computer Science</Name>
+<Details summary="" depth="1" element_count="44" />
+<SubCategories>
+<SubCategory id="science.computer_science.neural_networks" />
+<SubCategory id="science.computer_science.expert_systems" />
+<SubCategory id="science.computer_science.data_encryption" />
+<SubCategory id="science.computer_science.bibliography" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

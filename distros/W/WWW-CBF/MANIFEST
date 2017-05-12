@@ -1,0 +1,13 @@
+Changes
+ignore.txt
+lib/WWW/.CBF.pm.swp
+lib/WWW/CBF.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

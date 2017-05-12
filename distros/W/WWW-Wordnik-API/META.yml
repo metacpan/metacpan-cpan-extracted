@@ -1,0 +1,26 @@
+---
+abstract: 'Wordnik API implementation'
+author:
+  - 'Pedro Silva <pedros@berkeley.edu>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Wordnik-API
+provides:
+  WWW::Wordnik::API:
+    file: lib/WWW/Wordnik/API.pm
+    version: v0.0.5
+recommends:
+  JSON: 0
+requires:
+  Carp: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  version: 0
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: v0.0.5

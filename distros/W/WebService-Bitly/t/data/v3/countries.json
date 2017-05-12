@@ -1,0 +1,14 @@
+{
+    "data": {
+        "countries": [
+            {"clicks": 40, "country": "US"},
+            {"clicks": 1,"country": "SE"}
+        ],
+        "created_by": "bitly",
+        "global_hash": "djZ9g4",
+        "short_url": "http://bit.ly/djZ9g4",
+        "user_hash": "djZ9g4"
+    },
+    "status_code": 200,
+    "status_txt": "OK"
+}

@@ -1,0 +1,163 @@
+README for Win32::Locale
+                                        Time-stamp: "2001-05-16 22:04:35 MDT"
+
+			    Win32::Locale
+
+[Partially excerpted from the POD.]
+NAME
+    Win32::Locale -- get the current MSWin locale or language
+
+SYNOPSIS
+      use Win32::Locale;
+      my $language = Win32::Locale::get_language();
+      if($language eq 'en-us') {
+        print "Wasaaap homeslice!\n";
+      } else {
+        print "You $language people ain't FROM around here, are ya?\n";
+      }
+
+DESCRIPTION
+    This library provides some simple functions allowing Perl under
+    MSWin to ask what the current locale/language setting is. (Yes,
+    MSWin conflates locales and languages, it seems; and the way it's
+    conflated is even stranger after MSWin98.)
+
+    Note that you should be able to safely use this module under any
+    OS; the functions just won't be able to access any current locale
+    value.
+
+FUNCTIONS
+    Note that these functions are not exported, nor are they exportable:
+
+    Win32::Locale::get_language()
+        Returns the (all-lowercase) RFC3066 language tag corresponding
+        to the currently currently selected MS locale.
+
+        Returns nothing if the MS locale value isn't accessible
+        (notably, if you're not running under MSWin!), or if it
+        corresponds to no known language tag. Example: "en-us".
+
+        In list context, this may in the future be made to return
+        multiple values.
+
+    Win32::Locale::get_locale()
+        Returns the (all-lowercase) Unixish locale tag corresponding
+        to the currently currently selected MS locale. Example:
+        "en_us".
+
+        Returns nothing if the MS locale value isn't accessible
+        (notably, if you're not running under MSWin!), or if it
+        corresponds to no locale.
+
+        In list context, this may in the future be made to return
+        multiple values.
+
+        Note that this function is experimental, and I greatly welcome
+        suggestions.
+
+    Win32::Locale::get_ms_locale()
+        Returns the MS locale ID code for the currently selected
+        MSWindows locale. For example, returns the number 1033 for "US
+        English". (You may know the number 1033 better as 0x00000409,
+        as these numbers are usually given in hex in MS documents).
+
+        Returns nothing if the value isn't accessible (notably, if
+        you're not running under MSWin!).
+
+    Win32::Locale::get_language($msid)
+        Returns the (all-lowercase) RFC3066 language tag corresponding
+        to the given MS locale code, or nothing if none.
+
+        In list context, this may in the future be made to return
+        multiple values.
+
+    Win32::Locale::get_locale($msid)
+        Returns the (all-lowercase) Unixish locale tag corresponding
+        to the given MS locale code, or nothing if none.
+
+        In list context, this may in the future be made to return
+        multiple values.
+
+    ("Nothing", above, means "in scalar context, undef; in list
+    context, empty- list".)
+
+AND MORE
+    This module provides an (unexported) public hash,
+    %Win32::Locale::MSLocale2LangTag, that maps from the MS locale ID
+    code to my idea of the single best corresponding RFC3066 language
+    tag.
+
+    The hash's contents are relatively certain for well-known
+    languages (US English is "en-us"), but are still experimental in
+    its finer details (like Konkani being "kok").
+
+SEE ALSO
+    I18N::LangTags, Locale::Maketext.
+
+COPYRIGHT AND DISCLAIMER
+    Copyright (c) 2001 Sean M. Burke. All rights reserved.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    This program is distributed in the hope that it will be useful,
+    but without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+
+    I am not affiliated with the Microsoft corporation, nor the
+    ActiveState corporation.
+
+    Product and company names mentioned in this document may be the
+    trademarks or service marks of their respective owners. Trademarks
+    and service marks might not be identified as such, although this
+    must not be construed as anyone's expression of validity or
+    invalidity of each trademark or service mark.
+
+AUTHOR
+    Sean M. Burke `sburke@cpan.org'
+
+
+[End of POD excerpt]
+
+PREREQUISITES
+
+This module requires Perl 5.
+
+
+INSTALLATION
+
+You install Win32::Locale, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this suite in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Or see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Locale.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Win32::Locale should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Win32::Locale is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

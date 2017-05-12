@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/sample.pl
+lib/WWW/256locksMaker.pm
+t/00_compile.t
+META.yml
+MANIFEST

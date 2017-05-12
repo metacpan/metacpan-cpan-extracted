@@ -1,0 +1,53 @@
+Win32API::Registry - Low-level access to Win32 system API calls from WINREG.H
+
+CHANGES
+
+This is version 0.23.  The major change is that it now builds under
+Perl v5.8.
+
+SYNOPSIS
+
+  use Win32API::Registry 0.21 qw( :ALL );
+
+  RegOpenKeyEx( HKEY_LOCAL_MACHINE, "SYSTEM\\Disk", 0, KEY_READ, $key );
+    or  die "Can't open HKEY_LOCAL_MACHINE\\SYSTEM\\Disk: ",
+	    regLastError(),"\n";
+  RegQueryValueEx( $key, "Information", [], $type, $data, [] );
+    or  die "Can't read HKEY_L*MACHINE\\SYSTEM\\Disk\\Information: ",
+	    regLastError(),"\n";
+  [...]
+  RegCloseKey( $key )
+    or  die "Can't close HKEY_LOCAL_MACHINE\\SYSTEM\\Disk: ",
+	    regLastError(),"\n";
+
+DESCRIPTION
+
+This provides fairly low-level access to the Win32 System API
+calls dealing with the Registry [mostly from WINREG.H].  This
+is mostly intended to be used by other modules such as
+Win32::TieRegistry [which provides an extremely Perl-friendly
+method for using the Registry].
+
+You might prefer to get this module by installing a sufficiently
+recent version of the "libwin32" package which includes this and
+many other useful modules for use on Win32 systems.
+
+Beyond raw access to the API calls and related constants, this module
+handles smart buffer allocation and translation of return codes.
+
+Nearly all calls return a true value for success and a false value
+for failure.  After any failure, $^E should automatically be set
+to indicate the reason.
+
+This and the other Win32API:: modules are meant to expose the
+nearly raw API calls so they can be used from Perl code in any
+way they might be used from C code.
+
+AUTHOR
+
+Tye McQueen, tye@metronet.com, http://www.metronet.com/~tye/.
+
+Comments, additions, and bug reports are welcomed.  Please address
+technical questions that are not full bug reports to one of the Usenet
+newsgroups comp.lang.perl.modules or comp.lang.perl.moderated or
+to http://www.perlmonks.org/.

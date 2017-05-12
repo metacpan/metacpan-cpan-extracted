@@ -1,0 +1,33 @@
+.travis.yml
+Changes
+lib/WWW/Scrape/FindaGrave.pm
+LICENCE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/00-load.t
+t/10-new.t
+t/20-findagrave.t
+t/boiler.t
+t/changes.t
+t/coverage.t
+t/critic.t
+t/cv.t
+t/dist.t
+t/gv.t
+t/kwalitee.t
+t/manifest.t
+t/metrics.t
+t/noplan.t
+t/pod-cm.t
+t/pod.t
+t/prereq.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/unused.t
+t/used.t
+t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

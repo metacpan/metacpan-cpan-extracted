@@ -1,0 +1,20 @@
+
+v0.004    2012-01-08
+  - Thanks to TOBYINK++ for pointing out that application/xhtml+xml is the 
+    correct way to accept text/xhtml.
+  - Thanks to the.tuxster++ for submitting a patch to allow for a 'follow_ok'
+    callback to be called for each link found within a response.
+  - Thanks to bart++ from PerlMonks.org for pointing out that using HTML::LinkExtor
+    for parsing the links in a page is a much better approach than a simple regexp.
+
+v0.003    2010-09-10
+  - Using WWW::RobotRules is great, as long as you remove extra newlines before parsing.
+
+v0.002    2010-07-01
+  - Updated Makefile.PL to correct prerequisites.
+  - Fixed META.yml
+
+v0.001    2010-07-01
+  - Initial release.
+  - Works just fine as far as I can tell.  
+

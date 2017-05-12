@@ -1,0 +1,10 @@
+* add methods to access data on Index pages. e.g:
+  http://en.wiktionary.org/wiki/Index:All_languages
+  http://en.wiktionary.org/wiki/Index:German
+  http://en.wiktionary.org/wiki/Index:Tarantino
+
+* Methods to access Alternative Forms
+  
+* Methods to access Definitions
+
+* Methods to access specific slices of data? (need suggestions)

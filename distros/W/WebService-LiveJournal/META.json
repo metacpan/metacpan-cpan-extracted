@@ -1,0 +1,77 @@
+{
+   "abstract" : "Interface to the LiveJournal API",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-LiveJournal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "HTTP::Cookies" : "0",
+            "RPC::XML" : "0",
+            "RPC::XML::Client" : "0",
+            "RPC::XML::ParserFactory" : "0",
+            "base" : "0",
+            "overload" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Time::HiRes" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/WebService-LiveJournal/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/WebService-LiveJournal",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/WebService-LiveJournal.git",
+         "web" : "https://github.com/plicease/WebService-LiveJournal"
+      }
+   },
+   "version" : "0.08"
+}
+

@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+example/gilles-peterson.pl
+lib/WWW/BBC/Track.pm
+lib/WWW/BBC/TrackListings.pm
+t/00-compile.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

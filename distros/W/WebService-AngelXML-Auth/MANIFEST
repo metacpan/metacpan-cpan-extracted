@@ -1,0 +1,14 @@
+docs/angelxml-dtd.xml
+Changes
+lib/WebService/AngelXML/Auth.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+scripts/agent_validate_webservice.cgi
+t/001_constructor.t
+t/002_methods.t
+t/003_param.t
+t/004_xml.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

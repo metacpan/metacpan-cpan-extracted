@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+Mozilla.xs
+ppport.h
+README
+t/Wx-Mozilla.t
+lib/Wx/Mozilla.pm
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

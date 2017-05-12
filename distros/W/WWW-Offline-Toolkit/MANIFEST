@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Offline-Toolkit.t
+lib/WWW/Offline/Toolkit.pm
+META.yml                                 Module meta-data (added by MakeMaker)

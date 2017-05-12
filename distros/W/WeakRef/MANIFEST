@@ -1,0 +1,7 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+WeakRef.pm
+WeakRef.xs
+test.pl

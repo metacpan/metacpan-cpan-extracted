@@ -1,0 +1,593 @@
+
+=head1 NAME
+
+Win32::GUI::RichEdit - Create and manipulate Richedit controls.
+
+=head1 DESCRIPTION
+
+Most of the methods and events that apply to a L<Textfield|Win32::GUI::Textfield>
+also apply to Win32::GUI::RichEdit.
+
+Note that in order for most events to be triggered you must call the
+SetEventMask() method, to set the events that you want to be triggered.
+See L<SetEventMask()|Win32::GUI::RichEdit/SetEventMask>.
+
+By default Win32::GUI::RichEdit uses Rich Edit 1.0.
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new RichEdit object;
+can also be called as PARENT->AddRichEdit(%OPTIONS).
+See L<new Win32::GUI::Textfield()|Win32::GUI::Textfield/new> for B<%OPTIONS>
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AutoURLDetect
+
+B<AutoURLDetect([FLAG=TRUE])>
+
+Set automatic detection of URLs mode.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackColor
+
+B<BackColor([COLOR])>
+
+See L<SetBkgndColor()|Win32::GUI::RichEdit/SetBkgndColor>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CanPaste
+
+B<CanPaste([FORMAT=CF_TEXT])>
+
+Determine if RichEdit can paste a specified clipboard format.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CanRedo
+
+B<CanRedo()>
+
+Determine whether there are any actions in redo queue
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CharFromPos
+
+B<CharFromPos(X, Y)>
+
+Returns a two elements array identifying the character nearest to the
+position specified by X and Y.
+The array contains the zero-based index of the character and its line
+index.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DisplayBand
+
+B<DisplayBand(LEFT, TOP, RIGHT, BOTTOM)>
+
+Displays a portion of a RichEdit's contents, as previously formatted for a device using the EM_FORMATRANGE message.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindText
+
+B<FindText(STRING, START, END, [FLAG})>
+
+Search a string text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindWordBreak
+
+B<FindWordBreak(START, [FLAG=WB_NEXTBREAK] )>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetAutoURLDetect
+
+B<GetAutoURLDetect()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCharFormat
+
+B<GetCharFormat([FLAG=SCF_SELECTION])>
+
+Return a named hash containing the formatting of the current selection
+if FLAG = SCF_SELECTION (1) or the default character character formatting
+if FLAG = SCF_DEFAULT (0).
+
+Hash keys (if a hash key doesn't exist, that property varies across the selection):
+
+  -bold => 0/1
+  -italic => 0/1
+  -underline => 0/1
+  -strikeout => 0/1
+  -color => Text color (0xBBGGRR)
+  -name => Font name
+  -size => Character height, in twips (1/1440 of an inch or 1/20 of a printer's point).
+
+MSDN link:
+http://msdn.microsoft.com/library/en-us/shellcc/platform/commctls/richedit/richeditcontrols/richeditcontrolreference/richeditstructures/charformat.asp
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEditStyle
+
+B<GetEditStyle()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEventMask
+
+B<GetEventMask()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetIMEOptions
+
+B<GetIMEOptions()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLangOptions
+
+B<GetLangOptions()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetOptions
+
+B<GetOptions()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRedoName
+
+B<GetRedoName()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSel
+
+B<GetSel()>
+
+Returns a two elements array containing the current selection start
+and end.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelText
+
+B<GetSelText()>
+
+Returns the current selection text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextMode
+
+B<GetTextMode()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextRange
+
+B<GetTextRange(START, LENGTH)>
+
+Returns LENGTH bytes of text from the RichEdit control, starting at START
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTypographyOptions
+
+B<GetTypographyOptions()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUndoName
+
+B<GetUndoName()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetWordWrapMode
+
+B<GetWordWrapMode()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HideSelection
+
+B<HideSelection([HIDE=TRUE,CHANGESTYLE=FALSE])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LimiteText
+
+B<LimiteText(LENGTH)>
+
+Sets the RichEdit control's maximum length (up to 2GB)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LimitText
+
+B<LimitText(LENGTH)>
+
+See L<LimiteText()|Win32::GUI::RichEdit/LimiteText>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineFromChar
+
+B<LineFromChar(INDEX)>
+
+Returns the line number where the zero-based INDEX character appears.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Load
+
+B<Load(FILENAME, [FORMAT])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PosFromChar
+
+B<PosFromChar(INDEX)>
+
+Returns a two elements array containing the x and y position of the
+specified zero-based INDEX character in the RichEdit control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Redo
+
+B<Redo()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RequestResize
+
+B<RequestResize()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Save
+
+B<Save(FILENAME, [FORMAT])>
+
+More information at http://msdn.microsoft.com/library/en-us/shellcc/platform/commctls/richedit/richeditcontrols/richeditcontrolreference/richeditmessages/em_setoptions.asp
+Here are some constants for the FORMAT:
+
+  0x0001 (SF_TEXT)
+  0x0002 (SF_RTF)
+  0x0003 (SF_RTFNOOBJS)
+  0x0004 (SF_TEXTIZED)
+  0x0010 (SF_UNICODE)
+  0x0020 (SF_USECODEPAGE)
+  0x8000 (SFF_SELECTION)
+  0x4000 (SFF_PLAINRTF)
+
+  1200 is the Unicode code page
+  CP_UTF8 = 65001
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(START, END)>
+
+See L<SetSel()|Win32::GUI::RichEdit/SetSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Selection
+
+B<Selection()>
+
+See L<GetSel()|Win32::GUI::RichEdit/GetSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectionType
+
+B<SelectionType()>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkgndColor
+
+B<SetBkgndColor([COLOR])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCharFormat
+
+B<SetCharFormat(%OPTIONS)>
+
+Sets the format of the selected text.  If there is no selected text sets the
+format of the insertion point for text subsequently inserted at that point.
+
+%OPTIONS are:
+
+ -name => font name,
+ -bold => 0/1,
+ -underline => 0/1,
+ -italic => 0/1,
+ -strikeout => 0/1,
+ -height => Character height, in twips (1/1440 of an inch or 1/20 of a printer's point).
+ -color => Text color (0xBBGGRR)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetEditStyle
+
+B<SetEditStyle(STYLE, MASK)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetEventMask
+
+B<SetEventMask(MASK)>
+
+The SetEventMask() method sets the event mask for a rich edit control.
+The event mask specifies which notification messages the control sends
+to its parent window.  MASK is any combination of:
+
+  ENM_CHANGE          Sends EN_CHANGE notifications.
+  ENM_CORRECTTEXT     Sends EN_CORRECTTEXT notifications.
+  ENM_DRAGDROPDONE    Sends EN_DRAGDROPDONE notifications.
+  ENM_DROPFILES       Sends EN_DROPFILES notifications.
+  ENM_IMECHANGE       Microsoft Rich Edit 1.0 only: Sends EN_IMECHANGE
+                      notifications when the IME conversion status has
+                      changed. Only for Asian-language versions of the
+                      operating system.
+  ENM_KEYEVENTS       Sends EN_MSGFILTER notifications for keyboard events.
+  ENM_LINK            Rich Edit 2.0 and later: Sends EN_LINK notifications when
+                      the mouse pointer is over text that has the CFE_LINK and
+                      one of several mouse actions is performed.
+  ENM_MOUSEEVENTS     Sends EN_MSGFILTER notifications for mouse events.
+  ENM_OBJECTPOSITIONS Sends EN_OBJECTPOSITIONS notifications.
+  ENM_PROTECTED       Sends EN_PROTECTED notifications.
+  ENM_REQUESTRESIZE   Sends EN_REQUESTRESIZE notifications.
+  ENM_SCROLL          Sends EN_HSCROLL and EN_VSCROLL notifications.
+  ENM_SCROLLEVENTS    Sends EN_MSGFILTER notifications for mouse wheel events.
+  ENM_SELCHANGE       Sends EN_SELCHANGE notifications.
+  ENM_UPDATE          Sends EN_UPDATE notifications.  Rich Edit 2.0 and later:
+                      this flag is ignored and the EN_UPDATE notifications are
+                      always sent. However, if Rich Edit 3.0 emulates Rich Edit
+                      1.0, you must use this flag to send EN_UPDATE notifications.
+
+The default event mask before any is set is ENM_NONE.  Returns the previous
+event mask.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetLangOptions
+
+B<SetLangOptions(MASK)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMaxLength
+
+B<SetMaxLength(LENGTH)>
+
+See L<LimiteText()|Win32::GUI::RichEdit/LimiteText>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetOptions
+
+B<SetOptions(MASK)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetParaFormat
+
+B<SetParaFormat(%OPTIONS)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRect
+
+B<SetRect(LEFT,TOP,RIGHT,BOTTOM)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSel
+
+B<SetSel(START, END)>
+
+Selects the characters range from START to END.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextMode
+
+B<SetTextMode(MODE, UNDO)>
+
+Sets the RichEdit control's text mode
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUndoLimit
+
+B<SetUndoLimit(MAX)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetWrapMode
+
+B<SetWrapMode(OPTION)>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ShowScrollBar
+
+B<ShowScrollBar(BARRE,[SHOW=TRUE])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextLength
+
+B<TextLength()>
+
+Returns the text length of the RichEdit control
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change (Win32::GUI::Textfield)
+
+B<Change()>
+
+Sent when the text in the field is changed by the user.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GotFocus (Win32::GUI::Textfield)
+
+B<GotFocus()>
+
+Sent when the control is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LostFocus (Win32::GUI::Textfield)
+
+B<LostFocus()>
+
+Sent when the control is deactivated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MaxText (Win32::GUI::Textfield)
+
+B<MaxText()>
+
+Sent when text has exceeded the specified number of characters
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll (Win32::GUI::Textfield)
+
+B<Scroll(SCROLLBAR)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Update (Win32::GUI::Textfield)
+
+B<Update()>
+
+Sent when an edit control is about to display altered text.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

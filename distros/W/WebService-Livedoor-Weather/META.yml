@@ -1,0 +1,19 @@
+---
+abstract: 'Perl interface to Livedoor Weather Web Service'
+author:
+  - 'Masahiro Nagano <kazeburo@nomadscafe.jp>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Livedoor-Weather
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/kazeburo/WebService-Livedoor-Weather.git
+version: '0.10'

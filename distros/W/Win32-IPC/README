@@ -1,0 +1,70 @@
+Win32-IPC version 1.11, released November 15, 2014
+
+
+The Win32-IPC modules provide access to the Win32 sychronization
+objects, which are (currently) documented at
+
+  http://msdn2.microsoft.com/en-us/library/ms686364(VS.85).aspx
+
+The supported sychronization objects and associated modules are:
+  Event     - Win32::Event
+  Mutex     - Win32::Mutex
+  Semaphore - Win32::Semaphore
+
+In addition, the Win32::ChangeNotify module provides access to
+directory change notifications, which let you monitor a specified
+directory tree for file modifications.  While not strictly a
+synchronization object, change notifications are often used in similar
+ways.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+You'll need a suitable C compiler.
+Microsoft Visual C++ 6 or MinGW GCC should work.
+You can also build it with GCC under Cygwin.
+
+  Package   Minimum Version
+  --------- ---------------
+  perl       5.6.0
+  Carp       
+  Exporter   
+  XSLoader
+
+
+
+CHANGES
+    Here's what's new in version 1.11 of Win32-IPC:
+    (See the file "Changes" for the full revision history.)
+
+	- There are no functional changes in 1.11.
+
+	- Change build process to use Module::Metadata instead of deprecated
+	  Module::Build::ModuleInfo (Klaus Eichner, GitHub#1)
+
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 1998-2014 Christopher J. Madsen
+
+ Created: 3 Feb 1998 from the ActiveWare version
+   (c) 1995 Microsoft Corporation. All rights reserved.
+       Developed by ActiveWare Internet Corp., http://www.ActiveState.com
+
+   Other modifications (c) 1997 by Gurusamy Sarathy <gsar@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

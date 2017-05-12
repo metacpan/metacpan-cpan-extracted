@@ -1,0 +1,519 @@
+
+=head1 NAME
+
+Win32::GUI::Combobox - Create and manipulate combobox controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Combobox object;
+can also be called as PARENT->AddCombobox(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+ -autohscroll => 0/1 (default 0)
+   Set/Unset autohscroll style
+ -disablenoscroll => 0/1 (default 0)
+   Set/Unset disablenoscroll style
+ -dropdown => 0/1 (default 0)
+   Set/Unset dropdown style
+ -dropdownlist => 0/1 (default 0)
+   Set/Unset dropdownlist style
+ -hasstring => 0/1 (default 0)
+   Set/Unset hasstring style
+ -lowercase => 0/1 (default 0)
+   Set/Unset lowercase style
+ -nointegraleheight => 0/1 (default 0)
+   Set/Unset nointegraleheight style
+ -simple => 0/1 (default 0)
+   Set/Unset simple style
+ -sort => 0/1 (default 0)
+   Set/Unset sort style
+ -uppercase => 0/1 (default 0)
+   Set/Unset uppercase style
+
+Only one of -simple, -dropdown and -dropdownlist should be used. If
+more than one is used, only the last one will be acted on.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Add
+
+B<Add(STRING, STRING .. STRING)>
+
+Adds one or more items at the end of the control's list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddString
+
+B<AddString(STRING)>
+
+Adds an item at the end of the control's list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear()>
+
+See L<ResetContent()|Win32::GUI::Combobox/ResetContent>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+Return the number of items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteString
+
+B<DeleteString(INDEX)>
+
+Removes the zero-based INDEX item from the Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Dir
+
+B<Dir(PATH, [FLAG])>
+
+Add a list of filenames.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindString
+
+B<FindString(STRING, [INDEX])>
+
+Search item beginning with specified string.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindStringExact
+
+B<FindStringExact(STRING, [INDEX])>
+
+Search item that match specified string.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FirstVisibleItem
+
+B<FirstVisibleItem([INDEX])>
+
+See L<TopIndex()|Win32::GUI::Combobox/TopIndex>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCount
+
+B<GetCount()>
+
+See L<Count()|Win32::GUI::Combobox/Count>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurSel
+
+B<GetCurSel()>
+
+Returns the zero-based index of the currently selected item, or -1 if
+no item is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDroppedControlRect
+
+B<GetDroppedControlRect()>
+
+Retrieves screen coordinates of the drop-down list box.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDroppedState
+
+B<GetDroppedState()>
+
+Determine whether the list box of a combo box is dropped down.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDroppedWidth
+
+B<GetDroppedWidth()>
+
+Retrieve the minimum allowable width, in pixels, of the list box af a Combobox with the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEditSel
+
+B<GetEditSel()>
+
+Get the starting and ending character positions of the current selection in the edit control of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetExtendedUI
+
+B<GetExtendedUI()>
+
+Determine whether a combo box has the default user interface or the extended user interface.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHorizontalExtent
+
+B<GetHorizontalExtent()>
+
+Retrieve from a combo box the width, in pixels, by which the list box can be scrolled horizontally (the scrollable width).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemHeight
+
+B<GetItemHeight(INDEX)>
+
+Determine the height of list items or the selection field in a combo box.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLBText
+
+B<GetLBText(INDEX)>
+
+Returns the string at the specified zero-based INDEX in the Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLBTextLen
+
+B<GetLBTextLen(INDEX)>
+
+Retrieve the length, in characters, of a string in the list of a combo box.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLocale
+
+B<GetLocale()>
+
+Retrieve the current locale of the Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetString
+
+B<GetString(INDEX)>
+
+See L<GetLBText()|Win32::GUI::Combobox/GetLBText>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTopIndex
+
+B<GetTopIndex()>
+
+Retrieve the zero-based index of the first visible item in the list box portion of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InitStorage
+
+B<InitStorage(count,size)>
+
+Allocates memory for storing list box items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(STRING, [INDEX])>
+
+See L<InsertString()|Win32::GUI::Combobox/InsertString>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertString
+
+B<InsertString(STRING, [INDEX])>
+
+Inserts an item at the specified zero-based INDEX in the Combobox,
+or adds it at the end if INDEX is not specified.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemHeight
+
+B<ItemHeight([HEIGHT])>
+
+Gets or sets the items height in a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LimitText
+
+B<LimitText(SIZE)>
+
+Set limit of the text length the user may type into the Textfield of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ListIndex
+
+B<ListIndex()>
+
+See L<GetCurSel()|Win32::GUI::Combobox/GetCurSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RemoveItem
+
+B<RemoveItem(INDEX)>
+
+See L<DeleteString()|Win32::GUI::Combobox/DeleteString>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Reset
+
+B<Reset()>
+
+See L<ResetContent()|Win32::GUI::Combobox/ResetContent>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ResetContent
+
+B<ResetContent()>
+
+Remove all items from the Listbox and Textfield of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(INDEX)>
+
+See L<SetCurSel()|Win32::GUI::Combobox/SetCurSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItem
+
+B<SelectedItem()>
+
+See L<GetCurSel()|Win32::GUI::Combobox/GetCurSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectString
+
+B<SelectString(STRING, [INDEX])>
+
+Search for an item that begins with the specified string in the Listbox.
+If a matching item is found, it is selected and copied to the Textfield.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCurSel
+
+B<SetCurSel(INDEX)>
+
+Selects the zero-based INDEX item in the Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDroppedWidth
+
+B<SetDroppedWidth(WIDTH)>
+
+Set the maximum allowable width, in pixels, of the Listbox of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetEditSel
+
+B<SetEditSel(START,END)>
+
+Select characters in the textfield.  START and END are the
+(zero-based) index of the characters to be selected.  START
+is the index of the first character to be selected, and END
+is the index of the first character following the selection.
+For example to select the first 4 characters:
+
+   $combobox->SetEditSel(0,4);
+
+If START is -1, the any selection is removed.  If END is -1,
+then the selection is from START to the last character in the
+textfield.
+
+Returns 1 on success, 0 on failure and -1 if sent to a
+Combobox that does not have a textfield (C<-dropdownlist => 1>).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedUI
+
+B<SetExtendedUI(FLAG)>
+
+Select either the default user interface or the extended user interface for a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHorizontalExtend
+
+B<SetHorizontalExtend(CX)>
+
+Set the width, in pixels, by which a listbox can be scrolled horizontally (the scrollable width).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemHeight
+
+B<SetItemHeight(INDEX,HEIGHT)>
+
+Set the height of list items or the selection field in a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetLocale
+
+B<SetLocale(LOCALE)>
+
+Set the current locale of the Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTopIndex
+
+B<SetTopIndex(INDEX)>
+
+Ensure that a particular item is visible in the Listbox of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ShowDropDown
+
+B<ShowDropDown(FLAG)>
+
+Show or hide the Listbox of a Combobox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TopIndex
+
+B<TopIndex([INDEX])>
+
+Set or Get first visible item index.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change()>
+
+Sent when the user selects an item from the Combobox
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseUp
+
+B<CloseUp()>
+
+Sent when the list box of a combo box has been closed. This event allows you to populate the
+dropdown dynamically. This event is only fired if the combo box has the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
+
+If the user changed the current selection, the combo box also sends the Change event when the drop-down list closes.
+In general, you cannot predict the order in which notifications will be sent. In particular, a Change event message
+may occur either before or after a CloseUp event.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DblClick
+
+B<DblClick()>
+
+Sent when the user double clicks on an item from the Combobox
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DropDown
+
+B<DropDown()>
+
+Sent when the user selects the list box. This event allows you to populate the
+dropdown dynamically. This event is only fired if the combo box has the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GotFocus
+
+B<GotFocus()>
+
+Sent when the control is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LostFocus
+
+B<LostFocus()>
+
+Sent when the control is deactivated.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

@@ -1,0 +1,29 @@
+Revision history for WWW-BashOrg
+
+1.001003  2014-03-15
+        - Fixed a broken tree of the test, for the case when the network
+          isn't available
+
+1.001002  2014-02-20
+        - Said I got rid of Class::Data::Accessor in the changelog,
+          but forgot to actually update it in the code :)
+
+1.001001  2014-02-20
+        - Merged qdb support and cache implementation written
+          by JBARRETT
+        - Converted to dzil
+        - Got rid of Class::Data::Accessor, which is deprecated
+        - Moved author tests to xt/
+
+0.0104  2013-10-30
+        - Minor changes to comply with specs and Kwalitee game.
+
+0.0103  2010-12-26
+        - Added missing prerequisites.
+
+0.0102  2009-07-27
+        - Added my links
+
+0.0101  2009-07-26
+        - First version, released on an unsuspecting world.
+

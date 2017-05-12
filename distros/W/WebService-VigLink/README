@@ -1,0 +1,38 @@
+NAME
+    WebService::VigLink - Interface to the VigLink web API
+
+METHODS
+    new()
+         $VigLink = WebService::VigLink->new({ key => $apikey })
+
+        See http://www.viglink.com/corp/api for the low level details and
+        where to obtain an API key.
+
+    make_url()
+         $api_url = $VigLink->make_url({ out      => $click_destination,
+                                         cuid     => $anonymous_user_id,
+                                         txt      => $text_of_link,
+                                         loc      => $current_webpage,
+                                         title    => $current_page_title,
+                                         referrer => $referring_page, });
+
+        Returns a VigLink href. Dies on missing args.
+
+SYNOPSIS
+      use WebService::VigLink;
+      $VigLink = WebService::VigLink->new({ key => $api_key });
+      $affiliate_url = $VigLink->make_url({ ... });
+
+DESCRIPTION
+    Simple encapsulation of the VigLink API.
+
+AUTHOR
+    "Fred Moyer", <fred@slwifi.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Silver Lining Networks
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

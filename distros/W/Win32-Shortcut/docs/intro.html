@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Shortcut Introduction</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+<A NAME=Top>
+<CENTER><H1>Win32::Shortcut</H1>
+<FONT FACE=Arial SIZE=2>
+Perl Module to deal with Windows Shortcut<BR>
+Version 0.03 (07 Apr 1997)<BR>
+by Aldo Calpini (<A HREF="mailto:dada@perl.it">dada@perl.it</A>)<BR>
+</FONT></CENTER>
+
+<HR>
+
+
+<FONT FACE=Arial><H2><A NAME="Intro">Introduction</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+This module implements the Win32 IShellLink Interface to allow
+management of shortcut files from Perl.
+</FONT>
+<P>
+
+<HR>
+
+<FONT FACE=Arial><H2><A NAME="Disclaimer">Disclaimer</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2><I>
+This program is FREE; you can redistribute, modify, disassemble, or even reverse engineer this software at
+your will. Keep in mind, however, that NOTHING IS GUARANTEED to work and everything you do is
+AT YOUR OWN RISK - I will not take responsability for any damage, loss of money and/or health that may
+arise from the use of this program! 
+</I>
+<P>
+
+This is distributed under the terms of <A HREF="license.html">Larry Wall's Artistic License</A>. 
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME=Credits>Credits</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+Thanks to: Jesse Dougherty, Dave Roth, ActiveWare, and the Perl-Win32-Users community.
+</FONT>
+<P>
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="History">Version History</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+
+<B>0.03 (07 Apr 1997)</B>
+<UL TYPE=disc>
+  <LI>The PLL file now comes in 2 versions, one for Perl version 5.001 (build 110)
+      and one for Perl version 5.003 (build 300 and higher, EXCEPT 304).
+  <LI>Added an installation program which will automatically copy the right files
+      in the right place.
+</UL>
+
+<B>0.02 (21 Jan 1997)</B>
+<UL TYPE=disc>
+  <LI>Added methods matching properties to reduce typing overhead (eg. Alt-123 and 125...).
+</UL>
+
+<B>0.01 (15 Jan 1997)</B>
+<UL TYPE=disc>
+  <LI>First public release. 
+  <LI>Added "Set" and "Resolve" and the properties "Hotkey", "IconLocation" and "IconNumber".
+</UL>
+
+<B>0.01a (10 Jan 1997)</B>
+<UL TYPE=disc>
+  <LI>First implementation of the IShellLink interface (wow, it works!);
+      can "Load", "Save", and modify properties of shortcut files.
+</UL>
+
+</FONT>
+<P>
+
+
+<HR>
+<FONT FACE=Arial><H2><A NAME="Install">Installation Instructions</A></H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+<OL>
+    <LI>Run the INSTALL.BAT program.
+    <P>
+    <LI>Run the TEST.PL script to see if everything works
+    <P>
+    <LI>Have fun.
+</OL>
+</FONT>
+<P>
+
+
+<HR>
+<FONT FACE=Arial SIZE=1>
+08 Apr 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;</FONT><P>
+
+</BODY>
+</HTML>
+

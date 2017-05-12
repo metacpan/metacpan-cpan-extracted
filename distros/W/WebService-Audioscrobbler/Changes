@@ -1,0 +1,38 @@
+Revision history for WebService-Audioscrobbler
+
+0.08    Mon Nov 30 19:52:37 2015
+        * fix broken encoding, add unmaintained warnings
+
+0.07    Wed Oct 17 08:45:48 2007
+        * added missing NEXT dependency
+
+0.06    Wed Oct 17 01:55:59 2007
+        * bugfix: tags() wouldn't work for entities with only one tag
+        * fixed some typos
+
+0.05    Fri Jan  5 03:25:03 2007
+        * bugfix: resources which contained slash (/) characters didn't work
+        * uri_builder() method implemented (helps child classes build their
+          resource_paths easier)
+
+0.04    Thu Dec 28 01:15:15 2006
+        * added caching support!
+        * somewhat major internal refactoring
+        * removed resource_url() method from Base.pm (it was replace by 
+          the resource_path() method as part of the refactoring)
+        * most of the constructors now require a data fetcher object
+        * some internal interfaces changed
+
+0.03    Wed Dec 27 04:06:24 2006
+        * bugfix: warnings when listing an user's artists
+        * added support for fetching a user's friends
+        * internal refactoring in various places
+
+0.02    Sun Dec 24 02:33:34 2006
+        * initial support for fetching user data and neighbours
+        * now it's possible to fetch artists tagged with a given tag
+        * fixed typos (thanks to Menno Blom)
+
+0.01    Thu Dec 21 02:35:17 2006
+        First version, released on an unsuspecting world.
+

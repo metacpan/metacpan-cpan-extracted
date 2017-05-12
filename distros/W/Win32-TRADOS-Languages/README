@@ -1,0 +1,62 @@
+Win32-TRADOS-Languages
+
+This module (and the utility script that calls it) write Registry
+values that change the currently installed languages for TRADOS 2007.
+This builds on the Registry-editing technique and table of language
+codes that have been available on the Internet since at least 2009,
+and makes it reliable and convenient to use the Registry editing
+technique, instead of de-installing and re-installing TRADOS with
+the new selection of languages.
+
+In its simplest form, you can simply call:
+
+   ttx-lang
+
+at the Windows command prompt to see the languages installed, or
+
+   ttx-lang -i
+
+to start an interactive session allowing you to edit them.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Win32::TRADOS::Languages
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-TRADOS-Languages
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Win32-TRADOS-Languages
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Win32-TRADOS-Languages
+
+    Search CPAN
+        http://search.cpan.org/dist/Win32-TRADOS-Languages/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Michael Roberts
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

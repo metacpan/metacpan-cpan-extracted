@@ -1,0 +1,54 @@
+WWW::Google::News
+=================
+
+This is a simple screen scraper for Google's News service. It has
+an example RSS feed publisher as an example.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+TODO
+
+- make regex more robust
+- merge with other existing Google scraper codebases
+
+HISTORY / AUTHORS
+
+v0.11
+
++ update regexes for new html layout
+
+v0.10
+
++ add OO search interface
+
+v0.09
+
++ update regexes for new html layout
++ fix sample script for get_news_for_topic()
++ add summary property to get_news_for_topic()
++ clean up output from get_news_for_topic()
+
+v0.05 
+
++ Bowen Dwelle added get_news_for_topic()
++ get_news() and get_news_greg_style() should be considered deprecated, 
+since they don't really do anything interesting. 
+
+v0.04 
+
++ The original author is Greg McCarroll. 
+
+COPYRIGHT AND LICENSE
+
+Please report any bugs/suggestions to Bowen Dwelle <bowen@dwelle.org>
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

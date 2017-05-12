@@ -1,0 +1,30 @@
+---
+abstract: '(DEPRECATED) Shorten URLs'
+author:
+  - 'Eric Hammond <ehammond@thinksome.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-NotLong
+requires:
+  WWW::Shorten: '3.08'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/p5-shorten/www-shorten-notlong/issues
+  homepage: https://github.com/p5-shorten/www-shorten-notlong
+  repository: https://github.com/p5-shorten/www-shorten-notlong.git
+version: '9.992'
+x_contributors:
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Dave Cross C<davecross@cpan.org>'
+  - 'Iain Truskett C<spoon@cpan.org>'
+x_deprecated: 1

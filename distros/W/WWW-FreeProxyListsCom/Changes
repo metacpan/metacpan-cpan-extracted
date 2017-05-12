@@ -1,0 +1,52 @@
+Revision history for WWW-FreeProxyListsCom
+
+1.005   2016-02-19
+        - removed t/kwalitee.t
+
+1.004   2016-02-16
+        - changed use() to require() in POD test eval()s
+        - fixed typo in regex check in t/05
+
+1.003   2016-02-08
+        - added Test::Perl::Critic tests
+        - get_list() in t/00-load.t wasn't passing in the type param, which
+          resulted in the default 'elite' type being used on each test
+          iteration (fixes #1)
+        - moved xt/ tests to t/
+        - corrected code that was breaking new critic tests (fixes #2)
+        - added _url() method which sets/fetches 'url' param for testing
+        - added t/03-error test
+        - changed tests that fail in t/02-fetch to properly skip
+        - added t/04-filter tests
+        - added t/05-timeout tests (closes #4; as invalid)
+        - reduced timeout in t/04-filter, and wrapped in eval (closes #5)
+        - added tests for _set_error() (closes #6)
+
+1.002   2016-02-07
+        - Adopted by Steve Bertrand (STEVEB) (2016-02-04)
+        - added git info to Makefile.PL
+        - added .travis.yml
+        - updated license, removed LICENSE file
+        - added travis/coverage badges
+
+1.001   2013-12-27
+        - Fixed broken test and prereqs
+
+0.004   2013-12-26
+        - Fixed a partially broken test
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+        - Switched away from now deprecated Class::Data::Accessor
+          to Class::Accessor::Grouped
+
+0.003   2010-08-06
+        - Fixed first element of the list being garbage
+
+0.002   2008-03-16
+        - Fixed improper prerequisites list which was missing
+          Class::Data::Accessor
+
+0.001   2008-03-15
+        - First version, released on an unsuspecting world.
+

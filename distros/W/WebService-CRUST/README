@@ -1,0 +1,125 @@
+NAME
+    WebService::CRUST - A lightweight Client for making REST calls
+
+SYNOPSIS
+      use WebService::CRUST;
+      use Data::Dumper;
+  
+      my $c = WebService::CRUST->new;
+  
+      print Dumper $c->get('http://developer.yahooapis.com/TimeService/V1/getTime',
+        appid => 'YahooDemo',
+        format => 'ms'
+      );
+
+CONSTRUCTOR
+  new
+    my $c = WebService::CRUST->new( <options> );
+
+OPTIONS
+  base
+    Sets a base URL to perform actions on. Example:
+
+      my $c = WebService::CRUST->new(base => 'http://somehost.com/API/');
+      $c->get('foo'); # calls http://somehost.com/API/foo
+
+  params
+    Pass hashref of options to be sent with every query. Example:
+
+      my $c = WebService::CRUST->new( params => { appid => 'YahooDemo' });
+      $c->get('http://developer.yahooapis.com/TimeService/V1/getTime');
+  
+    Or combine with base above to make your life easier:
+
+      my $c = WebService::CRUST->new(
+        base => 'http://developer.yahooapis.com/TimeService/V1/',
+        params => { appid => 'YahooDemo' }
+      );
+      $c->get('getTime');
+      $c->get('getTime', format => 'ms');
+
+  request_key
+    Use a specific parm argument for the action, for instance, to talk to
+    Amazon:
+
+      my $c = WebService::CRUST->new(
+        base => 'http://webservices.amazon.com/onca/xml?Service=AWSECommerceService',
+        request_key => 'Operation',
+        params => { AWSAccessKeyId => 'my_key' }
+      );
+
+      $c->get('ItemLookup', ItemId => 'B00000JY1X');
+      # does a GET on http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=ItemLookup&ItemId=B00000JY1X&AWSAccessKeyId=my_key
+
+  timeout
+    Number of seconds to wait for a request to return. Default is LWP's
+    default (180 seconds).
+
+  ua
+    Pass an LWP::UserAgent object that you want to use instead of the
+    default.
+
+  format
+    What format to use. Defaults to XML::Simple. To use something like JSON:
+
+      my $c = WebService::CRUST->new(format => [ 'JSON', 'objToJson' ]);
+      $c->get($url);
+
+    The second argument can also be a coderef, so for instance:
+
+      my $c = WebService::CRUST->new(format => [ 'JSON::Syck', sub { JSON::Syck::Load(shift) } ]);
+      $c->get($url);
+
+    Formatter classes are loaded dynamically if needed, so you don't have to
+    'use' them first.
+
+  opts
+    A hashref of alternate options to pass the data formatter.
+
+METHODS
+  get
+    Performs a GET request with the specified options. Returns undef on
+    failure.
+
+  head
+    Performs a HEAD request with the specified options. Returns undef on
+    failure.
+
+  put
+    Performs a PUT request with the specified options. Returns undef on
+    failure.
+
+    If -content is passed as a parameter, that will be set as the content of
+    the PUT:
+
+      $c->put('something', { -content => $content });
+
+  post
+    Performs a POST request with the specified options. Returns undef on
+    failure.
+
+  request
+    Same as get/post except the first argument is the method to use.
+
+      my $c = WebService::CRUST->new;
+      $c->request( 'HEAD', $url );
+
+    Returns undef on failure.
+
+  response
+    The HTTP::Response of the last request.
+
+      $c->get('action');
+      $c->response->code eq 200 and print "Success\n";
+  
+      $c->get('invalid_action') or die $c->response->status_line;
+
+  ua
+    Get or set the LWP::UserAgent object.
+
+SEE ALSO
+    Catalyst::Model::WebService::CRUST, LWP, XML::Simple
+
+AUTHOR
+    Chris Heschong <chris@wiw.org>
+

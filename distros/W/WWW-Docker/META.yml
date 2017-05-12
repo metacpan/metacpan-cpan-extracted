@@ -1,0 +1,26 @@
+---
+abstract: 'turns baubles into trinkets'
+author:
+  - 'Shane Utt <sutt@cpan.org>'
+build_requires:
+  Test::Spec: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Docker
+requires:
+  HTTP::Request: '5.810'
+  JSON: '0'
+  LWP::Protocol::http::SocketUnixAlt: '0'
+  LWP::UserAgent: '5.810'
+  Moose: '0.34'
+  constant: '1.16'
+  namespace::autoclean: '0.01'
+  perl: '5.008001'
+version: '0.03'

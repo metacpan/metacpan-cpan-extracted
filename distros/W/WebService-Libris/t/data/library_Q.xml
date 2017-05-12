@@ -1,0 +1,12 @@
+<rdf:rdf xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+        
+    <rdf:description rdf:about="http://libris.kb.se/resource/library/Q">
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization" />
+        <rdfs:isdefinedby rdf:resource="http://libris.kb.se/data/library/Q" />
+        <foaf:name>Umeå universitetsbibliotek</foaf:name>
+        <geo:lat>63.823181</geo:lat>
+        <geo:long>20.305824</geo:long>
+        <foaf:homepage>http://www.ub.umu.se</foaf:homepage>
+    </rdf:description>
+</rdf:rdf>
+      

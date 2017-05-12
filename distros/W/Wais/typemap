@@ -1,0 +1,17 @@
+TYPEMAP
+DocObj **		T_PTROBJ
+SearchResponseAPDU *	T_SRAPDU
+InitResponseAPDU *	T_SRAPDU
+#############################################################################
+INPUT
+T_SRAPDU
+	if (sv_isa($arg, \"${Package}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_SRAPDU
+	sv_setref_pv($arg, \"${Package}\", (void*)$var);

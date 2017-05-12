@@ -1,0 +1,15 @@
+Revision history for Perl extension WWW-Connpass
+
+0.03 2016-08-24T01:48:04Z
+
+    - fixed bugs
+    - added `fetch_participants_info` API for WWW::Connpass::Session
+
+0.02 2016-05-22T14:17:29Z
+
+    - implement some features
+
+0.01 2016-05-18T11:47:04Z
+
+    - original version
+

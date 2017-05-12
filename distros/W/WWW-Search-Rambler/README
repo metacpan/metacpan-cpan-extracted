@@ -1,0 +1,30 @@
+WWW-Search-Rambler version 0.03
+===============================
+
+This module is backend for WWW::Search engine for searching in
+http://www.rambler.ru.
+Example of using this module in `example/rambler-ru.pl'.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Search
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Artur Penttinen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,122 @@
+NAME
+    Web::ID - implementation of WebID (a.k.a. FOAF+SSL)
+
+SYNOPSIS
+     my $webid = Web::ID->new(certificate => $pem_encoded_x509);
+     if ($webid->valid)
+     {
+       say "Authenticated as: ", $webid->uri;
+     }
+
+DESCRIPTION
+    WebID is a simple authentication protocol based on TLS (Transaction Layer
+    Security, better known as Secure Socket Layer, SSL) and the Semantic Web.
+    This module provides a Perl implementation for authenticating clients
+    using WebID.
+
+    For more information see the Web::ID::FAQ document.
+
+    Bundled with this module are Plack::Middleware::Auth::WebID, a plugin for
+    Plack to perform WebID authentication on HTTPS connections; and
+    Web::ID::Certificate::Generator, a module that allows you to generate
+    WebID-enabled certificates that can be installed into web browsers.
+
+  Constructor
+    `new`
+        Standard Moose-style constructor.
+
+  Attributes
+    `certificate`
+        A Web::ID::Certificate object representing and x509 certificate,
+        though a PEM-encoded string will be coerced.
+
+        This is usually the only attribute you want to pass to the
+        constructor. Allow the others to be built automatically.
+
+    `first_valid_san`
+        Probably fairly uninteresting. This is the first subjectAltName value
+        found in the certificate that could be successfully authenticated
+        using Web::ID. An Web::ID::SAN object.
+
+    `uri`
+        The URI associated with the first valid SAN. A URI object.
+
+        This is a URI you can use to identify the person, organisation or
+        robotic poodle holding the certificate.
+
+    `profile`
+        Data about the certificate holder. An RDF::Trine::Model object. Their
+        FOAF file (probably).
+
+    `valid`
+        Boolean.
+
+  Methods
+    `node`
+        Returns the same as `uri`, but as an RDF::Trine::Node object.
+
+    `get(@predicates)`
+        Queries the `profile` for triples of the form:
+
+          $self->node $predicate $x .
+
+        And returns literal and URI values for $x, as strings.
+
+        $predicate should be an RDF::Trine::Node, or a string. If a string, it
+        will be expanded using RDF::Trine::NamespaceMap, so you can do stuff
+        like:
+
+          my $name   = $webid->get('foaf:name', 'rdfs:label');
+          my @mboxes = $webid->get('foaf:mbox');
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Web-ID>.
+
+SEE ALSO
+    Web::ID::FAQ.
+
+    Web::ID::Certificate, Plack::Middleware::Auth::WebID.
+
+    RDF::ACL provides an access control system that complements WebID.
+
+    CGI::Auth::FOAF_SSL is the spiritual ancestor of this module though they
+    share very little code, and have quite different APIs.
+
+    General WebID information: <http://webid.info/>,
+    <http://www.w3.org/wiki/WebID>,
+    <http://www.w3.org/2005/Incubator/webid/spec/>,
+    <http://lists.foaf-project.org/mailman/listinfo/foaf-protocols>.
+
+    Mailing list for general Perl RDF/SemWeb discussion and support:
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+THANKS
+    Thanks to Kjetil Kjernsmo (cpan:KJETILK) for persuading me to port my old
+    CGI-specific implementaton of this to Plack.
+
+    Thanks Kjetil Kjernsmo (again), Florian Ragwitz (cpan:FLORA), and Jonas
+    Smedegaard for help with testing and advice on dependencies.
+
+    Thanks to Henry Story, Melvin Carvalho, Simon Reinhardt, Bruno Harbulot,
+    Ian Jacobi and many others for developing WebID from a poorly thought out
+    idea to a clever, yet simple and practical authentication protocol.
+
+    Thanks to Gregory Williams (cpan:GWILLIAMS), Tatsuhiko Miyagawa
+    (cpan:MIYAGAWA) and the Moose Cabal for providing really good platforms
+    (RDF::Trine, Plack and Moose respectively) to build this on.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

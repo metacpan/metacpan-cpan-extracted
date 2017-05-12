@@ -1,0 +1,30 @@
+Revision history for WebService-ReutersConnect
+
+0.06    20 Mar 2013
+        - Added missing files in manifest. Do'h
+
+0.05    20 Mar 2013
+        - Added shell 'reutersconnect'
+        - Added dirty demo page scraping for the very lazy
+        - Depends only on debian distributed Perl modules
+        - Tests will be skipped instead of failing when missing exotic modules
+
+0.04    24 Dec 2012
+        - Added client instance creation datetime.
+        - Added broader concept links.
+        - Made compatible with stock squeeze version of DBIx::Class (0.08123)
+
+0.03    16 Dec 2012 
+        - Requiring minimal perl 5.10.
+        - Added built-in Reuters data about Concepts (aka subjects).
+        - Added Convenience Methods To the WebService::ReutersConnect::XMLDocument
+        - Avoid warnings when Log4perl is not initialized
+        - Fixed some documentation
+
+0.02    30 Nov 2012
+        - Made test independent from Reuters Servers using LWP::UserAgent::Mockable
+        - Fixed some documentation
+
+0.01    22 Nov 2012
+        First version, released on an unsuspecting world.
+

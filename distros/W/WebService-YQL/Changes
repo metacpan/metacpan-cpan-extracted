@@ -1,0 +1,13 @@
+Revision history for Perl module WebService::YQL
+
+0.01 Fri Jul 10 07:22:34 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.02 Fri Jul 10 09:10:31 EEST 2009
+    - fixed POD formatting
+
+0.03 Mon Jul 13 08:21:56 EEST 2009
+    - renamed from WWW::YQL to WebService::YQL
+    - fixed RT #51233
+    - specified required dependencies
+

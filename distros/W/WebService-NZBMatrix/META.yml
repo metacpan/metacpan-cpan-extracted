@@ -1,0 +1,18 @@
+---
+abstract: 'Provides an object oriented interface to the NZBMatrix APIs.'
+author:
+  - 'Chris Portman <chrisportman@internode.net.au>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-NZBMatrix
+requires:
+  LWP::UserAgent: 0
+  strict: 0
+version: 0.002

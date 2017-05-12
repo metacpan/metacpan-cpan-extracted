@@ -1,0 +1,27 @@
+PEFile object layout:
+
+-file:      # Path to the file being processed
+COFFHeader: # Decoded COFF header parameters
+DataDir:    # Directory of section locations
+err:        # Last error message
+is32PE:     # true if the object represents a PE32+ image
+MSDOSStub:  # raw binary blob
+ok:         # true if the object is in a good state
+OptionalHeader: # Decoded OptionalHeaders parameters
+peOffset:   # Byte offset to the start of the COFF header
+SecData:    # Data managed by section handlers keyed by section name
+
+DataDir:
+    {section name}:
+        {imageRVA}: # Relative virtual address - 0 if empty
+        {size}:     # Raw data size - 0 if empty
+        {filePos}:  # File pos for raw data - 0 if not determined
+        {fileBias}: # filePos to imageRVA adjustment
+
+SecData:
+    {section name}:
+        {header}:   # Section header
+        {raw}:      # Section raw data blob or ref to blob image in file
+        {added}:    # Data added by client. _assemble data builds or updates
+                    # {raw} and {header} using this content. Content is section
+                    # specific.

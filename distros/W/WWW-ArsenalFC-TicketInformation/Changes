@@ -1,0 +1,10 @@
+1.123160  2012-11-11 18:20:11 Europe/London
+    Use HTTP::Online to check for online access when running tests/
+
+1.122600  2012-09-16 09:37:33 Europe/London
+    Fix populating the availabilities membership data.
+    Remove dependency on Data::Dumper.
+    Doc updates.
+
+1.122590  2012-09-15 16:02:14 Europe/London
+    Initial version.

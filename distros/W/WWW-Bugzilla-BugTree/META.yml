@@ -1,0 +1,32 @@
+---
+abstract: 'Fetch a tree of bugzilla bugs blocking a bug'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  Test::Script: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Bugzilla-BugTree
+requires:
+  LWP::UserAgent: '0'
+  Moo: '2.0'
+  Ref::Util: '0'
+  Term::ANSIColor: '0'
+  Term::Clui: '0'
+  URI: '0'
+  XML::Simple: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/plicease/WWW-Bugzilla-BugTree/issues
+  homepage: http://perl.wdlabs.com/WWW-Bugzilla-BugTree
+  repository: git://github.com/plicease/WWW-Bugzilla-BugTree.git
+version: '0.07'

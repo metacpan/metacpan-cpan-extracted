@@ -1,0 +1,37 @@
+---
+abstract: 'class to assist in interacting with DanDomain admin interface'
+author:
+  - 'Jonas B. Nielsen (jonasbn) <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.30
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build: 0.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-DanDomain
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Env: 0
+  File::Slurp: 0
+  Test::Exception: 0
+  Test::MockObject::Extends: 0
+  Test::More: 0
+  Try::Tiny: 0
+  WWW::Mechanize: 0
+  WWW::Mechanize::Cached: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/jonasbn/dand/issues
+  homepage: http://logicLAB.jira.com/browse/DAND
+  repository: https://github.com/jonasbn/dand.git
+version: 0.08

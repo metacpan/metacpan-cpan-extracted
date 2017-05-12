@@ -1,0 +1,29 @@
+######################################################################
+## File: $Id: README 3442 2005-05-14 14:14:01Z spadkins $
+######################################################################
+
+1. What is the WWW-WebArchive distribution?
+
+It is a set of modules to retrieve old versions of public web pages
+from various web archives.
+
+  * http://www.archive.org - Internet Archive's Wayback Machine
+  * http://www.google.com  - Google's page cache
+
+This is useful if
+
+ 1. Your web server crashed and you didn't have complete backups
+ 2. A site (such as a valuable reference source) changed or went away
+    and you want to restore an old version of the site to your local
+    disk
+
+2. How do I install it?
+
+To install this distribution, cd to the directory that contains this README
+file and type the following (as usual).
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

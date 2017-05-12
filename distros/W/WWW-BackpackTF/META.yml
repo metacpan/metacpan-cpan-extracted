@@ -1,0 +1,26 @@
+---
+abstract: 'interface to the backpack.tf trading service'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-BackpackTF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::MaybeXS: '0'
+  PerlX::Maybe: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=www-backpacktf.git
+version: '0.002001'

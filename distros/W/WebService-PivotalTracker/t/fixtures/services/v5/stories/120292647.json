@@ -1,0 +1,24 @@
+{
+   "created_at" : "2016-05-25T16:10:06Z",
+   "current_state" : "unscheduled",
+   "description" : "We want to do a thing.",
+   "id" : 120292647,
+   "kind" : "story",
+   "labels" : [
+      {
+         "created_at" : "2016-01-28T20:03:18Z",
+         "id" : 13915187,
+         "kind" : "label",
+         "name" : "dev project",
+         "project_id" : 557367,
+         "updated_at" : "2016-01-28T20:03:18Z"
+      }
+   ],
+   "name" : "Do a thing!",
+   "owner_ids" : [],
+   "project_id" : 557367,
+   "requested_by_id" : 670657,
+   "story_type" : "feature",
+   "updated_at" : "2016-05-25T16:10:06Z",
+   "url" : "https://www.pivotaltracker.com/story/show/120292647"
+}

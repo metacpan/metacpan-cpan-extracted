@@ -1,0 +1,54 @@
+Revision history for Perl extension Win32::DirSize.
+
+0.01  2003-03-05
+	- original version; created by h2xs 1.21 with options
+		-X -n Win32::DirSize -v 0.01
+1.00  2003-03-08
+	- re-written to use XS.
+	- fixed bug whereby "exbibytes" came after "tebibytes"
+		instead of "pebibytes".
+1.01  2003-08-08
+	- fixed bug whereby best_convert() would incorrectly
+		return -1 for sizes under 1024 bytes.
+		(Thanks Chuck Lawhorn)
+	- corrected readme file.
+1.02  2003-10-28
+	- fixed trailing slash code that caused $Directory to
+		be displayed wrong.
+	- fixed gzip files in ppm.zip to correct problem with
+		ppm version not installing properly.
+		(Thanks Chuck Lawhorn)
+	- added double-slash removal code.
+	- small documentation changes.
+1.03  2003-10-29
+	- fixed "Modification of a read-only value attempted"
+		error message
+1.10  2003-12-15
+	- rewrote almost completely from the ground up (So the
+		code is now cleaner, more efficient, maybe
+		faster too)
+	- added support for Unicode paths.
+	- added support for paths longer than 260 characters.
+	- added support for "Size on Disk" calculation
+		(Thanks for Victor Dozal for the suggestion)
+	- added support for entire-disk size & free calculaton.
+	- added string representation of 64-bit numbers.
+	- fixed bug preventing scanning of UNC paths.
+		(Thanks Chuck Lawhorn)
+	- exported constants using the constant module, rather
+		than the XS method.
+
+1.11  2003-12-15
+	- fixed a bug in best_convert() that caused sizes
+		greater than 4 GiB to be shown in MiB.
+
+1.12  2003-12-16
+	- fixed a null termination bug in best_convert() 
+		and size_convert (Thanks Chuck Lawhorn)
+
+1.13  2005-05-02
+	- fixed a warning in best_convert: 
+		"Use of uninitialized value in subroutine entry" 
+		(Thanks Mike Freedman)
+	- corrected a possible access violation during
+		an out-of-memory condition

@@ -1,0 +1,3 @@
+- Needs more tests.
+
+- Need to write find_internal_links method (see Wiki::Toolkit::Formatter::Default).

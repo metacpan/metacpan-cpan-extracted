@@ -1,0 +1,27 @@
+0.04    2015-11-17
+        * Bumped version of Win32::Netsh
+        * In Win32::Netsh::Interface, corrected problem when calling 
+          interface_info_all() on Windows XP
+          
+0.03    2015-11-17
+        * In Win32::Netsh:
+          + Added netsh_context_found() to determine if a context is supported
+            on the system
+        * Updated Win32::Netsh::Wlan tests skip all tests if the wlan context
+          was not supported.
+          
+0.02    2015-11-16
+        * In Win32::Netsh:
+          + Added netsh_path() to allow setting an alternative path to the
+            netsh command
+          + Added can_netsh() to determine if the netsh command can be located
+            and run successfully
+        * In Win32::Netsh::Wlan:
+          + In wlan_profile_info() and wlan_profile_info_all(), the ssid key
+            is now an array reference to a list of ssid strings to allow
+            support for profiles with more than one SSID defined
+          + Added wlan_connect() and wlan_disconnect()
+        * Updated Win32::Netsh::Wlan tests to add and delete test profiles
+
+0.01    2015-11-12
+        * Initial release of 0.01

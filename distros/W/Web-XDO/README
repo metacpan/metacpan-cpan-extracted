@@ -1,0 +1,446 @@
+NAME
+
+    Web::XDO -- static web site tool
+
+SYNOPSIS
+
+     #!/usr/bin/perl -wT
+     use strict;
+     use Web::XDO;
+     
+     # variables
+     my ($xdo);
+     
+     # get XDO object
+     $xdo = Web::XDO->new();
+     
+     # custom configurations here
+     
+     # output XDO page
+     $xdo->output();
+
+DESCRIPTION
+
+    XDO ("extensible document objects") is a tool for creating simple
+    static web sites. Full documentation for XDO is in the official web
+    site <http://www.idocs.com/xdo/>. This POD documentation focuses on the
+    internals of Web::XDO.
+
+INSTALLATION
+
+    The module Web::XDO can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+    After you install Web::XDO you should check out the online installation
+    guide <http://idocs.com/xdo/guides/version-0-10/install/> for the
+    remaining steps.
+
+OVERVIEW
+
+    Web::XDO is called from a Perl CGI script that you write. The script
+    should look something like this:
+
+     #!/usr/bin/perl -wT
+     use strict;
+     use Web::XDO;
+     
+     # variables
+     my ($xdo);
+     
+     # get XDO object
+     $xdo = Web::XDO->new();
+     
+     # custom configurations here
+     
+     # output XDO page
+     $xdo->output();
+
+    The $xdo object does all the work or creating a CGI object, parsing and
+    processing the contents of the .xdo page, and outputing the results.
+    This POD page documents thos internals.
+
+CLASSES
+
+ Web::XDO
+
+  Web::XDO->new()
+
+    Web::XDO->new() creates a new Web::XDO object. It takes no parameters
+    or options.
+
+     # get XDO object
+     $xdo = Web::XDO->new();
+
+  $xdo->initial_tag_defs()
+
+    initial_tag_defs() is a private method that defines the default
+    behavior of XDO and HTML tags. In subsequent releases the hash of tag
+    definitions will be configurable.
+
+  $xdo->output()
+
+    output() outputs the requested XDO page. It take no params or options.
+
+  $xdo->show_src()
+
+    show_src() is a private method that handles showing the XDO code when
+    the src URL parameter
+    <http://idocs.com/xdo/guides/version-0-10/configuration/src-param/> is
+    sent.
+
+  $xdo->xdo_significant_tag($token)
+
+    xdo_significant_tag() is a private method that returns true if the
+    given token is specially processed by XDO, as opposed to output as-is
+    for tags that aren't significant. So, for example, an <included> tag is
+    significant, but the <i<gt> tag is not.
+
+  $xdo->page_class()
+
+    page_class() returns the class name for an object representing an XDO
+    page. Right now page_class() always returns Web::XDO::Page. In
+    susequent releases this method will allow coders to create custom
+    classes for different types of pages. I haven't worked out the details
+    on how that's going to work.
+
+  $xdo->default_tag_class()
+
+    default_tag_class() returns the tag class used for tags that are not
+    recognized by XDO. In subsequent releases programmers will be able to
+    override Web::XDO and have this method return their own custom tag
+    class.
+
+  $xdo->status_404()
+
+    status_404() outputs a "404 Not Found" page and exits. This method is
+    called when the requested XDO page is not found.
+
+  $xdo->adjust_url_for_root($url)
+
+    adjust_url_for_root() is an internal method that removes <xdo-root>
+    from the beginning of a URL and substitutes in the value of
+    $xdo->{'root'}
+    <http://idocs.com/xdo/guides/version-0-10/configuration/xdo-root/>.
+    Care is taken in this method to ensure that a single / is put between
+    <xdo-root> and whatever comes after it.
+
+  $xdo->tag_class()
+
+    tag_class() is an internal method for determining the class name for a
+    given tag name. If the tag is defined in $xdo->{'tags'} then that name
+    is returned, otherwise the value of $xdo->default_tag_class() is
+    returned.
+
+    In subsequent programmers will be able to superclass Web::XDO and
+    override this method to use their own routines for determining tag
+    class.
+
+ Web::XDO::Page
+
+    A Web::XDO::Page object represents a single XDO file. When an XDO page
+    is requested, the corresponding XDO file is parsed into a
+    Web::XDO::Page object. Each page that object includes is itself parsed
+    into a Web::XDO::Page object.
+
+    Web::XDO::Page superclasses HTML::Parser
+    <http://search.cpan.org/dist/HTML-Parser/Parser.pm>. The XDO file is
+    parsed as part of Web::XDO::Page->new().
+
+  Web::XDO::Page->new()
+
+    Web::XDO::Page->new() takes four parameters plus one optional
+    parameter:
+
+      * $class: The name of the page class. For this release it's always
+      "Web::XDO::Page".
+
+      * $url_root: The base page against which an absoulte URL path should
+      be calculated from $url_rel_path. Yes, this variable should actually
+      be called $url_base. That will be fixed in subsequent releases.
+
+      * $url_rel_path: The relative URL path from $url_root.
+
+      * $xdo: The Web::XDO object that is handling the entire process.
+
+      * caller=>$page
+
+      If a page is being included in another page then the included page
+      needs to know its "caller" page. That information is set with the
+      caller option. So, for example, the <included> tag creates the
+      included page object with a call like this:
+
+       $included = $xdo->page_class->new($url_base, $atts->{'src'}, $xdo, 'caller'=>$caller);
+
+      If a caller is sent then that object is stored in the included page
+      in the $page->{'caller'} property.
+
+  $page->top()
+
+    This method returns the top page in the hierarchy of included pages. If
+    a Web::XDO::Page object is created with the 'caller' option (which
+    means the caller page is stored in $page->{'caller'}), then the page's
+    caller's top() method is called and returned. The top() method is
+    called recursively up the hierarchy until the top page (which has no
+    caller) is reached. The top page returns itself and that result is
+    returned back down the hierarchy to page that initiated the routine.
+
+  $page->top_props()
+
+    Returns the top page's {'props'} hash. Only the top page should have a
+    {'props'} hash and only properties in that hash should be set.
+
+  $page->set_paths($url_root, $url_rel_path)
+
+    This internal method sets the page's url_path property to an absolute
+    path. The absolute path is calculated using the $url_root and
+    $url_rel_path params. The final result is put into the
+    $page->{'url_path'}.
+
+    Note: I put a lot of effort into addressing attempts to read files
+    outside the document root. A particular concern is for someone to send
+    a request directly to xdo.pl with something like this:
+
+     xdo.pl?p=../../../../../etc/passwd
+
+    If set_paths() doesn't properly filter the request then such a request
+    could return unauthorized files.
+
+  $page->output()
+
+    output() outputs the page.
+
+  $page->start()
+
+    Web::XDO::Page superclasses HTML::Parser
+    <http://search.cpan.org/dist/HTML-Parser/Parser.pm>. start() handles
+    HTML::Parser's event when a start tag is parsed.
+
+    start() creates a new tag object using the class returned by
+    $xdo->tag_class().
+
+  $page->end()
+
+    end() handles HTML::Parser's event when an end tag is parsed. end()
+    creates a new end tag object with the Web::XDO::Token::EndTag class.
+
+  $page->text()
+
+    text() handles HTML::Parser's event when an end tag is parsed. text()
+    creates a new text object with the Web::XDO::Token::Text class.
+
+  $page->is_directory_index()
+
+    is_directory_index() returns true if the XDO page is a directory index
+    <http://httpd.apache.org/docs/2.2/mod/mod_dir.html#directoryindex>
+    file. Generally you should configure your server
+    <http://idocs.com/xdo/guides/version-0-10/install/configure-web-server.
+    xdo> so that the directory index file is named index.xdo.
+
+  $page->url_path_sans_directory_index()
+
+    This method returns the $page->{'url_path'} property with the name of
+    the directory index file removed. If the page is not a directory index
+    file then the path isn't changed. So, for example, this url_path
+
+     /mysite/index.xdo
+
+    would be return as /mysite/, whereas this url_path
+
+     /mysite/resume.xdo
+
+    would be returned as /mysite/resume.xdo.
+
+  $page->title()
+
+    This method returns the title of the page as set with the <property>
+    tag. The tag should have the name attribute set to "title", like this:
+
+     <property name="title" value="My Home Page">
+
+    If the path option is sent, and if a property of path-title is set,
+    then path-title will be returned. The path-title is used with the
+    <path> tag. So, for example, suppose you want the title of your home
+    page to be "My Home Page" when the page itself is displayed, but just
+    "Home" for a link to it in the path, then you would set the <property>
+    tags like this:
+
+     <property name="title" value="My Home Page">
+     <property name="path-title" value="Home">
+
+    title() would be called like this:
+
+     $page->title(path=>1)
+
+  $page->parent()
+
+    parent() returns the page's parent page. Be careful to avoid confusing
+    the terms "caller" and "parent". "caller" is the page that is embedding
+    the page represented by this object. "parent" is the page that is one
+    step up in the web site hierarchy. The parent page is always going to
+    be either a directory index file or (for the home page) nothing.
+
+  $page->path_pages()
+
+    path_pages() returns an array of the pages in the web site hierarcy
+    leading down to and including the page represented by this object. In
+    array context this method returns an array. In scalar context it
+    returns an array reference.
+
+  $page->link_path()
+
+    This method returns the URL path to link to the page represented by
+    this object. This method always returns an absolute path.
+
+ Web::XDO::Token
+
+    This class represents a generic token in an XDO page. All token classes
+    superclass this class.
+
+  $class->new()
+
+    Creates a new Web::XDO::Token object and returns it. Doesn't do
+    anything else.
+
+  $token->output()
+
+    Outputs $token->{'raw'} if it is defined. This method is overridden by
+    many tag classes.
+
+ Web::XDO::Token::Tag
+
+    This class represents a tag. This is the default class for tags that
+    XDO doesn't recognize. This class superclasses Web::XDO::Token.
+
+  $tag->add_class()
+
+    This method adds a CSS class to the tag's "class" attribute. If such an
+    attribute doesn't already exist then it is created. If the new CSS
+    class is already in the "class" attribute then no change is made.
+
+    After calling add_class() and before outputting the tag you should call
+    $tag->rebuild() or the output tag will not have the added class.
+
+  $tag->rebuild()
+
+    rebuild() rebuilds the $tag->{'raw'} attribute. 'raw' is the string
+    that is output by $token->output().
+
+  $tag->adjust_atts_for_root()
+
+    adjust_atts_for_root() modifies the given tag attributes if they have
+    the <xdo-root> tag.
+
+  $tag->content()
+
+    Returns the elements contained within the tag represented by this
+    object. The elements are removed from the page's tokens array. The end
+    tag is removed from the tokens array but is not returned by this
+    method.
+
+    $tag->contents() is an alias for $tag->content().
+
+  $tag->included_page()
+
+    This method returns a page object representing the page referenced in a
+    tag. Most commonly this method is used by <included> to retrieve the
+    included page.
+
+  $tag->output()
+
+    Outputs the tag. $tag->adjust_atts_for_root() is called before the tag
+    is output.
+
+ Web::XDO::Token::Tag::Include
+
+    This class represents an <include> tag. This tag embeds the referenced
+    page in the current page.
+
+ Web::XDO::Token::Tag::Property
+
+    This class represents a <property> tag. That tag sets a page property.
+    It does not output anything.
+
+  $property->set_page_prop()
+
+    This method sets a property of the top page.
+
+  $property->output()
+
+    This method sets a property of the top page again. When an XDO page is
+    loaded the properties of the page are set as the page is parsed.
+    Because properties can be changed between parsing and output, the
+    <property> tag sets properties in both parsing and output.
+
+ Web::XDO::Token::Tag::ShowProperty
+
+    This class represents a <show-property> tag. This tag outputs the
+    property of the top page's that is named in the "name" attribute. Note
+    that the value of the property is not HTML-escaped.
+
+ Web::XDO::Token::Tag::XdoRoot
+
+    This class represents an <xdo-root>
+    <http://idocs.com/xdo/guides/version-0-10/tags/xdo-root/> tag. This tag
+    outputs the $xdo object's {'root'} property.
+
+ Web::XDO::Token::Tag::Wrapper
+
+    This class represents a <wrapper>
+    <http://idocs.com/xdo/guides/version-0-10/tags/wrapper/> tag. The
+    contents of the <wrapper> tag are used to replace the included page's
+    <wrapper-content> tag.
+
+ Web::XDO::Token::Tag::WrapperContent
+
+    This class represents a <wrapper-content>
+    <http://idocs.com/xdo/guides/version-0-10/tags/wrapper/> tag.
+
+    This tag itself does not output anything. The <wrapper-content> tag is
+    a placeholder. When a <wrapper> tag is output it removes the
+    <<wrapper-content> tag and substitutes in its own contents.
+
+ Web::XDO::Token::Tag::XdoTest
+
+    This class represents an <xdo-test>
+    <http://idocs.com/xdo/guides/version-0-10/tags/xdo-test/> tag.
+
+ Web::XDO::Token::Tag::Parent
+
+    This class represents a <parent>
+    <http://idocs.com/xdo/guides/version-0-10/tags/parent/> tag.
+
+ Web::XDO::Token::Tag::Path
+
+    This class represents a <path>
+    <http://idocs.com/xdo/guides/version-0-10/tags/path/> tag.
+
+ Web::XDO::Token::Tag::A
+
+    This class represents an <a>
+    <http://idocs.com/xdo/guides/version-0-10/tags/a/> tag.
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2013 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHORS
+
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+
+    Version 0.10 - December 1, 2013
+
+      Initial release
+
+    Version 0.11 - December 2, 2013
+
+      Fixed problem with prerequisites.
+

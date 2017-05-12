@@ -1,0 +1,72 @@
+---
+abstract: 'a framework for building data service applications for the Web'
+author:
+  - 'Michael McClennen <mmcclenn@cpan.org>'
+build_requires:
+  Module::Build: '0.42'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-DataService
+provides:
+  Web::DataService:
+    file: lib/Web/DataService.pm
+    version: '0.254'
+  Web::DataService::Document:
+    file: lib/Web/DataService/Document.pm
+  Web::DataService::Execute:
+    file: lib/Web/DataService/Execute.pm
+  Web::DataService::Format:
+    file: lib/Web/DataService/Format.pm
+  Web::DataService::IDocument:
+    file: lib/Web/DataService/IDocument.pm
+  Web::DataService::IRequest:
+    file: lib/Web/DataService/IRequest.pm
+  Web::DataService::Node:
+    file: lib/Web/DataService/Node.pm
+  Web::DataService::Output:
+    file: lib/Web/DataService/Output.pm
+  Web::DataService::Plugin::Backend:
+    file: lib/Web/DataService.pm
+  Web::DataService::Plugin::Dancer:
+    file: lib/Web/DataService/Plugin/Dancer.pm
+  Web::DataService::Plugin::JSON:
+    file: lib/Web/DataService/Plugin/JSON.pm
+  Web::DataService::Plugin::TemplateToolkit:
+    file: lib/Web/DataService/Plugin/TemplateToolkit.pm
+  Web::DataService::Plugin::Templating:
+    file: lib/Web/DataService.pm
+  Web::DataService::Plugin::Text:
+    file: lib/Web/DataService/Plugin/Text.pm
+  Web::DataService::PodParser:
+    file: lib/Web/DataService/PodParser.pm
+  Web::DataService::Render:
+    file: lib/Web/DataService/Render.pm
+  Web::DataService::Request:
+    file: lib/Web/DataService/Request.pm
+  Web::DataService::Ruleset:
+    file: lib/Web/DataService/Ruleset.pm
+  Web::DataService::Set:
+    file: lib/Web/DataService/Set.pm
+  Web::DataService::Vocabulary:
+    file: lib/Web/DataService/Vocabulary.pm
+recommends:
+  Dancer::Plugin::Database: '0'
+  Template: '0'
+requires:
+  Dancer: '1'
+  HTTP::Validate: '0.45'
+  JSON: '2'
+  Moo: '1'
+  YAML: '0'
+  namespace::clean: '0.16'
+  perl: '5.012'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.254'

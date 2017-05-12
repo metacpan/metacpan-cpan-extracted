@@ -1,0 +1,52 @@
+Revision history for Perl module WebService::DigitalOcean.
+
+0.026 2016-12-10T14:29:54Z
+    - Fix warning of unexpected content type when deleting droplet.
+
+0.025 2016-10-17T14:15:06Z
+    - Respect proxies environment settings
+    - Be more explicit about requirements
+    - Clarify comments about fake tokens
+
+0.024 2015-08-17T20:03:34Z
+    - Create Image role (thanks Evan Staton)
+    - Update links to upstream documentation (thanks Evan Staton)
+
+0.023 2015-01-17T03:37:56Z
+    - Fix documentation formatting in one of the methods, which was still using
+      the old format: $do->region_list()
+    - Update Changes file for 0.022 version
+
+0.022 2015-01-17T03:29:11Z
+    - Yet another rework in docs, changing the way the methods were listed
+    - Create a test helper class
+    - Create the first useful unit test
+
+0.021 2015-01-14T18:37:33Z
+    - Add user_data argument for droplet_create
+    - Improve POD format in docs
+
+0.020 2014-12-03T21:32:39Z
+    - BACK INCOMPATIBLE CHANGE: simplify return value of all methods in the
+      "content" key of the resulting hashref, omitting the unnecessary first
+      key
+    - Rework documentation to include all methods in the main module
+
+0.011 2014-10-28T16:39:08Z
+    - Fix variable scope, which broke random systems
+
+0.010 2014-10-25T20:07:57Z
+    - BACK INCOMPATIBLE CHANGE: Rework entire API to use hashrefs arguments,
+      instead of hashes
+    - Documentation improvements
+    - Remove PWP::Encoding author dep
+    - Create DropletActions, Sizes and Regions role
+
+0.003 2014-07-24T13:43:37Z
+    - Improve documentation
+
+0.002 2014-07-22T17:57:10Z
+    - Create Keys role for SSH Keys management.
+
+0.001 2014-07-21T15:21:52Z
+    - Initial release.

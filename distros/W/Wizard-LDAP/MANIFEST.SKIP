@@ -1,0 +1,6 @@
+^blib/
+~$
+^ldapWizard|wizard|ldapAdmin$
+^pm_to_blib$
+^Makefile(.old)?$
+^lib/.*/Config.pm$

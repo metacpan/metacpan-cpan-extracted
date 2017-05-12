@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-MyNewsletterBuilder.t
+lib/WWW/MyNewsletterBuilder.pm

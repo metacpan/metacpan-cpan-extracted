@@ -1,0 +1,344 @@
+Changes -*- org -*-
+:   ____ _                              _                
+:  / ___| |__   __ _ _ __   __ _  ___  | |    ___   __ _ 
+: | |   | '_ \ / _` | '_ \ / _` |/ _ \ | |   / _ \ / _` |
+: | |___| | | | (_| | | | | (_| |  __/ | |__| (_) | (_| |
+:  \____|_| |_|\__,_|_| |_|\__, |\___| |_____\___/ \__, |
+:                          |___/                   |___/ 
+
+* Release 0.22 [2016-05-18 Wed]
+
+Fixes for AUR4, adding git info, fixed the scraper to update the 
+fields to the AUR4 packages page and updated a few tests to reflect
+AUR4 related changes.
+
+* Release 0.19 [2014-01-04 Sun]
+
+Fixes the 01-info.t test. The ``clyde-git'' package was removed
+from the AUR. The test looked up clyde-git in order to make
+sure the AUR::RPC::Info::info sub worked properly. Now we look
+up the ``yaourt'' package because it is the most popular
+package on the AUR.
+
+* Release 0.18 [2013-12-29 Sun]
+
+** Fix incorrect categories used by WWW::AUR::Login::upload()
+
+When submitting a source package file to the AUR, categories are
+submitted as an ordinal. All this time I thought they were all
+sorted but it turns out some are out of order.
+
+Patch submitted by Dylon Edwards. Thanks!
+
+** Internal WWW::AUR::RPC::info func changed.
+
+The return type of WWW::AUR::RPC::info change from a hash (list)
+to a hashref. An empty result was being returned as an empty
+hash where instead I thought an undef reference would be more
+fitting.
+
+* Release 0.17 [2012-12-11 Mon]
+
+** Fix WWW::AUR::Login to use the new login and submit URLs.
+
+The old AUR allowed logins from any webpage. The new AUR only allows
+logins from the /login/ page. Package submition now takes place at
+the /submit/ URL.
+
+** Fix compilation error for perl 5.17.
+
+Perl version 5.17 does not like unescaped open curly brackets in
+regexps. CPAN testers kept sending me fail reports.
+
+** More JSON RPC updates.
+
+I missed some obsolete code.
+
+** Switch the default url scheme to https.
+
+Because JSON now only works with https we require the https support.
+Almost everything requires JSON so we might as well use https for
+everything else, too.
+
+** Fix a typo in WWW::AUR::RPC.
+
+msearch had a call to status_code instead of status_line for an
+HTTP::Response object.
+
+* Release 0.16 [2012-11-09 Fri]  
+
+** Update WWW::AUR::RPC for RPC JSON changes.
+
+The JSON changed in several ways. An error is no longer emitted when
+there are no results. Result counts were added to the results (but not
+used).  Creation time and modification time were added. We can also
+use the maintainer name from the JSON results instead of needing a
+seperate page scrape.
+
+** Fix package list scraping to work for new AUR HTML design.
+
+WWW::AUR::Iterator was broken because the HTML changed. This has been
+updated and the id element of the iterator was removed because that
+information is no longer supplied. The packages.php URL was also changed
+to packages/.
+
+** Fix missed updates for RPC changes.
+
+Remove more error checking when no results are found, which no longer applies.
+The WWW::AUR::URI::rpc_uri sub always uses https no matter which scheme is
+specified by $WWW::AUR::Scheme.
+
+* Release 0.15 [2012-06-26 Tue]                                         :FIX:
+
+** Update WWW::AUR::Login to use the new security token for actions.
+
+The aur.archlinux.org website was updated to require a new security token
+for package actions. This prevents XSS vulnerabilities. The token is the
+same as the session ID cookie.
+
+* Release 0.14 [2012-02-22 Wed]
+
+** Message checking for unnotify action response had a typo.            :FIX:
+
+If you used the unnotify method of a Login object, the code that checks
+the response from the website had a missing character in it. So unnotify
+would always appear to fail.
+
+* Release 0.13 [2011-11-06 Sun]
+
+** WWW::AUR::Iterator yields proper vote count and category.            :FIX:
+
+Previously, the vote count was mistaken for the category id. Neato!
+The hash key names that WWW::AUR::Iterator::next() returns are also
+changed slightly. 'maintainer' is shortened to 'maint' and 'category'
+is shortened to 'cat'.
+
+* Release 0.12 [2011-08-21 Sun]
+
+** Update PKGBUILD and package file URLs to match AUR changes.
+
+AUR package URLs are now stored under a new directory component.
+The new url component consists of the first two characters in the
+name of the package.
+
+The old URLs still work but I thought it wise to upgrade. Also
+adds a new 12-url.t test for simple URL tests.
+
+** Adds the multiinfo method to the WWW::AUR::RPC module.
+
+Yeah, the WWW::AUR::RPC module is undocumented and only used
+internally... but what the heck! I don't seem to have a use
+for it yet but maybe one day.
+
+* Release 0.11 [2011-07-10 Sun]
+
+** Fix tests, perl-cpanplus-dist-arch has moved to community.
+
+We can no longer look up the perl-cpanplus-dist-arch package on the
+AUR since it is not there anymore.
+
+* Release 0.10 [2011-05-25 Wed]
+
+** Add set_pos() method to WWW::AUR::Iterator.
+
+This is nice if you want to start iterating where you left off
+last. Keep in mind that the value you give set_pos() is not the ID of
+the package it is simply the offset that is given to the packages.php
+webpage as a query parameter.
+
+** Depend array with extra whitespace now parses                        :FIX:
+
+The only package on the AUR that seems to have this problem is
+turbovnc-bin.  To give you an idea of the problem, the depend string
+looks like this:
+
+: depends=('turbojpegipp >=1.11')
+
+This was throwing an error from inside WWW::AUR::PKGBUILD when attempting
+to parse this.
+
+*** Adds new test to parse example PKGBUILDs from the AUR
+
+I added a new test and a new directory (t/PKGBUILDs) for testing real-
+world examples that I find on the AUR. I have already accomodated for
+some poorly written / difficult to parse PKGBUILDs but I forgot to
+write tests to them. I'll try to add more later.
+
+I wanted to be sure I could parse turbovnc-bin's PKGBUILD after making
+fixes.
+
+* Release 0.09 [2011-03-09 Wed]
+
+** Default dependency data structure
+
+I corrected the data structure that is created for a dependency which
+does not specify a version and only a package name. Without a version
+specified the dep should be satisfied by any version. The hash ref
+that is created is similiar to this:
+
+: { 'pkg' => q{...}, 'cmp' => q{>=}, 'ver' => 0, 'str' => q{...} }
+
+** Improved PKGBUILD parsing
+
+While I was using this module to iterate over the entire AUR I noticed
+there were many badly written PKGBUILDs that did not parse
+properly. Some bad (and not so bad) habits that are accounted for
+include...
+
+ - Fields which should be arrays but aren't.
+ - Backslashes (\) after every array element.
+ - Commented array elements.
+
+** Expand empty parameters
+
+Because of a mistake of mine empty but defined parameters were not
+expanded to the empty string. Now they are.
+
+** Public WWW::AUR::URI module
+
+I documented the WWW::AUR::URI module and allowed it to be indexed
+by CPAN. This module might be useful for advanced users.
+
+** WWW::AUR::Iterator is more robust
+
+WWW::AUR::Iterator was rewritten to provide more data without creating
+a WWW::AUR::Package object. The Iterator->next() method was changed to
+return a hash ref of all available data that I could scrape. The data
+is scraped from the package list (packages.php) webpage on the AUR.
+
+The old next() method which returns an object was renamed to
+next_obj().
+
+* Release 0.08 [2011-03-06 Sun]
+
+** Rename packages() method to iter()
+
+I thought packages() might be a bit misleading as to what you are
+actually getting from the method (a WWW::AUR::Iterator object).
+
+** Update PKGBUILD URL
+
+The URLs for every PKGBUILD were changed on the website. The old
+scheme was /packages/$pkgname/$pkgname/PKGBUILD. The new scheme is
+/packages/$pkgname/PKGBUILD.
+
+** Better PKGBUILD Parsing
+
+*** Splits array fields on spaces
+    
+Some poorly authored PKGBUILDs have fields which should be arrays,
+but instead are one element arrays with many elements separated
+by spaces. We split arrays on spaces where possible (everywhere
+except optdepends) and where array fields are expected.
+
+*** Crude parameter expansion added
+
+We expand previously defined bash parameters (aka PKGBUILD fields).
+The expansion is very simple, no special modifiers are recognized.
+(Only ${NAME} is expanded, not ${NAME:-default}, etc). No command
+expansion, path expansion, etc is implemented.
+
+** WWW::AUR::Package->maintainer_name() method added
+
+This is handy when you don't want a full fledged WWW::AUR::Maintainer
+object. When creating objects, often their names, etc, are looked
+up on the AUR RPC. This takes more time.
+  
+* Release 0.07 [2011-02-04 Fri]
+
+** Fix Broken Test                                                      :FIX:
+
+I foolishly broke a test by changing outside circumstances. I had
+renamed 'Archlinux::Messages' to 'Archlinux::Term' and so the
+'perl-archlinux-messages' package on the AUR was deleted in favor of
+'perl-archlinux-term'. One of our tests checks for the existance of
+'perl-archlinux-messages' on the AUR, which fails.
+
+* Release 0.06 [2011-02-04 Fri]
+
+** POD Documentation
+
+Fixes many errors in the documentation.
+
+** PKGBUILD Parsing
+
+PKGBUILD parsing is now more resilient. The parsing is still far from
+perfect but strange quotations now result in the same value that bash
+gives them. I have also changed how parsing works, internally. I
+suspect it is more efficient than previously.
+
+** Org-mode documentation
+
+I've decided to switch to Emacs's org-mode for all README and
+changelog files in my own projects.
+
+** Logins
+
+*** HTTPS Logins
+
+All actions taken while logged in now use HTTPS in order to secure
+the login's session key. This also requires the Crypt::SSLeay
+module to be installed if you want to login and do stuff.
+
+*** Multilingual Logins
+
+Multilingual logins will now work properly. The internal webpage
+requests are set to English so the module only has to check for errors
+in one language.
+   
+** Delete Action Added
+
+Adds the delete package action in case any Trusted User wants to
+use this module to delete packages. It is kind of scary what you
+can do with it but heck... I trust you!
+
+* Old GNU-style ChangeLog Entries:
+
+2010-10-21  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (0.05)
+
+	* lib/WWW/AUR/Package/File.pm: Extracted package file code
+	from lib/WWW/AUR/Package/File.pm.
+
+	* lib/WWW/AUR/PKGBUILD.pm: Extracted PKGBUILD code from
+	lib/WWW/AUR/Package.pm.
+
+2010-10-09  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (0.04)
+
+	* lib/WWW/AUR.pod: Fix docs for PATH PARAMETERS. They still had
+	sigils on their names from when I copy/pasted.
+
+	* RELEASE (0.03)
+
+	* Makefile.PL: Add module requirements I forgot about.
+
+	* lib/WWW/AUR/Package.pod: Fix typo in docs (%BUILD_PARMAS).
+	Add info() method.
+
+	* lib/WWW/AUR/Login.pm: Remove 'Returns' and 'Parameters'
+	in documentation. Add documentation for action methods
+	and upload method.
+
+	* lib/WWW/AUR/Maintainer.pm: Remove 'Returns' and 'Parameters'
+	in documentation.
+
+	* lib/WWW/AUR/Iterator.pm: Remove 'Returns' and 'Parameters'
+	in documentation.
+
+	* lib/WWW/AUR.pod: Fix wrong usage of 'upload' in SYNOPSIS.
+
+2010-10-07  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (0.02)
+
+	* lib/WWW/AUR/Package.pm (extract): Use the Archive::Tar module
+	instead of the 'bsdtar' command to extract .tar.gz source package
+	files.
+
+2010-10-04  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (0.01)
+

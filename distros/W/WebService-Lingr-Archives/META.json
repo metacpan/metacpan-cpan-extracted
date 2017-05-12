@@ -1,0 +1,66 @@
+{
+   "abstract" : "load archived messages from lingr.com",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Lingr-Archives",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "2.53",
+            "LWP::UserAgent" : "0",
+            "URI" : "1.59",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "Test::Exception" : "0.31",
+            "Test::MockObject" : "1.20120301",
+            "Test::More" : "0.98",
+            "Try::Tiny" : "0.16",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/WebService-Lingr-Archives/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/WebService-Lingr-Archives.git",
+         "web" : "https://github.com/debug-ito/WebService-Lingr-Archives"
+      }
+   },
+   "version" : "0.03"
+}

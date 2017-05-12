@@ -1,0 +1,14 @@
+Revision history for WWW-CBF
+
+0.03    2012-08-11
+    - removed some leftovers from the previous build
+
+0.02	2012-07-21
+	- updated to follow the 2012 table
+	- Changelog date now looks like W3CDTF (changes.cpanhq compliance)
+	- proper Pod encoding
+
+
+0.01	2009-06-17
+	- First version, released on an unsuspecting world.
+

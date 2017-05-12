@@ -1,0 +1,36 @@
+# Debian menu system entry.
+
+# Copyright 2013 Kevin Ryde
+
+# This file is part of Wx-Perl-PodBrowser.
+#
+# Wx-Perl-PodBrowser is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Wx-Perl-PodBrowser is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Wx-Perl-PodBrowser.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Menu policy is in /usr/share/doc/menu/menu.txt.gz
+# Menu files are in /usr/share/menu (previously /usr/lib/menu).
+# Part "3.5. The `section' field" has the possible menu sections.
+#
+# section="Help" would be another possibility.  Think that's meant for
+# user documentation rather than programming things.
+
+?package(libwx-perl-podbrowser-perl): \
+	needs="x11" \
+	section="Applications/Programming" \
+	title="Wx-Perl-PodBrowser" \
+	hints="Perl,POD" \
+	command="wx-perl-podbrowser"
+
+# No icon yet.
+# icon="/usr/share/perl5/Wx/Perl/PodBrowser.xpm" \

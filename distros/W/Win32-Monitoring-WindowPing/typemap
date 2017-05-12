@@ -1,0 +1,21 @@
+# $Id: typemap 152 2008-08-25 14:16:30Z rplessl $
+TYPEMAP
+HWND         T_HANDLE
+DWORD        T_IV
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));
+
+################################################################################
+OUTPUT
+T_HANDLE
+    sv_setiv($arg, PTR2IV($var));

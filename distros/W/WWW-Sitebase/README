@@ -1,0 +1,43 @@
+WWW::Sitebase
+
+This module is a base class for modules that navigate web sites
+like Myspace or Bebo.  It provides basic methods like
+get_page and submit_form that are more robsut than their counterparts
+in WWW::Mechanize.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc WWW::Sitebase
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Sitebase
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Sitebase
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/WWW-Sitebase
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/WWW-Sitebase
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Grant Grueninger
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

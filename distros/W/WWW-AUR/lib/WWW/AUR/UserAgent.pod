@@ -1,0 +1,53 @@
+=head1 NAME
+
+WWW::AUR::UserAgent - Default HTTP UserAgent object for requests.
+
+=head1 DESCRIPTION
+
+This is the default user agent for making HTTP requests. By default
+this class ISA LWP::UserAgent object with all methods provided
+by LWP::UserAgent. Maybe in the future I will fancy it up a bit more
+in order to use AnyEvent and concurrent requests if I need to.
+
+The only difference from LWP::UserAgent is that the 'useragent'
+string parameter is set to "WWW::AUR/v$VERSION" where $VERSION
+is equal to $WWW::AUR::VERSION.
+
+=head1 OBJECT METHODS
+
+Right now the methods are the same as LWP::UserAgent.
+
+=head1 CLASS METHODS
+
+This class also contains the C<InitTLS> class method to load
+the modules required for SSL/TLS https connections. This is
+used by WWW::AUR::Login and WWW::AUR::RPC.
+C<InitTLS> takes no parameters. If TLS cannot be loaded
+(for example, if LWP::Protocol::https fails to load) then an error
+message is croaked.
+
+=head1 SEE ALSO
+
+L<WWW::AUR>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+=head1 BUGS
+
+Please email me any bugs you find. I will try to fix them as quick as I can.
+
+=head1 SUPPORT
+
+Send me an email if you have any questions or need help.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Justin Davis.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

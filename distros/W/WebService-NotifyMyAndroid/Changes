@@ -1,0 +1,38 @@
+Revision history for WebService-NotifyMyAndroid
+
+0.0.6     2013-01-31 00:30:28 Europe/London
+    No changes - official release of the dzil work
+
+0.0.5_04  2013-01-11 15:20:06 UTC
+    Rework some areas to pass more strict perlcritic regime
+    Add [Prereqs] for script modules used
+    Drop Test::Kwalitee plugin from dist.ini
+
+0.0.5_03  2013-01-05 10:23:50 Europe/London
+    Add explicit use of LWP::Protocol::https
+    Fix t/perlcritic.t behaviour when test module missing
+
+0.0.5_02  2012-12-29 11:06:29 Europe/London
+      Fix issues with Dist::Zilla conversion
+
+0.0.5_01  2012-12-26 15:49:16 Europe/London
+      Convert to Dist::Zilla
+
+0.0.4
+       FIX: :utf8 --> :encoding(UTF-8)
+
+0.0.3  Fri Dec 21 10:26:16 2012 +0000
+       Fix the API URL <Chisel>
+       Add dependency: LWP::Protocol::https <Chisel>
+       Add reminder for lib*-dev packages <Chisel>
+       Add demo script for NMA <Chisel>
+       POD: Add Chisel as contributor <Chisel>
+
+0.0.2  Mon Jul  4 08:38:20 2011
+       Renamed to 'WebService-NotifyMyAndroid'.
+       Added a README.
+       Captured additional test dependencies to make CPANTS happy.
+
+0.0.1  Mon Jun 20 11:43:25 2011
+       Initial release.
+

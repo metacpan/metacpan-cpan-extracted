@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                WWW-FoneFinder
+version:             0.02
+abstract:            Provides an interface to FoneFinder.net
+license:             ~
+author:              
+    - Dusty Wilson <dusty@megagram.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP::UserAgent:                5
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

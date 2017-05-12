@@ -1,0 +1,72 @@
+Weather-Com version 0.5
+=======================
+
+Introduction:
+--------------
+Weather-Com is meant to be a module suite enabling the perl programmer
+to access weather information as provided by weather.com's XOAP
+interface.
+
+This interface is a kind of HTTP-GET/XMLResponse API (not really a
+WebService). They also provide an SDK containing implementation guides,
+weather icons in several sizes, 'The Weather Channel' logos, etc.
+
+By this XOAP API they provide lots of information - not only the current
+conditions like other weather services do, but also up to 10 days of 
+forecast containing most information one could need, e.g. the time of
+sunrise and sunset, the longitude and latitude of the location, data 
+precompiled either in the US system or in the metric system, etc. 
+
+Up from version 0.4 this module contains localization support. That is,
+textual weather data provided by weather.com (wind directions, current
+conditions descriptions, uv index descriptions, moon phases, etc.)
+can be translated into your favourite language - if someone did the
+translation.
+
+For each language there has to be a language package (e.g. 
+Weather::Com::L10N::de for German). If there are new languages available
+that are not already included in this release, you'll find them on my
+support webpage (http://www.schnuecker.org/weather-com). If you don't
+find your prefered language, feel free to build your own language pack
+and send it to me. I'll then put it on my support page and it will be
+part of the next release. 
+
+Up from version 0.5 there is 'dynamic language support'. That is, you
+can provide a language tag (e.g. 'de_DE') to a method returning
+textual information and the returned text than is not in the default
+language you defined while creating your Weather::Com::Finder
+instance but in the language you requested with your method call.
+
+To use the weather.com's service you have to register first
+(http://www.weather.com/services/xmloap.html), but's for free.
+You'll be send an email containing your 'partner id', a license key
+and a link where to download the SDK.
+
+Components of this module:
+--------------------------
+This module consists of several parts:
+
+1. Weather::Com::Base   - the low level API
+2. Weather::Com::Cached - implements the caching rules from weather.com
+3. Weather::Com::Simple - high level wrapper around the API providing the
+                          same interace as Weather::Underground
+4. Weather::Com::Finder - The entrance point to the main high level interface.
+5. weather.pl           - a sample console program using Weather::Com::Simple
+6. weather_ext.pl       - a sample console program using the new high level 
+                          interface
+
+Usually you should always use one of the high level interfaces as parsing
+the hash structure returned by Weather::Com::Base and Weather::Com::Cached
+is not self-explanatory.
+
+If you plan to use the low level interface directly, please use 
+Weather::Com::Cached instead of Weather::Com::Base to be sure to 
+have the right caching rules implemented. You should only use 
+Weather::Com::Base directly, if you plan to implement other caching 
+mechanisms, e.g. a database driven one instead of the file- and 
+'Storable-' based one that is used in Weather::Com::Cached.
+
+If you want to implement another caching package for Weather::Com
+please contact the author of this module and tell him... There's no
+need to to the same work twice. Same applies for other packages to
+be build around the above ones.

@@ -1,0 +1,81 @@
+Revision history for Web-DataService
+
+0.254   2015-03-18
+
+- It is now possible to add aliases for the special parameters.
+- In Text format output, the field name "Starting Index" has been replaced by
+  "Record Offset".
+- The following field names in Text format output no longer are followed by colons:
+  "Records Found", "Records Returned", "Elapsed Time".
+
+0.253   2014-12-21
+
+- Added method 'delete_output_field' to remove a field from the output.  This can
+  be used by operation methods to remove fields that are determined to be unnecessary.
+  This is especially useful for text-format output.
+- Fixed a bug that was causing single quotes to be improperly doubled in CSV output.
+
+0.252   2014-11-07 
+
+- You can now specify a summary block for any operation, with the node attribute 'summary'
+- This block will be included in the output header, before any records are output
+- New request method 'document_summary' to document the list of fields
+- New request method 'summary_data' which takes a hash of fields with which the
+  block will be filled in.
+- You can now specify extended documentation for a node, with the method 'extended_doc'.
+  This can be used to specify the documentation that will appear at the top of an
+  operation page, without having to create a custom template.
+- Added method 'map_value' which transforms a set value to its 'maps_to' value
+- The 'set_values' method now throws an exception if given an invalid set name
+- Fixed a bug that would wipe out the field lists of configured blocks if one bad
+  block name was passed to 'configure_boock'.
+
+0.251   2014-10-17
+
+- Fixed a bug that was causing text output not to be properly encoded in some circumstances
+- Added format attribute 'encode_as_text'
+- Fixed a bug that caused the 'Access-Control-Allow-Origin' header to not be sent under some circumstances
+- Improved the documentation of the configuration process
+
+0.25    2014-10-16
+
+- Added documentation files that were accidentally left out of 0.24
+- Added one missing module that was accidentally left out of 0.24
+- The method 'generate_url' can now take a string instead of a hashref
+- Note: there were several incompatible changes between 0.23 and 0.24, so be
+  careful if you are updating to this version from 0.23 or prior
+
+0.24    2014-10-15
+
+- Added Perl version check to Build.PL.  The minimum version of Perl is 5.012
+- There are several changes to this version that are not compatible with 0.23
+- Changed the template element names for documentation sections (incompatible)
+- Added documentation for node lists
+- Reorganized the configuration documentation
+- Added node attribute 'place', and methods 'list_node', 'get_nodelist', 'document_nodelist'
+- Renamed method 'has_output_block' to 'has_block' (incompatible)
+- Renamed method 'response_format' to 'output_format' (incompatible)
+- Renamed method 'response_vocab' to 'output_vocab' (incompatible)
+- Renamed method 'response_linebreak' to 'output_linebreak' (incompatible)
+- Added method 'substitute_select'
+- Usage examples are now strings (incompatible)
+- Fixed bug that was ignoring ordinary paragraphs in ruleset documentation
+- Fixed bug that was causing documentation strings to be inherited
+
+0.23    2014-10-03
+
+- Improved the documentation some more
+- Removed spurious use of Sub::Identify
+- Fixed bug in evaluating set attributes starting with + or -
+- Fixed bug that prevented multiple validators in a parameter rule
+- Added set_foundation class method to set the foundation framework, removed the foundation_plugin attribute.
+
+0.22    2014-10-02
+
+- Fixed bad tests and improved the documentation.
+- new_request and execute_request can now be called as class methods.
+
+0.21    2014-10-01
+
+- First release that actually works and is fully documented.
+

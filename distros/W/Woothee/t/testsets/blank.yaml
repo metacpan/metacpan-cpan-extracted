@@ -1,0 +1,20 @@
+- target: ''
+  name: UNKNOWN
+  version: UNKNOWN
+  os: UNKNOWN
+  os_version: UNKNOWN
+  category: UNKNOWN
+
+- target: ~
+  name: UNKNOWN
+  version: UNKNOWN
+  os: UNKNOWN
+  os_version: UNKNOWN
+  category: UNKNOWN
+
+- target: '-'
+  name: UNKNOWN
+  version: UNKNOWN
+  os: UNKNOWN
+  os_version: UNKNOWN
+  category: UNKNOWN

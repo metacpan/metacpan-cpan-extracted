@@ -1,0 +1,225 @@
+
+=head2 DESCRIPTION
+
+This page describes the text response formats in detail.
+
+=head2 SYNOPSIS
+
+This service can produce responses in two different text formats: tab-separated and comma-separated.  Both
+of these formats can be loaded into a spreadsheet, or copied into an e-mail message or other text document.
+
+You may choose from any of the following three suffixes:
+
+=for wds_table_no_header Suffix* | Description
+
+=over
+
+=item C<.csv>
+
+Generate a download file in comma-separated text format.  Most browsers will save this
+file directly to disk; if you would rather see it immediately in a browser tab, then use
+the suffix C<.txt> instead.
+
+=item C<.tsv>
+
+Generate a download file in tab-separated text format.
+
+=item C<.txt>
+
+Display the results in a browser tab in comma-separated text format.
+You will then be able to save this file to disk using the "Save Page As..." 
+menu item in your browser, which will produce the same result
+as if you had used the C<csv> suffix.
+
+=back
+
+Note that you should only use the C<.txt> suffix if your result set is
+of small to moderate size.  If you try to display a large result set
+directly in a browser tab, it may take a long time to render and use
+up an enormous amount of memory.
+
+In addition, you may choose to include one or more of the following URL parameters:
+
+=for wds_table_no_header Parameter* | Description
+
+=over
+
+=item datasource
+
+If this parameter is specified, then extra header lines will be included at the
+beginning of the response.  These lines will include information about the data
+source, the URL used to generate this response, and more.  See below for more
+information.
+
+=item count
+
+If this parameter is specified, then extra header lines will be included at the
+beginning of the response.  These lines will specify the number of records found
+and the number returned, as well as the elapsed time to compute this result.  See
+below for more information.
+
+=item header=no
+
+If this parameter is specified, then no header material at all will be
+included.  The first line of the file will be the first data record,
+if any.  If no data records were found, the file will be empty.  This
+parameter doesn't need any value.
+
+=item lb=cr
+
+If this parameter is specified, then each line will be terminated by a
+single carriage return instead of the standard carriage return/line
+feed sequence.
+
+=back
+
+The body of the response consists of a series of lines containing comma-separated or tab-separated values.
+The initial part of the file may contain some or all of the following lines:
+
+=for wds_table_no_header Label* | Description
+
+=over
+
+=item C<Data Source:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the name of this data source.
+
+=item C<Documentation URL:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be a URL that provides documentation about the URL path
+used to fetch this data.  This URL will document both the parameters and the response fields.
+This information may be helpful in guiding the later interpretation of this data.
+
+=item C<Data URL:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the actual URL that was used to fetch this data.
+If this dataset is saved to disk, the included line will allow someone to later repeat this query.
+
+=item C<Access Time:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the date and time time (GMT) at which this data
+was accessed.  If this dataset is saved to disk, the included line will enable it to be
+compared with other datasets on the basis of access time.
+
+=item C<Parameters:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.  It will
+be followed by one line per parameter, giving the parameter name and value(s) used to generate this 
+result.  If this dataset is saved to disk, the parameter information may be helpful in documenting how
+the data was selected, what it includes, and what it does not include.
+
+=item C<Records Found:>
+
+This line will be present if the parameter L<count|node:special> was specified.  The 
+value in the second column will be the number of records that matched the main query.
+
+=item C<Records Returned:>
+
+This line will be present if the paramter L<count|node:special> was specified.  The value
+in the second column will be the number of records actually returned.
+<%- IF request.default_limit %>
+This may be less than the total number of records found, because the
+size of the result set is limited by default to <% request.default_limit %>.
+You can override this using the L<limit|node:special> parameter.
+<%- END %>
+
+=item C<Record Offset:>
+
+This line will be present if the parameter L<count|node:special> was specified, and if
+the parameter L<offset|node:special> was specified with a value greater than zero.  The
+value in the second column will be the number of records that were skipped at the beginning
+of the result set.
+
+=item C<Warning:>
+
+One or more of these lines will be present if any warnings were generated during the execution
+of the query.  The warning message(s) will appear in the second column.
+
+=item C<Records:>
+
+If any of the lines mentioned so far in this table appear in the output, this line will appear immediately
+before the data header line.  It serves to mark off the supplementary header material from the data.
+
+=item I<data header>
+
+Unless the parameter L<header=no|node:special> was specified, a data header line will always precede
+the first data line.  This header line will contain the name of each column.
+
+=back
+
+The data records will follow this header material, one record per line until the end of the file.
+
+For example, the following URL will produce the following output, consisting of a single data record
+with accompanying header line:
+
+=over
+
+=item *
+
+L<op:single.txt?state=WI>
+
+=back
+
+    "name","abbrev","region","pop2010"
+    "Wisconsin","WI","MW","5686986"
+
+By contrast, the following URL includes some additional header information, terminated by a "Records:" line.
+
+=over
+
+=item *
+
+L<op:list.txt?state=wi,mn,il&count>
+
+=back
+
+    "Elapsed Time:","0.000152"
+    "Records Found:","3"
+    "Records Returned:","3"
+    "Records:"
+    "name","abbrev","region","pop2010"
+    "Illinois","IL","MW","12830632"
+    "Minnesota","MN","MW","5303925"
+    "Wisconsin","WI","MW","5686986"
+
+This output includes several header lines, terminated by the "Records:" line.  Following that is the data header, and then the data records.
+
+The following URL returns an HTTP error response instead of a data response:
+
+=over
+
+=item *
+
+L<op:list.txt?state=WI,IX&foo=1>
+
+=back
+
+    400 Bad Request
+    
+        unknown parameter 'foo'
+    
+    Warnings:
+    
+        the value of 'state' must be a valid state name or abbreviation
+
+Lastly, the following URL generates just the data records with no header information at all:
+
+=over
+
+=item *
+
+L<op:list.txt?region=NE&header=no>
+
+=back
+
+    "Connecticut","CT","NE","3574097"
+    "Maine","ME","NE","1328361"
+    "Massachusetts","MA","NE","6547629"
+    "New Hampshire","NH","NE","1316472"
+    "Rhode Island","RI","NE","1052567"
+    "Vermont","VT","NE","625741"
+

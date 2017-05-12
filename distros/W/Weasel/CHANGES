@@ -1,0 +1,42 @@
+
+** 0.11 / 2017-04-21
+   - Fix expansion of *text HTML expander when only one of 'id' or 'name' given
+
+** 0.10 / 2016-09-09
+   - Repair <5.14 compatibility
+   - Add new 'get_page_source' api to the driver
+   - Add driver API version check during session creation
+
+** 0.09 / 2016-09-04
+   - Set the correct version number in Weasel.pm
+
+** 0.08 / 2016-08-26
+   - Add the possibility to use environment variables for base_url
+
+** 0.07 / 2016-08-20
+   - Correctly update the version numbers in lib/Weasel.pm
+
+** 0.06 / 2016-08-20
+   - Add key codes in order to send special keys to elements
+   - Add helper method on elements: has_class
+   - Move development time tests to 'xt/' directory (fixes #1)
+
+** 0.05 / 2016-07-08
+   - Change behaviour of Selectable widget (Radiobutton, Checkbox and Option)
+     to return the empty string (false) when not selected for the 'value'
+     attribute
+
+** 0.04 / 2016-07-04
+   - Fix timing problem initializing Session's 'page' attribute
+     (depends on 'page_class') by making it lazy
+
+** 0.03 / 2016-07-03
+   - Allow overriding the class of the object instantiated
+     into the 'page' attribute
+
+** 0.02 / 2016-06-22 (TRIAL)
+   - Adjusted dependencies based on testing in clean VM
+
+** 0.01 / 2016-06-22 (TRIAL)
+  - Initial release to replace LedgerSMB's
+    (https://github.com/ledgersmb/LedgerSMB) test code

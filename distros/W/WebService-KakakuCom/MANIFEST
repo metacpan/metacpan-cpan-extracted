@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WebService/KakakuCom.pm
+lib/WebService/KakakuCom/Parser.pm
+lib/WebService/KakakuCom/Product.pm
+lib/WebService/KakakuCom/ResultSet.pm
+t/00-load.t
+t/01-methods.t

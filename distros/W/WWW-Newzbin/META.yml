@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WWW-Newzbin
+version:             0.07
+abstract:            Interface to Newzbin.com's Usenet index
+license:             perl
+author:              
+    - Chris Novakovic (chrisn@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:     0.78
+    LWP::UserAgent: 2.036
+    Exporter:       5.58
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

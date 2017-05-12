@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Honeypot::httpBL.
+
+0.01  Sat Dec 19 06:31:58 2009
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n WWW::Honeypot::httpBL
+
+0.01 Thu Apr 1 10:33:10 2009
+	- renamed from WWW::httpBL, code otherwise unchanged

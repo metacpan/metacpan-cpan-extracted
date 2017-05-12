@@ -1,0 +1,8 @@
+Revision history for Perl extension WebService::Bloglines::Blogroll.
+
+0.02 16 September 2005
+	- added methods to setup properties, get blogroll and display it
+
+0.01 14 September 2005
+	- original version; created by h2xs 1.23	
+

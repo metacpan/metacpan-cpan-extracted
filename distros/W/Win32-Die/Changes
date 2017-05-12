@@ -1,0 +1,12 @@
+Revision history for Perl extension Win32::Die.
+
+0.03 Tue  Dec 28 2004
+      	- Fixed Makefile
+
+0.02  Sun Dec 26 2004
+      	- POD update
+
+0.01  Wed Jul 30 19:05:11 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Win32::Die
+

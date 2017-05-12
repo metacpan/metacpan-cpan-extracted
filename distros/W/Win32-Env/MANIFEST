@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Win32/Env.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/error-handling-arguments.t

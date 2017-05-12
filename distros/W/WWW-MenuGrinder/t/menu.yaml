@@ -1,0 +1,40 @@
+---
+item:
+  - label: Home
+    location: ""
+    target: /
+    item:
+      - label: Directory
+        location: directory
+  - label: _User Manager
+    location: user
+    need_role: it
+    target: /user/search
+    item:
+      - label: 'Your name is ${username}'
+      - label: Search
+        location: user/search
+      - label: View
+        location: user/view
+        need_var: current_user
+  - label: _Hardware Manager
+    location: hardware
+    need_role: it
+    target: /hardware/search
+    item:
+      - label: Search
+        location: hardware
+      - label: Add
+        location: hardware/add
+  - label: _CSR Manager
+    location: csr
+    need_role: csr_manager
+    item:
+      - label: CSR Performance
+        location: csr/perf
+  - label: Log Out
+    location: logout
+    need_var: logged_in
+  - label: Log In
+    location: login
+    no_var: logged_in

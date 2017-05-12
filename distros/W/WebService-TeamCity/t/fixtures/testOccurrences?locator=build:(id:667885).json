@@ -1,0 +1,705 @@
+{
+   "count" : 100,
+   "default" : false,
+   "href" : "https://teamcity.jetbrains.com/app/rest/testOccurrences?locator=build:(id:667885)",
+   "nextHref" : "/httpAuth/app/rest/testOccurrences?locator=count:100,start:100,build:(id:667885)",
+   "testOccurrence" : [
+      {
+         "href" : "/httpAuth/app/rest/testOccurrences/id:677,build:(id:667885)",
+         "id" : "id:677,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.auth_uri_for_anonymous_protocol_should_not_have_user_and_password",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:679,build:(id:667885)",
+         "id" : "id:679,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.credential_provider_should_return_true_when_all_items_provided",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:681,build:(id:667885)",
+         "id" : "id:681,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.should_not_fail_when_password_is_empty",
+         "status" : "SUCCESS"
+      },
+      {
+         "href" : "/httpAuth/app/rest/testOccurrences/id:683,build:(id:667885)",
+         "id" : "id:683,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.should_take_username_from_URL_into_account",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:685,build:(id:667885)",
+         "id" : "id:685,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.should_take_username_in_URL_into_account2",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 10159,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:697,build:(id:667885)",
+         "id" : "id:697,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.CleanerTest.test_clean(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 10881,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:695,build:(id:667885)",
+         "id" : "id:695,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.CleanerTest.test_clean(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 248,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:699,build:(id:667885)",
+         "id" : "id:699,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.convert_scp_like_syntax",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 33,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:701,build:(id:667885)",
+         "id" : "id:701,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.convert_scp_like_syntax_with_credentials",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 46,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:703,build:(id:667885)",
+         "id" : "id:703,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.http_protocol",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 398,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:705,build:(id:667885)",
+         "id" : "id:705,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.http_protocol_svn_repo",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 55,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:707,build:(id:667885)",
+         "id" : "id:707,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.http_protocol_with_credentials",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:709,build:(id:667885)",
+         "id" : "id:709,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.should_not_throw_exception_when_url_is_from_other_provider",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:711,build:(id:667885)",
+         "id" : "id:711,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.should_not_use_private_key_for_local_repository",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:713,build:(id:667885)",
+         "id" : "id:713,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitUrlSupportTest.should_use_username_from_url",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2904,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:423,build:(id:667885)",
+         "id" : "id:423,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.all_changes_should_have_parents",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2016,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:426,build:(id:667885)",
+         "id" : "id:426,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.backslash_in_username",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 314,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:430,build:(id:667885)",
+         "id" : "id:430,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.branch_turned_into_dir(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4281,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:428,build:(id:667885)",
+         "id" : "id:428,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.branch_turned_into_dir(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4087,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:432,build:(id:667885)",
+         "id" : "id:432,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_after_cache_reset",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2134,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:434,build:(id:667885)",
+         "id" : "id:434,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_between_repositories_with_different_urls_and_branches",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2073,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:436,build:(id:667885)",
+         "id" : "id:436,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_between_states_should_understand_revisions_with_timestamps",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2047,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:438,build:(id:667885)",
+         "id" : "id:438,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_should_understand_revisions_with_timestamps",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2076,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:440,build:(id:667885)",
+         "id" : "id:440,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_with_branch_pointing_to_a_non_commit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2120,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:444,build:(id:667885)",
+         "id" : "id:444,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.collect_changes_with_broken_commit_encoding",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2064,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:448,build:(id:667885)",
+         "id" : "id:448,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.comma_in_branch_name",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 20,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:450,build:(id:667885)",
+         "id" : "id:450,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.current_state_should_contain_revision_for_expanded_ref_in_root",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:452,build:(id:667885)",
+         "id" : "id:452,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.default_autocrlf_should_not_be_included_in_checkout_properties",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4474,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:454,build:(id:667885)",
+         "id" : "id:454,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.do_not_do_fetch_per_branch",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2044,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:458,build:(id:667885)",
+         "id" : "id:458,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.fetch_process_should_have_necessary_options_from_internal_properties",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 12052,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:460,build:(id:667885)",
+         "id" : "id:460,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.fetch_process_should_respect_fetch_timeout",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4504,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:462,build:(id:667885)",
+         "id" : "id:462,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.fetch_should_not_fail_if_remote_repository_does_not_have_some_branches",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 21,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:466,build:(id:667885)",
+         "id" : "id:466,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.getCurrentVersion_should_not_do_fetch",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 3,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:468,build:(id:667885)",
+         "id" : "id:468,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.non_default_autocrlf_should_be_reported_in_checkout_properties",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4167,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:470,build:(id:667885)",
+         "id" : "id:470,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.relative_path_to_repository_should_go_under_git_caches_dir",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 48822,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:472,build:(id:667885)",
+         "id" : "id:472,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_be_able_to_do_fetch_per_branch",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 23,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:478,build:(id:667885)",
+         "id" : "id:478,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_create_teamcity_config_in_root_with_custom_path(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 24,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:476,build:(id:667885)",
+         "id" : "id:476,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_create_teamcity_config_in_root_with_custom_path(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 150,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:480,build:(id:667885)",
+         "id" : "id:480,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_mention_branch_when_commit_in_submodule_is_not_found",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 109,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:482,build:(id:667885)",
+         "id" : "id:482,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_mention_branch_when_entry_in_gitmodules_is_not_found",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 91,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:484,build:(id:667885)",
+         "id" : "id:484,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_mention_branch_when_no_gitmodules_config_found",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 102,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:486,build:(id:667885)",
+         "id" : "id:486,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_not_traverse_history_deeper_than_specified_limit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 16,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:490,build:(id:667885)",
+         "id" : "id:490,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_report_hash_of_commit_tag_points_to_instead_of_hash_of_tag",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 84,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:492,build:(id:667885)",
+         "id" : "id:492,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_retry_getCurrentState_if_it_fails",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 76,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:499,build:(id:667885)",
+         "id" : "id:499,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_git_refs_format",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 126,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:503,build:(id:667885)",
+         "id" : "id:503,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_pull_request(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 3989,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:501,build:(id:667885)",
+         "id" : "id:501,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_pull_request(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 88,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:507,build:(id:667885)",
+         "id" : "id:507,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_tag(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4004,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:505,build:(id:667885)",
+         "id" : "id:505,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_support_submodule_on_tag(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 82,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:509,build:(id:667885)",
+         "id" : "id:509,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_throw_descriptive_error_when_referenced_commit_not_found",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 5050,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:515,build:(id:667885)",
+         "id" : "id:515,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_update_local_ref_when_it_locked(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 8976,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:511,build:(id:667885)",
+         "id" : "id:511,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_update_local_ref_when_it_locked(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 95,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:519,build:(id:667885)",
+         "id" : "id:519,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.start_using_full_branch_name_as_default_branch_name",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 28,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:521,build:(id:667885)",
+         "id" : "id:521,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.tags_in_currentState",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 176,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:523,build:(id:667885)",
+         "id" : "id:523,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 114,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:526,build:(id:667885)",
+         "id" : "id:526,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo_MergeCommit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 206,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:530,build:(id:667885)",
+         "id" : "id:530,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo_parent_child",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 115,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:532,build:(id:667885)",
+         "id" : "id:532,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testBuildModificationInfo_parent_gap_child",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 59,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:537,build:(id:667885)",
+         "id" : "id:537,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChanges(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2100,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:534,build:(id:667885)",
+         "id" : "id:534,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChanges(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 55,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:542,build:(id:667885)",
+         "id" : "id:542,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubSubmodulesNonRecursive(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 3990,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:540,build:(id:667885)",
+         "id" : "id:540,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubSubmodulesNonRecursive(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 78,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:546,build:(id:667885)",
+         "id" : "id:546,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubSubmodulesRecursive(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 6035,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:544,build:(id:667885)",
+         "id" : "id:544,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubSubmodulesRecursive(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 114,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:550,build:(id:667885)",
+         "id" : "id:550,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubmodules(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4177,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:548,build:(id:667885)",
+         "id" : "id:548,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubmodules(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 45,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:554,build:(id:667885)",
+         "id" : "id:554,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubmodulesIgnored(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2111,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:552,build:(id:667885)",
+         "id" : "id:552,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesSubmodulesIgnored(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 59,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:556,build:(id:667885)",
+         "id" : "id:556,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesWithBrokenSubmoduleOnLastCommit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 87,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:558,build:(id:667885)",
+         "id" : "id:558,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesWithFixedBrokenFixedSubmodule",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 113,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:562,build:(id:667885)",
+         "id" : "id:562,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesWithFixedBrokenFixedSubmodule2",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 110,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:566,build:(id:667885)",
+         "id" : "id:566,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectBuildChangesWithFixedSubmoduleOnLastCommit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 122,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:574,build:(id:667885)",
+         "id" : "id:574,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCollectChangesWithBrokenSubmoduleOnLastCommitAndUsualFileInsteadOfSubmoduleInPreviousCommit",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 448,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:588,build:(id:667885)",
+         "id" : "id:588,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testConcurrentCollectBuildChanges(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 30512,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:582,build:(id:667885)",
+         "id" : "id:582,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testConcurrentCollectBuildChanges(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 12,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:596,build:(id:667885)",
+         "id" : "id:596,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCurrentVersion(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 14,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:594,build:(id:667885)",
+         "id" : "id:594,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testCurrentVersion(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 401,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:600,build:(id:667885)",
+         "id" : "id:600,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testMapFullPath(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2380,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:598,build:(id:667885)",
+         "id" : "id:598,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testMapFullPath(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:602,build:(id:667885)",
+         "id" : "id:602,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testModificationInfoBuilderSupported",
+         "status" : "SUCCESS"
+      },
+      {
+         "href" : "/httpAuth/app/rest/testOccurrences/id:604,build:(id:667885)",
+         "id" : "id:604,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testNormalizedPaths",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 80,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:606,build:(id:667885)",
+         "id" : "id:606,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.testSubmoduleWithDirs",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 53,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:608,build:(id:667885)",
+         "id" : "id:608,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_collect_changes_between_states",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 17,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:610,build:(id:667885)",
+         "id" : "id:610,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_display_name_conflict",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 24,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:612,build:(id:667885)",
+         "id" : "id:612,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_display_name_no_conflict",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 3500,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:614,build:(id:667885)",
+         "id" : "id:614,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_logging",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 4134,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:616,build:(id:667885)",
+         "id" : "id:616,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_long_input_for_fetcher_process",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 19,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:620,build:(id:667885)",
+         "id" : "id:620,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_non_fast_forward_update(false)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 13,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:618,build:(id:667885)",
+         "id" : "id:618,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.test_non_fast_forward_update(true)",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:687,build:(id:667885)",
+         "id" : "id:687,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.SubmoduleTest.testByteRanges",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 2,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:689,build:(id:667885)",
+         "id" : "id:689,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.SubmoduleTest.testSubmoduleMapping",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 1,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:691,build:(id:667885)",
+         "id" : "id:691,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.SubmoduleTest.testSubmoduleMultiEntryMapping",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 3,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:693,build:(id:667885)",
+         "id" : "id:693,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.SubmoduleTest.testSubmoduleTreeWalk",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 11,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:622,build:(id:667885)",
+         "id" : "id:622,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.should_failed_when_branch_not_found",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 17,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:652,build:(id:667885)",
+         "id" : "id:652,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_not_be_blocked_by_long_fetch",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 254536,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:666,build:(id:667885)",
+         "id" : "id:666,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_throw_exception_for_anonymous_git_url_with_username",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 5,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:669,build:(id:667885)",
+         "id" : "id:669,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.testConnection_should_validate_branchSpec",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 5,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:671,build:(id:667885)",
+         "id" : "id:671,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.test_not_existing_local_repository",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 29,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:673,build:(id:667885)",
+         "id" : "id:673,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.wrong_github_username(\"Auth fail\")",
+         "status" : "SUCCESS"
+      },
+      {
+         "duration" : 9,
+         "href" : "/httpAuth/app/rest/testOccurrences/id:675,build:(id:667885)",
+         "id" : "id:675,build:(id:667885)",
+         "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.TestConnectionTest.wrong_github_username(\"session is down\")",
+         "status" : "SUCCESS"
+      }
+   ]
+}

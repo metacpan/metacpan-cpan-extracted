@@ -1,0 +1,83 @@
+NAME
+    Wiki::Toolkit::Formatter::XHTMLMediaWiki - A Mediawiki-style formatter
+    for Wiki::Toolkit.
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+    This package implements a formatter for the Wiki::Toolkit module which
+    attempts to duplicate the behavior of the Mediawiki application (a set
+    of PHP scripts used by Wikipedia and friends).
+
+        use Wiki::Toolkit
+        use Wiki::Toolkit::Store::Mediawiki;
+        use Wiki::Toolkit::Formatter::XHTMLMediaWiki;
+
+        my $store = Wiki::Toolkit::Store::Mediawiki->new( ... );
+        # See below for parameter details.
+        my $formatter = Wiki::Toolkit::Formatter::XHTMLMediaWiki->new(
+           store => $store
+        );
+        my $wiki = Wiki::Toolkit->new(store     => $store,
+                                      formatter => $formatter);
+
+METHODS
+  new
+      my $formatter = Wiki::Toolkit::Formatter::XHTMLMediaWiki->new(
+          store => $store
+      );
+
+    See: XHTML::MediaWiki for other arguments
+
+  format
+      my $html = $formatter->format($content);
+
+    This is the main method. You give this method "wiki text" and it returns
+    "xhtml".
+
+SEE ALSO
+    XHTML::MediaWiki
+    Wiki::Toolkit
+    Wiki::Toolkit::Formatter::Default
+    Wiki::Toolkit::Store::Mediawiki
+    Wiki::Toolkit::Kwiki
+
+AUTHOR
+    "G. Allen Morris III" "<gam3 at gam3.net>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-cgi-wiki-formatter-XHTMLMediaWiki at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Wiki-Toolkit-Formatter-M
+    ediawiki>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find more information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Wiki-Toolkit-Formatter-XHTMLMediaWiki>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Wiki-Toolkit-Formatter-XHTMLMediaWiki
+        >
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Wiki-Toolkit-Formatter-XHT
+        MLMediaWiki>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Wiki-Toolkit-Formatter-Mediawiki>
+
+EXAMPLE
+    There is a simple example "cgi-bin" file in the examples directory of
+    the distribution.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 G. Allen Morris III, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

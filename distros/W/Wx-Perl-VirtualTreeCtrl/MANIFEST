@@ -1,0 +1,14 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Wx/Perl/VirtualTreeCtrl.pm
+lib/Wx/Perl/VirtualDirSelector.pm
+demo/virtualdirctrl.pl
+t/v_treectrl.t
+t/v_dirselector.t
+t/pod_coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

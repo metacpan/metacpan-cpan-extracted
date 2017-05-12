@@ -1,0 +1,113 @@
+Revision history for Perl extension WWW::Translate::Apertium
+
+0.16  September 6, 2010
+
+    * Added support for the new Macedonian < > Bulgarian bidirectional pair.
+    * Replaced uri_scape with uri_scape_utf8.
+    * Fixed a bug related to the "invalid value for parameter" message.
+
+0.15  March 8, 2010
+
+    * Added the new Icelandic -> English pair.
+    * Changed the file encoding of the .pm file to UTF-8.
+    
+
+0.14  February 13, 2010
+
+    * The web service whitelist restriction no longer applies to this module.
+    * Added a new single-direction pair: Spanish -> Asturian.
+    * Updated the documentation.
+    * Changed the contact e-mail address.
+    * Added the BUGS and SUPPORT boilerplate sections.
+    * Updated the license text.
+    * Fixed file permissions bug.
+    * Changed file EOL to Unix.
+
+
+0.13  January 12, 2010
+
+    * Added a warning to the documentation to inform potential users of
+      the temporary whitelist-based access system implemented by
+      the Apertium team on their web service, and the steps required
+      to have their IPs included in the whitelist.
+
+0.12  October 22, 2009
+
+    * Resubmitted the module after increasing the version number.
+      Distribution v.011 contained word writable files and directories... 
+
+0.11  October 22, 2009
+
+    * Added new language pairs:
+        Norwegian Bokmål -> Norwegian Nynorsk
+        Norwegian Nynorsk -> Norwegian Bokmål
+        Swedish -> Danish
+        Esperanto -> English
+        Breton -> French
+    * Updated the documentation.
+    
+
+0.10  April 11, 2009
+
+    * A few weeks ago, the Apertium developers changed the I/O format of the
+      web service from TXT to HTML. This update includes another dependency,
+      HTML::Entities, to turn the resulting HTML entities into the actual
+      extended characters.
+    * Added support for new language pairs:
+      Occitan < > Spanish, English > Esperanto, Portuguese < > Catalan,
+      Portuguese < > Galician.
+    * Improved the documentation.
+
+0.09  December 14, 2008
+
+    * Fixed a couple of details in the interpertium.pl sample.
+    * More documentation changes.
+
+0.08  December 13, 2008
+
+    * Added a code sample to the examples folder of the distribution.
+      interpertium.pl generates an HTML report containing a comparison of 
+      the translations returned by Apertium and interNOSTRUM for the
+      Spanish < > Catalan language pair.
+    * Minor code changes.
+    * Fixed a few things in the documentation.
+
+0.07  December 12, 2008
+
+    * Modified the code to return a string with the utf8 flag on.
+    * Improved the documentation and added more details on UTF-8 stuff.
+
+0.06  December 11, 2008
+    
+    * Version 0.05 was affected by a URL change of the Apertium machine translation
+      test drive a few months ago. Version 0.06 fixes that and adds support for
+      new language pairs available in Apertium 3.0.
+    * The module now uses the Apertium web service.
+    * Updated the documentation.
+    * Added more tests.
+    
+0.05  September 30, 2007
+    
+    * Minor code and POD fixes and improvements.
+    
+0.04  September 30, 2007
+
+    * Fixed a bug that prevented the module to work properly since the last
+      update of the Apertium online test drive.
+      In order to do so, switched from WWW::Mechanize to LWP::UserAgent.
+      Changed the code to adapt it to the new output encoding, utf-8.
+      Updated Makefile.PL and the documentation accordingly.
+
+0.03  September 20, 2007
+
+    * Edited Makefile.PL to include the license field in META.yml
+
+0.02  May 3, 2007
+    
+    * META.yml conforms to spec 1.0
+    * Added the get_pairs() method and updated the documentation
+
+0.01  March 26, 2007
+    
+    * First version, based on WWW::Translate::interNOSTRUM
+

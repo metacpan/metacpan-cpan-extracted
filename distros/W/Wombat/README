@@ -1,0 +1,27 @@
+
+Wombat - a Perl servlet engine
+==============================
+
+Wombat is a servlet engine for Perl. It provides a servlet container
+that implements an adaption of the Java (TM) Servlet API Specification
+to Perl. The engine is designed to run in many different deployment
+configurations: embedded inside a protocol server, standalone with an
+external protocol server, or standalone with one or more internal
+protocol listeners.
+
+The web site for Wombat is located at
+<http://wombat.sourceforge.net/>.
+
+For comments, questions, bug reports etc, join the mailing list for
+users and developers by visiting
+<http://lists.sourceforge.net/lists/listinfo/wombat-users>.
+
+Copyright (c) 2001 Brian Moseley <bcm@maz.org>
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README
+file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

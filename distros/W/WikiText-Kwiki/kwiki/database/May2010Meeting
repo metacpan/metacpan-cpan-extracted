@@ -1,0 +1,17 @@
+== May2010Meeting ==
+
+  Wed. May 12th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+=== Introduction to, and call for feedback on the Fennec testing framework ===
+
+speaker: Chad 'Exodist' Granum
+
+Chad will demonstrate what he has so far, and request feedback.
+
+From the fennec docs:
+
+Fennec - Framework upon which inter-compatible testing solutions can be built.
+
+Fennec provides a solid base that is highly extendable. It allows for the writing of custom nestable workflows (like RSPEC), Custom Asserts (like Test::Exception), Custom output handlers (Alternatives to TAP), Custom file types, and custom result passing (collectors). In Fennec all test files are objects. Fennec also solves the forking problem, that's it, forking just plain works.
+
+This framework is what has come from a discussion around modern testing in Perl. It is an attempt to address, or make addressable the desires and needs expressed therein. It is also an attempt to make glue for all future solutions to current and future problems.

@@ -1,0 +1,12 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST.SKIP
+lib/Win32/SAPI4.pm
+t/01_load.t
+t/pod.t
+t/pod-coverage.t
+t/voicetext.t
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+lib/Win32/Girder/IEvent/Client.pm
+lib/Win32/Girder/IEvent/Server.pm
+lib/Win32/Girder/IEvent/Common.pm
+t/01Common.t
+t/02Client.t
+t/03Server.t
+t/04Advanced.t
+t/90pod.t
+t/91podcoverage.t
+examples/client.pl
+examples/server.pl
+META.yml                                 Module meta-data (added by MakeMaker)

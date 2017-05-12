@@ -1,0 +1,13 @@
+Revision history for Perl module WWW-Hashbang-Pastebin-Client
+
+0.003     2012-05-29
+  - Accidental dependency on Plack::Loader removed [GH #1]
+  - Replace LWP::UserAgent with HTTP::Tiny
+  - Remove URI
+
+0.002     2012-03-31
+  - Update for latest changes in WWW::Hashbang::Pastebin - strip terminating + from
+    ID, if present (instead of ., which was the previous way to get HTML output)
+
+0.001     2012-03-16
+  - First release

@@ -1,0 +1,31 @@
+---
+abstract: 'Interface to http://www.omdbapi.com/'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  File::Spec: 0
+  HTTP::Online: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-OMDB
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  constant: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-WebService-OMDBAPI/issues
+  homepage: https://github.com/andrewrjones/perl5-WebService-OMDBAPI
+  repository: https://github.com/andrewrjones/perl5-WebService-OMDBAPI.git
+version: 1.140440

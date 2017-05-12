@@ -1,0 +1,10 @@
+Revision history for Web::Request::Role::AbsoluteUriFor
+
+1.001   2017-02-07T13:12:19
+    - more removal of duplicate script_name (Thomas Klausner)
+
+
+1.000   2017-02-06T15:29:38
+    - added tests & docs
+    - extracted from Validad::Tools
+

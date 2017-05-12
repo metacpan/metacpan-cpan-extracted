@@ -1,0 +1,45 @@
+use Test::More tests => 2;
+BEGIN { use_ok('Win32::SqlServer::DTS::Package') }
+
+can_ok(
+    'Win32::SqlServer::DTS::Package',
+    qw(log_to_server
+      auto_commit
+	  execute
+	  get_steps
+      new
+      use_explicit_global_vars
+      use_event_log
+      fail_on_error
+      add_lineage_vars
+      is_lineage_none
+      is_repository
+      is_repository_required
+      to_string
+      get_connections
+      count_connections
+      get_tasks
+      count_tasks
+      count_datapumps
+      get_datapumps
+      count_dynamic_props
+      get_dynamic_props
+      get_execute_pkgs
+      count_execute_pkgs
+      get_send_emails
+      count_send_emails
+      save_to_server
+      save_to_file
+      get_creation_date
+      get_creator_computer
+      get_description
+      get_log_file
+      get_sibling
+      kill_sibling
+      debug
+      get_max_steps
+      get_name
+      get_id
+      get_priority
+      get_version_id)
+);

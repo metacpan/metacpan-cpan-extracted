@@ -1,0 +1,114 @@
+Revision history for WWW-Scraper-ISBN-Pearson_Driver
+====================================================
+
+0.23    2015-02-06
+        - updated regex for site changes.
+
+0.22    2014-11-30
+        - fixed license fields in META.json to be lists.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.21    2014-07-29
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - provide html in book details.
+
+0.20    2013-11-27
+        - META updates.
+        - added git repository links to metadata.
+        - added isbn-check.pl to examples.
+        - added Data::Dumper to prerequisites.
+
+0.19    2012-12-16
+        - updated regex for site changes.
+        - change file dates changed to meet W3CDTF standards.
+        - updated form name for search.
+        - License updated consistently to Artistic License v2.0.
+        - reworked Makefile.PL for clarity.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+
+0.18    2011-05-04
+        - amended pingtest() in network tests.
+        - added further skip test if test books are withdrawn from the site.
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - image link updates due to site changes.
+
+0.17    2010-10-06
+        - provided alternate ping test methods.
+
+0.16    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.15    2010-08-10
+        - added better protection from network failures.
+        - updated prerequisite requirements.
+
+0.14    2010-08-02
+        - added connection protection if client or server offline.
+        - documentation updates.
+
+0.13    2010-07-30
+        - documentation fixes.
+
+0.12    2010-07-30
+        - updates to parser for Pearson site.
+        - added fields (if known) for binding, pages, weight, width & height.
+        - added ean13, which is the industry name for isbn-13.
+        - more tests.
+        - removal of Template::Extract references.
+        - various package file changes (inc adding META.json).
+
+0.11	2009-08-14
+        - minor fixes to parsing of Pearson website.
+        - added ping tests, to avoid failing when no network connection.
+        - real failures produce diagnostics not skips now.
+        - added more package tests.
+
+0.10	2008-06-27
+        - added checks to only run extra tests under AUTOMATED_TESTING
+        - switched metatest to use Test-CPAN-Meta
+        - upped META.ym spec version and link
+        - added isbn10 key into book data
+        - attempt to catch bad ISBN in tests where Business::ISBN is installed,
+          which is now used by the new version of WWW::Scraper::ISBN.
+
+0.09	2007-07-26
+        - added test to check for non-existent ISBNs
+        - updated first book test to a new book, Perl Medic looks to be out of 
+          print :(
+
+0.08	2007-03-01
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - Updated the pattern matching code now that Yahoo have changed their 
+          page layouts.
+        - Added better error reporting.
+        - Removed dependency on Template::Extract.
+        - Devel::Cover = 95.2%
+
+0.07	2005-03-02
+        - book_link made from bookid stored in the page
+
+0.06	2001-01-07  
+        - handler() moved to WWW::Scraper::ISBN::Driver
+        - test suite updated to peform skips if can't access web pages
+
+0.05	2004-08-31
+        - Simplified error handling
+
+0.04	2004-06-07
+        - Simplified extract string
+
+0.03	2004-05-10
+        - Added publisher attribute
+
+0.02	2004-04-07
+        - can't remember!
+
+0.01	2004-04-07
+        - original version

@@ -1,0 +1,17 @@
+Changes
+lib/WWW/BackpackTF.pm
+lib/WWW/BackpackTF/Currency.pm
+lib/WWW/BackpackTF/Item.pm
+lib/WWW/BackpackTF/Listing.pm
+lib/WWW/BackpackTF/MarketItem.pm
+lib/WWW/BackpackTF/User.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/50-network.t
+t/perlcritic.t
+t/perlcriticrc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

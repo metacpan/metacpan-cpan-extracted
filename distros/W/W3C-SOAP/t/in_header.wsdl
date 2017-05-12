@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:s0="urn:HeaderTest" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:HeaderTest">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified" targetNamespace="urn:HeaderTest">
+      <xsd:element name="OpGet" type="s0:GetInputMap"/>
+      <xsd:complexType name="GetInputMap">
+        <xsd:sequence>
+          <xsd:element name="CR_Ref" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="OpGetResponse" type="s0:GetOutputMap"/>
+      <xsd:complexType name="GetOutputMap">
+        <xsd:sequence>
+          <xsd:element name="Status" type="s0:StatusType"/>
+          <xsd:element name="StatusDisplay" type="xsd:string"/>
+          <xsd:element name="Cancellation_Reason" type="xsd:string"/>
+          <xsd:element name="Rejected_By" type="xsd:string"/>
+          <xsd:element name="Rejected_By_Group" type="xsd:string"/>
+          <xsd:element name="Rejected_Reason" type="xsd:string"/>
+          <xsd:element name="Source_System" type="xsd:string"/>
+          <xsd:element name="Source_System_ID" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="StatusType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Draft"/>
+          <xsd:enumeration value="Planning"/>
+          <xsd:enumeration value="Review"/>
+          <xsd:enumeration value="Pending"/>
+          <xsd:enumeration value="Approved"/>
+          <xsd:enumeration value="Verify"/>
+          <xsd:enumeration value="Closed"/>
+          <xsd:enumeration value="Rejected"/>
+          <xsd:enumeration value="Cancelled"/>
+          <xsd:enumeration value="Template"/>
+          <xsd:enumeration value="SCT Draft"/>
+          <xsd:enumeration value="SCT Pending"/>
+          <xsd:enumeration value="SCT Approved"/>
+          <xsd:enumeration value="SCT Rejected"/>
+          <xsd:enumeration value="SCT Cancelled"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="AuthenticationInfo" type="s0:AuthenticationInfo"/>
+      <xsd:complexType name="AuthenticationInfo">
+        <xsd:sequence>
+          <xsd:element name="userName" type="xsd:string"/>
+          <xsd:element name="password" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="authentication" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="locale" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="timeZone" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="OpGetSoapIn">
+    <wsdl:part element="s0:OpGet" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpGetSoapOut">
+    <wsdl:part element="s0:OpGetResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ARAuthenticate">
+    <wsdl:part element="s0:AuthenticationInfo" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="HeaderTestPortType">
+    <wsdl:operation name="OpGet">
+      <wsdl:input message="s0:OpGetSoapIn"/>
+      <wsdl:output message="s0:OpGetSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HeaderTestSoapBinding" type="s0:HeaderTestPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="OpGet">
+      <soap:operation soapAction="urn:HeaderTest/OpGet" style="document"/>
+      <wsdl:input>
+        <soap:header message="s0:ARAuthenticate" part="parameters" use="literal">
+
+            </soap:header>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HeaderTestService">
+    <wsdl:documentation>Query Service for Header Test</wsdl:documentation>
+    <wsdl:port binding="s0:HeaderTestSoapBinding" name="HeaderTestSoap">
+       <soap:address location="https://example.com/HeaderTest"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,17 @@
+{
+    "data": {
+        "lookup": [
+            {
+                "global_hash": "beta",
+                "short_url": "http://bit.ly/beta",
+                "url": "http://betaworks.com/"
+            },
+            {
+                "error": "NOT_FOUND",
+                "url": "asdf://www.google.com/not/a/real/link"
+            }
+        ]
+    },
+    "status_code": 200,
+    "status_txt": "OK"
+}

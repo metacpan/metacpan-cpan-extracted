@@ -1,0 +1,23 @@
+---
+abstract: "WebService::CloudProvider - an interface to cloudprovider.net's RESTful Web API using Web::API"
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-CloudProvider
+requires:
+  Mouse: 0
+  Web::API: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/nupfel/WebService-CloudProvider/issues
+  homepage: https://github.com/nupfel/WebService-CloudProvider/wiki
+  repository: git://github.com/nupfel/WebService-CloudProvider.git
+version: 0.3

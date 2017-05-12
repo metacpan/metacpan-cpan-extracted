@@ -1,0 +1,63 @@
+﻿WebService-Viddler
+
+Similar to YouTube and Vimeo, Viddler is a web application, built around videos, that allows one to upload and share on the web.
+
+Viddler also provides a great deal of features for customization, from customizing of the video player to the integration of the Viddler platform into a specific application. The obvious advantage here for a business or organization is the ability to provide video content wrapped within their own branding or application without the expense of building and managing the huge computing infrastructure required for bandwidth and data storage.
+
+This module wraps around Viddler's API. The goal here is not only to provide a basic how-to, but a quick method for integrating Perl-based applications with Viddler.
+
+At the moment this module is undergoing rapped development. Not all methods that this module wraps have been tested and verified. As such, at this time please consider this module Alpha quality code. If considering use in a production environment, be sure to rigorously test and validate the implementation of this code against the expected behavior as outlined in Viddler's API documentation: http://developers.viddler.com/documentation/api/
+
+Version 0.10
+
+TO DO
+
+# Complete support of all API methods
+	Missing v1 API methods: videos_comments_add and videos_comments_remove
+	Missing v2 API methods: videos_enableAds and videos_disableAds
+# Process/Return Viddler error codes for all method calls
+# Document all common error codes and method specific error codes
+# Validation/Error Handling of parameters/results
+# Add SSL option for methods such as users_auth
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::Viddler
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Viddler
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-Viddler
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-Viddler
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Viddler/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Paul Weinstein
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

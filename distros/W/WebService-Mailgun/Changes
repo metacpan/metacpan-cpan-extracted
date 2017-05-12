@@ -1,0 +1,32 @@
+Revision history for Perl extension WebService-Mailgun
+
+0.06 2017-03-02T17:23:41Z
+    - fix recursive fetch data
+    - support event recursive fetch
+    - add get_message_from_event
+    - update document
+
+0.05 2017-03-01T11:27:57Z
+
+    - support Event API
+
+0.04 2016-08-27T11:40:16Z
+
+    - fix cpanfile (add Try::Tiny)
+
+0.03 2016-08-27T06:27:03Z
+
+    - fix the behavior at the time of error
+    - add RaiseError option
+    - add error, error_status method
+    - fix error message (use carp and croak)
+
+0.02 2016-08-13T02:41:53Z
+
+    - fix unit test
+    - require perl 5.10 and later
+
+0.01 2016-08-12T13:40:58Z
+
+    - original version
+

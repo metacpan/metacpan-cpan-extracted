@@ -1,0 +1,171 @@
+This set of scripts is provided to help you migrate a WeSQL site in one 
+language to a multi-language site. You would execute tag.pl, number.pl,
+extract.pl and assemble.pl in sequence. But don't just do it - read the
+rest of this file first, don't say I didn't warn you!
+
+***** WARNING *****
+The scripts are far from perfect, so before anything else, 
+BACKUP your files!!
+***** END WARNING *****
+
+Here's a short description of what each script does:
+
+1. tag.pl
+
+tag.pl will 'tag' text in all .wsql or .cf files in the specified directory 
+with the language tag you specify. This means that it will recognize clear 
+text like this:
+
+<b>This is a test</b>
+
+and will change it into:
+
+<b><en>This is a test</en></b>
+
+provided you specified 'en' as the language to tag the files with. These
+language tag will be recognized by WeSQL, and the text enclosed within will
+only be displayed when a page in this language (in this case English) is 
+requested.
+
+tag.pl is ideal for switching a single-language .wsql site to a 
+multi-language site.
+
+tag.pl has some limitations:
+
+a) It will only tag text outside <!-- --> blocks, that means it won't touch
+any html you generate on the fly within EVAL blocks. You'll have to tag that
+manually.
+
+b) It's smart enough not to tag a file that already contains tags for that 
+language. It will warn you about that. This means that you will have to deal
+with those files manually.
+
+c) I'm pretty sure that in certain cases, tag.pl will NOT do the right thing.
+If you find such a case, let me know.
+
+So check your files after you run tag.pl on them!
+
+tag.pl comes with WeSQL (http://wesql.org), and is licensed under the GPL 
+(Gnu Public License) version 2 or higher.
+
+Command line arguments:
+  -d <directory>, --directory=<directory>     (MANDATORY!)
+    the directory to scan for .wsql and .cf files
+  -l <languagetag>, --language=<languagetag>  (MANDATORY!)
+    the language tag to be inserted in the file, for instance 'en'
+  -h, --help: 
+    display the help you are reading now
+  -v, --version:
+    display version output
+
+Report bugs to w@wesql.org
+
+2. number.pl
+
+number.pl will number the language tags in all .wsql/.cf files in the directory
+you specify. This means that a line like:
+
+<b><en>This is a test</en></b>
+
+will become something like (the actual number may vary):
+
+<b><en 12>This is a test</en 12></b>
+
+Every tag pair gets a unique number. 
+
+Be sure to keep the tag numbers for all your languages in sync: the numbers 
+of the tag pairs of the different languages will need to match! Running number.pl 
+once for every language will solve this issue if you have the same number of tags 
+for every language.
+
+This also means that you should be careful running the script after you have run
+extract.pl and before you run assemble.pl: it will change the numbers of your tag
+pairs if you have inserted extra tag pairs! To avoid this, first run assemble.pl,
+to update the language, and then you can re-run number.pl safely and generate a new
+language file for translation with extract.pl
+
+The script is smart enough not to touch
+already numbered tags, so it is safe to run on your set of files as many times
+as you wish. 
+
+
+number.pl comes with WeSQL (http://wesql.org), and is licensed under the GPL 
+(Gnu Public License) version 2 or higher.
+  
+Command line arguments:
+  -d <directory>, --directory=<directory>     (MANDATORY!)
+    the directory to scan for .wsql and .cf files
+  -l <languagetag>, --language=<languagetag>  (MANDATORY!)
+    the language tag to be numbered in the file, for instance 'en'
+  -h, --help: 
+    display the help you are reading now
+  -v, --version:
+    display version output
+      
+Report bugs to w@wesql.org
+
+3. extract.pl
+
+extract.pl will make a 'language file' from all .wsql/.cf files in the 
+directory you specify, from the language you specify.
+
+You have to give it two languages as parameters, the 'from' and the 'to' 
+language. The 'from' language is the language you would like the translation
+to start from, and the 'to' language is obviously the language you are
+getting a translation into.
+
+extract.pl looks for all numbered tag pairs in the 'from' language, and puts 
+the text that they surround in one big file that can then be passed on to a 
+translator. If some tag pairs already exist in the 'to' language, the 'to' 
+language text will be inserted in the language file. So this script is safe
+to run on your files as much as you like. It will not change them.
+
+One word of caution, however: be sure that the tag numbers for all the 
+languages correspond! Run number.pl for each language to make them correspond,
+as described higher.
+
+After you have run extract.pl, and before you run assemble.pl, DON'T run the
+number.pl script! Once you have 'assembled' your translated language, you can 
+number.pl again.
+
+extract.pl comes with WeSQL (http://wesql.org), and is licensed under the GPL 
+(Gnu Public License) version 2 or higher.
+
+Command line arguments:
+  -d <directory>, --directory=<directory>     (MANDATORY!)
+    the directory to scan for .wsql and .cf files
+  -f <from-language>, --from=<from-language>     (MANDATORY!)
+    the 'from' language
+  -t <to-language>, --to=<to-language>  (MANDATORY!)
+    the 'to' language to generate the language file for
+  -h, --help: 
+    display the help you are reading now
+  -v, --version:
+    display version output
+
+Report bugs to w@wesql.org
+
+4. assemble.pl
+
+assemble.pl will read a 'language file' as made by extract.pl, and update the 
+text surrounded by language tags in the .wsql/.cf files in the specified 
+directory.
+
+After running assemble.pl, you can erase the language file, and if desired, 
+generate a new one with extract.pl
+
+assemble.pl comes with WeSQL (http://wesql.org), and is licensed under the GPL 
+(Gnu Public License) version 2 or higher.
+
+Command line arguments:
+  -d <directory>, --directory=<directory>     (MANDATORY!)
+    the directory with .wsql and .cf files to be updated
+  -f <language-file>, --file=<language-file>     (MANDATORY!)
+    the language file (e.g. nl_en_language.txt)
+  -h, --help: 
+    display the help you are reading now
+  -v, --version:
+    display version output
+
+Report bugs to w@wesql.org
+

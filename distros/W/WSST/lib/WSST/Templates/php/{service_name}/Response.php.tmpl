@@ -1,0 +1,159 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Response" -%]
+
+require_once 'PEAR.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Class encapsulating the HTTP Response" -%]
+class [% package_name %]_Response
+{
+    /**
+     * HTTP status line
+     * 
+     * @access private
+     * @var string
+     */
+    var $_status = null;
+    
+    /**
+     * HTTP response header
+     * 
+     * @access private
+     * @var array
+     */
+    var $_header = null;
+
+    /**
+     * HTTP response message content
+     * 
+     * @access private
+     * @var string
+     */
+    var $_content = null;
+    
+    /**
+     * parsed response XML data
+     * 
+     * @access private
+     * @var array
+     */
+    var $_data = null;
+
+    /**
+     * Constructor
+     * 
+     * @access public
+     * @param string $status HTTP status line
+     * @param string $headers HTTP response header
+     * @param string $content HTTP response message content
+     */
+    function [% package_name %]_Response($status = null, $headers = null, $content = null)
+    {
+        if (!is_null($status)) {
+            $this->setStatus($status);
+        }
+        if (!is_null($headers)) {
+            $this->setHeaders($headers);
+        }
+        if (!is_null($content)) {
+            $this->setContent($content);
+        }
+    }
+    
+    /**
+     * Get status
+     * 
+     * @access public
+     * @return string status line
+     */
+    function getStatus()
+    {
+        return $this->_status;
+    }
+    
+    /**
+     * Set status
+     * 
+     * @access public
+     * @param string $status status line
+     * @return void
+     */
+    function setStatus($status)
+    {
+        $this->_status = $status;
+    }
+    
+    /**
+     * Get headers
+     * 
+     * @access public
+     * @return array headers
+     */
+    function getHeaders()
+    {
+        return $this->_headers;
+    }
+    
+    /**
+     * Set headers
+     * 
+     * @access public
+     * @param array $headers headers
+     * @return void
+     */
+    function setHeaders($headers)
+    {
+        $this->_headers = $headers;
+    }
+    
+    /**
+     * Get content
+     * 
+     * @access public
+     * @return string content
+     */
+    function getContent()
+    {
+        return $this->_content;
+    }
+    
+    /**
+     * Set content
+     * 
+     * @access public
+     * @param string $content content
+     * @return void
+     */
+    function setContent($content)
+    {
+        $this->_content = $content;
+    }
+    
+    /**
+     * Get data
+     * 
+     * @access public
+     * @return object data
+     */
+    function &getData()
+    {
+        if (!$this->_data) {
+            $this->processData();
+        }
+        return $this->_data;
+    }
+
+    /**
+     * process response data
+     * 
+     * @access public
+     * @param array $conf config
+     * @return object PEAR_Error on error, or null.
+     */
+    function processData($conf = array())
+    {
+        return null;
+    }
+}
+
+?>

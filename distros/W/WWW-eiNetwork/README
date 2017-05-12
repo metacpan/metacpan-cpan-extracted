@@ -1,0 +1,25 @@
+WWW::eiNetwork
+====================
+
+This module provides an object-oriented Perl interface to eiNetwork libraries in Allegheny County, Pennsylvania.
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    WWW::Mechanize
+    HTML::TableContentParser
+	Crypt::SSLeay or IO::Socket::SSL
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Michael Aquilina. All rights reserved.

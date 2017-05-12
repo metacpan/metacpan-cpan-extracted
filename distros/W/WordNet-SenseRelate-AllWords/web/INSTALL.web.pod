@@ -1,0 +1,267 @@
+=head1 NAME
+
+INSTALL.web - [Web] Installation instructions for
+WordNet::SenseRelate::AllWords Web interface
+
+=head1 SYNOPSIS
+
+ubuntu
+
+	cd web	
+	cp -R cgi-bin/allwords/ /usr/lib/cgi-bin/
+	cp -R htdocs/allwords/ /var/www/
+	chmod -R 0777 /usr/lib/cgi-bin/allwords/user_data
+	chmod -R 0777 /var/www/allwords/user_data
+	cd /usr/lib/cgi-bin/allwords/
+	sudo perl allwords_server.pl --logfile /var/www/allwords_log.txt
+
+Fedora
+
+	cd web	
+	cp -R cgi-bin/allwords/ /usr/local/apache2/cgi-bin/
+	cp -R htdocs/allwords/ /usr/local/apache2/htdocs/
+	chmod -R 0777 /usr/local/apache2/cgi-bin/allwords/user_data 	
+	chmod -R 0777 /usr/local/apache2/htdocs/allwords/user_data 	
+	cd /usr/local/apache2/cgi-bin/allwords/
+	sudo perl ./allwords_server.pl --logfile /usr/local/apache2/htdocs/allwords_log.txt
+
+=head1 DESCRIPTION
+
+
+=over
+
+=item 1.
+
+This guide provides guidelines for WordNet::SenseRelate::AllWords Web
+interface installation. The guide assumes that you are using the 
+Apache webserver as installed on a Fedora Core 3 or Ubuntu 8.04 based 
+Linux distribution. If you are using a different server or Linux 
+distribution, then the setup process will probably vary a little. 
+Moreover Your path names may vary depending on how you have installed 
+Apache. 
+
+=item 2.
+
+The following Modules and their dependencies are required by the
+SenseRelate::AllWords Web interface :
+
+      WordNet::Similarity
+      WordNet::Tools
+      WordNet::SenseRelate::AllWords
+
+All these modules are available at CPAN. Please refer to README.web.pod
+for more information about installation of these modules. Before
+installing the web interface all these dependencies must be resolved.
+Please refer to INSTALL.pod of WordNet-SenseRelate-AllWords for
+installing dependencies.
+
+=back
+
+=head1 Installation steps
+
+=over
+
+=item 1
+
+Make sure you are a super user, more specifically sudo in ubuntu and su in 
+Fedora
+
+=item 2.
+
+Assuming that you are currently in the directory where you have downloaded
+WordNet-SenseRelate-AllWords, go to the web directory 
+
+cd web/
+
+=item 3.
+
+Copy cgi-bin/allwords directory to the cgi-bin directory of your web
+server.
+
+ubuntu
+
+	cp -R cgi-bin/allwords/ /usr/lib/cgi-bin/
+
+Fedora
+
+	cp -R cgi-bin/allwords/ /usr/local/apache2/cgi-bin/
+
+=item 4.
+
+Copy htdocs/allwords directory to the htdocs directory of your web
+server.
+
+ubuntu
+
+	cp -R htdocs/allwords/ /var/www/
+
+fedora
+
+	cp -R htdocs/allwords/ /usr/local/apache2/htdocs/
+
+=item 5.
+
+Several output files are created by the web-interface for which it
+requires read, write and execute permissions to the user_data/
+directory. Thus make sure that "others" user level has
+read-write-execute access to the cgi-bin/allwords/user_data and
+htdocs/allwords/user_data directory. Similarly make sure if .pl and
+.cgi files in cgi-bin/allwords/ directory have execute permission for
+all users including "others" user level. This might not be the best
+way considering the security related issues. However, at this point
+this is how we deal with the permissions. Alternative suggestions are
+most welcome! 
+
+ubuntu
+
+	chmod -R 0777 /usr/lib/cgi-bin/allwords/user_data
+	chmod -R 0777 /var/www/allwords/user_data 	
+
+Fedora
+
+	chmod -R 0777 /usr/local/apache2/cgi-bin/allwords/user_data
+	chmod -R 0777 /usr/local/apache2/htdocs/allwords/user_data
+
+=item 6.
+
+Starting the web server.
+
+Again make sure you are a super user. We need bash shell to run 
+our scripts. So make sure your /bin/sh is pointing to /bin/bash.
+Go to the cgi-bin/allwords directory and start the web server
+with the appropriate options. You need to provide the path of
+your logfile, which is a mandatory option of allwords_server.pl.
+First start similarity server, if it is not already running. For
+example, we start our similarity server as below. 
+
+/usr/local/bin/similarity_server.pl --stoplist /root/stoplist.txt --logfile /var/log/similarity_server.log --maxchild 8
+
+ubuntu
+
+	If your /bin/sh is pointing to /bin/dash, please make 
+	it point to /bin/bash
+
+	Here is what we did during our install on ubuntu
+	sudo rm /bin/sh
+	sudo ln -s /bin/bash /bin/sh
+
+	Please refer the link below for more information on this
+	https://wiki.ubuntu.com/DashAsBinSh
+
+	Then start the server
+
+	cd /usr/lib/cgi-bin/allwords/
+	nohup sudo perl allwords_server.pl --logfile /var/www/allwords_log.txt &
+
+	In this example allwords_server.pl's log is stored at 
+	/var/www/allwords_log.txt.
+
+Fedora
+
+	cd /usr/local/apache2/cgi-bin/allwords/
+	nohup sudo perl ./allwords_server.pl --logfile /usr/local/apache2/htdocs/allwords_log.txt &
+
+	In this example allwords_server.pl's log is stored at 
+	/usr/local/apache2/htdocs/allwords_log.txt.
+
+You might want to change the following things by using various options
+of allwords_server.pl
+
+--wnlocation
+
+	The default WordNet path we use is /usr/local/WordNet-3.0.
+	If you have WordNet installed on path other than 
+	/usr/local/WordNet-3.0/, you can use --wnlocation option of
+	allwords_server.pl and specify your WordNet path. For example,
+	if your WordNet is installed at the path /usr/MyWordNet/WordNet-3.0
+
+	perl allwords_server.pl --logfile /var/www/allwords_log.txt --wnlocation /usr/MyWordNet/WordNet-3.0
+
+--port
+
+	We use 32323 port by default. If you want to change this port you can
+	use --port option of allwords_server.pl. For example, 
+
+	perl allwords_server.pl --logfile /var/www/allwords_log.txt --port 30303
+
+	Note that the port you are listening on should be same as the port
+	you are sending messages to. Therefore, if you want to use this 
+	option, you need to change $port variable in allwords.cgi file and
+	make it same as the port you are listening on. For example, in this
+	case we will set $port variable in allwords.cgi to 7075
+
+	my $remote_port=32323;
+
+=item 7.
+
+Automatic start up.
+
+If you would like the web server to start automatically when your system
+is rebooted, you can modify your /etc/rc.local file to include the
+following:
+
+ubuntu
+
+	echo "** similarity_server.pl starting ..."
+	/usr/local/bin/similarity_server.pl --stoplist /root/stoplist.txt --logfile /var/log/similarity_server.log --maxchild 8
+
+	echo "** senserelate allwords starting ..."
+	OLDPWD=`pwd`
+	cd /usr/lib/cgi-bin/allwords
+	./allwords_server.pl --logfile /var/www/allwords_log.txt
+	cd $OLDPWD
+
+	exit 0
+
+fedora
+
+	# start apache (must be done before starting allwords)
+
+	/usr/local/apache2/bin/apachectl -k start
+
+	# start allwords server
+
+	OLDPWD=`pwd`
+	cd /usr/local/apache2/cgi-bin/allwords
+	/usr/local/apache2/cgi-bin/allwords/allwords_server.pl &
+	cd $OLDPWD
+
+	exit 0
+
+
+Note that /root/stoplist.txt is the stoplist used by WordNet::Similarity. The default stoplist
+used by the web interface is located at web/cgi-bin/allwords/user_data/default-stoplist-raw.txt.
+
+=back
+
+=head1 AUTHORS
+
+ Varada Kolhatkar, University of Minnesota, Duluth
+ kolha002 at d.umn.edu
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+This document last modified by :
+$Id: INSTALL.web.pod,v 1.12 2009/02/13 16:25:16 kvarada Exp $
+
+=head1 SEE ALSO
+
+ L<README.web.pod> L<INSTALL.pod>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2008, Varada Kolhatkar, Ted Pedersen, Jason Michelizzi
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut
+

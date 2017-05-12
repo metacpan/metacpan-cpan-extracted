@@ -1,0 +1,41 @@
+---
+abstract: 'Interface for Eksisozluk.com'
+author:
+  - 'Kivanc Yazan'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Eksi
+requires:
+  Carp: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  Mojo::DOM: '0'
+  URI: '0'
+  WWW::Lengthen: '0'
+  experimental: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kyzn/WWW-Eksi/issues
+  homepage: https://github.com/kyzn/WWW-Eksi
+  repository: https://github.com/kyzn/WWW-Eksi.git
+version: '0.26'
+x_contributors:
+  - 'Kivanc Yazan <kivancyazan@gmail.com>'
+  - 'Kivanc Yazan <kyzn@users.noreply.github.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

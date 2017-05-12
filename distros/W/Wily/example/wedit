@@ -1,0 +1,17 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+use Cwd 'abs_path';
+
+use Wily;
+use Wily::Message;
+
+die "Usage: $0 filename\n" unless @ARGV;
+
+my $wily = Wily->new();
+my $win = $wily->win(abs_path($ARGV[0]), 1);
+$win->set_callback(Wily::Message::WEdestroy, sub {exit(0)});
+$win->attach(Wily::Message::WEdestroy);
+$wily->event_loop();
+
+

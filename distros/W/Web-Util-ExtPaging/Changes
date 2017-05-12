@@ -1,0 +1,15 @@
+Revision history for Web-Util-ExtPaging
+
+0.001003  2015-03-30 13:54:41-05:00 America/Chicago
+ - Fix HRI'd resultsets to use coderef if passed (Good find Nathan Dyck!)
+
+0.001002  2014-11-03 16:21:05-06:00 America/Chicago
+ - Transparently support resultsets using HRI (Wes Malone)
+
+0.001001  2013-05-31 23:00:29 CST6CDT
+ - Remove unneeded dep on parent.pm
+
+0.001000  2013-05-25 13:22:30 CST6CDT
+ - Initial Release, factored out of
+   Catalyst::TraitFor::Controller::DoesExtPaging
+

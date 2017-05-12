@@ -1,0 +1,84 @@
+Revision history for the WebFetch modules for Perl5
+
+0.11
+      - converted the following modules to support Embedding API:
+      	DebianNews, General
+      - removed fetch_main function from the derived modules; WebFetch.pm now
+        handles this for all of them.  (This is a partial fix for a problem
+	with embedding more than one WebFetch module at a time, reported by
+	Joey Hess of the Debian Project.)
+      - fixed pod formatting problem in Embedding API docs
+
+0.10 Wed Sep 15 01:23:53 PDT 1999
+      - added WebFetch Embedding API (added over 850 lines to WebFetch.pm)
+      - XML::Parser added as a build-time dependency
+      - the Slashdot and LinuxToday modules now fetch their news via XML
+      - converted the following modules to support Embedding API:
+        CNETnews, CNNsearch, COLA, Freshmeat, SiteNews, Slashdot
+	(upcoming releases will convert more until all are done)
+      - modules with the Embedding API can now all export in WebFetch, XML
+        or RDF output formats
+
+0.09 Sun Aug 15 03:56:47 PDT 1999
+      - added XML fetching for WebFetch::Slashdot, patch by Dan Sully
+      - added WebFetch::LinuxTelephony, contributed by Greg Youngblood
+      - added WebFetch::LinuxDevNet
+      - added WebFetch::32BitsOnline
+
+0.08 Sun Aug  1 22:58:48 PDT 1999
+      - added WebFetch::DebianNews, contributed by Chuck Ritter
+      - updated TODO with plans for site configuration, and
+        prioritization notes about what's required for WebFetch 1.0
+      - added --noshuffle to WebFetch::COLA
+      - updated WebFetch core docs, moved style parameter docs to command line
+
+0.07 Tue Jul  6 05:50:29 PDT 1999
+      - obsoleted WebFetch::EGAuthors because eGroups changes their site too
+        often to keep up with (and has no direct news-export support)
+      - added WebFetch::CNETnews, contributed by Jamie Heilman
+      - updated WebFetch::CNNsearch to allow keyword-only searches.
+        This became necessary when a Linux story got on all the
+	"in other news" pages at CNN and suddenly all pages on CNN
+	matched a search for Linux.  This release also fixed a bug
+	with non-Linux searches, reported by Jamie Heilman.
+      - New --style command line option was added to control the internal
+        HTML style parameter.  Some new style strings were added
+	(notable, bullet)
+
+0.06 Tue May  4 17:00:01 PDT 1999
+      - updated WebFetch::EGAuthors for formatting changes all over their
+        site on May 1
+      - updated WebFetch::CNNsearch for formatting changes in their
+        search engine on May 4
+
+0.05  Sun Apr 11 00:00:00 PDT 1999
+      - added experimental WebFetch::PerlStruct
+
+0.04  Thu Apr  8 18:51:29 PDT 1999
+      - modified WebFetch::Slashdot so it can get Segfault.org headlines
+        and any other Slashdot-compatible site
+      - updated module dependencies in Makefile.PL (was missing Date::Calc
+        for WebFetch::SiteNews)
+      - added WebFetch::CNNsearch module
+      - added WebFetch::COLA module
+      - added --font_size and --font_face to WebFetch (all command lines)
+      - default WebFetch::General format now uses "title" instead of "text"
+      - fixed bad RE flags in WebFetch::General, captures more than one
+        field correctly now
+
+0.03  Sun Mar 21 22:22:03 PST 1999
+      - added documentation to WebFetch::General
+      - updated --ns_export capability when Netscape switched to use RDF
+      - fixed off-by-one error in WebFetch::SiteNews short news output
+
+0.02  Fri Jan 15 02:33:34 PST 1999
+      - fixed a test.pl typo
+      - added WebFetch::General module to read WebFetch::wf_export format
+      - added webfetch-pb.gif "powered by" image
+      - added documentation to WebFetch::SiteNews
+      - added --ns_export (MyNetscape export)
+
+0.01  Mon Jan 11 02:56:15 PST 1999
+      - original version
+	(Though this is the first beta of WebFetch, this is a second
+	generation of code used to handle web-gathered news by SVLUG)

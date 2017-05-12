@@ -1,0 +1,16 @@
+Revision history for Perl extension WWW::Shorten::Flickr
+
+0.03    Tue Feb 16 14:33:31 2010
+        - fix regex in makeashorterlink()
+          fix Makefile.PL
+          fix MANIFEST
+
+0.02    Mon Jan 4 15:10:37 2010 
+        - update makeashorterlink() accept the photo-id
+          fix/add documents 
+          fix/add tests
+          fix Makefile.PL
+          fix MANIFEST and MANIFEST.SKIP
+
+0.01    Fri Jan  1 20:28:49 2010
+        - original version

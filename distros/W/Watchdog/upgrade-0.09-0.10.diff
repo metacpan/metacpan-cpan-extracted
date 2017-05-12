@@ -1,0 +1,107 @@
+diff -ru Watchdog-0.09/Base.pm Watchdog-0.10/Base.pm
+--- Watchdog-0.09/Base.pm	Tue Aug  5 22:48:31 2003
++++ Watchdog-0.10/Base.pm	Mon Nov 10 20:03:35 2003
+@@ -3,9 +3,9 @@
+ use strict;
+ use Alias;
+ use base qw(Watchdog::Util);
+-use vars qw($VERSION $NAME $HOST $PORT);
++use vars qw($VERSION $NAME $HOST $PORT $FILE);
+ 
+-$VERSION = '0.08';
++$VERSION = '0.09';
+ 
+ =head1 NAME
+ 
+@@ -25,11 +25,12 @@
+ 	      NAME    => undef,
+ 	      HOST    => 'localhost',
+ 	      PORT    => undef,
++	      FILE    => '',
+ );
+ 
+ =head1 CLASS METHODS
+ 
+-=head2 new($name,$host,$port)
++=head2 new($name,$host,$port,$file)
+ 
+ Returns a new B<Watchdog::Base> object.  I<$name> is a string which
+ will identify the service to a human.  I<$host> is the name of the
+@@ -45,12 +46,12 @@
+   my $self  = bless { _PERMITTED => \%fields, %fields, },$class;
+   attr $self;
+ 
+-  print STDERR "Watchdog::Base::new() $NAME $HOST $PORT\n" if $DEBUG;
++  print STDERR "Watchdog::Base::new() $NAME $HOST $PORT $FILE\n" if $DEBUG;
+   my $arg;
+-  for (\$NAME,\$HOST,\$PORT) {
++  for (\$NAME,\$HOST,\$PORT,\$FILE) {
+     $$_ = $arg if $arg = shift;
+   }
+-  print STDERR "Watchdog::Base::new() $NAME $HOST $PORT\n" if $DEBUG;
++  print STDERR "Watchdog::Base::new() $NAME $HOST $PORT $FILE\n" if $DEBUG;
+ 
+   return $self;
+ }
+@@ -71,6 +72,7 @@
+   my $self = attr shift;
+   my $id = "$NAME\@$HOST";
+   $id .= ":$PORT" if defined($PORT);
++  $id .= "/$FILE" if ($FILE eq '');
+   return $id;
+ }
+ 
+diff -ru Watchdog-0.09/HTTP.pm Watchdog-0.10/HTTP.pm
+--- Watchdog-0.09/HTTP.pm	Tue Aug  5 21:49:43 2003
++++ Watchdog-0.10/HTTP.pm	Mon Nov 10 20:03:47 2003
+@@ -5,9 +5,9 @@
+ use base qw(Watchdog::Base);
+ use HTTP::Request;
+ use LWP::UserAgent;
+-use vars qw($VERSION $HOST $PORT);
++use vars qw($VERSION $HOST $PORT $FILE);
+ 
+-$VERSION = '0.01';
++$VERSION = '0.02';
+ 
+ =head1 NAME
+ 
+@@ -16,7 +16,7 @@
+ =head1 SYNOPSIS
+ 
+   use Watchdog::HTTP;
+-  $h = new Watchdog::HTTP($name,$host,$port);
++  $h = new Watchdog::HTTP($name,$host,$port,$file);
+   print $h->id, $h->is_alive ? ' is alive' : ' is dead', "\n";
+ 
+ =head1 DESCRIPTION
+@@ -25,11 +25,11 @@
+ 
+ =cut
+ 
+-my($name,$port) = ('httpd',80);
++my($name,$port,$file) = ('httpd',80,'');
+ 
+ =head1 CLASS METHODS
+ 
+-=head2 new($name,$host,$port)
++=head2 new($name,$host,$port,$file)
+ 
+ Returns a new B<Watchdog::HTTP> object.  I<$name> is a string which
+ will identify the service to a human (default is 'httpd').  I<$host>
+@@ -54,13 +54,13 @@
+ =head2 is_alive()
+ 
+ Returns true if an HTTP B<GET> method succeeds for the URL
+-B<http://$host:$port/> or false if it doesn't.
++B<http://$host:$port/$file> or false if it doesn't.
+ 
+ =cut
+ 
+ sub is_alive() {
+   my $self = attr shift;
+-  my $request  = new HTTP::Request(GET => "http://$HOST:$PORT/");
++  my $request  = new HTTP::Request(GET => "http://$HOST:$PORT/$FILE");
+   my $ua       = new LWP::UserAgent;
+   my $response = $ua->request($request);
+   return $response->is_success ? 1 : 0;

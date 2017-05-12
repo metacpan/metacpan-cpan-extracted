@@ -1,0 +1,95 @@
+=begin pod
+=CHAPTER  WebDAO - platform for web applications.
+
+
+B<WebDAO> - object-oriented system  for easy creation of high-performance and scalable web applications writen in I<perl>.
+
+=head2 Key Features
+
+=item *  Abstraction application code from the environment
+
+=item *  Dynamic structure of the domain logic
+
+=item *  Addressing objects by URL
+
+=item *  Built-in support session parameters
+
+=head3  Abstraction application code from the environment
+
+There are many environments in which the web applications work:
+
+    ---------------------------------------------
+    |                                Apache     |
+    | FastCGI                       CGI         |
+    |           ------------------------        |
+    |     nginx |                      |        |
+    |           |     Your code        | isapi  |
+    |           |                      |        |
+    |            ----------------------         |
+    |  Shell            Test::More      IIS     |
+    |        lighttpd                           |
+    ---------------------------------------------
+
+B<WebDAO> designed to save developers from the details of the application environment, reduce costs with a change of environment, and to simplify debugging and testing applications. An important goal is to simplify and increase the speed of web development.
+
+=head3 Dynamic structure of the domain logic
+
+The structure of the domain logic is based on I<XML>(I<HTML>) file. The file name can be derived. For example, let his name be commonplace for web developers: I<index.xhtml>.
+
+  <body>
+  <div>
+   <wd>
+     <object class="MyTest" id="page"/>
+   </wd>
+  </div>
+  </body>
+
+In this text, except for XHTML tags are used more, for example: I<wd> and I<object>. Tag I<wd> is a sign of the special (I<interpreted>) field. While there is no support for the XML namespace, but over time, I promise, it will appear.
+
+Tags I<wd> frame area in which there are definitions of objects and other interpretable tags. In the above example, using the I<command> creates a instance of the class I<MyTest> and identifier: I<page>. This object identifier is used in the URL. For example:
+
+    http://example.org/page
+    http://example.org/page/Method?par1=1&par2=2
+
+    
+In the package I<WebDAO> include lexical analyzer, which processes the file and builds a structure of objects.
+
+Create a file C<MyTest.pm> with the following content:
+
+    package MyTest;
+    use WebDAO;
+    use base 'WebDAO';
+    
+    sub fetch {
+        "Hello Web X.0!";
+    }
+    1;
+
+Each of the domain structures involved in the formation of the results, shows himself. Therefore, in this example, the resulting XHTML will look like this:
+
+    <body>
+    <div>
+       Hello Web X.0!
+    </div>
+    </body>
+
+=head3 Addressing objects by URL
+
+One of the main ideas I<WebDAO> - resolve the URL to the domain structure of objects.
+For example, for URL:
+
+    http:://example.com/test/Method?param=1&param2
+
+Will be called the method I<Method> at  object I<test>.     
+The names of public methods that are available for applications from outside begin with a capital letter. The names of objects can be arbitrary.If the method is not specified - using the name I<index_x>. If this method is not available at the object, returned to the status of "404: Not found". Thus the address below:
+
+    http:://example.com/test/?param=1&param2
+    http:://example.com/test/
+
+Equivalent to the following:
+
+    http:://example.com/test/index_x?param=1&param2
+    http:://example.com/test/index_x
+
+
+=end pod

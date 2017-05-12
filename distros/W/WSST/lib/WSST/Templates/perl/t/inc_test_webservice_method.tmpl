@@ -1,0 +1,65 @@
+<%[ for (my $i = 0; $i < @{$method{tests}}; $i++) {
+    my $test = $method{tests}->[$i];
+    my $name = $method{name} . " / " . ($test->{name} || "Test[$i]");
+
+    $OUT .= "\n";
+    $OUT .= "# $name\n";
+    $OUT .= "{\n";
+    $OUT .= "    my \$params = {\n";
+    foreach my $key (sort keys %{$test->{params}}) {
+        my $val = $test->{params}->{$key};
+        unless ($val =~ s/^\$(.*)$/\$ENV{'$1'}/) {
+            $val = "'$val'";
+        }
+        $OUT .= "        '$key' => $val,\n";
+    }
+    $OUT .= "    };\n";
+
+    $OUT .= "    my \$res = eval { \$obj->$method{interface_name}(\%\$params); };\n";
+
+    if ($test->{type} eq 'lib_error') {
+        $OUT .= "    ok( \$@, '${name}: die' );\n";
+    } elsif ($test->{type} eq 'error') {
+        $OUT .= "    ok( ! \$@, '${name}: die' );\n";
+        $OUT .= "    ok( ! \$res->is_error, '${name}: is_error' );\n";
+        $OUT .= "    my \$data = \$res->root;\n";
+        $OUT .= "    ok( ref \$data, '${name}: root' );\n";
+        my $ret_test = [map {['', $_]} @{$method{'error'}->{children}}];
+        while (my $ret = shift(@$ret_test)) {
+            next if $ret->[1]->{nullable} eq 'true';
+            $OUT .= "    can_ok( \$data$ret->[0], '$ret->[1]->{name}' );\n";
+            $OUT .= "    if ( \$data$ret->[0]\->can('$ret->[1]->{name}') ) {\n";
+            $OUT .= "        ok( eval { defined \$data$ret->[0]\->$ret->[1]->{name} }, '${name}: $ret->[1]->{name}' );\n";
+            $OUT .= "        ok( eval { ref \$data$ret->[0]\->$ret->[1]->{name} eq 'ARRAY' }, '${name}: $ret->[1]->{name}' );\n"
+                if $ret->[1]->{multiple} eq 'true';
+            $OUT .= "    }\n";
+            next unless $ret->[1]->{children};
+            my $next_node = $ret->[0].'->'.$ret->[1]->{name};
+            $next_node .= '->[0]'
+                if $ret->[1]->{multiple} eq 'true';
+            push(@$ret_test, map {[$next_node, $_]} @{$ret->[1]->{children}});
+        }
+    } else {
+        $OUT .= "    ok( ! \$@, '${name}: die' );\n";
+        $OUT .= "    ok( ! \$res->is_error, '${name}: is_error' );\n";
+        $OUT .= "    my \$data = \$res->root;\n";
+        $OUT .= "    ok( ref \$data, '${name}: root' );\n";
+        my $ret_test = [map {['', $_]} @{$method{'return'}->{children}}];
+        while (my $ret = shift(@$ret_test)) {
+            next if $ret->[1]->{nullable} eq 'true';
+            $OUT .= "    can_ok( \$data$ret->[0], '$ret->[1]->{name}' );\n";
+            $OUT .= "    if ( \$data$ret->[0]\->can('$ret->[1]->{name}') ) {\n";
+            $OUT .= "        ok( eval { defined \$data$ret->[0]\->$ret->[1]->{name} }, '${name}: $ret->[1]->{name}' );\n";
+            $OUT .= "        ok( eval { ref \$data$ret->[0]\->$ret->[1]->{name} eq 'ARRAY' }, '${name}: $ret->[1]->{name}' );\n"
+                if $ret->[1]->{multiple} eq 'true';
+            $OUT .= "    }\n";
+            next unless $ret->[1]->{children};
+            my $next_node = $ret->[0].'->'.$ret->[1]->{name};
+            $next_node .= '->[0]'
+                if $ret->[1]->{multiple} eq 'true';
+            push(@$ret_test, map {[$next_node, $_]} @{$ret->[1]->{children}});
+        }
+    }
+    
+    $OUT .= "}\n";
+} ]%>

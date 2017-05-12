@@ -1,0 +1,8 @@
+TYPEMAP
+HANDLE  T_PTR
+DWORD   T_U_LONG
+WCHAR * T_MY_WCHAR
+
+INPUT
+T_MY_WCHAR
+    $var = (wchar_t *)SvPV_nolen ($arg);

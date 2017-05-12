@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Dwolla.t
+lib/WebService/Dwolla.pm
+examples/account_info.pl
+examples/balance.pl
+examples/contacts.pl
+examples/deposit.pl
+examples/funding_sources.pl
+examples/gateway.cgi
+examples/listings.pl
+examples/oauth.cgi
+examples/register.pl
+examples/request.pl
+examples/send.pl
+examples/stats.pl
+examples/webhook.cgi
+examples/withdraw.pl
+META.yml                                 Module meta-data (added by MakeMaker)

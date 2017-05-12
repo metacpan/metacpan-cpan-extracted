@@ -1,0 +1,93 @@
+---
+abstract: 'Moose-based pluggable library manager for compiling and serving static assets'
+author:
+  - 'Ryan Lang <rlang@cpan.org>'
+build_requires:
+  CSS::Minifier::XS: '0'
+  JavaScript::Minifier::XS: '0'
+  LWP::Protocol::https: '0'
+  Test::Compile: '0'
+  Test::More: '0.98'
+  Test::Most: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-AssetLib
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Web::AssetLib::TestLibrary:
+    file: lib/Test/Web/AssetLib/TestLibrary.pm
+  Test::Web::AssetLib::TestRole:
+    file: lib/Test/Web/AssetLib/TestRole.pm
+  Web::AssetLib:
+    file: lib/Web/AssetLib.pm
+    version: '0.042'
+  Web::AssetLib::Asset:
+    file: lib/Web/AssetLib/Asset.pm
+  Web::AssetLib::Bundle:
+    file: lib/Web/AssetLib/Bundle.pm
+  Web::AssetLib::InputEngine:
+    file: lib/Web/AssetLib/InputEngine.pm
+  Web::AssetLib::InputEngine::Content:
+    file: lib/Web/AssetLib/InputEngine/Content.pm
+  Web::AssetLib::InputEngine::LocalFile:
+    file: lib/Web/AssetLib/InputEngine/LocalFile.pm
+  Web::AssetLib::InputEngine::RemoteFile:
+    file: lib/Web/AssetLib/InputEngine/RemoteFile.pm
+  Web::AssetLib::Library:
+    file: lib/Web/AssetLib/Library.pm
+  Web::AssetLib::MinifierEngine:
+    file: lib/Web/AssetLib/MinifierEngine.pm
+  Web::AssetLib::MinifierEngine::Standard:
+    file: lib/Web/AssetLib/MinifierEngine/Standard.pm
+  Web::AssetLib::Output:
+    file: lib/Web/AssetLib/Output.pm
+  Web::AssetLib::Output::Content:
+    file: lib/Web/AssetLib/Output/Content.pm
+  Web::AssetLib::Output::Link:
+    file: lib/Web/AssetLib/Output/Link.pm
+  Web::AssetLib::OutputEngine:
+    file: lib/Web/AssetLib/OutputEngine.pm
+  Web::AssetLib::OutputEngine::LocalFile:
+    file: lib/Web/AssetLib/OutputEngine/LocalFile.pm
+  Web::AssetLib::OutputEngine::String:
+    file: lib/Web/AssetLib/OutputEngine/String.pm
+  Web::AssetLib::Role::Logger:
+    file: lib/Web/AssetLib/Role/Logger.pm
+  Web::AssetLib::Util:
+    file: lib/Web/AssetLib/Util.pm
+requires:
+  Data::Dump: '0'
+  HTML::Element: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '0'
+  Method::Signatures: '0'
+  Moo: '0'
+  Moose: '0'
+  MooseX::Aliases: '0'
+  MooseX::Log::Log4perl: '0'
+  Path::Tiny: '0'
+  Types::Standard: '0'
+resources:
+  bugtracker: https://github.com/ryan-lang/Web-AssetLib/issues
+  homepage: https://github.com/ryan-lang/Web-AssetLib
+  repository: git://github.com/ryan-lang/Web-AssetLib.git
+version: '0.042'
+x_contributors:
+  - 'Ryan Lang <rlang@me.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

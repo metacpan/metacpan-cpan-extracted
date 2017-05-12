@@ -1,0 +1,497 @@
+2009-10-27  Jason Rennie
+
+	* README: update WNHOME/WNSEARCHDIR doc w/ Debian/Ubuntu tip
+
+2009-03-20  Jason Rennie
+
+	* release 1.48
+	* fix handling of WNSEARCHDIR
+
+2009-03-14  Danny Brian
+
+	* added the ability for new() to take a named param list
+	* added a new() param "noload" to not preload index files, but to
+	instead use Search::Dict lookups thereafter
+	* added _getIndexFH() and _getDataFH() to consolidate opening and
+	caching of filehandles
+	* added _dataLookup() to consolidate reads from data files
+	* added _indexLookup() to consolidate reads from index files
+	* added _indexOffsetLookup() to consolidate offset reads from index
+	files
+	* added _parseIndexLine() to consolidate the parsing of index file lines
+	* moved path data to new(), so that everything reads off of $self->{dir}
+	* removed the cntlinst path special-casing
+	* all file opens are deferred until necessary; for noload this means as
+	long as possible, for caching it means during the constructor (see
+	_get*FH() functions)
+	* documented "noload" option
+	* loop tests again for "noload"
+	* cleaned up formatting
+
+2008-01-08  Jason Rennie
+
+	* release 1.47
+	* QueryData.pm: documentation fix
+
+2007-05-06  Jason Rennie
+
+	* release 1.46
+	* QueryData.pm (version): removed (Invalid as of WN 3.0)
+	* test.pm: remove tests for pre-3.0 WN; update tests for WN 3.0
+	* README, QueryData.pm: update documentation of WN version to 3.0
+	* Makefile.PL: update default WN paths
+
+2006-10-16  Jason Rennie
+
+	* release 1.45
+	* QueryData.pm (_initialize): move errorString and errorVal
+	initialization here (so that variables are specific to each
+	instantiation of the module)
+	* QueryData.pm (getResetError): return error information, reset
+	error variables
+	* QueryData.pm (offset): update to use error variables via $self
+	* test.pm: test error handling for offset function
+
+2006-10-16  Jason Rennie
+
+	* release 1.44
+	* QueryData.pm: add "use vars" for new variables
+	* QueryData.pm (offset): fix syntax error
+
+2006-10-15  Jason Rennie
+
+	* release 1.43
+	* QueryData.pm (offset): add error handling
+	* QueryData.pm ($errorString): new package variable
+	* QueryData.pm ($errorVal): new package variable
+
+2006-10-05  Jason Rennie
+
+	* release 1.42
+	
+2006-10-05  Hugh S. Myers
+
+	* QueryData.pm (offset): return undef if anything is undefined
+
+2005-12-30  Jason Rennie
+
+	* release 1.40
+	
+2005-12-30  Gregory Marton
+
+	* QueryData.pm (getWordPointers): $src is a hex, convert it to
+	decimal before trying to use it as an array index
+
+2005-09-15  Jason Rennie
+
+	* release 1.39
+	* test.pl: remove old (1.6, 1.7, 1.71) tests
+	* test.pl: update tests for 2.1
+	* QueryData.pm (@indexFilePC,@dataFilePC): delete; no longer used (2.1)
+	* QueryData.pm (@indexFileUnix,@dataFileUnix): remove Unix suffix
+	* QueryData.pm (loadIndex,openData): update for new variable names
+	* QueryData.pm: update instances of WordNet 2.0 to 2.1
+	* QueryData.pm: update beginning of file w/ correct copyright, remove
+	my e-mail address
+	* QueryData.pm (%lexnames): new variable; encodes data from old
+	lexnames file
+	* QueryData.pm (_initialize): don't load lex names
+	* QueryData.pm (loadLexnames): removed; no longer useful
+	* QueryData.pm (lexname): use new %lexnames variable
+	* QueryData.pm ($lexnamesFile): deleted; no longer used
+	
+2005-09-14  Jason Rennie
+
+	* QueryData.pm (indexFilePC,dataFilePC): now considered to be
+	deprecated (since WordNet 2.1 uses unix file names exclusively
+	now)
+	* QueryData.pm: delete deprecated variables and functions
+	* QueryData.pm (%relation_sym): deleted
+	* QueryData.pm (remove_duplicates): deleted
+	* QueryData.pm (get_pointers): deleted
+	* QueryData.pm (get_all_words): deleted
+	* QueryData.pm (get_words): deleted
+	* QueryData.pm (query): deleted
+	* QueryData.pm (valid_forms): deleted
+	* QueryData.pm (list_all_words): deleted
+	* README: update to reflect known validForms bug
+	* README: update copyright dates
+	* QueryData.pm: update documentation to reflect known validForms bug
+	* QueryData.pm: update copyright dates
+
+2005-09-14  Ben Haskell
+
+	* QueryData.pm: Note that many hypo/hyper-nym relationships have
+	been replaced by "instance of" and "has instance" relations; the
+	new querySense arguments are 'inst' and 'hasi'; 'hypes' returns
+	all hypernym and "instance of" relations; 'hypos' returns all
+	hyponyms and "has instance" relations
+	
+	* QueryData.pm: update for WordNet 2.1: add new entries
+	(inst,hypes,hasi,hypos) in %relNameSym and relSymName
+
+2004-11-10  Beata Klebanov
+
+	* QueryData.pm: Identified the following bug:
+	validForms("hating#v") returns ["hate#v", "hat#v"]; problem is
+	that only the first matching rule of detachment (with a
+	corresponding entry in Wordnet) should be used.
+	validForms/forms/_forms/tokenDetach code needs to be restructured
+	to reflect this.
+
+2004-11-10  Beata Klebanov
+
+	* release 1.38
+	* QueryData.pm (tokenDetach): change match pattern from \w+ to .+;
+	old code wasn't matching words with hyphens! (e.g. go-karts)
+	* test.pl: added "go-karts" test
+
+2004-11-10  Jason Michelizzi
+
+	* release 1.37
+	* QueryData.pm (frequency): new function
+	* QueryData.pm (documentation): add "frequency" entry
+	* test.pl: added tests for frequency()
+	
+2004-11-10  Jason Rennie
+
+	* release 1.36
+	* QueryData.pm (documentation): revise queryWord vs. querySense
+	documentation
+
+2004-09-03  Jason Rennie
+
+	* README: add pointer to NMake information for Windows
+
+2004-08-25  Jason Rennie
+
+	* release 1.35
+	* QueryData.pm (loadExclusions): if there are two entries for the
+	same word, append to the list created by earlier entries (thanks
+	for Jerry D. Hedden for spotting the bug (validForms("involucra")
+	didn't produce involucre#n due to later involcra->involcrum
+	exclusion entry)
+	* test.pl: add involucra->involucre test
+
+2004-08-24  Jason Rennie
+
+	* release 1.34
+	* QueryData.pm (lexnamesFile): new top-level variable
+	* QueryData.pm (loadLexnames): new function
+	* QueryData.pm (lexname): new function
+	* QueryData.pm: add lexname documentation
+	* test.pl: add lexname tests
+	* README: remove e-mail addresses (to reduce spam)
+	* ChangeLog: remove e-mail addresses (to reduce spam)
+
+2004-07-14  Jason Rennie
+
+	* release 1.33
+	* QueryData.pm: Update "LOCATING THE WORDNET DATABASE"
+	documentation (kudos to Jason R Michelizzi for pointing out that
+	this needed updating)
+
+2003-10-08  Jason R Michelizzi
+
+	* release 1.31
+	* QueryData.pm: add new symbols to %relNameSym and %relSymName;
+	QueryData should work perfectly with WordNet 2.0 now.
+	Changed documentation to reflect this.
+	* test.pl: updated tests for 2.0
+
+2003-09-25  Jason Rennie
+
+	* test.pl: move "cat#n" test to version-specific area (8 senses in 2.0)
+	
+2003-09-17  Jason R Michelizzi
+
+	* release 1.30
+	* QueryData.pm (queryWord): updates to fix handling of type (2) strings
+	* test.pl: updated queryWord tests
+
+2003-09-08  Jason R Michelizzi
+
+	* release 1.29
+	* QueryData.pm (getWord): debug
+	* QueryData.pm (queryWord): debug
+	* test.pl: updated queryWord tests
+	
+2003-05-02  Siddharth A Patwardhan
+
+	* QueryData.pm (loadIndex): remember WordNet path
+
+2003-04-03  Jason Rennie
+
+	* release 1.28
+
+	* QueryData.pm ($version): make into a package variable
+
+	* QueryData.pm (queryWord): warn if called; certain aspects of
+	queryWord do not work as they should; see commented out tests in
+	test.pl for examples of what doesn't work
+
+2002-12-04  Jason Rennie
+
+	* release 1.27
+	
+	* test.pl: add detachment tests; postpone queryWord tests
+
+	* QueryData.pm: add new detachment rules; warn that 1.6 and 1.7
+	are no longer officially supported
+	
+2002-08-06  Jason Rennie
+
+	* release 1.26
+	* QueryData.pm (wnPrefixUnix, wnPrefixPC): don't prepend WNHOME to
+	WNSEARCHDIR
+	
+2002-07-30  Jason Rennie
+
+	* release 1.25
+	* QueryData.pm (validForms): return forms for all POS's if no POS
+	passed
+	* QueryData.pm: only lowercase when necessary (index.* lookups)
+	* QueryData.pm (getAllSenses): return word straight from data.*
+	* QueryData.pm (getSense): return word straight from data.*
+	* QueryData.pm (querySense): type (1) & (2): use same capitalization
+	as query
+	* QueryData.pm (queryWord): type (1): use same capitalization as query
+	* QueryData.pm (getWordPointers): lower($word), ignore case in
+	comparison
+	* QueryData.pm (loadExclusions): don't lowercase words
+	* QueryData.pm (loadIndex): don't lowercase words
+	* QueryData.pm (forms): don't lowercase words
+	* QueryData.pm (delMarker): new function
+	* QueryData.pm (underscore): new function
+	* QueryData.pm (tagSenseCnt): new function
+	* QueryData.pm (loadIndex): store tagsense_cnt information
+	* Makefile.PL: update default directories to v1.7.1
+	* QueryData.pm (wnHomeUnix, wnHomePC): update to v1.7.1
+	* test.pl: update for v1.7.1
+	* test.pl: add tests for syntactic marker, capitalization, tagSenseCnt
+	* QueryData.pm (documentation): Use "type" to describe different
+	levels of query specificity
+	
+2002-06-27  Jason Rennie
+
+	* release 1.24
+	* test.pl: add test to check for hex parsing
+	* QueryData.pm (getWordPointers): bugfix: parse source/target as
+	hexidecimal (thanks to Peter Turney for spotting the bug)
+	
+2002-06-20  Jason Rennie
+
+	* release 1.23
+	* test.pl: add test to check for hex conversion
+	* QueryData.pm (getSensePointers): convert $st from hexidecimal
+	* QueryData.pm (getWordPointers): convert $tgt from hexidecimal
+
+2002-06-12  Jason Rennie
+
+	* release 1.22
+	* Makefile.PL: die if WNHOME isn't set and the neither the windows
+	nor the unix default directory exists (so that CPAN tests will
+	die prematurely if WordNet is not installed---will prevent false
+	FAIL's)
+	* QueryData.pm (getWord): bugfix: convert $w_cnt from hexadecimal
+	(thanks to Peter Turney for spotting the bug)
+	
+2002-06-11  Jason Rennie
+
+	* release 1.21
+	* test.pl: make tests reflect changes
+	* QueryData.pm (_forms): return original word (in addition to morph
+	exclusion or rules of detachment forms)
+
+2002-06-11  Jason Rennie
+
+	* release 1.20
+	* QueryData.pm (_forms): new function
+	* QueryData.pm (forms): check morph exclusions for tokens of
+	collocations; use a recursive organization.
+
+2002-06-11  Jason Rennie
+
+	* release 1.19
+	* test.pl: add tests to cover changes
+	* QueryData.pm (tokenDetach): new function
+	* QueryData.pm (forms): if word is in morph exclusion table, return
+	that entry, otherwise use rules of detachment; don't check morph excl.
+	table for parts of collocations (may want to change this later)
+	* QueryData.pm (querySense): given word#pos query, use underscores for
+	spaces in any retured words
+	* QueryData.pm (lower): translate ' ' to '_'
+
+2002-04-12  Jason Rennie
+
+	* release 1.18
+	* QueryData.pm (querySense): fix bug in "glos" lookup (no varaible
+	for pattern match, m//)
+	* test.pl: some tests still used old functions; use new ones
+	
+2002-04-07  Jason Rennie
+
+	* release 1.17
+	* QueryData.pm: update documentation
+	* test.pl: update to use new functions; increment counter to print
+	test numbers; only run relevant tests (use version)
+	* QueryData.pm (relSymName, relNameSym): new maps
+	* QueryData.pm (getSense, getWord, getSensePointers,
+	getWordPointers, querySense, queryWord): important new query
+	functions; distinguish between sense relations and word/lemma
+	relations
+	* QueryData.pm (removeDupliates, getAllSenses, validForms,
+	listAllWords): renamed functions
+	* QueryData.pm (remove_duplicates, get_all_words, valid_forms,
+	list_all_words, get_word, query, get_pointers): deprecated
+	functions
+	* QueryData.pm (lower): strip syntactic marker (if any)
+	* QueryData.pm (loadExclusions, loadIndex, openData): correctly
+	handle WNSEARCHDIR environment variable; use correct directory
+	separator (PC/Unix)
+	* QueryData.pm (version): new function
+	
+2002-04-05  Jason Rennie
+
+	* QueryData.pm (querySense, queryWord): new functions
+	* QueryData.pm (query): Deprecated.  Use querySense instead.
+
+2002-04-03  Jason Rennie
+
+	* README: add citation
+
+2002-04-02  Jason Rennie
+
+	* QueryData.pm: revise man page
+	* test.pl: update numbering
+	* QueryData.pm (load_index): try both Unix and PC file names
+	* QueryData.pm (open_data): try both Unix and PC file names
+	* release 1.16
+
+2002-04-01  Jason Rennie
+
+	* QueryData.pm (load_exclusions): words may have multiple listed
+	exclusions in the *.exc files; fix code to read in all of them;
+	bug reported by Bano
+	* release 1.15
+	
+2002-03-21  Jason Rennie
+
+	* QueryData.pm (offset): use 'defined' to check for good query string;
+	bug ("0#n#1") discovered by Bano
+	* release 1.14
+
+2001-11-25  Jason Rennie
+
+	* QueryData.pm (get_word): eliminate syntactic marker (previously
+	fixed this in get_all_words); bug discovered by Satanjeev Banerjee
+	* test.pl: add syntactic marker check (authority#n#4)
+	* release 1.13
+
+2001-11-22  Jason Rennie
+
+	* test.pl ($wnDir): use WNHOME environment variable
+	* test.pl: update tests for WordNet 1.7; identify which tests work
+	for 1.6 and which work for 1.7
+	* README (CUSTOM DIRECTORY): new section
+	* release 1.12
+
+2001-11-22  Eric Joanis
+
+	* QueryData.pm (remove_duplicates): new function
+	* QueryData.pm (forms): use it
+
+2001-09-12  John Asmuth
+
+	* QueryData.pm ($wordnet_dir): use WNHOME environment variable
+
+2001-02-26  Luigi Bianchi
+
+	* README: added an installation procedure for Windows
+
+2000-09-12  Jason Rennie
+
+	* QueryData.pm (list_all_words): new function
+	* test.pl: add test for list_all_words
+
+2000-05-04  Jason Rennie
+
+	* QueryData.pm (_initialize, query): explicitly set value of input
+	record separator; restore old value before returning
+
+2000-03-31  Eric Joanis
+
+	* QueryData.pm (%relation_sym): '#' is holonym symbol, '%' is
+	meronym symbol.  Previously had this backwards.
+
+2000-03-28  Eric Joanis
+
+	* QueryData.pm (%relation_sym): don't escape dollar-sign
+	* QueryData.pm (get_all_words): fix problems with "new to(p)"
+	by removing "(p)"
+
+2000-03-22  Jason Rennie
+
+	* QueryData.pm (offset): new function
+	* test.pl: add test for offset
+
+2000-03-21  Jason Rennie
+
+	* QueryData.pm (get_pointers, get_all_words): fix minor bug in
+	data file parsing
+
+2000-03-10  Jason Rennie
+
+	* test.pl: Test for new glos code
+
+2000-03-10  John Matiasek
+
+	* QueryData.pm: Allow access to glossary definitions (glos)
+
+2000-02-22  Jason Rennie
+
+	* QueryData.pm: Rewrite documentation; disallow long relation names
+	* QueryData.pm (query): use single regex (like valid_forms);
+	clean up code a bit
+	* QueryData.pm (level): new function
+
+2000-02-02  Keith J. Miller
+
+	* QueryData.pm (forms): make consistent with query syntax;
+	don't return immediately if we find a morph exclusion entry
+	* QueryData.pm (valid_forms): new function
+	* test.pl: make tests consistent with changes, add checks for
+	new function
+
+1999-10-22  Jason Rennie
+
+	* QueryData.pm: update documentation to look a bit nicer
+
+1999-09-15  Jason Rennie
+
+	* README: make specific to QueryData
+	* README: rewrite to correspond to Query
+	* test.pl: rename from my_test.pl
+	* my_test.pl: add test 12; test long POS names
+	* QueryData.pm (get_all_words): fix
+	* QueryData.pm: allow long relation names; allow long POS names;
+	check for illegal POS
+
+1999-09-14  Jason Rennie
+
+	* my_test.pl: nice test suite for QueryData 1.2.
+	* QueryData.pm: first draft of direct access to WordNet data
+	files; 'new'ing is slow; about 15 seconds on my PII/400.  Memory
+	consumption using WordNet 1.6 is appx. 16M.  Still need to
+	integrate forms into query.  query requires the word form to be
+	exactly like that in WordNet (although caplitalization may differ)
+
+1999-09-13  Jason Rennie
+
+	* my_test.pl: test corpus for QueryData
+
+1999-09-13  Jason Rennie
+
+	* QueryData.pm: access data files directly; us a more OO style of
+	coding; initialization (new) code is pretty much done; forms is
+	done

@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w -I../lib
+# This script is here for testing.  browse method doesn't work yet.
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace( auto_login => 0 );;
+
+my @friends = $myspace->browse( {} );
+
+print $myspace->error . "\n" if $myspace->error;
+
+print "Found " . @friends . " friends\n";
+
+foreach my $id ( @friends ) {
+	print $id . "\n";
+}

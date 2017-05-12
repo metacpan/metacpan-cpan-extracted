@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: WebService-Advogato
+version: 1.1.0
+author:
+  - Jaldhar H. Vyas <jaldhar@braincells.com>
+abstract: XML-RPC interface to www.advogato.org
+license: perl
+requires:
+  RPC::XML: 0.53
+provides:
+  WebService::Advogato:
+    file: lib/WebService/Advogato.pm
+    version: 1.1.0
+generated_by: Module::Build version 0.24

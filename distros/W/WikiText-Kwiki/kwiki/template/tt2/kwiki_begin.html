@@ -1,0 +1,35 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>
+[% IF hub.action == 'display' || 
+      hub.action == 'edit' || 
+      hub.action == 'revisions' 
+%]
+  [% hub.cgi.page_name %] -
+[% END %]
+[% IF hub.action != 'display' %]
+  [% self.class_title %] - 
+[% END %]
+  [% site_title %]</title>
+[%# FOR link = hub.links.all -%]
+<!-- XXX Kwiki::Atom might need this, but it breaks Hub::AUTOLOAD
+  <link rel="[% link.rel %]" type="[% link.type %]" href="[% link.href %]" />
+-->
+[%# END %]
+[% FOR css_file = hub.css.files -%]
+  [% IF css_file -%]
+    <link rel="stylesheet" type="text/css" href="[% css_file %]" />
+  [% END -%]
+[% END -%]
+[% FOR javascript_file = hub.javascript.files -%]
+  [% IF javascript_file -%]
+    <script type="text/javascript" src="[% javascript_file %]"></script>
+  [% END -%]
+[% END -%]
+  <link rel="shortcut icon" href="" />
+  <link rel="start" href="[% script_name %]" title="Home" />
+</head>
+<body>
+<!-- END kwiki_begin -->

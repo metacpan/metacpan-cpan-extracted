@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Mechanize-Plugin-Retry
+version:      0.04
+version_from: lib/WWW/Mechanize/Plugin/Retry.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0
+    Test::Exception:               0
+    Test::More:                    0
+    WWW::Mechanize::Pluggable:     0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

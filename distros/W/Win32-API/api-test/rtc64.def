@@ -1,0 +1,16 @@
+LIBRARY	"rtc64"
+EXPORTS
+dummy_for_RTC
+_RTC_InitBase; referenced in API_test.dll but never called due to custom DllMain
+_RTC_Shutdown; referenced in API_test.dll but never called due to custom DllMain
+_RTC_CheckStackVars
+__security_check_cookie
+__GSHandlerCheck
+;__security_cookie DATA; __declspec(dllimport) has no effect on __security_cookie
+rtc_security_cookie=__security_cookie DATA
+;these are in rtc.dll regardless of whether referenced in the export list of
+;rtc.dll since the static CRT parts in rtc.dll require them anyways
+memcmp
+memset
+memcpy
+strlen

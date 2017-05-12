@@ -1,0 +1,89 @@
+#############################################################################
+## Name:        typemap
+## Purpose:     typemap
+## Author:      Mark Wardell
+## Modified by:
+## Created:     24/07/2006
+## RCS-ID:      $Id: typemap,v 1.0 2006/07/24 00:00:00 netcon Exp $
+## Copyright:   (c) 2006, 2012 Mark Wardell
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxDuplexMode            T_ENUM
+wxPaperSize             T_ENUM
+wxPrintQuality          T_ENUM
+wxPrinterError          T_ENUM
+wxPrintBin              T_ENUM
+wxPrintOrientation      T_ENUM
+wxPrintQuality          T_ENUM
+wxPdfMapModeStyle       T_ENUM
+
+wxPageSetupDialogData * O_WXOBJECT
+wxPrintDialogData *     O_WXOBJECT
+wxPrintout *            O_WXOBJECT
+wxPrintPreview *        O_WXOBJECT
+wxPdfPrintPreview *     O_WXOBJECT
+wxPreviewCanvas *       O_WXOBJECT
+
+wxPdfPageSetupDialog *  O_WXOBJECT
+wxPdfPageSetupDialogCanvas *  O_WXOBJECT
+wxPdfPrintDialog     *  O_WXOBJECT
+
+wxPdfColour *           O_NON_WXOBJECT
+const wxPdfColour       O_NON_WXOBJECT
+wxPdfFontManager *      O_NON_WXOBJECT
+
+wxPdfFont *             O_NON_WXOBJECT_THR
+wxPdfFont               O_NON_WXOBJECT_THR
+wxPdfFontDescription *  O_NON_WXOBJECT_THR
+wxPdfDocument *         O_WXOBJECT_THR
+wxPlPdfDocument *       O_WXOBJECT_THR
+wxPdfLineStyle *        O_NON_WXOBJECT_THR
+wxPdfInfo *             O_NON_WXOBJECT_THR
+wxPdfLayer *            O_NON_WXOBJECT_THR
+wxPdfOcg *              O_NON_WXOBJECT_THR
+wxPdfLayerGroup *       O_NON_WXOBJECT_THR
+wxPdfLayerMembership *  O_NON_WXOBJECT_THR
+wxPdfShape *            O_NON_WXOBJECT_THR
+wxPdfLink *             O_NON_WXOBJECT_THR
+wxPdfPageLink *         O_NON_WXOBJECT_THR
+wxPdfBarCodeCreator *   O_NON_WXOBJECT_THR
+wxPdfCoonsPatchMesh *   O_NON_WXOBJECT_THR
+
+wxPdfDC *               O_WXOBJECT_THR
+wxPerlPdfDC *           O_WXOBJECT_THR
+
+wxRichTextBuffer *      O_WXOBJECT
+wxRichTextHeaderFooterData * O_WXOBJECT_THR
+
+wxPdfOcgType			T_ENUM
+wxPdfOcgPolicy			T_ENUM
+
+wxPdfAlignment			T_ENUM
+wxPdfZoom				T_ENUM
+wxPdfLayout				T_ENUM
+wxPdfLineCap			T_ENUM
+wxPdfLineJoin			T_ENUM
+wxPdfMarker				T_ENUM
+
+wxPdfTextRenderMode		T_ENUM
+wxPdfEncryptionMethod	T_ENUM
+wxPdfPageBox		    T_ENUM
+wxPdfBorderStyle		T_ENUM
+wxPdfLinearGradientType	T_ENUM
+wxPdfBlendMode	        T_ENUM
+wxPdfShapedTextMode		T_ENUM
+wxPdfXConformanceType	T_ENUM
+wxPdfRunDirection		T_ENUM
+wxPdfColourType         T_ENUM
+wxPdfSegmentType        T_ENUM
+
+const unsigned char     T_U_CHAR
+const unsigned int      T_UV
+double *                T_PV
+wxPrintData *           O_WXOBJECT
+wxPdfPrinter *          O_WXOBJECT
+wxPdfPrintData *        O_WXOBJECT
+

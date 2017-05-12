@@ -1,0 +1,30 @@
+Revision history for Perl extension Win32::Console
+
+0.05 2013-11-28
+	- Fix required perl version 5.6 -> 5.006.
+
+	- Add Github repo link to META.yml
+
+0.04 2011-01-06
+        - Open the log files with FILE_SHARE_READ so that they can be read
+	  while the subprocess is still running (John Elion). [rt#49946]
+
+0.03 2008-06-13
+        - move sample.pl and child.t into the eg/ subdirectory to avoid
+	  sample.pl from getting installed
+
+0.02 2008-04-15
+	- new version for separate upload to CPAN
+
+	- Allow Win32::Job to be used recursively (each Job object will
+	  "breakaway" from the current job and run inside its own job
+	  context).
+
+	- updated Makefile.PL
+
+	- added Changes and META.yml files
+
+	- renamed test.pl to sample.pl because it doesn't generate TAP output
+
+0.01
+	- initial version

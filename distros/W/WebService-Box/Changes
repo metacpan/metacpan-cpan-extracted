@@ -1,0 +1,14 @@
+Change history for WebService::Box
+==================================
+
+0.02 2013-09-18T19:40:17
+
+     updated dist.ini:
+       + added versions to prereq list
+       + added Sub::Name to prereq list
+       + added metadata
+     added Changes file
+
+0.01 2013-09-14T13:22:45
+
+     initial release

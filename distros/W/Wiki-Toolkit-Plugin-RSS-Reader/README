@@ -1,0 +1,34 @@
+NAME
+Wiki::Toolkit::Plugin::RSS::Reader - retrieve RSS feeds for inclusion in
+Wiki::Toolkit nodes
+
+DESCRIPTION
+Use this Wiki::Toolkit plugin to retrieve an RSS feed from a given URL so
+that you can include it in a wiki node.
+
+INSTALLATION
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+A passthrough Makefile.PL is included for convenience; it will prompt you to
+install Module::Build if you don't already have it.
+
+USAGE
+
+This is a plugin for Wiki::Toolkit, a toolkit for building wikis; therefore
+please consult the documentation for Wiki::Toolkit for relevant information.
+This module can, however, be used standalone if you wish.
+
+AUTHOR
+
+Earle Martin (EMARTIN@cpan.org)
+
+LEGAL
+
+Copyright 2004 Earle Martin.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

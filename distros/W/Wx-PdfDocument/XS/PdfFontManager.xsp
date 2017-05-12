@@ -1,0 +1,62 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdffontmanager.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2008-08-10
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfFontManager} class wxPdfFontManager
+{
+
+public:
+
+  static wxPdfFontManager* GetFontManager();
+
+  %name{AddSearchPathString} void AddSearchPath(const wxString& path) %Overload;
+
+  %name{AddSearchPathArray }void AddSearchPath(const wxArrayString& pathArray) %Overload;
+
+  bool SetDefaultEmbed(bool embed);
+
+  bool GetDefaultEmbed();
+
+  bool SetDefaultSubset(bool subset);
+
+  bool GetDefaultSubset();
+
+  %name{RegisterFontFilename} wxPdfFont RegisterFont(const wxString& fontFileName, const wxString& aliasName = wxEmptyString, int fontIndex = 0) %Overload;
+
+  %name{RegisterFontFont} wxPdfFont RegisterFont(const wxFont& font, const wxString& aliasName = wxEmptyString) %Overload;
+
+  int RegisterFontCollection(const wxString& fontCollectionFileName);
+
+  bool RegisterFontCJK(const wxString& family);
+
+  int RegisterSystemFonts();
+
+  int RegisterFontDirectory(const wxString& directory, bool recursive = false);
+
+  wxPdfFont GetFont(const wxString& fontName, int fontStyle = wxPDF_FONTSTYLE_REGULAR) const;
+
+  wxPdfFont GetFont(const wxString& fontName, const wxString& fontStyle) const;
+
+  wxPdfFont GetFont(size_t fontIndex) const;
+
+  size_t GetFontCount() const;
+
+  bool InitializeFontData(const wxPdfFont& font);
+  
+  /*
+  bool RegisterEncoding(const wxPdfEncoding& encoding);
+
+  const wxPdfEncoding* GetEncoding(const wxString& encodingName);
+  */
+
+};

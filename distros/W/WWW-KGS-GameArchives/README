@@ -1,0 +1,150 @@
+NAME
+    WWW::KGS::GameArchives - Interface to KGS Go Server Game Archives
+    (DEPRECATED)
+
+SYNOPSIS
+      use WWW::KGS::GameArchives;
+      my $archives = WWW::KGS::GameArchives->new;
+      my $result = $archives->query( user => 'YourAccount' );
+
+DEPRECATION
+    This module was added to the WWW::GoKGS distribution, and also renamed
+    to WWW::GoKGS::Scraper::GameArchives. See "HISTORY" in
+    WWW::GoKGS::Scraper::GameArchives for details.
+
+    This module will not be maintained anymore. Thanks for using
+    "WWW::KGS::GameArchives".
+
+DESCRIPTION
+    KGS <http://www.gokgs.com/> Game Archives preserves Go games played by
+    the users. You can search games by filling in the HTML forms. The search
+    result is provided as an HTML document naturally.
+
+    This module provides yet another interface to send a query to the
+    archives, and also parses the result into a neatly arranged Perl data
+    structure.
+
+  DISCLAIMER
+    According to KGS's "robots.txt", bots are not allowed to crawl the Game
+    Archives:
+
+      User-agent: *
+      Disallow: /gameArchives.jsp
+
+    Although this module can be used to implement crawlers, the author
+    doesn't intend to violate their policy. Use at your own risk.
+
+  ATTRIBUTES
+    base_uri
+        Defaults to "http://www.gokgs.com/gameArchives.jsp". The value is
+        used to create a request URI by "query" method. The request URI is
+        passed to "scrape" method.
+
+    user_agent
+        This attribute is used to construct a Web::Scraper object if a value
+        is set.
+
+  METHODS
+    $result = $archives->query( user => 'YourAccount', ... )
+        Given key-value pairs of query parameters, returns a hash reference
+        which represnets the result.
+
+          my $result = $archives->query(
+              user        => 'foo',
+              year        => '2013',
+              month       => '7',
+              oldAccounts => 'y',
+              tags        => 't',
+          );
+
+        The hashref is formatted as follows:
+
+          $result;
+          # => {
+          #     summary => 'Games of KGS player foo, ...',
+          #     games => [ # sorted by "start_time" in descending order
+          #         {
+          #             white => [
+          #                 {
+          #                     name => 'foo [4k]',
+          #                     link => 'http://...&user=foo...'
+          #                 }
+          #             ],
+          #             black => [
+          #                 {
+          #                     name => 'bar [6k]',
+          #                     link => 'http://...&user=bar...'
+          #                 }
+          #             ],
+          #             setup => '19x19 H2',
+          #             start_time => '7/4/13 5:32 AM', # GMT
+          #             type => 'Ranked',
+          #             result => 'W+Res.'
+          #             kifu_uri => 'http://.../games/2013/7/foo-bar.sgf',
+          #         },
+          #         ...
+          #     ],
+          #     zip_uri => 'http://.../foo-2013-7.zip',    # contains SGF files
+          #     tgz_uri => 'http://.../foo-2013-7.tar.gz', # created in July 2013
+          #     calendar => [
+          #         {
+          #             year  => '2011',
+          #             month => 'Jul',
+          #             link  => 'http://...&year=2011&month=7...',
+          #         },
+          #         ...
+          #     ]
+          # }
+
+        The possible parameters are as follows:
+
+        user (required)
+            Represents a KGS username.
+
+              my $result = $archives->query( user => 'foo' );
+
+        year, month
+            Can be used to search games played in the specified month.
+
+              my $result = $archives->query(
+                  user  => 'foo',
+                  year  => '2013',
+                  month => '7',
+              );
+
+        oldAccounts
+            Can be used to search games played by expired and guest
+            accounts.
+
+              my $result = $archives->query(
+                  user        => 'foo',
+                  oldAccounts => 'y'
+              );
+
+        tags
+            Can be used to search games tagged by the specified "user".
+
+              my $result = $archives->query(
+                  user => 'foo',
+                  tags => 't'
+              );
+
+    $result = $archives->scrape( $stuff )
+        The given arguments are passed to Web::Scraper's "scrape" method.
+        "query" method is just a wrapper of this method. For example, you
+        can pass URIs included by the return value of "query" method.
+
+FILTERING VALUES
+    This module doesn't modify the values of $result at all. Use Moo's or
+    Mouse's "coerce" to filter values. See "examples/".
+
+SEE ALSO
+    Web::Scraper
+
+AUTHOR
+    Ryo Anazawa (anazawa@cpan.org)
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

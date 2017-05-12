@@ -1,0 +1,11 @@
+Revision history for WWW::Piwik::API
+
+0.02 Sun Nov 27 10:37:21 2016 CET
+
+     * Add prerequisite on Type::Tiny (Stefan Hornburg/Racke).
+
+0.01 Sat Nov 26 16:05:47 2016 CET
+     
+     * Initial release.
+
+

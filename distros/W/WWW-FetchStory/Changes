@@ -1,0 +1,86 @@
+Revision History for WWW-FetchStory
+===================================
+
+v0.1902 2016-01-01
+------------------
+
+* 2016-01-01 14:10:44 +1100
+  added TODO list
+* 2016-01-01 14:07:04 +1100
+  fixing github meta, version bump
+* 2015-12-06 17:36:05 +1100
+  version bump
+* 2015-12-06 17:35:33 +1100
+  multi-chapter SSHG-Giftfest stories
+
+v0.19 2015-12-02
+----------------
+
+* 2015-12-02 13:30:58 +1100
+  version bump
+* 2015-12-02 13:29:22 +1100
+  Improving fetching of SSHG-Giftfest.
+* 2015-12-01 18:03:51 +1100
+  oops typo
+* 2015-12-01 18:01:22 +1100
+  added separate SSHG Giftfest parser
+
+v0.1828 2015-09-22
+------------------
+
+* 2015-09-22 11:17:09 +1000
+  version bump
+* 2015-09-17 19:15:35 +1000
+  fixing PotionsAndSnitches
+
+v0.1827 2015-07-29
+------------------
+
+* 2015-07-29 23:07:58 +1000
+  version bump
+* 2015-07-29 23:05:35 +1000
+  fixing AO3 parsing
+* 2015-05-05 11:43:49 +1000
+  Merge branch 'develop'
+* 2015-05-05 11:22:15 +1000
+  Dist::Zilla fix.
+* 2015-02-23 21:11:47 +1100
+  Fixing wordcount for AO3 fetcher.
+* 2015-02-23 20:36:08 +1100
+  version bump
+* 2015-02-23 20:34:29 +1100
+  Fixing bugs with AO3 fetcher.
+* 2015-02-10 17:48:22 +1100
+  tweaking title page
+
+v0.1825 2015-01-21
+------------------
+
+* 2015-01-21 04:57:04 +1100
+  version bump
+* 2015-01-21 04:56:42 +1100
+  trying again to get the indexer to believe me
+
+v0.1824 2015-01-19
+------------------
+
+* 2015-01-19 07:24:36 +1100
+  CPAN indexing problem
+
+v0.1823 2015-01-18
+------------------
+
+* 2015-01-18 23:44:02 +1100
+  version bump
+* 2015-01-18 23:43:19 +1100
+  fixed bug with AO3 parsing
+* 2014-12-20 19:16:46 +1100
+  removed warning
+* 2014-12-20 19:03:27 +1100
+  fixing more LJ format parsing
+* 2014-10-18 00:48:38 +1100
+  need blank lines for PkgVersion
+
+===================================
+End of changes in the last 365 days
+===================================

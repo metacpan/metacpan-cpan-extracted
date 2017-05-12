@@ -1,0 +1,19 @@
+person
+title:<en 11>Edit person</en><nl 11>Wijzig persoon</nl>
+titlenew:<en 1>Add person</en><nl 1>Persoon toevoegen</nl>
+key:id
+query:select id,firstname,lastname,birthday,email,mobile,im from people where $data{key}=$params{$data{key}} and status='1' 
+captions:firstname=<en 2>First Name</en><nl 2>Voornaam</nl>:|lastname=<en 3>Last Name</en><nl 3>Familienaam</nl>:|mobile=<en 4>Mobile</en><nl 4>GSM</nl>:|birthday=<en 5>Birthday (format yyyy.mm.dd)</en><nl 5>Geboortedatum (formaat jjjj.mm.dd)</nl>:|email=E-mail:|im=<en 6>Instant Messaging</en><nl 6>Berichtjes</nl>:
+form:id=hidden
+appendnew:<center><en 9>some text to add if this is a NEW record</en><nl 9>enige text, toe te voegen als dit een NIEUW item is</nl></center>
+appendedit:<center><a href=jdetails.wsql?id=$id&view=person>Details</a> | <a href=jdeleteform.wsql?view=person&id=$id&deldest=jlist.wsql%3Fview%3Dpeople><en 10>Delete</en><nl 10>Wissen</nl></a></center>
+
+address
+title:<en 12>Edit address</en><nl 12>Wijzig adres</nl>
+titlenew:<en 13>Add address</en><nl 13>Voeg adres toe</nl>
+key:id
+query:select id,peopleid,name,email,phone,fax,street,number,adrs1,adrs2,zip,city,country from addresses where $data{key}=$params{$data{key}} and status='1'
+captions:name=<en 15>Name</en><nl 15>Naam</nl>:|phone=<en 16>Phone</en><nl 16>Telefoon</nl>:|fax=<en 17>Fax</en><nl 17>Fax</nl>:|street=<en 18>Street</en><nl 18>Straat</nl>:|number=<en 19>Number</en><nl 19>Nummer</nl>:|adrs1=<en 20>Address</en><nl 20>Adres</nl>:|adrs2=<en 21>Address</en><nl 21>Adres</nl>:|zip=<en 22>Zip</en><nl 22>Postcode</nl>:|city=<en 23>City</en><nl 23>Stad</nl>:|country=<en 24>Country</en><nl 24>Land</nl>:|peopleid=<en 25>Person</en><nl 25>Persoon</nl>:|email=<en 26>E-mail</en><nl 26>E-mail</nl>:
+form:id=hidden
+form:peopleid=select(select id,firstname,lastname from people where status='1';id=peopleid;value=#id;show=#firstname #lastname)
+appendedit:<center><a href=jdeleteform.wsql?view=address&id=$id&deldest=[encode($params{editdest})|/]><en 29>Delete</en><nl 29>Wis</nl></a></center>

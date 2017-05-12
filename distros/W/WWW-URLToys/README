@@ -1,0 +1,28 @@
+WWW::URLToys 1.28 Release
+
+Install this the standard way, using:
+
+---
+
+perl Makefile.PL
+make
+make test
+make install
+
+---
+
+WWW::URLToys requires the following modules:
+
+Exporter
+LWP
+HTTP::Cookies
+URI::URL
+Term::ReadLine
+MIME::Base64
+Cwd
+
+Most of the time, installing LWP and Term::ReadLine from CPAN
+will finish a regular distribution's setup enough to get all
+of these available to you.
+
+

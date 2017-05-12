@@ -1,0 +1,707 @@
+                  WSRF::Lite
+		  ==========   
+ 
+WSRF::Lite version 0.8.2.4 by Mark Mc Keown, mark.mckeown@man.ac.uk
+with contributions from Andrew Porter, Sven van den Berghe, Stephen Pickles,
+Mark Riding, Jonathan Chin, Mary Thompson, Bruno Harbulot,  Mary Thompson,
+Alex Peeters, Bjoern A. Zeeb, Glen Fu, Doug Claar, John Newman, 
+Jamie Vicary and Edward Kawas.
+
+Stefan Zasada (sjzasada@lycos.co.uk) did most of the work implementing 
+WS-Security - a big thanks goes to Savas Parastatidis 
+(http://savas.parastatidis.name/) for helping us get it working with
+.NET.
+
+If you have any problems, bugs, feature requests or questions on 
+WSRF::Lite you can e-mail me at edward.kawas+wsrf@gmail.com.
+There is now a bugzilla for WSRF::Lite at 
+http://kato.mvc.mcc.ac.uk/bugzilla/ and Wiki pages at
+http://kato.mvc.mcc.ac.uk/rss-wiki/WSRFLite.
+
+
+Contents
+========
+* Introduction.
+* Requirements.
+* Changes from v0.3
+* Changes from v0.4
+* Changes from v0.5
+* Changes from v0.6
+* Changes from v0.7
+* Changes from version 0.8 - adding AJAX
+* WSRF.
+* Running the Container.
+* Running the Secure Container.
+* Process based Resources.
+* MultiSession Resources.
+* File based Resources. 
+* Logging.
+* WSDL.
+* WS-Security
+* docs
+* Further Reading.
+
+Introduction
+============
+
+This is a Container for running WSRF compliant Services
+written in Perl, the Container itself is written in Perl.
+The Container can be run with or without SSL for security.
+To create a WSRF Service it is simply a matter of writing
+a Perl module, making sure the module inherits from a base
+class that provides the standard WSRF functionality and
+placing the module in the correct directory. You may also be
+required to provide a Factory module, however most of the 
+default functionality can be inherited from a base Factory
+class. All the work is based on the excellent SOAP::Lite
+module that can be used to build Web Services in Perl - 
+(http://www.soaplite.com/). A very good site for SOAP::Lite
+information is:
+http://www.majordojo.com/archives/cat_soaplite_solutions.html
+
+Further pointers to interesting papers and
+Web sites are in the Further Reading section.
+
+
+Requirements
+============
+This version of WSRF::Lite requires SOAP::Lite version 0.67
+(or later) which can be downloaded from http;//www.soaplite.com/  
+or retrieved from CPAN.
+
+The Container and associated modules are written in Perl and
+have been tested and run on Perl 5.6 and later.  
+
+To use the Container you need to install the SOAP::Lite, LWP,
+XML::DOM, Sys::Hostname::Long, DateTime, DateTime::Format::Epoch 
+DateTime::Format::W3CDTF and Storable modules. 
+These can all be installed using CPAN.
+
+To use WS-Security for signing or verifying messages you will
+also need: Crypt::OpenSSL::RSA, MIME::Base64, Digest::SHA1, 
+and Crypt::OpenSSL::X509 and XML::CanonicalizeXML - these can all 
+be retrieved from CPAN.
+
+If you cannot use CPAN, because you do not have root privileges
+for example you, you can install required modules by downloading
+them and building them by hand. Another possibility is to 
+configure CPAN to run as a normal user, the file CPAN_help gives
+pointers on how to do this.
+
+If you run into problems with Module::Build, which is used by
+DateTime see 
+http://kato.mvc.mcc.ac.uk/rss-wiki/SoftwareInstallation/ModuleBuild
+
+You should update your CPAN shell issuing a  "install Bundle::CPAN" 
+before doing anything else. People have reported error (unresolved 
+version conflicts) while installing required packages 
+(DateTime::Format::Epoch) with prior versions of CPAN (1.7x)
+
+
+
+Changes from v0.3
+=================
+
+v0.3 uses the latest version of the WS-Addressing 
+specification, the major change is that ResourceProperties
+have been dropped from WS-Addressing. WSRF::Lite used
+ResourceProperties to route messages to particular 
+backend WS-Resources. The old WS-Addressing Endpoint
+References (EPRs) for WSRF::Lite looked like:
+
+<wsa:EndpointReference>
+  <wsa:Address>http://vermont.mvc.mcc.ac.uk/WSRF/Counter</wsa:Address>
+  <wsa:ResourceProperties>
+    <mmk:ResourceID xmlns:mmk="http://www.sve.man.ac.uk/wsrf/">346435645764576456</mmk:ResourceID> 
+  </wsa:ResourceProperties>
+</wsa:EndpointReference>
+
+The new version of WS-Addressing EPRs is:
+
+<wsa:EndpointReference>
+ <wsa:Address>http://vermont.mvc.mcc.ac.uk/WSRF/3464645764576456</wsa:Address> 
+</wsa:EndpointReference>
+
+So each WS-Resource will have a different value for the Address element.
+This change may cause some older WSRF::Lite clients/services to break.  
+Also WS-Addressing may yet still change - it has not completed the 
+standardisation process. (If you have already developed services using
+a previous version of WSRF::Lite it may be wise to wait for the version
+of WSRF::Lite that implements the specifications when they become 
+standards)
+
+This version of WSRF::Lite also provides better support for WS-Addressing
+on the client side, the client will now automatically create the proper
+SOAP headers if you pass them a WS_Address object:
+
+$ans=  WSRF::Lite
+       -> uri($uri)                                              #set the namespace
+       -> wsaddress(WSRF::WS_Address->new()->Address($target))   #location of service
+       -> $func(@ARGV);                                    #function + args to invoke
+
+Note the use of WSRF::Lite instead of SOAP::Lite. Instead of using
+->proxy($target) we now use ->wsaddress passing it a WS_Address
+object created using the endpoint of the service. This client will
+automatically create the correct WS-Addressing SOAP Headers, there
+is no longer any need to create a SOAP::Header object with the
+WS-Addressing information. 
+
+The WS_Address funtion 'from_envelope' takes either an WS-Addressing 
+EPR encoded as XML or as a SOM object and returns a WS_Address object:
+
+eg.
+
+ $som = WSRF::Lite
+        ->uri("http://localhost:50000/CounterFactory")
+        ->wsaddress(WSRF::WS_Address->new()
+                                    ->Address('http://localhost:50000/CounterFactory/'))
+        ->createCounterResource();
+
+ $wsa = WSRF::WS_Address->from_envelope($som);
+
+ $ans = WSRF::Lite
+         ->uri("http://localhost:50000/Counter")
+         ->wsaddress($wsa)
+         ->add('1');
+
+
+This version of WSRF::Lite provides experimental support for signing
+SOAP messages using x509 digital certificates according to the WS-Security
+standard and WS-I Basic Security Profile. You should find two sample
+client scripts ./client-scripts/sample_WS-Security_client.pl and 
+./test/signature_checker.pl. The WS-Security signing has been tested
+against a .NET service and a service implemented with the Sun Java Web 
+Service Developer Pack (JWSDP) however more testing needs to be done (see 
+TODO).
+
+There has been some changes to the Container scripts to support command
+line arguments to set the port and hostname to use.
+
+The WSRF::Container module has been re-written to make it eashier to
+add HTTP handlers - it should be easy to add a handler to support
+uploading files for example.
+
+WS-Resources hosted in the Container now support HTTP GET, if you
+use GET (from the LWP Perl package) on a WS-Resource endpoint you 
+get a copy of the WS-Resource's ResourceProperty document in a 
+SOAP message. You can also use a HTTP DELETE to destroy a WS-Resource
+eg.
+
+  GET -m DELETE http://localhost:50000/WSRF/Counter/Counter/354634563456
+
+(curl can also be used, there are problems with wget, see TODO)
+
+WSRF::Lite v0.4 implements the latest version of the WSRF specifications,
+these add the following operations: GetResourcePropertyDocument (gets
+the ResoureProperty document, effectively all the Resource Properties,
+of the WS-Resource, UpdateResourceProperty (updates a WS-Resource),
+InsertResourceProperty (insert a property into the WS-Resource) and 
+DeleteResourceProeprty (delete a property from a WS-Resource). The last
+three operations are effectively a breaking down of the functionality of
+the SetResourceProperty operation - which is of course still available.
+
+The WS specifications versions implemented are:
+WS-Addressing - 
+http://www.w3.org/TR/2005/WD-ws-addr-core-20050331/
+
+WSRF - 
+http://docs.oasis-open.org/wsrf/wsrf-ws_resource-1.2-spec-cd-01.pdf
+http://docs.oasis-open.org/wsrf/wsrf-ws_resource_properties-1.2-spec-cd-01.pdf
+http://docs.oasis-open.org/wsrf/wsrf-ws_resource_lifetime-1.2-spec-cd-01.pdf
+http://docs.oasis-open.org/wsrf/wsrf-ws_service_group-1.2-spec-cd-01.pdf
+http://docs.oasis-open.org/wsrf/wsrf-ws_base_faults-1.2-spec-cd-01.pdf
+
+WS-Security - 
+http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0.pdf
+http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf
+http://www.ws-i.org/Profiles/BasicSecurityProfile-1.0.html
+
+
+Changes from version 0.4
+========================
+The major changes is adding support for Makefile.PL etc, this
+is the precursor for putting the module into CPAN.
+
+The SContainer script now uses HTTP::Daemon::SSL to provide 
+support for SSL connections. Depending on the version of the
+Linux kernel there were problems with the SSL connections 
+related to blocking in the OpenSSL libraries with WSRF::Lite 
+0.4. These have been handled by moving to using the 
+HTTP::Daemon::SSL module - thanks to Ross Nicoll for pointing 
+out the bug. 
+
+The module used to canonicalize the XML for signing SOAP messages
+has been improved - in the original version there was a memory
+leak. The module is now available on CPAN.
+
+The client scripts now check the SOAP response from a service to
+see if it has been digitally signed - it will issue a warning if
+the message has not been signed. 
+
+In the sample WS-Resource modules you should see a number
+of environmental variables which have been commented out:
+
+# If these $ENV are set the SOAP message will be signed
+# Points to the public key of the X509 certificate
+#$ENV{HTTPS_CERT_FILE} = $ENV{HOME}."/.globus/hostcert.pem";
+# Points to the private key of the cert - must be unencrypted
+#$ENV{HTTPS_KEY_FILE}  = $ENV{HOME}."/.globus/hostkey.pem";
+# Tells WSRF::Lite to sign the message with the above cert
+#$ENV{WSS_SIGN} = 'true';
+
+If these are uncommented the WS-Resource will attempt to sign 
+the SOAP responses it sends back to the client. The sample
+client scripts in the sample-clients directory have code that
+shows you how to check for a digital signature. 
+
+A number of smaller bugs have also been fixed since WSRF::Lite
+version 0.4. The WSRF specification has not yet finished going
+through the standardization process so the namespaces are still
+not fixed - so expect the namespaces to change at some time in 
+the future.
+
+Changes from version 0.5
+========================
+Switched back to using WSRF::SSLDeamon for the SContainer,
+the HTTP::Daemon::SSL module blocks on later versions of
+Linux  so I switched back to WSRF::SSLDeamon which was modified
+to avoid the blocking behaviour.
+
+Added some POD.
+
+Changed the WSDL for the Counter WS-Resources - thanks to
+Bruno Harbulot.
+
+
+Changes from version 0.6
+========================
+
+Added the WSRF::WSRP::NotInsert{count} = 1 to counter examples,
+this means a new value cannot be inserted using the SetResourceProperty
+operation.
+
+Fixed a memory leak in the client code, thanks to glukasz AT yahoo.com.
+
+Added support for using HASHs as ResourceProperties, eg
+
+$WSRF::WSRP::ResourceProperties{bar} = bless { foo => "mmmh" }, "BAR";
+$WSRF::WSRP::PropertyNamespaceMap->{bar}{prefix} = "mmk";
+$WSRF::WSRP::PropertyNamespaceMap->{bar}{namespace} =
+   "http://www.sve.man.ac.uk/Counter";
+
+bar is a blessed HASH - the HASH will be serialized automatically for us
+When using getResourceProperties the XML will look like:
+
+<mmk:bar xmlns:mmk="http://www.sve.man.ac.uk/Counter"><BAR><foo>mmmh</foo></BA
+R></mmk:bar>
+
+
+Changes From version 0.7
+========================
+
+This release contains mostly bug fixes from the previous
+version. For WS-Resources that use Files to store state the 
+module Storable is used to serialize the state rather than storing 
+the state as XML in the file. This fixed some problems with
+serializing the XML and also reduced the size of the files.
+
+Support has been added to support "private" data for WS-Resources
+that store state in files. This is data that has not been declared
+as a ResourceProperty but which needs to stored between calls to
+the WS-Resource. The data is stored in a hash called 
+%WSRF::WSRP::Private and is stored along with the ResourceProperties
+in the file. An example of how to use the %WSRF::WSRP::Private is
+given in ./modules/Session/Counter/Counter.pm 
+
+
+Changes From version 0.8 - adding AJAX
+======================================
+
+The major change to this version of WSRF::Lite is the addition of the
+support for AJAX 
+(http://adaptivepath.com/publications/essays/archives/000385.php) 
+access to WS-Resources. Previous versions allowed you to do a
+HTTP GET on the wsa:Address element from the EPR of a WS-Resource
+and receive the ResourceProperties of the WS-Resource as XML.
+For example entering the wsa:Address into the input field
+of a Web browser caused it to display the ResourceProperties.
+Now support has been added for XSLT, if an XSLT file is included
+in WSRF::Lite for a WS-Resource then the Web browser will use
+the XSLT to transform the XML of the ResourceProperties into another
+format, XHTML for example. This allows the WS-Resource developer to
+control how the ResourceProperties will be displayed in a Web
+browser. The XHTML can also include a link to Javascript which the
+Web browser will execute. The WS-Resource developer can create 
+Javascript so that it will automatically update the Web page 
+every few seconds. The WS-Resource developer can also use Javascript
+to allow the Web browser user to update the ResourceProperties. 
+
+In WSRF::Lite HTTP GET is mapped to WSRF GetResourcePropertyDocument,
+HTTP PUT to WSRF PutResourcePropertyDocument and HTTP DELETE to WSRF 
+Destroy. The Javascript can use HTTP PUT, GET and DELETE to manipulate
+the WS-Resource. For HTTP PUT the Javascript client sends a version
+of the WS-Resource's ResourceProperty document to replace the 
+existing one. Within WSRF::Lite this is done by invoking the 
+PutResourcePropertyDocument operation. Unfortunately WSRF::Lite does
+not provide very much support for PutResourcePropertyDocument as its
+functionality can vary so much for different types of WS-Resources.
+For HTTP PUT only the XML of the ResourceProperty document needs to be
+sent, it does not need to be encoded in SOAP.
+
+XSLT, CSS and Javascript files have been provided for the Counter 
+example WS-Resource, you will find them in the same directory as the
+Counter module file. The files must end in .xsl, .css and .js 
+respectively.
+ 
+Arjun Sen did a Masters on using AJAX and WSRF::Lite to create clients,
+his thesis is available at 
+http://www.sve.man.ac.uk/Research/AtoZ/ILCT/arjunsthesis.
+Also in the docs directory is a paper on how to use AJAX with WSRF::Lite.
+
+
+Web Service Resource Framework, WSRF
+====================================
+
+The following is a rough description of WSRF, it
+is not perfect since the definition is changing
+as WSRF goes through standardisation.
+
+WSRF is the replacement for OGSI, OGSI was initially
+concerned about Grid Services which were "stateful
+Web Services" that provided standard mechanisms for 
+accessing and managing this state. OGSI was pretty
+radical and WSRF is closer to main stream Web Service
+thinking. The basic problem is that you want to allow
+a client to manage some state/Resource through a standard 
+set of interfaces, WSRF provides a way of doing this (
+there are others...). 
+
+Effectively you have a Web Service that acts as a front
+end to a number of stateful resources, these resources
+can be created and destroyed and may naturally expire.
+The WSRF uses WS-Address to identify a WS-Resource, 
+in the WS-Address there is a Resource identifier that the 
+client MUST send to the Web Service in the SOAP Header 
+if it wants to use that Resource. For full details on 
+WSRF see http://www.globus.org/wsrf, in particular the 
+"Modeling Stateful Resources with Web Services" is a good
+introduction.
+
+WSRF::Lite provides a Container for hosting WSRF
+Web Services, it also provides a number of base classes
+for building WSRF Web Services that provide the
+required operations: GetResourceProperty, Destroy,
+GetMultipleResourceProperties, SetTerminationTime,
+and SetResourceProperties.  
+
+WS-Resources can be implemented in various ways in
+WSRF::Lite: a process can be used to hold the state of
+a single resource (Process based WS-Resources), a process
+can manage the state of a number of Resources (MultiSession
+WS-Resources) and finally the state can be stored in a file
+between calls to the service (File based WS-Resources).
+
+Storing the state in a file between calls to the WS-Resource
+means the WS-Resource can survive a Container failure.
+Potentially the state could be stored in a Database.
+
+See the section on Further Reading for pointers to
+more detailed descriptions of WSRF etc...
+
+
+Running the Container
+=====================
+
+The Container uses the directory /tmp/wsrf and /tmp/wsrf/data 
+- so you need to create these directories before starting the 
+Container.pl. (These paths can be chnaged by setting
+$WSRF::Constants::SOCKETS_DIRECTORY and $WSRF::Constants::Data
+in the Container script.)
+
+The Container script is based on sample code from the
+Perl CookBook, it is quite short and easy to modify.
+
+To start the Container run ./Container.pl The Container
+uses port 50000 by default - this can be changed in the 
+Container.pl script or using the command line argument -p. 
+(You can use any port you want, 50000 is just an arbitrary 
+number)
+
+When the Container starts it should advertise which URL
+it is listening on. Sometimes depending on how your 
+machine is configure it will use "localhost" as the
+hostname, you can override this behaviour in the Container
+script or using the -h option.
+
+The Environmental Variable WSRF_MODULES should point to the 
+directory which holds the WSRF modules. The provided Modules
+directory is ./modules and has a number of simple Counter 
+examples.
+
+The Container and SContainer script now take command line arguments
+for the hostname and port:
+
+./Container -h vermont.mvc.mcc.ac.uk -p 40000
+
+Running the Secure Container
+============================
+
+SContainer.pl is the secure version of the Container - you
+will need to change the script to point to your host certificates,
+the container needs to use a server certificate. The private key of 
+the host certificate should be unencrypted to allow the Container to 
+read it, the key should be read only by the user running the Container.
+The same client scripts will work with the SContainer as the standard
+Container but they will need to be modified to point to the user's 
+x509 digital certificate, also when they are invoked they will promote 
+for the password for the certificate private key unless it is unencrypted.  
+
+
+Process Based WS-Resources
+==========================
+
+In this case the container forks of a process to handle the
+WS-Resource, it then passes SOAP to and from the service using
+a UNIX domain socket to the outside world. There is an example 
+of the Counter Resource included in WSRF::Lite that uses process, 
+the Counter is just a simple counter that you can add and subtract 
+values from - the state of the counter is maintained between calls. 
+There are two modules involved in the process based Counter example: 
+./modules/Session/CounterFactory/Counterfactory.pm, the factory
+that creates a counter resource for us and the actual counter
+module, ./modules/WSRF/Counter/Counter.pm.
+
+To create a counter resource use the client scripts provided in
+./client-scripts eg.
+
+wsrf_createCounterResource.pl http://localhost:50000/Session/CounterFactory/CounterFactory http://www.sve.man.ac.uk/CounterFactory
+
+The README in the the ./client-scripts describes how to use the
+other scripts to interact with the new Counter resource. The client
+scripts check if the SOAP response from any service has been signed,
+if it has not been you should see this is the output from the client:
+
+SOAP Message not signed
+WSRF::WSS::verify Fault - No Security Token in SOAP Header
+ 
+By default the the sample WS-Resources do not sign their SOAP responses
+so you can simply ignore this message.
+
+Process based resource module files should be stored under 
+./modules/WSRF, the factory modules can be stored in ./modules/Session
+since they do not have to maintain state between calls.
+
+ 
+MultiSession Based WS-Resources
+===============================
+
+This is similar to the process based resource example, except
+a single process manages the state of a number of resources. 
+The example Counter module is ./modules/MultiSession/Counter/Counter.pm,
+there s no need for an extra factory module since the resource acts
+as a factory itself.
+
+
+To create a MultiSession based counter using the client scripts 
+run:
+
+wsrf_createCounterResource.pl http://localhost:50000/MultiSession/Counter/Counter http://www.sve.man.ac.uk/Counter
+ 
+MultiSession based resource module files should be stored in directories
+under ./modules/MultiSession/
+
+
+File Based WS-Resources
+=======================
+
+In this example the state of the service is stored in a file between
+calls ie there are no extra processes forked of. The File based Counter
+module file can be found in ./modules/Session/Counter/Counter.pm.
+
+To start a file based counter resource use:
+
+wsrf_createCounterResource.pl http://localhost:50000/Session/Counter/Counter http://www.sve.man.ac.uk/Counter
+
+File based modules should be stored under the Session directory.
+
+Logging
+=======
+
+Anything sent to  STDOUT or STDERR by a Resource will end up in a file in
+./modules/logs - the name of the file will be the same as the ID of the 
+Resource.
+
+
+WSDL
+====
+
+In response to a HTTP GET the Container will return the WSDL for 
+a service eg:
+
+curl http://localhost:50000/WSRF/Counter/Counter/45674576?WSDL
+
+will return the WSDL for the service that uses the endpoint
+http://localhost:50000/WSRF/Counter/Counter/45674576. To deploy a
+WSDL file for a service create a WSDL file with the same name as 
+the module and with a ".WSDL" extension and put it in the same 
+directory as the module. The Container will dynamically set the 
+endpoint in the WSDL file for you when someone attempts to GET it. 
+For an example of a WSDL file see ./module/WSRF/Counter/Counter.WSDL
+
+Unfortunately you have to create the WSDL file yourself, the 
+WSDL::Generator module might help you.
+
+
+Configuring WS-Security
+=======================
+By default WSRF::Lite will sign all the WS-Addressing SOAP Headers,
+a timestamp on the message, the actual X509 certificate used to
+sign the message and the SOAP Body of the message. (The X509
+certificate is included in the parts of the message that are signed
+to prevent it being replaced by another certificate) This means 
+the messages signed by WSRF::Lite are very secure, however it may not
+be necessary to sign all this for a particular message. 
+
+The things that should be signed are controlled by the 
+WSRF::WSS::ID_Xpath hash. You stop WSRF::Lite
+from signing an element by setting to undef in the hash, 
+the following stops all the WS-Addressing elements being signed
+(you could always just empty the hash)
+
+ $WSRF::WSS::ID_Xpath{To}                  = undef;
+ $WSRF::WSS::ID_Xpath{MessageID}           = undef;
+ $WSRF::WSS::ID_Xpath{ReplyTo}             = undef;
+ $WSRF::WSS::ID_Xpath{Action}              = undef;
+ $WSRF::WSS::ID_Xpath{Timestamp}           = undef;
+ $WSRF::WSS::ID_Xpath{BinarySecurityToken} = undef;
+ $WSRF::WSS::ID_Xpath{From}                = undef;
+ $WSRF::WSS::ID_Xpath{RelatesTo}           = undef;
+
+It is not pretty using a global hash but it is necessary to fit in 
+with the way SOAP::Lite works. You should notice that the X509 
+certificate and timestamp is not included in the above hash, this is
+because the WS-Security specification strongly recommends that they
+should be signed. However, it is possible to override this using the
+following:
+
+$WSRF::WSS::sec_xpath= undef;
+$WSRF::WSS::timestamp_xpath= undef;
+
+The WSRF::WSS::ID_Xpath holds a set of XPaths to the elements in the
+message that should be signed. WSRF::Lite iterates through this hash
+and uses the associated XPath to sign that element. An example of an
+Xpath expression for the WS-Addressing To header is:
+
+$WSRF::WSS::ID_Xpath{To}=
+'<XPath xmlns:wsa="'.$WSRF::Constants::WSA.'">
+(//. | //@* | //namespace::*)[ancestor-or-self::wsa:To]
+</XPath>';
+
+To add another element to be signed simply add another entry into
+the hash with the relevant XPath. If you are switching signing policies
+in a particular program it might be wise to store a copy of 
+WSRF::WSS::ID_Xpath to fall back on.
+
+
+docs
+====
+This directory contains a number of papers and tutorials on WSRF::Lite.
+The README in the docs directory provides a brief description of each.
+
+
+Further Reading
+===============
+
+Background to WSRF
+------------------
+
+To understand how things evolved to arrive at WSRF you
+should read the following papers in order:
+
+"The Anatomy of the Grid: Enabling Scalable Virtual Organizations"
+http://www.globus.org/research/papers/anatomy.pdf
+Introduction to Grids.
+
+
+"The Physiology of the Grid: An Open Grid Services Architecture 
+for Distributed Systems Integration"
+http://www.globus.org/research/papers/ogsa.pdf
+"Grid Service" first introduced.
+
+"The OGSI Primer"
+https://forge.gridforum.org/projects/ogsi-wg/document/draft-ggf-ogsi-gridserviceprimer/en/1
+A description of the Open Grid Service Infrastructure,
+a formalization of the concepts introduced in the
+Physiology paper. (NB the actual OGSI specification is 
+difficult to read) 
+
+"A Grid Application Framework based on Web Services Specifications 
+and Practices"
+http://www.neresc.ac.uk/ws-gaf/documents.html
+Provides a detailed critique of OGSI.
+
+"Modeling Stateful Resources with Web Services"
+"The WS-Resource Framework"
+"From Open Grid Services Infrastructure to WS-Resource 
+Framework: Refactoring and Extension"
+http://www.globus.org/wsrf
+These provide an overview of WSRF, the successor
+to OGSI.
+
+WS-Security
+-----------
+The OASIS Technical Committee for WS-Security has useful documents
+on WS-Security:
+http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=wss
+
+
+The WS-I document "Security Challenges, Threats and Countermeasures"
+provides good background on the issues addressed by WS-Security, it
+is well worth a read - you can download it from here:
+http://www.ws-i.org/Profiles/BasicSecurity/SecurityChallenges-1.0.pdf
+
+
+Also worth reading is Stefan Zasada's MSc dissertation, hs did most
+of the work implementing SOAP signing in WSRF::Lite as part of his
+Masters project:
+http://vermont.mvc.mcc.ac.uk/msc_dissertation.pdf
+
+
+Other Web Services stuff of interest
+------------------------------------
+
+WS-Transfer
+http://msdn.microsoft.com/ws/2004/09/ws-transfer/
+From Microsoft, BEA et al, a competing specification to
+WSRF
+
+REST (Representational State Transfer)
+http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm
+This is Roy Fieldings thesis - it describes how to
+build a distributed system using HTTP, URIs etc.
+Chapter 5 is well worth a read even if you are not 
+going to use REST.
+
+
+"Data on the Outside versus Data on the Inside"
+http://www-db.cs.wisc.edu/cidr/papers/P12.pdf
+A very good paper by Pat Helland discussing 
+Web Services.
+
+
+SOAP::Lite stuff
+----------------
+
+http://www.soaplite.com/
+The Cookbook and Users Guide are worth reading.
+
+http://www.majordojo.com/archives/cat_web_services.php
+Provides advanced tips on using SOAP::Lite.
+
+"Programming Web Service with Perl"
+http://www.oreilly.com/catalog/pwebserperl/
+by  Randy J. Ray and Pavel Kulchenko
+Discusses building Web Services with Perl,
+lots of SOAP::Lite examples and a section
+on REST.
+

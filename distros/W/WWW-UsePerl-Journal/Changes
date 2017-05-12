@@ -1,0 +1,168 @@
+Changes for WWW-UsePerl-Journal
+===============================
+
+0.26    2015-02-14
+        - added resources to META files.
+        - created GitHub repositories.
+
+0.25    2012-08-31
+        - created connected() method.
+        - removed PingTest.pm test library.
+        - removed Carp as a prerequisite.
+
+0.24    2012-08-26
+        - use.perl.org is now read only. 
+        - removed Post.pm features & tests
+        - rewritten to work with current URLs
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - spelling fixes. (thanks to Nicholas Bamber, Florian Schlichting & 
+          Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - implemented Perl::Critic suggestions.
+        - added META.json
+        - change file dates changed to meet W3CDTF standards.
+
+0.23    2009-11-06
+        - added PingTest to test suite in order to check whether a network 
+          connection is available.
+
+0.22    2008-09-29
+        - patch by Dave Rolsky to fix the login code, to match recent updates 
+          to use.perl.org. (RT#38998 - thanks Dave).
+        - updated optional tests.
+        - closed security risk in entrytitled (RT#37177 - thanks Yanick)
+
+0.21    2007-11-07
+        - updated date testing to try and capture problems CPAN testers are
+          seeing.
+        - updated an entry test in the event no content is returned.
+
+0.20    2007-11-07
+        - username or userid MUST be provided to new().
+        - added debug() method to turn internal debugging on or off.
+        - internal function _journalsearch_content renamed to _recent_content().
+        - added debug testing script.
+
+0.19    2007-11-05
+        - fixed user names with other characters in aside from \w.
+        - rewrote the the recent list testing, as posts can appear between
+          extracts.
+        - missing entries can have to 2 different error messages, depending
+          upon context.
+        - added futher diagnostics in the event of errors.
+        - reversed login checks, now assumes failure unless validated.
+
+0.18    2007-11-04
+        - changed constants to variable due to suprious errors from 
+          Test::Pod::Coverage.
+        - added raw() functions for debugging purposes.
+        - changed date processing slightly, hopefully this finally fixes those
+          errors. (thanks to Andreas and Slaven for the feedback)
+
+0.17    2007-10-31
+        - Still getting CPAN Tester failures :( It looks like use.perl is
+          timing out, as it's unable to reference the test users (russell and 
+          147 (koschei)). The tests now skip, reporting the error, so I can
+          keep an eye on it.
+        - More error reporting in tests if results not as expected, so that
+          CPAN Testers reports can hopefully identify specific problems.
+
+0.16    2007-03-14
+        - relaxed date testing, as timezones can affect the date/time value
+          returned.
+
+0.15    2007-03-05
+        - fixed several test bugs, including the date parsing issues.
+        - WUJ::Post->new() now takes a hash as it states in the docs.
+        - Rewrote some of the internals so they correctly cache results. 
+        - Bit of an overhaul of the code so that underlying Entry objects are 
+          returned more appropriate, with the caller able to access the Entry
+          methods more directly. 
+        - Error handling rewritten so the modules don't fail under pressure,
+          just return undef and set an $j->error().
+        - Post.pm has had a fresh look and form completion has been updated.
+        - Lots more testing, including developer only tests (not included).
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE file.
+        - Renamed the contrib directory to examples.
+        - POD/README updates.
+        - Devel::Cover - 93.3% (including developer only tests)
+
+0.14    2005-09-22
+        - updated journal post code (RT #4718)
+        - added refresh() method to clear the cache
+        - removed 22post.t so use.perl isn't bombarded with testing :)
+
+0.13    2005-07-22
+        - use.perl layout changes (inc Simon Wilcox - RT #13748)
+        - refactored test scripts
+        - refactored journal post code
+        - Added more test scripts
+
+0.12    2005-04-05
+        - New maintainer - Barbie
+        - Added sort patch from many eons ago
+        - Updated tests to reflect changes to use.perl
+        - Added more test scripts
+
+0.11    2003-01-24T15:11:53+00:00
+        - Fix for change in the title HTML
+        - Date code is still broken - it is out by the timezone of the user
+          who wrote the entry, this may not be fixable if we cannot
+          determine that user's timezone.
+
+0.10    2002-10-14T10:51:25+01:00
+        - Patch from Kate L Pugh fixes noon - 1pm bug and newline title bug
+
+0.09    2002-10-09T15:11:57+01:00
+        - Patch from Kate L Pugh fixes recentarray regex bug
+        - Patch from Richard Clamp to fix his surname and strptime on Mac OS X
+        - Contributed scripts for various statistics by 'jdavidb'
+
+0.08    2002-10-04T15:19:30+01:00
+        - Change in u.p.o broke recentarray - fixed
+
+0.07    2002-09-27T17:42:51+01:00
+        - Patch from Spoon
+        - Gets date information from posts
+        - "It produces potentially weird results due to time zones. But I believe
+          they are consistently weird. Will probably break if the user logs in."
+          -- the patch author
+
+0.06    2002-09-26T10:46:16+01:00
+        - Internal change to use.perl.org broke things
+        - Thanks to Simon Wilcox and Simon Wistow for both reporting it on
+          the same day (which confused me ...).
+
+0.05    2002-03-03T20:14:29+00:00
+        - Fixes
+        - Interface had changed due to the introduction of the Entry class
+        - stringification added to it to make it work as it did before
+        - date added to Entry class
+        - added Test::Simple dependency to makefile.
+        - Many thanks to Richard!
+
+0.04    2002-03-03T18:01:36+00:00
+        - Changes from koschei
+        - WWW::UsePerl::Journal::Entry class
+        - recentarray, recent journal entries.
+
+0.03    2002-02-13T12:46:37+00:00
+        - Installed Richard Clamp's patches (finally!)
+        - Journal list changed on use.perl
+        - user id may be supplied instead of username
+        - Added LWP dependency to makefile.
+        - Thanks Richard!
+
+0.02    2002-01-28T02:16:46+00:00
+        - use.perl.org changed some things and everything broke, now fixed.
+        - Interface changed, more OO now...
+        - Posting possible via postEntry (thanks to Iain Truskett!)
+        - Test suite corrected (thanks to Tony Bowden)
+
+0.01    2002-01-23T18:56:32+00:00
+        - original version; created by h2xs 1.19

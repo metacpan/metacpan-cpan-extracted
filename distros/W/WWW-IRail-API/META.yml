@@ -1,0 +1,36 @@
+---
+abstract: 'A wrapper for the iRail.be API'
+author:
+  - 'Tim Esselens <tim.esselens@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-IRail-API
+requires:
+  Carp: 0
+  Date::Format: 0
+  DateTime::Format::Natural: 0
+  FindBin: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  HTTP::Response: 0
+  JSON::XS: 0
+  LWP: 0
+  LWP::UserAgent: 0
+  Test::Deep: 0
+  Test::Most: 0
+  XML::Simple: 0
+  YAML: 0
+  common::sense: 0
+  parent: 0
+resources:
+  homepage: http://github.com/timesselens/www-irail-api/tree
+  repository: git://github.com/timesselens/www-irail-api.git
+version: 0.003
+x_authority: cpan:ESSELENS

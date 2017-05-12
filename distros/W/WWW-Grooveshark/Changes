@@ -1,0 +1,62 @@
+Revision history for WWW::Grooveshark
+=====================================
+
+July 22, 2009
+-------------
+ * added tests and documentation for the tinysong API methods
+ * releasing version 0.02
+
+July 21, 2009
+-------------
+ * added one more user API method and tests
+
+July 19, 2009
+-------------
+ * added example script to query the service for a list of its API methods and
+   their parameters
+ * minor documentation updates
+
+July 10, 2009
+-------------
+ * added "query_string" as a constructor option
+ * WWW::Grooveshark destructor now destroys the session, if any
+ * overloaded boolean evaluation of WWW::Grooveshark::Response objects to give
+   true for success responses and false for fault responses
+ * wrapped two more service API methods
+
+July 8, 2009
+------------
+ * some documentation fixes
+ * added "staging" as a constructor option to use the staging server instead
+   of the live one by default
+
+July 7, 2009
+------------
+ * improved documentation significantly
+ * "discovered" a few undocumented API methods using the sandbox tool
+ * releasing version 0.01
+
+July 6, 2009
+------------
+ * added the autoplay, playlist, user, and the rest of the song API methods to
+   WWW::Grooveshark
+ * note: encountered some server-side errors during testing of playlist
+   methods
+
+July 4, 2009
+------------
+ * added the popular, session, and most of the song API methods to
+   WWW::Grooveshark
+
+July 3, 2009
+------------
+ * added AUTOLOADing to WWW::Grooveshark::Response and improved documentation
+ * added the search, album, and artist API methods to WWW::Grooveshark
+
+July 1, 2009
+------------
+ * created WWW::Grooveshark::Response to encapsulate API responses
+
+June 26, 2009
+-------------
+ * original version created

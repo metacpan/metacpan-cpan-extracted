@@ -1,0 +1,73 @@
+{
+   "abstract" : "Manager for wrappers around client-side libraries",
+   "author" : [
+      "The following person is the author of all the files provided in"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Library",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.025"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Cwd" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "Moose" : "0",
+            "MooseX::Singleton" : "0",
+            "Params::Validate" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcelgruenauer/Web-Library/issues"
+      },
+      "homepage" : "https://github.com/marcelgruenauer/Web-Library",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marcelgruenauer/Web-Library.git",
+         "web" : "https://github.com/marcelgruenauer/Web-Library"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Marcel Gruenauer <hanekomu@gmail.com>"
+   ]
+}
+

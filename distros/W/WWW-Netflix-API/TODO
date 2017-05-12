@@ -1,0 +1,45 @@
+TODO
+
+put rest2sugar.pl in examples dir
+add test to rest2sugar.t for ?foo=bar
+example for Twig and filtering the catalog.xml (e.g. for instant titles)
+
+don't throw error if 200 OK  and empty content if content was saved to disk. (e.g. catalog.pl)
+
+in catalog2db.pl, add commented (ENV-controlled??) line in title_index_item to filter format (e.g. instant)	http://developer.netflix.com/docs/REST_API_Reference#0_42335
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* have _submit (thus Get() et al) take a param to force protected vs basic resource
+
+* can __get_token_response() call _submit for Net::OAuth (to consolidate code)?
+
+* need(?) way to pass params from _submit() to content_filter()
+
+* have a strict mode (by default) for the AUTOLOAD that validates the levels/stack.
+
+* swap out WWW::Mechanize ??
+
+* more POD details; especially methods/attributes
+
+* examples w/params (if nothing else, w/start_index/max_results)
+
+* better error handling in RequestAccess() ... set a error string somewhere.
+
+* title search example
+
+* autocomplete example
+
+* suppress warn's -- set error string/code instead
+	and/or use IO::CaptureOutput to test warning strings
+
+
+TEST COVERAGE:
+
+v0.08
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/WWW/Netflix/API.pm    96.5   86.5   66.7  100.0  100.0  100.0   93.2
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+

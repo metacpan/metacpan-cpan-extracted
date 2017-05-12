@@ -1,0 +1,1252 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<!DOCTYPE wbxml [
+  <!ELEMENT wbxml (PublicIdentifiers,App+)>
+  <!ATTLIST wbxml version NMTOKEN #REQUIRED>
+  <!ELEMENT PublicIdentifiers (PublicIdentifier)*>
+  <!ELEMENT PublicIdentifier EMPTY>
+  <!ATTLIST PublicIdentifier value NMTOKEN #REQUIRED>
+  <!ATTLIST PublicIdentifier name CDATA #REQUIRED>
+  <!ELEMENT App (TagTokens?,AttrStartTokens?,AttrValueTokens?,Ext0Values?,Ext1Values?,Ext2Values?,CharacterEntities?)>
+  <!ATTLIST App publicid CDATA #REQUIRED>
+  <!ATTLIST App systemid CDATA #IMPLIED>
+  <!ATTLIST App use-default (no|yes) #IMPLIED>
+  <!ATTLIST App variable-subs (no|yes) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST App textual-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App tokenised-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App xml-space (default|preserve) #IMPLIED>
+  <!ELEMENT TagTokens (TAG)*>
+  <!ELEMENT TAG EMPTY>
+  <!ATTLIST TAG token NMTOKEN #REQUIRED>
+  <!ATTLIST TAG name NMTOKEN #REQUIRED>
+  <!ATTLIST TAG codepage NMTOKEN #IMPLIED>
+  <!ATTLIST TAG encoding (base64|datetime|integer) #IMPLIED>	<!-- WV -->
+  <!ELEMENT AttrStartTokens (ATTRSTART)*>
+  <!ELEMENT ATTRSTART EMPTY>
+  <!ATTLIST ATTRSTART token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART name NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART value CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART codepage NMTOKEN #IMPLIED>
+  <!ATTLIST ATTRSTART default CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART fixed CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART validate (std|length|vdata) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST ATTRSTART encoding (std|iso-8601) #IMPLIED>		<!-- WAP -->
+  <!ELEMENT AttrValueTokens (ATTRVALUE)*>
+  <!ELEMENT ATTRVALUE EMPTY>
+  <!ATTLIST ATTRVALUE token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRVALUE value CDATA #REQUIRED>
+  <!ATTLIST ATTRVALUE codepage NMTOKEN #IMPLIED>
+  <!ELEMENT Ext0Values (EXTVALUE)*>	<!-- WV -->
+  <!ELEMENT Ext1Values (EXTVALUE)*>
+  <!ELEMENT Ext2Values (EXTVALUE)*>
+  <!ELEMENT EXTVALUE EMPTY>
+  <!ATTLIST EXTVALUE index NMTOKEN #REQUIRED>
+  <!ATTLIST EXTVALUE value CDATA #REQUIRED>
+  <!ELEMENT CharacterEntities (CharacterEntity)*>
+  <!ELEMENT CharacterEntity EMPTY>
+  <!ATTLIST CharacterEntity name NMTOKEN #REQUIRED>
+  <!ATTLIST CharacterEntity code NMTOKEN #REQUIRED>
+  <!ENTITY quot "&#34;">
+  <!ENTITY amp "&#38;#38;">
+  <!ENTITY apos "&#39;">
+  <!ENTITY lt "&#38;#60;">
+  <!ENTITY gt ">">
+]>
+<wbxml version="1.3">
+  <!--  see: Binary XML Content Format, Version 1.3 -->
+  <!--       WAP-192-WBXML-20010725-a -->
+  <PublicIdentifiers>
+    <!-- The normative list of well known public identifiers issued, and maintained,
+         by the OMNA (Open Mobile Naming Authority) SHALL be found
+         at http://www.openmobilealliance.org/tech/omna/omna-wbxml-public-docid.htm -->
+    <!-- value="1"  Unknown or missing public identifier
+         if no value, publicid is encoding as string -->
+    <PublicIdentifier value="2"  name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <!--   DEPRECATED       value="3"  name="-//WAPFORUM//DTD WTA 1.0//EN" -->
+    <PublicIdentifier value="4"  name="-//WAPFORUM//DTD WML 1.1//EN"/>
+    <PublicIdentifier value="5"  name="-//WAPFORUM//DTD SI 1.0//EN"/>
+    <PublicIdentifier value="6"  name="-//WAPFORUM//DTD SL 1.0//EN"/>
+    <PublicIdentifier value="7"  name="-//WAPFORUM//DTD CO 1.0//EN"/>
+    <PublicIdentifier value="8"  name="-//WAPFORUM//DTD CHANNEL 1.1//EN"/>
+    <PublicIdentifier value="9"  name="-//WAPFORUM//DTD WML 1.2//EN"/>
+    <PublicIdentifier value="A"  name="-//WAPFORUM//DTD WML 1.3//EN"/>
+    <PublicIdentifier value="B"  name="-//WAPFORUM//DTD PROV 1.0//EN"/>
+    <PublicIdentifier value="C"  name="-//WAPFORUM//DTD WTA-WML 1.2//EN"/>
+    <PublicIdentifier value="D"  name="-//WAPFORUM//DTD EMN 1.0//EN"/>
+    <PublicIdentifier value="E"  name="-//OMA//DTD DRMREL 1.0//EN"/>
+    <PublicIdentifier value="F"  name="-//WIRELESSVILLAGE//DTD CSP 1.0//EN"/>
+    <PublicIdentifier value="10" name="-//WIRELESSVILLAGE//DTD CSP 1.1//EN"/>
+    <PublicIdentifier value="11" name="-//OMA//DTD WV-CSP 1.2//EN"/>
+    <!-- values 12-7F : Reserved -->
+    <PublicIdentifier value="1201" name="-//SYNCML//DTD SyncML 1.2//EN"/>
+    <PublicIdentifier value="1202" name="-//SYNCML//DTD MetaInf 1.2//EN"/>
+    <PublicIdentifier value="1203" name="-//SYNCML//DTD DevInf 1.2//EN"/>
+  </PublicIdentifiers>
+  <App publicid="-//WAPFORUM//DTD SI 1.0//EN" use-default="yes" textual-ext="si" tokenised-ext="sic" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/si.dtd">
+    <!-- see: Service Indication, WAP-167-ServiceInd-20010731-a -->
+    <TagTokens>
+      <TAG token="05" name="si"/>
+      <TAG token="06" name="indication"/>
+      <TAG token="07" name="info"/>
+      <TAG token="08" name="item"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="action" value="signal-none"/>
+      <ATTRSTART token="06" name="action" value="signal-low"/>
+      <ATTRSTART token="07" name="action" value="signal-medium" default="indication"/>
+      <ATTRSTART token="08" name="action" value="signal-high"/>
+      <ATTRSTART token="09" name="action" value="delete"/>
+      <ATTRSTART token="0A" name="created" encoding="iso-8601"/>
+      <ATTRSTART token="0B" name="href"/>
+      <ATTRSTART token="0C" name="href" value="http://"/>
+      <ATTRSTART token="0D" name="href" value="http://www."/>
+      <ATTRSTART token="0E" name="href" value="https://"/>
+      <ATTRSTART token="0F" name="href" value="https://www."/>
+      <ATTRSTART token="10" name="si-expires" encoding="iso-8601"/>
+      <ATTRSTART token="11" name="si-id"/>
+      <ATTRSTART token="12" name="class"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+    </AttrValueTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD SL 1.0//EN" use-default="yes" textual-ext="sl" tokenised-ext="slc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/sl.dtd">
+    <!-- see: Service Loading, WAP-168-ServiceLoad-20010731-a -->
+    <TagTokens>
+      <TAG token="05" name="sl"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="action" value="execute-low" default="sl"/>
+      <ATTRSTART token="06" name="action" value="execute-high"/>
+      <ATTRSTART token="07" name="action" value="cache"/>
+      <ATTRSTART token="08" name="href"/>
+      <ATTRSTART token="09" name="href" value="http://"/>
+      <ATTRSTART token="0A" name="href" value="http://www."/>
+      <ATTRSTART token="0B" name="href" value="https://"/>
+      <ATTRSTART token="0C" name="href" value="https://www."/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+    </AttrValueTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD CO 1.0//EN" textual-ext="co" tokenised-ext="coc" xml-space="default"
+       systemid="http://www.wapforom.org/DTD/co_1.0.dtd">
+    <!-- see: Cache Operation, WAP-175-CacheOp-20010731-a -->
+    <TagTokens>
+      <TAG token="05" name="co"/>
+      <TAG token="06" name="invalidate-object"/>
+      <TAG token="07" name="invalidate-service"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="uri"/>
+      <ATTRSTART token="06" name="uri" value="http://"/>
+      <ATTRSTART token="07" name="uri" value="http://www."/>
+      <ATTRSTART token="08" name="uri" value="https://"/>
+      <ATTRSTART token="09" name="uri" value="https://www."/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+    </AttrValueTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD CHANNEL 1.2//EN" textual-ext="channel" tokenised-ext="channelc" xml-space="default"
+       systemid="channel.dtd">
+    <!-- see: WAP Wireless Telephony Application -->
+    <!--      WAP-266-WTA-20010711-p -->
+    <TagTokens>
+      <TAG token="05" name="channel"/>
+      <TAG token="06" name="title"/>
+      <TAG token="07" name="abstract"/>
+      <TAG token="08" name="resource"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="maxspace"/>
+      <ATTRSTART token="06" name="base"/>
+      <ATTRSTART token="07" name="href"/>
+      <ATTRSTART token="08" name="href" value="http://"/>
+      <ATTRSTART token="09" name="href" value="https://"/>
+      <ATTRSTART token="0A" name="lastmod"/>
+      <ATTRSTART token="0B" name="etag"/>
+      <ATTRSTART token="0C" name="md5"/>
+      <ATTRSTART token="0D" name="success"/>
+      <ATTRSTART token="0E" name="success" value="http://"/>
+      <ATTRSTART token="0F" name="success" value="https://"/>
+      <ATTRSTART token="10" name="failure"/>
+      <ATTRSTART token="11" name="failure" value="http://"/>
+      <ATTRSTART token="12" name="failure" value="https://"/>
+      <ATTRSTART token="13" name="eventid"/>
+      <ATTRSTART token="14" name="eventid" value="wtaev-"/>
+      <ATTRSTART token="15" name="channelid"/>
+      <ATTRSTART token="16" name="useraccessible"/>
+    </AttrStartTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD CHANNEL 1.1//EN" textual-ext="channel" tokenised-ext="channelc" xml-space="default"
+       systemid="channel.dtd">
+    <!-- see: WAP WTA, Version 08-Nov-1999 -->
+    <TagTokens>
+      <TAG token="05" name="channel"/>
+      <TAG token="06" name="title"/>
+      <TAG token="07" name="abstract"/>
+      <TAG token="08" name="resource"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="maxspace"/>
+      <ATTRSTART token="06" name="base"/>
+      <ATTRSTART token="07" name="href"/>
+      <ATTRSTART token="08" name="href" value="http://"/>
+      <ATTRSTART token="09" name="href" value="https://"/>
+      <ATTRSTART token="0A" name="lastmod"/>
+      <ATTRSTART token="0B" name="etag"/>
+      <ATTRSTART token="0C" name="md5"/>
+      <ATTRSTART token="0D" name="success"/>
+      <ATTRSTART token="0E" name="success" value="http://"/>
+      <ATTRSTART token="0F" name="success" value="https://"/>
+      <ATTRSTART token="10" name="failure"/>
+      <ATTRSTART token="11" name="failure" value="http://"/>
+      <ATTRSTART token="12" name="failure" value="https://"/>
+      <ATTRSTART token="13" name="EventId"/>
+    </AttrStartTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD WML 1.3//EN" use-default="yes" variable-subs="yes" textual-ext="wml" tokenised-ext="wmlc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/wml13.dtd">
+    <!-- see: WAP WML, Version 19-Feb-2000 -->
+    <!--      Wireless Markup Language Specification, Version 1.3 -->
+    <TagTokens>
+      <TAG token="1C" name="a"/>
+      <TAG token="22" name="anchor"/>
+      <TAG token="23" name="access"/>
+      <TAG token="24" name="b"/>
+      <TAG token="25" name="big"/>
+      <TAG token="26" name="br"/>
+      <TAG token="27" name="card"/>
+      <TAG token="28" name="do"/>
+      <TAG token="29" name="em"/>
+      <TAG token="2A" name="fielset"/>
+      <TAG token="2B" name="go"/>
+      <TAG token="2C" name="head"/>
+      <TAG token="2D" name="i"/>
+      <TAG token="2E" name="img"/>
+      <TAG token="2F" name="input"/>
+      <TAG token="30" name="meta"/>
+      <TAG token="31" name="noop"/>
+      <TAG token="20" name="p"/>
+      <TAG token="21" name="postfield"/>
+      <TAG token="1B" name="pre"/>
+      <TAG token="32" name="prev"/>
+      <TAG token="33" name="onevent"/>
+      <TAG token="34" name="optgroup"/>
+      <TAG token="35" name="option"/>
+      <TAG token="36" name="refresh"/>
+      <TAG token="37" name="select"/>
+      <TAG token="3E" name="setvar"/>
+      <TAG token="38" name="small"/>
+      <TAG token="39" name="strong"/>
+      <TAG token="1F" name="table"/>
+      <TAG token="1D" name="td"/>
+      <TAG token="3B" name="template"/>
+      <TAG token="3C" name="timer"/>
+      <TAG token="1E" name="tr"/>
+      <TAG token="3D" name="u"/>
+      <TAG token="3F" name="wml"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="accept-charset"/>
+      <ATTRSTART token="5E" name="accesskey" validate="vdata"/>
+      <ATTRSTART token="52" name="align"/>
+      <ATTRSTART token="06" name="align" value="bottom" default="img"/>
+      <ATTRSTART token="07" name="align" value="center"/>
+      <ATTRSTART token="08" name="align" value="left" default="p"/>
+      <ATTRSTART token="09" name="align" value="middle"/>
+      <ATTRSTART token="0A" name="align" value="right"/>
+      <ATTRSTART token="0B" name="align" value="top"/>
+      <ATTRSTART token="0C" name="alt" validate="vdata"/>
+      <ATTRSTART token="64" name="cache-control" value="no-cache"/>
+      <ATTRSTART token="54" name="class"/>
+      <ATTRSTART token="53" name="columns"/>
+      <ATTRSTART token="0D" name="content"/>
+      <ATTRSTART token="5C" name="content" value="application/vnd.wap.wmlc;charset="/>
+      <ATTRSTART token="0F" name="domain"/>
+      <ATTRSTART token="10" name="emptyok" value="false" default="input"/>
+      <ATTRSTART token="11" name="emptyok" value="true"/>
+      <ATTRSTART token="5F" name="enctype" validate="vdata"/>
+      <ATTRSTART token="60" name="enctype" value="application/x-www-form-urlencoded" default="go" validate="vdata"/>
+      <ATTRSTART token="61" name="enctype" value="multipart/form-data" validate="vdata"/>
+      <ATTRSTART token="12" name="format"/>
+      <ATTRSTART token="56" name="forua" value="false" default="meta"/>
+      <ATTRSTART token="57" name="forua" value="true"/>
+      <ATTRSTART token="13" name="height" validate="length"/>
+      <ATTRSTART token="4A" name="href" validate="vdata"/>
+      <ATTRSTART token="4B" name="href" value="http://" validate="vdata"/>
+      <ATTRSTART token="4C" name="href" value="https://" validate="vdata"/>
+      <ATTRSTART token="14" name="hspace" validate="length" default="0"/>
+      <ATTRSTART token="5A" name="http-equiv"/>
+      <ATTRSTART token="5B" name="http-equiv" value="Content-Type"/>
+      <ATTRSTART token="5D" name="http-equiv" value="Expires"/>
+      <ATTRSTART token="55" name="id"/>
+      <ATTRSTART token="15" name="ivalue" validate="vdata"/>
+      <ATTRSTART token="16" name="iname"/>
+      <ATTRSTART token="18" name="label" validate="vdata"/>
+      <ATTRSTART token="19" name="localsrc" validate="vdata"/>
+      <ATTRSTART token="1A" name="maxlength"/>
+      <ATTRSTART token="1B" name="method" value="get" default="go"/>
+      <ATTRSTART token="1C" name="method" value="post"/>
+      <ATTRSTART token="1D" name="mode" value="nowrap"/>
+      <ATTRSTART token="1E" name="mode" value="wrap"/>
+      <ATTRSTART token="1F" name="multiple" value="false" default="select"/>
+      <ATTRSTART token="20" name="multiple" value="true"/>
+      <ATTRSTART token="21" name="name" validate="vdata"/>
+      <ATTRSTART token="22" name="newcontext" value="false" default="card"/>
+      <ATTRSTART token="23" name="newcontext" value="true"/>
+      <ATTRSTART token="25" name="onenterbackward" validate="vdata"/>
+      <ATTRSTART token="26" name="onenterforward" validate="vdata"/>
+      <ATTRSTART token="24" name="onpick" validate="vdata"/>
+      <ATTRSTART token="27" name="ontimer" validate="vdata"/>
+      <ATTRSTART token="28" name="optional" value="false" default="do"/>
+      <ATTRSTART token="29" name="optional" value="true"/>
+      <ATTRSTART token="2A" name="path"/>
+      <ATTRSTART token="2E" name="scheme"/>
+      <ATTRSTART token="2F" name="sendreferer" value="false" default="go"/>
+      <ATTRSTART token="30" name="sendreferer" value="true"/>
+      <ATTRSTART token="31" name="size"/>
+      <ATTRSTART token="32" name="src" validate="vdata"/>
+      <ATTRSTART token="58" name="src" value="http://" validate="vdata"/>
+      <ATTRSTART token="59" name="src" value="https://" validate="vdata"/>
+      <ATTRSTART token="33" name="ordered" value="true" default="card"/>
+      <ATTRSTART token="34" name="ordered" value="false"/>
+      <ATTRSTART token="35" name="tabindex"/>
+      <ATTRSTART token="36" name="title" validate="vdata"/>
+      <ATTRSTART token="37" name="type"/>
+      <ATTRSTART token="38" name="type" value="accept"/>
+      <ATTRSTART token="39" name="type" value="delete"/>
+      <ATTRSTART token="3A" name="type" value="help"/>
+      <ATTRSTART token="3B" name="type" value="password"/>
+      <ATTRSTART token="3C" name="type" value="onpick"/>
+      <ATTRSTART token="3D" name="type" value="onenterbackward"/>
+      <ATTRSTART token="3E" name="type" value="onenterforward"/>
+      <ATTRSTART token="3F" name="type" value="ontimer"/>
+      <ATTRSTART token="45" name="type" value="options"/>
+      <ATTRSTART token="46" name="type" value="prev"/>
+      <ATTRSTART token="47" name="type" value="reset"/>
+      <ATTRSTART token="48" name="type" value="text" default="input"/>
+      <ATTRSTART token="49" name="type" value="vnd."/>
+      <ATTRSTART token="4D" name="value" validate="vdata"/>
+      <ATTRSTART token="4E" name="vspace" validate="length" default="0"/>
+      <ATTRSTART token="4F" name="width" validate="length"/>
+      <ATTRSTART token="50" name="xml:lang"/>
+      <ATTRSTART token="62" name="xml:space" value="preserve" fixed="pre"/>
+      <ATTRSTART token="63" name="xml:space" value="default"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+      <ATTRVALUE token="89" value="accept"/>
+      <ATTRVALUE token="8A" value="bottom"/>
+      <ATTRVALUE token="8B" value="clear"/>
+      <ATTRVALUE token="8C" value="delete"/>
+      <ATTRVALUE token="8D" value="help"/>
+      <ATTRVALUE token="8E" value="http://"/>
+      <ATTRVALUE token="8F" value="http://www."/>
+      <ATTRVALUE token="90" value="https://"/>
+      <ATTRVALUE token="91" value="https://www."/>
+      <ATTRVALUE token="93" value="middle"/>
+      <ATTRVALUE token="94" value="nowrap"/>
+      <ATTRVALUE token="96" value="onenterbackward"/>
+      <ATTRVALUE token="97" value="onenterforward"/>
+      <ATTRVALUE token="95" value="onpick"/>
+      <ATTRVALUE token="98" value="ontimer"/>
+      <ATTRVALUE token="99" value="options"/>
+      <ATTRVALUE token="9A" value="password"/>
+      <ATTRVALUE token="9B" value="reset"/>
+      <ATTRVALUE token="9D" value="text"/>
+      <ATTRVALUE token="9E" value="top"/>
+      <ATTRVALUE token="9F" value="unknown"/>
+      <ATTRVALUE token="A0" value="wrap"/>
+      <ATTRVALUE token="A1" value="www."/>
+    </AttrValueTokens>
+    <CharacterEntities>
+      <CharacterEntity code="160" name="nbsp"/>
+      <CharacterEntity code="173" name="shy"/>
+    </CharacterEntities>
+  </App>
+  <App publicid="-//WAPFORUM//DTD WML 1.2//EN" use-default="yes" variable-subs="yes" textual-ext="wml" tokenised-ext="wmlc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/wml12.dtd">
+    <!-- see: WAP WML, Version 04-Nov-1999 -->
+    <!--      Wireless Markup Language Specification, Version 1.2 -->
+    <TagTokens>
+      <TAG token="1C" name="a"/>
+      <TAG token="22" name="anchor"/>
+      <TAG token="23" name="access"/>
+      <TAG token="24" name="b"/>
+      <TAG token="25" name="big"/>
+      <TAG token="26" name="br"/>
+      <TAG token="27" name="card"/>
+      <TAG token="28" name="do"/>
+      <TAG token="29" name="em"/>
+      <TAG token="2A" name="fielset"/>
+      <TAG token="2B" name="go"/>
+      <TAG token="2C" name="head"/>
+      <TAG token="2D" name="i"/>
+      <TAG token="2E" name="img"/>
+      <TAG token="2F" name="input"/>
+      <TAG token="30" name="meta"/>
+      <TAG token="31" name="noop"/>
+      <TAG token="20" name="p"/>
+      <TAG token="21" name="postfield"/>
+      <TAG token="1B" name="pre"/>
+      <TAG token="32" name="prev"/>
+      <TAG token="33" name="onevent"/>
+      <TAG token="34" name="optgroup"/>
+      <TAG token="35" name="option"/>
+      <TAG token="36" name="refresh"/>
+      <TAG token="37" name="select"/>
+      <TAG token="3E" name="setvar"/>
+      <TAG token="38" name="small"/>
+      <TAG token="39" name="strong"/>
+      <TAG token="1F" name="table"/>
+      <TAG token="1D" name="td"/>
+      <TAG token="3B" name="template"/>
+      <TAG token="3C" name="timer"/>
+      <TAG token="1E" name="tr"/>
+      <TAG token="3D" name="u"/>
+      <TAG token="3F" name="wml"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="accept-charset"/>
+      <ATTRSTART token="5E" name="accesskey" validate="vdata"/>
+      <ATTRSTART token="52" name="align"/>
+      <ATTRSTART token="06" name="align" value="bottom" default="img"/>
+      <ATTRSTART token="07" name="align" value="center"/>
+      <ATTRSTART token="08" name="align" value="left" default="p"/>
+      <ATTRSTART token="09" name="align" value="middle"/>
+      <ATTRSTART token="0A" name="align" value="right"/>
+      <ATTRSTART token="0B" name="align" value="top"/>
+      <ATTRSTART token="0C" name="alt" validate="vdata"/>
+      <ATTRSTART token="54" name="class"/>
+      <ATTRSTART token="53" name="columns"/>
+      <ATTRSTART token="0D" name="content"/>
+      <ATTRSTART token="5C" name="content" value="application/vnd.wap.wmlc;charset="/>
+      <ATTRSTART token="0F" name="domain"/>
+      <ATTRSTART token="10" name="emptyok" value="false" default="input"/>
+      <ATTRSTART token="11" name="emptyok" value="true"/>
+      <ATTRSTART token="5F" name="enctype" validate="vdata"/>
+      <ATTRSTART token="60" name="enctype" value="application/x-www-form-urlencoded" default="go" validate="vdata"/>
+      <ATTRSTART token="61" name="enctype" value="multipart/form-data" validate="vdata"/>
+      <ATTRSTART token="12" name="format"/>
+      <ATTRSTART token="56" name="forua" value="false" default="meta"/>
+      <ATTRSTART token="57" name="forua" value="true"/>
+      <ATTRSTART token="13" name="height" validate="length"/>
+      <ATTRSTART token="4A" name="href" validate="vdata"/>
+      <ATTRSTART token="4B" name="href" value="http://" validate="vdata"/>
+      <ATTRSTART token="4C" name="href" value="https://" validate="vdata"/>
+      <ATTRSTART token="14" name="hspace" validate="length" default="0"/>
+      <ATTRSTART token="5A" name="http-equiv"/>
+      <ATTRSTART token="5B" name="http-equiv" value="Content-Type"/>
+      <ATTRSTART token="5D" name="http-equiv" value="Expires"/>
+      <ATTRSTART token="55" name="id"/>
+      <ATTRSTART token="15" name="ivalue" validate="vdata"/>
+      <ATTRSTART token="16" name="iname"/>
+      <ATTRSTART token="18" name="label" validate="vdata"/>
+      <ATTRSTART token="19" name="localsrc" validate="vdata"/>
+      <ATTRSTART token="1A" name="maxlength"/>
+      <ATTRSTART token="1B" name="method" value="get" default="go"/>
+      <ATTRSTART token="1C" name="method" value="post"/>
+      <ATTRSTART token="1D" name="mode" value="nowrap"/>
+      <ATTRSTART token="1E" name="mode" value="wrap"/>
+      <ATTRSTART token="1F" name="multiple" value="false" default="select"/>
+      <ATTRSTART token="20" name="multiple" value="true"/>
+      <ATTRSTART token="21" name="name" validate="vdata"/>
+      <ATTRSTART token="22" name="newcontext" value="false" default="card"/>
+      <ATTRSTART token="23" name="newcontext" value="true"/>
+      <ATTRSTART token="25" name="onenterbackward" validate="vdata"/>
+      <ATTRSTART token="26" name="onenterforward" validate="vdata"/>
+      <ATTRSTART token="24" name="onpick" validate="vdata"/>
+      <ATTRSTART token="27" name="ontimer" validate="vdata"/>
+      <ATTRSTART token="28" name="optional" value="false" default="do"/>
+      <ATTRSTART token="29" name="optional" value="true"/>
+      <ATTRSTART token="2A" name="path"/>
+      <ATTRSTART token="2E" name="scheme"/>
+      <ATTRSTART token="2F" name="sendreferer" value="false" default="go"/>
+      <ATTRSTART token="30" name="sendreferer" value="true"/>
+      <ATTRSTART token="31" name="size"/>
+      <ATTRSTART token="32" name="src" validate="vdata"/>
+      <ATTRSTART token="58" name="src" value="http://" validate="vdata"/>
+      <ATTRSTART token="59" name="src" value="https://" validate="vdata"/>
+      <ATTRSTART token="33" name="ordered" value="true" default="card"/>
+      <ATTRSTART token="34" name="ordered" value="false"/>
+      <ATTRSTART token="35" name="tabindex"/>
+      <ATTRSTART token="36" name="title" validate="vdata"/>
+      <ATTRSTART token="37" name="type"/>
+      <ATTRSTART token="38" name="type" value="accept"/>
+      <ATTRSTART token="39" name="type" value="delete"/>
+      <ATTRSTART token="3A" name="type" value="help"/>
+      <ATTRSTART token="3B" name="type" value="password"/>
+      <ATTRSTART token="3C" name="type" value="onpick"/>
+      <ATTRSTART token="3D" name="type" value="onenterbackward"/>
+      <ATTRSTART token="3E" name="type" value="onenterforward"/>
+      <ATTRSTART token="3F" name="type" value="ontimer"/>
+      <ATTRSTART token="45" name="type" value="options"/>
+      <ATTRSTART token="46" name="type" value="prev"/>
+      <ATTRSTART token="47" name="type" value="reset"/>
+      <ATTRSTART token="48" name="type" value="text" default="input"/>
+      <ATTRSTART token="49" name="type" value="vnd."/>
+      <ATTRSTART token="4D" name="value" validate="vdata"/>
+      <ATTRSTART token="4E" name="vspace" validate="length" default="0"/>
+      <ATTRSTART token="4F" name="width" validate="length"/>
+      <ATTRSTART token="50" name="xml:lang"/>
+      <ATTRSTART token="00" name="xml:space" value="preserve" fixed="pre"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+      <ATTRVALUE token="89" value="accept"/>
+      <ATTRVALUE token="8A" value="bottom"/>
+      <ATTRVALUE token="8B" value="clear"/>
+      <ATTRVALUE token="8C" value="delete"/>
+      <ATTRVALUE token="8D" value="help"/>
+      <ATTRVALUE token="8E" value="http://"/>
+      <ATTRVALUE token="8F" value="http://www."/>
+      <ATTRVALUE token="90" value="https://"/>
+      <ATTRVALUE token="91" value="https://www."/>
+      <ATTRVALUE token="93" value="middle"/>
+      <ATTRVALUE token="94" value="nowrap"/>
+      <ATTRVALUE token="96" value="onenterbackward"/>
+      <ATTRVALUE token="97" value="onenterforward"/>
+      <ATTRVALUE token="95" value="onpick"/>
+      <ATTRVALUE token="98" value="ontimer"/>
+      <ATTRVALUE token="99" value="options"/>
+      <ATTRVALUE token="9A" value="password"/>
+      <ATTRVALUE token="9B" value="reset"/>
+      <ATTRVALUE token="9D" value="text"/>
+      <ATTRVALUE token="9E" value="top"/>
+      <ATTRVALUE token="9F" value="unknown"/>
+      <ATTRVALUE token="A0" value="wrap"/>
+      <ATTRVALUE token="A1" value="www."/>
+    </AttrValueTokens>
+    <CharacterEntities>
+      <CharacterEntity code="160" name="nbsp"/>
+      <CharacterEntity code="173" name="shy"/>
+    </CharacterEntities>
+  </App>
+  <App publicid="-//WAPFORUM//DTD WML 1.1//EN" use-default="yes" variable-subs="yes" textual-ext="wml" tokenised-ext="wmlc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/wml_1.1.xml">
+    <!-- see: WAP WML, Version 06-Jun-1999 -->
+    <!--      Wireless Markup Language Specification, Version 1.1 -->
+    <TagTokens>
+      <TAG token="1C" name="a"/>
+      <TAG token="22" name="anchor"/>
+      <TAG token="23" name="access"/>
+      <TAG token="24" name="b"/>
+      <TAG token="25" name="big"/>
+      <TAG token="26" name="br"/>
+      <TAG token="27" name="card"/>
+      <TAG token="28" name="do"/>
+      <TAG token="29" name="em"/>
+      <TAG token="2A" name="fielset"/>
+      <TAG token="2B" name="go"/>
+      <TAG token="2C" name="head"/>
+      <TAG token="2D" name="i"/>
+      <TAG token="2E" name="img"/>
+      <TAG token="2F" name="input"/>
+      <TAG token="30" name="meta"/>
+      <TAG token="31" name="noop"/>
+      <TAG token="20" name="p"/>
+      <TAG token="21" name="postfield"/>
+      <TAG token="32" name="prev"/>
+      <TAG token="33" name="onevent"/>
+      <TAG token="34" name="optgroup"/>
+      <TAG token="35" name="option"/>
+      <TAG token="36" name="refresh"/>
+      <TAG token="37" name="select"/>
+      <TAG token="3E" name="setvar"/>
+      <TAG token="38" name="small"/>
+      <TAG token="39" name="strong"/>
+      <TAG token="1F" name="table"/>
+      <TAG token="1D" name="td"/>
+      <TAG token="3B" name="template"/>
+      <TAG token="3C" name="timer"/>
+      <TAG token="1E" name="tr"/>
+      <TAG token="3D" name="u"/>
+      <TAG token="3F" name="wml"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="accept-charset"/>
+      <ATTRSTART token="52" name="align"/>
+      <ATTRSTART token="06" name="align" value="bottom" default="img"/>
+      <ATTRSTART token="07" name="align" value="center"/>
+      <ATTRSTART token="08" name="align" value="left" default="p"/>
+      <ATTRSTART token="09" name="align" value="middle"/>
+      <ATTRSTART token="0A" name="align" value="right"/>
+      <ATTRSTART token="0B" name="align" value="top"/>
+      <ATTRSTART token="0C" name="alt" validate="vdata"/>
+      <ATTRSTART token="54" name="class"/>
+      <ATTRSTART token="53" name="columns"/>
+      <ATTRSTART token="0D" name="content"/>
+      <ATTRSTART token="5C" name="content" value="application/vnd.wap.wmlc;charset="/>
+      <ATTRSTART token="0F" name="domain"/>
+      <ATTRSTART token="10" name="emptyok" value="false" default="input"/>
+      <ATTRSTART token="11" name="emptyok" value="true"/>
+      <ATTRSTART token="12" name="format"/>
+      <ATTRSTART token="56" name="forua" value="false"/>
+      <ATTRSTART token="57" name="forua" value="true"/>
+      <ATTRSTART token="13" name="height" validate="length"/>
+      <ATTRSTART token="4A" name="href" value="" validate="vdata"/>
+      <ATTRSTART token="4B" name="href" value="http://" validate="vdata"/>
+      <ATTRSTART token="4C" name="href" value="https://" validate="vdata"/>
+      <ATTRSTART token="14" name="hspace" validate="length" default="0"/>
+      <ATTRSTART token="5A" name="http-equiv"/>
+      <ATTRSTART token="5B" name="http-equiv" value="Content-Type"/>
+      <ATTRSTART token="5D" name="http-equiv" value="Expires"/>
+      <ATTRSTART token="55" name="id"/>
+      <ATTRSTART token="15" name="ivalue" validate="vdata"/>
+      <ATTRSTART token="16" name="iname"/>
+      <ATTRSTART token="18" name="label" validate="vdata"/>
+      <ATTRSTART token="19" name="localsrc" validate="vdata"/>
+      <ATTRSTART token="1A" name="maxlength"/>
+      <ATTRSTART token="1B" name="method" value="get" default="go"/>
+      <ATTRSTART token="1C" name="method" value="post"/>
+      <ATTRSTART token="1D" name="mode" value="nowrap"/>
+      <ATTRSTART token="1E" name="mode" value="wrap"/>
+      <ATTRSTART token="1F" name="multiple" value="false" default="select"/>
+      <ATTRSTART token="20" name="multiple" value="true"/>
+      <ATTRSTART token="21" name="name" validate="vdata"/>
+      <ATTRSTART token="22" name="newcontext" value="false" default="card"/>
+      <ATTRSTART token="23" name="newcontext" value="true"/>
+      <ATTRSTART token="25" name="onenterbackward"/>
+      <ATTRSTART token="26" name="onenterforward"/>
+      <ATTRSTART token="24" name="onpick"/>
+      <ATTRSTART token="27" name="ontimer"/>
+      <ATTRSTART token="28" name="optional" value="false" default="do"/>
+      <ATTRSTART token="29" name="optional" value="true"/>
+      <ATTRSTART token="2A" name="path"/>
+      <ATTRSTART token="2E" name="scheme"/>
+      <ATTRSTART token="2F" name="sendreferer" value="false" default="go"/>
+      <ATTRSTART token="30" name="sendreferer" value="true"/>
+      <ATTRSTART token="31" name="size"/>
+      <ATTRSTART token="32" name="src" validate="vdata"/>
+      <ATTRSTART token="58" name="src" value="http://" validate="vdata"/>
+      <ATTRSTART token="59" name="src" value="https://" validate="vdata"/>
+      <ATTRSTART token="33" name="ordered" value="true" default="card"/>
+      <ATTRSTART token="34" name="ordered" value="false"/>
+      <ATTRSTART token="35" name="tabindex"/>
+      <ATTRSTART token="36" name="title" validate="vdata"/>
+      <ATTRSTART token="37" name="type"/>
+      <ATTRSTART token="38" name="type" value="accept"/>
+      <ATTRSTART token="39" name="type" value="delete"/>
+      <ATTRSTART token="3A" name="type" value="help"/>
+      <ATTRSTART token="3B" name="type" value="password"/>
+      <ATTRSTART token="3C" name="type" value="onpick" validate="vdata"/>
+      <ATTRSTART token="3D" name="type" value="onenterbackward" validate="vdata"/>
+      <ATTRSTART token="3E" name="type" value="onenterforward" validate="vdata"/>
+      <ATTRSTART token="3F" name="type" value="ontimer" validate="vdata"/>
+      <ATTRSTART token="45" name="type" value="options"/>
+      <ATTRSTART token="46" name="type" value="prev"/>
+      <ATTRSTART token="47" name="type" value="reset"/>
+      <ATTRSTART token="48" name="type" value="text" default="input"/>
+      <ATTRSTART token="49" name="type" value="vnd."/>
+      <ATTRSTART token="4D" name="value" validate="vdata"/>
+      <ATTRSTART token="4E" name="vspace" validate="length" default="0"/>
+      <ATTRSTART token="4F" name="width" validate="length"/>
+      <ATTRSTART token="50" name="xml:lang"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+      <ATTRVALUE token="89" value="accept"/>
+      <ATTRVALUE token="8A" value="bottom"/>
+      <ATTRVALUE token="8B" value="clear"/>
+      <ATTRVALUE token="8C" value="delete"/>
+      <ATTRVALUE token="8D" value="help"/>
+      <ATTRVALUE token="8E" value="http://"/>
+      <ATTRVALUE token="8F" value="http://www."/>
+      <ATTRVALUE token="90" value="https://"/>
+      <ATTRVALUE token="91" value="https://www."/>
+      <ATTRVALUE token="93" value="middle"/>
+      <ATTRVALUE token="94" value="nowrap"/>
+      <ATTRVALUE token="96" value="onenterbackward"/>
+      <ATTRVALUE token="97" value="onenterforward"/>
+      <ATTRVALUE token="95" value="onpick"/>
+      <ATTRVALUE token="98" value="ontimer"/>
+      <ATTRVALUE token="99" value="options"/>
+      <ATTRVALUE token="9A" value="password"/>
+      <ATTRVALUE token="9B" value="reset"/>
+      <ATTRVALUE token="9D" value="text"/>
+      <ATTRVALUE token="9E" value="top"/>
+      <ATTRVALUE token="9F" value="unknown"/>
+      <ATTRVALUE token="A0" value="wrap"/>
+      <ATTRVALUE token="A1" value="www."/>
+    </AttrValueTokens>
+    <CharacterEntities>
+      <CharacterEntity code="160" name="nbsp"/>
+      <CharacterEntity code="173" name="shy"/>
+    </CharacterEntities>
+  </App>
+  <App publicid="-//WAPFORUM//DTD WML 1.0//EN" use-default="yes" variable-subs="yes" textual-ext="wml" tokenised-ext="wmlc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/wml.xml">
+    <!-- see: WAP WML, Version 30-Apr-1998 -->
+    <!--      Wireless Markup Language Specification, Version 1.0 -->
+    <TagTokens>
+      <TAG token="22" name="A"/>
+      <TAG token="23" name="ACCESS"/>
+      <TAG token="24" name="B"/>
+      <TAG token="25" name="BIG"/>
+      <TAG token="26" name="BR"/>
+      <TAG token="27" name="CARD"/>
+      <TAG token="28" name="DO"/>
+      <TAG token="29" name="EM"/>
+      <TAG token="2A" name="FIELSET"/>
+      <TAG token="2B" name="GO"/>
+      <TAG token="2C" name="HEAD"/>
+      <TAG token="2D" name="I"/>
+      <TAG token="2E" name="IMG"/>
+      <TAG token="2F" name="INPUT"/>
+      <TAG token="30" name="META"/>
+      <TAG token="31" name="NOOP"/>
+      <TAG token="32" name="PREV"/>
+      <TAG token="33" name="ONEVENT"/>
+      <TAG token="34" name="OPTGROUP"/>
+      <TAG token="35" name="OPTION"/>
+      <TAG token="36" name="REFRESH"/>
+      <TAG token="37" name="SELECT"/>
+      <TAG token="38" name="SMALL"/>
+      <TAG token="39" name="STRONG"/>
+      <TAG token="3A" name="TAB"/>
+      <TAG token="3B" name="TEMPLATE"/>
+      <TAG token="3C" name="TIMER"/>
+      <TAG token="3D" name="U"/>
+      <TAG token="3E" name="VAR"/>
+      <TAG token="3F" name="WML"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="ACCEPT-CHARSET"/>
+      <ATTRSTART token="06" name="ALIGN" value="BOTTOM" default="IMG"/>
+      <ATTRSTART token="07" name="ALIGN" value="CENTER"/>
+      <ATTRSTART token="08" name="ALIGN" value="LEFT" default="TAB;BR"/>
+      <ATTRSTART token="09" name="ALIGN" value="MIDDLE"/>
+      <ATTRSTART token="0A" name="ALIGN" value="RIGHT"/>
+      <ATTRSTART token="0B" name="ALIGN" value="TOP"/>
+      <ATTRSTART token="0C" name="ALT" validate="vdata"/>
+      <ATTRSTART token="0D" name="CONTENT"/>
+      <ATTRSTART token="0E" name="DEFAULT" validate="vdata"/>
+      <ATTRSTART token="0F" name="DOMAIN"/>
+      <ATTRSTART token="10" name="EMPTYOK" value="FALSE" default="INPUT"/>
+      <ATTRSTART token="11" name="EMPTYOK" value="TRUE"/>
+      <ATTRSTART token="12" name="FORMAT"/>
+      <ATTRSTART token="13" name="HEIGHT" validate="length"/>
+      <ATTRSTART token="14" name="HSPACE" validate="length" default="0"/>
+      <ATTRSTART token="15" name="IDEFAULT" validate="vdata"/>
+      <ATTRSTART token="16" name="IKEY"/>
+      <ATTRSTART token="17" name="KEY"/>
+      <ATTRSTART token="18" name="LABEL" validate="vdata"/>
+      <ATTRSTART token="19" name="LOCALSRC" validate="vdata"/>
+      <ATTRSTART token="1A" name="MAXLENGTH"/>
+      <ATTRSTART token="1B" name="METHOD" value="GET" default="GO"/>
+      <ATTRSTART token="1C" name="METHOD" value="POST"/>
+      <ATTRSTART token="1D" name="MODE" value="NOWRAP"/>
+      <ATTRSTART token="1E" name="MODE" value="WRAP"/>
+      <ATTRSTART token="1F" name="MULTIPLE" value="FALSE" default="SELECT"/>
+      <ATTRSTART token="20" name="MULTIPLE" value="TRUE"/>
+      <ATTRSTART token="21" name="NAME" validate="vdata"/>
+      <ATTRSTART token="22" name="NEWCONTEXT" value="FALSE" default="CARD"/>
+      <ATTRSTART token="23" name="NEWCONTEXT" value="TRUE"/>
+      <ATTRSTART token="24" name="ONCLICK" validate="vdata"/>
+      <ATTRSTART token="25" name="ONENTERBACKWARD" validate="vdata"/>
+      <ATTRSTART token="26" name="ONENTERFORWARD" validate="vdata"/>
+      <ATTRSTART token="27" name="ONTIMER" validate="vdata"/>
+      <ATTRSTART token="28" name="OPTIONAL" value="FALSE" default="DO"/>
+      <ATTRSTART token="29" name="OPTIONAL" value="TRUE"/>
+      <ATTRSTART token="2A" name="PATH"/>
+      <ATTRSTART token="2B" name="POSTDATA" validate="vdata"/>
+      <ATTRSTART token="2C" name="PUBLIC" value="FALSE" default="ACCESS"/>
+      <ATTRSTART token="2D" name="PUBLIC" value="TRUE"/>
+      <ATTRSTART token="2E" name="SCHEME"/>
+      <ATTRSTART token="2F" name="SENDREFERER" value="FALSE" default="GO"/>
+      <ATTRSTART token="30" name="SENDREFERER" value="TRUE"/>
+      <ATTRSTART token="31" name="SIZE"/>
+      <ATTRSTART token="32" name="SRC" validate="vdata"/>
+      <ATTRSTART token="33" name="STYLE" value="LIST" default="CARD"/>
+      <ATTRSTART token="34" name="STYLE" value="SET"/>
+      <ATTRSTART token="35" name="TABINDEX"/>
+      <ATTRSTART token="36" name="TITLE" validate="vdata"/>
+      <ATTRSTART token="37" name="TYPE"/>
+      <ATTRSTART token="38" name="TYPE" value="ACCEPT"/>
+      <ATTRSTART token="39" name="TYPE" value="DELETE"/>
+      <ATTRSTART token="3A" name="TYPE" value="HELP"/>
+      <ATTRSTART token="3B" name="TYPE" value="PASSWORD"/>
+      <ATTRSTART token="3C" name="TYPE" value="ONCLICK"/>
+      <ATTRSTART token="3D" name="TYPE" value="ONENTERBACKWARD"/>
+      <ATTRSTART token="3E" name="TYPE" value="ONENTERFORWARD"/>
+      <ATTRSTART token="3F" name="TYPE" value="ONTIMER"/>
+      <ATTRSTART token="45" name="TYPE" value="OPTIONS"/>
+      <ATTRSTART token="46" name="TYPE" value="PREV"/>
+      <ATTRSTART token="47" name="TYPE" value="RESET"/>
+      <ATTRSTART token="48" name="TYPE" value="TEXT" default="INPUT"/>
+      <ATTRSTART token="49" name="TYPE" value="vnd."/>
+      <ATTRSTART token="4A" name="URL" validate="vdata"/>
+      <ATTRSTART token="4B" name="URL" value="http://" validate="vdata"/>
+      <ATTRSTART token="4C" name="URL" value="https://" validate="vdata"/>
+      <ATTRSTART token="4D" name="USER-AGENT"/>
+      <ATTRSTART token="4E" name="VALUE" validate="vdata"/>
+      <ATTRSTART token="4F" name="VSPACE" validate="length" default="0"/>
+      <ATTRSTART token="50" name="WIDTH" validate="length"/>
+      <ATTRSTART token="51" name="xml:lang"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+      <ATTRVALUE token="89" value="ACCEPT"/>
+      <ATTRVALUE token="8A" value="BOTTOM"/>
+      <ATTRVALUE token="8B" value="CLEAR"/>
+      <ATTRVALUE token="8C" value="DELETE"/>
+      <ATTRVALUE token="8D" value="HELP"/>
+      <ATTRVALUE token="8E" value="http://"/>
+      <ATTRVALUE token="8F" value="http://www."/>
+      <ATTRVALUE token="90" value="https://"/>
+      <ATTRVALUE token="91" value="https://www."/>
+      <ATTRVALUE token="92" value="LIST"/>
+      <ATTRVALUE token="93" value="MIDDLE"/>
+      <ATTRVALUE token="94" value="NOWRAP"/>
+      <ATTRVALUE token="95" value="ONCLICK"/>
+      <ATTRVALUE token="96" value="ONENTERBACKWARD"/>
+      <ATTRVALUE token="97" value="ONENTERFORWARD"/>
+      <ATTRVALUE token="98" value="ONTIMER"/>
+      <ATTRVALUE token="99" value="OPTIONS"/>
+      <ATTRVALUE token="9A" value="PASSWORD"/>
+      <ATTRVALUE token="9B" value="RESET"/>
+      <ATTRVALUE token="9C" value="SET"/>
+      <ATTRVALUE token="9D" value="TEXT"/>
+      <ATTRVALUE token="9E" value="TOP"/>
+      <ATTRVALUE token="9F" value="UNKNOWN"/>
+      <ATTRVALUE token="A0" value="WRAP"/>
+      <ATTRVALUE token="A1" value="www."/>
+    </AttrValueTokens>
+    <CharacterEntities>
+      <CharacterEntity code="160" name="nbsp"/>
+      <CharacterEntity code="173" name="shy"/>
+    </CharacterEntities>
+  </App>
+  <App publicid="-//WAPFORUM//DTD PROV 1.0//EN" textual-ext="connectivity-xml" tokenised-ext="connectivity-wbxml" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/prov.dtd">
+    <!-- see: Provisioning Content Version 1.1, Version 12-Nov-2002 -->
+    <!--      OMA-WAP-ProvCont-v1_1-20021112-C -->
+    <TagTokens>
+      <TAG token="05" name="wap-provisioningdoc"/>
+      <TAG token="06" name="characteristic"/>
+      <TAG token="07" name="parm"/>
+      <TAG token="06" codepage="01" name="characteristic"/>
+      <TAG token="07" codepage="01" name="parm"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <!-- Wap-provisioningdoc -->
+      <ATTRSTART token="45" name="version"/>
+      <ATTRSTART token="46" name="version" value="1.0"/>
+      <!-- Characteristic -->
+      <ATTRSTART token="50" name="type"/>
+      <ATTRSTART token="51" name="type" value="PXLOGICAL"/>
+      <ATTRSTART token="52" name="type" value="PXPHYSICAL"/>
+      <ATTRSTART token="53" name="type" value="PORT"/>
+      <ATTRSTART token="54" name="type" value="VALIDITY"/>
+      <ATTRSTART token="55" name="type" value="NAPDEF"/>
+      <ATTRSTART token="56" name="type" value="BOOTSTRAP"/>
+      <ATTRSTART token="57" name="type" value="VENDORCONFIG"/>
+      <ATTRSTART token="58" name="type" value="CLIENTIDENTITY"/>
+      <ATTRSTART token="59" name="type" value="PXAUTHINFO"/>
+      <ATTRSTART token="5A" name="type" value="NAPAUTHINFO"/>
+      <ATTRSTART token="5B" name="type" value="ACCESS"/>
+      <ATTRSTART token="50" codepage="01" name="type"/>
+      <ATTRSTART token="53" codepage="01" name="type" value="PORT"/>
+      <ATTRSTART token="55" codepage="01" name="type" value="APPLICATION"/>
+      <ATTRSTART token="56" codepage="01" name="type" value="APPADDR"/>
+      <ATTRSTART token="57" codepage="01" name="type" value="APPAUTH"/>
+      <ATTRSTART token="58" codepage="01" name="type" value="CLIENTIDENTITY"/>
+      <ATTRSTART token="59" codepage="01" name="type" value="RESOURCE"/>
+      <!-- Parm -->
+      <ATTRSTART token="05" name="name"/>
+      <ATTRSTART token="06" name="value"/>
+      <ATTRSTART token="07" name="name" value="NAME"/>
+      <ATTRSTART token="08" name="name" value="NAP-ADDRESS"/>
+      <ATTRSTART token="09" name="name" value="NAP-ADDRTYPE"/>
+      <ATTRSTART token="0A" name="name" value="CALLTYPE"/>
+      <ATTRSTART token="0B" name="name" value="VALIDUNTIL"/>
+      <ATTRSTART token="0C" name="name" value="AUTHTYPE"/>
+      <ATTRSTART token="0D" name="name" value="AUTHNAME"/>
+      <ATTRSTART token="0E" name="name" value="AUTHSECRET"/>
+      <ATTRSTART token="0F" name="name" value="LINGER"/>
+      <ATTRSTART token="10" name="name" value="BEARER"/>
+      <ATTRSTART token="11" name="name" value="NAPID"/>
+      <ATTRSTART token="12" name="name" value="COUNTRY"/>
+      <ATTRSTART token="13" name="name" value="NETWORK"/>
+      <ATTRSTART token="14" name="name" value="INTERNET"/>
+      <ATTRSTART token="15" name="name" value="PROXY-ID"/>
+      <ATTRSTART token="16" name="name" value="PROXY-PROVIDER-ID"/>
+      <ATTRSTART token="17" name="name" value="DOMAIN"/>
+      <ATTRSTART token="18" name="name" value="PROVURL"/>
+      <ATTRSTART token="19" name="name" value="PXAUTH-TYPE"/>
+      <ATTRSTART token="1A" name="name" value="PXAUTH-ID"/>
+      <ATTRSTART token="1B" name="name" value="PXAUTH-PW"/>
+      <ATTRSTART token="1C" name="name" value="STARTPAGE"/>
+      <ATTRSTART token="1D" name="name" value="BASAUTH-ID"/>
+      <ATTRSTART token="1E" name="name" value="BASAUTH-PW"/>
+      <ATTRSTART token="1F" name="name" value="PUSHENABLED"/>
+      <ATTRSTART token="20" name="name" value="PXADDR"/>
+      <ATTRSTART token="21" name="name" value="PXADDRTYPE"/>
+      <ATTRSTART token="22" name="name" value="TO-NAPID"/>
+      <ATTRSTART token="23" name="name" value="PORTNBR"/>
+      <ATTRSTART token="24" name="name" value="SERVICE"/>
+      <ATTRSTART token="25" name="name" value="LINKSPEED"/>
+      <ATTRSTART token="26" name="name" value="DNLINKSPEED"/>
+      <ATTRSTART token="27" name="name" value="LOCAL-ADDR"/>
+      <ATTRSTART token="28" name="name" value="LOCAL-ADDRTYPE"/>
+      <ATTRSTART token="29" name="name" value="CONTEXT-ALLOW"/>
+      <ATTRSTART token="2A" name="name" value="TRUST"/>
+      <ATTRSTART token="2B" name="name" value="MASTER"/>
+      <ATTRSTART token="2C" name="name" value="SID"/>
+      <ATTRSTART token="2D" name="name" value="SOC"/>
+      <ATTRSTART token="2E" name="name" value="WSP-VERSION"/>
+      <ATTRSTART token="2F" name="name" value="PHYSICAL-PROXY-ID"/>
+      <ATTRSTART token="30" name="name" value="CLIENT-ID"/>
+      <ATTRSTART token="31" name="name" value="DELIVERY-ERR-SDU"/>
+      <ATTRSTART token="32" name="name" value="DELIVERY-ORDER"/>
+      <ATTRSTART token="33" name="name" value="TRAFFIC-CLASS"/>
+      <ATTRSTART token="34" name="name" value="MAX-SDU-SIZE"/>
+      <ATTRSTART token="35" name="name" value="MAX-BITRATE-UPLINK"/>
+      <ATTRSTART token="36" name="name" value="MAX-BITRATE-DNLINK"/>
+      <ATTRSTART token="37" name="name" value="RESIDUAL-BER"/>
+      <ATTRSTART token="38" name="name" value="SDU-ERROR-RATIO"/>
+      <ATTRSTART token="39" name="name" value="TRAFFIC-HANDL-PRIO"/>
+      <ATTRSTART token="3A" name="name" value="TRANSFER-DELAY"/>
+      <ATTRSTART token="3B" name="name" value="GUARANTEED-BITRATE-UPLINK"/>
+      <ATTRSTART token="3C" name="name" value="GUARANTEED-BITRATE-DNLINK"/>
+      <ATTRSTART token="3D" name="name" value="PXADDR-FQDN"/>
+      <ATTRSTART token="3E" name="name" value="PROXY-PW"/>
+      <ATTRSTART token="3F" name="name" value="PPGAUTH-TYPE"/>
+      <ATTRSTART token="47" name="name" value="PULLENABLED"/>
+      <ATTRSTART token="48" name="name" value="DNS-ADDR"/>
+      <ATTRSTART token="49" name="name" value="MAX-NUM-RETRY"/>
+      <ATTRSTART token="4A" name="name" value="FIRST-RETRY-TIMEOUT"/>
+      <ATTRSTART token="4B" name="name" value="REREG-THRESHOLD"/>
+      <ATTRSTART token="4C" name="name" value="T-BIT"/>
+      <ATTRSTART token="4E" name="name" value="AUTH-ENTITY"/>
+      <ATTRSTART token="4F" name="name" value="SPI"/>
+      <ATTRSTART token="05" codepage="01" name="name"/>
+      <ATTRSTART token="06" codepage="01" name="value"/>
+      <ATTRSTART token="07" codepage="01" name="name" value="NAME"/>
+      <ATTRSTART token="14" codepage="01" name="name" value="INTERNET"/>
+      <ATTRSTART token="1C" codepage="01" name="name" value="STARTPAGE"/>
+      <ATTRSTART token="22" codepage="01" name="name" value="TO-NAPID"/>
+      <ATTRSTART token="23" codepage="01" name="name" value="PORTNBR"/>
+      <ATTRSTART token="24" codepage="01" name="name" value="SERVICE"/>
+      <ATTRSTART token="2E" codepage="01" name="name" value="AACCEPT"/>
+      <ATTRSTART token="2F" codepage="01" name="name" value="AAUTHDATA"/>
+      <ATTRSTART token="30" codepage="01" name="name" value="AAUTHLEVEL"/>
+      <ATTRSTART token="31" codepage="01" name="name" value="AAUTHNAME"/>
+      <ATTRSTART token="32" codepage="01" name="name" value="AAUTHSECRET"/>
+      <ATTRSTART token="33" codepage="01" name="name" value="AAUTHTYPE"/>
+      <ATTRSTART token="34" codepage="01" name="name" value="ADDR"/>
+      <ATTRSTART token="35" codepage="01" name="name" value="ADDRTYPE"/>
+      <ATTRSTART token="36" codepage="01" name="name" value="APPID"/>
+      <ATTRSTART token="37" codepage="01" name="name" value="APROTOCOL"/>
+      <ATTRSTART token="38" codepage="01" name="name" value="PROVIDER-ID"/>
+      <ATTRSTART token="39" codepage="01" name="name" value="TO-PROXY"/>
+      <ATTRSTART token="3A" codepage="01" name="name" value="URI"/>
+      <ATTRSTART token="3B" codepage="01" name="name" value="RULE"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <!-- ADDRTYPE -->
+      <ATTRVALUE token="85" value="IPV4"/>
+      <ATTRVALUE token="86" value="IPV6"/>
+      <ATTRVALUE token="87" value="E164"/>
+      <ATTRVALUE token="88" value="ALPHA"/>
+      <ATTRVALUE token="89" value="APN"/>
+      <ATTRVALUE token="8A" value="SCODE"/>
+      <ATTRVALUE token="8B" value="TETRA-ITSI"/>
+      <ATTRVALUE token="8C" value="MAN"/>
+      <ATTRVALUE token="86" codepage="01" value="IPV6"/>
+      <ATTRVALUE token="87" codepage="01" value="E164"/>
+      <ATTRVALUE token="88" codepage="01" value="ALPHA"/>
+      <ATTRVALUE token="8D" codepage="01" value="APPSRV"/>
+      <ATTRVALUE token="8E" codepage="01" value="OBEX"/>
+      <!-- CALLTYPE -->
+      <ATTRVALUE token="90" value="ANALOG-MODEM"/>
+      <ATTRVALUE token="91" value="V.120"/>
+      <ATTRVALUE token="92" value="V.110"/>
+      <ATTRVALUE token="93" value="X.31"/>
+      <ATTRVALUE token="94" value="BIT-TRANSPARENT"/>
+      <ATTRVALUE token="95" value="DIRECT-ASYNCHRONOUS-DATA-SERVICE"/>
+      <!-- AUTHTYPE/PXAUTH-TYPE -->
+      <ATTRVALUE token="9A" value="PAP"/>
+      <ATTRVALUE token="9B" value="CHAP"/>
+      <ATTRVALUE token="9C" value="HTTP-BASIC"/>
+      <ATTRVALUE token="9D" value="HTTP-DIGEST"/>
+      <ATTRVALUE token="9E" value="WTLS-SS"/>
+      <ATTRVALUE token="9F" value="MD5"/>
+      <!-- BEARER -->
+      <ATTRVALUE token="A2" value="GSM-USSD"/>
+      <ATTRVALUE token="A3" value="GSM-SMS"/>
+      <ATTRVALUE token="A4" value="ANSI-136-GUTS"/>
+      <ATTRVALUE token="A5" value="IS-95-CDMA-SMS"/>
+      <ATTRVALUE token="A6" value="IS-95-CDMA-CSD"/>
+      <ATTRVALUE token="A7" value="IS-95-CDMA-PACKET"/>
+      <ATTRVALUE token="A8" value="ANSI-136-CSD"/>
+      <ATTRVALUE token="A9" value="ANSI-136-GPRS"/>
+      <ATTRVALUE token="AA" value="GSM-CSD"/>
+      <ATTRVALUE token="AB" value="GSM-GPRS"/>
+      <ATTRVALUE token="AC" value="AMPS-CDPD"/>
+      <ATTRVALUE token="AD" value="PDC-CSD"/>
+      <ATTRVALUE token="AE" value="PDC-PACKET"/>
+      <ATTRVALUE token="AF" value="IDEN-SMS"/>
+      <ATTRVALUE token="B0" value="IDEN-CSD"/>
+      <ATTRVALUE token="B1" value="IDEN-PACKET"/>
+      <ATTRVALUE token="B2" value="FLEX/REFLEX"/>
+      <ATTRVALUE token="B3" value="PHS-SMS"/>
+      <ATTRVALUE token="B4" value="PHS-CSD"/>
+      <ATTRVALUE token="B5" value="TETRA-SDS"/>
+      <ATTRVALUE token="B6" value="TETRA-PACKET"/>
+      <ATTRVALUE token="B7" value="ANSI-136-GHOST"/>
+      <ATTRVALUE token="B8" value="MOBITEX-MPAK"/>
+      <ATTRVALUE token="B9" value="CDMA2000-1X-SIMPLE-IP"/>
+      <ATTRVALUE token="BA" value="CDMA2000-1X-MOBILE-IP"/>
+      <!-- LINKSPEED -->
+      <ATTRVALUE token="C5" value="AUTOBAUDING"/>
+      <!-- SERVICE -->
+      <ATTRVALUE token="CA" value="CL-WSP"/>
+      <ATTRVALUE token="CB" value="CO-WSP"/>
+      <ATTRVALUE token="CC" value="CL-SEC-WSP"/>
+      <ATTRVALUE token="CD" value="CO-SEC-WSP"/>
+      <ATTRVALUE token="CE" value="CL-SEC-WTA"/>
+      <ATTRVALUE token="CF" value="CO-SEC-WTA"/>
+      <ATTRVALUE token="D0" value="OTA-HTTP-TO"/>
+      <ATTRVALUE token="D1" value="OTA-HTTP-TLS-TO"/>
+      <ATTRVALUE token="D2" value="OTA-HTTP-PO"/>
+      <ATTRVALUE token="D3" value="OTA-HTTP-TLS-PO"/>
+      <!-- AAUTHTYPE -->
+      <ATTRVALUE token="80" codepage="01" value=","/>
+      <ATTRVALUE token="81" codepage="01" value="HTTP-"/>
+      <ATTRVALUE token="82" codepage="01" value="BASIC"/>
+      <ATTRVALUE token="84" codepage="01" value="DIGEST"/>
+      <!-- AUTH-ENTITY -->
+      <ATTRVALUE token="E0" value="AAA"/>
+      <ATTRVALUE token="E1" value="HA"/>
+    </AttrValueTokens>
+  </App>
+  <App publicid="-//WAPFORUM//DTD WTA-WML 1.2//EN" use-default="yes" variable-subs="yes" textual-ext="wta-wml" tokenised-ext="wta-wmlc" xml-space="default"
+       systemid="http://www.wapforum.org/DTD/wta-wml12.dtd">
+    <!-- see: WAP Wireless Telephony Application -->
+    <!--      WAP-266-WTA-20010711-p -->
+    <!--  WTA-WML is a superset of WML 1.2 -->
+    <TagTokens>
+      <TAG token="1C" name="a"/>
+      <TAG token="22" name="anchor"/>
+      <TAG token="23" name="access"/>
+      <TAG token="24" name="b"/>
+      <TAG token="25" name="big"/>
+      <TAG token="26" name="br"/>
+      <TAG token="27" name="card"/>
+      <TAG token="28" name="do"/>
+      <TAG token="29" name="em"/>
+      <TAG token="2A" name="fielset"/>
+      <TAG token="2B" name="go"/>
+      <TAG token="2C" name="head"/>
+      <TAG token="2D" name="i"/>
+      <TAG token="2E" name="img"/>
+      <TAG token="2F" name="input"/>
+      <TAG token="30" name="meta"/>
+      <TAG token="31" name="noop"/>
+      <TAG token="20" name="p"/>
+      <TAG token="21" name="postfield"/>
+      <TAG token="1B" name="pre"/>
+      <TAG token="32" name="prev"/>
+      <TAG token="33" name="onevent"/>
+      <TAG token="34" name="optgroup"/>
+      <TAG token="35" name="option"/>
+      <TAG token="36" name="refresh"/>
+      <TAG token="37" name="select"/>
+      <TAG token="3E" name="setvar"/>
+      <TAG token="38" name="small"/>
+      <TAG token="39" name="strong"/>
+      <TAG token="1F" name="table"/>
+      <TAG token="1D" name="td"/>
+      <TAG token="3B" name="template"/>
+      <TAG token="3C" name="timer"/>
+      <TAG token="1E" name="tr"/>
+      <TAG token="3D" name="u"/>
+      <TAG token="3F" name="wml"/>
+      <TAG token="3F" codepage="01" name="wta-wml"/>
+    </TagTokens>
+    <AttrStartTokens>
+      <ATTRSTART token="05" name="accept-charset"/>
+      <ATTRSTART token="5E" name="accesskey" validate="vdata"/>
+      <ATTRSTART token="52" name="align"/>
+      <ATTRSTART token="06" name="align" value="bottom" default="img"/>
+      <ATTRSTART token="07" name="align" value="center"/>
+      <ATTRSTART token="08" name="align" value="left" default="p"/>
+      <ATTRSTART token="09" name="align" value="middle"/>
+      <ATTRSTART token="0A" name="align" value="right"/>
+      <ATTRSTART token="0B" name="align" value="top"/>
+      <ATTRSTART token="0C" name="alt" validate="vdata"/>
+      <ATTRSTART token="54" name="class"/>
+      <ATTRSTART token="53" name="columns"/>
+      <ATTRSTART token="0D" name="content"/>
+      <ATTRSTART token="5C" name="content" value="application/vnd.wap.wmlc;charset="/>
+      <ATTRSTART token="0F" name="domain"/>
+      <ATTRSTART token="10" name="emptyok" value="false" default="input"/>
+      <ATTRSTART token="11" name="emptyok" value="true"/>
+      <ATTRSTART token="5F" name="enctype" validate="vdata"/>
+      <ATTRSTART token="60" name="enctype" value="application/x-www-form-urlencoded" default="go" validate="vdata"/>
+      <ATTRSTART token="61" name="enctype" value="multipart/form-data" validate="vdata"/>
+      <ATTRSTART token="12" name="format"/>
+      <ATTRSTART token="56" name="forua" value="false" default="meta"/>
+      <ATTRSTART token="57" name="forua" value="true"/>
+      <ATTRSTART token="13" name="height" validate="length"/>
+      <ATTRSTART token="4A" name="href" validate="vdata"/>
+      <ATTRSTART token="4B" name="href" value="http://" validate="vdata"/>
+      <ATTRSTART token="4C" name="href" value="https://" validate="vdata"/>
+      <ATTRSTART token="14" name="hspace" validate="length"/>
+      <ATTRSTART token="5A" name="http-equiv"/>
+      <ATTRSTART token="5B" name="http-equiv" value="Content-Type"/>
+      <ATTRSTART token="5D" name="http-equiv" value="Expires"/>
+      <ATTRSTART token="55" name="id"/>
+      <ATTRSTART token="15" name="ivalue" validate="vdata"/>
+      <ATTRSTART token="16" name="iname"/>
+      <ATTRSTART token="18" name="label" validate="vdata"/>
+      <ATTRSTART token="19" name="localsrc" validate="vdata"/>
+      <ATTRSTART token="1A" name="maxlength"/>
+      <ATTRSTART token="1B" name="method" value="get" default="go"/>
+      <ATTRSTART token="1C" name="method" value="post"/>
+      <ATTRSTART token="1D" name="mode" value="nowrap"/>
+      <ATTRSTART token="1E" name="mode" value="wrap"/>
+      <ATTRSTART token="1F" name="multiple" value="false" default="select"/>
+      <ATTRSTART token="20" name="multiple" value="true"/>
+      <ATTRSTART token="21" name="name" validate="vdata"/>
+      <ATTRSTART token="22" name="newcontext" value="false" default="card"/>
+      <ATTRSTART token="23" name="newcontext" value="true"/>
+      <ATTRSTART token="25" name="onenterbackward" validate="vdata"/>
+      <ATTRSTART token="26" name="onenterforward" validate="vdata"/>
+      <ATTRSTART token="24" name="onpick" validate="vdata"/>
+      <ATTRSTART token="27" name="ontimer" validate="vdata"/>
+      <ATTRSTART token="28" name="optional" value="false" default="do"/>
+      <ATTRSTART token="29" name="optional" value="true"/>
+      <ATTRSTART token="2A" name="path"/>
+      <ATTRSTART token="2E" name="scheme"/>
+      <ATTRSTART token="2F" name="sendreferer" value="false" default="go"/>
+      <ATTRSTART token="30" name="sendreferer" value="true"/>
+      <ATTRSTART token="31" name="size"/>
+      <ATTRSTART token="32" name="src" validate="vdata"/>
+      <ATTRSTART token="58" name="src" value="http://" validate="vdata"/>
+      <ATTRSTART token="59" name="src" value="https://" validate="vdata"/>
+      <ATTRSTART token="33" name="ordered" value="true" default="card"/>
+      <ATTRSTART token="34" name="ordered" value="false"/>
+      <ATTRSTART token="35" name="tabindex"/>
+      <ATTRSTART token="36" name="title" validate="vdata"/>
+      <ATTRSTART token="37" name="type"/>
+      <ATTRSTART token="38" name="type" value="accept"/>
+      <ATTRSTART token="39" name="type" value="delete"/>
+      <ATTRSTART token="3A" name="type" value="help"/>
+      <ATTRSTART token="3B" name="type" value="password"/>
+      <ATTRSTART token="3C" name="type" value="onpick"/>
+      <ATTRSTART token="3D" name="type" value="onenterbackward"/>
+      <ATTRSTART token="3E" name="type" value="onenterforward"/>
+      <ATTRSTART token="3F" name="type" value="ontimer"/>
+      <ATTRSTART token="45" name="type" value="options"/>
+      <ATTRSTART token="46" name="type" value="prev"/>
+      <ATTRSTART token="47" name="type" value="reset"/>
+      <ATTRSTART token="48" name="type" value="text" default="input"/>
+      <ATTRSTART token="49" name="type" value="vnd."/>
+      <ATTRSTART token="4D" name="value" validate="vdata"/>
+      <ATTRSTART token="4E" name="vspace" validate="length"/>
+      <ATTRSTART token="4F" name="width" validate="length"/>
+      <ATTRSTART token="50" name="xml:lang"/>
+      <ATTRSTART token="00" name="xml:space" value="preserve" fixed="pre"/>
+      <ATTRSTART token="05" codepage="01" name="href" value="wtai://"/>
+      <ATTRSTART token="06" codepage="01" name="href" value="wtai://wp/mc;"/>
+      <ATTRSTART token="07" codepage="01" name="href" value="wtai://wp/sd;"/>
+      <ATTRSTART token="08" codepage="01" name="href" value="wtai://wp/ap;"/>
+      <ATTRSTART token="09" codepage="01" name="href" value="wtai://ms/ec"/>
+      <ATTRSTART token="10" codepage="01" name="type" value="wtaev-"/>
+      <ATTRSTART token="11" codepage="01" name="type" value="wtaev-cc/"/>
+      <ATTRSTART token="12" codepage="01" name="type" value="wtaev-cc/ic"/>
+      <ATTRSTART token="13" codepage="01" name="type" value="wtaev-cc/cl"/>
+      <ATTRSTART token="14" codepage="01" name="type" value="wtaev-cc/co"/>
+      <ATTRSTART token="15" codepage="01" name="type" value="wtaev-cc/oc"/>
+      <ATTRSTART token="16" codepage="01" name="type" value="wtaev-cc/cc"/>
+      <ATTRSTART token="17" codepage="01" name="type" value="wtaev-cc/dtmf"/>
+      <ATTRSTART token="20" codepage="01" name="type" value="wtaev-nt/"/>
+      <ATTRSTART token="21" codepage="01" name="type" value="wtaev-nt/it"/>
+      <ATTRSTART token="22" codepage="01" name="type" value="wtaev-nt/st"/>
+      <ATTRSTART token="30" codepage="01" name="type" value="wtaev-pb/"/>
+      <ATTRSTART token="38" codepage="01" name="type" value="wtaev-lg/"/>
+      <ATTRSTART token="50" codepage="01" name="type" value="wtaev-ms/"/>
+      <ATTRSTART token="51" codepage="01" name="type" value="wtaev-ms/ns"/>
+      <ATTRSTART token="58" codepage="01" name="type" value="wtaev-gsm/"/>
+      <ATTRSTART token="59" codepage="01" name="type" value="wtaev-gsm/ru"/>
+      <ATTRSTART token="5A" codepage="01" name="type" value="wtaev-gsm/ch"/>
+      <ATTRSTART token="5B" codepage="01" name="type" value="wtaev-gsm/ca"/>
+      <ATTRSTART token="60" codepage="01" name="type" value="wtaev-pdc/"/>
+      <ATTRSTART token="68" codepage="01" name="type" value="wtaev-ansi136/"/>
+      <ATTRSTART token="69" codepage="01" name="type" value="wtaev-ansi136/ia"/>
+      <ATTRSTART token="6A" codepage="01" name="type" value="wtaev-ansi136/if"/>
+      <ATTRSTART token="70" codepage="01" name="type" value="wtaev-cdma/"/>
+    </AttrStartTokens>
+    <AttrValueTokens>
+      <ATTRVALUE token="85" value=".com/"/>
+      <ATTRVALUE token="86" value=".edu/"/>
+      <ATTRVALUE token="87" value=".net/"/>
+      <ATTRVALUE token="88" value=".org/"/>
+      <ATTRVALUE token="89" value="accept"/>
+      <ATTRVALUE token="8A" value="bottom"/>
+      <ATTRVALUE token="8B" value="clear"/>
+      <ATTRVALUE token="8C" value="delete"/>
+      <ATTRVALUE token="8D" value="help"/>
+      <ATTRVALUE token="8E" value="http://"/>
+      <ATTRVALUE token="8F" value="http://www."/>
+      <ATTRVALUE token="90" value="https://"/>
+      <ATTRVALUE token="91" value="https://www."/>
+      <ATTRVALUE token="93" value="middle"/>
+      <ATTRVALUE token="94" value="nowrap"/>
+      <ATTRVALUE token="96" value="onenterbackward"/>
+      <ATTRVALUE token="97" value="onenterforward"/>
+      <ATTRVALUE token="95" value="onpick"/>
+      <ATTRVALUE token="98" value="ontimer"/>
+      <ATTRVALUE token="99" value="options"/>
+      <ATTRVALUE token="9A" value="password"/>
+      <ATTRVALUE token="9B" value="reset"/>
+      <ATTRVALUE token="9D" value="text"/>
+      <ATTRVALUE token="9E" value="top"/>
+      <ATTRVALUE token="9F" value="unknown"/>
+      <ATTRVALUE token="A0" value="wrap"/>
+      <ATTRVALUE token="A1" value="www."/>
+    </AttrValueTokens>
+    <CharacterEntities>
+      <CharacterEntity code="160" name="nbsp"/>
+      <CharacterEntity code="173" name="shy"/>
+    </CharacterEntities>
+  </App>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//W3C//DTD XHTML 1.0 Strict//EN"
+       systemid="DTD/xhtml1-strict.dtd"/>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//W3C//DTD XHTML 1.0 Transitional//EN"
+       systemid="DTD/xhtml1-transitional.dtd"/>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//W3C//DTD XHTML 1.0 Frameset//EN"
+       systemid="DTD/xhtml1-frameset.dtd"/>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//W3C//DTD XHTML 1.1//EN"
+       systemid="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"/>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//W3C//DTD XHTML Basic 1.0//EN"
+       systemid="http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd"/>
+  <App textual-ext="html" tokenised-ext="htmlc" publicid="-//WAPFORUM//DTD XHTML Mobile 1.0//EN"
+       systemid="http://www.wapforum.org/DTD/xhtml-mobile10.dtd"/>
+</wbxml>

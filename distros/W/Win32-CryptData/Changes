@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::CryptData.
+
+0.01  Wed Aug 21 11:50:15 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Win32::CryptData
+
+0.02  Mon Aug 09 15:02:25 2004
+	- fixes for the first release, rewrite for the POD documentation
+

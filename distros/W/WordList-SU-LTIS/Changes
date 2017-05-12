@@ -1,0 +1,24 @@
+Revision history for WordList-SU-LTIS
+
+0.04    2016-01-13 (PERLANCAR)
+
+	- [Bugfix] Need 'use utf8'.
+
+
+0.03    2016-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.02    2016-01-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to add statistics.
+
+
+0.01    2016-01-12 (PERLANCAR)
+
+        - First release.

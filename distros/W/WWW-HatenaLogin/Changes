@@ -1,0 +1,13 @@
+Revision history for Perl extension WWW::HatenaLogin
+
+0.03    2008-01-30T19:30:14+09:00
+        - add Crypt::SSLeay deps
+        - fixed a documentation error by kentaro
+
+0.02    2008-01-29T23:42:48+09:00
+        - add login_uri and logout_uri method
+        - add username accessor
+        - WWW::HatenaDiary friendry
+
+0.01    2008-01-29T22:28:09+09:00
+        - original version

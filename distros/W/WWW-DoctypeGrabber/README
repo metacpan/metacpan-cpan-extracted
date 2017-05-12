@@ -1,0 +1,232 @@
+NAME
+    WWW::DoctypeGrabber - grab doctypes from webpages
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use WWW::DoctypeGrabber;
+
+        my $grabber = WWW::DoctypeGrabber->new;
+
+        my $res_ref = $grabber->grab('http://zoffix.com/')
+            or die "Error: " . $grabber->error;
+
+        print "Results: $grabber\n";
+
+DESCRIPTION
+    The module was developed to be used in an IRC bot and probably will be
+    useless for anything else. If your intent is to parse some doctypes of
+    HTML documents for validness etc. you are probably better off using some
+    other module.
+
+    The module accesses a given URI and checks if the page has doctype, what
+    kind of doctype, whether or not there are any (non-)whitespace
+    characters in front of the doctype, whether or not there is an XML
+    prolog and whether or not the DTD URI matches the ones provided by W3C.
+
+CONSTRUCTOR
+  "new"
+        my $grabber = WWW::DoctypeGrabber->new;
+
+        my $grabber = WWW::DoctypeGrabber->new(
+            raw      => 1,
+            timeout  => 30,
+            max_size => 100,
+        );
+
+        my $grabber = WWW::DoctypeGrabber->new(
+            ua  => LWP::UserAgent->new(
+                agent       => 'SuperUA',
+                timeout     => 30,
+                max_size    => 500,
+            ),
+        );
+
+    Constructs and returns a new WWW::DoctypeGrabber object. Takes several
+    arguments as key/value pairs but all of them are optional. The possible
+    arguments are as follows:
+
+   "raw"
+        ->new( raw => 1 );
+
+    Optional. When set to a true value will make the "grab()" method (see
+    below) return the full doctype string as it appears in the document (
+    with the exception that all whitespace will appear as single spaces ).
+    When set to a false value will cause the "grab()" method return a
+    hashref and interpret the kind of doctype on the page. Defaults to:
+    "undef"
+
+   "timeout"
+        ->new( timeout => 30 );
+
+    Optional. Specifies LWP::UserAgent timeout for the requests. Defaults
+    to: 30
+
+   "max_size"
+        ->new( max_size => 30 );
+
+    Optional. Since DOCTYPE is supposed to be at the beginning of the page
+    we are not really interested in anything past the first bytes of the
+    document. The "max_size" argument specifies the "maximum" number of
+    bytes to download; however the final size may be larger as document is
+    retrieved in chunks. Defaults to: 500
+
+   "ua"
+        ->new( ua => LWP::UserAgent->new( agent => 'Foos' ) );
+
+    Optional. If "timeout" and "max_size" arguments are not enough for your
+    needs feel free to specify the "ua" argument which takes an
+    LWP::UserAgent object as a value. Defaults to: default LWP::UserAgent
+    object with "timeout" and "max_size" set WWW::DoctypeGrabber
+    constructor's "timeout" and "max_size" arguments as well as "agent"
+    argument set to mimic FireFox.
+
+METHODS
+  "grab"
+        my $data_ref = $grabber->grab('http://zoffix.com/')
+            or die $grabber->error;
+
+    Instructs the object to grab the doctype from the webpage uri of which
+    is specified as the first and only argument. On failure returns either
+    "undef" or an empty list depending on the context and the reason for
+    failure will be available via "error" method. On success returns the raw
+    doctype if "raw" argument to constructor is set to a true value,
+    otherwise returns a hashref with the following keys/values:
+
+        $VAR1 = {
+            'doctype' => 'HTML 4.01 Strict + url',
+            'xml_prolog' => 0,
+            'non_white_space' => 0,
+            'has_doctype' => 1,
+            'mime' => 'text/html; charset=UTF-8'
+        };
+
+   "doctype"
+        { 'doctype' => 'HTML 4.01 Strict + url', }
+
+    The "doctype" key will contain the name of the doctype (e.g. HTML 4.01
+    Strict) and possibly words "+ url" indicating that a known DTD URI is
+    also specified. If DTD URI is not recognized the "doctype" value will
+    say so, if doctype is not recognized the "doctype" value will have the
+    doctype as is. If the page does not have a doctype then "doctype" will
+    contain an empty string.
+
+   "xml_prolog"
+        { 'xml_prolog' => 0, }
+
+    The "xml_prolog" key will have the number of XML prologs present before
+    the doctype.
+
+   "non_white_space"
+        { 'non_white_space' => 0, }
+
+    The "non_white_space" key will contain the number of non-whitespace
+    characters (excluding XML prologs) present before the doctype.
+
+   "has_doctype"
+        { 'has_doctype' => 1 }
+
+    The "has_doctype" key will have either true or false value indicating
+    whether or not the doctype was found on the page.
+
+   "mime"
+        { 'mime' => 'text/html; charset=UTF-8' }
+
+    The "mime" key will contain the value of the "Content-type" header.
+
+  "error"
+        $grabber->grab('http://zoffix.com')
+            or die $grabber->error;
+
+    Takes no arguments, returns an error message explaining why "grab()"
+    method failed.
+
+  "result"
+        print "Last doctype: " . $grabber->result->{doctype};
+
+    Must be called after a successful call to "grab()" method. Takes no
+    arguments, returns the exact same hashref (or raw doctype) last call to
+    "grab()" returned.
+
+  "doctype"
+        $grabber->grab('http://zoffix.com');
+
+        print "Doctype is: " . $grabber->doctype . "\n";
+
+        # or
+
+        print "Doctype is: $grabber\n";
+
+    Must be called after a successful call to "grab()" method. Takes no
+    arguments, returns an "info string" which indicates what doctype is
+    present on the page (see "doctype" key in "grab()"'s return value) as
+    well as mention about the XML prolog and any non-whitespace characters
+    present. If no doctype was found on the page the string will only
+    contain words "NO DOCTYPE".
+
+    If "raw" argument (see CONSTRUCTOR) is set to a true value the
+    "doctype()" method will return the same raw doctype as "result()" and
+    "grab()" method would.
+
+    Note: this method is overloaded for "q|""|" thus you can simply
+    interpolate your object in a string to call this method.
+
+  "raw"
+        my $do_get_raw = $grabber->raw;
+
+        $grabber->raw( 1 );
+
+    This method is an accessor/mutator of constructor's "raw" argument. See
+    "CONSTRUCTOR" section for details. When given the optional argument will
+    assign a new value to "raw" argument.
+
+  "ua"
+        my $old_ua = $grabber->ua;
+
+        $grabber->ua( LWP::UserAgent->new( agent => 'foos' ) );
+
+    Returns a current LWP::UserAgent object used for retrieving doctypes.
+    When called with its optional argument which must be an LWP::UserAgent
+    object will use it in any subsequent calls to "grab()"
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-doctypegrabber at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-DoctypeGrabber>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::DoctypeGrabber
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-DoctypeGrabber>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-DoctypeGrabber>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-DoctypeGrabber>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-DoctypeGrabber>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

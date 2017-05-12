@@ -1,0 +1,32 @@
+= Change Log for WWW::Baidu
+
+== Version 0.06 (2007-01-21, rev 10)
+* fixed the retval of the search method when baidu finds no results
+* fixed the search method which should have cleared the internal search result buffer when called.
+* added tests for these fixed bugs.
+* updated the POD to clarify the behavior of a second call of the search method.
+
+== Version 0.05 (2007-01-20, rev 8)
+* removed Chinese chars from the POD (i was suffering from search.cpan.org's encoding)
+* made the sample code in SYNOPSIS more "usable"
+* clarified in SYNOPSIS that the GBK/GB2312 encoding is used both in inputs and outputs
+* updated the code coverage report
+* added timeout checks to t/02-live.t
+* used named argument syntax for WWW::Baidu::new, namely,
+    $obj = WWW::Baidu->new(cache => $cache);
+  the old syntax is still supported but is now deprecated:
+    $obj = WWW::Baidu->new($cache);
+* skipped a weird baidu bug reported by the cpan testers
+
+== Version 0.04 (2007-01-19, rev 7)
+* minor tweaks for small issues...
+
+== Version 0.03 (2007-01-19, rev 5)
+* fixed the Storale binary incompatibility bug
+
+== Version 0.02 (2007-01-19, rev 3)
+* added notes for the svn repos
+* added live tests to t/02-live.t
+
+== Version 0.01 (2007-01-19, rev 1)
+* initial CPAN release

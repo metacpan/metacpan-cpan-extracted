@@ -1,0 +1,23 @@
+---
+abstract: "WebService::Desk - an interface to desk.com's RESTful Web API using Web::API"
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Desk
+requires:
+  Mouse: '0'
+  Web::API: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nupfel/WebService-Desk/issues
+  homepage: https://github.com/nupfel/WebService-Desk/wiki
+  repository: git://github.com/nupfel/WebService-Desk.git
+version: '0.6'

@@ -1,0 +1,42 @@
+=== get root url as html
+Request:
+GET /
+Accept: text/html
+Response:
+302 Found
+Content-type: text/html
+Location: browser/browser.html#/
+=== get root url as plain json
+Request:
+GET /
+Accept: application/vnd.wapid+json
+Response:
+200 OK
+Content-type: application/vnd.wapid+json
+{
+   "routes" : {
+      "/artist" : "TestSchema Artist",
+      "/artist/:1" : "TestSchema Artist",
+      "/artist/:1/invoke/:method" : "TestSchema Artist",
+      "/artist/invoke/:method" : "TestSchema Artist",
+      "/cd" : "TestSchema CD",
+      "/cd/:1" : "TestSchema CD",
+      "/cd_to_producer" : "TestSchema CD_to_Producer",
+      "/cd_to_producer/:1/:2" : "TestSchema CD_to_Producer",
+      "/city" : "TestSchema City",
+      "/city/:1" : "TestSchema City",
+      "/classic_albums" : "TestSchema ClassicAlbums",
+      "/classic_albums/:1" : "TestSchema ClassicAlbums",
+      "/country" : "TestSchema Country",
+      "/country/:1" : "TestSchema Country",
+      "/genre" : "TestSchema Genre",
+      "/genre/:1" : "TestSchema Genre",
+      "/gig" : "TestSchema Gig",
+      "/gig/:1/:2" : "TestSchema Gig",
+      "/producer" : "TestSchema Producer",
+      "/producer/:1" : "TestSchema Producer",
+      "/track" : "TestSchema Track",
+      "/track/:1" : "TestSchema Track"
+   }
+}
+

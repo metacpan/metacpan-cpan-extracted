@@ -1,0 +1,7 @@
+Changes
+Crawler.pm
+Makefile.PL
+MANIFEST
+README
+t/query.t
+t/mybookmark.db

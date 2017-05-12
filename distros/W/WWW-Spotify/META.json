@@ -1,0 +1,89 @@
+{
+   "abstract" : "Spotify Web API Wrapper",
+   "author" : [
+      "Aaron Johnson <aaronjjohnson@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Spotify",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "HTTP::Headers" : "0",
+            "IO::CaptureOutput" : "0",
+            "JSON::MaybeXS" : "0",
+            "JSON::Path" : "0",
+            "LWP::Protocol::https" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "2.002004",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "WWW::Mechanize" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trs-80/WWW-Spotify/issues"
+      },
+      "homepage" : "https://github.com/trs-80/WWW-Spotify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trs-80/WWW-Spotify.git",
+         "web" : "https://github.com/trs-80/WWW-Spotify"
+      }
+   },
+   "version" : "0.009",
+   "x_contributors" : [
+      "aj <aj@spotify.com>",
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,13 @@
+<contextfile concordance=brown>
+<context filename=br-e24 paras=yes>
+<p pnum=1>
+<s snum=1>
+<wf cmd=ignore pos=DT>The</wf>
+<wf cmd=done pos=JJ lemma=russian wnsn=1 lexsn=3:01:00::>Russian</wf>
+<wf cmd=done pos=NN lemma=gymnast wnsn=1 lexsn=1:18:00::>gymnasts</wf>
+<wf cmd=done pos=IN ot=idiom>beat_the_tar_out_of</wf>
+<wf cmd=ignore pos=DT>the</wf>
+</s>
+</p>
+</context>
+</contextfile>

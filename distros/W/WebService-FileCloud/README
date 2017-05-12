@@ -1,0 +1,14 @@
+WebService-FileCloud
+====================
+
+This Perl module is used to interact with the filecloud.io webservice API.  In order
+to install the module, you would typically do:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+Once installed, documentation is also provided:
+
+  man WebService::FileCloud

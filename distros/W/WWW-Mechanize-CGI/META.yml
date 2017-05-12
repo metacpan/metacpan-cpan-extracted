@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Mechanize-CGI
+version:      0.3
+version_from: lib/WWW/Mechanize/CGI.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    File::Spec:                    0
+    HTTP::Request::AsCGI:          0.2
+    IO::Pipe:                      0
+    Test::More:                    0
+    WWW::Mechanize:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

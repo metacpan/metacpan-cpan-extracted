@@ -1,0 +1,179 @@
+NAME
+    Win32::WindowsUpdate - Access to Windows Update functions
+
+DESCRIPTION
+    Currently only provides the ability to see installed and available not
+    installed Windows Updates.
+
+    The intention is to provide the ability to manage all features related
+    to Windows Updates, including downloading, installing, uninstalling
+    (maybe), and configuring Windows Updates.
+
+    If you test this, please let me know your results. It's not ready for
+    production use, but any testing is greatly appreciated.
+
+EXAMPLE
+      use Win32::WindowsUpdate;
+      my $wu = Win32::WindowsUpdate->new;
+
+      die "Reboot first...\n" if $wu->rebootRequired;
+
+      my @updates;
+      foreach my $update ($wu->updates)
+      {
+        next unless ($update->{Title} =~ m/Security Update.*Windows XP/i); # filter for something
+        push(@updates, $update); # push it into the updates list
+      }
+
+      sleep 1 while ($wu->installerBusy); # if Windows Installer is busy
+      die "Reboot first...\n" if $wu->rebootRequired; # if whatever WI finished doing requires reboot
+      $wu->install(@updates); # install your selected updates
+      print "Installed updates want you to reboot...\n" if $wu->rebootRequired;
+
+METHODS
+  new
+      my $wu = Win32::WindowsUpdate->new;
+      my $wu = Win32::WindowsUpdate->new({online => 0});
+
+    Creates the WindowsUpdate object.
+
+    online
+        Defaults to 1. Check online for updates.
+
+  updates
+      my $updates = $wu->updates;
+      # .. or ..
+      my @updates = $wu->updates;
+
+      my $updatesHidden = $wu->updates({IsHidden => 1});
+
+    Returns a list of updates available for download and install.
+
+    IsInstalled
+        Returns installed (if true) or not installed (if false) updates.
+        Defaults to 0.
+
+    IsHidden
+        Returns hidden (if true) or not hidden (if false) updates. Defaults
+        to 0.
+
+  installed
+      my $installed = $wu->installed;
+      # .. or ..
+      my @installed = $wu->installed;
+
+    Returns a list of installed updates.
+
+  install
+      my @updates;
+      foreach my $update ($wu->updates)
+      {
+        printf("Available Update: %s %s\n", $update->{UpdateId}, $update->{Title});
+        next unless ($update->{Title} =~ m/Security Update.*Windows XP/i);
+        printf("Want to install: %s\n", $update->{Title});
+
+        push(@updates, $update->{UpdateId});
+        # .. or .. (both ways will work)
+        push(@updates, $update);
+      }
+
+      $wu->install(@updates);
+
+    Install specified updates. Provide an array of either "update" (directly
+    from "$wu->updates") or "updateId". See example above for usage.
+
+    Currently implemented via VBScript (via Inline::WSC). Perl code exists
+    in the module to do it without VBScript, but it doesn't work. If you
+    would like to help, please check out the source of this module to see
+    what's going on there.
+
+  rebootRequired
+      my $needToReboot = $wu->rebootRequired();
+
+    Returns bool. True if reboot is required, false otherwise.
+
+    You should check this before and after you run "install". If it's true
+    before you install, you'll want to reboot before you install. If it's
+    true after you install, you'll want to reboot sometime.
+
+  installerBusy
+      my $installerIsBusy = $wu->installerBusy();
+
+    Returns bool. True if Windows Installer is busy, false otherwise.
+
+    If the installer is busy, you probably won't have any success at running
+    "install". You could just sit in a loop waiting for it to no longer be
+    busy, but you'd want to check "rebootRequired" immediately before you
+    run "install" to be sure you won't want to reboot first.
+
+TODO
+    Provide ability to install specific updates.
+    Determine other necessary features. (email me with your requests)
+
+BUGS
+    REPORT BUGS! Report any bugs to the CPAN bug tracker.
+
+COPYRIGHT/LICENSE
+    Copyright 2009 Megagram. You can use any one of these licenses: Perl
+    Artistic, GPL (version >= 2), BSD.
+
+  Perl Artistic License
+    Read it at <http://dev.perl.org/licenses/artistic.html>. This is the
+    license we prefer.
+
+  GNU General Public License (GPL) Version 2
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License
+      as published by the Free Software Foundation; either version 2
+      of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see http://www.gnu.org/licenses/
+
+    See the full license at <http://www.gnu.org/licenses/>.
+
+  GNU General Public License (GPL) Version 3
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see http://www.gnu.org/licenses/
+
+    See the full license at <http://www.gnu.org/licenses/>.
+
+  BSD License
+      Copyright (c) 2009 Megagram.
+      All rights reserved.
+
+      Redistribution and use in source and binary forms, with or without modification, are permitted
+      provided that the following conditions are met:
+
+          * Redistributions of source code must retain the above copyright notice, this list of conditions
+          and the following disclaimer.
+          * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+          and the following disclaimer in the documentation and/or other materials provided with the
+          distribution.
+          * Neither the name of Megagram nor the names of its contributors may be used to endorse
+          or promote products derived from this software without specific prior written permission.
+
+      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+      WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+      PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+      ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+      INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+      OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+      IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

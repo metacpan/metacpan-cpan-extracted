@@ -1,0 +1,8 @@
+Changes
+Hotmail.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+examples/forward_hotmail.pl
+META.yml                                 Module meta-data (added by MakeMaker)

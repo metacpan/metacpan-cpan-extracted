@@ -1,0 +1,25 @@
+Revision history for WWW-Shorten-IsGd
+
+0.005     2017-02-06
+    - Clean up URL parsing a bit
+    - Add LICENSE file to repository
+    - Add CONTRIBUTING.md to repository
+    - LWP::Protocol::https requirement
+    - Remove requirement for IO::Socket::SSL
+
+0.004     2016-07-06
+    - Updated the build to use [@Starter]
+    - Placed dependencies in cpanfile
+    - Require IO::Socket::SSL now that it's HTTPS only
+    - Require HTML::Entities
+    - No longer require URI
+    - moved live tests to author tests
+
+0.003     2011-04-22
+    * Packaging updates
+
+0.002     2011-01-21
+    * Make the tests slightly more robust
+
+0.001     2011-01-18
+    * First released version

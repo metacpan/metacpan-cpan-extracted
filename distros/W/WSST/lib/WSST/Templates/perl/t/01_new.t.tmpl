@@ -1,0 +1,13 @@
+#
+# Test case for [% package_name %]
+#
+
+use strict;
+use Test::More tests => 2;
+
+BEGIN { use_ok('[% package_name %]'); }
+
+my $obj = new [% package_name %]();
+ok( ref $obj, 'new [% package_name %]()');
+
+1;

@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Bizowie::API
+
+0.02  Thu Jul 6 2013
+    - fix issues with POD/distribution
+
+0.01  Wed Feb 20 2012
+    - original version
+

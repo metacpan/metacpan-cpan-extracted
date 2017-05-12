@@ -1,0 +1,14 @@
+Revision history for Perl extension Web-Library-jQuery
+
+0.03  2013-08-11 19:56:42 CEST
+    [Improvements]
+        - added versions 1.10.1, 1.10.2, 2.0.2, 2.0.3
+        - converted to Dist::Milla
+
+0.02 Fri May 17 13:07:25 2013 CEST
+    [Improvements]
+        - t/basic.t uses Web::Library::Test
+
+0.01 Thu May  2 11:42:35 2013 CEST
+    [New Features]
+        - original version

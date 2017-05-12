@@ -1,0 +1,121 @@
+/L7"WebTools" HTML_LANG Line Comment = # Escape Char = \ File Extensions = WHTML CGIHTML CGI
+/Delimiters = ~!@$%^&*()+=|\{}[]:;"'<> ,.?
+/Indent Strings = "{" "<?perl"
+/Unindent Strings = "}" "?>"
+/Function String = "%[ ^t]++^(sub[ ^t][a-z_]+^)[ ^t]{"
+/C1"Keywords and types"
+-A -B -C -M -O -R -S -T -W -X -b -c -d -e -f -g -k -l -o -p -r -s -t -u -w -x -z
+__DATA__ __END__ __FILE__ __LINE__
+continue
+do
+else elsif exists_var
+for foreach
+goto
+if
+last local
+my
+next no
+package
+redo return require
+sub
+until unless use
+while
+/C2
+accept action_sid_adder alarm atan2 action_adder attach_var
+bind binmode bless b_print
+caller chdir chmod chomp convert_ses_time chop chown chr chroot ClearBuffer ClearHeader close closedir connect cos crypt
+DB_OnDestroy DB_OnExit dbmclose dbmopen decode_separator defined delete delete_cookie DestroyScript die disattach_var dump
+each encode_separator endgrent endhostent endnetent endprotoent endpwent endservent eof eval exec exit exp exists
+fcntl fileno flock flush_print fork formline format
+getc GetCookies GetCompressedCookies GetCurrentSID getgrent getgrgid getgrname gethostbyaddr gethostbyname gethostent getlogin getnetbyaddr getnetbyname getnetent getpeername getpgrp getppid getpriority getprotobyname getprotobynumber getprotoent getpwent getpwnam getpwuid getservbyname getservbyport getservent getsockname getsockopt glob gmtime grep
+Header hex hideerror href_adder href_sid_adder
+index int ioctl
+join
+keys kill
+lc lcfirst length link listen LoadCfgFile localtime log lstat
+map mkdir msgctl msgget msgrcv msgsnd
+new_session 
+oct open opendir ord
+pack Parse_Form pipe pop pos print printf push
+quotemeta
+r_str rand_srand rand read read_array read_cookie readdir readline readlink read_form read_form_array read_var read_hash read_scalar recv ref register_var rename reset reverse rewinddir rindex rmdir RunScript
+scalar seek seekdir select semctl semgett semop send session_clear_expired session_cookie_path session_destroy session_expiration session_expire_update session_id session_id_adder session_id_name session_ip_restrict session_register session_set_id_name session_start SetCompressedCookies SetCookies SetCookieExpDate SetCookieDomain SetCookiePath SetSecureCookie setgrent sethostent setnetent setpgrp set_printing_mode setpriority setprotoent setpwent setservent set_script_timeout setsockopt shift shmctl shmget shmread shmwrite shutdown SignInUser SignUpUser sin sleep socket socketpair sort splice split sprintf sql_affected_rows sql_fetchrow sql_inserted_id sql_query sql_connect sql_disconnect sql_num_rows sql_quote sql_errmsg sql_errno sql_data_seek sql_select_db sqrt srand stat StartUpInit study substr symlink syscall sysopen sysread system syswrite
+tell telldir test_connect tie tied time times truncate
+uc ucfirst umask undef unlink unpack unregister_var update_var unshift utime
+values vec
+wait waitpid wantarray warn write write_cookie
+xreader xreader_dbh
+/C3
+AUTOLOAD
+BEGIN
+CORE
+DESTROY
+eq
+END
+ge gt
+le lt
+ne not
+m
+or
+q qq qw qx
+SUPER
+s
+tr
+UNIVERSAL
+x xor
+y
+/C4"HTML Tags"
+<A </A> <ABBR> <ABBR </ABBR> <ABOVE> <ACRONYM> <ACRONYM </ACRONYM> <ADDRESS>
+<ADDRESS </ADDRESS> <APPLET </APPLET> <ARRAY> <AREA </AREA
+<B> <B </B> <BASE <BASEFONT <BDO> <BDO </BDO> <BGSOUND <BIG> <BIG </BIG>
+<BLINK> </BLINK> <BLOCKQUOTE> <BLOCKQUOTE </BLOCKQUOTE> <BODY <BODY> </BODY>
+<BOX> <BR <BR> <BIG <BLINK <BUTTON> </BUTTON>
+<CAPTION> <CAPTION </CAPTION> <CENTER> <CENTER </CENTER> <CITE> <CITE
+</CITE> <CODE> <CODE </CODE> <COL> <COLGROUP> </COLGROUP> <COMMENT>
+</COMMENT>
+<DD> <DD </DD> <DEL> <DEL </DEL> <DFN> <DFN </DFN> <DIR> <DIR </DIR> <DIV>
+<DIV </DIV> <DL> <DL </DL> <DT> <DT  </DT>
+<EM> <EM </EM> <EMBED
+<FIELDSET> <FIELDSET </FIELDSET> <FIG> <FONT </FONT> <FORM> <FORM </FORM>
+<FRAME <FRAMESET </FRAMESET>
+<H1> <H1 </H1> <H2> <H2 </H2> <H3> <H3 </H3> <H4> <H4 </H4> <H5> <H5 </H5>
+<H6> <H6 </H6> <HEAD> <HEAD </HEAD> <HR> <HR <HTML> <HTML </HTML>
+<I> <I </I> <IFRAME> </IFRAME> <ILAYER> </ILAYER> <IMG <INPUT> <INPUT <INS>
+<INS </INS> <ISINDEX> <ISINDEX
+<KBD> <KBD </KBD>
+<LABEL> <LABEL </LABEL> <LAYER> <LAYER </LAYER> <LEGEND> <LEGEND </LEGEND>
+<LI> <LI </LI> <LINK <LISTING> </LISTING>
+<MAP </MAP> <MARQUEE </MARQUEE> <MENU> <MENU </MENU> <META <MULTICOL>
+</MULTICOL>
+<NEXTID <NOBR> </NOBR> <NOFRAMES> </NOFRAMES> <NOLAYER> </NOLAYER> <NOTE>
+</NOTE> <NOSCRIPT> </NOSCRIPT>
+<OBJECT> <OBJECT <OL> <OL </OL> <OPTION> <OPTION </OPTION> <OPTGROUP>
+<OPTGROUP </OPTGROUP>
+<P <P> </P> <PARAM <PRE> <PRE </PRE>
+<Q> <Q </Q> <QUOTE>
+<RANGE> <ROOT>
+<S> <S </S> <SAMP> <SAMP </SAMP> <SCRIPT <SCRIPT> </SCRIPT> <SELECT
+</SELECT> <SMALL> <SMALL </SMALL> <SOUND <SPACER> <SPAN> <SPAN </SPAN>
+<SQRT> <STRIKE> <STRIKE </STRIKE> <STRONG> <STRONG </STRONG> <STYLE> <STYLE
+</STYLE> <SUB> <SUB </SUB> <SUP> <SUP </SUP>
+<TABLE> <TABLE </TABLE> <TBODY> <TBODY </TBODY> <TD <TD> </TD> <TEXT>
+<TEXTAREA <TEXTAREA> </TEXTAREA> <TFOOT> <TFOOT </TFOOT> <TH <TH> </TH>
+<THEAD> <THEAD </THEAD> <TITLE> </TITLE> <TR <TR> </TR> <TT> </TT> <TT
+<U> <U </U> <UL> <UL </UL>
+<VAR> </VAR> <VAR
+<WBR>
+<XMP> </XMP>
+/C5"Predefined Apache variables"
+GATEWAY_INTERFACE
+REQUEST_METHOD REQUEST_URI
+QUERY_STRING
+DOCUMENT_ROOT
+HTTP_ACCEPT HTTP_ACCEPT_CHARSET HTTP_ENCODING HTTP_ACCEPT_LANGUAGE HTTP_ACCEPT_LANGUAGE HTTP_CONNECTION HTTP_HOST HTTP_REFERER HTTP_USER_AGENT
+REMOTE_ADDR REMOTE_PORT
+SCRIPT_FILENAME SERVER_ADMIN SERVER_PORT SERVER_SIGNATURE SCRIPT_NAME SERVER_NAME SERVER_SOFTWARE SERVER_PROTOCOL
+PATH_TRANSLATED
+/C6"Predefined WebTools variables"
+$INTERNALVERSION $sess_cpg %sess_cookies %SESREG $cookie_path_cgi $cookie_domain_cgi $cookie_exp_date_cgi $secure_cookie_cgi 
+$sql_host test_connect sql_data_seek sql_errmsg sql_errno $sql_user $sql_pass $sql_database_sessions $sql_sessions_table
+$print_header_buffer $print_flush_buffer *SESSIONSTDOUT $reg_buffer $print_header_buffer $print_flush_buffer $sentcontent $apacheshtdocs 
+%SIGNALS

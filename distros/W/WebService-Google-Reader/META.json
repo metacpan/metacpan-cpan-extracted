@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl interface to the Google Reader API",
+   "author" : [
+      "gray <gray@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Google-Reader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "2"
+         },
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Encode" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "2",
+            "LWP::Protocol::https" : "6.02",
+            "LWP::UserAgent" : "6.02",
+            "URI" : "1.36",
+            "URI::Escape" : "0",
+            "URI::QueryParam" : "0",
+            "XML::Atom" : "0",
+            "XML::LibXML" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/gray/webservice-google-reader"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,47 @@
+Revision history for WebService::Eventful
+1.05 Sept 2013
+  - Changed the META.yml file to list the Oauth requirements 
+1.03 Aug 2013
+  - Added in new selftest, updated Changes 
+1.02 Aug 2013
+  - Added in support for Oauth authentication.
+
+1.0  Sep 2006
+  - Moved modules from EVDB::API to WebService::Eventful namespace.
+
+
+Revision history for EVDB::API
+
+0.99 Aug 2006
+  - Structural updates to allow EVDB::API to use the YAML or JSON "flavors"
+    provided by api.evdb.com.  Also provides support for XML::Twig parsing,
+    which may perform better on some systems. (Thanks, Daniel!)
+  - Added a default set of force_array options for common API methods.
+    This set will probably be split out into another package with 
+    more frequent updates.
+  - Last revision (hopefully) before releasing 1.0 and finding a permanent home.
+
+0.9  Jul 2005
+  - Updated call() to accept file upload fields.  Specifically, any parameter
+    that ends with "_file" will be treated as a local filename and uploaded
+    along with the method call.
+  - call() now accepts either a hash reference (as before) or an array
+    reference (a la HTTP::Request::Common) for the parameter key-value pairs.
+    This allows multiple values to be sent for the same key.
+
+0.8  Jul 2005
+  - Improved error handling.  $EVDB::API::errcode now provides
+    the machine-readable error, while $EVDB::API::errstr
+    provides a human-readable description.
+
+0.7  Jun 2005
+  - Updated to match changes to API user_key and app_key.
+
+0.6  Jun 2005
+  - Removed ._* files from tarball.
+
+0.5  Jun 2005
+  - First publicly-available version.
+  - Provides login() for digest (token) authentication. 
+  - Catches XML errors and sets $EVDB::API::errstr.
+

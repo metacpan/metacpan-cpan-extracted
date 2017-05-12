@@ -1,0 +1,21 @@
+Changes
+lib/WWW/Codeguard.pm
+lib/WWW/Codeguard/Partner.pm
+lib/WWW/Codeguard/User.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README_TESTING
+t/lib/CommonSubs.pm
+t/00-load.t
+t/01-initializeapi.t
+t/02-partner.t
+t/03-user-create_website_ftp.t
+t/04-user-create_website_sftp.t
+t/05-user-edit_website.t
+t/06-user-create_database_direct.t
+t/07-user-create_database_ssh.t
+t/08-user-edit_database.t
+t/config/TEST_INFO.json.sample
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

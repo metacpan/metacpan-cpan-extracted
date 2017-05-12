@@ -1,0 +1,118 @@
+commit 152f411c4579588838e7e0c2d116d05568babca1
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sat Jul 16 16:32:22 2011 +0930
+
+    Tag: WebDyne-Session_1.044
+    
+    Update to new version standard that keeps dist version in sync with main module version
+
+commit 5173df418c38d03cd8d89a54c2ce92983734c53d
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:22:58 2011 +0930
+
+    Tag: WebDyne-Session_1.042
+    
+    Modify Makefile PREREQ section to be more compatible with older version of CPAN
+
+commit 684f20caa3a813e089443905071e8f4fd5cdf15e
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:43:25 2010 +0930
+
+    Tag: WebDyne-Session_1.041
+    
+    clean mm_ver redundancy in Makefile.PL, edit README
+
+commit ce13187b9292b5ace717d013beea85aa0a077630
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 22:10:13 2010 +0930
+
+    Tag: WebDyne-Session_1.040
+    
+    Changed import routine to fix bug working with WebDyne::Chain handler
+
+commit 822021a8e95168a97e099965c719d38374285a3c
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:19:51 2010 +0930
+
+    Tag: WebDyne-Session_1.039
+    
+    Updated to YAML spec 1.4
+
+commit 2f289540a5b5a39fbd32e93d995155a4e18aa03c
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:43:37 2010 +0930
+
+    Tag: WebDyne-Session_1.038
+
+commit e1371ef21856a9df3070dd051335b8ce7946c957
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:40:56 2010 +0930
+
+    Tag: WebDyne-Session_1.037
+
+commit b1b280fd4bf55097a45bd63e0796a90678c9a0c1
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:04:31 2010 +0930
+
+    Tag: WebDyne-Session_1.036
+
+commit 506ea84e7e003d6fb87cbe59ac1ce3922cd108e0
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:01:26 2010 +0930
+
+    Tag: WebDyne-Session_1.035
+
+commit aa58e65244b09038d88018311d31b64bb91a3d15
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:00:21 2010 +0930
+
+    Tag: WebDyne-Session_1.034
+    
+    Updated META.yml
+
+commit b8d13449f6eee7bc38328824a802f771a9a46110
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 11 16:48:52 2010 +0930
+
+    Tag: WebDyne-Session_1.033
+    
+    Update copyright and author information, Makefile.PL to generate better META.yml
+
+commit 777aab19c290a90f5b0e57797b6a53f1ff4ae029
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Apr 10 18:39:34 2010 +0930
+
+    Tag: WebDyne-Session_1.032
+    
+    Made email addesses uniform across module doc, update copyright info
+
+commit 09a74c4883e5005130a28624accb13225ec14b83
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Apr 10 16:25:27 2010 +0930
+
+    Tag: WebDyne-Session_1.031
+    
+    Updated copyright notices in prep for CPAN upload.
+
+commit 881994eed739bc3112e88f1c77ad6124e24dde58
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Apr 10 13:45:36 2010 +0930
+
+    Tag: WebDyne-Session_1.030
+    
+    Cleaned up ready for CPAN release.
+
+commit 366963acfd01eba9ce83e9152f832d5c089c491a
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Thu Feb 25 01:04:34 2010 +1030
+
+    Tag: WebDyne-Session_1.29
+    
+    Bring Makefile.PL and file locations into line with other WebDyne modules
+
+commit 457d6bb128e4648167ea146a372019c39b47f274
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Mon Aug 24 11:57:58 2009 +0930
+
+    MANIFEST import
+

@@ -1,0 +1,58 @@
+<%-
+    
+    main_doc_label = "Example Data Service";
+    main_doc_prefix = "";
+    
+    section_label = {
+        descrip = "DESCRIPTION"
+        usage = "USAGE"
+        params = "PARAMETERS"
+ 	methods = "METHODS"
+    	response = "RESPONSE"
+    	formats = "FORMATS"
+    	vocabs = "VOCABULARIES"
+    };
+    
+    special_param = {
+        show = ds.special_param('show')
+	format = ds.special_param('format')
+        vocab = ds.special_param('vocab')
+    };
+    
+    message = {
+        
+	MSG_DOCSTRING_MISSING = "I<The documentation string for this node is missing.>  "
+	
+	MSG_USAGE_HEADER_LONG = "Here are some usage examples:"
+	MSG_USAGE_HEADER_SHORT = "For example:"
+	MSG_USAGE_NONE_DEFINED = "I<No usage examples are given.>"
+	
+	MSG_PARAM_HEADER_LONG = "You can use any of the following parameters with this operation:"
+	MSG_PARAM_NONE_DEFINED = "I<No parameters are defined.>"
+	
+    	MSG_FORMAT_HEADER_SOME = "The following response formats are available for this operation.  "
+    	MSG_FORMAT_HEADER_ALL = "The following response formats are available for this data service.  Not all of these may be available for every operation.  "
+	MSG_FORMAT_HEADER_SUFFIX = "You must select the desired format for a request by adding the appropriate suffix to the URI path.  "
+	MSG_FORMAT_HEADER_PARAM = "You can select the desired format by using the parameter C<$special_param.format> with the appropriate format name.  "
+	MSG_FORMAT_HEADER_DEFAULT = "The default format for this operation is C<%s>."
+        MSG_FORMAT_NONE_DEFINED = "I<No output formats are defined for this data service.>  "
+	MSG_FORMAT_NONE_ALLOWED = "I<No output formats are configured for this operation.>  "
+	
+	MSG_VOCAB_HEADER_SOME = "The following response vocabularies are available for this operation.  "
+    	MSG_VOCAB_HEADER_ALL = "The following response vocabularies are available for this data service.  "
+	MSG_VOCAB_HEADER_PARAM = "If you wish your responses to be expressed in a vocabulary other than the default for your selected format, you can use the C<$special_param.vocab> parameter with the appropriate vocabulary name.  "
+	MSG_VOCAB_NONE_ALLOWED = "I<No output vocabularies are configured for this operation.>  "
+	
+	MSG_METHOD_NONE_DEFINED = "I<none are defined>"
+	MSG_METHOD_HEADER_OP = "You can use the following HTTP methods with this operation:"
+	MSG_METHOD_HEADER_NODE = "This data service accepts the following HTTP methods:"
+	
+	MSG_RESPONSE_HEADER = "The response to an HTTP request on this path will consist of fields from the following list.  "
+	MSG_RESPONSE_HEADER_FIXED = "The block C<%s> is always present.  "
+	MSG_RESPONSE_HEADER_OPT = "The others may be selected using the parameter C<$special_param.show>.  "
+	MSG_RESPONSE_HEADER_OPT_ONLY = "You can select which blocks will be present in the response using the parameter C<$special_param.show>.  "
+        MSG_RESPONSE_SUMMARY = "The summary block will consist of fields from the following list.  "
+	MSG_RESPONSE_NONE_DEFINED = "I<No response is defined for this operation.>  "
+    };
+        
+-%>

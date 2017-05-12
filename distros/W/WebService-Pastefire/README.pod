@@ -1,0 +1,56 @@
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::Pastefire - module for using Pastefire.com
+
+=head1 SYNOPSIS
+
+    use WebService::Pastefire;
+    my $pf = WebService::Pastefire->new(
+        username => 'someuser',
+        password => 'somepass',
+    );
+    $pf->paste('PASTE ME!');
+
+=head1 DESCRIPTION
+
+C<WebService::Pastefire> is for using Pastefire.com - can send text to your iOS
+devices.
+
+To specify you and your devices, you need username (= email address) & password.
+You must install Pastefire App to your devices and set the same username /
+password.
+
+See L<Pastefire app › Home|http://pastefire.com/> for detail setting.
+
+=head1 METHODS
+
+=over 4
+
+=item * new()
+
+Constructor. C<username> & C<password> are mandatory.
+
+=item * paste()
+
+Set text you want paste to a parameter. 
+
+=back
+
+=head1 AUTHOR
+
+JINNOUCHI Yasushi E<lt>delphinus@remora.cxE<gt>
+
+=head1 SEE ALSO
+
+L<Pastefire app › Home|http://pastefire.com/>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

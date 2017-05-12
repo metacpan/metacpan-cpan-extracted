@@ -1,0 +1,72 @@
+Copyright 2012, 2013, 2017 Kevin Ryde
+
+This file is part of Wx-Perl-PodBrowser.
+
+Wx-Perl-PodBrowser is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Wx-Perl-PodBrowser is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Wx-Perl-PodBrowser.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 15, April 2017
+    - preserve pod spaces
+
+Version 14, September 2013
+    - desktop file and debian menu entry
+
+Version 13, July 2013
+    - goto_pod() new heading_num=>$n
+    - fix don't show =encoding charset name in the text
+
+Version 12, March 2013
+    - no paragraph spacing between adjacent =item
+
+Version 11, March 2013
+    - fix F<> was not displaying the intended italics
+
+Version 10, March 2013
+    - tests Wx::AboutBox is not asynchronous on mswin, as reported by
+      Alexandr Ciornii RT#83696
+
+Version 9, February 2013
+    - Section menu allow for duplicated heading names
+
+Version 8, January 2013
+    - tests try MainLoop for weakening
+
+Version 7, November 2012
+    - Destroy() on EVT_CLOSE
+
+Version 6, November 2012
+    - tests diagnostics on frame weakening
+
+Version 5, October 2012
+    - PodRichText new method get_section_position(),
+      fix docs new($parent,$id) parameters
+    - new Wx::DemoModules::WxPerlPodBrowser
+    - new wx-perl-podbrowser program
+
+Version 4, October 2012
+    - PodBrowser new methods popup_print(), popup_print_preview(),
+      popup_print_setup(), quit()
+    - PodRichText new method can_reload()
+
+Version 3, September 2012
+    - PodBrowser fix goto_own_pod() which is the Help/Pod Browser menu
+
+Version 2, August 2012
+    - PodBrowser new "File/Print" menuitems
+    - PodBrowser new methods reload(), go_back(), go_forward(),
+      popup_about_dialog(), about_dialog_info()
+
+Version 1, June 2012
+    - the first version.

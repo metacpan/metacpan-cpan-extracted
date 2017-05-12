@@ -1,0 +1,7 @@
+.git
+.gitignore
+WWW-Mechanize-Plugin-AutoWrite-*
+blib
+Makefile
+Makefile.old
+pm_to_blib

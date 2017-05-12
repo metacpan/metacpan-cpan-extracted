@@ -1,0 +1,178 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#service_exists">service_exists</a></li>
+      <li><a href="#zone_exists">zone_exists</a></li>
+      <li><a href="#services">services</a></li>
+      <li><a href="#zones">zones</a></li>
+      <li><a href="#service">service</a></li>
+      <li><a href="#service1">service</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Domain</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $services = $ovh-&gt;domain-&gt;services; foreach my $service (@$services) {</p>
+
+<pre><code>    print $service-&gt;name;
+}</code></pre>
+
+<p>my $ = $ovh-&gt;domain-&gt;zones; foreach my $zone (@$zones) {</p>
+
+<pre><code>    print $zone-&gt;name;
+}</code></pre>
+
+<p>print &quot;I have a zone&quot; if $ovh-&gt;domain-&gt;zone_exists(&quot;myaddress.de&quot;); print &quot;I have a service&quot; if $ovh-&gt;domain-&gt;service_exists(&quot;myaddress.de&quot;);</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Gives access to services and zones connected to the uses account.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the domain object. This method is not ment to be called external.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order.html">Webservice::OVH::Order</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order-&gt;_new($ovh_api_wrapper, $self);</p>
+
+</li>
+</ul>
+
+<h2 id="service_exists">service_exists</h2>
+
+<p>Returns 1 if service is available for the connected account, 0 if not.</p>
+
+<ul>
+
+<li><p>Parameter: $service_name - Domain name, $no_recheck - (optional)only for internal usage</p>
+
+</li>
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;mydomain.com exists&quot; if $ovh-&gt;domain-&gt;service_exists(&quot;mydomain.com&quot;);</p>
+
+</li>
+</ul>
+
+<h2 id="zone_exists">zone_exists</h2>
+
+<p>Returns 1 if zone is available for the connected account, 0 if not.</p>
+
+<ul>
+
+<li><p>Parameter: $zone_name - Domain name, $no_recheck - (optional)only for internal usage</p>
+
+</li>
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;zone mydomain.com exists&quot; if $ovh-&gt;domain-&gt;zone_exists(&quot;mydomain.com&quot;);</p>
+
+</li>
+</ul>
+
+<h2 id="services">services</h2>
+
+<p>Produces an array of all available services that are connected to the used account.</p>
+
+<ul>
+
+<li><p>Return: ARRAY</p>
+
+</li>
+<li><p>Synopsis: my $services = $ovh-&gt;order-&gt;services();</p>
+
+</li>
+</ul>
+
+<h2 id="zones">zones</h2>
+
+<p>Produces an array of all available zones that are connected to the used account.</p>
+
+<ul>
+
+<li><p>Return: ARRAY</p>
+
+</li>
+<li><p>Synopsis: my $zones = $ovh-&gt;order-&gt;zones();</p>
+
+</li>
+</ul>
+
+<h2 id="service">service</h2>
+
+<p>Returns a single service by name</p>
+
+<ul>
+
+<li><p>Parameter: $service_name - domain name</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Service.html">Webservice::OVH::Domain::Service</a></p>
+
+</li>
+<li><p>Synopsis: my $service = $ovh-&gt;domain-&gt;service(&quot;mydomain.com&quot;);</p>
+
+</li>
+</ul>
+
+<h2 id="service1">service</h2>
+
+<p>Returns a single zone by name</p>
+
+<ul>
+
+<li><p>Parameter: $zone_name - domain name</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone.html">Webservice::OVH::Domain::Zone</a></p>
+
+</li>
+<li><p>Synopsis: my $zone = $ovh-&gt;domain-&gt;zone(&quot;mydomain.com&quot;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

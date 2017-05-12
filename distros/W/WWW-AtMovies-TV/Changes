@@ -1,0 +1,8 @@
+Revision history for WWW-AtMovies-TV
+
+0.03    2008年09月06日 15時23分46秒 CST
+        update Pod::Coverage to 0.19 to prevent test fail in Moose attributes
+            
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

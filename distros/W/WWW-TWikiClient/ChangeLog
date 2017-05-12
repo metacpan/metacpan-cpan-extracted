@@ -1,0 +1,55 @@
+2010-03-27  Steffen Schwigon  <ss5@vinyl.webit.de>
+
+	* 0.11
+
+	* distribution maintenance for newer CPAN toolchains
+
+	* moved repository to git
+
+2006-06-09  Steffen Schwigon  <schwigon@cpan.org>
+
+	* 0.10
+
+	* Separate distribution sourced out of
+	Acme::PM::Dresden::TWikiClient.
+	
+	* read_topic() bugfix for TWiki 4.0.2:
+	The new TWiki version has a different topic raw view mode: the
+	TEXTAREA isn't inside a FORM. Because of this, read_topic() always
+	returns empty content. Problem fixed with patch while maintaining
+	backwards compatibility (I suppose, but I couldn't test it on
+	older TWiki installations). Reported by Aleksander Adamowski.
+	
+	* name of sub _htm(p)lparse_get_text() corrected
+	
+2005-07-31 ... 2005-01-06  Steffen Schwigon  <schwigon@cpan.org>
+
+	* Version 0.09...0.01 as Acme::PM::Dresden::TWikiClient.
+	  Here is the accumulated change log:
+
+	* attach_to_topic() for uploading files.
+
+	* Test::Distribution and Test::Pod::Coverage only used if
+	explicitely required, because I don't want to fail remote
+	installation due to those modules, which might change in future.
+
+	* save_topic didn't work with some skins, as reported by
+	Aleksander Adamowski. Now there's better save_topic handling,
+	hopefully skin independent.
+
+	* "Release edit lock" handling
+
+	* more correct regexes for orientation in pages
+
+	* renamed auxiliary (i.e., non-API) methodnames to _methodname()
+	
+	* extended and fixed documentation
+	
+	* POD fixes
+
+	* Complete example script that migrates a VQWiki to TWiki
+
+	* verbose mode
+
+	* Bugfixes
+

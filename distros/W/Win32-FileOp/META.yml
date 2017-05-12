@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Win32-FileOp
+version:            0.16.02
+abstract:           Operations on files, copy/move/delete/recycle with fancy dialogs, Open and SaveAs dialogs, INI files editing, maping drives and a few others
+author:
+    - Jan Krynicky (Jenda@Krynicky.cz),Mike (blazer@mail.nevalink.ru),Bill Luebkert (dbe@wgn.net)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Lazy:      0.5
+    Win32::AbsPath:  1.0
+    Win32::API:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

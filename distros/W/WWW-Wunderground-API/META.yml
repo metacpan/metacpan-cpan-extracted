@@ -1,0 +1,37 @@
+---
+abstract: "Use Weather Underground's JSON/XML API"
+author:
+  - 'John Lifsey, C<< <nebulous at crashed.net> >>'
+  - 'John Lifsey <nebulous@crashed.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Wunderground-API
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  CHI: '0.50'
+  Cache::FileCache: 0
+requires:
+  Hash::AsObject: 0
+  JSON::MaybeXS: 0
+  LWP::Simple: 0
+  Moo: '1.0'
+  XML::Simple: 0
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/nebulous/WWW-Wunderground-API
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/nebulous/WWW-Wunderground-API.git
+version: '0.08'

@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/WebService/SendInBlue.pm
+lib/WebService/SendInBlue/Response.pm
+t/001_constructor.t
+t/002_campaigns.t
+t/003_lists.t
+t/004_processes.t

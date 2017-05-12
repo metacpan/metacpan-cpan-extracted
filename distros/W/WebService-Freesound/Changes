@@ -1,0 +1,8 @@
+Revision history for WebService-Freesound
+
+0.02    28Nov2016 Andy Cragg
+        Changed all http to https as requested by bram at Freesound.org.
+
+0.01    25Nov2016 Andy Cragg
+        First version, released on an unsuspecting world.
+

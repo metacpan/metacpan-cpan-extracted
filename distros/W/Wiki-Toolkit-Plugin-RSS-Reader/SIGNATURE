@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 61244c442b685ba429220943446a3f54b6fd9358 Build.PL
+SHA1 f0c0d1fb04076eafa1b0f5f5646cb9f7b9099b14 CHANGES
+SHA1 b97098d27809b2f51fbdfddbe8dd194b29c110df MANIFEST
+SHA1 5216088c6a5ba2693cdf9d0d6ad0dc8fad69d3ef META.yml
+SHA1 9fac6f034ce9889fcc0916351df871264de7b8f8 Makefile.PL
+SHA1 cb46d19e200ef909ef4d73cad2e5de37fd10a613 README
+SHA1 e45d2a44f5b633789e1874f9b358e1add7f99721 lib/Wiki/Toolkit/Plugin/RSS/Reader.pm
+SHA1 c34dd7748ee3116d54b4318781cb2d63b78772c3 t/rss.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFJTovWYzuFKFF44qURAv4eAJ0Y+qPGjNMv2Osr0sHFup+o3S55jwCg5ARF
+OWa/dsUBHLFuL+jVq28/gLM=
+=+poB
+-----END PGP SIGNATURE-----

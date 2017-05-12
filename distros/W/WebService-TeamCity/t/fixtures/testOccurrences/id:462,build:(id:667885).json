@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:31:16,199]   WARN - cs.git.ModificationDataRevWalk - Cannot parse the b0799af24940ea316efd2985b5c5c10b47875abd commit author due to unknown commit encoding 'brokenEncoding' \n\r\n[2016-01-13 14:31:16,200]   WARN - cs.git.ModificationDataRevWalk - Cannot parse the b0799af24940ea316efd2985b5c5c10b47875abd commit message due to unknown commit encoding 'brokenEncoding' \n",
+   "duration" : 4504,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:462,build:(id:667885)",
+   "id" : "id:462,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.fetch_should_not_fail_if_remote_repository_does_not_have_some_branches",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:9091291095461035641",
+      "id" : 9091291095461035641,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.fetch_should_not_fail_if_remote_repository_does_not_have_some_branches"
+   }
+}

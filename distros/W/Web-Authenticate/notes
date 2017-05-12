@@ -1,0 +1,13 @@
+Storage::Handler
+    needs to handle auth roles
+    
+Session::Handler
+
+RedirectRole <- need to load
+AuthRole <- How diff? Redirects if auth fails
+
+create_user
+
+DONE
+Digest
+User

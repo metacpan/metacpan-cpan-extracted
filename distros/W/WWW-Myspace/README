@@ -1,0 +1,224 @@
+WWW::Myspace - Access MySpace.com from Perl scripts
+
+WARNING
+
+March 2007: Using WWW::Myspace for commenting, messaging, or adding
+friends will probably get your Myspace account deleted or disabled.
+
+
+WWW::Myspace.pm provides methods to access myspace.com accounts and functions
+automatically. It provides a simple interface for scripts to log in,
+access lists of friends, scan user's profiles, retreive profile
+data, and post comments.
+
+Example:
+
+    use WWW::Myspace;
+    my $myspace = WWW::Myspace->new ($account, $password);
+        OR
+    my $myspace = new WWW::Myspace; # Prompts for email and password
+
+    my ( @friends ) = $myspace->get_friends();
+
+
+PREREQUESITES
+
+    (Makefile.PL will always have the the current list. This was copied from there Jun 6, 2007)
+
+        'Test::More' => 0,
+        'Spiffy' => 0.24,
+        'YAML' => 0.39,
+        'File::Spec::Functions' => 0, # Note: Forces File::Spec 0.7 or later.
+        'Contextual::Return'    => 0, # For send_friend_request method
+        'Locale::SubCountry'    => 0, # FriendAdder.pm, cool_new_people
+        'WWW::Mechanize'        => 1.20, # Myspace.pm
+        'Time::Local'			=> 0, # Myspace.pm - last_login method
+        'Crypt::SSLeay'			=> 0.53, # WWW::Mechanize, for SSL access to myspace.com
+        'Config::General'       => 0, # MyBase.pm
+        'Params::Validate'      => 0, # MyBase.pm
+
+
+Each of them has a list of dependencies also.
+
+If you don't have XML::Parser installed, you may need to manually install expat:
+http://sourceforge.net/projects/expat/
+Just try installing and if the install fails look through the messages
+and see if it says you need expat.
+
+On MacOS X you'll need to install the developer tools from your
+Tiger install DVD or download them from http://developer.apple.com
+or nothing will install and you'll get errors about missing CORE files).
+(I haven't tested this on pre-Tiger MacOS, but it should work with
+those developer tools also).
+
+INSTALLATION
+
+Installing using the cpan command-line tool is the easiest
+as it will install the dependencies for you.
+
+cpan install WWW::Myspace
+
+or
+
+sudo cpan install WWW::Myspace
+
+Good general advice for installing any CPAN module:
+If a module fails to install:
+- Starting at the top, scan the copious output cpan will create
+- When you see a module has failed to install:
+  - cd into the module's directory ( hint: cd ~/.cpan/build ; ls )
+  - Read the README for the module and install it manually. You'll
+    see the specific errors it's having there.
+  - Once it's installed, run your cpan install command again.
+
+If you don't configure cpan to use "sudo make install"
+(and you should, for which you'll need cpan 1.83), you'll probably
+want to run the cpan command as root or run "sudo cpan". man cpan
+for more info.
+
+
+To install this module manually, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install  # Or su root ; make install
+
+
+The distribution also installs the following convenience modules:
+WWW::Myspace::Comment
+WWW::Myspace::FriendChanges
+WWW::Myspace::Message
+
+Also be sure to check out:
+WWW::Myspace::FriendAdder
+WWW::Myspace::Data
+which are available as separate modules (these used to be included
+but were separated out on 6/29/2007 to make the base module lighter).
+
+The distribution also installs the following handy scripts:
+approve_friends
+comment_myspace
+message_group
+
+(add_friends was moved to WWW::Myspace::FriendAdder)
+
+These are scripts I use, and decided to include in the
+distribution in case they're handy, since they're the most common
+uses for the module, and they're a bit more robust and friendly
+than just using the methods in the module themselves.
+
+
+TEST SUITE
+
+WWW::Myspace accesses a web site, which by nature may change.
+Such change may break functions in this module.
+The test suite (run during cpan installation or when you type
+"make test") runs an extensive battery of tests on all methods
+against the myspace site. This has a few effects:
+1) It makes sure the module works on your system.
+2) It makes sure that the module works with the current version
+   of the myspace site.
+3) If the site changes, or has problems, tests may fail even though
+   overall the module will work.
+My approach to programming is that the module should be robust
+enough to handle the changes in the myspace site, so if condition
+3 occurs, the module needs beefing up.
+
+Note that you can re-run the test suite at any time. Keep a copy
+of the distribution (hint: cd ~/.cpan/build/WWW-Myspace* ) and
+run:
+    perl Makefile.PL
+    make test
+
+This is handy if you find that something in one of your scripts
+stops working and you're wondering if something changed that broke
+WWW::Myspace. If the tests pass, it's probably your script. If not,
+there'll probably be an update coming soon (make sure you have
+the latest version, of course - just re-run the cpan command).
+
+IMPORTANT NOTE ABOUT TESTS: As of version 0.40, you can run the full
+test suite against your own accounts.  To do so, place a config
+file (copy/paste this and change the values) in
+~/.www-myspace/test_config.yaml:
+
+---
+acct1:
+  friend_id: 12345
+  username: myspace_login_email_address
+  password: myspace_login_password
+  user_name: Username (as it appears in "Hello, Username" when you log in.)
+acct2:
+  friend_id: 
+  username: 
+  password: 
+  user_name: 
+test_group: 100009984
+# If fulltest is set to 1, tests will post bulletins (and possibly other similar
+# "destructive" or "public" things in the future).  If it's set to 0 (the default)
+# bulletin won't actually post a bulletin, but will stop short of the final
+# confirmation.  This is probably fine unless you're actually working on those
+# methods.
+fulltest: 0
+
+
+See t/config.yaml for an example file (but lacking "username" and "password").
+
+This establishes test data for 2 accounts, "acct1", and "acct2".  You provide
+the login info, friendID, and display name for each account. The test
+scripts then log into each account and test the module's methods using them.
+They'll post comments back and forth, send a message or two, and delete and
+add each other as friends.  It should be safe to run on an active account,
+but if you feel nervous, set up a couple dummy accounts.
+
+NOTE THAT acct2 MUST BE A PERSONAL (not a band) ACCOUNT, or the is_band
+test will fail, causing your tests to fail.
+
+
+HOW TO SUBMIT A PATCH
+
+To submit a patch for a new feature or a bug fix, please observe the following.
+Doing so will allow me to implement your patch quickly.  Not doing so may
+delay its implementation or prevent me from implementing your patch at all.
+
+ - Download the newest development version from SVN.
+   The command to use is here:
+   http://sourceforge.net/svn/?group_id=163042
+   (Or see http://sourceforge.net/projects/www-myspace)
+ - Apply your changes to that version.
+ - Create a unified or context diff of the changed file(s):
+   diff -u original_file.pm your_file.pm
+ - Email the output to bug-www-myspace at rt.cpan.org, or go to the
+   CPAN RT web site (see below) and submit it there.
+
+I will apply your patch and run the tests on it.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command.
+
+  perldoc WWW::Myspace
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Myspace
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Myspace
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/WWW-Myspace
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/WWW-Myspace
+
+COPYRIGHT AND LICENCE
+
+This module copyright (C) 2005-2006 Grant Grueninger except
+FriendAdder.pm, (c) 2006 Olaf Alders.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

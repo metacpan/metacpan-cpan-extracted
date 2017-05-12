@@ -1,0 +1,24 @@
+bin/worepan
+Changes
+cpanfile
+lib/WorePAN.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_local.t
+t/20_cpan.t
+t/30_backpan.t
+t/40_requires.t
+t/50_cant_be_included.t
+t/51_rare_cases.t
+t/60_add.t
+t/70_invalid_version.t
+t/71_indexed_undef_version.t
+t/80_latest_dists.t
+t/81_dev_releases.t
+t/82_permissions.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

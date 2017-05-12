@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/01_basic.t
+t/99_pod.t
+t/99_podcoverage.t
+lib/Win32/IEFavorites.pm
+lib/Win32/IEFavorites/Item.pm
+lib/Win32/IEFavorites/DateTime.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

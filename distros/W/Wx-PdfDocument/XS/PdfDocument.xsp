@@ -1,0 +1,981 @@
+#############################################################################
+## Name:        XS/PdfDocument.xsp
+## Purpose:     XS++ for Wx::PdfDocument
+## Author:      Mark Wardell
+## Modified by:
+## Created:     25/01/2006
+## RCS-ID:      $Id: PdfDocument.xsp,v 1.0 2006/01/24 07:02:49 netcon Exp $
+## Copyright:   (c) 2006, 2012 Mark Wardell
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#define WXPERL_DEFAULT_DOC_UNIT wxString(wxT("mm"))
+
+## DECLARE_OVERLOAD( wpfl, Wx::PdfLink )
+## DECLARE_OVERLOAD( wimg, Wx::Image )
+
+#include "cpp/streams.h"
+#include <wx/filename.h>
+#include <wx/mimetype.h>
+
+%loadplugin{myinc::XSPP::Overload};
+%loadplugin{myinc::XSPP::Virtual};
+
+%name{Wx::PdfDocument} class wxPdfDocument
+{
+
+    %VirtualImplementation{
+        %Name{wxPlPdfDocument};
+        %Declaration{% WXPLI_DECLARE_DYNAMIC_CLASS( wxPlPdfDocument ); %};
+        %Implementation{% WXPLI_IMPLEMENT_DYNAMIC_CLASS( wxPlPdfDocument, wxPdfDocument ); %};
+    };
+
+%{
+static void
+wxPdfDocument::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+    
+  %name{newWidthHeight} wxPdfDocument(int orientation = wxPORTRAIT, 
+                const wxString& unit = WXPERL_DEFAULT_DOC_UNIT, 
+                wxPaperSize format = wxPAPER_A4) %Overload;
+  
+  %name{newSize} wxPdfDocument(int orientation, double pageWidth, double pageHeight,
+                const wxString& unit = WXPERL_DEFAULT_DOC_UNIT ) %Overload;
+
+  %name{Destroy} virtual ~wxPdfDocument()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  virtual void SetProtection(int permissions,
+                             const wxString& userPassword = wxEmptyString,
+                             const wxString& ownerPassword = wxEmptyString,
+                             wxPdfEncryptionMethod encryptionMethod = wxPDF_ENCRYPTION_RC4V1,
+                             int keyLength = 0);
+
+  // placeholder to pretend wxPdfDocument is an abstract class
+  virtual void wxPerlHelperProc() %Virtual{pure};
+  
+  // wxPerl static funtion to launch a PDF document
+  static void LaunchPdfViewer( const wxString& filePath )
+    %code%{
+        wxFileName fileName  = wxFileName(filePath);  
+        wxFileType* fileType = wxTheMimeTypesManager->GetFileTypeFromExtension(wxT("pdf"));
+        if (fileType != NULL)
+        {
+          wxString cmd = fileType->GetOpenCommand(fileName.GetFullPath());
+            if (!cmd.IsEmpty())
+            {
+              wxExecute(cmd);
+            }
+            delete fileType;
+        }
+        else
+        {
+          // fallback
+          wxString fileURL;
+          if (wxIsAbsolutePath( filePath ) )
+          {
+            fileURL = wxT("file://") + filePath;
+          }
+          else
+          {
+            fileURL = wxT("file://") + wxGetCwd() + wxFILE_SEP_PATH + filePath;
+          }
+          wxLaunchDefaultBrowser(fileURL);
+        }
+        %};
+ 
+  virtual void SetImageScale(double scale);
+
+  virtual double GetImageScale();
+
+  virtual double GetPageWidth();
+  
+  virtual double GetPageHeight();
+  
+  virtual double GetBreakMargin();
+  
+  virtual double GetScaleFactor();
+
+  virtual void SetMargins(double left, double top, double right = -1);
+  
+  virtual void SetLeftMargin(double margin);
+  
+  virtual double GetLeftMargin();
+
+  virtual void SetTopMargin(double margin);
+  
+  virtual double GetTopMargin();
+  
+  virtual void SetRightMargin(double margin);
+
+  virtual double GetRightMargin();
+  
+  virtual void SetCellMargin(double margin);
+
+  virtual double GetCellMargin();
+
+  virtual void SetLineHeight(double height);
+
+  virtual double GetLineHeight();
+
+  virtual void SetAutoPageBreak(bool autoPageBreak, double margin = 0);
+
+  virtual void SetDisplayMode(wxPdfZoom zoom,
+                              wxPdfLayout layout = wxPDF_LAYOUT_CONTINUOUS,
+                              double zoomFactor = 100.);
+
+  virtual void SetKerning(bool kerning);
+
+  virtual void SetCompression(bool compress);
+
+  virtual void SetViewerPreferences(int preferences = 0);
+
+  virtual void SetTitle(const wxString& title);
+  
+  virtual void SetSubject(const wxString& subject);
+  
+  virtual void SetAuthor(const wxString& author);
+
+  virtual void SetKeywords(const wxString& keywords);
+  
+  virtual void SetCreator(const wxString& creator);
+  
+  virtual void AliasNbPages(const wxString& alias = wxString(wxT("{nb}")));
+
+  virtual void Open();
+  
+  virtual void Close();
+  
+  virtual void AddPage() %Overload;
+  
+  virtual void AddPage(int orientation) %Overload;
+
+  virtual void AddPage(int orientation, wxPaperSize format) %Overload;
+
+  virtual void AddPage(int orientation, double pageWidth, double pageHeight) %Overload;
+
+  virtual void Header() %Virtual;
+
+  virtual void Footer() %Virtual;
+ 
+  virtual bool IsInFooter();
+  
+  virtual int  PageNo();
+  
+  virtual void AddSpotColour(const wxString& name, double cyan, double magenta, double yellow, double black);
+
+  virtual bool AddPattern(const wxString& patternName, const wxImage& image, double width, double height);
+
+  %name{SetDrawColourName} virtual void SetDrawColour(const wxString& name) %Overload;
+  
+  %name{SetDrawColourTint} virtual void SetDrawColour(const wxString& name, double tint) %Overload;
+  
+  %name{SetDrawColourColour} virtual void SetDrawColour(const wxColour& colour) %Overload;
+ 
+  %name{SetDrawColourPDFColour} virtual void SetDrawColour(const wxPdfColour& colour) %Overload;
+  
+  %name{SetDrawColourGreyScale} virtual void SetDrawColour(const unsigned char grayscale) %Overload;
+  
+  %name{SetDrawColourRGB} virtual void SetDrawColour(const unsigned char red, const unsigned char green, const unsigned char blue) %Overload;
+  
+  %name{SetDrawColourCMYB} virtual void SetDrawColour(double cyan, double magenta, double yellow, double black) %Overload;
+
+  virtual void SetDrawPattern(const wxString& name) %Overload;
+
+  virtual const wxPdfColour GetDrawColour();
+  
+  %name{SetFillColourName} virtual void SetFillColour(const wxString& name) %Overload;
+  
+  %name{SetFillColourTint} virtual void SetFillColour(const wxString& name, double tint) %Overload;
+  
+  %name{SetFillColourGreyScale} virtual void SetFillColour(const unsigned char grayscale) %Overload;
+  
+  %name{SetFillColourColour} virtual void SetFillColour(const wxColour& colour) %Overload;
+  
+  %name{SetFillColourPDFColour} virtual void SetFillColour(const wxPdfColour& colour) %Overload;
+  
+  %name{SetFillColourRGB} virtual void SetFillColour(const unsigned char red, const unsigned char green, const unsigned char blue) %Overload;
+
+  %name{SetFillColourCMYB} virtual void SetFillColour(double cyan, double magenta, double yellow, double black) %Overload;
+
+
+  virtual void SetFillPattern(const wxString& name);
+  
+  virtual const wxPdfColour GetPatternColour(const wxString& patternName);
+  
+  virtual const wxPdfColour GetFillColour();
+  
+  %name{SetTextColourName} virtual void SetTextColour(const wxString& name) %Overload;
+  
+  %name{SetTextColourTint} virtual void SetTextColour(const wxString& name, double tint) %Overload;
+  
+  %name{SetTextColourGreyscale} virtual void SetTextColour(const unsigned char grayscale) %Overload;
+  
+  %name{SetTextColourColour} virtual void SetTextColour(const wxColour& colour) %Overload;
+  
+  %name{SetTextColourPDFColour} virtual void SetTextColour(const wxPdfColour& colour) %Overload;
+ 
+  %name{SetTextColourRGB} virtual void SetTextColour(const unsigned char red, const unsigned char green, const unsigned char blue) %Overload;
+
+  %name{SetTextColourCMYB} virtual void SetTextColour(double cyan, double magenta, double yellow, double black) %Overload;
+
+  virtual void SetTextPattern(const wxString& name);
+
+  virtual const wxPdfColour GetTextColour();
+  
+  virtual void SetTextRenderMode(wxPdfTextRenderMode mode = wxPDF_TEXT_RENDER_FILL);
+  
+  virtual wxPdfTextRenderMode GetTextRenderMode() const;
+
+  virtual double GetStringWidth(const wxString& s);
+
+  virtual void SetLineWidth(double width);
+
+  virtual double GetLineWidth();
+  
+  virtual void SetLineStyle(const wxPdfLineStyle& linestyle);
+
+  virtual const wxPdfLineStyle& GetLineStyle();
+
+  virtual void SetFillingRule(int rule = wxWINDING_RULE);
+
+  virtual int GetFillingRule();
+
+  virtual void Line(double x1, double y1, double x2, double y2);
+  
+  virtual void Arrow(double x1, double y1, double x2, double y2, double linewidth, double height, double width);
+
+  virtual void Rect(double x, double y, double w, double h, int style = wxPDF_STYLE_DRAW);
+
+  virtual void RoundedRect(double x, double y, double w, double h,
+                           double r, int roundCorner = wxPDF_CORNER_ALL, int style = wxPDF_STYLE_DRAW);
+
+  virtual void Curve(double x0, double y0, double x1, double y1,
+                     double x2, double y2, double x3, double y3,
+                     int style = wxPDF_STYLE_DRAW);
+
+  virtual void Ellipse(double x0, double y0, double rx, double ry = 0, 
+                       double angle = 0, double astart = 0, double afinish = 360,
+                       int style = wxPDF_STYLE_DRAW, int nSeg = 8, bool doSector = false);
+
+  virtual void Circle(double x0, double y0, double r, 
+                      double astart = 0, double afinish = 360,
+                      int style = wxPDF_STYLE_DRAW, int nSeg = 8);
+
+  virtual void Sector(double x0, double y0, double r, double astart, double afinish,
+                      int style = wxPDF_STYLE_FILLDRAW, bool clockwise = true, double origin = 90.);
+  
+%{
+
+void
+wxPdfDocument::Polygon(svx, svy, style = wxPDF_STYLE_DRAW)
+    SV* svx
+	SV* svy
+	int style
+  PREINIT:
+    wxArrayDouble arr_x;
+	wxArrayDouble arr_y;
+  CODE:
+    AV* avx;
+	AV* avy;
+	int n;
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx );
+	arr_x.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy );
+	arr_y.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+	THIS->Polygon( arr_x, arr_y, style );
+
+
+void
+wxPdfDocument::RegularPolygon(x0, y0, r, ns, angle = 0, circle = false, style = wxPDF_STYLE_DRAW, circleStyle = wxPDF_STYLE_DRAW, circleLineStyle = new wxPdfLineStyle(),  circleFillColour = new wxPdfColour() )
+    double x0
+	double y0
+	double r
+	int ns
+	double angle
+	bool circle
+	int style
+	int circleStyle
+	wxPdfLineStyle* circleLineStyle
+	wxPdfColour* circleFillColour
+  CODE:
+	THIS->RegularPolygon(x0,y0,r,ns,angle,circle,style,circleStyle,*circleLineStyle, *circleFillColour);
+
+void
+wxPdfDocument::StarPolygon(x0, y0, r, nv, ng, angle = 0, circle = false, style = wxPDF_STYLE_DRAW, circleStyle = wxPDF_STYLE_DRAW, circleLineStyle = new wxPdfLineStyle(), circleFillColour = new wxPdfColour() ) 
+    double x0
+	double y0
+	double r
+	int nv
+	int ng
+	double angle
+	bool circle
+	int style
+	int circleStyle
+	wxPdfLineStyle* circleLineStyle
+	wxPdfColour* circleFillColour  
+  CODE:
+	THIS->StarPolygon(x0,y0,r,nv,ng,angle,circle,style,circleStyle,*circleLineStyle, *circleFillColour);
+
+
+void
+wxPdfDocument::BezierSpline(svx, svy, style)
+    SV* svx
+	SV* svy
+	int style
+  PREINIT:
+    wxArrayDouble arr_x;
+	wxArrayDouble arr_y;
+  CODE:
+    AV* avx;
+	AV* avy;
+	int n;
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx );
+	arr_x.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy );
+	arr_y.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+	THIS->BezierSpline( arr_x, arr_y, style );
+	
+
+void
+wxPdfDocument::ClosedBezierSpline(svx, svy, style)
+    SV* svx
+	SV* svy
+	int style
+  PREINIT:
+    wxArrayDouble arr_x;
+	wxArrayDouble arr_y;
+  CODE:
+    AV* avx;
+	AV* avy;
+	int n;
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx );
+	arr_x.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy );
+	arr_y.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+	
+	THIS->ClosedBezierSpline( arr_x, arr_y, style );
+
+%}
+ 
+  virtual void Shape(const wxPdfShape& shape, int style = wxPDF_STYLE_DRAW);
+
+  virtual void Rotate(double angle, double x = -1, double y = -1);
+
+  virtual void SetFontSubsetting(bool fontSubsetting = true);
+
+  virtual bool GetFontSubsetting() const;
+
+  virtual bool AddFont(const wxString& family, 
+                       const wxString& style = wxEmptyString, 
+                       const wxString& file = wxEmptyString);
+
+  virtual bool AddFontCJK(const wxString& family);
+
+  %name{SetFontFamilyStringStyle} virtual bool SetFont(const wxString& family, const wxString& style = wxEmptyString, double size = 0) %Overload;
+  
+  %name{SetFontFamilyNumberStyle} virtual bool SetFont(const wxString& family, int style, double size = 0) %Overload;
+ 
+  %name{SetFontPdfFont} virtual bool SetFont(const wxPdfFont& font, int style = wxPDF_FONTSTYLE_REGULAR, double size = 0) %Overload;
+
+  %name{SetFontFont} virtual bool SetFont(const wxFont& font) %Overload;
+
+  virtual void SetFontSize(double size);
+ 
+  virtual wxPdfFont GetCurrentFont() const;
+
+  virtual const wxPdfFontDescription& GetFontDescription() const;
+  
+  virtual const wxString GetFontFamily();
+
+  virtual const wxString GetFontStyle() const;
+  
+  virtual int GetFontStyles() const;
+ 
+  virtual double GetFontSize() const;
+
+  virtual int AddLink();
+
+  virtual bool SetLink(int link, double y = 0., int page = -1);
+ 
+  virtual void Link(double x, double y, double w, double h, const wxPdfLink& link);
+
+  virtual void Bookmark(const wxString& txt, int  level = 0, double y = 0);
+
+  virtual void Text(double x, double y, const wxString& txt);
+
+  virtual void RotatedText(double x, double y, const wxString& txt, double angle);
+
+  virtual bool AcceptPageBreak() %Virtual;
+ 
+%{
+
+void
+wxPdfDocument::Cell(w, h = 0.0, txt = wxEmptyString, border = wxPDF_BORDER_NONE, ln = 0, align = wxPDF_ALIGN_LEFT, fill = 0, link = new wxPdfLink(-1))
+	double w
+	double h
+	wxString& txt
+	int border
+	int ln
+	int align
+	int fill
+	wxPdfLink* link
+  CODE:
+	THIS->Cell(w,h,txt,border,ln,align,fill, *link);
+
+void
+wxPdfDocument::Write(double h, wxString& txt, wxPdfLink* link = new wxPdfLink(-1))
+  CODE:
+	THIS->Write(h, txt, *link);
+
+void
+wxPdfDocument::WriteCell(double h, wxString& txt, int border = wxPDF_BORDER_NONE, int fill = 0, wxPdfLink* link = new wxPdfLink(-1))
+  CODE:
+	THIS->WriteCell(h,txt,border,fill,*link);
+
+void
+wxPdfDocument::Image( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_n_n_n_n_s_wpfl_n, ImageFileName, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_wimg_n_n_n_n_wpfl_n, ImageImage, 4 )
+		MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_wist_s_n_n_n_n_wpfl_n, ImageFH, 5 )
+		END_OVERLOAD( "Wx::PdfDocument::Image" )
+
+bool
+wxPdfDocument::ImageFileName(wxString& file, double x, double y, double w = 0, double h = 0, wxString& mimeType = wxEmptyString, wxPdfLink* link = new wxPdfLink(-1), int maskImage = 0)
+  CODE:
+	RETVAL = THIS->Image(file,x,y,w,h,mimeType,*link,maskImage);
+  OUTPUT: RETVAL
+
+bool
+wxPdfDocument::ImageImage(wxString& name, wxImage* image, double x, double y, double w = 0, double h = 0, wxPdfLink* link = new wxPdfLink(-1), int maskImage = 0)
+  CODE:
+    RETVAL = THIS->Image(name,*image,x,y,w,h,*link,maskImage);
+  OUTPUT: RETVAL
+
+bool
+wxPdfDocument::ImageFH(wxString& name, SV* fh, wxString& mimeType, double x, double y, double w = 0, double h = 0, wxPdfLink* link = new wxPdfLink(-1), int maskImage = 0)
+  CODE:
+    wxInputStream* stream = wxPliInputStream_ctor( fh );
+	RETVAL = THIS->Image(name, *stream, mimeType, x,y,w,h, *link, maskImage );
+	delete stream;
+  OUTPUT: RETVAL
+
+%}
+ 
+  virtual int MultiCell(double w, double h, const wxString& txt,
+                        int border = 0, int align = wxPDF_ALIGN_JUSTIFY,
+                        int fill = 0, int maxline = 0);
+
+  virtual int LineCount(double w, const wxString& txt);
+
+  virtual int TextBox(double w, double h, const wxString& txt,
+                      int halign = wxPDF_ALIGN_JUSTIFY, int valign = wxPDF_ALIGN_TOP,
+                      int border = 0, int fill = 0);
+
+
+%{
+
+bool
+wxPdfDocument::WriteGlyphArray(svx, svy, svg)
+    SV* svx
+	SV* svy
+	SV* svg
+  PREINIT:
+    wxArrayDouble arr_x;
+	wxArrayDouble arr_y;
+	wxPdfArrayUint32 arr_g;
+  CODE:
+    AV* avx;
+	AV* avy;
+	AV* avg;
+	int n;
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx );
+	arr_x.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy );
+	arr_y.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svg ) ||
+		( SvTYPE( (SV*) ( avg = (AV*) SvRV( svg ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the glyph value is not an array reference" );
+		return;
+	}
+	n = av_len( avg );
+	arr_g.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avg, i, 0 );
+		arr_g[i] = (wxUint32) SvUV( t );
+	}
+	
+	THIS->WriteGlyphArray( arr_x, arr_y, arr_g );
+
+%}
+
+  %name{ImageMaskFileName}virtual int ImageMask(const wxString& file, const wxString& mimeType = wxEmptyString);
+
+  %name{ImageMaskImage} virtual int ImageMask(const wxString& name, const wxImage& image);
+
+  %name{ImageMaskFH} virtual int ImageMask(const wxString& name, SV* fh, const wxString& mimeType)
+					%code{% wxInputStream* stream = wxPliInputStream_ctor( fh );
+							RETVAL = THIS->ImageMask(name, *stream, mimeType );
+							delete stream;
+						  %};
+
+%{
+
+void
+wxPdfDocument::ImageMask( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+	    MATCH_REDISP( wxPliOvl_s_wimg, ImageMaskImage )
+		MATCH_REDISP( wxPliOvl_s_wist_s, ImageMaskFH )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_s, ImageMaskFileName, 1 )
+	END_OVERLOAD( "Wx::PdfDocument::ImageMask" )
+  
+
+void
+wxPdfDocument::RotatedImage(wxString& file, double x, double y, double w, double h, double angle, wxString& type = wxEmptyString, wxPdfLink* link = new wxPdfLink(-1), int maskImage = 0)
+  CODE:
+	THIS->RotatedImage(file,x,y,w,h,angle,type,*link,maskImage);
+
+%}
+
+
+  virtual void Ln(double h = -1);
+
+  virtual double GetX();
+  
+  virtual void SetX(double x);
+  
+  virtual double GetY();
+ 
+  virtual void SetY(double y);
+  
+  virtual void SetXY(double x, double y);
+  
+  virtual void SaveAsFile(const wxString& name = wxEmptyString);
+
+%{
+
+void
+wxPdfDocument::CloseAndGetBuffer()
+  CODE:
+    SV* output;
+	unsigned char* outputbuffer;
+	const wxMemoryOutputStream& stream = THIS->CloseAndGetBuffer();
+	size_t outputsize = (size_t)stream.GetLength();
+	SvUPGRADE(output, SVt_PV);
+	outputbuffer = (unsigned char *)SvGROW(output, outputsize + 1);
+	stream.CopyTo( outputbuffer, outputsize );
+	SvCUR_set(output, outputsize);
+    *SvEND(output) = '\0';
+    (void) SvPOK_only(output);
+	EXTEND(SP, 1);
+    PUSHs(output);
+
+%}
+
+  virtual void ClippingText(double x, double y, const wxString& txt, bool outline = false);
+
+  virtual void ClippingRect(double x, double y, double w, double h, bool outline = false);
+
+  virtual void ClippingEllipse(double x, double y, double rx, double ry = 0, bool outline = false);
+
+%{
+
+void
+wxPdfDocument::ClippingPolygon(svx, svy, outline = false )
+    SV* svx
+	SV* svy
+	bool outline
+  PREINIT:
+    wxArrayDouble arr_x;
+	wxArrayDouble arr_y;
+  CODE:
+    AV* avx;
+	AV* avy;
+	int n;
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx );
+	arr_x.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+	
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy );
+	arr_y.SetCount(n + 1);
+	for( int i = 0; i <= n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+	THIS->ClippingPolygon( arr_x, arr_y, outline );
+
+%}
+
+  virtual void ClippingPath();
+
+  virtual void MoveTo(double x, double y);
+
+  virtual void LineTo(double x, double y);
+
+  virtual void CurveTo(double x1, double y1, double x2, double y2, double x3, double y3);
+
+  virtual void EndPath(int style = wxPDF_STYLE_DRAW);
+
+  virtual void ClosePath(int style = wxPDF_STYLE_NOOP);
+
+  virtual void ClippingPath(const wxPdfShape& shape, int style = wxPDF_STYLE_NOOP);
+
+  virtual void UnsetClipping();
+
+%{
+
+void
+wxPdfDocument::ClippedCell(double w, double h = 0.0, wxString& txt = wxEmptyString, int border = wxPDF_BORDER_NONE, int ln = 0, int align = wxPDF_ALIGN_LEFT, int fill = 0, wxPdfLink* link = new wxPdfLink(-1))
+  CODE:
+    THIS->ClippedCell(w,h,txt,border,ln,align,fill,*link);
+
+%}
+
+  virtual void StartTransform();
+
+  virtual bool ScaleX(double sx, double x = -1, double y = -1);
+
+  virtual bool ScaleY(double sy, double x = -1, double y = -1);
+
+  virtual bool ScaleXY(double s, double x = -1, double y = -1);
+
+  virtual bool Scale(double sx, double sy, double x = -1, double y = -1);
+
+  virtual void MirrorH(double x = -1);
+
+  virtual void MirrorV(double y = -1);
+
+  virtual void TranslateX(double tx);
+
+  virtual void TranslateY(double ty);
+
+  virtual void Translate(double tx, double ty);
+
+  virtual bool SkewX(double xAngle, double x = -1, double y = -1);
+
+  virtual bool SkewY(double yAngle, double x = -1, double y = -1);
+
+  virtual bool Skew(double xAngle, double yAngle, double x = -1, double y = -1);
+
+  virtual void Transform( double a, double b, double c, double d, double tx, double ty );
+
+  virtual void StopTransform();
+
+  virtual int SetAlpha(double lineAlpha = 1, double fillAlpha = 1, wxPdfBlendMode blendMode = wxPDF_BLENDMODE_NORMAL);
+
+  virtual void SetAlphaState(int alphaState);
+
+  virtual int LinearGradient(const wxPdfColour& col1, const wxPdfColour& col2,
+                             wxPdfLinearGradientType gradientType = wxPDF_LINEAR_GRADIENT_HORIZONTAL);
+
+  virtual int AxialGradient(const wxPdfColour& col1, const wxPdfColour& col2,
+                            double x1 = 0, double y1 = 0,
+                            double x2 = 1, double y2 = 0,
+                            double intexp = 1);
+
+  virtual int MidAxialGradient(const wxPdfColour& col1, const wxPdfColour& col2,
+                               double x1 = 0, double y1 = 0,
+                               double x2 = 1, double y2 = 0,
+                               double midpoint = 0.5, double intexp = 1);
+
+  virtual int RadialGradient(const wxPdfColour& col1, const wxPdfColour& col2, 
+                              double x1 = 0.5, double y1 = 0.5, double r1 = 0,
+                              double x2 = 0.5, double y2 = 0.5, double r2 = 1,
+                              double intexp = 1);
+  
+  virtual int CoonsPatchGradient(wxPdfCoonsPatchMesh& mesh, double minCoord = 0, double maxCoord = 1);
+  
+  virtual void SetFillGradient(double x, double y, double w, double h, int gradient);
+
+  virtual void Marker(double x, double y, wxPdfMarker markerType, double size);
+
+  virtual void Annotate(double x, double y, const wxString& text);
+
+  virtual void AppendJavascript(const wxString& javascript);
+
+  virtual void WriteXml(const wxString& str);
+
+  %name{CheckBoxWidth} virtual void CheckBox(const wxString& name, double width) %Overload;
+  
+  %name{CheckBoxWidthBool} virtual void CheckBox(const wxString& name, double width, bool checked) %Overload;
+
+  %name{CheckBoxXYWidth}virtual void CheckBox(const wxString& name, double x, double y, double width) %Overload;
+  
+  %name{CheckBoxXYWidthBool}virtual void CheckBox(const wxString& name, double x, double y, double width, bool checked) %Overload;
+  
+%{
+
+void
+wxPdfDocument::ComboBox( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+	    MATCH_REDISP( wxPliOvl_s_n_n_arr, ComboBoxWH )
+		MATCH_REDISP( wxPliOvl_s_n_n_n_n_arr, ComboBoxXYWH )
+	END_OVERLOAD( "Wx::PdfDocument::ComboBox" )
+
+void
+wxPdfDocument::ComboBoxWH( name, width, height, values )
+    wxString name
+    double width
+    double height
+    SV* values
+  CODE:
+    wxArrayString	vallarry;
+    wxPli_av_2_arraystring( aTHX_ values, &vallarry );
+    THIS->ComboBox( name, width, height, vallarry );
+
+void
+wxPdfDocument::ComboBoxXYWH( name, x, y, width, height, values )
+    wxString name
+    double x
+    double y
+    double width
+    double height
+    SV* values
+  CODE:
+    wxArrayString	vallarry;
+    wxPli_av_2_arraystring( aTHX_ values, &vallarry );
+    THIS->ComboBox( name, x, y, width, height, vallarry );
+
+%}
+ 
+  %name{PushButtonWH} virtual void PushButton(const wxString& name, double width, double height, 
+                          const wxString& caption, const wxString& action) %Overload;
+  
+  %name{PushButtonXYWH} virtual void PushButton(const wxString& name, double x, double y, double width, double height, 
+                          const wxString& caption, const wxString& action) %Overload;
+  
+  %name{RadioButtonWH} virtual void RadioButton(const wxString& group, const wxString& name, double width) %Overload;
+  
+  %name{RadioButtonXYWH} virtual void RadioButton(const wxString& group, const wxString& name, 
+                           double x, double y, double width) %Overload;
+
+  %name{TextFieldWH} virtual void TextField(const wxString& name, double width, double height) %Overload;
+  
+  %name{TextFieldWHValue} virtual void TextField(const wxString& name, double width, double height, const wxString& value) %Overload;
+  
+  %name{TextFieldWHValueMult} virtual void TextField(const wxString& name, double width, double height, const wxString& value, bool multiline) %Overload;
+
+  %name{TextFieldXYWH} virtual void TextField(const wxString& name, double x, double y, double width, double height) %Overload;
+  
+  %name{TextFieldXYWHValue} virtual void TextField(const wxString& name, double x, double y, double width, double height,
+                         const wxString& value) %Overload;
+  
+  %name{TextFieldXYWHValueMulti} virtual void TextField(const wxString& name, 
+                         double x, double y, double width, double height,
+                         const wxString& value, bool multiline) %Overload;
+
+%{
+
+void
+wxPdfDocument::SetFormColours(wxPdfColour* borderColour = new wxPdfColour(), wxPdfColour* backgroundColour = new wxPdfColour(250), wxPdfColour* textColour = new wxPdfColour())
+  CODE:
+    THIS->SetFormColours(*borderColour, *backgroundColour, *textColour);
+
+%}
+
+  virtual void SetFormBorderStyle(wxPdfBorderStyle borderStyle = wxPDF_BORDER_SOLID,
+                                  double borderWidth = -1);
+
+  virtual int BeginTemplate(double x = 0, double y = 0, double width = 0, double height = 0);
+
+  virtual int EndTemplate();
+
+  virtual void UseTemplate(int templateId, double x = -1, double y = -1, double width = 0, double height = 0);
+
+  virtual int SetSourceFile(const wxString& filename, const wxString& password = wxEmptyString);
+
+%{
+
+wxPdfInfo*
+wxPdfDocument::GetSourceInfo()
+  CODE:
+    RETVAL = new wxPdfInfo();
+    bool res = THIS->GetSourceInfo(*RETVAL);
+  OUTPUT: RETVAL
+
+void
+wxPdfDocument::GetTemplateBBox(templateId)
+    int templateId
+  PREINIT:
+    double x, y, width, height;
+  PPCODE:
+    THIS->wxPdfDocument::GetTemplateBBox(templateId, x, y, width, height );
+    EXTEND( SP, 4 );
+    PUSHs( sv_2mortal( newSVnv( x ) ) );
+    PUSHs( sv_2mortal( newSVnv( y ) ) );
+    PUSHs( sv_2mortal( newSVnv( width ) ) );
+    PUSHs( sv_2mortal( newSVnv( height ) ) );
+
+void
+wxPdfDocument::GetTemplateSize(templateId, width, height)
+    int templateId
+    double width
+    double height
+  PPCODE:
+    THIS->wxPdfDocument::GetTemplateSize(templateId, width, height );
+    EXTEND( SP, 2 );
+    PUSHs( sv_2mortal( newSVnv( width ) ) );
+    PUSHs( sv_2mortal( newSVnv( height ) ) );
+
+%}
+
+  virtual int ImportPage(unsigned int pageno, wxPdfPageBox pageBox = wxPDF_PAGEBOX_ARTBOX);
+
+  virtual void SetTemplateBBox(int templateId, double x, double y, double width, double height);
+
+  virtual void ShapedText(const wxPdfShape& shape, const wxString& text, wxPdfShapedTextMode mode = wxPDF_SHAPEDTEXTMODE_STRETCHTOFIT);
+
+  virtual wxPdfLayer* AddLayer(const wxString& layerName);
+
+  virtual wxPdfLayer* AddLayerTitle(const wxString& layerTitle);
+
+  virtual wxPdfLayerMembership* AddLayerMembership();
+
+  virtual void LockLayer(wxPdfLayer* layer);
+
+  virtual void AddLayerRadioGroup(const wxPdfLayerGroup& radioGroup);
+
+  %name{EnterLayerLayer} virtual void EnterLayer(wxPdfLayer* layer) %Overload;
+  
+  %name{EnterLayerLayerMembership} virtual void EnterLayer(wxPdfLayerMembership* layer) %Overload;
+
+  virtual void LeaveLayer();
+
+  void SetMessageTranslateMode(bool translate);
+
+  bool GetMessageTranslateMode();
+  
+  virtual double GetLastImageBottomRightX();
+
+  virtual double GetLastImageBottomRightY();
+
+  virtual bool AttachFile(const wxString& fileName, 
+                          const wxString& attachName = wxEmptyString,
+                          const wxString& description = wxEmptyString);
+
+
+};

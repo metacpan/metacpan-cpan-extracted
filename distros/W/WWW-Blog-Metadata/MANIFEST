@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/WWW/Blog/Metadata.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-compile.t
+t/01-extract.t
+t/02-plugin.t
+t/lib/WWW/Blog/Metadata/IsTypePad.pm
+t/lib/WWW/Blog/Metadata/RSD.pm
+t/samples/blog-full.html
+xt/perlcritic.t
+xt/pod.t
+xt/synopsis.t

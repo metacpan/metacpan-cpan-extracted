@@ -1,0 +1,103 @@
+This README documents Win32::EventLog::Carp, version 1.41, released
+2007-05-19.
+
+NAME
+    Win32::EventLog::Carp - For carping in the Windows NT Event Log
+
+REQUIREMENTS
+      Carp (*)
+      Win32::EventLog (*)
+      Win32::EventLog::Message (**)
+      
+      (*) standard modules on Win32 systems, if they are not available,
+      your installation is probably broken.
+      
+      (**) Not available from CPAN. You can find it at the following
+      location:
+
+          ftp://ftp.roth.net/pub/ntperl/EventLog.Message
+
+      You should see a series of 'yyyymmdd' date-stamped directories.
+      Choose the most recent one, and look for a file named
+      EventMsg_500x.Zip (where x = 5, 6 or 8, corresponding to your
+      Perl version).
+      
+  Installation
+
+    Installation is pretty standard:
+
+      perl Makefile.PL
+      nmake
+      nmake test
+      nmake install
+
+    If you have Module::Build installed, you can use the following:
+
+      perl Build.PL
+      perl Build
+      perl Build test
+      perl Build install
+
+    Note that the tests for this module will write to the event log!
+    
+    You may set the environment variable PERL_WIN32_EVENTLOG_CARP_TEST_VERBOSE
+    to something (e.g. 1) for a more verbose test output.
+
+  Known Issues with Installation
+
+    * WinZip is unable to use POSIX-style long pathnames in tar files,
+      so it may ignore the directory structure of this package's 
+      distribution.  Alternate gzip and tar utilities can be found at
+      http://gnuwin32.sourceforge.net or http://unxutils.sourceforge.net
+
+    * The tests may fail on some systems.  If it fails, check your event
+      logs to verify that your Application log contains events with
+      messages of the form:
+
+        test,cluck,2,1103305379 at t\01-basic.t line 124
+
+      if so, it works and can be installed.
+
+      In certain other cases, tests will fail the first time they are
+      run on a system, but will succeed the second time they are run.
+
+SYNOPSIS
+      use Win32::EventLog::Carp;
+      croak "We're outta here!";
+
+      use Win32::EventLog::Carp qw(cluck);
+      cluck "This is how we got here!";
+
+DESCRIPTION
+    `Win32::EventLog::Carp' traps warnings and fatal errors in Perl and
+    reports these errors in the Windows NT Event Log. This is useful for
+    scripts which run as services or through the scheduler, and for
+    CGI/ISAPI scripts.
+
+    The interface is similar to `Carp': the `carp', `croak' and `confess'
+    functions are exported (with `cluck' being optional). You need only
+    change references of "Carp" to "Win32::EventLog::Carp" to begin using
+    this module.
+
+    A more detailed description can be found in the module's POD docu-
+    mentation.
+
+REVISION HISTORY
+    Changes since Win32::EventLog::Carp v1.37.  (Note: potential
+    incompatabilities are marked with '*'.)
+
+    1.40 2006-10-06
+    - maintenance hand-over release. No functional changes.
+
+    A detailed revision history is in the Changes file included with
+    this distribution.
+
+AUTHOR
+    David Landgren <dland at cpan.org> (current maintainer)
+    Robert Rothenberg <rrwo at cpan.org>
+
+LICENSE
+    Copyright (c) 2000-2004 Robert Rothenberg. Copyright 2006 David Landgren.
+    All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

@@ -1,0 +1,19 @@
+Revision history for WebService-KakakuCom
+
+0.05    Mon Oct 3 1:16:00 2006
+        - Fixed typo in ua()
+
+0.04    Mon Sep 29 15:16:00 2006
+        - Fixed typo in search() method.
+
+0.03    Mon Sep 28 15:53:00 2006
+        - Writing more pods
+        - Upload to CPAN
+
+0.02    Mon Sep 28 10:49:00 2006
+        - Modified wrong number setting to Data::Page.
+        - Added more tests to 01-methods.t
+
+0.01    Mon Sep 27 21:30:16 2006
+        First version, released on an unsuspecting world.
+

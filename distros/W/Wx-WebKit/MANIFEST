@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+WebKit.xs
+typemap
+t/Wx-WebKit.t
+lib/Wx/WebKit.pm
+META.yml                                 Module meta-data (added by MakeMaker)

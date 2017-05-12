@@ -1,0 +1,27 @@
+TYPEMAP
+pWFT *	    O_OBJECT
+pWFD *	    O_OBJECT
+WFile	    WINDOWS_FILE
+pobj	    O_OBJECT
+
+
+INPUT
+WINDOWS_FILE
+    $var = (WCHAR *)SvPV_nolen(normalize_path( mortal_wchar( $arg )));
+
+
+
+
+OUTPUT
+O_OBJECT
+     sv_setref_pv( $arg, \"$Package\", (void*) $var );
+INPUT
+O_OBJECT
+     if (sv_isobject($arg) && SvTYPE( SvRV($arg)) == SVt_PVMG ) {
+	$var = INT2PTR($type, SvIV((SV*)SvRV( $arg )));
+     }
+    else {
+	warn(  \"${Package}::$pname() -- $var is not a blessed SV reference\" );
+	XSRETURN_UNDEF;
+    }
+

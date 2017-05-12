@@ -1,0 +1,8 @@
+Revision history for Perl extension Wily.
+0.02  Fri Aug 21 00:11:04 2004
+	- fixed up an incorrect email address in the docs, and added
+          added signatures and META.yml
+0.01  Tue Jul 20 15:37:01 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n Wily
+

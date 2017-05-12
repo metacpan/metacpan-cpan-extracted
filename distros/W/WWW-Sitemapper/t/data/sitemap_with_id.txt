@@ -1,0 +1,9 @@
+[0] index.html
+  [0:0] 1.html
+    [0:0:0] friendly_url.html
+      [0:0:0:0] 3.html
+        [0:0:0:0:0] 31.html
+        [0:0:0:0:1] 32.html
+  [0:1] 2.html
+    [0:1:0] 21.html
+    [0:1:1] 22.html

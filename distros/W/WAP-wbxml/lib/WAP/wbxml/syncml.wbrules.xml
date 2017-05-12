@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<!DOCTYPE wbxml [
+  <!ELEMENT wbxml (PublicIdentifiers,App+)>
+  <!ATTLIST wbxml version NMTOKEN #REQUIRED>
+  <!ELEMENT PublicIdentifiers (PublicIdentifier)*>
+  <!ELEMENT PublicIdentifier EMPTY>
+  <!ATTLIST PublicIdentifier value NMTOKEN #REQUIRED>
+  <!ATTLIST PublicIdentifier name CDATA #REQUIRED>
+  <!ELEMENT App (TagTokens?,AttrStartTokens?,AttrValueTokens?,Ext0Values?,Ext1Values?,Ext2Values?,CharacterEntities?)>
+  <!ATTLIST App publicid CDATA #REQUIRED>
+  <!ATTLIST App systemid CDATA #IMPLIED>
+  <!ATTLIST App use-default (no|yes) #IMPLIED>
+  <!ATTLIST App variable-subs (no|yes) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST App textual-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App tokenised-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App xml-space (default|preserve) #IMPLIED>
+  <!ELEMENT TagTokens (TAG)*>
+  <!ELEMENT TAG EMPTY>
+  <!ATTLIST TAG token NMTOKEN #REQUIRED>
+  <!ATTLIST TAG name NMTOKEN #REQUIRED>
+  <!ATTLIST TAG codepage NMTOKEN #IMPLIED>
+  <!ATTLIST TAG encoding (base64|datetime|integer) #IMPLIED>	<!-- WV -->
+  <!ELEMENT AttrStartTokens (ATTRSTART)*>
+  <!ELEMENT ATTRSTART EMPTY>
+  <!ATTLIST ATTRSTART token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART name NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART value CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART codepage NMTOKEN #IMPLIED>
+  <!ATTLIST ATTRSTART default CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART fixed CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART validate (std|length|vdata) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST ATTRSTART encoding (std|iso-8601) #IMPLIED>		<!-- WAP -->
+  <!ELEMENT AttrValueTokens (ATTRVALUE)*>
+  <!ELEMENT ATTRVALUE EMPTY>
+  <!ATTLIST ATTRVALUE token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRVALUE value CDATA #REQUIRED>
+  <!ATTLIST ATTRVALUE codepage NMTOKEN #IMPLIED>
+  <!ELEMENT Ext0Values (EXTVALUE)*>	<!-- WV -->
+  <!ELEMENT Ext1Values (EXTVALUE)*>
+  <!ELEMENT Ext2Values (EXTVALUE)*>
+  <!ELEMENT EXTVALUE EMPTY>
+  <!ATTLIST EXTVALUE index NMTOKEN #REQUIRED>
+  <!ATTLIST EXTVALUE value CDATA #REQUIRED>
+  <!ELEMENT CharacterEntities (CharacterEntity)*>
+  <!ELEMENT CharacterEntity EMPTY>
+  <!ATTLIST CharacterEntity name NMTOKEN #REQUIRED>
+  <!ATTLIST CharacterEntity code NMTOKEN #REQUIRED>
+  <!ENTITY quot "&#34;">
+  <!ENTITY amp "&#38;#38;">
+  <!ENTITY apos "&#39;">
+  <!ENTITY lt "&#38;#60;">
+  <!ENTITY gt ">">
+]>
+<wbxml version="1.3">
+  <!--  see: Binary XML Content Format, Version 1.3 -->
+  <!--       WAP-192-WBXML-20010725-a -->
+  <PublicIdentifiers>
+    <!-- The normative list of well known public identifiers issued, and maintained,
+         by the OMNA (Open Mobile Naming Authority) SHALL be found
+         at http://www.openmobilealliance.org/tech/omna/omna-wbxml-public-docid.htm -->
+    <!-- value="1"  Unknown or missing public identifier -->
+    <!-- if no value, publicid is encoding as string -->
+    <PublicIdentifier value="2" name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <PublicIdentifier value="2"  name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <!--   DEPRECATED       value="3"  name="-//WAPFORUM//DTD WTA 1.0//EN" -->
+    <PublicIdentifier value="4"  name="-//WAPFORUM//DTD WML 1.1//EN"/>
+    <PublicIdentifier value="5"  name="-//WAPFORUM//DTD SI 1.0//EN"/>
+    <PublicIdentifier value="6"  name="-//WAPFORUM//DTD SL 1.0//EN"/>
+    <PublicIdentifier value="7"  name="-//WAPFORUM//DTD CO 1.0//EN"/>
+    <PublicIdentifier value="8"  name="-//WAPFORUM//DTD CHANNEL 1.1//EN"/>
+    <PublicIdentifier value="9"  name="-//WAPFORUM//DTD WML 1.2//EN"/>
+    <PublicIdentifier value="A"  name="-//WAPFORUM//DTD WML 1.3//EN"/>
+    <PublicIdentifier value="B"  name="-//WAPFORUM//DTD PROV 1.0//EN"/>
+    <PublicIdentifier value="C"  name="-//WAPFORUM//DTD WTA-WML 1.2//EN"/>
+    <PublicIdentifier value="D"  name="-//WAPFORUM//DTD EMN 1.0//EN"/>
+    <PublicIdentifier value="E"  name="-//OMA//DTD DRMREL 1.0//EN"/>
+    <PublicIdentifier value="F"  name="-//WIRELESSVILLAGE//DTD CSP 1.0//EN"/>
+    <PublicIdentifier value="10" name="-//WIRELESSVILLAGE//DTD CSP 1.1//EN"/>
+    <PublicIdentifier value="11" name="-//OMA//DTD WV-CSP 1.2//EN"/>
+    <!-- values 12-7F : Reserved -->
+    <!-- SyncML specification -->
+    <PublicIdentifier value="FD1"  name="-//SYNCML//DTD SyncML 1.0//EN"/>
+    <PublicIdentifier value="FD2"  name="-//SYNCML//DTD DevInf 1.0//EN"/>
+    <PublicIdentifier value="FD3"  name="-//SYNCML//DTD SyncML 1.1//EN"/>
+    <PublicIdentifier value="FD4"  name="-//SYNCML//DTD DevInf 1.1//EN"/>
+    <PublicIdentifier value="1201" name="-//SYNCML//DTD SyncML 1.2//EN"/>
+    <PublicIdentifier value="1202" name="-//SYNCML//DTD MetaInf 1.2//EN"/>
+    <PublicIdentifier value="1203" name="-//SYNCML//DTD DevInf 1.2//EN"/>
+  </PublicIdentifiers>
+  <!--
+       SyncML - www.syncml.org
+  -->
+  <App publicid="-//SYNCML//DTD SyncML 1.0//EN"
+       systemid="http://www.syncml.org/docs/syncml_represent_v101_20010615.dtd">
+    <!-- see: SyncML Representation Protocol, version 1.0.1, 2001-06-15 -->
+    <TagTokens>
+      <TAG token="05" name="Add" />
+      <TAG token="06" name="Alert" />
+      <TAG token="07" name="Archive" />
+      <TAG token="08" name="Atomic" />
+      <TAG token="09" name="Chal" />
+      <TAG token="0A" name="Cmd" />
+      <TAG token="0B" name="CmdID" />
+      <TAG token="0C" name="CmdRef" />
+      <TAG token="0D" name="Copy" />
+      <TAG token="0E" name="Cred" />
+      <TAG token="0F" name="Data" />
+      <TAG token="10" name="Delete" />
+      <TAG token="11" name="Exec" />
+      <TAG token="12" name="Final" />
+      <TAG token="13" name="Get" />
+      <TAG token="14" name="Item" />
+      <TAG token="15" name="Lang" />
+      <TAG token="16" name="LocName" />
+      <TAG token="17" name="LocURI" />
+      <TAG token="18" name="Map" />
+      <TAG token="19" name="MapItem" />
+      <TAG token="1A" name="Meta" />
+      <TAG token="1B" name="MsgID" />
+      <TAG token="1C" name="MsgRef" />
+      <TAG token="1D" name="NoResp" />
+      <TAG token="1E" name="NoResults" />
+      <TAG token="1F" name="Put" />
+      <TAG token="20" name="Replace" />
+      <TAG token="21" name="RespURI" />
+      <TAG token="22" name="Results" />
+      <TAG token="23" name="Search" />
+      <TAG token="24" name="Sequence" />
+      <TAG token="25" name="SessionID" />
+      <TAG token="26" name="SftDel" />
+      <TAG token="27" name="Source" />
+      <TAG token="28" name="SourceRef" />
+      <TAG token="29" name="Status" />
+      <TAG token="2A" name="Sync" />
+      <TAG token="2B" name="SyncBody" />
+      <TAG token="2C" name="SyncHdr" />
+      <TAG token="2D" name="SyncML" />
+      <TAG token="2E" name="Target" />
+      <TAG token="2F" name="TargetRef" />
+      <!-- token="30" Reserved for future use -->
+      <TAG token="31" name="VerDTD" />
+      <TAG token="32" name="VerProto" />
+      <!-- see: SyncML Meta-Information DTD, version 1.0.1, 2001-06-15 -->
+      <TAG token="05" codepage="01" name="Anchor" />
+      <TAG token="06" codepage="01" name="EMI" />
+      <TAG token="07" codepage="01" name="Format" />
+      <TAG token="08" codepage="01" name="FreeID" />
+      <TAG token="09" codepage="01" name="FreeMem" />
+      <TAG token="0A" codepage="01" name="Last" />
+      <TAG token="0B" codepage="01" name="Mark" />
+      <TAG token="0C" codepage="01" name="MaxMsgSize" />
+      <TAG token="0D" codepage="01" name="Mem" />
+      <TAG token="0E" codepage="01" name="MetInf" />
+      <TAG token="0F" codepage="01" name="Next" />
+      <TAG token="10" codepage="01" name="NextNonce" />
+      <TAG token="11" codepage="01" name="SharedMem" />
+      <TAG token="12" codepage="01" name="Size" />
+      <TAG token="13" codepage="01" name="Type" />
+      <TAG token="14" codepage="01" name="Version" />
+    </TagTokens>
+  </App>
+  <App publicid="-//SYNCML//DTD SyncML 1.1//EN"
+       systemid="http://www.openmobilealliance.org/tech/DTD/OMA-SyncML-RepPro-DTD-V1_1_2-20030505-D.dtd">
+    <!-- see: SyncML Representation Protocol, version 1.1.2, Approved Version 12-June-2003
+              OMA-SyncML-RepPro-V1_1_2-20030612-A -->
+    <!-- see: SyncML Representation Protocol, version 1.1.1, 2002-10-02 -->
+    <TagTokens>
+      <TAG token="05" name="Add" />
+      <TAG token="06" name="Alert" />
+      <TAG token="07" name="Archive" />
+      <TAG token="08" name="Atomic" />
+      <TAG token="09" name="Chal" />
+      <TAG token="0A" name="Cmd" />
+      <TAG token="0B" name="CmdID" />
+      <TAG token="0C" name="CmdRef" />
+      <TAG token="0D" name="Copy" />
+      <TAG token="0E" name="Cred" />
+      <TAG token="0F" name="Data" />
+      <TAG token="10" name="Delete" />
+      <TAG token="11" name="Exec" />
+      <TAG token="12" name="Final" />
+      <TAG token="13" name="Get" />
+      <TAG token="14" name="Item" />
+      <TAG token="15" name="Lang" />
+      <TAG token="16" name="LocName" />
+      <TAG token="17" name="LocURI" />
+      <TAG token="18" name="Map" />
+      <TAG token="19" name="MapItem" />
+      <TAG token="1A" name="Meta" />
+      <TAG token="1B" name="MsgID" />
+      <TAG token="1C" name="MsgRef" />
+      <TAG token="1D" name="NoResp" />
+      <TAG token="1E" name="NoResults" />
+      <TAG token="1F" name="Put" />
+      <TAG token="20" name="Replace" />
+      <TAG token="21" name="RespURI" />
+      <TAG token="22" name="Results" />
+      <TAG token="23" name="Search" />
+      <TAG token="24" name="Sequence" />
+      <TAG token="25" name="SessionID" />
+      <TAG token="26" name="SftDel" />
+      <TAG token="27" name="Source" />
+      <TAG token="28" name="SourceRef" />
+      <TAG token="29" name="Status" />
+      <TAG token="2A" name="Sync" />
+      <TAG token="2B" name="SyncBody" />
+      <TAG token="2C" name="SyncHdr" />
+      <TAG token="2D" name="SyncML" />
+      <TAG token="2E" name="Target" />
+      <TAG token="2F" name="TargetRef" />
+      <!-- token="30" Reserved for future use -->
+      <TAG token="31" name="VerDTD" />
+      <TAG token="32" name="VerProto" />
+      <TAG token="33" name="NumberOfChanges" />
+      <TAG token="34" name="MoreData" />
+      <!-- see: SyncML Meta Information, version 1.1.2, Approved Version 12-June-2003
+                OMA-SyncML-MetaInfo-V1_1_2-20030612-A -->
+      <!-- see: SyncML Meta-Information DTD, version 1.1.1, 2002-10-02 -->
+      <TAG token="05" codepage="01" name="Anchor" />
+      <TAG token="06" codepage="01" name="EMI" />
+      <TAG token="07" codepage="01" name="Format" />
+      <TAG token="08" codepage="01" name="FreeID" />
+      <TAG token="09" codepage="01" name="FreeMem" />
+      <TAG token="0A" codepage="01" name="Last" />
+      <TAG token="0B" codepage="01" name="Mark" />
+      <TAG token="0C" codepage="01" name="MaxMsgSize" />
+      <TAG token="15" codepage="01" name="MaxObjSize" />
+      <TAG token="0D" codepage="01" name="Mem" />
+      <TAG token="0E" codepage="01" name="MetInf" />
+      <TAG token="0F" codepage="01" name="Next" />
+      <TAG token="10" codepage="01" name="NextNonce" />
+      <TAG token="11" codepage="01" name="SharedMem" />
+      <TAG token="12" codepage="01" name="Size" />
+      <TAG token="13" codepage="01" name="Type" />
+      <TAG token="14" codepage="01" name="Version" />
+    </TagTokens>
+  </App>
+  <App publicid="-//SYNCML//DTD DevInf 1.0//EN"
+       systemid="http://www.syncml.org/docs/devinf_v101_20010530.dtd">
+    <!-- see: SyncML Device Information DTD, version 1.0.1, 2001-06-15 -->
+    <TagTokens>
+      <TAG token="05" name="CTCap" />
+      <TAG token="06" name="CTType" />
+      <TAG token="07" name="DataStore" />
+      <TAG token="08" name="DataType" />
+      <TAG token="09" name="DevID" />
+      <TAG token="0A" name="DevInf" />
+      <TAG token="0B" name="DevTyp" />
+      <TAG token="0C" name="DisplayName" />
+      <TAG token="0D" name="DSMem" />
+      <TAG token="0E" name="Ext" />
+      <TAG token="0F" name="FwV" />
+      <TAG token="10" name="HwV" />
+      <TAG token="11" name="Man" />
+      <TAG token="12" name="MaxGUIDSize" />
+      <TAG token="13" name="MaxID" />
+      <TAG token="14" name="MaxMem" />
+      <TAG token="15" name="Mod" />
+      <TAG token="16" name="OEM" />
+      <TAG token="17" name="ParamName" />
+      <TAG token="18" name="PropName" />
+      <TAG token="19" name="Rx" />
+      <TAG token="1A" name="Rx-Pref" />
+      <TAG token="1B" name="SharedMem" />
+      <TAG token="1C" name="Size" />
+      <TAG token="1D" name="SourceRef" />
+      <TAG token="1E" name="SwV" />
+      <TAG token="1F" name="SyncCap" />
+      <TAG token="20" name="SyncType" />
+      <TAG token="21" name="Tx" />
+      <TAG token="22" name="Tx-Pref" />
+      <TAG token="23" name="ValEnum" />
+      <TAG token="24" name="VerCT" />
+      <TAG token="25" name="VerDTD" />
+      <TAG token="26" name="Xnam" />
+      <TAG token="27" name="Xval" />
+    </TagTokens>
+  </App>
+  <App publicid="-//SYNCML//DTD DevInf 1.1//EN"
+       systemid="http://www.openmobilealliance.org/tech/DTD/OMA-SyncML-DevInfo-DTD-V1_1_2-20030505-D.dtd">
+    <!-- see: SyncML Device Information, version 1.1.2, Approved Version 12-June-2003
+              OMA-SyncML-DevInfo_V1_1_2-20030612-A -->
+    <!-- see: SyncML Device Information DTD, version 1.1.1, 2002-10-02 -->
+    <TagTokens>
+      <TAG token="05" name="CTCap" />
+      <TAG token="06" name="CTType" />
+      <TAG token="07" name="DataStore" />
+      <TAG token="08" name="DataType" />
+      <TAG token="09" name="DevID" />
+      <TAG token="0A" name="DevInf" />
+      <TAG token="0B" name="DevTyp" />
+      <TAG token="0C" name="DisplayName" />
+      <TAG token="0D" name="DSMem" />
+      <TAG token="0E" name="Ext" />
+      <TAG token="0F" name="FwV" />
+      <TAG token="10" name="HwV" />
+      <TAG token="11" name="Man" />
+      <TAG token="12" name="MaxGUIDSize" />
+      <TAG token="13" name="MaxID" />
+      <TAG token="14" name="MaxMem" />
+      <TAG token="15" name="Mod" />
+      <TAG token="16" name="OEM" />
+      <TAG token="17" name="ParamName" />
+      <TAG token="18" name="PropName" />
+      <TAG token="19" name="Rx" />
+      <TAG token="1A" name="Rx-Pref" />
+      <TAG token="1B" name="SharedMem" />
+      <TAG token="1C" name="Size" />
+      <TAG token="1D" name="SourceRef" />
+      <TAG token="1E" name="SwV" />
+      <TAG token="1F" name="SyncCap" />
+      <TAG token="20" name="SyncType" />
+      <TAG token="21" name="Tx" />
+      <TAG token="22" name="Tx-Pref" />
+      <TAG token="23" name="ValEnum" />
+      <TAG token="24" name="VerCT" />
+      <TAG token="25" name="VerDTD" />
+      <TAG token="26" name="Xnam" />
+      <TAG token="27" name="Xval" />
+      <TAG token="28" name="UTC" />
+      <TAG token="29" name="SupportNumberOfChanges" />
+      <TAG token="2A" name="SupportLargeObjs" />
+    </TagTokens>
+  </App>
+</wbxml>

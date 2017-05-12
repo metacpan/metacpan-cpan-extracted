@@ -1,0 +1,77 @@
+Revision history for Perl extension Win32::Console
+
+0.10 2013-11-28
+
+- Fix required perl version 5.6 -> 5.006.
+
+- Add Github repo link to META.yml 
+
+- Typo fixes by David Steinbrunner. 
+
+0.09 2008-06-13
+
+- Move sample.pl to eg/sample.pl so that it doesn't get installed.
+
+- Use T_BOOL instead of T_IV for BOOL typemap entry so that
+  the code doesn't warn on undef.
+
+0.08 2008-04-17
+
+- version 0.08 for separate upload to CPAN
+
+- updated email addresses
+
+- simplified Makefile.PL
+
+- added META.yml
+
+- renamed test.pl to sample.pl because it doesn't generate TAP output
+
+- casts to suppress compiler warnings under Win64
+
+0.07 2004-08-05
+
+- Rename GRAY to LIGHTGRAY and add definitions for the "real" GRAY
+  colors (James K. Lowden).
+
+
+0.06 2003-07-09
+
+- Add get_Win32_IPC_HANDLE() method so that Win32::IPC can wait
+  on a console handle (Christopher J. Madsen)
+
+
+0.05 2003-06-25
+
+- Add SetIcon() method to change the icon of the window
+  (Christopher J. Madsen)
+
+
+0.04 2003-06-06
+
+- Don't export the scalar variables to %main:: but into the
+  callers namespace (Christopher J. Madsen)
+
+
+0.031 1999-09-24
+
+- Fixed typo in GenerateCtrlEvent().
+
+- Converted and added pod documentation (Jan Dubois).
+
+
+0.03 1997-04-07
+
+- Added "GenerateCtrlEvent" method.
+
+- The PLL file now comes in 2 versions, one for Perl version 5.001
+  (build 110) and one for Perl version 5.003 (build 300 and higher,
+  EXCEPT 304).
+
+- added an installation program that will automatically copy the
+  right version in the right place.
+
+
+0.01 1997-02-09
+
+- First public release

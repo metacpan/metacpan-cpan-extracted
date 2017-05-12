@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+     xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+     xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+     xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+ <url>
+   <loc>http://example.com/sample1.html</loc>
+   <lastmod>2014</lastmod>
+   <changefreq>Never</changefreq>
+   <priority>0.1</priority>
+   <image:image>
+     <image:loc>http://example.com/image1.jpg</image:loc>
+     <image:caption>Caption 1</image:caption>
+     <image:title>Title 1</image:title>
+     <image:license>http://www.mozilla.org/MPL/2.0/</image:license>
+     <image:geo_location>Town 1, Region 1</image:geo_location>
+   </image:image>
+   <image:image>
+     <image:loc>http://example.com/image2.jpg</image:loc>
+     <image:caption>Caption 2</image:caption>
+     <image:title>Title 2</image:title>
+     <image:license>http://www.mozilla.org/MPL/2.0/</image:license>
+     <image:geo_location>Town 2, Region 1</image:geo_location>
+   </image:image>
+   <video:video>
+     <video:content_loc>http://example.com/video1.flv</video:content_loc>
+     <video:player_loc allow_embed="yes" autoplay="ap=1">http://example.com/video_player.swf?video=1</video:player_loc>
+     <video:thumbnail_loc>http://example.com/thumbs/1.jpg</video:thumbnail_loc>
+     <video:title>Video Title 1</video:title>
+     <video:description>Video Description 1</video:description>
+   </video:video>
+ </url> 
+ <url>
+   <loc>http://example.com/sample2.html</loc>
+   <lastmod>2014</lastmod>
+   <changefreq>Never</changefreq>
+   <priority>0.8</priority>
+   <mobile:mobile/>
+   <image:image>
+     <image:loc>http://example.com/image3.jpg</image:loc>
+     <image:caption>Caption 3</image:caption>
+     <image:title>Title 3</image:title>
+     <image:license>http://www.mozilla.org/MPL/2.0/</image:license>
+     <image:geo_location>Town 1, Region 2</image:geo_location>
+   </image:image>
+   <image:image>
+     <image:loc>http://example.com/image4.jpg</image:loc>
+     <image:caption>Caption 4</image:caption>
+     <image:title>Title 4</image:title>
+     <image:license>http://www.mozilla.org/MPL/2.0/</image:license>
+     <image:geo_location>Town 2, Region 2</image:geo_location>
+   </image:image>
+   <video:video>
+     <video:content_loc>http://example.com/video2.flv</video:content_loc>
+     <video:player_loc allow_embed="yes" autoplay="ap=1">http://example.com/video_player.swf?video=2</video:player_loc>
+     <video:thumbnail_loc>http://example.com/thumbs/2.jpg</video:thumbnail_loc>
+     <video:title>Video Title 2</video:title>
+     <video:description>Video Description 2</video:description>
+   </video:video>
+ </url> 
+</urlset> 

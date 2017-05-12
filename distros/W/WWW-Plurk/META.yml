@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                WWW-Plurk
+version:             0.02
+abstract:            Unoffical plurk.com API
+license:             perl
+author:              
+    - Andy Armstrong <andy@hexten.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Data::Dumper:                  0
+    DateTime::Format::Mail:        0
+    Getopt::Long:                  0
+    HTML::Tiny:                    0
+    HTTP::Cookies:                 0
+    JSON:                          2.00
+    LWP::UserAgent:                0
+    Math::Base36:                  0
+    Test::Deep:                    0
+    Test::More:                    0
+    Time::Piece:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

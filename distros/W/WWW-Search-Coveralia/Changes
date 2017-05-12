@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Search::Coveralia.
+
+0.001 2014-11-08T23:41+02:00
+ - First stable release
+ - Use Test::RequiresInternet
+
+0.000_001 2014-11-01T00:40+02:00
+ - Initial release

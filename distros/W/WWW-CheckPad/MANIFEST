@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+my-sample/export-as-csv.pl
+my-sample/sandbox.pl
+t/WWW-CheckPad.t
+lib/WWW/CheckPad.pm
+lib/WWW/CheckPad/CheckList.pm
+lib/WWW/CheckPad/CheckItem.pm
+lib/WWW/CheckPad/TodoParser.pm
+lib/WWW/CheckPad/ListParser.pm
+lib/WWW/CheckPad/Base.pm
+lib/WWW/CheckPad/Parser.pm
+lib/WWW/CheckPad.pod
+lib/WWW/CheckPad/CheckList.pod
+lib/WWW/CheckPad/CheckItem.pod
+lib/WWW/CheckPad/Cookbook.pod
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,3 @@
+Following things have to be done next...
+ * even more testing
+ * switch time representations from epoc seconds to ISO8601 format

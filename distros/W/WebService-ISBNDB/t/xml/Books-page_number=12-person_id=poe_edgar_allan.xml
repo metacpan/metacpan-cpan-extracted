@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:38Z">
+<BookList total_results="252" page_size="10" page_number="12" shown_results="10">
+<BookData book_id="tales_of_horror" isbn="0886467934">
+<Title>Tales of horror</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="audio_language_studies">Don Mills, Ont. : Audio Language Studies, [1986]</PublisherText>
+<Details dewey_decimal="" physical_description_text="2 sound cassettes, and 1 transcript ; in container, 23 x 17 x 4 cm." language="eng" edition_info="$29.95" dewey_decimal_normalized="" lcc_number="" change_time="2004-08-06T22:53:08Z" price_time="2006-10-08T07:58:53Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Horror" store_url="http://isbndb.com/x/book/tales_of_horror/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:35Z" currency_rate="1" price="22.7" />
+<Price store_isbn="" store_title="Tales of Horror" store_url="http://isbndb.com/x/book/tales_of_horror/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:35Z" currency_rate="1" price="49.94" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="National Library of Canada" last_update="2004-08-06T22:53:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-167-tales_of_horror-20040806.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_horror_a02" isbn="0886460263">
+<Title>Tales of Horror</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="dh_audio">Dh Audio</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Audio Cassette; 1985-05" dewey_decimal_normalized="" lcc_number="" change_time="2006-03-24T07:25:37Z" price_time="2006-10-08T07:58:56Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780886460266" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-24T07:25:44Z" currency_rate="1" price="11.23" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_horror_a02/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:35Z" currency_rate="1" price="5.77" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_horror_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:35Z" currency_rate="1" price="5.43" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_horror_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:36Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_horror_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:36Z" currency_rate="1" price="20" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_horror_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="5.48" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_imagination" isbn="046001336X">
+<Title>Tales of mystery and imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; introduction by Padraic Colum</AuthorsText>
+<PublisherText publisher_id="dent">London : Dent, 1908</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xiii, 527 p. ; 19 cm." language="eng" edition_info="(pbk.)" dewey_decimal_normalized="813.3" lcc_number="" change_time="2003-11-04T15:47:53Z" price_time="2006-10-08T07:58:59Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="TALES OF MYSTERY AND IMAGINATION" store_url="http://www.biblio.com/details.php?dcx=54562928&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T21:46:12Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780460013369" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T21:46:13Z" currency_rate="1" price="7.35" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:36Z" currency_rate="1" price="10.47" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:37Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination (Everyman Pbs.)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:45Z" currency_rate="1" price="2.96" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Adelaide University (Adelaide, Australia)" last_update="2003-11-04T15:47:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-1-tales_of_mystery_and_imagination-20031104.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_imagination_a01" isbn="0460003364">
+<Title>Tales of mystery and imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; introduction by Padraic Colum</AuthorsText>
+<PublisherText publisher_id="dent">London : Dent, 1908</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xiii, 527 p. ; 19 cm." language="eng" edition_info="(hardback)" dewey_decimal_normalized="813.3" lcc_number="" change_time="2003-11-04T15:47:53Z" price_time="2006-10-08T07:59:03Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780460003360" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-17T10:12:50Z" currency_rate="1" price="12.02" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://www.biblio.com/details.php?dcx=83782521&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-17T10:12:50Z" currency_rate="1" price="11.62" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination (Everyman's Library)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:36Z" currency_rate="1" price="7.67" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:38Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:49Z" currency_rate="1" price="1.3" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:47Z" currency_rate="1" price="4.5" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Adelaide University (Adelaide, Australia)" last_update="2003-11-04T15:47:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-1-tales_of_mystery_and_imagination_a01-20031104.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_imagination_a02" isbn="058254159X">
+<Title>Tales of mystery and imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; simplified by Roland John and Michael West; illustrated by Per Dahlerg</AuthorsText>
+<PublisherText publisher_id="longman">Harlow, Essex, England : Longman, 1988.</PublisherText>
+<Details dewey_decimal="" physical_description_text="74 p. : col. ill ; 20 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-03-18T08:40:52Z" price_time="2006-10-08T07:59:07Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Mystery and Imagination: (Stage 4)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-03-22T01:27:14Z" currency_rate="1" price="8.6" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-03-22T01:27:14Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination, Stage 4 (Longman Classics Series)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:37Z" currency_rate="1" price="0.49" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination, Stage 4 (Longman Classics Series)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:37Z" currency_rate="1" price="0.67" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination, Stage 4 (Longman Classics Series)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:38Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination (Longman Classics Series)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:50Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a02/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:49Z" currency_rate="1" price="9.3" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Hong Kong" last_update="2004-03-18T08:40:52Z" marc_url="http://isbndb.com/x/libdata/isbndb-325-tales_of_mystery_and_imagination_a02-20040318.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="john_roland">John, Roland</Person>
+<Person person_id="west_michael_o">West, Michael O.</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_imagination_a03" isbn="0582084830">
+<Title>Tales of mystery and imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe; simplified by R. John; introduction and questions by Rowena Akinyemi</AuthorsText>
+<PublisherText publisher_id="longman">Harlow : Longman, 1993.</PublisherText>
+<Details dewey_decimal="813.3" physical_description_text="viii, 104 p. ; 20cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="" change_time="2004-07-29T22:19:12Z" price_time="2006-10-08T07:59:10Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a03/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:38Z" currency_rate="1" price="73.45" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination (Longman Fiction S. )" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a03/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:39Z" currency_rate="1" price="96.73" />
+<Price store_isbn="" store_title="Tales Of Mystery And The Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a03/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:50Z" currency_rate="1" price="4.85" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a03/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:52Z" currency_rate="1" price="8.96" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2004-07-29T22:19:12Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-tales_of_mystery_and_imagination_a03-20040729.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="john_roland">John, Roland</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_imagination_a04" isbn="1853268445">
+<Title>Tales of Mystery and Imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="universal_sales_marketing">Universal Sales Marketing</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Unknown Binding" dewey_decimal_normalized="" lcc_number="" change_time="2005-12-29T23:52:21Z" price_time="2005-12-29T23:59:23Z" />
+<Summary>Award-winning fantasy illustrator Gary Kelley writes, "I have selected three of Edgar Allan Poe's best short stories.... I chose 'The Fall of the House of Usher' for its classic Gothic images and its dark, melancholic central characters, including the house itself. 'The Black Cat' is ... appealing to me for its use of mystery and foreboding that takes us to a horrifying climax. 'The Cask of Amontillado' ... my personal favorite, [is] a simple narrative of revenge set in the contrasting worlds of carnival and catacomb." Click on the book's cover for a closer look, but the reproduction doesn't really do justice to the richness of color in Kelley's shadowy, atmospheric paintings. (The cat's eye is green, and its tongue is pink.) This gorgeous edition has 20 full- and double-page paintings, including a melancholy portrait of Poe; each page of text is surrounded by subtle decorative frames. The images of Roderick and Madeleine Usher are especially effective.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-12-29T23:52:27Z" currency_rate="1" price="2.97" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-29T23:52:27Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-29T23:52:27Z" currency_rate="1" price="1.13" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2005-12-29T23:52:27Z" currency_rate="1" price="2.9" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=54517661&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-29T23:52:28Z" currency_rate="1" price="1.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_imagination_a04/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-29T23:59:23Z" currency_rate="1" price="1.15" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_terror" isbn="0140367209">
+<Title>Tales of mystery and terror</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="puffin_books">London ; Puffin Books, 1990.</PublisherText>
+<Details dewey_decimal="" physical_description_text="235 p. ; 20 cm." language="eng" edition_info="(pbk. : cover)" dewey_decimal_normalized="" lcc_number="" change_time="2003-11-01T04:33:12Z" price_time="2006-10-03T21:45:21Z" />
+<Summary></Summary>
+<Notes>The sphinx -- The fall of the house of Usher -- The oval portrait -- MS found in a bottle -- A descent into the maelstrom -- The tell-tale heart -- The oblong box -- The masque of the red death -- Hop-frog -- Some words with a mummy -- William Wilson -- The black cat -- The pit and the pendulum.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="3.4" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror (Puffin Classics S.)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror (Puffin Classics S.)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror (Puffin Classics S.)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=2587045" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="4.24" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror (Puffin Classics)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:46Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30016689%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:47Z" currency_rate="1" price="4.49" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:47Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780140367201" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:47Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror " store_url="20393955&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:49Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0140367209&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:51Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:54Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:54Z" currency_rate="1" price="2.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:44:55Z" currency_rate="1" price="1.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:44:55Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror by Edgar Allan Poe (1995)" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T21:45:08Z" currency_rate="1" price="0.93" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_and_terror/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:45:16Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Terror Product 517190" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.517190&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T21:45:21Z" currency_rate="1" price="4.69" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american_juvenile_fiction">Horror tales, American -- Juvenile fiction</Subject>
+<Subject subject_id="detective_and_mystery_stories_american_juvenile_fiction">Detective and mystery stories, American -- Juvenile fiction</Subject>
+<Subject subject_id="horror_fiction">Horror fiction</Subject>
+<Subject subject_id="mystery_fiction">Mystery fiction</Subject>
+<Subject subject_id="short_stories">Short stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Salt Lake City Public Library" last_update="2003-11-01T04:33:12Z" marc_url="http://isbndb.com/x/libdata/isbndb-260-tales_of_mystery_and_terror-20031031.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_and_terror_a01" isbn="1577658159">
+<Title>Tales of Mystery and Terror</Title>
+<TitleLong>Tales of Mystery and Terror (Great Illustrated Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, Marjorie P. Katz, </AuthorsText>
+<PublisherText publisher_id="abdo_publishing_company">Abdo Publishing Company</PublisherText>
+<Details dewey_decimal="" physical_description_text="238 pages" language="" edition_info="Library Binding; 2002-01-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-08-28T01:36:46Z" price_time="2006-10-08T08:04:38Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="marjorie_p_katz">Marjorie P. Katz</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mystery_imagination" isbn="0794501869">
+<Title>Tales of mystery &amp; imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>from the stories by Edgar Allan Poe; retold by Tony Allan; with introduction and notes by Anthony Marks; illustrated by Barry Jones</AuthorsText>
+<PublisherText publisher_id="edc_pub">Tulsa, Okla. : EDC Pub., 2004.</PublisherText>
+<Details dewey_decimal="" physical_description_text="124 p. : ill. ; 20 cm." language="eng" edition_info="$4.95" dewey_decimal_normalized="" lcc_number="" change_time="2006-03-09T05:06:05Z" price_time="2006-10-04T20:30:41Z" />
+<Summary>This book is a retelling of some of Poe's classic tales of terror, including "The Masque of the Red Death," "The Pit and the Pendulum," "The Telltale Heart," "The Fall of the House of Usher," and other tales.</Summary>
+<Notes>4-8Medialog, Inc.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:30Z" currency_rate="1" price="3.71" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0794501869&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-04T18:23:30Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:30Z" currency_rate="1" price="3.53" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:31Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780794501860" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:31Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D36333075%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:32Z" currency_rate="1" price="4.45" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:32Z" currency_rate="1" price="3" />
+<Price store_isbn="" store_title="Tales of Mystery &amp;amp; Imagination " store_url="97788402&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:32Z" currency_rate="1" price="1.7" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:32Z" currency_rate="1" price="3.99" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:32Z" currency_rate="1" price="4.95" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:34Z" currency_rate="1" price="3.37" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination (Paperback Classics)" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:34Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination Product 2614990" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2614990&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-04T18:23:35Z" currency_rate="1" price="4.65" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination (Paperback Classics)" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T18:23:37Z" currency_rate="1" price="4.95" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination (Paperback Classics)" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:23:37Z" currency_rate="1" price="1.67" />
+<Price store_isbn="" store_title="Tales of Mystery &amp; Imagination (Paperback Classics)" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:49:12Z" currency_rate="1" price="4.95" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination" store_url="http://isbndb.com/x/book/tales_of_mystery_imagination/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-04T20:30:41Z" currency_rate="1" price="4.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_fiction">Horror fiction</Subject>
+<Subject subject_id="short_stories">Short stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Clive Public Library  (Clive, Iowa)" last_update="2006-03-09T05:06:05Z" marc_url="http://isbndb.com/x/libdata/isbndb-57-tales_of_mystery_imagination-20060308.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="allan_tony">Allan, Tony</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="jones_barry_e">Jones, Barry E.</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

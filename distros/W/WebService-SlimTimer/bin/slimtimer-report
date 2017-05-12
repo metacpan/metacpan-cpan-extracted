@@ -1,0 +1,216 @@
+#!/usr/bin/env perl
+
+# PODNAME: slimtimer-report
+#
+# ABSTRACT: Simple script to report all SlimTimer entries in the given interval.
+
+
+use strict;
+use warnings;
+
+use DateTime;
+use File::Spec;
+use File::Slurp;
+use Getopt::Long::Descriptive;
+use YAML::XS;
+
+use WebService::SlimTimer;
+
+# Parse the command line first.
+my ($opt, $usage) = describe_options(
+        '%c %o [start-date [end-date]]',
+        [ 'task|t=s'    => 'Only report time spent on the specified task.' ],
+        [ 'version'     => 'Output program version and exit.' ],
+        [ 'help'        => 'Print usage message and exit.' ]
+    );
+
+print("Usage: $usage"), exit if $opt->help;
+print("WebService::SlimTimer version $WebService::SlimTimer::VERSION.\n"), exit
+    if $opt->version;
+
+my %range;
+if ( @ARGV > 2 ) {
+    die "Too many arguments.\nUsage: $usage"
+}
+
+if ( @ARGV > 0 ) {
+    use DateTime::Format::Natural;
+
+    my $parser = DateTime::Format::Natural->new;
+
+    $range{start} = $parser->parse_datetime($ARGV[0]);
+    if ( !$parser->success ) {
+        die "Incorrect start date: " . $parser->error . "\n"
+    }
+
+    if ( @ARGV == 2 ) {
+        $range{end} = $parser->parse_datetime($ARGV[1]);
+        if ( !$parser->success ) {
+            die "Incorrect end date: " . $parser->error . "\n"
+        }
+    }
+}
+
+
+# Check the config file next, we need it to do anything non-trivial.
+my $config_file;
+if ( $^O eq 'MSWin32' ) {
+    $config_file = File::Spec->catfile($ENV{APPDATA}, "slimtimer.ini");
+}
+else {
+    $config_file = File::Spec->catfile($ENV{HOME}, ".slimtimerrc");
+}
+
+if ( ! -r $config_file ) {
+    print "Please create file $config_file with the the following contents:\n"
+        . "\n"
+        . "     api_key: api-key-in-hex\n"
+        . "     login: your\@email.address\n"
+        . "     password: secret-password\n"
+        . "\n";
+    exit 1
+}
+
+if ( $^O ne 'MSWin32' ) {
+    my $mode = (stat($config_file))[2];
+    if ( $mode & 0044 ) {
+        warn "File $config_file shouldn't be readable by others.\n"
+    }
+}
+
+my $config = Load(scalar read_file($config_file));
+
+for (qw(api_key login password)) {
+    die "Required parameter $_ not defined in configuration file $config_file.\n"
+        if !exists $config->{$_}
+}
+
+my $st = WebService::SlimTimer->new($config->{api_key});
+$st->login($config->{login}, $config->{password});
+
+my $task_id;
+if ( my $task_name = $opt->task ) {
+    for ($st->list_tasks()) {
+        if ( $_->name eq $task_name ) {
+            $task_id = $_->id;
+            last
+        }
+    }
+
+    die qq{Task with the name "$task_name" not found.\n}
+        unless defined $task_id;
+
+    my @entries = $st->list_task_entries($task_id, %range);
+
+    my $duration;
+    map { $duration += $_->duration } @entries;
+
+    print qq{Time spent on "$task_name": } . format_time($duration) . "\n";
+}
+else { # Report for all tasks.
+    my @entries = $st->list_entries(%range);
+
+    my (%durations, %task_names);
+    for (@entries) {
+        $durations{$_->task_id} += $_->duration;
+        $task_names{$_->task_id} = $_->task_name;
+    }
+
+    print '-' x 50 . "\n";
+    printf "%-40s%10s\n", 'Task', 'Time';
+    print '-' x 50 . "\n";
+
+    sub report_one_task
+    {
+        my ($name, $duration) = @_;
+        printf "%-40s%10s\n", $name, format_time($duration)
+    }
+
+    my $total = 0;
+    for (sort { $task_names{$a} cmp $task_names{$b} } keys %durations) {
+        report_one_task($task_names{$_}, $durations{$_});
+        $total += $durations{$_};
+    }
+
+    print '-' x 50 . "\n";
+
+    report_one_task('Total', $total);
+}
+
+exit 0;
+
+sub format_time
+{
+    my ($duration) = @_;
+    sprintf "%4d:%02d:%02d",
+        $duration / 3600,
+        ($duration % 3600) / 60,
+        $duration % 60
+}
+
+__END__
+=pod
+
+=head1 NAME
+
+slimtimer-report - Simple script to report all SlimTimer entries in the given interval.
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+slimtimer-report [-t|--task name] [start-date [end-date]]
+
+For example:
+
+  slimtimer-report today
+
+=head1 DESCRIPTION
+
+Without the task option, output a table summarizing all entries in the given
+time interval as well as the total time spent on all of them.
+
+With the task option only output the time spent on the specified task.
+
+The times in the output are always given in HH:MM:SS format.
+
+=head1 OPTIONS
+
+By default, the entries for the entire interval are retrieved. Usually a
+C<start-date> should be specified to limit the output to only the entries
+after the specified date. An optional C<end-date> can also be specified to
+limit the output to the entries started before the end date as well.
+
+Both dates are parsed using L<DateTime::Format::Natural> and so can be
+specified in a variety of ways.
+
+=head1 CONFIGURATION FILE
+
+The script requires a simple configuration file to run. If the configuration
+file doesn't exist, it outputs a message with the full path of the expected
+configuration file name asking to create it. The contents of the file should
+be:
+
+  api_key: 30-letter-hex-digit-key
+  login: your@email.here
+  password: slimtimer-password
+
+=head1 SEE ALSO
+
+L<WebService::SlimTimer>
+
+=head1 AUTHOR
+
+Vadim Zeitlin <vz-cpan@zeitlins.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Vadim Zeitlin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

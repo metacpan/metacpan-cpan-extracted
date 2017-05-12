@@ -1,0 +1,16 @@
+<html lang="en-US">
+<perl method="head">
+<head>
+<title>Head</title>
+</head>
+</perl>
+<perl method="body">
+<body>
+<p>
+Body
+</body>
+</perl>
+</html>
+__PERL__
+sub head { shift()->render }
+sub body { shift()->render }

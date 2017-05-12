@@ -1,0 +1,14 @@
+Revision history for WebService-KuronekoYamato
+
+0.0.5  Sun Mar 20 22:44:01 2011
+       Add user_agent in results ( $res->[0]->{user_agent} = __PACKAGE_NAME__; ) .
+
+0.0.3  Wed Nov 25 12:30:00 2009
+       libwww-perlの仕様変更に対応（Encode）
+       2009.11.18頃に行われたヤマト運輸荷物調査サイト構造変更に対応
+
+0.0.2  Sun Sep 28 01:42:00 2008
+       CPAN Testでみなビルド失敗するので、テスト内容を見直した
+
+0.0.1  Thu Aug 28 00:53:01 2008
+       Initial release.

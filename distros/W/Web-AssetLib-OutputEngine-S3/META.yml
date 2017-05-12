@@ -1,0 +1,45 @@
+---
+abstract: 'allows exporting an asset or bundle to an AWS S3 Bucket'
+author:
+  - 'Ryan Lang <rlang@cpan.org>'
+build_requires:
+  Test::Compile: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-AssetLib-OutputEngine-S3
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Web::AssetLib::OutputEngine::S3:
+    file: lib/Web/AssetLib/OutputEngine/S3.pm
+    version: '0.042'
+requires:
+  DateTime::Format::HTTP: '0'
+  Kavorka: '0'
+  Moo: '0'
+  Paws: '0'
+  Web::AssetLib: '0'
+  perl: '5.018004'
+resources:
+  bugtracker: https://github.com/ryan-lang/Web-AssetLib-OutputEngine-S3/issues
+  homepage: https://github.com/ryan-lang/Web-AssetLib-OutputEngine-S3
+  repository: git://github.com/ryan-lang/Web-AssetLib-OutputEngine-S3.git
+version: '0.042'
+x_contributors:
+  - 'Ryan Lang <rlang@me.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,179 @@
+2008-07-07  Lars Hartmann  <lars (at) chaotika (dot) org>
+	* Version 0.0135 Released
+	
+	* NEW: Updated to 0.0135
+
+	* lib/WWW/Scroogle.pm: version bumped to 1.135
+
+	* lib/WWW/Scroogle/Result.pm:  version bumped to 0.004
+
+	* lib/WWW/Scroogle.pm: removed hard dependency on perl 5.8.8
+
+	* lib/WWW/Scroogle/Result.pm: same here
+
+2008-07-06  Lars Hartmann  <lars (at) chaotika (dot) org>
+	
+	* Version 0.0134 Released
+
+	* NEW: Updated to 0.0134
+
+	* lib/WWW/Scroogle.pm: version bumped to 0.134
+
+2008-07-06  Lars Hartmann  <lars (at) chaotika (dot) org>
+	
+	* Version 0.0133 Released
+	
+	* NEW: Updated to 0.0133
+
+	* lib/WWW/Scroogle.pm: version bumped to 0.133
+
+	* lib/WWW/Scroogle.pm (position): simplified and commented function
+
+	* lib/WWW/Scroogle.pm (positions): commented function
+
+	* lib/WWW/Scroogle.pm (get_results_matching): commented function
+
+	* lib/WWW/Scroogle.pm (languages): introduced lazy methods and commented function
+
+2008-07-06  Lars Hartmann  <lars (at) chaotika (dot) org>
+
+	* Version 0.0132_001 Released
+
+2008-07-06  Lars Hartmann  <lars (at) chaotika (dot) org>
+
+	* NEW: Updated to 0.0132_001
+
+	* NEW: Changed build System from MakeMaker to Module::Build
+
+	* MANIFEST: added META.yml and Build.PL
+
+	* Makefile.PL: displaced by a Module::Build generated version
+
+	* lib/WWW/Scroogle.pm (POD-CREDITS): section added
+
+	* Build.PL: added
+
+	* META.yml: added
+
+	* lib/WWW/Scroogle.pm: bumped version to 0.0132_001
+
+	* README: bumped version to 0.0132_001
+
+2008-07-06  Lars Hartmann  <lars (at) chaotika (dot) org>
+	* Makefile.PL: added "use 5.008008" again
+
+	* Makefile.PL: cleaned it up and added depends
+
+2008-07-03  Lars Hartmann  <lars (at) chaotika (dot) org>
+	Version 0.013 Released
+	
+	* NEW: Updated to 0.0132
+
+	* README: cleaned it up
+
+2008-07-03  Lars Hartmann  <lars (at) chaotika (dot) org>
+	Version 0.0131 Released
+	
+	* NEW: Updated to 0.0131
+
+	* lib/WWW/Scroogle.pm (POD-CAVEAT): added CAVEAT to inform the users about the legal status of scroogle.org - thanks moritz for pointing me to that
+
+2008-07-03  Lars Hartmann  <lars (at) chaotika (dot) org>
+
+	* lib/WWW/Scroogle.pm: bumped version to 0.0131
+
+	* lib/WWW/Scroogle.pm: changed require to use
+
+2008-07-02  Lars Hartmann  <lars (at) chaotika (dot) org>
+	Version 0.013 Released
+	
+	* NEW: Updated to 0.013
+
+	* lib/WWW/Scroogle.pm (POD): solved another obscurity - thanks moritz
+
+	* Makefile.PL: changed LWP Depend from version 5 to 5.808 as <5.08 gives strange warnings - again thanks tinita and moritz
+
+2008-07-02  Lars Hartmann  <lars (at) chaotika (dot) org>
+	Version 0.012 Released
+	
+	* NEW: Updated to 0.012
+
+	* lib/WWW/Scroogle.pm (POD): fixed another Typo and another obscuritie - again thanks to moritz
+
+2008-07-02  Lars Hartmann  <lars (at) chaotika (dot) org>
+	Version 0.011 Released.
+
+	* NEWS: Updated to 0.011
+
+	* lib/WWW/Scroogle.pm (POD): corrected a few obscurities - thanks moritz
+
+	* t/pod_coverage.t: fixed error - thanks tinita for uncovering it
+
+2008-07-02  Lars Hartmann  <lars (at) chaotika (dot) org>
+
+	Version 0.010 Released.
+
+	* NEWS: Updated to 0.010
+
+	* t/02-WWW-Scroogle.t: added tests for the new method 'get_results_matching'
+
+	* lib/WWW/Scroogle.pm (get_results_matching): added method
+
+	* lib/WWW/Scroogle.pm (positions): Changed to use the new method 'get_results_matching'
+
+	* lib/WWW/Scroogle.pm: cleaned up Documentation
+
+	* lib/WWW/Scroogle.pm: Version bumped to 0.010
+
+	* lib/WWW/Scroogle/Result.pm: added documentation
+
+	* lib/WWW/Scroogle/Result.pm: cleaned up Documentation
+
+	* lib/WWW/Scroogle/Result.pm: Version bumped to 0.003
+
+2008-07-01  Lars Hartmann  <lars (at) chaotika (dot) org>
+
+	* t/02-WWW-Scroogle.t: extended tests (got 100% test-coverage now)
+	
+	* t/02-WWW-Scroogle.t: beautified
+
+	* lib/WWW/Scroogle.pm (perform_search): corrected check
+	
+	* lib/WWW/Scroogle.pm (get_results): corrected typo in error message (now i know what tests are good for ;-)
+	
+	* lib/WWW/Scroogle.pm (position): position does now return boolean false if no match was found
+	
+	* lib/WWW/Scroogle.pm (position): changed to allow regular expressions as string
+	
+	* lib/WWW/Scroogle.pm (POD SYNOPSIS): method string() is not jet implemented in WWW::Scroogle::Result, changed to url()
+	
+	* lib/WWW/Scroogle.pm (positions): added method
+	
+	* lib/WWW/Scroogle.pm (get_result): beautified
+	
+	* lib/WWW/Scroogle.pm (position): beautified
+	
+	* lib/WWW/Scroogle.pm (positions): beautified
+
+	* Makefile.PL: masked email
+
+2008-06-24 Lars Hartmann <lars (at) chaotika (dot) org>
+
+	* updated WWW::Scroogle::Results and WWW::Scroogle::Result to Version 0.002
+2008-06-18 Lars Hartmann <lars (at) chaotika (dot) org>
+
+	* got it fully workin now
+
+2008-06-13 Lars Hartmann <lars (at) chaotika (dot) org>
+
+	* introduced testing
+
+2008-05-28 Lars Hartmann <lars (at) chaotika (dot) org>
+
+	* Documentation updates
+
+	* fixed bug which prevented it from working
+
+2008-05-25 Lars Hartmann <lars (at) chaotika (dot) org>
+
+	* Initial Import

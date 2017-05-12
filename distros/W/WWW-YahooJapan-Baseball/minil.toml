@@ -1,0 +1,6 @@
+name = "WWW-YahooJapan-Baseball"
+# badges = ["travis"]
+authority="cpan:TAKEBAYAS"
+
+module_maker="ModuleBuildTiny"
+

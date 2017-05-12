@@ -1,0 +1,66 @@
+{
+   "abstract" : "Simple web scraper with XPath support",
+   "author" : [
+      "Roger Pettett <rmp@psyphi.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Scraper-Lite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.8"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CAM::PDF" : "1.54",
+            "CGI" : "3.52",
+            "DBI" : "1.616",
+            "Data::Dumper" : "2.130_02",
+            "Date::Parse" : "2.30",
+            "DateTime" : "0.70",
+            "File::Temp" : "0.22",
+            "Getopt::Long" : "2.38",
+            "HTML::Entities" : "3.68",
+            "Module::Build" : "0.38",
+            "Readonly" : "1.03",
+            "Time::HiRes" : "1.972101"
+         },
+         "requires" : {
+            "Carp" : "1.02",
+            "English" : "1.01",
+            "HTML::TreeBuilder::XPath" : "0.12",
+            "LWP::UserAgent" : "6.02",
+            "Readonly" : "1.03",
+            "strict" : "1.04",
+            "warnings" : "1.06"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Scraper::Lite" : {
+         "file" : "lib/WWW/Scraper/Lite.pm",
+         "version" : "15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "15"
+}

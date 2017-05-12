@@ -1,0 +1,6 @@
+Revision history for Perl extension WebService::Mappoint.
+
+0.30  Fri May 23 12:35:13 2003
+	- original version; created by h2xs 1.20 with options
+		-AX -n WebService::Mappoint
+

@@ -1,0 +1,560 @@
+0.85    16 December 2016
+        Make ->rename_node try to ensure a valid new node name (depending on
+          formatter parameters).
+        Add dependency on CGI which is no longer core (RT#118582)
+
+0.84    23 February 2014
+        Add new options to Lucy and Plucene backends: (1) content munging
+          before search indexing, (2) total exclusion of certain nodes from
+          search indexing.
+
+0.83    22 November 2013
+        Fix bug in Lucy backend (if you wrote a node Foo Bar and then one
+          called Foo, it would delete Foo Bar from its index).
+        Make Lucy backend capable of indexing metadata as well.
+        Allow weighting of node title in Lucy search.
+
+0.82    12 October 2013
+        Fix uninitialised value warnings in Lucy backend
+
+0.81    25 May 2013
+        Fix compatibility with DBD::SQLite 1.83+ (RT#84680)
+        Added a backend for searching with Lucy - Wiki::Toolkit::Search::Lucy
+        Fix POD errors which are fatal with perl 5.18.
+
+0.80    3 May 2012
+        Spelling fix in Wiki::Toolkit::Search::Base
+        Fixed deprecated use of foreach ... qw (fixes #53 and #54)
+        Fixed bug with metadata_was in recent changes (#41).
+
+0.79    14 August 2010
+        Fix Win32 test failure http://www.cpantesters.org/cpan/report/8099980
+        Declare minimum required Perl version
+        (thanks to Alexandr Ciornii for the patches)
+
+0.78    16 December 2009
+        Fix various POD errors and add POD testing (#45)
+        More recent changes tests (for #41)
+        Fix transaction handling in SQLite backend (#49)
+
+0.77    24 December 2008
+        Complete support for store->list_metadata_by_type, which
+          returns a list of all the metadata values
+        Add store->list_metadata_names, which will tell you all the
+          different metadata types (names)
+        write_node: return the version of the node that was just committed,
+        if successful
+        Don't write out a new version of a node if the checksum is the
+        same as the one already stored (#43)
+        t/400_upgrade.t: skip all tests correctly if no backends
+        configured (#44)
+        Configure charset correctly when passing in an existing $dbh (#24)
+
+0.76    13 July 2008
+        Really add missing prereq of DBI!
+        Add testing of database schema upgrades (#32)
+        Move to new schema version 10, including some missing indexes
+          and support for verified flags. Note that
+          the code using this column has not yet been written (#25, #34).
+        Changed Wiki::Toolkit::Feed::Listing to use metadata_was instead of
+          metadata_wasnt, for efficiency reasons.
+        list_dangling_links, list_backlinks: don't return internal links
+          that are from a node which does not exist. This works around
+          database inconsistencies (introduced by manual deletion of nodes)
+          which should be fixed by adding constraints to the database (see #38)
+
+0.75	11 May 2008
+        Added support for selecting versions by moderation status (see
+          OpenGuides ticket #142).
+        Added "new_only" parameter to ->list_recent_changes, so you can ask
+          for e.g. all pages added in the last week.  This involved a bit of
+          a rewrite of ->list_recent_changes, so please keep an eye out for
+          any bugs that may have been introduced (I'm not convinced the test
+          suite covered everything it should have).
+        Fix some badly-formatted POD documentation which accidentally included
+          some code
+        Fix uninitialized warnings in feed tests
+        Fix database setup to ignore tables that aren't Wiki::Toolkit tables
+        Fix test suite's incorrect passing of DBIxFTSMySQL connection
+          parameters
+        Add missing prereq of DBI (caught by the CPAN testers) and don't
+          use DBI in Makefile.PL
+        Add new scripts wiki-toolkit-delete-node and
+          wiki-toolkit-revert-to-date
+
+0.74    9  June 2007
+        Added list_last_version_before method, to get the version of all the
+         nodes at a given point in time
+        Updated version on Text::WikiFormat dependency to avoid long-standing
+         test failure with old version
+        Bump version number of Wiki::Toolkit::Plugin as this was not done
+         the last time it was changed (for CPAN.pm compatibility)
+
+0.73    12 December 2006
+        Added parse_feed_timestamp method
+        Added encoding parameter to the Feed methods, to allow overriding
+          the store's encoding.
+
+0.72    15 September 2006
+        Install wiki-toolkit-rename-node
+
+0.71    30 August 2006
+        More feed code refactoring, to allow "mini" feeds with just
+          name, and optionally distance and location. Typically used in
+          search results, especially with Wiki::Toolkit::Plugin::Locator's
+        Ability to filter by nodes without certain metadata, by type
+          or type+value ("everything without a longitude" or 
+          "everything not category=Pub")
+        Fix bug in Listing.pm pod output
+
+0.70    6 June 2006
+        Feed code has been refactored.
+        Check that the database schema is up-to-date when initializing the
+          store and abort otherwise.
+        In PostgresSQL setup code, delete orphaned content/metadata rows.
+        When we bulk delete and insert data for an upgrade, check to make
+          sure we can create the tables and indexes before dropping the old
+          tables.
+        Other miscellaneous fixes.
+
+0.69_03 13 May 2006
+        Add Wiki::Toolkit::Feed::RSS (formerly CGI::Wiki::Plugin::RSS::Modwiki)
+          and Wiki::Toolkit::Feed::Atom (formerly CGI::Wiki::Plugin::Atom)
+
+0.69_02 27 April 2006
+        Add missing new file lib/Wiki/Toolkit/Setup/Database.pm to
+          distribution.
+
+0.69_01 23 April 2006
+        *** IMPORTANT NOTICE *** This release introduces a new database schema
+        which should be considered beta in nature at this stage. It is not yet
+        suitable for deployment on production data and should only be tested
+        on copies of your production data. If it eats your data, you get to
+        keep the pieces. Additionally, functionality exposed in this beta
+        release is subject to change.
+
+        Rename to Wiki::Toolkit.
+        Support for moderation on a per-node basis.
+        Update to the database schema: added needs_moderation column to
+         node, and moderated column to content
+        You will need to run wiki-toolkit-setupdb to upgrade your database
+
+		Many more plugin points: pre_write + pre_retrieve (get to change
+		 the data), pre_moderate + post_moderate, pre_rename + post_rename,
+		 + post_delete. See test 150 for examples, and the perldoc of
+		 Wiki::Toolkit::Plugin for a description.
+
+        Merge Wiki::Toolkit::Formatter::Multiple:
+        0.02    15 September 2004
+                Applied patch from Tom Insam to fix bug with 
+                find_internal_links.
+
+        0.01    22 September 2003
+                Initial release.
+
+0.69    22 February 2006
+        Update to database schema: added an ID column to node, and changed
+          the content + metadata tables to FK to the ID field, rather than
+          the node name. Also added rails like schema_info table, to hold
+          the current database schema version number
+        You will need to run cgi-wiki-setupdb to upgrade your database
+
+0.62    26 November 2004
+        Fixed delete_node bug - now it's OK to delete eg version 2 and
+          then version 3 of a node (ie you no longer have to delete
+          versions in order newest first).
+
+0.61    3 October 2004
+        Added "ignore_case" option to ->node_exists.
+
+0.60    30 September 2004
+        Added generic ->new method to CGI::Wiki::Plugin (Tom Insam).
+
+0.59    18 September 2004
+        Added "ignore_case" option to list_recent_changes for use with
+          metadata filtering.
+
+0.58    18 September 2004
+        Even more powerful metadata filtering!  You can now supply both
+          "metadata_was" and "metadata_wasnt", or both "metadata_is"
+          and "metadata_isnt", and they will be ANDed.
+        (Also added the test I forgot to add to MANIFEST last time.)
+
+0.57    18 September 2004
+        Extended capabilities of list_recent_changes - more powerful
+          metadata filtering (see docs for details).
+
+0.56    14 September 2004
+        Added Plucene search backend (with help from Simon Cozens).
+        Applied Tom Insam's encoding patch.
+
+0.55    There wasn't one.  Something bizarre happened with PAUSE.
+
+0.54    25 June 2004
+        Let ->delete_node take an optional version parameter.
+
+0.53    18 June 2004
+        Fixed CGI::Wiki::TestLib so $iterator->number actually does something.
+
+0.52    10 June 2004
+        Add include_all_changes and between_days to list_recent_changes.
+
+0.51    8 June 2004
+        Time for a non-developer release.
+
+0.51_02 6 June 2004
+        Added support for passing in a database handle instead of
+          connection parameters (Chris Winters).
+
+0.51_01 24 February 2004
+        Refactoring of search classes in preparation for new search
+          backend.  (Simon Cozens)
+        Please test against your applications and let me know of any
+          problems ASAP.
+
+0.50    21 December 2003
+        First non-developer release with new test system.
+
+0.50_02 21 November 2003
+        Make tests skip rather than try to run zero tests if no backends
+          configured - thanks to nothingmuch via CPAN testers for the
+          test failure report.
+
+0.50_01 18 November 2003
+        Huge overhaul of test suite, no change in functionality.
+        Removed dependency on Test::MockObject and Hook::LexWrap
+          (the relevant tests are now skipped if these aren't installed).
+        Removed the examples since they were very out of date.
+        Made a small clarification to the CGI::Wiki::Plugin docs.
+
+0.49    23 September 2003
+        Added "ignore_case" option to ->list_nodes_by_metadata
+
+0.48    22 September 2003
+        Couple of small changes so I can write formatters that allow node
+          metadata to affect the rendering of the node.
+        A rewrite and renaming of the CGI::Wiki distribution is on the
+          cards - subscribe to cgi-wiki-dev if you're interested:
+          http://www.earth.li/cgi-bin/mailman/listinfo/cgi-wiki-dev
+
+0.47    29 August 2003
+        Added metadata_was and metadata_wasnt parameters to list_recent_changes
+
+0.46    14 August 2003
+        Fix for Shevek.  ->write_node used to croak if it failed to index
+          the backlinks, but since the MySQL varchar type is case-insensitive
+          by default, we were getting a duplicate key error.  As a temporary
+          fix pending a proper think about an explicit way for you to specify
+          whether you want your wiki case-sensitive or not (yes, people have
+          asked me for both), this now just warns if it has trouble writing
+          backlinks.
+
+0.45    11 August 2003
+        Removed dependency on Class::Delegation.
+        Fixed Makefile.PL to check for Lingua::Stem before trying to test
+          DBIx::FullTextSearch stuff.
+        Fixed DBIx and Search::InvertedIndex tests to take note of database
+          host if one supplied.
+
+0.44    10 July 2003
+        Fixed bug with metadata_isnt - it wasn't picking up nodes where
+          that metadata type wasn't set.
+
+0.43    10 July 2003
+        Added metadata_isnt constraint to ->list_recent_changes.
+
+0.42    16 June 2003
+        Dropped Test::Warn from the dependencies - it's too much installing
+          for too little gain (I was hardly using it).
+        Made CGI::Wiki::TestConfig::Utilities check for the Postgres
+          Search::InvertedIndex backend, and test using that if possible.
+
+0.41    27 May 2003
+        Changed the order of things when registering a plugin, so the
+          on_register method can access the datastore properly.
+
+0.40    24 May 2003
+        Added an index to the metadata table in the MySQL setup, to
+          speed up RecentChanges.  To apply this index to an existing
+          database you need to do (as the database superuser):
+
+          CREATE INDEX metadata_index ON metadata
+                       (node, version, metadata_type, metadata_value(10))
+
+        Also made the warnings in Makefile.PL and INSTALL stronger, since
+          we had another data-eating incident.
+
+0.39    21 May 2003
+        Amended Makefile.PL and INSTALL to make it absolutely clear that you
+          should not run the tests on databases containing valuable data.
+          Thanks to Rocco for, er, stress-testing this, and sorry to 'know'
+          for eating its brains...
+
+0.38    17 May 2003
+        Added ->list_dangling_links method; thanks to Simon Cozens for
+          the idea.
+
+0.37    12 May 2003
+        Oh dear.  No real changes, but I moved Extending.pod to stop it
+          getting installed as CGI::Extending.  Sorry.
+
+0.36    9 May 2003
+        Added CGI::Wiki::Plugin as a base class for plugins to inherit from.
+
+0.35    5 May 2003
+        Fixed bug in CGI::Wiki::Store::SQLite introduced with new calling
+          syntax in version shipped with 0.34.
+        Very basic start at plugin support as described in Extending.pod -
+          see 'perldoc CGI::Wiki' for details.
+
+0.34    5 May 2003
+        Moving towards adding proper plugin support - the proposed API is
+          in Extending.pod, please take a look and send comments.
+        In preparation for the above, the metadata hash passed to ->write_node
+          can now contain more complex data structures - but these will *not*
+          be stored directly, just checksummed.  The way to access them will
+          be via plugins.  See 'perldoc CGI::Wiki;' for details.
+        Also added alternative calling syntax for the CGI::Wiki::Setup::*
+          store modules, as requested by Podmaster.
+
+0.33    3 May 2003
+        Added ->fuzzy_title_match method to the Search::InvertedIndex backend
+          (CGI::Wiki::Search::SII).  You will need to re-index all existing
+          nodes in your wiki in order to take advantage of this.  Take your
+          wiki offline and do something like
+
+          my $wiki = CGI::Wiki->new( %conf );
+          # (Where %conf is exactly as you would set this up for your actual
+          #  Wiki application, including your store, search and formatter
+          #  options exactly as you use them live.)
+          my @nodes = $wiki->list_all_nodes;
+          foreach my $node ( @nodes ) {
+            my %node_data = $wiki->retrieve_node( $node );
+            $wiki->write_node( $node,
+                               $node_data{content}, 
+                               $node_data{checksum},
+                               $node_data{metadata}
+            );
+            print "Reindexed $node\n";
+          }
+
+        to refresh all the nodes in your database.  Note that for wikis
+        of more than a couple of nodes, this can take quite some time.
+
+0.32    2 May 2003
+        Fixed bug with write_node dying when using Search::InvertedIndex
+          and writing node with blank content (thanks to Bob Walker for
+          the bug report).
+
+0.31    26 April 2003
+        Added an index to the metadata table in the postgres setup, to
+          speed up RecentChanges.  To apply this index to an existing
+          database you need to do (as the database superuser):
+
+          bench=# create index metadata_nodeindex on metadata
+                   (node, version, metadata_type, metadata_value);
+
+        It will also help speed things up if you run:
+
+          bench=# analyze;
+
+        every so often, maybe once a week.
+
+0.30    22 April 2003
+        Added support for supplying 'host' parameter when connecting to
+          MySQL/Postgres databases (requested and assisted by Paul Makepeace).
+
+0.29    20 April 2003
+        Got rid of the separate bin/user-setup-* scripts, added
+          bin/cgi-wiki-setupdb and made it be installed when the rest of
+          the distribution is.
+
+0.28    6 April 2003
+        Added ->formatter accessor to Wiki.pm
+
+0.27    5 April 2003
+        Added ->reinitialise_stores method to CGI::Wiki::TestConfig::Utilities
+          to make it easier for plugins and so forth to make sure they have
+          nice virginal test stores before they start running their tests.
+          Altered my setup tests to use this.
+
+0.26    3 April 2003
+        Cleanup:
+          - Removed deprecated method retrieve_node_and_checksum.
+          - Added DBI as a prerequisite (ta Max).
+          - Fixed up the SEE ALSO in the pod.
+
+        Bugfix:
+          - The SQLite backend was failing tests with DBI 1.34 or up;
+            fixed now (with a kluge, but no worse than the one already there)
+            Thanks to DH for the test failure report.
+
+0.25    29 March 2003
+        list_recent_changes can now filter on a single metadata criterion
+          - multiple criteria coming soon.
+
+0.24    29 March 2003
+        list_recent_changes now returns any metadata attached to the node
+          as well - so you can put comments and usernames and things in there
+          and display them on RecentChanges.  Note that it no longer pretends
+          to return a comment separately since you can do it this way now.
+          See perldoc CGI::Wiki::Store::Database for the new API.
+        Moved recent changes tests out into their own file.
+
+0.23    17 March 2003
+        Fixed bug - metadata wasn't getting deleted when ->delete_node
+          was called.
+
+0.22    8 March 2003
+        Rejig of the way the tests work, in preparation for allowing
+          third-party plugins:
+
+            When 'perl Makefile.PL' is run on a CGI::Wiki distribution,
+            information will be gathered about test databases etc that
+            can be used for running tests. CGI::Wiki::TestConfig::Utilities
+            gives you convenient access to this information, so you can
+            easily write and run tests for your own CGI::Wiki plugins.
+
+        No functionality changes.
+
+0.21    6 March 2003
+        Purely a documentation update; thanks to Alex McLintock for comments.
+
+0.20    22 February 2003
+        Added simple (and intentionally naive) metadata support.  Note that
+          the database schema has changed (additional 'metadata' table), so
+          you will need to re-run the relevant database setup script again as
+          described below for upgrading to 0.15.
+        Much of this release was written on David Woolger's laptop; thanks :)
+
+0.16    5 February 2003
+        Changed CGI::Wiki::Setup::Pg to use the 'timestamp' data type
+          instead of 'datetime', since 'datetime' was deprecated and
+          has been removed in Postgres 7.3.
+        Fixed bug with supplying blank database username/password;
+          thanks to DH for the bug report.
+        Fixed mistake in pod, pointed out by Podmaster.
+
+0.15    5 January 2003
+        Amended store setup modules so their 'setup' functions don't
+          wipe pre-existing data; added 'cleardb' functions for when you
+          really do want to wipe it.
+        Along with that, amended the setup scripts in ./bin/ to take a
+          --force-preclear option.  Now they leave existing data by default.
+        Added standalone tests for CGI::Wiki::Formatter::Default
+        Added $formatter->find_internal_links method and tests.
+
+        Implemented backlinks!  Thanks to blair christensen for the idea,
+          and sorry for taking so long to get around to it.
+
+        *** IMPORTANT NOTE ***
+        *After* upgrading, you will need to re-run the relevant database setup
+        script (in ./bin/) on any databases created using earlier versions of
+        CGI::Wiki, in order that the internal_links table gets created.  From
+        version 0.15, these scripts won't affect data in existing tables, as
+        long as you don't supply the --force-preclear option, so this is safe.
+
+ ===>    *** IF YOU DON'T DO THIS THEN YOUR CODE WILL FALL OVER AND DIE. ***
+
+        You have been warned.
+
+        (You can do the database munging before you install this new version
+        -- the old versions won't mind the extra table -- but
+ ===>                     *** MAKE SURE ***
+        to invoke the scripts as something like
+          perl -Ilib bin/user-setup-[...]
+        so you get the *new* setup modules which *won't* hose your data
+        (the old ones did, ugh).)
+
+        The backlink data will also not exist for links *from* a given node
+        until you re-write that node.  Take your wiki offline then do
+        something like
+
+          my $wiki = CGI::Wiki->new( %conf );
+          # (Where %conf is exactly as you would set this up for your actual
+          #  Wiki application, including your store, search and formatter
+          #  options exactly as you use them live.)
+          my @nodes = $wiki->list_all_nodes;
+          foreach my $node ( @nodes ) {
+            my %nodedata = $wiki->retrieve_node( $node );
+            $wiki->write_node($node, $nodedata{content}, $nodedata{checksum});
+          }
+
+        to refresh all the nodes in your database.
+
+0.14    3 January 2003
+        Added $store->node_exists method and tests.
+        Amended $store->list_recent_changes to take a 'last_n_changes'
+          parameter, so you can find the last 10 (or whatever) nodes edited.
+        Made an internal change to the way ->format is delegated to the
+          formatter object, to give said object access to the store.
+
+0.13    2 January 2003
+        Minor fix - t/031_formatting.t was being reported as failing on
+          systems without support for any of the backends, since I forgot to
+          update the SKIP condition when I added six extra tests.  Thanks
+          to root@ostend.org for the report via cpan-testers.
+
+0.12    1 January 2003
+        The Search::InvertedIndex backend wasn't indexing the node titles -
+          fixed and added tests.
+        Added tests for non-MySQL Search::InvertedIndex backends and fixed
+          CGI::Wiki::Search::SII to be case-insensitive all the time (instead
+          of just when using MySQL).
+        Tweaked the documentation some more - offers to simplify the docs
+          and/or write a tutorial would be greatly appreciated.
+
+0.11    31 December 2002
+        Changes suggested by blair christensen, to allow alternate formatters.
+        See the README for details and CGI::Wiki::Formatter::Default for an
+          example.
+        Took out some leftover debug stuff from CGI::Wiki::Search::SII.
+
+0.10    19 December 2002
+        Added a Search::InvertedIndex backend; currently only tested with
+          the MySQL version of Search::InvertedIndex.  When running make test,
+          if the Search::InvertedIndex tests are being run, the following tests
+          will warn 'testdb is not open. Can't lock.' (but should pass):
+            005_setup_mysql_search_invertedindex.t
+            011_cgi_wiki.t
+
+        *** NOTE INTERFACE CHANGE ****
+        Cleaned up the initialisation of the Wiki object, at the expense of
+          a small interface change - you now need to create your store and
+          (optional) search objects yourself and pass them as arguments
+          to CGI::Wiki->new - read 'perldoc CGI::Wiki' (once installed)
+          for details, or see examples/wiki.cgi in the tarball.
+
+0.05    17 November 2002
+        I'd uploaded an unfinished version by mistake.  One day I will figure
+          out how to do this upload thing without screwing up.
+
+0.04    17 November 2002
+        Added a DBD::SQLite storage backend (thanks to blair christensen
+          for a patch that makes up part of this).
+        Added tests and docs for retrieval of old versions of pages
+          (bad Kake, should have written those before implementing the
+           feature; blair and Richard shamed me into getting it sorted now).
+        retrieve_node_and_checksum is now deprecated -- retrieve_node is
+          more clever and will return content only or a hash with content
+          plus meta-data, according to context.  So you should get at the
+          checksum via that.
+        user-setup-postgres.pl was buggy, fixed now.
+        Only two beer rewards now remain.
+
+0.03    9 November 2002
+        Forgot to regenerate and add the README (I've put it in the
+        MANIFEST now to stop that happening again).  Also forgot to
+        mention that I've upped the bribe.
+
+0.02    9 November 2002
+        Pulled out the database setup stuff into modules (Mark Fowler
+          did most of this bit, thanks).
+        Added recent_changes method and its tests, changed the example
+          wiki to show how this can be used.
+        Renamed some tests since the order they're run in matters now.
+        Added better support for noninteractive installation (with help
+          from Mark again).
+
+0.01    28 October 2002
+        Initial release.

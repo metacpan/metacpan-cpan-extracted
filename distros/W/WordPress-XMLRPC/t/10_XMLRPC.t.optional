@@ -1,0 +1,52 @@
+use Test::Simple 'no_plan';
+use strict;
+use lib './lib';
+use WordPress::XMLRPC;
+no strict 'refs';
+
+ok(1,'starting test.');
+
+
+assure_fulltesting();
+
+
+
+my $w = WordPress::XMLRPC->new(_conf('./t/wppost'));
+
+
+
+
+for my $method_name  ( $w->xmlrpc_methods ){
+   ok(1,"method $method_name");
+
+   my $example_return_value = $w->$method_name;
+
+   ### --------------------------
+   ### $method_name   
+   ### $example_return_value
+   
+}
+
+
+
+sub usage {
+
+   return 'To test fully, you need to set up a ./t/wppost YAML
+   Please see README included in this distro.';
+
+}
+
+
+
+
+sub _conf {
+   my $abs = shift;
+   require YAML;
+   my $conf = YAML::LoadFile($abs);
+   $conf->{username} = $conf->{U};
+   $conf->{password} = $conf->{P};
+   $conf->{proxy} = $conf->{p};
+   return $conf;
+}
+
+

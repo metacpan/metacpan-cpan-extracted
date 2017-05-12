@@ -1,0 +1,6 @@
+
+<!-- $OUT=$FILE_LIGHTTPD_CONF_DELIM -->
+
+include "<!-- $OUT=$FILE_WEBDYNE_CONF -->"
+
+<!-- $OUT=$FILE_LIGHTTPD_CONF_DELIM -->

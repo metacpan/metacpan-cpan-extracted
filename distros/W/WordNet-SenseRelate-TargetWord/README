@@ -1,0 +1,499 @@
+NAME
+    intro.pod - introduction to WordNet::SenseRelate::TargetWord
+
+CONTENTS
+    *intro.pod*, *install.pod*, *utils.pod*, *modules.pod*,
+    *developers.pod*, *config.pod*, FDL.txt
+
+SYNOPSIS
+    You can use pod2html, pod2latex, pod2man, or pod2text to get this
+    documentation in a different format. See the man pages for pod2html,
+    etc. These translators should come with Perl, but you can also download
+    them from <http://search.cpan.org>.
+
+DESCRIPTION
+    This package consists of a set of Perl modules along with supporting
+    Perl programs that perform the task of Word Sense Disambiguation. The
+    program(s) attempt to disambiguate the sense of a single target word in
+    a given context as described by Banerjee and Pedersen (2002), Patwardhan
+    et al. (2003) and Banerjee and Pedersen (2003). This package separates
+    the disambiguation process into the following steps:
+
+    (a) Preprocessing
+
+    (b) Context Selection
+
+    (c) Postprocessing
+
+    (d) Sense Selection Algorithm
+
+    The context, which is typically 3 to 4 sentences of text, is passed
+    through each of these stages. Each stage does some processing of the
+    context. The final sense selection stage picks a sense of the target
+    word, using the information from the context. For example, in order to
+    determine which sense of a given word is being used in a particular
+    context, the sense having the highest relatedness with its context word
+    senses is most likely to be the sense being used.
+
+    Because of the wide range of possibilites for each of the stages, the
+    package has been made highly configurable. The user is allowed to choose
+    different modules for each of the stages. Additionally, various
+    configuration options can be passed to the substages to control their
+    behavior.
+
+    The WordNet::SenseRelate::TargetWord initializes the modules specified
+    by the user for each substage. It then accepts instances of text,
+    consisting of a few sentences, with one of the words marked as the
+    target word to be disambiguated. It passes the text through each of the
+    stages, and gets the chosen sense from the last (Algorithm) stage, and
+    return the chosen sense as the answer for that instance. The substages
+    are applied in the following order:
+
+    Preprocessing
+        WordNet::SenseRelate::TargetWord allows the user to apply multiple
+        preprocessing modules to the input text. All of the preprocessing
+        modules specified by the user are applied to the text in the order
+        specified by the user.
+
+    Context Selection
+        The WordNet::SenseRelate::TargetWord package allows the user to
+        select one *Context Selection* package, which when applied to the
+        context would pick a subset of the words around the target word for
+        the disambiguation algorithm to use in picking the intended sense of
+        the target word.
+
+    Postprocessing
+        Like the preprocessing modules the user can select multiple
+        postprocessing modules that would be applied to the text after the
+        context selection has been done. Before the postprocessing modules
+        are called the program determines the possible senses of the target
+        word and the selected context words. The postprocessing stages are
+        intended for any processing that involves the senses of the context
+        words. For example, applying some heutistics to "prune" some of the
+        senses of the target word, or the context words.
+
+    Sense Selection Algorithm
+        The goal of the sense selection algorithm is to use the senses of
+        the context words to pick one of the senses of the target word as
+        the answer. The WordNet::SenseRelate::TargetWord module allows the
+        user to specify only one Algorithm module.
+
+INSTALL
+    The package can be installed with the following four commands:
+
+     perl Makefile.PL
+
+     make
+
+     make test
+
+     make install
+
+    For a more detailed explanation or for non-standard installations, see
+    install.pod.
+
+MODULES
+    In this section, we list the modules provided in the package.
+
+    Preprocessing modules
+        Currently, only one preprocessing module is provided in the package:
+
+        WordNet::SenseRelate::Preprocess::Compounds
+            This module detects collocations within the text, and joins them
+            with underscores. For example, a piece of text such as "the
+            board of directors" would become "the board_of_directors".
+
+    Context Selection modules
+        One context selection module is provided in the package:
+
+        WordNet::SenseRelate::Context::NearestWords
+            This modules picks the N words nearest the target word as the
+            context words that should be used by the disambiguation
+            algorithm. A stop list can be specified to omit words like "a",
+            "an, "the", etc. The value N can be set during initialization.
+
+    Postprocessing modules
+        As of this vesion, there are no postprocessing modules in the
+        package. However, we intend to add some in future releases.
+
+    Sense Selection Algorithm
+        Four sense selection algorithm modules are provided in the pacakge:
+
+        WordNet::SenseRelate::Algorithm::Local
+            This modules selects that sense of the target word which is most
+            related to the senses of the context words. To do this it uses
+            the "Local" disambiguation algorithm as described by Banerjee
+            and Pedersen (2002). In order to determine the relatedness of
+            senses, the algorithm uses one of the WordNet::Similarity
+            measures of relatedness. Using the configuration options for
+            this module, the user can specify which measure the algorithm
+            should use.
+
+        WordNet::SenseRelate::Algorithm::Global
+            This modules selects that sense of the target word which is most
+            related to the senses of the context words. To do this it uses
+            the "Global" disambiguation algorithm as described by Banerjee
+            and Pedersen (2002). This algorithm is somewhat similar to the
+            "Local" algorithm. It differs from the "Local" algorithm, in
+            that it forms all possible combinations of the senses of the
+            context words, and evaluates the semantic relatedness for each
+            combination separately. The combination with the maximum score
+            is is selected, and the sense of the target word in that
+            combination is returned as the answer.
+
+        WordNet::SenseRelate::Algorithm::SenseOne
+            This module provides a baseline for the disambiguation process
+            by always returning the first sense of the target word as the
+            answer.
+
+        WordNet::SenseRelate::Algorithm::Random
+            This module provides another baseline by randomly selecting one
+            of the senses of the target word as the answer.
+
+    Apart from all of the modules mentioned above that form the pieces of
+    the bigger structure, the package also contains the
+    WordNet::SenseRelate::TargetWord module which combines the above pieces.
+
+    In order to use these modules in a Perl program for Word Sense
+    Disambiguation, we need only create an instance of the
+    WordNet::SenseRelate::TargetWord module in our program, and provide it
+    with options that indicate which of the above modules (along with
+    configuration options) it should use in the disambiguation process.
+
+    Additionally, in order to be able to use this package for disambiguating
+    instances from the Senseval2 or the Senseval3 data sets, the
+    WordNet::SenseRelate::Reader::Senseval2 module has also been provided in
+    the package. The reader module reads in an entire Senseval2 formatted
+    XML file and builds a list of instances from the file. A Perl program
+    can then iterate over these instances and pass them to the
+    WordNet::SenseRelate::TargetWord object.
+
+UTILITIES
+    Some Perl utilities that provide command-line and graphical interfaces
+    to the Perl modules are provided in the '/utils' directory of the
+    package.
+
+    disamb.pl
+        Performs Word Sense Disambiguation on Senseval-2 lexical sample
+        data. It uses the WordNet::SenseRelate::Reader::Senseval2 module to
+        read a Senseval2 lexical sample file, and then disambiguates each of
+        the instances using the WordNet::SenseRelate::TargetWord module.
+
+        Usage: disamb.pl [ [--config FILE] [--wnpath WNPATH] [--trace] XMLFILE | --help | --version]
+
+        --config=*FILENAME* Specifies a configuration file (FILENAME) to set
+        up the various configuration options.
+
+        --wnpath=*WNPATH* WNPATH specifies the path of the WordNet data
+        files. Ordinarily, this path is determined from the $WNHOME
+        environment variable. But this option overides this behavior.
+
+        --trace Indicates that trace information be printed.
+
+        --help Displays this help screen.
+
+        --version Displays version information.
+
+        Example:
+
+        To disambiguate an English lexical sample file using the default
+        options
+
+          disamb.pl eng-lex-samp.xml
+
+        To dismabiguate an English lexical sample file, specifying
+        configuration options and trace output
+
+          disamb.pl --config config.txt --trace eng-lex-sample.xml
+
+    wps2sk.pl
+        Creates a word#pos#sense to sensekey mapping of a Senseval-2 answer
+        file (output by disamb.pl). In order to be able to evaluate the
+        output of disamb.pl using software provided by the Senseval
+        organizers, we need to covert the output of disamb.pl to the
+        "SenseKey" format.
+
+        Usage: wps2sk.pl [ [--wnpath WNPATH] [FILE...] | --help | --version]
+
+        --wnpath=*WNPATH* WNPATH specifies the path of the WordNet data
+        files. Ordinarily, this path is determined from the $WNHOME
+        environment variable. But this option overides this behavior.
+
+        --quiet Run in quiet mode -- does not print informational messages.
+        But it does print warning or error messages if any.
+
+        --help Displays this help screen.
+
+        --version Displays version information.
+
+        Example:
+
+        To convert a captured output from disamb.pl
+
+          wps2sk.pl output.txt
+
+        Typically used in a pipe with disamb.pl
+
+          disamb.pl xmlfile.xml | wps2sk.pl --quiet
+
+    disamb-gui.pl
+        Performs Word Sense Disambiguation on Senseval-2 lexical sample data
+        (graphical interface to WordNet::SenseRelate::TargetWord). It uses
+        the WordNet::SenseRelate::Reader::Senseval2 module to read a
+        Senseval2 lexical sample file, and then allows the user to pick the
+        instances that she wishes to disambiguate.
+
+        Usage: disamb-gui.pl [ [--config FILE] [--wnpath WNPATH] [XMLFILE] | --help | --version]
+
+        --config=*FILENAME* Specifies a configuration file (FILENAME) to set
+        up the various configuration options.
+
+        --wnpath=*WNPATH* WNPATH specifies the path of the WordNet data
+        files. Ordinarily, this path is determined from the $WNHOME
+        environment variable. But this option overides this behavior.
+
+        --help Displays this help screen.
+
+        --version Displays version information.
+
+CONFIGURATION FILE
+    A configuration file can be passed to both, disamb.pl as well as to
+    disamb-gui.pl in order to set up the configuration parameters for the
+    modules. The format of this file is specified in this section.
+
+    The configuration file must start with a header, which is the string
+    "WordNet::SenseRelate::TargetWord" on the first byte of the first line
+    of the file.
+
+    It consists of a number of sections. Each section contains a list of
+    modules for that section, along with the configuration options for the
+    modules.
+
+    A section starts with the string
+
+      [SECTION:section_name]
+
+    A new section header indicates the end of the previous section. The
+    utilies in this package recognize four types of sections:
+
+      [SECTION:PREPROCESS]
+
+      [SECTION:CONTEXT]
+
+      [SECTION:POSTPROCESS]
+
+      [SECTION:ALGORITHM]
+
+    Any other section will be ignored by the program, without warning. Each
+    of the sections is used to specify the list of modules for that section.
+    A module is specified by [START modname] and [END] tags appearing on
+    separate lines.
+
+    Configuration parameters for the module appear on separate lines in
+    between the start and end tags as PARAMETER=VALUE pairs.
+
+    Example config file:
+
+    *WordNet::SenseRelate::TargetWord*
+
+    *[SECTION:PREPROCESS]*
+
+    *[START WordNet::SenseRelate::Preprocess::Compounds]*
+
+    *[END]*
+
+    *[SECTION:CONTEXT]*
+
+    *[START WordNet::SenseRelate::Context::NearestWords]*
+
+    *windowsize=5*
+
+    *windowstop=/home/sid/window-stop.txt*
+
+    *[END]*
+
+    *[SECTION:POSTPROCESS]*
+
+    *[SECTION:ALGORITHM]*
+
+    *[START WordNet::SenseRelate::Algorithm::Local]*
+
+    *[END]*
+
+    The above config file has four sections -- PREPROCESS, CONTEXT,
+    POSTPROCESS and ALGORITHM. The PREPROCESS section contains a single
+    module for compound detection, and has no config parameters. The CONTEXT
+    section lists one module (NearestWords), with parameters *windowsize*
+    and *windowstop*. There are no modules listed in the POSTPROCESS
+    section. The ALGORITHM section lists the Local disambiguation algorithm
+    module, also with no config parameters.
+
+EXAMPLE USAGE AS AN APPLICATION PROGRAMMING INTERFACE
+    The WordNet::SenseRelate::TargetWord module handles the managerial task
+    of initializing the processing modules, initializing the data and
+    passing it between modules. The following pieces of code can serve as a
+    guide for using the module to disambiguate a word within its context.
+
+    We would start by initializing the module:
+
+        use WordNet::SenseRelate::TargetWord;
+
+        # Create a hash with the config options
+        my %wsd_options = (preprocess => [],
+                           preprocessconfig => [],
+                           context => 'WordNet::SenseRelate::Context::NearestWords',
+                           contextconfig => {(windowsize => 5,
+                                              contextpos => 'n')},
+                           algorithm => 'WordNet::SenseRelate::Algorithm::Local',
+                           algorithmconfig => {(measure => 'WordNet::Similarity::res')});
+
+        # Initialize the object
+        my ($wsd, $error) = WordNet::SenseRelate::TargetWord->new(\%wsd_options, 0);
+
+    In the current implementation, an "instance" is a hash reference with
+    these fields: "text", "words", "head", "target", "wordobjects",
+    "lexelt", "id", "answer" and "targetpos". The values of the hash
+    reference corresponding to "text", "words" and "wordobjects" are array
+    references. The remaining values are scalars. So an instance object can
+    be created like so:
+
+        my $hashRef = {};             # Creates a reference to an empty hash.
+        $hashRef->{text} = [];        # Value is an empty array ref.
+        $hashRef->{words} = [];       # Value is an empty array ref.
+        $hashRef->{wordobjects} = []; # Value is an empty array ref.
+        $hashRef->{head} = -1;        # Index into the text array (initialized to -1)
+        $hashRef->{target} = -1;      # Index into the words & wordobjects arrays (initialized to -1)
+        $hashRef->{lexelt} = "";      # Lexical element (terminology from Senseval2)
+        $hashRef->{id} = "";          # Some ID assigned to this instance
+        $hashRef->{answer} = "";      # Answer key (only required for evaluation)
+        $hashRef->{targetpos} = "";   # Part-of-speech of the target word (if known).
+
+    The ones that are important to us are wordobjects and target. The
+    wordobjects array is an array of WordNet::SenseRelate::Word objects.
+    Given a word (say "bank"), a WordNet::SenseRelate::Word object can be
+    created like this:
+
+        use WordNet::SenseRelate::Word;
+
+        my $wordobj = WordNet::SenseRelate::Word->new("bank");
+
+    The wordobject array represents your sentence/paragraph containing the
+    word to be disambiguated. The target field is an index into this array,
+    pointing to the word to be disambiguated. So, for a given example
+    sentence, the disambiguation code would be as follows:
+
+        my @sentence = ("The", "boat", "ran", "aground", "on", "the", "river", "bank");
+        foreach my $theword (@sentence)
+        {
+          my $wordobj = WordNet::SenseRelate::Word->new($theword);
+          push(@{$hashRef->{wordobjects}}, $wordobj);
+          push(@{$hashRef->{words}}, $theword);
+        }
+        $hashRef->{target} = 7;              # Index of "bank"
+        $hashRef->{id} = "Instance1";        # ID can be any string.
+
+    The remaining fields are not really used by the system, but they could
+    be initialized (for use later in the system):
+
+        $hashRef->{lexelt} = "bank.n";
+        $hashRef->{answer} = "bank#n#1";
+        $hashRef->{targetpos} = "n";         # n, v, a or r
+        $hashRef->{text} = [("The boat ran aground on the river", "bank")];
+        $hashRef->{head} = 1;                # Index to bank
+
+    Finally, the disambiguation is done as follows:
+
+        my ($sense, $error) = $wsd->disambiguate($hashRef);
+        print "$sense\n";
+
+    The scalar $sense contains the selected sense of the target word, and
+    can be processed as required.
+
+SOFTWARE COPYRIGHT AND LICENSE
+    Copyright (C) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+    Banerjee
+
+    This suite of programs is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+    Note: The text of the GNU General Public License is provided in the file
+    'GPL.txt' that you should have received with this distribution.
+
+ACKNOWLEDGEMENTS
+    This research is partially supported by a National Science Foundation
+    Faculty Early CAREER Development Award (#0092784).
+
+REFERENCES
+    1   S. Patwardhan and T. Pedersen. Using WordNet-based Context Vectors
+        to Estimate the Semantic Relatedness of Concepts. In Proceedings of
+        the EACL 2006 Workshop on Making Sense of Sense: Bringing
+        Computational Linguistics and Psycholinguistics Together, pages 1-8,
+        Trento, Italy, April 2006.
+
+    2   S. Banerjee and T. Pedersen. Extended gloss overlaps as a measure of
+        semantic relatedness. In Proceedings of the Eighteenth International
+        Conference on Artificial Intelligence (IJCAI-03). Acapulco, Mexico.
+        2003.
+
+    3   S. Patwardhan, S. Banerjee and T. Pedersen. Using Semantic
+        Relatedness for Word Sense Disambiguation. In Proceedings of the
+        Fourth International Conference on Intelligent Text Processing and
+        Computational Linguistics (CiCLING-03). Mexico City, Mexico. 2003.
+
+    4   S. Patwardhan. Incorporating Dictionary and Corpus Information into
+        a Context Vector Measure of Semantic Relatedness. Masters Thesis,
+        University of Minnesota, Duluth. 2003.
+
+    5   S. Banerjee and T. Pedersen. An Adapted Lesk Algorithm for Word
+        Sense Disambiguation Using WordNet. In Proceedings of the Fourth
+        International Conference on Computational Linguistics and
+        Intelligent Text Processing (CICLING-02). Mexico City, Mexico. 2002.
+
+    6   S. Banerjee. Adapting the Lesk algorithm for Word Sense
+        Disambiguation to WordNet. Masters Thesis, University of Minnesota,
+        Duluth. 2002.
+
+    7   Fellbaum C., editor. WordNet: An electronic lexical database. MIT
+        Press. 1998.
+
+SEE ALSO
+    <http://groups.yahoo.com/group/senserelate>
+
+    <http://search.cpan.org/dist/WordNet-SenseRelate-TargetWord>
+
+    <http://senserelate.sourceforge.net>
+
+AUTHORS
+     Ted Pedersen, University of Minnesota Duluth
+     tpederse at d.umn.edu
+
+     Siddharth Patwardhan, University of Utah
+     sidd at cs.utah.edu
+
+     Satanjeev Banerjee, Carnegie Mellon University
+     banerjee+ at cs.cmu.edu
+
+DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+    Banerjee
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at <http://www.gnu.org/copyleft/fdl.html> and is included in this
+    distribution as FDL.txt.
+

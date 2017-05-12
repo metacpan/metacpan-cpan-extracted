@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Win32-IntAuth.t
+lib/Win32/IntAuth.pm
+META.yml                                 Module meta-data (added by MakeMaker)

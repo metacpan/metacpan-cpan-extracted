@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               WWW-Salesforce-Report
+version:            0.03
+abstract:           The poor man's Salesforce report API in Perl!
+author:
+    - Pedro Paixao <paixaop@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    DBI:                  0
+    Digest::MD5:          0
+    File::Spec:           0
+    HTTP::Cookies:        0
+    HTTP::Headers:        0
+    HTTP::Request::Common:  0
+    IO::Compress::Zip:    0
+    LWP::UserAgent:       0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

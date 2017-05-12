@@ -1,0 +1,20 @@
+Build.PL
+Changelog.txt
+lib/WWW/ClickSource.pm
+lib/WWW/ClickSource/Request.pm
+lib/WWW/ClickSource/Request/CatalystRequest.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00_module_compiles.t
+t/01_pod_coverage.t
+t/02_pod.t
+t/03_request.t
+t/04_catalyst_request.t
+t/10_organic.t
+t/11_google_adwords.t
+t/12_facebook_ads.t
+t/13_facebook_posts.t
+t/14_other_ads.t
+t/15_pageview.t

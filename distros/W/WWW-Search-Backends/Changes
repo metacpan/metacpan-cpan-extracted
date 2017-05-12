@@ -1,0 +1,16 @@
+2007-07-20    <Daddy@C-3PO>
+
+	* lib/WWW/Search/WatchNet.pm (parse_tree): fix parser for new page format
+
+2006-08-12    <Daddy@C-3PO>
+
+	* lib/WWW/Search/CraigsList.pm: first released version
+
+	* lib/WWW/Search/Newturfers.pm: first released version
+
+2006-07-30    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Timezone.pm: first released version
+
+	* lib/WWW/Search/WatchNet.pm: first released version
+

@@ -1,0 +1,28 @@
+WebService::Antigate
+===========================================
+
+This module allows you to recognize captches text using antigate.com
+service (one-time anti-captcha.com) through its API. Please do not use
+this module to crime!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Oleg G
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

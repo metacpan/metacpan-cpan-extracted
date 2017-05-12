@@ -1,0 +1,80 @@
+WordPress::XMLRPC - api to wordpress xml rpc calls
+==================================================
+
+$Revision: 2.11 $
+
+
+I wanted to interact via the command line to a wordpress blog's xmlrpc.php file.
+Bascially this is interaction with xmlrpc.php as client.
+This module is not meant for speed, it is meant for convenience.
+
+This is really useful to automate new postings, uploading media, etc.
+You could write your custom cli scripts to upload and mess with your wordpress blog.
+
+
+INSTALL
+=======
+
+I suggest you install via downloading the package from cpan and testing.
+
+Example (note that this link points to an older version):
+
+   wget http://search.cpan.org/CPAN/authors/id/L/LE/LEOCHARRE/WordPress-XMLRPC-1.09.tar.gz
+   tar -xvf ./WordPress-XMLRPC-1.09.tar.gz
+   cd WordPress-XMLRPC-1.09
+   
+   vim t/wppost # see TESTING
+   
+   perl Makefile.PL
+   make test
+   make install   
+
+TESTING
+=======
+
+To test fully, you need to set up a ./t/wppost YAML
+
+
+t/wppost
+--------
+
+This is a YAML file,  file should contain:
+
+   ---
+   U:username
+   P:password
+   p:proxy
+
+Example t/wppost file:
+
+   ---
+   U: jim
+   P: wegjwgw
+   p: 'http://jim/xmlrpc.php'
+
+When you run this on a proxy for a wordpress blog with content, 
+you're gonna get all kinds of output. 
+The calls do not provide arguments, so some calls will fail.
+
+I suggest you pipe the output (STDERR) to a file.
+
+   perl t/10_XMLRPC.t 2> t/out
+
+Then you can open the file with vim and inspect the output.
+This may be useful to get acquainted with what's going on on the inside.
+
+Example output is in t/10_XMLRPC.out
+
+BASIC INSTALLATION
+==================
+
+perl Makefile.PL
+make test
+make install
+
+
+
+BUGS AND CONTACT
+================
+Please contact the author with any suggestions, for help, etc, at:
+Ian Gibs igibbs at cpan dot org

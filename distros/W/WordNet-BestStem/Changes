@@ -1,0 +1,8 @@
+0.2.1	10/09/2009
+	BEST_FOR solely for WordNet lookups, done in best_stem
+	best_stem do only /^\w/ because WordNet hangs with some extra stuff
+	deluxe_stems returns in list context % ref to str-stem lookup table, stem and str fres
+0.2.0	09/18/2009
+        deluxe_stems added
+0.1.0	prior to 09/18/2009
+	best_stem

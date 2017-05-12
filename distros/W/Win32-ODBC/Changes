@@ -1,0 +1,31 @@
+Revision history for Perl extension Win32::ODBC.
+
+2013-11-28
+
+        * version 0.035
+        * Fix required perl version 5.6 -> 5.006.
+        * Add Github repo link to META.yml
+        * Typo fixes by David Steinbrunner
+
+
+2008-06-13
+
+	* version 0.034
+	* moved sample.pl to eg/ subdirectory to avoid the file from
+	  getting installed.
+
+2008-04-15
+
+	* new version 0.033 for separate upload to CPAN
+	* updated email addresses
+	* simplified Makefile.PL
+	* added Changes, META.yml and ppport.h files
+	* renamed Test.pl to sample.pl because it doesn't generate TAP output
+
+2005-09-18 11:15:17 rurban@x-ray.at
+
+	* ODBC/ODBC.xs: use iodbcinst.h with CYGWIN
+	* ODBC/ODBC.xs (_NT_ODBC_Error): use the correct 
+   	  SQLINTEGER, ... types in SQLError and not the wrong from MSVC.
+
+Older changes can be found in the HISTORY.TXT file.

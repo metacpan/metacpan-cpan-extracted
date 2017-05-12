@@ -1,0 +1,31 @@
+Win32::CLR version 0.03
+
+Win32::CLR provides utility methods to using Microsoft .NET Framework,
+also known as Common Language Runtime. It is available for creating object,
+calling method, accessing field or property, converting perl subroutine
+to delegate, loading assembly.
+
+PREREQUISITES
+
+This module requires C++/CLI compiler, C++/CLI is supported on VC++ 2005 or later.
+
+    Microsoft Visual C++ 2005 with Platform SDK or 2008
+    perl 5.9.5 or later compiled with Visual C++ 2005 or 2008
+    .NET Framework Runtime 2.0 or later
+
+INSTALL
+
+To install this module, run the following commands:
+
+    vcvars32 # setup VC++ environment variables
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Toshiyuki Yamato <toshiyuki.yamato@gmail.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

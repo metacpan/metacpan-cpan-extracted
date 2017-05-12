@@ -1,0 +1,48 @@
+
+
+Somehow we should think very carefully about how to back the WWW::Link
+class with a database.
+
+As one option we should split up the link into different records in an
+SQL database.  There would be tables like
+
+Links
+	id
+	url
+	status
+	reliability
+	<etc> - possibly a perl object as a string?
+
+Tests
+	id
+	LINK-ID
+	date
+	response
+
+pages-to-links
+	page-url
+	LINK-ID
+	description
+	
+Infostrucs
+	url-base
+	dir-base
+	
+
+
+test that the link makes reasonable suggestions for when it should be
+checked (e.g. within the next month and no later etc.)
+
+test for redirects of finite length
+
+test for indefinite redirects
+
+test for non redirects
+
+
+Information categorisation
+
+	User configured v.s. Automatically Extracted
+	Page information / Link Information
+	Information about a test.
+	Information about all tests.

@@ -1,0 +1,33 @@
+Revision history for Win32-ServiceManager
+
+0.002003  2014-09-26 23:26:33-05:00 America/Chicago
+ - upgrade nssm to 2.24
+ - add `check_command` and related `check_command_default` attr for
+   `create_services`
+
+0.002002  2014-01-24 22:54:52-06:00 America/Chicago
+ - upgrade nssm to 2.21.1
+ - fix description not accepting strings with spaces (thanks wes!)
+ - fix off-by-one error in get_status call counting (thanks wes!)
+
+0.002001  2013-10-22 16:48:29 America/Chicago
+ - workaround get_status failing sometimes
+
+0.002000  2013-10-22 11:57:47 America/Chicago
+ - add (default on) idempotent option
+ - refactor start and stop_service methods to use Win32::Service instead of
+   shelling out to sc or net.  Because of this the use_sc option has been
+   renamed to non_blocking
+ - add get_status method
+ - add get_services method
+ - add autostop option to delete_service
+ - document delete_service method
+
+0.001001  2013-03-12 17:44:51 CST6CDT
+ - fix deps (Test::Deep)
+ - Bundle nssm binaries (version 2.16)
+ - Allow easy specification of 32 or 64 bit nssm
+
+0.001000  2013-01-31 21:40:06 CST6CDT
+ - Initial Release
+

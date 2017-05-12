@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
+<!--
+    Comment within sitemap. GH#3
+-->
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap1.xml?param1=value1&amp;param2=value2</loc>
+    <lastmod>2010-11-19T19:05:01+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap2.xml</loc>
+    <lastmod>2010-11-19T13:05:01+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap3.xml?name=Alex%20J.%20G.%20Burzy%C5%84ski</loc>
+    <lastmod>2010-11-19T16:05:01</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap4.xml</loc>
+    <lastmod>2010-11-19T06:05</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap5.xml?param3=value3#fragment</loc>
+    <lastmod>2010-11-19T18:05:01.12-05:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap6.xml</loc>
+    <lastmod>2010-11-19T13:05:01+01:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap7.xml</loc>
+    <lastmod>2010-11-19T16:05:01.45Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap8.xml</loc>
+    <lastmod>2010</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://www.mywebsite.com/sitemap9.xml</loc>
+    <lastmod>2010-11-19</lastmod>
+  </sitemap>
+</urlset>

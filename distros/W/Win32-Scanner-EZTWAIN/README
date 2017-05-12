@@ -1,0 +1,27 @@
+Win32/Scanner/EZTWAIN version 0.01
+==================================
+
+This module provides you with an interface to the classic DOSADI
+EZTWAIN library. See the pod documentation for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+  Win32::API
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Lennert Ouwerkerk. All rights reserved.
+
+This package is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.

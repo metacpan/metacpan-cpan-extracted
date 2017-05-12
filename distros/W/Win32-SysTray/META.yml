@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Win32-SysTray
+version:      0.20
+version_from: SysTray.pm
+installdirs:  lib
+requires:
+    Win32:        0
+    Win32::Mutex: 0
+    Win32::GUI:   1.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

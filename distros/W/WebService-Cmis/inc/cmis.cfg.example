@@ -1,0 +1,84 @@
+$WebService::Cmis{DefaultConnection} = "alfresco_local";
+$WebService::Cmis{TestRoot} = "/";
+$WebService::Cmis{TestFile} = "t/data/free.jpg";
+$WebService::Cmis{Connections} = {
+  alfresco_local_old => {
+    url => "http://localhost:8080/alfresco/service/cmis",
+    testRoot => "/User Homes/<username>",
+    useragent => {
+      impl => "WebService::Cmis::Agent::TokenAuth",
+      user => "proxy",
+      password => "proxy",
+      loginUrl => "http://localhost:8080/alfresco/service/api/login?u={username}&pw={password}",
+      logoutUrl => "http://localhost:8080/alfresco/service/api/login/ticket/{ticket}",
+    },
+  },
+  alfresco_local => {
+    url => "http://localhost:8080/alfresco/cmisatom",
+    testRoot => "/User Homes/<username>",
+    useragent => {
+      impl => "WebService::Cmis::Agent::TokenAuth",
+      user => "proxy",
+      password => "proxy",
+      loginUrl => "http://localhost:8080/alfresco/service/api/login?u={username}&pw={password}",
+      logoutUrl => "http://localhost:8080/alfresco/service/api/login/ticket/{ticket}",
+    },
+  },
+  alfresco_com_old => {
+    url => "http://cmis.alfresco.com/service/cmis",
+    testRoot => "/User Homes/admin",
+    cacheEnabled => 1,
+    useragent => {
+      user => "admin",
+      password => "admin",
+    },
+  },
+  alfresco_com => {
+    url => "http://cmis.alfresco.com/cmisatom",
+    testRoot => "/User Homes/admin",
+    cacheEnabled => 1,
+    useragent => {
+      user => "admin",
+      password => "admin",
+    },
+  },
+  nuxeo_local => {
+    url => "http://localhost:8080/nuxeo/atom/cmis",
+    testRoot => "/default-domain/workspaces",
+    useragent => {
+      impl => "WebService::Cmis::Agent::CookieAuth",
+      user => "proxy",
+      password => "proxy",
+      loginUrl => "http://localhost:8081/nuxeo/nxstartup.faces",
+      cookieDir => "/tmp",
+    }
+  },
+  nuxeo_org => {
+    url => "http://cmis.demo.nuxeo.org/nuxeo/atom/cmis",
+    cacheEnabled => 1,
+    testRoot => "/default-domain/workspaces",
+    useragent => {
+      impl => "WebService::Cmis::Agent::CookieAuth",
+      user => "Administrator",
+      password => "Administrator",
+      loginUrl => "http://cmis.demo.nuxeo.org/nuxeo/nxstartup.faces",
+      cookieDir => "/tmp",
+    },
+  },
+  xcmis_local => {
+    url => "http://localhost:9090/xcmis/rest/cmisatom",
+    useragent => {
+      user => "root",
+      password => "exo",
+    },
+  }, 
+  xcmis_org => {
+    url => "http://xcmis.org/xcmis/rest/cmisatom",
+    cacheEnabled => 1,
+    useragent => {
+      user => "root",
+      password => "exo",
+    },
+  }
+};
+

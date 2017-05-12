@@ -1,0 +1,49 @@
+v0.12 [December 27, 2007]
+
+! fix dependency
+
+v0.11 [October 28, 2005]
+
+! fixed example/rss_category.pl
+! change email address
+! news.google.com.tw make minor changes, so do I :p
+
+v0.10 [March 23, 2005]
+
++ add get_news_for_category(), now support browse by category
++ add example/rss_category.pl
+
+v0.09 [March 1, 2005]
+
+! the same issue in 0.08 also appear in get_news_for_topic, fixed.
+! fixed t/*
+
+v0.08 [March 1, 2005]
+
+! change $re1 in lib/WWW/Google/News/TW.pm, with respect to Google's
+  format change.
+
+v0.07 [November 19, 2004]
+
+! fix lib/WWW/Google/News/TW.pm, typo
+
+v0.06 [September 12, 2004]
+
+! use inc::Module::Install instead of ExtUtils::MakeMaker.
+! rename ChangeLog to Changes.
+
+v0.05 [September 12, 2004]
+
+* fix bug about summary (get_news).
++ add get_news_for_topic(), a search function.
++ add t/2-news_topic.t
++ add examples/rss.pl for generating Google Headline
+
+v0.02 [September 10, 2004]
+
+- print summary
++ add filed: source, update_time, summary.
+
+v0.01 [September 10, 2004]
+
++ Based on WWW::Google::News 0.07 by Bowen Dwelle <bowen@dwelle.org>.

@@ -1,0 +1,19 @@
+Revision history for Perl extension Win32::GUI::Carp.
+
+Version 1.01 (April 23, 2003)
+  Release to CPAN on May 11, 2004
+
+  Added $FatalFilter and $WarningFilter
+
+Version 1.0 (October 25, 2002)
+  Adapted from Tk::Carp
+
+  Fixed bug where calling windie or winwarn with
+  messages that didn't end in a newline would report the wrong
+  line number (ie, inside Win32::GUI::Carp).
+
+  Fixed bug where warningsToDialog was ignored by warnings
+  generated in old / chained __WARN__ and __DIE__ handlers.
+
+  Fixed bug where immediateWarnings was ignored by warnings
+  generated in old / chained __WARN__ handlers.

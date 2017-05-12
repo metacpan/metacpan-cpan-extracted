@@ -1,0 +1,220 @@
+____________________________________________________________________________
+[ 10623] By: autrijus                              on 2004/05/22  08:07:29
+        Log: * This be 0.20.
+             * $results->asAtomString is officially supported.
+	   ! Makefile.PL lib/WWW/SherlockSearch.pm
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[ 10621] By: autrijus                              on 2004/05/22  07:50:56
+        Log: * try to make it atom 0.3 valid.
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  9681] By: autrijus                              on 2004/01/12  15:44:47
+        Log: * oops, typo
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  9680] By: autrijus                              on 2004/01/12  15:43:27
+        Log: * This be 0.18.
+             * ->new now may take a scalar ref to the template content.
+             * the default UA (LWP::RobotUA) is now subclassable via
+             the import line and the $UAClass variable.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  9675] By: autrijus                              on 2004/01/11  16:26:16
+        Log: * This be 0.17.
+             * Tony Laszlo suggested us to use {search}{action}
+             if ChannelUrl is unavailable, so we can generate
+             valid RSS feeds.
+             * updates copyright strings.
+             * switch to either of Build/Makefile.
+	   + Build.PL
+	   ! MANIFEST Makefile.PL README
+	   ! lib/WWW/SherlockSearch.pm
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  8975] By: autrijus                              on 2003/11/20  08:25:37
+        Log: * switch to Module::Install.
+	   - Build.PL MANIFEST.SKIP
+	   ! MANIFEST Makefile.PL
+	  !> t/0-signature.t
+____________________________________________________________________________
+[  8974] By: autrijus                              on 2003/11/20  08:21:41
+        Log: * This be 0.16.
+             * We now respect RobotUA.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  7686] By: autrijus                              on 2003/08/24  03:26:42
+        Log: * patch from Mike Castle to fix one doc typo.
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  7592] By: autrijus                              on 2003/08/19  00:31:54
+        Log: * This be 0.15.
+             * asSherlockString was missing <INPUT> fields in the
+             search stage.
+             * adding sign and dynamic_config to Build.PL.
+	   ! Build.PL lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  6720] By: autrijus                              on 2003/06/24  19:36:04
+        Log: * correctly handle //-started urls
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  6719] By: autrijus                              on 2003/06/24  19:30:53
+        Log: * redefine absolutedness
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  6717] By: autrijus                              on 2003/06/24  18:43:51
+        Log: * only serialize non-empty values in ->asSherlockString.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3584] By: autrijus                              on 2003/01/17  05:12:30
+        Log: * This be 0.14.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3583] By: autrijus                              on 2003/01/17  05:10:55
+        Log: * fix asSherLockString so empty string is generated for
+	       empty
+             stages.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3473] By: autrijus                              on 2003/01/13  03:33:38
+        Log: * only serialize action stages.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3469] By: autrijus                              on 2003/01/13  02:36:40
+        Log: * oops.
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  3468] By: autrijus                              on 2003/01/13  02:35:15
+        Log: * add '...' in excerpt.
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  3465] By: autrijus                              on 2003/01/13  02:30:31
+        Log: * 100 is better.
+             * this be .13.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3464] By: autrijus                              on 2003/01/13  02:29:22
+        Log: * a sane default for excerpt length.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  3463] By: autrijus                              on 2003/01/13  02:27:08
+        Log: * implement excerpt.
+	   ! lib/WWW/SherlockSearch.pm
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  3213] By: gugod                                 on 2003/01/05  11:19:29
+        Log: Sucessfully fetch the first listItem now.
+	   ! plugins/googlenews.src
+____________________________________________________________________________
+[  3212] By: autrijus                              on 2003/01/05  11:09:58
+        Log: * fixed.
+	   ! plugins/googlenews.src
+____________________________________________________________________________
+[  3210] By: autrijus                              on 2003/01/05  11:05:26
+        Log: * not working.
+	   + plugins/googlenews.src
+____________________________________________________________________________
+[  3015] By: autrijus                              on 2002/12/31  07:13:50
+        Log: * clkao pointed out that we shouldn't initialize CPAN.pm in
+	       vain.
+	   ! Makefile.PL
+____________________________________________________________________________
+[  2919] By: autrijus                              on 2002/12/25  14:42:03
+        Log: * nitpick
+	   ! t/1-basic.t
+____________________________________________________________________________
+[  2913] By: autrijus                              on 2002/12/25  10:14:23
+        Log: * This be 0.12.
+             * some rudimentary POD for 'sherch'.
+	   ! script/sherch
+____________________________________________________________________________
+[  2912] By: autrijus                              on 2002/12/25  10:07:27
+        Log: * oops, limit didn't work on multipage.
+             * script/sherch now don't pose arbitary limits.
+	   ! lib/WWW/SherlockSearch.pm script/sherch
+____________________________________________________________________________
+[  2907] By: autrijus                              on 2002/12/25  06:44:15
+        Log: * beginning of support for next page and querylimit.
+             * also accepts queryencoding if querycharset is not
+	       specified.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2899] By: autrijus                              on 2002/12/24  13:03:45
+        Log: * oopsie.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2896] By: autrijus                              on 2002/12/24  11:52:30
+        Log: * proper date support.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2891] By: autrijus                              on 2002/12/24  10:27:41
+        Log: * now encodes the query string before sending out.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2890] By: autrijus                              on 2002/12/24  10:27:27
+        Log: * show usage.
+	   ! script/sherch
+____________________________________________________________________________
+[  2864] By: autrijus                              on 2002/12/23  17:39:19
+        Log: * fnord. :)
+	   ! plugins/clkao.src
+____________________________________________________________________________
+[  2859] By: autrijus                              on 2002/12/23  17:06:01
+        Log: * This be 0.11.
+             * Fixed redundant </prefetch> and </postfetch> lines
+             in asSherlockString.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2854] By: autrijus                              on 2002/12/23  11:58:17
+        Log: * converts <br> and handles entities in contents.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2853] By: autrijus                              on 2002/12/23  11:57:55
+        Log: * We somehow really needs this.
+	   ! Build.PL
+____________________________________________________________________________
+[  2817] By: autrijus                              on 2002/12/21  06:57:21
+        Log: * 0.10, first CPAN release.
+	   ! MANIFEST MANIFEST.SKIP
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2805] By: autrijus                              on 2002/12/20  06:51:10
+        Log: * don't use RSS till needed.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2792] By: autrijus                              on 2002/12/19  17:41:01
+        Log: * now prints warnings.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2788] By: autrijus                              on 2002/12/19  15:25:38
+        Log: * fix \Q\E.
+	   ! lib/WWW/SherlockSearch.pm
+	   ! lib/WWW/SherlockSearch/Results.pm
+____________________________________________________________________________
+[  2781] By: autrijus                              on 2002/12/19  05:18:23
+        Log: * strictness.
+	   ! lib/WWW/SherlockSearch.pm
+____________________________________________________________________________
+[  2780] By: autrijus                              on 2002/12/19  05:17:44
+        Log: * move to lib/.
+	  +> lib/WWW/SherlockSearch.pm
+	  +> lib/WWW/SherlockSearch/Results.pm
+	   - SherlockSearch.pm SherlockSearch/Results.pm
+____________________________________________________________________________
+[  2779] By: autrijus                              on 2002/12/19  05:10:20
+        Log: * add pods.
+	   ! SherlockSearch.pm SherlockSearch/Results.pm
+____________________________________________________________________________
+[  2777] By: autrijus                              on 2002/12/19  04:57:45
+        Log: * some build facilities.
+	   + Build.PL
+	  +> Makefile.PL
+____________________________________________________________________________
+[  2768] By: autrijus                              on 2002/12/18  17:49:18
+        Log: * optional search term
+	   ! script/sherch
+____________________________________________________________________________
+[  2766] By: autrijus                              on 2002/12/18  17:36:53
+        Log: * new place sir.
+	  +> SherlockSearch.pm SherlockSearch/Results.pm
+	  +> plugins/clkao.src script/sherch

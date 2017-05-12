@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW::TypePad::CmdLine
+
+0.02  2011.02.07
+    - Fixed Homedir -> HomeDir.
+
+0.01  Wed Mar 31 11:16:47 2010
+        - original version

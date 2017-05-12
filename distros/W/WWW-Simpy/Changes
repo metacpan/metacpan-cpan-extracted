@@ -1,0 +1,20 @@
+Revision history for Perl extension WWW::Simpy.
+
+
+6/6/06 - status method now returns Simpy error code, if any
+	 Methods return undef is status other than zero
+         Simpy Status codes now exported
+         
+6/4/06 - Export PUBLIC / PRIVATE for accessType
+         Use POST rather than GET
+
+6/3/06 - Catch XML::Parse errors
+	 Added *Tag methods
+	 Migrated to WWW::Simpy namespace
+
+6/2/06 - Launched first general release, two API methods implemented
+
+0.01  Tue May 30 17:14:13 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Simpy::API
+

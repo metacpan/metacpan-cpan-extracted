@@ -1,0 +1,17 @@
+make clean
+perl Makefile.PL
+ID=`id -u`;
+if [ x"$ID" != x"0" ]
+then
+	MAKERPMOPTS="$MAKERPMOPTS --nochown"
+        export MAKERPMOPTS
+fi
+
+DISTFILE=WWW-Link-0.036.tar.gz
+rm $DISTFILE
+make
+make dist
+cp $DISTFILE /usr/src/redhat/SOURCES
+/usr/src/redhat/SOURCES/makerpm.pl $MAKERPMOPTS --specs --runtests --auto-desc --source=$DISTFILE
+cd /usr/src/redhat
+rpm -ba SPECS/WWW-Link-0.036.spec

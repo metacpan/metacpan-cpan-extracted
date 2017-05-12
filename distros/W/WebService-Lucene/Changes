@@ -1,0 +1,35 @@
+Revision history for Perl extension WebService::Lucene
+
+0.10  Thu Nov 19 2009
+    - repackaged with a new version of Module::Install
+
+0.09  Tue Apr 22 2008
+    - fix WebService::Lucene::Document::fields() in scalar context
+
+0.08  Tue Apr 08 2008
+    - The title of an index in the service document is now an element and
+      not an attribute
+
+0.07  Mon Feb 25 2008
+    - Added Digest::SHA1 to prereqs as it is optional for XML::Atom, but
+      required for XML::Atom::Client
+
+0.06  Fri Feb 22 2008
+    - use relevance extension to opensearch get get the score
+
+0.05  Thu Nov 01 2007
+    - switch to Module::Install
+
+0.04  Mon Jun 04 2007
+    - pod fixes
+
+0.03  Tue Apr 17 2007
+    - released to CPAN
+
+0.02  Wed Dec 06 2006
+    - overhauled to minimize network traffic and handle
+      exceptions properly
+
+0.01  Fri Feb 17 2006
+    - original version
+

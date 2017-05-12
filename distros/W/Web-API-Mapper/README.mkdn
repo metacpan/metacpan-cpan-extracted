@@ -1,0 +1,223 @@
+# NAME
+
+Web::API::Mapper - [Web::API::Mapper](http://search.cpan.org/perldoc?Web::API::Mapper) is an API (Application Programming Interface) convergence class for mapping/dispatching 
+API to web frameworks.
+
+# SYNOPSIS
+
+    package YourService;
+    use Any::Moose;
+
+    sub route { {
+        post => [
+            '/bar/(\d+)' => sub { my $args = shift;  return $1;  }
+        ]
+        get =>  [ 
+            ....
+        ]
+    } }
+
+    package main;
+
+    my $service = YourService->new;
+    my $serviceA = OtherService->new;
+    $service->connect( ... );
+
+    my $m = Web::API::Mapper->new
+            ->mount( '/foo' => $service->route )
+            ->mount( '/a' => $serviceA->route );
+
+    my $ret = $m->post->dispatch( '/foo/bar' , { ... args ... } );
+    my $ret = $m->get->dispatch(  '/foo/bar' );
+    my $ret = $m->dispatch( '/foo/bar' , { args ... } );
+
+    $m->post->mount( '/foo' , [ '/subpath/to' => sub {  ....  } ]);
+    $m->mount( '/fb' => {  post => [  ... ] , get => [  ... ] }  )->mount( ... );
+
+To generate API routing table automatically, see test file `t/auto-router.t`:
+
+
+
+#!/usr/bin/env perl
+    use Test::More tests => 6;
+    use Web::API::Mapper;
+
+    my $api = Test::API->new;
+    my $routes = Web::API::Mapper->auto_route( $api , { prefix => 'foo' } );
+
+    ok( $routes->{get} );
+    ok( $routes->{post} );
+    ok( $routes->{any} );
+
+    # The $routes will be:
+    # {
+    #     post => [ ],
+    #     get => [ ],
+    #     any => [
+    #         '/get/id' => sub { DUMMY }
+    #         '/get/id' => sub { DUMMY }
+    #     ]
+    # }
+
+    my $m = Web::API::Mapper->new( "/foo" => $routes );
+    ok( $m );
+    my $ret = $m->dispatch( '/foo/get/id' , { data => 'John' } );
+
+    is_deeply( $ret->{args} , { data => 'John' } );
+    is( ref($ret->{self}) , 'Test::API' );
+
+    package Test::API;
+
+    sub new { bless {} , shift; }
+
+    sub foo_get_id {
+        my ($self,$args) = @_;
+        return {  
+            self => $self,
+            args => $args,
+        };
+    }
+
+    sub foo_set_id {
+
+    }
+
+    1;
+
+
+
+# DESCRIPTION
+
+[Web::API::Mapper](http://search.cpan.org/perldoc?Web::API::Mapper) is an API (Application Programming Interface) convergence class for mapping/dispatching 
+API to web frameworks.
+
+This module is for reducing class coupling of web services on web frameworks.
+
+Web frameworks are always changing, and one day you will need to migrate your code to 
+the latest web framework. If your code heavily depends on your framework,
+it's pretty hard to migrate and it takes time.
+
+by using [Web::API::Mapper](http://search.cpan.org/perldoc?Web::API::Mapper) you can simply seperate service application and framework.
+you can simply mount these api service like Twitter ... etc, and dispatch paths
+to these services.
+
+[Web::API::Mapper](http://search.cpan.org/perldoc?Web::API::Mapper) is using [Path::Dispatcher](http://search.cpan.org/perldoc?Path::Dispatcher) for dispatching.
+
+# TODO
+
+- Provide service classes for mounting.
+
+- Provide mounter for web frameworks.
+
+# ROUTE SPEC
+
+API Provider can provide a route hash reference for dispatching rules.
+
+- post => [ '/path/to/(\d+)' => sub {  } , ... ]
+
+- get => [  '/path/to/(\d+)' => sub {  } , ... ]
+
+- fallback => sub {    }
+
+# ACCESSORS
+
+## route
+
+## post
+
+is a [Web::API::Mapper::RuleSet](http://search.cpan.org/perldoc?Web::API::Mapper::RuleSet) object.
+
+## get
+
+is a [Web::API::Mapper::RuleSet](http://search.cpan.org/perldoc?Web::API::Mapper::RuleSet) object.
+
+## fallback
+
+is a CodeRef, fallback handler.
+
+# FUNCTIONS
+
+## mount
+
+## dispatch
+
+## auto_route( Class|Object $api , HashRef $options  )
+
+Auto generate API routing table for object|class.
+
+You can use `prefix` or `regexp` to filter methods.
+
+underscores will be translated to slash `/`. for example, foo_get_id will be /get/id.
+
+### Options
+
+- prefix => qq|prefix_|
+
+Get methods by prefix, and strip the prefix.
+
+- regexp => qr/.../
+
+Filter methods by a regular expression pattern.
+
+- type => post|get|any
+
+Handler type, can be `post`, `get` and `any`.
+
+# EXAMPLE
+
+    package Twitter::API;
+
+    sub route { {
+        post => [
+            '/timeline/add/' => sub { my $args = shift;  .... },
+            '/timeline/remove/' => sub { ... },
+        ],
+        get => [
+            '/timeline/get/(\w+)' => sub {  my $args = shift;  .... return $1 },
+        ],
+    } }
+
+    package main;
+
+    # This will add rule path to /twitter/timeline/add/  ... etc
+    my $m = Web::API::Mapper->new( '/twitter' => Twitter::API->route );
+    $m->mount(  '/basepath' , {  post => [  ... ] } );
+    $m->post->mount( '/basepath' , [  ...  ]  );
+    $m->dispatch( '/path/to' , { args ... } );
+
+    1;
+
+For example, if you are in Dancer:
+
+    #!/usr/bin/perl
+    use Dancer;
+    use JSON;
+
+    our $m = Web::API::Mapper->new
+        ->mount( '/twitter' => Twitter::API->route )
+        ->mount( '/basepath' , { post => [  ... ] } );
+
+    any '/api/*' => sub {
+        return encode_json( $m->dispatch( $1 , params ) );
+    };
+
+    # request for '/api/twitter/timeline/add' to run!
+
+    dance;
+
+And one day you want another applciation in Mojo:
+
+    use Mojolicious::Lite;
+    get '/api/*' => sub {
+        my $self = shift;
+        return $self->render(  $m->dispatch( $1 , $self->params ) );
+    };
+    app->start;
+
+# AUTHOR
+
+Cornelius & cornelius.howl at gmail.com ;
+
+# LICENSE
+
+Perl

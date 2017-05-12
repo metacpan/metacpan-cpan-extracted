@@ -1,0 +1,301 @@
+#!/usr/local/bin/perl
+#########
+# Author:        rmp
+# Last Modified: $Date: 2011-05-29 22:56:18 +0100 (Sun, 29 May 2011) $
+# Id:            $Id: indexer 11 2011-05-29 21:56:18Z rmp $
+# $HeadURL: svn+ssh://psyphi.net/repository/svn/www-scraper-lite/trunk/bin/indexer $
+#
+use strict;
+use warnings;
+use WWW::Scraper::Lite;
+use Data::Dumper;
+use HTML::Entities;
+use DBI;
+use Carp;
+use Time::HiRes qw(tv_interval gettimeofday);
+use Getopt::Long;
+use English qw(-no_match_vars);
+use LWP::UserAgent;
+use File::Temp qw(tempfile);
+use CAM::PDF;
+use CGI qw(unescape);
+use DateTime;
+use Date::Parse;
+use Readonly;
+
+our $VERSION    = do { my ($r) = q$Revision: 11 $ =~ /(\d+)/smx; $r; };
+our $WEIGHTINGS = {
+		   'pdf'   => 0.8,
+		   'html'  => 10,
+		   'htm'   => 10,
+		   'shtml' => 10,
+		  };
+my $opts = {};
+GetOptions($opts, qw(url=s dbname=s init help)) or croak $ERRNO;
+
+if(!$opts->{url} || !$opts->{dbname} || $opts->{help}) {
+  print <<'EOT' or croak $ERRNO;
+indexer -url=http://www.../ -dbname=database.sqlite [-help] [-init]
+
+ -url=...    The website to crawl
+ -dbname=... The filename for the output index
+ -init       (Drop and) initialise the database
+ -help       This help
+EOT
+  exit;
+}
+
+my $pdfs         = [];
+my $starting_url = $opts->{url};
+my ($dbname)     = $opts->{dbname} =~ m{([[:lower:]\d_/.\-]+)}smix;
+my $dbh          = DBI->connect(qq[DBI:SQLite:dbname=$dbname],q[],q[],{
+								       RaiseError => 1,
+								       AutoCommit => 0,
+								      });
+if($opts->{init}) {
+  eval {
+    $dbh->do(q[drop table idx]); # todo: build tmp index and rename
+  } or do {
+    #########
+    # don't worry
+    #
+  };
+
+  $dbh->do(q[create table idx(word char(32), page char(255), title char(64), context char(64), score float, last_mod datetime)]);
+}
+
+{
+  my $scraper = WWW::Scraper::Lite->new;
+  $scraper->crawl($starting_url,
+		  {
+		   q[//a]  => \&process_url,
+		   q[/*]   => \&process_page,
+		  }
+		 );
+}
+
+sub cleanup_entities {
+  my ($str) = @_;
+
+  if(!defined $str) {
+    $str = q[];
+  }
+
+  encode_entities(${$str});
+  $str =~ s/&nbsp;/ /smxg;
+  decode_entities(${$str});
+  decode_entities(${$str});
+
+  ${$str} =~ s{[^\x20-\xff]}{ }smxig;
+  ${$str} =~ s{\s+}{ }smxg;
+
+  return 1;
+}
+
+sub process_url {
+  my ($scraper, $node) = @_;
+  my $url = $node->{href};
+
+  if(!$url) {
+    #########
+    # no 'href' attribute in this anchor
+    #
+    return;
+  }
+
+  $url = $scraper->url_remove_anchor($url);
+  $url = $scraper->url_make_absolute($url);
+
+  if(!$url) {
+    return;
+  }
+
+  if($url !~ m{^http}smix) {
+    #########
+    # unsupported protocol
+    #
+    return;
+  }
+
+  if($url !~ m{^$starting_url}smix) {
+    #########
+    # external website
+    #
+    return;
+  }
+
+  if($url =~ m{pdf}smix) {
+    #########
+    # special handling for PDFs
+    #
+    process_pdf($url);
+    return;
+  }
+
+  if($url =~ m{(png|jpe?g|gif|zip|css|js|docx?|pptx?|xlsx?|odt|odp|ods)$}smix) {
+    #########
+    # unsupported filetype
+    # todo: queue for independent processing
+    #
+    return;
+  }
+
+  return $scraper->enqueue($url);
+}
+
+sub process_page {
+  my ($scraper, $node) = @_;
+  my $url       = $scraper->current->{url};
+
+  print "processing $url\n" or croak $ERRNO;
+
+  my $html    = $scraper->current->{response}->content;
+  my ($title) = $html =~ m{<title>(.*?)</title>}smxi;
+  my @headers = $html =~ m{(<h\d>.*?</h\d>)}smxig;
+  my $text    = $html;
+  $text       =~ s{<script(.*?)/script>}{}smxig;
+  $text       =~ s{<[^>]+>}{ }smxg;
+
+  return process_text($url, \$text, \$title, q[]);
+}
+
+sub process_text {
+  my ($page, $text_ref, $title_ref, $lastmod_iso) = @_;
+
+  $page =~ s{$starting_url}{}smx;
+
+  if($page !~ m{^/}smx) {
+    $page = "/$page";
+  }
+
+  cleanup_entities($text_ref);
+  cleanup_entities($title_ref);
+
+  Readonly::Scalar my $LENGTH_CUTOFF => 3;
+  my @words = grep { /[[:lower:]\d]{$LENGTH_CUTOFF,}/smix } # at least three alphanumerics
+              grep { length $_ > $LENGTH_CUTOFF }     # longer than three characters
+	      map  { s{\s+}{}smxg; $_ }               ## no critic (ProhibitComplexMappings ProhibitMutatingListFunctions)
+	      map  { lc }                             # store in lowercase
+	      split /\b/smx,                          # split on word boundary
+	      ${$text_ref};
+
+  my ($extension) = $page =~ /([^.]+)$/smx;
+  my $weighting;
+
+  if($extension) {
+    $weighting = $WEIGHTINGS->{$extension};
+  }
+
+  if(!$weighting) {
+    $weighting = 1;
+  }
+
+  for my $word (@words) {
+    my $score = $dbh->selectall_arrayref(q[SELECT score from idx WHERE word=? AND page=?], {}, $word, $page)->[0]->[0];
+
+    if(!defined $score) {
+      my ($match) = ${$text_ref} =~ /($word)/smix;
+      my $before  = substr ${$text_ref}, 0, $LAST_MATCH_START[0];
+      my $after   = substr ${$text_ref}, $LAST_PAREN_MATCH[0];
+      $after      =~ s/((?:(?:\w+)(?:\W+)){10}).*/$1/smix;
+      $before     = reverse $before; # reverse the string to limit backtracking.
+      $before     =~ s/((?:(?:\W+)(?:\w+)){10}).*/$1/smix;
+      $before     = reverse $before;
+
+      my $context = "$before $match $after"; # use $match here instead of $word to retain case
+      $context    =~ s/\s+/ /smxg;
+      $context    =~ s/^\s+//smxg;
+      $context    =~ s/\s+$//smxg;
+      $dbh->do(q[INSERT INTO idx (word,page,title,score,context,last_mod) values(?,?,?,?,?,?)], {}, $word, $page, ${$title_ref}, $weighting, $context, $lastmod_iso);
+
+    } else {
+      $dbh->do(q[UPDATE idx SET score=score+? WHERE word=? AND page=?], {}, $weighting, $word, $page);
+    }
+  }
+
+  $dbh->commit;
+  return 1;
+}
+
+sub strip_starting_url {
+  my $str = shift;
+  $str =~ s{$starting_url}{}smx;
+
+  if($str !~ m{^/}smx) {
+    $str = "/$str";
+  }
+
+  return $str;
+}
+
+sub process_pdf {
+  my ($page) = @_;
+  my $ua     = LWP::UserAgent->new;
+
+  print "processing $page" or croak $ERRNO;
+
+  $ua->agent('psyphi-indexer');
+
+  my $head_response = $ua->head($page);
+
+  if (!$head_response->is_success) {
+    print "\n" or croak $ERRNO;
+    carp $head_response->status_line;
+    return;
+  }
+
+  my $lastmod_http  = $head_response->header('Last-Modified'); # Last-Modified: Wed, 26 Jan 2011 21:40:04 GMT
+  my $lastmod_epoch = str2time($lastmod_http);
+  my $lastmod_iso   = DateTime->from_epoch(epoch=>$lastmod_epoch);
+  my $page_tmp      = strip_starting_url($page);
+  my $lastmod_db    = $dbh->selectall_arrayref(q[SELECT last_mod FROM idx WHERE page = ? GROUP BY page], {}, $page_tmp);
+
+  if(scalar @{$lastmod_db} && $lastmod_db->[0]->[0] ge $lastmod_iso) {
+    print " [SKIP]\n" or croak $ERRNO;
+    return;
+  }
+
+  my $response = $ua->get($page);
+  if (!$response->is_success) {
+    print "\n" or croak $ERRNO;
+    carp $response->status_line;
+    return;
+  }
+
+  #########
+  # start with a clean slate for this page
+  #
+  $dbh->do(q[DELETE FROM idx WHERE page = ?], {}, $page_tmp);
+
+  my $tmp           = File::Temp->new;
+  my $filename      = sprintf q[%s.pdf], $tmp->filename;
+  eval {
+    open my $fh, q[>], $filename or croak "Error opening $filename: $ERRNO";
+    binmode $fh;
+    print {$fh} $response->decoded_content or croak "Error writing to $filename: $ERRNO";
+    close $fh or croak "Error closing $filename: $ERRNO";
+    1;
+  } or do {
+    carp qq[Error decoding $filename [$page]: $EVAL_ERROR];
+  };
+
+  eval {
+    my $pdf              = CAM::PDF->new($filename);
+    my $npages           = $pdf->numPages();
+    my ($short_filename) = $page =~ m{([^/]+)$}smix;
+    my $title            = unescape($short_filename);
+
+    for my $pagenum (1..$npages) {
+      my $str = $pdf->getPageText($pagenum);
+      process_text($page, \$str, \$title, $lastmod_iso);
+    }
+    1;
+  } or do {
+    carp qq[Error parsing $filename [$page]: $EVAL_ERROR];
+  };
+
+  unlink $filename;
+
+  print "\n" or croak $ERRNO;
+  return 1;
+}

@@ -1,0 +1,189 @@
+SYNOPSIS
+
+        use WWW::Mechanize::Cached;
+    
+        my $cacher = WWW::Mechanize::Cached->new;
+        $cacher->get( $url );
+    
+        # or, with your own Cache object
+        use CHI;
+        use WWW::Mechanize::Cached;
+    
+        my $cache = CHI->new(
+            driver   => 'File',
+            root_dir => '/tmp/mech-example'
+        );
+    
+        my $mech = WWW::Mechanize::Cached->new( cache => $cache );
+        $mech->get("http://www.wikipedia.org");
+
+DESCRIPTION
+
+    Uses the Cache::Cache hierarchy by default to implement a caching Mech.
+    This lets one perform repeated requests without hammering a server
+    impolitely. Please note that Cache::Cache has been superceded by CHI,
+    but the default has not been changed here for reasons of backwards
+    compatibility. For this reason, you are encouraged to provide your own
+    CHI caching object to override the default.
+
+CONSTRUCTOR
+
+ new
+
+    Behaves like, and calls, WWW::Mechanize's new method. Any params, other
+    than those explicitly listed here are passed directly to
+    WWW::Mechanize's constructor.
+
+    You may pass in a cache => $cache_object if you wish. The $cache_object
+    must have get() and set() methods like the Cache::Cache family.
+
+    The default Cache object is set up with the following params:
+
+        my $cache_params = {
+            default_expires_in => "1d", namespace => 'www-mechanize-cached',
+        };
+    
+        $cache = Cache::FileCache->new( $cache_params );
+
+    This should be fine if you only want to use a disk-based cache, you
+    only want to cache results for 1 day and you're not in a shared hosting
+    environment. If any of this presents a problem for you, you should pass
+    in your own Cache object. These defaults will remain unchanged in order
+    to maintain backwards compatibility.
+
+    For example, you may want to try something like this:
+
+        use WWW::Mechanize::Cached;
+        use CHI;
+    
+        my $cache = CHI->new(
+            driver   => 'File',
+            root_dir => '/tmp/mech-example'
+        );
+    
+        my $mech = WWW::Mechanize::Cached->new( cache => $cache );
+        $mech->get("http://www.wikipedia.org");
+
+METHODS
+
+    Most methods are provided by WWW::Mechanize. See that module's
+    documentation for details.
+
+ cache( $cache_object )
+
+    Requires an caching object which has a get() and a set() method. Using
+    the CHI module to create your cache is the recommended way. See new()
+    for examples.
+
+ is_cached()
+
+    Returns true if the current page is from the cache, or false if not. If
+    it returns undef, then you don't have any current request.
+
+ positive_cache( 0|1 )
+
+    As of v1.36 positive caching is enabled by default. Up to this point,
+    this module had employed a negative cache, which means it cached 404
+    responses, temporary redirects etc. In most cases, this is not what you
+    want, so the default behaviour now better reflects this. You can revert
+    to the negative cache quite easily:
+
+        # cache everything (404s, all 300s etc)
+        $mech->positive_cache( 0 );
+
+ ref_in_cache_key( 0|1 )
+
+    Allow the referring URL to be used when creating the cache key. This is
+    off by default. In almost all cases, you will not want to enable this,
+    but it is available to you for reasons of backwards compatibility and
+    giving you enough rope to hang yourself.
+
+    Previous to v1.36 the following was in the "BUGS AND LIMITATIONS"
+    section:
+
+        It may sometimes seem as if it's not caching something. And this may well
+        be true. It uses the HTTP request, in string form, as the key to the cache
+        entries, so any minor changes will result in a different key. This is most
+        noticable when following links as L<WWW::Mechanize> adds a C<Referer>
+        header.
+
+    See RT #56757 for a detailed example of the bugs this functionality can
+    trigger.
+
+ cache_undef_content_length( 0 | 'warn' | 1 )
+
+    This is configuration option which adjusts how caching behaviour
+    performs when the Content-Length header is not specified by the server.
+
+    Default behaviour is 0, which is not to cache.
+
+    Setting this value to 1, will cache pages even if the Content-Length
+    header is missing, which was the default behaviour prior to the
+    addition of this feature.
+
+    And thirdly, you can set the value to the string 'warn', to warn if
+    this scenario occurs, and then not cache it.
+
+ cache_zero_content_length( 0 | 'warn' | 1 )
+
+    This is configuration option which adjusts how caching behaviour
+    performs when the Content-Length header is equal to 0.
+
+    Default behaviour is 0, which is not to cache.
+
+    Setting this value to 1, will cache pages even if the Content-Length
+    header is 0, which was the default behaviour prior to the addition of
+    this feature.
+
+    And thirdly, you can set the value to the string 'warn', to warn if
+    this scenario occurs, and then not cache it.
+
+ cache_mismatch_content_length( 0 | 'warn' | 1 )
+
+    This is configuration option which adjusts how caching behaviour
+    performs when the Content-Length header differs from the length of the
+    content itself. ( Which usually indicates a transmission error )
+
+    Setting this value to 0, will silenly not cache pages with a
+    Content-Length mismatch.
+
+    Setting this value to 1, will cache pages even if the Content-Length
+    header conflicts with the content length, which was the default
+    behaviour prior to the addition of this feature.
+
+    And thirdly, you can set the value to the string 'warn', to warn if
+    this scenario occurs, and then not cache it. ( This is the default
+    behaviour )
+
+UPGRADING FROM 1.40 OR EARLIER
+
+    Caching behaviour has changed since 1.40, and this may result in pages
+    that were previously cached start failing to cache, and in some cases,
+    emit warnings.
+
+    To return to the 1.40 behaviour:
+
+        $mech->cache_undef_content_length(1);  # Default is 0
+        $mech->cache_zero_content_length(1);   # Default is 0
+        $mech->cache_mismatch_content_length(1); # Default is 'warn'
+
+THANKS
+
+    Iain Truskett for writing this in the first place. Andy Lester for
+    graciously handing over maintainership. Kent Fredric for adding content
+    length handling.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Mechanize::Cached
+
+      * Search CPAN
+
+      https://metacpan.org/module/WWW::Mechanize::Cached
+
+SEE ALSO
+
+    WWW::Mechanize, WWW::Mechanize::Cached::GZip.
+

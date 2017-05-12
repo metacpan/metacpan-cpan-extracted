@@ -1,0 +1,39 @@
+---
+abstract: 'support for various ways to sign AWS requests'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Dir::Self: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Amazon-Signature
+requires:
+  Digest::HMAC: '0'
+  Digest::SHA: '0'
+  HTTP::StreamParser: '0.100'
+  List::UtilsBy: '0'
+  Log::Any: '0'
+  Mixin::Event::Dispatch: '1.006'
+  Time::Moment: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::QueryParam: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Amazon-Signature
+  homepage: http://search.cpan.org/dist/WebService-Amazon-Signature/
+version: '0.002'

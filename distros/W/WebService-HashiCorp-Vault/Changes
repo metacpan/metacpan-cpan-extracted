@@ -1,0 +1,7 @@
+WebService::HashiCorp::Vault - perl API for HashiCorp's Vault
+
+0.002 2017-04-28
+ - Add cubbyhole secret
+
+0.001 2017-04-10
+ - Initial revision

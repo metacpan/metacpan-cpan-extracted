@@ -1,0 +1,126 @@
+Revision history for WebService-Shippo
+ 
+0.0.21    2015-11-14 23:19:22+00:00 Europe/London
+    - The currency refresh in WebService::Shippo::Currency now fails
+      quietly, falling back to the hard-coded snapshot.
+    - Some tidying up and a little re-factoring
+0.0.20    2015-11-12 19:02:44+00:00 Europe/London
+    - De-clutter interface to main package
+    - Clean up serialization a bit
+    - The collection "count" method works as a static method
+    - POD updates
+0.0.19    2015-11-12 01:45:32+00:00 Europe/London
+    - Didn't run tests before releasing 0.0.18 to CPAN.
+    - Should have run tests before releasing 0.0.18 to CPAN.
+    - Travis you're the best!
+    - Clear out debug from tests causing one failure and fix a 
+      serialization bug in another test.
+    - Once more, with feeling...
+0.0.18    2015-11-12 01:32:55+00:00 Europe/London
+    - Some work on the iterator
+    - A new collector added, which uses the iterator to gather matches
+      and some very basic tests.
+    - A slew of POD updates
+0.0.17    2015-11-10 19:10:39+00:00 Europe/London
+    - Much POD, so wow!
+    - Separated Item and Collection class definitions to ease
+      their documentation.
+    - Locale::Codes and Locale::Currency both pretty hairy to use
+      accross different versions of Perl. Have come up with a 
+      different plan until one of thoses works consistently on 
+      on Perl versions.
+0.0.16    2015-11-09 22:32:19+00:00 Europe/London
+    - Some of the ancillary modules that didn't create Shippo::
+      namespace aliases now do so for the sake of consistency.
+    - There were some symbols exported on request and via tag :all; 
+      they're no longer exported at all because I'm not sure they'll
+      be used anyway.
+    - Begun to separate API entity classes from their collection classes
+      to make documentation easier. I'll continue this in the next release.
+    - POD updates.
+0.0.15    2015-11-08 21:19:47+00:00 Europe/London
+    - With the exception of "id" methods that didn't started with
+      "object_" but were identical in function to AUTOLOADed methods
+      that did have that prefix have now been removed.
+    - AUTOLOADed methods with always return '' instead of undef.
+    - Collection classes (always the plural form of the item class) now
+      respond to the Creator, Fetcher, Updater interfaces.
+    - POD updates.
+0.0.14    2015-11-05 21:09:08+00:00 Europe/London
+    - Some tidying up
+    - Some documentation
+    - A slow day
+0.0.13    2015-11-03 20:06:01+00:00 Europe/London
+    - Some POD stubs added.
+0.0.12    2015-11-03 18:55:11+00:00 Europe/London
+    - Address->validate no longer refreshes subject of method call if 
+      that subject is an address. The returned object is a validated
+      address, not an opportunity to enrich the subject.
+    - to_json is pretty if also passed a true as second argument
+    - AUTOLOAD methods defined as pure accessors, not as mutators.
+    - All entities now implement an iterator using the iterator method
+    - Fix buggy ObjectList page transitions. Results were not correctly
+      blessed as items but as lists.
+    - Lots of stuff that just didn't smell right either got fixed or
+      re-factored.
+0.0.11    2015-11-02 17:31:00+00:00 Europe/London
+    - The CarrierAccount "active" and "production" mutators have been
+      replaced with "activate", "deactivate", "enable_test_mode" and
+      "enable_production_mode" methods.
+    - The non-OO interface is history; seems a little pointless
+    - We're working with JSON a lot and so too is the client (probably)
+      so the boolean, true, false functions brought in by boolean pragma
+      are exported by default. So is callback.
+    - Some re-factoring.
+    - Now beginning to work on POD.
+0.0.10    2015-10-25 19:56:30+00:00 Europe/London
+    - Basic Authorization added.
+    - Numerous doc and test change.
+    - Had to remove Try::Tiny because it was giving grief under 5.8.8
+    - Still having grief with Locale::Currency which works on some Perls
+      and not others. If I avoid the really poor public interface with the
+      patchy support on earlier and later versions of Perl, and use the 
+      private Locale::Codes interface, I only have problems on Perl 5.14.
+      Fighting the urge to avoid using it altogether by eliminating the
+      dependency and replacing it with something that works properly and
+      consistently. Grumble, grumble. Hope it can be fixed. And tested. On
+      lots and lots of different Perls. Because that's good. Right?
+0.0.9     2015-10-24 23:41:44+01:00 Europe/London
+    - A reasonable minimum set of test finished. There can always be more
+      tests and there will be in the future. At 96.1% coverage (local), 93%
+      (Github), I'm now going to get some documentation done.
+0.0.8     2015-10-24 16:16:29+01:00 Europe/London
+    - Interim release.
+    - Entities with asynchronous work-flows stable.
+    - More tests.
+    - More refactoring.
+0.0.7     2015-10-20 20:00:55+01:00 Europe/London
+    - Interim release (no more until the 23rd when I return home).
+    - More core tests added for Rate and Shipment entities.
+    - Most of the important user-facing methods take blocking callbacks.
+    - A metric ton of re-factoring.
+    - And a partridge in a pear tree.
+0.0.6     2015-10-19 23:34:42+01:00 Europe/London
+    - Interim release (reasonably stable)
+    - More tests added
+    - Lots of re-factoring (particularly of test code)
+
+0.0.5     2015-10-19 20:16:14+01:00 Europe/London
+    - Interim release (reasonably stable).
+    - More tests added.
+    - Lots and lots of re-factoring.
+    
+0.0.4     2015-10-17 00:01:33+01:00 Europe/London
+    - Interim release.
+
+0.0.3     2015-10-16 17:55:27+01:00 Europe/London
+    - Interim release.
+    
+0.0.2     2015-10-16 01:07:52+01:00 Europe/London
+    - Interim release.
+    - API appears functional. Cruddy developer tests will now be built-out
+      into something more useful and robust. Naturally, documentation is
+      going to be forthcoming, too.
+    
+0.0.1     2015-10-15 14:30:34+01:00 Europe/London
+    - Initial version.

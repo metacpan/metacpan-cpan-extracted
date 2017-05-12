@@ -1,0 +1,19 @@
+.cvsignore
+Changes
+lib/WebService/ClinicalTrialsdotGov.pm
+lib/WebService/ClinicalTrialsdotGov/Parser.pm
+lib/WebService/ClinicalTrialsdotGov/Reply.pm
+lib/WebService/ClinicalTrialsdotGov/Request.pm
+lib/WebService/ClinicalTrialsdotGov/SearchResult.pm
+lib/WebService/ClinicalTrialsdotGov/Study.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/multiple_generic.t
+t/pod.t
+t/searchresult.t
+t/single_study.t
+t/study.t
+META.yml                                 Module meta-data (added by MakeMaker)

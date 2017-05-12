@@ -1,0 +1,24 @@
+---
+abstract: "WebService::Saasu - an interface to saasu.com's RESTful accounting API using Web::API"
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Saasu
+requires:
+  Modern::Perl: '0'
+  Mouse: '0'
+  Web::API: '0'
+  XML::Simple: '0'
+resources:
+  bugtracker: https://github.com/nupfel/WebService-Saasu/issues
+  homepage: https://github.com/nupfel/WebService-Saasu/wiki
+  repository: git://github.com/nupfel/WebService-Saasu.git
+version: '0.5'

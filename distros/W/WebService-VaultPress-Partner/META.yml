@@ -1,0 +1,25 @@
+---
+abstract: 'The VaultPress Partner API Client'
+author:
+  - 'SymKat <symkat@symkat.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-VaultPress-Partner
+requires:
+  Carp: 0
+  JSON: 0
+  LWP: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+version: 0.05

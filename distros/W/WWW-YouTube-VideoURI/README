@@ -1,0 +1,18 @@
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) Gavin Brown. All rights reserved.
+
+--
+$Id: README,v 1.1 2007/08/29 17:35:11 gavin Exp $

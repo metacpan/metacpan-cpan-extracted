@@ -1,0 +1,41 @@
+Revision history for WWW-Notifo
+
+0.09  2010-Jul-21
+
+      - Depend on LWP::UserAgent 5.815
+
+0.08  2010-Jul-18
+
+      - Add notifo static method
+      - Add notifo program
+
+0.07  2010-Jul-18
+
+      - Use message from service in errors if available
+
+0.06  2010-Jul-17
+
+      - Remove dependency on Test::Deep, Getopt::Long
+
+0.05  2010-Jul-17
+
+      - Documenation fixes
+
+0.04  2010-Jul-17    
+
+      - Clarify error handling documentation
+      - Make most recent response available via last accessor.
+
+0.03  2010-Jul-17    
+
+      - Replace url with uri in documentation.
+      - Strict arg checking
+
+0.02  2010-Jul-17    
+
+      - Documentation for new method.
+      - Removed spurious bin/notifo
+
+0.01  2010-Jul-17    
+
+      - Initial release.

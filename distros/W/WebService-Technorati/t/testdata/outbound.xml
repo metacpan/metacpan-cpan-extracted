@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- generator="Technorati API version 1.0 /outbound" -->
+<!DOCTYPE tapi PUBLIC "-//Technorati, Inc.//DTD TAPI 0.02//EN" "http://api.technorati.com/dtd/tapi-002.xml">
+<tapi version="1.0">
+<document>
+<result>
+  <url>http://www.arachna.com/roller/page/spidaman</url>
+  <weblog>
+    <name>What's That Noise?! [Ian Kallen's Weblog]</name>
+    <url>http://www.arachna.com/roller/page/spidaman</url>
+    <rssurl>http://www.arachna.com/roller/rss/spidaman</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>17</inboundblogs>
+    <inboundlinks>60</inboundlinks>
+    <lastupdate>2004-11-07 15:05:18 GMT</lastupdate>
+    <rank>26080</rank>
+  </weblog>
+  <inboundblogs>17</inboundblogs>
+  <inboundlinks>60</inboundlinks>
+  <rankingstart>1</rankingstart>
+</result>
+<item>
+  <weblog>
+    <name>Just a Theory</name>
+    <url>http://www.justatheory.com</url>
+    <rssurl>http://www.justatheory.com/index.rss</rssurl>
+    <atomurl>http://www.justatheory.com/index.atom</atomurl>
+    <inboundblogs>1</inboundblogs>
+    <inboundlinks>2</inboundlinks>
+    <lastupdate>2004-10-22 00:01:40 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>David Crow: Software Usability, Information Architecture and Innovation</name>
+    <url>http://davidcrow.ca</url>
+    <rssurl>http://davidcrow.ca/index.xml</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>24</inboundblogs>
+    <inboundlinks>30</inboundlinks>
+    <lastupdate>2004-11-04 04:04:21 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>CamWorld: Thinking Outside the Box</name>
+    <url>http://www.camworld.com</url>
+    <rssurl>http://www.camworld.com/index.rdf</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>484</inboundblogs>
+    <inboundlinks>528</inboundlinks>
+    <lastupdate>2004-10-24 22:05:44 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>High Context</name>
+    <url>http://www.highcontext.com</url>
+    <rssurl>http://www.highcontext.com/feed/rss/</rssurl>
+    <atomurl>http://www.highcontext.com/feed/atom/</atomurl>
+    <inboundblogs>63</inboundblogs>
+    <inboundlinks>227</inboundlinks>
+    <lastupdate>2004-11-02 05:57:14 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>The Truth Laid Bear</name>
+    <url>http://www.truthlaidbear.com</url>
+    <rssurl>http://www.truthlaidbear.com/index.rdf</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>1938</inboundblogs>
+    <inboundlinks>3235</inboundlinks>
+    <lastupdate>2004-11-12 03:37:56 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>Wonkette</name>
+    <url>http://www.wonkette.com</url>
+    <rssurl>http://www.wonkette.com/index.rdf</rssurl>
+    <atomurl>http://www.wonkette.com/atom.xml</atomurl>
+    <inboundblogs>2471</inboundblogs>
+    <inboundlinks>3125</inboundlinks>
+    <lastupdate>2004-11-12 13:21:45 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>AlwaysOn Home</name>
+    <url>http://www.alwayson-network.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>459</inboundblogs>
+    <inboundlinks>956</inboundlinks>
+    <lastupdate>2004-08-05 07:56:00 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>VentureBlog</name>
+    <url>http://www.ventureblog.com</url>
+    <rssurl>http://feeds.feedburner.com/ventureblog</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>387</inboundblogs>
+    <inboundlinks>498</inboundlinks>
+    <lastupdate>2004-10-07 09:09:01 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>rc3.org: Rafe Colburn's weblog</name>
+    <url>http://rc3.org</url>
+    <rssurl>http://rc3.org/rss/</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>218</inboundblogs>
+    <inboundlinks>246</inboundlinks>
+    <lastupdate>2004-11-11 21:29:08 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>Jeremy Zawodny's blog</name>
+    <url>http://jeremy.zawodny.com/blog</url>
+    <rssurl>http://jeremy.zawodny.com/blog/flickr.rss</rssurl>
+    <atomurl>http://jeremy.zawodny.com/blog/atom.xml</atomurl>
+    <inboundblogs>940</inboundblogs>
+    <inboundlinks>1238</inboundlinks>
+    <lastupdate>2004-11-14 20:32:28 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>Slashdot: News for nerds, stuff that matters</name>
+    <url>http://www.slashdot.org</url>
+    <rssurl>http://slashdot.org/index.rss</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>15445</inboundblogs>
+    <inboundlinks>26545</inboundlinks>
+    <lastupdate>2004-10-10 19:51:58 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:01 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>Haggis Buffet</name>
+    <url>http://haggisbuffet.blogspot.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>3</inboundblogs>
+    <inboundlinks>4</inboundlinks>
+    <lastupdate>2004-07-24 15:15:04 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>The TNL.net weblog</name>
+    <url>http://www.tnl.net/blog</url>
+    <rssurl>http://www.tnl.net/channels/feeds/rss200/main.xml</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>75</inboundblogs>
+    <inboundlinks>94</inboundlinks>
+    <lastupdate>2004-10-14 23:21:08 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>Chad Dickerson</name>
+    <url>http://weblog.infoworld.com/dickerson</url>
+    <rssurl>http://weblog.infoworld.com/dickerson/index.rdf</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>36</inboundblogs>
+    <inboundlinks>41</inboundlinks>
+    <lastupdate>2004-11-12 01:27:43 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>What The Hell Am I Doing Here?</name>
+    <url>http://www.mediawench.com</url>
+    <rssurl>http://www.mediawench.com/rss.xml</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>26</inboundblogs>
+    <inboundlinks>78</inboundlinks>
+    <lastupdate>2004-11-14 01:06:49 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>a later date</name>
+    <url>http://blog.mittenartworks.com</url>
+    <rssurl>http://blog.mittenartworks.com/index.rdf</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>13</inboundblogs>
+    <inboundlinks>39</inboundlinks>
+    <lastupdate>2004-11-06 18:35:51 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>empty-handed.com: heal THIS</name>
+    <url>http://www.empty-handed.com</url>
+    <rssurl>http://www.empty-handed.com/index.rdf</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>83</inboundblogs>
+    <inboundlinks>118</inboundlinks>
+    <lastupdate>2004-11-10 19:20:35 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>girlwonder</name>
+    <url>http://www.girlwonder.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>84</inboundblogs>
+    <inboundlinks>121</inboundlinks>
+    <lastupdate>2004-11-10 05:46:53 GMT</lastupdate>
+  </weblog>
+</item>
+<item>
+  <weblog>
+    <name>limon :: by Laura Lemay</name>
+    <url>http://blog.lauralemay.com</url>
+    <rssurl>http://blog.lauralemay.com/index.xml</rssurl>
+    <atomurl>http://blog.lauralemay.com/atom.xml</atomurl>
+    <inboundblogs>7</inboundblogs>
+    <inboundlinks>21</inboundlinks>
+    <lastupdate>2004-11-08 19:53:45 GMT</lastupdate>
+  </weblog>
+</item>
+</document>
+</tapi>
+

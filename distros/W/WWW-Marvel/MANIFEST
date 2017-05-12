@@ -1,0 +1,25 @@
+Changes
+examples/all_characters_names.pl
+lib/WWW/Marvel.pm
+lib/WWW/Marvel/Client.pm
+lib/WWW/Marvel/Config.pm
+lib/WWW/Marvel/Config/File.pm
+lib/WWW/Marvel/Entity.pm
+lib/WWW/Marvel/Entity/Character.pm
+lib/WWW/Marvel/Factory/Entity.pm
+lib/WWW/Marvel/Response.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/characters.pl
+t/000_load.t
+t/www-marvel-client.t
+t/www-marvel-config-file.conf
+t/www-marvel-config-file.t
+t/www-marvel-config.t
+t/www-marvel.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

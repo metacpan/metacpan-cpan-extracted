@@ -1,0 +1,62 @@
+{
+   "abstract" : "Simple library for accessing the Bonusly API",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Bonusly",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zostay/WebService-Bonusly/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/zostay/WebService-Bonusly"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

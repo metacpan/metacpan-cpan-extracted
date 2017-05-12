@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+# incase anyone runs perlcritic on this, yes, we have a package name
+# that is not in the Required Filename form that we would demand of
+# an actual perl module.
+#
+# this also demonstrates the idea of allowing this script to subclass
+# the Wetware::CLI and over ride the methods that it needs.
+## no critic (Modules::RequireFilenameMatchesPackage)
+package Wetware::CLI::demo_runner;
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../blib/lib/";
+
+use Data::Dumper qw(Dumper);
+use Wetware::CLI;
+use base q{Wetware::CLI};
+
+exit run(@ARGV) unless caller;
+
+#-------------------------------------------------------------------------------
+
+sub run {
+	my (@args) = @_;
+	
+	# if we can sub class ourselves ...
+	my $cli =  __PACKAGE__->new();
+	
+	my $options = $cli->get_options(@args);
+
+	$cli->DumpMe($options, 'the options');
+	
+	return 0;
+}
+
+# illustration of overriding the base class
+# without this, there would be the error of the form:
+# wooster:~/devel/Wetware-CLI drieux$ demo/cli_runner --new_option
+# Unknown option: new_option
+# Error Parsing GetOptions
+# Usage:
+#       demo/cli_runner [ -verbose | --help | --pod ]
+# 
+# wooster:~/devel/Wetware-CLI drieux$
+
+sub option_specifications {
+	my ($self) = @_;	
+	my @default_specifications = $self->SUPER::option_specifications();
+	push @default_specifications, qw( SomeStrange new_option=s );
+	return @default_specifications;
+}
+
+# just a helper to wrap data dumper...
+sub DumpMe {
+	my ($self, $data, $msg) = @_;
+	
+	print "$msg\n" if $msg;
+	print Dumper($data);
+	
+	return;
+}
+
+#-------------------------------------------------------------------------------
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cli_runner - demo ways to think about the Wetware::CLI
+
+=head1 SYNOPSIS
+
+  demo/cli_runner [ -verbose | --help | --pod ] 
+  [ --SomeStrange ] [ --new_option = string ]
+
+
+=head1 DESCRIPTION
+
+This should show this POD if all is correct.
+
+
+=cut

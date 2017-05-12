@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/WebService/Wedata.pm
+lib/WebService/Wedata/Database.pm
+lib/WebService/Wedata/Item.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/010.api_basic.database.t.skip
+t/011.api_basic.item.t.skip
+t/012.api_basic.t.skip
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

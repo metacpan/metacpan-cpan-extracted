@@ -1,0 +1,15 @@
+Revision history for Perl extension Win32::Unicode::Shortcut.
+
+0.04  Tue Jun 25 20:14:00 2012
+	- Use COINIT_APARTMENTTHREADED in the tests
+
+0.03  Tue May 29 22:57:00 2012
+	- removed the use in Makefile.PL and added t/threads.t
+
+0.02  Tue May 29 07:20:00 2012
+	- missing typemap
+
+0.01  Thu May 24 18:56:29 2012
+	- original version; created by h2xs 1.23 with options
+		-cn Win32::Unicode::Shortcut
+

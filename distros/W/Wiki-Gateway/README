@@ -1,0 +1,43 @@
+Wiki::Gateway presents an API for interaction with remote wikis.
+
+You must have the Python module "WikiGateway" installed first. Wiki::Gateway is a wrapper for the Python module.
+
+If you'd like a pure Perl implementation of Wiki::Gateway, see release version 0.00143.
+
+
+
+---------------
+
+SYNOPSIS:
+
+use Wiki::Gateway;
+
+$result = Wiki::Gateway::getPage('http://interwiki.sourceforge.net/cgi-bin/wiki.pl', $wiki_type, 'SandBox');
+
+
+$result = Wiki::Gateway::putPage('http://interwiki.sourceforge.net/cgi-bin/wiki.pl', $wiki_type, 'SandBox', $page_source_text);
+
+
+$timestamp = Wiki::Gateway::daysAgoToDate(1);
+$result = Wiki::Gateway::getRecentChanges('http://interwiki.sourceforge.net/cgi-bin/wiki.pl',$wiki_type, $timestamp);
+
+
+$result = Wiki::Gateway::getAllPages('http://interwiki.sourceforge.net/cgi-bin/wiki.pl',$wiki_type);
+
+
+---------------
+
+
+Right now, WikiGateway supports (i.e. knows how to talk to) the following wiki engines:
+
+* MoinMoin ($wiki_type = "moinmoin1")
+* UseMod   ($wiki_type = "usemod1")
+* OddMuse  ($wiki_type = "usemod1")
+
+Wiki::Gateway is part of a suite of related programs, including a command-line client, an Atom proxy server which can act as a proxy for a wiki, and an XML-RPC proxy server. See http://interwiki.sourceforge.net/cgi-bin/wiki.pl?WikiGateway for more information.
+
+To get help, email the WikiGateway users' mailing list: interwiki-wgateway-usr@lists.sourceforge.net.
+
+   -- Bayle Shanks
+   http://interwiki.sourceforge.net/
+

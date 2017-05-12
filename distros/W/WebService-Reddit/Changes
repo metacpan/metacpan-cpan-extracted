@@ -1,0 +1,10 @@
+Revision history for WebService-Reddit
+
+0.000003  2017-02-03 23:07:08-05:00 America/Toronto
+    - Adds post() and delete() methods.
+
+0.000002  2017-01-26 00:54:15-05:00 America/Toronto
+    - Adds LWP::Protocol::https to dependencies.
+
+0.000001  2017-01-24 22:59:33-05:00 America/Toronto
+    - Initial release.

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:tns="http://avatax.avalara.com/services"
+    xmlns:s="http://www.w3.org/2001/XMLSchema"
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    targetNamespace="http://avatax.avalara.com/services"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://avatax.avalara.com/services">
+      <s:complexType name="TaxLine">
+        <s:all>
+          <s:element minOccurs="0" maxOccurs="1" name="No" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TaxCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Taxability" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="BoundaryLevel" type="tns:BoundaryLevel" />
+          <s:element minOccurs="1" maxOccurs="1" name="Exemption" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Discount" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Taxable" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Rate" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tax" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TaxCalculated" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="TaxDetails" type="tns:ArrayOfTaxDetail" />
+          <s:element minOccurs="1" maxOccurs="1" name="ExemptCertId" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TaxDate" type="s:date" />
+          <s:element minOccurs="1" maxOccurs="1" name="ReportingDate" type="s:date" />
+          <s:element minOccurs="1" maxOccurs="1" name="AccountingMethod" type="tns:AccountingMethod" />
+          <s:element minOccurs="0" maxOccurs="1" name="TaxIncluded" type="s:boolean" default="false" />
+        </s:all>
+      </s:complexType>
+      <s:complexType name="TaxAddress">
+        <s:all>
+          <s:element minOccurs="0" maxOccurs="1" name="Address" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AddressCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="BoundaryLevel" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="City" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Country" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PostalCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Region" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="TaxRegionId" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="JurisCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Latitude" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Longitude" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ValidateStatus" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="GeocodeType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DistanceToBoundary" type="s:int" />
+        </s:all>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+</wsdl:definitions>

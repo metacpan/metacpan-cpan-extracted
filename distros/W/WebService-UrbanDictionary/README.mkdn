@@ -1,0 +1,56 @@
+# NAME
+
+WebService::UrbanDictionary - An OO interface to UrbanDictionary.com's JSON API.
+
+# VERSION
+
+version 2.015
+
+# SYNOPSIS
+
+        use WebService::UrbanDictionary;
+
+        my $ud = WebService::UrbanDictionary->new;
+
+        my $results = $ud->request('perl'); 
+
+        for my $each (@{ $results->definitions }) {
+                printf "Definition: %s\n(by %s)\n\n", $each->definition, $each->author;
+        }
+
+# DESCRIPTION
+
+WebService::UrbanDictionary provides an object-oriented to UrbanDictionary's online JSON API.
+
+## Methods
+
+- `request(word)`
+
+    Requests data on the given word from UrbanDictionary's API.
+    Returns a [WebService::UrbanDictionary::Term](https://metacpan.org/pod/WebService::UrbanDictionary::Term) object.
+
+# SEE ALSO
+
+[WebService::UrbanDictionary::Term](https://metacpan.org/pod/WebService::UrbanDictionary::Term)
+
+[WebService::UrbanDictionary::Term::Definition](https://metacpan.org/pod/WebService::UrbanDictionary::Term::Definition)
+
+[WWW::Search::UrbanDictionary](https://metacpan.org/pod/WWW::Search::UrbanDictionary) - Module for accessing UrbanDictionary's (deprecated) SOAP API.
+
+# AUTHOR
+
+William Woodruff <william@tuffbizz.com>
+
+# CONTRIBUTORS
+
+- Gabriel Vieira <gabriel.vieira@gmail.com>
+- Scott C <cabrinhascott@gmail.com>
+- William Woodruff <woodruffw@users.noreply.github.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by William Woodruff.
+
+This is free software, licensed under:
+
+    The MIT (X11) License

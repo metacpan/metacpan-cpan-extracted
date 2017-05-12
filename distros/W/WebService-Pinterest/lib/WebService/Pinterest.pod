@@ -1,0 +1,515 @@
+
+=head1 NAME
+
+WebService::Pinterest - Pinterest API client
+
+=head1 SYNOPSIS
+
+    use WebService::Pinterest;
+
+    $pinterest = WebService::Pinterest->new( access_token => $access_token );
+
+    $r1 = $pinterest->fetch('me');
+    $r2 = $pinterest->fetch('my/pins');
+    $r3 = $pinterest->fetch('board/pins', {board => $board});
+
+    $r4 = $pinterest->create('board', board => 'nobody/board');
+    $r5 = $pinterest->create(
+        'pin',
+        board     => 'nobody/board',
+        note      => 'Nothing at nowhere',
+        image_url => 'http://nothing.com/nowhere/image.jpg',
+        link      => 'http://nothing.com/nowhere.html',
+    );
+
+    $r6 = $pinterest->edit('pin', {pin => 9999999, note => $new_note, link => $new_link});
+
+
+=head1 DESCRIPTION
+
+This module implements a client for the Pinterest API documented at:
+
+    https://developers.pinterest.com/docs/
+
+I<This code is in alpha state. Its interface may change
+in the next releases.>
+
+L<Pinterest|https://www.pinterest.com/> offers a RESTful API
+that gives access to user's Pinterest data, like their boards, pins,
+followers and more.
+
+L<WebService::Pinterest> gives you an easy way to access most
+of the official Pinterest API capabilities from a Perl program.
+
+=head2 API ENDPOINTS
+
+Pinterest API endpoints are tuples with HTTP method and endpoint path.
+
+The HTTP methods for the current API endpoints are:
+
+    GET
+    POST
+    PATCH
+    DELETE
+
+Examples of current endpoints (methods and paths) are:
+
+    GET   /v1/me/
+    GET   /v1/me/likes/
+    GET   /v1/users/:user
+    POST  /v1/boards/
+    GET   /v1/boards/:board/pins/
+    PATCH /v1/boards/:board/
+
+Each of the documented endpoints can be invoked with
+the help of the C<call()> method. For example,
+
+    $pinterest->call(GET => '/v1/me/');
+    $pinterest->call(GET => '/v1/me/likes/', fields => 'id,note,board,link,url,counts');
+    $pinterest->call(POST => '/v1/boards/', name => 'Awesome Pictures');
+    $pinterest->call(PATCH => '/v1/boards/:board/', {board => 'awesome-pictures', description => $desc});
+
+The parameters can be given as a hash or hashref,
+as in
+
+    $pinterest->call($method => $path, %params);
+    $pinterest->call($method => $path, \%params);
+
+The module implements parameter validation,
+so errors are caught earlier and without the need to
+reach Pinterest servers (and consume your hourly quota).
+
+=head2 RESOURCES
+
+I found that remembering the endpoints can be error-prone
+and boring. That is why the concept of "resources"
+as simple aliases to the endpoints has been incorporated
+to this module.
+
+The examples given above with C<call()> can be rewritten
+as:
+
+    $pinterest->fetch('me');
+    $pinterest->fetch('my/likes', fields => 'id,note,board,link,url,counts');
+    $pinterest->create('board', name => 'Awesome Pictures');
+    $pinterest->edit('board', {board => 'awesome-pictures', description => $desc});
+
+Notice that resources are insensitive to singular/plural
+(for cases like C<'my/likes'> and C<'my/like'>)
+and also insensitive to trailing slashes (C<'board/'>
+works as well as C<'board'>).
+
+Based on the resources, there are also
+endpoint methods like:
+
+    $pinterest->fetch_me();
+    $pinterest->fetch_my_likes(fields => 'id,note,board,link,url,counts');
+    $pinterest->create_board(name => 'Awesome Pictures');
+    $pinterest->edit_board({board => 'awesome-pictures', description => $desc});
+
+=begin TODO
+
+PARAMETERS
+
+CALL OPTIONS
+
+=end TODO
+
+=head1 SUPPORTED ENDPOINTS
+
+All supported endpoints are listed below.
+For details on the parameters for each call, take a look at
+
+    https://developers.pinterest.com/docs/api/users/
+    https://developers.pinterest.com/docs/api/boards/
+    https://developers.pinterest.com/docs/api/pins/
+
+=over 4
+
+=item C<GET /v1/me/>
+
+    Resource: me
+
+    Endpoint method: fetch_me
+
+=item C<GET /v1/me/boards/>
+
+    Resource: my/boards me/boards
+
+    Endpoint method: fetch_my_boards
+
+=item C<GET /v1/me/boards/suggested/>
+
+    Resource: my/suggested/boards me/boards/suggested
+
+    Endpoint method: fetch_my_suggested_boards
+
+=item C<GET /v1/me/likes/>
+
+    Resource: my/likes me/likes
+
+    Endpoint method: fetch_my_likes
+
+=item C<GET /v1/me/pins/>
+
+    Resource: my/pins me/pins
+
+    Endpoint method: fetch_my_pins
+
+=item C<GET /v1/users/:user>
+
+    Resource: user
+
+    Endpoint method: fetch_user
+
+=item C<GET /v1/me/search/boards/>
+
+    Resource: search/my/boards me/search/boards
+
+    Endpoint method: search_my_boards
+
+=item C<GET /v1/me/search/pins/>
+
+    Resource: search/my/pins me/search/pins
+
+    Endpoint method: search_my_pins
+
+=item C<POST /v1/me/following/boards/>
+
+    Resource: my/following/board me/following/board
+
+    Endpoint method: create_my_following_board
+
+=item C<POST /v1/me/following/users/>
+
+    Resource: my/following/user me/following/user
+
+    Endpoint method: create_my_following_user
+
+=item C<GET /v1/me/followers/>
+
+    Resource: my/followers me/followers
+
+    Endpoint method: fetch_my_followers
+
+=item C<GET /v1/me/following/boards/>
+
+    Resource: my/following/boards me/following/boards
+
+    Endpoint method: fetch_my_following_boards
+
+=item C<GET /v1/me/following/interests/>
+
+    Resource: my/following/interests me/following/interests my/interests
+
+    Endpoint method: fetch_my_following_interests
+
+=item C<GET /v1/me/following/users/>
+
+    Resource: my/following/users me/following/users
+
+    Endpoint method: fetch_my_following_users
+
+=item C<DELETE /v1/me/following/boards/:board/>
+
+    Resource: my/following/board me/following/board
+
+    Endpoint method: delete_my_following_board
+
+=item C<DELETE /v1/me/following/users/:user/>
+
+    Resource: my/following/user me/following/user
+
+    Endpoint method: delete_my_following_user
+
+=item C<POST /v1/boards/>
+
+    Resource: board
+
+    Endpoint method: create_board
+
+=item C<GET /v1/boards/:board/>
+
+    Resource: board
+
+    Endpoint method: fetch_board
+
+=item C<GET /v1/boards/:board/pins/>
+
+    Resource: board/pins
+
+    Endpoint method: fetch_board_pins
+
+=item C<PATCH /v1/boards/:board/>
+
+    Resource: board
+
+    Endpoint method: edit_board
+
+=item C<DELETE /v1/boards/:board/>
+
+    Resource: board
+
+    Endpoint method: delete_board
+
+=item C<POST /v1/pins/>
+
+    Resource: pin
+
+    Endpoint method: create_pin
+
+=item C<GET /v1/pins/:pin/>
+
+    Resource: pin
+
+    Endpoint method: fetch_pin
+
+=item C<PATCH /v1/pins/:pin/>
+
+    Resource: pin
+
+    Endpoint method: edit_pin
+
+=item C<DELETE /v1/pins/:pin/>
+
+    Resource: pin
+
+    Endpoint method: delete_pin
+
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>
+
+    $pinterest = WebService::Pinterest->new(%args);
+
+Constructor. Accepts the arguments:
+
+    access_token - most API calls require only this
+
+    api_id - for authorization calls
+
+    api_secret - needed for authorization_url()
+
+    trace_calls - to enable tracing HTTP requests and responses to / from Pinterest
+
+=item B<call>
+
+    $response = $pinterest->call($method, $endpoint, \%params);
+    $response = $pinterest->call($method, $endpoint, \%params, \%opts);
+    $response = $pinterest->call($method, $endpoint, %params);
+
+For C<\%opts>, C<< {allow_extra => 1} >> can be used to tell
+the validation routine to allow extra parameters for the endpoint.
+
+=begin TODO
+
+See L</CALL OPTIONS> for C<%opts>.
+
+=end TODO
+
+=item B<authorization_url>
+
+    $url = $pinterest->authorization_url(
+        response_type => 'code',
+        state         => $state,
+        scope         => 'read_public,write_public',
+        redirect_uri  => 'https://my.app.com/connect/pinterest',
+    );
+
+Builds an authorization URL to request authorization from
+a user to read or change the Pinterest data in their account.
+
+See https://developers.pinterest.com/docs/api/overview/#getting-your-authorization-code
+
+Requires C<app_id> and C<app_secret> attributes,
+besides C<response_type>, C<scope>, C<redirect_uri> parameters.
+
+C<state> is optional but recommended, since this can
+be used to make sure that redirect back to your site
+or app wasn't spoofed.
+
+C<scope> is a comma-separated list of
+C<Pinterest permission scopes|https://developers.pinterest.com/docs/api/overview/#permission-scopes>.
+
+C<redirect_uri> is the URI which the user will be redirected to
+after they authorize (or choose not to authorize) your app.
+This URI B<must> be added to the list of redirect URIs in
+your L<Pinterest app configuration|https://developers.pinterest.com/apps/>.
+
+It is probably a good practice to keep track of the app user
+via the authorization state. If successful, Pinterest will
+generate a request to your app with the authorization state
+and an authorization code. The authorization code (which stands
+for temporary credentials) should then be exchanged by an access token
+(and may be obtained with a C<get_access_token()> call.
+The access code in turn works as a permanent credential
+(until the user revokes app access).
+
+=item B<get_access_token>
+
+    $response = $pinterest->get_access_token(
+         grant_type => 'authorization_code',
+         code       => $code,
+    );
+
+Retrieves the I<access token> corresponding to the authorization code
+obtained from an app user. This access token will then be used
+for the app to access Pinterest data on user's behalf.
+
+Requires C<app_id> and C<app_secret> attributes,
+besides C<grant_type> and C<code> parameters.
+
+=item B<resolve_resource>
+
+    $method_endpoint = $pinterest->resolve_resource($method, $resource);
+
+Returns an arrayref with the actual HTTP method
+and endpoint path for a Pinterest API call.
+
+=item B<fetch>
+
+    $response = $pinterest->fetch($resource, %params);
+    $response = $pinterest->fetch($resource, \%params);
+    $response = $pinterest->fetch($resource, \%params, \%opts);
+
+Resolves C<< GET => $resource >> and, if successful,
+does a Pinterest API call to the resulting endpoint.
+
+On failure, it croaks.
+
+=item B<create>
+
+    $response = $pinterest->create($resource, %params);
+    $response = $pinterest->create($resource, \%params);
+    $response = $pinterest->create($resource, \%params, \%opts);
+
+Resolves C<< POST => $resource >> and, if successful,
+does a Pinterest API call to the resulting endpoint.
+
+On failure, it croaks.
+
+=item B<edit>
+
+    $response = $pinterest->edit($resource, %params);
+    $response = $pinterest->edit($resource, \%params);
+    $response = $pinterest->edit($resource, \%params, \%opts);
+
+Resolves C<< PATCH => $resource >> and, if successful,
+does a Pinterest API call to the resulting endpoint.
+
+On failure, it croaks.
+
+=item B<delete>
+
+    $response = $pinterest->delete($resource, %params);
+    $response = $pinterest->delete($resource, \%params);
+    $response = $pinterest->delete($resource, \%params, \%opts);
+
+Resolves C<< DELETE => $resource >> and, if successful,
+does a Pinterest API call to the resulting endpoint.
+
+On failure, it croaks.
+
+=item B<fetch_paged>
+
+    $pager = $pinterest->fetch_paged($resource, %params);
+    $pager = $pinterest->fetch_paged($resource, \%params);
+    $pager = $pinterest->fetch_paged($resource, \%params, \%opts);
+
+Resolves C<< GET => $resource >> to a Pinterest API endpoint
+which supports paging. If successful, creates a pager
+object to iterate through the resulting response pages.
+
+On failure, it croaks.
+
+See L</PAGINATION>.
+
+
+=back
+
+=head1 HELPER METHODS
+
+=over 4
+
+=item B<upload>
+
+    $upload = $pinterest->upload($file_path);
+
+See L</IMAGE UPLOADS>.
+
+=item B<pager>
+
+    $pager = $pinterest->pager($method => $endpoint, %params);
+    $pager = $pinterest->pager($method => $endpoint, \%params);
+    $pager = $pinterest->pager($method => $endpoint, \%params, \%opts);
+
+Used to implement C<fetch_paged()>. See L</PAGINATION>.
+
+=back
+
+=head1 SPECIAL TRICKS
+
+=head2 IMAGE UPLOADS
+
+By now, the parameters to the API calls are simply scalars.
+There is one exception for the endpoint
+
+    POST /v1/pins/
+
+It accepts an optional "image" parameter which should be
+an upload of the image content for the pin being created.
+
+If you want to create a pin by uploading an image
+stored at a file in the local machine, use the methods C<upload()>
+and C<create('pin', ...)> as in the example below:
+
+    $r = $pinterest->create('pin',
+        board => 'nobody/hummingbirds',
+        note  => 'Hummingbirds & Orchids',
+        link  => 'http://www.orchiddigest.com/orchid-digest-75-1.html',
+        image => $pinterest->upload($image_path),
+    );
+
+See https://developers.pinterest.com/docs/api/pins/#create-pins
+
+=head2 PAGINATION
+
+Some "fetch" endpoints support pagination and each response
+contains a limited number of items in the list. The number
+of items per page can be specified by the "limit" parameter.
+This parameter defaults to 25 and can be at most 100.
+
+You can traverse through the pages of a fetched result,
+using the C<fetch_paged()> method which returns a "pager"
+object. The pager in turn is  an iterator which returns one page at a time
+for each invocation of C<next()> until no page is left,
+when a false value is returned.
+
+The usage is illustrated below:
+
+    $pager = $api->fetch_paged('board/pins', board => $board, limit => 50);
+    while ($res = $pager->next) {
+        ...
+    }
+
+See https://developers.pinterest.com/docs/api/overview/#pagination
+
+=head1 BUGS
+
+Please report bugs via Github L<https://github.com/aferreira/cpan-WebService-Pinterest/issues>.
+
+=head1 AUTHORS
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,32 @@
+Revision history for WWW-Sitemap-XML
+
+2.02   2014-12-02 14:56:51
+    Fix Google::Video BUILDARGS
+
+2.01   2014-11-30 22:18:20
+    Documentation cleanup
+
+2.00   2014-11-30 02:03:03
+    Automatically lowercase the changefreq when loading invalid sitemaps
+        (Requested in GH#5 Case insensitive values, by rkleemann)
+    Ignore comments from loaded XML files
+        (GH#3 Sitemap with comments not working, by astuanax)
+    Support Google sitemap video, image and mobile extensions
+        (Requested in GH#4 Image, Video, and Mobile sitemaps/extensions, by ianmcorvidae)
+
+1.121160    Wed Apr 25 23:33:25 2012
+            [github#2] Updating documentation to use consistent forms of XML
+            and URL
+            [rt#69660] Moose version dependency
+            
+1.103500    Thu Dec 16 22:04:08 2010
+            fix invalid schemaLocation for sitemap index files
+                - reported by Michael Schaap
+
+1.103300    Fri Nov 26 15:17:18 2010
+            Add support for sitemap index files.
+            Replace XML::Twig with XML::LibXML.
+
+1.103270    Tue Nov 23 23:55:01 2010
+            First version.
+

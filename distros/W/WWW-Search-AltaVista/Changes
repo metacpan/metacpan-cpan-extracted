@@ -1,0 +1,120 @@
+2007-08-11    <Daddy@C-3PO>
+
+	* various: improved pod coverage
+
+2007-06-27    <Daddy@C-3PO>
+
+	* lib/WWW/Search/AltaVista.pm (parse_tree): ignore advertised links; fix result-count parser
+
+2007-05-20    <Daddy@C-3PO>
+
+	* use strict in all modules
+
+2004-04-05  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm: handle new HTML page format
+
+	* lib/WWW/Search/AltaVista.pm: handle new HTML page format
+
+2004-02-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (parse_tree): use count_pattern()
+
+	* lib/WWW/Search/AltaVista.pm (count_pattern): new method
+
+	* lib/WWW/Search/AltaVista/Web.pm: add $VERSION
+
+2004-02-06  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista.pm (parse_tree): fixed undef error(s)
+
+2004-01-16  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista.pm (parse_tree): FIX urls being absolutized wrong
+
+2004-01-09  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista.pm (native_setup_search): FIX _qr_count pattern; FIX use Date::Manip; clean up old code
+
+2003-12-16  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista.pm (native_setup_search): add . to result-count patterns (thanks to Andre Halama)
+
+2003-11-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (parse_tree): new method
+
+	* t/de.t: add content tests; call env_proxy()
+	
+	* t/news.t: add content tests; call env_proxy()
+
+	* lib/WWW/Search/AltaVista.pm: re-write parser using HTML::Tree
+
+	* t/altavista.t (my_engine): new file
+
+2003-07-27  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/AltaVista/DE.pm: new backend (thanks to Dmitry Katsubo)
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): tweak result-count patterns for www.altavista.de
+
+2003-03-30  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/AltaVista/News.pm (native_setup_search): new search URL
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): fix parsing of NEXT link; ignore image links
+
+2003-01-08  Kingpin  <mthurn@carbon>
+
+	* lib/WWW/Search/AltaVista.pm (gui_query): new method
+	(native_setup_search): new URL options
+	(native_retrieve_some): parse new output format
+
+2002-08-21  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): bail out if page says 0 hits
+
+2002-08-20  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_setup_search): new CGI options
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): update for slightly changed output format
+
+2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/NL.pm: delete un-parsable email from bottom of file
+
+2002-03-25  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* test.pl: all tests pass
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): correctly parse result list of length one
+
+2002-02-19  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_retrieve_some): unescape URL
+	(native_retrieve_some): BUGFIX for undefined $hit (?)
+
+2001-12-11  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): unescape URL
+
+2001-11-30  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista/Intranet3.pm: new backend supplied by Peter von Burg
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): do not use URI::URL
+	(native_setup_search): reorder CGI args for Intranet3.pm
+
+	* lib/WWW/Search/AltaVista/AdvancedWeb.pm (native_retrieve_some): do not use URI::URL
+
+2001-10-09  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): BUGFIX for death when seeing (bogus) description without a URL
+	(native_retrieve_some): FIX for getting count of News results
+
+2001-07-05  Kingpin  <mthurn@tasc.com>
+
+	* FIRST RELEASE outside of the WWW::Search distribution
+	
+

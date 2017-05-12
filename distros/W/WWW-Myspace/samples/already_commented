@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w -I../lib
+######################################################################
+# already_commented
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: already_commented,v 1.3 2006/01/18 01:59:34 grant Exp $
+######################################################################
+# Copyright (c) 2004 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+
+#---------------------------------------------------------------------
+# Setup Variables
+
+# Debugging?
+#$DEBUG=0;
+
+#---------------------------------------------------------------------
+# Libraries
+
+use WWW::Myspace;
+
+######################################################################
+# Main Program
+
+my $myspace = new WWW::Myspace;
+
+print $myspace->already_commented( @ARGV );

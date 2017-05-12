@@ -1,0 +1,94 @@
+NAME
+    WebService::Bloglines - Easy-to-use Interface for Bloglines Web Services
+
+SYNOPSIS
+      use WebService::Bloglines;
+
+      my $bloglines = WebService::Bloglines->new(
+          username => $username,
+          password => $password, # password is optional for notify()
+      );
+
+      # get the number of unread items using Notifer API
+      my $notifier = $bloglines->notify();
+
+      # list subscriptions using Sync API
+      my $subscription = $bloglines->listsubs();
+
+      # list all feeds
+      my @feeds = $subscription->feeds();
+      for my $feed (@feeds) {
+          my $title  = $feed->{title};            # title of the feed
+          my $url    = $feed->{htmlUrl};          # URL for HTML
+          my $type   = $feed->{type};             # "rss"
+          my $xml    = $feed->{xmlUrl};           # URL for XML
+          my $subid  = $feed->{BloglinesSubId};   # Blogines SubId
+          my $unread = $feed->{BloglinesUnread};  # number of unread items
+          my $ignore = $feed->{BloglinesIgnore};  # flag to ignore update
+      }
+
+      # list folders
+      my @folders = $subscription->folders();
+      for my $folder (@folders) {
+          my $title  = $folder->{title};  # title of the folder
+          my $subid  = $folder->{BloglinesSubId};  # Bloglines SubId
+          my $ignore = $folder->{BloglinesIgnore}; # flag to ignore update
+          my @feeds  = $subscription->feeds_in_folder($subid);
+      }
+
+      # list feeds in root folder
+      my @root_feeds = $subscription->feeds_in_folder(); # no args or just use $subId = 0
+
+      # get new items using Sync API
+      my $update = $bloglines->getitems($subId);
+      #  $update = $bloglines->getitems($subId, 1);            # mark unread items as read
+      #  $update = $bloglines->getitems($subId, 1, $unixtime); # items from $unixtime
+
+      # get channel information
+      my $feed = $update->feed();
+      $feed->{title};       # channel/title
+      $feed->{link};        # channel/link
+      $feed->{description}; # channel/description
+      $feed->{bloglines}->{siteid};      # bloglines::siteid
+      $feed->{language};    # language
+
+      for my $item ($update->items) {
+          my $title       = $item->{title};
+          my $creator     = $item->{dc}->{creator};
+          my $link        = $item->{link};
+          my $guid        = $item->{guid};
+          my $description = $item->{description};
+          my $pubDate     = $item->{pubDate}; # "Mon, 27 Sep 2004 8:04:17 GMT"
+          my $itemid      = $item->{bloglines}->{itemid};
+      }
+
+DESCRIPTION
+    WebService::Bloglines priovides you an Object Oriented interface for
+    Bloglines Web Services (BWS). It currently supports Notifier API and
+    Sync API. See http://www.bloglines.com/services/api/ for details.
+
+METHODS
+    TBD.
+
+TODO
+    *   Cacheability using Cache::Cache API.
+
+    *   Use LibXML to parse OPML?
+
+WARNING
+    This module is in beta version. Object interface it provides may be
+    changed later.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    http://www.bloglines.com/
+
+    http://www.bloglines.com/services/api/
+
+    Blog Hacks: http://hacks.bloghackers.net/ (in Japanese)
+

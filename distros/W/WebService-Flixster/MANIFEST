@@ -1,0 +1,26 @@
+CHANGELOG
+Makefile.PL
+MANIFEST
+README
+lib/WebService/Flixster.pm
+lib/WebService/Flixster/Actor.pm
+lib/WebService/Flixster/Actor/Stub.pm
+lib/WebService/Flixster/Base.pm
+lib/WebService/Flixster/Currency.pm
+lib/WebService/Flixster/Date.pm
+lib/WebService/Flixster/Director.pm
+lib/WebService/Flixster/Movie.pm
+lib/WebService/Flixster/Movie/Stub.pm
+lib/WebService/Flixster/Photo.pm
+lib/WebService/Flixster/Poster.pm
+lib/WebService/Flixster/Reviews.pm
+lib/WebService/Flixster/Review/Critic.pm
+lib/WebService/Flixster/Review/Flixster.pm
+lib/WebService/Flixster/Review/RottenTomatoes.pm
+lib/WebService/Flixster/Review/User.pm
+lib/WebService/Flixster/RunningTime.pm
+lib/WebService/Flixster/Trailer.pm
+lib/WebService/Flixster/URL.pm
+t/extended.t
+t/flixster.t
+META.yml                                 Module meta-data (added by MakeMaker)

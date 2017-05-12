@@ -1,0 +1,20 @@
+LICENSE
+Changes
+lib/WWW/Google/URLShortener.pm
+lib/WWW/Google/URLShortener/Params.pm
+lib/WWW/Google/URLShortener/Analytics.pm
+lib/WWW/Google/URLShortener/Analytics/Result.pm
+lib/WWW/Google/URLShortener/Analytics/Result/Country.pm
+lib/WWW/Google/URLShortener/Analytics/Result/Browser.pm
+lib/WWW/Google/URLShortener/Analytics/Result/Referrer.pm
+lib/WWW/Google/URLShortener/Analytics/Result/Platform.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-unit-test.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

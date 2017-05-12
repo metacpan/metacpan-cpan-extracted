@@ -1,0 +1,27 @@
+<workflow>
+
+ <type>ObservedTicket</type>
+ <description>This is the workflow for sample application Ticket</description>
+ <persister>TestPersister</persister>
+
+ <observer class="SomeObserver" />
+ <observer sub="SomeObserver::other_sub" />
+
+ <state name="INITIAL">
+     <action name="null"  resulting_state="FIRST" />
+ </state>
+
+ <state name="FIRST">
+     <action name="null2" resulting_state="NOCHANGE" />        
+     <action name="null"  resulting_state="PROGRESS" />
+  </state>
+
+  <state name="PROGRESS">
+      <action name="null" resulting_state="CLOSED" />
+  </state>
+
+  <state name="CLOSED">
+      <action name="null" resulting_state="FIRST" />
+  </state>
+
+</workflow>

@@ -1,0 +1,20 @@
+Revision history for cpe:/a:colliertech.org:wallflower
+
+0.0.3   20120814T104413 cjac@colliertech.org
+      - Stripped perl out of distribution .zip at the request of Mika
+        Epstein (Ipstenu) from the wordpress plugin cabal
+      - Stripped references to Perl from README based on same above
+        request
+      - Stole some re-useable bits from WordPress HTTPS.  Thanks go to
+        Mike Ems for producing something worth stealing - licensensed
+        under GPL3
+      - Included the Mvied library to provide a base class - license: GPL3
+      - Removed text output from wallflower.php
+
+0.0.2   20120810T173854 carl.j.adams-collier@us.army.mil
+      - Made a perl module out of it
+
+0.0.1   20120810T170159 cjac@f5.com
+      - Published the PHP version here: http://wp.colliertech.org/downloads/wallflower-0.0.1.zip
+
+

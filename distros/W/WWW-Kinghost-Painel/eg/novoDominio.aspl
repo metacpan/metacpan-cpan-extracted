@@ -1,0 +1,20 @@
+﻿<%@LANGUAGE="PerlScript" CODEPAGE="65001"%>
+<%
+use Win32::ASP;
+use WWW::Kinghost::Painel;
+
+$Response->{charset}="utf-8";
+
+my $painel = WWW::Kinghost::Painel->new();
+
+$painel->logar('email@revenda.com.br','xxxxxxx');
+
+my $plano = "000000";
+my $dominio = "topjeca.com.br";
+my $cliente = "000000";
+my $pagoate = "2012-03-01";
+my $senha = "testeteste";
+my $plataforma = "Windows";
+my $webmail = "SquirrelMail"; # SquirrelMail, NutsMail, RoundCube, TupiMail, Horde
+print $painel->novoDominio($plano, $cliente, $pagoate, $dominio, $senha, $plataforma, $webmail);
+%>

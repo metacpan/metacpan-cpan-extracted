@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::Search::Rambler.
+
+0.01  Sat Aug  7 16:36:05 2004
+	- original version; created by h2xs 1.23 with options
+	  -X -c -n WWW::Search::Rambler
+        - This is the first public release.
+
+0.02  Sat Aug 14 11:42:58 2004
+	- Added prereq modules to Makefile.PM.
+
+0.03  Tue Jun 27 14:47:00 2006
+	- Corrected charset name.

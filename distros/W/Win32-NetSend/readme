@@ -1,0 +1,83 @@
+NAME
+
+Win32::NetSend - Sends message from NT to NT or Win9x running winpopup
+
+Version 0.2
+
+SYNOPSIS
+
+	use Win32::NetSend;
+
+	my $NetSend = Win32::NetSend->new(
+		to => "user",
+		message => "hello world!");
+	$NetSend->Send();
+
+Or can use it:
+
+	my $NetSend = Win32::NetSend->new();
+	$NetSend->Send(
+		to => "user",
+		message => "hello world");
+
+DESCRIPTION
+
+	This module sends message from NT to NT or Win9x running winpopup.
+
+	This module is a small and simple Perl GUI utility to send messages
+	via MS LAN Manager to lists of recipients. It works in the same
+	manner as "net send" command.
+
+	The utility can be used if you need to send the same message to
+	groups of people. For instance, you are going to update some server
+	software and have to ask the users who work with the software to log
+	off.
+
+PLATAFORMS
+
+	This module work in:
+
+	Win95	- Only receive if running winpopup
+	Win98	- Only receive if running winpopup
+	WinMe	- Only receive if running winpopup
+
+	WinNT4	- Full support, send an receive
+	Win2000	- Full support, send an receive
+	WinXP	- Full support, send an receive
+
+
+Functions
+
+Send
+
+	Send(
+		to => "user",
+		message => "hello world");
+
+Send a message to user, machine, domain. For actual domain use *
+
+
+SEE ALSO
+
+Win32::NetSend requires Win32::API .
+
+STATUS
+
+This version (0.02) is a beta version. You can use it but interface may change.
+
+AUTHOR
+
+Victor Sanchez <vsanchez@cpan.org>
+
+THANKS
+
+Thanks to people of Perl-ES ( htpp://perl-es.sf.net )
+
+COPYRIGHT
+
+(c) Copyright 2002, 2003 Victor Sanchez <vsanchez@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+

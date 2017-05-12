@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+NetAdmin.pm
+NetAdmin.xs
+ppport.h
+t/netadmin.t

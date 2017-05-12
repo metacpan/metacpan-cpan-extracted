@@ -1,0 +1,147 @@
+Revision history for WWW::Google::Places
+
+0.32   Sat May 06 11:30:00 2017
+       - Fixed issue #2 with regard to parameter 'types' having multiple values.
+
+0.31   Sun Jul 31 03:30:00 2016
+       - Added package for attributes 'photos' and 'address_components'.
+       - Updated method WWW::Google::Place::Review::as_string().
+       - Added method WWW::Google::Place::DetailResult::as_string().
+       - Added method WWW::Google::Place::SearchResult::as_string().
+       - Updated section "SYNOPSIS" to reflect the above changes.
+       - Tidied up unit test scripts.
+
+0.30   Sun Jul 10 12:00:00 2016
+       - Updated copyright year information.
+       - Addressed issue raised in the CPAN Tester Report.
+         http://www.cpantesters.org/cpan/report/3ed22692-434c-11e6-b35e-6fe162f69d7e
+
+0.29   Sun Dec 13 03:15:00 2015
+       - Fixed issue RT: 110292 raised by SREZIC.
+
+0.28   Sat Dec 12 05:05:00 2015
+       - Used new package Method::ParamValidator for validating method parameters dynamically.
+
+0.27   Mon Oct 05 10:50:00 2015
+       - Upgraded to use WWW::Google::UserAgent v0.20.
+
+0.26   Wed Sep 30 10:10:00 2015
+       - Upgraded to use WWW::Google::UserAgent v0.19.
+
+0.25   Sun Sep 06 08:35:00 2015
+       - Added link to the official Google API document.
+
+0.24   Wed Aug 19 10:10:00 2015
+       - Upgraded to use WWW::Google::UserAgent v0.18.
+
+0.23   Sun Aug 09 12:00:00 2015
+       - Upgraded to use WWW::Google::UserAgent v0.17.
+
+0.22   Tue May 19 10:40:00 2015
+       - Added missing 'pagetoken' field to $FIELDS in the package WWW::Google::Places::Params.
+
+0.21   Sun May 17 08:30:00 2015
+       - Fixed setting default values to class attributes.
+       - Made the return value of method search() and paged_search() based on wantarray().
+       - Upgraded to use WWW::Google::UserAgent v0.16.
+
+0.20   Mon May 04 18:15:10 2015
+       - Fixed sample code in the pod document.
+
+0.19   Mon Apr 27 13:40:10 2015
+       - Added following packages
+         - WWW::Google::Places::Geometry
+         - WWW::Google::Places::Location
+         - WWW::Google::Places::Review
+         - WWW::Google::Places::Review::Aspect
+       - Updated package WWW::Google::Places::DetailResult to respect the above changes.
+       - Updated package WWW::Google::Places::SearchResult to respect the above changes.
+       - Added section "SYNOPSIS" to the pod document of WWW::Google::Places.
+
+0.18   Fri Feb 13 17:20:10 2015
+       - Upgraded to use Test::Internet v0.04.
+       - Updated test script 05-paging.t
+
+0.17   Thu Feb 12 23:00:10 2015
+       - Used Test::Internet in the test script 05-paging.t
+       - Tidied up pod document in general.
+
+0.16   Wed Feb 11 11:40:10 2015
+       - Merged pull request from Hunter McMillen (mcmillhj) about new method paged_search().
+       - Tidied up test script 05-paging.t.
+       - Upgraded to use WWW::Google::UserAgent v0.14.
+       - General code tidied up.
+
+0.15   Tue Jan 13 20:00:10 2015
+       - Updated description of methods in the pod document of the package WWW::Google::Places.
+
+0.14   Mon Jan 12 15:05:18 2015
+       - Upgraded to use WWW::Google::UserAgent v0.13.
+       - Updated the description of the following methods in the pod document:
+         - search()
+         - details()
+         - add()
+         - delete()
+       - Marked the following methods as DEPRECATED/UNSUPPORTED in the pod document:
+         - search_place()
+         - place_detail()
+         - add_place()
+         - delete_place()
+         - place_checkins()
+
+0.13    Mon Jan 12 12:40:18 2015
+        - Added 'use 5.006;' line to the following test scripts:
+          - t/01-new.t
+          - t/02-search_place.t
+          - t/03-place_detail.t
+          - t/04-add_place.t
+          - t/meta-json.t
+          - t/meta-yml.t
+
+0.12    Sat Jan 10 18:50:18 2015
+        - Upgraded to use WWW::Google::UserAgent v0.12.
+        - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+        - Documented methods in the package WWW::Google::Places::SearchResult and WWW::Google::Places::DetailResult.
+        - Removed SIGNATURE file.
+        - Added unit test to test META files.
+        - Added LICENSE file.
+        - Updated Copyright year information.
+
+0.11    Sat Aug 30 01:35:18 2014
+        - Added section "REPOSITORY" to the pod document.
+        - Added key "META_MERGE" to Makefile.PL file.
+
+0.10    Sun Aug 10 01:16:00 2014
+        - Tidied up README file.
+        - Updated Copyright year details.
+
+0.09    Tue Jul 29 15:35:20 2014
+        - Updated Makefile.PL to make the pre-requisite WWW::Google::UserAgent v0.07
+
+0.08    Tue Jul 29 00:38:00 2014
+        - Updated Makefile.PL to make the pre-requisite WWW::Google::UserAgent v0.06
+
+0.07    Mon Jul 28 14:35:00 2014
+        - Updated Makefile.PL to make the pre-requisite WWW::Google::UserAgent v0.03
+
+0.06    Sun Jul 27 11:51:25 2014
+        - Made use of WWW::Google::UserAgent v0.02.
+        - Deleted Build.PL file.
+
+0.05    Sun Jul 07 16:27:20 2014
+        - Restructured to use the common library WWW::Google::UserAgent
+
+0.04    Mon Aug 08 09:46:11 2011
+        - Made Readonly v1.03 as minimum requirement.
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.03    Wed May 18 20:00:00 2011
+        - Updated text for "LICENSE AND COPYRIGHT".
+
+0.02    Mon May 16 13:09:00 2011
+        - Updated the CONSTRUCTOR logic, so that it can now accept the api_key and sensor param
+          as list i.e new($api_key, $sensor) as well.
+        - Minor pod changes.
+
+0.01    Mon May 16 11:30:01 2011
+        - First version, released.

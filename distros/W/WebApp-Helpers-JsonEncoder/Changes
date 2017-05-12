@@ -1,0 +1,9 @@
+Revision history for Perl extension WebApp-Helpers-JsonEncoder
+
+0.01 2014-06-27T18:26:05Z
+
+    - original version from FREW at:
+
+      https://github.com/frioux/drinkup/blob/master/lib/DU/Role/JsonEncoder.pm
+
+      with some modifications made by FELLIOTT

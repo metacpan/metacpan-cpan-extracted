@@ -1,0 +1,4 @@
+severity=stern
+
+# We're actually fine here, but MooseX:: magic confuses critic.
+exclude=RequireEndWithOne

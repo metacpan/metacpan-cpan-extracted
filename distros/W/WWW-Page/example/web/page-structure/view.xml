@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page
+	import="Import::Client"
+	transform="view.xsl"
+	xmlns:page="urn:www-page">
+
+	<manifest>
+		<title>Test site</title>
+		<page:keyword-list/>
+	</manifest>
+
+	<content>
+		<page:current-view/>
+	</content>
+</page>

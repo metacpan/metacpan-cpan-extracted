@@ -1,0 +1,42 @@
+---
+abstract: 'Interface to shortening URLs using Naver Shorten URL API'
+author:
+  - 'Jeen Lee <F<jeen@perl.kr>>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Shorten-Naver
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::Shorten::Naver:
+    file: lib/WWW/Shorten/Naver.pm
+    version: '0.03'
+requires:
+  JSON::MaybeXS: '0'
+  URI: '0'
+  WWW::Shorten: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/JEEN/p5-WWW-Shorten-Naver/issues
+  homepage: https://github.com/JEEN/p5-WWW-Shorten-Naver
+  repository: git://github.com/JEEN/p5-WWW-Shorten-Naver.git
+version: '0.03'
+x_contributors:
+  - 'Jeen Lee <aiatejin@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

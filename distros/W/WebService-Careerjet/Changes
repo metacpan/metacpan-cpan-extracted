@@ -1,0 +1,57 @@
+Revision history for WebService-Careerjet
+
+3.1     9 Dec 2015
+        Updated documentation for en_CN and fr_CA.
+
+3.0     6 May 2015
+        Changed user agent name in API call.
+        Syncronized module version number with other languages.
+
+1.14    5 May 2015
+        Made the Careerjet affiliate ID, the end-user's IP address and user agent
+        required parameters.
+
+0.13    4 May 2012
+        Adapted module to the new Careerjet API
+
+0.12    3 Nov 2009
+        Added documentation about how to use the new location disambiguation system.
+
+0.11    8 July 2009
+        Corrected the documentation part about ISO codes.
+        Added Bangladesh (www.careerjet.com.bd).
+        Added Saudi Arabia (www.careerjet-saudi-arabia.com).
+
+0.10    24 April 2009
+        Added the affid parameter for Careerjet partners.
+        Added documentation about proxy settings.
+
+0.09    1 April 2009
+        Added debug mode.
+        Fixed decoding and encoding issues in the CLI executable.
+        Added dependency for Class::AutoAccess class.
+
+0.08    12 Mar 2009
+        Added Colombia and Kuwait.
+
+0.07    26 Nov 2008
+        Added Oman, Pakistan, Qatar, Vietnam, Malaysia, Russia, Ukraine and
+        Hungary. Fixed JSON deprecated call.
+
+0.06    17 Apr 2008
+        Fixed typo.
+        Added Korea, Japan, China and a few spanish speaking countries
+        Fixed problems with locale code for China for English-speakers.
+        Fixed problems with locale code for Czech Republic.
+
+0.05    3  Mar 2008
+        Corrected documentation.
+        Added Denmark, Finland and Norway.
+        Fixed data issues with Mexico and Hong Kong.
+
+0.04    2  May 2007
+        Added command line interface executable.
+
+0.01    26 April 2007
+        First version.
+

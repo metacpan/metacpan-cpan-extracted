@@ -1,0 +1,25 @@
+---
+abstract: 'Perl interface to the Zoopla API'
+author:
+  - 'Willem Basson <willem.basson@gmail.com>'
+build_requires:
+  Data::Dumper: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Zoopla-API
+requires:
+  List::Util: 0
+  Moose: 0
+  Net::HTTP::Spore: 0
+version: 0.001

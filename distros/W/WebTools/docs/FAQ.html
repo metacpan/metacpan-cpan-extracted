@@ -1,0 +1,183 @@
+<HTML>
+<body bgcolor="#FFFFFF" text="#333333" link="#000066" vlink="#660000" alink="#FF0033" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5">
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+<table width="100%" border="0" background="images/bgimage.jpg">
+  <tr> 
+    <td>
+      <div align="center"><img src="images/FAQ.gif" width="81" height="35"></div>
+    </td>
+  </tr>
+  <tr> 
+    <td> <font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"> 
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td> 
+            <ul>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq1"> 
+              <li>What I need to install properly this package?</li>
+              </a></font></b><br>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq2"> 
+              <li>How can I configure this package?</li>
+              </a></font></b><br>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq3"> 
+              <li>Why I get &quot;Internal error&quot; in browser?</li>
+              </a></font></b><br>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq4"> 
+              <li>How I can learn more about &quot;WebTools&quot;?</li>
+              </a></font></b><br>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq6"> 
+              <li>Why some SQL queries works and other not?</li>
+              </a></font></b><br>
+              <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a href="#faq5"> 
+              <li>How I can report errors and make comments?</li>
+              </a></font></b><br>
+            </ul>
+          </td>
+        </tr>
+      </table>
+      <br>
+      <br>
+      <blockquote> 
+        <p><a name="faq1"></a><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px" color="#FF6600">Q: 
+          <i>What I need to install properly this package?</i></font></b><br>
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A:</b></font> 
+          <b> The base requirements are: </b><br>
+          <br>
+          <b><font color="#000066" size="2" style="font-size:13px">Perl 5.005_03</font> 
+          or higher,<br>
+          <font color="#000066" size="2" style="font-size:13px">Unix/Linux</font> 
+          or<font color="#000066" size="2" style="font-size:13px"> Windows 9x/NT/XP</font><font color="#000099" size="2" style="font-size:13px"><br>
+          <br>
+          <font color="#000000" size="2" style="font-size:13px"><i>Recomended</i>:<br>
+          <br>
+          <font color="#FF0000" size="2" style="font-size:13px"><a href="http://www.perl.com/">Perl</a> 
+          5.6,</font></font></font></b><font color="#FF0000" size="2" style="font-size:13px"><br>
+          <b><a href="http://www.freebsd.org/">Unix/Linux</a> OS,<br>
+          <a href="http://www.mysql.org/">MySQL</a></b></font></p>
+        <p><b><font color="#000000" size="2" style="font-size:13px">You really 
+          need Unix/Linux based OS to enjoy all features in this module. Also 
+          you need MySQL to get speed with your session/user support! Of cource 
+          you can use our Flat Db driver (based on DBD::Sprite)</font></b><font color="#000000" size="2" style="font-size:13px"><b> 
+          to enjoy session/user functions.<br>
+          <br>
+          To run scripts you also may need to install follow standart modules</b></font></p>
+        <p><b><font color="#000000" size="2" style="font-size:13px"><a href="http://cpan.valueclick.com/authors/id/TIMB/DBI-1.21.tar.gz">DBI</a> 
+          (for DB access - In all cases!)</font></b></p>
+        <p><b><font color="#000000" size="2" style="font-size:13px"><a href="http://cpan.valueclick.com/authors/id/JWIED/Msql-Mysql-modules-1.2219.tar.gz">MySQL</a> 
+          (for MySQL access)</font></b></p>
+        <p><b><font color="#000000" size="2" style="font-size:13px"><a href="http://cpan.valueclick.com/authors/id/J/JU/JURL/DBD-ODBC-0.38.tar.gz">DBD-ODBC</a> 
+          (for MS Access)</font></b></p>
+        <p><b></b></p>
+        <p>&nbsp;</p>
+      </blockquote>
+      <blockquote> 
+        <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a name="faq2"></a>Q: 
+          </font></b><i><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b><font color="#FF6600" size="2" style="font-size:13px">How 
+          can I configure this package?</font></b></font></i><br>
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A:</b></font> 
+          <b> The only one configuration file in this package is &quot;config.pl&quot; 
+          and you can find it in 'conf' directory. Please configure FIRST! (More 
+          info about config.pl you can find in docs directory, please read HELP.html)<br>
+		  <font color="#C85330"><BR>
+          NOTE: For easy configure you can use our web based install.cgi script instead of
+          manual edit of config file!<BR><BR>
+          </font>
+          To install WebTools you must read INSTALL.html (located in your docs 
+          directory. Please read it!)<br>
+          Before you can start any script you 'must' run check test that show 
+          your active configuration.<br>
+          To do this, you must have already</b><b> configured &quot;config.pl&quot;<br>
+          To perform check please type follow in browser:</b><b><br>
+          </b></p>
+        <p><b><i><font color="#0000CC" size="2" style="font-size:13px">http://yourhost/cgi-bin/webtools/process.cgi</font></i></b></p>
+        <p><b>where 'cgi-bin' is your web server cgi directory;<br>
+          'webtools' is your cgi based package directory;<br>
+          process.cgi is you sub 'compiler' :-))</b><br>
+          <br>
+          <b>After you have passed the 'test' successfully you have to turn 'off' 
+          variable $check_module_functions to run your scripts normal (for more 
+          information see config.pl) </b></p>
+        <p><b>Anyway you need to read INSTALL.html and/or next FAQ.</b></p>
+        <p>&nbsp;</p>
+        <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a name="faq3"></a>Q: 
+          <font color="#FF3300"> <i> <font color="#FF6600" size="2" style="font-size:13px">Why 
+          I get &quot;Internal error&quot; in browser?</font></i></font></font></b><br>
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A: 
+          <font size="2">Commonly you get this error when your <font color="#FF0000" size="2" style="font-size:13px">shebang</font> 
+          (path to your perl compiler) is not correctly set. You have to change 
+          it only in one place: <font color="#000066" size="2" style="font-size:13px">process.cgi 
+          </font>(found in base directory of your package).
+          <font color="#C85330"><BR>
+          NOTE:</font> If you intend to use install.cgi (easy configurator) you have to edit and it's shebang too.
+          <BR>
+          On default it's set 
+          to: <font color="#000099" size="2" style="font-size:13px">#!/usr/bin/perl</font></font></b></font><br>
+          <b>If you don't know where is your Perl, you can use follow Unix command: 
+          <font color="#000099" size="2" style="font-size:13px">whereis perl</font><br>
+          to find out where is it.<br>
+          Of course the reason for that unconfortable error can be hidden in your 
+          installation!</b><br>
+          <b>Please check out for common errors like <font color="#FF0000" size="2" style="font-size:13px">mode</font> 
+          of your <font color="#000066" size="2" style="font-size:13px">process.cgi</font> 
+          (is it <font color="#000066" size="2" style="font-size:13px">755</font> 
+          ?) and/or directories?<br>
+          Other often error is related to Apache's(your web server) permissions, 
+          i.e. Apache can be unable to run<br>
+          scripts (!!!) and you must make Apache able to run them properly. More 
+          information you can fetch from INSTALL.html (please read careful).</b></p>
+        <p>&nbsp;</p>
+        <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a name="faq4"></a>Q: 
+          <i><font color="#FF6600" size="2" style="font-size:13px">How I can learn 
+          more about &quot;WebTools&quot;?<br>
+          </font></i></font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A: 
+          <font size="2">Reading this FAQ and you will :-)<br>
+          The real help actualy is in all the examples that I wrote (with some 
+          friends help) placed into docs/examples sub directory. A quick reference 
+          of functions you can find in Help.html (found into docs directory)</font></b></font></p>
+        <p>&nbsp;</p>
+        <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a name="faq6"></a>Q: 
+          <i><font color="#FF6600" size="2" style="font-size:13px">Why some SQL 
+          queries works and other not?<br>
+          </font></i></font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A: 
+          <font size="2">Well, all sql_* functions are able to support sessions 
+          and users functions but when you try to use it for your private needs, 
+          you must care about what exacly you 'insert</font></b></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b><font size="2">', 
+          'update' and so on... i.e. you must be very carefull when use these 
+          functions for anything else! Please QUOTE all data and take care about 
+          what kind of DB engine you prepare to use!<br>
+          <br>
+          <i>Example: </i><br>
+          So best way to insert, update...your data is:</font></b></font></p>
+        <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">$sth 
+          = sql_query(&quot;INSERT INTO TABL VALUES($val1,$val2,...)&quot;,$dbh);<br>
+          <br>
+          where: $val1, $val2,... must be quoted using sql_quote() on that way:<br>
+          $val1 = sql_quote($unquoted_var1,$dbh);<br>
+          <br>
+          </font></b><i><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Note</font>:</b></i> 
+          <font color="#000066" size="2"><b><font face="Courier New, Courier, mono" color="#333333">If 
+          inserted data is numeric then you don't need to quote them!</font></b></font></p>
+        <p><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b><font size="2">Using 
+          that style you will remove most problems with insert/update!<br>
+          <br>
+          <font color="#CC6633">Note:</font> Flat DB and Ms Access does not support 
+          binary files, so please don't insert binary files into session with 
+          these engines! However session support via MySQL and Flat files (not 
+          Flat DB) is FULL!</font></b></font></p>
+        <p>&nbsp;</p>
+        <p><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><a name="faq5"></a>Q: 
+          <font color="#FF6600" size="2" style="font-size:13px"> <i> How I can 
+          report errors and make comments?</i></font></font><br>
+          <font face="Verdana, Arial, Helvetica, sans-serif" size="2" style="13px"><b>A: 
+          <font size="2">Every help, suggessions and reports I will appreciate 
+          very high!</font></b></font></b><br>
+          <br>
+          <b>Please mail it to:<font color="#999999" size="2" style="font-size:13px"> 
+          <font size="2" style="font-size:13px"><a href="mailto:%20julian@proscriptum.com"><font size="2" style="13px" color="#666666">julian@proscriptum.com</font></a></font></font></b></p>
+      </blockquote>
+      </font></td>
+  </tr>
+</table>
+</font> 
+</body>
+</HTML>

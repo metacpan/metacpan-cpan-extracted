@@ -1,0 +1,178 @@
+#############################################################################
+## Name:        ext/propgrid/typemap.xsp
+## Purpose:     typemap file for xsubppp.pl
+## Author:      Mark Dootson
+## Modified by:
+## Created:     01/03/2012
+## SVN-ID:      $Id: typemap.xsp 2962 2010-08-23 19:33:35Z mbarbon $
+## Copyright:   (c) 2012 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%typemap{wxPGVIterator}{reference};
+%typemap{const wxPGVIterator&}{reference};
+
+%typemap{wxPGCell&}{reference};
+%typemap{wxPGChoices&}{reference};
+%typemap{wxPGChoices}{reference};
+%typemap{const wxPGChoices&}{reference};
+%typemap{const wxPGCell&}{reference};
+%typemap{wxPGValidationInfo&}{reference};
+
+%typemap{wxPGCellRenderer*}{simple};
+%typemap{wxPGEditorDialogAdapter*}{simple};
+%typemap{wxPGPropertyFlags}{simple};
+
+%typemap{wxPGPaintData&}{reference};
+/* %typemap{const wxPGCellData*}{simple}; */
+%typemap{wxPGChoicesData*}{simple};
+%typemap{wxPGChoiceEntry&}{reference};
+%typemap{const wxPGChoiceEntry&}{reference};
+
+%typemap{wxPGWindowList}{reference};
+%typemap{wxPropertyGrid*}{simple};
+%typemap{const wxPropertyGrid*}{simple};
+%typemap{wxPropertyGridHitTestResult}{reference};
+
+%typemap{wxPropertyGridIterator}{reference};
+%typemap{wxPropertyCategory*}{simple};
+%typemap{wxPGEditor*}{simple};
+%typemap{const wxPGEditor*}{simple};
+%typemap{const wxPropertyGridEvent&}{reference};
+%typemap{const wxPropertyGridIteratorBase&}{reference};
+
+%typemap{wxPropertyGridInterface*}{simple};
+%typemap{wxPropertyGridInterface}{reference};
+%typemap{wxPropertyGridInterface&}{reference};
+%typemap{wxPropertyGridPageState*}{simple};
+
+%typemap{wxPropertyGridPage*}{simple};
+
+%typemap{wxArrayPGProperty*}{simple};
+%typemap{const wxArrayPGProperty&}{reference};
+
+%typemap{wxBitmap*}{simple};
+%typemap{wxBitmap&}{reference};
+%typemap{wxDateTime}{reference};
+
+%typemap{wxValidator*}{simple};
+%typemap{wxVariant*}{simple};
+%typemap{wxVariant&}{reference};
+%typemap{wxVariant}{reference};
+
+
+%typemap{wxVariantArg}{parsed}{
+    %cpp_type{%wxVariant%};
+    %precall_code{% $CVar = wxPli_sv_2_wxvariant( aTHX_ $PerlVar ); %};
+};
+
+%typemap{wxEvent&}{reference};
+%typemap{wxFont&}{reference};
+%typemap{wxRect}{reference};
+%typemap{wxStatusBar*}{simple};
+
+%typemap{wxArrayString*}{simple};
+%typemap{wxLongLong_t}{simple};
+%typemap{wxULongLong_t}{simple};
+
+%typemap{wxPGInDialogValidator*}{simple};
+
+%typemap{wxNumericPropertyValidator*}{simple};
+
+%typemap{wxIntProperty*}{simple};
+%typemap{wxUIntProperty*}{simple};
+%typemap{wxFloatProperty*}{simple};
+%typemap{wxBoolProperty*}{simple};
+%typemap{wxEnumProperty*}{simple};
+%typemap{wxEditEnumProperty*}{simple};
+%typemap{wxFlagsProperty*}{simple};
+%typemap{wxFileProperty*}{simple};
+%typemap{wxLongStringProperty*}{simple};
+%typemap{wxDirProperty*}{simple};
+%typemap{wxArrayStringProperty*}{simple};
+
+%typemap{wxPGFileDialogAdapter*}{simple};
+%typemap{wxPGLongStringDialogAdapter*}{simple};
+
+%typemap{wxPGArrayEditorDialog*}{simple};
+%typemap{wxPlPGArrayEditorDialog*}{simple};
+%typemap{wxPGArrayStringEditorDialog*}{simple};
+
+%typemap{const wxLongLong&}{reference};
+%typemap{const wxULongLong&}{reference};
+%typemap{const long*}{simple};
+%typemap{wxPGChoices*}{simple};
+
+%typemap{wxString*}{simple};
+%typemap{const wxUniChar&}{reference};
+%typemap{wxUniChar}{reference};
+%typemap{wxCommandEvent&}{reference};
+%typemap{wxListEvent&}{reference};
+%typemap{wxIdleEvent&}{reference};
+%typemap{const wxWindow*}{simple};
+
+
+%typemap{wxColourPropertyValue}{reference};
+%typemap{const wxColourPropertyValue&}{reference};
+
+%typemap{wxFontProperty*}{simple};
+%typemap{wxPlFontProperty*}{simple};
+%typemap{wxSystemColourProperty*}{simple};
+%typemap{wxColourProperty*}{simple};
+%typemap{wxCursorProperty*}{simple};
+%typemap{wxImageFileProperty*}{simple};
+
+%typemap{wxMultiChoiceProperty*}{simple};
+%typemap{wxDateProperty*}{simple};
+%typemap{wxPGSpinCtrlEditor*}{simple};
+
+%typemap{const wxVariant*}{simple};
+
+%typemap{wxColour&}{reference};
+%typemap{wxColour*}{simple};
+%typemap{WXVARIANT}{simple};
+
+%typemap{wxStringProperty*}{simple};
+
+%typemap{wxPGProperty&}{reference};
+%typemap{const wxPGProperty*}{simple};
+%typemap{wxPGProperty*}{simple};
+%typemap{Wx_UserDataCD*}{simple};
+
+%typemap{wxPGProperty__parsed_nodelete*}{parsed}{
+    %cpp_type{%wxPGProperty*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+
+%typemap{const wxPGProperty__parsed_nodelete*}{parsed}{
+    %cpp_type{%const wxPGProperty*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+
+%typemap{wxPGProperty__parsed_allowdelete*}{parsed}{
+    %cpp_type{%wxPGProperty*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, true )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, true )%};
+};
+
+%typemap{wxPropertyCategory__parsed_nodelete*}{parsed}{
+    %cpp_type{%wxPropertyCategory*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+
+%typemap{wxPGEditor__parsed_nodelete*}{parsed}{
+    %cpp_type{%wxPGEditor*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+
+%typemap{const wxPGEditor__parsed_nodelete*}{parsed}{
+    %cpp_type{%const wxPGEditor*%};
+    %cleanup_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+    %precall_code{%wxPli_object_set_deleteable( aTHX_ $PerlVar, false )%};
+};
+

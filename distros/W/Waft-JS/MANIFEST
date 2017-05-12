@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Waft/JS.pm
+t/convert_text_part.t
+t/output_js_make_url_script.t

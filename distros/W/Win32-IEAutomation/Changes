@@ -1,0 +1,26 @@
+Revision history for Perl extension Win32::IEAutomation.
+
+0.1  Thu Jan 5 12:41:00 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Win32::IEAutomation
+		
+0.2 Tue Jan 17 17:10:00 2006
+	- Fixed bug in SelectItem method of select list
+	- Updated VerifyText method
+	- Added PageText method
+	- Added push_button_yes method in WinClicker class
+
+0.3 Wed Mar 01 15:30:00 2006
+	- Added Table.pm to support html table and its content.
+	- Added GetValue method on textbox and text area object
+	- Fixed minor bug in 'aftertext:' option to access html elements.
+	- Modified VerifyText method which now uses findtext method of DOM
+
+0.4 Wed Mar 01 15:30:00 2006
+	- Modified VerifyText method which now uses findtext method of DOM
+	
+0.5 Fri Mar 10 14:33:00 2006
+	- Added support for file upload input field.
+	
+	
+

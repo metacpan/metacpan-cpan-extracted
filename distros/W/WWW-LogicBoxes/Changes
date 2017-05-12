@@ -1,0 +1,114 @@
+v1.9.0 2016-12-07
+  - Handle domus contacts that do not have nexus data
+  - Added QueuedForDeletion as possible domain status
+
+v1.8.0 2016-11-30
+  - Support for 2016-12-01 ICANN IRTP Verification, introduced
+    WWW::LogicBoxes::IRTPDetail
+  - OBSOLETED update_contact, LogicBoxes no longer allows for updating a contact,
+    instead you should create a new contact and assoicate it with the domain
+
+v1.7.0 2016-11-17
+  - Better handling of raaVerificationStatus being missing (specifically for
+    expired domains)
+
+v1.6.0 2016-11-08
+  - Added Support for .ca Contacts and Registration/Retrieval of .ca Domains
+
+v1.5.0 2016-10-22
+  - Introduced a contact factory to improve ability to construct Contact
+    objects from LogicBoxes responses.
+
+v1.4.0 2016-10-21
+  - Make the Phone Number library more tolernate of bad phone numbers that
+    contain the country code twice ( +1.18005551212 )
+
+v1.3.0 2016-06-16
+  - Add support for IPv6 to Type Library and Private Nameservers
+
+v1.2.1 2016-06-09
+  - Fixed Coercion bug for US Contacts, was treating them as regular contacts
+
+v1.2.0 2016-04-12
+  - Implemented support for renewing existing domain registrations
+
+v1.1.1 2016-03-08
+  - Updated Test::Moose::More required version and marked it as a Testing dep
+
+v1.1.0  2016-03-07
+  - Added support for handling multiple responses from LogicBoxes when a contact
+    does not exist
+
+v1.0.6  2016-02-18
+  - Fixed minor bug where suggest_domain_names method was treating related as
+    optional => 0 instead of default => 0
+
+v1.0.5 2016-02-17
+  - Refactored domain suggestions to use the new V5 LogicBoxes
+    Suggestion API
+    - This *had* to happen because LogicBoxes is stopping support for
+      the older API method
+    - Usage of the hyphen attribute now triggers deprecation warnings
+  - Added missing use statement to
+    WWW::LogicBoxes::Role::Command::Domain::Transfer
+  - Fixed bug in POD for register_domain's request attribute
+  - Implemented Support for Updating Contacts
+
+v1.0.4    2016-02-15
+  - Added missing coercion to WWW::LogicBoxes::Role::Command::Contact's
+    create_contact
+
+v1.0.3    2016-02-03
+  - Allow for { } or "naked" arguments to new
+  - Add min version for Test::Moose::More
+
+v1.0.2    2016-01-26
+  - Fixed now forbidden usage of keys on scalars
+
+v1.0.1    2016-01-25
+  - Minor Fixes for Dzil Release Process
+
+1.0.0     2016-01-25
+  - First Stable Release
+  - Large Refactor but preserving backwards compatability
+  - Implemented Object Based Support For
+    - Customer
+    - Contact
+    - Domain
+      - Availability
+      - Registration
+      - Transfer
+      - Private Name Servers
+  - Implemented Role Based Operations For
+    - Customer
+    - Contact
+    - Domain
+      - Availability
+      - Registration
+      - Transfer
+      - Private Name Servers
+    - Raw
+
+0.1.0     2014-05-28
+    - Added support for apikey based authentication
+    - Quitely releasing two new more well defined methods
+        * check_availability
+        * suggest_names
+    - Both of these make use of WWW::LogicBoxes::Domain which is just a very
+      basic implementation at this point
+
+0.0.4     2012-03-06
+    - Modified tests to skip if username and password are not defined
+
+0.0.3     2012-03-06
+
+    - Added support for xml_simple
+
+0.0.2     2012-03-06
+
+    - Updated POD Docs, corrected minor grammer and formatting mistakes
+    - Added POD Docs section about incremented keys for some methods
+
+0.0.1     2012-03-05
+
+    - First version, released on an unsuspecting world.

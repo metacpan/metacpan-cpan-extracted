@@ -1,0 +1,77 @@
+WebService::ScormCloud
+
+This module provides an API interface to cloud.scorm.com, which is a
+web service provided by Rustici Software (http://www.scorm.com/).
+
+API docs can be found at:
+   http://cloud.scorm.com/EngineWebServices/doc/SCORMCloudAPI.html
+
+The author of this module has no affiliation with Rustici Software
+other than as a user of the interface.
+
+Registered trademarks are property of their respective owners.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+CONFIGURATION FOR TESTING
+
+Running "make test" will prompt you for the values of your
+ScormCloud AppID, SecretKey, and ServiceURL.  Those values will be
+stored in a config file under blib/ (until you "make clean").  To
+avoid the prompts, you can set:
+
+    $ENV{SCORM_CLOUD_APPID}
+    $ENV{SCORM_CLOUD_SECRETKEY}
+    $ENV{SCORM_CLOUD_SERVICEURL}
+
+You can set $ENV{SCORM_CLOUD_SERVICEURL} to the value "default" to
+use the default ServiceURL (currently "http://cloud.scorm.com/api").
+
+Note that these ENV values are only used for tests, you will need to
+provide your own mechanism to supply them to the
+WebService::ScormCloud->new() method (e.g. via ENV or config file).
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::ScormCloud
+
+You can also look for information at:
+
+    GitHub
+        git://github.com/larryl/ScormCloud.git
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-ScormCloud
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-ScormCloud
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-ScormCloud
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-ScormCloud/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Larry Leszczynski
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

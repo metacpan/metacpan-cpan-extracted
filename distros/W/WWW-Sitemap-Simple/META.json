@@ -1,0 +1,60 @@
+{
+   "abstract" : "simple sitemap builder",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Sitemap-Simple",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "Test::Output" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0.05",
+            "Compress::Zlib" : "0",
+            "Digest::MD5" : "0",
+            "IO::File" : "0",
+            "IO::Zlib" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Sitemap::Simple" : {
+         "file" : "lib/WWW/Sitemap/Simple.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/WWW-Sitemap-Simple/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/WWW-Sitemap-Simple"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               WWW-Phanfare-API
+version:            0.09
+abstract:           Perl wrapper for Phanfare API
+author:
+    - Soren Dossing <netcom@sauber.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             0
+    Config::General:  0
+    Digest::MD5:      0
+    File::HomeDir:    0
+    File::Slurp:      0
+    REST::Client:     0
+    Test::More:       0
+    URI::Escape:      0
+    XML::Simple:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

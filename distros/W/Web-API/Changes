@@ -1,0 +1,192 @@
+==================================================
+Changes from 2013-12-19 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 2.2 at 2014-12-19 01:23:05 +0000
+----------------------------------------
+
+  Change: fb57bb4d1c490e8d8cc211858f75cdcf06220022
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-19 14:22:51 +0000
+
+    added POD coverage to satisfy release build 
+
+  Change: fb4790824e9b0aec1af2775c3f0269644892b09e
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:15:22 +0000
+
+    version bump + updated documentation 
+
+  Change: f7d1448121ae8c7e8a6bd812a9ff51ddacad9e02
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:14:29 +0000
+
+    decoded content has to be a hash, this will break plain text based
+    APIs 
+
+  Change: d8246e27c842408ff24e449263e91d3273886051
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 23:12:17 +0000
+
+    implemented first version of error handling configuration (#2) 
+
+  Change: da9820d6bfbe0c28970cf2dcd984094405c5aac9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-18 22:27:29 +0000
+
+    fixed #15 
+
+  Change: 7a64524f0a06295401ef4d2aff388739f00152a5
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-12-04 01:16:12 +0000
+
+    enable strict_ssl by default 
+
+  Change: 00fccc030cd090608949fe802304e004d8ec4a3e
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-28 02:04:50 +0000
+
+    print package of the caller instead of always Web::API 
+
+  Change: 3dcf60cbfdd4bb5a8e7c388c687694fdee054c62
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-28 02:03:55 +0000
+
+    enable strict SSL hostname checking per default 
+
+  Change: 83c2be14fc4df51ad6103bc22944065c5c911e40
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-28 02:03:34 +0000
+
+    updated documentation 
+
+  Change: b9f4b5c4a74ad0bd30c1339b9b2f4546678e337b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 15:33:24 +0000
+
+    v2.1 
+
+----------------------------------------
+version 2.1 at 2014-11-27 02:32:56 +0000
+----------------------------------------
+
+  Change: 1f0c4c1bb176eac753430e9239c5a83b64a10d39
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 15:32:56 +0000
+
+    because some people can't implement APIs properly (hint SAASU) and
+    return 'text/html' instead of 'text/xml', let's just pretend they are
+    the same... 
+
+----------------------------------------
+version 2.0 at 2014-11-26 15:41:07 +0000
+----------------------------------------
+
+  Change: b0b182597a27bc02a2d0444cad257fa5723491c5
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 04:34:42 +0000
+
+    also map api_key_field for convenience and allow mapping to be a code
+    ref 
+
+  Change: a9cd832d5a81896e697a55f2a6ceceabe0edb931
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 04:31:58 +0000
+
+    keep connection alive for a speed boost 
+
+  Change: 23990c5491e59d614334410ce08a21127deafba9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-11-27 04:31:05 +0000
+
+    implemented request retrying based on HTTP response codes only for
+    now. closes #8 
+
+  Change: af09b99799e02363560e531481545fe52ffdc770
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:44:22 +0000
+
+    verion bump 
+
+  Change: 57e6db1bc6d6231a5f1aab6a98a50efd2786fb7b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:44:07 +0000
+
+    added contributors file 
+
+  Change: d646379027f06af765e62b15c38a0aa904620ee8
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-09-28 00:43:54 +0000
+
+    check for all mandatory keys as last step before wrapping. this maps
+    default_attributes now! 
+
+----------------------------------------
+version 1.9 at 2014-07-02 15:21:59 +0000
+----------------------------------------
+
+  Change: 8658599a40698c773720c5ca848b3557a270cfa8
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-07-02 17:21:59 +0000
+
+    leave out the check for specific content_types, we want this to work
+    for any deep structure supporting encoder 
+
+  Change: dd9f05b456f0844a155d665111af61a0f3dcda15
+  Author: Robert Norris <rob@eatenbyagrue.org>
+  Date : 2014-07-02 16:28:05 +0000
+
+    support mandatory deep hash params for json and xml output 
+
+  Change: 797ac16e4c988c5c56b5660055d65c4fb539a01f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-07-02 16:21:07 +0000
+
+    added support for custom encoders/decoders, use by defining a sub
+    that receives $options(hash)/$response(string) as first and as second
+    argument 
+
+  Change: b45b297ca37db2bd0805cfc5557109a00fb16acc
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-05-01 15:13:46 +0000
+
+    skip newline when debug dumping request headers 
+
+  Change: 16d691fec736a620ea1647c554507ab860533e6b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-28 00:27:47 +0000
+
+    v1.8 
+
+----------------------------------------
+version 1.8 at 2014-03-27 11:20:27 +0000
+----------------------------------------
+
+  Change: f0fb24d872d7a4126ab1fece6a025bd49c61c65e
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-28 00:20:27 +0000
+
+    make empty/no extension work by removing defined() test 
+
+  Change: 81b80bc26510b61229d699f84d89350415e58699
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-28 00:18:36 +0000
+
+    fixed missing POD for auth_type 
+
+----------------------------------------
+version 1.7 at 2014-03-06 05:48:04 +0000
+----------------------------------------
+
+  Change: 3cc13e96bae961164439848e0f104f6f3aa1a27b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2014-03-06 18:48:04 +0000
+
+    use extension to set incoming content-type for convenience and decode
+    response based on content-type header with fallback to configured
+    incoming content-type 
+
+=================================================
+Plus 16 releases after 2013-12-19 00:00:00 +0000.
+=================================================

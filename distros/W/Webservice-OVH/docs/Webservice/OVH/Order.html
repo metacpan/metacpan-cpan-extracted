@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#new_cart">new_cart</a></li>
+      <li><a href="#carts">carts</a></li>
+      <li><a href="#cart">cart</a></li>
+      <li><a href="#hosting">hosting</a></li>
+      <li><a href="#email">email</a></li>
+      <li><a href="#domain">domain</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $carts = $ovh-&gt;order-&gt;carts; my $cart_id = $carts-&gt;[0]-&gt;id; my $cart = $ovh-&gt;order-&gt;cart($cart_id);</p>
+
+<p>my $new_cart = $ovh-&gt;order-&gt;new_cart(ovh_subsidiary =&gt; &#39;DE&#39;);</p>
+
+<p>$ovh-&gt;order-&gt;hosting-&gt;web; $ovh-&gt;order-&gt;email-&gt;domain; $ovh-&gt;order-&gt;domain-&gt;zone;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Module that support carts and domain/transfer orders at the moment</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the order object. This method is not ment to be called external.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order.html">Webservice::OVH::Order</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order-&gt;_new($ovh_api_wrapper, $self);</p>
+
+</li>
+</ul>
+
+<h2 id="new_cart">new_cart</h2>
+
+<p>Creates a new &#39;shopping&#39; cart. Items can be put into it, to create orders.</p>
+
+<ul>
+
+<li><p>Parameter: %params - ovh_subsidiary =&gt; &#39;DE&#39; (required) expire =&gt; DateTime-str (optional) description =&gt; &quot;shopping&quot; (optional)</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: my $cart = $ovh-&gt;order-&gt;new_cart(ovh_subsidiary =&gt; &#39;DE&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="carts">carts</h2>
+
+<p>Produces an array of all available carts that are connected to the used account.</p>
+
+<ul>
+
+<li><p>Return: ARRAY</p>
+
+</li>
+<li><p>Synopsis: my $carts = $ovh-&gt;order-&gt;carts();</p>
+
+</li>
+</ul>
+
+<h2 id="cart">cart</h2>
+
+<p>Returns a single cart by id</p>
+
+<ul>
+
+<li><p>Parameter: cart_id - cart id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: my $cart = $ovh-&gt;order-&gt;cart(1234567);</p>
+
+</li>
+</ul>
+
+<h2 id="hosting">hosting</h2>
+
+<p>Gives Acces to the /order/hosting/ methods of the ovh api</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Hosting.html">Webservice::OVH::Order::Hosting</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;order-&gt;hosting</p>
+
+</li>
+</ul>
+
+<h2 id="email">email</h2>
+
+<p>Gives Acces to the /order/email/ methods of the ovh api</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Email.html">Webservice::OVH::Order::Email</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;order-&gt;email</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Gives Acces to the /order/domain/ methods of the ovh api</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Domain.html">Webservice::OVH::Order::Domain</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;order-&gt;domain</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

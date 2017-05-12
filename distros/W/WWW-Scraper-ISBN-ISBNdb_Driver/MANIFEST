@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/WWW/Scraper/ISBN/ISBNdb_Driver.pm
+t/01base.t
+t/10api-v1.t
+t/11api-v2.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t

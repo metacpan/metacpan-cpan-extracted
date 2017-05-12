@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use File::Slurper qw(read_text write_text);
+
+my $path = "lib/WordList/CPAN/PAUSEIDs.pm";
+my $content = read_text($path);
+$content =~ s/(__DATA__\n).+\z/$1 . `lcpan authors`/es or die;
+write_text($path, $content);

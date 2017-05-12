@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WebService-Validator-HTML-W3C-Fast
+version:             0.02
+abstract:            Access the W3Cs online HTML validator in a local persistent daemon
+license:             perl
+author:              
+    - David Dick <ddick@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTTP::Daemon:                  0
+    POSIX:                         0
+    WebService::Validator::HTML::W3C: 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

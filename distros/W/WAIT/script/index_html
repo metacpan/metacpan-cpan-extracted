@@ -1,0 +1,197 @@
+#!/usr/local/perl5.005_56.Mar06/bin/perl -w
+eval 'exec perl -w -S $0 "$@"'
+    if 0;
+
+use strict;
+
+
+use FileHandle;
+use Getopt::Long;
+
+require WAIT::Database;
+require WAIT::Config;
+require WAIT::Parse::HTML;
+require WAIT::Document::Find;
+
+
+my %OPT = (database => 'DB',
+           dir      => $WAIT::Config->{WAIT_home} || '/tmp',
+           table    => 'kbox',
+           clean    => 0,
+           remove   => 0,
+          );
+
+GetOptions(\%OPT,
+           'database=s',
+           'dir=s',
+           'table=s',
+           'clean!',
+           'remove',
+          ) || die "Usage: ...\n";
+
+my $db;
+if ($OPT{clean} and -d "$OPT{dir}/$OPT{database}") {
+  eval {
+    my $tmp = WAIT::Database->open(name        => $OPT{database},
+                                   'directory' => $OPT{dir})
+      or die "Could not open table $OPT{table}: $@";
+    my $tbl = $tmp->table(name => $OPT{table});
+    $tbl->drop if $tbl;
+    $tmp->close;
+    rmtree("$OPT{dir}/$OPT{database}/$OPT{table}",1,1)
+      if -d "$OPT{dir}/$OPT{database}/$OPT{table}";
+  };
+  exit;
+}
+unless (-d "$OPT{dir}/$OPT{database}") {
+  $db = WAIT::Database->create(name       => $OPT{database},
+                              'directory' => $OPT{dir})
+    or die "Could not open database $OPT{database}: $@";
+} else {
+  $db = WAIT::Database->open(name        => $OPT{database},
+                             'directory' => $OPT{dir})
+    or die "Could not open table $OPT{table}: $@";
+}
+
+my $layout= new WAIT::Parse::HTML;
+my $stem = [{
+             'prefix'    => ['isotr', 'isolc'],
+             'intervall' => ['isotr', 'isolc'],
+            },'decode_entities', 'isotr', 'isolc', 'split2', 'stop', 'Stem'];
+my $text = [{
+             'prefix'    => ['isotr', 'isolc'],
+             'intervall' => ['isotr', 'isolc'],
+            },
+             'decode_entities', 'isotr', 'isolc', 'split2', 'stop'];
+my $sound = ['decode_entities', 'isotr', 'isolc', 'split2', 'Soundex'];
+
+my %D;
+
+my $access = tie (%D, 'WAIT::Document::Find',  sub { $_[0] =~ /\.htm/; }, 
+		  "/usr/local/etc/httpd/htdocs/berlin");
+die $@ unless defined $access;
+
+
+my $tb = $db->table(name => $OPT{table}) ||
+  $db->create_table
+  (name     => $OPT{table},
+   attr     => ['docid', 'headline', 'size'],
+   keyset   => [['docid']],
+   layout   => $layout,
+   access   => $access,
+   invindex =>
+   [
+    'text'         => $stem,
+    'title'        => $stem,
+    'title'        => $text,
+   ]
+  );
+die unless $tb;
+
+my @DIRS;
+if (@ARGV) {
+  @DIRS = @ARGV;
+} else {
+  @DIRS  = @{$WAIT::Config->{manpath}};
+}
+
+while (my ($path, $content) = each %D) {
+  &index($path, $content);
+}
+$db->close();
+exit;
+
+my $NO;
+sub index {
+  my ($did, $value) = @_;
+  if ($tb->have('docid' => $did)) {
+    if (!$OPT{remove}) {
+      print "duplicate\n";
+      return;
+    }
+  } elsif ($OPT{remove}) {
+    print "missing\n";
+    return;
+  }
+
+  if (-s $did < 100) {
+    print "too small\n";
+    return;
+  }
+
+  unless (defined $value) {
+    print "unavailable\n";
+    return;
+  }
+  printf STDERR "ok [%d]\n", ++$NO;
+  
+  my $record = $layout->split($value);
+  $record->{size} = length($value);
+  my $headline = $record->{title} || $did;
+  $headline =~ s/\s+/ /g; $headline =~ s/^\s+//;
+  printf "%s\n", substr($headline,0,80);
+  if ($OPT{remove}) {
+    $tb->delete('docid' => $did, headline => $headline, %{$record});
+  } else {
+    $tb->insert('docid' => $did, headline => $headline, %{$record});
+  }
+}
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+index_html - generate a manual database for sman
+
+=head1 SYNOPSIS
+
+B<index_html>
+[B<-database> I<database name>]
+[B<-dir> I<database directory>]
+[B<-table> I<name>]
+[B<-remove>]
+[I<mandir> ...]
+
+=head1 DESCRIPTION
+
+B<Index_html> generates/updates databases for B<sman>(1). If
+I<mandir>s are specified, these are used. Otherwise the confiigured
+default directories are indexed.
+
+=head2 OPTIONS
+
+=over 10
+
+=item B<-database> I<database name>
+
+Change the default database name to I<database name>.
+
+=item B<-dir> I<database directory>
+
+Change the default database directory to I<database directory>.
+
+=item B<-table> I<name>
+
+Use I<name> instead of C<man> as table name.
+
+=item B<-clean>
+
+Clean B<database> before indexing.
+
+=item B<-remove>
+
+Remove the selected directories from the database instead of
+adding/updating. This works only for the manuals which are unchanged
+since the indexing.
+
+=head1 SEE ALSO
+
+L<sman>.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@ls6.informatik.uni-dortmund.de>E<gt>

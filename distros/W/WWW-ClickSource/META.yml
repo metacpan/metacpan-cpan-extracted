@@ -1,0 +1,34 @@
+---
+abstract: 'Determine the source of a visit on your website : organic, adwords, facebook, referer site'
+author:
+  - 'Horea <horea@cpan.org>'
+build_requires:
+  Test::More: '0'
+  URI: '0'
+  perl: '5.010000'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-ClickSource
+provides:
+  WWW::ClickSource:
+    file: lib/WWW/ClickSource.pm
+    version: '0.8'
+  WWW::ClickSource::Request:
+    file: lib/WWW/ClickSource/Request.pm
+  WWW::ClickSource::Request::CatalystRequest:
+    file: lib/WWW/ClickSource/Request/CatalystRequest.pm
+requires:
+  Module::Build: '0.38'
+  URI: '0'
+  perl: '5.010000'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/gliganh/WWW-ClickSource
+version: '0.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

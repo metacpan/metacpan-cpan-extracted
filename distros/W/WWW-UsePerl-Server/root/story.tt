@@ -1,0 +1,25 @@
+[% page.title = 'use.perl.org story by ' _ story.user.nickname _ ': ' _
+story.title %]
+
+<div class="container">
+
+<div class="row">
+
+<div class="span4">
+<h1>[% story.title | html  %]</h1>
+<h2><a href="[% c.uri_for('~' _ story.user.nickname _ '/' ) %]">[% story.user.nickname |
+        html %]</a> on [% story.time | html %]</h2>
+</div> <!-- /span4 -->
+
+
+<div class="span8">
+<p>[% story.introtext_html %]</p>
+<p>[% story.bodytext_html %]</p>
+
+[% INCLUDE lib/comments.tt %]
+
+</div> <!-- /span8 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

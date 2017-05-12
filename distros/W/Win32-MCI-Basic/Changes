@@ -1,0 +1,7 @@
+Revision history for Perl extension Win32::MCI::Basic.
+
+0.01  Sat Sep  1 14:19:38 2001
+	- first working version; 
+
+0.02  Mon Mar 22 03:16:15 2004
+	- not really a module update, just removing my email address from the pods

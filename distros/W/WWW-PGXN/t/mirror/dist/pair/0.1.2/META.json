@@ -1,0 +1,37 @@
+{
+   "name": "pair",
+   "abstract": "A key/value pair dåtå type",
+   "description": "This library contains a single PostgreSQL extension called `pair`.",
+   "docs": {
+      "README": { "title": "pair 0.1.2" },
+      "doc/pair": { "title": "pair", "abstract": "A key/value pair data type" }
+   },
+   "version": "0.1.2",
+   "maintainer": [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "date": "2010-11-10T12:18:03Z",
+   "release_status": "stable",
+   "user": "theory",
+   "sha1": "cebefd23151b4b797239646f7ae045b03d028fcf",
+   "license": "postgresql",
+   "provides": {
+      "pair": {
+         "abstract": "A key/value pair dåtå type",
+         "file": "sql/pair.sql",
+         "version": "0.1.2"
+      }
+   },
+   "special_files": ["Changes","Makefile","README.md","META.json"],
+   "tags": ["ordered pair", "pair", "key value"],
+   "resources": {
+      "bugtracker": {
+         "web": "http://github.com/theory/kv-pair/issues/"
+      },
+      "repository": {
+         "type": "git",
+         "url": "git://github.com/theory/kv-pair.git",
+         "web": "http://github.com/theory/kv-pair/"
+      }
+   }
+}

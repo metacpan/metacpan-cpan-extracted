@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#order">order</a></li>
+      <li><a href="#id">id</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#description">description</a></li>
+      <li><a href="#domain">domain</a></li>
+      <li><a href="#quantity">quantity</a></li>
+      <li><a href="#total_price">total_price</a></li>
+      <li><a href="#unit_price">unit_price</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Me::Order::Details</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $order = $ovh-&gt;me-&gt;orders-&gt;[0];</p>
+
+<p>my $details = $order-&gt;details;</p>
+
+<p>foreach my $detail (@$details) {</p>
+
+<pre><code>    print $detail-&gt;unit_price;
+}</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides access to details for an order entry.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Detail object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $detail_id - api id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Order/Detail.html">Webservice::OVH::Me::Order::Detail</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Me::Order::Detail-&gt;_new($ovh_api_wrapper, $detail_id, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="order">order</h2>
+
+<p>Returns root Order object.</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me/Order.html">Webservice::OVH::Me::Order</a></p>
+
+</li>
+<li><p>Synopsis: my $order = $datail-&gt;order;</p>
+
+</li>
+</ul>
+
+<h2 id="id">id</h2>
+
+<p>Returns the api id.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $id = $detail-&gt;id;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Retrieves properties. This method updates the intern property variable.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $detail-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="description">description</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $description = $detail-&gt;description;</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $domain = $detail-&gt;domain;</p>
+
+</li>
+</ul>
+
+<h2 id="quantity">quantity</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $quantity = $detail-&gt;quantity;</p>
+
+</li>
+</ul>
+
+<h2 id="total_price">total_price</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $total_price = $detail-&gt;total_price;</p>
+
+</li>
+</ul>
+
+<h2 id="unit_price">unit_price</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $unit_price = $detail-&gt;unit_price;</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

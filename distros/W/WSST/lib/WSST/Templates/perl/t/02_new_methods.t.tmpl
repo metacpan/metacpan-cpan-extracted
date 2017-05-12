@@ -1,0 +1,16 @@
+#
+# Test case for [% package_name %]
+#
+
+use strict;
+use Test::More tests => [% count(methods) * 2 %];
+
+[% FOREACH method = methods -%]
+{
+    use_ok('[% "${package_name}::${method.class_name}" %]');
+    my $obj = new [% "${package_name}::${method.class_name}" %]();
+    ok( ref $obj, 'new [% "${package_name}::${method.class_name}" %]()');
+}
+
+[% END -%]
+1;

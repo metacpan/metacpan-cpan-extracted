@@ -1,0 +1,31 @@
+WWW-Mechanize-Plugin-Cache version 0.0.1
+
+This plugin reimplements the WWW::Mechanize::Cached functionality
+via a plugin.
+
+HTTP requests will be cached automatically, so repeated requests
+to the same URL will only access the page once, with subsequent
+requests getting the cached copy directly.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+WWW::Mechanize::Pluggable, Cache::FileCache.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Joe McMahon and Yahoo!
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

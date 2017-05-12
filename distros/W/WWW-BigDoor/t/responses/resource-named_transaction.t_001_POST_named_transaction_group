@@ -1,0 +1,20 @@
+201[
+    {
+        "end_user_description": "end user description", 
+        "read_only": 0, 
+        "end_user_cap": "-1", 
+        "pub_title": "Test Transaction Group", 
+        "named_transactions": [], 
+        "modified_timestamp": 1294259908, 
+        "end_user_cap_interval": "-1", 
+        "challenge_response_enabled": false, 
+        "non_secure": 0, 
+        "urls": [], 
+        "created_timestamp": 1294259908, 
+        "pub_description": "test description", 
+        "end_user_title": "end user title", 
+        "id": 615912, 
+        "resource_name": "named_transaction_group"
+    }, 
+    {}
+]

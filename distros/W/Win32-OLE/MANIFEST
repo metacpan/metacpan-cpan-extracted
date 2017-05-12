@@ -1,0 +1,50 @@
+Changes			Lowlevel changelog
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+OLE.xs
+README
+ToDo
+hints/cygwin.pl
+lib/OLE.pm		Compatibility layer: old toplevel OLE.pm
+lib/Win32/OLE.pm
+lib/Win32/OLE/Const.pm	Win32::OLE::Const module: TypeLib constants
+lib/Win32/OLE/Enum.pm	Win32::OLE::Enum module: Collection objects
+lib/Win32/OLE/Lite.pm   Lightweight OLE.pm not using ANY other modules
+lib/Win32/OLE/NEWS.pod	History of user visable changes
+lib/Win32/OLE/NLS.pm	Win32::OLE::NLS module: National Language Support
+lib/Win32/OLE/TPJ.pod	Win32::OLE article from "The Perl Journal" #10
+lib/Win32/OLE/TypeInfo.pm       Win32::OLE::TypeInfo module
+lib/Win32/OLE/Variant.pm	Win32::OLE::Variant module: VARIANT variables
+
+browser/Browser.htm	OLE Automation type library browser
+browser/Browser.html	FRAMESET document for typelib browser
+
+browser/Class.png
+browser/Const.png
+browser/Default.png
+browser/Enum.png
+browser/Event.png
+browser/Function.png
+browser/Global.png
+browser/Help.png
+browser/Library.png
+browser/Module.png
+browser/Property.png
+browser/Type.png
+
+eg/constants.pl		Sample script prints all Excel defined constants
+eg/properties.pl	Sample script prints all Excel application properties
+eg/tpj.pl		Sample code from the Win32::OLE article in TPJ #10
+eg/typelibs.pl		Sample script prints all registered typelib names
+eg/word2pod.pl		Prototype of a Word -> POD translator
+eg/word2xxx.pl		Sample file type converter
+
+t/1_nls.t		Regression tests for Win32::OLE::NLS module
+t/2_variant.t		Regression tests for the Win32::OLE::Variant module
+t/3_ole.t		Regression tests for Win32::OLE using Excel 7 and above
+t/4_compat.t		Regression tests for OLE compatibility module
+t/5_unicode.t		Regression tests using the Unicode::String module
+t/6_event.t		Regression tests for OLE Events using Excel
+t/7_overload.t		Regression tests for overloaded number/string conversion

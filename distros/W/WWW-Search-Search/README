@@ -1,0 +1,16 @@
+
+This is a backend for use with the WWW::Search module,
+for querying www.search.com.
+
+Please read the README for WWW::Search for general information.
+
+(One place to find it is
+http://www.perl.com/CPAN-local/modules/by-module/WWW
+)
+
+Read the ChangeLog file in this distribution to see what is new with
+this backend since the previous release.
+
+For more information about my Perl Modules, visit
+http://www.sandcrawler.com/SWB/cpan-modules.html
+

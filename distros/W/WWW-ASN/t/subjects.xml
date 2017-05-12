@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<asnSubjects>
+   <Subject xml:id="88">
+     <Subject>Behavioral Studies</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/behavioralStudies</SubjectIdentifier>
+     <DocumentCount>28</DocumentCount>
+   </Subject>
+   <Subject xml:id="78">
+     <Subject>Career Education</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/careerEducation</SubjectIdentifier>
+     <DocumentCount>3176</DocumentCount>
+   </Subject>
+   <Subject xml:id="89">
+     <Subject>Civics</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/civics</SubjectIdentifier>
+     <DocumentCount>53</DocumentCount>
+   </Subject>
+   <Subject xml:id="90">
+     <Subject>Economics</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/economics</SubjectIdentifier>
+     <DocumentCount>54</DocumentCount>
+   </Subject>
+   <Subject xml:id="79">
+     <Subject>English</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/english</SubjectIdentifier>
+     <DocumentCount>5715</DocumentCount>
+   </Subject>
+   <Subject xml:id="80">
+     <Subject>Foreign Language</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/foreignLanguage</SubjectIdentifier>
+     <DocumentCount>97</DocumentCount>
+   </Subject>
+   <Subject xml:id="91">
+     <Subject>Geography</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/geography</SubjectIdentifier>
+     <DocumentCount>60</DocumentCount>
+   </Subject>
+   <Subject xml:id="81">
+     <Subject>Health</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/health</SubjectIdentifier>
+     <DocumentCount>156</DocumentCount>
+   </Subject>
+   <Subject xml:id="92">
+     <Subject>Historical Understanding</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/historicalUnderstanding</SubjectIdentifier>
+     <DocumentCount>56</DocumentCount>
+   </Subject>
+   <Subject xml:id="93">
+     <Subject>K-4 History and State History</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/k-4HistoryAndStateHistory</SubjectIdentifier>
+     <DocumentCount>42</DocumentCount>
+   </Subject>
+   <Subject xml:id="83">
+     <Subject>Math</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/math</SubjectIdentifier>
+     <DocumentCount>1742</DocumentCount>
+   </Subject>
+   <Subject xml:id="84">
+     <Subject>Physical Education</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/physicalEducation</SubjectIdentifier>
+     <DocumentCount>82</DocumentCount>
+   </Subject>
+   <Subject xml:id="85">
+     <Subject>Science</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/science</SubjectIdentifier>
+     <DocumentCount>4456</DocumentCount>
+   </Subject>
+   <Subject xml:id="87">
+     <Subject>Social Studies</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/socialStudies</SubjectIdentifier>
+     <DocumentCount>2486</DocumentCount>
+   </Subject>
+   <Subject xml:id="86">
+     <Subject>Technology</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/technology</SubjectIdentifier>
+     <DocumentCount>3598</DocumentCount>
+   </Subject>
+   <Subject xml:id="77">
+     <Subject>The Arts</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/theArts</SubjectIdentifier>
+     <DocumentCount>4034</DocumentCount>
+   </Subject>
+   <Subject xml:id="94">
+     <Subject>U.S. History</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/usHistory</SubjectIdentifier>
+     <DocumentCount>40</DocumentCount>
+   </Subject>
+   <Subject xml:id="95">
+     <Subject>World History</Subject>
+     <SubjectIdentifier>http://purl.org/ASN/scheme/ASNTopic/worldHistory</SubjectIdentifier>
+     <DocumentCount>40</DocumentCount>
+   </Subject>
+</asnSubjects>

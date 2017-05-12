@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Wiki-Toolkit-Plugin-Diff
+version:      0.12
+version_from: lib/Wiki/Toolkit/Plugin/Diff.pm
+installdirs:  site
+requires:
+    Module::Optional:              0
+    Params::Validate:              0
+    VCS::Lite:                     0.05
+    Wiki::Toolkit:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

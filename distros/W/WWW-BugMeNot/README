@@ -1,0 +1,28 @@
+WWW-BugMeNot version 0.02
+=========================
+
+Many websites require compulsory registration before they will allow readers to access their pages. This is bad for a variety of reasons, and so many people use BugMeNot.com to share common usernames and passwords. This module provides a programmatic interface to BugMeNot. It takes a URL, and returns a username/password pair, as per the BugMeNot site.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple
+  HTML::TokeParser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Ben Hammersley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

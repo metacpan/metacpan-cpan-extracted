@@ -1,0 +1,27 @@
+Revision history for WWW-ProxyChecker
+
+1.005   2016-02-08
+        - cleaned up failing tests
+
+1.004   2016-02-07
+        - fixed MANIFEST
+        - added t/02-check.t
+
+1.003   2016-02-07
+        - distribution adopted by Steve Bertrand (STEVEB) on
+          2016-02-04
+        - removed distzilla
+        - updated POD
+
+1.001001 2014-03-13
+        - Maintenance update to fix up failing tests due to
+          outdated code usage
+        - Converted to dzil
+
+0.002   2008-03-16
+        - fixed the documentation which was missing
+          'max_working_per_kid' description
+
+0.001   2008-03-16
+        - First version, released on an unsuspecting world.
+

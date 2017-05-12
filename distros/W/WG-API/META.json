@@ -1,0 +1,144 @@
+{
+   "abstract" : "Module for work with Wargaming.net Public API",
+   "author" : [
+      "cynovg , C<< <cynovg at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WG-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.61",
+            "LWP" : "6.08",
+            "Moo" : "2.00",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "WG::API" : {
+         "file" : "lib/WG/API.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::Auth" : {
+         "file" : "lib/WG/API/Auth.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::Error" : {
+         "file" : "lib/WG/API/Error.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::NET" : {
+         "file" : "lib/WG/API/NET.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::NET::Accounts" : {
+         "file" : "lib/WG/API/NET/Accounts.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::NET::Clans" : {
+         "file" : "lib/WG/API/NET/Clans.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::NET::Servers" : {
+         "file" : "lib/WG/API/NET/Servers.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoT" : {
+         "file" : "lib/WG/API/WoT.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoT::Account" : {
+         "file" : "lib/WG/API/WoT/Account.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoT::Ratings" : {
+         "file" : "lib/WG/API/WoT/Ratings.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoT::Tanks" : {
+         "file" : "lib/WG/API/WoT/Tanks.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWp" : {
+         "file" : "lib/WG/API/WoWp.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWp::Account" : {
+         "file" : "lib/WG/API/WoWp/Account.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWp::Ratings" : {
+         "file" : "lib/WG/API/WoWp/Ratings.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWs" : {
+         "file" : "lib/WG/API/WoWs.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWs::Account" : {
+         "file" : "lib/WG/API/WoWs/Account.pm",
+         "version" : "v0.8.1"
+      },
+      "WG::API::WoWs::Warships" : {
+         "file" : "lib/WG/API/WoWs/Warships.pm",
+         "version" : "v0.8.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cynovg/WG-API/issues"
+      },
+      "homepage" : "https://github.com/cynovg/WG-API",
+      "repository" : {
+         "url" : "git://github.com/cynovg/WG-API.git",
+         "web" : "https://github.com/cynovg/WG-API"
+      }
+   },
+   "version" : "v0.8.1",
+   "x_contributors" : [
+      "root <root@cynovg-debian.local>",
+      "Cyrill Novgorodcev <cynovg@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

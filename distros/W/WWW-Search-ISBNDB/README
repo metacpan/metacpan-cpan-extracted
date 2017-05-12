@@ -1,0 +1,72 @@
+NAME
+    WWW::Search::ISBNDB - Search for book information on isbndb.com
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    This module creates an easy to use interface for searching books on
+    isbndb.com.
+
+      use WWW::Search;  
+      my $search = WWW::Search->new('ISBNDB', key => 'abcd1234');
+      $search->native_query("born in blood");
+      while (my $result = $search->next_result() ) {
+        print $result->{isbn}.' - '.$result->{book_id}, "\n";
+        print $result->{title}.' - '.$result->url, "\n";
+      }
+
+DETAILS
+  native_setup_search
+    This prepares the search by checking for a valid developer key. A
+    developer key can be obtained at isbndb.com and is free.
+
+  native_retrieve_some
+    The logic behind this module is very simple. First we prepare the search
+    query that includes the access_key, search type, search value and
+    display options and fetch the page with LWP::UserAgent. Once we have the
+    results, we use XML::Simple to sift through them and populate a
+    WWW::SearchResult object.
+
+    Note that because of the complexity of the search result, it does not
+    have all of the default WWW::SearchResult fields. The extra fields are
+    contained within the object hash and consist of the following:
+
+      book_id
+      idbn
+      language
+      summary
+      titlelong
+      notes
+
+INSTALLATION
+    To install this module, run the following commands:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+AUTHOR
+    Nick Gerakines, "<nick@socklabs.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-search-isbndb@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Search-ISBNDB>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Thanks to isbndb.com for the data that powers this module.
+
+    I have no affiliation whatsoever with this website, staff or affiliates.
+
+    If you are bored, check out my website: http://www.socklabs.com/
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Nick Gerakines, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,27 @@
+#######################################################################
+#
+# Win32::Shortcut - Perl Module to manipulate Windows Shortcut Files
+# ^^^^^^^^^^^^^^^
+# This module creates an object oriented interface to the Win32
+# IShellLink Interface.
+#
+# Version: 0.06 (16 Apr 2008)
+# by Aldo Calpini <dada@perl.it>
+#
+#######################################################################
+
+
+Documentation
+^^^^^^^^^^^^^
+Complete documentation for this package is in the file DOCS\INDEX.HTML
+
+
+On-line
+^^^^^^^
+You can always find the latest version of this package online at:
+
+    http://www.divinf.it/dada/perl/shortcut
+
+Send any comment to:
+
+    Aldo Calpini  <dada@perl.it>

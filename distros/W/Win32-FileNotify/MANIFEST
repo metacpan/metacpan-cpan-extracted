@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+
+t/Win32-FileNotify.t
+t/manifest.t
+t/pod.t
+t/pod_coverage.t
+
+lib/Win32/FileNotify.pm

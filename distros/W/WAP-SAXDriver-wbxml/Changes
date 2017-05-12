@@ -1,0 +1,52 @@
+Revision history for Perl extension WAP::SAXDriver::wbxml.
+
+2.07  Wed Jun  1 11:30:00 2011
+	- fix Makefile.PL
+
+2.06  Mon May 30 15:30:00 2011
+	- wbxml.pm : handle unknown PublicId
+	- Makefile.PL : all wbrules2.pl are now generated from WAP::wbxml
+
+2.05  Fri Oct 26 08:30:00 2007
+	- some Perl Best Practices
+
+2.04  Wed Jul  7 18:30:00 2004
+	- wbxmld.pl : add option -h (display help)
+	- wbxmld.pl : add option -v (display version)
+	- mkwbrules.pl : add support for Wireless Village
+	- wbxml.pm : add support for Wireless Village
+
+2.03  Thu Jul 22 12:30:00 2003
+	- add option -p : path for rules
+	- rename wbrules.pl to wap.wbrules2.pl
+	- deprecated xml_decl in favour of start_document
+	- add syncmld.pl & syncml.wbrules2.pl (SyncML)
+	- bug mkwbrules (ATTRVALUE)
+
+2.02  Mon Dec 02 12:30:00 2002
+	- bug with IO::String (not save copy in IO::String)
+	- fix (string table not NULL terminated)
+	- suppress error with OPAQUE
+	- add an error handler in wbxmld.pl
+	- add an option beautify (-b) in wbxmld.pl
+	- fix (missing binmode)
+
+2.01  Thu Sep 26 12:30:00 2002
+	- bug in Makefile.PL
+
+2.00  Tue Sep 24 08:30:00 2002
+	- interface SAX 2.0
+	- rename xmld to wbxmld.pl
+
+1.02  Thu Feb 14 20:30:00 2002
+	- use of I18N-Charset
+
+1.01  Wed Jan 23 17:30:00 2002
+	- bug in Makefile.PL
+
+1.0   Mon Jan 21 20:00:00 2002
+	- first release
+
+0.01  Thu Jan 17 21:41:35 2002
+	- original version; created by h2xs 1.19
+

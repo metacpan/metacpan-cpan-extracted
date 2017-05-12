@@ -1,0 +1,58 @@
+WebService-Livedoor-SpamChampuru-DNSBL
+
+
+Checks if an IP has recently been used for sending spams, via spam-champuru (spam-champloo) DNSBL service (beta).
+
+Spam-champuru DNSBL holds list of IPs which have been reported as sources of spams by various services running at livedoor.com.
+
+The result may not be suitable for filtering mails, as this service is mainly intended for checking blog comments/trackbacks or bbs posts.
+
+* livedoor.com is not responsible for appropriateness of the result, nor for any harms caused by the use of the result.
+
+* The service is in a beta status, and may at any time become unavailable.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::Livedoor::SpamChampuru::DNSBL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Livedoor-SpamChampuru-DNSBL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-Livedoor-SpamChampuru-DNSBL
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-Livedoor-SpamChampuru-DNSBL
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Livedoor-SpamChampuru-DNSBL
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 livedoor Co., Ltd.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

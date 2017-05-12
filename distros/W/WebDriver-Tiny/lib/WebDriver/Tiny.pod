@@ -1,0 +1,488 @@
+=encoding UTF-8
+
+=head1 NAME
+
+WebDriver::Tiny - Selenium 2.0 bindings for Perl
+
+=for html
+<a href=https://travis-ci.org/cv-library/WebDriver-Tiny>
+    <img src=https://api.travis-ci.org/cv-library/WebDriver-Tiny.svg>
+</a>
+<a href=https://coveralls.io/r/cv-library/WebDriver-Tiny>
+    <img src=https://coveralls.io/repos/cv-library/WebDriver-Tiny/badge.svg>
+</a>
+<a href=https://metacpan.org/pod/WebDriver::Tiny>
+    <img src=https://badge.fury.io/pl/WebDriver-Tiny.svg>
+</a>
+<a href=https://github.com/cv-library/WebDriver-Tiny/issues>
+    <img src=https://img.shields.io/github/issues/cv-library/WebDriver-Tiny.svg>
+</a>
+
+=head1 SYNOPSIS
+
+ use WebDriver::Tiny;
+
+ my $drv = WebDriver::Tiny->new;
+
+ # Go to Google.
+ $drv->get('https://www.google.co.uk');
+
+ # Type into the search box 'p', 'e', 'r', 'l', <RETURN>.
+ $drv->('input[name=q]')->send_keys("perl\N{WD_RETURN}");
+
+ # Click the first perl result (perl.org).
+ $drv->('h3.r > a')->click;
+
+ # Save a screenshot of the page.
+ $drv->screenshot('/tmp/perl.org.png');
+
+=head1 DESCRIPTION
+
+Selenium automates browsers. That's it! What you do with that power is
+entirely up to you. Primarily, it is for automating web applications for
+testing purposes, but is certainly not limited to just that. Boring web-based
+administration tasks can (and should!) also be automated as well.
+
+Selenium has the support of some of the largest browser vendors who have taken
+(or are taking) steps to make Selenium a native part of their browser. It is
+also the core technology in countless other browser automation tools, APIs and
+frameworks.
+
+L<http://www.seleniumhq.org>
+
+B<WARNING>: The API of this module is unstable and may change without warning
+(any change will be appropriately documented in the changelog).
+
+=head1 USAGE
+
+The usage of this module varies greatly depending on which backend your're
+targetting, below are some examples:
+
+=head2 ChromeDriver
+
+ my $drv = WebDriver::Tiny->new(
+     capabilities => {
+         chromeOptions => { binary => '/usr/bin/google-chrome' },
+     },
+     port => 9515,
+ );
+
+=head2 PhantomJS
+
+On the command line:
+
+ phantomjs -w
+
+In Perl code:
+
+ my $drv = WebDriver::Tiny->new( port => 8910 );
+
+=head2 Selenium
+
+ my $drv = WebDriver::Tiny->new(
+     capabilities => { browserName => 'firefox' },
+     path         => '/wd/hub',
+     port         => 4444,
+ );
+
+=head1 IMPORT
+
+This module imports L<custom charnames|charnames/CUSTOM_ALIASES> for sending
+keys that would otherwise be hard to represent in text. Each code point falls
+inside the Unicode Private Use Area (U+E000–U+F8FF), and are as follows:
+
+=over
+
+=item * WD_NULL
+
+=item * WD_CANCEL
+
+=item * WD_HELP
+
+=item * WD_BACK_SPACE
+
+=item * WD_TAB
+
+=item * WD_CLEAR
+
+=item * WD_RETURN
+
+=item * WD_ENTER
+
+=item * WD_SHIFT
+
+=item * WD_CONTROL
+
+=item * WD_ALT
+
+=item * WD_PAUSE
+
+=item * WD_ESCAPE
+
+=item * WD_SPACE
+
+=item * WD_PAGE_UP
+
+=item * WD_PAGE_DOWN
+
+=item * WD_END
+
+=item * WD_HOME
+
+=item * WD_ARROW_LEFT
+
+=item * WD_ARROW_UP
+
+=item * WD_ARROW_RIGHT
+
+=item * WD_ARROW_DOWN
+
+=item * WD_INSERT
+
+=item * WD_DELETE
+
+=item * WD_SEMICOLON
+
+=item * WD_EQUALS
+
+=item * WD_NUMPAD0
+
+=item * WD_NUMPAD1
+
+=item * WD_NUMPAD2
+
+=item * WD_NUMPAD3
+
+=item * WD_NUMPAD4
+
+=item * WD_NUMPAD5
+
+=item * WD_NUMPAD6
+
+=item * WD_NUMPAD7
+
+=item * WD_NUMPAD8
+
+=item * WD_NUMPAD9
+
+=item * WD_MULTIPLY
+
+=item * WD_ADD
+
+=item * WD_SEPARATOR
+
+=item * WD_SUBTRACT
+
+=item * WD_DECIMAL
+
+=item * WD_DIVIDE
+
+=item * WD_F1
+
+=item * WD_F2
+
+=item * WD_F3
+
+=item * WD_F4
+
+=item * WD_F5
+
+=item * WD_F6
+
+=item * WD_F7
+
+=item * WD_F8
+
+=item * WD_F9
+
+=item * WD_F10
+
+=item * WD_F11
+
+=item * WD_F12
+
+=item * WD_META
+
+=item * WD_COMMAND
+
+=item * WD_ZENKAKU_HANKAKU
+
+=back
+
+=head1 METHODS
+
+=head2 Driver
+
+=head3 new
+
+ my $drv = WebDriver::Tiny->new(
+     base_url => ...,
+     host     => 'localhost',
+     port     => 4444,
+ );
+
+Constructs an instance of this class.
+
+=head3 base_url
+
+ my $base_url = $drv->base_url;
+
+ $drv->base_url($base_url);
+
+Accessor to get/set the C<base_url> after instantiation.
+
+=head2 Actions
+
+=head3 find
+
+ my @array_of_elements $drv->find('.class');
+
+ my $elements = $drv->find( '#id', %args );
+
+Return a collection of matched elements found in the DOM based on passed
+argument(s). Always returns a collection of L<WebDriver::Tiny::Elements> (sometimes
+containing no elements), in list context it will return an array of
+collections, each containing one element.
+
+Due to C<find> being the most common method invoked, the method name can be
+dropped altogether like so:
+
+ $drv->('#foo');
+ $drv->('.bar');
+
+Accepts a mandatory selector parameter and zero or more of the following
+key/value options:
+
+=over
+
+=item dies
+
+Whether C<find> dies if it fails to find any elements. Defaults to true.
+
+=item method
+
+The matching pattern to use with the given selector - css, ecmascript,
+link_text, partial_link_text, or xpath. Defaults to 'css'.
+
+=item sleep
+
+How long to sleep before a reattempt of an unsuccessful match. Defaults to 0.1
+seconds.
+
+=item tries
+
+Maximum number of attempts to try and find a match. Defaults to 5.
+
+=back
+
+=head2 Alerts
+
+=head3 accept_alert
+
+ $drv->accept_alert;
+
+=head3 alert_text
+
+ my $text = $drv->alert_text;
+
+=head3 dismiss_alert
+
+ $drv->dismiss_alert;
+
+=head2 Cookies
+
+=head3 cookie
+
+ # Get cookie "foo".
+ my $cookie = $drv->cookie('foo');
+
+ # Set cookie "foo".
+ $drv->cookie( foo => 'value' );
+
+ # Or
+ $drv->cookie(
+     foo      => 'value',
+     domain   => 'example.com',
+     expires  => 123,
+     httponly => 0,
+     secure   => 1,
+ );
+
+=head3 cookie_delete
+
+ # Delete all cookies.
+ $drv->cookie_delete;
+
+ # Delete cookie "foo".
+ $drv->cookie_delete('foo');
+
+ # Delete cookie "bar", and "baz".
+ $drv->cookie_delete(qw/bar baz/);
+
+=head3 cookies
+
+ # Get a hashref of all cookies.
+ my $cookies = $drv->cookies;
+
+=head2 JavaScript
+
+=head3 js
+
+ my $return = $drv->js('return "foo"');
+
+=head3 js_async
+
+ my $return = $drv->js_async(<<'JS');
+     let callback = arguments[0];
+
+     callback("bar");
+ JS
+
+=head3 js_phantom
+
+ my $return = $drv->js_phantomjs('return "baz"');
+
+=head2 Local Storage
+
+=head3 storage
+
+ # Get a hashref of all keys and values in local storage.
+ my $storage = $drv->storage;
+
+ # Get a list of all the keys in local storage.
+ my @keys = $drv->storage;
+
+ # Get the value of the "foo" key in local storage.
+ my $value = $drv->storage('foo');
+
+ # Set the value of the "foo" key in local storage to "bar".
+ $drv->storage( foo => 'bar' );
+
+=head3 storage_delete
+
+=head2 Navigation
+
+=head3 back
+
+ $drv->back;
+
+=head3 forward
+
+ $drv->forward;
+
+=head3 get
+
+ $drv->get($url);
+
+=head3 refresh
+
+ $drv->refresh;
+
+=head2 Properties
+
+=head3 capabilities
+
+Hash of the capabilities of the current session.
+
+=head3 orientation
+
+ my $orientation = $drv->orientation;
+
+ $drv->orientation($orientation);
+
+=head3 source
+
+Get the source code of the current page.
+
+=head3 status
+
+ my $status = $drv->status;
+
+=head3 title
+
+ my $title = $drv->title;
+
+=head3 url
+
+ my $url = $drv->url;
+
+Get the URL of the current page.
+
+=head3 user_agent
+
+ my $user_agent = $drv->user_agent;
+
+=head2 Window Management
+
+=head3 screenshot
+
+ my $png_blob = $drv->screenshot;
+
+ $drv->screenshot('/tmp/foo.png');
+
+=head3 window
+
+ my $handle = $drv->window;
+
+=head3 windows
+
+ my $handles = $drv->windows;
+
+=head3 window_close
+
+ $drv->window_close;
+
+Close the current window.
+
+=head3 window_fullscreen
+
+ $drv->window_fullscreen;
+
+=head3 window_maximize
+
+ $drv->window_maximize;              # Maximize current window.
+ $drv->window_maximize('current');   # Same as above.
+ $drv->window_maximize('foo');       # Maximize window "foo".
+
+=head3 window_position
+
+The following get the window's position, returning a list of C<x> and C<y>.
+
+ my ( $x, $y ) = $drv->window_position;              # Get position of current window.
+ my ( $x, $y ) = $drv->window_position('current');   # Same as above.
+ my ( $x, $y ) = $drv->window_position('foo');       # Get position of window "foo".
+
+The following set the window's position, returning C<$self> to allow chaining.
+
+ $drv->window_position( $x, $y );                    # Set position of current window.
+ $drv->window_position( current => $x, $y );         # Same as above.
+ $drv->window_position( foo     => $x, $y );         # Set position of window "foo".
+
+=head3 window_size
+
+The following get the window's size, returning a list of C<width> and C<height>.
+
+ my ( $w, $h ) = $drv->window_size;                  # Get size of current window.
+ my ( $w, $h ) = $drv->window_size('current');       # Same as above.
+ my ( $w, $h ) = $drv->window_size('foo');           # Get size of window "foo".
+
+The following set the window's size, returning C<$self> to allow chaining.
+
+ $drv->window_size( $w, $h );                        # Set size of current window.
+ $drv->window_size( current => $w, $h );             # Same as above.
+ $drv->window_size( foo     => $w, $h );             # Set size of window "foo".
+
+=head3 window_switch
+
+ $drv->window_switch($handle);
+
+=head1 SEE ALSO
+
+L<Selenium::Remote::Driver>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015 CV-Library Ltd.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

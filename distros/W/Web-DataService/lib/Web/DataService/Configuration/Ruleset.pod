@@ -1,0 +1,381 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Ruleset - how to configure parameter rulesets
+
+=head1 SYNOPSIS
+
+This page describes the role that parameter rulesets play in the
+Web::DataService framework, and how to configure them.  It includes a list of
+the attributes that you can use to define them.
+
+=head1 RULESET DEFINITIONS
+
+Each data service may define one or more groups of rules for validating
+request parameters, called "rulesets".  These are defined by calling the
+L<define_ruleset|Web::DataService/define_ruleset> method of a data service
+object.
+
+The first argument to C<define_ruleset> must be a string that provides the
+name of the ruleset.  This must be unique among all of the rulesets defined
+for this data service.  The remaining elements must be either hashrefs or
+strings: the hashrefs define the individual rules, and the strings provide
+documentation.  For example:
+
+    $ds->define_ruleset( 'filters' =>
+	{ param => 'lat', valid => DECI_VALUE('-90.0','90.0') },
+	    "Return all datasets associated with the given latitude.",
+	{ param => 'lng', valid => DECI_VALUE('-180.0','180.0') },
+	    "Return all datasets associated with the given longitude.",
+	{ together => ['lat', 'lng'], errmsg => "you must specify 'lng' and 'lat' together" },
+	    "If either 'lat' or 'lng' is given, the other must be as well.",
+	{ param => 'id', valid => POS_VALUE },
+	    "Return the dataset with the given identifier",
+	{ param => 'name', valid => STR_VALUE },
+	    "Return all datasets with the given name");
+
+These rulesets are selected using the node attribute C<ruleset>.  When a data
+service request is handled, its parameters are automatically validated against
+the ruleset (if any) specified by corresponding data service node.  If the
+validation fails, then an HTTP 400 error ("bad request") is returned to the
+client along with one or more error messages indicating how the parameter
+values should be adjusted.  If the validation succeeds but warnings are
+generated, those warnings are included as part of the response message.  If
+the validation succeeds, the cleaned parameter values are made available
+through methods of the request object such as
+L<clean_param|Web::DataService::Request/clean_param> and
+L<clean_param_list|Web::DataService::Request/clean_param_list>).
+
+Ruleset validation is handled by the module L<HTTP::Validate>.  The
+Web::DataService method alters the ruleset definitions as specified below, and
+then hands off the resulting rulesets to the latter module.  See that module's
+documentation for more information about how this process works.
+
+=head1 RULESET ATTRIBUTES
+
+Each rule in a ruleset has a type.  The rule type is indicated by the presence
+of a hash key corresponding to the type; each rule must have exactly one such
+key.  The rule type keys are as follows:
+
+=head2 parameter rules
+
+The following three types of rules define the recognized parameter names.
+
+=head3 param
+
+    { param => <parameter_name>, valid => <validator> ... }
+
+If the specified parameter is present, then its value must pass one of the
+specified validators.  If it passes any of them, the rest are ignored.  If it
+does not pass any of them, then an appropriate error message will be
+generated.  If no validators are specified, then the value will be accepted no
+matter what it is.
+
+=head3 optional
+
+    { optional => <parameter_name>, valid => <validator> ... }
+
+An C<optional> rule is identical to a C<param> rule, except that the presence
+or absence of the parameter will have no effect on whether or not the
+containing ruleset is fulfilled. A ruleset in which all of the parameter rules
+are C<optional> will always be fulfilled.  This kind of rule is useful in
+validating URL parameters, especially for GET requests.
+
+A special syntax is available which automatically generates validation rules
+for any special parameters that have been enabled for this data service.  You
+can provide any of the following as the parameter name in a rule of type
+C<optional>:
+
+=over 4
+
+=item C<SPECIAL(parameter_name)>
+
+This generates a rule for the specified special parameter, with the attributes
+defaulting to appropriate values.  You are free to override these by
+specifying any of the attributes explicitly.  Standard documentation is
+provided by default, unless you specifically provide your own.
+
+For example, the following definition will change the set
+of acceptable values for the special parameter C<linebreak>.
+
+    { param => 'SPECIAL(linebreak)', valid => ENUM_VALUE('cr', 'crlf', 'foo') }
+
+You will often use this form with the special parameter C<show>, which is not
+included in the lists shown below because the set of values it can take may
+vary.  Unless your data service is very simple, you will probably need to
+define multiple rulesets that specify this parameter, selecting the
+appropriate validation set for each one.  For example, the following
+definition specifies that the valid values for the special parameter C<show>
+will be the values defined for the set C<extra>.  See the
+L<example data service|Web::DataService::Tutorial> for an example of how these are used.
+
+    { param => 'SPECIAL(show)', valid => 'extra' }
+
+=item C<SPECIAL(all)>
+
+This generates a list of rules, one for each enabled special parameter except
+C<show> and possibly C<vocab>, and except for any special parameters that have
+been already defined in this ruleset.  The C<show> parameter is never
+included, and C<vocab> is only included if any vocabulary other than
+C<default> has been defined for this data service.  Each of these generated
+rules includes standard documentation strings.  If you wish to override these
+for certain parameters, define them explicitly using the form discussed above.
+
+=item C<SPECIAL(single)>
+
+This works similarly to C<SPECIAL(all)>, but only includes those parameters
+that are relevant to single-record results.  The parameters C<limit>,
+C<offset>, and C<count> are skipped.
+
+=back
+
+=head3 mandatory
+
+    { mandatory => <parameter_name>, valid => <validator> ... }
+
+A C<mandatory> rule is identical to a C<param> rule, except that the parameter
+is required to be present with a non-empty value.  If it is not, then an error
+message will be generated.  This kind of rule can be useful when validating
+HTML form parameters.
+
+=head2 parameter constraint rules
+
+The following rule types can be used to specify additional constraints on the
+presence or absence of parameter names.
+
+=head3 together
+
+    { together => [ <parameter_name> ... ] }
+
+If one of the listed parameters is present, then all of them must be.
+This can be used with parameters such as 'longitude' and 'latitude', where
+neither one makes sense without the other.
+
+=head3 at_most_one
+
+    { at_most_one => [ <parameter_name> ... ] }
+
+At most one of the listed parameters may be present.  This can be used along
+with a series of C<param> rules to require that exactly one of a particular
+set of parameters is provided.
+
+=head3 ignore
+
+    { ignore => [ <parameter_name> ... ] }
+
+The specified parameter or parameters will be ignored if present, and will not
+be included in the set of reported parameter values.  This rule can be used to
+prevent requests from being rejected with "unrecognized parameter" errors in
+cases where spurious parameters may be present.  If you are specifying only one
+parameter name, it does need not be in a listref.
+
+=head2 inclusion rules
+
+The following rule types can be used to include one ruleset inside of another.
+This allows you, for example, to define rulesets for validating different
+groups of parameters and then combine them into specific rulesets for use with
+different URL paths.
+
+It is okay for an included ruleset to itself include other rulesets.  However,
+any given ruleset is checked only once per validation no matter how many times
+it is included.
+
+=head3 allow
+
+    { allow => <ruleset_name> }
+
+A rule of this type is essentially an 'include' statement.  If this rule is
+encountered during a validation, it causes the named ruleset to be checked
+immediately.  It must pass, but does not have to be fulfilled.
+
+=head3 require
+
+    { require => <ruleset_name> }
+
+This is a variant of C<allow>, with an additional constraint.  The validation
+will fail unless the named ruleset not only passes but is also fulfilled by
+the parameters.  You could use this, for example, with a query-type URL in
+order to require that the query not be empty but instead contain at least one
+significant criterion.  The parameters that count as "significant" would be
+declared by C<param> rules, the others by C<optional> rules.
+
+=head2 inclusion constraint rules
+
+The following rule types can be used to specify additional constraints on the
+inclusion of rulesets.
+
+=head3 require_one
+
+    { require_one => [ <ruleset_name> ... ] }
+
+You can use a rule of this type to place an additional constraint on a list of
+rulesets already included with C<allow> rules.  Exactly one of the named
+rulesets must be fulfilled, or else the request is rejected.  You can use
+this, for example, to ensure that a request includes either a parameter from
+group A or one from group B, but not both.
+
+=head3 require_any
+
+    { require_any => [ <ruleset_name> ... ] }
+
+This is a variant of C<require_one>.  At least one of the named rulesets must be
+fulfilled, or else the request will be rejected.
+
+=head3 allow_one
+
+    { allow_one => [ <ruleset_name> ... ] }
+
+Another variant of C<require_one>.  The request will be rejected if more than one
+of the listed rulesets is fulfilled, but will pass if either none of them or
+just one of them is fulfilled.  This can be used to allow optional parameters
+from either group A or group B, but not from both groups. 
+
+=head2 Other attributes
+
+Any rule definition may also include one or more of the following keys:
+
+=head3 errmsg
+
+This key specifies the error message to be returned if the rule fails,
+overriding the default message.  For example:
+
+    $ds->define_ruleset( 'specifier' => 
+        { param => 'name', valid => STRING_VALUE },
+        { param => 'id', valid => POS_VALUE });
+    
+    $ds->define_ruleset( 'my_operation' =>
+        { require => 'specifier', 
+          errmsg => "you must specify either of the parameters 'name' or 'id'" });
+
+Error messages may include any of the following placeholders: C<{param}>,
+C<{value}>.  When included with a parameter rule these are replaced by the
+parameter name and original parameter value(s), single-quoted.  When used with other
+rules, {param} is replaced by the full list of relevant parameters or ruleset
+names, quoted and separated by commas.  This feature allows you to define
+common messages once and use them with multiple rules.
+
+=head2 warn
+
+This key causes a warning to be generated rather than an error if the
+rule fails.  Unlike errors, warnings do not cause a request to be rejected.
+Instead, they will automatically be returned as part of the data service response.
+
+If the value of this key is 1, then what would otherwise be the error
+message will be used as the warning message.  Otherwise, the specified string
+will be used as the warning message.
+
+=head2 key
+
+The key 'key' specifies the name under which any inforamtion generated by
+the rule will be saved.  For a parameter rule, the cleaned value will be saved
+under this name.  For all rules, any generated warnings or errors will be
+stored under the specified name instead of the parameter name or rule number.
+This allows you to easily determine after a validation which
+warnings or errors were generated.
+
+The following keys can be used only with rules of type
+C<param>, C<optional> or C<mandatory>:
+
+=head2 valid
+
+This key specifies the domain of acceptable values for a parameter.  The value
+must be either a single string, a single code reference, or a list of code
+references.  If you provide a string, it must be the name of a 
+L<set|/Set definitions> previously defined for this data service.
+Otherwise, you can either select from the list of
+L<built-in validator functions|HTTP::Validate/VALIDATORS> 
+or L<provide your own|HTTP::Validate/"Writing your own validator functions">.
+
+If the parameter named by this rule is present, it must pass at least one of
+the specified validators or else an error message will be generated.  If
+multiple validators are given, then the error message returned will be the one
+generated by the last validator in the list.  This can be overridden by using
+the L</errmsg> key.
+
+=head2 multiple
+
+This key specifies that the parameter may appear multiple times in the
+request.  Without this directive, multiple values for the same parameter will
+generate an error.  For example:
+
+    $ds->define_ruleset( 'identifiers' => 
+	{ param => 'id', valid => POS_VALUE, multiple => 1 });
+
+If this directive is used, then the cleaned value of the parameter will be a
+list if at least one valid value was found and I<undef> otherwise.  If
+you wish a request to be considered valid even if some of the values fail the
+validator, then either use the L</list> key instead or include a
+L</warn> key as well.
+
+=head2 split
+
+This directive has the same effect as L</multiple>, and in addition causes
+each parameter value string to be split (L<perlfunc/split>) as indicated by the
+value of the directive.  If this value is a string, then it will be compiled
+into a regexp preceded and followed by C<\s*>.  So in the
+following example:
+
+    define_ruleset( 'identifiers' =>
+        { param => 'id', valid => POS_VALUE, split => ',' });
+
+The value string will be considered to be valid if it contains one or more
+positive integers separated by commas and optional whitespace.  Empty strings
+between separators are ignored.
+
+    123,456		# returns [123, 456]
+    123 , ,456		# returns [123, 456]
+    , 456		# returns [456]
+    123 456		# not valid
+    123:456		# not valid
+
+If you wish more precise control over the separator expression, you can pass a
+regexp quoted with L<qr> instead.
+
+=head2 list
+
+This directive has the same effect as L</split>, but generates warnings
+instead of error messages when invalid values are encountered (as if 
+C<< warn => 1 >> was also specified).  The resulting cleaned value will be a
+list containing any values which pass the validator, or I<undef> if no
+valid values were found.  See also L</warn>.
+
+=head2 alias
+
+This directive specifies one or more aliases for the parameter name (use a
+listref for multiple aliases).  These names may be used interchangeably in
+requests, but any request that contains more than one of them will be rejected
+with an appropriate error message unless L</multiple> is also specified.
+
+=head2 default
+
+This directive specifies a default value for the parameter, which will be
+reported if no value is specified in the request.  If the rule also includes a
+validator, the specified default value will be passed to it and the resulting
+cleaned value, if any, will be used.  An exception will be thrown at the time
+of rule definition if the default value does not pass the validator.
+
+=head2 no_set_doc
+
+If this directive is given a true value, then the documentation string for
+this rule will not have a list of set values appended.  You can use this if
+you are giving the name of a set as a validator, but do not wish to have the
+list of set values automatically appended.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

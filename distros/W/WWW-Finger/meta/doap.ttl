@@ -1,0 +1,38 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/WWW-Finger/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "WWW-Finger" ;
+	:shortdesc      "get useful data from e-mail addresses"@en ;
+	:programming-language "Perl" ;
+	:homepage       <https://metacpan.org/release/WWW-Finger> ;
+	:download-page  <https://metacpan.org/release/WWW-Finger> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=WWW-Finger> ;
+	:repository [
+		a            :GitRepository ;
+		:browse      <https://github.com/tobyink/p5-www-finger>
+	] ;
+	:maintainer     <http://tobyinkster.co.uk/#i> ;
+	:developer      <http://tobyinkster.co.uk/#i> ;
+	:documenter     <http://tobyinkster.co.uk/#i> ;
+	:tester         <http://tobyinkster.co.uk/#i> ;
+	:created        "2009-12-08"^^xsd:date ;
+	:license
+		<http://dev.perl.org/licenses/> ,
+		<http://dev.perl.org/licenses/artistic.html> ,
+		<http://www.opensource.org/licenses/gpl-license.php> .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/tobyink> .

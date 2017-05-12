@@ -1,0 +1,121 @@
+NAME
+    WWW::DoingItWrongCom::RandImage - fetch random image from
+    <http://www.doingitwrong.com>
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use WWW::DoingItWrongCom::RandImage;
+
+        my $wrong = WWW::DoingItWrongCom::RandImage->new;
+
+        my $wrong_pic = $wrong->fetch
+            or die "Failed to get the picture: " . $wrong->err_msg;
+
+        print "You are doing it wrong: $wrong_pic\n";
+
+DESCRIPTION
+    The module is basic and simple. All it does is access
+    <http://www.doingitwrong.com> and return a URI to a random image.
+
+CONSTRUCTOR
+  new
+        my $wrong = WWW::DoingItWrongCom::RandImage->new;
+
+        my $wrong = WWW::DoingItWrongCom::RandImage->new(
+            ua_args => {
+                timeout => 20,
+                agent   => 'WrongAgent',
+            },
+        );
+
+    The "new()" method *returns a WWW::DoingItWrongCom::RandImage object*.
+    It takes one *optional* argument:
+
+   ua_args
+        my $wrong = WWW::DoingItWrongCom::RandImage->new(
+            ua_args => {
+                timeout => 20,
+                agent   => 'WrongAgent',
+            },
+        );
+
+    Optional. The "ua_args" argument takes a hashref as a value which will
+    be passed to LWP::UserAgent object constructor. See LWP::UseAgent
+    documentation for possible keys/values. By default the default
+    LWP::UserAgent's constructor will be used *except* for "timeout" which,
+    unless specified by you, will default to 30 seconds.
+
+METHODS
+  fetch
+        my $wrong_pic = $wrong->fetch
+            or die "Failed to get the picture: " . $wrong->err_msg;
+
+    The "fetch()" method instructs WWW::DoingItWrongCom::RandImage to fetch
+    a random image from <http://www.doingitwrong.com> and *returns a* URI
+    object (which is overloaded, thus can be treated as a string) which will
+    point to the random image from <http://www.doingitwrong.com>. If an
+    error occured during the process, "fetch()" will return "undef" and the
+    error explanation will be accessible via "err_msg()" method (see below).
+
+  err_msg
+        my $wrong_pic = $wrong->fetch
+            or die "Failed to get the picture: " . $wrong->err_msg;
+
+    If an error occured during the fetching of the URI of the image, the
+    "fetch()" method will return "undef". The explanation of the error will
+    be avalable via "err_msg()" method.
+
+PREREQUISITES
+    For healthy operation module requires the following modules/versions:
+
+        'Carp'                     => 1.04,
+        'URI'                      => 1.35,
+        'LWP::UserAgent'           => 2.036,
+        'HTML::TokeParser::Simple' => 3.15,
+
+    It might work well with earlier versions of the above modules, but it
+    wasn't tested with those.
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-doingitwrongcom-randimage at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-DoingItWrongCom-Rand
+    Image>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::DoingItWrongCom::RandImage
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-DoingItWrongCom-RandIm
+        age>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-DoingItWrongCom-RandImage>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-DoingItWrongCom-RandImage>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-DoingItWrongCom-RandImage>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

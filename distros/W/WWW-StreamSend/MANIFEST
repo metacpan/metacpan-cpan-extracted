@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-StreamSend.t
+lib/WWW/StreamSend.pm
+lib/WWW/StreamSend/Response.pm
+lib/WWW/StreamSend/Audience.pm
+lib/WWW/StreamSend/Subscriber.pm
+META.yml                                 Module meta-data (added by MakeMaker)

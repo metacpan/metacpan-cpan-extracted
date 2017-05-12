@@ -1,0 +1,51 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdfbarcode.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2005-09-12
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+%name{Wx::PdfBarCodeCreator} class wxPdfBarCodeCreator
+{
+
+%{
+static void
+wxPdfBarCodeCreator::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+  wxPdfBarCodeCreator(wxPdfDocument& document);
+
+  %name{Destroy} virtual ~wxPdfBarCodeCreator()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  bool EAN13(double x, double y, const wxString& barcode, double h = 16.0, double w = 0.35);
+
+  bool UPC_A(double x, double y, const wxString& barcode, double h = 16.0, double w = 0.35);
+
+  bool Code39(double x, double y, const wxString& code, bool ext = true, bool cks = false, double w = 0.4, double h = 20.0, bool wide = true);
+
+  bool I25(double xpos, double ypos, const wxString& code, double basewidth = 1.0, double height = 10.0);
+
+  bool PostNet(double x, double y, const wxString& zipcode);
+  
+  bool Code128(double x, double y, const wxString& barcode, double h, double w = 0.21);
+
+  bool Code128A(double x, double y, const wxString& barcode, double h = 13.0, double w = 0.21);
+
+  bool Code128B(double x, double y, const wxString& barcode, double h = 13.0, double w = 0.21);
+
+  bool Code128C(double x, double y, const wxString& barcode, double h = 13.0, double w = 0.21);
+
+  bool EAN128(double x, double y, const wxString& barcode, double h, double w = 0.21);
+
+};

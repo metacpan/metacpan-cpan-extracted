@@ -1,0 +1,50 @@
+{
+   "abstract" : "An interface to the Joker.com DMAPI",
+   "author" : [
+      "Peter Pentchev <roam@ringlet.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Peter Pentchev",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Domain-Registry-Joker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Test::POD::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Dispatch" : "2",
+            "LWP" : "5",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11",
+   "x_authority" : "cpan:ROAM"
+}

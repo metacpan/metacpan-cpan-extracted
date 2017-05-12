@@ -1,0 +1,351 @@
+#!/usr/bin/perl
+use Smart::Comments '###';
+use lib './lib';
+use WordPress::CLI::Base ':all';
+use strict;
+# ABSTRACT= 'show wordpress info'
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /(\d+)/g;
+use LEOCHARRE::Strings ':all';
+use WordPress::XMLRPC;
+use Getopt::Std::Strict 'hc:u:p:x:C:vm:Pi:';
+$opt_h and print STDERR usage() and exit;
+$opt_v and print "$VERSION\n" and exit;
+
+sub usage {q{wordpres-info [OPTION].. 
+Show wordpress info.
+
+   -h          help
+   -c number   category name or id, can be comma separated, to show posts for
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -C path     load username, password, and proxy from this config file
+   -m number   show latest number posts in all categories
+   -P          show page list
+   -i id       show post info
+
+* required
+Try 'man wordpress-info' for more info.
+}}
+
+
+###############################################################################
+# load config from file ?
+#
+if ($opt_C){
+   _opts_from_file(\%OPT, $opt_C) 
+      or die("you asked to load args from $opt_C, but file's not on disk");
+   ### %OPT
+}
+
+###############################################################################
+# check we have all options wanted
+# turn into args
+my $u = usage();
+while ( $u=~/\s+-(\w)\s(\w+)\s+(.+)\*/g ){
+   my($option,$value,$desc)=($1,$2,$3);
+   shomp $desc;
+   $OPT{$option} or die("missing $desc (-$option), value must be $value");
+}
+
+###############################################################################
+### check login credentials..
+my $wp = _wordpress_xmlrpc_object_or_die(\%OPT);
+
+rm_show_posts_in_categories(); # exits if triggered
+
+rm_recent_posts();
+
+rm_show_pages();
+
+rm_show_post_info();
+
+rm_show_categories();
+
+
+
+exit 0;
+
+###############################################################################
+
+
+
+
+sub rm_show_categories {   
+   my $cats = $wp->getCategories or warn("No categories present.");
+
+   print STDERR "# Categories:\n# parent name:name:id\n";
+
+   my @lines;
+
+   for my $catdata (@{$cats}){
+      my $parentname='';
+      if (my $parentid = $catdata->{parentId} ){
+         my $cp = $wp->getCategory($parentid) or die;
+         $parentname = $cp->{categoryName};
+      }
+
+      
+      push @lines, sprintf "%35s:%-35s:%10d", 
+         $parentname,
+         $catdata->{categoryName}, 
+         $catdata->{categoryId},          
+         #$catdata->{htmlUrl},
+         ;
+
+
+   }
+   map { print "$_\n" } sort @lines;
+   exit 0;
+}
+
+
+
+
+
+###############################################################################
+# if categories specified.. make sure they exist for real
+sub _get_resolved_categories {
+   #########################################################################
+   ### resolve categories string arg..
+   my $argstring = shift;
+   ### categories resolving..
+   my @cats;
+   my @wanted = grep { defined } split(/[\,\:]/,$argstring);
+   for my $category_arg (@wanted){      
+      
+      shomp $category_arg;
+      ### $category_arg
+      my ($name,$id) = _resolve_cat_arg( $wp, $category_arg ) or die;
+      push @cats, $name;
+      
+   }
+   ### $argstring
+   ### categories ok
+   return( @cats );
+   
+}
+
+sub rm_show_posts_in_categories {
+   $opt_c or return;
+
+   my @category_names = _get_resolved_categories($opt_c);
+
+   # this is expensive.. only way i can figure out how to do this junk
+   my $allposts = $wp->getRecentPosts(1000); # gets all
+   my $recent_posts_count = scalar @$allposts;
+   ### $recent_posts_count
+
+   # show all posts for these categories
+   for my $category_name(@category_names){
+      
+      my @posts_selected;
+
+      # select posts for category
+
+      POST: for my $p (@$allposts){
+
+         my $cats = $p->{categories} or next POST;
+         for my $postcat (@$cats){
+            if( $postcat eq $category_name ){
+               push @posts_selected, $p;
+            }
+         }
+      }
+
+      ## @posts_selected
+      
+      (print STDERR "# $category_name\n# id:title:href\n" )if @posts_selected;
+      for my $p ( @posts_selected ){
+
+         my $id = $p->{postid};
+         my $rel_url = sprintf '/?p=%s', $id;
+         my $title  =  $p->{title};
+         
+         #printf "'%s' => '%s'\n", $title, $rel_url;
+         printf "%s:%s:%s\n",$id,$title,$rel_url;
+      }
+      print STDERR "\n";
+
+   }
+      
+      
+
+   exit 0;
+   
+}
+
+
+
+
+sub rm_recent_posts {
+   $opt_m or return;
+   my $numposts = $opt_m;
+
+   my @p = @{$wp->getRecentPosts($numposts)};
+   #print "Recent posts (max $numposts):\n\n";
+   #printf "%s %s %s\n", qw/postid title link/;
+
+   #map { printf "id: %s\n%s\n%s\n\n", $_->{postid}, $_->{title}, $_->{link} }  @p;
+   print STDERR "# post id:title\n";
+   map { printf "%s:%s\n", $_->{postid}, $_->{title} }  @p; 
+
+   exit 0;
+}
+
+sub rm_show_pages {
+   $opt_P or return;
+
+   my @p = @{$wp->getPageList()};
+
+   print STDERR "# page id:title\n";
+
+   map { printf "%s:%s\n", $_->{page_id}, $_->{page_title} }  @p; 
+
+   exit 0;
+}
+
+
+sub rm_show_post_info {
+   $opt_i or return;
+
+   my $post = $wp->getPost($opt_i) or die("Failed get post.. ".$wp->errstr);
+   
+   require YAML;
+   printf "%s\n", YAML::Dump($post);
+
+   #_structdump2($post); 
+   #_structdump($post);
+   exit 0;
+
+
+}
+
+sub _structdump2 {
+   my $ref = shift;
+   ref $ref eq 'HASH' or die;
+   my %seen;
+
+   # various that might be present
+   for my $att (qw(postid page_id title page_status permaLink text_more userid wp_author wp_author_display_name wp_author_id wp_page_order wp_page_parent_id wp_page_parent_title wp_password wp_slug  page_status dateCreated date_created_gmt )){
+      exists $ref->{$att} or next;
+      
+      $seen{$att}++ and next;
+
+      printf "%s: %s\n", $att, $ref->{$att};
+   }
+  
+   if( exists $ref->{categories}){
+      $seen{categories}++ and next;
+      printf "categories: %s\n", join(',',@{$ref->{categories}});
+   }
+   # any left over..
+   for my $att( sort keys %$ref ){
+      $att eq 'description' and next;
+      $seen{$att}++ and next;
+      my $v = $ref->{$att};
+      if (ref $v and (ref $v eq 'ARRAY')){
+         printf "$att: %s\b", join(',',@$v);
+      }
+      else {
+         print "$att: $v\n";
+      }
+
+   }
+
+   if (exists $ref->{description}){
+      printf "description: %s\n", $ref->{description};
+   } 
+  
+
+
+}
+
+sub _structdump {
+   my $ref= shift;
+
+   ref $ref or print "$ref\n" and return;
+
+   if (ref $ref eq 'ARRAY'){
+      for (@$ref){
+         _structdump(\$_);  
+      }
+      print "\n";
+   }
+   elsif( ref $ref eq 'HASH'){
+      for (sort keys %$ref){
+         print "$_: ";
+         _structdump($ref->{$_});
+      }
+      print "\n";
+   }
+   elsif ( ref $ref eq 'SCALAR'){
+      print "$_\n";
+   }
+   else {
+      die("dunno what to do with $_");
+   }
+   print "\n";
+
+}
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+wordpress-info - show wordpress info
+
+=head1 USAGE
+
+wordpress-info [OPTIONS]..
+
+   -h          help
+   -c number   category name or id, can be comma separated, to show posts for
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -C path     load username, password, and proxy from this config file
+   -m number   show latest number posts in all categories
+   -P          show page list
+
+* required.
+
+=head2 USAGE EXAMPLES
+
+See what categories are present in the blog
+
+   wordpress-info -u leo -p 235 -x http://leocharre.com/xmlrpc.php
+
+See what posts are in category 23 and 'dev', one category is by id, the other by name.
+
+   wordpress-info -u leo -p 235 -x http://leocharre.com/xmlrpc.php -c 'dev,23'
+
+
+
+
+=head1 SEE ALSO
+
+WordPress-CLI - parent package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+

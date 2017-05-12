@@ -1,0 +1,2 @@
+name = "WWW-NHKProgram-API"
+badges = ["travis", "coveralls"]

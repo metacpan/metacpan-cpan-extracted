@@ -1,0 +1,80 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="eng">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/Content/Gamercard/default/gamercard.css" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="category" content="Gamercard" />
+        <base target="_top" />
+        <title>BrazenStraw3</title>
+    </head>
+    <body>
+        <div class="XbcGamercard Gold Male ">
+            
+            <a id="Gamertag" href="http://live.xbox.com/en-US/MyXbox/Profile?Gamertag=BrazenStraw3">BrazenStraw3</a>
+            <a href="http://live.xbox.com/en-US/MyXbox/Profile?Gamertag=BrazenStraw3">
+                <img id="Gamerpic" src="http://avatar.xboxlive.com/avatar/BrazenStraw3/avatarpic-l.png" alt="BrazenStraw3" title="BrazenStraw3"/>
+            </a>
+            <div class="RepContainer">
+                <label>Rep</label>
+                
+                    <div class="Star Full"></div>
+                    <div class="Star Full"></div>
+                    <div class="Star Full"></div>
+                    <div class="Star Empty"></div>
+                    <div class="Star Empty"></div>
+            </div>
+            <div class="GamerscoreContainer">
+                <label></label>
+                <div id="Gamerscore">150</div>
+            </div>
+            <div id="Location">UK</div>
+            <div id="Motto">Am I drunk yet?</div>
+            <div id="Name">Andrew</div>
+            <div id="Bio">Software developer and a bit of a geek. Arsenal fan.
+
+http://twitter.com/andrewrjones
+http://andrew-jones.com</div>
+
+            
+            <ol id="PlayedGames" >
+            
+                <li >
+                    
+                    <a href="http://live.xbox.com/en-US/GameCenter/Achievements?titleId=1096157387&amp;compareTo=BrazenStraw3">
+                       <img src="http://tiles.xbox.com/tiles/63/-y/0mdsb2JhbA9ECgQJGgYfViwhL2ljb24vMC84MDAwIAAAAAAAAP3df-Q=.jpg" alt="Modern Warfare® 3" title="Modern Warfare® 3" />
+                       <span class="Title">Modern Warfare&#174; 3</span>
+                       <span class="LastPlayed">1/1/2012</span>
+                       <span class="EarnedGamerscore">15</span>
+                       <span class="AvailableGamerscore">1000</span>
+                       <span class="EarnedAchievements">2</span>
+                       <span class="AvailableAchievements">50</span>
+                       <span class="PercentageComplete">4%</span>
+                    </a>
+                </li>
+            
+                <li >
+                    
+                    <a href="http://live.xbox.com/en-US/GameCenter/Achievements?titleId=1161890151&amp;compareTo=BrazenStraw3">
+                       <img src="http://tiles.xbox.com/tiles/+1/Pq/02dsb2JhbA9ECgQNGwEfV1lUL2ljb24vMC84MDAwIAAAAAAAAPzFU+Q=.jpg" alt="FIFA 12" title="FIFA 12" />
+                       <span class="Title">FIFA 12</span>
+                       <span class="LastPlayed">12/31/2011</span>
+                       <span class="EarnedGamerscore">135</span>
+                       <span class="AvailableGamerscore">1000</span>
+                       <span class="EarnedAchievements">6</span>
+                       <span class="AvailableAchievements">45</span>
+                       <span class="PercentageComplete">13%</span>
+                    </a>
+                </li>
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+            </ol>
+        </div>
+        
+    </body>
+</html>

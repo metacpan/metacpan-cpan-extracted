@@ -1,0 +1,15 @@
+# Testing
+
+## Testing with mock objects
+ 1. By default, all tests run using WebService::MyGengo::Test::Mock::LWP, a mocked LWP::UserAgent
+
+## Live Sandbox Testing
+ 1. Open t/lib/WebService/MyGengo/Test/Util/Config.pm in a text editor
+ 1. Enter your sandbox public and private keys and save the file
+ * Because some tests require Jobs of particular statuses, several test
+     classes will create test Jobs for you and ask you to modify them in the
+     sandbox web interface. That is why there are 2 test runs below:
+ 1. `prove -I t/lib -I lib t/*.t :: --live 1`
+ 1. Follow the instructions in the test output
+ 1. `prove -I t/lib -I lib t/*.t :: --live 2`
+

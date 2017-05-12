@@ -1,0 +1,10 @@
+Revision history for WWW-Codeguard
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    Jan 20, 2014
+        Added tests
+        Added 'delete resource' calls in WWW::Codeguard::User
+        Added separate 'edit resource' calls in WWW::Codeguard::User
+0.03    Jul 31, 2015
+        Moved show_database param website_id from required to optional.

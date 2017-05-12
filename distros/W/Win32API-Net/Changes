@@ -1,0 +1,107 @@
+Revision history for Perl extension Win32API::Net
+
+0.18    Oct 21 2014
+        - Change remaining resumeHandle to DWORD_PTR
+
+0.17	Dec 6 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+	- Typo fixes by David Steinbrunner
+
+0.16	Jan 07 2011
+        - Don't redefine USER_INFO_4 etc because some versions of the
+	  MinGW headers do define the new structures, but don't include
+	  any of the new preprocessor constants, so there is no way to
+	  check for this at compiletime.  Instead we'll always use our
+	  own inlined definitions using a custom name.
+
+0.15	Jan 06 2011
+	- Remove lvalue casts to restore compatibility with GCC 4.x. [rt#58537]
+
+0.14	May 06 2010
+	- The 0.13 tarball was rejected by PAUSE because it contained
+	  world writable files/directories.
+
+0.13	May 06 2010
+	- Add support for USER_INFO_4, USER_INFO_21, USER_INFO_22,
+	  USER_INFO_23 and GROUP_INFO_3 for better usability on
+	  Windows XP or higher (Jens Rehsack)
+
+0.12    Apr 16 2008
+	- version 0.12 for separate upload to CPAN
+	- simplified Makefile.PL
+	- added META.yml and ppport.h
+	- More fixes for Win64 compatibility
+
+0.11	Dec 08 2005
+	- Use WMI to determine Administrators and Guests group names
+	  in the test because the enumeration sequence failed on Win2003.
+	- Fix Win64 compatibility problems (resumehandles are pointers,
+	  not DWORDs, so they are 8 bytes on Win64)
+
+0.10	Sep 09 2005
+	- Fix tests to work on non-English Windows versions (Reini Urban).
+	- cygwin compatibility changes.
+
+0.09	Tue Sep 05 2000
+	- fixed yet another memory leak pointed out again by Eamon Doyle.
+	  Macro HV_STORE_AV used newRV_inc instead of newRV_noinc
+	- Corrected minor typo in documentation
+
+0.081   Mon May 22 20:38:11 2000
+        - support for building under Perl v5.6.0.
+	- fixed a leak due to improper freeing in UserGetInfo()
+	  (thanks to Eamon Doyle <eamon.doyle@cp.net>)
+
+0.08	Thu Sep  24th 1999
+	- Changed logic relating to passing empty strings in as values
+	  in input hashes. The old behaviour turned such strings into
+	  NULL pointers. The API treats NULL pointers as an indication
+	  to not change the stored value for that field.  Now fields
+	  with empty strings pass an empty string to the underlying API
+	  structure correctly (enabling a field to be clear fields
+	  e.g. logonScript).  To pass a NULL pointer to the underlying
+	  API, the field must now be set to undef.  NOTE: THIS IS AN
+	  INCOMPATIBLE CHANGE.  IF YOU WERE RELYING ON PRIOR BEHAVIOR
+	  BY SETTING FIELDS TO EMPTY STRINGS, YOUR SCRIPT MAY NEED
+	  TO BE MODIFIED.
+
+0.07	Thu Jul  1st 1999
+	- Added USER_BAD_PW_COUNT_PARMNUM to User export tag
+	  Changed incorrect spelling of UF_DONT_EXPIRE_PASSWORD
+	  to UF_DONT_EXPIRE_PASSWD in Net.pm
+	  (both errors reported by Eamon Doyle <eamon.doyle@isocor.ie>)
+
+0.06	Tue Jun 22nd 1999
+	- Changed all occurances of 'na' to 'pl_na'
+	- Fixed bug in UserGetLocalGroups that was only apparent when trying
+	  to use LG_INCLUDE_INDIRECT() as the optional forth argument
+
+0.05	Thu Feb  4th 1999
+	- Fixed bug in GroupGetInfo
+	- Added support for level 2 in GroupGetInfo
+
+0.04	Sun Sep 14th 1998
+	- use Perl's malloc API instead of calloc/free
+	- eliminate hardcoded module names in messages etc
+	- minor formatting fixes
+	- convert HTML doc to POD, but distribute original (better) HTML
+	- eliminate use of file statics
+
+0.03	Sun Sep 13th 1998
+	- changed EXPORT lists to be something sane (EXPORT is null list,
+	  EXPORT_TAGS has tags for each function group (User, Group etc) and
+	  EXPORT_OK is join of EXPORT_TAGS entries)
+	- Changed name of GetPDC to GetDCName to bring it in line with MS
+	  function NetGetDCName()
+	- Updated documentation and test script
+		  
+0.02    Thu Sep 10th 1998
+	- second version - renamed as Win32API::Net
+	- fixed indentation in Net.xs to be in Perl Sytle
+	- Removed GetLastError() function - now availble as Win32::GetLastError
+	  and $^E (if you're running 5.005+)
+	- Added @EXPORT, @EXPORT_OK and $EXPORT_TAGS{ALL} in Net.pm
+
+0.01    Sun Apr 19th
+	- first version - named Win32::AccNT

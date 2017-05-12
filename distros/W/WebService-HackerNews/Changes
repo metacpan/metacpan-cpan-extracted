@@ -1,0 +1,25 @@
+Revision history for Perl module WebService::HackerNews
+
+0.05 2016-09-28 NEILB
+    - Updated github repo URL as a result of changing my github username
+
+0.04 2014-11-10 NEILB
+    - Forgot the blank lines between =item pod commands.
+    - Added explicit require for IO::Socket::SSL and dropped a duplicate
+      use of HTTP::Tiny (thanks to David Farrell).
+
+0.03 2014-10-13 NEILB
+    - Improved the documentation for WebService::HackerNews, and added
+      some basic doc for WebService::HackerNews::Item and
+      WebService::HackerNews::User.
+
+0.02 2014-10-10 NEILB
+    - Added changed_items_and_users() method, which returns references
+      to arrays of changed items and changed users. Changed since when,
+      I don't know, and the official API doc doesn't say.
+    - The SYNOPSIS was missing a line, which meant it wouldn't work.
+    - I'd left "use Data::Dumper" in from while I was hacking.
+
+0.01 2014-10-09 NEILB
+    - First lash-up released to CPAN
+

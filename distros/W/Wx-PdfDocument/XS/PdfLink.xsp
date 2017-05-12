@@ -1,0 +1,90 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdflinks.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2009-06-24
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfLink} class wxPdfLink
+{
+  
+%{
+static void
+wxPdfLink::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+  /// Constructor
+  %name{newDefault} wxPdfLink(int linkRef) %Overload;
+  
+  %name{newUrl} wxPdfLink(const wxString& linkURL) %Overload;
+
+  %name{newCopy} wxPdfLink(const wxPdfLink& pdfLink) %Overload;
+
+  %name{Destroy} virtual ~wxPdfLink()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+
+  /// Check whether this instance is a valid link reference
+  bool  IsValid() const;
+
+  /// Check whether this instance is an internal reference
+  bool  IsLinkRef() const;
+
+  /// Get the internal link reference
+  int   GetLinkRef() const;
+
+  /// Get the external link reference
+  const wxString GetLinkURL() const;
+
+  /// Set page number and position on page
+  void   SetLink(int page, double ypos);
+
+  /// Get the page this link refers to
+  int    GetPage();
+
+  /// Get the page position this link refers to
+  double GetPosition();
+
+};
+
+
+%name{Wx::PdfPageLink} class wxPdfPageLink : public %name{Wx::PdfLink} wxPdfLink
+{
+  
+%{
+static void
+wxPdfPageLink::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+  /// Constructor
+  wxPdfPageLink(double x, double y, double w, double h, const wxPdfLink& pdfLink);
+
+  %name{Destroy} virtual ~wxPdfPageLink()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+  /// Get the X offset
+  double GetX();
+
+  /// Get the Y offset
+  double GetY();
+
+  /// Get the width
+  double GetWidth();
+
+  /// Get the height
+  double GetHeight();
+
+};

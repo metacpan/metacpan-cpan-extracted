@@ -1,0 +1,45 @@
+Revision history for WWW-Search-MSN
+
+0.0202  2015-12-28
+        - Update away from old E-mail address.
+
+0.0201  2015-05-31
+        - Add VCS repository info to META.yml/META.json.
+
+0.0200  2014-04-12
+        - Deprecate the module in favour of Bing::Search.
+        - Various CPANTS Kwalitee fixes.
+
+0.0106  2009-04-04
+        - Making sure we do the right thing, when a possibly non-existent
+        element was not found and as a result was assigned undef.
+            - Fixes https://rt.cpan.org/Ticket/Display.html?id=43339
+
+0.0105  2008-11-27
+        - Updated to the new MSN Search syntax.
+
+0.0104  2006-11-11
+        - Fixed https://rt.cpan.org/Ticket/Display.html?id=21568 -
+        search.msn.com changed their markup.
+            - Thanks to PURDY for reporting it!
+
+0.0103  2006-07-28
+        - Added 02empty.t to test for an empty result set.
+        - Fixed bug http://rt.cpan.org/Ticket/Display.html?id=20649
+            - Thanks to Tomasz Chomiuk for reporting it.
+
+0.0102  2006-07-12
+        - In 01basic.t the test now matches http:// and https:// instead of
+        just http://
+        - Added Encode to the pre-requisites, as it is absent in some earlier
+        perl versions. See:
+            -http://rt.cpan.org/Public/Bug/Display.html?id=20210
+            - Thanks to PURDY for reporting it!
+
+0.0101  2006-04-16
+        - Fixed the POD from its module-starter leftovers.
+        - Added a note about the Subversion repository to the POD.
+
+0.01    2006-04-15
+        First version, released on an unsuspecting world. Works from what
+        I tested.

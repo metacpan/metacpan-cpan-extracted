@@ -1,0 +1,112 @@
+WebService-Megaplan
+
+Perl bindings for Megaplan.ru API
+
+http://wiki.megaplan.ru/API
+
+VERSION 0.03
+
+
+    use WebService::Megaplan;
+
+    my $api = WebService::Megaplan->new(
+                    login    => 'robot_user',
+                    password => 'xxxxxx',
+                    hostname => 'mycompany.megaplan.ru',
+                    use_ssl  => 1,
+                );
+    $api->authorize();
+
+    # get list of tasks
+    my $data = $api->get_data('/BumsTaskApiV01/Task/list.api', { OnlyActual => 'true' });
+    my $task_list = $data->{data}->{tasks};
+
+    # create new task
+    my $task_reply = $api->post_data('/BumsTaskApiV01/Task/create.api', {
+                                'Model[Name]'        => 'Test title',
+                                'Model[SuperTask]'   => 'p1000001',
+                                'Model[Statement]'   => 'Task long description',
+                                'Model[Responsible]' => $employee_id, # number like 1000020
+                            });
+    printf "Created task #%d\n", $task_reply->{data}->{task}->{Id};
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+TESTING
+
+To provide real credentials to the tests, pass them via environment variables:
+    MEGAPLAN_LOGIN
+    MEGAPLAN_PASSWORD
+    MEGAPLAN_HOST
+    MEGAPLAN_PROJECT (this is Id of project to test)
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::Megaplan
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Megaplan
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-Megaplan
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-Megaplan
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Megaplan/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Sergey Leschenko
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

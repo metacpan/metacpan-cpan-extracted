@@ -1,0 +1,80 @@
+{
+   "abstract" : "Fetches Yahoo Japan's baseball stats",
+   "author" : [
+      "Shun Takebayashi <shun@takebayashi.asia>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-YahooJapan-Baseball",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Web::Scraper" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::YahooJapan::Baseball" : {
+         "file" : "lib/WWW/YahooJapan/Baseball.pm",
+         "version" : "0.04"
+      },
+      "WWW::YahooJapan::Baseball::Game" : {
+         "file" : "lib/WWW/YahooJapan/Baseball/Game.pm"
+      },
+      "WWW::YahooJapan::Baseball::Parser" : {
+         "file" : "lib/WWW/YahooJapan/Baseball/Parser.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/takebayashi/p5-WWW-YahooJapan-Baseball/issues"
+      },
+      "homepage" : "https://github.com/takebayashi/p5-WWW-YahooJapan-Baseball",
+      "repository" : {
+         "url" : "git://github.com/takebayashi/p5-WWW-YahooJapan-Baseball.git",
+         "web" : "https://github.com/takebayashi/p5-WWW-YahooJapan-Baseball"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:TAKEBAYAS"
+}

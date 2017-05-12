@@ -1,0 +1,600 @@
+{
+    "listener_count": 886, 
+    "name": "Gilles - Web Gems", 
+    "tags": [
+        {
+            "url": "http://www.mixcloud.com/tag/beats/", 
+            "name": "Beats", 
+            "key": "/tag/beats/"
+        }, 
+        {
+            "url": "http://www.mixcloud.com/tag/hip-hop/", 
+            "name": "Hip hop", 
+            "key": "/tag/hip-hop/"
+        }, 
+        {
+            "url": "http://www.mixcloud.com/tag/abstract/", 
+            "name": "Abstract", 
+            "key": "/tag/abstract/"
+        }
+    ], 
+    "url": "http://www.mixcloud.com/LaidBackRadio/gilles-web-gems/", 
+    "pictures": {
+        "medium": "http://d27ylsxkm6728c.cloudfront.net/w/100/h/100/q/85/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg", 
+        "extra_large": "http://d27ylsxkm6728c.cloudfront.net/w/600/h/600/q/85/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg", 
+        "large": "http://d27ylsxkm6728c.cloudfront.net/w/300/h/300/q/85/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg", 
+        "medium_mobile": "http://d27ylsxkm6728c.cloudfront.net/w/80/h/80/q/75/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg", 
+        "small": "http://d27ylsxkm6728c.cloudfront.net/w/25/h/25/q/85/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg", 
+        "thumbnail": "http://d27ylsxkm6728c.cloudfront.net/w/50/h/50/q/85/upload/images/extaudio/fa799c5b-ac1a-4ebb-a821-c5257011ea86.jpg"
+    }, 
+    "updated_time": "2012-03-05T18:15:04Z", 
+    "play_count": 2762, 
+    "comment_count": 10, 
+    "percentage_music": 100, 
+    "user": {
+        "url": "http://www.mixcloud.com/LaidBackRadio/", 
+        "username": "LaidBackRadio", 
+        "name": "Laid Back", 
+        "key": "/LaidBackRadio/", 
+        "pictures": {
+            "medium": "http://d1lolb6yyp8wyu.cloudfront.net/w/150/h/150/q/85/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg", 
+            "extra_large": "http://d1lolb6yyp8wyu.cloudfront.net/w/600/h/600/q/85/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg", 
+            "large": "http://d1lolb6yyp8wyu.cloudfront.net/w/300/h/300/q/85/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg", 
+            "medium_mobile": "http://d1lolb6yyp8wyu.cloudfront.net/w/80/h/80/q/75/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg", 
+            "small": "http://d1lolb6yyp8wyu.cloudfront.net/w/25/h/25/q/85/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg", 
+            "thumbnail": "http://d1lolb6yyp8wyu.cloudfront.net/w/50/h/50/q/85/upload/images/profile/c0b9faab-4a87-4ced-a602-3f3f410f2328.jpg"
+        }
+    }, 
+    "key": "/LaidBackRadio/gilles-web-gems/", 
+    "created_time": "2012-02-25T12:04:30Z", 
+    "audio_length": 5541, 
+    "sections": [
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/gonjasufi/nikels-and-dimes/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/gonjasufi/", 
+                    "name": "Gonjasufi", 
+                    "key": "/artist/gonjasufi/", 
+                    "slug": "gonjasufi"
+                }, 
+                "name": "Nikels and Dimes", 
+                "key": "/track/gonjasufi/nikels-and-dimes/", 
+                "slug": "nikels-and-dimes"
+            }, 
+            "position": 1, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/kraus/i-love-you-im-sorry/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/kraus/", 
+                    "name": "Kraus", 
+                    "key": "/artist/kraus/", 
+                    "slug": "kraus"
+                }, 
+                "name": "I love you, I'm sorry", 
+                "key": "/track/kraus/i-love-you-im-sorry/", 
+                "slug": "i-love-you-im-sorry"
+            }, 
+            "position": 2, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/raleigh-moncrief/guppies/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/raleigh-moncrief/", 
+                    "name": "Raleigh Moncrief", 
+                    "key": "/artist/raleigh-moncrief/", 
+                    "slug": "raleigh-moncrief"
+                }, 
+                "name": "Guppies", 
+                "key": "/track/raleigh-moncrief/guppies/", 
+                "slug": "guppies"
+            }, 
+            "position": 3, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/smaharba/heels/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/smaharba/", 
+                    "name": "S.maharba", 
+                    "key": "/artist/smaharba/", 
+                    "slug": "smaharba"
+                }, 
+                "name": "Heels", 
+                "key": "/track/smaharba/heels/", 
+                "slug": "heels"
+            }, 
+            "position": 4, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/dza/flogram-dynooos-crakkk-remix/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/dza/", 
+                    "name": "Dza", 
+                    "key": "/artist/dza/", 
+                    "slug": "dza"
+                }, 
+                "name": "Flogram (Dynooo's Crakkk Remix)", 
+                "key": "/track/dza/flogram-dynooos-crakkk-remix/", 
+                "slug": "flogram-dynooos-crakkk-remix"
+            }, 
+            "position": 5, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/demokracy/starhaven-julllllzzeedd-by-dza/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/demokracy/", 
+                    "name": "Demokracy", 
+                    "key": "/artist/demokracy/", 
+                    "slug": "demokracy"
+                }, 
+                "name": "Starhaven (Julllllzzeedd by DZA)", 
+                "key": "/track/demokracy/starhaven-julllllzzeedd-by-dza/", 
+                "slug": "starhaven-julllllzzeedd-by-dza"
+            }, 
+            "position": 6, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/hayzee/reso7/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/hayzee/", 
+                    "name": "Hayzee", 
+                    "key": "/artist/hayzee/", 
+                    "slug": "hayzee"
+                }, 
+                "name": "Reso7", 
+                "key": "/track/hayzee/reso7/", 
+                "slug": "reso7"
+            }, 
+            "position": 7, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/tayreeb/9-lives-cat/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/tayreeb/", 
+                    "name": "Tayreeb", 
+                    "key": "/artist/tayreeb/", 
+                    "slug": "tayreeb"
+                }, 
+                "name": "9 lives cat", 
+                "key": "/track/tayreeb/9-lives-cat/", 
+                "slug": "9-lives-cat"
+            }, 
+            "position": 8, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/ricardo-villalobos/easy-lee-monolithium-recrunk/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/ricardo-villalobos/", 
+                    "name": "Ricardo Villalobos", 
+                    "key": "/artist/ricardo-villalobos/", 
+                    "slug": "ricardo-villalobos"
+                }, 
+                "name": "Easy Lee (Monolithium Recrunk)", 
+                "key": "/track/ricardo-villalobos/easy-lee-monolithium-recrunk/", 
+                "slug": "easy-lee-monolithium-recrunk"
+            }, 
+            "position": 9, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/flying-lotus/aunties-lock-infinitum-ft-laura-darlington/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/flying-lotus/", 
+                    "name": "Flying Lotus", 
+                    "key": "/artist/flying-lotus/", 
+                    "slug": "flying-lotus"
+                }, 
+                "name": "Auntie's lock / infinitum ft. Laura Darlington", 
+                "key": "/track/flying-lotus/aunties-lock-infinitum-ft-laura-darlington/", 
+                "slug": "aunties-lock-infinitum-ft-laura-darlington"
+            }, 
+            "position": 10, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/ethx/8-days-ft-erin-nicole/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/ethx/", 
+                    "name": "ETHX", 
+                    "key": "/artist/ethx/", 
+                    "slug": "ethx"
+                }, 
+                "name": "8 days ft. Erin Nicole", 
+                "key": "/track/ethx/8-days-ft-erin-nicole/", 
+                "slug": "8-days-ft-erin-nicole"
+            }, 
+            "position": 11, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/the-range/disjoint/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/the-range/", 
+                    "name": "The Range", 
+                    "key": "/artist/the-range/", 
+                    "slug": "the-range"
+                }, 
+                "name": "Disjoint", 
+                "key": "/track/the-range/disjoint/", 
+                "slug": "disjoint"
+            }, 
+            "position": 12, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/fugitive/iron-merms/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/fugitive/", 
+                    "name": "Fugitive", 
+                    "key": "/artist/fugitive/", 
+                    "slug": "fugitive"
+                }, 
+                "name": "Iron merms", 
+                "key": "/track/fugitive/iron-merms/", 
+                "slug": "iron-merms"
+            }, 
+            "position": 13, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/frank-ocean/swim-good/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/frank-ocean/", 
+                    "name": "Frank Ocean", 
+                    "key": "/artist/frank-ocean/", 
+                    "slug": "frank-ocean"
+                }, 
+                "name": "Swim Good", 
+                "key": "/track/frank-ocean/swim-good/", 
+                "slug": "swim-good"
+            }, 
+            "position": 14, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/the-weeknd/glass-table-girls/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/the-weeknd/", 
+                    "name": "The Weeknd", 
+                    "key": "/artist/the-weeknd/", 
+                    "slug": "the-weeknd"
+                }, 
+                "name": "Glass Table Girls", 
+                "key": "/track/the-weeknd/glass-table-girls/", 
+                "slug": "glass-table-girls"
+            }, 
+            "position": 15, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/100-akres/charlie-murphy/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/100-akres/", 
+                    "name": "100 akres", 
+                    "key": "/artist/100-akres/", 
+                    "slug": "100-akres"
+                }, 
+                "name": "Charlie murphy", 
+                "key": "/track/100-akres/charlie-murphy/", 
+                "slug": "charlie-murphy"
+            }, 
+            "position": 16, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/grimy-kid/grim-street/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/grimy-kid/", 
+                    "name": "Grimy Kid", 
+                    "key": "/artist/grimy-kid/", 
+                    "slug": "grimy-kid"
+                }, 
+                "name": "Grim street", 
+                "key": "/track/grimy-kid/grim-street/", 
+                "slug": "grim-street"
+            }, 
+            "position": 17, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/p-major/collide/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/p-major/", 
+                    "name": "P Major", 
+                    "key": "/artist/p-major/", 
+                    "slug": "p-major"
+                }, 
+                "name": "Collide", 
+                "key": "/track/p-major/collide/", 
+                "slug": "collide"
+            }, 
+            "position": 18, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/dza/out-of-time/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/dza/", 
+                    "name": "Dza", 
+                    "key": "/artist/dza/", 
+                    "slug": "dza"
+                }, 
+                "name": "Out of time", 
+                "key": "/track/dza/out-of-time/", 
+                "slug": "out-of-time"
+            }, 
+            "position": 19, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/siroj/beat-01/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/siroj/", 
+                    "name": "SirOJ", 
+                    "key": "/artist/siroj/", 
+                    "slug": "siroj"
+                }, 
+                "name": "Beat 01", 
+                "key": "/track/siroj/beat-01/", 
+                "slug": "beat-01"
+            }, 
+            "position": 20, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/paul-white/we-three-kings/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/paul-white/", 
+                    "name": "Paul White", 
+                    "key": "/artist/paul-white/", 
+                    "slug": "paul-white"
+                }, 
+                "name": "We Three Kings", 
+                "key": "/track/paul-white/we-three-kings/", 
+                "slug": "we-three-kings"
+            }, 
+            "position": 21, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/the-roots/make-em-nv/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/the-roots/", 
+                    "name": "The Roots", 
+                    "key": "/artist/the-roots/", 
+                    "slug": "the-roots"
+                }, 
+                "name": "Make Em NV", 
+                "key": "/track/the-roots/make-em-nv/", 
+                "slug": "make-em-nv"
+            }, 
+            "position": 22, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/lafam-and-orono/nyawara-freestyle/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/lafam-and-orono/", 
+                    "name": "LaFam and Orono", 
+                    "key": "/artist/lafam-and-orono/", 
+                    "slug": "lafam-and-orono"
+                }, 
+                "name": "Nyawara freestyle", 
+                "key": "/track/lafam-and-orono/nyawara-freestyle/", 
+                "slug": "nyawara-freestyle"
+            }, 
+            "position": 23, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/geteye/heres-to-the-world-beat-version/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/geteye/", 
+                    "name": "Geteye", 
+                    "key": "/artist/geteye/", 
+                    "slug": "geteye"
+                }, 
+                "name": "Here's to the world (beat version)", 
+                "key": "/track/geteye/heres-to-the-world-beat-version/", 
+                "slug": "heres-to-the-world-beat-version"
+            }, 
+            "position": 24, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/jay-electronica/exhibit-c/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/jay-electronica/", 
+                    "name": "Jay electronica", 
+                    "key": "/artist/jay-electronica/", 
+                    "slug": "jay-electronica"
+                }, 
+                "name": "Exhibit C", 
+                "key": "/track/jay-electronica/exhibit-c/", 
+                "slug": "exhibit-c"
+            }, 
+            "position": 25, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/oh-dee/makes-no-difference/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/oh-dee/", 
+                    "name": "Oh! Dee", 
+                    "key": "/artist/oh-dee/", 
+                    "slug": "oh-dee"
+                }, 
+                "name": "Makes No Difference", 
+                "key": "/track/oh-dee/makes-no-difference/", 
+                "slug": "makes-no-difference"
+            }, 
+            "position": 26, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/average-joe/sunriders/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/average-joe/", 
+                    "name": "Average Joe", 
+                    "key": "/artist/average-joe/", 
+                    "slug": "average-joe"
+                }, 
+                "name": "Sunriders", 
+                "key": "/track/average-joe/sunriders/", 
+                "slug": "sunriders"
+            }, 
+            "position": 27, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/danny-brown/contra/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/danny-brown/", 
+                    "name": "Danny Brown", 
+                    "key": "/artist/danny-brown/", 
+                    "slug": "danny-brown"
+                }, 
+                "name": "Contra", 
+                "key": "/track/danny-brown/contra/", 
+                "slug": "contra"
+            }, 
+            "position": 28, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/halo/nevermind/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/halo/", 
+                    "name": "Halo", 
+                    "key": "/artist/halo/", 
+                    "slug": "halo"
+                }, 
+                "name": "Nevermind", 
+                "key": "/track/halo/nevermind/", 
+                "slug": "nevermind"
+            }, 
+            "position": 29, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/action-bronson/shiraz/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/action-bronson/", 
+                    "name": "Action Bronson ", 
+                    "key": "/artist/action-bronson/", 
+                    "slug": "action-bronson"
+                }, 
+                "name": "Shiraz", 
+                "key": "/track/action-bronson/shiraz/", 
+                "slug": "shiraz"
+            }, 
+            "position": 30, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/curreny-alchemist/double-07/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/curreny-alchemist/", 
+                    "name": "Curren$y & Alchemist", 
+                    "key": "/artist/curreny-alchemist/", 
+                    "slug": "curreny-alchemist"
+                }, 
+                "name": "Double 07", 
+                "key": "/track/curreny-alchemist/double-07/", 
+                "slug": "double-07"
+            }, 
+            "position": 31, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/ransom/introduction/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/ransom/", 
+                    "name": "RANSOM", 
+                    "key": "/artist/ransom/", 
+                    "slug": "ransom"
+                }, 
+                "name": "Introduction", 
+                "key": "/track/ransom/introduction/", 
+                "slug": "introduction"
+            }, 
+            "position": 32, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/slaine-statik-selektah/the-american-way/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/slaine-statik-selektah/", 
+                    "name": "Slaine & Statik Selektah", 
+                    "key": "/artist/slaine-statik-selektah/", 
+                    "slug": "slaine-statik-selektah"
+                }, 
+                "name": "The American Way", 
+                "key": "/track/slaine-statik-selektah/the-american-way/", 
+                "slug": "the-american-way"
+            }, 
+            "position": 33, 
+            "section_type": "track"
+        }, 
+        {
+            "track": {
+                "url": "http://www.mixcloud.com/track/raekwon/just-a-toast-ft-jd-era/", 
+                "artist": {
+                    "url": "http://www.mixcloud.com/artist/raekwon/", 
+                    "name": "RAEKWON", 
+                    "key": "/artist/raekwon/", 
+                    "slug": "raekwon"
+                }, 
+                "name": "Just a toast ft. JD Era", 
+                "key": "/track/raekwon/just-a-toast-ft-jd-era/", 
+                "slug": "just-a-toast-ft-jd-era"
+            }, 
+            "position": 34, 
+            "section_type": "track"
+        }
+    ], 
+    "slug": "gilles-web-gems", 
+    "favorite_count": 96, 
+    "description": "Internet is the new digging paradise: with dozens of websites from music magazines & radios to curators, activists, (net)labels, music blogs & artists self released work (www.freemusicarchive.org, www.netlabelism.com, BTS radio, Dublab, xlr8r, fact magazine, error broadcast, svetlana records, pitchfork, bandcamp, etc... to only name a few), the amount & variety of sources for collecting free, legit, quality music has never been that big.\r\n\r\n« Web Gems » is my selection from my digging trips through this never ending amazing world.\r\n\r\nGilles is long time Laid Back collaborator based in Liège (BE). He used to run Dust Shop records (www.ldbk.eu/dustshop), he is now part of the Tailor Made collective and prepares the release of their first mixtape (may 2012) - http://fr.flavors.me/tailormade\r\n"
+}

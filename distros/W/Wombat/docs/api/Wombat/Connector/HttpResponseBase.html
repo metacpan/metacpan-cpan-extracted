@@ -1,0 +1,329 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Connector::HttpResponseBase - internal http response base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Connector::HttpResponseBase - internal http response base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Connector::HttpResponse;</PRE>
+<PRE>
+  use base qw(Wombat::Connector::HttpResponseBase);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::HttpResponse</STRONG> and
+<STRONG>Servlet::Http::HttpServletResponse</STRONG> which can be used for most
+connectors that implement the HTTP protocol. Only connector-specific
+methods need to be implemented. Extends
+<STRONG>Wombat::Connector::ResponseBase</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Connector::HttpResponseBase</STRONG>
+instance, initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getCookies"><CODE>getCookies()</CODE></A></STRONG><BR>
+<DD>
+Return the list of Cookies for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_addCookie"><CODE>addCookie($cookie)</CODE></A></STRONG><BR>
+<DD>
+Add the specified Cookie to those that will be included with this Response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24cookie">$cookie</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::Cookie</STRONG> to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearCookies"><CODE>clearCookies()</CODE></A></STRONG><BR>
+<DD>
+Clear the list of Cookies for this Response;
+<P></P>
+<DT><STRONG><A NAME="item_addDateHeader">addDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Add a date value for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the response header
+<P></P>
+<DT><STRONG><A NAME="item_%24date">$date</A></STRONG><BR>
+<DD>
+the additional header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setDateHeader">setDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Set the date value for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the header
+<P></P>
+<DT><STRONG>$date</STRONG><BR>
+<DD>
+the header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Add a value for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the response header
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the additional header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value for the first occurrence of the named response
+header. For all values, use <A HREF="#item_getHeaderValues"><CODE>getHeaderValues()</CODE></A>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Return a list of all the header names set for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderValues"><CODE>getHeaderValues($name)</CODE></A></STRONG><BR>
+<DD>
+Return the list of values for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setHeader">setHeader($name, $value)</A></STRONG><BR>
+<DD>
+Set the value for the named response header.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the response header
+<P></P>
+<DT><STRONG>$value</STRONG><BR>
+<DD>
+the header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearHeaders"><CODE>clearHeaders()</CODE></A></STRONG><BR>
+<DD>
+Clear the set of headers for this Response;
+<P></P>
+<DT><STRONG><A NAME="item_setLocale"><CODE>setLocale($loc)</CODE></A></STRONG><BR>
+<DD>
+Set the locale for this Response. The character encoding for this
+Response will be set to the encoding specified by the locale, and the
+<EM>Content-Language</EM> header will be set to the language specified by
+the locale.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24loc">$loc</A></STRONG><BR>
+<DD>
+the locale for the response
+<P></P></DL>
+<DT><STRONG><A NAME="item_getMessage"><CODE>getMessage()</CODE></A></STRONG><BR>
+<DD>
+Return the status message for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getStatus"><CODE>getStatus()</CODE></A></STRONG><BR>
+<DD>
+Return the HTTP status code for this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setStatus"><CODE>setStatus($code)</CODE></A></STRONG><BR>
+<DD>
+Set the status code for this response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24code">$code</A></STRONG><BR>
+<DD>
+the HTTP status code
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_containsHeader"><CODE>containsHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return a boolean value indicating whether or not the named response
+header has already been set.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the header
+<P></P></DL>
+<DT><STRONG><A NAME="item_encodeRedirectURL"><CODE>encodeRedirectURL($url)</CODE></A></STRONG><BR>
+<DD>
+Encode the session ID for this Response into the specified redirect
+URL, if necessary.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24url">$url</A></STRONG><BR>
+<DD>
+the url to be encoded
+<P></P></DL>
+<DT><STRONG><A NAME="item_encodeURL"><CODE>encodeURL($url)</CODE></A></STRONG><BR>
+<DD>
+Encode the session ID for this Response into the specified URL, if
+necessary.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$url</STRONG><BR>
+<DD>
+the url to be encoded
+<P></P></DL>
+<DT><STRONG><A NAME="item_finishResponse"><CODE>finishResponse()</CODE></A></STRONG><BR>
+<DD>
+Perform whatever actions are required to flush and close the output
+handle or writer, including sending headers if the response is not
+already committed.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException">Servlet::Util::IOException</A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_flushBuffer"><CODE>flushBuffer()</CODE></A></STRONG><BR>
+<DD>
+Force any content in the buffer to be written to the client. Headers
+are automatically sent and the response is committed on the first
+invocation of this method.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+</DL>
+<DT><STRONG><A NAME="item_reset"><CODE>reset()</CODE></A></STRONG><BR>
+<DD>
+Clear any data that exists in the content buffer and unsets the
+content length and content type, all cookies and headers, and the
+status and message.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_sendError">sendError($code, [$message])</A></STRONG><BR>
+<DD>
+Send an error response with the specified status and optional message.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$code</STRONG><BR>
+<DD>
+the error status code
+<P></P>
+<DT><STRONG><A NAME="item_%24message">$message</A></STRONG><BR>
+<DD>
+the optional descriptive message; if unspecified, the standard message
+for the given status code will be used.
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_sendRedirect"><CODE>sendRedirect($location)</CODE></A></STRONG><BR>
+<DD>
+Send a temporary redirect to the specified URL.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24location">$location</A></STRONG><BR>
+<DD>
+the redirect location URL
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_sendHeaders"><CODE>sendHeaders()</CODE></A></STRONG><BR>
+<DD>
+Write response headers to the output handle, committing the
+response. Usually doesn't need to be called by other classes, but will
+be called the first time the buffer is flushed.
+<P></P>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A>,
+<A HREF="../../../api/Servlet/Http/Cookie.html">the Servlet::Http::Cookie manpage</A>,
+<A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/HttpResponse.html">the Wombat::HttpResponse manpage</A>,
+<A HREF="../../../api/Wombat/Connector/ResponseBase.html">the Wombat::Connector::ResponseBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

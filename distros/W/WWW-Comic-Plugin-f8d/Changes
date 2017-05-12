@@ -1,0 +1,9 @@
+Revision history for WWW-Comic-Plugin-f8d
+
+0.02    2009/09/17
+        Tests ought to try loading the right damn module :)  (Duplicated a
+        previous module and changed, but missed those bits, it would seem!)
+
+0.01    2008/05/10
+        First version, released on an unsuspecting world.
+

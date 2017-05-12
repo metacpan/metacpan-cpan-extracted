@@ -1,0 +1,124 @@
+<%flags>
+   inherit => '/maslib/basic/defaults.mas'
+</%flags>
+
+<%method pkg>Data::Type</%method>
+<%method info>robust and extensible data- and valuetype system</%method>
+<%method version>0.02.01</%method>
+<%method last_released_version>0.01.15</%method>
+<%method author>Murat Uenalan</%method>
+<%method email>muenalan@cpan.org</%method>
+<%method newsgroups>comp.lang.perl.announce</%method>
+<%method cvsrevision>$Revision: 1.16 $</%method>
+<%method version_from>Type.pm.tmpl</%method>
+<%method changelog>ChangeLog</%method>
+<%method make>nmake</%method>
+<%method dist_copy_dir>y:\perl\dists</%method>
+<%method buildtm><% scalar gmtime %></%method>
+<%method perl_info>
+% scalar `perl -v`;
+</%method>
+<%method revision>
+<%args>
+    $from => ''
+</%args>
+% open( FROM, $from ) or die $!." as version file";
+% return map { /Revision: (.*) \$/ ? $1 : () } <FROM>;
+</%method>
+
+<%method install>
+I highly recommend to use CPAN for one-stop-shop installation:
+
+perl -MCPAN -e "install Data::Type"
+</%method>
+
+<%method short_desc>
+<%text>This module delivers an easy, generic and unified interface to type related CPAN modules. They all have one common purpose: reporting if data has some "characteristics". And this module wraps that with a clean api.</%text>
+</%method>
+
+<%method desc>
+<%text>
+A lot of CPAN modules have a common purpose: reporting if data has some "characteristics". Email::Valid is an illustrous example: reporting if a string has characteristics of an email address. The address() method reports this via returning 'yes' or 'no'. Another module, another behaviour: Business::ISSN tests for the characteristics of an "International Standard Serial Number" and does this via an is_valid() method returning <true> or <false>. In fact a jungle of APIs for the same general problem. This module hides all that under one simple and unified API.
+
+The resulting key concepts:
+
+   * unified interface to type related CPAN modules (via L<Data::Type>)
+
+   * generic but simple API (via L<Data::Type::Docs::RFC)
+
+   * paremeterized types ( eg. C<STD::VARCHAR(80)> )
+   
+   * alternativly exception-based or functional problem reports (L<valid()> contra L<is()>).
+
+   * localization via "Locale::Maketext" (L<Localization>)
+
+   * syntactic sugar ( "C<die unless is BIO::DNA>" )
+
+   * generic access through "DBI" to catalog of data types and more (see L<Data::Type::Query>)
+
+This module relies, as much as its plausible, on CPAN modules doing the job in the backend. For instance L<Regexp::Common> is doing a 
+lot of the regular expression testing. L<Email::Valid> takes care of the C<STD::EMAIL> (see L<Std Collection|Data::Type::Collection::Std>) type. L<Data::Parse> can be exploited
+for doing the backwork for the C<STD::DATE> (see L<Std Collection|Data::Type::Collection::Std>) type.
+
+Parts are inspired by "XML Schema Part 2: Datatypes". Andrew Wardley's XML::Schema in fact transported it mostly to perl. Data::Type exploits that.
+</%text>
+</%method>
+
+<%method desc_as_pod>
+<%text>
+A lot of CPAN modules have a common purpose: reporting if data has some "characteristics". L<Email::Valid> is an illustrous example: reporting if a string has characteristics of an email address. The C<address()> method reports this via returning C<'yes'> or C<'no'>. Another module, another behaviour: C<Business::ISSN> tests for the characteristics of an C<International Standard Serial Number> and does this via an C<is_valid> method returning C<true> or C<false>. And so on and so on.
+L<Data::Type> was created with modularity, introspectability and usability in mind.
+
+The resulting key concepts are:
+
+=over 3
+
+=item * 
+a unified interface to type related CPAN modules (via L<Data::Type>)
+
+=item * 
+generic, fun to extend and simple API (see L<Data::Type::Docs::RFC>)
+
+=item * 
+paremeterized types ( eg. C<STD::VARCHAR(80)> )
+
+=item * 
+alternativly exception-based or functional problem reports (L<valid()> contra L<is()>)
+
+=item * 
+localization via L<Locale::Maketext> (L<Data::Type/Localization>)
+
+=item *
+syntactic sugar ( C<die unless is BIO::DNA> )
+
+=item *
+generic access through L<DBI> to catalog of data types and more (see L<Data::Type::Query>)
+
+=back
+
+This module relies, as much as its plausible, on CPAN modules doing the job in the backend. For instance L<Regexp::Common> is doing a 
+lot of the regular expression testing. L<Email::Valid> takes care of the C<EMAIL> type. L<Data::Parse> can be exploited
+for doing the backwork for the C<DATE> type.
+</%text>
+</%method>
+
+<%method synopsis_as_pod>
+  use <& /maslib/defaults.mas:pkg &> qw(:is +ALL);
+
+  is STD::EMAIL or warn;
+
+  warn if isnt STD::CREDITCARD( 'MASTERCARD', 'VISA' );
+
+  try
+  {
+    valid( '9999-12-31 23:59:59', DB::DATETIME );
+  }
+  catch Data::Type::Exception with
+  {
+    print $e->to_string foreach @_;
+  };
+</%method>
+
+<%method synopsis_as_text>
+<& SELF:synopsis_as_pod &>
+</%method>

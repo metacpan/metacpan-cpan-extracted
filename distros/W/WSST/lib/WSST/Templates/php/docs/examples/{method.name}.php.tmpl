@@ -1,0 +1,43 @@
+<?php
+
+[% INCLUDE inc_example_file_header.tmpl file_title="Example of ${package_name}::${method.interface_name}" -%]
+
+error_reporting(E_ALL);
+ini_set('display_errors', true);
+
+require_once '[% package_dir %].php';
+
+// create [% package_name %] object.
+$service =& new [% package_name %]();
+
+// call [% method.interface_name %] and get response.
+[% IF method.first_good_test -%]
+[% test = method.first_good_test -%]
+$params = array(
+[% FOREACH key = sort_keys(test.params) -%]
+    '[% key %]' => [% test.params.$key | $env_param %],
+[% END -%]
+);
+$res =& $service->[% method.interface_name %]($params);
+[% ELSE -%]
+$res =& $service->[% method.interface_name %]();
+[% END -%]
+
+// check library error.
+if (PEAR::isError($res)) {
+    echo "Error: " . $res->getMessage() . "\n";
+    exit(1);
+}
+
+// get response data.
+$data =& $res->getData();
+
+// print response data.
+[% FOREACH node = method.return.to_array -%]
+[% NEXT IF node.depth < 2 -%]
+[% NEXT IF node_nullable(node) -%]
+[% NEXT IF node.children -%]
+echo "[% node.name %]: {$data[% node_access(node) %]}\n";
+[% END -%]
+
+?>

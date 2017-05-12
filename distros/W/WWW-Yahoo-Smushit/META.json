@@ -1,0 +1,26 @@
+{
+   "abstract" : "Perl interface to Yahoo Smushit image optimizer",
+   "author" : [
+      "Junior Moraes <fvox@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Yahoo-Smushit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}
+

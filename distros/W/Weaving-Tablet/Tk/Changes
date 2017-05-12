@@ -1,0 +1,17 @@
+Revision history for Perl extension Snartemo::Tk.
+
+0.01  Tue Sep  7 11:31:26 1999
+	- original version; created by h2xs 1.18
+
+0.5   Sep 14 1999
+	- first iteration of Tk user interface
+
+0.6
+	- added ability to see twist
+	- added control over background color
+	- added option to make short vs long shapes (with/without overlap from
+	row to row)
+	- diplays file name or "untitled" in title of window
+	- almost every dialog now is cached in the object with each object
+	having its own instance
+	- added ability to have cards idle

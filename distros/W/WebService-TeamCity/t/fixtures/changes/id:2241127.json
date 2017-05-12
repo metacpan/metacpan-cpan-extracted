@@ -1,0 +1,31 @@
+{
+   "comment" : "Don't use API introduced in TC10\n",
+   "date" : "20151228T125449+0300",
+   "files" : {
+      "file" : [
+         {
+            "after-revision" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649",
+            "before-revision" : "679d882ef863a1716c1f5593c162682e74358da8",
+            "file" : "git-tests/src/jetbrains/buildServer/buildTriggers/vcs/git/tests/GitLabelingSupportTest.java",
+            "relative-file" : "git-tests/src/jetbrains/buildServer/buildTriggers/vcs/git/tests/GitLabelingSupportTest.java"
+         }
+      ]
+   },
+   "href" : "/httpAuth/app/rest/changes/id:2241127",
+   "id" : 2241127,
+   "user" : {
+      "href" : "/httpAuth/app/rest/users/id:787",
+      "id" : 787,
+      "name" : "Neverov",
+      "username" : "neverov"
+   },
+   "username" : "dmitry.neverov",
+   "vcsRootInstance" : {
+      "href" : "/httpAuth/app/rest/vcs-root-instances/id:2495",
+      "id" : "2495",
+      "name" : "ssh://git.labs.intellij.net/teamcity/git-plugin.git#%default.branch%",
+      "vcs-root-id" : "TeamCityPluginsByJetBrains_Git_SshGitLabsIntellijNetTeamcityGitPluginGitDefaultB"
+   },
+   "version" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649",
+   "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2241127&personal=false"
+}

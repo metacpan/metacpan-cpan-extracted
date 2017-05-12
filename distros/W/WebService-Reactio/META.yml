@@ -1,0 +1,48 @@
+---
+abstract: 'API client for Reactio'
+author:
+  - 'papix <mail@papix.net>'
+build_requires:
+  Furl::Response: '0'
+  Path::Class: '0'
+  Test::Mock::Furl: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Reactio
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Reactio:
+    file: lib/WebService/Reactio.pm
+    version: '0.03'
+  WebService::Reactio::Incident:
+    file: lib/WebService/Reactio/Incident.pm
+requires:
+  Carp: '0'
+  Furl: '0'
+  JSON: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/papix/WebService-Reactio/issues
+  homepage: https://github.com/papix/WebService-Reactio
+  repository: git://github.com/papix/WebService-Reactio.git
+version: '0.03'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

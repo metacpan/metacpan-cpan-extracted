@@ -1,0 +1,24 @@
+Revision history for WWW-Pastebin-PastebinCom-Create
+
+1.003   2014-01-17
+        - Fixed a bug where the module died when a network error occured
+
+1.002   2014-01-11
+        - Fixed the module and the tests to handle properly the case
+          when we reach the daily 10-pastes limit.
+
+1.001   2014-01-07
+        - Resurrected the module for use with App::Nopaste
+
+0.004   2011-12-04
+        - Fixed an error in one of the test files
+
+0.003   2009-01-17
+        - Applied Diab Jerius's patch to adopt the module for
+          the new pastebin.com format
+
+0.002   2009-01-17
+        - Added a "uri" argument to support pasting to "private" pastebins.
+
+0.001   2008-03-23
+        - First version, released on an unsuspecting world.

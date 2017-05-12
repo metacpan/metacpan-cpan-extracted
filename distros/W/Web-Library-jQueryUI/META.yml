@@ -1,0 +1,34 @@
+---
+abstract: 'Distribution wrapper around jQueryUI'
+author:
+  - 'The following person is the author of all the files provided in'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Web-Library-jQueryUI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Moose: 0
+  Web::Library: 0.02
+  perl: 5.012000
+resources:
+  bugtracker: https://github.com/marcelgruenauer/Web-Library-jQueryUI/issues
+  homepage: https://github.com/marcelgruenauer/Web-Library-jQueryUI
+  repository: https://github.com/marcelgruenauer/Web-Library-jQueryUI.git
+version: 0.04
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

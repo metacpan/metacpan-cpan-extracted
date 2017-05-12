@@ -1,0 +1,12 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+WWW-Mechanize-Shell-*
+WWW-Mechanize-Shell-*/
+.releaserc
+.lwpcookies
+CVS
+MYMETA.*

@@ -1,0 +1,632 @@
+=encoding ISO8859-1
+
+
+=head1 NAME
+
+Win32::GUI::UserGuide::FAQ - Frequently asked questions about Win32::GUI
+
+=head1 The Win32::GUI F.A.Q.
+
+These are the "Frequently Asked Questions" for the Perl Win32::GUI
+module. These questions and answers have been collected from the
+Win32::GUI-Users mailing list.
+
+You can subscribe to the mailing list at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>
+
+This FAQ is currently significantly out of date - hopefully it will
+be reviewed and updated for the next Win32::GUI release.
+
+=head2 Can I use a window handle in more than one process?
+
+If you run some lengthy processing like web page retrieval with LWP,
+database search, file processing etc., and you cannot call
+$Window->DoEvents() within that processing, your window will seem to
+freeze during your processing. The solution to that is, to do the
+processing in a separate Windows thread or process. ActivePerl 5.6
+simulates the "fork" command using Windows threads.
+
+"Well, from Windows point of view, it is a thread. From Perl's point of
+view, it is a process. The Perl interpreter is busily keeping the data
+separate between the two threads (I'm not sure I understand the complete
+technique of the magic that does that, but I'm sure it can be made to
+work because the Perl language doesn't expose "real" addresses (much))."
+
+"On the other hand, the (UNIX) model for "fork" is that the multiple
+processes (threads on Perl for Windows) start off with identical
+data/variables/file handles. And the Windows model for "windows" is that
+the windows are owned by a process (not a thread), and can be accessed
+by any thread that has the window handle. (And in fact, because Windows
+was developed on DOS, the windows are even a bit visible to other
+processes, but that doesn't concern us here.)"
+
+"By creating the Win32::GUI objects before forking, both the parent and
+child threads get copies (?) of the object variables. Because of the
+nature of Windows, the embedded Window handles inside both copies of the
+object variables are equally usable. Because of the (present) nature of
+Win32::GUI, whereby most of the parameter data is pumped into Win32 API
+parameters, and most of the return values are obtained by calling Win32
+APIs to obtain it, I have shown experimentally that it is possible to
+use the Win32::GUI object references from both a parent and a child
+thread. Now it is important to remember that Windows only delivers
+window messages to the first thread of a program, so in the Perl "fork"
+environment, this gets translated to *only the parent process of a group
+of Perl-forked processes can successfully run Win32::GUI::Dialog* (Yep,
+I tried it the other way first, figuring that the parent could more
+easily monitor the child process for death, since fork returns the child
+pid, and waitpid works that way--but it just hung, and the windows never
+appeared). However, *the child can use the object references created by
+Win32::GUI* [before the fork] to access the "IsEnabled", "IsVisible"
+attributes of the window widgets, and they are dynamically updated (not
+cached in the object). The child can access the current selection from
+combo boxes. The child can enable and disable widgets, and the display
+gets updated appropriately. This is quite adequate for my application,
+which now can do its "long" operations in the child "process", and keep
+the GUI window "active" (except that certain parts get disabled during
+"long" operations)."
+
+=head2 Why does my window seem to freeze when my program is in a loop?
+
+Put a call to DoEvents() inside the loop. This will ensure that all
+queued messages are processed before going on with the loop:
+
+  use strict;
+  use Win32::GUI;
+
+  my $main = Win32::GUI::Window->new(
+    -name    => "Main",
+    -title   => "Win32-GUI: Doevents-Demo",
+    -left    => 100,
+    -top     => 100,
+    -width   => 600,
+    -height  => 400,
+  );
+
+  sub Main_Terminate() {
+    print "Main window terminated\n";
+    return -1;
+  }
+
+  my $textfield = $main->AddTextfield(
+    -name   => "Textfield",
+    -text   => "have fun and more",
+    -left   => 75,
+    -top    => 150,
+    -width  => 200,
+    -height => 40,
+    -readonly => 1,
+  );
+
+  $main->Show();
+
+  $textfield->Text("Processing infile...");
+  open INFILE, "<infile.txt" or die "open infile error: $!";
+  my $linenr = 0;
+  foreach my $line (<INFILE>) {
+    $linenr++;
+    $textfield->Text("Processing line $linenr");
+    Win32::GUI::DoEvents() >= 0 or die "Window was closed during processing";*
+
+    sleep 1; #body of the loop...
+  }
+
+  $textfield->Text("completed");
+  Win32::GUI::DoEvents();
+  sleep 1; #program continues...
+
+This will, of course, make your loop run slightly slower (almost
+irrelevant if there is no activity on the window). But there is the
+advantage (other than having the Textfield saying "Processing...") of
+being able to stop the loop in the middle by killing the window, or with
+a 'dedicated' stopbutton, for example.
+
+=head2 What about licensing?
+
+If I develop a product in Perl with usage of the Win32::GUI module, and
+I spread (well lets assume for FREE) to the public.. Is it still under
+GNU license or do we have to pay the Win32::GUI team something?
+
+"No, you don't have to pay anything. I'm not a lawyer and I don't want
+to pay a lawyer :-) Win32::GUI is released under the Artistic License,
+e.g. you can redistribute it under the same terms of Perl itself."
+
+Note that some of the extensions may be released under different terms.
+Please ensure that you check the documentation of such extensions
+for individual licencing terms.
+
+=head2 What is Win32::GUI?
+
+"Win32::GUI is a Win32-platform native graphical user interface toolkit
+for Perl. Basically, it's an XS implementation of most of the functions
+found in user32.dll and gdi32.dll, with an object oriented Perl
+interface and an event-based dialog model that mimic the functionality
+of visual basic. It was a big fun for me to put it up, hope it will be a
+fun for you too :-)"
+
+=head2 Where can I get Win32::GUI?
+
+The creator and guru of the Win32::GUI project is Aldo
+Calpini. Some (old) information can be found on his website at
+L<http://dada.perl.it/>.
+
+The project is under active development, and the latest information
+and releases can be found at the Win32::GUI homepage on SourceForge.
+
+=over
+
+=item L<http://perl-win32-gui.sourceforge.net/>
+
+=item L<http://sourceforge.net/projects/perl-win32-gui/>
+
+=back
+
+Both source distributions and PPM distributions (for ActiveState
+Perl 5.6 an 5.8) can be found here.  It should be noted that
+the PPMs currently available directly from the ActiveState
+repositories and now very old, and should not be preferred for
+installations.
+
+There are some other binary distributions around (some linked from
+CPAN, for example), but due to complexities in the project's build
+process these may well be missing the documentation.  SourceForge is
+your best download location at the time of writing.
+
+Full documentation is installed with the PPM installation, and
+can be found online at:
+
+=over
+
+=item L<http://perl-win32-gui.sourceforge.net/docs/>
+
+=back
+
+Somewhat older versions of the documents can be found at:
+
+=over
+
+=item L<http://dada.perl.it/gui_docs/gui.html>
+
+=item L<http://www.jeb.ca/perl/win32-gui-docs/>
+
+=back
+
+=head2 How can I use Win32::GUI functions in EVAL?
+
+Yes, Win32::GUI supports things like these (it's really Perl that
+supports it :-), but you need to escape your window-handler variable $W:
+
+    eval qq (
+        sub main::$subtxt {
+            print "button clicked\n";
+            *\$W*->SimpleLabel->Text("Got a click");
+        }
+    );
+    $@ or die "Error in eval: $@";   $$$verify
+
+...and always check for $@ after an eval!
+
+=head2 How can I get a vertical scrollbar in a textfield?
+
+Add these options when you create the textfield:
+  
+  -multiline   => 1
+  -autovscroll => 1
+
+This should do the trick.
+
+=head2 How can I get the selected portion of a textfield?
+
+There is a Selection method that returns the start and end of the
+selection. Then you just make a substr on the Textfield content:
+
+  ($from, $to) = $Textfield->Selection();
+  $var = substr($Textfield->Text, $from, $to-$from);
+
+=head2 How can I get the _Change event from a RichEdit control?
+
+"I'd like to share a solution to a problem that has been driving me
+nuts for a while. I changed a Textfield control to a RichEdit and it
+would not give me the _Change event. I dug in the GUI.xs and could find
+nothing wrong. I finally tracked it down to the eventmask being zero,
+which means that the notification messages don't come to the GUI message
+loop in the first place. The workaround is to do
+
+  $MainWindow->myRichEditField->SendMessage (0x445, 0, 1);
+
+That sends EM_SETEVENTMASK (0x445) to the control with the ENM_CHANGE
+bit set. Hope that spares somebody else a headache."
+
+=head2 How can I format text in a RichEdit control?
+
+There is a SetCharFormat method to the RichEdit control.
+
+  $Rich->Select ($from_here, $to_there);
+  $Rich->SetCharFormat (-color => $flashy_pink)
+
+To set the font at the beginning you can use:
+
+  my $Font = new Win32::GUI::Font(
+   -name => "Courier New", 
+   -height => 16,
+   -bold => 0,
+  );
+
+  ### or the font/style of your choice...
+  ### and then in your AddRichEdit use
+
+  -font => $Font
+
+=head2 How can I prevent the user from choosing more than one item in a Listview?
+
+You can use the
+
+  -singlesel
+
+option on the ListView to achieve what you want.
+
+=head2 How do I disable the standard window controls in the upper right corner
+
+(that is, the Minimize, Maximize, and (sometimes) Help buttons)
+
+Create a DialogBox and set the "-minimizebox", "-maximizebox",
+"-helpbutton" options approprietly. For example,
+
+  $db = new Win32::GUI::DialogBox(
+    -name        => "dialog_box",
+    -text        => "DialogBox Test",
+    -size        => [800,550],
+    -helpbutton  => 1,
+    -menu        => 0,
+    -maximizebox => 0,
+    -minimizebox => 0,
+    -resizable   => 0,
+  );
+
+=head2 What are the icon, button and modality values for MessageBox?
+
+I think these will work, I haven't tried them all.
+
+  Settings
+  =================================
+  0 - display only the OK button
+  1 - display OK and Cancel buttons
+  2 - display Abort, Retry, and Ignore buttons
+  3 - display Yes, No, and Cancel buttons
+  4 - display Yes and No buttons
+  5 - display Retry and Cancel buttons
+
+  16 - display Critical Message icon
+  32 - display Warning Query icon
+  48 - display Warning Message icon
+  64 - display Information Message icon
+
+  0 - set first button as default
+  256 - set second button as default
+  512 - set third button as default
+  768 - set fourth button as default
+
+ 
+  Return Values
+  =============
+  1 - OK
+  2 - Cancel
+  3 - Abort
+  4 - Retry
+  5 - Ignore
+  6 - Yes
+  7 - No
+
+=head2 How can I change the cursor to an hourglass and back?
+
+Basically, what you want is
+
+  Win32::GUI::SetCursor ()
+
+the tricky thing is to get the standard resource of the hourglass. Feel
+free to use my perl module http://www.fairymails.com/perl/WinStRes.pm
+for exactly this: (Notice: Win32::API must be installed)
+
+  Win32::GUI::SetCursor (WinCursor (WAIT)); # hourglass ...
+  Win32::GUI::SetCursor (WinCursor ()); # ... and back
+
+What this module does is
+
+  $LoadImage = new Win32::API ('user32', 'LoadImage', [N,N,I,I,I,I],N)
+  or die 'can\'t find LoadImage function';
+  ....
+  %cursors =
+  (
+    'NORMAL'      => 32512,
+    'IBEAM'       => 32513,
+    'WAIT'        => 32514,
+  ....
+  sub WinCursor
+  {
+    local $_ = $cursors{$_[0]} or $cursors{'NORMAL'};
+    return $LoadImage->Call (0, $_, 2, 0, 0, 0x8040);
+  }
+
+Example:
+
+First download the module http://www.fairymails.com/perl/WinStRes.pm and
+store it under the name 'WinStRes.pm' in the directory where you have
+your perl program, or in the perl modules directory. Second, make sure
+Win32::API is installed, or install it using ppm. The perl program below
+now shows the hourglass cursor for two seconds each time the button
+"search now" is clicked.
+
+  use strict;
+  use Win32::GUI;
+
+  #How to get the "wait cursor" resource.
+  #Alternative 1, using the Win32::API module:
+  use Win32::API;
+  my $loadImage = new Win32::API ('user32', 'LoadImage', ['N','N','I','I','I','I'],'N')
+     or die 'cannot find LoadImage function';
+  my $waitCursor = $loadImage->Call(0, 32514, 2, 0, 0, 0x8040);
+
+  #Alternative 2, using the WinStRes module (uses Win32::API)
+  #use WinStRes;  #download from http://www.fairymails.com/perl/WinStRes.pm
+  #my $waitCursor = WinCursor("WAIT");
+
+  my $main = Win32::GUI::Window->new(
+    -name    => "Main",
+    -title   => "Win32-GUI: Hourglass Cursor Demo",
+    -left    => 100,
+    -top     => 100,
+    -width   => 600,
+    -height  => 400,
+  );
+
+  my $search = $main->AddButton(
+    -name    => 'Search',
+    -text    => 'search now', 
+    -left    => 25,
+    -top     => 25,
+  );
+
+  sub Search_Click {
+    print "Searching..."; 
+    my $oldCursor = Win32::GUI::SetCursor($waitCursor);  #show hourglass ...
+
+    sleep 2;  #do your search here
+    print "done\n";
+    Win32::GUI::SetCursor($oldCursor);  #show previous arrow cursor again
+    return 1;
+  }
+
+  sub Main_Terminate {
+    print "Main Window terminated\n";
+    return -1;
+  }
+
+  $main->Show();
+  Win32::GUI::Dialog();
+
+=head2 Is there a spreadsheet (grid) look-a-like solution or component?
+
+Have a look at Win32::GUI::Grid.
+
+The original author was Laurent Rocher, but the module is included
+with Win32::GUI from V1.04 onwards
+
+=head2 Is there a inline web browser somewhere or an HTML or XML parser?
+
+"No, and I don't think I will try to implement one :-) You should
+instead look at Win32::OLE, to see if you can embed an InternetExplorer
+instance in a window. That said, it seems that RichEdit 3.0 (available
+in Windows 2000) has a lot of nice features, that I'll try to implement
+if time permits."
+
+So, I used the Win32:OLE example from Learning Perl on Win32:
+
+  use Win32::OLE;
+  my $browser = CreateObject OLE "InternetExplorer.Application.1" || return 0;
+  $browser->{'Visible'} = 1;
+  $browser->Navigate("http://www.perlmonks.org/");
+
+This works fine, except I'm now forcing the user to use IE instead of
+Netscape. And it's possible (not likely I realize) that they don't even
+have IE. So what happens then?
+
+To show an URL in the default browser of your PC, the Win32::Shell
+helps. Win32::Shell can be downloaded from the Activestate archive using
+ppm. It is not in CPAN at present (June 2001).
+
+  use Win32::Shell;
+  $url = "http://www.perlmonks.org";
+  Win32::Shell::Execute("open", $url, undef, undef, "SW_SHOWNORMAL");
+
+This starts the default browser opened to the correct URL, with no
+delay, and no console window.
+
+An alternative is to use Win32::GUI::AxWindow by Laurent Rocher. This
+control adds ActiveX control hosting to Win32::GUI. This will allow you
+to "add" a web browser to a Win32::GUI window.
+
+Win32::GUI::AxWindow is included in the Win32::GUI distribution with
+V1.04 and later.
+
+=head2 Is there support for JPG or common image formats like PNG or GIF?
+
+Win32::GUI::DIBitmap add new reading/writing bitmap formats to
+Win32::GUI and some images manipulations (Conversion, Screen capture, ...).
+This package uses FreeImage 3.5.1, an open source image library
+supporting all common bitmap formats (visit:
+L<http://freeimage.sourceforge.net/>).
+
+Supports many formats, such as:
+
+  Format  Reading Writing Description.
+  BMP     Y       Y       Windows or OS/2 Bitmap
+  ICO     Y       N       Windows Icon
+  JPEG    Y       Y       JPEG - JFIF Compliant
+  JNG     Y       N       JPEG Network Graphics
+  KOALA   Y       N       C64 Koala Graphics
+  IFF     Y       N       IFF Interleaved Bitmap
+  MNG     Y       N       Multiple Network Graphics
+  PBM     Y       Y       Portable Bitmap (ASCII)
+  PBMRAW  Y       Y       Portable Bitmap (RAW)
+  PCD     Y       N       Kodak PhotoCD
+  PCX     Y       N       Zsoft Paintbrush
+  PGM     Y       Y       Portable Greymap (ASCII)
+  PGMRAW  Y       Y       Portable Greymap (RAW)
+  PNG     Y       Y       Portable Network Graphics
+  PPM     Y       Y       Portable Pixelmap (ASCII)
+  PPMRAW  Y       Y       Portable Pixelmap (RAW)
+  RAS     Y       N       Sun Raster Image
+  TARGA   Y       N       Truevision Targa
+  TIFF    Y       Y       Tagged Image File Format
+  WBMP    Y       Y       Wireless Bitmap
+  PSD     Y       N       Adobe Photoshop
+
+
+      Current version : 0.03
+
+For more information see 
+
+Win32::GUI::DIBitmap is included with Win32::GUI v1.04
+and later
+
+=head2 How can I deal with moving and resizing stuff when a window is resized?
+
+"Dealing with moving and resizing stuff when a window is resized is
+really annoying, not to mention boring. So I created a class to make
+that easier. That was a lot more fun for some reason :) Anyway, the
+result is Win32::GUI::Resizer.
+
+=over
+
+=item L<http://www.bahnhof.se/~johanl/perl/Win32GUI/>
+
+=back
+
+Please try it out if you like and let me know what you think. "  (email
+from Johan Lindström, Sourcerer, Boss Casinos Ltd, Antigua,
+jpl@bosscasinos.com)
+
+=head2 Is there a Win32-GUI-Builder available (i.e. a visual aid in designing the GUI)?
+
+yes, well.. at least a basic one. Download
+
+=over
+
+=item L<ftp://ftp.wh.whoi.edu/pub/gb109.zip>
+
+=back
+
+For more information, check the Win32::GUI mailing-list, the emails from
+David Hiltz.
+
+Another one is the B<GUI Loft> by Johan Lindström. This is a powerful and
+easy-to-use WYSIWYG editor for designing Win32::GUI windows, dialog
+boxes and toolwindows. It is also a set of classes used to create the
+window for you at runtime.
+
+Download source and/or binaries here:
+
+=over
+
+=item L<http://www.bahnhof.se/~johanl/perl/Loft/>
+
+=back
+
+The Perl Artistic License applies.
+
+There is an extensive User Manual in the Help menu, please read it. But
+try the program first, you are programmers and power-users after all,
+right? :)
+
+Currently supported controls are: Window, DialogBox, ToolbarWindow,
+Button, Label, TextField, RadioButton, CheckBox, GroupBox, Listbox,
+RichEdit, ListView, ComboBox, TreeView, TabStrip, Timer, ImageList
+
+Cool features include:
+
+=over
+
+=item * Pretty extensive WYSIWYG support + 100% accurate preview
+
+=item * Pretty complete support for Win32::GUI control options--and then some
+
+=item * It's actually easy to use (IMHO :)
+
+=item * Docs and demo code
+
+=item * No-code runtime TabStrip management
+
+=back
+
+=head2 How can I display a popup menu within a ListView?
+
+Here is an example how it can be done:
+
+  # define popup menu for listview
+  my $PopupMenu = new Win32::GUI::Menu(
+    "Item Properties" => "ItemProp",
+    ">&Properties" => "ItemProperties",
+  );
+ 
+  # get right-click in listview
+  sub DataView_RightClick {
+     my($X, $Y) = Win32::GUI::GetCursorPos();
+ 
+     $MainWindow->TrackPopupMenu($PopupMenu->{ItemProp},$X, $Y);
+  }
+ 
+  # clicked on particular menu item in popup menu
+  sub ItemProperties_Click {
+     ## code you want to process;
+  }
+
+=head2 I'm using the Win32::GUI::AxWindow module, but I can't navigate within the same browser I lauched from, how can I fix that?  
+
+You need to use a WebBrowser control for that (not a MSHTML). MSHTML
+display html but can not navigate in same window (lauch defaut
+navigator). You can directly write HTML in a webbrowser with GetOLE and
+Win32::OLE.
+
+  $OLEControl = $Control->GetOLE(); # Get Win32::Ole object
+  $OLEControl->Navigate("about:blank"); # Clear control and load a blank document
+  $OLEControl->{Document}->write('perl.com <http://www.perl.com>'); # Write Html Now, when you click on link,
+                                                                    # it navigate in same window.
+
+From: "Laurent Rocher" 
+Subject: Re: [perl-win32-gui-users] AxWindow: Creating HTML on the fly without loading a file!
+Date: Thu, 31 Jul 2003 13:04:02 +0200
+
+=head1 CONTRIBUTORS
+
+This FAQ has been constructed by contributions to the users mailing list.  You can join the mailing list
+by following the instructions at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.
+
+The following people have contributed in collating this FAQ:
+
+  Aldo Calpini, dada at perl dot it
+  Erick Bourgeois, erick at jeb dot ca 
+  Felix Gaehler, feli at freesurf dot ch
+  Robert May, robertemay at users dor sourceforge dot net
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/UserGuide/FAQ.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

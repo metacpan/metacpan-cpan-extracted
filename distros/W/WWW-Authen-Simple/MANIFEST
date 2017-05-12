@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Simple.pm
+t/1.t
+t/dbh.config
+examples/README
+examples/addusers.pl
+examples/example.pl
+examples/mysql_schema.sql
+META.yml                                 Module meta-data (added by MakeMaker)

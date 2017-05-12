@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+User.pm
+User.xs
+SIGNATURE

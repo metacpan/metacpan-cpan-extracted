@@ -1,0 +1,25 @@
+WWW::Tabela::Fipe
+
+Objetivo
+
+Robo automatizado para obter os dados atualizados da tabela fipe.
+
+Descricao
+
+Esta é a primeira versão do WWW::Tabela::Fipe baixa todos os dados de Carros+Caminhões+Motos e gera um json.
+Se quiser salvar em outro formato é só alterar a chamada de escrita no WWW::Tabela::FipeWrite.
+
+Modo de usar
+
+Ajuste o comando execute.sh de acordo com seu ambiente.. e execute conforme esse arquivo... ou se preferir, instale o HTML::Robot::Scapper e apenas execute o fipe.pl
+
+*** VISUALIZACAO WEB:
+baixe 2 arquivos ( do repositorio original: https://github.com/hernan604/WWW-Tabela-Fipe/ ):
+- index.htm ............. https://raw.github.com/hernan604/WWW-Tabela-Fipe/master/index.htm
+- fipe.json ............. https://github.com/hernan604/WWW-Tabela-Fipe/blob/master/fipe.json
+
+abra o index.htm no browser e deve funcionar.. se não funcionar me avisem ! 
+
+abs! e enjoy
+
+--Hernan

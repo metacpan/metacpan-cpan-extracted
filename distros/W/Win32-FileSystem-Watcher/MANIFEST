@@ -1,0 +1,13 @@
+lib/Win32/FileSystem/Watcher.pm
+lib/Win32/FileSystem/Watcher/Change.pm
+lib/Win32/FileSystem/Watcher/Constants.pm
+lib/Win32/FileSystem/Watcher/SimpleAccessors.pm
+lib/Win32/FileSystem/Watcher/Synchronous.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/asynchronous_test.pl
+t/synchronous_test.pl
+t/01_change_obj.t
+TODO.txt
+META.yml                                 Module meta-data (added by MakeMaker)

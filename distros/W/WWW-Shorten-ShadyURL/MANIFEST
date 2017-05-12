@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Shorten/ShadyURL.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/20-WWW-Shorten-ShadyURL.t
+META.yml                                 Module meta-data (added by MakeMaker)

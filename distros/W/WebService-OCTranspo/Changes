@@ -1,0 +1,20 @@
+Revision history for WebService-OCTranspo
+
+0.027	Mon, 14 May 2007 09:16:42 -0400	dmo
+	- specify DateTime as a dependency (argh!)
+
+0.026	Mon, 14 May 2007 09:12:52 -0400 dmo
+	- corrections to pod
+
+0.025	Sat, 12 May 2007 00:47:04 -0400	dmo
+	- testing added
+	- minor cleanups to prepare for CPAN release
+
+0.011	Tue, 08 May 2007 19:25:08 -0400 dmo
+	- only match full route number, not a partial (solves '1' matching for route 111 stops)
+	- Error handling for routes that don't exist
+	- note bug with Transitway stations
+
+
+0.010	Mon, 07 May 2007 23:44:03 -0400 dmo
+        First version, released on an unsuspecting world.

@@ -1,0 +1,9 @@
+
+This module provides XS wrappings of the Windows API functions
+CryptGenRandom and RtlGenRandom (SystemFunction036).
+
+Build in the usual way:
+
+perl Makefile.PL
+dmake test
+dmake install

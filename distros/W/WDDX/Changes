@@ -1,0 +1,202 @@
+WDDX History
+
+1.02 	- Mon Dec  1 21:42:29 CST 2003
+    Taken over by Andy Lester
+
+    [FIXES]
+    WDDX needed a good update and modernization to let it run under perl
+    5.8.0 and higher.
+
+    * Fixed up some dependencies in Makefile.PL
+    * Cleaned up warnings on things like ambiguous calls to keys().
+    * Added more tests.
+    * Removed automatic version number generation
+
+
+Version 1.01 (7/29/00)
+
+Bug fix.
+
+  * Fixed a bug that wouldn't allow undef values in WDDX::Recordsets;
+    should properly be encoded as a WDDX::Null now. However, this is a
+    kludge. WDDX::Recordset should probably be rewritten to allow a field
+    to have differing data types (WDDX::Null is the only exception
+    currently)... but this will break compatibility.
+  * Perl 5.60 changed how the map function works. Now scalars in numeric
+    form are converted to string form (seems like a bug to me). This broke
+    a few of the make tests, so these have been removed to allow WDDX.pm
+    to build with 5.60.
+
+Version 1.00 (1/17/00)
+
+Added new methods to WDDX::Array and WDDX::Struct.
+
+  * Added get(), set(), splice(), length(), push(), pop(), shift(), &
+    unshift() to WDDX::Array.
+  * Added get(), set(), delete(), keys(), and values() to WDDX::Struct.
+  * Decided to up the version to 1.00. I probably should have done this
+    earlier: 0.13 was effectively 1.00 beta 1, and 0.17 probably should
+    have been 1.00. In any case everything seems stable now with nothing
+    left on the to do list.
+
+Version 0.18 (1/4/00)
+
+Bug fix.
+
+  * Fixed bugs in array2wddx() and hash2wddx(). (reported by Jon Sala)
+  * Started citing bug-reporters in this file (Nate Weiss, Thomas Hall,
+    and David MacKenzie collectively get credit for reporting much of
+    the bugs previously fixed).
+
+
+Version 0.17 (11/6/99)
+
+Mainly bug fixes.
+
+  * Added support as_javascript() support to binary data objects.
+  * Added $VERSION to all modules to keep CPAN happy.
+  * Added PREREQ_PM to Makefile.PL.
+  * Added code to quiet warnings when using -w flag.
+  * Fixed bug that prevented WDDX.pm from deserializing empty recordsets
+    and this required some minor tweaking to Recordset object (shouldn't
+    affect backwards compatibility).
+  * Fixed bug introduced last version that caused deserialization
+    problems when there is additional whitespace between elements.
+
+
+Version 0.16 (11/1/99)
+
+Minor stuff I noticed as I was buidling, but see 0.15 too since it was
+never released.
+
+  * Fixed more POD formatting probs; I think it's presentable now.
+  * Fixed a bug that sometimes stripped white space when parsing strings.
+  * Created a couple test files as part of the install.
+  * Allowed binary encoding to wrap to default MIME::Base64 width.
+  * Created an automated build script (yeah, I know you can't see this
+    but it makes my life easier :)
+
+
+Version 0.15 (10/26/99)
+
+Internal release; not distributed.
+
+  * Added as_javascript() methods so you can get the JavaScript code
+    to generate any WDDX data object (except binary objects)
+  * Added scalar2wddx(), array2wddx(), and hash2wddx() utility
+    methods that make it much easier to go from Perl data structures
+    to WDDX data objects
+  * Added $WDDX::INDENT variable (and corresponding code) to allow
+    serialize() to generate human-readable packets
+  * Fixed errors that appear in taint mode and discovered that 
+    XML::Parser untaints data as it parses it (!!); patched WDDX::Parser
+    to retaint the data
+  * Edited documentation: fixed typos and formatting problems, documented
+    new methods, etc.
+  * Fixed bug that disallowed the creation of empty WDDX struct objects
+  * Fixed bug that disallowed the creation of recordsets with one field
+  * Added get_element(), set_element() methods to WDDX::Recordset and
+    deprecated get_field(), set_field() methods
+  * Packaged with Makefile.PL (finally); posting to CPAN!
+
+
+Version 0.14 (10/21/99)
+
+Bug fixes, API changes, and POD:
+
+  * Added some checks for undefined values to fix warnings when
+    running under -w
+  * Rewrote documentation. It's in POD now (finally)!
+  * Prefixed internal data object serialize & deserialize subs to 
+    with an underscore make them more private
+  * Changed all the to_something subs to as_something subs since
+    it makes more sense with the WDDX data object as an intermediary
+  * Fixed recordset bugs by adding more error checking for funny data
+  * Made object type checks non-dependent on object having WDDX in
+    its name (so the module is more easily subclassed now)
+  * Renamed to_xml() to as_packet()
+    
+
+Version 0.13 (10/1/99)
+
+Total rewrite: improved parsing and added full support of WDDX 1.00 DTD:
+
+  * Everything. WDDX.pm is the only file that resembles its old form. I
+    wasn't happy with the parsing code. All the logic was in a couple long,
+    complicated subs, so it's now been broken out. Each data type now has 
+    its own corresponding parser object. It's _much_ easier to maintain now, 
+    so hopefully it won't take me so long for the next version. :)
+  * Added code to do proper encoding of control characters, and special
+    characters like '<', '&', etc. for strings.
+  * Added support for the 1.00 DTD. New binary and null data types
+    and restrictions on things like allowed characters in recordset field,
+    names, case insensitive struct keys, etc.
+  * Rewrote WDDX::Recordset object and added a slew of methods to
+    for working with it.
+  * Changed most variable object methods. Constructors are much less
+    obfuscated. Got rid of value(). Added to_packet(), and a variety of methods 
+    to go to Perl: to_scalar(), to_arrayref(), to_hashref(), to_gmtime(), 
+    and to_localtime(). This new structure will support to_javascript() when 
+    it's added to the next version.
+  * WDDX.pm methods to create variables changed for the complex types. 
+    array(), hash(), and recordset() now take array/hash references. 
+    recordset() takes totally different parameters which hopefully will be 
+    much easier to work with when using DBI.
+  * Updated the README with all the new info. POD next time, I promise. :)
+  * Moved this history info off the website and into this file.
+
+Version 0.12 (7/19/99)
+
+The module is now fully usable (albeit rough). It can go both from Perl to
+WDDX as well as from WDDX to Perl. Lots of changes:
+
+   * Added serialization support so it's now possible to go from Perl to
+     WDDX.
+   * Fixed a problem due to a misunderstanding of the DTD. I originally
+     believed that multiple variables could be contained within the root
+     level of a WDDX packet, even outside a struct. As a result, I was
+     requiring a <var> tag around everything including top level data. That
+     was incorrect. Deserialization works as documented now.
+   * Stripped out all of the tie interface code. It didn't add a lot of
+     value, especially given the previous change, and it added a lot of
+     complexity to the code.
+   * Fixed a bug that wouldn't parse dateTime packet data properly if the
+     GMT timezone adjustment caused the date to wrap.
+   * Fixed a bug where certain data types (e.g. booleans) weren't parsed
+     correctly within arrays.
+   * Added some basic Usage documentation to the README.
+   * Changed version numbering: version numbers will always have two digits
+     after the decimal.
+
+Version 0.3a (6/13/99)
+
+First public version. Completed parsing of all WDDX structures. Can now go
+fully from WDDX to Perl.
+
+Current features:
+   * Object oriented.
+   * Only requires XML::Parser (plus Carp, but it's now standard and
+     XML::Parser requires it too)
+   * Full validation of WDDX DTD syntax during parsing.
+   * Supports multiple methods for returning parsed data structures:
+        o may be returned via a hash
+        o may be exported as true variables to any namespace
+   * Supports multiple methods for representing parsed data structures:
+        o structures can be accessed as WDDX variable objects
+        o structures can be accessed as straight perl values
+        o structures can be accessed via tie so that data type checking is
+          maintained while you work with the data; this gives you the
+          benefit of working with the data in as perlish a manner as
+          possible while still making it simple to reserialize the data
+          back into a WDDX packet later; ties for values nested within
+          complex types are generated dynamically only for those variables
+          accessed
+
+Version 0.2a (6/1/99)
+
+Split parser and variable types into separate packages. Able to parse basic
+(scalar) WDDX data types.
+
+Version 0.1a (5/24/99)
+
+Set up CVS tree and began writing module.

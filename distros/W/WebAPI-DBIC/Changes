@@ -1,0 +1,126 @@
+Changes file for WebAPI::DBIC
+
+0.004002  2015-03-22 22:54:59+00:00 Europe/London
+
+ - Require List::MoreUtils >=0.408', only used indirectly, avoid buggy 0.407.
+
+0.004001  2015-03-17 14:49:59+00:00 Europe/London
+
+ - NOTE: This release has some backwards-incompatible changes.
+ - WebApp and RouteMaker no longer have a schema attribute (Tim Bunce)
+ - Now supports ActiveModel style results, using the 'application/json' media
+   type, and thereby better supports client-side frameworks like Ember.js (JD Lewis)
+ - Supports invoking methods on set resources (Jess Robinson)
+ - Improved handling of complex prefetch parameters (Mike Francis)
+ - Added WebAPI::DBIC::Resource::$TYPE docs as a home for each media type.
+ - Assorted other fixes and improvements (Mike Francis, Guillaume Aubert, Tim Bunce)
+
+0.003002  2015-01-09 18:00:43+00:00 Europe/Dublin
+
+ - Remove resource_default_args from WepApp, set via route_maker now.
+ - Added plackonce utility for ad-hoc testing of single requests.
+ - Added MooX::StrictConstructor and fix up issues it found.
+ - Workaround for Path::Router Plack::Middleware::StackTrace interaction.
+
+0.003001  2014-12-24 15:34:48+00:00 Europe/Dublin (TRIAL RELEASE)
+
+ - Major update to WebAPI::DBIC::WebApp. Added RouteMaker and TypeNamer (experimental).
+ - Added type_name_inflect to control inflection of paths and type names
+ - Auth handles more kinds of schema connection_info data
+ - Improved compatibility for JSON API (still a work in progress)
+ - Fixed fixture filenames to be windows compatable
+
+0.002007  2014-12-14 22:29:58+00:00 Europe/Dublin
+
+ - Add dependency on Cpanel::JSON::XS to preserve numerics in JSON #21
+ - Add a CONTRIBUTING file, based on ETHER's
+
+0.002006  2014-12-14 16:41:01+00:00 Europe/Dublin
+
+  - Added WebAPI::DBIC::Route class and refactored ::WebApp to use it.
+  - Workaround Test::Differences context size bug RT#100912
+  - Switch expected test results to use non-stringified integers
+
+0.002005  2014-12-11 21:23:46+00:00 Europe/Dublin
+
+  - For ResultSets with no primary key defined warn and skip item routes.
+  - Unbundle HAL browser into Alien::Web::HalBrowser (Vanstyn)
+  - Make Test::Compile version insufficiency more clear
+
+0.002004  2014-12-06 18:49:30+00:00 Europe/Dublin
+
+  - Renamed WebAPI::DBIC::Resource::Role::Foo$TYPE -> ...::Resource::$TYPE::Role::Foo
+  - Renamed test files similarly to split into per-media-type directories
+  - Fix handling of JSON boolean in WebAPI::DBIC::Resource::HAL::Role::Root
+
+0.002003  2014-12-06 12:59:36+00:00 Europe/Dublin
+
+  - Possibly incompatible change: paths are now based on the schema source
+    (eg class) name, rather than the result source (eg table) name.
+  - Moved handling of root (/) to a Web::Machine resource class.
+  - Further generalization of WebAPI::DBIC::WebApp.
+  - Deprecate order=foo%20desc in favor of sort=-foo, and tighten spec.
+  - Start support for foo[bar]=... style of parameter naming.
+  - Migrate tests to DBIx::Class::Fixtures to enable loading in demo app.
+
+0.002002  2014-11-25 15:25:29+00:00 Europe/Dublin
+
+  - Fixed webapi-dbic-demo.psgi (Mike Francis)
+  - Fixed use of DSN as Auth Realm (Mike Francis)
+  - Added compilation tests for *.psgi files.
+
+0.002001  2014-11-24 19:57:02+00:00 Europe/Dublin
+
+  - Require DBIx::Class 0.08250+ (#14)
+  - Added autodie to cpanfile for Perl 5.10
+  - Fixed stability of t/30-ordering-hal.t output
+
+0.002000  2014-11-17 23:01:09+00:00 Europe/Dublin
+
+  - Added initial support for JSON API application/vnd.api+json media type
+  - Added support for arbitrary depth/complexity of prefetch (Mike Francis)
+
+0.001010  2014-11-12 14:05:00+00:00 Europe/Dublin (TRIAL RELEASE)
+
+  - Prefetch now supports has_many relationships on item and set resources.
+  - Major refactoring to separate out HAL support ready for JSON API.
+  - Changed (some) tests to use a simpler 'golden result' scheme.
+
+0.001008  2014-11-03 21:05:28+00:00 Europe/Dublin
+
+  - Improved error reporting for prefetch attribute.
+  - Ignore empty params.
+  - Add "did you mean me.$param" to exception for params containing "."
+
+0.001008  2014-11-03 09:28:33+00:00 Europe/Dublin (TRIAL RELEASE)
+
+  - Added skip_dirty_check to WebAPI::DBIC::Resource::Role::ItemWritable
+  - Added a COMPARISONS section to docs (and renamed INTEGRATING to INTEGRATIONS)
+  - Added minimum versions to some prerequisites in cpanfile
+
+0.001007  2014-08-18 12:04:57+01:00 Europe/Dublin
+
+  - Add Catalyst integration example (Arthur Axel fREW Schmidt)
+  - Switch from Module::Pluggable to Test::Compile for t/00-compile.t
+  - Doc updates re router vs app integration, and transparency.
+
+0.001006  2014-08-17 16:04:19+01:00 Europe/Dublin
+
+  - Abstracted the router interface.
+  - Renamed some classes.
+  - Added more documentation.
+
+0.001005  2014-08-17 00:43:49+01:00 Europe/Dublin (TRIAL RELEASE)
+
+  - Added tests and test schema tables for multi-field keys (mfr++)
+  - Much improved handling of tables with multi-field keys /foo/key1/key2/keyN/
+  - Improved handling of code-ref based joins
+  - cached relationship _link building information
+
+0.001004  2014-07-28 11:42:41+02:00 Europe/Paris
+
+  - Minor documentation and toolchain  fixes.
+
+0.001003  July 28 2014
+
+  - the first release

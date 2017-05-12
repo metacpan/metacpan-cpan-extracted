@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w -I../lib
+# get_friends [ friendID ]
+# Returns your friends or the friends from the profile identified by
+# friendID
+#
+# Example:
+# get_friends
+# 
+# get_friends source profile id 12345
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace;
+unless ( $myspace->logged_in ) { die "Login failed\n" }
+
+my @friends = $myspace->get_friends( @ARGV );
+
+warn $myspace->error if ( $myspace->error );
+
+print "Got " . @friends . " friends:\n";
+
+foreach ( @friends ) {
+	print;
+	print "\n";
+}

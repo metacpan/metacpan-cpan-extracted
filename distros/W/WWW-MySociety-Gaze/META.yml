@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                WWW-MySociety-Gaze
+version:             0.02
+abstract:            An interface to MySociety.org's Gazetteer service
+license:             perl
+author:              
+    - Andy Armstrong <andy@hexten.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    HTML::Tiny:                    0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    Text::CSV:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

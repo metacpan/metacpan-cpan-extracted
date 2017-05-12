@@ -1,0 +1,62 @@
+NAME
+    Web::Hippie::PubSub - Comet/Long-poll event server using AnyMQ
+
+SYNOPSIS
+      use Plack::Builder;
+      use AnyMQ;
+      use AnyMQ::ZeroMQ;
+
+      my $bus = AnyMQ->new_with_traits(
+        traits            => [ 'ZeroMQ' ],
+        subscribe_address => 'tcp://localhost:4001',
+        publish_address   => 'tcp://localhost:4000',
+      );
+
+      # your plack application
+      my $app = sub { ... }
+
+      builder {
+        # mount hippie server on /_hippie/*
+        mount '/_hippie' => builder {
+          enable "+Web::Hippie::PubSub",
+            keep_alive => 30,   # send 'ping' event every 30 seconds
+            bus        => $bus;
+          sub {
+            my $env = shift;
+            my $args = $env->{'hippie.args'};
+            my $handle = $env->{'hippie.handle'};
+            # Your handler based on PATH_INFO: /init, /error, /message
+          }
+        };
+        mount '/' => my $app;
+      };
+
+ATTRIBUTES
+    bus AnyMQ bus configured for publish/subscribe events
+
+    keep_alive
+        Number of seconds between keep-alive events. ZMQ::Server will send a
+        "ping" event to keep connections alive. Set to zero to disable.
+
+DESCRIPTION
+    This module adds publish/subscribe capabilities to Web::Hippie using
+    AnyMQ.
+
+    See eg/event_server.psgi for example usage.
+
+SEE ALSO
+    Web::Hippie, Web::Hippie::Pipe, AnyMQ, ZeroMQ::PubSub
+
+AUTHOR
+    Mischa Spiegelmock <revmischa@cpan.org>
+
+    Based on work by:
+
+    Chia-liang Kao <clkao@clkao.org>
+
+    Jonathan Rockway <jrockway@cpan.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

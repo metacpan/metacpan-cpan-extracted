@@ -1,0 +1,43 @@
+Revision history for Win32::App::which.
+
+1.030   2015-04-18  Olivier Mengué (DOLMEN)
+	Fix which.cmd on Win64 where PATH contains "C:\Program Files (x86)\"
+	  and the ')' breaks shell code.
+
+1.022   2013-10-05  Olivier Mengué (DOLMEN)
+	Fix POD for Kwalitee (due to stricter checks by Pod::Simple).
+	Fix minimum Perl version to 5.8 for consistency with the Build.PL
+	  requirement.
+
+1.021   2011-11-14  Olivier Mengué (DOLMEN)
+	Fix POD tests for Kwalitee.
+	Specifiy a minimum Perl version (5.6) for Kwalitee, but in fact, no
+	  perl at all is required for runtime.
+
+1.02    2011-11-04  Olivier Mengué (DOLMEN)
+	Add metadata about the public repository.
+	Mostly a dummy release just to raise Kwalitee for the CPANTS game:
+	- add README
+	- add fake t/91-pod-coverage.t (useless for this non-perl module)
+	- make t/90-pod.t run only on release testing (anyway we use M::B's
+	  built-in "testpod" command)
+	- add strictures and perl version requirement to the dummy module
+          Win32::App::which
+
+1.01    2011-03-28  Olivier Mengué (DOLMEN)
+        Refactoring leading to huge (x8) speed improvement.
+
+1.00    2011-03-21  Olivier Mengué (DOLMEN)
+        Completely rewrote which.cmd to fix major issues:
+        - show multiple files only with '-a'
+        - file list was not ordered according to PATH in case of multiple
+          matches in one directory
+        - add '--'
+        - add support for '-a'
+	Add 'which.pod' for documentation.
+        Note that license is GNU GPL 3.0 or later, but some Module::Build bugs
+          block from specifying it in META.json.
+
+0.01    2011-03-13  Olivier Mengué (DOLMEN)
+        Initial release based on my "which.cmd" already posted at
+          https://gist.github.com/553703

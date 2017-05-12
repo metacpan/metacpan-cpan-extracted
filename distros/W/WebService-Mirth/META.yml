@@ -1,0 +1,39 @@
+---
+abstract: 'Interact with a Mirth Connect server via REST'
+author:
+  - 'Tommy Stanton <tommystanton@gmail.com>'
+build_requires:
+  Class::Monkey: 0
+  File::Temp: 0
+  HTTP::Daemon::SSL: 0
+  HTTP::Request::Params: 0
+  Path::Class: 0.26
+  Test::Deep: 0
+  Test::Fake::HTTPD: 0.06
+  Test::Fatal: 0
+  Test::File: 0
+  Test::More: 0
+  Test::XML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Mirth
+requires:
+  IO::Socket::SSL: 1.75
+  Log::Minimal: 0.13
+  Mojolicious: 1.97
+  Moose: 1.00
+  Moose::Util::TypeConstraints: 0
+  MooseX::Params::Validate: 0
+  MooseX::Types::Path::Class::MoreCoercions: 0.002
+  aliased: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/tommystanton/webservice-mirth/issues
+  repository: git://github.com/tommystanton/webservice-mirth.git
+version: 0.131220

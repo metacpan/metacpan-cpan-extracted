@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#
+#  This is free software, licensed under:
+#
+#    The GNU General Public License, Version 2, June 1991
+#
+#  Full license text is available at:
+#
+#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#
+
+#
+#  Compile and/or show compiled version of WebDyne HTML scripts
+#
+package main;
+
+
+#  Compiler pragma, load library path
+#
+sub BEGIN {
+
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+}
+use strict qw(vars);
+use vars qw($VERSION);
+
+
+#  Use the base modules
+#
+use WebDyne::Base;
+
+
+#  External modules
+#
+use WebDyne::Compile;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='1.246';
+
+
+#  Run main
+#
+exit ${&main(\@ARGV) || die errdump()};
+
+
+#===================================================================================================
+
+
+sub main {
+
+
+    #  Get argv array ref
+    #
+    my $argv_ar=shift();
+
+
+    #  Base options will pass to compile
+    #
+    my %opt=(
+
+        nofilter => 1,    # don't run through any filters
+        noperl   => 1,    # don't run perl code,
+        stage4   => 1,    # default
+
+    );
+
+
+    #  Now import command line options. Command line option compilation stages are different from
+    #  internal stage numbers so maps are 0=>stage0, 1=>stage2, 2=>stage3, 3=>stage4, confusing ..
+    #
+    GetOptions(\%opt, 'stage0|0', 'stage2|1', 'stage3|2', 'stage4|3', 'meta', 'version', 'help|?', 'man') ||
+        pod2usage(2);
+    pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1) if $opt{'help'};
+    pod2usage(-verbose => 2) if $opt{'man'};
+    $opt{'version'} && do {
+        print "$Script version: $VERSION\n";
+        print "WebDyne version: $WebDyne::VERSION\n";
+        exit 0
+    };
+
+
+    #  Get srce file, add to options
+    #
+    my $srce_fn=$argv_ar->[0] ||
+        pod2usage("$Script: no source file specified !");
+    $opt{'srce'}=$srce_fn;
+
+
+    #  Create and run compile object
+    #
+    my $compile_or=WebDyne::Compile->new();
+    my $data_ar=$compile_or->compile(\%opt) ||
+        return err ();
+
+
+    #  Dump it
+    #
+    $Data::Dumper::Indent=1;
+    print Data::Dumper::Dumper(grep {$_} $opt{'meta'} ? $data_ar->[0] : undef, $data_ar->[1]);
+
+
+    #  Return success
+    #
+    \undef;
+
+
+}
+
+__END__
+
+=head1 Name
+
+wdcompile - parse and compile WebDyne pages
+
+=head1 Synopsis
+
+B<wdcompile> B<[OPTIONS]> B<FILE>
+
+=head1 Options
+
+-h, --help
+Show brief help message.
+
+
+=over 5
+
+
+=item -0
+
+
+
+
+Stop and display internal data structure after parsing
+withHTML::TreeBuilder. This stage shows the HTML syntax tree
+generated from the source file.
+
+
+=item -1
+
+
+
+
+Stop and display internal data structure after first stage of
+optimisation. In this stage any parts of the HTML tree that do not
+contain child tags that generate dynamic output are pre-rendered
+back into HTML
+
+
+=item -2
+
+
+
+
+Stop and display internal data structure after second stage of
+optimisation. In this stage blocks that do generate dynamic code
+are analysed for child tags that can be pre-rendered back into HTML
+without affecting the dymamic components of the tree.
+
+
+=item -m, --meta
+
+
+
+
+Show any WebDyne meta data found in the source file. WebDyne meta
+data are hints or instructions contained in the B<<meta>> sections
+with the name "WebDyne". If found such meta data is removed from
+the resulting HTML parse tree and stored in a separate data
+structure. This option will show that data structire if it exists.
+
+=back
+
+
+=head1 Description
+
+The B<wdcompile> command displays the internal data structure used by
+WebDyne when compiling psp pages.
+
+WebDyne uses the same parsing and compilation routines as B<wdcompile>.
+After compilation WebDyne optionally stores the resulting data
+structure to a cache directory using the Perl Storable module to speed
+up subsequent rendering operations.
+
+If the tree structure does not appear correct when debugging with
+B<wdcompile> then it will probably not display as expected when rendered
+with WebDyne. Missing end quotes, closing tags and general HTML syntax
+problems can all make the parse tree misplace (or omit completely)
+blocks of HTML/WebDyne code.
+
+By default B<wdcompile> will show the data structure after all parsing and
+optimisation stages have been completed. You can display various
+intermediate stages using the options below.
+
+=head1 Notes
+
+The wdcompile will not run any code in the __PERL__ section of a psp
+file. It will also not execute any WebDyne filters that may be called
+by the source file.
+
+=head1 Examples
+
+B<wdcompile> B<widget.psp>
+
+Compile and display the completed internal WebDyne data structure of
+the file called widget.psp. The resulting output shows the data
+structure after the file is parsed, the rebuilt around any dynamic
+WebDyne tags.
+
+B<wdcompile> B<-0> B<widget.psp>
+
+Parse and display the very data structure of the widget.psp file at the
+lowest level - as interpreted by the HTML::Treebuilder module, with no
+optimisation at all.
+
+=head1 Author
+
+Written by Andrew Speer, andrew@webdyne.org
+
+=head1 LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+Full license text is available at:
+L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+

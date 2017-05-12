@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+		<title>Unit tests of DTS packages</title>
+		<link rel="stylesheet" type="text/css" href="/style/test_result.css" />
+    <script type="text/javascript" src="/scripts/checkAll.js"></script>
+</head>
+<body>
+<h1 style="text-align: center;">Unit tests of DTS packages</h1>
+<br>
+Mark each check button below to execute the unit test for the respective DTS package
+and press the button "Test".<br>
+<br>
+<form name="selectPackages" method="post" action="<TMPL_VAR NAME=MYSELF>">
+<input onclick="checkAll()" name="all" value="all" type="checkbox">All packages</input>
+<hr>
+<TMPL_LOOP NAME=PACKAGES_LIST>
+<input name="<TMPL_VAR NAME=ITEM>" value="<TMPL_VAR NAME=PACKAGE>" type="checkbox"><TMPL_VAR NAME=PACKAGE>
+<br>
+</TMPL_LOOP>
+<br>
+<br>
+<input type="hidden" name="rm" value="exec_test">
+<input type="submit" value="Test">
+</form>
+</body>
+</html>

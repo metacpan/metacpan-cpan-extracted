@@ -1,0 +1,211 @@
+listheader
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+listbody
+</head>
+<body bgcolor="#FFFFFF">
+<center>
+<!-- EVAL PRE
+my $retval = '';
+my $uri = $r->uri;
+$uri =~ s/^(.*?)\..*$/$1/;
+return qq|<a href="$uri.nl.wsql?| . $r->args . qq|"><img src="/images/bel_flag.png" alt="Nederlands" border=0><img src="/images/ned_flag.png" alt="Nederlands" border=0></a> <en>or</en><nl>of</nl> <a href="$uri.en.wsql?| . $r->args . qq|"><img src="/images/gb_flag.png" alt="English" border=0><img src="/images/usa_flag.png" alt="English" border=0></a>|;
+/EVAL PRE -->
+</center>
+<p>
+
+liststarttable1
+<hr width=760>
+<center>
+<table width="752" border="0" cellspacing="0" cellpadding="1">
+<tr><td bgcolor="#000000">
+<table width="750" border="0" cellspacing="2" cellpadding="1" bgcolor="#000000">
+<tr>
+<td align=left valign=top width=200>
+<a href="index.wsql"><en 1>Home</en><nl 1>Thuispagina</nl></a>
+</td>
+<td align=center width=350><font color="#FFFFFF"><b>
+
+liststarttable2
+</b></font></td>
+<td width=200 valign=top align=right><a href="http://wesql.org">WeSQL</a></td>
+</tr>
+</table>
+</td></tr>
+</table>
+<center>
+&nbsp;
+<table width="752" border="0" cellspacing="0" cellpadding="1">
+<tr><td bgcolor="#000000">
+<table width="750" border="0" cellspacing="0" cellpadding="5" bgcolor="#FFFF00">
+<tr>
+<td><table align=center cellpadding="2" cellspacing="1">
+<tr>
+
+liststoptable
+</table>
+</td></tr>
+</table>
+</td></tr>
+</table>
+<hr width=760>
+
+listfooter
+</center>
+<center>
+<!-- EVAL PRE
+	my $retval = "";
+	if (defined($cookies{su}) && ($cookies{su} ne '0')) {
+		$retval .= "<en 2><b>To the <a href=/admin/index.wsql>admin</a> interface.</b><br></en><nl 2><b>Naar de <a href=/admin/index.wsql>administratie</a> pagina's.</b><br></nl>";
+	}
+  $retval .= "</center><p>";
+  if (defined($cookies{id})) {
+    my @login = &sqlSelect($dbh,"select id from logins where uid='$cookies{id}' and hash='$cookies{hash}' and status='1'");
+    $retval .= '<center>[<a href="jlogout.wsql?redirdest=index.wsql"><en 3>Logout</en><nl 3>Afmelden</nl></a>]</center><p>' if (defined($login[0]));
+  }
+	return $retval;
+/EVAL PRE -->
+<font size=-1>
+<en 4>
+<center>This page has been generated dynamically with <a href=http://wesql.org>WeSQL v0.53</a><br>
+Copyright (c) 2000-2002 by <a href=mailto:w@wesql.org>Ward Vandewege</a>.<br>
+This program is free software; you can redistribute it and/or modify it under the terms of the GPL.<br>
+Dear Bill, this site is best viewed with ANY browser on ANY platform, unlike your MSN!</center>
+</en>
+<nl 4>
+<center>Deze pagina is dynamisch gegenereerd met <a href=http://wesql.org>WeSQL v0.53</a><br>
+Copyright (c) 2000-2002 by <a href=mailto:w@wesql.org>Ward Vandewege</a>.<br>
+Dit programma is 'free software'; u kan het verdelen en/of aanpassen onder de voorwaarden van de GPL.<br>
+Beste Bill, deze site kan best bekeken worden met GELIJK WELKE browser op GELIJK WELK platform, niet zoals uw MSN!</center>
+</nl>
+</font>
+</body>
+</html>
+
+loginformcaption
+<en>Log in</en><nl>Aanmelden</nl>
+
+loginform1
+<tr>
+<td align=center valign=top>
+<br>
+<center>
+<form action="jlogin.wsql" method=post>
+<table width=400>
+<tr><td align=right colspan=2><b><en>Login:</en><nl>Gebruiker:</nl></b></td><td><INPUT name="login"></td></tr>
+<tr><td align=right colspan=2><b><en 5>Password:</en><nl 5>Paswoord:</nl></b></td><td><INPUT name="passwd" type=password></td></tr>
+<tr><td colspan=3 align=center>
+
+loginform2
+<input type="submit" value="<en>Log in</en><nl>Meld aan</nl>"></td></tr>
+
+publiclogon
+<tr><td align=center><b><en>Login</en><nl>Gebruiker</nl></b></td><td align=center><b><en 6>Password</en><nl 6>Paswoord</nl></b></td><td align=center><b><en>Superuser</en><nl>Supergebruiker</nl></b></td></tr>
+<!-- LIST A select login, password, superuser from users where status='1' order by login -->
+<tr><td align=center>A_LOGIN</td><td align=center>A_PASSWORD</td><td align=center><!-- EVAL POST if ('A_SUPERUSER' eq 1) { return "<en>Yes</en><nl>Ja</nl>"; } else { return "<en>No</en><nl>Nee</nl>"; } --></td></tr>
+<!-- /LIST A -->
+
+loginform3
+</table>
+</form>
+</td></tr>
+<tr>
+<td align=center>
+<en 7><b>If you get this page time and again, your browser does not support cookies.<br>Enable cookies and try again!</b></en><nl 7><b>Als u deze pagina opnieuw en opnieuw te zien krijgt, dan ondersteunt uw browser geen 'cookies'.<br>Activeer 'cookies' en probeer opnieuw!</b></nl>
+</td>
+</tr>
+</form>
+
+listrowstart
+<tr>
+
+listrowstop
+</tr>
+
+listcolumnstart
+<td$align[$cnt]>
+
+listcolumnstop
+</td>
+
+listappendstart
+<tr><td colspan=$visiblecols>
+
+listappendnoresultsstart
+<tr><td align=center>
+
+formrowstart
+<tr>
+
+formrowstop
+</tr>
+
+formkeycolumnstart
+<td$alignkey>
+
+formvalcolumnstart
+<td$alignval>
+
+formcolumnstop
+</td>
+
+formboldstart
+<b>
+
+formboldstop
+</b>
+
+formnoresults
+<tr>
+<td colspan=2><center><en>No results found.</en><nl>Geen resultaten.</nl></center></td>
+</tr>
+
+formupdatebutton
+<en>Update</en><nl>Wijzig</nl>
+
+formaddbutton
+<en>Add</en><nl>Voeg toe</nl>
+
+formappendcolumnstart
+<td colspan=2 align=center>
+
+formtablestop
+</table>
+
+detailscenterstart
+<center>
+
+detailscenterstop
+</center>
+
+detailsdeletemessage
+&nbsp;<br>
+<en>Are you <b>sure</b> you want to delete this entry?</en>
+<nl>Bent u <b>zeker</b> dat u deze informatie wenst te verwijderen?</nl><br>
+
+detailskeycolumnstart
+<td$alignkey>
+
+detailsvalcolumnstart
+<td$alignval>
+
+detailscolumnstop
+</td>
+
+detailsboldstart
+<b>
+
+detailsboldstop
+</b>
+
+detailsappendcolumnstart
+<td colspan=2 align=center>
+
+detailsrowstart
+<tr>
+
+detailsrowstop
+</tr>

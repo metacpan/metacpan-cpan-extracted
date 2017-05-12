@@ -1,0 +1,66 @@
+makefile.pl                      Makefile.pl for Win32::SqlServer.
+MANIFEST                         This file.
+README.html                      README file.
+Win32-SqlServer.pod              Rudimentary POD for Win32::SqlServer.
+Win32-SqlServer.html             The Win32::SqlServer manual.
+History.html                     History file for Win32::SqlServer.
+Tests.html                       Information on the Win32::SqlServer test suite.
+CommonInclude.h                  Includes external #include used by all files.
+connect.cpp                      Connection and disconnectin.
+connect.h
+convenience.cpp                  Basic utility routines.
+convenience.h
+datatypemap.cpp                  Map SQL Server data types to OLE DB indicators.
+datatypemap.h
+datetime.cpp                     Conversion between date/time types and Perl SVs.
+datetime.h
+errcheck.cpp                     Error-checking and message handling.
+errcheck.h
+filestream.cpp                   Support for OpenSqlFilestream.
+filestream.h
+getdata.cpp                      nextresultset, nextrow, getoutputparams getcolumninfo
+getdata.h
+handleattributes.cpp             Get handle attributes from OlleDB hash.
+handleattributes.h
+init.cpp                         Module and object initialisation.
+init.h
+internaldata.cpp                 Handling of data internal to the XS part.
+internaldata.h
+senddata.cpp                     initbatch, enterparameter, executebatch and SV to SQL conversion.
+senddata.h
+SqlServer.xs                     The XS part of Win32::SqlServer
+SqlServer.pm                     The Perl part of Win32::SqlServer.
+tableparam.cpp                   Handlng of table parameters.
+tableparam.h
+utils.cpp                       Utility routines.
+utils.h
+t/1_resultsets.t                Test of result styles and row styles
+t/2_datatypes.t                 Test of SQL Server data types.
+t/3_retvalues.t                 Test of return values from SPs and UDFs.
+t/4_conversion.t                Test of sql_set_conversion.
+t/5_errors.t                    Test of error handling.
+t/6_paramsql.t                  Test of parameterised SQL statements.
+t/7_objectnames.t               Testing resolution of object names.
+t/8_columninfo.t                Testing data-type information from getcolumninfo.
+t/9_loginproperties.t           Test of login properties.
+t/A_tableparam.t                Test of table-valued parameters.
+t/B_filestream.t                Test for OpenSqlFileStream.
+t/Y_rowsetprops.t               Test of CommandTimeout and Query Notification.
+t/Z_threads.t                   Test with Perl threads.
+t/testsqllogin.pl               Common login module for the test scripts.
+t/testitall.pl                  A poor man's "make test" for the module.
+t/Helpers/assemblies.pl         Loads assemblies for CLR UDTs from binary strings.
+t/Helpers/complexinteger.cs     Source code for CLR UDT.
+t/Helpers/Datehelp.bas          Source code for datetesthelper.
+t/Helpers/Datetesthelper.exe    Help program to test DATETIME_REGIONAL.
+t/Helpers/Datetesthelper.vbp    Visual Basic project for datetesthelper.
+t/Helpers/point.vb              Source code for CLR UDT.
+t/Helpers/spatial.data.10       Test data for spatial queries for SQL 2008.
+t/Helpers/spatial.data.11       Test data for spatial queries for SQL 2012.
+t/Helpers/spatial.data.12       Test data for spatial queries for SQL 2014.
+t/Helpers/spatial.data.13       Test data for spatial queries for SQL 2016.
+t/Helpers/spatial.queries       Queries to genereate spatial.data
+t/Helpers/udt_create.sql        SQL script to create the assemblies from DLLs.
+t/Helpers/Utf8String.cs         Source code for CLR UDT.
+t/Helpers/Utf8StringMax.cs      Source code for CLR UDT.
+META.yml                                 Module meta-data (added by MakeMaker)

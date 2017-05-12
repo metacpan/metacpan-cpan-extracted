@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WWW/Shorten/Yahooit.pm
+t/00-compile.t
+t/001_shorten.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

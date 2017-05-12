@@ -1,0 +1,98 @@
+Revision history for Perl module WWW::Patent::Page and its submodules
+
+0.107.0 August 2009
+	-removed all traces of ESPACE_EP due to captcha implementation
+
+0.106.0 ~ October 2008
+	-added method "request" in Page.pm to override LWP; allow debugging, retrying
+	-set sights on Open Patent Services version 2 xml/soap services.
+	
+
+0.105.1 finished Apr 2008
+	-added module for JPO machine translations to English
+		this website is often not responsive, so watch out.
+	-added www and command line example of JPO_IPDI.pm use for translations
+	-gave in example/ the type of html output for translations
+	-removed tests for pod, pod coverage, and Perl::Critic from distribution
+		tests still used in development
+	-update TODO
+
+0.104.0 started ~ Nov 15, 2007
+	-changed MICROPATENT to account for standard and special collection PDF
+	-added 3 tests to US2323935 to test for MICROPATENT special collection
+
+0.103.1 finished Oct 30 2007
+	-corrected bad use of %passed_parms and %passed_parm
+	-added test that diagnosed correction immediately above
+
+0.102.0 finished August 2007
+	-polled micropatent pdf to give time to get the stuff ready 
+	-added a new "document" type to MICROPATENT, called "data" (versus "pdf", "html", etc.) from the "worksheet" they provide, that delivers a hash of data about the patent (inventors, assignee, citations, claims, etc.) 
+	-increased File::Temp version to 0.17 to account for ->seek method 
+	-returned HTTP::Response -like objects in various places where they should be... whoops 
+	
+0.101.0 finished Aug 2007
+	-commented out two "close" statements on File::Temp objects in USPTO_pdf method of USPTO class; I think these could be closed after the files are accessed, but going for minimal changes.  This may make a memory leak, so let me know.
+	-improved critic test in looking for TEST_AUTHOR
+	
+0.100.0 finished Feb 2007
+	-three part release number requires installing "version.pm" distribution (sorry about that...)
+	-rewrote the parser of "patent numbers"- method 'parse_doc_id'
+	-changed some tests to be consistent with parser, which now leaves the doc_id alone and parses into separate values like country, kind, type
+	-added further testing of patent number parser
+	-added Perl::Critic testing (with some exclusions, and only used when you are me )
+	-added test of network accessibility (basically for firewalls)
+	-got rid of some warnings that wrote over testing
+	-made pod testing conditional on being me- so others will not need to add modules for testing
+	-added many two-letter country codes
+
+	TODO -  use HTTP::Response, better use of "is_success" and "message", more tests
+	 Longer range:  Add modules for machine translations from Japan and Korea
+	 timing of patent retrieval from various offices
+	 test coverage
+
+0.09 (beginning Nov 14) tried to account for Micropatent javascript that refreshes document delivery page until document is delivered.
+    Did not add a test for this condition, as the condition (slowness) depends on MicroPatent website.
+	Accounted for it by repeatedly clicking the "Click Here for Current Status of Order" form, assumed to be the first form on the page.
+
+0.08 removed extraneous print statements
+
+0.07 changed tests for MicroPatent to skip if username and password not supplied
+  put in a longer timeout for LWP::UserAgent to allow for slow patent offices
+
+0.06 added MICROPATENT.pm to use that source: pdf, xml, html
+
+0.05 use PDF::API2 2.00
+	USPTO changed their interface: H1,523 is out, H001,523 is in!
+	    PP8,901 is out, PP08,901 is in!
+
+USPTO: All patent numbers must be seven characters in length, excluding commas, which are optional. Examples:
+Utility -- 	5,146,634 6923014 0000001
+Design -- 	D339,456 D321987 D000152
+Plant -- 	PP08,901 PP07514 PP00003
+Reissue -- 	RE35,312 RE12345 RE00007
+Defensive Publication -- 	T109,201 T855019 T100001
+Statutory Invention Registration -- 	H001,523 H001234 H000001
+Re-examination -- 	RX29,194 RE29183 RE00125
+Additional Improvement -- 	AI00,002 AI000318 AI00007
+
+0.04 added USPTO_pdf: pdf delivery for USPTO
+     uses File::Temp for save handling of temporary files
+     added tempdir to specify working directory
+     Thanks to H. Schier h.schier@fkf.mpg.de
+
+     Added Test::Pod to pass Pod for Kwalitee- Wanda
+
+0.03 Major Changes:
+	error reporting, sanity checks
+
+0.02 Major Changes:
+	underlying logic made closer to LWP::UserAgent + HTTP::Response
+	changed some defaults
+	used PDF::API2 to produce multipage patent from EPO
+	include example scripts; one for command line, one for cgi-bin
+
+0.01 Sun Feb 20 21:19:42 2005
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

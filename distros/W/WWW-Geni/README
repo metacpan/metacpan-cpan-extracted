@@ -1,0 +1,37 @@
+WWW-Geni version 0.3.0
+=====================
+
+This Perl module is a simple object-oriented frontend to the Geni.com API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTTP::Cookies
+  HTTP::Response
+  LWP::UserAgent
+  JSON
+
+SUPPORT
+
+No official support is offered.  Email geni@thespicelands.com and hope for the
+best.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Erin Spiceland
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

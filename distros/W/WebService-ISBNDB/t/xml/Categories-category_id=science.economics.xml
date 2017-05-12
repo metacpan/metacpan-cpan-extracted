@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:13">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.economics" parent_id="science">
+<Name>Economics</Name>
+<Details summary="" depth="1" element_count="2491" />
+<SubCategories>
+<SubCategory id="science.economics.study_and_teaching" />
+<SubCategory id="science.economics.models_and_simulation" />
+<SubCategory id="science.economics.welfare" />
+<SubCategory id="science.economics.marxian" />
+<SubCategory id="science.economics.consumption" />
+<SubCategory id="science.economics.urban" />
+<SubCategory id="science.economics.medical" />
+<SubCategory id="science.economics.statistical_methods" />
+<SubCategory id="science.economics.home" />
+<SubCategory id="science.economics.handbooks_and_manuals" />
+<SubCategory id="science.economics.mathematical" />
+<SubCategory id="science.economics.regional" />
+<SubCategory id="science.economics.equilibrium" />
+<SubCategory id="science.economics.dictionaries" />
+<SubCategory id="science.economics.congresses" />
+<SubCategory id="science.economics.history" />
+<SubCategory id="science.economics.bibliography" />
+<SubCategory id="science.economics.keynesian" />
+<SubCategory id="science.economics.labor" />
+<SubCategory id="science.economics.social_aspects" />
+<SubCategory id="science.economics.developing_countries" />
+<SubCategory id="science.economics.moral_and_ethical_aspects" />
+<SubCategory id="science.economics.religious_aspects" />
+<SubCategory id="science.economics.in_literature" />
+<SubCategory id="science.economics.infrastructure" />
+<SubCategory id="science.economics.informal_sector" />
+<SubCategory id="science.economics.economic_development" />
+<SubCategory id="science.economics.capitalism" />
+<SubCategory id="science.economics.economic_policy" />
+<SubCategory id="science.economics.macroeconomics" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

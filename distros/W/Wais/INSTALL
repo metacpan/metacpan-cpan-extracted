@@ -1,0 +1,100 @@
+READ THIS
+    If you don't want to go through the trouble explained below and
+    want to build this extension from a freeWAIS-sf source
+    directory, get the latest `Wais-2.2??' version!
+
+    If you have a perl <= 5.003_07, get the latest `Wais-2.1??'
+    version!
+
+Requirements
+  wais.h
+
+    To compile this modules needs to find `wais.h' in it's include
+    path. If you don't have one already, chdir to your freeWAIS-sf
+    source directory in the `ir' and call the mkinc script in this
+    distribution like this:
+
+            perl .../mkinc -I../ctype ui.h cutil.h irext.h irfiles.h \
+                 irsearch.h irtfiles.h weight.h docid.h > wais.h
+
+    The `...' must be replaced by the path to this directory. Then
+    move `wais.h' to a place where your C-compiler can find it.
+
+    You may add additional directories to search in the
+    `Makefile.PL' to the `INC' parameter of the `WriteMakefile()'
+    call.
+
+  libwais.a
+
+    You need also a `libwais.a' which contains all necessary object
+    files. If you use a older freeWAIS-sf distribution, it might
+    have generated different libraries, namely `ir/libwais.a',
+    `lib/libftw.a', `regexp/libregexp.a'. Also the file
+    `ctype/ctype.o' might be not in any of them. In this case you
+    must merge the libraries by hand:
+
+            mkdir /tmp/wais
+            cd /tmp/wais
+            ar x .../ir/libwais.a
+            ar x .../regexp/libregexp.a
+            ar x .../lib/libftw.a
+            cp .../ctype/ctype.o .
+            ar rc libwais.a *.o
+            ranlib libwais.a 
+
+    Depending an your system, the `ar' flags might differ or the
+    `ranlib' may be obsolete. Please consult the ar manpage and the
+    ranlib manpage. In addition you may examine the output of perl -
+    V:ar -V:ranlib
+
+    Move the new `libwais.a' to a place where your linker will find
+    it or add appropriate linker flags to the `LIBS' parameter of
+    the `WriteMakefile()' call.
+
+  waisindex, waisserver
+
+    To perform the regression tests, the Module will need
+    `waisindex' to create a test database and waisserver to test
+    *remote* connections.
+
+    If you do not have a working `waisserver', failure report will
+    approximately look like this:
+
+      t/a_preop.t                   3    1  33.33%  3    <- server start failed
+      t/basic.t                     4    2  50.00%  3-4  <- 'remote' searches
+      t/parallel.t                  6    4  66.67%  3-6  <- 'remote' searches
+      t/z_postop.t                  2    1  50.00%  1    <- server stop
+
+Building this extension
+    Make sure that you met the requirements above. If your perl
+    supports dynamic loading, do:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+            make clean
+
+    If you want to build a perl with this extension statically
+    linked in do:
+
+            make Makefile.PL
+            make waisperl
+            make test_static
+
+    To install the new "waisperl" binary, call
+
+        make -f Makefile.aperl inst_perl MAP_TARGET=waisperl
+
+    To remove the intermediate files say
+
+        make -f Makefile.aperl map_clean
+
+    If something goes wrong during `make test', try
+
+        make test TEST_VERBOSE=1
+
+    or
+
+        make test_static TEST_VERBOSE=1
+

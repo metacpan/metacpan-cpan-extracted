@@ -1,0 +1,13 @@
+^blib
+.gitignore
+MANIFEST.bak
+check_webinject
+^webinject.pl
+http.log
+results.html
+results.xml
+Makefile$
+Makefile.old$
+pm_to_blib
+MYMETA.json
+MYMETA.yml

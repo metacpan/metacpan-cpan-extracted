@@ -1,0 +1,18 @@
+person
+title:<en>User details</en><nl>Details persoon</nl>
+key:id
+query:select id,firstname,lastname,birthday,email,mobile,im from people where $data{key}=$params{$data{key}} and status='1' 
+captions:firstname=<en 1>First Name</en><nl 1>Voornaam</nl>:|lastname=<en 2>Last Name</en><nl 2>Familienaam</nl>:|mobile=<en 3>Mobile</en><nl 3>GSM</nl>:|birthday=<en 4>Birthday</en><nl 4>Geboortedatum</nl>:|email=<en 5>E-mail</en><nl 5>E-mail</nl>:|im=<en 6>Instant Messaging</en><nl 6>Berichtjes</nl>:
+replace:epoch=perl;return(strftime "%Y.%m.%e %H:%M:%S", localtime($epoch));
+replace:email=<a href=mailto:$email><en 7>$email</en><nl 7>$email</nl></a>
+append:<center><a href=jform.wsql?id=$id&view=person&editdest=caller><en 10>Edit</en><nl 10>Wijzig</nl></a></center>&list(view=addresses&peopleid=$id)
+hide:id
+
+address
+title:Address details
+key:id
+query:select id,name,phone from addresses where $data{key}=$params{$data{key}} and status='1' 
+captions:name=<en 11>Name</en><nl 11>Naam</nl>|phone=<en 12>Phone</en><nl 12>Telefoon</nl>
+replace:email=<a href=mailto:$email><en 13>$email</en><nl 13>$email</nl></a>
+append:<center><a href=jform.wsql?id=$id&view=person&editdest=caller><en 16>Edit</en><nl 16>Wijzig</nl></a></center>
+hide:id

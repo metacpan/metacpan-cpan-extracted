@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project kpf_version="2" name="proj">
+<file name="MBCS.pm" url="MBCS.pm">
+</file>
+<file name="MBCS.xs" url="MBCS.xs">
+</file>
+<file name="Changes" url="Changes">
+</file>
+<file name="Makefile.PL" url="Makefile.PL">
+</file>
+<file name="MANIFEST" url="MANIFEST">
+</file>
+<file name="META.yml" url="META.yml">
+</file>
+<file name="README" url="README">
+</file>
+<folder name="t" url="t">
+<file name="00base.t" url="t/00base.t">
+</file>
+</folder>
+</project>

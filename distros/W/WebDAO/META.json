@@ -1,0 +1,170 @@
+{
+   "abstract" : "platform for easy creation of high-performance and scalable web applications",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebDAO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.37",
+            "DateTime::Format::HTTP" : "0.37",
+            "Encode" : "0",
+            "FCGI" : "0.67",
+            "Getopt::Long" : "2.35",
+            "HTTP::Body" : "1.11",
+            "MIME::Base64" : "0",
+            "Test::Class" : "0",
+            "URI" : "1.36",
+            "XML::Flow" : "0.86"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Writer" : {
+         "file" : "lib/WebDAO/Test.pm",
+         "version" : "0.01"
+      },
+      "TestCV" : {
+         "file" : "lib/WebDAO/Test.pm",
+         "version" : "0.01"
+      },
+      "WebDAO" : {
+         "file" : "lib/WebDAO.pm",
+         "version" : "2.25"
+      },
+      "WebDAO::Base" : {
+         "file" : "lib/WebDAO/Base.pm",
+         "version" : "0.02"
+      },
+      "WebDAO::CV" : {
+         "file" : "lib/WebDAO/CV.pm",
+         "version" : "0.02"
+      },
+      "WebDAO::CVfcgi" : {
+         "file" : "lib/WebDAO/CVfcgi.pm",
+         "version" : "0.02"
+      },
+      "WebDAO::CVfcgiold" : {
+         "file" : "lib/WebDAO/CVfcgi.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Component" : {
+         "file" : "lib/WebDAO/Component.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Config" : {
+         "file" : "lib/WebDAO/Config.pm",
+         "version" : "0.4"
+      },
+      "WebDAO::Container" : {
+         "file" : "lib/WebDAO/Container.pm",
+         "version" : "0.02"
+      },
+      "WebDAO::Element" : {
+         "file" : "lib/WebDAO/Element.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Engine" : {
+         "file" : "lib/WebDAO/Engine.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::FCGI::ProcManager" : {
+         "file" : "lib/WebDAO/FCGI/ProcManager.pm",
+         "version" : "0.17"
+      },
+      "WebDAO::Fcgi::Writer" : {
+         "file" : "lib/WebDAO/CVfcgi.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lex" : {
+         "file" : "lib/WebDAO/Lex.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lexer::base" : {
+         "file" : "lib/WebDAO/Lexer/base.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lexer::method" : {
+         "file" : "lib/WebDAO/Lexer/method.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lexer::object" : {
+         "file" : "lib/WebDAO/Lexer/object.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lexer::regclass" : {
+         "file" : "lib/WebDAO/Lexer/regclass.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lexer::text" : {
+         "file" : "lib/WebDAO/Lexer/text.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lib::MethodByPath" : {
+         "file" : "lib/WebDAO/Lib/MethodByPath.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Lib::RawHTML" : {
+         "file" : "lib/WebDAO/Lib/RawHTML.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Modal" : {
+         "file" : "lib/WebDAO/Modal.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Response" : {
+         "file" : "lib/WebDAO/Response.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Session" : {
+         "file" : "lib/WebDAO/Session.pm",
+         "version" : "0.02"
+      },
+      "WebDAO::SessionSH" : {
+         "file" : "lib/WebDAO/SessionSH.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Sessionco" : {
+         "file" : "lib/WebDAO/Sessionco.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Test" : {
+         "file" : "lib/WebDAO/Test.pm",
+         "version" : "0.01"
+      },
+      "WebDAO::Util" : {
+         "file" : "lib/WebDAO/Util.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zag/webdao/issues"
+      },
+      "homepage" : "http://webdao.sourceforge.net",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/zag/webdao.git"
+      },
+      "x_ProjectHome" : "https://github.com/zag/webdao"
+   },
+   "version" : "2.25"
+}

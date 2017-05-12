@@ -1,0 +1,3004 @@
+use utf8;
+
+=encoding utf-8
+
+=head1 NAME
+
+WebService::Rakuten - Object interface to Rakuten webservice
+
+=head1 SYNOPSIS
+
+  use WebService::Rakuten;
+
+  my $rws = WebService::Rakuten->new(
+      output_type  => 'perl',
+      developer_id => '0123456789abcdef',
+  );
+
+  my $result_rh = $rws->itemsearch(
+      keyword => 'Sony Vaio',
+      page    => 1,
+  );
+
+=head1 DESCRIPTION
+
+Use this module to conveniently interface with the Rakuten webservices.
+
+=head3 Documentation
+
+  http://webservice.rakuten.co.jp/
+
+=head1 METHODS
+
+=head2 simplehotelsearch
+
+=head3 Example
+
+
+ my $results_rh = $rws->simplehotelsearch(
+     largeClassCode  => 'japan',
+     middleClassCode => 'akita',
+     smallClassCode  => 'tazawa',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item largeClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item middleClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item smallClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item detailClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item hotelNo
+
+=over
+
+=item type: int(10)
+
+=back
+
+=item latitude
+
+=over
+
+=item type: decimal
+
+=back
+
+=item longitude
+
+=over
+
+=item type: decimal
+
+=back
+
+=item searchRadius
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item squeezeCondition
+
+=over
+
+=item type: String
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item hits
+
+=over
+
+=item type: long
+
+=back
+
+=item datumType
+
+=over
+
+=item type: int(1)
+
+=item default: 2
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/simplehotelsearch/
+
+=head2 booksgamesearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksgamesearch(
+     title    => 'バイオハザード',
+     hardware => 'Wii',
+     sort     => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item hardware
+
+=over
+
+=item type: String
+
+=back
+
+=item makerCode
+
+=over
+
+=item type: String
+
+=back
+
+=item label
+
+=over
+
+=item type: String
+
+=back
+
+=item jan
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 006
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksgamesearch/
+
+=head2 hoteldetailsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->hoteldetailsearch( hotelNo => 123456, );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item hotelNo B<(required)>
+
+=over
+
+=item type: int(10)
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item datumType
+
+=over
+
+=item type: int(1)
+
+=item default: 2
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/hoteldetailsearch/
+
+=head2 gethotelchainlist
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/gethotelchainlist/
+
+=head2 bookssoftwaresearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->bookssoftwaresearch(
+     title => '会計',
+     os    => 'Mac',
+     sort  => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item os
+
+=over
+
+=item type: String
+
+=back
+
+=item makerCode
+
+=over
+
+=item type: String
+
+=back
+
+=item label
+
+=over
+
+=item type: String
+
+=back
+
+=item jan
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 004
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/bookssoftwaresearch/
+
+=head2 bookscdsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->bookscdsearch(
+     artistName => 'サザンオールスターズ',
+     sort       => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item artistName
+
+=over
+
+=item type: String
+
+=back
+
+=item label
+
+=over
+
+=item type: String
+
+=back
+
+=item jan
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 002
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/bookscdsearch/
+
+=head2 vacanthotelsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->vacanthotelsearch(
+     largeClassCode  => 'japan',
+     middleClassCode => 'akita',
+     smallClassCode  => 'tazawa',
+     checkinDate     => '2009-07-01',
+     checkoutDate    => '2009-07-02',
+     adultNum        => 2,
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item largeClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item middleClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item smallClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item detailClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=item hotelNo
+
+=over
+
+=item type: int(10)
+
+=back
+
+=item checkinDate B<(required)>
+
+=over
+
+=item type: date
+
+=back
+
+=item checkoutDate B<(required)>
+
+=over
+
+=item type: date
+
+=back
+
+=item adultNum
+
+=over
+
+=item type: int(2)
+
+=item default: 1
+
+=back
+
+=item upClassNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item lowClassNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item infantWithMBNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item infantWithMNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item infantWithBNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item infantWithoutMBNum
+
+=over
+
+=item type: int(2)
+
+=item default: 0
+
+=back
+
+=item roomNum
+
+=over
+
+=item type: int(3)
+
+=item default: 1
+
+=back
+
+=item maxCharge
+
+=over
+
+=item type: long
+
+=back
+
+=item minCharge
+
+=over
+
+=item type: long
+
+=back
+
+=item latitude
+
+=over
+
+=item type: decimal
+
+=back
+
+=item longitude
+
+=over
+
+=item type: decimal
+
+=back
+
+=item searchRadius
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item squeezeCondition
+
+=over
+
+=item type: String
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item datumType
+
+=over
+
+=item type: int(1)
+
+=item default: 2
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/vacanthotelsearch/
+
+=head2 booksmagazinesearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksmagazinesearch(
+     title        => '週間 経済',
+     booksGenreId => 007604001,
+     sort         => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item publisherName
+
+=over
+
+=item type: String
+
+=back
+
+=item jan
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 007
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksmagazinesearch/
+
+=head2 itemcodesearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->itemcodesearch( itemCode => 'aaa:1234567', );
+ 
+
+=head3 Parameters
+
+=over
+
+=item itemCode B<(required)>
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/itemcodesearch/
+
+=head2 bookstotalsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->bookstotalsearch(
+     keyword   => 'ガンダム',
+     NGKeyword => '予約',
+     sort      => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 000
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/bookstotalsearch/
+
+=head2 booksforeignbooksearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksforeignbooksearch(
+     title        => 'HarryPotter',
+     booksGenreId => 005407,
+     sort         => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item author
+
+=over
+
+=item type: String
+
+=back
+
+=item publisherName
+
+=over
+
+=item type: String
+
+=back
+
+=item isbn
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 005
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksforeignbooksearch/
+
+=head2 genresearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->genresearch( genreId => 0, );
+ 
+
+=head3 Parameters
+
+=over
+
+=item genreId B<(required)>
+
+=over
+
+=item type: int
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/genresearch/
+
+=head2 auctionitemsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->auctionitemsearch(
+     keyword => '福袋',
+     sort    => '+bidCount',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item minPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item maxPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: '+endTime'
+
+=back
+
+=item blowFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item itemType
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item newFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/auctionitemsearch/
+
+=head2 dynamicad
+
+=head3 Example
+
+
+
+ my $results_rh =
+   $rws->dynamicad( url =>
+ 'http%3a%2f%2fplaza%2erakuten%2eco%2ejp%2fisblog%2fdiary%2f200705230001%2f',
+   );
+ 
+
+=head3 Parameters
+
+=over
+
+=item url
+
+=over
+
+=item type: String
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int
+
+=item default: 0
+
+=back
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/dynamicad/
+
+=head2 cdsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->cdsearch(
+     keyword => 'SMAP',
+     genreId => 200533,
+     sort    => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=item default: 0
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: '-reviewCount'
+
+=back
+
+=item minPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item maxPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreInformationFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/cdsearch/
+
+=head2 booksearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksearch(
+     keyword => 'ブログ',
+     genreId => 200446,
+     sort    => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=item default: 0
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: '-reviewCount'
+
+=back
+
+=item minPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item maxPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreInformationFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksearch/
+
+=head2 getareaclass
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/getareaclass/
+
+=head2 hotelranking
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->hotelranking( genre => 'all', );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item genre B<(required)>
+
+=over
+
+=item type: String
+
+=item default: 'all'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/hotelranking/
+
+=head2 catalogsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->catalogsearch(
+     keyword => '%e6%b6%b2%e6�%b6%e3��%e3�%ac%e3��',
+     sort    => '-reviewCount',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=item default: 0
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: '-registerDate'
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item releaseRange
+
+=over
+
+=item type: int
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreInformationFlag
+
+=over
+
+=item type: String
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/catalogsearch/
+
+=head2 booksdvdsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksdvdsearch(
+     title => 'ガンダム',
+     sort  => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item artistName
+
+=over
+
+=item type: String
+
+=back
+
+=item label
+
+=over
+
+=item type: String
+
+=back
+
+=item jan
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 003
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksdvdsearch/
+
+=head2 keywordhotelsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->keywordhotelsearch( keyword => '伊豆', );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 20
+
+=back
+
+=item sumDisplayFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item keyword B<(required)>
+
+=over
+
+=item type: String
+
+=back
+
+=item middleClassCode
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/keywordhotelsearch/
+
+=head2 itemranking
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=back
+
+=item age
+
+=over
+
+=item type: int
+
+=back
+
+=item sex
+
+=over
+
+=item type: int
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/itemranking/
+
+=head2 auctionitemcodesearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->auctionitemcodesearch( itemCode => 'i:aaa:1234567', );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item itemCode B<(required)>
+
+=over
+
+=item type: String
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/auctionitemcodesearch/
+
+=head2 dvdsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->dvdsearch(
+     keyword => 'SMAP',
+     genreId => 300337,
+     sort    => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=item default: 0
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: '-reviewCount'
+
+=back
+
+=item minPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item maxPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreInformationFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/dvdsearch/
+
+=head2 itemsearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->itemsearch(
+     keyword => '福袋',
+     sort    => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item keyword
+
+=over
+
+=item type: String
+
+=back
+
+=item shopCode
+
+=over
+
+=item type: String
+
+=back
+
+=item genreId
+
+=over
+
+=item type: long
+
+=item default: 0
+
+=back
+
+=item catalogCode
+
+=over
+
+=item type: String
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item minPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item maxPrice
+
+=over
+
+=item type: long
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item field
+
+=over
+
+=item type: int(1)
+
+=item default: 1
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item imageFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item orFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item NGKeyword
+
+=over
+
+=item type: String
+
+=back
+
+=item genreInformationFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item purchaseType
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/itemsearch/
+
+=head2 booksbooksearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksbooksearch(
+     title        => '太陽',
+     booksGenreId => 001004008,
+     sort         => '+itemPrice',
+ );
+ 
+
+=head3 Parameters
+
+=over
+
+=item callBack
+
+=over
+
+=item type: String
+
+=back
+
+=item title
+
+=over
+
+=item type: String
+
+=back
+
+=item author
+
+=over
+
+=item type: String
+
+=back
+
+=item publisherName
+
+=over
+
+=item type: String
+
+=back
+
+=item size
+
+=over
+
+=item type: int
+
+=item default: 0
+
+=back
+
+=item isbn
+
+=over
+
+=item type: long
+
+=back
+
+=item booksGenreId
+
+=over
+
+=item type: String
+
+=item default: 001
+
+=back
+
+=item hits
+
+=over
+
+=item type: int
+
+=item default: 30
+
+=back
+
+=item page
+
+=over
+
+=item type: int
+
+=item default: 1
+
+=back
+
+=item availability
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item outOfStockFlag
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=item sort
+
+=over
+
+=item type: String
+
+=item default: 'standard'
+
+=back
+
+=item carrier
+
+=over
+
+=item type: int(1)
+
+=item default: 0
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksbooksearch/
+
+=head2 booksgenresearch
+
+=head3 Example
+
+
+
+ my $results_rh = $rws->booksgenresearch( booksGenreId => 000, );
+ 
+
+=head3 Parameters
+
+=over
+
+=item booksGenreId B<(required)>
+
+=over
+
+=item type: String
+
+=back
+
+=back
+
+
+
+=head3 Documentation
+
+http://webservice.rakuten.co.jp/booksgenresearch/
+
+
+=head1 LIMITATIONS
+
+=over
+
+=item Namespace
+
+There are multiple authors with permission on this namespace. If you're installing via the cpan prompt, or command line tool, you'll need to do so like this:
+
+ cpan[1]> install DYLAN/WebService-Rakuten-0.05.tar.gz
+
+=item Auto-generated code
+
+This module and its POD were generated by a program which crawls the online documentation and outputs a Perl interpretation. 
+I may never personally test every function. Please report any bugs.
+
+=item Method documentation links
+
+For reasons beyond this author's control, Rakuten doesn't want you to follow links from other websites to their API pages.
+They enforce this by redirecting you to the main API page whenever you follow any of the above links. Go figure.
+
+=back
+
+=head1 AUTHOR
+
+Dylan Doxey, E<lt>dylan.doxey@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

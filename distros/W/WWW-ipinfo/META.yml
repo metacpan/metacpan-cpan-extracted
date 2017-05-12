@@ -1,0 +1,28 @@
+---
+abstract: 'Returns your ip address and geolocation data using L<http://ipinfo.io>'
+author:
+  - 'David Farrell <sillymoos@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0.03'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-ipinfo
+requires:
+  Exporter: '0'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/WWW-ipinfo
+  repository: https://github.com/sillymoose/WWW-ipinfo.git
+version: '0.05'

@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+lib/Weather/NWS/NDFDgenByDay.pm
+lib/Weather/NWS/NDFDgen.pm
+t/00_load.t
+t/01_boilerplate.t
+t/02_pod.t
+t/03_pod-coverage.t
+t/04_NDFDgen.t
+t/05_NDFDgenByDay.t

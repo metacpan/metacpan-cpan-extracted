@@ -1,0 +1,88 @@
+#-------------------------------------------------------------------------------
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+#-------------------------------------------------------------------------------
+Revision history for Wetware-CLI
+
+0.06  2009.05.07 1000h
+
+		add
+			demo/cli_runner
+	
+	 	This is the proof in the pudding that one just sub classes
+	 	the Wetware::CLI in the script and goes from there.
+
+0.05  2009.05.07 0931h
+
+		Hey, what if there were a way to filter in Test::Load
+		why then we could have a simpler solution to our problem
+		and for all FOO there would be a FOO::TestSuite
+		
+		WOW.
+		
+		Now all we need is a tool to gin up the minimum for
+		FOO::TestSuite for all FOO, or at least validate that
+		they exist. 
+
+0.04  2009.05.06
+		fix pod. Round out the test suite. look at the idea of
+		running the code with some sort of 
+		
+		    t/lib/Wetware/CLI/TestSuite/Stub.pm
+		
+		but that just seems like more work.
+
+0.03  Tue May  5 19:41:47 PDT 2009
+
+	Have opted to create a Wetware::Test distribution that will deliver
+	the basic Test::Class::Load module - As well as our basic TestSuite 
+	core set of methods.
+
+	There is the problem, that since Wetware::CLI::TestSuite.pm is going to be
+	in blib, it will cause problems for both
+
+	t/pod-coverage.t
+
+	and the t/00_compile_pm.t strategy of:
+
+		use strict;
+		use warnings;
+		use Test::Compile;
+		BEGIN { all_pm_files_ok(); }
+	
+	If we do not put it in the BEGIN block then we run into the problem
+	of the INIT {} block for the Test::Class that runs too late, eg:
+	
+	t/00_compile_pm.t ............. 1/2 Too late to run INIT block at 
+	  /usr/local/lib/perl5/site_perl/5.8.7/Wetware/Test/Class.pm line 22.
+	
+	In the BEGIN Block, we have the problem that it sees 
+	
+	t/00_compile_pm.t ............. 1/2 # Looks like you planned 2 tests but ran 7 extra.
+    t/00_compile_pm.t ............. Dubious, test returned 255 (wstat 65280, 0xff00)
+    All 2 subtests passed 
+
+	This suggest a problem - that the t/lib/*/TestSuite.pm will be
+	runable with the basic 
+		
+		use strict;
+		use warnings;
+		use FindBin qw($Bin);
+		use Test::Class::Load "$Bin/../lib/Wetware/CLI";
+	
+	which is normally Loading 
+		use Test::Class::Load "$Bin/t/lib/";
+
+    to find all of the TestSuite modules...
+    
+    What ever to Do.
+
+0.02  2009.05.05
+	basic shape, but what if we want to export the Test::Class
+	based TestSuite?
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

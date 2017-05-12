@@ -1,0 +1,29 @@
+---
+name: Win32-EventLog-Carp
+version: 1.42
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org> and David Landgren <dland at cpan.org>'
+abstract: for carping in the Windows NT Event Log
+license: perl
+requires:
+  Carp: 0
+  Carp::Heavy: 0
+  File::Basename: 0
+  File::Spec: 0
+  Win32: 0
+  Win32::EventLog: 0
+  perl: 5.005
+build_requires:
+  Test::More: 0
+recommends:
+  Win32::EventLog::Message: 0
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Win32::EventLog::Carp:
+    file: lib/Win32/EventLog/Carp.pm
+    version: 1.42
+resources:
+  license: http://dev.perl.org/licenses/

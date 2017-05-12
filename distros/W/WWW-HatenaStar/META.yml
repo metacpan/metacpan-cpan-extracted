@@ -1,0 +1,28 @@
+---
+abstract: 'perl interface to Hatena::Star'
+author:
+  - 'woremacx <woremacx at cpan dot org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-HatenaStar
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  JSON::Syck: 0
+  Time::HiRes: 0
+  URI: 0
+  WWW::HatenaLogin: 0.02
+  WWW::Mechanize: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

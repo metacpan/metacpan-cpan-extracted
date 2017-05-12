@@ -1,0 +1,123 @@
+=== get root url as html
+Request:
+GET /
+Accept: text/html
+Response:
+302 Found
+Content-type: text/html
+Location: browser/browser.html#/
+=== get root url as hal+json
+Request:
+GET /
+Accept: application/hal+json
+Response:
+200 OK
+Content-type: application/hal+json
+{
+   "_links" : {
+      "artist" : {
+         "href" : "/artist",
+         "title" : "TestSchema Artist"
+      },
+      "artistinvoke{/method}" : {
+         "href" : "/artistinvoke{/method}",
+         "templated" : true,
+         "title" : "TestSchema Artist"
+      },
+      "artist{/1}" : {
+         "href" : "/artist{/1}",
+         "templated" : true,
+         "title" : "TestSchema Artist"
+      },
+      "artist{/1}invoke{/method}" : {
+         "href" : "/artist{/1}invoke{/method}",
+         "templated" : true,
+         "title" : "TestSchema Artist"
+      },
+      "cd" : {
+         "href" : "/cd",
+         "title" : "TestSchema CD"
+      },
+      "cd_to_producer" : {
+         "href" : "/cd_to_producer",
+         "title" : "TestSchema CD_to_Producer"
+      },
+      "cd_to_producer{/1}{/2}" : {
+         "href" : "/cd_to_producer{/1}{/2}",
+         "templated" : true,
+         "title" : "TestSchema CD_to_Producer"
+      },
+      "cd{/1}" : {
+         "href" : "/cd{/1}",
+         "templated" : true,
+         "title" : "TestSchema CD"
+      },
+      "city" : {
+         "href" : "/city",
+         "title" : "TestSchema City"
+      },
+      "city{/1}" : {
+         "href" : "/city{/1}",
+         "templated" : true,
+         "title" : "TestSchema City"
+      },
+      "classic_albums" : {
+         "href" : "/classic_albums",
+         "title" : "TestSchema ClassicAlbums"
+      },
+      "classic_albums{/1}" : {
+         "href" : "/classic_albums{/1}",
+         "templated" : true,
+         "title" : "TestSchema ClassicAlbums"
+      },
+      "country" : {
+         "href" : "/country",
+         "title" : "TestSchema Country"
+      },
+      "country{/1}" : {
+         "href" : "/country{/1}",
+         "templated" : true,
+         "title" : "TestSchema Country"
+      },
+      "genre" : {
+         "href" : "/genre",
+         "title" : "TestSchema Genre"
+      },
+      "genre{/1}" : {
+         "href" : "/genre{/1}",
+         "templated" : true,
+         "title" : "TestSchema Genre"
+      },
+      "gig" : {
+         "href" : "/gig",
+         "title" : "TestSchema Gig"
+      },
+      "gig{/1}{/2}" : {
+         "href" : "/gig{/1}{/2}",
+         "templated" : true,
+         "title" : "TestSchema Gig"
+      },
+      "producer" : {
+         "href" : "/producer",
+         "title" : "TestSchema Producer"
+      },
+      "producer{/1}" : {
+         "href" : "/producer{/1}",
+         "templated" : true,
+         "title" : "TestSchema Producer"
+      },
+      "self" : {
+         "href" : "/"
+      },
+      "track" : {
+         "href" : "/track",
+         "title" : "TestSchema Track"
+      },
+      "track{/1}" : {
+         "href" : "/track{/1}",
+         "templated" : true,
+         "title" : "TestSchema Track"
+      }
+   }
+}
+

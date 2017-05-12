@@ -1,0 +1,19 @@
+---
+name: Win32-API-Interface
+version: 0.03
+author:
+  - 'Sascha Kiefer, L<esskar@cpan.org>'
+abstract: Object oriented interface generation
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Win32::API: 0.41
+provides:
+  Win32::API::Interface:
+    file: lib/Win32/API/Interface.pm
+    version: 0.03
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

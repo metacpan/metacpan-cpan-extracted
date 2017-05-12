@@ -1,0 +1,57 @@
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix prio: <http://purl.org/NET/cpan-uri/rt/priority/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rt: <http://purl.org/NET/cpan-uri/rt/ticket/> .
+@prefix status: <http://purl.org/NET/cpan-uri/rt/status/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+_:r1330002862r0 a foaf:Agent ;
+	foaf:mbox <mailto:KEVINR@cpan.org> .
+_:r1330002862r1 a foaf:Agent ;
+	foaf:nick "TOBYINK" .
+_:r1330002862r2 a foaf:Agent ;
+	foaf:mbox <mailto:peter@stuifzand.com> .
+_:r1330002862r3 a foaf:Agent ;
+	foaf:mbox <mailto:fschlich@zedat.fu-berlin.de> .
+_:r1330002862r4 a foaf:Agent ;
+	foaf:nick "Nobody" .
+<http://purl.org/NET/cpan-uri/dist/WWW-Finger/project> dbug:issue <http://purl.org/NET/cpan-uri/rt/ticket/52771>, <http://purl.org/NET/cpan-uri/rt/ticket/67091>, <http://purl.org/NET/cpan-uri/rt/ticket/75122>, <http://purl.org/NET/cpan-uri/rt/ticket/75123> .
+<http://purl.org/NET/cpan-uri/rt/ticket/52771> dbug:assignee _:r1330002862r1 ;
+	dbug:id "52771"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=52771> ;
+	dbug:reporter _:r1330002862r0 ;
+	dbug:status status:resolved ;
+	dc:created "2009-12-15T05:42:17"^^xsd:dateTime ;
+	dc:modified "2009-12-15T16:03:22"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "Doesn't install cleanly off CPAN" .
+<http://purl.org/NET/cpan-uri/rt/ticket/67091> dbug:assignee _:r1330002862r1 ;
+	dbug:id "67091"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=67091> ;
+	dbug:reporter _:r1330002862r2 ;
+	dbug:status status:resolved ;
+	dc:created "2011-03-30T18:53:44"^^xsd:dateTime ;
+	dc:modified "2011-11-27T22:44:48"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "The module won't install, because of error in WWW::Finger::CPAN module" .
+<http://purl.org/NET/cpan-uri/rt/ticket/75122> dbug:assignee _:r1330002862r4 ;
+	dbug:id "75122"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=75122> ;
+	dbug:reporter _:r1330002862r3 ;
+	dbug:status status:resolved ;
+	dc:created "2012-02-18T22:08:09"^^xsd:dateTime ;
+	dc:modified "2012-02-23T13:10:22"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "replaced UNIVERSAL::AUTHORITY still referenced in meta" .
+<http://purl.org/NET/cpan-uri/rt/ticket/75123> dbug:assignee _:r1330002862r4 ;
+	dbug:id "75123"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=75123> ;
+	dbug:reporter _:r1330002862r3 ;
+	dbug:status status:resolved ;
+	dc:created "2012-02-18T22:11:58"^^xsd:dateTime ;
+	dc:modified "2012-02-23T13:11:00"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "please use Digest::SHA instead of Digest::SHA1" .

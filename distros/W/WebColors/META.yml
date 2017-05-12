@@ -1,0 +1,26 @@
+---
+abstract: 'Get the values for webcolours'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebColors
+requires:
+  Exporter: '0'
+  perl: v5.10.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/moodfarm/WebColors/issues
+  repository: https://github.com/moodfarm/WebColors
+version: 0.4.4

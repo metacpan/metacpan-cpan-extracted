@@ -1,0 +1,42 @@
+---
+abstract: 'retrieve text versions of comics on www.xkcd.com'
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-XKCD-AsText
+provides:
+  WWW::XKCD::AsText:
+    file: lib/WWW/XKCD/AsText.pm
+    version: '0.006'
+requires:
+  Carp: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  URI: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/kyzn/WWW-XKCD-AsText/issues
+  homepage: https://github.com/kyzn/WWW-XKCD-AsText
+  repository: https://github.com/kyzn/WWW-XKCD-AsText.git
+version: '0.006'
+x_contributors:
+  - 'Kivanc Yazan <kyzn@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

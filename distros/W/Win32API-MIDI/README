@@ -1,0 +1,56 @@
+	-*- Indented-text -*-
+# $Id: README,v 1.4 2003-04-13 22:58:10-05 hiroo Exp $
+
+Win32API::MIDI version 0.05
+=======================
+
+Win32API::MIDI - Perl extension for MS Windows 32bit MIDI API
+
+   Win32API::MIDI is a Perl extension for MS Windows 32bit MIDI API.
+   It supports almost all MS Windoews 32bit MIDI API, MIDI output,
+   input, and stream API.
+
+   This module is still under development.  API may be changed to
+   improve usability.
+
+INSTALLATION
+
+   To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+   This module is being developed on Cygwin (http://www.cygwin.com/)
+   environment.  It is not tested well on Active Perl environment,
+   since I don't have MS C Compiler.  I had a report saying it could
+   be compiled and MIDI output worked well but MIDI input did not.
+   Any feedback from ActiveState Perl users' are welcome.
+
+   On Cygwin Devel/gcc, Libs/w32api package are required in addition
+   to Base package.
+
+COPYRIGHT AND LICENCE
+
+   Copyright (c) 2003 Hiroo Hayashi.  All rights reserved.
+   
+   This program is free software; you can redistribute it and/or
+   modify it under the same terms as Perl itself.
+
+REVISION HISTORY:
+
+0.05  2003-04-??
+	- MANIFEST file is fixed!
+	- More documentation and test code.
+	- System exclusive support functions (Win32API::MIDI::SysEX)
+	  are added.
+
+0.04  2002-10-13
+	- Renamed to Win32API::MIDI.
+	- MANIFEST file was broken. Nobody used this release.
+
+0.03  2002-09-30
+	- The first public release as Win32::MIDI::API.

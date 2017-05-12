@@ -1,0 +1,54 @@
+Win32-Status
+
+This module provides a perl interface to the symbols defined in the Windows
+ntstatus.h header.  It allows mapping from integers to symbols and vice-versa.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Win32::Status
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-Status
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Win32-Status
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Win32-Status
+
+    Search CPAN
+        http://search.cpan.org/dist/Win32-Status/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Rohan McGovern
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License version 2.1 as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+

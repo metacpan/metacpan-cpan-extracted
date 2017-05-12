@@ -1,0 +1,91 @@
+NAME
+    WWW::NFSe::Guarapari- Module for issuance electronic invoice and
+    customer management.
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use WWW::NFSe::Guarapari; 
+
+        my $nfse = WWW::NFSe::Guarapari->new();
+        #my $nfse= new WWW::NFSe::Guarapari();
+
+        # Loga no sistema
+        $nfse->logar( "cpfcnpj", "senha" );
+
+        # Novo Cliente(Tomador/Intermediário)
+        my $tipo_tomador = "J"; # F - J - E(Estrangeiro)
+        my $documento = "000.000.000-00"; # CPF ou CNPJ
+        my $nome = "Fulano de Tal";
+        my $NomeFantasia = "Beltranos S.A"; #If tipo_tomador = "F"
+        my $InscricaoMunicipal = "000.000"; #If tipo_tomador = "F"
+        my $InscricaoEstadual = "000.000"; #If tipo_tomador = "F"
+        my $telefone = "";
+        my $email = "fulano@de.tal";
+        my $municipioEstrangeiro = "NeverLand"; #If tipo_tomador = "E"
+        my $PaisEstrangeiro = "NeverLand"; #If tipo_tomador = "E"
+        my $tipologradouro = "";
+        my $tipoEndereco = "-1"; # -1/Selecione | 3/Cobrança | 2/Comercial | 4/Correspondência | 1/Residencial
+        my $logradouro = "";
+        my $numero = "";
+        my $complemento = "";
+        my $bairro = "";
+        my #cep = "000.000-000";
+        my $uf = "DF";
+        my $cidades = "";
+
+        print $nfse->novo_cliente( $tipo_tomador, $documento, $nome, $telefone, $email, $tipologradouro, $tipoendereco, $logradouro, $numero, $complemento, $bairro, $cep, $uf, $cidades );
+
+METHODS
+  logar()
+    Loga no painel de controle. Este método deverá ser chamado antes de
+    qualquer outro método. Ativa flag $statusLogin.
+
+        my $status_login = $painel->logar($email, $senha);
+
+    Return string
+
+        logged, invalid login, not found, unknow HTTP error, connection error
+
+  novo_cliente()
+    Cria novo tomador/Intermediário
+
+        # Novo Cliente(Tomador/Intermediário)
+        my $tipo_tomador = "J"; # F - J - E(Estrangeiro)
+        my $documento = "000.000.000-00"; # CPF ou CNPJ
+        my $nome = "Fulano de Tal";
+        my $NomeFantasia = "Beltranos S.A";     #If tipo_tomador = "F"
+        my $InscricaoMunicipal = "000.000";     #If tipo_tomador = "F"
+        my $InscricaoEstadual = "000.000";      #If tipo_tomador = "F"
+        my $telefone = "";
+        my $email = "fulano@de.tal";
+        my $municipioEstrangeiro = "NeverLand";  #If tipo_tomador = "E"
+        my $PaisEstrangeiro = "NeverLand";       #If tipo_tomador = "E"
+        my $tipologradouro = "";
+        my $tipoEndereco = "-1"; # -1/Selecione | 3/Cobrança | 2/Comercial | 4/Correspondência | 1/Residencial
+        my $logradouro = "";
+        my $numero = "";
+        my $complemento = "";
+        my $bairro = "";
+        my #cep = "000.000-000";
+        my $uf = "DF";
+        my $cidades = "";
+
+        print $nfse->novo_cliente( $tipo_tomador, $documento, $nome, $telefone, $email, $tipologradouro, $tipoendereco, $logradouro, $numero, $complemento, $bairro, $cep, $uf, $cidades );
+
+    Return JSON
+
+        {"nome":"Fulano de Tal","resposta":"registrado","status":"sucesso","codigo":"107630"}
+        {"resposta":"E-mail em uso","status":"erro"}
+        {"resposta":"efetue login primeiro","status":"erro"}
+
+AUTHOR
+    Álvaro Luiz Andrade <alvaro@web2solutions.com.br>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by WEB2 Soluções.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

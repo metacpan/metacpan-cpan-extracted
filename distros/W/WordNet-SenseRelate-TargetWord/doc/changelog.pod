@@ -1,0 +1,218 @@
+=head1 NAME
+
+Revision History for WordNet::SenseRelate::TargetWord.
+
+=head1 SYNOPSIS
+
+A list of changes to the WordNet::SenseRelate::TargetWord package. These
+are copied from the Recently Completed Items in the file todo.pod when a
+new version is released. 
+
+=head1 DESCRIPTION
+
+=head2 Version 0.09 (12/24/06)
+
+=over
+
+=item *
+
+12/23/06
+
+=over
+
+=item (1)
+
+Removed Compound detection as a default preprocessing phase. (Sid)
+
+=item (2)
+
+Added documentation to README, with sample code for using the
+WordNet::SenseRelate::TargetWord module. (Sid)
+
+=item (3)
+
+Fixed bug: config option "targetpos" was being ignored by disamb.pl. (Sid)
+
+=item (4)
+
+Added documentation and example code usage to the PODs and man pages
+of the WordNet::SenseRelate::TargetWord module. (Sid)
+
+=item (5)
+
+Modified the order of authors in all documentation. (Sid)
+
+=item (6)
+
+Added data-structure/format checking of options hash passed to
+WordNet::SenseRelate::TargetWord initilization method. (Sid)
+
+=item (7)
+
+Added test scripts for all recent bugs fixed. (Sid)
+
+=back
+
+=item *
+
+07/18/05
+
+=over
+
+=item (1)
+
+Changed the default algorithm used by TargetWord to
+WordNet::SenseRelate::Algorithm::Local. (Sid)
+
+=item (2)
+
+Changed the default measure used by the "Local" and the "Global" algorithms
+to WordNet::Similarity::jcn. (Sid)
+
+=item (3)
+
+Modified some of the documentation. (Sid)
+
+=back
+
+=back
+
+=head2 Version 0.08 (Released 06/30/05)
+
+=over
+
+=item *
+
+06/29/05
+
+=over
+
+=item (1)
+
+Changed the contextpos-based sense restriction process. (Sid)
+
+=item (2)
+
+Made some changes to README. (Sid)
+
+=back
+
+=back
+
+=over
+
+=item *
+
+06/26/05
+
+=over
+
+=item (1)
+
+Added graphical interface senserelate.pl. (Sid)
+
+=item (2)
+
+Fixed bug in context selection module. (Sid)
+
+=back
+
+=back
+
+=head2 Version 0.07 (Released 06/24/05)
+
+=over
+
+=item *
+
+06/23/05
+
+=over
+
+=item (1)
+
+Added graphical interface disamb-gui.pl. (Sid)
+
+=item (2)
+
+Added documentation. (Sid)
+
+=back
+
+=back
+
+=over
+
+=item *
+
+06/19/05
+
+=over
+
+=item (1) 
+
+Added output traces to all the modules (Context.pm, Compounds.pm,
+Global.pm, Local.pm, Random.pm, SenseOne.pm). (Sid)
+
+=item (2)
+
+Fixed bug in Local.pm. (Sid)
+
+=back
+
+=back
+
+=head2 Version 0.06 (Released 06/13/05)
+
+=over
+
+=item *
+
+06/07/05
+
+=over
+
+=item (1)
+
+Converted the SenseRelate (v0.05) package to a modular package
+WordNet::SenseRelate::TargetWord. (Sid)
+
+=back
+
+=back
+
+=head1 AUTHORS
+
+  Ted Pedersen, University of Minnesota Duluth
+  tpederse at d.umn.edu
+
+  Siddharth Patwardhan, University of Utah, Salt Lake City
+  sidd at cs.utah.edu
+
+  Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+  banerjee+ at cs.cmu.edu
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 SEE ALSO
+
+todo.pod
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+Banerjee
+
+Permission is granted to copy, distribute and/or modify this  document  
+under the terms of the GNU Free Documentation License, Version 1.2 or  any  
+later version published by the Free Software Foundation; with no  
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the web   
+at L<http://www.gnu.org/copyleft/fdl.html> and is included in this    
+distribution as FDL.txt. 
+
+=cut
+

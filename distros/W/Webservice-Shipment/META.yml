@@ -1,0 +1,34 @@
+---
+abstract: 'Get common shipping information from supported carriers'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Webservice-Shipment
+provides:
+  Webservice::Shipment:
+    file: lib/Webservice/Shipment.pm
+    version: '0.03'
+  Webservice::Shipment::Carrier:
+    file: lib/Webservice/Shipment/Carrier.pm
+  Webservice::Shipment::Carrier::UPS:
+    file: lib/Webservice/Shipment/Carrier/UPS.pm
+  Webservice::Shipment::Carrier::USPS:
+    file: lib/Webservice/Shipment/Carrier/USPS.pm
+  Webservice::Shipment::MockUserAgent:
+    file: lib/Webservice/Shipment/MockUserAgent.pm
+requires:
+  Mojolicious: '5.0'
+  Time::Piece: '0'
+resources:
+  bugtracker: https://github.com/jberger/Webservice-Shipment/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Webservice-Shipment
+version: '0.03'

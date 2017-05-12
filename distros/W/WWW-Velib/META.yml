@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                WWW-Velib
+version:             0.05
+abstract:            Download account information from the Velib website
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Crypt::SSLeay:                 0.53
+    LWP::Simple:                   0
+    Math::Trig:                    0
+    WWW::Mechanize:                0
+    XML::Twig:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - David Landgren

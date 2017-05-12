@@ -1,0 +1,4 @@
+Changelog for WWW::Scraper::Lite
+================================
+12 - Updated Build.PL dependencies
+9  - Initial import, support for crawling, XPath expressions, callbacks

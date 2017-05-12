@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-30Boxes-API
+version:      1.05
+version_from: lib/WebService/30Boxes/API.pm
+installdirs:  site
+requires:
+    HTTP::Request:                 0
+    HTTP::Response:                0
+    LWP::UserAgent:                0
+    Test::Simple:                  0.44
+    URI:                           0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

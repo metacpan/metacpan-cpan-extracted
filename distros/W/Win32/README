@@ -1,0 +1,50 @@
+TaskScheduler version 2.0.0
+==========================
+
+This package implements almost all functions useful to manage scheduled
+tasks under Win32.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test [might mess your setting for certain tasks!!]
+   nmake install
+
+DEPENDENCIES
+
+none.
+
+NOTES
+
+Please note that starting with major release 2 the package uses an object
+oriented approach which breaks compatibility with older versions.
+
+This new OO approach lets you have more than one tasks active at once, just call
+New() as many times as you need and assign the returned hash to different variables.
+
+If you upgrade please update your scripts too, or they won't work.
+If you have the Cygwin utilities, sed, a UNIX box or any decent text
+editor you can use something like this:
+
+#sed "s/Win32::TaskScheduler::/\$scheduler->/g" test.pl > test2.pl
+(for those of you not UNIX aware: substitute every occurrence of 
+Win32::TaskScheduler:: with $scheduler-> in file test.pl and save new file
+as test2.pl)
+
+Then open the new file and add a line like this at the beginning, after the use
+directives and before any task scheduler operation:
+
+$scheduler=Win32::TaskScheduler->New();
+
+That's it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Umberto Nicoletti unicolet@netscape.net
+
+This library is free software; you can redistribute it and/or modify
+it under the GPL license. 
+

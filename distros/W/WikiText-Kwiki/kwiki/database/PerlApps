@@ -1,0 +1,10 @@
+A list of perl-based pdx.pm-recommended apps:
+
+* [Open Webmail http://openwebmail.com]
+* [Mailman http://www.list.org] (written in Python, but it's a standard)
+* [SQL-Ledger http://www.sql-ledger.org] Double entry accounting system with lots of nice features.
+* [SpamAssassin http://spamassassin.org/] Goodbye, spam, buh-byeee!
+* [Siesta http://siesta.unixbeard.net/] Mailing list manager ([on cpan http://search.cpan.org/dist/Siesta/])
+* [Majordomo http://www.greatcircle.com/majordomo/]
+* [ Strace http://freshmeat.net/projects/strace/] See what system calls your processes are making. Swell for debugging.
+* [Interchange http://www.icdevgroup.org/] Excellent open source e-commerce server.

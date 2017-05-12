@@ -1,0 +1,110 @@
+Package WebFS::FileCopy version 1.04
+
+This is the WebFS::FileCopy package.  This module provides subroutines
+for the getting, putting, copying, moving and deleting of files
+located by URIs.  It also supports listing directories identified by
+URI.  Currently, files for getting can use any URI protocol, such as
+file, FTP, HTTP, etc.  For putting, only the file and FTP protocols
+are currently supported.
+
+Notable features:
+
+   * Uses LWPng for simultaneous file transfers.
+
+   * Get the contents of multiple URIs simultaneously.
+
+   * Put content into multiple URIs simultaneously.
+
+   * Copy multiple files located by URIs to multiple locations
+     simultaneously.
+
+   * Delete a file located by a URI.
+
+   * Move a file located from located at one URI to another location.
+
+   * List the contents of a URI directory.
+
+WARNINGS AND LWPng PATCHES
+
+This package is based on Gisle Aas's LWPng-alpha module, which is
+still alpha code.  Because the LWPng interface may change in the
+future, this module may break if LWPng is updated in the future
+without updating WebFS::FileCopy.
+
+There are two available patches to LWPng in the patches subdirectory:
+
+  1) patches/LWPng-0.24-patch-1
+
+     The first guesses the content type and try to determine if a file
+     to be read from disk should be read in binary or text mode.  Go
+     into binary mode unless the content type is some form of text.
+     This is really only useful in Win32 platforms.
+
+  2) patches/LWPng-0.24-patch-2
+
+     With at least Perl version 5.6.0, you will need to apply the
+     following patch to LWPng to prevent a 'Prototype mismatch: sub
+     IO::Handle::blocking ($;$) vs none at ../lib/LWP/Conn/_Connect.pm
+     line 43' warning.
+
+REQUIREMENTS
+
+   * Perl 5.004_04 or greater.
+
+   * LWPng-alpha 0.24 or greater.
+
+   * URI 1.09 or greater.
+
+   * Net::FTP 2.56 or greater.
+
+SUPPORTED PLATFORMS
+
+I have built and tested the WebFS::FileCopy package on both Solaris
+and Windows NT machines.
+
+AVAILABILITY
+
+The latest version of this package is available for download from a
+CPAN (Comprehensive Perl Archive Network) site near your at
+
+    http://www.perl.com/CPAN/authors/id/B/BZ/BZAJAC/
+
+or from my FTP site:
+
+    ftp://ftp.gps.caltech.edu/pub/blair/Perl/
+
+INSTALLATION
+
+In order to use this package you will need Perl version 5.004_04 or
+better.
+
+You will need a LWPng-alpha version 0.24 or greater.  Versions older
+than this one will not work with WebFS::FileCopy.  Get LWPng-alpha
+from CPAN as CPAN/authors/id/G/GA/GAAS/LWPng-alpha-?.??.tar.gz.
+
+If you do not have Net::FTP installed, use CPAN to install Net::FTP.
+
+If you want to install a private copy of this package in some other
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+    perl Makefile.PL LIB=~/perl
+
+DOCUMENTATION
+
+See the CHANGES file for a list of recent changes.  POD style
+documentation is included in all modules and scripts.  These are
+normally converted to manual pages end installed as part of the "make
+install" process.  You should also be able to use the 'perldoc'
+utility to extract documentation from the module files directly.
+
+AUTHOR, COMMENTS AND BUGS
+
+I welcome all comments and bug reports.  Please email them to Blair
+Zajac <blair@akamai.com>.
+
+COPYRIGHT
+
+Copyright (C) 1998-2001 Blair Zajac.  All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

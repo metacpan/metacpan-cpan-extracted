@@ -1,0 +1,22 @@
+Revision history for W3C::Validator::Server
+
+0.1201   Fri Jun 17 10:51:34 CEST 2011
+       - Merge pull request #1 from alanhaggai/master
+         Replace `chdir` with `cd`
+
+0.12     Fri Jun 10 17:50:39 CEST 2011
+       - Add build_app() to W3C::Validator::Server
+
+0.11     Wed Jun  8 21:22:06 CEST 2011
+       - Remove P::A::File::DirectoryIndex
+
+0.1002   Wed Jun  8 15:50:32 CEST 2011
+       - Add missing dependencies
+
+0.1001   Wed Jun  8 14:32:23 CEST 2011
+       - Fix repository URL
+
+0.10     Wed Jun  8 14:28:22 CEST 2011
+       - First release of W3C::Validator::Server
+       - Add install and psgi script
+

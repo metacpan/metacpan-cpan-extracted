@@ -1,0 +1,3 @@
+Just some perl humor for you....
+
+s/bush/gerry/ig

@@ -1,0 +1,8 @@
+WWW::Restaurant::Menu 0.11
+A Perl class collection for querying online menus of restaurants.
+(C) 2004-2005 Julian Mehnle <julian@mehnle.net>
+
+See WWW::Restaurant::Menu::Overview for an introduction.
+
+# $Id: README,v 1.5 2005/01/15 15:46:15 julian Exp $
+# vim:tw=79

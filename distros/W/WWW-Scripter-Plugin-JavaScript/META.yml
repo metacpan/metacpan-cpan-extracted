@@ -1,0 +1,39 @@
+--- #YAML:1.0
+name:               WWW-Scripter-Plugin-JavaScript
+version:            0.009
+abstract:           JavaScript plugin for WWW::Scripter
+author:
+    - Father Chrysostomos <sprout & cpan . org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    CSS::DOM::Interface:  0
+    Encode:               0
+    Hash::Util::FieldHash::Compat:  0
+    HTML::DOM:            0.027
+    HTML::DOM::EventTarget:  0.032
+    HTML::DOM::Interface:  0.032
+    JE:                   0.038
+    JE::Destroyer:        0
+    lib:                  0
+    LWP::UserAgent:       5.815
+    Scalar::Util:         1.09
+    strict:               0
+    Test::More:           0
+    URI::Escape:          0
+    URI::file:            0
+    warnings:             0
+    WWW::Scripter:        0.022
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

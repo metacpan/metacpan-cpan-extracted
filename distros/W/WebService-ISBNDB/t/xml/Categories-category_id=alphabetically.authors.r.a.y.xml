@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:25">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="alphabetically.authors.r.a.y" parent_id="alphabetically.authors.r.a">
+<Name>Y</Name>
+<Details summary="Authors, 'RAY'" depth="4" element_count="0" />
+<SubCategories></SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

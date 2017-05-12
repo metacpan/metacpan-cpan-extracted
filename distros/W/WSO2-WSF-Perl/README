@@ -1,0 +1,90 @@
+
+            Web Services Framework (Perl extension) - WSF/Perl
+	    --------------------------------------------------
+
+
+What it is?
+-----------
+
+WSF/Perl is Perl language bindings for WSO2 WSF/C which can be accessed by
+visiting http://wso2.org/projects/wsf/c.  WSO2 WSF/C is a Web services
+framework supporting consuming and providing SOAP as well as REST style
+services.
+
+WSF/Perl supports SOAP 1.1, SOAP 1.2, SOAP MTOM, WS-Addressing, WS-Security,
+WS-SecurityPolicy, WS-ReliableMessaging and REST service invocation.
+
+
+The Latest Version
+------------------
+
+Details of the latest version can be found on the WSO2 WSF/Perl project page
+under http://wso2.org/projects/wsf/perl
+
+
+Installation
+------------
+
+Before installing WSF/Perl you should install WSF/C which is available from
+http://wso2.org/projects/wsf/c.  If you install WSF/C to the standard location
+(which is /opt/wso2/wsf_c) you can proceed with the following commands to get
+WSF/Perl installed.  If you have installd WSF/C to a non standard folder
+setting WSFC_HOME environment variable will allow the WSF/Perl installer to
+find the correct headers and libraries and install itself.
+
+Also note that WSF/Perl depends on Error.pm module so you need to install that
+before installing WSF/Perl.
+
+You can install Error module from CPAN, issue the following command,
+
+$ perl -MCPAN -e 'install Error'
+
+Then proceed to install WSF/Perl,
+
+$ perl Makefile.PL
+$ make
+$ sudo make install
+
+After installing WSF/Perl you could run samples in the samples folder.  You
+need to have the WSF/C lib folder in your library path.  If you don't have it
+you could set the environment variable LD_LIBRARY_PATH before runnig the
+samples.
+
+$ export LD_LIBRARY_PATH=<path to WSF/c>/lib
+
+
+Licensing
+---------
+
+WSO2 WSF/Perl is released under Apache License Version 2.0.  Please see the file
+called LICENSE.  The generated file from SWIG (WSFC_wrap.c) is under the same
+license as SWIG.  Please see http://www.swig.org/copyright.html for more
+information about the license of SWIG.
+
+
+Contacts
+--------
+
+   o If you want freely available support for using WSO2 WSF/Perl please
+     join the WSO2 WSF/Perl user community by subscribing to users mailing
+     list, wsf-perl-user@wso2.org by sending an email to 
+     'wsf-perl-user-request@wso2.org' with the subject 'subscribe'.
+
+   o If you have a bug report for WSO2 WSF/Perl please go log a Jira issue
+     at https://wso2.org/jira/browse/WSFPERL
+
+   o If you want to participate in actively developing WSO2 WSF/Perl please
+     subscribe to the 'wsf-c-dev@wso2.org' by sending and email to 
+     wsf-c-dev-request@wso2.org with the subject 'subscribe'.
+
+
+Support
+-----------
+
+WSO2 Inc. offers a variety of development and production support
+programs, ranging from Web-based support up through normal business
+hours, to premium 24x7 phone support.
+
+For additional support information please refer to http://wso2.com/support/ 
+
+

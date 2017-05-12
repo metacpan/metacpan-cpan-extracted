@@ -1,0 +1,24 @@
+---
+name: WebService-Google-Contact
+version: 0.1
+author:
+  - 'DAISUKE ABUI <abui@cpan.org>'
+abstract: Simple Interface for Google Contact API.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor::Fast: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI: 0
+  XML::Liberal: 0
+  version: 0
+provides:
+  WebService::Google::Contact:
+    file: lib/WebService/Google/Contact.pm
+    version: 0.1
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

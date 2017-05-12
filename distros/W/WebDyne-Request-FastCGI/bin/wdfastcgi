@@ -1,0 +1,20 @@
+#!/bin/perl
+
+
+#  Init FastCGI responder
+#
+sub BEGIN {
+    #  Massage warnings and @INC path
+    $^W=0;
+    use File::Spec;
+    use FindBin qw($RealBin $Script);
+    require File::Spec->catfile($RealBin, 'perl5lib.pl');
+    perl5lib->import(File::Spec->catdir($RealBin, File::Spec->updir()));
+};
+use strict qw(vars);
+use WebDyne::Request::FastCGI::Run;
+
+
+#  Start endless loop
+#
+WebDyne::Request::FastCGI::Run->start();

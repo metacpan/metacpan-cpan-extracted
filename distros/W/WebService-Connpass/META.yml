@@ -1,0 +1,40 @@
+---
+abstract: 'connpass API (v1) wrapper module for perl5'
+author:
+  - 'Masanori Ohgita (http://ohgita.info)'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4002, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Connpass
+provides:
+  WebService::Connpass:
+    file: lib/WebService/Connpass.pm
+    version: v0.0.1
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  Data::Recursive::Encode: 0
+  DateTime::Format::ISO8601: 0
+  File::Slurp: 0
+  FindBin: 0
+  Hash::AsObject: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Module::Build: 0
+  Plack::Loader: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.08
+  Test::TCP: 0
+  URI: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.1

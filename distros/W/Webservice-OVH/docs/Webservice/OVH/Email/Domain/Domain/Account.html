@@ -1,0 +1,278 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_existing">_new_existing</a></li>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#is_valid">is_valid</a></li>
+      <li><a href="#is_valid1">_is_valid</a></li>
+      <li><a href="#name">name</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#is_blocked">is_blocked</a></li>
+      <li><a href="#email">email</a></li>
+      <li><a href="#domain">domain</a></li>
+      <li><a href="#description">description</a></li>
+      <li><a href="#size">size</a></li>
+      <li><a href="#change">change</a></li>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#delete1">delete</a></li>
+      <li><a href="#usage">usage</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Email::Domain::Domain::Account</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $email_domain = $ovh-&gt;email-&gt;domain-&gt;domain(&#39;testdomain.de&#39;);</p>
+
+<p>my $account = $email_domain-&gt;new_account( account_name =&gt; &#39;testaccount&#39;, password =&gt; $password, description =&gt; &#39;a test account&#39;, size =&gt; 50000000 );</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides access to email accounts.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_existing">_new_existing</h2>
+
+<p>Internal Method to create an Account object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $domain - parent domain Objekt, $account_name =&gt; unique name</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Email/Domain/Domain/Account.html">Webservice::OVH::Email::Domain::Domain::Account</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Email::Domain::Domain::Account-&gt;_new_existing($ovh_api_wrapper, $domain, $account_name, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Account object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $domain - parent domain, %params - key =&gt; value</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Email/Domain/Domain/Account.html">Webservice::OVH::Email::Domain::Domain::Account</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Email::Domain::Domain::Account-&gt;_new($ovh_api_wrapper, $domain, $module, account_name =&gt; $account_name, password =&gt; $password, description =&gt; $description, size =&gt; $size );</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid">is_valid</h2>
+
+<p>When this account is deleted on the api side, this method returns 0.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;Valid&quot; if $account-&gt;is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid1">_is_valid</h2>
+
+<p>Intern method to check validity. Difference is that this method carps an error.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: $account-&gt;_is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="name">name</h2>
+
+<p>Unique identifier.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $name = $account-&gt;name;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Returns the raw properties as a hash. This is the original return value of the web-api.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $account-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="is_blocked">is_blocked</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $is_blocked = $account-&gt;is_blocked;</p>
+
+</li>
+</ul>
+
+<h2 id="email">email</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $email = $account-&gt;email;</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Returns the email-domain this account is attached to.</p>
+
+<ul>
+
+<li><p>Return: <a>Webservice::Email::Domain::Domain</a></p>
+
+</li>
+<li><p>Synopsis: my $email_domain = $account-&gt;domain;</p>
+
+</li>
+</ul>
+
+<h2 id="description">description</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $description = $account-&gt;description;</p>
+
+</li>
+</ul>
+
+<h2 id="size">size</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $size = $account-&gt;size;</p>
+
+</li>
+</ul>
+
+<h2 id="change">change</h2>
+
+<p>Changes the account</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value description size</p>
+
+</li>
+<li><p>Synopsis: $account-&gt;change(description =&gt; &#39;authors account&#39;, size =&gt; 2000000 );</p>
+
+</li>
+</ul>
+
+<h2 id="delete">delete</h2>
+
+<p>Deletes the account api sided and sets this object invalid.</p>
+
+<ul>
+
+<li><p>Synopsis: $account-&gt;delete;</p>
+
+</li>
+</ul>
+
+<h2 id="delete1">delete</h2>
+
+<p>Deletes the account api sided and sets this object invalid.</p>
+
+<ul>
+
+<li><p>Parameter: $password - new password</p>
+
+</li>
+<li><p>Synopsis: $account-&gt;change_password($password);</p>
+
+</li>
+</ul>
+
+<h2 id="usage">usage</h2>
+
+<p>Deletes the account api sided and sets this object invalid.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: $account-&gt;change_password($password);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

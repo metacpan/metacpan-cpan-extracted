@@ -1,0 +1,14 @@
+blib
+\.git
+\.gitignore$
+\.releaserc$
+^Makefile$
+^Makefile\.old$
+^MANIFEST\.bak$
+\.orig$
+pm_to_lib
+.*\.swp$
+WWW-PivotalTracker-.*
+\.shipit$
+t/tmp/*
+t/pod_spell.t

@@ -1,0 +1,36 @@
+<HTML>
+<BODY>
+<B>Simple Session Demo<BR><BR>
+<?perl 
+ $coded_buffer = '';
+ if($sess_force_flat =~ m/^on$/)
+   {
+    $dbh = '';
+   }
+ else
+   {
+    $dbh = sql_connect();
+   }
+ $myid = session_start($dbh);
+ $i = read_scalar ('counter');
+ $i++;
+ if($i == 1)
+  {
+   print "Session Started!<BR>";
+  }
+ if($i > 4)
+  {
+   print "Session destroyed!<BR>";
+   session_destroy($dbh);
+  }
+ else
+  {
+   $coded_buffer .= register_var ('scalar','counter',$i);
+   session_register($coded_buffer,$dbh);
+  }
+ print "Current count of executions for this session is: ".$i;
+ print "<BR><BR>Please press Ctrl+R to refresh this page!";
+?>
+</B>
+</BODY>
+</HTML>

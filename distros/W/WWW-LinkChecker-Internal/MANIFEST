@@ -1,0 +1,16 @@
+Build.PL
+Changes
+examples/shlomif-homepage-local.bash
+lib/WWW/LinkChecker/Internal.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/cpan-changes.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t
+Makefile.PL
+META.yml
+META.json
+scripts/link-checker

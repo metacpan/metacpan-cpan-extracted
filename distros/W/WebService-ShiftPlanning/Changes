@@ -1,0 +1,5 @@
+Revision history for WebService-ShiftPlanning
+
+0.01    Date/time
+        Extracted WebService::ShiftPlanning from module of aggregated private code
+

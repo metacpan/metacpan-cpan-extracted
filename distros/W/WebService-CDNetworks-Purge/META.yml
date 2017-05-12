@@ -1,0 +1,37 @@
+---
+abstract: "A client for the CDNetworks's Cache Flush Open API"
+author:
+  - 'Jean Pierre Ducassou <jpducassou at gmail dot com, no spaces>'
+build_requires:
+  Test::Exception: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+  Test::NoWarnings: '1.04'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-CDNetworks-Purge
+provides:
+  WebService::CDNetworks::Purge:
+    file: lib/WebService/CDNetworks/Purge.pm
+    version: '0.23'
+requires:
+  Carp: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  perl: v5.8.8
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/jpducassou/perl-WebService-CDNetworks-Purge/issues
+  repository: git://github.com/jpducassou/perl-WebService-CDNetworks-Purge
+version: '0.23'
+x_serialization_backend: 'YAML::Tiny version 1.70'

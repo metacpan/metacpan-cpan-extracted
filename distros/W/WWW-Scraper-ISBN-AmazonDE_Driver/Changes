@@ -1,0 +1,79 @@
+Revision history for WWW::Scraper::ISBN::AmazonDE_Driver
+========================================================
+
+0.28    2015-01-31
+
+  [MISC]
+  * Add metadata for resources to dist.ini
+
+0.27    2015-01-31
+
+  [MISC]
+  * fix changes file
+
+0.26    2015-01-31
+
+  [MISC]
+  * Deprecate module
+
+0.25    2012-10-04
+
+        + fix regex in t/02_die_welle.t
+
+0.24    2012-10-03
+
+        + minor fix in t/02_die_welle.t
+
+0.23    2012-02-17
+
+        + for some books the format of title and author changed
+
+0.22    2011-12-28
+
+        + description meta tag changed for some books
+
+0.21    2010-08-08
+
+        + adopt README
+        + adopt License
+
+0.2     2010-08-08
+
+        + request the site for the ISBN directly
+
+0.1     2009-11-22
+
+        + fix some bugs in the tests
+        + Amazon.de has changed the layout of the pages
+        + switched to Artistic License 2.0
+
+0.044   2008-11-05
+
+        - a small fix in META.yml
+        - a small fix in 02_*.t
+
+0.043   2008-11-04
+
+        + fix some bugs in the tests
+
+0.042   2008-08-28
+
+        + changed publish date of 'Die Welle' due to a new edition
+
+0.041   2008-05-14
+
+        + new upload due to changes on an internal tool
+
+0.04    2008-05-13
+
+        + some changes due to changes on Amazon.de
+
+0.02    2007-09-18
+
+        + Replaced RegEx by Web::Scraper
+        + added some prereqs to Build.PL
+        - bugfix: handle some more titles
+        
+0.01    2007-08-12
+
+        First version, released on an unsuspecting world.

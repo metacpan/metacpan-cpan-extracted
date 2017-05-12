@@ -1,0 +1,9 @@
+do { my $x = {
+       'a-cd59806361b64' => '2e9d0338-6bf7-1014-84f8-8982487cd7cd',
+       'c-9d2392d06fcb4' => '9e2a87dc-6bf3-1014-bac8-f00d109e4eae',
+       'cvrsnica-freebsd-92' => '3c68fc3e-7536-11e6-bc6e-bffe313d1b4f',
+       'nightshade64' => '58c88ce8-37fe-11e6-afb7-4393435f1677',
+       'virtua.com.br' => '45d0a1fa-6343-11e6-a772-a07c19fe2ca9'
+     };
+  $x;
+ }

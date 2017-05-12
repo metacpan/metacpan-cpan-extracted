@@ -1,0 +1,36 @@
+---
+abstract: 'Interface to EFA sites (Elektronische Fahrplanauskunft)'
+author:
+  - 'Robin Clarke <perl@robinclarke.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-EFA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Class::Date: 0
+  Digest::SHA: 0
+  File::Spec::Functions: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Aliases: 0
+  MooseX::Params::Validate: 0
+  Test::More: 0
+  Try::Tiny: 0
+  URI: 0
+  XML::LibXML: 0
+  YAML: 0
+version: 0.04

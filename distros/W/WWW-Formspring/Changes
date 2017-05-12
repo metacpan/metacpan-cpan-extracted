@@ -1,0 +1,414 @@
+commit 0f6ea000992f1f12d52969f59091ccb44827ac30
+Author: William Orr <will@worrbase.com>
+Date:   Sat Sep 18 05:16:24 2010 -0400
+
+    Added WWW::Formspring::Question to manifest
+
+commit cc64c8bc619b484a159c168815ff9a132c96cacd
+Author: William Orr <will@worrbase.com>
+Date:   Sat Sep 18 04:59:30 2010 -0400
+
+    Version bump
+
+commit 077a52b7d5ae3c678c9b5ce56f7acf94a695c19b
+Author: William Orr <will@worrbase.com>
+Date:   Sat Sep 18 04:55:23 2010 -0400
+
+    Updated documentation
+    
+    - fixed bug where respond shared method name with answer
+
+commit faa27bd6a32bfc6de80db72acab82d92b0f63877
+Author: William Orr <will@worrbase.com>
+Date:   Sat Sep 18 04:47:13 2010 -0400
+
+    Added Question object
+    
+    - added inheritence from Question object
+    - added Question->ask and Response->answer
+
+commit ddf7e9bc5cdfa631b4c77bee2cdead2597230927
+Author: William Orr <will@worrbase.com>
+Date:   Sat Sep 18 04:35:57 2010 -0400
+
+    Added dependencies in Makefile.PL
+    
+    - version bump for upcoming features
+
+commit c94cd5e4646a30344a515788809d068762511a12
+Author: William Orr <will@worrbase.com>
+Date:   Fri Sep 10 15:38:31 2010 -0400
+
+    Made some basic changes to testing framework
+    
+    - Removed some testing modules from code
+
+commit 3814eecbdf87adf0d3fb53169d749dcfe89bb295
+Author: William Orr <will@worrbase.com>
+Date:   Sun Aug 1 14:19:02 2010 -0400
+
+    profile_details takes a WWW::Formspring::User object
+
+commit 1136766fc85a0160123433fe2b5d121f2fbfce49
+Author: William Orr <will@worrbase.com>
+Date:   Sun Aug 1 14:17:38 2010 -0400
+
+    inbox methods can take objects
+
+commit 4ccb43f440f34e403583b4f0357a719fe2cc0be1
+Author: William Orr <will@worrbase.com>
+Date:   Sun Aug 1 14:08:28 2010 -0400
+
+    follow methods take objects now
+
+commit e339cdf166f97f47db3aa16dae1ad9e9225373a5
+Author: William Orr <will@worrbase.com>
+Date:   Sun Aug 1 14:01:01 2010 -0400
+
+    answered_remove takes a WWW::Formspring::Response
+
+commit c7b8f6bd41ba41d5ae61795644ff2f3204304bc3
+Author: William Orr <will@worrbase.com>
+Date:   Sun Aug 1 12:51:58 2010 -0400
+
+    answered_list now accepts a WWW::Formspring::User
+    
+    - also made ref checking better
+
+commit 28f56a2110dfdce10c4cb9553bf953479e6c2884
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 09:52:59 2010 -0400
+
+    Better way to check if object
+
+commit b1b951b2161c249faa3a34ed8efd3eda240f6a03
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 09:48:01 2010 -0400
+
+    answered_details can now take a WWW::Formspring::Response object
+
+commit c11963159a969655755a53ef4281c76dc8981983
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 09:33:15 2010 -0400
+
+    Better param checking in OAuth code
+
+commit 9327775909bdc13f3e4cd7e52bc58b3e44e5ebb3
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 09:18:18 2010 -0400
+
+    Wrote better documentation
+
+commit 913675e33accbcca12995c7bbe78a33663539ef7
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 07:02:51 2010 -0400
+
+    Removed changelog from tracked files
+
+commit 100e813ea1ffd2017144d1736024bbd99616e840
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 06:49:55 2010 -0400
+
+    Handled most options parameters
+    
+    - added TODO for services
+
+commit e289b0605b433a6099eb5e45b31818f52d233cea
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 06:34:13 2010 -0400
+
+    Cleaned up search_profiles
+    
+    - doesn't break on searches that return one item
+    - more standard param handling
+
+commit cf9e195871aa0dcffdd39304dbf9ae01b496785a
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 06:10:39 2010 -0400
+
+    Implemented auth'd profile_details
+
+commit cb170b7a54250fadc24282987da37f88a7d0d8bc
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 06:03:46 2010 -0400
+
+    Wrote profile_ask
+
+commit 6cd483c1f66c8f995ed16ffea23bd0d067313e7c
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 05:46:45 2010 -0400
+
+    Fixed bug when responding with response object
+
+commit 1b98ba38f4b2ddda2072bf117532570d92509558
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 05:39:06 2010 -0400
+
+    Made POST-ing work better
+    
+    - fixed small, dumb sigil error
+    - post uses to_post_body instead of to_hash
+    - made inbox_respond work
+
+commit f896e231d998d8873ee6e36d14b658f353029a19
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 04:59:20 2010 -0400
+
+    Removed some leftover test code
+
+commit 3d68f8acf33d96ac533209a7b8fa8b97d9e94883
+Author: William Orr <will@worrbase.com>
+Date:   Sat Jul 31 04:58:17 2010 -0400
+
+    Fixed some authentication bugs
+    
+    - POSTs correctly
+    - gets parameters correctly
+
+commit b1e78684b30797a26ed5611f5c575cf8cb824a6e
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 15:20:47 2010 -0400
+
+    Wrote inbox_remove
+
+commit 1abde7ddfb25076728ba3d56d024abfac4699e46
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 15:14:30 2010 -0400
+
+    Wrote inbox_random
+
+commit 16b03f4b878334134312db06bfc1d7fddb9e8cba
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:53:33 2010 -0400
+
+    Wrote inbox_list
+
+commit 3bed48a7832ac029edb808a9100aecc6da6f56ad
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:40:36 2010 -0400
+
+    Major internal changes
+    
+    - connect methods call _xmlify on their return contents
+    - _unauth_connect calls _auth_connect if auth creds are defined
+
+commit 484d057da8f41c3abff8e8196217e2f2882730bd
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:33:11 2010 -0400
+
+    Wrote inbox_count
+    
+    - fixed bug where counts of 0 would return user objects
+
+commit 961de5a65c0d5a6a34ad810e91fcbf85788836be
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:23:01 2010 -0400
+
+    Wrote inbox_block
+
+commit ff52aa694f1a8ad7ba36da9f195ccc8ea24d8548
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:14:46 2010 -0400
+
+    Put URL in my namespace...where it belongs
+
+commit 5ec93854f0070936e1be7fd5dcf396d9fa8e555e
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 14:12:42 2010 -0400
+
+    Wrote follow_remove and follow_list
+
+commit 9d2897262eb609c141fe8644f45fd65ff81ec5e1
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 04:45:29 2010 -0400
+
+    Implemented follow_count
+
+commit 12559949cb659a050ee58a36a3bddcd402e96cde
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 04:42:53 2010 -0400
+
+    Wrote follow_answers
+    
+    - xmlify now handles profile tags in responses
+
+commit 9a691f8673a1efd86ec8c47c8e51ac36b72fe78f
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 04:14:22 2010 -0400
+
+    Added asked_to parameter to WWW::Formspring::Response
+    
+    - fixed answered_list to add that param
+
+commit c6a2c2dcacea844fd0a34b246a341683f8ccfd30
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 03:56:16 2010 -0400
+
+    Fixed some borked typing issues
+
+commit 81208f5c7fd6dbf8032c4dc3b452e3e1656c2011
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 03:09:48 2010 -0400
+
+    Wrote broken version of follow_add
+    
+    - breaks on making a new user...which is undocumented...
+
+commit cb863ab291589cc5723cdaf3df1e3c3fbe06294b
+Author: William Orr <will@worrbase.com>
+Date:   Sun Jul 25 02:52:22 2010 -0400
+
+    Added remove_answered
+    
+    - added access_token and access_secret member vars
+    - wrote _auth_connect
+
+commit acb32e2cd64e7f9516ca2685e4a472aa86fa8710
+Author: William Orr <will@worrbase.com>
+Date:   Wed Jul 21 16:36:27 2010 -0400
+
+    Changed some of the user object testing
+
+commit 618ec15eabd9fb844fa9947b2b6e1327f2f6af32
+Author: William Orr <will@worrbase.com>
+Date:   Wed Jul 21 16:36:04 2010 -0400
+
+    Authentication works
+    
+    - formspring fixed their bug
+    - I fixed mine :)
+
+commit d016458dbc5b317ac1182b1c2481ec99a0b4859f
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 8 03:45:31 2010 -0400
+
+    Fixed testing errors due to subclasses not knowing about subtypes
+
+commit 343687fbe9f18eeaa6c58cc1cae6891599e3a2f6
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 8 03:28:49 2010 -0400
+
+    Moved subtype definitions around
+    
+    - Stuck subtype definitions in WWW::Formspring
+    - Added URL subtype
+    - Made FormspringURL a child of URL
+
+commit ed279d75480255e005caeb6814882ac3b15d646c
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 8 03:21:36 2010 -0400
+
+    Added stricter types to WWW::Formspring::Response
+    
+    - Natural for message id
+
+commit ee4e9ffe01ff29bfbc8e6ea93c5f0097cedcbe3f
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 8 03:05:43 2010 -0400
+
+    Beefed up tests
+    
+    - Better testing plan for Formspring.pm
+    - Slightly better testing plan for Formspring/Response.pm
+    - Added predicates to Formspring.pm
+
+commit 3f1a1bc6b29168a3ecead587201f0f2325106153
+Author: William Orr <will@worrbase.com>
+Date:   Tue Jul 6 03:49:07 2010 -0400
+
+    Added callback_url so everything doesn't need to be oob
+
+commit b8bc8aa81f07a40bb04faefd4d066ae83ccf4517
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 1 04:28:18 2010 -0400
+
+    Bugfixes
+    
+    - Uses OAuth 1.0a
+    - Fixed spelling of verifier
+    - Added oauth_callback field
+
+commit c25f4c24f9951a38e7376b111f84ca678793f25a
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 1 03:37:39 2010 -0400
+
+    I can almost get access tokens
+    
+    - Get 401 Unauthorized errors?
+
+commit adb1591c010d2375d35f3f9adacb7ece991253ab
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jul 1 02:48:33 2010 -0400
+
+    I can get request tokens!
+
+commit 27577148ab9a0c799860f4e47ae8a20dcfa8015c
+Author: William Orr <will@worrbase.com>
+Date:   Fri Jun 11 10:29:05 2010 -0400
+
+    Temp commit
+
+commit 39d8511152df4c4a8964cd3124566a6ac45425ea
+Author: William Orr <will@worrbase.com>
+Date:   Fri Jun 4 18:28:43 2010 -0400
+
+    Wrote search_profiles
+
+commit 9b160184196e9ad7c054bfdd4a4b24e6df03a790
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 06:34:27 2010 -0400
+
+    Wrote bits of search/profiles
+    
+    - Formspring API is broken
+    - Did not write the _xmlify code
+
+commit 85f869715941026751459fbd0c1e16f2d4ad2bf5
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 06:04:31 2010 -0400
+
+    Wrote unauthed part of profile_details
+
+commit f874d43ecd391c77f450b68fb7aaae4fe8a56a4f
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 05:37:58 2010 -0400
+
+    Added answered_list function
+
+commit 5f811b9b927b322c684e7c405d8fcdca470e1b9e
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 05:04:28 2010 -0400
+
+    Added some additional tests
+
+commit 27e02c909aadf100b28880c9ae571ef7ce6b234b
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 05:01:41 2010 -0400
+
+    Got rid of repetitive code
+
+commit ec59d14f56407e754bda163d078db90869823fe9
+Author: William Orr <will@worrbase.com>
+Date:   Thu Jun 3 03:59:45 2010 -0400
+
+    Made new classes and OOed the current classes
+    
+    - Wrote basic tests
+    - Added some more files to the gitignore
+
+commit 7b46909837736e039ffffcaafd6dc94c7afc7b27
+Author: William Orr <will@worrbase.com>
+Date:   Wed Jun 2 20:09:48 2010 -0400
+
+    Added answered_details
+    
+    - renamed get_answer_count to answered_count
+    - updated .gitignore
+
+commit ec562ae79370b3ba4a5185c059be2d232b24aa14
+Author: William Orr <will@worrbase.com>
+Date:   Wed Jun 2 19:43:56 2010 -0400
+
+    Initial commit
+    
+    - wrote answered_count

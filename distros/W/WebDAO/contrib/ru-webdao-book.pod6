@@ -1,0 +1,28 @@
+=begin pod
+=begin BOOKINFO
+*TITLE WebDAO - платформа для создания web приложений
+
+*SUBTITLE Разработка веб приложений в WebDAO
+*AUTHOR
+firstname: Александр
+surname: Загацкий
+
+*DESCRIPTION
+Документация по использованию  WebDAO в разработке web приложений. Включает описание процесса установки и настройки web окружения, примеры кодов и описание модулей.
+
+*CHANGES
+Jul 26th 2009(v0.2)[zag]  "Install" chapter, update About.pod
+
+Feb 24th 2009(v0.1)[zag]   Начальная версия
+
+=end BOOKINFO
+
+=config C<> :allow<E>
+=config code :allow<E>
+
+=Include Preface.ru.pod6
+=Include About.ru.pod
+=Include Install.ru.pod
+=Include Setup.ru.pod
+
+=end pod

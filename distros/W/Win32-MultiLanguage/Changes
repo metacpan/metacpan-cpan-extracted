@@ -1,0 +1,65 @@
+Revision history for Perl extension Win32::MultiLanguage.
+
+0.73  March 2014
+	- fixed encoding error in POD
+
+0.72  Mon Jun 30 17:54:00 2008
+	- minor fixes
+
+0.71  Sun Jun 29 17:54:00 2008
+	- minor fixes
+	- added eg/encenum.pl
+
+0.70  Sun Jun 29 16:54:00 2008
+	- added documentation for many routines
+	- added GetLcidFromRfc1766
+	- added GetRfc1766Info
+	- added EnumScripts
+	- added EnumRfc1766
+	- added EnumCodePages
+	- added Transcode
+	- added 05Transcode.t tests
+	- rewrote internal utf-16 to utf-8 converter
+	- fixed broken link to MSDN...
+	- add LICENSE => 'perl' to Makefile.PL
+	- cleanup
+
+0.06  Sun Oct  3 23:54:00 2004
+	- added GetNumberOfScripts
+	- added GetNumberOfCodePageInfo
+	- known issues/todo in documentation
+	- removed version number from README
+	- added GetFamilyCodePage
+	- some methods no longer considered for implementation
+	- added GetLcidFromRfc1766
+	- added GetRfc1766Info
+	- added IsConvertible
+
+0.05  Sun Oct  3 20:40:00 2004
+	- added MLDETECTF constants
+	- added documentation for MLDETECTF constants
+	- added DetectOutboundCodePage
+	- added GetCharsetInfo
+	- added GetCodePageDescription
+	- minor fixes to the documentation
+	- added implementation status section to documentation
+
+0.04  Sun Oct  3 08:00:00 2004
+	- added documentation for GetCodePageInfo constants
+	- added constants for GetCodePageInfo
+	- added GetCodePageInfo (lacks documentation)
+	- major code cleanup
+
+0.03  Sun Oct  3 03:00:00 2004
+	- fixed memory leak
+	- changed max number of code pages to 32
+	- static memory allocation for detected codepages
+	- added GetRfc1766FromLcid (lacks documentation)
+
+0.02  Sat Oct  2 23:19:20 2004
+	- removed debug warn() on read bytes
+
+0.01  Sat Oct  2 20:33:20 2004
+	- original version; created by h2xs 1.23 with options
+		-A -O -c -n Win32::MultiLanguage --skip-ppport --skip-exporter -v 0.01 -b 5.8.0
+

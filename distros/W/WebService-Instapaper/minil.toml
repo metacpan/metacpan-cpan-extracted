@@ -1,0 +1,3 @@
+name = "WebService-Instapaper"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"

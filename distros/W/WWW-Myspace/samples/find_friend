@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w -I../lib
+# find_friend email
+# Prints the friendID(s) for the provided email
+#
+# Example:
+# find_friend your@email.com
+
+use WWW::Myspace;
+my $myspace=new WWW::Myspace( auto_login=>0 );
+
+my $email = shift;
+my ( @friend_ids ) = $myspace->find_friend( $email );
+
+if ( $myspace->error ) {
+   die $myspace->error;
+} elsif ( @friend_ids ) {
+   print "${email}'s friendID is @friend_ids\n";
+} else {
+   print "Don't think $email is on myspace, sorry\n";
+}

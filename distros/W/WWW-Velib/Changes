@@ -1,0 +1,25 @@
+Revision history for Perl extension WWW::Velib
+
+0.05 2007-11-13 14:35:39 UTC
+    - deal with hostname change and HTML changes
+    - more methods documented in sub-packages
+
+0.04 2007-10-28 17:24:57 UTC
+    - Month trips: return date ascending rather than descending.
+    - added next_trip() iterator in Velib.pm
+    - drive POD tests directly from MANIFEST
+    - moved data files from eg/ to eg/data/
+
+0.03 2007-10-20 12:44:09 UTC
+    - eg/map.cache.v1 was left out of the distribution
+    - documented WWW::Velib::Map (version bumped to 0.02)
+
+0.02 2007-10-19 21:06:34 UTC
+    - implement WWW::Velib::Station to retrieve the status of a
+      station (slots free, used, broken).
+    - implement WWW::Velib::Map to retrieve geographical information
+      about the stations in the Velib' system.
+
+0.01 2007-09-22 15:04:43 UTC
+    - initial version.
+

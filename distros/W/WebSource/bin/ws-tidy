@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ws-tidy : Put a document into a correct XML format using WebSource::Parser
+
+=head1 DESCRIPTION
+
+This script uses the WebSource::Parser module to put HTML documents
+(hopefully even badly formatted ones) into a correct XML format
+
+=cut
+
+use WebSource::Parser;
+use Getopt::Mixed;
+
+
+my $parser = WebSource::Parser->new;
+foreach my $file (@ARGV) {
+  my $doc = $parser->parse_html_file($file);
+  print $doc->toString(1);
+}

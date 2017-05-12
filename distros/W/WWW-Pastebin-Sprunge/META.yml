@@ -1,0 +1,44 @@
+---
+abstract: 'create new pastes on sprunge.us'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Is: '0'
+  Test::More: '0'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Pastebin-Sprunge
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Carp: '0'
+  Class::Data::Accessor: '0'
+  Encode: '0'
+  HTTP::Request::Common: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  base: '0'
+  overload: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/WWW-Pastebin-Sprunge/issues
+  homepage: http://metacpan.org/release/WWW-Pastebin-Sprunge/
+  repository: git://github.com/doherty/WWW-Pastebin-Sprunge.git
+version: '0.010'

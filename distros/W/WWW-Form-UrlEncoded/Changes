@@ -1,0 +1,64 @@
+Revision history for Perl extension WWW-Form-UrlEncoded
+
+0.24 2017-02-28T06:15:18Z
+
+   - updated by Minil 3
+
+0.23 2015-11-19T00:33:17Z
+
+   - bugfix. parse(undef) return arrayref
+
+0.22 2015-06-12T05:37:24Z
+
+   - \C is deprecated at perl-5.22 (Thank you eserte)
+
+0.21 2015-04-28T17:04:09Z
+
+   - add some tests related https://github.com/kazeburo/WWW-Form-UrlEncoded-XS/issues/1
+
+0.19 2014-04-30T03:26:43Z
+
+   - bugfix: PP::build_urlencoded should not do utf8::upgrade.
+
+0.17 2014-02-24T13:50:55Z
+
+    - fix EXPORT bug. _arrayref did not export
+
+0.16 2014-02-24T08:14:53Z
+
+    - add parse_urlencoded_arrayref
+
+0.14 2014-02-21T04:21:03Z
+
+    - add build_urlencoded_utf8
+
+0.13 2014-02-18T07:59:59Z
+
+    - supports a delimiter parameter
+
+0.12 2014-02-18T03:38:24Z
+
+    - install .keep file under $arch/WWW/Form/UrlEncoded/XS to keep compatiblity before 0.10
+    - build_urlencoded supports arrayref and hashref args
+
+0.10 2014-02-17T06:10:58Z
+
+    - [IMPORTANT] split WWW::Form::UrlEncoded into another dist.
+                  instal with `cpanm WWW::Form::UrlEncoded` 
+
+0.04 2014-02-17T03:30:50Z
+
+    - add build_urlencoded
+
+0.03 2014-02-10T16:10:56Z
+
+    - fix bug with thread enabled perl
+
+0.02 2014-02-10T02:25:59Z
+
+    - mv ppport.h to src
+
+0.01 2014-02-07T05:44:01Z
+
+    - original version
+

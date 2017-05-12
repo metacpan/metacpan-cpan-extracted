@@ -1,0 +1,20 @@
+---
+abstract: 'SpinnerChief API'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-SpinnerChief
+requires:
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+resources:
+  repository: git://github.com/fayland/p5-WWW-SpinnerChief.git
+version: 0.01

@@ -1,0 +1,9 @@
+TYPEMAP
+
+MMRESULT       	T_UV
+UINT           	T_UV
+HWND       		T_IV
+
+  		
+
+

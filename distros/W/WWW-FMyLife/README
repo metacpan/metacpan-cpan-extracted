@@ -1,0 +1,182 @@
+NAME
+    WWW::FMyLife - Obtain FMyLife.com anecdotes via API
+
+VERSION
+    Version 0.15
+
+SYNOPSIS
+    THIS MODULE IS STILL UNDER INITIAL DEVELOPMENT! BE WARNED!
+
+        use WWW::FMyLife;
+
+        my $fml = WWW::FMyLife->new();
+        print map { "Items: $_\n" } $fml->last( { as => text' } );
+
+DESCRIPTION
+    This module fetches FMyLife.com (FML) anecdotes, comments, votes and
+    more via API, comfortably and in an extensible manner.
+
+        my @items = $fml->top_daily();
+        foreach my $item (@items) {
+            my $item_id      = $item->id;
+            my $item_content = $item->content;
+            print "[$item_id] $item_content\n";
+        }
+
+        print $fml->random()->text, "\n";
+        ...
+
+EXPORT
+    This module exports nothing.
+
+SUBROUTINES/METHODS
+  last()
+    Fetches the last quotes. Can accept a hashref that indicates the
+    formatting:
+
+        # returns an array of WWW::FMyLife::Item objects
+        $fml->last();
+
+        # or more explicitly
+        $fml->last( { as => 'object' } ); # same as above
+        $fml->last( { as => 'text'   } ); # returns an array of text anecdotes
+        $fml->last( { as => 'data'   } ); # returns an array of hashes of anecdotes
+
+    You can also specify which page you want:
+
+        # return 1st page
+        my @last = fml->last();
+
+        # return 5th page
+        my @last = $fml->last(5);
+
+        # same
+        my @last = $fml->last( { page => 5 } );
+
+    And options can be mixed:
+
+        my @not_so_last = $fml->last( { as => 'text', page => 50 } );
+
+  random
+    This method gets a single random quote as an object.
+
+  top
+    This method works the same as the last() method, only it fetches the top
+    quotes.
+
+    This method, as for its variations, can format as an object, text or
+    data.
+
+  top_day
+    This method works the same as the last() method, only it fetches the top
+    quotes.
+
+    This specific variant fetches the top anecdotes from the last day.
+
+  top_week
+    This method works the same as the last() method, only it fetches the top
+    quotes.
+
+    This specific variant fetches the top anecdotes from the last week.
+
+  top_month
+    This method works the same as the last() method, only it fetches the top
+    quotes.
+
+    This specific variant fetches the top anecdotes from the last month.
+
+  flop
+    Fetches the flop quotes.
+
+    This method, as for its variations, can format as an object, text or
+    data.
+
+  flop_day
+    Fetches the flop quotes of the day.
+
+  flop_week
+    Fetches the flop quotes of the week.
+
+  flop_month
+    Fetches the flop quotes of the month.
+
+  credentials( $username, $password ) (NOT YET FULLY IMPLEMENTED)
+    WARNING: THIS HAS NOT YET BEEN IMPLEMENTED.
+
+    THE TESTS HAVE BEEN DISABLED FOR NOW, PLEASE WAIT FOR A MORE ADVANCED
+    VERSION.
+
+    Sets credentials for members.
+
+        $fml->credentials( 'foo', 'bar' );
+
+        # same thing
+        $fml->username('foo');
+        $fml->password('bar');
+
+AUTHOR
+    Sawyer X (XSAWYERX), "<xsawyerx at cpan.org>"
+
+    Tamir Lousky (TLOUSKY), "<tlousky at cpan.org>"
+
+DEPENDENCIES
+    Moose
+
+    XML::Simple
+
+    LWP::UserAgent
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-www-fmylife at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-FMyLife>.
+
+    You can also use the Issues Tracker on Github @
+    <http://github.com/xsawyerx/www-fmylife/issues>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::FMyLife
+
+    You can also look for information at:
+
+    *   Our Github!
+
+        <http://github.com/xsawyerx/www-fmylife/tree/master>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-FMyLife>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-FMyLife>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-FMyLife>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-FMyLife/>
+
+    *   FML (FMyLife)
+
+        <http://www.fmylife.com>
+
+SEE ALSO
+    *   WWW::VieDeMerde
+
+        Apparently supports more options right now. Mainly for French
+        version but seems to support English as well.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Sawyer X, Tamir Lousky.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,21 @@
+Revision History for WebService::Autotask
+
+1.5   Wed,  1 May 2013 08:34:00 -0500 cmadams
+		Handle non-ASCII characters in strings
+		Bump version number (not everybody sees 1.1 > 1.003)
+
+1.1   Thu, 25 April 2013 16:11:00 -0500 cmadams
+		Switch from Autotask API 1.4 to 1.5
+		Add support for attachments
+
+1.003 Fri, 22 March 2011 16:17:00 -0500 derek
+		getAttribute method call was typoed. Fixed now.
+
+1.002 Fri, 11 March 2011 14:41:00 -0400 derek
+		Adding missing perl critic rc file.	
+
+1.001 Thu, 29 January 2010 13:56:00 -0400 derek
+		Bug fixes - Thanks Stefan Adams
+
+1.000	Mon, 22 January 2010 11:00:00 -0400 derek
+		First release to CPAN.

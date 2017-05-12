@@ -1,0 +1,24 @@
+#############################################################################
+## Name:        ext/xrc/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     27/07/2001
+## RCS-ID:      $Id: typemap 2317 2008-01-18 22:00:14Z mbarbon $
+## Copyright:   (c) 2001, 2003-2004, 2006, 2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxXmlNodeType           T_ENUM
+
+wxXmlResource *         O_NON_WXOBJECT_THR
+wxXmlResourceHandler *  O_WXOBJECT
+wxXmlSubclassFactory *  O_NON_WXOBJECT
+wxPliXmlSubclassFactory * O_NON_WXOBJECT
+wxXmlNode*              O_NON_WXOBJECT
+wxXmlDocument*          O_WXOBJECT
+wxXmlProperty*          O_NON_WXOBJECT
+wxXmlAttribute*         O_NON_WXOBJECT
+wxPlXmlResourceHandler* O_WXOBJECT

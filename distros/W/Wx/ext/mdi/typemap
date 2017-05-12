@@ -1,0 +1,21 @@
+#############################################################################
+## Name:        ext/mdi/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     06/09/2001
+## RCS-ID:      $Id: typemap 2517 2008-11-30 20:14:22Z mbarbon $
+## Copyright:   (c) 2001, 2003-2004, 2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxMDIParentFrame *      O_WXOBJECT
+wxMDIChildFrame *       O_WXOBJECT
+wxMDIClientWindow *     O_WXOBJECT
+wxMDIClientWindowBase * O_WXOBJECT
+
+wxGenericMDIParentFrame *      O_WXOBJECT
+wxGenericMDIChildFrame *       O_WXOBJECT
+wxGenericMDIClientWindow *     O_WXOBJECT

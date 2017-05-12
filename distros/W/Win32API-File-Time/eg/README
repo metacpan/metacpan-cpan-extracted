@@ -1,0 +1,4 @@
+This directory contains the following examples:
+
+touch.pl - More-or-less equivalent to the Unix 'touch' command. You can
+use the -help option to get help.

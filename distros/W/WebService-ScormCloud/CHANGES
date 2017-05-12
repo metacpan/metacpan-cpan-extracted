@@ -1,0 +1,25 @@
+Revision history for WebService::ScormCloud
+
+0.03    2011-06-17
+
+  [OTHER]
+
+  * Code tweaks to get rid of Perl 5.14 messages about:
+
+        Use of qw(...) as parentheses is deprecated
+
+    No change in functionality.
+
+  * Makefile tweak to silence warning about non-numeric version
+    when checking version of ExtUtils::MakeMaker.
+
+0.02    2011-03-18
+
+  [NEW FEATURES]
+
+  * Most features implemented at this point, a few placeholders remain.
+
+0.01    2010-12-16
+
+  * First version, released on an unsuspecting world.
+

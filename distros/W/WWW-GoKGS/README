@@ -1,0 +1,289 @@
+NAME
+    WWW::GoKGS - KGS Go Server (http://www.gokgs.com/) Scraper
+
+SYNOPSIS
+      use WWW::GoKGS;
+
+      my $gokgs = WWW::GoKGS->new(
+          from => 'user@example.com'
+      );
+
+      # Game archives
+      my $game_archives_1 = $gokgs->scrape( '/gameArchives.jsp?user=foo' );
+      my $game_archives_2 = $gokgs->game_archives->query( user => 'foo' );
+
+      # Top 100 players
+      my $top_100_1 = $gokgs->scrape( '/top100.jsp' );
+      my $top_100_2 = $gokgs->top_100->query;
+
+      # List of tournaments 
+      my $tourn_list_1 = $gokgs->scrape( '/tournList.jsp?year=2014' );
+      my $tourn_list_2 = $gokgs->tourn_list->query( year => 2014 );
+
+      # Information for the tournament
+      my $tourn_info_1 = $gokgs->scrape( '/tournInfo.jsp?id=123' );
+      my $tourn_info_2 = $gokgs->tourn_info->query( id => 123 );
+
+      # The tournament entrants
+      my $tourn_entrants_1 = $gokgs->scrape( '/tournEntrans.jsp?id=123&sort=n' );
+      my $tourn_entrants_2 = $gokgs->tourn_entrants->query( id => 123, sort => 'n' );
+
+      # The tournament games
+      my $tourn_games_1 = $gokgs->scrape( '/tournGames.jsp?id=123&round=1' );
+      my $tourn_games_2 = $gokgs->tourn_games->query( id => 123, round => 1 );
+
+      # List of time zones
+      my $tz_list_1 = $gokgs->scrape( '/tzList.jsp' );
+      my $tz_list_2 = $gokgs->tz_list->query;
+
+DESCRIPTION
+    This module is a KGS Go Server ("http://www.gokgs.com/") scraper. KGS
+    allows the users to play a board game called go a.k.a. baduk (Korean) or
+    weiqi (Chinese). Although the web server provides resources generated
+    dynamically, such as Game Archives, they are formatted as HTML, the only
+    format. This module provides yet another representation of those
+    resources, Perl data structure.
+
+    This class maps a URI preceded by "http://www.gokgs.com/" to a proper
+    scraper. The supported resources on KGS are as follows:
+
+    KGS Game Archives (http://www.gokgs.com/archives.jsp)
+        Handled by WWW::GoKGS::Scraper::GameArchives.
+
+    Top 100 KGS Players (http://www.gokgs.com/top100.jsp)
+        Handled by WWW::GoKGS::Scraper::Top100.
+
+    KGS Tournaments (http://www.gokgs.com/tournList.jsp)
+        Handled by WWW::GoKGS::Scraper::TournList,
+        WWW::GoKGS::Scraper::TournInfo, WWW::GoKGS::Scraper::TournEntrants
+        and WWW::GoKGS::Scraper::TournGames.
+
+    KGS Time Zone Selector (http://www.gokgs.com/tzList.jsp)
+        Handled by WWW::GoKGS::Scraper::TzList.
+
+  ATTRIBUTES
+    $UserAgent = $gokgs->user_agent
+    $gokgs->user_agent( LWP::RoboUA->new(...) )
+        Can be used to get or set a user agent object which is used to "GET"
+        the requested resource. Defaults to LWP::RobotUA object which
+        consults "http://www.gokgs.com/robots.txt" before sending HTTP
+        requests, and also sets a proper delay between requests.
+
+        NOTE: "LWP::RobotUA" fails to read "/robots.txt" since the KGS web
+        server doesn't returns the Content-Type response header as of June
+        23rd, 2014. This module can not solve this problem.
+
+        You can also set your own user agent object which inherits from
+        LWP::UserAgent as follows:
+
+          use LWP::UserAgent;
+
+          $gokgs->user_agent(
+              LWP::UserAgent->new(
+                  agent => 'MyAgent/1.00'
+              )
+          );
+
+        NOTE: You should set a delay between requests to avoid overloading
+        the KGS server.
+
+    $GameArchives = $gokgs->game_archives
+        Returns a WWW::GoKGS::Scraper::GameArchives object.
+
+    $Top100 = $gokgs->top_100
+        Returns to a WWW::GoKGS::Scraper::Top100 object.
+
+    $TournList = $gokgs->tourn_list
+        Returns a WWW::GoKGS::Scraper::TournList object.
+
+    $TournInfo = $gokgs->tourn_info
+        Returns a WWW::GoKGS::Scraper::TournInfo object.
+
+    $TournEntrants = $gokgs->tourn_entrants
+        Returns a WWW::GoKGS::Scraper::TournEntrants object.
+
+    $TournGames = $gokgs->tourn_games
+        Returns a WWW::GoKGS::Scraper::TournGames object.
+
+    $TzList = $gokgs->tz_list
+        Returns a WWW::GoKGS::Scraper::TzList object.
+
+  INSTANCE METHODS
+    $email_address = $gokgs->from
+    $gokgs->from( 'user@example.com' )
+        Can be used to get or set your email address which is used to send
+        the From request header that indicates who is making the request.
+
+    $agent = $gokgs->agent
+    $gokgs->agent( 'MyAgent/0.01' )
+        Can be used to get or set the product token that is used to send the
+        User-Agent request header.
+
+    $Response = $gokgs->get( URI->new(...) )
+        A shortcut for:
+
+          my $response = $gokgs->user_agent->get( URI->new(...) );
+
+        This method is used by "scrape" method to "GET" the requested
+        resource. You can override this method by subclassing.
+
+    $cookie_jar = $gokgs->cookie_jar
+    $gokgs->cookie_jar( $cookie_jar_obj )
+        Can be used to get or set a cookie jar object to use.
+
+    $scraper = $gokgs->can_scrape( '/fooBar.jsp' )
+    $scraper = $gokgs->can_scrape( 'http://www.gokgs.com/fooBar.jsp' )
+        Returns a scraper object which can "scrape" the resource specified
+        by the given URL. If the scraper object does not exist, then "undef"
+        is returned. This method can be used to check whether $gokgs can
+        "scrape" the resource.
+
+    $HashRef = $gokgs->scrape( '/gameArchives.jsp?user=foo' )
+    $HashRef = $gokgs->scrape(
+    'http://www.gokgs.com/gameArchives.jsp?user=foo' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/gameArchives.jsp?user=foo' );
+          my $game_archives = $gokgs->game_archives->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::GameArchives for details.
+
+    $HashRef = $gokgs->scrape( '/top100.jsp' )
+    $HashRef = $gokgs->scrape( 'http://www.gokgs.com/top100.jsp' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/top100.jsp' );
+          my $top_100 = $gokgs->top_100->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::Top100 for details.
+
+    $HashRef = $gokgs->scrape( '/tournList.jsp?year=2014' )
+    $HashRef = $gokgs->scrape(
+    'http://www.gokgs.com/tournList.jsp?year=2014' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/tournList.jsp?year=2014' );
+          my $tourn_list = $gokgs->tourn_list->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::TournList for details.
+
+    $HashRef = $gokgs->scrape( '/tournInfo.jsp?id=123' )
+    $HashRef = $gokgs->scrape( 'http://www.gokgs.com/tournInfo.jsp?id=123' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/tournInfo.jsp?id=123' );
+          my $tourn_info = $gokgs->tourn_info->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::TournInfo for details.
+
+    $HashRef = $gokgs->scrape( '/tournEntrants.jsp?id=123&s=n' )
+    $HashRef = $gokgs->scrape(
+    'http://www.gokgs.com/tournEntrants.jsp?id=123&s=n' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/tournEntrants.jsp?id=123&s=n' );
+          my $tourn_entrants = $gokgs->tourn_entrants->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::TournEntrants for details.
+
+    $HashRef = $gokgs->scrape( '/tournGames.jsp?id=123&round=1' )
+    $HashRef = $gokgs->scrape(
+    'http://www.gokgs.com/tournGames.jsp?id=123&round=1' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/tournGames.jsp?id=123&round=1' );
+          my $tourn_games = $gokgs->tourn_games->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::TournGames for details.
+
+    $HashRef = $gokgs->scrape( '/tzList.jsp' )
+    $HashRef = $gokgs->scrape( 'http://www.gokgs.com/tzList.jsp' )
+        A shortcut for:
+
+          my $uri = URI->new( 'http://www.gokgs.com/tzList.jsp' );
+          my $tz_list = $gokgs->tz_list->scrape( $uri );
+
+        See WWW::GoKGS::Scraper::TzList for details.
+
+    $scraper = $gokgs->get_scraper( $path )
+        Returns a scraper object which can "scrape" a resource located at
+        $path on KGS. If the scraper object does not exist, then "undef" is
+        returned.
+
+          my $game_archives = $gokgs->get_scraper( '/gameArchives.jsp' );
+          # => WWW::GoKGS::Scraper::GameArchives object
+
+    $gokgs->each_scraper( sub { my ($path, $scraper) = @_; ... } )
+        Given a subref, applies the subroutine to each scraper object in
+        turn. The callback routine is called with two parameters; the path
+        to the resource on KGS and the scraper object which can scrape the
+        resource.
+
+          $gokgs->each_scraper(sub {
+              my $path = shift; # => "/gameArchives.jsp"
+              my $scraper = shift; # isa WWW::GoKGS::Scraper::GameArchives
+
+              # overwrite "user_agent" attributes of all the scraper objects
+              $scraper->user_agent( $gokgs->user_agent );
+          });
+
+DIAGNOSTICS
+    This module throws the following exceptions:
+
+    LWP::RobotUA from required
+        This message is printed by the constructor of LWP::RobotUA. You must
+        provide your email address when you use the module.
+
+          my $gokgs = WWW::GoKGS->new(
+              from => 'user@example.com'
+          );
+
+    Don't know how to scrape '/fooBar.jsp'
+        You tried to "scrape" a resource which $gokgs can't handle. Use
+        "can_scrape" before invoke the "scrape" method.
+
+          # scrape safely
+          if ( $gokgs->can_scrape('/fooBar.jsp') ) {
+              my $result = $gokgs->scrape('/fooBar.jsp');
+          }
+
+    GET /fooBar.jsp failed: ...
+        $gokgs failed to "GET" the requested resource. The reason phrase is
+        added to the end of the message.
+
+LIMITATIONS
+    Although KGS website allows you to set a locale and time zone by using
+    HTTP cookie, this module ignores the settings. The scrapers assume the
+    locale is set to "en_US", and the time zone "GMT".
+
+      # not supported
+      $gokgs->user_agent->cookie_jar(...);
+
+ENVIRONMENTAL VARIABLES
+    AUTHOR_TESTING
+        Some tests for scrapers send HTTP requests to "GET" resources on
+        KGS. When you run "./Build test", they are skipped by default to
+        avoid overloading the KGS server. To run those tests, you have to
+        set "AUTHOR_TESTING" to true explicitly:
+
+          $ perl Build.PL
+          $ env AUTHOR_TESTING=1 ./Build test
+
+        Author tests are run by Travis CI
+        <https://travis-ci.org/anazawa/p5-WWW-GoKGS> once a day. You can
+        visit the website to check whether the tests passed or not.
+
+ACKNOWLEDGEMENT
+    Thanks to wms, the author of KGS Go Server, we can enjoy playing go
+    online for free.
+
+SEE ALSO
+    KGS Go Server <http://www.gokgs.com>, Web::Scraper
+
+AUTHOR
+    Ryo Anazawa (anazawa@cpan.org)
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

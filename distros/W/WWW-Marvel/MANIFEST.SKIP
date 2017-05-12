@@ -1,0 +1,11 @@
+^marvel\.conf$
+^README\.author$
+^MYMETA\.
+^Makefile$
+\.bak$
+\.csv$
+\.swp$
+\.git
+^blib/
+^pm_to_blib
+\.tar\.gz$

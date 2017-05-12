@@ -1,0 +1,248 @@
+NAME
+    WebService::BuzzurlAPI - Buzzurl WebService API
+
+VERSION
+    0.02
+
+SYNOPSIS
+      use WebService::BuzzurlAPI;
+      use strict;
+
+      my $buzz = WebService::BuzzurlAPI->new(email => "your email", password => "your password");
+      # readers api
+      my $res = $buzz->readers( userid => "your userid" );
+      if($res->is_success){
+          my $json = $res->json;
+          # do something
+      }else{
+          die $res->errstr;
+      }
+
+DESCRIPTION
+    Buzzurl is social bookmark service.
+
+    For more information on Buzzurl, visit the Buzzurl website.
+    http://buzzurl.jp/.
+
+    API Reference. http://labs.ecnavi.jp/developer/buzzurl/api/
+
+METHOD
+  new
+    Create instance
+
+    Option:
+
+      email    : your login email(require when add api)
+      password : your login password(require when add api)
+
+    Example:
+
+      my $buzz = WebService::BuzzurlAPI->new(email => "your email", password => "your password");
+
+  readers
+    Get readers userid
+
+    Options:
+
+      userid  : userid(require)
+
+    Example:
+
+      my $res = $buzz->readers( userid => "userid" );
+      if($res->is_success){
+        foreach my $userid(@{$res->json}){
+            # do something...
+        }
+      }
+
+  favorites
+    Get favorites userid
+
+    Options:
+
+      userid  : userid(require)
+
+    Example:
+
+      my $res = $buzz->favorites( userid => "userid" );
+      if($res->is_success){  
+        foreach my $userid(@{$res->json}){
+            # do something...
+        }
+      }
+
+  url_info
+    Get url info
+
+    Options:
+
+      url    : url(require)
+
+    Example:
+
+      my $res = $buzz->url_info( url => "http://your.wanted.domain/" );
+      if($res->is_success){
+         my $urlinfo = shift @{$res->json};
+         my $url = $urlinfo->{url};
+         my $title = $urlinfo->{title};
+         my $user_num = $urlinfo->{user_num};
+         foreach my $ref(@{$userinfo->{posts}}){
+            my $keywords = $ref->{keywords};
+            my $comment = $ref->{comment};
+            my $date = $ref->{date};
+            my $user_name = $ref->{user_name};
+         }
+         # do something...
+      }
+
+  bookmark_count
+    Get bookmark count
+
+    Options:
+
+      url   : url(require max:30)
+
+    Example:
+
+      my $res = $buzz->bookmark_count( url => "http://your.wanted.domain" );
+      # multiple
+      # my $res = $buzz->bookmark_count( url => [ "http://your.wanted.domain", "http://your.wanted.domain2" ] );
+      if($res->is_success){  
+        foreach my $ref(@{$res->json}){
+            my $url = $ref->{url};
+            my $title = $ref->{title};
+            my $users = $ref->{users};
+            # do something...
+        }
+      }
+
+  user_articles
+    Get user articles
+
+    Options:
+
+      userid  : userid(require)
+
+    Example:
+
+      my $res = $buzz->user_articles( userid => "userid" );
+      if($res->is_success){  
+        foreach my $ref(@{$res->json}){
+            my $url = $ref->{url};
+            my $title = $ref->{title};
+            my $comment = $ref->{comment};
+            my $keywords = $ref->{keywords};
+            # do something...
+        }
+      }
+
+  recent_articles
+    Get recent articles
+
+    Options:
+
+      num       : get number(default:5)
+      of        : page number(default:0)
+      threshold : bookmark count threshold(default:0)
+
+    Example:
+
+      my $res = $buzz->recent_articles( num => 0, of => 1, threshold => 3 );
+      if($res->is_success){  
+        foreach my $ref(@{$res->json}){
+            my $url = $ref->{url};
+            my $title = $ref->{title};
+            my $user_num = $ref->{user_num};
+            my $user_id = $ref->{user_id};
+            my $register_date = $ref->{register_date};
+            # do something...
+        }
+      }
+
+  keyword_articles
+    Get keyword articles
+
+    Options:
+
+      userid  : userid(require)
+      keyword : keyword string(require)
+
+    Example:
+
+      my $res = $buzz->keyword_articles( userid => "userid", keyword => "keyword string" );
+      if($res->is_success){  
+        foreach my $ref(@{$res->json}){
+            my $url = $ref->{url};
+            my $title = $ref->{title};
+            my $user_num = $ref->{user_num};
+            my $user_id = $ref->{user_id};
+            my $register_date = $ref->{register_date};
+            # do something...
+        }
+      }
+
+  add
+    Add my bookmark(https + basic auth access)
+
+    Options:
+
+      url     : bookmark url(require)
+      title   : bookmark title
+      comment : bookmark comment
+      keyword : bookmark keyword(max:8)
+
+    Example:
+
+      my $res = $buzz->add(
+                 url     => "http://your.register.domain/",
+                 title   => "my bookmark title",
+                 comment => "my bookmark comment",
+                 keyword => "my keyword",
+                 # multiple keyword
+                 keyword => [ "my keyword", "my keyword2" ],
+                );
+      if($res->is_success){
+        print $res->json->{status} . "\n";
+      }else{
+        die $res->errstr;
+      }
+
+ACCESSOR METHOD
+  email
+    Get/Set login email
+
+    Example:
+
+      $buzz->email("your email");
+      my $email = $buzz->email;
+
+  password
+    Get/Set login password
+
+    Example:
+
+      $buzz->password("your password");
+      my $password = $buzz->password;
+
+  ua
+    Get LWP::UserAgent instance(Readonly)
+
+    Example:
+
+      # LWP::UserAgent::timeout
+      $buzz->ua->timeout(30);
+      # LWP::UserAgent::env_proxy
+      $buzz->ua->env_proxy;
+
+SEE ALSO
+    Class::Accessor LWP::UserAgent Readonly UNIVERSAL::require URI
+
+AUTHOR
+    Akira Horimoto
+
+COPYRIGHT
+    Copyright (C) 2007 Akira Horimoto
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

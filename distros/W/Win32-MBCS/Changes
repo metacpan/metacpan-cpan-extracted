@@ -1,0 +1,30 @@
+Revision history for Perl extension Win32::MBCS.
+
+0.07  2004.03.13 17:51 Qing-Jie Zhou
+    * Correct mistake in README
+
+0.06  2004.03.13 17:51 Qing-Jie Zhou
+    * Forbidden make when platform is not MSWin32
+    * Correct support URL Link
+
+0.05  2004.03.13 12:28 Qing-Jie Zhou
+    * Add support at http://bookbot.sourceforge.net
+    * Add copyright and license
+    * Add komodo project file
+
+0.04  2004.03.08 08:48 Qing-Jie Zhou
+    * Remove useless t.pl
+
+0.03  2004.03.08 08:15 Qing-Jie Zhou
+    * Correct wrong example in document
+    * add META.yml
+    * Convert DOS format into UNIX format in all sources
+    * add LocalToUtf8 as reverse function of Utf8ToLocal
+    * add LocalToUtf8/Utf8ToLocal to EXPORT_OK
+
+0.02  2003.11.14 18:50 Qing-Jie Zhou
+    * Correct wrong description in document
+
+0.01  2003.11.14 16:25 Qing-Jie Zhou
+    - original version; created by h2xs 1.23 with options
+        -cfn Win32::MBCS

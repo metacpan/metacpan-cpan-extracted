@@ -1,0 +1,35 @@
+Revision history for Wrap-Sub
+
+0.06    2016-02-03
+        - renamed wrapped_state() to is_wrapped() (closes #6)
+        - minor code cleanup
+        - POD rewrite (closes #4)
+        - bumped prereq of Devel::Examine::Subs to 1.63, due to DES creating
+          a read-only file on every read (closes #7)
+        - removed results() and added pre_results() and post_results() (closes #8)
+
+0.05    2016-02-02
+        - the parent wrap object now has a results() method, returns a list of
+          all post() call results (even if post_return is disabled) (fixes #3)
+        - more tests
+        - POD fixes
+
+0.04    2016-02-02
+        - added ability to wrap all subs in a module (prereq Devel::Examine::Subs)
+        - pre() and post() methods now have access to $Wrap::Sub::name, which
+          contains the name of the wrapped sub
+        - completed POD
+        - added more tests
+
+0.03    2016-02-01
+        - release candidate
+        - took caller() code from Hook::LexWrap, and wrote tests (caller works)
+        - further work on POD
+
+0.02    2016-02-01
+        - all initial planned functionality works properly
+        - began POD rewrite
+        - all tests reworked and pass (99.6%+ coverage)
+
+0.01    2016-01-28
+        - clone Mock::Sub and rework

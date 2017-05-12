@@ -1,0 +1,77 @@
+{
+   "count" : 18,
+   "property" : [
+      {
+         "name" : "ArtifactsResolvingTime",
+         "value" : "32448"
+      },
+      {
+         "name" : "ArtifactsSize",
+         "value" : "12644108"
+      },
+      {
+         "name" : "BuildArtifactsPublishingTime",
+         "value" : "413"
+      },
+      {
+         "name" : "BuildCheckoutTime",
+         "value" : "3688"
+      },
+      {
+         "name" : "BuildDuration",
+         "value" : "573126"
+      },
+      {
+         "name" : "BuildDurationNetTime",
+         "value" : "536577"
+      },
+      {
+         "name" : "buildStageDuration:artifactsPublishing",
+         "value" : "438"
+      },
+      {
+         "name" : "buildStageDuration:buildFinishing",
+         "value" : "12"
+      },
+      {
+         "name" : "buildStageDuration:buildStepRUNNER_416",
+         "value" : "536206"
+      },
+      {
+         "name" : "buildStageDuration:firstStepPreparation",
+         "value" : "32527"
+      },
+      {
+         "name" : "buildStageDuration:sourcesUpdate",
+         "value" : "3708"
+      },
+      {
+         "name" : "BuildTestStatus",
+         "value" : "1"
+      },
+      {
+         "name" : "IgnoredTestCount",
+         "value" : "1"
+      },
+      {
+         "name" : "PassedTestCount",
+         "value" : "223"
+      },
+      {
+         "name" : "SuccessRate",
+         "value" : "1"
+      },
+      {
+         "name" : "TimeSpentInQueue",
+         "value" : "278"
+      },
+      {
+         "name" : "TotalTestCount",
+         "value" : "224"
+      },
+      {
+         "name" : "VisibleArtifactsSize",
+         "value" : "12441654"
+      }
+   ]
+}

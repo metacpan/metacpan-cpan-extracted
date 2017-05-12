@@ -1,0 +1,16 @@
+<?perl 
+require 'downloader.pl';
+ClearBuffer();                     # Clear buffers
+ClearHeader();
+flush_print(1);                    # flush_print (not real: 1 - clear mode)
+set_printing_mode('nonbuffered');  # Force non-buffered print
+if (download_file('this.zip',10))  # Download file with 10kb/s
+ {
+  open(FF,'>'.$tmp.'done.txt');close FF;   # Create file showing successful download.
+ }
+else 
+ {
+  open(FF,'>'.$tmp.'error.txt');close FF;   # Error occure throught download process.
+ }
+exit;
+?>

@@ -1,0 +1,55 @@
+{
+   "abstract" : "A Perl wrapper for the OANDA Exchange Rates API",
+   "author" : [
+      "Dave Doyle <ddoyle@oanda.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-OANDA-ExchangeRates",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "HTTP::Response" : "0",
+            "Module::Spy" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod::Coverage" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/oanda/perl-webservice-oanda-exchangerates",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oanda/perl-webservice-oanda-exchangerates.git",
+         "web" : "https://github.com/oanda/perl-webservice-oanda-exchangerates"
+      }
+   },
+   "version" : "0.003"
+}
+

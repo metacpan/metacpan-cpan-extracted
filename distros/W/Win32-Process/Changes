@@ -1,0 +1,107 @@
+Revision history for Perl extension Win32::Process.
+
+0.16  Wed Dec 11 2013
+	- Really add Github repo link to META.yml
+
+0.15  Wed Dec 4 2013
+        - Add LICENSE section to the POD (RT #41182).
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+
+0.14  Wed Jul 02 2008
+
+        - Re-insert "require Win32" statement in Makefile.PL.  There
+	  are Cygwin perl versions that don't have Win32CORE statically
+	  linked.
+
+0.13  Fri Jun 13 2008
+
+	- Get rid of the "require Win32" statement in Makefile.PL.
+
+	- Add ABOVE_NORMAL_PRIORITY_CLASS and BELOW_NORMAL_PRIORITY_CLASS
+	  constants (not exported by default).
+
+	- Use T_BOOL instead of T_IV for BOOL typemap entry so that
+	  the code doesn't warn on undef.
+
+0.12  Tue Apr 15 2008
+
+	- version 0.12 for separate upload to CPAN
+
+	- simplified Makefile.PL
+
+	- added META.yml and ppport.h
+
+	- fixed typemap for Win64
+
+0.11  Wed May 17 2006
+
+	- add WINAPI calling convention to LPSetProcessAffinityMask typedef
+
+0.10  Thu Sep 1 2005
+
+	- add get_Win32_IPC_HANDLE() method for Win32::IPC compatibility
+	  (Christopher J. Madsen)
+
+	- add STILL_ACTIVE constant for GetExitCode()
+	  (suggested by Michael Ellery)
+
+	- add GetCurrentProcessID() for cygwin
+	  (Reini Urban <rurban@x-ray.at>)
+
+	- Win32::Process::Open() now records the process ID correctly
+	  for GetProcessID().  It also creates handle now that can be
+	  used with the Wait() method. (Christopher Allan)
+
+	- make it work with the latest cygwin version
+	  remove USING_WIDE() codepaths (Jan Dubois)
+
+
+0.09  Fri Aug 17 16:11:58 2001
+
+	- allow opening an existing pid, like OpenProcess() (thanks to
+	  Blair Zajac <blair@orcaware.com>)
+
+0.08  Tue Dec 26 2000
+
+	- make sure the environment is correctly inherited by the new
+	  process.  Only implemented in non-Unicode branch!
+	  (by Jan Dubois <jand@ActiveState.com>)
+
+0.07  Mon May 22 21:45:19 2000
+
+	- support for passing Unicode strings to methods (thanks to
+	  Doug Lankshear <dougl@ActiveState.com>)
+
+0.06  Sat Sep 25 15:33:29 1999
+
+	- added GetProcessID() and KillProcess() (suggested by
+	  Sherwin Kartick <rsk@msi.com>)
+
+0.05  Thr Oct  1 1998 16:58:24
+
+	- Changed SetProcessAffinityMask to be dynalinked
+	  same build runs on NT and 95.
+
+0.04  Sun May 10 1998 20:35:29
+
+	- SetProcessAffinityMask() is not available on Win95, protect
+	  it with an #ifdef and supply separate binary
+
+0.03  Fri Feb  6 1998 11:07:35
+
+	- Removed unnecessary references to AutoLoader & Win32::IPC
+
+	- Simplified the AUTOLOAD and constant() functions
+
+	- Added get_process_handle for communication with Win32::IPC 1.00
+
+	- contributed by Christopher J. Madsen <cjm@pobox.com>
+
+0.02  Sun Dec 14 06:01:44 1997
+
+	- added [GS]etProcessAffinityMask(), contributed by
+	  Ricardo E. Gonzalez <regonzal@gomez.sc.intel.com>
+
+0.01  Sat Apr  5 14:25:02 1997
+	- original version; created by h2xs 1.18

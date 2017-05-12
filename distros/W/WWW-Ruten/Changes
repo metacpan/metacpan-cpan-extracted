@@ -1,0 +1,12 @@
+Revision history for WWW-Ruten
+
+0.03
+- Move author tests to xt/ so cpantesters do not have to bug me for those failures.
+- Also, use dzil instead.
+
+0.02
+- Test and dep fixes
+
+0.01  Sun Sep 28 17:38:13 2008
+      Initial release.
+

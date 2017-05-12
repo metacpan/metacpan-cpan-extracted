@@ -1,0 +1,23 @@
+DWORD_PTR               T_UV
+DWORD                   T_NV
+DWORD *                 T_PV
+LPCSTR                  T_PV
+LPCTSTR                 T_PV
+BOOL                    T_BOOL
+LPTSTR                  T_PV
+cProcess *              T_PTROBJ
+
+#############################################################################
+INPUT
+T_PTROBJ
+	if (sv_derived_from($arg, \"${Package}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    croak(\"$var is not of type ${Package}\")
+
+#############################################################################
+OUTPUT
+T_PTROBJ
+	sv_setref_pv($arg, \"${Package}\", (void*)$var);

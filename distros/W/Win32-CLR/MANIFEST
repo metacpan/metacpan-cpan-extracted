@@ -1,0 +1,11 @@
+Changes
+CLR.xs
+lib/Win32/CLR.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/CLR.t
+t/pod.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

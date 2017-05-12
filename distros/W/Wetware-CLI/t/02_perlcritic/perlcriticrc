@@ -1,0 +1,35 @@
+##############################################################################
+# $Revision: 8318 $
+# $Author: menzer $
+# $Date: 2009-04-24 12:05:33 -0700 (Fri, 24 Apr 2009) $
+# $URL: https://aesvn.apple.com/svn/UserPubs/Users/menzer/Apple-UserPubs-ReleaseManager/t/02_perlcritic/perlcriticrc $
+#------------------------------------------------------------------------------
+# Global options here...
+
+theme = core
+severity = 4
+verbose = 8
+profile-strictness = fatal
+
+#------------------------------------------------------------------------------
+# Disabled policies here...
+
+# for the moment we 'use constants' - so disable the policy
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+#------------------------------------------------------------------------------
+# Customized policies here...
+
+# Complexity is the greatest form of evil.
+[Subroutines::ProhibitExcessComplexity]
+severity = 5
+max_mccabe = 7
+
+# Complexity is the greatest form of evil.
+[Modules::ProhibitExcessMainComplexity]
+severity = 5
+max_mccabe = 3
+
+[InputOutput::RequireBriefOpen]
+lines = 15
+

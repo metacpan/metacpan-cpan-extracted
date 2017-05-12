@@ -1,0 +1,41 @@
+WWW/Blog/Identify version 0.01
+==============================
+
+Weblogs are a common online format, but they're a pain to detect programatically.
+Most common blog creation tools don't add a generator tag or other useful metadata,
+so it's up to Perl to step into the breach.  
+
+This module uses a suite of regular expressions to try and suss out whether a page is 
+a blog, and if so, what kind of CMS it was created with.   The blog detection part
+is pretty rudimentary (but effective) - if you have an RSS feed, or use the word
+'blog' five times on your page, or match one of the engine-specific regexes in 
+this module then you are marked as a blogger.   
+
+The classification part relies on some common boilerplate found in many blog templates,
+as well as those ubiquitous 'powered by' images, to determine the CMS used in creating
+the page.   In order of preference, the module tests the URL, looks for META tags, and
+then wades into the actual content.
+
+Additions and improvements on this module are always welcome.  My preference is for
+false negatives over false positives, so please keep that in mind when creating patches.
+
+If you are a blog tool designer, please consider adding a distinctive comment or (better yet)
+a META tag to your default template, to reduce the risk of not being counted.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Maciej Ceglowski
+

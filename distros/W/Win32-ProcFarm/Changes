@@ -1,0 +1,55 @@
+Revision history for Perl extension Win32::ProcFarm
+
+2.15  Fri Jan  9 2004
+      -	Added parens to my line in Child.pl to eliminate warning.
+
+2.14  Wed Jan  7 2004
+      -	Added support for using an executable (i.e. PerlApp
+	based) for the child processes.
+      -	Migrated Win32 directory into lib and updated Manifest and
+	Makefile.pl.
+
+2.13  Fri Jan 11 15:00:00 2002
+      -	Discovered and fixed a very nasty bug related to my
+	fixes for the Win32::GetTickCount() wrap-around bugs.
+	I was initializing the next_list_check and
+	next_exit_check fields with 0, which meant that if the
+	current Win32::GetTickCount() value was > 2^31, it
+	would be a very long time before those checks were run!
+      -	Added support for adding more threads to a pool at
+	runtime.  No support exists for reducing the size of a
+	pool.
+      -	Doing the above require minor edits to the Port object
+	to support dealing with limited listeners.  The code
+	to add threads was modified to support parallelization
+	through a limited number of listeners.
+      -	Fixed typo bug relating to result_sub
+      -	Extended result_sub to normal pools
+      -	Added support for limiting the rate at which jobs execute
+      -	Set things up so that the order jobs are listed in waiting_pool
+	matches the order in which they will execute.
+      -	Update PingFeedback.pl sample to use result_sub
+      -	Patched bug in TickCount.pm that manifested under 5.005.
+	Guess what?  2**32 == 0!  Thanks for finding this one go
+	to Sam Crosby.
+      -	Updated and extended the samples.
+      -	Added a few extra hints to Docs/tutorial.pod.
+
+2.12  Wed Jun 26 11:00:00 2001
+      -	Removed directories from MANIFEST
+      -	Fixed various Win32::GetTickCount() wrap-around bugs
+
+2.11  Wed Feb 14 12:01:00 2001
+      -	Updated README file to be based on Docs/overview.pod
+
+2.10  Wed Feb 14 12:00:00 2001
+      -	Added Win32::ProcFarm::PerpetualPool
+      -	Lots of bugs cleaned up
+      -	Rearchitected Win32::ProcFarm::Pool to make subclassing easier
+	(factored the code more completely)
+      -	Modified Win32::ProcFarm::TkPool to reflect the rearchitecture
+      -	Even more bugs cleaned up
+
+2.00  Tue Aug  1 12:00:00 2000
+      -	first to-be-but-never-CPANed release in Win32::ProcFarm namespace
+

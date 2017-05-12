@@ -1,0 +1,26 @@
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to [% user %] ([% user %]@somewhere).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+[% user %] - ([% user %]@somewhere)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 [% user %] (Somewhere).
+All rights reserved.
+
+=cut

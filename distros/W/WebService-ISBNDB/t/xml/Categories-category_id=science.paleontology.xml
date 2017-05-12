@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:12">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.paleontology" parent_id="science">
+<Name>Paleontology</Name>
+<Details summary="" depth="1" element_count="246" />
+<SubCategories>
+<SubCategory id="science.paleontology.linguistic" />
+<SubCategory id="science.paleontology.regions" />
+<SubCategory id="science.paleontology.periods" />
+<SubCategory id="science.paleontology.juvenile_literature" />
+<SubCategory id="science.paleontology.history" />
+<SubCategory id="science.paleontology.bibliography" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

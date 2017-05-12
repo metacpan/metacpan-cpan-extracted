@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Testafy.t
+lib/WWW/Testafy.pm

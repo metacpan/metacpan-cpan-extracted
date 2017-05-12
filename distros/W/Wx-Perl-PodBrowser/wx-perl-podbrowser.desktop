@@ -1,0 +1,44 @@
+# Copyright 2013 Kevin Ryde
+
+# This file is part of Wx-Perl-PodBrowser.
+#
+# Wx-Perl-PodBrowser is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Wx-Perl-PodBrowser is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# This file should be /usr/share/applications/wx-perl-podbrowser.desktop
+# Makefile.PL has nothing to install it there yet.
+#
+# Possible categories are at
+#   http://standards.freedesktop.org/menu-spec/latest/apa.html
+
+[Desktop Entry]
+Version=1.0
+Name=Wx-Perl-PodBrowser
+Type=Application
+GenericName=Pod Browser
+Comment=Browse Perl POD documentation
+Exec=wx-perl-podbrowser
+Terminal=false
+Categories=Development;Documentation;
+Keywords=Perl;POD
+
+# Believe class "Wx-perl-podbrowser" comes from the executable
+# filename "wx-perl-podbrowser" upcased by Wx or Gtk.
+StartupWMClass=Wx-perl-podbrowser
+#
+# Does Wx have anything to work with the startup notify stuff?
+# StartupNotify=0
+
+# No icon yet.
+# Icon=/usr/share/perl5/Wx/Perl/PodBrowser.xpm

@@ -1,0 +1,35 @@
+---
+abstract: 'check whether or not proxy servers are alive'
+author:
+  - 'Zoffix Znet <cpan@zoffix.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-ProxyChecker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Accessor::Grouped: '0'
+  IO::Pipe: '0'
+  LWP::UserAgent: '0'
+  WWW::FreeProxyListsCom: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/stevieb9/p5-www-proxychecker/issues
+  repository: https://github.com/stevieb9/p5-www-proxychecker.git
+version: '1.005'

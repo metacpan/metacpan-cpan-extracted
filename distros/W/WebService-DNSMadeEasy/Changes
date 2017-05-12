@@ -1,0 +1,11 @@
+Revision history for Perl extension WebService-DNSMadeEasy
+
+0.02 2016-05-24T13:33:30Z
+    - Added some missing dependencies to the cpanfile
+    - Minor pod update
+    - Print a bit more info to screen when an api request fails
+    - Modify tests to handle sandbox quirks more gracefully
+
+0.01 2016-05-24T03:27:19Z
+    - Original version
+

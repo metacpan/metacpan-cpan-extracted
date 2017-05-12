@@ -1,0 +1,39 @@
+Revision history for Perl extension Web::Dispatcher::Simple
+
+0.11  Sun Apr 17 23:36:00 2011
+        * Updated Readme 
+
+0.1  Sun Apr 17 23:36:00 2011
+        * Fixed the response encoding bug. Thanks, woremacx! 
+
+0.092 Sun Nov 6 10:26:00 2010
+        * Fixed the uri_for test
+
+0.091 Sun Nov 6 10:15:00 2010
+        * Updated plack version
+
+0.09 Sun Oct 30 20:15:00 2010
+        * Fixed the exceptoin handling when exception occured.
+        * Added dependencies
+
+0.08 Sun Oct 25 20:18:00 2010
+        * Decode request params and encode response body
+
+0.07 Sun Oct 24 14:30:00 2010
+        * added request and response classes
+
+0.06 Fri Oct 15 23:50:00 2010
+        * fixed POD
+
+0.05 Fri Oct 15 17:47:00 2010
+	* Changed the module name from PlackX::RouteBuilder to
+          Web::Dispatcher::Simple
+
+0.03 Fri Oct 15 12:40:00 2010
+	* fixed any method
+
+0.02 Fri Oct 15 11:50:30 2010
+	* Improved documentation and added tests
+
+0.01 Fri Oct 15 00:53:30 2010
+	* original version

@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+DialUpManager.pm
+DialUpManager.xs
+DialUpEvent.xs
+typemap
+cpp/du_constants.cpp
+t/01_load.t
+t/02_try.t
+t/03_constants.t
+t/04_event.t
+META.yml                                 Module meta-data (added by MakeMaker)

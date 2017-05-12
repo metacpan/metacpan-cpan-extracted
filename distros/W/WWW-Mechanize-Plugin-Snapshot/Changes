@@ -1,0 +1,92 @@
+Revision history for WWW-Mechanize-Plugin-Snapshot
+
+0.20  Thu Sep 21 16:56:33 PDT 2006
+	- Do not create snapshot directory until the first snapshot is taken
+
+0.19  Tue Apr 18 13:10:14 PDT 2006
+	- Added missing prereq for Class::Accessor
+	- Upgraded required version of WWW::Mechanize::Pluggable
+
+0.18  Tue Apr 18 09:20:47 PDT 2006
+	- eliminate uninitialized variable warning on first snap
+
+0.17  Fri Apr 14 15:11:55 PDT 2006
+	- accidentally included pre-built man page, which confuses
+	  Cygwin mightily
+	- test count off by 1 in XML tests
+
+0.16  Tue Mar 21 17:23:17 PST 2006
+	- added automatic type discovery for XML content.
+	  This allows XML returns to show properly in
+	  snapshots.
+	- reversed 'horizontal' and 'vertical' layouts
+	  to match the documentation (and common sense)
+
+0.15  Tue Mar 21 16:50:49 PST 2006
+	- change snapshot_layout to snap_layout for
+	  consistency with the simple_scan plugin
+
+0.14  Mon Mar 20 17:31:32 PST 2006
+	- add option to allow different layouts to
+	  be used (still predefined, but you get a choice)
+	- fix tests to clean up after themselves
+        - removed excessive diags
+
+0.13  Tue Dec  6 16:38:44 PST 2005
+	- change CSS in debug info to not use Impact
+	  (Users: "too clunky!"). Differing visions.
+
+0.12  Fri Dec  2 16:46:23 PST 2005
+	- Code is still too fast. (This is a problem?!)
+	  Changed to using a version counter that adds 
+	  a -1, -2, etc. to the filename instead of 
+          depending on the program being "slow enough"
+
+0.11  Fri Dec  2 15:49:28 PST 2005
+	- change colors in debug to something less loud.
+	- Add millisecods to timestamp (fast-running
+	  programs can clobber snapshots made close together)
+
+0.10  Fri Dec  2 13:48:04 PST 2005
+        - Reorder code to ensure that the run directory 
+	  timestamp stays consistent
+
+0.09  Fri Dec  2 12:47:29 PST 2005
+	- Fix inconsistency between snapped files and
+	  links in the frame file
+
+0.08  Thu Dec  1 11:49:09 PST 2005
+	- Fix inconsistency in filename between 
+	  generated files and references in the frame file
+
+0.07  Thu Dec  1 11:42:11 PST 2005
+	- changed method name to snap_prefix
+	  (easier to remember)
+
+0.06  Thu Dec  1 10:52:22 PST 2005
+	- Minor reorganization to simplify name generation
+	- Fix a bug with single-digit day of month
+	- Remove extraneous double-slashes from files/URLs
+	  generated with leaders
+
+0.05  Wed Nov 30 17:00:40 PST 2005
+	- added snap_leader so we can customize the
+	  file location for reporting by simple_scan
+	- new tests for snap_leader
+
+0.04  Wed Nov 30 13:17:50 2005
+	- Snap directory now timestamped per run
+	- timestamps now human-readable
+
+0.03  Tue Nov 22 13:07:30 2005
+	- remove Inline::Files dependency; not 
+	  dependable enough
+
+0.02  Fri Nov  4 14:06:13 2005 
+	- Updated interface
+	  -- Added snapshot_comment: prepost a comment
+	  -- Added optional filename arg to snapshot()
+
+0.01  Wed Nov  2 12:21:43 2005
+	- Initial release.
+

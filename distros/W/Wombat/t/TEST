@@ -1,0 +1,51 @@
+# -*- Mode: Perl; indent-tabs-mode: nil -*-
+
+use strict;
+use warnings;
+
+# cobbled together from modperl-2.0/Apache-Test. Thanks!
+
+use Cwd qw(cwd);
+use File::Find qw(find);
+use File::Spec::Functions qw(catfile);
+use Test::Harness ();
+
+chdir 't' if -d 't';
+
+# use blib
+my $cwd = cwd();
+unshift @INC, map "$cwd/../blib/$_", qw(lib arch);
+unshift @INC, "$cwd/lib";
+
+# fix all relative library locations
+for (@INC) {
+    $_ = "$cwd/../$_" unless m,^(/)|([a-f]:),i;
+}
+
+$Test::Harness::verbose = shift
+    if $ARGV[0] && ($ARGV[0] =~ /^\d+$/ || $ARGV[0] eq "-v");
+
+my @tests;
+
+if (@ARGV) {
+    for (@ARGV) {
+        if (-d $_) {
+            push(@tests, <$_/*.t>);
+        }
+        else {
+            $_ .= ".t" unless /\.t$/;
+            push(@tests, $_);
+        }
+    }
+}
+else {
+    find(sub {
+             return unless /\.t$/;
+             my $t = catfile $File::Find::dir, $_;
+             my $dotslash = catfile '.', "";
+             $t =~ s:^$dotslash::;
+             push @tests, $t
+         }, '.');
+}
+
+Test::Harness::runtests(@tests);

@@ -1,0 +1,134 @@
+-*- org -*-
+:  ________ ________ ________ __ __ _______ _______ ______ 
+: |  |  |  |  |  |  |  |  |  |__|__|   _   |   |   |   __ \
+: |  |  |  |  |  |  |  |  |  |__ __|       |   |   |      <
+: |________|________|________|__|__|___|___|_______|___|__|
+: 
+WWW::AUR - API for the Archlinux User Repository website.
+
+* Background
+
+The Archlinux User Repository is a relatively simple website that houses
+user-submitted packages for ArchLinux. These "source packages" merely
+contain what is required to build the package, unlike Archlinux's
+official repository which house binary packages.
+
+* Requirements
+
+The following modules are required for the use of WWW::AUR and
+friends. I provide this information in case you are wondering about
+lots of dependencies or maybe you aren't lucky enough to use a CPAN
+shell.
+
+Instead of listing each module used, I list each distribution (aka
+package) that you need to install from CPAN. This makes more sense
+to me and is more succinct.
+
+- libwww-perl
+- URI
+- JSON
+
+Logins to the AUR connect using the https port and are encrypted
+to protect your password and session cookie. In order to use
+WWW::AUR::Login you will also need the LWP-Protocol-https
+distribution installed. This brings in its own set of requirements
+for using SSL connections.
+
+** Core Modules
+
+These distributions are included with perl (as of version 5.10) so
+you probably won't need to download them:
+
+- Archive-Tar
+- Carp
+- Fctnl
+- File-Path (2.06)
+- PathTools (for File::Spec and Cwd)
+
+* Install
+
+To install this module follow these steps. If you have already downloaded
+and extracted the distribution tarball (WWW-AUR-<version>.tar.gz) in order
+to read this README file skip to step 4.
+
+1) Download the distribution tarball from CPAN.
+2) Extract the tarball.
+3) *cd* into the extracted directory (WWW-AUR-<version>)
+4) Run *perl Makefile.PL* to create a *Makefile*
+5) Run *make* to build the module using the *Makefile*
+6) (Optional) Run *make test* to run automated self-tests.
+7) Run *make install* to install the perl module into a system directory.
+
+#+BEGIN_EXAMPLE
+
+curl -O http://search.cpan.org/CPAN/authors/id/J/JU/JUSTER/WWW-AUR-X.XX.tar.gz
+tar xf WWW-AUR-X.XX.tar.gz
+cd WWW-AUR-X.XX
+perl Makefile.PL
+make
+make test
+sudo make install
+
+#+END_EXAMPLE
+
+Or better yet use a CPAN shell to do it for you! Cpanminus is available
+on CPAN under the name "App-cpanminus".
+
+* Purpose
+
+WWW::AUR has two basic purposes:
+
+1) Interacting with the AUR webpage (http://aur.archlinux.org)
+2) Building source packages by calling the makepkg script.
+   (http://www.archlinux.org/pacman/makepkg.8.html)
+
+** Web Page
+
+This module provides an interface for the straight-forward AUR user as
+well as for package author and trusted user. The (unmet) goal is to be able
+to do anything with this module that you could with a web browser.
+
+** Package Building
+
+The WWW::AUR::Package module also allows the module user to download and
+build source packages using makepkg. Installation is left up to the
+module user and is not implemented in this module.
+
+* Testing
+
+The automated testing (by using 'make test') can only succeed if there
+is an internet connection available. I suppose the tests would also fail
+if the AUR website is down...
+
+* See also
+
+** Source code repository
+
+http://github.com/jnbek/perl-www-aur
+
+** ArchLinux User Repository   
+
+http://aur.archlinux.com
+
+** Online makepkg manpage
+
+http://www.archlinux.org/pacman/makepkg.8.html
+
+* Author
+
+John D Jones III <jnbek at cpan dot org>
+
+* Support
+
+Send me an e-mail if you have any questions or need help. If you
+run into any bugs please e-mail any information about them.
+
+* License and Copyright
+
+Copyright 2016 John D Jones IIII
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

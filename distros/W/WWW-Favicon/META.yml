@@ -1,0 +1,27 @@
+---
+abstract: 'perl module to detect favicon url'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Test::MockObject::Extends: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Favicon
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  Exporter: 0
+  HTML::ResolveLink: 0
+  HTML::TreeBuilder: 0
+  LWP::UserAgent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03001

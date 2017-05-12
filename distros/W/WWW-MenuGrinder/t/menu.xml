@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<menu>
+  <item>
+    <label>Home</label>
+    <target>/</target>
+    <location />
+    <item>
+      <location>directory</location>
+      <label>Directory</label>
+    </item>
+  </item>
+  <item>
+    <label>_User Manager</label>
+    <need_role>it</need_role>
+    <location>user</location>
+    <target>/user/search</target>
+    <item>
+      <label>Your name is ${username}</label>
+    </item>
+    <item>
+      <location>user/search</location>
+      <label>Search</label>
+    </item>
+    <item>
+      <need_var>current_user</need_var>
+      <location>user/view</location>
+      <label>View</label>
+    </item>
+  </item>
+  <item>
+    <label>_Hardware Manager</label>
+    <need_role>it</need_role>
+    <location>hardware</location>
+    <target>/hardware/search</target>
+    <item>
+      <location>hardware</location>
+      <label>Search</label>
+    </item>
+    <item>
+      <location>hardware/add</location>
+      <label>Add</label>
+    </item>
+  </item>
+  <item>
+    <label>_CSR Manager</label>
+    <need_role>csr_manager</need_role>
+    <location>csr</location>
+    <item>
+      <location>csr/perf</location>
+      <label>CSR Performance</label>
+    </item>
+  </item>
+  <item>
+    <need_var>logged_in</need_var>
+    <location>logout</location>
+    <label>Log Out</label>
+  </item>
+  <item>
+    <no_var>logged_in</no_var>
+    <location>login</location>
+    <label>Log In</label>
+  </item>
+</menu>

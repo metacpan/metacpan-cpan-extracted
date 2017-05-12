@@ -1,0 +1,22 @@
+Perl Module: WWW::Github::Files
+===============================
+
+Because you just want to read a few files from Github
+
+Installation
+============
+
+As any other Perl module
+
+DEPENDENCIES
+============
+ 
+None.
+ 
+COPYRIGHT AND LICENCE
+=====================
+ 
+Copyright (C) 2013 by Shmuel Fomberg
+ 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

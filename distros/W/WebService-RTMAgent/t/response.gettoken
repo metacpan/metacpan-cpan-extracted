@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Date: Mon, 24 Dec 2007 08:48:03 GMT
+Server: nginx/RTM
+Vary: Accept-Encoding
+Content-Type: text/xml; charset="utf-8"
+Client-Date: Mon, 24 Dec 2007 08:49:31 GMT
+Client-Peer: 75.126.232.204:80
+Client-Response-Num: 1
+Client-Transfer-Encoding: chunked
+Keep-Alive: timeout=300
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok"><auth><token>token</token><perms>delete</perms><user id="403947" username="yves.rutschle" fullname="Yves Rutschle"/></auth></rsp>
+
+

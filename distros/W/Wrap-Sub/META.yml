@@ -1,0 +1,28 @@
+---
+abstract: 'Object Oriented subroutine wrapper with pre and post hooks, and more.'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wrap-Sub
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Devel::Examine::Subs: '1.63'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/stevieb9/wrap-sub/issues
+  repository: https://github.com/stevieb9/wrap-sub.git
+version: '0.06'

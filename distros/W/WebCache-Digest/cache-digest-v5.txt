@@ -1,0 +1,455 @@
+                                                      Martin Hamilton
+                                              JANET Web Cache Service
+                                                        Alex Rousskov
+                                                                NLANR
+                                                        Duane Wessels
+                                                                NLANR
+                                                        December 1998
+
+
+                Cache Digest specification - version 5
+
+
+Status of this memo
+
+This draft document may be updated, replaced, or made obsolete by
+other documents at any time. It is inappropriate to use this draft as
+reference material or to cite them other than as work in progress.
+
+Cache Digests are experimental and subject to change.  This isn't just
+an idle threat - the current specification *will* change soon!  These
+changes are likely to affect both the underlying data format and the
+digest exchange mechanism.  This document describes the Squid 2.[01]
+implementation, specifically that in Squid 2.1PATCH2.
+
+
+Abstract
+
+This document describes the Cache Digest exchange protocol and data
+format, as implemented by version 2 of the Squid WWW cache server.
+Cache Digests provide a mechanism for (primarily) WWW cache servers to
+cooperate without the latency and congestion problems associated with
+previous protocols such as ICP.
+
+
+1. What are Cache Digests ?
+
+Cache Digests are a response to the problems of latency and congestion
+associated with previous inter-cache communications mechanisms such as
+the Internet Cache Protocol (ICP) [RFC 2186, RFC 2187] and the
+HyperText Cache Protocol [HTCP-ID].  Unlike most of these protocols,
+Cache Digests support peering between cache servers without a
+request-response exchange taking place.  Instead, a summary of the
+contents of the server (the Digest) is fetched by other servers which
+peer with it.  Using Cache Digests it is possible to determine with a
+relatively high degree of accuracy whether a given URL is cached by a
+particular server.  This is done by feeding the URL and the HTTP
+method by which it is being requested into a hash function which
+returns a list of bits to test against in the Cache Digest [DIGESTS,
+BLOOM].
+
+Cache Digests are both a protocol and a data format, in the sense that
+the construction of the Cache Digest itself is well defined, and there
+is a well defined protocol for fetching Cache Digests over a network -
+currently via HTTP.  It's possible that Cache Digests could be
+exchanged via other mechanisms, in addition to HTTP, e.g. via FTP.
+The Cache Digest is calculated internally by the cache server and can
+exist as (for instance) a cached object like any other - subject to
+object refresh and expiry rules.
+
+Although Cache Digests as currently conceived are intended primarily
+for use in sharing summaries of which URLs are cached by a given
+server, this capability can be extended to cover other data sources.
+For example, an FTP mirror server might make a Cache Digest available
+which indicated matches for all of the URLs by which the resources it
+mirrored may be accessed.  This is potentially a very powerful
+mechanism for eliminating redundancy and making better use of Internet
+server and bandwidth resources.
+
+Cache Digests have been implemented in version 2 of the Squid WWW
+Cache Server [SQUID], though they are still considered experimental
+and (at the time of writing) must be explicitly enabled when Squid is
+compiled.
+
+
+2. Public keys
+
+Although we've spoken so far about URLs, the keys which are looked up
+in Cache Digests are actually formed by performing the MD5 [RFC 1321]
+digest function on the concatenation of:
+
+  1. a numeric code for the HTTP method used, and
+  2. the URL requested.
+
+Internally within Squid these MD5 values are referred to as 'public
+keys', and we'll reuse this terminology here to keep things simple.
+
+Legal values for the method number, and their corresponding HTTP
+methods, are:
+
+  GET       1
+  POST      2
+  PUT       3
+  HEAD      4
+  CONNECT   5
+  TRACE     6
+  PURGE     7
+
+The method value is stored as an 8 bit integer - see below for
+bit/byte ordering details.  
+
+For example, the public key (MD5 digest value) for the
+'http://www.w3.org/' URL fetched via the HTTP 'GET' method is:
+
+  e06a56257d8879d9e968e83f2ded3df7
+
+This is calculated on:
+
+  ASCII:  GET  h  t  t  p  :  /  /  w  w  w  .  w  3  .  o  r  g  /
+  Hex:    01   68 74 74 70 3a 2f 2f 77 77 77 2e 77 33 2e 6f 72 67 2f
+
+[ Note that versions of Squid prior to 2.1PATCH2 packed the HTTP
+method value incorrectly.  Unfortunately, the Cache Digests version
+was not updated in 2.1PATCH2.  Thus, all Cache Digests with versions
+0-3 and some with version 4 may contain the endian-ness bug. ]
+
+
+3. The Cache Digest itself
+
+The Cache Digest is an array of bits.  A hash function is used to
+derive the indices into the array which should be set (to register the
+presence of a public key) or tested (to look up a given public key in
+a given Digest).
+
+In Squid the number of bits in the Digest per public key is currently
+set to 5 by default.  The size of the Digest itself depends on both
+the number of bits consumed per entry, and the number of public keys
+which may be stored in the Digest - referred to as its capacity.
+
+The number of bytes used for the digest can be written as:
+  
+  digest_size = int((capacity * bits_per_entry + 7) / 8);
+
+Note that these values must be communicated to any entity which is to
+make use of the Cache Digest - this is the function of the Cache
+Digest header (see below).
+
+
+4. The Cache Digest hash function
+
+In order to register a given public key in a Cache Digest, a number of
+indices into the array (in Squid - four by default, though this may
+change) are calculated using a hash function.  This carries out the
+following steps:
+
+  1) Calculate the public key from the HTTP method and URL.
+
+  2) Split the resulting 128 bit value into N chunks, say:
+
+       temp_key[0] .. temp-key[N-1]
+
+  3) For each of these N chunks, the corresponding index into the
+     cache digest is the digest value modulo the number of bits
+     in the digest:
+
+       hash_key[i] = temp_key[i] % (digest_size * 8);
+
+The resulting N indices are the result of the function. N is called
+the dimension of a hashing function.
+
+In the 'GET http://www.w3.org/' example above, the public key is:
+
+  e06a56257d8879d9e968e83f2ded3df7
+
+In the default Squid scheme (N is 4) we would split it into the following
+four chunks:
+
+  temp_key[0] = 0xe06a5625;
+  temp_key[1] = 0x7d8879d9;
+  temp_key[2] = 0xe968e83f;
+  temp_key[3] = 0x2ded3df7;
+
+And calculate the indices into the cache digest as follows:
+
+  hash_key[0] = temp_key[0] % (digest_size * 8);
+  hash_key[1] = temp_key[1] % (digest_size * 8);
+  hash_key[2] = temp_key[2] % (digest_size * 8);
+  hash_key[3] = temp_key[3] % (digest_size * 8);
+
+Giving us the following four lookup keys (assuming digest_size is 16 
+bytes):
+
+  hash_keys[0] = 0x05;
+  hash_keys[1] = 0x29;
+  hash_keys[2] = 0x5f;
+  hash_keys[3] = 0x17;
+
+Note that these are indices into a bit array!
+
+
+5. Adding a public key to a Cache Digest
+
+Given a public key, the bit in the Cache Digest bit array associated
+with each of the indices (as calculated above) should be set.
+
+
+6. Testing a Cache Digest for a given public key
+
+A given public key is considered to be a match if and only if all of
+the bits associated with it (as outlined above) in the Cache Digest are
+set to 1.
+
+
+7. Deleting a public key
+
+You can't delete a single public key from the Digest without
+rebuilding it from scratch.  Simply clearing the bits in the Digest
+associated with this public key may also clear (some of the) bits
+associated with other public keys.
+
+
+8. Fetching a Cache Digest
+
+To fetch the Cache Digest from the Squid server listening for proxy
+HTTP requests on port 3128 of the host 'test.lut.ac.uk',
+a proxy HTTP request should be sent to it for the URL:
+
+  http://test.lut.ac.uk:3128/squid-internal-periodic/store_digest
+
+Clients must use 'If-Modified-Since' requests if they have old
+Digests, to avoid inadvertently transferring the same Digest more than
+once.
+
+
+The Cache Digest response is formatted as a regular HTTP response
+with the Internet Media Type (MIME type):
+
+  application/cache-digest
+
+The normal HTTP status codes should be used to deal with, for
+instance, authentication and access controls.  A successful response
+would look something like:
+
+  HTTP/1.0 200 OK
+  Server: Squid/2.1.PATCH2+Martin
+  Mime-Version: 1.0
+  Date: Sun, 13 Dec 1998 04:26:46 GMT
+  Content-Type: application/cache-digest
+  Content-Length: 142
+  Expires: Sun, 13 Dec 1998 05:26:46 GMT
+  Last-Modified: Sun, 13 Dec 1998 04:26:46 GMT
+  X-Cache: HIT from test.lut.ac.uk
+  X-Cache-Lookup: HIT from test.lut.ac.uk:3128
+  Age: 284
+  Proxy-Connection: close
+
+  <followed by body of response>
+
+The body of the response consists of the Cache Digest header, a fixed
+length (binary) data structure which specifies various aspects of the
+Digest, followed by the Cache Digest itself.  The header and digest
+combined come to the total number of bytes specified in the HTTP
+Content-Length header - 142 in this case.
+
+Note that all numbers, including the bits of the Cache Digest itself
+and the header which precedes it, are transfered in 'network'
+(big-endian, most significant byte first) order.
+
+
+9. Format of the Cache Digest Header
+
+The Cache Digest header is (currently!) a 128 byte data structure
+which contains the following fields:
+
+  Field name           Type   Bytes  Function
+  --------------------------------------------------------------
+  Current version      n      2      Version of this Digest
+  Required version     n      2      Minimum version required
+  Capacity             N      4      Number of URLs we can fit in
+  Count                N      4      Number of URLs actually in digest
+  Deletion count       N      4      Number of URL deletion attempts
+  Size in bytes        N      4      Size of digest, in bytes
+  Bits per entry       C      1      Number of bits per digest entry
+  Hash func dimension  C      1      Number of hash function chunks
+  Reserved             n      2      Reserved for future expansion
+  Reserved             N26    104    Reserved for future expansion
+
+Where:
+
+  C: 8 bit  (1 byte) wide unsigned integer/unsigned char
+  n: 16 bit (2 byte) signed integer
+  N: 32 bit (4 byte) signed integer
+
+As noted above, "Capacity" is the number of URLs we expected to be in
+the digest when we built it.  Squid calculates this value based on the
+number of URLs which were cached by the server at the time the digest
+was calculated, and recalculates the digest at periodic intervals
+-- every hour by default.
+
+"Required version" is the minimum version the decoding algorithm must
+support to interpret the digest correctly. If a receiver does not support
+"Required version", the entire reply must be ignored. No attempts to
+guess a part of the header must be made in the latter case.
+
+The "Reserved" fields are currently unused and must be set to zero.
+
+
+10. Security considerations
+
+If the contents of the Cache Digest are in any way sensitive, the
+Cache Administrator should take care to protect it from access by The
+Wrong People.  Note that any methods which would normally be applied
+to secure an HTTP connection can be applied to Cache Digests,
+e.g. Message Digest Authentication [RFC 2069] or Secure Sockets
+Layer/TLS [TLS-ID].
+
+Note that these access control issues also apply to Cache Digests
+which are cached alongside regular HTTP objects such as WWW pages - if
+not, it may be possible for third parties to download the Cache Digest
+of a server without the administrator of the server being aware that
+this has happened.  For this reason it may be desirable to have a flag
+in the Cache Digest header which indicates whether redistribution is
+permitted/encouraged.  Squid does not currently support such a flag,
+however.
+
+Since the algorithm is inherently imprecise, the resulting Digest is
+likely to contain some false hits for URLs which the cache doesn't
+actually contain (as well as some false misses).  If the cache is
+configured so as to allow its peers to only request objects which are
+already cached (e.g. via Squid's miss_allow option), peers will have
+to take care not to assume that a Digest hit means that access to the
+server which generated it will be allowed - and should be robust in
+the even that access is denied.  This may result in unintentional
+denial of service.
+
+Cache A can build a fake peer Digest for cache B and serve it to B's
+peers if requested. This way A can direct traffic toward/from B.  The
+impact of this problem is minimized by the 'pull' model of
+transferring Cache Digests from one server to another, but this
+'Trojan horse' attack is possible in a cache mesh.
+
+
+11. Open issues
+
+The 'application/cache-digest' media type needs to be registered with
+IANA, for use with HTTP.
+
+There should be a standard URL for fetching Cache Digests from a
+server.  That is, one which doesn't include '/squid-internal-periodic/'.
+
+How to decide the initial capacity?  Squid works on the basis of the
+number of cached URLs when it periodically regenerates its Digest, by
+dividing the amount of cache disk space in use by the average object
+size.
+
+One cache may have more than one digest - e.g. very fresh objects,
+somewhat fresh objects, and stale objects.  How to ask for a list of
+the digests the cache has?
+
+Rather than exchanging full digests, make "delta" or "diff" style
+exchanges of Digests.  For example, when the number of bits changed
+since the previous version of the Digest was generated is below a
+given threshold.  This implies some degree of synchronization between
+Digest aware cache servers, perhaps via DNS style serial numbers in
+the Cache Digest headers.
+
+Add info on how to verify that the Digest is not corrupted.  It may be
+worth computing an end-to-end checksum for this - e.g. via MD5, since
+we already need the MD5 code in order to calculate public keys.
+
+What to do with Cache Digest protocol version numbers in the header.
+For example, version 3 implementations should not fetch digests from
+version 4 servers, since the set bits corresponding to a given URL
+will be different due to the change in HTTP method encoding.
+
+How to add custom info to the header.  Despite the presence of
+"reserved" bytes, extending the current format is strongly discouraged.
+The next header format will allow for customizations. 
+
+How to calculate the probability of a false hit.
+
+How often to rebuild a Digest.  Squid currently has a hard wired
+default of rebuilding the Digest every hour.
+
+How many of the cached object URLs (or percentage of the Digest) to
+rebuild in any one chunk - or handle this in its entirety via a
+separate thread or (non-blocking) process.
+
+
+12. Acknowledgments
+
+This work was supported by the Joint Informations Systems Committee
+(JISC) of the UK Higher Education funding Councils, as part of the
+JANET Web Cache Service, and by the US National Science Foundation
+under grants NCR-9521745 and NCR-9616602.
+
+
+13. References
+
+[RFC 2186] D. Wessels and K. Claffy, "Internet Cache Protocol (ICP),
+           version 2", RFC 2186, September 1997.
+           <URL:ftp://ftp.ietf.org/rfc/rfc2186.txt>
+
+[RFC 2187] D. Wessels and K. Claffy, "Application of Internet Cache
+           Protocol (ICP), version 2", RFC 2187, September 1997.
+           <URL:ftp://ftp.ietf.org/rfc/rfc2187.txt>
+
+[HTCP-ID]  P. Vixie and D. Wessels, "Hyper Text Caching Protocol
+           (HTCP/0.0)", Internet Draft (work in progress), September
+           1998.
+
+[SUMMARY]  L. Fan, P. Cao, J. Almeida, and A. Z. Broder,
+	   "Summary Cache: A Scalable Wide-Area Web Cache Sharing
+	   Protocol", Proceedings of SIGCOMM'98,
+	   <URL:http://www.cs.wisc.edu/%7ecao/papers/summarycache.html>
+
+[DIGESTS]  A. Rousskov and D. Wessels, "Cache Digests",
+           Computer Networks and ISDN Systems, 
+           Volume 30, Numbers 22-23, November 1998,
+           <URL:http://ircache.nlanr.net/Papers/cache-digests.ps.gz>
+
+[BLOOM]    B. Bloom, "Space/time trade-offs in hash coding with
+           allowable errors", Communications of the ACM, volume 13,
+           pp. 422-426, July 1970.
+
+[SQUID]    D. Wessels, "Squid Homepage", December 1998.
+           <URL:http://squid.nlanr.net/>
+
+[RFC 1321] R. Rivest, "The MD5 Message Digest Algorithm", RFC 1321,
+           April 1992.  <URL:http://ftp.ietf.org/rfc/rfc132.txt>
+
+[RFC 2069] J. Franks, P. Hallam-Baker, J. Hostetler, P. Leach, A.
+           Luotonen, E. Sink and L. Stewart, "An Extension to HTTP:
+           Digest Access Authentication", RFC 2069, January 1997.
+           <URL:ftp://ftp.ietf.org/rfc/rfc2069.txt>
+
+[TLS-ID]   T. Dierks and C. Allen, "The TLS Protocol, Version 1.0",
+           Internet Draft (work in progress), November 1998. 
+
+
+14. Authors' addresses
+
+Martin Hamilton
+JANET Web Cache Service/Department of Computer Studies
+Loughborough University
+Leics. LE11 3TU, UK
+Email: martin@wwwcache.ja.net
+
+Alex Rousskov
+National Laboratory for Applied Network Research
+NCAR
+SCD, Room 22c
+1850 Table Mesa Drive
+Boulder, CO 80303, USA
+Email: rousskov@nlanr.net
+
+Duane Wessels
+National Laboratory for Applied Network Research
+NCAR
+SCD, Room 24D
+1850 Table Mesa Drive
+Boulder, CO 80303, USA
+Email: wessels@nlanr.net
+
+--
+$Id: cache-digest-v5.txt,v 1.3 1999/01/07 06:31:45 rousskov Exp $

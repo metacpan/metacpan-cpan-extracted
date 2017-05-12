@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "url": "http://bit.ly/cmeH01",
+        "hash": "cmeH01",
+        "global_hash": "1YKMfY",
+        "long_url": "http://betaworks.com/",
+        "new_hash": 0
+    },
+    "status_txt": "OK"
+}

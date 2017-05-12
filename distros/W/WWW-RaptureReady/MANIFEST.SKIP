@@ -1,0 +1,4 @@
+.*.swp
+.bak
+.git
+Makefile

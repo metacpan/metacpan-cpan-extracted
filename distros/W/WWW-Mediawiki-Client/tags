@@ -1,0 +1,535 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+ABSPERL	Makefile	/^ABSPERL = $(PERL)$/;"	m
+ABSPERLRUN	Makefile	/^ABSPERLRUN = $(ABSPERL)$/;"	m
+ABSPERLRUNINST	Makefile	/^ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+ACTION	blib/lib/WWW/Mediawiki/Client.pm	/^use constant ACTION => 'action';$/;"	c
+ACTION	lib/WWW/Mediawiki/Client.pm	/^use constant ACTION => 'action';$/;"	c
+AR	Makefile	/^AR = ar$/;"	m
+AR_STATIC_ARGS	Makefile	/^AR_STATIC_ARGS = cr$/;"	m
+AUTOSPLITFILE	Makefile	/^AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)'$/;"	m
+BASEEXT	Makefile	/^BASEEXT = Client$/;"	m
+BOOTDEP	Makefile	/^BOOTDEP = $/;"	m
+BOOTSTRAP	Makefile	/^BOOTSTRAP =$/;"	m
+CC	Makefile	/^CC = cc$/;"	m
+CCCDLFLAGS	Makefile	/^CCCDLFLAGS = -fPIC$/;"	m
+CCDLFLAGS	Makefile	/^		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=$/;"	m
+CCDLFLAGS	Makefile	/^CCDLFLAGS = -Wl,-E$/;"	m
+CHECKED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant CHECKED            => 1;$/;"	c
+CHECKED	lib/WWW/Mediawiki/Client.pm	/^use constant CHECKED            => 1;$/;"	c
+CHMOD	Makefile	/^CHMOD = chmod$/;"	m
+CI	Makefile	/^CI = ci -u$/;"	m
+COMMENT_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant COMMENT_NAME       => 'wpSummary';$/;"	c
+COMMENT_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant COMMENT_NAME       => 'wpSummary';$/;"	c
+COMPRESS	Makefile	/^COMPRESS = gzip --best$/;"	m
+CONFIGDEP	Makefile	/^CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h$/;"	m
+CONFIG_FILE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant CONFIG_FILE => '.mediawiki';$/;"	c
+CONFIG_FILE	lib/WWW/Mediawiki/Client.pm	/^use constant CONFIG_FILE => '.mediawiki';$/;"	c
+COOKIE_FILE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant COOKIE_FILE => '.mediawiki_cookies.dat';$/;"	c
+COOKIE_FILE	lib/WWW/Mediawiki/Client.pm	/^use constant COOKIE_FILE => '.mediawiki_cookies.dat';$/;"	c
+CP	Makefile	/^CP = cp$/;"	m
+C_FILES	Makefile	/^C_FILES  = $/;"	m
+DEFAULTS	blib/lib/WWW/Mediawiki/Client.pm	/^sub DEFAULTS { \\%DEFAULTS };$/;"	s
+DEFAULTS	lib/WWW/Mediawiki/Client.pm	/^sub DEFAULTS { \\%DEFAULTS };$/;"	s
+DEFINE_VERSION	Makefile	/^DEFINE_VERSION = -D$(VERSION_MACRO)=\\"$(VERSION)\\"$/;"	m
+DESTDIR	Makefile	/^DESTDIR = $/;"	m
+DESTINSTALLARCHLIB	Makefile	/^DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)$/;"	m
+DESTINSTALLBIN	Makefile	/^DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)$/;"	m
+DESTINSTALLMAN1DIR	Makefile	/^DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)$/;"	m
+DESTINSTALLMAN3DIR	Makefile	/^DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)$/;"	m
+DESTINSTALLPRIVLIB	Makefile	/^DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)$/;"	m
+DESTINSTALLSCRIPT	Makefile	/^DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)$/;"	m
+DESTINSTALLSITEARCH	Makefile	/^DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)$/;"	m
+DESTINSTALLSITEBIN	Makefile	/^DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)$/;"	m
+DESTINSTALLSITELIB	Makefile	/^DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)$/;"	m
+DESTINSTALLSITEMAN1DIR	Makefile	/^DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)$/;"	m
+DESTINSTALLSITEMAN3DIR	Makefile	/^DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)$/;"	m
+DESTINSTALLVENDORARCH	Makefile	/^DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)$/;"	m
+DESTINSTALLVENDORBIN	Makefile	/^DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)$/;"	m
+DESTINSTALLVENDORLIB	Makefile	/^DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)$/;"	m
+DESTINSTALLVENDORMAN1DIR	Makefile	/^DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)$/;"	m
+DESTINSTALLVENDORMAN3DIR	Makefile	/^DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)$/;"	m
+DEV_NULL	Makefile	/^DEV_NULL = > \/dev\/null 2>&1$/;"	m
+DFSEP	Makefile	/^DFSEP = $(DIRFILESEP)$/;"	m
+DIRFILESEP	Makefile	/^DIRFILESEP = \/$/;"	m
+DISTNAME	Makefile	/^DISTNAME = WWW-Mediawiki-Client$/;"	m
+DISTVNAME	Makefile	/^DISTVNAME = WWW-Mediawiki-Client-0.28$/;"	m
+DIST_CP	Makefile	/^DIST_CP = best$/;"	m
+DIST_DEFAULT	Makefile	/^DIST_DEFAULT = tardist$/;"	m
+DLBASE	Makefile	/^DLBASE = $(BASEEXT)$/;"	m
+DLEXT	Makefile	/^DLEXT = so$/;"	m
+DLSRC	Makefile	/^DLSRC = dl_dlopen.xs$/;"	m
+DOC_INSTALL	Makefile	/^DOC_INSTALL = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install$/;"	m
+ECHO	Makefile	/^ECHO = echo$/;"	m
+ECHO_N	Makefile	/^ECHO_N = echo -n$/;"	m
+EDIT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT => 'edit';$/;"	c
+EDIT	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT => 'edit';$/;"	c
+EDIT_MINOR_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_MINOR_NAME    => 'wpMinoredit';$/;"	c
+EDIT_MINOR_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_MINOR_NAME    => 'wpMinoredit';$/;"	c
+EDIT_PREVIEW_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_PREVIEW_NAME  => 'wpPreview';$/;"	c
+EDIT_PREVIEW_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_PREVIEW_NAME  => 'wpPreview';$/;"	c
+EDIT_PREVIEW_VALUE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_PREVIEW_VALUE => 'Show preview';$/;"	c
+EDIT_PREVIEW_VALUE	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_PREVIEW_VALUE => 'Show preview';$/;"	c
+EDIT_SUBMIT_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_SUBMIT_NAME   => 'wpSave';$/;"	c
+EDIT_SUBMIT_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_SUBMIT_NAME   => 'wpSave';$/;"	c
+EDIT_SUBMIT_VALUE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_SUBMIT_VALUE  => 'Save Page';$/;"	c
+EDIT_SUBMIT_VALUE	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_SUBMIT_VALUE  => 'Save Page';$/;"	c
+EDIT_TIME_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_TIME_NAME     => 'wpEdittime';$/;"	c
+EDIT_TIME_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_TIME_NAME     => 'wpEdittime';$/;"	c
+EDIT_TOKEN_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_TOKEN_NAME    => 'wpEditToken';$/;"	c
+EDIT_TOKEN_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_TOKEN_NAME    => 'wpEditToken';$/;"	c
+EDIT_WATCH_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_WATCH_NAME    => 'wpWatchthis';$/;"	c
+EDIT_WATCH_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant EDIT_WATCH_NAME    => 'wpWatchthis';$/;"	c
+EQUALIZE_TIMESTAMP	Makefile	/^EQUALIZE_TIMESTAMP = $(ABSPERLRUN) "-MExtUtils::Command" -e eqtime$/;"	m
+EXE_EXT	Makefile	/^EXE_EXT = $/;"	m
+EXE_FILES	Makefile	/^EXE_FILES = bin\/mvs$/;"	m
+EXPORT_LIST	Makefile	/^EXPORT_LIST        = $/;"	m
+FIRST_MAKEFILE	Makefile	/^FIRST_MAKEFILE = Makefile$/;"	m
+FIXIN	Makefile	/^FIXIN = $(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"$/;"	m
+FULLEXT	Makefile	/^FULLEXT = WWW\/Mediawiki\/Client$/;"	m
+FULLPERL	Makefile	/^FULLPERL      = \/usr\/bin\/perl$/;"	m
+FULLPERL	Makefile	/^FULLPERL = \/usr\/bin\/perl$/;"	m
+FULLPERLRUN	Makefile	/^FULLPERLRUN = $(FULLPERL)$/;"	m
+FULLPERLRUNINST	Makefile	/^FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+FULL_AR	Makefile	/^FULL_AR = \/usr\/bin\/ar$/;"	m
+Getopt	bin/mvs	/^	Getopt::Long::Configure($/;"	l
+Getopt	bin/mvs	/^	Getopt::Long::Configure('bundling', 'pass_through');$/;"	l
+Getopt	bin/mvs	/^	Getopt::Long::GetOptions($/;"	l
+Getopt	bin/mvs	/^	Getopt::Long::GetOptions('<>' => sub {$/;"	l
+Getopt	blib/script/mvs	/^	Getopt::Long::Configure($/;"	l
+Getopt	blib/script/mvs	/^	Getopt::Long::Configure('bundling', 'pass_through');$/;"	l
+Getopt	blib/script/mvs	/^	Getopt::Long::GetOptions($/;"	l
+Getopt	blib/script/mvs	/^	Getopt::Long::GetOptions('<>' => sub {$/;"	l
+HELP_MESSAGE	bin/mvs	/^sub HELP_MESSAGE {$/;"	s
+HELP_MESSAGE	blib/script/mvs	/^sub HELP_MESSAGE {$/;"	s
+HREF	Makefile	/^	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" \/>' >> $(DISTNAME).ppd$/;"	m
+H_FILES	Makefile	/^H_FILES  = $/;"	m
+INSTALLARCHLIB	Makefile	/^INSTALLARCHLIB = $(PERLPREFIX)\/lib\/perl\/5.8$/;"	m
+INSTALLBIN	Makefile	/^INSTALLBIN = $(PERLPREFIX)\/bin$/;"	m
+INSTALLDIRS	Makefile	/^INSTALLDIRS = site$/;"	m
+INSTALLMAN1DIR	Makefile	/^INSTALLMAN1DIR = $(PERLPREFIX)\/share\/man\/man1$/;"	m
+INSTALLMAN3DIR	Makefile	/^INSTALLMAN3DIR = $(PERLPREFIX)\/share\/man\/man3$/;"	m
+INSTALLPRIVLIB	Makefile	/^INSTALLPRIVLIB = $(PERLPREFIX)\/share\/perl\/5.8$/;"	m
+INSTALLSCRIPT	Makefile	/^INSTALLSCRIPT = $(PERLPREFIX)\/bin$/;"	m
+INSTALLSITEARCH	Makefile	/^INSTALLSITEARCH = $(SITEPREFIX)\/lib\/perl\/5.8.8$/;"	m
+INSTALLSITEBIN	Makefile	/^INSTALLSITEBIN = $(SITEPREFIX)\/bin$/;"	m
+INSTALLSITELIB	Makefile	/^INSTALLSITELIB = $(SITEPREFIX)\/share\/perl\/5.8.8$/;"	m
+INSTALLSITEMAN1DIR	Makefile	/^INSTALLSITEMAN1DIR = $(SITEPREFIX)\/man\/man1$/;"	m
+INSTALLSITEMAN3DIR	Makefile	/^INSTALLSITEMAN3DIR = $(SITEPREFIX)\/man\/man3$/;"	m
+INSTALLVENDORARCH	Makefile	/^INSTALLVENDORARCH = $(VENDORPREFIX)\/lib\/perl5$/;"	m
+INSTALLVENDORBIN	Makefile	/^INSTALLVENDORBIN = $(VENDORPREFIX)\/bin$/;"	m
+INSTALLVENDORLIB	Makefile	/^INSTALLVENDORLIB = $(VENDORPREFIX)\/share\/perl5$/;"	m
+INSTALLVENDORMAN1DIR	Makefile	/^INSTALLVENDORMAN1DIR = $(VENDORPREFIX)\/share\/man\/man1$/;"	m
+INSTALLVENDORMAN3DIR	Makefile	/^INSTALLVENDORMAN3DIR = $(VENDORPREFIX)\/share\/man\/man3$/;"	m
+INST_ARCHAUTODIR	Makefile	/^INST_ARCHAUTODIR = $(INST_ARCHLIB)\/auto\/$(FULLEXT)$/;"	m
+INST_ARCHLIB	Makefile	/^INST_ARCHLIB = blib\/arch$/;"	m
+INST_ARCHLIBDIR	Makefile	/^INST_ARCHLIBDIR  = $(INST_ARCHLIB)\/WWW\/Mediawiki$/;"	m
+INST_AUTODIR	Makefile	/^INST_AUTODIR     = $(INST_LIB)\/auto\/$(FULLEXT)$/;"	m
+INST_BIN	Makefile	/^INST_BIN = blib\/bin$/;"	m
+INST_BOOT	Makefile	/^INST_BOOT        = $/;"	m
+INST_DYNAMIC	Makefile	/^INST_DYNAMIC     = $/;"	m
+INST_LIB	Makefile	/^INST_LIB = blib\/lib$/;"	m
+INST_LIBDIR	Makefile	/^INST_LIBDIR      = $(INST_LIB)\/WWW\/Mediawiki$/;"	m
+INST_MAN1DIR	Makefile	/^INST_MAN1DIR = blib\/man1$/;"	m
+INST_MAN3DIR	Makefile	/^INST_MAN3DIR = blib\/man3$/;"	m
+INST_SCRIPT	Makefile	/^INST_SCRIPT = blib\/script$/;"	m
+INST_STATIC	Makefile	/^INST_STATIC      = $/;"	m
+IR	Makefile	/^		Makefile.PL DIR= \\$/;"	m
+LANGUAGE_CODE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant LANGUAGE_CODE => 'en';$/;"	c
+LANGUAGE_CODE	lib/WWW/Mediawiki/Client.pm	/^use constant LANGUAGE_CODE => 'en';$/;"	c
+LD	Makefile	/^LD = cc$/;"	m
+LDDLFLAGS	Makefile	/^LDDLFLAGS = -shared -L\/usr\/local\/lib$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS =  -L\/usr\/local\/lib$/;"	m
+LDFROM	Makefile	/^LDFROM = $(OBJECT)$/;"	m
+LIBC	Makefile	/^LIBC = \/lib\/libc-2.3.6.so$/;"	m
+LIBPERL_A	Makefile	/^LIBPERL_A = libperl.a$/;"	m
+LIBPERL_A	Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+LIB_EXT	Makefile	/^LIB_EXT = .a$/;"	m
+LINKTYPE	Makefile	/^		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \\$/;"	m
+LINKTYPE	Makefile	/^	LINKTYPE="$(LINKTYPE)"\\$/;"	m
+LINKTYPE	Makefile	/^LINKTYPE = dynamic$/;"	m
+LOGIN	blib/lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN => 'submitlogin';$/;"	c
+LOGIN	lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN => 'submitlogin';$/;"	c
+LOGIN_SUBMIT_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_SUBMIT_NAME  => 'wpLoginattempt';$/;"	c
+LOGIN_SUBMIT_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_SUBMIT_NAME  => 'wpLoginattempt';$/;"	c
+LOGIN_SUBMIT_VALUE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_SUBMIT_VALUE => 'Log In';$/;"	c
+LOGIN_SUBMIT_VALUE	lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_SUBMIT_VALUE => 'Log In';$/;"	c
+LOGIN_TITLE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_TITLE => 'Special:Userlogin';$/;"	c
+LOGIN_TITLE	lib/WWW/Mediawiki/Client.pm	/^use constant LOGIN_TITLE => 'Special:Userlogin';$/;"	c
+MACROEND	Makefile	/^MACROEND = $/;"	m
+MACROSTART	Makefile	/^MACROSTART = $/;"	m
+MAKEAPERL	Makefile	/^		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=$/;"	m
+MAKEFILE	Makefile	/^		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \\$/;"	m
+MAKEFILE_OLD	Makefile	/^MAKEFILE_OLD = Makefile.old$/;"	m
+MAKEMAKER	Makefile	/^MAKEMAKER   = \/usr\/share\/perl\/5.8\/ExtUtils\/MakeMaker.pm$/;"	m
+MAKE_APERL_FILE	Makefile	/^MAKE_APERL_FILE = Makefile.aperl$/;"	m
+MAN1EXT	Makefile	/^MAN1EXT = 1p$/;"	m
+MAN1PODS	Makefile	/^MAN1PODS = bin\/mvs$/;"	m
+MAN3EXT	Makefile	/^MAN3EXT = 3pm$/;"	m
+MAN3PODS	Makefile	/^MAN3PODS = lib\/WWW\/Mediawiki\/Client.pm \\$/;"	m
+MAP_TARGET	Makefile	/^MAP_TARGET    = perl$/;"	m
+MINOR_DEFAULT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant MINOR_DEFAULT => OPT_DEFAULT;$/;"	c
+MINOR_DEFAULT	lib/WWW/Mediawiki/Client.pm	/^use constant MINOR_DEFAULT => OPT_DEFAULT;$/;"	c
+MKPATH	Makefile	/^MKPATH = $(ABSPERLRUN) "-MExtUtils::Command" -e mkpath$/;"	m
+MM_REVISION	Makefile	/^MM_REVISION = Revision: 4535 $/;"	m
+MM_Unix_VERSION	Makefile	/^MM_Unix_VERSION = 1.50$/;"	m
+MM_VERSION	Makefile	/^MM_VERSION  = 6.30$/;"	m
+MOD_INSTALL	Makefile	/^MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install({@ARGV}, '\\''$(VERBINST)'\\'', 0, '\\''$(UNINST)'\\'');'$/;"	m
+MV	Makefile	/^MV = mv$/;"	m
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{META.yml} => q{Module meta-data (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=fullcheck" -e fullcheck$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \\$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=mkmanifest" -e mkmanifest$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=skipcheck" -e skipcheck$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="i486-linux-gnu-thread-multi" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Bundle-LWP" VERSION="1,11,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Carp" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Data-Dumper" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Encode" VERSION="1,75,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Encode-Guess" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Exception-Class" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="File-Find" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="File-Spec" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Getopt-Std" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTML-TokeParser" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Cookies" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Message" VERSION="1,56,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Request" VERSION="1,4,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Request-Common" VERSION="1,26,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Pod-Usage" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Test-Differences" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="URI" VERSION="1,31,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="VCS-Lite" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="XML-LibXML" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '        <OS NAME="$(OSNAME)" \/>' >> $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,28,0,0">' > $(DISTNAME).ppd$/;"	m
+NAME	Makefile	/^NAME = WWW::Mediawiki::Client$/;"	m
+NAME_SYM	Makefile	/^NAME_SYM = WWW_Mediawiki_Client$/;"	m
+NOECHO	Makefile	/^NOECHO = @$/;"	m
+NOOP	Makefile	/^NOOP = $(SHELL) -c true$/;"	m
+NSTALLDIRS	Makefile	/^	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site$/;"	m
+OBJECT	Makefile	/^OBJECT = $/;"	m
+OBJ_EXT	Makefile	/^OBJ_EXT = .o$/;"	m
+OPTION_SETTINGS	blib/lib/WWW/Mediawiki/Client.pm	/^use constant OPTION_SETTINGS => ($/;"	c
+OPTION_SETTINGS	lib/WWW/Mediawiki/Client.pm	/^use constant OPTION_SETTINGS => ($/;"	c
+OPTION_STATES	bin/mvs	/^use constant OPTION_STATES => ($/;"	c
+OPTION_STATES	blib/script/mvs	/^use constant OPTION_STATES => ($/;"	c
+OPT_DEFAULT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant OPT_DEFAULT => -1;$/;"	c
+OPT_DEFAULT	lib/WWW/Mediawiki/Client.pm	/^use constant OPT_DEFAULT => -1;$/;"	c
+OPT_KEEP	blib/lib/WWW/Mediawiki/Client.pm	/^use constant OPT_KEEP    => -2; # Only for watch.$/;"	c
+OPT_KEEP	lib/WWW/Mediawiki/Client.pm	/^use constant OPT_KEEP    => -2; # Only for watch.$/;"	c
+OPT_NO	blib/lib/WWW/Mediawiki/Client.pm	/^use constant OPT_NO      =>  0;$/;"	c
+OPT_NO	lib/WWW/Mediawiki/Client.pm	/^use constant OPT_NO      =>  0;$/;"	c
+OPT_YES	blib/lib/WWW/Mediawiki/Client.pm	/^use constant OPT_YES     =>  1;$/;"	c
+OPT_YES	lib/WWW/Mediawiki/Client.pm	/^use constant OPT_YES     =>  1;$/;"	c
+ORECURS	Makefile	/^		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=$/;"	m
+OSNAME	Makefile	/^OSNAME = linux$/;"	m
+OSVERS	Makefile	/^OSVERS = 2.6.15.4$/;"	m
+O_FILES	Makefile	/^O_FILES  = $/;"	m
+PARENT_NAME	Makefile	/^PARENT_NAME = WWW::Mediawiki$/;"	m
+PASSWORD_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant PASSWORD_NAME      => 'wpPassword';$/;"	c
+PASSWORD_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant PASSWORD_NAME      => 'wpPassword';$/;"	c
+PASTHRU	Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+PERL	Makefile	/^PERL = \/usr\/bin\/perl$/;"	m
+PERLMAINCC	Makefile	/^PERLMAINCC = $(CC)$/;"	m
+PERLPREFIX	Makefile	/^PERLPREFIX = $(PREFIX)$/;"	m
+PERLRUN	Makefile	/^PERLRUN = $(PERL)$/;"	m
+PERLRUNINST	Makefile	/^PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+PERL_ARCHIVE	Makefile	/^PERL_ARCHIVE       = $/;"	m
+PERL_ARCHIVE_AFTER	Makefile	/^PERL_ARCHIVE_AFTER = $/;"	m
+PERL_ARCHLIB	Makefile	/^PERL_ARCHLIB = \/usr\/lib\/perl\/5.8$/;"	m
+PERL_CORE	Makefile	/^PERL_CORE = 0$/;"	m
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)$/;"	m
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)$/;"	m
+PERL_INC	Makefile	/^PERL_INC = \/usr\/lib\/perl\/5.8\/CORE$/;"	m
+PERL_LIB	Makefile	/^PERL_LIB = \/usr\/share\/perl\/5.8$/;"	m
+PERL_MALLOC_DEF	Makefile	/^PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc$/;"	m
+PERM_RW	Makefile	/^PERM_RW = 644$/;"	m
+PERM_RWX	Makefile	/^PERM_RWX = 755$/;"	m
+PM_TO_BLIB	Makefile	/^PM_TO_BLIB = lib\/WWW\/Mediawiki\/Client\/Exceptions.pm \\$/;"	m
+POD2MAN	Makefile	/^POD2MAN = $(POD2MAN_EXE)$/;"	m
+POD2MAN_EXE	Makefile	/^POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"$/;"	m
+POSTOP	Makefile	/^POSTOP = $(NOECHO) $(NOOP)$/;"	m
+PREFIX	Makefile	/^	PREFIX="$(PREFIX)"$/;"	m
+PREFIX	Makefile	/^PREFIX = \/usr$/;"	m
+PREOP	Makefile	/^PREOP = $(NOECHO) $(NOOP)$/;"	m
+PROTOCOL	blib/lib/WWW/Mediawiki/Client.pm	/^use constant PROTOCOL => 'http';$/;"	c
+PROTOCOL	lib/WWW/Mediawiki/Client.pm	/^use constant PROTOCOL => 'http';$/;"	c
+RANLIB	Makefile	/^RANLIB = :$/;"	m
+RCS_LABEL	Makefile	/^RCS_LABEL = rcs -Nv$(VERSION_SYM): -q$/;"	m
+REMEMBER_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant REMEMBER_NAME      => 'wpRemember';$/;"	c
+REMEMBER_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant REMEMBER_NAME      => 'wpRemember';$/;"	c
+RM_F	Makefile	/^RM_F = rm -f$/;"	m
+RM_RF	Makefile	/^RM_RF = rm -rf$/;"	m
+SAVED_ATTRIBUTES	blib/lib/WWW/Mediawiki/Client.pm	/^use constant SAVED_ATTRIBUTES => ($/;"	c
+SAVED_ATTRIBUTES	lib/WWW/Mediawiki/Client.pm	/^use constant SAVED_ATTRIBUTES => ($/;"	c
+SHAR	Makefile	/^SHAR = shar$/;"	m
+SHELL	Makefile	/^SHELL = \/bin\/sh$/;"	m
+SITEARCHEXP	Makefile	/^SITEARCHEXP = \/usr\/local\/lib\/perl\/5.8.8$/;"	m
+SITELIBEXP	Makefile	/^SITELIBEXP = \/usr\/local\/share\/perl\/5.8.8$/;"	m
+SITEPREFIX	Makefile	/^SITEPREFIX = $(PREFIX)\/local$/;"	m
+SKIP	t/client.t	/^SKIP: {$/;"	l
+SO	Makefile	/^SO = so$/;"	m
+SPACE_SUBSTITUTE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant SPACE_SUBSTITUTE => '_';$/;"	c
+SPACE_SUBSTITUTE	lib/WWW/Mediawiki/Client.pm	/^use constant SPACE_SUBSTITUTE => '_';$/;"	c
+SPECIAL_EXPORT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant SPECIAL_EXPORT => 'Special:Export';$/;"	c
+SPECIAL_EXPORT	lib/WWW/Mediawiki/Client.pm	/^use constant SPECIAL_EXPORT => 'Special:Export';$/;"	c
+SPECIAL_VERSION	blib/lib/WWW/Mediawiki/Client.pm	/^use constant SPECIAL_VERSION => 'Special:Version';$/;"	c
+SPECIAL_VERSION	lib/WWW/Mediawiki/Client.pm	/^use constant SPECIAL_VERSION => 'Special:Version';$/;"	c
+STATUS_CONFLICT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_CONFLICT        => 'C';$/;"	c
+STATUS_CONFLICT	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_CONFLICT        => 'C';$/;"	c
+STATUS_LOCAL_ADDED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_LOCAL_ADDED     => 'A';$/;"	c
+STATUS_LOCAL_ADDED	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_LOCAL_ADDED     => 'A';$/;"	c
+STATUS_LOCAL_MODIFIED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_LOCAL_MODIFIED  => 'M';$/;"	c
+STATUS_LOCAL_MODIFIED	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_LOCAL_MODIFIED  => 'M';$/;"	c
+STATUS_SERVER_MODIFIED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_SERVER_MODIFIED => 'U';$/;"	c
+STATUS_SERVER_MODIFIED	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_SERVER_MODIFIED => 'U';$/;"	c
+STATUS_UNCHANGED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_UNCHANGED       => '=';$/;"	c
+STATUS_UNCHANGED	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_UNCHANGED       => '=';$/;"	c
+STATUS_UNKNOWN	blib/lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_UNKNOWN         => '?';$/;"	c
+STATUS_UNKNOWN	lib/WWW/Mediawiki/Client.pm	/^use constant STATUS_UNKNOWN         => '?';$/;"	c
+SUBMIT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant SUBMIT => 'submit';$/;"	c
+SUBMIT	lib/WWW/Mediawiki/Client.pm	/^use constant SUBMIT => 'submit';$/;"	c
+SUFFIX	Makefile	/^SUFFIX = .gz$/;"	m
+TAR	Makefile	/^TAR = tar$/;"	m
+TARFLAGS	Makefile	/^TARFLAGS = cvf$/;"	m
+TESTDB_SW	Makefile	/^TESTDB_SW = -d$/;"	m
+TEST_F	Makefile	/^TEST_F = test -f$/;"	m
+TEST_FILE	Makefile	/^TEST_FILE = test.pl$/;"	m
+TEST_FILES	Makefile	/^TEST_FILES = t\/*.t$/;"	m
+TEST_TYPE	Makefile	/^TEST_TYPE=test_$(LINKTYPE)$/;"	m
+TEST_VERBOSE	Makefile	/^TEST_VERBOSE=0$/;"	m
+TEXTAREA_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant TEXTAREA_NAME      => 'wpTextbox1';$/;"	c
+TEXTAREA_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant TEXTAREA_NAME      => 'wpTextbox1';$/;"	c
+TITLE	blib/lib/WWW/Mediawiki/Client.pm	/^use constant TITLE => 'title';$/;"	c
+TITLE	lib/WWW/Mediawiki/Client.pm	/^use constant TITLE => 'title';$/;"	c
+TOUCH	Makefile	/^TOUCH = touch$/;"	m
+TO_INST_PM	Makefile	/^TO_INST_PM = lib\/WWW\/Mediawiki\/Client.pm \\$/;"	m
+TO_UNIX	Makefile	/^TO_UNIX = $(NOECHO) $(NOOP)$/;"	m
+UMASK_NULL	Makefile	/^UMASK_NULL = umask 0$/;"	m
+UNCHECKED	blib/lib/WWW/Mediawiki/Client.pm	/^use constant UNCHECKED          => 0;$/;"	c
+UNCHECKED	lib/WWW/Mediawiki/Client.pm	/^use constant UNCHECKED          => 0;$/;"	c
+UNINST	Makefile	/^UNINST = 0$/;"	m
+UNINSTALL	Makefile	/^UNINSTALL = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall$/;"	m
+USEMAKEFILE	Makefile	/^USEMAKEFILE = -f$/;"	m
+USERNAME_NAME	blib/lib/WWW/Mediawiki/Client.pm	/^use constant USERNAME_NAME      => 'wpName';$/;"	c
+USERNAME_NAME	lib/WWW/Mediawiki/Client.pm	/^use constant USERNAME_NAME      => 'wpName';$/;"	c
+VENDORARCHEXP	Makefile	/^VENDORARCHEXP = \/usr\/lib\/perl5$/;"	m
+VENDORLIBEXP	Makefile	/^VENDORLIBEXP = \/usr\/share\/perl5$/;"	m
+VENDORPREFIX	Makefile	/^VENDORPREFIX = $(PREFIX)$/;"	m
+VERBINST	Makefile	/^VERBINST = 0$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Bundle-LWP" VERSION="1,11,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Carp" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Data-Dumper" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Encode" VERSION="1,75,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Encode-Guess" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Exception-Class" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="File-Find" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="File-Spec" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Getopt-Std" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTML-TokeParser" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Cookies" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Message" VERSION="1,56,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Request" VERSION="1,4,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="HTTP-Request-Common" VERSION="1,26,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Pod-Usage" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="Test-Differences" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="URI" VERSION="1,31,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="VCS-Lite" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '        <DEPENDENCY NAME="XML-LibXML" VERSION="0,0,0,0" \/>' >> $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,28,0,0">' > $(DISTNAME).ppd$/;"	m
+VERSION	Makefile	/^VERSION = 0.28$/;"	m
+VERSION_FROM	Makefile	/^VERSION_FROM = lib\/WWW\/Mediawiki\/Client.pm$/;"	m
+VERSION_MACRO	Makefile	/^VERSION_MACRO = VERSION$/;"	m
+VERSION_SYM	Makefile	/^VERSION_SYM = 0_28$/;"	m
+WARN_IF_OLD_PACKLIST	Makefile	/^WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist$/;"	m
+WATCH_DEFAULT	blib/lib/WWW/Mediawiki/Client.pm	/^use constant WATCH_DEFAULT => OPT_DEFAULT;$/;"	c
+WATCH_DEFAULT	lib/WWW/Mediawiki/Client.pm	/^use constant WATCH_DEFAULT => OPT_DEFAULT;$/;"	c
+WIKI_PATH	blib/lib/WWW/Mediawiki/Client.pm	/^use constant WIKI_PATH => 'wiki\/index.php';$/;"	c
+WIKI_PATH	lib/WWW/Mediawiki/Client.pm	/^use constant WIKI_PATH => 'wiki\/index.php';$/;"	c
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^		WWW::Mediawiki::Client::InvalidOptionException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^	WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^            WWW::Mediawiki::Client::CorruptedConfigFileException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^            WWW::Mediawiki::Client::FileAccessException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::CommitException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::InvalidOptionException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::LoginException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::ServerPageException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::UpdateNeededException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::AbsoluteFileNameException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::AuthException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::CommitException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::CommitMessageException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ConflictsPresentException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::FileAccessException->throw("No such file!") $/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::FileTypeException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ReadOnlyFieldException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ServerPageException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	blib/lib/WWW/Mediawiki/Client/Exceptions.pm	/^WWW::Mediawiki::Client::Exception->Trace(1);$/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^		WWW::Mediawiki::Client::InvalidOptionException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^	WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^            WWW::Mediawiki::Client::CorruptedConfigFileException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^            WWW::Mediawiki::Client::FileAccessException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::CommitException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::InvalidOptionException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::LoginException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::ServerPageException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^        WWW::Mediawiki::Client::UpdateNeededException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::AbsoluteFileNameException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::AuthException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::CommitException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::CommitMessageException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ConflictsPresentException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::FileAccessException->throw("No such file!") $/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::FileTypeException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ReadOnlyFieldException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::ServerPageException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client.pm	/^    WWW::Mediawiki::Client::URLConstructionException->throw($/;"	l
+WWW	lib/WWW/Mediawiki/Client/Exceptions.pm	/^WWW::Mediawiki::Client::Exception->Trace(1);$/;"	l
+WWW	t/server.t	/^        WWW::Mediawiki::Client::STATUS_UNKNOWN,$/;"	l
+XS_DEFINE_VERSION	Makefile	/^XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\\"$(XS_VERSION)\\"$/;"	m
+XS_FILES	Makefile	/^XS_FILES = $/;"	m
+XS_VERSION	Makefile	/^XS_VERSION = 0.28$/;"	m
+XS_VERSION_MACRO	Makefile	/^XS_VERSION_MACRO = XS_VERSION$/;"	m
+ZIP	Makefile	/^ZIP = zip$/;"	m
+ZIPFLAGS	Makefile	/^ZIPFLAGS = -r$/;"	m
+_check_path	blib/lib/WWW/Mediawiki/Client.pm	/^sub _check_path {$/;"	s
+_check_path	lib/WWW/Mediawiki/Client.pm	/^sub _check_path {$/;"	s
+_conflicts_found_in	blib/lib/WWW/Mediawiki/Client.pm	/^sub _conflicts_found_in {$/;"	s
+_conflicts_found_in	lib/WWW/Mediawiki/Client.pm	/^sub _conflicts_found_in {$/;"	s
+_get_edit_checkbox	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_checkbox {$/;"	s
+_get_edit_checkbox	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_checkbox {$/;"	s
+_get_edit_date	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_date {$/;"	s
+_get_edit_date	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_date {$/;"	s
+_get_edit_is_watching	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_is_watching {$/;"	s
+_get_edit_is_watching	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_is_watching {$/;"	s
+_get_edit_minor_default	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_minor_default {$/;"	s
+_get_edit_minor_default	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_minor_default {$/;"	s
+_get_edit_token	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_token {$/;"	s
+_get_edit_token	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_token {$/;"	s
+_get_edit_watch_default	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_watch_default {$/;"	s
+_get_edit_watch_default	lib/WWW/Mediawiki/Client.pm	/^sub _get_edit_watch_default {$/;"	s
+_get_export_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_export_url {$/;"	s
+_get_export_url	lib/WWW/Mediawiki/Client.pm	/^sub _get_export_url {$/;"	s
+_get_exported_pages	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_exported_pages {$/;"	s
+_get_exported_pages	lib/WWW/Mediawiki/Client.pm	/^sub _get_exported_pages {$/;"	s
+_get_host_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_host_url {$/;"	s
+_get_host_url	lib/WWW/Mediawiki/Client.pm	/^sub _get_host_url {$/;"	s
+_get_page_headline	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_page_headline {$/;"	s
+_get_page_headline	lib/WWW/Mediawiki/Client.pm	/^sub _get_page_headline {$/;"	s
+_get_ref_filename	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_ref_filename {$/;"	s
+_get_ref_filename	lib/WWW/Mediawiki/Client.pm	/^sub _get_ref_filename {$/;"	s
+_get_reference_page	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_reference_page {$/;"	s
+_get_reference_page	lib/WWW/Mediawiki/Client.pm	/^sub _get_reference_page {$/;"	s
+_get_server_encoding	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_server_encoding {$/;"	s
+_get_server_encoding	lib/WWW/Mediawiki/Client.pm	/^sub _get_server_encoding {$/;"	s
+_get_update_status	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_update_status {$/;"	s
+_get_update_status	lib/WWW/Mediawiki/Client.pm	/^sub _get_update_status {$/;"	s
+_get_version_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_version_url {$/;"	s
+_get_version_url	lib/WWW/Mediawiki/Client.pm	/^sub _get_version_url {$/;"	s
+_get_wiki_text	blib/lib/WWW/Mediawiki/Client.pm	/^sub _get_wiki_text {$/;"	s
+_get_wiki_text	lib/WWW/Mediawiki/Client.pm	/^sub _get_wiki_text {$/;"	s
+_merge	blib/lib/WWW/Mediawiki/Client.pm	/^sub _merge {$/;"	s
+_merge	lib/WWW/Mediawiki/Client.pm	/^sub _merge {$/;"	s
+_option_check	blib/lib/WWW/Mediawiki/Client.pm	/^sub _option_check {$/;"	s
+_option_check	lib/WWW/Mediawiki/Client.pm	/^sub _option_check {$/;"	s
+_option_verify	blib/lib/WWW/Mediawiki/Client.pm	/^sub _option_verify {$/;"	s
+_option_verify	lib/WWW/Mediawiki/Client.pm	/^sub _option_verify {$/;"	s
+_ref_to_filename	blib/lib/WWW/Mediawiki/Client.pm	/^sub _ref_to_filename {$/;"	s
+_ref_to_filename	lib/WWW/Mediawiki/Client.pm	/^sub _ref_to_filename {$/;"	s
+_update_core	blib/lib/WWW/Mediawiki/Client.pm	/^sub _update_core {$/;"	s
+_update_core	lib/WWW/Mediawiki/Client.pm	/^sub _update_core {$/;"	s
+_upload_file	blib/lib/WWW/Mediawiki/Client.pm	/^sub _upload_file {$/;"	s
+_upload_file	lib/WWW/Mediawiki/Client.pm	/^sub _upload_file {$/;"	s
+commit_message	blib/lib/WWW/Mediawiki/Client.pm	/^sub commit_message {$/;"	s
+commit_message	lib/WWW/Mediawiki/Client.pm	/^sub commit_message {$/;"	s
+do_clean	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_clean {$/;"	s
+do_clean	lib/WWW/Mediawiki/Client.pm	/^sub do_clean {$/;"	s
+do_com	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_com {$/;"	s
+do_com	lib/WWW/Mediawiki/Client.pm	/^sub do_com {$/;"	s
+do_commit	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_commit {$/;"	s
+do_commit	lib/WWW/Mediawiki/Client.pm	/^sub do_commit {$/;"	s
+do_li	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_li {$/;"	s
+do_li	lib/WWW/Mediawiki/Client.pm	/^sub do_li {$/;"	s
+do_login	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_login {$/;"	s
+do_login	lib/WWW/Mediawiki/Client.pm	/^sub do_login {$/;"	s
+do_preview	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_preview {$/;"	s
+do_preview	lib/WWW/Mediawiki/Client.pm	/^sub do_preview {$/;"	s
+do_up	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_up {$/;"	s
+do_up	lib/WWW/Mediawiki/Client.pm	/^sub do_up {$/;"	s
+do_update	blib/lib/WWW/Mediawiki/Client.pm	/^sub do_update {$/;"	s
+do_update	lib/WWW/Mediawiki/Client.pm	/^sub do_update {$/;"	s
+encoding	blib/lib/WWW/Mediawiki/Client.pm	/^sub encoding {$/;"	s
+encoding	lib/WWW/Mediawiki/Client.pm	/^sub encoding {$/;"	s
+escape_filenames	blib/lib/WWW/Mediawiki/Client.pm	/^sub escape_filenames {$/;"	s
+escape_filenames	lib/WWW/Mediawiki/Client.pm	/^sub escape_filenames {$/;"	s
+filename_to_pagename	blib/lib/WWW/Mediawiki/Client.pm	/^sub filename_to_pagename {$/;"	s
+filename_to_pagename	lib/WWW/Mediawiki/Client.pm	/^sub filename_to_pagename {$/;"	s
+filename_to_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub filename_to_url {$/;"	s
+filename_to_url	lib/WWW/Mediawiki/Client.pm	/^sub filename_to_url {$/;"	s
+get_local_page	blib/lib/WWW/Mediawiki/Client.pm	/^sub get_local_page {$/;"	s
+get_local_page	lib/WWW/Mediawiki/Client.pm	/^sub get_local_page {$/;"	s
+get_server_page	blib/lib/WWW/Mediawiki/Client.pm	/^sub get_server_page {$/;"	s
+get_server_page	lib/WWW/Mediawiki/Client.pm	/^sub get_server_page {$/;"	s
+host	blib/lib/WWW/Mediawiki/Client.pm	/^sub host {$/;"	s
+host	lib/WWW/Mediawiki/Client.pm	/^sub host {$/;"	s
+language_code	blib/lib/WWW/Mediawiki/Client.pm	/^sub language_code {$/;"	s
+language_code	lib/WWW/Mediawiki/Client.pm	/^sub language_code {$/;"	s
+list_wiki_files	blib/lib/WWW/Mediawiki/Client.pm	/^sub list_wiki_files {$/;"	s
+list_wiki_files	lib/WWW/Mediawiki/Client.pm	/^sub list_wiki_files {$/;"	s
+load_state	blib/lib/WWW/Mediawiki/Client.pm	/^sub load_state {$/;"	s
+load_state	lib/WWW/Mediawiki/Client.pm	/^sub load_state {$/;"	s
+main	bin/mvs	/^sub main {$/;"	s
+main	blib/script/mvs	/^sub main {$/;"	s
+minor_edit	blib/lib/WWW/Mediawiki/Client.pm	/^sub minor_edit {$/;"	s
+minor_edit	lib/WWW/Mediawiki/Client.pm	/^sub minor_edit {$/;"	s
+multistate_map	bin/mvs	/^sub multistate_map {$/;"	s
+multistate_map	blib/script/mvs	/^sub multistate_map {$/;"	s
+multistate_option	bin/mvs	/^sub multistate_option {$/;"	s
+multistate_option	blib/script/mvs	/^sub multistate_option {$/;"	s
+multistate_text	bin/mvs	/^sub multistate_text {$/;"	s
+multistate_text	blib/script/mvs	/^sub multistate_text {$/;"	s
+new	blib/lib/WWW/Mediawiki/Client.pm	/^sub new {$/;"	s
+new	lib/WWW/Mediawiki/Client.pm	/^sub new {$/;"	s
+pagename_to_filename	blib/lib/WWW/Mediawiki/Client.pm	/^sub pagename_to_filename {$/;"	s
+pagename_to_filename	lib/WWW/Mediawiki/Client.pm	/^sub pagename_to_filename {$/;"	s
+pagename_to_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub pagename_to_url {$/;"	s
+pagename_to_url	lib/WWW/Mediawiki/Client.pm	/^sub pagename_to_url {$/;"	s
+parse_command	bin/mvs	/^sub parse_command {$/;"	s
+parse_command	blib/script/mvs	/^sub parse_command {$/;"	s
+parse_options	bin/mvs	/^sub parse_options {$/;"	s
+parse_options	blib/script/mvs	/^sub parse_options {$/;"	s
+password	blib/lib/WWW/Mediawiki/Client.pm	/^sub password {$/;"	s
+password	lib/WWW/Mediawiki/Client.pm	/^sub password {$/;"	s
+print_defaults	bin/mvs	/^sub print_defaults {$/;"	s
+print_defaults	blib/script/mvs	/^sub print_defaults {$/;"	s
+protocol	blib/lib/WWW/Mediawiki/Client.pm	/^sub protocol {$/;"	s
+protocol	lib/WWW/Mediawiki/Client.pm	/^sub protocol {$/;"	s
+save_state	blib/lib/WWW/Mediawiki/Client.pm	/^sub save_state {$/;"	s
+save_state	lib/WWW/Mediawiki/Client.pm	/^sub save_state {$/;"	s
+site_url	blib/lib/WWW/Mediawiki/Client.pm	/^sub site_url {$/;"	s
+site_url	lib/WWW/Mediawiki/Client.pm	/^sub site_url {$/;"	s
+space_substitute	blib/lib/WWW/Mediawiki/Client.pm	/^sub space_substitute {$/;"	s
+space_substitute	lib/WWW/Mediawiki/Client.pm	/^sub space_substitute {$/;"	s
+status	blib/lib/WWW/Mediawiki/Client.pm	/^sub status {$/;"	s
+status	lib/WWW/Mediawiki/Client.pm	/^sub status {$/;"	s
+top	t/files/Main_Page.html	/^	  <a name="top" id="contentTop"><\/a>$/;"	a
+url_to_filename	blib/lib/WWW/Mediawiki/Client.pm	/^sub url_to_filename {$/;"	s
+url_to_filename	lib/WWW/Mediawiki/Client.pm	/^sub url_to_filename {$/;"	s
+username	blib/lib/WWW/Mediawiki/Client.pm	/^sub username {$/;"	s
+username	lib/WWW/Mediawiki/Client.pm	/^sub username {$/;"	s
+version_message	bin/mvs	/^sub version_message {$/;"	s
+version_message	blib/script/mvs	/^sub version_message {$/;"	s
+watch	blib/lib/WWW/Mediawiki/Client.pm	/^sub watch {$/;"	s
+watch	lib/WWW/Mediawiki/Client.pm	/^sub watch {$/;"	s
+wiki_path	blib/lib/WWW/Mediawiki/Client.pm	/^sub wiki_path {$/;"	s
+wiki_path	lib/WWW/Mediawiki/Client.pm	/^sub wiki_path {$/;"	s

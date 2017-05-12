@@ -1,0 +1,82 @@
+Revision history for Wx-Perl-Packager
+
+0.27    2010-09-16 00:00
+        Essential bug-fix for wx relocation in PerlApp
+
+0.26    2010-04-15 00:00
+        POD changes only for MacOSX
+        wxpar improved handling for Linux binary names and improved POD
+        wxpar now picks up runtime library for mingw-w64 built binaries
+
+0.25    2010-04-13 00:00
+        Fixed for MacOSX 10.4
+
+0.24    2010-03-27 00:00
+        Fixed Wx::XRC loading bug
+
+0.23    2010-03-16 00:00
+        Fixes for MSWin32 64 bit Wx builds
+        Better unique keys for wx temp path
+        Various documentation updates
+
+0.22    2010-03-13 01:00
+        Implemented MacOSX 10.4 / ppc arch workaround
+        for errors on exit
+
+0.21    2010-03-13 00:00
+        Linux Build fixed
+        POD updated for MacOSX
+        
+0.20    2010-01-30 00:00
+        Added notes for MacOSX packaging
+        minor improvements for linux and mswin
+
+0.19    2010-01-23 23:00
+        Release 18 broken (missing modules)
+
+0.18    2010-01-23 12:00
+        complete rework to make actions a little less opaque
+        linux support added (for PPMs from http://www.wxperl.co.uk)
+        removed obsolete wxpdk
+
+0.16    2010-01-10 12:00
+        Updated to work with PDK 8.1 / 8.0.2
+        Handle monolithic wxWidgets dlls        
+        
+0.15    2008-02-28 12:00
+        Updated to work with PDK 7.1
+        --dyndll does not with PerlApp
+        --clean  does not with PerlApp
+        
+0.12 - 0.14 Not Released
+
+0.11    2007-11-21 12:00
+        Handle gdiplus dependency
+        Added more methods to help packaging /fixed warnings
+        Fixed PerlApp errors - now use separate directory
+        --dyndll now works with PerlApp
+        --clean does not
+
+0.10    2007-09-15 12:00
+        Fixed longstanding error in wx_path settings.
+        Added some methods to help packaging.
+        Improved documentaton
+
+0.09    2007-08-22 17:00
+        wxpar & wxpdk scripts updated for gcc built wx modules.
+        wxpdk updated for PDK version 7
+        wxpar script now uses argfile (Getopt::Argfile)
+        wxpar now runs pp using 'system' (was 'exec')
+
+0.08    2007-04-28 17:00
+        Amended documentation. Some code cleanup.
+
+0.07    2007-02-28 17:00
+        Changes for wxWidgets 2.8.0 (replaces 0.04/05/06 which had pause problems on dir permissions)
+
+0.03    2006-07-01 17:00
+        Fixed README.
+
+0.02    2006-07-01 16:00
+        First release version, released on an unsuspecting world.
+

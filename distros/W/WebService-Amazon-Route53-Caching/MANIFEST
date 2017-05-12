@@ -1,0 +1,22 @@
+ChangeLog
+lib/WebService/Amazon/Route53/Caching.pm
+lib/WebService/Amazon/Route53/Caching/Store/DBM.pm
+lib/WebService/Amazon/Route53/Caching/Store/NOP.pm
+lib/WebService/Amazon/Route53/Caching/Store/Redis.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/amazon-functional-test.t
+t/manifest.t
+t/pod.t
+t/style-no-tabs.t
+t/style-no-trailing-whitespace.t
+t/test-cache-dbm.t
+t/test-cache-nop.t
+t/test-cache-redis.t
+t/test-strict.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

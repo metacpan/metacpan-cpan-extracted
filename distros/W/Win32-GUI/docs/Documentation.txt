@@ -1,0 +1,194 @@
+INTRODUCTION
+============
+
+This file describes the documentation for Win32::GUI.  Please edit it and keep it up
+to date as chages are made.
+
+All documentation should originate as POD.  The HTML documentation is then generated from
+this using pod2html (see POD::Html).
+
+The documentation is divided into packages, and the directory structure under the top
+level 'docs' directory reflects this - this is required so that links to over documents
+works correctly.
+
+DOCUMENTATION PACKAGES
+======================
+
+* Win32::GUI                          docs/GUI.pod
+  Table of Contents
+
+* Win32::GUI::pkg                     docs/GUI/pkgname.pod
+    Per Package docs, generated from embedded documentation in
+    the Source (XS, CPP and PM files).  Depending on the package,
+    there may be documentation in sub-packages below this one.
+    (See doPodDocs script, later)
+
+* Win32::GUI::UserGuide               docs/GUI/UserGuide/
+
+- Win32::GUI::UserGuide::Readme       docs/GUI/UserGuide/Readme.pod
+    Win32::GUI Readme file.  This is used to build Readme and
+    Readme.html that are put into the distribution files
+    (see doReadme script, later)
+
+- Win32::GUI::UserGuide::Introduction docs/GUI/UserGuide/Introduction.pod
+    A brief introduction to Win32::GUI
+
+- Win32::GUI::UserGuide::Concepts     docs/GUI/UserGuide/Concepts.pod
+    A overview of the Win32::GUI concepts
+
+- Win32::GUI::UserGuide::FAQ          docs/GUI/UserGuide/FAQ.pod
+    A (currently outdated) FAQ.
+
+* Win32::GUI::Reference               docs/GUI/Reference/
+
+- Win32::GUI::Reference::Packages     docs/GUI/Reference/Packages.pod
+    A list of all the Win32::GUI packages, with links to the
+    per-package documentation. Package list is built automatically
+    (See doPodDocs script, later)
+
+- Win32::GUI::Reference::Methods      docs/GUI/Reference/Methods.pod
+    A list of the common methods - actually a list of all the
+    methods in the Win32::GUI package.  Method list is built
+    automatically.
+
+- Win32::GUI::Reference::Options      docs/GUI/Reference/Options.pod
+    A list of the common options.
+
+- Win32::GUI::Reference::Events       docs/GUI/Reference/Events.pod
+    A list of common events - actually a list of all events found
+    with "APPLIES_TO:*".  Event list is built automatically.
+
+* Win32::GUI::Tutorial                docs/GUI/Tutorial.pod
+    Table of contents for the tutorial
+
+- Win32::GUI::Tutorial::Part1         docs/GUI/Tutorial/Part1.pod
+    Part 1 of the tutorial
+
+- Win32::GUI::Tutorial::Part2         docs/GUI/Tutorial/Part2.pod
+    Part 2 of the tutorial
+
+- Win32::GUI::Tutorial::Part3         docs/GUI/Tutorial/Part3.pod
+    Part 3 of the tutorial
+
+- Win32::GUI::Tutorial::Part4         docs/GUI/Tutorial/Part4.pod
+    Part 4 of the tutorial
+
+- Win32::GUI::Tutorial::Part5         docs/GUI/Tutorial/Part5.pod
+    Part 5 of the tutorial
+
+- Win32::GUI::Tutorial::Part9         docs/GUI/Tutorial/Part9.pod
+    Part 9 of the tutorial
+
+EMBEDED DOCUMENTATION
+=====================
+
+The Embedded documentation is turned into POD documentation
+by the script 'build_tools/doPodDocs.pl'.  This tool is
+run by the make target 'all', and puts generated POD documentation
+into the correct subdirectory of the blib directory tree, such that
+it will be installed in the correct locations by 'make install'.
+
+You may manually invoke this script from the commandline, using the make
+target 'poddocs'.
+
+When parsing the documentation, the script uses the package
+'build_tools/SrcParser.pm' to parse out the documentation from the
+source files.
+
+* Packages
+  Introduced by a line containing the text:
+  (@)PACKAGE: Win32::GUI::PackageName
+
+  The first comment line, immediately following such a declaration is taken
+  as the package abstract, and should be a short title for the package
+
+  Any other comment lines following the package declaration are taken as
+  package description text.
+
+* Methods
+  Introduced by a line containg the text:
+  (@)METHOD: MethodName(prototype)
+  This must happen AFTER a (@)PACKAGE declaration.  Any comment lines
+  following such a declaration are taken as a description of the method,
+  with the exception of addiional (@)METHOD declarations, which are
+  assumed to be alternate calls for the same method. Alternate calls
+  my have no package declaration (DoStuff()) in which case they are
+  assumed to be in the sam epackage as is current, and will get a
+  'See method()' text, with a link to the current method; or they may
+  have a package declaration (Win32::GUI::SomePackage::doStuff()) in
+  which case they will be documented under the alternate package, including
+  the description, with an addition 'See OriginalPackage::OriginalMethod()'
+  line.
+
+* Events
+  Intruduced by a line containg the text:
+  (@)EVENT: EventName(prototype)
+  Any following comment lines are assumed to be description, except lines
+  containing (@)APPLIES_TO: listOfPackages.  Where listOfPAckages is either
+  * (applies to all packages) or non-qualified, comma seperated package names.
+  There must be at least one (@)APPLIES_TO line.
+
+* DESCRIPTIONS
+  Decription blocks are continuous block of source comments following one of
+  the identifier lines described above.  The descriptions amy contain POD
+  formatting commandes (e.g. B<...> C<...> etc.).  Any line indented
+  by more than one space after the comment identifier (#, *) will be treated
+  as a POD 'verbatim' line.  Continuous sets of such indented lines will be
+  treated as a POD verbatim block.  Blank lines will be introduced either
+  side of verbatim blocks if not provided in the source.
+
+  Description blocks are also parsed for text that looks like:
+  See also method()
+  See new Win32::GUI:Package()
+  and various variations on this theme. Such text will be updated to have a link
+  to the referenced method on the appropriate package's page.
+
+* LINKS
+  If you wish to provide a link to a page from within the text, please use the
+  form:
+    L<description|Win32::GUI::PackageName>
+  even if this means that your link looks like:
+    L<Win32::GUI::PackageName|Win32::GUI::PackageName>
+  as the form without the description generates text like
+  'See the Win32::GUI::PackageName manpage' when converted to HTML by pod2html.
+
+MACROS and TEMPLATING
+=====================
+  The 'build_tools/doPodDocs.pl' script applies a very basic macro expansion and templating scheme
+  to the documents that it processes.  The following macros are applied to every
+  POD page as it is copied from the 'docs' directory tree to the 'blib' directory
+  tree (See 'build_tools/BuildTools.pm'):
+__W32G_VERSION__         The Win32::GUI VERSION being built
+__W32G_PERLVERSION__     The Major perl version being used (e.g. 5.6, 5.8)
+__W32G_DATE__            Today's date  (formatted as 12 Jun 2005)
+__W32G_YEAR__            Today's year (4 digits)
+__W32G_FILE__            The Win32::GUI VERSION being built
+__W32G_WEB_HOMEPAGE__    The URL of the Win32::GUI homepage (http://sourceforge.net/projects/perl-win32-gui/)
+__W32G_WEB_USERMAIL__    The URL of the users mailing list sign-up page
+                            (http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users)
+__W32G_WEB_MAILARCHIVE__ The URL of the mailing list archives (http://sourceforge.net/mail/?group_id=16572)
+__W32G_WEB_FILES__       The URL of the Win32::GUI files download page
+                            (http://sourceforge.net/project/showfiles.php?group_id=16572)
+__W32G_POSTAMBLE__       Expands to include VERSION, SUPPORT and COPYRIGHT and LICENCE sections that
+                         should be common to all POD pages (see 'docs/pod_postamble.tpl')                     
+__W32G_EMAIL_USERLIST__ => 'perl-win32-gui-users@lists.sourceforge.net',
+
+README FILE
+===========
+  The script 'build_tools/doReadme.pl' is run as a dependent for any distribution generating
+  make target (dist, distdir, ppm), and updates the Readme and Reademe.html files in the
+  root of the distribution from the 'docs/GUI/UserGuide/Readme.pod' file.
+
+  It can be run manually as 'make readmedocs'.
+
+HTML DOCUMENTATION
+==================
+  The script 'docs/doHTMLDocs.pl' takes any POD dcumentation that exists in the blib/lib
+  directory tree, converts it to html and put it in the blib/html/site/lib directory tree.
+  It also copies any image files from the 'docs' directory tree (esp. See the tutorial).
+
+  This script is run as a part of the 'make ppm' target, and can be run from the command
+  line as 'make htmldocs'.  It is dependent on the poddocs target, so POD documentation
+  is all automatically updated as part of this process.  Conversion to HTML is performed
+  using pod2html (See POD::Html).
+

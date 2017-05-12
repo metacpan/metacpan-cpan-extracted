@@ -1,0 +1,42 @@
+Win32-IntAuth version 0.12
+==========================
+
+This module encapsulates (with Win32::API) the SSPI-API functions that are necessary
+to authenticate and impersonate remote users from an already existing
+session without additional specification of username and password.
+
+The used Security Package is always 'Negotiate'.
+
+The module does not handle transport of the created user token to the
+server process or service nor does it provide routines for further
+evaluation of user rights or group memberships.
+
+The outline provided in the synopsis should be enough to get you
+started. For details please look at the SSPI docs at:
+
+  http://msdn2.microsoft.com/en-us/library/aa380493.aspx
+
+(as of 5/2008)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::API
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Thomas Kratz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

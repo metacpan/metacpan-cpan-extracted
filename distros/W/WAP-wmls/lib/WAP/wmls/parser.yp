@@ -1,0 +1,1494 @@
+/*
+ *      WMLScript Language Specification Version 1.1
+ */
+
+%token  IDENTIFIER
+        /* Literal */
+%token  INTEGER_LITERAL
+%token  FLOAT_LITERAL
+%token  STRING_LITERAL
+%token  UTF8_STRING_LITERAL
+%token  TRUE_LITERAL
+%token  FALSE_LITERAL
+%token  INVALID_LITERAL
+        /* Keyword */
+%token  ACCESS
+%token  AGENT
+%token  BREAK
+%token  CONTINUE
+%token  DOMAIN
+%token  DIV
+%token  ELSE
+%token  EQUIV
+%token  EXTERN
+%token  FOR
+%token  FUNCTION
+#%token HEADER
+%token  HTTP
+%token  IF
+%token  ISVALID
+%token  META
+%token  NAME
+%token  PATH
+%token  RETURN
+%token  TYPEOF
+%token  USE
+%token  USER
+%token  VAR
+%token  WHILE
+%token  URL
+
+%expect 1
+
+%start  CompilationUnit
+
+%%
+
+Literal
+:   INTEGER_LITERAL
+        {
+            # always positive
+            use bigint;
+            if ($_[1] > 2147483648) {
+                $_[0]->Error("Integer $_[1] is out of range.\n");
+                new WAP::wmls::LoadConst($_[0],
+                        'TypeDef'           =>  'TYPE_INVALID',
+                );
+            }
+            else {
+                new WAP::wmls::LoadConst($_[0],
+                        'TypeDef'           =>  'TYPE_INTEGER',
+                        'Value'             =>  $_[1]
+                );
+            }
+        }
+|   FLOAT_LITERAL
+        {
+            # always positive
+            use bignum;
+            if ($_[1] > 3.40282347e+38) {
+                $_[0]->Error("Float $_[1] is out of range.\n");
+                new WAP::wmls::LoadConst($_[0],
+                        'TypeDef'           =>  'TYPE_INVALID',
+                );
+            }
+            else {
+                if ($_[1] < 1.17549435e-38) {
+                    $_[0]->Warning("Float $_[1] is underflow.\n");
+                    $_[1] = 0.0;
+                }
+                new WAP::wmls::LoadConst($_[0],
+                        'TypeDef'           =>  'TYPE_FLOAT',
+                        'Value'             =>  $_[1]
+                );
+            }
+        }
+|   StringLiteral
+        #default action
+|   TRUE_LITERAL
+        {
+            new WAP::wmls::LoadConst($_[0],
+                    'TypeDef'           =>  'TYPE_BOOLEAN',
+                    'Value'             =>  1
+            );
+        }
+|   FALSE_LITERAL
+        {
+            new WAP::wmls::LoadConst($_[0],
+                    'TypeDef'           =>  'TYPE_BOOLEAN',
+                    'Value'             =>  0
+            );
+        }
+|   INVALID_LITERAL
+        {
+            new WAP::wmls::LoadConst($_[0],
+                    'TypeDef'           =>  'TYPE_INVALID',
+            );
+        }
+;
+
+StringLiteral
+:   STRING_LITERAL
+        {
+            new WAP::wmls::LoadConst($_[0],
+                    'TypeDef'           =>  'TYPE_STRING',
+                    'Value'             =>  $_[1]
+            );
+        }
+|   UTF8_STRING_LITERAL
+        {
+            new WAP::wmls::LoadConst($_[0],
+                    'TypeDef'           =>  'TYPE_UTF8_STRING',
+                    'Value'             =>  $_[1]
+            );
+        }
+;
+
+PrimaryExpression
+:   IDENTIFIER
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[1]);
+            new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+        }
+|   Literal
+        #default action
+|   '(' Expression  ')'
+        {
+            $_[2];
+        }
+|   '(' error
+        {
+            $_[0]->Error("invalid expression.\n");
+            $_[0]->YYErrok();
+        }
+|   '(' Expression  error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+CallExpression
+:   PrimaryExpression
+        #default action
+|   LocalScriptFunctionCall
+        #default action
+|   ExternalScriptFunctionCall
+        #default action
+|   LibraryFunctionCall
+        #default action
+;
+
+LocalScriptFunctionCall
+:   FunctionName    Arguments
+        {
+            my $nbargs = (defined $_[2]) ? $_[2]->{OpCode}->{Index} : 0;
+            my $def = $_[0]->YYData->{symbtab_func}->LookupLocal($_[1]);
+            my $call = new WAP::wmls::Call($_[0],
+                    'Definition'        =>  $def,
+                    'Index'             =>  $nbargs
+            );
+            (defined $_[2]) ? $_[2]->concat($call) : $call;
+        }
+;
+
+ExternalScriptFunctionCall
+:   ExternalScriptName  '#' FunctionName    Arguments
+        {
+            my $nbargs = (defined $_[4]) ? $_[4]->{OpCode}->{Index} : 0;
+            my $def = $_[0]->YYData->{symbtab_func}->LookupExternal($_[1], $_[3], $nbargs);
+            my $call = new WAP::wmls::CallUrl($_[0],
+                    'Definition'        =>  $def,
+                    'Url'               =>  $_[0]->YYData->{symbtab_url}->Lookup($_[1])
+            );
+            (defined $_[4]) ? $_[4]->concat($call) : $call;
+        }
+;
+
+LibraryFunctionCall
+:   LibraryName '.' FunctionName    Arguments
+        {
+            my $nbargs = (defined $_[4]) ? $_[4]->{OpCode}->{Index} : 0;
+            my $def = $_[0]->YYData->{symbtab_func}->LookupLibrary($_[1], $_[3], $nbargs)
+                    if ($_[0]->YYData->{symbtab_lib}->Lookup($_[1]));
+            my $call = new WAP::wmls::CallLib($_[0],
+                    'Definition'        =>  $def
+            );
+            (defined $_[4]) ? $_[4]->concat($call) : $call;
+        }
+;
+
+FunctionName
+:   IDENTIFIER
+        #default action
+;
+
+ExternalScriptName
+:   IDENTIFIER
+        #default action
+;
+
+LibraryName
+:   IDENTIFIER
+        #default action
+;
+
+Arguments
+:   '(' ')'
+        {
+            undef;
+        }
+|   '(' ArgumentList    ')'
+        {
+            $_[2];
+        }
+|   '(' ArgumentList    error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+ArgumentList
+:   AssignmentExpression
+        {
+            $_[1]->configure(
+                    'Index'             =>  1   # nb args
+            );
+        }
+|   ArgumentList    ',' AssignmentExpression
+        {
+            $_[1]->concat($_[3]);
+            $_[1]->configure(
+                    'Index'             =>  $_[1]->{OpCode}->{Index} + 1    # nb args
+            );
+        }
+|   ArgumentList    ',' error
+        {
+            $_[0]->Error("invalid argument.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+PostfixExpression
+:   CallExpression
+        #default action
+|   IDENTIFIER  '++'
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[1]);
+            my $load = new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+            my $incr = new WAP::wmls::IncrVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $load->concat($incr);
+        }
+|   IDENTIFIER  '--'
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[1]);
+            my $load = new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+            my $decr = new WAP::wmls::DecrVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $load->concat($decr);
+        }
+;
+
+UnaryExpression
+:   PostfixExpression
+        #default action
+|   TYPEOF  UnaryExpression
+        {
+            BuildUnop($_[0], $_[1], $_[2]);
+        }
+|   ISVALID UnaryExpression
+        {
+            BuildUnop($_[0], $_[1], $_[2]);
+        }
+|   '++'        IDENTIFIER
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[2]);
+            my $incr = new WAP::wmls::IncrVar($_[0],
+                    'Definition'        =>  $var
+            );
+            my $load = new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $incr->concat($load);
+        }
+|   '--'        IDENTIFIER
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[2]);
+            my $decr = new WAP::wmls::DecrVar($_[0],
+                    'Definition'        =>  $var
+            );
+            my $load = new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $decr->concat($load);
+        }
+|   '+'     UnaryExpression
+        {
+            $_[2];
+        }
+|   '-'     UnaryExpression
+        {
+            BuildUnop($_[0], $_[1], $_[2]);
+        }
+|   '~'     UnaryExpression
+        {
+            BuildUnop($_[0], $_[1], $_[2]);
+        }
+|   '!'     UnaryExpression
+        {
+            BuildUnop($_[0], $_[1], $_[2]);
+        }
+;
+
+MultiplicativeExpression
+:   UnaryExpression
+        #default action
+|   MultiplicativeExpression    '*'     UnaryExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   MultiplicativeExpression    '/'     UnaryExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   MultiplicativeExpression    DIV     UnaryExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   MultiplicativeExpression    '%'     UnaryExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+AdditiveExpression
+:   MultiplicativeExpression
+        #default action
+|   AdditiveExpression  '+'     MultiplicativeExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   AdditiveExpression  '-'     MultiplicativeExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+ShiftExpression
+:   AdditiveExpression
+        #default action
+|   ShiftExpression     '<<'    AdditiveExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   ShiftExpression     '>>'    AdditiveExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   ShiftExpression     '>>>'   AdditiveExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+RelationalExpression
+:   ShiftExpression
+        #default action
+|   RelationalExpression    '<'     ShiftExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   RelationalExpression    '>'     ShiftExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   RelationalExpression    '<='        ShiftExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   RelationalExpression    '>='        ShiftExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+EqualityExpression
+:   RelationalExpression
+        #default action
+|   EqualityExpression  '=='        RelationalExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+|   EqualityExpression  '!='        RelationalExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+BitwiseANDExpression
+:   EqualityExpression
+        #default action
+|   BitwiseANDExpression    '&'     EqualityExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+BitwiseXORExpression
+:   BitwiseANDExpression
+        #default action
+|   BitwiseXORExpression    '^'     BitwiseANDExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+BitwiseORExpression
+:   BitwiseXORExpression
+        #default action
+|   BitwiseORExpression     '|'     BitwiseXORExpression
+        {
+            BuildBinop($_[0], $_[1], $_[2], $_[3]);
+        }
+;
+
+LogicalANDExpression
+:   BitwiseORExpression
+        #default action
+|   LogicalANDExpression    '&&'        BitwiseORExpression
+        {
+            BuildLogop($_[0], $_[1], new WAP::wmls::ScAnd($_[0]), $_[3]);
+        }
+;
+
+LogicalORExpression
+:   LogicalANDExpression
+        #default action
+|   LogicalORExpression     '||'        LogicalANDExpression
+        {
+            BuildLogop($_[0], $_[1], new WAP::wmls::ScOr($_[0]), $_[3]);
+        }
+;
+
+ConditionalExpression
+:   LogicalORExpression
+        #default action
+|   LogicalORExpression '?' AssignmentExpression    ':' AssignmentExpression
+        {
+            BuildIfElse($_[0], $_[1], $_[3], $_[5]);
+        }
+|   LogicalORExpression '?' AssignmentExpression    error
+        {
+            $_[0]->Error("':' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+AssignmentExpression
+:   ConditionalExpression
+        #default action
+|   IDENTIFIER  AssignmentOperator  AssignmentExpression
+        {
+            my $asg;
+            my $var = $_[0]->YYData->{symbtab_var}->Lookup($_[1]);
+            if      ($_[2] eq '=') {
+                my $store1 = new WAP::wmls::StoreVar($_[0],
+                        'Definition'        =>  $var
+                );
+                $asg = $_[3]->concat($store1);
+            }
+            elsif ($_[2] eq '+=') {
+                my $add = new WAP::wmls::AddAsg($_[0],
+                        'Definition'        =>  $var
+                );
+                $asg = $_[3]->concat($add);
+            }
+            elsif ($_[2] eq '-=') {
+                my $sub = new WAP::wmls::SubAsg($_[0],
+                        'Definition'        =>  $var
+                );
+                $asg = $_[3]->concat($sub);
+            }
+            else {
+                my $load1 = new WAP::wmls::LoadVar($_[0],
+                        'Definition'        =>  $var
+                );
+                my $binop = BuildBinop($_[0], $load1, $_[2], $_[3]);
+                my $store2 = new WAP::wmls::StoreVar($_[0],
+                        'Definition'        =>  $var
+                );
+                $asg = $binop->concat($store2);
+            }
+            my $load2 = new WAP::wmls::LoadVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $asg->concat($load2);
+        }
+;
+
+AssignmentOperator
+:   '='
+        #default action
+|   '*='
+        {
+            '*';
+        }
+|   '/='
+        {
+            '/';
+        }
+|   '%='
+        {
+            '%';
+        }
+|   '+='
+        #default action
+|   '-='
+        #default action
+|   '<<='
+        {
+            '<<';
+        }
+|   '>>='
+        {
+            '>>';
+        }
+|   '>>>='
+        {
+            '>>>';
+        }
+|   '&='
+        {
+            '&';
+        }
+|   '^='
+        {
+            '^';
+        }
+|   '|='
+        {
+            '|';
+        }
+|   'div='
+        {
+            'DIV';
+        }
+;
+
+Expression
+:   AssignmentExpression
+        #default action
+|   Expression  ',' AssignmentExpression
+        {
+            $_[1]->concat(new WAP::wmls::Pop($_[0]));
+            $_[1]->concat($_[3]);
+        }
+;
+
+Statement
+:   Block
+        #default action
+|   VariableStatement
+        #default action
+|   EmptyStatement
+        #default action
+|   ExpressionStatement
+        #default action
+|   IfStatement
+        #default action
+|   IterationStatement
+        #default action
+|   ContinueStatement
+        #default action
+|   BreakStatement
+        #default action
+|   ReturnStatement
+        #default action
+;
+
+Block
+:   '{' StatementList   '}'
+        {
+            $_[2];
+        }
+|   '{' StatementList   error
+        {
+            $_[0]->Error("'\x7d' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   '{' '}'
+        {
+            undef;
+        }
+;
+
+StatementList
+:   Statement
+        #default action
+|   StatementList   Statement
+        {
+            if (! defined $_[1]) {
+                $_[2];
+            }
+            else {
+                if (! defined $_[2]) {
+                    $_[1];
+                }
+                else {
+                    $_[1]->concat($_[2]);
+                }
+            }
+        }
+;
+
+VariableStatement
+:   VAR VariableDeclarationList ';'
+        {
+            $_[2];
+        }
+|   VAR error
+        {
+            $_[0]->Error("invalid variable declaration.\n");
+            $_[0]->YYErrok();
+        }
+|   VAR VariableDeclarationList error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+VariableDeclarationList
+:   VariableDeclaration
+        #default action
+|   VariableDeclarationList ',' VariableDeclaration
+        {
+            if (! defined $_[1]) {
+                $_[3];
+            }
+            else {
+                if (! defined $_[3]) {
+                    $_[1];
+                }
+                else {
+                    $_[1]->concat($_[3]);
+                }
+            }
+        }
+;
+
+VariableDeclaration
+:   IDENTIFIER  VariableInitializer
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->InsertLocal($_[1]);
+            my $store = new WAP::wmls::StoreVar($_[0],
+                    'Definition'        =>  $var
+            );
+            $_[2]->concat($store);
+        }
+|   IDENTIFIER
+        {
+            $_[0]->YYData->{symbtab_var}->InsertLocal($_[1]);
+            undef;
+        }
+;
+
+VariableInitializer
+:   '='     ConditionalExpression
+        {
+            $_[2];
+        }
+;
+
+EmptyStatement
+:   ';'
+        {
+            undef;
+        }
+;
+
+ExpressionStatement
+:   Expression  ';'
+        {
+            $_[1]->concat(new WAP::wmls::Pop($_[0]));
+        }
+|   Expression  error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+IfStatement
+:   IF  '(' Expression  ')' Statement    ELSE    Statement
+        {
+            BuildIfElse($_[0], $_[3], $_[5], $_[7]);
+        }
+|   IF  '(' Expression  ')' Statement
+        {
+            BuildIf($_[0], $_[3], $_[5]);
+        }
+|   IF  error
+        {
+            $_[0]->Error("'(' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   IF  '(' error
+        {
+            $_[0]->Error("invalid expression.\n");
+            $_[0]->YYErrok();
+        }
+|   IF  '(' Expression  error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+IterationStatement
+:   WhileStatement
+        #default action
+|   ForStatement
+        #default action
+;
+
+WhileStatement
+:   WHILE   '(' Expression  ')' Statement
+        {
+            BuildFor($_[0], undef, $_[3], undef, $_[5]);
+        }
+|   WHILE   error
+        {
+            $_[0]->Error("'(' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   WHILE   '(' error
+        {
+            $_[0]->Error("invalid expression.\n");
+            $_[0]->YYErrok();
+        }
+|   WHILE   '(' Expression  error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+for_begin
+:   FOR '(' Expression  ';'
+        {
+            $_[3]->concat(new WAP::wmls::Pop($_[0]));
+        }
+|   FOR '(' ';'
+        {
+            undef;
+        }
+|   FOR '(' VAR VariableDeclarationList ';'
+        {
+            $_[4];
+        }
+|   FOR error
+        {
+            $_[0]->Error("'(' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   FOR '(' error
+        {
+            $_[0]->Error("invalid init expression.\n");
+            $_[0]->YYErrok();
+        }
+|   FOR '(' Expression  error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   FOR '(' VAR error
+        {
+            $_[0]->Error("invalid variable declaration.\n");
+            $_[0]->YYErrok();
+        }
+|   FOR '(' VAR VariableDeclarationList error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+ForStatement
+:   for_begin   Expression  ';' Expression  ')' Statement
+        {
+            my $upd = $_[4]->concat(new WAP::wmls::Pop($_[0]));
+            BuildFor($_[0], $_[1], $_[2], $upd, $_[6]);
+        }
+|   for_begin   Expression  ';' ')' Statement
+        {
+            BuildFor($_[0], $_[1], $_[2], undef, $_[5]);
+        }
+|   for_begin   ';' Expression  ')' Statement
+        {
+            my $upd = $_[3]->concat(new WAP::wmls::Pop($_[0]));
+            BuildFor($_[0], $_[1], undef, $upd, $_[5]);
+        }
+|   for_begin   ';' ')' Statement
+        {
+            BuildFor($_[0], $_[1], undef, undef, $_[4]);
+        }
+|   for_begin   error
+        {
+            $_[0]->Error("invalid control expression.\n");
+            $_[0]->YYErrok();
+        }
+|   for_begin   Expression  error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   for_begin   Expression  ';'     error
+        {
+            $_[0]->Error("invalid update expression.\n");
+            $_[0]->YYErrok();
+        }
+|   for_begin   Expression  ';' Expression  error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   for_begin   ';' error
+        {
+            $_[0]->Error("invalid update expression.\n");
+            $_[0]->YYErrok();
+        }
+|   for_begin   ';' Expression  error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+ContinueStatement
+:   CONTINUE    ';'
+        {
+            new WAP::wmls::Jump($_[0],
+                    'TypeDef'           =>  'LABEL_CONTINUE'
+            );
+        }
+|   CONTINUE    error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+BreakStatement
+:   BREAK       ';'
+        {
+            new WAP::wmls::Jump($_[0],
+                    'TypeDef'           =>  'LABEL_BREAK'
+            );
+        }
+|   BREAK       error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+ReturnStatement
+:   RETURN      ';'
+        {
+            new WAP::wmls::ReturnES($_[0]);
+        }
+|   RETURN      Expression  ';'
+        {
+            $_[2]->concat(new WAP::wmls::Return($_[0]));
+        }
+|   RETURN      error
+        {
+            $_[0]->Error("Missing term.\n");
+            $_[0]->YYErrok();
+        }
+|   RETURN      Expression  error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+func_decl
+:   EXTERN  FUNCTION    IDENTIFIER  '('
+        {
+            $_[0]->YYData->{symbtab_func}->InsertLocal($_[3], 'PUBLIC_FUNC');
+        }
+|   FUNCTION    IDENTIFIER  '('
+        {
+            $_[0]->YYData->{symbtab_func}->InsertLocal($_[2], 'PRIVATE_FUNC');
+        }
+|   EXTERN  error
+        {
+            $_[0]->Error("function excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   EXTERN FUNCTION     error
+        {
+            $_[0]->Error("invalid function name.\n");
+            $_[0]->YYErrok();
+        }
+|   EXTERN FUNCTION IDENTIFIER  error
+        {
+            $_[0]->Error("'(' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   FUNCTION    error
+        {
+            $_[0]->Error("invalid function name.\n");
+            $_[0]->YYErrok();
+        }
+|   FUNCTION IDENTIFIER error
+        {
+            $_[0]->Error("'(' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+FunctionDeclaration
+:   func_decl   FormalParameterList ')' Block   ';'
+        {
+            new WAP::wmls::Function($_[0],
+                    'Definition'        =>  $_[1],
+                    'Param'             =>  $_[2],
+                    'Value'             =>  $_[4]
+            );
+        }
+|   func_decl   FormalParameterList ')' Block
+        {
+            new WAP::wmls::Function($_[0],
+                    'Definition'        =>  $_[1],
+                    'Param'             =>  $_[2],
+                    'Value'             =>  $_[4]
+            );
+        }
+|   func_decl   ')' Block   ';'
+        {
+            new WAP::wmls::Function($_[0],
+                    'Definition'        =>  $_[1],
+                    'Value'             =>  $_[3]
+            );
+        }
+|   func_decl   ')' Block
+        {
+            new WAP::wmls::Function($_[0],
+                    'Definition'        =>  $_[1],
+                    'Value'             =>  $_[3]
+            );
+        }
+|   func_decl   error
+        {
+            $_[0]->Error("invalid parameters.\n");
+            $_[0]->YYErrok();
+        }
+|   func_decl   FormalParameterList error
+        {
+            $_[0]->Error("')' excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   func_decl   FormalParameterList ')' error
+        {
+            $_[0]->Error("block statement expected.\n");
+            $_[0]->YYErrok();
+        }
+|   func_decl   ')' error
+        {
+            $_[0]->Error("block statement expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+FormalParameterList
+:   IDENTIFIER
+        {
+            my $var = $_[0]->YYData->{symbtab_var}->InsertArg($_[1], 0);
+            new WAP::wmls::Argument($_[0],
+                    'Definition'        =>  $var,
+                    'Index'             =>  1           # nb args
+            );
+        }
+|   FormalParameterList ',' IDENTIFIER
+        {
+            my $idx = $_[1]->{OpCode}->{Index};
+            $_[1]->{OpCode}->{Index} ++;                # nb args
+            my $var = $_[0]->YYData->{symbtab_var}->InsertArg($_[3], $idx);
+            my $arg = new WAP::wmls::Argument($_[0],
+                    'Definition'        =>  $var,
+            );
+            $_[1]->concat($arg);
+        }
+;
+
+CompilationUnit
+:   Pragmas     FunctionDeclarations
+        {
+            $_[0]->YYData->{PragmaList} = $_[1];
+            $_[0]->YYData->{FunctionList} = $_[2];
+        }
+|   Pragmas     error
+        {
+            $_[0]->YYData->{PragmaList} = $_[1];
+            $_[0]->YYData->{FunctionList} = undef;
+            $_[0]->Error("function declaration excepted.\n");
+            $_[0]->YYErrok();
+        }
+|   Pragmas
+        {
+            $_[0]->YYData->{PragmaList} = $_[1];
+            $_[0]->YYData->{FunctionList} = undef;
+            $_[0]->Error("function declaration excepted.\n");
+        }
+|   FunctionDeclarations
+        {
+            $_[0]->YYData->{PragmaList} = undef;
+            $_[0]->YYData->{FunctionList} = $_[1];
+        }
+;
+
+Pragmas
+:   Pragma
+        #default action
+|   Pragmas Pragma
+        {
+            $_[1]->concat($_[2]);
+        }
+;
+
+Pragma
+:   USE PragmaDeclaration   ';'
+        {
+            $_[2];
+        }
+|   USE error
+        {
+            $_[0]->Error("invalid pragma.\n");
+            $_[0]->YYErrok();
+        }
+|   USE PragmaDeclaration   error
+        {
+            $_[0]->Error("';' excepted.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+PragmaDeclaration
+:   ExternalCompilationUnitPragma
+        #default action
+|   AccessControlPragma
+        {
+            if (exists $_[0]->YYData->{AccessControlPragma}) {
+                $_[0]->Error("multiple access control pragma.\n");
+                $_[0]->YYData->{AccessControlPragma} ++;
+            }
+            else {
+                $_[0]->YYData->{AccessControlPragma} = 1;
+            }
+            $_[1];
+        }
+|   MetaPragma
+        #default action
+;
+
+ExternalCompilationUnitPragma
+:   URL IDENTIFIER  StringLiteral
+        {
+            new WAP::wmls::Url($_[0],
+                    'Value'             =>  $_[3],
+                    'Definition'        =>  $_[0]->YYData->{symbtab_url}->Insert($_[2])
+            );
+        }
+;
+
+AccessControlPragma
+:   ACCESS  AccessControlSpecifier
+        {
+            $_[2];
+        }
+;
+
+AccessControlSpecifier
+:   DOMAIN  StringLiteral
+        {
+            new WAP::wmls::AccessDomain($_[0],
+                    'Value'             =>  $_[2],
+            );
+        }
+|   PATH    StringLiteral
+        {
+            new WAP::wmls::AccessPath($_[0],
+                    'Value'             =>  $_[2]
+            );
+        }
+|   DOMAIN  StringLiteral   PATH    StringLiteral
+        {
+            my $domain = new WAP::wmls::AccessDomain($_[0],
+                    'Value'             =>  $_[2],
+            );
+            my $path = new WAP::wmls::AccessPath($_[0],
+                    'Value'             =>  $_[4],
+            );
+            $domain->concat($path);
+        }
+;
+
+MetaPragma
+:   META    MetaSpecifier
+        {
+            $_[2];
+        }
+;
+
+MetaSpecifier
+:   MetaName
+        #default action
+|   MetaHttpEquiv
+        #default action
+|   MetaUserAgent
+        #default action
+;
+
+MetaName
+:   NAME    MetaBody
+        {
+            new WAP::wmls::MetaName($_[0],
+                    'Value'             =>  $_[2],
+            );
+        }
+;
+
+MetaHttpEquiv
+:   HTTP    EQUIV   MetaBody
+        {
+            new WAP::wmls::MetaHttpEquiv($_[0],
+                    'Value'             =>  $_[3],
+            );
+        }
+;
+
+MetaUserAgent
+:   USER    AGENT   MetaBody
+        {
+            new WAP::wmls::MetaUserAgent($_[0],
+                    'Value'             =>  $_[3],
+            );
+        }
+;
+
+MetaBody
+:   MetaPropertyName    MetaContent MetaScheme
+        {
+            $_[2]->concat($_[3]);
+            $_[1]->concat($_[2]);
+        }
+|   MetaPropertyName    MetaContent
+        {
+            $_[1]->concat($_[2]);
+        }
+;
+
+MetaPropertyName
+:   StringLiteral
+        #default action
+;
+
+MetaContent
+:   StringLiteral
+        #default action
+;
+
+MetaScheme
+:   StringLiteral
+        #default action
+;
+
+FunctionDeclarations
+:   FunctionDeclaration
+        #default action
+|   FunctionDeclarations    FunctionDeclaration
+        {
+            $_[1]->concat($_[2]);
+        }
+;
+
+%%
+
+#   Number of rules         : 202
+#   Number of terminals     : 80
+#   Number of non-terminals : 66
+#   Number of states        : 308
+
+use strict;
+use warnings;
+
+use WAP::wmls::lexer;
+use WAP::wmls::node;
+
+sub BuildUnop {
+    my ($parser, $op, $expr) = @_;
+    my $unop = new WAP::wmls::UnaryOp($parser,
+            'Operator'                  =>  $op
+    );
+    return $expr->concat($unop);
+}
+
+sub BuildBinop {
+    my ($parser, $expr1, $op, $expr2) = @_;
+    my $binop = new WAP::wmls::BinaryOp($parser,
+            'Operator'                  =>  $op,
+            'Left'                      =>  $expr1->{Last}
+    );
+    $expr1->concat($expr2);
+    return $expr1->concat($binop);
+}
+
+sub BuildLogop {
+    my ($parser, $expr1, $logop, $expr2) = @_;
+    my $endif = $parser->YYData->{symbtab_label}->Next();
+    my $label = new WAP::wmls::Label($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{Node} = $label;
+    my $falsejump = new WAP::wmls::FalseJump($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{NbUse} ++;
+    $expr1->concat($logop);
+    $expr1->concat($falsejump);
+    $expr1->concat($expr2);
+    $expr1->concat(new WAP::wmls::ToBool($parser));
+    return $expr1->concat($label);
+}
+
+sub BuildIf {
+    my ($parser, $expr, $stat) = @_;
+    my $endif = $parser->YYData->{symbtab_label}->Next();
+    my $label = new WAP::wmls::Label($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{Node} = $label;
+    my $falsejump = new WAP::wmls::FalseJump($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{NbUse} ++;
+    $expr->concat($falsejump);
+    $expr->concat($stat) if (defined $stat);
+    return $expr->concat($label);
+}
+
+sub BuildIfElse {
+    my ($parser, $expr, $stat1, $stat2) = @_;
+    my $else = $parser->YYData->{symbtab_label}->Next();
+    my $endif = $parser->YYData->{symbtab_label}->Next();
+    my $label1 = new WAP::wmls::Label($parser,
+            'Definition'                =>  $else
+    );
+    $else->{Node} = $label1;
+    my $label2 = new WAP::wmls::Label($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{Node} = $label2;
+    my $falsejump = new WAP::wmls::FalseJump($parser,
+            'Definition'                =>  $else
+    );
+    $else->{NbUse} ++;
+    my $jump = new WAP::wmls::Jump($parser,
+            'Definition'                =>  $endif
+    );
+    $endif->{NbUse} ++;
+    $expr->concat($falsejump);
+    $expr->concat($stat1) if (defined $stat1);
+    $expr->concat($jump);
+    $expr->concat($label1);
+    $expr->concat($stat2) if (defined $stat2);
+    return $expr->concat($label2);
+}
+
+sub BuildFor {
+    my ($parser, $init, $cond, $upd, $stat) = @_;
+    my $for;
+    my $loop = $parser->YYData->{symbtab_label}->Next();
+    my $continue = $parser->YYData->{symbtab_label}->Next();
+    my $break = $parser->YYData->{symbtab_label}->Next();
+    my $label1 = new WAP::wmls::Label($parser,
+            'Definition'                =>  $loop
+    );
+    $loop->{Node} = $label1;
+    my $label2 = new WAP::wmls::Label($parser,
+            'Definition'                =>  $continue
+    );
+    $continue->{Node} = $label2;
+    my $label3 = new WAP::wmls::Label($parser,
+            'Definition'                =>  $break
+    );
+    $break->{Node} = $label3;
+    if (defined $cond) {
+        my $falsejump = new WAP::wmls::FalseJump($parser,
+                'Definition'                =>  $break
+        );
+        $break->{NbUse} ++;
+        my $jump = new WAP::wmls::Jump($parser,
+                'Definition'                =>  $loop
+        );
+        $loop->{NbUse} ++;
+        $for = (defined $init) ? $init->concat($label1) : $label1;
+        $for->concat($cond);
+        $for->concat($falsejump);
+        $for->concat($stat) if (defined $stat);
+        $for->concat($label2);
+        $for->concat($upd) if (defined $upd);
+        $for->concat($jump);
+        $for->concat($label3);
+    }
+    else {
+        my $jump = new WAP::wmls::Jump($parser,
+                'Definition'                =>  $loop
+        );
+        $loop->{NbUse} ++;
+        $for = (defined $init) ? $init->concat($label1) : $label1;
+        $for->concat($stat) if (defined $stat);
+        $for->concat($label2);
+        $for->concat($upd) if (defined $upd);
+        $for->concat($jump);
+        $for->concat($label3);
+    }
+    for (my $node = $for; defined $node; $node = $node->{Next}) {
+        my $opcode = $node->{OpCode};
+        if (        $opcode->isa('Jump')
+                and exists $opcode->{TypeDef} ) {
+            my $type = $opcode->{TypeDef};
+            if    ($type eq 'LABEL_CONTINUE') {
+                $node->configure(
+                        'Definition'        =>  $continue
+                );
+                $continue->{NbUse} ++;
+            }
+            elsif ($type eq 'LABEL_BREAK') {
+                $node->configure(
+                        'Definition'        =>  $break
+                );
+                $break->{NbUse} ++;
+            }
+        }
+    }
+    return $for;
+}
+
+sub Run {
+    my $parser = shift;
+
+    my $srcname = $parser->YYData->{filename};
+    my $enc = $parser->YYData->{encoding};
+    open $parser->YYData->{fh}, "<:encoding($enc)", $srcname
+        or die "can't open $srcname ($!).\n";
+
+    WAP::wmls::lexer::InitLexico($parser);
+    $parser->YYData->{symbtab_var} = new WAP::wmls::SymbTabVar($parser);
+    $parser->YYData->{symbtab_lib} = new WAP::wmls::SymbTabLib($parser);
+    $parser->YYData->{symbtab_func} = new WAP::wmls::SymbTabFunc($parser);
+    $parser->YYData->{symbtab_url} = new WAP::wmls::SymbTabUrl($parser);
+    $parser->YYData->{symbtab_label} = new WAP::wmls::SymbTabLabel($parser);
+    $parser->InitStandardLibrary();
+    $parser->YYData->{doc} = q{};
+    $parser->YYData->{lineno} = 1;
+    $parser->YYParse(
+            yylex   => \&WAP::wmls::lexer::Lexer,
+            yyerror => sub { return; }
+    );
+
+    close $parser->YYData->{fh};
+    delete $parser->{RULES};
+    delete $parser->{STATES};
+    delete $parser->{STACK};
+    return;
+}
+
+sub InitStandardLibrary {
+    my $parser = shift;
+    my $cfg = $INC{'WAP/wmls/parser.pm'};
+    $cfg =~ s/parser\.pm$//;
+    $cfg .= 'wmlslibs.cfg';
+    open my $IN, '<', $cfg
+        or warn "can't open $cfg.\n";
+
+    my $lib = undef;
+    my $LibID;
+    while (<$IN>) {
+        if      (/^#.*$/) {
+#           print "Comment $_";
+        }
+        elsif (/^\s*$/) {
+#           print "Empty\n";
+        }
+        elsif (/^\@([A-Z_a-z][0-9A-Z_a-z]*)\s+([0-9]+)\s*$/) {
+#           print "Lib $1 $2\n";
+            $lib = $1;
+            $LibID = $2;
+            $parser->YYData->{symbtab_lib}->Insert($lib, 1);
+        }
+        elsif (/^([A-Z_a-z][0-9A-Z_a-z]*)\s+([0-9]+)\s+([0-9]+)\s*$/) {
+#           print "Fct $1 $2 $3\n";
+            if (defined $lib) {
+                my $symb = $lib . '.' . $1;
+                $parser->YYData->{symbtab_func}->InsertLibrary($symb, $LibID, $2, $3);
+            }
+        }
+        else {
+            print "cfg? $_";
+        }
+    }
+    close $IN;
+    return;
+}
+
+sub Error {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= "Syntax error.\n";
+
+    if (exists $parser->YYData->{nb_error}) {
+        $parser->YYData->{nb_error} ++;
+    }
+    else {
+        $parser->YYData->{nb_error} = 1;
+    }
+
+    print STDOUT '#',$parser->YYData->{filename},':',$parser->YYData->{lineno},'#Error: ',$msg
+            if (        exists $parser->YYData->{verbose_error}
+                    and $parser->YYData->{verbose_error});
+    return;
+}
+
+sub Warning {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= ".\n";
+
+    if (exists $parser->YYData->{nb_warning}) {
+        $parser->YYData->{nb_warning} ++;
+    }
+    else {
+        $parser->YYData->{nb_warning} = 1;
+    }
+
+    print STDOUT '#',$parser->YYData->{filename},':',$parser->YYData->{lineno},'#Warning: ',$msg
+            if (        exists $parser->YYData->{verbose_warning}
+                    and $parser->YYData->{verbose_warning});
+    return;
+}
+
+sub Info {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= ".\n";
+
+    if (exists $parser->YYData->{nb_info}) {
+        $parser->YYData->{nb_info} ++;
+    }
+    else {
+        $parser->YYData->{nb_info} = 1;
+    }
+
+    print STDOUT '#',$parser->YYData->{filename},':',$parser->YYData->{lineno},'#Info: ',$msg
+            if (        exists $parser->YYData->{verbose_info}
+                    and $parser->YYData->{verbose_info});
+    return;
+}
+

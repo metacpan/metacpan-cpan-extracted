@@ -1,0 +1,29 @@
+Revision history for WebService-Bluga-Webthumb
+
+0.05    2013-01-11
+        [ ENHANCEMENTS ]
+        Add example script.  No functional changes to module.
+
+0.04    2012-12-15
+        [ ENHANCEMENTS ]
+        Add support for local caching, so images can be fetched and stored to a
+        local directory, and URLs for the image in that directory served up
+        afterwards.
+
+0.03    2011-07-07
+        Actually default to caching for 14 days if nothing else was specified,
+        as already documented.
+
+        The medium image sizes are "medium" and "medium2", not "medium1".
+        The API documentation was originally wrong, the author Josh confirmed
+        that it's "medium", not "medium1", and updated the docs.  Thanks Josh,
+
+0.02    2011-07-06
+        Some documentation improvements, and use thumb_url instead of easy_thumb
+        for a method name (but continue to support easy_thumb as an alias).
+
+0.01    2011-07-05
+        First beta version.  Working, but need to write some tests.
+
+
+

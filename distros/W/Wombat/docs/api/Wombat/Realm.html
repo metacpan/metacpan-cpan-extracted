@@ -1,0 +1,104 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Realm - internal realm interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Realm - internal realm interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a read-only interface for an underlying security realm used to
+authenticate individual users and to identify the security roles
+associated with those users. Realms can be attached at any Container
+level but will typically only be attached to an Application or higher
+level Container.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container associated with this Realm.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container associated with this Realm.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> associated with this Realm
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_authenticate">authenticate ($username, $credentials)</A></STRONG><BR>
+<DD>
+Return the Principal associated with the specified username and
+credentials, if there is one, or <CODE>undef</CODE> otherwise.
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24username">$username</A></STRONG><BR>
+<DD>
+username of the principal to be looked up
+<P></P>
+<DT><STRONG><A NAME="item_%24credentials">$credentials</A></STRONG><BR>
+<DD>
+password or other credentials to use in authenticating this username
+<P></P></DL>
+<DT><STRONG><A NAME="item_hasRole">hasRole($principal, $role)</A></STRONG><BR>
+<DD>
+Return true if the specified Principal has the specified security
+role within the context of this Realm, or false otherwise.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Util::Principal</STRONG> for whom the role is to be checked
+<P></P>
+<DT><STRONG><A NAME="item_%24role">$role</A></STRONG><BR>
+<DD>
+the name of the security role to be checked
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Util/Principal.html">the Servlet::Util::Principal manpage</A>,
+<A HREF="../../api/Wombat/Container.html">the Wombat::Container manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

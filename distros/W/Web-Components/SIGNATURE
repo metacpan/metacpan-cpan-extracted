@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9bcc5facd84c92eed9b6bb40d76ed44b76949bd4 Build.PL
+SHA1 2deb2397cc0299d46fd20ee5f425904b9843900e Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 54cab5f2759ef514b06479fabd170ef277bc6781 MANIFEST
+SHA1 44c9e63641b162348f9fd4466cece72185f58903 META.json
+SHA1 b34622711e5164f010fa4a35cec96535f6ca5307 META.yml
+SHA1 0553db4b5debe8d90141e4f52f46994d3382164d README
+SHA1 8b7dc032eca209a2bef114c6f38c0e4153565f6f lib/Web/Components.pm
+SHA1 f59c372e8007ede649cf71f32887e3e5bf2ba952 lib/Web/Components/Loader.pm
+SHA1 af38fc33fb0d44d32aa4d0a1b20e4b9febf626d2 lib/Web/Components/Role.pm
+SHA1 79a084c2bd4fe39542ffb81d281dc53e0b4bd366 lib/Web/Components/Util.pm
+SHA1 08420d6e6e3e1c1fe2baec981edebf34fbfc86ac t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
+SHA1 1be42347ca117d1b4928eb5030363b6d6982af65 t/07podspelling.t
+SHA1 497e14f3c72cf8693c5b309eadc34f2cc5df59ec t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYqNwLAAoJEK492j4Im1BptmUIAJrHatILU0p6PbS7yhulH3yZ
+a8AENvIBT696R5OytN126ER0i/KjBIFJOpfbxOgw+FGQA1YLQ1b1EyiNVeFykAjs
+l7lSYCWzNPoiBa3fb+p3Lcf0vIPxqKIwV9jSu+68Vxc/6qzP3HnjxcbxN7yR1XaC
+of0gbxDvNiSigMQh17WFl9H53MVoHr2cs0KUerTRLgWjm5aHbFaF5zhAj9DCNFzZ
+3zjc/BKNpXvnGxtejjlRvWpfrb+DEmzE6ZJr/rGCj0GPIAsSwXJnN3hILIqpyo8d
+w3Oi5WmAMug6fFkWKnlWDDVJRZBhIsr5K1TKlspdOFGj/wSTN+wUE1djSttsH4o=
+=pDX0
+-----END PGP SIGNATURE-----

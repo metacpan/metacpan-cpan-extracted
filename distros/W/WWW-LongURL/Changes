@@ -1,0 +1,16 @@
+Changes to WWW::LongURL
+
+0.01  2011-08-22
+    * Initial version.
+
+0.02  2011-08-23
+    * Removed unnecessary test dependency on Test::Exception.
+
+0.03  2011-08-23
+    * Better error checking in expand().
+
+0.04  2011-08-23
+    * Using URI::Escape when constructing API URL.
+
+0.05  2011-08-28
+    * Added get_services().

@@ -1,0 +1,43 @@
+---
+abstract: 'Simple Interface to Amazon Web Service using WebService::Simple'
+author:
+  - 'Yusuke Wada  C<< <yusuke@kamawada.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Simple-AWS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Simple::AWS:
+    file: lib/WebService/Simple/AWS.pm
+    version: '0.02'
+requires:
+  Digest::SHA: '0'
+  Filter::Util::Call: '0'
+  URI::Escape: '0'
+  WebService::Simple: '0'
+resources:
+  bugtracker: https://github.com/yusukebe/WebService-Simple-AWS/issues
+  homepage: https://github.com/yusukebe/WebService-Simple-AWS
+  repository: git://github.com/yusukebe/WebService-Simple-AWS.git
+version: '0.02'
+x_contributors:
+  - 'Yusuke Wada <yusukebe@cpan.org>'
+  - 'Yusuke Wada <yusuke@kamawada.com>'

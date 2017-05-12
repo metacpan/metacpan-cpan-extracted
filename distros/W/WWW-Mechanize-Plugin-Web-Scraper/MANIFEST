@@ -1,0 +1,8 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/WWW/Mechanize/Plugin/Web/Scraper.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

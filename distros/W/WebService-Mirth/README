@@ -1,0 +1,197 @@
+NAME
+    WebService::Mirth - Interact with a Mirth Connect server via REST
+
+VERSION
+    version 0.131220
+
+SYNOPSIS
+        my $mirth = WebService::Mirth->new(
+            server   => 'mirth.example.com',
+            port     => 8443,
+            username => 'admin',
+            password => 'password',
+        );
+
+        $mirth->export_channels({
+            to_dir => 'path/to/export/to/'
+        });
+
+        $mirth->export_global_scripts({
+            to_dir => 'path/to/export/to/'
+        });
+
+        $mirth->export_code_templates({
+            to_dir => 'path/to/export/to/'
+        });
+
+DESCRIPTION
+    Mirth Connect is an open-source Java-powered application used for
+    healthcare integration. Incoming HL7 or XML feeds containing electronic
+    medical records can be parsed and then handled (munged, stored, sent
+    off, etc) by Mirth Connect.
+
+    This module provides a pure-Perl means of RESTful interaction with a
+    Mirth Connect server (referred to as "Mirth" going forward). The
+    functionality is similar to what the "Mirth Shell" program provides
+    within a Mirth installation.
+
+    Parser code living in Mirth can be exported as XML files locally, for
+    off-site archival.
+
+    Mojo::DOM objects in some of the "ATTRIBUTES" could be used for
+    inspecting or altering the channels locally (ie. turn a channel off by
+    changing the "enabled" node from "true" to "false").
+
+    The "login" and "logout" methods will automatically be called as needed.
+
+    All internal HTTP interactions are performed via Mojo::UserAgent, so the
+    "MOJO_USERAGENT_DEBUG" environment variable can be set to 1 to turn on
+    HTTP debugging.
+
+    Log::Minimal is used for application logging, so the "LM_DEBUG"
+    environment variable can be set to 1 for additional debugging.
+
+ATTRIBUTES
+  server
+    A string containing the FQDN (see "CAVEATS") of the Mirth server to
+    connect to.
+
+  port
+    The Jetty port that Mirth is listening on for HTTP.
+
+  version
+    A string containing the version of Mirth that the "server" is hosting.
+    This value is required by Mirth for HTTP interaction.
+
+    Defaults to "0.0.0", which should be sufficient.
+
+  username
+    The name of the user to connect with. "admin" is likely a good choice:
+    full administrative privileges are ideal.
+
+  password
+    The corresponding password for the "username" being used.
+
+  base_url
+    A Mojo::URL object that represents the HTTP address of the Mirth server.
+    The RESTful HTTP requests will be made based on this URL.
+
+    Mirth uses HTTPS, so it will be constructed into something like
+    "https://mirth.example.com:8443".
+
+  code_templates_dom
+    A Mojo::DOM object of the XML representing the "Code Templates" in
+    Mirth. Used by "get_code_templates" to create a
+    WebService::Mirth::CodeTemplates object.
+
+  global_scripts_dom
+    A Mojo::DOM object of the XML representing the "Global Scripts" in
+    Mirth. Used by "get_global_scripts" to create a
+    WebService::Mirth::GlobalScripts object.
+
+  channels_dom
+    A Mojo::DOM object of the XML representing all of the channels in Mirth.
+    Massaged by "get_channel" to return a WebService::Mirth::Channel object.
+
+    Also used in the construction of "channel_list".
+
+  channel_list
+    Contains a hashref representing all of the channels in Mirth. The key is
+    a channel name and the value is the corresponding channel ID.
+
+METHODS
+  login
+        $mirth->login;
+
+    Login as "username" at the "/users" URI, via an HTTP POST. If
+    authentication is successful, starts a session that persists until
+    "logout" is called.
+
+    This method is automatically called upon object construction.
+
+  get_global_scripts
+        $global_scripts = $mirth->get_global_scripts;
+
+    Returns a WebService::Mirth::GlobalScripts object of the "Global
+    Scripts" in Mirth.
+
+  export_global_scripts
+        $mirth->export_global_scripts({
+            to_dir => 'path/to/export/to/'
+        });
+
+    Given a path to a directory in the "to_dir" parameter, writes an XML
+    file named "global_scripts.xml" to the directory.
+
+  get_code_templates
+        $code_templates = $mirth->get_code_templates;
+
+    Returns a WebService::Mirth::CodeTemplates object of the "Code
+    Templates" in Mirth.
+
+  export_code_templates
+        $mirth->export_code_templates({
+            to_dir => 'path/to/export/to/'
+        });
+
+    Given a path to a directory in the "to_dir" parameter, writes an XML
+    file named "code_templates.xml" to the directory.
+
+  get_channel
+        $channel = $mirth->get_channel('foobar');
+        print $channel->name, "\n";    # "foobar"
+        print $channel->id, "\n";      # "a25ea24c-d8f4-439a-9063-62f8a2b6a4b1"
+        print $channel->enabled, "\n"; # "true"
+
+    Given the name of a channel in Mirth, returns a
+    WebService::Mirth::Channel object.
+
+  export_channels
+        $mirth->export_channels({
+            to_dir => 'path/to/export/to/'
+        });
+
+    Given a path to a directory in the "to_dir" parameter, writes XML files
+    (with names like "my_channel.xml") to the directory.
+
+  logout
+        $mirth->logout;
+
+    Ends the session initiated by "login".
+
+    This method is automatically called upon object destruction.
+
+TODO
+    Add feature to put channels onto a Mirth box
+
+CAVEATS
+  Server specification and session cookies
+    It seems that an FQDN (fully-qualified domain name) is required for
+    "server" in order for the session started by "login" (involving cookies)
+    to stick.
+
+    For example, an IP address for "server" is not sufficient. A workaround
+    could be adding an entry to "/etc/hosts" with something like
+    "mirth.localhost" (in which case, see hosts(1)).
+
+SEE ALSO
+    <http://www.mirthcorp.com/products/mirth-connect>
+    <http://www.mirthcorp.com/community/wiki/display/mirthuserguidev1r8p0/In
+    troduction>
+    <http://www.mirthcorp.com/community/wiki/display/mirthuserguidev1r8p0/Mi
+    rth+Shell>
+    Mojo::DOM
+
+ACKNOWLEDGEMENTS
+    Thanks to the Informatics Corporation of America (ICA) for sponsoring
+    the development of this module.
+
+AUTHOR
+    Tommy Stanton <tommystanton@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Tommy Stanton.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

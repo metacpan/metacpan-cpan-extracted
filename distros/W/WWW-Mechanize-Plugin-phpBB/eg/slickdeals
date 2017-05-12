@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+###########################################
+# Grab forums from slickdeals.net
+###########################################
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+
+use Log::Log4perl qw(:easy);
+use WWW::Mechanize::Pluggable;
+Log::Log4perl->easy_init($DEBUG);
+
+my $mech = new WWW::Mechanize::Pluggable;
+
+$mech->get("http://forums.slickdeals.net/");
+my $forums = $mech->phpbb_forums();

@@ -1,0 +1,89 @@
+Copyright (c) 1999,2000,2001,2002 by Martin Tomes. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+If you find this module useful please e-mail me, my e-mail address is in
+OPC.txt and OPC.html.  I failed to record the addresses of those who have
+contacted me about version 0.91 so please mail me again and let me know how
+you got on.
+
+This code implements an OPC Server Interface, OPC used to mean Ole for Process
+Control, but as Microsoft don't like to talk about OLE any more it's now just
+OPC.  For more information about OPC see the OPC Programmers Connection at
+http://www.opcconnect.com/
+
+SYNOPSIS
+    Two ways of using the OPC interface are provided, the class
+    methods:
+
+        use Win32::OLE::OPC;
+
+        my $opcintf = Win32::OLE::OPC->new('Someones.OPCAutomation',
+                                           'Someones.Server');
+        $opcintf->MoveToRoot;
+        foreach $item ($opcintf->Leafs) {
+          print $item->{name}, "\n";
+          my %result = $opcintf->ItemData($item->{itemid});
+          for $attrib (keys %result) {
+            print "        [", $attrib, " = '", $result{$attrib}, "']", "\n";
+          }
+          print "\n";
+        }
+        foreach $item ($opcintf->Branches) {
+          print $item->{name}, "\n";
+        }
+
+    or a tied hash:
+
+        use Win32::OLE::OPC;
+
+        my %OPC;
+        tie %OPC, Win32::OLE::OPC, 'Someones.OPCAutomation', 'Someones.Server';
+
+        # OK, list the keys...
+        for $key (keys %OPC) {
+          my %x = %{$OPC{$key}};
+          print $key, "\n";
+          for $attrib (keys %x) {
+            print "        '", $attrib, "' = '", $x{$attrib}, "'", "\n";
+          }
+          print "\n";
+        }
+
+    The tied hash method has to return a reference to a hash
+    containing the item data hence the unpleasant code '`%x =
+    %{$OPC{$key}}''. Alternatively one can assign the returned value
+    into a scalar and dereference it when using the hash like this
+    '`keys %$x'' and '`$result->{$item}''.
+
+    Note that both methods can be used together. First create an
+    interface using the `new()' method and then tie it like this:
+
+        tie %OPC, $opcintf, 'Someones.OPCAutomation', 'Someones.Server';
+
+    To connect to a remote server add the name of the server as a
+    parameter to the call to new() or to the tie:
+
+      my $opcintf = Win32::OLE::OPC->new('Someones.OPCAutomation',
+                                         'Someones.Server',
+                                         'machine.name');
+      tie %OPC, Win32::OLE::OPC, 'Someones.OPCAutomation',
+                                 'Someones.Server',
+                                 'machine.name';
+
+INSTALLATION
+    If you have nmake you can use MakeMaker as follows:
+
+      perl Makefile.PL
+      nmake
+      nmake test
+      nmake install
+      nmake documentation
+
+    The final step makes OPC.html and OPC.txt from OPC.pm.
+
+    If you don't have nmake then you will find OPC.html and OPC.txt
+    are included in the package ready built and all you have to do
+    is copy OPC.pm into the `site/lib/Win32/OLE' directory with your
+    Perl installation. This module has been tested with ActiveState
+    Perl build 522.

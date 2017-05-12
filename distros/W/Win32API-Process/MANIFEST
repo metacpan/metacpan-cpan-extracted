@@ -1,0 +1,14 @@
+buffers.h
+build.bat
+clean.bat
+Changes
+Makefile.PL
+MANIFEST
+package/README
+package/Win32API-Process.ppd
+README
+test.pl
+Process.html
+Process.pm
+Process.xs
+typemap

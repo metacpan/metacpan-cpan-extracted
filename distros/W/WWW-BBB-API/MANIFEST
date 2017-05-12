@@ -1,0 +1,8 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/WWW-BBB-API.t
+lib/WWW/BBB/API.pm
+Makefile.PL
+META.yml

@@ -1,0 +1,8 @@
+Revision history for WWW-TMDB-API
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    3/12/2012
+        Fixed incorrect parameters to LWP
+0.03    3/12/2012
+        Added required modules to Makefile.PL

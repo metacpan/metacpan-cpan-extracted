@@ -1,0 +1,98 @@
+{
+   "abstract" : "universal website visitors tracking",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "web",
+      "www",
+      "tracking",
+      "analytics"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Tracking",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Cookie" : "0",
+            "Carp::Clan" : "0",
+            "Class::Accessor::Fast" : "0",
+            "DateTime" : "0",
+            "Digest::MD5" : "0",
+            "HTTP::Headers" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Math::BaseCnv" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "URI::QueryParam" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Tracking" : {
+         "file" : "lib/WWW/Tracking.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data" : {
+         "file" : "lib/WWW/Tracking/Data.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data::Plugin::Catalyst" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/Catalyst.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data::Plugin::GoogleAnalytics" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/GoogleAnalytics.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data::Plugin::GoogleAnalytics::DataFilter" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/GoogleAnalytics.pm"
+      },
+      "WWW::Tracking::Data::Plugin::Headers" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/Headers.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data::Plugin::Piwik" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/Piwik.pm",
+         "version" : "0.05"
+      },
+      "WWW::Tracking::Data::Plugin::Piwik::DataFilter" : {
+         "file" : "lib/WWW/Tracking/Data/Plugin/Piwik.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/WWW-Tracking/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/WWW-Tracking"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

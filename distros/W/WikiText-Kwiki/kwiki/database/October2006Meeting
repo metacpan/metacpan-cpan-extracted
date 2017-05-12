@@ -1,0 +1,13 @@
+=== wxPerl:  What I had to Learn the Hard Way ===
+
+EricWilhelm talked about how to get started with the Perl bindings to the wxwidgets GUI toolkit.  Eric has spent the last several months designing and building a large (7.5kLOC and growing in 62 modules) system complete with a comprehensive test suite, pluggable, reskinnable architecture, network-transparent connectivity, blah, blah, blah (ok, the blah part is done, but I'm still working on some of the other bits.)
+
+* overview
+* how cross platform is it?
+* finding documentation
+* installation on Windows, Mac, and Linux
+* code generation with wxglade (or not)
+* creating a sane object-oriented architecture while using an event-driven toolkit
+* testing
+
+Chris Dawson at [http://www.webcastinabox.com WebCast in a Box] is graciously hosting a [http://www.podasp.com/episodes/P/PD/PDX.pm/1058.mp3 podcast] of this talk, which was recorded on his donated equipment.

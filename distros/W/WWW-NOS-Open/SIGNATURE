@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 977166ea987241aff639743b0ee92a3a2b0e179b Build.PL
+SHA1 0e6df96501c5ed37f390a06ba63a696def701f0a Changes
+SHA1 09460736f6d6a89b101ce2955af3ea380e17c379 MANIFEST
+SHA1 a612dc1b261fab2dc82f07ddcb4cf128b5334c3c MANIFEST.SKIP
+SHA1 7122fa3244e0b90690a2fb9cf94ee707f2eef52a META.json
+SHA1 bd3a65e47fae6d985d1be79d4b067ff3436aa2b2 META.yml
+SHA1 cfd52e85eb056e1fd8aafc7b31648d41f7493a17 README
+SHA1 3710ad55015cb1af0ad2b6e9bde8e69e0c955d78 lib/WWW/NOS/Open.pm
+SHA1 f22d87d219f0d5d4b0ce929d62cff91791fc851f lib/WWW/NOS/Open/Article.pm
+SHA1 1ae0a953c7e5af553a722bdf97b0d730d9a1a80d lib/WWW/NOS/Open/AudioFragment.pm
+SHA1 a44f013c2998614b916c60214bcebfc5bc9cfbff lib/WWW/NOS/Open/Broadcast.pm
+SHA1 9eb2f218b70d0277f986bdc727db27ba74b30e75 lib/WWW/NOS/Open/DayGuide.pm
+SHA1 76192438bf189caffb0873c1514998b6e370298b lib/WWW/NOS/Open/Document.pm
+SHA1 cff4e90e0b6dd2f161126d44f402d3b98633b574 lib/WWW/NOS/Open/Exceptions.pm
+SHA1 a1ac09665facefc870fb65a2b97b512ff61a6361 lib/WWW/NOS/Open/Interface.pm
+SHA1 57b3db80d02cd4acf4689942b28b744012ca93cb lib/WWW/NOS/Open/MediaResource.pm
+SHA1 c33724f75b1e71f9e13fb0cfc008d90c5d9fac29 lib/WWW/NOS/Open/Resource.pm
+SHA1 867ec5170c517507e17731980a6619dd729d494e lib/WWW/NOS/Open/Result.pm
+SHA1 3325491944ae6d5eb9c5093ee7d70451ef911491 lib/WWW/NOS/Open/TypeDef.pm
+SHA1 2c0955d116c499e477564367820623e6ff6224b6 lib/WWW/NOS/Open/Version.pm
+SHA1 9c89465240da3e4af20d95203c3ab6e66726cb1d lib/WWW/NOS/Open/Video.pm
+SHA1 f06432d5c2b04184fca22642aa186a861aa919dc scripts/DummyServer.pl
+SHA1 aa3702b2e8dcffdcf9d131527d166e873fb47f9b scripts/TestNOSOpen.pl
+SHA1 e6d7e9e00006e118f0aa38eb7c65c50ae0f41fac t/00_base.t
+SHA1 ee853fb6f04dede0b8d4c8f8978ca4f321019e19 t/00_dependencies.t
+SHA1 41b05256e6ce4eb2c25689d9a871479cb80d04e2 t/00_signature.t
+SHA1 f676786a388718302ae37847b5f9664772eb66b0 t/01_live.t
+SHA1 b96ae6fc1dd31c783a456d510dcde640749b3d17 t/02_exceptions.t
+SHA1 4f1a8121309b9fc192b1734081a235d80ef064ab t/09_pod.t
+SHA1 1a930204d066e426b42373fb148ddf266741babe t/10_pod-coverage.t
+SHA1 b9441485e2d16eb06b48feb72b47bcccb71fae6d t/11_test-coverage.t
+SHA1 986a8495ad0233bfdd64cfd2d32cc328f8e8ad18 t/12_manifest.t
+SHA1 62aac67f5c462a8af6fa774b77f10381fcbb483b t/13_critic.t
+SHA1 2c2fa9a3a4dd275ac6aeb3fda40ff67e208dab6d t/14_kwalitee.t
+SHA1 9a6bcbf0008073a8a64f7ccceb1ec90b2c3c84c0 t/15_spell.t
+SHA1 90110e42ee7e8af1582da5f1744d8039b53fbf24 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlj7rBEACgkQ8EyqqHBOVHfZUgCfSvSoZWMyJdkZUlS6FxW06K6R
+XrsAn2sdYYbrRTCcY3W0u6+aumhVtTNb
+=1DYv
+-----END PGP SIGNATURE-----

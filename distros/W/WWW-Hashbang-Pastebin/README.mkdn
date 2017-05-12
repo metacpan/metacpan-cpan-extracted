@@ -1,0 +1,58 @@
+# NAME
+
+WWW::Hashbang::Pastebin - command line pastebin
+
+# VERSION
+
+version 0.004
+
+# SYNOPSIS
+
+    $ (hostname ; uptime) | curl -F 'p=<-' http://p.hashbang.ca
+    http://p.hashbang.ca/f4s2
+    $ chromium-browser http://p.hashbang.ca/f4s2+#l2
+
+# DESCRIPTION
+
+This pastebin has no user interface - use `curl` or [WWW::Hashbang::Pastebin::Client](http://search.cpan.org/perldoc?WWW::Hashbang::Pastebin::Client)'s
+`p` command to POST paste content. Your paste's ID is returned in the
+`X-Pastebin-ID` header; the URL in the `X-Pastebin-URL`, as well as the response
+content.
+
+Append a plus sign to the URL to get line numbers. Add an anchor like `#l1` to
+jump to the given line number, or click the line number you want. The line number
+for the selected line will be highlighted.
+
+# SEE ALSO
+
+- [http://sprunge.us](http://sprunge.us)
+- [http://p.defau.lt](http://p.defau.lt)
+
+# AVAILABILITY
+
+The project homepage is [http://metacpan.org/release/WWW-Hashbang-Pastebin/](http://metacpan.org/release/WWW-Hashbang-Pastebin/).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/WWW::Hashbang::Pastebin/](https://metacpan.org/module/WWW::Hashbang::Pastebin/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/WWW-Hashbang-Pastebin](http://github.com/doherty/WWW-Hashbang-Pastebin)
+and may be cloned from [git://github.com/doherty/WWW-Hashbang-Pastebin.git](git://github.com/doherty/WWW-Hashbang-Pastebin.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/WWW-Hashbang-Pastebin/issues](https://github.com/doherty/WWW-Hashbang-Pastebin/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

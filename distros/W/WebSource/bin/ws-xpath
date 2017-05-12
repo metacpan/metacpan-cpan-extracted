@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ws-xpath : Search for an XPATH expression in an XML or HTML document
+
+=head2 DESCRIPTION
+
+This allows to search for an XPATH expression in a document which has been
+parsed using the WebSource::Parser module. Hopefully it allows to search
+for XPATH expression in even badly formatted HTML documents.
+
+=cut
+
+use WebSource::Parser;
+use Getopt::Mixed;
+
+Getopt::Mixed::getOptions(
+  "e=s expr>e",
+  "c count>c",
+  "h help>h",
+);
+
+sub usage {
+  print <<END;
+USAGE : $0 [options] <file>...
+Mandatory options
+-e <expr> or --expr=<expr>      the xpath to search for
+-c        or --count            return the number of results rather than the results
+-h        or --help             print this help message
+-s        or --separator        string used to separate results (default "--\\n")
+END
+}
+
+if($opt_h) {
+  usage; exit(0);
+}
+$opt_e or die "No xpath expression given\n";
+$opt_s or $opt_s = "--\n";
+my $parser = WebSource::Parser->new(verbose => 0);
+
+foreach my $file (@ARGV) {
+  my $doc = ($file =~ m/\.html?/) ? 
+     $parser->parse_html_file($file) :
+     $parser->parse_file($file);
+  my $result = $doc->find($opt_e);
+  if(UNIVERSAL::isa($result,"XML::LibXML::NodeList")) {
+    if($opt_c) {
+      print $result->size(),"\n";    
+    } else {
+      foreach my $node ($result->get_nodelist()) {
+        print $opt_s,$node->toString(1),"\n";
+      }
+    }
+  } else {
+    if($opt_c) {
+      print "1\n";
+    } else {
+      print $result->to_literal,"\n";
+    }
+  }
+}

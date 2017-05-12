@@ -1,0 +1,61 @@
+#!perl
+use strict;
+use warnings;
+use WWW::Expand::More;
+
+my $url = shift @ARGV;
+
+if ( scalar(grep { $_ && $_ =~ /^[-]+?all$/ } @ARGV) ) {
+    print join("\n", WWW::Expand::More->expand_all($url));
+}
+else {
+    print WWW::Expand::More->expand($url)."\n";
+}
+
+__END__
+
+=head1 NAME
+
+expand_url - to expand a shortened url
+
+=head1 SYNOPSIS
+
+    $ expand_url URL [--all]
+
+=head2 OPTIONS
+
+=head3 --all
+
+If you set C<--all> option, then you can get all redirect url list.
+
+=head2 EXAMPLES
+
+simple one.
+
+    $ expand_url http://bit.ly/1BPj30x
+    https://www.google.com/search?q=Perl
+
+with all option
+
+    $ expand_url http://bit.ly/1BPj30x --all
+    http://bit.ly/1BPj30x
+    https://goo.gl/dXwzqw
+    https://www.google.com/search?q=Perl
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<WWW::Expand::More>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

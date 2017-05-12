@@ -1,0 +1,62 @@
+WWW-Mechanize-Frames version 0.02
+=================================
+
+This is a quick and dirty expansion of WWW::Mechanize adding a function to retrieve
+frames and returns an array of mech objects each one storing the info about each frame.
+
+USAGE
+---------
+WWW-Mechanize-Frames inherits all the methods from WWW-Mechanize. Additional method added is get_frames.
+
+Example:
+--------
+use WWW::Mechanize::Frames;
+
+$url = 'http://www.site_with_frames.com';
+$mech = WWW::Mechanize::Frames->new();
+
+$mech->get($url);
+
+@frames = $mech->get_frames();
+
+print $frames[0]->content;
+print $frames[1]->content;
+
+   
+
+INSTALLATION
+--------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+----------------
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+  Clone::PP
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright 2005 by Nick Stoianov <cpanperl@yahoo.com>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+ACKNOWLEDGEMENTS
+-----------------
+Thanks to: Andy Lester for WWW:Mechanize(it is a great tool),
+Matthew Simon Cavalletto for Clone::PP, and everybody from the Perl
+community.
+
+

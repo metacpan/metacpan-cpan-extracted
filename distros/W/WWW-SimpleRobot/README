@@ -1,0 +1,43 @@
+WWW::SimpleRobot
+================
+
+Description
+-----------
+
+A simple perl module for doing robot stuff. For a more elaborate interface,
+see WWW::Robot. This version uses LWP::Simple to grab pages, and
+HTML::LinkExtor to extract the links from them. Only href attributes of
+anchor tags are extracted. Extracted links are checked against the
+FOLLOW_REGEX regex to see if they should be followed. A HEAD request is
+made to these links, to check that they are 'text/html' type pages. 
+
+Prerequisites
+-------------
+
+This module requires the following perl modules:
+
+URI
+LWP::Simple
+HTML::LinkExtor
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+[ > make test ]
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Author
+------
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>

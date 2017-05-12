@@ -1,0 +1,28 @@
+---
+abstract: 'get information from RSS feed on http://cpanratings.perl.org/'
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-CPANRatings-RSS
+provides:
+  WWW::CPANRatings::RSS:
+    file: lib/WWW/CPANRatings/RSS.pm
+    version: 0.0307
+requires:
+  Class::Data::Accessor: 0.04001
+  LWP::UserAgent: 2.036
+  Storable: 2.18
+  XML::Simple: 2.18
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0307

@@ -1,0 +1,137 @@
+PRIORITY HIGH:
+
+* rewrite docs/* in POD (?)
+
+PRIORITY NORMAL:
+
+* Treebook, Toolbook, Proprtysheet
+
+* Buttonbar
+
+* Overload resolution
+  finish it!
+
+* store events in a C++ file
+* autogenerate event definitons
+* try to have constants inlined where appropriate
+
+* wxCalendarCtrl
+    HitTest
+    
+* wxFontEnumerator virtual functions
+
+* wxDocManager::FileHistoryLoad/Save
+  wxDocument  CommandProcessor functions
+  wxDocument::Load/Save, investigate
+
+* testing
+    tests for all overloaded methods
+    tests for all events
+    tests for all classes creation/deletion
+
+* Threads
+    cloning of objects with a DESTROY
+
+* configuration system
+
+* finish cpp/chkconfig.h
+
+* Wx::DataObject
+    Wx::PlDataObject
+
+* Decrease compilation time/code bloat:
+    Use precompiled headers where appropriate
+    Move constants out of Constants.xs when they need a separate #include
+    Move #include <wx/foo.h> to the XS requiring them
+    Add tests for wxUSE_XXX, and maybe a wxPERL_USE_XXX
+
+* Wx::HtmlWindow
+    AddFilter
+    AddProcessor
+    GetParser
+    Fix inheritance...
+
+* Wx::HelpController
+    OnQuit
+    Get/SetFrameParameters
+
+* Wx::StyledTextCtrl
+    AddStyledText
+    GetStyledText
+    GetCurLine
+    SendMsg
+
+* Wx::PlGridTable
+    Attribute-releated functions
+    Custom data functions
+
+PRIORITY LOW:
+
+* Wx::HtmlHelpData ?
+
+* Wx::App methods
+    CreateLogTarget
+
+* Wx::App::new
+    find a better solution yhan just 'croak' if OnInit
+    returns a false value
+
+* Wx::PrintData
+    PostScript specific functions
+    overloaded constructors
+
+* Wx::PageSetupDialogData
+    overloaded constructors
+
+* operator == and != (are they useful/have side effects?)
+    Wx::AcceleratorTable
+    Wx::Bitmap (enable)
+    Wx::Brush
+    Wx::Colour
+    Wx::Cursor
+    Wx::Font
+    Wx::Rect
+    Wx::Region
+    Wx::Point
+    Wx::Size
+    Wx::Icon
+    Wx::Image
+    Wx::Palette
+    Wx::Pen
+
+DOCUMENTATTION:
+
+* Document Wx::PlValidator, Wx::PlLog, Wx::PlLogPassThrough
+
+* Document wxStatusBar::GetFieldRect
+
+* Document wxDocTemplate::new
+
+* wxFontMapper
+   GetAltForEncoding
+
+-- not documented in wxWidgets --
+
+* Wx::MultipleChoiceDialog
+
+* Wx::NativeFontInfo
+
+CLASSES:
+  wxGLCanvas
+
+  wxDirCtrl
+  wxMetafileDC
+  wxDCClipper
+  wxBufferedDC
+  wxTextValidator
+  wxGenericValidator
+
+  wxDDE*
+  wxTCP*
+
+  wxMimeTypesManager
+  wxEncodingConverter
+
+FEATURE REQUESTS
+
+* wxAutomationObject

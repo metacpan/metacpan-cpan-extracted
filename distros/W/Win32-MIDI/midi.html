@@ -1,0 +1,603 @@
+<HTML>
+<HEAD>
+<TITLE>Win32::MIDI - Perl extension for writing to MIDI devices under Win32</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32::MIDI - Perl extension for writing to MIDI devices under Win32</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Win32::MIDI;</PRE>
+<PRE>
+        # create new instance of the class, you need to create
+        # a new object for every midi device you want to write to
+        # at any given time.  You can only open a device once, so no
+        # two objects can write to the same device at the same time.
+</PRE>
+<PRE>
+
+  my $midi_obj = Win32::MIDI-&gt;new();</PRE>
+<PRE>
+        # print number of available (writing) devices
+</PRE>
+<PRE>
+
+  print $midi_obj-&gt;numDevices() . &quot;\n&quot;;</PRE>
+<PRE>
+        # open a device</PRE>
+<PRE>
+  $midi_obj-&gt;openDevice(0);</PRE>
+<PRE>
+        # set default channel</PRE>
+<PRE>
+  $midi_obj-&gt;cur_channel(1);</PRE>
+<PRE>
+        # play a note by absolute value (numeric)
+        # middle C - 60
+        # note,dur,velocity
+</PRE>
+<PRE>
+
+  $midi_obj-&gt;play_note(60,2.5,127) || print $midi_obj-&gt;error() . &quot;\n&quot; and $midi_obj-&gt;reset_error();</PRE>
+<PRE>
+        # set default octave (middle)
+</PRE>
+<PRE>
+
+  $midi_obj-&gt;cur_octave(4);</PRE>
+<PRE>
+
+        # play a note by relative name (note name)
+        # middle C - 60
+        # note,dur,velocity</PRE>
+<PRE>
+  $midi_obj-&gt;play_note(C,2.5,127) || print $midi_obj-&gt;error() . &quot;\n&quot; and $midi_obj-&gt;reset_error();</PRE>
+<PRE>
+        # close the device
+</PRE>
+<PRE>
+
+  $midi_obj-&gt;closeDevice();</PRE>
+<P></P>
+<PRE>
+
+        ## Low-Level Method -- Writing Directly To The Device,
+        ## Creating Your Own MIDI Messages</PRE>
+<PRE>
+        # note_on event, channel 1 (0x90), velocity (127), note (127), null (0x00);
+  my $data_on = &quot;\x00\127\127\x90&quot;;     
+        # note_off event, channel 1 (0x80), velocity (127), note (127), null (0x00);
+   my $data_off  = &quot;\x00\127\127\x80&quot;;</PRE>
+<PRE>
+  $midi_obj-&gt;writeMIDI(unpack(&quot;N&quot;,$data_on));</PRE>
+<PRE>
+  sleep(3);</PRE>
+<PRE>
+  $midi_obj-&gt;writeMIDI(unpack(&quot;N&quot;,$data_off));</PRE>
+<PRE>
+        # NOTE: Mixed-case methods warn() on error
+        # Others use $obj-&gt;error();
+</PRE>
+
+<hr size=1 width=100%>
+<h1><a name="description">DESCRIPTION</a></h1>
+<P>Win32::MIDI Version 0.2</P>
+<P>Win32::MIDI serves as a driver for PERL to gain write access to a MIDI device.  This module is, in no way,
+complete or expansive.  It does not currently provide access to reading data from a MIDI device.
+It is intended to compliment such packages as Win32::Sound and MIDI-Perl (indeed, it would be quite nice
+if it were more compatible with MIDI-Perl).  Win32::MIDI provides the ability to send Channel Control messages,
+Pitch Wheel Changes, (some) SYSEX messages, Aftertouch, Notes, and a whole lot more to any available MIDI
+output device on your system.  This module uses the Time::HiRes module to provide timing intervals of less than
+a second.  This package is by no means complete, and can be expanded upon a great deal.</P>
+<P>You will need Win32::Sound if you wish to know anything about a device other than its number. (See the info on
+ <CODE>openDevice()</CODE> below)</P>
+<P>This module can be retrieved from <A HREF="http://www.digitalKOMA.com/church/projects/">http://www.digitalKOMA.com/church/projects/</A></P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<PRE>
+ new()</PRE>
+<PRE>
+        Creates a new instance of the class.  Returns a blessed object upon success.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                my $object = Win32::MIDI::new();</PRE>
+<PRE>
+ error()</PRE>
+<PRE>
+        Returns the last set error message.  Returns undef() if no errors have occured.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                my $error = $object-&gt;error();</PRE>
+<PRE>
+ reset_error()</PRE>
+<PRE>
+        Resets the error message mechanism.  error() will now return undef.</PRE>
+<PRE>
+        Always returns true (1).</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                $object-&gt;reset_error();</PRE>
+<PRE>
+ numDevices()</PRE>
+<PRE>
+        Returns the number of available MIDIOUT devices on the system.
+        For more information about these devices, you should use the Devices() method of Win32::Sound.</PRE>
+<PRE>
+        This method, as all methods with mixed-case names do, utilizes croak() on errors.
+</PRE>
+<PRE>
+
+        Usage:</PRE>
+<PRE>
+                my $num_devices = $object-&gt;numDevices();</PRE>
+<PRE>
+ openDevice NUM</PRE>
+<PRE>
+        Opens a MIDI device, specified by NUM.
+        NUM corresponds to the (x) portion of MIDIOUTx as returned by Win32::Sound::Devices().  This number
+        should never be more than the number of devices returned by numDevices() minus 1.  You must open a
+        device BEFORE you attempt to write any data to a MIDI device or close a device.  If you wish to open
+        more than one device at a time, you must create another instance of this class to do so.</PRE>
+<PRE>
+        This method, as all methods with mixed-case names do, utilizes croak() on errors.
+</PRE>
+<PRE>
+
+        Usage:</PRE>
+<PRE>
+                $object-&gt;openDevice(1);</PRE>
+<PRE>
+ closeDevice()</PRE>
+<PRE>
+        Closes the currently open device.</PRE>
+<PRE>
+        This method, as all methods with mixed-case names do, utilizes croak() on errors.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                $object-&gt;closeDevice();</PRE>
+<PRE>
+ play_note NOTE DURATION VELOCITY CHANNEL ON/OFF OCTAVE</PRE>
+<PRE>
+        Sends a note_on event to an opened MIDIOUT device.  The following arguments may be supplied:</PRE>
+<PRE>
+        NOTE            The note to play, can be an absolute note value (e.g.: 100) or relative name (e.g.: 'C')
+        DURATION        A decimal representing how many seconds to play the note for.  May be less than 1.
+        VELOCITY        (optional) The velocity value of the note being played, defaults to 127.
+        CHANNEL (optional) The channel to play the note on (1..16) checks cur_channel() if not supplied.
+                        Defaults to 1.
+        ON/OFF  (optional) Specifies whether a note_off event should be sent at the end of DURATION.
+                        Boolean: 1 = send note_off event, 0 = do not send
+        OCTAVE  (optional) Used in conjunction with a relative note name (e.g.: 'C'), specifies the octave the
+                        note falls in.  If not supplied, and a relative note name is used, will check cur_octave().  If
+                        no 'current octave' is set, then the method will fail.</PRE>
+<PRE>
+        All arguments are positional.  That is to say, if you wish to supply OCTAVE, you must supply all
+        other arguments.
+</PRE>
+<PRE>
+
+        Returns true (1) on success, sets the value of error() and returns undef() on failure.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                        # play note by absolute vlaue, and minimum arguments.
+</PRE>
+<PRE>
+
+                if($object-&gt;play_note(60,.35)) {
+                        print(&quot;Note played.\n&quot;);
+                        } else {
+                                print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                }</PRE>
+<PRE>
+                        # play note by relative name, specifying octave
+                        # middle C (c4), half a second duration full velocity, channel 1
+                        # with note_off event
+</PRE>
+<PRE>
+
+                if($object-&gt;play_note('C',.5,127,1,1,4)) {
+                        print(&quot;Note played.\n&quot;);
+                        } else {
+                                print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                }</PRE>
+<PRE>
+                        # use cur_octave and relative names for minimum arguments</PRE>
+<PRE>
+                        # cycle through octaves, playing C from each.</PRE>
+<PRE>
+                my $nmRef = $object-&gt;note_map();
+</PRE>
+<PRE>
+
+                foreach my $octave (sort { $a &lt;=&gt; $b } keys(%{ $nmRef })) {
+                        $object-&gt;cur_octave($octave);
+                        print(&quot;Octave is $octave\n&quot;);
+                        if($object-&gt;play_note('C',.5)) {
+                                print(&quot;\tPlayed C\n&quot;);
+                                } else {
+                                        print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                        }
+                        }</PRE>
+<PRE>
+ cur_octave OCTAVE</PRE>
+<PRE>
+        Returns the current 'default' octave.  Sets the current 'default' octave if OCTAVE
+        is supplied.     Valid range for OCTAVE is -1..9. (unless you have redefined the Note
+        Name Map, see note_map() below.)</PRE>
+<PRE>
+        The 'default' octave is utilized when no OCTAVE argument is provided to the play_note()
+        method and a relative note name (e.g.: 'C#') is utilized.</PRE>
+<PRE>
+        This function always returns the currently set 'default' octave, and undef() if no
+        'default' octave has been set.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                $object-&gt;cur_octave('3');
+                my $octave = $object-&gt;cur_octave();</PRE>
+<PRE>
+ cur_channel CHANNEL</PRE>
+<PRE>
+        Returns the current 'default' channel.  Sets the current 'default' channel if CHANNEL
+        is supplied.  Valid range for CHANNEL is 1..16.</PRE>
+<PRE>
+        The 'default' channel is utilized when no CHANNEL argument is provided to the play_note()
+        method.</PRE>
+<PRE>
+        This function always returns the currently set 'default' channel, and undef() if no
+        'default' channel has been set.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                $object-&gt;cur_channel('1');
+                my $channel = $object-&gt;cur_channel();</PRE>
+<P></P>
+<PRE>
+
+ note_map()</PRE>
+<PRE>
+        Returns a reference to the hash which represents the current mapping of note names to
+        absolute note values, grouped by octave.  By changing the data within the reference, you can
+        create new octaves, new note names, and more.  Note names can be anything you desire, octaves
+        must be numeric.  You may define any number of octaves as well.</PRE>
+<PRE>
+        The Note Map is accessed on every call to play_note() that utilizes a relative note name.</PRE>
+<PRE>
+        For a read-only version of the note map, see value_of() method below.
+</PRE>
+<PRE>
+
+        The structure of the note map is as follows:</PRE>
+<PRE>
+        Top
+                Octave
+                        Note
+                                Value
+                        Note
+                                Value
+                Octave
+                        Note
+                                Value</PRE>
+<PRE>
+        That is,</PRE>
+<PRE>
+        %map = ();
+        $map{4} = ();
+        $map{4}{'c'} = 60;
+        $map{4}{'c#'} = 61;
+        $map{4}{'d'} = 62;</PRE>
+<PRE>
+        It is useful to note, that all note names must be lower-cased, even though you can use any
+        word to name a note, if you use any upper-cased characters, the note will not be retrievable.
+        (This is to allow the use of any case when calling play_note(), see it's entry below)</PRE>
+<PRE>
+        By default, the range of octaves is -1..9, where C4 is 60.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+        my $hRef = $object-&gt;note_map();</PRE>
+<PRE>
+                # Print the     contents of the map</PRE>
+<PRE>
+        foreach my $key (sort { $a &lt;=&gt; $b } keys(%{ $hRef })) {
+                print(&quot;Octave $key:\n&quot;);
+                foreach my $note (sort { $a cmp $b } keys(%{ $hRef-&gt;{&quot;$key&quot;} })) {
+                        my $abs_value = $hRef-&gt;{&quot;$key&quot;}{&quot;$note&quot;};
+                        print(&quot;\tNote: $note, Absolute Value: $abs_value\n&quot;);
+                        next;
+                        }
+                next;
+                }</PRE>
+<PRE>
+                # create a new map</PRE>
+<PRE>
+        %{ $hRef } = ();</PRE>
+<PRE>
+                # group by 4 notes, using a, b, c, and d.  There are 0-127      (128 total) possible
+                # values.
+</PRE>
+<PRE>
+
+         my $total_octaves = 128 / 4;
+         my $base_note_val = 0;</PRE>
+<PRE>
+
+         for my $oct (1..$total_octaves) {
+                 $hRef-&gt;{&quot;$oct&quot;} = ();
+                 for my $note (a..d) {
+                         last if($base_note_val &gt; 127);
+                         $hRef-&gt;{&quot;$oct&quot;}{&quot;$note&quot;} = $base_note_val;
+                         $base_note_val++;
+                        }
+                }</PRE>
+<PRE>
+                # all calls to play_note() utilizing named notes will now use this note map.</PRE>
+<PRE>
+ value_of NAME OPT1 OPT2</PRE>
+<PRE>
+        Returns the stored value of a given data element in use by the module.  NAME is the name of the
+        element you wish to receive, and OPT1 and OPT2 can be utilized to become more specific.  Not
+        all names require, or can have OPT arguments.  NAME can be one of the following:</PRE>
+<PRE>
+                note
+                velocity
+                cc
+                channel
+                channel_aftertouch
+                polyphonic
+                pitch_wheel
+                special
+                note_name_map
+                null</PRE>
+<PRE>
+        The data returned is read-only, and is of the type specified, all elements consist of a single byte
+        except for generally described elements (lacking a specific target, i.e. OPT which specifies which
+        value of the list of elements of that type to return, in which case a hash is returned).</PRE>
+<PRE>
+        The following data elements can accept OPT2 arguments, and the possible values:</PRE>
+<P></P>
+<PRE>
+
+        channel         OPT1 = on|off   OPT2 = channel number [1..16]</PRE>
+<PRE>
+                Returns the byte to use as a channel note on/off MIDI status.  Can
+                also return the entire hash of a particular state (on/off) or both.
+</PRE>
+<PRE>
+
+                e.g.:
+                        my $channel_1_on_byte = $object-&gt;value_of('channel','on',1);
+                        my $channel_4_off_byte = $object-&gt;value_of('channel','off',4);</PRE>
+<PRE>
+        note_name_map   OPT1 = octave   OPT2 = note name</PRE>
+<PRE>
+                Returns the mapping of relative note names to octaves and absolute note
+                values.  Can return a single note's value, an entire octave, or the entire range
+                of octaves.
+</PRE>
+<PRE>
+
+                e.g.:
+                        my $c4_note_value = $object-&gt;value_of('note_name_map',4,'c');
+                        my $d_sharp_neg1 = $object-&gt;value_of('note_name_map',-1,'d#');</PRE>
+<PRE>
+                                See the note_map() method above for a writeable version of the
+                                note name map.</PRE>
+<PRE>
+        Either of the above elements will return hashes if not given OPT2 or OPT1.
+        OPT2 can only be supplied if OPT1 is.  Example:</PRE>
+<PRE>
+                my %note_hash = ($object-&gt;value_of('note_name_map'));
+                print $note_hash{4}{'d#'} . &quot;\n&quot;;</PRE>
+<PRE>
+                my $channel_off_hash = ($object-&gt;value_of('channel','off'));
+                print $channel_off_hash{};</PRE>
+<PRE>
+        The other elements are described here:</PRE>
+<PRE>
+        note OPT1 = number [0..127]</PRE>
+<PRE>
+                Returns the MIDI byte which represents a note event (to be combined with a channel
+                on/off MIDI status byte and velocity value byte).  Returns a hash with 128 keys (0..127)
+                if OPT1 is omitted.</PRE>
+<PRE>
+        velocity OPT1 = value [0..127]</PRE>
+<PRE>
+                Return the MIDI byte which represents a velocity level.  See note, above.  Returns a hash
+                with 128 keys (0..127) if OPT1 is omitted.</PRE>
+<PRE>
+        cc OPT1 = channel [1..16]</PRE>
+<PRE>
+                Returns the MIDI byte which represents a MIDI Channel Control event.  To be used in
+                creating MIDI CC commands.  Returns a hash with 16 keys (1..16) if OPT1 is omitted.</PRE>
+<PRE>
+        channel_aftertouch OPT1 = channel (1..16)</PRE>
+<PRE>
+                Returns the MIDI byte which represents a MIDI Channel Aftertouch command.  Returns
+                a hash with 16 keys (1..16) if OPT1 is omitted.</PRE>
+<PRE>
+        polyphonic OPT1 = channel (1..16)</PRE>
+<PRE>
+                Returns the MIDI byte which represents a MIDI Polyphonic Aftertouch command.  Returns
+                a hash with 16 keys (1..16) if OPT1 is omitted.</PRE>
+<PRE>
+        pitch_wheel OPT1 = channel (1..16)</PRE>
+<PRE>
+                Returns the MIDI byte which represents a MIDI Pitch Wheel change.  Returns      a hash with 16
+                keys (1..16) if OPT1 is omitted.</PRE>
+<PRE>
+        special OPT1 = number   (1..16)</PRE>
+<PRE>
+                Returns the MIDI byte which represents a MIDI special command, such as SYSEX or PLAY.
+                Returns a hash with 16 keys (1..16) if OPT1 is omitted.</PRE>
+<PRE>
+        null</PRE>
+<PRE>
+                Returns the current value of a NULL byte.  This is used to construct and pad MIDI messages.
+                If OPT1 is supplied, undef() will be returned.
+</PRE>
+<PRE>
+
+        This method is used both internally and externally to access the raw data used to construct a
+        MESSAGE for the low-level writeMIDI() method below.  You can utilize this method to avoid having
+        to create your own data maps when sending out messages.</PRE>
+<P></P>
+<PRE>
+ send_cc CCVALUE CCDATA CHANNEL</PRE>
+<PRE>
+        Sends a MIDI Channel Control message.  The following arguments are accepted:</PRE>
+<PRE>
+        CCVALUE Which Channel Control message to send.  Values range 0..127.  Each value
+                        typically maps to a function as defined by the MMA.  For example, Modulation
+                        Wheel position is value 33.  This determines what the contents of CCDATA may be.</PRE>
+<PRE>
+        CCDATA  The data to send related to the Control Message specified by CCVALUE.  CCDATA
+                        is always numeric, and the maximum value is always 127.  CCVALUE determines what
+                        an appropriate value for CCDATA is.  For example, to move the Mod Wheel to position
+                        slightly below 'default', you'd use a CCVALUE of 33 and CCDATA of 62 (64 is roughly
+                        center, or 'default').</PRE>
+<PRE>
+        CHANNEL (optional) The channel to send a Control Message to.  If no CHANNEL is supplied, then
+                        cur_channel() is consulted.  Will default to 1 if no 'current channel' is set.</PRE>
+<PRE>
+        Returns true (1) on success, sets the value of error() and return undef() on failure.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                        # send an expression controller change, move it up, and then back down</PRE>
+<PRE>
+                if($object-&gt;send_cc(11,68,1)) {
+                        print(&quot;Expression Controller Go Up\n&quot;);
+                        if($object-&gt;send_cc(11,50,1)) {
+                                print(&quot;Expression Controller Go Down\n&quot;);
+                                } else {
+                                        print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                        }
+                        } else {
+                                print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                }</PRE>
+<PRE>
+ pitch_wheel VALUE1 VALUE2 CHANNEL</PRE>
+<PRE>
+        Sends a pitch wheel change to specified CHANNEL.  Two values are used for changes
+        of fine granularity.  The following arguments are accepted:</PRE>
+<PRE>
+        VALUE1  The major value.  0-127.
+        VALUE2  The minor value. 0-127.
+        CHANNEL (optional) The channel to send the Pitch Wheel change to.  If not supplied,
+                        cur_channel() is consulted.  Defaults to 1 if no 'current channel' has been set.</PRE>
+<PRE>
+        The two (major + minor) VALUEs are used to allow for very fluid, human-like changes.  You
+        can consider the MAJOR value (VALUE1) to be the 'large step' position, and the MINOR value
+        (VALUE2) to be the 'small step' position.  That is, if we first chopped the total length the pitch
+        wheel can move into 128 sections, we get the MAJOR value, if we then split each of those sections
+        in 128 small sections, we'd have the minor value.  VALUE1, then, determines our 'big' steps, and
+        VALUE2 determines our 'precise' movement within that 'step'.</PRE>
+<PRE>
+        Returns true (1) on success, sets the value of error() and returns undef() on failure.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                        # move pitchwheel up slightly (64/64 can be considered 'center', or unchanged)</PRE>
+<PRE>
+                if($object-&gt;pitch_wheel(64,70,1)) {
+                        print(&quot;I moved it up slightly\n&quot;);
+                        } else {
+                                print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                }</PRE>
+<PRE>
+                        # move pitchwheel down VERY far and then reset it.</PRE>
+<PRE>
+                if($object-&gt;pitch_wheel(0,1,1)) {
+                        print(&quot;Dropped it down\n&quot;);
+                        if($object-&gt;pitch_wheel(64,64,1)) {
+                                print(&quot;Back to normal\n&quot;);
+                                } else {
+                                        print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                        }
+                        } else {
+                                print $object-&gt;error() . &quot;\n&quot; and $object-&gt;reset_error();
+                                }</PRE>
+<PRE>
+ writeMIDI MESSAGE</PRE>
+<PRE>
+        Writes MESSAGE to the currently open MIDI device.
+        Structure of MESSAGE comes from the midiOutShortMsg() function of Winmm.dll:</PRE>
+<PRE>
+        A doubleword (long) message with the first byte of the message in the low-order byte.
+        The message is packed as follows:</PRE>
+<PRE>
+                Word            Byte                    Usage
+                High            High-order              Not used.
+                                Low-order               The second byte of MIDI data (when needed)
+                Low             High-order              The first byte of MIDI data (when needed)
+                                Low-order               The MIDI Status</PRE>
+<PRE>
+        This means that the format of MESSAGE must be an unsigned long in &quot;network&quot; order.</PRE>
+<PRE>
+        To achieve this, you can create a string with the necessary values like this:</PRE>
+<PRE>
+                my $string = &quot;\x00\127\127\x90&quot;;</PRE>
+<PRE>
+        Which mean:</PRE>
+<PRE>
+                Not used data           : NULL (\x00)
+                Second MIDI Byte        : Velocity 127 (\127)
+                First MIDI Byte         : Note 127 (\127)
+                Status                  : note_on channel 1 (\x90)</PRE>
+<PRE>
+        Then, you must convert the string into an unsigned long, in network order:</PRE>
+<PRE>
+                my $message = unpack(&quot;N&quot;,$string);</PRE>
+<PRE>
+        For more information on the byte data for MIDI messages, see <A HREF="http://www.harmony-central.com/MIDI/Doc/">http://www.harmony-central.com/MIDI/Doc/</A></PRE>
+<PRE>
+        This method, as all methods with mixed-case names do, utilizes croak() on errors.</PRE>
+<PRE>
+        Usage:</PRE>
+<PRE>
+                $object-&gt;writeMIDI($message);</PRE>
+<P></P>
+
+
+<hr size=1 width=100%>
+<h2><a name="export">EXPORT</a></h2>
+<P>None.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>C. Church, &lt;<A HREF="mailto:dolljunkie@digitalKOMA.com">dolljunkie@digitalKOMA.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>perl</EM>, <EM>MIDI-Perl</EM>, <A HREF="/Win32/Sound.html">the Win32::Sound manpage</A>, <EM>MIDI</EM>, <A HREF="http://www.harmony-central.com/MIDI/Doc/">http://www.harmony-central.com/MIDI/Doc/</A></P>
+
+</BODY>
+
+</HTML>

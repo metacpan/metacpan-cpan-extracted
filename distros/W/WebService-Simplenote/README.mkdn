@@ -1,0 +1,106 @@
+# NAME
+
+WebService::Simplenote - Note-taking through simplenoteapp.com
+
+# VERSION
+
+version 0.2.1
+
+# SYNOPSIS
+
+    use WebService::Simplenote;
+    use WebService::Simplenote::Note;
+
+    my $sn = WebService::Simplenote->new(
+        email    => $email,
+        password => $password,
+    );
+
+    my $notes = $sn->get_remote_index;
+
+    foreach my $note_id (keys %$notes) {
+        say "Retrieving note id [$note_id]";
+        my $note = $sn->get_note($note_id);
+        printf "[%s] %s\n %s\n",
+            $note->modifydate->iso8601,
+            $note->title,
+            $note->content;
+    }
+
+    my $new_note = WebService::Simplenote::Note->new(
+        content => "Some stuff",
+    );
+
+    $sn->put_note($new_note);
+
+# DESCRIPTION
+
+This module proves v2.1.5 API access to the cloud-based note software at
+[Simplenote](https://simplenoteapp.com).
+
+# ERRORS
+
+Will `die` if unable to connect/login. Returns `undef` for other errors.
+
+# METHODS
+
+- WebService::Simplenote->new($args)
+
+Requires the `email` and `password` for your simplenote account. You can also
+provide a [Log::Any](http://search.cpan.org/perldoc?Log::Any) compatible `logger`.
+
+- get\_remote\_index
+
+Returns a hashref of [WebService::Simplenote::Note](http://search.cpan.org/perldoc?notes). The notes are keyed by id.
+
+- get\_note($note\_id)
+
+Retrieves a note from the remote server and returns it as a [WebService::Simplenote::Note](http://search.cpan.org/perldoc?WebService::Simplenote::Note).
+`$note_id` is an alphanumeric key generated on the server side.
+
+- put\_note($note)
+
+Puts a [WebService::Simplenote::Note](http://search.cpan.org/perldoc?WebService::Simplenote::Note) to the remote server
+
+- delete\_note($note\_id)
+
+Delete the specified note from the server. The note should be marked as `deleted`
+beforehand.
+
+# TESTING
+
+Setting the environment variables `SIMPLENOTE_USER` and `SIMPLENOTE_PASS` will enable remote tests.
+If you want to run the remote tests __MAKE SURE YOU MAKE A BACKUP OF YOUR NOTES FIRST!!__
+
+# SEE ALSO
+
+Designed for use with Simplenote:
+
+<http://www.simplenoteapp.com/>
+
+Based on SimplenoteSync:
+
+<http://fletcherpenney.net/other\_projects/simplenotesync/>
+
+# AUTHORS
+
+- Ioan Rogers <ioanr@cpan.org>
+- Fletcher T. Penney <owner@fletcherpenney.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Ioan Rogers.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 2, June 1991
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/ioanrogers/WebService-Simplenote/issues](https://github.com/ioanrogers/WebService-Simplenote/issues).
+
+# SOURCE
+
+The development version is on github at [http://github.com/ioanrogers/WebService-Simplenote](http://github.com/ioanrogers/WebService-Simplenote)
+and may be cloned from [git://github.com/ioanrogers/WebService-Simplenote.git](git://github.com/ioanrogers/WebService-Simplenote.git)

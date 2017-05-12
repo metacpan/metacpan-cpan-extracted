@@ -1,0 +1,70 @@
+
+=head1 NAME
+
+Wrangler::Development - notes for developers interested in contributing
+
+=head1 DESCRIPTION
+
+=head2 Public repository vs. "real" repository.
+
+As you may have found out already, the source code on CPAN - bundled as tarball 
+- is only a subset of the files that are on the next "level", the source tree made
+available on github. For example, the screenshots you see in L<Wrangler.pm>'s POD
+are hosted on github, but the Makefile.PL does not include them in the CPAN tarball
+- which is to ease load on the CPAN mirrors.
+
+On the other hand, L<Wrangler::License> and L<Wrangler::Changes> are doublettes
+of the files "LICENSE" and "Changes" which I<are> part of the tarball already,
+but have been roled into Perl-modules so they can be accessed reliably from within
+the application. Even less optimal is the inflated storage of all of Wrangler's
+internally used bitmaps, originally PNGs, as XPM encoded data in L<Wrangler::Images>.
+The latter is done to lift the need to reference external binary image files. Well,
+at least text compresses well.
+
+Both, the text-modules and the Images.pm module have been build with makescripts
+on the next level up, the "real" repository, which is a superset of the github
+repository and currently unreleased. It's not that much: some "source files", images,
+notes, internal TODO docs, and scripts which are part of the build-pipeline for
+Debian or Windows. Some files may trickle down to the public repo eventually, but
+telling interested developers (you) about this multi-layered repo approach now might
+explain and justify some of the minor quirks of the Wrangler source-code.
+
+=head1 PLUGINS
+
+Wrangler currently ships with one core Plugin, L<Wrangler::Plugin::ColourLabels>.
+Functionality therein has been bundled into a module to test and demonstrate the 
+Plugin API, which is described in more detail in L<Wrangler::Plugin>.
+
+=head1 CONTRIBUTING
+
+As with most Perl programs, Wrangler's source-code is open. And as such it can be
+modified by the user. However, we ask you to report back any bugfixes or improvements.
+Also, as Wrangler's license does not allow to redistribute a modified Wrangler as
+a whole, certain restrictions apply for submitting patches via public "forks".
+Please read the exact licensing terms if you want to work on the source or contribute
+code.
+
+L<Wrangler's public repository|https://github.com/clipland/wrangler> is currently
+on github.
+
+=head1 SEE ALSO
+
+Additional pointers about how Wrangler works can be derrived from the on-topic
+documentation placed into key modules:
+
+L<Wrangler>
+
+L<Wrangler::Wx::App>
+
+L<Wrangler::Layers>
+
+L<Wrangler::Plugin>
+
+L<Wrangler::Plugin::ColourLabels>
+
+L<Wrangler::PubSub>
+
+=head1 COPYRIGHT & LICENSE
+
+This module is part of L<Wrangler>. Please refer to the main module for further
+information and licensing / usage terms.

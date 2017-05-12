@@ -1,0 +1,14 @@
+Changes
+lib/WWW/betfair.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/betfair.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/TypeCheck.t
+lib/WWW/betfair/Template.pm
+lib/WWW/betfair/Request.pm
+lib/WWW/betfair/TypeCheck.pm

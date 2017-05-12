@@ -1,0 +1,47 @@
+Revision history for Win32-Tracert
+
+0.011     2015-01-20 22:14:57+01:00 Europe/Paris
+    * Lot of code cleaning based on CPAN Testers Reports and perlcritic 
+
+0.010     2015-01-13 20:48:35+01:00 Europe/Paris
+    * Clean POD format. I should verify more often my documentation.
+
+0.009     2015-01-13 18:57:39+01:00 Europe/Paris
+    * Get some statistics from Win32::Tracert path
+        - Add Statistics module to the distribution
+        - Add 05_statistics.t test file
+
+0.008     2014-04-03 00:17:41+02:00 Europe/Paris
+    * Join MetaCPAN and GitHub
+        - Add plugin [GithubMeta]
+
+0.007     2014-04-03 00:08:54+02:00 Europe/Paris
+    * Remove git push and reuse NextRelease
+        - i don't succed to set it correctly
+        - precedently remove [NextRelease] plugin by misunderstood its action
+
+0.006     2014-04-02 23:46:01+02:00 Europe/Paris
+    * integration with GitHub
+        - Add automatic version number in Module
+        - Add automatic version number in POD
+        - Create repository on GitHub and synchronise with it
+
+0.005     2014-04-01 22:32:01+02:00 Europe/Paris
+    * clean POD
+        - cosmetic update, remove semicolon at the end of NAME section
+          (Thanks to dolmen@cpan.org for his advices)
+
+0.004     2014-03-31 21:24:35+02:00 Europe/Paris
+    * clean tests files
+        - Skip tests associated with [destination] attribute if system is not MSWin32.
+          We should be able to use that module event if we are not on MSWin32.
+          It is possible when creating object with circuit attribute.
+
+0.003     2014-03-29 16:33:15+01:00 Europe/Paris
+    * clean unuseful code (Improve my knowledge on Dist:Zilla)
+        - Remove use Data::Printer in 04_weird_use.t
+        - Remove use Data::Dumper in Parser.pm
+
+0.002     2014-03-29 00:30:54+01:00 Europe/Paris
+
+0.001     2014-03-28 00:01:34+01:00 Europe/Paris

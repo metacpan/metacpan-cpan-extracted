@@ -1,0 +1,14 @@
+Revision history for Web::Passwd
+
+0.01    Wed Jan 10 13:51:13 2007
+        Test version, used internally.
+
+0.02    Mon Jan 29 09:14:59 2007
+        First public version, released on an unsuspecting world.
+
+0.03    Wed Feb  7 15:11:01 2007
+        Added Build.PL for systems without a make utility
+        Added 'form_method' configuration directive
+        Replaced $Config package variable with lexical variable
+        Fixed minor typos/errors in POD documentation
+        Fixed a permission issue with the distribution (credit to Mark Stosberg)

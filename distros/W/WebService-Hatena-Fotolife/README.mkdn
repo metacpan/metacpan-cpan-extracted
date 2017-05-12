@@ -1,0 +1,149 @@
+# NAME
+
+WebService::Hatena::Fotolife - A Perl interface to the
+Hatena::Fotolife Atom API
+
+# SYNOPSIS
+
+  use WebService::Hatena::Fotolife;
+
+  my $fotolife = WebService::Hatena::Fotolife->new;
+     $fotolife->username($username);
+     $fotolife->password($password);
+
+  # create a new entry with image filename
+  my $EditURI = $fotolife->createEntry(
+      title    => $title,
+      filename => $filename,
+      folder   => $folder,
+  );
+
+  # or specify the image source as a scalarref
+  my $EditURI = $fotolife->createEntry(
+      title     => $title,
+      scalarref => \$image_content,
+      folder    => $folder,
+  );
+
+  # update the entry
+  $fotolife->updateEntry($EditURI, title => $title);
+
+  # delete the entry
+  $fotolife->deleteEntry($EditURI);
+
+  # retrieve the feed
+  my $feed = $fotolife->getFeed;
+  my @entries = $feed->entries;
+  ...
+
+# DESCRIPTION
+
+WebService::Hatena::Fotolife provides an interface to the
+Hatena::Fotolife Atom API.
+
+This module is a subclass of [XML::Atom::Client](http://search.cpan.org/perldoc?XML::Atom::Client), so see also the
+documentation of the base class for more usage.
+
+# METHODS
+
+## new
+
+  my $fotolife = WebService::Hatena::Fotolife->new;
+
+Creates and returns a WebService::Hatena::Fotolife object.
+
+## createEntry ( I<%param> )
+
+  # passing an image by filename
+  my $EditURI = $fotolife->createEntry(
+      title    => $title,
+      filename => $filename,
+  );
+
+  # or...
+
+  # a scalar ref to the image content
+  my $EditURI = $fotolife->createEntry(
+      title     => $title,
+      scalarref => $scalarref,
+  );
+
+Uploads given image to Hatena::Fotolife. Pass in the image source as a
+filename or a scalarref to the image content. There're some more
+options described below:
+
+- * title
+
+Title of the image.
+
+- * filename
+
+Local filename of the image.
+
+- * scalarref
+
+Scalar reference to the image content itself.
+
+- * folder
+
+Place, called "folder" in Hatena::Fotolife, you want to upload your
+image.
+
+- * generator
+
+Specifies generator string. Hatena::Fotolife can handle your request
+along with it. If not passed, the package name of this modules is
+used.
+
+## updateEntry ( I<$EditURI>, I<%param> )
+
+  my $EditURI = $fotolife->updateEntry(
+      $EditURI,
+      title => $title,
+  );
+
+Updates the title of the entry at _$EditURI_ with given
+options. Hatena::Fotolife Atom API currently doesn't support to update
+the image content directly via Atom API.
+
+## getFeed
+
+  my $feed = $fotolife->getFeed;
+
+Retrieves the feed. The count of the entries the _$feed_ includes
+depends on your configuration of Hatena::Fotolife.
+
+## use_soap ( I<[ 0 | 1 ]> )
+
+## username ( [ I<$username ]> )
+
+## password ( [ I<$password ]> )
+
+## getEntry ( I<$EditURI> )
+
+## deleteEntry ( I<$EditURI> )
+
+See the documentation of the base class, [XML::Atom::Client](http://search.cpan.org/perldoc?XML::Atom::Client).
+
+# SEE ALSO
+
+- * Hatena::Fotolife
+
+http://f.hatena.ne.jp/
+
+- * Hatena::Fotolife API documentation
+
+http://d.hatena.ne.jp/keyword/%A4%CF%A4%C6%A4%CA%A5%D5%A5%A9%A5%C8%A5%E9%A5%A4%A5%D5AtomAPI
+
+- * [XML::Atom::Client](http://search.cpan.org/perldoc?XML::Atom::Client)
+
+# AUTHOR
+
+Kentaro Kuribayashi, <kentarok@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 - 2010 by Kentaro Kuribayashi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

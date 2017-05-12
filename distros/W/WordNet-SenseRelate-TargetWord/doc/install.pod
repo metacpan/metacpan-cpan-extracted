@@ -1,0 +1,208 @@
+=head1 NAME
+
+install.pod - how to install WordNet::SenseRelate::TargetWord
+
+=head1 SYNOPSIS
+
+ perl Makefile.PL
+
+ make
+
+ make test
+
+ make install
+
+=head1 DESCRIPTION
+
+=head2 Prerequisites
+
+You need to have WordNet (version 1.7.1 or later, 2.0 preferred),
+WordNet::QueryData (version 1.30 or later), WordNet::Similarity (latest
+version preferred), XML::Parser (version 2.34 or later)
+installed. Optionally, you should also have Gtk+ (version 1.2.x) and
+Gtk::Perl installed, to be able to use the graphical interfaces provided.
+
+WordNet is available at http://www.cogsci.princeton.edu/~wn/
+
+WordNet::QueryData is available from
+http://search.cpan.org/dist/WordNet-QueryData/
+
+WordNet::Similarity is available from
+http://search.cpan.org/dist/WordNet-Similarity/
+
+XML::Parser is available from http://search.cpan.org/dist/XML-Parser/
+
+Gtk is available from http://www.gtk.org/
+
+Gtk::Perl is available from http://search.cpan.org/dist/Gtk-Perl/
+
+You should set the WNHOME environment variable to the location where you
+have WordNet installed; see the WordNet::QueryData documentation for more
+information.
+
+=head2 Installing
+
+The usual way to install the package is to run the following commands:
+
+ perl Makefile.PL
+
+ make
+
+ make test
+
+ make install
+
+If you can't set the WNHOME environment variable, you can use the WNHOME
+option when running S<perl Makefile.PL>.  For example,
+
+ perl Makefile.PL WNHOME=/usr/local/WordNet-2.0
+
+You will often need root access/superuser priviledges to run S<make install>.
+The module can also be installed locally.  To do a local install, you need
+to specify a PREFIX option when you run 'perl Makefile.PL'.  For example,
+
+ perl Makefile.PL PREFIX=/home/sid
+
+or
+
+ perl Makefile.PL LIB=/home/sid/lib PREFIX=/home/sid
+
+will install Similarity into /home/sid.  The first method above will
+install the modules in /home/sid/lib/perl5/site_perl/5.8.3 (assuming
+you are using version 5.8.3 of Perl; otherwise, the directory will
+be slightly different).  The second method will install the modules
+in /home/sid/lib.  In either case the executable scripts will be
+installed in /home/sid/bin and the man pages will be installed in
+/home/sid/share.
+
+In your Perl programs that you may write using the modules, you may need
+to add a line like so
+
+ use lib '/home/sid/lib/perl5/site_perl/5.8.3';
+
+if you used the first method or
+
+ use lib '/home/sid/lib';
+
+if you used the second method.  By doing this, the installed
+modules are found by your program.  To run the similarity.pl program,
+you would need to do
+
+ perl -I/home/sid/lib/perl5/site_perl/5.8.3 similarity.pl
+
+or 
+
+ perl -I/home/sid/lib
+
+Of course, you could also add the 'use lib' line to the top of the program
+yourself.  You will need to replace 5.8.3 with whatever version of Perl you
+are using.  The preceeding instructions should be sufficient for standard
+and slightly non-standard installations. However, if you need to modify
+other makefile options you should look at the ExtUtils::MakeMaker
+documentation. Modifying other makefile options is not recommended unless
+you really, absolutely, and completely know what you're doing!
+
+Alternatively, you could also set the PERL5LIB environment variable to
+indicate the location of the Perl modules.
+
+NOTE: If one (or more) of the tests run by 'make test' fails, you will see
+a summary of the tests that failed, followed by a message of the form
+"make: *** [test_dynamic] Error Y"  where Y is a number between 1 and
+255 (inclusive).  If the number is less than 255, then it indicates how
+many test failed (if more than 254 tests failed, then 254 will still be
+shown).  If one or more tests died, then 255 will be shown.  For more
+details, see:
+
+http://search.cpan.org/dist/Test-Simple/lib/Test/Builder.pm#EXIT_CODES
+
+=head2 System Requirements
+
+=over
+
+=item 1.
+
+Perl version 5.6 or later.  This package has been written in Perl, which is
+freely available from www.perl.org. This package assumes that Perl is
+installed in the directory /usr/local/bin.  If this is where Perl is on
+your computer, then the support programs can be run directly at the
+command line as 'disamb.pl ...' or 'wps2sk.pl...',
+etc. However, if Perl is not installed at this location,
+you would need to explicitly invoke them as 'perl disamb.pl ... ' or
+'perl wps2sk.pl...', etc.
+
+=item 2.
+
+WordNet: The modules are based on WordNet. WordNet must be
+installed on your system. WordNet is freely downloadable from
+http://www.cogsci.princeton.edu/~wn/. WordNet version 2.0 was used during
+the development and testing of the package; however, it should work with
+other versions of WordNet as well. The WordNet::QueryData Perl module is
+used to access WordNet. This module requires that an environment variable
+'WNHOME', containing the path to the WordNet files, be set up. For further
+details, please see the WordNet::QueryData documentation.
+
+=item 3.
+
+WordNet::QueryData: This is the Perl interface to WordNet written by
+Jason Rennie. QueryData should be accessible on the @INC path of Perl. (Can
+be freely downloaded from http://search.cpan.org/dist/WordNet-QueryData/).
+QueryData 1.31 was used during the development. Also we observed that that
+due to some major changes in QueryData from its previous versions, this
+software does not work with the earlier versions of QueryData. If you have
+an earlier version of QueryData (1.29 or earlier) you may need to upgrade
+QueryData.
+
+=item 4.
+
+WordNet::Similarity: This module is used by some of the
+WordNet::SenseRelate::Algorithm modules while performing the
+disambiguation. You can get this package from
+http://search.cpan.org/dist/WordNet-Similarity/
+
+=item 5.
+
+XML::Parser: The Senseval2 lexical sample data set is provided in an XML
+format. The XML::Parser package is required to parse these files. XML::Parser
+is available from http://search.cpan.org/dist/XML-Parser/
+
+=item 6.
+
+Gtk+ and Gtk::Perl: Graphical interfaces to the modules have been included
+among the tools. These interfaces require that Gtk+ (The GIMP Toolkit) and
+its Perl library Gtk::Perl be installed on the system. 
+Gtk+ is available from http://www.gtk.org/ and Gtk::Perl is available from
+http://search.cpan.org/dist/Gtk-Perl/ 
+
+=back
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah, Salt Lake City
+ sidd at cs.utah.edu
+
+ Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+ banerjee+ at cs.cmu.edu
+
+=head1 SEE ALSO
+
+intro.pod modules.pod
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev
+Banerjee
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+Texts.
+
+Note: a copy of the GNU Free Documentation License is available on
+the web at L<http://www.gnu.org/copyleft/fdl.html> and is included in
+this distribution as FDL.txt.
+
+=cut

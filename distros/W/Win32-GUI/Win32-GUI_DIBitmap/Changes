@@ -1,0 +1,116 @@
+Revision history for Perl extension FreeImage.
+
+0.17 15/10/2006 [Robert May]
+    - Fix memory leak in AlphaCopyToDC
+    - Win32::GUI 1.04 Release.
+
+0.16  25/05/2006 [Robert May]
+    - merge into Win32::GUI core distribution
+    - new build process
+    - fixed to build with C compiler (rather than requiring C++)
+    - added basic tests
+
+0.15  28/11/2004
+    - Use FreeImage 3.5.1
+        -> GIF support
+        -> LZW compression
+        -> other improvements, bug fix, ...
+    - New Win32::GUI::DIBitmap method
+        -> GetFIFMimeType
+        -> ConvertTo4Bits
+
+0.14  21/02/2004
+    - Use FreeImage 3.2.0
+    - New Win32::GUI::DIBitmap method
+        -> Image internal format
+        -> Pixel and and Background methods
+            + SetPixel
+            + GetPixel
+            + HasBackgroundColor
+            + GetBackgroundColor
+            + SetBackgroundColor
+        -> Conversion with new internal type
+        -> Chanel processing
+            + GetComplexChannel
+            + SetComplexChannel
+
+0.13  08/12/2003
+    - Correct memory leak in NewFromWindow, newFromDC [Thank to Steve Pick]
+
+0.12  17/11/2003
+    - Use FreeImage 3.0.4
+
+0.11  11/11/2003
+    - Use FreeImage 3.0.3
+
+0.10  28/10/2003
+    - Use FreeImage 3.0.2
+
+0.09  24/10/2003
+    - Use FreeImage 3.0.1
+
+0.08  28/09/2003
+    - Use FreeImage 3.0.0
+    - New format : XBM, XPM
+    - New Win32::GUI::DIBitmap method
+        -> Conversion
+            + Threshold : Convert to 1 bit
+            + Dither    : Convert to 1 bit
+        -> Color manipulation
+            + AdjustGamma
+            + AdjustBrightness
+            + AdjustContrast
+            + Invert          : Invert effect
+            + GetHistogram    : Get Color histogram
+        -> Chanel processing
+            + GetChannel
+            + SetChannel
+        -> Copy/Paste
+            + Copy
+            + Paste
+        -> Rotation / flipping
+            + Rotate    : Create a rotated Bitmap (>= 8 bits only)
+            + RotateEx  : Create a rotated/translated Bitmap (>= 8 bits only)
+            + FlipVerticaly   : Flip Verticaly effect
+            + FlipHorizontaly : Flip Horizontaly effect
+        -> UpSampling / DownSampling
+            + Rescale   : Create a rescaled Bitmap (32 bits only)
+    - New TIFF save format option.
+    - New sample : read image from zipfile.
+
+0.07  24/04/2003
+    - New Win32::GUI::DIBitmap method
+        + newFromGD
+        + CopyFromGD, CopyToGD : Must have Same Size and BPP.
+    - UPDATE 1 : Add switch for old GD version
+    - UPDATE 2 : Correct upside down bitmap bug
+
+0.06  28/05/2002
+    - Use FreeImage 2.5.3
+    - Add FreeImage Multipaging interface
+
+0.05  14/01/2002
+    - Use FreeImage 2.5.0
+    - Add FreeImage Multipaging interface (experimental in this release)
+    - New Win32::GUI::DIBitmap method
+        + Clone
+        + AlphaCopyToDC
+        + AlphaStrechToDC
+
+0.04  29/10/2001
+    - Use FreeImage 2.4.2
+    - Fix bug in jpeg plug-in
+
+0.03  18/08/2001
+    - Correct Bug when capture screen if display isn't in 32 bits
+    - Add new function GetColorType
+    - ColorQuantize work if image isn't in 24 bits
+    - Add more Documentation
+
+0.02  15/08/2001
+    - Use FreeImage 2.4.1
+    - Some little change
+
+0.01  21/03/2001
+    - original version; created by h2xs 1.19
+    - First build Win32::GUI::DIBitmap

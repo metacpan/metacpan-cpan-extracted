@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<purchaseOrder>
+	<Order>
+		<BookName>Programming Web Serivices with Perl</BookName>
+		<Id>0-596-00206-8</Id>
+		<Quantity>500</Quantity>
+	</Order>
+	<Payment>
+		<CardNo>1234-5678-9012-3456</CardNo>
+		<CardType>VISA</CardType>
+		<ValidDate>12-10-2006</ValidDate>
+	</Payment>
+</purchaseOrder>

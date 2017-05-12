@@ -1,0 +1,61 @@
+<project default="release">
+
+<!-- release target -->
+  <target name="release">
+	  <echo>WSRF::Lite v0.7 January 2006 http://www.sve.man.ac.uk/Research/AtoZ/ILCT</echo>
+   </target>
+
+  <property name="src" value="."/>
+   
+
+  <target name="build-all">
+     <echo message="Running WSRF::Lite installer script ${src}/installer.pl" />
+     <exec dir="${src}" executable="installer.pl" failonerror="true" failifexecutionfails="true" resolveexecutable="true">
+	  <arg line="-i"/>
+     </exec>	  
+   </target>
+   
+   <target name="build-server" depends="build-all"/>
+
+   <target name="build-client" depends="build-all"/>
+
+   <target name="build-doc" depends="build-all"/>
+
+   <target name="test">
+     <echo message="Testing WSRF::Lite installation with ${src}/installer.pl" />
+     <exec dir="${src}" executable="installer.pl" failonerror="true" failifexecutionfails="true" resolveexecutable="true" >
+         <arg line="-t"/>
+       </exec>
+   </target>
+   
+   <target name="clean"/>
+   
+   <target name="verify-install-env">
+      <echo message="Checking installation environment with ${src}/installer.pl" />
+      <exec dir="${src}" executable="installer.pl" failonerror="true" failifexecutionfails="true" resolveexecutable="true" >
+         <arg line="-v"/>
+      </exec>
+   </target>
+   
+   <target name="verify-uninstall-env"/>
+   
+   <target name="pre-install"/>
+   
+   <target name="post-install"/>
+   
+   <target name="uninstall"/>
+   
+   <target name="deploy"/>
+   
+   <target name="undeploy"/>
+   
+   <target name="test-install"/>
+   
+   <target name="clean-install"/>
+   
+   <target name="configure-db"/>
+   
+   <target name="clean-db"/>
+
+   
+</project>   

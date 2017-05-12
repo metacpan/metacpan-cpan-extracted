@@ -1,0 +1,22 @@
+WWW::Adblock
+============
+
+This module is a very simple Perl implementation of the Adblock Plus 
+extension for Firefox.  Currently it supports URL filtering but not
+element blocking.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 David Cannings
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

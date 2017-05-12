@@ -1,0 +1,48 @@
+Revision history for WebService-Google-Closure
+
+0.11    27 Dec 2015
+        - Fix bad code test, following change by Google [RT#110454]
+          Thanks to SREZIC for reporting
+
+0.10	3 Aug 2011
+
+	- Fix test not to depend on locale [RT#69975]
+	  Thanks to Syohei Yoshida for report and patch
+
+0.09    23 June 2011
+
+	- Added 'NOOP' compilation level
+
+0.08	9 Dec 2010
+
+	- Require at least version 1.09 of Class::MOP
+	
+0.07    9 Aug 2010
+
+	- Remove stupid English-centric test
+	
+0.06    3 July 2010
+
+	- OO JSON
+
+0.05    15 June 2010
+
+	- Specifically import "from_json" to please cpantesters
+
+0.04    10 June 2010
+
+	- Add JSON as prerequisite
+
+0.03    08 June 2010
+
+	- Added option --manifest to closure-compile
+	- Die if server error on response
+
+0.02    07 June 2010
+
+	- Fixed --level option to closure-compile to allow number or string
+	- use File::Slurp
+
+0.01    01 June 2010
+
+	- Initial release

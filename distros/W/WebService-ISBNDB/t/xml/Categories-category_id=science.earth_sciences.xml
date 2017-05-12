@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:14">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.earth_sciences" parent_id="science">
+<Name>Earth Sciences</Name>
+<Details summary="" depth="1" element_count="86" />
+<SubCategories>
+<SubCategory id="science.earth_sciences.congresses" />
+<SubCategory id="science.earth_sciences.literature" />
+<SubCategory id="science.earth_sciences.reference" />
+<SubCategory id="science.earth_sciences.history" />
+<SubCategory id="science.earth_sciences.remote_sensing" />
+<SubCategory id="science.earth_sciences.study_and_teaching" />
+<SubCategory id="science.earth_sciences.regions" />
+<SubCategory id="science.earth_sciences.views_and_contributions" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

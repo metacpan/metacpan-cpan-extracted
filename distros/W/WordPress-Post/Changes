@@ -1,0 +1,19 @@
+2010-07-05 05:38  leo
+
+	* lib/WordPress/Post.pm: DEPRECATED, use WordPress::CLI distro
+	  instead.
+
+2010-07-05 05:35  leo
+
+	* MANIFEST, Makefile.PL, README, bin/wppost, lib/WordPress/Base.pm,
+	  lib/WordPress/CLI.pm, lib/WordPress/Post.pm, t/01.t,
+	  t/02_file_upload.t, t/99_cleanup.t, t/Test_Post_From_File.txt,
+	  t/image.jpg: ''
+
+2010-07-05 05:35  leo
+
+	* MANIFEST, Makefile.PL, README, bin/wppost, lib/WordPress/Base.pm,
+	  lib/WordPress/CLI.pm, lib/WordPress/Post.pm, t/01.t,
+	  t/02_file_upload.t, t/99_cleanup.t, t/Test_Post_From_File.txt,
+	  t/image.jpg: Initial revision
+

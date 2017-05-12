@@ -1,0 +1,68 @@
+NAME
+    WWW::JASRAC - Interact With JASRAC Search Interface
+
+SYNOPSIS
+      use WWW::JASRAC;
+      my $jasrac  = WWW::JASRAC->new(ie => 'euc-jp');
+      my @results = $jasrac->search(title => $SongTitle);
+
+      foreach my $r (@results) {
+         print $r->title, "\n";
+      }
+
+DESCRIPTION
+    BEWARE! EXTREMELY ALPHA SOFTWARE!
+
+    WWW::JASRAC is a module to query and extract data out of JASRAC
+    (Japanese Society for Rights of Authors, Composers and Publishers)
+    site's search capabilities.
+
+METHOD
+  new %ARGS
+    Creates a new WWW::JASRAC instance. The following arguments are
+    accepted:
+
+    ie  The input (i.e. what YOU supply) encoding. Default is 'euc-jp'.
+
+    oe  The output (i.e. what comes out of WWW::JASRAC) encoding. Default is
+        'euc-jp'
+
+  search %ARGS
+    You can specify the following query criteria:
+
+    code
+        The JASRAC code
+
+    title
+        The title of the song.
+
+    artist
+        The name of the artist.
+
+    rights_holder
+        the name of the rights holder (such as the writer or the publisher)
+
+    Each of the criteria has a correspodngin "yomi" criteria as well. For
+    example, instead of specifying the song title, you may specify the
+    "yomi" of the title like so:
+
+      $jasrac->search(title_yomi => $yomi);
+
+    Also, the value of each criteria may optionally be a hashref, so that
+    you can specify the search option, which are O_ZENPOU (prefix match),
+    O_BUBUN (partial match), O_KOHO (suffix match), and O_KANZEN (exact
+    match). In this case, use the 'text' slot in the hash to supply the
+    actual query string:
+
+      $jasrac->search(title => { text => $title, option => O_KANZEN });
+
+    If unspecified, the default for option is O_KANZEN
+
+    Returns a list of WWW::JASRAC::Result objects.
+
+SEE ALSO
+    WWW::JASRAC::Result
+
+AUTHOR
+    Daisuke Maki <dmaki@cpan.org> All rights reserved.
+

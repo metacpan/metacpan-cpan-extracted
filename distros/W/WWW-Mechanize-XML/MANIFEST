@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Mechanize-XML.t
+t/files/valid.xml
+t/files/invalid.xml
+t/files/error.xml
+lib/WWW/Mechanize/XML.pm

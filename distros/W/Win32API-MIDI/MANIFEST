@@ -1,0 +1,22 @@
+# MANIFEST for Win32API::MIDI
+#	$Id: MANIFEST,v 1.4 2003-04-13 23:00:39-05 hiroo Exp $
+MIDI.pm
+MIDI.xs
+MIDI/Out.pm
+MIDI/SysEX.pm
+MIDI/SysEX/Roland.pm
+MIDI/SysEX/Yamaha.pm
+MIDI/SysEX/MIDIbox.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/td6
+eg/midisysexin.pl
+mmsystem.xs
+t/midi.t
+t/midiin.t
+t/midiout.t
+t/midistream.t
+t/sysex.t
+typemap

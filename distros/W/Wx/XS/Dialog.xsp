@@ -1,0 +1,184 @@
+#############################################################################
+## Name:        XS/Dialog.xsp
+## Purpose:     XS for Wx::Dialog
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     29/10/2000
+## RCS-ID:      $Id: Dialog.xsp 2938 2010-07-04 12:56:48Z mbarbon $
+## Copyright:   (c) 2000-2001, 2003-2004, 2006-2008, 2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#include <wx/dialog.h>
+#include <wx/sizer.h>
+#include <wx/button.h>
+#include "cpp/dialog.h"
+#include "cpp/overload.h"
+
+%typemap{wxDialogLayoutAdaptationMode}{simple};
+
+%name{Wx::Dialog} class wxDialog {
+#if WXPERL_W_VERSION_GE( 2, 6, 3 )
+    void SetAffirmativeId( int affirmativeId );
+    int GetAffirmativeId();
+
+    int GetEscapeId() const;
+#endif
+#if WXPERL_W_VERSION_GE( 2, 7, 0 )
+    void SetEscapeId( int escapeId );
+#endif
+    wxSizer* CreateTextSizer( const wxString &message );
+    wxSizer* CreateButtonSizer( long flags );
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    wxSizer* CreateSeparatedButtonSizer( long flags );
+#endif
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+    wxSizer* CreateStdDialogButtonSizer( long flags );
+#endif
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+    void AddMainButtonId( wxWindowID id );
+    bool IsMainButtonId( wxWindowID id ) const;
+%{
+void
+wxDialog::GetMainButtonIds()
+  PPCODE:
+    PUTBACK;
+    wxPli_intarray_push( aTHX_ THIS->GetMainButtonIds() );
+    SPAGAIN;
+%}
+
+    bool CanDoLayoutAdaptation();
+
+    package_static bool IsLayoutAdaptationEnabled();
+    package_static void EnableLayoutAdaptation( bool enable );
+
+    wxWindow* GetContentWindow();
+
+    void SetLayoutAdaptationLevel( int level );
+    int GetLayoutAdaptationLevel() const;
+
+    void SetLayoutAdaptationMode( wxDialogLayoutAdaptationMode mode );
+    wxDialogLayoutAdaptationMode GetLayoutAdaptationMode() const;
+
+    void SetLayoutAdaptationDone( bool adaptationDone );
+    bool GetLayoutAdaptationDone() const;
+
+#if defined(__WXMSW__) && defined(__POCKETPC__)
+    wxToolBar* GetToolBar() const;
+#endif
+#endif
+};
+
+%{
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::Dialog::new" )
+
+wxDialog*
+newDefault( CLASS )
+    PlClassName CLASS
+  CODE:
+    RETVAL = new wxPliDialog( CLASS );
+    wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+  OUTPUT: RETVAL
+
+wxDialog*
+newFull( CLASS, parent, id = wxID_ANY, title = wxEmptyString, pos = wxDefaultPosition, size = wxDefaultSize, style = wxDEFAULT_DIALOG_STYLE, name = wxDialogNameStr )
+      PlClassName CLASS
+      wxWindow* parent
+      wxWindowID id
+      wxString title
+      wxPoint pos
+      wxSize size
+      long style
+      wxString name
+    CODE:
+      RETVAL = new wxPliDialog( CLASS, parent, id, title, pos,
+          size, style, name );
+    OUTPUT:
+      RETVAL
+
+bool
+wxDialog::Create( parent, id = wxID_ANY, title = wxEmptyString, pos = wxDefaultPosition, size = wxDefaultSize, style = wxDEFAULT_DIALOG_STYLE, name = wxDialogNameStr )
+    wxWindow* parent
+    wxWindowID id
+    wxString title
+    wxPoint pos
+    wxSize size
+    long style
+    wxString name
+
+void
+wxDialog::EndModal( retCode )
+    int retCode
+
+int
+wxDialog::GetReturnCode()
+
+wxString
+wxDialog::GetTitle()
+
+bool
+wxDialog::IsModal()
+
+# void
+# wxDialog::SetModal( flag )
+#    bool flag
+
+void
+wxDialog::SetIcon( icon )
+    wxIcon* icon
+  C_ARGS: *icon
+
+void
+wxDialog::SetIcons( icons )
+    wxIconBundle* icons
+  C_ARGS: *icons
+
+void
+wxDialog::SetReturnCode( retCode )
+    int retCode
+
+void
+wxDialog::SetTitle( title )
+    wxString title
+
+int
+wxDialog::ShowModal()
+
+#if WXPERL_W_VERSION_GE( 2, 5, 4 )
+
+void
+wxDialog::SetFocusIgnoringChildren()
+
+#endif
+
+bool
+wxDialog::TransferDataFromWindow()
+  CODE:
+    RETVAL = THIS->wxDialog::TransferDataFromWindow();
+  OUTPUT:
+    RETVAL
+
+bool
+wxDialog::TransferDataToWindow()
+  CODE:
+    RETVAL = THIS->wxDialog::TransferDataToWindow();
+  OUTPUT:
+    RETVAL
+
+bool
+wxDialog::Validate()
+  CODE:
+    RETVAL = THIS->wxDialog::Validate();
+  OUTPUT:
+    RETVAL
+
+%}

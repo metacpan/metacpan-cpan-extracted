@@ -1,0 +1,171 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Deploy::SecurityCollection - web-resource-collection
+deployment descriptor element class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Deploy::SecurityCollection - web-resource-collection
+deployment descriptor element class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Representation of a web resource collection for a web application's
+security constraint, as specified in a <EM>web-resource-collection</EM>
+element in the deployment descriptor.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> instance,
+initializing fields appropriately.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of this SecurityCollection (optional)
+<P></P>
+<DT><STRONG><A NAME="item_%24description">$description</A></STRONG><BR>
+<DD>
+a description of this SecurityCollection (optional)
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getDescription"><CODE>getDescription()</CODE></A></STRONG><BR>
+<DD>
+Return the description of this web resource collection.
+<P></P>
+<DT><STRONG><A NAME="item_setDescription"><CODE>setDescription($description)</CODE></A></STRONG><BR>
+<DD>
+Set the description of this web resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$description</STRONG><BR>
+<DD>
+the description to set
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Get the name of this web resource collection.
+<P></P>
+<DT><STRONG><A NAME="item_setName"><CODE>setName($name)</CODE></A></STRONG><BR>
+<DD>
+Set the name of this web resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name to set
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addMethod"><CODE>addMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Add an HTTP request method to be part of this web resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24method">$method</A></STRONG><BR>
+<DD>
+the method to add
+<P></P></DL>
+<DT><STRONG><A NAME="item_hasMethod"><CODE>hasMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Return true if the specified HTTP request methodd is part of this web
+resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$method</STRONG><BR>
+<DD>
+the method to be checked
+<P></P></DL>
+<DT><STRONG><A NAME="item_getMethods"><CODE>getMethods()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the names of the HTTP methods that are part
+of this web resource collection.
+<P></P>
+<DT><STRONG><A NAME="item_removeMethod"><CODE>removeMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Remove the specified HTTP request method from those that are part of
+this web resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$method</STRONG><BR>
+<DD>
+the name of the method to be removed
+<P></P></DL>
+<DT><STRONG><A NAME="item_addPattern"><CODE>addPattern($pattern)</CODE></A></STRONG><BR>
+<DD>
+Add a URL pattern to be part of this web resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24pattern">$pattern</A></STRONG><BR>
+<DD>
+the pattern to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_hasPattern"><CODE>hasPattern($pattern)</CODE></A></STRONG><BR>
+<DD>
+Return true if the specified pattern is aprt of this web resource
+collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$pattern</STRONG><BR>
+<DD>
+the pattern to be checked
+<P></P></DL>
+<DT><STRONG><A NAME="item_getPatterns"><CODE>getPatterns()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the URL patterns that are part of this web
+resource collection.
+<P></P>
+<DT><STRONG><A NAME="item_removePattern"><CODE>removePattern($pattern)</CODE></A></STRONG><BR>
+<DD>
+Remove the specified URL pattern from those that are part of this web
+resource collection.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$pattern</STRONG><BR>
+<DD>
+the pattern to be removed
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

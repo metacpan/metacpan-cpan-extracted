@@ -1,0 +1,101 @@
+WWW-Finger
+==========
+
+Created:      2009-12-08
+Home page:    <https://metacpan.org/release/WWW-Finger>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=WWW-Finger>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.105  2013-07-17
+
+ - (Bugfix Packaging) Stop bundling prehistoric version of Scalar::Util in
+   'inc'.
+   Fixes RT#86567
+
+0.104  2012-02-23
+
+ - (Bugfix Packaging) Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY
+   in META.yml too.
+   Fixes RT#75122
+   ++"Florian Schlichting"
+ - (Bugfix Update) s/Digest::SHA1/Digest::SHA/
+   Fixes RT#75123
+   ++"Florian Schlichting"
+
+0.103  2011-12-04
+
+ - (Bugfix Packaging) Newer version of Module::Package::RDF.
+ - Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY.
+
+0.102  2011-11-27
+
+ - (Packaging) Module::Package::RDF
+ - (Update) use 5.010
+ - Cleanup.
+ - Rewrite of WWW::Finger::CPAN using MetaCPAN API.
+ - Use Module::Pluggable instead of homebrew plugin system.
+
+0.101  2010-07-31
+
+ - (Addition) Webfinger and Fingerpoint modules provide a 'get' method to
+   easily access additional data.
+
+0.100  2010-07-25
+
+ - (Addition) CPAN module now has webid method.
+ - (Update) Use the somewhat more complete (albeit slower) HTTP::LRDD
+   module to perform LRDD for Webfinger rather than a home-grown method.
+
+0.09  2010-04-26
+
+ - (Update) Switch Changes file from Aaron Cope's changefile vocab to my
+   own DOAP Change Sets vocab.
+ - Various cleanups.
+
+0.08  2010-01-06
+
+ - (Bugfix) Documentation improvements.
+
+0.05  2009-12-16
+
+ - (Bugfix) Mini bug-fixes.
+ - (Update) use XRD::Parser 0.04.
+
+0.04  2009-12-16
+
+ - (Addition) Bundle a command-line query tool.
+ - (Bugfix) Fingerpoint bugfix in ->graph().
+ - (Bugfix) Unimplemented methods return empty arrays properly.
+ - Change default scheme for Webfinger from 'acct://' to 'acct:'.
+
+0.03  2009-12-15
+
+ - (Addition) WWW::Finger::Webfinger now provides an ->endpoint method.
+ - (Bugfix) Fixed package signature.
+
+0.02  2009-12-14
+
+ - (Bugfix) Fixed problems with build.
+
+0.01  2009-12-14  # Initial release
+
+
+0.07  2009-01-06
+
+ - (Bugfix) Include BitworkingFingerProtocol.pm in MANIFEST.
+ - (Update) Update copyright noticed to 2010.
+
+0.06  2009-01-06
+
+ - (Addition) Allow fingerw command-line client to load additional modules.
+ - (Addition) Follow rdf:seeAlso and ianalink:describedby links found in
+   Webfinger account profiles.
+ - (Addition) Support Joe Gregorio's alternative to current Webfinger
+   protocol.
+ - (Addition) Support semantics of foaf:account and foaf:holdsAccount.
+ - (Bugfix) Fix duplicated mbox in WWW::Finger::CPAN.
+ - (Update) Improve fingerw's debugging (verbose) messages.
+ - (Update) Use Turtle for Changes file.
+ - Refactor some code from WWW::Finger::Webfinger to allow it to be used
+   elsewhere.
+

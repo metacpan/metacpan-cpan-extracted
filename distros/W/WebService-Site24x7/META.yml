@@ -1,0 +1,47 @@
+---
+abstract: 'An api client for https://site24x7.com'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Site24x7
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Site24x7:
+    file: lib/WebService/Site24x7.pm
+    version: 0.06
+  WebService::Site24x7::Client:
+    file: lib/WebService/Site24x7/Client.pm
+  WebService::Site24x7::LocationProfiles:
+    file: lib/WebService/Site24x7/LocationProfiles.pm
+  WebService::Site24x7::Monitors:
+    file: lib/WebService/Site24x7/Monitors.pm
+  WebService::Site24x7::Reports:
+    file: lib/WebService/Site24x7/Reports.pm
+requires:
+  Moo: 0
+  Role::REST::Client: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/kablamo/WebService-Site24x7/issues
+  homepage: https://github.com/kablamo/WebService-Site24x7
+  repository: git://github.com/kablamo/WebService-Site24x7.git
+version: 0.06
+x_authority: cpan:KABLAMO

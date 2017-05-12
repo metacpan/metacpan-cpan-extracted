@@ -1,0 +1,7 @@
+Revision history for Perl extension Workflow::Aline.
+
+0.01  Wed Dec  1 15:27:58 2004
+	- original version; created by h2xs 1.23 with options
+		-n Workflow::Aline -X
+
+Fixed File::Copy stringification bug copy

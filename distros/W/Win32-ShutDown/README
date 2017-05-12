@@ -1,0 +1,30 @@
+Win32-ShutDown version 0.01
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   nb: "make test" does nothing; I assume you don't want to shut down your PC at that point...
+   you can run the test module with the paramater /restart if you want it to actually test anything
+
+DEPENDENCIES
+
+This module requires no other modules or libraries.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by C. N. Drake
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

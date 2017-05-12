@@ -1,0 +1,81 @@
+{
+   "abstract" : "Interface to the OpenWeatherMap API",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Weather-OpenWeatherMap",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Exporter::Tiny" : "0",
+            "File::ShareDir" : "0",
+            "HTTP::Request" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Objects::Types" : "1",
+            "List::Objects::WithUtils" : "2.010002",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Path::Tiny" : "0.05",
+            "Throwable" : "0.2",
+            "Try::Tiny" : "0",
+            "Types::DateTime" : "0",
+            "Types::Path::Tiny" : "0.005",
+            "Types::Standard" : "0",
+            "URI::Escape" : "0",
+            "perl" : "v5.10.1",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Devel::Cycle" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::File::ShareDir" : "1",
+            "Test::More" : "0",
+            "Test::Roo" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/weather-openweathermap.git",
+         "web" : "http://github.com/avenj/weather-openweathermap"
+      }
+   },
+   "version" : "0.005004"
+}
+

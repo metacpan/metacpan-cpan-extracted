@@ -1,0 +1,1362 @@
+#############################################################################
+## Name:        ext/propgrid/XS/PGProperty.xsp
+## Purpose:     XS++ for Wx::PGProperty
+## Author:      Mark Dootson
+## Modified by:
+## Created:     04/03/2012
+## RCS-ID:      $Id: $
+## Copyright:   (c) 2012 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#if WXPERL_W_VERSION_GE( 2, 9, 3 ) && wxUSE_PROPGRID
+
+## DECLARE_OVERLOAD( wpgc, Wx::PGChoices )
+
+%loadplugin{build::Wx::XSP::Overload};
+
+%name{Wx::PropertyCategory} class wxPropertyCategory : public %name{Wx::PGProperty} wxPGProperty
+{
+   
+public:
+
+    /** Default constructor is only used in special cases. */
+    %name{newDefault} wxPropertyCategory() %Overload;
+
+    %name{newFull} wxPropertyCategory( const wxString& label,
+                        const wxString& name = wxPG_LABEL ) %Overload;
+
+    int GetTextExtent( const wxWindow* wnd, const wxFont& font ) const;
+
+    virtual wxString ValueToString( wxVariant value, int argFlags ) const;
+    virtual wxString GetValueAsString( int argFlags = 0 ) const;
+    
+};
+
+/***********************************************************************************
+ *
+ * Wx::PGProperty
+ * 
+ * *********************************************************************************/
+
+%name{Wx::PGProperty} class wxPGProperty : public %name{Wx::Object} wxObject
+
+{
+
+/* CLONE method to be inherited by all property classes */
+
+%{
+static void
+wxPGProperty::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+
+    /* no point in allowing constructors when we havn't yet wrapped pure virtual methods */
+    /* %name{newDefault} wxPGProperty() %Overload; */
+    /* %name{newFull} wxPGProperty( const wxString& label, const wxString& name ) %Overload; */
+    
+    /* Destructor for all Property Classes */
+    ~wxPGProperty()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+                 if( wxPli_object_is_deleteable( aTHX_ ST(0) ) )
+                    delete THIS;
+               %};
+
+    virtual void OnSetValue(); /* %Virtual; */
+
+    virtual wxVariant DoGetValue() const; /* %Virtual; */
+
+    virtual bool ValidateValue( wxVariant& value, wxPGValidationInfo& validationInfo ) const; /* %Virtual; */
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const; /* %Virtual; */
+    
+    /* TODO
+    virtual bool StringToValue( wxVariant& variant, const wxString& text, int argFlags = 0 ) const;
+    virtual bool IntToValue( wxVariant& variant, int number, int argFlags = 0 ) const;
+    */
+
+    bool SetValueFromString( const wxString& text, int flags = 0 );
+
+    bool SetValueFromInt( long value, int flags = 0 );
+
+    virtual wxSize OnMeasureImage( int item = -1 ) const; /* %Virtual; */
+
+    virtual bool OnEvent( wxPropertyGrid* propgrid, wxWindow* wnd_primary, wxEvent& event ); /* %Virtual; */
+
+    virtual wxVariant ChildChanged( wxVariant& thisValue,
+                                    int childIndex,
+                                    wxVariant& childValue ) const; /* %Virtual; */
+
+    virtual const wxPGEditor__parsed_nodelete* DoGetEditorClass() const; /* %Virtual; */
+
+    virtual wxValidator* DoGetValidator () const; /* %Virtual; */
+
+    /* TODO FIXME wrap wxPGPaintData
+    virtual void OnCustomPaint( wxDC& dc, const wxRect& rect, wxPGPaintData& paintdata ) %Virtual;
+    */
+
+    virtual wxPGCellRenderer* GetCellRenderer( int column ) const; /* %Virtual; */
+
+    virtual int GetChoiceSelection() const; /* %Virtual; */
+
+    virtual void RefreshChildren(); /* %Virtual; */
+
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value ); /* %Virtual; */
+
+    virtual wxVariant DoGetAttribute( const wxString& name ) const; /* %Virtual; */
+
+    virtual wxPGEditorDialogAdapter* GetEditorDialog() const; /* %Virtual; */
+
+    virtual void OnValidationFailure( wxVariant& pendingValue ); /* %Virtual; */
+
+    int AddChoice( const wxString& label, int value = wxPG_INVALID_VALUE );
+
+    void AddPrivateChild( wxPGProperty__parsed_nodelete* prop );
+
+    void AdaptListToValue( wxVariant& list, wxVariant* value ) const;
+
+    wxPGProperty__parsed_nodelete* AppendChild( wxPGProperty__parsed_nodelete* childProperty );
+
+    bool AreAllChildrenSpecified( wxVariant* pendingList = NULL ) const;
+    
+    bool AreChildrenComponents() const;
+
+    void ChangeFlag( wxPGPropertyFlags flag, bool set );
+
+    void DeleteChildren();
+
+    void DeleteChoice( int index );
+
+    /* void Empty(); */
+    
+    void Enable( bool enable = true );
+
+    wxString GenerateComposedValue() const;
+
+    wxVariant GetAttribute( const wxString& name ) const;
+
+    wxString GetAttribute( const wxString& name, const wxString& defVal ) const;
+
+    long GetAttributeAsLong( const wxString& name, long defVal ) const;
+
+    double GetAttributeAsDouble( const wxString& name, double defVal ) const;
+
+    wxVariant GetAttributesAsList() const;
+
+    const wxPGEditor__parsed_nodelete* GetColumnEditor( int column ) const;
+
+    const wxString& GetBaseName() const;
+
+    const wxPGCell& GetCell( unsigned int column ) const;
+
+    wxPGCell& GetCell( unsigned int column );
+
+    wxPGCell& GetOrCreateCell( unsigned int column );
+
+    unsigned int GetChildCount() const;
+
+    int GetChildrenHeight( int lh, int iMax = -1 ) const;
+
+    const wxPGChoices& GetChoices() const;
+    
+    Wx_UserDataCD* GetClientData() const
+      %code{% RETVAL = (wxPliUserDataCD*)THIS->GetClientObject(); %};
+    
+    wxVariant GetDefaultValue() const;
+
+    wxString GetDisplayedString() const;
+
+    const wxPGEditor__parsed_nodelete* GetEditorClass() const;
+
+    wxUint32 GetFlags() const;
+
+    wxPropertyGrid* GetGrid() const;
+
+    wxPropertyGrid* GetGridIfDisplayed() const;
+
+    const wxString& GetHelpString() const;
+
+    unsigned int GetIndexInParent() const;
+
+    const wxString& GetLabel() const;
+
+    const wxPGProperty__parsed_nodelete* GetLastVisibleSubItem() const;
+
+    wxPGProperty__parsed_nodelete* GetMainParent() const;
+
+    int GetMaxLength() const;
+
+    wxString GetName() const;
+
+    wxPGProperty__parsed_nodelete* GetParent() const;
+
+    wxPGProperty__parsed_nodelete* GetPropertyByName( const wxString& name ) const;
+
+    wxValidator* GetValidator() const;
+
+    wxVariant GetValue() const;
+
+    wxBitmap* GetValueImage() const;
+
+    virtual wxString GetValueAsString( int argFlags = 0 ) const; /* %Virtual; */
+
+    wxString GetValueType() const;
+
+    int GetY() const;
+
+    wxUint32 HasFlag( wxPGPropertyFlags flag ) const;
+
+    bool HasVisibleChildren() const;
+
+    bool Hide( bool hide, int flags = wxPG_RECURSE );
+
+    int Index( wxPGProperty* p ) const;
+
+    wxPGProperty__parsed_nodelete* InsertChild( int index, wxPGProperty__parsed_nodelete* childProperty );
+
+    int InsertChoice( const wxString& label, int index, int value = wxPG_INVALID_VALUE );
+
+    bool IsCategory() const;
+
+    bool IsEnabled() const;
+
+    bool IsExpanded() const;
+
+    bool IsRoot() const;
+
+    bool IsSomeParent( wxPGProperty* candidateParent ) const;
+
+    bool IsTextEditable() const;
+
+    bool IsValueUnspecified() const;
+
+    bool IsVisible() const;
+
+    wxPGProperty__parsed_nodelete* Item( unsigned int i ) const;
+
+    void RefreshEditor();
+
+    void SetAttribute( const wxString& name, wxVariantArg value );
+
+    void SetAutoUnspecified( bool enable = true );
+
+    void SetBackgroundColour( const wxColour& colour,
+                              int flags = wxPG_RECURSE );
+
+    %name{SetEditorEditor} void SetEditor( const wxPGEditor__parsed_nodelete* editor ) %Overload;
+
+    %name{SetEditorEditorName} void SetEditor( const wxString& editorName ) %Overload;
+
+    void SetCell( int column, const wxPGCell& cell );
+
+    bool SetChoices( wxPGChoices& choices );
+    
+    %name{SetClientData} void SetClientObject( Wx_UserDataCD* data );
+
+    void SetChoiceSelection( int newValue );
+
+    void SetDefaultValue( wxVariant& value );
+
+    void SetFlagRecursively( wxPGPropertyFlags flag, bool set );
+
+    void SetHelpString( const wxString& helpString );
+
+    void SetLabel( const wxString& label );
+
+    bool SetMaxLength( int maxLen );
+
+    void SetModifiedStatus( bool modified );
+
+    void SetName( const wxString& newName );
+
+    void SetParentalType( int flag );
+
+    void SetTextColour( const wxColour& colour,
+                        int flags = wxPG_RECURSE );
+
+    void SetValidator( const wxValidator& validator );
+
+    void SetValue( wxVariant value, wxVariant* pList = NULL,
+                   int flags = wxPG_SETVAL_REFRESH_EDITOR );
+
+    void SetValueImage( wxBitmap& bmp );
+
+    void SetValueInEvent( wxVariant value ) const;
+
+    void SetValueToUnspecified();
+    
+    void SetWasModified( bool set = true );
+
+    wxPGProperty__parsed_nodelete* UpdateParentValues();
+
+    bool UsesAutoUnspecified() const;
+    
+};
+
+%name{Wx::StringProperty} class wxStringProperty : public wxPGProperty
+{
+
+public:
+
+    wxStringProperty( const wxString& label = wxPG_LABEL,
+                      const wxString& name = wxPG_LABEL,
+                      const wxString& value = wxEmptyString );
+        
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+
+    virtual void OnSetValue();
+
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/
+    
+};
+
+%name{Wx::IntProperty} class wxIntProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+    
+public:
+    
+    wxIntProperty( const wxString& label = wxPG_LABEL,
+                   const wxString& name = wxPG_LABEL,
+                   long value = 0 );
+        
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual bool ValidateValue( wxVariant& value,
+                                wxPGValidationInfo& validationInfo ) const;
+    virtual bool IntToValue( wxVariant& variant,
+                             int number,
+                             int argFlags = 0 ) const;
+    static wxValidator* GetClassValidator();
+    virtual wxValidator* DoGetValidator() const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+
+%name{Wx::UIntProperty} class wxUIntProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    
+    /* wxUIntProperty( const wxString& label = wxPG_LABEL,
+                    const wxString& name = wxPG_LABEL,
+                    unsigned long value = 0 ); */
+    
+    wxUIntProperty( const wxString& label,
+                    const wxString& name,
+                    wxULongLong_t value );
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+    
+    virtual bool ValidateValue( wxVariant& value,
+                                wxPGValidationInfo& validationInfo ) const;
+    
+    virtual wxValidator* DoGetValidator () const;
+    
+    virtual bool IntToValue( wxVariant& variant,
+                             int number,
+                             int argFlags = 0 ) const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+%name{Wx::FloatProperty} class wxFloatProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    wxFloatProperty( const wxString& label = wxPG_LABEL,
+                     const wxString& name = wxPG_LABEL,
+                     double value = 0.0 );
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+    
+    virtual bool ValidateValue( wxVariant& value,
+                                wxPGValidationInfo& validationInfo ) const;
+
+    static wxValidator* GetClassValidator();
+    
+    virtual wxValidator* DoGetValidator () const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+%name{Wx::BoolProperty} class wxBoolProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    wxBoolProperty( const wxString& label = wxPG_LABEL,
+                    const wxString& name = wxPG_LABEL,
+                    bool value = false );
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    
+    virtual bool IntToValue( wxVariant& variant,
+                             int number, int argFlags = 0 ) const;
+    
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    bool GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% wxVariant var = THIS->GetValue();
+              RETVAL = var.GetBool();
+            %};
+
+    bool SetPlValue( bool val, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% THIS->SetValue( val, NULL, flags );
+              RETVAL = true;
+      %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+
+%name{Wx::EnumProperty} class wxEnumProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    
+%{
+
+void
+wxEnumProperty::new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newArrays )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_s_wpgc_n, newChoices, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE(wxPliOvl_s_s_arr_arr_n, newArrays, 3 )
+    END_OVERLOAD( Wx::EnumProperty::new )
+
+%}  
+   
+    %name{newChoices} wxEnumProperty( const wxString& label,
+                    const wxString& name,
+                    wxPGChoices& choices,
+                    int value = 0 );
+
+    %name{newArrays} wxEnumProperty( const wxString& label,
+                    const wxString& name,
+                    const wxArrayString& labels,
+                    const wxArrayInt& values = wxArrayInt(),
+                    int value = 0 );
+
+    size_t GetItemCount() const;
+
+    virtual void OnSetValue();
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    
+    virtual bool ValidateValue( wxVariant& value,
+                                wxPGValidationInfo& validationInfo ) const;
+
+    // If wxPG_FULL_VALUE is not set in flags, then the value is interpreted
+    // as index to choices list. Otherwise, it is actual value.
+    
+    virtual bool IntToValue( wxVariant& variant,
+                             int number,
+                             int argFlags = 0 ) const;
+
+    // This must be overridden to have non-index based value
+    virtual int GetIndexForValue( int value ) const;
+
+    // GetChoiceSelection needs to overridden since m_index is
+    // the true index, and various property classes derived from
+    // this take advantage of it.
+    
+    virtual int GetChoiceSelection() const;
+
+    virtual void OnValidationFailure( wxVariant& pendingValue );
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    long GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValue().GetLong(); %};
+
+    bool SetPlValue( long newval, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+        THIS->SetValue( newval, NULL, flags );
+        RETVAL = true;
+      %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+%name{Wx::EditEnumProperty} class wxEditEnumProperty : public %name{Wx::EnumProperty} wxEnumProperty
+
+{
+
+public:
+    
+%{
+
+void
+wxEditEnumProperty::new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newArrays )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_s_wpgc_s, newChoices, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE(wxPliOvl_s_s_arr_arr_s, newArrays, 3 )
+    END_OVERLOAD( Wx::EditEnumProperty::new )
+
+%}   
+  
+    %name{newArrays} wxEditEnumProperty( const wxString& label = wxPG_LABEL,
+                        const wxString& name = wxPG_LABEL,
+                        const wxArrayString& labels = wxArrayString(),
+                        const wxArrayInt& values = wxArrayInt(),
+                        const wxString& value = wxEmptyString );
+    
+    %name{newChoices} wxEditEnumProperty( const wxString& label,
+                        const wxString& name,
+                        wxPGChoices& choices,
+                        const wxString& value = wxEmptyString );
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    long GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValue().GetLong(); %};
+
+    bool SetPlValue( long newval, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+        THIS->SetValue( newval, NULL, flags );
+        RETVAL = true;
+      %};   
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+%name{Wx::FlagsProperty} class wxFlagsProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+  
+public:
+
+%{
+
+void
+wxFlagsProperty::new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newArrays )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_s_wpgc_n, newChoices, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE(wxPliOvl_s_s_arr_arr_n, newArrays, 3 )
+    END_OVERLOAD( Wx::FlagsProperty::new )
+
+%}    
+    
+    %name{newChoices} wxFlagsProperty( const wxString& label,
+                     const wxString& name,
+                     wxPGChoices& choices,
+                     long value = 0 );
+
+    %name{newArrays} wxFlagsProperty( const wxString& label = wxPG_LABEL,
+                     const wxString& name = wxPG_LABEL,
+                     const wxArrayString& labels = wxArrayString(),
+                     const wxArrayInt& values = wxArrayInt(),
+                     int value = 0 );
+
+    virtual void OnSetValue();
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int flags ) const;
+    
+    virtual wxVariant ChildChanged( wxVariant& thisValue,
+                                    int childIndex,
+                                    wxVariant& childValue ) const;
+    
+    virtual void RefreshChildren();
+    
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+
+    // GetChoiceSelection needs to overridden since m_choices is
+    // used and value is integer, but it is not index.
+    
+    virtual int GetChoiceSelection() const;
+
+    // helpers
+    size_t GetItemCount() const;
+    const wxString& GetLabel( size_t ind ) const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    long GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValue().GetLong(); %};
+
+    bool SetPlValue( long newval, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+        THIS->SetValue( newval, NULL, flags );
+        RETVAL = true;
+      %};    
+    /************** End wxPerl Methods ***********************************************/ 
+
+protected:
+    // Creates children and sets value.
+    void Init();
+
+};
+
+
+%name{Wx::PGFileDialogAdapter} class  wxPGFileDialogAdapter : public %name{Wx::PGEditorDialogAdapter} wxPGEditorDialogAdapter
+{
+public:
+    virtual bool DoShowDialog( wxPropertyGrid* propGrid,
+                               wxPGProperty* property );
+};
+
+%name{Wx::FileProperty} class wxFileProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+
+    wxFileProperty( const wxString& label = wxPG_LABEL,
+                    const wxString& name = wxPG_LABEL,
+                    const wxString& value = wxEmptyString );
+    
+    /* virtual ~wxFileProperty (); */
+
+    virtual void OnSetValue();
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual wxPGEditorDialogAdapter* GetEditorDialog() const;
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+
+    static wxValidator* GetClassValidator();
+    virtual wxValidator* DoGetValidator() const;
+    
+    wxString GetFileName()
+      %code{%
+          wxFileName myfile = THIS->GetFileName();
+          RETVAL = myfile.GetPath();
+         %};
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+%name{Wx::PGLongStringDialogAdapter} class wxPGLongStringDialogAdapter : public %name{Wx::PGEditorDialogAdapter} wxPGEditorDialogAdapter
+{
+public:
+    virtual bool DoShowDialog( wxPropertyGrid* propGrid,
+                               wxPGProperty* property );
+};
+
+%name{Wx::LongStringProperty} class wxLongStringProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+
+    wxLongStringProperty( const wxString& label = wxPG_LABEL,
+                          const wxString& name = wxPG_LABEL,
+                          const wxString& value = wxEmptyString );
+
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual bool OnEvent( wxPropertyGrid* propgrid,
+                          wxWindow* primary, wxEvent& event );
+
+    // Shows string editor dialog. Value to be edited should be read from
+    // value, and if dialog is not cancelled, it should be stored back and true
+    // should be returned if that was the case.
+    virtual bool OnButtonClick( wxPropertyGrid* propgrid, wxString& value );
+
+    static bool DisplayEditorDialog( wxPGProperty* prop,
+                                     wxPropertyGrid* propGrid,
+                                     wxString& value );
+   
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+%name{Wx::DirProperty} class wxDirProperty : public %name{Wx::LongStringProperty} wxLongStringProperty
+{
+
+public:
+    wxDirProperty( const wxString& name = wxPG_LABEL,
+                   const wxString& label = wxPG_LABEL,
+                   const wxString& value = wxEmptyString );
+
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+    virtual wxValidator* DoGetValidator() const;
+
+    virtual bool OnButtonClick ( wxPropertyGrid* propGrid, wxString& value );
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+%name{Wx::ArrayStringProperty} class wxArrayStringProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    
+    wxArrayStringProperty( const wxString& label = wxPG_LABEL,
+                           const wxString& name = wxPG_LABEL,
+                           const wxArrayString& value = wxArrayString() );
+
+    virtual void OnSetValue();
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual bool OnEvent( wxPropertyGrid* propgrid,
+                          wxWindow* primary, wxEvent& event );
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+
+    // Implement in derived class for custom array-to-string conversion.
+    
+    /* 
+    virtual void ConvertArrayToString(const wxArrayString& arr,
+                                      wxString* pString,
+                                      const wxUniChar& delimiter) const;
+    */
+    
+    // Shows string editor dialog. Value to be edited should be read from
+    // value, and if dialog is not cancelled, it should be stored back and true
+    // should be returned if that was the case.
+    virtual bool OnCustomStringEdit( wxWindow* parent, wxString& value );
+
+    // Helper.
+    virtual bool OnButtonClick( wxPropertyGrid* propgrid,
+                                wxWindow* primary,
+                                const wxChar* cbt );
+
+    // Creates wxPGArrayEditorDialog for string editing. Called in OnButtonClick.
+    virtual wxPGArrayEditorDialog* CreateEditorDialog();
+    
+    /*
+    enum ConversionFlags
+    {
+        Escape          = 0x01,
+        QuoteStrings    = 0x02
+    };
+    */
+
+    /************** Begin wxPerl Methods ***********************************************/
+
+
+/* TODO - FIXME - novice stack issues
+void
+wxArrayStringProperty::GetPlValue( int flags = wxPG_FULL_VALUE )
+  PPCODE:
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ THIS->GetValue().GetArrayString() );
+    SPAGAIN;
+*/
+
+%{
+
+bool
+wxArrayStringProperty::SetPlValue( SV* arr, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+  CODE:
+    wxVariant var = wxPli_sv_2_wxvariant( aTHX_ arr );
+    if( var.IsNull() ) {
+        RETVAL = false;
+    } else {
+        THIS->SetValue( var, NULL, flags );
+        RETVAL = true;
+    }
+  OUTPUT: RETVAL
+
+%}
+    
+    /************** End wxPerl Methods ***********************************************/    
+    
+protected:
+   
+    virtual void GenerateValueAsString();
+
+};
+
+#if wxUSE_EDITABLELISTBOX
+
+
+%name{Wx::PGArrayEditorDialog} class wxPGArrayEditorDialog : public %name{Wx::Dialog} wxDialog
+{
+    
+public:
+    /*
+    %name{newDefault} wxPGArrayEditorDialog() %Overload
+        %postcall{% wxPli_create_evthandler( aTHX_ RETVAL, CLASS ); %};
+    
+
+    %name{newFull} wxPGArrayEditorDialog( wxWindow *parent,
+                         const wxString& message,
+                         const wxString& caption,
+                         long style = wxAEDIALOG_STYLE,
+                         const wxPoint& pos = wxDefaultPosition,
+                         const wxSize& sz = wxDefaultSize ) %Overload
+        %postcall{% wxPli_create_evthandler( aTHX_ RETVAL, CLASS ); %};
+    
+    */
+
+    void Init();
+
+    bool Create( wxWindow *parent,
+                 const wxString& message,
+                 const wxString& caption,
+                 long style = wxAEDIALOG_STYLE,
+                 const wxPoint& pos = wxDefaultPosition,
+                 const wxSize& sz = wxDefaultSize );
+
+    void EnableCustomNewAction();
+
+    /** Set value modified by dialog. */
+    
+    virtual void SetDialogValue( const wxVariant& value ); /* %Virtual; */
+
+    /** Return value modified by dialog.
+    */
+    virtual wxVariant GetDialogValue() const; /* %Virtual; */
+
+    /** Override to return wxValidator to be used with the wxTextCtrl
+        in dialog. Note that the validator is used in the standard
+        wx way, ie. it immediately prevents user from entering invalid
+        input.
+
+        @remarks
+        Dialog frees the validator.
+    */
+    virtual wxValidator* GetTextCtrlValidator() const; /* %Virtual; */
+
+    // Returns true if array was actually modified
+    bool IsModified() const;
+
+    // wxEditableListBox utilities
+    int GetSelection() const;
+
+    // implementation from now on
+    void OnAddClick(wxCommandEvent& event);
+    void OnDeleteClick(wxCommandEvent& event);
+    void OnUpClick(wxCommandEvent& event);
+    void OnDownClick(wxCommandEvent& event);
+    void OnEndLabelEdit(wxListEvent& event);
+    void OnIdle(wxIdleEvent& event);
+
+protected:
+   
+    // These must be overridden - must return true on success.
+    virtual wxString ArrayGet( size_t index ); /* %Virtual{pure}; */
+    virtual size_t ArrayGetCount(); /* %Virtual{pure}; */
+    virtual bool ArrayInsert( const wxString& str, int index ); /* %Virtual{pure}; */
+    virtual bool ArraySet( size_t index, const wxString& str ); /* %Virtual{pure}; */
+    virtual void ArrayRemoveAt( int index ); /* %Virtual{pure}; */
+    virtual void ArraySwap( size_t first, size_t second ); /* %Virtual{pure}; */
+    /* TODO FIXME 
+    virtual bool OnCustomNewAction(wxString* resString) %Virtual{pure};
+    */
+
+};
+
+
+%name{Wx::PGArrayStringEditorDialog} class wxPGArrayStringEditorDialog : public %name{Wx::PGArrayEditorDialog} wxPGArrayEditorDialog
+{
+public:
+    wxPGArrayStringEditorDialog()
+        %postcall{% wxPli_create_evthandler( aTHX_ RETVAL, CLASS ); %};
+    
+
+    void Init();
+
+    virtual void SetDialogValue( const wxVariant& value );
+
+    virtual wxVariant GetDialogValue() const;
+
+    void SetCustomButton( const wxString& custBtText,
+                          wxArrayStringProperty* pcc );
+
+    /* TODO FIXME virtual bool OnCustomNewAction(wxString* resString); */
+
+protected:
+    
+    virtual wxString ArrayGet( size_t index );
+    virtual size_t ArrayGetCount();
+    virtual bool ArrayInsert( const wxString& str, int index );
+    virtual bool ArraySet( size_t index, const wxString& str );
+    virtual void ArrayRemoveAt( int index );
+    virtual void ArraySwap( size_t first, size_t second );
+
+};
+
+#endif // wxUSE_EDITABLELISTBOX
+
+%name{Wx::ColourPropertyValue} class wxColourPropertyValue : public %name{Wx::Object} wxObject
+{
+
+%{
+static void
+wxColourPropertyValue::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+   
+    %name{newDefault} wxColourPropertyValue() %Overload;
+
+    %name{newCopy} wxColourPropertyValue( const wxColourPropertyValue& v ) %Overload;
+
+    %name{newColour} wxColourPropertyValue( const wxColour& colour ) %Overload;
+
+    %name{newType} wxColourPropertyValue( wxUint32 type ) %Overload;
+
+    %name{newTypeColour }wxColourPropertyValue( wxUint32 type, const wxColour& colour ) %Overload;
+    
+    ~wxColourPropertyValue()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::ColourPropertyValue", THIS, ST(0) );
+                 delete THIS;
+               %};
+    
+    void Init( wxUint32 type, const wxColour& colour );
+    
+    wxColour* GetColour()
+        %code{% RETVAL = new wxColour( THIS->m_colour ); %};
+
+};
+
+#if wxUSE_IMAGE
+    #include "wx/image.h"
+#endif
+
+%name{Wx::FontProperty} class wxFontProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    
+    %name{newDefault} wxFontProperty() %Overload;
+    
+    %name{newFull} wxFontProperty(const wxString& label,
+                   const wxString& name,
+                   const wxFont& value) %Overload;  
+    
+    virtual void OnSetValue();
+    
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    
+    virtual bool OnEvent( wxPropertyGrid* propgrid,
+                          wxWindow* primary, wxEvent& event );
+    
+    virtual wxVariant ChildChanged( wxVariant& thisValue,
+                                    int childIndex,
+                                    wxVariant& childValue ) const;
+    
+    virtual void RefreshChildren();
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxFont* GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{%
+            wxAny value = THIS->GetValue();
+            wxFont font = wxANY_AS(value, wxFont);
+            RETVAL = new wxFont( font );
+      %};
+
+    bool SetPlValue( wxFont* font, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+        if( font->IsOk() ) {
+            wxVariant value = wxVariant(*font);
+            THIS->SetValue(value, NULL, flags );
+            RETVAL = true;
+        } else {
+            RETVAL = false;
+        }
+      %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+%name{Wx::SystemColourProperty} class wxSystemColourProperty : public %name{Wx::EnumProperty} wxEnumProperty
+{
+
+public:
+    
+    wxSystemColourProperty( const wxString& label,
+                            const wxString& name,
+                            const wxColourPropertyValue& value );
+
+    virtual void OnSetValue();
+    virtual bool IntToValue(wxVariant& variant,
+                            int number,
+                            int argFlags = 0) const;
+
+    virtual wxString ColourToString( const wxColour& col, int index,
+                                     int argFlags = 0 ) const;
+
+    virtual int GetCustomColourIndex() const;
+
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue( wxVariant& variant,
+                                const wxString& text,
+                                int argFlags = 0 ) const;
+    virtual bool OnEvent( wxPropertyGrid* propgrid,
+                          wxWindow* primary, wxEvent& event );
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+    virtual wxSize OnMeasureImage( int item ) const;
+    
+    /* TODO FIXME wrap PaintData 
+    virtual void OnCustomPaint( wxDC& dc,
+                                const wxRect& rect, wxPGPaintData& paintdata );
+    */
+    
+    // Helper function to show the colour dialog
+    bool QueryColourFromUser( wxVariant& variant ) const;
+
+    /** Default is to use wxSystemSettings::GetColour(index). Override to use
+        custom colour tables etc.
+    */
+    
+    virtual wxColour GetColour( int index ) const;
+
+    wxColourPropertyValue GetVal( const wxVariant* pVariant = NULL ) const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxColourPropertyValue* GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{%
+            wxAny value = THIS->GetValue();
+            wxColourPropertyValue col = wxANY_AS(value, wxColourPropertyValue);
+            RETVAL = new wxColourPropertyValue( col );
+      %};
+
+    bool SetPlValue( wxColourPropertyValue* col, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+            wxVariant value = wxVariant(*col);
+            THIS->SetValue(value, NULL, flags );
+            RETVAL = true;
+      %};
+    /************** End wxPerl Methods ***********************************************/    
+
+};
+
+
+%name{Wx::ColourProperty} class wxColourProperty : public %name{Wx::SystemColourProperty} wxSystemColourProperty
+{
+
+public:
+    
+    wxColourProperty( const wxString& label,
+                      const wxString& name,
+                      wxColour& value );
+
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual wxColour GetColour( int index ) const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxColour* GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{%
+            wxAny value = THIS->GetValue();
+            wxColour col = wxANY_AS(value, wxColour);
+            RETVAL = new wxColour( col );
+      %};
+
+    bool SetPlValue( wxColour* col, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+            if( col->IsOk() ) {
+                wxVariant value = wxVariant(*col);
+                THIS->SetValue(value, NULL, flags );
+                RETVAL = true;
+            } else {
+                RETVAL = false;
+            }
+      %};
+    /************** End wxPerl Methods ***********************************************/
+
+protected:
+    virtual wxVariant DoTranslateVal( wxColourPropertyValue& v ) const;
+
+private:
+    void Init( wxColour colour );
+};
+
+
+%name{Wx::CursorProperty} class wxCursorProperty : public %name{Wx::EnumProperty} wxEnumProperty
+{
+
+public:
+    
+    wxCursorProperty( const wxString& label= wxPG_LABEL,
+                      const wxString& name= wxPG_LABEL,
+                      int value = 0 );
+    
+    virtual wxSize OnMeasureImage( int item ) const;
+    /*TODO FIXME wrap paintdata
+    virtual void OnCustomPaint( wxDC& dc,
+                                const wxRect& rect, wxPGPaintData& paintdata );
+    */
+        /************** Begin wxPerl Methods ***********************************************/
+    
+    long GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValue().GetLong(); %};
+
+    bool SetPlValue( long newval, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+        THIS->SetValue( newval, NULL, flags );
+        RETVAL = true;
+      %};
+    
+    /************** End wxPerl Methods ***********************************************/ 
+};
+
+#if wxUSE_IMAGE
+
+%name{Wx::ImageFileProperty} class wxImageFileProperty : public %name{Wx::FileProperty} wxFileProperty
+{
+    
+public:
+
+    wxImageFileProperty( const wxString& label= wxPG_LABEL,
+                         const wxString& name = wxPG_LABEL,
+                         const wxString& value = wxEmptyString);
+
+    virtual void OnSetValue();
+
+    virtual wxSize OnMeasureImage( int item ) const;
+    /*TODO FIXME wrap paintdata
+    virtual void OnCustomPaint( wxDC& dc,
+                                const wxRect& rect, wxPGPaintData& paintdata );
+    */
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxString GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{% RETVAL = THIS->GetValueAsString( flags ); %};
+
+    bool SetPlValue( const wxString& text, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{% RETVAL = THIS->SetValueFromString( text, flags ); %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+};
+
+#endif
+
+#if wxUSE_CHOICEDLG
+
+%name{Wx::MultiChoiceProperty} class wxMultiChoiceProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+    
+%{
+
+void
+wxMultiChoiceProperty::new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newValues )
+        MATCH_REDISP( wxPliOvl_s_s_arr_arr, newStrings )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_s_wpgc_arr, newChoices, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE(wxPliOvl_s_s_arr, newValues, 1)
+    END_OVERLOAD( Wx::MultiChoiceProperty::new )
+
+%}
+
+    %name{newStrings} wxMultiChoiceProperty( const wxString& label,
+                           const wxString& name,
+                           const wxArrayString& strings,
+                           const wxArrayString& value );
+    
+    %name{newChoices} wxMultiChoiceProperty( const wxString& label,
+                           const wxString& name,
+                           const wxPGChoices& choices,
+                           const wxArrayString& value = wxArrayString() );
+
+    %name{newValues} wxMultiChoiceProperty( const wxString& label = wxPG_LABEL,
+                           const wxString& name = wxPG_LABEL,
+                           const wxArrayString& value = wxArrayString() );
+
+    virtual void OnSetValue();
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue(wxVariant& variant,
+                               const wxString& text,
+                               int argFlags = 0) const;
+    virtual bool OnEvent( wxPropertyGrid* propgrid,
+                          wxWindow* primary, wxEvent& event );
+
+    wxArrayInt GetValueAsArrayInt() const;
+
+    /************** Begin wxPerl Methods ***********************************************/
+
+/* TODO - FIXME - novice stack problems
+void
+wxMultiChoiceProperty::GetPlValue( int flags = wxPG_FULL_VALUE )
+  PPCODE:
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ THIS->GetValue().GetArrayString() );
+    SPAGAIN;
+*/
+
+%{
+
+bool
+wxMultiChoiceProperty::SetPlValue( SV* arr, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+  CODE:
+    wxVariant var = wxPli_sv_2_wxvariant( aTHX_ arr );
+    if( var.IsNull() ) {
+        RETVAL = false;
+    } else {
+        THIS->SetValue( var, NULL, flags );
+        RETVAL = true;
+    }
+  OUTPUT: RETVAL
+
+%}
+    
+    /************** End wxPerl Methods ***********************************************/  
+
+};
+
+#endif // wxUSE_CHOICEDLG
+
+#if wxUSE_DATETIME
+
+%name{Wx::DateProperty} class wxDateProperty : public %name{Wx::PGProperty} wxPGProperty
+{
+
+public:
+
+    wxDateProperty( const wxString& label,
+                    const wxString& name,
+                    const wxDateTime& value );
+    
+
+    virtual void OnSetValue();
+    virtual wxString ValueToString( wxVariant& value, int argFlags = 0 ) const;
+    virtual bool StringToValue(wxVariant& variant,
+                               const wxString& text,
+                               int argFlags = 0) const;
+
+    virtual bool DoSetAttribute( const wxString& name, wxVariant& value );
+
+    void SetFormat( const wxString& format );
+
+    const wxString& GetFormat() const;
+
+    void SetDateValue( const wxDateTime& dt );
+
+    wxDateTime GetDateValue() const;
+    long GetDatePickerStyle() const;
+    
+    /************** Begin wxPerl Methods ***********************************************/
+    
+    wxDateTime* GetPlValue( int flags = wxPG_FULL_VALUE )
+      %code{%
+        wxVariant var = wxVariant( THIS->GetValue() );
+        if ( var.IsNull() ) {
+            RETVAL = NULL;
+        } else {
+            RETVAL = new wxDateTime( var.GetDateTime() );
+        }
+      %};
+
+    bool SetPlValue( wxDateTime* value, int flags = wxPG_SETVAL_REFRESH_EDITOR )
+      %code{%
+         THIS->SetValue( value, NULL, flags );
+         RETVAL = true;
+        %};
+    
+    /************** End wxPerl Methods ***********************************************/    
+
+protected:
+    
+    static wxString DetermineDefaultDateFormat( bool showCentury );
+};
+
+#endif // wxUSE_DATETIME
+
+#endif

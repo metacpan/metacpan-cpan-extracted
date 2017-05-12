@@ -1,0 +1,32 @@
+Changes
+ignore.txt
+lib/WebService/SSLLabs.pm
+lib/WebService/SSLLabs/EndpointDetails.pm
+lib/WebService/SSLLabs/DrownHost.pm
+lib/WebService/SSLLabs/StatusCodes.pm
+lib/WebService/SSLLabs/Suite.pm
+lib/WebService/SSLLabs/Cert.pm
+lib/WebService/SSLLabs/Suites.pm
+lib/WebService/SSLLabs/Info.pm
+lib/WebService/SSLLabs/Key.pm
+lib/WebService/SSLLabs/SimDetails.pm
+lib/WebService/SSLLabs/Protocol.pm
+lib/WebService/SSLLabs/Chain.pm
+lib/WebService/SSLLabs/Endpoint.pm
+lib/WebService/SSLLabs/ChainCert.pm
+lib/WebService/SSLLabs/SimClient.pm
+lib/WebService/SSLLabs/Simulation.pm
+lib/WebService/SSLLabs/Host.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-ssllabs.t
+t/02-ssllabs-params.t
+t/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+{
+   "filename" : "svt-play.kanaler.svt1",
+   "streams" : [
+      {
+         "url" : "http://svt10-lh.akamaihd.net/z/svt10_0@77505/manifest.f4m",
+         "type" : "http"
+      },
+      {
+         "url" : "http://svt10hls-lh.akamaihd.net/i/svt10hls_0@78142/master.m3u8?__b__=563&bkup=off",
+         "type" : "hls"
+      }
+   ],
+   "ppurl" : "http://www.svtplay.se/kanaler/svt1?output=json",
+   "url" : "http://www.svtplay.se/video/0/",
+   "title" : "SVT1",
+   "duration" : 86400,
+   "subtitles" : []
+}
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-GameMonitor.t
+lib/WWW/GameMonitor.pm
+META.yml                                 Module meta-data (added by MakeMaker)

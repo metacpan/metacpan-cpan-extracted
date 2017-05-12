@@ -1,0 +1,43 @@
+=======================================
+Revision history for WebService-YouTube
+=======================================
+
+1.0.3   2009-01-20
+    - Applied Patrick's patch to W::Y::Util#get_video_uri to fix RT#40171.
+
+1.0.2   2007-09-15
+    - Fixed W::Y::Util#get_video_uri.
+
+1.0.1   2007-04-09
+    - Fixed the namespace URI of the Media RSS.
+    - Applied the patch of RT#26073 for version compatibility.
+      (Thanks Mark Stosberg!)
+
+1.0.0   2007-01-07
+    - Fixed the error which occurs when video_list has only one result.
+    - Changed to use Test::Base instead of Test::More.
+    - Deleted all the deprecated methods.
+    - Changed the rule of versioning.
+
+0.04    2006-09-11
+    - Fixed the specification of the version number.
+
+0.03    2006-09-11
+    - Added Module::Build support.
+    - Added Module::AutoInstall support.
+
+0.02    2006-09-10
+    - Changed the interface of WebService-YouTube dramatically.
+    - Added WebService::YouTube::Videos
+        - Added youtube.videos.list_by_tag support.
+        - Added youtube.videos.list_by_user support.
+    - Added WebService::YouTube::Feeds
+        - Added RSS of tag support.
+        - Added RSS of user support.
+
+0.01    2006-08-25
+    - Modified to accept a video ID at W::Y::Util#get_video_uri.
+    - Added the ForceArray option for ``*_list`` elements.
+    - Added youtube.videos.get_details support.
+    - Added youtube.videos.list_featured support.
+    - Added RSS support.

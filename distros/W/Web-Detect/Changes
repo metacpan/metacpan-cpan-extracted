@@ -1,0 +1,44 @@
+Revision history for Web-Detect
+
+0.05    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.04    2013-08-15 (SHARYANTO)
+
+        - Add heuristics for: Pangea, cPanel, Dancer, Mojo, Catalyst, FCGI, IIS,
+          and general. (DMUEY)
+
+        - Use explicit return of hashref. (DMUEY)
+
+        - Add comment for MOD_PERL. (DMUEY)
+
+        - Add detect_web_fast() to speed things up when we really only want a
+          boolean. (DMUEY)
+
+        - Remove unused POD and fill in DESCRIPTION. (DMUEY)
+
+        - Add a few more tests. (DMUEY)
+
+
+0.03    2013-04-09 (SHARYANTO)
+
+        - Make the module usable on pre-5.10 perl. (DMUEY)
+
+        - Use 'return' instead of 'return undef' to avoid possible return
+          ambiguity issues. (DMUEY)
+
+
+0.02    2013-04-05 (SHARYANTO)
+
+        - No functional change. Fix copy paste mistake in Synopsis (spotted by
+          Daniel Muey).
+
+
+0.01    2013-03-21 (SHARYANTO)
+
+        - First release.
+

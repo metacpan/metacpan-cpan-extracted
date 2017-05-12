@@ -1,0 +1,35 @@
+WWW-TheMovieDB-Search version 0.01
+===============================
+
+This client lets you retrieve data from the TMDb Search; I currently have not implemented methods to write to the Search, I don't really plan on it, unless someone really wants the feature.
+
+It requires that you have a TMDb Search key, which you can generate by getting an account at: http://api.themoviedb.org/2.1
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP::Simple
+	URI::Escape
+	Switch
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and license information here.
+
+Copyright (C) 2010 by Paul Jobson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

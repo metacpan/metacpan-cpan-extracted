@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::WikiSpaces.
+
+0.01  Thu Aug 28 10:27:35 2008
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::WikiSpaces
+

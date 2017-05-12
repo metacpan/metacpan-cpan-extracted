@@ -1,0 +1,26 @@
+---
+abstract: 'A Perl Interface for Hatena::Diary AtomPub API'
+author:
+  - 'Yohei Fushii <hakobe@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Hatena-Diary
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  DateTime::Format::W3CDTF: 0
+  HTTP::Request: 0
+  XML::Atom: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

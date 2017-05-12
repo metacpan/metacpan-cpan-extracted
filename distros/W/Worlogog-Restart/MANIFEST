@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Worlogog/Restart.pm
+lib/Worlogog/Restart/Restart.pm
+t/00-load.t
+t/bindcase.t
+t/hyperspec.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

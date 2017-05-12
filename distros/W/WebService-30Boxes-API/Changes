@@ -1,0 +1,10 @@
+Revision history for Perl module WebService::30Boxes::API
+
+0.01 Apr 01 2007
+    - original version; created by ExtUtils::ModuleMaker 0.44
+
+1.01 Jul 20 2007
+    - merged with WebService::30Boxes::API::Event
+    - merged with WebService::30Boxes::API::Todo
+    - fixed bug where if only one result was returned the hash structure was different than with multiple events
+

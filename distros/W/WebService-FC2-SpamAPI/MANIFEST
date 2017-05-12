@@ -1,0 +1,13 @@
+META.yml # Will be created by "make dist"
+Changes
+lib/WebService/FC2/SpamAPI/Response.pm
+lib/WebService/FC2/SpamAPI.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-live.t
+t/02-response.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

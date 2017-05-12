@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Date: Sun, 16 Dec 2007 14:15:55 GMT
+Server: nginx/RTM
+Vary: Accept-Encoding
+Content-Type: text/xml; charset="utf-8"
+Client-Date: Sun, 16 Dec 2007 14:16:52 GMT
+Client-Peer: 75.126.232.204:80
+Client-Response-Num: 1
+Client-Transfer-Encoding: chunked
+Keep-Alive: timeout=300
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok"><lists><list id="1917453" name="Inbox" deleted="0" locked="1" archived="0" position="-1" smart="0" sort_order="0"/><list id="1977301" name="Bugs" deleted="0" locked="0" archived="0" position="0" smart="0" sort_order="0"/><list id="1956685" name="Download" deleted="0" locked="0" archived="0" position="0" smart="0" sort_order="0"/><list id="1917457" name="Sent" deleted="0" locked="1" archived="0" position="1" smart="0" sort_order="0"/></lists></rsp>
+
+

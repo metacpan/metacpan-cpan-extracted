@@ -1,0 +1,4 @@
+POST https://api.rememberthemilk.com/services/rest/
+Content-Type: application/x-www-form-urlencoded
+
+method=rtm.timelines.create&api_key=key&auth_token=token&api_sig=5975115ef2f57276786870da2ef5ca2d

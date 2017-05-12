@@ -1,0 +1,69 @@
+{
+   "abstract" : "Unity Dash from Web browsers (experimental)",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Dash",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "inc",
+         "t",
+         "xt"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockModule" : "0.05",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::DBus" : "0.31",
+            "Async::Queue" : "0.02",
+            "Carp" : "0",
+            "Encode" : "0",
+            "File::Find" : "0",
+            "Future::Q" : "0.012",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "Net::DBus" : "1.0",
+            "Plack" : "0",
+            "Plack::Request" : "0",
+            "Plack::Runner" : "0",
+            "Plack::Util" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "1.20",
+            "Try::Tiny" : "0",
+            "Twiggy" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Web-Dash.git"
+      }
+   },
+   "version" : "0.041"
+}

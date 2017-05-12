@@ -1,0 +1,99 @@
+{
+   "abstract" : "Access to USF's online directory",
+   "author" : [
+      "Douglas Christopher Wilson <doug@somethingdoug.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-USF-Directory",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : 0,
+            "Test::More" : "0.94",
+            "Test::Override::UserAgent" : 0,
+            "Test::Requires" : "0.02",
+            "URI::QueryParam" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Load" : 0,
+            "Const::Fast" : "0.004",
+            "HTML::HTML5::Parser" : "0.101",
+            "List::MoreUtils" : "0.07",
+            "Moose" : "0.89",
+            "MooseX::StrictConstructor" : "0.08",
+            "MooseX::Types" : "0.08",
+            "MooseX::Types::Common" : 0,
+            "MooseX::Types::Email" : 0,
+            "MooseX::Types::Moose" : 0,
+            "MooseX::Types::URI" : 0,
+            "Net::SAJAX" : "0.102",
+            "namespace::clean" : "0.04",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::USF::Directory" : {
+         "file" : "lib/WWW/USF/Directory.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Entry" : {
+         "file" : "lib/WWW/USF/Directory/Entry.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Entry::Affiliation" : {
+         "file" : "lib/WWW/USF/Directory/Entry/Affiliation.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Exception" : {
+         "file" : "lib/WWW/USF/Directory/Exception.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Exception::MethodArguments" : {
+         "file" : "lib/WWW/USF/Directory/Exception/MethodArguments.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Exception::TooManyResults" : {
+         "file" : "lib/WWW/USF/Directory/Exception/TooManyResults.pm",
+         "version" : "0.003001"
+      },
+      "WWW::USF::Directory::Exception::UnknownResponse" : {
+         "file" : "lib/WWW/USF/Directory/Exception/UnknownResponse.pm",
+         "version" : "0.003001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dougwilson/perl5-www-usf-directory/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/dougwilson/perl5-www-usf-directory.git"
+      }
+   },
+   "version" : "0.003001"
+}

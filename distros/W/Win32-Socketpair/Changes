@@ -1,0 +1,10 @@
+Revision history for Perl extension Win32::Socketpair.
+
+0.01  Thu Mar 23 11:08:18 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn Win32::Socketpair
+
+0.02 14 July 2012 BUK
+	- modified socketpair to allow blocking usage 
+	- added winopen2_5() that captures stderr as well as stdout
+	

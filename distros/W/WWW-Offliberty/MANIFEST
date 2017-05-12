@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+off
+t/00-load.t
+t/50-network.t
+t/perlcritic.t
+t/perlcriticrc
+lib/WWW/Offliberty.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::Bookmark::Crawler.
+
+0.01  Sun Dec  8 22:48:05 2002
+	- original version; created by h2xs 1.21 with options
+		-XA WWW::Bookmark::Crawler
+

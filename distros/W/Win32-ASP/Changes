@@ -1,0 +1,43 @@
+Revision history for Perl extension Win32::ASP.
+
+2.15  Sun Mar 25 2001
+    - Support assumed by Bill Odom
+    - Commented and reformatted code
+    - Removed experimental STDIN support (for now, at least)
+    - Removed END block
+    - Fixed param() call
+    - Added LoadEnvironment()
+
+2.12
+    - Minor changes to experimental STDIN support
+    - Minor change to HTMLEncode()
+
+2.10  Wed Feb 2 2000 (Groundhog Day, apparently!)
+    - Removed tests
+    - Added experimental STDIN support
+    - Added param() to @EXPORT
+
+2.02  Tue Jun 1 1999
+    - Fixed Tests
+    - Added param() as alias for GetFormValue()
+    - Added no-parameter version of GetFormValue (returns keys)
+
+2.01  Mon Feb 15 1999
+    - Fixed SetCookie Dictionaries
+    - Fixed DeathHooks
+    - Fixed Documentation
+
+2.0   Tue Jan 12 1999
+    - Made into an Autoloading module to increase speed.
+
+1.11  Sun Jan 10 1999
+    - Forgot to document changes in 1.10 (sorry)
+    - Added HTMLEncode as requested
+    - Speedup by only requiring Win32::OLE::Variant at the last minute
+
+1.9   Fri Oct 23 11:38:00 1998
+    - Well, it was always 1.9 - I just never had the proper structure
+      before. Anyway I added a README (just the module run through pod2text)
+
+0.01  Thu Oct 22 21:33:56 1998
+    - original version; created by h2xs 1.18

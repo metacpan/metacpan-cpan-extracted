@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+#---------------------------------------------------------------------
+use WWW::Spyder;  # our crawler
+use URI::Escape;  # to properly escape our query for the search engine
+#---------------------------------------------------------------------
+@ARGV == 2 or usage();
+my $spyder = WWW::Spyder->new(sleep_base => 20,
+                              exit_on    => { pages => 30,
+                                              time  => '1min'});
+my $name = join(' ',@ARGV);
+my $name_rx = qr/\b(?:$ARGV[0]\s+)?$ARGV[1]|$ARGV[0]\b/;
+
+$spyder->terms($name, qr/birthdays?/i);
+
+$spyder->seed( 'http://www.google.com/search?q=' . 
+               uri_escape(qq{"$name"}) );
+
+my $bday;
+while ( my $page = $spyder->crawl ) {
+
+    print "Check-->> ", $page->url, "\n";
+
+# try to extract the birthday here
+
+    my ( $anything ) = $page->text =~ /($name_rx[^.]+)/mis;
+
+    print "\n$anything\n\n" if $anything;
+
+    ( $bday ) = $page->text =~ 
+        m,$name\s+was born on ([^.]+\d\d+),sio;
+    last if $bday;
+    ( $bday ) = $page->text =~
+        m,$name\'s\s+birthday is ([^.]+\d\d+),sio;
+    last if $bday;
+}
+
+if ( $bday ) {
+    print "\n  ${name}'s birthday seems to be: $bday\n\n";
+} else {
+    print "\n   Sorry, couldn't find ${name}'s birthday quickly.\n\n"; 
+}
+
+exit 0;
+#=====================================================================
+sub usage {
+    my ( $tool ) = $0 =~ m,([^\/]+)$,;
+    die <<KettleChips;
+----------------------------------------------------------------------
+USAGE:
+   $tool [Proper Name]
+
+I will try to find the birthday of someone famous if you will please
+give me his/her name. I can only do two word names right now.
+----------------------------------------------------------------------
+KettleChips
+}
+#=====================================================================
+

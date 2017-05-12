@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Win32/Security/ACE.pm
+lib/Win32/Security/ACL.pm
+lib/Win32/Security/NamedObject.pm
+lib/Win32/Security/Raw.pm
+lib/Win32/Security/Recursor.pm
+lib/Win32/Security/SID.pm
+MANIFEST			This list of files
+META.yml
+README
+script/PermChg.pl
+script/PermDump.pl
+script/PermFix.pl
+t/ace.t
+t/extended.t
+t/scripts.t

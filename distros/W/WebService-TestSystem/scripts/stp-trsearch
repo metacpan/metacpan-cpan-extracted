@@ -1,0 +1,275 @@
+#!/usr/bin/perl -w
+
+# Performs a search against test requests
+
+use Pod::Usage;
+use Getopt::Long;
+use SOAP::Lite;
+use strict;
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_resource     = 'http://www.osdl.org/WebService/TestSystem';
+our $opt_server       = 'http://localhost:8081/';
+
+our %opt_search;
+our @opt_fields       = ();
+our %opt_field_widths;
+our $opt_debug        = 0;
+
+my %field_widths = (
+                    id              => '%-6s',
+                    distro          => '%-12s',
+                    test            => '%-15s',
+                    host            => '%-10s',
+                    host_type       => '%-8s',
+                    project         => '%-15s',
+                    priority        => '%-4s',
+                    status          => '%-12s',
+                    patch_id        => '%-6s',
+                    patch           => '%-20s',
+                    created_by      => '%-6s',
+                    created_date    => '%-12s',
+                    username        => '%-8s',
+                    );
+my @fields = qw(id test patch host_type created_date status);
+
+# Handle commandline options
+warn "Parsing cmdline options\n" if ($opt_debug>3);
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           'version|V'    => \$opt_version,
+           'help|h'       => \$opt_help,
+           'man'          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+           "search=s"     => \%opt_search,
+           "fields=s"     => \@opt_fields,
+           "field-width"  => \%opt_field_widths,
+           "debug=i"      => \$opt_debug
+           );
+
+# Handle -V or --version
+if ($opt_version) {
+    print q($0: $Revision: 1.10 $ ), "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+exit main();
+
+
+
+sub main {
+
+    if (@opt_fields) {
+	# Convert --fields=a,b,c into array elements ('a', 'b', 'c')
+	@opt_fields = split(/,/, join(',', @opt_fields));
+
+	@fields = @opt_fields;
+    }
+
+    if (%opt_field_widths) {
+	foreach my $field (keys %opt_field_widths) {
+	    $field_widths{$field} = $opt_field_widths{$field};
+	}
+    }
+
+    if ($opt_debug > 1) {
+	print "Defines:\n";
+	while( my ($key, $value) = each %opt_search) {
+	    print " $key = $value\n";
+	}
+    }
+
+    # Connect to the server
+    my $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the test service object
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    my $testsys = $response->result;
+
+    if (! $testsys) {
+        die "Could not create testsys object\n";
+    }
+
+    warn "Getting requests\n" if $opt_debug>3;
+    $response = $soap->get_requests($testsys, %opt_search);
+    soap_assert($response);
+
+
+    ########################################################################
+    # Format and display the results
+    #
+    warn "Fields:  (@fields)\n" if $opt_debug>3;
+
+    my $format = '';
+    foreach my $field (@fields) {
+	$format .= ($field_widths{$field} || '') . ' ';
+    }
+    warn "Format:  '$format'\n" if $opt_debug>3;
+    $format =~ s/\s+$//;
+    $format .= "\n";
+
+    if (! $response->result) {
+        $response = $soap->get_error($testsys);
+        soap_assert($response);
+        if ($response->result) {
+            warn "Error:  ". $response->result ."\n";
+            exit -1;
+        } else {
+            warn "No results\n";
+            exit 0;
+        }
+    }
+    printf($format, @fields);
+    print '-'x72, "\n";
+    foreach my $row (@{$response->result}) {
+	my @values;
+	foreach my $field (@fields) {
+	    push(@values, $row->{$field} || '');
+	}
+	printf($format, @values);
+    }
+
+    return 0;
+}
+
+# Convenience function to create the soap instance
+sub create_soap_instance {
+    my $resource = shift || return undef;
+    my $server = shift || return undef;
+
+    my $soap = SOAP::Lite
+        -> uri($resource)
+        -> proxy($server,
+                 options => {compress_threshold => 10000});
+    return $soap;
+};
+
+# Convenience function to print out any errors encountered in a soap call
+# and exit.
+sub soap_assert {
+    my $response = shift;
+    if ($response->fault) {
+        print join ', ',
+        $response->faultcode,
+        $response->faultstring;
+        return undef;
+    }
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+stp-trsearch - performs a search against existing test requests and test runs.
+
+=head1 SYNOPSIS
+
+stp-trsearch [options]
+
+  Options:
+
+    --search field=value
+    --fields=[field1,field2,...]
+    --field-width field1=width
+
+=head1 DESCRIPTION
+
+B<trqueue> searches through a list of test requests and test runs and
+displays the results to the commandline.  The user can specify various 
+search criteria and indicate which fields to be included in the report.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the WebService::TestSystem server to connect to.  By default,
+it uses 'http://localhost:8081'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.osdl.org/WebService/TestSystem'.  Users should not typically
+need to alter this setting.
+
+=item B<--search>
+
+Allows specifying additional search criteria.  Uses % as wildcard
+character.
+
+  Example:
+
+    stp-trsearch --search host='stp4%'
+
+=item B<--fields>
+
+Allows overriding the default set of fields shown in the report.
+
+  Example:
+
+    stp-trsearch --fields=id,test,priority
+
+=item B<--field-width>
+
+Allows overriding the default column widths.  
+
+  Example:
+
+    stp-trsearch --field-width id='%-4d' --field-width priority='%-12s'
+
+=item B<debug> = I<NUM>
+
+Print debug messages.  The larger the number, the more verbose the debug
+messages will be (typical range is 0-5).
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@osdl.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Open Source Development Labs
+All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.10 $
+
+=cut
+
+
+

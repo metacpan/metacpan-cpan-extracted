@@ -1,0 +1,60 @@
+pre.code {
+	border: 2px solid #003B62;
+	color: red;
+	background-color: #B5CFE0;
+	padding: 5px 5px 20px 5px;
+	overflow-y : hidden;
+	position : relative;
+	overflow: auto;
+}
+
+body { 
+
+    font-family: verdana;
+    font-size: 12px;
+
+}
+
+table {
+
+    margin-left: 5px;
+    border: 1px solid #666666;
+    border-collapse: collapse;
+
+}
+
+td { 
+    
+    border: 1px solid #666666;
+    padding: 2px;
+
+}
+
+th { border: 1px solid #666666; }
+
+div.result {
+
+  background-color: #A2A5B7;
+  padding: 4px;
+
+}
+
+div.error {
+
+    border: 2px solid #003B62;
+    color: red;
+    background-color: #B5CFE0;
+    padding: 5px 5px 20px 5px;
+
+}
+
+
+p.error {
+
+    font-family: Courier New;
+    border: 2px solid #003B62;
+    color: red;
+    background-color: #B5CFE0;
+    padding: 5px 5px 20px 5px;
+
+}

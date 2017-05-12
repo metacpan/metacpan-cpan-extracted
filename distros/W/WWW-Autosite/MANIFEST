@@ -1,0 +1,39 @@
+public_html/tmp/test.txt   text file
+public_html/tmp/test.pod
+public_html/tmp/test.pod.meta
+public_html/tmp/test.jpg.meta
+public_html/tmp/test.jpg
+public_html/tmp/test.css
+public_html/tmp/image.duh    normal image with bad ext
+public_html/tmp/script.pl
+public_html/tmp/wrapme.htm						wrap demo
+public_html/tmp/2002_02_16_P2160039.JPG
+public_html/tmp/2002_02_16_P2160039.JPG.meta
+
+
+public_html/.htaccess							.htaccess file
+
+cgi-bin/autosite/wraphtm.cgi					real handler
+cgi-bin/apache-magick.cgi
+cgi-bin/autosite/pod.html.pl					handler
+cgi-bin/autosite/image.html.pl                                    handler
+cgi-bin/autosite/text.hi.pl					handler
+cgi-bin/autosite/text.html.pl
+#cgi-bin/autosite/image.im_.pl					this is too complicated, it works.. but.. tooooo clever. sketchy.
+cgi-bin/autosite/dir.cgi		# listings
+
+cgi-bin/autosite/router.cgi					router
+
+
+t/2.t
+t/pod.html.t										test
+t/deps.t
+
+lib/WWW/Autosite.pm								api and api manual
+lib/WWW-Autosite-Manual.pod					manual
+
+
+MANIFEST												this file
+Makefile.PL											module installed
+META.yml												Module meta-data (added by MakeMaker)
+installwebfiles.PL                        easy install web stuffs, optional

@@ -1,0 +1,56 @@
+NAME
+    WebService::YQL - Simple interface for Yahoo Query Language
+
+SYNOPSIS
+      use WebService::YQL;
+      
+  my $yql = WebService::YQL->new;
+
+      my $data = $yql->query("select * from search.web where query = 'YQL'");
+      for my $result ( @{ $data->{'query'}{'results'}{'result'} } ) {
+          print $result->{'title'}, "\n";
+          print $result->{'abstract'}, "\n";
+          print '* ', $result->{'url'}, "\n\n";
+      }
+
+DESCRIPTION
+    This is a simple wrapper to the Yahoo Query Language service. Instead of
+    manually sending a GET request to Yahoo and getting XML or JSON you can
+    now use a simple function call and get a deep Perl data structure.
+
+USAGE
+      my $data = $yql->query("select * from table");
+
+FUNCTIONS
+  new
+    New instance of WebService::YQL. Accepts one argument, 'env', to load more data
+    tables, e.g. WebService::YQL->new(env =>
+    'http://datatables.org/alltables.env');
+
+  query
+    Run an YQL query. Accepts one argument, the query as a string.
+
+  useragent
+    Returns the LWP::UserAgent object used to contact yahoo. You can tweak
+    that object as required, e.g. $yql->useragent->env_proxy in order to use
+    the proxy set in environment.
+
+BUGS
+    As any software, it has bugs, but I'm hunting them down.
+
+SUPPORT
+    Check the source code or contact author for support.
+
+AUTHOR
+    Viorel Stirbu CPAN ID: VIORELS http://stirbu.name
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    http://developer.yahoo.com/yql http://developer.yahoo.com/yql/console
+

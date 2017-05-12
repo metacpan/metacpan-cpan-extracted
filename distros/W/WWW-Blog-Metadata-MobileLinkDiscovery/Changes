@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::Blog::Metadata::MobileLinkDiscovery
+
+0.02  Thu Dec  8 21:01:50 UTC 2005
+        - Support case-insensitive ness of 'rel' attribute
+        - Added tests
+
+0.01  Mon Oct 31 17:08:38 2005
+	- original version

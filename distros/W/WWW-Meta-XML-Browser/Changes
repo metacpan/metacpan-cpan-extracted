@@ -1,0 +1,29 @@
+Revision history for Perl extension WWW::Meta::XML::Browser.
+
+0.08  Mon Mar 22 22:33:49 CET 2004
+	- bugfix: changed the type of hash used in replacements of certain entities to avoid problems with regular expressions
+0.07  Thu Mar 11 10:18:37 CET 2004
+	- introduced embedded requests, a powerful feature to parse a tree of pages and produces one xml document
+	- added examples
+0.06  Fri Nov 14 13:17:43 CET 2003
+	- fixed a serious bug concerning HTML-parsing
+0.05  Tue Aug 26 22:37:38 CEST 2003
+	- added the possibility to define callbacks in the XML file
+	- added the meta-element to the DTD, together with some child
+	  elements
+	- introduces versioning of DTDs
+	- browser now follows redirects for HEAD, GET and POST requests
+	- the request element has a new attribute: result-callback,
+	  see the manual page and online documentation for details
+	- some internal changes on how a request-result is handled
+0.04  Wed Jun 25 11:32:32 CEST 2003
+	- fixed PREREQ_PM in Makefile.PL
+0.03  Sun Jun 22 14:57:04 CEST 2003
+	- implemented debug and result callbacks
+	- added warning for 302-redirects 
+0.02  Thu May 29 21:38:23 2003
+	- first release that is made available to the public
+	
+0.01  Fri Mar  7 16:48:37 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n WWW::Meta::XML::Browser

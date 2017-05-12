@@ -1,0 +1,10 @@
+bin/hanako.pl
+Changes
+lib/WWW/Hanako.pm
+Makefile.PL
+MANIFEST
+README
+t/pod-coverage.t
+t/pod.t
+t/WWW-Hanako.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,58 @@
+0.010 4 May 2015
+    * non-dev release
+
+0.009_01 21 Aug 2013
+    * use uri_escape_utf8 instead of uri_escape
+
+0.009 21 Aug 2013
+    * change name in Makefile (dsteinbrunner)
+
+0.008 6 Jun 2013
+    * non-dev release
+
+0.007_03 4 Jun 2013
+    * uri encode json params
+
+0.007_02 4 Jun 2013
+    * dev release for Request-URI Too Large
+
+0.007_01 26 Mar 2013
+    * dev version for RT#83160
+
+0.007 16 Jan 2013
+    * release a non-dev version
+
+0.006_04 7 Jan 2013
+    * dep on MooX::Types::MooseLike
+
+0.006_03 4 Jan 2013
+    * unbreak the dist
+
+0.006_02 4 Jan 2013
+    * move from Moose to Moo
+
+0.006   13 Aug 2012
+    * fix typo in synopsis (RT#75800)
+
+0.005   13 Aug 2012
+    * Don't check for certificate authenticity (HHUNTER)
+
+0.004   16 Sep 2011
+    * fix up query string generation
+    * add a live test for batch commands 
+      $ENV{MAILCHIMP_APIKEY} must be set
+      it will add two subscribers to the first list and then remove them via the batch commands
+    * fix up the Makefile.PL
+
+0.003   13 May 2011
+    * base datacenter off api key (FAYLAND)
+    * fix "Can't use an undefined value as an ARRAY reference" (FAYLAND)
+    * use allow_nonref in JSON, http://apidocs.mailchimp.com/1.3/campaigncreate.func.php (FAYLAND)
+    * more POD cleanup
+
+0.002   20 Apr 2011
+    * add some meta information (thanks, MDIETRICH)
+    * fix up some POD
+
+0.001   18 Apr 2011
+    * first release

@@ -1,0 +1,11 @@
+Revision history for WWW::IP
+
+0.04    2016-04-12
+        Added WWW::canihazip service!
+
+0.03    2016-04-02
+        Removed PerlTricks module and Try Tiny dependencies
+
+0.01    2014-09-19
+        -Initial release
+

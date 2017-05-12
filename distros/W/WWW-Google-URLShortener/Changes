@@ -1,0 +1,69 @@
+Revision history for WWW-Google-URLShortener
+
+0.19   Sat Nov 14 12:10:00 2015
+       - Added LICENSE file.
+
+0.18   Tue Nov 10 12:00:00 2015
+       - Upgraded to use WWW::Google::UserAgent v0.20.
+
+0.17   Thu Sep 10 10:25:00 2015
+       - Added link to the official Google API document.
+
+0.16    Fri Aug 21 11:55:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.18.
+
+0.15    Mon Aug 10 10:50:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.17.
+
+0.14    Sun Jul 19 03:40:00 2015
+        - Fixed issue RT: 105926.
+        - Upgraded to use WWW::Google::UserAgent v0.16.
+
+0.13    Fri Jan 23 20:15:00 2015
+        - Added Data::Validate::Domain as pre-requisite to the Makefile.PL file.
+
+0.12    Fri Jan 23 17:25:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.14.
+        - Patched RT: 101674, logged against WWW::Google::Places by mistake.
+
+0.11    Sat Jan 17 10:45:00 2015
+        - Removed SIGNATURE file.
+        - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+        - Updated Copyright year information.
+
+0.10    Sat Aug 30 01:55:18 2014
+        - Added section "REPOSITORY" to the pod document.
+        - Added key "META_MERGE" to Makefile.PL file.
+
+0.09    Sat Aug 09 00:33:20 2014
+        - Tidied up README file.
+
+0.08    Wed Jul 30 22:35:19 2014
+        - Added missing pre-requisite 'JSON'
+        - Added SYNOPSIS to WWW::Google::URLShortener::Analytics
+
+0.07    Tue Jul 29 15:44:25 2014
+        - Updated Makefile.PL to make the pre-requisite WWW::Google::UserAgent v0.07
+
+0.06    Tue Jul 29 00:01:00 2014
+        - Complete restructure the code base using 'Moo'
+        - Making use of common library WWW::Google::UserAgent
+        - Present the result in object way for ease.
+
+0.05    Mon Aug 08 13:06:11 2011
+        - Made Readonly v1.03 as minimum requirement.
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.04    Wed May 25 11:26:34 2011
+        - Added link to the License information.
+
+0.03    Tue May 10 12:34:12 2011
+        - Fixed typo in the method shorten_url(), misspelt 'croak'.
+        - Fixed typo in the method expand_url(), misspelt 'croak'.
+        - Fixed typo in the method get_analytics(), misspelt 'croak'.
+
+0.02    Thu May 05 16:47:10 2011
+        - Fixed typo in the pod for title "DESCRIPTION".
+
+0.01    Thu May 05 11:43:01 2011
+        - First version, released.

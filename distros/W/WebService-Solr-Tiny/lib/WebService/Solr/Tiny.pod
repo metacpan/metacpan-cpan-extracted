@@ -1,0 +1,97 @@
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::Solr::Tiny - Perl interface to Apache Solr
+
+=for html
+<a href=https://travis-ci.org/JRaspass/WebService-Solr-Tiny>
+    <img src=https://api.travis-ci.org/JRaspass/WebService-Solr-Tiny.svg>
+</a>
+<a href=https://coveralls.io/r/JRaspass/WebService-Solr-Tiny>
+    <img src=https://coveralls.io/repos/JRaspass/WebService-Solr-Tiny/badge.svg>
+</a>
+<a href=https://metacpan.org/pod/WebService::Solr::Tiny>
+    <img src=https://img.shields.io/cpan/v/WebService::Solr::Tiny.svg>
+</a>
+<a href=https://github.com/JRaspass/WebService-Solr-Tiny/issues>
+    <img src=https://img.shields.io/github/issues/JRaspass/WebService-Solr-Tiny.svg>
+</a>
+
+=head1 SYNOPSIS
+
+ use WebService::Solr::Tiny 'solr_escape';
+
+ my $solr = WebService::Solr::Tiny->new;
+
+ # Simple
+ $solr->search('foo');
+
+ # Complex
+ $solr->search(
+     '{!lucene q.op=AND df=text}myfield:foo +bar -baz',
+     debugQuery => 'true',
+     fl         => 'id,name,price',
+     fq         => [
+         'foo:"' . solr_escape($foo) . '"',
+         'popularity:[10 TO *]',
+         'section:0',
+     ],
+     omitHeader => 'true',
+     rows       => 20,
+     sort       => 'inStock desc, price asc',
+     start      => 10,
+ );
+
+=head1 DESCRIPTION
+
+WebService::Solr::Tiny is similar to, and inspired by L<WebService::Solr>,
+but with an aim to be tinier.
+
+=head1 FUNCTIONS
+
+=head2 solr_escape
+
+Exportable on request, C<solr_escape> is a small utility subroutine for
+escaping characters that have meaning in Lucene query syntax.
+
+=head1 METHODS
+
+=head2 search
+
+=head1 PERFORMANCE
+
+One way to increase the performance of this module is to swap out the decoder.
+By default Solr returns JSON, therefore the fastest decoder for this would be
+L<JSON::XS>. You can swap out L<JSON::PP> for L<JSON::XS> like so:
+
+ use JSON::XS ();
+ use WebService::Solr::Tiny;
+
+ my $solr = WebService::Solr::Tiny->new( decoder => \&JSON::XS::decode_json );
+
+However it's possible to make Solr return a compact binary format known as
+JavaBin, to do so we send C<wt=javabin> with each request. Couple that with
+the CPAN module L<JavaBin> like so:
+
+ use JavaBin ();
+ use WebService::Solr::Tiny;
+
+ my $solr = WebService::Solr::Tiny->new(
+     decoder      => \&JavaBin::from_javabin,
+     default_args => { wt => 'javabin' },
+ );
+
+Both of these should be faster than the stock configuration, but require a C
+compiler and are generally not as portable, YMMV so benchmark first.
+
+=head1 SEE ALSO
+
+L<WebService::Solr>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015 by James Raspass
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

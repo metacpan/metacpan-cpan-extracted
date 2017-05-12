@@ -1,0 +1,622 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat - a Perl servlet container</TITLE>
+<LINK REL="stylesheet" HREF="../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#container configuration">CONTAINER CONFIGURATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#container directories">CONTAINER DIRECTORIES</A></LI>
+		<LI><A HREF="#container deployment descriptor">CONTAINER DEPLOYMENT DESCRIPTOR</A></LI>
+	</UL>
+
+	<LI><A HREF="#web application configuration">WEB APPLICATION CONFIGURATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#web application directories">WEB APPLICATION DIRECTORIES</A></LI>
+		<LI><A HREF="#web application deployment descriptor">WEB APPLICATION DEPLOYMENT DESCRIPTOR</A></LI>
+	</UL>
+
+	<LI><A HREF="#servlet api support">SERVLET API SUPPORT</A></LI>
+	<LI><A HREF="#other notes">OTHER NOTES</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#authors">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat - a Perl servlet container</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Wombat is a servlet container for Perl. It is not an executable
+program itself; rather, it is a library that can be used by programs
+to embed a servlet container. Embedding programs must provide
+implementations of Connector API classes that adapt Wombat to the
+surrounding environment. One such connector is <STRONG>Apache::Wombat</STRONG> which
+embeds a Wombat servlet container within an Apache httpd built with
+mod_perl.</P>
+<P>Currently no developer documentation for Wombat itself is provided
+beyond the contents of this document and the POD for each Wombat
+class.</P>
+<P>
+<HR>
+<H1><A NAME="container configuration">CONTAINER CONFIGURATION</A></H1>
+<P>
+<H2><A NAME="container directories">CONTAINER DIRECTORIES</A></H2>
+<P>Web application directories are generally located beneath a single
+<EM>application base</EM> directory which in turn is usually located beneath
+the container's home directory. Each Host configured in the container
+can use the same application base directory (called <CODE>webapps</CODE> by
+default) or provide its own, possibly located outside the container's
+home directory. As well, each Application configured in the container
+has the option of locating its webapp directory outside its Host's
+application base directory.</P>
+<P>A typical directory structure for Wombat embedded within
+Apache/mod_perl might be:</P>
+<PRE>
+  # container's home dir
+  /usr/local/apache
+  # default hosts's appbase dir
+  /usr/local/apache/webapps
+  # examples app's webapp dir
+  /usr/local/apache/webapps/examples
+  # another host's appbase dir
+  /home/bcm/maz.org/webapps
+  # another app's webapp dir
+  /home/bcm/maz.org/webapps/comics</PRE>
+<P>
+<H2><A NAME="container deployment descriptor">CONTAINER DEPLOYMENT DESCRIPTOR</A></H2>
+<P>The behavior and attributes of the Wombat servlet container are
+controlled by a <EM>container deployment descriptor</EM> (usually named
+<CODE>server.xml</CODE>). This file is modeled after the Tomcat 4 equivalent,
+but it does have slight differences. A full Configuration Guide will
+be published; until then, the definitions included below are the only
+documentation:</P>
+<P>Elements supported in <CODE>server.xml</CODE> (named with XPath paths, example
+attribute settings included inline):</P>
+<DL>
+<DT><STRONG><A NAME="item_Server">Server</A></STRONG><BR>
+<DD>
+Represents the entire perl interpreter, into which one or more
+Services are deployed. Only one Server may be specified.
+<P></P>
+<DT><STRONG><A NAME="item_Server%2FService">Server/Service</A></STRONG><BR>
+<DD>
+Represents a collection of one or more Connectors that share a single
+Engine (and therefore the web applications visible within that
+Engine). A display name for the Service (<CODE>name=&quot;HTTP Service&quot;</CODE>) may
+be specified. Many Services may be specified for the single Server.
+<P></P>
+<DT><STRONG><A NAME="item_Server/">Server/Service/Connector</A></STRONG><BR>
+<DD>
+Represents an endpoint by which requests are received and responses
+are returned. Each Connector passes requests on to its associated
+Container for processing. The name of a class that implements the
+<STRONG>Wombat::Connector</STRONG> interface <STRONG>MUST</STRONG> be specified
+(<CODE>className=&quot;Apache::Wombat::Connector&quot;</CODE>), as well as a scheme
+(<CODE>scheme=&quot;http&quot;</CODE> attribute) and any attributes needed by the
+implementation. A secure flag (<CODE>secure=&quot;1&quot;</CODE>) may also be set to
+indicated that the request was transported using SSL. Many Connectors
+may theoretically be specified for a particular Service, but at this
+time, the Wombat internals need some refactoring before they can
+support Connectors for protocols other than HTTP.
+<P></P>
+<DT><STRONG>Server/Service/Engine</STRONG><BR>
+<DD>
+Represents the highest level Container associated with a set of
+Connectors. The Engine discriminates between virtual hosts as
+necessary and passes the request along to the appropriate Host. A
+display name for the Engine (<CODE>name=&quot;Apache-Wombat&quot;</CODE>) may be
+specified, as well as the name of a default host
+(<CODE>defaultHost=&quot;localhost&quot;</CODE> attribute) to receive requests that are
+not mapped to other specifically configured Hosts. Only one Engine may
+be specified for a particular Service.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Logger</STRONG><BR>
+<DD>
+Unless overridden in a lower level Container, all log messages will be
+handled by this Logger. The name of a class that implements the
+<STRONG>Wombat::Logger</STRONG> interface <STRONG>MUST</STRONG> be specified
+(<CODE>className=&quot;Apache::Wombat::Logger&quot;</CODE>), as well as any attributes
+needed by the implementation. A minimum log level (<CODE>level=&quot;DEBUG&quot;</CODE>)
+may also be specified. If no Logger is specified, logging will be
+disabled for the Container. Only one Logger may be specified for a
+particular Container.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Realm</STRONG><BR>
+<DD>
+Unless overridden in a lower level Container, all web applications
+will be subject to this security Realm. The name of a class that
+implements the <STRONG>Wombat::Realm</STRONG> interface <STRONG>MUST</STRONG> be specified
+(<CODE>className=&quot;Wombat::Realm::DBIRealm&quot;</CODE>), as well as any attributes
+needed by the implementation. If no Realm is specified, security will
+be disabled for the Container. Only one Realm may be specified for a
+particular Container.
+<P>Note that security <STRONG>MUST</STRONG> be also enabled in a particular web
+application's deployment descriptor in order for the Realm to be
+relevant to that web application. Therefore a Realm may be configured
+for an entire Container but only in use for a single Application.</P>
+<P></P>
+<DT><STRONG>Server/Service/Engine/SessionManager</STRONG><BR>
+<DD>
+Unless overridden in a lower level Container, all sessions will be
+managed by this SessionManager. The name of a class that implements
+the <STRONG>Wombat::SessionManager</STRONG> interface <STRONG>MUST</STRONG> be specified
+(<CODE>className=&quot;Wombat::SessionManager::StandardSessionManager&quot;</CODE>), as
+well as any attributes needed by the implementation. A maximum
+inactivity interval/idle out time may also be specified
+(<CODE>maxInactiveInterval=&quot;300&quot;</CODE>). If no SessionManager element is
+specified, sessions will be disabled for the Container. Only one
+SessionManager may be specified for a particular Container.
+<P>The type of SessionManager used will depend heavily on the environment
+provided by the embedding program. For instance, a multiprocess
+Apache/mod_perl server embedding Wombat will require a SessionManager
+that caches sessions in shared memory, on disk or in some other
+location that all processes can access, whereas a multithreaded daemon
+embedding Wombat might use a simple memory-based SessionManager.</P>
+<P></P>
+<DT><STRONG>Server/Service/Engine/Valve</STRONG><BR>
+<DD>
+Represents a request-processing component that ``wraps'' around the
+Servlet that is ultimately responsible for processing the request. The
+name of a class that implements the <STRONG>Wombat::Valve</STRONG> interface <STRONG>MUST</STRONG>
+be specified (<CODE>className=&quot;Wombat::Valve::RequestDumperValve&quot;</CODE>), as
+well as any attributes needed by the implementation. Many Valves may
+be specified for a single Container.
+<P>Valves are used to add container functionality for specific
+Containers, much like Filters are used to add application
+functionality for specific Servlets. An example of a commonly-used
+Valve might be a one that logs information about each request (an
+AccessLogValve perhaps).</P>
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host</STRONG><BR>
+<DD>
+Represents a Container associated with a particular virtual host. A
+Host maps the request URI to a particular web application and passes
+the request along to the appropriate Application. The name of the host
+<STRONG>MUST</STRONG> be specified (<CODE>name=&quot;localhost&quot;</CODE>), as well as the application
+base directory (<CODE>appBase=&quot;webapps&quot;</CODE>) which can be specified
+absolutely or relative to the container's home directory. Many Hosts
+(at least one, corresponding to the Engine's default host attribute)
+may be specified for a single Engine.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Alias</STRONG><BR>
+<DD>
+Represents an alternate name or names for the virtual host. For a Host
+named 'maz.org', the Alias '*.maz.org' might be configured to catch
+requests for specific hosts and subdomains in the domain. The name of
+the alias <STRONG>MUST</STRONG> be specified (<CODE>name=&quot;*.maz.org&quot;</CODE>). Many Aliases may
+be specified for a particular Host.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Logger</STRONG><BR>
+<DD>
+A Logger configured for a Host overrides any Logger configured at the
+Engine level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Realm</STRONG><BR>
+<DD>
+A Realm configured for a Host overrides any Realm configured at the
+Engine level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/SessionManager</STRONG><BR>
+<DD>
+A SessionManager configured for a Host overrides any SessionManager
+configured at the Engine level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Valve</STRONG><BR>
+<DD>
+Any Valves configured for a Host add to (and execute after) any Valves
+configured at the Engine level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Application</STRONG><BR>
+<DD>
+Represents a Container associated with a particular web
+application. An Application inspects the request URI and passes the
+request along to the appropriate Servlet (as configured in the web
+application's deployment descriptor). The display name of the
+application (<CODE>displayName=&quot;Examples Application&quot;</CODE>) and the URI path
+base for the application (<CODE>path=&quot;/wombat-examples&quot;</CODE>) <STRONG>MUST</STRONG> be
+specified, as well as the webapp directory (<CODE>docBase=&quot;examples&quot;</CODE>)
+which can be specified absolutely or relative to the parent Host's
+application base directory. Many Applications (at least one,
+corresponding to the URI path '/') may be specified for a single Host.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Application/Logger</STRONG><BR>
+<DD>
+A Logger configured for an Application overrides any Logger configured
+at a higher level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Application/Realm</STRONG><BR>
+<DD>
+A Realm configured for an Application overrides any Realm configured
+at a higher level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Application/SessionManager</STRONG><BR>
+<DD>
+A SessionManager configured for an Application overrides any
+SessionManager configured at a higher level.
+<P></P>
+<DT><STRONG>Server/Service/Engine/Host/Application/Valve</STRONG><BR>
+<DD>
+Any Valves configured for an Application add to (and execute after)
+any Valves configured at a higher level.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="web application configuration">WEB APPLICATION CONFIGURATION</A></H1>
+<P>
+<H2><A NAME="web application directories">WEB APPLICATION DIRECTORIES</A></H2>
+<P>Each web application's resources (images, static HTML files, templates
+and classes) are located in a single <EM>webapp directory</EM>. This makes
+it trivially easy to organize and deploy individual web applications.</P>
+<P>Each webapp directory <STRONG>MUST</STRONG> contain a directory named
+<CODE>WEB-INF</CODE>. This directory <STRONG>MUST</STRONG> contain the web application
+deployment descriptor, <CODE>web.xml</CODE> (see <A HREF="#web application configuration">WEB APPLICATION CONFIGURATION</A>). Additionally it <STRONG>MAY</STRONG> contain a <CODE>lib</CODE> directory in
+which application-specific modules are located. If the <CODE>lib</CODE>
+directory exists, it will be added to <CODE>@INC</CODE> when the application is
+loaded so that application classes are visible.</P>
+<P>All contents of the webapp directory <STRONG>EXCEPT</STRONG> the <CODE>WEB-INF</CODE>
+directory and everything beneath it will be visible at the path
+specified for the Application in the container's deployment descriptor
+(see <A HREF="#container configuration">CONTAINER CONFIGURATION</A>). For example, if an application's
+path is configured as ``/wombat-examples'', then the file named
+<CODE>index.html</CODE> located inside the webapp directory would be visible at
+the URI ``/wombat-examples/index.html''. The <EM>context-relative</EM> path of
+the file would be ``/index.html''.</P>
+<P>
+<H2><A NAME="web application deployment descriptor">WEB APPLICATION DEPLOYMENT DESCRIPTOR</A></H2>
+<P>The behavior and attributes of a particular web application are
+controlled by a <EM>web application deployment descriptor</EM> (<CODE>web.xml</CODE>)
+as specified in the Java (TM) servlet specification. The elements that
+may be included in <CODE>web.xml</CODE> are defined in the servlet specification
+and in the DTD included in the libservlet distribution.</P>
+<P>Web application deployment descriptor elements recognized by Wombat:</P>
+<DL>
+<DT><STRONG><A NAME="item_web%2Dapp">web-app</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fcontext%2Dparam">web-app/context-param</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fcontext%2Dparam%2Fparam%2Dname">web-app/context-param/param-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fcontext%2Dparam%2Fparam%2Dvalue">web-app/context-param/param-value</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fdisplay%2Dname">web-app/display-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flogin%2Dconfig">web-app/login-config</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flogin%2Dconfig%2Fauth%2Dmethod">web-app/login-config/auth-method</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flogin%2Dconfig%2Frealm%2Dname">web-app/login-config/realm-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Dconstraint">web-app/security-constraint</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Dconstraint%2Fauth%2Dconstra">web-app/security-constraint/auth-constraint</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/auth-constraint/role-name</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Dconstraint%2Fdisplay%2Dname">web-app/security-constraint/display-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Dconstraint%2Fuser%2Ddata%2D">web-app/security-constraint/user-data-constraint</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/user-data-constraint/transport-guarantee</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Dconstraint%2Fweb%2Dresource">web-app/security-constraint/web-resource-collection</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/web-resource-collection/http-method</STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/web-resource-collection/url-pattern</STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/web-resource-collection/web-resource-name</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet">web-app/servlet</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Finit%2Dparam">web-app/servlet/init-param</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Finit%2Dparam%2Fparam%2Dname">web-app/servlet/init-param/param-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Finit%2Dparam%2Fparam%2Dvalue">web-app/servlet/init-param/param-value</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fsecurity%2Drole%2Dref">web-app/servlet/security-role-ref</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fsecurity%2Drole%2Dref%2Frole">web-app/servlet/security-role-ref/role-name</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/servlet/security-role-ref/role-link</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fservlet%2Dclass">web-app/servlet/servlet-class</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fservlet%2Dname">web-app/servlet/servlet-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Dmapping">web-app/servlet-mapping</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Dmapping%2Furl%2Dpattern">web-app/servlet-mapping/url-pattern</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Dmapping%2Fservlet%2Dname">web-app/servlet-mapping/servlet-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsession%2Dconfig">web-app/session-config</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsession%2Dtimeout">web-app/session-timeout</A></STRONG><BR>
+<DD>
+</DL>
+<P>Elements currently not recognized by Wombat, or for which Wombat does
+not currently provide feature support:</P>
+<DL>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fcontext%2Dparam%2Fdescription">web-app/context-param/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fdescription">web-app/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fdistributable">web-app/distributable</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Fdescription">web-app/ejb-local-ref/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Fejb%2Dref%2Dname">web-app/ejb-local-ref/ejb-ref-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Fejb%2Dref%2Dtype">web-app/ejb-local-ref/ejb-ref-type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Flocal%2Dhome">web-app/ejb-local-ref/local-home</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Flocal">web-app/ejb-local-ref/local</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dlocal%2Dref%2Fejb%2Dlink">web-app/ejb-local-ref/ejb-link</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fdescription">web-app/ejb-ref/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fejb%2Dref%2Dname">web-app/ejb-ref/ejb-ref-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fejb%2Dref%2Dtype">web-app/ejb-ref/ejb-ref-type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fhome">web-app/ejb-ref/home</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fremote">web-app/ejb-ref/remote</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fejb%2Dref%2Fejb%2Dlink">web-app/ejb-ref/ejb-link</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fenv%2Dentry">web-app/env-entry</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fenv%2Dentry%2Fdescription">web-app/env-entry/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fenv%2Dentry%2Fenv%2Dentry%2Dname">web-app/env-entry/env-entry-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fenv%2Dentry%2Fenv%2Dentry%2Dvalue">web-app/env-entry/env-entry-value</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fenv%2Dentry%2Fenv%2Dentry%2Dtype">web-app/env-entry/env-entry-type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ferror%2Dpage">web-app/error-page</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ferror%2Dpage%2Ferror%2Dcode">web-app/error-page/error-code</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ferror%2Dpage%2Fexception%2Dtype">web-app/error-page/exception-type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ferror%2Dpage%2Flocation">web-app/error-page/location</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter">web-app/filter</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Ficon">web-app/filter/icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Ficon%2Fsmall%2Dicon">web-app/filter/icon/small-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Ficon%2Flarge%2Dicon">web-app/filter/icon/large-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Finit%2Dparam">web-app/filter/init-param</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Finit%2Dparam%2Fparam%2Dname">web-app/filter/init-param/param-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Finit%2Dparam%2Fparam%2Dvalue">web-app/filter/init-param/param-value</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Ffilter%2Dname">web-app/filter/filter-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Fdisplay%2Dname">web-app/filter/display-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Fdescription">web-app/filter/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Ffilter%2Dclass">web-app/filter/filter-class</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/filter/init-param</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Dmapping">web-app/filter-mapping</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Dmapping%2Ffilter%2Dname">web-app/filter-mapping/filter-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Dmapping%2Furl%2Dpattern">web-app/filter-mapping/url-pattern</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ffilter%2Dmapping%2Fservlet%2Dname">web-app/filter-mapping/servlet-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ficon">web-app/icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ficon%2Fsmall%2Dicon">web-app/icon/small-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ficon%2Flarge%2Dicon">web-app/icon/large-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flistener">web-app/listener</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flistener%2Dclass">web-app/listener-class</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Flogin%2Dconfig%2Fform%2Dlogin%2Dconfig">web-app/login-config/form-login-config</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/login-config/form-login-config/form-login-page</STRONG><BR>
+<DD>
+<DT><STRONG>web-app/login-config/form-login-config/form-error-page</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fmime%2Dmapping">web-app/mime-mapping</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fmime%2Dmapping%2Fextension">web-app/mime-mapping/extension</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fmime%2Dmapping%2Fmime%2Dtype">web-app/mime-mapping/mime-type</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Denv%2Dref">web-app/resource-env-ref</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Denv%2Dref%2Fdescription">web-app/resource-env-ref/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Denv%2Dref%2Fresource%2Denv%">web-app/resource-env-ref/resource-env-ref-name</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/resource-env-ref/resource-env-ref-type</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref">web-app/resource-ref</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref%2Fdescription">web-app/resource-ref/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref%2Fres%2Dauth">web-app/resource-ref/res-auth</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref%2Fres%2Dref%2Dname">web-app/resource-ref/res-ref-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref%2Fres%2Dsharing%2Dscope">web-app/resource-ref/res-sharing-scope</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fresource%2Dref%2Fres%2Dtype">web-app/resource-ref/res-type</A></STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/auth-constraint/description</STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/user-data-constraint/description</STRONG><BR>
+<DD>
+<DT><STRONG>web-app/security-constraint/web-resource-collection/description</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Drole">web-app/security-role</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Drole%2Fdescription">web-app/security-role/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fsecurity%2Drole%2Frole%2Dname">web-app/security-role/role-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fdescription">web-app/servlet/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fdisplay%2Dname">web-app/servlet/display-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Ficon">web-app/servlet/icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Ficon%2Fsmall%2Dicon">web-app/servlet/icon/small-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Ficon%2Flarge%2Dicon">web-app/servlet/icon/large-icon</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fjsp%2Dfile">web-app/servlet/jsp-file</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fload%2Don%2Dstartup">web-app/servlet/load-on-startup</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Frun%2Das%2Fdescription">web-app/servlet/run-as/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Frun%2Das%2Frole%2Dname">web-app/servlet/run-as/role-name</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fservlet%2Fsecurity%2Drole%2Dref%2Fdesc">web-app/servlet/security-role-ref/description</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ftaglib">web-app/taglib</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ftaglib%2Ftaglib%2Duri">web-app/taglib/taglib-uri</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Ftaglib%2Ftaglib%2Dlocation">web-app/taglib/taglib-location</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fwelcome%2Dfile%2Dlist">web-app/welcome-file-list</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_web%2Dapp%2Fwelcome%2Dfile%2Dlist%2Fwelcome%2Dfile">web-app/welcome-file-list/welcome-file</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="servlet api support">SERVLET API SUPPORT</A></H1>
+<P>Wombat will eventually implement the entire Java (TM) servlet
+specification as adapted to Perl by <STRONG>libservlet</STRONG>. Currently it
+supports just enough to be classified as a 'proof of concept' servlet
+container.</P>
+<P>Features currently not supported by Wombat but likely to be supported
+in the near future include:</P>
+<DL>
+<DT><STRONG><A NAME="item_reloading">Application class reloading (SRV.3.7)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_replacing">Application replacing (SRV.9.8)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_events">Application events (SRV.10)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_form">Auth methods: client cert, digest, form (SRV.12.5)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_loading">Compartmentalized class loading (SRV.9.7.2)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Secure_connector_redirection">Secure connector redirection</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_distribution">Clustering/session distribution (SRV.2.2, SRV.3.4.1, SRV.7.7.2,
+SRV.10.6)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_entries">Environment entries (SRV.9.11)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_resources">Environment/external resources (SRV.9.11)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_pages">Error handling request attributes and pages (SRV.9.9)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Filtering">Filtering (SRV.6)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Internationalization">Internationalization (SRV.4.8, SRV.4.9, SRV.5.4)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_MIME_mappings">MIME mappings</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Multiple_protocol_support">Multiple protocol support</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_dispatchers">Named request dispatchers (SRV.8.2)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_attributes">Request dispatcher attributes (SRV.8.3, SRV.8.4)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_translation">Request path translation (SRV.4.5)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_roles">Security roles (SRV.12.3)</A></STRONG><BR>
+<DD>
+<DT><STRONG>Servlet context resources (SRV.3.5)</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_directories">Servlet context working directories (SRV.3.7.1)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_startup">Servlet load-on-startup (SRV.2.3.1)</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_rewriting">Session tracking via SSL or URL rewriting (SRV.7.1)</A></STRONG><BR>
+<DD>
+<DT><STRONG>Session events (SRV.7.4, SRV.7.5, SRV.10.7)</STRONG><BR>
+<DD>
+<DT><STRONG>SSL attributes (SRV.4.7)</STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_files">Welcome files (SRV.9.10)</A></STRONG><BR>
+<DD>
+</DL>
+<P>Features not likely to ever be supported include:</P>
+<DL>
+<DT><STRONG><A NAME="item_EJB">EJB</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Icons">Icons</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_JSP_files">JSP files</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Taglibs">Taglibs</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="other notes">OTHER NOTES</A></H1>
+<P>No consideration has been given to threading. When the threading
+environment in perl has settled down, this may change.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><STRONG>Apache::Wombat</STRONG>,
+<STRONG>mod_perl</STRONG>,
+<STRONG>Servlet</STRONG></P>
+<P>Java (TM) Servlet 2.3 Specification:
+<A HREF="http://www.jcp.org/aboutJava/communityprocess/final/jsr053/">http://www.jcp.org/aboutJava/communityprocess/final/jsr053/</A></P>
+<P>
+<HR>
+<H1><A NAME="authors">AUTHORS</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+<P>Largely inspired by Tomcat, the Apache Java (TM) servlet container at
+<A HREF="http://jakarta.apache.org/tomcat/.">http://jakarta.apache.org/tomcat/.</A> Many thanks!</P>
+
+</BODY>
+
+</HTML>

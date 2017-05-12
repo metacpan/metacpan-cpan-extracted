@@ -1,0 +1,32 @@
+Revision history for WWW-Search-Scrape
+
+0.08    10 May 2010/20:45
+    Use HTML::TreeBuilder::XPath for Google new interface
+
+0.07    17 Apr 2010/22:00
+    Add support for Yahoo
+
+0.06    17 Apr 2010/20:00
+    * Fix 0.05 problems
+    * Add google geo location
+    * Add dependences check
+
+0.05    11 Oct 2009/09:00
+    Default use google.com/ncr 
+    Add frontpage parameter to dispatch target country for google
+
+0.04    4 Oct 2009/13:00
+    Bing return proper value when there is no result.
+
+0.03    28 Sep 2009/21:16
+	Fix wrong document for WWW::Search::Scrape.
+
+0.02    25 Sep 2009/22:00
+	Add Bing.
+
+0.01b   23 Sep 2009/20:00
+	Google returns results number properly now.
+
+0.01    23 Sep 2009/10:00
+        First version, released on an unsuspecting world.
+

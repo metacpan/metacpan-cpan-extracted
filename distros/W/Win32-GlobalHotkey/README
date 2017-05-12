@@ -1,0 +1,34 @@
+Win32-GlobalHotkey version 0.01
+===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   dmake
+   dmake test
+   dmake install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  threads
+  threads:shared
+  Thread::Cancel
+  Carp
+  
+and Win32::GuiTest if you want to run t/02-auto.t
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Tarek Unger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

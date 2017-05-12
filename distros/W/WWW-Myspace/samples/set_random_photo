@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w -I../lib
+
+use WWW::Myspace 0.60;
+my $myspace = new WWW::Myspace;
+
+warn "Got myspace object.\n";
+my @ids = $myspace->get_photo_ids;
+print "@ids\n";
+my $photo_num = int( rand( @ids ) );
+my $photo_id = $ids[ $photo_num ];
+print "Picked photo number $photo_num, photo_id $photo_id\n";
+if ( $myspace->set_default_photo( photo_id => $photo_id ) ) {
+	print "Set photo\n";
+} else {
+    print "Got error: ";
+	print $myspace->error . "\n";
+};
+

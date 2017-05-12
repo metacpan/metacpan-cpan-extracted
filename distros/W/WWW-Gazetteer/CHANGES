@@ -1,0 +1,21 @@
+Revision history for Perl module WWW::Gazetteer: 
+
+0.24 Tue Jun 23 19:34:50 BST 2009
+   - perltidy
+   - add computer-readable license
+   - add human-readable license
+   - move test into t/ directory
+   - use strict
+   - add pod tests
+
+0.23 Sat Jan 29 11:14:51 CET 2005
+	- reworked to use Module::Pluggable
+
+0.22 Fri Oct 25 17:21:18 BST 2002
+	- document support for WWW::Gazetteer::Getty
+
+0.21 Wed Oct 23 09:47:11 BST 2002
+	- now document support for WWW::Gazetteer::HeavensAbove
+
+0.20 Mon Oct 21 20:24:28 BST 2002
+	- first released version of factory

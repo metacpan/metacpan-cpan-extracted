@@ -1,0 +1,178 @@
+---
+abstract: 'Static and dynamic SOAP client generator from WSDL & XSD files'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+  Test::Warnings: '0'
+  Test::XML: '0'
+  parent: '0.225'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: W3C-SOAP
+provides:
+  W3C::SOAP:
+    file: lib/W3C/SOAP.pm
+    version: '0.14'
+  W3C::SOAP::Base:
+    file: lib/W3C/SOAP/Base.pm
+    version: '0.14'
+  W3C::SOAP::Client:
+    file: lib/W3C/SOAP/Client.pm
+    version: '0.14'
+  W3C::SOAP::Document:
+    file: lib/W3C/SOAP/Document.pm
+    version: '0.14'
+  W3C::SOAP::Document::Node:
+    file: lib/W3C/SOAP/Document/Node.pm
+    version: '0.14'
+  W3C::SOAP::Exception:
+    file: lib/W3C/SOAP/Exception.pm
+    version: '0.14'
+  W3C::SOAP::Exception::BadInput:
+    file: lib/W3C/SOAP/Exception.pm
+    version: '0.14'
+  W3C::SOAP::Exception::Doomed:
+    file: lib/W3C/SOAP/Exception.pm
+    version: '0.14'
+  W3C::SOAP::Exception::HTTP:
+    file: lib/W3C/SOAP/Exception.pm
+    version: '0.14'
+  W3C::SOAP::Exception::XML:
+    file: lib/W3C/SOAP/Exception.pm
+    version: '0.14'
+  W3C::SOAP::Header:
+    file: lib/W3C/SOAP/Header.pm
+    version: '0.14'
+  W3C::SOAP::Header::Security:
+    file: lib/W3C/SOAP/Header/Security.pm
+    version: '0.14'
+  W3C::SOAP::Header::Security::Username:
+    file: lib/W3C/SOAP/Header/Security/Username.pm
+    version: '0.14'
+  W3C::SOAP::Parser:
+    file: lib/W3C/SOAP/Parser.pm
+    version: '0.14'
+  W3C::SOAP::Utils:
+    file: lib/W3C/SOAP/Utils.pm
+    version: '0.14'
+  W3C::SOAP::WSDL:
+    file: lib/W3C/SOAP/WSDL.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document:
+    file: lib/W3C/SOAP/WSDL/Document.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Binding:
+    file: lib/W3C/SOAP/WSDL/Document/Binding.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::InOutPuts:
+    file: lib/W3C/SOAP/WSDL/Document/InOutPuts.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Message:
+    file: lib/W3C/SOAP/WSDL/Document/Message.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Node:
+    file: lib/W3C/SOAP/WSDL/Document/Node.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Operation:
+    file: lib/W3C/SOAP/WSDL/Document/Operation.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Policy:
+    file: lib/W3C/SOAP/WSDL/Document/Policy.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Port:
+    file: lib/W3C/SOAP/WSDL/Document/Port.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::PortType:
+    file: lib/W3C/SOAP/WSDL/Document/PortType.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Document::Service:
+    file: lib/W3C/SOAP/WSDL/Document/Service.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Meta::Method:
+    file: lib/W3C/SOAP/WSDL/Meta/Method.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Parser:
+    file: lib/W3C/SOAP/WSDL/Parser.pm
+    version: '0.14'
+  W3C::SOAP::WSDL::Utils:
+    file: lib/W3C/SOAP/WSDL/Utils.pm
+    version: '0.14'
+  W3C::SOAP::XSD:
+    file: lib/W3C/SOAP/XSD.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document:
+    file: lib/W3C/SOAP/XSD/Document.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::ComplexType:
+    file: lib/W3C/SOAP/XSD/Document/ComplexType.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::Element:
+    file: lib/W3C/SOAP/XSD/Document/Element.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::List:
+    file: lib/W3C/SOAP/XSD/Document/List.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::Node:
+    file: lib/W3C/SOAP/XSD/Document/Node.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::SimpleType:
+    file: lib/W3C/SOAP/XSD/Document/SimpleType.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Document::Type:
+    file: lib/W3C/SOAP/XSD/Document/Type.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Parser:
+    file: lib/W3C/SOAP/XSD/Parser.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Traits:
+    file: lib/W3C/SOAP/XSD/Traits.pm
+    version: '0.14'
+  W3C::SOAP::XSD::Types:
+    file: lib/W3C/SOAP/XSD/Types.pm
+    version: '0.14'
+recommends:
+  AnyEvent: '0'
+  AnyEvent::HTTP::LWP::UserAgent: '0'
+  MooseX::Aliases: '0'
+  Pod::Coverage: '0'
+  Test::Kwalitee: '0'
+  Test::Perl::Critic: '0'
+  Test::Spelling: '0'
+requires:
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  File::ShareDir: '1'
+  File::Temp: '0.22'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::Build: '0.3'
+  Moose: '1'
+  Moose::Meta::Method: '1'
+  Moose::Role: '1'
+  Moose::Util::TypeConstraints: '1'
+  MooseX::Exception::Base: '0'
+  MooseX::Types: '0'
+  MooseX::Types::XMLSchema: '0.03'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Template: '2.2'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  WWW::Mechanize: '1.6'
+  XML::LibXML: '1.7'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=W3C::SOAP
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ivanwills/W3C-SOAP.git
+version: '0.14'

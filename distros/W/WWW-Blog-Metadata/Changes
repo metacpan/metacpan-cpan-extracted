@@ -1,0 +1,13 @@
+# $Id: Changes 1811 2005-03-16 22:50:01Z btrott $
+
+Revision history for WWW::Blog::Metadata
+
+0.03  2009.12.09
+    - Fixed long-broken tests.
+
+0.02  2005.03.16
+    - Added on_finished event.
+    - Removed icon_uri method. Use WWW::Blog::Metadata::Icon instead.
+
+0.01  2005.01.27
+    - Initial distribution.

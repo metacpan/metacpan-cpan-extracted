@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use WebService::Prowl;
+use Getopt::Long;
+
+GetOptions(
+    'providerkey|k=s'      => \my $providerkey,
+);
+
+die "Usage: $0 -k providerkey" unless $providerkey;
+
+my $ws = WebService::Prowl->new(providerkey => $providerkey);
+my $token_res = $ws->retrieve_token();
+my $retrieve_url = $token_res->{retrieve}{url};
+my $token = $token_res->{retrieve}{token};
+print "open $retrieve_url in your browser to grant access\n then press enter\n";
+while(<STDIN>){
+    my $apikey_res = $ws->retrieve_apikey(token => $token);
+    print "API Key: " . $apikey_res->{retrieve}{apikey} . "\n";
+    exit;
+}
+

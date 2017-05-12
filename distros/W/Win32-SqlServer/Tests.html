@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<STYLE TYPE="text/css">
+<!--
+small {font-size: 90%;}
+
+.nowrap	{white-space: nowrap;}
+-->
+</STYLE>
+<HEAD>
+<TITLE>Test scripts for Win32::SqlServer</TITLE>
+<META HTTP-EQUIV="Content-Language" CONTENT="en-gb" />
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8" />
+<STYLE TYPE="text/css">
+<!--
+.allcaps {font-size: 90%;}
+-->
+</STYLE>
+</HEAD>
+<BODY>
+<CENTER><H1>Test scripts for Win32::SqlServer</H1></CENTER>
+<P>
+This text gives some information on the test suite for Win32::SqlServer<SMALL>. </SMALL></P>
+<H2>
+Requirements for Running the Scripts</H2>
+<P>
+Obviously you need <SMALL>SQL</SMALL> Server. It can be any version of <SMALL>SQL</SMALL> Server supported by
+Win32::SqlServer. There is no requirement that you have a certain edition; Express Edition will work just fine. Which tests that are performed depends on the <SMALL>SQL</SMALL> Server version:
+  Generally, the higher the version, the more tests. </P>
+<P>The test script assumes that you are running with the permissions needed in SQL Server. 
+  Several test scripts create databases and one creates a login and will fail if you don't have permission. Many scripts also create
+tables and executable objects in tempdb. You may not have be a member of <B>sysadmin</B> to run the scripts, but it's certainly the easiest way out. It goes without saying that you should not run the tests on a production server. </P>
+<P>If a script terminates normally, it
+  should drop everything it creates. (If not, that's a bug in the test script.) But if a script crashes, you may have to clean up
+  manually. Below, I detail what each script creates. </P>
+<H2>Collations, Regional Settings etc</H2>
+<P> A challenge with writing these scripts is that they to some extent depends on settings for language, regional settings etc, both on the client computer running the tests and the SQL Server instance. I have mainly developed the tests under these conditions:</P>
+<UL>
+  <LI>Swedish regional settings client-side.</LI>
+  <LI>The <small>ANSI</SMALL> code page 1252 and the <SMALL>OEM</SMALL> code page 850, client-side.</LI>
+  <LI>English version of the <SMALL>OLE DB</SMALL> provider (matters for error messages).</LI>
+  <LI>Server collation Finnish_Swedish_<SMALL>CS_AS</SMALL>, which imples <SMALL>ANSI</SMALL> code page 1252 for varchar.</LI>
+  <LI>The SQL Server language set to <B>us_english</B> (matters for error messages).</LI>
+</UL>
+<P>I have occasionally run the tests with different regional settings (to test <SMALL>DATETIME_REGIONAL</SMALL>), and some tests with Czech_<SMALL>CS_AS</SMALL>, which has a different <SMALL>ANSI</SMALL> code page in the server, I've tweaked/cheated to suppress test failures in this case. I have not tested with a different <SMALL>ANSI</SMALL> code page on the client than 1252 &#8211; most likely you will see errors in this case. If you use non-English version of SQL Server and/or SQL Server client, tests where I test on text in error messages will fail.</P>
+<P>These shortcomings should not be construed as restrictions in what Win32::SqlServer supports, it is just the difficulty to cover all in a test script.</P>
+<H2>Running the Test Scripts</H2>
+<P>
+All test scripts looks at the environment variable <SMALL>OLLEDBTEST.</SMALL>
+This variable controls which
+server(s) the test scripts should access. <SMALL>OLLEDBTEST</SMALL> has this format:</P>
+<PRE>    Server1;User1;Pwd1;Server2;User2;Pwd2;Provider</PRE>
+<P>If you don't specify <B>Server1</B>, the test script uses the default instance on
+   the local machine. If you don't specify <B>User1</B>, the test scripts logs in with
+   Windows authentication. <B>Server2</B> is a second server, and is needed for some
+   tests in the script <B>9_loginproperties.t</B>. If you don't specify <B>Server2</B>, or it is
+   the same as <B>Server1</B>, those tests are skipped.
+   Example: to run the test at the server <SMALL>DEVSERVER</SMALL> with Windows authentication,
+   and skip tests that require a second server, simply say:</P>
+<PRE>   SET OLLEDBTEST=DEVSERVER</PRE>
+<P>To run the test on your local server and <SMALL>DEVSERVER</SMALL> as a second server, now
+   with <SMALL>SQL</SMALL> authentication, you would say:</P>
+<PRE>   SET OLLEDBTEST=.;;;DEVSERVER;sa;notstrong</PRE>
+<P>The last option in the string is <B>Provider</B>. Use this if you want to force a
+certain provider. You will neeed to use this if you want to test against a version of SQL Server which is not supported by the default provider, which always is the most recently released proivder. The values for <B>Provider</B> are: 1&nbsp;&#8211;&nbsp;<SMALL>SQLOLEDB</SMALL>, 2&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI</SMALL>, 3&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI10</SMALL>, 4&nbsp;&#8211;<SMALL>&nbsp;SQLNCLI11</SMALL>.</P>
+<P>The simplest way to run the scripts is to run them with <KBD>MAKE test</KBD>. </P>
+<P>A poor man's test harness is avilable in the t directory. Do:</P>
+<PRE>   CD t
+   set OLLEDBTEST=...<BR>   perl testitall.pl</PRE>
+<P>This will run all the test scripts in order and analyse the output. Note that for this to work, you first need to have installed Win32::SqlServer in your Perl installation. (As you would if you are relying on the binary distribution.)</P>
+<h2>Reporting Errors from Tests</h2>
+<P>If you run a test script and one or more tests fail, please don't just tell
+   me that test 324 in some script failed, put please send me the full output
+   from the script. The test numbers are assigned dynamically in several of the
+   scripts, so I will not be able to easily find which is test 324. I also need to know which version of SQL Server you are using and which provider.</P>
+<H2>The Test Scripts</H2>
+<H3>
+<B>1_resultsets.t</B> </H3>
+<P>
+<B>Tests</B>: the various
+<A HREF="Win32-SqlServer.html#RowResultStyles">row, result and colinfo styles</A>.
+</P>
+<P>
+<B>Number of tests</B>: 414.</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: Temporary tables only.</P>
+<H3>
+<B>2_datatypes.t</B>
+</H3>
+<P>
+<B>Tests:</B> that Win32::SqlServer handle all <SMALL>SQL</SMALL> Server data types
+correctly. As a side effect it also tests <A HREF="Win32-SqlServer.html#sql_sp">
+<SPAN CLASS="nowrap">sql_sp()</SPAN></A>, <SPAN CLASS="nowrap"><A HREF="Win32-SqlServer.html#sql_insert">
+sql_insert()</A></SPAN> and that the <A HREF="Win32-SqlServer.html#LogHandle">log
+file</A> is correctly constructed.
+</P>
+<P><B>Notes</B>: Four tests related to the datetimeoffset data type may fail. This is due to, cough, a bug in Win32::SqlServer. I have not been able to address the bug in the current verison of Win32::SqlServer, because there does not seem to be any rounding function available in Visual Studio 2005 which I have used to build the binaries.</P>
+<P>
+<B>Number of tests</B>: Many. From a 1269 on <SMALL>SQL</SMALL>&nbsp;7 to over 
+4100
+on <SMALL>SQL</SMALL>&nbsp;2008 when you use SQLNCLI10 and you 
+have the <SMALL>CLR</SMALL> enabled.</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: Tables and stored
+procedures in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection and three
+<SMALL>CLR</SMALL> user-defined types (the latter only if <SMALL>CLR</SMALL> is enabled). If you have SQL 2012 and your server collation is one of the new SC (surrogate-aware) collations, the script creates a <I><FONT COLOR="#FF0000">database</FONT></I>, and runs all tests in that database rather than tempdb. (Because the old data types <B>text</B> and <B>ntext</B> are not supported with SC collations.)</P>
+<H3>
+<B>3_retvalues.t</B> </H3>
+<P>
+<B>Tests</B>: return values of different data types from stored
+procedures and user-defined functions for <A HREF="Win32-SqlServer.html#sql_sp">
+<SPAN CLASS="nowrap">sql_sp()</SPAN></A>.</P>
+<P>
+<B>Number of tests</B>: 7 (<SMALL>SQL</SMALL>&nbsp;7), 33-43 (<SMALL>SQL</SMALL>&nbsp;2000 and <SMALL>SQL</SMALL>&nbsp;2005), 
+79 (SQL 2008 and later).</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: stored procedures and
+user-defined function in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection
+and <SMALL>CLR</SMALL> user-defined types (if the <SMALL>CLR</SMALL> is enabled).</P>
+<H3>
+<B>4_conversion.t</B> </H3>
+<P>
+<B>Tests:</B> the charset conversion you can set up with
+<A HREF="Win32-SqlServer.html#Conversion_Routines"><SPAN CLASS="nowrap">sql_set_conversion()</SPAN></A>. If your <SMALL>OEM</SMALL> code page is not CP850 or CP437,
+some of the tests are skipped. If the code page for your system collation is not 1252, the entire test is skipped. </P>
+<P>
+<B>Notes</B>: the script requires Win32::Registry and will not compile if this
+module is not available. This an issue with the test script, not with Win32::SqlServer itself.</P>
+<P>
+<B>Number of tests</B>: 37.  Some tests are skipped if the <SMALL>CLR</SMALL> is not enabled. 
+  Tests for table-valued parameters are only performed if you have SQL 2008 and 
+<SMALL>SQLNCLI10</SMALL> or later.</P>
+<P>
+  <B>Creates in <SMALL>SQL</SMALL> Server</B>: <SMALL>CLR</SMALL> user-defined 
+  types and a table type, if these features are available. Else only temporary 
+objects.</P>
+<H3>
+<B>5_errors.t</B> </H3>
+<P>
+<B>Tests</B>: the error handling. </P>
+<P>
+<B>Number of tests</B>: 237. Some tests are skipped depending on the SQL Server 
+version.</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: On SQL 2008 and 
+later the test creates a table type in tempdb. Else only temporary
+objects.</P>
+<H3>
+<B>6_paramsql.t</B> </H3>
+<P>
+<B>Tests:</B> passing parameters to <SPAN CLASS="nowrap">
+<A HREF="Win32-SqlServer.html#sql">sql()</A></SPAN>.</P>
+<P>
+<B>Number of tests</B>: 113. With SQL 7/2000 a few tests are skipped and even fewer for later versions. For all tests to be run, you must have SQL 2008 or later, <SMALL>SQLNCLI10</SMALL> or later and the <SMALL>CLR</SMALL> must be enabled.</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: User-defined types in tempdb. On <SMALL>SQL</SMALL>&nbsp;2005 
+  and later, it creates an <SMALL>XML</SMALL> schema collection in 
+  tempdb, as well as four <SMALL>CLR</SMALL> user-defined types if the <SMALL>CLR</SMALL> is
+enabled. </P>
+<H3>
+<B>7_objectnames.t</B> </H3>
+<P>
+<B>Tests</B>: how Win32::SqlServer looks up the procedure and table names
+for <SPAN CLASS="nowrap"><A HREF="Win32-SqlServer.html#sql_sp">sql_sp()</A></SPAN> and
+<A HREF="Win32-SqlServer.html#sql_insert"><SPAN CLASS="nowrap">sql_insert()</SPAN></A>, as well as the names for user-defined types for <A HREF="Win32-SqlServer.html#sql">sql()</A> and also
+  how it parses the &quot;typeinfo&quot; argument for the <SMALL>UDT</SMALL> and xml data types in <SMALL>SQL</SMALL>
+2005. </P>
+<P>
+  <B>Number of tests</B>: From 1140 for <SMALL>SQL 7 to </SMALL>3641 (SQL 2008 or later with <SMALL>SQLNCLI10</SMALL> or later). While the latter combination has the highest number of tests due to the available feature set, you will also need to run for SQL 2005 or <SMALL>SQLNCLI</SMALL> to tests all apsects of user-defined data types. (Because for SQL 2008 and <SMALL>SQLNCLI10</SMALL>, the script tests user-defined types with table types only, but these types cannot be used across databases, which Win32::SqlServer supports for regular user-defined types.)</P>
+<P><B>Creates in <SMALL>SQL</SMALL> Server</B>: This script creates no less than five
+  <FONT COLOR="#FF0000"><I>databases</I></FONT>. Four of
+  them have names starting in &quot;OlleDB&quot; or Olle$DB&quot;, and the fifth has all Greek
+  letters, &#929;&#949;&#954;&#963;&#956;&#959;&#949;&#961;&#957;&#947;&#969;&#962;. The script also creates objects in these databases and
+adds <B>guest</B> as user.</P>
+<H3>
+8_columninfo.t</H3>
+<P>
+<B>Tests</B>: the type information returned when the colinfo style is
+<SMALL>COLINFO_FULL</SMALL>.</P>
+<P>
+<B>Number of tests</B>: 36, of which some are skipped depending on the SQL
+Server version, the <SMALL>OLE DB</SMALL> provider, the collation and the availability of the <SMALL>CLR</SMALL>.</P>
+<P>
+<B>Creates in SQL Server</B>: Temp tables. On <SMALL>SQL</SMALL>&nbsp;2005 and later, it creates an <SMALL>XML</SMALL> 
+schema collection in tempdb, as well as four <SMALL>CLR</SMALL> user-defined types, if the <SMALL>CLR</SMALL> is
+enabled.</P>
+<H3>
+<B>9_loginproperties.t</B> </H3>
+<P>
+<B>Tests:</B>
+<SPAN CLASS="nowrap"><A HREF="Win32-SqlServer.html#setloginproperty">setloginproperty()</A></SPAN> and
+other connection routines. </P>
+<P>
+<B>Notes</B>: to perform all tests, this script requires that you have defined a
+second test server with the <SMALL>OLLEDBTEST</SMALL> environment variable.</P>
+<P>
+<B>Number of tests</B>: 44, whereof three will be skipped if no second server
+is defined. Some tests are skipped depending on the <SMALL>SQL</SMALL> Server and the provider.
+Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>SQL</SMALL> Native Client and a second server all tests will be
+performed. And even in that case, two tests will be skipped if <SMALL>SQL</SMALL>
+Server is configured for Windows authentication only.</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: Creates a <FONT COLOR="#FF0000"><I>database</I></FONT> which it detaches and
+then reattaches with a different name. Both names start with &quot;OlleDB&quot;. On
+<SMALL>SQL</SMALL>&nbsp;2005 and later, if SQL Server authentication is enabled, the script creates a
+<FONT COLOR="#FF0000"><I>login</I></FONT>
+with the name starting in &quot;Olle&quot; followed by random digits. The script creates the
+login with <SMALL>CHECK_POLICY = OFF</SMALL>. As all other objects the test script creates, the
+login is dropped if the script terminates normally. No objects are created in
+the second server.</P>
+<H3>
+A_tableparam.t</H3>
+<P>
+<B>Tests</B>: table-valued parameters in general (some aspects of TVPs are 
+tested in other scripts).</P>
+<P>
+<B>Notes</B>: this test is skipped entirely unless you have SQL 2008 or later 
+and the provider is <SMALL>SQLNCLI10</SMALL> or later. </P>
+<P>
+<B>Number of tests</B>: 1554 (somewhat fewer if the <SMALL>CLR</SMALL> is disabled).</P>
+<P>
+<B>Creates in SQL Server</B>: various table types, a XML schema collection and 
+four <SMALL>CLR UDT</SMALL>s if the 
+<SAMLL>CLR</SAMLL>
+is enabled.</P>
+<H3>
+B_filestream.t</H3>
+<P>
+<B>Tests</B>: the OpenSqlFilestream method.</P>
+<P>
+<B>Notes</B>: this test is skipped entirely, if any these are true: 1) The 
+version is SQL 2005 or earlier. 2) Filestream is not enabled for remote access 
+according to <B>sys.configurations</B>. 
+3) You run the test suite with <SMALL>SQL</SMALL> authentication. If the provider is <SMALL>SQLOLEDB</SMALL> or <SMALL>SQLNCLI</SMALL>, there is only a single test to verify that Win32::SqlServer croaks with the correct error message.</P>
+<P>Note that the Filestream 
+  feature is configured in two places. In SQL Server with <B>sp_configure</B> and on 
+  Windows level through the SQL Server Configuration Manager. I have not been able 
+  to find out how to check for the latter reliably, so in case <B>sys.configurations</B> says that Filestream is enabled for remote access, but this is not the fact on 
+  Windows level, the test will fail big time.</P>
+<P>
+<B>Number of tests</B>: 9. </P>
+<P>
+<B>Creates in SQL Server</B>: the scripts creates a <I><FONT COLOR="#FF0000">
+database</FONT></I>, Olle$DB, with a <SMALL>FILESTREAM</SMALL> file group. It creates a table 
+with filestream data in that database. The database is dropped at the end of the 
+script.</P>
+<P><B>Known issues</B>: All tests but the last fails on Windows 10 when connected to SQL 2008, but not to SQL 2008 R2 and higher versions.</P>
+<P>On 32-bit Perl with USE_64_BIT_INT, the last test fails for reasons I have not been able to understand. The test intends to pre-allocate a 80 TB record which is expected to fail, but the call unexpectedly succeeds.</P>
+<H3>
+Y<B>_rowsetprops.t</B> </H3>
+<P>
+<B>Tests</B> the properties <B>
+<A HREF="Win32-SqlServer.html#CommandTimeout">CommandTimeout</A></B> and <B>
+<A HREF="Win32-SqlServer.html#QueryNotification">QueryNotification</A></B>. </P>
+<P>
+<B>Notes</B>: This
+script runs for almost a minute, because of a 45-second <SMALL>WAITFOR</SMALL> to test <B>
+<A HREF="Win32-SqlServer.html#CommandTimeout">CommandTimeout</A></B>. That&#39;s why 
+it is demoted to always be next-to-last in the test suite.</P>
+<P>
+<B>Number of tests</B>: 11 (With <SMALL>SQLOLEDB), 9 (SQL</SMALL> Native Client and <SMALL>SQL</SMALL>&nbsp;2000 or
+earlier), 18 (With <SMALL>SQL</SMALL> Native Client and <SMALL>SQL</SMALL>&nbsp;2005 
+or later).</P>
+<P>
+<B>Creates in <SMALL>SQL</SMALL> Server</B>: On <SMALL>SQL</SMALL>&nbsp;2005
+or later when you have <SMALL>SQLNCLI or later</SMALL>, 
+the script creates a <FONT COLOR="#FF0000"><I>database</I></FONT>, OlleQN, in which it creates a broker service
+service and a queue. In the other test cases, no objects are created.</P>
+<H3>
+Z<B>_threads.t</B> </H3>
+<P>
+<B>Tests</B>: Win32::SqlServer with Perl threads. </P>
+<P>
+<B>Number of tests</B>: 24.</P>
+<P><B>Creates in <SMALL>SQL</SMALL> Server</B>: nothing.</P>
+<H2>Subdirectories to t</H2>
+<P>
+There are two subdirectories in the <B>t</B> directory: </P>
+<P>
+<B>Helpers</B> - Here you find the source code for the four <SMALL>CLR</SMALL> types that are
+used in the test, and a Perl script to create them. Here is also a short program
+in VB6 which is used to generate and interpret date in regional settings for the
+<A HREF="Win32-SqlServer.html#DATETIME_REGIONAL"><SMALL>DATETIME_REGIONAL</SMALL></A> setting. 
+There is also test data for the spatial data types geometry and geography and 
+the queries to generate that data.</P>
+<P>
+<B>Output</B> - This directory holds output files from some of the test scripts.
+Most of them comes from <B>2_datatypes.t</B>, and <B>5_errors.t</B>, but also<B>
+A_tableparam.t</B> and <B>Z_threads.t</B>
+generate output files.
+</P>
+<HR />
+<I>
+Last updated <!--$$Modtime:--> 16-07-15 14:14 <!-- $-->
+</I>
+</P>
+</BODY>
+</HTML>

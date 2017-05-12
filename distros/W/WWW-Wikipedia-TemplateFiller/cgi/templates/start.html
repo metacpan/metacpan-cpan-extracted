@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Wikipedia template filling</title>
+<style type="text/css">
+<TMPL_INCLUDE NAME="stylesheet.css">
+</style>
+
+<script type="text/javascript">
+<TMPL_INCLUDE NAME="script.js">
+</script>
+</head>
+<body>
+
+<div id="wrapper">
+<form action="index.cgi">
+<fieldset class="hidden">
+  <input type="hidden" name="ddb" value="" />
+</fieldset>
+
+<h1>Wikipedia template filling</h1>
+
+<TMPL_IF name="error_message">
+<div id="error">
+  <p>Error:</p>
+  <p><TMPL_VAR name="error_message"></p>
+</div>
+</TMPL_IF>
+
+<TMPL_IF NAME="template_markup">
+<div id="markup">
+  <p style="font-weight:bold">Paste this into your article:</p>
+  <!-- no need to use escape=html because template_markup is already html-escaped by WebApp -->
+  <p><textarea rows="4" cols="60" style="width:65%"><tmpl_var name="template_markup"></textarea></p>
+</div>
+
+<TMPL_IF NAME="source_url">
+<p id="source_url">
+Source: <i><a href="<tmpl_var name="source_url" escape="html">"><tmpl_var name="source_url" escape="html"></a></i>
+</p>
+</TMPL_IF>
+</TMPL_IF>
+
+<p>Enter a
+<TMPL_LOOP name="data_sources">
+  <TMPL_IF name="__last__"> or </TMPL_IF>
+  <TMPL_VAR name="name"><TMPL_UNLESS __last__>, </TMPL_UNLESS>
+</TMPL_LOOP>
+and press submit to fill out an appropriate template that can be
+pasted into a Wikipedia article:</p>
+
+<p>
+<select name="type">
+<TMPL_LOOP NAME="data_sources">
+<option value="<TMPL_VAR NAME="source">" <TMPL_IF NAME="selected">selected="selected"</TMPL_IF>><TMPL_VAR NAME></option>
+</TMPL_LOOP>
+</select>
+<input type="text" name="id" id="search_id" value="<TMPL_VAR NAME="id">" />
+<input type="submit" value="Submit" />
+</p>
+
+<div id="options" class="<tmpl_if name="template_markup">result</tmpl_if><tmpl_if name="error_message">result</tmpl_if>">
+<h2 style="font-weight:bold; font-size:12pt">Options:</h2>
+<table style="margin-bottom:10px">
+<TMPL_LOOP NAME="checkbox_options">
+  <tr><td>
+  <input type="checkbox" id="<TMPL_VAR NAME="id">" name="<TMPL_VAR NAME="name">" value="<TMPL_VAR NAME="value" escape="html">" <TMPL_IF NAME="checked">checked="checked"</TMPL_IF> />
+  <label for="<TMPL_VAR NAME="id">"><TMPL_VAR NAME="label"></label>
+  </td></tr>
+</TMPL_LOOP>
+</table>
+</div>
+
+<div id="notes">
+<TMPL_IF NAME="data_sources">
+<h2>Data sources</h2>
+<table style="border-collapse:collapse; background:#eee; text-align:left; margin-left:20px" cellpadding="3" border="1">
+<tr style="background:#ccc">
+  <th>Data source</th>
+  <th>Template</th>
+  <th>Example</th>
+</tr>
+<TMPL_LOOP NAME="data_sources">
+  <tr>
+    <td><TMPL_IF NAME="source_url"><a href="<TMPL_VAR NAME="source_url"><TMPL_VAR NAME="name"></a><TMPL_ELSE><TMPL_VAR NAME="name"></TMPL_IF></td>
+    <td><code style="color:#666">{{<a href="http://en.wikipedia.org/wiki/Template:<TMPL_VAR NAME="template">"><TMPL_VAR NAME="template"></a>}}</code></td>
+    <td><a href="?type=<TMPL_VAR NAME="source">&amp;id=<TMPL_VAR NAME="example_id">">Example</a></td>
+  </tr>
+</TMPL_LOOP>
+</table>
+</TMPL_IF>
+
+<h2>XML output</h2>
+<p>This tool can output XML in case you're interested in developing,
+for example, an Ajax interface to this page. Just slap a
+<tt>"&amp;format=xml"</tt> at the end of the URL.</p>
+
+</div></form></div>
+</body>
+</html>

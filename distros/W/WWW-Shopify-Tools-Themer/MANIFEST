@@ -1,0 +1,24 @@
+.shopsettings
+assets/activate.png
+assets/check-syntax-off.png
+assets/check-syntax.png
+assets/deactivate.png
+assets/home.png
+assets/languages/liquid-css.lang
+assets/languages/liquid.lang
+assets/preview.png
+assets/pull.png
+assets/push.png
+assets/refresh-off.png
+assets/refresh.png
+assets/shopify-icon.png
+assets/shopifyeditor.plugin
+assets/shopifyeditor.py
+Build.PL
+lib/WWW/Shopify/Tools/Themer.pm
+MANIFEST			This list of files
+META.json
+META.yml
+screenshot.png
+shopify-themer.pl
+t/01initial.t

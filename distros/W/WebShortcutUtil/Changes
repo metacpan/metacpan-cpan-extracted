@@ -1,0 +1,24 @@
+Revision history for Perl extension WebShortcutUtil.
+
+0.22  Tue Mar 17 00:38:33 2015
+    - Rename unicode files to avoid unpacking problems in Windows
+    - Add META.yml
+
+0.21  Fri Feb 20 05:40:49 2015
+    - Fix unicode bugs
+
+0.20  Sun Jan 25 12:00:00 2015
+    - Add new Read and Write functionality
+    - General cleanup
+
+0.11  Tue Jun 19 20:00:00 2013
+    - Updated metadata for CPAN.
+    - Fixed compile error in WebShortcutUtil::Write module which
+      occurred on versions of Perl older than 5.14.0.
+
+0.10  Tue Jun 18 16:00:00 2013
+    - Initial beta version for CPAN
+
+0.01  Tue Jan  1 13:59:59 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn WebShortcutUtil

@@ -1,0 +1,16 @@
+.*\.svn.*
+pm_to_blib
+.*\.old
+.*\.bak
+.*\.swp
+blib/.*
+ApiCalls.doc
+.*.swp
+^Makefile$
+\d+_local_
+^tags$
+.*\.xml
+^Design.txt$
+^check.pl$
+^raw_request.pl$
+local_.*\.t

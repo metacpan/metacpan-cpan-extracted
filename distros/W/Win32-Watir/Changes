@@ -1,0 +1,30 @@
+Revision history for Perl extension Win32::Watir.
+
+0.01  Thu Sep 18 00:00:30 2008
+	- original version; created by h2xs 1.23 with options
+		-AX Win32::Watir
+
+0.02  Fri Sep 11 10:15:01     2009
+	- support multipleIE.
+	- support IE8.
+
+0.03  Sun Sep 13 17:35:19     2009
+	- add/modify POD.
+	- minor bugfix.
+
+0.04  
+	- Windows Vista + IE8 support.
+	- more compatible methods.
+
+0.05
+	- fix broken AutoItX3.dll
+	- remove some invalid tests
+
+0.06
+	- add AutItX3_x64.dll
+	- dll registration fix on x86_64 Windows.
+	- Windows7 + IE9 support partially.
+	- fix https://rt.cpan.org/Public/Bug/Display.html?id=69607
+	  (thanks Sergey Parubochiy)
+	- some minor bug fix.
+

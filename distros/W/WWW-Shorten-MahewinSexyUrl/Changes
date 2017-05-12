@@ -1,0 +1,7 @@
+Revision history for Net::Gandi
+
+0.2 31/07/11
+    Support makealongerlink function, fix encodind in a pod, return absolute url for makeashorterlink function, clean code.
+
+0.1 28/02/11
+    Initial version developed.

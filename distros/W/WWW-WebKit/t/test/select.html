@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>test</title>
+        <script type="text/javascript">
+            function test_onchange() {
+                alert("onchange fired");
+            }
+
+            window.addEventListener('load', function() {
+                document.getElementById('test_event').addEventListener('change', function () {
+                    alert('change event fired');
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <select id="test" name="foo" onchange="test_onchange()">
+            <option value="0">0</option>
+            <option value="1">1</option>
+        </select>
+        <select id="test_event" name="bar">
+            <option value="0">0</option>
+            <option value="1">1</option>
+        </select>
+    </body>
+</html>

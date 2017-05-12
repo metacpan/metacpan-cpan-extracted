@@ -1,0 +1,12 @@
+Revision history for WWW-WorldLingo
+
+0.02  Thu Oct 18 17:34:40 PDT 2007
+      - Missing dependency on Class::Accessor::Fast added to makefile.
+      - Took out HTML::TokeParser... I have no idea why it was in there.
+      - Added facility to get HTTP::Request object instead of doing a call.
+      - Added a couple new tests.
+      - Added "scheme" method to do "https" or "http."
+
+0.01  Sun Oct  7 10:46:16 PDT 2007
+      - Initial release.
+

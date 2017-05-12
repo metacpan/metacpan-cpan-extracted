@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 be0560f404c6dd46b346eec0911688bbdd651206 Build.PL
+SHA1 53a421247929c21f029229a059d8b317e3db8a8d Changes
+SHA1 40dbe2293d1797c99ca91d7513c2243ecba8ed8b LICENSE
+SHA1 9d095a9f6e44af171c9f7ca65441c1afa39d4fa6 MANIFEST
+SHA1 00fed5572918028398abb60a54b2ebfff4e4f9de MANIFEST.SKIP
+SHA1 d6795d58377d09b7f2f4036168a4371519b48182 META.yml
+SHA1 d453ec9fb49a69d6cfeb5e5b2358b6d3dd9de2b1 README
+SHA1 c27449d15022e7e3b30686f7b48310fa731c1874 examples/rrdtool/create.pl
+SHA1 f83fefd55ee834af9038195443573f2dab06a530 examples/rrdtool/cron.sh
+SHA1 51c766a74f6e4e219873bc3b88792bdf19f9bc2e examples/rrdtool/graph.pl
+SHA1 edc86170ebeee150e83dd9be0c0e7ed3859bbd3f examples/rrdtool/update.pl
+SHA1 25edd972bc37fed02eaaf07ed801f54802326251 examples/run.pl
+SHA1 42b37698ca58af827dc7f9aa3f676474e0a6b2df lib/WWW/OPG.pm
+SHA1 c3469c0237d3045a7105d5acbeb27f047bd2e4bc lib/WWW/OPG/Scraper.pm
+SHA1 c538cc4a0d6d3aabf8eb8dfafafbaa1a239c9d35 t/00signature.t
+SHA1 3e9a3181d9d2c964853b1f1a22b33f75df368574 t/01manifest.t
+SHA1 14b28e5ee13d6b765b8974d5b1851666509a176a t/02compile.t
+SHA1 c4ab2c2c5dcf760d35d9c265e728f749f03bb39d t/03core.t
+SHA1 bca902b82e157c1ee3cb05b5087204d163434294 t/04live-scraper.t
+SHA1 77fc2e798476b295374f2d3c38c1bf0e03427ad2 t/04live.t
+SHA1 d8d24f48ac1b0afe35f7f159ce231eb7c1782ae9 t/05exceptions.t
+SHA1 30f7cd0fd94e7cbfa99103a13469ec7ee43b0b5d t/97pod.t
+SHA1 4d4bb37a2645659783a3f667ef68597733d24722 t/98pod-coverage.t
+SHA1 38039ef0a99349b727ba0c52adb8c11fe849193e t/99kwalitee.t
+SHA1 737546a9f397e850081aa3e7283b4a2b9f5340ca t/99meta.t
+SHA1 d8967672d44d9909af2e252a4a18c26a6f9d1575 t/99min-perl.t
+SHA1 a498d66758914b97354b2a64f28db8b55bc59116 t/99portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBCAAGBQJLUV5cAAoJEPPC9oiiHLZI6usQAL0zIuQ1Ej3b2FWQlGtmNyHs
+bydEAiLBlCg6qP6+3aPygUljMxdSTMoJHijxQ71KJG2+c2RwdBAvjDawh/aGUJDC
+KY7iuX2bAcTy1ydcOkXf5+ICIKjRDkzyqy73N0azXSrMmigJMHyOtlaBlcZZrWKP
+KAd2bggbhgKUUhciVrRFEwdOaJrE/WK9jCHQfCQtwR+Gj8EOweVUVVlP7Lnb7OFL
+VMO2AXJgwl+o42mCeOVAN0juNLMPjuUX2Tq26JPi3sh5ZqPS1NW0nfBbDOoqKiZM
+tF+ZVdVaxw2zj9CFAfOAC8GVD7RAmRdqXPgBbEkc0YAzC4NPP3Weqa3/cGlPJkq0
+8CSHQomttn86p1ixqcRYiTREaYbfYYk43S8cigPtdszrLxhBEHn0+WLpe20PAeGn
+eU9Jk1Sw/PhRVmkdGzrTRZo17M8LJmzN1r5QcBiJ5vcLNNhhAcVVPpcnxY8vNbVq
+aK8TN9iYrbIeKJbWiPEQXaq1X/V7TNWOlKlrQeMUW2lYo30ayaFBT4PQVwItIsS4
+ogkq3uCygav6YZTvbBvMCfpPlw0UuXPZEIGq0USJrf9GtgaaBx7FTtucEPMq+Z+D
+65ySMJSu87j08nnO6kQC4ARCaepTraHXAPqX4T3JyersC2EzaaXWSaQDL2ulR4nz
+voXIuQ0ieYLkE6JR0DZz
+=qBj3
+-----END PGP SIGNATURE-----

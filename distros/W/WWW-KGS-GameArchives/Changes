@@ -1,0 +1,35 @@
+Revision history for Perl extension WWW::KGS::GameArchives.
+
+0.06  Jun 4th, 2014
+
+  This module was added to the WWW::GoKGS distribution,
+  and also renamed to WWW::GoKGS::Scraper::GameArchives.
+  See "HISTORY" in WWW::GoKGS::Scraper::GameArchives for details.
+
+  This module will not be maintained anymore.
+  Thanks for using WWW::KGS::GameArchives.
+
+0.05  Jul 17th, 2013
+
+  - add examples/
+  - tests require Path::Class
+
+0.04  Jul 15th, 2013
+
+  - fix KGS's calendar bug
+
+0.03  Jul 15th, 2013
+
+  - #user_agent doesn't default to Web::Scraper#user_agent
+  - simplify the data structure of result->calendar
+
+0.02  Jul 13th, 2013
+
+  - #user_agent defaults to Web::Scraper#user_agent
+  - #_build_scraper creates callbacks more effectively
+
+0.01  Jul 5th, 2013
+
+  - original version
+  - Renamed from Net::KGS::GameArchives to avoid abusing Net:: namespace.
+    Sorry for confusing changes.

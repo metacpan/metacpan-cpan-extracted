@@ -1,0 +1,24 @@
+0.014     2016-07-28
+          Methods to list and delete multipart uploads
+
+0.013     2016-06-19
+          Content-type support
+
+0.012     2016-06-19
+          Workaround. For zero-size object CEPH does not return Content-Lenth header at all.
+
+0.011     2016-06-19
+          Workaround for http://lists.ceph.com/pipermail/ceph-users-ceph.com/2016-June/010704.html
+          implemented. Now it make at least 2 requests during downloads.
+
+0.010     2016-06-19
+          FileShadow implemented
+
+0.004     2016-06-17
+          download_to_file now truncates file
+
+0.003     2016-06-16
+          query_string_authentication_uri implemented
+
+0.002     2016-06-15
+          Initial release

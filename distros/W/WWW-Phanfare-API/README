@@ -1,0 +1,134 @@
+NAME
+    WWW::Phanfare::API - Perl wrapper for Phanfare API
+
+VERSION
+    Version 0.09
+
+SYNOPSIS
+    Create agent. Developer API keys required.
+
+        use WWW::Phanfare::API;
+        my $api = WWW::Phanfare::API->new(
+          api_key     => 'xxx',
+          private_key => 'yyy',
+        );
+
+    Authentication with account:
+
+        my $session = $api->Authenticate(
+           email_address => 'my@email',
+           password      => 'zzz',
+        )
+        die "Cannot authenticate: $session->{code_value}"
+          unless $session->{'stat'} eq 'ok';
+        my $target_uid = $session->{session}{uid};
+
+    Or authenticate as guest:
+
+        $api->AuthenticateGuest();
+
+    Get list of albums:
+
+        my $albumlist = $api->GetAlbumList(
+          target_uid => $session->{session}{uid}
+        )->{albums}{album};
+
+        printf(
+          "%s %s %s\n",
+          $_->{album_id}, substr($_->{album_start_date}, 0, 10), $_->{album_name}
+        ) for @$albumlist;
+
+    Create new album, upload an image to it and delete it all again.
+
+        my $album = $api->NewAlbum(
+          target_uid => $target_uid,
+        );
+
+        my $album_id   = $album->{album}{album_id};
+        my $section_id = $album->{album}{sections}{section}{section_id};
+        my $content    = read_file('IMG_1234.jpg', binmode => ':raw');
+
+        my $image = $api->NewImage(
+          target_uid => $target_uid,
+          album_id   => $album_id,
+          section_id => $section_id,
+          filename   => 'IMG_1234.jpg',
+          content    => $content,
+        );
+
+        my $del_album = $api->DeleteAlbum(
+          target_uid => $target_uid,
+          album_id   => $album_id,
+        );
+
+    Load an image.
+
+        my $image = $api->geturl( $url );
+
+DESCRIPTION
+    Perl wrapper the Phanfare API. A developer API key is required for using
+    this module.
+
+SUBROUTINES/METHODS
+    Refer to methods and required parameters are listed on
+    http://help.phanfare.com/index.php/API .
+
+    api_key and private_key is only required for the constructor, not for
+    individual methods.
+
+    Methods return hash references. The value of the 'stat' key will be 'ok'
+    if the call succeeded. Value of 'code_value' key has error message.
+
+  new
+    Create a new API agent.
+
+  geturl
+    Load data from URL.
+
+AUTHOR
+    Soren Dossing, "<netcom at sauber.net>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-phanfare-api at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Phanfare-API>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Phanfare::API
+
+    You can also look for information at:
+
+    *   Github's request tracker
+
+        <https://github.com/sauber/p5-www-phanfare-api/issues>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Phanfare-API>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Phanfare-API>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Phanfare-API/>
+
+SEE ALSO
+    *   Official Phanfare API Refence Guide
+
+        <http://help.phanfare.com/index.php/API>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Soren Dossing.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

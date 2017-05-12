@@ -1,0 +1,23 @@
+WebService::Etsy
+----------------
+
+This is the README file for WebService::Etsy, a Perl module for
+accessing data from the Etsy REST API.
+
+Documentation for WebService::Etsy is available by doing
+
+    perldoc WebService::CIA
+
+at the command line.
+
+
+Installation
+------------
+
+This module uses Module::Build. The installation process is therefore
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+

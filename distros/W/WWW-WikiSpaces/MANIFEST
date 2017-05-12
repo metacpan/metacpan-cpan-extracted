@@ -1,0 +1,8 @@
+Changes
+examples/example.pl
+lib/WWW/WikiSpaces.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/WWW-WikiSpaces.t

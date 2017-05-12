@@ -1,0 +1,27 @@
+---
+abstract: 'Interface to NewYorkTimes Movie Reviews API.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0505, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-MovieReviews-NYT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: '5.824'
+  LWP::UserAgent: '2.33'
+  perl: '5.006'
+resources:
+  repository: https://github.com/Manwar/WWW-MovieReviews-NYT.git
+version: '0.05'
+

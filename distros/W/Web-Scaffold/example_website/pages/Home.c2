@@ -1,0 +1,14 @@
+<!-- revised 8-30-06 -->
+<table cellspacing=0 cellpadding=5 border=1 width=160>
+<tr><td class=PT>
+<b>Web::Scaffold</b><br>
+A Perl module to easily build fancy web sites with drop down menus and smart
+hot links
+</td></tr></table>
+&nbsp;<p>
+<table cellspacing=0 cellpadding=5 border=1 width=160>
+<tr><td class=PT>
+Two config arrays:<br>
+LINK<#specs#%specs> : look & feel<br>
+LINK<#pages#%pages> : menu system
+</td></tr></table>

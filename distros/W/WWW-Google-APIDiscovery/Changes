@@ -1,0 +1,73 @@
+Revision history for WWW-Google-APIDiscovery
+
+0.20    Thu Oct 08 10:35:00 2015
+        - Added LICENSE file.
+
+0.19    Tue Oct 06 10:25:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.20.
+
+0.18    Sat Sep 05 09:00:00 2015
+        - Added link to the official Google API document.
+
+0.17    Sun Aug 16 10:45:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.18.
+
+0.16    Wed Aug 05 12:00:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.17.
+
+0.15    Sat Jan 17 10:10:00 2015
+        - Removed SIGNATURE file.
+        - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+        - Updated Copyright year information.
+
+0.14    Thu Aug 28 02:40:00 2014
+        - Updated pre-requisite module "WWW::Google::UserAgent" version 0.10.
+
+0.13    Thu Aug 28 02:20:00 2014
+        - Added section "CONTRIBUTORS" to the pod document.
+
+0.12    Thu Aug 28 02:00:00 2014
+        - Merged patch from Gabor Szabo about link to GitHub from META.
+        - Added section "REPOSITORY" to the pod document.
+
+0.11    Sat Aug 09 00:05:00 2014
+        - Tidied up README file.
+
+0.10    Tue Aug 05 23:34:09 2014
+        - Fixed unit test 02-discover.t to handle where no internet connection is found.
+
+0.09    Sun Aug 03 06:00:00 2014
+        - Added missing pre-requisite WWW::Google::UserAgent v0.07
+        - Added method exposed by WWW::Google::APIDiscovery::API
+
+0.08    Sun Aug 03 04:05:06 2014
+        - Added method supported_apis() to WWW::Google::APIDiscovery class.
+        - Fixed the code in the SYNOPSIS of WWW::Google::APIDiscovery.
+        - Added more attributes to the WWW::Google::APIDiscovery::API::MetaData class.
+        - Added details of every attributes of WWW::Google::APIDiscovery::API::MetaData class.
+
+0.07    Sun Aug 03 03:28:15 2014
+        - Updated method discover() to return object of type WWW::Google::APIDiscovery::API::MetaData.
+        - Updated "Name" in the pod document of WWW::Google::APIDiscovery::API::MetaData.
+        - Updated "License" information in the Makefile.PL
+
+0.06    Sat Aug 02 03:18:11 2014
+        - Re-structured the code using 'Moo'
+        - Made the result object
+
+0.05    Mon Nov 28 12:27:01 2011
+        - Importing Moose instead of Mouse in the Result class.
+
+0.04    Mon Sep 12 12:13:14 2011
+        - Added Result handler class for WWW::Google::APIDiscovery module.
+        - Added unit test.
+
+0.03    Mon Aug 08 12:34:11 2011
+        - Made Readonly v1.03 as minimum requirement.
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.02    Mon Jul 04 10:22:23 2011
+        - Corrected the examples in the pod.
+
+0.01    Fri Jul 01 18:14:01 2011
+        - First version, released.

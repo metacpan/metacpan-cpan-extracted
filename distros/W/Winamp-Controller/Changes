@@ -1,0 +1,9 @@
+Revision history for Perl extension Winamp::Controller.
+
+0.02  Fri Jan  3 02:28:37 2014
+	- Improved documentation
+
+0.01  Thu Jan  2 16:49:56 2014
+	- Support for simple tasks: connect to Winamp, get version, clear playlist, delete playlist items, enqueue a file on a playlist, and generate a random playlist.
+	- original version; created by h2xs 1.23 with options -AX Winamp::Controller
+

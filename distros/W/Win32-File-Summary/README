@@ -1,0 +1,32 @@
+Win32/File/Prop version 0.01
+===============================
+
+The modul Win32::File::Summary can be used to get the summary informations from a MS compound file or normal (text) files.
+What are the summary information: 
+For compound documents, e.g. Word, you can add Title, Author, Description and some other informations to the document.
+The same, but not all of them you can add also to normal (text) files.
+This informationes can be read and add in the Property Dialog under the tab Summary. The module now reads these informations.
+
+
+
+INSTALLATION
+
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MS SDK: Uuid.lib mfc42.lib
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Reinhard Pagitsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

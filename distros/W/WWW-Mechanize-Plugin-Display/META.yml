@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: WWW-Mechanize-Plugin-Display
+version: 1.01
+author: []
+abstract: |-
+  Display WWW::Mechanize results in a local web browser.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Display: 0
+  WWW::Mechanize: 0
+provides:
+  WWW::Mechanize::Plugin::Display:
+    file: lib/WWW/Mechanize/Plugin/Display.pm
+    version: 1.01
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: |-
+    http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

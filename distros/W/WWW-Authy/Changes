@@ -1,0 +1,29 @@
+==================================================
+Changes from 1739-01-30 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2012-11-13 01:35:38 +0000
+------------------------------------------
+
+  Change: a9fb70f06ea994ce08a29f3e43db65f67de9c484
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-11-13 02:35:31 +0000
+
+    Added sms feature 
+
+  Change: fe27bd811d69daadfb65a03707256b7318b266c8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 08:41:48 +0000
+
+    First version, .... nearly all done, probably nicer error handling 
+
+  Change: cc087a22ac28678a79511fe5167191e4a1fd4e45
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-09-26 06:32:16 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,1754 @@
+<definitions name="Account" targetNamespace="http://soap.vindicia.com/v4_0/Account" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v4_0/Account" xmlns:vin="http://soap.vindicia.com/v4_0/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v4_0/Account" >
+  <documentation>WSDL Specification for Account</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v4_0/Account">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v4_0/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+            <xsd:element name="created" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="stopAutoBilling">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="autobills" type="vin:AutoBill" />
+            <xsd:element name="disentitle" type="xsd:boolean" />
+            <xsd:element name="force" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="stopAutoBillingResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updatePaymentMethod">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element name="replaceOnAllAutoBills" type="xsd:boolean" />
+            <xsd:element name="updateBehavior" type="vin:PaymentUpdateBehavior" />
+            <xsd:element name="numCycles" type="xsd:int" />
+            <xsd:element minOccurs="0" name="ignoreAvsPolicy" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="ignoreCvnPolicy" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updatePaymentMethodResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+            <xsd:element name="validated" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantAccountId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantAccountId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantAccountIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByEmail">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="emailAddress" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByEmailResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="accounts" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByPaymentMethod">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByPaymentMethodResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="accounts" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tokenBalance">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokens" type="vin:Token" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tokenBalanceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tokenTransaction">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="transactions" type="vin:TokenTransaction" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="tokenTransactionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="incrementTokens">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="incrementTokensResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="decrementTokens">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="decrementTokensResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="tokenAmounts" type="vin:TokenAmount" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="transfer">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="targetAccount" type="vin:Account" />
+            <xsd:element name="sourceAccount" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="transferResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="mergedAccount" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="redeemGiftCard">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+            <xsd:element minOccurs="0" name="credit" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="redeemGiftCardResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="giftcard" type="vin:GiftCard" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="credit" type="vin:Credit" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantCreditResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="credit" type="vin:Credit" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeCreditResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchCreditHistory">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="endTimestamp" type="xsd:dateTime" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchCreditHistoryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="creditEventLogs" type="vin:CreditEventLog" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchAllCreditHistory">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="endTimestamp" type="xsd:dateTime" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchAllCreditHistoryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="creditEventLogs" type="vin:CreditEventLog" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="addChildren">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="parent" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="child" type="vin:Account" />
+            <xsd:element minOccurs="0" name="force" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="payerReplacementBehavior" type="vin:AccountPayerReplacementBehavior" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="addChildrenResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="childAdded" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="removeChildren">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="parent" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="child" type="vin:Account" />
+            <xsd:element minOccurs="0" name="payerReplacementBehavior" type="vin:AccountPayerReplacementBehavior" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="removeChildrenResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchFamily">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchFamilyResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="parent" type="vin:Account" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="child" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="transferCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="fromAccount" type="vin:Account" />
+            <xsd:element name="toAccount" type="vin:Account" />
+            <xsd:element name="credit" type="vin:Credit" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="transferCreditResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="makePayment">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element name="amount" type="xsd:decimal" />
+            <xsd:element minOccurs="0" name="currency" type="xsd:string" />
+            <xsd:element name="invoiceId" type="xsd:string" />
+            <xsd:element minOccurs="0" name="overageDisposition" type="vin:PaymentOverageDisposition" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="makePaymentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="transaction" type="vin:Transaction" />
+            <xsd:element minOccurs="0" name="summary" type="vin:TransactionAttemptSummary" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reversePayment">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="timestamp" type="xsd:dateTime" />
+            <xsd:element minOccurs="0" name="paymentId" type="xsd:string" />
+            <xsd:element minOccurs="0" name="invoiceId" type="xsd:string" />
+            <xsd:element minOccurs="0" name="indexNumber" type="xsd:int" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reversePaymentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="isEntitled">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="merchantEntitlementId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="isEntitledResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="entitled" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantEntitlement">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="entitlement" type="vin:Entitlement" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantEntitlementResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeEntitlement">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="entitlement" type="vin:Entitlement" />
+            <xsd:element minOccurs="0" name="merchantEntitlementId" type="xsd:string" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeEntitlementResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="extendEntitlementToDate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="entitlement" type="vin:Entitlement" />
+            <xsd:element minOccurs="0" name="merchantEntitlementId" type="xsd:string" />
+            <xsd:element name="extensionDate" type="xsd:dateTime" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="extendEntitlementToDateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="extendEntitlementByInterval">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="entitlement" type="vin:Entitlement" />
+            <xsd:element minOccurs="0" name="merchantEntitlementId" type="xsd:string" />
+            <xsd:element name="interval" type="vin:TimeInterval" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="extendEntitlementByIntervalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="stopAutoBilling_in">
+    <part element="tns:stopAutoBilling" name="parameters" />
+  </message>
+  <message name="stopAutoBilling_out">
+    <part element="tns:stopAutoBillingResponse" name="parameters" />
+  </message>
+  <message name="updatePaymentMethod_in">
+    <part element="tns:updatePaymentMethod" name="parameters" />
+  </message>
+  <message name="updatePaymentMethod_out">
+    <part element="tns:updatePaymentMethodResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantAccountId_in">
+    <part element="tns:fetchByMerchantAccountId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantAccountId_out">
+    <part element="tns:fetchByMerchantAccountIdResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_in">
+    <part element="tns:fetchByWebSessionVid" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_out">
+    <part element="tns:fetchByWebSessionVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByEmail_in">
+    <part element="tns:fetchByEmail" name="parameters" />
+  </message>
+  <message name="fetchByEmail_out">
+    <part element="tns:fetchByEmailResponse" name="parameters" />
+  </message>
+  <message name="fetchByPaymentMethod_in">
+    <part element="tns:fetchByPaymentMethod" name="parameters" />
+  </message>
+  <message name="fetchByPaymentMethod_out">
+    <part element="tns:fetchByPaymentMethodResponse" name="parameters" />
+  </message>
+  <message name="tokenBalance_in">
+    <part element="tns:tokenBalance" name="parameters" />
+  </message>
+  <message name="tokenBalance_out">
+    <part element="tns:tokenBalanceResponse" name="parameters" />
+  </message>
+  <message name="tokenTransaction_in">
+    <part element="tns:tokenTransaction" name="parameters" />
+  </message>
+  <message name="tokenTransaction_out">
+    <part element="tns:tokenTransactionResponse" name="parameters" />
+  </message>
+  <message name="incrementTokens_in">
+    <part element="tns:incrementTokens" name="parameters" />
+  </message>
+  <message name="incrementTokens_out">
+    <part element="tns:incrementTokensResponse" name="parameters" />
+  </message>
+  <message name="decrementTokens_in">
+    <part element="tns:decrementTokens" name="parameters" />
+  </message>
+  <message name="decrementTokens_out">
+    <part element="tns:decrementTokensResponse" name="parameters" />
+  </message>
+  <message name="transfer_in">
+    <part element="tns:transfer" name="parameters" />
+  </message>
+  <message name="transfer_out">
+    <part element="tns:transferResponse" name="parameters" />
+  </message>
+  <message name="redeemGiftCard_in">
+    <part element="tns:redeemGiftCard" name="parameters" />
+  </message>
+  <message name="redeemGiftCard_out">
+    <part element="tns:redeemGiftCardResponse" name="parameters" />
+  </message>
+  <message name="grantCredit_in">
+    <part element="tns:grantCredit" name="parameters" />
+  </message>
+  <message name="grantCredit_out">
+    <part element="tns:grantCreditResponse" name="parameters" />
+  </message>
+  <message name="revokeCredit_in">
+    <part element="tns:revokeCredit" name="parameters" />
+  </message>
+  <message name="revokeCredit_out">
+    <part element="tns:revokeCreditResponse" name="parameters" />
+  </message>
+  <message name="fetchCreditHistory_in">
+    <part element="tns:fetchCreditHistory" name="parameters" />
+  </message>
+  <message name="fetchCreditHistory_out">
+    <part element="tns:fetchCreditHistoryResponse" name="parameters" />
+  </message>
+  <message name="fetchAllCreditHistory_in">
+    <part element="tns:fetchAllCreditHistory" name="parameters" />
+  </message>
+  <message name="fetchAllCreditHistory_out">
+    <part element="tns:fetchAllCreditHistoryResponse" name="parameters" />
+  </message>
+  <message name="addChildren_in">
+    <part element="tns:addChildren" name="parameters" />
+  </message>
+  <message name="addChildren_out">
+    <part element="tns:addChildrenResponse" name="parameters" />
+  </message>
+  <message name="removeChildren_in">
+    <part element="tns:removeChildren" name="parameters" />
+  </message>
+  <message name="removeChildren_out">
+    <part element="tns:removeChildrenResponse" name="parameters" />
+  </message>
+  <message name="fetchFamily_in">
+    <part element="tns:fetchFamily" name="parameters" />
+  </message>
+  <message name="fetchFamily_out">
+    <part element="tns:fetchFamilyResponse" name="parameters" />
+  </message>
+  <message name="transferCredit_in">
+    <part element="tns:transferCredit" name="parameters" />
+  </message>
+  <message name="transferCredit_out">
+    <part element="tns:transferCreditResponse" name="parameters" />
+  </message>
+  <message name="makePayment_in">
+    <part element="tns:makePayment" name="parameters" />
+  </message>
+  <message name="makePayment_out">
+    <part element="tns:makePaymentResponse" name="parameters" />
+  </message>
+  <message name="reversePayment_in">
+    <part element="tns:reversePayment" name="parameters" />
+  </message>
+  <message name="reversePayment_out">
+    <part element="tns:reversePaymentResponse" name="parameters" />
+  </message>
+  <message name="isEntitled_in">
+    <part element="tns:isEntitled" name="parameters" />
+  </message>
+  <message name="isEntitled_out">
+    <part element="tns:isEntitledResponse" name="parameters" />
+  </message>
+  <message name="grantEntitlement_in">
+    <part element="tns:grantEntitlement" name="parameters" />
+  </message>
+  <message name="grantEntitlement_out">
+    <part element="tns:grantEntitlementResponse" name="parameters" />
+  </message>
+  <message name="revokeEntitlement_in">
+    <part element="tns:revokeEntitlement" name="parameters" />
+  </message>
+  <message name="revokeEntitlement_out">
+    <part element="tns:revokeEntitlementResponse" name="parameters" />
+  </message>
+  <message name="extendEntitlementToDate_in">
+    <part element="tns:extendEntitlementToDate" name="parameters" />
+  </message>
+  <message name="extendEntitlementToDate_out">
+    <part element="tns:extendEntitlementToDateResponse" name="parameters" />
+  </message>
+  <message name="extendEntitlementByInterval_in">
+    <part element="tns:extendEntitlementByInterval" name="parameters" />
+  </message>
+  <message name="extendEntitlementByInterval_out">
+    <part element="tns:extendEntitlementByIntervalResponse" name="parameters" />
+  </message>
+  <portType name="AccountPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="stopAutoBilling">
+      <input message="tns:stopAutoBilling_in" />
+      <output message="tns:stopAutoBilling_out" />
+    </operation>
+    <operation name="updatePaymentMethod">
+      <input message="tns:updatePaymentMethod_in" />
+      <output message="tns:updatePaymentMethod_out" />
+    </operation>
+    <operation name="fetchByMerchantAccountId">
+      <input message="tns:fetchByMerchantAccountId_in" />
+      <output message="tns:fetchByMerchantAccountId_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <input message="tns:fetchByWebSessionVid_in" />
+      <output message="tns:fetchByWebSessionVid_out" />
+    </operation>
+    <operation name="fetchByEmail">
+      <input message="tns:fetchByEmail_in" />
+      <output message="tns:fetchByEmail_out" />
+    </operation>
+    <operation name="fetchByPaymentMethod">
+      <input message="tns:fetchByPaymentMethod_in" />
+      <output message="tns:fetchByPaymentMethod_out" />
+    </operation>
+    <operation name="tokenBalance">
+      <input message="tns:tokenBalance_in" />
+      <output message="tns:tokenBalance_out" />
+    </operation>
+    <operation name="tokenTransaction">
+      <input message="tns:tokenTransaction_in" />
+      <output message="tns:tokenTransaction_out" />
+    </operation>
+    <operation name="incrementTokens">
+      <input message="tns:incrementTokens_in" />
+      <output message="tns:incrementTokens_out" />
+    </operation>
+    <operation name="decrementTokens">
+      <input message="tns:decrementTokens_in" />
+      <output message="tns:decrementTokens_out" />
+    </operation>
+    <operation name="transfer">
+      <input message="tns:transfer_in" />
+      <output message="tns:transfer_out" />
+    </operation>
+    <operation name="redeemGiftCard">
+      <input message="tns:redeemGiftCard_in" />
+      <output message="tns:redeemGiftCard_out" />
+    </operation>
+    <operation name="grantCredit">
+      <input message="tns:grantCredit_in" />
+      <output message="tns:grantCredit_out" />
+    </operation>
+    <operation name="revokeCredit">
+      <input message="tns:revokeCredit_in" />
+      <output message="tns:revokeCredit_out" />
+    </operation>
+    <operation name="fetchCreditHistory">
+      <input message="tns:fetchCreditHistory_in" />
+      <output message="tns:fetchCreditHistory_out" />
+    </operation>
+    <operation name="fetchAllCreditHistory">
+      <input message="tns:fetchAllCreditHistory_in" />
+      <output message="tns:fetchAllCreditHistory_out" />
+    </operation>
+    <operation name="addChildren">
+      <input message="tns:addChildren_in" />
+      <output message="tns:addChildren_out" />
+    </operation>
+    <operation name="removeChildren">
+      <input message="tns:removeChildren_in" />
+      <output message="tns:removeChildren_out" />
+    </operation>
+    <operation name="fetchFamily">
+      <input message="tns:fetchFamily_in" />
+      <output message="tns:fetchFamily_out" />
+    </operation>
+    <operation name="transferCredit">
+      <input message="tns:transferCredit_in" />
+      <output message="tns:transferCredit_out" />
+    </operation>
+    <operation name="makePayment">
+      <input message="tns:makePayment_in" />
+      <output message="tns:makePayment_out" />
+    </operation>
+    <operation name="reversePayment">
+      <input message="tns:reversePayment_in" />
+      <output message="tns:reversePayment_out" />
+    </operation>
+    <operation name="isEntitled">
+      <input message="tns:isEntitled_in" />
+      <output message="tns:isEntitled_out" />
+    </operation>
+    <operation name="grantEntitlement">
+      <input message="tns:grantEntitlement_in" />
+      <output message="tns:grantEntitlement_out" />
+    </operation>
+    <operation name="revokeEntitlement">
+      <input message="tns:revokeEntitlement_in" />
+      <output message="tns:revokeEntitlement_out" />
+    </operation>
+    <operation name="extendEntitlementToDate">
+      <input message="tns:extendEntitlementToDate_in" />
+      <output message="tns:extendEntitlementToDate_out" />
+    </operation>
+    <operation name="extendEntitlementByInterval">
+      <input message="tns:extendEntitlementByInterval_in" />
+      <output message="tns:extendEntitlementByInterval_out" />
+    </operation>
+  </portType>
+  <binding name="AccountBinding" type="tns:AccountPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new Account object or updates an existing one. You can't update Payment Methods using this call, Please see updatePaymentMethod<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The <a href="#data_type.Account">Account</a> class object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The <a href="#data_type.Account">Account</a> class object</dd>
+<dt><b>created</b></dt>
+<dd>True if the object was created new</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="stopAutoBilling">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Cancels and optionally dis-entitles a specified or all AutoBill objects for an Account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+<dt><b>autobills</b></dt>
+<dd>The autobills to be cancelled.  If none specified, cancels all AutoBills.</dd>
+<dt><b>disentitle</b></dt>
+<dd>If true, also immediately disentitles the Account for relevant Products.</dd>
+<dt><b>force</b></dt>
+<dd>If true, allows cancelling even if within a defined commitment period.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#stopAutoBilling" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="updatePaymentMethod">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new payment method if necessary, and, if so specified, sets this payment method to replace all others on all of an account's autobills.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>Method to add</dd>
+<dt><b>replaceOnAllAutoBills</b></dt>
+<dd>If true, replaces the autobilling on all this Account's AutoBills</dd>
+<dt><b>updateBehavior</b></dt>
+<dd>Whether to just update, validate first, or catch up billing first</dd>
+<dt><b>numCycles</b></dt>
+<dd>Number of cycles to catch up if updateBehavior is set to CatchUp. This parameter is currently not supported and is reserved for future implementation</dd>
+<dt><b>ignoreAvsPolicy</b></dt>
+<dd>Set to 1, to not evaluate any custom or default avs policy.</dd>
+<dt><b>ignoreCvnPolicy</b></dt>
+<dd>Set to 1, to not evaluate any custom or default cvn policy.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+<dt><b>validated</b></dt>
+<dd>True if the payment method was successfully validated</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#updatePaymentMethod" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantAccountId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an account by the merchant's unique customer ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantAccountId</b></dt>
+<dd>Merchant ID for the customer</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchByMerchantAccountId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an account by Vindicia's unique ID for the account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the customer</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The account object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an account by WebSession's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the WebSession object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchByWebSessionVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByEmail">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an account by an email address<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>emailAddress</b></dt>
+<dd>Address to load by</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>accounts</b></dt>
+<dd>The account objects</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchByEmail" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByPaymentMethod">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+This method will return a list of accounts that have the specified payment method associated with them. The       The input PaymentMethod object need not be fully populated. If VID is specified in the input PaymentMethod object, it will be used as the primary       identifying factor for the payment method record to be used as the search criterion. If VID is not specified in the input PaymentMethod object, merchantPaymentMethodId       will be used as the primary identifying factor for the payment method record to be used as the search criterion. If both VID, and merchantPaymentMethod are absent,       account number for a Credit Card, account number - bank routing number combination for ACH/ECP, fiscal number used for a Boleto payment will be used as the search criterion depending on       type specified in the input PaymentMethod object. Since PayPal transactions processed through CashBox have no unique identifier, all accounts that use PayPal will be       returned. Merchants should use the paging parameters to limit the number of records returned per call<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>Payment method to use as search criterion</dd>
+<dt><b>page</b></dt>
+<dd>Page number to begin results returned. First page number is 0</dd>
+<dt><b>pageSize</b></dt>
+<dd>Number of results to display per page, should be more than 0</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>accounts</b></dt>
+<dd>Array of Account objects matching the search criteria</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchByPaymentMethod" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="tokenBalance">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Returns a customer's balance of tokens of the requested type, or all types attached to the account if none are specified
+<p>
+Has the following return values:<p>
+
+'404:Token not found' One or more tokens specified is not a saved
+type; all transactions are aborted, and the tokens are not created or transferred.<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account for which token balance is to be obtained</dd>
+<dt><b>tokens</b></dt>
+<dd>Token(s) balance is requested for, if not specified all tokens attached to the account will be returned</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>The       customer's resultant balances specified or all token types</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#tokenBalance" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="tokenTransaction">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Performs one or more token transactions on an account. These transactions
+may be on multiple token types, and may be positive (increasing token balance) or negative (reducing token balance).
+<p>
+Has the following return values:<p>
+'401:Balance too low' One or more transaction requested would drop the user's balance below 0<br>
+'404:Token not found' One or more tokens specified is not a saved
+type; the tokens available on the account are still returned, however.<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account for which this transaction is to be conducted</dd>
+<dt><b>transactions</b></dt>
+<dd>A set of token transactions to be performed against the user's account</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>New balances for each changed token</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#tokenTransaction" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="incrementTokens">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Performs one or more token transactions on an account. These transactions
+may be on multiple token types.  This method is equivalent to tokenTransaction with a negative value for token amount(s).
+<p>
+Has the following return values:<p>
+'404:Token not found' One or more tokens specified is not a saved
+type; the tokens available on the account are still returned, however.<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this token transaction applies</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>A set of token amounts to be added to the user's account</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>New balances for each changed token</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#incrementTokens" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="decrementTokens">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Performs one or more token transactions on an account. These transactions
+may be on multiple token types.  This method is equivalent to tokenTransaction with a positive value for token amount(s).
+<p>
+Has the following return values:<p>
+'401:Balance too low' One or more requested token decrements would drop the user's balance below 0<br>
+'404:Token not found' One or more tokens specified is not a saved
+type; the tokens available on the account are still returned, however.<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this token transaction applies</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>A set of token amounts to be subtracted from the user's account</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>tokenAmounts</b></dt>
+<dd>New balances for each changed token</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#decrementTokens" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="transfer">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Merges target account with a given (source) account and returns the target account with merged contents. Both accounts specified as input to this call must exist in the CashBox system otherwise an error will be returned. This method transfers payment methods, chargebacks, tax exemptions, autobills, activities, token grants and deductions, transactions, and name-value pairs associated with the source account into the target account. Additionally, it creates two name-value pairs with names VIN_MERCHANT_CUSTOMER_ID_UPDATED_FROM and VIN_MERCHANT_CUSTOMER_ID_UPDATED_DATE in each of the autobill object transferred indicating the original merchantCustomerId the autobill was associated with and the date on which it was transferred. The source account is stripped of all of the above contents but will continue to exist in the system with some basic attributes.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>targetAccount</b></dt>
+<dd>Target account into which the contents of the two accounts will be merged</dd>
+<dt><b>sourceAccount</b></dt>
+<dd>Account to be merged with the target account</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>mergedAccount</b></dt>
+<dd>Target account with merged contents of the two input accounts</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#transfer" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="redeemGiftCard">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Redeems gift card for an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this gift card redemption applies</dd>
+<dt><b>giftcard</b></dt>
+<dd>The gift card being redeemed</dd>
+<dt><b>credit</b></dt>
+<dd>Number of credits to be redeemed from gift card (CURRENTLY UNSUPPORTED)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>giftcard</b></dt>
+<dd>Gift card that was redeemed with updated status</dd>
+<dt><b>account</b></dt>
+<dd>Account with updated credit as granted by gift card redemption</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#redeemGiftCard" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="grantCredit">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Grant credit to an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this credit grant applies</dd>
+<dt><b>credit</b></dt>
+<dd>Credits to be granted</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding credit being granted</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with new credit balances for each changed credit</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#grantCredit" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="revokeCredit">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Decrement credits from an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this credit decrement applies</dd>
+<dt><b>credit</b></dt>
+<dd>Credits to be decremented</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding credit being revoked</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with new credit balances for each changed credit</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#revokeCredit" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchCreditHistory">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Fetch credit grant/decrement history for an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The Account to which this request applies</dd>
+<dt><b>timestamp</b></dt>
+<dd>All credit events on or after this timestamp</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>All credit events before this timestamp</dd>
+<dt><b>page</b></dt>
+<dd>Optional page number to begin results returned</dd>
+<dt><b>pageSize</b></dt>
+<dd>Optional number of results to display per a page</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>creditEventLogs</b></dt>
+<dd>Credit events (grants/deductions), with timestamp and event type</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchCreditHistory" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchAllCreditHistory">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Fetch credit grant/decrement history for all accounts<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>timestamp</b></dt>
+<dd>All credit events on or after this timestamp</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>All credit events before this timestamp</dd>
+<dt><b>page</b></dt>
+<dd>Optional page number to begin results returned</dd>
+<dt><b>pageSize</b></dt>
+<dd>Optional number of results to display per a page</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>creditEventLogs</b></dt>
+<dd>Credit events (grants/deductions), with timestamp and event type</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchAllCreditHistory" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="addChildren">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Add one or more child accounts to a parent account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>parent</b></dt>
+<dd>The Account that should be parent to these children</dd>
+<dt><b>child</b></dt>
+<dd>The child or children that should be attached to this parent account</dd>
+<dt><b>force</b></dt>
+<dd>If set, replace any parents that these children may already have</dd>
+<dt><b>payerReplacementBehavior</b></dt>
+<dd>Controls how existing AutoBills of the children are affected</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>childAdded</b></dt>
+<dd>The child or children added</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#addChildren" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="removeChildren">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Delete one or more child accounts from a parent account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>parent</b></dt>
+<dd>The Account that should be parent to these children</dd>
+<dt><b>child</b></dt>
+<dd>The child or children that should be deleted from this parent account</dd>
+<dt><b>payerReplacementBehavior</b></dt>
+<dd>Controls how existing AutoBills of the children are affected</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#removeChildren" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchFamily">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Return the family of the given account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account that you want to look up the family for</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>parent</b></dt>
+<dd>The parent Account for this family</dd>
+<dt><b>child</b></dt>
+<dd>The child or children in this family</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#fetchFamily" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="transferCredit">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Transfer credits from one account to another<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>fromAccount</b></dt>
+<dd>The parent Account to transfer credits from</dd>
+<dt><b>toAccount</b></dt>
+<dd>The child account to transfer credits to</dd>
+<dt><b>credit</b></dt>
+<dd>Credits to be transferred</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#transferCredit" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="makePayment">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+makes a payment against an Account/AutoBill<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this payment applies</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The <a href="#data_type.PaymentMethod">PaymentMethod</a> used for this Payment.</dd>
+<dt><b>amount</b></dt>
+<dd>Amount to pay.</dd>
+<dt><b>currency</b></dt>
+<dd>ISO 4217 currency code for amount. This must match the currency used for charges on the current invoice (if not specified, the AutoBill/Invoice currency will be used).</dd>
+<dt><b>invoiceId</b></dt>
+<dd>ID of Invoice to make payment against.</dd>
+<dt><b>overageDisposition</b></dt>
+<dd>How to disposition amounts in excess of a required AutoBill payment amount.  Defaults to applyToOldestInvoice if not specified</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding payment being made</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>transaction</b></dt>
+<dd>The transaction generated by the payment attempt.  This transaction must be inspected to assess the details of the payment attempt.</dd>
+<dt><b>summary</b></dt>
+<dd>Summary of payment attempt</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#makePayment" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="reversePayment">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Reverses an Account/AutoBill payment. This may only be used with payments using MerchantAcceptedPayment PaymentMethods.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this reversal applies</dd>
+<dt><b>timestamp</b></dt>
+<dd>Time that payment reversal occurred</dd>
+<dt><b>paymentId</b></dt>
+<dd>The paymentId of the <a href="#data_type.MerchantAcceptedPayment">MerchantAcceptedPayment</a> used for this Payment.  Either the paymentID, or the invoiceID (and optional indexNumber) must be specified.</dd>
+<dt><b>invoiceId</b></dt>
+<dd>ID of Invoice associated with the payment reversal. Either the paymentID, or the invoiceID (and optional indexNumber) must be specified.</dd>
+<dt><b>indexNumber</b></dt>
+<dd>IndexNumber of the payment item (on the invoiceID invoice) that is being reversed.</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding payment being reversed</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#reversePayment" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="isEntitled">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Determines whether or not an account has an entitlement.  This will check account entitlements,                                  as well as entitlements associated with the account AutoBills.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account for which the check is to be performed</dd>
+<dt><b>merchantEntitlementId</b></dt>
+<dd>The merchant's unique ID for this entitlement</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>entitled</b></dt>
+<dd>Set to true if the customer is entitled</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#isEntitled" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="grantEntitlement">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Grants entitlement to an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this grant applies</dd>
+<dt><b>entitlement</b></dt>
+<dd>Entitlement for a given Account</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding entitlement being granted</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with new entitlements</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#grantEntitlement" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="revokeEntitlement">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Revokes entitlement from an account (Note:  This will not revoke AutoBill entitlements)<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this revocation applies</dd>
+<dt><b>entitlement</b></dt>
+<dd>Entitlement for a given Account</dd>
+<dt><b>merchantEntitlementId</b></dt>
+<dd>The merchant's unique ID for this entitlement. This may be specified in lieu of                   the full Entitlement object.  Note that Either the Entitlement or the merchantEntitlementId                   must be specified.</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding entitlement revocation</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with modified entitlements</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#revokeEntitlement" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="extendEntitlementToDate">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Extends an account entitlement to the date provided<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this extension applies</dd>
+<dt><b>entitlement</b></dt>
+<dd>Entitlement for a given Account</dd>
+<dt><b>merchantEntitlementId</b></dt>
+<dd>The merchant's unique ID for this entitlement. This may be specified in lieu of                   the full Entitlement object.  Note that Either the Entitlement or the merchantEntitlementId                   must be specified.</dd>
+<dt><b>extensionDate</b></dt>
+<dd>New end time for entitlement</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding entitlement extension</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with modified entitlements</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#extendEntitlementToDate" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="extendEntitlementByInterval">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Extends an account entitlement by the interval provided<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account to which this extension applies</dd>
+<dt><b>entitlement</b></dt>
+<dd>Entitlement for a given Account</dd>
+<dt><b>merchantEntitlementId</b></dt>
+<dd>The merchant's unique ID for this entitlement. This may be specified in lieu of                   the full Entitlement object.  Note that Either the Entitlement or the merchantEntitlementId                   must be specified.</dd>
+<dt><b>interval</b></dt>
+<dd>Extension interval to be applied to entitlement</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding entitlement extension</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>account</b></dt>
+<dd>Account with modified entitlements</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v4_0/Account#extendEntitlementByInterval" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Account">
+    <port binding="tns:AccountBinding" name="AccountPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

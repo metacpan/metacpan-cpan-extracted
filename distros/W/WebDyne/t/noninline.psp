@@ -1,0 +1,14 @@
+<start_html lang="en-US">
+<p>
+<perl method="hello0"/>
+<p>
+<perl method="hello1">Hello World 1</perl>
+<p>
+<perl method="hello1">Hello World 1 Again</perl>
+<p>
+<perl method="hello2">Hello World 2 </perl>
+<end_html>
+__PERL__
+sub hello0 { return \'Hello World 0' }
+sub hello1 { return shift()->render() }
+sub hello2 { my $s=shift(); my @r=map { $s->render() } (0..2); \@r }

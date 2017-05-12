@@ -1,0 +1,57 @@
+<%init>
+	my $newsgroups = 0;
+	my $email = 0;
+	my $format = 0;	
+</%init>
+
+<%method text>
+From: <& /maslib/defaults.mas:author &> <<& /maslib/defaults.mas:email &>>
+Newsgroups: <& /maslib/defaults.mas:perl_announce_newsgroup &>
+Subject: [ANNOUNCE] <& /maslib/defaults.mas:pkg &> <& /maslib/defaults.mas:version &> enters CPAN
+
+
+LAST CHANGES <& /maslib/changes.mas:current &>
+
+Enjoy,
+<& /maslib/defaults.mas:author &>
+
+NAME
+<& /maslib/defaults.mas:pkg &> - <& /maslib/defaults.mas:info &>
+
+VERSION
+<& /maslib/defaults.mas:version &> (<& /maslib/defaults.mas:buildtm &>)
+
+DESCRIPTION
+<& /maslib/defaults.mas:short_desc &>
+
+AUTHOR
+<& /maslib/defaults.mas:author &>, <<& /maslib/defaults.mas:email &>>
+
+COPYRIGHT/LICENSE
+<& /maslib/defaults.mas:copyright &>
+</%method>
+
+<%method usenet>
+<%args>	
+	$newshost
+	$username
+	$passwd	
+</%args>
+<%perl>
+
+use Net::NNTP;
+
+my $nntp = Net::NNTP->new( $newshost, Debug => 1 ) or die "Cannot connect to $newshost\n";
+		
+$nntp->authinfo ( $username, $passwd );
+								
+my @text = $m->base_comp->call_method( 'text' );
+						
+print @text;
+			
+$nntp->post( \@text ) if $nntp->postok;
+		
+$nntp->quit();
+
+</%perl>
+</%method>

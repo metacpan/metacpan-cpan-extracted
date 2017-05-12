@@ -1,0 +1,41 @@
+---
+author:
+  - 'John D Jones III, C<< <jnbek at cpan dot org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.87_01
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-AUR
+no_index:
+  dir:
+    - ex
+  directory:
+    - inc
+    - t
+    - xt
+  package:
+    - WWW::AUR::RPC
+requires:
+  Archive::Tar: 0
+  Carp: 0
+  Cwd: 0
+  Fcntl: 0
+  File::Path: '2.06'
+  File::Spec: 0
+  HTTP::Cookies: 0
+  JSON: 0
+  LWP::Protocol::https: '6'
+  LWP::UserAgent: '6'
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jnbek/perl-www-aur
+version: '0.22'

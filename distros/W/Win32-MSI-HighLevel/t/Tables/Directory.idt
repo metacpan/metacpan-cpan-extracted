@@ -1,0 +1,6 @@
+Directory	Directory_Parent	DefaultDir
+s72	S72	s255
+Directory	Directory
+Dobbie	TARGETDIR	target~1|Target Dir:wibble~1|Wibble Plonk
+Root	TARGETDIR	.
+TARGETDIR		SrcDir|SourceDir

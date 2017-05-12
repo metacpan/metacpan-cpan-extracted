@@ -1,0 +1,60 @@
+{
+   "abstract" : "Get common shipping information from supported carriers",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Webservice-Shipment",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.0",
+            "Time::Piece" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Webservice::Shipment" : {
+         "file" : "lib/Webservice/Shipment.pm",
+         "version" : "0.03"
+      },
+      "Webservice::Shipment::Carrier" : {
+         "file" : "lib/Webservice/Shipment/Carrier.pm"
+      },
+      "Webservice::Shipment::Carrier::UPS" : {
+         "file" : "lib/Webservice/Shipment/Carrier/UPS.pm"
+      },
+      "Webservice::Shipment::Carrier::USPS" : {
+         "file" : "lib/Webservice/Shipment/Carrier/USPS.pm"
+      },
+      "Webservice::Shipment::MockUserAgent" : {
+         "file" : "lib/Webservice/Shipment/MockUserAgent.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jberger/Webservice-Shipment/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jberger/Webservice-Shipment"
+      }
+   },
+   "version" : "0.03"
+}

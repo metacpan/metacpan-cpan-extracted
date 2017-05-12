@@ -1,0 +1,105 @@
+Revision history for WWW-AdventCalendar
+
+1.112     2015-11-22 16:35:19-05:00 America/New_York
+        - provide slightly better errors when articles are missing required
+          headers
+
+1.111     2014-02-18 07:50:05-05:00 America/New_York
+        - add --year-links to add links to prev/next years' calendars
+          (thanks, Len Jaffe!)
+
+1.110     2013-12-19 22:34:26-0500 America/New_York
+          fix encoding problem introduced by bugfix in Mixin::Linewise
+
+1.109     2013-10-21 22:19:50 America/New_York
+          update bugtracker and repo metadata
+
+1.108     2011-12-27 17:53:09 America/New_York
+          do not consider days "missing" unless they're in the calendar period
+
+1.107     2011-12-21 08:00:23 America/New_York
+          make "credit.mhtml" its own template
+
+1.106     2011-12-19 16:45:30 America/New_York
+          call article authors "authors" in the Atom, not "contributors"
+
+          use a strict, optimized %color hash for the color palette
+
+1.105     2011-12-07 08:54:55 America/New_York
+          only put the author's name in the feed, not email address
+
+          include an HTML comment with the generating version in output
+
+          don't call our Atom feed an RSS feed
+
+1.104     2011-11-30 17:39:06 America/New_York
+          css_href config option allows extra CSS hrefs to be added to output
+
+          author gravatars are now included by default
+
+          minor tweaks to global CSS
+
+1.103     2011-11-08 10:56:49 America/New_York
+          added article author and calendar's default_author
+
+1.102     2011-11-03 10:50:59 America/New_York
+          an article's "package" is now called its "topic" -- this will break
+          your advent calendar, if you exist and have written one
+
+1.101     2011-11-02 14:03:13 America/New_York
+          The style sheet is now a template, using Color::Palette for picking
+          colors to use.  The default color palette was imported from the 2009
+          RJBS Advent Calendar.  A new palette can be provided in the [Palette]
+          config section.
+
+          The "subtitle" option is now "tagline" to avoid ambiguities with the
+          Article formatting.
+
+1.100     2011-10-07 18:58:51 America/New_York
+          The start_date and end_date parameters can be provided for periods
+          other than Advent.  This feature is still young and has a bunch of
+          arbitrary restrictions.  Among other things, the date range may not
+          cross a month boundary.
+
+          A "subtitle" option has been added for the text in the bar below the
+          main title.
+
+          The default templates will be used if custom templates are not found.
+
+          The default templates no longer have "RJBS Advent Calendar"
+          hardcoded.
+
+          The default favicon is no longer "rjbs."  Instead, it's a nice little
+          Christmas tree from http://www.favicon.cc/?action=icon&file_id=11923
+
+          The default calendar template no longer displays a year and month
+          label.
+
+          The templates can now access the WWW::AdventCalendar object as
+          $calendar.
+
+          Like everybody else, I used DateTime math incorrectly.  The "days
+          until the first door" only worked accurately if there was less than a
+          month to go.  This has been fixed.
+
+1.002     2011-08-04 10:13:00 America/New_York
+          L<> links now go to metacpan by default
+
+1.001     2010-12-08 09:21:11 America/New_York
+          correct some encoding boundary bugs
+
+1.000     2010-11-22 18:29:22 America/New_York
+          updated for Config::MVP v2
+
+          fix bugs that prevent rebuilding of last year's calendar
+
+0.100160  2010-01-16 15:39:53 America/New_York
+          add configure_requires needed to build!
+
+0.100080  2010-01-08 07:41:51 America/New_York
+          require File::Path 2.07 (thanks, ANDK)
+
+0.100010  2010-01-01 18:29:55 America/New_York
+
+0.093580  2009-12-24 21:24:48 America/New_York
+          first release!

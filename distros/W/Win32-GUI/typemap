@@ -1,0 +1,61 @@
+# $Id: TYPEMAP,v 1.10 2007/07/15 18:56:25 robertemay Exp $
+TYPEMAP
+HWND         T_HANDLE
+HMENU        T_HANDLE
+HICON        T_HANDLE
+HCURSOR      T_HANDLE
+HBITMAP      T_HANDLE
+HFONT        T_HANDLE
+HGDIOBJ      T_HANDLE
+HIMAGELIST   T_HANDLE
+HDC          T_HANDLE
+HBRUSH       T_HANDLE
+HPEN         T_HANDLE
+HRGN         T_HANDLE
+HTREEITEM    T_PTR
+LONG         T_IV
+LPCTSTR      T_PV
+LPTSTR       T_PV
+DWORD        T_UV
+UINT         T_UV
+INT          T_IV
+BOOL         T_IV
+WPARAM       T_UV
+LPARAM       T_LPARAM
+LRESULT      T_IV
+HINSTANCE    T_PTR
+COLORREF     T_COLOR
+LPCSTR       T_PV
+HENHMETAFILE T_PTR
+FLOAT        T_FLOAT
+LPVOID       T_PV
+HACCEL       T_PTR
+UINT_PTR     T_PTR
+LONG_PTR     T_PTR
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));
+
+T_COLOR
+    $var = SvCOLORREF(NOTXSCALL $arg);
+T_LPARAM
+    if(SvPOK($arg))
+      $var = ($type) SvPV_nolen($arg);
+    else
+      $var = ($type) SvIV($arg);
+################################################################################
+OUTPUT
+T_HANDLE
+    sv_setiv($arg, PTR2IV($var));
+T_COLOR
+    sv_setiv($arg, (IV) $var);
+

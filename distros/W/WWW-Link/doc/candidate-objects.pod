@@ -1,0 +1,55 @@
+=head1 CANDIDATE OBJECTS
+
+This is just a list of possible objects which could be used for
+keeping information about links.
+
+=head2 link
+
+a link is the full set of information about a link to another infostructure.
+
+we have to be able to store and recover links so that we can later
+give out information about them.
+
+links contain URLs, result histories etc.
+
+=head2 tester
+
+a tester knows how to find out if a link is broken or not
+
+=head2 link_updater
+
+B<not implemented>
+
+knows how to take the results of a tester and apply them to a link...
+
+=head2 result
+
+B<not implemented>
+
+a result could be what we get when we run a tester
+
+=head2 reporter
+
+a reporter knows how to generate a report about the status of links
+
+=head2 selector
+
+knows how to filter links.
+
+=cut
+
+=head1 THOUGHTS
+
+do not multiply entities beyond necessity
+
+we need a tester to bundle together testing stuff
+
+we need a link to remember about link information
+
+we need output through reporters
+
+it would be nice to have testers that work on urls only, using
+options.. this would allow us to share code with people who want to do
+instant testing.
+
+=cut

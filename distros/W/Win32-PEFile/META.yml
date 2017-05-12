@@ -1,0 +1,47 @@
+---
+abstract: 'Portable Executable File parser'
+author:
+  - 'Peter Jaquiery <grandpa@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: v5.8.8
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-PEFile
+provides:
+  Win32::LangId:
+    file: lib/Win32/LangId.pm
+  Win32::PEFile:
+    file: lib/Win32/PEFile.pm
+    version: '0.7007'
+  Win32::PEFile::PEBase:
+    file: lib/Win32/PEFile/PEBase.pm
+  Win32::PEFile::PEConstants:
+    file: lib/Win32/PEFile/PEConstants.pm
+  Win32::PEFile::PEReader:
+    file: lib/Win32/PEFile/PEReader.pm
+  Win32::PEFile::PEWriter:
+    file: lib/Win32/PEFile/PEWriter.pm
+  Win32::PEFile::Resource:
+    file: lib/Win32/PEFile/Resource.pm
+  Win32::PEFile::SectionHandlers:
+    file: lib/Win32/PEFile/SectionHandlers.pm
+  Win32::PEFile::VersionResource:
+    file: lib/Win32/PEFile/Resource.pm
+  Win32::PEFile::certHandler:
+    file: lib/Win32/PEFile/SectionHandlers.pm
+  Win32::PEFile::edataHandler:
+    file: lib/Win32/PEFile/SectionHandlers.pm
+  Win32::PEFile::idataHandler:
+    file: lib/Win32/PEFile/SectionHandlers.pm
+  Win32::PEFile::rsrcHandler:
+    file: lib/Win32/PEFile/SectionHandlers.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.7007'

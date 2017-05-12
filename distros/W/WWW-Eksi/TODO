@@ -1,0 +1,12 @@
+In order of priority:
+  - Issue a warning on too many download calls
+  - Add parsing 'today/popular/historical/channel' topic lists
+  - Try to replace _process_entry regexps with DOM
+  - Parse author pages (detect sponsored/rookie/banned)
+  - Parse AMA-type topic pages, with questions + answers
+  - Make entries WWW::Eksi::Entry objects
+  - Make authors WWW::Eksi::Author objects
+  - Write an explanation why there is no time zone
+
+Future:
+  - login, post, vote

@@ -1,0 +1,1726 @@
+## XS for Wx::ScintillaTextCtrl
+
+%module{Wx};
+
+#undef FindText
+#include "wx-scintilla/include/WxScintilla.h"
+
+%typemap{wxDragResult}{simple};
+%typemap{wxFontEncoding}{simple};
+
+%name{Wx::ScintillaTextCtrl} class wxScintillaTextCtrl {
+%{
+wxScintillaTextCtrl*
+wxScintillaTextCtrl::new( parent, id = wxID_ANY, pos = wxDefaultPosition, size = wxDefaultSize, style = 0, name = wxSTCNameStr )
+    wxWindow* parent
+    wxWindowID id
+    wxPoint pos
+    wxSize size
+    long style
+    wxString name
+  CODE:
+    RETVAL = new wxScintillaTextCtrl( parent, id, pos, size, style, name );
+    wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::AddText( text )
+    wxString text
+
+void
+wxScintillaTextCtrl::SetLexer( lexer )
+    int lexer
+
+int
+wxScintillaTextCtrl::GetLexer()
+
+
+## Extract style settings from a spec-string which is composed of one or
+## more of the following comma separated elements:
+##
+##      bold                    turns on bold
+##      italic                  turns on italics
+##      fore:#RRGGBB            sets the foreground colour
+##      back:#RRGGBB            sets the background colour
+##      face:[facename]         sets the font face name to use
+##      size:[num]              sets the font size in points
+##      eol                     turns on eol filling
+##      underline               turns on underlining
+
+void
+wxScintillaTextCtrl::StyleSetSpec( style, spec )
+    int style
+    wxString spec
+
+void
+wxScintillaTextCtrl::StyleSetFont( style, font )
+    int style
+    wxFont* font
+  CODE:
+    THIS->StyleSetFont( style, *font );
+
+void
+wxScintillaTextCtrl::StyleSetFontAttr( styleNum, size, faceName, bold, italic, underline )
+    int styleNum
+    int size
+    wxString faceName
+    bool bold
+    bool italic
+    bool underline
+
+void
+wxScintillaTextCtrl::StyleClearAll()
+
+void
+wxScintillaTextCtrl::ClearDocumentStyle()
+
+void
+wxScintillaTextCtrl::StyleSetForeground( style, fore )
+    int style
+    wxColour* fore
+  CODE:
+    THIS->StyleSetForeground( style, *fore );
+
+void
+wxScintillaTextCtrl::StyleSetBackground( style, back )
+    int style
+    wxColour* back
+  CODE:
+    THIS->StyleSetBackground( style, *back );
+
+void
+wxScintillaTextCtrl::StyleSetBold( style, bold )
+    int style
+    bool bold
+
+void
+wxScintillaTextCtrl::StyleSetItalic( style, italic )
+    int style
+    bool italic
+
+void
+wxScintillaTextCtrl::StyleSetUnderline( style, underline )
+    int style
+    bool underline
+
+void
+wxScintillaTextCtrl::InsertText(pos, text)
+    int pos
+    wxString text
+
+void
+wxScintillaTextCtrl::StyleSetSize(style, size_points)
+    int style
+    int size_points
+
+void
+wxScintillaTextCtrl::StyleSetFaceName(style, font_name)
+    int style
+    wxString font_name
+
+void
+wxScintillaTextCtrl::StyleSetEOLFilled( style, filled )
+    int style
+    bool filled
+
+void
+wxScintillaTextCtrl::StyleResetDefault()
+
+void
+wxScintillaTextCtrl::StyleSetCase( style, caseForce )
+    int style
+    int caseForce
+
+void
+wxScintillaTextCtrl::StyleSetCharacterSet( style, characterSet )
+    int style
+    int characterSet
+
+void
+wxScintillaTextCtrl::SetSelForeground( useSetting, fore )
+    bool useSetting
+    wxColour* fore
+  CODE:
+    THIS->SetSelForeground( useSetting, *fore );
+
+void
+wxScintillaTextCtrl::SetSelBackground( useSetting, back )
+    bool useSetting
+    wxColour* back
+  CODE:
+    THIS->SetSelBackground( useSetting, *back );
+
+void
+wxScintillaTextCtrl::SetCaretForeground( fore )
+    wxColour* fore
+  CODE:
+    THIS->SetCaretForeground( *fore );
+
+void
+wxScintillaTextCtrl::CmdKeyAssign( key, modifiers, cmd )
+    int key
+    int modifiers
+    int cmd
+
+void
+wxScintillaTextCtrl::CmdKeyClear( key, modifiers )
+    int key
+    int modifiers
+
+void
+wxScintillaTextCtrl::CmdKeyClearAll()
+
+void
+wxScintillaTextCtrl::SetStyleBytes( length, styleBytes )
+    int length
+    char* styleBytes
+
+void
+wxScintillaTextCtrl::StyleSetVisible( style, visible )
+    int style
+    bool visible
+
+int
+wxScintillaTextCtrl::GetCaretPeriod()
+
+void
+wxScintillaTextCtrl::SetCaretPeriod( periodMilliseconds )
+    int periodMilliseconds
+
+void
+wxScintillaTextCtrl::SetWordChars( characters )
+    wxString characters
+
+void
+wxScintillaTextCtrl::BeginUndoAction()
+
+void
+wxScintillaTextCtrl::EndUndoAction()
+
+void
+wxScintillaTextCtrl::IndicatorSetStyle( indic, style )
+    int indic
+    int style
+
+int
+wxScintillaTextCtrl::IndicatorGetStyle( indic )
+    int indic
+
+void
+wxScintillaTextCtrl::IndicatorSetForeground( indic, fore )
+    int indic
+    wxColour* fore
+  CODE:
+    THIS->IndicatorSetForeground( indic, *fore );
+
+void
+wxScintillaTextCtrl::IndicatorSetAlpha( indicator, alpha )
+    int indicator
+    int alpha
+  CODE:
+    THIS->IndicatorSetAlpha( indicator, alpha );
+
+int
+wxScintillaTextCtrl::IndicatorGetAlpha( indicator )
+    int indicator
+  CODE:
+    RETVAL = THIS->IndicatorGetAlpha( indicator );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::IndicatorSetUnder( indicator, under )
+    int indicator
+    bool under
+  CODE:
+    THIS->IndicatorSetUnder( indicator, under );
+
+bool
+wxScintillaTextCtrl::IndicatorGetUnder( indicator )
+    int indicator
+  CODE:
+    RETVAL = THIS->IndicatorGetUnder( indicator );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::SetIndicatorCurrent( indicator )
+    int indicator
+  CODE:
+    THIS->SetIndicatorCurrent( indicator);
+
+int
+wxScintillaTextCtrl::GetIndicatorCurrent()
+
+void
+wxScintillaTextCtrl::SetIndicatorValue( value )
+    int value
+  CODE:
+    THIS->SetIndicatorValue( value );
+
+int
+wxScintillaTextCtrl::GetIndicatorValue()
+
+void
+wxScintillaTextCtrl::IndicatorFillRange( position, fillLength )
+    int position
+    int fillLength
+  CODE:
+    THIS->IndicatorFillRange(position, fillLength);
+
+void
+wxScintillaTextCtrl::IndicatorClearRange(position, clearLength)
+    int position
+    int clearLength
+  CODE:
+    THIS->IndicatorClearRange(position, clearLength);
+
+int
+wxScintillaTextCtrl::IndicatorAllOnFor(position)
+    int position
+  CODE:
+    RETVAL = THIS->IndicatorAllOnFor(position);
+  OUTPUT: RETVAL
+  
+int
+wxScintillaTextCtrl::IndicatorValueAt(indicator, position)
+    int indicator
+    int position
+  CODE:
+    RETVAL = THIS->IndicatorValueAt( indicator, position);
+  OUTPUT: RETVAL
+
+int
+wxScintillaTextCtrl::IndicatorStart(indicator, position)
+    int indicator
+    int position
+  CODE:
+    RETVAL = THIS->IndicatorStart( indicator, position);
+  OUTPUT: RETVAL
+
+int
+wxScintillaTextCtrl::IndicatorEnd(indicator, position)
+    int indicator
+    int position
+  CODE:
+    RETVAL = THIS->IndicatorEnd( indicator, position);
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::AnnotationSetText(line, text)
+    int line
+    wxString& text
+  CODE:
+    THIS->AnnotationSetText( line, text );
+
+wxString
+wxScintillaTextCtrl::AnnotationGetText(line)
+    int line
+  CODE:
+    RETVAL = THIS->AnnotationGetText( line );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::AnnotationSetStyle(line, style)
+    int line
+    int style
+  CODE:
+    THIS->AnnotationSetStyle( line, style );
+
+int
+wxScintillaTextCtrl::AnnotationGetStyle(line)
+    int line
+  CODE:
+    RETVAL = THIS->AnnotationGetStyle( line );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::AnnotationSetStyles(line, styles)
+    int line
+    wxString& styles
+  CODE:
+    THIS->AnnotationSetStyles( line, styles );
+
+wxString
+wxScintillaTextCtrl::AnnotationGetStyles(line)
+    int line
+  CODE:
+    RETVAL = THIS->AnnotationGetStyles( line );
+  OUTPUT: RETVAL
+
+int
+wxScintillaTextCtrl::AnnotationGetLines(line)
+    int line
+  CODE:
+    RETVAL = THIS->AnnotationGetLines( line );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::AnnotationClearAll()
+
+void
+wxScintillaTextCtrl::AnnotationSetVisible(visible)
+    int visible
+  CODE:
+    THIS->AnnotationSetVisible( visible );
+
+int
+wxScintillaTextCtrl::AnnotationGetVisible()
+
+void
+wxScintillaTextCtrl::AnnotationSetStyleOffset(style)
+    int style
+  CODE:
+    THIS->AnnotationSetStyleOffset( style );
+
+int
+wxScintillaTextCtrl::AnnotationGetStyleOffset()
+
+void
+wxScintillaTextCtrl::SetWhitespaceForeground( useSetting, fore )
+    bool useSetting
+    wxColour* fore
+  CODE:
+    THIS->SetWhitespaceForeground( useSetting, *fore );
+
+void
+wxScintillaTextCtrl::SetWhitespaceBackground( useSetting, back )
+    bool useSetting
+    wxColour* back
+  CODE:
+    THIS->SetWhitespaceBackground( useSetting, *back );
+
+void
+wxScintillaTextCtrl::SetStyleBits( bits )
+    int bits
+
+int
+wxScintillaTextCtrl::GetStyleBits()
+
+void
+wxScintillaTextCtrl::SetLineState( line, state )
+    int line
+    int state
+
+int
+wxScintillaTextCtrl::GetLineState( line )
+    int line
+
+int
+wxScintillaTextCtrl::GetMaxLineState()
+
+bool
+wxScintillaTextCtrl::GetCaretLineVisible()
+
+void
+wxScintillaTextCtrl::SetCaretLineVisible( show )
+    bool show
+
+#if WXPERL_W_VERSION_LT( 2, 7, 0 )
+
+void
+wxScintillaTextCtrl::SetCaretLineBack( back )
+    wxColour* back
+  CODE:
+    THIS->SetCaretLineBack( *back );
+
+#else
+
+void
+wxScintillaTextCtrl::SetCaretLineBack( back )
+    wxColour* back
+  CODE:
+    THIS->SetCaretLineBackground( *back );
+
+void
+wxScintillaTextCtrl::SetCaretLineBackground( back )
+    wxColour* back
+  CODE:
+    THIS->SetCaretLineBackground( *back );
+
+#endif
+
+void
+wxScintillaTextCtrl::StyleSetChangeable( style, changeable )
+    int style
+    bool changeable
+
+void
+wxScintillaTextCtrl::AutoCompShow( lenEntered, itemList )
+    int lenEntered
+    wxString itemList
+
+void
+wxScintillaTextCtrl::AutoCompCancel()
+
+bool
+wxScintillaTextCtrl::AutoCompActive()
+
+int
+wxScintillaTextCtrl::AutoCompPosStart()
+
+void
+wxScintillaTextCtrl::AutoCompComplete()
+
+void
+wxScintillaTextCtrl::AutoCompStops( characterSet )
+    wxString characterSet
+
+void
+wxScintillaTextCtrl::AutoCompSetSeparator( separatorCharacter )
+    int separatorCharacter
+
+int
+wxScintillaTextCtrl::AutoCompGetSeparator()
+
+void
+wxScintillaTextCtrl::AutoCompSelect( text )
+    wxString text
+
+void
+wxScintillaTextCtrl::AutoCompSetCancelAtStart( cancel )
+    bool cancel
+
+bool
+wxScintillaTextCtrl::AutoCompGetCancelAtStart()
+
+void
+wxScintillaTextCtrl::AutoCompSetFillUps( characterSet )
+    wxString characterSet
+
+void
+wxScintillaTextCtrl::AutoCompSetChooseSingle( chooseSingle )
+    bool chooseSingle
+
+bool
+wxScintillaTextCtrl::AutoCompGetChooseSingle()
+
+bool
+wxScintillaTextCtrl::AutoCompGetIgnoreCase()
+
+void
+wxScintillaTextCtrl::UserListShow( listType, itemList )
+    int listType
+    wxString itemList
+
+void
+wxScintillaTextCtrl::AutoCompSetAutoHide( autoHide )
+    bool autoHide
+
+bool
+wxScintillaTextCtrl::AutoCompGetAutoHide()
+
+void
+wxScintillaTextCtrl::AutoCompSetDropRestOfWord( dropRestOfWord )
+    bool dropRestOfWord
+
+bool
+wxScintillaTextCtrl::AutoCompGetDropRestOfWord()
+
+void
+wxScintillaTextCtrl::SetIndent( indentSize )
+    int indentSize
+
+int
+wxScintillaTextCtrl::GetIndent()
+
+void
+wxScintillaTextCtrl::SetUseTabs( useTabs )
+    bool useTabs
+
+bool
+wxScintillaTextCtrl::GetUseTabs()
+
+void
+wxScintillaTextCtrl::SetLineIndentation( line, indentSize )
+    int line
+    int indentSize
+
+int
+wxScintillaTextCtrl::GetLineIndentation( line )
+    int line
+
+int
+wxScintillaTextCtrl::GetLineIndentPosition( line )
+    int line
+
+int
+wxScintillaTextCtrl::GetColumn( pos )
+    int pos
+
+void
+wxScintillaTextCtrl::SetUseHorizontalScrollBar( show )
+    bool show
+
+bool
+wxScintillaTextCtrl::GetUseHorizontalScrollBar()
+
+void
+wxScintillaTextCtrl::SetIndentationGuides( show )
+    bool show
+
+bool
+wxScintillaTextCtrl::GetIndentationGuides()
+
+void
+wxScintillaTextCtrl::SetHighlightGuide( column )
+    int column
+
+int
+wxScintillaTextCtrl::GetHighlightGuide()
+
+int
+wxScintillaTextCtrl::GetLineEndPosition( line )
+    int line
+
+int
+wxScintillaTextCtrl::GetCodePage()
+
+bool
+wxScintillaTextCtrl::GetReadOnly()
+
+void
+wxScintillaTextCtrl::SetCurrentPos( pos )
+    int pos
+
+void
+wxScintillaTextCtrl::SetSelectionStart( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::GetSelectionStart()
+
+void
+wxScintillaTextCtrl::SetSelectionEnd( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::GetSelectionEnd()
+
+void
+wxScintillaTextCtrl::SetPrintMagnification( magnification )
+    int magnification
+
+int
+wxScintillaTextCtrl::GetPrintMagnification()
+
+void
+wxScintillaTextCtrl::SetPrintColourMode( mode )
+    int mode
+
+int
+wxScintillaTextCtrl::GetPrintColourMode()
+
+int
+wxScintillaTextCtrl::FindText( minPos, maxPos, text, flags = 0 )
+    int minPos
+    int maxPos
+    wxString text
+    int flags
+
+int
+wxScintillaTextCtrl::GetFirstVisibleLine()
+
+int
+wxScintillaTextCtrl::GetLineCount()
+
+void
+wxScintillaTextCtrl::SetMarginLeft( pixelWidth )
+    int pixelWidth
+
+int
+wxScintillaTextCtrl::GetMarginLeft()
+
+void
+wxScintillaTextCtrl::SetMarginRight( pixelWidth )
+    int pixelWidth
+
+int
+wxScintillaTextCtrl::GetMarginRight()
+
+bool
+wxScintillaTextCtrl::GetModify()
+
+void
+wxScintillaTextCtrl::SetSelection( start, end )
+    int start
+    int end
+
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+
+void
+wxScintillaTextCtrl::SetSelectionMode( mode )
+    int mode
+
+int
+wxScintillaTextCtrl::GetSelectionMode()
+
+#endif
+
+void
+wxScintillaTextCtrl::HideSelection( normal )
+    bool normal
+
+int
+wxScintillaTextCtrl::LineFromPosition( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::PositionFromLine( line )
+    int line
+
+void
+wxScintillaTextCtrl::LineScroll( columns, lines )
+    int columns
+    int lines
+
+void
+wxScintillaTextCtrl::EnsureCaretVisible()
+
+void
+wxScintillaTextCtrl::ReplaceSelection( text )
+    wxString text
+
+void
+wxScintillaTextCtrl::SetReadOnly( readOnly )
+    bool readOnly
+
+bool
+wxScintillaTextCtrl::CanPaste()
+
+bool
+wxScintillaTextCtrl::CanUndo()
+
+void
+wxScintillaTextCtrl::EmptyUndoBuffer()
+
+void
+wxScintillaTextCtrl::Undo()
+
+void
+wxScintillaTextCtrl::Cut()
+
+void
+wxScintillaTextCtrl::Copy()
+
+void
+wxScintillaTextCtrl::Paste()
+
+void
+wxScintillaTextCtrl::Clear()
+
+int
+wxScintillaTextCtrl::GetTextLength()
+
+void
+wxScintillaTextCtrl::SetOvertype( overtype )
+    bool overtype
+
+bool
+wxScintillaTextCtrl::GetOvertype()
+
+void
+wxScintillaTextCtrl::SetCaretWidth( pixelWidth )
+    int pixelWidth
+
+int
+wxScintillaTextCtrl::GetCaretWidth()
+
+void
+wxScintillaTextCtrl::SetTargetStart( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::GetTargetStart()
+
+void
+wxScintillaTextCtrl::SetTargetEnd( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::GetTargetEnd()
+
+int
+wxScintillaTextCtrl::ReplaceTarget( text )
+    wxString text
+
+int
+wxScintillaTextCtrl::ReplaceTargetRE( text )
+    wxString text
+
+int
+wxScintillaTextCtrl::SearchInTarget( text )
+    wxString text
+
+void
+wxScintillaTextCtrl::SetSearchFlags( flags )
+    int flags
+
+int
+wxScintillaTextCtrl::GetSearchFlags()
+
+void
+wxScintillaTextCtrl::CallTipShow( pos, definition )
+    int pos
+    wxString definition
+
+void
+wxScintillaTextCtrl::CallTipCancel()
+
+bool
+wxScintillaTextCtrl::CallTipActive()
+
+int
+wxScintillaTextCtrl::CallTipPosAtStart()
+
+void
+wxScintillaTextCtrl::CallTipSetHighlight( start, end )
+    int start
+    int end
+
+void
+wxScintillaTextCtrl::CallTipSetBackground( back )
+    wxColour* back
+  CODE:
+    THIS->CallTipSetBackground( *back );
+
+int
+wxScintillaTextCtrl::VisibleFromDocLine( line )
+    int line
+
+int
+wxScintillaTextCtrl::DocLineFromVisible( lineDisplay )
+    int lineDisplay
+
+void
+wxScintillaTextCtrl::SetFoldLevel( line, level )
+    int line
+    int level
+
+int
+wxScintillaTextCtrl::GetFoldLevel( line )
+    int line
+
+int
+wxScintillaTextCtrl::GetLastChild( line, level )
+    int line
+    int level
+
+int
+wxScintillaTextCtrl::GetFoldParent( line )
+    int line
+
+void
+wxScintillaTextCtrl::ShowLines( lineStart, lineEnd )
+    int lineStart
+    int lineEnd
+
+void
+wxScintillaTextCtrl::HideLines( lineStart, lineEnd )
+    int lineStart
+    int lineEnd
+
+bool
+wxScintillaTextCtrl::GetLineVisible( line )
+    int line
+
+void
+wxScintillaTextCtrl::SetFoldExpanded( line, expanded )
+    int line
+    bool expanded
+
+bool
+wxScintillaTextCtrl::GetFoldExpanded( line )
+    int line
+
+void
+wxScintillaTextCtrl::ToggleFold( line )
+    int line
+
+void
+wxScintillaTextCtrl::EnsureVisible( line )
+    int line
+
+void
+wxScintillaTextCtrl::SetFoldFlags( flags )
+    int flags
+
+void
+wxScintillaTextCtrl::EnsureVisibleEnforcePolicy( line )
+    int line
+
+void
+wxScintillaTextCtrl::SetTabIndents( tabIndents )
+    bool tabIndents
+
+bool
+wxScintillaTextCtrl::GetTabIndents()
+
+void
+wxScintillaTextCtrl::SetBackSpaceUnIndents( bsUnIndents )
+    bool bsUnIndents
+
+bool
+wxScintillaTextCtrl::GetBackSpaceUnIndents()
+
+void
+wxScintillaTextCtrl::SetMouseDwellTime( periodMilliseconds )
+    int periodMilliseconds
+
+int
+wxScintillaTextCtrl::GetMouseDwellTime()
+
+int
+wxScintillaTextCtrl::WordStartPosition( pos, onlyWordCharacters )
+    int pos
+    bool onlyWordCharacters
+
+int
+wxScintillaTextCtrl::WordEndPosition( pos, onlyWordCharacters )
+    int pos
+    bool onlyWordCharacters
+
+void
+wxScintillaTextCtrl::SetLayoutCache( mode )
+    int mode
+
+int
+wxScintillaTextCtrl::GetLayoutCache()
+
+void
+wxScintillaTextCtrl::SetScrollWidth( pixelWidth )
+    int pixelWidth
+
+int
+wxScintillaTextCtrl::GetScrollWidth()
+
+int
+wxScintillaTextCtrl::TextWidth( style, text )
+    int style
+    wxString text
+
+void
+wxScintillaTextCtrl::SetEndAtLastLine( endAtLastLine )
+    bool endAtLastLine
+
+int
+wxScintillaTextCtrl::GetEndAtLastLine()
+
+int
+wxScintillaTextCtrl::TextHeight( line )
+    int line
+
+void
+wxScintillaTextCtrl::HomeDisplay()
+
+void
+wxScintillaTextCtrl::HomeDisplayExtend()
+
+void
+wxScintillaTextCtrl::LineEndDisplay()
+
+void
+wxScintillaTextCtrl::LineEndDisplayExtend()
+
+void
+wxScintillaTextCtrl::MoveCaretInsideView()
+
+int
+wxScintillaTextCtrl::LineLength( line )
+    int line
+
+void
+wxScintillaTextCtrl::BraceHighlight( pos1, pos2 )
+    int pos1
+    int pos2
+
+void
+wxScintillaTextCtrl::BraceBadLight( pos )
+    int pos
+
+int
+wxScintillaTextCtrl::BraceMatch( pos )
+    int pos
+
+bool
+wxScintillaTextCtrl::GetViewEOL()
+
+void
+wxScintillaTextCtrl::SetViewEOL( visible )
+    bool visible
+
+void*
+wxScintillaTextCtrl::GetDocPointer()
+
+void
+wxScintillaTextCtrl::SetDocPointer( docPointer )
+    void* docPointer
+
+void
+wxScintillaTextCtrl::SetModEventMask( mask )
+    int mask
+
+int
+wxScintillaTextCtrl::GetEdgeColumn()
+
+void
+wxScintillaTextCtrl::SetEdgeColumn( column )
+    int column
+
+int
+wxScintillaTextCtrl::GetEdgeMode()
+
+void
+wxScintillaTextCtrl::SetEdgeMode( mode )
+    int mode
+
+void
+wxScintillaTextCtrl::SetEdgeColour( edgeColour )
+    wxColour edgeColour
+
+void
+wxScintillaTextCtrl::SearchAnchor()
+
+int
+wxScintillaTextCtrl::SearchNext( flags, text )
+    int flags
+    wxString text
+
+int
+wxScintillaTextCtrl::SearchPrev( flags, text )
+    int flags
+    wxString text
+
+int
+wxScintillaTextCtrl::LinesOnScreen()
+
+void
+wxScintillaTextCtrl::UsePopUp( allowPopUp )
+    bool allowPopUp
+
+bool
+wxScintillaTextCtrl::SelectionIsRectangle()
+
+void
+wxScintillaTextCtrl::SetZoom( zoom )
+    int zoom
+
+int
+wxScintillaTextCtrl::GetZoom()
+
+void*
+wxScintillaTextCtrl::CreateDocument()
+
+void
+wxScintillaTextCtrl::AddRefDocument( docPointer )
+    void* docPointer
+
+void
+wxScintillaTextCtrl::ReleaseDocument( docPointer )
+    void* docPointer
+
+int
+wxScintillaTextCtrl::GetModEventMask()
+
+void
+wxScintillaTextCtrl::SetSTCFocus( focus )
+    bool focus
+
+bool
+wxScintillaTextCtrl::GetSTCFocus()
+
+void
+wxScintillaTextCtrl::SetStatus( statusCode )
+    int statusCode
+
+int
+wxScintillaTextCtrl::GetStatus()
+
+void
+wxScintillaTextCtrl::SetMouseDownCaptures( captures )
+    bool captures
+
+bool
+wxScintillaTextCtrl::GetMouseDownCaptures()
+
+void
+wxScintillaTextCtrl::SetControlCharSymbol( symbol )
+    int symbol
+
+int
+wxScintillaTextCtrl::GetControlCharSymbol()
+
+void
+wxScintillaTextCtrl::WordPartLeft()
+
+void
+wxScintillaTextCtrl::WordPartLeftExtend()
+
+void
+wxScintillaTextCtrl::WordPartRight()
+
+void
+wxScintillaTextCtrl::WordPartRightExtend()
+
+void
+wxScintillaTextCtrl::SetVisiblePolicy( visiblePolicy, visibleSlop )
+    int visiblePolicy
+    int visibleSlop
+
+void
+wxScintillaTextCtrl::DelLineLeft()
+
+void
+wxScintillaTextCtrl::DelLineRight()
+
+void
+wxScintillaTextCtrl::SetXOffset( newOffset )
+    int newOffset
+
+int
+wxScintillaTextCtrl::GetXOffset()
+
+void
+wxScintillaTextCtrl::SetXCaretPolicy( caretPolicy, caretSlop )
+    int caretPolicy
+    int caretSlop
+
+void
+wxScintillaTextCtrl::SetYCaretPolicy( caretPolicy, caretSlop )
+    int caretPolicy
+    int caretSlop
+
+void
+wxScintillaTextCtrl::StartRecord()
+
+void
+wxScintillaTextCtrl::StopRecord()
+
+void
+wxScintillaTextCtrl::Colourise( start, end )
+    int start
+    int end
+
+void
+wxScintillaTextCtrl::SetProperty( key, value )
+    wxString key
+    wxString value
+
+void
+wxScintillaTextCtrl::SetKeyWords( keywordSet, keyWords )
+    int keywordSet
+    wxString keyWords
+
+void
+wxScintillaTextCtrl::SetLexerLanguage( language )
+    wxString language
+
+## Retrieve the selected text
+wxString
+wxScintillaTextCtrl::GetSelectedText()
+
+## Retrieve a range of text
+wxString
+wxScintillaTextCtrl::GetTextRange(startPos, endPos)
+    int startPos
+    int endPos
+
+## Retrieve all the text in the document.
+wxString
+wxScintillaTextCtrl::GetText()
+
+## Returns the position of the opposite end of the selection to the caret.
+int
+wxScintillaTextCtrl::GetAnchor()
+
+## Returns the style byte at the position
+int
+wxScintillaTextCtrl::GetStyleAt(pos)
+    int pos
+
+## Redoes the next action on the undo history.
+void
+wxScintillaTextCtrl::Redo()
+
+## Select all the text in the document.
+void
+wxScintillaTextCtrl::SelectAll()
+
+## Remember the current position in the undo history as the position
+## at which the document was saved.
+void
+wxScintillaTextCtrl::SetSavePoint()
+
+## Replace the contents of the document with the argument text.
+void
+wxScintillaTextCtrl::SetText(text)
+    wxString text
+
+## Are there any redoable actions in the undo history?
+bool
+wxScintillaTextCtrl::CanRedo()
+
+## Retrieve the line number at which a particular marker is located.
+int
+wxScintillaTextCtrl::MarkerLineFromHandle( handle )
+    int handle
+
+## Delete a marker
+void
+wxScintillaTextCtrl::MarkerDeleteHandle( handle )
+    int handle
+
+## Is undo history being collected?
+bool
+wxScintillaTextCtrl::GetUndoCollection()
+
+## Are white space characters currently visible?
+## Returns one of SCWS_* constants.
+int
+wxScintillaTextCtrl::GetViewWhiteSpace()
+
+## Make white space characters invisible, always visible or visible outside indentation.
+void
+wxScintillaTextCtrl::SetViewWhiteSpace( viewWs )
+    int viewWs
+
+## Find the position from a point within the window.
+int
+wxScintillaTextCtrl::PositionFromPoint( pt )
+    wxPoint pt
+
+int
+wxScintillaTextCtrl::PositionFromPointClose( x, y )
+    int x
+    int y
+
+## Set caret to start of a line and ensure it is visible.
+void
+wxScintillaTextCtrl::GotoLine(line)
+    int line
+
+## Set caret to a position and ensure it is visible.
+void
+wxScintillaTextCtrl::GotoPos(pos)
+    int pos
+
+void
+wxScintillaTextCtrl::SetAnchor( posAnchor )
+    int posAnchor
+
+int
+wxScintillaTextCtrl::GetEndStyled()
+
+void
+wxScintillaTextCtrl::ConvertEOLs( eolMode )
+    int eolMode
+
+int
+wxScintillaTextCtrl::GetEOLMode()
+
+void
+wxScintillaTextCtrl::SetEOLMode( eolMode )
+    int eolMode
+
+void
+wxScintillaTextCtrl::StartStyling( pos, mask )
+    int pos
+    int mask
+
+void
+wxScintillaTextCtrl::SetStyling( length, style )
+    int length
+    int style
+
+bool
+wxScintillaTextCtrl::GetBufferedDraw()
+
+void
+wxScintillaTextCtrl::SetBufferedDraw( buffered )
+    bool buffered
+
+void
+wxScintillaTextCtrl::SetTabWidth( tabWidth )
+    int tabWidth
+
+int
+wxScintillaTextCtrl::GetTabWidth()
+
+void
+wxScintillaTextCtrl::SetCodePage( codePage )
+    int codePage
+
+void
+wxScintillaTextCtrl::MarkerDefine( markerNumber, markerSymbol, foreground, background )
+    int markerNumber
+    int markerSymbol
+    wxColour* foreground
+    wxColour* background
+  CODE:
+    THIS->MarkerDefine( markerNumber, markerSymbol, *foreground, *background );
+
+void
+wxScintillaTextCtrl::MarkerDefineBitmap( markerNumber, bmp )
+    int markerNumber
+    wxBitmap* bmp
+  C_ARGS: markerNumber, *bmp
+
+void
+wxScintillaTextCtrl::MarkerSetForeground( markerNumber, fore )
+    int markerNumber
+    wxColour* fore
+  CODE:
+    THIS->MarkerSetForeground( markerNumber, *fore );
+
+void
+wxScintillaTextCtrl::MarkerSetBackground( markerNumber, back )
+    int markerNumber
+    wxColour* back
+  CODE:
+    THIS->MarkerSetBackground( markerNumber, *back );
+
+int
+wxScintillaTextCtrl::MarkerAdd( line, markerNumber )
+    int line
+    int markerNumber
+
+void
+wxScintillaTextCtrl::MarkerDelete( line, markerNumber )
+    int line
+    int markerNumber
+
+void
+wxScintillaTextCtrl::MarkerDeleteAll( markerNumber )
+    int markerNumber
+
+int
+wxScintillaTextCtrl::MarkerGet( line )
+    int line
+
+int
+wxScintillaTextCtrl::MarkerNext( lineStart, markerMask )
+    int lineStart
+    int markerMask
+
+int
+wxScintillaTextCtrl::MarkerPrevious( lineStart, markerMask )
+    int lineStart
+    int markerMask
+
+void
+wxScintillaTextCtrl::SetMarginType( margin, marginType )
+    int margin
+    int marginType
+
+int
+wxScintillaTextCtrl::GetMarginType( margin )
+    int margin
+
+void
+wxScintillaTextCtrl::SetMarginWidth( margin, pixelWidth )
+    int margin
+    int pixelWidth
+
+int
+wxScintillaTextCtrl::GetMarginWidth( margin )
+    int margin
+
+void
+wxScintillaTextCtrl::SetMarginMask( margin, mask )
+    int margin
+    int mask
+
+int
+wxScintillaTextCtrl::GetMarginMask( margin )
+    int margin
+
+void
+wxScintillaTextCtrl::SetMarginSensitive( margin, sensitive )
+    int margin
+    bool sensitive
+
+bool
+wxScintillaTextCtrl::GetMarginSensitive( margin )
+    int margin
+
+
+## Returns the position of the caret
+int
+wxScintillaTextCtrl::GetCurrentPos()
+
+int
+wxScintillaTextCtrl::GetLength()
+
+int
+wxScintillaTextCtrl::GetCharAt( pos )
+    int pos
+
+## Sets whether text is word wrapped
+void
+wxScintillaTextCtrl::SetWrapMode(mode)
+    int mode
+
+## Retrieve whether text is word wrapped
+int
+wxScintillaTextCtrl::GetWrapMode()
+
+## Retrieve the contents of a line.
+wxString
+wxScintillaTextCtrl::GetLine(line)
+    int line
+
+## Delete all text in the document
+void
+wxScintillaTextCtrl::ClearAll()
+
+## Returns the line number of the line with the caret.
+int
+wxScintillaTextCtrl::GetCurrentLine()
+
+void
+wxScintillaTextCtrl::SetMargins( left, right )
+    int left
+    int right
+
+void
+wxScintillaTextCtrl::SetUndoCollection( collectUndo )
+    bool collectUndo
+
+wxColour*
+wxScintillaTextCtrl::IndicatorGetForeground( indic )
+    int indic
+  CODE:
+    RETVAL = new wxColour( THIS->IndicatorGetForeground( indic ) );
+  OUTPUT:
+    RETVAL
+
+#if WXPERL_W_VERSION_LT( 2, 7, 0 )
+
+wxColour*
+wxScintillaTextCtrl::GetCaretLineBack()
+  CODE:
+    RETVAL = new wxColour( THIS->GetCaretLineBack() );
+  OUTPUT:
+    RETVAL
+
+#endif
+
+wxColour*
+wxScintillaTextCtrl::GetCaretForeground()
+  CODE:
+    RETVAL = new wxColour( THIS->GetCaretForeground() );
+  OUTPUT:
+    RETVAL
+
+int
+wxScintillaTextCtrl::FormatRange( doDraw , startPos , endPos , draw , target , renderRect , pageRect )
+    bool   doDraw
+    int    startPos
+    int    endPos
+    wxDC*  draw
+    wxDC*  target
+    wxRect* renderRect
+    wxRect* pageRect
+  CODE:
+    RETVAL = THIS->FormatRange( doDraw, startPos, endPos, draw,
+                                target, *renderRect, *pageRect );
+  OUTPUT:
+    RETVAL
+
+wxColour*
+wxScintillaTextCtrl::GetEdgeColour()
+  CODE:
+    RETVAL = new wxColour( THIS->GetEdgeColour() );
+  OUTPUT:
+    RETVAL
+
+bool
+wxScintillaTextCtrl::GetLastKeydownProcessed()
+
+void
+wxScintillaTextCtrl::SetLastKeydownProcessed( val )
+    bool val
+
+wxPoint*
+wxScintillaTextCtrl::PointFromPosition( pos )
+    int pos
+  CODE:
+    RETVAL = new wxPoint( THIS->PointFromPosition( pos ) );
+  OUTPUT: RETVAL
+
+void
+wxScintillaTextCtrl::SetEmptySelection( pos )
+    int pos
+  CODE:
+    THIS->SetEmptySelection( pos );
+
+void
+wxScintillaTextCtrl::ScrollToLine( line )
+    int line
+
+void
+wxScintillaTextCtrl::SetHScrollBar( bar )
+    wxScrollBar* bar
+
+void
+wxScintillaTextCtrl::SetVScrollBar( bar )
+    wxScrollBar* bar
+
+void
+wxScintillaTextCtrl::GetSelection()
+  PREINIT:
+    int start, end;
+  PPCODE:
+    THIS->GetSelection( &start, &end );
+    XPUSHs( newSViv( start ) );
+    XPUSHs( newSViv( end ) );
+
+bool
+wxScintillaTextCtrl::SaveFile(wxString filename)
+
+bool
+wxScintillaTextCtrl::LoadFile(wxString filename)
+
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+
+void
+wxScintillaTextCtrl::AddTextRaw( text )
+    const char* text = wxUSE_UNICODE ? SvPVutf8( $arg, PL_na ) : SvPV( $arg, PL_na );
+
+void
+wxScintillaTextCtrl::InsertTextRaw( pos, text )
+    int pos
+    const char* text = wxUSE_UNICODE ? SvPVutf8( $arg, PL_na ) : SvPV( $arg, PL_na );
+
+void
+wxScintillaTextCtrl::AppendTextRaw( text )
+    const char* text = wxUSE_UNICODE ? SvPVutf8( $arg, PL_na ) : SvPV( $arg, PL_na );
+
+#endif
+%}
+
+    void Allocate( int bytes );
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+    void AppendText( const wxString& text );
+#endif
+    int AutoCompGetCurrent();
+    int AutoCompGetTypeSeparator();
+    void AutoCompSetTypeSeparator( int separatorCharacter );
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void AutoCompSetMaxWidth( int characterCount );
+    int AutoCompGetMaxWidth();
+    void AutoCompSetMaxHeight( int rowCount );
+    int AutoCompGetMaxHeight();
+#endif
+    void AutoCompSetIgnoreCase( bool ignoreCase );
+
+    void BackTab();
+
+    void CallTipSetForeground( const wxColour& fore );
+    void CallTipSetForegroundHighlight( const wxColour& fore );
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void CallTipUseStyle( int tabSize );
+#endif
+
+    void Cancel();
+
+    void CharLeft();
+    void CharLeftExtend();
+    void CharRight();
+    void CharRightExtend();
+    void CharLeftRectExtend();
+    void CharRightRectExtend();
+
+    void ChooseCaretX();
+
+    void ClearRegisteredImages();
+
+    void CopyRange( int start, int end );
+    void CopyText( int length, const wxString& text );
+
+    void DelWordLeft();
+    void DelWordRight();
+    void DeleteBack();
+    void DeleteBackNotLine();
+
+#if wxUSE_DRAG_AND_DROP
+    wxDragResult DoDragOver( wxCoord x, wxCoord y, wxDragResult def );
+    bool DoDropText( long x, long y, const wxString& data );
+#endif
+
+    void DocumentStart();
+    void DocumentStartExtend();
+    void DocumentEnd();
+    void DocumentEndExtend();
+
+    void EditToggleOvertype();
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+    int FindColumn( int line, int column );
+#endif
+    void FormFeed();
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void SetCaretLineBackAlpha( int alpha );
+    int GetCaretLineBackAlpha();
+    wxColour GetCaretLineBackground();
+
+    bool GetCaretSticky();
+    void SetCaretSticky( bool useCaretStickyBehaviour );
+    void ToggleCaretSticky();
+#endif
+
+    int GetLineSelStartPosition( int line );
+    int GetLineSelEndPosition( int line );
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void SetPasteConvertEndings( bool convert );
+    bool GetPasteConvertEndings();
+#endif
+
+    void SetPrintWrapMode( int mode );
+    int GetPrintWrapMode();
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    wxString GetProperty( const wxString& key );
+    wxString GetPropertyExpanded( const wxString& key );
+    int GetPropertyInt( const wxString& key );
+#endif
+
+    int GetSTCCursor();
+    void SetSTCCursor( int cursorType );
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    int GetSelAlpha();
+    void SetSelAlpha( int alpha );
+
+    int GetStyleBitsNeeded();
+#endif
+
+    bool GetTwoPhaseDraw();
+    void SetTwoPhaseDraw( bool twoPhase );
+
+    void SetUseAntiAliasing( bool useAA );
+    bool GetUseAntiAliasing();
+
+    void SetUseVerticalScrollBar( bool show );
+    bool GetUseVerticalScrollBar();
+
+    void SetWrapVisualFlags( int wrapVisualFlags );
+    int GetWrapVisualFlags();
+    void SetWrapVisualFlagsLocation( int wrapVisualFlagsLocation );
+    int GetWrapVisualFlagsLocation();
+    void SetWrapStartIndent( int indent );
+    int GetWrapStartIndent();
+
+    void Home();
+    void HomeExtend();
+    void HomeRectExtend();
+    void HomeWrap();
+    void HomeWrapExtend();
+
+    void LineCopy();
+    void LineCut();
+    void LineDelete();
+    void LineDownExtend();
+    void LineDownRectExtend();
+    void LineDuplicate();
+    
+    void LineUp();
+    void LineDown();
+
+    void LineEnd();
+    void LineEndExtend();
+    void LineEndRectExtend();
+    void LineEndWrap();
+    void LineEndWrapExtend();
+
+    void LineScrollDown();
+    void LineScrollUp();
+
+    void LineTranspose();
+
+    void LineUpExtend();
+    void LineUpRectExtend();
+
+    void LinesJoin();
+    void LinesSplit( int pixelWidth );
+
+    void LowerCase();
+    void UpperCase();
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void MarkerAddSet( int line, int set );
+    void MarkerSetAlpha( int markerNumber, int alpha );
+#endif
+
+    void NewLine();
+
+    void PageDown();
+    void PageDownExtend();
+    void PageDownRectExtend();
+    void PageUp();
+    void PageUpExtend();
+    void PageUpRectExtend();
+
+    void ParaDown();
+    void ParaDownExtend();
+    void ParaUp();
+    void ParaUpExtend();
+
+    int PositionBefore( int pos );
+    int PositionAfter( int pos );
+
+    void RegisterImage( int type, const wxBitmap& bmp );
+
+    void ScrollToColumn( int column );
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    void SelectionDuplicate();
+#endif
+
+    void SetCharsDefault();
+    void SetFoldMarginColour( bool useSetting, const wxColour& back );
+    void SetFoldMarginHiColour( bool useSetting, const wxColour& fore );
+    void SetHotspotActiveForeground( bool useSetting, const wxColour& fore );
+    void SetHotspotActiveBackground( bool useSetting, const wxColour& back );
+    void SetHotspotActiveUnderline( bool underline );
+    void SetHotspotSingleLine( bool singleLine );
+    void SetWhitespaceChars( const wxString& characters );
+
+    void StutteredPageUp();
+    void StutteredPageUpExtend();
+    void StutteredPageDown();
+    void StutteredPageDownExtend();
+
+#if WXPERL_W_VERSION_GE( 2, 6, 0 )
+    void StyleSetFontEncoding( int style, wxFontEncoding encoding );
+#endif
+    void StyleSetHotSpot( int style, bool hotspot );
+
+    void Tab();
+
+    void TargetFromSelection();
+
+    void VCHome();
+    void VCHomeExtend();
+    void VCHomeRectExtend();
+    void VCHomeWrap();
+    void VCHomeWrapExtend();
+
+    void WordLeft();
+    void WordLeftEnd();
+    void WordLeftEndExtend();
+    void WordLeftExtend();
+    void WordRight();
+    void WordRightEnd();
+    void WordRightEndExtend();
+    void WordRightExtend();
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    int WrapCount( int line );
+#endif
+
+    void ZoomIn();
+    void ZoomOut();
+
+    void MoveSelectedLinesUp();
+    void MoveSelectedLinesDown();
+};

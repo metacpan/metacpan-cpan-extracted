@@ -1,0 +1,50 @@
+{
+   "abstract" : "Base class for Perl modules",
+   "author" : [
+      "Grant Grueninger <grantg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Sitebase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::Prompt" : "0",
+            "List::Compare" : "0",
+            "Mozilla::CA" : "20130114",
+            "Params::Validate" : "0",
+            "Spiffy" : "0.24",
+            "Test::More" : "0",
+            "WWW::Mechanize" : "1.2",
+            "YAML" : "0.39"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.15"
+}

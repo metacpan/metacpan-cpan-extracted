@@ -1,0 +1,12 @@
+user
+title:<en 1>Edit user</en><nl 1>Wijzig gebruiker</nl>
+titlenew:<en 2>Add user</en><nl 2>Voeg gebruiker toe</nl>
+key:id
+query:select id,login,password,superuser from users where $data{key}=$params{$data{key}} and status='1' 
+captions:login=<en 3>Login</en><nl 3>Login</nl>:|password=<en 4>Password</en><nl 4>Paswoord</nl>:|superuser=<en 5>Superuser</en><nl 5>Supergebruiker</nl>:
+pagehead:<center><en 6>some view-specific header</en><nl 6>een view-afhankelijke hoofding</nl></center><br>
+pagefoot:<center><en 7>some view-specific footer</en><nl 7>een view-afhankelijke voetnoot</nl></center><br>
+form:id=hidden
+form:superuser=select(<en>Yes</en><nl>Ja</nl>=1,<en>No</en><nl>Nee</nl>=0)
+appendnew:<center><en 8>If you make this user a superuser,<br>(s)he will be able to add/edit/remove other users.</en><nl 8>Als u van deze gebruiker een supergebruiker maakt,<br>kan hij/zij gebruikers toevoegen/wijzigen en verwijderen.</nl></center>
+appendedit:<center><a href=jdetails.wsql?id=$id&view=user><en 9>Details</en><nl 9>Details</nl></a> | <a href=jdeleteform.wsql?view=user&id=$id&deldest=jlist.wsql%3Fview%3Dusers>Delete</a></center>

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!-- Export of tamperdata transactions -->
+<tdRequests>
+<tdRequest uri="http%3A//www.justanotherhacker.com/cgi-bin/env.cgi"><tdStartTime>21:28:53.465</tdStartTime>
+<tdStartTimeMS>1241004533465</tdStartTimeMS>
+<tdElapsedTime>3783</tdElapsedTime>
+<tdTotalElapsedTime>3817</tdTotalElapsedTime>
+<tdStatus>200</tdStatus>
+<tdStatusText>OK</tdStatusText><tdRequestMethod>GET</tdRequestMethod>
+<tdContentSize>-1</tdContentSize>
+<tdMimeType>text/plain</tdMimeType>
+<tdRequestHeaders>
+<tdRequestHeader name="Host">
+www.justanotherhacker.com</tdRequestHeader>
+<tdRequestHeader name="User-Agent">
+Mozilla/5.0%20%28Windows%3B%20U%3B%20Windows%20NT%206.0%3B%20en-US%3B%20rv%3A1.9.0.9%29%20Gecko/2009040821%20Firefox/3.0.9%20%28.NET%20CLR%203.5.30729%29</tdRequestHeader>
+<tdRequestHeader name="Accept">
+text/html%2Capplication/xhtml+xml%2Capplication/xml%3Bq%3D0.9%2C*/*%3Bq%3D0.8</tdRequestHeader>
+<tdRequestHeader name="Accept-Language">
+en-us%2Cen%3Bq%3D0.5</tdRequestHeader>
+<tdRequestHeader name="Accept-Encoding">
+gzip%2Cdeflate</tdRequestHeader>
+<tdRequestHeader name="Accept-Charset">
+ISO-8859-1%2Cutf-8%3Bq%3D0.7%2C*%3Bq%3D0.7</tdRequestHeader>
+<tdRequestHeader name="Keep-Alive">
+300</tdRequestHeader>
+<tdRequestHeader name="Connection">
+keep-alive</tdRequestHeader>
+<tdRequestHeader name="Cookie">
+__utma%3D135334890.50523998086824290.1231245228.1238433490.1239103257.18%3B%20__utmz%3D135334890.1231245228.1.1.utmcsr%3D%28direct%29%7Cutmccn%3D%28direct%29%7Cutmcmd%3D%28none%29%3B%20SQMSESSID%3D6a290aa5efc92d129588e66456d69c50%3B%20mt_user%3Dwireghoul%253A%253AcBYgr8jMN0tn8ixk7gK5a8fXv5Poykk6PKDGiGRo%253A%253A0</tdRequestHeader>
+<tdRequestHeader name="Cache-Control">
+max-age%3D0</tdRequestHeader>
+</tdRequestHeaders><tdPostHeaders></tdPostHeaders>
+<tdPostElements>
+</tdPostElements>
+<tdResponseHeaders><tdResponseHeader name="Date">
+Wed%2C%2029%20Apr%202009%2011%3A29%3A00%20GMT
+</tdResponseHeader>
+<tdResponseHeader name="Server">
+Apache/2.2.3%20%28Debian%29%20PHP/5.2.0-8+etch13
+</tdResponseHeader>
+<tdResponseHeader name="Keep-Alive">
+timeout%3D15%2C%20max%3D100
+</tdResponseHeader>
+<tdResponseHeader name="Connection">
+Keep-Alive
+</tdResponseHeader>
+<tdResponseHeader name="Transfer-Encoding">
+chunked
+</tdResponseHeader>
+<tdResponseHeader name="Content-Type">
+text/plain%3B%20charset%3DUTF-8
+</tdResponseHeader>
+<tdResponseHeader name="X-Antivirus">
+avast%21%204
+</tdResponseHeader>
+<tdResponseHeader name="X-Antivirus-Status">
+Clean
+</tdResponseHeader>
+</tdResponseHeaders>
+</tdRequest>
+</tdRequests>

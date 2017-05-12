@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w -I../lib
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace;
+
+my $result = $myspace->post_blog( @ARGV );
+
+die $myspace->error."\n" if $myspace->error;
+
+print "Blog posted.\n";

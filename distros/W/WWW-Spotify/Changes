@@ -1,0 +1,33 @@
+0.009     2017-02-16 23:18:10-05:00 America/Toronto
+- Require rather than use XML::Simple.
+
+0.008     2016-08-07 00:00:18-04:00 America/Toronto
+- Adds LWP::Protocol::https to dependencies.
+
+0.007     2016-08-06 01:50:04-04:00 America/Toronto
+- Allow users to provide their own useragents via "ua" arg to new().
+- Remove unused is_valid_json() method.
+
+0.006     2016-08-04 23:49:44-04:00 America/Toronto
+- Switch from Moose to Moo + Type::Tiny
+
+0.005     2016-07-28 22:23:03-04:00 America/Toronto
+ - GitHub repo url is now in metadata.
+
+0.004     2014-11-23
+ - Enhanced documentation
+ - Added query_full_url to help work with playlist results
+
+0.003     2014-10-23
+ - Changed album_tracks to albums_tracks to better match actual API call
+ - Added browse_feature_playlist method
+ - Added browse_new_releases method
+ - Enhanced documentation
+ - Improved tests
+
+0.002     2014-06-24
+ - Resolved issue with undefined item which caused tests to fail on some platforms
+ - Minor changes to documention
+
+0.001     2014-06-23
+ - Initial releasee

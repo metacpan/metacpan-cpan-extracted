@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+use strict;
+
+our $VERSION = '0.01';
+
+use WWW::Dictionary;
+
+binmode STDOUT, ':utf8';
+
+my $expression = join " ", @ARGV;
+
+my $dictionary = WWW::Dictionary->new( $expression );
+
+print $dictionary->get_meaning, "\n";
+
+__END__
+
+=head1 NAME
+
+dictionary - provides an interface with www.dictionary.com
+
+=head1 SYNOPSIS
+
+  dictionary expression
+
+=head1 DESCRIPTION
+
+Provides an interface to search www.dictionary.com through WWW::Dictionary
+
+=head1 SEE ALSO
+
+WWW::Dictionary(3).
+
+=head1 AUTHOR
+
+Jose Alves de Castro, E<lt>cog@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 by Jose Alves de Castro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

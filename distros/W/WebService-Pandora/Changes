@@ -1,0 +1,18 @@
+Revision history for Perl module WebService::Pandora
+
+0.4 2016-03-15
+ - Require Crypt::ECB >= 2.15 to fix backwards incompatibilies introduced in its 2.00 release [cpan rt #112971]
+
+0.3 2015-11-06
+ - Don't require critic or POD unit tests [cpan rt #108500]
+
+0.2 2013-11-23
+ - Method.pm does most of the work in execute() now instead of new()
+ - Added better error handling
+ - More unit tests
+ - Documentation fixes
+ - Added example scripts
+ - Makefile.PL fixes
+
+0.1 2013-11-21
+ - First Release!

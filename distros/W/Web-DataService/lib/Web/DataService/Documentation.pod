@@ -1,0 +1,386 @@
+=head1 NAME
+
+Web::DataService::Documentation - how to write documentation templates
+for Web::DataService
+
+=head1 SYNOPSIS
+
+This file explains the process of creating documentation templates for a
+Web::DataService application.
+
+=head1 OVERVIEW
+
+The documentation templates for a Web::DataService application are located by
+default in the F<doc> directory.  If you wish to specify a different
+directory, you can do so by means of the attribute
+L<doc_template_dir|Web::DataService::Configuration/doc_template_dir>.  For
+now, the only template engine compatible with Web::DataService is
+L<Template-Toolkit|Template>, but this may change in the future.
+
+You can create an individual documentation page for any node, by simply
+creating a file in the F<doc> directory whose path corresponds the node path.
+There are two ways to name this file.  At your option, you can either append
+the string C<_doc.tt> to the node path, or you can append C</index.tt>.  In
+the example application, the template corresponding to C<formats> is
+F<formats/index.tt>, but it could instead have been called F<formats_doc.tt>.
+The template corresponding to C<formats/json> is F<formats/json_doc.tt>, but
+it could also have been called F<formats/json/index.tt>.  If no matching
+template file is not found, then Web::DataService will try to use one of the
+default templates.  For an operation node, it will try the value of the node
+attribute C<doc_default_op_template>.  For all other nodes, it will try the
+value of the node attribute C<doc_default_template>.
+
+If the node attributes C<doc_header> and C<doc_footer> are defined (as they
+are by default) then the templates named by these attributes are included as a
+header and footer respectively.  The default values are C<doc_header.tt> and
+C<doc_footer.tt>.  The file C<doc_defs.tt> is included before every template,
+to define all of the elements described below.  It in turn includes the file
+C<doc_strings.tt>, which you are free to edit in any way you choose.
+
+=head2 Documentation format
+
+The main format for Web::DataService documentation pages is L<Pod|perlpod>.
+All documentation is generated first in Pod format, and is then converted to
+HTML by the module L<Web::DataService::PodParser>.  If you want to see the
+actual Pod output, just replace C<.html> with C<.pod> at the end of a request
+URL.  For example:
+
+    http://localhost:3000/data1.0/index.pod
+    http://localhost:3000/data1.0/list_doc.pod
+
+You can include arbitrary Pod commands and formatting codes in both
+documentation strings and template files.
+
+=head2 Embedded links
+
+The Web::DataService framework provides an easy way to include links from one
+documentation page to another, as well as from a documentation page to an
+operation (i.e. as a usage example).  This is done by using one of the
+following special prefixes.  Any link specified with LE<lt>E<gt> is checked to see if
+it starts with one of these, and if so then it is replaced by an auto-generated
+URL which includes the appropriate path prefix, selector key, format
+specifier, etc. for this data service instance.  The examples given below are
+from the L<example application|Web::DataService::Tutorial>:
+
+=over
+
+=item node:
+
+When a link is encountered with this prefix, the remainder is taken to be a
+node path.  This is used to auto-generate a URL that will retrieve the
+documentation page for that node.  For example:
+
+    L<special parameters|node:special>
+    L<JSON format|node:formats/json>
+
+=item op:
+
+When a link is encountered with this prefix, the remainder is parsed to
+determine a node path, format, and optional parameters.  These are then used
+to auto-generate a URL that will carry out the specified operation.  For
+example:
+
+    L<op:single.json?state=WI>
+    L<the list of regions|op:regions.txt>
+
+=item path:
+
+When a link is encountered with this prefix, the remainder is used to
+auto-generate a URL that will fetch the specified file from a file node.  For
+example:
+
+    L<stylesheet|path:css/dsdoc.css>
+
+=back
+
+The remainder of the link is parsed as follows:
+
+=over
+
+=item *
+
+Everything up to the first '?' or '#' is interpreted as a node path.  If it
+ends in '.something', that suffix is removed and interpreted as a format
+(except with the C<path:> prefix).
+
+=item *
+
+If the link ends in '#something', this is removed and then appended to the end
+of the generated URL.
+
+=item *
+
+If the link includes a '?', everything after it is interpreted as a parameter
+string.  Additional parameters might be automatically added, depending on
+which data service features are active.
+
+=back
+
+The syntax described here is fixed, but the resulting URL is generated
+according to the particular data service features and special parameters that
+are active.  So it might, for example, contain a C<format> parameter if that
+special parameter is active and if the feature C<format_suffix> is disabled.
+In this way, you can specify embedded links without worrying about the details
+of path prefix, data service features, etc.  In fact, you can change these
+later and the generated URLs will automatically adjust!
+
+=head2 Embedded html
+
+You may embed HTML into your documentation templates by using the Pod commands
+C<=begin html>, C<=end html>, and C<=for html>.  Any content specified using
+these commands will be output as-is when documentation pages are generated in
+HTML format, whereas most Pod translators will simply ignore this content.  If
+you wish to include data service URLs in this content, use the L<URL/"URL">
+element.
+
+For example, if you wish to put an image on one of your documentation pages,
+you could do it as follows:
+
+    =for html <img src="http://somewhere.org/some/image.gif">
+
+If you wish to make an image available via your data service and also display
+it on a page, try the following:
+
+    =for html <img src="<% URL('path:images/my_image.gif') %>">
+
+In order for this to work you would also need to define a data service node
+with path "images" and a "file_dir" attribute that points to the directory on
+disk where f<my_image.gif> is located.
+
+=head1 ELEMENTS
+
+The following elements are available for use in documentation templates.
+These are all defined in the file F<doc/doc_defs.tt>.
+
+If you wish to change the names of the section headers, you can edit the
+variable C<section_label> in F<doc/doc_defs.tt>.  If you wish to change the
+contents of the introductory paragraph of each section, you can edit the
+appropriate entry in the variable C<message>.  Alternatively, you can use
+the WRAPPER function of Template Toolkit to override this paragraph, in the
+following manner:
+
+    <% WRAPPER PARAMETERS(special) %>
+    You can use any of the following special parameters with any request:
+    <% END %>
+
+=head2 NAVTRAIL
+
+This element is replaced by a "navigation trail" linking to each level of the
+node hierarchy above the currnet node.  This is typically included in a header
+file, as follows:
+
+    <% NAVTRAIL %>
+
+=head2 DESCRIPTION_SECTION
+
+If the C<doc_string> attribute has been set for the node corresponding to this
+page, then this element is replaced by the default heading "DESCRIPTION",
+followed by the doc_string value.  You can most easily set this by including
+L<documentation strings|Web::DataService::Configuration/SYNTAX> in your calls
+to C<define_node>.
+
+If no C<doc_string> value was given for this node, then this element will be
+ignored unless the option C<opt_force=1> is given.  You can use either of the
+following calls:
+
+    <% DESCRIPTION_SECTION %>
+    <% DESCRIPTION_SECTION(opt_force=1) %>
+
+=head2 DOCSTRING
+
+This element is replaced by the value of the C<doc_string> attribute of the
+node corresponding to this page, with no header.  Use it as follows:
+
+    <% DOCSTRING %>
+
+=head2 USAGE_SECTION
+
+If the C<usage> attribute has been specified for the node corresponding to
+this page, then this element is replaced by the default heading "USAGE" followed
+by a list of links generated from the contents of that attribute.  Otherwise,
+it is ignored.  Use this as follows:
+
+    <% USAGE_SECTION %>
+
+=head2 USAGE
+
+This element is simply replaced by the list of usage links, or ignored if none
+have been specified.  Use it as follows:
+
+    <% USAGE %>
+
+=head2 NODELIST
+
+This element is replaced by a list of nodes that are children of the current
+one.  The list will include: the node title, the node description, and the
+node usage.  Only nodes for which the attribute C<place> was given a nonzero
+value will be included.  Use it as follows:
+
+    <% SUBNODES %>
+
+=head2 PARAMETER_SECTION
+
+This element is replaced by the default header "PARAMETERS" followed by a list
+of the parameters accepted by node corresponding to this page, along with a
+brief description of each parameter.  If you wish to document the parameters
+accepted by a different ruleset, include the ruleset name as a parameter.
+Use it in one of the following ways:
+
+    <% PARAMETER_SECTION %>
+    <% PARAMETER_SECTION(ruleset_name) %>
+
+=head2 PARAMETERS
+
+This element is simply replaced by the parameter documentation for the node
+corresponding to this page, with no header.  If you wish to document the
+parameters accepted by a different ruleset, include the ruleset name as a
+parameter.  Use it in one of the following ways:
+
+    <% PARAMETERS %>
+    <% PARAMETERS(ruleset_name) %>
+
+=head2 METHOD_SECTION
+
+This element is replaced by the default header "METHODS" followed by a list of
+the HTTP methods accepted by the node corresponding to this page.  The list of
+accepted methods may vary from node to node, depending upon how you set the
+node attribute C<allow_method>.  Use it as follows:
+
+    <% METHOD_SECTION %>
+
+=head2 METHODS
+
+This element is simply replaced by the list of methods accepted by the node
+corresponding to this page, with no header.  Use it as follows:
+
+    <% METHODS %>
+
+=head2 RESPONSE_SECTION
+
+This element is only valid in documentation templates for operation nodes.  It
+is replaced by the default header "RESPONSE" followed by a list of the data
+fields that are generated by this operation, including those in the optional
+output blocks.  The listing for each data field includes a brief description.
+If multiple vocabularies are available, then the name of each field in each
+vocabulary will be reported.  Use it as follows:
+
+    <% RESPONSE_SECTION %>
+
+=head2 RESPONSE
+
+This element is simply replaced by the response documentation for the node
+corresponding to this page, with no header.  Use it as follows:
+
+    <% RESPONSE %>
+
+=head2 FORMAT_SECTION
+
+This element is a replaced by the default header "FORMATS" followed by a list
+of the data formats that are provided by the data service and allowed for this
+node.  This list may vary from node to node, depending upon how you use the
+node attribute C<allow_format>.  You may follow the element name with one or
+both of the following options:
+
+=over
+
+=item opt_extended=1
+
+Include the documentation string for each format.  Without this option, the
+list includes just the format name and suffix and a link to its documentation
+page.
+
+=item opt_all=1
+
+List all formats, not just those available for this node.
+
+=back
+
+Use it in one of the following ways:
+
+    <% FORMAT_SECTION %>
+    <% FORMAT_SECTION(opt_extended=1,opt_all=1) %>
+
+=head2 FORMATS
+
+This element is simply replaced by the format documentation for the node
+corresponding to this page, with no header.  The same options are available as
+with FORMAT_SECTION.  Use it as follows:
+
+    <% FORMATS %>
+
+=head2 VOCAB_SECTION
+
+This element is replaced by the default header "VOCABULARIES" followed by a
+list of the vocabularies that are provided by the data service and allowed for
+this node.  This list may vary from node to node, depending upon how you use
+the node attribute C<allow_vocab>.  You may follow the element name with one
+or both of the following options:
+
+=over
+
+=item opt_extended=1
+
+Include the documentation string for each vocabulary.  Without this option, the
+list includes just the format name and suffix and a link to its documentation
+page.
+
+=item opt_all=1
+
+List all vocabularies, not just those available for this node.
+
+=back
+
+Use it in one of the following ways:
+
+    <% VOCAB_SECTION %>
+    <% VOCAB_SECTION(opt_extended=1,opt_all=1) %>
+
+=head2 VOCABS
+
+This element is simply replaced by the vocabulary documentation for the node
+corresponding to this page, with no header.  The same options are available as
+with VOCAB_SECTION.  Use it as follows:
+
+    <% VOCABS %>
+
+=head2 URL
+
+This element is used to generate arbitrary URLs in accordance with the data
+service features and special parameters that are currently active.  See
+L<Embedded links|/"Embedded links"> above for a description of the syntax.
+You will probably only need to use this element if you include L<embedded
+html/"Embedded html"> in your templates.  In the rest of your documentation
+you can just enclose any URLs in LE<lt>E<gt> and they will be automatically
+translated.  For example, you could put something like the following in
+f<doc_header.tt>:
+
+    =begin html
+    <div class="banner">
+        <img id="logo" src="<% URL('path:images/my_logo.png') %>">
+        <h1 id="title">My Data Service: <% doc_title %></h1>
+    </div>
+    =end html
+
+In order for this to work you would also need to define a data service node
+with path "images" and a "file_dir" attribute that points to the directory on
+disk where f<my_logo.png> is located.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

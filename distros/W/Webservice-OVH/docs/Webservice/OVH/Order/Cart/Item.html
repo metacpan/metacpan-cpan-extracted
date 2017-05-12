@@ -1,0 +1,275 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#is_valid">is_valid</a></li>
+      <li><a href="#is_valid1">_is_valid</a></li>
+      <li><a href="#is_valid2">_is_valid</a></li>
+      <li><a href="#id">id</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#configurations">configurations</a></li>
+      <li><a href="#duration">duration</a></li>
+      <li><a href="#offer_id">offer_id</a></li>
+      <li><a href="#options">options</a></li>
+      <li><a href="#prices">prices</a></li>
+      <li><a href="#product_id">product_id</a></li>
+      <li><a href="#settings">settings</a></li>
+      <li><a href="#available_configuration">available_configuration</a></li>
+      <li><a href="#delete">delete</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order::Cart::Item</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $cart = $ovh-&gt;order-&gt;new_cart(ovh_subsidiary =&gt; &#39;DE&#39;);</p>
+
+<p>my $items = $cart-&gt;items;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides info for a specific cart item.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Item object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $item_id - api id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Cart-&gt;_new($ovh_api_wrapper, $cart_id, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid">is_valid</h2>
+
+<p>When the item is deleted on the api side, this method returns 0.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;Valid&quot; if $item-&gt;is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid1">_is_valid</h2>
+
+<p>Intern method to check validity. Difference is that this method carps an error.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: $item-&gt;_is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid2">_is_valid</h2>
+
+<p>Gets the associated cart.</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Cart.html">Webservice::OVH::Order::Cart</a></p>
+
+</li>
+<li><p>Synopsis: my $cart = $item-&gt;cart;</p>
+
+</li>
+</ul>
+
+<h2 id="id">id</h2>
+
+<p>Returns the api id.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $id = $item-&gt;id;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Retrieves properties. This method updates the intern property variable.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $item-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="configurations">configurations</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $configurations = $item-&gt;configurations;</p>
+
+</li>
+</ul>
+
+<h2 id="duration">duration</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $duration = $item-&gt;duration;</p>
+
+</li>
+</ul>
+
+<h2 id="offer_id">offer_id</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $offer_id = $item-&gt;offer_id;</p>
+
+</li>
+</ul>
+
+<h2 id="options">options</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $options = $item-&gt;options;</p>
+
+</li>
+</ul>
+
+<h2 id="prices">prices</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $prices = $item-&gt;prices;</p>
+
+</li>
+</ul>
+
+<h2 id="product_id">product_id</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $product_id = $item-&gt;product_id;</p>
+
+</li>
+</ul>
+
+<h2 id="settings">settings</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $settings = $item-&gt;settings;</p>
+
+</li>
+</ul>
+
+<h2 id="available_configuration">available_configuration</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $available_configuration = $item-&gt;available_configuration;</p>
+
+</li>
+</ul>
+
+<h2 id="delete">delete</h2>
+
+<p>Deletes the item and sets the object to invalid.</p>
+
+<ul>
+
+<li><p>Synopsis: $item-&gt;delete;</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d01feea7b93edba696b9a4e569741cd46c1b68c7 Changes
+SHA1 d14d967d0150e1d097ab6794b25551dfb70f09c6 MANIFEST
+SHA1 50816c9ec29234dab5da059d04d6e40998306e2e META.yml
+SHA1 6400e3d34a49e8e2cef96fb4cb5734b0e80537e2 Makefile.PL
+SHA1 7073fd1dae5f58447c9688bbb2121fc3bf39b645 README
+SHA1 76d9fbd992def125e54e9bbcc06b5ac539860b3e TODO
+SHA1 58bcd7e152f4f5d31fd05e16ae4623ccbd2e298c lib/Wiki/Toolkit/Formatter/Pod.pm
+SHA1 7bdb354194bfa188331a7e0dc1b05222c2dcb220 t/01_formatting.t
+SHA1 f6945637437dc2e1769287d15e4e58735e9fb2af t/02_extended_links.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFLYg08YzuFKFF44qURAjvNAKCsCSJ8PBykqoHL9D9jf5N9tyiy/wCgpp4N
+E3rMBVRQdEtGkGqRH8KgZas=
+=Fyiz
+-----END PGP SIGNATURE-----

@@ -1,0 +1,279 @@
+
+=head1 NAME
+
+Win32::GUI::Reference::Packages - List of Win32::GUI packages.
+
+=head1 DESCRIPTION
+
+This page provides a summary of the packages available with Win32::GUI.
+
+=head1 PACKAGES
+
+=over
+
+=item L<Win32::GUI|Win32::GUI::Reference::Methods>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::AcceleratorTable|Win32::GUI::AcceleratorTable>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Animation|Win32::GUI::Animation>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::AxWindow|Win32::GUI::AxWindow>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Bitmap|Win32::GUI::Bitmap>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::BitmapInline|Win32::GUI::BitmapInline>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Brush|Win32::GUI::Brush>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Button|Win32::GUI::Button>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Checkbox|Win32::GUI::Checkbox>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Class|Win32::GUI::Class>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Combobox|Win32::GUI::Combobox>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ComboboxEx|Win32::GUI::ComboboxEx>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Constants|Win32::GUI::Constants>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Cursor|Win32::GUI::Cursor>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::DC|Win32::GUI::DC>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::DIBitmap|Win32::GUI::DIBitmap>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::DateTime|Win32::GUI::DateTime>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::DialogBox|Win32::GUI::DialogBox>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::DropFiles|Win32::GUI::DropFiles>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Font|Win32::GUI::Font>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Graphic|Win32::GUI::Graphic>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Grid|Win32::GUI::Grid>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::GridLayout|Win32::GUI::GridLayout>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Groupbox|Win32::GUI::Groupbox>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Header|Win32::GUI::Header>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Icon|Win32::GUI::Icon>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ImageList|Win32::GUI::ImageList>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Label|Win32::GUI::Label>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ListView|Win32::GUI::ListView>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ListView::Item|Win32::GUI::ListView::Item>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ListView::SubItem|Win32::GUI::ListView::SubItem>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Listbox|Win32::GUI::Listbox>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Listbox::Item|Win32::GUI::Listbox::Item>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MDIChild|Win32::GUI::MDIChild>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MDIClient|Win32::GUI::MDIClient>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MDIFrame|Win32::GUI::MDIFrame>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Menu|Win32::GUI::Menu>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MenuButton|Win32::GUI::MenuButton>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MenuItem|Win32::GUI::MenuItem>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::MonthCal|Win32::GUI::MonthCal>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::NotifyIcon|Win32::GUI::NotifyIcon>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Pen|Win32::GUI::Pen>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::ProgressBar|Win32::GUI::ProgressBar>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::RadioButton|Win32::GUI::RadioButton>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Rebar|Win32::GUI::Rebar>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Region|Win32::GUI::Region>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::RichEdit|Win32::GUI::RichEdit>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Scintilla|Win32::GUI::Scintilla>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Slider|Win32::GUI::Slider>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Splitter|Win32::GUI::Splitter>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::StatusBar|Win32::GUI::StatusBar>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::TabStrip|Win32::GUI::TabStrip>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Textfield|Win32::GUI::Textfield>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Timer|Win32::GUI::Timer>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Toolbar|Win32::GUI::Toolbar>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Tooltip|Win32::GUI::Tooltip>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Trackbar|Win32::GUI::Trackbar>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::TreeView|Win32::GUI::TreeView>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::UpDown|Win32::GUI::UpDown>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=item L<Win32::GUI::Window|Win32::GUI::Window>
+
+=for comment $Id: Packages_package.tpl,v 1.5 2008/02/02 17:03:56 robertemay Exp $
+
+=back
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/Reference/Packages.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

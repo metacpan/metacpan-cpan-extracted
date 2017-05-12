@@ -1,0 +1,1591 @@
+<HTML>
+<HEAD>
+<TITLE>Win32API::Net - Perl interface to the Windows NT LanManager API account management functions.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#note on versions prior to 0.08">NOTE ON VERSIONS PRIOR TO 0.08</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#using references">Using References</A></LI>
+	</UL>
+
+	<LI><A HREF="#data structures">DATA STRUCTURES</A></LI>
+	<LI><A HREF="#exports">EXPORTS</A></LI>
+	<LI><A HREF="#net user functions">NET USER FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#useradd(server, level, hash, error)">UserAdd(server, level, hash, error)</A></LI>
+		<LI><A HREF="#userchangepassword(server, user, old, new)">UserChangePassword(server, user, old, new)</A></LI>
+		<LI><A HREF="#userdel(server, user)">UserDel(server, user)</A></LI>
+		<LI><A HREF="#userenum(server, array[, filter])">UserEnum(server, array[, filter])</A></LI>
+		<LI><A HREF="#usergetgroups(server, user, array)">UserGetGroups(server, user, array)</A></LI>
+		<LI><A HREF="#usergetinfo(server, user, level, hash)">UserGetInfo(server, user, level, hash)</A></LI>
+		<LI><A HREF="#usergetlocalgroups(server, user, array[, flags])">UserGetLocalGroups(server, user, array[, flags])</A></LI>
+		<LI><A HREF="#usermodalsget()"><CODE>UserModalsGet()</CODE></A></LI>
+		<LI><A HREF="#usermodalsset()"><CODE>UserModalsSet()</CODE></A></LI>
+		<LI><A HREF="#usersetgroups(server, user, array)">UserSetGroups(server, user, array)</A></LI>
+		<LI><A HREF="#usersetinfo(server, user, level, hash, error)">UserSetInfo(server, user, level, hash, error)</A></LI>
+	</UL>
+
+	<LI><A HREF="#net group functions">NET GROUP FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#groupadd(server, level, hash, error)">GroupAdd(server, level, hash, error)</A></LI>
+		<LI><A HREF="#groupadduser(server, group, user)">GroupAddUser(server, group, user)</A></LI>
+		<LI><A HREF="#groupdel(server, group)">GroupDel(server, group)</A></LI>
+		<LI><A HREF="#groupdeluser(server, group, user)">GroupDelUser(server, group, user)</A></LI>
+		<LI><A HREF="#groupenum(server, array)">GroupEnum(server, array)</A></LI>
+		<LI><A HREF="#groupgetinfo(server, group, level, hash)">GroupGetInfo(server, group, level, hash)</A></LI>
+		<LI><A HREF="#groupgetusers(server, group, array)">GroupGetUsers(server, group, array)</A></LI>
+		<LI><A HREF="#groupsetinfo(server, group, level, hash, error)">GroupSetInfo(server, group, level, hash, error)</A></LI>
+		<LI><A HREF="#groupsetusers(server, group, array)">GroupSetUsers(server, group, array)</A></LI>
+	</UL>
+
+	<LI><A HREF="#net local group functions">NET LOCAL GROUP FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#localgroupadd(server, level, hash, error)">LocalGroupAdd(server, level, hash, error)</A></LI>
+		<LI><A HREF="#localgroupaddmember()"><CODE>LocalGroupAddMember()</CODE></A></LI>
+		<LI><A HREF="#localgroupaddmembers(server, group, array)">LocalGroupAddMembers(server, group, array)</A></LI>
+		<LI><A HREF="#localgroupdel(server, group)">LocalGroupDel(server, group)</A></LI>
+		<LI><A HREF="#localgroupdelmember()"><CODE>LocalGroupDelMember()</CODE></A></LI>
+		<LI><A HREF="#localgroupdelmembers(server, group, array)">LocalGroupDelMembers(server, group, array)</A></LI>
+		<LI><A HREF="#localgroupenum(server, array)">LocalGroupEnum(server, array)</A></LI>
+		<LI><A HREF="#localgroupgetinfo(server, group, level, hash)">LocalGroupGetInfo(server, group, level, hash)</A></LI>
+		<LI><A HREF="#localgroupgetmembers(server, group, hash)">LocalGroupGetMembers(server, group, hash)</A></LI>
+		<LI><A HREF="#localgroupsetinfo(server, level, hash, error)">LocalGroupSetInfo(server, level, hash, error)</A></LI>
+		<LI><A HREF="#localgroupsetmembers()"><CODE>LocalGroupSetMembers()</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#net get functions">NET GET FUNCTIONS</A></LI>
+	<UL>
+
+		<LI><A HREF="#getdcname(server, domain, domaincontroller)">GetDCName(server, domain, domain-controller)</A></LI>
+	</UL>
+
+	<LI><A HREF="#user info levels">USER INFO LEVELS</A></LI>
+	<LI><A HREF="#user info fields">USER INFO FIELDS</A></LI>
+	<LI><A HREF="#user flags">USER FLAGS</A></LI>
+	<LI><A HREF="#user privilege flags">USER PRIVILEGE FLAGS</A></LI>
+	<LI><A HREF="#user enum filter">USER ENUM FILTER</A></LI>
+	<LI><A HREF="#user field errors">USER FIELD ERRORS</A></LI>
+	<LI><A HREF="#group info levels">GROUP INFO LEVELS</A></LI>
+	<LI><A HREF="#group info fields">GROUP INFO FIELDS</A></LI>
+	<LI><A HREF="#group field errors">GROUP FIELD ERRORS</A></LI>
+	<LI><A HREF="#group users info levels">GROUP USERS INFO LEVELS</A></LI>
+	<LI><A HREF="#group users info fields">GROUP USERS INFO FIELDS</A></LI>
+	<LI><A HREF="#local group info levels">LOCAL GROUP INFO LEVELS</A></LI>
+	<LI><A HREF="#local group info fields">LOCAL GROUP INFO FIELDS</A></LI>
+	<LI><A HREF="#local group field errors">LOCAL GROUP FIELD ERRORS</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#acknowedgements">ACKNOWEDGEMENTS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Win32API::Net - Perl interface to the Windows NT LanManager API account management functions.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>use Win32API::Net;</P>
+<P>
+<HR>
+<H1><A NAME="note on versions prior to 0.08">NOTE ON VERSIONS PRIOR TO 0.08</A></H1>
+<P>As of version 0.08 of this module, the behaviour relating to empty strings
+in input hashes has changed. The old behaviour converted such strings to
+the NULL pointer. The underlying API uses this value as an indication to
+not change the value stored for a given field. This meant that you were not
+able to clear (say) the logonScript field for a user using UserSetInfo().</P>
+<P>The new behaviour is to leave the string as an empty C string which will
+allow fields to be cleared.  To pass a NULL pointer to the underlying
+API call (and thus, to leave the field as it was), you need to set the
+corresponding field to <CODE>undef</CODE>.</P>
+<P>WARNING: <STRONG>THIS IS AN INCOMPATIBLE CHANGE</STRONG>.
+<STRONG>EXISTING SCRIPTS THAT RELIED ON PRIOR BEHAVIOR MAY NEED TO BE MODIFIED</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Win32API::Net provides a more complete wrapper for the account management
+parts of the NT LanManager API than do other similar packages. Most of what
+you can achieve with the native C++ API is possible with this package - albeit
+in a more Perl like manner by using references to pass information to and
+from functions.</P>
+<P>For an understanding of the environment in which these functions operate see
+<A HREF="#data structures">DATA STRUCTURES</A>.</P>
+<P>The following groups of functions are available:</P>
+<DL>
+<DT><STRONG><A NAME="item_NET_USER_FUNCTIONS"><A HREF="#net user functions">NET USER FUNCTIONS</A></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_NET_GROUP_FUNCTIONS"><A HREF="#net group functions">NET GROUP FUNCTIONS</A></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_NET_LOCAL_GROUP_FUNCTIONS"><A HREF="#net local group functions">NET LOCAL GROUP FUNCTIONS</A></A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_NET_GET_FUNCTIONS"><A HREF="#net get functions">NET GET FUNCTIONS</A></A></STRONG><BR>
+<DD>
+</DL>
+<P>All functions return 0 on failure and 1 on success. Use the
+<CODE>Win32::GetLastError()</CODE> function to find out more information on why a
+function failed. In addition, some functions that take a hash reference
+to pass information in (e.g. <CODE>UserAdd()</CODE>) have a last argument that will
+allow more detailed information on which key/value pair was not properly
+specified.</P>
+<P>
+<H2><A NAME="using references">Using References</A></H2>
+<P>References to hashes and arrays are used throughout this package to pass
+information into and out of functions.</P>
+<DL>
+<DT><STRONG><A NAME="item_Using_Hash_References">Using Hash References</A></STRONG><BR>
+<DD>
+Where a hash reference is required you can use anything that evaluates to a
+hash reference. e.g.
+<PRE>
+        $href = \%someHash;
+        UserAdd(server, 2, $hRef);</PRE>
+<P>Or more directly:</P>
+<PRE>
+        UserAdd(server, 2, \%someHash);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Using_Array_references">Using Array references</A></STRONG><BR>
+<DD>
+Array references are used in a similar manner to hash references. e.g.
+<PRE>
+        $aref = \@someArray;
+        UserEnum(server, $aref);</PRE>
+<P>Or more directly:</P>
+<PRE>
+        UserEnum(server, \@someArray);</PRE>
+<P></P></DL>
+<P>Please note: Any <CODE>*Get*()</CODE> or <CODE>*Enum()</CODE> operation will first clear the
+contents of the input hash or array being referenced.</P>
+<P>See <EM>EXAMPLES</EM> and the test.pl script for examples of usage.</P>
+<P>
+<HR>
+<H1><A NAME="data structures">DATA STRUCTURES</A></H1>
+<P>Most the the functions in the underlying API allow the programmer to pass
+specify at runtime the amount of information that is supplied to the
+function. For example, the <CODE>NetUserGetInfo()</CODE> call allows the programmer to
+specify levels of 0, 1, 2, 3 (and others). Having specified this level, the
+function returns a structure that will contain different fields. For a
+level <CODE>0</CODE>, the function returns a structure that has only one field. For a
+supplied level of 1, the function returns a structure with <CODE>8</CODE> fields. The
+programmer needs to know in advance what fields should be provided or will
+be returned for a given level. This mechanism works very will since it
+effectively overloads functions without having to use different function
+prototypes. Perl provides better higher level data structures in the form
+of arrays and hashes. This package uses hashes as the means to pass these
+variable size structure into and out of functions.</P>
+<P>For any function that takes a reference to a hash as input, the programmer
+is expected to provide appropriate keys and corresponding values as well as
+the level parameter. The called function will then takes the values out of
+the supplied hash and build the approprite structure to pass to the
+underlying API function.</P>
+<P>For any function that takes a reference to a hash to recieve output, the
+function will first clear any keys an corresponding values in the supplied
+hash. It will call the underlying API call and will then return in the hash
+any keys and values that are applicable at the requested level.</P>
+<P>Example:</P>
+<P>The <CODE>UserGetInfo()</CODE> can takes a number of levels. If called with level <CODE>0</CODE>
+the supplied hash will, on return from the function, contain a single key
+and value - namely <STRONG>name</STRONG>/<STRONG>requested-users-name</STRONG>. If called with a level
+of <CODE>1</CODE> the supplied hash will, on return from the function, contain 8 keys
+and values. The returned keys are <CODE>name, password</CODE>, <CODE>passwordAge</CODE>,
+<CODE>priv</CODE>, <CODE>homeDir</CODE>, <CODE>comment</CODE>, <CODE>flags</CODE>, <CODE>scriptPath</CODE>. See
+<A HREF="#user info fields">USER INFO FIELDS</A> for more information on what these represent.</P>
+<P>
+<HR>
+<H1><A NAME="exports">EXPORTS</A></H1>
+<P>By default, Win32API::Net exports no symbols into the callers namespace.
+The following tags can be used to selectively import symbols into the
+main namespace.</P>
+<DL>
+<DT><STRONG><A NAME="item_%3AUser"><CODE>:User</CODE></A></STRONG><BR>
+<DD>
+Exports all symbols needed for the <CODE>User*()</CODE> functions.
+See <A HREF="#net user functions">NET USER FUNCTIONS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%3AGet"><CODE>:Get</CODE></A></STRONG><BR>
+<DD>
+Exports all symbols needed for the <CODE>Get*()</CODE> functions.
+See <A HREF="#net get functions">NET GET FUNCTIONS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%3AGroup"><CODE>:Group</CODE></A></STRONG><BR>
+<DD>
+Exports all symbols needed for the <CODE>Group*()</CODE> functions.
+See <A HREF="#net group functions">NET GROUP FUNCTIONS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_%3ALocalGroup"><CODE>:LocalGroup</CODE></A></STRONG><BR>
+<DD>
+Exports all symbols needed for the <CODE>LocalGroup*()</CODE> functions.
+See <A HREF="#net local group functions">NET LOCAL GROUP FUNCTIONS</A>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="net user functions">NET USER FUNCTIONS</A></H1>
+<P>The <CODE>User*()</CODE> functions operate on NT user accounts.</P>
+<P>Administrator or Account Operator group membership is required to
+successfully execute most of these functions on a remote server or on a
+computer that has local security enabled. Administrator privileges are
+required to add an Administrator Privilege account.  There are some
+exceptions to this whereby a user can change some of their own settings
+where these don't conflict with 'administrative information' (e.g. full
+name).</P>
+<P>The <CODE>server</CODE> field can be the empty string, in which case the function
+defaults to running on the local computer. If you leave this field blank
+then you should ensure that you are running the function on a PDC or BDC
+for your current domain. Use the support function <CODE>GetDCName()</CODE> to find out
+what the domain controller is, should you not be running this on the PDC.</P>
+<P>All functions in this section are 'DOMAIN functions'. This means that,
+for example, the <CODE>UserGetLocalGroups()</CODE> function actually lists the
+domain's local groups of which the named user is a member.</P>
+<P>The following functions are available.</P>
+<P>
+<H2><A NAME="useradd(server, level, hash, error)">UserAdd(server, level, hash, error)</A></H2>
+<P>Add a new user account. The user name is taken from the <CODE>name</CODE>-key's
+value in the supplied hash.</P>
+<DL>
+<DT><STRONG><A NAME="item_server_%2D_Scalar_String"><CODE>server</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The server on which to add the account.
+<P></P>
+<DT><STRONG><A NAME="item_level_%2D_Scalar_Int"><CODE>level</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+Level of information provided in hash. This can be either 1, 2 or 3.
+See <A HREF="#user info levels">USER INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_hash_%2D_Hash_Reference"><CODE>hash</CODE> - Hash Reference</A></STRONG><BR>
+<DD>
+The information to use to add this account. This should have all the
+appropriate keys and values required for <CODE>level</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_error_%2D_Scalar_Int"><CODE>error</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+Provides information on which field in the hash was not properly specified.
+See <A HREF="#user field errors">USER FIELD ERRORS</A> for more information about what values this can
+take.
+<P></P></DL>
+<P>
+<H2><A NAME="userchangepassword(server, user, old, new)">UserChangePassword(server, user, old, new)</A></H2>
+<P>Changes the password for <CODE>user</CODE>. If the policy of the machine/domain
+only allows password changes if the <CODE>user</CODE> is logged on then the <CODE>user</CODE>
+must be logged on to execute this function. With Administrator or Account
+Operator privilege you can use this function to change anyone's password,
+so long as you know the old password.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to change the password.
+<P></P>
+<DT><STRONG><A NAME="item_user_%2D_Scalar_String"><CODE>user</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The name of the <CODE>user</CODE> whose password is being changed.
+<P></P>
+<DT><STRONG><A NAME="item_old_%2D_Scalar_String"><CODE>old</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The existing password for <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_new_%2D_Scalar_String"><CODE>new</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The new password for <CODE>user</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="userdel(server, user)">UserDel(server, user)</A></H2>
+<P>Deletes the specified <CODE>user</CODE> account. Administrator or Account Operator
+privilege is required to execute this function.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to delete the <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> account to delete.
+<P></P></DL>
+<P>
+<H2><A NAME="userenum(server, array[, filter])">UserEnum(server, array[, filter])</A></H2>
+<P>Enumerates all the accounts on server that satisfy <CODE>filter</CODE>. Unlike the
+<CODE>NetUserEnum()</CODE> function in the API, this function does not allow you
+to specify a level (internally it is hardcoded to 0). In Perl it is
+trivial to implement the equivalent function (should you need it) - see
+<A HREF="#example 1">Example 1</A>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to enumerate the accounts satisfying <CODE>filter</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_array_%2D_Array_Reference"><CODE>array</CODE> - Array Reference</A></STRONG><BR>
+<DD>
+The array that will hold the names of all users on <CODE>server</CODE> whose
+accounts match <CODE>filter</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_Int"><CODE>filter</CODE> - Scalar Int (optional)</A></STRONG><BR>
+<DD>
+The filter to apply (see <A HREF="#user enum filter">USER ENUM FILTER</A>). This argument is optional
+and if not present a default of <A HREF="#item_FILTER_NORMAL_ACCOUNT"><CODE>FILTER_NORMAL_ACCOUNT</CODE></A> is used.
+<P></P></DL>
+<P>
+<H2><A NAME="usergetgroups(server, user, array)">UserGetGroups(server, user, array)</A></H2>
+<P>Get the global groups for which <CODE>user</CODE> is a member. It returns the group
+names in <CODE>array</CODE>. Unlike the <CODE>NetUserGetGroups()</CODE> function in the API,
+this function does not allow you to specify a level (internally is
+hardcoded to 0). In Perl it is trivial to implement the equivalent function
+(in the unlikely event that you might need it).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to get the groups of which <CODE>user</CODE> is a member.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> whose group membership you wish to examine.
+<P></P>
+<DT><STRONG><A NAME="item_array_%2D_Scalar_String"><CODE>array</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The array that will contain the group names to which <CODE>user</CODE> belongs.
+<P></P></DL>
+<P>
+<H2><A NAME="usergetinfo(server, user, level, hash)">UserGetInfo(server, user, level, hash)</A></H2>
+<P>Returns the information at the specified <CODE>level</CODE> for the named <CODE>user</CODE>
+in <CODE>hash</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to get the requested information about <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> whose information you want.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+One of: 0, 1, 2, 3, 10, 11 and 20. See <A HREF="#user info levels">USER INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash that will contain the keys and values for the information
+requested. See <A HREF="#user info fields">USER INFO FIELDS</A> for information about which keys are
+present in a given level.
+<P></P></DL>
+<P>
+<H2><A NAME="usergetlocalgroups(server, user, array[, flags])">UserGetLocalGroups(server, user, array[, flags])</A></H2>
+<P>Gets the names of the local groups of which <CODE>user</CODE> is a member. Unlike
+the <CODE>NetUserEnum()</CODE> function in the API, this function does not allow you
+to specify a level. Since the underlying API restricts you to level 0 there
+really isn't any need to include it...</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The server from which to get the local groups of which <CODE>user</CODE> is a member.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> whose local group membership you wish to enumerate.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array that will hold the names of the local groups to which <CODE>user</CODE>
+belongs.
+<P></P>
+<DT><STRONG><A NAME="item_flags_%2D_Scalar_Int_%3Cem%3E%28optional%29%3C%2Fe"><CODE>flags</CODE> - Scalar Int &lt;em&gt;(optional)&lt;/em&gt;</A></STRONG><BR>
+<DD>
+Either <CODE>Win32API::Net::LG_INCLUDE_INDIRECT()</CODE> or 0. if <CODE>flags</CODE> is
+omitted, the function internally uses 0. Specifying <CODE>LG_INCLUDE_INDIRECT()</CODE>
+will include in the list the names of the groups of which the <CODE>user</CODE> is
+indirectly a member (e.g. by being in a global group that is a member of a
+local group).
+<P>This field can take no other values.</P>
+<P></P></DL>
+<P>
+<H2><A NAME="usermodalsget()"><CODE>UserModalsGet()</CODE></A></H2>
+<P>This function is not currently implemented.</P>
+<P>
+<H2><A NAME="usermodalsset()"><CODE>UserModalsSet()</CODE></A></H2>
+<P>This function is not currently implemented.</P>
+<P>
+<H2><A NAME="usersetgroups(server, user, array)">UserSetGroups(server, user, array)</A></H2>
+<P>Sets the (global) group membership for <CODE>user</CODE> to the specified groups.
+Unlike the API function <CODE>NetUserSetGroups()</CODE>, this function does not take a
+<CODE>level</CODE> parameter (mainly because this option is largely redundant).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which you wish to set the group membership for <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> whose group membership you wish to set.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array containing the (global) group names to set the <CODE>user</CODE>s
+membership of.
+<P></P></DL>
+<P>This function will fail if any of the group names specified do not exist.</P>
+<P>
+<H2><A NAME="usersetinfo(server, user, level, hash, error)">UserSetInfo(server, user, level, hash, error)</A></H2>
+<P>Sets the info for <CODE>user</CODE> according to the information contained in <CODE>hash</CODE>
+for <CODE>level</CODE> (see <A HREF="#user info levels">USER INFO LEVELS</A>).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which you wish to change the info for <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> whose info you wish to change.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+One of 0, 1, 2, 3, or 20 (according to Microsoft documentation). In
+practice, you can use all the 10xx levels as well to change most of the
+individual properties of the named <CODE>user</CODE> - although this may not be
+supported in future...
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash that will contain the necessary key/value pairs required for
+<CODE>level</CODE> (see <A HREF="#user info levels">USER INFO LEVELS</A>).
+<P></P>
+<DT><STRONG><CODE>error</CODE> - Scalar Int</STRONG><BR>
+<DD>
+Provides information on which field in <CODE>hash</CODE> were not properly
+specified. See <A HREF="#user field errors">USER FIELD ERRORS</A> for more information about what
+values can be returned in this field.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="net group functions">NET GROUP FUNCTIONS</A></H1>
+<P>The <CODE>Group*()</CODE> functions all operate only on global groups. To modify
+local groups, use the corresponding <CODE>LocalGroup*()</CODE> functions.</P>
+<P>Administrator or Account Operator group membership is required to
+successfully execute most of these functions on a remote server or on
+a computer that has local security enabled.</P>
+<P>The <CODE>server</CODE> field can be the empty string, in which case the function
+defaults to running on the local computer. If you leave this field blank
+then you should ensure that you are running the function on a PDC or BDC
+for your current domain. Use the support function <CODE>GetDCName()</CODE> to find out
+what the domain controller is, should you not be running this on the PDC.</P>
+<P>The following functions are available.</P>
+<P>
+<H2><A NAME="groupadd(server, level, hash, error)">GroupAdd(server, level, hash, error)</A></H2>
+<P>Adds the specified group.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to add the group.
+<P></P>
+<DT><STRONG><A NAME="item_level_%2D_Scalar_String"><CODE>level</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information contained in <CODE>hash</CODE>. This can be one of 0, 1
+or 2. See <A HREF="#group info levels">GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+A hash containing the required key/value pairs for <CODE>level</CODE>.
+<P></P>
+<DT><STRONG><CODE>error</CODE> - Scalar Int</STRONG><BR>
+<DD>
+Provides information on which field in <CODE>hash</CODE> was not properly specified.
+See <A HREF="#group field errors">GROUP FIELD ERRORS</A> for more information about what values can be
+returned in this field.
+<P></P></DL>
+<P>
+<H2><A NAME="groupadduser(server, group, user)">GroupAddUser(server, group, user)</A></H2>
+<P>Adds the specified <CODE>user</CODE> to the specified <CODE>group</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to add the <CODE>user</CODE> to <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_group_%2D_Scalar_String"><CODE>group</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The <CODE>group</CODE> to add the <CODE>user</CODE> to.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> to add to <CODE>group</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="groupdel(server, group)">GroupDel(server, group)</A></H2>
+<P>Deletes the specified global group.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to delete the named <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_group_%2DScalar_String"><CODE>group</CODE> -Scalar String</A></STRONG><BR>
+<DD>
+The <CODE>group</CODE> to delete.
+<P></P></DL>
+<P>
+<H2><A NAME="groupdeluser(server, group, user)">GroupDelUser(server, group, user)</A></H2>
+<P>Deletes the specified user from the specified group.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to delete <CODE>user</CODE> from <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> from which to delete <CODE>user</CODE>.
+<P></P>
+<DT><STRONG><CODE>user</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>user</CODE> to delete from <CODE>group</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="groupenum(server, array)">GroupEnum(server, array)</A></H2>
+<P>Enumerates all the global groups on the server. Unlike the API call
+<CODE>NetGroupEnum()</CODE>, this function does not allow you to specify a level
+(internally it is hardcoded to 0). In Perl it is trivial to implement
+the equivalent function (should you need it).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The server on which to enumerate the (global) <CODE>groups</CODE>.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+An array that, on return, will contain the <CODE>group</CODE> names.
+<P></P></DL>
+<P>
+<H2><A NAME="groupgetinfo(server, group, level, hash)">GroupGetInfo(server, group, level, hash)</A></H2>
+<P>Retrieves <CODE>level</CODE> information for <CODE>group</CODE> returning information in
+<CODE>hash</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to get the group information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose information you wish to obtain.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information you wish to retrieve. This can be one of 1, 2
+or 3. See <A HREF="#group info levels">GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash that will contain the information.
+<P></P></DL>
+<P>
+<H2><A NAME="groupgetusers(server, group, array)">GroupGetUsers(server, group, array)</A></H2>
+<P>Returns (in <CODE>array</CODE>) the users belonging to <CODE>group</CODE>. Unlike the API
+call <CODE>NetGroupGetUsers()</CODE>, this function does not allow you to specify
+a level (internally it is hardcoded to 0). In Perl it is trivial to
+implement the equivalent function (should you need it).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to get the group information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose users you wish to obtain.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array to hold the user names retrieved.
+<P></P></DL>
+<P>
+<H2><A NAME="groupsetinfo(server, group, level, hash, error)">GroupSetInfo(server, group, level, hash, error)</A></H2>
+<P>Sets the information for <CODE>group</CODE> according to <CODE>level</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to set the <CODE>group</CODE> information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose information you wish to set.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information you are supplying in <CODE>hash</CODE>.  Level can be
+one of 0, 1 or 2. See <A HREF="#group info levels">GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash containing the required key/value pairs for <CODE>level</CODE>.
+<P></P>
+<DT><STRONG><A NAME="item_error_%2D_Scalar_String"><CODE>error</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+On failure, the <CODE>error</CODE> parameter will contain a value which specifies
+which field caused the error. See <A HREF="#group field errors">GROUP FIELD ERRORS</A>.
+<P></P></DL>
+<P>
+<H2><A NAME="groupsetusers(server, group, array)">GroupSetUsers(server, group, array)</A></H2>
+<P>Sets the membership of <CODE>group</CODE> to contain only those users specified
+in <CODE>array</CODE>. This function will fail if any user names contained in the
+array are not valid users on <CODE>server</CODE>.  On successful completion
+<CODE>group</CODE> will contain only the users specified in <CODE>array</CODE>.  Use the
+functions <CODE>GroupAddUser()/GroupDelUser()</CODE> to add and delete individual
+users from a group.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to set the <CODE>group</CODE> membership.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> to set the membership of.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array containing the names of all users who will be members of <CODE>group</CODE>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="net local group functions">NET LOCAL GROUP FUNCTIONS</A></H1>
+<P>The <CODE>LocalGroup*()</CODE> functions operate on local groups. If these
+functions are run on a PDC then these functions operate on the domains
+local groups.</P>
+<P>Administrator or Account Operator group membership is required to
+successfully execute most of these functions on a remote server or on a
+computer that has local security enabled.</P>
+<P>The <CODE>server</CODE> field can be the empty string, in which case the function
+defaults to running on the local computer. If you leave this field blank
+then you should ensure that you are running the function on a PDC or BDC
+for your current domain. Use the support function <CODE>GetDCName()</CODE> to find
+out what the domain controller is, should you not be running this on the PDC.</P>
+<P>The following functions are available.</P>
+<P>
+<H2><A NAME="localgroupadd(server, level, hash, error)">LocalGroupAdd(server, level, hash, error)</A></H2>
+<P>Adds the specified group. The name of the group is contained in the <CODE>name</CODE>
+key of <CODE>hash</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to add the group.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information contained in <CODE>hash</CODE>. This can be one of 0 or 1.
+See <A HREF="#local group info levels">LOCAL GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+A hash containing the required key/value pairs for <CODE>level</CODE>.
+<P></P>
+<DT><STRONG><CODE>error</CODE> - Scalar Int</STRONG><BR>
+<DD>
+Provides information on which field in <CODE>hash</CODE> wasn't properly specified.
+See <A HREF="#local group field errors">LOCAL GROUP FIELD ERRORS</A> for more information about what values
+this can take.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupaddmember()"><CODE>LocalGroupAddMember()</CODE></A></H2>
+<P>This function is obselete in the underlying API and has therefore not
+been implemented.  Use <CODE>LocalGroupAddMembers</CODE> instead.</P>
+<P>
+<H2><A NAME="localgroupaddmembers(server, group, array)">LocalGroupAddMembers(server, group, array)</A></H2>
+<P>Adds the specified users (members) to the local group. Unlike the API
+function <CODE>NetLocalGroupAddMembers()</CODE>, this function does not allow you
+to specify a level (internally it is hardcoded to 3).
+This was done to simplify the implementation. To add a 'local' user, you
+need only specify the <CODE>name</CODE>. You can also specify users using the
+<CODE>DOMAIN\user</CODE> syntax.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to add the members to <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> to add the members to.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array containing the members to add to <CODE>group</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupdel(server, group)">LocalGroupDel(server, group)</A></H2>
+<P>Delete the specified local group.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to delete the named <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><CODE>group</CODE> -Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> to delete.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupdelmember()"><CODE>LocalGroupDelMember()</CODE></A></H2>
+<P>This function is obselete in the underlying API and has therefore not
+been implemented.  Use <CODE>LocalGroupDelMembers()</CODE> instead.</P>
+<P>
+<H2><A NAME="localgroupdelmembers(server, group, array)">LocalGroupDelMembers(server, group, array)</A></H2>
+<P>Delete the specified users (members) of the local group. Unlike the API
+function <CODE>NetLocalGroupDelMembers()</CODE>, this function does not allow you
+to specify a level (internally it is hardcoded to 3). This was done to
+simplify the implementation. To delete a 'local' user, you need only
+specify the <CODE>name</CODE>. You can also specify users using the <CODE>DOMAIN\user</CODE>
+syntax.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to delete the members from <CODE>group</CODE>.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> to delete the members from.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array containing the members to delete from <CODE>group</CODE>.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupenum(server, array)">LocalGroupEnum(server, array)</A></H2>
+<P>Enumerates all the local groups on the server. Unlike the API call
+<CODE>NetLocalGroupEnum()</CODE>, this function does not allow you to specify a
+level (internally it is hardcoded to 0). In Perl it is trivial to
+implement the equivalent function (should you need it).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The server on which to enumerate the (local) <CODE>groups</CODE>.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array to hold the <CODE>group</CODE> names.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupgetinfo(server, group, level, hash)">LocalGroupGetInfo(server, group, level, hash)</A></H2>
+<P>Retrieves <CODE>level</CODE> information for <CODE>group</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to get the group information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose information you wish to obtain.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information you wish to retrieve. This can be 0 or 1.
+See <A HREF="#local group info levels">LOCAL GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash that will contain the information.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupgetmembers(server, group, hash)">LocalGroupGetMembers(server, group, hash)</A></H2>
+<P>Retrieves the users belonging to <CODE>group</CODE>. Unlike the API call
+<CODE>NetLocalGroupGetUsers()</CODE>, this function does not allow you to specify
+a level (internally it is hardcoded to 0). In Perl it is trivial to
+implement the equivalent function (should you need it).</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> from which to retrieve the group information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose users you wish to obtain.
+<P></P>
+<DT><STRONG><CODE>array</CODE> - Array Reference</STRONG><BR>
+<DD>
+The array to hold the user names retrieved.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupsetinfo(server, level, hash, error)">LocalGroupSetInfo(server, level, hash, error)</A></H2>
+<P>Sets the information for <CODE>group</CODE> according to <CODE>level</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> on which to set the <CODE>group</CODE> information.
+<P></P>
+<DT><STRONG><CODE>group</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>group</CODE> whose information you wish to set.
+<P></P>
+<DT><STRONG><CODE>level</CODE> - Scalar Int</STRONG><BR>
+<DD>
+The <CODE>level</CODE> of information you are supplying in <CODE>hash</CODE>.
+Level can be one of 0 or 1. See <A HREF="#local group info levels">LOCAL GROUP INFO LEVELS</A>.
+<P></P>
+<DT><STRONG><CODE>hash</CODE> - Hash Reference</STRONG><BR>
+<DD>
+The hash containing the required key/value pairs for <CODE>level</CODE>.
+<P></P>
+<DT><STRONG><CODE>error</CODE> - Scalar String</STRONG><BR>
+<DD>
+On failure, the <CODE>error</CODE> parameter will contain a value which specifies
+which field caused the error. See <A HREF="#local group field errors">LOCAL GROUP FIELD ERRORS</A>.
+<P></P></DL>
+<P>
+<H2><A NAME="localgroupsetmembers()"><CODE>LocalGroupSetMembers()</CODE></A></H2>
+<P>This function has not been implemented at present.</P>
+<P>
+<HR>
+<H1><A NAME="net get functions">NET GET FUNCTIONS</A></H1>
+<P>
+<H2><A NAME="getdcname(server, domain, domaincontroller)">GetDCName(server, domain, domain-controller)</A></H2>
+<P>Gets the <CODE>domain-controller</CODE> name for <CODE>server</CODE> and <CODE>domain</CODE>.</P>
+<DL>
+<DT><STRONG><CODE>server</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>server</CODE> whose domain controller you wish to locate.
+<P></P>
+<DT><STRONG><A NAME="item_domain_%2D_Scalar_String"><CODE>domain</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The <CODE>domain</CODE> that <CODE>server</CODE> is a member of whose domain-controller
+you wish the locate.
+<P></P>
+<DT><STRONG><A NAME="item_String"><CODE>domain-controller</CODE> - Scalar String (output)</A></STRONG><BR>
+<DD>
+The name of the <CODE>domain-controller</CODE> for the requested <CODE>domain</CODE>.
+<P></P></DL>
+<P>Note: This module does not implement the <CODE>NetGetAnyDCName()</CODE>API function
+as this is obsolete.</P>
+<P>
+<HR>
+<H1><A NAME="user info levels">USER INFO LEVELS</A></H1>
+<P>Most of the <CODE>User*()</CODE> functions take a <CODE>level</CODE> parameter. This <CODE>level</CODE>
+specifies how much detail the corresponding <CODE>hash</CODE> should contain (or in
+the case of a <CODE>UserGet*()</CODE> function, will contain after the call). The
+following <CODE>level</CODE> descriptions provide information on what fields should
+be present for a given level. See <A HREF="#user info fields">USER INFO FIELDS</A> for a description of
+the fields.</P>
+<DL>
+<DT><STRONG><A NAME="item_Level_0">Level 0</A></STRONG><BR>
+<DD>
+name
+<P></P>
+<DT><STRONG><A NAME="item_Level_1">Level 1</A></STRONG><BR>
+<DD>
+name, password, passwordAge, priv, homeDir, comment, flags, scriptPath
+<P></P>
+<DT><STRONG><A NAME="item_Level_2">Level 2</A></STRONG><BR>
+<DD>
+name, password, passwordAge, priv, homeDir, comment, flags, scriptPath,
+authFlags, fullName, usrComment, parms, workstations, lastLogon,
+lastLogoff, acctExpires, maxStorage, unitsPerWeek, logonHours, badPwCount,
+numLogons, logonServer, countryCode, codePage
+<P></P>
+<DT><STRONG><A NAME="item_Level_3">Level 3</A></STRONG><BR>
+<DD>
+name, password, passwordAge, priv, homeDir, comment, flags, scriptPath,
+authFlags, fullName, usrComment, parms, workstations, lastLogon, lastLogoff,
+acctExpires, maxStorage, unitsPerWeek, logonHours, badPwCount, numLogons,
+logonServer, countryCode, codePage, userId, primaryGroupId, profile,
+homeDirDrive, passwordExpired
+<P></P>
+<DT><STRONG><A NAME="item_Level_10">Level 10</A></STRONG><BR>
+<DD>
+name, comment, usrComment, fullName
+<P></P>
+<DT><STRONG><A NAME="item_Level_11">Level 11</A></STRONG><BR>
+<DD>
+name, comment, usrComment, fullName, priv, authFlags, passwordAge, homeDir,
+parms, lastLogon, lastLogoff, badPwCount, numLogons, logonServer,
+countryCode, workstations, maxStorage, unitsPerWeek, logonHours, codePage
+<P></P>
+<DT><STRONG><A NAME="item_Level_20">Level 20</A></STRONG><BR>
+<DD>
+name, fullName, comment, flags, userId
+<P></P>
+<DT><STRONG><A NAME="item_Level_21">Level 21</A></STRONG><BR>
+<DD>
+<STRONG>Not available in this implementation</STRONG>
+<P></P>
+<DT><STRONG><A NAME="item_Level_22">Level 22</A></STRONG><BR>
+<DD>
+<STRONG>Not available in this implementation</STRONG>
+<P></P>
+<DT><STRONG><A NAME="item_Level_1003">Level 1003</A></STRONG><BR>
+<DD>
+password
+<P></P>
+<DT><STRONG><A NAME="item_Level_1005">Level 1005</A></STRONG><BR>
+<DD>
+priv
+<P></P>
+<DT><STRONG><A NAME="item_Level_1006">Level 1006</A></STRONG><BR>
+<DD>
+homeDir
+<P></P>
+<DT><STRONG><A NAME="item_Level_1007">Level 1007</A></STRONG><BR>
+<DD>
+comment
+<P></P>
+<DT><STRONG><A NAME="item_Level_1008">Level 1008</A></STRONG><BR>
+<DD>
+flags
+<P></P>
+<DT><STRONG><A NAME="item_Level_1009">Level 1009</A></STRONG><BR>
+<DD>
+scriptPath
+<P></P>
+<DT><STRONG><A NAME="item_Level_1010">Level 1010</A></STRONG><BR>
+<DD>
+authFlags
+<P></P>
+<DT><STRONG><A NAME="item_Level_1011">Level 1011</A></STRONG><BR>
+<DD>
+fullName
+<P></P>
+<DT><STRONG><A NAME="item_Level_1012">Level 1012</A></STRONG><BR>
+<DD>
+usrComment
+<P></P>
+<DT><STRONG><A NAME="item_Level_1013">Level 1013</A></STRONG><BR>
+<DD>
+parms
+<P></P>
+<DT><STRONG><A NAME="item_Level_1014">Level 1014</A></STRONG><BR>
+<DD>
+workstations
+<P></P>
+<DT><STRONG><A NAME="item_Level_1017">Level 1017</A></STRONG><BR>
+<DD>
+acctExpires
+<P></P>
+<DT><STRONG><A NAME="item_Level_1018">Level 1018</A></STRONG><BR>
+<DD>
+maxStorage
+<P></P>
+<DT><STRONG><A NAME="item_Level_1020">Level 1020</A></STRONG><BR>
+<DD>
+unitsPerWeek, logonHours
+<P></P>
+<DT><STRONG><A NAME="item_Level_1023">Level 1023</A></STRONG><BR>
+<DD>
+logonServer
+<P></P>
+<DT><STRONG><A NAME="item_Level_1024">Level 1024</A></STRONG><BR>
+<DD>
+countryCode
+<P></P>
+<DT><STRONG><A NAME="item_Level_1025">Level 1025</A></STRONG><BR>
+<DD>
+codePage
+<P></P>
+<DT><STRONG><A NAME="item_Level_1051">Level 1051</A></STRONG><BR>
+<DD>
+primaryGroupId
+<P></P>
+<DT><STRONG><A NAME="item_Level_1052">Level 1052</A></STRONG><BR>
+<DD>
+profile
+<P></P>
+<DT><STRONG><A NAME="item_Level_1053">Level 1053</A></STRONG><BR>
+<DD>
+homeDirDrive
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="user info fields">USER INFO FIELDS</A></H1>
+<P>The following is an alphabetical listing of each possible field, together
+with the data type that the field is expected to contain.</P>
+<DL>
+<DT><STRONG><CODE>acctExpires</CODE> - Scalar Int (UTC)</STRONG><BR>
+<DD>
+The time (as the number of seconds since 00:00:00, 1st January 1970) when
+the account expires. A -1 in this field specifies that the account never
+expires.
+<P></P>
+<DT><STRONG><CODE>authFlags</CODE> - Scalar Int (See USER_AUTH_FLAGS).</STRONG><BR>
+<DD>
+The level of authority that this use has. The value this can take depends
+on the users group membership - this value is therefore read only and
+cannot be set using <CODE>UserAdd()</CODE> or <CODE>UserSetInfo()</CODE>. Its value can be one
+of:
+<P></P></DL>
+<PRE>
+        User belongs to group           Flag value
+        ---------------------           ----------
+        Print Operators                 Win32API::Net::AF_OP_PRINT()
+        Server Operators                Win32API::Net::AF_OP_SERVER()
+        Account Operators               Win32API::Net::AF_OP_ACCOUNTS()</PRE>
+<DL>
+<DT><STRONG><A NAME="item_badPwCount_%2D_Scalar_Int"><CODE>badPwCount</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The number of times that the user has failed to logon by specifying an
+incorrect password.
+<P></P>
+<DT><STRONG><A NAME="item_codePage_%2D_Scalar_Int"><CODE>codePage</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The code page that this user uses.
+<P></P>
+<DT><STRONG><A NAME="item_comment_%2D_Scalar_String"><CODE>comment</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The comment associated with this user account. This can be any string
+(apparently of any length).
+<P></P>
+<DT><STRONG><A NAME="item_countryCode_%2D_Scalar_Int"><CODE>countryCode</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The country code that this user uses.
+<P></P>
+<DT><STRONG><CODE>flags</CODE> - Scalar Int (Bitwise OR of USER_FLAGS)</STRONG><BR>
+<DD>
+The flags for this user. See <A HREF="#user flags">USER FLAGS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_fullName_%2D_Scalar_String"><CODE>fullName</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The users' full name.
+<P></P>
+<DT><STRONG><A NAME="item_homeDir_%2D_Scalar_String"><CODE>homeDir</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The home directory of the user. This can be either a UNC path or an
+absolute path (drive letter + path). Can be the empty string (``'').
+<P></P>
+<DT><STRONG><A NAME="item_homeDirDrive_%2D_Scalar_String"><CODE>homeDirDrive</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The home directory drive that the users home directory is mapped to
+(assuming that the specified home directory is a UNC path).
+<P></P>
+<DT><STRONG><CODE>lastLogon</CODE> - Scalar Int (UTC)</STRONG><BR>
+<DD>
+The time (as the number of seconds since 00:00:00, 1st January 1970)
+that the user last logged on.
+<P></P>
+<DT><STRONG><CODE>lastLogoff</CODE> - Scalar Int (UTC)</STRONG><BR>
+<DD>
+The time (as the number of seconds since 00:00:00, 1st January 1970)
+that the user last logged off .
+<P></P>
+<DT><STRONG><A NAME="item_Integers"><CODE>logonHours</CODE> - Reference to Array of Integers (length 21 elements)</A></STRONG><BR>
+<DD>
+The times at which the user can logon. This should be an integer array
+with 21 elements.  Each element represents an 8 hour period and each bit
+represents represents an hour. Only the lower byte of each integer is
+used. If this is left undefined then no restrictions are placed on the
+account.
+<P></P>
+<DT><STRONG><A NAME="item_logonServer_%2D_Scalar_String"><CODE>logonServer</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The logon server for this user. Under Windows NT, this value cannot be
+set and will always have the value '\\*' when queried.
+<P></P>
+<DT><STRONG><A NAME="item_maxStorage_%2D_Scalar_Int"><CODE>maxStorage</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The current release of Windows NT does not implement disk quotas so
+it is believed that the value of this key is ignored.
+<P></P>
+<DT><STRONG><A NAME="item_name_%2D_Scalar_String"><CODE>name</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The user name that this request applies to. Most of the functions take
+the user name as a separate argument. In general, the user name provided
+should be the same as that in the one provided in the hash.
+<P></P>
+<DT><STRONG><A NAME="item_numLogons_%2D_Scalar_Int"><CODE>numLogons</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The number of times that the named user has successfully logged on to
+this machine/domain.
+<P></P>
+<DT><STRONG><A NAME="item_parms_%2D_Scalar_String"><CODE>parms</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The value of this key can be used by applications. There are none known
+to to author that use it, although it could be used to hold adminitrative
+information.
+<P></P>
+<DT><STRONG><A NAME="item_password_%2D_Scalar_String"><CODE>password</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The password to be set. The password is never returned in a <CODE>UserGet()</CODE>
+operation.
+<P></P>
+<DT><STRONG><CODE>passwordAge</CODE> - Scalar Int (UTC)</STRONG><BR>
+<DD>
+The current age of the password (stored as the number of seconds since
+00:00:00, 1st January 1970).
+<P></P>
+<DT><STRONG><A NAME="item_passwordExpired_%2D_Scalar_Int"><CODE>passwordExpired</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The value of this key is used in two different ways. When queried via
+<CODE>UserGetInfo()</CODE> the return value is 0 is the password has not expired
+and 1 if it has. When setting the value via <CODE>UserAdd()</CODE> or
+<CODE>UserSetInfo()</CODE> a value of 0 indicates that the users' password has
+not expired whereas a value of 1 will force the user to change their
+password at the next logon.
+<P></P>
+<DT><STRONG><A NAME="item_primaryGroupId_%2D_Scalar_Int"><CODE>primaryGroupId</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The id of the primary group that this user belongs to. When creating
+accounts with <CODE>UserAdd()</CODE> you should use a value of 0x201.
+<P></P>
+<DT><STRONG><CODE>priv</CODE> - Scalar Int (Bitwise OR of USER_PRIVILEGE_FLAGS)</STRONG><BR>
+<DD>
+The privilege level that this user has. This is never returned from a
+<CODE>UserGet()</CODE> call. See <A HREF="#user privilege flags">USER PRIVILEGE FLAGS</A>.
+<P></P>
+<DT><STRONG><A NAME="item_profile_%2D_Scalar_String"><CODE>profile</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The profile that is associated with the named user. This can be UNC path,
+a local path or undefined.
+<P></P>
+<DT><STRONG><A NAME="item_scriptPath_%2D_Scalar_String"><CODE>scriptPath</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The path to the logon script for this user. This should be specified as a
+relative path and will cause the logon script to be run from (relative
+location) in the logon servers export directory.
+<P></P>
+<DT><STRONG><A NAME="item_unitsPerWeek_%2D_Scalar_Int"><CODE>unitsPerWeek</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The value of this key represents the granularity of the logonHours array.
+Its use is beyond the scope of this package.
+<P></P>
+<DT><STRONG><A NAME="item_usrComment_%2D_Scalar_String"><CODE>usrComment</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+The user comment field (contrasted with the comment field ;-).
+<P></P>
+<DT><STRONG><A NAME="item_workstations_%2D_Scalar_String"><CODE>workstations</CODE> - Scalar String</A></STRONG><BR>
+<DD>
+A comma-separated string containing upto 8 workstation that the named
+user can login to.  Setting a value for this key will then allow the
+named user to login to only those computers named.
+<P></P>
+<DT><STRONG><A NAME="item_userId_%2D_Scalar_Int"><CODE>userId</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The user id associated with this user This value is generated by the
+system and cannot be set or changed using the <CODE>UserAdd()</CODE> or
+<CODE>UserSetInfo()</CODE> calls.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="user flags">USER FLAGS</A></H1>
+<P>The following is an alphabetical listing of the user flags.
+The <CODE>flags</CODE> key (see <A HREF="#user info fields">USER INFO FIELDS</A>) should be the bitwise OR of one
+or more of these values.</P>
+<DL>
+<DT><STRONG><A NAME="item_UF_ACCOUNTDISABLE"><CODE>UF_ACCOUNTDISABLE()</CODE></A></STRONG><BR>
+<DD>
+This account has been disabled.
+<P></P>
+<DT><STRONG><A NAME="item_UF_DONT_EXPIRE_PASSWD"><CODE>UF_DONT_EXPIRE_PASSWD()</CODE></A></STRONG><BR>
+<DD>
+Never expire the password on this account.
+<P></P>
+<DT><STRONG><A NAME="item_UF_HOMEDIR_REQUIRED"><CODE>UF_HOMEDIR_REQUIRED()</CODE></A></STRONG><BR>
+<DD>
+A home directory must be specified (ignored for NT).
+<P></P>
+<DT><STRONG><A NAME="item_UF_INTERDOMAIN_TRUST_ACCOUNT"><CODE>UF_INTERDOMAIN_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+The account represents a interdomain trust account.
+<P></P>
+<DT><STRONG><A NAME="item_UF_LOCKOUT"><CODE>UF_LOCKOUT()</CODE></A></STRONG><BR>
+<DD>
+Lock out this account (or this account has been locked out due to
+security policy - i.e.  badLogonCount is greater than your policy allows).
+This value can be cleared but not set by a <CODE>UserSetInfo()</CODE> call.
+<P></P>
+<DT><STRONG><A NAME="item_UF_NORMAL_ACCOUNT"><CODE>UF_NORMAL_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+The account is a normal user account.
+<P></P>
+<DT><STRONG><A NAME="item_UF_PASSWD_CANT_CHANGE"><CODE>UF_PASSWD_CANT_CHANGE()</CODE></A></STRONG><BR>
+<DD>
+The password for this account cannot be changed (execpt by an Administrator
+using one of the above calls).
+<P></P>
+<DT><STRONG><A NAME="item_UF_PASSWD_NOTREQD"><CODE>UF_PASSWD_NOTREQD()</CODE></A></STRONG><BR>
+<DD>
+A password is not required for this account.
+<P></P>
+<DT><STRONG><A NAME="item_UF_SCRIPT"><CODE>UF_SCRIPT()</CODE></A></STRONG><BR>
+<DD>
+This &lt;strong&gt;must be set when creating account on Windows NT.
+<P></P>
+<DT><STRONG><A NAME="item_UF_SERVER_TRUST_ACCOUNT"><CODE>UF_SERVER_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+The account represents a Windows NT Backup Domain Controller account in
+the domain.
+<P></P>
+<DT><STRONG><A NAME="item_UF_TEMP_DUPLICATE_ACCOUNT"><CODE>UF_TEMP_DUPLICATE_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+To quote the Microsoft Documentation &lt;em&gt;&amp;quot;This is an account for
+users whose primary account is in another domain. This account provides
+user access to this domain, but not to any domain that trusts this domain.
+The User Manager refers to this account type as a local user account.
+<P></P>
+<DT><STRONG><A NAME="item_UF_WORKSTATION_TRUST_ACCOUNT"><CODE>UF_WORKSTATION_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+The account represents a computer account for a workstation or server in
+the domain.
+<P></P></DL>
+<P>Please note that these are implemented as functions and are therefore
+called in the same way as other functions. You should typically use them
+like:</P>
+<PRE>
+        $ufScript = Win32API::Net::UF_SCRIPT();</PRE>
+<P>
+<HR>
+<H1><A NAME="user privilege flags">USER PRIVILEGE FLAGS</A></H1>
+<P>These following values are used in the <CODE>priv</CODE> key. This field is never
+initialised on a <CODE>UserGet*()</CODE> call and once set cannot be changed in a
+<CODE>UserSetInfo()</CODE> call.</P>
+<DL>
+<DT><STRONG><A NAME="item_USER_PRIV_ADMIN"><CODE>USER_PRIV_ADMIN()</CODE></A></STRONG><BR>
+<DD>
+Account is an an administrative account.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PRIV_GUEST"><CODE>USER_PRIV_GUEST()</CODE></A></STRONG><BR>
+<DD>
+Account is a guest account.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PRIV_USER"><CODE>USER_PRIV_USER()</CODE></A></STRONG><BR>
+<DD>
+Account is a user account.
+<P></P></DL>
+<P>Please note that these are implemented as functions and are therefore
+called in the same way as other functions. You should typically use them
+like:</P>
+<PRE>
+        $userPrivUser = Win32API::Net::USER_PRIV_USER();</PRE>
+<P>
+<HR>
+<H1><A NAME="user enum filter">USER ENUM FILTER</A></H1>
+<P>These flags are used in the <CODE>UserEnum()</CODE> function to specify which
+accounts to retrieve. It should be a bitwise OR of some (or all) of
+the following.</P>
+<DL>
+<DT><STRONG><A NAME="item_FILTER_TEMP_DUPLICATE_ACCOUNT"><CODE>FILTER_TEMP_DUPLICATE_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+Show temporary duplicate account (one presumes).
+<P></P>
+<DT><STRONG><A NAME="item_FILTER_NORMAL_ACCOUNT"><CODE>FILTER_NORMAL_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+Show normal user account.
+<P></P>
+<DT><STRONG><A NAME="item_FILTER_INTERDOMAIN_TRUST_ACCOUNT"><CODE>FILTER_INTERDOMAIN_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+Show interdomain trust accounts.
+<P></P>
+<DT><STRONG><A NAME="item_FILTER_WORKSTATION_TRUST_ACCOUNT"><CODE>FILTER_WORKSTATION_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+Show workstation trust accounts.
+<P></P>
+<DT><STRONG><A NAME="item_FILTER_SERVER_TRUST_ACCOUNT"><CODE>FILTER_SERVER_TRUST_ACCOUNT()</CODE></A></STRONG><BR>
+<DD>
+Show server trust accounts.
+<P></P></DL>
+<P>Please note that these are implemented as functions and are therefore
+called in the same way as other functions. You should typically use them
+like:</P>
+<PRE>
+        $filterNormalAccounts = Win32API::Net::FILTER_NORMAL_ACCOUNT();</PRE>
+<P>
+<HR>
+<H1><A NAME="user field errors">USER FIELD ERRORS</A></H1>
+<P>For the <CODE>User*()</CODE> functions that take an <CODE>error</CODE> parameter this variable
+will, on failure, contain one of the following constants. Note that the
+function may fail because more than one key/value was missing from the
+input hash. You will only find out about the first one that was incorrectly
+specified. This is only really useful in debugging.</P>
+<DL>
+<DT><STRONG><A NAME="item_USER_ACCT_EXPIRES_PARMNUM"><CODE>USER_ACCT_EXPIRES_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>acctExpires</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_AUTH_FLAGS_PARMNUM"><CODE>USER_AUTH_FLAGS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>authFlags</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_BAD_PW_COUNT_PARMNUM"><CODE>USER_BAD_PW_COUNT_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>badPasswordCount</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_CODE_PAGE_PARMNUM"><CODE>USER_CODE_PAGE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>codePage</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_COMMENT_PARMNUM"><CODE>USER_COMMENT_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>comment</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_COUNTRY_CODE_PARMNUM"><CODE>USER_COUNTRY_CODE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>countryCode</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_FLAGS_PARMNUM"><CODE>USER_FLAGS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>flags</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_FULL_NAME_PARMNUM"><CODE>USER_FULL_NAME_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>fullName</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_HOME_DIR_DRIVE_PARMNUM"><CODE>USER_HOME_DIR_DRIVE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>homeDirDrive</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_HOME_DIR_PARMNUM"><CODE>USER_HOME_DIR_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>homeDir</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_LAST_LOGOFF_PARMNUM"><CODE>USER_LAST_LOGOFF_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>lastLogoff</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_LAST_LOGON_PARMNUM"><CODE>USER_LAST_LOGON_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>lastLogon</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_LOGON_HOURS_PARMNUM"><CODE>USER_LOGON_HOURS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>logonHours</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_LOGON_SERVER_PARMNUM"><CODE>USER_LOGON_SERVER_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>logonServer</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_MAX_STORAGE_PARMNUM"><CODE>USER_MAX_STORAGE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>maxStorage</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_NAME_PARMNUM"><CODE>USER_NAME_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>name</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_NUM_LOGONS_PARMNUM"><CODE>USER_NUM_LOGONS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>numLogons</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PARMS_PARMNUM"><CODE>USER_PARMS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>parms</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PASSWORD_AGE_PARMNUM"><CODE>USER_PASSWORD_AGE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>passwordAge</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PASSWORD_PARMNUM"><CODE>USER_PASSWORD_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>password</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PRIMARY_GROUP_PARMNUM"><CODE>USER_PRIMARY_GROUP_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>primaryGroup</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PRIV_PARMNUM"><CODE>USER_PRIV_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>priv</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_PROFILE_PARMNUM"><CODE>USER_PROFILE_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>profile</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_SCRIPT_PATH_PARMNUM"><CODE>USER_SCRIPT_PATH_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>scriptPath</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_UNITS_PER_WEEK_PARMNUM"><CODE>USER_UNITS_PER_WEEK_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>unitPerWeek</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_USR_COMMENT_PARMNUM"><CODE>USER_USR_COMMENT_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>usrComment</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_USER_WORKSTATIONS_PARMNUM"><CODE>USER_WORKSTATIONS_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>workstations</CODE> field was absent or not correctly specified.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="group info levels">GROUP INFO LEVELS</A></H1>
+<P>Some of the <CODE>Group*()</CODE> functions take a <CODE>level</CODE> parameter. This <CODE>level</CODE>
+specifies how much detail the corresponding <CODE>hash</CODE> should contain (or in
+the case of a <CODE>GroupGetInfo()</CODE> function, will contain after the call).
+The following <CODE>level</CODE> descriptions provide information on what fields
+should be present for a given level. See <A HREF="#group info fields">GROUP INFO FIELDS</A>
+for a description of the fields.</P>
+<DL>
+<DT><STRONG><CODE>Level 0</CODE></STRONG><BR>
+<DD>
+name.
+<P></P>
+<DT><STRONG><CODE>Level 1</CODE></STRONG><BR>
+<DD>
+name, comment.
+<P></P>
+<DT><STRONG><CODE>Level 2</CODE></STRONG><BR>
+<DD>
+name, comment, groupId, attributes.
+<P></P>
+<DT><STRONG><A NAME="item_Level_1002"><CODE>Level 1002</CODE></A></STRONG><BR>
+<DD>
+comment.
+<P></P>
+<DT><STRONG><CODE>Level 1005</CODE></STRONG><BR>
+<DD>
+attributes.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="group info fields">GROUP INFO FIELDS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_attributes_%2D_Scalar_Int"><CODE>attributes</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The attributes of the group. These are no longer settable in Windows NT 4.0
+and they are not currently supported in this package either.
+<P></P>
+<DT><STRONG><CODE>comment</CODE> - Scalar String</STRONG><BR>
+<DD>
+The <CODE>comment</CODE> that applies to this group. This is the only value that
+can be set via a GroupSetInfo call.
+<P></P>
+<DT><STRONG><A NAME="item_groupId_%2D_Scalar_Int"><CODE>groupId</CODE> - Scalar Int</A></STRONG><BR>
+<DD>
+The groups Id.
+<P></P>
+<DT><STRONG><CODE>name</CODE> - Scalar String</STRONG><BR>
+<DD>
+The groups name.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="group field errors">GROUP FIELD ERRORS</A></H1>
+<P>For the <CODE>Group*()</CODE> functions that take an <CODE>error</CODE> parameter
+this variable will, on failure, contain one of the following constants.
+Note that the function may fail because more than one key/value was
+missing from the input hash. You will only find out about the first one
+that was incorrectly specified. This is only really useful for debugging
+purposes.</P>
+<DL>
+<DT><STRONG><A NAME="item_GROUP_ATTRIBUTES_PARMNUM"><CODE>GROUP_ATTRIBUTES_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>attributes</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_GROUP_COMMENT_PARMNUM"><CODE>GROUP_COMMENT_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>comment</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_GROUP_NAME_PARMNUM"><CODE>GROUP_NAME_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+<CODE>name</CODE> field was absent or not correctly specified.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="group users info levels">GROUP USERS INFO LEVELS</A></H1>
+<P>The <CODE>GroupGetUsers()</CODE> function can take a level of 0 or 1. These will
+return the following:</P>
+<DL>
+<DT><STRONG><CODE>Level 0</CODE></STRONG><BR>
+<DD>
+name.
+<P></P>
+<DT><STRONG><CODE>Level 1</CODE></STRONG><BR>
+<DD>
+name, attributes.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="group users info fields">GROUP USERS INFO FIELDS</A></H1>
+<DL>
+<DT><STRONG><CODE>name</CODE> - Scalar String</STRONG><BR>
+<DD>
+The user's name.
+<P></P>
+<DT><STRONG><CODE>attributes</CODE> - Scalar Int</STRONG><BR>
+<DD>
+The attributes of the group. These are no longer settable in Windows NT
+4.0 and they are not currently supported in this package either.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="local group info levels">LOCAL GROUP INFO LEVELS</A></H1>
+<DL>
+<DT><STRONG><CODE>Level 0</CODE></STRONG><BR>
+<DD>
+name
+<P></P>
+<DT><STRONG><CODE>Level 1</CODE></STRONG><BR>
+<DD>
+name, comment
+<P></P>
+<DT><STRONG><CODE>Level 1002</CODE></STRONG><BR>
+<DD>
+comment
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="local group info fields">LOCAL GROUP INFO FIELDS</A></H1>
+<DL>
+<DT><STRONG><CODE>name</CODE> - Scalar String</STRONG><BR>
+<DD>
+The groups name
+<P></P>
+<DT><STRONG><CODE>comment</CODE> - Scalar String</STRONG><BR>
+<DD>
+The groups 'comment'
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="local group field errors">LOCAL GROUP FIELD ERRORS</A></H1>
+<P>For the <CODE>LocalGroup*()</CODE> functions that take an <CODE>error</CODE> parameter this
+variable will, on failure, contain one of the following constants. Note
+that the function may fail because more than one key/value was missing
+or incorrectly specified in the input hash. You will only find out about
+the first one that was incorrectly specified. This is only really useful
+for debugging purposes.</P>
+<DL>
+<DT><STRONG><A NAME="item_LOCALGROUP_NAME_PARMNUM"><CODE>LOCALGROUP_NAME_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+The <CODE>name</CODE> field was absent or not correctly specified.
+<P></P>
+<DT><STRONG><A NAME="item_LOCALGROUP_COMMENT_PARMNUM"><CODE>LOCALGROUP_COMMENT_PARMNUM()</CODE></A></STRONG><BR>
+<DD>
+The <CODE>comment</CODE> field wasabsent or not correctly specified.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The following example shows how you can create a function in Perl that
+has the same functionality as the <CODE>NetUserEnum()</CODE> API call. The Perl
+version doesn't have the level parameter so you must first use the
+<CODE>UserEnum()</CODE> function to retrieve all the account names and then iterate
+through the returned array issuing <CODE>UserGetInfo()</CODE> calls.</P>
+<PRE>
+    sub userEnumAtLevel {
+       my($server, $level, $filter) = @_;
+       my(@array);
+       Win32API::Net::UserEnum($server, \@array, $filter);
+       for $user (@array) {
+          Win32API::Net::UserGetInfo($server, $user, $level, \%hash);
+          print &quot;This could access all level $level settings for $user - eg fullName $hash{fullName}\n&quot;;
+       }
+    }
+    userEnumAtLevel(&quot;&quot;, 2, 0);</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Bret Giddings, &lt;<A HREF="mailto:bret@essex.ac.uk">bret@essex.ac.uk</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><CODE>perl(1)</CODE></P>
+<P>
+<HR>
+<H1><A NAME="acknowedgements">ACKNOWEDGEMENTS</A></H1>
+<P>This work was built upon work done by HiP Communications along with
+modifications to HiPs code by &lt;<A HREF="mailto:michael@ecel.uwa.edu.au">michael@ecel.uwa.edu.au</A>&gt; and &lt;<A HREF="mailto:rothd@roth.net">rothd@roth.net</A>&gt;.
+In addition, I would like to thank Jenny Emby at GEC Marconi, U.K. for
+proof reading this manual page and making many suggestions that have led
+to its current layout. Last but not least I would like to thank Larry Wall
+and all the other Perl contributors for making this truly wonderful
+language.</P>
+
+</BODY>
+
+</HTML>

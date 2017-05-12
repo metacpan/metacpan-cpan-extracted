@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+<Window 
+	size='[150, 50]'
+	onTimer='sub { $self->{L}->Text(scalar localtime) }'
+	text='Clock'
+	hasminimize='0' hasmaximize='0' resizable='0'
+>
+	<Label name='L' size='[150, 50]' text='loading...'/>
+	<Timer elapse='1000'/>
+</Window>
+</GUI>

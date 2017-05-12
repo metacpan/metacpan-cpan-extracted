@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_from_json">new_from_json</a></li>
+      <li><a href="#new">new</a></li>
+      <li><a href="#set_timeout">set_timeout</a></li>
+      <li><a href="#domain">domain</a></li>
+      <li><a href="#me">me</a></li>
+      <li><a href="#order">order</a></li>
+      <li><a href="#email">email</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new(&quot;credentials.json&quot;);</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new(application_key =&gt; $key, application_secret =&gt; $secret, consumer_key =&gt; $token);</p>
+
+<p>my $services = $ovh-&gt;domain-&gt;services;</p>
+
+<p>foreach my $service (@$services) {</p>
+
+<pre><code>    my $last_update = $service-&gt;last_update;
+    print $last_update-&gt;datetime;
+}</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The base object from which every api call is done. The object structure represents the ovh api structure. This module uses the perl api module provided by ovh</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_from_json">new_from_json</h2>
+
+<p>Creates an api Object based on credentials in a json File</p>
+
+<ul>
+
+<li><p>Parameter: $file_json - dir to json file</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH.html">Webservice::OVH</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH-&gt;new_from_json(&quot;path/file&quot;);</p>
+
+</li>
+</ul>
+
+<ul>
+
+<li><p>application_key is generated when creating an application via ovh web interface</p>
+
+</li>
+<li><p>application_secret is generated when creating an application via ovh web interface</p>
+
+</li>
+<li><p>consumer_key must be requested through ovh authentification</p>
+
+</li>
+<li><p>timeout timeout in milliseconds, warning some request may take a while</p>
+
+</li>
+</ul>
+
+<h2 id="new">new</h2>
+
+<p>Create the api object. Credentials are given directly via %params Credentials can be generated via ovh web interface and ovh authentification</p>
+
+<ul>
+
+<li><p>Parameter: %params - application_key =&gt; value, application_secret =&gt; value, consumer_key =&gt; value</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH.html">Webservice::OVH</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH-&gt;new(application_key =&gt; $key, application_secret =&gt; $secret, consumer_key =&gt; $token);</p>
+
+</li>
+</ul>
+
+<h2 id="set_timeout">set_timeout</h2>
+
+<p>Sets the timeout of the underlying LWP::Agent</p>
+
+<ul>
+
+<li><p>Parameter: timeout - in milliseconds default 120</p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH-&gt;set_timeout(120);</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Main access to all /domain/ api methods</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain.html">Webservice::OVH::Domain</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;domain;</p>
+
+</li>
+</ul>
+
+<h2 id="me">me</h2>
+
+<p>Main access to all /me/ api methods</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Me.html">Webservice::OVH::Me</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;me;</p>
+
+</li>
+</ul>
+
+<h2 id="order">order</h2>
+
+<p>Main access to all /order/ api methods</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order.html">Webservice::OVH::Order</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;order;</p>
+
+</li>
+</ul>
+
+<h2 id="email">email</h2>
+
+<p>Main access to all /email/ api methods</p>
+
+<ul>
+
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Email.html">Webservice::OVH::Email</a></p>
+
+</li>
+<li><p>Synopsis: $ovh-&gt;email;</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,6 @@
+TODO:
+ - documentation
+ - should handle paint events from the bitmap label and re-paint the text
+ - make the "default" splashscreen nicer
+ - add version to non standard splash?
+ - allow registration of a window that must be visible before the splash is taken down

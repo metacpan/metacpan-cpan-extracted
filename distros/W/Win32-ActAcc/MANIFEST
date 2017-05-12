@@ -1,0 +1,44 @@
+MANIFEST	List of files
+README	Cover letter
+pod/ActAcc/README.pod	Readme source file
+Makefile.PL	Conventional
+typemap	HWND and other types
+ActAcc.html	Documentation
+ActAcc.pod	Documentation source file
+aaEvents.pl	Demo WinEvents
+aaWhereAmI.pl	Demo mouse pointer events
+aadigger.pl	Demo accessible-object hierarchy
+ActAcc.xs	Extension core (includes *.xsh)
+ActAcc.xsh	Active Accessibility API wrappers
+AO.xsh	AO functions included in ActAcc.xs
+EM.xsh	EventListener functions included in ActAcc.xs
+consts.xsh	Dispenses constants by name
+AAEvtMon.h	Interface between ActAcc and ActAccEM DLLs
+ActAcc.pm	Module
+ActAccEM.x	C code for ActAccEM.dll; called 'x' to escape MakeMaker's attention
+ActAccEL.h	Circular-buffer event functions
+ActAccEL.x	Circular-buffer event functions
+eg/elizaNotepad.pl	Converse with the psychotherapist in Notepad
+eg/simpleNotepad.pl	Open and close Notepad
+eg/playpen.pl	Operate the Win32::ActAcc playpen app
+eg/MenuWalker.pl    Display the menus of all open Notepad windows
+eg/playpen/App.ico		Playpen app source file
+eg/playpen/AssemblyInfo.cs	Playpen app source file
+eg/playpen/build.cmd    Build ActAccPlaypen.exe using C# compiler
+eg/playpen/Form1.cs	Playpen app source file
+eg/playpen/Form1.resx	Playpen app source file
+ActAcc/aaExplorer.pm	Interactive exploration tool
+ActAcc/MouseTracker.pm	Interactive exploration tool
+ActAcc/AO.pm                   Accessible object
+ActAcc/AOFake.pm                   Dummy accessible object
+ActAcc/Event.pm			Events
+ActAcc/Iterators.pm		Iterators
+ActAcc/Menu.pm		Menu
+ActAcc/MiscRoles.pm		MiscRoles
+ActAcc/Outline.pm		Outlines
+ActAcc/Test.pm		Window-tests
+ActAcc/Window.pm		Window methods
+ActAcc/aaconstlists.pm	Generated file of constants, their names and values
+pod/ActAcc/aaconst.pod	Generated lists of constants
+t/t01.t	Noninteractive tests very likely to pass
+META.yml   Module meta-data (added by MakeMaker)

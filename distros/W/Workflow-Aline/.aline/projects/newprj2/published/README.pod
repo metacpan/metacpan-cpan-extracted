@@ -1,0 +1,93 @@
+=head1 NAME
+
+Data::Type - robust and extensible data- and valuetype system
+
+=head1 VERSION
+
+0.02.01 (Thu Dec 31 13:59:04 2009)
+
+=head1 DESCRIPTION
+
+This module delivers an easy, generic and unified interface to type related CPAN modules. They all have one common purpose: reporting if data has some "characteristics". And this module wraps that with a clean api.
+
+=head1 SYNOPSIS
+
+  use Data::Type qw(:is +ALL);
+
+  is STD::EMAIL or warn;
+
+  warn if isnt STD::CREDITCARD( 'MASTERCARD', 'VISA' );
+
+  try
+  {
+    valid( '9999-12-31 23:59:59', DB::DATETIME );
+  }
+  catch Data::Type::Exception with
+  {
+    print $e->to_string foreach @_;
+  };
+
+=head1 EXAMPLES
+
+Visit the L<Data::Type::Docs::Howto> to explore how to use this module
+for DBI, CGI, Getopt and more scenarios.
+
+=head1 INSTALLATION
+
+I highly recommend to use CPAN for one-stop-shop installation:
+
+perl -MCPAN -e "install Data::Type"
+
+
+=head1 SUPPORTED TYPES
+
+
+All types are grouped and though belong to a B<collection>. The collection is identified by a short id. All members are living in a namespace that is prefixed with it (uppercased).
+
+=over 3
+
+=item L<Standard Collection ('STD')|Data::Type::Collection::Std>
+
+This is a heterogenous collection of datatypes which is loaded by default. It contains various issues from CPAN modules (i.e. business, creditcard, email, markup, regexps and etc.) and some everyday things. See L<Data::Type::Collection::Std>.
+
+=item L<W3C/XML-Schema Collection ('W3C')|Data::Type::Collection::W3C>
+
+A nearly 1-to-1 use of L<XML::Schema> datatypes. It is nearly complete and works off the shelf. Please visit the XMLSchema L<http://www.w3.org/TR/xmlschema-2/> homepage for sophisticated documentation. See L<Data::Type::Collection::W3C>.
+
+=item L<Database Collection ('DB')|Data::Type::Collection::DB>
+
+Common database table types (VARCHAR, TINYTEXT, TIMESTAMP, etc.). See L<Data::Type::Collection::DB>.
+
+=item L<Biological Collection ('BIO')|Data::Type::Collection::Bio>
+
+Everything that is related to biological matters (DNA, RNA, etc.). See L<Data::Type::Collection::Bio>.
+
+=item L<Chemistry Collection ('CHEM')|Data::Type::Collection::Chem>
+
+Everything that is related to chemical matters (Atoms, etc.). See L<Data::Type::Collection::Chem>.
+
+=item L<Perl5 Collection ('PERL')|Data::Type::Collection::Perl>
+
+Reserved and undecided. See L<Data::Type::Collection::Perl>.
+
+=item L<Perl6 Apocalypse Collection ('PERL6')|Data::Type::Collection::Perl6>
+
+Placeholder for the Apocalypse and Synopsis 6 suggested datatypes for perl6. See L<Data::Type::Collection::Perl6>.
+
+=back
+
+B<[Note]> L<C<ALL>|Data::Type/EXPORT> is a an alias for all available collections at once.
+
+
+
+=head1 PREREQUISITES
+
+Following modules get automatically installed via the CPAN module. See INSTALLATION above. Data::Type has a mechanism
+for delayed loading of modules. This means modules are loaded only when the used types require
+them, not all at once.
+
+=head1 READON
+
+Visit the L<Data::Type> main documentation or advance directly to the L<Data::Type::Docs> manpage.
+
+=head1 COPYRIGHT/LICENSE

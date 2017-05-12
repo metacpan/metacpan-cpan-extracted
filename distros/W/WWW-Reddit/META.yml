@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               WWW-Reddit
+version:            0.10
+abstract:           Perl extension for http://www.reddit.com, this module has been obsoleted and replaced by the Reddit module
+author:
+    - jon <jon@>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:    0
+    HTTP::Cookies:   0
+    JSON:            0
+    LWP::Simple:     0
+    LWP::UserAgent:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,10 @@
+Changes
+lib/Web/oEmbed/Common.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/00-compile.t
+t/08-url-patterns.t
+t/10-youtube.t
+t/50-xkcd.t
+META.json                                Module JSON meta-data (added by MakeMaker)

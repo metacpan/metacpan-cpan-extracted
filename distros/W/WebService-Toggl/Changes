@@ -1,0 +1,51 @@
+Revision history for Perl extension WebService-Toggl
+
+0.11 2016-05-06T05:12:40Z
+
+    - add page parameters to details report (thanks, @mattgill!)
+
+0.10 2015-03-10T18:04:15Z
+
+    - move test packages into their own files to appease Strawberry
+      Perl
+
+0.09 2015-03-09T15:31:08Z
+
+    - minor pod fixes
+    - get tests working on windows
+
+0.08 2014-07-29T19:56:05Z
+
+    - add very basic tests for Reports
+    - make ::Report::Weekly compile by specifying week_total key
+    - fix ::Report::Details api_path
+    - add type checking to ::Report::*
+
+0.07 2014-07-29T18:01:34Z
+
+    - add documentation for ::Report::* objects
+
+0.06 2014-07-29T14:43:23Z
+
+    - add use strict/warnings to ::Role::Item
+    - minor pod fixes
+
+0.05 2014-07-12T19:28:42Z
+    - add more missing dependencies
+
+0.04 2014-07-11T14:14:56Z
+
+    - remove Data::Printer used for debugging
+
+0.03 2014-07-11T01:33:20Z
+
+    - dang, I'm bad at this releasing game
+
+0.02 2014-07-11T01:30:20Z
+
+    - fix broken test that was testing the wrong modules
+
+0.01 2014-07-10T15:09:46Z
+
+    - original version
+

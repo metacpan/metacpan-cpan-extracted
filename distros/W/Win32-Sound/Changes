@@ -1,0 +1,51 @@
+Version history for Win32::Sound
+
+0.52 (18 Dec 2013)
+    * Added repository cpan metadata (thanks dsteinbrunner)
+    * perl version correction (thanks dsteinbrunner and steve-m-hay)
+    * commented out spurious print in Win32::Sound::WaveOut::Save
+    * removed useless/undocumented stuff and made "constant" method private
+    * documented OpenDevice(ID) to use multiple soundcards with Win32::Sound::WaveOut (RT #64857)
+    * added minimal tests
+
+0.51 (10 Apr 2012)
+    * repackaged because of bad permissions on distribution tar (doh!)
+    * added Changes file
+    * also fixed sinus wave formula (RT #4213)
+
+0.50 (03 Apr 2012)
+    * fix longstanding Win32::Sound::Volume bug (RT #28113 and #43776)
+    * updated documentation, contacts etc.
+
+0.49 (13 Jun 2008)
+    * fix $VERSION number (0.48 was still 0.47 internally)
+    * fix package name in META.yml
+    * move sample.pl into eg/ subdirectory to prevent it from being installed
+
+0.48 (16 Apr 2008)
+    * uploaded to CPAN separately from libwin32
+    * updated email addresses
+    * simplified Makefile.PL
+    * added META.yml and ppport.h
+    * renamed test.pl to sample.pl
+
+0.47 (22 May 2000)
+    * support for passing Unicode string to Play() (Doug Lankshear <doug@lankshear.net>)
+
+0.46 (25 Sep 1999)
+    * fixed small bug in DESTROY, wo was used without being initialized (Gurusamy Sarathy <gsar@cpan.org>)
+
+0.45 (09 Apr 1999)
+    * added $! support, documentation et goodies
+
+0.40 (16 Mar 1999)
+    * added the WaveOut object
+
+0.30 (20 Oct 1998)
+    * added Volume/Format/Devices/DeviceInfo (thanks Dave Roth!)
+
+0.03 (08 Apr 1997)
+    * first release
+
+0.01 (19 Nov 1996)
+    * file created

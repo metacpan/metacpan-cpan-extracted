@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<component>
+
+<?component error="true" debug="true"?>
+
+<registration
+	description="etill"
+	progid="etill.WSC"
+	version="1.00"
+	classid="{79f1e868-a8fb-41f5-a6a0-3ec0f83cb6ec}"
+>
+</registration>
+
+<public>
+	<property name="OrderNo">
+		<get/>
+		<put/>
+	</property>
+	<property name="MerchantNo">
+		<get/>
+		<put/>
+	</property>
+	<property name="PaymentNumber">
+		<get/>
+		<put/>
+	</property>
+	<property name="Exponent">
+		<get/>
+		<put/>
+	</property>
+	<property name="Currency">
+		<get/>
+		<put/>
+	</property>
+	<property name="PayServerURL">
+		<get/>
+		<put/>
+	</property>
+	<property name="approveflag">
+		<get/>
+		<put/>
+	</property>
+	<property name="depositflag">
+		<get/>
+		<put/>
+	</property>
+	<property name="Amount">
+		<get/>
+		<put/>
+	</property>
+	<property name="SecondaryRC">
+		<get/>
+	</property>
+	<property name="PrimaryRC">
+		<get/>
+	</property>
+	<property name="PMMessage">
+		<get/>
+	</property>
+	<property name="Error">
+		<get/>
+	</property>
+	<method name="AcceptPayment">
+	</method>
+	<method name="Close">
+	</method>	
+	<method name="AddProtocolData">
+		<PARAMETER name="name"/>
+		<PARAMETER name="data"/>
+	</method>
+</public>
+
+<implements type="ASP" id="ASP"/>
+
+<script language="PerlScript">
+<![CDATA[
+use WebSphere::Payment;
+use vars qw($cashregister $paymentdata);
+
+$pmurl = 'http://localhost/webapp/PaymentManager/PaymentServlet';
+$admin = 'YWRtaW46YWRtaW4=';
+
+
+($cashregister) = ();
+$paymentdata = {};
+$cashregister = new WebSphere::Payment($pmurl,$admin);
+
+
+sub AddProtocolData() {
+    my ($name, $data) = @_;
+    $name =~ s/\$/%24/g;
+    $paymentdata->{"$name"} = $data;
+}
+
+sub AcceptPayment() {
+	return($cashregister->acceptPayment($paymentdata));
+}
+
+sub Close() {
+    $cashregister->close();
+    undef $cashregister;
+    undef $paymentdata;
+}
+
+sub get_OrderNo() {
+	return($paymentdata->{ordernumber});
+}
+
+sub put_OrderNo() {
+    $paymentdata->{ordernumber} = shift;
+}
+
+sub get_MerchantNo() {
+	return($paymentdata->{merchantnumber});
+}
+
+sub put_MerchantNo() {
+	$paymentdata->{merchantnumber} = shift;
+}
+
+sub get_PaymentNumber() {
+	return($paymentdata->{paymentnumber});
+}
+
+sub put_PaymentNumber() {
+	$paymentdata->{paymentnumber} = shift;	
+}
+
+sub get_Amount() {
+	return($paymentdata->{amount});
+}
+
+sub put_Amount() {
+	$paymentdata->{amount} = shift;	
+}
+     
+sub get_Exponent() {
+	return($paymentdata->{amountexp10});
+}
+
+sub put_Exponent() {
+	$paymentdata->{amountexp10} = shift;	
+}
+
+sub get_Currency() {
+	return($cashregister->{currency});
+}
+
+sub put_Currency() {
+	$cashregister->{currency} = shift;	
+}
+
+sub get_PayServerURL() {
+	return($cashregister->{pmurl});
+}
+
+sub put_PayServerURL() {
+	$cashregister->{pmurl} = shift;	
+}
+
+sub get_approveflag() {
+	return($paymentdata->{approveflag});
+}
+
+sub put_approveflag() {
+	$paymentdata->{approveflag} = shift;	
+}
+
+sub get_depositflag() {
+	return($paymentdata->{depositflag});
+}
+
+sub put_depositflag() {
+	$paymentdata->{depositflag} = shift;	
+}
+
+sub get_SecondaryRC() {
+	return($cashregister->{secrc});
+}
+
+sub get_PrimaryRC() {
+	return($cashregister->{prirc});
+}
+
+sub get_PMMessage() {
+	if ($cashregister->{pmmessage}) {
+		return($cashregister->{pmmessage});
+	}
+	else {
+		return("");
+	}
+}
+sub get_Error() {
+	return($cashregister->{error});
+}
+]]>
+</script>
+
+</component>

@@ -1,0 +1,1390 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+		<link href="http://tv.static.burrp.net/images/favicon.gif" rel="SHORTCUT ICON"/>
+	  <title>Welcome | burrp!TV Guide</title>
+    <script language="javascript">
+      var staticDomain = "http://tv.static.burrp.net";
+    </script>
+	  <!-- goog verification tag -->
+	  <meta name="verify-v1" content="aDutwYEtyTOAVs4eskq6aNvZZLq25n4etKm+KwwQdCQ=" />
+	  <link rel="stylesheet" type="text/css" href="/css/tv-styles.css" media="all"/>
+<script type="text/javascript" src="/js/tvLib.js"></script>
+<script type="text/javascript" src="/js/tv-util.js"></script>
+<script type="text/javascript" src="/js/burrpWindow.js"></script>
+	  <meta name="decorator" content="default"/>
+	</head>
+	<body>
+		
+
+
+<div class="global">
+  <div class="wrap">
+    <ul class="inline user">
+      
+			  <li class="first"><a href="/login">Sign-In</a></li>
+			  <li><a href="/user/signup">Sign-Up</a></li>
+			
+		</ul>
+		<ul class="inline">
+			<li class="first"><a href="http://www.burrp.com/">burrp.com</a></li>
+			<li class="current"><a href="/">TV</a></li>
+			<li><a href="http://blah.burrp.com/">Blah!</a></li>
+		</ul>
+    <ul class="inline response">
+      <li class="first"><a href="javascript:void(0)" onclick="createShareWindow({username:'', email:'', text:'I found this cool online TV guide you might find useful.', action:'invite', title:'Invite friends to burrp!TV'})">Invite Friends</a></li>
+			<li><a href="javascript:void(0)" onclick="createFeedbackWindow('')">Feedback</a></li>
+			<li><a href="/faqs.html">FAQ's</a></li>			
+		</ul>
+	</div>
+</div>
+
+		<div class="wrap">
+  <div class="searchpanel clearfix">
+    <div class="branding">
+      <a href="/" class="hoverfix"><img src="http://tv.static.burrp.net/images/burrp-tv-logo.gif" alt="TV Homepage" height="40" width="179" border="0"/></a>
+    </div>
+    <div class="search clearfix"><b class="tl"></b><b class="tr"></b><b class="br"></b><b class="bl"></b>
+		<ul id="nav" class="inline">
+		  <li id="listings"><a href="/scheduler/view.html">TV Listings</a></li>
+		  <li class="more" id="channels" onmouseover="toggle(this)"><a href="/channels.html">Channels</a>
+        <ul>
+          
+            <li><a href="/channel/zee-studio/63/">Zee Studio</a></li>
+          
+            <li><a href="/channel/axn/1/">AXN</a></li>
+          
+            <li><a href="/channel/zee-cinema/4/">Zee Cinema</a></li>
+          
+            <li><a href="/channel/hbo/8/">HBO</a></li>
+          
+            <li><a href="/channel/star-one/28/">Star One</a></li>
+          
+            <li><a href="/channel/discovery-channel/46/">Discovery Channel</a></li>
+          
+            <li><a href="/channel/set-max/51/">SET MAX</a></li>
+          
+            <li><a href="/channel/sony-pix/53/">Sony PIX</a></li>
+          
+            <li><a href="/channel/star-movies/59/">Star Movies</a></li>
+          
+          <li class="all"><a href="/channels.html">All Channels &raquo;</a></li>
+        </ul>
+		  </li>
+		  <li class="more" id="categories" onmouseover="toggle(this)"><a href="/heat-map.html?action=generate#category">Categories</a>
+        <ul>
+            
+              <li><a href="/search.html?c=8">Movie</a></li>
+            
+              <li><a href="/search.html?c=17">TV Series</a></li>
+            
+              <li><a href="/search.html?c=1">Documentary</a></li>
+            
+              <li><a href="/search.html?c=12">Reality</a></li>
+            
+              <li><a href="/search.html?c=7">Lifestyle</a></li>
+            
+              <li><a href="/search.html?c=6">Kids</a></li>
+            
+              <li><a href="/search.html?c=14">Sports</a></li>
+            
+          <li class="all"><a href="/heat-map.html?action=generate#category">All Categories &raquo;</a></li>
+        </ul>
+		  </li>
+		  <li class="more" id="genres" onmouseover="toggle(this)"><a href="/heat-map.html?action=generate#genre">Genres</a>
+        <ul>
+            
+              <li><a href="/search.html?g=8">Comedy</a></li>
+            
+              <li><a href="/search.html?g=11">Drama</a></li>
+            
+              <li><a href="/search.html?g=1">Action/Adventure</a></li>
+            
+              <li><a href="/search.html?g=23">Romance</a></li>
+            
+              <li><a href="/search.html?g=27">Suspense/Thriller</a></li>
+            
+              <li><a href="/search.html?g=10">Crime/Mystery</a></li>
+            
+              <li><a href="/search.html?g=25">Sci-Fi/Fantasy</a></li>
+            
+          <li class="all"><a href="/heat-map.html?action=generate#genre">All Genres &raquo;</a></li>
+        </ul>
+		  </li>
+		  <li class="more" id="movies" onmouseover="toggle(this)"><a href="/movie-explorer.html" >Movies on TV</a>
+        <ul>
+          <li><a href="/search.html?c=8&l=4&s=t">English Movies</a></li>
+          <li><a href="/search.html?c=8&l=7&s=t">Hindi Movies</a></li>
+          <li class="all"><a href="/movie-explorer.html">Movie Explorer &raquo;</a></li>
+        </ul>
+		  </li>
+		</ul>
+		<form method="get" action="/search.html">
+			<input type="text" class="text" name="q" value=""/><button type="submit"><img src="http://tv.static.burrp.net/images/icons/magnifying.gif" width="15" height="15"/></button>
+		</form>
+		</div>
+  </div>
+
+<div class="navBottomBanner">
+<script type="text/javascript">new BurrpAd("http://ads.burrp.com/serveAd/tv_nav_bt.php");</script>
+</div>
+</div>
+
+
+		<div class="wrap">
+			<div class="container">
+				<!-- beginning of dialog box -->
+					
+				<!-- end of dialog -->
+				<style>
+			strong.channelCategory {font-size:11px; display:block}
+		</style>
+	
+		<div id="ContentFrame" class="bodyAllChannel">
+			<div class="breadCrumbs">
+				<a href="/index.html">Home</a> / 
+				<b>Channels</b>
+			</div>			
+			<div class="column">	
+        <!-- ad banner fat sky scrapper -->
+        <script type="text/javascript">new BurrpAd("http://ads.burrp.com/serveAd/tv_all_ch_mr.php");</script>													
+				<div class="tagCloud">
+					<h1 id="channels">What's Hot</h1>			
+					<ul>
+						
+							<li>
+								
+										<a class="XXL" href="/channel/star-movies/59/">
+											Star Movies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="XXL" href="/channel/hbo/8/">
+											HBO
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="XL" href="/channel/discovery-channel/46/">
+											Discovery Channel
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="XL" href="/channel/axn/1/">
+											AXN
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="XL" href="/channel/set-max/51/">
+											SET MAX
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="XL" href="/channel/sony-pix/53/">
+											Sony PIX
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="L" href="/channel/star-world/23/">
+											Star World
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="L" href="/channel/zee-studio/63/">
+											Zee Studio
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="L" href="/channel/national-geographic-channel/71/">
+											National Geographic Channel
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a class="L" href="/channel/discovery-travel-living/61/">
+											Discovery Travel & Living
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-cinema/4/">
+											Zee Cinema
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-gold/64/">
+											Star Gold
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-one/28/">
+											Star One
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-plus/29/">
+											Star Plus
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/colors/66/">
+											Colors
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/cartoon-network/3/">
+											Cartoon Network
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-cafe/65/">
+											Zee Cafe
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zoom/20/">
+											Zoom
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/utv-movies/76/">
+											UTV Movies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/sony-entertainment-tv/78/">
+											Sony Entertainment TV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/world-movies/74/">
+											World Movies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/mtv/9/">
+											MTV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/pogo/58/">
+											POGO
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/bindass-movies/73/">
+											Bindass Movies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/fox-history-entertainment/83/">
+											Fox History & Entertainment
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/animal-planet/45/">
+											Animal Planet
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ndtv-imagine/70/">
+											NDTV Imagine
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/sab-tv/77/">
+											SAB TV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/wb/99/">
+											WB
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/vh1/80/">
+											Vh1
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/espn/101/">
+											ESPN
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/channel-v/81/">
+											Channel [V]
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ten-sports/105/">
+											Ten Sports
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/filmy/82/">
+											FILMY
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-sports/102/">
+											Star Sports
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ndtv-good-times/98/">
+											NDTV Good Times
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-utsav/30/">
+											Star Utsav
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-cricket/103/">
+											Star Cricket
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/9x/84/">
+											9X
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-tv/32/">
+											ZEE TV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/disney-channel/93/">
+											Disney Channel
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/bbc-world-news/85/">
+											BBC World News
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/b4u-movies/88/">
+											B4U Movies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/cnbc-tv18/106/">
+											CNBC TV18
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/mgm/95/">
+											MGM
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ndtv-lumiere/72/">
+											NDTV Lumiere
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/bbc-entertainment/69/">
+											BBC Entertainment
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/bindass-tv/75/">
+											Bindass Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/sahara-one/89/">
+											Sahara One
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/cnn/86/">
+											CNN
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/neo-cricket/100/">
+											Neo Cricket
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/cnnibn/50/">
+											CNN-IBN
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/neo-sports/49/">
+											Neo Sports
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/nickelodeon/79/">
+											Nickelodeon
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/b4u-music/87/">
+											B4U Music
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/animax/57/">
+											Animax
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-action/90/">
+											Zee Action
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/jetix/96/">
+											Jetix
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-classic/92/">
+											Zee Classic
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-premier/91/">
+											Zee Premier
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/real/97/">
+											Real
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/9xm/104/">
+											9XM
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-trendz/94/">
+											Zee Trendz
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/times-now/127/">
+											Times Now
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ibn-7/111/">
+											IBN 7
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/cbeebies/68/">
+											CBeebies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/imagine-showbiz/107/">
+											Imagine Showbiz
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/utvi/123/">
+											UTVi
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/hungama-tv/130/">
+											Hungama TV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-talkies/132/">
+											Zee Talkies
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/mi-marathi/114/">
+											Mi Marathi
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etc/113/">
+											etc
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-marathi/117/">
+											Etv Marathi
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zee-marathi/133/">
+											Zee Marathi
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/zing/109/">
+											Zing
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-pravah/131/">
+											Star Pravah
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv/120/">
+											Etv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/star-jalsha/119/">
+											Star Jalsha
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/sun-tv/152/">
+											Sun Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/newsx/129/">
+											NewsX
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/homeshop-18/128/">
+											HomeShop 18
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/ibn-lokmat/108/">
+											IBN Lokmat
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-gujarati/122/">
+											Etv Gujarati
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-2/121/">
+											Etv 2
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/asianet/153/">
+											Asianet
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-bangla/115/">
+											Etv Bangla
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/surya-tv/136/">
+											Surya Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/kiran-tv/145/">
+											Kiran Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/chutti-tv/112/">
+											Chutti TV
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-kannada/124/">
+											Etv Kannada
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-oriya/6/">
+											Etv Oriya
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/jaya-tv/147/">
+											Jaya Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-rajasthan/44/">
+											Etv Rajasthan
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/raj-tv/144/">
+											Raj Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-urdu/125/">
+											Etv Urdu
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/gemini-tv/137/">
+											Gemini Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-bihar/116/">
+											Etv Bihar
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-mp/118/">
+											Etv MP
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/etv-up/126/">
+											Etv UP
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/teja-tv/135/">
+											Teja Tv
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/jaya-plus/148/">
+											Jaya Plus
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/jaya-max/149/">
+											Jaya Max
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/udaya/134/">
+											Udaya
+										</a>
+									
+							</li>
+						
+							<li>
+								
+										<a href="/channel/vissa-tv/146/">
+											Vissa Tv
+										</a>
+									
+							</li>
+						
+					</ul>
+				</div>
+			</div>
+			<div class="content">
+				<div class="main">
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Movies</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/b4u-movies/88/" title="B4U Movies"><img src="/images/ch/s/i/sizzo0qf_2g_2.gif" alt="B4U Movies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/bindass-movies/73/" title="Bindass Movies"><img src="/images/ch/7/p/7pr4pemf_21_2.gif" alt="Bindass Movies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/filmy/82/" title="FILMY"><img src="/images/ch/w/c/wcrvabof_2a_2.gif" alt="FILMY"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/hbo/8/" title="HBO"><img src="/images/ch/d/o/dolcjvcf_8_2.gif" alt="HBO"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/mgm/95/" title="MGM"><img src="/images/ch/h/c/hceuf4rf_2n_2.gif" alt="MGM"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ndtv-lumiere/72/" title="NDTV Lumiere"><img src="/images/ch/w/q/wq8v9ltf_20_2.gif" alt="NDTV Lumiere"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/set-max/51/" title="SET MAX"><img src="/images/ch/o/j/ojczivcf_1f_2.gif" alt="SET MAX"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/sony-pix/53/" title="Sony PIX"><img src="/images/ch/8/m/8m8hyobf_1h_2.gif" alt="Sony PIX"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-gold/64/" title="Star Gold"><img src="/images/ch/b/6/b684vsif_1s_2.gif" alt="Star Gold"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-movies/59/" title="Star Movies"><img src="/images/ch/t/2/t2ecqnpf_1n_2.gif" alt="Star Movies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/utv-movies/76/" title="UTV Movies"><img src="/images/ch/3/i/3icnytyf_24_2.gif" alt="UTV Movies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/world-movies/74/" title="World Movies"><img src="/images/ch/s/z/sz0vjemf_22_2.gif" alt="World Movies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-action/90/" title="Zee Action"><img src="/images/ch/g/k/gk99vuqf_2i_2.gif" alt="Zee Action"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-cinema/4/" title="Zee Cinema"><img src="/images/ch/x/a/xar71lef_4_2.gif" alt="Zee Cinema"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-classic/92/" title="Zee Classic"><img src="/images/ch/3/z/3z7ixuqf_2k_2.gif" alt="Zee Classic"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-premier/91/" title="Zee Premier"><img src="/images/ch/l/m/lmqgxuqf_2j_2.gif" alt="Zee Premier"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-studio/63/" title="Zee Studio"><img src="/images/ch/u/8/u8gy9rif_1r_2.gif" alt="Zee Studio"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-talkies/132/" title="Zee Talkies"><img src="/images/ch/j/6/j63nn8xf_3o_2.gif" alt="Zee Talkies"/><sup>New</sup></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Entertainment</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/9x/84/" title="9X"><img src="/images/ch/3/1/31uii8of_2c_2.gif" alt="9X"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/asianet/153/" title="Asianet"><img src="/images/ch/8/y/8yj1kcyf_49_2.gif" alt="Asianet"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/axn/1/" title="AXN"><img src="/images/ch/7/a/7acewibf_1_2.gif" alt="AXN"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/bbc-entertainment/69/" title="BBC Entertainment"><img src="/images/ch/s/2/s25sgmkf_1x_2.gif" alt="BBC Entertainment"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/bindass-tv/75/" title="Bindass Tv"><img src="/images/ch/y/f/yfbz1xsf_23_2.gif" alt="Bindass Tv"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/colors/66/" title="Colors"><img src="/images/ch/w/a/wagtotif_1u_2.gif" alt="Colors"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv/120/" title="Etv"><img src="/images/ch/d/t/dtwciuvf_3c_2.gif" alt="Etv"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-bangla/115/" title="Etv Bangla"><img src="/images/ch/e/0/e0l7iuvf_37_2.gif" alt="Etv Bangla"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-bihar/116/" title="Etv Bihar"><img src="/images/ch/6/j/6jlx7twf_38_2.gif" alt="Etv Bihar"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-gujarati/122/" title="Etv Gujarati"><img src="/images/ch/p/a/par5iuvf_3e_2.gif" alt="Etv Gujarati"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-kannada/124/" title="Etv Kannada"><img src="/images/ch/p/q/pqay7twf_3g_2.gif" alt="Etv Kannada"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-marathi/117/" title="Etv Marathi"><img src="/images/ch/l/n/lncwd0wf_39_2.gif" alt="Etv Marathi"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-mp/118/" title="Etv MP"><img src="/images/ch/i/j/ijxy7twf_3a_2.gif" alt="Etv MP"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-oriya/6/" title="Etv Oriya"><img src="/images/ch/e/z/ez8vd0wf_6_2.gif" alt="Etv Oriya"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-rajasthan/44/" title="Etv Rajasthan"><img src="/images/ch/7/4/74t4iuvf_18_2.gif" alt="Etv Rajasthan"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-up/126/" title="Etv UP"><img src="/images/ch/y/x/yxgz7twf_3i_2.gif" alt="Etv UP"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-urdu/125/" title="Etv Urdu"><img src="/images/ch/h/d/hd73o8wf_3h_2.gif" alt="Etv Urdu"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/fox-history-entertainment/83/" title="Fox History & Entertainment"><img src="/images/ch/j/o/jonoi8of_2b_2.gif" alt="Fox History & Entertainment"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/gemini-tv/137/" title="Gemini Tv"><img src="/images/ch/z/o/zo953byf_3t_2.gif" alt="Gemini Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/imagine-showbiz/107/" title="Imagine Showbiz"><img src="/images/ch/x/9/x9j0a2uf_2z_2.gif" alt="Imagine Showbiz"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/jaya-max/149/" title="Jaya Max"><img src="/images/ch/m/x/mx063byf_45_2.gif" alt="Jaya Max"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/jaya-plus/148/" title="Jaya Plus"><img src="/images/ch/y/o/yo073byf_44_2.gif" alt="Jaya Plus"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/jaya-tv/147/" title="Jaya Tv"><img src="/images/ch/g/1/g1l83byf_43_2.gif" alt="Jaya Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/kiran-tv/145/" title="Kiran Tv"><img src="/images/ch/4/f/4f793byf_41_2.gif" alt="Kiran Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/mi-marathi/114/" title="Mi Marathi"><img src="/images/ch/s/7/s70akavf_36_2.gif" alt="Mi Marathi"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ndtv-imagine/70/" title="NDTV Imagine"><img src="/images/ch/p/m/pmh2phlf_1y_2.gif" alt="NDTV Imagine"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/raj-tv/144/" title="Raj Tv"><img src="/images/ch/l/k/lku93byf_40_2.gif" alt="Raj Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/real/97/" title="Real"><img src="/images/ch/b/n/bnz7t8sf_2p_2.gif" alt="Real"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/sab-tv/77/" title="SAB TV"><img src="/images/ch/a/v/avxcx8nf_25_2.gif" alt="SAB TV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/sahara-one/89/" title="Sahara One"><img src="/images/ch/3/r/3ry8nkqf_2h_2.gif" alt="Sahara One"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/sony-entertainment-tv/78/" title="Sony Entertainment TV"><img src="/images/ch/i/m/im9usinf_26_2.gif" alt="Sony Entertainment TV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-jalsha/119/" title="Star Jalsha"><img src="/images/ch/2/a/2a0v93wf_3b_2.gif" alt="Star Jalsha"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-one/28/" title="Star One"><img src="/images/ch/k/r/krh41lef_s_2.gif" alt="Star One"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-plus/29/" title="Star Plus"><img src="/images/ch/b/6/b6p7qscf_t_2.gif" alt="Star Plus"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-pravah/131/" title="Star Pravah"><img src="/images/ch/w/x/wxvtuvwf_3n_2.gif" alt="Star Pravah"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-utsav/30/" title="Star Utsav"><img src="/images/ch/r/4/r4k51lef_u_2.gif" alt="Star Utsav"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-world/23/" title="Star World"><img src="/images/ch/6/i/6ilgwibf_n_2.gif" alt="Star World"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/sun-tv/152/" title="Sun Tv"><img src="/images/ch/3/o/3oy1hbyf_48_2.gif" alt="Sun Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/surya-tv/136/" title="Surya Tv"><img src="/images/ch/6/i/6ifa3byf_3s_2.gif" alt="Surya Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/teja-tv/135/" title="Teja Tv"><img src="/images/ch/f/n/fnbb3byf_3r_2.gif" alt="Teja Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/udaya/134/" title="Udaya"><img src="/images/ch/o/d/od9c3byf_3q_2.gif" alt="Udaya"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/vissa-tv/146/" title="Vissa Tv"><img src="/images/ch/f/f/ffed3byf_42_2.gif" alt="Vissa Tv"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/wb/99/" title="WB"><img src="/images/ch/1/b/1bxqqisf_2r_2.gif" alt="WB"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-cafe/65/" title="Zee Cafe"><img src="/images/ch/i/t/it58qmjf_1t_2.gif" alt="Zee Cafe"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-marathi/133/" title="Zee Marathi"><img src="/images/ch/b/h/bhkmn8xf_3p_2.gif" alt="Zee Marathi"/><sup>New</sup></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-tv/32/" title="ZEE TV"><img src="/images/ch/m/g/mg4pivcf_w_2.gif" alt="ZEE TV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zing/109/" title="Zing"><img src="/images/ch/g/1/g1wwjzxf_31_2.gif" alt="Zing"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zoom/20/" title="Zoom"><img src="/images/ch/a/j/ajrzv3ff_k_2.gif" alt="Zoom"/></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Kids</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/animax/57/" title="Animax"><img src="/images/ch/1/h/1hdk70mf_1l_2.gif" alt="Animax"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/cartoon-network/3/" title="Cartoon Network"><img src="/images/ch/t/r/tripmqef_3_2.gif" alt="Cartoon Network"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/cbeebies/68/" title="CBeebies"><img src="/images/ch/s/l/sljsgmkf_1w_2.gif" alt="CBeebies"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/chutti-tv/112/" title="Chutti TV"><img src="/images/ch/a/q/aqivjavf_34_2.gif" alt="Chutti TV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/disney-channel/93/" title="Disney Channel"><img src="/images/ch/m/l/mlbiprqf_2l_2.gif" alt="Disney Channel"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/hungama-tv/130/" title="Hungama TV"><img src="/images/ch/h/y/hyx9ekwf_3m_2.gif" alt="Hungama TV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/jetix/96/" title="Jetix"><img src="/images/ch/l/j/ljy3g4rf_2o_2.gif" alt="Jetix"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/nickelodeon/79/" title="Nickelodeon"><img src="/images/ch/p/q/pqcnjfnf_27_2.gif" alt="Nickelodeon"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/pogo/58/" title="POGO"><img src="/images/ch/h/f/hf821lef_1m_2.gif" alt="POGO"/></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Documentary</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/animal-planet/45/" title="Animal Planet"><img src="/images/ch/0/r/0rhou8sf_19_2.gif" alt="Animal Planet"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/discovery-channel/46/" title="Discovery Channel"><img src="/images/ch/9/l/9lsewibf_1a_2.gif" alt="Discovery Channel"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/national-geographic-channel/71/" title="National Geographic Channel"><img src="/images/ch/8/t/8t3m70mf_1z_2.gif" alt="National Geographic Channel"/></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Lifestyle</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/discovery-travel-living/61/" title="Discovery Travel & Living"><img src="/images/ch/f/r/frsgyobf_1p_2.gif" alt="Discovery Travel & Living"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/homeshop-18/128/" title="HomeShop 18"><img src="/images/ch/x/4/x4m05cwf_3k_2.gif" alt="HomeShop 18"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ndtv-good-times/98/" title="NDTV Good Times"><img src="/images/ch/w/a/waymlesf_2q_2.gif" alt="NDTV Good Times"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/zee-trendz/94/" title="Zee Trendz"><img src="/images/ch/l/h/lh7ul1rf_2m_2.gif" alt="Zee Trendz"/></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Music</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/9xm/104/" title="9XM"><img src="/images/ch/k/j/kjmsjavf_2w_2.gif" alt="9XM"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/b4u-music/87/" title="B4U Music"><img src="/images/ch/3/o/3os0p0qf_2f_2.gif" alt="B4U Music"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/channel-v/81/" title="Channel [V]"><img src="/images/ch/t/4/t4qmjfnf_29_2.gif" alt="Channel [V]"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etc/113/" title="etc"><img src="/images/ch/r/2/r2j2kavf_35_2.gif" alt="etc"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/mtv/9/" title="MTV"><img src="/images/ch/w/y/wysrp9of_9_2.gif" alt="MTV"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/vh1/80/" title="Vh1"><img src="/images/ch/4/7/475hjfnf_28_2.gif" alt="Vh1"/></a>
+  							
+  						</fieldset>
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">News & Business</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/bbc-world-news/85/" title="BBC World News"><img src="/images/ch/9/q/9qx3c2pf_2d_2.gif" alt="BBC World News"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/cnbc-tv18/106/" title="CNBC TV18"><img src="/images/ch/8/r/8r1j1rtf_2y_2.gif" alt="CNBC TV18"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/cnn/86/" title="CNN"><img src="/images/ch/i/y/iy7ee2pf_2e_2.gif" alt="CNN"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/cnnibn/50/" title="CNN-IBN"><img src="/images/ch/w/2/w2v0kavf_1e_2.gif" alt="CNN-IBN"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/etv-2/121/" title="Etv 2"><img src="/images/ch/k/d/kdz3iuvf_3d_2.gif" alt="Etv 2"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ibn-7/111/" title="IBN 7"><img src="/images/ch/a/j/ajj4kavf_33_2.gif" alt="IBN 7"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ibn-lokmat/108/" title="IBN Lokmat"><img src="/images/ch/e/s/es48kavf_30_2.gif" alt="IBN Lokmat"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/newsx/129/" title="NewsX"><img src="/images/ch/q/h/qhtl8rxf_3l_2.gif" alt="NewsX"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/times-now/127/" title="Times Now"><img src="/images/ch/y/j/yj415zvf_3j_2.gif" alt="Times Now"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/utvi/123/" title="UTVi"><img src="/images/ch/p/8/p8alnowf_3f_2.gif" alt="UTVi"/><sup>New</sup></a>
+  							
+  						</fieldset>
+  						
+					
+  						
+					
+  					
+  						<fieldset>
+  							<legend class="channelCategory">Sports</legend>
+  							
+  								<a class="channelLogoBox" href="/channel/espn/101/" title="ESPN"><img src="/images/ch/f/8/f8qwnzsf_2t_2.gif" alt="ESPN"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/neo-cricket/100/" title="Neo Cricket"><img src="/images/ch/i/b/ibl7emtf_2s_2.gif" alt="Neo Cricket"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/neo-sports/49/" title="Neo Sports"><img src="/images/ch/r/7/r788emtf_1d_2.gif" alt="Neo Sports"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-cricket/103/" title="Star Cricket"><img src="/images/ch/l/j/lj3x1xsf_2v_2.gif" alt="Star Cricket"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/star-sports/102/" title="Star Sports"><img src="/images/ch/7/o/7olx1xsf_2u_2.gif" alt="Star Sports"/></a>
+  							
+  								<a class="channelLogoBox" href="/channel/ten-sports/105/" title="Ten Sports"><img src="/images/ch/t/j/tjv8emtf_2x_2.gif" alt="Ten Sports"/></a>
+  							
+  						</fieldset>
+  						
+					
+				</div>
+			</div>
+		</div>
+			</div>
+		</div>
+		
+
+
+
+
+
+
+
+
+
+
+
+<div class="footer">
+  <div class="wrap">
+		<div class="leaderboard">
+      <script type="text/javascript">new BurrpAd("http://ads.burrp.com/serveAd/tv_ft_lb.php");</script>
+		</div>
+  	<ul class="inline prim">
+  		<li><a href="/">TV Home</a></li>
+		  <li><a href="/scheduler/view.html">TV Listings</a></li>
+			<li><a href="/movie-explorer.html">Movies on TV</a></li>
+      <li><a href="javascript:void(0)" onclick="createShareWindow({username:'', email:'', text:'Checkout burrp!TV', action:'invite', title:'Invite friends to burrp!TV'})">Invite Friends</a></li>
+			<li><a href="javascript:void(0)" onclick="createFeedbackWindow('')">Feedback</a></li>
+      <li><a href="javascript:void(0)" onclick="createNewsLetterWindow()" title="Subscribe to Newsletter">Subscribe to Newsletter</a></li>
+		  <li><a href="/faqs.html">FAQ's</a></li>
+		</ul>
+  	<ul class="xplore">
+			<li class="first">Top 5 Categories</li>
+			
+				<li><a href="/search.html?c=8">Movie</a></li>
+			
+				<li><a href="/search.html?c=17">TV Series</a></li>
+			
+				<li><a href="/search.html?c=1">Documentary</a></li>
+			
+				<li><a href="/search.html?c=12">Reality</a></li>
+			
+				<li><a href="/search.html?c=7">Lifestyle</a></li>
+			
+			<li class="all"><a href="/heat-map.html?action=generate#category">All Categories &raquo;</a></li>
+  	</ul>
+  	<ul class="xplore">
+			<li class="first">Top 5 Genres</li>
+			
+				<li><a href="/search.html?g=8">Comedy</a></li>
+			
+				<li><a href="/search.html?g=11">Drama</a></li>
+			
+				<li><a href="/search.html?g=1">Action/Adventure</a></li>
+			
+				<li><a href="/search.html?g=23">Romance</a></li>
+			
+				<li><a href="/search.html?g=27">Suspense/Thriller</a></li>
+			
+			<li class="all"><a href="/heat-map.html?action=generate#genre">All Genres &raquo;</a></li>
+  	</ul>
+  	<ul class="xplore">
+			<li class="first">Top 5 Channels</li>
+			
+				<li><a href="/channel/zee-studio/63/">Zee Studio</a></li>
+			
+				<li><a href="/channel/axn/1/">AXN</a></li>
+			
+				<li><a href="/channel/zee-cinema/4/">Zee Cinema</a></li>
+			
+				<li><a href="/channel/hbo/8/">HBO</a></li>
+			
+				<li><a href="/channel/star-one/28/">Star One</a></li>
+			
+			<li class="all"><a href="/channels.html">All Channels &raquo;</a></li>
+  	</ul>
+  	<div class="promo">
+			<img src="http://tv.static.burrp.net/images/promos/tv-features/inbox.jpg" width="164" height="164"/>
+			<h3>TV in your Inbox!</h3>
+			<p>Just set your favourite shows on burrp!TV and we'll manage the rest! We'll send you a daily schedule of all your favourite shows on email so you're always updated on when they're playing!</p>
+			
+					<p class="no">Not a burrper! yet? <a href="/user/signup">Sign up</a></p>
+				
+  	</div>
+    <ul class="inline seco">
+      <li><a href="http://www.burrp.com/about-us.html" target="_blank">About</a></li>
+      <li><a href="http://blog.burrp.com/" target="_blank">Blog</a></li>
+      <li><a href="http://www.burrp.com/privacy-policy.html" target="_blank">Privacy Statement</a></li>
+      <li><a href="http://www.burrp.com/terms-of-use.html" target="_blank">Terms of Service</a></li>
+    	<li><a href="http://www.burrp.com/careers.html" target="_blank" style="font-weight:bold;color:red">We are hiring!</a></li>
+    </ul>
+    <p>burrp!TV is a registered trademark used under license &copy; 2006 - 2009 burrp.com. All rights reserved.</p>
+    <p>(build# 1 created on 2009/08/30 03:23 AM)<br/></p>
+  </div>
+</div>
+
+		<!-- beggining of analytics -->
+		<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	try {
+	var pageTracker = _gat._getTracker("UA-9364851-1");
+	pageTracker._setDomainName(".burrp.com");
+	pageTracker._trackPageview();
+	} catch(err) {}
+	</script>
+		<!-- end of analytics -->
+
+	</body>
+</html>

@@ -1,0 +1,63 @@
+=head1 NAME
+
+Win32::ActAcc 1.1 - Active Accessibility client in Perl
+
+=head1 SYNOPSIS
+
+Win32::ActAcc enables Perl scripts to examine the GUI and monitor
+WinEvents, as screen readers do.
+
+In this Perl extension, you'll find familiar Active Accessibility
+functions, along with novelties such as iterators to accommodate
+laziness and impatience.
+
+For documentation (on the Perl extension, not Active Accessibility
+itself), run C<perldoc Win32::ActAcc> or view ActAcc.html after
+installation.
+
+For clicking and typing and such, you may use Win32::GuiTest to
+complement the view of the GUI you get from Active Accessibility.
+
+=head1 INSTALLATION
+
+Building the extension from source code requires Visual C++ 6.0 SP 4
+or later, and the "Platform SDK" of July 2000 or later.  (The C++
+compiler in the ".NET Framework 1.0" SDK will do, but it creates a
+dependency on a .NET DLL that not everyone has.)  The "nmake test"
+requires English-language Windows 2000 or XP.
+
+Reboot first, to unload any residual inproc WinEvent handlers from a
+prior version of Win32::ActAcc.
+
+ perl Makefile.PL
+ nmake 
+ nmake test
+ nmake install
+
+C<nmake test> depends on very little outside of Win32::ActAcc
+itself, and therefore tests very few features.
+
+A more in-depth test, C<eg\playpen.pl>, uses the small C# Windows
+Forms app in the C<eg\playpen> directory to exercise more
+features. Even this simple app has been observed to present itself
+differently to Active Accessibility on computers running different
+versions of Windows, so your mileage may vary.
+
+=head1 CHANGES from version 1.0
+
+You can import specific symbols, or get all of them like this:
+
+ use Win32::ActAcc qw(:all); 
+
+C<dig> allows paths to omit C<client> only by request:
+
+ $Win32::ActAcc::IMPLICIT_CLIENT = 1; # deprecated
+
+The "Start Menu" module is history.  Each revision of Windows
+outsmarted it.
+
+=head1 COPYRIGHT
+
+Copyright 2000-2004, Phill Wolf. 
+
+pbwolf@cpan.org

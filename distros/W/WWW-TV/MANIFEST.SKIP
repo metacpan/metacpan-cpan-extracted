@@ -1,0 +1,10 @@
+^Makefile$
+\.old$
+\.svn/
+\.bak$
+\.DS_Store
+\.tar.gz$
+svn-commit
+cover_db
+TODO
+blib

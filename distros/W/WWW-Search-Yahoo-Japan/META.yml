@@ -1,0 +1,26 @@
+---
+abstract: 'WWW::Search backend for searching Yahoo! Japan'
+author:
+  - 'Martin Thurn <mthurn@cpan.org>'
+build_requires:
+  Test::More: 0
+  WWW::Search::Test: 2.265
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::Yahoo::Japan
+name: WWW-Search-Yahoo-Japan
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dumper: 0
+  WWW::Search::Yahoo: 2.377
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.103

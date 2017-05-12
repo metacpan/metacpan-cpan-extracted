@@ -1,0 +1,14 @@
+CHANGELIST
+Makefile.PL
+MANIFEST
+README
+t/test.t
+Upcoming.pm
+Upcoming/Object.pm
+Upcoming/Object/Category.pm
+Upcoming/Object/Country.pm
+Upcoming/Object/Event.pm
+Upcoming/Object/Metro.pm
+Upcoming/Object/State.pm
+Upcoming/Object/Venue.pm
+Upcoming/Object/Watchlist.pm

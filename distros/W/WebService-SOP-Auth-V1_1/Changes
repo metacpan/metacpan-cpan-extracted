@@ -1,0 +1,23 @@
+Revision history for Perl extension WebService-SOP-Auth-V1_1
+
+0.04 2016-03-09T07:02:11Z
+
+    - Perl >= 5.10
+    - HTTP::Request::Common >= 6.07
+
+0.03 2016-03-04T04:28:42Z
+
+    - Remove cpanfile.snapshot
+    - Change copyright holder company name
+    - Add DELET, PUT, PUT_JSON request functions
+    - Improve POD
+
+0.02 2015-07-03T13:11:39Z
+
+    - Rebuilt cpanfile.snapshot
+    - Added more details and improved POD
+
+0.01 2014-11-12T06:33:02Z
+
+    - original version
+

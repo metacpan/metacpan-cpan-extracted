@@ -1,0 +1,60 @@
+{
+   "abstract" : "Determine the source of a visit on your website : organic, adwords, facebook, referer site",
+   "author" : [
+      "Horea <horea@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-ClickSource",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "URI" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "URI" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::ClickSource" : {
+         "file" : "lib/WWW/ClickSource.pm",
+         "version" : "0.8"
+      },
+      "WWW::ClickSource::Request" : {
+         "file" : "lib/WWW/ClickSource/Request.pm"
+      },
+      "WWW::ClickSource::Request::CatalystRequest" : {
+         "file" : "lib/WWW/ClickSource/Request/CatalystRequest.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/gliganh/WWW-ClickSource"
+      }
+   },
+   "version" : "0.8",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

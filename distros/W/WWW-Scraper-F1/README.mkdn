@@ -1,0 +1,63 @@
+# NAME
+
+WWW::Scraper::F1 - Use f1.com race data seamlessly in perl.
+
+<a href="http://travis-ci.org/FreekKalter/WWW-Scraper-F1"><img src="https://secure.travis-ci.org/FreekKalter/WWW-Scraper-F1.png" alt="Build status"></a>
+
+# SYNOPSIS
+
+    use WWW::Scraper:F1;
+
+    my $top      = get_top_championship( { length => 5 } );
+    my $upcoming = get_upcoming_race();
+
+# FUNCTIONS
+
+
+
+## get\_top\_championship()
+
+This functions retrieves the current championship. It returns a reference to an array of hashes. By default it
+returns the top 5 drivers like this.
+
+    [
+        { name => "Sebastian Vettel" , points => 55 , team => "Red Bull Racing" }
+        { name => "Fernando Alonso"  , points => 40 , team => "Ferrari" }
+    ]
+
+You can specify options via a hash reference `get_top_chamionship( {length => 3} )`
+
+## get\_upcoming\_race()
+
+This function returns a reference to a hash. The hash elements contain information about the upcoming race.
+The hash looks like this:
+
+    {
+      'country'    => 'Canada',
+      'city'       => 'Montreal',
+      'time'       => '10/06/12 20:00:00',
+      'countdown'  => '7 days 21 hours'
+    }
+
+You can specify options via a hash refernce, `get_upcoming_rac( { cache => 0 } )`
+Available options:
+
+- cache
+
+    Set this to 0, to not use the internal cache mechanism. This will disable reading form the cache file, it will still write the results of the call to it.
+
+# INTERNALS
+
+This module caches the results fetched from f1.com for futher use. Since the actual data only changes after a race, it only needs to fetch it again if the cache is older then the previous race.
+
+# AUTHOR
+
+Freek Kalter
+
+freek@kalteronline.org
+
+[http://kalteronline.org](http://kalteronline.org)
+
+# COPYRIGHT
+
+This module is distributed under the same lincense as perl5 itself.

@@ -1,0 +1,7 @@
+use Test::More tests => 1;
+
+BEGIN {
+  use_ok( 'WWW::ErnestMarples' );
+}
+
+diag( "Testing WWW::ErnestMarples $WWW::ErnestMarples::VERSION" );

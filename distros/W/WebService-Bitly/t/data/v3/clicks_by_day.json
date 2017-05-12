@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "clicks_by_day": [
+            {
+                "short_url": "http://j.mp/9DguyN",
+                "global_hash": "9DguyN",
+                "user_hash": "user9Dg",
+                "clicks": [
+                    {
+                        "clicks": 5,
+                        "day_start": 1290920400
+                    },
+                    {
+                        "clicks": 10,
+                        "day_start": 1290834000
+                    }
+                ]
+            },
+            {"hash": "9N", "error": "NOT_FOUND"}
+        ]
+    },
+    "status_txt": "OK"
+}

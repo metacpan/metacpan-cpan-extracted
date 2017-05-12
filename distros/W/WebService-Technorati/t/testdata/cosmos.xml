@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- generator="Technorati API version 1.0 /cosmos" -->
+<!DOCTYPE tapi PUBLIC "-//Technorati, Inc.//DTD TAPI 0.02//EN" "http://api.technorati.com/dtd/tapi-002.xml">
+<tapi version="1.0">
+<document>
+<result>
+  <url>http://www.arachna.com/roller/page/spidaman</url>
+  <weblog>
+    <name>What's That Noise?! [Ian Kallen's Weblog]</name>
+    <url>http://www.arachna.com/roller/page/spidaman</url>
+    <rssurl>http://www.arachna.com/roller/rss/spidaman</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>18</inboundblogs>
+    <inboundlinks>62</inboundlinks>
+    <lastupdate>2004-11-07 15:05:18 GMT</lastupdate>
+    <rank>26080</rank>
+  </weblog>
+  <inboundblogs>18</inboundblogs>
+  <inboundlinks>62</inboundlinks>
+  <rankingstart>1</rankingstart>
+</result>
+<item>
+  <weblog>
+    <name>BigMarv.net</name>
+    <url>http://bigmarv.net</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>0</inboundblogs>
+    <inboundlinks></inboundlinks>
+    <lastupdate>2004-11-07 23:37:48 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>   You Silly Girl Belle de Jour Ook giraffe TEN Wiki Barry Weintraub Ian Kallen </excerpt>
+  <linkcreated>2004-11-07 21:14:31 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>Davidx.org</name>
+    <url>http://www.davidx.org/blog</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>1</inboundblogs>
+    <inboundlinks>1</inboundlinks>
+    <lastupdate>2004-11-06 12:19:59 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.davidx.org/blog/index.php?p=14</nearestpermalink>
+  <excerpt>   This is an example of a post where i’d just happened to mention that i work at Technorati with' Ian  and richard and Bradley and Tantek and many others, and automatically these references will now appear as hyperlinks.</excerpt>
+  <linkcreated>2004-11-06 11:37:09 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>ctrl-ault-del</name>
+    <url>http://www.richardault.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>11</inboundblogs>
+    <inboundlinks>12</inboundlinks>
+    <lastupdate>2004-10-30 01:58:32 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt> Technorati  Bradley Allen  David Andersen  Aaron Bannert  Tantek Çelik  Cheyenne  Adam Hertz  Joi Ito' Ian Kallen   Kevin Marks  Bill Schoolcraft  Doc Searls  David Sifry   Adriaan Tijsseling</excerpt>
+  <linkcreated>2004-10-30 00:36:01 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>To Wish for Impossible Things</name>
+    <url>http://adam.typepad.com/impossiblethings</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>7</inboundblogs>
+    <inboundlinks>89</inboundlinks>
+    <lastupdate>2004-10-30 01:14:39 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt> Technorarium  Sifry's Alerts What's That Noise?  Epeus' epigone ctrl-ault-del Tantek's Thoughts</excerpt>
+  <linkcreated>2004-10-29 23:19:02 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>Davidx.org</name>
+    <url>http://www.davidx.org/blog</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>1</inboundblogs>
+    <inboundlinks>1</inboundlinks>
+    <lastupdate>2004-09-22 10:25:28 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>   Linked  Technorati    People  Albert Ceren Chad hugh Ken Mason Rodi   People i Work with  Aaron Ado Bill David Sifry Ian  Joi Ito Kevin Marks Mary Richard Ault Tantek   Categories:  General     Search:</excerpt>
+  <linkcreated>2004-09-22 10:14:01 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>tantek/log/2004/09</name>
+    <url>http://homepage.mac.com/kevinmarks/tantektest.html</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>0</inboundblogs>
+    <inboundlinks>0</inboundlinks>
+    <lastupdate>2004-09-17 01:12:38 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://homepage.mac.com/kevinmarks/tantektest.html#d07t0904</nearestpermalink>
+  <excerpt>independent.co.uk: Bush by numbers: Four years of double standards.  Either way, if you haven't registered to vote, you should, and here is a way to possibly even win some money: VOTEorNOT.org.  Here is a useful tip for making self-signed certificates work with IE5/Mac . Thanks for documenting this Ian.  86 the *38. Startup tries to monetize caller-id spoofing. Founder gets harrassed over the phone. Hilarity ensues.  Technorati's very own Kevin Marks is going to be</excerpt>
+  <linkcreated>2004-09-17 01:11:02 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040903#microsoft_no_se_habla_sslv3</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>tantek/log/2004/09</name>
+    <url>http://homepage.mac.com/kevinmarks/tantektest.html</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>0</inboundblogs>
+    <inboundlinks>0</inboundlinks>
+    <lastupdate>2004-09-17 01:12:57 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://homepage.mac.com/kevinmarks/07.html#d26t0621</nearestpermalink>
+  <excerpt>of roles and transparency, I'd like to interrupt this blog post briefly to give a shout out to Trout Girl, who was recently fired from Friendster, for being too transparent. Lots of folks are already talking about this. The best commentary so far from Ian Kallen , who said he was: *shocked* *SHOCKED I TELL YOU* to learn that Friendster's cluetrain ticket was misplaced. Indeed. Now back to our regularly scheduled program.    So about designing standards. One thing I learned at</excerpt>
+  <linkcreated>2004-09-17 01:11:02 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040831</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>tantek/log/2004/09</name>
+    <url>http://homepage.mac.com/kevinmarks/tantektest.html</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>0</inboundblogs>
+    <inboundlinks>0</inboundlinks>
+    <lastupdate>2004-09-17 01:11:34 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt> recent finds  Change Research Read &amp;amp; Burn To Wish For Impossible Things What's That Noise?!  ctrl-ault-del Hampton Slut Napsterization</excerpt>
+  <linkcreated>2004-09-17 01:11:02 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>Read &amp;amp; Burn</name>
+    <url>http://bradleyallen.typepad.com/read_burn</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>3</inboundblogs>
+    <inboundlinks>10</inboundlinks>
+    <lastupdate>2004-09-13 22:38:39 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>Reading/Writing  Adam Hertz  Alanna Spence  Andreas Duess  Anne Allen  Ben Hammersley  Bryce Glass  Catherine Tornabene  Cheyenne  David Andersen  David Sifry  Dean Allen  Doc Searls  Eric Meyer  Hugh Macleod Ian Kallen   Jeffrey Veen  Jeffrey Zeldman  Joi Ito  Kevin Marks  Mark Pilgrim  Mary Hodder  Phil Sherry  Richard Ault  Stuart Hughes  Tantek Çelik'</excerpt>
+  <linkcreated>2004-09-13 16:20:54 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>chaotic intransient prose bursts</name>
+    <url>http://blog.kung-foo.tv</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>31</inboundblogs>
+    <inboundlinks>120</inboundlinks>
+    <lastupdate>2004-09-11 20:02:12 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>   »' arachna.com  » benhammersley.com » bitworking.org » bopuc.levendis.com » chrishiller.net » daringfireball.net » diveintomark.org » ecyrd.com » inessential.com » intertwingly.net • » jluster.org » joi.ito.com'</excerpt>
+  <linkcreated>2004-09-11 17:03:54 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>brianstorms weblog</name>
+    <url>http://www.brianstorms.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>95</inboundblogs>
+    <inboundlinks>139</inboundlinks>
+    <lastupdate>2004-09-03 16:49:29 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>Feld Thoughts (VC blog)  Â Mark Fletcher (WingedPig Blog)  Â Fluxblog (MP3s)  Â Fred Wilson's VC blog  Â Future Hi  Â Future Now  Â Geoff Goodfellow  Â GirlWonder  Â How to Save the World  Â' Ian Kallen's blog   Â IDFuel  Â JOHO  Â kottke  Â LanguageLog  Â Laughingmeme  Â lightningfield  Â Madeleines  Â Jeffrey McManus' Grind  Â Media Diet  Â media|venture|collective  Â memepool  Â Mitch Kapor'</excerpt>
+  <linkcreated>2004-09-03 14:12:11 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>tantek/log/2004/11</name>
+    <url>http://tantek.com/log</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>224</inboundblogs>
+    <inboundlinks>261</inboundlinks>
+    <lastupdate>2004-09-03 04:24:11 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt> recent finds  Read &amp;amp; Burn To Wish For Impossible Things What's That Noise?!  ctrl-ault-del Hampton Slut Napsterization</excerpt>
+  <linkcreated>2004-09-02 23:48:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>Mikes Weblogs</name>
+    <url>http://www.lnxpowered.org/mikesblog</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>3</inboundblogs>
+    <inboundlinks>3</inboundlinks>
+    <lastupdate>2004-07-30 04:46:21 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>   Links  Mozilla  OpenOffice  Slashdot!    Some Blogs  Adot's Notblog* Advogato bradchoate.com Dan Gillmor's eJournal Doc's Weblogs Gaylen's Weblog Groklaw Ian Kallen's Weblog  Jeremy Zawodny's Blog Popdex : the website popularity index Rasmus' Toys scriptygoddess Setuid's Weblog Sifry's Alerts Vikk's Weblog Your Tech Weblog   Categories:  General  Weblogs  Views  employment</excerpt>
+  <linkcreated>2004-07-30 03:07:09 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>chaotic intransient prose bursts</name>
+    <url>http://kung-foo.tv/blog</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>124</inboundblogs>
+    <inboundlinks>152</inboundlinks>
+    <lastupdate>2004-07-16 12:32:25 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink></nearestpermalink>
+  <excerpt>   »' arachna.com  » bitworking.org » bopuc.levendis.com » chrishiller.net » daringfireball.net » diveintomark.org » ecyrd.com » inessential.com » intertwingly.net » jluster.org » joi.ito.com » kottke.org »'</excerpt>
+  <linkcreated>2004-07-16 12:31:36 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:07 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt>riddles that likely have little to do with the work that will be fulfilled?  ...Fourth of July From the Berkeley Hills (Jul 5, 2004)   The city and bay were covered in a thick blanket of fog. High above the vastness, we watched a unique show. ... </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040705#fourth_of_july_from_the</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:07 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt>riddles that likely have little to do with the work that will be fulfilled?  ...Fourth of July From the Berkeley Hills (Jul 5, 2004)   The city and bay were covered in a thick blanket of fog. High above the vastness, we watched a unique show.  ... War, lies, burgers, baseball and the American Way </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040704#war_lies_burgers_baseball_and</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:08 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt>of fog. High above the vastness, we watched a unique show.  ...War, lies, burgers, baseball and the American Way (Jul 4, 2004)   I'll be observing this 4th of July doing a few very American activities: criticizing our government and bar-b-queing. ... </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040704#war_lies_burgers_baseball_and</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:08 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt>of fog. High above the vastness, we watched a unique show.  ...War, lies, burgers, baseball and the American Way (Jul 4, 2004)   I'll be observing this 4th of July doing a few very American activities: criticizing our government and bar-b-queing.  ... Better to burn out than fade away? </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040609#better_to_burn_out_than</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:08 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt> I'll be observing this 4th of July doing a few very American activities: criticizing our government and bar-b-queing.  ...Better to burn out than fade away? (Jun 9, 2004)   Metallica's Lars Ulrich apparently had an inexplicable spell. ... </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040609#better_to_burn_out_than</linkurl>
+</item>
+<item>
+  <weblog>
+    <name>spidaman</name>
+    <url>http://www.arachna.com</url>
+    <rssurl></rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>12</inboundblogs>
+    <inboundlinks>35</inboundlinks>
+    <lastupdate>2004-07-08 06:31:09 GMT</lastupdate>
+  </weblog>
+  <nearestpermalink>http://www.arachna.com/roller/page/spidaman/20040605#managing_terabytes</nearestpermalink>
+  <excerpt> I'll be observing this 4th of July doing a few very American activities: criticizing our government and bar-b-queing.  ...Better to burn out than fade away? (Jun 9, 2004)   Metallica's Lars Ulrich apparently had an inexplicable spell.  ... Lots of traffic and cops, but no protesters </excerpt>
+  <linkcreated>2004-07-08 06:28:32 GMT</linkcreated>
+  <linkurl>http://www.arachna.com/roller/page/spidaman/20040608#lots_of_traffic_and_cops</linkurl>
+</item>
+</document>
+</tapi>
+

@@ -1,0 +1,38 @@
+Win32::GUI::Carp version 1.01
+=============================
+
+When Perl programs are run in a GUI environment, it is often desirable
+to have them run with no console attached.  Unfortunately, this causes
+any warnings or errors to be lost.  Worse, fatal errors can cause your
+program to silently disappear, forcing you to restart the program,
+attached to a console, and hope you can reproduce the error.
+
+This module makes it easy to see any errors or warnings your
+console-less program might produce by catching any errors and/or
+warnings and displaying them in a pop-up dialog box using Win32::GUI.
+It is similar in spirit to CGI::Carp's fatalsToBrowser and
+warningsToBrowser special import directives.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp, Win32::GUI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002, Cory Johns.  All rights reserved.
+
+This module is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: Cory Johns <johnsca@cpan.org>

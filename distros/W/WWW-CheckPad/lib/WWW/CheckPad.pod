@@ -1,0 +1,107 @@
+=encoding utf8
+
+=head1 NAME
+
+WWW::CheckPad - An API to control the check*pad (http://www.checkpad.jp/)
+
+=head1 SYNOPSIS
+
+  use WWW::CheckPad;
+  use WWW::CheckPad::CheckList;
+  use WWW::CheckPad::CheckItem;
+
+  ## check*padに接続し、ログインします。
+  WWW::CheckPad->connect({
+    email => 'your email address',
+    password => 'your password'
+  });
+
+  ## 新しいチェックリストを作成し、保存します。
+  my $new_checklist = WWW::CheckPad::CheckList->insert({
+      title => 'Private Todo List'
+  });
+
+  ## 新しいチェックリストに新しいTodoを追加します。
+  my $cut_my_nail = $new_checklist->add_checkitem('Cut my nail.');
+  my $buy_a_cat_food = $new_checklist->add_checkitem('Buy a cat food.');
+
+  ## ... 数分後 ...
+
+  ## OK,　爪は切ったぞ。
+  $cut_my_nail->finish();
+
+  ## あ！　そういえば、私が飼ってるのは猫ではなく、犬だった。
+  $buy_a_cat_food->title('Buy a dog food');
+  $buy_a_cat_food->update();
+
+  ## 今、終了してない全Todoを見なくちゃ。
+  foreach my $checklist (WWW::CheckPad::CheckList->retrieve_all) {
+      foreach my $checkitem (grep {not $_->is_finished} $checklist->checkitems) {
+          printf "[%s] %s\n", $checklist->title, $checkitem->title;
+      }
+  }
+
+  ## 接続を切るのはいつだって、良い習慣なのです。
+  WWW::CheckPad->disconnect();
+
+=head1 DESCRIPTION
+
+WWW::CheckPadはcheck*pad（http://www.checkpad.jp/）をプログラムから操作する
+ことを可能にするAPIです。ログインを正常に行う為に、あらかじめcheck*padで
+アカウントを用意する必要があります（アカウントの作成等はcheck*padのサイトを
+見てください。）。
+
+なお、全体を理解するためにC<WWW::CheckPad::CheckList>とC<WWW::CheckPad::CheckItem>
+も必ずお読みください。
+
+=head2 CLASS METHOD
+
+=head3 WWW::CheckPad->connect
+
+  my $connection = WWW::CheckPad->connect({
+    email => 'your email address',
+    password => 'your password'
+  })
+
+WWW::CheckPad::CheckListやWWW::CheckPad::CheckItemのメソッドを呼ぶ前に必ず、
+このメソッドでログインを完了させなくてはいけません。ログインが成功したか
+どうかは、後に説明するC<has_logged_in>メソッドで判断できます。
+
+
+=head3 WWW::CheckPad->disconnect
+
+  WWW::CheckPad->disconnect();
+
+接続を解除します。これを呼んだ後はWWW::CheckPad::CheckListやWWW::CheckPad::CheckItem
+のメソッドを使用する事は出来ません。
+
+=head2 INSTANCE METHOD
+
+=head3 has_logged_in
+
+  $connection->has_logged_in()
+
+C<connect>メソッドでログインが正常に完了したときは、trueを、
+そうでないときはfalseを返します。
+
+=head1 SEE ALSO
+
+WWW::CheckPad::CheckList
+
+WWW::CheckPad::CheckItem
+
+=head1 AUTHOR
+
+Ken Takeshige, E<lt>ken.takeshige@gmail.comE<gt>
+
+http://d.hatena.ne.jp/ya_ken/
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Ken Takeshige
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

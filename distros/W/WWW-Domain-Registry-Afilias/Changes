@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::Domain::Registry::Afilias.
+
+0.01  Sun Nov 19 23:47:29 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n WWW::Domain::Registry::Afilias
+

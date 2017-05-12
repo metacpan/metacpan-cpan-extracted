@@ -1,0 +1,21 @@
+Wx-Perl-CheckBoxWizardPage
+
+This class allows you to quickly create a wizard page with some text and
+one or more checkboxes to choose.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Jouke Visser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,27 @@
+Build.PL
+Changes
+eg/ProcessInfo.pl
+eg/README
+inc/My/Module/Build.pm
+inc/My/Module/Meta.pm
+lib/Win32/Process/Info.pm
+lib/Win32/Process/Info/NT.pm
+lib/Win32/Process/Info/PT.pm
+lib/Win32/Process/Info/WMI.pm
+LICENSES/Artistic
+LICENSES/Copying
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/basic.t
+xt/author/changes.t
+xt/author/critic.t
+xt/author/executable.t
+xt/author/kwalitee.t
+xt/author/manifest.t
+xt/author/perlcriticrc
+xt/author/pod.t
+xt/author/pod_coverage.t
+xt/author/pod_spelling.t

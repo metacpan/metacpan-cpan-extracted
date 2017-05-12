@@ -1,0 +1,11 @@
+bin/test-syslog.pl
+bin/test.pl
+Changes
+lib/Working/Daemon.pm
+lib/Working/Daemon/Syslog.pm
+Makefile.PL
+MANIFEST
+README
+t/background-foreground.t
+t/Working-Daemon.t
+META.yml                                 Module meta-data (added by MakeMaker)

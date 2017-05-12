@@ -1,0 +1,31 @@
+---
+abstract: 'Google Suggest as an API'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>, franck cuny <franck@lumberjaph.net>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Google-Suggest
+provides:
+  WebService::Google::Suggest:
+    file: lib/WebService/Google/Suggest.pm
+    version: 0.05
+requires:
+  Carp: 0
+  LWP::UserAgent: 0
+  URI::Escape: 0
+resources:
+  bugtracker: http://github.com/franckuny/${lcdist}/issue
+  homepage: http://search.cpan.org/dist/${dist}
+  repository: git://github.com/franckuny/${lcdist}
+version: 0.05

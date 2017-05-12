@@ -1,0 +1,14 @@
+0.06 - Wrong name in the license (Mattie Barbon). Used
+       example code from a project of his.
+
+0.05 - Test script: Changed refresh from
+       whole window to only the Panel
+       used for the drawing.
+
+0.04 - Test script was not in MANIFEST.
+     - Making on Win32 was not as simple as expected.
+
+0.03 Changed the calculations from Perl to C to get a 
+     performance boost. This makes us dependent on wxMakeMaker.
+
+0.02 Planar prerequisite is no longer.

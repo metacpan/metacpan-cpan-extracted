@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-PhotoZou
+version:      0.01
+version_from: lib/WebService/PhotoZou.pm
+installdirs:  site
+requires:
+    Class::Accessor:               0
+    LWP:                           5.6
+    Test::More:                    0.32
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,1991 @@
+#!/usr/bin/perl -w
+#
+#	Roland TD6 Percussion Sound Module Controller
+#
+#	Copyright (c) 2003 Hiroo Hayashi.  All rights reserved.
+#		hiroo.hayashi@computer.org
+#
+#	This program is free software; you can redistribute it and/or
+#	modify it under the same terms as Perl itself.
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!NOTICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# This program is under development adding MIDI input facility.  "td6"
+# in Win32API-MIDI-0.04.tar.gz is better than current one.
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!NOTICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# I developed Win32API::MIDI to make this program.
+# This program works but is still under development.
+#
+# TODO
+#	Utilize MIDI Input
+#		when init : read setup data
+#		default kits can be selected any time.
+#		drum kit library (file/kit) vs. drum kits in memory
+#		kit name must be uniq (-> filename)
+#		when drum kit is changed : read the kit data
+#		save/load kit data
+#		add button to synchronize all drum kit info (or Kit name only)
+#			only a list of kit name need to be managed.
+#		when a drum kit is choosed or default drum kit at init.
+#			load data in %db overiding the kit offset address
+#			call set_kit_parameters()
+#		drum kit library
+#			copy setting
+#	file load/save (menu)
+#	multi window (volume)
+#	trigger frame
+#	use balloon
+#	more instrument name
+#	instrument select frame
+#	code clean up
+#		widget order (tab move)
+#		improve layout
+require 5.004;
+use strict;
+use Data::Dumper;		# for debug
+my $ver = '$Id: td6,v 1.15 2003-04-13 22:43:14-05 hiroo Exp $';
+my ($VERSION) = $ver =~ m/\s+(\d+\.\d+)\s+/;
+my $VERSION_MESSAGE = <<"EOM";
+TD-6 Roland Percussion Sound Module MIDI Controller
+                     Version $VERSION
+  with Perl/Tk $Tk::VERSION on $Tk::platform platform
+
+       Copyright (c) 2003 Hiroo Hayashi
+               All rights reserved.
+EOM
+print "$VERSION_MESSAGE\n";
+# default drum kit
+my $DEFAULT_DRUM_KIT = 99;
+
+# default database file name
+my $db_file = '/tmp/td6.syx';
+
+# Modify this table according to the drum PADs you have.
+#	     name,    pad #, dual trigger, availablity, cymbal
+my @pads = (
+	    ['Kick',	 1,	0,	1,	0],
+	    ['Snare',	 3,	0,	1,	0],
+	    ['Hi-Hat',	 7,	0,	1,	1],
+	    ['Crash 1',	 8,	1,	1,	1],
+	    ['Tom 1',	 4,	0,	1,	0],
+	    ['Tom 2',	 5,	0,	1,	0],
+	    ['Tom 3',	 6,	0,	1,	0],
+	    ['Tom 4',	12,	0,	0,	0],
+	    ['Ride',	10,	1,	1,	1],
+	    ['Crash 2',	 9,	1,	0,	1],
+	    ['AUX',	11,	1,	0,	0],
+	   );
+
+# device ID
+my $midiin_portId = 0;		# Windows MIDI port device ID
+my $midiout_portId = 1;		# Windows MIDI port device ID
+my $midi_devId = 17;		# default device ID
+
+if (-f 't/devinfo') {		# for debugging
+    my $midi = new Win32API::MIDI;
+    open(F, 't/devinfo') or die "cannot open 't/dev/info': $!\n";
+    chomp(my $iname = <F>);
+    chomp(my $oname = <F>);
+    chomp($midi_devId = <F>);
+    close F;
+    $midiin_portId = $midi->InGetDevNum($iname);
+    $midiout_portId = $midi->OutGetDevNum($oname);
+}
+
+my $SC_SL = 20;			# scale : sliderlength
+my $SC_WD = 10;			# scale : width
+my $CB_WD = 16;			# check button : width
+########################################################################
+my $NP = 12;			# number of pad
+my $db_dirty = 0;		# dirty flag for Database
+
+########################################################################
+# initialize the instrument name list
+instrument::init();
+
+# read TD6 default setting database
+my $db;
+$db = read_db($db_file);
+#foreach (sort keys %{$db}) { printf "%08x: ", $_; datadump($db->{$_}); }
+
+# %dr: hash database for TD6 parameters
+my %dr;
+init_pad_parameters();
+init_kit_name();
+
+########################################################################
+#	create Tk GUI
+use Tk 800.000;
+use Tk::widgets qw/NoteBook LabFrame BrowseEntry Balloon/;
+
+# create main window
+my $MW = Tk::MainWindow->new;
+$MW->title('TD-6 Controller');
+$MW->focusFollowsMouse;
+my $balloon = $MW->Balloon;
+
+$MW->bind($MW, "<Control-o>" => \&open_db);
+$MW->bind($MW, "<Control-s>" => sub { write_db($db_file, $db); });
+$MW->bind($MW, "<Control-q>" => \&quit);
+
+########################################################################
+# create menu
+$MW->configure(-menu => my $menubar = $MW->Menu);
+map {$menubar->cascade( -label => '~' . $_->[0], -menuitems => $_->[1] )}
+    ['File', &file_menuitems],
+    ['Help', &help_menuitems];
+
+########################################################################
+# create control frame
+my $fr_control	 = $MW->Frame;
+
+########################################################################
+# create Top NoteBook
+my $nb_top = $MW->NoteBook();
+my %np_top;
+$np_top{pad}	 = $nb_top->add('pad', -label => 'Pad');
+my $fr_pad_drm	 = $np_top{pad}->Frame;
+my $fr_pad_cym	 = $np_top{pad}->Frame;
+
+$np_top{mixer}   = $nb_top->add('mixer', -label => 'Mixer');
+my $fr_mixer_cmn = $np_top{mixer}->Frame;
+my $fr_amb	 = $fr_mixer_cmn
+    ->LabFrame(-label => 'Ambience', -labelside => 'acrosstop');
+my $fr_eq	 = $fr_mixer_cmn
+    ->LabFrame(-label => 'Equalizer', -labelside => 'acrosstop');
+my $fr_mixer_vol = $np_top{mixer}->Frame;
+
+$np_top{midi}    = $nb_top->add('midi', -label => 'MIDI');
+my $fr_midi_cmn  = $np_top{midi}->Frame;
+my $fr_midi_pad	 = $np_top{midi}->Frame;
+
+$np_top{trigger} = $nb_top->add('trigger', -label => 'Trigger');
+
+########################################################################
+# create subwidgets
+########################################################################
+
+$MW->focus;
+$MW->grabGlobal;		# does not work?
+
+# initialize MIDI
+midi_init();
+
+# Setup : Kit Common Data
+# dump request for all setup except Device ID and LCD Contrast
+td6_setup_data_dump_request($MW);
+set_setup();			# set setup variables
+mkwidgets_setup();
+
+# Set up Drum Kit Data
+# set default drum kit
+my $drum_kit = $DEFAULT_DRUM_KIT; # 1-99
+
+sub set_kit_parameters {
+    my($kit_name, $init) = @_;
+    td6_kit_data_dump_request($MW, $drum_kit);
+    set_kit_name($drum_kit);
+    set_common_parameters($drum_kit, $init);
+    set_pad_parameters($drum_kit, $init);
+}
+set_kit_parameters($drum_kit, 1);
+
+print "mkwidgets_drum_kit()\n";
+mkwidgets_drum_kit();
+print "mkwidgets_common($drum_kit)\n";
+mkwidgets_common($drum_kit);
+print "mkwidgets_pads($drum_kit)\n";
+mkwidgets_pads($drum_kit);
+print "done\n";
+$MW->grabRelease;		# does not work?
+
+#print Dumper(%dr); exit;
+
+# pack top frames
+$fr_control->pack(-side => 'left', -anchor => 'nw');
+
+$fr_pad_drm->pack(-expand =>0, -fill => 'both');
+$fr_pad_cym->pack(-expand =>0, -fill => 'both');
+
+$fr_mixer_cmn->pack(-expand => 0, -fill => 'both');
+$fr_eq->pack(-side => 'left', -anchor => 'n');
+$fr_amb->pack(-side => 'left', -anchor => 'n');
+$fr_mixer_vol->pack(-expand => 0, -fill => 'both');
+
+$fr_midi_cmn->pack(-side => 'left', -anchor => 'n');
+$fr_midi_pad->pack(-side => 'left', -anchor => 'n');
+
+$nb_top->pack(-expand =>1, -fill => 'both');
+
+MainLoop;
+
+quit();
+
+
+########################################################################
+# MainWindow $MW
+#	+ Menu $menubar
+#		+ cascade &file_menuitems
+#		+ cascade &help_menuitems
+#	+ Frame $fr_control
+#	+ NoteBook $nb_top
+#		+ $np_top{pad}
+#			+ Frame $fr_pad_drm
+#				+ Frame $fr_pad (for each pad)
+#					+ Frame $fr_pad_sub
+#			+ Frame $fr_pad_cym
+#				+ Frame $fr_pad (for each pad)
+#					+ Frame $fr_pad_sub
+#		+ $np_top{mixer}
+#			+ Frame $fr_mixer_cmn
+#				+ Frame $fr_amb
+#				+ Frame $fr_eq
+#			+ Frame $fr_mixer_vol
+#				+ Frame $fr_vol (for each pad)
+#					+ Frame $fr_vol_lvl
+#					+ Frame $fr_vol_amb
+#		+ $np_top{midi}
+#			+ $fr_midi_cmn
+#			+ $fr_midi_pad
+#				+ Frame $fr_midi (for each pad)
+#		+ $np_top{trigger}
+
+########################################################################
+# for debug
+sub datadump {
+    my ($m) = @_;
+    my $l = length $m;
+    foreach (unpack 'C*', $m) { printf "%02x ", $_; }; print ":length $l\n";
+}
+
+
+# output SysEX Message
+sub Win32API::MIDI::Out::sysex {
+    my ($self, $m) = @_;
+    # struct midiHdr
+    my $midiHdr = pack ("PL4PL6",
+			$m,	# lpData
+			length $m, # dwBufferLength
+			0, 0, 0, undef, 0, 0);
+    # make pointer to struct midiHdr
+    # cf. perlpacktut in Perl 5.8.0 or later (http://www.perldoc.com/)
+    my $lpMidiOutHdr = unpack('L!', pack('P',$midiHdr));
+    $self->PrepareHeader($lpMidiOutHdr)	  or die $self->GetErrorText();
+    $self->LongMsg($lpMidiOutHdr)	  or die $self->GetErrorText();
+    $self->UnprepareHeader($lpMidiOutHdr) or die $self->GetErrorText();
+}
+
+{
+    my ($midi, $mo, $mi);
+    my ($buf1, $buf2, $hdr1, $hdr2, $lphdr1, $lphdr2);
+    my $ignore_callback;	# set 1 when closing MIDI In handler
+    my $get_sysex;		# set by callback routine to signal
+    my @data;			# input data buffer
+    my $np;			# # of packet received
+    my $npacket;		# # of packet to be received
+    my $midi_in_done;		# signal completion of data receipt
+    my ($ndata, $cb_debug);	# for MIDI In debugging
+    my $td6;			# MIDI::SysEX object
+
+    # Store pointer to our input buffer for System Exclusive messages
+    # in MIDIHDR
+    #sub midi_mkhdr {
+    #	 my ($ptr, $len) = @_;
+    #	 return pack("LLLLLPLL",
+    #		     $ptr,	# lpData
+    #		     $len,	# dwBufferLength
+    #		     0,		# dwBytesRecorded
+    #		     0xBEEF,	# dwUser (not used)
+    #		     0,		# dwFlags must be set to 0
+    #		     undef,	# lpNext
+    #		     0,		# reserved
+    #		     0);		# dwOffset
+    #}
+
+    sub midi_init {
+	use Win32API::MIDI qw( /^(MIM_)/ );
+	use Win32API::MIDI::SysEX::Roland;
+	use Tie::Watch;		# included in Perl/Tk
+
+	# system exclusive message
+	$td6 = new Win32API::MIDI::SysEX::Roland(modelName => 'TD-6',
+						 deviceID => $midi_devId);
+	# open MIDI device
+	$midi = new Win32API::MIDI;
+	# MIDI Out
+	$mo = new Win32API::MIDI::Out($midiout_portId)
+	    or die $midi->OutGetErrorText();
+
+	# MIDI In
+	$ignore_callback = 0;
+	$mi = new Win32API::MIDI::In($midiin_portId, \&midiCallback, 0xDEAD)
+	    or die $midi->InGetErrorText();
+
+	# MIDI input buffer 1
+	$buf1 = "\x00" x 256;
+	$hdr1 = pack("LLLLLPLL",
+    		     unpack('L!', pack('P',$buf1)),
+    		     length $buf1,
+    		     0, 0, 0, undef, 0, 0);
+	$lphdr1 = unpack('L!', pack('P', $hdr1));
+	$mi->PrepareHeader($lphdr1)	or die $mi->GetErrorText();
+	$mi->AddBuffer($lphdr1)		or die $mi->GetErrorText();
+
+	printf("lphdr1: 0x%08x, buf1: 0x%08x\n",
+	       $lphdr1, unpack('L!', pack('P', $buf1)));
+
+	# MIDI input buffer 2
+	$buf2 = "\x00" x 256;
+	$hdr2 = pack("LLLLLPLL",
+    		     unpack('L!', pack('P',$buf2)),
+    		     length $buf2,
+    		     0, 0, 0, undef, 0, 0);
+	$lphdr2 = unpack('L!', pack('P', $hdr2));
+	$mi->PrepareHeader($lphdr2)	or die $mi->GetErrorText();
+	$mi->AddBuffer($lphdr2)		or die $mi->GetErrorText();
+
+	printf("lphdr2: 0x%08x, buf2: 0x%08x\n",
+	       $lphdr2, unpack('L!', pack('P', $buf2)));
+
+	# Let copy_buf_data() be invoked when callback handler receives data.
+	Tie::Watch->new
+	      (
+	       -variable	=> \$get_sysex,
+	       -store		=> \&copy_buf_data,
+	      );
+	$mi->Start or die $mi->GetErrorText();
+	$ndata = 0;
+    }
+    END {
+	# Without this line, midiInReset() hangs!
+	$ignore_callback = 1;
+	if (defined $mi) {
+	    # Stop recording
+	    $mi->Stop()		or die $mi->GetErrorText();
+	    $mi->Reset()	or die $mi->GetErrorText();
+	    $mi->Close()	or die $mi->GetErrorText();
+	    # Unprepare the buffer and MIDIHDR.
+	    # You must use this function before freeing the buffer.
+	    $mi->UnprepareHeader($lphdr1);
+	    $mi->UnprepareHeader($lphdr2);
+	}
+	if (defined $mo) {
+	    $mo->Close()	or die $mo->GetErrorText();
+	}
+    }
+    sub td6_midi_out {
+	my ($address, $data) = @_;
+	$mo->sysex($td6->DT1($address, $data));
+	$db_dirty = 1;		# mark dirty
+    }
+
+    # Callback handler have to return as early as possible.
+    sub midiCallback {
+	my ($handle, $uMsg, $dwInstance, $dwParam1, $dwParam2) = @_;
+	# ignore Timing Clock message (System Real Time Messages)
+	return if ($uMsg == MIM_DATA and $dwParam1 == 0xf8);
+
+	# Don't call MIDI functions when MIDI-In hanlder is closing.
+	return if $ignore_callback;
+
+	printf("midiCallback: %p, %x, %x, %x, %x\n",
+	       $handle, $uMsg, $dwInstance, $dwParam1, $dwParam2) if $cb_debug;
+
+	if ($uMsg == MIM_LONGDATA) {
+	    printf("MIM_LONGDATA:\n") if $cb_debug;
+	    $get_sysex = [ $handle, $dwInstance, $dwParam1, $dwParam2 ];
+	} else {
+	    # Ignore other type of messages, MIM_OPEN, MIM_CLOSE,
+	    # MIM_ERROR, MIM_LONGERROR, MIM_MOREDATA, or MIM_DATA.
+	    printf("[%d]\n", $uMsg) if $cb_debug;
+	}
+    }
+
+    ########################################################################
+    # When $get_sysex is updated, push received data into @data, then
+    # queue the input buffer again.
+    sub copy_buf_data {
+	my($self, $new_val) = @_;
+	my ($handle, $dwInstance, $dwParam1, $dwParam2) = @{$new_val};
+
+	my $midihdr = unpack('P32', pack('L!', $dwParam1));
+	my $bytesrecorded = (unpack('LL4LL2', $midihdr))[2];
+
+	push(@data, unpack("P$bytesrecorded", $midihdr));
+
+	# Queue the MIDIHDR for more input
+	$handle->PrepareHeader($dwParam1) or die $handle->GetErrorText();
+	$handle->AddBuffer($dwParam1)	  or die $handle->GetErrorText();
+
+	# signal when all data is received
+	$midi_in_done = 1 if (++$np == $npacket);
+	print "[$np,$midi_in_done]\n" if $np == $npacket;
+
+	# for debugging
+	$ndata += $bytesrecorded;
+	#print ".";
+	#print "[$np,$midi_in_done]";
+    }
+
+    sub midi_req_bulk_dump {
+	my ($self, $sysex, $npkt, $timeout) = @_;
+	$npacket = $npkt;
+	$np = 0; $midi_in_done = 0;
+	# timeout after $timeout/1000 seconds
+	my $tid = $self->after($timeout,
+			       sub {
+				   print STDERR "timeout\n";
+				   undef $midi_in_done;
+			       });
+	# without this line waitVariable never finishes when window closed.
+	$self->OnDestroy(sub { undef $midi_in_done; });
+	# request data
+	$mo->sysex($sysex);
+	# wait for data
+	$self->waitVariable(\$midi_in_done);
+	$self->afterCancel($tid);
+	return $midi_in_done;
+    }
+    sub td6_process_dump_data {
+	foreach (@data) {
+	    #datadump($_);
+	    my ($prefix, $address, $data) = unpack('a6Na*', $_);
+	    #my ($prefix, $data) = unpack('a5a*', $_); my $address=0;
+	    if (ord(chop($data)) != 0xf7) {
+		print STDERR "unexpected data: without EOX (f7)\n";
+		datadump($_);
+		next;
+	    }
+	    my $dev = chr($midi_devId - 1);
+	    # EXS, Roland, devId, GS, DT1
+	    #if ($prefix ne "\xf0\x41${dev}\x42\x12") {
+	    # EXS, Roland, devId, TD-6, DT1
+	    if ($prefix ne "\xf0\x41${dev}\x00\x3f\x12") {
+		print STDERR "unexpected data: prefix error\n";
+		datadump($prefix);
+		next;
+	    }
+	    #		chop $data;	# force check sum error
+	    #		if (checkSum(unpack('C*', $data))) {
+	    if ($td6->checkSum(unpack('C*', pack('N', $address)),
+			       unpack('C*', $data))) {
+		print STDERR "check sum error\n";
+		datadump($_);
+	    }
+	    #printf "%08x\n", $address;
+	    next if $address < 0x40000000; # ignore user song
+	    if ($address & 0xff) { # sanity check
+		printf "%08x\n", $address;
+		die "td6: unexpected address\n"
+	    }
+	    $db->{$address & 0xfffffff} = $data;
+	}
+	@data = ();		# clean up @data
+    }
+
+    sub td6_setup_data_dump_request {
+	my ($MW) = @_;
+	my $req = $td6->RQ1(0x40000000, 0);
+	if (defined midi_req_bulk_dump($MW, $req, 71, 10000)) {
+	    td6_process_dump_data();
+	} else {
+	    print STDERR "td6_kit_data_dump_requeset: timeout error\n";
+	    print STDERR "$ndata,$np\n";
+	}
+    }
+
+    sub td6_kit_data_dump_request {
+	my ($MW, $drum_kit) = @_;
+	die "internal error \$drum_kit = $drum_kit"
+	    if ($drum_kit < 1 or $drum_kit > 99);
+	my $address = 0x41000000 | ($drum_kit - 1) << 16;
+	my $req = $td6->RQ1($address, 0);
+	if (defined midi_req_bulk_dump($MW, $req, 13, 10000)) {
+	    td6_process_dump_data();
+	} else {
+	    print STDERR "td6_kit_data_dump_requeset: timeout error\n";
+	    print STDERR "$ndata,$np\n";
+	}
+    }
+
+    # for debugging (or SC-55mkII windows may be added?)
+    sub sc55_data_dump_request {
+	my ($MW) = @_;
+	my $sc55 = new Win32API::MIDI::SysEX::Roland(modelName => 'gs',
+						     devideID => $midi_devId);
+	my $req = $sc55->RQ1(0x480000, 0x1d10); # all
+	#my $req = $sc55->RQ1(0x480000, 0x10); # sys parm
+	#my $req = $sc55->RQ1(0x41024b, 0x01); # manual ex.2
+	#datadump($req);
+	if (defined midi_req_bulk_dump($MW, $req, 30, 5000)) {
+	    print "$ndata,$np\n";
+	    dump_data();
+	    @data = ();
+	    #sc55_process_dump_data();
+	} else {
+	    print STDERR "sc55_data_dump_requeset: timeout error\n";
+	    print STDERR "$ndata,$np\n";
+	}
+    }
+
+    # for debugging
+    sub dump_data {
+	foreach my $d (@data) {
+	    my $bytes = 16;
+	    foreach (unpack('C*', $d)) {
+		if (!(--$bytes)) {
+		    printf("%02X\n", $_);
+		    $bytes = 16;
+		} else {
+		    printf("%02X ", $_);
+		}
+	    }
+	    print "\n" unless $bytes == 16;
+	    print '-' x 48, "\n";
+	}
+    }
+}
+
+########################################################################
+
+sub read_db {
+    my ($fname) = @_;
+    my $db;
+    open(F, $fname) or die "td6: cannot open file \'$fname\': $!\n";
+    $/ = "\xf7";
+    while (<F>) {
+#	datadump($_);
+	chop; chop;		# remove 0xF7 and check sum
+	my ($address, $data) = unpack('x6Na*', $_);
+	next if $address < 0x40000000; # ignore user song
+	if ($address & 0xff) {	# sanity check
+	    printf "%08x\n", $address;
+	    die "td6: unexpected address\n"
+	}
+	$db->{$address & 0xfffffff} = $data;
+    }
+    close(F);
+    $db_dirty = 0;		# mark clean
+    return $db;			# return reference to a hash
+}
+
+sub write_db {
+    my ($fname, $db) = @_;
+    return unless $db_dirty;
+    open(F, ">$fname") or die "td6: cannot open file \'$fname\': $!\n";
+    $/ = "\xf7";
+    foreach (sort {$a <=> $b} keys %{$db}) {
+	# reculculate check sum
+#	my $d = $td6->DT1(0x40000000 + $_, $db->{$_});
+#	print F $d;
+    }
+    close(F);
+    $db_dirty = 0;		# mark clean
+}
+
+sub set_b {
+    my ($addr, $val) = @_;
+    return if get_b($addr) == $val;
+#printf "b:%x,$val,%d\n", $addr, get_b($addr);
+    substr($db->{$addr & ~0xff}, $addr & 0xff, 1) = pack('C', $val);
+    td6_midi_out($addr, pack('C', $val));
+}
+
+sub get_b {
+    my ($addr) = @_;
+    scalar unpack('C', substr($db->{$addr & ~0xff}, $addr & 0xff, 1));
+}
+
+# convert nibbled expression
+sub set_w {
+    my ($addr, $val) = @_;
+    return if get_w($addr) == $val;
+#printf "w:%x,$val,%d\n", $addr, get_w($addr);
+    $val = unpack('H4', pack('n', $val));
+    $val =~ tr/0-9a-f/\x00-\x0f/;
+    substr($db->{$addr & ~0xff}, $addr & 0xff, 4) = $val;
+    td6_midi_out($addr, $val);
+}
+
+sub get_w {
+    my ($addr) = @_;
+    scalar unpack('n', pack('H4', substr($db->{$addr & ~0xff}, $addr & 0xff, 4)));
+}
+
+sub set_str {
+    my ($addr, $val, $len) = @_;
+    return if get_str($addr, $len) eq $val;
+#printf "s:%s,$val,%s\n", $addr, get_str($addr,$len);
+    $val = substr($val, 0, $len);
+    substr($db->{$addr & ~0xff}, $addr & 0xff, $len) = $val;
+    td6_midi_out($addr, $val);
+}
+sub get_str {
+    my ($addr, $len) = @_;
+    substr($db->{$addr & ~0xff}, $addr & 0xff, $len);
+}
+
+
+########################################################################
+sub help_menuitems {
+    [
+     [command => 'Version',
+      -command => sub {
+	  $MW->messageBox
+	      (-title => 'TD-6 Controller Version Information',
+	       -message => $VERSION_MESSAGE,
+	       -type => 'OK');
+      }
+     ],
+    ];
+}
+
+{
+    my $db_file_types;
+    BEGIN {
+	$db_file_types = [['Syxex', ['.syx', '.cbk']],
+			  ['All Files', '*']];
+    }
+
+    sub open_db {
+	my ($dir, $file) = ($db_file =~ m|(.*/)?([^/]+)$|);
+	print "$dir,$file\n";
+	my $f = $MW->getOpenFile(-initialdir => 'C:\\tmp', #$dir, Ooops!
+				 -initialfile => $file,
+				 -filetypes => $db_file_types,
+				 -defaultextension => '.syx');
+	read_db($db_file = $f) if defined $f;
+    }
+
+    sub save_db {
+	my ($dir, $file) = ($db_file =~ m|(.*/)?([^/]+)$|);
+	print "$dir,$file\n";
+	my $f = $MW->getSaveFile(-initialdir => $dir,
+				 -initialfile => $file,
+				 -filetypes => $db_file_types,
+				 -defaultextension => '.syx');
+	write_db($db_file = $f, $db) if defined $f;
+    }
+}
+
+sub quit {
+    if ($db_dirty) {
+	my $do_write = $MW->messageBox
+	    (-title => 'TD-6 Controller Quit Confirmation',
+	     -message => "Save File before Quit?",
+	     -type => 'YesNoCancel');
+	return if $do_write eq 'cancel';
+	write_db($db_file, $db) if $do_write eq 'yes';
+    }
+    exit 0;
+}
+
+sub file_menuitems {
+    [
+     [command => '~Open...', -accelerator => 'Ctrl-O',
+      -command => \&open_db ],
+     [command => '~Save', -accelerator => 'Ctrl-S',
+      -command => sub { write_db($db_file, $db); }],
+     [command => '~Save As...',
+      -command => \&save_db ],
+     [command => '~Close', -accelerator => 'Ctrl-q',
+      -command => \&quit ]
+    ]
+}
+
+########################################################################
+# Scale with Label
+sub Tk::LabScale {
+    my $self = shift;
+    my $label = shift;
+    my $fr = $self->LabFrame(-label => $label, -labelside => 'acrosstop');
+    $fr->Scale
+	(
+	 @_,
+	 -sliderlength => $SC_SL,
+	 -width => $SC_WD,
+	)->pack();
+    return $fr;
+}
+
+########################################################################
+#
+# 1-1-2 Setup - MIDI
+#
+
+{
+    my ($note_chase, $local_cntl, $soft_thru, $gm, $rx_gm, $sync_mode,
+	$sync_mode_label, $pdt, $pdt_label, $ch10_priority,
+	$ch10_priority_label, $rx_pc_sw, $tx_pc_sw, $preview_vel, $perc_vel,
+	$back_vel, $mute_part, $mute_part_label, $master_tune,
+	@sync_mode_label, @pdt_label, @ch10_priority_label, @mute_part_label);
+    BEGIN {
+	@sync_mode_label	= qw(Internal External Remote);
+	@pdt_label		= qw(Off 1 2);
+	@ch10_priority_label	= qw(Kit Percussion);
+	@mute_part_label	= ('Song Drum', 'Song Drum & Perc',
+				   'User Drum Part', 'Part 1', 'Part 2',
+				   'Part 3', 'Part 4', 'Part 1-4');
+    }
+    sub set_setup {
+	$note_chase		= get_b(0x00060006);
+	$local_cntl		= get_b(0x00060007);
+	$soft_thru		= get_b(0x00060008);
+	$gm			= get_b(0x00060009);
+	$rx_gm			= get_b(0x0006000a);
+	$sync_mode		= get_b(0x0006000b);
+	$sync_mode_label	= $sync_mode_label[$sync_mode];
+	$pdt			= get_b(0x0006000c);
+	$pdt_label		= $pdt_label[$pdt];
+	$ch10_priority		= get_b(0x0006000f);
+	$ch10_priority_label	= $ch10_priority_label[$ch10_priority];
+	$rx_pc_sw		= get_b(0x00070000);
+	$tx_pc_sw		= get_b(0x00070001);
+	$preview_vel		= get_b(0x00090007);
+	$perc_vel		= get_b(0x00090009);
+	$back_vel		= get_b(0x0009000a);
+	$mute_part		= get_b(0x0009000b);
+	$mute_part_label	= $mute_part_label[$mute_part];
+	$master_tune		= get_w(0x000a0000)/10 + 415.3;
+    }
+    sub mkwidgets_setup {
+	my $w;			# for balloon
+	# Part 1-4, Parc, Kit Tx/Rx Channel (1-16,off) !!!FIXIT!!!
+
+	# Note Chase on/off
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Note Chase',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$note_chase,
+	     -command => sub {set_b(0x00060006,$note_chase)},
+	    )->pack(-side   => 'top');
+	$balloon->attach($w, -msg => 'Select a pad either by tapping the pad or receiveing a MIDI data for the pad.');
+
+	# Local Control on/off
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Local Control',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$local_cntl,
+	     -command => sub {set_b(0x00060007,$local_cntl)},
+	    )->pack(-side   => 'top');
+	$balloon->attach($w, -msg => 'Send MIDI data from Pad trigger and internal sequencer to the internal sound module.');
+
+	# Soft Thru on/off
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Soft Through',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$soft_thru,
+	     -command => sub {set_b(0x00060008,$soft_thru)},
+	    )->pack(-side   => 'top');
+	$balloon->attach($w, -msg => 'Output MIDI data from MIDI IN to MIDI OUT/THRU.');
+
+	# GM mode on/off
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'GM Mode',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$gm,
+	     -command => sub {set_b(0x00060009,$gm)},
+	    )->pack(-side   => 'top');
+	$balloon->attach($w, -msg => 'General MIDI sound module mode.');
+
+	# Rx GM On
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Rx GM On',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$rx_gm,
+	     -command => sub {set_b(0x0006000a,$rx_gm)},
+	    )->pack(-side   => 'top');
+	$balloon->attach($w, -msg => 'Receive "GM System ON message".');
+
+	# Sync Mode (INT,EXT,REMOTE)
+	$w = $fr_midi_cmn->LabFrame(-label => 'Sync Mode', -labelside => 'acrosstop')
+	    ->pack(-fill => 'both')->Optionmenu
+		(
+		 -options => [[Internal => 0], [External => 1], [Remote => 2]],
+		 -variable => \$sync_mode,
+		 -textvariable => \$sync_mode_label,
+		 -command => sub {
+		     $sync_mode_label = $sync_mode_label[$sync_mode];
+		     set_b(0x0006000b, $sync_mode);
+		 },
+		)->pack(-fill => 'both');
+	$balloon->attach($w, -msg => 'Synchronizing with an External MIDI Device. REMOTE: controlled by the external device except playback tempo.');
+
+	# Pedal Data Thin (Off, 1, 2)
+	$w = $fr_midi_cmn->LabFrame
+	    (-label => 'Pedal Data Thin', -labelside => 'acrosstop')
+		->pack(-fill => 'both')->Optionmenu
+		    (
+		     -options => [[Off => 0], [1 => 1], [2 => 2]],
+		     -variable => \$pdt,
+		     -textvariable => \$pdt_label,
+		     -command => sub {
+			 $pdt_label = $pdt_label[$pdt];
+			 set_b(0x0006000c, $pdt);
+		     },
+		    )->pack(-fill => 'both');
+	$balloon->attach($w, -msg => 'Hi-Hat Control Pedal MIDI Data Reduction');
+
+	# CH10 Priority (Kit, Perc)
+	$w = $fr_midi_cmn->LabFrame
+	    (-label => 'CH10 Priority', -labelside => 'acrosstop')
+		->pack(-fill => 'both')->Optionmenu
+		    (
+		     -options => [[Kit => 0], [Percussion => 1]],
+		     -variable => \$ch10_priority,
+		     -textvariable => \$ch10_priority_label,
+		     -command => sub {
+			 $ch10_priority_label = $ch10_priority_label[$ch10_priority];
+			 set_b(0x0006000f, $ch10_priority);
+		     },
+		    )->pack(-fill => 'both');
+	$balloon->attach($w, -msg => 'Select sound on MIDI channel 10.');
+
+	# 1-1-3 Program Change SW
+	# Rx Program Change SW (off/on)
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Rx Program Change',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$rx_pc_sw,
+	     -command => sub {set_b(0x00070000,$rx_pc_sw)},
+	    )->pack(-side   => 'top', -expand => 1);
+	$balloon->attach($w, -msg => 'The drum kit is switched when Program Change messages are received.');
+
+	# Tx Program Change SW (off/on)
+	$w = $fr_midi_cmn->Checkbutton
+	    (
+	     -text    => 'Tx Program Change',
+	     -width   => $CB_WD,
+	     #-indicatoron => 0,
+	     -variable => \$tx_pc_sw,
+	     -command => sub {set_b(0x00070000,$tx_pc_sw)},
+	    )->pack(-side   => 'top', -expand => 1);
+	$balloon->attach($w, -msg => 'Transmitt Program Change message when the drum kit is changed.');
+
+	# 1-1-4 Setup - Control
+
+	# Preview Velocity
+	$w = $fr_mixer_cmn->LabScale
+	    (
+	     'Preview',
+	     -from => 127,
+	     -to => 0,
+	     -variable => \$preview_vel,
+	     -command => sub {set_b(0x00090007,$preview_vel)},
+	    )->pack(-side => 'left', -anchor => 'n');
+	$balloon->attach($w, -msg => 'Preview Volume Control');
+
+	# Percussion Part Level
+	$fr_mixer_cmn->LabScale
+	    (
+	     'Percussion Part',
+	     -from => 127,
+	     -to => 0,
+	     -variable => \$perc_vel,
+	     -command => sub {set_b(0x00090009,$perc_vel)},
+	    )->pack(-side => 'left', -anchor => 'n');
+
+	# Backing Part Level
+	$fr_mixer_cmn->LabScale
+	    (
+	     'Backing Part',
+	     -from => 127,
+	     -to => 0,
+	     -variable => \$back_vel,
+	     -command => sub {set_b(0x0009000a,$back_vel)},
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	    )->pack(-side => 'left', -anchor => 'n');
+
+	# Mute Part (affects when [PART MUTE] button is pressed)
+	$fr_mixer_cmn->LabFrame(-label => 'Mute Part',
+				-labelside => 'acrosstop')
+	    ->pack(-side => 'left', -anchor => 'n')->Optionmenu
+		(
+		 -options => [['Song Drum' => 0], ['Song Drum & Perc' => 1],
+			      ['User Drum Part' => 2],
+			      ['Part 1' => 3], ['Part 2' => 4],
+			      ['Part 3' => 5], ['Part 4' => 6],
+			      ['Part 1-4' => 7]],
+		 -variable => \$mute_part,
+		 -textvariable => \$mute_part_label,
+		 -command => sub {
+		     $mute_part_label = $mute_part_label[$mute_part];
+		     set_b(0x0009000b, $mute_part);
+		 },
+		)->pack(-side => 'left', -anchor => 'n');
+
+	# 1-1-5 Setup - Master Tune
+	$fr_control->Scale
+	    (
+	     -from => 415.3,	# 0
+	     -to => 466.2,	# 509
+	     -resolution => 0.1,
+	     -variable => \$master_tune,
+	     -command => sub {
+		 set_w(0x000a0000, int(($master_tune - 415.3)*10+0.5))
+	     },
+	     -orient => 'horizontal',
+	     -label => 'Master Tune',
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	    )->pack(-side => 'bottom');
+    }
+}
+
+########################################################################
+# 1-2 Drum Kit
+# 1-2-1 Drum Kit (Common Paramenter)
+
+# offset for Drum Common Parameters
+sub dk_c_offset {
+    my ($kit, $offset) = @_;
+    return 0x01000000 + ($kit - 1) * 0x10000 + $offset;
+}
+
+# offset for Drum Pad Parameters
+sub dk_p_offset {
+    my ($kit, $pad_num, $offset) = @_;
+    return 0x01000000 + ($kit - 1) * 0x10000 + $pad_num * 0x100 + $offset;
+}
+
+# Drum Kit Name
+{
+    my @kit_name;
+    my %kit_num;
+
+    sub init_kit_name {
+	# make a list of kit name
+	for (1..99) {
+	    my $name = "kit $_"; #get_str(dk_c_offset($_, 0x0), 8);
+	    $kit_name[$_-1] = $name; # BrowseEntry assumes base index is `0'.
+	    $kit_num{$name} = $_;
+	}
+    }
+    sub set_kit_name {
+	my ($kit) = @_;
+	$dr{kit_name}		= $kit_name[$kit-1];
+    }
+    sub mkwidgets_drum_kit {
+	my $fr_dr_kit = $fr_control
+	    ->LabFrame(-label => 'Drum Kit', -labelside => 'acrosstop')->pack;
+	my $fr_dr_kit_sub = $fr_dr_kit->Frame;
+
+	$fr_dr_kit_sub->Label
+	    (
+	     -textvariable => \$drum_kit,
+	     -width =>  2,
+	    )->pack(-side => 'left');
+
+	my $be_dr_kit = $fr_dr_kit_sub->BrowseEntry
+	    (
+	     -choices => \@kit_name,
+	     -variable => \$dr{kit_name},
+	     -browsecmd => sub {
+		 $drum_kit = $kit_num{$dr{kit_name}};
+		 set_kit_parameters($drum_kit, 0);
+	     },
+	     -validate => 'key',
+	     -validatecommand => sub {
+		 $_[0] =~ m/^[ -~]{0,8}$/;
+	     },
+	     -invalidcommand => sub {$MW->bell},
+	     -width => 8,
+	     -listwidth => 32,
+	    )->pack(-side => 'left');
+
+	$fr_dr_kit_sub->pack();
+
+	sub centering {		# return centered 8 character string
+	    $_ = $_[0];
+	    s/^\s+//; s/\s+$//;
+	    my $l = (8 - length($_)) >> 1;
+	    substr(' ' x $l . $_ . ' ' x ($l + 1), 0, 8);
+	}
+
+	$fr_dr_kit->Button
+	    (
+	     -text => 'Rename',
+	     -command => sub {
+		 # need confermation?
+		 #	 print "[$dr{kit_name}]->";
+		 my $new_name = centering($dr{kit_name});
+		 #	 print "[$new_name]\n";
+		 return if ($kit_name[$drum_kit-1] eq $new_name);
+
+		 $kit_name[$drum_kit-1] = $new_name;
+		 $kit_num{$new_name} = $drum_kit;
+		 # bug or feature?
+		 $be_dr_kit->configure( -choices => \@kit_name );
+		 $dr{kit_name} = $new_name;
+		 # send to TD-6
+		 set_str(dk_c_offset($drum_kit, 0x0), $new_name, 8);
+	     },
+	    )->pack(-fill => 'both');
+    }
+}
+
+# Drum Kit Common Parameters
+{
+    my (@studio_label, @wall_type_label, @room_size_label);
+    BEGIN {
+	@studio_label[1..9]	= ('Living Room', 'Bathroom',
+				   'Recording Studio', 'Garage',
+				   'Locker Room', 'Theater',
+				   'Cave', 'Gymnasium', 'Domed Stadium');
+	@wall_type_label	= qw(Wood Plaster Glass);
+	@room_size_label[1..3]	= qw(Small Medium Large);
+    }
+    sub set_common_parameters {
+	my ($kit, $init) = @_;
+
+	# pad common parameters
+	$dr{studio}			= get_b(dk_c_offset($kit, 0x8));
+	$dr{studio_label}		= $studio_label[$dr{studio}];
+	$dr{amb_level}			= get_b(dk_c_offset($kit, 0x9));
+	$dr{wall_type}			= get_b(dk_c_offset($kit, 0xa));
+	$dr{wall_type_label}		= $wall_type_label[$dr{wall_type}];
+	$dr{room_size}			= get_b(dk_c_offset($kit, 0xb));
+	$dr{room_size_label}		= $room_size_label[$dr{room_size}];
+	$dr{eq_low_gain}		= get_b(dk_c_offset($kit, 0xd))-12;
+	$dr{eq_high_gain}		= get_b(dk_c_offset($kit, 0xf))-12;
+	$dr{amb}			= get_b(dk_c_offset($kit, 0x10));
+	$dr{master_eq}			= get_b(dk_c_offset($kit, 0x11));
+	unless ($init) {
+	    $dr{eq_lo_sc} ->configure
+		( -state => $dr{master_eq} == 0 ? 'disable' : 'normal' );
+	    $dr{eq_hi_sc} ->configure
+		( -state => $dr{master_eq} == 0 ? 'disable' : 'normal' );
+	}
+	$dr{pedal_hh_vol}		= get_b(dk_c_offset($kit, 0x13));
+	$dr{pedal_pitch_ctrl_range}	= get_b(dk_c_offset($kit, 0x14))-24;
+	$dr{master_vol}			= get_b(dk_c_offset($kit, 0x15));
+    }
+    sub mkwidgets_common {
+	my ($drum_kit) = @_;
+	my $w;
+
+	# Ambience Switch
+	$w = $fr_amb->Checkbutton
+	    (
+	     -variable => \$dr{amb},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0x10), $dr{amb});
+		 $dr{amb_type_om}->configure
+		     ( -state => $dr{amb} == 0 ? 'disable' : 'normal' );
+		 $dr{amb_wall_om}->configure
+		     ( -state => $dr{amb} == 0 ? 'disable' : 'normal' );
+		 $dr{amb_size_om}->configure
+		     ( -state => $dr{amb} == 0 ? 'disable' : 'normal' );
+	     },
+	    )->pack(-side   => 'left', -anchor => 'n');
+	$balloon->attach($w, -msg => 'Master Ambience On/Off');
+
+	# Studio Type
+	$dr{amb_type_om} = $fr_amb->LabFrame(-label => 'Studio Type',
+					     -labelside => 'acrosstop')
+	    ->pack(-fill => 'both')->Optionmenu
+		(
+		 -options => [['Living Room'      => 1], [Bathroom  => 2],
+			      ['Recording Studio' => 3], [Garage    => 4],
+			      ['Locker Room'      => 5], [Theater   => 6],
+			      [Cave		      => 7], [Gymnasium => 8],
+			      ['Domed Stadium'    => 9]],
+		 -variable => \$dr{studio},
+		 -textvariable => \$dr{studio_label},
+		 -command => sub {
+		     $dr{studio_label} = $studio_label[$dr{studio}];
+		     set_b(dk_c_offset($drum_kit, 0x8), $dr{studio});
+		 },
+		 -state => $dr{amb} == 0 ? 'disable' : 'normal'
+		)->pack(-fill => 'both');
+
+	# Wall Surface Type
+	$dr{amb_wall_om} = $fr_amb->LabFrame(-label => 'Wall Type',
+					     -labelside => 'acrosstop')
+	    ->pack(-fill => 'both')->Optionmenu
+		(
+		 -options => [[Wood => 0], [Plaster => 1], [Glass => 2]],
+		 -variable => \$dr{wall_type},
+		 -textvariable => \$dr{wall_type_label},
+		 -command => sub {
+		     $dr{wall_type_label} = $wall_type_label[$dr{wall_type}];
+		     set_b(dk_c_offset($drum_kit, 0xa), $dr{wall_type});
+		 },
+		 -state => $dr{amb} == 0 ? 'disable' : 'normal'
+		)->pack(-fill => 'both');
+
+	# Room Size
+	$dr{amb_size_om} = $fr_amb->LabFrame(-label => 'Room Size',
+					     -labelside => 'acrosstop')
+	    ->pack(-fill => 'both')->Optionmenu
+		(
+		 -options => [[Small => 1], [Medium => 2], [Large => 3]],
+		 -variable => \$dr{room_size},
+		 -textvariable => \$dr{room_size_label},
+		 -command => sub {
+		     $dr{room_size_label} = $room_size_label[$dr{room_size}];
+		     set_b(dk_c_offset($drum_kit, 0xb), $dr{room_size});
+		 },
+		 -state => $dr{amb} == 0 ? 'disable' : 'normal'
+		)->pack(-fill => 'both');
+
+	# Master Equalizer Switch
+	$w = $fr_eq->Checkbutton
+	    (
+	     -variable => \$dr{master_eq},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0x11),$dr{master_eq});
+		 $dr{eq_lo_sc} ->configure
+		     ( -state => $dr{master_eq} == 0 ? 'disable' : 'normal' );
+		 $dr{eq_hi_sc} ->configure
+		     ( -state => $dr{master_eq} == 0 ? 'disable' : 'normal' );
+	     },
+	    )->pack(-side   => 'left', -anchor => 'n');
+	$balloon->attach($w, -msg => 'Master Equalizer On/Off');
+
+	# Equalizer Low Gain
+	$w = $fr_eq->LabFrame(-label => 'Low', -labelside => 'acrosstop');
+	$dr{eq_lo_sc} = $w->Scale
+	    (
+	     -from => 12,
+	     -to => -12,
+	     -tickinterval => 12,
+	     -variable => \$dr{eq_low_gain},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0xd),$dr{eq_low_gain}+12)
+	     },
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	     -state => $dr{master_eq} == 0 ? 'disable' : 'normal'
+	    )->pack;
+	$w->pack(-side => 'left');
+
+	# Equalizer High Gain
+	$w = $fr_eq->LabFrame(-label => 'High', -labelside => 'acrosstop');
+	$dr{eq_hi_sc} = $w->Scale
+	    (
+	     -from => 12,
+	     -to => -12,
+	     -tickinterval => 12,
+	     -variable => \$dr{eq_high_gain},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0xf),$dr{eq_high_gain}+12)
+	     },
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	     -state => $dr{master_eq} == 0 ? 'disable' : 'normal'
+	    )->pack;
+	$w->pack(-side => 'left');
+
+	# Pedal Pitch Control Range
+	$w = $fr_control->Scale
+	    (
+	     -from => -24,
+	     -to => 24,
+	     -tickinterval => 24,
+	     -variable => \$dr{pedal_pitch_ctrl_range},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0x14),
+		       $dr{pedal_pitch_ctrl_range}+24)
+	     },
+	     -orient => 'horizontal',
+	     -label => 'Pitch Control Range',
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	    )->pack();
+	$balloon->attach($w, -msg => 'Setting the Range for the Pitch Control with the Hi-Hat Control Pedal');
+
+	# Master Volume
+	my $fr_master_vol = $fr_mixer_vol
+	    ->LabFrame(-label => 'Master', -labelside => 'acrosstop')
+		->pack(-side => 'left', -fill => 'y');
+
+	# Master Ambience Level
+	$fr_master_vol->LabScale
+	    (
+	     'Amb',
+	     -from => 127,
+	     -to => 0,
+	     -variable => \$dr{amb_level},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0x9),$dr{amb_level})
+	     },
+	    )->pack(-side => 'bottom', -anchor => 's');
+
+	$fr_master_vol->LabScale
+	    (
+	     'Vol',
+	     -from => 127,
+	     -to => 0,
+	     -variable => \$dr{master_vol},
+	     -command => sub {
+		 set_b(dk_c_offset($drum_kit, 0x15), $dr{master_vol})
+	     },
+	    )->pack(-side => 'bottom', -anchor => 's');
+    }
+}
+
+########################################################################
+# Drum Kit Pad Parameters
+
+sub init_pad_parameters {
+    foreach my $p (@pads) {
+	my ($pad_name, $pad_num, $dual_trigger, $exist) = @{$p};
+	next unless $exist;
+	for my $i (0..1) {	# 0: Head, 1: Rim
+	    my %pad;
+	    # assign a reference of static hash to accessed his entry
+	    # by reference
+	    $dr{pad}->[$pad_num+$NP*$i] = \%pad;
+	    last unless $dual_trigger;
+	}
+    }
+}
+sub set_pad_parameters {
+    my ($kit, $init) = @_;
+    # pad parameters
+    foreach my $p (@pads) {
+	my ($pad_name, $pad_num, $dual_trigger, $exist) = @{$p};
+	next unless $exist;
+	for my $i (0..1) {	# 0: Head, 1: Rim
+	    my $pad = $dr{pad}->[$pad_num+$NP*$i];
+	    my $inst = get_w(dk_p_offset($kit, $pad_num, 0x0+0x13*$i))+1;
+	    $pad->{instrument_name} = instrument::name($inst);
+	    my $group = instrument::group($inst);
+	    $pad->{instrument_group} = $group;
+	    $pad->{be_inst} ->configure(-choices => $instrument::name{$group})
+		unless $init;
+
+	    $pad->{pitch}
+		= get_w(dk_p_offset($kit, $pad_num, 0x4+0x13*$i))-480;
+	    $pad->{decay}
+		= get_b(dk_p_offset($kit, $pad_num, 0x8+0x13*$i))-31;
+	    $pad->{pad_pattern}
+		= get_w(dk_p_offset($kit, $pad_num, 0x9+0x13*$i));
+	    $pad->{gate_time}
+		= get_b(dk_p_offset($kit, $pad_num, 0xd+0x13*$i))/10;
+	    $pad->{note_number}
+		= get_b(dk_p_offset($kit, $pad_num, 0xe+0x13*$i));
+	    $pad->{pad_pattern_vel}
+		= get_b(dk_p_offset($kit, $pad_num, 0xf+0x13*$i));
+	    $pad->{pad_level}
+		= get_b(dk_p_offset($kit, $pad_num, 0x10+0x13*$i));
+	    $pad->{pad_cb}->configure
+		( -state => $pad->{pad_pattern} == 0 ? 'disable' : 'normal' )
+		    unless $init;
+	    $pad->{pad_amb_level}
+		= get_b(dk_p_offset($kit, $pad_num, 0x11+0x13*$i));
+	    $pad->{pitch_cntl}
+		= get_b(dk_p_offset($kit, $pad_num, 0x12+0x13*$i));
+
+	    last unless $dual_trigger;
+	}
+	my $pan = get_b(dk_p_offset($kit, $pad_num, 0x26));
+	if ($pan == 31) {
+	    $dr{pad}->[$pad_num]->{pan_mode} = 31;
+	    $dr{pad}->[$pad_num]->{pan} = 0;
+	} elsif ($pan == 32) {
+	    $dr{pad}->[$pad_num]->{pan_mode} = 32;
+	    $dr{pad}->[$pad_num]->{pan} = 0;
+	} else {
+	    $dr{pad}->[$pad_num]->{pan_mode} = 0;
+	    $dr{pad}->[$pad_num]->{pan} = $pan-15;
+	}
+	$dr{pad}->[$pad_num]->{sc_pan}->configure
+	    (-state => $pan < 31 ? 'normal' : 'disable') unless $init;
+    }
+}
+sub mkwidgets_pads {
+    my ($drum_kit) = @_;
+
+    foreach my $pad (@pads) {
+	my $w;
+	my ($pad_name, $pad_num, $dual_trigger, $exist, $cym) = @{$pad};
+	next unless $exist;
+
+	# create a pad page
+	my $fr_pad;
+	$fr_pad = ($cym ? $fr_pad_cym : $fr_pad_drm)
+	    ->LabFrame(-label => $pad_name, -labelside => 'acrosstop')
+		->pack(-side => 'left');
+
+	# create frame of pad MIDI
+	my $fr_midi = $fr_midi_pad
+	    ->LabFrame(-label => $pad_name, -labelside => 'left');
+
+	# create frame of pad volume
+	my $fr_vol = $fr_mixer_vol
+	    ->LabFrame(-label => $pad_name, -labelside => 'acrosstop');
+	my $fr_vol_lvl =$fr_vol->Frame();
+	my $fr_vol_amb =$fr_vol->Frame();
+
+	# Pan (0-30:Fixed (L15-R15), 31:Random, 32:Alternate)
+	my $fr_pan_rb = $fr_vol->Frame;
+	$w = $fr_pan_rb->Radiobutton
+	    (
+	     -value => 0,
+	     -variable => \$dr{pad}->[$pad_num]->{pan_mode},
+	     -command => sub {
+		 $dr{pad}->[$pad_num]->{sc_pan}->configure(-state => 'normal');
+	     },
+	    )->pack(-side => 'left');
+	$balloon->attach($w, -msg => 'Normal Pan Mode');
+
+	$w = $fr_pan_rb->Radiobutton
+	    (
+	     -value => 31,
+	     -variable => \$dr{pad}->[$pad_num]->{pan_mode},
+	     -command => sub {
+		 set_b(dk_p_offset($drum_kit, $pad_num, 0x26), 31);
+		 $dr{pad}->[$pad_num]->{sc_pan}->configure(-state => 'disable');
+	     },
+	    )->pack(-side => 'left');
+	$balloon->attach($w, -msg => 'Random Pan Mode');
+
+	$w = $fr_pan_rb->Radiobutton
+	    (
+	     -value => 32,
+	     -variable => \$dr{pad}->[$pad_num]->{pan_mode},
+	     -command => sub {
+		 set_b(dk_p_offset($drum_kit, $pad_num, 0x26), 32);
+		 $dr{pad}->[$pad_num]->{sc_pan}->configure(-state => 'disable');
+	     },
+	    )->pack(-side => 'left');
+	$balloon->attach($w, -msg => 'Alternate Pan Mode');
+
+	$fr_pan_rb->pack;
+
+	$w = $dr{pad}->[$pad_num]->{sc_pan} = $fr_vol->Scale
+	    (
+	     -from => -15,
+	     -to => 15,
+	     -variable => \$dr{pad}->[$pad_num]->{pan},
+	     -command => sub {
+		 set_b(dk_p_offset($drum_kit, $pad_num, 0x26),
+		       $dr{pad}->[$pad_num]->{pan} + 15);
+	     },
+	     -orient => 'horizontal',
+	     -length => 64,
+	     -sliderlength => $SC_SL,
+	     -width => $SC_WD,
+	    )->pack(-side => 'top');
+	$balloon->attach($w, -msg => 'Pan (31:Random, 32:Alternate)');
+
+	for my $i (0..1) {	# 0: Head, 1: Rim
+	    my $pad = $dr{pad}->[$pad_num+$NP*$i];
+	    my $ofst = 0x13*$i;
+
+	    # create subframe for Head or Rim
+	    my $fr_pad_sub = $fr_pad->LabFrame
+		(-label => $i ? 'Rim' : 'Head', -labelside => 'acrosstop')
+		    ->pack(-side => 'left');
+
+	    # instrument group
+	    $fr_pad_sub->BrowseEntry
+		(
+		 -choices => \@instrument::group,
+		 -variable => \$pad->{instrument_group},
+		 -browsecmd => sub {
+		     my $group = $pad->{instrument_group};
+		     $pad->{be_inst}
+			 ->configure(-choices => $instrument::name{$group});
+		 },
+		 -width => 16,
+		 -listwidth => 32,
+		 -state => 'readonly',
+		)->pack();
+
+	    # instrument name
+	    $pad->{be_inst} = $fr_pad_sub->BrowseEntry
+		(
+		 -choices => $instrument::name{$pad->{instrument_group}},
+		 -variable => \$pad->{instrument_name},
+		 -browsecmd => sub {
+		     set_w(dk_p_offset($drum_kit, $pad_num, 0x0+$ofst),
+			   $instrument::num{$pad->{instrument_name}}-1);
+		 },
+		 -width => 16,
+		 -listwidth => 32,
+		 -state => 'readonly',
+		)->pack();
+
+	    # pitch
+	    $fr_pad_sub->Scale
+		(
+		 -from => -480,
+		 -to => 480,
+		 -variable => \$pad->{pitch},
+		 -command => sub {
+		     set_w(dk_p_offset($drum_kit, $pad_num, 0x4+$ofst),
+			   $pad->{pitch}+480);
+		 },
+		 -orient => 'horizontal',
+		 -label => 'Pitch',
+		 -sliderlength => $SC_SL,
+		 -width => $SC_WD,
+		)->pack();
+
+	    # decay
+	    $w = $fr_pad_sub->Scale
+		(
+		 -from => -31,
+		 -to => 31,
+		 -variable => \$pad->{decay},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0x8+$ofst),
+			   $pad->{decay}+31);
+		 },
+		 -orient => 'horizontal',
+		 -label => 'Decay',
+		 -sliderlength => $SC_SL,
+		 -width => $SC_WD,
+		)->pack();
+	    $balloon->attach($w, -msg => 'Length of Sound');
+
+	    # Ambience Send Level
+	    $fr_vol_amb->LabScale
+		(
+		 #$i == 0 ? 'Head' : 'Rim',
+		 'Amb',
+		 -from => 0,
+		 -to => 127,
+		 -variable => \$pad->{pad_amb_level},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0x11+$ofst),
+			   $pad->{pad_amb_level});
+		 },
+		)->pack(-side => 'left');
+
+	    # pad pattern
+	    $w = $fr_pad_sub->Scale
+		(
+		 -from => 0,
+		 -to => 250,
+		 -variable => \$pad->{pad_pattern},
+		 -command => sub {
+		     set_w(dk_p_offset($drum_kit, $pad_num, 0x9+$ofst),
+			   $pad->{pad_pattern});
+		     $pad->{pad_cb}->configure
+			 (
+			  -state => $pad->{pad_pattern} == 0 ? 'disable' : 'normal'
+			 );
+		 },
+		 -orient => 'horizontal',
+		 -label => 'Pad Pattern',
+		 -sliderlength => $SC_SL,
+		 -width => $SC_WD,
+		)->pack();
+	    $balloon->attach($w, -msg => 'Playng a Song by Hitting a Pad. (0: off)');
+
+	    # MIDI Gate Time
+	    $fr_midi->Scale
+		(
+		 -from => 0.1,
+		 -to => 8.0,
+		 -resolution => 0.1,
+		 -variable => \$pad->{gate_time},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0xd+$ofst),
+			   int($pad->{gate_time}*10+0.5));
+		 },
+		 -orient => 'horizontal',
+		 -label => 'MIDI Gate Time',
+		 -sliderlength => $SC_SL,
+		 -width => $SC_WD,
+		)->pack(-side => 'left');
+
+	    # Note Number
+	    $fr_midi->Scale
+		(
+		 -from => 0,
+		 -to => 127,
+		 -variable => \$pad->{note_number},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0xe+$ofst),
+			   $pad->{note_number});
+		 },
+		 -orient => 'horizontal',
+		 -label => 'Note Number',
+		 -sliderlength => $SC_SL,
+		 -width => $SC_WD,
+		)->pack(-side => 'left');
+
+	    # Pad Pattern Velocity on/off
+	    $pad->{pad_cb} = $fr_pad_sub->Checkbutton
+		(
+		 -text    => 'Pad Pattern Vel.',
+		 -width   => $CB_WD,
+		 #-indicatoron => 0,
+		 -variable => \$pad->{pad_pattern_vel},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0xf+$ofst),
+			   $pad->{pad_pattern_vel});
+		 },
+		 -state => $pad->{pad_pattern} == 0 ? 'disable' : 'normal',
+		)->pack(-side   => 'top',
+			-expand => 1);
+	    $balloon->attach($pad->{pad_cb}, -msg => 'Control the Level of the Pattern with Playing Dynamics');
+
+	    # Level
+	    $fr_vol_lvl->LabScale
+		(
+		 $i == 0 ? 'Head' : 'Rim',
+		 -from => 127,
+		 -to => 0,
+		 -variable => \$pad->{pad_level},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0x10+$ofst),
+			   $pad->{pad_level});
+		 },
+		)->pack(-side => 'left', -expand => 1, -anchor => 'center');
+
+	    # Pitch Control on/off
+	    $w = $fr_pad_sub->Checkbutton
+		(
+		 -text    => 'Pitch Control',
+		 -width   => $CB_WD,
+		 #-indicatoron => 0,
+		 -variable => \$pad->{pitch_cntl},
+		 -command => sub {
+		     set_b(dk_p_offset($drum_kit, $pad_num, 0x12+$ofst),
+			   $pad->{pitch_cntl});
+		 },
+		)->pack(-side   => 'top',
+			-expand => 1);
+	    $balloon->attach($w, -msg => 'Pitch Control with the Hi-Hat Control Pedal');
+
+	    last unless $dual_trigger;
+	}
+
+	if ($pad_name eq 'Hi-Hat') {
+	    $fr_vol_lvl->LabScale
+		(
+		 'Pedal',
+		 -from => 15,
+		 -to => 0,
+		 -variable => \$dr{pedal_hh_vol},
+		 -command => sub {
+		     set_b(dk_c_offset($drum_kit, 0x13),$dr{pedal_hh_vol});
+		 },
+		)->pack(-side => 'left');
+	}
+	# pack midi frame
+	$fr_midi->pack(-side => 'top');
+	# pack volume frame
+	$fr_vol_lvl->pack(-side => 'top');
+	$fr_vol_amb->pack(-side => 'top', -anchor => 'w');
+	$fr_vol->pack(-side => 'left');
+    }
+}
+
+########################################################################
+package instrument;
+
+use vars qw(%base %name @group %num);
+
+sub init {
+    while (<DATA>) {
+	chomp;
+	s/#.*//;
+	next if /^\s*$/;
+	my ($from, $to, $group) = split(' ');
+	$base{$group} = $from;
+	my $k = 0;
+	my @list;
+	if ($group ne 'Tom') {	# make instruction name list for except Tom
+	    for my $i ($from..$to) {
+		$k++;
+#		print "$i:$group $k\n";
+		push(@list, "$group $k");
+		$num{"$group $k"} = $i;
+	    }
+	} else {		# make instruction name list for Tom
+	    my $ntom = 4;
+	    for (my $i = $from; $i <= $to; ) {
+		if ($i == 485 || $i == 549) {
+		    $ntom = 6;
+		} elsif ($i == 521) {
+		    $ntom = 4;
+		}
+		$k++;
+		for my $t (1..$ntom) {
+#		    print "$i:Tom $k-$t\n";
+		    push(@list, "Tom $k-$t");
+		    $num{"Tom $k-$t"} = $i;
+		    $i++;
+		}
+	    }
+	}
+	$name{$group} = \@list;
+	last if $group eq 'Off';
+    }
+#    @group = sort keys %name;
+    @group = (qw(Kick Snare Tom Hi-Hat Crash Ride Percussion
+		 Special Melodic Voice Reverse), 'Fixed Hi-Hat', 'Off');
+
+    my $n;
+    while (<DATA>) {
+	chomp;
+	s/#.*//;
+	next if /^\s*$/;
+	m/^(\d*)\s*(.*)$/;
+	$n = $1 || ++$n;
+	my $group = group($n);
+#	print "$n:$group,", $name{$group}->[$n - $base{$group}],"->$2\n";
+#	print "$n:$group:$2\n";
+	$name{$group}->[$n - $base{$group}] = $2;
+	$num{$2} = $n;
+    }
+    #print Dumper(@group);
+    #print Dumper(%base);
+    #print Dumper(%name);
+}
+
+sub name {
+    my ($n) = @_;
+    my $group = group($n);
+    $name{$group}->[$n - $base{$group}];
+}
+
+sub group {
+    my ($i) = @_;
+    return ($i < 680 ?		# if
+	    ($i < 561 ?		#   if
+	     ($i < 325 ?
+	      ($i < 130 ? 'Kick' : 'Snare') : 'Tom') :
+	     ($i < 635 ?	#   else
+	      ($i < 599 ? 'Hi-Hat' : 'Crash') : 'Ride')) :
+	    ($i < 921 ?		# elsif
+	     ($i < 811 ? 'Percussion' :
+	      ($i < 889 ? 'Special' : 'Melodic')) :
+	     ($i < 990 ?	#   else
+	      ($i < 972 ? 'Voice' : 'Reverse') :
+	      ($i < 1024 ? 'Fixed Hi-Hat' : 'Off'))));
+}
+
+__DATA__
+1 129 Kick
+130 324 Snare
+325 560 Tom
+561 598 Hi-Hat
+599 634 Crash
+635 679 Ride
+680 810 Percussion
+811 888 Special
+889 920 Melodic
+921 971 Voice
+972 989 Reverse
+990 1023 Fixed Hi-Hat
+1024 1024 Off
+# Kick
+17 Studio 1
+Studio 2
+Studio 3
+Studio 4
+Studio 5
+Studio 6
+Studio 7
+Studio 8
+44 Jazz 1
+Jazz 2
+106 Jazz 3
+Jazz 4
+# Snare
+211 Jazz
+Jazz Rim
+Jazz x-stick
+Jazz Brass
+Jazz Brass Rim
+Jazz Brass x-stick
+Jazz Steel
+Jazz Steel Rim
+Jazz Steel x-stick
+233 Brush 1
+Brush 2
+Brush 3
+Brush Tmb
+271 Jazz 2
+Jazz 3
+
+# Tom
+357 Jazz 1-1
+Jazz 1-2
+Jazz 1-3
+Jazz 1-4
+Jazz 2-1
+Jazz 2-2
+Jazz 2-3
+Jazz 2-4
+441 Brush 1-1
+Brush 1-2
+Brush 1-3
+Brush 1-4
+Brush 2-1
+Brush 2-2
+Brush 2-3
+Brush 2-4
+509 Jazz 3-1
+Jazz 3-2
+Jazz 3-3
+Jazz 3-4
+Jazz 3-5
+Jazz 3-6
+Brush 3-1
+Brush 3-2
+Brush 3-3
+Brush 3-4
+Brush 3-5
+Brush 3-6
+
+# Hi-Hat
+561 Pure
+Pure Edge
+Bright
+Bright Edge
+Jazz
+Jazz Edge
+Thin
+Thin Edge
+Heavy
+Heavy Edge
+Light
+Light Edge
+Dark
+Dark Edge
+12"
+12" Edge
+13"
+13" Edge
+14"
+14" Edge
+15"
+15" Edge
+Brush 1
+Brush 2
+Sizzle 1
+Sizzle 2
+Voice
+HandC
+Tambrn
+Maracs
+TR808
+TR909
+CR78
+Mtl808
+Mtl909
+Mtl78
+LoFi1
+LoFi2
+
+# Crash
+599 Medium 14
+Medium 16
+Medium 18
+Quik 16
+Quik 18
+Thin 16
+Thin 18
+Brush 1
+Brush 2
+Sizzle Brush
+Swell
+Splash 6
+Splash 8
+Splash 10
+Splash 12
+Cup 4
+Cup 6
+Hand Splash 8
+Hand Splash 10
+China 10
+China 12
+China 18
+China 20
+Sizzle China
+Swell China
+Piggyback
+Piggyback Crash 1
+Piggyback Crash 2
+Piggyback Crash 3
+Piggyback Splash 1
+Piggyback Splash 2
+Phase Cymbal
+Electric
+TR808
+LoFi 1
+LoFi 2
+
+# Ride
+635 Jazz
+Jazz (Edge)
+Jazz (Bow)
+Jazz (Bow/Bell)
+Pop
+Pop (Edge)
+Pop (Bow)
+Pop (Bow/Bell)
+Rock
+Rock (Edge)
+Rock (Bow)
+Rock (Bow/Bell)
+Light
+Light (Edge)
+Light (Bow)
+Light (Bow/Bell)
+Crash
+Crash (Edge)
+Dark Crash
+Dark Crash (Edge)
+Brush 1
+Brush 2
+Sizzle Brush
+Sizzle 1
+Sizzle 1 (Edge)
+Sizzle 1 (Bow)
+Sizzle 1 (Bow/Bell)
+Sizzle 2
+Sizzle 2 (Edge)
+Sizzle 2 (Bow)
+Sizzle 2 (Bow/Bell)
+Sizzle 3
+Sizzle 3 (Edge)
+Sizzle 3 (Bow)
+Sizzle 3 (Bow/Bell)
+Sizzle 4
+Piggyback 1
+Piggyback 1 (Bow)
+Piggyback 1 (Bow/Bell)
+Piggyback 2
+Piggyback 2 (Bow)
+Piggyback 2 (Bow/Bell)
+LoFi
+LoFi (Edge)
+LoFi (Bow)
+
+# Percussion
+680 R8 Bongo Hi
+R8 Bongo Lo
+R8 Bongo 2 Hi
+R8 Bongo 2 Lo
+Bongo Hi
+Bongo Lo
+Bongo 2 Hi
+Bongo 2 Lo
+R8 Conga Mute
+R8 Conga Hi
+R8 Conga Lo
+Conga Mute
+Conga Sl
+Conga Open
+Conga Lo
+Conga Mute (VS)
+Conga Sl (VS)
+Cowbell 1
+Cowbell 2
+Cowbell Duo
+Claves
+Guiro Long 1
+Giuro Short
+Guiro Long 2
+Giuro (VS)
+Maracas
+Shaker
+Small Shaker
+tambourine 1
+tambourine 2
+tambourine 3
+tambourine 4
+Tmbl 1 Hi
+Tmbl 1 Rim
+Tmbl 1 Low
+Paila
+Tmbl 2 Hi
+Tmbl 2 Low
+VibraSlp
+Agogo Hi
+Agogo Lo
+Agogo 2 Hi
+Agogo 2 Lo
+Cabasa Up
+Cabasa Down
+Cabasa (VS)
+Cuica Mute 1
+Cuica Open
+Cuica Lo
+Cuica Mute 2
+Pandro Mute
+Pandro Open
+Pandro Sl
+Pandro (VS)
+Surdo Hi Mute
+Surdo Hi Open
+Surdo Hi (VS)
+Surdo Lo Mute
+Surdo Lo Open
+Surdo Lo (VS)
+Whistle
+Whistle Short
+Caxixi
+Tabla Na
+TablaTin
+TablaTun
+Tabla Te
+Tabla Ti
+Baya Ge
+Baya Ka
+Baya Gin
+Baya Sld
+Pot Drum
+Pot Drum Mute
+Pot Drum (VS)
+Talking Drum
+Thai Gong
+Thai Gong 2
+Bell Tree
+Tiny Gong
+Gong
+TemplBell
+Wa-Daiko
+Taiko
+Sleibell
+Tree Chime
+Tringl Open
+Tringl Mute
+Tringl (VS)
+R70 Tri Open
+R70 Tri Mute
+R70 Tri (VS)
+Castanet
+Wood Block Hi
+Wood Block Lo
+Concert BD
+Concert BD Mute
+Hand Cymbal
+Hand Cymbal Mute
+Timpani G
+Timpani C
+Timpani E
+Percussion Hit 1
+Percussion Hit 2
+Orchestra Major
+Orchestra Minor
+Orchestra Diminish
+Kick/Roll
+Kick/Cymbal
+Orchestra Roll
+Orchestra Chok
+Hit Roll
+Finale

@@ -1,0 +1,30 @@
+---
+abstract: 'class for searching www.lycos.com'
+author:
+  - 'As of 1998-12-07, C<WWW::Search::Lycos> is maintained by Martin Thurn'
+  - 'Martin Thurn <mthurn@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::Lycos
+name: WWW-Search-Lycos
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::TreeBuilder: 0
+  WWW::Search::Test: 2.21
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: '2.225'

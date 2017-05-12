@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<!DOCTYPE www-meta-xml-browser SYSTEM "http://www.boksa.de/pub/xml/dtd/www-meta-xml-browser_v0.08.dtd">
+<www-meta-xml-browser>
+	<request url="http://cgi.ebay.de/aw-cgi/eBayISAPI.dll" method="get">
+		<content><![CDATA[MyeBayItemsBiddingOn]]></content>
+	</request>
+	<request url="http://signin.ebay.de/aw-cgi/eBayISAPI.dll" method="post" stylesheet="MyeBayItemsBiddingOn-Form.xsl">
+		<content><![CDATA[MfcISAPICommand=SignInWelcome&siteid=77&co_partnerId=2&UsingSSL=0&ru=http://cgi1.ebay.de/aw-cgi/eBayISAPI.dll?MyEbayItemsBiddingOn&amp;first=default&amp;bidonSort=0&amp;wonSort=0&amp;lostSort=0&amp;watchingSort=0&amp;dayssince=2&amp;p1=0&amp;p2=0&amp;p3=0&amp;p4=0&amp;p5=0&amp;update=0&amp;nitem=0&amp;rows=25&amp;pagebid=1&amp;pagewon=1&amp;pagelost=1&amp;SaveSetting=off&amp;ssPageName=MerchMax&amp;pass={_pass_}&amp;userid=&pp=pass&pa1=&pa2=&pa3=&i1=-1&pageType=366&userid=#{args:username}&pass=#{args:password}]]></content>
+	</request>
+</www-meta-xml-browser>

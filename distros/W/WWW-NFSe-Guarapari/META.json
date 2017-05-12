@@ -1,0 +1,49 @@
+{
+   "abstract" : "Another scraper perl",
+   "author" : [
+      "\u00c3\u0081lvaro Luiz Andrade <alvaro@web2solutions.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-NFSe-Guarapari",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "JSON" : "0",
+            "WWW::Mechanize" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AlvaroBrasilia/WWW-NFSe-Guarapari/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/WWW-NFSe-Guarapari/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/AlvaroBrasilia/WWW-NFSe-Guarapari.git",
+         "web" : "https://github.com/AlvaroBrasilia/WWW-NFSe-Guarapari"
+      }
+   },
+   "version" : "0.02"
+}
+

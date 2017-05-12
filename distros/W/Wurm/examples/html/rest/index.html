@@ -1,0 +1,87 @@
+<!doctype html>
+
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <style>
+    #viewer       {visibility: hidden;}
+    #viewer-text  {visibility: hidden;}
+    #viewer-close {border-radius: 4px; float: right;}
+  </style>
+</head>
+<body>
+<table>
+  <thead><tr><th>id</th><th>text</th><th></th></tr></thead>
+  <tbody>
+<?pl for my $id (keys %{$_context->{items}}) { ?>
+    <tr>
+      <td><a href="/[= $id =]">[= $id =]</a></td>
+      <td>
+        <button onClick="view_item('[= $id =]'); return false;">View</button>
+        <button onClick="delete_item('[= $id =]'); return false;">Delete</button>
+      </td>
+    </tr>
+<?pl } ?>
+  </tbody>
+</table>
+<br>
+<h3>Add some text</h3>
+<form method="POST">
+  <textarea name="text" cols="80" rows="25"></textarea><br>
+  <input type="submit">
+</form>
+<div id="viewer">
+  <div><button id="viewer-close" onClick="view_close(); return false;">☓</button></div>
+  <div id="viewer-text"></div>
+</div>
+</body>
+<script>
+function view_close() {
+  document.getElementById('viewer-text').style.visibility = 'hidden';
+  document.getElementById('viewer').style.visibility      = 'hidden';
+  document.getElementById('viewer-text').textContent      = '';
+}
+function view_item(id) {
+  var xhr = new XMLHttpRequest;
+  xhr.addEventListener('load', function() {
+    if(xhr.status === 200) {
+      var j = JSON.parse(xhr.responseText);
+      document.getElementById('viewer-text').textContent = j.text;
+
+      var e = document.getElementById('viewer')
+
+      e.style.position        = 'absolute';
+      e.style.left            = '320px';
+      e.style.top             = '240px';
+      e.style.backgroundColor = '#fff';
+      e.style.border          = '1px solid #000';
+      e.style.borderRadius    = '4px';
+      e.style.width           = '512px';
+      e.style.minHeight       = '256px';
+
+      document.getElementById('viewer').style.visibility      = 'visible';
+      document.getElementById('viewer-text').style.visibility = 'visible';
+    }
+    else {
+      alert('Failed to GET item:'+ xhr.status.toString(10));
+    }
+  });
+
+  xhr.open('GET', '/'+ id);
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.send();
+}
+
+function delete_item(id) {
+  var xhr = new XMLHttpRequest;
+  xhr.addEventListener('load', function() {
+    window.location.reload();
+  });
+
+  xhr.open('DELETE', '/'+ id);
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.send();
+}
+</script>
+</html>

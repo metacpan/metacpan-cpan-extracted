@@ -1,0 +1,16 @@
+Revision history for WWW-Jawbone-Up
+
+1.32.4  2014-04-22 16:20:04 MST
+        - Correct failing tests because of Locales, thanks to Slaven Rezić
+
+1.32.3  2014-04-22 12:02:10 MST
+        - Force locale when using Test::Approx
+
+1.32.2  2014-04-21 16:00:40 MST
+        - Change to MIT license
+
+1.32.1  2013-07-15 11:18:21 MST
+        - Fixes for perl 5.18
+
+1.32.0  2013-04-15 18:03:55 MST
+        - Initial release

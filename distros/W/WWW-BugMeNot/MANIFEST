@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-BugMeNot.t
+lib/WWW/BugMeNot.pm

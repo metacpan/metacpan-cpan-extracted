@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_use.t
+t/01_methods.t
+t/02_new.t
+t/03_get_info.t
+lib/WWW/YouTube/Info.pm

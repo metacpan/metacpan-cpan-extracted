@@ -1,0 +1,34 @@
+Workflow-XPDL version 0.40
+==========================
+
+Workflow::XPDL is essentially a object oriented reference library to read 
+XML documents in XPDL format (http://www.Workflow.org/standards/xpdl.htm).
+Workflow::XPDL takes sections of the XPDL document based on input values and 
+returns scalars, hashes, and arrays for use in the calling programs. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::XPath, Carp, Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Stephen Rhoton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

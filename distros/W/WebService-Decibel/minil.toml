@@ -1,0 +1,6 @@
+name = "WebService-Decibel"
+# badges = ["travis"]
+authority="cpan:HONDALLIC"
+
+module_maker="ModuleBuildTiny"
+

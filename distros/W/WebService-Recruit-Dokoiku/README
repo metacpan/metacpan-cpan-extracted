@@ -1,0 +1,86 @@
+NAME
+    WebService::Recruit::Dokoiku - A Interface for Dokoiku Web Service Beta
+
+SYNOPSIS
+        use WebService::Recruit::Dokoiku;
+
+        my $doko = WebService::Recruit::Dokoiku->new();
+        $doko->key( 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' );
+
+        my $param = {
+            lat_jgd =>  '35.6686',
+            lon_jgd =>  '139.7593',
+            name    =>  'ATM',
+        };
+        my $res = $doko->searchPOI( %$param );
+        my $list = $res->root->poi;
+        foreach my $poi ( @$list ) {
+            print "name: ", $poi->name, "\n";
+            print "addr: ", $poi->address, "\n";
+            print "web:  ", $poi->dokopcurl, "\n";
+            print "map:  ", $poi->dokomapurl, "\n";
+            print "\n";
+        }
+
+DESCRIPTION
+    This module is a interface for the Dokoiku Web Service *Beta*, provided
+    by Recruit Co., Ltd., Japan. It provides three API methods: "searchPOI",
+    "getLandmark" and "getStation". With these methods, you can find almost
+    all of shops, restaurants and many other places in Japan.
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $doko = WebService::Recruit::Dokoiku->new();
+
+    This accepts optional parameters.
+
+        my $conf = { key => 'your_auth_key', utf8_flag => 1 };
+        my $doko = WebService::Recruit::Dokoiku->new( %$conf );
+
+  key
+    A valid developer key is required to make a request.
+
+        $doko->key( 'your_auth_key' );
+
+  searchPOI
+    This makes a request for "searchPOI" API. See
+    WebService::Recruit::Dokoiku::SearchPOI for details.
+
+        my $res = $doko->searchPOI( lmcode => 4212, name => 'ATM' );
+
+  getLandmark
+    This makes a request for "getLandmark" API. See
+    WebService::Recruit::Dokoiku::GetLandmark for details.
+
+        my $res = $doko->getLandmark( name => 'SHIBUYA 109' );
+
+  getStation
+    This makes a request for "getStation" API. See
+    WebService::Recruit::Dokoiku::GetStation for details.
+
+        my $res = $doko->getStation( lon_jgd => 139.758, lat_jgd => 35.666 );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $doko->utf8_flag( 1 );
+        $doko->user_agent( 'Foo-Bar/1.0 ' );
+        $doko->lwp_useragent( LWP::UserAgent->new() );
+        $doko->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://www.doko.jp/api/
+
+AUTHOR
+    Yusuke Kawasaki <http://www.kawa.net/>
+
+    This module is unofficial and released by the authour in person.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Yusuke Kawasaki. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

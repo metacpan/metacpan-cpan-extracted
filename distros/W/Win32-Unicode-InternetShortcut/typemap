@@ -1,0 +1,23 @@
+DWORD			T_UV
+WCHAR *			T_BUF
+IUniformResourceLocatorW *		T_UV
+IPersistFile *		T_UV
+
+#############################################################################
+INPUT
+T_BUF
+	if(  ! null_arg($arg)  ) {
+	    STRLEN n_a;
+	    $var= ($type) SvPV( $arg, n_a );
+	} else
+	    $var= NULL
+T_UV
+	$var= null_arg($arg) ? ($type)0 : INT2PTR($type, SvUV($arg))
+
+#############################################################################
+OUTPUT
+T_BUF
+	;
+T_UV
+	if(  ! null_arg($arg)  &&  ! SvREADONLY($arg)  )
+	    sv_setuv( $arg, PTR2UV($var) );

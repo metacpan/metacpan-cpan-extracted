@@ -1,0 +1,69 @@
+WWW::Wikipedia::TemplateFiller installation
+===========================================
+
+The easiest way to install WWW::Wikipedia::TemplateFiller is via the
+CPAN, which automatically checks for and installs dependencies as
+needed.
+
+If you wish to test the ISBNdb functionality, you will need to provide
+your ISBNdb developer's access key before 'make test' is invoked by the CPAN.
+This can be done in the shell with something like
+
+  $ export ISBNDB_ACCESS_KEY=your_key_here
+
+And then enter CPAN and install the module:
+
+  $ cpan WWW::Wikipedia::TemplateFiller
+
+Warnings during installation
+============================
+
+You may receive warnings during installation. The following are safe
+to ignore:
+
+  t/01-fill.........ok 7/16Parsing of undecoded UTF-8 will give garbage when decoding entities at /usr/local/lib/perl5/site_perl/5.8.6/WWW/Mechanize.pm line 449, <DATA> line 484.
+  t/01-fill.........ok 8/16Parsing of undecoded UTF-8 will give garbage when decoding entities at /usr/local/lib/perl5/site_perl/5.8.6/WWW/Mechanize.pm line 449, <DATA> line 484.
+  t/01-fill.........ok 11/16Use of uninitialized value in length at /usr/local/lib/perl5/5.8.6/Text/ParseWords.pm line 29.
+  t/01-fill.........ok 12/16Use of uninitialized value in length at /usr/local/lib/perl5/5.8.6/Text/ParseWords.pm line 29.
+
+If anyone has a way to resolve these warnings, feel free to drop me an
+email.
+
+Web access
+==========
+
+W::W::TF comes with a built-in web application for deploying the
+template filler via the web. The application is coded in
+W::W::TF::WebApp and uses the CGI::Application framework. An instance
+script that uses W::W::TF::WebApp is available as well; it is called
+cgi/index.cgi. Templates used by W::W::TF::WebApp are stored in
+cgi/templates.
+
+To install these files, copy the cgi directory to your cgi-bin
+directory and provide proper file permissions to files contained
+therein. For example:
+
+  % cp -r cgi /var/www/cgi-bin/wtf
+
+For permissions, something like this ought to work:
+
+  % chmod 655 /var/www/cgi-bin/wtf/index.cgi
+  % chmod a+r /var/www/cgi-bin/wtf/templates/*
+
+Update the %config hash in /var/www/cgi-bin/wtf/index.cgi to point to
+the templates directory and assign an ISBNdb access key:
+
+  # Inside /var/www/cgi-bin/wtf/index.cgi:
+  my %config = (
+    template_path => '/var/www/cgi-bin/wtf/templates',
+    isbndb_access_key => 'your_access_key',
+  );
+
+The template filler should then be available via a standard URL:
+
+  http://www.yourhost.com/cgi-bin/wtf/index.cgi
+
+Author
+======
+
+David J. Iberri <diberri@cpan.org>

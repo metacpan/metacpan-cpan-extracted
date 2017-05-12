@@ -1,0 +1,28 @@
+Revision history for Perl extension Win32API::ToolHelp.
+
+0.02  Sat Jul 13 11:18:03 2002
+	* original version; created by h2xs 1.21 with options
+		-A -n Win32API::ToolHelp
+
+	  it is numbered 0.02 because of its predecessor Win32::ToolHelp 0.01
+	   that was knocked up too fast to have a good interface
+
+	  it comes with all the functions in the Win32 ToolHelp API (heap
+	  functions not tested though), structures returned as hashes:
+
+	+ BOOL CloseToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+	+ HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+	+ BOOL Heap32First(LPHEAPENTRY32 lphe, DWORD th32ProcessID,
+		ULONG_PTR th32HeapID);
+	+ BOOL Heap32ListFirst(HANDLE hSnapshot, LPHEAPLIST32 lphl);
+	+ BOOL Heap32ListNext(HANDLE hSnapshot, LPHEAPLIST32 lphl);
+	+ BOOL Heap32Next(LPHEAPENTRY32 lphe);
+	+ BOOL Module32First(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
+	+ BOOL Module32Next(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
+	+ BOOL Process32First(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
+	+ BOOL Process32Next(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
+	+ BOOL Thread32First(HANDLE hSnapshot, LPTHREADENTRY32 lpte);
+	+ BOOL Thread32Next(HANDLE hSnapshot, LPTHREADENTRY32 lpte);
+	+ BOOL Toolhelp32ReadProcessMemory(DWORD th32ProcessID,
+		LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T cbRead,
+		SIZE_T* lpNumberOfBytesRead);

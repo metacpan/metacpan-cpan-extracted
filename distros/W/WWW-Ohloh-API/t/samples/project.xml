@@ -1,0 +1,29 @@
+  <result>
+    <project>
+      <id>10716</id>
+      <name>WWW::Ohloh::API</name>
+      <created_at>2008-01-03T20:55:40Z</created_at>
+      <updated_at>2008-01-03T21:20:21Z</updated_at>
+      <description>A Perl interface to the Ohloh API as defined at http://www.ohloh.net/api/getting_started.</description>
+      <homepage_url>http://search.cpan.org/search%3fmodule=WWW::Ohloh::API</homepage_url>
+      <download_url>http://search.cpan.org/search%3fmodule=WWW::Ohloh::API</download_url>
+      <irc_url/>
+      <stack_count>1</stack_count>
+      <average_rating>0.0</average_rating>
+      <rating_count>0</rating_count>
+      <analysis_id>100430</analysis_id>
+      <analysis>
+        <id>100430</id>
+        <project_id>10716</project_id>
+        <updated_at>2008-01-03T21:20:21Z</updated_at>
+        <logged_at>2008-01-03T20:59:39Z</logged_at>
+        <min_month>2008-01-01T00:00:00Z</min_month>
+        <max_month>2008-01-01T00:00:00Z</max_month>
+        <twelve_month_contributor_count>1</twelve_month_contributor_count>
+        <total_code_lines>381</total_code_lines>
+        <main_language_id>8</main_language_id>
+        <main_language_name>Perl</main_language_name>
+      </analysis>
+    </project>
+  </result>
+

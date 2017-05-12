@@ -1,0 +1,12 @@
+Revision history for WebService-Sprint
+
+0.5     2012/05/30
+        Implemented add_device and del_device methods.
+        Updated documentation.
+
+0.02	2012/01/02
+        Minor documentation changes, adding module dependencies.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

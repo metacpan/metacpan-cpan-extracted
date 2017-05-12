@@ -1,0 +1,33 @@
+WWW-BackpackTF version 0.002001
+===============================
+
+WWW-BackpackTF is an interface to the backpack.tf Team Fortress 2, Dota 2 and Counter-Strike: Global Offensive trading service.
+
+It wraps the API described at http://backpack.tf/api.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Test::RequiresInternet
+* JSON::MaybeXS
+* PerlX::Maybe
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

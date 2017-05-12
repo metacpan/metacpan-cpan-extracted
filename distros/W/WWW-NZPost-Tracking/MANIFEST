@@ -1,0 +1,9 @@
+Changes
+lib/WWW/NZPost/Tracking.pm
+lib/WWW/NZPost/Tracking/Detail.pm
+lib/WWW/NZPost/Tracking/Package.pm
+Makefile.PL
+MANIFEST
+README
+t/01.t
+META.yml                                 Module meta-data (added by MakeMaker)

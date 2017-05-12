@@ -1,0 +1,11 @@
+severity        = brutal
+only            = 0
+force           = 0
+verbose         = 4
+top             = 50
+#theme           = (pbp || security) && bugs
+exclude         = Bangs::ProhibitFlagComment Miscellanea::RequireRcsKeywords RegularExpressions::RequireDotMatchAnything RegularExpressions::RequireExtendedFormatting RegularExpressions::RequireLineBoundaryMatching Variables::ProhibitPunctuationVars 
+criticism-fatal = 1
+color           = 1
+pager           = less
+

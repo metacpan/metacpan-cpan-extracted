@@ -1,0 +1,84 @@
+WWW::Scripter::Plugin::Ajax, version 0.09 (alpha)
+
+Plugin for WWW::Scripter that provides the XMLHttpRequest object.
+
+
+RECENT CHANGES
+
+0.09
+----
+getAllResponseHeaders now returns the headers with CR LF line endings
+instead of just LF.
+
+0.08
+----
+file:  URLs now work when they  contain  %-escapes  beyond  the ASCII
+range.
+
+0.07
+----
+• send()  now sets the  Content-Length  header  for  a  POST  request.
+  Thanks to Erwan Mas for fixing this.
+• send(data)  now actually sends the data when the  Content-Type  has
+  been set explicitly with an  encoding.  Thanks  to  Erwan  Mas  for
+  finding this.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install WWW::Scripter::Plugin::Ajax"
+
+    [sudo] cpan WWW::Scripter::Plugin::Ajax
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+PREREQUISITES
+
+This module requires:
+
+- perl 5.8.5 or higher
+
+- WWW::Scripter
+
+- WWW::Scripter::Plugin::JavaScript 0.002 or later
+
+- XML::DOM::Lite
+
+- constant::lexical
+
+- HTML::DOM 0.013 or later
+
+- Encode 2.09 or higher
+
+- LWP
+
+- URI
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc WWW::Scripter::Plugin::Ajax
+
+Or try using man (it's faster, in my experience):
+
+    man WWW::Scripter::Plugin::Ajax
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2008-10 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

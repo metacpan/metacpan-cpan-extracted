@@ -1,0 +1,86 @@
+commit 01cff3c176b2316420160f99164a2ccb8259961c
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Fri Jul 15 17:33:54 2011 +0930
+
+    Tag: WebDyne-Chain_1.050
+    
+    Change to new versioning system, main module now holds dist version
+
+commit ed8e32847122a7c3af0d230f186940aa5fd8dbc6
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:19:05 2011 +0930
+
+    Tag: WebDyne-Chain_1.046
+    
+    Updated Makefile PREREQ section to be more compatible with older CPAN versions
+
+commit d2543943f9fffc0cbb4f45276ba6cb9d183f1b71
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:40:15 2010 +0930
+
+    Tag: WebDyne-Chain_1.045
+    
+    clean mm_ver redundancy in Makefile.PL, edit README
+
+commit a9ee5a13bb6c30070a14827df027fbc3de2e2d8e
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:22:20 2010 +0930
+
+    Tag: WebDyne-Chain_1.044
+    
+    Updated to YAML 1.4
+
+commit 7dd5838c590deaca068e112d21cb41ebefc0f93f
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 15:46:22 2010 +0930
+
+    Tag: WebDyne-Chain_1.043
+    
+    Update Makefile.PL to generate better META.yml for CPAN
+
+commit 3fe8daee2674b24054fb282e5c59e76386cbdbc5
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 11 14:53:33 2010 +0930
+
+    Tag: WebDyne-Chain_1.042
+    
+    Update git config
+
+commit cb6802951c2d993120d132a2392d13b6e4274cee
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 11 14:52:51 2010 +0930
+
+    Tag: WebDyne-Chain_1.041
+    
+    Cleaned up copyright and author information (again)
+
+commit 6e0d46c24bdd3a827786571537f052c59f9df912
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Apr 10 18:40:22 2010 +0930
+
+    Tag: WebDyne-Chain_1.040
+    
+    Update copyright info, made email address consistant
+
+commit c85f6d6092d24fd4882922961269ebb4e4ecab59
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Apr 10 13:33:04 2010 +0930
+
+    Tag: WebDyne-Chain_1.039
+    
+    Better SIG{__DIE__} handling in autoloader, cleaned up documentation and versioning ready for CPAN release.
+
+commit f6793f258f62b78e2eec45ef2468ffba8de72eb3
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Thu Feb 25 01:08:52 2010 +1030
+
+    Tag: WebDyne-Chain_1.38
+    
+    Brought file locations and Makefile.PL into line with other modules
+
+commit 5d7047e63177abedc25d5f37fc2f43373f096926
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 20 19:46:03 2010 +1030
+
+    MANIFEST Import
+

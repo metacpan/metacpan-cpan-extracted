@@ -1,0 +1,20 @@
+Geeks have a special relationship with The Truth. Nothing is more important than correcting a falsehood, no matter how small, and nothing is more odious than not telling The Truth. Unfortunately, in speaking The Whole Truth and Nothing But The Truth, the meaning is often mangled and the end result is the opposite, a lie.
+
+We’ll examine some ways geeks lie while telling The Truth, to themselves and to others, and hopefully achieve better communications, easier to understand interfaces and maybe some personal enlightenment.
+
+Some examples include: Lies by omission, lies by precision, lies by irrelevancy, lies by design, lies with statistics and that most dangerous of words “should” as in “the user should have realized”.
+
+There will be [http://homepage.mac.com/joester5/writing/images/the-cake-is-a-lie.png cake].
+
+----
+
+Meeting we actually had:
+
+=== Euler Bench, GSoC, Parrot, cake ... ===
+
+Schwern will be out of town, so the meeting topic has changed at the last minute. Jonathan Leto will give updates of The Perl Foundation's involvement in Google Summer of Code 2009, as well as a short rundown of recent milestones in Parrot/Perl 6/Rakudo development. (chromatic probably has some good stuff to say about these things as well)
+
+Euler_bench update: benchmarking Parrot/Rakudo/Perl 5 with the Euler Project:
+http://github.com/notbenh/euler_bench/tree.  Bring your own Euler solutions in whatever language -- we'll compare algorithms and runtimes, plus learn more about rakudo.
+
+<lie> There will be cake.</lie>

@@ -1,0 +1,218 @@
+NAME
+
+    WebService::SSLLabs - Analyze the configuration of any SSL web server
+    on the public Internet via ssllabs.com
+
+VERSION
+
+    Version 0.27
+
+SYNOPSIS
+
+    Check the security of your TLS services
+
+        use WebService::SSLLabs;
+        use v5.10;
+    
+        my $labs = WebService::SSLLabs->new();
+        my $host;
+        while(not $host = $labs->analyze(host => 'ssllabs.com')->complete()) {
+            sleep $labs->previous_eta();
+        }
+        if ($host->ready()) {
+            foreach my $endpoint ($host->endpoints()) {
+               if ($endpoint->ready()) {
+                  say $host->host() . ' at ' . $endpoint->ip_address() . ' gets a ' . $endpoint->grade();
+               } else {
+                  warn $host->host() . ' at ' . $endpoint->ip_address() . ' returned an error:' . $endpoint->status_message();
+               }  
+            }
+        } else {
+            warn $host->host() . ' returned an error:' . $host->status_message();
+        }
+
+DESCRIPTION
+
+    This is a client module for the https://www.ssllabs.com/ssltest API,
+    which provides a deep analysis of the configuration of any SSL/TLS web
+    server on the public Internet
+
+SUBROUTINES/METHODS
+
+ new
+
+    a new WebService::SSLLabs object, ready to process TLS services
+
+ info
+
+    This call should be used to check the availability of the SSL Labs
+    servers, retrieve the engine and criteria version, and initialize the
+    maximum number of concurrent assessments. Returns one Info object on
+    success.
+
+ analyze
+
+    This call is used to initiate an assessment, or to retrieve the status
+    of an assessment in progress or in the cache. It will return a single
+    Host object on success. The Endpoint object embedded in the Host object
+    will provide partial endpoint results.
+
+    Parameters:
+
+      * host - host name; required.
+
+      * publish - set to "on" if assessment results should be published on
+      the public results boards; optional, defaults to "off".
+
+      * start_new - if set to "on" then cached assessment results are
+      ignored and a new assessment is started. However, if there's already
+      an assessment in progress, its status is delivered instead. This
+      parameter should be used only once to initiate a new assessment;
+      further invocations should omit it to avoid causing an assessment
+      loop.
+
+      * from_cache - always deliver cached assessment reports if available;
+      optional, defaults to "off". This parameter is intended for when you
+      don't want to wait for assessment results. Can't be used at the same
+      time as the start_new parameter.
+
+      * max_age - maximum report age, in hours, if retrieving from cache
+      (from_cache parameter set).
+
+      * all - by default this call results only summaries of individual
+      endpoints. If this parameter is set to "on", full information will be
+      returned. If set to "done", full information will be returned only if
+      the assessment is complete (status is READY or ERROR).
+
+      * ignore_mismatch - set to "on" to proceed with assessments even when
+      the server certificate doesn't match the assessment host name. Set to
+      "off" by default. Please note that this parameter is ignored if a
+      cached report is returned.
+
+ previous_eta
+
+    will return the highest of either 10 seconds or the eta values from the
+    available endpoints from the previous analyze call. This value is
+    intended to act as the correct number of seconds to wait before calling
+    analyze again
+
+ get_endpoint_data
+
+    This call is used to retrieve detailed endpoint information. It will
+    return a single Endpoint object on success. The object will contain
+    complete assessment information. This call does not initiate new
+    assessments, even when a cached report is not found.
+
+    Parameters:
+
+      * host - as above
+
+      * s - endpoint IP address
+
+      * from_cache - see above.
+
+ get_status_codes
+
+    This call will return one StatusCodes instance.
+
+ max_assessments
+
+    This call will return the maximum number of concurrent assessments the
+    client is allowed to initiate. This information is only available after
+    a analyze, get_endpoint_data, info or get_status_codes call has been
+    made. It is retrieved from the X-Max-Assessments header from a
+    successful API call.
+
+ current_assessments
+
+    This call will return the number of ongoing assessments submitted by
+    this client. This information is only available after a analyze,
+    get_endpoint_data, info or get_status_codes call has been made. It is
+    retrieved from the X-Current-Assessments header in a successful API
+    call.
+
+ get_root_certs_raw
+
+    This call will return a scalar containing the root certificates used
+    for trust validation.
+
+DIAGNOSTICS
+
+    Failed to retrieve %s
+
+      The URL could not be retrieved. Check network and proxy settings.
+
+CONFIGURATION AND ENVIRONMENT
+
+    WebService::SSLLabs requires no configuration files or environment
+    variables. However, it will use the values of $ENV{no_proxy} and
+    $ENV{HTTP_PROXY} as defaults for calls to the
+    https://www.ssllabs.com/ssltest API via the LWP::UserAgent module.
+
+DEPENDENCIES
+
+    WebService::SSLLabs requires the following non-core modules
+
+      JSON
+      LWP::UserAgent
+      URI
+      URI::Escape
+
+INCOMPATIBILITIES
+
+    None reported
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to bug-net-ssllabs at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-SSLLabs. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+AUTHOR
+
+    David Dick, <ddick at cpan.org>
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WebService::SSLLabs
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-SSLLabs
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/WebService-SSLLabs
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/WebService-SSLLabs
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/WebService-SSLLabs/
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Ivan Ristic and the team at https://www.qualys.com for
+    providing the service at https://www.ssllabs.com
+
+    POD was extracted from the API help at
+    https://github.com/ssllabs/ssllabs-scan/blob/stable/ssllabs-api-docs.md
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 David Dick.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,60 @@
+NAME
+    WWW::Splunk - Client library for Splunk log search engine
+
+SYNOPSIS
+      use WWW::Splunk;
+
+      my $splunk = new WWW::Splunk ({
+              host    => $host,
+              port    => $port,
+              login   => $login,
+              password => $password,
+              unsafe_ssl => 1,
+              verbose => 0,
+      });
+
+      my $sid = $splunk->start_search ('selinux avc');
+      $splunk->poll_search ($sid);
+      until ($splunk->results_read ($sid)) {
+        print scalar $splunk->search_results ($sid);
+      }
+      print " results found\n";
+
+DESCRIPTION
+    This module contains utility functions for Splunk API, implementing
+    version 4.1 API, verified to work with 4.2, 4.3 and 5.0.3 versions.
+
+  start_search (string) [(since)] [(until)]
+    Initiate a search, return a SID (Search ID) string.
+
+  rt_search (string) (callback) [(since)] [(until)]
+    Initiate a real-time search, calling a callback for each line matched.
+
+    Finishes only if connection terminates (potentially never), returning
+    number of results consumed.
+
+  search_done (sid)
+    Return true if the search is finished.
+
+  poll_search (sid)
+    Wait for a search to finish.
+
+  search_results (sid)
+    Return an array of the matched events. If called multiple times, it only
+    returns events which were added from the time of the last call. Oh, and
+    you can't run multiple search concurrently with single WWW::Splunk
+    instance. Otherwise, WWW::Splunk is perfectly thread-safe.
+
+  results_read (sid)
+    Return true if search is finished and all there are no more results to
+    read (everything was fetched with search_results).
+
+AUTHORS
+    Lubomir Rintel, <lkundrak@v3.sk>, Michal Josef Špaček <skim@cpan.org>
+
+    The code is hosted on GitHub
+    <http://github.com/tupinek/perl-WWW-Splunk>. Bug fixes and feature
+    enhancements are always welcome.
+
+LICENSE
+     This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

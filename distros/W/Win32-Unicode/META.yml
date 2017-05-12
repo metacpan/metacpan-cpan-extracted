@@ -1,0 +1,36 @@
+---
+abstract: 'perl unicode-friendly wrapper for win32api.'
+author:
+  - 'Yuji Shimada <xaicron@cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0.31
+  Test::Mock::Guard: 0.08
+  Test::More: 0.98
+  Test::Output: 1.01
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-Unicode
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+  perl: 5.8.3
+resources:
+  bugtracker: https://github.com/xaicron/p5-win32-unicode/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/xaicron/p5-win32-unicode
+version: 0.38

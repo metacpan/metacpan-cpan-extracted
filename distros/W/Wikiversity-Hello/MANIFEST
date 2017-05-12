@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Wikiversity-Hello.t
+lib/Wikiversity/Hello.pm
+META.yml                                 Module meta-data (added by MakeMaker)

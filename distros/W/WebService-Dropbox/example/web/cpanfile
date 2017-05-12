@@ -1,0 +1,4 @@
+requires 'Amon2::Lite' => '0.13';
+requires 'Furl' => '2.19';
+requires 'IO::Socket::SSL' => '1.954';
+requires 'JSON::XS' => '3.02';

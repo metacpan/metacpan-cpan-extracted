@@ -1,0 +1,222 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name="${package_name}_Request_Default" -%]
+
+require_once 'PEAR.php';
+
+require_once '[% package_dir %]/Request.php';
+require_once '[% package_dir %]/Factory.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="Default implementation of Request class" -%]
+class [% package_name %]_Request_Default extends [% package_name %]_Request
+{
+    /**
+     * port number
+     *
+     * @access public
+     * @var int
+     */
+    var $port = 80;
+    
+    /**
+     * timeout seconds
+     * if 0 then never set timeout
+     *
+     * @access public
+     * @var int
+     */
+    var $timeout = 0;
+
+    /**
+     * Send
+     *
+     * @return mixed [% package_name %]_Response|PEAR_Error
+     */
+    function &send()
+    {
+        $url = $this->getUrl();
+        $purl = parse_url($url);
+        if ($purl == false || empty($purl['host'])) {
+            return PEAR::raiseError('Invalid URL.');
+        }
+        
+        if (!array_key_exists('port', $purl)) {
+            $purl['port'] = null;
+        }
+        
+        $reqStr = $this->_createReqStr($purl);
+        
+        $host = $purl['host'];
+        $port = $purl['port'] ? $purl['port'] : $this->port;
+        
+        if ($this->timeout) {
+            $fp = fsockopen($host, $port, $errno, $errstr, $this->timeout);
+        } else {
+            $fp = fsockopen($host, $port, $errno, $errstr);
+        }
+        if (!$fp) {
+            return PEAR::raiseError("failed fsockopen(): errno=$errno, errstr=$errstr");
+        }
+
+        if ($this->timeout) {
+            socket_set_timeout($fp, $this->timeout);
+        }
+        
+        if (fwrite($fp, $reqStr) == false) {
+            fclose($fp);
+            return PEAR::raiseError('failed fwrite().');
+        }
+
+        $status = null;
+        $statusCode = null;
+        if (!feof($fp)) {
+            $status = trim(fgets($fp, 4096));
+            sscanf($status, "HTTP/1.%d %d %s", $minor, $statusCode, $statusstr);
+        }
+        if (!$statusCode || (($statusCode < 200 || 300 <= $statusCode)
+                             && !$this->isIgnoreStatusCode($statusCode))) {
+            $content = '';
+            while (!feof($fp)) {
+                $content .= fread($fp, 8192);
+            }
+            fclose($fp);
+            return PEAR::raiseError("HTTP Error: status=$status, content=$content");
+        }
+        
+        $headers = array();
+        while (!feof($fp)) {
+            $line = trim(fgets($fp, 4096));
+            if (empty($line)) {
+                break;
+            }
+            list($key, $val) = explode(":", $line);
+            $headers[trim($key)] = trim($val);
+        }
+
+        $content = '';
+        while (!feof($fp)) {
+            $content .= fread($fp, 8192);
+        }
+        
+        fclose($fp);
+
+        if (array_key_exists('Transfer-Encoding', $headers)
+            && $headers['Transfer-Encoding'] == 'chunked') {
+            $content = $this->_decodeChunked($content);
+        }
+        
+        return $this->fac->createResponse($status, $headers, $content);
+    }
+    
+    /**
+     * Create request string and return
+     * 
+     * @access private
+     * @param array $purl parsed URL
+     * @return string request string
+     */
+    function _createReqStr($purl)
+    {
+        $rm = $this->getRequestMethod();
+        $params = $this->getParams();
+
+        $reqStr = '';
+        
+        if (!array_key_exists('query', $purl)) {
+            $purl['query'] = null;
+        }
+        
+        if ($rm == 'POST') {
+            $query = $purl['path'];
+            if ($purl['query']) {
+                $query .= '?' . $purl['query'];
+            }
+            $qstrs = array();
+            if ($purl['query']) {
+                $qstrs[] = $purl['query'];
+            }
+            foreach ($params as $key => $val) {
+                if (is_array($val)) {
+                    foreach ($val as $val2) {
+                        $qstrs[] = urlencode($key) . "=" . urlencode($val2);
+                    }
+                } else {
+                    $qstrs[] = urlencode($key) . "=" . urlencode($val);
+                }
+            }
+
+            $reqStr .= sprintf("%s %s HTTP/1.1\r\n", $rm, $query);
+            $reqStr .= "Host: $purl[host]\r\n";
+            $reqStr .= "Connection: close\r\n";
+            $reqStr .= "Content-Type: application/x-www-form-urlencoded\r\n";
+            $reqStr .= "\r\n";
+            if ($qstrs) {
+                $reqStr .= implode('&', $qstrs) . "\r\n";
+            }
+            $reqStr .= "\r\n";
+        } else {
+            $query = $purl['path'];
+            //$qstr = http_build_query($params);
+            $qstrs = array();
+            if ($purl['query']) {
+                $qstrs[] = $purl['query'];
+            }
+            foreach ($params as $key => $val) {
+                if (is_array($val)) {
+                    foreach ($val as $val2) {
+                        $qstrs[] = urlencode($key) . "=" . urlencode($val2);
+                    }
+                } else {
+                    $qstrs[] = urlencode($key) . "=" . urlencode($val);
+                }
+            }
+            if ($qstrs) {
+                $query .= '?' . implode('&', $qstrs);
+            }
+
+            $reqStr .= sprintf("%s %s HTTP/1.1\r\n", $rm, $query);
+            $reqStr .= "Host: $purl[host]\r\n";
+            $reqStr .= "Connection: close\r\n";
+            $reqStr .= "\r\n";
+        } 
+        
+        return $reqStr;
+    }
+
+    /**
+     * Decodes chunked content.
+     * 
+     * @param string $src chunked content
+     * @return string decoded content
+     */
+    function _decodeChunked($src)
+    {
+        $result = "";
+        
+        while (strlen($src) > 0) {
+            $pos = strpos($src, "\n");
+            if ($pos === false) {
+                break;
+            }
+            
+            $chunk = substr($src, 0, $pos + 1);
+            $chunk_len = strlen($chunk);
+            list($len) = sscanf($chunk, "%x");
+            if ($len == 0) {
+                break;
+            }
+            
+            $result .= substr($src, $chunk_len, $len);
+            
+            $pos = strpos($src, "\n", $chunk_len + $len);
+            if ($pos === false) {
+                $pos = $chunk_len + $len;
+            }
+            $src = substr($src, $pos + 1);
+        }
+        
+        return $result;
+    }
+}
+
+?>

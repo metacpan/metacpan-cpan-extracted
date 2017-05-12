@@ -1,0 +1,64 @@
+0.008		2016-04-05	T. R. Wyant
+  Code and documentation clean-up.
+
+  Convert to Test::More.
+
+  Add machinery to test (though not use) on non-Windows systems.
+
+0.007		2016-01-26	T. R. Wyant
+  Use 'our' for $VERSION, exporter symbols
+
+  Have {Makefile,Build}.PL die unless MSWin32 or cygwin. There is a
+    back door if environment variable AUTHOR_BUILD is true, so I can
+    build a kit.
+
+  Have t/basic.t skip if can't load Windows modules.
+
+  Bring Changes file into compliance with Test::CPAN::Changes, and add
+    test xt/author/changes.t to make sure it stays that way.
+
+  Require Test::More 0.88 for building.
+
+  Move the modification history into the Changes file.
+
+  Update minimum Perl from 5.005 to 5.006002, since that is the minimum I
+    have been able to actually build.
+
+  Make the code as perlcritic-compliant as I think reasonable.
+
+  Convert to CPAN-recommented license.
+
+  Tweak t/basic.t to work under ReactOS.
+
+0.006		2007-10-16	T. R. Wyant
+  Re-layout kit, add POD tests.
+
+0.005		2005-05-04	T. R. Wyant
+  Assert FILE_FLAG_BACKUP_SEMANTICS when reading times, so that it works
+    for directories under XP and 2003 server. Thanks to Leigh Power for
+    pointing out the problem and suggesting the solution.
+
+  Document FAT, and accomodate it in self-test. Thanks again, Leigh.
+
+  Centralize code to close handles on error.
+
+0.004		2005-01-13	T. R. Wyant
+  Close handles after use. Thanks to Chris Camejo for pointing out the
+    leak.
+
+  Fix export tags to agree with docs.
+
+  Tweak "BUGS" documentation.
+
+0.003		2004-12-17	T. R. Wyant
+  Correct time conversion.
+
+  Modify test to not change own date.
+
+0.002		2004-10-02	T. R. Wyant
+  Correct MANIFEST and Makefile.PL dependencies.
+
+  Tweak documentation. No code changes.
+
+0.001		2004-05-13	T. R. Wyant
+  Initial release

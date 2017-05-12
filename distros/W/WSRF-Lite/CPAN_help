@@ -1,0 +1,64 @@
+Help For Using CPAN as a non-root User
+======================================
+
+Installing all the required modules needed by WSRF::Lite
+can be time consumming if you don't use CPAN. By default 
+CPAN is configured only to be used by root but you can use 
+it with normal user privelges. This is an outline of the 
+steps you need to go through - more details can be found in 
+the CPAN manpage.
+
+1) Create a directory .cpan/CPAN in your home directory,
+   in the rest of the examples /home/mm will be used as 
+   the home directory.
+
+2) Copy the CPAN config file from the Perl modules directory 
+   to /home/mm/.cpan/CPAN/MyConfig.pm. The file will be called 
+   Config.pm and will be in the CPAN directory in the Perl 
+   modules directory (usually /usr/lib/perl5). The following 
+   command may help you find the file
+
+   find /usr/lib/perl5 -name Config.pm -print
+
+3) The Config.pm file is configured for use by root, it
+   needs to be modified.
+   Edit /home/mm/.cpan/CPAN/MyConfig.pm to change the directories
+   CPAN uses from /root/.cpan/ to /home/mm/.cpan/ These are
+   the directories that CPAN uses to store and build modules.
+
+4) Once MyConfig.pm has been configured you should be able 
+   to run CPAN as a normal user with the following command:
+
+   perl -MCPAN -e shell
+
+5) If you succeeded in getting CPAN running you need to 
+   tell it which directory to install modules into, you 
+   probably will not have permission to install it into
+   the system Perl libraries. From the CPAN shell run:
+
+   o conf makepl_arg "LIB=/home/mm/myperl/lib \
+                      INSTALLMAN1DIR=/home/mm/myperl/man/man1 \
+                      INSTALLMAN3DIR=/home/mm/myperl/man/man3"
+  
+   This will cause CPAN to install the modules into /home/mm/myperl/lib
+   etc. After running this command you should commit the changes
+   with the following command in the CPAN shell:
+
+   o conf commit
+
+6) You should be able to install the modules now. For example you
+   can install a newer version of CPAN if the version installed in
+   the system directories is out of date using "install Bundle::CPAN". 
+   If you do update CPAN sometimes it can help to restart CPAN with
+   "perl -MCPAN -e shell", remembering to set PERL5LIB first. Once the 
+   modules are installed you need to tell Perl where to find them, this
+   can be done by setting the PERL5LIB environmental variable in the
+   shell eg:
+  
+   export PERL5LIB=/home/mm/myperl/lib
+
+   or by including the following in your scripts:
+
+   use lib "$ENV{HOME}/myperl/lib";
+   
+

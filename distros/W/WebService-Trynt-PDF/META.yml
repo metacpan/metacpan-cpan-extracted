@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Trynt-PDF
+version:      0.01
+version_from: lib/WebService/Trynt/PDF.pm
+installdirs:  site
+requires:
+    File::Copy:                    0
+    File::Temp:                    0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    URI:                           0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

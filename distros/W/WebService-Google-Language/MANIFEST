@@ -1,0 +1,20 @@
+Changes
+lib/WebService/Google/Language.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-constructor.t
+t/02-accessors.t
+t/03-constructor-revisited.t
+t/04-result.t
+t/05-methods.t
+t/06-mock.t
+xt/cpan-meta.t
+xt/hasversion.t
+xt/minimumversion.t
+xt/pod-coverage.t
+xt/pod.t
+xt/synopsis.t
+META.json                                Module JSON meta-data (added by MakeMaker)

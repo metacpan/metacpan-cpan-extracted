@@ -1,0 +1,12 @@
+Revision history for WebService::TestSystem.
+
+CVS
+	- improved the user detection during RPM install (kees)
+	- added META.yml to CVS (kees)
+	- added SSL support and example args to scripts (kees)
+
+1.02  Thu Sep 16 15:16:57 2004
+	- original version; created by sdist 1.9
+
+
+

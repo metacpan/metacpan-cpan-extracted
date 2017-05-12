@@ -1,0 +1,15 @@
+This package contains Web::App library modules for database entities mapping using DBI::Easy.
+
+Installation is simple:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you have questions mail to dot.and.thing@gmail.com.
+
+Copyright 2003-2009, Ivan Baktsheev
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

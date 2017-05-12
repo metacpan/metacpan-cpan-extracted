@@ -1,0 +1,248 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use v5.10;
+use Data::Dumper;
+use IO::File;
+use WriteAt;
+use WriteAt::To::Latex;
+use Perl6::Pod::Utl;
+use Perl6::Pod::Lib;
+use WriteAt::To::Atom;
+use constant {
+    TYPE2CLASS => {
+        docbook => 'WriteAt::To::DocBook',
+        latex   => 'WriteAt::To::Latex',
+        atom    => 'WriteAt::To::Atom'
+      }
+
+};
+my ( $help, $man, $render_class, $set_date );
+my ( $type, $lang, $enable_published ) = ( "docbook", 'en', 0 );
+my %opt = (
+    help   => \$help,
+    man    => \$man,
+    type   => \$type,
+    lang   => \$lang,
+    render => \$render_class,
+    enable_published=>\$enable_published,
+    set_date =>\$set_date
+);
+GetOptions( \%opt, 'help|?', 'man', 'set_date=s','enable_published','c=s', "type|t:s", 'lang=s', 'render|r:s' )
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+unless ($type) {
+    pod2usage( -exitstatus => 2, -message => 'Need valide -type !' );
+}
+
+{
+    my $infile = shift;
+    my $in_fd;
+    if ($infile) {
+        $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+    }
+    else {
+        $in_fd = \*STDIN;
+    }
+    my $in;
+    { local $/; undef $/; $in = <$in_fd> };
+    utf8::decode($in) unless utf8::is_utf8($in);
+    my $tree = Perl6::Pod::Utl::parse_pod( $in, default_pod => 1 )
+      || die "Can't parse $infile";
+
+    #create driver instance
+    #preload render class
+
+    my $class = TYPE2CLASS->{$type} || 'WriteAt::To::DocBook';
+
+    if ($render_class) {
+        $class = $render_class;
+        eval "use $class";
+        if ($@) {
+            use Carp;
+            croak "Error register class :$class with $@ ";
+            return 0;
+        }
+    }
+
+    my %ini;
+
+    # process params after -- 
+    my $tag = shift;
+    foreach (@ARGV) {
+        #clean opts
+        my @opt = split( /\s*\,\s*/, $_ );
+        if ( $opt[0] =~ /^-(\S+)/ ) {
+            shift @opt;
+            $tag = $1;
+        }
+        next unless defined $tag;
+        push @{ $ini{$tag} }, @opt;
+
+    }
+    #clear -baseurl -> baseurl
+    # baseurl => ['http://example.com'] -> baseurl=>'http://example.com'
+    my %opt = ();
+    while ( my ($k, $v ) = each %ini ) {
+        $k =~ s/^-+//;
+        $opt{$k} = scalar(@$v) > 1 ? $v : $v->[0] ;
+        
+    }
+    my $r = $class->new( lang => $lang, %opt );
+
+    #set src key for path
+    $r->context->custom->{src} = $infile;
+    no strict 'refs';
+
+    #add plugins
+    foreach
+      my $pod6use ( ${"Perl6::Pod::Lib::POD6USE"}, ${"${class}::POD6USE"} )
+    {
+        next unless ref($pod6use);
+        while ( my ( $k, $v ) = each %$pod6use ) {
+            $r->context->use->{$k} = $v;
+        }
+    }
+    use strict 'refs';
+    $r->context->use->{CHANGES} = 'WriteAt::CHANGES';
+    $r->context->use->{AUTHOR}  = 'WriteAt::AUTHOR';
+
+    my %res;
+    $tree = &WriteAt::get_book_info_blocks( $tree, \%res, $r );
+    #now filter by publush time if endable
+    if ($enable_published) {
+        my $pub_time = $set_date || &WriteAt::unixtime_to_string(time());
+        $tree = &WriteAt::filter_published($tree, $pub_time);
+    }
+    $r->start_write(%res);
+    $r->write($tree);
+    $r->end_write();
+}
+
+exit 0;
+
+=head1 NAME
+
+  writeat  - process pod6 files
+
+=head1 SYNOPSIS
+
+Minimal book template is:
+
+    =begin pod
+    =TITLE Main title
+    =SUBTITLE mini subtitle
+    =for DESCRIPTION tag:<tag1 tag2>
+    asd asd 
+    =begin CHANGES
+    Dec 09th 2012(v0.1)[zag]   Start
+    =end CHANGES
+    =AUTHOR Alex Zahatski
+    =for CHAPTER
+    Test chapter
+    =for head1 :published<'2013-01-10T09:09:09Z'> :updated<'2013-02-27T10:30:01Z'>
+    = :tag<setup>
+    Begining
+    =head2 Second level
+    
+    The following text ...
+    =end pod
+
+
+
+  writeat -type docbook  file.pod6 > file.xml
+ 
+or
+  writeat [options] [file] -- [render oprions]
+  
+
+   [options]:
+
+    -help  - print help message
+    -man   - print man page
+    -type  - output format (docbook, latex, atom)
+    -render,-r - use class for render (option -type ignored) (default: off)
+    -lang  - set language ( default: en )
+    -enable_published - filter :publish attributes (default: off)
+    -set_date '2012-11-27T09:39:18Z' - set time to filter published (default: now)
+
+    [file] : filename or - for STDIN
+
+    [render options]:
+     atom:
+         -baseurl http://example.org  - base url for links
+         -as_entry head1               - use head1 for atom entry (default =CHAPTER)
+
+      atom example:
+
+    writeat -t atom -lang en \
+        -enable_published \
+        -set_date '2012-11-27T09:39:18Z' \
+        - \
+        -- -level head1 -baseurl http://example.org  < exportatom.pod6
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exit
+
+=item B<-man>
+
+Prints manual page and exit
+
+=item B<-render>, B<-r> class
+
+use class for render (C<-type> ignored)
+
+=back
+
+=head1 DESCRIPTION
+
+    writeat  - process pod6 files
+
+=head1 EXAMPLE
+
+Minimal book template is:
+
+    =begin pod
+    =TITLE Main title
+    =SUBTITLE mini subtitle
+    =for DESCRIPTION tag:<tag1 tag2>
+    asd asd 
+    =begin CHANGES
+    Dec 09th 2012(v0.1)[zag]   Start
+    =end CHANGES
+    =AUTHOR Alex Zahatski
+    =for CHAPTER
+    Test chapter
+    =for head1 :published<'2013-01-10T09:09:09Z'> :updated<'2013-02-27T10:30:01Z'>
+    = :tag<setup>
+    Begining
+    =head2 Second level
+    
+    The following text ...
+    =end pod
+
+   writeat -type docbook < book.pod6
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2013-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

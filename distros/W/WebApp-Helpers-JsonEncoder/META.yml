@@ -1,0 +1,42 @@
+---
+abstract: 'Simple role for en/decoding JSON'
+author:
+  - 'frew: Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Moo: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebApp-Helpers-JsonEncoder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebApp::Helpers::JsonEncoder:
+    file: lib/WebApp/Helpers/JsonEncoder.pm
+    version: '0.01'
+requires:
+  JSON::MaybeXS: '0'
+  Moo::Role: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/felliott/WebApp-Helpers-JsonEncoder/issues
+  homepage: https://github.com/felliott/WebApp-Helpers-JsonEncoder
+  repository: git://github.com/felliott/WebApp-Helpers-JsonEncoder.git
+version: '0.01'
+x_authority: cpan:FELLIOTT
+x_contributors:
+  - 'Fitz Elliott <felliott@fiskur.org>'

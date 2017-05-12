@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/WWW/Pixelletter.pm
+t/WWW-Pixelletter.t
+samples/send_by_pixelletter.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,43 @@
+WWW-Lovefilm-API
+
+This module provides an interface to Lovefilm's API.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Lovefilm::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Lovefilm-API
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Lovefilm-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Lovefilm-API
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Lovefilm-API
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 David Westbrook
+Copyright (C) 2010 Paul Mooney
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

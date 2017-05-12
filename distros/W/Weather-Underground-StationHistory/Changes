@@ -1,0 +1,24 @@
+Revision history for Weather-Underground-StationHistory
+
+1.0.5  2008-04-06
+       META.yml update and more kwalitee.
+
+1.0.4  2007-05-07
+       Add Makefile.PL for those using archaic module management
+       systems.
+
+1.0.3  2007-05-06
+       Attempt to deal with limitations of Exporter in perl v5.6.
+
+1.0.2  2007-05-04
+       Cleanup tests, including dealing with current Perl::Critic.
+
+1.0.1  2006-12-03
+       Play the kwalitee game.
+
+1.0.0  2006-12-03
+       Declare production-ready.  Comply with bleading-edge
+       Perl::Critic.
+
+0.0.1  2006-10-26
+       Initial release.

@@ -1,0 +1,8 @@
+TYPEMAP
+BOOL         T_IV
+HWND         T_IV
+HBITMAP      T_IV
+LONG         T_IV
+LPVOID       T_PV
+UINT         T_UV
+LPCTSTR      T_PV

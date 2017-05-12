@@ -1,0 +1,41 @@
+WWW::Amazon::Wishlist - grab details from an Amazon wishlist
+
+-----------------------------------
+INSTALLATION
+-----------------------------------
+
+The usual ...
+
+% perl Makefile.PL
+% make test
+% make install
+
+Remember peeps, It's bad to do 'make test' as root.  In fact, try to do as 
+little as possible as root.  Only do the 'make install' as root.  Root is bad. 
+Root is scary.  Tree pretty.  Beer Foamy.  Fire bad.
+
+You have been warned.
+
+It also installs a utility called amazonwish, which will grab your amazon wishlist for you and total it up.
+
+-----------------------------------
+DESCRIPTION
+-----------------------------------
+
+Goes to Amazon.(com|co.uk) and scrapes away your wishlist and returns it in a array of hashrefs so that you can fiddle with it until your hearts content.
+
+Note: Items marked as "currently unavailable" are not returned.  (This may be considered a bug...)
+
+-----------------------------------
+SHOWING YOUR APPRECIATION
+-----------------------------------
+
+There was a thread on london.pm mailing list about working in a vacuum
+- that it was a bit depressing to keep writing modules but never get
+any feedback. So, if you use and like this module then please send me
+an email and make my day.
+
+All it takes is a few little bytes.
+
+Either that or you have the adress of my Amazon Wishlist, it's huge, buy something for me off it :)
+

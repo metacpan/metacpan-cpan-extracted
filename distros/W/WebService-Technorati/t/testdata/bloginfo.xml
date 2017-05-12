@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- generator="Technorati API version 1.0 /bloginfo" -->
+<!DOCTYPE tapi PUBLIC "-//Technorati, Inc.//DTD TAPI 0.02//EN" "http://api.technorati.com/dtd/tapi-002.xml">
+<tapi version="1.0">
+<document>
+<result>
+  <url>http://www.arachna.com/roller/page/spidaman</url>
+  <weblog>
+    <name>What's That Noise?! [Ian Kallen's Weblog]</name>
+    <url>http://www.arachna.com/roller/page/spidaman</url>
+    <rssurl>http://www.arachna.com/roller/rss/spidaman</rssurl>
+    <atomurl></atomurl>
+    <inboundblogs>17</inboundblogs>
+    <inboundlinks>60</inboundlinks>
+    <lastupdate>2004-11-07 15:05:18 GMT</lastupdate>
+    <rank>26080</rank>
+    <lat>37.88724</lat>
+    <lon>-122.16037</lon>
+    <lang>20354</lang>
+  </weblog>
+  <inboundblogs>17</inboundblogs>
+  <inboundlinks>60</inboundlinks>
+</result>
+</document>
+</tapi>

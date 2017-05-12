@@ -1,0 +1,29 @@
+---
+abstract: 'Yes24 Web Service API Module'
+author:
+  - 'Keedi Kim - 김도형 <keedi at cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Yes24
+requires:
+  Encode: 0
+  LWP::Simple: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Test::Base: 0
+  Test::More: 0
+  URI: 0
+  URI::Escape: 0
+  Web::Scraper: 0
+  common::sense: 0
+  namespace::autoclean: 0
+  perl: 5.010
+resources:
+  repository: http://github.com/keedi/WebService-Yes24
+version: 0.100980

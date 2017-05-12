@@ -1,0 +1,34 @@
+---
+abstract: 'Fetch Krispy Kreme locations near a given geolocation!'
+author:
+  - 'Curtis Brandt <curtis@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::RequiresInternet: '0.02'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-KrispyKreme-HotLight
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '6.0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/aggrolite/WWW-KrispyKreme-HotLight/issues
+  homepage: https://github.com/aggrolite/WWW-KrispyKreme-HotLight
+  repository: https://github.com/aggrolite/WWW-KrispyKreme-HotLight.git
+version: '1.1'
+x_contributors:
+  - 'Curtis Brandt <curtisjbrandt@gmail.com>'

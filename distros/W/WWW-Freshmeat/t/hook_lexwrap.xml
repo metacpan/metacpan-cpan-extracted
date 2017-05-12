@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <created-at type="datetime">2008-12-29T17:18:24Z</created-at>
+  <description>Hook::LexWrap allows you to install a pre- or
+post-wrapper (or both) around an existing
+subroutine. Unlike other modules that provide this
+capacity (e.g. Hook::PreAndPost and
+Hook::WrapSub), Hook::LexWrap implements wrappers
+in such a way that the standard 'caller' function
+works correctly within the wrapped subroutine.</description>
+  <name>Hook::LexWrap</name>
+  <oneliner>Lexically scoped subroutine wrappers in Perl.</oneliner>
+  <permalink>hook_lexwrap</permalink>
+
+  <popularity type="float">12.92</popularity>
+  <updated-at type="datetime">2008-12-29T18:48:04Z</updated-at>
+  <vitality type="float">1.0</vitality>
+  <tag-list>Software Development, Libraries, Perl Modules</tag-list>
+  <license-list>Perl</license-list>
+  <operating-system-list>OS Independent</operating-system-list>
+
+  <programming-language-list>Perl</programming-language-list>
+  <translation-list></translation-list>
+  <vote-score type="integer">1</vote-score>
+  <project-filters-count type="integer">53</project-filters-count>
+  <subscriptions-count type="integer">0</subscriptions-count>
+  <recent-releases type="array">
+    <recent-release type="Release">
+
+      <approved-at type="datetime">2008-12-29T18:48:04Z</approved-at>
+      <changelog></changelog>
+      <id type="integer">291107</id>
+      <version>0.22</version>
+      <tag-list>Initial freshmeat announcement</tag-list>
+    </recent-release>
+  </recent-releases>
+
+  <approved-urls type="array">
+    <approved-url type="Url">
+      <id type="integer">63210</id>
+      <label>Bug Tracker</label>
+      <permalink>854d57e030b1b55bb959ab066144c62d</permalink>
+      <redirector>http://freshmeat.net/urls/854d57e030b1b55bb959ab066144c62d</redirector>
+      <host>rt.cpan.org</host>
+
+    </approved-url>
+    <approved-url type="Url">
+      <id type="integer">123211</id>
+      <label>Website</label>
+      <permalink>958a46b0fd68b07418a150fc730dd5a1</permalink>
+      <redirector>http://freshmeat.net/urls/958a46b0fd68b07418a150fc730dd5a1</redirector>
+      <host>search.cpan.org</host>
+
+    </approved-url>
+  </approved-urls>
+  <approved-screenshots type="array"/>
+</project>

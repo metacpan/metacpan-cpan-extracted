@@ -1,0 +1,23 @@
+WWW::VirtualPBX
+====================
+
+Generate random CUSIP numbers for testing
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    WWW::Mechanize
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 Michael Aquilina. All rights reserved.

@@ -1,0 +1,28 @@
+---
+name:                WWW-ConfixxBackup
+version:             0.1001
+abstract:            Create Backups with Confixx and download them via FTP
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    HTTP::Cookies:                 0
+    Net::FTP:                      0
+    Test::CheckManifest:           1.01
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Renee Baecker <module@renee-baecker.de>
+provides:
+    WWW::ConfixxBackup:
+        file: lib/WWW/ConfixxBackup.pm
+        version: 0.1001
+    WWW::ConfixxBackup::Confixx:
+        file: lib/WWW/ConfixxBackup/Confixx.pm
+        version: 0.05
+    WWW::ConfixxBackup::FTP:
+        file: lib/WWW/ConfixxBackup/FTP.pm
+        version: 0.04
+

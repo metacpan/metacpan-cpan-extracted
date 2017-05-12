@@ -1,0 +1,44 @@
+WWW-Webkit
+================================
+
+WWW::WebKit is a drop-in replacement for WWW::Selenium using Gtk3::WebKit
+as browser instead of relying on an external Java server and an installed
+browser.
+
+See perldoc of WWW::WebKit for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Gtk3
+  Gtk3::WebKit
+  Glib::Object::Introspection
+  X11::Xlib
+
+On openSUSE, the following packages have to be installed:
+  gobject-introspection-devel gtk3-devel libwebkitgtk3-devel perl-Glib
+
+DEVELOPMENT VERSION
+
+The current development version can be found in the git repository at:
+https://github.com/niner/WWW-WebKit
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Stefan Seifert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

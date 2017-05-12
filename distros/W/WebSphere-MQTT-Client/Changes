@@ -1,0 +1,30 @@
+Revision history for Perl extension WebSphere::MQTT.
+
+
+0.01  Sun Jul 25 01:07:29 2004
+	First release
+	
+0.02  Mon Jul 17 13:46:00 2006
+	<B.Candler@pobox.com>
+	* Added publish capability
+	* Added persistence wrapper and Perl persistence module
+	* Added "async" connect option; allows publishing via persistence
+	  layer even when remote MQ server is down. Note however this is
+	  limited by API, in particular max. 65536 messages and a risk of
+	  the same message ID being used twice.
+	* Some sanity checking when processing received publications
+	* Some fixes to compile cleanly with -Wall
+    * Added Makefile.PL shim
+
+0.03  Tue Nov 07 16:01:00 2006
+	<B.Candler@pobox.com>
+	* Fixed bug where receivePub croaked with 'OK'
+	* xs_publish() now returns array of (status, message handle)
+	* added xs_getMsgStatus() to check status of a given message
+	* publish() now takes an optional callback function and argument
+	  which is invoked when a QoS 1 or 2 message is delivered
+	This is primarily so that if your messages are already locally
+	queued, you can publish at QOS 1 without having to write them
+	again to the persistence layer. You wait for successful delivery
+	and then delete them from your own queue when done.
+

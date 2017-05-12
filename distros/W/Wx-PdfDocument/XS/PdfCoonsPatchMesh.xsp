@@ -1,0 +1,131 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdfcoonspatchmesh.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2009-06-24
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+// wxWidgets headers
+#include <wx/dynarray.h>
+
+// wxPdfDocument headers
+#include "wx/pdfdocdef.h"
+#include "wx/pdfcolour.h"
+
+/// Class representing a coons patch mesh.
+%name{Wx::PdfCoonsPatchMesh} class wxPdfCoonsPatchMesh
+{
+    
+%{
+static void
+wxPdfCoonsPatchMesh::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+  /// Constructor
+  wxPdfCoonsPatchMesh();
+
+  ~wxPdfCoonsPatchMesh()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::PdfCoonsPatchMesh", THIS, ST(0) );
+                 delete THIS;
+               %};
+
+%{
+
+bool
+wxPdfCoonsPatchMesh::AddPatch(edgeFlag, svcol, svx, svy)
+    int edgeFlag
+    SV* svcol
+    SV* svx
+    SV* svy
+  PREINIT:
+    wxPdfColour arr_col[4];
+    double arr_x[12];
+	double arr_y[12];
+  CODE:
+    AV* avcol;
+    AV* avx;
+	AV* avy;
+    
+    int numcol   = (edgeFlag == 0) ? 4 : 2;
+    int numcoord = (edgeFlag == 0) ? 12 : 8;
+	int n;
+    
+    // colours
+	if( !SvROK( svcol ) ||
+		( SvTYPE( (SV*) ( avcol = (AV*) SvRV( svcol ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the colour value is not an array reference" );
+		return;
+	}
+	n = av_len( avcol ) + 1;
+    if( n != numcol )
+    {
+        croak( "The edgFlag value and number of colours provided is inconsistent." );
+        return;
+    }
+	for( int i = 0; i < n; ++i )
+	{
+		arr_col[i] = *(wxPdfColour*)wxPli_sv_2_object( aTHX_ *av_fetch( avcol, i, 0 ), "Wx::PdfColour" );
+	}  
+    
+    // x coord
+	if( !SvROK( svx ) ||
+		( SvTYPE( (SV*) ( avx = (AV*) SvRV( svx ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the x value is not an array reference" );
+		return;
+	}
+	n = av_len( avx ) + 1;
+    if( n != numcoord )
+    {
+        croak( "The edgFlag value and number of Xs provided is inconsistent.");
+        return;
+    }
+	for( int i = 0; i < n; ++i )
+	{
+		SV* t = *av_fetch( avx, i, 0 );
+		arr_x[i] = (double) SvNV( t );
+	}
+    
+    // y coord
+	if( !SvROK( svy ) ||
+		( SvTYPE( (SV*) ( avy = (AV*) SvRV( svy ) ) ) != SVt_PVAV ) )
+	{
+		croak( "the y value is not an array reference" );
+		return;
+	}
+	n = av_len( avy ) + 1;
+    if( n != numcoord )
+    {
+        croak( "The edgFlag value and number of Ys provided is inconsistent.");
+        return;
+    }
+	for( int i = 0; i < n; ++i )
+	{
+		SV* t = *av_fetch( avy, i, 0 );
+		arr_y[i] = (double) SvNV( t );
+	}
+  
+    RETVAL = THIS->AddPatch(edgeFlag, arr_col, arr_x, arr_y);
+  OUTPUT: RETVAL
+
+%}
+
+  bool Ok() const;
+
+  wxPdfColourType GetColourType() const;
+
+  size_t GetPatchCount() const;
+
+  // TODO const wxArrayPtrVoid* GetPatches() const;
+
+};
+

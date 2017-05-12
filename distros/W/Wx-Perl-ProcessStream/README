@@ -1,0 +1,45 @@
+#########################################################
+
+Wx-Perl-ProcessStream
+
+(c)2007 - 2010 Mark Dootson
+
+#########################################################
+
+This module provides the STDOUT, STDERR and exit codes of 
+asynchronously running processes via events. It may be 
+used for long running or blocking processes that provide 
+periodic updates on state via STDOUT. Simple IPC is 
+possible via STDIN.
+
+REQUIRES >= Perl 5.8.1
+         >= Wx   0.50
+         >= wxWidgets 2.6.3
+
+INSTALLATION
+
+Linux / *nix
+
+To install this module the following commands
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+MSWin
+
+To install this module, using VC6 run the following 
+commands
+
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2010 Mark Dootson
+
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.

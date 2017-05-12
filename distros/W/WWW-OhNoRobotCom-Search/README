@@ -1,0 +1,219 @@
+NAME
+    WWW::OhNoRobotCom::Search - search comic transcriptions on
+    http://ohnorobot.com
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use WWW::OhNoRobotCom::Search;
+
+        my $site = WWW::OhNoRobotCom::Search->new;
+
+        # search XKCD comics
+        my $results_ref = $site->search( 'foo', comic_id => 56 )
+            or die $site->error;
+
+        print "Results:\n",
+                map { "$results_ref->{$_} ( $_ )\n" } keys %$results_ref;
+
+DESCRIPTION
+    The module provides interface to perform searches on
+    <http://www.ohnorobot.com> comic transcriptions website.
+
+CONSTRUCTOR
+  new
+        my $site = WWW::OhNoRobotCom::Search->new;
+
+        my $site = WWW::OhNoRobotCom::Search->new(
+            timeout => 10,
+        );
+
+        my $site = WWW::OhNoRobotCom::Search->new(
+            ua => LWP::UserAgent->new(
+                timeout => 10,
+                agent   => 'robotos',
+            ),
+        );
+
+    Constructs and returns a brand new yummy juicy WWW::OhNoRobotCom::Search
+    object. Takes two arguments, both are *optional*. Possible arguments are
+    as follows:
+
+   timeout
+        ->new( timeout => 10 );
+
+    Optional. Specifies the "timeout" argument of LWP::UserAgent's
+    constructor, which is used for searching. Defaults to: 30 seconds.
+
+   ua
+        ->new( ua => LWP::UserAgent->new( agent => 'Foos!' ) );
+
+    Optional. If the "timeout" argument is not enough for your needs of
+    mutilating the LWP::UserAgent object used for searching, feel free to
+    specify the "ua" argument which takes an LWP::UserAgent object as a
+    value. Note: the "timeout" argument to the constructor will not do
+    anything if you specify the "ua" argument as well. Defaults to: plain
+    boring default LWP::UserAgent object with "timeout" argument set to
+    whatever "WWW::OhNoRobotCom::Search"'s "timeout" argument is set to as
+    well as "agent" argument is set to mimic Firefox.
+
+METHODS
+  search
+        my $results_ref = $site->search('foo')
+            or die $site->error;
+
+        my $xkcd_results_ref = $site->search(
+            'foo',
+            comic_id    => 56,
+            include     => [ qw(all_text meta) ],
+            max_results => 20,
+        ) or die $site->error;
+
+        my $uri = $site->search( 'foo', lucky => 1 )
+            or die "No lucky :(" . $site->error;
+
+    Instructs the object to perform a search. If an error occured returns
+    either "undef" or an empty list depending on the context and the
+    description of the error will be available via "error()" method. On
+    success, returns a (possibly empty) hashref where keys are URI's poiting
+    to comics and values are titles presented in search results unless the
+    "lucky" (see below) argument is set, in which case it will return a URI
+    object pointing to the *Let the robot decide* URI or will "error out"
+    with the "Nothing was found" in the "error()" message. Takes one
+    mandatory argument and several optional arguments.
+
+    Note: the "search()" can make several requests, (see "max_results"'s
+    argument) but it will tell you about only the *first* network error, any
+    network errors occuring later during the search will not be reported,
+    will be silently skipped and the internal "results found" counter will
+    be increased by 10 to prevent any infinite loops.
+
+    The first argument (mandatory) is the term you want to search. The
+    other, optional, arguments are given in a key/value fashion and are as
+    follows:
+
+   comic_id
+        $site->search( 'term', comic_id => 56 );
+
+    The "comic_id" argument takes a scalar as a value which should be a
+    comic ID number or an empty string which indicates that search should be
+    done on all comics. To obtain the comic ID number go to
+    <http://www.ohnorobot.com/index.pl?show=advanced>, "View Source" and
+    search for the name of the comic, when you'll find an <option> the
+    "value=""" attribute of that option will be the number you are looking
+    for. Idealy, it would make sense to make the "search()" method accepts
+    names instead of those numbers, but there are just too many (500+)
+    different comics sites and new are being added, blah blah (me is lazy
+    too :) ). Defaults to: empty string, meaning search through all the
+    comics.
+
+   include
+        $site->search( 'term', include => [ qw(all_text meta) ] );
+
+    Specifies what kind of "things" to include into consideration when
+    performing the search. Takes an arrayref as an argument. Defaults to:
+    all possible elements included which are as follows:
+
+    all_text  Include *All comic text*.
+
+    scene     Include *Scene descriptions*.
+
+    sound     Include *Sound effects*.
+
+    speakers  Include *Speakers' names*
+
+    link      Include *Link text*.
+
+    meta      Include *Meta information*
+
+   max_results
+        $site->search( 'term', max_results => 30 );
+
+    The number of results displayed on <http://www.ohnorobot.com> is 10, the
+    object will send out several requests if needed to obtain the number of
+    results specified in the "max_results" argument. Don't use extremely
+    large values here, as the amount of requests will NOT be "max_results /
+    10" because results are often repeating and the object will count only
+    unique URIs on the results page. Defaults to: 10 (this does not
+    necessarily mean that the object will send only one request).
+
+   lucky
+        $site->search( 'term', lucky => 1 );
+
+    ARE YOU FEELING LUCKY?!!? If so, the "lucky" argument, when set to a
+    true value, will "press" the *Let the robot decide* button on
+    <http://www.ohnorobot.com> and the "search" method will return a URI
+    object poiting to the comic which the *ahem* "robot" thinks is what you
+    want. Note: when using the "lucky" argument the "search()" method will
+    return either "undef" or an empty list (depending on the context) if
+    nothing was found. Defaults to: a false value (no feelin' lucky :( )
+
+  error
+        $site->search('term')
+            or die $site->error;
+
+    If "search()" method failed, be it due to a network error or nothing
+    found for "lucky" search it will return either "undef" or an empty list
+    depending on the context and the error will be available via "error()"
+    method. Takes no arguments, returns a human parsable message describing
+    why "search()" failed.
+
+  results
+        my $results = $site->results;
+
+    Must be called after a successfull call to "search()". Takes no
+    arguments, returns the exact same thing last "search()" returned. See
+    "search()" method's description for more information.
+
+  ua
+        my $old_ua = $site->ua;
+
+        $site->ua( LWP::UserAgent->new( timeout => 10, agent => 'agent007' );
+
+    Returns an LWP::UserAgent object used for searching. When called with an
+    optional argument which should be an LWP::UserAgent object the
+    WWW::OhNoRobotCom::Search will use the argument in any subsequent
+    "search()"es.
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-www-ohnorobotcom-search at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-OhNoRobotCom-Search>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::OhNoRobotCom::Search
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-OhNoRobotCom-Search>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-OhNoRobotCom-Search>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-OhNoRobotCom-Search>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-OhNoRobotCom-Search>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

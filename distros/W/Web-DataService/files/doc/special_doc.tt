@@ -1,0 +1,4 @@
+
+<% WRAPPER PARAMETERS(special) %>
+You can use any of the following special parameters with any request:
+<% END %>

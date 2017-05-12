@@ -1,0 +1,86 @@
+NAME
+    WWW::Hashbang::Pastebin::Client - a client library for
+    WWW::Hashbang::Pastebin websites
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        use WWW::Hashbang::Pastebin::Client;
+        my $client = WWW::Hashbang::Pastebin::Client->new(url => 'http://p.hashbang.ca');
+
+        # retrieve paste content by paste ID
+        print $client->get('b'), "\n";
+
+        # create a paste from a string
+        my $pasted_string_url = $client->paste(paste => rand());
+
+        # create a paste from a file
+        my $pasted_file_url = $client->paste(file => '/var/log/syslog');
+
+        print "$pasted_string_url\n$pasted_file_url\n";
+
+DESCRIPTION
+    WWW::Hashbang::Pastebin::Client is, as you might expect, a client
+    library for interfacing with WWW::Hashbang::Pastebin websites. It also
+    ships with an example command-line client p.
+
+METHODS
+  new
+    Creates a new client object. You must provide the URL of the
+    WWW::Hashbang::Pastebin site you want to talk to:
+
+        my $client = WWW::Hashbang::Pastebin::Client->new(url => 'http://p.hashbang.ca');
+
+  paste
+    Create a new paste on the specified website. Specify either "file" to
+    read in the named file, or "paste" to provide the text directly:
+
+        # create a paste from a string
+        my $pasted_string_url = $client->paste(paste => rand());
+
+        # create a paste from a file
+        my $pasted_file_url = $client->paste(file => '/var/log/syslog');
+
+        print "$pasted_string_url\n$pasted_file_url\n";
+
+  put
+    This is a synonym for "paste".
+
+  get
+    Get paste content from the pastebin. Pass just the ID of the paste:
+
+        # retrieve paste content by paste ID
+        print $client->get('b'), "\n";
+
+  retrieve
+    This is a synonym for "get"
+
+AVAILABILITY
+    The project homepage is
+    <http://metacpan.org/release/WWW-Hashbang-Pastebin-Client/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/WWW::Hashbang::Pastebin::Client/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/WWW-Hashbang-Pastebin-Client> and may be
+    cloned from <git://github.com/doherty/WWW-Hashbang-Pastebin-Client.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <https://github.com/doherty/WWW-Hashbang-Pastebin-Client/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

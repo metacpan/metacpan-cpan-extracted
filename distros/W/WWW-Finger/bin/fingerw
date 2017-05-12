@@ -1,0 +1,202 @@
+#!/usr/bin/perl
+
+use DateTime;
+use Getopt::Long qw(:config no_ignore_case bundling no_getopt_compat permute);;
+use Pod::Usage;
+use RDF::Trine::Serializer::RDFXML;
+use RDF::Trine::Serializer::NTriples;
+use RDF::Trine::Serializer::RDFJSON;
+use WWW::Finger;
+
+my $format  = 'text';
+my $verbose = 0;
+
+GetOptions(
+	'format|f=s'    => \$format,
+	'verbose|v+'    => \$verbose,
+	'help|h|?'      => \$help,
+	);
+
+if ($verbose > 1)
+{
+	warn "Verbosity is $verbose.\n";
+}
+
+pod2usage(1) if $help;
+
+my $address = shift @ARGV
+	or pod2usage("$0: Must supply an address.\n");
+
+pod2usage("Supported formats: text, vcard, xml, nt, json.\n")
+	unless $format =~ /^(text|vcard|xml|nt|json)$/i;
+
+my $finger = WWW::Finger->new($address);
+
+die "Could not find any info for address $address.\n"
+	unless defined $finger;
+
+if ($verbose)
+{
+	warn sprintf("Used implementation: %s.\n", ref $finger);
+}
+
+if ($format =~ /xml/i)
+{
+	die "Could not generate RDF graph.\n"
+		unless $finger->graph;
+	my $s = RDF::Trine::Serializer::RDFXML->new;
+	print $s->serialize_model_to_string($finger->graph);
+}
+
+elsif ($format =~ /nt/i)
+{
+	die "Could not generate RDF graph.\n"
+		unless $finger->graph;
+	my $s = RDF::Trine::Serializer::NTriples->new;
+	print $s->serialize_model_to_string($finger->graph);
+}
+
+elsif ($format =~ /json/i)
+{
+	die "Could not generate RDF graph.\n"
+		unless $finger->graph;
+	my $s = RDF::Trine::Serializer::RDFJSON->new;
+	print $s->serialize_model_to_string($finger->graph,{pretty=>1})."\n";
+}
+
+elsif ($format =~ /vcard/i)
+{
+	print "BEGIN:VCARD\n";
+	print "VERSION:3.0\n";
+	if ($finger->can('endpoint') && length $finger->endpoint)
+	{
+		printf("SOURCE;X-QUERY=SPARQL:%s\n", vcard_escape($finger->endpoint));
+	}
+	elsif ($finger->isa('WWW::Finger::BitworkingFingerProtocol'))
+	{
+		printf("SOURCE:%s\n", vcard_escape($finger->{'profile_uri'}));
+	}
+	printf("FN:%s\n", vcard_escape($finger->name))
+		if $finger->name;
+	if ($finger->can('nick'))
+	{
+		foreach my $nick ($finger->nick)
+		{
+			printf("NICKNAME:%s\n", vcard_escape($nick));
+		}
+	}
+	printf("UID:%s\n", vcard_escape($finger->webid))
+		if $finger->webid;
+	foreach my $email ($finger->mbox)
+	{
+		$email =~ s/^mailto://i;
+		printf("EMAIL;TYPE=INTERNET:%s\n", vcard_escape($email));
+	}
+	foreach my $u ($finger->homepage)
+	{
+		printf("URL:%s\n", vcard_escape($u));
+	}
+	foreach my $u ($finger->weblog)
+	{
+		printf("URL;TYPE=X-WEBLOG:%s\n", vcard_escape($u));
+	}
+	foreach my $u ($finger->image)
+	{
+		printf("PHOTO;VALUE=URI:%s\n", vcard_escape($u));
+	}
+	foreach my $u ($finger->key)
+	{
+		printf("KEY;VALUE=URI:%s\n", vcard_escape($u));
+	}
+	printf("REV:%s\n", DateTime->now->strftime('%Y%m%dT%H%M%S'));
+	print "END:VCARD\n";
+}
+
+else
+{
+	print "<" . $finger->webid . ">\n";
+	
+	foreach my $field (qw(name homepage mbox weblog image key))
+	{
+		my @r = $finger->$field;
+		print "\t$field:\n"
+			if @r;
+		foreach my $value (@r)
+		{
+			print "\t\t$value\n";
+		}
+	}
+}
+
+sub vcard_escape
+{
+	my $rv = shift;
+	
+	$rv =~ s/\\/\\\\/g;
+	$rv =~ s/\"/\\\"/g;
+	$rv =~ s/\t/\\t/g;
+	$rv =~ s/\r/\\r/g;
+	$rv =~ s/\n/\\n/g;
+	
+	return $rv;
+}
+
+__END__
+
+=head1 NAME
+
+fingerw - WWW::Finger command-line tool
+
+=head1 SYNOPSIS
+
+fingerw [options] identifier
+
+  Options:
+    --help, -h         this help message
+    --format=F, -f F   output format
+    --verbose, -v      increase verbosity
+
+The identifier should be an e-mail-like URI.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--format>
+
+Sets the output format. Currently supported are 'text' (a human
+readable plain text output - the default), 'vcard' (vCard 3.0),
+'xml' (RDF/XML) and 'nt' (N-Triples);
+
+The amount and type of data returned may vary depending on which
+format is chosen.
+
+=item B<--verbose>
+
+Shows debugging messages.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster, E<lt>tobyink@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 by Toby Inkster
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

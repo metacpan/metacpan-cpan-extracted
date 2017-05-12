@@ -1,0 +1,14 @@
+Changes
+lib/WWW/Search/Coveralia.pm
+lib/WWW/Search/Coveralia/Albums.pm
+lib/WWW/Search/Coveralia/Artists.pm
+lib/WWW/Search/Coveralia/Result/Album.pm
+lib/WWW/Search/Coveralia/Result/Artist.pm
+Makefile.PL
+MANIFEST
+README
+t/albums.t
+t/artists.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

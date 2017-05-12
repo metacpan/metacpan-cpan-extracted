@@ -1,0 +1,199 @@
+NAME
+    WWW::Foursquare - is a Perl wrapper for the Foursqauare API.
+
+DESCRIPTION
+    This wrapper help you send requests to Foursquare API and get result in easy way, OAuth is supported, quick integration with your current project.
+    You can get more information about Foursquare API here: 
+    https://developer.foursquare.com/ 
+
+
+SYNOPSIS
+    use WWW::Foursquare;
+    
+    # Create fs object
+    my $fs = WWW::Foursquare->new(
+        client_id     => 'client_id',
+        client_secret => 'client_secret',
+        redirect_uri  => 'redirect_uri',
+    );
+
+    # Set access_token
+    my $access_token = 'XXXX';
+    $fs->set_token($access_token);
+
+    # Search users by name
+    my $search_users = eval { $fs->users()->search(name => 'Pavel Vlasov') };
+   
+    if (not $@) {
+        
+        # work with result in Perl structure
+        # print Dumper($search_users);
+    }
+    else {
+
+        # process errors
+        warn $@ if $@;
+    }
+
+INTEGRATION
+
+    How to connect your apps with foursquare via OAuth 2.0.
+
+      1. Create foursquare app: 
+
+        https://foursquare.com/developers/apps
+
+        Get Client ID, Client Secret and Callback url
+
+        my $fs = WWW::Foursquare->new(
+            client_id     => 'client_id',
+            client_secret => 'client_secret',
+            redirect_uri  => 'redirect_uri',
+        );
+
+      2. Get auth url for your apps:
+
+        my $auth_url = $fs->get_auth_url();
+
+        It looks like this:
+        https://foursquare.com/oauth2/authenticate?client_id=client_id&redirect_uri=redirect_url&response_type=code
+
+      3. Have a user authorize your app.
+
+        Implement callback in your server. 
+
+        - You click on auth url to go to autorize page. 
+        - If authorization is successful you will redirect to callback url and get code.
+        - Then you use this code for getting access_token for Foursquare API 
+
+        http://your_server.com/callback&code=XXXXXXX
+        my $code = ... # getting code here
+
+        Allow app to access to your account in foursquare
+
+        my $access_token = $fs->get_access_token($code);
+        Background magic will send GET request to Foursquare API 
+
+      4. Set access_token and using Foursquare API
+
+        $fs->set_access_token($access_token);
+
+    For more information I would like recommend you visit page:
+    https://developer.foursquare.com/overview/auth
+
+DEBUG MODE
+
+my $fs = WWW::Foursquare->new(
+    debug => 1,
+);
+
+METHODS
+
+    new
+
+      Creating a new foursquare object.
+
+      my $fs = WWW::Foursquare->new(
+          client_id     => 'client_id',
+          client_secret => 'client_secret',
+          redirect_uri  => 'redirect_uri',
+      );
+
+    get_auth_url
+      Prepare auth url from Foursquare parameters (cliend_id, redirect_uri)
+
+      my $auth_url = $fs->get_auth_url();
+
+      If you want to use itself method for forsquare API:
+
+      $fs->users->info(); # get info about users etc
+
+    get_access_token
+      Get code after redirect, and send GET request to fetch access token
+
+      my $access_token = $fs->get_access_token($code);
+
+    set_access_token
+      Set access token for foursquare object
+
+    users
+      All users methods: https://developer.foursquare.com/docs/users/users
+
+    venues
+      All venues methods: https://developer.foursquare.com/docs/venues/venues
+
+    venuegroups
+      All venuegroups methods: https://developer.foursquare.com/docs/venuegroups/venuegroups
+
+    checkins
+      All checkins methods: https://developer.foursquare.com/docs/checkins/checkins
+
+    tips
+      All tips methods: https://developer.foursquare.com/docs/tips/tips
+
+    lists
+      All lists methods: https://developer.foursquare.com/docs/lists/lists
+
+    updates
+      All updates methods: https://developer.foursquare.com/docs/updates/updates
+
+    photos
+      All photos methods: https://developer.foursquare.com/docs/photos/photos
+
+    settings
+      All settings methods: https://developer.foursquare.com/docs/settings/settings
+
+    specials
+      All specials methods: https://developer.foursquare.com/docs/specials/specials
+
+    campaigns
+      All campaigns methods: https://developer.foursquare.com/docs/campaigns/campaigns
+
+    events
+      All events methods: https://developer.foursquare.com/docs/events/events
+
+    pages
+      All pages methods: https://developer.foursquare.com/docs/pages/pages
+
+    pageupdates
+      All pageupdates methods: https://developer.foursquare.com/docs/pageupdates/pageupdates
+
+EXAMPLES
+    You can see examples how to use WWW::Foursquare. 
+    Here: /eg/test.pl
+
+AUTHOR
+    Pavel Vlasov, fxzuz at cpan.org
+
+BUGS
+    Please report any bugs or feature requests to bug-www-foursquare at rt.cpan.org, or through
+    the web interface at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Foursquare.  I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+        perldoc WWW::Foursquare
+
+
+    You can also look for information at:
+    * Github 
+    http://github.com/fxzuz/WWW-Foursquare/
+
+    * RT: CPAN's request tracker (report bugs here)
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Foursquare
+
+    * AnnoCPAN: Annotated CPAN documentation
+    http://annocpan.org/dist/WWW-Foursquare
+
+    * CPAN Ratings
+    http://cpanratings.perl.org/d/WWW-Foursquare
+
+    * Search CPAN
+    http://search.cpan.org/dist/WWW-Foursquare/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2012 Pavel Vlasov.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

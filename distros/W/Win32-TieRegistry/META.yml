@@ -1,0 +1,29 @@
+---
+abstract: Manipulate the Win32 Registry
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-TieRegistry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Tie::Hash: 0
+  Win32::WinError: 0
+  Win32API::Registry: 0.33
+  perl: 5.006
+resources:
+  repository: git://github.com/chorny/Win32-TieRegistry.git
+version: 0.30

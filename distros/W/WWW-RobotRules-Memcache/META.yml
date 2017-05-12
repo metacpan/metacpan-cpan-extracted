@@ -1,0 +1,16 @@
+---
+name: WWW-RobotRules-Memcache
+version: 0.1
+author:
+  - 'Nick Gerakines <nick@gerakines.net>'
+abstract: Use memcached in conjunction with WWW::RobotRules
+license: perl
+requires:
+  Cache::Memcached: 0
+build_requires:
+  Test::More: 0
+provides:
+  WWW::RobotRules::Memcache:
+    file: lib/WWW/RobotRules/Memcache.pm
+    version: 0.1
+generated_by: Module::Build version 0.2612

@@ -1,0 +1,19 @@
+{
+    "data": {
+        "info": [
+            {
+                "error": "NOT_FOUND",
+                "short_url": "http://bit.ly/a.35"
+            },
+            {
+                "created_by": "scotster",
+                "global_hash": "lLWr",
+                "hash": "j3",
+                "title": "test title",
+                "user_hash": "j3"
+            }
+        ]
+    },
+    "status_code": 200,
+    "status_txt": "OK"
+}

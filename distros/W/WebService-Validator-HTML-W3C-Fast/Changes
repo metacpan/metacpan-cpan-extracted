@@ -1,0 +1,10 @@
+Revision history for Perl extension WebService::Validator::HTML::W3C::Fast.
+
+0.02  Thu Mar  5 20:00:15 2009
+	- changed name to WebService::Validator::HTML::W3C::Fast
+	- fixed Makefile.PL to point to WebService::Validator::HTML::W3C as a dependency
+
+0.01  Wed Mar  4 13:01:46 2009
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n WebService::Validator::HTML::W3C::Fast
+

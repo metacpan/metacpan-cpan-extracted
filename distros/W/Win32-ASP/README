@@ -1,0 +1,235 @@
+NAME
+    Win32::ASP - a module for ASP (PerlScript) Programming
+
+SYNOPSIS
+        use Win32::ASP;
+
+        print "This is a test<BR><BR>";
+
+        $PageName = GetFormValue('PageName');
+
+        if ($PageName eq 'Select a page...')
+          {
+            die "Please go back and select a value from the Pages list.";
+          }
+
+        print "You selected the ", $PageName, " page.<BR>";
+
+        exit;
+
+DESCRIPTION
+    I knocked these routines together one day when I was wondering "Why
+    don't my `print' statements output to the browser?" and "Why don't
+    `exit' and `die' end my script?" So I started investigating how I could
+    overload the core functions. `print' is overloaded via the `tie'
+    mechanism (thanks to Eryq (eryq@zeegee.com), Zero G Inc. for the code
+    which I ripped from IO::Scalar).
+
+    Also added recently was `AddDeathHook', which allows cleanup code to be
+    executed upon an `exit' or `die'. `BinaryWrite' wraps up Unicode
+    conversion and `$Response->BinaryWrite' in one call. Finally, I was
+    annoyed that I couldn't just develop a script using GET, then change to
+    POST for release, since ASP code handles each one differently.
+    `GetFormValue' solves that one.
+
+  Installation instructions
+
+    Assuming the ActiveState repository is up-to-date with the latest
+    archive from CPAN, you should be able to type:
+
+        ppm install Win32-ASP
+
+    on the command line. Make sure you're connected to the Internet first.
+
+    Installing via MakeMaker is pretty standard -- just download the archive
+    from CPAN, extract it to some directory, then type in that directory:
+
+        perl Makefile.PL
+        nmake
+        nmake install
+
+    Don't do `nmake test' because the ASP objects won't be available.
+
+Function Reference
+  Print LIST
+
+    Obsolete - use `print' instead.
+
+    Outputs a string or comma-separated list of strings to the browser. Use
+    as if you were using `print' in a CGI application. `Print' handles the
+    ASP limitation of 128K per `$Response->Write' call.
+
+    Note: `print' calls `Print', so you can actually use either one, but
+    `print' is more integrated with "the Perl way."
+
+  DebugPrint LIST
+
+    The same as `Print', except the output is wrapped in HTML comment
+    markers, so that you can only see it by viewing the page source.
+    `DebugPrint' is not exported, so call it as
+
+        Win32::ASP::DebugPrint($val);
+
+    This function is useful for debugging your application. For example, I
+    use it to print out SQL before it is executed.
+
+  HTMLPrint LIST
+
+    The same as `Print', except the output is encoded so that any HTML tags
+    appear as sent, i.e. < becomes &lt;, > becomes &gt;, etc. `HTMLPrint' is
+    not exported, so call it as
+
+      Win32::ASP::HTMLPrint($val);
+
+    This function is useful for printing output that comes from a database
+    or a file, where you don't have total control over the input.
+
+  wprint LIST
+
+    Deprecated - use `print' instead.
+
+  die LIST
+
+    Outputs the contents of LIST to the browser and then exits. `die'
+    automatically calls `$Response->End' and executes any cleanup code added
+    with `AddDeathHook'.
+
+  exit
+
+    Exits the current script. `exit' automatically calls `$Response->End'
+    and executes any cleanup code added with `AddDeathHook'.
+
+  HTMLEncode LIST
+
+    The same as `HTMLPrint', except the output is not printed but returned
+    as a scalar instead. `HTMLEncode' is not exported, so call it as
+
+        my $text = Win32::ASP::HTMLEncode($val);
+
+    This function is useful to handle output that comes from a database or a
+    file, where you don't have total control over the input.
+
+    If an array reference is passed, `HTMLEncode' uses it. Otherwise, it
+    assumes an array of scalars is used. Using a reference makes for less
+    time spent passing values back and forth, and is the prefered method.
+
+  GetFormValue EXPR [, EXPR]
+
+    Returns the value passed from a form (or non-form GET request). Use this
+    method if you want to be able to develop in GET mode (for ease of
+    debugging) and move to POST mode for release. The second (optional)
+    parameter is for getting multiple parameters, as in
+
+        http://localhost/scripts/test.asp?Q=a&Q=b
+
+    In the above, `GetFormValue("Q", 1)' returns "a" and
+    `GetFormValue("Q", 2)' returns "b".
+
+    `GetFormValue' will work in an array context too, returning all the
+    values for a particular parameter. For example, with the above URL:
+
+        my @AllQs = GetFormValue('Q');
+
+    will result in the array `@AllQs' containing `('a', 'b')'.
+
+    If you call `GetFormValue' without any parameters, it will return a list
+    of form parameters in the same way that CGI.pm's `param' function does.
+    This allows easy iteration over the form elements:
+
+        for my $key (GetFormValue())
+          {
+            print "$key = ", GetFormValue($key), "<br>\n";
+          }
+
+    For convenience, Win32::ASP exports `param' as an alias for
+    `GetFormValue'.
+
+  param EXPR [, EXPR]
+
+    `param' is an alias for `GetFormValue'.
+
+  GetFormCount EXPR
+
+    Returns the number of times EXPR appears in the request (Form or
+    QueryString). Use this value as `$i' to iterate over
+    `GetFormValue(EXPR, $i)'.
+
+    For example, if the URL is:
+
+        http://localhost/scripts/myscript.asp?Q=a&Q=b
+
+    And code is:
+
+        my $numQs = GetFormCount('Q');
+
+    Then `$numQs' will equal 2.
+
+  AddDeathHook LIST
+
+    This frightening-sounding function allows you to have cleanup code
+    executed when you `die' or `exit'. For example, you may want to
+    disconnect from your database if there is a problem:
+
+        <%
+            my $Conn = $Server->CreateObject('ADODB.Connection');
+            $Conn->Open( "DSN=BADEV1;UID=sa;DATABASE=ProjAlloc" );
+            $Conn->BeginTrans();
+
+            Win32::ASP::AddDeathHook( sub { $Conn->Close if $Conn; } );
+        %>
+
+    Now when you `die' because of an error, your database connection will
+    close gracefully, instead of you having loads of rogue connections that
+    you have to kill by hand, or restart your database once a day.
+
+    Death hooks are not executed upon the normal termination of the script,
+    so if you have processing that should occur upon a normal exit, be sure
+    to execute it directly.
+
+  BinaryWrite LIST
+
+    Performs the same function as `$Response->BinaryWrite', but handles
+    Perl's Unicode-related null padding. This function is not exported, so
+    call it as
+
+      Win32::ASP::BinaryWrite($val);
+
+  LoadEnvironment
+
+    Copies the `$Request->ServerVariables' collection to the `%ENV' hash,
+    allowing the values to be accessed as environment variables. Changes to
+    `%ENV' are not propagated back to the `ServerVariables' collection, and
+    changes to the `ServerVariables' collection do not automatically appear
+    in `%ENV'. To see any such changes, simply run `LoadEnvironment' again.
+
+    `LoadEnvironment' is not exported, so run it as follows:
+
+        Win32::ASP::LoadEnvironment;
+
+  SetCookie Name, Value [, HASH]
+
+    Sets the cookie *Name* with the value *Value*. The optional HASH can
+    contain any of the following parameters:
+
+    * -expires => A CGI.pm style expires value (see the CGI.pm header()
+    documentation).
+    * -domain => a domain in the style ".matt.com" that the cookie is
+    returned to.
+    * -path => a path that the cookie is returned to.
+    * -secure => cookie only gets returned under SSL if this is true.
+    If *Value* is a hash reference, then it creates a cookie dictionary. See
+    the ASP docs for more info on cookie dictionaries.
+
+    Example:
+
+        Win32::ASP::SetCookie("Matt", "Sergeant", ( -expires => "+3h",
+            -domain => ".matt.com",
+            -path => "/users/matt",
+            -secure => 0 ));
+
+AUTHORS
+    Originally created by Matt Sergeant <matt@sergeant.org>.
+
+    Currently being maintained and updated by Bill Odom
+    <wnodom@intrasection.com>.
+

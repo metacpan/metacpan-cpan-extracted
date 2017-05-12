@@ -1,0 +1,104 @@
+WordNet::QueryData perl module
+------------------------------
+
+WordNet::QueryData provides a direct interface to the WordNet database
+files.  It requires the WordNet package
+(http://wordnet.princeton.edu/).  It allows the user direct access to
+the full WordNet semantic lexicon.  All parts of speech are supported
+and access is generally very efficient because the index and morphical
+exclusion tables are loaded at initialization.  This initialization
+step is slow (appx. 10-15 seconds), but queries are very fast
+thereafter---thousands of queries can be completed every second.
+
+PREREQUISITES
+-------------
+
+- Perl5
+- WordNet Database Package version 3.0
+
+DOCUMENTATION
+-------------
+
+Make sure to read the included man page ("perldoc QueryData.pm" or
+"perldoc WordNet::QueryData" to extract).
+
+The ChangeLog file lists a summary of changes to the code.
+
+See http://groups.google.com/group/wn-perl for information on the mailing list.
+
+WINDOWS INSTALLATION
+--------------------
+
+This assumes that perl was installed to the default location (C:\perl).
+
+  0) Make sure that you have installed WordNet to C:\Program Files\WordNet\3.0
+  1) Unpack the WordNet QueryData distribution
+  2) Create the directory C:\perl\site\lib\WordNet
+  3) Copy QueryData.pm to C:\perl\site\lib\WordNet
+  4) Run "perl test.pl" to test the installation
+
+Alternatively, you can install NMake and use the Make installation steps.
+See http://johnbokma.com/perl/make-for-windows.html for info on NMake.
+
+MAKE INSTALLATION
+-----------------
+
+Installation uses the perl MakeMaker utility ('perldoc
+ExtUtils::MakeMaker').  To build and test the distribution do:
+
+     perl Makefile.PL
+     make
+     make test
+
+If "perl Makefile.PL" breaks or "make test" doesn't work at all ("not ok 1"),
+you may not have the WNHOME or WNSEARCHDIR environment variables defined
+correctly.  Read the QueryData manual page ("perldoc QueryData.pm") to find out
+how to tell it where your WordNet database is located (you'll need to edit
+test.pl).  Note that if you are are using Debian/Ubuntu and have the standard
+wordnet package installed , you should set WNSEARCHDIR to /usr/share/wordnet.
+
+If any of the tests fail, send e-mail to the wn-perl mailing list (see
+DOCUMENTATION).
+
+If the tests run okay, install with (this may need to be run as root):
+
+     make install
+
+CUSTOM DIRECTORY
+----------------
+
+To install WordNet::QueryData in /foo/bar/baz do:
+
+mkdir /foo/bar/baz/WordNet
+cp QueryData.pm /foo/bar/baz/WordNet
+
+Make sure to add /foo/bar/baz to perl's @INC variable (e.g. -I/foo/bar/baz)
+
+COPYRIGHT
+---------
+
+Copyright (C) 1999-2006 Jason Rennie.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+CITATION
+--------
+
+If you use this software as a contribution to a published work, please
+cite it like this:
+
+@misc{Rennie00
+,author = "Jason Rennie"
+,title = "WordNet::QueryData: a {P}erl module for accessing the {W}ord{N}et 
+database"
+,howpublished = "http://people.csail.mit.edu/~jrennie/WordNet"
+,year = 2000
+}
+
+KNOWN BUGS
+----------
+
+validForms does not implement WordNet's morphological processing
+correctly.  Only the first element of the list returned by validForms
+is guaranteed to be valid.  Later elements may not be valid.

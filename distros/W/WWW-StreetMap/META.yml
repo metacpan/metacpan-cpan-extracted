@@ -1,0 +1,25 @@
+---
+name: WWW-StreetMap
+version: 0.18
+author: []
+abstract: Interface to http://www.streetmap.co.uk/
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Temp: 0
+  IO::All: 0.38
+  IO::All::LWP: 0.14
+  Image::Magick: 0
+  OpenOffice::OODoc: 0
+build_requires:
+  Devel::CheckOS: 1.42
+  Test::Distribution: 1.29
+provides:
+  WWW::StreetMap:
+    file: lib/WWW/StreetMap.pm
+    version: 0.18
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

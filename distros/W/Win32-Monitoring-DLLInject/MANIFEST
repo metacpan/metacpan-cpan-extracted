@@ -1,0 +1,16 @@
+Changes
+DLLInject.pm
+DLLInject.xs
+HookedFunctions/HookedFunctions.c
+HookedFunctions/Makefile
+HookedFunctions/Makefile.migw32.mak
+HookedFunctions/README
+HookedFunctions/test_llu.c
+LICENSE
+MANIFEST
+Makefile.PL
+README
+ppport.h
+t/Win32-Monitoring-DLLInject.t
+example.pl
+typemap

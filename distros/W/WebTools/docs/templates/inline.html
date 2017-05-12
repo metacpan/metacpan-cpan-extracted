@@ -1,0 +1,216 @@
+<html>
+<head>
+<title>Templates: INLINE/INPERL and INLUDE</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#3300CC" vlink="#3300CC" alink="#3300CC" leftmargin="10" topmargin="5" marginwidth="10" marginheight="5">
+<table width="100%" border="0" cellspacing="3" cellpadding="3" background="bgimage.jpg"> 
+<tr> <td bordercolor="#0000FF"> <p align="center"><font face="Times New Roman, Times, serif" size="4"><b><font size="3" face="Verdana, Arial, Helvetica, sans-serif" color="#000000">WebTools 
+Templates:<font color="#0000CC"> Page 2</font></font></b></font> </p>
+      <p><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><font face="Courier New, Courier, mono" size="4" color="#000000">3. 
+        INLINE/INPERL templates: Description and reference&nbsp;</font><br>
+        <br>
+        &nbsp;&nbsp;WebTools has unique capability to manage templates with build-in 
+        functions (INLINE/INPERL), also it has &quot;xreader&quot; module that 
+        can be used directly in your WebTools scripts. With out any doubts, &quot;templates&quot; 
+        are realy important part of WebTools, so this doucument intend to be comprehensive 
+        source to learn how to work with it!<br>
+        <br>
+        &nbsp;&nbsp;&nbsp;Generally INLINE/INPERL templates have exactly same 
+        functions as normal xreader has! But INLINE/INPERL templates are more 
+        comfortable and easer to use.<br>
+        <br>
+        NOTE 1: I want to make one stipulation: INLINE and INPERL terms mean and 
+        do absolutly same things, but INPERL is used in Perl code and INLINE is 
+        used only in HTML code! From now on I will use term INLINE instead of 
+        INLINE/INPERL. <br>
+        <br>
+        NOTE 2: There is small difference between INLINE and INPERL. Result of 
+        INLINE template will be pushed directly into HTML code, where template 
+        itself exist! From another hand INPERL return it's result into default 
+        variable <font color="#FF0000">$_</font> Please keep this in your mind!<br>
+        <br>
+        INLINE syntax:<br>
+        <br>
+        &nbsp;&nbsp;<br>
+        &nbsp;&nbsp;<font color="#0000CC">&lt;!--<font color="#006633">&copy;</font>INLINE<font color="#006633">&copy;</font>&gt; 
+        inline functions &lt;/<font color="#006633">&copy;</font>INLINE<font color="#006633">&copy;</font>--&gt;</font><br>
+        <br>
+        &nbsp;&nbsp;OR <br>
+        <br>
+        &nbsp;&nbsp;<font color="#0000CC">&lt;!--<font color="#006633">&copy;</font>INPERL<font color="#006633">&copy;</font>&gt; 
+        inline functions &lt;/<font color="#006633">&copy;</font>INPERL<font color="#006633">&copy;</font>--&gt; 
+        <br>
+        </font><br>
+        <font color="#FF0066">&nbsp;&nbsp;If you want use alternative style of 
+        INILINE/INPERL:<br>
+        </font><br>
+        &nbsp;&nbsp;<font color="#0000CC">%%%INLINE%%% inline functions %%%/INLINE%%%</font><br>
+        <br>
+        &nbsp;&nbsp;OR <br>
+        <br>
+        <font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><font color="#0000CC">&nbsp;&nbsp;%%%INPERL%%% 
+        inline functions %%%/INPERL%%%</font></b></font><font color="#0000CC"><br>
+        </font><br>
+        <br>
+        &nbsp;&lt;!--&copy;INLINE&copy;&gt;&lt;/&copy;INLINE&copy;--&gt; is used 
+        to excape HTML (and repectively PERL code), so code between these &quot;tags&quot; 
+        will be parsed from WebTools engine.<br>
+        <br>
+        &nbsp;&nbsp;Supported inline functions are:<br>
+        <br>
+        <font color="#0000CC">&lt;<font color="#006633">&sect;</font>TEMPLATE<font color="#FF0000">:</font>number_of_templates_variable<font color="#FF0000">:</font>$variable<font color="#FF0000">:</font><font color="#006633">&sect;</font>&gt; 
+        <br>
+        <br>
+        &lt;XREADER<font color="#FF0000">:</font>number_of_template_in_file<font color="#FF0000">:</font>template_file.jhtml<font color="#FF0000">:</font>$first_param,$second_param,...&gt;<br>
+        <br>
+        &lt;S<font color="#006633">&copy;</font>L<font color="#FF0000">:</font>number_of_SQL_query<font color="#FF0000">:</font>&quot;SQL 
+        query;&quot;<font color="#FF0000">:</font>used_query<font color="#FF0000">:</font>row_number<font color="#FF0000">:</font>col_number<font color="#FF0000">:</font>should_be_printed?<font color="#FF0000">:</font>S<font color="#006633">&copy;</font>L&gt;<br>
+        <br>
+        &lt;S<font color="#006633">&copy;</font>LVAR<font color="#FF0000">:</font>number_of_template_variable<font color="#FF0000">:</font>S<font color="#006633">&copy;</font>L&gt;<br>
+        <br>
+        &lt;MENUSELECT<font color="#FF0000">:</font>$html_source<font color="#FF0000">:</font>&quot;SQL 
+        query&quot;<font color="#FF0000">:</font>$ref_DB<font color="#FF0000">:</font>$ref_TEMPLATE<font color="#FF0000">:</font>$ref_HTML<font color="#FF0000">:</font>$dbh<font color="#FF0000">:</font>&gt; 
+        <br>
+        </font><br>
+        <font color="#0000CC"><font color="#FF0066">&nbsp;If prefer you can use 
+        alternative syntax for all templates!</font></font><br>
+        <br>
+        &nbsp;&nbsp;Supported inline functions with alternative syntax (in any 
+        other aspect they are same):<br>
+        <br>
+        <font color="#0000CC">%%TEMPLATE<font color="#FF0000">:</font>number_of_templates_variable<font color="#FF0000">:</font>$variable<font color="#FF0000">:</font>%%<br>
+        <br>
+        %%XREADER<font color="#FF0000">:</font>number_of_template_in_file<font color="#FF0000">:</font>template_file.jhtml<font color="#FF0000">:</font>$first_param,$second_param,...%%<br>
+        <br>
+        %%SQL<font color="#FF0000">:</font>number_of_SQL_query<font color="#FF0000">:</font>&quot;SQL 
+        query;&quot;<font color="#FF0000">:</font>used_query<font color="#FF0000">:</font>row_number<font color="#FF0000">:</font>col_number<font color="#FF0000">:</font>should_be_printed?<font color="#FF0000">:</font>SQL%%<br>
+        <br>
+        %%SQLVAR<font color="#FF0000">:</font>number_of_template_variable%%<br>
+        <br>
+        %%MENUSELECT<font color="#FF0000">:</font>$html_source<font color="#FF0000">:</font>&quot;SQL 
+        query&quot;<font color="#FF0000">:</font>$ref_DB<font color="#FF0000">:</font>$ref_TEMPLATE<font color="#FF0000">:</font>$ref_HTML<font color="#FF0000">:</font>$dbh<font color="#FF0000">:</font>%%<br>
+        </font><br>
+        I don't like to make analogy between &quot;normal&quot; templates described 
+        in previuos page because thay practicaly is absolutely equal. I just think 
+        to show you an example that will help you to understand difference.<br>
+        <br>
+        At last I forgot to introduce new feature that will be useful. This &quot;function&quot; 
+        include file in your perl/html file independ of it's contain (it can be 
+        perl code or html... no matter!)<br>
+        INCLUDE syntax:<br>
+        <br>
+        <font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;&lt;!--<font color="#0000FF">&copy;</font>INCLUDE<font color="#0000FF">&copy;</font>file.ext<font color="#0000FF">&copy;</font>--&gt;</font></b></font><br>
+        <br>
+        or alternative syntaxes:<br>
+        <br>
+        <font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;&lt;!--<font color="#0000FF">%</font>INCLUDE<font color="#0000FF">%</font>file.ext<font color="#0000FF">%</font>--&gt;</font></b></font><br>
+        <br>
+        OR<br>
+        <br>
+        <font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;<font color="#0000FF">%%%</font>INCLUDE<font color="#0000FF">%</font>file.ext<font color="#0000FF">%%%</font></font></b></font> 
+        <br>
+        <br>
+        Note that you should not use INLINE/INPERL tag for that function!!! (For 
+        more info see example below)<br>
+        <br>
+        <FONT SIZE="3">To see full description of INLINE/INPERL syntax and comparison 
+        between them and &quot;normal&quot; templates click <A HREF="syncomp.html"><FONT SIZE="2">HERE</FONT></A>.</FONT><BR>
+        <br>
+        <font face="Courier New, Courier, mono" size="4" color="#000000"><a name="example"></a>4. 
+        INLINE/INPERL templates: How to use it?</font><br>
+        <br>
+        All INLINE and INPERL templates are located in our pretty perl/html (as 
+        we use to refer to them: WebTools perl code)&nbsp;without care whether 
+        database is connected or not! WebTools will care about evry insignificant 
+        detail in this form of templates. Just watch out!<br>
+        <br>
+        </b></font><font color="#000000"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">----- 
+        Please save this file as: jhtml/inline.jhtml but remove this line -----<br>
+        <font color="#993366">Any information here is comment till begining separator<br>
+        &lt;&copy;N&reg;1&reg;1&reg;&reg;&copy;&gt;<br>
+        &lt;BR&gt;Are you male? &lt;input type=&quot;radio&quot; name=&quot;Male&quot; 
+        value=&quot;Y&quot; &lt;&sect;TEMPLATE:1&sect;&gt;&gt;Yes<br>
+        &lt;input type=&quot;radio&quot; name=&quot;Male&quot; value=&quot;N&quot; 
+        &lt;&sect;TEMPLATE:2&sect;&gt;&gt;No<br>
+        &lt;input type=&quot;radio&quot; name=&quot;Male&quot; value=&quot;-&quot; 
+        &lt;&sect;TEMPLATE:3&sect;&gt;&gt;Unknown :-)</font></font></b></font><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        &lt;&#152;&copy;&#152;&gt;<br>
+        </font></b></font><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">----- 
+        This is end of file. Please remove this line -----<br>
+        </font></b><b><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        </font><font color="#000000"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">----- 
+        Please save this file as: htmls/include.whtml but remove this line -----<br>
+        </font></b></font><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif" color="#993366">$color 
+        = 'red';</font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        ----- This is end of file. Please remove this line -----</font></b><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+        <br>
+        <br>
+        </font><font color="#000000"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">----- 
+        Please save this file as: htmls/inline.whtml but remove this line -----<br>
+        </font></b></font><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&lt;!-- 
+        PERL: Hide Perl`s script<br>
+        &lt;?perl <br>
+        Header(type=&gt;'content',val=&gt;'text/html; charset=Windows-1251');<br>
+        &lt;!--&copy;INCLUDE&copy;include.whtml&copy;--&gt; # That will include 
+        file with color definitions!<br>
+        ?&gt;<br>
+        //--&gt;<br>
+        &lt;HTML&gt;<br>
+        &lt;HEAD&gt;<br>
+        &lt;TITLE&gt;INLINE Example&lt;/TITLE&gt;<br>
+        &lt;/HEAD&gt;<br>
+        &lt;BODY TEXT=&quot;white&quot; BGCOLOR=&quot;black&quot; LINK=&quot;red&quot;<br>
+        VLINK=&quot;</font><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&lt;!--&copy;INLINE&copy;&gt;</font></b></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b>&lt;&sect;TEMPLATE:7:$color:&sect;&gt;<font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&lt;/&copy;INLINE&copy;--&gt;</font></b></font></b>&quot;&gt;<br>
+        &lt;FONT FACE=&quot;Verdana&quot; SIZE=2&gt;&lt;B&gt;<br>
+        &lt;?perl<br>
+        &nbsp;&nbsp;&nbsp;print &quot;Example begin!&lt;BR&gt;\n&quot;;<br>
+        <b>&nbsp;&nbsp;&nbsp;&lt;!--&copy;INPERL&copy;&gt;&lt;XREADER:1:inline.jhtml:&gt;</b><b>&lt;/&copy;INPERL&copy;--&gt;</b><br>
+        &nbsp;&nbsp; $source = $_; # Result is in $_ !!!<br>
+        &nbsp;&nbsp;&nbsp;@DB_VALUES = (&quot;Y&quot;,&quot;N&quot;,&quot;-&quot;); 
+        #Possible values that SQL can return!<br>
+        &nbsp;&nbsp;&nbsp;@TEMPLATE_NUMBERS = (1,2,3); #Number of templates in 
+        HTML<br>
+        &nbsp;&nbsp;&nbsp;@HTML_VALUES = (&quot;checked&quot;,&quot;&quot;); #Possible 
+        states of &quot;check box&quot; tag!<br>
+        &nbsp;&nbsp;&nbsp;$ref1=\@DB_VALUES; #We need references to these arrays!<br>
+        &nbsp;&nbsp;&nbsp;$ref2=\@TEMPLATE_NUMBERS;<br>
+        &nbsp;&nbsp;&nbsp;$ref3=\@HTML_VALUES;<br>
+        &nbsp;&nbsp;&nbsp;# $sqlq = &quot;SELECT menuState FROM menu_table WHERE 
+        menu= 'gender';&quot;;<br>
+        &nbsp;&nbsp;&nbsp;$sqlq = &quot;!Y&quot;; # That should be SQL query but 
+        we put &quot;!&quot; in the begining<br>
+        &nbsp;&nbsp;&nbsp;# so we simulate query that select &quot;Y&quot; state!</font></b></font></b><b><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        &nbsp;&nbsp;&nbsp;$dbh = undef; #If DB handler is invalid, WebTools will 
+        connect DB for you!<br>
+        ?&gt;<br>
+        &lt;/B&gt;Also see state of check box:&lt;BR&gt;<br>
+        &lt;!--&copy;INLINE&copy;&gt;&lt;MENUSELECT:$source:$sqlq:$ref1:$ref2:$ref3:$dbh:&gt;&lt;/&copy;INLINE&copy;--&gt;<br>
+        &lt;BR&gt; My work possition is:<br>
+        </font><font color="#993366"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&lt;!--&copy;INLINE&copy;&gt;&lt;S&copy;L:1:&quot;select 
+        USER from webtools_users where id=0;&quot;:1:1:1:1:S&copy;L&gt;&lt;/&copy;INLINE&copy;--&gt;</font></b></font><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        &lt;/FONT&gt;<br>
+        &lt;/BODY&gt;<br>
+        &lt;/HTML&gt;<br>
+        </font></b></font><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">----- 
+        This is end of file. Please remove this line -----</font></b><font color="#000000" size="2" face="Verdana, Arial, Helvetica, sans-serif"><br>
+        <br>
+        To run this script please save and upload these files in your webtools 
+        directory (in jhtml and htmls), open one browser and write there follow 
+        url:<br>
+        <br>
+        <font color="#CC0000">http://your_server/cgi-bin/your_webtools/process.cgi?file=inline.whtml</font><br>
+        <br>
+        where: <i><font color="#CC0000">your_server</font> </i>is host where you 
+        keep WebTools and where you can run CGI scripts,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><font color="#FF0000">your_webtools</font></i> 
+        is directory where you keep WebTools files.</font></b><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b> 
+        </b></font></p>
+      <p align="left"><b><font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;I 
+hope everything works fine, but please learn evry line of this code and try to 
+explain for you how it works :-)<br> <br> Best regards!<br> <br> <a href="http://www.proscriptum.com/">www.proscriptum.com 
+</a><br> <br> Author:&nbsp;Julian Lishev (<a href="mailto:julian@proscriptum.com">julian@proscriptum.com</a>)<br> 
+</font></b></p></td></tr> </table>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+BestStem.pm
+t/best_stem.t
+META.yml                                 Module meta-data (added by MakeMaker)

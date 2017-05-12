@@ -1,0 +1,59 @@
+{
+  "results_returned": 2,
+  "events": [
+    {
+      "event_url": "http://connpass.com/event/1852/",
+      "event_type": "participation",
+      "owner_nickname": "nobutaka_wakabayashi",
+      "series": {
+        "url": "http://connpass.com/series/263/",
+        "id": 263,
+        "title": "Perl鍋"
+      },
+      "updated_at": "2013-02-14T00:20:54+09:00",
+      "lat": 34.733452200000,
+      "started_at": "2013-03-14T19:00:00+09:00",
+      "hash_tag": "Perl鍋",
+      "title": "#Perl鍋 #3",
+      "event_id": 1852,
+      "lon": 135.490843600000,
+      "waiting": 0,
+      "place": "新大阪コワーキング",
+      "owner_id": 5007,
+      "description": "<div style=\"margin:0px;padding:0px;border:0px;background-color:rgb(255, 255, 255);\"><div style=\"margin:0px;padding:0px;border:0px;\">※ 写真は「<a href=\"http://notonabe.com/local/post-1.php\" rel=\"nofollow\">能登島村田さんちの炭火焼き塩糀豚鍋 島宿せがわバージョン</a>」です</div><div style=\"margin:0px;padding:0px;border:0px;\"><br /></div><div style=\"margin:0px;padding:0px;border:0px;\">参加費：1000円（鍋付き）</div><div style=\"margin:0px;padding:0px;border:0px;\"><br /></div><div style=\"margin:0px;padding:0px;border:0px;\">大まかな流れ</div><div style=\"margin:0px;padding:0px;border:0px;\">* 「CPANモジュールガイド」から気になるモジュールを選ぶ</div><div style=\"margin:0px;padding:0px;border:0px;\">* そのモジュールを使って何か作る</div><div style=\"margin:0px;padding:0px;border:0px;\">* 鍋</div><div style=\"margin:0px;padding:0px;border:0px;\">* （希望者は）作ったものを発表する</div><div style=\"margin:0px;padding:0px;border:0px;\"><br /></div><div style=\"margin:0px;padding:0px;border:0px;\">「CPANモジュールガイド」を持っている方は、是非ご持参ください。</div><div style=\"margin:0px;padding:0px;border:0px;\"><br /></div><div style=\"margin:0px;padding:0px;border:0px;\">21時終了としていますが、会場はその後も使えますので、続きを作ったり、懇親を深めたりしてお楽しみください。</div><div style=\"color:rgb(68, 68, 68);font-size:12px;font-style:normal;font-weight:normal;\"><br /></div></div>",
+      "address": "大阪府大阪市淀川区西宮原1-8-14(新大阪コーポラス401号室)",
+      "catch": "Perlで何か作る勉強会",
+      "accepted": 3,
+      "ended_at": "2013-03-14T21:00:00+09:00",
+      "limit": 6
+    },
+    {
+      "event_url": "http://connpass.com/event/1654/",
+      "event_type": "participation",
+      "owner_nickname": "nobutaka_wakabayashi",
+      "series": {
+        "url": "http://connpass.com/series/263/",
+        "id": 263,
+        "title": "Perl鍋"
+      },
+      "updated_at": "2013-01-08T03:11:29+09:00",
+      "lat": 34.733452200000,
+      "started_at": "2013-02-21T19:00:00+09:00",
+      "hash_tag": "Perl鍋",
+      "title": "#Perl鍋 #2",
+      "event_id": 1654,
+      "lon": 135.490843600000,
+      "waiting": 0,
+      "place": "新大阪コワーキング",
+      "owner_id": 5007,
+      "description": "<div><span>参加費：500円</span></div><div><span><br /></span></div><div><a href=\"http://goo.gl/maps/NUk8a\" rel=\"nofollow\">地図</a></div><div><br /></div><div>第2回も、「CPANモジュールガイド」から気になるモジュールを選んで、そのモジュールを使ってなにか作り、最後に希望者は作ったものを発表する、という感じでやってみたいと思います。</div><div>「CPANモジュールガイド」を持っている方は、是非ご持参ください。</div><div><br /></div><div>第1回のあと、内容を変更する場合がありますので、ご了承ください。</div>",
+      "address": "大阪府大阪市淀川区西宮原1-8-14(新大阪コーポラス401号室)",
+      "catch": "〜Perlで何か作る勉強会〜",
+      "accepted": 4,
+      "ended_at": "2013-02-21T21:00:00+09:00",
+      "limit": 6
+    }
+  ],
+  "results_start": 1,
+  "results_available": 2
+}

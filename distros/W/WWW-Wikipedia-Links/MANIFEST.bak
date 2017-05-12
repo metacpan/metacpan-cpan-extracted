@@ -1,0 +1,15 @@
+.MANIFEST.SKIP.swp
+Changes
+lib/WWW/Wikipedia/Links.pm
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/extract_homepage.t
+t/extract_translations.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,20 @@
+Changes
+HACKING
+lib/WWW/Scripter/Plugin/JavaScript/JE.pm
+lib/WWW/Scripter/Plugin/JavaScript.pm
+Makefile.PL
+MANIFEST
+README
+t/blank.html
+t/je-form-event.html
+t/je.t
+t/js-api.t
+t/js-back-ends.t
+t/js-die.html
+t/js-errsv.t
+t/js-require.t
+t/js.t
+t/tests.pm
+t/threads/shared.pm
+t/threads.pm
+META.yml                                 Module meta-data (added by MakeMaker)

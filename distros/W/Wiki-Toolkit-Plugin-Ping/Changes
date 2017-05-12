@@ -1,0 +1,12 @@
+0.03    24 February 2009
+        Add Changes file to MANIFEST
+
+0.02    31 January 2009
+        Skip database test when SQLite is not available
+         (fixes cpantesters 2957644, 3047914, 3122378)
+        Support configurable user-agent (#18)
+        Sign distribution
+        Cleanup test database in clean target
+
+0.01    5 December 2006
+        Initial public release (missing this changelog file, oops)

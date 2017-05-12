@@ -1,0 +1,32 @@
+Wiki::Toolkit::Plugin::Diff
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Algorithm::Diff
+   VCS::Lite  (version 0.05 or later)
+   CGI::Wiki  (version 0.44 or later)
+   Params::Validate
+
+A database (one of MySQL, PostgreSQL or DBD::SQLite) is needed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2004 I. P. Williams (IVORW [at] CPAN {dot} org).
+Copyright (C) 2006 the Wiki::Toolkit team (http://www.wiki-toolkit.org/)
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

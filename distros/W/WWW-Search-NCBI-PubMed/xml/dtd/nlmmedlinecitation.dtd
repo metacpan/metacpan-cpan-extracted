@@ -1,0 +1,97 @@
+<!-- MedlineCitation DTD              
+
+        This is the Current DTD which NLM has written for 
+        External Use.      
+      
+        Comments and suggestions are welcome.
+        December 11, 2000
+
+        
+-->
+<!-- ================================================================= -->
+<!--   NLM Medline DTD   -->
+<!-- Typical usage:   
+
+  <!DOCTYPE MedlineCitationSet PUBLIC "-//NLM//DTD NLM//EN">
+
+-->
+<!-- ================================================================= -->
+<!-- Reference to Where the NLM Common DTD is located  -->
+<!ENTITY % NlmCommon PUBLIC "-//NLM//DTD Common, 11th December 2000//EN"
+          "nlmcommon_001211.dtd">
+%NlmCommon;
+<!-- ================================================================= -->
+<!-- ================================================================= -->
+<!-- internal DTD entities -->
+<!ENTITY % Ref.template "(RefSource,
+                          MedlineID?,
+                          Note?)">
+<!ELEMENT RefSource (#PCDATA)>
+<!ELEMENT Note (#PCDATA)>
+<!-- ================================================================= -->
+<!-- This is the top level element for MedlineCitation -->
+<!ELEMENT MedlineCitation (MedlineID,
+                           PMID?,
+                           %DateCreated.Ref;,
+                           DateCompleted?,
+                           DateRevised?,
+                           Article, 
+                           MedlineJournalInfo,
+                           AdditionalInformation?,
+                           ChemicalList?, 
+                           CitationSubset*,
+                           CommentsCorrections?, 
+                           GeneSymbolList?,
+                           MeshHeadingList?,
+                           NumberOfReferences?, 
+                           PersonalNameSubjectList?)>
+<!ATTLIST MedlineCitation
+	CitationOwner (NLM | NOTNLM) "NLM"
+>
+<!-- End of MedlineCitation group -->
+<!-- ================================================================= -->
+<!--             Further Definition of NLM Tags         -->
+<!ELEMENT DateCreated (%normal.date;)>
+<!ELEMENT DateCompleted (%normal.date;)>
+<!ELEMENT DateRevised (%normal.date;)>
+<!ELEMENT MedlineID (#PCDATA)>
+<!ELEMENT AdditionalInformation (OtherAbstract*,
+                                 Keyword*, 
+                                 ProcurementSource*,
+                                 SponsoringAgency*, 
+                                 SpaceFlightMission*)>
+<!ELEMENT OtherAbstract (Abstract, AbstractAuthor)>
+<!ELEMENT AbstractAuthor (#PCDATA)>
+<!ELEMENT Keyword (#PCDATA)>
+<!ELEMENT ProcurementSource (#PCDATA)>
+<!ELEMENT SponsoringAgency (#PCDATA)>
+<!ELEMENT SpaceFlightMission (#PCDATA)>
+<!ELEMENT CitationSubset (#PCDATA)>
+<!ELEMENT ChemicalList (Chemical+)>
+<!ELEMENT Chemical (CASRegistryNumber, NameOfSubstance)>
+<!ELEMENT CASRegistryNumber (#PCDATA)>
+<!ELEMENT NameOfSubstance (#PCDATA)>
+<!ELEMENT GeneSymbolList (GeneSymbol+)>
+<!ELEMENT GeneSymbol (#PCDATA)>
+<!ELEMENT PersonalNameSubjectList (PersonalNameSubject+)>
+<!ELEMENT PersonalNameSubject (%personal.name;)>
+<!ELEMENT NumberOfReferences (#PCDATA)>
+<!ELEMENT CommentsCorrections (CommentOn*,
+                               CommentIn*,
+                               ErratumIn*,
+                               RepublishedFrom*,
+                               RepublishedIn*, 
+                               RetractionOf*,
+                               RetractionIn*, 
+                               UpdateIn*, 
+                               UpdateOf*)>
+<!ELEMENT CommentOn (%Ref.template;)>
+<!ELEMENT CommentIn (%Ref.template;)>
+<!ELEMENT ErratumIn (%Ref.template;)>
+<!ELEMENT RepublishedFrom (%Ref.template;)>
+<!ELEMENT RepublishedIn (%Ref.template;)>
+<!ELEMENT RetractionOf (%Ref.template;)>
+<!ELEMENT RetractionIn (%Ref.template;)>
+<!ELEMENT UpdateIn (%Ref.template;)>
+<!ELEMENT UpdateOf (%Ref.template;)>
+<!-- ================================================================= -->

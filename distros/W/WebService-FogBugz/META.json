@@ -1,0 +1,81 @@
+{
+    "name" : "WebService-FogBugz",
+    "version": "0.1.2",
+    "abstract" : "FogBugz API for Perl",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>",
+        "Takatsugu Shigeta (SHIGETA) <shigeta@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "web",
+        "bugs",
+        "tracker"
+    ],
+
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "1.00"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Class::Accessor::Fast": "0",
+                "IO::File": "0",
+                "LWP::UserAgent": "0",
+                "XML::LibXML" : "1.60",
+                "XML::Liberal" : "0.16"
+            }
+        }
+    },
+
+    "provides": {
+        "WebService::FogBugz": {
+            "file": "lib/WebService/FogBugz.pm",
+            "version": "0.1.2"
+        },
+        "WebService::FogBugz::Config": {
+            "file": "lib/WebService/FogBugz/Config.pm",
+            "version": "0.1.2"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-FogBugz" },
+        "repository": {
+            "url": "git://github.com/barbie/perl-WebService-FogBugz.git",
+            "web": "http://github.com/barbie/perl-WebService-FogBugz",
+            "type": "git"
+        }
+    }
+}

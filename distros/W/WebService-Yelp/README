@@ -1,0 +1,46 @@
+WebService-Yelp version 0.01
+============================
+
+OVERVIEW
+
+This module allows you to access Yelp's REST API for searching
+business, location, and review information. Please see
+http://www.yelp.com/developers/getting_started for information on the
+API. Also be sure to read Yelp's Terms Of Use and Branding
+Requirements. They will probably both apply to you if you plan to use
+the data resulting from using this module.
+
+TESTING
+
+You'll need a Yelp Web Service ID (ywsid) in order to run the tests
+(and use the module). The tests will automagically use the YWSID environment
+variable, i.e.
+
+export YWSID='xxxxxxxxx'
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by josh rotenberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

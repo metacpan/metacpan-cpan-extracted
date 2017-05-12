@@ -1,0 +1,32 @@
+Revision history for Perl extension WWW::xkcd.
+
+0.007   2016-10-14
+        * Provide a META.json file.
+
+0.006   2016-07-14
+        * Added fetch_random() method. (Alberto Simões)
+
+0.005   02.04.12
+        * Provide 100% test coverage, why not.
+
+0.004   16.02.12
+        * Load AnyEvent/AnyEvent::HTTP using Try::Tiny only once. (Joel Berger)
+        * Major Dzil changes: (Joel Berger)
+            - Adding metadata (repo, etc.).
+            - Adding recommends of AnyEvent/AnyEvent::HTTP.
+            - Create Readme POD automatically.
+
+0.003   14.02.12
+        * Removed unused method.
+
+0.002   14.02.12
+        * We can now fetch the images!
+        * fetch() method now returns both the image and the metadata.
+        * New fetch_metadata() returns just the metadata.
+        * Documentation cleanup.
+        * Refactored argument parsing.
+        * Created README.txt to please Github. We'll see how it pans out.
+
+0.001   14.02.12
+        * It works. Yay!
+

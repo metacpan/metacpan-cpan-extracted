@@ -1,0 +1,65 @@
+WWW-KeePassRest
+
+KeePass is a nifty Windows app (with work-alikes for Linux) that stores passwords and other sensitive
+information in an encrypted database on the local hard drive. When open, it can then be used to manage
+usernames and passwords, even generating new passwords with crunchy random goodness.
+
+Wouldn't it be nice if you could just use the open KeePass instance for unattended retrieval of usernames
+and passwords for your Web-enabled scripts? Well, with the doubly nifty KeePassRest plug-in, you can do
+just that!
+
+KeePassRest exposes a minimal API on localhost:12984, secured by SSL and accessed with a JSON API.
+You can't do everything with it (you can't generate passwords, work with groups of entries, etc.) but
+for that stuff you've got L<File::KeePass> anyway.
+
+Here's the absolutely simplest possible way to use WWW::KeePassRest:
+
+    use LWP;
+    use WWW::KeePassRest;
+    use strict;
+
+    my $url = 'http://somesite.com/aa/bb/cc.html';
+    my $browser = LWP::UserAgent->new('Mozilla');
+    $browser->credentials("somesite.com:80", "Realm", WWW:::KeePassRest->get_by_title('Some site credentials', 'UserName', 'Password'));
+    my $response=$browser->get($url);
+
+Seriously. Easy as that. Notice that there is I<absolutely no sensitive information> in this script.
+The username and password are stored in KeePass under the title "Some site credentials". The script will
+only run when KeePass is running and you've given it your password entirely separately - and that needs
+to happen I<once>, after which your scripts can run to your heart's content with no further need to
+enter passwords.
+If KeePass is not running, the call here will croak with "KeePass not running", so you can easily trap for that case.
+
+Note that KeePass is actually based on a nifty key/value-oriented database and could be used for any kind
+of sensitive information, not just usernames and passwords.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::KeePassRest
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-KeePassRest
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-KeePassRest
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-KeePassRest
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-KeePassRest/
+

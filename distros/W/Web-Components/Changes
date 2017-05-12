@@ -1,0 +1,48 @@
+Revision history for Web::Components
+
+0.9.1     2017-02-18 23:43:05
+          - Toolchain update
+          - Refactored controller routes in loader
+
+0.8.1     2016-11-07 22:54:27
+          - Use should_log_errors loader_attr to log exceptions as errors
+          - Adds config loader_attr hashref
+
+0.7.1     2016-05-01 15:01:11
+          - Redirect preserves query_form when adding message id
+
+0.6.1     2016-03-16 00:06:00
+          - Added new signature to response filter
+            Can now pass the action path as the first arg instead of
+            moniker and method
+          - Added coverage badge
+          - Improved coverage
+          - Tunnel method parameters now configurable
+          - Toolchain update
+
+0.5.1     2015-10-03 13:51:18
+          - Use containerised builds for Travis CI
+          - Smarter changelog parsing in git hook
+          - Fewer test dependencies in boilerplate
+          - Toolchain updates
+          - Qualify role names in dynamic components
+          - Added dynamic component setup
+          - Added badge markup
+          - Use BuildRequires not TestRequires for Kwalitee
+
+0.4.1     2015-08-28 15:38:13
+          - Added strictures to Loader for Kwalitee's benefit
+
+0.3.1     2015-08-27 15:12:19
+          - Fixed test prereqs
+
+0.2.1     2015-08-27 14:12:13
+          - Updated POD. Added model loading test
+          - Renamed roles to Loader and Role
+          - No longer calls req->loc_default unconditionally
+          - Added tests and POD
+          - Works with App::Doh
+
+0.1.1     2015-08-14 01:20:58
+          - Added project files to master branch
+

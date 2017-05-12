@@ -1,0 +1,44 @@
+Revision history for Perl extension WSRF-Lite.
+
+For previous changes prior to version 0.8.2.3, please read README
+
+0.8.3.0
+    - NEW: SAML Assertion (added by Alex Peeters - Author from ASNMTAP)
+
+0.8.2.7
+	- updated the copyright
+    - made the ws:id for X509Token, TimeStamp and myBody unique 
+      across messages (thanks Alex Peeters)
+    - sorry about the jump in version numbers for Lite.pm, but I
+      needed to make the version of Lite.pm correspond to the 
+      version of the package WSRF-Lite.
+    - add ns() and default_ns() to Lite (since use_prefix is
+      deprecated in new versions of SOAP::Lite).
+
+0.8.2.6
+  * bug fixes:
+    - WSRF now compatible with BEA's weblogic - basically weblogic didnt
+      like the id of our security element (thanks Alex Peeters)
+    - currently we dont add undef elements to our soap (security sign)
+      message (thanks Alex Peeters)
+    - added a DS xml namespace declaration to the envelope so that our
+      XPATH statements used to compare signatures compiles and works.
+      This bug was found using the signature_checker.pl script
+    - when parsing certificates, there was an extra newline character.
+      I know trim the whitespace from the end of the message.
+    - fixed a syntax bug in signature_checker.pl
+    
+0.8.2.5
+    - nothing new (uploaded incorrect version to cpan)
+    
+0.8.2.4
+	* bug fixes:
+	   - old XPATH expressions didnt work with XML::LibXML; removed the <XPATH ...> elements and left the actual expression
+	   - wrapped some of the canonicalization code in evals so that we dont die everytime an expression doesnt match
+	- added a $WSRF::TIME::EXPIRES_IN variable so that resources dont always expire in 3600 seconds. 
+	
+
+0.8.2.3
+    - first cpan release
+    - swapped XML::CanonicalizeXML for XML::LibXML
+    - makefile now downloads missing dependencies

@@ -1,0 +1,29 @@
+==================================================
+Changes from 2012-10-28 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2013-10-28 05:03:17 +0000
+----------------------------------------
+
+  Change: a92cc6958df9d01366fc3b628e6667f398c437c7
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-10-28 18:01:51 +0000
+
+    no api_key needed, added README.pod for git doc 
+
+  Change: 0c35193df2085c877d12aefc289e3636055dc3c2
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-10-28 17:56:47 +0000
+
+    fixed default attribute name and base URL 
+
+  Change: 9d49f7a9f5e5d3a562486246972b155b3a23c084
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-10-28 17:42:52 +0000
+
+    initial version of burning man PlayaEvents API 
+
+================
+End of releases.
+================

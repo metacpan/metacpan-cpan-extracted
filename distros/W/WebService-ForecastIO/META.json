@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl client for api.forecast.io",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-ForecastIO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Socket" : "0",
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-WebService-ForecastIO@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-ForecastIO"
+      },
+      "homepage" : "https://metacpan.org/dist/WebService-ForecastIO",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/WebService-ForecastIO.git",
+         "web" : "https://github.com/mrallen1/WebService-ForecastIO"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
+}
+

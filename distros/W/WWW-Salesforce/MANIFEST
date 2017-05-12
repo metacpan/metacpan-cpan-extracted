@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/WWW/Salesforce.pm
+lib/WWW/Salesforce/Constants.pm
+lib/WWW/Salesforce/Deserializer.pm
+lib/WWW/Salesforce/Serializer.pm
+lib/WWW/Salesforce/Simple.pm
+t/WWW-Salesforce.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

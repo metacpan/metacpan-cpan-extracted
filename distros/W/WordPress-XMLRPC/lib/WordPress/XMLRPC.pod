@@ -1,0 +1,711 @@
+=pod
+
+=head1 NAME
+
+WordPress::XMLRPC - api to wordpress xml rpc calls
+
+=head1 SYNOPSIS
+
+   use WordPress::XMLRPC;
+      
+   my $o = WordPress:::XMLRPC->new({
+     username => 'author1',
+     password => 'superpass',
+     proxy => 'http://mysite.com/xmlrpc.php',
+   });
+   
+   my $post = $o->getPost(5); # id 5
+   
+   # let's change the title
+   $post->{title} = 'I did not like the old title.';
+   
+   # let's save the changes back to the server..
+   $o->editPost(5, $post, 1); # 1 is publish
+
+
+=head1 DESCRIPTION
+
+I wanted to interact via the command line to a wordpress blog's xmlrpc.php file.
+Bascially this is interaction with xmlrpc.php as client.
+This module is not meant for speed, it is meant for convenience.
+
+This is really useful to automate new postings, uploading media, etc.
+
+=head2 WordPress version
+
+This code has been tested against WordPress 4.5.3. Not all the calls available in the API at https://codex.wordpress.org/XML-RPC_WordPress_API are implemented. Please send patches.
+
+=head1 CONSTRUCTOR
+
+=head2 new()
+
+Optional arg is hash ref.
+
+Before we open a connection with xmlrpc, we need to have 
+username, password, and proxy in the object's data.
+You can provide this in the following ways..
+
+   my $o = WordPress:::XMLRPC->new({
+     username => 'author1',
+     password => 'superpass',
+     proxy => 'http://mysite.com/xmlrpc.php',
+   });
+
+Or..
+
+   my $o = WordPress:::XMLRPC->new;  
+   
+   $o->username('author1');
+   $o->password('superpass');
+   $o->proxy('http://mysite.com/xmlrpc.php');
+   
+   $o->server 
+      or die( 
+         sprintf 'could not connect with %s:%s to %s',
+            $self->username,
+            $self->password,
+            $self->proxy,
+         );
+
+Uploading a file..
+
+   my $data = WordPress:::XMLRPC::abs_path_to_media_object_data('./file.jpg');
+   my $r = $o->newMediaObject($data);
+   print $r->{url};
+  
+=head1 DEPRECATED METHODS
+
+Since v1.23 WordPress have not just deprecated but obseleted a number of calls to do with pages and categories. The corresponding methods have been removed from this module, and are slowly being replaced with their current equivalents.
+
+=head1 METHODS
+
+=head2 username()
+
+Perl set/get method. Argument is string.
+If you pass 'username' to constructor, it is prepopulated.
+
+   my $username = $o->username;
+   $o->username('bill');
+
+=head2 password()
+
+Perl set/get method. Argument is string.
+If you pass 'password' to constructor, it is prepopulated.
+
+   my $pw = $o->password;
+   $o->password('jim');
+
+=head2 proxy()
+
+Perl set/get method. Argument is string.
+If you pass 'proxy' to constructor, it is prepopulated.
+
+=head2 server()
+
+Returns XMLRPC::Lite object.
+proxy() must be set.
+
+=head2 blog_id()
+
+Setget method, set to '1' by default.
+This seems unused by wordpress. They have some documentation on this.
+
+=head2 publish()
+
+Many methods use 'publish' boolean value, by default we set to 1.
+You can still pass a value for publish such as;
+
+   $o->newPost( $content_hashref, 1 );
+
+But you can also call;
+
+   $o->newPost( $content_hashref );
+
+As we said, by default it is set to 1, if you want to set the default to 0,
+
+   $o->publish(0);
+
+=head2 errstr()
+
+Returns error string if a call fails. 
+
+   $o->newPost(@args) or die($o->errstr);
+
+If the DEBUG flag is on, this warns to STDERR automatically as well.
+
+=cut
+
+
+=pod
+
+=head2 STANDARD XML RPC METHODS
+
+These methods specifically mirror the xmlrpc.php file provided by WordPress installations.
+This file sits on your website.
+
+
+=cut
+
+
+
+
+
+=pod
+
+=head3 getAuthors()
+
+Takes no argument.
+Returns array ref, each element is a hashref.
+
+	 $return_value: [
+	                  {
+	                    display_name => 'leo',
+	                    user_id => '2',
+	                    user_login => 'leo'
+	                  },
+	                  {
+	                    display_name => 'chamon',
+	                    user_id => '3',
+	                    user_login => 'chamon'
+	                  }
+	                ]
+
+=cut
+
+=head3 getComment()
+
+Takes 1 args: comment_id (number).
+Returns struct (hashref).
+
+   $o->getComment(2603);
+
+Example return value:
+   $r: {
+         author => 'santrex sucks',
+         author_email => 'webmaster@santrexsucks.com',
+         author_ip => '66.165.246.149',
+         author_url => 'http://santrexsucks.com',
+         comment_id => '2603',
+         content => 'santrex is the worst hosting company ive ever used. santrex should be avoided at all costs!',
+         date_created_gmt => '20090617T00:17:54',
+         link => 'http://leocharre.com/articles/its-on-bitch/comment-page-1/#comment-2603',
+         parent => '0',
+         post_id => '372',
+         post_title => 'IT&#8217;S ON BITCH',
+         status => 'approve',
+         type => '',
+         user_id => '0'
+       }
+
+=head3 getComments()
+
+Takes 1 args: struct (hashref).
+NOTE: Untested. If you have info on this, send it in.
+
+=head3 getCommentCount()
+
+Takes 1 args: post_ID
+Returns post struct, hashref.
+	$VAR1 = {
+          'awaiting_moderation' => '0',
+          'total_comments' => '0',
+          'spam' => '0',
+          'approved' => '0'
+        };
+
+=head3 deleteComment()
+
+Takes 1 args: comment_id (number).
+Returns bool true or false.
+
+   $o->deleteComment(2603);
+
+=head3 editComment()
+
+Takes 2 args: comment_id (number), content_struct (hashref).
+
+
+=head3 newComment()
+
+Takes 2 args: post id, content_struct (hashref).
+Returns new comment id (number).
+
+This will be posted under your login name. The post id is the post the comment is in regards to.
+
+   $o->newComment( 15, { status => 'approve', content => "Hi there, this is a note." } );
+
+=head3 getCommentStatusList()
+
+Takes no argument.
+Returns hashref.
+
+Example return value:
+   $r: {
+         approve => 'Approved',
+         hold => 'Unapproved',
+         spam => 'Spam'
+       }
+
+
+=head3 getOptions()
+
+Optional arguments are, a list of option names.
+If you do not pass a list of options assumes all are chosen.
+Returns hash ref. Of which each key is the option name. Each value is a hashref itself.
+
+Return hashref format:
+
+   $options => {
+
+      $option_name => {
+         desc        => $string,
+         readonly    => $boolean,
+         value       => $string
+      },
+   };
+
+Possible option names (as of wordpress 2.8.4):
+   blog_tagline, blog_title, blog_url, date_format, software_name, 
+   software_version, time_format, time_zone
+
+Example return value (with no arguments):
+
+   $options: {
+               blog_tagline => {
+                                 desc => 'Blog Tagline',
+                                 readonly => '0',
+                                 value => 'pinup art, perl, unix, developer smorgasbord'
+                               },
+               blog_title => {
+                               desc => 'Blog Title',
+                               readonly => '0',
+                               value => 'leo charre'
+                             },
+               blog_url => {
+                             desc => 'Blog URL',
+                             readonly => '1',
+                             value => 'http://leocharre.com'
+                           },
+               date_format => {
+                                desc => 'Date Format',
+                                readonly => '0',
+                                value => 'F j, Y'
+                              },
+               software_name => {
+                                  desc => 'Software Name',
+                                  readonly => '1',
+                                  value => 'WordPress'
+                                },
+               software_version => {
+                                     desc => 'Software Version',
+                                     readonly => '1',
+                                     value => '2.8.4'
+                                   },
+               time_format => {
+                                desc => 'Time Format',
+                                readonly => '0',
+                                value => 'g:i a'
+                              },
+               time_zone => {
+                              desc => 'Time Zone',
+                              readonly => '0',
+                              value => '-8'
+                            }
+             }
+
+
+Example usage:
+
+   my $options = $o->getOptions('software_name', 'time_zone',);
+   my $options = $o->getOptions;
+
+
+=head3 setOptions()
+
+Takes 1 args: options hash ref.
+Returns same as getOptions().
+
+Argument is hashref with keys the name of the option, and values the new values.
+
+
+NOTE: The structure of the hashref to setOptions() is *not* the same as the structure that getOptions()
+returns.
+
+NOTE: Also note, some options are set read only, that means they cannot be changed via this method.
+
+Example usage:
+
+   $o->setOptions({ blog_tagline => 'New tagline for this blog, this is the best blog ever' });
+
+This would return:
+
+   $out: {
+           blog_tagline => {
+                             desc => 'Blog Tagline',
+                             readonly => '0',
+                             value => 'New tagline for this blog, this is the best blog ever', 
+                           }
+         }
+
+The value taken by setOptions() should be the same as returned by getOptions(). This is more proof
+that php "coders" have no discipline. As if proof were needed. Ok, maybe that's too harsh.
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+
+=pod
+
+=head3 newPost()
+
+Takes 2 args: content_struct, publish.
+Returns id number of new post.
+
+=head3 editPost()
+
+Takes 3 args: post_ID, content_struct, publish.
+Returns boolean, true or false.
+
+=head3 deletePost()
+
+Argument is post id(number).
+Returns boolean.
+
+=head3 getPost()
+
+Takes 1 args: post_ID
+Returns post struct, hashref.
+
+	 $example_return_value: {
+	                          categories => [
+	                                          'Uncategorized'
+	                                        ],
+	                          dateCreated => '20080130T14:19:05',
+	                          date_created_gmt => '20080130T22:19:05',
+	                          description => 'test description here',
+	                          link => 'http://leocharre.com/articles/test_1201731544/',
+	                          mt_allow_comments => '1',
+	                          mt_allow_pings => '1',
+	                          mt_excerpt => '',
+	                          mt_keywords => '',
+	                          mt_text_more => '',
+	                          permaLink => 'http://leocharre.com/articles/test_1201731544/',
+	                          postid => '119',
+	                          title => 'test_1201731544',
+	                          userid => '2',
+	                          wp_author_display_name => 'leocharre',
+	                          wp_author_id => '2',
+	                          wp_password => '',
+	                          wp_slug => 'test_1201731544'
+	                        }
+
+=head3 getPostStatusList()
+
+Takes no argument.
+Returns hashref.
+
+Example return value:
+	{
+          'draft' => 'Draft',
+          'publish' => 'Published',
+          'private' => 'Private',
+          'pending' => 'Pending Review'
+        };
+
+=head3 uploadFile()
+
+Takes 1 args: data (hashref).
+The hashref keys and values are bits (Mime::Base64), type (mime type), and name (filename).
+See abs_path_to_media_object_data().
+Returns result:
+
+   ### $r: {
+   ###       file => 'media.jpg',
+   ###       type => 'image/jpeg',
+   ###       url => 'http://leocharre.com/wp-content/uploads/media3.jpg'
+   ###     }
+
+Would be truly useful if it returned id!
+
+=head3 getUsersBlogs()
+
+No argument, returns users blogs.
+Example return :
+
+	 $r: [
+	       {
+	         blogName => 'leo charre',
+	         blogid => '1',
+	         isAdmin => '1',
+	         url => 'http://leocharre.com/'
+	       }
+	     ]
+
+=head3 getUser()
+
+Get a specific user by ID. 
+
+Examples:
+
+	$o->getUser({id => 27});
+	$o->getUser({id => 27, fields => ['nickname', 'email']);
+
+Arguments:
+
+=over
+
+=item * 
+B<id> (I<mandatory>) The ID of the user to retrieve
+
+=item *
+B<fields> (I<optional>) An array reference of fields to return. I<user_id> is always returned. See L<https://codex.wordpress.org/XML-RPC_WordPress_API/Users#wp.getUser> for a list of fields.
+
+=back
+
+Returns:
+
+	{
+          'roles' => [
+                     'administrator'
+                   ],
+          'registered' => '20160211T14:12:31',
+          'nickname' => 'administrator',
+          'display_name' => 'administrator',
+          'last_name' => '',
+          'username' => 'administrator',
+          'email' => 'hostmaster@company.com',
+          'nicename' => 'administrator',
+          'url' => '',
+          'user_id' => '1',
+          'bio' => '',
+          'first_name' => ''
+        };
+
+unless you specify 'fields', in which case it returns just those fields plus user_id.
+
+=head3 getUsers()
+
+Get a list of users.
+
+Examples:
+
+	$o->getUsers();
+	$o->getUsers({filter => {roles => 'administrator'}, fields => ['nickname', 'email']);
+
+Arguments:
+
+=over
+
+=item * 
+B<filter> (I<optional>) A hash reference of filter values to select specific users. Filtering is carried out on the WordPress server. See L<https://codex.wordpress.org/XML-RPC_WordPress_API/Users#wp.getUsers> for a list of values.
+
+=item *
+B<fields> (I<optional>) An array reference of fields to return. I<user_id> is always returned. See L<https://codex.wordpress.org/XML-RPC_WordPress_API/Users#wp.getUser> for a list of fields. Has no efffect unless you also specify B<filter> (because WordPress is weird).
+
+=back
+
+Returns:
+
+	[
+         {
+            'roles' => [
+                       'author'
+                     ],
+            'registered' => '20160509T13:40:20',
+            'nickname' => 'Mariann Ratz',
+            'display_name' => 'Mariann Ratz',
+            'last_name' => 'Ratz',
+            'username' => 'Mariann.ratz',
+            'email' => 'Mariann.ratz@company.com',
+            'nicename' => 'mariann-ratz',
+            'url' => '',
+            'user_id' => '42',
+            'bio' => '',
+            'first_name' => 'Mariann'
+          },
+          {
+            'roles' => [
+                       'author'
+                     ],
+            'registered' => '20160322T12:56:55',
+            'nickname' => 'Mark Orkden',
+            'display_name' => 'Mark Orkden',
+            'last_name' => 'Orkden',
+            'username' => 'mark.orkden',
+            'email' => 'mark.orkden@company.com',
+            'nicename' => 'mark-orkden',
+            'url' => '',
+            'user_id' => '17',
+            'bio' => '',
+            'first_name' => 'Mark'
+          }
+        ];
+
+unless you specify 'fields', in which case it returns just those fields plus user_id.
+
+=head2 EXTENDED XML RPC CALLS
+
+The following calls are not part of the standard WP XML RPC API. To enable them to work you will need to install the Extended XMLAPC API plugin available at L<https://github.com/realflash/extended-xmlrpc-api>, and configure it to permit the relevant WP API methods described below. For example, I<createUser()> will not work until you have enabled I<wp_create_user> in your WordPress instance. Until that time you will just get a no such method error.
+
+=head3 createUser()
+
+=head4 WP API method: wp_insert_user
+
+Make a new user. 
+
+Example:
+	
+	# Minimum possible information - no capabilities so can't do much
+	$o->createUser({ user_login => 'atest.user2', user_pass => 'klsdfslfhew', user_email => 'test.user@mywordpressite.com'});
+	# Minium useful information
+	$o->createUser({ user_login => 'atest.user2', user_pass => 'klsdfslfhew', user_nicename => 'test-user', display_name => 'Test User', first_name => 'Test', last_name => 'User', role => 'author', user_email => 'test.user@mywordpressite.com'});
+
+
+Arguments:
+
+=over
+
+=item * 
+(I<mandatory>) A hash reference of arguments to pass to wp_create_user. You must specify at least I<user_login>,I<user_pass> and I<user_email>. See L<https://codex.wordpress.org/Function_Reference/wp_insert_user> for the list of arguments.
+
+=back
+
+Returns:
+
+	113
+
+for example, which is the user_id the newly created user.
+
+=head3 addUserMeta()
+
+=head4 WP API method: add_user_meta
+
+Add a piece of metadata to a user.
+
+Examples:
+
+	$o->addUserMeta({ user_id => 23, meta_key => 'foo', meta_value => 'bar'});
+	$o->addUserMeta({ user_id => 23, meta_key => 'foo', meta_value => 'bar', unique => 'true'});
+	$o->addUserMeta({ user_id => 23, meta_key => 'foo', meta_value => 'bar', unique => 'false'});
+
+Arguments:
+
+=over
+
+=item * 
+(I<mandatory>) A hash reference of arguments to pass to wp_create_user. You must specify at least I<user_id>, I<meta_key>, and I<meta_value>. See L<https://codex.wordpress.org/Function_Reference/add_user_meta> for the list of arguments.
+
+=back
+
+Returns:
+
+	2437
+
+for example, which is the unique key for the database row inserted successfully with the piece of meta information, or 0 if it was unsuccessful.
+
+=head3 getUserMeta()
+
+=head4 WP API method: get_user_meta
+
+Add a piece of metadata to a user.
+
+Examples:
+
+	$o->getUserMeta({ user_id => 23 });
+	$o->getUserMeta({ user_id => 23, meta_key => 'foo'});
+	$o->getUserMeta({ user_id => 23, meta_key => 'foo', single => 'true'});
+
+Arguments:
+
+=over
+
+=item * 
+(I<mandatory>) A hash reference of arguments to pass to wp_create_user. You must specify at least I<user_id>. See L<https://codex.wordpress.org/Function_Reference/get_user_meta> for the list of arguments.
+
+=back
+
+Returns:
+
+	{
+		'show_admin_bar_front' => [ 'true' ],
+		'npn_mailnotify' => [ '1' ],
+		'wp_4mv06tbsd5_capabilities' => [ 'a:1:{s:6:"author";b:1;}' ],
+		'nickname' => [ 'Abdul Hafaaz' ],
+		'session_tokens' => [ 'a:1:{s:64:"6df58d104147ce47eba41dd2f6e86a9c144659d4f4b095385eeeea2e26c7bef0";a:4:{s:10:"expiration";i:1482412957;s:2:"ip";s:13:"108.18.98.132";s:2:"ua";s:134:"Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_5 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13G36 Safari/601.1";s:5:"login";i:1482240157;}}' ],
+		'comment_shortcuts' => [ 'false' ],
+		'rich_editing' => [ 'true' ],
+		'description' => [ '' ],
+		'last_name' => [ 'Hafaaz' ],
+		'use_ssl' => [ '0' ],
+		'wp_4mv06tbsd5_user_level' => [ '2' ],
+		'admin_color' => [ 'fresh' ],
+		'first_name' => [ 'Abdul' ]
+	}
+
+for example, if you don't specify which key you want. Actual fields will depend upon which plugins you have installed and database table names. Note that each value in the hash is an array, even if there is only one value to display. If you specify I<meta_key>, you will just get the value of that key:
+
+	bar
+
+or an empty string if that key doesn't exist.
+
+=head1 DEBUG
+
+This is useful if you get errors..
+
+   $WordPress::XMLRPC::DEBUG = 1;
+
+=head1 WISHLIST
+
+It'd be nice to manage links via xmlrpc.php, but this is up to wordpress devs.
+
+=head1 BUGS
+
+Please submit to AUTHOR
+
+=head1 CAVEATS
+
+This distro is alpha.
+Included are the metaWeblog and wp method calls.
+
+=head1 REQUIREMENTS
+
+L<XMLRPC::Lite>
+
+=head1 SEE ALSO
+
+L<XMLRPC::Lite>
+L<SOAP::Lite>
+WordPress L<http://wordpress.org>
+
+=head1 AUTHOR
+
+Originally by Leo Charre leocharre at cpan dot org
+Adopted by Ian Gibbs igibbs at cpan dot org
+
+=head2 THANKS
+
+People who contributed code, criticism, patches, suggestions;
+
+Alan Haggai Alavi
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

@@ -1,0 +1,18 @@
+Revision history for Perl extension WWW::Search::Yandex.
+
+0.01  Wed Aug  4 12:03:04 2004
+	- original version; created by h2xs 1.23 with options
+	  -X -c -n WWW::Search::Yandex
+	- This is the first public release.
+
+0.02  Sat Aug 14 11:42:58 2004
+	- Added prereq modules to Makefile.PM.
+
+0.03  Sun Aug 15 23:39:16 2004
+	- Error with rambler.
+
+0.04  Tue Aug  9 21:19:05 2005
+	- Small changes in test script.
+
+0.05  Tue Jun 27 14:53:16 2006
+	- Corrected charset name.

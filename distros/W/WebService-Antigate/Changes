@@ -1,0 +1,28 @@
+Revision history for Perl extension WebService::Antigate.
+
+0.07  Mon Jan 19 13:27:06 NOVT 2015
+      - prevent tests failing because of IO::Socket::IP
+
+0.06  Sun Jan 18 15:15:50 NOVT 2015
+      - mention some new settings supported by API
+      - fix content-type detection for files without extension
+
+0.05  Tue Jun 12 17:46:31 2012
+      - few new error codes added
+      - last_captcha_id() method implemented
+
+0.04  Wed Feb 29 21:43:03 2012
+      - fix for qw() deprication warning
+      - determine file name by signature when needed
+
+0.03  Tue Jul 12 12:46:43 2011
+      - more real tests added
+      - is_russian flag documented
+
+0.02  Wed Apr 21 01:14:54 2010
+      - fixed documentation bugs
+      - added undocumented error codes
+
+0.01  Thu Apr 20 00:35:40 2010
+      - original version;
+

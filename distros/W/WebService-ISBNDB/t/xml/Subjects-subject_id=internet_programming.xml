@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:29">
+<SubjectList total_results="1" page_size="10" page_number="1" shown_results="1">
+<SubjectData subject_id="internet_programming" book_count="287" marc_field="650" marc_indicator_1="" marc_indicator_2="0">
+<Name>Internet programming</Name>
+<Categories></Categories>
+</SubjectData>
+</SubjectList>
+</ISBNdb>

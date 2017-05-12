@@ -1,0 +1,25 @@
+Revision history for Perl module WebService::CRUST
+
+0.7 Tue Jul 17 16:26:00 2007
+    - Fixed returning of arrays.  Sticks with the ref if the object returned one.
+0.6 Mon Jul 16 13:28:00 2007
+    - Ditched CRUST__Request in favor of xlink:hrefs
+    - Serialize PUT hashes
+0.5 Sun Jul 15 15:03:00 2007
+    - Better array handling - PUT serialization coming soon.
+0.4 Wed Jul 11 11:09:00 2007
+    - The WebService::CRUST::Result is now the preferred
+      method of interaction.  This may be incompatible with 0.3
+      and previous versions.
+0.3 Tue Jun 26 17:56:00 2007
+    - Fixed UA bug
+    - Added chainable result object
+    - Added CRUST__Result type inflation
+0.2 Mon May 07 18:32:00 2007
+    - Added debug code
+    - Cleaned up documentation
+    - Added additional requirements for building
+    - Removed ._ files
+
+0.1 Fri May 04 15:46:00 2007
+    - Initial version

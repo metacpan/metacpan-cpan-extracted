@@ -1,0 +1,68 @@
+---
+abstract: 'KGS Go Server (http://www.gokgs.com/) Scraper'
+author:
+  - 'Ryo Anazawa (anazawa@cpan.org)'
+build_requires:
+  Encode: '0'
+  Test::Base: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Time::Piece: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-GoKGS
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+provides:
+  WWW::GoKGS:
+    file: lib/WWW/GoKGS.pm
+    version: '0.21'
+  WWW::GoKGS::LibXML:
+    file: lib/WWW/GoKGS/LibXML.pm
+    version: '0.21'
+  WWW::GoKGS::Scraper:
+    file: lib/WWW/GoKGS/Scraper.pm
+  WWW::GoKGS::Scraper::Declare:
+    file: lib/WWW/GoKGS/Scraper/Declare.pm
+  WWW::GoKGS::Scraper::Filters:
+    file: lib/WWW/GoKGS/Scraper/Filters.pm
+  WWW::GoKGS::Scraper::GameArchives:
+    file: lib/WWW/GoKGS/Scraper/GameArchives.pm
+  WWW::GoKGS::Scraper::Top100:
+    file: lib/WWW/GoKGS/Scraper/Top100.pm
+  WWW::GoKGS::Scraper::TournEntrants:
+    file: lib/WWW/GoKGS/Scraper/TournEntrants.pm
+  WWW::GoKGS::Scraper::TournGames:
+    file: lib/WWW/GoKGS/Scraper/TournGames.pm
+  WWW::GoKGS::Scraper::TournInfo:
+    file: lib/WWW/GoKGS/Scraper/TournInfo.pm
+  WWW::GoKGS::Scraper::TournLinks:
+    file: lib/WWW/GoKGS/Scraper/TournLinks.pm
+  WWW::GoKGS::Scraper::TournList:
+    file: lib/WWW/GoKGS/Scraper/TournList.pm
+  WWW::GoKGS::Scraper::TzList:
+    file: lib/WWW/GoKGS/Scraper/TzList.pm
+recommends:
+  HTML::TreeBuilder::LibXML: '0'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  LWP::RobotUA: '0'
+  URI: '1.59'
+  Web::Scraper: '0'
+  parent: '0'
+  perl: v5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/anazawa/p5-WWW-GoKGS.git
+version: '0.21'

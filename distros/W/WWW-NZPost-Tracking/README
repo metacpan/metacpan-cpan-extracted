@@ -1,0 +1,14 @@
+WWW::NZPost::Tracking
+====================
+
+Perl interface to the New Zealand Post tracking service
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+

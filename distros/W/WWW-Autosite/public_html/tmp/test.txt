@@ -1,0 +1,14 @@
+This file should be autoparsed. 
+
+It should have some html around it.
+This is a plain text file.
+
+	- thing 1
+	- thing 2
+	- thing 3
+
+OK?
+
+Great.
+
+

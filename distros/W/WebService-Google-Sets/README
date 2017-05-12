@@ -1,0 +1,17 @@
+WebService::Google::Sets
+  Provides function based access to the Sets service hosted at
+  Google Labs.
+
+For documentation please read the modules inline POD.
+  perldoc WebService::Google::Sets
+
+To install, do the usual:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.
+
+For a complete list of changes, see the Changes file.

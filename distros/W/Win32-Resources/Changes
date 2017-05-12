@@ -1,0 +1,8 @@
+Revision history for Perl extension Win32::Resources.
+
+0.02  2003-04-09
+	- fix a bug for int resources name and types which were interpreted as char
+0.01  Sun Apr  4 18:58:44 2004
+	- original version; created by h2xs 1.23 with options
+		-A -n Win32::Resources
+

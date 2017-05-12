@@ -1,0 +1,31 @@
+---
+abstract: 'NationBuilder API bindings'
+author:
+  - 'Ali Anari <ali@anari.me>'
+build_requires:
+  Log::Any::Adapter: 0.11
+  Log::Dispatch: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-NationBuilder
+requires:
+  Carp: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  List::Util: 1.35
+  Log::Any: 0.15
+  Log::Any::Adapter: 0.11
+  Moo: 1.004002
+  Moo::Role: 0
+  Try::Tiny: 0
+  strict: 0
+  warnings: 0
+version: 0.0107

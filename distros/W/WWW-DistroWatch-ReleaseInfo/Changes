@@ -1,0 +1,32 @@
+Revision history for WWW-DistroWatch-ReleaseInfo
+
+0.05    2015-10-06 (PERLANCAR)
+
+	- [ux] Add completion for distribution argument.
+
+
+0.04    2015-10-06 (PERLANCAR)
+
+        - Rebuild with updated data from gudangdata-distrowatch (fix encoding
+          problem).
+
+
+0.03    2015-10-06 (PERLANCAR)
+
+	- Add functions: list_distros, list_distros_cached.
+
+	- [ux] Return error response instead of dying when: 1) file/URL retrieve
+          fails; 2) page says that distro does not exist.
+
+	- Document the 'file' argument.
+
+
+0.02    2015-10-06 (PERLANCAR)
+
+	- Add table.fields result metadata for nicer table output
+	  (appropriate column order).
+
+
+0.01    2015-10-04 (PERLANCAR)
+
+        - First early release.

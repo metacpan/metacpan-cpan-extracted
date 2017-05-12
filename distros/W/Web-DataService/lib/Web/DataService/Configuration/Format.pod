@@ -1,0 +1,204 @@
+
+=head1 NAME
+
+Web::DataService::Configuration::Format - how to configure output formats
+
+=head1 SYNOPSIS
+
+This page describes the role that output formats play in the
+Web::DataService framework, and how to configure them.  It includes a list of
+the attributes that you can use to define them.
+
+=head1 FORMAT DEFINITIONS
+
+Each data service I<must> define one or more output formats.  These are
+defined using the L<define_format|Web::DataService/define_format> method of a
+data service object.  This must be be done at data service startup time before
+any nodes are defined, so that the
+L<default_format|Web::DataService::Configuration::Node/default_format> and
+L<allow_format|Web::DataService::Configuration::Node/allow_format> node
+attributes can be interpreted properly.  Each format definition configures one
+of the available serialization modules.
+
+=head2 Predefined formats
+
+The format names listed below are predefined by Web::DataService and can be
+activated simply by specifying a hashref with the appropriate C<name>
+attribute.  For example, the following call will enable the formats 'json' and
+'txt' with all of their default attribute values and documentation strings.
+
+    $ds->define_format(
+        { name => 'json' },
+        { name => 'txt' });
+
+You can override any of these attribute values and documentation strings by
+specifying them explicitly.  The example code directory contains documentation
+files for each of these formats, which you can copy into your own application
+directory and modify as you see fit.  However, you must explicitly define the
+corresponding data service nodes yourself or else the documentation pages will
+not be available.  The corresponding call for this example would be:
+
+    $ds->define_node(
+	{ path => 'formats',
+	  title => 'Output formats' },
+	{ path => 'formats/json',
+	  title => 'JSON format' },
+	{ path => 'formats/txt',
+	  title => 'Plain text format' });
+
+See the next section for descriptions of the various attributes.
+
+=head4 json
+
+This format serializes operation results using
+L<JSON|https://en.wikipedia.org/wiki/JSON> (JavaScript Object Notation).  It
+sets the content type of the response to "application/json", and its default
+documentation node is "formats/json".  The module used is
+L<Web::DataService::Plugins::JSON>.
+
+=head4 txt
+
+This format serializes operation results as lines of L<comma-separated
+values|https://en.wikipedia.org/wiki/Comma-separated_values> separated by the
+specified L<linebreak sequence|/default_linebreak>.  Its content type is
+"text/plain", and its default documentation node is "formats/txt".  The module
+used is L<Web::DataService::Plugins::Text>.
+
+=head4 csv
+
+This format is identical to L</txt>, except that it sets the content type of
+the response to "text/csv" and sets the content disposition to "attachment".
+
+=head4 tsv
+
+This format serializes operation results as lines of L<tab-separated
+values|https://en.wikipedia.org/wiki/Tab-separated_values> separated by the
+specified L<linebreak sequence|/default_linebreak>.  Its content type is
+"text/tab-separated-values", and its disposition is "attachment".  Its default
+documentation node is "formats/txt".  The module used is
+L<Web::DataService::Plugins::Text>.
+
+=head1 FORMAT ATTRIBUTES
+
+With the exception of C<name>, each of the following attributes is optional for
+predefined formats.  Those which are required for custom (i.e. not predefined)
+formats are noted below.
+
+=head2 name
+
+Each format defined for a given data service must have a unique name.  This
+name can be used as the value of the node attributes C<allow_format> and
+C<default_format>, and is matched either to the URL path suffix or to the
+value of the special parameter L</format> depending upon which data service
+features are enabled.  This attribute is required for all format definitions.
+
+=head2 title
+
+The value of this attribute is used as the format's title in all
+generated documentation.  It defaults to the name.
+
+=head2 content_type
+
+The value of this attribute specifies the HTTP content type that will be
+reported in the response message.  It is required for all custom format
+definitions.
+
+=head2 disposition
+
+If this attribute is given the value 'attachment', then any response generated
+with this format will be returned with a "content-disposition" header
+indicating that it should be saved to disk.  However, if the special parameter
+"save" is active and a request includes that parameter with the value "no",
+then this attribute will be overridden for that request.
+
+The value of this attribute defaults to 'inline' if not specified.
+
+=head2 module
+
+The value of this attribute must be the name of a Perl module implementing
+this format.  This module will be automatically loaded via C<require>.  You
+must specify this attribute when defining a custom format, and then include
+a module with the corresponding name in the appropriate library directory.
+
+=head2 doc_node
+
+The value of this attribute specifies the path of a data service node which
+will provide documentation about this format.  You must define the node with a
+separate call to C<define_node>.
+
+=head2 doc_string
+
+You can set this attribute either directly or by including one or more
+documentation strings after each format definition hash in the call to
+C<define_format>.  This value will be used in any auto-generated format lists
+in the documentation pages.
+
+=head2 default_vocab
+
+The value of this attribute must be the name of an already-defined
+L<vocabulary|Web::DataService::Configuration::Vocabulary>.  This vocabulary
+will be used when rendering responses in this format, unless overridden by the
+special parameter C<vocab>.  It defaults to 'null', which simply uses the
+underlying field names from the backend data store.
+
+=head2 uses_header
+
+The special parameter C<header> will only be enabled if at least one enabled
+output format uses it.  If you are defining a custom format that includes an
+optional header, you should give this attribute a true value.  All of the Text
+builtin formats set this by default.
+
+=head2 encode_as_text
+
+If this attribute is given a true value, then the output of this format will
+be encoded in the output character set (specified by the 'charset' attribute
+in the application configuration file) before being sent.  This attribute is
+required because the foundation framework L<Dancer> only encodes output if its
+content type matches C</(x(?:ht)?ml|text|json|javascript)/>.  If you are
+defining a custom format whose content is character data but whose content
+type does not match this regexp, you must set this attribute to true.
+
+If you are defining a custom format for binary data, then you should B<not>
+set this attribute.  A good example would be a format such as 'png', which
+would be used with binary image data.  This kind of format should be used only
+with operation methods that read binary data from the backend or from a file
+and send it using the
+L<data_result|Web::DataService::Request/data_result-data> method without doing
+anything in the method code that would cause perl to apply Character semantics
+to the data.
+
+=head2 disabled
+
+If this attribute is given a true value, then any request that selects this
+format will get an HTTP 415 error response ("Invalid media type") just as if
+an undefined format was requested.  This format can still be used as a value
+of the node attribute
+L<allow_format|Web::DataService::Configuration::Node/allow_format>.  You can
+use this to create a placeholder for a format that is not fully implemented
+yet, or to temporarily disable a format.  Disabled formats will not appear in
+any auto-generated documentation lists.
+
+=head2 undocumented
+
+If this attribute is given a true value, the format will be available to be
+selected in the usual way, but it will never appear in any auto-generated
+documentation list.
+
+=head1 AUTHOR
+
+mmcclenn "at" cpan.org
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-web-dataservice at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Web-DataService>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Michael McClennen, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

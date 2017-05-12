@@ -1,0 +1,56 @@
+Changes
+examples/bloggery/bloggery.cgi
+examples/bloggery/posts/Another-Post.html
+examples/bloggery/posts/One-Post.html
+examples/bloggery/posts/One-Post.summary.html
+examples/dispatchex/dispatchex.cgi
+examples/golf/golf.cgi
+examples/hello-world/hello-world.cgi
+lib/CSS/Declare.pm
+lib/HTML/Tags.pm
+lib/Plack/Middleware/Dispatch.pm
+lib/Web/Dispatch.pm
+lib/Web/Dispatch/HTTPMethods.pm
+lib/Web/Dispatch/Node.pm
+lib/Web/Dispatch/ParamParser.pm
+lib/Web/Dispatch/Parser.pm
+lib/Web/Dispatch/Predicates.pm
+lib/Web/Dispatch/ToApp.pm
+lib/Web/Dispatch/Upload.pm
+lib/Web/Dispatch/Wrapper.pm
+lib/Web/Simple.pm
+lib/Web/Simple/AntiquatedPerl.pod
+lib/Web/Simple/Application.pm
+lib/Web/Simple/Deployment.pod
+lib/Web/Simple/HackedPlack.pm
+lib/Web/Simple/Role.pm
+lib/XML/Tags.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/bloggery.t
+t/css_declare.t
+t/dispatch_misc.t
+t/dispatch_parser.t
+t/env.t
+t/globbery/one
+t/globbery/three
+t/globbery/two
+t/leak.t
+t/match-home.t
+t/param_parser.t
+t/post.t
+t/predicate_objects.t
+t/request_mode_heuristics.t
+t/response-filter.t
+t/role.t
+t/stream_test.t
+t/sub-dispatch-args.t
+t/sub-dispatch-env.t
+t/tags.t
+t/test-request-basic-auth.t
+t/underscore.t
+t/wd-http-methods.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

@@ -1,0 +1,32 @@
+---
+name: Wetware-Test-CreateTestSuite
+version: 0.03
+author:
+  - '"drieux" <"drieux [AT] @wetware.com">'
+abstract: for creating TestSuite.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  English: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  ReadOnly: 0
+  Wetware::CLI: 0.06
+  Wetware::Test: 0.06
+build_requires:
+  Test::Compile: 0.08
+  Test::More: 0
+provides:
+  Wetware::Test::CreateTestSuite:
+    file: lib/Wetware/Test/CreateTestSuite.pm
+    version: 0.03
+  Wetware::Test::CreateTestSuite::TestSuite:
+    file: lib/Wetware/Test/CreateTestSuite/TestSuite.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

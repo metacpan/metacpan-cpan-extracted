@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+test.pl
+WebSphere-Payment.ppd
+WebSphere-Payment.wsc
+Payment.pm
+WebSphere-Payment-1.21.readme

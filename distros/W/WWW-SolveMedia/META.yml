@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               WWW-SolveMedia
+version:            1.1
+abstract:           an interface to the Solve Media puzzle API
+author:
+    - Jeff Weisberg <http://www.tcp4me.com/>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:          0
+    Digest::SHA1:  0
+    JSON:          0
+    LWP:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

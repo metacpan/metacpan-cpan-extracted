@@ -1,0 +1,51 @@
+{
+   "abstract" : "backend for searching search.msn.com",
+   "author" : [
+      "Shlomi Fish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Search-MSN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "WWW::Search" : "2.523",
+            "WWW::Search::Test" : "2.265",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Search::MSN" : {
+         "file" : "lib/WWW/Search/MSN.pm",
+         "version" : "0.0202"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/www-search-backends"
+      }
+   },
+   "version" : "0.0202",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

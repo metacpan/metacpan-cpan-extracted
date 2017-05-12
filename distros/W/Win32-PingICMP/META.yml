@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Win32-PingICMP
+version: 0.51
+author:
+  - Toby Ovod-Everett, toby@ovod-everett.org
+abstract: ICMP Ping support for Win32 based on ICMP.DLL
+license: perl
+generated_by: Module::Build version 0.2604, without YAML.pm

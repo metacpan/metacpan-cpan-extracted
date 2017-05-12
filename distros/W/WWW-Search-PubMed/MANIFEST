@@ -1,0 +1,18 @@
+Changes
+lib/WWW/Search/PubMed.pm
+lib/WWW/Search/PubMed/Result.pm
+Makefile.PL
+MANIFEST
+META.yml                                Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/1-test.t
+t/0-signature.t
+t/pod.t
+t/pod_coverage.t
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install.pm
+examples/motif_references.pl

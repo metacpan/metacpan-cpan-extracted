@@ -1,0 +1,10 @@
+Revision history for Perl extension Wordnet::SenseSearch.
+
+0.02  Thu Feb 15 23:12:16 2007
+	- fixed a hex conversion for the number of words in the synset,
+	  courtesy Fintan Costello; added tests for the fix.
+
+0.01  Wed Sep 20 21:56:12 2006
+	- original version; created by h2xs 1.23 with options
+		-X Wordnet::SenseSearch
+

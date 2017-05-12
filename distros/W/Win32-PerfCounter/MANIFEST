@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+PerfCounter.pm
+PerfCounter.xs
+ppport.h
+README
+t/1_use.t
+t/2_frequency.t
+t/3_counter_diff.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                Module meta-data (added by MakeMaker)

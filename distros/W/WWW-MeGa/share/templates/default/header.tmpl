@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+		<title>Gallery</title>
+		<style type="text/css">
+			body {
+				background-color: #111;
+				font: 10pt sans-serif;
+				color: gray;
+			}
+			a { text-decoration: none; color: white; }
+			.item {
+				float: left;
+				height: 12em; 
+				width: 12em; 
+				overflow: hidden;
+				padding: 2em;
+				margin: .5em;
+				background-color: black;
+			}
+			.item img
+			{
+				border: none;
+			}
+
+			.items
+			{
+				margin: auto;
+				padding: .5em;
+				overflow: hidden;
+				text-align: center;
+			}
+			.exif-tiny
+			{
+				font-size: 7pt;
+				text-align: left;
+			}
+			.error
+			{
+				border: 1px solid red;
+			}
+			.parent
+			{
+				float: right;
+			}
+			.off
+			{
+				border: 1px solid gray;
+				position: fixed;
+			}
+			.next
+			{
+				padding-left: 10em;
+			}
+			.tiny { font-size: small; }
+			pre
+			{
+				border: 1px dotted gray;
+			}
+
+		</style>
+	</head>
+	<body>
+	<div class='nav'><%if PARENT %><a href="?path=<%= PARENT %>">back to <%= PARENT %></a><%/if%><br />
+	<span class='off'>
+		<a class='prev' href="?size=<%= SIZE %>;path=<%= PATH_REL %>;off=prev">Previous</a>
+		<a class='next' href="?size=<%= SIZE %>;path=<%= PATH_REL %>;off=next">Next</a>
+	</span>
+	</div>
+

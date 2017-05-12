@@ -1,0 +1,136 @@
+NAME
+    WWW::Notifo - Interface to notifo.com notification service
+
+VERSION
+    This document describes WWW::Notifo version 0.09
+
+SYNOPSIS
+      use WWW::Notifo;
+      my $notifo = WWW::Notifo->new( username => 'foo', secret => 'xabc123' );
+  
+      # Subscribe a user...
+      my $status = $notifo->subscribe_user( username => 'bar' );
+  
+      # Send a notification
+      my $status = $notifo->send_notification(
+        to    => 'someone',
+        msg   => 'Hello!',
+        label => 'JAPH',
+        title => 'Boo',
+        uri   => 'http://example.com/'
+      );
+
+DESCRIPTION
+    Notifo (<http://notifo.com/>) is a web based notification service that
+    can send push messages to mobile deviceas.
+
+    From <http://notifo.com/>:
+
+      What Can I Do With Notifo?
+
+      If you are a User, you can subscribe to receive notifications from
+      your favorite services that integrate with Notifo. On Notifo's site
+      you can set timers, send yourself messages, set stock alerts, and
+      Google Voice SMS alerts. More built-in services will be released in
+      the near future.
+
+      If you are a Service, you can integrate with Notifo's API and start
+      sending mobile notifications to your users within a few hours. No need
+      to spend time or resources developing mobile applications just so you
+      can reach your users!
+
+  "new"
+    Create a new "WWW::Notifo" object. In common with all methods exposed by
+    the module accepts a number of key => value pairs. The "username" and
+    "secret" options are mandatory:
+
+      my $notifo = WWW::Notifo->new(
+        username => 'alice',
+        secret   => 'x3122b4c4d3bad5e8d7397f0501b617ce60afe5d'
+      );
+
+  API Calls
+    API calls provide access to the Notifo API.
+
+    On success they return a reference to a hash containing the response
+    from notifo.com. On errors an exception will be thrown. In the case of
+    an error the response hash can be retrieved by calling "last".
+
+   "subscribe_user"
+    Service providers must call this method when users want to subscribe to
+    notifo alerts. This method will send a confirmation message to the user
+    where they can complete the opt-in process. The service provider will
+    not be able to send notifications to the user until this subscribe/opt-
+    in process has been completed.
+
+    Users sending notifications to themselves with their User account do not
+    need to use this method. Since a User account can only send
+    notifications to itself, it is already implicitly subscribed. Only
+    Service accounts need to use this method to subscribe other users.
+
+      my $resp = $notifo->subscribe_user(
+        username => 'hexten'
+      );
+
+   "send_notification"
+    Once a user has subscribed to notifo alerts, service providers can call
+    this method to send notifications to specific users. The "to" and "msg"
+    parameters are required. The "title" parameter is optional, and can be
+    thought of as a description of the type of notification being sent
+    (almost like the subject of an email). The "uri" parameter is used to
+    specify what URI (web address, app uri, etc) will be loaded when the
+    user opens the notification. If omitted, the default service provider
+    URL is used.
+
+      my $resp = $notifo->send_notification(
+        to    => 'hexten',
+        msg   => 'Testing...',
+        label => 'Test',
+        title => 'Hoot',
+        uri   => 'http://hexten.net/'
+      );
+
+   "api"
+    API entry points other than "subscribe_user" and "send_notification" (of
+    which there are currently none) can be accessed directly by calling
+    "api". For example, the above send_notification example can also be
+    written as:
+
+      my $resp = $notifo->api(
+        'send_notification',
+        to    => 'hexten',
+        msg   => 'Testing...',
+        label => 'Test',
+        title => 'Hoot',
+        uri   => 'http://hexten.net/'
+      );
+
+   "last"
+    Get the most recent response (a hash ref). Useful in the case of an HTTP
+    error (which throws an exception).
+
+  Procedural Interface
+    The following convenience subroutine may be exported:
+
+   "notifo"
+    Send a notification.
+
+      notifo(
+        username  => 'alice',
+        secret    => 'x3122b4c4d3bad5e8d7397f0501b617ce60afe5d',
+        to        => 'hexten',
+        msg       => 'Testing...',
+        label     => 'Test',
+        title     => 'Hoot',
+        uri       => 'http://hexten.net/'
+      );
+
+AUTHOR
+    Andy Armstrong "<andy@hexten.net>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010, Andy Armstrong "<andy@hexten.net>".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

@@ -1,0 +1,53 @@
+Revision history for Perl extension WWW-Selenium-Utils.
+
+0.09 - 13 Mar 2008
+    - added missing Test::Exception dependency
+
+0.08 - 7 Mar 2006
+    - switch to eval'd config file, still support old style
+    - report all errors in file before exiting
+    - Added support to include other files
+    - refactored wiki to html function
+    - Documented integration with Selenium Recorder (Mark Stosberg)
+    - Added sel2wiki utility for converting html tables to wiki
+    - fixed 0/defined bug - thanks Orlando!
+
+0.07 - 16 Dec 2005
+    - wiki file lines with extra pipe are considered invalid (Mark Stosberg)
+    - added support for reading test_dir from config file
+      (default: $Config{prefix}/etc/selutils.conf)
+    - added support for generating a TestSuite for each directory
+    - added support to build a TestSuite index
+    - handle comments before the title in selenium-regen
+    - added auto-generated WWW::Selenium::Utils::Actions from selenium sources
+    - selenium-regen will now die if the number of args is incorrect for certain
+      selenium actions
+    - invalid lines are now fatal 
+
+0.06 - Mon Dec 12 00:22:25 PST 2005
+    - added --base option to selenium-regen to prefix a common
+      path to all open and assert/verifyLocation commands
+      - Thanks Mark Stosberg!
+    - reword the auto-generated comment
+    - bugfixes for directory paths
+
+0.05 - Sat Dec 10 15:42:26 PST 2005
+    - added Auto-generated comment to generated html files
+      (thanks Mark Stosberg!)
+    - added PostResults.pm to write selenium results to file
+    - added script/postResults.cgi   
+
+0.04 - Mon Nov 28 23:09:42 PST 2005
+    - Added state functionality
+    - changed --selenium to default parameter
+    - selenium-regen needs the tests dir, not the selenium dir
+      - Thanks Mark Stosberg!
+    - use test title in TestSuite.html (better titles)
+
+0.03  Later
+    - moved selenium-regen to bin from script
+
+0.01  Fri Nov  4 10:05:50 2005
+	- original version; created by h2xs 1.21 with options
+		-AXP -b 5.6.0 WWW-Selenium-Utils
+

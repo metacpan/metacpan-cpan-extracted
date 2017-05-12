@@ -1,0 +1,62 @@
+
+=head1 NAME
+
+WWW::Scripter::History - History object for WWW::Scripter
+
+=head1 VERSION
+
+Version 0.032
+
+=head1 METHODS
+
+=over
+
+=item length
+
+Returns the number of items in the browser's history.
+
+This is 1 when you
+haven't gone anywhere yet.
+
+=item index
+
+Returns the current position in the history list.
+
+=item go ( $distance )
+
+Moves forward (positive C<$distance>) or back (negative) in history, or
+reloads the page if C<$distance> is 0. If the C<$distance> would cause
+navigation beyond either beginning or end of the history list, nothing 
+happens.
+
+=item back
+
+Same as C<< $history->go(-1) >>.
+
+=item forward
+
+Same as C<< $history->go(1) >>.
+
+=item pushState( $some_scalar, $title, $url )
+
+This adds a 'dummy' entry to browser history, which is identical to the
+current page (actually, it I<is> the current page), except that it has the
+state information contained in C<$some_scalar> associated with it. The
+C<$url>, if specified, becomes the URL of the current page (so a script can
+lie about what the URL is). The C<$title> is ignored.
+
+=back
+
+=head1 AUTHOR & COPYRIGHT
+
+See L<WWW::Scripter>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item -
+
+L<WWW::Scripter>
+
+=back

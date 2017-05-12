@@ -1,0 +1,6 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+lib/WWW/Search/Jobserve.pm
+t/use.t
+README

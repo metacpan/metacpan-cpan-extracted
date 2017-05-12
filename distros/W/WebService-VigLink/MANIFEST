@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Viglink.t
+lib/WebService/VigLink.pm
+META.yml                                 Module meta-data (added by MakeMaker)

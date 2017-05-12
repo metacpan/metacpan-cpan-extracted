@@ -1,0 +1,188 @@
+#! /usr/bin/env perl
+=head1 NAME
+
+fetch_story - fetch a story from the internet
+
+=head1 VERSION
+
+version 0.1902
+
+=head1 SYNOPSIS
+
+fetch_story [ --help | --manpage | --list ]
+
+fetch_story [ --basename I<string> ] [ --firefox_cookies I<filename> | --wget_cookies I<filename> ] [ --first_is_toc ] [ --toc | --epub ] [ --use_wget ] [ --yaml ] I<url> [ I<url> ] ...
+
+=head1 DESCRIPTION
+
+This fetches a story from the net (including multi-part stories) tidies up the
+HTML, and saves it.  If multiple URLs are given, they are assumed to be URLs
+for all the chapters of the story.  If one URL is given, and a story is deduced
+to be a multi-chapter story, all chapters of the story are downloaded.  In
+both cases, the chapters will be saved to separate files.
+
+=head2 Fetcher Plugins
+
+In order to tidy the HTML and parse the pages for data about the story,
+site-specific "Fetcher" plugins have been written for various sites
+such as fanfiction.net, LiveJournal and others.
+These plugins can scrape meta-information about the story from the
+given page, including the URLs of all the chapters of a multi-chapter story.
+
+=head1 OPTIONS
+
+=over
+
+=item --basename I<string>
+
+This option uses the given string as the "base" name of the story file(s)
+instead of constructing the name from the title of the story.
+
+=item --epub
+
+Convert the story file(s) into EPUB format.
+
+=item --firefox_cookies I<filename>
+
+The name of a Firefox 4+ cookie file to use for cookies, for logging in
+to restricted sites.
+This option will be ignored if using wget.
+
+=item --help
+
+Print help and exit.
+
+=item --list
+
+List the available fetcher plugins.
+
+=item --manpage
+
+Print manual page and exit. Requires "perldoc" to be installed.
+
+=item --quiet
+
+Don't be verbose.
+
+=item --toc
+
+Build a table-of-contents file for the story.
+
+=item --use_wget
+
+Use wget to download files rather than the default Perl module, LWP.
+This may be necessary for some sites (such as LiveJournal) which require
+cookies to access restricted content, but which also don't play nice
+with the way LWP handles cookies.
+
+=item --verbose
+
+Be verbose.  If this option is repeated, the output will be even more verbose.
+
+=item --wget_cookies I<filename>
+
+The name of a cookie file in the format used by wget for cookies,
+(also known as Netscape cookie format) for logging in to restricted sites.
+This option works whether one is using wget or not.
+
+=item --yaml
+
+Put the meta-data into a YAML file.
+
+=back
+
+=cut
+use Getopt::Long 2.34;
+use Pod::Usage;
+use File::Basename;
+use YAML::Any;
+use WWW::FetchStory;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $opts = shift;
+
+    $opts->{manpage} = 0;
+    $opts->{verbose} = 0;
+    $opts->{debug} = 0;
+} # init_data
+
+sub process_args ($) {
+    my $opts = shift;
+
+    my $ok = 1;
+
+    # check the rc file if we can
+    if (eval("require Getopt::ArgvFile")) {
+	my $nameBuilder=sub
+	{
+	    my $bn = basename($_[0], '');
+	    [".${bn}rc", ".${bn}/config", ".config/${bn}/config"];
+	};
+	Getopt::ArgvFile::argvFile(
+				   startupFilename=>$nameBuilder,
+				   home=>1,
+				   current=>1);
+    }
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($opts,
+	       'verbose+',
+	       'quiet',
+	       'debug!',
+	       'basename=s',
+	       'firefox_cookies=s',
+	       'wget_cookies=s',
+	       'list',
+	       'toc!',
+               'first_is_toc!',
+	       'epub!',
+	       'yaml!',
+	       'use_wget!',
+	       'manpage',
+	      ) or pod2usage(2);
+
+    if ($opts->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+    if ($opts->{quiet})
+    {
+	$opts->{verbose} = 0;
+    }
+
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+
+    my $fs = WWW::FetchStory->new(%data);
+    if ($data{list})
+    {
+	my %fetchers = $fs->list_fetchers();
+	foreach my $fe_name (sort keys %fetchers)
+	{
+	    print sprintf("%s: %s\n", $fe_name, $fetchers{$fe_name});
+	}
+    }
+    else
+    {
+	my %info = $fs->fetch_story(%data,
+	    urls=>\@ARGV);
+	print Dump(\%info) if $data{verbose};
+    }
+}

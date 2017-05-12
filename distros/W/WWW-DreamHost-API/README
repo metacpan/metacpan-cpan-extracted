@@ -1,0 +1,81 @@
+NAME
+    WWW::DreamHost::API - Perl interface to DreamHost Web Panel API
+
+VERSION
+    1.07
+
+SYNOPSIS
+     my $key = '6SHU5P2HLDAYECUM';
+     my $api = new WWW::DreamHost::API($key);
+     my $res = $api->command('api-list_accessible_cmds');
+     print Data::Dumper->Dump([$res]);
+
+DESCRIPTION
+    WWW::DreamHost::API provides a simple Perl interface to DreamHost Web
+    Panel API.
+
+    Read more about API commands at
+    <http://wiki.dreamhost.com/Application_programming_interface>
+
+METHODS
+  new ( $key )
+    Creates WWW::DreamHost::API object
+
+  uuid ( )
+    Returns UUID. Probably actually unique (randomly based on key and run
+    time). Don't worry, if it's not, because it's reinitializing in case of
+    failure (though I cannot imagine how it can happen).
+
+  reinit ( )
+    If unique check fails, attempt to re-initialize. You don't have to call
+    it yourself.
+
+  command ( $cmd, [ $param => $value, ]+ )
+    Execute a command.
+
+    To get a list of availible commands, use something like that:
+
+        my $res = $api->command('api-list_accessible_cmds');
+        if ($res->{'result'} eq 'success') {
+            my @commands = @{ $res->{'data'} };
+        }
+
+    Returns a hash reference with (usually) 'result' and 'data' keys.
+    'result' can be 'success' or 'error', and 'data' depends on command
+    executed.
+
+    See <http://wiki.dreamhost.com/Application_programming_interface> for
+    more details.
+
+CONFIGURATION AND ENVIRONMENT
+    WWW::DreamHost::API is based on *libwww-perl* which uses *Crypt::SSLeay*
+    or *IO::Socket::SSL*, with all consequences: HTTPS_proxy environment
+    variable and so on. See *LWP* documentation unless you're already
+    familiar with it.
+
+DEPENDENCIES
+    LWP::UserAgent Data::UUID LWP::protocol::https
+
+    If JSON.pm is installed, JSON format is used when making requests to
+    API; otherwise Data::Dumper format is used. Note that Data::Dumper
+    format is "eval"-ed so (in theory) it can be used for security breach.
+    On the side note, Data::Dumper way is 7 times faster.
+
+INCOMPATIBILITIES
+    Not known.
+
+BUGS AND LIMITATIONS
+    Not known, but test suite MAY fail if DreamHost adds some other commands
+    or change their behaviour. If you are using CPAN::Reporter in your
+    service, I'll know about it. Consider installing it, as it really helps
+    authors to know about possible bugs. See
+    <http://wiki.cpantesters.org/wiki/QuickStart>.
+
+AUTHOR
+    Serguei Trouchelle stro@cpan.org
+
+LICENSE AND COPYRIGHT
+    This module is distributed under the same terms as Perl itself.
+
+    Copyright (c) 2009-2015 Serguei Trouchelle
+

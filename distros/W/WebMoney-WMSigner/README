@@ -1,0 +1,30 @@
+NAME
+    WebMoney::WMSigner - WebMoney signer module
+
+SYNOPSIS
+      use WebMoney::WMSigner;
+
+      my $signed_str = WebMoney::WMSigner::sign( $wmid, $passwd, $path_to_keyfile, $str_to_sign );
+
+DESCRIPTION
+    This is signer module that signs any data using specified WebMoney key
+    file. Key file is protected by password. See more details at
+    http://www.webmoney.ru.
+
+    In the original WMSigner distribution
+    (http://download.webmoney.ru/WMSigner.zip) signer is implemented as an
+    external command-line utility - this is not very convenient interface.
+    This module implements native Perl interface without using any external
+    command-line utilities. WMSigner code is compiled as XS module - this
+    makes many advantages.
+
+EXPORT
+    None by default.
+
+AUTHOR
+    Walery Studennikov, <despair@cpan.org> Based on code of WMSigner utility
+    by WebMoney <unix_support@webmoney.ru>
+
+SEE ALSO
+    http://www.webmoney.ru
+

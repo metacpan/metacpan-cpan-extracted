@@ -1,0 +1,63 @@
+{
+   "abstract" : "Perl module for rajce.net web API.",
+   "author" : [
+      "Petr Kletecka <pek@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Rajce",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "2.06_05",
+            "Getopt::Long" : "0",
+            "Image::Magick" : "0",
+            "Net::Netrc" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "WWW::Mechanize" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/petrkle/webservice-rajce/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/petrkle/webservice-rajce.git",
+         "web" : "https://github.com/petrkle/webservice-rajce"
+      }
+   },
+   "version" : "1.152450"
+}
+

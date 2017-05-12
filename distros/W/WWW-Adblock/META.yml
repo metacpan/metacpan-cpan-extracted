@@ -1,0 +1,23 @@
+---
+abstract: 'a simple implementation of Adblock Plus in Perl'
+author:
+  - 'The idea for this code comes from Adblock Plus.  Find out more at http://adblockplus.org/en/.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Adblock
+no_index:
+  directory:
+    - inc
+requires:
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+lib/Wx/Perl/EntryList.pm
+lib/Wx/Perl/EntryList/FwBwIterator.pm
+lib/Wx/Perl/EntryList/Iterator.pm
+lib/Wx/Perl/EntryList/ListBoxView.pm
+lib/Wx/Perl/EntryList/VirtualListCtrlView.pm
+t/001_load.t
+t/zzy_pod_coverage.t
+t/zzz_pod.t

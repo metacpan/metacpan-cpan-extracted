@@ -1,0 +1,23 @@
+---
+abstract: 'Make readlink work with shortcuts'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '0.82'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Shortcut-Readlink
+requires:
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/plicease/win32-shortcut-readlink/issues
+  homepage: http://perl.wdlabs.com/Win32-Shortcut-Readlink/
+  repository: git://github.com/plicease/win32-shortcut-readlink.git
+version: '0.02'

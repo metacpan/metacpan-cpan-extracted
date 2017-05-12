@@ -1,0 +1,111 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdfdc28.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2010-11-28
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+%loadplugin{myinc::XSPP::Overload};
+
+%name{Wx::PdfDC} class wxPdfDC: public %name{Wx::DC} wxDC
+{
+
+public:
+
+  %name{newDefault} wxPdfDC() %Overload;
+  
+  %name{newPrintData} wxPdfDC(const wxPrintData& printData) %Overload;
+  
+  %name{newDocument} wxPdfDC(wxPdfDocument* pdfDocument, double templateWidth, double templateHeight) %Overload;
+ 
+  wxPdfDocument* GetPdfDocument();
+  
+  // void SetPrintData(const wxPrintData& data);
+  // wxPrintData& GetPrintData();
+
+  void SetResolution(int ppi);
+  int GetResolution() const;
+  
+  void SetMapModeStyle(wxPdfMapModeStyle style);
+  wxPdfMapModeStyle GetMapModeStyle() const;
+
+  // implement base class pure virtuals
+
+  virtual void Clear();
+  virtual bool StartDoc(const wxString& message);
+  virtual void EndDoc();
+  virtual void StartPage();
+  virtual void EndPage();
+  virtual void SetFont(const wxFont& font);
+  
+  virtual void SetPen(const wxPen& pen);
+  virtual void SetBrush(const wxBrush& brush);
+  virtual void SetBackground(const wxBrush& brush);
+  virtual void SetBackgroundMode(int mode);
+  virtual void SetPalette(const wxPalette& palette);
+
+  virtual void DestroyClippingRegion();
+
+  virtual wxCoord GetCharHeight() const;
+  virtual wxCoord GetCharWidth() const;
+
+  virtual bool CanDrawBitmap() const;
+  virtual bool CanGetTextExtent() const;
+  virtual int GetDepth() const;
+  virtual wxSize GetPPI() const;
+  
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+  virtual void SetMapMode(wxMappingMode mode);
+#else
+  virtual void SetMapMode(int mode);
+#endif
+
+  virtual void SetUserScale(double x, double y);
+
+  virtual void SetLogicalScale(double x, double y);
+  virtual void SetLogicalOrigin(wxCoord x, wxCoord y);
+  virtual void SetDeviceOrigin(wxCoord x, wxCoord y);
+  virtual void SetAxisOrientation(bool xLeftRight, bool yBottomUp);
+
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+  virtual void SetLogicalFunction(wxRasterOperationMode function);
+#else
+  virtual void SetLogicalFunction(int function);
+#endif
+
+  virtual void SetTextForeground(const wxColour& colour);
+/*
+#if 0
+  
+  virtual void SetTextBackground(const wxColour& colour);
+  virtual void ComputeScaleAndOrigin();
+#endif
+*/
+
+/*
+#if 0
+  // works for single as well as multi-line strings
+  virtual void GetMultiLineTextExtent(const wxString& string,
+                                      wxCoord *width,
+                                      wxCoord *height,
+                                      wxCoord *heightLine = NULL,
+                                      wxFont *font = NULL) const;
+
+  // RTL related functions
+  // ---------------------
+
+  // get or change the layout direction (LTR or RTL) for this dc,
+  // wxLayout_Default is returned if layout direction is not supported
+  virtual wxLayoutDirection GetLayoutDirection() const
+        { return wxLayout_Default; }
+  virtual void SetLayoutDirection(wxLayoutDirection WXUNUSED(dir))
+       { }
+#endif
+ */
+
+};

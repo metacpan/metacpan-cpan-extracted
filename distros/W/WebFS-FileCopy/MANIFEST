@@ -1,0 +1,14 @@
+CHANGES
+MANIFEST
+README
+Makefile.PL
+lib/WebFS/FileCopy.pm
+lib/WebFS/FileCopy/Put.pm
+lib/WebFS/FileCopy/Put/FTP.pm
+lib/WebFS/FileCopy/Put/File.pm
+t/01copy.t
+t/file1
+t/file2
+t/file3
+t/file5
+t/dir/file6

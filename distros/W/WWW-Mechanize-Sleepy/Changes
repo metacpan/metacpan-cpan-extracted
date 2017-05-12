@@ -1,0 +1,25 @@
+Revision history for Perl extension WWW::Mechanize::Sleepy
+
+0.7   Wed Sep 29 2010
+    - Primary maintenance taken over by Kostas Ntonas (kntonas@gmail).
+    - get method removed becaused it caused the agent to sleep twice than it should.
+
+0.6   Tue Mar 20 09:44:05 EDT 2007
+    - updated to work with WWW::Mechanize 1.86 - thanks alexchorny@gmail.com
+
+0.5   Sun Aug 31 12:41:50 2003
+	- constructor now allows you to not pass in anything if you want a 
+	  vanilla WWW::Mechanize object (thanks Nicholas Dronen).
+
+0.4   Tue Aug 26 14:00:32 2003
+	- added trailing slash to test url
+
+0.3   Tue Aug 26 10:24:09 2003
+	- use http://www.google.com/intl/en/ for tests
+
+0.2   Mon Aug 25 11:02:05 2003
+	- doc fix
+
+0.1   Fri Aug 22 21:18:47 2003
+	- original version
+

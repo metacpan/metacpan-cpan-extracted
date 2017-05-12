@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WebService/PhotoZou.pm
+t/00_compile.t
+t/01_nop.t
+t/02_photo.t
+t/03_search_public.t
+t/04_user_group.t
+t/test.jpg

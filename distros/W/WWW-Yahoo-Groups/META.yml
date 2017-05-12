@@ -1,0 +1,43 @@
+--- #YAML:1.0
+# http://module-build.sourceforge.net/META-spec.html
+distribution_type: module
+name: WWW-Yahoo-Groups
+date: 1 Dec 2003
+author: SPOON
+version: 1.91
+license: perl
+
+conflicts: {}
+
+build_requires:
+  Test::Differences: 0.47
+  Test::More: 0.47
+recommends:
+  Test::Pod: 1.02
+  Test::Signature: 1.05
+requires:
+  Exception::Class: 1.16
+  HTML::Entities: 1.27
+  HTTP::Cookies: 1.36
+  Net::SSL: 2.77
+  Params::Validate: 0.70
+  WWW::Mechanize: 0.70
+
+private:
+  directory:
+    - examples
+    - t
+
+provides:
+  WWW::Yahoo::Groups:
+    file: lib/WWW/Yahoo/Groups.pm
+    version: 1.91
+  WWW::Yahoo::Groups::Errors:
+    file: lib/WWW/Yahoo/Groups/Errors.pm
+    version: 1.91
+  WWW::Yahoo::Groups::Mechanize:
+    file: lib/WWW/Yahoo/Groups/Mechanize.pm
+    version: 1.91
+
+dynamic_config: 0
+generated_by: docmaker version 1.01

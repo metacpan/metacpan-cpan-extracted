@@ -1,0 +1,61 @@
+Revision history for WebService::Wikimapia
+
+0.12  Mon Apr 10 19:10:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.11  Sun Apr 09 11:20:00 2017
+      - Added key 'provides' to Makefile.PL script.
+
+0.10  Tue Jan 24 12:10:00 2017
+      - Fixed inconsisten versions.
+      - Renamed method 960_url() to url_960() and 1280_url() to url_1280() to fix invalid sub name error.
+        http://www.cpantesters.org/cpan/report/480d32cc-e0d8-11e6-af13-afb6b8e3343c
+      - Added $AUTHORITY to each package in the distribution.
+
+0.09  Sun Jan 22 03:15:00 2017
+      - Added LICENSE file.
+      - General tidied up Makefile.PL and t/00-load.t scripts.
+
+0.08  Fri Jan 16 16:05:00 2015
+      - Removed the duplicate entry from the MANIFEST file.
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.07  Mon Oct 13 23:34:29 2014
+      - Updated section 'Description', regarding deprecation of methods search(), box() and object().
+      - Marked methods search(), box() and object() as deprecated in the pod document.
+      - Removed the key 'disable' from the pod document in the section 'Constructor'.
+      - Updated method box() description in the perldoc.
+      - Updated method category_getbyid() in the perldoc, (example passing param incorrectly)
+      - Updated method _url() and remove key 'disable' from the url.
+      - Updated method place_getbyarea() to returns a ref to the list of object of type WebService::Wikimapia::Place.
+      - Updated method place_getnearest() to returns a ref to the list of object of type WebService::Wikimapia::Place.
+      - Updated method place_search() to returns a ref to the list of object of type WebService::Wikimapia::Place.
+      - Updated method search() to return an object of type 'WebService::Wikimapia::Place'.
+      - Added attribute 'name' to the package 'WebService::Wikimapia::Place'.
+      - Deleted the package WebSservice::Wikimapi::Response.
+      - Deleted the package WebSservice::Wikimapi::Result.
+
+0.06  Mon Oct 13 00:58:10 2014
+      - Fixed the typo in the package WebService::Wikimapia::UserAgent::Exception.
+      - Tidied up pod document.
+
+0.05  Sun Oct 12 21:07:45 2014
+      - Restructured the code using 'Moo'.
+      - Respresent the result of API into individual objects.
+      - Making use of useragent and exception object.
+      - Added 'Repository' section.
+
+0.04  Fri Oct 03 23:55:20 2014
+      - Tidied up distribution.
+
+0.03  Mon Aug 08 13:29:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.02  Wed Aug 03 10:03:01 2011
+      - Added optional parameters handler.
+
+0.01  Tue Aug 02 14:48:01 2011
+      - First version, released.

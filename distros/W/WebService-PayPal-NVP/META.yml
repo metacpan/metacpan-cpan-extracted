@@ -1,0 +1,48 @@
+---
+abstract: 'PayPal NVP API'
+author:
+  - 'Brad Haywood <brad@perlpowered.com>'
+build_requires:
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  YAML::Syck: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-PayPal-NVP
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  DateTime: '0'
+  Encode: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0'
+  URI::Escape: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bradhaywood/WebService-PayPal-NVP/issues
+  homepage: https://github.com/bradhaywood/WebService-PayPal-NVP
+  repository: https://github.com/bradhaywood/WebService-PayPal-NVP.git
+version: '0.006'
+x_contributors:
+  - 'Brad Haywood <brad@geeksware.(none)>'
+  - 'Brad Haywood <brad.haywood@opusvl.com>'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Сергей Романов <complefor@rambler.ru>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

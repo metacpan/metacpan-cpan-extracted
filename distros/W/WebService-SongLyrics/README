@@ -1,0 +1,16 @@
+Webservice::SongLyrics
+  Retrieve and return song lyrics from www.songlyrics.com
+
+For documentation please read the modules inline POD.
+  perldoc Webservice::SongLyrics
+
+To install, do the usual:
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.
+
+For a complete list of changes, see the Changes file.

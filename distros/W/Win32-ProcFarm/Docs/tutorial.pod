@@ -1,0 +1,251 @@
+=head1 TUTORIAL
+
+Win32-ProcFarm - system for parallelization of code under Win32
+
+=head1 How C<Win32::ProcFarm::Parent> Works
+
+Because the C<Win32::ProcFarm::Parent>/C<Win32::ProcFarm::Child> concept is
+critical to the C<Win32::ProcFarm::Pool>, I will start with a demonstration of
+the "RPC" system first.
+
+In this demonstration, the child process has one function: C<dir>. The
+function sleeps for five seconds before returning the results of executing
+C<dir> on the passed parameter.  The parent will spin off one child, tell it
+to do a dir on C<C:\>, and return the results.
+
+=head2 DirChild.pl
+
+The child is fairly simple to implement.  First we start off with some
+boilerplate code that imports C<Win32/ProcFarm/Child.pl>, initiates the
+communications with the parent, and the main loop implementation.
+
+  require 'Win32/ProcFarm/Child.pl';
+
+  &init;
+  while(1) {
+    &main_loop;
+  }
+
+We then implement our demonstration function, C<dir>, which sleeps for five
+seconds and then returns the result of a dir on the passed argument.
+
+  sub dir {
+    my($string) = @_;
+
+    sleep(5);
+    return `dir $string`;
+  }
+
+That's it for the child.  Note that the child script can have multiple
+subroutines if desired.
+
+=head2 DirParent.pl
+
+The parent is a little more complicated.  Again, much of the code is
+boilerplate.  We start with the default includes:
+
+  use Win32::ProcFarm::Parent;
+  use Win32::ProcFarm::Port;
+
+We then create a C<Win32::ProcFarm::Port> object and pass the port number we
+wish to use.  If we want to use the process farm in multiple scripts that will
+be run simultaneously, we need to use different port numbers.
+
+  $port_obj = Win32::ProcFarm::Port->new(9000, 1);
+
+We then instantiate a C<Win32::ProcFarm::Parent> object which will act as a
+stand-in for the child process.  We use C<new_async> which starts the child
+process without connecting to it.  We also pass it the name of the child
+script, and the desired working directory.
+
+  $interface = Win32::ProcFarm::Parent->new_async($port_obj, "DirChild.pl", Win32::GetCwd);
+
+Once we have the process spun off, we call C<connect> on the stand-in to
+initiate communications with the child process.
+
+  $interface->connect;
+
+Once we have initiated communications, we can start sending commands to the
+child process.  The C<execute> method takes first the name of the command to
+execute as a string and then any parameters that need to be passed to it.  The
+parameters will be packaged up using Data::Dumper for passing to the child
+process.
+
+  $interface->execute('dir', "C:\\");
+
+We then wait for C<get_state> to return C<fin>, which indicates that the
+command has finished execution and the return values can be retrieved.
+
+  until($interface->get_state eq 'fin') {
+    print "Waiting for ReturnValue.\n";
+    sleep(1);
+  }
+  print "GotReturnValue.\n";
+
+Once we know that C<check> has been successful, we can use C<get_retval> to
+get the returned values
+
+  print $interface->get_retval;
+
+As you may have noticed, for a single process system,
+C<Win32::ProcFarm::Parent> is overly complicated.  The main reason for this is
+that it was designed to enable asynchronous operation so that the pool would
+work, and so we will turn to the pool.
+
+=head1 Using C<Win32::ProcFarm::Pool>
+
+In this demonstration, a range pinger is implemented.  The idea is that the
+user can specify the base 3 octets along with the start and end values for the
+last octet and the program will ping all IP addresses in that range and return
+the IP addresses that are in use.
+
+=head2 PingChild.pl
+
+This child is so simplistic I'm just pasting the code in here.  Of note,
+C<$p> is a global variable so it only has to be created once.
+
+  use Net::Ping;
+
+  require 'Win32/ProcFarm/Child.pl';
+
+  &init;
+  while(1) { &main_loop };
+
+  sub ping {
+    my($host) = @_;
+
+    $p or $p = Net::Ping->new("icmp", 1);
+    return $p->ping($host);
+  }
+
+=head2 PingParent.pl
+
+This is where the real fun begins.  First we start with the C<use> statement:
+
+  use Win32::ProcFarm::Pool;
+
+We then check the passed parameters from the command line:
+
+  $ARGV[0] =~ /^(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3})-(\d{1,3})$/ or
+      die "Pass me the range to ping in the format start_address-end (i.e. 135.40.94.1-40).\n";
+  ($base, $start, $end) = ($1, $2, $3);
+
+We then decide on a pool size based on the number of addresses we are planning
+to ping.  In general, the optimal number of processes is proportional to the
+square root of the number of jobs.  I also output some text to let the user
+know what is going on and set a timer (the timer code is in two subroutines at
+the end of the script).
+
+  $poolsize = int(sqrt(($end-$start+1)*2));
+  print "Creating pool with $poolsize threads . . .\n";
+  &set_timer;
+
+The pool is then created.  This takes as parameters to C<new> the
+number of processes to create for the pool, the mutex string root, the port
+number to which to bind, the name of the child process, and the working
+directory in which to start those child processes.
+
+  $Pool = Win32::ProcFarm::Pool->new($poolsize, 9000, 'PingChild.pl',
+  Win32::GetCwd); print "Pool created in ".&get_timer." seconds.\n";
+  &set_timer;
+
+Once the pool is created we can now add jobs to the waiting queue.  The
+C<add_waiting_job> method takes several parameters:  First, a
+unique identifier for the thread that will be used by the pool as the hash
+key for the return values.  Second, the name of the command to execute.
+Third, any parameters that need to be passed to that command.
+
+  foreach $i ($start..$end) {
+    $ip_addr = "$base.$i";
+    $Pool->add_waiting_job($ip_addr, 'ping', $ip_addr);
+  }
+
+Finally, we tell the pool to execute all the commands.  The parameter passed
+is the number of seconds to pause between checking the process pool for
+process that have finished execution.
+
+  $Pool->do_all_jobs(0.1);
+
+After all the jobs have been executed, C<get_return_data> will return
+a hash containing the returned data.  The keys to the hash were passed when
+the jobs were added to the waiting pool and the return values are stored in
+an anonymous array.  Of note, if you wish to re-use the process farm later in
+the same code, the C<clear_return_data> method will clear the hash so
+that the data from multiple runs are not co-mingled.
+
+  %pingdata = $Pool->get_return_data;
+
+Finally, the results can be printed out.  Notice that the data has to be
+pulled out of the anonymous array (the C<< ->[0] >>).
+
+  $retval = 0;
+  foreach $i ($start..$end) {
+    $ip_addr = "$base.$i";
+    if ($pingdata{$ip_addr}->[0]) {
+      print "$ip_addr\n";
+      $retval++;
+    }
+  }
+  print "Total of $retval addresses responded in ".&get_timer." seconds.\n";
+
+Finally, the C<set_timer> and C<get_timer> functions used to provide quick and
+dirty timing results.
+
+  sub set_timer {
+    $start_clock = Win32::GetTickCount();
+  }
+
+  sub get_timer {
+    return (Win32::GetTickCount()-$start_clock)/1000;
+  }
+
+=head1 Rudimentary Docs on a few things to think about
+
+=head2 C<Win32::ProcFarm::PerpetualPool.pm>
+
+Normal pools are designed for the problem: "I have this list of jobs to do.
+Execute all of them and display/record/summarize the results."
+
+Perpetual pools are designed for the problem: "I want to monitor this
+(possible changing, but largely static) list of machines/accounts/entities
+steadily and display/record/summarize the results continually."
+
+In a normal pool, jobs move from the waiting_pool to the thread_pool and then
+disappear (although the results are added to the results hash).  In a
+perpetual pool, jobs move from the waiting_pool to the thread_pool, but when
+they finish they move back into the waiting_pool.  Every so often, a
+subroutine is run that updates the list of machines/account/entities being
+executed, and the perpetual pool code takes care of adding new ones into the
+waiting_pool and when the delete ones show up for execution, they get purged.
+
+If your problem falls into the second category, take a look at the
+PingPerpetual.pl sample.
+
+
+=head2 Think about setting a timeout value
+
+The support for timeouts on child process job execution sits at a fairly low
+level in the code base - it's actually in the C<Win32::ProcFarm::Parent> code.
+This means you don't even have to use a pool to make use of the support.  If
+you have a problem where you don't need parallelization support, but you have
+code that keeps hanging, you can use split your code into two parts and use a
+Win32::ProcFarm::Parent object to take care of the killing the child process
+when it takes too long to do something.
+
+
+=head2 Check out result_sub
+
+If you want to be able to return the results asychronously as the jobs
+execute, result_sub is your friend.  You've probably noticed that printing to
+STDOUT from child processes is a big no-no - you end up with merged and mixed
+up output.  Use result_sub - it's available in C<Win32::ProcFarm::Pool> and
+C<Win32::ProcFarm::PerpetualPool>.  It's not in C<Win32::ProcFarm::TkPool>,
+but that has support for independent callbacks on every job instead.
+
+=head2 Think about max_rate
+
+If you have jobs that take a variable amount of time to execute, but you want
+them started on a fairly consistent schedule, look at max_rate.  It's only
+available with C<Win32::ProcFarm::Pool>, but it allows you to restrict the
+rate at which jobs are started (which can be useful if those jobs cause other
+machines to impose a load on a shared resource).

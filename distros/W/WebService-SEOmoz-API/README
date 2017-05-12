@@ -1,0 +1,92 @@
+NAME
+    WebService::SEOmoz::API - SEOmoz API
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use WebService::SEOmoz::API;
+
+        my $seomoz = WebService::SEOmoz::API->new(
+            accessID   => $accessID,
+            secretKey  => $secretKey,
+            expiresInterval => $expiresInterval, # optional, default 300s
+        ) or die "Can't init the seomoz instance: " . $WebService::SEOmoz::API::errstr;
+    
+        my $t = $seomoz->getUrlMetrics( {
+            objectURL => 'www.seomoz.org/blog',
+        } ) or die $seomoz->errstr;
+    
+        $t = $seomoz->getLinks( {
+            objectURL => 'www.google.com',
+            Scope => 'page_to_page',
+            Sort  => 'page_authority',
+            Limit => 1,
+        } ) or die $seomoz->errstr;
+
+DESCRIPTION
+    <http://www.seomoz.org/api>
+
+  METHODS
+   CONSTRUCTION
+        my $seomoz = WebService::SEOmoz::API->new(
+            accessID   => $accessID,
+            secretKey  => $secretKey,
+            expiresInterval => $expiresInterval, # optional, default 300s
+        );
+
+    *   accessID
+
+    *   secretKey
+
+        get them from http://www.seomoz.org/api/ after signup
+
+    *   ua_args
+
+        passed to LWP::UserAgent
+
+    *   ua
+
+        LWP::UserAgent or WWW::Mechanize instance
+
+   getUrlMetrics
+        my $t = $seomoz->getUrlMetrics( {
+            objectURL => 'www.seomoz.org/blog',
+        } );
+
+    <http://apiwiki.seomoz.org/w/page/13991153/URL-Metrics-API>
+
+   getLinks
+        my $t = $seomoz->getLinks( {
+            objectURL => 'www.google.com',
+            Scope => 'page_to_page',
+            Filter => 'internal 301',
+            Sort => 'page_authority',
+            SourceCols => 536870916,
+            TargetCols => 4,
+            Limit => 1,
+        } );
+
+    <http://apiwiki.seomoz.org/w/page/13991141/Links-API>
+
+   getAnchorText
+        my $t = $seomoz->getAnchorText( {
+            objectURL => 'www.google.com',
+            Scope => 'page_to_page',
+            Sort => 'page_authority',
+            Cols => 536870916,
+            Offset => 4,
+            Limit => 1,
+        } );
+
+    <http://apiwiki.seomoz.org/w/page/13991127/Anchor-Text-API>
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

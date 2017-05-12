@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/initial.t
+lib/WebService/Validator/HTML/W3C/Fast.pm
+META.yml                                 Module meta-data (added by MakeMaker)

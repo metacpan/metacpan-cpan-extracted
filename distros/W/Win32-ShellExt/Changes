@@ -1,0 +1,7 @@
+Revision history for Perl extension Win32::ShellExt.
+
+0.1  Sun Jan 13 21:38:42 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Win32::ShellExt
+
+

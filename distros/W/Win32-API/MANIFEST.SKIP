@@ -1,0 +1,11 @@
+API\.xsc$
+^blib
+^patches/
+\.git
+pm_to_blib$
+\.bak$
+\.old$
+^Makefile$
+^Callback/Makefile$
+t/StructTest\.pl$
+^MYMETA\.

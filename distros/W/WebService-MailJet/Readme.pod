@@ -1,0 +1,27 @@
+=pod
+
+=encoding UTF-8
+
+=head1 SYNOPSIS
+
+use WebService::Mailjet;
+
+    my $mailjet = WebService::MailJet->new(auth_key => 'abc',auth_secret=>'xyz');
+
+    All "GET" Methods are called on send
+
+    my $json = $mailjet->send('apikey');
+
+    All "post" methos are called on send_post
+
+    my $data = ( 'name' =>'Name' , 'DateType'=> "str", 'NameSpace' : 'static' );
+
+    my $json = $mailjet->send_post('contactmetadata' , %data);
+
+    All "put" methos are called on send_put
+
+    my $data = ( 'title' => 'Update title of the Newsletter' );
+
+    my $json = $mailjet->send_put('newsletter/123' , %data);
+
+=cut

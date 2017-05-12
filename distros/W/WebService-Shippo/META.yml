@@ -1,0 +1,130 @@
+---
+abstract: 'A Shippo Perl API wrapper'
+author:
+  - 'Iain Campbell <cpanic@cpan.org>'
+build_requires:
+  Data::Dumper::Concise: '0'
+  Test::Deep: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Shippo
+provides:
+  WebService::Shippo:
+    file: lib/WebService/Shippo.pm
+    version: v0.0.21
+  WebService::Shippo::Address:
+    file: lib/WebService/Shippo/Address.pm
+    version: v0.0.21
+  WebService::Shippo::Addresses:
+    file: lib/WebService/Shippo/Addresses.pm
+    version: v0.0.21
+  WebService::Shippo::Async:
+    file: lib/WebService/Shippo/Async.pm
+    version: v0.0.21
+  WebService::Shippo::CarrierAccount:
+    file: lib/WebService/Shippo/CarrierAccount.pm
+    version: v0.0.21
+  WebService::Shippo::CarrierAccounts:
+    file: lib/WebService/Shippo/CarrierAccounts.pm
+    version: v0.0.21
+  WebService::Shippo::Collection:
+    file: lib/WebService/Shippo/Collection.pm
+    version: v0.0.21
+  WebService::Shippo::Config:
+    file: lib/WebService/Shippo/Config.pm
+    version: v0.0.21
+  WebService::Shippo::Create:
+    file: lib/WebService/Shippo/Create.pm
+    version: v0.0.21
+  WebService::Shippo::Currency:
+    file: lib/WebService/Shippo/Currency.pm
+    version: v0.0.21
+  WebService::Shippo::CustomsDeclaration:
+    file: lib/WebService/Shippo/CustomsDeclaration.pm
+    version: v0.0.21
+  WebService::Shippo::CustomsDeclarations:
+    file: lib/WebService/Shippo/CustomsDeclarations.pm
+    version: v0.0.21
+  WebService::Shippo::CustomsItem:
+    file: lib/WebService/Shippo/CustomsItem.pm
+    version: v0.0.21
+  WebService::Shippo::CustomsItems:
+    file: lib/WebService/Shippo/CustomsItems.pm
+    version: v0.0.21
+  WebService::Shippo::Fetch:
+    file: lib/WebService/Shippo/Fetch.pm
+    version: v0.0.21
+  WebService::Shippo::Item:
+    file: lib/WebService/Shippo/Item.pm
+    version: v0.0.21
+  WebService::Shippo::Manifest:
+    file: lib/WebService/Shippo/Manifest.pm
+    version: v0.0.21
+  WebService::Shippo::Manifests:
+    file: lib/WebService/Shippo/Manifests.pm
+    version: v0.0.21
+  WebService::Shippo::Object:
+    file: lib/WebService/Shippo/Object.pm
+    version: v0.0.21
+  WebService::Shippo::Parcel:
+    file: lib/WebService/Shippo/Parcel.pm
+    version: v0.0.21
+  WebService::Shippo::Parcels:
+    file: lib/WebService/Shippo/Parcels.pm
+    version: v0.0.21
+  WebService::Shippo::Rate:
+    file: lib/WebService/Shippo/Rate.pm
+    version: v0.0.21
+  WebService::Shippo::Rates:
+    file: lib/WebService/Shippo/Rates.pm
+    version: v0.0.21
+  WebService::Shippo::Refund:
+    file: lib/WebService/Shippo/Refund.pm
+    version: v0.0.21
+  WebService::Shippo::Refunds:
+    file: lib/WebService/Shippo/Refunds.pm
+    version: v0.0.21
+  WebService::Shippo::Request:
+    file: lib/WebService/Shippo/Request.pm
+    version: v0.0.21
+  WebService::Shippo::Resource:
+    file: lib/WebService/Shippo/Resource.pm
+    version: v0.0.21
+  WebService::Shippo::Shipment:
+    file: lib/WebService/Shippo/Shipment.pm
+    version: v0.0.21
+  WebService::Shippo::Shipments:
+    file: lib/WebService/Shippo/Shipments.pm
+    version: v0.0.21
+  WebService::Shippo::Transaction:
+    file: lib/WebService/Shippo/Transaction.pm
+    version: v0.0.21
+  WebService::Shippo::Transactions:
+    file: lib/WebService/Shippo/Transactions.pm
+    version: v0.0.21
+  WebService::Shippo::Update:
+    file: lib/WebService/Shippo/Update.pm
+    version: v0.0.21
+requires:
+  Clone: '0'
+  File::HomeDir: '0'
+  JSON::XS: '0'
+  LWP: '0'
+  LWP::Protocol::https: '0'
+  MRO::Compat: '0'
+  Params::Callbacks: '0'
+  Path::Class: '0'
+  Sub::Util: '0'
+  URI::Encode: '0'
+  YAML::XS: '0'
+  boolean: '0'
+  perl: v5.8.8
+resources:
+  repository: https://github.com/cpanic/WebService-Shippo.git
+version: 0.0.21

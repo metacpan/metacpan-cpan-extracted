@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Simpy.t
+lib/WWW/Simpy.pm
+META.yml                                 Module meta-data (added by MakeMaker)

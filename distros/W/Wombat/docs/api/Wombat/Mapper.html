@@ -1,0 +1,107 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Mapper - internal mapper interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Mapper - internal mapper interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface specifies a component that selects a subordinate
+Container to continue processing a Request for a parent Container,
+modifying the properties of the Request to reflect the selections
+made.</P>
+<P>A Container may be associated with a single Mapper that processes all
+requests to that Container or a Mapper for each request protocol that
+the Container supports.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container with which the Mapper is associated.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container with which the Mapper is associated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG> used for processing Requests
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+if the Container is not acceptable to this Mapper
+<P></P></DL>
+<DT><STRONG><A NAME="item_getProtocol"><CODE>getProtocol()</CODE></A></STRONG><BR>
+<DD>
+Return the protocol for which this Mapper is responsible.
+<P></P>
+<DT><STRONG><A NAME="item_setProtocol"><CODE>setProtocol($protocol)</CODE></A></STRONG><BR>
+<DD>
+Set the protocol for which this Mapper is responsible.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24protocol">$protocol</A></STRONG><BR>
+<DD>
+the protocol
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_map"><CODE>map($request)</CODE></A></STRONG><BR>
+<DD>
+Return the child Container that should be used to process the
+Request, or <CODE>undef</CODE> f no such child Container can be identified.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> being processed
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

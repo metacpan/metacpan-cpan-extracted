@@ -1,0 +1,49 @@
+WWW-Opentracker-Stats
+==================================
+
+Provides an easy to use interface to retrieve various statistics from
+opentracker, a BitTorrent tracker.
+
+It executes HTTP requests to opentrackers web services, parses the
+response and returns data structures that you can easily extract data from,
+to store it in a database or display it on the web.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+See http://erdgeist.org/arts/software/opentracker/ for instructions
+of installing opentracker and running.
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    parent
+    Bit::Vector
+    Carp
+    Class::Accessor::Fast
+    Convert::Bencode
+    LWP::UserAgent
+    Params::Validate
+
+You also need a running opentracker server for this module to be useful.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009, Knut-Olav Hoven
+Copyright 2009, NRK (The Norwegian Broadcasting Corporation)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

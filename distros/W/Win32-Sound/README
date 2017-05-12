@@ -1,0 +1,18 @@
+#######################################################################
+#
+# Win32::Sound - An extension to play with Windows sounds
+# 
+# Author: Aldo Calpini <dada@perl.it>
+# Version: 0.50
+# Info:
+#       http://dada.perl.it/
+#       https://github.com/dada/win32-sound
+#
+#######################################################################
+
+This module lets you:
+    * play WAV files
+    * get WAV files format details
+    * enumerate sound devices and get info
+    * set the wave playback volume
+    * do some wave audio data manipulation

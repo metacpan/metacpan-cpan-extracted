@@ -1,0 +1,16 @@
+Revision history for WebService-NiigataUnyu
+
+0.0.6  Wed Apr 06 00:34:06 2011
+       Use CP932 decode
+       Fixed parsing
+
+0.0.3  Thu Feb 22 11:57:01 2011
+       Add user_agent in results ( $res->[0]->{user_agent} = __PACKAGE_NAME__; ) .
+
+0.0.2  Mon Jan 31 13:25:52 2011
+       有効なお問合せ番号を入れた場合、想定したTABLE要素と違った
+       書式で書き出されることが発覚したので修正した。
+
+0.0.1  Sat Jan 29 15:55:52 2011
+       Initial release.
+

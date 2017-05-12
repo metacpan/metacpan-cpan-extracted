@@ -1,0 +1,8 @@
+#   1.07    2015/06/29  Removed Crypt::SSLeay dependency in favor of LWP 6.02
+#   1.06    2013/06/24  Fixed distribution to prevent circular dependency error
+#   1.05    2012/03/24  Converted distribution to Dist::Zilla, improved style, fixed typos
+#   1.04    2012/03/24  If JSON is installed use it to prevent potential security breach (thanks to Darin McBride). Added "dynamic dns" script example.
+#   1.03    2011/03/31  Added LWP::Protocol::https as prerequisite to resolve problems with libwww-perl v6
+#   1.02    2009/11/22  Added "sanity check" test so at least one test is passed, regardless of presence of Test::More, Test::Pod::Coverage and Test::Pod -- to avoid UNKNOWN status
+#   1.01    2009/10/18  Updated test prerequisites to Test::More 0.88 (thanks to Andreas Koenig)
+#   1.00    2009/09/16  Initial revision  

@@ -1,0 +1,50 @@
+#############################################################################
+## Name:        ext/dataview/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     05/11/2007
+## RCS-ID:      $Id: typemap 2938 2010-07-04 12:56:48Z mbarbon $
+## Copyright:   (c) 2007, 2009-2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxDataViewCellMode      T_ENUM
+wxAlignment             T_ENUM
+
+wxDataViewCtrl *        O_WXOBJECT
+wxDataViewTreeCtrl *    O_WXOBJECT
+wxDataViewListCtrl *    O_WXOBJECT
+wxDataViewColumn *      O_NON_WXOBJECT_THR
+const wxDataViewColumn * O_NON_WXOBJECT
+wxDataViewModel *       O_NON_WXOBJECT
+wxDataViewTreeStore *   O_NON_WXOBJECT
+const wxDataViewTreeStore * O_NON_WXOBJECT
+wxDataViewItem *        O_NON_WXOBJECT
+wxDataViewItemAttr *    O_NON_WXOBJECT
+wxDataViewIndexListModel* O_NON_WXOBJECT
+wxPlDataViewIndexListModel* O_NON_WXOBJECT
+wxDataViewVirtualListModel* O_NON_WXOBJECT
+wxPlDataViewVirtualListModel * O_NON_WXOBJECT
+wxDataViewRenderer *    O_WXOBJECT_THR
+wxDataViewEvent *       O_WXOBJECT_THR
+wxDataViewModelNotifier * O_NON_WXOBJECT
+wxDataViewTextRenderer * O_WXOBJECT_THR
+wxDataViewTextRendererAttr * O_WXOBJECT
+wxDataViewProgressRenderer * O_WXOBJECT_THR
+wxDataViewIconTextRenderer * O_WXOBJECT_THR
+wxDataViewToggleRenderer * O_WXOBJECT_THR
+wxDataViewBitmapRenderer * O_WXOBJECT_THR
+wxDataViewDateRenderer * O_WXOBJECT_THR
+wxDataViewSpinRenderer * O_WXOBJECT_THR
+wxDataViewIconText*      O_NON_WXOBJECT
+wxDataViewListStore *    O_NON_WXOBJECT
+const wxDataViewListStore * O_NON_WXOBJECT
+wxVectorVariant          T_VECTORVARIANT
+
+INPUT
+T_VECTORVARIANT
+    wxPli_av_2_arrayany( aTHX_ $arg, & $var, wxPli_convert_variant(),
+                         wxPli_vector_allocator<wxVector<wxVariant>, wxVariant>( & $var ) );

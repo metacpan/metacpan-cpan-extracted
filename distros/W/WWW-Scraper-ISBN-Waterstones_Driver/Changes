@@ -1,0 +1,45 @@
+Revision history for WWW-Scraper-ISBN-Waterstones_Driver
+========================================================
+
+0.08    2015-04-05
+        - new patterns for new website design.
+
+0.07    2014-12-12
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.06    2014-08-30
+        - Waterstones' website fails alot!
+        - fixed license fields in META.json to be lists.
+
+0.05    2014-08-08
+        - fixed skip test count.
+
+0.04    2014-08-01
+        - added git repository links to metadata.
+        - fixed distribution name in META.
+        - extended test suite.
+        - added missing prerequisite; Data::Dumper.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - removed conversion tests.
+        - updated pattern matching due to website redesign.
+        - updated no results check, and added test.
+
+0.03    2013-03-10
+        - change file dates changed to meet W3CDTF standards.
+        - added isbn-check.pl to examples.
+        - added minimum perl version (5.006).
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - META tests no longer require specific versions.
+        - various META updates.
+        - License updated consistently to Artistic License v2.0.
+        - reworked Makefile.PL for clarity.
+        - updated test suite.
+        - more error reporting in tests.
+
+0.02    2010-11-30
+        - fix to field cleanup code for non-existent field values.
+        - more skip checks.
+
+0.01	2010-11-18
+        - initial release

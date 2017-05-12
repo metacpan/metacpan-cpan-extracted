@@ -1,0 +1,93 @@
+CK: Burghardt/etal:93
+DT: IP
+AU: Burghardt, A.; Fuhr, N.;  Pfeifer, U.;
+    Spielmann, H.; Stach, O. Gro&szlig;johann, K.; 
+TI: NOSFERATU --- ein integriertes Datenbank- und
+    Informationssystem basierend auf dem Datenstrom-Paradigma
+BT: Proceedings 1. GI-Fachtagung Information Retrieval
+PN: Universitätsverlag Konstanz
+PA: Konstanz
+PP: 27-40
+LA: GE
+ED: 04.01.93
+PY: 1993
+LO: P
+RD: Fu
+CC: H.3.3
+SD: selection process
+FT: stream-oriented
+
+CK: Burghardt/etal:93a
+DT: IP
+AU: Burghardt, A.; Fuhr, N.; Großjohann, K.;  Pfeifer, U.;
+    Spielmann, H.; Stach, O.
+TI: NOSFERATU --- an Integrated Database Management and Information
+    Retrieval system based on Data Streams (in German)
+BT: Proceedings 1. GI-Fachtagung Information Retrieval
+PN: Universitätsverlag Konstanz
+PA: Konstanz
+PP: 27-40
+LA: GE
+ED: 04.01.93
+PY: 1993
+LO: P
+RD: Fu
+CC: H.3.3
+SD: selection process
+FT: stream-oriented
+
+CK: Pfeifer/Fuhr:93
+DT: IP
+AU: Pfeifer, U.; Fuhr, N.
+TI: Aufwandsabschätzung für die Prozessierung vager Anfragen auf der
+    Basis des Datenstrom-Ansatzes
+ER: Stucky, W.
+BT: Datenbanksysteme in Büro, Technik und Wissenschaft
+PN: Springer
+PA: Berlin et al.
+PP: 375-392
+LA: GE
+ED: 17.12.92
+PY: 1993
+LO: P
+RD: Pf
+CC: H.2.4; H.3.3; H.99.4
+SD: query processing; selection process
+FT: stream-oriented
+
+CK: Schmidt/Pfeifer:93
+DT: IP
+AU: Schmidt, M.; Pfeifer, U.
+TI: Eignung von Signaturbäumen für Best-Match-Anfragen
+BT: Proceedings 1. GI-Fachtagung Information Retrieval
+PN: Universitätsverlag Konstanz
+PA: Konstanz
+PP: 125-138
+LA: GE
+PY: 1993
+PR: TOAPP
+LO: D
+RD: Pf
+CC: H.3.2
+SD: file organisation
+FT: signature files; signature trees
+ED: 24.06.93
+
+CK: Schmidt/Pfeifer:93a
+DT: IP
+AU: Schmidt, M.; Pfeifer, U.
+TI: Suitability of Signature Trees for Processing of Best Match
+    Queries (in German)
+BT: Proceedings 1. GI-Fachtagung Information Retrieval
+PN: Universitätsverlag Konstanz
+PA: Konstanz
+PP: 125-138
+LA: GE
+PY: 1993
+PR: TOAPP
+LO: D
+RD: Pf
+CC: H.3.2
+SD: file organisation
+FT: signature files; signature trees
+ED: 24.06.93

@@ -1,0 +1,29 @@
+lib/WebService/Recruit/CarSensor.pm
+lib/WebService/Recruit/CarSensor/Base.pm
+lib/WebService/Recruit/CarSensor/Body.pm
+lib/WebService/Recruit/CarSensor/Brand.pm
+lib/WebService/Recruit/CarSensor/Catalog.pm
+lib/WebService/Recruit/CarSensor/Color.pm
+lib/WebService/Recruit/CarSensor/Country.pm
+lib/WebService/Recruit/CarSensor/LargeArea.pm
+lib/WebService/Recruit/CarSensor/Pref.pm
+lib/WebService/Recruit/CarSensor/Usedcar.pm
+LICENSE
+make-dist.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_pod.t
+t/01_new.t
+t/02_new_methods.t
+t/03_setget.t
+t/04_Method_Usedcar.t
+t/05_Method_Catalog.t
+t/06_Method_Brand.t
+t/07_Method_Country.t
+t/08_Method_LargeArea.t
+t/09_Method_Pref.t
+t/10_Method_Body.t
+t/11_Method_Color.t
+t/12_CarSensor.t
+META.yml                                 Module meta-data (added by MakeMaker)

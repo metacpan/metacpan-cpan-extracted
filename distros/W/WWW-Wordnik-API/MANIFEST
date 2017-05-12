@@ -1,0 +1,18 @@
+Build.PL
+Changes
+ignore.txt
+index.html
+INSTALL
+lib/WWW/Wordnik/API.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/10.object-creation.t
+t/20.selectors.t
+t/30.methods.t
+t/40.internal.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

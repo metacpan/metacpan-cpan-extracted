@@ -1,0 +1,230 @@
+
+=head1 NAME
+
+Win32::GUI::UpDown - Create and manipulate up-down controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new UpDown object;
+can also be called as PARENT->AddUpDown(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -align => left,right
+    When Left, positions the up-down control next to the left edge of the buddy window.
+    The buddy window is moved to the right, and its width is decreased to accommodate the
+    width of the up-down control.
+    When right, positions the up-down control next to the right edge of the buddy window.
+    The width of the buddy window is decreased to accommodate the width of the up-down control.
+  -nothousands => 0/1
+    Does not insert a thousands separator between every three decimal digits.
+  -wrap => 0/1 (default 0)
+    Causes the position to "wrap" if it is incremented or decremented beyond the ending or beginning of the range.
+  -horizontal => 0/1
+    Causes the up-down control's arrows to point left and right instead of up and down.
+  -autobuddy => 0/1
+    Automatically selects the previous window in the z-order as the up-down control's buddy window.
+  -setbuddy => 0/1
+    Causes the up-down control to set the text of the buddy window (using the WM_SETTEXT message)
+    when the position changes. The text consists of the position formatted as a decimal or hexadecimal string.
+  -arrowkeys => 0/1
+    Causes the up-down control to increment and decrement the position when the UP ARROW and
+    DOWN ARROW keys are pressed.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Base
+
+B<Base([VALUE])>
+
+Gets or sets the radix base for the UpDown control; VALUE can be
+either 10 or 16 for decimal or hexadecimal base numbering.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Buddy
+
+B<Buddy([OBJECT])>
+
+Gets or sets the buddy window for the UpDown control. Returns the handle of the buddy.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBase
+
+B<GetBase()>
+
+Gets the radix base for the UpDown control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBuddy
+
+B<GetBuddy()>
+
+Returns the handle of the buddy.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPos
+
+B<GetPos()>
+
+Gets the current position of the UpDown control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRange
+
+B<GetRange()>
+
+Gets the range for the UpDown control (16bit values)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRange32
+
+B<GetRange32()>
+
+Gets the range for the UpDown control (32bit values)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Pos
+
+B<Pos([VALUE])>
+
+Gets or sets the current position of the UpDown control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Range
+
+B<Range([MIN, MAX])>
+
+Gets or sets the range for the UpDown control; if no parameter is given,
+returns a two element array containing the MIN and MAX range values,
+otherwise sets them to the given values.
+If MAX is lower than MIN, the UpDown control function is reversed, eg.
+the up button decrements the value and the down button increments it
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Range32
+
+B<Range32([MIN, MAX])>
+
+Gets or sets the range for the UpDown control; if no parameter is given,
+returns a two element array containing the MIN and MAX range values,
+otherwise sets them to the given values.
+If MAX is lower than MIN, the UpDown control function is reversed, eg.
+the up button decrements the value and the down button increments it
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBase
+
+B<SetBase(VALUE)>
+
+Sets the radix base for the UpDown control; VALUE can be
+either 10 or 16 for decimal or hexadecimal base numbering.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBuddy
+
+B<SetBuddy(OBJECT)>
+
+Sets the buddy window for the UpDown control. Returns the handle of the previous buddy.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPos
+
+B<SetPos(VALUE)>
+
+Sets the current position of the UpDown control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRange
+
+B<SetRange(START,END)>
+
+Sets the range for the UpDown control (16bit values)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRange32
+
+B<SetRange32(START,END)>
+
+Sets the range for the UpDown control (32bit values)
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+OPERATION can be compared against one of the following constants:
+SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

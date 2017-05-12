@@ -1,0 +1,246 @@
+#############################################################################
+## Name:        typemap.xsp
+## Purpose:     Main typemap file for xsubppp.pl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     01/03/2003
+## RCS-ID:      $Id: typemap.xsp,v 1.20 2006/08/11 19:54:58 mbarbon Exp $
+## Copyright:   (c) 2003-2006 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%typemap{wxPdfMapModeStyle}{simple};
+%typemap{wxPdfDocument*}{simple};
+%typemap{wxPdfDocument&}{reference};
+%typemap{wxPdfColour*}{simple};
+%typemap{wxPdfColour&}{reference};
+%typemap{const wxPdfColour&}{reference};
+%typemap{const wxPdfColour}{reference};
+%typemap{const wxPdfLineStyle&}{reference};
+%typemap{const wxPdfShape&}{reference};
+%typemap{const wxPdfFont&}{reference};
+%typemap{wxPdfFont}{reference};
+%typemap{wxPdfLineStyle*}{simple};
+%typemap{wxPdfShape*}{simple};
+%typemap{wxPdfFont*}{simple};
+%typemap{const wxPdfFontDescription&}{reference};
+%typemap{const wxPdfFontDescription}{reference};
+%typemap{wxPdfFontDescription}{reference};
+%typemap{wxPdfFontDescription&}{reference};
+%typemap{wxPdfFontDescription*}{simple};
+%typemap{const wxPdfLink&}{reference};
+%typemap{wxPdfLink*}{simple};
+%typemap{wxPdfPageLink*}{simple};
+%typemap{wxPdfInfo*}{simple};
+%typemap{wxPdfInfo&}{reference};
+%typemap{wxPdfLayer*}{simple};
+%typemap{wxPdfLayer&}{reference};
+%typemap{const wxPdfLayer&}{reference};
+%typemap{wxPdfLayerGroup*}{simple};
+%typemap{wxPdfLayerGroup&}{reference};
+%typemap{const wxPdfLayerGroup&}{reference};
+%typemap{wxPdfLayerMembership*}{simple};
+%typemap{wxPdfLayerMembership&}{reference};
+%typemap{const wxPdfLayerMembership&}{reference};
+%typemap{wxPdfOcg*}{simple};
+%typemap{wxPdfOcg&}{reference};
+%typemap{const wxPdfOcg&}{reference};
+%typemap{wxPdfFontManager*}{simple};
+%typemap{wxPdfBarCodeCreator*}{simple};
+%typemap{wxPdfDC*}{simple};
+%typemap{wxPdfCoonsPatchMesh*}{simple};
+%typemap{wxPdfCoonsPatchMesh&}{reference};
+
+%typemap{wxPdfPrintData&}{reference};
+%typemap{const wxPdfPrintData&}{reference};
+%typemap{wxPrintDialogData*}{simple};
+%typemap{wxPrintDialogData&}{reference};
+%typemap{wxPageSetupDialogData*}{simple};
+%typemap{wxPageSetupDialogData&}{reference};
+%typemap{wxPrintout*}{simple};
+%typemap{wxPreviewCanvas*}{simple};
+%typemap{wxPrintOrientation}{simple};
+%typemap{wxPrintQuality}{simple};
+%typemap{wxDC&}{reference};
+%typemap{wxPaintEvent&}{reference};
+
+%typemap{wxPdfAlignment}{simple};
+%typemap{wxPdfTextRenderMode}{simple};
+%typemap{wxPdfEncryptionMethod}{simple};
+%typemap{wxPdfPageBox}{simple};
+%typemap{wxPdfBorderStyle}{simple};
+%typemap{wxPdfLinearGradientType}{simple};
+%typemap{wxPdfBlendMode}{simple};
+%typemap{wxPdfShapedTextMode}{simple};
+%typemap{wxPdfXConformanceType}{simple};
+%typemap{wxPdfRunDirection}{simple};
+%typemap{wxPdfZoom}{simple};
+%typemap{wxPdfLayout}{simple};
+%typemap{wxPdfLineCap}{simple};
+%typemap{wxPdfLineCap}{simple};
+%typemap{wxPdfLineJoin}{simple};
+%typemap{wxPdfMarker}{simple};
+%typemap{wxPdfColourType}{simple};
+%typemap{wxPdfSegmentType}{simple};
+%typemap{wxPdfOcgType}{simple};
+%typemap{wxPdfOcgPolicy}{simple};
+
+%typemap{wxRect&}{reference};
+%typemap{wxRichTextBuffer*}{simple};
+%typemap{const wxRichTextHeaderFooterData&}{reference};
+
+%typemap{const wxArrayDouble&}{reference};
+%typemap{wxPaperSize}{simple};
+%typemap{const wxImage&}{reference};
+
+%typemap{SV*}{simple};
+%typemap{void}{simple};
+%typemap{bool}{simple};
+%typemap{char}{simple};
+%typemap{const unsigned char}{simple};
+%typemap{const unsigned int}{simple};
+%typemap{short}{simple};
+%typemap{int}{simple};
+%typemap{unsigned}{simple};
+%typemap{long}{simple};
+%typemap{float}{simple};
+%typemap{double}{simple};
+%typemap{double&}{reference};
+
+
+%typemap{size_t}{simple};
+%typemap{time_t}{simple};
+
+%typemap{wxUint32}{simple};
+%typemap{wxByte}{simple};
+
+%typemap{wxImageList*}{simple};
+
+%typemap{wxWindowID}{simple};
+%typemap{wxCoord}{simple};
+%typemap{wxEventType}{simple};
+
+%typemap{wxChar}{simple};
+%typemap{const wxChar*}{simple};
+%typemap{PlClassName}{simple};
+
+%typemap{wxString}{simple};
+%typemap{wxString&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{const wxString&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{const wxString}{parsed}{
+    %cpp_type{%wxString%};
+};
+
+%typemap{wxMappingMode}{simple};
+%typemap{wxRasterOperationMode}{simple};
+
+%typemap{const wxPoint&}{parsed}{%wxPoint%};
+%typemap{const wxSize&}{parsed}{%wxSize%};
+%typemap{wxSize}{parsed}{%wxSize%};
+%typemap{wxPoint}{parsed}{%wxPoint%};
+%typemap{const wxArtID&}{parsed}{%wxString%};
+%typemap{const wxArtClient&}{parsed}{%wxString%};
+%typemap{wxArtProvider*}{simple};
+%typemap{wxArtProvider&}{reference};
+%typemap{wxBitmap}{reference};
+%typemap{const wxBitmap&}{reference};
+%typemap{wxCursor}{reference};
+%typemap{wxIcon}{reference};
+%typemap{wxFont}{reference};
+%typemap{wxFont*}{simple};
+%typemap{wxDC*}{simple};
+%typemap{const wxDC&}{reference};
+%typemap{const wxValidator&}{reference};
+
+%typemap{wxDateTime*}{simple};
+%typemap{wxDateTime&}{reference};
+%typemap{const wxDateTime&}{reference};
+%typemap{wxDateSpan*}{simple};
+%typemap{wxDateSpan&}{reference};
+%typemap{const wxDateSpan&}{reference};
+%typemap{wxTimeSpan*}{simple};
+%typemap{wxTimeSpan&}{reference};
+%typemap{const wxTimeSpan&}{reference};
+
+%typemap{wxObject*}{simple};
+%typemap{wxSplitterWindow*}{simple};
+%typemap{wxSplitterEvent*}{simple};
+%typemap{wxWindow*}{simple};
+%typemap{wxListView*}{simple};
+%typemap{wxSizer*}{simple};
+%typemap{wxIconBundle*}{simple};
+%typemap{wxFrame*}{simple};
+%typemap{wxDialog*}{simple};
+%typemap{wxChoice*}{simple};
+%typemap{wxTreeCtrl*}{simple};
+%typemap{wxToolBarBase*}{simple};
+%typemap{wxToolBar*}{simple};
+
+%typemap{wxColour}{reference};
+%typemap{const wxColour&}{reference};
+%typemap{const wxIcon&}{reference};
+%typemap{const wxFont&}{reference};
+
+%typemap{const wxPrintData&}{reference};
+%typemap{wxPrintData&}{reference};
+%typemap{wxPrintData*}{simple};
+%typemap{const wxPen&}{reference};
+%typemap{const wxBrush&}{reference};
+%typemap{const wxPalette&}{reference};
+
+%typemap{wxArrayDouble&}{parsed}{
+  %cpp_type{%wxArrayDouble%};
+  %output_list{%
+    PUTBACK;
+    wxPli_doublearray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+
+%typemap{wxArrayString}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+
+%typemap{wxArrayString*}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+
+%typemap{wxArrayInt}{parsed}{
+  %output_list{%
+    PUTBACK;
+    wxPli_intarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{const wxArrayString&}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{const wxArrayInt&}{parsed}{
+  %cpp_type{%wxArrayInt%};
+  %output_list{%
+    PUTBACK;
+    wxPli_intarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{wxArrayInt&}{parsed}{%wxArrayInt%};

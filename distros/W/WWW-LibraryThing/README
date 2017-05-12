@@ -1,0 +1,107 @@
+NAME
+    WWW::LibraryThing::Covers - Interface to LibraryThing book cover API
+
+VERSION
+    Version 0.0002
+
+SYNOPSIS
+        use WWW::LibraryThing::Covers;
+
+        my %config = (api_key => 'd231aa37c9b4f5d304a60a3d0ad1dad4',
+                      directory => 'images',
+                      size => 'large');
+
+        my $lt_covers = WWW::LibraryThing::Covers->new(%config);
+    
+        $lt_covers->get('0977920151');
+
+DESCRIPTION
+    Retrieves book covers from LibraryThing based on ISBN-10 numbers.
+
+    Please checkout the terms of use first.
+
+CONSTRUCTOR
+  new
+    Create a WWW::LibraryThing::Covers object with the following parameters:
+
+    api_key
+        Your LibraryThing API key (required).
+
+    directory
+        Output directory for the cover images.
+
+    size
+        Default size for cover images (optional, defaults to medium).
+        Possible values are large, medium and small.
+
+    not_found
+        Defines behaviour for cover images not available. LibraryThing
+        returns a transparent 1×1 pixel GIF image.
+
+    delay
+        Delay between requests. Defaults to 1 second as this is required for
+        automatic downloads.
+
+    user_agent
+        LWP::UserAgent object (optional).
+
+METHODS
+  get
+    Retrieves an image for given isbn and size (optional).
+
+    The image is stored as ISBN.jpg in the directory provided to the
+    constructor or just returned as scalar reference otherwise.
+
+    The actual return value in case of success is a list with three members:
+
+    *   Filename or scalar reference of the image data.
+
+    *   Image width.
+
+    *   Image size.
+
+    Returns undef in case of errors.
+
+    Returns 0 if constructor parameter not_found is set to return_zero and
+    cover image is not available.
+
+AUTHOR
+    Stefan Hornburg (Racke), `<racke at linuxia.de>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-webservice-librarything-covers at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-LibraryThing-Covers.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::LibraryThing::Covers
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-LibraryThing-Covers
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-LibraryThing-Covers
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-LibraryThing-Covers
+
+    * Search CPAN
+        http://search.cpan.org/dist/WWW-LibraryThing-Covers/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2011,2012 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

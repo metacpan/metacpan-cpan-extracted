@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:13">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science.philosophy" parent_id="science">
+<Name>Philosophy</Name>
+<Details summary="" depth="1" element_count="3142" />
+<SubCategories>
+<SubCategory id="science.philosophy.bibliography" />
+<SubCategory id="science.philosophy.study_and_teaching" />
+<SubCategory id="science.philosophy.religion" />
+<SubCategory id="science.philosophy.history" />
+<SubCategory id="science.philosophy.political" />
+<SubCategory id="science.philosophy.social" />
+<SubCategory id="science.philosophy.dictionaies" />
+<SubCategory id="science.philosophy.languages" />
+<SubCategory id="science.philosophy.biographies" />
+<SubCategory id="science.philosophy.chronologically" />
+<SubCategory id="science.philosophy.art" />
+<SubCategory id="science.philosophy.in_literature" />
+<SubCategory id="science.philosophy.law" />
+<SubCategory id="science.philosophy.technology" />
+<SubCategory id="science.philosophy.congresses" />
+<SubCategory id="science.philosophy.homosexuality" />
+<SubCategory id="science.philosophy.ethics" />
+<SubCategory id="science.philosophy.epistemology" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

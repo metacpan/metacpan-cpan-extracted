@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::Omegle.
+
+0.02 Sun Apr  5
+	- improve callback robustness
+
+0.01  Fri Apr  3 16:40:16 2009
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 -n WWW::Omegle
+

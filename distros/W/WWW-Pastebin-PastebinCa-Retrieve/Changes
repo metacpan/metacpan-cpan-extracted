@@ -1,0 +1,15 @@
+Revision history for WWW-Pastebin-PastebinCa-Retrieve
+
+1.001001    2015-03-27
+        - Fixed failing tests
+        - Converted distro to Dist::Zilla
+
+0.003   2010-12-26
+        - Fixed bugs that occured after the pastebin got changed
+
+0.002   2008-04-08
+        - added examples
+
+0.001   2008-03-20
+        - First version, released on an unsuspecting world.
+

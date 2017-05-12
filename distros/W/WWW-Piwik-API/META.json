@@ -1,0 +1,56 @@
+{
+   "abstract" : "Tracking module for Piwik using the Tracking API",
+   "author" : [
+      "Stefan Hornburg <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Piwik-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Type::Tiny" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/WWW-Piwik-API/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/WWW-Piwik-API.git"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

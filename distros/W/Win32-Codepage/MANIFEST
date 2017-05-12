@@ -1,0 +1,12 @@
+index.html
+Build.PL
+ChangeLog
+lib/Win32/Codepage.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/codepage.t
+t/pod-coverage.t
+t/pod.t

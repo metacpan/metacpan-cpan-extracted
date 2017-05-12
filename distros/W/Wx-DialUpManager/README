@@ -1,0 +1,53 @@
+
+INSTALLATION
+
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+
+TESTING
+    Set DO_NET_TEST=1 in your ENV if you want to test
+    this module and you're connected to the internet.
+    (what it will try to do is disconnect you if you're on dialup).
+
+
+THANKS
+    Much thanks to Mattia and G.M.Passos for helping me write this.
+
+
+NAME
+    Wx::DialUpManager - perl extension for wxDialUpManager
+
+SYNOPSIS
+        use Wx::DialUpManager qw[ EVT_DIALUP_CONNECTED EVT_DIALUP_DISCONNECTED ];
+        EVT_DIALUP_CONNECTED( sub {warn "you're connected"});
+        EVT_DIALUP_CONNECTED( sub {warn "you're dis-connected"});
+        ...
+
+DESCRIPTION
+    This is an example of writing an extension for wxPerl (a more complete
+    sample than Wx::Sample::XS).
+
+    If you want to use this module, please refer to the wxWindows
+    documentation for wxDialUpManager.
+
+BUGS
+    Please don't report bugs ;) But if you really really need to, go to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Wx-DialUpManager> or send
+    mail to <bug-Wx-DialUpManager#rt.cpan.org>
+
+AUTHOR
+    D. H. (PODMASTER)
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module distribution.
+
+SEE ALSO
+    Wx, Wx::GLCanvas, Wx::ActiveX, Wx::Sample::XS, Wx::Metafile
+

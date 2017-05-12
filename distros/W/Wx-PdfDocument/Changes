@@ -1,0 +1,77 @@
+Revision history for Perl extension Wx::PdfDocument.
+
+0.21  Tue Apr 18 2017
+    - build on Perl >= 5.25.11 - . no longer in @INC
+    - add dependency on LWP::Protocol::https
+
+0.20  Mon Dec 21 2015
+    - upgrade to use wxPdfDocument version 0.9.5
+
+0.19  Fri Mar 13 2015
+    - Don't build wxPdfDocument samples by default - allow cmd
+      option --pdfdoc-build-target to override
+
+0.18  Wed Mar 11 2015
+    - compilation using clang on MacOSX with recent Xcode
+    - compilation fixes for wxOSX version 3.0.x
+    - patches for wxPdfDocument from wxCode SVN
+    - fix pause indexing
+
+0.17  Wed Mar 11 2015
+    - pause and I are no longer speaking to each other
+
+0.16  Wed Mar 11 2015
+    - pause didn't like this either
+
+0.15  Tue Mar 10 2015
+    - pause didn't like this
+
+0.14  Mon Mar 31 2014
+    - use wxPdfDocument version 0.9.4
+	- wxWidgets 3.0.0 compatibility
+
+0.1301  Tue Oct 16 2012
+    - Fix build bug for gmake vs mingw32-make on Windows
+    
+0.13  Tue Oct 16 2012
+    - wxPdfDocument patches - fixes errors for version 0 fonts
+    - Use expanded config values( e.g. archlib ->archlibexp ) so
+      build against static perl can work
+
+0.12  Tue Aug 28 2012
+    - Allow universal build - ppc + i386
+
+0.11  Thu Aug 9 2012
+    - Latest update to wxPdfDocument fixes GDI memory leak on Windows
+
+0.10  Fri June 1 2012
+    - use wxPdfDocument version 0.9.3 source directly
+
+0.09  Thu May 31 2012
+    - corrected calls to wxThePrintPaperDatabase in demo
+    - use Wx::MimeTypesManager to launch docs in demo
+
+0.08  Sat May 26 2012
+    - wrap of all relevant classes from current wxPdfDocument svn
+    - Includes wxPdfDC and new wxPrinting framework classes
+    - added Wx::Demo module
+    - distribution now builds and installs wxPdfDocument
+    - moved to Module::Build
+
+0.06 - 0.07 not released
+
+0.04  Tue Sep  5 08:55:12 CET 2005
+	- un-bundled from wxPerl source tree
+	- first release to CPAN
+	- compatible with wxPdfDoc 0.7
+
+0.03  Wed Jan  5 07:43:03 CET 2005
+	- various fixes for wxWidgets 2.5.3 under Windows.
+
+0.02  Fri Sep 12 23:35:08 CEST 2003
+	- Compatibility with wxWindows 2.5.x
+	- Don't depend on OpenGL. Any module providing access to OpenGL
+	  API can be used together with Wx::GLCanvas.
+
+0.01  Tue Aug 26 16:44:26 CEST 2003
+	- First version.

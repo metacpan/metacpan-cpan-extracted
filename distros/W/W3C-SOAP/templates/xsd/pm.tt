@@ -1,0 +1,73 @@
+[% PROCESS config.tt -%]
+[%- module = xsd.get_module_name(xsd.target_namespace) -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moose;
+use namespace::autoclean;
+use Moose::Util::TypeConstraints;
+use MooseX::Types::XMLSchema qw/:all/;
+use W3C::SOAP::XSD::Types qw/:all/;
+[%- IF config.alias %]
+use MooseX::Aliases;
+[%- END %]
+use W3C::SOAP::XSD::Traits;
+[%- FOREACH type IN xsd.complex_types %]
+use [% type.module %];
+[%- END %]
+extends '[% config.xsd.parent_module || 'W3C::SOAP::XSD' %]';
+
+our $VERSION = 0.12;
+
+has '+w3c_built_with_version' => (
+    default => sub {version->new('[% w3c_version %]')},
+);
+has '+xsd_ns' => (
+    default => '[% xsd.target_namespace %]',
+    required => 1,
+);
+#has '+xsd_ns_name' => (
+#    default => '[% ns_name %]',
+#);
+[% FOREACH element IN xsd.elements %]
+[% INCLUDE xsd/element.pm.tt %]
+[%- END %]
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] - Talks to the [% end_point %] on the ESB
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+[% FOREACH element IN xsd.elements %]
+[% INCLUDE xsd/element.pod.tt %]
+[%- END %]
+=back
+
+[% INCLUDE pod.tt %]

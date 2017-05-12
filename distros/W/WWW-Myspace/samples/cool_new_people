@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w -I../lib
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace( auto_login => 0 );
+
+my $cool = $myspace->cool_new_people( 'US' );
+
+foreach $person ( keys ( %{ $cool } ) ) {
+
+  print $person . "\n";
+
+}

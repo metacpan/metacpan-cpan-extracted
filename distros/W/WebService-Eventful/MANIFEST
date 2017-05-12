@@ -1,0 +1,12 @@
+Changes
+lib/WebService/Eventful.pm
+lib/WebService/Eventful/JSON.pm
+lib/WebService/Eventful/REST.pm
+lib/WebService/Eventful/YAML.pm
+Makefile.PL
+MANIFEST
+README
+t/01use.t
+t/02basic.t
+t/03flavor.t
+META.yml                                 Module meta-data (added by MakeMaker)

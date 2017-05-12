@@ -1,0 +1,38 @@
+NAME
+    WWW::Shorten::Google - Perl interface to goo.gl
+
+SYNOPSIS
+      use WWW::Shorten::Google;
+      use WWW::Shorten 'Google';
+
+      $short_url = makeashorterlink($long_url);
+      $long_url  = makealongerlink($short_url);
+
+DESCRIPTION
+    WWW::Shorten::Google is Perl interface to the web api goo.gl.
+
+Functions
+  makeashorterlink
+    The function "makeashorterlink" will call the Google URL Shortener web
+    site passing it your long URL and will return the shorter Google URL
+    Shortener version.
+
+  makealongerlink
+    The function "makealongerlink" does the reverse. "makealongerlink" will
+    accept as an argument either the full Google URL Shortener URL or just
+    the Google URL Shortener identifier.
+
+    If anything goes wrong, then either function will return "undef".
+
+AUTHOR
+    Kazuhiro Osawa <yappo <at> shibuya <döt> pl>
+
+    sunnavy
+
+SEE ALSO
+    WWW::Shorten, <http://goo.gl/>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

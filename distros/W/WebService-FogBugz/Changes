@@ -1,0 +1,36 @@
+Revision history for WebService-FogBugz
+=======================================
+
+0.1.2   2015-01-23
+        - fix executable Build Tool and text files.
+        - added missing prerequisite.
+
+0.1.1   2015-01-10
+        - added Config module.
+        - merge original module test scripts into one.
+        - extended functional tests.
+
+0.1.0   2014-12-29
+        - New Maintainer: Barbie.
+        - aded META files as permanent files.
+        - updated Makefile.PL without Module-Install.
+        - change file dates changed to meet W3CDTF standards.
+        - extended META and functional test suite.
+        - added LICENSE file.
+
+0.0.5   2013-02-09T11:47:46
+        - Start using git, Module::Install, 
+
+0.0.4   2008-03-12T19:03:06
+        - Fixed RT#33997 (kpower, thanks for a report)
+        - Add test code: t/04.response.t
+
+0.0.3   2007-09-27T09:37:58
+        - Wrote required modules again.
+
+0.0.2   2007-09-27T02:02:31
+        - Wrote required modules to Build.PL and Makefile.PL.
+
+0.0.1   2007-09-20T23:43:42
+        - Initial release.
+

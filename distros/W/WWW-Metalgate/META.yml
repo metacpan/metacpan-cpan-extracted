@@ -1,0 +1,29 @@
+---
+abstract: 'parse http://www.metalgate.jp/.'
+author:
+  - 'Tomohiro Hosaka <bokutin@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::UseAllModules: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WWW-Metalgate
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cache::File: 0
+  Encode: 0
+  IO::All: 0
+  IO::All::LWP: 0
+  Moose: 0
+  MooseX::Types::URI: 0
+  Text::Trim: 0
+  URI::Fetch: 0
+  Web::Scraper: 0
+version: 0.04

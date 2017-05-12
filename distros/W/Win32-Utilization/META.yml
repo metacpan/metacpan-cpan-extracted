@@ -1,0 +1,26 @@
+---
+abstract: "Perl extension for Win32 system utilization\r"
+author:
+  - 'xiaoyafeng <xyf.xiao@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-Utilization
+no_index:
+  directory:
+    - inc
+requires:
+  AutoLoader: 0
+  Exporter: 0
+  Win32::API: 0
+  Win32::DriveInfo: 0
+  strict: 0
+  warnings: 0
+version: 0.1

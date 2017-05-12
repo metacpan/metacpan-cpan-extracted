@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Win32-ToolHelp" VERSION="0,1,0,0">
+	<TITLE>Win32-ToolHelp</TITLE>
+	<ABSTRACT>Perl extension for obtaining information about currently executing applications</ABSTRACT>
+	<AUTHOR>Ferdinand Prantl &lt;prantl@host.sk&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/Win32-ToolHelp.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

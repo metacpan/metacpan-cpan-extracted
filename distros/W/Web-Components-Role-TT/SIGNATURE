@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 026f9aa37f6bb04767bdde91111654219cfa20f5 Build.PL
+SHA1 1cf951c1c61416c0be248017d3969b0fb8cc9fa3 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 cacb05162500046b69db3b7b74005b8898c00a0e MANIFEST
+SHA1 e46db36427ee04a225af66238fcfa509b06e5cfc META.json
+SHA1 07f53c63e8bb4562cce6d3f7d522d98aeb0f5a76 META.yml
+SHA1 4a14eee0e127ff058673821a6dcc5c342992fe7f README
+SHA1 c6619fe27bed392c1873b56beaa74ab14930269e lib/Web/Components/Role/TT.pm
+SHA1 7fe925963d95095bdf566f83bed4e765d1886799 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
+SHA1 836372fef44ff1c707eea1416516eb625118b956 t/07podspelling.t
+SHA1 b02f396520a7c4eec7fee217b543c2a2f2059cb3 t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 81a6f972a5194d871eaf543f23ab802e027c9468 t/root/templates/default/standard.tt
+SHA1 81a6f972a5194d871eaf543f23ab802e027c9468 t/templates/default/standard.tt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJY32C+AAoJEK492j4Im1BpxR8H/34Ernew6D+w2fkcNXiUv9Wv
+wIJogYnpxKLJgXe77R3SQINp/L40bvJF9ggC0QHhxK0Ja87tEgYWYj08gMsp5rOO
+wFbJ0lmy6pM5X8LH3fFbrjDcvzNoDUS/uC1Tns3Dnsf3trX52ntFZ/Fc6sDRMd2V
+inckX3QDO/wwnbhsqmbBKle7Jh+e+DvcvNNQGgp57Tq5g8N6rVNBKzCmypF+NzjS
+EsxovZt5eEzSywEYUMJO6yAY3pGkb//UXBTnuDdQWobfSoTf6jnhIl/Nhl/9TqwQ
+qgT+dSouWXQTCIXj/jrPiTiL80HlHy8eQSzvG6c6VI8FYnlVPAGrSWeqH60/m3s=
+=DgzD
+-----END PGP SIGNATURE-----

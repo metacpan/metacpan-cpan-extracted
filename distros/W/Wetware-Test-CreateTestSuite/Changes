@@ -1,0 +1,22 @@
+Revision history for Wetware-Test-CreateTestSuite
+
+0.03    2009.05.11 1540h
+
+		Found out that we would need a Wetware::Test::Class::Load to
+		solve a problem that Module::Build will copy over the pm files
+		even IF they are in .svn or CVS subdirectories of lib.
+		
+		So we created the class, added the fun little 
+		preprocessor portion to the File::Find:find() just like the POD
+		said it would do what we wanted.
+		
+		Fixed up the 01_test_class.t to use the new Wetware::Test::Class
+		and it looks like we are good to go.
+		
+		Also, opted to remove 
+		
+    		create_makefile_pl => 'traditional',
+		
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

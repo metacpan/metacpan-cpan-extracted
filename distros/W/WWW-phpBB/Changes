@@ -1,0 +1,38 @@
+Revision history for Perl extension WWW::phpBB.
+
+0.09  Wed May 04 17:46:47 2011
+	- don't fork if max_children is 1 (work around a Windows issue)
+	- exception handling and retries for forum_login(), get_users(), scrape_forum_common(), forum_logout(), update_users(), update_forum_common()
+	- encode to HTML entities non-ASCII characters in post bodies (solves a unicode issue in perl-5.12)
+
+0.08  Sat Feb 05 22:05:38 2011
+	- more flexible user profile scraping
+
+0.07  Tue Jan 27 20:12:10 2011
+	- fix page navigation when not all the pages are shown in the menu
+
+0.06  Tue Jan 22 01:27:11 2011
+	- create groups for the scraped users
+	- check that there's no name clash with the destination forum's admin
+
+0.05  Tue Jan 18 22:13:50 2011
+	- fix pod
+
+0.04  Tue Jan 18 20:40:09 2011
+	- exception handling in the parallelization code
+	- more configuration knobs
+	- better foren-city.de example
+
+0.03  Sun Jan 09 18:40:17 2011
+	- more parameters to control custom URL schemes
+	- got rid of the WWW::Mechanize wrapper
+	- max_children defaults to 1
+
+0.02 
+     	- parallel fetching of topics
+	- removed Perl version requirement
+	
+0.01  Sat May 27 15:34:10 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::phpBB
+

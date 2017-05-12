@@ -1,0 +1,8 @@
+Changes
+lib/Win32/IPConfig.pm
+lib/Win32/IPConfig/Adapter.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,35 @@
+0.07      2011-07-25 16:46:47 America/Denver
+
+          Fixes:
+          - Use default property for source_URL instead of a lazy builder propery.
+            This is an attempt to keep some CPAN testers from getting an empty source_URL.
+            
+0.06      2011-01-11 19:47:25 America/Denver
+          Fixes:
+          - Adjust basic.t to use the contents when it checks 
+            if one has an Internet connection.  This will prevent
+            tests from dyeing when trying to get raw_data
+
+0.05      2011-01-06 07:47:46 America/Denver
+          Fixes:
+          - Adding XML::Validate::LibXML as a dep. was not enough.
+            Need to add XML::LibXML directly.
+
+0.04      2011-01-03 11:29:31 America/Denver
+          Fixes:
+          - XML::LibXML dependency (caused test to fail)
+          
+0.03      2010-12-29 20:35:22 America/Denver
+          Improvements:
+          - enlargen private parts (the dilemma of POD for _subs)
+          - Test multiple location types
+          
+0.02      2010-12-29 14:28:29 America/Denver
+          Improvements:
+          - Add raw_data attribute that has the raw XML
+          - Validate XML before using just in case.
+          - improve Synopsis
+          
+
+0.01      2010-12-29 09:04:55 America/Denver
+          - Initial Release

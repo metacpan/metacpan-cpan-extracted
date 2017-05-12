@@ -1,0 +1,69 @@
+<h3 align="center">About</h3>
+<table align="center" cellspacing="0" cellpadding="0">
+: for $data -> $item {
+<tr>
+<!-- Left -->
+<td>
+: if $~item.is_first {
+: 	 if $~item.is_last {
+<div class="last_even_left">
+:	 }
+: 	 else {
+<div class="even_left">
+: 	 }
+: }
+: else {
+: 	   if $~item.is_last {
+:	   	  if ($~item.index % 2 > 0) {
+<div class="last_odd_left">
+:		  }
+:		  else {
+<div class="last_even_left">
+:		  }
+:	   }
+:	   else {
+:	   	  if ($~item.index % 2 > 0) {
+<div class="odd_left">
+:		  }
+:		  else {
+<div class="even_left">
+:		  }
+:	   }
+: }
+<: $item.left :>
+</div>
+</td>
+<!-- Right -->
+<td>
+: if $~item.is_first {
+: 	 if $~item.is_last {
+<div class="last_even_right">
+:	 }
+: 	 else {
+<div class="even_right">
+: 	 }
+: }
+: else {
+: 	   if $~item.is_last {
+:	   	  if ($~item.index % 2 > 0) {
+<div class="last_odd_right">
+:		  }
+:		  else {
+<div class="last_even_right">
+:		  }
+:	   }
+:	   else {
+:	   	  if ($~item.index % 2 > 0) {
+<div class="odd_right">
+:		  }
+:		  else {
+<div class="even_right">
+:		  }
+:	   }
+: }
+<: $item.right :>
+</div>
+</td>
+</tr>
+: }
+</table>

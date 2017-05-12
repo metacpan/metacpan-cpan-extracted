@@ -1,0 +1,146 @@
+///////////////////////////////////////////////////////////////////////////////
+// Name:        pdflinestyle.h
+// Purpose:     
+// Author:      Ulrich Telle
+// Modified by:
+// Created:     2009-05-25
+// Copyright:   (c) Ulrich Telle
+// Licence:     wxWindows licence
+///////////////////////////////////////////////////////////////////////////////
+
+%module{Wx};
+
+#define WXPERL_DEFAULT_PDFCOLOUR new wxPdfColour()
+
+## DECLARE_OVERLOAD( pdfls, Wx::PdfLineStyle )
+## DECLARE_OVERLOAD( pdfcol, Wx::PdfColour )
+
+%name{Wx::PdfLineStyle} class wxPdfLineStyle
+{
+
+%{
+static void
+wxPdfLineStyle::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+
+public:
+  
+%{
+
+void
+wxPdfLineStyle::new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newFull )
+        MATCH_REDISP( wxPliOvl_pdfls, newCopy )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_n_n_n_arr_n_pdfcol, newFull, 1 )
+    END_OVERLOAD( Wx::PdfLineStyle::new )
+
+
+wxPdfLineStyle*
+newCopy(cls, lineStyle )
+    SV* cls
+    wxPdfLineStyle* lineStyle
+  CODE:
+    RETVAL = new wxPdfLineStyle( *lineStyle );
+  OUTPUT: RETVAL
+
+wxPdfLineStyle*
+newFull(cls, width = -1, cap = wxPDF_LINECAP_NONE, join = wxPDF_LINEJOIN_NONE, avdash = NULL, phase = -1, colour = WXPERL_DEFAULT_PDFCOLOUR)
+    SV* cls
+    double width
+    wxPdfLineCap cap
+    wxPdfLineJoin join
+    SV* avdash
+    double phase
+    wxPdfColour* colour
+  PREINIT:
+    wxArrayDouble dashes;
+  CODE:
+    if( avdash == NULL ) {
+      dashes.SetCount(0);
+    } else {
+      AV* av;
+      if( !SvROK( avdash ) ||
+          ( SvTYPE( (SV*) ( av = (AV*) SvRV( avdash ) ) ) != SVt_PVAV ) )
+      {
+          croak( "the value is not an array reference" );
+          return;
+      }
+      int n = av_len( av );
+      dashes.SetCount(n + 1);
+      for( int i = 0; i <= n; ++i )
+      {
+          SV* t = *av_fetch( av, i, 0 );
+          dashes[i] = (double) SvNV( t );
+      }
+    }
+    RETVAL = new wxPdfLineStyle(width,cap,join,dashes,phase,*colour);
+  OUTPUT:RETVAL
+  
+%}
+
+  %name{Destroy} virtual ~wxPdfLineStyle()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ wxPli_get_class( aTHX_ ST(0) ), THIS, ST(0) );
+		         delete THIS; %};
+  
+  bool IsSet() const;
+  void SetWidth(double width);
+  double GetWidth() const;
+  void SetLineCap(wxPdfLineCap cap);
+  wxPdfLineCap GetLineCap();
+  void SetLineJoin(wxPdfLineJoin join);
+  wxPdfLineJoin GetLineJoin() const;
+  
+  /* TODO - ArrayDouble type */
+  /* it would V simple to implement wxPli_av_2_arraydouble */
+  /* but this would mean Wx::PdfDocument requiring an */
+  /* upgrade of Wx */
+
+%{
+
+void
+wxPdfLineStyle::SetDash( avdash )
+    SV* avdash
+  PREINIT:
+    wxArrayDouble dashes;
+  PPCODE:
+    AV* av;
+    if( !SvROK( avdash ) ||
+        ( SvTYPE( (SV*) ( av = (AV*) SvRV( avdash ) ) ) != SVt_PVAV ) )
+    {
+        croak( "the value is not an array reference" );
+        return;
+    }
+    int n = av_len( av );
+    dashes.SetCount(n + 1);
+    for( int i = 0; i <= n; ++i )
+    {
+        SV* t = *av_fetch( av, i, 0 );
+        dashes[i] = (double) SvNV( t );
+    }
+    THIS->SetDash( dashes );
+
+
+void
+wxPdfLineStyle::GetDash()
+  PPCODE:
+    wxArrayDouble dashes = THIS->GetDash();
+    size_t mx = dashes.GetCount();
+    EXTEND( SP, int(mx) );
+    for( size_t i = 0; i < mx; ++i )
+    {
+        PUSHs( sv_2mortal( newSVnv( dashes[i] ) ) );
+    }
+
+%}
+
+  void SetPhase(double phase);
+  double GetPhase() const;
+  void SetColour(const wxPdfColour& colour);
+  const wxPdfColour& GetColour() const;
+  
+};
+

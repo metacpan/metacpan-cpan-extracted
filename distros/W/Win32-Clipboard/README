@@ -1,0 +1,41 @@
+#######################################################################
+#
+# Win32::Clipboard - Interaction with the Windows clipboard
+#
+# Author: Aldo Calpini <dada@perl.it>
+# Modified by: Hideyo Imazu <h@imazu.net>
+# Version: 0.58
+# Info:
+#       http://dada.perl.it
+#       http://www.perl.com/CPAN/authors/Aldo_Calpini
+#
+#######################################################################
+
+DESCRIPTION
+
+This module lets you interact with the Windows clipboard: you can get 
+its content, set it, empty it, or let your script sleep until it 
+changes. This version supports 3 formats for getting clipboard data:
+
+    - simple text
+    - bitmaps
+    - list of files
+
+...and only simple text for putting data to the clipboard.
+
+SYNOPSIS
+
+    use Win32::Clipboard;
+
+    $CLIP = Win32::Clipboard();
+
+    print "Clipboard contains: ", $CLIP->Get(), "\n";
+
+    $CLIP->Set("some text to copy into the clipboard");
+
+    $CLIP->Empty();
+
+    $CLIP->WaitForChange();
+    print "Clipboard has changed!\n";
+
+

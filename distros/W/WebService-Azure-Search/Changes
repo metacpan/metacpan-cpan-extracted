@@ -1,0 +1,15 @@
+Revision history for Perl extension WebService-Azure-Search
+
+0.04 2016-03-01T06:38:50Z
+    - bugfixed.
+0.03 2016-02-29T03:29:16Z
+    - add skip, top, filter option when select AzureSearch
+
+0.02 2016-02-17T06:09:50Z
+    - no changed.
+
+0.01 2016-02-17T06:06:17Z
+
+    - original version
+
+

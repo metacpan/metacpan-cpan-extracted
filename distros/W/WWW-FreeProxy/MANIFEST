@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/WWW/FreeProxy.pm
+lib/WWW/FreeProxy/Look.pm
+lib/WWW/FreeProxy/Proxy4Free.pm
+lib/WWW/FreeProxy/PublicProxyServers.pm
+lib/WWW/FreeProxy/Samair.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

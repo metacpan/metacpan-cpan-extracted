@@ -1,0 +1,5 @@
+dzil authordeps | cpanm
+dzil build
+and that'll build you a .tgz that is installable
+2:54
+and a directory that also hase a Makefile.PL

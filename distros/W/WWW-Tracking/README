@@ -1,0 +1,122 @@
+NAME
+    WWW::Tracking - universal website visitors tracking
+
+SYNOPSIS
+            use WWW::Tracking;
+            use WWW::Tracking::Data::Plugin::GoogleAnalytics;
+
+            my $wt = WWW::Tracking->new(
+                    tracker_account => 'MO-9226801-5',
+                    tracker_type    => 'ga',
+            );
+
+            $wt->from(
+                    headers => {
+                            headers             => $c->request->headers,
+                            'request_uri'       => $c->request->uri,
+                            'remote_ip'         => $c->address,
+                            visitor_cookie_name => '__vcid',
+                    },
+            );
+        
+            eval { $wt->make_tracking_request; };
+            warn 'tracking request failed - '.$@
+                    if $@;
+        
+            say $wt->data->visitor_id;
+            say $wt->data->hostname;
+            say $wt->data->request_uri;
+            say $wt->data->referer;
+            say $wt->data->user_agent;
+            say $wt->data->browser_language;
+            say $wt->data->remote_ip;
+
+            my $data = $wt->data->as_hash;
+            my $wt2 = $wt->from(hash => $data);
+
+            my $ga_url = $wt->data->as_ga;
+
+            ###
+            # TODO
+
+            my $wt3 = $wt->from(ga => $ga_url);
+        
+            use WWW::Tracking::Data::Plugin::Piwik;
+            my $piwik_url = $wt->data->as_piwik;
+            my $wt3 = $wt->from(piwik => $piwik_url);
+
+            use WWW::Tracking::Data::Plugin::ECSV;
+            my $line = $wt->data->as_ecsv;
+            my $wt4 = $wt->from(ecsv => $line));
+
+            use WWW::Tracking::Data::Plugin::Log;
+            my $line2 = $wt->data->as_log;
+            my $wt5 = $wt->from(log => $line2));
+
+NOTE
+    Work in progress, designed to be pluggable, but for now only things that
+    I need (headers parsing and server-side Google Analytics) are
+    implemented.
+
+DESCRIPTION
+  GOAL
+    Server-side web hits tracking, generic and flexible enough so that many
+    tracking services like Google Analytics, Piwik, local file, etc. can be
+    used depending on configuration.
+
+  VISION
+    Universal enough to process many sources (headers, logs, tracking URL-s,
+    ...) and covert or relay them to different other destinations (GA,
+    Piwik, ...) making use of the fact that the tracking data information is
+    the same or nearly the same for all the sources and destinations.
+
+  IMPLEMENTATION
+    Initially tracking data needs to be gathered. Look at
+    WWW::Tracking::Data for the complete list. Most of these data can be
+    found in headers of the http request. Then these data can be serialized
+    and passed on to one of the tracking services.
+
+    Bare WWW::Tracking::Data offers just `as_hash' and `from_hash', the rest
+    can be done by one or more plugins, like for example parsing the http
+    headers with WWW::Tracking::Data::Plugin::Headers and passing it to
+    WWW::Tracking::Data::Plugin::GoogleAnalytics.
+
+  USE CASES
+    *   tracking browsers that doesn't support JavaScript (ex. mobile
+        browsing)
+
+    *   store the tracking data in local logs or files and replay it later
+        to Piwik or Google Analytics
+
+    *   track web browsing simultaneous to more tracking services (compare
+        the results, choose the one that fits)
+
+    *   aid with transition from one tracking service to another
+
+PROPERTIES
+            tracker_account
+            tracker_type
+            data
+
+METHODS
+  new()
+    Object constructor.
+
+  from($type, $args)
+    Will call one of the `from_$type' functions provided by
+    `WWW::Tracking::Data::Plugin::*' passing on `$args'.
+
+  make_tracking_request
+    Makes request (http, write to file, ...) to the tracking API via calling
+    one of the `make_tracking_request_$tracker_type' that are provided by
+    `WWW::Tracking::Data::Plugin::*'.
+
+SEE ALSO
+    http://code.google.com/apis/analytics/docs/tracking/gaTrackingTroublesho
+    oting.html#gifParameters
+
+    http://piwik.org/docs/tracking-api/
+
+AUTHOR
+    Jozef Kutej
+

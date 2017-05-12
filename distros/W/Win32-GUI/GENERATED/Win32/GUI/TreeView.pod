@@ -1,0 +1,749 @@
+
+=head1 NAME
+
+Win32::GUI::TreeView - Create and manipulate treeview controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new TreeView object
+can also be called as PARENT->AddTreeView(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -imagelist => IMAGELIST
+  -tooltip => Win32::GUI::Tooltip
+  -lines => 0/1
+  -rootlines => 0/1
+  -buttons => 0/1
+       enables or disables the +/- buttons to expand/collapse tree items.
+  -showselalways => 0/1
+  -checkboxes => 0/1
+  -trackselect => 0/1
+  -disabledragdrop => 0/1
+  -editlabels => 0/1
+  -fullrowselect => 0/1
+  -nonevenheight => 0/1
+  -noscroll => 0/1
+  -notooltips => 0/1
+  -rtlreading => 0/1
+  -singleexpand => 0/1
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackColor
+
+B<BackColor([COLOR])>
+
+Gets or sets the background color for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeItem
+
+B<ChangeItem(NODE, %OPTIONS)>
+
+See L<SetItem()|Win32::GUI::TreeView/SetItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear([NODE])>
+
+Deletes all nodes from the TreeView if no argument is given;
+otherwise, delete all nodes under the given B<NODE>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Collapse
+
+B<Collapse(NODE)>
+
+Closes a B<NODE> of the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+See L<GetCount()|Win32::GUI::TreeView/GetCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateDragImage
+
+B<CreateDragImage(NODE)>
+
+Creates a dragging bitmap for the specified item in a tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteAllItems
+
+B<DeleteAllItems()>
+
+Deletes all nodes from the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteItem
+
+B<DeleteItem(NODE)>
+
+Removes the specified B<NODE> from the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EditLabel
+
+B<EditLabel(NODE)>
+
+Begins in-place editing of the specified item's text, replacing the text of the item with a single-line edit control containing the text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndEditLabelNow
+
+B<EndEditLabelNow([FLAG_CANCEL=TRUE])>
+
+Ends the editing of a tree view item's label.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EnsureVisible
+
+B<EnsureVisible(NODE)>
+
+Ensures that a tree view item is visible, expanding the parent item or scrolling the tree view control, if necessary.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Expand
+
+B<Expand(NODE, [FLAG])>
+
+Expands or collapses the list of child items associated with the specified parent item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FirstVisible
+
+B<FirstVisible([NODE])>
+
+Set or Get first visible node.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBkColor
+
+B<GetBkColor()>
+
+Retrieves the current background color of the TreeView
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetChild
+
+B<GetChild(NODE)>
+
+Returns the handle of the first child node for the given NODE.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCount
+
+B<GetCount()>
+
+Returns the number of nodes in the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDropHilight
+
+B<GetDropHilight()>
+
+Retrieves the tree view item that is the target of a drag-and-drop operation.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEditControl
+
+B<GetEditControl()>
+
+Retrieves the handle to the edit control being used to edit a tree view item's text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFirstVisible
+
+B<GetFirstVisible()>
+
+Retrieves the first visible item in a TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList([TYPE=TVSIL_NORMAL])>
+
+Retrieves the handle to the normal or state image list associated with a TreeView.
+B<TYPE> = TVSIL_NORMAL | TVSIL_STATE
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetIndent
+
+B<GetIndent()>
+
+Retrieves the amount, in pixels, that child items are indented relative to their parent items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetInsertMarkColor
+
+B<GetInsertMarkColor()>
+
+Retrieves the color used to draw the insertion mark for the tree view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetISearchString
+
+B<GetISearchString(STRING)>
+
+Retrieves the incremental search string for a tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItem
+
+B<GetItem(NODE)>
+
+Returns an associative array of information about the given NODE:
+
+    -children
+    -image
+    -parent
+    -selectedimage
+    -state
+    -text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemHeight
+
+B<GetItemHeight()>
+
+Retrieves the current height of the tree view items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(NODE,[FLAG=FALSE])>
+
+Retrieves the bounding rectangle for a tree view item and indicates whether the item is visible.
+If B<FLAG> is TRUE, the bounding rectangle includes only the text of the item. Otherwise, it includes the entire line that the item occupies in the tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLastVisible
+
+B<GetLastVisible()>
+
+Retrieves the last expanded item in a tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNextItem
+
+B<GetNextItem(ITEM,FLAG)>
+
+Retrieves the tree view item that bears the specified relationship to a specified item.
+
+B<FLAG> specifying the item to retrieve :
+
+ TVGN_CARET           = Retrieves the currently selected item.
+ TVGN_CHILD           = Retrieves the first child item of the item specified by the hitem parameter.
+ TVGN_DROPHILITE      = Retrieves the item that is the target of a drag-and-drop operation.
+ TVGN_FIRSTVISIBLE    = Retrieves the first visible item.
+ TVGN_NEXT            = Retrieves the next sibling item.
+ TVGN_NEXTVISIBLE     = Retrieves the next visible item that follows the specified item. The specified item must be visible.
+ TVGN_PARENT          = Retrieves the parent of the specified item.
+ TVGN_PREVIOUS        = Retrieves the previous sibling item.
+ TVGN_PREVIOUSVISIBLE = Retrieves the first visible item that precedes the specified item. The specified item must be visible.
+ TVGN_ROOT            = Retrieves the topmost or very first item of the tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNextSibling
+
+B<GetNextSibling(NODE)>
+
+Returns the handle of the next sibling node for the given B<NODE>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetNextVisible
+
+B<GetNextVisible(NODE)>
+
+Retrieves the next visible item that follows a specified item in a tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetParent
+
+B<GetParent(NODE)>
+
+Returns the handle of the parent node for the given B<NODE>.
+
+NOTE: With no B<NODE> parameter this is the standard
+L<GetParent()|Win32::GUI::Reference::Methods/GetParent>
+method, returning the parent window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPrevSibling
+
+B<GetPrevSibling(NODE)>
+
+Returns the handle of the previous sibling node for the given B<NODE>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPrevVisible
+
+B<GetPrevVisible(NODE)>
+
+Retrieves the first visible item that precedes a specified item in a TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRoot
+
+B<GetRoot()>
+
+Returns the handle of the TreeView root node.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetScrollTime
+
+B<GetScrollTime()>
+
+Retrieves the maximum scroll time for the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelection
+
+B<GetSelection()>
+
+Returns the handle of the currently selected node.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextColor
+
+B<GetTextColor()>
+
+Retrieves the current text color of the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToolTips
+
+B<GetToolTips()>
+
+Retrieves the handle to the child tooltip control used by a TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetVisibleCount
+
+B<GetVisibleCount()>
+
+Obtains the number of items that can be fully visible in the client window of a TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X, Y)>
+
+Determines the location of the specified point relative to the client area of a TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Indent
+
+B<Indent([VALUE])>
+
+Set or Get Indent value.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(%OPTIONS)>
+
+Inserts a new node in the TreeView.
+
+Allowed B<%OPTIONS> are:
+
+    -bold => 0/1, default 0
+    -image => NUMBER
+        index of an image from the associated ImageList
+    -item => NUMBER
+        handle of the node after which the new node is to be inserted,
+        or one of the following special values:
+            0xFFFF0001: at the beginning of the list
+            0xFFFF0002: at the end of the list
+            0xFFFF0003: in alphabetical order
+        the default value is at the end of the list
+    -parent => NUMBER
+        handle of the parent node for the new node
+    -selected => 0/1, default 0
+    -selectedimage => NUMBER
+        index of an image from the associated ImageList
+    -text => STRING
+        the text for the node
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemCheck
+
+B<ItemCheck(NODE, [VALUE])>
+
+Set or Get node checked state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemInfo
+
+B<ItemInfo(NODE)>
+
+See L<GetItem()|Win32::GUI::TreeView/GetItem>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Reset
+
+B<Reset()>
+
+See L<DeleteAllItems()|Win32::GUI::TreeView/DeleteAllItems>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(NODE, [FLAG=TVGN_CARET])>
+
+Selects the given B<NODE >in the TreeView.
+If B<NODE> is 0 (zero), the selected item, if any, is deselected.
+
+Optional B<FLAG> parameter
+
+ TVGN_CARET        = Sets the selection to the given item.
+ TVGN_DROPHILITE   = Redraws the given item in the style used to indicate the target of a drag-and-drop operation.
+ TVGN_FIRSTVISIBLE = Ensures that the specified item is visible, and, if possible, displays it at the top of the control's window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectDropTarget
+
+B<SelectDropTarget(NODE)>
+
+Redraws a specified tree view control item in the style used to indicate the target of a drag-and-drop operation.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItem
+
+B<SelectedItem()>
+
+See L<GetSelection()|Win32::GUI::TreeView/GetSelection>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectItem
+
+B<SelectItem(NODE)>
+
+Selects the specified tree view item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectSetFirstVisible
+
+B<SelectSetFirstVisible(NODE)>
+
+Scrolls the tree view control vertically to ensure that the specified item is visible. If possible, the specified item becomes the first visible item at the top of the control's window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkColor
+
+B<SetBkColor(COLOR)>
+
+Sets the background color for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(IMAGELIST, [TYPE])>
+
+Sets the normal or state image list for a tree view control and redraws the control using the new images.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIndent
+
+B<SetIndent(VALUE)>
+
+Sets the width of indentation for a tree view control and redraws the control to reflect the new width.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetInsertMark
+
+B<SetInsertMark(NODE,[FLAG_AFTER=FALSE])>
+
+Sets the insertion mark in a tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetInsertMarkColor
+
+B<SetInsertMarkColor(COLOR)>
+
+Sets the color used to draw the insertion mark for the tree view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItem
+
+B<SetItem(NODE, %OPTIONS)>
+
+Change most of the options used when the item was created (see L<InsertItem()|Win32::GUI::TreeView/InsertItem>).
+Allowed B<%OPTIONS> are:
+
+    -bold
+    -image
+    -selected
+    -selectedimage
+    -text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemHeight
+
+B<SetItemHeight(HEIGHT)>
+
+Sets the height of the tree view items.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetScrollTime
+
+B<SetScrollTime(TIME)>
+
+Sets the maximum scroll time for the tree view control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextColor
+
+B<SetTextColor(COLOR)>
+
+Sets the text color of the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToolTips
+
+B<SetToolTips(TOOLTIP)>
+
+Sets a tree view control's child tooltip control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Sort
+
+B<Sort(NODE)>
+
+See L<SortChildren()|Win32::GUI::TreeView/SortChildren>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SortChildren
+
+B<SortChildren(NODE)>
+
+Sorts the childs of the specified NODE in the TreeView.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextColor
+
+B<TextColor([COLOR])>
+
+Gets or sets the text color for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 VisibleCount
+
+B<VisibleCount()>
+
+See L<GetVisibleCount()|Win32::GUI::TreeView/GetVisibleCount>
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginLabelEdit
+
+B<BeginLabelEdit(NODE)>
+
+Sent when the user is about to edit the specified NODE of the TreeView
+The event should return 0 to prevent the  action, 1 to allow it.
+
+For a treeview to receive this event, -editlabels need to be set to true.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Collapse
+
+B<Collapse(NODE)>
+
+Sent when the user closes the specified NODE of the TreeView.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Collapsing
+
+B<Collapsing(NODE)>
+
+Sent when the user is about to close the
+specified NODE of the TreeView.
+The event should return 0 to prevent the
+action, 1 to allow it.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndLabelEdit
+
+B<EndLabelEdit(NODE,TEXT)>
+
+Sent when the user has finished editing a label in the TreeView control.
+You have explicitly set the text of the node to reflect the new changes.
+If the user cancels the edit, the text is undef.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Expand
+
+B<Expand(NODE)>
+
+Sent when the user opens the specified NODE of the TreeView.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Expanding
+
+B<Expanding(NODE)>
+
+Sent when the user is about to open the
+specified NODE of the TreeView
+The event should return 0 to prevent the
+action, 1 to allow it.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 KeyDown
+
+B<KeyDown(KEY)>
+
+Sent when the user presses a key while the TreeView
+control has focus; KEY is the ASCII code of the
+key being pressed.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 NodeClick
+
+B<NodeClick(NODE)>
+
+Sent when the user clicks on the specified NODE of the TreeView.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

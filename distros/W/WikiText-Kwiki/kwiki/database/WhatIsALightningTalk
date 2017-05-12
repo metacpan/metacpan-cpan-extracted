@@ -1,0 +1,42 @@
+About Lightning Talks
+
+*Q: What is a lightning talk?*
+
+Any Perlish or geekish lecture, rant, speech, poem, droll witticism, or (hopefully) constructive criticism that you can fit into N MINUTES (where N usually equals 5, 8, 10 or 15).
+
+*Q: Who talks?*
+
+You do!
+
+*Q: Why would you want to do this?*
+
+(Copied from Perl Paraphernalia verbatim; minor edits)
+
+Maybe you've never given a talk before, and you'd like to start small. For a Lightning Talk, you don't need to make slides, and if you do decide to make slides, you only need to make four.
+
+Maybe you're nervous and you're afraid you'll mess up. It's a lot easier to plan and deliver a eight minute talk than it is to deliver a long talk. And if you do mess up, at least the painful part will be over quickly.
+
+Maybe you don't have much to say. Maybe you just want to ask a question, or invite people to help you with your project, or boast about something you did, or tell a short cautionary story. These things are all interesting and worth talking about, but there might not be enough to say about them to fill up thirty minutes.
+
+Maybe you have a lot of things to say, and you're already going to give a long talk on one of them, and you don't want to hog the spotlight. There's nothing wrong with giving several Lightning Talks. Hey, they're only eight minutes.
+
+*Q: What do I talk about?*
+
+Why not take a look at prior lightning talks? A sampling:
+
+Here's a list of the talks from last time we did this:
+
+* Allison Randal - On her upcoming book, Perl 6 Essentials
+* Annett Sullivan - Perl and Water Quality (with GD animations!)
+* Jeff Zucker - Everything is database. Nothing is database
+* Josh Heumann - Perljxta, an implementation of Sun's JXTA P2P protocols
+* Michael G. Schwern - MakeMaker Is Doomed
+* Brian Ingerson - Two Tails of OOP Adventures in Data-Driven Design
+* Brian Ingerson - Lightn-ingy Strikes Twice
+* Ben Marcotte - From the Dark Side Back to the Light How having to use Win32::TieRegistry led to experimenting with "hierarchical" hashes
+* Clint Moore - Experiences Gained From Working Alone on a Large Project
+
+There are even more examples at [Perl Paraphernalia http://perl.plover.com/lt].
+
+*Q: I still have questions!*
+Mark-Jason probably answers your question on [Perl Paraphernalia's "Lightning Talks" page http://perl.plover.com/lt].

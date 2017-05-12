@@ -1,0 +1,10 @@
+Changelog
+Makefile.PL
+README
+leo
+t/run.t
+samples/singular.pl
+Org.pm
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

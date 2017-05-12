@@ -1,0 +1,43 @@
+WWW/Search/Jobserve version 1.02
+==============================
+
+INTRODUCTION
+This is a backend for use with the WWW::Search module.
+
+Please read the README for WWW::Search for general information.
+http://www.perl.com/CPAN-local/modules/by-module/WWW/WWW-Search-2.35.readme
+
+Or:
+
+   perldoc WWW::Search::Jobserve
+   
+from the command line.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or:
+
+   perl -MCPAN -e "install 'WWW::Search::Jobserve'"
+
+If you have the CPAN module installed.
+
+DEPENDENCIES
+
+This module requires plenty of other modules and libraries.
+I'd recommend using the CPAN install above to ensure you get the lot
+
+COPYRIGHT AND LICENCE
+
+Distribute this module freely
+
+Copyright (C) 2003 Andy Pritchard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

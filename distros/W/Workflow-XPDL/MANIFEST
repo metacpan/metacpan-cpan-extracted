@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Workflow-XPDL.t
+t/workflow.xml
+lib/Workflow/XPDL.pm
+META.yml                                 Module meta-data (added by MakeMaker)

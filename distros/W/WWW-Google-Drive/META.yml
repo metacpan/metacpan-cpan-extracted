@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Dinesh Dharmalingam <dd.dinesh.rajakumar@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Google-Drive
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::JSON: '1.52'
+  Crypt::OpenSSL::RSA: '0.2'
+  File::Basename: '2.84'
+  File::MimeInfo: '0.25'
+  HTML::Entities: '3.69'
+  HTTP::Headers: '6.05'
+  HTTP::Request::Common: '6.04'
+  JSON: '2.9'
+  JSON::WebToken: '0.1'
+  LWP::UserAgent: '6.06'
+  Log::Log4perl: '1.47'
+  Moose: '2.1212'
+  Sysadm::Install: '0.47'
+  URI: '1.71'
+resources:
+  repository: https://github.com/dinesh-it/www-google-drive.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

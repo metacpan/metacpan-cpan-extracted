@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/WebService/LibraryThing/ThingISBN.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+ignore.txt
+t/ThingISBN.t
+Makefile.PL
+META.yml

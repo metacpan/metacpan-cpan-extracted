@@ -1,0 +1,33 @@
+
+This is the README file for WWW::PkgFind, a tool for retrieving packages
+(tarballs, patches, etc.) posted to web pages.  It is suitable for being
+run as a cronjob to watch a website for new package releases, and
+download the packages that match your acceptance criteria.
+
+This was designed for use in an automated testing environment, where you
+want to watch some open source project's websites for new releases of
+tarballs, patches, etc. and automatically retrieve them and queue them
+for processing.
+
+For more information on how to use the script, see the
+pod documentation via the command
+
+  perldoc WWW::PkgFInd
+  perldoc pkgfind
+
+or, after installation, view the man pages with
+
+  man WWW::PkgFind
+  man pkgfind
+
+For instructions on how to install the script, see the file INSTALL.
+
+Problems, questions, etc. may be sent to bryce@osdl.org
+
+pkgfind is Copyright (c) 2006, by Bryce W. Harrington.
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

@@ -1,0 +1,2 @@
+- document constants usage in Win32::GUI
+- look at using PERL_HASH as the hash function

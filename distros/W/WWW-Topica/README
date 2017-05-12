@@ -1,0 +1,8 @@
+WWW::Topica - Scrape mails of Topica mailing lists
+
+Install using
+
+	% perl Makefile.PL
+	% make 
+	% make test
+	% sudo make install

@@ -1,0 +1,35 @@
+Warnings-Version-0.003002  2015-06-19
+  Locale test on windows doesn't work, so disable it when $^O eq MSWin32
+
+Warnings-Version-0.003001  2015-06-19
+  5.22 test file fixed.
+
+Warnings-Version-0.003000  2015-06-18
+  Update for perl 5.22 support
+
+Warnings-Version-0.002003 2014-12-27
+  Fix failing imprecision test on windows, and taint test when prerequisites
+     are in PERL5LIB or PERLLIB
+
+Warnings-Version-0.002002  2014-12-26
+  Skip failing imprecision test when compiled with -Duselongdouble
+
+Warnings-Version-0.002001  2014-12-26
+  POD fixups
+
+Warnings-Version-0.002     2014-12-26
+  Added Changes file
+  Change the source code so it doesn't exceed 80 columns
+  Add numerous tests and rework how they're run
+  Let dzil handle more things, like GitHub integration, $VERSION
+  Added BUGS and SEE ALSO sections to POD
+  Specify minimum perl version
+  No version specification when 'use'ing the module is now interpreted as
+     use Warnings::Version 'all';
+  Bugfix: utf8 category warnings were also needed on perls 5.14 and 5.16
+
+Warnings-Version-0.001001 2014-12-25
+  PodWeaver section added to dist.ini, to generate needed POD
+
+Warnings-Version-0.001 2014-12-25
+  First release

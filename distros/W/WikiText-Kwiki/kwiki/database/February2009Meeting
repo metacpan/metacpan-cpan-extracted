@@ -1,0 +1,27 @@
+= Perl in the 21st Century =
+
+speaker:  EricWilhelm
+
+I started using Perl just over six years ago, when 5.6.2 was already
+getting old and 5.8.1 was on the way.  By the time I put my first module
+on the CPAN, over half of the current contributors had already shipped.
+
+I have often read the source of a core module and asked "Why?" only to
+discover some unknown feature or historical accident.  The history
+lesson continues all the way into the roots of Unix in some cases, but
+also often leaves me thinking "So?".  And now I am quickly approaching
+my 40th CPAN distribution.
+
+In this talk, I will share my own experiences in developing with Perl
+and explore the idea of the "Modern" or "Enlightened" Perl.  Did I miss
+the heyday of Perl or are we still making that now?  How does today's
+Perl code look different than it did 5 or 10 years ago?  Is there a Perl
+renaissance coming, and what does it have to do with Perl 6?  What
+modules should you be using for new development?  Where is my flying
+car?  Why am I still programming in Perl?  And why am I programming at
+all?
+
+I will try to find answers to some of these questions and invite you to bring
+questions (or answers!) of your own.
+
+[http://scratchcomputing.com/software/developers/talks/perl21st/ Slides] and [http://pdxpm.podasp.com/archive.html Podcast]

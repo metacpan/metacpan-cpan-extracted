@@ -1,0 +1,258 @@
+==================================================
+Changes from 2012-12-19 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------------------
+version 1.20131219.1627 at 2013-12-19 16:27:20 +0000
+----------------------------------------------------
+
+  Change: 424482424b687c69b9c9077841042be0c2eed7c4
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-12-19 16:17:45 +0000
+
+    Switching to handy Git plugins for Dist::Zilla 
+
+  Change: 51474b379614583a30d83d2ae6c66f45917d6fb2
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-12-19 16:01:36 +0000
+
+    Version bump 
+
+  Change: 8cd5673d69a9df221d9bd5ac32b2950b845238ed
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-12-19 16:00:27 +0000
+
+    Properly added Class::Accessor requirements 
+
+  Change: d34289142be0c7add4b0373c7dd0c4270eb22211
+  Author: Ryan Olson <ryan@ziprecruiter.com>
+  Date : 2013-12-19 14:53:19 +0000
+
+    JSON > 1.15 obsoletes objToJson and jsonToObj 
+
+  Change: 7eb2e46f826b34ec0b0d86524ab459069e22860a
+  Author: Ryan Olson <ryan@ziprecruiter.com>
+  Date : 2013-05-22 14:12:36 +0000
+
+    Added a module requirement in a new test. 
+
+  Change: f10b655489d7db6c22c2bdc0eacdf709bc90f245
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-05-22 19:27:46 +0000
+
+    Proper version bump + added CONTRIBUTORS into POD 
+
+  Change: 146099a8f4b4d58515ea6f0c98c02a567cd43a53
+  Author: Ryan Olson <ryan@ziprecruiter.com>
+  Date : 2013-05-13 18:15:34 +0000
+
+    Support for api_key authorization. 
+
+  Change: 35183721afbd13c6c2a4e634d87f8481232ee19e
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-08-25 02:37:35 +0000
+
+    Transition from Moo to Class::Accessor + version bump 
+
+  Change: 38c195506bf618a6785a7930f6500b881a65ca8b
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-08-25 00:26:47 +0000
+
+    Factor out configuration from tests 
+
+  Change: f6355cd6d5d4f703aab18b5121220961321d90b7
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-08-09 16:01:57 +0000
+
+    Transition from Mouse to Moo + version bump 
+
+  Change: e4c150f46b6b55723b45a2826bf101463040226f
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 15:02:39 +0000
+
+    Switch from Try::Tiny to Error + version bump 
+
+  Change: 16f0a1b8472c4199d6f41463505d364d582e1cfe
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:34:09 +0000
+
+    Bump version 
+
+  Change: 27b5a9d78178527570cd68b03663971af170cd95
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:32:44 +0000
+
+    Improve a bit POD and POD testing 
+
+  Change: 7c68e226f3e583cff54b17c694cdaa3c6fb7c8d6
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:20:01 +0000
+
+    Improve code, remove dups 
+
+  Change: 4fe3ecd5348d37b1d491e6011504f034e308a2a9
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:20:01 +0000
+
+    Workaround for dzil PkgVersion plugin and PerlCritic 
+
+  Change: ca1ce0630245f3e7e004e62b8608f40171a6c47a
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:20:01 +0000
+
+    Switch from Any::Moose to Mouse 
+
+  Change: 3fb8001c1eb61e021a8b5146af455e2d0b734736
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:20:00 +0000
+
+    Eliminate need of Class::Load 
+
+  Change: eff5318ec5fd7e31b3e82664127074160c11e705
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:20:00 +0000
+
+    Bugfix: "Unknown escape E<copy>" message during install 
+
+  Change: b053d16cce24a451f96593008306b94c2eaa8cdf
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:59 +0000
+
+    Switch to use PkgVersion plugin 
+
+  Change: 18376ceb0cf66ab45c6e2837a1605aa81f3b64c6
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:59 +0000
+
+    Move author test into separate directory (follow to dzil conventions) 
+
+  Change: 7374eff78f3082964c975667c6d0eba3b7876fe3
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:59 +0000
+
+    Improve and simplify dist.ini 
+
+  Change: 64f6ee2b2358319d81232cfdef75edda93190aac
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:58 +0000
+
+    Switch to use Dist::Zilla, bump version 
+
+  Change: de299edc3c18759b102479c74a4d7b7136710076
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:41 +0000
+
+    Disable testing over network for non-author environment 
+
+  Change: b7fa41761e2d94649503678dde8283b25be132c8
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:17 +0000
+
+    Improve documentation 
+
+  Change: 818d7e2a373c8bdbe333f7f087ed8fa24e7d62bf
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:17 +0000
+
+    Created test suite for Schedules 
+
+  Change: 6fb5806fae82b57c502c84eadaf9245d2aa82067
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:16 +0000
+
+    Bugfixing for Schedules 
+
+  Change: b329f85bf1b2f51b701b3d9c099df5e8b51de837
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:16 +0000
+
+    Improve Response data handling 
+
+  Change: cadbe848cccf50928aee6e9f9bc2407aed4a23f3
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:15 +0000
+
+    Added handling of extra params in Request 
+
+  Change: 00a1867e4787cd1043db3a9c2a0c70dc1f82ef67
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:15 +0000
+
+    Created test suite for Incidents 
+
+  Change: 000496fa32dcc9553fda82d250cb169d44360c7b
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:15 +0000
+
+    Improve handling of Responses 
+
+  Change: bd9f460f6e5166d9ab8836a72404424cc8df653f
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:14 +0000
+
+    Created test suite for Events 
+
+  Change: f44c8827fe8d3dd43b99167f29f443c089a294df
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:14 +0000
+
+    Include incident_key attribute into set of default attributes for
+    Response object, for more convenient work with Events 
+
+  Change: 9d2eef274fb9845dbc7414ccc98f9b3c1828eae6
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:14 +0000
+
+    Added forgotten call to new() 
+
+  Change: 16d5d9c7897c8999783ac54fb617f2d6313372b0
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:14 +0000
+
+    Mark some attributes as lazy 
+
+  Change: 4378f7c8ee5073a1f3230cab83222d7e5f3b3606
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:13 +0000
+
+    Added loading of required classes 
+
+  Change: 4fb4c994e233a0bcdd7889e43da522a00d5cb55d
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:13 +0000
+
+    Implemented all required classes 
+
+  Change: 673702c45e7ba4fa95edb4f7ec776d0ba494ccef
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:13 +0000
+
+    Created base implementation for all required classes 
+
+  Change: 338ed358a6391d5026de017953deaa038dafe2bf
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:12 +0000
+
+    Added minimal set of class memebers 
+
+  Change: 2be3c4d69e0d4e0441a7b3101934e0f744bcd1bd
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:12 +0000
+
+    Created examples of use in SYNOPSIS section 
+
+  Change: 230f7f6b738bbdd0700388bec40d98186fcb4fa1
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-12 14:19:03 +0000
+
+    Created stub files 
+
+  Change: bef68e860aeecd20e608571aec99a3ed63e095fc
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2012-07-05 23:12:59 +0000
+
+    Initial repository creation 
+
+================
+End of releases.
+================

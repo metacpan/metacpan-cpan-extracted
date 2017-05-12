@@ -1,0 +1,15 @@
+Revision history for WWW-Shorten-Safemn
+1.0     2009-05-27/21:00PSTST
+        First version
+
+1.10    Choose alternate domain for short links
+        Fix typos
+        Details arguments for each function
+
+1.20    Implement API info (http://safe.mn/api-doc/protocol#track-request)
+
+1.21    Fix minor typos in the documentation
+
+1.22	Fix seveal methods
+		Add unit tests
+

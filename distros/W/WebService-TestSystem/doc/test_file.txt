@@ -1,0 +1,66 @@
+# This file is used for configuring a new test.
+# Fill out this file using valid info for your test and submit it
+# via stp-testadd, like this:
+#
+#   $ stp-testadd test_file.txt
+#
+
+test_name:            foobar
+description:          foo \
+                      bar \
+                      baz
+lilo_default:         
+code_location:        http://mysite.com
+configuration_notes:  
+environment_default:  
+category:             Scheduler
+status:               Available         # or Unavailable
+repeat_safe:          0                 # 1 if it is repeat_safe
+
+# Test parameters - this is a listing of different parameters that
+#     the test will support.  Each item in the list consists of a
+#     parameter, and a description of the parameter.  Parameters
+#     can either be switches, or can take values.
+#     
+#
+test_parameters:      \
+  -s=string           The s parameter (requires a string), \
+  -d=int              The d parameter (requires an int), \
+  -h                  My switch that turns something on
+
+# Distro images - this is a list of the valid distro images that
+#     this test can be run on.  List the ID numbers of the distro
+#     images.  E.g., 4=RedHat 9.0, 6=SuSE 9.0
+#
+distros:              4, 6
+
+# Host types - this is the listing of types of hosts the test is
+#     allowed to be run on.  List the ID numbers of the host types.
+#     E.g.:
+#      1  1-way      
+#     77  stp2-000   
+#     78  stp2-001   
+#     79  stp2-002   
+#     80  stp2-003   
+#     81  stp4-000   
+#     82  stp4-001   
+#     83  stp4-002   
+#     84  stp4-003   
+#     85  stp8-000   
+#     86  stp8-001   
+#     87  stp8-002   
+#     88  stp8-003   
+#     14  testdev    
+#     15  testdummy  
+#     
+host_types:           77, 78, 79, 80
+
+# Software types - this is a comma-separated list of software types
+#     that the test accepts patches for.  Each software type must be
+#     registered with PLM.  When making test requests, the user will
+#     be allowed to submit tests for these software types.  The 'linux'
+#     software type is required, the others are optional.  Examples
+#     of software types include:  linux, sysstat, postgresql
+#
+software_types:       linux, sysstat
+

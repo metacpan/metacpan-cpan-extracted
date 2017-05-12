@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Wx-Perl-Throbber
+version:      1.05
+version_from: lib/Wx/Perl/Throbber.pm
+installdirs:  site
+requires:
+    Test::More:                    0.45
+    Wx:                            0.19
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

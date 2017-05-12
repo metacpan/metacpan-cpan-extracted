@@ -1,0 +1,89 @@
+{
+   "abstract" : "fetch websites and executes tests on the results",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Mechanize-Script",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Config::Any::Base" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::ConfigDir" : "0.004",
+            "File::Find::Rule" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "Hash::Merge" : "0.12",
+            "IO::File" : "0",
+            "JSON" : "2.00",
+            "List::MoreUtils" : "0.22",
+            "Module::Pluggable" : "4.0",
+            "Module::Pluggable::Object" : "0",
+            "Params::Util" : "0.33",
+            "Pod::Usage" : "0",
+            "Template" : "2.20",
+            "Text::Balanced" : "0",
+            "WWW::Mechanize" : "1.72",
+            "WWW::Mechanize::Timed" : "0.44",
+            "base" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "HTTP::Daemon" : "0",
+            "HTTP::Status" : "0",
+            "IO::CaptureOutput" : "0",
+            "IO::Select" : "0",
+            "IO::Socket" : "0",
+            "POSIX" : "0",
+            "Sys::Hostname" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-www-mechanize-script@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Script"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://repo.or.cz/WWW-Mechanize-Script.git",
+         "web" : "http://repo.or.cz/w/WWW-Mechanize-Script.git"
+      }
+   },
+   "version" : "0.101"
+}
+

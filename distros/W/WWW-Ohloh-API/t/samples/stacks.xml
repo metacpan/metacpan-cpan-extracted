@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <result>
+    <stack>
+      <id>21420</id>
+      <updated_at>2008-03-17T17:09:16Z</updated_at>
+      <project_count>35</project_count>
+      <stack_entries>
+        <stack_entry>
+          <id>111885</id>
+          <stack_id>21420</stack_id>
+          <project_id>29</project_id>
+          <created_at>2008-03-17T17:09:16Z</created_at>
+          <project>
+            <id>29</id>
+            <name>OpenOffice.org</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T23:45:27Z</updated_at>
+            <description>OpenOffice.org is a multiplatform and multilingual office suite and an open-source project. Compatible with all other major office suites, the product is free to download, use, and distribute.</description>
+            <homepage_url>http://www.openoffice.org/</homepage_url>
+            <download_url>http://download.openoffice.org/index.html</download_url>
+            <url_name>openoffice</url_name>
+            <medium_logo_url>&lt;img alt="Open_office_med" src="http://bits.ohloh.net/attachments/45/open_office_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Open_office_small" src="http://bits.ohloh.net/attachments/45/open_office_small.png" /&gt;</small_logo_url>
+            <stack_count>1269</stack_count>
+            <average_rating>4.10194174757282</average_rating>
+            <rating_count>206</rating_count>
+            <analysis_id>132455</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>106155</id>
+          <stack_id>21420</stack_id>
+          <project_id>36</project_id>
+          <created_at>2008-02-28T04:46:49Z</created_at>
+          <project>
+            <id>36</id>
+            <name>Thunderbird</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-05-01T01:43:49Z</updated_at>
+            <description>Thunderbird delivers. Enjoy safe, fast, and easy email, with intelligent spam filters, quick message search, and customizable views. Brought to you by Mozilla, Thunderbird makes email better.</description>
+            <homepage_url>http://www.mozilla.org/projects/thunderbird/</homepage_url>
+            <download_url>http://www.getthunderbird.com</download_url>
+            <url_name>thunderbird</url_name>
+            <medium_logo_url>&lt;img alt="Thunderbird_med" src="http://bits.ohloh.net/attachments/109/thunderbird_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Thunderbird_small" src="http://bits.ohloh.net/attachments/109/thunderbird_small.png" /&gt;</small_logo_url>
+            <stack_count>982</stack_count>
+            <average_rating>4.16025641025641</average_rating>
+            <rating_count>156</rating_count>
+            <analysis_id>161985</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>106154</id>
+          <stack_id>21420</stack_id>
+          <project_id>43</project_id>
+          <created_at>2008-02-28T04:46:43Z</created_at>
+          <project>
+            <id>43</id>
+            <name>GIMP</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T23:45:26Z</updated_at>
+            <description>GIMP is an acronym for GNU Image Manipulation Program. It is a freely distributed program for such tasks as photo retouching, image composition and image authoring.
+
+It has many capabilities. It can be used as a simple paint program, an expert quality photo retouching program, an online batch processing system, a mass production image renderer, an image format converter, etc.
+
+GIMP is expandable and extensible. It is designed to be augmented with plug-ins and extensions to do just about anything. The advanced scripting interface allows everything from the simplest task to the most complex image manipulation procedures to be easily scripted.
+
+GIMP is written and developed under X11 on UNIX platforms. But basically the same code also runs on MS Windows and Mac OS X.</description>
+            <homepage_url>http://www.gimp.org/</homepage_url>
+            <download_url>http://www.gimp.org/downloads/</download_url>
+            <url_name>gimp</url_name>
+            <medium_logo_url>&lt;img alt="Gimp_med" src="http://bits.ohloh.net/attachments/106/gimp_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Gimp_small" src="http://bits.ohloh.net/attachments/106/gimp_small.png" /&gt;</small_logo_url>
+            <stack_count>1012</stack_count>
+            <average_rating>4.27329192546584</average_rating>
+            <rating_count>161</rating_count>
+            <analysis_id>161808</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>106153</id>
+          <stack_id>21420</stack_id>
+          <project_id>3546</project_id>
+          <created_at>2008-02-28T04:46:38Z</created_at>
+          <project>
+            <id>3546</id>
+            <name>Vim</name>
+            <created_at>2006-11-09T22:22:18Z</created_at>
+            <updated_at>2008-04-30T21:50:16Z</updated_at>
+            <description>Vim is an advanced text editor that seeks to provide the power of the de-facto Unix editor 'Vi', with a more complete feature set. It's useful whether you're already using vi or using a different editor.</description>
+            <homepage_url>http://www.vim.org/</homepage_url>
+            <download_url>http://www.vim.org/download.php</download_url>
+            <url_name>vim</url_name>
+            <medium_logo_url>&lt;img alt="Vim_med" src="http://bits.ohloh.net/attachments/54/vim_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Vim_small" src="http://bits.ohloh.net/attachments/54/vim_small.png" /&gt;</small_logo_url>
+            <stack_count>1037</stack_count>
+            <average_rating>4.67149758454106</average_rating>
+            <rating_count>207</rating_count>
+            <analysis_id>141560</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>103885</id>
+          <stack_id>21420</stack_id>
+          <project_id>8127</project_id>
+          <created_at>2008-02-21T21:55:00Z</created_at>
+          <project>
+            <id>8127</id>
+            <name>CPAN</name>
+            <created_at>2007-09-01T21:29:42Z</created_at>
+            <updated_at>2008-04-30T20:14:43Z</updated_at>
+            <description>The CPAN module automates or at least simplifies the make and install of perl modules and extensions. It includes some primitive searching capabilities and knows how to use Net::FTP or LWP or some external download clients to fetch the distributions from the net.
+
+These are fetched from one or more of the mirrored CPAN (Comprehensive Perl Archive Network) sites and unpacked in a dedicated directory.
+
+The CPAN module also supports the concept of named and versioned bundles of modules. Bundles simplify the handling of sets of related modules.</description>
+            <homepage_url>http://search.cpan.org/~andk/CPAN</homepage_url>
+            <download_url>http://search.cpan.org/~andk/CPAN</download_url>
+            <url_name/>
+            <stack_count>85</stack_count>
+            <average_rating>4.66666666666667</average_rating>
+            <rating_count>18</rating_count>
+            <analysis_id>161548</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>103884</id>
+          <stack_id>21420</stack_id>
+          <project_id>3583</project_id>
+          <created_at>2008-02-21T21:54:57Z</created_at>
+          <project>
+            <id>3583</id>
+            <name>DBI</name>
+            <created_at>2006-11-14T01:49:59Z</created_at>
+            <updated_at>2008-04-30T18:50:46Z</updated_at>
+            <description>The DBI module enables your Perl applications to access multiple database types transparently. You can connect to a large number of databases, including MySQL, MSSQL, Oracle, Informix, Sybase, ODBC etc. without having to know the different underlying interfaces of each. The API defined by DBI will work on all these database types and many more.</description>
+            <homepage_url>http://dbi.perl.org/</homepage_url>
+            <download_url>http://search.cpan.org/~timb/DBI/</download_url>
+            <url_name/>
+            <medium_logo_url>&lt;img alt="Perl_logo_50x50_med" src="http://bits.ohloh.net/attachments/2287/perl_logo_50x50_med.gif" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Perl_logo_50x50_small" src="http://bits.ohloh.net/attachments/2287/perl_logo_50x50_small.gif" /&gt;</small_logo_url>
+            <stack_count>112</stack_count>
+            <average_rating>4.91304347826087</average_rating>
+            <rating_count>23</rating_count>
+            <analysis_id>161403</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>100729</id>
+          <stack_id>21420</stack_id>
+          <project_id>69</project_id>
+          <created_at>2008-02-13T02:26:48Z</created_at>
+          <project>
+            <id>69</id>
+            <name>Inkscape</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T21:37:02Z</updated_at>
+            <description>Inkscape is a drawing tool with capabilities similar to Illustrator, Freehand, and CorelDraw that uses the W3C standard scalable vector graphics format (SVG). The supported SVG features include basic shapes, paths, text, markers, clones, alpha blending, transforms, gradients, and grouping. In addition, it supports Creative Commons meta-data, node-editing, layers, complex path operations, text-on-path, and SVG XML editing. It also imports several formats like EPS, Postscript, JPEG, PNG, BMP, and TIFF and exports PNG as well as multiple vector-based formats.</description>
+            <homepage_url>http://www.inkscape.org</homepage_url>
+            <download_url>http://www.inkscape.org/download/?lang=en</download_url>
+            <url_name>inkscape</url_name>
+            <medium_logo_url>&lt;img alt="Svg2raster-1_med" src="http://bits.ohloh.net/attachments/274/svg2raster-1_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Svg2raster-1_small" src="http://bits.ohloh.net/attachments/274/svg2raster-1_small.png" /&gt;</small_logo_url>
+            <stack_count>403</stack_count>
+            <average_rating>4.65934065934066</average_rating>
+            <rating_count>91</rating_count>
+            <analysis_id>161648</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>98812</id>
+          <stack_id>21420</stack_id>
+          <project_id>3141</project_id>
+          <created_at>2008-02-06T17:04:20Z</created_at>
+          <project>
+            <id>3141</id>
+            <name>Linux Kernel 2.6</name>
+            <created_at>2006-10-12T18:17:49Z</created_at>
+            <updated_at>2008-04-30T19:46:30Z</updated_at>
+            <description>Linux is a free software kernel, which combined with the GNU libraries, core utils and shell form the GNU/Linux operating system.</description>
+            <homepage_url>http://www.kernel.org/</homepage_url>
+            <download_url>http://www.kernel.org/</download_url>
+            <url_name>linux</url_name>
+            <medium_logo_url>&lt;img alt="Linux_med" src="http://bits.ohloh.net/attachments/37/linux_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Linux_small" src="http://bits.ohloh.net/attachments/37/linux_small.png" /&gt;</small_logo_url>
+            <stack_count>1454</stack_count>
+            <average_rating>4.70848708487085</average_rating>
+            <rating_count>271</rating_count>
+            <analysis_id>157700</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>96803</id>
+          <stack_id>21420</stack_id>
+          <project_id>98</project_id>
+          <created_at>2008-01-29T19:54:37Z</created_at>
+          <project>
+            <id>98</id>
+            <name>AWStats</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T07:58:10Z</updated_at>
+            <description>Advanced Web Statistics (AWStats) is a free powerful Web server logfile analyzer (Perl script) that shows you all your Web statistics including visits, unique visitors, pages, hits, rush hours, search engines, keywords used to find your site, robots, broken links, and more. It works with both IIS 5.0+ and Apache Web server log files as a CGI and/or from the command line. It also supports multiple languages including English, French, Dutch, Spanish, Italian, German, Polish, and Greek.</description>
+            <homepage_url>http://awstats.sourceforge.net</homepage_url>
+            <download_url>http://awstats.sourceforge.net/#DOWNLOAD</download_url>
+            <url_name>awstats</url_name>
+            <medium_logo_url>&lt;img alt="Awstats_logo4_med" src="http://bits.ohloh.net/attachments/2307/awstats_logo4_med.jpg" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Awstats_logo4_small" src="http://bits.ohloh.net/attachments/2307/awstats_logo4_small.jpg" /&gt;</small_logo_url>
+            <stack_count>104</stack_count>
+            <average_rating>3.26315789473684</average_rating>
+            <rating_count>19</rating_count>
+            <analysis_id>160868</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>93485</id>
+          <stack_id>21420</stack_id>
+          <project_id>10983</project_id>
+          <created_at>2008-01-18T17:54:57Z</created_at>
+          <project>
+            <id>10983</id>
+            <name>brian d foy's Perl modules</name>
+            <created_at>2008-01-15T22:39:28Z</created_at>
+            <updated_at>2008-04-24T00:26:02Z</updated_at>
+            <description/>
+            <homepage_url/>
+            <download_url/>
+            <url_name/>
+            <stack_count>3</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>154697</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>92260</id>
+          <stack_id>21420</stack_id>
+          <project_id>4062</project_id>
+          <created_at>2008-01-16T13:49:13Z</created_at>
+          <project>
+            <id>4062</id>
+            <name>XML::Simple</name>
+            <created_at>2007-01-18T23:24:45Z</created_at>
+            <updated_at>2008-04-20T13:34:38Z</updated_at>
+            <description>XML::Simple is a Perl module that makes it really easy to read and write XML files. It was originally developed for the purpose of reading and writing config files in XML format, many people find it useful for other purposes.</description>
+            <homepage_url>http://www.mclean.net.nz/cpan/index.html</homepage_url>
+            <download_url/>
+            <url_name/>
+            <stack_count>15</stack_count>
+            <average_rating>4.8</average_rating>
+            <rating_count>5</rating_count>
+            <analysis_id>112608</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>92259</id>
+          <stack_id>21420</stack_id>
+          <project_id>1853</project_id>
+          <created_at>2008-01-16T13:48:30Z</created_at>
+          <project>
+            <id>1853</id>
+            <name>Params::Validate</name>
+            <created_at>2006-10-12T03:51:08Z</created_at>
+            <updated_at>2008-03-23T09:00:14Z</updated_at>
+            <description>The Perl module Params::Validate.</description>
+            <homepage_url>http://search.cpan.org/dist/Params-Validate/</homepage_url>
+            <download_url/>
+            <url_name/>
+            <stack_count>17</stack_count>
+            <average_rating>4.25</average_rating>
+            <rating_count>4</rating_count>
+            <analysis_id>125636</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>92258</id>
+          <stack_id>21420</stack_id>
+          <project_id>10257</project_id>
+          <created_at>2008-01-16T13:47:30Z</created_at>
+          <project>
+            <id>10257</id>
+            <name>Test::Harness</name>
+            <created_at>2007-12-13T22:14:16Z</created_at>
+            <updated_at>2008-04-27T17:32:10Z</updated_at>
+            <description>Test::Harness provides test execution and result analysis for Perl. It runs test scripts, parses TAP (Test Anything Protocol) output from them and presents a summary of which tests passed and which failed.
+
+It may be used to test non-Perl programs - in fact anything that outputs TAP.</description>
+            <homepage_url>http://search.cpan.org/dist/Test-Harness/</homepage_url>
+            <download_url>http://search.cpan.org/dist/Test-Harness/</download_url>
+            <url_name/>
+            <stack_count>36</stack_count>
+            <average_rating>4.8</average_rating>
+            <rating_count>5</rating_count>
+            <analysis_id>150168</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>90397</id>
+          <stack_id>21420</stack_id>
+          <project_id>230</project_id>
+          <created_at>2008-01-11T03:44:15Z</created_at>
+          <project>
+            <id>230</id>
+            <name>DocBook</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-29T12:06:49Z</updated_at>
+            <description>DocBook is an XML/SGML vocabulary that enables you to create document content in a presentation-neutral form that captures the logical structure of the content. Using the DocBook stylesheets, you can publish DocBook content as HTML pages and PDF files and other formats, including man pages, HTML Help, and JavaHelp.</description>
+            <homepage_url>http://docbook.org/xml/4.4</homepage_url>
+            <download_url/>
+            <url_name>docbook</url_name>
+            <stack_count>76</stack_count>
+            <average_rating>4.57142857142857</average_rating>
+            <rating_count>7</rating_count>
+            <analysis_id>154552</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>90396</id>
+          <stack_id>21420</stack_id>
+          <project_id>9023</project_id>
+          <created_at>2008-01-11T03:42:57Z</created_at>
+          <project>
+            <id>9023</id>
+            <name>SQLite Manager</name>
+            <created_at>2007-10-08T00:41:04Z</created_at>
+            <updated_at>2008-03-29T21:51:36Z</updated_at>
+            <description>A Firefox extension to manage any SQLite database on the computer</description>
+            <homepage_url>http://sqlitemanager.mozdev.org/</homepage_url>
+            <download_url>https://addons.mozilla.org/en-US/firefox/addon/5817</download_url>
+            <url_name/>
+            <stack_count>2</stack_count>
+            <average_rating>4.0</average_rating>
+            <rating_count>1</rating_count>
+            <analysis_id>122310</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>88534</id>
+          <stack_id>21420</stack_id>
+          <project_id>10716</project_id>
+          <created_at>2008-01-03T21:34:08Z</created_at>
+          <project>
+            <id>10716</id>
+            <name>WWW::Ohloh::API</name>
+            <created_at>2008-01-03T20:55:40Z</created_at>
+            <updated_at>2008-04-24T03:02:42Z</updated_at>
+            <description>A Perl interface to the Ohloh API as defined at http://www.ohloh.net/api/getting_started.</description>
+            <homepage_url>http://search.cpan.org/dist/WWW-Ohloh-API/</homepage_url>
+            <download_url>http://search.cpan.org/dist/WWW-Ohloh-API/</download_url>
+            <url_name>www-ohloh-api</url_name>
+            <stack_count>2</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>100430</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>88373</id>
+          <stack_id>21420</stack_id>
+          <project_id>5711</project_id>
+          <created_at>2008-01-03T14:53:20Z</created_at>
+          <project>
+            <id>5711</id>
+            <name>Mason</name>
+            <created_at>2007-05-31T17:10:26Z</created_at>
+            <updated_at>2008-04-26T12:08:10Z</updated_at>
+            <description>Mason is a powerful Perl-based web site development and delivery engine. With Mason you can embed Perl code in your HTML and construct pages from shared, reusable components.
+
+Mason solves the common problems of site development: caching, debugging, templating, maintaining development and production sites, and more.
+
+Mason is 100% free and open source. Although it can be used from CGI or even stand-alone, it is optimally designed for use with two other open source technologies: mod_perl and Apache.</description>
+            <homepage_url>http://www.masonhq.com</homepage_url>
+            <download_url/>
+            <url_name/>
+            <stack_count>31</stack_count>
+            <average_rating>4.57142857142857</average_rating>
+            <rating_count>14</rating_count>
+            <analysis_id>124952</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87641</id>
+          <stack_id>21420</stack_id>
+          <project_id>3545</project_id>
+          <created_at>2008-01-01T00:53:02Z</created_at>
+          <project>
+            <id>3545</id>
+            <name>Catalyst Framework</name>
+            <created_at>2006-11-09T18:55:51Z</created_at>
+            <updated_at>2008-04-30T17:06:08Z</updated_at>
+            <description>Catalyst is an MVC framework for web development in perl, designed to save on wheel re-invention without getting in the way of architecting your application however is best suited to the problem domain and taking full advantage of the power of CPAN</description>
+            <homepage_url>http://www.catalystframework.org/</homepage_url>
+            <download_url>http://search.cpan.org/dist/Catalyst-Runtime/</download_url>
+            <url_name>catalyst</url_name>
+            <medium_logo_url>&lt;img alt="Catalyst_logo1_med" src="http://bits.ohloh.net/attachments/1069/catalyst_logo1_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Catalyst_logo1_small" src="http://bits.ohloh.net/attachments/1069/catalyst_logo1_small.png" /&gt;</small_logo_url>
+            <stack_count>57</stack_count>
+            <average_rating>4.28571428571429</average_rating>
+            <rating_count>21</rating_count>
+            <analysis_id>161185</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87639</id>
+          <stack_id>21420</stack_id>
+          <project_id>5950</project_id>
+          <created_at>2008-01-01T00:35:57Z</created_at>
+          <project>
+            <id>5950</id>
+            <name>Perl-Critic</name>
+            <created_at>2007-06-12T09:16:11Z</created_at>
+            <updated_at>2008-04-30T19:33:55Z</updated_at>
+            <description>Perl-Critic is a static source analyzer for Perl code.  It is an extensible framework for creating and automatically enforcing coding standards across a body of code.  Many of the default rules are taken from Damian Conway's book "Perl Best Practices."  However, you can enable/disable &amp; customize these rules to your heart's content.</description>
+            <homepage_url>http://perlcritic.tigris.org</homepage_url>
+            <download_url>http://search.cpan.org/dist/Perl-Critic</download_url>
+            <url_name/>
+            <medium_logo_url>&lt;img alt="Critic_64x64_med" src="http://bits.ohloh.net/attachments/247/Critic_64x64_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Critic_64x64_small" src="http://bits.ohloh.net/attachments/247/Critic_64x64_small.png" /&gt;</small_logo_url>
+            <stack_count>45</stack_count>
+            <average_rating>4.625</average_rating>
+            <rating_count>8</rating_count>
+            <analysis_id>161494</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87626</id>
+          <stack_id>21420</stack_id>
+          <project_id>5965</project_id>
+          <created_at>2008-01-01T00:24:38Z</created_at>
+          <project>
+            <id>5965</id>
+            <name>ack</name>
+            <created_at>2007-06-12T18:31:09Z</created_at>
+            <updated_at>2008-04-28T22:22:02Z</updated_at>
+            <description>ack is a tool like grep, aimed at programmers with large trees of heterogeneous source code.
+
+ack is written purely in Perl, and takes advantage of the power of Perl's regular expressions.
+
+* Searches recursively through directories by default, while ignoring .svn, CVS and other VCS directories.
+
+* ack ignores most of the crap you don't want to search
+
+* Lets you specify file types to search, as in --perl or --nohtml.
+
+* Color highlighting of search results.
+
+* Uses real Perl regular expressions, not a GNU subset.
+
+* ack is pure Perl, so consistent across all platforms.  It even comes as a single standalone program with no module dependencies.</description>
+            <homepage_url>http://petdance.com/ack/</homepage_url>
+            <download_url/>
+            <url_name>ack</url_name>
+            <medium_logo_url>&lt;img alt="Ack_med" src="http://bits.ohloh.net/attachments/3175/Ack_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Ack_small" src="http://bits.ohloh.net/attachments/3175/Ack_small.png" /&gt;</small_logo_url>
+            <stack_count>50</stack_count>
+            <average_rating>5.0</average_rating>
+            <rating_count>10</rating_count>
+            <analysis_id>154912</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87625</id>
+          <stack_id>21420</stack_id>
+          <project_id>9258</project_id>
+          <created_at>2008-01-01T00:24:13Z</created_at>
+          <project>
+            <id>9258</id>
+            <name>Module::Build</name>
+            <created_at>2007-10-21T21:13:30Z</created_at>
+            <updated_at>2008-04-27T16:42:38Z</updated_at>
+            <description>Module::Build is a system for building, testing, and installing Perl modules. It is meant to be an alternative to ExtUtils::MakeMaker.  Developers may alter the behavior of the module through subclassing in a much more straightforward way than with MakeMaker. It also does not require a make on your system - most of the Module::Build code is pure-Perl and written in a very cross-platform way. In fact, you don't even need a shell, so even platforms like MacOS (traditional) can use it fairly easily. Its only prerequisites are modules that are included with perl 5.6.0, and it works fine on perl 5.005 if you can install a few additional modules.</description>
+            <homepage_url/>
+            <download_url>http://search.cpan.org/dist/Module-Build/</download_url>
+            <url_name/>
+            <stack_count>14</stack_count>
+            <average_rating>5.0</average_rating>
+            <rating_count>1</rating_count>
+            <analysis_id>145509</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87624</id>
+          <stack_id>21420</stack_id>
+          <project_id>8090</project_id>
+          <created_at>2008-01-01T00:23:16Z</created_at>
+          <project>
+            <id>8090</id>
+            <name>Test::More</name>
+            <created_at>2007-08-31T07:08:52Z</created_at>
+            <updated_at>2008-04-27T16:41:26Z</updated_at>
+            <description>Test-Simple contains Test::More, the most popular testing module for Perl, as well as Test::Builder which is the most popular module for writing more testing modules.  It also contains Test::Simple, the simplest possible testing module.
+
+Test-Simple makes use of TAP (the Test Anything Protocol).</description>
+            <homepage_url>http://search.cpan.org/dist/Test-Simple</homepage_url>
+            <download_url>http://search.cpan.org/dist/Test-Simple</download_url>
+            <url_name/>
+            <stack_count>66</stack_count>
+            <average_rating>4.78947368421053</average_rating>
+            <rating_count>19</rating_count>
+            <analysis_id>138785</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87583</id>
+          <stack_id>21420</stack_id>
+          <project_id>10637</project_id>
+          <created_at>2007-12-31T19:13:45Z</created_at>
+          <project>
+            <id>10637</id>
+            <name>Yanick's GreaseMonkey scripts</name>
+            <created_at>2007-12-31T19:12:42Z</created_at>
+            <updated_at>2007-12-31T19:24:51Z</updated_at>
+            <description>A collection of all my GreaseMonkey scripts.</description>
+            <homepage_url>http://userscripts.org/users/38422/scripts</homepage_url>
+            <download_url>http://userscripts.org/users/38422/scripts</download_url>
+            <url_name/>
+            <stack_count>1</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>99329</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87275</id>
+          <stack_id>21420</stack_id>
+          <project_id>10610</project_id>
+          <created_at>2007-12-30T22:06:20Z</created_at>
+          <project>
+            <id>10610</id>
+            <name>Test::Pod::Snippets</name>
+            <created_at>2007-12-30T22:06:01Z</created_at>
+            <updated_at>2008-04-21T15:46:54Z</updated_at>
+            <description>Generate tests from Perl pod code snippets</description>
+            <homepage_url>http://search.cpan.org/~yanick/Test-Pod-Snippets/</homepage_url>
+            <download_url>http://search.cpan.org/~yanick/Test-Pod-Snippets/</download_url>
+            <url_name>test-pod-snippets</url_name>
+            <stack_count>4</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>110931</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87274</id>
+          <stack_id>21420</stack_id>
+          <project_id>10609</project_id>
+          <created_at>2007-12-30T22:02:14Z</created_at>
+          <project>
+            <id>10609</id>
+            <name>Ymusk</name>
+            <created_at>2007-12-30T22:02:01Z</created_at>
+            <updated_at>2007-12-30T22:09:37Z</updated_at>
+            <description>Ymusk stands for Yenzie's Mush Klient. It is a mush client written in Perl. Built around the Net::Telnet and Tk modules, it is meant to be a simple program easily customizable.</description>
+            <homepage_url>http://ymusk.sourceforge.net/</homepage_url>
+            <download_url>http://ymusk.sourceforge.net/#download</download_url>
+            <url_name/>
+            <stack_count>1</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>99002</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87232</id>
+          <stack_id>21420</stack_id>
+          <project_id>10606</project_id>
+          <created_at>2007-12-30T20:41:40Z</created_at>
+          <project>
+            <id>10606</id>
+            <name>Games::Perlwar</name>
+            <created_at>2007-12-30T20:22:40Z</created_at>
+            <updated_at>2008-04-28T08:55:53Z</updated_at>
+            <description>Perlwar is inspired by the classic http://www.corewar.info/|Corewar game. In this game, players pit snippets of Perl code (called 'agents') against each other in order to gain control of the vicious virtual battlefield known as... the Array.</description>
+            <homepage_url>http://search.cpan.org/~yanick/Games-Perlwar/</homepage_url>
+            <download_url>http://search.cpan.org/~yanick/Games-Perlwar/</download_url>
+            <url_name>games-perlwar</url_name>
+            <stack_count>2</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>98965</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87222</id>
+          <stack_id>21420</stack_id>
+          <project_id>10604</project_id>
+          <created_at>2007-12-30T19:21:30Z</created_at>
+          <project>
+            <id>10604</id>
+            <name>Pod::Manual</name>
+            <created_at>2007-12-30T19:20:17Z</created_at>
+            <updated_at>2008-04-24T02:58:54Z</updated_at>
+            <description>The goal of Pod::Manual is to gather the pod of several modules into a comprehensive manual. Its primary objective is to generate a document that can be printed, but it also allow to output the document into other formats (e.g., docbook).</description>
+            <homepage_url>http://search.cpan.org/~yanick/Pod-Manual/</homepage_url>
+            <download_url>http://search.cpan.org/~yanick/Pod-Manual/</download_url>
+            <url_name>pod-manual</url_name>
+            <stack_count>1</stack_count>
+            <average_rating>0.0</average_rating>
+            <rating_count>0</rating_count>
+            <analysis_id>98952</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87221</id>
+          <stack_id>21420</stack_id>
+          <project_id>10602</project_id>
+          <created_at>2007-12-30T19:16:00Z</created_at>
+          <project>
+            <id>10602</id>
+            <name>XML::XPathScript</name>
+            <created_at>2007-12-30T18:46:35Z</created_at>
+            <updated_at>2008-04-23T23:31:21Z</updated_at>
+            <description>XPathScript is a stylesheet language similar in many ways to XSLT (in concept, not in appearance), for transforming XML from one format to another (possibly HTML, but XPathScript also shines for non-XML-like output).</description>
+            <homepage_url>http://search.cpan.org/~yanick/XML-XPathScript/</homepage_url>
+            <download_url>http://search.cpan.org/~yanick/XML-XPathScript/</download_url>
+            <url_name>xml-xpathscript</url_name>
+            <stack_count>2</stack_count>
+            <average_rating>4.0</average_rating>
+            <rating_count>1</rating_count>
+            <analysis_id>98949</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87215</id>
+          <stack_id>21420</stack_id>
+          <project_id>7947</project_id>
+          <created_at>2007-12-30T18:54:22Z</created_at>
+          <project>
+            <id>7947</id>
+            <name>Wget</name>
+            <created_at>2007-08-25T08:40:22Z</created_at>
+            <updated_at>2008-04-29T22:54:16Z</updated_at>
+            <description>GNU Wget is a free software package for retrieving files using HTTP, HTTPS and FTP, the most widely-used Internet protocols. It is a non-interactive commandline tool, so it may easily be called from scripts, cron jobs, terminals without X-Windows support, etc.</description>
+            <homepage_url>http://www.gnu.org/software/wget/</homepage_url>
+            <download_url>http://ftp.gnu.org/pub/gnu/wget/</download_url>
+            <url_name>wget</url_name>
+            <medium_logo_url>&lt;img alt="Wget_med" src="http://bits.ohloh.net/attachments/1674/wget_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Wget_small" src="http://bits.ohloh.net/attachments/1674/wget_small.png" /&gt;</small_logo_url>
+            <stack_count>324</stack_count>
+            <average_rating>4.5609756097561</average_rating>
+            <rating_count>41</rating_count>
+            <analysis_id>78477</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87214</id>
+          <stack_id>21420</stack_id>
+          <project_id>72</project_id>
+          <created_at>2007-12-30T18:53:58Z</created_at>
+          <project>
+            <id>72</id>
+            <name>Apache HTTP Server</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T15:35:20Z</updated_at>
+            <description>The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server. The project is jointly managed by a group of volunteers located around the world, using the Internet and the Web to communicate, plan, and develop the server and its related documentation. This project is part of the Apache Software Foundation. In addition, hundreds of users have contributed ideas, code, and documentation to the project.</description>
+            <homepage_url>http://httpd.apache.org</homepage_url>
+            <download_url>http://httpd.apache.org/download.cgi</download_url>
+            <url_name>apache</url_name>
+            <medium_logo_url>&lt;img alt="Apache_med" src="http://bits.ohloh.net/attachments/34/apache_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Apache_small" src="http://bits.ohloh.net/attachments/34/apache_small.png" /&gt;</small_logo_url>
+            <stack_count>1864</stack_count>
+            <average_rating>4.57913669064748</average_rating>
+            <rating_count>278</rating_count>
+            <analysis_id>155230</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87213</id>
+          <stack_id>21420</stack_id>
+          <project_id>4810</project_id>
+          <created_at>2007-12-30T18:53:49Z</created_at>
+          <project>
+            <id>4810</id>
+            <name>Firebug</name>
+            <created_at>2007-04-01T17:12:18Z</created_at>
+            <updated_at>2008-04-30T13:10:16Z</updated_at>
+            <description>Firebug integrates with Firefox to put a wealth of web development tools at your fingertips while you browse. You can edit, debug, and monitor CSS, HTML, and JavaScript live in any web page.</description>
+            <homepage_url>http://www.getfirebug.com/</homepage_url>
+            <download_url>http://www.getfirebug.com/</download_url>
+            <url_name>firebug</url_name>
+            <medium_logo_url>&lt;img alt="Firebug_med" src="http://bits.ohloh.net/attachments/147/firebug_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Firebug_small" src="http://bits.ohloh.net/attachments/147/firebug_small.png" /&gt;</small_logo_url>
+            <stack_count>764</stack_count>
+            <average_rating>4.90967741935484</average_rating>
+            <rating_count>155</rating_count>
+            <analysis_id>149779</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87212</id>
+          <stack_id>21420</stack_id>
+          <project_id>4132</project_id>
+          <created_at>2007-12-30T18:53:35Z</created_at>
+          <project>
+            <id>4132</id>
+            <name>Greasemonkey</name>
+            <created_at>2007-01-23T01:40:27Z</created_at>
+            <updated_at>2008-04-30T03:08:57Z</updated_at>
+            <description>Greasemonkey is a Firefox extension which lets you to add bits of DHTML ("user scripts") to any web page to change its behavior. In much the same way that user CSS lets you take control of a web page's style, user scripts let you easily control any aspect of a web page's design or interaction.</description>
+            <homepage_url>http://www.greasespot.net/</homepage_url>
+            <download_url>https://addons.mozilla.org/firefox/748/</download_url>
+            <url_name>greasemonkey</url_name>
+            <medium_logo_url>&lt;img alt="Greasemonkey-logo-v2_med" src="http://bits.ohloh.net/attachments/2293/greasemonkey-logo-v2_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Greasemonkey-logo-v2_small" src="http://bits.ohloh.net/attachments/2293/greasemonkey-logo-v2_small.png" /&gt;</small_logo_url>
+            <stack_count>116</stack_count>
+            <average_rating>4.23809523809524</average_rating>
+            <rating_count>21</rating_count>
+            <analysis_id>150452</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87207</id>
+          <stack_id>21420</stack_id>
+          <project_id>9</project_id>
+          <created_at>2007-12-30T18:53:24Z</created_at>
+          <project>
+            <id>9</id>
+            <name>Mozilla Firefox</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T23:45:27Z</updated_at>
+            <description>The award-winning Web browser is now faster, more secure, and fully customizable to your online life. With Firefox 2, we’ve added powerful new features that make your online experience even better.
+
+If you stack this project, you should also stack the Mozilla Core.</description>
+            <homepage_url>http://www.firefox.com/</homepage_url>
+            <download_url>http://www.mozilla.com/en-US/firefox/all.html</download_url>
+            <url_name>firefox</url_name>
+            <medium_logo_url>&lt;img alt="Firefox64_med" src="http://bits.ohloh.net/attachments/747/firefox64_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Firefox64_small" src="http://bits.ohloh.net/attachments/747/firefox64_small.png" /&gt;</small_logo_url>
+            <stack_count>2640</stack_count>
+            <average_rating>4.46953405017921</average_rating>
+            <rating_count>558</rating_count>
+            <analysis_id>160843</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87206</id>
+          <stack_id>21420</stack_id>
+          <project_id>4515</project_id>
+          <created_at>2007-12-30T18:49:46Z</created_at>
+          <project>
+            <id>4515</id>
+            <name>Perl</name>
+            <created_at>2007-02-20T21:56:51Z</created_at>
+            <updated_at>2008-04-29T23:14:59Z</updated_at>
+            <description>Perl is a general-purpose programming language originally developed for text manipulation and now used for a wide range of tasks including system administration, web development, network programming, GUI development, and more. Its major features include support for multiple programming paradigms (procedural, object-oriented, and functional styles), automatic memory management, built-in support for text processing, and a large collection of third-party modules.
+
+It's worth noting that Perl is currently under /very/ active development - although the commit stats here don't reflect that fact because the version control system Perl uses isn't yet compatible with Ohloh. Hopefully that can be fixed - the Perl community would certainly like Ohloh to show recent activity.</description>
+            <homepage_url>http://www.perl.org/</homepage_url>
+            <download_url>http://www.perl.org/get.html</download_url>
+            <url_name>perl</url_name>
+            <medium_logo_url>&lt;img alt="Lcamel_med" src="http://bits.ohloh.net/attachments/352/lcamel_med.gif" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Lcamel_small" src="http://bits.ohloh.net/attachments/352/lcamel_small.gif" /&gt;</small_logo_url>
+            <stack_count>389</stack_count>
+            <average_rating>4.39784946236559</average_rating>
+            <rating_count>93</rating_count>
+            <analysis_id>148805</analysis_id>
+          </project>
+        </stack_entry>
+        <stack_entry>
+          <id>87205</id>
+          <stack_id>21420</stack_id>
+          <project_id>278</project_id>
+          <created_at>2007-12-30T18:49:36Z</created_at>
+          <project>
+            <id>278</id>
+            <name>Git</name>
+            <created_at>2006-10-10T15:51:31Z</created_at>
+            <updated_at>2008-04-30T14:02:38Z</updated_at>
+            <description>Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.</description>
+            <homepage_url>http://git.or.cz/</homepage_url>
+            <download_url>http://www.kernel.org/pub/software/scm/git/</download_url>
+            <url_name>git</url_name>
+            <medium_logo_url>&lt;img alt="Git-logo_med" src="http://bits.ohloh.net/attachments/514/git-logo_med.png" /&gt;</medium_logo_url>
+            <small_logo_url>&lt;img alt="Git-logo_small" src="http://bits.ohloh.net/attachments/514/git-logo_small.png" /&gt;</small_logo_url>
+            <stack_count>396</stack_count>
+            <average_rating>4.68965517241379</average_rating>
+            <rating_count>116</rating_count>
+            <analysis_id>147947</analysis_id>
+          </project>
+        </stack_entry>
+      </stack_entries>
+      <account_id>12933</account_id>
+    </stack>
+  </result>
+</response>

@@ -1,0 +1,247 @@
+
+=head1 NAME
+
+Win32::GUI::DateTime - Create and manipulate datetime controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new DateTime object;
+can also be called as PARENT->AddDateTime(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -align  => 'right'/'left' (default 'left')
+    The drop-down month calendar alignement.
+  -format => 'shortdate', 'longdate', 'time'
+    Control format type (Use local format date/time).
+  -shownone => 0/1 (default 0)
+    Allow no datetime (add a prefix checkbox).
+  -updown   => 0/1 (default 0 for date, 1 for time format)
+    Use updown control instead of the drop-down month calendar.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Format
+
+B<Format(FORMAT)>
+
+See L<SetFormat()|Win32::GUI::DateTime/SetFormat>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDate
+
+B<GetDate()>
+
+Returns the date in the DateTime control in a three elements array (day, month, year).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDateTime
+
+B<GetDateTime()>
+
+See L<GetSystemTime()|Win32::GUI::DateTime/GetSystemTime>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMonthCal
+
+B<GetMonthCal()>
+
+Retrieves the handle to a date and time picker's (DTP) child month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMonthCalColor
+
+B<GetMonthCalColor(icolor)>
+
+Retrieves the color for a given portion of the month calendar within a date and time picker (DTP) control.
+icolor :
+
+  MCSC_BACKGROUND = Retrieve the background color displayed between months.
+  MCSC_MONTHBK = Retrieve the background color displayed within the month.
+  MCSC_TEXT = Retrieve the color used to display text within a month.
+  MCSC_TITLEBK = Retrieve the background color displayed in the calendar's title.
+  MCSC_TITLETEXT = Retrieve the color used to display text within the calendar's title.
+  MCSC_TRAILINGTEXT = Retrieve the color used to display header day and trailing day
+                text. Header and trailing days are the days from the previous and following
+                months that appear on the current month calendar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMonthCalFont
+
+B<GetMonthCalFont(icolor)>
+
+Retrieves the font that the date and time picker (DTP) control's child month calendar control is currently using.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSystemTime
+
+B<GetSystemTime()>
+
+Returns the date and time in the DateTime control in a eight
+elements array (year, month, day, dayofweek, hour, minute, second, millisecond).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTime
+
+B<GetTime()>
+
+Returns the time in the DateTime control in a four
+elements array (hour, min, sec, msec).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsNone
+
+B<IsNone()>
+
+Test if the DateTime control is None (control check box was not selected).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDate
+
+B<SetDate(DAY, MONTH, YEAR)>
+
+Sets the date in the DateTime control in a three elements array (day, month, year).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDateTime
+
+B<SetDateTime(YEAR,MON, DAY, HOUR, MIN, SEC, [MSEC=0])>
+
+See L<SetSystemTime()|Win32::GUI::DateTime/SetSystemTime>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetFormat
+
+B<SetFormat(FORMAT)>
+
+Sets the format for the DateTime control to the specified string.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMonthCalColor
+
+B<SetMonthCalColor(icolor,color)>
+
+Sets the color for a given portion of the month calendar within a date and time picker (DTP) control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMonthCalFont
+
+B<SetMonthCalFont(font,flag)>
+
+Sets the font to be used by the date and time picker (DTP) control's child month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetNone
+
+B<SetNone(handle)>
+
+Set none state in the DateTime control (control check box was selected).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSystemTime
+
+B<SetSystemTime(YEAR,MON, DAY, HOUR, MIN, SEC, [MSEC=0])>
+
+Sets the date time in the DateTime control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTime
+
+B<SetTime(HOUR, MIN, SEC, [MSEC=0])>
+
+Sets the time in the DateTime control in a four
+elements array (hour, min, sec, [msec=0]).
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change()>
+
+Sent when the datetime change. .
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseUp
+
+B<CloseUp()>
+
+Sent when the user closes the drop-down month calendar. .
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DropDown
+
+B<DropDown()>
+
+Sent when the user activates the drop-down month calendar..
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

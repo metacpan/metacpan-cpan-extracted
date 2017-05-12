@@ -1,0 +1,35 @@
+Win32::GUIRobot
+===============
+
+The module is a superset of Win32::GuiTest module functionaliy, with
+addition of simple analyzis of graphic output. The module is useful
+where analysis based on enumeration of window by title, class, etc is
+not enough (in particular in Citrix environment), by providing searching
+of arbitrary graphic bits on the screen.
+
+The module is a mixed bag of various win32 functions with the same
+purpose as Win32::GuiTest - to provide environment for batch windows
+GUI tests/macros, but also focusing on code logic reuse when many
+similar GUI scripts should be written. Therefore, in addition to image
+search, the module also features a set of wrapper functions to win32
+API, timers, etc.
+
+Image operations, -- loading, retrieving information etc is based on
+Prima, which can work not only on win32, so basically the module can be
+of limited use on X11, for searching sub-images in images. Possibly
+this functionality is worth releasing as a stand-alone module, but OTOH
+the search is not limited to the Prima toolkit, and can be trivially
+implemented using any other image system, not to say that the searching
+itself is very simple, and being abstracted from image toolkit calls, is
+a single regexp.
+
+INSTALLATION
+============
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Dmitry Karasik <dmitry@karasik.eu.org>

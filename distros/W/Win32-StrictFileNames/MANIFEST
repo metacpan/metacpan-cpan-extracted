@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+StrictFileNames.xs
+lib/Win32/StrictFileNames.pm
+t/0-pod.t
+t/1-open.t
+t/2-exist.t
+t/3-stat.t
+t/4-dir.t
+t/5-sopen.t
+t/6-unlink.t
+t/7-rmdir.t
+t/8-chdir.t
+t/bigdirectoryname/small/test.txt
+t/small/bigdirectoryname/test.txt
+META.yml                                 Module meta-data (added by MakeMaker)

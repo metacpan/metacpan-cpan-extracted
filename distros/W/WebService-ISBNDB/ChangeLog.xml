@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+    The schema for this namespace may be found at the following URL:
+
+    http://www.blackperl.com/XML/ChangeLog/ChangeLogML.xsd
+
+    $Id: ChangeLog.xml 51 2008-04-06 11:02:35Z  $
+-->
+<changelog xmlns="http://www.blackperl.com/XML/ChangeLog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blackperl.com/XML/ChangeLog etc/ChangeLogML.xsd">
+  <description>
+    Revision history for the Perl extension module WebService::ISBNDB. This is
+    an API to communicate with the web service hosted by isbndb.com.
+  </description>
+  <release version="0.34" date="2008-04-06T04:00:00-07:00">
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API/Authors.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API/Categories.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API/Publishers.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/API/Subjects.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/Agent.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="47" />
+        <file path="lib/WebService/ISBNDB/Iterator.pm" revision="47" />
+        <file path="t/DUMMY.pm" revision="47" />
+      </fileset>
+      <description>
+        Fixed/updated copyright and licensing information. All licensing links
+        are current with regards to Artistic 2.0 and LGPL 2.1.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API/Authors.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API/Categories.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API/Publishers.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/API/Subjects.pm" revision="48" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="48" />
+      </fileset>
+      <description>
+        Fixed a bug found by Gavin Carr in which search attempts routed through
+        static-method invocations of search() in any of the types (Books,
+        Authors, etc.) would fail to get the API key unless one had been set as
+        a default.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API/Authors.pm" revision="49" />
+        <file path="lib/WebService/ISBNDB/API/Categories.pm" revision="49" />
+        <file path="lib/WebService/ISBNDB/API/Publishers.pm" revision="49" />
+        <file path="lib/WebService/ISBNDB/API/Subjects.pm" revision="49" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="49" />
+      </fileset>
+      <description>
+        Fixed $VERSION strings to bump them up; bitten by svn oversight again.
+      </description>
+    </change>
+    <change>
+      <file path="lib/WebService/ISBNDB.pm" revision="50" />
+      <description>
+        Added the warnings pragma for cleanliness and consistency (despite this
+        being a dummy module).
+      </description>
+    </change>
+  </release>
+  <release version="0.33" date="2007-09-11T11:04:20">
+    <change>
+      <file path="lib/WebService/ISBNDB/API/Books.pm" revision="44" />
+      <description>
+        Re-wrote areas that use Business::ISBN, due to some interface
+        changes in the latest version. Some just broke tests, but one
+        flat out broke this module.
+      </description>
+  </release>
+  <release version="0.32" date="2006-12-02T03:46:00">
+    <change>
+      <file path="lib/WebService/ISBNDB/API.pm" revision="42" />
+      <description>
+        Fixed a bug reported by Kevin Old in which trying to "find" an item
+        using a handle with a non-default API key, and the factory syntax,
+        would fail to use the existing API key.
+      </description>
+    </change>
+  </release>
+  <release version="0.31" tag="v0_31" date="2006-10-12T22:27:13-06:00">
+    <change>
+      <fileset>
+        <file path="Build.PL" revision="36" />
+        <file path="lib/WebService/ISBNDB.pm" action="ADD" revision="36" />
+        <file path="t/00_load.t" revision="36" />
+      </fileset>
+      <description>
+        Added a WebService::ISBNDB module. This is an empty module that acts as
+        the version place-holder, both for build numbering and for testing by
+        modules that depend on this package.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API.pm" revision="37" />
+        <file path="t/05_api_baseclass.t" revision="37" />
+      </fileset>
+      <description>
+        Found that creating an API object with an explicit API key argument was
+        ignoring the user argument and using the default all the time. Also
+        created test cases to check this going forward.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="38" />
+        <file path="t/50_books.t" revision="38" />
+        <file path="t/Books-book_id=programming_web_services_with_perl.xml"
+              action="ADD" revision="38" />
+      </fileset>
+      <description>
+        Fixed a bug in which looking up a book (via find()) with the ID instead
+        of the ISBN did not work. Added a unit test for this, as well.
+      </description>
+    </change>
+  </release>
+  <release version="0.30" tag="v0_30" date="2006-10-11T02:58:55-06:00">
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="26" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="26" />
+        <file path="t/50_books.t" revision="27" />
+        <file path="t/Books-isbn=0596002068.xml" revision="28" />
+      </fileset>
+      <description>
+        Removed explicit specification of "UTC" in str2time calls, since talk
+        with isbndb.com verified that these are already in UTC. Added 'Z'
+        suffix to strings when setting them via set_*_sec methods, to ensure
+        UTC.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/Agent.pm" revision="29" />
+        <file path="t/07_agent_baseclass.t" revision="29" />
+      </fileset>
+      <description>
+        Renamed the "agent" attribute to "useragent", and renamed the accessors
+        to reflect this.
+      </description>
+    </change>
+    <change>
+      <file path="t/DUMMY.pm" revision="31" />
+      <description>
+        Fixed the handling of arguments to make sure that page_number is
+        included and properly handled.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="t/10_categories.t" revision="32" />
+        <file path="t/20_publishers.t" revision="32" />
+        <file path="t/30_subjects.t" revision="32" />
+        <file path="t/40_authors.t" revision="32" />
+        <file path="t/50_books.t" revision="32" />
+      </fileset>
+      <description>
+        No longer necessary to test connectivity to isbndb.com in order to
+        run the tests.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/Agent.pm" revision="33" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="33" />
+        <file path="lib/WebService/ISBNDB/Iterator.pm" action="ADD"
+              revision="33" />
+        <file path="t/60_iterator.t" action="ADD" revision="33" />
+        <file path="t/Authors-person_id=poe_edgar_allan.xml" revision="33" />
+        <file path="t/Books-page_number=10-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=11-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=12-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=13-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=14-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=15-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=16-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=17-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=18-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=19-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=2-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=20-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=21-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=22-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=23-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=24-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=25-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=26-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=3-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=4-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=5-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=6-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=7-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=8-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-page_number=9-person_id=poe_edgar_allan.xml"
+              action="ADD" revision="33" />
+        <file path="t/Books-person_id=poe_edgar_allan.xml" action="ADD"
+              revision="33" />
+      </fileset>
+      <description>
+        Implementation of an Iterator class, with tests and test data.
+        Integrated into the REST protocol module as the return value from
+        request_all().
+      </description>
+    </change>
+  </release>
+  <release version="0.20" tag="v0_20" date="2006-09-24T20:45:08-06:00">
+    <change>
+      <file path="lib/WebService/ISBNDB/Agent.pm" revision="17" />
+      <description>
+        Extended the _lr_trim() method to also translate newlines to spaces
+        and squeeze sequences of spaces.
+      </description>
+    </change>
+    <change>
+      <file path="Build.PL" revision="18" />
+      <description>
+        Added dependency specification for other non-core modules this
+        module uses (Class::Std, Error, Business::ISBN). Added a "recommends"
+        spec for Date::Parse, which is used only if available. Bumped the
+        dist version number.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="t/00_signature.t" revision="19" />
+        <file path="t/01_pod.t" revision="19" />
+        <file path="t/02_pod_coverage.t" revision="19" />
+      </fileset>
+      <description>
+        Added svn Id keywork for tracking purposes.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="20" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="20" />
+      </fileset>
+      <description>
+        Added the rest of the data isbndb.com makes available for books.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="t/05_api_baseclass.t" action="ADD" revision="21" />
+        <file path="t/07_agent_baseclass.t" action="ADD" revision="21" />
+        <file path="t/10_categories.t" action="ADD" revision="21" />
+        <file path="t/20_publishers.t" action="ADD" revision="21" />
+        <file path="t/30_subjects.t" action="ADD" revision="21" />
+        <file path="t/40_authors.t" action="ADD" revision="21" />
+        <file path="t/50_books.t" action="ADD" revision="21" />
+        <file path="t/Authors-person_id=kulchenko_pavel.xml" action="ADD"
+              revision="21" />
+        <file path="t/Authors-person_id=ray_randy_j.xml" action="ADD"
+              revision="21" />
+        <file path="t/Books-isbn=0596002068.xml" action="ADD" revision="21" />
+        <file path="t/Categories-category_id=alphabetically.authors.r.a.y.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=alphabetically.publishers.o.r.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=computers.programming.languages.perl.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.astronomy.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.biology.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.botany.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.chemistry.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.computer_science.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.earth_sciences.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.economics.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.geography.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.mathematics.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.mineralogy.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.paleontology.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.philosophy.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.physics.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.political_science.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.psychology.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.social_sciences.xml"
+              action="ADD" revision="21" />
+        <file path="t/Categories-category_id=science.sociology.xml" action="ADD"
+              revision="21" />
+        <file path="t/Categories-category_id=science.xml" action="ADD"
+              revision="21" />
+        <file path="t/DUMMY.pm" action="ADD" revision="21" />
+        <file path="t/Publishers-publisher_id=oreilly.xml" action="ADD"
+              revision="21" />
+        <file path="t/Subjects-subject_id=internet_programming.xml" action="ADD"
+              revision="21" />
+        <file path="t/Subjects-subject_id=perl_computer_program_language.xml"
+              action="ADD" revision="21" />
+        <file path="t/testing.key" action="ADD" revision="21" />
+        <file path="t/util.pl" action="ADD" revision="21" />
+      </fileset>
+      <description>
+        A more comprehensive suite of tests. Includes XML files that are
+        snapshots of the corresponding data from isbndb.com, so that the tests
+        don't keep using up the daily allotment of requests for the key. Also
+        includes DUMMY.pm, a dummy connector for WebService::ISBNDB::Agent that
+        reads the XML from the snapshot files.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/API/Authors.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/API/Categories.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/API/Publishers.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/API/Subjects.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/Agent.pm" revision="22" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="22" />
+      </fileset>
+      <description>
+        Bug-fixes directly resulting from the unit-test suites.
+      </description>
+    </change>
+  </release>
+  <release version="0.12" tag="v0_12" date="2006-09-14T03:11:29-06:00">
+    <change>
+      <fileset>
+        <file path="lib/Net" action="DELETE" revision="11" />
+        <file path="lib/WebService" action="ADD" revision="11" />
+      </fileset>
+      <description>
+        Renamed lib/Net to lib/WebService.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="lib/WebService/ISBNDB/API.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/Agent.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/API/Books.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/API/Publishers.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/API/Subjects.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/API/Categories.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/API/Authors.pm" revision="12" />
+        <file path="lib/WebService/ISBNDB/Agent/REST.pm" revision="12" />
+        <file path="MANIFEST" revision="12" />
+      </fileset>
+      <description>
+        Change all file-references and class-references from Net to
+        WebService.
+      </description>
+    </change>
+    <change>
+      <file path="t/00_load.t" revision="13" />
+      <description>
+        Change all file-references and class-references from Net to
+        WebService.
+      </description>
+    </change>
+    <change>
+      <fileset>
+        <file path="Build.PL" revision="14" />
+        <file path="MANIFEST" revision="14" />
+        <file path="MANIFEST.SKIP" revision="14" />
+        <file path="Makefile.PL" revision="14" />
+      </fileset>
+      <description>
+        Changed the build controller from ExtUtils::MakeMaker to
+        Module::Build, and put in a compatibility layer for EU::MM.
+        Added Build.PL to MANIFEST and some more elements to MANIFEST.SKIP.
+      </description>
+    </change>
+  </release>
+  <release version="0.11" tag="v0_11" date="2006-09-13T02:11:00-06:00">
+    <change>
+      <fileset>
+        <file path="ChangeLog" revision="9" />
+        <file path="ChangeLog.xml" revision="9" />
+        <file path="MANIFEST" revision="9" />
+        <file path="README" revision="9" />
+        <file path="Makefile.PL" revision="9" />
+      </fileset>
+      <description>
+        The initial release omitted the changelog files and README from the
+        manifest.
+      </description>
+    </change>
+  </release>
+  <release version="0.10" tag="v0_10" date="2006-09-13T01:15:06-06:00">
+    <change>
+      <fileset>
+        <file path="ChangeLog" revision="5" />
+        <file path="ChangeLog.xml" revision="7" />
+        <file path="etc/ChangeLogML.xsd" revision="5" />
+        <file path="lib/Net/ISBNDB/API.pm" revision="5" />
+        <file path="lib/Net/ISBNDB/Agent.pm" revision="5" />
+        <file path="lib/Net/ISBNDB/API/Books.pm" revision="5" />
+        <file path="lib/Net/ISBNDB/API/Publishers.pm" revision="6" />
+        <file path="lib/Net/ISBNDB/API/Subjects.pm" revision="6" />
+        <file path="lib/Net/ISBNDB/API/Categories.pm" revision="6" />
+        <file path="lib/Net/ISBNDB/API/Authors.pm" revision="6" />
+        <file path="lib/Net/ISBNDB/Agent/REST.pm" revision="5" />
+        <file path="Makefile.PL" revision="5" />
+        <file path="MANIFEST" revision="5" />
+        <file path="MANIFEST.SKIP" revision="5" />
+        <file path="README" revision="5" />
+        <file path="t/01_pod.t" revision="5" />
+        <file path="t/02_pod_coverage.t" revision="5" />
+        <file path="t/00_load.t" revision="5" />
+        <file path="t/00_signature.t" revision="5" />
+      </fileset>
+      <description>
+        Initial release.
+      </description>
+    </change>
+  </release>
+</changelog>

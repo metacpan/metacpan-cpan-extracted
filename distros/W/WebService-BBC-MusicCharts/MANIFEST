@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/WebService/BBC/MusicCharts.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.WebServiceBBCMusicCharts.t
+t/pod-coverage.t
+t/pod.t
+t/test-kwalitee.t
+WebService-BBC-MusicCharts-0.01.tar.gz

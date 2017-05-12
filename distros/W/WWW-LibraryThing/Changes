@@ -1,0 +1,18 @@
+Revision history for WWW::LibraryThing
+
+0.0002 Fri Nov 30 09:59:24 2012 CET
+
+    [BUG FIXES]
+
+    * Set POD encoding to utf8.
+
+    [DOCUMENTATION]
+
+    * Add quotes and decrease width of SYNOPSIS in POD.
+
+0.0001 Thu Sep  8 19:28:34 2011 CEST
+ 
+    * Initial release
+
+
+

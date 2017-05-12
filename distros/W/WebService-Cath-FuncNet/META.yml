@@ -1,0 +1,34 @@
+---
+abstract: 'Interface to the CATH FuncNet webservice'
+author:
+  - 'Ian Sillitoe  C<< <sillitoe@biochem.ucl.ac.uk> >>'
+build_requires:
+  Test::More: 0.77
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Cath-FuncNet
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Temp: 0.21
+  LWP::UserAgent: 5.822
+  Log::Log4perl: 1.20
+  Moose: 0.64
+  MooseX::Types: 0.08
+  Readonly: 1.03
+  URI: 1.37
+  URI::Heuristic: 4.18
+  URI::file: 4.20
+  XML::Compile::Schema: 1.05
+  XML::Compile::Transport::SOAPHTTP: 2.04
+  XML::Compile::WSDL11: 2.04
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

@@ -1,0 +1,36 @@
+Revision history for Perl extension WebService::Livedoor::Weather.
+0.10 Wed Sep  3 17:53:46 JST 2014
+        - META files: link to GitHub, include license (szabgab)
+
+0.09 Tue Aug 26 10:39:36 JST 2014
+        - repackaging
+
+0.08 Tue Aug 26 10:29:30 JST 2014
+        - fix synopsis
+
+0.07 Fri Jan 24 10:45:00 JST 2014
+        - fix problem of encoding in t/12parse_forecast.t. (papix)
+        - specify a version of Encode.pm (2.53 or higher)
+
+0.06 Wed May  8 17:54:17 JST 2013
+        - specify XML::Parser as $XML::Simple::PREFFERED_PERSER
+        - remove strange stuff in manifest
+
+0.05 Thu Apr 25 10:31:33 JST 2013
+        - fix tests that failed about utf8 (moznion)
+
+0.04 Tue Apr 16 10:55:08 JST 2013
+        - add Test::Exception as dependency
+
+0.03 Fri Apr 5 17:50:39 2013
+        - update for supporting new interface
+                - Livedoor weather API changed its data-format from XML to JSON at April 1st, 2013.
+                  (See http://weather.livedoor.com/weather_hacks/webservice for more detail. [lang:ja])
+
+0.02 Thu Feb 2 16:44:33 2006
+        - {temperature}{min/max}{*} = undef if {temperature}{min/max}{*} is hash ref
+
+0.01  Fri Feb 10 11:11:26 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn WebService::Livedoor::Weather
+

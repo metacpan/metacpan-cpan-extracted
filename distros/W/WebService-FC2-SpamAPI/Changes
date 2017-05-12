@@ -1,0 +1,8 @@
+Revision history for WebService-FC2-SpamAPI
+
+0.02    2007-02-26 21:40:45
+        Fix URI::Fetch->fetch($uri): $uri as string.
+
+0.01    2007-02-25
+        Initial release.
+

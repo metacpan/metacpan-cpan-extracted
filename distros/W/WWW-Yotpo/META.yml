@@ -1,0 +1,30 @@
+---
+abstract: 'API for Yotpo'
+author:
+  - 'Fayland Lam <fayland@binary.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Yotpo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fayland/perl-WWW-Yotpo/issues
+  homepage: https://github.com/fayland/perl-WWW-Yotpo
+  repository: https://github.com/fayland/perl-WWW-Yotpo.git
+version: '0.01'

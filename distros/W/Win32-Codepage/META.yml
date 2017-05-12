@@ -1,0 +1,16 @@
+---
+name: Win32-Codepage
+version: 1.00
+author:
+  - 'Clotho Advanced Media, Inc. <cpan@clotho.com>'
+abstract: get Win32 codepage information
+license: perl
+requires:
+  Win32::Locale: 0.04
+build_requires:
+  Test::More: 0
+provides:
+  Win32::Codepage:
+    file: lib/Win32/Codepage.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

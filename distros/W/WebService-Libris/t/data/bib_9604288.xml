@@ -1,0 +1,49 @@
+<rdf:rdf xmlns:bibo="http://purl.org/ontology/bibo/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:libris="http://libris.kb.se/vocabulary/experimental#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rda="http://RDVocab.info/Elements/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"> 
+  <rdf:description rdf:about="http://libris.kb.se/resource/bib/9604288">
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/NB" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/10185625" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Q" />
+    <dc:title xml:lang="sv">Låt den rätte komma in : [skräckroman]</dc:title>
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/10485918" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/12095434" />
+    <rdfs:isdefinedby rdf:resource="http://libris.kb.se/data/bib/9604288" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11816704" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11829092" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/S" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Ba" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/10740648" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Ha" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Ld" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/H" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11777008" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/10043585" />
+    <dc:description xml:lang="sv">Undertitel från skyddsomslag</dc:description>
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Li" />
+    <rdf:type rdf:resource="http://purl.org/ontology/bibo/Book" />
+    <dc:language rdf:resource="http://purl.org/NET/marccodes/languages/swe#lang" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/9718010" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/12038929" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/U" />
+    <dc:creator>Ajvide Lindqvist, John, 1968-</dc:creator>
+    <dc:publisher>Ordfront</dc:publisher>
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11527757" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11307472" />
+    <dc:creator>John Ajvide Lindqvist</dc:creator>
+    <bibo:isbn10>9170370192</bibo:isbn10>
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/G" />
+    <rda:placeofpublication rdf:resource="http://purl.org/NET/marccodes/countries/sw#location" />
+    <dc:type>text</dc:type>
+    <dc:identifier rdf:resource="URN:ISBN:9170370192" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/L" />
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/Gbg" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11787981" />
+    <dc:creator rdf:resource="http://libris.kb.se/resource/auth/246603" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/10951070" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11232231" />
+    <dc:date>2004</dc:date>
+    <libris:held_by rdf:resource="http://libris.kb.se/resource/library/BOKR" />
+    <dc:description xml:lang="sv">Originalupplaga 2004</dc:description>
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/11956285" />
+    <libris:frbr_related rdf:resource="http://libris.kb.se/resource/bib/9979096" />
+  </rdf:description>
+</rdf:rdf>

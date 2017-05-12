@@ -1,0 +1,31 @@
+v0.007
+    * Scpecified modules minimum versions, to hopefully pass more tests
+    * fixed a documentation error
+
+v0.006
+   
+   * Fuck it, update your perl 5.14, requered now.
+   * Better testing, done localy now on included asset file
+   * Proper unicode compatibility.
+   * Added option to ignore the cache file, and always srape from scratch.
+                    
+v0.005
+
+   * Fixed build problems on perl version under 5.14.
+      (no s///r anymore)
+   
+v0.004
+
+   * Fixed  'byte-order' bug when building on 64-bit systems.
+   * Added Pod test.
+   * Removed unnecessary files from dist.
+   * Lowered minimum Perl version required.
+
+v0.003
+
+   * Added tests.
+   * Functions now return real perl data-structures.
+
+v0.002
+   
+   * First non-trial release, a lot to be done.

@@ -1,0 +1,28 @@
+---
+name: Win32-Mock
+version: 0.05
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Mock Win32 modules
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Devel::FakeOSName: 0
+  ExtUtils::Command: 0
+  File::Basename: 0
+  File::Spec: 0.7
+  constant: 1.12
+build_requires:
+  Test::More: 0
+recommends:
+  Data::GUID: 0
+  File::HomeDir: 0
+provides:
+  Win32::Mock:
+    file: lib/Win32/Mock.pm
+    version: 0.05
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

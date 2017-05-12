@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# Sturtup script for FreeBS 7.x
+#
+
+# PROVIDE: webdao
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+
+#
+# Add the following line to /etc/rc.conf to enable webdao:
+# webdao_enable (bool):	Set to "NO" by default.
+#			Set it to "YES" to enable WebDAO.
+# webdao_pidfile (str):	Set full path to pid file
+#                        Default to "/tmp/webdao.pid"
+# webdao_inc (str):	Set INC path for includes
+#                       Default set to ""
+#                       "/path1 /path2" or "/path1:/path2"
+# webdao_mod (str)      Compile modules at start ( using -M arg for perl )
+#                       Default set to "WebDAO WebDAO::Engine"
+# webdao_socket (str)   Set socket for bind (file or net socket 127.0.0.1:9090)
+#                       Default set to "/tmp/webdao.sock". 
+# webdao_user (str)     User to run webdao as (default:www)
+# webdao_group (str)    Group to run webdao as (default:www)
+                        
+# webdao_args (str):	Custom additional arguments to be passed
+#			to wd_fcgi.fpl (default "-n 3 -maxreq 1000").
+#
+# Define these webdao_* variables in one of these files:
+#       /etc/rc.conf
+#       /etc/rc.conf.local
+#       /etc/rc.conf.d/nginx
+#
+# DO NOT CHANGE THESE DEFAULT VALUES HERE
+#
+
+. /etc/rc.subr
+
+name="webdao"
+rcvar=`set_rcvar`
+
+load_rc_config $name
+
+: ${webdao_enable="NO"}
+: ${webdao_pidfile="/tmp/webdao.pid"}
+: ${webdao_inc=""}
+: ${webdao_mod="WebDAO WebDAO::Engine"}
+: ${webdao_socket="/tmp/webdao.sock"}
+: ${webdao_args="-n 3 -maxreq 1000"}
+: ${webdao_bin="/usr/local/bin/wd_fcgi.fpl"}
+: ${webdao_user="www"}
+: ${webdao_user="www"}
+
+ mmods= 
+ for _mod in $webdao_mod; do
+    mmods="${mmods} -M${_mod}"
+ done
+ inclide=
+ for _inc in $webdao_inc; do
+    inclide="${inclide} -I${_inc}"
+ done
+
+pidfile="${webdao_pidfile}"
+command="/usr/local/bin/perl"
+procname="perl-fcgi-pm"
+export PERLLIB="$PERLLIB:${webdao_inc}"
+command_args="$mmods $inclide ${webdao_bin} -l $webdao_socket -p $webdao_pidfile -d ${webdao_args}"
+
+run_rc_command "$1"

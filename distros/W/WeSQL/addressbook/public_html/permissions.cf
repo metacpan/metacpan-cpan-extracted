@@ -1,0 +1,23 @@
+person
+table:people
+increment:id
+add:yes
+delete:yes
+update:firstname,lastname,mobile,birthday,email,im
+validate:'$params{birthday}'=~/^\d{2,4}.\d{1,2}.\d{1,2}$/
+validatetext:<font color=#FF0000><en 1>A valid date has the format yyyy.mm.dd, for instance 1970.01.01!</en><nl 1>Een geldige datum heeft het formaat jjjj.mm.dd, bijvoorbeeld 1970.01.01!</nl></font><br>
+sqlcondition:add|select count(*) from people where firstname='$params{firstname}' and lastname='$params{lastname}' and status='1'|==|0
+sqlconditiontext:<font color=#FF0000><en 2>This person ($params{firstname} $params{lastname}) is already defined!</en><nl 2>Deze persoon ($params{firstname} $params{lastname}) bestaat al in de de database!</nl></font><br>
+validateifcondition:!('$params{mobile}' =~ /^$/)
+validateif:'$params{mobile}' =~ /^\+[\d\s]+/
+validateiftext:<font color=#FF0000><en 3>If the 'mobile' field is not empty, it must start with a '+' sign and consist only of digits and spaces!</en><nl 3>Als het 'GSM' niet leeg is, moet het beginnen met een plusteken en alleen uit nummers en spaties bestaan!</nl></font><br>
+
+address
+table:addresses
+increment:id
+add:yes
+delete:yes
+update:name,phone,fax,street,number,adrs1,adrs2,zip,city,country,peopleid,email
+validate:!('$params{name}'=~/^$/)
+validatetext:<font color=#FF0000><en 4>Give a name to the address!</en><nl 4>Geef een naam aan het adres!</nl></font><br>
+

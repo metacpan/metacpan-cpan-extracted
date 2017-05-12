@@ -1,0 +1,25 @@
+<!-- PERL: Hide Perl`s script
+<?perl 
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');
+?>
+//-->
+<HTML>
+  <HEAD>
+     <TITLE>HTML/SQL Templates Example</TITLE>
+  </HEAD>
+<BODY TEXT="white" BGCOLOR="black" LINK="yellow" VLINK="yellow">
+<FONT FACE="Verdana" SIZE=2><B>
+<CENTER><H3>HTML/SQL Templates Example</H3></CENTER><BR>
+<!-- PERL: Hide Perl`s script
+<?perl
+ require 'xreader.pl';
+ $dbh = sql_connect();
+ xreader_dbh($dbh);
+ $text = xreader(2,'xread/xr.jhtml',$sql_user_table);
+ $data = xreader(1,'xread/xr.jhtml',200,$text);
+ print $data;
+?>
+//-->
+</B></FONT>
+</BODY>
+</HTML>

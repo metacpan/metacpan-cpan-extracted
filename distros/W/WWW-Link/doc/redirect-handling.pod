@@ -1,0 +1,55 @@
+=head1 Redirects
+
+There are multiple kinds of redirects.  
+
+=head1 Permanent Redirects.
+
+A permanent redirect is a sign that a resource has been moved.  You
+would use it, for example, if you changed internet provider and had to
+change where your pages were, or if you moved a page around within
+your web site.
+
+Permanent redirects are the correct way to signal a change of link,
+and if everything worked properly, detecting these would be about the
+main job of a link checker.  It doesn't of course.
+
+=head1 Temporary Redirects
+
+According to the HTTP definitions, a temporary redirect is just
+telling a client (e.g. your browser) that it would be better to get
+the document it wants from somewhere else right now, but that later it
+will be back here.
+
+Examples of use could be someone who has five or six different
+servers.  By giving out a different redirect at random from the
+primary server, the load can be spread evenly between the others.  Of
+course, there are much better ways of doing this, but we have to be
+ready for everything.  
+
+In the above examples you wouldn't want to change the link.  Just tell
+the link maintainance system that you don't want to be bothered about
+this redirect again.
+
+It is also possible that someone has chosen the wrong kind of redirect
+through some kind of misunderstanding.  The symptoms would be
+
+=over 4
+
+=item * 
+
+the redirect wasn't there before
+
+=item * 
+
+the redirect only goes to one page
+
+=item * 
+
+the pages mention the new redirect
+
+=cut
+
+For this reason, temporary redirects should, by default, be shown to
+the WWW maintainer.
+
+=cut

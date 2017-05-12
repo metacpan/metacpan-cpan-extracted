@@ -1,0 +1,44 @@
+Win32-GUI-SplashScreen
+----------------------
+
+VERSION
+
+This is Win32::GUI::SplashScreen v0.04
+
+INTRODUCTION
+
+Win32::GUI::SplashScreen is a module that works with Win32::GUI
+to implement a Windows application splash screen.
+
+It can generate a simple splash screen from basic text information,
+or use a supplied image.  The splash screen can be configured to
+have a minimum display time (so that users always have time
+to read any information), and can be taken down automatically
+once your program reaches the dialog phase.
+
+REQUIRES
+
+Win32::GUI v1.02 or higher
+Win32::GUI::DIBitmap (for JPEG support)
+
+DOCUMENTATION
+
+There is full POD documentation inside the SplashScreen.pm file.
+There are demonstration scripts provided, showing most of the
+features.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    [n|d]make
+    [n|d]make test
+    [n|d]make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005..2009 Robert May
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,203 @@
+NAME
+
+    WWW::ProxyChecker - Check whether or not proxy servers are alive
+
+SYNOPSIS
+
+        use strict;
+        use warnings;
+        use WWW::ProxyChecker;
+    
+        my $checker = WWW::ProxyChecker->new( debug => 1 );
+    
+        my $working_ref= $checker->check( [ qw(
+                    http://221.139.50.83:80
+                    http://111.111.12.83:8080
+                    http://111.111.12.183:3218
+                    http://111.111.12.93:8080
+                )
+            ]
+        );
+    
+        die "No working proxies were found\n"
+            if not @$working_ref;
+    
+        print "$_ is alive\n"
+            for @$working_ref;
+
+DESCRIPTION
+
+    The module provides means to check whether or not HTTP proxies are
+    alive. The module was designed more towards "quickly scanning through
+    to get a few" than "guaranteed or your money back" therefore there is
+    no 100% guarantee that non-working proxies are actually dead and that
+    all of the reported working proxies are actually good.
+
+CONSTRUCTOR
+
+ new
+
+        my $checker = WWW::ProxyChecker->new;
+    
+        my $checker_juicy = WWW::ProxyChecker->new(
+            timeout       => 5,
+            max_kids      => 20,
+            max_working_per_child => 2,
+            check_sites   => [ qw(
+                    http://google.com
+                    http://microsoft.com
+                    http://yahoo.com
+                    http://digg.com
+                    http://facebook.com
+                    http://myspace.com
+                )
+            ],
+            agent   => 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.8.1.12)'
+                        .' Gecko/20080207 Ubuntu/7.10 (gutsy) Firefox/2.0.0.12',
+            debug => 1,
+        );
+
+    Bakes up and returns a new WWW::ProxyChecker object. Takes a few
+    arguments all of which are optional. Possible arguments are as follows:
+
+  timeout
+
+        ->new( timeout => 5 );
+
+    Optional. Specifies timeout in seconds to give to LWP::UserAgent object
+    which is used for checking. If a connection to the proxy times out the
+    proxy is considered dead. The lower the value, the faster the check
+    will be done but also the more are the chances that you will throw away
+    good proxies. Defaults to: 5 seconds
+
+  agent
+
+        ->new( agent => 'ProxeyCheckerz' );
+
+    Optional. Specifies the User Agent string to use while checking
+    proxies. By default will be set to mimic Firefox.
+
+  check_sites
+
+        ->new( check_sites => [ qw( http://some_site.com http://other.com ) ] );
+
+    Optional. Takes an arrayref of sites to try to connect to through a
+    proxy. Yes! It's evil, saner ideas are more than welcome. Defaults to:
+
+        check_sites   => [ qw(
+                    http://google.com
+                    http://microsoft.com
+                    http://yahoo.com
+                    http://digg.com
+                    http://facebook.com
+                    http://myspace.com
+                )
+            ],
+
+  max_kids
+
+        ->new( max_kids => 20 );
+
+    Optional. Takes a positive integer as a value. The module will fork up
+    maximum of max_kids processes to check proxies simultaneously. It will
+    fork less if the total number of proxies to check is less than
+    max_kids. Technically, setting this to a higher value might speed up
+    the overall process but keep in mind that it's the number of
+    simultaneous connections that you will have open. Defaults to: 20
+
+  max_working_per_child
+
+        ->new( max_working_per_child => 2 );
+
+    Optional. Takes a positive integer as a value. Specifies how many
+    working proxies each sub process should find before aborting (it will
+    also abort if proxy list is exhausted). In other words, setting 20
+    max_kids and max_working_per_child to 2 will give you 40 working
+    proxies at most, no matter how many are in the original list.
+    Specifying undef will get rid of limit and make each kid go over the
+    entire sub list it was given. Defaults to: undef (go over entire sub
+    list)
+
+  debug
+
+        ->new( debug => 1 );
+
+    Optional. When set to a true value will make the module print out some
+    debugging information (which proxies failed and how, etc). By default
+    not specifies (debug is off)
+
+METHODS
+
+ check
+
+        my $working_ref = $checker->check( [ qw(
+                    http://221.139.50.83:80
+                    http://111.111.12.83:8080
+                    http://111.111.12.183:3218
+                    http://111.111.12.93:8080
+                )
+            ]
+        );
+
+    Instructs the object to check several proxies. Returns a (possibly
+    empty) array ref of addresses which the object considers to be alive
+    and working. Takes an arrayref of proxy addresses. The elements of this
+    arrayref will be passed to LWP::UserAgent's proxy() method as:
+
+        $ua->proxy( [ 'http', 'https', 'ftp', 'ftps' ], $proxy );
+
+    so you can read the docs for LWP::UserAgent and maybe think up
+    something creative.
+
+ alive
+
+        my $last_alive = $checker->alive;
+
+    Must be called after a call to check(). Takes no arguments, returns the
+    same arrayref last check() returned.
+
+ACCESSORS/MUTATORS
+
+    The module provides an accessor/mutator for each of the arguments in
+    the constructor (new() method). Calling any of these with an argument
+    will set a new value. All of these return a currently set value:
+
+        max_kids
+        check_sites
+        max_working_per_kid
+        timeout
+        agent
+        debug
+
+    See CONSTRUCTOR section for more information about these.
+
+REPOSITORY
+
+    https://github.com/stevieb9/p5-www-proxychecker
+
+BUGS
+
+    To report bugs or request features, please use
+    https://github.com/stevieb9/p5-www-proxychecker/issues
+
+AUTHOR
+
+    Zoffix Znet, <zoffix at cpan.org> (http://zoffix.com,
+    http://haslayout.net)
+
+    Adopted on Feb 4, 2016 and currently maintained by:
+
+    Steve Bertrand <steveb at cpan.org>
+
+COPYRIGHT & LICENSE
+
+    Copyright 2016 Steve Bertrand
+
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

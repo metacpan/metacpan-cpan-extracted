@@ -1,0 +1,15 @@
+Revision history for Perl module WWW::Wikipedia::LangTitles
+
+0.03 2016-12-27 BKB
+
+- Document
+
+0.02 2016-12-25 BKB
+
+- Document
+- Add make_wiki_url function
+
+0.01 2016-12-24 BKB
+
+- Initial version
+

@@ -1,0 +1,267 @@
+NAME
+
+    WWW::FreeProxyListsCom - get proxy lists from
+    http://www.freeproxylists.com
+
+SYNOPSIS
+
+        use strict;
+        use warnings;
+    
+        use WWW::FreeProxyListsCom;
+    
+        my $prox = WWW::FreeProxyListsCom->new;
+    
+        my $ref = $prox->get_list( type => 'non_anonymous' )
+            or die $prox->error;
+    
+        print "Got a list of " . @$ref . " proxies\nFiltering...\n";
+    
+        $ref = $prox->filter( port => qr/(80){1,2}/ );
+    
+        print "Filtered list contains: " . @$ref . " proxies\n"
+                . join "\n", map( "$_->{ip}:$_->{port}", @$ref), '';
+
+DESCRIPTION
+
+    The module provides interface to fetch proxy server lists from
+    http://www.freeproxylists.com/
+
+CONSTRUCTOR
+
+ new
+
+        my $prox = WWW::FreeProxyListCom->new;
+    
+        my $prox2 = WWW::FreeProxyListCom->new(
+            timeout     => 20, # or 'mech'
+            mech        => WWW::Mechanize->new( agent => 'foos', timeout => 20 ),
+            debug       => 1,
+        );
+
+    Bakes up and returns a fresh WWW::FreeProxyListCom object. Takes a few
+    arguments, all of which are optional. Possible arguments are as
+    follows:
+
+  timeout
+
+        my $prox = WWW::FreeProxyListCom->new( timeout => 10 );
+
+    Takes a scalar as a value which is the value that will be passed to the
+    WWW::Mechanize object to indicate connection timeout in seconds.
+    Defaults to: 30 seconds
+
+  mech
+
+        my $prox = WWW::FreeProxyListCom->new(
+            mech => WWW::Mechanize->new( agent => '007', timeout => 10 ),
+        );
+
+    If a simple timeout is not enough for your needs feel free to specify
+    the mech argument which takes a WWW::Mechanize object as a value.
+    Defaults to: plain WWW::Mechanize object with timeout argument set to
+    whatever WWW::FreeProxyListCom's timeout argument is set to as well as
+    agent argument is set to mimic FireFox.
+
+  debug
+
+        my $prox = WWW::FreeProxyListCom->new( debug => 1 );
+
+    When set to a true value will make the object print out some debugging
+    info. Defaults to: 0
+
+METHODS
+
+ get_list
+
+        my $list_ref = $prox->get_list
+            or die $prox->error;
+    
+        my $list_ref2 = $prox->get_list(
+            type        => 'standard',
+            max_pages   => 5,
+        ) or die $prox->error;
+
+    Instructs the object ot fetch a list of proxies from
+    http://www.freeproxylists.com/ website. On failure returns either undef
+    or an empty list depending on the context and the reason for failure
+    will be available via error() method. Note: if request for a each of
+    the "list" (see max_pages argument below) fails the get_list() will NOT
+    error out, if you are getting empty proxy lists try setting debug
+    option on in the constructor and it will carp() any failures on the
+    "list" gets. On success returns an arrayref of hashrefs, see RETURN
+    VALUE section below for details. Takes several arguments all of which
+    are optional. To understand them better you should visit
+    http://www.freeproxylists.com/ first. The possible arguments are as
+    follows:
+
+  type
+
+        ->get_list( type => 'standard' );
+
+    Optional. Specifies the list of proxies to fetch. Defaults to: elite.
+    Possible arguments are as follows (valid type values are on the left,
+    corresponding "list" site's menu link names are on the right):
+
+        elite           => http elite proxies
+        anonymous       => http anonymous lists
+        non_anonymous   => http non-anonymous
+        https           => https (SSL enabled)
+        standard        => http standard ports
+        us              => us proxies only
+        socks           => socks (version 4/5)
+
+  max_pages
+
+        ->get_list( max_pages => 4 );
+
+    Optional. Specifies how many "lists" to fetch. In other words, if you
+    go to list section titled "http elite proxies" you'll see several lists
+    in the table; the max_pages specifies how many of those lists to fetch.
+    If max_pages is larger than the number of available lists only the
+    number of available lists will be fetched. A special value of 0
+    indicates that the object should fetch all available lists for a
+    specified type. Defaults to: 1 (which is more than enough).
+
+  RETURN VALUE
+
+        $VAR1 = [
+            {
+                'country' => 'China',
+                'last_test' => '3/15 4:23:14 pm',
+                'ip' => '121.15.200.147',
+                'latency' => '5115',
+                'port' => '80',
+                'is_https' => 'true'
+            },
+        ]
+
+    On success get_list() method returns a (possibly empty) arrayref of
+    "proxy" hashrefs. The hashrefs represent each proxy listed on the proxy
+    list on the site. Each will contain the following keys (if the value
+    for a specific key was not found on the site it will be set to N/A):
+
+    ip
+
+      The IP address of the proxy
+
+    port
+
+      The port of the proxy
+
+    country
+
+      The country of the proxy
+
+    last_test
+
+      When was the proxy last tested to be alive, this is the "Date
+      checked, UTC" column on the site.
+
+    latency
+
+      Corresponds to the "Latency" column on the site
+
+    is_https
+
+      Corresponds to "HTTPS" column on the site.
+
+ filter
+
+        my $filtered_list_ref = $prox->filter(
+            port        => 80,
+            ip          => qr/^120/,
+            country     => 'Russia',
+            is_https    => 'true',
+            last_test   => qr|^3/15|, # march 15's
+            latency     => qr/\d{1,2}/,
+        );
+
+    Must be called after a successfull call to get_list() will croak
+    otherwise. Takes one or more key/value pairs of arguments which specify
+    filtering rule. The keys are the same as the keys of "proxy" hashref in
+    the return value of the get_list() method. Values can be either simple
+    scalars or regexes (qr//). If value is a regex the corresponding value
+    in the "proxy" hashref will matched against the regex, otherwise the eq
+    will be done. Returns an arrayref of "proxy" hashrefs in the exact same
+    format as get_list() returns except filtered. In other words calling
+    $prox->filter( port => 80, latency => qr/\d{1,2}/ ) will return only
+    proxies with port number 80 and for which latency is a two digit value.
+    On failure returns either undef or an empty list depending on the
+    context and the reason for the error will be available via error()
+    method. Although, filter() should not fail if you pass proper filter
+    arguments and call it after successfull get_list().
+
+ error
+
+        my $list_ref = $prox->get_list
+            or die $prox->error;
+
+    When either get_list() or filter() methods fail they will return either
+    undef or an empty list depending on the context and the reason for the
+    failure will be available via error() method. Takes no arguments,
+    returns a human parsable message explaining why get_list() or filter()
+    failed.
+
+ list
+
+        my $last_list_ref = $prox->list;
+
+    Must be called after a successfull call to get_list(). Takes no
+    arugments, returns the same arrayref of hashrefs last call to
+    get_list() returned.
+
+ filtered_list
+
+        my $last_filtered_list_ref = $prox->filtered_list;
+
+    Must be called after a successfull call to filter(). Takes no
+    arugments, returns the same arrayref of hashrefs last call to filter()
+    returned.
+
+ mech
+
+        my $old_mech = $prox->mech;
+    
+        $prox->mech( WWW::Mechanize->new( agent => 'blah' ) );
+
+    Returns a WWW::Mechanize object used for fetching proxy lists. When
+    called with an optional argument (which must be a WWW::Mechanize
+    object) will use it in any subsequent get_list() calls.
+
+ debug
+
+        my $old_debug = $prox->debug;
+    
+        $prox->debug( 1 );
+
+    Returns a currently set debug flag (see debug argument to constructor).
+    When called with an argument will set the debug flag to the value
+    specified.
+
+AUTHOR
+
+    Zoffix Znet, <zoffix at cpan.org> (http://zoffix.com,
+    http://haslayout.net)
+
+    Adopted on Feb 4, 2016 and currently maintained by:
+
+    Steve Bertrand <steveb at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    https://github.com/stevieb9/p5-www-freeproxylistscom/issues.
+
+COPYRIGHT & LICENSE
+
+    Copyright 2016 Steve Bertrand
+
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

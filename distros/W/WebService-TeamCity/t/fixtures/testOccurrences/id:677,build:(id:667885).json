@@ -1,0 +1,23 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "",
+   "href" : "/httpAuth/app/rest/testOccurrences/id:677,build:(id:667885)",
+   "id" : "id:677,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.auth_uri_for_anonymous_protocol_should_not_have_user_and_password",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-3447374463964464227",
+      "id" : -3447374463964464227,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.AuthSettingsTest.auth_uri_for_anonymous_protocol_should_not_have_user_and_password"
+   }
+}

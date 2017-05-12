@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/PTV.pm
+lib/WWW/PTV/Area.pm
+lib/WWW/PTV/Route.pm
+lib/WWW/PTV/TimeTable.pm
+lib/WWW/PTV/TimeTable/Schedule.pm
+lib/WWW/PTV/Stop.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

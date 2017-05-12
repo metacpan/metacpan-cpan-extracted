@@ -1,0 +1,65 @@
+Non-standart template lettersNon-standart (template) letters 
+you can find here (you can copy and paste in your document): 
+
+©   -   Example: <S©L:1:"select USER,ID from $mytable where id=0;":1:1:1:1:S©L>
+®   -   Example: <©N®1®1®®©> 
+§    -   Example: <§VAR§>
+˜    -   Example: <˜©˜>  Please note that: '˜' is not '~' (tilde)!
+
+
+
+Also for convenience you can find some blank templates that you can copy and 
+paste:
+
+* Template place:
+<©N®1®1®®©>
+place your template here
+<˜©˜>
+
+
+* SQL template
+<S©L:1:"SQL query here":1:1:1:1:S©L>
+
+
+* SQL variable
+<S©LVAR:1:S©L>
+
+
+* Template variable
+<§VAR§>
+
+
+* Begin INLINE
+<!--©INLINE©>
+
+
+* End INLINE
+</©INLINE©-->
+
+
+* Begin INPERL
+<!--©INPERL©>
+
+
+* End INPERL
+</©INPERL©-->
+
+
+* Include statement
+<!--©INCLUDE©file.ext©-->
+
+
+* Inline template
+<§TEMPLATE:2:$val:§>
+
+
+* Inline XREADER
+<XREADER:1:bestbuy.jhtml:$first_param,$second_param>
+
+
+* Inline MENUSELECT
+<MENUSELECT:$source:"SQL query here":$ptr_DB:$ptr_TEMPLATE:$ptr_HTML:$dbh:> 
+
+
+* Template destination (target point)
+<§TEMPLATE:1§> 

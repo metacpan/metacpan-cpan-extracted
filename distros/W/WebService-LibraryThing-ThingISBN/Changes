@@ -1,0 +1,11 @@
+Revision history for WebService-LibraryThing-ThingISBN
+
+0.503   September 2, 2009
+        Indicate that Time::HiRes is recommended, fix typo
+
+0.502   August 3, 2009
+        Minor documentation fix
+
+0.50    August 2, 2009
+        Initial release
+

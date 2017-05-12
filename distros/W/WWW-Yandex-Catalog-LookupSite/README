@@ -1,0 +1,48 @@
+WWW-Yandex-Catalog-LookupSite
+
+This module retrieves a website's Thematic Index of Citing, checks 
+website's presence in Yandex Catalog, retrieves it's descriptions 
+as recorded in the catalog, and the list of categories it belongs to.
+
+This module uses LWP::UserAgent for making requests to Yandex Catalog.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Yandex::Catalog::LookupSite
+
+You can also look for information at:
+
+    GitHub Repository
+        https://github.com/OpossumPetya/WWW-Yandex-Catalog-LookupSite
+
+    MetaCPAN
+        https://metacpan.org/module/WWW::Yandex::Catalog::LookupSite
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Yandex-Catalog-LookupSite/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010-2014 Irakliy Sunguryan
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

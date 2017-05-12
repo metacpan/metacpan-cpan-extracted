@@ -1,0 +1,13 @@
+Revision history for Win32-Getppid
+
+0.04      2016-05-06 08:01:25 -0400
+  - Add support for MSYS2
+
+0.03      2016-05-06 07:59:21 -0400
+  - Erroneous bad release
+
+0.02      2015-02-18 07:58:09 -0500
+  - remove accidental deps
+
+0.01      2015-01-21 09:24:24 -0500
+  - initial version

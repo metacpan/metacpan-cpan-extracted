@@ -1,0 +1,32 @@
+Wiki::Toolkit::Plugin::Ping
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   LWP
+
+A database (one of MySQL, PostgreSQL or DBD::SQLite) is needed.
+
+USE
+
+One or more URLs to ping with a written node should be supplied at run-time
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2009 the Wiki::Toolkit team (http://www.wiki-toolkit.org/)
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

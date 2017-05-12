@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - 'Aaron Lewis <the.warl0ck.1989@gmail.com>'
+build_requires:
+  HTML::TagParser: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI::Fetch: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-RMDown
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.006
+version: 0.01

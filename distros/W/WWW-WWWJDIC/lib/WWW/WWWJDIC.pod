@@ -1,0 +1,80 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+WWW::WWWJDIC - Get information from online Japanese dictionary WWWJDIC
+
+=head1 SYNOPSIS
+
+    
+    use WWW::WWWJDIC;
+    
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/WWW-WWWJDIC-0.001/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents WWW::WWWJDIC version 0.001
+corresponding to git commit L<6a08a22ea1a128965b8191c3cc13f96338cf9527|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/6a08a22ea1a128965b8191c3cc13f96338cf9527> released on Thu Feb 2 16:07:59 2017 +0900.
+
+=head1 DESCRIPTION
+
+Scrape the WWWJDIC online dictionaries.
+
+=head1 METHODS
+
+=head2 new
+
+    my $wwwjdic = WWW::WWWJDIC::new (mirror => "japan")
+
+Create the object which extracts the information from WWWJDIC. Arguments:
+
+mirror: Mirror site. This can take the values @SCRAPE MIRROR NAMES@.
+
+=head2 lookup_url
+
+    my $url = $wwwjdic->lookup_url ($key, $search_type);
+
+For example,
+
+    my $wwwjdic = WWW::WWWJDIC->new();
+    $wwwjdic->lookup_url ("日本");
+
+returns a value C<http://>
+
+Make a lookup url (the "backdoor URL") which links to a WWWJDIC page.
+
+=head2 lookup
+
+Look up a word in WWWJDIC.
+
+=head2 parse_results
+
+    $html = <contents of WWWJDIC page>;
+    my $results = $wwwjdic->parse_results ($html);
+    
+=head1 BUGS
+
+The module relies on the structure of the WWWJDIC reply page, which
+seems to change every few months.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2009-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

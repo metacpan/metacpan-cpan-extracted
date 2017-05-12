@@ -1,0 +1,43 @@
+2008-11-06  Kingpin  <Martin@BLUEMAX>
+
+	* lib/Win32/IIS/Admin.pm (set_timeout): new method
+	(get_timeout): new method
+
+2007-06-11    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm (add_extension_restriction): new method
+	(remove_extension_restriction): new method
+	(remove_extension_restriction_group): new method
+
+2007-06-09    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm (restart_iis): new method
+
+2007-05-16    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm (path_of_virtual_dir): fixed so that 'ROOT' works
+
+2007-05-14    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm (iis_version): new method
+	(create_virtual_dir): all virtual_dir methods now work in IIS 6.0
+	(_config_set_value): _set_value method now actually affects the live server!
+
+2007-05-09    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm (create_virtual_dir): fix error message
+
+2007-04-30    <Daddy@C-3PO>
+
+	* make sure tests pass even if module load causes extra warnings
+
+2006-03-20    <Daddy@C-3PO>
+
+	* lib/Win32/IIS/Admin.pm: add pod for all methods
+
+Revision history for Perl module Win32::IIS::Admin
+
+0.01 Fri Sep 23 20:11:21 2005
+    - original version; created by ExtUtils::ModuleMaker 0.41
+
+

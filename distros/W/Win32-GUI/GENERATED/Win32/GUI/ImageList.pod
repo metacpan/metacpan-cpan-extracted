@@ -1,0 +1,397 @@
+
+=head1 NAME
+
+Win32::GUI::ImageList - Create and manipulate imagelist resources
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(X, Y, FLAGS, INITAL, GROW)>
+
+Creates an ImageList object; X and Y specify the size of the images,
+FLAGS [TBD]. INITIAL and GROW specify the number of images the ImageList
+actually contains (INITIAL) and the number of images for which memory
+is allocated (GROW).
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 newFromImage
+
+B<newFromImage(IMAGE,CX,[FLAG=LR_LOADFROMFILE],[TYPE=IMAGE_BITMAP],[COLORMASK=CLR_DEFAULT],[HINSTANCE=NULL],[GROW=1])>
+
+See L<LoadImage()|Win32::GUI::ImageList/LoadImage>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Add
+
+B<Add(BITMAP, [BITMAPMASK])>
+
+Adds a bitmap to the ImageList; both B<BITMAP> and B<BITMAPMASK> can be either
+Win32::GUI::Bitmap objects or filenames.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddBitmap
+
+B<AddBitmap(BITMAP, [BITMAPMASK])>
+
+Adds a Win32::GUI::Bitmap object to the ImageList. BITMAPMASK is
+optional. See also L<Add()|Win32::GUI::ImageList/Add>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddBitmapMasked
+
+B<AddBitmapMasked(BITMAP, COLORMASK)>
+
+Adds a Win32::GUI::Bitmap object to the ImageList. COLORMASK is
+color used to generate the mask. See also L<AddMasked()|Win32::GUI::ImageList/AddMasked>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddIcon
+
+B<AddIcon(ICON)>
+
+Add a icon specified by ICON (must be a Win32::GUI::Icon object).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddMasked
+
+B<AddMasked(BITMAP, COLORMASK)>
+
+Adds a bitmap to the ImageList; B<BITMAP> can be either Win32::GUI::Bitmap
+object or filename.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackColor
+
+B<BackColor([COLOR])>
+
+Gets or sets the background color for the ImageList.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginDrag
+
+B<BeginDrag(INDEX, X, Y)>
+
+Creates a temporary image list that is used for dragging.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Clear
+
+B<Clear()>
+
+Removes all the images from the ImageList.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+Returns the number of images in the ImageList.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Create
+
+B<Create(X, Y, FLAGS, INITAL, GROW)>
+
+Creates a new image list.
+See L<new()|Win32::GUI::ImageList/new>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Destroy
+
+B<Destroy()>
+
+Destroys an image list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DragEnter
+
+B<DragEnter(WINDOW, X, Y)>
+
+Locks updates to the specified window during a drag operation and displays
+the drag image at the specified position within the window.
+
+Class method : Win32::GUI::ImageList::DragEnter($window, $x, $y)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DragLeave
+
+B<DragLeave(WINDOW)>
+
+Unlocks the specified window and hides the drag image, allowing the window
+to be updated.
+
+Class method : Win32::GUI::ImageList::DragLeave($window)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DragMove
+
+B<DragMove(X, Y)>
+
+Locks updates to the specified window during a drag operation and displays
+the drag image at the specified position within the window.
+
+Class method : Win32::GUI::ImageList::DragMove($x, $y)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DragShowNolock
+
+B<DragShowNolock(FLAG)>
+
+Shows or hides the image being dragged.
+
+Class method : Win32::GUI::ImageList::DragShowNolock($flag)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Draw
+
+B<Draw(INDEX, DC, X, Y, [STYLE=ILD_NORMAL])>
+
+Draws an image list item in the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawEx
+
+B<DrawEx(INDEX, DC, X, Y, DX, DY, BKCOLOR, FGCOLOR, [STYLE=ILD_NORMAL])>
+
+Draws an image list item in the specified device context.
+The function uses the specified drawing style and blends the image with the specified color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawIndirect
+
+B<DrawIndirect(INDEX, DC, X, Y, CX, CY, XBITMAP, YBITMAP, BKCOLOR, FGCOLOR, [STYLE=ILD_NORMAL], [ROP=SRCCOPY])>
+
+Draws an image list item in the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Duplicate
+
+B<Duplicate()>
+
+Creates a duplicate of an existing image list. Return a new Win32::GUI::ImageList object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndDrag
+
+B<EndDrag()>
+
+Ends a drag operation.
+
+Class method : Win32::GUI::ImageList::EndDrag()
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBkColor
+
+B<GetBkColor()>
+
+Retrieves the current background color for an image list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDragImage
+
+B<GetDragImage()>
+
+Retrieves the temporary image list that is used for the drag image.
+
+Class method : Win32::GUI::ImageList::GetDragImage()
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetIcon
+
+B<GetIcon(index, [flags=ILD_NORMAL])>
+
+Creates an Win32::GUI::Icon object from an image and mask in an image list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetIconSize
+
+B<GetIconSize()>
+
+Retrieves the dimensions of images in an image list. All images in an image list have the same dimensions.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageCount
+
+B<GetImageCount()>
+
+See L<Count()|Win32::GUI::ImageList/Count>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadImage
+
+B<LoadImage(IMAGE,CX,[FLAG=LR_LOADFROMFILE],[TYPE=IMAGE_BITMAP],[COLORMASK=CLR_DEFAULT],[HINSTANCE=NULL],[GROW=1])>
+
+Return a new Win32::GUI::ImageList object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Merge
+
+B<Merge(INDEX1,INDEX2, DX,DY,[IMAGELIST=SELF])>
+
+Creates a new image by combining two existing images. The function also creates a new image list in which to store the image.
+Return a new Win32::GUI::ImageList object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Remove
+
+B<Remove(INDEX)>
+
+Removes the specified zero-based INDEX image from the ImageList.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RemoveAll
+
+B<RemoveAll()>
+
+See L<Clear()|Win32::GUI::ImageList/Clear>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Replace
+
+B<Replace(INDEX, BITMAP, [BITMAPMASK])>
+
+Replaces the specified zero-based INDEX image with the image specified
+by BITMAP (must be a Win32::GUI::Bitmap object). BITMAPMASK is optional.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ReplaceIcon
+
+B<ReplaceIcon(INDEX, ICON)>
+
+Replaces the specified zero-based INDEX image with the icon specified
+by ICON (must be a Win32::GUI::Icon object).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBkColor
+
+B<SetBkColor(COLOR)>
+
+Sets the background color for an image list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDragCursorImage
+
+B<SetDragCursorImage(INDEX, X, Y)>
+
+Creates a new drag image by combining the specified image (typically a
+mouse cursor image) with the current drag image.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIconSize
+
+B<SetIconSize(CX, CY)>
+
+Sets the dimensions of images in an image list and removes all images from the list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageCount
+
+B<SetImageCount(COUNT)>
+
+Resizes an existing image list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetOverlayImage
+
+B<SetOverlayImage(INDEX, OVERLAY)>
+
+Adds a specified image to the list of images to be used as overlay masks.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Size
+
+B<Size([X, Y])>
+
+Gets or sets the size of the images in the ImageList;
+if no parameter is given, returns a 2 element array (X, Y),
+otherwise sets the size to the given parameters.
+If X and Y is given, also removes all images from the list.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

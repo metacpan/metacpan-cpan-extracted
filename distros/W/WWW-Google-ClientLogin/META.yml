@@ -1,0 +1,38 @@
+---
+abstract: 'Yet Another Google ClientLogin Client Library'
+author:
+  - 'xaicron <xaicron@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Fake::HTTPD: 0.03
+  Test::Flatten: 0.06
+  Test::More: 0.98
+  Test::SharedFork: 0.18
+  URI::Escape: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Google-ClientLogin
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  HTTP::Request::Common: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://github.com/xaicron/p5-WWW-Google-ClientLogin/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/xaicron/p5-WWW-Google-ClientLogin/
+version: 0.04

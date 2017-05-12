@@ -1,0 +1,52 @@
+Revision history for Perl extension Web-ChromeLogger
+
+0.06 2016-02-28T03:33:47Z
+
+    commit 4f385f36aaea9ef917673835deda9a354f174aad
+    Author: Kang-min Liu <gugod@gugod.org>
+    Date:   Thu Feb 25 12:58:11 2016 +0100
+
+        Fix encode() method mis-implementation.
+
+        The ChromeLogger tech spec:
+
+            https://craig.is/writing/chrome-logger/techspecs
+
+        ... specified the base64 encoded result must contain no
+        newline characters:
+
+            final_data = utf8_data.encode('base64').replace('\n', '')
+
+        The newline should be *removed* instead of being replaced by a pair of
+        single quotes.
+0.05 2014-04-07T04:56:25Z
+
+    - Added Web::ChromeLogger::Null
+      (moznion)
+    - Set 'alllow_nonref' option for JSON encoder.
+      (tokuhirom)
+    - Implement formatted methods
+      (moznion)
+
+0.04 2014-03-30T10:13:25Z
+
+    commit 6b0776ae8d67e93fc87b797e61521597eb29f7cf
+    Author: bayashi <bayashi@cpan.org>
+    Date:   Sun Mar 30 12:56:23 2014 +0900
+
+    support JSON::XS 2.X
+    JSON::XS 2.X exports the 'to_json' method.
+    It's also implemeted in Web::ChromeLogger.
+
+0.03 2014-03-28T01:10:23Z
+
+    - Fixed dependencies.
+
+0.02 2014-03-28T00:42:18Z
+
+    - Better POD markup.
+
+0.01 2014-03-28T00:38:24Z
+
+    - original version
+

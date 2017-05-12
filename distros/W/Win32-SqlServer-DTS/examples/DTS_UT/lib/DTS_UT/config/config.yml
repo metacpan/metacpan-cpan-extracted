@@ -1,0 +1,6 @@
+templates_path: C:/Perl/site/lib/DTS_UT/View
+index_template: index.tmpl
+error_template: error.tmpl
+result_template: test_result.tmpl
+ut_config: C:/Perl/site/lib/DTS_UT/config/ut_config.yml
+temp_files_path: C:/temp

@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WebService/PlayaEvents.pm
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Convert from and to *.xls, *.csv using Win32::OLE ",
+   "author" : [
+      "Klaus Eichner <klaus03@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Win32-Scsv",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Copy" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Win32::File" : "0",
+            "Win32::OLE" : "0",
+            "Win32::OLE::Const" : "0",
+            "Win32::OLE::Variant" : "0",
+            "Win32::VBScript" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/klaus03/Win32-Scsv",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/klaus03/Win32-Scsv.git",
+         "web" : "https://github.com/klaus03/Win32-Scsv"
+      }
+   },
+   "version" : "0.39"
+}
+

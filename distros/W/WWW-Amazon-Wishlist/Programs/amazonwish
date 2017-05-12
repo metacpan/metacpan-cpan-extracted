@@ -1,0 +1,286 @@
+#!perl -w -- -*- cperl -*-
+#line 2
+#
+# Grab all the values from your Amazon Wish list
+# and then print it out - surprisingly scary (at
+# least in my case, it came out over a grand)
+#
+# copyright (c) Simon Wistow <simon@thegestalt.org>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This software is under no warranty and will
+# probably destroy your wish list, kill your friends,
+# burn your house, and bring about the apocalypse
+
+# v1.31 fixed an unescaped @ sign in the here doc
+# v1.3  changed to use my shiny new WWW::Amazon::Wishlist module
+# v1.21 fixed number formatting bug (thanks to 'Evil' Dave Cantrell)
+# v1.2  fixes bug in grabbing stuff from .co.uk
+# v1.1  adds ability to grab everything from multipage wishlists
+
+use strict;
+use LWP::UserAgent;
+use Getopt::Long;
+use WWW::Amazon::Wishlist qw(get_list COM UK);
+
+our
+$VERSION = do { my @r = (q$Revision: 2.6 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+
+# initialise the total
+my $total = 0;
+
+# defined where the resource file is
+my $res  = "$ENV{HOME}/.amazon_wish";
+
+# set up some variables
+my $uk     = 0;
+my $suffix = 'com';
+my $match  = '\$';
+my $symbol = '$';
+my $force  = 0;
+my $save   = 0;
+my $help   = 0;
+my $verbose = 0;
+my $id;
+
+my $opt_version;
+die unless GetOptions(
+                      'uk' => \$uk,
+                      'id=s' => \$id,
+                      'force' => \$force,
+                      'save' => \$save,
+                      'help' => \$help,
+                      'verbose' => \$verbose,
+                      'version',
+                      );
+if ($opt_version)
+  {
+  print STDOUT qq{$0 version $VERSION\n};
+  exit 0;
+  } # if
+if ($help)
+  {
+  my $name;
+  ($name = $0) =~ s!^.*[\\/]!!;
+  print STDOUT << "ENDOFHELP";
+% $name  [-uk] [-id ID] [-force] [-save] [-verbose] [-help]
+-uk      : get values from amazon.co.uk (default is .com)
+-id      : your amazon wish list id (it's the last bit of the URL after /wishlist/)
+-force   : don't look up values from the resource file
+-save    : save these values to the resource files
+-help    : print this message
+-verbose : print out all the titles, authors, price and type as well as totalling it all up
+ 
+the first time you run the script you must supply the values
+but after that it will save them in .amazon_wish in your home directory.
+ 
+You can overide the resource file by using -force option or the
+-save option (which will save the new values into the resource file).
+ 
+So ...
+ 
+% $name -uk -id yakyakyak
+£100\.00
+ 
+% $name
+£100\.00
+ 
+% $name -id barbarbar -force
+\$111\.00
+ 
+% $name
+£100\.00
+ 
+% $name -id barbarbar -save
+\$111\.00
+ 
+% $name
+\$111\.00
+ 
+Finding Your Amazon ID
+ 
+The best way to do this is to search for your own wishlist in the search tools.
+ 
+Searching for mine (simon\@twoshortplanks.com) on amazon.com takes me to the URL
+ 
+   http://www.amazon.com/exec/obidos/wishlist/2EAJG83WS7YZM/ 
+ 
+there's some more cruft after that last string of numbers and letters but it's the
+ 
+   2EAJG83WS7YZM
+ 
+bit that's important.
+ 
+Doing the same for amazon.co.uk is just as easy.
+ENDOFHELP
+
+  exit 0;
+  } # if
+
+# Check to see if we've already stored the settings or we're forcing 
+if (-e $res && !$force && !$save)
+  {
+  open FILE, $res || die "Couldn't open the resource file '$res' for reading : $!\n";
+  # grab all the value
+  while (<FILE>)
+    {
+    chomp;
+    my ($key, $value) =split /\s*=\s*/;
+    if ($key =~ /\s*uk\s*$/)
+      {
+      $uk = $value;
+      }
+    elsif ($key =~ /\s*id\s*$/)
+      {
+      $id = $value;
+      $id =~ s/^\s*([^\s]+)\s*$/$1/;
+      }
+    } # while
+  close FILE;
+  } # if
+
+# check to see we're valid
+die "You haven't defined an id\n" unless (defined $id);
+
+# if it's a uk version update the variables
+if ($uk)
+  {
+  $suffix = "co.uk";
+  $match  = "&pound;";
+  $symbol = "£";
+  } # if
+
+# and write out to our resource file
+unless (-e $res && !$save)
+  {
+  open FILE, ">$res" || die "Couldn't open the resource file '$res' for writing : $!\n";
+  print FILE "id = $id\nuk = $uk\n";
+  close FILE;
+  } # unless
+
+my $iBooks = 0;
+foreach my $bookref (get_list ($id,  $uk))
+  {
+  my %book = %{$bookref};
+  $book{'price'} =~ s/[^.\d]//g;
+  $book{price} = 0 if ($book{price} eq q{});
+  if ($verbose)
+    {
+    printf STDOUT (q{'%s' by %s (%s%s)},
+                   $book{'title'}, $book{'author'}, $symbol, $book{'price'});
+    printf STDOUT (q{ [%s]}, $book{'type'}) if defined $book{'type'};
+    print STDOUT "\n";
+    } # if
+  $total += $book{'price'};
+  $iBooks++;
+  } # foreach
+if ($verbose)
+  {
+  print STDOUT "------------------------\n";
+  print STDOUT "Total $iBooks items\n";
+  print STDOUT "------------------------\n";
+  } # if
+
+# dump
+print STDOUT sprintf("%s%.2f\n", $symbol, $total);
+
+# and exit 
+exit 0;
+
+
+=pod
+
+=head1 DESCRIPTION 
+
+amazonwish - goes and grabs your amazon.(co.uk|com) wishlist and totals it up for you
+
+=head1 USAGE 
+
+-uk     : get values from amazon.co.uk (default is .com)
+
+-id     : your amazon wish list id (it's the last bit of the URL after /wishlist/)
+
+-force   : don't look up values from the resource file
+
+-save    : save these values to the resource files
+
+-help    : print this message
+
+-verbose : print out all the titles, authors, price and type as well as totalling it all up
+
+the first time you run the script you must supply the values
+but after that it will save them in .amazon_wish in your
+home directory.
+
+You can overide the resource file by using -force option or the    
+-save option (which will save the new values into the resource
+file).
+
+So ...
+
+% amazonwish -uk -id yakyakyak
+
+£100.00
+
+% amazonwish
+
+£100.00
+
+% amazonwish -id barbarbar -force
+
+$111.00
+
+% amazonwish
+
+£100.00
+
+% amazonwish -id barbarbar -save\n
+
+$111.00
+
+% amazonwish
+
+$111.00
+
+=head1 FINDING YOUR AMAZON ID
+
+The best way to do this is to search for your own wishlist in the search tools.
+
+Searching for mine (simon@twoshortplanks.com) on amazon.com takes me to the URL
+
+   http://www.amazon.com/exec/obidos/wishlist/2EAJG83WS7YZM/ 
+ 
+there's some more cruft after that last string of numbers and letters but it's the
+
+   2EAJG83WS7YZM
+   
+bit that's important.
+
+Doing the same for amazon.co.uk is just as easy.
+
+
+=head1 SHOWING YOUR APPRECIATION
+
+There was a thread on london.pm mailing list about working in a vacumn - that it was a bit depressing to keep writing
+modules but never get any feedback. So, if you use and like this module then please send me an email and make my day. 
+All it takes is a few little bytes.
+
+Either that or you have the adress of my Amazon Wishlist, it's huge, buy something for me off it :)
+
+=head1 COPYING
+
+Copyright (c) 2001 Simon Wistow
+
+Distributed under the same terms as Perl itself.
+
+This software is under no warranty and will probably destroy your wish list, kill your friends, burn your house and bring about the apocalypse
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=cut

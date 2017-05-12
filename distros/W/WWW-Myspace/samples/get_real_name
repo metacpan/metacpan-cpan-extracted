@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w -I../lib
+# real_name friendID
+# Prints the friend's real name
+#
+# Example:
+# real_name 12345
+
+use WWW::Myspace;
+
+my $myspace = new WWW::Myspace( auto_login => 0 );
+
+if ( my $name = $myspace->get_real_name( @ARGV ) ) {
+    print "Real name: " . $name . "\n";
+} else {
+    print "Couldn't find mention of their name on their profile\n";
+}
+
+die $myspace->error if $myspace->error;

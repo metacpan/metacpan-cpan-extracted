@@ -1,0 +1,55 @@
+{
+   "abstract" : "yet another mixi scraper",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Mixi-Scraper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : 0,
+            "Exporter" : 0,
+            "Module::Find" : 0,
+            "String::CamelCase" : 0,
+            "Test::UseAllModules" : "0.09",
+            "Time::HiRes" : 0,
+            "URI" : 0,
+            "URI::QueryParam" : 0,
+            "WWW::Mechanize" : "1.50",
+            "Web::Scraper" : "0.17"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/charsbar/www-mixi-scraper/"
+      }
+   },
+   "version" : "0.34"
+}

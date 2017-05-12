@@ -1,0 +1,26 @@
+Things TODO for WWW::Velib
+
+Allow weather images to be downloaded and cached to build up a local
+repository of weather icons.
+
+Download last 2 days/1, 2 or 3 weeks details.
+
+Download account information (name, date, CP, etc)
+
+Decide on myaccount/get_myaccount, and multiple months.
+
+Remove eg/station (merge into eg/velib)
+
+Search for open/not open stations
+
+Reduce size of eg/data/*
+
+Diff two maps
+
+Search stations by like_name, like_address
+
+Velib trips: return DateTime objects if DateTime is installed
+(override via a package var)?
+
+Velib trip: return average speed (need a map, to obtain geographic
+coordinates).

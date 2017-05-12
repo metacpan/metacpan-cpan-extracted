@@ -1,0 +1,7 @@
+Revision history for Perl extension WebService::Lingr
+
+  0.02  Mon Jan 29 01:28:52 PST 2007
+        - Fixed method mapping to support camelCase methods
+
+  0.01  Sun Jan 28 19:11:29 2007
+        - original version

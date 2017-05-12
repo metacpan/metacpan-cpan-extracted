@@ -1,0 +1,39 @@
+Revision history for WWW-Lengthen
+
+0.09 2016/10/04
+  - added a support for https-urls (with a patch by Kivanc Yazan)
+
+0.08 2012/02/18
+  - disabled several dead or unreliable services
+  - added several redirect-only services including t.co (twitter)
+    and fb.me (facebook)
+  - supports lengthening a shortened url of a shortened url of ...
+
+0.07 2009/04/14
+  - added is.gd, bit.ly, enabled shorl, and disabled icanhaz, urltea
+  - added several services WWW::Shorten supports, and marked them
+    as dead
+
+0.06 2008/05/22
+  - added icanhaz.com support
+  - live test failed when no extra library found.
+
+0.05 2008/03/20
+  - fixed pod glitches
+  - no significant code changes
+
+0.04 2008/03/20
+  - added "snurl" support
+  - bumped up the version requirement of Test::UseAllModules
+
+0.03 2008/03/05
+  - hide t_live::urllist from PAUSE (it's just for tests)
+
+0.02 2008/03/05
+  - added "haojp" support
+  - listed supported services in the pod
+  - ::Cached uses better keys to get/set
+  - refined live tests
+
+0.01 2007/12/27
+  - initial release

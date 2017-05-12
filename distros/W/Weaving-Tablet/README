@@ -1,0 +1,35 @@
+Weaving/Tablet version 0.8
+==========================
+
+Weaving::Tablet provides an object-oriented tablet weaving simulation
+for four-holed tablets with quarter turns and idling tablets. This is
+intended to be the computational guts of a GUI for designing patterns.
+A Tk user interface is provided as Weaving::Tablet::Tk.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+For the truly lazy (like me), the test script for the Tk interface
+starts it up. Thus, 'make test' suffices to use the design tool.
+
+Note also a number of pattern files in the Tk directory. You get my
+miscellaneous cruft along with the code.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk for the Tk user interface
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 1999-2002 Michael J. Houghton.
+All rights reserved.
+
+This software may be used under the same terms as Perl itself.

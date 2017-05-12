@@ -1,0 +1,10 @@
+Changes
+example/wwwflatten
+lib/WWW/Flatten.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+readme.md
+t/flatten_partial.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

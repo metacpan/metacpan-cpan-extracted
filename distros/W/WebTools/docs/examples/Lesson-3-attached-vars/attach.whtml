@@ -1,0 +1,74 @@
+<HTML>
+<style type="text/css">
+<!--
+.myTABLE {
+	background : #99FFCC;
+		border : 2px solid #9900CC;
+		font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size : 10px;
+		}
+INPUT {
+	background-color : #0099FF;
+	border-bottom-width : thin;
+	border-left-width : 1px;
+	border-style : double;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color : White;
+}
+
+-->
+</style>
+<!-- PERL: Hide Perl`s script
+<?perl
+
+Header(type=>"content", val=>'text/html; charset=Windows-1251');
+
+if ($action eq '')
+ {
+?>
+//-->
+<body bgcolor="#FFFFFF" text="#666666" link="#0033FF" vlink="#00FFFF" alink="#CC3366" leftmargin="10" topmargin="10" marginwidth="0" marginheight="0">
+Hello, you are on the start page of our variable attaching example. <BR>
+Please, fill out the form below to test the example... <BR>
+
+<FORM name="f1" METHOD="POST" ACTION="/cgi-bin/webtools/process.cgi?file=attach/attach.html">
+  <TABLE class="myTABLE" BORDER=0 cellpadding="5" cellspacing="5">
+    <TR> 
+      <TD> <b>User Name</b> </TD>
+      <TD> 
+        <INPUT TYPE="TEXT" NAME="visitor_name">
+      </TD>
+    </TR>
+  </TABLE> 
+<script language="JavaScript">
+ document.f1.visitor_name.focus();
+</script>
+<table width="255" border="0" cellspacing="5" cellpadding="5">
+  <tr>
+    <td valign="middle"> 
+      <div align="center"> 
+        <input type="HIDDEN" value="1" name="action">
+        <input type="SUBMIT" value="Log in" name="SUBMIT">
+      </div>
+    </td>
+  </tr>
+</table>
+</FORM>
+<!-- PERL: Hide Perl`s script
+<?perl 
+ }
+ if ($action eq '1')
+ {
+  print "Hello <B>$visitor_name</B> nice to meet you here!"; 
+  attach_var('visitor_name',$visitor_name);
+  print '<A HREF="/cgi-bin/webtools/process.cgi?file=attach/attach.html&action=2">'."Log out $visitor_name</A>";
+ }
+ if ($action eq '2')
+ {
+  print "<B>$visitor_name</B> successfully passed the exaple test! [ logged out ]";
+  detach_var('visitor_name');
+ }
+ ?>
+ //-->
+</body>
+</HTML>

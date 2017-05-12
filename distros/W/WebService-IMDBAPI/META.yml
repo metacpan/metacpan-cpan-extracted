@@ -1,0 +1,31 @@
+---
+abstract: 'Interface to http://imdbapi.org/'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Online: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-IMDBAPI
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  Object::Tiny: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-WebService-IMDBAPI/issues
+  homepage: https://github.com/andrewrjones/perl5-WebService-IMDBAPI
+  repository: https://github.com/andrewrjones/perl5-WebService-IMDBAPI.git
+version: 1.130150

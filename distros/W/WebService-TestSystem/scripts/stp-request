@@ -1,0 +1,336 @@
+#!/usr/bin/perl -w
+
+# Requests a test run from the system
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use SOAP::Lite;
+use XML::Parser;
+use Data::Dumper;
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_project;
+our $opt_priority     = 'low';
+our $opt_resource     = 'http://www.osdl.org/WebService/TestSystem';
+our $opt_server       = 'http://localhost:8081/';
+our $opt_debug        = 0;
+our $opt_user         = $ENV{'username'};
+
+# Handle commandline options
+warn "Parsing cmdline options\n" if ($opt_debug>3);
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           'version|V'    => \$opt_version,
+           'help|h'       => \$opt_help,
+           'man'          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+           'project|p=s'  => \$opt_project,
+           'debug=i'      => \$opt_debug,
+           'user|u'       => \$opt_user
+           );
+our $command = shift @ARGV;
+
+# Handle -V or --version
+if ($opt_version) {
+    print '$0: $Revision: 1.5 $', "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+pod2usage(-verbose => 1, -exitstatus => 0) if (! $command);
+
+exit main();
+
+
+sub main {
+    # Connect to the server
+    my $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the test service object
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    my $testsys = $response->result;
+
+    if (! $testsys) {
+        die "Could not create testsys object\n";
+    }
+
+    if ($command eq 'add') {
+	# Parse and send test requests
+	foreach my $filename (@ARGV) {
+	    if (! -f $filename) {
+		warn "'$filename' is not a valid file.  Skipping.\n";
+		next;
+	    }
+	    foreach my $request (parse_input_xml($filename)) {
+		warn "Sending request\n" if $opt_debug>3;
+		my $response = $soap->request_test($testsys, $request);
+		soap_assert($response);
+		print "Test request id:  " . $response->result . "\n";
+	    }
+	}
+
+    } elsif ($command eq 'cancel') {
+	foreach my $id (@ARGV) {
+	    if ($id !~ /^\d+$/) {
+		warn "'$id' is not a valid test ID number.  Skipping...\n";
+		next;
+	    }
+	    my $response = $soap->cancel_test_request($testsys, $id);
+	    soap_assert($response);
+	    print "$id: " . $response->result . "\n";
+	}
+
+    } elsif ($command eq 'get') {
+	my $id = shift @ARGV;
+
+	my $response = $soap->get_test_request($id);
+	print "$id:\n";
+	die "Unimplemented command '$command'\n";
+
+
+    } elsif ($command eq 'change') {
+	my $id = shift @ARGV;
+	my $filename = shift @ARGV;
+
+	my $request = parse_input_xml($filename);
+
+	my $response = $soap->change_test_request($testsys, $id, $request);
+	soap_assert($response);
+	print "$id: " . $response->result . "\n";
+
+   } else {
+	die "Unknown command '$command'\n";
+    }
+    exit 0;
+}
+
+
+########################################################################
+# Parse the test request info
+sub parse_input_xml {
+    my $filename = shift || return undef;
+    my $patch_ids = shift;
+
+    my @requests;
+    my $parser = XML::Parser->new(ErrorContext => 2, Style => "Tree");
+    my $xso = XML::SimpleObject->new($parser->parsefile( $filename ) );
+
+    foreach my $elem ( $xso->child("config")->children("host")) {
+        foreach my $telem ( $elem->children( "test" ) ) {
+            foreach my $run ( $telem->children( "run" ) ) {
+                my %request = 
+                    (
+                     d_creator_id     => $opt_user,
+                     d_distro_tag_id  => $telem->child("distro")->attribute("id"),
+                     d_test_id        => $telem->attribute("id"),
+                     d_project_id     => $opt_project,
+                     d_host_type_id   => $elem->attribute("id"),
+                     d_test_priority  => $opt_priority
+                     );
+
+                if ( $run->child("lilo") ) {
+                    $request{'d_lilo'} = $run->child("lilo")->value;
+                } else {
+                    $request{'d_lilo'} = '';
+                }
+                if ( $run->child("env") ) {
+                    $request{'d_environment'} = $run->child("env")->value;
+                } else {
+                    $request{'d_environment'} = 'DEFAULT';
+                }
+                if ( $run->child("sysctl") ) {
+                    $request{'d_sysctl'} = $run->child("sysctl")->value;
+                } else {
+                    $request{'d_sysctl'} = 'DEFAULT';
+                }
+                if ( $run->children("param") ) {
+                    foreach my $pelem ( $run->children("param") ) {
+                        $request{'d_parameter'}->{$pelem->attribute("name")} =
+                            $pelem->value;
+                    }
+                }
+		if ( $run->children("app" ) ) {
+                    my $app_it = 0;
+                    foreach my $app ( $run->children("app") ) {
+                        push @{$request{'d_component_patch_id'}},
+                        [ patch_type => $app->attribute("PLM") ];
+                    }
+                }
+                
+                # TODO:  Convert test into test_id, etc.
+                
+                # Flag the request for submission
+                $request{d_store} = 1;
+                
+                print Dumper(\%request);
+
+                push @requests, \%request;
+            }
+        }
+        print "Host " .  $elem->attribute("name") . " finished\n";
+    }
+    return \@requests;
+}
+
+# Convenience function to create the soap instance
+sub create_soap_instance {
+    my $resource = shift || return undef;
+    my $server = shift || return undef;
+
+    my $soap = SOAP::Lite
+        -> uri($resource)
+        -> proxy($server,
+                 options => {compress_threshold => 10000});
+    return $soap;
+};
+
+# Convenience function to print out any errors encountered in a soap call
+# and exit.
+sub soap_assert {
+    my $response = shift;
+    if ($response->fault) {
+        print join ', ',
+        $response->faultcode,
+        $response->faultstring;
+        return undef;
+    }
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+stp-request - submits a test request to the system
+
+=head1 SYNOPSIS
+
+stp-request [options] add request.xml [request2.xml ...]
+
+stp-request [options] cancel ID [ID ...]
+
+stp-request [options] get ID
+
+stp-request [options] change ID request.xml
+
+
+=head1 DESCRIPTION
+
+B<stp-request> allows performing various operations on the test queue.
+The user can add, get, cancel, or change test runs from the commandline.
+
+Tests are added or edited via a test request input file using the 'add'
+command.  The user then submits the test request to the testing service
+to be queued and run.
+
+Via the 'cancel' command, the user may be able to cancel the request.
+Generally, only queued tests can be canceled.  A user can only cancel
+their own tests.
+
+The 'get' command causes the given test request number to be retrieved.
+This retrieves the test request in the correct format for re-submitting
+the test.
+
+The 'change' command enables making alterations to the test request.
+This can only be used on queued test requests.  Once the test has begun
+running, no changes are allowed.
+
+=head1 FILE FORMAT
+
+TBD
+
+=head1 CUSTOMIZED TEST REQUEST PROCESSES
+
+Hopefully, your needs are straightforward enough that this script can
+be used as-is for requesting tests.
+
+However, in the real world you may want to do something fancier.  You
+can probably get a lot of mileage out of wrapping this script with a
+shell script to automate the generation of the test request files.
+But if this is not enough, you are quite encouraged to hack up this 
+script to suit your fancy.
+
+Test requests are submitted to the server as a hash map data structure
+through SOAP.  The format of this data structure is documented in
+WebService::TestSystem::Request.  Or if you're feeling lazy, just run
+Data::Dumper on the output of parse_input_xml() and inspect it.  In
+brief, it consists of some general data items such as the test to run
+and who you are, plus a list of software (including patched software) to
+be installed, plus any special commandline parameters to pass to the
+test code.
+
+If you wish to generate a large queue of test requests, you may want to
+code up some loops to generate and submit these request structures
+directly.  Look at the 'add' command handler for how to send these to
+the SOAP server.
+
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the WebService::TestSystem server to connect to.  By default,
+it uses 'http://localhost'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.osdl.org/WebService/TestSystem'.  Users should not typically
+need to alter this setting.
+
+=item B<debug> = I<NUM>
+
+Print debug messages.  The larger the number, the more verbose the debug
+messages will be (typical range is 0-5).
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@osdl.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Open Source Development Labs
+All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.5 $
+
+=cut
+
+
+

@@ -1,0 +1,111 @@
+Revision history for Perl extension Win32::Console::ANSI
+
+1.10 2015/09/06
+  - added \e[39m and \e[49m esc sequences for resetting foreground and 
+    background colors to default (RT#106872).
+    Thanks to Harrie Huzen.
+
+1.09 2015/06/16
+  - changed the order of included file (RT#92382)
+    Thanks to J. Mash.
+  - Tests are now independent of the default settings of the user for CMD
+    (RT#105257 and RT#105260) Thanks to Ralf Neubauer.
+
+1.08 2014/01/13
+  - added #define PERL_NO_GET_CONTEXT to XS code, for efficiency RT#92071
+    Thanks to Daniel Dragan.
+
+1.07 2014/01/11
+  - Fix a bug about background/foreground colors.
+    (thanks to Gilles Maisonneuve to report this bug).
+
+1.06 2013/09/10
+  - Added two DEC private esc seq DECTCEM: hide/show cursor RT#87992
+    (Code adapted from the ansicon program. Thanks to Jason Hood.)
+  - Added auxiliary function CursorSize to Get/Set cursor size.
+  - update doc.
+
+1.05 2013/08/05
+  - Use DWORD_PTR for pointer arithmetics RT#46139 -fixed
+  - typo fix RT#86748 -fixed
+  - Default Initialisation of background/foreground color RT#86089
+    (thanks to Jörg Kreuzberger for the patch)
+
+1.04 2009/03/22
+  - New modification of the xs: the module can now be compiled under Windows 7
+    (32 and 64 bits, with Perl 32 and 64).
+
+1.03  2009/03/07
+  - Modifications of the xs so that the module can be compiled under
+    Windows x64 (with Perl 64bits). (thanks to Sisyphus)
+
+1.02  2009/02/28
+  - Tests rewritten using Win32::Pipe for IPC.
+  - Adding dependencies in the Makefile (thanks to Dominique Goncalves).
+  - bug with Windows Vista64 + SP1 (RT#43592 and RT#43639) -fixed
+    (thanks to Sisyphus)
+
+1.01  2008/07/07
+  Just added some auxiliary functions
+  - ShowConsoleWindow: changes the console window's show state (hide, max, min...),
+  - MinimizeAll: minimizes all the windows on the desktop,
+  - SetCloseButton: enables/disables the close button [x] of the console window,
+  - SetConsoleFullScreen: sets the console in full-screen or windowed mode (WinXP/Vista)
+  - SetMonitorState: sets the monitor state (on/off/standby).
+
+1.00  2005/07/03
+  The module has been rewritten in C.
+  By hooking the WriteFile API function in all the modules loaded by the
+  script, it is possible to interpret the escape sequences just before they
+  are written in the console.
+  This suppresses several previous versions limitations:
+  - no tied handles (we can duplicate STDOUT or STDERR as usual and the
+    module works now with IPC::Open2 and IPC::Open3)
+  - the bug with the join method is fixed. We can use threads.
+  - The conversion of the Windows codepage to the console codepage (ANSI to
+    OEM conversion) is done by the internal Windows functions. The
+    Encode module is not used anymore (the exe made with PAR are smaller).
+  - The module is smaller and faster.
+
+0.07  2005/01/02
+  - it's now possible to redirect STDERR or STDOUT to a file.
+    Request from Phoeares Tsai.
+  - added two auxiliary functions 'Title' and 'Cursor'.
+  - improved the doc (limitations)
+
+0.06  2004/09/20
+  - bug: with \e[#K, if the cursor is on the last line of the console,
+         a new line is added. -fixed.
+    Thanks to Eric Zmiro for reporting this bug.
+  - STDIN and STDERR are tied only if there are tty
+
+0.05  2004/02/26
+  - bug: the variable $, has no effect on print! -fixed.
+  - the module takes now the pragma -w and (use warnings) into account.
+  - bug: print '0' print nothing! -fixed
+    Thanks to Daniel Schoene to report this bug.
+
+0.04  2003/10/09
+  - bug: the printf function doesn't work as expected! -fixed.
+    Thanks to Mark A. Rudolph to report this bug.
+
+0.03  2003/07/21
+  - bug: print $s; with $s undef gives two error messages.
+    fixed: now the module croaks.
+  - bug: print "\e[m" x 100; dies with error message:
+    Deep recursion on subroutine "Win32::Console::ANSI::IO::_PrintString"
+    fixed: the routine is now iterative, not recursive.
+  - bug: \e(K now restore the original code page.
+  - fixed some typo in doc and test.pl
+
+0.02  2003/07/13
+  - module renamed Win32::Console::ANSI for the CPAN (brian d foy)
+  - this module use now the module Encode for codepages conversion.
+    Thanks to Benjamin Goldberg for the suggestion.
+  - added more escape sequences for compatibility with Term::ANSIScreen.
+    Thanks to Autrijus Tang for the encouragements.
+  - fixed a bug about format. Thanks to Josh Spohr to report it.
+
+0.01  2002/11/01
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Win32::ANSIConsole version 0.01 beta

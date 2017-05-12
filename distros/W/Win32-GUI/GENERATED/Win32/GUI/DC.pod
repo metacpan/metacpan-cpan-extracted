@@ -1,0 +1,860 @@
+
+=head1 NAME
+
+Win32::GUI::DC - Work with a Window's DC (Drawing Context)
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(WINDOW | DRIVER, DEVICE)>
+
+Creates a new DC object; the first form (WINDOW is a Win32::GUI object)
+gets the DC for the specified window (can also be called as
+WINDOW->GetDC). The second form creates a DC for the specified DEVICE;
+actually, the only supported DRIVER is the display driver (eg. the
+screen). To get the DC for the entire screen use:
+
+    $Screen = new Win32::GUI::DC("DISPLAY");
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AbortPath
+
+B<AbortPath()>
+
+Closes and discards any paths.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Arc
+
+B<Arc(X, Y, RADIUS, START, SWEEP)>
+
+Draws a line segment and an arc.
+The line segment is drawn from the current position to the beginning
+of the arc. The arc is drawn along the perimeter of a circle with the
+given radius and center. The length of the arc is defined by the given
+start and sweep angles.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ArcDirection
+
+B<ArcDirection([DIRECTION])>
+
+Gets or sets the drawing direction to be used for arc and rectangle
+functions.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ArcTo
+
+B<ArcTo(LEFT, TOP, RIGHT, BOTTOM, XRADIALF, YRADIALF, XRADIALS, YRADIALS)>
+
+Draws an elliptical arc.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackColor
+
+B<BackColor([COLOR])>
+
+Gets or sets the background color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BeginPath
+
+B<BeginPath()>
+
+Opens a path bracket.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BitBlt
+
+B<BitBlt(XD, YD, WD, HD, SOURCE, XS, YS, [ROP=SRCCOPY])>
+
+Performs a bit-block transfer of the color data corresponding to a
+rectangle of pixels from the specified source device context into
+a destination device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BkMode
+
+B<BkMode([MODE])>
+
+Gets or sets the current background mix mode for the DC;
+possible values are:
+
+ 1 TRANSPARENT
+ 2 OPAQUE
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CancelDC
+
+B<CancelDC()>
+
+Cancels any pending operation on the device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Chord
+
+B<Chord(LEFT, TOP, RIGHT, BOTTOM, XF, YF, XS, YS)>
+
+Draws a chord (a region bounded by the intersection of an ellipse and
+a line segment, called a "secant"). The chord is outlined by using the
+current pen and filled by using the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Circle
+
+B<Circle(X, Y, (WIDTH, HEIGHT | RADIUS))>
+
+Draws a circle or an ellipse; X, Y, RADIUS specifies the center point
+and the radius of the circle, while X, Y, WIDTH, HEIGHT specifies the
+center point and the size of the ellipse.
+Returns nonzero if succesful, zero on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseFigure
+
+B<CloseFigure()>
+
+Closes an open figure in a path.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateCompatibleBitmap
+
+B<CreateCompatibleBitmap(WIDTH, HEIGHT)>
+
+Creates a bitmap compatible with the device that is associated with
+the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateCompatibleDC
+
+B<CreateCompatibleDC()>
+
+Creates a memory device context (DC) compatible with the specified device.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateDC
+
+B<CreateDC(DRIVER, DEVICE)>
+
+Used by new Win32::GUI::DC.
+Creates a device context (DC) for a device by using the specified name.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteDC
+
+B<DeleteDC(HANDLE)>
+
+Deletes the specified device context
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteObject
+
+B<DeleteObject(OBJECT)>
+
+Deletes a logical pen, brush, font, bitmap, region, or palette, freeing
+all system resources associated with the object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawEdge
+
+B<DrawEdge(LEFT, TOP, RIGHT, BOTTOM, [EDGE=EDGE_RAISE, [FLAGS=BF_RECT]])>
+
+Draws one or more edges of rectangle
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawFocusRect
+
+B<DrawFocusRect(LEFT, TOP, RIGHT, BOTTOM)>
+
+Draws a rectangle in the style used to indicate that the rectangle has
+the focus.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawFrameControl
+
+B<DrawFrameControl(LEFT, TOP, RIGHT, BOTTOM, TYPE, STATE)>
+
+Draws a frame control of the specified type and style.
+
+If STATE includes DFCS_ADJUSTRECT, then the input parameters
+LEFT, TOP, RIGHT, BOTTOM are ajusted to exclude the surrounding edge
+of the push button. If any of LEFT, TOP, RIGHT, BOTTOM are readonly,
+then DFCS_ADJUSTRECT will be ignored for the readonly parameters.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawIcon
+
+B<DrawIcon(Icon,X, Y)>
+
+The DrawIcon method draws an icon or cursor into the specified
+device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawText
+
+B<DrawText(STRING, LEFT, TOP, RIGHT, BOTTOM, [FORMAT=DT_LEFT|DT_SINGLELINE|DT_TOP])>
+
+Draws formatted text in the specified rectangle. It formats the text
+according to the specified method.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Ellipse
+
+B<Ellipse(LEFT, TOP, RIGHT, BOTTOM)>
+
+Draws an ellipse.
+The center of the ellipse is the center of the specified bounding
+rectangle. The ellipse is outlined by using the current pen and is
+filled by using the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EndPath
+
+B<EndPath()>
+
+Closes a path bracket and selects the path defined by the bracket.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ExtFloodFill
+
+B<ExtFloodFill(X, Y, COLOR, [TYPE=FLOODFILLSURFACE])>
+
+Fills an area of the display surface with the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Fill
+
+B<Fill(X, Y, [COLOR], [TYPE])>
+
+Fills an area of the display surface.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FillPath
+
+B<FillPath()>
+
+Closes any open figures in the current path and fills the path's interior by
+using the current brush and polygon-filling mode.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FillRect
+
+B<FillRect(LEFT, TOP, RIGHT, BOTTOM, BRUSH)>
+
+Fills a rectangle by using the specified brush.
+This includes the left and top borders, but excludes the right and
+bottom borders of the rectangle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FillRgn
+
+B<FillRgn(Region,Brush)>
+
+The FillRgn function fills a region by using the specified brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FlattenPath
+
+B<FlattenPath()>
+
+Transforms any curves in the path that is selected, turning each curve into a sequence of lines.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FloodFill
+
+B<FloodFill(X, Y, COLOR)>
+
+Fills an area of the display surface with the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FrameRect
+
+B<FrameRect(LEFT, TOP, RIGHT, BOTTOM, BRUSH)>
+
+Draws a border around the specified rectangle by using the specified
+brush. The width and height of the border are always one logical unit.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FrameRgn
+
+B<FrameRgn(Region,Brush,Width,Height)>
+
+The FrameRgn function draws a border around the specified region
+by using the specified brush.
+
+The Width Specifies the width of vertical brush strokes.
+The Height Specifies the height of horizontal brush strokes.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetBrushOrgEx
+
+B<GetBrushOrgEx(GetBrushOrgEx)>
+
+The GetBrushOrgEx method retrieves the current brush origin (x,y)
+for the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurrentObject
+
+B<GetCurrentObject(HANDLE,OBJECTTYPE)>
+
+Obtains a handle to a device context's currently selected object of a
+specified type.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDC
+
+B<GetDC(HANDLE)>
+
+Gets a handle to the DC associated with the given window
+(eg. gets an HDC from an HWND).
+Used by new Win32::GUI::DC
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDeviceCaps
+
+B<GetDeviceCaps(HANDLE,INDEX)>
+
+Retrieves device-specific information about a specified device.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMiterLimit
+
+B<GetMiterLimit()>
+
+Returns the miter limit for the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetObjectType
+
+B<GetObjectType(OBJECT)>
+
+Identifies the type of the specified object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPixel
+
+B<GetPixel(X, Y)>
+
+Returns the color of the pixel at X, Y.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetStockObject
+
+B<GetStockObject(TYPEOBJECT)>
+
+Identifies the type of the specified object.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextExtentPoint
+
+B<GetTextExtentPoint(STRING)>
+
+Computes the width and height of the specified string of text.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextFace
+
+B<GetTextFace()>
+
+Retrieves the typeface name of the font that is selected into the
+specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUpdateRect
+
+B<GetUpdateRect([ERASE])>
+
+Returns the rectangle (as a four-element array containing left, top,
+right, bottom coordinates) that needs to be updated.
+If the update region is empty (eg. no need to update, the function
+returns undef).
+The optional ERASE parameter can be set to 1 to force an erase of
+the update region, if there is any; by default, no erase action is
+performed.
+This function is intended to be used in a Paint event;
+see L<Win32::GUI::Graphic::Paint()|Win32::GUI::Graphic/Paint>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GradientFillRectangle
+
+B<GradientFillRectangle(X0, Y0, COLOR0, X1, Y1, COLOR1, X2, Y2, COLOR2,DIRECTION)>
+
+Fills the area of the Rectangle using smooth shading from color0 to color1.
+As a default the smoothing will be horizontal, to specify vertical smoothing pass any
+value as the final parameter.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GradientFillTriangle
+
+B<GradientFillTriangle(X0, Y0, COLOR0, X1, Y1, COLOR1, X2, Y2, COLOR2)>
+
+Fills the area of the triangle using smooth shading from color0 at point
+zero through to the other points.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InvertRect
+
+B<InvertRect(LEFT, TOP, RIGHT, BOTTOM)>
+
+Inverts a rectangle in a window by performing a logical NOT operation
+on the color values for each pixel in the rectangle's interior.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InvertRgn
+
+B<InvertRgn(Region)>
+
+The InvertRgn function inverts the colors in the specified region.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Line
+
+B<Line(X,Y,X1,Y1)>
+
+A combination of MoveTo and LineTo
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LineTo
+
+B<LineTo(X, Y)>
+
+Draws a line from the current drawing position up to, but not including,
+the point specified by X, Y.
+Returns nonzero if succesful, zero on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MapMode
+
+B<MapMode([MODE])>
+
+[TBD]
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MoveTo
+
+B<MoveTo(X, Y)>
+
+Moves the current drawing position to the point specified by X, Y.
+Returns nonzero if succesful, zero on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PaintDesktop
+
+B<PaintDesktop()>
+
+Fills the DC content with the desktop pattern or wallpaper.
+Returns nonzero if succesful, zero on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PaintRgn
+
+B<PaintRgn(Region)>
+
+The PaintRgn function paints the specified region by using the brush
+currently selected into the device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PathToRegion
+
+B<PathToRegion()>
+
+Creates a region from the path that is selected into the specified
+device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Pie
+
+B<Pie(LEFT, TOP, RIGHT, BOTTOM, XF, YF, XS, YS)>
+
+Draws a pie-shaped wedge bounded by the intersection of an ellipse
+and two radials. The pie is outlined by using the current pen and
+filled by using the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PolyBezier
+
+B<PolyBezier(X1, Y1, X2, Y2, X3, Y3, X4, Y4, [ X, Y, ... ])>
+
+Draws one or more Bezier curves.
+The first curve is drawn from the first point to the fourth point by
+using the second and third points as control points.
+Each subsequent curve in the sequence needs exactly three more points:
+the ending point of the previous curve is used as the starting point, the
+next two points in the sequence are control points, and the third is
+the ending point.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PolyBezierTo
+
+B<PolyBezierTo(X1, Y1, X2, Y2, X3, Y3, [ X, Y, ... ])>
+
+Draws cubic Bezier curves.
+The first curve is drawn from the current position to the third point by
+using the first two points as control points. For each subsequent curve,
+the function needs exactly three more points, and uses the ending point
+of the previous curve as the starting point for the next.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Polygon
+
+B<Polygon(X1, Y1, X2, Y2, [ X, Y, ... ])>
+
+Draws a polygon consisting of two or more vertices connected by
+straight lines.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Polyline
+
+B<Polyline(X1, Y1, X2, Y2, [ X, Y, ... ])>
+
+Draws one or more straight lines.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PolylineTo
+
+B<PolylineTo(X1, Y1, [ X, Y, ... ])>
+
+Draws one or more straight lines.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Rectangle
+
+B<Rectangle(LEFT, TOP, RIGHT, BOTTOM)>
+
+Draws a rectangle.
+The rectangle is outlined by using the current pen and filled by
+using the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ReleaseDC
+
+B<ReleaseDC(HWND, HDC)>
+
+Releases a device context (DC), freeing it for use by other applications.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Restore
+
+B<Restore([STATE])>
+
+Restores the state of the DC saved by Save(). STATE can identify a state
+from the saved stack (use the identifier returned by the corresponding
+Save() call) or a negative number that specifies how many steps backwards
+in the stack to recall (eg. -1 recalls the last saved state).
+The default if STATE is not specified is -1.
+Note that the restored state is removed from the stack, and if you restore
+an early one, all the subsequent states will be removed too.
+Returns nonzero if succesful, zero on errors.
+See also L<Save()|Win32::GUI::DC/Save>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RestoreDC
+
+B<RestoreDC([STATE])>
+
+See L<Restore()|Win32::GUI::DC/Restore>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ROP2
+
+B<ROP2([MODE])>
+
+Gets or sets the foreground mix mode of the specified device context.
+The mix mode specifies how the pen or interior color and the color
+already on the screen are combined to yield a new color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RoundRect
+
+B<RoundRect(LEFT, TOP, RIGHT, BOTTOM, WIDTH, HEIGHT)>
+
+Draws a rectangle with rounded corners.
+The rectangle is outlined by using the current pen and filled by using
+the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Save
+
+B<Save()>
+
+Saves the current state of the DC (this means the currently selected
+colors, brushes, pens, drawing modes, etc.) to an internal stack.
+The function returns a number identifying the saved state; this number
+can then be passed to the Restore() function to load it back.
+If the return value is zero, an error occurred.
+See also L<Restore()|Win32::GUI::DC/Restore>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SaveDC
+
+B<SaveDC()>
+
+See L<Save()|Win32::GUI::DC/Save>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectClipRgn
+
+B<SelectClipRgn(Region)>
+
+This method selects a region as the current clipping region for
+the specified device context.
+
+If no region is passed, then this method will remove a
+device-context's clipping region.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectObject
+
+B<SelectObject(OBJECT)>
+
+Selects an object into the specified device context.
+The new object replaces the previous object of the same type.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBrushOrgEx
+
+B<SetBrushOrgEx(X, Y)>
+
+The SetBrushOrgEx method sets the brush origin that GDI assigns to
+the next brush an application selects into the specified device context.
+Returns the (x,y) of the previous brush origin.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMiterLimit
+
+B<SetMiterLimit(FLOAT)>
+
+Sets the limit for the length of miter joins
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetPixel
+
+B<SetPixel(X, Y, [COLOR])>
+
+Sets the pixel at X, Y to the specified COLOR
+(or to the current TextColor() if COLOR is not specified).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTextJustification
+
+B<SetTextJustification(BREAKEXTRA, BREAKCOUNT)>
+
+Specifies the amount of space the system should add to the break
+characters in a string of text
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 StretchBlt
+
+B<StretchBlt(XD, YD, WD, HD, SOURCE, XS, YS, WD, HD, [ROP=SRCCOPY])>
+
+Performs a bit-block transfer of the color data corresponding to a
+rectangle of pixels from the specified source device context into
+a rectangle of pixels in the destination device context, performing
+stretching a necessary.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 StretchBltMode
+
+B<StretchBltMode([MODE])>
+
+Get or Set bitmap stretching mode in the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 StrokeAndFillPath
+
+B<StrokeAndFillPath()>
+
+Closes any open figures in a path, strokes the outline of the path by
+using the current pen, and fills its interior by using the current brush.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 StrokePath
+
+B<StrokePath()>
+
+Renders the specified path by using the current pen.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextAlign
+
+B<TextAlign([ALIGN])>
+
+Set or Get text-alignment setting for the specified device context.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextCharacterExtra
+
+B<TextCharacterExtra([CHAREXTRA])>
+
+Set or Get the intercharacter spacing.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextColor
+
+B<TextColor([COLOR])>
+
+Gets or sets the text color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextOut
+
+B<TextOut(X, Y, TEXT)>
+
+Writes a character string at the specified location, using the
+currently selected font, background color, and text color.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Validate
+
+B<Validate()>
+
+Validates (removes from the update region) the whole DC area.
+This function is intended to be used in a Paint event;
+see L<Win32::GUI::Graphic::Paint()|Win32::GUI::Graphic/Paint>.
+Returns nonzero if succesful, zero on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 WidenPath
+
+B<WidenPath()>
+
+Redefines the current path as the area that would be painted if the path
+were stroked using the pen currently selected into the given device
+context.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

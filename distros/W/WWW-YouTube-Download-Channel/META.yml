@@ -1,0 +1,32 @@
+---
+abstract: 'Downloads all/every/some of the videos from any youtube user channel'
+author:
+  - 'Hernan Lopes - hernanlopes <d0t> gmail ...'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-YouTube-Download-Channel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 0
+  IO::Socket::SSL: 0
+  LWP::Protocol::https: 0
+  Moose: 0
+  Mozilla::CA: 0
+  Perl6::Form: 0
+  Test::Simple: 0.44
+  WWW::Mechanize: 0
+  WWW::YouTube::Download: 0
+  XML::XPath: 0
+  XML::XPath::XMLParser: 0
+version: 0.09

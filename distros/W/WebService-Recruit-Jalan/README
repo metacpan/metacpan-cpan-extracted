@@ -1,0 +1,90 @@
+NAME
+    WebService::Recruit::Jalan - A Interface for Jalan Web Service
+
+SYNOPSIS
+        use WebService::Recruit::Jalan;
+
+        my $jalan = WebService::Recruit::Jalan->new();
+        $jalan->key( 'xxxxxxxxxxxxxx' );
+
+        my $res = $jalan->HotelSearchAdvance( s_area => '260502' );
+        my $list = $res->root->Hotel;
+        foreach my $hotel ( @$list ) {
+            print "HotelID: ",   $hotel->HotelID, "\n";
+            print "HotelName: ", $hotel->HotelName, "\n";
+        }
+
+DESCRIPTION
+    This module is a interface for the Jalan Web Service, produced by
+    Recruit Co., Ltd., Japan. It provides five API methods:
+    "HotelSearchLite", "HotelSearchAdvance", "AreaSearch", "OnsenSearch" and
+    "StockSearch".
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $jalan = WebService::Recruit::Jalan->new();
+
+    This accepts optional parameters.
+
+        my $conf = { key => 'your_auth_key', utf8_flag => 1 };
+        my $jalan = WebService::Recruit::Jalan->new( %$conf );
+
+  key
+    A valid developer key is required to make a request.
+
+        $jalan->key( 'your_auth_key' );
+
+  HotelSearchLite
+    This makes a request for "HotelSearchLite" API. See
+    WebService::Recruit::Jalan::HotelSearchLite for details.
+
+        my $res = $jalan->HotelSearchLite( s_area => '162612' );
+
+  HotelSearchAdvance
+    This makes a request for "HotelSearchAdvance" API. See
+    WebService::Recruit::Jalan::GetLandmark for details.
+
+        my $res = $jalan->HotelSearchAdvance( s_area => '260502' );
+
+  AreaSearch
+    This makes a request for "AreaSearch" API. See
+    WebService::Recruit::Jalan::AreaSearch for details.
+
+        my $res = $jalan->AreaSearch( reg => 15 );
+
+  OnsenSearch
+    This makes a request for "OnsenSearch" API. See
+    WebService::Recruit::Jalan::OnsenSearch for details.
+
+        my $res = $jalan->OnsenSearch( s_area => '141602' );
+
+  StockSearch
+    This makes a request for "StockSearch" API. See
+    WebService::Recruit::Jalan::StockSearch for details.
+
+        my $res = $jalan->StockSearch( lon_jgd => 139.758, lat_jgd => 35.666 );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $jalan->utf8_flag( 1 );
+        $jalan->user_agent( 'Foo-Bar/1.0 ' );
+        $jalan->lwp_useragent( LWP::UserAgent->new() );
+        $jalan->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://jws.jalan.net/
+
+AUTHOR
+    Yusuke Kawasaki <http://www.kawa.net/>
+
+    This module is unofficial and released by the author in person.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Yusuke Kawasaki. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

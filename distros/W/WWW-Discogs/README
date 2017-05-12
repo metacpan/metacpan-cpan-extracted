@@ -1,0 +1,30 @@
+WWW-Discogs version 0.13
+============================
+
+This module will let you connect to discogs.com to gather information
+about artists, albums, and labels.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent, URI, URI::Escape, JSON::XS, NEXT
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Lee Aylward
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

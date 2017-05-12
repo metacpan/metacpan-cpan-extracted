@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-iThenticate-Client.t
+t/WebService-iThenticate-Request.t
+t/WebService-iThenticate-Response.t
+lib/WebService/iThenticate/Client.pm
+lib/WebService/iThenticate/Request.pm
+lib/WebService/iThenticate/Response.pm
+bin/doc_check.pl
+bin/doc_submit.pl
+bin/folder_list.pl
+bin/get_report.pl
+bin/login_check.pl
+bin/tiifa_api_example.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

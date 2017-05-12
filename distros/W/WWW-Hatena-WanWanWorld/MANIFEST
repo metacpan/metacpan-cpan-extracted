@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+t/00_use.t
+lib/WWW/Hatena/Scraper.pm
+lib/WWW/Hatena/WanWanWorld.pm
+META.yml                                 Module meta-data (added by MakeMaker)

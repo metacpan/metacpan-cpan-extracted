@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use 5.014;
+use strict;
+use warnings;
+
+use lib 'lib';
+use WebService::FOAAS::Codegen;
+
+WebService::FOAAS::Codegen->run;
+
+__END__

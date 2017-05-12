@@ -1,0 +1,29 @@
+Sun Sep 23 10:52:37 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * tests for all features which can be tested without a server
+
+Sat Sep 22 10:14:47 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * debug calendar urls
+
+Fri Sep 21 20:51:31 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * fix bugs introduced during documentation, shift toward Date::Format URL strings
+
+Thu Sep 20 18:33:16 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * more documentation
+
+Thu Sep 20 17:04:14 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * more documentation
+
+Wed Sep 19 17:30:21 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * licenses
+
+Wed Sep 19 17:29:54 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * start documentation
+
+Wed Sep 19 16:59:51 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * remember seen events
+
+Wed Aug 22 19:15:14 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * change version name for CPAN
+
+Wed Aug 22 18:53:11 CEST 2007  Mark Jaroski <mark@geekhive.net>
+  * preparations for first release

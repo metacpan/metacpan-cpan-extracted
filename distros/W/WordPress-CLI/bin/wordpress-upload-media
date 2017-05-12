@@ -1,0 +1,446 @@
+#!/usr/bin/perl
+use strict;
+# ABSTRACT= 'upload FILE to wordpress'
+use lib './lib';
+use WordPress::CLI::Base ':all';
+use LEOCHARRE::Basename ':all';
+use vars qw/@FILES $VERSION/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+use Smart::Comments '###';
+
+use LEOCHARRE::Strings ':all';
+use Getopt::Std::Strict 'ht:d:D:u:p:x:vnC:k';
+$opt_h and print STDERR usage() and exit;
+$opt_v and print "$VERSION\n" and exit;
+
+# 1376
+
+sub usage {q{wordpres-upload-media [OPTION].. FILE..
+Upload FILE to wordpress.
+
+   -d path     simple text/html file containing content description
+   -h          help
+   -t string   title !
+   -d path     path to text or html file holding description text, or text itself !
+   -D string   date !
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -C path     load username, password, and proxy from this config file
+   -k          clean description text, if any
+   -n          don't post, just test
+
+* required
+! experimental
+
+Try 'man wordpress-upload-media' for more info.
+}}
+
+
+###############################################################################
+# load config from file ?
+if ($opt_C){
+   _opts_from_file(\%OPT,$opt_C) 
+      or die("you asked to load args from $opt_C, but file's not on disk");
+   ### %OPT
+}
+
+
+
+###############################################################################
+# check we have all options wanted
+# turn into args
+my $u = usage();
+while ( $u=~/\s+-(\w)\s(\w+)\s+(.+)\*/g ){
+   my($option,$value,$desc)=($1,$2,$3);
+   shomp $desc;
+   $OPT{$option} or die("missing $desc (-$option), value must be $value");
+}
+
+
+
+
+###############################################################################
+# check login credentials
+my $wp = _wordpress_xmlrpc_object_or_die(\%OPT);
+
+
+
+###############################################################################
+# resolve options 
+
+if( my $count = scalar @ARGV ){
+
+   for (@ARGV){
+      push @FILES, abs_file_or_die($_);
+
+   }
+}
+else {
+   die("no files");
+}
+   
+
+if( $opt_d ){ # description content file
+   if ( -e $opt_d ){
+      -f $opt_d or die("not on disk $opt_d");
+      $opt_d = slurp($opt_d);
+   }
+   $opt_d=~/\w/ or die('bad description');
+
+   if ($opt_k){
+      # if we see a newline but the chars in between are word chars not uppercase
+      $opt_d=~s/(?<=[a-z])\s*\n(?=[a-z])/ /g;
+      # this helps prevent wordpress from adding breaks where we dont want then
+      # because for flat text files, 80 width is great
+      # but for the web, not so much
+   }
+
+
+   length($opt_d) > 10 or warn("description had very little length");
+   ### description content seems ok
+}
+
+if ($opt_D){ # date
+   $opt_D = _date2wordpressdate($opt_D) or die;      
+}
+if ($opt_t){
+   $opt_t=~/^[a-zA-Z0-9\-,\. _]+$/ 
+      or die("bad description '$opt_t', use a-zA-Z0-9d dash, underscore, . and space");
+   (length($opt_t) > 5 ) or die("description is too short, must be at least 5 chars");
+}
+
+###############################################################################
+### DO IT
+my $fails=0;
+#my $counter=0; # to set titlle if many.. or mayeb wordpress already DOES THIS
+FILE: for my $abs ( @FILES ){
+
+   my $result = upload_file($abs) or (++$fails and next FILE);
+
+   my $url = $result->{url}; # will be here regardless, if we were able to upload
+
+   ### $result
+   if ( $opt_D or $opt_d or $opt_t ){
+      # did we get full result??
+      unless( exists $result->{postid} ){
+         print STDERR "Was not able to retrieve the actual struct back, file was uploaded and url is ";
+         print "$url\n";
+         $fails++;
+         exit $fails;
+         # next FILE; # no, stop.
+      }
+
+      if ($opt_D){ # try to set date
+         $result->{dateCreated} = $opt_D;
+         $result->{date_created_gmt} = undef;
+      }
+      if ($opt_t){
+         $result->{title} = $opt_t;
+      }
+      if ($opt_d){
+         $result->{description} = $opt_d;
+      }
+      unless( $wp->editPost($result->{postid}, $result, 1 ) ){
+         warn ("Was able to upload '$abs', but failed setting extras on $result->{postid}, " . $wp->errstr );
+
+         print "$url\n";         
+         $fails++;
+         exit $fails;
+         # next FILE;# no, stop.
+      }
+      
+      # OK ALL WORKED>....
+      require YAML;
+      print YAML::Dump($result);
+      print "\n";     
+
+   }
+
+   else {
+      printf "%s\n", $url;
+   }
+
+
+
+
+
+}
+
+exit $fails;
+###############################################################################
+# SUBS
+
+# TOTAL HACK ....
+sub _find_mediaobject {
+   my $result_struct_from_upload = shift;
+   #my $url = shift; # wont work
+   #my $title = shift;
+   my $filename = $result_struct_from_upload->{file};
+   $filename or die;
+
+   # if we get wrong ones
+   my $tries_max = 100;
+   my $tries_failed = 0;
+
+   # if we get nothing
+   my $noresult_max = 20;
+   my $noresult_failed = 0;
+   
+   # get the last id of some posts, and brute guess 
+   my $posts =  $wp->getRecentPosts(1) or die;
+   
+   my $id_start = $posts->[0]->{postid} or die('cant get postid');
+
+   ### $id_start
+
+   my $id_now = $id_start;
+   while( ($tries_failed <= $tries_max ) and ( $noresult_failed <= $noresult_max )){
+      $id_now++;
+
+      # weeeeee!!!!!!! 
+
+      if ( my $struct = $wp->getPost($id_now) ){
+         #$struct->{link}
+         my $_title = $struct->{title};
+         if ($_title eq $filename){
+            return $struct;
+         }         
+         $tries_failed++;       
+      }
+      else {
+         $noresult_failed++;
+      }
+   }
+
+   return;
+
+
+
+
+}
+
+
+sub upload_file {
+   my $abs = shift;
+
+   my $title;
+
+   # figure out title
+   unless( $title = $opt_t ){
+      use String::Prettify;
+      $title = String::Prettify::prettify_filename($abs);
+   }
+  
+
+
+   ###############################################################################
+   ### BUILD STRUCT
+   my $struct;
+   
+   # basic struct..
+   require WordPress::Base::MediaObject;
+   $struct = WordPress::Base::MediaObject::abs_path_to_media_object_data($abs) or die;
+   
+
+   # these extras probably wont work
+
+   #if ($opt_D){ # date
+   #   $struct->{dateCreated} = $opt_D;
+   #   $struct->{date_created_gmt} = undef; # maybe needs that
+   #}
+
+   # i dont think this works, setting title or desc this way here
+   #$struct->{title}=$title;
+   #if ($opt_d){  $struct->{description} = $opt_d; }
+   
+
+   ###############################################################################
+   ### INSERT POST
+   ### $opt_n
+
+   my $result;
+   $result= $wp->newMediaObject($struct, 1) or die("failed: ".$wp->errstr);
+   ### $result
+   
+
+   ### ok, now for crazy hack shit
+   ### attempt to figure out id etc
+   ### xmlrpc.php does not return useful info, but.. we can do crazyness..
+
+   if( my $real_post_struct = _find_mediaobject($result) ){
+      ### was able to find the uploaded media id and struct after uploading
+      
+      # if we are setting title and description... update it!! hahahh!
+      ## THIS WORKS!!!
+
+
+      return   $real_post_struct;
+
+   }
+   else {
+      return $result;
+   }
+
+}
+
+
+
+
+
+
+
+###############################################################################
+### subs
+
+sub slurp {   
+   open(FILE, '<', $_[0]) or warn("Can't open file for reading: '$_[0]', $!") and return;   
+   local $/;
+   my $text = <FILE>;
+   close FILE or die($!);
+   $text;
+}
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+wordpress-upload-media - upoad files to wordpress
+
+=head1 DESCRIPTION
+
+If you provide a date, we check for correctness before attempt.
+
+=head2 Motivation
+
+This allows you to upload media files like images etc to your wordpress
+blog. Very helpful.
+
+=head1 USAGE
+
+wordpress-upload-post [OPTIONS].. [PATH|DESCRIPTION]
+
+   -d path     simple text/html file containing content description
+   -h          help
+   -t string   title !
+   -D string   date !
+   -d path     path to text or html file holding description text, or text itself !
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -C path     load username, password, and proxy from this config file
+   -k          clean description text, if any
+   -n          don't post, just test
+
+* required
+! experimental
+
+=head2 USAGE EXAMPLES
+
+Load the login info from a file:
+   wordpress-upload-media -d ./content.txt -t 'Red House Found' -C ./conf.txt file.jpg
+
+Login conf example file:
+
+   -u usenamejim
+   -p passew2t42t
+   -x http://jimmysite.net/xmlrpc.php
+
+
+You may specify the file with content for the description (the body of the post), via -d
+argument. The -d argument may also be a string instead. We check for existence first,
+to see if it is a file path arg.
+(This needs to be improved, potentially you an end up setting description to look like a
+file path just because it's not on disk..)
+
+=head3 clean description text flag
+
+If you want to clean the description text, use the -k flag.
+This makes it so
+
+   This is another kind of 
+   break that happens here.
+   
+   As well as this 
+    one.
+
+Gets turned to
+
+   This is another kind of break that happens here.
+   
+   As well as this 
+    one.
+
+This is useful if you have as decription input file, properly formatted 80 char wide
+data. This prevents wordpress from inserting breaks where we don't want them.
+For the web, it's best to have only paragraphs, the user can set the width and.. well.
+You know the argument.
+   
+=head2 ABOUT EXPERIMENTAL FEATURES
+
+I always thought it would be cool if wordpress xmlrpc.php returned the id of a media
+file uploaded. That way, you could maybe set description and title of media! All via
+the command line! How coold would that be?!?!?!
+
+So. Brace yourself. I have a hack here that does just that.
+It's a HACK. For real- HACK all uppercase letters.
+
+What we do is if you try to set date, description, or title- after we upload the file,
+we try to find it by *guessing*, and matching filename against title.
+It's really a hack- and it does test itself pretty well. But it won't work in an 
+environment where you have many people working on the same blog- not at all.
+And if you upload many files with the same filename, and don't give them any titles.
+
+It will conk out after a few tries though, and the script has propper exit code back to 
+shell.
+
+Here's how it works..
+Imagine you have a picture of a painting (this example uses a config file for credentials,
+you should realize that the credentials file can be named anything)..
+
+   wordpress-upload-media -C ~/mysite.wordpress.credentials -t 'Portrait of Lao Tzu' -d 'this is lao tzu. Nobody knows what he really looked like, but.. here he is.' ./lao-tzu-portrait.jpg
+
+If this succeeds, we print out the struct updated as YAML.
+If we were able to upload, but could not set the title and description etc- then we print
+the url of the file uploaded, but we exit with error code to the shell.
+
+=over 4
+
+As you know, unix exits silently if all is good, with a code if not. If not, you need to 
+read up on unix, I suggest http://catb.org/esr/writings/taoup/, the art of unix programming
+by Eric Raymond. Don't make excuses for not reading this- if you're looking for command
+line to wordpress, you have to learn the basics- there's no going around this. And on the good side, that way you'll become a fledgeling unix hacker like me! Wwheee!!!
+
+=back  
+
+=head1 SEE ALSO
+
+WordPress::XMLRPC
+wordpress-upload-post
+wordpress-info
+WordPress::CLI - parent package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

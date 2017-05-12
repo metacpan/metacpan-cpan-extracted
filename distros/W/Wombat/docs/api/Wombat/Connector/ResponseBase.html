@@ -1,0 +1,344 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Connector::ResponseBase - internal response base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Connector::ResponseBase - internal response base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Connector::Response;</PRE>
+<PRE>
+  use base qw(Wombat::Connector::ResponseBase);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Convenience base implementation of <STRONG>Wombat::Response</STRONG> and
+<STRONG>Servlet::ServletResponse</STRONG> which can be used for most
+connectors. Only connector-specific methods need to be implemented.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Connector::ResponseBase</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getApplication"><CODE>getApplication()</CODE></A></STRONG><BR>
+<DD>
+Return the Application within which this Response is being generated.
+<P></P>
+<DT><STRONG><A NAME="item_setApplication"><CODE>setApplication($application)</CODE></A></STRONG><BR>
+<DD>
+Set the Application within which this Response is being generated. This
+must be called as soon as the appropriate Application is identified.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24application">$application</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Application</STRONG> within which the Response is being generated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getBufferSize"><CODE>getBufferSize()</CODE></A></STRONG><BR>
+<DD>
+Return the buffer size (in bytes) used for the response.
+<P></P>
+<DT><STRONG><A NAME="item_setBufferSize"><CODE>setBufferSize($size)</CODE></A></STRONG><BR>
+<DD>
+Set the preferred buffer size for the body of the response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24size">$size</A></STRONG><BR>
+<DD>
+the buffer size, in bytes
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if content has been written to the buffer
+<P></P></DL>
+<DT><STRONG><A NAME="item_getCharacterEncoding"><CODE>getCharacterEncoding()</CODE></A></STRONG><BR>
+<DD>
+Return the character encoding used in the body of this Response, or
+<EM>ISO-8859-1</EM> if the character encoding is unset. The character
+encoding is set explicitly with <A HREF="#item_setContentType"><CODE>setContentType()</CODE></A> or implicity with
+<A HREF="#item_setLocale"><CODE>setLocale()</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_isCommitted"><CODE>isCommitted()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating if this Response has been committed.
+<P></P>
+<DT><STRONG><A NAME="item_getConnector"><CODE>getConnector()</CODE></A></STRONG><BR>
+<DD>
+Return the Connector through which this Response is returned.
+<P></P>
+<DT><STRONG><A NAME="item_setConnector"><CODE>setConnector($connector)</CODE></A></STRONG><BR>
+<DD>
+Set the Connector through which this response is returned.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connector">$connector</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Connector</STRONG> that will return the response
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContentCount"><CODE>getContentCount()</CODE></A></STRONG><BR>
+<DD>
+Return the number of bytes actually written to the output handle.
+<P></P>
+<DT><STRONG><A NAME="item_getContentLength"><CODE>getContentLength()</CODE></A></STRONG><BR>
+<DD>
+Return the content length, in bytes, that was set or calculated for
+this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setContentLength"><CODE>setContentLength($len)</CODE></A></STRONG><BR>
+<DD>
+Set the length of the content body in this Response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24len">$len</A></STRONG><BR>
+<DD>
+the content length, in bytes
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContentType"><CODE>getContentType()</CODE></A></STRONG><BR>
+<DD>
+Return the MIME type that was set or calculated for this response.
+<P></P>
+<DT><STRONG><A NAME="item_setContentType"><CODE>setContentType($type)</CODE></A></STRONG><BR>
+<DD>
+Set the content type of this Response. If the <CODE>charset</CODE> parameter is
+specified, the character encoding of this Response is also set.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24type">$type</A></STRONG><BR>
+<DD>
+the MIME type of the content
+<P></P></DL>
+<DT><STRONG><A NAME="item_isError"><CODE>isError()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not this is an error response.
+<P></P>
+<DT><STRONG><A NAME="item_setError"><CODE>setError()</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating that this Response is an error response.
+<P></P>
+<DT><STRONG><A NAME="item_getHandle"><CODE>getHandle()</CODE></A></STRONG><BR>
+<DD>
+Return the output handle associated with this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setHandle"><CODE>setHandle($handle)</CODE></A></STRONG><BR>
+<DD>
+Set the output handle ssociated with this Response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24handle">$handle</A></STRONG><BR>
+<DD>
+the <STRONG>IO::Handle</STRONG> associated with this response
+<P></P></DL>
+<DT><STRONG><A NAME="item_isIncluded"><CODE>isIncluded()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not this Response is being
+processed as an include.
+<P></P>
+<DT><STRONG><A NAME="item_setIncluded"><CODE>setIncluded($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not this Response is being processed
+as an include.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+a boolean value indicating whether or not this response is included
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLocale"><CODE>getLocale()</CODE></A></STRONG><BR>
+<DD>
+Return the locale assigned to this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setLocale"><CODE>setLocale($loc)</CODE></A></STRONG><BR>
+<DD>
+Set the locale for this Response. The character encoding for this
+Response will be set to the encoding specified by the locale.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24loc">$loc</A></STRONG><BR>
+<DD>
+the locale for the response
+<P></P></DL>
+<DT><STRONG><A NAME="item_getOutputHandle"><CODE>getOutputHandle()</CODE></A></STRONG><BR>
+<DD>
+Return the <STRONG>Servlet::ServletOutputHandle</STRONG> that wraps the underlying
+output handle (see <A HREF="#item_getHandle"><CODE>getHandle()</CODE></A>. The default implementation returns a
+handle created by <A HREF="#item_createOutputHandle"><CODE>createOutputHandle()</CODE></A>.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the <A HREF="#item_getWriter"><CODE>getWriter()</CODE></A> method has already been called for this response
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequest"><CODE>getRequest()</CODE></A></STRONG><BR>
+<DD>
+Return the Request with which this Response is associated.
+<P></P>
+<DT><STRONG><A NAME="item_setRequest"><CODE>setRequest($request)</CODE></A></STRONG><BR>
+<DD>
+Set the Request with which this Response is associated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> with which this response is associated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getResponse"><CODE>getResponse()</CODE></A></STRONG><BR>
+<DD>
+Return the ServletResponse for which this object is the facade.
+<P></P>
+<DT><STRONG><A NAME="item_getWriter"><CODE>getWriter()</CODE></A></STRONG><BR>
+<DD>
+Return the <STRONG>XXX</STRONG> that wraps the ServletOutputHandle for this
+response. The default implementation returns a <STRONG>XXX</STRONG> wrapped around
+the handle created by <A HREF="#item_createOutputHandle"><CODE>createOutputHandle()</CODE></A>.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AUnsupportedEncodingExceptio"><STRONG>Servlet::Util::UnsupportedEncodingException</STRONG></A></STRONG><BR>
+<DD>
+if the charset specified in <A HREF="#item_setContentType"><CODE>setContentType()</CODE></A> cannot be used
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the <A HREF="#item_getOutputHandle"><CODE>getOutputHandle()</CODE></A> method has already been called for this
+request
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurred
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_createOutputHandle"><CODE>createOutputHandle()</CODE></A></STRONG><BR>
+<DD>
+Create and return a <STRONG>Servlet::ServletOutputHandle</STRONG> to write the
+response content.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG>Servlet::Util::IOException</STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_finishResponse"><CODE>finishResponse()</CODE></A></STRONG><BR>
+<DD>
+Perform whatever actions are required to flush and close the output
+handle or writer.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG>Servlet::Util::IOException</STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_flushBuffer"><CODE>flushBuffer()</CODE></A></STRONG><BR>
+<DD>
+Force any content in the buffer to be written to the client. The
+response is automatically committed on the first invocation of this
+method.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+</DL>
+<DT><STRONG><A NAME="item_reset"><CODE>reset()</CODE></A></STRONG><BR>
+<DD>
+Clear any data that exists in the content buffer and unset the
+content length and content type.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_resetBuffer"><CODE>resetBuffer()</CODE></A></STRONG><BR>
+<DD>
+Clear the content of the content buffer in the response without
+modifying any other fields.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<P>These methods should only ever be called by other classes in the
+<STRONG>Wombat::Connector</STRONG> namespace. Other packages should use the public
+API only!</P>
+<DL>
+<DT><STRONG><A NAME="item_write">write($string, [$length, [$offset]])</A></STRONG><BR>
+<DD>
+Write the specified string to the content buffer and return the number
+of bytes written. If the operation causes the buffer to be filled, the buffer
+will be flushed (as many times as necessary).
+<P></P>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/IO/Handle.html">the IO::Handle manpage</A>,
+<A HREF="../../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A>,
+<A HREF="../../../api/Servlet/ServletServletOutputHandle.html">the Servlet::ServletServletOutputHandle manpage</A>,
+<A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../../api/Wombat/Application.html">the Wombat::Application manpage</A>,
+<A HREF="../../../api/Wombat/Connector.html">the Wombat::Connector manpage</A>,
+<A HREF="../../../api/Wombat/Request.html">the Wombat::Request manpage</A>,
+<A HREF="../../../api/Wombat/Response.html">the Wombat::Response manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

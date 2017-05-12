@@ -1,0 +1,45 @@
+
+I think at this point a more or less complete rewrite is in order, and so
+I'll be working on that over the next month or so.  My idea is to make the
+API a lot more OO.  For some reason I was having an anti-OO fit when I
+wrote this in the first place.  I seem to have recovered.
+
+-- mark, Tuesday 27 June 2006
+
+---------------------------------------------------------------------------
+
+* Check for code 3xx redirects and try to reset the wiki_host value to the 
+  correct host to which we are redirected. (target: 0.28)
+
+* Add a flag allowing the user to choose whether to proceed with commits if 
+  not logged in. (target: 0.28)
+
+* Add a command to return a diff between the local version and the server 
+  version. (0.28)
+
+* Image handling, upload and download of images
+
+* Use of "Special:All pages" to return a list of every page in the host wiki
+
+* Image handling, upload and download of images
+
+* Add a commit comment editor
+
+* The ability to access data from robots.txt for use by programmers using the library to create Mediawiki bots
+
+* Multi-file commits which respect the delay between uploads as specified in robots.txt
+
+* Win32-Perl support
+
+* A *nix GUI (this could be done as an outside project)
+
+* Win 32 GUI (possibly like tortoise CVS or tortoise SVN)
+
+* A Vim plugin supporting mvs
+
+* An EMACS macro supporting mvs
+
+* A KDE Kate plugin for mvs
+
+
+

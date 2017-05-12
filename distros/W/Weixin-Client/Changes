@@ -1,0 +1,49 @@
+2016-01-25 Weixin::Client v2.1
+1）该项目已经停止维护，请关注重构项目 https://github.com/sjdy521/Mojo-Weixin
+
+2015-07-17 Weixin::Client v2.0
+1）修复二维码下载bug
+2）修复客户端无法启动的错误
+
+2015-05-19 Weixin::Client v1.9
+1）修复reply_msg回复群组消息时失败的bug，感谢 @Matthew 的反馈
+2）修复demo示例代码
+3）修复pfwx模块的错误
+
+2015-04-24 Weixin::Client v1.8
+1）修复json转换失败程序退出的bug
+2）修复Makefile.PL错误
+
+2015-04-24 Weixin::Client v1.7
+1）修复send_chatroom_msg无法正常发送消息的bug，感谢[新浪微博 @刘轩33]反馈
+2）修复测试脚本注释错误
+3）增加模块的别名pfwx
+4）更新pod文档
+
+2015-04-23 Weixin::Client v1.6
+1）增加群组、好友新增、修改、删除等操作的自动同步
+2）修复使用cookie免扫码登录后运行异常的bug
+
+2015-04-21 Weixin::Client v1.5
+1）程序启动时自动删除上次运行产生的验证码临时文件
+2）登录cookie默认文件保存路径修改为临时目录下
+3）Makefile增加核心依赖模块
+4）删除SmartReply插件无用的调试代码 感谢[群Mojolicious @Matthew]的反馈
+5）添加对长时间登录超时异常处理，长时间登录超时后会自动注销退出 感谢[群Mojolicious @Matthew]的反馈
+6）修复关键请求失败时客户端无法继续正常运行的bug
+
+2015-04-12 Weixin::Client v1.4
+1）将登录cookie保存到本地，再次登录免扫码
+
+2015-04-12 Weixin::Client v1.3
+1）修复文档错误
+
+2015-04-12 Weixin::Client v1.2
+1）继续修复文档错误
+2）修复demo中示例代码错误
+
+2015-04-12 Weixin::Client v1.1
+1）修复文档错误
+2）on_receive_message/on_send_message回调名称修改为on_receive_msg/on_send_msg
+
+2015-04-12 Weixin::Client v1.0 release

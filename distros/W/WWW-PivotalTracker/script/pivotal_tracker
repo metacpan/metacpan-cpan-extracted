@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use aliased 'WWW::PivotalTracker::Command';
+
+our $VERSION = '1.00';
+
+my $cmd = Command->new();
+$cmd->run();
+
+__END__
+
+=head1 NAME
+
+pivotal_tracker - Command-line interface to L<http://www.pivotaltracker.com>
+
+=head1 SYNOPSIS
+
+pivotal_tracker [options]
+
+ General options:
+      --help             Brief help
+      --man              Full documentation
+   -v --verbose          Make noise
+   -p --project          Named project (from config file) to query/update
+   -P --project-id       Project ID to query/update
+   -i --story-id         Story ID to query/update
+
+ Actions:
+      --list-projects    List all named projects, and their project IDs
+      --show-project     Display the current settings for a project
+   -a --add-story        Add a new story
+   -D --delete-story     Delete an existing story
+   -s --show-story       Show single story
+   -A --all-stories      Show all stories for project
+      --search <filter>  Search for stories given a filter
+   -c --comment          Comment on story
+   -u --update-story     Update the details of a story
+      --add-note <note>  Add a note to an existing story
+      --deliver-all      Deliver all deliverable stories
+
+ Story Display Options:
+   -n --show-notes       Show stories' notes (if any)
+   -1 --one-line         Show stories one per line
+
+ Story Attributes:
+   -S --story            Story title to create
+   -d --description      Story description
+   -b --requested-by     Who requested the story
+   -o --owned-by         Who is responsible for working on the story
+   -l --label            Label to apply (May appear more than once, or be a single comma separated list
+   -e --estimate         Point estimate for story
+   -C --created-at       Date/Time story was created (Defaults to 'now')
+      --deadline         Deadline of the story (Only applicable to 'release' story type)
+
+ Story Type Options:
+   --feature             Set story type to 'feature' (Default for new stories)
+   --release             Set story type to 'release'
+   --bug                 Set story type to 'bug'
+   --chore               Set story type to 'chore'
+
+ Story State Options:
+   --unscheduled         Story has not been scheduled, and is in the icebox
+   --unstarted           Story is in the backlog
+   --started             Work has started on the story
+   --finished            Work has been completed on the story
+   --delivered           The story has been delivered for review
+   --accepted            The story has been accepted after review
+   --rejected            The story has been rejected after review
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the man page, and exit.
+
+=item B<-v> B<--verbose>
+
+Show more verbose output.
+
+=item B<-P> B<--project-id>
+
+Use this Project ID, instead of the one speficied in the config file (if any).
+
+=back
+
+=head1 DESCRIPTION
+
+B<pivotal_tracker> provides a command line interface to the Pivotal Tracker
+API (L<http://www.pivotaltracker.com/>).  This is meant to be used by humans.
+For a programmatic interface, please see L<WWW::PivotalTracker>.
+
+=head1 CONFIG
+
+B<~/.pivotal_tracker.yml> contains the configuration of default values, and 
+project name, to project ID mappings.
+
+    ---
+    General:
+      APIKey: 'c0ffe'
+      Me: Jacob Helwig
+      DefaultProject: Testing
+    Projects:
+      Testing: 1
+      Another Project: 2
+
+=head1 AUTHOR
+
+Jacob Helwig, C<< <jhelwig at cpan.org> >>
+
+=head1 BUGS
+
+Many flags aren't implemented yet, and are merely placeholders at this point.
+
+Please report any bugs or feature requests to C<bug-www-pivotaltracker at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-PivotalTracker>.  I will
+be notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc WWW::PivotalTracker
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/WWW-PivotalTracker>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/WWW-PivotalTracker>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/WWW-PivotalTracker>
+
+=item * Source code
+
+L<git://github.com/jhelwig/www-pivotaltracker.git>
+
+=item * Webpage
+
+L<http://github.com/jhelwig/www-pivotaltracker>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Chris Hellmuth
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008-2010 Jacob Helwig, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config>
+<package>test all</package>
+<credential>
+	<server>FOOBAR</server>
+	<user>foo</user>
+	<password>bar</password>
+	<use_trusted_connection>0</use_trusted_connection>
+</credential>
+</config>

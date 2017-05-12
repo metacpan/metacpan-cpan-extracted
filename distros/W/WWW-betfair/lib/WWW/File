@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <login xmlns="https://api.betfair.com/global/v3/BFGlobalService">
+            <request>
+                <password>password</password>
+                <vendorId>0</vendorId>
+                <locationId>0</locationId>
+                <ipAddress>0</ipAddress>
+                <productId>82</productId>
+                <username>username</username>
+            </request></login>
+    </soap:Body>
+</soap:Envelope>

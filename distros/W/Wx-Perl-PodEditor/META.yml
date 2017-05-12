@@ -1,0 +1,36 @@
+---
+abstract: 'A RichText Ctrl for creating Pod'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires:
+  Wx: 0.87
+  Data::Dumper: 2.121
+  Exporter: 5.58
+  File::Basename: 2.74
+  File::Spec: 0.87
+  Pod::Simple::Methody: 2.02
+  Test::More: 0
+  Wx: 0.87
+  XML::Twig: 3.26
+generated_by: 'h2xs version 1.23'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+name: Wx-Perl-PodEditor
+provides:
+  Wx::Perl::PodEditor:
+    file: lib/Wx/Perl/PodEditor.pm
+    version: 0.03
+  Wx::Perl::PodEditor::FormatActions:
+    file: lib/Wx/Perl/PodEditor/FormatActions.pm
+    version: 0.01
+  Wx::Perl::PodEditor::PodParser:
+    file: lib/Wx/Perl/PodEditor/PodParser.pm
+    version: 0.01
+  Wx::Perl::PodEditor::XMLParser:
+    file: lib/Wx/Perl/PodEditor/XMLParser.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses
+version: 0.03

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9937d188aad9afa2bcd798309ca6e97f88595d4e Changes
+SHA1 659e9590a4cc5a35750744ced2961a1639988192 MANIFEST
+SHA1 85e0406d1b1be0336f4019d200387608b5c1dcfc META.json
+SHA1 9cc0b64ad1658804f670858ffe881b7a3b550da6 META.yml
+SHA1 9079152ce554d2a80255917bc629314c3610beeb Makefile.PL
+SHA1 23533a20ab8966f9982900147bf544e0c23a6a07 README
+SHA1 215cbff2eda8b92b62638f3eaecbbdc05b075c46 lib/Wiki/Toolkit/Formatter/UseMod.pm
+SHA1 7ca8c08ee676aaef11f394be2bc85629381d256c t/default_links.t
+SHA1 0da3f93b51eab8230d5bd25954d83872acdf8626 t/encode-node-names.t
+SHA1 b6e39bfdea51d12b17a07af7572b46814e13bef4 t/external_links.t
+SHA1 5eaab43671e4219d09e3aa5b23f2bd958e174150 t/linebreaks.t
+SHA1 c3dea30a205dd4ff599629eba912484cbc1bf7d9 t/links.t
+SHA1 a166cf1b523d08475450d831791f681e515b83e9 t/lists.t
+SHA1 a39107208bf7b54d8e17577435ed14b55f577ab2 t/macros.t
+SHA1 7ccf3c4c6a703a50fe425eb4dc623da124ebebe5 t/macros_with_wiki_passed.t
+SHA1 aaa14f0ddc8c64c2bf23c24ff4dc9318a652d41e t/munge_node_name.t
+SHA1 7165c638d94c34728ac3ede7b7278c993e9b8394 t/node-suffix.t
+SHA1 e958cb9352bdeb3a8052aa86e23c3f1460c42943 t/paragraphs.t
+SHA1 61e28ddd05ab0f3722f2a8cdce80a8f314b86391 t/pod.t
+SHA1 adf1ca261fa5fbfa3f7eb38e80725d9b83c90cad t/tables.t
+SHA1 67eb4005ffb64044aa14fcfe273684b2b3c56f9f t/twf-bug.t
+SHA1 ad8eae9b9ff969911377c64ae7f63b03b4b214f5 t/usemod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVtPueAAoJEJsOndGQ5lgDjV8H/2pQ5C9oeWMBxoEYLrq2sa1M
+DNCsPj60pGzFASFc3xWF5cITQiRgUkJ19i6YuIdN2mhf7GZRT9Bhvg92bp34LnSQ
+T+mdNPpjYHqzoT3YZLIkJCVJiq7VO3KMwQK/EYNRcTEih3GGl0YwPqreCDzGAeh3
+4kd41c3SLhH1xuIprKt2E6BeM0Kq3MfmFTKSX399Q50hLspzLRWyatuglbEIQN9z
+Q2eLGKzT7eWK3zko1r/BQE7bX9CyI+aKHr42tm6XrQgKnQ8R8aPjepNHem30Qd0I
+G3Fxv6J6ws+SXPS+g5qisIT9rrPTgdkTTyocaR68eoS9Tt14ENZgrLkoD3udWX4=
+=/9c3
+-----END PGP SIGNATURE-----

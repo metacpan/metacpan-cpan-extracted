@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<Window
+		dim='100, 100, 250, 90'
+		title='Listbox - example'
+		class='$self->{C}'
+	>
+		<Listbox dim='0, 0, 100, %P%->ScaleHeight'>
+			<Item text='Item 1'/>
+			<Item text='Item 2'/>
+			<Item text='Item 3'/>
+			<Item text='Item 4' default='1'/>
+		</Listbox>
+		<Combobox dim='120, 0, 100, 80' dropdown='1'>
+			<Item text='Item 1'/>
+			<Item text='Item 2'/>
+			<Item text='Item 3'/>
+			<Item text='Item 4' default='1'/>
+			<Item text='Item 5'/>
+			<Item text='Item 6'/>
+			<Item text='Item 7'/>
+			<Item text='Item 8'/>
+			<Item text='Item 9'/>
+			<Item text='Item 10'/>
+		</Combobox>
+	</Window>
+</GUI>

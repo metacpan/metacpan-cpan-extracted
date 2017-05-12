@@ -1,0 +1,15 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/WebPrototypes/Registration.pm
+t/main.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

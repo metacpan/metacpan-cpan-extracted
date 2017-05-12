@@ -1,0 +1,351 @@
+2008-03-26    <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm: removed to its own distribution
+
+2008-03-25    <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Yahoo.pm (_result_list_items): new private method
+
+2008-03-23    <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Yahoo/China.pm: removed to its own distribution
+
+2007-07-02    <Daddy@C-3PO>
+
+	* Yahoo/TV/Echostar.pm: removed because Yahoo does not provide TV listings search any more
+
+2007-04-21    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (native_setup_search): overhauled for new Yahoo web page format
+
+2007-04-16    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm (parse_tree): fixed for new page format
+
+	* lib/WWW/Search/Yahoo/China.pm (parse_details): fixed for new page format
+
+	* lib/WWW/Search/Yahoo.pm (parse_details): new sub-class-able method
+
+2007-04-14    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): fixed for new page format
+
+2007-04-01    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/China.pm (_result_list_tags): fix for new results page format
+
+2007-03-28    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): don't return Yahoo links
+
+2006-05-01    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/China.pm (_result_list_tags): FIX for returning yahoo links as results
+	
+	* lib/WWW/Search/Yahoo/DE.pm (_result_list_tags): FIX for returning yahoo links as results
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): FIX for parsing result count with commas
+
+2006-04-30    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo.pm (_result_list_tags): new private method
+
+2005-10-24    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Yahoo/China.pm: add pod about UTF-8
+
+	* Yahoo.pm (parse_tree): fix next_url demangling
+
+2005-07-02  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): fix for next-page url when query contains "http:"
+
+2004-09-25  Kingpin  <mthurn@verizon.net>
+
+	* t/japan-news.t: use Encode instead of Jcode
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm (parse_tree): fix parse_debug level for msgs
+
+2004-09-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): fix 'http%3A' in URLs
+
+2004-09-19  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/DE.pm (_where_to_find_count): fix tag names
+	(_string_has_count): fix pattern
+
+2004-09-11  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/DE.pm (_where_to_find_count): new private method
+
+	* lib/WWW/Search/Yahoo.pm (_where_to_find_count): new private method
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): handle new HTML formatting
+
+2004-05-17  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/DE.pm: fix version number
+
+2004-05-14  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): strip period out of numbers
+
+	* lib/WWW/Search/Yahoo/DE.pm (_string_has_count): add . to number pattern
+
+2004-05-13  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (_string_has_count): new method
+	(_a_is_next_link): new method
+
+	* lib/WWW/Search/Yahoo/DE.pm (_a_is_next_link): new method
+	(_string_has_count): new method
+
+	* lib/WWW/Search/Yahoo/China.pm (_a_is_next_link): new method
+	(_string_has_count): new method
+
+2004-03-28  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): overhaul for new webpage format
+
+2004-03-13  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): unescape URLs
+
+2004-02-17  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): updates to support cn.yahoo.com
+
+	* t/china.t: new file
+
+	* lib/WWW/Search/Yahoo/China.pm: new file
+
+	* lib/WWW/Search/Yahoo/Korea.pm: tiny pod fix; make VERSION 3 digits
+
+2004-01-23  Kingpin  <mthurn@verizon.net>
+
+	* t/*.t: call env_proxy() on all WWW::Search objects
+
+2004-01-18  Kingpin  <mthurn@verizon.net>
+
+	* t/echostar-advanced.t: make most tests TODO because yahoo.com is broken
+
+2003-12-29  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm (parse_tree): fix date parsing for year-end wraparound!
+
+2003-11-01  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (native_retrieve_some): follow next page of results
+
+2003-09-20  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo.pm: use strict
+
+2003-08-31  Kingpin  <mthurn@verizon.net>
+
+	* t/echostar-advanced.t: new file
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm (native_setup_search): set _allow_empty_query if doing Advanced search;
+	(parse_tree): parse result count in Advanced search results;
+	added pod for how to do Advanced search
+
+2003-08-27  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (native_retrieve_some): fixed for moreover.com links
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm (ignore_channels): new method
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (native_retrieve_some): fix parser for new page layout
+
+2003-07-29  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm (native_setup_search): fix TZ setting(?); undo "fix" for preprocess_ bug
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm: undo "fix" for preprocess_ bug
+
+2003-07-27  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm: move episode title to after show name
+
+2003-07-14  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo/TV/Echostar.pm: new backend
+
+2003-07-13  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo/DE.pm: new backend donated by Roland Moriz <roland at moriz.de>
+
+2003-06-24  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm: fix parsing for new yahoo.co.jp page format
+
+2003-05-14  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): fix parsing for new yahoo.com page format
+
+2003-01-23  Kingpin  <mthurn@carbon>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): fix parsing for new yahoo.com page format
+
+2002-12-20  Kingpin  <mthurn@carbon.>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): make sure result count is taken from "Web Matches" section
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm (parse_tree): ignore yahoo.co.jp links that look like hit results:
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): do not follow "next" link if result count is being spoofed
+
+2002-11-08  Kingpin  <mthurn@carbon.>
+
+	* Makefile.PL: add prereq Date::Manip
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): FIX pattern for result-count integer match
+
+2002-11-01  Kingpin  <mthurn@carbon.>
+
+	* lib/WWW/Search/Yahoo.pm (native_setup_search): new URL
+	(parse_tree): tweak parser for new webpage format
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): overhaul for new webpage format
+
+	* test.pl: switch to Test::More; all tests pass as of today
+
+2002-10-01  Kingpin  <mthurn@carbon.>
+
+	* lib/WWW/Search/Yahoo.pm (gui_query): new URL google.yahoo.com
+
+2002-03-29  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): even more cleanup of title & description
+
+2002-03-28  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): clean up description
+
+2001-12-24  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Yahoo.pm (gui_query): FIXED for not passing debug argument(s)
+	(parse_tree): fix for slightly changed output format
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (parse_tree): handle new output format
+
+2001-09-13  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm: bugfix, and update pod
+
+2001-09-07  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* test.pl: fix all tests, and add new tests for Japan News
+
+	* lib/WWW/Search/Yahoo/Japan/News.pm: new backend!
+
+2001-08-07  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm (native_setup_search): default to OR search
+
+	* test.pl: fix all tests, and add new tests for Advanced News
+
+2001-07-16  Kingpin  <mthurn@tasc.com>
+
+	* test.pl: fix old tests, and add new tests for Advanced News
+
+	* lib/WWW/Search/Yahoo.pm (parse_tree): new method for subclasses to use
+
+	* lib/WWW/Search/Yahoo/News/Advanced.pm: new backend
+
+2001-03-31  Kingpin  <mthurn@tasc.com>
+	
+	* VERSION 2.22 RELEASED
+	
+2001-03-30  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Yahoo.pm (native_setup_search): added support for subclassing
+
+	* lib/WWW/Search/Yahoo/UK.pm: new backend
+
+	* lib/WWW/Search/Yahoo/Korea.pm: new backend
+
+2000-12-16
+	
+	* VERSION 2.21 RELEASED
+	
+2000-12-15  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm (native_retrieve_some): clean up URL parsing (yahoo.com added text to it)
+
+2000-11-11
+	
+	* VERSION 2.19 RELEASED
+	
+2000-11-10  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm (native_retrieve_some): rewrote parser using HTML::TreeBuilder
+
+2000-09-23
+	
+	* VERSION 2.17 RELEASED
+	
+2000-09-22  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm (native_retrieve_some): fix description parsing and URL parsing
+
+2000-09-20
+	
+	* VERSION 2.16 RELEASED
+	
+2000-09-19  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm (native_retrieve_some): fix gui-style results parsing
+
+2000-09-15
+	
+	* VERSION 2.15 RELEASED
+	
+2000-09-14  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm (native_retrieve_some): fix result-count parsing
+
+2000-07-05  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.14 RELEASED
+
+	* Yahoo.pm (native_retrieve_some): fixed parsing for new output format
+
+2000-05-11  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.13 RELEASED
+
+2000-05-10  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm: fixed parsing for all sections of gui_query results
+
+2000-04-28  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.11 RELEASED
+
+2000-04-27  Kingpin  <mthurn@tasc.com>
+
+	* test.pl: new test case for gui_query
+
+	* Yahoo.pm: new URL for gui_query
+
+2000-04-03  Kingpin  <mthurn@tasc.com>
+
+	* VERSION 2.09 RELEASED
+
+2000-03-27  Kingpin  <mthurn@tasc.com>
+
+	* test.pl: updated test cases
+
+	* Yahoo.pm: (2.09) fixed for new CGI options
+
+2000-03-20  Kingpin  <mthurn@tasc.com>
+
+	* test.pl: added "real" test
+
+Revision history for Perl extension WWW::Search::Yahoo.
+
+2.07  Fri Feb  4 10:01:42 2000
+	- original version; created by h2xs 1.19
+

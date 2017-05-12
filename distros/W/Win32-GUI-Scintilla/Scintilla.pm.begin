@@ -1,0 +1,212 @@
+#------------------------------------------------------------------------
+# Scintilla control for Win32::GUI
+# by Laurent ROCHER (lrocher@cpan.org)
+#------------------------------------------------------------------------
+#perl2exe_bundle 'SciLexer.dll'
+
+package Win32::GUI::Scintilla;
+
+use vars qw($ABSTRACT $VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
+use Win32::GUI;
+use Config;
+
+require Exporter;
+require DynaLoader;
+require AutoLoader;
+
+@ISA = qw(Exporter DynaLoader Win32::GUI::Window);
+
+$VERSION = '1.7';
+
+bootstrap Win32::GUI::Scintilla $VERSION;
+
+#------------------------------------------------------------------------
+
+# Load Scintilla DLL from perl directory or standard LoadLibrary search
+my $SCILEXER_PATH = $Config{'installsitelib'} . '\auto\Win32\GUI\Scintilla\SciLexer.DLL';
+my $SCINTILLA_DLL = Win32::GUI::LoadLibrary($SCILEXER_PATH) || Win32::GUI::LoadLibrary('SciLexer.DLL');
+
+Win32::GUI::Scintilla::_Initialise();
+
+END {
+  # Free Scintilla DLL
+  Win32::GUI::FreeLibrary($SCINTILLA_DLL);
+  Win32::GUI::Scintilla::_UnInitialise();
+}
+
+#------------------------------------------------------------------------
+
+#
+# Notify event code
+#
+
+use constant SCN_STYLENEEDED        => 2000;
+use constant SCN_CHARADDED          => 2001;
+use constant SCN_SAVEPOINTREACHED   => 2002;
+use constant SCN_SAVEPOINTLEFT      => 2003;
+use constant SCN_MODIFYATTEMPTRO    => 2004;
+use constant SCN_KEY                => 2005;
+use constant SCN_DOUBLECLICK        => 2006;
+use constant SCN_UPDATEUI           => 2007;
+use constant SCN_MODIFIED           => 2008;
+use constant SCN_MACRORECORD        => 2009;
+use constant SCN_MARGINCLICK        => 2010;
+use constant SCN_NEEDSHOWN          => 2011;
+use constant SCN_PAINTED            => 2013;
+use constant SCN_USERLISTSELECTION  => 2014;
+use constant SCN_URIDROPPED         => 2015;
+use constant SCN_DWELLSTART         => 2016;
+use constant SCN_DWELLEND           => 2017;
+use constant SCN_ZOOM               => 2018;
+use constant SCN_HOTSPOTCLICK       => 2019;
+use constant SCN_HOTSPOTDOUBLECLICK => 2020;
+use constant SCN_CALLTIPCLICK       => 2021;
+
+#------------------------------------------------------------------------
+
+#
+# New scintilla control
+#
+
+sub new {
+
+  my $class  = shift;
+
+  my (%in)   = @_;
+  my %out;
+
+  ### Filtering option
+  for my $option qw(
+        -name -parent
+        -left -top -width -height -pos -size
+        -pushstyle -addstyle -popstyle -remstyle -notstyle -negstyle
+        -exstyle -pushexstyle -addexstyle -popexstyle -remexstyle -notexstyle
+        ) {
+    $out{$option} = $in{$option} if exists $in{$option};
+  }
+
+  ### Default window
+  my $constant     = Win32::GUI::constant("WIN32__GUI__STATIC", 0);
+  $out{-style}     = WS_CLIPCHILDREN;
+  $out{-class}     = "Scintilla";
+
+  ### Window style
+  $out{-style} |= WS_TABSTOP unless exists $in{-tabstop} && $in{-tabstop} == 0;         #Default to -tabstop => 1
+  $out{-style} |= WS_VISIBLE unless exists $in{-visible} && $in{-visible} == 0;         #Default to -visible => 1
+  $out{-style} |= WS_HSCROLL if     exists $in{-hscroll} && $in{-hscroll} == 1;
+  $out{-style} |= WS_VSCROLL if     exists $in{-vscroll} && $in{-vscroll} == 1;
+
+  my $self = Win32::GUI->_new($constant, $class, %out);
+  if (defined ($self)) {
+
+    # Option Text :
+    $self->SetText($in{-text}) if exists $in{-text};
+    $self->SetReadOnly($in{-readonly}) if exists $in{-readonly};
+  }
+
+  return $self;
+}
+
+#
+# Win32 shortcut
+#
+
+sub Win32::GUI::Window::AddScintilla {
+  my $parent  = shift;
+  return Win32::GUI::Scintilla->new (-parent => $parent, @_);
+}
+
+#------------------------------------------------------------------------
+# Miscolous function
+#------------------------------------------------------------------------
+
+#
+# Clear Scintilla Text
+#
+
+sub NewFile {
+  my $self = shift;
+
+  $self->ClearAll();
+  $self->EmptyUndoBuffer();
+  $self->SetSavePoint();
+}
+
+#
+# Load text file to Scintilla
+#
+
+sub LoadFile {
+  my ($self, $file) = @_;
+
+  $self->ClearAll();
+  $self->Cancel();
+  $self->SetUndoCollection(0);
+
+  open F, "<$file" or return 0;
+  while ( <F> ) {
+    $self->AppendText($_);
+  }
+  close F;
+
+  $self->SetUndoCollection(1);
+  $self->EmptyUndoBuffer();
+  $self->SetSavePoint();
+  $self->GotoPos(0);
+
+  return 1;
+}
+
+#
+# Save Scintilla text to file
+#
+
+sub SaveFile {
+  my ($self, $file) = @_;
+
+  open F, ">$file" or return 0;
+
+  for my $i (0..$self->GetLineCount()) {
+    print F $self->GetLine ($i);
+  }
+
+  close F;
+
+  $self->SetSavePoint();
+
+  return 1;
+}
+
+#
+# Help routine for StyleSet
+#
+
+sub StyleSetSpec {
+  my ($self, $style, $textstyle) = @_;
+
+  foreach my $prop (split (/,/, $textstyle)) {
+
+    my ($key, $value) = split (/:/, $prop);
+
+    $self->StyleSetFore($style, $value) if $key eq 'fore';
+    $self->StyleSetBack($style, $value) if $key eq 'back';
+
+    $self->StyleSetFont($style, $value) if $key eq 'face';
+
+    $self->StyleSetSize($style, int ($value) )  if $key eq 'size';
+
+    $self->StyleSetBold($style, 1)      if $key eq 'bold';
+    $self->StyleSetBold($style, 0)      if $key eq 'notbold';
+    $self->StyleSetItalic($style, 1)    if $key eq 'italic';
+    $self->StyleSetItalic($style, 0)    if $key eq 'notitalic';
+    $self->StyleSetUnderline($style, 1) if $key eq 'underline';
+    $self->StyleSetUnderline($style, 0) if $key eq 'notunderline';
+    $self->StyleSetEOLFilled ($style, 1) if $key eq 'eolfilled';
+    $self->StyleSetEOLFilled ($style, 0) if $key eq 'noteolfilled';
+  }
+}
+
+#------------------------------------------------------------------------
+# Begin Autogenerate
+#------------------------------------------------------------------------
+

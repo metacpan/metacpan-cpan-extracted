@@ -1,0 +1,41 @@
+WWW-Orkut-Spider version 0.02
+=========================
+
+WWW::Orkut::Spider uses WWW:Mechanize to scrape orkut.com.
+Output is a simple xml format containing friends, communities and profiles for a given Orkut UID.
+Two example scripts are provided.
+
+WARNING
+
+I am not sure if Orkut.com allows this kind of software. So don't blame me if anything happens.
+The script is really slow if you want to grab a lot of users.
+If you try to grab too much (>60 users) it may not work at all.
+This is just another example for the powers of WWW::Mechanize.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  WWW::Mechanize
+  HTML::Entities
+
+COPYRIGHT AND LICENCE
+
+GPL
+
+Copyright (C) 2004 by Mario Manno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

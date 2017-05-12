@@ -1,0 +1,88 @@
+{
+   "abstract" : "PayPal NVP API",
+   "author" : [
+      "Brad Haywood <brad@perlpowered.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-PayPal-NVP",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Encode" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
+            "YAML::Syck" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bradhaywood/WebService-PayPal-NVP/issues"
+      },
+      "homepage" : "https://github.com/bradhaywood/WebService-PayPal-NVP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bradhaywood/WebService-PayPal-NVP.git",
+         "web" : "https://github.com/bradhaywood/WebService-PayPal-NVP"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Brad Haywood <brad@geeksware.(none)>",
+      "Brad Haywood <brad.haywood@opusvl.com>",
+      "Dave Rolsky <autarch@urth.org>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <complefor@rambler.ru>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

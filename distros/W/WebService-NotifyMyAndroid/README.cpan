@@ -1,0 +1,17 @@
+A couple of the cpan module have dependencies on libraries being installed
+
+# Net::SSLeay
+
+This is a sub-dependency of LWP::Protocol::https and requires 'libssl-dev' to
+install.
+
+On a debian/ubuntu machine this can be resolved by running:
+
+    sudo apt-get install libssl-dev
+
+# XML::Parser
+
+This is a sub-dependency of WebService::Simple and required 'libexpat-dev' to
+install.
+
+    sudo apt-get install install libexpat-dev

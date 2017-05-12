@@ -1,0 +1,52 @@
+WebService-Images-Nofrag version 0.0.6
+
+my $pix = WebService::Images::Nofrag->new();
+$pix->upload({file => '/path/to/the/file'});
+  
+# or
+$pix->upload({file => '/path/to/the/file'}, '800x600');
+
+# or
+$pix->upload({url => 'http://test.com/my/file.jpg', '50%'});
+
+print "URL : " . $pix->url . "\n";    # print the url of the page
+print "image : " . $pix->image . "\n";# print the url of the image
+print "thumb : " . $pix->thumb . "\n";# print the url of the thumb
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Class::Accessor::Fast
+Image::Magick
+Image::Magick::Info
+LWP::Simple
+Test::More
+Test::Perl::Critic
+version
+WWW::Mechanize
+                     
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, franck cuny
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,60 @@
+commit 3da2b482b0734411ca73b8bf456df48751e36b62
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sat Jul 16 16:27:25 2011 +0930
+
+    Tag: WebDyne-Install-Lighttpd_1.009
+    
+    Updated to new versioning system that keeps dist version in sync with main module version
+
+commit ab71c2b979e8c48982fccd147bc61f342fcad5ae
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:20:42 2011 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.007
+    
+    Modify Makefile PREREQ section to be more compatible with older version of CPAN
+
+commit 7d644cb99f9c0fef091e76b96e24ea2cd3d04da9
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:42:46 2010 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.006
+    
+    clean mm_ver redundancy in Makefile.PL, edit README
+
+commit 74b1975147846c6d2b81bf8799725d173ad74d55
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 21:35:02 2010 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.005
+    
+    Updated to YAML 1.4, fixed ref to missing perl5lib.pm
+
+commit 1b0c7c9ff5fb3278eaa67b65e3460ce1cffa21a4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 11 16:38:57 2010 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.004
+    
+    Updated copyright and author information, updated Makekefiel to create META.yml
+
+commit 78325d3c94f976529ee3a723799cce30448e0709
+Author: root <root@copper.isolutions.com.au>
+Date:   Thu Apr 8 22:24:35 2010 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.003
+    
+    Updated documentation, cleaned up ready for CPAN release.
+
+commit 5e379c369494ffee558dc5ffc762ca02bd67e4c3
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Mon Aug 24 00:34:21 2009 +0930
+
+    MANIFEST import
+
+commit ca6298ddca2d254978655eecb69a98c2ecf98f7c
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Mon Aug 24 00:11:39 2009 +0930
+
+    Tag: WebDyne-Install-Lighttpd_0.02
+

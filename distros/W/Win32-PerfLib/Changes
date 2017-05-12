@@ -1,0 +1,33 @@
+Revision history for Perl extension Win32::PerfLib.
+
+0.01  Tue Jan 20 20:58:30 1998
+	- original version; created by h2xs 1.18
+
+0.02
+        - first version included in libwin32-0.12
+
+0.03  Wed Aug 19 22:03:00 1998
+        - fixed: counter without instances didn't return correct values
+        - added: makefile for AS Perl build 316 and support in PerfLib.xs
+
+0.04  Sat Nov 14 23:05:05 1998
+	- memory leak fixes from Artur Silveira da Cunha
+	  <Artur.Silveira@rezo.com>
+	- allocate space on a mortal SV for auto-cleanup
+
+0.05  Mon May 22 21:35:30 2000
+	- support for building under Perl v5.6.0
+	- support for passing Unicode strings to methods (thanks to
+	  Doug Lankshear <doug@lankshear.net>)
+
+0.06  Tue Apr 17 2008
+	- version 0.06 for separate upload to CPAN
+	- updated email addresses
+	- simplified Makefile.PL
+	- added META.yml
+	- added ppport.h
+	- added casts to suppress compiler warnings under Win64
+
+0.07  Wed Dec 4 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml

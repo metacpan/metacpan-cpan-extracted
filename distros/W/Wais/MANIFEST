@@ -1,0 +1,28 @@
+ChangeLog
+HTWAIS.c
+HTWAIS.h
+INSTALL
+MANIFEST
+Makefile.PL
+README                       Generated from Wais.pm
+Wais.h                       Wrapper around wais.h
+Wais.xs
+dictionary.c                 Code for examining local wais databases.
+dictionary.h
+lib/Wais.pm                  Including some documentation for the curious.
+lib/Wais/Dict.pm
+mkinc                        Script to generate wais.h
+script/inspect               Example script for exploring wais databases.
+script/makedb                Creating and updating Wais databases
+t/a_preop.t                  Index test database, start server
+t/basic.t
+t/data/TEST
+t/data/TESTG
+t/data/test.fmt
+t/data/testg.fmt
+t/dict.t
+t/ndict.t
+t/parallel.t                 Test for the new interface.
+t/stem.t
+t/z_postop.t                 kill server, remove test database
+typemap

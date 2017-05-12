@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+use strict; use warnings;
+use IO::All;
+use WikiText::Kwiki::Parser;
+use WikiText::Markdown::Emitter;
+use XXX;
+
+run(@ARGV);
+
+sub run {
+    return test() if $_[0] eq 'test';
+    my $input_dir = shift
+        or die usage("Missing input directory");
+    -d $input_dir
+        or die usage("'$input_dir' not a directory");
+    my $output_dir = shift
+        or die usage("Missing output directory");
+    -d $output_dir
+        or die usage("'$output_dir' not a directory");
+    die usage("Unknown arguments: '@_'")
+        if @_;
+
+    for my $kwiki_file (io->dir($input_dir)->all_files) {
+        my $name = $kwiki_file->filename;
+        next if $name =~ /^\./;
+        print "$name\n";
+        my $markdown = convert_kwiki_file(io($kwiki_file)->all);
+        $markdown =~ s/\n\n\z/\n/;  # Remove extra final blank line.
+        io->file("$output_dir/$name.md")->print($markdown);
+    }
+}
+
+sub convert_kwiki_file {
+    my ($input) = @_;
+    require WikiText::HTML::Emitter;
+    my $receiver = WikiText::Markdown::Emitter->new();
+    $receiver->reset;
+    my $parser = WikiText::Kwiki::Parser->new(
+        receiver => $receiver,
+    );
+    return $parser->parse($input);
+}
+
+sub test {
+    my $markdown = convert_kwiki_file <<'...';
+Aaa *bbb* /ccc/ */ddd/* /*eee*/ [=/*fff*/] ggg.
+----
+  pre
+* foo
+** bar
+*** vvv
+** bar
+* baz
+
+xxxxxx http://ingy.net
+yyy [Ingy http://ingy.net dot Net]
+yyy [http://ingy.net Ingy dot Net]
+  $$$
+yyy [Ingy dot Net]
+yyy [Ingy dot net http://ingy.net]
+this is !NotALink. ok
+
+hhh FooBar
+| foo | bar |
+|    yy    | z|
+..
+...
+    $markdown =~ s/\n\n\z/\n/;  # Remove extra final blank line.
+    print $markdown . "-----------------------------------------------\n";
+}
+
+sub usage {
+    my $msg = shift || '';
+    my $usage = <<'...';
+Usage:
+    kwiki2markdown <kwiki/input/dir> <markdown/output/dir>
+
+Note: output directory must be empty.
+...
+    $usage = "Error: '$msg'\n\n$usage" if $msg;
+    return $usage;
+}

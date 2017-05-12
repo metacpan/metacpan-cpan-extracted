@@ -1,0 +1,39 @@
+---
+abstract: "Perl client library for SeatGeek's Sixpack A/B testing framework http://sixpack.seatgeek.com/"
+author:
+  - 'Menno Blom, C<< <blom at cpan.org> >>'
+build_requires:
+  Plack: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.038'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: p5-WWW-Sixpack
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: '0'
+  Data::UUID: '0'
+  JSON::Any: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/b10m/p5-WWW-Sixpack/issues
+  homepage: https://github.com/b10m/p5-WWW-Sixpack
+  repository: https://github.com/b10m/p5-WWW-Sixpack.git
+version: '0.04'
+x_contributors:
+  - 'B10m <menno@b10m.net>'

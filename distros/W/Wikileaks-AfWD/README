@@ -1,0 +1,52 @@
+Wikileaks-AfWD
+
+Useful utilities for searching the Afganistan War Diary.
+
+If you don't have a SQL server available, install
+sqlite3 and DBD::SQLite.
+
+Please see the URL below for the required SQL file.
+
+http://wikileaks.org/wiki/Afghan_War_Diary,_2004-2010
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Wikileaks::AfWD
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Wikileaks-AfWD
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Wikileaks-AfWD
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Wikileaks-AfWD
+
+    Search CPAN
+        http://search.cpan.org/dist/Wikileaks-AfWD/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

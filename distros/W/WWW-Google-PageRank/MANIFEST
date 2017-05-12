@@ -1,0 +1,10 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/WWW/Google/PageRank.pm
+t/00use.t
+t/local.t
+t/utf8.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

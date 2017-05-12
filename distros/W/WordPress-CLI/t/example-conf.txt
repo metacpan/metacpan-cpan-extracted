@@ -1,0 +1,4 @@
+   -u leo
+   -p sparrow3
+   -x http://leocharre.com/xmlrpc.php
+   -n

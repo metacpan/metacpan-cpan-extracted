@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<recent_changes>
+[% FOR page = pages %]
+  <page_name>[% page.title %]</page_name>
+  <page_uri>[% page.uri %]</page_uri>
+  <edit_by>[% page.metadata.edit_by %]</edit_by>
+  <edit_unixtime>[% page.metadata.edit_unixtime || page.modified_time %]</edit_unixtime>
+  <edit_time>[% page.edit_time %]</edit_time>
+[% END %]
+</recent_changes>
+

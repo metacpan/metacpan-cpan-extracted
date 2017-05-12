@@ -1,0 +1,20 @@
+Revision history for WebService-RTMAgent
+
+0.602     2015-07-21 21:54:46-04:00 America/New_York
+        - initialize the RTMAgent's parent class, LWP::UA, first
+          (thanks, Ed Santiago)
+
+0.601     2014-12-31 15:15:03-05:00 America/New_York
+        - use api.rememberthemilk.com, not www.rememberthemilk.com (thanks,
+          Vince Broz!)
+
+0.600     2013-11-10 20:02:31 America/New_York
+        - tried to make tests pass reliably
+        - use https
+
+0.5       14 March 2008
+	      - Fixed dependencies in Makefile.PL
+
+0.05      16 December 2007
+        - First CPAN version, released on an unsuspecting world.
+

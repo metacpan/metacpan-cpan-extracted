@@ -1,0 +1,52 @@
+{
+   "abstract" : "Redirects print STDOUT and warn statements to a message box under wperl",
+   "author" : [
+      "DClarke <dclarke@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-PrintBox",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Win32" : "0",
+            "Win32::Console::ANSI" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Win32::PrintBox" : {
+         "file" : "lib/Win32/PrintBox.pm",
+         "version" : "0.004"
+      },
+      "Win32::PrintBox::IO" : {
+         "file" : "lib/Win32/PrintBox.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.004"
+}

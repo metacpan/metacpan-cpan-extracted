@@ -1,0 +1,35 @@
+Revision history for WG-API
+
+v0.8.1 2016-01-09T08:26:46Z
+  - fix depends
+
+v0.8 2016-01-07T21:06:51Z
+  - fix depends
+
+v0.7 2016-01-07T20:59:32Z
+  - add version info into all modules
+
+v0.06 2016-01-07T20:43:00Z
+  - reworked all modules
+
+v0.05 2015-09-09T16:09:14Z
+	- add work with global accounts
+  - changed response format for scalar context
+
+v0.04 2015-08-21T16:32:37Z
+        - add World of Warships API
+        - rename some tests
+        - remove some tests
+        - fix pods
+
+v0.03 2015-07-04T10:04:53Z
+        - change tests structure
+        - fix pods
+        - no parallel test in TRAVIS
+
+v0.02 2015-07-02T19:42:50Z
+        Hot fix
+
+v0.01    02.07.2015
+        First version, released on an unsuspecting world.
+

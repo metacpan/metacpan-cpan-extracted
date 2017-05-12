@@ -1,0 +1,40 @@
+Revision history for Perl extension WWW::Google::Groups.
+
+0.01  Thu Sep  4 02:45:20 2003
+	- original version; created by h2xs 1.21 with options
+		-XA WWW::Google::Groups
+
+0.02  Sun, 14 Sep 2003 16:11:41 +0800
+	- several bugs fixed.
+	- added save2mbox() in Groups.pm
+	- added starting_thread() in Groups.pm
+	- added Groups/Vars.pm
+	- added @agent_alias in Groups/Vars.pm for simulating browsing with
+          different agent
+
+0.03  Mon, 15 Sep 2003 04:17:02 +0800
+	- fixed infinite fetching problem
+	- several code reductions using mechanize methods
+
+0.04  Tue, 16 Sep 2003 23:14:38 +0800
+	- added searching capability
+	- complete thread downloading
+	- added Groups/Search.pm
+	- added Groups/SearchResult.pm
+
+0.05  Sun, 21 Sep 2003 18:22:45 +0800
+	- fixed ill-formatted mbox dumping
+
+0.06  Mon, 22 Sep 2003 02:19:17 +0800
+	- fixed duplicate messages fetching
+
+0.07  Mon, 22 Sep 2003 10:54:50 +0800
+	- void-email-address-in-header problem seems fixed.
+	- *really* seems rid of the message duplicate problem
+
+0.08  Sun,  4 Jan 2004 03:08:04 +0800
+	- www::mechanize's "onerror" and "onwarn" suppressed
+	  (not a good solution)
+
+0.09  Sun,  4 Jan 2004 15:49:05 +0800
+	- posting function added

@@ -1,0 +1,253 @@
+
+=head1 NAME
+
+Win32::GUI::ComboboxEx - Create and manipulate extended combobox controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new ComboboxEx object;
+can also be called as PARENT->AddComboboxEx(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -imagelist => Win32::GUI::ImageList object
+    Set Imagelist object
+  -casesensitive => 0/1 (default 0)
+    Set/Unset casesensitive extended style.
+  -noeditimage => 0/1 (default 0)
+    Set/Unset noeditimage extended style.
+  -noeditimageindent => 0/1 (default 0)
+    Set/Unset noeditimageindent extended style.
+  -nosizelimit => 0/1 (default 0)
+    Set/Unset nosizelimit extended style.
+
+Except for images, a ComboboxEx object acts like a Win32::GUI::Combobox
+object. See also L<new Win32::GUI::Combobox()|Win32::GUI::Combobox/new>.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteItem
+
+B<DeleteItem(INDEX)>
+
+Delete an indexed item of the control's list.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetComboControl
+
+B<GetComboControl()>
+
+Retrieves the handle to the child combo box control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEditControl
+
+B<GetEditControl()>
+
+Retrieves the handle to the edit control portion of a ComboBoxEx control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetExtendedStyle
+
+B<GetExtendedStyle()>
+
+Retrieves the extended styles that are in use for a ComboBoxEx control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetImageList
+
+B<GetImageList()>
+
+Retrieves the handle to an image list assigned to a ComboBoxEx.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItem
+
+B<GetItem(NODE)>
+
+Retrieves item information for a given ComboBoxEx item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HasEditChanged
+
+B<HasEditChanged()>
+
+Determines if the user has changed the contents of the ComboBoxEx edit control by typing.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(%OPTIONS)>
+
+Inserts a new item in the ComboboxEx control. Returns the newly created
+item zero-based index or -1 on errors.
+
+B<%OPTIONS> can be:
+
+  -index => position (-1 for the end of the list)
+  -image => index of an image from the associated ImageList
+  -selectedimage => index of an image from the associated ImageList
+  -text => string
+  -indent => indentation spaces (1 space == 10 pixels)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetExtendedStyle
+
+B<SetExtendedStyle(mask, exstyle)>
+
+Sets extended styles within a ComboBoxEx control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetImageList
+
+B<SetImageList(imagelist)>
+
+Sets an image list for a ComboBoxEx control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItem
+
+B<SetItem(%OPTIONS)>
+
+Sets the attributes for an item in a ComboBoxEx control.
+
+B<%OPTIONS> can be:
+
+  -image => index of an image from the associated ImageList
+  -selectedimage => index of an image from the associated ImageList
+  -text => string
+  -indent => indentation spaces (1 space == 10 pixels)
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change (Win32::GUI::Combobox)
+
+B<Change()>
+
+Sent when the user selects an item from the Combobox
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseUp (Win32::GUI::Combobox)
+
+B<CloseUp()>
+
+Sent when the list box of a combo box has been closed. This event allows you to populate the
+dropdown dynamically. This event is only fired if the combo box has the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
+
+If the user changed the current selection, the combo box also sends the Change event when the drop-down list closes.
+In general, you cannot predict the order in which notifications will be sent. In particular, a Change event message
+may occur either before or after a CloseUp event.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DblClick (Win32::GUI::Combobox)
+
+B<DblClick()>
+
+Sent when the user double clicks on an item from the Combobox
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DropDown (Win32::GUI::Combobox)
+
+B<DropDown()>
+
+Sent when the user selects the list box. This event allows you to populate the
+dropdown dynamically. This event is only fired if the combo box has the CBS_DROPDOWN or CBS_DROPDOWNLIST style.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GotFocus (Win32::GUI::Combobox)
+
+B<GotFocus()>
+
+Sent when the control is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LostFocus (Win32::GUI::Combobox)
+
+B<LostFocus()>
+
+Sent when the control is deactivated.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

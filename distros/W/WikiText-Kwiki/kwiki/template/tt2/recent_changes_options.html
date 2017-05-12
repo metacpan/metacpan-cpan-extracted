@@ -1,0 +1,29 @@
+<!-- BEGIN recent_changes_options -->
+[%- choices = {
+        '1'   => 'Last 24 hours',
+        '2'   => 'Last 2 Days',
+        '3'   => 'Last 3 Days',
+        '7'   => 'Last Week',
+        '14'  => 'Last 2 Weeks',
+        '30'  => 'Last Month',
+        '60'  => 'Last 2 Months',
+        '90'  => 'Last 3 Months',
+        '182' => 'Last 6 Months'
+   }
+-%]
+<form class="recent_changes_options"
+      name="recent_changes_options"
+      action="[% script_name %]">
+<input type="hidden" name="action" value="recent_changes" />
+<span>In</span>
+<select name="depth">
+[%- FOREACH c = choices.keys.nsort -%]
+    <option onclick="this.parentNode.parentNode.submit();"
+[%- IF hub.recent_changes.cgi.depth == c -%]
+            selected="selected"
+[%- END -%]
+            value="[% c %]">[% choices.$c %]</option>
+[%- END -%]
+</select>
+</form>
+<!-- END recent_changes_options -->

@@ -1,0 +1,19 @@
+This package contains WWW::Google::PageRank module assigned for querying
+PageRank of web page in Google.
+
+This module uses URI and LWP::UserAgent (libwww-perl), so you must
+have it if you want to use this module.
+
+Installation is simple:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you have questions mail to ykar@cpan.org.
+
+Copyright 2004 Yuri Karaban.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

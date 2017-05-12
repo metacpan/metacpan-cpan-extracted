@@ -1,0 +1,94 @@
+=pod
+
+=head1 NAME
+
+Webservice::InterMine::Cookbook::List::Combination - Combining Lists
+
+=head1 SYNOPSIS
+
+  use Webservice::InterMine;
+
+  my $service = Webservice::InterMine->get_service('www.flymine.org/query', token => $TOKEN);
+
+  # Make a new list by combining two or more
+  my $combined_list = $list + $combined_list;
+  $combined_list->rename("Combination");
+
+  # Make a new list which is a clone of another list
+  my $copy = $service->new_list($list, name => "Copy of my list");
+
+=head1 DESCRIPTION 
+
+=head2 Copying Lists
+
+Lists can be copied within the same service by simply passing the list to copy from as the 
+first parameter to C<new_list>. This makes a new list (with a default name if none is supplied)
+with the same content as the original.
+
+=head2 Combining Lists
+
+Lists can be combined in several ways (see Recipe2 for more operations). One of these
+is to join two or more lists together. This can be done in a number of ways:
+
+  my $new_list = $listA + $listB; # Addition as union
+  $new_list = $listA | $listB;    # Union as this or that
+  $new_list = $listA + $query;    # OK to combine lists and queries.
+  $new_list = $service->join_lists([$listA, $listB, $query], "Combination") # Use the service
+
+The main benefit of using the service method is being able to supply a name
+at creation time, rather than using the C<rename> method, as well as being able 
+to supply as many lists and queries as you wish.
+
+The syntax is much the same for the other operations, more details of which can be found in
+Recipe2.
+
+=head2 Retrieving Results
+
+Lists may be treated much like queries, and this is explored in more depth in 
+Recipe3. Methods that work on queries and lists include:
+
+  $list->show();
+  $list->show_first();
+  $list->print_results();
+  while (<$list>) { 
+    # Iteration
+  }
+  $list->results_iterator;
+
+=head1 CONCLUSION
+
+The syntax for creating lists is the same for all the different 
+content types, and many of the same operations that can be performed on 
+queries can be performed on Lists as well.
+
+=head1 AUTHOR
+
+Alex Kalderimis C<dev@intermine.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<dev@intermine.org>.
+
+=head1 SUPPORT
+
+You can find information about InterMine at:
+
+=over 4
+
+=item * InterMine
+
+L<http://www.intermine.org>
+
+=item * Documentation
+
+L<http://intermine.org/wiki/PerlWebServiceAPI>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2006 - 2013 FlyMine, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w -I../lib
+######################################################################
+# send_all
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: send_all,v 1.3 2006/01/18 01:59:34 grant Exp $
+######################################################################
+# Copyright (c) 2006 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+
+use WWW::Myspace;
+use WWW::Myspace::Message;
+
+# usage: send_all -s subject -m message friend_id [friend_id ...]
+$message = new WWW::Myspace::Message( new WWW::Myspace, @ARGV );
+
+$message->noisy(1);
+$message->send_all;
+

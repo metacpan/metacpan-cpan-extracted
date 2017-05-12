@@ -1,0 +1,313 @@
+=head1 NAME
+
+WWW::AUR::Package - Query, download, and build AUR packages.
+
+=head1 SYNOPSIS
+
+  use WWW::AUR;
+  my $aurobj = WWW::AUR->new();
+  my $pkg = $aurobj->find( 'perl-www-aur' );
+  
+  # or using WWW::AUR::Package directly ...
+  use WWW::AUR::Package;
+  my $pkg = WWW::AUR::Package->new( 'perl-www-aur' );
+  
+  #----------------------------------------------------------------------
+  
+  # Accessors exist for package info fields...
+  printf "ID: %d -- Name: %s -- Version: %s\n",
+      $pkg->id, $pkg->name, $pkg->version;
+  
+  # Or retrieve the info as a hash, easier for printing...
+  my %info = $pkg->info;
+  print "ID: $info{id} -- Name: $info{name} -- Version: $info{version}"
+  
+  # Before extracting, pkgbuild() gets the PKGBUILD from the webpage...
+  my %pkgbuild = $pkg->pkgbuild;
+  print "pkgname: $pkgbuild{pkgname}\npkgver: $pkgbuild{pkgver}\n";
+  
+  #----------------------------------------------------------------------
+  
+  # Check the source package file size before downloading...
+  my $dlsize = $pkg->download_size;
+  print "Source package size is $dlsize bytes.\n";
+  
+  # PKGBUILD arrays are turned into array refs...
+  printf "depends: %s\n", join q{ }, @{ $pkgbuild{depends} };
+  
+  # download() method sets the src_pkg_path() accessor...
+  $pkg->download;
+  printf "Downloaded %s to %s.\n", $pkg->name, $pkg->src_pkg_path;
+  
+  # extract() method sets the src_dir_path() accessor...
+  $pkg->extract;
+  printf "Extracted source package to %s.\n", $pkg->src_dir_path;
+  
+  # build() method sets the bin_pkg_path() accessor...
+  $pkg->build;
+  printf "Build binary package and saved to %s.\n", $pkg->bin_pkg_path();
+  
+  # After extracting, pkgbuild() is read from the file on disk...
+  %pkgbuild = $pkg->pkgbuild;
+  
+  # Get the package owner maintainer object...
+  my $maint_obj = $pkg->maintainer();
+  
+  # Or maybe you only want their name... (this is faster)
+  my $maint_name = $pkg->maintainer_name();
+
+=head1 DESCRIPTION
+
+The package class is the most important class for the I<WWW-AUR>
+distribution. Using a package object, you can lookup any information
+you need for the package as well as download, extract, and build the
+package with the makepkg command.
+
+=head1 CONSTRUCTOR
+
+  $OBJ = WWW::AUR::Package->new( $NAME, %PATH_PARAMS? );
+
+The constructor takes the package name as its argument. An error will
+be I<croaked> with L<Carp> if the package could not be found on the
+AUR.  Path parameters are optional, see L<WWW::AUR/PATH PARAMETERS>
+for more information.
+
+  NOTE: In order to look up a package by name, this module must query
+        the AUR RPC first. Just keep in mind every WWW::AUR::Package
+        object you creates requires an HTTP request.
+
+=over 4
+
+=item C<$NAME>
+
+The name of the AUR package.
+
+=item C<%PATH_PARAMS> I<(Optional)>
+
+Path parameters. See L<WWW::AUR/PATH PARAMETERS>.
+
+=item B<Errors>
+
+=over 4
+
+=item Failed to find package: C<$NAME>
+
+This error is I<croak>-ed if the package with the given C<$NAME> could
+not be found.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=head2 Package Info Accessors
+
+  $IDNUM    = $OBJ->id;         (RPC Field Names)
+  $NAME     = $OBJ->name;
+  $VERSION  = $OBJ->version;
+  $DESC     = $OBJ->desc;       ("Description")
+  $CATEGORY = $OBJ->category;
+  $URL      = $OBJ->url;
+  $URLPATH  = $OBJ->urlpath;
+  $LICENSE  = $OBJ->license;
+  $VOTES    = $OBJ->votes;      ("NumVotes")
+  $OUTDATED = $OBJ->outdated;   ("OutOfDate")
+  $CTIME    = $OBJ->ctime;      ("FirstSubmitted")
+  $MTIME    = $OBJ->mtime;      ("LastModified")
+
+These accessors correlate exactly to the keys returned to by the AUR's
+rpc.php output given. Most of the fields are self explanatory.
+
+=over 4
+
+=item C<$CATEGORY>
+
+Instead of using an id number for categories, they are mapped to the
+name of the category. The following names are used for each corresponding
+category ID:
+
+=over 4
+
+=item 1. daemons
+
+=item 2. devel
+
+=item 3. editors
+
+=item 4. emulators
+
+=item 5. games
+
+=item 6. gnome
+
+=item 7. i18n
+
+=item 8. kde
+
+=item 9. kernels
+
+=item 10. lib
+
+=item 11. modules
+
+=item 12. multimedia
+
+=item 13. network
+
+=item 14. office
+
+=item 15. science
+
+=item 16. system
+
+=item 17. x11
+
+=item 18. xfce
+
+=back
+
+=item C<$VOTES>
+
+The I<NumVotes> RPC field was renamed to, simply, I<votes>.
+
+=item C<$OUTDATED>
+
+The I<OutOfDate> RPC field was renamed to I<outdated>.
+
+=item C<$CTIME>
+
+The I<FirstSubmitted> RPC field was renamed to I<ctime>.
+
+=item C<$MTIME>
+
+The I<LastModified> RPC field was renamed to I<mtime>.
+
+=back
+
+=head2 info
+
+  %INFO = $OBJ->info;
+
+Returns all data from the info accessors as one hash. Keys are the
+same as the accessor names.
+
+=head2 pkgbuild
+
+  $PKGBUILD_OBJ = $OBJ->pkgbuild;
+
+Parses the PKGBUILD file and returns it as a L<WWW::AUR::PKGBUILD>
+object.
+
+If the package has already been extracted then the PKGBUILD is read
+from the PKGBUILD file extracted to disk. Otherwise, the PKGBUILD is
+read direct from the AUR webpage without downloading a source package
+file.
+
+=head2 download
+
+  $SRCPKGPATH = $OBJ->download( $CALLBACK? )
+
+=over 4
+
+=item C<$CALLBACK> I<(Optional)>
+
+A code reference that will be called everytime a "chunk" of data
+is downloaded. Two parameters are passed to the supplied code reference:
+
+=over 4
+
+=item 1. The number of bytes downloaded so far.
+
+=item 2. The total size of the package, in bytes.
+
+=back
+
+=item C<$SRCPKGPATH>
+
+The absolute path to the source package file that was downloaded.
+
+=back
+
+=head2 maintainer
+
+  $MAINTAINER_OBJ = $OBJ->maintainer( %PATH_PARAMS? )
+
+=over 4
+
+=item C<$MAINTAINER_OBJ>
+
+The L<WWW::AUR::Maintainer> object representing the maintainer of this
+package.
+
+=item C<%PATH_PARAMS> I<(Optional)>
+
+Optional path parameters to store in the new maintainer object. These
+will get passed to any package object that are initialized by it.
+
+=back
+
+=head2 maintainer_name
+
+  $MAINTAINER_NAME = $OBJ->maintainer_name()
+
+=over 4
+
+=item C<$MAINTAINER_NAME>
+
+The name of the maintainer of this package. This method is alot faster
+than C<maintainer()> because it does not verify anything. This just
+scrapes the package's webpage for the maintainer name.
+
+=back
+
+=head2 Package File Methods
+
+  $SRCPKGDIR = $OBJ->extract;
+  $BINPKGDIR = $OBJ->build( %BUILD_PARAMS? );
+  undef | $PATH = $OBJ->src_pkg_path;
+  undef | $PATH = $OBJ->src_pkg_dir;
+  undef | $PATH = $OBJ->bin_pkg_path;
+
+After calling L</download> a L<WWW::AUR::Package::File> object is
+stored inside the B<WWW::AUR::Package> object. All of the
+B<WWW::AUR::Package::File> methods are wrapped by the Package object.
+
+The I<extract> and I<build> methods call L</download> first if it has
+not already been called. I<build> calls the I<build> method in the
+L<WWW::AUR::Package::File> object, which will call the corresponding
+I<extract> method if it has not already been called.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<WWW::AUR>
+
+=item * L<WWW::AUR::Package::File>
+
+=item * L<WWW::AUR::PKGBUILD>
+
+=back
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+=head1 BUGS
+
+Please email me any bugs you find. I will try to fix them as quick as I can.
+
+=head1 SUPPORT
+
+Send me an email if you have any questions or need help.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Justin Davis.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

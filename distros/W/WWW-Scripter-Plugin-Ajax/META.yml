@@ -1,0 +1,30 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Scripter-Plugin-Ajax
+version:      0.09
+version_from: lib/WWW/Scripter/Plugin/Ajax.pm
+installdirs:  site
+requires:
+    Bundle::LWP5_837:              0
+    constant:                      1.03
+    constant::lexical:             0
+    Encode:                        2.09
+    File::Spec::Functions:         0
+    HTML::DOM::Event:              0
+    HTML::DOM::Exception:          0.013
+    HTML::DOM::Interface:          0
+    JE:                            0.041
+    lib:                           0
+    Scalar::Util:                  1.09
+    strict:                        0
+    Test::More:                    0
+    URI:                           1
+    URI::Escape:                   0
+    utf8:                          0
+    warnings:                      0
+    WWW::Scripter:                 0
+    WWW::Scripter::Plugin::JavaScript: 0.002
+    XML::DOM::Lite:                0.09
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,8 @@
+Revision history for WebService-Yes24
+
+0.100980  2010-04-08 18:45:43 Asia/Seoul
+    - Use WebService::Yes24::Item for search result
+    - Add 'link' attributes
+
+0.100890  2010-03-30 19:24:50 Asia/Seoul
+    First release

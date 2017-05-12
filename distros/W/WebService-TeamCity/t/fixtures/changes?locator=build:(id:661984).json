@@ -1,0 +1,22 @@
+{
+   "change" : [
+      {
+         "date" : "20151228T125449+0300",
+         "href" : "/httpAuth/app/rest/changes/id:2241127",
+         "id" : 2241127,
+         "username" : "dmitry.neverov",
+         "version" : "faa61d8dec6bfec81c8dba113bfb1c92d2d02649",
+         "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2241127&personal=false"
+      },
+      {
+         "date" : "20151228T124916+0300",
+         "href" : "/httpAuth/app/rest/changes/id:2241126",
+         "id" : 2241126,
+         "username" : "dmitry.neverov",
+         "version" : "679d882ef863a1716c1f5593c162682e74358da8",
+         "webUrl" : "https://teamcity.jetbrains.com/viewModification.html?modId=2241126&personal=false"
+      }
+   ],
+   "count" : 2,
+   "href" : "/httpAuth/app/rest/changes?locator=build:(id:661984)"
+}

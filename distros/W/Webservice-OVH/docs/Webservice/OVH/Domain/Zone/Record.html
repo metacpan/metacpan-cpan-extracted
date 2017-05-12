@@ -1,0 +1,264 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_existing">_new_existing</a></li>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#is_valid">is_valid</a></li>
+      <li><a href="#is_valid1">_is_valid</a></li>
+      <li><a href="#id">id</a></li>
+      <li><a href="#zone">zone</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#field_type">field_type</a></li>
+      <li><a href="#sub_domain">sub_domain</a></li>
+      <li><a href="#target">target</a></li>
+      <li><a href="#ttl">ttl</a></li>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#change">change</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Domain::Zone::Record</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $zone = $ovh-&gt;domain-&gt;zone(&quot;myzone.de&quot;);</p>
+
+<p>my $a_record = $zone-&gt;new_record(field_type =&gt; &#39;A&#39;, target =&gt; &#39;0.0.0.0&#39;, ttl =&gt; 1000 ); my $mx_record = $zone-&gt;new_record(field_type =&gt; &#39;MX&#39;, target =&gt; &#39;1 my.mail.server.de.&#39;);</p>
+
+<p>my $records = $zone-&gt;records(filed_type =&gt; &#39;A&#39;, sub_domain =&gt; &#39;www&#39;);</p>
+
+<p>foreach my $record (@$records) {</p>
+
+<pre><code>    $record-&gt;change( target =&gt; &#39;0.0.0.0&#39; );
+    $record-&gt;zone-&gt;refresh;
+    $record-&gt;change( sub_domain =&gt; &#39;www&#39;, refresh =&gt; &#39;true&#39; );
+}</code></pre>
+
+<p>$record-&gt;delete(&#39;true&#39;);</p>
+
+<p>print &quot;Not Valid anymore&quot; unless $record-&gt;is_valid;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides all api Record Methods available in the api. Delete deletes the record object in the api and makes the object invalid. No actions be done with it, when it is invalid.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_existing">_new_existing</h2>
+
+<p>Internal Method to create a Record object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $zone - parent zone Objekt, $record_id =&gt; api intern id</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone/Record.html">Webservice::OVH::Domain::Zone::Record</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Domain::Zone::Record-&gt;_new_existing($ovh_api_wrapper, $module, $zone, $record_id);</p>
+
+</li>
+</ul>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the zone object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $zone - parent zone, %params - key =&gt; value</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone/Record.html">Webservice::OVH::Domain::Zone::Record</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Domain::Zone::Record-&gt;_new($ovh_api_wrapper, $module, $zone_name, target =&gt; &#39;0.0.0.0&#39;, field_type =&gt; &#39;A&#39;, sub_domain =&gt; &#39;www&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid">is_valid</h2>
+
+<p>When this record is deleted on the api side, this method returns 0.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;Valid&quot; if $record-&gt;is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid1">_is_valid</h2>
+
+<p>Intern method to check validity. Difference is that this method carps an error.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: $record-&gt;_is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="id">id</h2>
+
+<p>Returns the api id of this record</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $id = $record-&gt;id;</p>
+
+</li>
+</ul>
+
+<h2 id="zone">zone</h2>
+
+<p>Returns the zone this record is attached to.</p>
+
+<ul>
+
+<li><p>Return: <a>Webservice::Domain::Zone</a></p>
+
+</li>
+<li><p>Synopsis: my $zone = $record-&gt;zone;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Returns the raw properties as a hash. This is the original return value of the web-api.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $record-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="field_type">field_type</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $field_type = $record-&gt;field_type;</p>
+
+</li>
+</ul>
+
+<h2 id="sub_domain">sub_domain</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $sub_domain = $record-&gt;sub_domain;</p>
+
+</li>
+</ul>
+
+<h2 id="target">target</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $target = $record-&gt;target;</p>
+
+</li>
+</ul>
+
+<h2 id="ttl">ttl</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $ttl = $record-&gt;ttl;</p>
+
+</li>
+</ul>
+
+<h2 id="delete">delete</h2>
+
+<p>Deletes the record api sided and sets this object invalid. After deleting, the zone must be refreshed, if the refresh parameter is not set.</p>
+
+<ul>
+
+<li><p>Parameter: $refresh &#39;true&#39; &#39;false&#39; undef - imidiate refreshing of the domain zone</p>
+
+</li>
+<li><p>Synopsis: $record-&gt;delete(&#39;true&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="change">change</h2>
+
+<p>Changes the record After changing the zone must be refreshed, if the refresh parameter is not set.</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value sub_domain target ttl refresh</p>
+
+</li>
+<li><p>Synopsis: $record-&gt;change(sub_domain =&gt; &#39;www&#39;, refresh =&gt; &#39;true&#39;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

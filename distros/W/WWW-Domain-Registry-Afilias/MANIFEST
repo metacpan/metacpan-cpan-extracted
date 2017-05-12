@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/02_login.t
+t/03_home.t
+t/04_account.t
+lib/WWW/Domain/Registry/Afilias.pm
+META.yml                                 Module meta-data (added by MakeMaker)

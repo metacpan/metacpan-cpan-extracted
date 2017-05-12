@@ -1,0 +1,25 @@
+Revision history for WebNano
+
+0.001 17-10-2010 
+    Initial release.
+0.002 17-10-2010 
+    Hiding examples from PAUSE
+0.003     2010-11-21
+    Using Class::Load
+0.004     2010-11-23
+    DEBUG set from env
+    some improvements in debug info
+0.005     2010-12-15
+    the path is split in the app class and passed around as an array
+    docs improvements from Jeff Doozan
+
+0.006     2011-02-28
+    psgi_callback renamed to psgi_app (this seems to be unwritten standard)
+    docs improvements (Plack::Middleware::Auth::Form mentioned)
+
+0.007     2012-05-19
+    there are incompatible changes!
+    got rid of DirController (add sub search_subcontrollers { 1 } to get the functionality
+        with standard Controller
+    path attribute for the Controller class - removing all the path parameter passing
+    dispatch_to_class factored out

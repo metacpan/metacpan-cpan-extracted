@@ -1,0 +1,18 @@
+---
+abstract: 'WebService::FaucetBOX - FaucetBOX (faucetbox.com) API bindings'
+author:
+  - 'Todd Wade <waveright@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-FaucetBOX
+requires:
+  Function::Parameters: '1.0705'
+  WebService::Client: '0.0501'
+version: '0.01'

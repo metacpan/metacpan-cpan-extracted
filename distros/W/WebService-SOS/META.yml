@@ -1,0 +1,28 @@
+---
+abstract: 'A module for interfacing with an OpenGIS Sensor Observation Service (SOS)'
+author:
+  - 'James C. Davis <jdavis@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-SOS
+requires:
+  Carp: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  URI::Escape: 0
+  XML::Rabbit: 0
+  XML::Rabbit::Root: 0.1.0
+  namespace::autoclean: 0
+version: 0.01

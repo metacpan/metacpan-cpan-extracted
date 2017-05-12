@@ -1,0 +1,296 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#name">name</a></li>
+      <li><a href="#service_infos">service_infos</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#dnssec_supported">dnssec_supported</a></li>
+      <li><a href="#domain">domain</a></li>
+      <li><a href="#glue_record_ipv6_supported">glue_record_ipv6_supported</a></li>
+      <li><a href="#glue_record_multi_ip_supported">glue_record_multi_ip_supported</a></li>
+      <li><a href="#last_update">last_update</a></li>
+      <li><a href="#name_server_type">name_server_type</a></li>
+      <li><a href="#offer">offer</a></li>
+      <li><a href="#owo_supported">owo_supported</a></li>
+      <li><a href="#parent_service">parent_service</a></li>
+      <li><a href="#transfer_lock_status">transfer_lock_status</a></li>
+      <li><a href="#whois_owner">whois_owner</a></li>
+      <li><a href="#change_contact">change_contact</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Domain::Service</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $service = $ovh-&gt;domain-&gt;service(&quot;mydomain.org&quot;);</p>
+
+<p>my $info = $service-&gt;service_info; my $last_update = $service-&gt;last_update;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provieds basic functionality for Services A service contact_change can be initialized.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the service object. This method is not ment to be called external.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Domain/Zone.html">Webservice::OVH::Domain::Zone</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Domain::Zone-&gt;_new($ovh_api_wrapper, $zone_name, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="name">name</h2>
+
+<p>Name is the unique identifier.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $name = $service-&gt;name;</p>
+
+</li>
+</ul>
+
+<h2 id="service_infos">service_infos</h2>
+
+<p>Retrieves additional infos about the service. Infos that are not part of the properties</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $info = $service-&gt;service_info;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Retrieves properties of the service. This method updates the intern property variable.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $service-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="dnssec_supported">dnssec_supported</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $dnssec_supported = $service-&gt;dnssec_supported;</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $domain = $service-&gt;domain;</p>
+
+</li>
+</ul>
+
+<h2 id="glue_record_ipv6_supported">glue_record_ipv6_supported</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $glue_record_ipv6_supported = $service-&gt;glue_record_ipv6_supported;</p>
+
+</li>
+</ul>
+
+<h2 id="glue_record_multi_ip_supported">glue_record_multi_ip_supported</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $glue_record_multi_ip_supported = $service-&gt;glue_record_multi_ip_supported;</p>
+
+</li>
+</ul>
+
+<h2 id="last_update">last_update</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: DateTime</p>
+
+</li>
+<li><p>Synopsis: my $last_update = $service-&gt;last_update;</p>
+
+</li>
+</ul>
+
+<h2 id="name_server_type">name_server_type</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $name_server_type = $service-&gt;name_server_type;</p>
+
+</li>
+</ul>
+
+<h2 id="offer">offer</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $offer = $service-&gt;offer;</p>
+
+</li>
+</ul>
+
+<h2 id="owo_supported">owo_supported</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $owo_supported = $service-&gt;owo_supported;</p>
+
+</li>
+</ul>
+
+<h2 id="parent_service">parent_service</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $parent_service = $service-&gt;parent_service;</p>
+
+</li>
+</ul>
+
+<h2 id="transfer_lock_status">transfer_lock_status</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $transfer_lock_status = $service-&gt;transfer_lock_status;</p>
+
+</li>
+</ul>
+
+<h2 id="whois_owner">whois_owner</h2>
+
+<p>Exposed Property Value. Readonly.</p>
+
+<ul>
+
+<li><p>Return: <a>Webservice::Me::Contact</a></p>
+
+</li>
+<li><p>Synopsis: my $owner = $service-&gt;whois_owner;</p>
+
+</li>
+</ul>
+
+<h2 id="change_contact">change_contact</h2>
+
+<p>Initializes a change_contact procedure. This generates a task. An email is sent to the other account-</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value contact_billing contact_admin contact_tech - ovh account names</p>
+
+</li>
+<li><p>Return: <a>Webservice::Me::Task</a></p>
+
+</li>
+<li><p>Synopsis: $service-&gt;change_contact(contact_tech =&gt; &#39;otheraccount-ovh&#39;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

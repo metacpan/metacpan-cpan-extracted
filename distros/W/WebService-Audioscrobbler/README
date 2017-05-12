@@ -1,0 +1,51 @@
+WebService-Audioscrobbler
+
+This module aims to be a full implementation of a an object-oriented interface 
+to the Audioscrobbler WebService API (as available on 
+http://www.audioscrobbler.net/data/webservices/). Since version 0.04, the 
+module fully supports data caching and, thus, complies to the service's 
+recommended usage guides.
+
+Audioscrobbler is a great service for tracking musical data of various sorts,
+and its integration with the LastFM service (L<http://www.last.fm>) makes it
+work even better. Audioscrobbler provides data regarding similarity between
+artists, artists discography, tracks by musical genre (actually, by tags), 
+top artists / tracks / albums / tags and how all of that related to your own
+musical taste.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc WebService::Audioscrobbler
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Audioscrobbler
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Audioscrobbler
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/WebService-Audioscrobbler
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/WebService-Audioscrobbler
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 Nilson Santos Figueiredo Júnior
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

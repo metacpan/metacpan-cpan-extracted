@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Win32-Capture
+version:      1.6
+version_from: lib/Win32/Capture.pm
+installdirs:  site
+requires:
+    Win32::API:         0
+    Win32::GUI::DIBitmap:         0
+distribution_type: module
+license: perl
+generated_by: ExtUtils::MakeMaker version 6.17

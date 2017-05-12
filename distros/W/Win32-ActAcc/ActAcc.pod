@@ -1,0 +1,866 @@
+=pod
+
+=head1 NAME
+
+Win32::ActAcc - Active Accessibility client in Perl
+
+=head1 SYNOPSIS
+
+I<Note: We assume you're already familiar with Microsoft's Active
+Accessibility.> 
+
+=head2 Tools
+
+Explore your Active Accessibility world with Win32::ActAcc's utilities:
+
+ C:\> aadigger    # Explore the window hierarchy (details: perldoc aadigger.pl)
+ C:\> aaWhereAmI  # Mouse around and see the path to each accessible Object.
+ C:\> aaEvents    # Watch WinEvents through Active Accessibility.
+
+=head2 Script essentials
+
+Now let's write a Perl script. You need this stuff at the top:
+
+=for sample pod\Synopsis.pl use01 -v
+
+ use Win32::OLE;
+ use Win32::ActAcc qw(:all);
+ Win32::OLE->Initialize();
+ use Win32::GuiTest; # recommended
+
+=for sample pod\Synopsis.pl use01 -^
+
+=head2 Get Accessible Object from Desktop, Point, or HWND
+
+Get the "root" Accessible Object:
+
+=for sample pod\Synopsis.pl get_ao02 -v
+
+ $ao = Desktop();
+
+=for sample pod\Synopsis.pl get_ao02 -^
+
+=over
+
+=item Note
+
+A Perl C<Win32::ActAcc::AO> object contains an C<IAccessible*> and
+C<childID>.  
+
+The object's precise subclass of AO reflects its role (Window, Client, Pushbutton, etc.).
+
+=back
+
+Other ways to get an Accessible Object:
+
+=for sample pod\Synopsis.pl get_ao03 -v
+
+ $ao = AccessibleObjectFromPoint($x, $y); # pixels from upper left
+ $ao = AccessibleObjectFromWindow($hwnd);
+
+=for sample pod\Synopsis.pl get_ao03 -^
+
+You can also get an Accessible Object from an event, such as 
+when an application opens..
+
+=head2 Invoke an app and watch for its window to appear
+
+Here's how to invoke an app with C<system> and latch onto its main
+window by listening to events.  
+
+=for sample pod\Synopsis.pl event01 -v
+
+ # Install event hook with first call to "clearEvents":
+ clearEvents();
+ 
+ # Give event hook time to permeate your computer:
+ # ...
+ 
+ # Start Notepad, but first discard the event backlog:
+ clearEvents();
+ system("start notepad.exe");
+ 
+ # Wait for Notepad to appear, as signaled by
+ # an EVENT_OBJECT_SHOW event associated with an
+ # Accessible Object whose name matches qr/Notepad$/,
+ # and make a note of that useful Accessible Object.
+ my $aoNotepad = waitForEvent
+   (
+    +{ 
+      'event'=>EVENT_OBJECT_SHOW(),
+      'ao_profile'=>qr/Notepad$/ # a 'window test': see below
+     }, 
+    # options:
+    +{
+      'timeout'=>30, # seconds
+                     # (an hourglass buys a few more seconds)
+      'trace'=>1 # display events as troubleshooting aid
+      # Tip: Don't turn off 'trace' until your script works!
+     }
+   );
+ # The sentinel event might not be the last in the flurry of events.
+ # Wait for steady state before proceeding.
+ awaitCalm(); 
+
+=for sample pod\Synopsis.pl event01 -^
+
+For jobs too elaborate for C<waitForEvent>, see L</"Events"> below.
+
+=head2 Accessible Object properties
+
+Having found an Accessible Object, examine it:
+
+=for sample pod\Synopsis.pl ao01 -v
+
+ my $hwnd = $ao->WindowFromAccessibleObject();
+ my $roleNumber = $ao->get_accRole();
+ my $roleText = GetRoleText( $roleNumber );
+ my $stateBits = $ao->get_accState();
+ my $name = $ao->get_accName();
+ my $value = $ao->get_accValue();
+ my $description = $ao->get_accDescription();
+ my $default_action = $ao->get_accDefaultAction();
+ my $help = $ao->get_accHelp();
+ my $f = $ao->get_accFocus();
+ my ($left, $top, $width, $height) = $ao->accLocation();
+ my $ks = $ao->get_accKeyboardShortcut();
+ my $id = $ao->get_itemID();
+ my $bp = $ao->get_nativeOM();
+ my @selections = $ao->get_accSelection();
+
+=for sample pod\Synopsis.pl ao01 -^
+
+C<visible> considers the C<STATE_SYSTEM_INVISIBLE> bit from
+C<get_accState>, among other factors - see L</"visible">.
+
+=for sample pod\Synopsis.pl visible01 -v
+
+ my $might_be_visible = $ao->visible();
+
+=for sample pod\Synopsis.pl visible01 -^
+
+Troubleshoot your script by printing out the Accessible Objects.
+
+=for sample pod\Synopsis.pl ao03 -v
+
+ # Display class, name, state, location, ID, HWND, default action:
+ print "badger/limpid: " . $ao->describe() . "\n";
+ print "pilfer/bugle:  $ao\n"; # same thing
+ 
+ # display summary of $ao and all its descendants
+ $ao->debug_tree(); 
+
+=for sample pod\Synopsis.pl ao03 -^
+
+=head2 GUI Manipulation
+
+Active Accessibility alone is feeble, so be sure to see also L</"Using
+Active Accessibility with Win32::GuiTest">.
+
+=for sample pod\Synopsis.pl defact01 -v
+
+ # Selection and focus
+ $ao->accSelect(SELFLAG_TAKEFOCUS());
+ 
+ # doable action at this moment
+ my $action = $ao->get_accDefaultAction();
+ $ao->accDoDefaultAction(); 
+ 
+
+=for sample pod\Synopsis.pl defact01 -^
+
+If C<accDoDefaultAction> will do, then perhaps there is a
+I<particular> action that the script would like to assert is default
+before executing it.
+
+=for sample pod\Synopsis.pl defact02 -v
+
+ # Perl shortcut: Do named action iff it's the default -- otherwise die.
+ $ao->doActionIfDefault('Press'); # do-or-die
+ 
+ # Shorthand for the shortcut (for English-language Windows):
+ $ao->dda_Check();
+ $ao->dda_Click();
+ $ao->dda_Close();
+ $ao->dda_Collapse();
+ $ao->dda_DoubleClick();
+ $ao->dda_Execute();
+ $ao->dda_Expand();
+ $ao->dda_Press();
+ $ao->dda_Switch();
+ $ao->dda_Uncheck();
+
+=for sample pod\Synopsis.pl defact02 -^
+
+AO can simulate a click using the Windows API.
+
+=for sample pod\Synopsis.pl click01 -v
+
+ # Simulate click at center of an Accessible Object:
+ $ao->click(); # there's also $ao->rightclick()
+
+=for sample pod\Synopsis.pl click01 -^
+
+=head2 Parents and Children
+
+Find an Accessible Object's relatives:
+
+=for sample pod\Synopsis.pl parentchild01 -v
+
+ my $p = $ao->get_accParent(); # query Active Accessibility
+ $p = $ao->parent(); # prefer cached weak-ref from iterator, if present
+ 
+ # Get child-count, then one child at a time:
+ my $kk = $ao->get_accChildCount();
+ my $ak = $ao->get_accChild(0); # etc.
+ 
+ # Get children in a list:
+ my @likely_visible_children = $ao->AccessibleChildren();
+ my @all = $ao->AccessibleChildren(0,0); # state-bits to compare, bit values
+ 
+ # Navigate turtle-style:
+ my $np1 = $ao->accNavigate(NAVDIR_FIRSTCHILD()); # etc. etc.
+
+=for sample pod\Synopsis.pl parentchild01 -^
+
+=over
+
+=item Note
+
+Win32::ActAcc's C<AccessibleChildren>, with no arguments, screens out
+`invisible' and `offscreen' results by assuming the default arguments
+(C<STATE_SYSTEM_INVISIBLE()|STATE_SYSTEM_OFFSCREEN(), 0>).
+
+=back
+
+Buggy apps may respond inconsistently to one or another technique of
+enumerating children.  Unfortunately, you must program the
+script differently for each technique, so experimenting with more than
+one is tedious.
+
+So why not use an Iterator instead?
+
+=head2 Iterators
+
+Here's how to visit an Accessible Object's children using an iterator:
+
+=for sample pod\Synopsis.pl iter01 -v
+
+ my $iter = $ao->iterator();
+ $iter->open();
+ while ( my $aoi = $iter->nextAO() )
+   {
+     print "$aoi\n";
+   }
+ $iter->close();
+
+=for sample pod\Synopsis.pl iter01 -^
+
+Accessible Objects from iterators keep a weak reference to the
+"parent" that enumerated them, and can infer some state information
+from the parent's state.
+
+=for sample pod\Synopsis.pl iter03 -v
+
+ my $p = $ao->iparent(); # parent as noted by iterator...
+ $p = $ao->parent();     # ... or get_accParent() if iparent=undef
+ 
+ # get state bits, including states implicit from parent
+ # (readonly, offscreen, invisible, unavailable):
+ my $allstate = $ao->istate();
+
+=for sample pod\Synopsis.pl iter03 -^
+
+The iterator for most windows uses a slow, but thorough, combination of
+C<AccessibleChildren> and C<accNavigate>.  The iterator for menus and
+outlines can click through them and treat sub-items like children.
+You can select the best child-enumeration technique for each occasion.
+See details at L</"More on Iterators"> below.
+
+Win32::ActAcc's power tools -- C<dig>, C<tree>, C<menuPick> -- use
+iterators so as not to couple their mission to any specific
+child-enumeration technique.
+
+=head2 Tree of Accessible Objects
+
+Use C<tree> to traverse a hierarchy of Accessible Objects
+depth-first, calling a code-ref once for each Accessible Object
+(including the starting object).  The code can control iteration using
+C<level>, C<prune>, C<stop> and C<pin> (see sample).
+
+=for sample pod\Synopsis.pl tree01 -v
+
+ $ao->tree
+   (
+    sub
+    {
+      my ($ao, $monkey) = @_;
+      # $monkey->level() returns count of levels from root.
+      # $monkey->prune() skips this AO's children.
+      # $monkey->stop() visits NO more Accessible Objects.
+      # $monkey->pin() prevents closing any menus and outlines
+      #                that tree() opened
+      #                (applies only if flag 'active'=>1)
+      print ' 'x($monkey->level())."$ao\n";
+    },
+    #+{ 'active'=>1 } # optional iterator flags-hash
+   );
+
+=for sample pod\Synopsis.pl tree01 -^
+
+When C<tree> obtains an iterator for each Accessible Object it visits,
+C<tree> passes its second argument (an optional hash) to the
+iterator's constructor.  (See L</"More on Iterators">.)
+
+=head2 Referring to an object by name or role
+
+Supposing C<$ao> is a client area containing a Close button, here's
+how to find and press Close:
+
+=for sample pod\Synopsis.pl dig02 -v
+
+ $aoBtnClose = $ao->dig
+   ( 
+    +[
+      "{push button}Close" # {role}name
+     ] 
+   ); 
+ $aoBtnClose->dda_Press();
+
+=for sample pod\Synopsis.pl dig02 -^
+
+If C<$ao> is a window, containing a client area, containing a Close button, 
+just set forth both steps in the path to reach Close from C<$ao>:
+
+=for sample pod\Synopsis.pl dig03 -v
+
+ $aoBtnClose = $ao->dig
+   ( 
+    +[
+      "{client}",  # {role} only, name doesn't matter
+      "{push button}Close"
+     ] 
+   );
+
+=for sample pod\Synopsis.pl dig03 -^
+
+In a word, C<dig> follows a path of L</"Window Tests">, 
+and returns what it finds.  See details at L</"Finding Accessible Objects using 'dig'">.
+
+You can run B<aadigger> or B<aaWhereAmI> interactively to
+reconnoiter and figure out a path to the interesting Accessible Object.
+
+=head2 Menus
+
+C<menuPick> uses Active Accessibility and Win32::GuiTest to manipulate
+standard Windows menu-bars and context-menus.  Your mileage may vary
+with apps that use custom menus with cockeyed support for Active
+Accessibility.
+
+=for sample pod\Synopsis.pl menu02 -v
+
+ # menuPick takes a ref to a list of window-tests,
+ # tracing a path from menubar to menu to submenu etc.,
+ # plus an optional flags hash.
+ $ao->menuPick(+[ 'Edit', qr/^Undo/ ], +{'trace'=>1} );
+
+=for sample pod\Synopsis.pl menu02 -^
+
+C<menuPick> can summon and operate a right-clicky context menu:
+
+=for sample pod\Synopsis.pl menu01 -v
+
+ $ao->context_menu()->menuPick(+[ 'Paste' ]);
+
+=for sample pod\Synopsis.pl menu01 -^
+
+If C<Win32::GuiTest> has been loaded (as by C<use Win32::GuiTest;>),
+the active menu iterator closes menus when it's done with them.
+
+Some menus contain items marked as invisible.  Use the HASH form of
+the window-test to pick such an invisible item; the string and regex
+window-tests match only visible items.
+
+=head2 Using Active Accessibility with Win32::GuiTest
+
+Get an HWND or location from an Accessible Object and manipulate it
+with the Windows API:
+
+=for sample pod\Synopsis.pl GuiTest01 -v
+
+ use Win32::GuiTest;
+ 
+ # use a HWND
+ my $hwnd = $ao->WindowFromAccessibleObject();
+ my $name = Win32::GuiTest::GetWindowText($hwnd);
+ 
+ # use an (x,y) location
+ my ($left, $top, $width, $height) = $ao->accLocation();
+ Win32::GuiTest::MouseMoveAbsPix($left, $top);
+
+=for sample pod\Synopsis.pl GuiTest01 -^
+
+=head1 DETAILS
+
+=head2 Window Tests
+
+A window-test examines an Accessible Object and returns a true or
+false value -- like Perl's file tests (-e, -f, etc.). Window-tests are used in C<waitForEvent>,
+C<dig>, C<menuPick>, and C<match>.
+
+A window-test can take the form of a string, a regex, or a hash.
+
+=over 4
+
+=item String
+
+The string must completely match the object's name, {role}, or
+{role}name. Matches L</"visible"> objects only.  You can't use the
+string form of window-test if you need to include a literal brace in
+the name. For the role, use whatever notation is convenient:
+
+ window                               # role text
+ ROLE_SYSTEM_WINDOW                   # constant name
+ WINDOW                               # last leg of constant name
+ Win32::ActAcc::Window                # Perl package for the role
+ Window                               # last leg of package name
+ value of ROLE_SYSTEM_WINDOW()        # the role number
+
+=item Regular expression (qr/blabla/)
+
+The regex matches the object's name, as in C<$name=~qr/regex/>. 
+Matches L</"visible"> objects only.
+
+=item Hash
+
+Specifying a window-test as a hash is the most flexible way, as it can
+test not only the name and role, but also the state and other
+attributes of the Accessible Object, and even run a custom code-ref.
+
+=back 4
+
+Hash members (all are optional; all present members must match the
+Accessible Object):
+
+=over 4
+
+=item C<get_accRole> hash member
+
+role number
+
+=item C<get_accName> hash member
+
+string (match entire) or regex
+
+=item C<get_accValue> hash member
+
+string (match entire) or regex
+
+=item C<get_accDescription> hash member
+
+string (match entire) or regex
+
+=item C<get_accHelp> hash member
+
+string (match entire) or regex
+
+=item C<get_accDefaultAction> hash member
+
+string (match entire) or regex
+
+=item C<WindowFromAccessibleObject> hash member
+
+match an HWND number
+
+=item C<visible> hash member
+
+a true value to match only L</"visible"> objects.  (Use a false value
+to match only invisible objects. Omit the 'visible' key if you don't
+care whether the object is visible.)
+
+=item C<state_has> and C<state_lacks> hash members
+
+or'd state bits
+
+=item C<role_in> or C<role_not_in> hash member
+
+LIST of roles (each item in the list uses any "{role}" notation
+(above), but without the braces)
+
+=item C<code> hash member
+
+a code-ref to call if the other hash keys match.
+Return a true value to indicate a match.
+
+=back 4
+
+Sample window-tests:
+
+=for sample pod\Synopsis.pl wintest01 -v
+
+ $b = $ao->match('Close'); # Is AO's name exactly Close?
+ $b = $ao->match( +{'get_accName'=>'Close'} ); # ... using a hash.
+ 
+ $b = $ao->match(qr/Close/); # Does AO's name match that regexp?
+ $b = $ao->match( +{'get_accName'=>qr/Close/} ); # ... using a hash.
+ 
+ $b = $ao->match('{ROLE_SYSTEM_PUSHBUTTON}Close'); # Is AO a pushbutton named Close?
+ $b = $ao->match('{push button}Close'); # ... using localized 'role text'
+ $b = $ao->match('{Pushbutton}Close'); # ... using ActAcc package name
+ $b = $ao->match( +{'get_accRole'=>ROLE_SYSTEM_PUSHBUTTON(), 'name'=>'Close'} ); # ...
+ $b = $ao->match( +{'rolename'=>'Pushbutton', 'get_accName'=>'Close'} ); # ...
+ 
+ $b = $ao->match
+   ( 
+    +{'code'=>
+      sub
+      { 
+        my $ao = shift; 
+        return $ao->match( qr/Bankruptcy in progress/ );
+      } 
+     } 
+   ); 
+ 
+ $b = $ao->match( +{'visible'=>1} ); 
+
+=for sample pod\Synopsis.pl wintest01 -^
+
+There is more to the 'visible'=>1 test than meets the eye..
+
+=head2 visible
+
+=for sample pod\Synopsis.pl visible02 -v
+
+ my $might_be_visible = $ao->visible();
+ my $same_thing       = $ao->match( +{'visible'=>1} ); 
+
+=for sample pod\Synopsis.pl visible02 -^
+
+The C<visible> function returns a true value if none of these
+reasons-for-being-invisible applies.
+
+=over 4
+
+=item *
+
+State bit `invisible' or `offscreen' is set
+
+=item *
+
+An ancestor's state includes `invisible' or `offscreen'. Note:
+C<visible> does not call C<get_accParent>, which may lead to a cycle
+in a buggy app, but instead relies on the cached weak-ref from the
+iterator that found this Accessible Object.
+
+=item *
+
+Location is undefined (unless state includes 'focusable')
+
+=item *
+
+Location is entirely negative
+
+=item *
+
+Height or width is zero
+
+=back
+
+The algorithm overlooks other reasons-for-being-invisible, such as
+occlusion and inconspicuousness.
+
+=head2 Finding Accessible Objects using 'dig'
+
+C<dig> follows a path of L</"Window Tests">, and returns what it
+finds.
+
+Depending on its scalar or list context, and B<min> and B<max> options,
+C<dig> can perform various searches:
+
+=over 4
+
+=item Find all matching Accessible Objects (die if none) 
+
+Use C<dig> in array context without specifying options C<min> or C<max>.
+
+=item Find all matching Accessible Objects (if any)
+
+Use C<dig> in array context, specifying option C<min=0>.
+
+=item Find first matching Accessible Object (die if none)
+
+Use C<dig> in scalar context, specifying neither option C<min> nor C<max>, or specifying them both as 1.
+
+=item Find first matching Accessible Object (if any)
+
+Use C<dig> in scalar context, specifying C<min=0>.  If it finds no
+matching Accessible Object, C<dig> returns C<undef>.
+
+=back
+
+The optional second parameter is a hash of options:
+
+=over 4
+
+=item "min" option
+
+Find this many objects, or die.
+
+=item "max" option
+
+Stop looking after finding this many objects.
+
+=item "trace" option
+
+If true, display the objects being examined.
+
+=item "active", "nav", and "perfunctory" options
+
+C<dig> passes these along when it obtains an iterator for each
+Accessible Object it traverses.  C<dig> sets the "active" flag unless
+the options hash specifies it as a non-true value.
+
+=back
+
+Samples using C<dig>:
+
+=for sample pod\Synopsis.pl dig01 -v
+
+ # Find one immediate child of $ao with role "client"; die if not found.
+ my $aoClient = $ao->dig( +[ '{client}' ] );
+ 
+ # Find one untitled Notepad within the Desktop's client area; die if not found.
+ my $someNewNotepad = Desktop()->
+   dig(+[ 
+         '{client}',                     # step 1
+         '{window}Untitled - Notepad'    # step 2
+        ]);
+ 
+ # Get results into a list: find *all* untitled Notepad
+ # windows in the Desktop's client area. Die if none found.
+ my @allNewNotepads1 = 
+   Desktop()->
+     dig(+[ 
+           '{client}',                   # step 12
+           '{window}Untitled - Notepad'  # step 2
+          ]);
+ 
+ # Find all untitled Notepads, using a regex to match their name.
+ my @allNewNotepads2 = 
+   Desktop()->
+     dig(+[ '{client}',                  # step 1
+            +{                           # step 2:
+              'get_accRole'=>ROLE_SYSTEM_WINDOW(),
+              'get_accName'=>qr/^Untitled - Notepad$/
+             }
+          ]);
+ 
+ # Find all untitled Notepads that contain an Application menubar.
+ my @allNewNotepads3 = 
+   Desktop()->
+     dig(+[ '{client}',                  # step 1
+            +{                           # step 2:
+              'get_accRole'=>ROLE_SYSTEM_WINDOW(),
+              'get_accName'=>qr/^Untitled - Notepad$/
+             },
+            +{                           # step 3:
+              'get_accRole'=>ROLE_SYSTEM_MENUBAR(),
+              'get_accName'=>'Application'
+             },
+            +{                           # step 4: back up!
+              'axis'=>'parent'
+             },
+          ]);
+ 
+ # Find windows on desktop. Die if fewer than 2. Return at most 42.
+ my @upTo42Windows =
+   Desktop()->dig( +[
+                     '{client}',         # step 1
+                     '{window}'          # step 2
+                    ], 
+                   +{                    # options
+                     'min'=>2,           #  -die unless at least 2
+                     'max'=>42,          #  -shortcut after 42
+ 
+                     'trace'=>1          #  -for troubleshooting
+                    } 
+                 );
+
+=for sample pod\Synopsis.pl dig01 -^
+
+The C<active>, C<nav>, and C<perfunctory> options configure the
+iterator with which C<dig> enumerates each Accessible Object's
+children in its quest for potential matches..
+
+=head2 More on Iterators
+
+The default iterator uses both C<AccessibleChildren> and C<accNavigate>, 
+which is slow but works with many applications.
+
+ my $iter = $ao->iterator();
+
+Optional hints convey a preference for an iterator type, if it
+applies to the Accessible Object:
+
+ # operate menus and outlines, treating consequences as children
+ my $iter = $ao->iterator( +{ 'active'=>1 } );
+ 
+ # use AccessibleChildren
+ my $iter = $ao->iterator( +{ 'perfunctory'=>1 } );
+ 
+ # use accNavigate
+ my $iter = $ao->iterator( +{ 'nav'=>1 } );
+
+For completeness, there is an iterator that uses C<get_accChildCount>
+and C<get_accChild>:
+
+ my $iter = new Win32::ActAcc::get_accChildIterator($ao);
+
+
+=head2 Events
+
+Win32::ActAcc installs a system-wide in-process event hook upon the
+first call to C<clearEvents>.  Thereafter, events stampede through
+a circular buffer.  You can watch by running B<aaEvents>.
+
+All Perl processes share one event hook and one circular buffer, but
+each Perl process keeps its own independent pointer into the buffer.
+
+C<getEvent> retrieves one event from the circular buffer and
+advances the pointer:
+
+=for sample pod\Synopsis.pl event03 -v
+
+ # Retrieve one event from circular buffer (if any there be).
+ my $anEvent = getEvent();
+ if (defined($anEvent))
+   {
+     print "Event: $anEvent\n";
+   }
+
+=for sample pod\Synopsis.pl event03 -^
+
+Scripts may C<getEvent> in a loop to watch for a specific sentinel
+event.  Such a loop is included: C<waitForEvent> consumes events
+until one satisfies a hash-of-criteria (sample in the Synopsis) or a
+code-ref:
+
+=for sample pod\Synopsis.pl event02 -v
+
+ waitForEvent
+   (
+    sub
+    {
+      my $e = shift;
+      if ($$e{'event'} == EVENT_SYSTEM_FOREGROUND())
+        {
+          my $ao = $e->AccessibleObjectFromEvent(); # or getAO() for short
+          my $name = $ao->get_accName();
+          return $ao if ($name =~ qr/Notepad$/);
+        }
+      return undef;
+    },
+    # options:
+    +{
+      'timeout'=>30, # seconds
+                     # (an hourglass buys a few more seconds)
+      'trace'=>1 # display events as troubleshooting aid
+      # Tip: Don't turn off 'trace' until your script works!
+     }
+   )
+     or die("Notepad didn't come to foreground in the allotted time.");    
+
+=for sample pod\Synopsis.pl event02 -^
+
+To prevent a stale event from triggering the exit condition, call
+C<clearEvents> before taking the action whose consequences the script
+will be looping in wait for.
+
+=head1 SAMPLE
+
+"eg\playpen.pl" demonstrates using Active Accessibility to
+inspect and manipulate a menu, a popup menu, a text-entry blank, a
+checkbox, a radio button, a spin button, tabs, a list box, a
+tree-list, a two-column list view, and suchlike.
+
+Of course, playpen.pl depends on an application that presents such
+widgets.  The applets that come with Windows change too often, so
+playpen.pl uses a simple C# app whose source code is in eg\playpen.
+
+playpen.pl also depends on Win32::GuiTest.
+
+Build the playpen C# app, then invoke playpen.pl to explore it:
+
+ > vcvars32 || rem ember to put 'csc' on the path
+ > cd eg\playpen
+ > build.cmd
+ > cd ..
+ > perl playpen.pl
+
+=head1 TROUBLESHOOTING
+
+If an Active Accessibility function unexpectedly returns C<undef>,
+check Perl's Extended OS Error special variable C<$^E> for clues.
+
+Run your script with "perl -w".
+
+If your script doesn't work, see whether the aadigger sample works.
+
+If you see Windows error 0x800401f0 ("CoInitialize has not been
+called"), make sure your script starts off with
+Win32::OLE->Initialize().
+
+If you get a Windows error number and want to know what it means,
+try using C<Win32::FormatMessage>.
+
+If your script sometimes misses noticing an event that occurs very
+soon after your script calls C<clearEvents()> for the first time,
+insert a C<sleep> after that first C<clearEvents()>.  Installing a
+WinEvent handler seems to take effect "soon", but not synchronously.
+
+If you are desperate enough to insert "print" statements:
+
+ print "The Accessible Object is: $ao\n"; # shows several attributes
+ print "same as: ". $ao->describe() . "\n";
+
+ $ao->debug_tree(); # display $ao and all its descendants
+
+If you are struggling to find the right event or window-test for
+use with C<waitForEvent>, C<dig>, C<tree>, or C<menuPick>,
+try using the C<trace> flag to evoke a lot of progress messages.
+Or, embed the interactive aadigger feature into your script:
+
+ # invoke interactive explorer feature starting at $ao:
+ use Win32::ActAcc::aaExplorer;
+ Win32::ActAcc::aaExplorer::aaExplore($ao);
+
+If C<menuPick> doesn't work because your computer is too slow,
+increase the value of C<$Win32::ActAcc::MENU_SLOWNESS>.  C<menuPick>
+relies on a hover delay to give the app a chance to update a menu-item
+object's default action.
+
+If your script displays gibberish instead of Unicode text on the
+console, try writing to a file instead.  
+
+=head1 BUGS
+
+It doesn't implement C<get_accHelpTopic> and C<accHitTest>.
+
+C<menuPick> doesn't know how to choose commands that hid
+because you seldom use them.
+
+You can't use a Win32::ActAcc "Accessible Object" with Win32::OLE.
+
+It probably doesn't work multi-threaded.
+
+Apps with a buggy C<IAccessible> implementation may cause the Perl
+process to crash.
+
+=head1 COPYRIGHT
+
+Copyright 2000-2004, Phill Wolf. 
+
+pbwolf@cpan.org
+
+=cut
+

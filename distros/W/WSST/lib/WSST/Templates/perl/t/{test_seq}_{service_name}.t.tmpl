@@ -1,0 +1,55 @@
+#
+# Test case for [% package_name %]
+#
+
+use strict;
+use Test::More;
+
+[% make_env_params_check(methods) %]
+plan tests => [% make_test_count(2, methods) %];
+
+use_ok('[% package_name %]');
+
+my $obj = [% package_name %]->new();
+
+ok(ref $obj, 'new [% package_name %]()');
+
+[% FOREACH method = methods -%]
+[% FOREACH test = method.tests -%]
+[% name = (test.name or "Test[${loop.index}]") -%]
+[% name = "${method.name} / $name" -%]
+[% "# $name" %]
+{
+    my $params = {
+[% FOREACH key = sort_keys(test.params) -%]
+        '[% key %]' => [% test.params.$key | $env_param %],
+[% END -%]
+    };
+
+    my $res = eval { $obj->[% method.interface_name %](%$params); };
+
+[% SWITCH test.type -%]
+[% CASE "lib_error" -%]
+    ok( $@, '[% name %]: die' );
+[% CASE "error" -%]
+    ok( ! $@, '[% name %]: die' );
+    ok( $res->is_error, '[% name %]: is_error' );
+[% CASE -%]
+    ok( ! $@, '[% name %]: die' );
+    ok( ! $res->is_error, '[% name %]: is_error' );
+    my $data = $res->root;
+    ok( ref $data, '[% name %]: root' );
+[% FOREACH node = method.return.to_array -%]
+[% NEXT IF node.depth < 2 -%]
+[% NEXT IF node_nullable(node) -%]
+    ok( eval { defined $data[% node_access(node) %] }, '[% name %]: [% node.name %]' );
+[% IF node.multiple -%]
+    ok( eval { ref $data[% node_access(node) %] eq 'ARRAY' }, '[% name %]: [% node.name %]' );
+[% END -%]
+[% END -%]
+[% END -%]
+}
+
+[% END -%]
+[% END -%]
+1;

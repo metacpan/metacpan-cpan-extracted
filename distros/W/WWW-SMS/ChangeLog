@@ -1,0 +1,191 @@
+#
+# WWW-SMS CVS ChangeLog
+#
+
+2003-04-03 Thursday 16:02  eim
+
+	* ChangeLog (1.1):
+
+	Added CVS ChangeLog
+	
+2003-04-03 Thursday 15:48  eim
+
+	* README (1.2), lib/Telephone/Number.pm (1.2), lib/WWW/SMS.pm
+	(1.9), samples/pop3tosms.pl (1.2), samples/smstk.pl (1.2),
+	samples/www-sms-example.pl (1.2), t/use.t (1.2):
+
+	road to 0.09
+	
+2003-03-21 Friday 01:11  eim
+
+	* lib/WWW/SMS.pm (1.8):
+
+	updated
+	
+2003-03-21 Friday 01:10  eim
+
+	* lib/WWW/SMS/Omnitel.pm (1.1):
+
+	initial import
+	
+2003-03-20 Thursday 01:10  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.8):
+
+	full of bugs today, argh. next fix.
+	
+2003-03-20 Thursday 01:07  eim
+
+	* lib/WWW/SMS/Libero.pm (1.4):
+
+	fixed another minor bug
+	
+2003-03-20 Thursday 01:05  eim
+
+	* lib/WWW/: SMS/Everyday.pm (1.7), SMS.pm (1.7):
+
+	updated some stuff
+	
+2003-03-20 Thursday 01:01  eim
+
+	* lib/WWW/SMS/Libero.pm (1.3):
+
+	fixed minor bug
+	
+2003-03-20 Thursday 00:59  eim
+
+	* lib/WWW/SMS/Libero.pm (1.2):
+
+	updated the qw array
+	
+2003-03-20 Thursday 00:44  eim
+
+	* lib/WWW/SMS/Libero.pm (1.1):
+
+	Initial import
+	
+2003-03-03 Monday 16:08  eim
+
+	* lib/WWW/SMS.pm (1.6):
+
+	updated %RELIABILITY
+	
+2003-02-03 Monday 08:07  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.6):
+
+	updated error check
+	
+2002-12-28 Saturday 18:32  eim
+
+	* lib/WWW/SMS/Gomobile.pm (1.5):
+
+	Updated Gomobile, should work with and only with Austrian mobile operators
+	
+2002-11-19 Tuesday 23:18  giulienk
+
+	* lib/WWW/SMS/o2UK.pm (1.1):
+
+	New Module from Andre Howe
+	
+2002-10-20 Sunday 16:11  eim
+
+	* lib/WWW/SMS.pm (1.5):
+
+	Updated %RELIABILITY
+	
+2002-09-27 Friday 17:55  eim
+
+	* lib/WWW/SMS/Gomobile.pm (1.4):
+
+	added cookie clear support
+	
+2002-09-27 Friday 17:34  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.5):
+
+	added proxy BUG note
+	
+2002-09-27 Friday 17:33  eim
+
+	* lib/WWW/SMS/Gomobile.pm (1.3):
+
+	debugged SMS send notification and updated MAXLENGTH
+	
+2002-09-26 Thursday 15:53  eim
+
+	* lib/WWW/SMS/: Everyday.pm (1.4), Gomobile.pm (1.2):
+
+	Fixed some issues related to error treatment
+	
+2002-09-26 Thursday 14:02  eim
+
+	* lib/WWW/SMS.pm (1.4):
+
+	Added Gomobile to %RELIABILITY
+	
+2002-09-26 Thursday 14:00  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.3):
+
+	Undefined prefixes var, we're on an INT gateway here
+	
+2002-09-26 Thursday 13:59  eim
+
+	* lib/WWW/SMS/Gomobile.pm (1.1):
+
+	New international gateway
+	
+2002-09-26 Thursday 04:36  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.2):
+
+	Debugging turned off now, it was on
+	
+2002-09-26 Thursday 04:14  eim
+
+	* lib/WWW/SMS.pm (1.3):
+
+	Added Everyday to %RELIABILITY
+	
+2002-09-26 Thursday 04:09  eim
+
+	* lib/WWW/SMS/Everyday.pm (1.1):
+
+	Added new Everyday.pm module
+	
+2002-08-08 Thursday 17:15  eim
+
+	* lib/WWW/SMS.pm (1.2):
+
+	Added %hash var check on line 113, WWW::SMS->gateways(); gave errore before when using perl -w
+	
+2002-08-07 Wednesday 13:55  giulienk
+
+	* Makefile.PL (1.1), README (1.1), lib/WWW/SMS.pm (1.1), t/use.t
+	(1.1), lib/WWW/SMS/Beeline.pm (1.1), lib/WWW/SMS/Clarence.pm (1.1),
+	lib/WWW/SMS/Enel.pm (1.1), lib/WWW/SMS/GoldenTelecom.pm (1.1),
+	lib/WWW/SMS/GsmboxIT.pm (1.1), lib/WWW/SMS/GsmboxUK.pm (1.1),
+	lib/WWW/SMS/MTS.pm (1.1), lib/WWW/SMS/Vizzavi.pm (1.1),
+	lib/Telephone/Number.pm (1.1), lib/WWW/SMS/GsmboxDE.pm (1.1),
+	lib/WWW/SMS/LoopDE.pm (1.1), lib/WWW/SMS/SFR.pm (1.1),
+	samples/pop3tosms.pl (1.1), samples/smstk.pl (1.1),
+	samples/www-sms-example.pl (1.1):
+
+	Initial revision
+	
+2002-08-07 Wednesday 13:55  giulienk
+
+	* Makefile.PL (1.1.1.1), README (1.1.1.1), lib/WWW/SMS.pm
+	(1.1.1.1), t/use.t (1.1.1.1), lib/WWW/SMS/Beeline.pm (1.1.1.1),
+	lib/WWW/SMS/Clarence.pm (1.1.1.1), lib/WWW/SMS/Enel.pm (1.1.1.1),
+	lib/WWW/SMS/GoldenTelecom.pm (1.1.1.1), lib/WWW/SMS/GsmboxIT.pm
+	(1.1.1.1), lib/WWW/SMS/GsmboxUK.pm (1.1.1.1), lib/WWW/SMS/MTS.pm
+	(1.1.1.1), lib/WWW/SMS/Vizzavi.pm (1.1.1.1),
+	lib/Telephone/Number.pm (1.1.1.1), lib/WWW/SMS/GsmboxDE.pm
+	(1.1.1.1), lib/WWW/SMS/LoopDE.pm (1.1.1.1), lib/WWW/SMS/SFR.pm
+	(1.1.1.1), samples/pop3tosms.pl (1.1.1.1), samples/smstk.pl
+	(1.1.1.1), samples/www-sms-example.pl (1.1.1.1) (utags: start):
+
+	Version 0.08
+	

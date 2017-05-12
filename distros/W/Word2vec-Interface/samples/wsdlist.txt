@@ -1,0 +1,28 @@
+########################################################
+#						       #
+# Format: instance_file sense_file		       #
+#	  --vectors vector_binary_file 	 	       #
+#	  --stoplist stoplist_file  		       #
+# 						       #
+# Sample: instance1.file sense1.file		       #
+#	  instance2.file sense2.file		       #
+#	  ...				               #
+#	  instanceN.file senseN.file		       #
+#	  --vectors ../vectors.bin		       #
+#	  --stoplist stoplist.txt		       #
+#						       #
+########################################################
+#
+# Real working example below.
+# Note: Number/Pound '#' character ignores line.
+
+-vectors samplevectors.bin
+-stoplist stoplist
+ACE.instances.sval ACE.senses.sval
+ANA.instances.sval ANA.senses.sval
+APC.instances.sval APC.senses.sval
+BPD.instances.sval BPD.senses.sval
+BSA.instances.sval BSA.senses.sval
+CAT.instances.sval CAT.senses.sval
+CML.instances.sval CML.senses.sval
+CMV.instances.sval CMV.senses.sval

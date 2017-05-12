@@ -1,0 +1,305 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Core::Session - internal session class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Core::Session - internal session class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Core implementation of <STRONG>Wombat::Session</STRONG> and
+<STRONG>Servlet::Http::HttpSession</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Core::Session</STRONG> instance, initializing
+fields appropriately.
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAttribute"><CODE>getAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the object bound with the specified name in this session, or
+<EM>undef</EM> if no object is bound under the name.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the object
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAttributeNames"><CODE>getAttributeNames()</CODE></A></STRONG><BR>
+<DD>
+Returns an array containing the names of all the objects bound to this
+session, or an empty array if there are no bound objects.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_removeAttribute"><CODE>removeAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Removes the object bound with the specified name from this session. If
+the session does not have an object bound with the specified name,
+this method does nothing.
+<P>After this method executes, and if the object implements
+<STRONG>Servlet::Http::HttpSessionBindingListener</STRONG>, the container calls
+<CODE>valueUnbound()</CODE> on the object.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the object
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_setAttribute">setAttribute($name, $value)</A></STRONG><BR>
+<DD>
+Binds an object to this session using the specified name. If an object
+of the same name is already bound to the session, the object is
+replaced.
+<P>After this method executes, and if the new object implements
+<STRONG>Servlet::Http::HttpSessionBindingListener</STRONG>, the container calls
+<CODE>valueBound()</CODE> on the object.</P>
+<P>If a previously bound object was replaced, and it implements
+<STRONG>Servlet::Http::HttpSessionBindingListener</STRONG>, the container calls
+<CODE>valueUnbound()</CODE> on it.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name to which the object is bound
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the object to be bound
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAuthType"><CODE>getAuthType()</CODE></A></STRONG><BR>
+<DD>
+Return the authentication type used to authenticate the cached
+principal, if any.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthType"><CODE>setAuthType($authType)</CODE></A></STRONG><BR>
+<DD>
+Set the authentication type used to authenticate the cached principal,
+if any.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24authType">$authType</A></STRONG><BR>
+<DD>
+the authentication type
+<P></P></DL>
+<DT><STRONG><A NAME="item_getCreationTime"><CODE>getCreationTime()</CODE></A></STRONG><BR>
+<DD>
+Return the creation time for this Session, in seconds since the epoch.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_setCreationTime"><CODE>setCreationTime(time)</CODE></A></STRONG><BR>
+<DD>
+Set the creation time for this Session. This method is called by the
+SessionManager when a Session instance is created or an existing
+Session instance is reused.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24time">$time</A></STRONG><BR>
+<DD>
+the creation time, in seconds since the epoch
+<P></P></DL>
+<DT><STRONG><A NAME="item_getId"><CODE>getId()</CODE></A></STRONG><BR>
+<DD>
+Return the session identifier for this Session.
+<P></P>
+<DT><STRONG><A NAME="item_setId"><CODE>setId($id)</CODE></A></STRONG><BR>
+<DD>
+Set the session identifier for this Session.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24id">$id</A></STRONG><BR>
+<DD>
+the session identifier
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLastAccessedTime"><CODE>getLastAccessedTime()</CODE></A></STRONG><BR>
+<DD>
+Return the last time the client sent a request associated with this
+Session, as the number of seconds since the epoch. Actions taken by
+servlet applications do not affect the last accessed time.
+<P></P>
+<DT><STRONG><A NAME="item_getMaxInactiveInterval"><CODE>getMaxInactiveInterval()</CODE></A></STRONG><BR>
+<DD>
+Return the maximum inactive interval, in seconds, between client
+requests before the servlet container will invalidate this Session. A
+negative itnerval indicates that the session should never be
+invalidated.
+<P></P>
+<DT><STRONG><A NAME="item_setMaxInactiveInterval"><CODE>setMaxInactiveInterval($interval)</CODE></A></STRONG><BR>
+<DD>
+Set the maximum inactive interval for the Session.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24interval">$interval</A></STRONG><BR>
+<DD>
+the new interval, in seconds
+<P></P></DL>
+<DT><STRONG><A NAME="item_isNew"><CODE>isNew()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the client does not yet know about the session or if
+the client chooses not to join the session. For example, if the server
+used only cookie-based sessions, and the client had disabled the use
+of cookies, then a session would be new on each request.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_setNew"><CODE>setNew($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag specifying whether or not the session is newly created.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+the boolean value to set
+<P></P></DL>
+<DT><STRONG><A NAME="item_getPrincipal"><CODE>getPrincipal()</CODE></A></STRONG><BR>
+<DD>
+Return the authenticated principal for this Session, or <CODE>undef</CODE> if
+there is none.
+<P></P>
+<DT><STRONG><A NAME="item_setPrincipal"><CODE>setPrincipal($principal)</CODE></A></STRONG><BR>
+<DD>
+Set the authenticated principal for this Session.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24principal">$principal</A></STRONG><BR>
+<DD>
+the new principal
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession()</CODE></A></STRONG><BR>
+<DD>
+Return the HttpSession which acts as a facade for this Session to
+servlet applications.
+<P></P>
+<DT><STRONG><A NAME="item_getSessionManager"><CODE>getSessionManager()</CODE></A></STRONG><BR>
+<DD>
+Return the SessionManager which manages this Session.
+<P></P>
+<DT><STRONG><A NAME="item_setSessionManager"><CODE>setSessionManager($manager)</CODE></A></STRONG><BR>
+<DD>
+Set the SessionManager which manages this Session.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24manager">$manager</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::SessionManager</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_isValid"><CODE>isValid()</CODE></A></STRONG><BR>
+<DD>
+Return a flag specifying whether or not the session is valid.
+<P></P>
+<DT><STRONG><A NAME="item_setValid"><CODE>setValid($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag specifying whether or not the session is valid.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$flag</STRONG><BR>
+<DD>
+the boolean value to set
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_access"><CODE>access()</CODE></A></STRONG><BR>
+<DD>
+Update the accessed time information for this Session. This method
+should be called by the Application when processing a Request, even if
+the Application does not reference it.
+<P></P>
+<DT><STRONG><A NAME="item_expire"><CODE>expire()</CODE></A></STRONG><BR>
+<DD>
+Perform the internal processing required to invalidate this session,
+without triggering an exception if the session has already expired.
+<P></P>
+<DT><STRONG><A NAME="item_invalidate"><CODE>invalidate()</CODE></A></STRONG><BR>
+<DD>
+Invalidates this session, then unbinds any objects bound to it.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if this method is called on an invalidated session
+<P></P></DL>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Wombat/Session.html">the Wombat::Session manpage</A>,
+<A HREF="../../../api/Wombat/SessionManager.html">the Wombat::SessionManager manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

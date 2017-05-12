@@ -1,0 +1,13 @@
+
+WWW::Search::Backends distribution
+
+This is a random collection of backends for WWW::Search.
+
+For the most part, they are old / abandoned / not working, AFAICT.
+
+Timezone and WatchNet are new and working as of 2006-07-31.
+
+Contact the author / maintainer mentioned in each backend if you have any questions.
+
+For more information about my Perl Modules, visit http://tinyurl.com/nn67z
+

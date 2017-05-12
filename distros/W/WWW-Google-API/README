@@ -1,0 +1,8 @@
+A Client for the Google APIs.
+
+http://code.google.com/apis/
+
+Just an initial release.  Needs implementation refactor for GBase internals.
+
+Currently only includes very immature querying ability (by id only) which
+also impacts update and delete.

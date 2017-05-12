@@ -1,0 +1,43 @@
+NAME
+    Web::Library::D3 - Distribution wrapper around D3
+
+SYNOPSIS
+        my $library_manager = Web::Library->instance;
+        $library_manager->mount_library({ name => 'D3' });
+
+DESCRIPTION
+    This is a distribution wrapper around D3.js. It enables you to include
+    the client-side library in multiple Web application projects with very
+    little effort. See Web::Library for the general concept and how to use
+    it with Catalyst.
+
+LIBRARY VERSIONS
+    The following versions are available. For each version all included
+    files are listed. Files marked with an asterisk are included in that
+    versions' asset list - see Web::Library's "css_link_tags_for()" and
+    "script_tags_for()" methods for an explanation of the concept.
+
+    Version 3.3.3 =item Version 3.3.12 (the default)
+            * js/d3.min.js
+
+LIBRARY WEBSITE
+    D3.js can be found at <http://d3.js/>.
+
+AUTHORS
+    The following person is the author of all the files provided in this
+    distribution EXCEPT D3.js files found in "share/".
+
+    Marcel Gruenauer "<marcel@cpan.org>", <http://marcelgruenauer.com>
+
+COPYRIGHT AND LICENSE
+    D3.js is licensed under the BSD license
+    <http://opensource.org/licenses/BSD-3-Clause>.
+
+    The following copyright notice applies to all files provided in this
+    distribution EXCEPT D3.js files found in "share/".
+
+    This software is copyright (c) 2013 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

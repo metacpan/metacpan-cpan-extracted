@@ -1,0 +1,85 @@
+Revision history for Perl extension Win32::FindFile.
+
+0.01  Mon Sep 20 17:18:42 2010
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.8 -n Win32::FindFile
+	- Added function FindFile
+
+0.02  Mon Sep 21 19:31:02 2010
+	- added function uchar, wchar 
+
+0.03  Mon Sep 23 10:25:30 2010
+	- some profiling and optimization
+
+0.04  Mon Sep 23 19:25:54 2010
+	- added GetCurrectDirectory
+
+0.05  Sun Sep 26 22:55:?? 2010
+	- wfchar function
+	
+0.06  Sun Sep 26 23:55:?? 2010
+	- added tests for wchar, uchar, wfchar
+
+0.07  Sun Sep 27 17:05 2010
+	- added wrappers around 
+
+	    DeleteFile
+	    MoveFile
+	    CopyFile
+	    RemoveDirectory
+	    CreateDirectory
+
+	    GetFullPathName
+	    GetCurrentDirectory
+	    SetCurrentDirectory
+
+	    GetBinaryType
+	    GetCompressedFileSize
+	    GetFileAttributes
+	    SetFileAttributes
+	    GetLongPathName
+
+0.08  Mon Sep 28 06:40 
+	- added wrappers around
+	    AreFileApisANSI
+	    SetFileApisToOEM
+	    SetFileApisToANSI
+
+0.09  Thu Sep 30 02:40 
+	- added overloaded struct _WFD
+	with properties
+	    is_hidden and etc
+	    cFileName
+
+0.10  Thu Sep 30 14:41
+	- added DateTime
+	- dosName
+	- LastModified && etc
+
+0.11  Thu Sep 30 14:41
+	- Fix FILETIME covertion and time_t
+	- dosName now return always something valid ( may be TODO is_dosName impl, how about retrieving extention )
+
+
+0.12  Thu Oct 10 17:41
+	- added #include <string.h> && <wchar.h> for mingw && etc
+
+0.12  Tue Oct 12 17:41
+	- Makefile.PL 
+	- LICENCE 
+	- replacement for wcsncpy_s 
+0.14  Mon Dec 27 9:00
+	- Fix bug in is_entry
+	- pod rewrite for better readability
+	- Added ReadDir function
+	- Added relName for items properties of data
+	- Added as_double for diritem
+	- Added tests for times (<=> cmp) 
+    
+0.15  Tue Apr 23 1:00
+  	- FindFile no croak
+	- ported to cygwin
+	- no compile warnings
+        - Fixed pod errors
+	- Fixed camel case of (FileName - fileName)
+	- better relName

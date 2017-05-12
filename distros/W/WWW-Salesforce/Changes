@@ -1,0 +1,133 @@
+Revision history for Perl extension WWW::Salesforce.
+
+0.25 Nov 13 2015
+    - change login URL from www.salesforce.com to login.salesforce.com [github/dclendenan]
+      - www.salesforce.com will no longer be an API login endpoint as of Jan 1 2016
+
+0.24 Aug 1 2015
+    - https://github.com/redhotpenguin/WWW-Salesforce/pull/20
+
+0.23 Aug 1 2015
+    - fixed some POD errors
+    - reformatted =item to =head2 in POD
+    - alphabetized methods in POD
+    - more clearly documented some features closing RT 48274
+    - Added some pod and pod coverage tests
+    - add stub pod for coverage tests
+    - move pod close to code
+
+0.22 Jan 23 2014
+    - typo fixes [github/dsteinbrunner]
+    - Force UTF8 to not be base64-encoded [github/pc-coholic]
+
+0.21 Dec 30 2013
+    - make all WWW::Salesforce::Simple methods available in WWW::Salesforce
+
+0.20 Jun 18 2013
+    - Clean up diagnostic messages in unit tests
+    - above by Dave Clendenan
+
+0.19 Jun 12 2013
+    - Added web proxy support ($WWW::Salesforce::WEB_PROXY=http://my.proxy.com:8080)
+    - added unit tests
+    - added the ability to override the API URL, for use within salesforce.com
+    - above by Dave Clendenan
+
+0.18 Mar 22 2013
+    - Added logout() subroutine to end session for logged in user
+    - Added bye() subroutine to simple.pm to call logout()
+    - Corrected get_tables() subroutine in simple.pm
+    - above by charlie redditt
+
+0.17 Dec 12 2012
+    - Temporary reversion to 0.15 while 2013 SF api is updated
+
+0.16 Dec 08 2012
+    - Element-ordering change for compatability with the
+      Spring 2013 release of salesforce.com [Dave Clendenan and Seth Miller]
+
+0.15 Dec 27 2011
+    - new features for table metadata inspection [Dmitry Rivlin]
+
+0.14 Fri Jan 07 14:23:00 2011 PST
+    - Added queryAll and do_queryAll functionality [Christopher Mckay]
+
+0.13 Sat Oct 30 14:05:00 2010 PST
+
+    - Add LICENSE file per Fedora maintainer request
+
+0.12 Tue Aug 17 19:34:00 2010 PST
+    - New maintainer PHRED
+    - Thanks to Mark Stosberg for several patches for this version
+    - Die with an error string instead of carping and returning
+    - Skip tests in automated testing mode
+    - Skip tests unless user, pass, and sectoken environment vars set
+    - Fix failing test - base64binary => base64Binary namespace change
+    - Perltidy file contents and remove unnecessary package scope braces
+    - Handle undefined return values from SOAP client
+    - Fix Type => type doc error in create()
+    - Add describeSObjects method [tom@eborcom.com]
+
+0.11 Thurs April 23 15:00:00 2009
+    - Fixed a problem with some documentation and code discrepencies (thanks to Michael Blanco)
+    - Fixed a small code problem in the retrieve function
+
+0.10 Sun March 1 04:30:00  2009
+    - fixed the Makefile to disable automated tests since they'll fail for lack of user/pass
+    - Added META.yml
+    - fixed some indention problems
+    - fixed some file name problems
+
+0.090 Tues Aug 5 12:00:00 2008
+    - fixed a few small bugs
+    - fixed some dependency issues
+    - fixed the constants
+        - Thanks to Garth Webb (garth at sixapart dot com) for noticing problems and providing fixes
+
+0.082 Mon Feb 12 17:00:00 2007
+    - updated to work with v8.0 of the API
+    - A lot of test cases added
+        - Thanks to Ron Hess (rhess at salesforce dot com) for fixing some things in the
+            module, adding many test cases and providing a lot of other help.
+
+0.081 Mon Oct 29 10:00:00 2006
+    - fixed a few small bugs reported with WWW::Salesforce::Simple
+        - Thanks to Tony Stubblebine (tony at tonystubblebine dot com) for pointing out
+            the errors and providing a fix.
+
+0.08  Thurs Aug 3 11:17:00 2006
+    - Reworked to work with API version 7.0 from salesforce.
+    - Added WWW::Salesforce::Serializer
+    - Deprecated new() call, use login() instead
+    - Got rid of $errstr static variable in favor of Carp
+    - All functions now either return a SOAP::SOM object or 0 upon error
+    - All errors are stored in $!
+    - More error handling inside the module
+    - Moved WWW::Salesforce::Simple into this build
+
+0.07  Mon April 17 17:45:00 2006
+    - Implemented addition to Constants.pm provided by Jun Shimizu. Thanks, Jun
+
+0.06  Fri March 31 14:27:00 2006
+    - implemented a bug fix for the delete function
+
+0.04  Thurs Feb 2 15:48:00 2006
+    - fixed a problem in the documentation
+
+0.04  Thurs Feb 2 15:00:00 2006
+    - fixed a directory quirk due to shared FAT partition work was stored on
+
+0.03  Thurs Feb 2 14:56:00 2006
+    - Changed the required version of perl to work with Perl 5.8.0 and greater
+    - fixed some documentation
+
+0.02  Wed Jan 18 12:19:00 2006
+    - Added deserializer
+    - fixed some documentation
+    - changed to use API version 6.0 instead of 4.0
+    - Added describeLayout method
+    - Added a test case
+
+0.01  Tue Jan 17 10:34:55 2006
+    - original version; created by h2xs 1.23 with options
+        -X -n WWW::Salesforce

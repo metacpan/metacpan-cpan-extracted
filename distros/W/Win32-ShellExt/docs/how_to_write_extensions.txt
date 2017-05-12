@@ -1,0 +1,26 @@
+How to write Windows Shell extensions using Win32::ShellExt
+-----------------------------------------------------------
+
+1. look at the samples provided in the examples/ subdirectory of the distribution
+
+2. start from any one of the .pm files provided there.
+
+3. change the CLSID to a new one : each extension MUST have its own CLSID, in particular
+ be careful not to reuse an existing one, or you might break the installation for that
+ extension (if it has been installed).
+
+4. change the body of the query_context_menu() and action() methods.
+	- query_context_menu() is called by the Explorer to know whether it should should your
+	menu entry in the context menu.
+	- action() is called when the user clicks on the command in the context menu.
+
+5. installing an extension: start a perl interpreter on the command line, then call the install()
+ method as in:
+	Win32::ShellExt::<your extension>->install
+ This will create the registry keys the Explorer needs to locate your extension (tell it how to 
+ load the perl embedding DLL and which CLSID to pass to it, then that DLL will locate the DLL
+ using the registry keys created at install() time). There also is an uninstall() method that you
+ can call in the same fashion to erase the registry keys for that extension, thereby making the
+ Explorer unable to find it anymore.
+
+

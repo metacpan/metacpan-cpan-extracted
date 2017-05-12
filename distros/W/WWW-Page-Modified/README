@@ -1,0 +1,49 @@
+NAME
+    WWW::Page::Modified - reports when a page was last modified
+
+SYNOPSIS
+        use WWW::Page::Modified;
+        my $dm = WWW::Page::Modified->new;
+        print $dm->get_modified('http://www.apple.com/');
+
+DESCRIPTION
+    The WWW::Page::Modified module attempts to determine when a web page
+    was last modified. It does this by examining the HTTP headers, HTML
+    headers and the body of the HTML document.
+
+    It will make use of Date::Manip so it is not necessarily the
+    quickest of cats.
+
+METHODS
+    WWW::Page::Modified->new()
+        Creates a new date modified checking object.
+
+    $dm->get_modified($url)
+        Returns the date modified or 0. $url can either be an
+        <HTTP::Response> object, a URI object or just a string URL.
+
+AUTHOR
+    Iain Truskett <spoon@cpan.org> <http://eh.org/~koschei/>
+
+    Please report any bugs, or post any suggestions, to either the
+    mailing list at <perl-www@dellah.anu.edu.au> (email
+    <perl-www-subscribe@dellah.anu.edu.au> to subscribe) or directly to
+    the author at <spoon@cpan.org>
+
+PLANS
+    It needs to cater for more weird and unusual ways of putting dates
+    on web pages.
+
+COPYRIGHT
+    Copyright (c) 2001 Iain Truskett. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+        $Id: Modified.pm,v 1.2 2002/02/03 13:10:01 koschei Exp $
+
+ACKNOWLEDGEMENTS
+    I would like to thank GRF for having me write this.
+
+SEE ALSO
+    Um.
+

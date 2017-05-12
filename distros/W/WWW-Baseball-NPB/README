@@ -1,0 +1,40 @@
+NAME
+    WWW::Baseball::NPB - Fetches Japanese baseball games information
+
+SYNOPSIS
+      use WWW::Baseball::NPB;
+
+      my $baseball = WWW::Baseball::NPB->new;
+      my @games  = $baseball->games;
+      # or @games = $baseball->games('central');
+
+      for my $game (@games) {
+          my $home    = $game->home;
+          my $visitor = $game->visitor;
+          printf "%s %d - %d %s (%s) [%s]\n",
+              $home, $game->score($home), $game->score($visitor), $visitor,
+              $game->status, $game->stadium;
+      }
+
+DESCRIPTION
+    WWW::Baseball::NPB provides you a way to fetch and extract Japanese
+    baseball games information via Yahoo! Baseball. (NPB = Nippon
+    Professional Baseball)
+
+NOTE
+    *   Characters like team names, status and stadium are encoded in
+        EUC-JP. You can convert them to any encoding via Jcode.
+
+TODO
+    *   Separate out Yahoo! Baseball parsing logic, using information
+        provider architecture (e.g. WWW::Baseball::NPB::Provider::*)
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the LWP::Simple manpage
+

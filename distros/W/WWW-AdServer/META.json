@@ -1,0 +1,55 @@
+{
+   "abstract" : "A simple AdServer that can be stand alone PSGI or be part of a larger system",
+   "author" : [
+      "Gabor Szabo <szabgab@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-AdServer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Time::Local" : "0",
+            "YAML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Geo::IP" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://pcas.szabgab.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/szabgab/WWW-AdServer.git",
+         "web" : "https://github.com/szabgab/WWW-AdServer"
+      }
+   },
+   "version" : "1.01"
+}
+

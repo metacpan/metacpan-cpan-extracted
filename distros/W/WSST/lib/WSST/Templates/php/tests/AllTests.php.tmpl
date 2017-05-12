@@ -1,0 +1,54 @@
+<?php
+
+[% INCLUDE inc_test_file_header.tmpl file_title="AllTests for $package_name" -%]
+
+if (!defined('PHPUnit_MAIN_METHOD')) {
+    define('PHPUnit_MAIN_METHOD', '[% package_name %]_AllTests::main');
+}
+
+require_once 'PHPUnit/Framework.php';
+require_once 'PHPUnit/TextUI/TestRunner.php';
+
+require_once '[% package_dir %]Test.php';
+require_once '[% package_dir %]/FactoryTest.php';
+require_once '[% package_dir %]/RequestTest.php';
+require_once '[% package_dir %]/Request/DefaultTest.php';
+require_once '[% package_dir %]/ResponseTest.php';
+require_once '[% package_dir %]/Response/DefaultTest.php';
+
+[% FOREACH method = methods -%]
+require_once '[% package_dir %]/Method/[% method.class_name %]Test.php';
+[% END -%]
+
+[% INCLUDE inc_class_header.tmpl class_title="AllTests class for $package_name" -%]
+class [% package_name %]_AllTests
+{
+    public static function main()
+    {
+        PHPUnit_TextUI_TestRunner::run(self::suite());
+    }
+ 
+    public static function suite()
+    {
+        $suite = new PHPUnit_Framework_TestSuite('[% package_name %]Test');
+
+        $suite->addTestSuite('[% package_name %]Test');
+        $suite->addTestSuite('[% package_name %]_FactoryTest');
+        $suite->addTestSuite('[% package_name %]_RequestTest');
+        $suite->addTestSuite('[% package_name %]_Request_DefaultTest');
+        $suite->addTestSuite('[% package_name %]_ResponseTest');
+        $suite->addTestSuite('[% package_name %]_Response_DefaultTest');
+
+[% FOREACH method = methods -%]
+        $suite->addTestSuite('[% package_name %]_Method_[% method.class_name %]Test');
+[% END -%]
+		
+        return $suite;
+    }
+}
+
+if (PHPUnit_MAIN_METHOD == '[% package_name %]_AllTests::main') {
+    [% package_name %]_AllTests::main();
+}
+
+?>

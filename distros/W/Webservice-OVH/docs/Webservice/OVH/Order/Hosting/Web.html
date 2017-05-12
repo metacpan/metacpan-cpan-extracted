@@ -1,0 +1,102 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#free_email_info">free_email_info</a></li>
+      <li><a href="#activate_free_email">activate_free_email</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Order::Hosting::Web</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $free_email_info = $ovh-&gt;order-&gt;hosting-&gt;web-&gt;free_email_info;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides the possibility to activate the free hostig package.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the Web object. This method is not ment to be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Order/Hosting/Web.html">Webservice::OVH::Order::Hosting::Web</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Hosting::Web-&gt;_new($ovh_api_wrapper, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="free_email_info">free_email_info</h2>
+
+<p>Gets information if free webhosting is available.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - target domain for free webhosting</p>
+
+</li>
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Order::Hosting::Web-&gt;_new(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="activate_free_email">activate_free_email</h2>
+
+<p>Generates an order and pays the order for free webhosting.</p>
+
+<ul>
+
+<li><p>Parameter: $domain - target domain for free webhosting</p>
+
+</li>
+<li><p>Return: <a>Webservice::Me::Order</a></p>
+
+</li>
+<li><p>Synopsis: my $order = Webservice::OVH::Order::Hosting::Web-&gt;activate_free_email(&#39;mydomain.de&#39;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

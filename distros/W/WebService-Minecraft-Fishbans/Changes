@@ -1,0 +1,8 @@
+Revision history for WebService-Minecraft-Fishbans
+
+0.02    2016-08-10
+        Include response from Fishbans in error message if not successful
+
+0.01    2015-04-11
+        First version, released on an unsuspecting world.
+

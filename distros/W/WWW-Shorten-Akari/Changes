@@ -1,0 +1,24 @@
+v1.2.1    2014-08-12 16:16:05+09:00 Asia/Tokyo
+          Add an "unshorten" alias to "increase".
+
+v1.1.0    2012-11-05 13:22:09 UTC
+          Minor test fixes.
+          Deprecate the "lenghten" alias. Add a new alias, "lengthen", which fixes its typo.
+          Change license to MIT (identical to FreeBSD, liked by CPAN)
+
+v1.0.0    2012-11-05 11:33:21 UTC
+
+v0.3.0    2012-11-05 11:23:50 UTC
+          Fixes the version number.
+
+v0.2.1    2012-11-05 03:41:24 UTC
+          Fixes the SYNOPSIS.
+
+v0.2      2012-11-05 03:36:38 UTC
+          Override WWW::Shorten::generic's import with Exporter's import that DTRT.
+          Allows calling ->makeashorterlink and ->makealongerlink in the object interface.
+          Supports calling short_link and long_link in the function interface.
+          Fixes POD typos, update POD to match changes.
+
+v0.1      2012-11-05 01:48:32 UTC
+          First release.

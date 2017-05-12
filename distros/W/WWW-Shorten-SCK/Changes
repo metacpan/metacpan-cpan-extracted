@@ -1,0 +1,20 @@
+0.5  2014-01-07 21:45:48 GMT
+    * Feature #400 : move to sck.pm (Celogeek San)
+
+0.4  2013-09-09 21:24:52 GMT
+    * Feature #308 : Use new api sck (Celogeek San)
+
+0.3       2012-11-28 17:19:06 Europe/Paris
+
+    * rewrite meta
+
+0.2       2012-07-17 16:01:00 Europe/Paris
+
+    fix pod
+
+0.1       2012-07-17 15:49:14 Europe/Paris
+
+    use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+    set bundle version number
+
+

@@ -1,0 +1,20 @@
+<%method pod_of_collection>
+<%args>
+	$id => 'STD'
+</%args>
+<%perl>
+  die q{$dtq->dbh is empty} unless $dtq->dbh;
+
+  my $sth = $dtq->dbh->prepare( qq{SELECT * FROM types} ) || die "[__FILE__] $DBI::errstr";
+
+  $sth->execute() or die "[__FILE__] $DBI::errstr";
+
+  while( my $href = $sth->fetchrow_hashref )
+  {
+    next unless $href->{export_prefix} =~ /$id/i;
+
+    print $href->{pkg_name}->can( 'pod' ) ? $href->{pkg_name}->pod( $href ) : 'no pod() detected';
+  }
+</%perl>
+
+</%method>

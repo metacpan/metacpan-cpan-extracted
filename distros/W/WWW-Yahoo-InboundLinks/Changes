@@ -1,0 +1,49 @@
+2009-03-05  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.07
+
+	Regression fix: module show debug information
+	Tests bugfix
+	Fix for incorrect options handler for object constructor
+
+2009-03-01  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.06
+
+	Rate limit fix
+
+2008-11-11  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.05
+
+	Documentation bug
+
+2008-11-11  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.04
+
+	Additional tests
+	
+2008-08-10  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.03 (Internal)
+
+	New module name
+	
+	Expanded interface
+	
+2008-08-06  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.02
+
+	Corrected «Error» response handling
+	
+	Fixed JSON version in requirements
+	
+	More detailed testing
+
+2008-08-06  Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 0.01
+
+	Initial module

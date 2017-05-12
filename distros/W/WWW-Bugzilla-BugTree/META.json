@@ -1,0 +1,77 @@
+{
+   "abstract" : "Fetch a tree of bugzilla bugs blocking a bug",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Bugzilla-BugTree",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Moo" : "2.0",
+            "Ref::Util" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Clui" : "0",
+            "URI" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Script" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/WWW-Bugzilla-BugTree/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/WWW-Bugzilla-BugTree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/WWW-Bugzilla-BugTree.git",
+         "web" : "https://github.com/plicease/WWW-Bugzilla-BugTree"
+      }
+   },
+   "version" : "0.07"
+}
+

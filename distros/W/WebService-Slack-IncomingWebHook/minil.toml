@@ -1,0 +1,6 @@
+name = "WebService-Slack-IncomingWebHook"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuild"
+
+[release]
+pause_config="./.pause"

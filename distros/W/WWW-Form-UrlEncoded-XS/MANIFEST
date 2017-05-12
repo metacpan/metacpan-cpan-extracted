@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/WWW/Form/UrlEncoded/XS.pm
+lib/WWW/Form/UrlEncoded/XS.xs
+lib/WWW/Form/UrlEncoded/ppport.h
+minil.toml
+t/00_compile.t
+t/01_parse.t
+t/02_build.t
+t/03_parse_arrayref.t
+META.yml
+MANIFEST

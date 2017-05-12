@@ -1,0 +1,40 @@
+This contains some thoughts behind adaptive testing.
+
+normally we allow simple testing
+
+if we check complex and it matches the normal result then we treat it
+as just another test and continue as normal.
+
+if we check complex and it doesn't match, we treat it as a problem and
+store that information in the link.
+
+if we are checking complex, then occastionally we try simple.  if it
+is consistent then we may switch back, but only if we can be sure that
+all different response codes work okay..
+
+This means that complex testing remains basically our reference and
+must be very carefully verified to give correct answers.  Simple
+testing, on the other hand, should be designed to be resource
+efficient.
+
+for each code we have an inconsistency factor
+
+when we do a complex test and immediately afterwards a simple test and
+the simple test doesn't match, we upgrade the inconsistency factor for
+the code that the complex test reports
+
+when we have inconsistency < 3 we test alternately
+
+when one inconsistency factor is > 3 we almost always test complex
+
+when do we apply a test???
+
+we have just done a complex test -> apply
+we have done a simple test which made us consistent -> apply
+we have done a simple test made us inconsistent -> do not apply
+we have done a different simple test  -> apply
+
+
+
+
+

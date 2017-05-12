@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_WWW_ConfixxBackup.t
+t/02_WWW_ConfixxBackup_Confixx.t
+t/03_WWW_ConfixxBackup_FTP.t
+t/04_WWW_ConfixxBackup_Confixx_online.t
+t/05_WWW_ConfixxBackup_FTP_online.t
+t/06_WWW_ConfixxBackup_online.t
+t/07_bugfix_20070918.t
+t/08_confixx_version.t
+t/09_file_prefix.t
+t/10_check_can_ok.t
+t/11_can_ok_Confixx.t
+t/12_can_ok_FTP.t
+t/13_detect_version.t
+t/14_detect_version_2.t
+t/97_manifest.t
+t/98_boilerplate.t
+t/99_pod.t
+t/99_pod_coverage.t
+lib/WWW/ConfixxBackup.pm
+lib/WWW/ConfixxBackup/Confixx.pm
+lib/WWW/ConfixxBackup/FTP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

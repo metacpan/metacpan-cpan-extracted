@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<MakeMenu name='M'>
+		<Item name='A' text='&amp;A'/>
+		<Item text='>One'/>
+		<Item text='>Two'/>
+		<Item text='>Three'/>
+		<Item text='>Four'/>
+		<Item text='>>A'/>
+		<Item text='>>B'/>
+		<Item text='>>C'/>
+		<Item text='>>>1'/>
+		<Item text='>>>2'/>
+		<Item text='>>>3'/>
+		<Item text='>-'/>
+		<Item name='Five' text='>Five' checked='1' onClick='sub { $self->{M}->{Five}->Checked(not $self->{M}->{Five}->Checked); }'/>
+		<Item text='>Six'   />
+		<Item name='B' text='&amp;B'/>
+		<Item text='>One'/>
+		<Item text='>-'/>
+		<Item text='>Two'/>
+		<Item text='>Three'/>
+		<Item text='>Four'/>
+		<Item text='>Five'/>
+	</MakeMenu>
+	<Window
+		left='200' top='200' width='250' height='60'
+		class='$self->{C}'
+		menu='$self->{M}'
+		title='Menus - example'
+	/>
+</GUI>
+

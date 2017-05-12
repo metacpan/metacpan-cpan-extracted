@@ -1,0 +1,30 @@
+requires 'parent', 0;
+requires 'Future', '>= 0.34';
+requires 'URI', 0;
+requires 'HTTP::Request', 0;
+requires 'HTTP::Response', 0;
+
+recommends 'Mozilla::CA', '>= 20160104';
+
+on 'test' => sub {
+	requires 'Test::More', '>= 0.98';
+	requires 'Test::Fatal', '>= 0.010';
+	requires 'Test::Refcount', '>= 0.07';
+};
+
+feature 'io-async', 'IO::Async support' => sub {
+	requires 'IO::Async', '>= 0.64';
+	requires 'IO::Async::SSL', '>= 0.19';
+	requires 'Net::Async::HTTP', '>= 0.41';
+};
+
+feature 'mojo', 'Mojolicious support' => sub {
+	requires 'Mojolicious', '>= 7.00';
+	requires 'Future::Mojo', '>= 0.003';
+};
+
+feature 'lwp', 'LWP support' => sub {
+	requires 'LWP::UserAgent', '>= 6.15';
+	requires 'IO::Socket::SSL', '>= 2.000';
+};
+

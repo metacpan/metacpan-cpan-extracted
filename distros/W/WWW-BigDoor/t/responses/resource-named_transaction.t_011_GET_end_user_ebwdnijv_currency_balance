@@ -1,0 +1,38 @@
+200[
+    [
+        {
+            "end_user_description": "can only be purchased", 
+            "read_only": 0, 
+            "modified_timestamp": 1294259927, 
+            "pub_title": "Coins", 
+            "transaction_group_id": "f7d72fafd07b4135a0ef41d8fed56381", 
+            "adjustment_amount": "50.00", 
+            "id": 17463051, 
+            "currency": {
+                "end_user_description": "can only be purchased", 
+                "read_only": 0, 
+                "modified_timestamp": 1294259911, 
+                "pub_title": "Coins", 
+                "currency_type_title": "Redeemable Purchase Currency", 
+                "currency_type_id": 1, 
+                "exchange_rate": "900.00", 
+                "resource_name": "currency", 
+                "urls": [], 
+                "created_timestamp": 1294259911, 
+                "pub_description": "an example of the Purchase currency type", 
+                "end_user_title": "Coins", 
+                "relative_weight": 2, 
+                "id": 5806, 
+                "currency_type_description": ""
+            }, 
+            "prev_balance": "50.00", 
+            "resource_name": "end_user_currency_balance", 
+            "created_timestamp": 1294259926, 
+            "pub_description": "an example of the Purchase currency type", 
+            "end_user_title": "Coins", 
+            "end_user_login": "ebwdnijv", 
+            "curr_balance": "100.00"
+        }
+    ], 
+    {}
+]

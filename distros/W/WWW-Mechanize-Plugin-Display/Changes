@@ -1,0 +1,10 @@
+Revision history for Perl module WWW::Mechanize::Plugin::Display
+
+1.01 Thu May 10 09:34:22 EDT 2007
+    - no code changes.
+    - Build.PL updated for better compatibility per RT#27002
+
+1.00 Mon May  7 10:51:59 EDT 2007
+    - Initial public release
+
+

@@ -1,0 +1,237 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<STYLE TYPE="text/css">
+<!--
+.nowrap	{white-space: nowrap;}
+-->
+</STYLE>
+
+<TITLE>History Win32::SqlServer</TITLE>
+</HEAD>
+<BODY>
+<CENTER>
+<H1>History Win32::SqlServer</H1>
+</CENTER>
+<H3>2016-07-15 &#8211; 2.010</H3>
+<UL>
+  <LI>There are now binaries for Perl 5.22 and Perl 5.24. They have been tested both with ActivePerl and Strawberry Perl.</LI>
+  <LI>The module can now be built with Visual Studio 2015. (The binaries are nevertheless built with VS 2005.)</LI>
+  <LI>Minor adaptions to code and test scripts for VS2015, Perl 5.24 and SQL 2016.</LI>
+  <LI>Bugfix: passing a string value for a bigint parameter or table column in a table-valued parameter could fail despite the string being a correct bigint number.</LI>
+  <LI>Known issue: OpenSqlFilestream does not seem to work on Windows 10, when you are connected to SQL 2008. It appears to work with SQL 2008 R2 and higher versions.</LI>
+  <LI>Known issue: When you use a hash to pass datetime2 and datetimeoffset value, a fractional value like 130.23 may be passed to SQL Server as 130.2299, because lack of rounding. This is not a new issue, but it was uncovered with this release, because changes in SQL 2016 prompted me to change some test cases.</LI>
+  <LI><B>This is the last version of Win32::SqlServer to support Windows 2000, Windows 2003 and Windows XP!</B></LI>
+</UL>
+<H3>2015-05-17 &#8211; 2.009</H3>
+<P>This release is all about platform support.</P>
+<UL>
+  <LI>Binaries for ActivePerl 5.18 and 5.20 now available. These binaries have not been built with ActivePerl, since these versions of ActivePerl are shipped as having been compiled with GNU CC and MinGW. Instead I have built Perl from sources with Visual Studio, and built Win32::SqlServer in these environments. ActivePerl has a <A HREF="http://community.activestate.com/node/14913">post</A> where they say that Microsoft compilers are incompatible with their builds, but I have not encountered any problem.</LI>
+  <LI>I'm supporting Strawberry Perl! It's as simple as this: the binaries that I ship for ActivePerl works with Strawberry Perl too. I have tested this for Perl 5.18 and 5.20. Users of Strawberry Perl will have to accept that the installation script is still called activeperl-copy.pl. </LI>
+  <LI>Note that there are no 32-bit binaries for perl 5.18 and 5.20 without USE_64_BIT_INT.</LI>
+  <LI>I have dropped support for SQL Server 6.5, as previously announced. I have also decided to drop support for Perl 5.8 and Perl 5.10. If you need support for any of these versions of SQL Server or Perl, you can use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.008.zip">version 2.008</A> of Win32::SqlServer.</LI>
+</UL>
+<H3>2012-09-29 &#8211; 2.008</H3>
+<P><B>Platform support:</B></P>
+<UL>
+  <LI>Win32::SqlServer now supports SQL Server Native Client 11 (That is, the version that ships with SQL 2012.)</LI>
+  <LI>Binaries for ActivePerl 5.16 are now included.</LI>
+  <LI><B>This is the last version of Win32::SqlServer to support SQL Server 6.5!</B></LI>
+</UL>
+<P><B>New Features:</B></P>
+<UL>
+  <LI>You can now use output parameters with <A HREF="Win32-SqlServer.html#sql">sql()</A> and <A HREF="Win32-SqlServer.html#sql_one">sql_one()</A>. To do this, pass a reference to a scalar, or, in the case of a datetime hash a reference to a hash.</LI>
+  <LI>In a parameter array to <A HREF="Win32-SqlServer.html#sql">sql()</A> and <A HREF="Win32-SqlServer.html#sql_one">sql_one()</A>, the type name can now be a the name of a user-defined type. This can be the name of a so-called alias type, a CLR UDT or a table type. Here is an example that shows both these features in play. Say that you previously have executed<code> CREATE TYPE custid_type FROM nchar(5)</CODE> previously in SQL Server. Now you can run:</LI>
+  <PRE>   my $cnt;
+   sql('SELECT @cnt = COUNT(*) FROM Orders WHERE CustomerID = @custid', 
+       {cnt    =&gt; ['int', \$cnt],
+        custid =&gt; ['custid_type. $custid]};
+   print &quot;There are $cnt orders.\n&quot;;</PRE>
+For full details, see the section <A HREF="Win32-SqlServer.html#parameterspecdetails"><I>Details on the Parameter Specification</I></A> in the manual.</LI>
+  <LI>Three new <A HREF="Win32-SqlServer.html#setloginproperty">loginproperties</A>: <B>ServerSPN</B>, <B>FailoverSPN</B> and <B>ApplicationIntent</B>.</LI>
+</UL>
+<P><B>Changed Behaviour:</B></P>
+<UL>
+  <LI>Win32::SqlServer now uses <B>@@version</B> to get the SQL Server version. Previously, Win32::SqlServer used <B>xp_msver</B>, but <B>xp_msver</B> is not available in SQL Azure, and I've gotten reports that sites have revoked permission on <B>xp_msver</B> in a security-lockdown craze. As a result of this change, the <B>SQL_version</B> property no longer has a lot of trailing spaces on SQL 6.5. (Which I was unaware of previously.)</LI>
+  <LI>Some occasional error messages have been changed.</LI>
+</UL>
+<P><B>Bugfixes</B>:</P>
+<UL>
+  <LI>Not all variations with quoted identifiers were handled correctly. The test script <B>7_objectnames.t</B> was supposed to test this, but there were bugs in the test script, why failing tests were not reported.</LI>
+  <LI>There might have been potential for SQL injection in queries that retrieves metadata as the database name was inlined. This has been addressed for SQL 7 and later by using <B>sp_executesql</B>. However, this change <B>does not apply to SQL 6.5</B> where the database name is still inlined. I should add that I have not found any actual way to make SQL injection this way.</LI>
+  <LI>Arguments with non-ASCII characters could be displayed incorrectly in error messages.</LI>
+  <LI>If you changed the provider for a Win32::SqlServer object after disconnecting and then reconnected, this was not always properly handled.</LI>
+</UL>
+<H3>2011-08-07 &#8211; 2.007</H3>
+<ul>
+  <li>Binaries for ActivePerl 5.14 are now included.</li>
+  <li>Bugfix: if an sql_variant column or output parameter held a value of the char or varchar data types, the value could have extraneous characters at the end. This was particularly prevalent if the value was the empty string.</li>
+  <li>Fixed an error where the handle returned from OpenSqlFilestream was truncated in 64-bit if the handle was &gt;= 2<sup>31</SUP>.</li>
+  <li>Various internal cleanups to avoid warnings when compiling for 64-bit.</li>
+  <li>Various enhancements to test scripts for Denali and servers with non-1252 collations.</li>
+</ul>
+<H3>2010-10-29 &#8211; 2.006</H3>
+<P>A couple of smaller changes and fixes:</P>
+<UL>
+  <LI>Binaries for ActivePerl 5.12 are now included.</LI>
+  <LI>You can now invoke <A HREF="Win32-SqlServer.html#sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A> as either 
+  <CODE><SPAN CLASS="nowrap">Win32::SqlServer::sql_init()</SPAN></CODE> or <CODE><SPAN CLASS="nowrap">Win32::SqlServer-&gt;sql_init()</SPAN></CODE>. Since 
+  <A HREF="Win32-SqlServer.html#sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A> is intended to be a static routine, 
+  the former is preferred, but several people tried the latter, misled by the 
+  manual that used <CODE><SPAN CLASS="nowrap">-&gt;</SPAN></CODE> in 
+  one place (and <CODE>::</CODE> in another).</LI>
+  <LI>Bugfix: Fixed an issue where table-valued parameters and possibly other 
+  values did not work properly with <B>threads::shared</B>.</LI>
+  <LI>Bugfix: table-valued parameters did not work in the 64-bit version, once you had allocated 2&nbsp;GB of memory.</LI>
+  <LI>Fixed a memory leak that occurred that appeared if create Win32::SqlServer objects repeatedly, for instance in a loop.</LI>
+  <LI>Fixed issues with how the log file was generated for table-variable parameters and the bit data type.</LI>
+  <LI>Added an example to the entry for
+  <A HREF="Win32-SqlServer.html#CommandTimeout">CommandTimeout</A> in the manual 
+  how to check for timeout errors.</LI>
+</UL>
+<P><B>Note</B>: If you are using ActivePerl 5.10, please beware that the 
+included binaries do not run with earlier 10xx builds. I have not tested all 
+builds, but the binaries did not run with build 1003. They do run with build 
+1007.</P>
+<H3>2009-06-21 &#8211; 2.005</H3>
+<P>This release brings one single change: there was a bug in the 64-bit version, so if your Perl process allocated more 
+than 2&nbsp;GB of memory, Win:32::SqlServer failed to instantiate. This bug has been fixed. </P>
+<P>Apart from that, there are some updates in the README about known issues about building from sources.</P>
+<H3>2008-08-18 – 2.004b</H3>
+<P>It&#39;s called 2.004b, because there are no changes to the module itself. The sole changes are in the test scripts so 
+that they run without errors against SQL 2008 RTM. There are also some changes in the build instructions to adapt for 
+the changes from CTP6 to RTM.</P>
+<H3>2008-05-04 &#8211; 2.004</H3>
+<P>The big thing for this release is support for new features in SQL 2008, 
+detailed below. At the time, SQL 2008 is still in beta, RTM is scheduled for Q3 
+of 2008. Thus I need to add the caveat that there may be issues with 
+Win32::SqlServer 2.004 and the RTM release. Rest assured that I will monitor 
+this, and relase a new version of Win32::SqlServer if required.</P>
+<P>Another big thing is support for Perl 5.10; Win32::SqlServer now ships with 
+binaries for ActiveState builds 10xx.</P>
+<P><B>Changes for SQL 2008:</B></P>
+<P>To have full access to these features, you need to use SQLNCLI10 provider 
+that ships with SQL 2008. Win32::SqlServer will use this provider by default if 
+it is installed.</P>
+	<UL><LI>Table-valued parameters.
+		See the section <A HREF="Win32-SqlServer.html#TVP">Working with Table 
+		Variables</A> for details for the high-level interface. For the 
+		mid-level interface there are two new routines:
+		<A HREF="Win32-SqlServer.html#definetablecolumn"><SPAN CLASS="nowrap">
+		definetablecolumn()</SPAN></A> and <SPAN CLASS="nowrap">
+		<A HREF="Win32-SqlServer.html#inserttableparam">inserttableparam()</A></SPAN>.</LI>
+		<LI>The new data types <B><CODE>date</CODE></B>, <B><CODE>time</CODE></B>,
+		<CODE><B>datetime2</B></CODE> and <B><CODE>datetimeoffset</CODE></B>. 
+		See the section <A HREF="Win32-SqlServer.html#datetime">Date and Time 
+		Data Ttypes</A>. There are some incompatibilities in that 
+		Win32::SqlServer previous silently accepted if there was garbage at the 
+		end of an ISO-formatted date string. Not so any more.</LI>
+		<LI>FILESTREAM: Win32::SqlServer provides access to the <SPAN CLASS="nowrap">
+		<A HREF="Win32-SqlServer.html#OpenSqlFilestream">OpenSqlFilesteam()</A></SPAN> 
+		API, so that you can access FILESTREAM columns using Win32::API 
+		functions ReadFile and WriteFile.</LI>
+		<LI>Support for large UDTs, that is UDTs that can exceed 8000 bytes in 
+		size.</LI>
+		<LI>The new built-in CLR types <B><CODE>hierarchyid</CODE></B>, <B>
+		<CODE>geometry</CODE></B> and <B><CODE>geography</CODE></B> are 
+		recognised, but apart from the name, Win32::SqlServer has no particular 
+		support for these; they are handled as any other CLR UDT.</LI>
+	</UL>
+	
+<P><B>Other changes and bugfixes:</B></P>	
+<UL>
+	<LI>Behvaiour change: previously if you declared a varchar/nvarbinar/varbinary 
+	parameter to <SPAN CLASS="nowrap"><A HREF="Win32-SqlServer.html#sql">sql()</A></SPAN> 
+	without specifying the length, for instance <SPAN CLASS="nowrap"><CODE>[&#39;nvarchar&#39;, $value]</CODE></SPAN>, 
+	Win32::SqlServer would infer the length of the value of the parameter. This 
+	has been changed, so that Win32::SqlServer now uses the maximum value, that 
+	is 8000 for <B><CODE>varbinary</CODE></B> and <B><CODE>varchar</CODE></B> 
+	and 4000 for <B><CODE>nvarchar</CODE></B>. If the value exceeds this length, 
+	Win32::SqlServer uses MAX. The reason for this change is that the parameter 
+	list is part of the statement that is in SQL Server&#39;s plan cache. By using a 
+	consistent parameter length, Win32::SqlServer reduces the cache bloat. For 
+	char/nchar/binary, Win32::SqlServer still infers the length from the actual 
+	value when none is explicitly provided, but now issues a warning to inform 
+	you that this is not good practice.</LI>
+	<LI>The variables <CODE><SPAN CLASS="nowrap">$Win32:SqlServer::VERSION</SPAN></CODE> and
+	<CODE><SPAN CLASS="nowrap">$Win32::SqlServer::Version</SPAN></CODE> are now
+	<A HREF="Win32-SqlServer.html#Versionnumbers">documented</A>.</LI>
+	<LI>Bugfix: character-set conversion did not work when there was no default 
+	handle. (Which there isn&#39;t if you connect with <SPAN CLASS="nowrap">
+	<A HREF="Win32-SqlServer.html#setloginproperty">setloginproperty()</A></SPAN> 
+	and <A HREF="Win32-SqlServer.html#connect"><SPAN CLASS="nowrap">connect()</SPAN></A> rather 
+	than <A HREF="Win32-SqlServer.html#sql_init">sql_init()</A>.)</LI>
+	<LI>Despite that the manual said that you could use <B><CODE>rowversion</CODE></B> 
+	as an alternative to <B><CODE>timestamp</CODE></B>, this was not the case. 
+	This has been corrected.</LI>
+	<LI>Bugfix: the check for duplicate column names in the result set was 
+	broken.</LI>
+	<LI>The <A HREF="Win32-SqlServer.html#EXPORTTAGS">export tag</A> <CODE>:consts</CODE> did 
+	not include the constants for command states.</LI>
+	<LI>Consistent behaviour when you pass an empty command batch. No matter if 
+	you pass <CODE>undef</CODE>, an empty string or a string of blanks, the 
+	batch is accepted without errors. In 2.003, you got an error for <CODE>undef</CODE> 
+	and an empty string, but not for a string with or more spaces.</LI>
+	<LI>If you call a Win32::SqlServer routine without specifying a handle, and 
+	there is no default handle, you will now get a clear error message up front. 
+	The next version of Win32::SqlServer will probnbly warn you rely on the 
+	default handle, as this is a deprecated feature.</LI>
+</UL>
+<P>To build Win32::SqlServer from sources, you now need Visual Studio 2005 (or the .Net 2.0 SDK),
+and the SDK for SQL Server Native Client 10 that ships with SQL 2008. See the README for the 
+source distribution for further details.
+</P>
+<H3>2007-07-11 &#8211; 2.003</H3>
+<UL>
+   <LI>Win32::SqlServer now runs on AMD64. In lieu of hardware to test on, IA64
+   is still unsupported. Note that the <CODE><B>
+   <A HREF="Win32-SqlServer.html#bigint">bigint</A></B></CODE> data type is
+   handled differently on 64-bit.</LI>
+   <LI>Added a mid-level routine <SPAN CLASS="nowrap">
+   <A HREF="Win32-SqlServer.html#getcolumninfo">getcoluminfo()</A></SPAN> that returns information about
+   the columns in the result set(s).</LI>
+   <LI>Added a new parameter to <SPAN CLASS="nowrap"><A HREF="Win32-SqlServer.html#sql">sql()</A></SPAN> and
+   <A HREF="Win32-SqlServer.html#sql_sp"><SPAN CLASS="nowrap">sql_sp()</SPAN></A>, <CODE>
+   <NOBR STYLE="text-align: left"><A HREF="Win32-SqlServer.html#colinfostyles">$colinfostyle</A></SPAN></CODE>, that permits you
+   to specify that you want information about the columns in the result set
+   included in the return structure. You can opt get only names, only position,
+   or get a hash with detail information.</LI>
+   <LI>Added a new result style, <A HREF="Win32-SqlServer.html#MULTISET_RC">MULTISET_RC</A>, that is very similar to MULTISET,
+   but which has row counts instead of&nbsp; empty arrays for INSERT, UPDATE and
+   DELETE statements.</LI>
+   <LI>Re-implemented the conversion initiated by
+   <A HREF="Win32-SqlServer.html#sql_set_conversion"><SPAN CLASS="nowrap">sql_set_conversion()</SPAN></A> to
+   use the Windows API, rather than relying on certain files being available in
+   System32. This makes about any code-page conversion accessible from Win32::SqlServer.
+   There is a new routine, <A HREF="Win32-SqlServer.html#codepage_convert">
+   <SPAN CLASS="nowrap">codepage_convert()</SPAN></A>, to convert a single value.</LI>
+   <LI><A HREF="Win32-SqlServer.html#sql_init">sql_init()</A> now has a fifth parameter,
+   <CODE><SPAN CLASS="nowrap">$provider</SPAN></CODE>.</LI>
+   <LI>Fixed bug that caused a crash on Vista when an <CODE><B>sql_variant</B></CODE> value had
+   certain base types.</LI>
+</UL>
+<H3>2006-04-17 &#8211; 2.002</H3>
+<P>Fixed two problems which prevented Win32::SqlServer to run under ASP:</P>
+<UL>
+   <LI>In the binary distribution, the C run-time is now statically linked with
+   the SqlServer.dll, because ASP did not pick up MSVCR70.DLL
+      when it was only in the same directory as SqlServer.dll. (Workaround was
+      to put MSVCR70 in System32.)</LI>
+   <LI>Fixed a problem caused an ASP page with Win32::SqlServer to fail on
+      second and succeeding invocations.</LI>
+</UL>
+<H3>2005-11-27 &#8211; 2.001</H3>
+<P>Renamed the module to Win32::SqlServer from the original name MSSQL::OlleDB
+ to comply with requirements from the maintainers of the Perl module list (and
+ because the original name was more cute than practical). No other changes.</P>
+<H3>2005-11-13 &#8211; 2.000</H3>
+<P>This is the first release of MSSQL::OlleDB. It has version number 2.000 since
+ it is a successor module to
+ <A HREF="http://www.sommarskog.se/mssqlperl/mssql-sqllib.html">MSSQL::Sqllib</A>.</P>
+
+<HR>
+<I>
+Last updated <!--$$Modtime:--> 16-07-15 21:33 <!-- $-->
+</I>
+</BODY>
+</HTML>

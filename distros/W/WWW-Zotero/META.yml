@@ -1,0 +1,41 @@
+---
+abstract: 'Perl interface to the Zotero API'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Zotero
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: '0'
+  IO::Socket::SSL: '1.993'
+  JSON: '0'
+  Log::Any: '0'
+  Moo: '1.0'
+  REST::Client: '0'
+  URI::Escape: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/phochste/WWW-Zotero/issues
+  homepage: https://github.com/phochste/WWW-Zotero
+  repository: https://github.com/phochste/WWW-Zotero.git
+version: '0.03'
+x_contributors:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

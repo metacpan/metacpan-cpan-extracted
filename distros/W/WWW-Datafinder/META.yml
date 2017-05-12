@@ -1,0 +1,35 @@
+---
+abstract: 'Perl API for Datafinder L<< http://datafinder.com >> API for marketing data append'
+author:
+  - 'Andrew Zhilenko <perl@putin-huylo.org>'
+build_requires:
+  Test::More: '0'
+  Test::Mouse: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Datafinder
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Exporter: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  JSON::XS: '0'
+  Mouse: '0'
+  REST::Client: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  URI: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

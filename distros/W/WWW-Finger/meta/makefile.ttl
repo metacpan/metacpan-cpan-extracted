@@ -1,0 +1,38 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/WWW-Finger/project>
+	:perl_version_from
+		_:main;
+	:version_from
+		_:main;
+	:readme_from
+		_:main;
+	:test_requires
+		"Test::More 0.61";
+	:requires
+		"common::sense",
+		"namespace::clean",
+		"parent",
+		"Carp",
+		"Digest::MD5",
+		"Digest::SHA",
+		"HTTP::Link::Parser 0.102",
+		"HTTP::LRDD 0.104",
+		"JSON 2.00",
+		"LWP::Simple",
+		"LWP::UserAgent",
+		"Module::Pluggable",
+		"Object::AUTHORITY",
+		"RDF::Query 2.900",
+		"RDF::Query::Client 0.106",
+		"RDF::Trine 0.135",
+		"URI",
+		"URI::Escape",
+		"XRD::Parser 0.102".
+
+_:main
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName>
+		"lib/WWW/Finger.pm".
+

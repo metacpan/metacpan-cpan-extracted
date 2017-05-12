@@ -1,0 +1,22 @@
+Build.PL
+Changes
+ex/check_login.pl
+lib/WWW/USF/WebAuth.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/netid_attribute.t
+xt/clean-namespaces.t
+xt/consistent-version.t
+xt/critic.t
+xt/eol.t
+xt/kwalitee.t
+xt/manifest.t
+xt/perl-version.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+SIGNATURE    Added here by Module::Build

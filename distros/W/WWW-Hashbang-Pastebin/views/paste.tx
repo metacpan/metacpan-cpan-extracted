@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
+<title>WWW::Hashbang::Pastebin</title>
+<style>
+a { text-decoration: none }
+</style>
+</head>
+<body>
+<pre id="paste">
+[% content %]
+</pre>
+</body>
+</html>

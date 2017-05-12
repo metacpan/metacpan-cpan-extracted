@@ -1,0 +1,133 @@
+Revision history for WWW::Google::CustomSearch
+
+0.34  Wed Apr 12 18:15:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.33  Mon Jan 30 11:30:00 2017
+      - Fixed github issue #2 with regard to param key dateRestrict format. (thanks @electromike)
+
+0.32  Sun Oct 04 15:50:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.20.
+      - Added dependency on Type::Tiny instead of Types::Standard.
+      - Removed the upper limit restriction on the field 'start'.
+      - Updated pod document about the restriction on the field 'start'.
+
+0.31  Tue Sep 29 10:35:00 2015
+      - Added dependency on Types::Standard.
+      - Updated the way WWW::Google::UserAgent::DataType was being imported.
+      - Upgraded to use WWW::Google::UserAgent v0.19.
+
+0.30  Mon Sep 07 11:45:00 2015
+      - Added link to the official Google API document.
+
+0.29  Mon Aug 17 11:00:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.18.
+
+0.28  Thu Aug 06 12:00:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.17.
+
+0.27  Fri Mar 13 15:55:00 2015
+      - Updated sample code in the section "SYNOPSIS".
+      - Tidied up pod document in general.
+
+0.26  THu Mar 12 11:40:00 2015
+      - Updated section "SYNOPSIS" and added more sample code.
+      - Tidied up pod document in general.
+
+0.25  Sun Jan 18 19:35:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.14 as it brings in 'https' support to
+        patch issue RT #101571.
+.
+0.24  Mon Jan 12 14:40:18 2015
+      - Upgraded to use WWW::Google::UserAgent v0.13.
+      - Updated method search() in the pod document.
+
+0.23  Mon Jan 12 12:30:18 2015
+      - Added 'use 5.006;' line to the following test scripts:
+        - t/01-new.t
+        - t/02-search.t
+        - t/meta-json.t
+        - t/meta-yml.t
+
+0.22  Sun Jan 11 21:45:18 2015
+      - Upgraded to use WWW::Google::UserAgent v0.12.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Removed SIGNATURE file.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.21  Thu Oct 16 20:33:29 2014
+      - Fixed the syntax error in the code in the pod document of WWW::Google::CustomSearch package.
+
+0.20  Mon Oct 13 20:27:20 2014
+      - Updated contributor names in all pod document.
+      - Minor changes to test script 00-load.t
+
+0.19  Fri Oct 10 22:42:23 2014
+      - Merged patch from David Kitcher-Jones about using URI for url encoding.
+      - Added 'URI' as pre-requisite to the Makefile.PL file.
+      - Updated pod documents (fixed code).
+
+0.18  Fri Aug 29 10:10:00 2014
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+      - Updated Copyright year details.
+
+0.17  Tue Jul 29 15:08:15 2014
+      - Made the pre-requisite WWW::Google::UserAgent v0.07
+
+0.16  Tue Jul 29 00:20:19 2014
+      - Made the pre-requisite WWW::Google::UserAgent v0.06
+
+0.15  Mon Jul 28 14:16:19 2014
+      - Made the pre-requisite WWW::Google::UserAgent v0.03
+
+0.14  Sun Jul 27 11:27:00 2014
+      - Upgraded to use WWW::Google::UserAgent v0.02.
+      - Removed Build.PL file.
+
+0.13  Sat Jul 19 04:00:00 2014
+      - Restructured code to use Moo.
+      - Making use of common library WWW::Google::UserAgent.
+
+0.12  Sat Mar 29 08:27:13 2014
+      - Added dependency check for LWP::Protocol::https v6.04 (RT: 94194).
+
+0.11  Sat Mar 01 11:12:13 2014
+      - Added link to the Google JSON/Atom Custom Search API in the pod.
+
+0.10  Sun Feb 02 17:15:10 2014
+      - Fixed the issue raised by JACINTA (RT: 92596).
+
+0.09  Fri Sep 14 08:55:10 2012
+      - Fixed the warning when no items found.
+      - Explicitly set the defaults.
+      - Hide the 'alt' attribute from user as it is no longer relevant.
+
+0.08  Fri Sep 14 06:02:22 2012
+      - Added XML::Simple dependency check.
+
+0.07  Thu Sep 13 15:00:00 2012
+      - Simplied the process of fetching search result.
+      - Fixed the handling of 'alt' attribute.
+
+0.06  Wed May 02 11:15:00 2012
+      - Updated pod about how the query parameters can be specified.
+
+0.05  Tue Nov 15 11:12:13 2011
+      - Fixed the issued raised by WILLERT (RT: 72417).
+
+0.04  Mon Sep 12 17:18:19 2011
+      - Fixed the checking of fields 'num' and 'start'.
+      - Added unit test to keep an eye.
+
+0.03  Mon Sep 12 14:15:16 2011
+      - Handle default settings correctly.
+
+0.02  Mon Aug 08 12:44:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.01  Wed May 18 19:39:01 2011
+      - First version, released.

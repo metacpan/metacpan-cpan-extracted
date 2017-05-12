@@ -1,0 +1,31 @@
+Revision history for WWW-Shorten-Googl
+
+1.100     2016-04-24
+    - Testing cleanup seems good. Closes https://rt.cpan.org/Ticket/Display.html?id=104847
+
+1.030_001 2016-04-23
+    - Git ignore/attributes, mailmap, perltidy, travis-ci
+    - Cleaned up Changes log.
+    - Added xt/ tests
+    - Remove specific Perl version requirement from library
+    - Remove ability to use username and password auth at this time.
+    - Update docs to represent that we no longer can do user/pass auth.
+    - Fixed Perl path in shebang in bin/goo.gl
+    - Add more robust testing
+    - Use JSON::MaybeXS instead of JSON::Any
+    - Use URI instead of manually making query options
+    - Use HTTP::Request to build a request
+
+1.02	2011-06-27
+    - https protocol is required
+
+1.01	2011-06-24
+    - Fix unit test
+
+1.00    2011-06-23
+    - Use the proper Google URL shortening API.
+    - Support authentication.
+    - Added function 'getlinkstats', to get statistics about link.
+
+0.99    2010-10-06
+    - Initial revision

@@ -1,0 +1,73 @@
+0.26  2017-01-22
+  - Added DOLUDOLU (alternative to DEBE)
+
+0.25  2017-01-20
+  - Fix failing tests
+  - Use GitHub issue tracker
+
+0.24  2017-01-15
+  - Fix version number!
+
+0.23  2017-01-15
+  - Fix failing tests
+
+0.22  2017-01-15
+  - Fix typo
+
+0.21  2017-01-15
+  - Use WWW::Lengthen (WWW::Expand has failing tests)
+
+0.20  2017-01-15
+  - Renamed to WWW::Eksi (WWW::Eksisozluk is now an alias)
+  - Removed DEBE (no more published since 2017-01-13)
+  - Added GHEBE (top entries of last week)
+  - Added politeness delay option
+  - Replaced most regexps with DOM
+
+0.13  2016-09-23
+  - Added deprecation warning to WWW::Eksisozluk
+
+0.12  2015-02-27
+  - Updated regexps to match new eksisozluk style
+  - increased default sleep time to 15
+  - converted tabs to spaces in "changes"
+  - this version is not published to cpan yet
+
+0.11  2015-04-27
+  - Trying to fix 'decreasing version number' problem
+
+0.10  2015-04-26
+  - move to dist:zilla
+  - entry->number_in_topic is deprecated (as it is removed by eksisozluk)
+  - entry->date_accessed is deprecated
+  - entry->date_published, is_modified, date_modified are deprecated.
+  - entry->date_print is renamed to entry->date
+  - gifs are no more embedded automatically in entry->body
+  - popular is renamed. now you need to call topiclist with argument popular
+  - list of today's topics is added (call topiclist with argument today)
+
+0.09  2014-11-09
+  - A semicolon was missing on dependency list
+
+0.08  2014-11-09
+  - List of popular topics (%popular)
+
+0.07  2014-08-03
+  - author_link is added
+  - style max-width from body's img is removed
+
+0.06  2014-07-22
+  - Changed namespace from "Net" to "WWW" as proposed by PrePAN community
+  - get_entry_by_id is renamed as entry
+  - get_current_debe is renamed as debe_ids
+  - debe_ids returns in 0..49, it was 1..50 where [0] was a dummy -1
+  - Partial list problem is handled at which you get 60 entries. Now you don't. It simply doesn't re-add already added value.
+  - Script now has a object oriented interface. You can call my $eksi = WWW::Eksisozluk->new(); and work from there.
+
+0.05  2014-07-21
+  - get_entry_by_id($id)
+  - get_current_debe
+
+0.01  2014-07-08
+  - original version; created by h2xs 1.23 with options
+  - AX Net::Eksisozluk

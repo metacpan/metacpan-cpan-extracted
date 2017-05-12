@@ -1,0 +1,777 @@
+#!/app/unido-i06/share/lang/perl/new/bin/perl
+#                              -*- Mode: Perl -*-
+#
+# makedb -- generate, update or remove wais databases
+#
+# Author       : Ulrich Pfeifer
+# Created On   : Mon Sep 18 13:16:21 1995
+# Last Modified: Time-stamp: <1998-07-26 16:38:37 goevert>
+# Status       : Unknown, Use with caution!
+#
+# (C) Copyright 1995, Universität Dortmund, all rights reserved.
+#
+# $Locker:  $
+# $Log: makedb.SH,v $
+# Revision 2.2  1997/02/04 17:11:12  pfeifer
+# Switched to CVS
+#
+# Revision 2.0.1.9  1996/12/27 15:50:14  pfeifer
+# patch69: Fixes from Norbert Goevert.
+#
+# Revision 2.0.1.8  1996/01/23 15:09:12  pfeifer
+# patch62: Fix for backticks in file selection.
+#
+# Revision 2.0.1.7  1995/12/18 13:51:46  pfeifer
+# patch56:  Some backtickes were not evaled corectely.
+#
+# Revision 2.0.1.6  1995/10/27  09:52:44  pfeifer
+# patch41: Cleaned by Norbert Goevert. Also the files already dead are
+# patch41: counted and subtracted from limit.
+#
+# Revision 2.0.1.5  1995/10/25  13:14:59  pfeifer
+# patch41: - minor fixings within the documentation
+# patch41: - handling of default values for `limit' (defaults to 100),
+# patch41:   `options' (defaults to empty string), `dbdir' (defaults to
+# patch41:   current working directory)
+# patch41: - inserted variable $reindex to determine wether reindexing
+# patch41:   of the whole database is necessary (return value from sub
+# patch41:   any_newer, argument for sub waisindex)
+# patch41: - new sub get_files_from_pattern to derive files from
+# patch41:   $files{$database}
+#
+# Revision 2.0.1.4  1995/10/20  17:07:11  pfeifer
+# patch40: makedb now can index in temporary directories. So the time
+# patch40: where databases are not available is just the time needed to
+# patch40: copy the database back.
+#
+# Revision 2.0.1.3  1995/10/04  17:25:45  pfeifer
+# patch20: Fix from Norbert Goevert.
+#
+# Revision 2.0.1.3  1995/10/04  17:25:45  pfeifer
+# patch20: Fix from Norbert Goevert.
+#
+# Revision 2.0.1.2  1995/09/21  10:10:56  pfeifer
+# patch16: Fixed typos.
+#
+# Revision 2.0.1.1  1995/09/20  12:13:02  pfeifer
+# patch14: Fixed extraction message.
+#
+# Revision 2.0  1995/09/20  09:28:42  pfeifer
+# Maintain databases calling waisindex.
+# Really cute wrapper. Emulates updates!
+#
+# Revision 1.4  1995/09/19  18:21:23  pfeifer
+# Fehlt noch URL handling bei incrementellem update
+#
+# Revision 1.3  1995/09/19  14:48:53  pfeifer
+# ok.
+#
+# Revision 1.2  1995/09/19  11:14:35  pfeifer
+# Fehlt noch -test option.
+#
+#`
+
+=head1 NAME
+
+makedb - generate, update or remove wais databases
+
+=head1 SYNOPSIS
+
+B<makedb>
+[[B<-clean>] B<-tidy>]
+[B<-update>]
+[B<-config> I<config_file>]
+[B<-test>]
+[B<-debug>]
+[B<-verbose>]
+[B<-copy> I<tmpdir>]
+([B<-all>] | I<database> ...)
+
+=head1 DESCRIPTION
+
+I<makedb> creates, updates or removes databases specified in a makedb
+config file (F<./makedb.conf> unless overwritten by the B<-config>
+option).
+
+=head1 OPTIONS
+
+Note that all options may be abreviated with a uniquely identifying
+prefix.
+
+=over 5
+
+=item B<-clean> B<-tidy>
+
+Delete databases. This option can be used together with the B<-update>
+option. Deletion is done before the update regardless of the order ogf
+options on the command line :-). Files with extension C<src>, C<fmt>,
+C<fde>, C<syn>, C<stop>, and C<cat> will not be removed unless
+B<-tidy> is given too.
+
+=item B<-config> I<config_file>
+
+Read an alternate config file. Default is F<./makedb.conf>.
+
+=item B<-update>
+
+Update the databases.
+
+=item B<-all>
+
+Do clean/update all databases specified in the config file. If not
+given clean/update all databases specified on the command line.
+
+=item B<-test>
+
+Do nothing. Just print actions.
+
+=item B<-copy> I<tmpdir>
+
+Do the actual indexing in I<tmpdir>. Copy the database to I<tmpdir>,
+run the index commands and copy the result back.
+
+=item B<-debug>
+
+Not implemented yet.
+
+=item B<-verbose>
+
+Additional messages to B<stderr>.
+
+=back
+
+=head1 Config File
+
+The config file should be made up of lines assigning values to
+variables as in:
+
+    waisindex = /usr/local/ls6/wais/bin/waisindex
+
+Each assignment must start in column 1. Shell comments are allowed.
+Some of the variables have predefined meaning. There are global and
+local variables. Local variables are instantiated for each database.
+Each C<database => assignment introduces a new local block.  Use the
+B<-verbose> option if you are unsure about the scoping.  Assignments
+may have the form I<variable> C<+=> I<value> in which case the
+I<value> is appended to I<variable>.
+
+The following variables are global. The last occurance in the file counts.
+
+=over 5
+
+=item B<waisindex>
+
+Path to the B<waisindex> program. See example above. 
+
+=item B<wais_opt>
+
+Options for all waisindex runs. For example:
+
+    wais_opt  = -nocat
+
+=item B<fmtdir>
+
+Directory where to look for I<database>C<.fmt> if it does not exist in
+B<dbdir>.  Also I<database>C<.src>, I<database>C<.fde>,
+I<database>C<.syn>, I<database>C<.stop> and I<database>C<.cat> are
+copied unless they exist in B<dbdir>.
+
+=back
+
+The following variables are local to a database block. The last
+occurance up to the end of the block counts. For B<limit>, B<dbdir>
+and B<options> there can be global defaults (given before the current
+block). When leaving a block these values are restored.
+
+=over 5
+
+=item B<database>
+
+The name of the database.
+
+=item B<files>
+
+A list of shell fileglob expressions as in:
+
+    files  = /usr/local/doc/*.html
+    files += /usr/local/doc/*.doc
+
+You may also use backticks (C<`>) but no double quotes (C<">):
+
+    files = `find $dbdir -name make\* -print`
+
+=item B<options>
+
+Additional B<wasindex> options. For example
+
+    options = -t fields
+
+=item B<dbdir>
+
+The directory in which the wais database lives.
+
+=item B<limit>
+
+The number of I<dead> files which should be tolerated in the index.  A
+dead file is a file which was in the index, changed and then
+re-indexed.  Since the index does not provide deletions, the file is
+removed from the filename table instead. All postings remain in the
+index thus occupying space on the disc and slowing down the
+search. Also the global occurence counter for terms in the file have
+too high values thus twisting final weights for hits. When more than
+B<limit> files are killed this way, B<makedb> regenerates the whole
+index. This will take more time than simply updating but the index
+size is reduced and searches will be faster. So set B<limit> to make
+your tradeoff. B<limit> defaults to 100.
+
+=back
+
+All other variables do not have any meaning to B<makedb> unless you
+use them in the value part of an assignment as in:
+
+	docdir	  = /home/robots/wais/wais-docs
+	database  = test
+	files	  = $docdir/TEST
+
+=head1 EXAMPLE
+
+        # makedb.conf -- makdb configuration file
+
+        # Global options
+        dbdir     = /home/robots/wais/wais-sources
+        waisindex = /usr/local/ls6/wais/bin/waisindex
+        wais_opt  = -nocat                 # don't create catalog files
+        limit     = 10                     # 10 dead files maximum
+
+        # User defined variables
+        docdir    = /home/robots/wais/wais-docs
+
+        # the databases
+        database  = bibdb-html
+        files     = $docdir/bibdb.html     # use of variables in the value
+        limit     = 0                      # no dead files
+        options   = -T HTML -t  fields
+
+        database  = journals
+        files     = $docdir/journals/*
+        limit     = 3
+        options   = -t  fields
+
+        database  = www-pages
+	wwwroot   = /home/robots/www/pages # new global variable
+        files     = `find $wwwroot -name \*.html -print`
+        options   = -t URL $wwwroot http:
+
+        database  = test
+        dbdir     = /home/crew/pfeifer/tmp/wittenberg
+        files     = $dbdir/ma*
+	files    += $dbdir/te*             # append
+        options   = -t text
+
+=head1 AUTHOR
+
+Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+=cut
+#`
+
+# --- options ---------------------------------------------------------
+    
+$opt_update     = 0;
+$opt_clean      = 0;
+$opt_verbose    = 0;
+$opt_all        = 0;
+$opt_test       = 0;
+$opt_debug      = 0;
+$opt_tidy       = 0;
+$opt_copy       = '';
+$opt_config     = './makedb.conf';
+$conf_waisindex = '/usr/local/bin/waisindex';
+
+use Getopt::Long;
+
+&GetOptions(
+            'all',
+            'clean',
+            'tidy',
+            'config=s',
+            'copy=s',
+            'test',
+            'debug',
+            'update',
+            'verbose',
+            ) || &usage;
+
+die "$opt_copy is no directory\n" 
+    if $opt_copy && ! -d $opt_copy;
+die "-copy $opt_copy without -update make no sense!\n"
+    if $opt_copy && ! $opt_update;
+if ($opt_tidy && !$opt_clean) {
+    print STDERR "-tidy without -update makes no sense.\n" .
+        "Ignoring -tidy!\n";
+}
+
+
+# --- read the config file --------------------------------------------
+
+# default values
+my $cdir;
+chomp($cdir = `pwd`);
+$conf_limit   = 100;            # default value for `limit'
+$conf_dbdir   = $cdir;          # default value for `dbdir'
+$conf_options = '';             # default value for `options'
+
+open(CONF, $opt_config)
+    || die "Could not read config file '$opt_config': $!\n";
+
+while(<CONF>) {
+    chomp;
+    s/#.*//;
+    if (/^database/) {
+        if ($conf_database) {   # second 'database'
+            &add_database;
+            ($conf_dbdir, $conf_limit, $conf_options)
+                = ($dbdir, $limit, $options);
+        } else {                # first 'database'. Save global variables.
+            ($dbdir, $limit, $options)
+                = ($conf_dbdir, $conf_limit, $conf_options);
+        }
+    }
+    if (/^(\w+)\s*(\+)?=\s*(.*)\s*$/) {
+        $var = $1; $op = $2; $val = $3;
+        $val =~ s/\$/\$conf_/g; # variable replacement
+        $val =~ s/\s+$//;                 # chop trailing spaces
+        $val =~ s/\\/\\\\/g;              # double backslash
+        if ($op eq '+') {
+            eval "\$conf_$var = &append(\$conf_$var, \"$val\");";
+        } else {
+            eval "\$conf_$var = \"$val\";";
+        }
+    } elsif (/./) {
+        warn "Ignoring line $.:\n$_\n";
+    }
+}
+&add_database;
+
+sub append {
+    my($left, $right) = @_;
+
+    if ($left =~ s/\\$//) {
+        return $left.$right;
+    } else {
+        return $left.' '.$right;
+    }
+}
+
+sub add_database {
+    print STDERR <<EOF if $opt_verbose;
+waisindex = $conf_waisindex
+wais_opt  = $conf_wais_opt
+database  = $conf_database
+options   = $conf_options
+files     = $conf_files
+dbdir     = $conf_dbdir
+limit     = $conf_limit
+
+EOF
+    ;
+    $files{$conf_database}   = $conf_files;
+    $options{$conf_database} = $conf_options;
+    $dbdir{$conf_database}   = $conf_dbdir;
+    $limit{$conf_database}   = $conf_limit;
+}
+
+
+# --- main ------------------------------------------------------------
+
+if ($opt_all) {
+    if ($#ARGV >= $[) {
+        print STDERR  "Don't specify databases with -all!\n";
+        &usage;
+    }
+    @ARGV = keys %files;
+}
+
+if ($#ARGV < $[) {
+    print STDERR "No databases specified!\n";
+    &usage;
+}
+
+    
+for $database (@ARGV) {
+    print STDERR "Working on database ### $database ###\n";
+    unless (defined($files{$database})) {
+        die "Unknown database '$database'\n";
+    }
+    if (! -d $dbdir{$database}) {
+        die "Unknown database directory for database '$database'\n";
+    }
+    print STDERR "cd $dbdir{$database}\n" if $opt_verbose;
+    chdir($dbdir{$database}) || die "could not cd to $dbdir{$database}: $!\n";
+
+    # find files belonging to database 
+    @files = &get_files_from_pattern($files{$database});
+
+    # reindex the whole database or just add to an existing index?
+    # (or do nothing?)
+    $reindex = 0;
+    if ($opt_clean) {
+        $reindex = 1;
+    }
+    else {
+      ($reindex, @newfiles) = &any_newer($database, @files);
+      if (!$reindex && !@newfiles) {
+        print STDERR "$database: nothing to index\n";
+        next;
+      }
+      @files = @newfiles if !$reindex;
+    }
+
+    if ($opt_copy && $opt_update) {
+
+        if (!$reindex) {
+            &copy_database($database, $dbdir{$database}, $opt_copy);
+        }
+
+        print STDERR "cd $opt_copy\n" if $opt_verbose;
+        chdir($opt_copy)  || die "could not cd to $opt_copy: $!\n";
+        &waisindex($reindex, $database, @files);
+        &copy_database($database, $opt_copy, $dbdir{$database});
+        # clean directory $opt_copy
+        print STDERR "Cleaning directory '$opt_copy'\n" if $opt_verbose;
+        for (<$database*>) {
+            next unless /^$database(_field_\w+)?\./;
+            print STDERR "Unlinking $_\n" if $opt_verbose;
+            unlink $_ unless $opt_test;
+        }
+    }
+    elsif ($opt_update) {
+        
+        if ($opt_clean
+            || -e "$database.update.lock"
+            || -e "$database.index.lock"
+            || $reindex) {
+            &clean($database);
+        }
+        &waisindex($reindex, $database, @files);
+    }
+    elsif ($opt_clean) {
+        &clean($database);
+    }
+}
+
+print STDERR "cd $cdir\n" if $opt_verbose;
+chdir($cdir);
+
+
+# --- subs ------------------------------------------------------------
+
+sub get_files_from_pattern
+{
+    my($all_pattern) = @_;
+    ## local variables
+    my($pattern, $file);
+    ## return value
+    my(@files);
+    
+    while ($all_pattern =~ s/\s*(\`[^\`]+\`|\S+)//) {
+        $pattern = $1;
+        print STDERR "Looking for $pattern\n";
+        if ($pattern =~ /^\`.*\`$/) {
+            $pattern =~ s:\\:\\\\:g;
+            for $file (eval $pattern) {            
+                $file =~ s/[\s\n]+$//;
+                print STDERR "Found $file\n" if $opt_verbose;
+                push(@files, $file);
+            }
+        } else {
+            for $file (<${pattern}>) {
+                print STDERR "Found $file\n" if $opt_verbose;
+                push(@files, $file);
+            }
+        }
+    }
+
+    @files;
+}
+
+
+sub copy_database {
+    my($database, $fromdir, $todir) = @_;
+    my $cdir;
+
+    chomp($cdir = `pwd`);
+    if ($opt_test) {
+        print STDERR "cd $fromdir\n";
+        print STDERR "tar cvpf - $database.* ${database}_field_*|".
+            "(cd $todir; tar xvpf -)\n";
+        print STDERR "cd $cdir\n";
+    } else {
+        chdir($fromdir)
+            || die "could not cd to $fromdir: $!\n";
+        
+        if (system("tar cvpf - $database.* ${database}_field_*|".
+                       "(cd $todir; tar xvpf - )")) {
+            die "Tar failed: $@\n";
+        }
+        chdir($cdir)
+            || die "could not cd to $cdir: $!\n";
+    }
+}
+    
+
+sub waisindex {
+    my($reindex, $database, @files) = @_;
+    my($add) = '';
+    my($file);
+    my($command);
+
+    if (!$reindex && -e "$database.doc") {
+        $add = '-a';
+    }
+    unless ($#files >= $[) {
+        print STDERR "$database: nothing to index\n";
+        return;
+    }
+    print STDERR "$database: indexing ... \n";
+
+    $command = "$conf_waisindex $add $conf_wais_opt ".
+        "$options{$database} -d $database -stdin";
+    $command =~ s/\s+/ /g;
+
+    if ($command =~ /\-t fields/) {
+        &copy_fmt("$database.fmt", 1);
+    }
+    for $file ('src', 'fde', 'syn', 'stop', 'cat') {
+         &copy_fmt("$database.$file", 0);
+    }
+
+    if ($opt_test) {
+        print STDERR "$command\n";
+    } else {
+        open(INDEX, "|$command")
+            || die "Could not run waisindex: $!\n";
+        for $file (@files) {
+            unless (-r $file) {
+                print STDERR "File not readable '$file': $!\n";
+                next;
+            }
+            unless (-f $file) {
+                print STDERR "No plain file '$file': $!\n";
+                next;
+            }
+            $file =~ s/\.(Z|gz)$//;
+            print INDEX "$file\n";
+        }
+        close(INDEX);
+    }
+    print STDERR "$database: indexing ... done\n";
+}
+
+sub copy_fmt {
+    my($file, $needed) = @_;
+
+    unless (-e "$file" && !$opt_copy) {
+        if ($opt_copy && $opt_clean && -e "$dbdir{$database}/$file") {
+            if ($opt_test) {
+                print STDERR "cp $dbdir{$database}/$file $file\n";
+            } else {
+                print STDERR "cp $dbdir{$database}/$file $file\n" 
+                    if $opt_verbose;
+                system("cp $dbdir{$database}/$file $file")
+                    && die "cp $dbdir{$database}/$file $file failed!";
+            }
+        } elsif (-e "$conf_fmtdir/$file") {
+            if ($opt_test) {
+                print STDERR "cp $conf_fmtdir/$file $file\n";
+            } else {
+                print STDERR "cp $conf_fmtdir/$file $file\n" if $opt_verbose;
+                system("cp $conf_fmtdir/$file $file")
+                    && die "cp $conf_fmtdir/$file $file failed!";
+            }
+        } elsif ($needed) {
+            die "Cannot run waisindex -t fields without $file\n";
+        }
+    }
+}
+
+sub clean {
+    my($database) = @_;
+    my($file);
+
+    for $file (<$database*>) {
+        unless ($opt_clean && $opt_tidy) {
+            next if $file =~ /$database\.(stop|cat|fmt|fde|syn|src)$/;
+        }
+        next unless $file =~ /^$database(_field_\w+)?\./; # just paranoid;
+        print STDERR "Unlinking $file\n";
+        unlink($file) unless $opt_test;
+    }
+}
+
+sub any_newer {
+
+  my($database, @files) = @_;           # parameter
+
+  my($pattern);                         # loop var
+  my($dbtime);                          # modification time of database
+  my(%newfiles);                        # files newer than db
+  my(@newfiles);                        # files newer than db
+  my($buf,$type);                       # loop var
+  my($files_changed) = (0);             # no of dead files
+  my($files_dead) = (0);                # files alreday dead
+  local($/) = "\0";                     # input field separator
+    
+  if (-e "$database.doc") {
+    $dbtime = &age("$database.doc");
+  } else {
+    print STDERR "No $database.doc file.\n";
+    print STDERR "Reindexing complete database\n";
+    return (1, ());
+  }
+  
+  if (! -e "$database.fn") {
+    print STDERR "No $database.fn file.\n";
+    print STDERR "Reindexing complete database\n";
+    return (1, ());
+  }
+
+  my $newfiles;
+  foreach my $file (@files) {
+    print STDERR "$dbtime <=> ", &age($file), "\n" if $opt_debug;
+    if (&age($file) > $dbtime) {
+      print STDERR "Newer $file\n" if $opt_verbose || $opt_test;
+      print STDERR "$file\n";
+      $newfiles{$file} = 1;
+      $newfiles++;
+    }
+  }
+
+  @newfiles = keys %newfiles;
+
+  if ($newfiles) {
+    if ($options{$database} =~ /-t\s+URL\s+([^\s]+)\s+([^\s]+)/) {
+      my($trim, $add, %newurls) = ($1, $2);
+      for $file (keys %newfiles) {
+        $file =~ s/^$trim//;
+        $file =  $add.$file;
+        $newurls{$file}++;
+      }
+      %newfiles = %newurls;
+    }
+    if ($opt_test) {
+      open(OLD, "$database.fn")
+        || die "Could not open '$database.fn'; $!\n";
+      read(OLD, $buf, 4);
+      while(1) {
+        chomp($file = <OLD>);
+        last unless length($file); # ??
+        read(OLD, $buf, 4);
+        chomp($type = <OLD>);
+        if ($file =~ /^x/) { # old dead file
+          $files_changed++;
+        }
+        if ($newfiles{$file}) {
+          print STDERR "$file has changed!\nDeleting it from table.\n";
+          $files_changed++;
+        }
+        $files_dead = &dead_files($database);
+        if ($files_changed + $files_dead > $limit{$database}) {
+          print STDERR "Number of changed files exceeding limit.\n";
+          print STDERR "Reindexing complete database\n";
+          close OLD;
+          return(1, @newfiles);
+        }
+      }
+      close(OLD);
+    } else {
+      rename("$database.fn", "$database.fn.bak")
+        || die "Could not rename '$database.fn': $!\n";
+      open(OLD, "< $database.fn.bak")
+        || die "Could not open '$database.fn.bak'; $!\n";
+      open(NEW, "> $database.fn")
+        || die "Could not open '$database.fn'; $!\n";
+      read(OLD, $buf, 4);
+      print NEW $buf;
+      while(1) {
+        chomp($file = <OLD>);
+        last unless length($file); # ??
+        read(OLD, $buf, 4);
+        chomp($type = <OLD>);
+        if ($file =~ /^x/) { # old dead file
+          $files_changed++;
+        }
+        if ($newfiles{$file}) {
+          print STDERR "$file has changed!\nDeleting it from table.\n";
+          $files_changed++;
+          $file =~ s/^./x/;
+        }
+        print NEW $file, "\0", $buf, $type, "\0";
+        if ($files_changed > $limit{$database}) {
+          print STDERR "Number of changed files exceeding limit.\n";
+          print STDERR "Reindexing complete database\n";
+          close OLD;
+          close NEW;
+          return(1, @newfiles);
+        }
+      }
+      close(OLD);
+      close(NEW);
+    }
+  }
+  
+  return(0, @newfiles)
+}
+
+sub dead_files {
+    my $database = shift;
+    my ($buf, $line, $path);
+    my $result = 0;
+
+    open(FN, "$database.fn") || return(0);
+    read(FN, $buf, 4);
+    while (!eof(FN)) {
+        read(FN, $buf,256);
+        $line .= $buf;
+        while ($line =~ s/^([^\000]*)\000(....)[^\000]*\000//) {
+            $path = $1;
+            unless ($path =~ /^(http|ftp):/) {
+                unless (-e $path) {
+                    print STDERR "Dead file $path\n" if $opt_verbose;
+                    $result ++ 
+                }
+            }
+        }
+    }
+    close FN;
+}
+
+sub age {
+    my($file) = @_;
+
+    my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+                    $atime,$mtime,$ctime,$blksize,$blocks)
+                        = stat($file);
+    return $mtime;
+}
+
+sub usage {
+    print STDERR <<EOF
+Usage:
+
+$0
+    [-all]
+    [-clean -tidy]
+    [-tidy]
+    [-config <path>]
+    [-update]
+    [-test]
+    [-debug]
+    [-verbose]
+
+    See the manual page for details.
+EOF
+    ;
+    die "\n";
+}
+

@@ -1,0 +1,35 @@
+---
+abstract: 'backend for searching www.yahoo.com'
+author:
+  - 'As of 1998-02-02, C<WWW::Search::Yahoo> is maintained by Martin Thurn'
+build_requires:
+  Encode: 0
+  ExtUtils::MakeMaker: 6.42
+  I18N::Charset: 0
+  Test::More: 0
+  WWW::Search::Test: 2.265
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.82'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::Yahoo
+name: WWW-Search-Yahoo
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dumper: 0
+  Date::Manip: 0
+  HTML::TreeBuilder: 0
+  URI: 0
+  URI::Escape: 0
+  WWW::Search: 2.557
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.415

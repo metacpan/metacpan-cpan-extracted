@@ -1,0 +1,64 @@
+Wetware-Test-CreateTestSuite
+
+The goal: automate the process of creating a Test::Class based TestSuite.pm
+for each module Foo. So that there will be at least a Foo::TestSuite.pm that
+can be run by a 01_test_class.t t/ test file.
+
+This distribution provides both the Wetware::Test::CreateTestSuite module,
+but also the front end script create_testsuite.
+
+The script will write the skeleton of a Test::Class based TestSuite for
+each module that does not appear to have a Foo::TestSuite. It will also
+create three t/ files:
+
+	'pod-coverage.t'
+	'00_compile_pm.t'  
+	'01_test_classes.t'
+
+These accept the problem that IF there is a Test::Class::Load based 
+TestSuite.pm in the lib, that it can NOT be 'used' "late" in the process.
+
+REQUIRES
+
+	Wetware::Test
+	
+	Wetware::CLI
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Wetware::Test::CreateTestSuite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Wetware-Test-CreateTestSuite
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Wetware-Test-CreateTestSuite
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Wetware-Test-CreateTestSuite
+
+    Search CPAN
+        http://search.cpan.org/dist/Wetware-Test-CreateTestSuite/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 "drieux"
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

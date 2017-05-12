@@ -1,0 +1,310 @@
+#!/usr/bin/env perl
+use common::sense;
+use WebService::MtGox;
+use Data::Dump 'pp';
+use Ouch;
+use Try::Tiny;
+use Getopt::Long;
+
+# allow us to repurpose the thai baht symbol for bitcoins
+binmode STDOUT, ":utf8";
+
+my $user;
+my $password;
+
+if (not -e "$ENV{HOME}/.mgrc") {
+print qq{Config file not found.
+
+To get started, you need to add your mtgox.com login credentials
+to a file that only you can read like this:
+
+  echo username >  ~/.mgrc
+  echo password >> ~/.mgrc
+  chmod 0400 ~/.mgrc
+
+Of course, you should replace username and password with your
+own credentials.
+
+To get started, run:
+
+  mg help
+
+};
+exit 1;
+} else {
+  open my $fh, '<', "$ENV{HOME}/.mgrc" or die $!;
+  ($user, $password) = map { chomp; $_ } <$fh>;
+}
+
+sub sei { print @_, "\n" }
+
+my $m = WebService::MtGox->new(
+  user     => $user,
+  password => $password,
+);
+
+my %actions; %actions = (
+
+  ticker => sub {
+    my $r = $m->get_ticker;
+    sei pp($r);
+  },
+
+  depth => sub {
+    my $r = $m->get_depth;
+    my $bids = $r->{bids};
+    my $asks = $r->{asks};
+    for (reverse @$bids) {
+      sei sprintf('%-20.8f%20.8f', @$_);
+    }
+    sei "-" x 40;
+    for (@$asks) {
+      sei sprintf('%-20.8f%20.8f', @$_);
+    }
+  },
+
+  trades => sub {
+    my $r = $m->get_trades;
+    sei pp($r);
+  },
+
+  balance => sub {
+    my $r = $m->get_balance;
+    sei pp($r);
+  }, 
+
+  buy => sub {
+    GetOptions(
+      \%_,
+      'amount|a=f',
+      'price|p=f',
+    );
+    ouch("MissingParameter", "--amount is required") if not $_{amount};
+    ouch("MissingParameter", "--price is required")  if not $_{price};
+    my $r = $m->buy(amount => $_{amount}, price => $_{price});
+    sei pp($r);
+  },
+  
+  sell => sub {
+    GetOptions(
+      \%_,
+      'amount|a=f',
+      'price|p=f',
+    );
+    ouch("MissingParameter", "--amount is required") if not $_{amount};
+    ouch("MissingParameter", "--price is required")  if not $_{price};
+    my $r = $m->sell(amount => $_{amount}, price => $_{price});
+    sei pp($r);
+  },
+
+  list => sub {
+    my $r = $m->list;
+    sei pp($r);
+  },
+  
+  cancel => sub {
+    GetOptions(
+      \%_,
+      'oid|o=n',
+      'type|t=s',
+    );
+    ouch("MissingParameter", "--oid is required")  if not ($_{oid});
+    ouch("MissingParameter", "--type is required") if not ($_{type});
+    my $r = $m->cancel(oid => $_{oid}, type => $_{type});
+    sei pp($r);
+  },
+  
+  send => sub {
+    GetOptions(
+      \%_,
+      'address|addr|b=s',
+      'amount=f',
+    );
+    ouch("MissingParameter", "--address is required") if not($_{address});
+    ouch("MissingParameter", "--amount is required")  if not($_{amount});
+    my $r = $m->send(bitcoin_address => $_{address}, amount => $_{amount});
+    sei pp($r);
+  },
+
+  # value of assets denominated in USD
+  usd => sub {
+    my $ticker  = $m->get_ticker->{ticker};
+    my $balance = $m->get_balance;
+    my $rate = $ticker->{last};
+    my $btc;
+    my $usd;
+    if (@ARGV) {
+      $btc = shift(@ARGV);
+      $usd = ($btc * $rate);
+    } else {
+      $btc = $balance->{btcs};
+      $usd = ($btc * $rate) + $balance->{usds};
+    }
+    printf("\$%.2f\n", $usd);
+  },
+
+  # value of assets denominated in BTC
+  btc => sub {
+    my $ticker  = $m->get_ticker->{ticker};
+    my $balance = $m->get_balance;
+    my $rate = $ticker->{last};
+    my $btc;
+    my $usd;
+    if (@ARGV) {
+      $usd = shift(@ARGV);
+      $btc = ($usd / $rate);
+    } else {
+      $btc = $balance->{btcs} + ($balance->{usds} / $rate);
+    }
+    printf("\x{0E3F}%.8f\n", $btc);
+  },
+
+  help => sub {
+    require Pod::Usage;
+    Pod::Usage->import;
+    pod2usage(-verbose => 2);
+  },
+);
+
+# aliases
+$actions{ls} = $actions{list};
+
+my $command = shift;
+
+try {
+  if ($command && exists $actions{$command}) {
+    $actions{$command}->();
+  } else {
+    require Pod::Usage;
+    Pod::Usage->import;
+    pod2usage(-verbose => 1);
+  }
+}
+catch {
+  sei "$_";
+  exit 1;
+};
+exit 0;
+
+__END__
+
+=head1 NAME
+
+mg - a command line client for MtGox
+
+=head1 SYNOPSIS
+
+  mg <COMMAND> [OPTION]...
+
+=head1 OPTIONS
+
+=over 2
+
+=item B<ticker>
+
+Get ticker.
+
+=item B<depth>
+
+Get trading depth.
+
+=item B<trades>
+
+Get recent trades.
+
+=item B<balance>
+
+Get your balance.
+
+=item B<buy>
+
+Buy some bitcoins.
+
+=over   4
+
+=item   --amount=NUMBER
+
+=item   --price=NUMBER
+
+=back
+
+=item B<sell>
+
+Sell some bitcoins.
+
+=over   4
+
+=item   --amount=NUMBER
+
+=item   --price=NUMBER
+
+=back
+
+=item B<ls>
+
+=item B<list>
+
+List your orders.
+
+=item B<cancel>
+
+Cancel an order.
+
+=over   4
+
+=item   --oid=ID
+
+The order id.
+
+=item   --type=NUMBER
+
+The type may be C<1> for buy or C<2> for sell.
+
+=back
+
+=item B<send>
+
+Send bitcoins from your MtGox account to a bitcoin address.
+
+=over   4
+
+=item   --amount=NUMBER
+
+=item   --address=BITCOIN_ADDRESS
+
+=back
+
+=item B<usd> [BITCOINS]
+
+Display the total value of your balance in US Dollars.
+You can also use this to find the value of an arbitrary amount
+of bitcoins in US Dollars.
+
+  # How much is 1000 btc worth in US Dollars?
+  mg usd 1000
+
+=item B<btc> [USD]
+
+Display the total value of your balance in bitcoins.
+You can also use this to find the value of an arbitrary amount
+of US Dollars in bitcoins.
+
+  # How much is $400 worth in bitcoins?
+  mg btc 400
+
+=back
+
+=head1 SEE ALSO
+
+L<WebService::MtGox>, L<Finance::Bitcoin>
+
+=head1 AUTHOR
+
+John BEPPU E<lt>beppu (at) cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

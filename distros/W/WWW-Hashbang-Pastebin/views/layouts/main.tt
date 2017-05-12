@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+<title>WWW::Hashbang::Pastebin</title>
+<style type="text/css">
+body            { background: #ffffff; }
+a               { text-decoration: none; color: #0000EE; }
+a.lineno:target { color: #FF0000; }
+.lineno > pre   { background-color: #F0F0F0; margin: 0; padding: 0 10px 0 5px; }
+a.lineno:target > pre { background-color: #FFFF00; }
+pre             { margin: 0; padding: 0; line-height: 125%; word-wrap: break-word; }
+#paste          { overflow: visible; }
+</style>
+</head>
+<body>
+<% content %>
+</body>
+</html>

@@ -1,0 +1,4 @@
+name = "Web-MarketReceipt"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

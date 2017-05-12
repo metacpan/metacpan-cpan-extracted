@@ -1,0 +1,36 @@
+WebService-TDWTF version 0.003
+==============================
+
+WebService::TDWTF is an interface to the API of L<http://thedailywtf.com>.
+Quoting the website's sidebar:
+
+    Founded in 2004 by Alex Papadimoulis, The Daily WTF is your
+    how-not-to guide for developing software. We recount tales of
+    disastrous development, from project management gone spectacularly
+    bad to inexplicable coding choices.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Class::Accessor::Fast
+* JSON::MaybeXS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

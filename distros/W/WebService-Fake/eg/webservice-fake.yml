@@ -1,0 +1,78 @@
+# vim: ts=2 sw=2 expandtab
+defaults:
+  body_wrapper: |
+    {
+      "status": true,
+      "data": [% content %]}
+  headers:
+    - X-Whatever: hello
+      X-Hey: "You [%= join '/', sort keys %{V('headers')} %] rock"
+
+somestuff: &somestuff >
+  {"hey":"joe"}
+
+v:
+  some_array:
+    - one
+    - two
+    - three
+  x: starter
+
+routes:
+
+  # this route gets the same behaviour for GETs and POSTs.
+  # Default body_wrapper applies here because there's no overriding
+  - path: '/'
+    methods: [ GET, post ]
+    headers:
+      - Server: 'My::Server'
+    body: '{"message":"ciao [% query_params.name %]"}'
+
+  # this route gets a custom wrapping and a single method
+  - path: '/simple'
+    method: get
+    headers:
+      - Content-Type: text/plain
+    body: 'hullo'
+    body_wrapper: "I say: [% content %]\n"
+
+  # this route does not get and wrapping at all
+  - path: '/nowrap'
+    method: get
+    headers:
+      - Content-Type: text/plain
+    body: "LOOK MA', NO WRAP!\n"
+    body_wrapper: ~
+
+  # this leverages upon YAML to get stuff around in this file
+  - path: '/somestuff'
+    body: *somestuff
+
+  # this modifies a variable that can be reused in following requests
+  - path: '/add'
+    method: post
+    code: 201
+    headers:
+      - Content-Type: text/plain
+    body: |
+      [%= push @{V "v.some_array"}, time(); "ok" %]
+    body_wrapper: ~
+
+  # this prints out the list in v.some_array (see above). It can be
+  # used to check that /add actually works
+  - path: '/visit-config'
+    body: >
+      [[%= join ", ", map { qq{"$_"} } A "v.some_array" %]]
+
+  # these two team up. The first one prepares the answer that the second
+  # will give out
+  - path: '/prepare/:id'
+    method: post
+    body: '[% V("v")->{x} = (A("v.some_array"))[V "stash.id"]; %]'
+    code: 204
+    body_wrapper: ~
+
+  - path: '/whatnow'
+    method: get
+    body: '[% v.x %]'
+    body_wrapper: ~

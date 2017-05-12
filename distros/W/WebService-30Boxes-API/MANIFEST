@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/WebService/30Boxes/API.pm
+lib/WebService/30Boxes/API/Request.pm
+lib/WebService/30Boxes/API/Response.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

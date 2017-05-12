@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+META.json
+META.yml
+README
+cpanfile
+lib/WWW/Domain/Registry/Joker.pm
+lib/WWW/Domain/Registry/Joker/Loggish.pm
+lib/WWW/Domain/Registry/Joker/Response.pm
+scripts/tests.pl
+t/WWW-Domain-Registry-Joker.t
+t/WWW-Domain-Registry-Joker-coverage.t
+t/WWW-Domain-Registry-Joker-podcheck.t

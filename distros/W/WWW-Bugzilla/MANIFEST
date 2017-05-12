@@ -1,0 +1,12 @@
+WWW/Bugzilla.pm
+WWW/Bugzilla/Search.pm
+Changes
+CREDIT
+Makefile.PL
+MANIFEST
+README
+t/www_bugzilla.t
+t/search.t
+GPL
+ARTISTIC
+META.yml                                 Module meta-data (added by MakeMaker)

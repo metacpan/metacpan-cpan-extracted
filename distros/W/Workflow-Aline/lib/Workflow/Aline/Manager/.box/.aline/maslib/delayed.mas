@@ -1,0 +1,14 @@
+<%args>
+	$comp => ''
+	$args => ''
+</%args>
+<%perl>
+if( $comp )
+{
+	printf "<& %s, %s &>", $comp, $args;
+}
+else
+{
+	print "[[ MASON ERROR delayed.mas: $comp argument was empty ]]";
+}
+</%perl>

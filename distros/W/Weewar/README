@@ -1,0 +1,8 @@
+CPAN module that talks to the weewar.com API.  To build:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+Have fun.

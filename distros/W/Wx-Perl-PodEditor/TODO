@@ -1,0 +1,17 @@
+
+# TODO
+#
+# Umwandlung Pod->Text
+# Pod::Simple-Parser. Event-driven, mit Begin(Bold|Italic|Underline) etc. arbeiten
+#    Stack aufbauen, damit richtiges Format "geschlossen" wird.
+#
+# Umwandlung Text->Pod
+# wxRichTextXMLHandler -> In Skalar speichern -> XML-Parser -> Pod
+#
+#
+# Verhaltensänderungen
+#
+# Innerhalb einer Liste soll es sich verhalten:
+#   * Nummerierte Listen sollen durchgezählt werden
+#   * Neuer Punkt -> Backspace => Zusatzinformationen zum Punkt
+#                +-> 2x Backspace => Neuer Absatz

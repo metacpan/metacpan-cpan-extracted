@@ -1,0 +1,26 @@
+#!perl -wT  -*- tab-width: 4; mode: perl -*-
+
+# :: check that all perl files 'use strict'
+
+use strict;
+use warnings;
+
+{
+## no critic ( ProhibitOneArgSelect RequireLocalizedPunctuationVars )
+my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $fh;	# DISABLE buffering on STDIN, STDOUT, and STDERR
+}
+
+use Test::More qw(no_plan);
+
+plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
+
+my $haveTestStrict = eval { require Test::Strict; import Test::Strict; 1; };
+
+plan skip_all => 'Test::Strict required to check strictness' if !$haveTestStrict;
+
+$Test::Strict::TEST_WARNINGS = $Test::Strict::TEST_WARNINGS = 1;	# ENABLE testing of warnings as well [ weird construct to block 'used only once' warning ]
+
+#Test::Strict::all_perl_files_ok( @mydirs );
+Test::Strict::all_perl_files_ok( 'lib', 'bin' );
+#Test::Strict::all_perl_files_ok( );
+

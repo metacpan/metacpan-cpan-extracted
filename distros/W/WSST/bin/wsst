@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cmd=$1; shift
+
+if [ -z "$cmd" ]; then
+    cmd=help
+fi
+
+exec perl -MWSST -e $cmd -- "$@"

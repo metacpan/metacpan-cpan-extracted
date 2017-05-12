@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::MapBlast.
+
+0.02  Mon Jun 25 18:13:00 2001 BST
+	- now catches the address too
+
+0.01  Mon Jun 25 15:15:11 2001 BST
+	- original version; created by h2xs 1.21 with options
+		-Xcfn WWW::MapBlast
+

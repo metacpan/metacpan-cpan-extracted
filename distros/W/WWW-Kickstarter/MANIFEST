@@ -1,0 +1,32 @@
+.gitignore
+Changes
+lib/WWW/Kickstarter.pm
+lib/WWW/Kickstarter/Data.pm
+lib/WWW/Kickstarter/Data/Categories.pm
+lib/WWW/Kickstarter/Data/Category.pm
+lib/WWW/Kickstarter/Data/Location.pm
+lib/WWW/Kickstarter/Data/NotificationPref.pm
+lib/WWW/Kickstarter/Data/Project.pm
+lib/WWW/Kickstarter/Data/Reward.pm
+lib/WWW/Kickstarter/Data/User.pm
+lib/WWW/Kickstarter/Data/User/Myself.pm
+lib/WWW/Kickstarter/Error.pm
+lib/WWW/Kickstarter/HttpClient.pm
+lib/WWW/Kickstarter/HttpClient/Lwp.pm
+lib/WWW/Kickstarter/Iterator.pm
+lib/WWW/Kickstarter/JsonParser.pm
+lib/WWW/Kickstarter/JsonParser/JsonXs.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.txt
+t/00_load.t
+t/01_devel_mark_check.t
+t/02_devel_version_check.t
+t/03_devel_whitespace.t
+t/04_devel_permissions.t
+t/05_pod.t
+t/06_devel_pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

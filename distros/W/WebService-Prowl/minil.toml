@@ -1,0 +1,4 @@
+name = "WebService-Prowl"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

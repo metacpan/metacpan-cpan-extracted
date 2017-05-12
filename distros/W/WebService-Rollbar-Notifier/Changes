@@ -1,0 +1,42 @@
+Revision history for WebService-Rollbar-Notifier
+
+1.002008 2016-08-16
+    - No functional changes since 1.002007-TRIAL
+
+1.002007-TRIAL 2016-08-12
+    - Reduce required Mojolicious version to 6.04
+
+1.002006 2016-07-24
+    - Fix bug when call without any custom attributes fails
+
+1.002005 2016-07-22
+    - Add support for setting 'server' value for whole instance
+
+1.002004 2016-07-15
+    - Add experimental report_trace and report_message methods
+
+1.002002 2016-07-14
+    - Added support for 'framework' and 'language'
+    - Send $VERSION to Rollbar as notifier version
+
+1.002001 2015-12-10
+    - Fix failing tests on newer Mojolicious (#5)
+    - Use plain HTTP on Solaris (#3)
+
+1.001004 2015-03-26
+    - Made tests skip 'Connect timeout' errors
+
+1.001003 2015-03-26
+    - Added needed prereq
+    - Added more informative tests (on failure)
+    [BREAKING]
+    - Changed return value of non-blocking call to ->notify
+      to return Mojo::Transaction::HTTP object, instead of plain
+      response
+
+1.001002 2015-03-26
+    - Added extra diagnostics in tests to help us figure out why so
+      many of them fail currently
+
+1.001001 2015-03-23
+    - First version released on an unsuspecting world

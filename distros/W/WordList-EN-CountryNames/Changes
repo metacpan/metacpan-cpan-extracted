@@ -1,0 +1,24 @@
+Revision history for WordList-En-CountryNames
+
+0.04    2016-01-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to add statistics.
+
+
+0.03    2016-01-12 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild: add Synopsis.
+
+
+0.02    2016-01-08 (PERLANCAR)
+
+	- Forgot to add WordList::EN::CountryNames::SingleWord.
+
+
+0.01    2016-01-07 (PERLANCAR)
+
+        - First release.

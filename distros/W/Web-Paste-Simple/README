@@ -1,0 +1,143 @@
+NAME
+    Web::Paste::Simple - simple PSGI-based pastebin-like website
+
+SYNOPSIS
+            #!/usr/bin/plackup
+            use Web::Paste::Simple;
+            Web::Paste::Simple->new(
+                    storage    => Path::Class::Dir->new(...),
+                    codemirror => "...",
+                    template   => Text::Template->new(...),
+            )->app;
+
+DESCRIPTION
+    Web::Paste::Simple is a lightweight PSGI app for operating a pastebin-like
+    website. It provides syntax highlighting via the CodeMirror
+    <http://codemirror.net/> Javascript library. It should be fast enough for
+    deployment via CGI.
+
+    It does not provide any authentication facilities or similar, instead
+    relying on you to use subclassing/roles or Plack middleware to accomplish
+    such things.
+
+  Constructor
+    `new(%attrs)`
+        Standard Moose-style constructor.
+
+        This class is not based on Moose though; instead it uses Moo.
+
+  Attributes
+    The following attributes are defined:
+
+    `storage`
+        A Path::Class::Dir indicating the directory where pastes should be
+        stored. Pastes are kept indefinitely. Each is a single file.
+
+    `codemirror`
+        Path to the CodeMirror syntax highlighter as a string. For example, if
+        CodeMirror is available at `http://example.com/js/lib/codemirror.js`
+        then this string should be `http://example.com/js` with no trailing
+        slash.
+
+        This defaults to an address on my server, but for production sites,
+        *please* set up your own copy: it only takes a couple of minutes; just
+        a matter of unzipping a single archive. I offer no guarantees about
+        the continued availability of my copy of CodeMirror.
+
+        Nothing is actually done with this variable, but it's passed to the
+        template.
+
+    `template`
+        A Text::Template template which will be used for *all* HTML output.
+        The following variables are available to the template...
+
+        *   $DATA - the text pasted on the curent page (if any), already HTML
+            escaped
+
+        *   $MODE - the currently selected syntax highlighting mode (if any),
+            already HTML escaped
+
+        *   @MODES - all configured highlighting modes
+
+        *   $CODEMIRROR - the path to codemirror
+
+        *   $APP - the blessed Web::Paste::Simple object
+
+        *   $REQUEST - a blessed Plack::Request for the current request
+
+        *   $PACKAGE - the string "Web::Paste::Simple"
+
+        *   $VERSION - the Web::Paste::Simple version number
+
+        The default template is minimal, but works.
+
+    `modes`
+        The list of CodeMirror highlighting modes to offer to the user.
+
+        Nothing is actually done with this variable, but it's passed to the
+        template.
+
+    `default_mode`
+        The default highlighting mode.
+
+    `uuid_gen`
+        A Data::UUID object used to generate URIs. The default should be fine.
+
+  Methods
+    The following methods may be of interest to people subclassing
+    Web::Paste::Simple.
+
+    `app`
+        Technically this is another attribute, but one that should not be set
+        in the constructor. Call this method to retrieve the PSGI coderef.
+
+        This coderef is built by `_build_app` (a Moo lazy builder).
+
+    `dispatch`
+        Basic request router/dispatcher. Given a Plack::Request, returns a
+        Plack::Response.
+
+    `create_paste`
+        Given a Plack::Request corresponding to an HTTP `POST` request, saves
+        the paste and returns a Plack::Reponse. The response may be an arror
+        message, success message, or (as per the current implementation) a
+        redirect to the paste's URI.
+
+    `retrieve_paste`
+        Given a Plack::Request and a paste ID, returns a Plack::Response with
+        a representation of the paste, or an error message.
+
+    `show_error`
+        Given an error string and optionally an HTTP status code, returns a
+        Plack::Response.
+
+    `show_template`
+        Given a Plack::Request and a hashref of data (possibly including
+        `paste` and `mode` keys) returns a Plack::Response with the rendered
+        template, and the pasted data plugged into it.
+
+    `make_paste_id`
+        Returns a unique ID string for a paste. The current implementation is
+        a base64-encoded UUID.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Web-Paste-Simple>.
+
+SEE ALSO
+    Plack, Moo, CodeMirror <http://codemirror.net/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

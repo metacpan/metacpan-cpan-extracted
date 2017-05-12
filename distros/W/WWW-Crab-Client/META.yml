@@ -1,0 +1,32 @@
+---
+abstract: 'Crab client library'
+author:
+  - 'Graham Bell <g.bell@eaobservatory.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Crab-Client
+provides:
+  WWW::Crab::Client:
+    file: lib/WWW/Crab/Client.pm
+    version: 0.07
+requires:
+  Config::IniFiles: 2.39
+  File::HomeDir: 0
+  File::Spec: 0
+  HTTP::Request: 0
+  IO::Scalar: 2.11
+  JSON: 0
+  LWP::UserAgent: 0
+  Sys::Hostname: 0
+  perl: v5.8.0
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: 0.07

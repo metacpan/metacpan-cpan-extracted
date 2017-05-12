@@ -1,0 +1,58 @@
+{
+   "abstract" : "Atom feed for web",
+   "author" : [
+      "Gea-Suan Lin <gslin@gslin.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-Atom",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : 0,
+            "Carp" : 0,
+            "Encode" : 0,
+            "LWP::UserAgent" : 0,
+            "XML::Atom::Entry" : 0,
+            "XML::Atom::Feed" : 0,
+            "XML::Atom::Link" : 0,
+            "XML::Atom::Person" : 0,
+            "namespace::autoclean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gslin/web-atom-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gslin/web-atom-perl.git",
+         "web" : "https://github.com/gslin/web-atom-perl"
+      }
+   },
+   "version" : "0.1.0"
+}
+

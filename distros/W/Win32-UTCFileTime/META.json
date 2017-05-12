@@ -1,0 +1,76 @@
+{
+   "abstract" : "Get/set UTC file times with stat/utime on Win32",
+   "author" : [
+      "Steve Hay <shay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-UTCFileTime",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "podtest" : {
+         "description" : "POD testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod" : "1.00"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66",
+            "File::Copy" : "0",
+            "File::Spec::Functions" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "File::Spec::Functions" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/steve-m-hay/Win32-UTCFileTime.git"
+      }
+   },
+   "version" : "1.58"
+}

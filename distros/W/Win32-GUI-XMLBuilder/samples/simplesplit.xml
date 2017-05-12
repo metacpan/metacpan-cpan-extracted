@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Window name='W'
+		dim='100, 100, 400, 150'
+	>
+		<WGXSplitter
+			dim='10, 10, $self->{W}->ScaleWidth-20, $self->{W}->ScaleHeight-20'
+			horizontal='1'
+			splittersize='4'
+			start='75'
+			min='0'
+		>
+			<Item>
+				<Label 
+					text='Panel 1'
+					foreground='exec:[255,255,255]' background='exec:[255,0,0]'
+				/>
+			</Item>
+			<Item>
+				<Label 
+					text='Panel 2' 
+					foreground='exec:[0,0,0]' background='exec:[0,255,0]'
+				/>
+			</Item>
+		</WGXSplitter>
+	</Window>
+</GUI>

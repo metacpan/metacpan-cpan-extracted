@@ -1,0 +1,44 @@
+---
+abstract: 'Access Strava via version 3 of the API'
+author:
+  - 'Leon Wright < techman@cpan.org >'
+build_requires:
+  IO::Socket: 0
+  Proc::Daemon: 0
+  Test::More: 0
+  Test::Most: 0
+  Test::Warnings: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Strava
+requires:
+  Carp: 0
+  Config::Tiny: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::MimeInfo::Magic: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  JSON: 0
+  JSON::Parse: 0
+  LWP::Authen::OAuth2: 0.09
+  Method::Signatures: 20140224
+  Moo: 0
+  Scalar::Util: 0
+  Scalar::Util::Reftype: 0
+  autodie: 2.25
+  experimental: 0.010
+  namespace::clean: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/techman83/WebService-Strava3
+version: 0.06

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Mixi.t
+lib/WWW/Mixi.pm
+lib/WWW/Mixi/Cookbook.pod
+lib/WWW/Mixi/Mixi.pod
+META.yml                                 Module meta-data (added by MakeMaker)

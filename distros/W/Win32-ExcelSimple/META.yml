@@ -1,0 +1,35 @@
+---
+abstract: "a wrap of Win32::OLE excel\r"
+author:
+  - 'xiaoyafeng <xyf.xiao@gmail.com>'
+build_requires:
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Spec::Functions: 0
+  Test::Deep: 0
+  Test::Harness: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-ExcelSimple
+no_index:
+  directory:
+    - inc
+requires:
+  Exporter: 0
+  Spreadsheet::Read: 0
+  Try::Tiny: 0
+  Win32::OLE: 0
+  Win32::OLE::Const: 0
+  Win32::OLE::NLS: 0
+  Win32::OLE::Variant: 0
+  strict: 0
+  warnings: 0
+version: 0.59

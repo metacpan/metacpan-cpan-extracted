@@ -1,0 +1,114 @@
+                       WSRF Sample Client Scripts
+                       ==========================
+				  				  
+This directory contains a number of simple client scripts to use with the
+various implementations of the Counter that come with WSRF::Lite. There have
+been significant changes since the last version because of the major change
+in WS-Addressing, the ResourceID part has now been dropped which makes things
+eashier. 
+    
+There are some client scripts for dealing with ServiceGroups in the
+ServiceGroup directory. 
+
+If you have a WSRF::Lite Container running on your local machine you can 
+create a new Counter WS-Resource using either of:
+
+  wsrf_createCounterResource.pl http://localhost:50000/Session/Counter/Counter http://www.sve.man.ac.uk/Counter
+     (Creates a File based WS-Resource)
+
+  wsrf_createCounterResource.pl http://localhost:50000/Session/CounterFactory/CounterFactory http://www.sve.man.ac.uk/CounterFactory
+     (Creates a Process based WS-Resource)
+
+  wsrf_createCounterResource.pl http://localhost:50000/MultiSession/Counter/Counter http://www.sve.man.ac.uk/Counter
+     (Creates a MutliSession WS-Resource)
+
+
+This will return the endpoint of the new WS-Resource.
+
+The client scripts check if the SOAP response from any service has 
+been signed, if it has not been you should see this is the output 
+from the client:
+
+SOAP Message not signed
+WSRF::WSS::verify Fault - No Security Token in SOAP Header
+
+By default the the sample WS-Resources do not sign their SOAP responses
+so you can ignore this message.
+
+To destroy the newly created Resource use wsrf_destroyResource.pl the endpoint 
+returned from wsrf_createCounterResource.pl:
+
+  wsrf_destroyResource.pl http://localhost:50000/Session/Counter/Counter/3318161341044133049558
+
+(remember to change the number 3318161341044133049558 to whatever is 
+appropriate for your WS-Resource) To perform the simple add, subtract and 
+getValue operations on the Counter service use the wsrf_client.pl script as 
+follows
+
+  wsrf_client.pl http://localhost:50000/Session/Counter/Counter/3318161341044133049558 http://www.sve.man.ac.uk/Counter add 1
+ 
+This adds one to the count resource property and returns the new value for 
+count. The script takes the endpoint for the service, the namespace the 
+operation belongs to (in this case http://www.sve.man.ac.uk/Counter), the 
+operation to invoke and the paramater to pass to it. In this case the operation 
+is add, and the paramater is 1 - this will work for simple paramaters such as 
+numbers and strings.
+
+To set the TerminationTime for the Resource use 
+
+  wsrf_setTerminationTime.pl http://localhost:50000/MultiSession/Counter/Counter/19501981104038050279 2005-02-08T20:31:19Z
+
+The time must be in ISO 8660 format. This operation will return the new 
+TerminationTime and the CurrentTime from the service.
+
+To find the value of a ResourceProperty use either 
+wsrf_getResourceProperties.pl or wsrf_getMultipleResourceProperties.pl 
+(wsrf_getResourceProperties.pl will get only one ResourceProperty while 
+wsrf_getMultipleResourceProperties.pl can get a number of properties).
+
+  wsrf_getResourceProperties.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 count
+  wsrf_getResourceProperties.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 foo
+  wsrf_getResourceProperties.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 TerminationTime
+
+or 
+
+  wsrf_getMultipleResourceProperties.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 
+    count foo TerminationTime CurrentTime
+
+(The TerminationTime can be undefined, effectively meaning the Resource has an 
+infinite lifetime.) You can also update, insert or delete a ResourceProperty, 
+in the Counter example the only property that can be modified or deleted is 
+the property foo, (the count can only be changed using the add and subtract 
+operations).
+
+  wsrf_insertResourceProperty.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 foo val
+
+This will insert a ResourceProperty foo with the value val, you can have more 
+than one foo so the following will add another two foo's with values val2 and 
+val3
+
+  wsrf_insertResourceProperty.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 foo val2 val3
+
+After this operations there will be three foo's with values "val", "val2" and 
+"val3". 
+
+If the property foo is Updated the previous value(s) of foo are deleted and 
+replaced with the new values.
+
+  wsrf_updateResourceProperty.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 foo bar
+
+After this operation the value of foo will be "bar". The property foo can also 
+be deleted eg:
+
+  wsrf_deleteResourceProperty.pl http://localhost:50000/Session/Counter/Counter/1823161341044133053268 foo
+
+There will be no foo's after this operation has completed.
+
+
+
+WS-Security Client
+==================
+There is also included a sample client for siging a SOAP message with an X509 
+digital certificate - sample_WS-Security_client.pl. The script should be 
+modified to point to your X509 certificate, the service it points to requires 
+a UK eScience certificate for authentication.     

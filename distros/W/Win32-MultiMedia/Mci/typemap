@@ -1,0 +1,10 @@
+TYPEMAP
+
+MMRESULT       	T_UV
+UINT           	T_UV
+HWND       		T_IV
+MCIDEVICEID		T_IV
+MCIERROR		T_IV
+DWORD			T_IV
+RECT			T_PV
+

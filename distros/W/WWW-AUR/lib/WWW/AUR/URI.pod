@@ -1,0 +1,167 @@
+=head1 NAME
+
+WWW::AUR::URI - Generate dynamic URIs for accessing the AUR
+
+=head1 SYNOPSIS
+
+  use WWW::AUR::URI qw(:all);
+  
+  my $uri = pkgfile_uri('perl-www-aur');
+  $uri = pkgbuild_uri('perl-www-aur');
+  $uri = pkgsubmit_uri();
+  $uri = pkg_uri('SB' => 'n', 'O' => 1234, 'https' => 'YUP');
+  
+  # Override Scheme to use http...
+  local $WWW::AUR::URI::Scheme = 'http';
+  my $httpsuri = pkgfile_uri('perl-www-aur');
+  print $httpsuri # "http://aur.archlinux.org/..."
+
+=head1 DESCRIPTION
+
+This is a collection of functions used internally by other modules
+in the WWW-AUR distribution. For advanced users only. Well... sorta.
+
+=head1 EXPORTS
+
+This module exports nothing by default. You must explicitly import
+functions or import the C<all> tag to import all functions.
+
+  use WWW::AUR::URI qw( pkgfile_uri pkgbuild_uri pkgsubmit_uri pkg_uri rpc_uri );
+  use WWW::AUR::URI qw( :all );
+
+=head1 FUNCTIONS
+
+=head2 pkgfile_uri
+
+  $URI = pkgfile_uri( $PKGNAME )
+
+=over 4
+
+=item C<$PKGNAME>
+
+The name of the package.
+
+=item C<$URI>
+
+The standard URI to the source package tarball.
+
+=back
+
+=head2 pkgbuild_uri
+
+  $URI = pkgbuild_uri( $PKGNAME )
+
+=over 4
+
+=item C<$PKGNAME>
+
+The name of the package.
+
+=item C<$URI>
+
+The standard URI to the conveniently extracted PKGBUILD file.
+
+=back
+
+=head2 pkg_uri
+
+  $URI = pkg_uri( %QUERY_PARAMS )
+
+This generates a URI for the L<https://aur.archlinux.org/packages/>
+webpage. The one that shows package information and comments, etc.
+
+=over 4
+
+=item C<%QUERY_PARAMS>
+
+You can supply whatever query parameters that you want. You might want
+to look at the AUR's HTML source to learn how they work.
+
+=item C<$URI>
+
+The URI to I<packages/> with query parameters appended.
+
+=back
+
+=head2 pkgsubmit_uri
+
+  $URI = pkgsubmit_uri( )
+
+This usually returns L<https://aur.archlinux.org/submit/> but can be changed
+with C<$WWW::AUR::HOST> and C<$WWW::AUR::URI::Scheme>.
+
+=over 4
+
+=item C<$URI>
+
+The URI used for submitting packages.
+
+=back
+
+=head2 rpc_uri
+
+  $URI = rpc_uri( $METHOD, @ARGS )
+
+Generates a URI for the L<http://aur.archlinux.org/rpc.php> page.
+
+=over 4
+
+=item C<$METHOD>
+
+The RPC "method" to use. Must be either I<search>, I<info>,
+I<multiinfo>, or I<msearch>.
+
+=item C<@ARG>
+
+The RPC "arguments" to give to the "method". I<multiinfo> is the only
+"method" that uses all of the arguments given. The other methods only
+use the first argument and ignore the rest.
+
+=item C<$URI>
+
+The URI to the rpc.php page with query parameters in place.
+
+=back
+
+=head1 PACKAGE VARIABLES
+
+=head2 Scheme
+
+This scalar contains the URI scheme to be inserted into all generated
+URIs. The default value is "https".
+
+=over 4
+
+=item B<Example>
+
+  # This prints a URI starting with http://
+  local $WWW::AUR::URI::Scheme = 'http';
+  print pkgbuild_uri('perl-www-aur'), "\n";
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::AUR>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+=head1 BUGS
+
+Please email me any bugs you find. I will try to fix them as quick as I can.
+
+=head1 SUPPORT
+
+Send me an email if you have any questions or need help.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Justin Davis.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

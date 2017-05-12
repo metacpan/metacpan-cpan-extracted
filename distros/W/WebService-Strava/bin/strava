@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+use v5.10.0;
+use strict;
+use warnings;
+use experimental 'say';
+use WebService::Strava;
+use Getopt::Long;
+use File::Spec;
+use File::Basename 'fileparse';
+use Data::Dumper;
+
+# PODNAME: strava
+
+# ABSTRACT: strava - Command line interface to Strava
+
+our $VERSION = '0.06'; # VERSION
+
+
+# $progname is just a nicer-formatted version of $0 (our command name)
+my $PROGNAME = (File::Spec->splitpath($0))[2];
+$PROGNAME ||= 'strava';
+
+my $strava = WebService::Strava->new();
+
+if (! @ARGV) {
+  &print_usage;
+}
+
+my $getopts_rc = GetOptions(
+  "setup"       => \&setup,
+  "upload=s"    => \&upload,
+  "version"     => \&version,
+
+  "help|?"        => \&print_usage,
+);
+
+sub print_usage {
+  say q{
+  Usage:
+
+  strava --setup                          : Configure Oauth2 authentication
+  strava --upload /path/to/file.gpx       : Simple uploading of activities
+
+  Debugging commands:
+  
+  strava --version                        : Show version information
+
+  For more documentation, use `perldoc strava`.
+  };
+
+  exit 1;
+}
+
+
+sub version {
+  $::VERSION ||= "Unreleased";
+  say "strava version                 : $::VERSION";
+  say "WebService::Strava version     : ", $strava->VERSION;
+}
+
+sub setup {
+  $strava->auth->setup;
+  my $athlete = $strava->athlete();
+
+  if ($athlete->{firstname}) {
+    say "Congratulations $athlete->{firstname}, you appear to have authenticated successfully!";
+  }
+}
+
+sub upload {
+  my ($option, $value) = @_;
+
+  say "Uploading $value";
+  
+  my ($filename, $path, $suffix) = fileparse($value, qw(fit fit.gz tcx tcx.gz gpx gpx.gz));
+
+  my $upload = $strava->upload_activity(
+    file => $value,
+    type => $suffix, 
+  );
+  
+  if (! $upload->{error} ) {
+    say "Uploaded successfully, Upload ID: $upload->{id}";
+  } else {
+    say "Upload failed: $upload->{status}";
+  }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+strava - strava - Command line interface to Strava
+
+=head1 VERSION
+
+version 0.06
+
+=head1 SYNOPSIS
+
+Usage:
+
+    strava --setup                            : Configure Oauth2 authentication
+    strava --upload /path/to/file.gpx         : Simple uploading of activities
+
+    Debugging commands:
+    
+    strava --version                          : Show version information
+
+=head1 DESCRIPTION
+
+This is a command-line client for the L<Strava|http://strava.com/>
+service.  Use C<strava> with no arguments for help.
+
+This interface needs expanding! Submit issues with feature requests and
+I will look at adding them, I currently don't have any use cases for
+it.
+
+=head1 SETUP
+
+=head2 Installation
+
+If you have not already installed this software, the easiest way
+is to use L<cpanm> and L<local::lib>. If you don't have them installed,
+it's easy with:
+
+    curl -L http://cpanmin.us/ | perl - --self-upgrade
+    ~/perl5/bin/cpanm -L ~/perl5 App::local::lib::helper
+    source ~/perl5/bin/localenv-bashrc
+
+You might want to put that last line in your F<~/.bashrc> file.
+
+You can then install C<strava> and related utilities with:
+
+    cpanm WebService::Strava3
+
+=head2 API Registration
+
+You will need to register for a Client Secret + Access token here:
+https://www.strava.com/settings/api
+
+Set the authorization callback domain to: http://127.0.0.1
+
+=head2 Configuration
+
+You will need the following
+
+  client_id     = xxxxx
+  client_secret = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+You can get these values by going to https://www.strava.com/settings/api
+and registering your application. After registration simply run:
+
+    strava setup
+
+=head1 BUGS/Features Requests
+
+Please submit any bugs, feature requests to
+L<https://github.com/techamn83/WebService-Strava3/issues> .
+
+Contributions are more than welcome!
+
+=head1 SEE ALSO
+
+L<WebService::Strava>
+
+=head1 AUTHOR
+
+Leon Wright < techman@cpan.org >
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Leon Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

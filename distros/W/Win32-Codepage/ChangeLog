@@ -1,0 +1,16 @@
+2005-09-26 12:08  chris
+
+	* MANIFEST: Add license to manifest
+
+2005-09-26 12:06  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Win32/Codepage.pm, t/codepage.t, t/pod-coverage.t, t/pod.t:
+	  Initial revision
+
+2005-09-26 12:06  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Win32/Codepage.pm, t/codepage.t, t/pod-coverage.t, t/pod.t:
+	  initial import
+

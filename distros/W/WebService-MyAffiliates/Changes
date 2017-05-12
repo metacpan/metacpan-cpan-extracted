@@ -1,0 +1,25 @@
+Revision history for WebService-MyAffiliates
+
+0.07      2017-02-27 06:42:57+00:00 UTC
+      - Switch to dzil
+
+0.07  2016-01-11 14:29:05 CST
+        - fix requiresments from Mojo::UserAgent to Mojolicious for version
+
+0.06  2016-01-11 11:59:55 CST
+        - remove cookie_jar set
+
+0.05  2016-01-11 11:53:59 CST
+        - fix cookie_jar ignore
+
+0.04  2014-10-14 13:13:10 CST
+        - under wrong ACCOUNT
+
+0.03  2014-10-14 13:12:02 CST
+        - no code changes, just version bump
+
+0.02  2014-10-02 23:13:12 CST
+        - bug fixes
+
+0.01  2014-10-02 18:27:40 CST
+        - Initial release

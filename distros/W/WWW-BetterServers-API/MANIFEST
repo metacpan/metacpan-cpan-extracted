@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/events.t
+t/WWW-BetterServers-API.t
+lib/WWW/BetterServers/API.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

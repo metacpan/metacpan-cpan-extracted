@@ -1,0 +1,31 @@
+% layout 'default';
+% title 'Coverage for author $author';
+
+<h1>Coverage for author <%= uc $author %></h1> 
+
+% my $schema = schema;
+% my $result = schema->resultset('Cover')->search_like( { author => $author . '%'}, {order_by => { -asc => [qw('name')] }});
+% my $columns = [ qw(name author coverage) ];
+%= tag table => class => "table table-striped table-bordered table-condensed" => begin
+  %= tag tr => begin
+    % for my $header (@$columns) {
+        %= tag th =>  $header
+    % }
+    %= tag th =>  'action' 
+  %= end
+  % while (my $record = $result->next) {
+    %= tag tr => begin
+      % for my $col (@$columns) {
+          %= tag td => $record->$col
+      % }
+      %= tag td => begin
+        % my $name = $record->name;
+        %= tag a => href => "http://cpancover.com/latest/$name/index.html" =>  'details' 
+      %= end
+    %= end
+  % }
+%= end
+
+<br />
+<br />
+

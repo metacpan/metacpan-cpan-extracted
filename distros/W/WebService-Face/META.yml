@@ -1,0 +1,49 @@
+---
+abstract: 'Client to the Face.com REST API'
+author:
+  - 'Arnaud (Arhuman) ASSAD <arhuman@gmail.com>'
+build_requires:
+  JSON: 0
+  REST::Client: 0
+  Storable: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Arnaud (Arhuman) ASSAD <arhuman@gmail.com>, CPAN::Meta::Converter version 2.112621'
+keywords:
+  - face
+  - recognition
+  - rest
+  - api
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Face
+provides:
+  WebService::Face::Client:
+    file: lib/WebService/Face/Client.pm
+    version: 0.04
+  WebService::Face::Response:
+    file: lib/WebService/Face/Response.pm
+    version: 0.04
+  WebService::Face::Response::Account:
+    file: lib/WebService/Face/Response/Account.pm
+    version: 0.04
+  WebService::Face::Response::Photo:
+    file: lib/WebService/Face/Response/Photo.pm
+    version: 0.04
+  WebService::Face::Response::Tag:
+    file: lib/WebService/Face/Response/Tag.pm
+    version: 0.04
+  WebService::Face::Store:
+    file: lib/WebService/Face/Store.pm
+    version: 0.04
+requires:
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/arhuman/WebService-Face/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/arhuman/WebService-Face
+version: 0.04

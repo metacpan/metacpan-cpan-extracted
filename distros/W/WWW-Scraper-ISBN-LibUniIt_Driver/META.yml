@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Scraper-ISBN-LibUniIt_Driver
+version:      0.2
+version_from: LibUniIt_Driver.pm
+installdirs:  site
+requires:
+    HTML::Entities:                1.32
+    LWP::UserAgent:                2
+    WWW::Scraper::ISBN::Driver:    0.15
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

@@ -1,0 +1,27 @@
+Revision history for Perl module WWW::Newzbin
+
+0.07 Wed Nov 12 23:3327 2008
+    - Added tests for POD correctness and POD coverage
+    - Added examples/ directory containing example scripts of how to use the distribution
+    - Updated documentation to reflect Newzbin's new 240-day retention policy
+
+0.06 Wed Mar 26 12:31:27 2008
+    - Better Test::More tests
+
+0.05 Tue Mar 25 11:59:30 2008
+    - Makefile.PL bugfix where a non-existent version of LWP::UserAgent was sought (thanks deadjones)
+    - META.yml file now included in the distribution
+
+0.04 Thu Nov 29 17:30:30 2007
+    - more stupid documentation fixes
+
+0.03 Thu Nov 29 17:19:23 2007
+    - documentation fix: search_files() returns a "groups" arrayref, not hashref
+
+0.02 Thu Nov 29 14:30:02 2007
+    - small fix to tarball to make the distribution uploadable to CPAN
+
+0.01 Thu Nov 29 13:30:41 2007
+    - original version; searches files index and generates .nzb files
+
+

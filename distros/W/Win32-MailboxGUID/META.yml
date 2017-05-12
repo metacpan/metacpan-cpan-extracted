@@ -1,0 +1,21 @@
+---
+abstract: 'functions to convert Exchange mailbox GUIDs'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  MIME::Base64: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-MailboxGUID
+requires:
+  perl: v5.6.0
+resources:
+  homepage: http://github.com/bingos/win32-mailboxguid/tree
+  repository: git://github.com/bingos/win32-mailboxguid.git
+version: 0.02

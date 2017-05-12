@@ -1,0 +1,63 @@
+## XS++ for Wx::ScintillaTextEvent
+
+%module{Wx};
+
+%typemap{wxScintillaTextEvent*}{simple};
+%typemap{wxDragResult}{simple};
+
+%name{Wx::ScintillaTextEvent} class wxScintillaTextEvent
+{
+    void SetPosition(int pos);
+    void SetKey(int k);
+    void SetModifiers(int m);
+    void SetModificationType(int t);
+    void SetText(const wxString& t);
+    void SetLength(int len);
+    void SetLinesAdded(int num);
+    void SetLine(int val);
+    void SetFoldLevelNow(int val);
+    void SetFoldLevelPrev(int val);
+    void SetMargin(int val);
+    void SetMessage(int val);
+    void SetWParam(int val);
+    void SetLParam(int val);
+    void SetListType(int val);
+    void SetX(int val);
+    void SetY(int val);
+    void SetDragText(const wxString& val);
+    void SetDragAllowMove(bool val);
+#ifdef  STC_USE_DND
+    void SetDragResult(wxDragResult val);
+#endif
+
+    int  GetPosition() const;
+    int  GetKey()  const;
+    int  GetModifiers() const;
+    int  GetModificationType() const;
+    wxString GetText() const;
+    int  GetLength() const;
+    int  GetLinesAdded() const;
+    int  GetLine() const;
+    int  GetFoldLevelNow() const;
+    int  GetFoldLevelPrev() const;
+    int  GetMargin() const;
+    int  GetMessage() const;
+    int  GetWParam() const;
+    int  GetLParam() const;
+    int  GetListType() const;
+    int  GetX() const;
+    int  GetY() const;
+    wxString GetDragText();
+    bool GetDragAllowMove();
+#ifdef STC_USE_DND
+    wxDragResult GetDragResult();
+#endif
+
+    bool GetShift() const;
+    bool GetControl() const;
+    bool GetAlt() const;
+
+##    virtual wxEvent* Clone() const;
+};
+
+

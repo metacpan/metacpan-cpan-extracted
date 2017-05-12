@@ -1,0 +1,10 @@
+Revision history for WebService-Amazon-IAM
+
+0.002     2015-01-26 16:50:23+00:00 Europe/London
+	No new features
+
+	Dependencies:
+	* Log::Any
+
+0.001     2015-01-26 16:24:15+00:00 Europe/London
+	Initial CPAN release

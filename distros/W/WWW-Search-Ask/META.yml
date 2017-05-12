@@ -1,0 +1,28 @@
+---
+abstract: 'class for searching www.search.com'
+author:
+  - 'Originally written by Martin Thurn,'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  WWW::Search::Test: 2.287
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::Search::Ask
+name: WWW-Search-Ask
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  WWW::Search: 0
+  perl: 5.004
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.011

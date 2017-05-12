@@ -1,0 +1,49 @@
+Revision history for Perl extension Win32::File::VersionInfo.
+
+0.07  Fri May 13 19:08:00 2016
+        - Changed Makefile.PL to copy the VersionInfo.xs file out of the xs
+          directory rather than messing with XS to try and compile it - since
+          that doesn't work!
+        - Ran perltidy over everything.
+        - Changed README to Markdown (README.md)
+        - Added Travis build status to README.md
+
+0.06  Fri May 13 09:06:00 2016
+        - Moved XS component out of the root, added conditional compilation
+          to avoid build failures on non-Win32 systems.
+        - Modified module to throw exception on non-Win32 systems (since the 
+          API won't be there).
+        - Updated tests to pass on non-Win32 systems, checking that the exception
+          is being thrown.
+
+0.05  Tue Oct 22 17:43:00 2013
+	- Documentation fix (should have done this as part of 0.04...)
+	  https://rt.cpan.org/Public/Bug/Display.html?id=27098
+
+0.04  Tue Oct 22 16:36:00 2013
+	- fixed bug 21867 where module does not compile under Cygwin.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=21867
+
+0.03  Sat May 1 03:30:00 2004
+	- fixed buffer overflow bug in the handling of the
+		language-dependant variable part
+	- fixed a bug that would cause undef to be returned if the
+		language-dependant variable part was absent
+	- improved the behavior of the Flags hash
+
+0.02  Mon Oct 20 08:50:00 2003
+	- renamed from Win32::File::Ver 0.02
+	- minor documentation fixes
+
+Revision history for Perl extension Win32::File::Ver.
+
+0.02  Tue Aug 12 09:53:13 2003
+	- removed use 5.008 from Makefile.PL and Ver.pm as suggested by
+		DH <crazyinsomniac@yahoo.com>
+	- fixed contact info in Makefile.PL
+	- changed test.pl based on advice from DH <crazyinsomniac@yahoo.com>
+
+0.01  Tue Jul  8 10:19:49 2003
+	- original version; created by h2xs 1.22 with options
+		-A --skip-ppport -n Win32::File::Ver
+

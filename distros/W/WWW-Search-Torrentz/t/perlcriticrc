@@ -1,0 +1,29 @@
+severity = 1
+
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodLinksIncludeText]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-RegularExpressions::ProhibitEnumeratedClasses]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::RequireFinalReturn]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-Variables::ProhibitLocalVars]
+[-Variables::ProhibitPackageVars]
+[-Variables::ProhibitPunctuationVars]
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 20
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | SYNOPSIS | DESCRIPTION | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | SYNOPSIS | DESCRIPTION | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 5
+allow_subscripts = 1

@@ -1,0 +1,17 @@
+DWORD                  T_HANDLE
+LPSTR                  T_PV
+LPCSTR                 T_PV
+IShellLink *           T_HANDLE
+IPersistFile *         T_HANDLE
+
+#############################################################################
+INPUT
+
+T_HANDLE
+	$var = INT2PTR($type, SvIV($arg))
+
+#############################################################################
+OUTPUT
+
+T_HANDLE
+	sv_setiv($arg, PTR2IV($var));

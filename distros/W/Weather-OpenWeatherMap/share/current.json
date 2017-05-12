@@ -1,0 +1,43 @@
+{
+   "rain" : {
+      "1h" : 0.25
+   },
+   "base" : "cmc stations",
+   "sys" : {
+      "country" : "United States of America",
+      "sunrise" : 1397728770,
+      "sunset" : 1397777462,
+      "message" : 0.005
+   },
+   "dt" : 1397768668,
+   "name" : "Manchester",
+   "cod" : 200,
+   "main" : {
+      "pressure" : 1040,
+      "temp" : 41.07,
+      "temp_min" : 37.99,
+      "temp_max" : 45,
+      "humidity" : 49
+   },
+   "wind" : {
+      "gust" : 6.17,
+      "speed" : 2.22,
+      "deg" : 59
+   },
+   "weather" : [
+      {
+         "icon" : "10d",
+         "id" : 500,
+         "description" : "light rain",
+         "main" : "Rain"
+      }
+   ],
+   "coord" : {
+      "lat" : 42.99,
+      "lon" : -71.46
+   },
+   "clouds" : {
+      "all" : 8
+   },
+   "id" : 5089178
+}

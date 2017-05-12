@@ -1,0 +1,15 @@
+Changes
+GLCanvas.xs
+MANIFEST
+Makefile.PL
+README.txt
+inc/MyMakeMaker.pm
+lib/Wx/DemoModules/wxGLCanvas.pm
+lib/Wx/GLCanvas.pm
+t/01_load.t
+t/zz_pod.t
+typemap
+wx/glcanvas.cpp
+wx/msw_myglcanvas.h
+wx/myglcanvas.h
+META.yml                                 Module meta-data (added by MakeMaker)

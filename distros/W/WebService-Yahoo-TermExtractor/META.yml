@@ -1,0 +1,21 @@
+---
+name: WebService-Yahoo-TermExtractor
+version: 0.01
+author:
+  - 'Dean Wilson <dean.wilson@gmail.com>'
+abstract: Perl wrapper for the Yahoo! Term Extraction WebService
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  LWP::UserAgent: 0
+build_requires:
+  Test::More: 0
+provides:
+  WebService::Yahoo::TermExtractor:
+    file: lib/WebService/Yahoo/TermExtractor.pm
+    version: 0.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

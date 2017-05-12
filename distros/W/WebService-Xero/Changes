@@ -1,0 +1,9 @@
+Revision history for WebService-Xero
+
+0.10    December, 2016
+        Moved top level. CCP::Xero -> WebService::Xero
+        performed 'percritic --harsh' review 
+
+0.01    November, 2016
+        First version, released on GitHub at https://github.com/pscott-au/CCP-Xero .
+

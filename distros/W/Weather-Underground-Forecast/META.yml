@@ -1,0 +1,26 @@
+---
+abstract: 'Weather Underground Forecast Data'
+author:
+  - 'Mateu X Hunter <hunter@missoula.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Weather-Underground-Forecast
+requires:
+  Data::Dumper::Concise: 0
+  LWP::Simple: 0
+  Moose: 0
+  XML::LibXML: 0
+  XML::Simple: 0
+  XML::Validate::LibXML: 0
+  namespace::autoclean: 0
+  strictures: 1
+version: 0.07

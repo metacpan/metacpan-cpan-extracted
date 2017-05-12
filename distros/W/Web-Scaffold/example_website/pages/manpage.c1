@@ -1,0 +1,446 @@
+<HTML>
+<HEAD>
+<TITLE>Web::Scaffold -- build minimalist fancy web sites</TITLE>
+<LINK REV="made" HREF="mailto:root@grommet.slackware.lan">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#sample website">SAMPLE WEBSITE</A></LI>
+	<UL>
+
+		<LI><A HREF="#http://www.bizsystems.net/downloads/webscaffold/"><A HREF="http://www.bizsystems.net/downloads/webscaffold/">http://www.bizsystems.net/downloads/webscaffold/</A></A></LI>
+	</UL>
+
+	<LI><A HREF="#configuration">CONFIGURATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#build(%specs,%pages)"><CODE>build(%specs,%pages)</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#operation">OPERATION</A></LI>
+	<UL>
+
+		<LI><A HREF="#menu and trailer link format">Menu and Trailer link format</A></LI>
+		<LI><A HREF="#embedded links within page text">Embedded Links Within Page Text</A></LI>
+		<LI><A HREF="#sitemap">Sitemap</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright and license">COPYRIGHT AND LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+  Web::Scaffold -- build minimalist fancy web sites</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Web::Scaffold;</PRE>
+<PRE>
+  Web::Scaffold::build(\%specs,\%pages);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>Web::Scaffold</STRONG> is a module that allows you to easily and quickly build a
+fancy web site with drop down menus an a variable number of columns. This is
+accomplished with a simple specification and a series of minimal html page
+includes that are written in very basic html.</P>
+<P>In its simplest form, your web will have the following structure:</P>
+<PRE>
+  pages/        contains minimalist html pages
+  ws_sitemap/   [optional] contains sitemap in google xml format
+                NOTE: link this into public_html
+  public_html/  contains the index page and
+                any non Web::Scaffold pages
+        images/ contains web site images
+        lib/    contains javascript library(s)</PRE>
+<P>The index pages requires Server Side Includes (SSI) and is as follows:</P>
+<PRE>
+  &lt;html&gt;
+  &lt;!-- page name &quot;index.shtml&quot;
+  place your comments, revision number, etc... here
+  --&gt;
+  &lt;!--#exec cmd=&quot;./pages.cgi&quot; --&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;</PRE>
+<P>Alternatively, you can use the included <STRONG>pages.cgi</STRONG> script as an example to
+build your own more sophisticated cgi or mod_perl application.</P>
+<P>An illustrated sample web site can be viewed here:</P>
+<P>
+<HR>
+<H1><A NAME="sample website">SAMPLE WEBSITE</A></H1>
+<P>
+<H2><A NAME="http://www.bizsystems.net/downloads/webscaffold/"><A HREF="http://www.bizsystems.net/downloads/webscaffold/">http://www.bizsystems.net/downloads/webscaffold/</A></A></H2>
+<P>
+<HR>
+<H1><A NAME="configuration">CONFIGURATION</A></H1>
+<P>
+<H2><A NAME="build(%specs,%pages)"><CODE>build(%specs,%pages)</CODE></A></H2>
+<P>A web site with drop down menus can be complete configured with two hash
+arrays. The <STRONG>%specs</STRONG> array configures the style and form of the site and
+the <STRONG>%pages</STRONG> array configures the menus and column layout.</P>
+<DL>
+<DT><STRONG><A NAME="item_%specs">%specs</A></STRONG><BR>
+<DD>
+The specifications for fonts, menu, links, colors
+<PRE>
+  %specs = (</PRE>
+<PRE>
+  # directory path for 'html pages' relative to the html root
+  # i.e. public_html/        defaults to:
+  #
+        pagedir         =&gt; '../pages',</PRE>
+<PRE>
+  # directory path for 'javascript libraries' relative to html root
+  # defaults to:</PRE>
+<PRE>
+        javascript      =&gt; 'lib',</PRE>
+<PRE>
+  # no search conditions for building the site map. Each
+  # element is evaluated as a perl match condition in the
+  # context of m/element/. Include page names, extensions, etc...
+  #
+  # [OPTIONAL]
+  #</PRE>
+<PRE>
+        nosearch        =&gt; [ 'pdf' ],</PRE>
+<PRE>
+  # Directory path for 'sitemap' page generation relative to the 
+  # html root. This directory must be WRITABLE by the web server.
+  #
+  # NOTE: link the file 'sitemapdir'/sitemaplxml to the 
+  # appropriate location in your web directory.
+  # 
+  # The sitemap.xml file will be generated and updated ONLY if 
+  # the 'sitemapdir' key is present in this configuration file.
+  #
+  # The sitemap page will auto update if you modify pages in
+  # 'pagedir' or in the 'autocheck' list below. If you modify 
+  # static pages elsewhere in the web directory tree that are
+  # not listed in 'autocheck', you must DELETE the sitemap.xml 
+  # file to force an update.
+  #
+  # [OPTIONAL]
+  #
+  #     sitemapdir      =&gt; '../ws_sitemap',</PRE>
+<PRE>
+  # Directories to autocheck for sitemap update.
+  # you can list BOTH directories and individual files
+  # here relative to the web root. The 'sitemapdir' and
+  # 'pagedir' are always checked and do not need to be
+  # listed here.
+  #
+        autocheck       =&gt; ['docs'],</PRE>
+<PRE>
+  # site map &lt;changefreq&gt; hint
+  #
+  # defaults to:
+  #
+        changefreq      =&gt; 'monthly',</PRE>
+<PRE>
+  # font family used throughout the document
+  #
+        face            =&gt; 'VERANDA,ARIAL,HELVETICA,SAN-SERIF',</PRE>
+<PRE>
+  # background color of the web page
+  # this can be a web color like 'white' or number '#ffffff'
+  #
+        backcolor       =&gt; 'white',</PRE>
+<PRE>
+  # Menu specifications
+  #
+        barcolor        =&gt; 'red',
+        menudrop        =&gt; '55',        # drop down position
+        menuwidth       =&gt; '100px',     # width of menu item
+        pagewidth       =&gt; '620px',     # recommended
+  # menu font specifications
+        menucolor       =&gt; 'black',
+        menuhot         =&gt; 'yellow',    # mouse over
+        menucold        =&gt; 'white',     # page selected
+        menustyle       =&gt; 'normal',    # bold, italic
+        menusize        =&gt; '13px',      # font points or pixels
+        sepcolor        =&gt; 'black',     # separator color</PRE>
+<PRE>
+  # Page link font specifications
+  #
+        linkcolor       =&gt; 'blue',
+        linkhot         =&gt; 'green',
+        linkstyle       =&gt; 'normal',    # bold, italic
+        linksize        =&gt; '13px',      # font points or pixels</PRE>
+<PRE>
+  # Page Text font specifications
+  #
+        fontcolor       =&gt; 'black',
+        fontstyle       =&gt; 'normal',
+        fontsize        =&gt; '13px',</PRE>
+<PRE>
+  # Heading font specifications
+  #
+        headcolor       =&gt; 'black',
+        headstyle       =&gt; 'bold',      # normal, italic
+        headsize        =&gt; '16px',
+  );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%pages">%pages</A></STRONG><BR>
+<DD>
+The specifications for menus and pages. Menus can be single link or a series
+of drop down menu depending on how you specifiy the page. The page names are
+the keys to the hash and are used as the menu-bar link text. All page files
+are placed in the 'pages' directory.
+<P>FILE NAME SYNTAX:</P>
+<P>Files are named with the 'key' name of the page as the lefthand side and 
+a suffix designating the file's purpose as the right hand side. For the 
+required page 'Home', they are as follows:</P>
+<PRE>
+ # [optional] page used if there are not individual pages
+ # NOTE: neither a Default page or individual page is required
+  Default.meta          # meta text loaded after &lt;title&gt;
+  Default.head          # optional additional &lt;head&gt; text
+                        # that is on every page, end of page
+  Default.top           # optional body text that appears
+                        # on every page before menu-bar
+                        # i.e. logo, etc...
+ # for each individual page
+  Home.meta             # meta text loaded after &lt;title&gt;
+  Home.head             # optional additional &lt;head&gt; text
+  Home.top              # body text that appears before
+                        # menu-bar. i.e. logo, etc...
+  Home.c1               # [optional] column 1 content
+  Home.c2               # [optional] column 2 content
+  Home.cn               # [optional] column 'n' content</PRE>
+<PRE>
+  %pages = (</PRE>
+<PRE>
+  # REQUIRED page
+  #
+        Home    =&gt; {
+  #                     SEE: detailed link format below
+            menu        =&gt; ['Home', 'Page1', 'Page2', 'Page5'],
+  # optional title text - if missing, 'heading' text will be used
+            title       =&gt; 'page title',</PRE>
+<PRE>
+  # optional table row immediately under menu. This allows a &quot;drop&quot;
+  # shadow to be added to the menu bar with a &quot;1&quot; pixel wide image, 'example'
+            menustripe  =&gt; '&lt;img src=&quot;images/stripe1.gif&quot; height=4 width=100%&gt;',</PRE>
+<PRE>
+  # optional
+            heading     =&gt; 'Text under menu, over body text',</PRE>
+<PRE>
+  # number of columns and column width in pixels
+            column      =&gt; [20, 200, 400],    # three columns</PRE>
+<PRE>
+  # optional
+            submenu     =&gt; [qw(Page3 Page4)], # drop down menu</PRE>
+<PRE>
+  # optional trailer bar
+            trailer     =&gt; {</PRE>
+<PRE>
+  # a named page
+                links   =&gt; [qw(Page5 Page6)],</PRE>
+<PRE>
+  # optional right hand side text. if there are no links then the
+  # text will be placed on the left hand side of the trailer bar
+                text    =&gt; 'Copyright 2006, yourname',</PRE>
+<PRE>
+  # optional table row immediately above trailer bar. this allows a &quot;drop&quot;
+  # shadow to be added to trailer bar with a &quot;1&quot; pixel wide image, 'example'
+                top     =&gt; '&lt;img src=&quot;images/stripe2.gif&quot; height=4 width=100%&gt;',</PRE>
+<PRE>
+  # optional table row immediately below trailer bar. This allows a &quot;top&quot; 
+  # shadow to be added to trailer bar with a &quot;1&quot; pixel wide image,  'example'
+                bottom  =&gt; '&lt;img src=&quot;images/stripe1.gif&quot; height=4 width=100%&gt;',
+            },
+        },</PRE>
+<PRE>
+  # next page
+  #
+        Page1   =&gt;      ... same as above
+        },
+  #
+  #     ... and so on</PRE>
+<PRE>
+  # for the auto-generated Sitemap page, there is one additional
+  # specification element...
+  #
+        Sitemap =&gt; {
+                ...
+  # specify the column in which the sitemap should appear
+  # defaults to '1'
+                autocol =&gt; 1,
+                ...
+        },</PRE>
+<PRE>
+  # and for debug... example
+  # load this page segment as source in a single window</PRE>
+<PRE>
+        'Home.top' =&gt; {</PRE>
+<PRE>
+  # copy prototype page from this one page.</PRE>
+<PRE>
+            debug       =&gt; 'Home',</PRE>
+<PRE>
+  # optional location if not in the 'pages' directory
+  #
+            location    =&gt; 'path/to/filename',
+        },
+  );</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="operation">OPERATION</A></H1>
+<P>The sample index.shtml and pages.cgi script may be used together with the
+above specification and configuration data to produce a multi-page web site
+with with drop down menus. Each of the sub-pages specified in the ./pages
+directory may be prepared in a simple text editor with 'basic' html
+formating. LINKS WITHIN THE PAGE may be regular html or to take advantage
+of the MouseOver and STATUS reporting features of Web::Scaffold, may be 
+specified using the special syntax:</P>
+<P>
+<H2><A NAME="menu and trailer link format">Menu and Trailer link format</A></H2>
+<P>There are two acceptable formats for links used in the MENU and TRAILER
+sections of a page specification:</P>
+<OL>
+<LI><STRONG><A NAME="item_PageName">PageName</A></STRONG><BR>
+
+This is simply the key to the %pages array and its value will be used as the
+text for the LINK and the display value in the browser STATUS bar.
+<P></P>
+<LI><STRONG><A NAME="item_%7Bseparator%7Dkey_or_URL%7Bseparator%7Dlink_text%">{separator}key or URL{separator}link text{separator}status text</A></STRONG><BR>
+
+This syntax allows for either a PageName as above or a file/http URL value
+to be used as the link target. The separator may be any printable ASCII
+character except <STRONG>{}</STRONG>. The <CODE>link text</CODE> and <CODE>status text</CODE> values are
+optional. <CODE>link text</CODE> will be filled from the key/URL value if it is not
+present. <CODE>status text</CODE> will be filled from the link text or from the
+key/URL value if link text is not present.
+<PRE>
+  Example:
+    #<A HREF="http://my.website.com#visit">http://my.website.com#visit</A> my website#MY WEBSITE#</PRE>
+<P>Note that an optional separator character may terminate the link string.</P>
+<P></P></OL>
+<P>
+<H2><A NAME="embedded links within page text">Embedded Links Within Page Text</A></H2>
+<P>The syntax for embedded page links is similar to above with the addition of
+a keyword and enclosing brackets.</P>
+<PRE>
+  LINK&lt;#page_name#optional link text#optional status text#&gt;
+or
+  LINK&lt;#URL#optional link text#optional status text#&gt;</PRE>
+<PRE>
+  LINK may also be specified with a CLASS designator for CSS
+  The default class is &quot;B&quot;</PRE>
+<PRE>
+  Alternate class designations may be specified for classes C thru Z
+  which you can then define in a CSS STYLE statement in the [page].head
+  portion of the give page.</PRE>
+<PRE>
+  Example:
+A.C {
+  color: #6666FF;
+  background: transparent;
+  font-family: VERANDA,ARIAL,HELVETICA,SAN-SERIF;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: underline;
+}
+A.C:hover {
+  color: #00CC00;
+}</PRE>
+<P>Exact syntax for LINK is as follows:</P>
+<PRE>
+  uppercase word        &quot;LINK&quot;
+  optional CLASS        C through Z  (default is B)
+  less than symbol      &lt;
+  delimiter (any char)  #
+  page name or url text ./dir/file or <A HREF="http://">http://</A>....
+    [optional] link and status fields
+  delimiter             #
+  link text             optional text for link
+  delimiter             #
+  status bar text       optional browser status bar text
+  delimiter             # [optional] closing delimiter
+     required
+  greater than symbol   &gt;</PRE>
+<P>Where the first syntax refers to a named page in the %pages array and the
+second syntax refers to a real URL optionally followed by the text to 
+appear as the ``link'' text and in the status bar.</P>
+<P>Line breaks are not allowed in LINK&lt;#text&gt;</P>
+<P><STRONG>Web::Scaffold</STRONG> builds the page with menus and incorporates the various
+include files (page.head, page.top, page.c1, page.c2, etc...) to produce a
+website that can be easily and quickly maintained by simply editing the page
+includes.</P>
+<P>Each web page assembled by <STRONG>Web::Scaffold</STRONG> as follows:</P>
+<PRE>
+  &lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt; [from page title or heading] &lt;/title&gt;
+  [optional] Default.meg\ta or Page.meta
+  internally generated style statements
+  [optional] Default.head or Page.head
+  &lt;/head&gt;
+  &lt;body&gt;
+  [optional] Default.top or Page.top
+  [optional] menu bar as specified for this Page
+  internally generated column specification for this Page
+  {    column 1    }{    column 2    }......{    column N    }
+   Page.c1 or blank  Page.c2 or blank .etc.. Page.cN or blank
+  [optional] trailer
+  &lt;/body&gt;
+  &lt;/html&gt;</PRE>
+<P>
+<H2><A NAME="sitemap">Sitemap</A></H2>
+<P><STRONG>Web::Scaffold</STRONG> will automatically write as sitemap.xml sitemap file and a
+corresponding scaffold page named <STRONG>Sitemap.htxt</STRONG> the first time the site is
+accessed if the specification KEY, 'sitemapdir' for
+the sitemap is present.</P>
+<P>If you modify any pages in the scaffold 'pagedir' or pages or directories 
+listed in the 'autocheck' list, the sitemap will
+auto update. If you modify a static page elsewhere in the web site that are
+not listed in 'autocheck', you must DELETE sitemap.xml to force and
+update.</P>
+<P>You must include a spec for the <STRONG>Sitemap</STRONG> page in the %pages configuration.</P>
+<P>If you wish to use your own sitemap, do not activate the specification KEY.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Michael Robinton &lt;<A HREF="mailto:michael@bizsystems.com">michael@bizsystems.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright and license">COPYRIGHT AND LICENSE</A></H1>
+<P>This notice does NOT cover the javascript libraries. Those libraries are
+freely usable but copyright and licensed all or in part by others and
+have their own copyright notices and license requirements. Please read 
+the text in the individual libraries to determine their specific licensing
+and copyright notice requirements.</P>
+<P>Copyright 2006 - 2010, Michael Robinton &lt;<A HREF="mailto:michael@bizsystems.com">michael@bizsystems.com</A>&gt;
+</P>
+<PRE>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</PRE>
+<P>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</P>
+<P>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.</P>
+
+</BODY>
+
+</HTML>

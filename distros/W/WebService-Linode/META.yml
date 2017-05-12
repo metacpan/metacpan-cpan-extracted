@@ -1,0 +1,40 @@
+---
+abstract: 'Perl Interface to the Linode.com API.'
+author:
+  - =over
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Linode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON: '2.00'
+  LWP: '0'
+  LWP::Protocol::https: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/mikegrb/WebService-Linode/issues
+  homepage: https://github.com/mikegrb/WebService-Linode
+  repository: https://github.com/mikegrb/WebService-Linode.git
+version: '0.28'
+x_contributors:
+  - 'James Ottinger <jottinger@linode.com>'
+  - 'Kevan Benson <kentrak@gmail.com>'
+  - 'Mike Greb <mikegrb@cpan.org>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Stan Schwertly <stan@schwertly.com>'
+  - 'trevorparker <trevor@trevorparker.com>'

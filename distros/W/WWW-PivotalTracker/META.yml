@@ -1,0 +1,49 @@
+---
+abstract: 'Functional interface to Pivotal Tracker L<http://www.pivotaltracker.com/>'
+author:
+  - 'Jacob Helwig <jhelwig@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Sub::Override: 0
+  Test::CheckChanges: 0.14
+  Test::Class: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-PivotalTracker
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  WWW::PivotalTracker::Command:
+    file: lib/WWW/PivotalTracker/Command.pm
+    version: 1.00
+requires:
+  Carp: 0
+  Config::Any: 0
+  File::HomeDir: 0
+  Getopt::Long::Descriptive: 0
+  HTTP::Request: 0
+  Hash::Merge: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Perl6::Parameters: 0
+  Pod::Usage: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  aliased: 0
+  parent: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/jhelwig/www-pivotaltracker
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jhelwig/www-pivotaltracker.git
+version: 1.00

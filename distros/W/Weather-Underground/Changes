@@ -1,0 +1,85 @@
+Revision history for Perl extension Weather::Underground.
+
+3.03 Fix single location match thanks to several people submitting patches
+
+3.02	Fix single location matches returning nothing if there was a special advisory posted -
+		thanks to several people for the notice
+
+3.01	Fix typo in returned results keys. "wind_milesperhour" was "wind_milesperhoud" -
+		thanks to Daniel Bosold <dan@bosold.net> for the report and patch.
+
+3.00	Fix both single and multi-location errors due to site layout changes
+
+		Changed from parsing wunderground's standard results page to parsing their "mobile"
+		page since the second is much easier to parse.  This has had the unfortunate side
+		effect or returning far less keys in multi-location matches as well as no windchill
+		even in single-location matches.  The upside is that single-location matches now
+		return a lot more keys.  Refer to the internal documentation for the new keys
+		being returned for each place.
+
+2.20	Fix lack of support for negative temperatures.  Thanks to several people who notified
+	   me, especially Mathew White <innards@xmission.com> for submitting a patch
+
+2.19	Fix single-location match
+
+2.18  Fix bug that reported wrong temperature if there was a decimal shown on the page
+
+2.17  Fix single-location match to work around temporary situation where
+      an advisory is posted
+
+2.16  Fix single-location match error due to major site layout changes
+
+2.15  Fix single-location match error due to site layout changes
+
+2.14	Fixed some warnings about uninitialized values, thanks to
+	   "John P. Linderman" <jpl@research.att.com>
+
+2.13  Added optional new constructor parameter "timeout" - resolves bug
+      https://rt.cpan.org/NoAuth/Bug.html?id=4808
+
+2.12	Renamed method getweather to get_weather - (getweather still grandfathered)
+		
+		Added new feature that caches results and allows setting maximum age
+		via new constructor keys cache_file and cache_max_age
+
+		Better POD formatting
+
+2.12a	Fixed bug introduced by web site changes that prevented single-location matches from
+      working properly
+
+		Allow the constructor "new" to accept hashrefs as well as hashes
+
+		Added several debugging statements throughout code
+
+2.11  Fixed both single and multi-location matches.  Guts completely re-written for easier logic
+      using HTML::TokeParser instead of the previous quickie nightmarish regex approach
+
+		Returned "celsius" and "fahrenheit" keys renamed to "temperature_celsius" and
+		"temperature_fahrenheit" - old keys still returned for compatability
+
+		Several new keys are now being returned: "wind", "pressure", "windchill_celsius",
+		"windchill_fahrenheit"
+
+2.10	Fixed single-location match, thanks to Daniel Cergatti for the IRC /msg :)
+
+2.09	Fixed multi-location match, thanks to Rabin Vincent's submitted code.
+
+2.08	Fixed multi-location match, thanks to Frederic TYNDIUK's submitted code.
+
+2.07	Fixed single-location match, thanks to Mike Irwin's submitted patch
+
+2.06	More changes to properly parse some single-location results.
+
+2.05	A change I implemented in 2.04 was broken in multi-location match, sometimes causing the name
+      of the place returned to be a large chunk of garbage HTML. This was fixed.
+
+2.04	WeatherUnderground website made a change again, changed regex to understand it
+
+2.03	WeatherUnderground website made a change in the HTML for single-listing preventing this module from
+      correctly parsing the needed info. This has been fixed.
+
+2.02	Renamed all references from celcius to celsius (including function names and hash key names)
+
+2.01	Fixed the _debug() method generating a warning when perl is called with the -w switch
+
+2.00	Initial public release after much beta testing consuming much 1.* versioning

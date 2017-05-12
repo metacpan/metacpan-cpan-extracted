@@ -1,0 +1,172 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+
+use WebService::Google::Closure;
+
+sub show_help {
+    printf <<EOF;
+Usage: $0 [options] file/url...
+Options:
+\t--level=level
+\t\tlevel to be one of
+\t\t0 or "NOOP"
+\t\t1 or "WHITESPACE_ONLY"
+\t\t2 or "SIMPLE_OPTIMIZATIONS" (default)
+\t\t3 or "ADVANCED_OPTIMIZATIONS"
+
+\t--manifest=file
+\t\tFilenames and urls to be compiled are read from given manifest file
+
+After the options, specify one or more filenames or urls that you wish to optimize
+If no filenames are specified, javascript is read from standard input
+Example: $0 /var/www/js/stuff.js
+
+For more information, see the Google Closure Tools website:
+\thttp://code.google.com/closure/
+
+EOF
+    exit;
+}
+
+my $args = {};
+my $help;
+my $manifest;
+GetOptions(
+    "level=s", \$args->{ compilation_level },
+    "manifest=s", \$manifest,
+    "help",\$help,
+) or show_help;
+show_help if ( $help );
+
+if ($manifest) {
+    open(my $fh, "<", $manifest) or die "Can't open manifest file [$manifest]: $!";
+    while (<$fh>) {
+        chomp;
+        next if ( m/^\#/ );
+        push @ARGV, $_;
+    }
+    close ($fh);
+}
+
+if ( scalar( @ARGV ) == 0 ) {
+    # read stdin
+    while (<>) {
+        $args->{ js_code } .= $_;
+    }
+}
+
+foreach my $in ( @ARGV ) {
+    if ( $in =~ m{^http}i ) {
+        push @{ $args->{ url } }, $in;
+    }
+    else {
+        push @{ $args->{ file } }, $in;
+    }
+}
+
+my $closure = WebService::Google::Closure->new( %$args )->compile;
+if ( $closure->is_success ) {
+    print $closure->code;
+}
+else {
+    my $txt = '';
+    foreach my $err ( @{ $closure->errors } ) {
+        $txt .= sprintf("%s line (%d) char [%d]. - %s\n",
+                        $err->text,
+                        $err->lineno,
+                        $err->charno,
+                        $err->line
+                    );
+    }
+    die $txt;
+}
+
+1;
+
+__END__
+
+
+=head1 NAME
+
+closure-compile - Compile javascript using the Google closure API
+
+=head1 SYNOPSIS
+
+ Usage: closure-compile [options] file/url...
+
+Options:
+
+=over 4
+
+=item --level
+
+Specifying how aggressive the compiler should be. There are four options.
+
+=over 8
+
+=item "NOOP" or 0
+
+Does not call the closure service at all, just returns the Javascript code as is.
+This is useful if you're using a manifest file, and need to debug your code or to compile the javascript into one file without having Internet access. B<Note> that this will only work if the values in your Manifest file are filenames, not urls.
+
+=item "WHITESPACE_ONLY" or 1
+
+Just removes whitespace and comments from your JavaScript.
+
+=item "SIMPLE_OPTIMIZATIONS" or 2 (default)
+
+Performs compression and optimization that does not interfere with the interaction between the compiled JavaScript and other JavaScript. This level renames only local variables.
+
+=item "ADVANCED_OPTIMIZATIONS" or 3
+
+Achieves the highest level of compression by renaming symbols in your JavaScript. When using ADVANCED_OPTIMIZATIONS compilation you must perform extra steps to preserve references to external symbols.
+
+=back
+
+=item --manifest
+
+Specify a manifest file containing the filenames/urls that should be compiled
+
+=back
+
+After the options, specify one or more filenames or urls that you wish to optimize
+If no filenames are specified, javascript is read from standard input
+
+For more information, see the Google Closure Tools website:
+
+ L<http://code.google.com/closure/>
+
+=head1 EXAMPLES
+
+=over 4
+
+=item Compile all Javascript files in one directory into one file
+
+The following command will compile all javascript files in the I<js> directory and put the output in compiled.js
+
+ cat js/*.js | closure-compile > compiled.js
+
+=back
+
+=head1 AUTHOR
+
+Magnus Erixzon, C<< <magnus at erixzon.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-webservice-google-closure at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Google-Closure>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2011 Magnus Erixzon.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

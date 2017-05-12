@@ -1,0 +1,24 @@
+WWW-Ohloh-API version 0.3.1
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+MANUAL
+
+The script 'docs/manual.pl' enclosed in the distribution can
+be used to generate a manual of all the modules's pod. (requires
+Pod::Manual and LaTeX to be installed on your system)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Yanick Champoux
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

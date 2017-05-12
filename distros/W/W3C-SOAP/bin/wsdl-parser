@@ -1,0 +1,347 @@
+#!/usr/bin/perl
+
+# Created on: 2012-05-27 18:58:06
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Scalar::Util;
+use List::Util;
+#use List::MoreUtils;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use W3C::SOAP::WSDL::Parser;
+use File::ShareDir qw/dist_dir/;
+use Template;
+
+our $VERSION = 0.14;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    lib           => 'lib',
+    ns_module_map => {},
+    verbose       => 0,
+    man           => 0,
+    help          => 0,
+    VERSION       => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'ns_module_map|ns|namespace-map|n=s%',
+        'ns_module_map_file|map-file|f=s',
+        'module_base|module-base|b=s',
+        'lib|l=s',
+        'show|s',
+        'path|p=s',
+        'save|S',
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    if ( $option{ns_module_map_file} && -f $option{ns_module_map_file} ) {
+        $option{ns_module_map} ||= {};
+        my $file = path($option{ns_module_map_file});
+
+        for my $line ($file->slurp) {
+            chomp $line;
+            next if !$line || $line =~ /^#/;
+            my ($ns, $mod) = split /=|,|\t/, $line, 2;
+            $option{ns_module_map}{$ns} ||= $mod
+        }
+    }
+    #warn Dumper $option{ns_module_map}, $option{ns_module_map_file};
+    $option{module_base} = 'Static::WSDL' if $option{show} && !$option{module_base};
+
+    return show() if $option{show};
+
+    my $template = Template->new(
+        INCLUDE_PATH => ($option{path} ? "$option{path}:" : '') . dist_dir('W3C-SOAP'),
+        INTERPOLATE  => 0,
+        EVAL_PERL    => 1,
+    );
+
+    my ( $module, $wsdl_file ) = @ARGV;
+
+    if ( !$wsdl_file ) {
+        if ( !$option{module_base} ) {
+            warn "You must specify a package name for your WSDL!\n";
+            pod2usage( -verbose => 1 );
+        }
+        $wsdl_file = $module;
+        $module = undef;
+    }
+
+    # check that %map modules don't overlap with $option{ns_module_map} modules
+    if ( $module && $option{ns_module_map}{$module} ) {
+        die "The module '$module' is mapped from both the WSDL '$wsdl_file'"
+            . " and the XMLSchema '$option{ns_module_map}{$module}' namespaces"
+            . " please use different modules!\n";
+    }
+
+    my $wsdl = W3C::SOAP::WSDL::Parser->new(
+        location => $wsdl_file,
+        template => $template,
+        %option,
+    );
+
+    $wsdl->module( $module ? $module : $wsdl->document->module );
+
+    my @files = $wsdl->write_modules;
+
+    if ( $option{save} ) {
+        my $file = $wsdl_file;
+        $file =~ s{[/:?&]}{_}g;
+        my $fh = path("$file.wsdl")->openw;
+        print {$fh} $wsdl->document->xml->toString();
+
+        for my $schema ($wsdl->get_xsd->get_schemas) {
+            next if ! $schema->location;
+            my $file = $schema->location;
+            $file =~ s{[/:?&]}{_}g;
+            my $fh = path("$file.xsd")->openw;
+            print {$fh} $schema->xml->toString();
+        }
+    }
+
+    if ( $option{test} ) {
+        for my $file (@files) {
+            my $ok = `perl -I$option{lib} -c $file 2>&1`;
+            if ( $ok =~ / syntax OK/ ) {
+                print "OK     $file\n";
+            }
+            else {
+                warn "Not OK $file\n";
+            }
+        }
+    }
+    if ( $option{verbose} ) {
+        my %written
+            = map {
+                my $module = $_;
+                $module =~ s{$option{lib}/}{};
+                $module =~ s{[.]pm}{};
+                $module =~ s{/}{::}g;
+
+                ( $_ => $module );
+            }
+            @files;
+
+        print "WSDL Module is $written{$files[0]} ($files[0])\n";
+        if ( $option{verbose} > 1 ) {
+            print "XSD Modules:\n";
+            for my $file (sort keys %written) {
+                next if $file eq $files[0];
+                print "  $written{$file} ($file)\n";
+            }
+        }
+    }
+
+    return;
+}
+
+sub show {
+    # do stuff here
+    my %map = $option{module_base} ? ($option{module_base} => @ARGV) : @ARGV;
+    for my $module (keys %map) {
+        my $wsdl = W3C::SOAP::WSDL::Document->new(
+            %option,
+            location => $map{$module},
+        );
+        print $wsdl->target_namespace, "\n";
+        print "Messages :\n";
+        for my $node (@{ $wsdl->messages }) {
+            print "\t", $node->name, "\n";
+        }
+        print "Port Types :\n";
+        for my $node (@{ $wsdl->port_types }) {
+            print "\t", $node->name, "\n";
+        }
+        print "Bindings :\n";
+        for my $node (@{ $wsdl->bindings }) {
+            print "\t", $node->name, "\n";
+        }
+        print "Services :\n";
+        for my $node (@{ $wsdl->services }) {
+            print "\t", $node->name, "\n";
+            for my $port (@{ $node->ports }) {
+                print "\t\t", $port->binding->name, ' : ', $port->address, "\n";
+                for my $operation (@{ $port->binding->operations }) {
+                    print "\t\t\t", $operation->name, "\n";
+                    for my $dir (qw/inputs outputs faults/) {
+                        print "\t\t\t\t$dir: ";
+                        if (defined(my $dir_el = $operation->port_type->$dir->[0] )) {
+                           if ($dir_el->message->element) {
+                               print $dir_el->message->element->type_module;
+                           }
+                           elsif ($dir_el->message->type) {
+                              print $dir_el->message->type;
+                           }
+                        }
+                        print "\n";
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+wsdl-parser - Parses a WSDL file to generate a SOAP client
+
+=head1 VERSION
+
+This documentation refers to wsdl-parser version 0.14.
+
+=head1 SYNOPSIS
+
+   wsdl-parser [options] [--module-base|-b Pkg WSDL
+   wsdl-parser [options] Pkg::Name WSDL [--namespace-map|-n] 'xsd-namespace=perl-namespace' ...
+   wsdl-parser [options] Pkg::Name WSDL [--map-file|-f] file
+   wsdl-parser [options] [--show|-s] WSDL
+
+ OPTIONS:
+  WSDL          The WSDL file or URL to get the WSDL from
+  Pkg::Name     The Perl package namespace you want the WSDLs operations accessible from
+
+  -s --show     Show some info about the passed WSDL file eg it's operations
+  -b --module-base[=]str
+                Let the W3C::SOAP auto generate package names for any WSDLs or
+                XSDs found while processing. (Note packages will be valid
+                but not pretty)
+  -n --namespace-map ns=package
+                A mapping of XSD namespaces (ns) to perl package names
+                (package), it is required when writing XSD files if --module-base
+                is not specified. (This results in controlled namespaces but can
+                be a lot of work to setup)
+  -f --map-file[=]file
+                File that contains namespace mappings instead of having to
+                write all the mappings on the command line and can be used
+                again for other WSDLs or regenerating the current one.
+  -l --lib[=]dir
+                Directory where generated modules should be writted, the
+                default is ./lib
+  -p --path[=]str
+                Extra template toolkit directories if you want to override
+                default templates.
+  -S --save     Save all downloaded WSDLs & XSDs
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for wsdl-parser
+
+=head1 DESCRIPTION
+
+There are three basic modes of operation of C<wsdl-parser>:
+
+=over 4
+
+=item show
+
+When using the C<--show> option C<wsdl-parser> dumps a human readable version
+of what the WSDL can do.
+
+=item basic
+
+In basic mode occurs when using the C<--module-base> option L<W3C::SOAP> will
+generate all of the module names for the WSDL and XSDs processed. The names
+are based on the target namespaces of each WSDL or XSD so they might end up
+being rather long and unwieldy.
+
+=item advanced
+
+In the advanced mode all namespaces must be specified either by C<--namespace-map>
+on the command line or by specifying a C<--map-file>. The easiest way to do
+this is to run C<wsdl-parser> and look at the thrown errors (which should
+include the unmapped XSD namespace and append that namespace to the end of
+the command and run again. This may take several iterations to get all of
+the namespaces specified.
+
+=back
+
+=head2 map-file
+
+The file format is = or tab separated rows of 2 elements with the first
+being the XSD namespace and the second being the perl package namespace.
+Lines with nothing on them are ignored as are lines starting with a hash (#).
+
+An example map file:
+
+ # this is ignored
+ http://example.com/=XSD::Example
+
+ http://example.com/data=XSD::Example::Data
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

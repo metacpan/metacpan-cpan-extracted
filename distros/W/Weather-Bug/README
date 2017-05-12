@@ -1,0 +1,54 @@
+Weather::Bug version 0.25
+
+Provide access to weather data from WeatherBug stations around the US. These
+stations provide live data via the WeatherBug API.
+
+This module supplies access to the following portions of the WeatherBug API.
+
+Station List
+   Retrieve a list of WeatherBug stations for the supplied zipcode.
+
+Forecast
+   Retrieve a 7 day forcast for a partcular zipcode.
+
+Live Weather
+   Retrieve the full current weather conditions reported by a particular
+   WeatherBug station.
+
+Compact Live Weather
+   Retrieve a reduced set of current weather conditions reported by a
+   particular WeatherBug station.
+
+Alerts
+   Returns information about any alerts specified for a particular zipcode.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+LWP::UserAgent, XML::LibXML, Moose
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, G. Wade Johnson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

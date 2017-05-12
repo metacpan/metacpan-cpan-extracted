@@ -1,0 +1,61 @@
+{
+  "id": 1,
+  "name": "サイト閲覧不可",
+  "manager": null,
+  "status": "open",
+  "detection": "msp",
+  "cause": "over-capacity",
+  "cause_supplement": "Webサーバがアクセス過多でダウン",
+  "point": "middleware",
+  "scale": "whole",
+  "pend_text": "Webサーバの再起動を行う",
+  "close_text": "Webサーバのスケールアウトを検討",
+  "closed_by": null,
+  "closed_at": null,
+  "pended_by": null,
+  "pended_at": null,
+  "created_by": 0,
+  "created_at": 1430209000,
+  "updated_by": 0,
+  "updated_at": 1430209000,
+  "topics": [
+    {
+      "id": 1,
+      "name": "原因調査",
+      "status": "open",
+      "color": "#5661aa",
+      "closed_by": null,
+      "closed_at": null,
+      "created_by": 0,
+      "created_at": 1430209000,
+      "updated_by": 0,
+      "updated_at": 1430209000
+    },
+    {
+      "id": 2,
+      "name": "復旧作業",
+      "status": "open",
+      "color": "#077f40",
+      "closed_by": null,
+      "closed_at": null,
+      "created_by": 0,
+      "created_at": 1430209000,
+      "updated_by": 0,
+      "updated_at": 1430209000
+    }
+  ],
+  "files": [
+    {
+      "name": "障害報告書",
+      "path": "https://.reactio.jpdata/reactio-mvp/files/incident/1/_bYMRLTxj75lcXCWN0iaAZud2CuGqFFL/data.docx"
+    }
+  ],
+  "users": [
+    {
+      "id": 1
+    },
+    {
+      "id": 2
+    }
+  ]
+}

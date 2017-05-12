@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/App-TDWTF.t
+t/WebService-TDWTF.t
+lib/App/TDWTF.pm
+lib/WebService/TDWTF.pm
+lib/WebService/TDWTF/Article.pm
+tdwtf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

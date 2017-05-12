@@ -1,0 +1,14 @@
+Build.PL
+lib/WWW/Arbeitsagentur.pm
+lib/WWW/Arbeitsagentur/Applicant.pm
+lib/WWW/Arbeitsagentur/Arbeitnehmer.pm
+lib/WWW/Arbeitsagentur/Search.pm
+lib/WWW/Arbeitsagentur/Search/FastSearchForWork.pm
+lib/WWW/Arbeitsagentur/Search/Filter.pm
+MANIFEST			This list of files
+README
+t/Arbeitsagentur.t
+t/FastSearchForWork.t
+t/live/FastSearchForWork.t
+t/Search.t
+META.yml

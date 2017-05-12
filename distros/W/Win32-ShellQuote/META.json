@@ -1,0 +1,56 @@
+{
+   "abstract" : "Quote argument lists for Win32",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-ShellQuote",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Win32-ShellQuote@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Win32-ShellQuote"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/Win32-ShellQuote.git",
+         "web" : "https://github.com/haarg/Win32-ShellQuote"
+      }
+   },
+   "version" : "0.003001",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

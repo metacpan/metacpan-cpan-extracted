@@ -1,0 +1,335 @@
+      INSTALL
+      TERMS AND PRIVACY:
+      WebTools
+      Copyright (c) 2001, Julian Lishev, Sofia 2002. All rights reserved.
+      This code is free software; you can use it, redistribute it and/or modify 
+      it, but WITHOUT ANY WARRANTY, under the same terms as Perl itself. 
+      Please keep structure of package and don't modify file names because you 
+      may have problems with next version of this package! Also you can maintain 
+      follow rules:
+      You can't add additional variables into 'config.pl' file: Please create 
+      your own config file for your private needs. (You can place your own 
+      config files into 'conf' directory)
+      You can't add functions into package libs and modules: Please create your 
+      own! (You can place your own libs and modules into 'libs/additionals' and 
+      'modules/additionals' respectively)
+
+      READ THIS! IT IS EXTREAMLY IMPORTANT:
+        Do NOT discard this document! You must read all this INSTALL.HTML 
+      completely. It exaplain all problems generally in Web/CGI programming and 
+      particular in WebTools installation. This file relate not only with 
+      installation tips but with common security problems and holes! Don't let 
+      yourself be misled with simple "make" installation how it described below, 
+      but take care about directories, files, permissions, apache's 
+      configuration and OS specific.
+        Note: You can install this package ONLY one time and after that you can 
+      run different scripts via webtools, so it is extreamly important to 
+      install package properly (now I can install package in few minutes, but 
+      you should read all information in this document and spend time in 
+      installation!)
+      REQUIREMENTS:
+      Perl (Perl 5.005_03 or later should work),
+      Unix/Linux or Windows 9x/NT/XP
+
+      Recomended:
+      Perl 5.6,
+      Unix/Linux OS,
+      MySQL server
+
+      Prerequirements:
+      Only DBI (for SQL access, respectively for Session/Users support)
+
+      If you want to use MySQL you also need: MySQL module 
+      For MS-Access you need DBD-ODBC 
+
+      If you haven't SQL server you can use our build in FLAT DB (based on 
+      DBD::Sprite)
+
+
+      INSTALL NOTES:
+      First of all you must have webtools package. It must be packed into one 
+      tar.gz file.
+      Please copy this .gz file into some directory and run follow commands:
+      tar -zxvf WebTools-1.27.tar.gz
+      cd WebTools-1.2
+      perl Makefile.PL
+      make
+      make install
+      make permissions
+      make clean
+      If you are under Win, you must use 'nmake'. In this case please change 
+      'make' with 'nmake'
+      'nmake' you can download from 
+      ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe (about 50kb). You don't 
+      need VC++ to run nmake!
+
+      When you run command: perl Makefile.pl, you will be asked to specify full 
+      path to your future webtools directory. This directory must be into your 
+      cgi-bin directory! 
+      On my private server it is:
+      /var/www/htdocs/cgi-bin/webtools
+      but on my Win system it is:
+      c:/Apache/cgi-bin/webtools
+      (Please realize that you need HTTP access to your process.cgi script!)
+      If you don't know where is your cgi-bin directory, you still can install 
+      package...just choose another directory! (after installation you must move 
+      your installed package to your cgi-bin directory and if needed, change 
+      owner of installed webtools and its permissions mode).
+      After successful 'make' you must check whether evrything is OK!
+      Go to your webtools directory and check file mode of process.cgi it must 
+      be: 0755 
+      Also it must be owned by your user (you don't need root access to install 
+      this package!)
+      NOTE: You may have big problems depending of your OS and security 
+      settings! To void this problem you must be very attentive:
+      - You have only one real script: process.cgi, so it must be able to read 
+      and write your files! So you must chmod to 0755. If Apache server don't 
+      change user of script to your user, YOU must insure that process.cgi never 
+      will try to read/write on directories where it has not access!
+      To insure this you must know very well structure of Webtools module!
+      webtools  ----- conf
+                        |
+                        +---- db 
+                        |
+                        +---- drivers
+                        |
+                        +---- htmls 
+                        |
+                        +---- jhtmls 
+                        |
+                        +---- libs 
+                        |
+                        +---- logs 
+                        |
+                        +---- mail 
+                        |
+                        +---- modules 
+                        | 
+      /tmp OR  +---- tmp
+
+      For 'conf','drivers','htmls','jhtmls','libs','modules' directories you 
+      need only 'read' access.
+      For 'db' directory you need 'read' access (and 'write' if you use DB FLAT 
+      - default)
+      For 'logs','mail' you need 'read' and 'write' access (default these 
+      directories are not used)
+      You need also full access to 'tmp' directory (your system directory or 
+      your own)
+      Now let see some examples:
+      ------------------------------------------------------------------------------------------------- 
+
+      CASE 1:  You are some good user(july) on some good free 
+      host(newald.proscriptum.com) :-)))
+      Let 'july' user has home directory:  /home/july (we use virtual host: 
+      july.newald.proscriptum.com)
+      His full cgi-bin directory is: /home/july/public_html/cgi-bin
+      So  his webtools directory can be: /home/july/public_html/cgi-bin/webtools
+      Now we can upload WebTools-1.27.tar.gz to our home directory and after 
+      that to install script.
+      After installation our process.cgi has permission mode set to 0755, 
+      directories have permission modes: 0755 and any other files: 0444
+      Features: 
+      - Our host is virtual, so Apache change user to 'july' when we start 
+      process.cgi!
+      In other words we are ready to configure package whitout any hidden traps!
+      Evrything is ok, so let run script: perl -c process.cgi
+
+      -------------------------------------------------------------------------------------------------
+      CASE 2:  You are some user (and you has not virtual host) under Open BSD 
+      OS. 
+      User: snm
+      Server: www.jozefina.bg
+      User home directory: /home/snm
+      His full cgi-bin directory: /home/snm/http/cgi-bin
+      So his webtools directory can be: /home/snm/http/cgi-bin/webtools , 
+      please install package into this directory!
+      Now let suppose that your scripts running with Apache's user (i.e. Apache 
+      can't write into your directories when they has 755 permissions!). That 
+      can be a problem, we realy need to write into db, logs, mail and tmp 
+      directories, so we must chmod these directories to 0777 (BUT THIS IS 
+      UNSECURE). To decide problem we must create these directories in our home 
+      directory, for example:
+      /home/snm/webtools/db
+      /home/snm/webtools/logs
+      /home/snm/webtools/mail
+      /home/snm/webtools/tmp
+      then we can chmod to 0777 these directories! (other user can't read/write 
+      'snm' directory, so they can't access and these directories too :))
+      After this you MUST move files from original(installed) directories to 
+      directories we've just created (preserve attributes/permissions when files 
+      are moved). Ok, is evrything done? Actualy not at all, you also need to 
+      edit "config.pl". Please run 'pico' or some other editor and change path 
+      to new location of db, logs, mail and tmp directories! (or use install.cgi 
+      to modify config.pl file!)
+
+      --------------------------------------------------------------------------------------------------
+      CASE 3:  You have root access! Well is not a good idea to install webtools 
+      with root access! You can login with some other user and install package 
+      in directory you want and chown/chmod if need (using root). With root 
+      access you can install package on way you want and can resolve problems 
+      very fast (if you want you can run your scripts with 'www' user and so 
+      on...). You can create directories (db,logs,mail, tmp ...) into some 
+      private directory (where nobady except Apache can read/write)...
+      NOTE: Please be very careful when install any scripts/modules with root 
+      access. You bring responsibilty for your actions!
+      --------------------------------------------------------------------------------------------------
+
+      SECURITY SETTINGS:
+
+      Before you can go life in web you have to check security settings of your 
+      web server!
+      Here we suppose that you haven't root access, so you can't make any 
+      changes to server if any security fixes are required.
+
+      - First of all you have to check ability of externel user to access your 
+      directories:
+      (If you are owner of web server and you are the only one user on it e.i. 
+      no body else can access remotely) you can close your eyes and leave this 
+      check unperformed. Other else you have to check whether other user can 
+      "cd" your directory. If that is possible you need to fix that (contact 
+      your system administrator and ask him to protect your directory of 
+      unauthorized access!)
+
+      - Secondry you need to check ability of web users to access and/or read 
+      your datas and/or scripts:
+      Immediatly go to your "webtools/htmls" directory and "vdir"(or "ls -l") 
+      this direcory. It should contain file "env.html" and it shoultd be with 
+      permission: 644 (or 444) depending of your OS defaults. These "htmls" 
+      actualy are embedded Perl files, so it is extreamly important these files 
+      (htmls) to be unaccessable and unreadable from Web interface i.e. line 
+      like this: http://your_server/cgi-bin/webtools/htmls/env.html should 
+      return NOT html page, it MUST return "Internal Server Error" because 
+      Apache must interpret these files as scripts!!! If that is not true, you 
+      have to set other extension for all files in webtools/htmls (.whtml , 
+      .cgihtml , .htm or .cgi are supported) That mean, that you need to correct 
+      all files that access these ".html" files (and given examples too). Other 
+      solution (when you have access to server) is to forbid ".html" to be read 
+      in cgi-bin directory (you need to edit httpd.conf -> please read Apache's 
+      documentation to learn how to do that).
+      NOTE: You can configure config.pl so extensions .whtml, .cgihtml and so on 
+      to be treated as .html!!!
+
+      - Finnaly solution (and in many cases the best): 
+      You can install webtools into ../cgi-bin/webtools and after that you can 
+      move all directories and files in your "secure" home directory where no 
+      body except you can read/write these files! Ofcource you must leave at 
+      least "process.cgi" in your web based cgi-bin/webtools directory and 
+      "conf" directory too, after these operations you must edit your config.pl 
+      file and mark changes of new webtools directory structure (you should edit 
+      section "[PATHS]" in config.pl). That is all but don't forgot to set 
+      variable $check_module_functions = "on" (that is internal build way to 
+      check your configuration!)
+      NOTE: Please preserve permissions of directories and files in.
+      NOTE: Apache's should handle (in httpd.conf) .cgi and .pl file with 
+      AddHandler!
+      Example: AddHandler cgi-script .cgi .pl
+
+      AFTER INSTALLATION:
+
+      - Before you can be able to run any srcipt (and examples) you must 
+      configure your 'config.pl' file!
+      For example of configuration please read HELP.doc (found into 'docs' 
+      directory)
+
+      - If evrything is configured properly, then go into telnet(console) and cd 
+      to your webtools directory.
+      Execute follow line: perl -c process.cgi
+      Evrything must be "OK" before you can go ahead. Now open one browser's 
+      window and type follow url: 
+      www.your_host.com/~your_user/cgi-bin/webtools/process.cgi
+      where:
+          ~your_user is your user name (remove it if you have your own 
+      server/virtual host)
+          cgi-bin/webtools is your http based webtools directory and
+          process.cgi is your base (only one) script!
+
+      Into browser's window you will see your current configuration. Please 
+      check it for problems/errors.
+      Clear them all and then set variable $check_module_functions to 'off'
+      Now you are ready to lear webtools and run all examples into docs/examples 
+      directory!
+
+
+      INSTALL.CGI (WEB BASED CONFIGURATOR)
+
+      At versioin 1.16 of WebTools, proscriptum.com released new feature for 
+      easy making of WebTools configuration. This new feature allow remote 
+      configure of config.pl file via Web interface i.e. you can make different 
+      adjustment to almost every aspect of WebTools configuration. So at this 
+      point I will recommend that script for configuration purposes instead of 
+      manual edit of config.pl. Also with "install.cgi" you have unique chance 
+      to create structure of MySQL and/or Flat DB without any additional work. 
+      (for MS Access you still have to do manual work)!
+
+      Get started:
+      First of all you need to insure that install.cgi has proper permissions 
+      mode (755 i.e. must be executable and install.cgi must be able to 
+      write/read ./conf/config.pl and ./db/ directory)!
+
+      I have to explain: install.cgi need to write/rewrite config.pl file so 
+      please set needed permissions for conf directory and for config.pl file! 
+      Also install.cgi need to create files into database directory (./db/)
+
+      At last install.cgi must have correct shebang (default it is: 
+      /usr/bin/perl) This rule is important for install.cgi on the same way as 
+      it is important for process.cgi So it is not a bad idea if you change 
+      shebang on these two scripts at once (of course do it in case of wrong 
+      Perl location!)
+
+      For advanced web programmers I will mention that install.cgi script is not 
+      accessable on default (security restriction). So if you want to use it, 
+      then you have to edit install.cgi (see first paragraph of script):
+       - Set $install_script_available to '1' to enable script.
+       - Set proper Admin user and respective password for script access!
+
+      When you have done with WebTools configuration set again variable 
+      $install_script_available to '0'! That will keep "hackers" away from your 
+      server! :-)
+
+      Work with install.cgi is absolutely clear. Just run script on that way and 
+      enjoy :-)
+      http://www.yourserver.com/cgi-bin/webtools/install.cgi
+
+
+      #-----------------------------------------------------------------------------------------
+      # Step by Step Installation example:
+      #-----------------------------------------------------------------------------------------
+      tar -zxvf WebTools-1.27.tar.gz
+      cd WebTools-1.27
+      perl Makefile.pl
+              > /usr/local/apache/cgi-bin/webtools/
+      make
+      make install
+      make permissions
+      make clean
+      cd ..
+      rm -rf WebTools-1.27
+      cd /usr/local/apache/cgi-bin/webtools
+      ls -l -a
+      perl -c process.cgi     # Must be "ok"
+      lynx www.your_server.com/cgi-bin/webtools/process.cgi
+      # Should see webtools in check mode...see your current configuration and 
+      edit where is needful!
+      pico conf/config.pl (or use install.cgi to modify config.pl file!)
+             Edit where is needful...
+      lynx www.your_server.com/cgi-bin/webtools/process.cgi     #Check again 
+      ...ok?
+      pico conf/config.pl (or use install.cgi to modify config.pl file!)
+             Edit:
+             $check_module_functions = 'off';     # Now evrything is ok, so you 
+      could set "off" value!
+      lynx www.your_server.com/cgi-bin/webtools/process.cgi?file=env.html
+
+      # If you want to configure properly your DataBase driver with webtools 
+      please go to docs/
+      # directory to find out how!
+
+      #With line above you call simple script example...
+      #----------------------------------------- END 
+      ------------------------------------------- 
+      AUTHOR:
+
+      Julian Lishev,
+      e-mail: julian@proscriptum.com
+       
+

@@ -1,0 +1,114 @@
+NAME
+    Win32::CtrlGUI - a Module for controlling Win32 GUIs based on
+    Win32::Setupsup
+
+SYNOPSIS
+      use Win32::CtrlGUI
+
+      my $window = Win32::CtrlGUI::wait_for_window(qr/Notepad/);
+      $window->send_keys("!fx");
+
+DESCRIPTION
+    "Win32::CtrlGUI" makes it much easier to use "Win32::Setupsup" to
+    control Win32 GUIs. It relies completely on "Win32::Setupsup" for its
+    underlying interaction with the GUI, but it provides a very powerful and
+    somewhat user-friendly OO interface to make things easier.
+
+    There are a number of modules in the system, so a brief overview will be
+    provided to make it easier to understand.
+
+    "Win32::CtrlGUI"
+        This module provides a set of methods for identifying and
+        enumerating windows.
+
+    "Win32::CtrlGUI::Window"
+        "Win32::CtrlGUI::Window" objects represent GUI windows. Internally,
+        they simply store the window handle. Stringification is overloaded
+        to return the window text, whereas numification and numeric
+        comparison are overloaded to operate on the handle. Friendlier
+        versions of the methods applicable to windows are provided. Finally,
+        a "send_keys" method is provided that uses a (IMHO) friendlier
+        syntax (it's based on that used by WinBatch). Instead of sending the
+        string "\\ALT+\\f\\ALT-\\x", one sends "!fx". Instead of sending
+        "\\RET\\", one sends "{ENTER}" or "{RET}". Instead of sending
+        "\\DOWN\\\\DOWN\\\\DOWN\\", one can send "{DOWN 3}".
+
+    "Win32::CtrlGUI::State"
+        The "Win32::CtrlGUI::State" hierarchy of modules provides for a very
+        powerful state machine system for responding to windows and
+        executing actions as a result. If you're using "Win32::CtrlGUI" to
+        script any sort of process, I strongly encourage you to look at the
+        documentation in "Win32::CtrlGUI::State". Yes, it's complicated. But
+        so is writing your own code to deal with optional windows, sequence
+        forking, and so forth. For now, there isn't much documentation. See
+        the demo.pl script for some ideas, and beyond that, feel free to
+        contact me if you have questions.
+
+        Also, there is a Tk debugger now. It requires, of course, that Tk be
+        installed. I haven't done much testing to see how it behaves on
+        anything other than Perl 5.6.0 with Tk 800.022. Take a look at
+        demotk.pl for an example.
+
+    "Win32::CtrlGUI::Criteria"
+        The "Win32::CtrlGUI::Criteria" hierarchy supports the
+        "Win32::CtrlGUI::State" hierarchy by providing an OO interface to
+        state criteria.
+
+  Installation instructions
+    "Win32::CtrlGUI" depends on "Win32::Setupsup", available from
+    http://www.cpan.org/modules/by-module/Win32/setupsup.1.0.1.0.zip,
+    although you might want to check that folder to see if there is a more
+    recent version.
+
+    If you want to use the Tk debugger/observer, you will need "Tk" and
+    "Win32::API". Both are available from CPAN and via PPM.
+
+    Standard "Make::Maker" approach or just move everything in "Win32" into
+    "site/lib/Win32".
+
+METHODS
+  enum_windows
+    This method returns a list of "Win32::CtrlGUI::Window" objects
+    representing the windows currently open. It uses
+    "Win32::Setupsup::EnumWindows" for the underlying call.
+
+  wait_for_window
+    This method waits a for a window matching the passed criteria. It
+    accepts three parameters - criteria for the window, criteria for the
+    child window, and a timeout. The last two parameters are optional. If
+    you need to specify a timeout, but don't want to specify criteria for
+    the child window, pass "undef" as the child window criteria.
+
+    Criteria can be one of three things:
+
+    *   A string. In this case, the string will be matched case
+        insensitively against the window title.
+
+    *   A regular expression. These should be passed using the "qr/ . . . /"
+        syntax.
+
+    *   A code reference (i.e. "sub { . . . }"). Code references will have
+        access to a "Win32::CtrlGUI::Window" object in $_ and should return
+        true or false.
+
+    These three formats can be used both for the window and the child window
+    criteria. In the special case of a string match on the window and no
+    child window criteria, "Win32::Setupsup::WaitForWindow" will be used. In
+    all other cases, a busy loop is executed using the default wait interval
+    in $Win32::CtrlGUI::wait_intvl (specified in milliseconds).
+
+    The call will return a "Win32::CtrlGUI::Window" object if successful or
+    "undef" if it timesout. If the timeout value is unspecified or negative,
+    it waits indefinitely. Timeout values are specified in seconds
+    (fractional seconds are allowed).
+
+  get_windows
+    This method returns a list of all windows matching the passed criteria.
+    Same criteria format as for "wait_for_window". Instead of a timeout, the
+    third parameter is the optional justone parameter. If it is true,
+    "get_windows" returns only the first window to match the criteria. The
+    returned windows are, of course, "Win32::CtrlGUI::Window" objects.
+
+AUTHOR
+    Toby Ovod-Everett, toby@ovod-everett.org
+

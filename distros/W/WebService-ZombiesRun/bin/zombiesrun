@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+use WebService::ZombiesRun;
+
+# ABSTRACT: Basic cmdline tool for showing Zombies, Run! stats
+# PODNAME: zombiesrun
+our $VERSION = '0.01'; # VERSION
+
+
+my ($player) = @ARGV;
+
+if (not $player) {
+    die "Usage: $0 player-name\n";
+}
+
+my $zombies = WebService::ZombiesRun->new(player => $player);
+
+my $total_runs = $zombies->total_runs;
+
+my $runs       = $zombies->runs_raw;
+
+my ($total_distance, $total_energy) = (0, 0);
+
+foreach my $run (@$runs) {
+    $total_distance += $run->{distance};
+    $total_energy   += $run->{energy};
+}
+
+say "$player has $total_runs runs for $total_distance metres and $total_energy calories.";
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+zombiesrun - Basic cmdline tool for showing Zombies, Run! stats
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+    $ zombiesrun pjf
+
+    pjf has 12 runs for 30405 metres and 2027 calories
+
+=head1 DESCRIPTION
+
+This cmdline tool provides basic information about the user specified
+as its argument. It's primarily intended as an example of using the
+L<WebService::ZombiesRun> module.
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

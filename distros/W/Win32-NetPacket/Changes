@@ -1,0 +1,20 @@
+Revision history for Perl extension Win32::NetPacket.
+
+0.03  12/02/2006
+
+  - The code was updated for WinPcap 3.1.
+  - GetAdapterNames() : increased the buffer size and added an optional 
+    argument %description.
+    Thanks to Guy Widloecher.   
+  - Added the MAC address of the adapter to the list returned by GetInfo.
+  - Added some new OID constants.
+  - Added tests for pod and constants.
+  - Documentation updated
+
+0.02  16/06/2003
+  - arrrgh..! I forgot the typemap file in the distro. Fixed.
+    Thanks to crazyinsomniac, the brave CPAN-tester.
+
+0.01  12/04/2003
+	- original version; created by h2xs 1.21 with options
+		-A Win32::NetPacket

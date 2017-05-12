@@ -1,0 +1,9 @@
+* index.html
+  * 1.html
+    * friendly_url.html
+      * 3.html
+        * 31.html
+        * 32.html
+  * 2.html
+    * 21.html
+    * 22.html

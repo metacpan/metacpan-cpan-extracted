@@ -1,0 +1,6 @@
+name = "WWW-Form-UrlEncoded"
+badges = ["travis"]
+
+[build]
+build_class = "builder::MyBuilder"
+

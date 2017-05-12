@@ -1,0 +1,440 @@
+=head1 NAME
+
+Web::Simple::AntiquatedPerl - the slides from the talk
+
+=head1 WHAT?
+
+Web::Simple was originally introduced in a talk at the Italian Perl Workshop,
+entitled Antiquated Perl.
+
+The video is available on the Shadowcat site: <http://www.shadowcat.co.uk/archive/conference-video/ipw-2009/antiquated>
+
+If you don't particularly want to watch me confusing a bunch of Italian perl
+mongers, the slides are reproduced below.
+
+=head1 SLIDES
+
+  Antiquated
+  Perl
+  ----
+  Modern
+  Perl?
+  ----
+  Post
+  Modern
+  Perl
+  ----
+  Enlightened
+  Perl
+  ----
+  everybody
+  knows
+  ----
+  Catalyst
+  Moose
+  DBIx::Class
+  ----
+  Modern
+  Perl?
+  ----
+  perl5
+  v10
+  ----
+    given ($x) {
+      when (3) {
+    ...
+  ----
+  ~~
+  ----
+  what's the
+  opposite?
+  ----
+  Old
+  Perl?
+  ----
+  if it 
+  works
+  ----
+  Legacy
+  Perl?
+  ----
+  not
+  interesting
+  ----
+  Stupid
+  Perl
+  ----
+  *$&^*(^
+  FormMail.PL
+  ----
+  Antiquated
+  Perl
+  ----
+  Antique
+  ----
+  Old *and*
+  beautiful
+  ----
+  Simple
+  Elegant
+  ----
+    $|++
+  ----
+    use IO::Handle;
+    STDOUT->autoflush(1);
+  ----
+  it's core.
+  it's fine.
+  ----
+  but why
+  think?
+  ----
+    select((select(FOO),$|++)[0])
+  ----
+    (select(FOO),$|++)
+    ->
+    ($old_selected_fh,$|)
+  ----
+    (select(FOO),$|++)[0]
+    ->
+    $old_select_fh
+  ----
+    select((select(FOO),$|++)[0])
+    ->
+    use IO::Handle;
+    FOO->autoflush(1)
+  ----
+  ~~
+  ----
+    ~~@x
+  ----
+    ~(~(@x))
+  ----
+  bitwise
+  negation
+  ----
+  so ...
+  ----
+    ~@x
+    ->
+    ~(scalar @x)
+  ----
+    ~~$number
+    ->
+    $number
+  ----
+    ~~@x
+    ->
+    scalar @x
+  ----
+    perl -MMoose -e'print ~~keys %INC'
+    84
+  ----
+  overload::constant
+  ----
+  lets you
+  affect
+  parsing
+  ----
+  numbers
+  strings
+  ----
+  q qq qr
+  t s qw
+  ----
+  i18n.pm
+  ----
+  ~~"$foo bar"
+  loc("_[0] bar", $foo)
+  ----
+  for
+  ----
+    for ($foo) {
+      /bar/ and ...
+  ----
+    for ($foo) {
+      /bar/ and return do {
+        <code here>
+      }
+  ----
+    /foo/gc
+  ----
+    /\Gbar/gc
+  ----
+    sub parse {
+      my ($self, $str) = @_;
+      for ($str) {
+        /match1/gc and return
+          $self->_subparse_1($_)
+  ----
+    sub _subparse_1 {
+      my ($self) = @_;
+      for ($_[1]) {
+        /\Gsubmatch1/gc ...
+  ----
+  prototypes
+  ----
+    sub foo (&) {
+  ----
+    foo {
+      ...
+    };
+  ----
+    prototype \&foo
+  ----
+  typeglobs
+  ----
+    *{"${package}::${name}"}
+      = sub { ... }
+  ---- 
+    local
+  ----
+    local $_
+  ----
+    local *Carp::croak
+      = \&Carp::confess;
+  ----
+    do {
+      local (@ARGV, $/) = $file;
+      <>
+    }
+  ----
+  strict
+  and
+  warnings
+  ----
+    strict->import
+  ----
+  affects
+  compilation
+  scope
+  ----
+    sub strict_and_warnings::import {
+      strict->import;
+      warnings->import;
+    }
+  ----
+    use strict_and_warnings;
+  ----
+  $^H
+  %^H
+  ----
+    $^H |= 0x20000;
+    $^H{'foo'}
+      = bless($foo, 'My::Foo');
+  ----
+    sub My::Foo::DESTROY {
+  ----
+    delete ${$package}{myimport}
+  ----
+  B::Hooks::EndOfScope
+  ----
+  tie
+  ----
+    tie $var, 'Foo';
+  ----
+    sub FETCH
+    sub STORE
+  ----
+  Scalar
+  Array
+  Hash
+  Handle
+  ----
+  now ...
+  ----
+  mst: destruction
+  testing technology
+  since March 1983
+  ----
+  3 days
+  old
+  ----
+  2 weeks
+  early
+  ----
+  incubator
+  ----
+  glass box
+  plastic tray
+  heater
+  ----
+  design
+  flaw
+  ----
+  BANG
+  ----
+  so ...
+  ----
+  interesting
+  fact
+  ----
+  prototypes
+  only warn
+  when parsed
+  ----
+  error when
+  compiled
+  ----
+  so ...
+  ----
+    dispatch [
+      sub (GET + /) { ... },
+      sub (GET + /user/*) { ... }
+    ];
+  ----
+    foreach my $sub (@$dispatch) {
+      my $proto = prototype $sub;
+      $parser->parse($proto);
+      ...
+  ----
+    PARSE: { do {
+      push @match, $self->_parse_spec_section($spec)
+        or $self->_blam("Unable to work out what the next section is");
+      last PARSE if (pos == length);
+      /\G\+/gc or $self->_blam('Spec sections must be separated by +');
+    } until (pos == length) };
+  ----
+    sub _blam {
+      my ($self, $error) = @_;
+      my $hat = (' ' x pos).'^';
+      die "Error parsing dispatch specification: ${error}\n
+    ${_}
+    ${hat} here\n";
+    }
+  ----
+    Error parsing ...
+    GET+/foo
+       ^ here
+  ----
+    sub (GET + /user/*) {
+     my ($self, $user) = @_;
+  ----
+  I hate
+  fetching
+  $self
+  ----
+    *{"${app}::self"}
+      = \${"${app}::self"};
+  ----
+  use vars
+  ----
+    sub _run_with_self {
+      my ($self, $run, @args) = @_;
+      my $class = ref($self);
+      no strict 'refs';
+      local *{"${class}::self"} = \$self;
+      $self->$run(@args);
+    }
+  ----
+  HTML
+  output
+  ----
+  templates
+  ----
+  HTML is
+  NOT TEXT
+  ----
+    <div>,
+      $text,
+    </div>;
+  ----
+  <div>
+  ----
+  <$fh>
+  ----
+    tie *{"${app}::${name}"},
+      'XML::Tags::TIEHANDLE',
+      "<${name}>";
+  ----
+    sub TIEHANDLE { my $str = $_[1]; bless \$str, $_[0] }
+    sub READLINE { ${$_[0]} }
+  ----
+    sub DESTROY {
+      my ($into, @names) = @$_[0];
+      no strict 'refs';
+      delete ${$into}{$_}
+        for @names;
+    }
+  ----
+  </div>
+  ----
+  glob('/div');
+  ----
+    *CORE::GLOBAL::glob
+      = sub { ... };
+  ----
+    delete
+      ${CORE::GLOBAL::}{glob};
+  ----
+    sub foo {
+      use XML::Tags qw(div);
+      <div>, "foo!", </div>;
+    }
+  ----
+  what about
+  interpolation
+  ----
+    my $stuff = 'foo"bar';
+    <a href="$stuff">
+  ----
+  hmm ...
+  ----
+  overload::constant!
+  ----
+    glob('a href="'.$stuff.'"');
+  ----
+    glob(
+      bless(\'a href="', 'MagicTag')
+      .$stuff
+      .bless(\'"', 'MagicTag')
+    )
+  ----
+    use overload
+      '.' => 'concat';
+  
+    sub concat {
+  ----
+  hooking
+  it up
+  ----
+    sub (.html) {
+      filter_response {
+        $self->render_html($_[1])
+      }
+    }
+  ----
+    bless(
+      $_[1],
+      'Web::Simple::ResponseFilter'
+    );
+  ----
+    if ($self->_is_response_filter($result)) {
+      return $self->_run_with_self(
+        $result,
+        $self->_run_dispatch_for($new_env, \@disp)
+      );
+    }
+  ----
+  and the result?
+  ----
+   goto &demo;
+  ----
+  questions?
+  ----
+  thank
+  you
+
+=head1 AUTHOR
+
+Matt S. Trout <mst@shadowcat.co.uk>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 Matt S. Trout <mst@shadowcat.co.uk>
+
+=head1 LICENSE
+
+This text is free documentation under the same license as perl itself.
+
+=cut

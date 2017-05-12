@@ -1,0 +1,335 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+pushbullet - Program giving easy access to PushBullet API
+
+=head1 DESCRIPTION
+
+Program giving easy access to PushBullet features
+
+=head1 SYNOPSIS
+
+    pushbullet address [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
+        --name 'address name' --address 'complete address'
+    
+    pushbullet contacts [ -k <pushbullet_apikey> ]
+    
+    pushbullet devices [ -k <pushbullet_apikey> ]
+    
+    pushbullet file [ -k <pushbullet_apikey> ] [ -d <device_iden> ] 
+        --file filename [ --body 'file description' ]
+    
+    pushbullet link [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
+        --title 'your title' --url 'http://address'
+    
+    pushbullet list [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
+        --title 'your title' --item item1 --item item2 --item item3
+    
+    pushbullet note [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
+        --title 'your title' --body 'your body message'
+    
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a>, B<--address>
+
+Sets address for 'pushbullet address'
+
+=item B<-b>, B<--body>
+
+Sets body/description for 'pushbullet file' or 'pusbullet note'
+
+=item B<-c>, B<--config>
+
+Sets configuration file where to find default parameters configuration
+
+=item B<-D>, B<--debug>
+
+Sets debug mode
+
+=item B<-d>, B<--device>
+
+Sets device to receive bullet
+
+=item B<-f>, B<--file>
+
+Sets file for 'pushbullet file'
+
+=item B<-h>, B<--help>
+
+Prints this Help
+
+=item B<-k>, B<--apikey>
+
+Sets PushBullet API key
+
+=item B<-n>, B<--name>
+
+Sets name for 'pushbullet address'
+
+=item B<-t>, B<--title>
+
+Sets title for 'pushbullet link', 'pushbullet list' or 'pushbullet note'
+
+=item B<-u>, B<--url>
+
+Sets url for 'pushbullet address'
+
+=item B<-v>, B<--version>    
+
+Prints WWW::PushBullet version
+
+=item B<-x>, B<--proxy>
+
+Sets proxy (with something like 'http://<proxy_url>:<pory_port>')
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use FindBin;
+use Getopt::Long qw(:config no_ignore_case);
+use JSON;
+use Pod::Usage;
+
+use lib "$FindBin::Bin/../lib/";
+
+use WWW::PushBullet;
+
+my $FILE_CONFIG = "$FindBin::Bin/../conf/pushbullet.json";
+
+my %opt         = ();
+my @opt_devices = ();
+my @opt_items   = ();
+
+=head1 SUBROUTINES/METHODS
+
+=head2 DEBUG($line)
+
+Prints message '[DEBUG] $line' if debug mode is enabled (with -D/--debug)
+
+=cut
+
+sub DEBUG
+{
+    my $line = shift;
+
+    printf "[DEBUG] %s\n", $line if ($opt{debug});
+
+    return ($line);
+}
+
+=head2 Read_File_Config($file_config)
+
+Reads configuration file '$file_config'
+
+=cut
+
+sub Read_Config_File
+{
+    my $file_config = shift;
+
+    $file_config ||= $FILE_CONFIG;
+    if (-r $file_config)
+    {
+        DEBUG("Read_Config_File('$file_config')");
+        my $json = read_file($file_config);
+        return (JSON->new->decode($json));
+    }
+
+    return (undef);
+}
+
+#
+# MAIN
+#
+
+my $status = GetOptions(
+    \%opt,
+    'address|a=s',    # for 'pushbullet address'
+    'body|b=s',       # for 'pushbullet file & note'
+    'config|c=s',     # to change configuration file
+    'device|d=s@',    # to specify device
+    'file|f=s',       # for 'pushbullet file'
+    'item|i=s@',      # for 'pushbullet list'
+    'apikey|k=s',     # to specify apikey
+    'name|n=s',       # for 'pushbullet address'
+    'title|t=s',      # for 'pushbullet note'
+    'url|u=s',        # for 'pushbullet link, list & note'
+    'proxy|x=s',      # to set proxy
+    'debug|D',        # to set debug mode
+    'help|h',         # to print help
+    'version|v',      # to print version
+);
+pod2usage(0) if ((!$status) || ($opt{help}));
+if ($opt{version})
+{
+    printf "WWW::PushBullet v%s\n", WWW::PushBullet::version();
+    exit 0;
+}
+
+$opt{action} = $ARGV[0];
+
+pod2usage(0)
+    if ((!defined $opt{action})
+    || ($opt{action} !~ /^(?:address|contacts|devices|file|link|list|note)$/));
+my $conf = Read_Config_File($opt{config});
+
+my $apikey  = $opt{apikey}  || $conf->{apikey};
+my $address = $opt{address} || $conf->{default_address};
+my $body    = $opt{body}    || $conf->{default_body};
+my @devices = (
+    defined $opt{device} && scalar @{$opt{device}}
+    ? @{$opt{device}}
+    : (defined $conf->{default_device_iden} ? @{$conf->{default_device_iden}} : ())
+);
+my $file = $opt{file} || $conf->{default_file};
+my $items = (
+    defined $opt{item} && scalar @{$opt{item}}
+    ? $opt{item}
+    : $conf->{default_items}
+);
+my $name  = $opt{name}  || $conf->{default_name};
+my $title = $opt{title} || $conf->{default_title};
+my $proxy = $opt{proxy} || $conf->{proxy};
+my $url   = $opt{url}   || $conf->{default_url};
+
+my $pb = WWW::PushBullet->new({
+    apikey => $apikey, 
+    proxy  => $proxy, 
+    debug  => $opt{debug}});
+
+if ((!scalar @devices) && ($opt{action} ne 'devices'))
+{
+    DEBUG('No device specified, get all devices from apikey account');
+    my $devs = $pb->devices();
+    foreach my $d (@{$devs})
+    {
+        push @devices, $d->{iden};
+    }
+}
+
+if ($opt{action} eq 'address')
+{
+    if ((defined $name) && (defined $address))
+    {
+        foreach my $device (@devices)
+        {
+            $pb->push_address(
+                {
+                    device_iden => $device,
+                    name        => $name,
+                    address     => $address
+                }
+            );
+        }
+    }
+    else
+    {
+        printf "pushbullet address --name name --address 'complete address'\n";
+    }
+}
+elsif ($opt{action} eq 'contacts')
+{
+    my $contacts = $pb->contacts();
+    foreach my $c (@{$contacts})
+    {
+        printf "Contact '%s' (%s) => %s\n", $c->{name}, $c->{iden}, $c->{email};
+    }
+}
+elsif ($opt{action} eq 'devices')
+{
+    my $devices = $pb->devices();
+    foreach my $d (@{$devices})
+    {
+        printf "Device '%s' (%s) => id %s\n", 
+            $d->{nickname}, $d->{model}, $d->{iden};
+    }
+}
+elsif ($opt{action} eq 'file')
+{
+    if ((defined $file) && (-r $file))
+    {
+        foreach my $device (@devices)
+        {
+            $pb->push_file({device_iden => $device, file_name => $file, body => $body});
+        }
+    }
+    else
+    {
+        printf "pushbullet file --file filename --body 'file description'\n";
+    }
+}
+elsif ($opt{action} eq 'link')
+{
+    if ((defined $title) && (defined $url) && ($url =~ /^https?:/))
+    {
+        foreach my $device (@devices)
+        {
+            $pb->push_link(
+                {
+                    device_iden => $device,
+                    title     => $title,
+                    url       => $url
+                }
+            );
+        }
+    }
+    else
+    {
+        printf "pushbullet link --title title --url http://address\n";
+    }
+}
+elsif ($opt{action} eq 'list')
+{
+    if ((defined $title) && (scalar @{$items}))
+    {
+        foreach my $device (@devices)
+        {
+            $pb->push_list(
+                {
+                    device_iden => $device,
+                    title     => $title,
+                    items     => $items
+                }
+            );
+        }
+    }
+    else
+    {
+        printf
+"pushbullet list --title title --item item1 --item item2 --item item3\n";
+    }
+}
+elsif ($opt{action} eq 'note')
+{
+    if ((defined $title) && (defined $body))
+    {
+        foreach my $device (@devices)
+        {
+            $pb->push_note(
+                {
+                    device_iden => $device,
+                    title     => $title,
+                    body      => $body
+                }
+            );
+        }
+    }
+    else
+    {
+        printf "pushbullet note --title title --body 'body message'\n";
+    }
+}
+
+=head1 AUTHOR
+
+Sebastien Thebert <www-pushbullet@onetool.pm>
+
+=cut

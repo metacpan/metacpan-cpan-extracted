@@ -1,0 +1,80 @@
+WWW::FreshMeat::API version 0.02
+
+This distribution includes the following modules:
+
+    WWW::FreshMeat::API                   (0.02)
+    WWW::FreshMeat::API::Session          (0.01)
+    WWW::FreshMeat::API::Pub              (0.01)
+    WWW::FreshMeat::API::Pub::V1_03       (0.01)
+    WWW::FreshMeat::API::Agent::XML::RPC  (0.01)
+
+
+** IMPORTANT ANNOUNCEMENT **
+
+Circa April 2009 Freshmeat relaunched their site and completely dropped the XML-RPC API :(
+
+In place is a new Freshmeat API 3.0 using REST JSON (or XML).
+
+Its not clear how stable this API is.    I'll look more closely at this in a few months 
+time and perform necessary surgery on this module.
+
+So note this module will not work in its present state until I make investigate the new API 
+& changes source code changes.
+
+Very sorry about this.
+
+BW 19-Jul-2009
+
+** END OF ANNOUCEMENT **
+
+
+
+DESCRIPTION
+
+FreshMeat (http://freshmeat.net) provides a very simple XML-RPC API which allows a user to inspect what projects
+the user as uploaded and also provides an update & withdrawal mechanism of the users projects.
+
+Requirements....
+
+    1) Must have a FreshMeat login & password
+
+    2) Must have already loaded project onto http://freshmeat.net
+
+For now see ./examples/freshmeat-submit.pl.
+
+More details to follow.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Moose
+    XML::RPC
+    
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::FreshMeat::API
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Barry Walsh (Draegtun Systems Ltd)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

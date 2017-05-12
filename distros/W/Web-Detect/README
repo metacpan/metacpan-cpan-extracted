@@ -1,0 +1,75 @@
+SYNOPSIS
+
+        use Web::Detect qw(detect_web detect_web_fast);
+        use IO::Interactive::Tiny ();
+    
+        if (Web::Detect::detect_web_fast()) {
+            # do HTML
+        }
+        else {
+            # do CLI
+            if (IO::Interactive::Tiny::is_interactive()) {
+                # prompt/ANSI/etc
+            }
+            else {
+                # do not prompt/plain text/etc
+            }
+        }
+
+DESCRIPTION
+
+    Knowing if you are under a web environment or not is very handy.
+
+    For example, often you need to decide whether to output HTML or
+    plaintext.
+
+FUNCTIONS
+
+    Functions are exportable but are not exported by default.
+
+ detect_web() => HASHREF
+
+    Return false if not detected running under any web environment.
+
+    Return a hash otherwise.
+
+    These keys exists if it is detected that we are running under the given
+    environment and the value is suitable as a boolean (always true).
+
+    mod_perl
+
+    plack
+
+    pangea
+
+    cpanel
+
+      http://cpanel.net
+
+    catalyst
+
+    dancer
+
+    mojo
+
+    FCGI.pm
+
+    IIS
+
+    cgi
+
+      General CGI
+
+    general
+
+      Value can be 1 if it was detected during the first general check, 2
+      if it was detected during the second general check, and 3 if it was
+      detected under both.
+
+    Additionally, psgi is also true if we know its a PSGI environment.
+
+ detect_web_fast()
+
+    Same as detect_web() but return HASHREF upon first successful check
+    instead of trying all heuristics.
+

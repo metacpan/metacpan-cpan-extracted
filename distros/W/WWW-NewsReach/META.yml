@@ -1,0 +1,26 @@
+---
+abstract: 'Perl wrapper for the NewsReach API'
+author:
+  - 'Adam Taylor <ajct@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-NewsReach
+requires:
+  Data::Dump: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  URI: 0
+  XML::LibXML: 0
+resources:
+  repository: git://github.com/adamtaylor/WWW-NewsReach.git
+version: 0.06

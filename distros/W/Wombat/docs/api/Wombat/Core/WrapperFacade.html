@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Core::WrapperFacade - internal wrapper facade</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Core::WrapperFacade - internal wrapper facade</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Facade class that wraps an internal Wrapper object. All methods are
+delegated to the wrapped wrapper. The facade is presented to servlet
+code so that the servlet code does not have access to internal Wrapper
+methods.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($wrapper)</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Connector::WrapperFacade</STRONG>
+instance. If subclasses override the constructor, they must be sure to
+call
+<PRE>
+  $self-&gt;SUPER::new($wrapper);</PRE>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24wrapper">$wrapper</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Core::Wrapper</STRONG> for which this object is the facade.
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletConfig.html">the Servlet::ServletConfig manpage</A>,
+<A HREF="../../../api/Wombat/Core/Wrapper.html">the Wombat::Core::Wrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

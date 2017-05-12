@@ -1,0 +1,55 @@
+NAME
+    WebService::IPRental - IP Rental API
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+DESCRIPTION
+        use WebService::IPRental;
+
+        my $ipr = WebService::IPRental->new(
+            APIkey   => $APIkey,
+            APIpass  => $APIpass,
+            Username => $Username,
+            Password => $Password,
+            TTL      => 780, # optional
+            LOcation => 0, # optional
+        );
+    
+        my $resp = $ipr->doIpLease();
+        if ($resp->{Response} == '202' or $resp->{Response} == '203') {
+            print "Res:  " . $ipr->verboseReponseCode($resp->{Response}) . "\n";
+            print "IP:   " . $ipr->verboseReponseCode($resp->{IP}) . "\n";
+            print "Port: " . $ipr->verboseReponseCode($resp->{Port}) . "\n";
+            print "TTL:  " . $ipr->verboseReponseCode($resp->{TTL}) . "\n";
+        
+            # $ua->proxy(['http', 'https'], 'http://'. $resp->{IP} . ':' . $resp->{Port});
+        } else {
+            die 'Caught error: ' . $ipr->verboseReponseCode($resp->{Response});
+        }
+
+                /**
+                 * ========  Response Codes are listed as so ========
+                 * 
+                 * ---- Positive ------------------------------------
+                 *  202 = Good, Fresh IP
+                 *  203 = Good, Duplicate IP
+                 * 
+                 * ---- Negative ------------------------------------
+                 *  402 = Internal Error, Unable to serve IP
+                 *  403 = Unknown User Authentication
+                 *  404 = Unknown API Authentication
+                 *  405 = 0 IP leases left in your pool
+                 *  406 = Impermissible network type
+                 */
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

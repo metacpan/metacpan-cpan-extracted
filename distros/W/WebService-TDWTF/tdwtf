@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+use v5.14;
+use warnings;
+
+use App::TDWTF;
+use Getopt::Long;
+
+my %args;
+GetOptions(
+	recent => \$args{recent},
+	series => \$args{series},
+	author => \$args{author},
+	'show-series' => \$args{show_series},
+);
+
+App::TDWTF::run(\%args, @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+tdwtf - CLI interface to thedailywtf.com
+
+=head1 SYNOPSIS
+
+  tdwtf                  # prints a random article, as text
+  tdwtf 8339             # prints the article with ID 8339, as text
+  tdwtf --recent         # lists the most recent 8 articles
+  tdwtf --recent 10      # lists the most recent 10 articles
+  tdwtf --recent 2015 01 # lists all articles published in January 2015
+  tdwtf --series errord  # lists the most recent 8 Error'd articles
+  tdwtf --series errord 10
+  tdwtf --series errord 2015 01
+  tdwtf --author snoofle # lists the most recent 8 articles by snoofle
+  tdwtf --author snoofle 10
+  tdwtf --author snoofle 2015 01
+  tdwtf --show-series    # prints a list of all existing article series
+
+=head1 DESCRIPTION
+
+tdwtf is an CLI interface to the API of L<http://thedailywtf.com>.
+Quoting the website's sidebar:
+
+    Founded in 2004 by Alex Papadimoulis, The Daily WTF is your
+    how-not-to guide for developing software. We recount tales of
+    disastrous development, from project management gone spectacularly
+    bad to inexplicable coding choices.
+
+See SYNOPSIS for usage examples.
+
+=head1 SEE ALSO
+
+L<http://thedailywtf.com/>
+
+L<WebService::TDWTF>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

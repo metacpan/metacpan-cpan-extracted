@@ -1,0 +1,15 @@
+Revision history for Perl extension Win32::Wallpaper.
+
+0.04  Fri Jul 25 2003
+      - This module actually works now. Fixed major bug. 
+
+0.03  Sun Jul 20 2003
+	- replaced Win32::AbsPath with core module File::Spec::Functions 
+
+0.02  Mon Jun 24 2003
+      - fixed makefile
+      - calling wallpaper w/o parameters now gives you the current wallpaper
+
+0.01  Thu Jun 19 2003
+	- original version
+

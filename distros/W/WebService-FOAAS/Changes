@@ -1,0 +1,7 @@
+Revision history for Perl extension WebService::FOAAS.
+
+0.001001 2017-02-10T18:01+00:00
+ - Add more dependencies to PREREQ_PM
+
+0.001 2017-01-31T16:44+00:00
+ - Initial release

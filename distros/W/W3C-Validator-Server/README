@@ -1,0 +1,79 @@
+NAME
+    W3C::Validator::Server - Run http://validator.w3c.org as a local
+    instance
+
+VERSION
+    0.1201
+
+DESCRIPTION
+    This application is useful if you want to verify your HTML either
+    offline or markup that is protected on an intranet. This server should
+    provide the same sort of validation as <http://validator.w3c.org>.
+
+ENVIRONMENT VARIABLES
+  W3C_HOME
+    Will be used by both "w3c-validator-install.sh" and
+    "w3c-validator-server.psgi" to install and search for external files.
+    See "INSTALLATION" for details.
+
+  W3C_VALIDATOR_CFG
+    Used by "cgi-bin/check" (from w3c). Default is to look for
+
+        $W3C_HOME/config/validator.conf
+
+  HOME
+    Will be used by both "w3c-validator-install.sh" and
+    "w3c-validator-server.psgi" to install and search for external files.
+    See "INSTALLATION" for details.
+
+    The directory holding files will be: "$HOME/.w3c-validator-server"
+
+INSTALLATION
+    After downloading/installing this module you have to install some more
+    external dependencies. This can be done by using the
+    w3c-validator-install.sh script, bundled with this package:
+
+        $ w3c-validator-install.sh all
+
+        # install libraries. Require sudo, apt-get and cpanm
+        $ w3c-validator-install.sh libs
+
+        # fetch files from http://validator.w3.org
+        $ w3c-validator-install.sh files
+
+        # rewrite config to defaults
+        $ w3c-validator-install.sh config
+
+    The files will be installed to your home directory, or current directory
+    if "Makefile.PL" is found. See
+    <http://validator.w3.org/docs/install.html> for more details.
+
+SYNOPSIS
+        $ w3c-validator-server.psgi
+        $ plackup /usr/bin/w3c-validator-server.psgi
+        $ starman path/to/w3c-validator-server.psgi
+        $ ./bin/w3c-validator-server.psgi
+
+METHODS
+  build_app
+        $app = $class->build_app({
+                   home => '/path/to/...', # W3C_HOME
+                   htdocs => '/path/to/...', # W3C_HOME/root/htdocs
+                   cgi_bin => '/path/to/...', # W3C_HOME/root/cgi-bin
+                   validator_config => '/path/to/...', # W3C_VALIDATOR_CFG
+               });
+
+    Will use Plack::Builder to create a plack application.
+
+    See "ENVIRONMENT VARIABLES" for details on how to instruct this method.
+
+  version_cb
+    See "version_cb" in Plack::Runner.
+
+COPYRIGHT & LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen at cpan.org"
+

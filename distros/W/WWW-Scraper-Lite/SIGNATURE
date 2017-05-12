@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d920078d7b69ae33ddc17a90fa4ab9543bbbf82c Build.PL
+SHA1 7d51a0e23fc94760ecf3a6c8257f87b55ab1474f Changes
+SHA1 1a421aebe2716bed2fdfb4789f0b7b88faa3965c MANIFEST
+SHA1 a46852de9207ee60cc2dfc60924d14388b504311 META.json
+SHA1 594edf486b6355f74d5916c791b587002e86ff38 META.yml
+SHA1 67d3c5f99c2eae0774a2c1695772232128b6e917 Makefile
+SHA1 5ee080c07e3374ddeb3fc6855edb503bd0c3e0fe README
+SHA1 8e449646046a189595af9614a3bca5478df1c00f bin/indexer
+SHA1 fe84c3dec1dcea87c7366e3a1461c90acebf0589 bin/validator
+SHA1 3fef11f6a2a15a57d96cd0f95265fdcfe6129a1c lib/WWW/Scraper/Lite.pm
+SHA1 bc62677f3d310e1b4a36f96d59e6e756f8c844ba t/00-critic.t
+SHA1 a4d5c885240c24c804abf555a317749f0c261f9b t/00-distribution.t
+SHA1 b25dfd1b35695ba248f212fd7b9fddd46e983472 t/00-pod.t
+SHA1 17dfad46f61fe15fd4b7ff8f004e56b5451c8924 t/00-podcoverage.t
+SHA1 2f727be94e1f28bc2f0b4b08d60346304cde2e7c t/10-scraper.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJN6AS8AAoJEPG6pZARLr4FnAYP/1S5f38+7jS99VpsmTnSR97i
+KWSk6evsVdAYo0h58JkgqP4Pv7KHqrbHIdkH3io9AXkBAmnyw90BIObbJHcauWyK
+1XIaVNXrjsFItjVosd893F+Ik2d09v8fk+1frJ2HH568kBZK3LaNLIWC/m6b/gFH
+kfJHVUUFDEh0t/Jmny/FQJ94sVhPJzgdBtdnAlGs/LPu5GHlfp/95p9lrkiwppY2
+u+YmbouP7iLzOG/LlOecmWz26KX4ewmZeAcvvXXeLgyAIBPw03yeNxMdTV9vWNAh
+shYe8DQPclDVWxCVw5xs1Hfb20STv7U/wQpbLWzmLDpxt2+VyY+IgABGtSnZuQYP
+ugw9UQMFn7tcdhR4Xv4Ia+wh4T6u8hpIsaE+WkzqovJ6TK8h0MH3ZN6JTIKItYPW
+PWXlWwjmLz3llk2BLCwoUeAof09QgNQxmnnj+BHoeny1kxTMip1za0SHu+hOV7cJ
+DmKlRYezFl61RjOC2Bv4Sa4rjvkcPR7hhjIIWttPHLPYcw7UiKajh+mR+MK+ooI4
+t7efOl+D5VrYTJWW1MwS55yF0If0WJpE3WC77ZZYSZcYdkSkgwVX0623O/K2ad2v
+scjrtTbbFk1xe3m+LDmulu2v33SZ1GJhUp7zr6jp4XVkZZwhDHncYA53T7OeNLyf
+cqTo6CpyvTfkAgJIzUE1
+=VEo/
+-----END PGP SIGNATURE-----

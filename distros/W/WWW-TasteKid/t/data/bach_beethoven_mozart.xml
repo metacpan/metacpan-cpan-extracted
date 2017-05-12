@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<similar>
+	<info>
+		<resource>
+			<name><![CDATA[Johann Sebastian Bach]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Ludwig Van Beethoven]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Wolfgang Amadeus Mozart]]></name>
+			<type>music</type>
+					</resource>
+	</info>
+	<results>
+		<resource>
+			<name><![CDATA[Joseph Haydn]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Franz Schubert]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Johannes Brahms]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[George Frideric Handel]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Robert Schumann]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Felix Mendelssohn]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Antonio Vivaldi]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Giuseppe Verdi]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Richard Strauss]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Gioacchino Rossini]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Richard Wagner]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Pyotr Ilyich Tchaikovsky]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Franz Liszt]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Frédéric Chopin]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Gustav Mahler]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Edvard Grieg]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Arcangelo Corelli]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Händel]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Niccolò Paganini]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Antonín Leopold Dvořák]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Georges Bizet]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Hector Berlioz]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Giacomo Puccini]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Telemann]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Claudio Monteverdi]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Anton Bruckner]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Maurice Ravel]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Sergei Prokofiev]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Sergei Rachmaninoff]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Igor Stravinsky]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Pachelbel]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Modest Mussorgsky]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Béla Bartók]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Dmitri Shostakovich]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Henry Purcell]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Jean Sibelius]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Albinoni]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Edward Elgar]]></name>
+			<type>music</type>
+					</resource>
+		<resource>
+			<name><![CDATA[Claude Debussy]]></name>
+			<type>music</type>
+					</resource>
+	</results>
+</similar>

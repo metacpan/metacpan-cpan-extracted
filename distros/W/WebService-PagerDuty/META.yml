@@ -1,0 +1,33 @@
+---
+abstract: 'Module to interface with the http://PagerDuty.com service'
+author:
+  - 'Oleg Kostyuk <cub@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::LWP::UserAgent: 0
+  Test::More: 0
+  Test::Most: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-PagerDuty
+requires:
+  Class::Accessor: 0
+  Error: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  URI: 0
+  URI::QueryParam: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 1.20131219.1627

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://localhost/Example" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://localhost/Example">
+  <wsdl:documentation>
+<![CDATA[Example Web Service]]>
+  </wsdl:documentation>
+  <wsdl:types xmlns="http://localhost/Example">
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://localhost/Example">
+      <xs:element name="CreateCustomer">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="TemplateCode" nillable="true" type="xs:string"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="ArrayOfCustomerID"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="ArrayOfCustomerType"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="Title" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" ref="Contact"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="ArrayOfContacts"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="BuildingNumber" nillable="true" type="xs:int"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="CreateCustomerResponseType">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" ref="ArrayOfCustomerID"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="CreateCustomerResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="createcustomer" type="tns:CreateCustomerResponseType"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="CreateCustomerFaultType">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="CustomerID" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="CreateCustomerFault">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="createcustomer" type="tns:CreateCustomerFaultType"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://localhost/Example">
+      <xs:element name="Contact">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="Street" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="City" nillable="true" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="County" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ArrayOfContacts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="Contacts"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Contacts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="Street" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="City" nillable="true" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="County" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ArrayOfCustomerID">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="CustomerID" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ArrayOfCustomerType">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="CustomerType" nillable="true" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="CreateCustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateCustomer"/>
+  </wsdl:message>
+  <wsdl:message name="CreateCustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateCustomerResponse"/>
+  </wsdl:message>
+  <wsdl:message name="CreateCustomerSoapFault">
+    <wsdl:part name="parameters" element="tns:CreateCustomerFault"/>
+  </wsdl:message>
+  <wsdl:portType name="ExampleSoap">
+    <wsdl:operation name="CreateCustomer">
+      <wsdl:documentation>
+<![CDATA[This is an example of documentation of an CreateCustomer operation]]>
+      </wsdl:documentation>
+      <wsdl:input message="tns:CreateCustomerSoapIn"/>
+      <wsdl:output message="tns:CreateCustomerSoapOut"/>
+      <wsdl:fault name="CreateCustomerFault" message="tns:CreateCustomerSoapFault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ExampleSoap" type="tns:ExampleSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="CreateCustomer">
+      <soap:operation soapAction="http://localhost/Example#CreateCustomer" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreateCustomerFault">
+        <soap:fault name="CreateCustomerFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Example">
+    <wsdl:port name="ExampleSoap" binding="tns:ExampleSoap">
+      <soap:address location="http://localhost/Example"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

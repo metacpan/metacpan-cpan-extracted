@@ -1,0 +1,47 @@
+---
+abstract: 'Thin wrapper around the Reddit OAuth API'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Devel::Confess: '0'
+  LWP::ConsoleLogger::Easy: '0'
+  Path::Tiny: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Compare: '0'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Reddit
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  JSON::MaybeXS: '0'
+  LWP::Protocol::https: '6.06'
+  Moo: '2.003000'
+  MooX::StrictConstructor: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  URI: '0'
+  WWW::Mechanize: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/oalders/webservice-reddit/issues
+  homepage: https://github.com/oalders/webservice-reddit
+  repository: https://github.com/oalders/webservice-reddit.git
+version: '0.000003'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

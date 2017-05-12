@@ -1,0 +1,49 @@
+{
+   "abstract" : "paste on www.pastebin.com without API keys",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Pastebin-PastebinCom-Create",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.004001",
+            "WWW::Mechanize" : "1.73",
+            "overload" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Pastebin::PastebinCom::Create" : {
+         "file" : "lib/WWW/Pastebin/PastebinCom/Create.pm",
+         "version" : "1.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "1.003"
+}

@@ -1,0 +1,52 @@
+{
+   "abstract" : "An object-oriented interface to the Audioscrobbler WebService API",
+   "author" : [
+      "Nilson Santos Figueiredo Júnior <nilsonsfj@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Audioscrobbler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLASS" : "0",
+            "Cache::FileCache" : "0",
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Class::Data::Accessor" : "0",
+            "LWP::Simple" : "0",
+            "NEXT" : "0",
+            "Test::More" : "0",
+            "UNIVERSAL::require" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08"
+}

@@ -1,0 +1,276 @@
+=head1 NAME
+
+WWW::AUR - API for the Archlinux User Repository website.
+
+=head1 SYNOPSIS
+
+  use WWW::AUR;
+  my $aur = WWW::AUR->new( basepath => '/tmp/aurtmp' );
+  my $pkg = $aur->find( 'perl-www-aur' );
+  
+  # download_size() can check the file size without downloading...
+  printf "Preparing to download source package file (%d bytes).\n",
+      $pkg->download_size;
+  
+  $pkg->download;
+  printf "Downloaded pkgfile to %s.\n", $pkg->src_pkg_path;
+  
+  $pkg->extract;  # calls download() if you didn't
+  printf "Extracted pkgfile to %s.\n", $pkg->src_dir_path;
+  
+  $pkg->build;    # calls extract()  if you didn't
+  printf "Built binary pkgfile and saved to %s.\n", $pkg->bin_pkg_path;
+  
+  my $who = $pkg->maintainer();
+  printf "%s is maintained by %s.\n", $pkg->name, $who->name;
+  
+  print "Here is all of their maintained packages:\n";
+  for my $otherpkg ( $who->packages ) {
+      printf " - %s\n", $otherpkg->name;
+  }
+  
+  my $login = $aur->login( 'myname', 'mypassword' )
+      or die "Failed to login as myname, what a shock";
+  
+  $login->vote( 'my-favorite-package' );
+  $login->disown( 'i-hate-this-package' );
+  $login->upload( '../a-new-package-file.src.pkg.tar.gz',
+                  'lib' );
+  
+  print "Iterating through ALL packages...\n";
+  my $iter = $aur->packages;
+  while ( my $pkgobj = $iter->next ) {
+      my %info = $pkgobj->info;
+      print "$info{name} -- $info{version}\n";
+  }
+
+=head1 DESCRIPTION
+
+The Archlinux User Repository is a relatively simple website that
+houses user-submitted packages for ArchLinux. These "source packages"
+merely contain what is required to build the package, unlike Archlinux's
+official repository which house binary packages.
+
+This module provides an interface for the straight-forward AUR user
+as well as for AUR author, aka package maintainers. The goal is to be
+able to do anything with this module that you could with a web
+browser.
+
+The L<WWW::AUR::Package> module also allows the module user to
+download and build source packages using I<makepkg>. Installation is
+left up to the module user and is not implemented in this module.
+
+=head1 CONSTRUCTOR
+
+  $OBJ = WWW::AUR->new( %PATH_PARAMS? );
+
+=over 4
+
+=item C<%PATH_PARAMS> I<(Optional)>
+
+These parameters are optional. See L</PATH PARAMETERS>.
+
+=item C<$OBJ>
+
+A C<WWW::AUR> object.
+
+=back
+
+=head1 METHODS
+
+=head2 search
+
+  @PACKAGES = $OBJ->search( $QUERY );
+
+=over 4
+
+=item C<$QUERY>
+
+A string to match package names against. The string can have regexp
+anchors (^ or $).
+
+If C<$QUERY> contains anchors then only package names that match the
+anchored text are returned. Other special regexp chars will be sent to
+the query literally. Since the AUR does not directly support regexp
+searches this will most likely return unexpected results.
+
+=item C<@PACKAGES>
+
+A list of L<WWW::AUR::Package> objects that matched the search query.
+
+=back
+
+=head2 find
+
+  $PKGOBJ | undef = $OBJ->find( $NAME )
+
+=over 4
+
+=item C<$NAME>
+
+The exact name of a package to find.
+
+=item C<$PKGOBJ>
+
+A L<WWW::AUR::Package> object if one was found.
+
+=item C<undef>
+
+If no package matching the given C<$NAME> was found.
+
+=back
+
+=head2 maintainer
+
+  $MAINOBJ | undef = $OBJ->maintainer( $NAME );
+
+=over 4
+
+=item C<$NAME>
+
+The name of the maintainer to find. Case-insensitive.
+
+=item C<$MAINOBJ>
+
+A L<WWW::AUR::Maintainer> object if a matching maintainer was found.
+
+=item C<undef>
+
+If no matching maintainer was found.
+
+=back
+
+=head2 iter
+
+  $ITEROBJ = $OBJ->iter()
+
+=over 4
+
+=item C<$ITEROBJ>
+
+A L<WWW::AUR::Iterator> object.
+
+=back
+
+=head2 login
+
+  $LOGINOBJ | undef = $OBJ->login( $USERNAME, $PASSWORD );
+
+=over 4
+
+=item C<$USERNAME>
+
+The maintainer name to login to the AUR with.
+
+=item C<$PASSWORD>
+
+The password to use for logging in.
+
+=item C<$LOGINOBJ>
+
+A L<WWW::AUR::Login> object, if the login succeeded.
+
+=item C<undef>
+
+If the login failed.
+
+=back
+
+=head1 PATH PARAMETERS
+
+The constructor's only parameters are for paths to use in
+objects. Path parameters are propogated to every L<WWW::AUR::Package>
+object that is created. Package objects are created when using methods
+such as L</search> and L</find>.
+
+Path parameters are also propogated to objects that create their own
+L<WWW::AUR::Package> object, in turn. For example they are propogated
+to the L<WWW::AUR::Maintainer> object created by
+L</maintainer>, the L<WWW::AUR::Login> object created by
+L</login>, and the L<WWW::AUR::Iterator> object created by
+L</packages>.
+
+Path parameters are given as a hash with the keys as follows:
+
+=over 4
+
+=item B<basepath>
+
+Specifies a base with which to set the C<dlpath>, C<extpath>, and
+C<destpath> quickly. Setting the base path sets the other path
+parameters to paths relative to the basepath.
+
+After the 'basepath' is set, other path parameters can still be
+overriden with their own values.
+
+Defaults to C</tmp/WWW-AUR>.
+
+=item B<dlpath>
+
+A directory to store downloaded source package files.
+
+Defaults to C<$basepath/src>.
+
+
+=item B<extpath>
+
+A directory to store source package directories. These are extracted
+from the source package file.
+
+Defaults to C<$basepath/build>.
+
+=item B<destpath>
+
+A directory to store built binary package files. Binary package files
+are built from the source package files by using C<makepkg>.
+
+Defaults to C<$basepath/cache>.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<http://github.com/jnbek/perl-www-aur>
+
+=item * L<http://aur.archlinux.org>
+
+=item * L<http://www.archlinux.org/pacman/makepkg.8.html>
+
+=back
+
+=head1 AUTHOR
+
+John D Jones III, C<< <jnbek at cpan dot org> >>
+
+=head1 SPECIAL THANKS
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Mr Davis created and maintained this awesome module for many years.
+After the AUR4 migration, he became unable to devote the time needed
+to maintain this module any longer and blessed me with taking over this module's
+maintainership. Thanks Justin for doing all the real work on this module and
+making it so all I needed to do was update a few lines of code here and there
+and update a couple of tests.
+
+=head1 BUGS
+
+Please email me any bugs you find. I will try to fix them as quick as I can.
+
+=head1 SUPPORT
+
+Send me an email if you have any questions or need help.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014-2015 Justin Davis.
+
+Copyright 2015-2016 John D Jones III
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

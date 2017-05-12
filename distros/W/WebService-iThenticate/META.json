@@ -1,0 +1,43 @@
+{
+   "abstract" : "A library to access the iThenticate web service",
+   "author" : [
+      "Fred Moyer <fred@iparadigms.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-iThenticate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::SSLeay" : "0.57",
+            "RPC::XML" : "1.36",
+            "URI" : "1.35"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.16"
+}

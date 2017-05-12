@@ -1,0 +1,102 @@
+NAME
+
+    WebService::Syncthing - Client library for Syncthing API
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+      use WebService::Syncthing;
+      my $Syncthing = WebService::Synthing->new(
+             base_url   => 'http://server:port/rest',
+             auth_token => 'optional_auth_token',
+      );
+    
+      $Syncthing->get_ping();
+
+DESCRIPTION
+
+    Simple client for talking to the Syncthing GUI using the REST API.
+
+METHODS
+
+ auth_token
+
+    The auth_token used to authenticate against the Syncthing GUI. Passed
+    as a X-API-Key header in requests.
+
+ BUILD
+
+GET Requests
+
+ new
+
+ get_ping
+
+    Ping using a GET request.
+
+ get_version
+
+ get_model
+
+ get_connections
+
+ get_completion
+
+ get_config
+
+ get_config_sync
+
+ get_system
+
+ get_errors
+
+ get_discovery
+
+ get_deviceid
+
+ get_upgrade
+
+ get_ignores
+
+ get_need
+
+POST Requests
+
+ post_ping
+
+ post_config
+
+ post_restart
+
+ post_reset
+
+ post_shutdown
+
+ post_error
+
+ post_error_clear
+
+ post_discovery_hint
+
+ post_scan
+
+ post_upgrade
+
+ post_ignores
+
+ post_bump
+
+AUTHOR
+
+    Chris Hughes <chrisjh@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Chris Hughes.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

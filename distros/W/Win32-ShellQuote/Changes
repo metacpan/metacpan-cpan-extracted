@@ -1,0 +1,33 @@
+Release history for Win32-ShellQuote
+
+0.003001 - 2016-09-27
+  - fix compatibility with perl 5.6
+
+0.003000 - 2015-12-05
+  - add functions for splitting a quoted string and unescaping a cmd string.
+  - Split tests into quoting tests and system call tests.  Some of the tests
+    will only be run in author mode.  This greatly reduces the time taken by
+    the tests.
+  - fix shell metacharacter detection with newlines and multiple quoted sections.
+
+0.002003 - 2015-04-06
+  - drop all non-core prerequisites
+
+0.002002 - 2014-08-16
+  - be compatible with older Exporter
+  - more extensive testing
+  - include additional metadata
+
+0.002001 - 2012-11-18
+  - Fix escape code used for vertical tab, which fixes perl 5.8 compatibility.
+
+0.002000 - 2012-10-04
+  - Simplify quoting and metacharacter detection to use regexes
+    instead of character loops.
+  - Don't run random string tests unless in author mode
+
+0.001001 - 2012-04-19
+  - Set proper Capture::Tiny prereq version
+
+0.001000 - 2012-04-04
+  - Initial release

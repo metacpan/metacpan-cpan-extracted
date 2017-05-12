@@ -1,0 +1,8 @@
+README					Do it! Read it.
+Changes					Changes for this module
+Makefile.PL				Module build meta-data
+MANIFEST
+t/WebService-Validator-Feed-W3C.t	automated (mini) test suite
+lib/WebService/Validator/Feed/W3C.pm	W3C Feed Validation service Web Service access class
+META.yml                                Module meta-data (added by MakeMaker)
+bin/feedvalidate.pl			validate RSS or atom feeds from the command line

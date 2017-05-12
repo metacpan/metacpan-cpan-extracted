@@ -1,0 +1,28 @@
+Changes
+lib/Win32/MSI/HighLevel/Common.pm
+lib/Win32/MSI/HighLevel/ErrorTable.pm
+lib/Win32/MSI/HighLevel/Handle.pm
+lib/Win32/MSI/HighLevel/Record.pm
+lib/Win32/MSI/HighLevel/Summary.pm
+lib/Win32/MSI/HighLevel/View.pm
+lib/Win32/MSI/HighLevel.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+Samples/InstallerTemplate.msi
+Samples/InstallMyself.msi
+Samples/InstallMyself.pl
+Samples/LICENSE.rtf
+Samples/README.rtf
+Samples/tables/InstallExecuteSequence.idt
+Samples/tables/InstallUISequence.idt
+t/01_HighLevel.t
+t/delme.msi
+t/Tables/Directory.idt
+t/Tables/Feature.idt
+t/Tables/File.idt
+t/Tables/Property.idt
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

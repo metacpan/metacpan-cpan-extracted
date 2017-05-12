@@ -1,0 +1,21 @@
+WebService::CloudPT example
+
+- auth.pl 
+
+This script will allow you to get an access_token and acess_secret for you cloudpt account with you app, 
+before using it, you'll need to get an account at https://cloudpt.pt and register your app.
+
+When registering your app, use http://localhost:3000/callback_cloudpt as callback URL
+and update auth.pl with your app key and secret. Once you're done, run the script
+
+perl auth.pl 
+
+and point your browser to http://localhost:3000
+
+If everything goes as plan you'll be redirected to cloudpt.pt to allow access to your accout, and you
+will be redirected to http://localhost:3000/callback_cloudpt where you will see your access_token and 
+access_secret as well as your email address .
+
+You'll need to install Dancer (cpan Dancer) to use this script
+
+

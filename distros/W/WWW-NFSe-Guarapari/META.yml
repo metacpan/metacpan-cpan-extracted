@@ -1,0 +1,28 @@
+---
+abstract: 'Another scraper perl'
+author:
+  - 'Álvaro Luiz Andrade <alvaro@web2solutions.com.br>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-NFSe-Guarapari
+requires:
+  HTML::Entities: 0
+  HTML::TreeBuilder::XPath: 0
+  JSON: 0
+  WWW::Mechanize: 0
+  strict: 0
+  utf8: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/AlvaroBrasilia/WWW-NFSe-Guarapari/issues
+  homepage: http://search.cpan.org/dist/WWW-NFSe-Guarapari/
+  repository: git://github.com/AlvaroBrasilia/WWW-NFSe-Guarapari.git
+version: 0.02

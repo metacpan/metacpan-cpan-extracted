@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SimplePlotter.pm
+t/1-use.t
+t/2-create.t
+t/3-setpoints.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                Module meta-data (added by MakeMaker)

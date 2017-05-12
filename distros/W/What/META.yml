@@ -1,0 +1,19 @@
+abstract: 'Find out what services run, MTAs to start with'
+author: 'Toni Prug <toni@irational.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.56
+license: gpl
+name: What
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Error: 0
+  Exception::Class: 1.21
+  IO::Socket::INET: 0
+  Net::Cmd: 0
+version: 1.00

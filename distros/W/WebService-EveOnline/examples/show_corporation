@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use WebService::EveOnline;
+
+my $API_KEY = $ENV{EVE_API_KEY};
+my $USER_ID = $ENV{EVE_USER_ID};
+
+unless ($API_KEY && $USER_ID) {
+    print "Please export EVE_API_KEY and EVE_USER_ID before running\n";
+    exit;
+}
+
+my $wanted = $ARGV[0] || undef;
+
+my $eve = WebService::EveOnline->new( { user_id => $USER_ID, api_key => $API_KEY } );
+
+foreach my $character ($eve->characters) {
+    next if $wanted && $wanted ne $character->name;
+    my @members = $character->corporation->members if $character->corporation->members;
+    
+    foreach my $member (@members) {
+        print $member->name . " is" . ($member->online ? " " : " not ") . "online\n";
+    }
+}

@@ -1,0 +1,21 @@
+# configuration file for production environment
+
+log: "warning"
+logger: "file"
+warnings: 0
+show_errors: 0
+
+# cache route resolution for maximum performance
+route_cache: 1
+
+plugins:
+    DBIC:
+        default:
+            dsn: dbi:mysql:pastebin
+            user: pastebin
+            pass: 
+            schema_class: WWW::Hashbang::Pastebin::Schema
+    EscapeHTML:
+        automatic_escaping: 1
+
+key: SbZ7ethU8BqLRGEnFckWiJw9-ACMjxpO_rafzoI2Hs3mvgXDy+$PVdNYTu1K!l50Q46

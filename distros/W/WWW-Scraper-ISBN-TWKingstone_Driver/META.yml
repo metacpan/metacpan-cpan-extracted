@@ -1,0 +1,23 @@
+--- 
+abstract: Search driver for TWKingstone's online catalog.
+author: Ying-Chieh Liao <ijliao@csie.nctu.edu.tw>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: WWW-Scraper-ISBN-TWKingstone_Driver
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Template::Extract: 0.40
+  Test::More: 0
+  Text::Iconv: 1.14
+  WWW::Mechanize: 1.16
+  WWW::Scraper::ISBN: 0.25
+  WWW::Scraper::ISBN::Driver: 0.18
+  perl: 5.6.1
+version: 0.02

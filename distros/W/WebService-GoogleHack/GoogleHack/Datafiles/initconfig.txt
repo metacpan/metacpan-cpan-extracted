@@ -1,0 +1,9 @@
+GoogleHack
+
+basedir::  # Give path to List of Adjectives,dont forget the forward slash at the end
+
+taggerdir:: #please give path to the brill tagger
+
+key::  	#give key to google access
+
+wsdl::	#give path to wsdl file

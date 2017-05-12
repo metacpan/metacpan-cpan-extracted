@@ -1,0 +1,7 @@
+severity = 3
+verbose  = 9
+exclude  = ValuesAndExpressions::ProhibitVersionStrings RegularExpressions::RequireExtendedFormatting ValuesAndExpressions::ProhibitVersionStrings Subroutines::RequireArgUnpacking
+include  = Variables::ProhibitPackageVars
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+

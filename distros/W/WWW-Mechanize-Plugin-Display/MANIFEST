@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/WWW/Mechanize/Plugin/Display.pm
+t/basic.t

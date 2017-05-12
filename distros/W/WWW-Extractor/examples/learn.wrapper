@@ -1,0 +1,71 @@
+#!/usr/bin/perl 
+use lib "/var/www/lib";
+use WWW::Extractor;
+use Getopt::Long;
+use Data::Dumper;
+
+$OUTPUT_AUTOFLUSH = 1;
+my ($debug) = 0;
+my ($exact_tables) = 1;
+my ($start_tags) = 2;
+my ($end_tags) = 1;
+my ($dump_one) = 0;
+my ($expand_hrefs) = 0;
+my ($extract_grammar) = 0;
+my ($load_grammar) = "";
+
+GetOptions("debug=i"=>\$debug,
+	   "exact-tables!"=>\${exact_tables},
+	   "start-tags=i"=>\$start_tags,
+	   "end-tags=i"=>\$end_tags,
+	   "expand-hrefs"=>\${expand_hrefs},
+	   "dump-one"=>\${dump_one},
+	   "extract-grammar"=>\${extract_grammar},
+	   "load-grammar=s"=>\${load_grammar}
+);
+my ($extractor) = WWW::Extractor->new();
+$extractor->debug($debug);
+$extractor->expand_hrefs($expand_hrefs);
+$extractor->start_tags($start_tags);
+$extractor->end_tags($end_tags);
+$extractor->exact_tables($exact_tables);
+$extractor->capture("href",
+		    qr/<hr>\*\*\s+(.*?)<br>/);
+
+my ($lp) = "";
+while (<STDIN>) {
+    s/\r//gi;
+    $lp .= $_;
+}
+
+$lp =~ s/<\!\-\-.*?\-\->//gis;
+$lp =~ s/\&nbsp;/ /gis;
+
+my (%f);
+
+if ($extract_grammar) {
+    my($tokens) = $extractor->tokenize($lp);
+    my($g) = $extractor->extract_grammar($tokens);
+    print Dumper($g), "\n";
+    exit;
+}
+
+if ($load_grammar ne "") {
+    require $load_grammar;
+    $g = $VAR1;
+    $extractor->open($lp, $g);
+} else {
+    $extractor->open($lp);
+}
+
+while ($extractor->read(\%f)) {
+    my ($item);
+    foreach $item (keys %f) {
+	print "$item  $f{$item}\n";
+    }
+    print "\n";
+    if ($dump_one) {
+	last;
+    }
+}
+$extractor->close();

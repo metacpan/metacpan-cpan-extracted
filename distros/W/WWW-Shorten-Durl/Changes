@@ -1,0 +1,17 @@
+Revision history for Perl extension WWW::Shorten::Durl
+
+0.05    Wed Feb  8 23:00:00 2011
+        - Added repository on resources
+
+0.04    Fri Oct  2 17:45:00 2009
+        - fixed more typos
+        - deleted to ignore files
+ 
+0.03    Fri Oct  2 17:30:00 2009
+        - fixed typos
+ 
+0.02    Fri Oct  2 17:00:00 2009
+        - Added a function to get a capture image of url - get_image
+
+0.01    Fri Oct  2 10:14:04 2009
+        - original version

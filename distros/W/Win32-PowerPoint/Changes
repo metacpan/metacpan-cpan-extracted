@@ -1,0 +1,49 @@
+Revision history for Win32-PowerPoint
+
+0.10  2014/11/24
+  - added a sample converter that I'm using.
+  - fixed an issue due to the change of PowerPoint 2007+
+    that made texts added after a footer (almost) invisible
+    (reported by Jaakko Holmen)
+
+0.09  2008/10/31
+  - added add_picture and add_(master_)footer (David Kao's request)
+  - short instruction of how to use "Record New Macro" menu.
+  - minor refactoring
+
+0.08_01  2008/06/08
+  - better Cygwin support with Filesys::CygwinPaths and
+    Cygwin::posix_to_win_path (since perl 5.10)
+
+0.08  2008/05/25
+  - added convert_cygwin_path function to ::Utils
+    for better Cygwin support.
+
+0.07  2008/05/22
+  - maintenance release: silence several warnings.
+
+0.06  2007/12/29
+  - maintenance release: no significant code changes
+  - skip basic test if MS PowerPoint is not installed.
+
+0.05  2007/05/27
+  - maintenance release: no significant code changes
+  - added license info to Makefile.PL
+
+0.04  2007/01/17
+  - added insert_before/insert_after methods (Austin Ekwebelam's request)
+  - new_presentation/new_slide now accepts several options (ibid)
+  - more text/range decorations (ibid)
+  - overall code refactoring
+
+0.03  2006/07/19
+  - add_text() now accepts link option (Nguyen Minh Duc's request).
+  - added several Win32::OLE accessors.
+  - added some basic tests.
+
+0.02  2006/07/02
+  - oops. fotgot to include Win32::PowerPoint::Constants.
+
+0.01  2006/06/29
+  - First version
+

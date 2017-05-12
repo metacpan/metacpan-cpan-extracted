@@ -1,0 +1,38 @@
+<!-- BEGIN user_preferences_content -->
+[% screen_title = 'User Preferences' %]
+<div class="user_preferences">
+<form method="post">
+<input type="submit" name="button" value="SAVE" />
+[% IF errors %]
+<span class="error">Errors in input. Values not saved.</span>
+[% END %]
+<br />
+<br />
+<table width="100%">
+[% FOR pref = self.preference_objects %]
+<tr>
+<td align="right">
+<table><tr><td>
+<b>[% pref.query %]</b>
+</td></tr></table>
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+[% method = pref.type %]
+[% pref.$method %]
+</td>
+</tr>
+<tr colspan="3"><td>
+[% IF pref.error %]
+<span class="error">[% pref.error %]</span>
+[% ELSE %]
+&nbsp;
+[% END %]
+</td></tr>
+[% END %]
+</table>
+<input type="hidden" name="action" value="user_preferences" />
+</form>
+<!-- END user_preferences_content -->

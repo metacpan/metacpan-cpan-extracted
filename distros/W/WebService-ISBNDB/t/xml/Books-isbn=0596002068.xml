@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:30Z">
+<BookList total_results="1" page_size="10" page_number="1" shown_results="1">
+<BookData book_id="programming_web_services_with_perl" isbn="0596002068">
+<Title>Programming Web services with Perl</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Randy J. Ray and Pavel Kulchenko</AuthorsText>
+<PublisherText publisher_id="oreilly">Farnham ; O'Reilly, 2002 printing, c2003.</PublisherText>
+<Details dewey_decimal="005.2762" physical_description_text="xiii, 470 p. : ill. ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="5.2762" lcc_number="TK5105.888" change_time="2003-11-05T16:12:06Z" price_time="2006-09-25T00:45:46Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. 434-437) and index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-07T02:49:46Z" currency_rate="1" price="39.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:10Z" currency_rate="1" price="28.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:10Z" currency_rate="1" price="27" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:10Z" currency_rate="1" price="29.96" />
+<Price store_isbn="" store_title="Programming Web Services with Perl" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="26.37" />
+<Price store_isbn="" store_title="" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=2803520" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="25.05" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="Programming Web Services with Perl" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="14.5" />
+<Price store_isbn="" store_title="Programming Web Services with Perl - Visual Quickstart Guide" store_url="95670524&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="27" />
+<Price store_isbn="" store_title="Programming Web Services with Perl" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="14.45" />
+<Price store_isbn="" store_title="Programming Web Services with Perl" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:11Z" currency_rate="1" price="26.76" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30877923%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:14Z" currency_rate="1" price="23.73" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780596002060" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:14Z" currency_rate="1" price="28.15" />
+<Price store_isbn="" store_title="Programming Web Services with PERL" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:14Z" currency_rate="1" price="39.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:17Z" currency_rate="1" price="29.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:17Z" currency_rate="1" price="32" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0596002068&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-25T00:43:17Z" currency_rate="1" price="43.95" />
+<Price store_isbn="" store_title="Programming Web Services with Perl Product 1715808" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1715808&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:21Z" currency_rate="1" price="24.79" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:26Z" currency_rate="1" price="27.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:43:26Z" currency_rate="1" price="22.5" />
+<Price store_isbn="" store_title="Programming Web Services With Perl by Pavel Kulchenk..." store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-25T00:43:59Z" currency_rate="1" price="12" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/programming_web_services_with_perl/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-25T00:45:46Z" currency_rate="1" price="27.96" />
+</Prices>
+<Subjects>
+<Subject subject_id="perl_computer_program_language">Perl (Computer program language)</Subject>
+<Subject subject_id="internet_programming">Internet programming</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Pittsburg" last_update="2003-11-05T16:12:06Z" marc_url="http://isbndb.com/x/libdata/isbndb-298-programming_web_services_with_perl-20031105.mrc" />
+<MARC library_name="Concordia University -- Montreal, Canada" last_update="2004-08-30T01:35:01Z" marc_url="http://isbndb.com/x/libdata/isbndb-200-programming_web_services_with_perl-20040829.mrc" />
+<MARC library_name="California State University, Hayward" last_update="2005-02-05T14:26:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-26-programming_web_services_with_perl-20050205.mrc" />
+<MARC library_name="University of Hong Kong" last_update="2005-12-22T20:52:44Z" marc_url="http://isbndb.com/x/libdata/isbndb-325-programming_web_services_with_perl-20051222.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="ray_randy_j">Ray, Randy J.</Person>
+<Person person_id="kulchenko_pavel">Kulchenko, Pavel</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

@@ -1,0 +1,33 @@
+Revision history for Perl extension WAP::wmls.
+
+1.13  Wed Dec 26 12:30:00 2007
+	- fix Unicode with Perl 5.10
+
+1.12  Wed Nov 07 12:30:00 2007
+	- add prereq Perl 5.8
+
+1.11  Mon Nov 05 18:30:00 2007
+	- package refactoring
+
+1.10  Tue Oct 10 12:30:00 2006
+	- depends of Perl 5.8 (remove old Unicode dependances)
+
+1.03  Tue Aug  8 18:30:00 2006
+	- fix use of Math::Big*
+	- fix generation for pre-decrement
+	- fix generation for logical op
+
+1.02  Sun Jul 16 22:30:00 2006
+	- Perl 5.8
+	- best practices
+
+1.01  Wed Aug 14 18:30:00 2002
+	- problem with test.pl
+
+1.0   Thu Feb 14 20:30:00 2002
+	- first release
+
+0.01  Thu Feb 14 19:37:54 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n WAP::wmls
+

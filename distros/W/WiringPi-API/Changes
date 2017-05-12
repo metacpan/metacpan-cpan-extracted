@@ -1,0 +1,185 @@
+Revision history for Perl extension WiringPi::API.
+
+2.3609  2017-03-26
+        - fix unicode POD error
+        - fix declaration issue for digitalReadByte2()
+        - add a 0.02 second delay in pull_up_down(), as it wasn't returning
+          fast enough to re-init the pin (this broke interrupts)
+             
+2.3608  2017-03-13
+        - clarified POD for lcd_put_char() and lcd_char_def()
+        - clean up test XS code
+        - remove all code related to creating threads. That's out of scope for
+          this project (closes #2)
+        - moved all XS/C declarations into a separate API.h file from API.xs
+        - changed versioning scheme from 2.36.x to 2.360x
+
+2.36.7  2017-03-09
+        - disable tests when not on a Pi board (within a BEGIN block)
+        - added INLINE.h to MANIFEST file (re-closes #8)
+        - fix bug in lcd_init(), where we weren't extracting the values from the
+          argument hash, thereby too many args were being passed into lcdInit()
+          C function (closes #27)
+        - added a workaround for lcd_char_def(). For some reason, we need to
+          print a zero-width char before calling the C function lcdCharDef().
+          One day I'll need to sort out why (closes #26)
+        - in lcd_char_def(), changed from "V0C*" to "C[8]" for pack()
+        - removed duplicate test declaration in t/00-load.t
+        - removed the :wiringPi and :perl export tags from POD, we only
+          advertise :all now, which only exports the Perl functions (all are
+          still available in code though)
+
+2.36.6  2017-02-22
+        - added in I2C support (work on #22)
+        - fix a boatload of C warnings due to functions not being pre-declared
+          (work on #25)
+        - added -lrt to LIBS in Makefile.PL to correct a "shm_open() undefined
+          symbol" error when testing with "make test" (closes #25)
+        - removed taint from tests
+        - added $state param for lcd_cursor_blink() in POD (closes #24)
+        - fix miniscule POD error (closes #17)
+        - added "barometric" to the POD's bmp180 section (closes #16)
+        - POD typo fix (closes #15)
+        - replaced BCM with GPIO in POD (closes #14)
+        - fix output constant in get_alt() in POD (PWM_OUT) (closes #13)
+
+2.36.5  2017-02-13
+        - lower-cased Inline functions in XS file
+
+2.36.4  2017-01-26
+        - modified spiDataRW(). It now returns a Perl array containing the same
+          number of elements as was sent in. A write aref is sent in (with
+          dummy bytes in each element) for the size of array you want back that
+          contains the read data (fixes #23)
+
+2.36.3  2017-01-22
+        - changed TOC to "TABLE OF CONTENTS" in POD (closes #18)
+        - modified dist description in POD
+        - added blurb in softpwm section that this functionality is quite
+          unreliable
+        - removed the code that skipped over the first interrupt in XS, as
+          the new wiringPi corrected the issue internally
+        - added POD for ads1115_setup()
+        - added test file for wiringPi's representation of the ADS1115 ADC
+        - added support for communicating on the SPI bus (spi_setup() and
+          spi_data()
+        - added spiDataRW() (C), which wraps wiringPiSPIDataRW() so that we
+          can accept an AV* (aref) before transforming it into the proper 
+          unsigned char* before sending it to wiringPiSPIDataRW()
+
+2.36.2  2017-01-19
+        - added function table of contents to POD
+        - added declaration of custom wiringPiVersion() in XS, but left it
+          commented out as it will break CPAN installs at this time
+        - added version.patch file in patches/, patch sent to Gordon
+        - all four setup routines added to test/setup.pl
+        - added in wiringPi's support for the Adafruit ADS1115 analog to digital
+          converter (I'm going to do a rewrite of this code to support 1015, as
+          well as allowing all ADC options to be configurable, and hope it gets
+          included in the next wiringPi cut)
+        - added docs/, which includes Fritzing diagrams and schematics
+        - added DEVELOPER FUNCTIONS section in POD for dev testing of private,
+          unpublished or unreleased functions
+        - added pseudoPinsSetup() for testing purposes
+        - reworded POD for setup() routines, as we no longer require root level
+          access to run our scripts (yay!)
+        - wrote test/pwm.pl, fully tests the hardware PWM functionality
+        - added test/pud.pl, testing for pull up/down internal resistors
+        - changed board_rev() references in POD to gpio_layout() (fixes #9)
+        - added test/pin_translations.pl, test all pin translation functions
+        - added pinModeAlt() as a developer function (allows setting any pin to
+          any valid mode)
+        - added digitalReadByte(), digitalReadByte2(), digitalWriteByte() and
+          digitalWriteByte2() as developer functions. Reads and writes an 8-bit
+          byte to/from the first and second bank of eight GPIO pins respectively
+        - added setup tests, since an issue was found that causes some calls to
+          crash the system (journal, RO), added root checks. Notes taken on
+          sourcing the issue(s)
+
+2.36.1  2017-01-15
+        - changed version numbering scheme. x.yy.z: x.yy represents the version
+          of wiringPi we fully support, and z represents updates to this Perl
+          distribution
+        - renamed examples/ to samples/ so they don't show up on the CPAN's
+          front page for the distribution
+        - added exports for physPinToWpi() and phys_to_wpi() to correct a test
+          breakage
+        
+2.36    2017-01-14
+        - major updates, we now require wiringPi v2.36+
+        - changed version numbering scheme. We now match the wiringPi version
+          number that we fully support
+        - changed piBoardRev() to piGpioLayout(), and board_rev() to 
+          gpio_laout() per changes in wiringPi.c/h
+        - added analogRead()/analog_read() and analogWrite()/analog_write() to
+          support the BMP180 sensor
+        - added bmp180_setup()/bmp180Setup()
+        - added bmp180_temp() and bmp180_pressure()
+        - added POD for all the new functionality
+
+1.05    2017-01-13
+        - added support for the SR74HC595 shift register (shift_reg_setup() for
+          Perl, and the original sr595Setup())
+        - added examples/sr.pl for the shift register code
+
+1.04    2016-08-22
+        - implemented softPwmCreate(), softPwmWrite() and softPwmStop(), perl:
+          soft_pwm_create(), soft_pwm_write(), soft_pwm_stop()
+        - interrupts now work; added code to stop the erroneous extra call to
+          the handler on first interrupt
+
+1.03    2016-08-18
+        - fixed call to SetupGpio(), case was wrong
+        - renamed gpio_scheme() call to pin_scheme()
+        - removed erroneous call to external module (pin_scheme())
+        - POD cleanup, re-worded $pin descriptions, and fixed up setup*()
+          routine explanations
+
+1.02    2016-08-16
+        - removed references to wiringPi pin numbering scheme being the default
+        - added clarification in setup*() routine POD
+
+1.00    2016-08-16
+        - new export tags, :wiringPi exports the originally named wiringPi
+          functions directly from XS. :perl exports the Perl representation
+          of the functions, and :all exports them all
+        - setup_sys() now exports all BCM pins with a system call with sudo,
+          which alleviates the need to run as user root
+        - interrupt code now implemented and working
+        - renamed to WiringPi::API
+
+0.06    2016-08-13
+        - moved arg validation out of Core and into upper-layer client
+          software. The idea is to keep this module as close to the C code
+          as possible, so if this module is used directly, C will handle the
+          problem
+        - wrote custom physPinToWpi() C function, and added a phys_to_wpi()
+          caller
+        - we now shift off the object or class name if it is present in all
+          sub calls
+        - all parameter error handling out, and put it into the upper layers...
+          we now pretty much call the C functions directly with little overhead
+
+0.05    2016-08-11
+        - added all of the wiringPiDev shared library LCD functions, and
+          mapped them in ::Core
+
+0.04    2016-08-10
+        - wiringPiSetupPhys() has been implemented
+        - added piBoardRev(), wpiPinToGpio(), physPinToGpio() and pwmSetRange()
+          functions
+        - added Perl->C mappings in POD
+
+0.03    2016-08-10
+        - added repo info to Makefile.PL
+        - added get_alt(), maps to C getAlt(). This returns the current mode
+          of a pin. Why it's not called getMode() is beyond me ;)
+
+0.02    2016-08-10
+        - added notices to POD
+        - added POD for pwm_write()
+
+0.01    2016-08-10
+        - separated out from RPi::WiringPi
+        - most core and system functions implemented
+

@@ -1,0 +1,22 @@
+Revision history for Perl extension Win32::DriveInfo.
+
+ 0.01 - first public release
+
+ 0.02 - Austin Durbin <adurbin@earthlink.net> tested module on Win NT
+        and discovered small bug in UNC paths handling. Fixed.
+        Thanks Austin!
+
+ 0.03 - fixed bug that returned incorrect values for volumes that are
+        larger than 0x7fffffff bytes (2 GB). Approved on Win98 with FAT32.
+
+ 0.04 - Mon Mar 13 09:33:02 2000
+	added IsReady() function and MakeMaker compartible distribution.
+        Empty SerialNumber fixed. Now it's empty string, previously it
+	was evaluated to 0000:0000.
+	Minor enhancements.
+
+ 0.05 - test.pl fixed, other minor fixes. 
+	The last 0.0x version before the major update (soon!)
+
+ 0.06 - test.pl fixed more ;-)
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Perl interface to the HabitRPG (Habitica) API'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-HabitRPG
+requires:
+  Carp: '0'
+  Config::Tiny: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  JSON::Any: '0'
+  LWP::Protocol::https: '0'
+  Method::Signatures: '20121201'
+  Moo: '0'
+  Mozilla::CA: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  WWW::Mechanize: '0'
+  autodie: '0'
+  constant: '0'
+  perl: v5.10.0
+  strict: '0'
+  utf8::all: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/pjf/WebService-HabitRPG.git
+version: '0.28'

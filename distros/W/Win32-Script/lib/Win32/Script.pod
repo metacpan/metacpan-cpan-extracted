@@ -1,0 +1,1192 @@
+=head1 NAME
+
+Win32::Script - system administrator`s library
+- for login and application startup scripts, etc
+
+
+=head1 SYNOPSIS
+
+ use Win32::Script;                # or use Win32::Script ':DEFAULT'
+ $a =FileRead('c:\\autoexec.bat');
+ FileDelete('-r','c:\\tmp\\*');
+ FileEdit('c:\\autoexec.bat',sub{s/(SET *TMP *= *)/${1}c:\\tmp/i});
+ use Win32::Script ':ALL';         # import from @EXPORT and @EXPORT_OK
+ Print('Using','all','functions','from','@EXPORT','and','@EXPORT_OK');
+ use Win32::Script ':ALL',':OVER'; # silently overwrite with imported
+
+
+=head1 DESCRIPTION
+
+At primary this module was written for system administrator needs in 
+centralised administration of Win32 clients: logon and application 
+startup scripts, etc. Later some functions useful in Windows NT server 
+scripts was added. Now many functions may run on UNIX or may be 
+developed for it. But area of Win32 servers and clients is very specific.
+
+This module was made for several reasons:
+
+- for useful functions does not (yet?) implemented as core perl functions.
+
+- for more flexible and powerful functional style programming functions, than exists.
+
+- to load used perl modules when required, with "eval('use ...')".
+
+- to support scripting modes: printing of commands executed, die on errors.
+
+This module calls for it`s functions many other modules from standard 
+and site perl libraries and OS commands, and depends on their 
+implementations and limitations. GUI functions implemented with Perl Tk.
+
+Currently this module is implemented and tested on Win32 platform.
+
+ 
+
+=head1 VARIABLES
+
+ use vars qw($Interact $GUI $Echo $ErrorDie $Error $FileLog $Print %WScript);
+
+ # example usage: $Win32::Script::Interact=0
+
+ $Interact   =1;   # interact with user in functions as Prompt, Die, GUIMsg
+ $GUI        =1;   # use GUI interaction instead of terminal in functions 
+                   # as Die, GUIMsg
+ $Echo       =1;   # print commands as 'set echo on' in DOS
+ $ErrorDie   =0;   # die on error if 1, 2 inside Try
+ $@ = $Error ='';  # last error occurred
+ $FileLog    ='';  # log file name (LOG handle) for Echo, Print, errors...
+ $Print      ='';  # external print routine reference
+
+NOTE:
+
+Some functions have not printout, and are not controlled by $Echo. Some
+functions are not controlled by $Echo due to used components.
+
+
+
+=head1 RESULTS of FUNCTIONS
+
+Some (boolean) functions returns TRUE to show success, or FALSE (0, '').
+
+Returning values functions returns on error empty value: 0 or '' or ().
+
+Undefined and negative results are escaped as possible for better 
+functional programming style support. 
+Values '0E0' or '0 but true' (numeric 0 and logical true) are not used.
+
+Variable $@ or $Error may be used to distinguish erroneous empty values from normal.
+
+
+
+=head1 CLASSES of FUNCTIONS
+
+(see L<Exporter>)
+
+@EXPORT = qw(CPTranslate Die Echo FileACL FileCompare FileCopy FileCRC FileCwd FileDelete FileDigest FileEdit FileFind FileGlob FileHandle FileIni FileLnk FileMkDir FileNameMax FileNameMin FileRead FileSize FileSpace FileTrack FileWrite FTPCmd GUIMsg NetUse OLECreate OLEGet OrArgs Pause Platform Print Registry Run RunInf RunKbd SMTPSend StrTime UserEnvInit UserPath WMIService WScript);
+
+@EXPORT_OK = qw(FileLog TrAnsi2Oem TrOem2Ansi Try(@) TryHdr);
+
+%EXPORT_TAGS = ('ALL'=>[@EXPORT,@EXPORT_OK], 'OVER'=>[]);
+
+=over
+
+=item Error processing functions
+
+C<Try>, C<TryHdr>
+
+=item File functions
+
+C<FileACL>, C<FileCompare>, C<FileCopy>, C<FileCRC>, C<FileCwd>, C<FileDelete>, 
+C<FileDigest>, 
+C<FileEdit>, C<FileFind>, C<FileGlob>, C<FileHandle>, C<FileIni>,
+C<FileLnk>,
+C<FileLog>,
+C<FileMkDir>, 
+C<FileNameMax>, C<FileNameMin>, C<FileRead>, C<FileSize>, C<FileSpace>, 
+C<FileTrack>, C<FileWrite>
+
+=item FTP functions
+
+C<FTPCmd>
+
+=item Registry functions
+
+C<Registry>
+
+=item Run & Misc functions
+
+C<OrArgs>, C<Run>, C<RunInf>, C<RunKbd>, C<OLECreate>, C<OLEGet>,
+C<NetUse>, C<Platform>, C<WScript>, C<WMIService>,
+C<UserEnvInit>, C<UserPath>
+
+=item Mail functions
+
+C<SMTPSend>
+
+=item String functions
+
+C<CPTranslate>, C<TrAnsi2Oem>, C<TrOem2Ansi>, C<StrTime>
+
+=item Interactive functions
+
+C<Die>, C<GUIMsg>, C<Pause>, C<Print>, C<Echo>
+
+=item Obsolete functions
+
+C<TrAnsi2Oem>, C<TrOem2Ansi>
+
+=back
+
+
+
+=head1 FUNCTIONS
+
+=over
+
+=item CPTranslate ( fromCP, toCP, string,... ) -> $translatedString
+
+=item TrAnsi2Oem ( ansiString ) -> oemString - obsolete, not recommended
+
+=item TrOem2Ansi ( oemString ) -> ansiString - obsolete, not recommended
+
+Translates strings from codepage fromCP to codepage toCP,
+returns translated string or list of strings. 
+Codepages may be 'oem', '866','ansi', '1251','koi' prone of koi8,
+'8859-5' prone of ISO 8859-5.
+
+
+=item Die ( ?string,... )
+
+Displays blank delimited strings to user and dies with error code 1. 
+As a default message $@ is used.
+For GUI uses C<GUIMsg> with text translated from 'oem' to 'ansi'.
+If $Interact == 0, does not waits for user response.
+
+
+=item Echo ( text,... ) -> success
+
+Prints given text list delimited with blanks and terminated with "\n". May be
+switched off with $Echo or redefined with $Print.
+
+
+=item FileACL ( ?'-r+', fileMask, ?sub(...), user => access,... ) -> success
+
+Sets access control list for directories and files matching fileMask and sub.
+Without given access control list, prints current, this behaviour may be changed.
+Uses C<FileFind>, L<Win32::FileSecurity|Win32/FileSecurity>.
+
+Options: 'r'ecurse subdirectories, '+' - add ACL entries instead of replacing them.
+
+Sub parameters are like in C<FileFind>.
+
+Access: 'add' (not implemented), 'add&read', 'add&list' (not implemented), 'read', 'change', 'full',
+reference to array of array references [[directory low level rights],[file low level rights]].
+
+
+=item FileCompare ( file1, file2 ) -> differs
+
+Compares two files and returns 0 for identical files, 1 for unequal files, -1 when error.
+Uses L<File::Compare|File/Compare>
+
+
+=item FileCopy ( ?'-rdfi', fromFileMask, toPath ) -> success
+
+Copies fromFileMask to toPath. On 'MSWin32' uses C<xcopy> with switches H, R, K, E, Q, Z.
+
+Options: 'r'ecurse subdirectories,
+'d'irectory target hint,
+'f'ile target hint,
+'i'gnore errors - continue copying.
+
+
+=item FileCRC (?'-adler', file) -> CRC
+
+Calculates CRC of file or 0 if error. Uses L<Compress::Zlib|Compress/Zlib>.
+
+Options: 'adler' or 'adler32' or '-a adler', 'crc32' (default).
+
+
+=item FileCwd () -> cwd
+
+eval('use Cwd; getcwd()')
+
+
+=item FileDelete ( ?'-r', fileMask,... ) -> success
+
+Deletes files and directories fileMask. Uses C<FileGlob>.
+
+Options: 'r'ecurse subdirectories.
+
+
+=item FileDigest ( ?-digest, filename ) -> digest
+
+Returns hex digest (default MD5) of file given.
+Uses L<Digest::MD5|Digest/MD5>.
+
+
+=item FileEdit ( ?'-im', file, ?fileTo, sub(section, @variables)) -> success
+
+=item FileEdit ( file, ?'-im', sub ) - obsolete, not recommended
+
+Edits given file with given sub using local variable $_ for text to edit.
+Uses C<FileRead>, C<FileWrite>, L<File::Copy|File/Copy>.
+
+Options: 'i'nplace edit in memory (default),
+'i ext' - use temporary file with given extension,
+'m'ultiline edit instead of evaluation sub for each row of file.
+
+Parameters of sub: $_, $_[0] - section name (determined with '[' sign in row beginning),
+@_(1...) - temporary variables with lifetime of FileEdit execution.
+
+
+=item FileFind ( ?'-i!dlmrs', fileMask,..., sub(\@stat,path,name)...) -> num_matches
+
+=item FileFind ( ?'-i!dlmrs', fileMask,..., sub(\@stat,,,result)...) -> result
+
+=item FileFind ( ?'-i!dlmrs', sub(\@stat), fileMask...) - obsolete, not recommended
+
+Finds files and directories with given mask and evaluates sub, locally setting
+$_ to filename. Returns number of sub agrees, or result if defined, 
+or 0 on errors. There may be 
+several subs and several filemasks for each sub, and they will be executed
+within one transaction of FileFind call.
+Uses C<FileGlob>
+
+Options: 'i'gnore stat errors, '!' - not, 'd'irectories,
+'l'ow before deep scan, 'm'ountpoints,
+'r'ecurse directories, 's'ymlinks.
+
+Parameters of sub are local $_ with full current filename, $_[0] with
+reference to @stat array, $_[1] with path, $_[2] with filename, 
+$_[3] as optional result storage (initially undefined).
+Sub can return undefined value in $_ to signal stop, determine directories with
+$_[0]->[2] & 0040000, prevent recursing by assigning $_[0]->[2] =0.
+
+Options for C<FileFind> and based on it functions as C<FileACL>, 
+C<FileSize> 
+should and should not be the same. FileFind defaulty recurses, other 
+commands traditionally not. Set of FileFind options may be extended in future, 
+but existing programs should be preserved, and so FileFind options should be
+negative instead of traditionally positive options of other commands.
+Based on FileFind functions are restricted, not using all possible FileFind
+features. All functions may be called from comprehensive C<FileFind> to get
+all features.
+
+
+=item FileGlob ( mask ) -> filelist
+
+Globs filenames with mask and returns list of them such as 
+standard function C<glob>. On error returns empty list?
+When $^O eq 'MSWin32' own implementation with fragments from 
+L<File::DosGlob|File/DosGlob> is used, else C<glob> is called.
+
+Standard glob is not well on Win32 platforms,
+when working with filenames in foreign languages 
+and calling external executable dosglob.exe should be placed in path.
+
+L<File::DosGlob|File/DosGlob> has some problems with non-english letters 
+in filenames and long filenames.
+
+
+=item FileHandle ( \*filehandle, sub(oldhandle) ) -> result
+
+=item FileHandle ( filename, sub(oldhandle) ) -> result
+
+Selects given filehandle, evals sub, selects previously selected handle. 
+For filename, temporarily opens file with handle 'HANDLE',
+selects this handle, evals sub...
+Returns result of sub, or empty ('') if error.
+
+
+=item FileIni ( ?'-', file, item,... ) -> success
+
+=item FileIni ( ?'-', file) -> hash of items
+
+Edits ini-file in Windows format with given items. 
+Without items returns a hash structure $hash{section}->{name}=value.
+Uses C<FileRead>, C<FileWrite>.
+
+Options: reserved for future use.
+
+Format of items:
+'[sectionName]', ';comment', [name => value];
+['[sectionName]', op], [';comment', op], [name, value, op]
+
+Operations: '+' - set (default), '-' -delete, 'i'nitial value, 'o'ptional value.
+
+
+=item FileLnk (?'-mda', ?filename) -> Win32::Shortcut object
+
+=item FileLnk (?'-mdac', filename, path, args, dir, description, show, hotkey, iconlocation, iconnumber ) -> Success
+
+=item FileLnk (?'-mdac', filename, {-path=>path, -arg=>args, -dir=>dir, -desc=>description, -show=>show, -hot=>hotkey, -il=>iconlocation, -in=>iconnumber}) -> Success
+
+Returns L<Win32::Shortcut|Win32/Shortcut> object or creates Win32 shortcut file.
+Uses L<Win32::Shortcut|Win32/Shortcut>.
+Filename may be absolute or relative to 'm'enu or 'd'esktop according to this options.
+Default filename extension is '.lnk'.
+Names of parameters for shortcut may be given above or may be names of properties of L<Win32::Shortcut|Win32/Shortcut> object.
+
+Options: 'm'enu relative filename, 'd'esktop relative filename,
+'a'll users profile use instead of current user profile,
+'c'reate shortcut file instead of update.
+
+
+=item FileLog (logfile) -> success
+
+=item FileLog () -> filename
+
+=item FileLog (undef)
+
+Sets or requests log file name, opens log file with LOG handle for
+errors, warnings, C<Echo>, C<Print>.
+
+
+=item FileMkDir ( dir, ?mask) -> success
+
+Executes standard L<mkdir|perlfunc/mkdir> call, uses optional access mask (0777 default).
+
+
+=item FileNameMax ( fileMask, ?sub(fullName, $_=fileName, digits)) -> max || (name, max)
+
+Finds filename with maximal number in it. Returns this number or 
+list of full filename and number in list context.
+Numeric comparing is used.
+Sub may be used to translate filename to comparable value or ignore values.
+Uses C<FileGlob>
+ 
+
+=item FileNameMin ( fileMask, ?sub(fullName, $_=fileName, digits)) -> name || (name, min)
+
+Finds filename with minimal number in it. Returns full name of this file or 
+list of full filename and number in list context.
+Numeric comparing is used.
+Sub may be used to translate filename to comparable value or ignore values.
+Uses C<FileGlob>
+ 
+
+=item FileRead ( ?'-asb', file, ?sub ) -> list of rows || data
+
+Reads given file into memory as array or list ('-a'), text scalar ('-s'),
+binary scalar ('-b'). Default, '-a' or '-b', is determined with L<wantarray|perlfunc/wantarray>.
+
+If sub is defined, it is evaluated for each row read into local $_, 
+and with '-a' option results of each evaluation are returned as a list, 
+true is returned otherwise.
+
+On error returns empty list or scalar, according to option '-a','-s','-b'.
+
+
+=item FileSize ( ?opt, fileMask, ?sub ) -> size in bytes
+
+Returns total size in bytes for directories and files matching fileMask and sub.
+Uses C<FileFind> with given options (-i default), 
+parameters of sub are the same.
+
+
+=item FileSpace ( ?filesystem ) -> free disk space in bytes
+
+Returns free disk space in bytes for specified dir.
+Users L<Win32::API|Win32/API>('kernel32', 'GetDiskFreeSpaceEx'||'GetDiskFreeSpace'...)
+or `\%COMSPEC\% /c dir $dir`.
+
+
+=item FileTrack ( ?'-it!cdrt', sourceDir, destDir, ?sub(\@stat,path,name)) -> arcDir
+
+Tracks changed files matched 'sub' in 'sourceDir' into 'destDir'.
+Returns path to new archive directory inside 'destDir' or empty string if none archived.
+'Sub' gets current filename in $_ and returns 'true' if match.
+Code and interface are like C<FileFind>.
+Uses C<FileCopy>, C<FileCRC>, C<FileGlob>.
+
+Options: 'i'gnore errors, 't'est and track CRC,
+'!' - not, 'c'opy changed files,
+'d'irectories, 'r'ecurse directories,
+'t'ime check.
+
+
+
+=item FileWrite ( ?'-b', file, data,...) -> success
+
+Writes given data into given file. Option '-b' chooses binary mode and
+binary write. Without '-b', each element of data list is printed with 
+trailing "\n" added.
+
+
+=item FTPCmd ( host, user, passwd, ?command, command, ?arguments) -> success
+
+=item FTPCmd ( {-host=>host, -user=>user, -passwd=>passwd}, ?command, command, ?arguments) -> success
+
+=item FTPCmd ( {-s=>host, -u=>user, -p=>passwd}, ?command, command, ?arguments) -> success
+
+Executes FTP command. First command may be 'ascii','binary','ebcdic','byte'.
+Second command may be 'dir', 'ls', 'get', 'put', sub($ftp).
+Returns result of command executed, for 'dir' and 'ls' - list of values.
+Uses L<Net::FTP|Net/FTP>.
+
+
+=item GUIMsg ( title, string,...)
+
+=item GUIMsg ( text )
+
+Popups given message to user.
+Uses L<Tk|Tk>.
+
+
+=item NetUse ( disk, resource ) -> success
+
+Executes Windows commands 'net use disk /d' and 'net use disk resource'.
+Uses C<Run>
+
+
+=item OLECreate ( progid, ?destructor ) -> OLE object
+
+Creates L<Win32::OLE|Win32/OLE> object
+via  L<Win32::OLE|Win32/OLE>->new(@_) call
+
+
+=item OLEGet ( moniker, ?destructor ) -> OLE object
+
+Gets L<Win32::OLE|Win32/OLE> object
+via  L<Win32::OLE|Win32/OLE>->GetObject(@_) call
+
+
+=item OLEIn ( OLE object | OLEGet args | OLECreate args ) -> list of OLE objects
+
+L<Win32::OLE|Win32/OLE>::in(object) call to list OLE containers.
+Example: foreach my $e (OLEIn('WinNT://domain/computer')) {print $e->{Class},"\t",$e->{Name},"\n"}
+
+
+
+=item OrArgs (sub, arg,...) -> succeeded arg
+
+=item OrArgs (function string, arg,...) -> succeeded arg
+
+Evaluates sub or function given with local $_ set to each arg
+until success. Returns successful arg. 
+Example: OrArgs('-d','c:/home','c:/users') returns first
+existed directory.
+
+
+=item Pause ( ?text,... ) -> response
+
+Prints given text list delimited with blanks and terminated with "\n", 
+reads row from STDIN and returns it.
+
+
+=item Platform ( parameter ) -> value
+
+Determine value of parameter: 
+'os', 'osname', 'win32', 'ver', 'patch', 'lang', 'prodid', 'windir',
+'name', 'domain', 
+'host', 'hostdomain',
+'user','userdomain'...
+Uses available environment variables, perl functions, OS commands, 
+stored in registry values.
+'windir' parameter may be used when Win32 'windir' environment variable is not available.
+
+
+=item Print ( text,... ) -> success
+
+Prints given text list delimited with blanks and terminated with "\n". May be
+redefined with $Print.
+
+
+=item Registry (?'-\\|/', key) -> value
+
+=item Registry (?'-\\|/', key, ?type, value) -> success
+
+=item Registry (?'-\\|/', key, value, ?type) - possible, but not recommended
+
+Works with values in Windows registry: returns value for given key and name,
+sets given value, deletes if undefined value given.
+Uses L<Win32::TieRegistry|Win32/TieRegistry>, error processing is unsupported.
+
+Option defines delimiter for key parts: '\\' (default), '|' or '/'. 
+
+Value name may be delimited with double delimiter ('key\\\\name') as 
+recommended L<Win32::TieRegistry|Win32/TieRegistry>, or single delimiter ('key\\name') as
+also supported.
+
+Last parts of key not present in registry are automatically created, 
+that improves behaviour of L<Win32::TieRegistry|Win32/TieRegistry>.
+
+Type may be 'REG_SZ' (default), 'REG_EXPAND_SZ', 'REG_BINARY', 'REG_MULTI_SZ', 'REG_DWORD'.
+
+
+=item Run (command, ?arguments) -> success
+
+Runs specified command with L<system|perlfunc/system> call, returns !($? || $!).
+Shell is used as in L<system|perlfunc/system> call - if command and arguments are in the same string.
+Last argument may be sub to print to program called.
+
+
+=item RunInf (filename, ?section, ?reboot mode) -> run string
+
+Generates command to run to install given inf-file on Windows.
+Default section name is 'DefaultInstall'.
+Default reboot mode is 128, not 132 as in Windows file association.
+
+
+=item RunKbd (?timeout, title mask) -> window handle
+
+=item RunKbd (?timeout, title mask, ?timeout, keyboard string) -> success
+
+=item RunKbd (?timeout, title mask, '') -> success
+
+Finds window with title mask (regexp) given and types keyboard string into it.
+Without keyboard string returns handle of window found.
+With empty keyboard string waits window to disappear.
+Find operation retries to be sucessful within timeout.
+Keyboard typing is delayed with timeout.
+Uses L<Win32::GuiTest|Win32/GuiTest>.
+Special symbols in keyboard string:
+'~' -ENTER, '+' -SHIFT, '^' -CONTROL, '%' -ALT;
+() - grouping, {} - quote special characters;
+{BACKSPACE}, {BS}, {BKSP} - backkspace;
+{BREAK}, {CAPS}, {DELETE}, {DOWN}, {END}, {ENTER}, {ESCAPE}, {HELP},
+{HOME}, {INSERT}, {LEFT}, {NUMLOCK}, {PGDN}, {PGUP}, {PRTSCR}, {RIGHT},
+{SCROLL}, {PAUSE}; {F1} .. {F24}.
+
+
+=item SMTPSend ( host, ?from, ?\@to, row,... ) - > success
+
+Sends MIME message to SMTP host, catenating rows via "\n". If 'from' or 
+'to' argument undefined, values are searched within rows of message 
+as 'From:', 'Sender:', 'To:'. If array reference 'to' occurs in place of 
+of message row, it will be converted to 'To:' MIME string.
+Uses L<Net::SMTP|Net/SMTP>.
+
+
+=item StrTime ( ?mask, ?@time ) -> string
+
+Converts given date-time array into string using given mask.
+Default mask is 'yyyy-mm-dd hh:mm:ss' or 'dd.mm.yy hh:mm:ss', constructs are 
+'yyyy', 'yy', 'mm', 'dd', 'hh', 'mm' or 'MM', 'ss'.
+Default time is 'localtime(time)'.
+
+
+=item Try ( eval {...}, default ) -> result
+
+=item Try ( eval {...}, \&catch ) -> result
+
+=item Try ( sub  {...}, ... ) -> result
+
+Try-Catch construction.
+Function C<Try> returns result of eval on success.
+If error occurred (determined by $@), it returns default value or result of catch evaluation.
+
+
+=item TryHdr (subject, stage)
+
+=item TryHdr (undef, stage)
+
+Declare title and/or stage name of transaction to insert into $@ inside C<Try>.
+May be used only inside C<Try>(sub{},...).
+
+
+
+=item UserEnvInit ( ?'-nhy', ?documents dirs )
+
+Initiates user`s environment on Win32.
+Uses L<Win32::TieRegistry|Win32/TieRegistry>, C<cacls>, reskit utilities C<winset>, C<setx>.
+
+Default options are '-nhy', option '-y' redefines environment variables when they defined, options may be '-n', '-ny', '-h'.
+
+Option 'n' sets on Win95 environment variables used on WinNT: 'OS', 'COMPUTERNAME', 'USERNAME'.
+
+Option 'h' works if 'c:/Home' directory exists. It creates directory 
+'c:/Home/Username' if it not exists (WinNT ACL setting applied), 
+sets value for $$Registry{'CUser\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders\\\\Personal'}
+to 'c:/Home/Username' or 'c:/Home/Work' (for systems with single user profile),
+sets 'My Pictures' based on 'Personal',
+sets 'HOME' environment variable to $ENV{USERPROFILE},
+sets 'HOMEDOCS' environment variable to 'Personal'
+
+
+=item UserPath (user) -> home dir
+
+=item UserPath (user, subdir) -> home subdir
+
+Returns path to user profile directory or subdirectory on Win32 
+or path to user home directory ($ENV{HOME}) or subdirectory on other platforms.
+User may be 'all' users, 'default', '' - current.
+Subdir on Win32 may be 'Desktop', 'Personal','Programs','Start Menu','Startup',
+and other Win32 registry names under 'Explorer / Shell Folders'.
+If Win32 subdir is not found for user, 'all users' profile' is used, and vice versa.
+
+
+=item WMIService ( ?connect args ) -> Windows Management Instrumentation service object
+
+Creates Windows Management Instrumentation service L<Win32::OLE|Win32/OLE> object with
+C<OLECreate>('WbemScripting.SWbemLocator')->ConnectServer(@_).
+Example: 
+WMIService->ExecQuery("SELECT Name,FreeSpace FROM Win32_LogicalDisk").
+C<OLEGet>("winmgmts:..."), C<OLEGet>("ADs:..."), C<OLEGet>("WinNT:...")
+calls may be used instead.
+See also 'wbemtest.exe', Web Based Enterprise Management (WBEM).
+
+
+=item WScript ( object ) -> Windows Script Host object
+
+=item WScript ( ?undef, object, ?args ) -> Windows Script Host object
+
+Creates or returns Windows Script Host L<Win32::OLE|Win32/OLE> object - 
+'Shell', 'Network', 'Controller',...
+May be used also 'FSO' for 'Scripting.FileSystemObject' object.
+Object created will be stored within %WScript hash for future reuse,
+first undefined argument prohibits this.
+Last optional arguments are used for C<OLECreate> call.
+Example: print WScript('Network')->ComputerName, "\t",
+WScript('FSO')->GetDrive('c:')->AvailableSpace, "\n".
+See also L<Win32::OLE::Browser|Win32/OLE/Browser/Browser> for
+Windows Script Host Object Model.
+
+
+=back
+
+
+
+
+=head1 VERSION
+
+
+=head2 29/06/2007
+
+Version 0.58 released
+
+
+=head2 18/06/2007
+
+Unicode Tk considered in C<GUIMsg> and C<Die>.
+
+Source reformated to minimize size.
+
+
+=head2 10/11/2004
+
+C<FileIni> corrected.
+
+
+
+=head2 10/10/2004
+
+Version 0.57 released
+
+
+
+=head2 06/10/2004
+
+=over
+
+=item Fixed
+
+' *' replaced with '\s*' in all regexps.
+
+=back
+
+
+
+=head2 02/06/2003
+
+=over
+
+=item Fixed
+
+C<FileCopy>() - L<Win32::CopyFile|Win32> destination path catenation delimiter doubling
+
+=back
+
+
+
+=head2 05/05/2003
+
+Version 0.56 released
+
+
+
+=head2 29/04/2003
+
+=over
+
+=item Fixed
+
+C<FileCopy>() - considered perl version, improved L<Win32::CopyFile|Win32> condition
+
+=back
+
+
+
+=head2 12/04/2003
+
+=over
+
+=item Changed
+
+C<FileCopy>() - using L<Win32::CopyFile|Win32> when possible
+
+=back
+
+
+
+=head2 26/02/2003
+
+=over
+
+=item Changed
+
+C<FileCopy>() - added C<Win32::GetOSVersion> prior to reading this from Registry
+
+C<UserEnvInit>() - '/P' C<cacls> key instead of '/G' for home directory owner
+
+=back
+
+
+=head2 06/02/2003
+
+=over
+
+=item Changed
+
+C<UserEnvInit>() - creates 'HOMEDOCS' environment variable; code restructured
+
+
+=back
+
+
+
+
+=head2 23/01/2003
+
+=over
+
+=item Changed
+
+Platform('name') - eval{Win32::NodeName()} added, 
+Platform('user') - eval{Win32::LoginName()} bracketed.
+
+
+=back
+
+
+
+=head2 12-22/04/2002
+
+=over
+
+=item Changed
+
+FileSpace - Win32::API('kernel32', 'GetDiskFreeSpaceEx' ||'GetDiskFreeSpace'...)
+attempted before using 'dir' command.
+
+WScript - May be used also 'FSO' for 'Scripting.FileSystemObject' object.
+
+
+=back
+
+
+
+
+=head2 26/03/2002
+
+=over
+
+=item Changed
+
+NetUse - optimized again
+
+
+=item New
+
+C<OLEIn>
+
+
+=back
+
+
+
+=head2 30/11/2001
+
+=over
+
+=item Changed
+
+None
+
+=item New
+
+C<OLECreate>, C<OLEGet>, C<WScript>, C<WMIService>
+
+
+=back
+
+
+=head2 15/11/2001
+
+=over
+
+=item Changed
+
+C<NetUse> on Windows NT some optimization.
+
+C<Platform>('host') corrected to return full host name with domain.
+If L<Sys::Hostname|Sys/Hostname> returns string without dot signs,
+L<Net::Domain|Net/Domain> is catenated.
+
+
+=back
+
+
+=head2 23/09/2001 - 27/09/2001
+
+=over
+
+=item New
+
+C<FileDigest>
+
+C<OrArgs>
+
+Module size reduced as sub delimiters
+
+
+=item Changed
+
+C<FileACL> - blank names are now quoted in 'cacls' run
+
+C<UserEnvInit> - $ENV{HOME} changed to ENV{USERPROFILE}, 'My Pictures' set,
+alternative documents dirs may be specified as parameters
+
+C<UserPath> - all arguments are optional
+
+
+=item Problems
+
+C<CPTranslate> and C<StrTime> does not use current locale and supports only Russian.
+
+
+=back
+
+
+
+=head2 24/11/2000 - 26/02/2001
+
+=over
+
+=item Changed
+
+C<FileACL> - echo format changed.
+
+C<FileDelete> - '-i'gnore option added.
+
+C<NetUse> - WinNT specific code added.
+
+C<StrTime> - 'mm' is month placeholder, 'MM' or second 'mm' is minutes placeholder.
+
+
+
+=back
+
+
+
+
+=head2 25/09-27/10/2000
+
+=over
+
+=item Changed
+
+C<Echo>, C<Print> - are exported by default (moved from @EXPORT_OK to @EXPORT).
+
+C<FileACL> - processed files are printed, not echoed; uses 'cacls.exe' when possible.
+
+C<FileCopy> - '-d' removed from 'cp'.
+
+C<FileCopy> - uses C<Run>(...sub{}).
+
+C<FileGlob> - support for filenames with '()'.
+
+C<FileLog> - $SIG{__DIE__} dies if !defined($^S) too.
+
+C<FileSpace> - digit grouping symbol may be ','.
+
+C<FileTrack> - internal filehandle renamed from 'LOG' to 'TRACK'.
+
+C<NetUse> - invokes 'net use ... /Yes' on Win95.
+
+C<Registry> - supports unnamed registry values.
+
+C<Run> - last argument may be sub to print to program called.
+
+C<UserPath> - excludes blanks at the end of path as may be on WinNT.
+
+
+=back
+
+
+
+=head2 31/07-15/09/2000
+
+=over
+
+=item New
+
+C<FileCwd>
+
+C<FileLnk>
+
+C<RunInf>
+
+C<RunKbd>
+
+C<UserPath>
+
+=item Changed
+
+C<$ErrorDie> - value 2 introduced and used inside C<Try> because of C<$^S> may be incorrect inside C<eval>('string') or C<do>(script).
+
+C<FileCopy> - used C<pipe> to answer to xcopy before C<system> call 
+because of codepage translation problem in C<open>(commandline) on Win32
+and incorrect $? of C<wait> of L<IPC::Open3|IPC/Open3> on Win95.
+
+C<FileEdit> - restored sub's parameter $_[0] with with section name, removed 28/02/2000.
+
+C<FileFind>, C<FileTrack> - filenames with '?' are ignored only when $^O eq 'MSWin32'.
+
+C<FileFind> - options added: !'l'ow before deep scan, 'm'ountpoints, 's'ymlinks.
+
+C<FileGlob> - created own implementation for 'MSWin32'
+supporting non-english letters and long filenames
+instead of L<File::DosGlob|File/DosGlob>.
+
+C<FileHandle> - uses caller's namespace for HANDLE.
+
+C<FileTrack> - added '!t' option to disable mtime checking.
+
+C<FTPCmd> - first parameter may be hash ref with host, username and password.
+
+C<Pause> - returns string entered as documented, instead of C<chomp> result.
+
+C<Platform> - new parameter 'windir'.
+
+
+=back
+
+
+
+=head2 16-17/06/2000, 03-05/07/2000, FileTrack and some corrections
+
+=over
+
+=item New
+
+C<FileTrack>
+
+
+=item Changed
+
+C<FileCopy> - translates '/' into '\' under Win32.
+C<FileFind> - corrected regular expressions for options.
+C<Pause>    - C<chomp> used.
+
+=back
+
+
+
+=head2 08/05/2000, Log writing and some corrections
+
+=over
+
+=item New
+
+C<FileLog>
+
+
+=item Changed
+
+C<FileFind> - filepath and filename inserted into sub args after stat reference;
+C<FileMkDir> - new default mode is 0777;
+C<StrTime> - always 4-digit years after 2000
+
+=back
+
+
+
+=head2 24/03/2000, Improved error processing
+
+=over
+
+Module C<Carp> used, C<croak> should be called instead of C<TryErr> or C<die>.
+
+=item Removed
+
+C<TryErr>, C<TryEnd>
+
+=item New
+
+C<TryHdr>
+
+=back
+
+
+
+=head2 12/02/2000 - 28/02/2000, Error processing and UNIX compatibility
+
+=over
+
+Error processing made with C<eval>{} and $@, see C<Try>. 
+Variable $Error is syncronised with $@ and becomes optional.
+
+$^O (osname) introduced into some functions.
+
+
+=item New
+
+C<Echo>, 
+C<Try>, C<TryEnd>, C<TryErr>,
+$@
+
+
+=item Changed
+
+C<Die>, 
+C<FileCopy> ('cp -dpRf' for unix compatibility),
+C<FileEdit> (removed parameter with section name),
+C<FileFind> (backslash replaced with slash for unix compatibility, -i introduced), 
+C<FileGlob> (C<glob> for unix compatibility), 
+C<FileSize> (options, -i C<FileFind> option),
+C<FileSpace> ('df -k' used for unix),
+C<Platform> ($^O (osname) and C<getlogin>),
+C<Print> ($Echo dependence moved into C<Echo>),
+C<SMTPSend>
+
+
+=item Removed
+
+C<PrintErr> and $PrintErr (use C<warn> and $SIG{__WARN__} instead)
+
+
+=item Problems
+
+C<FileACL> (failure L<Win32::FileSecurity|Win32/FileSecurity> on non-local users and groups),
+C<FileFind> (failure C<stat> on non-standard filenames, f.e. with '?')
+
+
+=item ToDo
+
+
+C<FileFind> - review options and arguments. 
+It should accept violating needs when deleting and creating. 
+When creating, sub should see directories first, when deleting - contents first.
+
+C<FTPCmd>, C<Platform>, C<SMTPSend>, - approve and test.
+ 
+
+=item Analysis of functions:
+
+ p - 5 - platform (windows specific) realisation only, 2 - unix+win
+ w - 3 - windows specific
+ e -   - no error handling
+    31 - total number of functions
+
+                     pwe  
+ CPTranslate           e  
+ Die                   e
+ Echo                  e
+ FileACL             p
+ FileCompare
+ FileCopy            2
+ FileCRC
+ FileDelete	     
+ FileEdit            
+ FileFind              
+ FileGlob              e
+ FileHandle            
+ FileIni               
+ FileMkDir
+ FileNameMax           
+ FileNameMin           
+ FileRead                
+ FileSize                
+ FileSpace           p 
+ FileWrite
+ FTPCmd                   
+ GUIMsg                  
+ NetUse              pw
+ Pause                
+ Platform            ?
+ Print                 e 
+ Registry            pw
+ Run
+ SMTPSend
+ StrTime               e
+ UserEnvInit         pw
+
+
+=back
+
+
+=head2 19/10 - 08/11/99, First documented release
+
+=over
+
+=item Source changing
+
+Functions sorted alphabetically.
+
+=item New variables:
+
+$Interact, $GUI, $Echo
+
+=item Removed variables: 
+
+$noInteract (replaced with $Interact)
+
+=item New functions: 
+
+C<CPTranslate>, C<FileACL>, C<FileHandle>, C<FileMkDir>, C<FileSize>, C<FileSpace>, C<Platform>, C<SMTPSend>
+
+=item Changed functions: 
+
+C<FileCopy>, C<FileFind>, C<FileGlob>, C<FileNameMax>, C<FileNameMin>, C<Registry>
+
+=item ToDo:
+
+RetCodes - '0E0' for successful empty?
+
+C<FileACL> - debug and develop.
+
+C<FileFind> - corrected C<stat> bug for filenames with sign '?'.
+
+C<FileFind> - review options and arguments.
+
+C<FileFind> - should accept violating needs when deleting and creating. When 
+creating, sub should see directories first, when deleting - contents first.
+
+C<FTPCmd> - approve and test.
+
+C<Platform> - approve and test.
+
+C<Print> and C<PrintErr> - should this functions be exported by default?
+
+C<UserEnvInit> - approve and test, especially for russian WinNT.
+
+
+=back
+
+=head2 24/02/99 - 02/07/99, Corrections and Developments
+
+Corrections and developments was made
+02/07/99, 28/06/99, 23/06/99, 15/06/99, 01/04/99, 25/03/99, 23/03/99, 20/03/99, 19/03/99, 17/03/99, 15/03/99, 13/03/99, 12/03/99, 09/03/99, 06/03/99, 03/03/99, 02/03/99, 01/03/99, 27/02/99, 24/02/99
+
+
+=head2 18/02/99 13:04, First release
+
+A small module with a few functions was created and turned onto 
+exploitation.
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow@mail.com>
+
+=cut

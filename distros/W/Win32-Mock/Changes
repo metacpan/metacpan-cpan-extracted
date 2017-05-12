@@ -1,0 +1,26 @@
+Revision history for Win32-Mock
+
+0.05    2008.03.27  (SAPER)
+        [CODE] Modified Win::Mock so it doesn't use File::Spec or lib.pm, 
+        because that would load the real Win32 module on true Win32 Perl 
+        (even Cygwin).
+        [TESTS] Fixed t/core/Win32/Names.t so it doesn't fail on 1-char 
+        login and node names.
+
+0.04    2008.01.30  (SAPER)
+        [CODE] Quick release to avoid loads of CPAN Testers FAIL reports.
+
+0.03    2008.01.30  (SAPER)
+        [CODE] Added mock modules for Win32::File, Win32::Service.
+        [CODE] All modules now use strict and warnings.
+        [DIST] Added an example.
+        [DIST] Updated prereqs.
+
+0.02    2007.10.06  (SAPER)
+        [CODE] Fix a nit to make test suite pass under 5.005
+        [DIST] Hide mocked Win32 modules from PAUSE indexer.
+        [DIST] Added an example.
+
+0.01    2007.10.06  (SAPER)
+        First version, released on an unsuspecting world.
+

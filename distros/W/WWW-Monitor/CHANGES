@@ -1,0 +1,21 @@
+Revision history for Perl module WWW::Monitor: 
+
+0.1 Sun Feb 18 09:15:11 GMT 2007
+	- Created
+        - Released for beta tests
+
+0.12  Tue Feb 20 09:15:11 GMT 2007
+        - Documentation changes
+        - Examples added
+
+0.126  Sun Feb 25  09:15:11 GMT 2007
+        -Bug fix in webmon.pl - support multi queries section       
+
+0.2     Sun Apr 1  21:15:11 GMT 2007
+        -Bug fix: if a server compresses data (e.g. with mod_gzip) then web pages are cached and notified as are.
+	-Cache the whole HTTP response.
+        -Take Out Text::Diff.
+        -Support non html sites.
+
+0.23    Apr 22 
+        - Mime::Light is being removed. LWP send is used instead

@@ -1,0 +1,42 @@
+API.h
+API.xs
+Changes
+docs/breadboard/test_physical_setup_bb.jpg
+docs/fritzing/test_physical_setup.fzz
+docs/schematics/test_physical_setup_schem.jpg
+INLINE.h
+lib/WiringPi/API.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+patch/version.patch
+ppport.h
+README
+t/00-load.t
+t/05-phys_to_wpi.t
+t/10-phys-to-gpio.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+testing/595.pl
+testing/aref_to_c.pl
+testing/bmp180.pl
+testing/c_extern_call_perl.pl
+testing/c_perl_callback.pl
+testing/get_mode.pl
+testing/import.pl
+testing/interrupt.pl
+testing/layout.pl
+testing/phys_pin_to_wpi.pl
+testing/pin.pl
+testing/pthread_callback.pl
+testing/pwm.pl
+testing/sr.pl
+testing/thread.pl
+testing/ver
+testing/ver.pl
+testing/wpwm.pl
+TODO
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

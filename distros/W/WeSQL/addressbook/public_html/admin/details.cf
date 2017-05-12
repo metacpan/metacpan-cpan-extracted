@@ -1,0 +1,10 @@
+user
+title:<en 1>User details</en><nl 1>Details gebruiker</nl>
+key:id
+query:select id,login,password,superuser from users where $data{key}=$params{$data{key}} and status='1' 
+captions:login=<en 2>Login</en><nl 2>Login</nl>:|password=<en 3>Password</en><nl 3>Paswoord</nl>:|superuser=<en 4>Superuser</en><nl 4>Supergebruiker</nl>:
+replace:superuser=perl;return ($superuser==1?"<en>Yes</en><nl>Ja</nl>":"<en>No</en><nl>Nee</nl>");
+pagehead:<center><en 5>some view-specific header</en><nl 5>een view-afhankelijke hoofding</nl></center><br>
+pagefoot:<center><en 6>some view-specific footer</en><nl 6>een view-afhankelijke voetnoot</nl></center><br>
+append:<center><a href=jform.wsql?id=$id&view=user&editdest=caller><en 7>Edit</en><nl 7>Wijzig</nl></a></center>
+hide:id

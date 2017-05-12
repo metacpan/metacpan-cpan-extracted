@@ -1,0 +1,13 @@
+Revision history for Perl extension Web::oEmbed
+
+0.04  Thu Jul  2 15:52:19 PDT 2009
+        - Kill the last instance of Squirrel
+
+0.03  Thu Feb 19 21:39:18 PST 2009
+        - use Any::Moose
+
+0.02  Fri Dec  5 02:36:44 JST 2008
+        - use Squirrel
+
+0.01  Wed Aug 13 11:47:22 2008
+        - original version

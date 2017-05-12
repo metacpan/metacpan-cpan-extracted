@@ -1,0 +1,9 @@
+Build.PL
+CHANGES
+lib/Wiki/Toolkit/Plugin/RSS/Reader.pm
+MANIFEST
+Makefile.PL
+META.yml
+README
+t/rss.t
+SIGNATURE    Added here by Module::Build

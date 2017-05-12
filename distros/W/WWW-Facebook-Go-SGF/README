@@ -1,0 +1,16 @@
+Ths module lets you suck game records out of the Facebook Go application
+and convert them to SGF.
+
+The facebook2sgf script is a really simple wrapper around it.
+
+To install, do the usual:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU General
+Public Licence version 2 or the Artistic Licence.  It's up to you which
+one you use.  The full text of the licences can be found in the files
+GPL2.txt and ARTISTIC.txt, respectively.

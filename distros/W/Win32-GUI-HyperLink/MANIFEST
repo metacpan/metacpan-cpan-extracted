@@ -1,0 +1,16 @@
+Changes
+lib/Win32/GUI/demos/HyperLink/HyperLinkDemo.pl
+lib/Win32/GUI/HyperLink.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.dependancies.t
+t/01.load.t
+t/02.methods.t
+t/03.method-new.t
+t/04.method-Url.t
+t/05.method-Launch.t
+t/98.pod.t
+t/99.pod-coverage.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

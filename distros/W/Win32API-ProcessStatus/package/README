@@ -1,0 +1,4 @@
+To install this ActiveState PPM package, run the following command
+in the current directory:
+
+    ppm install Win32API-ProcessStatus.ppd

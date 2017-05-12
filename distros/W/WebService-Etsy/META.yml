@@ -1,0 +1,52 @@
+---
+name: WebService-Etsy
+version: 0.7
+author:
+  - Ian Malpass (ian-cpan@indecorous.com)
+abstract: Access the Etsy REST API.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  JSON: 2.0
+  LWP::UserAgent: 2.0
+build_requires:
+  Test::More: 0
+provides:
+  WebService::Etsy:
+    file: lib/WebService/Etsy.pm
+    version: 0.7
+  WebService::Etsy::Methods:
+    file: lib/WebService/Etsy/Methods.pm
+  WebService::Etsy::Resource:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Category:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Feedback:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::GiftGuide:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Int:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Listing:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Material:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Method:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Shop:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::ShopSection:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::String:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::Tag:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Resource::User:
+    file: lib/WebService/Etsy/Resource.pm
+  WebService::Etsy::Response:
+    file: lib/WebService/Etsy/Response.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

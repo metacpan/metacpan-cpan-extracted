@@ -1,0 +1,133 @@
+NAME
+    WebService::Recruit::HotPepperBeauty - An Interface for HotPepperBeauty
+    Web Service
+
+SYNOPSIS
+        use WebService::Recruit::HotPepperBeauty;
+    
+        my $service = WebService::Recruit::HotPepperBeauty->new();
+    
+        my $param = {
+            'key' => $ENV{'WEBSERVICE_RECRUIT_KEY'},
+            'name' => 'サロン',
+            'order' => '3',
+        };
+        my $res = $service->salon( %$param );
+        my $root = $res->root;
+        printf("api_version: %s\n", $root->api_version);
+        printf("results_available: %s\n", $root->results_available);
+        printf("results_returned: %s\n", $root->results_returned);
+        printf("results_start: %s\n", $root->results_start);
+        printf("salon: %s\n", $root->salon);
+        print "...\n";
+
+DESCRIPTION
+    ホットペッパーBeauty
+    Webサービスを使うことで、ホットペッパーBeautyに掲載
+    されている、サロン情報にアクセスして、アプリケー
+    ションを構築することができます。
+
+METHODS
+  new
+    This is the constructor method for this class.
+
+        my $service = WebService::Recruit::HotPepperBeauty->new();
+
+    This accepts optional parameters.
+
+        my $conf = {
+            utf8_flag => 1,
+            param => {
+                # common parameters of this web service 
+            },
+        };
+        my $service = WebService::Recruit::HotPepperBeauty->new( %$conf );
+
+  add_param
+    Add common parameter of tihs web service.
+
+        $service->add_param( param_key => param_value );
+
+    You can add multiple parameters by calling once.
+
+        $service->add_param( param_key1 => param_value1,
+                             param_key2 => param_value2,
+                             ...);
+
+  get_param
+    Returns common parameter value of the specified key.
+
+        my $param_value = $service->get( 'param_key' );
+
+  salon
+    This makes a request for "salon" API. See
+    WebService::Recruit::HotPepperBeauty::Salon for details.
+
+        my $res = $service->salon( %$param );
+
+  service_area
+    This makes a request for "service_area" API. See
+    WebService::Recruit::HotPepperBeauty::ServiceArea for details.
+
+        my $res = $service->service_area( %$param );
+
+  middle_area
+    This makes a request for "middle_area" API. See
+    WebService::Recruit::HotPepperBeauty::MiddleArea for details.
+
+        my $res = $service->middle_area( %$param );
+
+  small_area
+    This makes a request for "small_area" API. See
+    WebService::Recruit::HotPepperBeauty::SmallArea for details.
+
+        my $res = $service->small_area( %$param );
+
+  hair_image
+    This makes a request for "hair_image" API. See
+    WebService::Recruit::HotPepperBeauty::HairImage for details.
+
+        my $res = $service->hair_image( %$param );
+
+  hair_length
+    This makes a request for "hair_length" API. See
+    WebService::Recruit::HotPepperBeauty::HairLength for details.
+
+        my $res = $service->hair_length( %$param );
+
+  kodawari
+    This makes a request for "kodawari" API. See
+    WebService::Recruit::HotPepperBeauty::Kodawari for details.
+
+        my $res = $service->kodawari( %$param );
+
+  kodawari_setsubi
+    This makes a request for "kodawari_setsubi" API. See
+    WebService::Recruit::HotPepperBeauty::KodawariSetsubi for details.
+
+        my $res = $service->kodawari_setsubi( %$param );
+
+  kodawari_menu
+    This makes a request for "kodawari_menu" API. See
+    WebService::Recruit::HotPepperBeauty::KodawariMenu for details.
+
+        my $res = $service->kodawari_menu( %$param );
+
+  utf8_flag / user_agent / lwp_useragent / http_lite
+    This modules uses XML::TreePP module internally. Following methods are
+    available to configure it.
+
+        $service->utf8_flag( 1 );
+        $service->user_agent( 'Foo-Bar/1.0 ' );
+        $service->lwp_useragent( LWP::UserAgent->new() );
+        $service->http_lite( HTTP::Lite->new() );
+
+SEE ALSO
+    http://webservice.recruit.co.jp/beauty/
+
+AUTHOR
+    RECRUIT Media Technology Labs <mtl@cpan.org>
+
+COPYRIGHT
+    Copyright 2008 RECRUIT Media Technology Labs
+

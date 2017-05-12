@@ -1,0 +1,204 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Deploy::SecurityConstraint - security-constraint deployment
+descriptor element class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Deploy::SecurityConstraint - security-constraint deployment
+descriptor element class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Representation of a security constraint object for a web application,
+as specified in a <EM>security-constraint</EM> element in the deployment
+descriptor.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> instance,
+initializing fields appropriately.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAllRoles"><CODE>getAllRoles()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating if the ``all roles'' wildcard is included in
+this SecurityConstraint.
+<P></P>
+<DT><STRONG><A NAME="item_getAuthConstraint"><CODE>getAuthConstraint()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indication if an authorization constraint is included in
+this SecurityConstraint. This is necessary to distinguish between an
+auth-constraint with no roles (signifying no direct access at all) and
+the lack of auth-constraint (which implies no access control checking).
+<P></P>
+<DT><STRONG><A NAME="item_setAuthConstraint"><CODE>setAuthConstraint($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating if an authorization constraint is included in
+this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+a boolean value
+<P></P></DL>
+<DT><STRONG><A NAME="item_getDisplayName"><CODE>getDisplayName()</CODE></A></STRONG><BR>
+<DD>
+Return the display name of this SecurityConstraint.
+<P></P>
+<DT><STRONG><A NAME="item_setDisplayName"><CODE>setDisplayName($displayName)</CODE></A></STRONG><BR>
+<DD>
+Set the display name of this SecurityCosntraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24displayName">$displayName</A></STRONG><BR>
+<DD>
+the display name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getUserConstraint"><CODE>getUserConstraint()</CODE></A></STRONG><BR>
+<DD>
+Return the user data constraint for this SecurityConstraint.
+<P></P>
+<DT><STRONG><A NAME="item_setUserConstraint"><CODE>setUserConstraint($userConstraint)</CODE></A></STRONG><BR>
+<DD>
+Set the user data constraint for this SecurityConstraint. Must be one
+of <EM>NONE</EM>, <EM>INTEGRAL</EM> or <EM>CONFIDENTIAL</EM>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24userConstraint">$userConstraint</A></STRONG><BR>
+<DD>
+the user data constraint
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addAuthRole"><CODE>addAuthRole($authRole)</CODE></A></STRONG><BR>
+<DD>
+Add an authorization role, which is a role name that will be permitted
+access to the resources protected by this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24authRole">$authRole</A></STRONG><BR>
+<DD>
+the role name to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_hasAuthRole"><CODE>hasAuthRole($role)</CODE></A></STRONG><BR>
+<DD>
+Return true if the specified role is permitted access to the resources
+protected by this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24role">$role</A></STRONG><BR>
+<DD>
+the role name to be checked
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAuthRoles"><CODE>getAuthRoles()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the names of the roles that are permitted
+access to the resources protected by this SecurityConstraint.
+<P></P>
+<DT><STRONG><A NAME="item_removeAuthRole"><CODE>removeAuthRole($role)</CODE></A></STRONG><BR>
+<DD>
+Remove the specified role from the set of roles permitted to access
+the resources protected by this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$role</STRONG><BR>
+<DD>
+the name of the role to be removed
+<P></P></DL>
+<DT><STRONG><A NAME="item_addCollection"><CODE>addCollection($collection)</CODE></A></STRONG><BR>
+<DD>
+Add a new web resource collection to those protected by this
+SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24collection">$collection</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::SecurityConstraint</STRONG> to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_getCollection"><CODE>getCollection($name)</CODE></A></STRONG><BR>
+<DD>
+Return the named web resource collection or <CODE>undef</CODE>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the web resource collection
+<P></P></DL>
+<DT><STRONG><A NAME="item_getCollections"><CODE>getCollections()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the web resource collections protected by
+this SecurityConstraint.
+<P></P>
+<DT><STRONG><A NAME="item_removeCollection"><CODE>removeCollection($collection)</CODE></A></STRONG><BR>
+<DD>
+Remove the specified web resource collection from those protected by
+this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$collection</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Deploy::SecurityCollection</STRONG> to be removed
+<P></P></DL>
+<DT><STRONG><A NAME="item_included">included($uri, $method)</A></STRONG><BR>
+<DD>
+Return true if the specified context-relative URI and associated HTTP
+method are protected by this SecurityConstraint.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24uri">$uri</A></STRONG><BR>
+<DD>
+the uri to check
+<P></P>
+<DT><STRONG><A NAME="item_%24method">$method</A></STRONG><BR>
+<DD>
+the method being used
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Wombat/Deploy/SecurityCollection.html">the Wombat::Deploy::SecurityCollection manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

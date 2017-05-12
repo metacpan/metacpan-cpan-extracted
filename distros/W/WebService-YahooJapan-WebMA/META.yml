@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WebService-YahooJapan-WebMA
+version:             0.01
+abstract:            Easy-to-use Interface for Yahoo! Japan Web MA Web Service
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    LWP:                           5.6
+    Test::More:                    0.32
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Jiro Nishiguchi <jiro@cpan.org>

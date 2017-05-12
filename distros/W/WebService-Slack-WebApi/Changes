@@ -1,0 +1,29 @@
+Revision history for Perl extension WebService-Slack-WebApi
+
+0.08 2016-08-12T01:57:54Z
+    - fix test (thx ArcticSnowman)
+
+0.07 2016-08-11T03:53:40Z
+    - add users.identity method (thx zostay)
+
+0.06 2016-01-11T03:33:47Z
+    - add client options
+
+0.05 2015-08-06T15:04:31Z
+    - add reactions methods
+
+0.04 2015-06-06T01:12:56Z
+    - add group.info method
+    - add team methods
+
+0.03 2015-05-08T06:36:17Z
+    - change attachments's type from Str to ArrayRef
+    - allow extra arguments
+
+0.02 2015-05-08T04:29:21Z
+    - add 'as_user' argument to chat.postMessage method (thx Likk)
+
+0.01 2015-02-13T13:15:21Z
+
+    - original version
+

@@ -1,0 +1,59 @@
+NAME
+
+    WebService::Yamli - Perl wrapper for Yamli's Arabic transliteration
+    service
+
+SYNOPSIS
+
+        use WebService::Yamli;
+    
+        # non-OO:
+        my $tr = WebService::Yamli::tr('perl di 7aga la6eefa aslan');
+        say $tr; # the whole sentence transliterated
+    
+        my @tr = WebService::Yamli::tr('perl');
+        say "@tr"; # a list of candidates
+
+DESCRIPTION
+
+    Franco-Arabic, aka Chat Arabic, Arabizy, is a transliteration of
+    Arabic, commonly used on the internet. It restricts itself to the ASCII
+    charset and substitutes numbers for the Arabic characters which have no
+    equivalent in Latin.
+
+    This Module is an interface to Yamli.com's API.
+
+IMPLEMENTATION
+
+    It seems there's no way to feed the Yamli API more than one word, so
+    currently each word results in a HTTP request.
+
+METHODS AND ARGUMENTS
+
+    tr($arg)
+
+      Transliterates argument. Returns transliterated string, except if
+      input is a single word and subroutine is in list context, in that
+      case it returns a candidate list
+
+GIT REPOSITORY
+
+    http://github.com/athreef/WebService-Yamli
+
+SEE ALSO
+
+    http://yamli.com
+
+    Encode::Arabic::Franco
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

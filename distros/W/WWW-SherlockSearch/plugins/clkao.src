@@ -1,0 +1,22 @@
+<SEARCH
+	name="Clkao Blog"
+	description="Melix Blog"
+	method="GET"
+	action="http://www.clkao.org/blog/"
+	queryCharset="BIG5"
+>
+
+<INTERPRET
+	browserResultType="result"
+	resultListStart="<body>"
+	resultListEnd="</body>"
+        resultItemStart='<a name'
+	resultItemEnd='</div>'
+	resultItemFind='="#(\d+)"></a>(.*?)</h3>'
+	resultItemReplace='<A HREF="article-$1.html">$2</A>'
+	resultContentStart='<pre class="blogbody">'
+	resultContentEnd='</pre>'
+>
+
+</SEARCH>
+

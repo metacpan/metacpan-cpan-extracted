@@ -1,0 +1,31 @@
+Weixin::Client v2.1
+========================
+该项目已经停止维护，请关注重构项目 https://github.com/sjdy521/Mojo-Weixin
+
+使用Perl语言编写的微信客户端框架，普通微信号(非公众号)手机扫码登录, 和手机客户端同时在线，消息自动同步
+
+INSTALLATION:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   or 
+
+   cpan -i Weixin::Client
+
+DEPENDENCIES:
+   
+    JSON
+    AnyEvent::HTTP
+    LWP::UserAgent
+    LWP::Protocol::https
+
+COPYRIGHT 和 LICENCE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

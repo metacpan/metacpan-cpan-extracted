@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+	<Class name='C' icon='exec:$Win32::GUI::XMLBuilder::ICON'/>
+	<DialogBox name='W' dim='100, 100, 600, 150' title='rebar - Example' class='$self->{C}'>
+		<Rebar bandborders='1'>
+			<Band text='One'
+				foreground='exec:[255,255,255]' background='exec:[255,0,0]'
+			/>
+			<Band text='Two'
+				width='210' minwidth='210' minheight='20'
+				foreground='exec:[255,255,255]' background='exec:[0,255,0]'
+			>
+				<Combobox dim='0, 0, 100, 80' dropdown='1'>
+					<Item text='Item 1'/>
+					<Item text='Item 2'/>
+					<Item text='Item 3'/>
+					<Item text='Item 4' default='1'/>
+				</Combobox>
+				<Combobox dim='105, 0, 100, 80' dropdown='1'>
+					<Item text='Red' default='1'/>
+					<Item text='Blue'/>
+					<Item text='Green'/>
+				</Combobox>
+			</Band>
+			<Band text='Three'
+				width='250' minwidth='250' minheight='20'
+				foreground='exec:[255,255,255]' background='exec:[0,0,255]'
+			>
+				<DateTime dim='0, 0, 130, 20'/>
+				<Button text='Button1' dim='135, 0, 50, 20'/>
+				<Button text='Button2' dim='195, 0, 50, 20'/>
+			</Band>
+		</Rebar>
+	</DialogBox>
+</GUI>

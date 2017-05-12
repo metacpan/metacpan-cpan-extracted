@@ -1,0 +1,47 @@
+#!/usr/bin/perl -I../lib
+
+# To use:
+# - Log into your myspace account and create an event.
+# - Note the event ID (in the URL when viewing the event).
+# - To send to all your friends: send_event_invitations eventID
+#   - Log in with the account/password under which you created the event.
+# This script will cache your friend list - delete the cache file if you
+# use a different account or want it to re-read the list.
+
+# usage: send_event_invitations event_id [ friend_id ... ]
+
+use WWW::Myspace;
+use YAML qw'DumpFile LoadFile';
+
+my $myspace = new WWW::Myspace( human => 0 );
+die $myspace->error if $myspace->error;
+
+my ( $event_id, @friends ) = @ARGV;
+
+unless ( @friends ) {
+	warn "Getting all friends\n";
+	if ( -f './invite_friends_cache.yaml' ) {
+		warn "Reading from cache file.  Delete invite_friends_cache.yaml\n".
+			  "if you don't want to do this.\n";
+		@friends = LoadFile( 'invite_friends_cache.yaml' );
+	} else {
+		@friends = $myspace->get_friends;
+		DumpFile( 'invite_friends_cache.yaml', @friends );
+	}
+}
+
+warn "Inviting " . @friends . " friends.\n";
+
+my ( $passed, $failed ) =
+    $myspace->send_event_invitation( $event_id, @friends );
+die $myspace->error if $myspace->error;
+
+print "\n\nSent to:\n";
+foreach $id ( @{ $passed } ) {
+    print $id . "\n";
+}
+
+print "Failed to send to:\n";
+ foreach $id ( @{ $failed } ) {
+    print $id . "\n";
+}

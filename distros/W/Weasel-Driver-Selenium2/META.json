@@ -1,0 +1,57 @@
+{
+   "abstract" : "PHP's Mink inspired multi-protocol web-testing library for Perl",
+   "author" : [
+      "Erik Huelsmann <ehuels@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Weasel-Driver-Selenium2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Util" : "0",
+            "Perl::Critic" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Selenium::Remote::Driver" : "0",
+            "Weasel" : "0.01",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl-weasel/weasel-driver-selenium2/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-weasel/weasel-driver-selenium2.git",
+         "web" : "https://github.com/perl-weasel/weasel-driver-selenium2"
+      }
+   },
+   "version" : "0.05"
+}
+

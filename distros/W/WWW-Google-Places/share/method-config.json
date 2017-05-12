@@ -1,0 +1,78 @@
+{
+   "fields" : [
+       { "name" : "radius",       "format" : "d", "type" : "Int" },
+       { "name" : "name",         "format" : "s", "type" : "Str" },
+       { "name" : "place_id",     "format" : "s", "type" : "Str" },
+       { "name" : "placeid",      "format" : "s", "type" : "Str" },
+       { "name" : "accuracy",     "format" : "d", "type" : "Int" },
+       { "name" : "website",      "format" : "s", "type" : "Str" },
+       { "name" : "phone_number", "format" : "s", "type" : "Str" },
+       { "name" : "address",      "format" : "s", "type" : "Str" },
+       { "name" : "reference",    "format" : "s", "type" : "Str" },
+       { "name" : "pagetoken",    "format" : "s", "type" : "Str" },
+       { "name" : "location",     "format" : "s", "type" : "Str" },
+       { "name" : "types",        "format" : "s", "type" : "Str", "multi" : "|",
+         "source": [ "accounting", "airport", "amusement_park", "aquarium", "art_gallery", "atm",
+                     "bakery", "bank", "bar", "beauty_salon", "bicycle_store", "book_store",
+                     "bowling_alley", "bus_station", "cafe", "campground", "car_dealer",
+                     "car_rental", "car_repair", "car_wash", "casino", "cemetery",  "church",
+                     "city_hall", "clothing_store", "convenience_store", "courthouse", "dentist",
+                     "department_store", "doctor", "electrician", "electronics_store", "embassy",
+                     "establishment", "finance", "fire_station", "florist", "food", "funeral_home",
+                     "furniture_store", "gas_station", "general_contractor", "geocode",
+                     "grocery_or_supermarket", "gym", "hair_care", "hardware_store", "health",
+                     "hindu_temple", "home_goods_store", "hospital", "insurance_agency",
+                     "jewelry_store", "laundry", "lawyer", "library", "liquor_store",
+                     "local_government_office", "locksmith", "lodging", "meal_delivery", "meal_takeaway",
+                     "mosque", "movie_rental", "movie_theater", "moving_company", "museum", "night_club",
+                     "painter", "park", "parking", "pet_store", "pharmacy", "physiotherapist",
+                     "place_of_worship", "plumber", "police", "post_office", "real_estate_agency",
+                     "restaurant", "roofing_contractor", "rv_park", "school", "shoe_store", "shopping_mall",
+                     "spa", "stadium", "storage", "store", "subway_station", "synagogue", "taxi_stand",
+                     "train_station", "travel_agency", "university", "veterinary_care", "zoo",
+                     "administrative_area_level_1", "administrative_area_level_2",
+                     "administrative_area_level_3", "colloquial_area", "country", "floor", "intersection",
+                     "locality", "natural_feature", "neighborhood", "political", "point_of_interest",
+                     "post_box", "postal_code", "postal_code_prefix", "postal_town", "premise", "room",
+                     "route", "street_address", "street_number", "sublocality", "sublocality_level_4",
+                     "sublocality_level_5", "sublocality_level_3", "sublocality_level_2",
+                     "sublocality_level_1", "subpremise", "transit_station" ] },
+       { "name" : "language",     "format" : "s", "type" : "Str",
+         "source": [ "ar", "eu", "bg", "bn", "ca", "cs", "da", "de", "el", "en",
+                     "en-au", "en-gb", "es", "eu", "fa", "fi", "fi", "fr", "gl",
+                     "gu", "hi", "hr", "hu", "id", "it", "iw", "ja", "kn", "ko",
+                     "lt", "lv", "ml", "mr", "nl", "no", "pl", "pt", "pt-br",
+                     "pt-pt", "ro", "ru", "sk", "sl", "sr", "sv", "tl", "ta",
+                     "te", "th", "tr", "uk", "vi", "zh-cn", "zh-tw" ] }
+   ],
+   "methods" : [
+       {
+           "name" : "search",
+           "fields" : { "location" : "1", "radius" : "1", "types" : "0", "name" : "0" }
+       },
+       {
+           "name" : "paged_search",
+           "fields" : { "location" : "1", "radius" : "1", "types" : "0", "name" : "0", "pagetoken" : "0" }
+       },
+       {
+           "name" : "details",
+           "fields" : { "placeid" : "1" }
+       },
+       {
+           "name" : "place_detail",
+           "fields" : { "reference" : "1" }
+       },
+       {
+           "name" : "delete_place",
+           "fields" : { "reference" : "1" }
+       },
+       {
+           "name" : "add",
+           "fields" : { "location" : "1", "name" : "1", "types" : "1", "accuracy" : "1", "address" : "0", "website" : "0", "language" : "0", "phone_number" : "0" }
+       },
+       {
+           "name" : "delete",
+           "fields" : { "place_id" : "1" }
+       }
+   ]
+}

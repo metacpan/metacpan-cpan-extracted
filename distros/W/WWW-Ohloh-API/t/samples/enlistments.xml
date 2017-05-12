@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <items_returned>1</items_returned>
+  <items_available>1</items_available>
+  <first_item_position>0</first_item_position>
+  <result>
+    <enlistment>
+      <id>20381</id>
+      <project_id>10716</project_id>
+      <repository_id>19724</repository_id>
+      <repository>
+        <id>19724</id>
+        <type>GitRepository</type>
+        <url>http://babyl.dyndns.org/git/www-ohloh-api.git</url>
+        <username>bob</username>
+        <password>frob</password>
+        <logged_at>2008-02-04T17:31:43Z</logged_at>
+        <commits>8</commits>
+        <ohloh_job_status>success</ohloh_job_status>
+      </repository>
+    </enlistment>
+  </result>
+</response>

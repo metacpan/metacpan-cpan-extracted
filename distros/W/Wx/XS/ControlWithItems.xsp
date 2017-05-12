@@ -1,0 +1,24 @@
+#############################################################################
+## Name:        XS/ControlWithItems.xsp
+## Purpose:     XS for Wx::ControlWithItems
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     14/08/2007
+## RCS-ID:      $Id: ControlWithItems.xsp 2757 2010-01-17 10:26:27Z mbarbon $
+## Copyright:   (c) 2007, 2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxControlWithItems*}{simple};
+
+%name{Wx::ControlWithItems} class wxControlWithItems
+{
+};
+
+INCLUDE_COMMAND: $^X -pe "s/ItemContainerImmutable/ControlWithItems/g" XS/ItemContainerImmutable.xs
+
+INCLUDE_COMMAND: $^X -pe "s/ItemContainer/ControlWithItems/g" XS/ItemContainer.xs
+

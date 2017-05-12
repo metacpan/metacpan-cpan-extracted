@@ -1,0 +1,41 @@
+#############################################################################
+## Name:        ext/dataview/XS/DataViewEvent.xsp
+## Purpose:     XS++ for Wx::DataViewEvent
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     25/11/2007
+## RCS-ID:      $Id: DataViewEvent.xsp 2314 2008-01-18 21:44:32Z mbarbon $
+## Copyright:   (c) 2007-2008 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+#if wxUSE_DATAVIEWCTRL
+
+#include <wx/dataview.h>
+
+%module{Wx};
+
+%name{Wx::DataViewEvent} class wxDataViewEvent {
+    wxDataViewEvent( wxEventType type, wxWindowID id );
+
+    wxDataViewItem& GetItem() const;
+    void SetItem( const wxDataViewItem& item );
+
+    int GetColumn() const;
+    void SetColumn( int col );
+
+    wxDataViewModel* GetModel() const;
+    void SetModel( wxDataViewModel *model );
+
+    const wxVariant &GetValue() const;
+    void SetValue( const wxVariant &value );
+
+    void SetDataViewColumn( wxDataViewColumn* col );
+    wxDataViewColumnDisown* GetDataViewColumn() const;
+    
+    ## wxPoint GetPosition() const;
+    void SetPosition( int x, int y );
+};
+
+#endif

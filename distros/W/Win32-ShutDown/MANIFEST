@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+ShutDown.xs
+t/Win32-ShutDown.t
+lib/Win32/ShutDown.pm
+META.yml                                 Module meta-data (added by MakeMaker)

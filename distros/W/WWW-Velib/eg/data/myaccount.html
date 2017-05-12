@@ -1,0 +1,489 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="fr" lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>	
+
+
+	<link href="/design/paris/stylesheets/reset-fonts-grids.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="/design/paris/stylesheets/core.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="/design/paris/stylesheets/pagelayout.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="/design/paris/stylesheets/content.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="/design/paris/stylesheets/gmaps.css" rel="stylesheet" type="text/css" />
+	<!--[if lte IE 6]>
+		<link href="/design/paris/stylesheets/css_ie6.css" rel="stylesheet" type="text/css" />
+	<![endif]-->
+	<!--[if IE 7]>
+		<link href="/design/paris/stylesheets/css_ie7.css" rel="stylesheet" type="text/css" />
+	<![endif]-->
+
+	<script type="text/javascript" src="/design/paris/javascript/jquery.js"></script>
+	<script type="text/javascript" src="/design/paris/javascript/chargement.js"></script>
+	<script type="text/javascript" src="/design/paris/javascript/pngforie.js"></script>
+	<script type="text/javascript" src="/design/paris/javascript/evenement.js"></script>
+
+	    
+    	  			  		  
+    <title>Mon compte - </title>
+
+    
+    
+    
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <meta http-equiv="Content-language" content="fr-FR" />
+
+    
+        <meta name="author" content="JCDecaux" />
+
+        <meta name="copyright" content="JCDecaux" />
+
+        <meta name="description" content="" />
+
+        <meta name="keywords" content="v�lo, cyclocity, JCDecaux" />
+
+    
+    <meta name="MSSmartTagsPreventParsing" content="TRUE" />
+    
+<link rel="Home" href="/" title="Page de garde " />
+<link rel="Index" href="/" />
+<link rel="Top"  href="/" title="" />
+<link rel="Search" href="/content/advancedsearch" title="Recherche " />
+
+
+<link rel="Alternate" href="/layout/set/print/service/myaccount" media="print" title="Version imprimable" />
+</head>
+
+<body>
+
+	<!-- page -->
+	<div id="page">
+		
+		<!-- bandeau haut -->
+		<div id="bandeau_haut">
+
+		<!-- Choix langue -->
+			<form action="/" method="post" id="form_lang">
+				<fieldset title="choix de la langue">
+					<legend>choix de la langue</legend>
+										<select name="acces_rapide_gp" title="choisir votre langue" onchange="form.submit()">
+						<option selected="selected" value="">Autres langues</option>
+				        					        					        					            						        						            <option value="http://www.en.velib.paris.fr/favicon.ico">English</option>
+					            					        					        				        					        					        					            						        						            <option value="http://www.es.velib.paris.fr/favicon.ico">Español</option>
+					            					        					        				        					</select>
+							         </fieldset>
+			</form>
+		<!-- Fin Choix langue -->
+
+	<!-- banner -->
+	<img src="/var/paris/storage/images/media/images/paris/bandeau/311-3-fre-FR/bandeau.png" class="banner" alt="bandeau" />
+	<!-- banner -->
+
+	<h1 class="hide">Vélib, la ville est plus belle à vélo</h1>
+	<a href="/" title=""><img src="/var/paris/storage/images/media/images/paris/logo/308-9-fre-FR/logo.png" alt=""/></a>
+</div>		<!-- fin bandeau haut -->
+
+
+		<!-- bandeau navigation -->
+		
+<div id="bandeau_nav">
+	<!-- logo de la mairie -->
+	<img src="/design/paris/images/contenu/logo_mairie_paris.png" alt="Mairie de paris" />
+	<!-- fin logo de la mairie -->
+
+	<!-- naviagtion haut -->
+	<ul>
+			<li><a href="/" title="Accueil">Accueil</a></li>
+							<li><a href="/comment_ca_marche" title="Comment ça marche ?">Comment ça marche ?</a></li>
+								<li><a href="/abonnements_et_tarifs" title="Abonnements et tarifs">Abonnements et tarifs</a></li>
+								<li><a href="/actualites" title="Actualités">Actualités</a></li>
+								<li><a href="/les_stations" title="Les stations">Les stations</a></li>
+								<li><a href="/espace_presse" title="Espace presse">Espace presse</a></li>
+				</ul>
+	<!-- fin navigation haut -->
+
+</div>		<!-- fin bandeau navigation -->
+		
+		<!-- conteneur -->
+		<div  id="conteneur">
+
+			<!-- coll gauche -->
+				
+<div id="coll_gauche" class="float_left" >
+			
+<!-- Trouver une station  -->
+<div class="arrondi_viol">
+	<div class="boxcontent">
+		<h2 class="titre_flch">
+			Trouver
+			<br /> <span>une station</span>		</h2>
+
+		<a href="/les_stations/trouver_une_station">
+		
+
+    
+        
+    
+                <img src="/var/paris/storage/images/paris/boites_a_outils/trouver_une_station/1651-5-fre-FR/trouver_une_station_toolbar_map.gif"  width="174" height="119"  style="border: 0px;" alt="" title="" />    
+    
+    
+    </a>
+
+		<!-- Recherche -->
+		<form action="/les_stations/trouver_une_station" method="get" id="form_recherche">
+			<fieldset title="Recherche des stations">
+			<legend>Recherche des stations</legend>
+				<input name="recherche" type="text" value="Adresse, mots clés" class="txt_bx1" id="entre_adresse" onfocus="if(this.value == 'Adresse, mots clés') this.value=''" onblur="if(!this.value) this.value = 'Adresse, mots clés';"/>
+				<input name="rechercher" type="image" src="/design/paris/images/contenu/rechercher.png" alt="Recherche des stations" id="enter" onclick="if(document.getElementById('recherche').value == 'Adresse, mots clés' || document.getElementById('recherche').value == '') return false;" />
+			</fieldset>
+		</form>
+		<!-- Fin Recherche -->
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- fin bloc trouver une station  -->
+
+
+
+			<!-- bloc acces au site ville  -->
+<div class="arrondi_orange">
+	<div class="boxcontent">
+   		<h2 class="titre_flch">
+   			Liens utiles
+					</h2>
+
+		<!-- Choix ville -->
+		<form action="" method="post" id="form_ville">
+			<fieldset title="choix de la langue">
+				<legend>choix de la langue</legend>
+				<select name="acces_rapide_ville" title="choisir votre ville" id="choix_ville" onchange="form.submit()">
+					<option value=""></option>
+										<option value="www.paris.fr/portail/deplacements/Portal.lut?page_id=5889">Les chantiers Vélib'</option>
+										<option value="www.paris.centraldoc.com/">La Lettre des déplacements</option>
+										<option value="www.paris.fr/portail/deplacements/Portal.lut?page_id=7053">Vélo et circulations douces</option>
+										<option value="www.paris.fr">La ville de Paris</option>
+										<option value="www.velocite-movies.com">Vélocité !</option>
+										<option value=""></option>
+										<option value=""></option>
+										<option value=""></option>
+									</select>
+			</fieldset>
+		</form>
+		<!-- Fin Choix ville -->
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- fin bloc acces au site ville  -->			<!-- bloc les stations -->
+<div class="arrondi_bleu">
+	<div class="boxcontent">
+		<h2 class="titre_flch">Abonnez vous !</h2>
+		<div class="border">
+			<p><a href="/abonnements_et_tarifs/abonnement_1_an/le_cout_de_l_abonnement_1_an_est_de_29__1" title="Le coût de l'abonnement 1 an est de 29 €" onfocus="this.value" >
+Cliquez ici pour vous pré-abonner en ligne</a></p>
+		</div>
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- fin bloc les stations  -->	</div>			<!-- fin coll gauche -->
+
+			<!-- coll centre -->
+			<div id="coll_centre" class="float_left">
+
+				<!-- contenu -->
+				<div class="contenu" >
+					<!-- bloc en direct sur mobile -->
+					<div class="arrondi_gris">
+												<div class="boxcontent2">
+																			
+
+
+<!-- bloc info compte-->
+<h2 class="pad_bot2">Mon compte</h2>
+<div class="border_vert">
+	<div class="content">
+		<h3 class="titre_top titre_top_compte">Mon abonnement</h3>
+		<div class="breaker"></div>
+		<div class="info_compte">
+						<p><span>Votre compte prend fin le :</span> 21/07/2008</p>
+			<p><span>Il vous reste encore 302 jours d'abonnement</span></p>
+							<p><span>
+Vous n'avez pas de vélo en cours de location.</span></p>
+					</div>
+
+		<div class="lien_info_compte">
+			<a href="/service/updatemyaccount" title="Modifier mon compte" class="lien_compte marg_right">Modifier mon compte</a>
+			<a href="/service/logout"title="Se déconnecter" class="lien_compte">Se déconnecter</a>
+			<div class="breaker"></div>
+
+			<div class="pack_lien_modif">
+											</div>
+		</div>
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- Fin bloc info compte-->
+<!-- bloc info solde-->
+<div class="border_vert">
+	<div class="content">
+		<h3 class="titre_top titre_top_compte">
+Mon paiement en ligne</h3>
+		<div class="breaker"></div>
+		<div class="info_compte">
+			<p><span>Solde :</span>0,00 &euro;</p>
+		</div>
+
+		<div class="lien_info_compte">
+			<a href="/service/credit1" title="
+Créditer mon compte" class="lien_compte marg_right">
+Créditer mon compte</a>
+			<a href="/service/updatecard1"title="
+Modifier carte de paiement" class="lien_compte">
+Modifier carte de paiement</a>
+			<div class="breaker"></div>
+		</div>
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- Fin bloc info compte-->
+
+<!-- bloc info compte-->
+<div class="border_vert">
+	<div class="content2">
+
+					<h3 class="titre_top titre_top_compte2">Ma consommation en Septembre 2007</h3>
+				<div class="breaker"></div>
+		<div class="results">
+		<table border="0" summary="tableau de consomation">
+	  		<tr>
+		 		<th scope="col" class="col1">Nbre de trajets</th>
+				<th scope="col" class="col4">Temps cumulé</th>
+				<th scope="col" class="col4">Montant</th>
+		  	</tr>
+		  	<tr class="pyjama">
+		  		<td>61</td>
+				<td>10h 27min</td>
+				<td>0,00 &euro;</td>
+			</tr>
+		</table>
+
+				<a href="/service/myaccount/month" class="lien_detail" title="Voir le détail du mois">Voir le détail du mois</a>
+				</div>
+
+
+		<form action="" method="post" id="form_contr_consommation">
+			<fieldset title="Formulaire consommation">
+			<legend>Formulaire consommation</legend>
+				<label for="date_deb">Voir ma consommation depuis :</label>
+				<select name="seedetails" id="date_deb">
+					<option value="2">2 jours</option>
+					<option value="7">1 semaine</option>
+					<option value="14">2 semaines</option>
+					<option value="21">3 semaines</option>
+				</select>
+				<div class="pack_valid">
+
+					<!-- bt -->
+					<div class="button_org position5">
+						<span class="right">&nbsp;</span>
+						<span class="txt"><input class="txt1" type="submit" value="OK" id="ok" /></span>
+						<span class="left">&nbsp;</span>
+						<div class="breaker"></div>
+					</div>
+					<!-- fin bt -->
+				</div>
+			</fieldset>
+		</form>
+	</div>
+
+	<div class="bas"></div>
+</div>
+<!-- Fin bloc info compte-->
+<a href="#" title="haut de page" class="haut_page">Haut de page</a>
+<div class="breaker"></div>
+						</div>
+						<div class="bas"></div>
+					</div>
+					<!-- fin bloc en direct sur mobile -->
+			 	 </div>
+				<!-- fin contenu -->
+
+			</div>
+			<!-- fin coll centre -->
+
+			<!-- coll droite -->
+			<div id="coll_droite" class="float_left" >
+	
+											
+<!-- bloc accees mon compte -->
+<script type="text/javascript">chargerContenuPage( 'https://abofr-velib.cyclocity.fr/service/userbox');</script>
+<!--Bloc mon compte-->
+<div id="my_account_detail" class="arrondi_org">
+	<div class="boxcontent" id="my_account_detail_text">
+		<h2 class="titre_cercle"><span class="first_letter">A</span>ccéder  <br /> <span> à mon compte</span></h2>
+		<a href="/service/myaccount" class="mn_compte" title="Mon compte">Mon compte</a>
+	</div>
+	<div class="bas"></div>
+</div>
+<!--Fin Bloc mon compte-->							<div class="arrondi_org" class="abonez_vs">
+	<div class="boxcontent">
+
+		<h2 class="titre_cercle"><span class="first_letter">A</span>ctiver mon compte Vélib'</h2>
+
+		<div class="border">
+			<p>
+Vous venez de recevoir votre confirmation d'abonnement ? Vous avez 45 jours pour activer votre compte Vélib'.</p>
+	  		<a href="/service/cardactivation" title="Activer ma carte Vélib'">Activer ma carte Vélib'</a>
+		</div>
+
+	</div>
+	<div class="bas"></div>
+</div>							<div class="arrondi_org recherche">
+	<div class="boxcontent">
+		<h2 class="titre_cercle"><span class="first_letter">R</span>echercher</h2>
+		<form name="searchForm" action="/content/advancedsearch" method="get" id="form_recherche2" onSubmit="return document.getElementById('SearchText').value != 'Rechercher dans le site';">
+			<fieldset title="Rechercher dans le site">
+				<legend>Rechercher dans le site</legend>
+				<input name="SearchText" type="text" value="Rechercher dans le site" class="txt_bx1" id="SearchText" onfocus="this.value=''" onblur="if(!this.value) this.value = 'Rechercher dans le site';" />
+				<input name="rechercher" type="image" src="/design/paris/images/contenu/valider.png" alt="rechercher" id="lancer" />
+			</fieldset>
+		</form>
+		<!-- Fin Recherche -->
+	</div>
+	<div class="bas"></div>
+</div>							<!-- bloc faq -->
+<div class="arrondi_org faq">
+	<div class="boxcontent">
+		<h2 class="titre_cercle">
+			<a href="/comment_ca_marche/faq__1" title="FAQ" class="faq">
+				<span class="first_letter">F</span>
+				aq
+			</a>
+		</h2>
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- fin bloc faq -->							<!-- bloc accees newsletter -->
+<div class="arrondi_org abonez_vs">
+	<div class="boxcontent">
+		<h2 class="titre_cercle">
+			<span class="first_letter">L</span>
+			a lettre Vélib' 
+		</h2>
+		<div class="border">
+			<p>
+Recevez tous les mois la lettre Vélib' dans votre boite mail</p>
+							<a href="/les_newsletters">Lire la lettre</a>
+					</div>
+	</div>
+	<div class="bas"></div>
+</div>
+<!-- fin bloc accees newsletter -->
+
+
+
+						
+
+				<!--Bloc meteo -->
+<div class="arrondi_vert2">
+	<div class="boxcontent">
+		<h2>
+Météo</h2>
+		<div class="border">
+			<h3><span>Paris, France</span> 23/09/2007</h3>
+
+			<table width="100%" border="0">
+				<tr>
+					<td>Dim</td>
+					<td>Lun</td>
+					<td>Mar</td>
+				</tr>
+				<tr>
+					<td><img src="/design/paris/images/contenu/64x64/28.png" alt="" class="png" width="48" height="48" /></td>
+					<td><img src="/design/paris/images/contenu/64x64/11.png" alt="" class="png" width="48" height="48" /></td>
+					<td><img src="/design/paris/images/contenu/64x64/39.png" alt="" class="png" width="48" height="48" /></td>
+				</tr>
+				<tr>
+					<td>
+15°</td>
+					<td>
+16°</td>
+					<td>
+16°</td>
+				</tr>
+			</table>
+	  	</div>
+		<p class="powrd_by"><a href="http://www.weather.com">The Weather Channel ®</a></p>
+	</div>
+	<div class="bas"></div>
+</div>
+<!--Fin Bloc meteo -->		</div>			<!-- fin coll droite -->
+
+			
+						<div class="skyscrapper">
+				
+									<a href="http://www.paris.fr/portail/accueil/Portal.lut?page_id=1&document_type_id=2&document_id=32391&portlet_id=815" title="" target="_blank">
+
+    
+        
+    
+                <img src="/var/paris/storage/images/media/images/banniere_environnement/15807-1-fre-FR/banniere_environnement_visuel_banniere_verticale.gif"  width="120" height="448"  style="border: 0px;" alt="" title="" />    
+    
+    
+    </a>
+				
+							</div>
+			
+			<div class="breaker"></div>
+			<!-- footer -->
+			<div id="footer">
+	
+
+<ul>
+
+<li><a href="http://www.paris.fr">www.paris.fr</a></li>
+
+<li>| <a href="/infos_editeur" title="Mentions Légales">Infos Editeur</a></li>
+
+<li>| Copyright : <a href="http://www.jcdecaux.com/" title="JCDecaux SA">SOMUPI</a></li>
+
+<li>| <a href="/nous_contacter">Contact</a></li>
+
+</ul>
+</div>			<!-- fin footer -->
+
+		</div>
+		<!-- fin conteneur -->
+		<div class="breaker"></div>
+
+	</div>
+	<!-- fin page -->
+
+					
+
+<script type="text/javascript">
+<!--
+xtnv = document;
+xtsd = "https://logs3";
+xtsite = "305741";
+xtn2 = "1";        	// level 2 site
+xtpage = "service::myaccount";        //page name (with the use of :: to create chapters)
+xtdi = "";        	//implication degree
+//-->
+</script>
+<script type="text/javascript" src="/design/paris/javascript/xiti.js"></script>
+
+<noscript>
+<img width="1" height="1" alt="" src="https://logs3.xiti.com/hit.xiti?s=305741&s2=1&p=service::myaccount&di=&" />
+</noscript>
+		<!--[if lte IE 6]>
+	<script type="text/javascript">
+	// <![CDATA[
+	        PngForIE("/design/paris/images/contenu/vide.gif");
+	// ]]>
+	</script>
+	<![endif]-->
+</body>
+
+</html>

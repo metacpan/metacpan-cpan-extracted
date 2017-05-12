@@ -1,0 +1,24 @@
+bin/bookbot											Launcher of bots
+BookBot.pm											Virtual bot to be inherited
+BookBot/Alias.pm									Utility class to support bot alias
+BookBot/Chinese.pm									Virtual bot to support chinese
+BookBot/Chinese/Agriculture/Cast.pm					Bot of http://www.cast.net.cn
+BookBot/Chinese/Agriculture/GreenHouse/Tech.pm		Bot of http://www.cngreenhouse.com
+BookBot/Chinese/Agriculture/GreenHouse/Market.pm	Bot of http://www.cngreenhouse.com
+BookBot/Chinese/Novel/DragonSky.pm					Bot of http://www.dragonsky.net
+BookBot/Chinese/Novel/ShuKu.pm						Bot of http://www.shuku.net
+BookBot/Chinese/Periodical/WanFang.pm				Bot of http://periodicals.wanfangdata.com.cn
+BookBot/English.pm									Virtual bot to support english
+BookBot/FakeCookies.pm								Utility class to support cookies when local file
+BookBot/Test.pm										Utility class to simplify test
+Changes												Change history
+MANIFEST											This list of files
+Makefile.PL											Makefile writer
+README												Readme
+TODO												Todo list
+clear.bat											Command line tool to clear test result
+t/10BookBot.t										Test of WWW::BookBot
+t/21Chinese.t										Test of WWW::BookBot::Chinese
+t/22English.t										Test of wWW::BookBot::English
+t/pattern.pl										Test of pattern and its speed
+test.bat											Command line tool to simplify test

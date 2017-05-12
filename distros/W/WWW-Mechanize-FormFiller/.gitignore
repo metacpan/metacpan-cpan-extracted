@@ -1,0 +1,15 @@
+blib
+Makefile
+WWW-Mechanize-FormFiller-*
+*.old
+*.bak
+*.tar.gz
+*.tar
+pm_to_blib
+pm_to_blib.ts
+.lwpcookies
+.releaserc
+META.yml
+MYMETA.*
+blibdirs.ts
+inc/

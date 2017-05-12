@@ -1,0 +1,36 @@
+WWW::Meta::XML::Browser - Perl module to simulate a browser session described in a XML file
+===========================================================================================
+
+DOCUMENTAION
+
+For a detailed documentation see the man page:
+
+   man WWW::Meta::XML::Browser
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   XML::LibXML
+   XML::LibXSLT
+   LWP::UserAgent
+   HTTP::Cookies
+   HTTP::Request
+   URI::Escape
+   Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Benjamin Boksa
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

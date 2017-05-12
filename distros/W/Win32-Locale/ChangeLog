@@ -1,0 +1,25 @@
+Revision history for Perl extension Win32::Locale
+                                        Time-stamp: "2004-01-11 18:55:22 AST"
+
+2004-01-11  Sean M. Burke  sburke@cpan.org
+
+        * Release 0.04 -- Merely fixed a potential "use of uninitialized
+	value" warning when calling get_locale or get_language on
+	non-MSWin systems.
+	
+2003-07-16  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.03 -- changes *-latin to the now-standard *-latn;
+	ditto *-cyrillic to *-cyrl.
+	Changed "<SRB> <Serbian> <Serbian (Cyrillic)>"'s langtag grom "sr"
+	to "sr-cyrl".
+	* Some incidental dist-making stuff (moving test.pl to t/*.t)
+	
+2001-05-17  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.02 -- corrects UK English from 'en-UK' to 'en-GB'
+	
+2001-05-16  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.01 -- first release
+

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+     <!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+                  "wml_1.1.dtd">
+<wml>
+  <card id="abc" ordered="true">
+    <p>
+      <do type="accept">
+        <go href="http://xyz.org/s"/>
+      </do>
+      X: $(X)<br/>
+      Y: $(&#x59;)<br/>
+      Enter name: <input type="text" name="N"/>
+      <img alt="toto" src="toto.bmp" height="120%"/>
+    </p>
+  </card>
+</wml>

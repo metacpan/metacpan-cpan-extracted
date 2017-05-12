@@ -1,0 +1,75 @@
+# Author: Eric Blue
+# url   = http://eric-blue.com/belkin-wemo-api/
+# email = ericblue76 (at) gmail (dot) com
+# Project: Belkin WeMo API - Uses UPNP to control Belkin Wemo Switches
+
+[Overview]
+
+The Belkin WeMo Switch (http://www.belkin.com/us/wemo-switch) lets you turn electronic devices on or off from anywhere inside or outside your home.
+The WeMo Switch uses your existing home Wi-Fi network to provide wireless control of TVs, lamps, stereos, and more.
+This library allows basic control of the switches (turning on/off and getting device info) through UPNP
+
+[Modules]
+
+1) WebService::Belkin::WeMo::Discover
+
+Used for searching for Belkin devices on the network using UPNP.  Search results can be stored
+and loaded to speed up operations.
+
+Methods:
+
+    * search - Performs UPNP search
+    * save - Saves searched devices to disk
+    * load - Loads searched devices from disk
+
+Sample Usage:
+
+my $wemoDiscover = WebService::Belkin::WeMo::Discover->new();
+
+# Perform UPNP Search for all Belkin WeMo switches
+my $discovered = $wemoDiscover->search();
+
+# Save device info to make API calls faster - eliminates search on startup
+$wemoDiscover->save("/etc/belkin.db");
+
+# Load from storage
+my $discovered = $wemoDiscover->load("/etc/belkin.db");
+
+foreach my $ip (keys %{$discovered}) {
+	print "IP = $ip\n";
+	print "Friendly Name = $discovered->{$ip}->{'name'}\n"
+}
+
+
+2) WebService::Belkin::WeMo::Device
+
+The core module for controlling WeMo devices.
+
+Methods:
+
+    * getFriendlyName - Get the name of the switch
+    * isSwitchOn - Returns true (1) or false (0)
+    * on - Turn switch on
+    * off - Turn switch off
+    * toggle - Toggle switch on/off
+
+Sample Usage:
+
+# Note: excluding 'db' will force a search each time - expect a 1-3 second delay for UPNP discover
+# This dependency on the search will be fixed in a future release
+
+my $wemo = WebService::Belkin::WeMo::Device->new(ip => '192.168.2.126', db => '/etc/belkin.db');
+
+OR
+
+my $wemo = WebService::Belkin::WeMo::Device->new(name => 'Livingroom Light', db => '/etc/belkin.db');
+
+print "Name = " . $wemo->getFriendlyName() . "\n";
+print "On/Off = " . $wemo->isSwitchOn() . "\n"; 
+
+print "Turning off...\n";
+$wemo->off();
+
+print "Turning on...\n";
+$wemo->on();	
+

@@ -1,0 +1,36 @@
+Links
+
+main page
+http://cpancover.com/latest/index.html
+
+Letter S
+http://cpancover.com/latest/dist/S.html
+
+Log
+http://cpancover.com/latest/W-WO-WOLLMERS-Set-Similarity-0.021.tar.gz--1412859060.280185.out.gz
+
+Per Distribution
+http://cpancover.com/latest/AproJo-0.011/index.html
+http://cpancover.com/latest//Set-Similarity-0.023/cover.json
+
+All Distributions:
+http://cpancover.com/staging/cpancover.json
+
+CPAN
+- latest
+http://www.cpan.org/modules/01modules.index.html
+- who is who
+http://www.cpan.org/authors/00whois.html
+- index of authors /id/
+http://www.cpan.org/authors/id/W/WO/WOLLMERS/
+
+CPAN::Common::Index
+CPAN::DistnameInfo
+CPAN::Cover::Results
+CPAN::ReleaseHistory
+CPAN::Releases::Latest
+
+ALTER TABLE mytable ADD COLUMN mycolumn character varying(50) NOT NULL DEFAULT 'foo';
+
+ALTER TABLE covers ADD COLUMN dist character varying(255) NOT NULL DEFAULT '';
+ALTER TABLE covers ADD COLUMN version character varying(25) NOT NULL DEFAULT '';

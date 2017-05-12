@@ -1,0 +1,12 @@
+This is the Perl Shopify API; licensed under the MIT license, meaning that you can use it for whatever you want.
+
+For specific documentation, try reading the perldoc documentation information encoded in the module.
+
+To read the documentation through a command-line interpreter, use
+
+	perldoc <module-name>
+
+For example:
+
+	perldoc WWW::Shopify
+

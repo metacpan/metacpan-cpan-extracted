@@ -1,0 +1,405 @@
+
+=head1 NAME
+
+Win32::GUI::MonthCal - Create and manipulate MonthCal controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new MonthCal object;
+can also be called as PARENT->AddMonthCal(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+  -daystate  => 0/1 (default 0)
+    Set/Unset daystate style.
+  -multiselect  => 0/1 (default 0)
+    Set/Unset multiselect style.
+  -notoday  => 0/1 (default 0)
+    Set/Unset notoday style.
+  -notodaycircle  => 0/1 (default 0)
+    Set/Unset notodaycircle style.
+  -weeknumber  => 0/1 (default 0)
+    Set/Unset weeknumber style.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackColor
+
+B<BackColor([COLOR])>
+
+Gets or sets the background color displayed between months.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackMonthColor
+
+B<BackMonthColor([COLOR])>
+
+Gets or sets the background color displayed within the month.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BackTitleColor
+
+B<BackTitleColor([COLOR])>
+
+Gets or sets the background color displayed in the calendar's title.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetColor
+
+B<GetColor(ICOLOR)>
+
+Retrieves the color for a given portion of a month calendar control.
+
+B<ICOLOR> :
+
+ MCSC_BACKGROUND   = 0 : the background color (between months)
+ MCSC_TEXT         = 1 : the dates
+ MCSC_TITLEBK      = 2 : background of the title
+ MCSC_TITLETEXT    = 3 : text color of the title
+ MCSC_MONTHBK      = 4 : background within the month cal
+ MCSC_TRAILINGTEXT = 5 : the text color of header & trailing days
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurSel
+
+B<GetCurSel()>
+
+Retrieves the currently selected date in a four
+elements array (year, month, day, dayofweek).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFirstDayOfWeek
+
+B<GetFirstDayOfWeek()>
+
+Retrieves the first day of the week for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMaxSelCount
+
+B<GetMaxSelCount()>
+
+Retrieves the maximum date range that can be selected in a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMaxTodayWidth
+
+B<GetMaxTodayWidth()>
+
+Retrieves the maximum width of the "today" string in a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMinReqRect
+
+B<GetMinReqRect()>
+
+Retrieves the minimum size required to display a full month in a month calendar control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMonthDelta
+
+B<GetMonthDelta()>
+
+Retrieves the scroll rate for a month calendar control.
+The scroll rate is the number of months that the control moves its display
+when the user clicks a scroll button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMonthRange
+
+B<GetMonthRange([FLAG=GMR_DAYSTATE])>
+
+Retrieves date information that represents the high and low limits of a
+month calendar control's display.
+Return an array (yearmin, monthmin, daymin, dayofweekmin, yearmax, monthmax, daymax, dayofweekmax).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRange
+
+B<GetRange()>
+
+Retrieves the minimum and maximum allowable dates set for a month calendar control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRangeMax
+
+B<GetRangeMax()>
+
+Retrieves the maximum allowable date set for a month calendar control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetRangeMin
+
+B<GetRangeMin()>
+
+Retrieves the minimum allowable date set for a month calendar control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelRange
+
+B<GetSelRange()>
+
+Retrieves date information that represents the upper and lower limits of
+the date range currently selected by the user.
+Return an array (yearmin, monthmin, daymin, dayofweekmin, yearmax, monthmax, daymax, dayofweekmax).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetToday
+
+B<GetToday()>
+
+Retrieves the date information for the date specified as "today" for a month calendar control.
+Return an array (year, month, day, dayofweek).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetUnicodeFormat
+
+B<GetUnicodeFormat()>
+
+Retrieves the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HitTest
+
+B<HitTest(X,Y)>
+
+Determines which portion of a month calendar control is at a given point on the screen.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColor
+
+B<SetColor(ICOLOR, COLOR)>
+
+Sets the color for a given portion of a month calendar control.
+
+B<ICOLOR> :
+
+ MCSC_BACKGROUND   = 0 : the background color (between months)
+ MCSC_TEXT         = 1 : the dates
+ MCSC_TITLEBK      = 2 : background of the title
+ MCSC_TITLETEXT    = 3 : text color of the title
+ MCSC_MONTHBK      = 4 : background within the month cal
+ MCSC_TRAILINGTEXT = 5 : the text color of header & trailing days
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCurSel
+
+B<SetCurSel(YEAR, MON, DAY)>
+
+Sets the currently selected date for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetDayState
+
+B<SetDayState([MONTHDAYSTATELIST])>
+
+Sets the day states for all months that are currently visible within a
+month calendar control.
+Each MONTHDAYSTATELIST items are an MONTHDAYSTATE.
+The MONTHDAYSTATE type is a bit field, where each bit (1 through 31)
+represents the state of a day in a month. If a bit is on, the corresponding
+day will be displayed in bold; otherwise it will be displayed with no emphasis.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetFirstDayOfWeek
+
+B<SetFirstDayOfWeek(IDAY)>
+
+Sets the first day of the week for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMaxSelCount
+
+B<SetMaxSelCount(MAX)>
+
+Sets the maximum number of days that can be selected in a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMonthDelta
+
+B<SetMonthDelta(DELTA)>
+
+Sets the scroll rate for a month calendar control.
+The scroll rate is the number of months that the control moves its display
+when the user clicks a scroll button.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRange
+
+B<SetRange(YEARMIN,MONTHMIN,DAYMIN,YEARMAX,MONTHMAX,DAYMAX)>
+
+Sets the minimum and maximum allowable dates for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRangeMax
+
+B<SetRangeMax(YEAR, MONTH, DAY)>
+
+Sets the maximum allowable date for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRangeMin
+
+B<SetRangeMin(YEAR, MONTH, DAY)>
+
+Sets the minimum allowable date for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSelRange
+
+B<SetSelRange(YEARMIN,MONTHMIN,DAYMIN,YEARMAX,MONTHMAX,DAYMAX)>
+
+Sets the selection for a month calendar control to a given date range.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetToday
+
+B<SetToday(YEAR, MON, DAY)>
+
+Sets the "today" selection for a month calendar control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetUnicodeFormat
+
+B<SetUnicodeFormat(FLAG)>
+
+Sets the UNICODE character format flag for the control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TextColor
+
+B<TextColor([COLOR])>
+
+Gets or sets the color used to display text within a month..
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TitleTextColor
+
+B<TitleTextColor([COLOR])>
+
+Gets or sets the color used to display text within the calendar's title.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TrailingTextColor
+
+B<TrailingTextColor([COLOR])>
+
+Gets or sets the color used to display header day and trailing day text.
+Header and trailing days are the days from the previous and following
+months that appear on the current month calendar.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DayState
+
+B<DayState(YEAR,MONTH,DAY,MAXMONTH,MONTHDAYSTATELIST)>
+
+Sent by a month calendar control to request information about how individual days should be displayed.
+
+MONTHDAYSTATELIST is array reference.
+Each MONTHDAYSTATELIST items are an MONTHDAYSTATE.
+The MONTHDAYSTATE type is a bit field, where each bit (1 through 31)
+represents the state of a day in a month. If a bit is on, the corresponding
+day will be displayed in bold; otherwise it will be displayed with no emphasis.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelChange
+
+B<SelChange(YEARMIN,MONTMIN,DAYMIN,YEARMAX,MONTMAX,DAYMAX)>
+
+Sent by a month calendar control when the currently selected date or range of dates changes.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(YEARMIN,MONTMIN,DAYMIN,YEARMAX,MONTMAX,DAYMAX)>
+
+Sent by a month calendar control when the user makes an explicit date selection within a month calendar control.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

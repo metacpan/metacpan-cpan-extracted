@@ -1,0 +1,34 @@
+
+# $Id: perlcriticrc 386 2009-01-08 13:50:49Z jonasbn $
+
+severity = 1
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|SYNOPSIS|VERSION|DESCRIPTION|METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|TEST AND QUALITY|QUALITY AND CODING STANDARD|BUGS AND LIMITATIONS|BUG REPORTING|DEVELOPMENT|TODO|SEE ALSO|AUTHOR|LICENSE AND COPYRIGHT
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Id
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#Requires Perl::Critic 1.094, for exclude_functions
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+# TODO
+# Perl::Critic policies, which needs to be addressed in the future
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+
+[-Documentation::RequirePodLinksIncludeText]
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-InputOutput::ProhibitJoinedReadline] 

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "expand": [
+            {
+                "short_url": "http://tcrn.ch/a4MSUH",
+                "global_hash": "bWw49z",
+                "long_url": "http://www.techcrunch.com/2010/01/29/windows-mobile-foursquare/",
+                "user_hash": "a4MSUH"
+            },
+            {
+                "hash": "a35.",
+                "error": "NOT_FOUND"
+            }
+        ]
+    },
+    "status_txt": "OK"
+}

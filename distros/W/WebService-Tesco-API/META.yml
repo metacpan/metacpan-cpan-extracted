@@ -1,0 +1,27 @@
+---
+abstract: 'Web service for the Tesco groceries API'
+author:
+  - 'Willem Basson <willem.basson@gmail.com>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Tesco-API
+requires:
+  Any::Moose: 0
+  Any::URI::Escape: 0
+  Data::Dumper: 0
+  JSON: 0
+  LWP::Curl: 0
+  URI: 0
+version: 1.110230

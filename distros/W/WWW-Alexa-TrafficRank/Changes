@@ -1,0 +1,75 @@
+2016-10-06      FileDir <guruperl@cpan.org>
+
+	Release 1.11
+
+	Cosmetic changes
+
+2014-12-12      FileDir <guruperl@cpan.org>
+
+	Release 1.10
+
+	Remove country rank
+
+2013-06-05      FileDir <guruperl@cpan.org>
+
+	Release 1.9
+
+	Cosmetic changes in Alexa.com
+
+2013-03-15      FileDir <guruperl@cpan.org>
+
+	Release 1.8
+
+	Cosmetic changes in Alexa.com
+
+2010-06-05      FileDir <guruperl@cpan.org>
+
+	Release 1.7
+
+	Cosmetic changes in Alexa.com
+
+2009-10-13      FileDir <guruperl@cpan.org>
+
+	Release 1.6
+
+	Cosmetic changes in Alexa.com
+	Added Changes to distribution
+
+2009-10-02      FileDir <guruperl@cpan.org>
+
+	Release 1.5
+
+	Cosmetic changes in Alexa.com
+	Added Changes to distribution
+
+
+2009-06-08      FileDir <guruperl@cpan.org>
+
+	Release 1.4
+
+	Added get_country_rank() method
+	Thanks to Evan Harris <spanner@ihug.co.nz>
+
+
+2009-05-10      FileDir <guruperl@cpan.org>
+
+	Release 1.3
+
+	Added Changes to distribution
+	Thanks to Lucas Mateus
+
+
+2009-04-01      FileDir <guruperl@cpan.org>
+
+	Release 1.2
+
+	Cosmetic changes in Alexa.com
+	Added Changes to distribution
+
+
+2008-08-28      FileDir <guruperl@cpan.org>
+
+	Release 1.0
+
+	Cosmetic changes in WWW/Alexa/TrafficRank.pm.
+	Added Changes to distribution

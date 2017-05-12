@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TaskScheduler.pm
+TaskScheduler.xs
+test.pl
+trigger.pl
+misc.h
+upload.bat
+makedist.bat
+TConvert.h
+Example.pl
+TaskScheduler.h

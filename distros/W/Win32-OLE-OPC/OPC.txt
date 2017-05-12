@@ -1,0 +1,410 @@
+NAME
+    Win32::OLE::OPC - OPC Server Interface
+
+SYNOPSIS
+    Two ways of using the OPC interface are provided, the class
+    methods:
+
+        use Win32::OLE::OPC;
+
+        my $opcintf = Win32::OLE::OPC->new('Someones.OPCAutomation',
+                                           'Someones.Server');
+        $opcintf->MoveToRoot;
+        foreach $item ($opcintf->Leafs) {
+          print $item->{name}, "\n";
+          my %result = $opcintf->ItemData($item->{itemid});
+          for $attrib (keys %result) {
+            print "        [", $attrib, " = '", $result{$attrib}, "']", "\n";
+          }
+          print "\n";
+        }
+        foreach $item ($opcintf->Branches) {
+          print $item->{name}, "\n";
+        }
+
+    or a tied hash:
+
+        use Win32::OLE::OPC;
+
+        my %OPC;
+        tie %OPC, Win32::OLE::OPC, 'Someones.OPCAutomation', 'Someones.Server';
+
+        # OK, list the keys...
+        for $key (keys %OPC) {
+          my %x = %{$OPC{$key}};
+          print $key, "\n";
+          for $attrib (keys %x) {
+            print "        '", $attrib, "' = '", $x{$attrib}, "'", "\n";
+          }
+          print "\n";
+        }
+
+    The tied hash method has to return a reference to a hash
+    containing the item data hence the unpleasant code '`%x =
+    %{$OPC{$key}}''. Alternatively one can assign the returned value
+    into a scalar and dereference it when using the hash like this
+    '`keys %$x'' and '`$result->{$item}''.
+
+    Note that both methods can be used together. First create an
+    interface using the `new()' method and then tie it like this:
+
+        tie %OPC, $opcintf, 'Someones.OPCAutomation', 'Someones.Server';
+
+    To connect to a remote server add the name of the server as a
+    parameter to the call to new() or to the tie:
+
+      my $opcintf = Win32::OLE::OPC->new('Someones.OPCAutomation',
+                                         'Someones.Server',
+                                         'machine.name');
+      tie %OPC, Win32::OLE::OPC, 'Someones.OPCAutomation',
+                                 'Someones.Server',
+                                 'machine.name';
+
+DESCRIPTION
+    A partial implementation of the OLE for Process Control dispatch
+    interface as defined in the 'Data Access Automation Interface
+    Standard' version 2.
+
+    An exception is raised using `Carp::croak()' on any failure.
+
+  METHODS
+
+    Win32::OLE::OPC->new(DLLPROGID, SERVERPROGID, SERVERNODE)
+        The `new()' method creates an instance of an OPC server
+        object. The `DLLPROGID' argument is the COM progid of the
+        Dll which implements the Dispatch interface to the OPC
+        server. The `SERVERPROGID' is the COM progid of the OPC
+        server containing the data you wish to access. The DLLPROGID
+        and SERVERPROGID arguments are required.
+
+        The SERVERNODE argument is optional and is the name of a
+        remote machine running the SERVERPROGID. When SERVERNODE is
+        specified a connection is made to the server using DCOM.
+        WARNING: DCOM security can be a little difficult to
+        understand so perseverance is required.
+
+        As the OPC specification only allows one browser per
+        instance of the dispatch Dll the `new()' method creates and
+        keeps a browser object in `Win32::OLE::OPC->{browser}'
+
+    MoveToRoot
+        A browser method. Moves the current browse position to the
+        root of the address space.
+
+    MoveDown(TO)
+        A browser method. Moves the current browse position one
+        branch down the address space. The `TO' parameter is the
+        branch name.
+
+    MoveUp
+        A browser method. Moves the current browse position one node
+        up the address space.
+
+    MoveTo(TO)
+        A browser method. Moves the current browse position to the
+        absolute location specified by `TO'.
+
+            $opcintf->MoveTo('COM1._Diagnostics');
+
+    Branches
+        A browser method.
+
+        Returns the branch names and itemid in a hash in an array.
+        The method has a different name from the OPC ShowBranches
+        method because it doesn't do quite the same thing.
+
+        The returned array is also stored in `Win32::OLE::OPC-
+        >{items}'.
+
+        See synopsis for an example of how to call this method.
+
+    Leafs
+        A browser method.
+
+        Returns the leaf names and itemid in a hash in an array. The
+        method has a different name from the OPC ShowLeafs because
+        it doesn't do quite the same thing. The hash has the members
+        `name' and `itemid'. The number of items in the array is
+        saved in `Win32::OLE::OPC->{count}'
+
+        The returned array is also stored in `Win32::OLE::OPC-
+        >{items}'.
+
+            foreach $item ($opcintf->Leafs) {
+              print $item->{name}, " ", item->{itemid}, "\n";
+            }
+
+    Item(N)
+        Returns a hash contining the name and itemid of item `N'.
+        Calls to `Leafs' and `Branches' collect the item data. This
+        is an alternative method of fetching the address space.
+
+          $opcintf->Leafs;
+          for (my $i = 0; $i < $opcintf->{count}; $i++) {
+            my $item = $opcintf->Item($i);
+            print $item->{name}, " ", item->{itemid}, "\n";
+          }
+
+    ItemData(ITEMID)
+        Use this to extract all the data the server holds for this
+        item of data. The `ITEMID' is the `itemid' member of the
+        hash returned by the `Leafs' method.
+
+        It returns a hash, the keys of which are the available
+        attributes (found by calling the OPC
+        `QueryAvailableProperties()' method) and the values of in
+        the hash are obtained by calling GetItemProperties.
+
+    AvailableProperties(ITEMID)
+        Returns the available properties of an item. The `ITEMID' is
+        the `itemid' member of the hash returned by the `Leafs'
+        method.
+
+        It returns an array of hashes containing the available
+        attributes found by calling the OPC
+        `QueryAvailableProperties()' method. The hash contains `Id',
+        `Description' and `DataType' members.
+
+        The returned array is also stored in `Win32::OLE::OPC-
+        >{properties}'.
+
+            print " Id Type Description\n";
+            foreach my $prop ($opcintf->AvailableProperties($item->{itemid})) {
+              printf "%3d %4d %s\n",
+                  $prop->{Id},
+                  $prop->{DataType},
+                  $prop->{Description};
+            }
+
+    ServerProperties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+            StartTime CurrentTime LastUpdateTime MajorVersion
+            MinorVersion BuildNumber VendorInfo ServerState LocaleID
+            Bandwidth OPCGroups PublicGroupNames ServerName
+            ServerNode ClientName
+
+        Note that the OPCGroups value is itself a reference to a
+        hash and it contains a hash member indexed 'Parent' which is
+        a hash pointing back up.
+
+    GetOPCServers
+        Return an array containing the names of available servers.
+        Can be called with the progid of the dispatch Dll as an
+        argument, in which case it will connect to the Dll and
+        extract the list of servers. It can also be called using the
+        object created by a call to new, in which case the name of
+        the Dll is not required. The GetOPCServers is not exported
+        by default.
+
+          use Win32::OLE::OPC qw(GetOPCServers);
+
+          my @AvailableServers = GetOPCServers('Someones.OPCAutomation');
+
+    BrowserProperties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+            Organization Filter DataType AccessRights CurrentPosition Count
+
+    GetItemIdFromName
+        This is not a standard OPC browser method. It translates a
+        full OPC path name to an item id. It is often the case that
+        the item id and the OPC path name is one and the same thing,
+        but you cannot assume that!
+
+  TIED HASH
+
+    See the SYNOPSIS for example code.
+
+    If you tie a hash to this module you can:
+
+    Read an items attributes
+        A reference to a hash keyed by attribute names is returned.
+        See the synopsis fo an example.
+
+    Access the Keys
+        The keys of the hash can be enumerated so `keys' and `each'
+        function will work.
+
+    Writing, deleting or undefining a member of the hash is not
+    possible.
+
+  OPCGroups
+
+    The Win32::OLE::OPC::OPCGroups method returns an OPCGroups
+    object which is blessed into the perl Win32::OLE::OPC::Groups
+    class.
+
+    Properties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+          Parent DefaultGroupIsActive DefaultGroupUpdateRate DefaultGroupDeadband
+          DefaultGroupLocaleID DefaultGroupTimeBias Count
+
+        Note that the hash member indexed 'Parent' is a hash
+        pointing back up to the parent properties.
+
+    SetProperty(PROPERTY,VALUE)
+        Set one of these properties to the value given.
+
+          DefaultGroupIsActive DefaultGroupUpdateRate DefaultGroupDeadband
+          DefaultGroupLocaleID DefaultGroupTimeBias
+
+    Add(NAME)
+        Add a group to the OPC groups collection. NAME is optional.
+
+    Item([NUMBER | NAME])
+        Get group by 1 based index or by the name used when it was
+        added to the groups list.
+
+    GetOPCGroup([SERVERHANDLE|NAME])
+        Get group using the server handle or by the name used when
+        it was added to the groups list.
+
+    Remove([SERVERHANDLE|NAME])
+        Remove group using the server handle or by the name used
+        when it was added to the groups list.
+
+    RemoveAll
+        Remove all groups from the groups list.
+
+    ConnectPublicGroup(NAME)
+        You connect to a public group, it cannot be added. NAME is a
+        string which identifies the group.
+
+        This is untested as I have no server which implements public
+        groups.
+
+    RemovePublicGroup([SERVERHANDLE|NAME})
+        You remove to a public group using this method. NAME is a
+        string which identifies the group or SERVERHANDLE is the
+        server handle. Talk about stating the obvious!
+
+        This is untested as I have no server which implements public
+        groups.
+
+  OPCGroup
+
+    The Win32::OLE::OPC::Group object has methods Add, Item,
+    GetOPCGroup and ConnectPublicGroup which all return a hash
+    blessed into the OPCGroup class.
+
+    Properties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+          Parent Name IsPublic IsActive IsSubscribed ClientHandle ServerHandle
+          LocaleID TimeBias DeadBand UpdateRate OPCItems
+
+        Note that the hash member indexed 'Parent' is a hash
+        pointing back up to the parent properties.
+
+    SetProperty(PROPERTY,VALUE)
+        Set one of these properties to the value given.
+
+          Name IsActive IsSubscribed ClientHandle LocaleID TimeBias DeadBand
+          UpdateRate
+
+    OPCItems
+        The Win32::OLE::OPC::OPCGroup::OPCItems method returns an
+        OPCItems object which is blessed into the perl
+        Win32::OLE::OPC::Items class.
+
+  OPCItems
+
+    This class contains a collection of OPCItem objects.
+
+    Properties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+          Parent DefaultRequestedDataType DefaultAccessPath DefaultIsActive Count
+
+        Note that the hash member indexed 'Parent' is a hash
+        pointing back up to the parent properties.
+
+    SetProperty(PROPERTY,VALUE)
+        Set one of these properties to the value given.
+
+          DefaultRequestedDataType DefaultAccessPath DefaultIsActive Count
+
+    Item(NUMBER])
+        Get item by 1 based index.
+
+    GetOPCItem(SERVERHANDLE)
+        Get item using the server handle.
+
+    AddItem(ITEMID, CLIENTHANDLE)
+        Add an item identified by ITEMID, CLIENTHANDLE is a value
+        you get back later.
+
+    AddItems(NUM, ITEMIDS, CLIENTHANDLES)
+        Add a load of items.
+
+          NUM is how many.
+          ITEMIDS is a reference to an array of itemids.
+          CLIENTHANDLES is a reference to an array of client handles.
+
+    Remove(SERVERHANDLES)
+        Removes the items in SERVERHANDLES.
+
+  OPCItem
+
+    This is the object used for reading and writing actual values.
+
+    Properties
+        Return a hash indexed by the following properties containing
+        the property value:
+
+          Parent ClientHandle ServerHandle AccessPath AccessRights ItemID IsActive
+          RequestedDataType Value Quality TimeStamp CanonicalDataType EUType EUInfo
+
+        Note that the hash member indexed 'Parent' is a hash
+        pointing back up to the parent properties.
+
+    Read(SOURCE)
+        Read the value for this item. SOURCE is either $OPCCache or
+        $OPCDevice, each of which is exported by OPC.pm by default.
+
+        Read returns a hash reference which contains Value, Quality
+        and TimeStamp values.
+
+    Write(VALUE)
+        Write VALUE to this item.
+
+    ServerHandle
+        Returns the items server handle.
+
+INSTALLATION
+    If you have nmake you can use MakeMaker as follows:
+
+      perl Makefile.PL
+      nmake
+      nmake test
+      nmake install
+      nmake documentation
+
+    The final step makes OPC.html and OPC.txt from OPC.pm.
+
+    If you don't have nmake then you will find OPC.html and OPC.txt
+    are included in the package ready built and all you have to do
+    is copy OPC.pm into the `site/lib/Win32/OLE' directory with your
+    Perl installation. This module has been tested with ActiveState
+    Perl build 522.
+
+COPYRIGHT
+        (c) 1999,2000,2001,2002 Martin Tomes.  All rights reserved.
+        Developed by Martin Tomes <martin@tomes.freeserve.co.uk>.
+
+        You may distribute under the terms of the Artistic License.  See
+        LICENSE.txt
+
+AUTHOR
+    Martin Tomes, martin@tomes.org.uk
+
+VERSION
+    Version 0.92
+

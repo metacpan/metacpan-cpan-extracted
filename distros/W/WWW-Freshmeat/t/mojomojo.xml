@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <created-at type="datetime">2009-01-22T14:58:27Z</created-at>
+  <description>MojoMojo is a Web2.0 wiki with AJAX live preview, hierarchical structure, tags, diffs, pluggable syntax, permissions/ACL, attachments, RSS feeds, a photo gallery, edit conflict resolution via 3-way merge, themes/skinning, localization, built-in full-text search, and a reverse index. Since it's built on top of the Perl Catalyst Web framework, MojoMojo supports any Web server, and includes its own standalone one. It also support any database backend supported by the DBIx::Class ORM, and has been successfully tested with PostgreSQL, SQLite, and MySQL.</description>
+  <name>MojoMojo</name>
+  <oneliner>A Perl/Catalyst-based hierarchical Web 2.0 wiki with AJAX preview, tags, etc.</oneliner>
+  <permalink>mojomojo</permalink>
+
+  <popularity type="float">191.25</popularity>
+  <updated-at type="datetime">2009-08-03T08:05:25Z</updated-at>
+  <vitality type="float">5.2</vitality>
+  <tag-list>Wiki, CMS, Web 2.0</tag-list>
+  <license-list></license-list>
+  <operating-system-list>Ubuntu, Mac OS X, FreeBSD, Windows</operating-system-list>
+
+  <programming-language-list>SQLite, jQuery, postgresql</programming-language-list>
+  <translation-list>Polish, Japanese, Catalan, French, German, Norwegian, English, Russian, Spanish</translation-list>
+  <vote-score type="integer">2</vote-score>
+  <project-filters-count type="integer">60</project-filters-count>
+  <subscriptions-count type="integer">10</subscriptions-count>
+  <recent-releases type="array">
+
+    <recent-release type="Release">
+      <approved-at type="datetime">2009-08-03T08:05:25Z</approved-at>
+      <changelog>Highlights of this release include numerous contributions, including a better design of the navigation and editing UI. First-time users will have an easier time thanks to friendlier database spawning and removal of non-user-serviceable options from the configuration file into MojoMojo.pm. Angle brackets are now preserved in code blocks. Perl comments render correctly in syntax highlighted code. Better markup code is inserted by the edit toolbar buttons.</changelog>
+      <id type="integer">303385</id>
+      <version>0.999032</version>
+      <tag-list>redesign, autarch, formatter, syntax highlight, angle brackets</tag-list>
+
+    </recent-release>
+    <recent-release type="Release">
+      <approved-at type="datetime">2009-07-29T14:12:50Z</approved-at>
+      <changelog>Session caching was improved. Remote img src URLs are allowed. POD documentation was written. Bugs were fixed.
+</changelog>
+      <id type="integer">303208</id>
+      <version>0.999031</version>
+      <tag-list>Minor bugfixes, Minor Enhancements</tag-list>
+
+    </recent-release>
+    <recent-release type="Release">
+      <approved-at type="datetime">2009-05-11T00:04:20Z</approved-at>
+      <changelog>Better XSS prevention and more testing of the code base.  Reworking of the Formatter chain. More theme choices. More Formatter plugins: RSS Feeds, Amazon, and Emoticons.</changelog>
+      <id type="integer">299207</id>
+      <version>0.999029</version>
+      <tag-list>Minor</tag-list>
+
+    </recent-release>
+    <recent-release type="Release">
+      <approved-at type="datetime">2009-04-25T08:48:19Z</approved-at>
+      <changelog>This release includes a full cleanup of the template set, Polish, Russian, Catalan, and Spanish translations, a new theme (Catalyst homepage) and a CPAN module formatter as well as DocBook and file-include formatters. There were also JQuery improvements including maximize support, sticky JavaScript-based vertical/horizontal split edit, drop-downs for syntax highlighters, and reCAPTCHA support for anti-spam.</changelog>
+      <id type="integer">298392</id>
+      <version>0.999028</version>
+      <tag-list></tag-list>
+
+    </recent-release>
+    <recent-release type="Release">
+      <approved-at type="datetime">2009-02-20T18:43:00Z</approved-at>
+      <changelog>This release adds a Japanese translation. It adds "Split Edit" for side-by-side view/edit. It supports merge for overlapping edits. It has switched from Cache::Store::Memory to Cache::FastMmap. It changes search results by link to link to ROOT/$author instead of author at page level. It shows the bread crumb path on search results, linking the terminal node. It lists one link for each page by an author via .users (instead of all revisions). It fixes broken authors (users) pager links.</changelog>
+      <id type="integer">294581</id>
+      <version>0.999027</version>
+      <tag-list>Minor feature enhancements</tag-list>
+
+    </recent-release>
+  </recent-releases>
+  <approved-urls type="array">
+    <approved-url type="Url">
+      <id type="integer">39578</id>
+      <label>Suggestions</label>
+      <permalink>105ac83fcb89c30e30347de95cde4e5a</permalink>
+
+      <redirector>http://freshmeat.net/urls/105ac83fcb89c30e30347de95cde4e5a</redirector>
+      <host>mojomojo.ideascale.com</host>
+    </approved-url>
+    <approved-url type="Url">
+      <id type="integer">63259</id>
+      <label>Twitter</label>
+      <permalink>2a70a6ab4c743fa3ba2e1d582885142a</permalink>
+
+      <redirector>http://freshmeat.net/urls/2a70a6ab4c743fa3ba2e1d582885142a</redirector>
+      <host>twitter.com</host>
+    </approved-url>
+    <approved-url type="Url">
+      <id type="integer">83403</id>
+      <label>GitHub source repo</label>
+      <permalink>d9041eaa4cb28430a73fb705457069f4</permalink>
+
+      <redirector>http://freshmeat.net/urls/d9041eaa4cb28430a73fb705457069f4</redirector>
+      <host>github.com</host>
+    </approved-url>
+    <approved-url type="Url">
+      <id type="integer">123415</id>
+      <label>GitHub source repo</label>
+      <permalink>d9041eaa4cb28430a73fb705457069f4</permalink>
+
+      <redirector>http://freshmeat.net/urls/d9041eaa4cb28430a73fb705457069f4</redirector>
+      <host>github.com</host>
+    </approved-url>
+    <approved-url type="Url">
+      <id type="integer">131288</id>
+      <label>Demo site</label>
+      <permalink>d0c6767b898a897ee25d47b82826c6a2</permalink>
+
+      <redirector>http://freshmeat.net/urls/d0c6767b898a897ee25d47b82826c6a2</redirector>
+      <host>mojomojo.org</host>
+    </approved-url>
+  </approved-urls>
+  <approved-screenshots type="array">
+    <approved-screenshot type="Screenshot">
+      <created-at type="datetime">2009-03-14T20:01:30Z</created-at>
+
+      <id type="integer">22667</id>
+      <title nil="true"></title>
+      <absolute-url>http://freshmeat.net/screenshots/8e/16/8e1625e76ea3c53892d05db914825583_thumb.png?1237060889</absolute-url>
+    </approved-screenshot>
+  </approved-screenshots>
+</project>

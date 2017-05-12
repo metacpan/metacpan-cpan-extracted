@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use WebService::Prowl;
+use Getopt::Long;
+
+GetOptions(
+    'priority|p=s'    => \my $priority,
+    'application|a=s' => \my $application,
+    'event|e=s'       => \my $event,
+    'description|d=s' => \my $description,
+    'apikey|k=s'      => \my $apikey,
+);
+
+die "Usage: $0 -k apikey -d yourmessage " unless $apikey && $description;
+
+$application ||= 'app';
+$event ||= 'test';
+
+my $ws = WebService::Prowl->new(apikey => $apikey);
+$ws->add('event' => $event, application => $application, description => $description) || die $ws->error();
+

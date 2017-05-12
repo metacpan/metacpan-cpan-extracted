@@ -1,0 +1,50 @@
+---
+abstract: 'a interface to Prowl Public API'
+author:
+  - 'Masayoshi Sekimura <sekimura@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Prowl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Prowl:
+    file: lib/WebService/Prowl.pm
+    version: '0.08'
+  WebService::Prowl::AnyEventHTTP:
+    file: lib/WebService/Prowl/AnyEventHTTP.pm
+requires:
+  AnyEvent::HTTP: '0'
+  Carp: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '6.02'
+  URI::Escape: '0'
+  XML::Simple: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sekimura/WebService-Prowl/issues
+  homepage: https://github.com/sekimura/WebService-Prowl
+  repository: git://github.com/sekimura/WebService-Prowl.git
+version: '0.08'
+x_contributors:
+  - 'Masayoshi Sekimura <sekimura@chacha.local>'
+  - 'Masayoshi Sekimura <sekimura@sixapart.com>'
+  - 'jeffblack360 <jeffblack360@gmail.com>'
+  - 'Matt Koscica <matt.koscica@gmail.com>'
+  - 'Masa Sekimura <sekimura@gmail.com>'

@@ -1,0 +1,21 @@
+NAME
+    Win32::Useful - Collection of useful functions that extend Win32
+    functionality
+
+FUNCTIONS
+  IsLastError( $errorcode )
+    Checks whether or not *Win32::GetLastError()* is equal to the the given
+    errorcode. Returns a *True* value if they are equal, 0 otherwise.
+
+    Compares the values as unsigned values, so you do not have to cope with
+    *Win32::GetLastError()* returning a signed integer.
+
+AUTHOR
+    Sascha Kiefer, esskar@cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Sascha Kiefer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

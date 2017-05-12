@@ -1,0 +1,59 @@
+---
+abstract: "Make working with JSON Web API's as painless as possible"
+author:
+  - 'Joe Papperello <antipasta@cpan.org>'
+build_requires:
+  Test::Mock::LWP::Dispatch: '0.06'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-JSON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::JSON:
+    file: lib/WWW/JSON.pm
+    version: '1.02'
+  WWW::JSON::Response:
+    file: lib/WWW/JSON/Response.pm
+  WWW::JSON::Role::Authentication:
+    file: lib/WWW/JSON/Role/Authentication.pm
+  WWW::JSON::Role::Authentication::Basic:
+    file: lib/WWW/JSON/Role/Authentication/Basic.pm
+  WWW::JSON::Role::Authentication::Header:
+    file: lib/WWW/JSON/Role/Authentication/Header.pm
+  WWW::JSON::Role::Authentication::OAuth1:
+    file: lib/WWW/JSON/Role/Authentication/OAuth1.pm
+  WWW::JSON::Role::Authentication::OAuth2:
+    file: lib/WWW/JSON/Role/Authentication/OAuth2.pm
+requires:
+  JSON::XS: '2.33'
+  LWP::UserAgent: '0'
+  Moo: '1.001'
+  Net::OAuth: '0.28'
+  Safe::Isa: '1.000003'
+  Try::Tiny: '0.12'
+  URI: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/antipasta/WWW-JSON/issues
+  homepage: https://github.com/antipasta/WWW-JSON
+  repository: git://github.com/antipasta/WWW-JSON.git
+version: '1.02'
+x_contributors:
+  - 'Joe Papperello <joeyis@gmail.com>'
+  - 'Joe Papperello <joe@socialflow.com>'

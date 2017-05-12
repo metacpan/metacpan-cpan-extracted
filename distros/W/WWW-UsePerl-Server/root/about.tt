@@ -1,0 +1,17 @@
+<div class="container">
+
+<div class="row">
+
+<div class="span12">
+
+<p>use.perl.org was a Perl-specific blogging website created by Chris Nandor and
+hosted at Geeknet. It was up from early 2001 until late 2010. This is project
+along the lines of <a href="http://www.archiveteam.org">Archive Team</a> to save historical
+Perl websites and keep the content going. Using this module you can host your
+own use.perl.org mirror.</p>
+
+</div> <!-- /span12 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

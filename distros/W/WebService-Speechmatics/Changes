@@ -1,0 +1,13 @@
+Revision history for Perl module WebService::Speechmatics
+
+0.02 2016-02-14 NEILB
+    - Removed a debugging print statement.
+    - The `lang` attribute was required on the constructor, but as noted
+      in the doc it shouldn't be. You can specify the lang when submitting
+      a job, and if you've done neither, then it will croak.
+      Thanks to José Joaquín Atria for pointing this out.
+    - Fixed typo in the doc.
+
+0.01 2015-03-23 NEILB
+    - First release to CPAN
+

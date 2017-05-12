@@ -1,0 +1,9 @@
+Revision history for Perl extension WebService::Scaleway.
+
+0.001001 2015-09-23T20:31+03:00
+ - Fix perform_server_action
+ - Improve POD
+ - Fix t/real.t
+
+0.001 2015-09-20T00:52+03:00
+ - Initial release

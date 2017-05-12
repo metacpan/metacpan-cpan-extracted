@@ -1,0 +1,16 @@
+  Wed. November 10th, 6:53pm at FreeGeek – 1731 SE 10th Ave.
+
+== Hudson - your digital monkey butler! ==
+
+speaker: JeffLavallee
+
+[Hudson http://hudson-ci.org/] is an open source [Continuous Integration http://en.wikipedia.org/wiki/Continuous_integration]  server
+
+The talk is aimed at folks new to Continuous Integration and new to Hudson.  
+
+Topic include:
+* a brief introduction to Continuous Integration
+* using Hudson to automate software builds
+* basic administration
+* getting Hudson and Perl to play nicely together
+* how Chuck Norris can improve your code quality

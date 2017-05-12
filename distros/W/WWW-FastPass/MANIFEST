@@ -1,0 +1,10 @@
+Changes
+lib/WWW/FastPass.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-pod.t
+t/02-url.t
+t/03-script.t
+META.yml                                 Module meta-data (added by MakeMaker)

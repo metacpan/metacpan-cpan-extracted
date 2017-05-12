@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+lib/WWW/Workflowy.pm
+t/001-utilities.t
+t/002-concurrent-remote-ops.t
+t/003-live-test.t
+MANIFEST
+manual_test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

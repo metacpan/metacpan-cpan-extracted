@@ -1,0 +1,46 @@
+---
+abstract: 'Provides access to Freelancer.com API'
+author:
+  - 'Alan Haggai Alavi <haggai@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Freelancer
+provides:
+  WWW::Freelancer:
+    file: lib/WWW/Freelancer.pm
+    version: v0.0.1
+  WWW::Freelancer::Project:
+    file: lib/WWW/Freelancer/Project.pm
+  WWW::Freelancer::Project::BidStats:
+    file: lib/WWW/Freelancer/Project.pm
+  WWW::Freelancer::Project::Budget:
+    file: lib/WWW/Freelancer/Project.pm
+  WWW::Freelancer::Project::Buyer:
+    file: lib/WWW/Freelancer/Project.pm
+  WWW::Freelancer::Project::Options:
+    file: lib/WWW/Freelancer/Project.pm
+  WWW::Freelancer::User:
+    file: lib/WWW/Freelancer/User.pm
+  WWW::Freelancer::User::Address:
+    file: lib/WWW/Freelancer/User.pm
+  WWW::Freelancer::User::BuyerRating:
+    file: lib/WWW/Freelancer/User.pm
+  WWW::Freelancer::User::ProviderRating:
+    file: lib/WWW/Freelancer/User.pm
+  WWW::Freelancer::User::Rating:
+    file: lib/WWW/Freelancer/User.pm
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/alanhaggai/WWW-Freelancer.git
+version: v0.0.1

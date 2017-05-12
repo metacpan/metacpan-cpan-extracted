@@ -1,0 +1,117 @@
+Revision history for Perl module WWW::Mechanize::Pluggable
+1.12  Fri Jul  8 22:57:10 PDT 2011
+	- Update prereqs: add HTTP::Cookies
+
+1.11  Wed Jul  6 21:17:48 PDT 2011
+	- clone.t shouldn't be run with taint on
+        - reduced tests to the ones that actually test this code, not Mech's
+
+1.10  Sat Jul  2 18:56:43 PDT 2011
+        - several other "helpful" ISPs cause the 404 test to fail;
+          detect this before testing anything and adjust accordingly
+        - fix syntax errors in taint.t
+
+1.09  Wed Mar  9 18:51:08 PST 2011
+	- Require LWP 6, as it fixes the object click bug
+
+1.08  Wed Mar  9 18:22:56 PST 2011
+	- remove pluggable tests, as they test the included Module::Pluggable
+	- move Module::Pluggable to inc/ to avoid PAUSE indexing errors
+	- add "use lib '../inc'" as needed to tests
+
+1.07  Tue Mar  8 22:40:31 PST 2011
+	- Updated several tests to match current WWW::Mechanize API.
+	- Hard-coded requirement for minimum level of WWW::Mechanize.
+
+1.06  Fri May 21 14:19:22 PDT 2010
+	- fix local/back.t to always use a localhost URL
+	  (fails if hostname doesn't resolve)
+
+1.05  Sat Mar 21 16:24:38 PDT 2009
+	- Updates to handle WWW::Mechanize API changes
+	  -- autoocheck now defaults to 1
+	  -- _pop_page_stack is gone
+	  -- other minor test changes
+
+1.04  Wed Sep 19 18:17:22 PDT 2007
+	- Updated t/local/back.t to be more cautious about whether it
+          should try to kill the (possibly nonexistent) HTTP:Daemon.
+	  Thanks to Andreas Koenig for this one,
+
+1.03 Tue Sep 18 14:41:05 PDT 2007
+	- Updated tests to match newest WWW::Mechanize
+	- Allow a different subclass (such as Test::WWW::Mechanize) 
+	  to be used for Mech (from Jonathan Swartz)
+	- Fix a bug where plugin load errors are concealed by an eval()
+	  (also from Jonathan Swartz)
+	- Patch Plugin/Cookbook.pm to fix a few minor errors
+	  (from Jonathan Swartz as well!)
+
+1.02 Thu Jan 25 09:20:52 PST 2007
+	- Expand the namespace allowed for plugins: now can use
+	  any namespace below WWW::Mechanize::Plugin
+
+1.01 Fri Jun 23 15:48:46 PDT 2006
+	- replaced YAML with Data::Dump::Streamer for cloning;
+	  fewer prereqs.
+
+1.00 Tue Apr  4 14:59:38 PDT 2006
+	- fixed ugly problem with parameterized plugins;
+ 	  removed the "elimate parameters" business that
+	  was a hack; replaced with by-plugin-name
+	  parameterization.
+
+0.11 Fri Mar 31 13:22:39 PST 2006
+	- fork() fix in tests for Win32 and other OS'es 
+	  without fork()
+
+0.10 Wed Nov 23 09:03:46 2005 
+	- last_method added to allow plugins to see what method
+	  was called (and optionally call it again if needed).
+
+0.09 Tue Sep 13 15:44:55 2005
+	- added code to WWW::Mechanize::Plugin::Cookbook to make sure
+          it didn't "fail to load" when the plugins were scanned.
+
+0.08 Tue Sep 13 15:00:32 2005 
+	- fixed Echo test plugin to consistently work under 5.8 
+
+0.07 Tue Sep 13 12:41:57 2005 
+	- Plugin arguments to new() are now supported via init()
+	- clarified init() interface; added docs for deleting params
+	- added test Echo plugin and plugin_args.t
+        - added cookbook
+
+0.06 Tue Aug 16 12:30:40 2005
+	- added -notaint option to tests and Makefile.PL
+        - expanded docs
+
+0.05 Tue Jul 26 15:42:08 2005
+	- minor change to return checking for pre hooks; a 
+	  plugin which returned undef would get a nasty warning
+	- reorder creation of WWW::Mechanize object in new() to 
+	  allow plugins to modify prereq classes before the object
+	  is created
+
+0.04 Thu Jul  8 14:38:41 2005 
+	- modifications to Module::Pluggable call to make sure modules
+          are not loaded until first new() call to WWW::Mech::Pluggable
+	- mods to init() to make sure plugins get a good copy of the object
+	- removed test for mech-dump, since we don't install it
+
+0.03 Thu Jun 30 23:36:34 2005
+	- core plugin support working
+	- core hook support working
+        - extended documentation for base class and example plugin
+        - removed debug warning message in plugin
+	- version numbering fixed in this file
+
+0.02 Tue Jun 28 12:20:34 2005
+	- core hook support started
+	- added fixed version of Module::Pluggable and tests
+	- fixes to Makefile.PL for missing prereqs
+
+0.01 Tue May  3 15:30:45 2005
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

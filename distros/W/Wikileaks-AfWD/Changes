@@ -1,0 +1,8 @@
+Revision history for Wikileaks-AfWD
+
+0.1.0	 2011-07-01/18:30
+		 -Name space fix. Rename from DBI::Wikileaks::AfWD to Wikileaks::AfWD.
+		 -Update name post marriage.
+
+0.0.0	 2010-07-01/11:12
+		 -Initial release.

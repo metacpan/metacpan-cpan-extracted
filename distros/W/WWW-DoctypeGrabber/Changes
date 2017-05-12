@@ -1,0 +1,29 @@
+Revision history for WWW-DoctypeGrabber
+
+0.007  2013-12-07
+        - Fixed broken test
+
+0.006  2013-12-02
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+        - Switched to Class::Accessor::Grouped from
+          deprecated Class::Data::Accessor
+
+0.005   2010-03-12
+	- Fixed a new bug in test suite due to updates in
+	  the website it accesses
+
+0.004   2009-01-18
+        - Fixed a new bug in test suite due to updates in
+          the website it accesses
+
+0.003   2008-11-01
+        - Added the Content-type in output
+
+0.002   2008-03-15
+        - added the C<raw()> argument/method
+
+0.001   2008-03-15
+        - First version, released on an unsuspecting world.
+

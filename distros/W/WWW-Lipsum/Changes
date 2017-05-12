@@ -1,0 +1,48 @@
+Revision history for WWW-Lipsum
+
+1.001012  2015-03-21
+        - Attempted to resolve cases where we get 'Unknown error'
+          and expanded the error message so we could debug
+          this further, should it reappears in CPAN TESTERS
+          reports (Fixes #6)
+
+1.001011  2015-03-10
+        - Fixes #5 (Failing tests)
+        - Fixes #4 (Missing version in example script)
+
+1.001010  2015-03-06
+        - Updated prereq version requirements to newer versions;
+          previous versions fail
+
+1.001009  2015-03-05
+        - Fixed failures with newer Mojolicious (Issue #2)
+
+1.001008  2014-02-10
+        - Fixed up the tests that failed when there was no network
+
+1.001007  2014-02-02
+        - Fixed a test that's been failing sometimes simply due to random
+          chance of getting the unwanted type of data
+
+1.001006  2014-01-28
+        - Added prereq version to Mojolicious to fix strange test
+          fails that seems to be related to old Mojo::DOM versions
+          (which in itself has no version number)
+
+1.001005  2014-01-27
+        - Upped required Moo version, as older versions cause a failure
+
+1.001004  2014-01-26
+        - Switched to use Author::ZOFFIX plugin bundle in dzil.ini
+
+1.001003  2014-01-26
+        - Forgot to bump the version
+
+1.001002  2014-01-26
+        - Made some clarifications in the POD
+        - Added up a whole bunch of author/release tests
+
+1.001001  2014-01-25
+        - Complete rewrite from scratch; taken over the namespace from
+          the previous author who deleted his WWW-Lipsum
+

@@ -1,0 +1,104 @@
+Web-ID
+======
+
+Created:      2012-04-26
+Home page:    <https://metacpan.org/release/Web-ID>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Web-ID>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.927	2014-05-10
+
+ [ Packaging ]
+ - Bump required version of Types::Standard to 0.040.
+ - Bump required version of match::simple to 0.008.
+
+ [ Other ]
+ - Rather than defining Datetime and Uri types in Web::ID::Types, use
+   Types::DateTime and Types::URI from CPAN.
+
+1.926	2013-12-10
+
+ - Updated: Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+1.925	2013-09-03
+
+1.924_03	2013-08-10
+
+ [ Packaging ]
+ - configure_requires File::ShareDir.
+
+1.924_02	2013-08-09
+
+ [ Packaging ]
+ - Package using Dist::Inkt.
+
+1.924_01	2013-08-07
+
+ [ Bug Fixes ]
+ - Type::Utils no longer exports `extends` by default; request it.
+
+ [ Packaging ]
+ - Minor packaging fixes.
+
+1.923	2013-05-21
+
+ - Do a better job searching for OpenSSL binary; use Alien::OpenSSL if it
+   can't be found.
+ - Switched from MooseX::Types to Types::Standard.
+ - Switched from Path::Class to Path::Tiny.
+ - Switched from Sub::Exporter to Exporter::TypeTiny.
+ - Switched from smartmatch to match::smart.
+
+1.922	2012-12-15
+
+ [ Documentation ]
+ - Documented test suite.
+
+ [ Other ]
+ - Make test suite output cleaner (no openssl junk) if Capture::Tiny is
+   available.
+ - Updated: RDF::Trine now uses Moose, so there's no reason for Web::ID to
+   continue using Any::Moose. All the old Any::Moose/Mouse stuff is now
+   gone, and Web::ID now uses Moose and MooseX::Types.
+ - Updated: Switched from namespace::clean to namespace::sweep.
+
+1.921	2012-05-20
+
+ [ Packaging ]
+ - Add version number (0.06) to MouseX::Types dependency.
+
+1.920	2012-05-10
+
+ [ Documentation ]
+ - Minor documentation changes.
+
+ [ Packaging ]
+ - Mark as non-development release.
+
+1.910_04	2012-05-09
+
+ - Drop dependency on Class::Load; use load_class from Plack::Util instead.
+ - Use File::Temp and Path::Class in t/04webid.t - they're already
+   dependencies, so might as well.
+   Kjetil Kjernsmo++
+
+1.910_03	2012-05-09
+
+ - Better hooks for subclassing Plack::Middleware::Auth::WebID.
+
+1.910_02	2012-05-08
+
+ [ Documentation ]
+ - Add Any::Moose stuff to Web::ID BUGS section.
+   Florian Ragwitz++
+ - Improve Web::ID DESCRIPTION.
+   Jonas Smedegaard++
+
+ [ Other ]
+ - Updated: Replace deprecated Digest::SHA1 with Digest::SHA.
+   Jonas Smedegaard++
+
+1.910_01	2012-05-07
+
+ - Almost complete rewrite of CGI::Auth::FOAF_SSL. Very different (and much
+   cleaner) API.

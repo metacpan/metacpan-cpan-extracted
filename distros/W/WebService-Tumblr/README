@@ -1,0 +1,143 @@
+NAME
+    WebService::Tumblr - A Perl interface to the Tumblr web API
+
+VERSION
+    version 0.0010
+
+SYNOPSIS
+        use WebService::Tumblr;
+
+        # Interact with the Tumblr blog at http://example.tumblr.com
+        my $tumblr = WebService::Tumblr->new(
+            name => 'example', email => 'alice@example.com', password => 'hunter2'
+        );
+
+        # Make a post
+        my $dispatch = $tumblr->write(
+           type => 'regular',
+           format => 'markdown',
+           body => ...
+           date => ...
+           generator => ...
+           state => ... # 'draft' or 'published'
+        );
+        if ( $dispatch->is_success ) {
+            my $post_id = $dispatch->content; # Shortcut for $dispatch->response->decoded_content;
+        }
+
+        # Making a post, part II: Electric Boogaloo
+        my $post_id = $tumblr->write( ... )->submit;
+
+        # Editing a post (will die unless post-id is given)
+        $tumblr->edit( 'post-id' => $post_id, ... )->submit;
+
+DESCRIPTION
+    WebService::Tumblr is a LWP::UserAgent-based interface for accessing the
+    Tumblr API
+
+USAGE
+  $tumblr = WebService::Tumblr->new( name => ..., email => ..., password => ... )
+    Returns a new Tumblr API agent configured for the Tumblr blog at
+    "(name).tumblr.com"
+
+        name            The name (hostname) of the blog to interface with
+
+        email           The e-mail & password of the account that owns the given blog
+        password
+
+  $dispatch = $tumblr->write( ... )
+        $post_id = $tumblr->write( ... )->content; # Will throw an exception if post fails (HTTP post is unsuccessful)
+
+    Create a new post or update an existing post (if given post-id)
+
+        type                The post type, can be one of the following
+                            * regular
+                            * photo
+                            * quote
+                            * link
+                            * conversation
+                            * video
+                            * audio
+
+                            See below about the additional parameters associated with each type
+
+        date (optional)     The post date, if different from now, in the blog's timezone
+                            Most unambiguous formats are accepted, such as '2007-12-01 14:50:02'
+                            Dates may not be in the future
+
+        private (optional)  1 or 0 (Whether the post is private)
+                            Private posts only appear in the dashboard or with authenticated links, and do not appear on the blog's main page
+
+        tags (optional)     Comma-separated list of post tags
+                            You may optionally enclose tags in double-quotes
+
+        format (optional)   'html' or 'markdown'
+
+        group (optional)    Post this to a secondary blog on your account, e.g. mygroup.tumblr.com (for public groups only)
+
+        slug (optional)     A custom string to appear in the post's URL: myblog.tumblr.com/post/123456/this-string-right-here
+                            URL-friendly formatting will be applied automatically
+                            Maximum of 55 characters
+
+        state (optional)    One of the following values:
+                            * published (default)
+                            * draft - Save in the drafts folder for later publishing
+                            * submission - Add to the messages folder for consideration
+                            * queue - Add to the queue for automatic publishing in a few minutes or hours
+                              To publish at a specific time in the future instead, specify an additional publish-on parameter
+                              with the date expression in the local time of the blog (e.g. publish-on=2010-01-01T13:34:00)
+                              If the date format cannot be understood, a 401 error will be returned and the post will not be created
+
+                            To change the state of an existing post, such as to switch from draft to published,
+                            follow the editing process and pass the new value as the state parameter
+
+                            Note: If a post has previously been saved as a draft, queue, or submission post,
+                            it will be assigned a new post ID the first time it enters the published state.
+
+    Depending on the kind of post (type), additional parameters will be
+    necessary:
+
+        regular             Requires at least one:
+                            * title
+                            * body (HTML or Markdown, depending on 'format')
+
+        photo               Requires either source or data, but not both. If both are specified, source is used.
+                            * source - The URL of the photo to copy. This must be a web-accessible URL, not a local file or intranet location.
+                            * data - An image file. See File uploads below.
+                            * caption (optional, HTML allowed)
+                            * click-through-url (optional)
+
+        quote               *  quote
+                            *  source (optional, HTML allowed)
+
+        link                * name (optional)
+                            * url
+                            * description (optional, HTML allowed)
+
+        conversation        * title (optional)
+                            * conversation
+
+        video               Requires either embed or data, but not both.
+                            * embed - Either the complete HTML code to embed the video, or the URL of a YouTube video page.
+                            * data - A video file for a Vimeo upload. See File uploads below.
+                            * title (optional) - Only applies to Vimeo uploads.
+                            * caption (optional, HTML allowed)
+
+        audio               * data - An audio file. Must be MP3 or AIFF format. See File uploads below.
+                            * externally-hosted-url (optional, replaces data) - Create a post that uses this
+                            externally hosted audio-file URL instead of having Tumblr copy and host an uploaded file.
+                            Must be MP3 format. No size or duration limits are imposed on externally hosted files.
+                            * caption (optional, HTML allowed)
+
+SEE ALSO
+    WWW::Tumblr
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

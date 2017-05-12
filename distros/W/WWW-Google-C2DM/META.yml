@@ -1,0 +1,38 @@
+---
+abstract: 'Google C2DM Client'
+author:
+  - 'xaicron <xaicron@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Fake::HTTPD: 0.03
+  Test::Flatten: 0.07
+  Test::More: 0.98
+  Test::SharedFork: 0.19
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Google-C2DM
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  WWW::Google::ClientLogin: 0
+requires:
+  HTTP::Request: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://github.com/xaicron/p5-WWW-Google-C2DM/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/xaicron/p5-WWW-Google-C2DM/
+version: 0.08

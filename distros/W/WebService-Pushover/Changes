@@ -1,0 +1,39 @@
+Revision history for WebService-Pushover
+
+       Moved deprecated methods out of main interface documentation.
+
+0.2.0  Fri Jan 10 10:35:18 2014
+       Fix for non-creator user key issue (thanks Chisel Wright!)
+       Added sounds() and bumped minor version.
+
+0.1.2  Mon Apr 22 10:45:43 2013
+       Reimplemented push() and tokens() for backwards compatibility.
+       Added deprecation warnings and more tests.
+
+0.1.1  Fri Apr 19 10:20:11 2013
+       Documentation fix, debug() argument fix, additional unit test
+       Thanks to Alec Edworthy for several bug reports :)
+
+0.1.0  Sun Apr 14 18:31:28 2013
+       Rewrote using Net::HTTP::Spore instead of WebService::Simple.
+       Added various new methods and parameters.
+
+0.0.6  Mon Oct 22 17:23:21 2012
+       Added additional valid options for priority parameter.
+       http://updates.pushover.net/post/33347359324/sending-quiet-messages-through-the-api
+
+0.0.5  Thu Jun 14 17:32:56 2012
+       Implemented missing url_title parameter and updated documentation (thanks Joshua!)
+
+0.0.4  Wed Jun 13 14:54:39 2012
+       Still more futzing with metadata.
+
+0.0.3  Wed Jun 13 14:43:07 2012
+       No, really, capture the correct build requirements.
+
+0.0.2  Mon Jun 11 16:26:00 2012
+       Updated requirements to make CPANTS happy.
+
+0.0.1  Thu Jun  7 11:03:02 2012
+       Initial release.
+

@@ -1,0 +1,43 @@
+---
+abstract: 'Obtain FMyLife.com anecdotes via API'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Tamir Lousky <tlousky@cpan.org>'
+build_requires:
+  Net::Ping: 0
+  Sub::Override: 0
+  Test::Deep: 0
+  Test::MockObject::Extends: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - fml
+  - fmylife
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-FMyLife
+provides:
+  WWW::FMyLife:
+    file: lib/WWW/FMyLife.pm
+    version: 0.15
+  WWW::FMyLife::Comment:
+    file: lib/WWW/FMyLife/Comment.pm
+    version: 0.02
+  WWW::FMyLife::Item:
+    file: lib/WWW/FMyLife/Item.pm
+    version: 0.05
+  WWW::FMyLife::Vote:
+    file: lib/WWW/FMyLife/Vote.pm
+    version: 0.02
+requires:
+  LWP::UserAgent: 0
+  Moose: 0.86
+  XML::Simple: 2.18
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/xsawyerx/www-fmylife/
+version: 0.15

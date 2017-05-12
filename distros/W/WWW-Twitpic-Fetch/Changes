@@ -1,0 +1,26 @@
+Revision history for WWW-Twitpic-Fetch
+
+0.07		20111010
+				fix some scraping rules. (#71562)
+
+0.06    20100413
+        followed some changes in Twitpic's HTML output.
+
+0.05		20090905
+				modified list method. now it returns empty ARRAY-ref when there's no photo on the page.
+
+0.04		20090711
+				just increment version number because I have mistaken uploading distfile. :(
+
+0.03		20090711
+				added tagged() method
+				get tags information from scaled photo page.
+
+0.02    2009710
+        modified pod.
+        photo_info() now can accept url of photo page instead of photo id.
+        
+
+0.01    20090708
+        First version.
+

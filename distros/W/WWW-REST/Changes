@@ -1,0 +1,17 @@
+[Changes for 0.011 - Sat May  2 18:44:52 CST 2015]
+
+* LICENSING CHANGE: This module is now in the public domain under
+  CC0 1.0 Universal terms.
+* Fix Module::Signature compatibility.
+
+[Changes for 0.01]
+____________________________________________________________________________
+[  8516] By: autrijus                              on 2003/10/21  07:04:37
+        Log: * This be 0.01, initial CPAN release.
+	   + MANIFEST Makefile.PL README t/0-signature.t
+	   ! lib/WWW/REST.pm t/1-basic.t
+____________________________________________________________________________
+[  8416] By: autrijus                              on 2003/10/15  07:31:47
+        Log: * make it work under the new namespace.
+             * switch to Class::Struct.
+	   ! lib/WWW/REST.pm t/1-basic.t

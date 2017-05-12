@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.37.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3f37a0c7840f2255a9a3cf19b366ffef1b576d62 AUTHORS
+SHA1 7a95fc8778fbce1f60d222e0d0d1dbb6c649461f Artistic
+SHA1 531e6b5c470d4726483fd68833391653eace0a92 COPYING
+SHA1 eeae5c9b30a6b79de84a186a864bef45b75c936b CREDITS
+SHA1 dce7a917e7702d12dc4a8a36f6bf7a892d074f2b ChangeLog
+SHA1 0956d58b87a66795e5576ff924c82f2a6e8b7128 Changes
+SHA1 84b0645e35fbfd34200a06f6e40a48ddb28c0355 INSTALL
+SHA1 6092652808a27a7a38efb77f902942a25014db5f LICENCE
+SHA1 f6858b3fe5bd3ecfaa6fb7b8deb146f6300eb065 MANIFEST
+SHA1 7ce845a1d35c493f35d7fc974bd99f785ce40a80 MANIFEST.SKIP
+SHA1 5739b9a724775dfd39b0f35399c9c898d278c608 META.yml
+SHA1 7e9d8bfa28170e355ae9593127d513d9e15b6801 Makefile.PL
+SHA1 b178f383a5a14c58bd6d9e9d74efe227fd5a1027 README
+SHA1 40d0459b80da8b5fbd59de234f69ebbe91e69e28 examples/yahoo2maildir
+SHA1 05095b440c4ad3d7390549c8dc1169d964c980bc lib/WWW/Yahoo/Groups.pm
+SHA1 f0234616d0e06a1053108e7439ce4711500196a3 lib/WWW/Yahoo/Groups/Errors.pm
+SHA1 c3b0a0d1c8ac242b47d75178f66e4a31c5e7f498 lib/WWW/Yahoo/Groups/Mechanize.pm
+SHA1 ff1347aed1f81b536966c27b0b57e6d14e68c57c t/00load.t
+SHA1 6a266926a5fbae4b8656b7bcc17019b8ebe9c2d2 t/00sig.t
+SHA1 52ba32cbde27620f05367fd67737bb02249f478c t/01login.t
+SHA1 d9a64499ac09b3dfabb41bd89eee7a96118edb7a t/02badparam.t
+SHA1 c4196b5642f85116b868cfd5c8b3320b406592ff t/03adult.t
+SHA1 e8875e2b91d65622e935c16bb437d442f1c86ab6 t/03message.t
+SHA1 7e9d4e3d0f8241570e9afd2d489645ad5143e8f2 t/04rss.t
+SHA1 1318bd0fca12dafb624f90064c6c1277226838a9 t/05lists.t
+SHA1 5d0a12da628099e8e26d3c96b814e5b62259f8bc t/06lastmsgid.t
+SHA1 8803265971be907bd0f875663e2710a481f6f35e t/07sleep.t
+SHA1 b53f635f2abce331ce87d5587162aba0d85a22da t/08logout.t
+SHA1 ee3d8167ff8e76dda699bc8984ea2af9463fb625 t/09badfetch.t
+SHA1 d3474b3c5e84ba7d32b3aa1b4e7914bacb6d235b t/10agent.t
+SHA1 c41574ca2c239b0c8dd9426018ee41eabb06e437 t/99pod.t
+SHA1 fd3f10755858c057f18376d45ab65b273c6e0e04 t/msgs_01.txt
+SHA1 e2f0b35bcd41b832d4705c7692fedae71e6a1f92 t/msgs_02.txt
+SHA1 e12cd0195fe3dc30cbd42d424f9522d76ca884eb t/msgs_adult01.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+
+iD8DBQE/yxv7zL8gm6KQWMgRAtMDAKCcvbAP0m6o7LTLSQozkeB+BB6ymACgr5Ix
+nxHuUeSq9pWMcsCy9VX9hiI=
+=8hY7
+-----END PGP SIGNATURE-----

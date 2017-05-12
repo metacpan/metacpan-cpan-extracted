@@ -1,0 +1,57 @@
+WordNet::BestStem
+
+Get the single best guess of word's stem form using text corpus frequencies of word forms.
+
+DEPENDENCIES
+
+WordNet  ( http://wordnet.princeton.edu )
+WordNet::QueryData
+WordNet::Similarity::ICFinder
+
+INSTALLATION
+
+Extract the files from the archive by entering this at a shell,
+
+    tar xvf WordNet-BestStem-xxx.tar.gz
+
+then,
+
+    cd WordNet-BestStem-xxx
+
+and run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+If you don't have permission to run sudo, you can specify an alternative path,
+
+    perl Makefile.PL PREFIX=/home/user/my_perl_lib
+    make
+    make test
+    make install
+
+then add /home/user/my_perl_lib to your PERL5LIB environment variable.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for the modules with the
+perldoc command.
+
+    perldoc WordNet::BestStem
+
+You can also look for information at:
+
+    Search CPAN
+      http://search.cpan.org/dist/WordNet-BestStem/
+
+If you notice a bug or have a request, or if you would like to help develop or maintain the package, please email me at the address below.
+
+
+~~~~~~~~~~~~ ~~~~~ ~~~~~~~~ ~~~~~ ~~~ `` ><(((">
+
+Copyright (C) 2009 Maggie J. Xiong  < maggiexyz users.sourceforge.net >
+
+All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as perl itself.

@@ -1,0 +1,27 @@
+Revision history for WWW-TamperData
+0.09	2011 February 17
+	Request and Response hooks
+	Improved test suite
+	Correctly handles missing pre-requisite modules
+
+0.08    2009 June 18
+        Fixed missing file in manifest that caused all tests to fail for 0.06 
+
+0.07    2009 June 12
+        Updated make procedure to include test data
+
+0.06    2009 June 11
+        Updated pod, cosmetic code changes, additional tests
+
+0.05    2009 May 30
+        Requests changed to use the HTTP::Request object
+        Single request transcripts now work
+        Multiple request types now supported (GET, HEAD, POST, etc)
+        Callback/filter functions introduced
+
+
+0.02	2009 May 25
+        Fixed some typos and made the module more testing compliant
+
+0.01_1  2009 May 21
+        First version, released on an unsuspecting world.

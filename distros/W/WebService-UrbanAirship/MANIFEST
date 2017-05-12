@@ -1,0 +1,23 @@
+lib/WebService/UrbanAirship.pm
+lib/WebService/UrbanAirship/APNS.pm
+Makefile.PL
+MANIFEST			This list of files
+t/apns/01compile.t
+t/apns/02constructor.t
+t/apns/03subclass.t
+t/apns/60_init.t
+t/base/01compile.t
+t/base/02constructor.t
+t/base/60_api_uri.t
+t/conf/ssl/ssl.last.conf.in
+t/lib/My/Subclass.pm
+t/lib/My/TestUtil.pm
+t/live/10register_device.t
+t/live/11push.t
+t/live/12batch.t
+t/live/13broadcast.t
+t/live/14feedback.t
+t/live/15stats.t
+t/live/16ping_device.t
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

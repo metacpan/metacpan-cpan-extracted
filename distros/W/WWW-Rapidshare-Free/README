@@ -1,0 +1,209 @@
+WWW-Rapidshare-Free
+
+
+NAME
+    WWW::Rapidshare::Free - Automates downloading from Rapidshare.com and
+    checking links for free users
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use WWW::Rapidshare::Free qw( verbose add_links check_links 
+          download connection );
+
+        # We are going to let the module be verbose and display a delay metre and 
+        # progress bar.
+        verbose(1);
+
+        my @links = add_links(
+            qw{
+              http://rapidshare.com/files/175658683/perl-51.zip
+              http://rapidshare.com/files/175662062/perl-52.zip
+              }
+        );
+
+        print "Added links:\n";
+        map print("\t$_\n"), @links;
+
+        my @erroneous_links = check_links;
+        map {
+            my ( $uri, $error ) = @{$_};
+            print "URI: $uri\nError: $error\n";
+        } @erroneous_links;
+
+        download(
+            properties    => \&properties,
+            file_complete => \&file_complete,
+        );
+
+        sub properties {
+            my ( $file_name, $file_size ) = @_;
+            print "Filename: $file_name\nFile size: $file_size bytes\n";
+        }
+
+        sub file_complete {
+            # Let us restart the modem. I have updated my /etc/sudoers file to allow me
+            # to execute sudo pppoe-start and sudo pppoe-stop without a password.
+            connection(
+                connect    => 'sudo pppoe-start',
+                disconnect => 'sudo pppoe-stop',
+            );
+        }
+
+FUNCTIONS
+    By default, the module does not export any function. An export tag "all"
+    has been defined to export all functions. The following functions can be
+    exported:
+
+    *   add_links
+
+        Adds links to be downloaded and returns the added links as an array.
+        Accepts an array of values as argument. Ignores commented links
+        (links that start with a "#") and invalid links.
+
+    *   add_links_from_file
+
+        Adds links from a file which is given as an argument and returns the
+        added links as an array. Ignores commented links (links that start
+        with a "#") and invalid links.
+
+    *   links
+
+        Returns current links which have been added by "add_links" or
+        "add_links_from_file".
+
+    *   clear_links
+
+        Clears current links and returns them as an array.
+
+    *   check_links
+
+        Checks if the links are alive or not. Returns an array of array
+        references if there are dead links. The latter arrays are of the
+        form "[ link, error message ]". If all links are alive, returns
+        false. Additionally it also removes the dead links.
+
+            my @erroneous_links = check_links;
+            map {
+                my ( $uri, $error ) = @{$_};
+                print "URI: $uri\nError: $error\n";
+            } @erroneous_links;
+
+    *   download
+
+        Downloads files off valid links. Accepts a hash with a maximum of
+        four keys having callbacks as their values. The hash should be of
+        the form:
+
+            (
+                delay          => \&delay_callback,
+                properties     => \&properties_callback,
+                progress       => \&progress_callback,
+                file_complete  => \&file_complete
+            )
+
+        Callbacks are passed values as follows:
+
+        *   "delay"
+
+            "delay" callback is passed the number of seconds until download
+            begins. It is called every second until the delay is zero. Delay
+            is decremented each time the callback is executed.
+
+        *   "properties"
+
+            "properties" is passed the file name and file size as two
+            arguments.
+
+        *   "progress"
+
+            Sole argument is the number of bytes of the current file
+            downloaded so far. This callback is executed every instant in
+            which data is written to the file which is being downloaded.
+
+        *   "file_complete"
+
+            This callback passes control after each file is downloaded.
+            Disconnection/connection establishment or reconnection is
+            possible by invoking "connection".
+
+    *   verbose
+
+        Controls the output verbosity. Pass it a false value such as 0 or ''
+        (empty string) to turn off the delay metre and progress bar.
+        Everything else turns on verbosity. Verbosity is true by default.
+
+    *   connection
+
+        Most useful within the callback of "download" pertaining to the hash
+        key "file_complete". Accepts a hash:
+
+            connection(
+                connect    => '',  # Command to start a connection
+                disconnect => '',  # Command to disconnect
+                reconnect  => ''   # Command to reconnect
+            );
+
+        Either both "connect" and "disconnect" have to be specified, or
+        "reconnect" has to be specified. If a single command can reconnect,
+        then a value for "reconnect" will be apt, else "connect" and
+        "disconnect" should be assigned the respective commands to connect
+        and disconnect. The commands should be your operating system's
+        commands to connect/disconnect/reconnect the internet connection.
+
+        Windows users can use the rasdial utility to connect/disconnect:
+        <http://technet.microsoft.com/en-us/library/bb490979.aspx>.
+
+    Check "download.pl" file inside "example" directory for usage example of
+    the module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+AUTHOR
+    Alan Haggai Alavi, "<alanhaggai at alanhaggai.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-rapidshare-free
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Rapidshare-Free>. I
+    will be notified, and then you will automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::Rapidshare::Free
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Rapidshare-Free
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-Rapidshare-Free
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-Rapidshare-Free
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Rapidshare-Free/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Alan Haggai Alavi, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

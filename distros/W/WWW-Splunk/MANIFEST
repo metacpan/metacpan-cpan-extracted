@@ -1,0 +1,14 @@
+bin/sc
+Build.PL
+ChangeLog
+lib/WWW/Splunk.pm
+lib/WWW/Splunk/API.pm
+lib/WWW/Splunk/XMLParser.pm
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+t/pod.t
+t/XMLParser.t
+SIGNATURE    Added here by Module::Build

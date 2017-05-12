@@ -1,0 +1,29 @@
+==================================================
+Changes from 2005-02-26 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.10 at 2015-02-24 14:13:49 +0000
+-----------------------------------------
+
+  Change: 3e01cf15172e6a67764eabbe2858a8e68bc90f20
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2015-02-24 14:02:32 +0000
+
+    POD fixup 
+
+  Change: 06a5a2ad1cc7bb78b9ceaae21379b4e8deb2efd7
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2015-02-24 13:13:03 +0000
+
+    First revision 
+
+  Change: 36d43af528db23e49e16d3ede984cca7d9b1df37
+  Author: Chris Hughes <chris@lokku.com>
+  Date : 2015-02-24 12:54:27 +0000
+
+    Gitignore 
+
+================
+End of releases.
+================

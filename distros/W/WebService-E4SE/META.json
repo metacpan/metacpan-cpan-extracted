@@ -1,0 +1,88 @@
+{
+   "abstract" : "Communicate with the various Epicor E4SE web services.",
+   "author" : [
+      "Chase Whitener <capoeirab@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-E4SE",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.4",
+            "Test::CheckManifest" : "1.29",
+            "Test::Kwalitee" : "1.22",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.88",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::Spelling::CommonMistakes" : "1.000",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::NTLM" : "1.0",
+            "Carp" : "0",
+            "File::Slurper" : "0",
+            "HTTP::Headers" : "6.0",
+            "HTTP::Request" : "6.0",
+            "LWP::UserAgent" : "6.0",
+            "Moo" : "2.0",
+            "Try::Tiny" : "0.24",
+            "URI" : "1.6",
+            "XML::Compile::Licensed" : "0.01",
+            "XML::Compile::SOAP" : "3.12",
+            "XML::Compile::SOAP11" : "3.12",
+            "XML::Compile::SOAP12" : "3.03",
+            "XML::Compile::WSDL11" : "3.03",
+            "XML::LibXML" : "2.0",
+            "namespace::clean" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "strictures" : "2.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::E4SE" : {
+         "file" : "lib/WebService/E4SE.pm",
+         "version" : "0.050"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/genio/webservice-e4se/issues"
+      },
+      "homepage" : "https://github.com/genio/webservice-e4se",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/genio/webservice-e4se.git",
+         "web" : "https://github.com/genio/webservice-e4se"
+      }
+   },
+   "version" : "0.050"
+}
+

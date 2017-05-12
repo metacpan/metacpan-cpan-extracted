@@ -1,0 +1,58 @@
+---
+abstract: 'Google Cloud Messaging (GCM) Client Library'
+author:
+  - 'xaicron <xaicron@cpan.org>'
+build_requires:
+  Test::Fake::HTTPD: '0.03'
+  Test::Flatten: '0.09'
+  Test::More: '0.98'
+  Test::SharedFork: '0.2'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Google-Cloud-Messaging
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::Google::Cloud::Messaging:
+    file: lib/WWW/Google/Cloud/Messaging.pm
+    version: '0.06'
+  WWW::Google::Cloud::Messaging::Constants:
+    file: lib/WWW/Google/Cloud/Messaging/Constants.pm
+  WWW::Google::Cloud::Messaging::Response:
+    file: lib/WWW/Google/Cloud/Messaging/Response.pm
+  WWW::Google::Cloud::Messaging::Response::Result:
+    file: lib/WWW/Google/Cloud/Messaging/Response/Result.pm
+  WWW::Google::Cloud::Messaging::Response::ResultSet:
+    file: lib/WWW/Google/Cloud/Messaging/Response/ResultSet.pm
+requires:
+  Class::Accessor::Lite: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/xaicron/p5-WWW-Google-Cloud-Messaging/issues
+  homepage: https://github.com/xaicron/p5-WWW-Google-Cloud-Messaging
+  repository: git://github.com/xaicron/p5-WWW-Google-Cloud-Messaging.git
+version: '0.06'
+x_contributors:
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Colin Kuskie <colink@perldreamer.com>'
+  - 'Oliver Kindernay <kindernay@dispecer.sk>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,97 @@
+Revision history for WebService-Google-Reader
+
+0.23  Thu Jul  2 18:56:20 UTC 2015
+    - Added support for appid and appkey because Inoreader now requires them.
+      (RT #105624)
+
+0.22  Tue Aug 13 16:52:44 UTC 2013
+    - Required host of webservice to be given.
+
+0.21  Sat Dec  3 06:52:42 UTC 2011
+    - Really fixed the XML::Atom bug.
+
+0.20  Sun Sep 18 22:02:11 UTC 2011
+    - Added fix for XML::Atom bug.
+
+0.19  Wed May 18 02:29:57 UTC 2011
+    - Fixed handling of expired tokens. (RT #68245)
+    - Added response method.
+
+0.18  Thu Apr 28 15:48:20 UTC 2011
+    - Fixed corner case in 'more' method to prevent an infinite loop.
+
+0.17  Wed Mar 30 00:26:09 UTC 2011
+    - Required newer LWP with better HTTPS support.
+
+0.16  Sun Mar 20 23:43:46 UTC 2011
+    - Added fix for google alert feeds. (ayanokouz)
+    - Added another example script.
+
+0.15  Wed Mar  9 17:46:14 UTC 2011
+    - Updated LWP usage to accommodate a change to the default behaviour
+      (HTTPS requests now verify the hostname matches the issued certificate).
+    - Explicitly set the default sort order of entries to desc, as documented.
+
+0.14  Mon Nov  1 02:51:37 UTC 2010
+    - Fixed search feeds.
+    - Fixed debug and compress constructor options.
+    - Added support for "liking" items.
+    - Updated some methods to accept both lists and array references.
+
+0.13  Tue Oct 26 20:51:30 UTC 2010
+    - Fixed 'more' method to prevent an infinite loop.
+    - Substituted deprecated API url.
+    - Added another example script- marks dead craigslist posts as read.
+    - Updated author tests.
+
+0.12  Mon Aug  2 10:34:42 UTC 2010
+    - Fixed infinite recursion in failed requests. (RT #59999)
+
+0.11  Tue Jul 27 15:19:52 UTC 2010
+    - Added back token logic since it is required for POSTs.
+      (reported by Brian Hannah)
+    - Added XML::LibXML as a prereq. (RT #58601)
+
+0.10  Sun May 16 07:16:58 UTC 2010
+    - Migrated from deprecated SID cookie-based authentication to ClientLogin
+    - Updated prereqs.
+
+0.09  Wed Aug 19 14:20:16 UTC 2009
+    - Fixed decoding bug. (RT #48787)
+    - Moved author tests into separate directory.
+    - Updated prereqs.
+
+0.08  Sat May  2 21:02:00 UTC 2009
+    - Prevented uninitialized warning.
+    - Skipped login for public feed.
+    - Exposed sortid field in ListElement.
+
+0.07  Sat Dec 1 17:16:33 UTC 2007
+    - Avoided CPANTS error_prereq by using eval with string instead of code.
+
+0.06  Sat Dec 1 16:19:39 UTC 2007
+    - Required 5.6.
+
+0.05  Sat Dec 1 03:09:09 UTC 2007
+    - Used warnings for better kwalitee.
+
+0.04  Wed Oct 31 22:28:42 GMT 2007
+    - Fixed typo in url.
+
+0.03  Tue Oct 16 02:11:53 GMT 2007
+    - Minor Pod correction.
+
+0.02  Wed Oct 10 15:41:07 GMT 2007
+    - No major change- made release stable.
+
+0.01_3  Mon Oct 8 19:46:25 GMT 2007
+    - Finalized API.
+    - Flushed out documentation.
+
+0.01_2  Mon Oct 1 23:04:44 GMT 2007
+    - Added list, edit, search.
+    - Used a cookie_jar instead of directly setting header.
+    - Refactored code.
+
+0.01_1  Sat Sep 17 19:14:57 GMT 2007
+    - Initial distribution.

@@ -1,0 +1,46 @@
+Revision history for WWW-Postmark
+
+1.000001  2017-02-06 22:56:18+02:00 Asia/Jerusalem
+    - Re-release under the terms of the Apache License 2.0
+
+1.000000  2015-03-03 20:21:10+02:00 Asia/Jerusalem
+	- Added support for file attachments
+	- Replaced JSON with JSON::MaybeXS
+
+0.7       2014-06-28 21:51:17+03:00 Asia/Jerusalem
+	- Not using the "switch" feature anymore.
+	- Updated Postmark return codes.
+	- Skipping SSL tests if HTTP::Tiny cannot use SSL (due to missing dependencies).
+
+0.6       2014-06-25 21:32:44+03:00 Asia/Jerusalem
+	- Added support for Postmark's new Open Tracking feature (Casimir Loeber).
+	- Fixed bug causing the BCC option not to work (Casimir Loeber).
+
+0.5       2013-05-05 20:37:54 Asia/Jerusalem
+	- The send() method now returns Postmark's return hash instead
+	  of just a true value (thanks Alex Peters)
+	- Using JSON instead of JSON::Any
+	- Small documentation fixes
+
+0.4       2012-11-22 22:22:25 Asia/Jerusalem
+	- Removed Try::Tiny dependency. Don't know why it was here in the first place.
+	- When Postmark returns an unrecognized/unexpected API or HTTP error codes,
+	  an appropriate exception is thrown, with the unrecognized error code indicated
+	  in the error message.
+	- Added new API error code 410.
+	- Improved documentation.
+
+0.3       2011-10-17 21:33:40 Asia/Jerusalem
+	- Added support to Postmark's new spam score/SpamAssassin API (see
+	  module documentation)
+	- Added the ability to provide HTML and/or plain text content for
+	  emails directly (thanks Ask Bjørn Hansen)
+	- Moved to HTTP::Tiny from LWP::UserAgent as a more lightweight
+	  solution
+	- Increased timeout from 30 seconds to 45 seconds
+
+0.2       2010-07-23 19:43:54 Asia/Jerusalem
+	- Added minimum perl requirement due to "use feature"
+
+0.1       2010-07-22 13:06:08 Asia/Jerusalem
+	- Initial release

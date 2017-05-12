@@ -1,0 +1,18 @@
+201[
+    {
+        "end_user_description": "test user description", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259945, 
+        "pub_title": "test title", 
+        "named_levels": [], 
+        "currency_id": 5808, 
+        "resource_name": "named_level_collection", 
+        "urls": [], 
+        "attributes": [], 
+        "created_timestamp": 1294259945, 
+        "pub_description": "test description", 
+        "end_user_title": "test user title", 
+        "id": 4166
+    }, 
+    {}
+]

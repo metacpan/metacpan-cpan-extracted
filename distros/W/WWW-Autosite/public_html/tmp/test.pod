@@ -1,0 +1,43 @@
+=pod
+
+=head1 NAME
+
+pod test for autosite
+
+=head1 DESCRIPTION
+
+Description would go here.
+
+
+=head1 Examples
+
+These are examples
+
+=head2 Example a
+
+This is example a
+
+	wonderful example
+	material here
+
+=head2 Example b
+
+This is example b
+
+	wonderful example
+	material here
+
+=head1 SUMMARY
+
+=over4
+
+This is over 4 material
+
+=back
+
+=head1 AUTHOR
+
+Leo Charre
+
+=cut
+

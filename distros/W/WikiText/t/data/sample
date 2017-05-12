@@ -1,0 +1,132 @@
+=== Header and Paragraph
+--- sample
+== Hello
+
+We are Devo.
+
+--- html
+<h2>Hello</h2>
+<p>We are Devo.</p>
+
+--- wikibyte
++h2
+ Hello
+-h2
++p
+ We are Devo.
+-p
+
+=== Bold and Italic
+--- sample
+'''Bold''', ''italic'', '''''both'''''.
+
+--- html
+<p><strong>Bold</strong>, <em>italic</em>, <strong><em>both</em></strong>.</p>
+
+--- wikibyte
++p
++b
+ Bold
+-b
+ , 
++i
+ italic
+-i
+ , 
++b
++i
+ both
+-i
+-b
+ .
+-p
+
+=== Headers and Bold and Italic
+--- sample
+== Hello
+'''Bold''', ''italic'', '''''both'''''.
+= The End
+
+--- html
+<h2>Hello</h2>
+<p><strong>Bold</strong>, <em>italic</em>, <strong><em>both</em></strong>.</p>
+<h1>The End</h1>
+
+--- wikibyte
++h2
+ Hello
+-h2
++p
++b
+ Bold
+-b
+ , 
++i
+ italic
+-i
+ , 
++b
++i
+ both
+-i
+-b
+ .
+-p
++h1
+ The End
+-h1
+
+=== Horizontal Rule
+--- sample
+foo
+
+----
+
+bar
+
+--- wikibyte
++p
+ foo
+-p
+=hr
++p
+ bar
+-p
+
+=== Zero
+--- sample
+0
+
+--- html
+<p>0</p>
+
+--- wikibyte
++p
+ 0
+-p
+
+=== Simple indented pre block like markdown
+--- sample
+  codes
+--- html
+<pre>codes</pre>
+
+=== Text before indented pre block
+--- sample
+A paragraph
+  codes yay
+--- html
+<p>A paragraph</p>
+<pre>codes yay</pre>
+
+=== Text after space indented pre blocks
+--- sample
+  code1
+  code2
+
+Not code
+
+--- html
+<pre>code1
+code2</pre>
+<p>Not code</p>

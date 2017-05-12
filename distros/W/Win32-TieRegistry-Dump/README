@@ -1,0 +1,30 @@
+Win32/TieRegistry/Dump version 0.01
+============================================
+
+    This module dumps info from the Win32 registry using the
+    "Win32::TieRegistry" module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make clean
+   perldoc Win32::TieRegistry::Dump
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Win32::TieRegistry
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Lee Goddard - All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

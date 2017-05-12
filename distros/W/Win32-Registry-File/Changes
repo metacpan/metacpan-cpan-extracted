@@ -1,0 +1,49 @@
+Revision history for Perl extension Win32::Registry::File (formerly
+Config::Ini, formerly IniFile).
+
+1.10  Sun Mar 24 05:30:48 2002
+	Now possible for the value part in .ini files to contain
+	the delimiter if it are escaped with backslash, like:
+		password=foo\;bar	; this is a password
+	Patched by Will Lowe <harpo@thebackrow.net>.
+
+1.09  Mon Jan 21 10:57:53 2002
+	Released as Win32::Registry::File.  Only documentation
+	changes.
+
+1.08  Sat Nov 10 12:35:24 2001
+	Suppressed perl -w warning by Jeremy Squires
+	<jsquires@opentext.com>.
+
+1.07  Sun Jun 17 08:13:17 2001
+	Fixed $quote not always initialized bug and -mapping not
+	checked bug by Brian "bfragged" Graham
+	<brian.graham@centrelink.gov.au>.
+
+1.06  Wed Jan 10 04:59:03 2001
+	Allow disabling comment stripping by specifying '' as
+	delimiter.
+
+1.05  Tue Jan  9 05:20:12 2001
+	Configurable comment delimiter by DEQ <deq@oct.zaq.ne.jp>.
+
+1.04  Wed Dec 13 07:11:30 2000
+	Minor bugfix from Fulko Hew <fulko@wecan.com>.
+	Package name changed to Config::Ini.
+
+1.03  Wed Nov 15 06:16:45 2000
+	Registry file I/O properly implemented by Fulko Hew
+	<fulko@wecan.com>.
+
+1.02  Thu Oct  5 02:39:38 2000
+	Registry file I/O added by Fulko Hew <fulko@wecan.com>.
+	lastpos() now works.
+
+1.01  Mon Jun 19 15:05:43 2000
+	Spaces surrounding first equation sign stripped.  Thanks to
+	    Shai Kfir <shaik@broadserve.com>.
+	Returns entire hash if get call has no param.
+
+1.00  Sun Mar 26 17:02:51 2000
+	Original version, created by h2xs 1.20.
+

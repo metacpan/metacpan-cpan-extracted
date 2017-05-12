@@ -1,0 +1,119 @@
+=encoding utf8
+
+=head1 NAME
+
+WWW::CheckPad::CheckItem - A class to control check item of check*pad.
+
+=head1 SYNOPSIS
+
+See the WWW::CheckPad
+
+=head1 DESCRIPTION
+
+check*padのTodo項目を扱う為のクラスです。APIは極力Class::DBIと
+同様のインターフェースを持つように設計されています。
+
+=head2 Class Method
+
+=head3 retrieve_all_of
+
+  my @checkitems = WWW::CheckPad::CheckItem->retrieve_all_of($chechlist_id);
+
+C<retrieve_all_of>は与えられたチェックリストの全Todo項目を返します。
+通常、このメソッドを直接呼ぶ必要はありません。代わりに
+C<WWW::CheckList->checkitems()>で同様に、しかもきれいに書くことが出来ます。
+
+
+=head2 Instance Method
+
+=head3 id
+
+  my $checkitem_id = $checkitem->id();
+  $checkitem->id(100000);
+
+チェック項目のIDを返します。引数を与えた時は、IDを変更します。
+
+=head3 title
+
+  my $checkitem_title = $checkitem->title();
+  $checkitem->title('title of check item.');
+
+チェック項目のタイトルを返します。引数を与えた時は、タイトルを変更する。
+
+=head3 is_finished
+
+  my $checkitem_is_finished = $checkitem->is_finished();
+  $checkitem->is_finished(1);
+
+チェック項目が終了済みであれば、真を返します。そうでなければ、偽を返します。
+引数を与えると、変更することが出来ますが、現在ここを変更してもサーバ側のデータに
+影響しません。終了状態を変更したい時はC<finish>かC<unfinish>を利用してください。
+
+=head3 finished_time
+
+  my $checkitem_finished_time = $checkitem->finished_time();
+  $checkitem->finished_time(time());
+
+（もし、このチェック項目が終了済みであれば）チェック項目の終了時間を返します。
+引数を与えると、変更する事が出来ますが、事実上意味がありません。
+
+=head3 checklist
+
+  my $checkitem_parent_checklist = $checkitem->checklist();
+  $checkitem->checklist($checklist);
+
+このチェック項目が所属するチェックリストを返す。この値はサーバから取得した際に自動的に
+セットされます。後から変更しても、所属するチェックリストが変わるわけではありません。
+
+=head3 update
+
+  $checkitem->update();
+
+このメソッドを呼ぶとこのTodo項目の情報をアップデートします。現在、変更できる
+値亜はタイトルだけなので、次のように使うことが多いと思います。
+
+  $checkitem->title('update title'); ## update the title
+  $checkitem->update();
+
+=head3 delete
+
+  $checkitem->delete();
+
+このTodo項目を削除します。
+
+=head3 finish
+
+  $checkitem->finish();
+
+このTodo項目の状態を”終了”にします。これは即座に反映されます。
+
+=head3 unfinish
+
+  $checkitem->unfinish();
+
+このTodo項目の状態を”未終了”にします。これは即座に反映されます。
+
+=head1 SEE ALSO
+
+WWW::CheckPad
+
+WWW::CheckPad::CheckList
+
+
+=head1 AUTHOR
+
+Ken Takeshige, E<lt>ken.takeshige@gmail.comE<gt>
+
+http://d.hatena.ne.jp/ya_ken/
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Ken Takeshige
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+

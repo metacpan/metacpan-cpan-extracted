@@ -1,0 +1,276 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Webqq::Qun - api for qq qun management,add member,remove member,set administrator,etc
+
+=head1 SYNOPSIS
+
+    use Webqq::Qun;
+    use Digest::MD5 qw(md5_hex);
+    #使用QQ号和密码进行初始化,密码先进行md5加密
+    my $qun = Webqq::Qun->new(qq=>12345678,pwd=>md5_hex('my password'),debug=>0);
+
+    #授权是第一步
+    $qun->authorize() or die "authorize fail\n";
+
+    #查找指定的群
+    my $q = $qun->find_qun(qun_name=>"PERL学习交流");
+
+    #使用chain方式
+    my $q = $qun->authorize->find_qun(qun_name=>"PERL学习交流");
+
+    #在指定的群中查找指定的群成员
+    my $member = $q->find_member(nick => "小灰");
+
+    $q->set_admin($member); #设置该成员为管理员，需要管理员或群主权限
+    $q->del_admin($member); #取消该成员的管理员身份，需要管理员或群主权限
+    $q->set_card($member);  #设置该成员的群名片，需要管理员或群主权限
+    $q->del_member($member);#将该成员从群中移除，需要管理员或群主权限
+
+    #直接在所有的群中搜索    
+    my $member = $qun->find_member(qun_name=>"PERL学习交流",nick=>"小灰");
+    $member->dump();
+
+    #高级条件过滤
+    $qun->each_qun(sub{
+        my $q = shift;
+        print $q->{qun_name} if $q->{qun_type} eq "manage";#打印我管理的群
+        print $q->{qun_name} if $q->{qun_type} eq "attend";#打印我加入的群（非管理员或群主）
+        print $q->{qun_name} if $q->{qun_type} eq "create";#打印我创建的群
+    });
+    $qun->each_member(sub{
+        my $member = shift;
+        #dump出所有存在不良记录的群成员结构
+        $member->dump if $member->{bad_record};
+        #dump出所有最近一天内发言的成员
+        $member->dump if time-86400 > $member->{last_speek_time};
+    });
+
+=head1 DESCRIPTION
+
+腾讯提供了基于web的群管理方式，可以参见页面L<http://qun.qq.com/member.html>
+
+可进行群成员添加、查询、筛选、设置管理员、取消管理员、设置群名片等常用功能
+
+本模块对该页面的功能进行了封装，提供面向对象的接口，方便实现对群成员管理的自动化操作
+
+操作的基本流程是：
+
+    =>  1.登录(授权) 
+    =>  2.生成token 
+    =>  3.获取个人信息 
+    =>  4.获取好友信息 
+    =>  5.获取群列表信息 
+    =>  6.获取群成员信息 
+    =>  7.对群成员进行各种操作
+
+=head1 CLASS AND METHOD
+
+    Webqq::Util （提供实用函数）
+    Webqq::Encryption（提供授权密码算法）
+
+    .-+--Webqq::Qun::Base       （基类）
+    | |--Webqq::Qun::Authorize  （提供授权功能）
+    | |--Webqq::Qun::Operate    （提供群成功操作相关的功能）
+    | `----Webqq::Qun           （继承自Webqq::Qun::Base Webqq::Qun::Operate Webqq::Qun::Authorize）
+    |       `--Webqq::Qun::One  （继承自Webqq::Qun，单个群绑定的类）
+    `--Webqq::Qun::Member       （继承自Webqq::Qun::Base，单个群成员绑定的类）
+
+=over 
+
+=item Webqq::Qun->new(debug=>0|1,qq=>xxx,pwd=>xxx)
+
+构造函数，提供了几个关键参数：
+
+    qq      你的qq号
+    pwd     你的qq号密码的32位小写md5
+    debug   0|1，默认是0
+
+返回一个Webqq::Qun的对象
+    
+    my $qun = Webqq::Qun->new(debug=>1,qq=>xxx,pwd=>xxx);    
+
+=item $qun->authorize()
+
+进行授权，这是->new()之后第一件要做的事情，只有授权成功才能够顺利进行后续的操作
+
+授权过程比较复杂，采用了和Webqq相同的MD5+RSA+TEA+BASE64的组合加密，计算需要花费一定的时间
+
+因此authorize的过程可能需要等待10s甚至更久，取决于你的运行环境
+
+你可以安装如下几个模块，程序会自动检查并进行调用，能够极大的提升RSA加密的计算速度
+
+L<Crypt::RSA>(或者 L<Crypt::OpenSSL::RSA> 和 L<Crypt::OpenSSL::Bignum> )
+
+
+另外，如果授权所在的网络环境和平时你的QQ号登录环境变化较大，腾讯会认为你的帐号存在异地登录异常
+
+在授权的过程中会要求输入验证码，这种情况下会自动下载验证码文件到本地，需要自己手动输入验证码
+
+请尽量保持和PC QQ相同的运行环境
+
+    #执行成功返回$qun本身，执行失败返回假
+    $qun->authorize() or die "authorize fail";
+
+=item $qun->find_qun(qun_type=>xxx,qun_number=>xxx,qun_name=>xxx)
+
+在所有群中查找指定的群,支持几个固定的过滤参数
+
+    qun_type    #群类型，包括create|attend|manage，分别表示创建的群|加入的群|管理的群
+    qun_number  #群号码，纯数字
+    qun_name    #群名称，中文需要使用UTF8编码
+
+在列表上下文返回所有匹配的查询列表，列表中每一个元素是一个Webqq::Qun::One的对象
+
+在标量上下文返回所有匹配结果中的第一个元素，该元素也是一个Webqq::Qun::One的对象
+
+一个Webqq::Qun::One的对象实际上是一个hash的引用，结构如下：
+
+    {
+        owner       #群主的qq号
+        qun_type    #群的类型 create|attend|manage
+        count       #群成员数量
+        qun_name    #群名称
+        adm_num     #管理员数量
+        adm_max     #管理员最大数量
+        qun_number  #群号码
+        max_count   #最大群成员数量
+        members=>[  #每个群成员都是一个Webqq::Qun::Member的对象，存储在members数组中
+            Webqq::Qun::Member obj1,
+            Webqq::Qun::Member obj2,
+            Webqq::Qun::Member obj3,
+            ...
+        }
+    }
+
+Webqq::Qun::Member的结构如下：
+
+    {
+        bad_record          #0|1，是否有不良记录
+        qq                  #群成员的qq号
+        qun_name            #群成员所在的群的名称，一个群成员可能同时存在多个群
+        qage                #Q龄
+        join_time           #加入群的时间
+        nick                #昵称
+        sex                 #性别 male|female
+        last_speak_time     #最后一次发言时间
+        card                #群名片，UTF8编码
+        level               #群等级，潜水|传说|活跃...
+        qun_number          #群号码
+        role                #角色 admin|owner|member 
+    }
+    
+
+具体的调用示例
+
+    my @match_qun = $qun->find_qun(qun_type=>"attend");
+    for my $q(@match_qun){
+        #$q是一个Webqq::Qun::One的对象，Webqq::Qun::One继承自Webqq::Qun，因此$q也具备$qun的所有方法
+        print $q->{qun_name},"\n"
+        #$q->dump(); 使用dump打印对象结构
+    }
+
+    my $match_qun = $qun->find_qun(qun_name=>"PERL学习交流");
+    #由于qun_name=>"PERL学习交流"的群，一般情况下也就是一个 
+    #因此设定成在标量上下文只返回查询结果的第一个元素
+
+=item $qun->find_member()
+
+在所有的群中查找匹配的的群成员，支持的过滤参数包括
+
+    sex             #性别male|female
+    card            #群名片 UTF8编码
+    qq              #qq号
+    nick            #昵称
+    role            #角色admin|owner|member
+    bad_record      #0|1 是否有不良记录
+    qun_name        #群名称
+    qun_number      #群号码
+
+列表上下文返回所有匹配的结果，标量上下文返回匹配结果的第一个
+
+    my $member = $qun->find_member(qun_name=>"PERL学习交流",nick=>"小灰");
+    $member->dump();#$member是一个Webqq::Qun::Member的对象，也是一个普通的hash引用
+
+=item $q->find_member()
+
+在特定的群中查找匹配的群成员，支持的过滤参数包括
+
+    sex             #性别male|female
+    card            #群名片 UTF8编码
+    qq              #qq号
+    nick            #昵称
+    role            #角色admin|owner|member
+    bad_record      #0|1 是否有不良记录
+
+=item $qun->each_qun(sub{...})
+=item $qun->each_member(sub{..})
+=item $q->each_member(sub{..})
+
+find_qun()/find_member()只能按固定的参数进行过滤，如果需要更高级的过滤方式
+
+可以通过each_qun/each_member，自己写过滤函数
+    
+    #在所有的群里查找所有Q龄大于5年的群成员
+    $qun->each_member(sub{
+        my $member = shift;
+        if($membe->{qage}>5){
+            ...;
+        }
+    });
+
+=item $q->set_admin(Webqq::Qun::Member obj)
+
+设置指定的群成员为管理员，需要自身帐号具有管理员权限
+
+    my $member = $q->find_member(nick=>"小灰");
+    $q->set_admin($member) or die "set admin fail\n";
+
+=item $q->del_admin(Webqq::Qun::Member obj)
+
+取消指定群成员的管理员身份，需要自身帐号具有管理员权限
+
+    my $member = $q->find_member(nick=>"小灰");
+    $q->del_admin($member) or die "cancel admin fail\n";
+
+=item $q->set_card(Webqq::Qun::Member obj,$card)
+
+设置指定群成员的群名片，需要自身帐号具有管理员权限
+    
+    my $member = $q->find_member(nick=>"小灰");
+    $q->set_card($member,"机器人-小灰") or die "set card fail\n";
+
+=item $q->del_member(Webqq::Qun::Member obj1,Webqq::Qun::Member obj2,...)
+
+移除指定的群成员，需要自身帐号具有管理员权限
+
+    my $member = $q->find_member(nick=>"小灰");
+    $q->del_member($member) or die "remove member fail\n";
+
+=back
+
+=head1 SEE ALSO
+
+L<https://github.com/sjdy521/Webqq-Qun>
+
+L<Webqq::Client>
+
+L<http://qun.qq.com/member.html>
+
+=head1 AUTHOR
+
+sjdy521, E<lt>sjdy521@163.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Perfi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

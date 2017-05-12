@@ -1,0 +1,33 @@
+---
+abstract: 'Convert from and to *.xls, *.csv using Win32::OLE '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Scsv
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Copy: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  Win32::File: '0'
+  Win32::OLE: '0'
+  Win32::OLE::Const: '0'
+  Win32::OLE::Variant: '0'
+  Win32::VBScript: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/Win32-Scsv
+  repository: https://github.com/klaus03/Win32-Scsv.git
+version: '0.39'

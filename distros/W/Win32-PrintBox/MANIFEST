@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Win32/PrintBox.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/PrintBox-01.t
+t/PrintBox-02.t
+META.yml
+META.json

@@ -1,0 +1,52 @@
+#!/usr/local/bin/perl
+# $Id: swap.ext,v 1.4 1998/11/30 14:58:22 paul Exp $
+
+# Copyright (c) 1997,1998 Paul Sharpe. England.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+
+# swap.ext is an extension to the UCSD snmp agent for monitoring
+# in-use swap space on a variety of Unix platforms.
+
+# To enable the extension add the following line to snmpd.conf
+# exec swap /path/to/swap.ext
+
+%prog = (
+	 'SunOS' => '/usr/sbin/swap -l',
+	 'Linux' => '/usr/bin/free',
+	 'OSF1'  => '/usr/sbin/swapon -s',
+	);
+
+chop($system = `uname -s`);
+$prog = $prog{$system};
+open(P,"$prog{$system}|") || die "Couldn't open pipe from $prog{$system}: $!\n";
+
+if ( $system =~ /^Linux$/ ) {
+  while ( <P> ) {
+    if ( my($total,$used) = /^Swap:\s+(\d+)\s+(\d+)/ ) {
+      printf "%d", $used / $total * 100;
+      last;
+    }
+  }
+} elsif ( $system =~ /^SunOS$/ ) {
+  while ( <P> ) {
+    if (  /^\/dev/ ) {
+      my($total,$free) = /(\d+)\s+(\d+)$/;
+      printf "%d", ($total - $free) / $total * 100;
+      last;
+    }
+  } 
+} elsif ( $system =~ /^OSF1$/ ) {
+  while ( <P> ) {
+    if ( /^\s+In-use space:/ ) {
+      /\(\s*(\d+)%\)$/;
+      printf $1;
+      last;
+    }
+  } 
+} else {
+  print "Unknown system: $system\n";
+  exit 1;
+}
+
+exit 0;

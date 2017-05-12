@@ -1,0 +1,33 @@
+<!-- NLM Medline DTD              
+
+        This is the Current DTD which NLM has written for 
+        External Use.  If you are a data Licensee, use the information
+        from the MedlineCitation Set.
+       
+ 
+        Comments and suggestions are welcome.
+        December 11, 2000
+
+       
+-->
+<!-- ================================================================= -->
+<!--   NLM Medline DTD   -->
+<!-- Typical usage:   
+
+  <!DOCTYPE MedlineCitationSet PUBLIC "-//NLM//DTD NLM//EN">
+
+-->
+<!-- ================================================================= -->
+<!ENTITY % ArticleTitle.Ref "ArticleTitle">
+<!ENTITY % ISSN.Ref "ISSN?">
+<!ENTITY % DateCreated.Ref "DateCreated">
+<!ENTITY % PubDate.Ref "PubDate">
+<!-- ================================================================= -->
+<!-- Reference to Where the NLM MedlineCitation DTD is located  -->
+<!ENTITY %  MedlineCitation PUBLIC "-//NLM//DTD MedlineCitation, 11th December 2000//EN"
+           "nlmmedlinecitation_001211.dtd">
+%MedlineCitation;
+<!-- ================================================================= -->
+<!ELEMENT MedlineCitationSet (MedlineCitation*, DeleteCitation?)>
+<!ELEMENT DeleteCitation (MedlineID+ | PMID+)>
+<!-- ================================================================= -->

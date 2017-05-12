@@ -1,0 +1,37 @@
+---
+abstract: 'Interface to a glucosebuddy.com account'
+author:
+  - 'Pete Smith <pete@cubabit.net>'
+build_requires:
+  Test::MockObject: 1.20110612
+  Test::More: 0.98
+  URI: 1.59
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-GlucoseBuddy
+requires:
+  Carp: 1.20
+  DateTime: 0.70
+  DateTime::Format::Strptime: 1.5
+  Getopt::Long: 2.38
+  MIME::Lite: 3.027
+  Modern::Perl: 1.03
+  Moose: 1.24
+  MooseX::Iterator: 0.11
+  Readonly: 1.03
+  Text::ASCIITable: 0.20
+  Text::CSV: 1.21
+  WWW::Mechanize: 1.70
+  namespace::autoclean: 0.13
+resources:
+  bugtracker: https://github.com/cubabit/WebService-GlucoseBuddy/issues
+  repository: git://github.com/cubabit/WebService-GlucoseBuddy.git
+version: 1.113540

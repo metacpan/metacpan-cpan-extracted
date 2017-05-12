@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Sucksub-Attila
+version:      0.06
+version_from: lib/WWW/Sucksub/Attila.pm
+installdirs:  site
+requires:
+    Alias:                         >=2.3
+    Carp:                          >= 1.0
+    DB_File:                       >= 1.8
+    HTML::Parser:                  >=1.0
+    Test::More:                    >=0.5
+    WWW::Mechanize:                >= 1.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

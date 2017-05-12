@@ -1,0 +1,22 @@
+A framework for crawling pages in the congressional record.
+
+By default, this crawls pages starting from the Daily Issues page
+(http://thomas.loc.gov/home/Browse.php?&n=Issues), visiting each issue in
+a depth-first fashion.
+
+## Synopsis
+
+    use WebService::LOC::CongRec::Crawler;
+    use Log::Log4perl;
+    Log::Log4perl->init_once('log4perl.conf');
+
+    $crawler = WebService::LOC::CongRec::Crawler->new();
+    $crawler->goForth(process => \&process_page);
+
+    sub process_page {
+        my ($day, $page) = @_;
+        my $logger = Log::Log4perl->get_logger('thomas.pl.process_page');
+
+        $logger->info("Page #$i ID " . $page->pageID);
+        exit if ++$i > $max;
+    }

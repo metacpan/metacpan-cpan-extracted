@@ -1,0 +1,9 @@
+TODO
+====
+
+* more robust parsing scheme
+* better interface
+* support for headlines ("Direct Matches (+ Prepositions)",  "Composed
+  Entries", ...)
+
+vim:tw=70

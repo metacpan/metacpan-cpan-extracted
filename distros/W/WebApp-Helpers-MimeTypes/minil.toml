@@ -1,0 +1,6 @@
+name = "WebApp-Helpers-MimeTypes"
+# badges = ["travis"]
+authority="cpan:FELLIOTT"
+
+module_maker="ModuleBuildTiny"
+

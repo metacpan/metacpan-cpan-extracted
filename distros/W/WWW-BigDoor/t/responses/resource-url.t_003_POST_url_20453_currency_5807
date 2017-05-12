@@ -1,0 +1,36 @@
+201[
+    {
+        "end_user_description": "can only be purchased", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259938, 
+        "pub_title": "Coins", 
+        "currency_type_title": "Redeemable Purchase Currency", 
+        "currency_type_id": 1, 
+        "exchange_rate": "900.00", 
+        "resource_name": "currency", 
+        "urls": [
+            {
+                "end_user_description": "end user description", 
+                "read_only": 0, 
+                "modified_timestamp": 1294259936, 
+                "pub_title": "Test URL", 
+                "url": "http://example.com/", 
+                "is_media_url": null, 
+                "is_for_end_user_ui": null, 
+                "created_timestamp": 1294259936, 
+                "pub_description": "test description", 
+                "end_user_title": "end user title", 
+                "attributes": [], 
+                "id": 20453, 
+                "resource_name": "url"
+            }
+        ], 
+        "created_timestamp": 1294259938, 
+        "pub_description": "an example of the Purchase currency type", 
+        "end_user_title": "Coins", 
+        "relative_weight": 2, 
+        "id": 5807, 
+        "currency_type_description": ""
+    }, 
+    {}
+]

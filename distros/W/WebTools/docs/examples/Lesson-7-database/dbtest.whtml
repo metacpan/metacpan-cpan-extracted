@@ -1,0 +1,60 @@
+<!-- PERL: Hide Perl`s script
+<?perl 
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');
+?>
+//-->
+<HTML>
+  <HEAD>
+     <TITLE>DataBase Example</TITLE>
+  </HEAD>
+<BODY TEXT="black" BGCOLOR="#D8D8D8" LINK="yellow" VLINK="yellow">
+<FONT FACE="Verdana" SIZE=2><B>
+<CENTER><H3>DataBase Example</H3></CENTER><BR>
+<!-- PERL: Hide Perl`s script
+<?perl
+ print "<HR>Connecting DB: ";
+ $hnd = sql_connect();
+ if($hnd)
+ {
+  print "<I>Done!</I>";
+  print "<HR>Insert row into admin table: ";
+  $mypass = sql_quote('mytestpass',$hnd);
+  my $q = "insert into $sql_user_table values(MAXVAL('ID|$sql_user_table'),'test',$mypass,'N','','1','Test','','')";
+  my $u = '';
+  if($res = sql_query($q, $hnd))
+   {
+    print "<I>Done!</I><BR>";
+    print "<HR>Update row from admin table: ";
+    $q = "update $sql_user_table set USER = 'july' where PASSWORD = $mypass";
+    if($res = sql_query($q, $hnd))
+    {
+     print "<I>Done!</I><BR>";
+     $u = 'july';
+    }
+    else
+    {
+     $u = 'test';
+     print sql_errmsg();
+    }
+    print "<HR>Delete row from admin table: ";
+    $q = "delete from $sql_user_table where USER = '$u' and PASSWORD = $mypass";
+    if($res = sql_query($q, $hnd))
+      {
+       print "<I>Done!</I><BR>";
+      }
+    else
+     {
+      print sql_errmsg();
+     }
+   }
+  else
+   {
+    print sql_errmsg();
+   }
+ }
+  print "<HR>";
+?>
+//-->
+</B></FONT>
+</BODY>
+</HTML>

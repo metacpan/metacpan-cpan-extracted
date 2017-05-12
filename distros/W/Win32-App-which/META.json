@@ -1,0 +1,50 @@
+{
+   "abstract" : "which Unix classic command for Windows",
+   "author" : [
+      "Olivier Mengué <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-App-which",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3800"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Win32::App::which" : {
+         "file" : "lib/Win32/App/which.pm",
+         "version" : "1.030"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/",
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dolmen/p5-Win32-App-which.git"
+      }
+   },
+   "version" : "1.030"
+}

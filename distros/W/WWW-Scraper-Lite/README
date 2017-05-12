@@ -1,0 +1,11 @@
+README for WWW::Scraper::Lite
+=============================
+
+WWW::Scraper::Lite is a small module combining basic crawling with
+LWP::UserAgent and parsing with HTML::TreeBuilder::XPath. Custom tag
+handling is performed by means of a hash of XPath expressions and
+callbacks.
+
+See "perldoc WWW::Scraper::Lite" for a usage synopsis.
+
+Please report bugs & feature requests via http://rt.cpan.org/

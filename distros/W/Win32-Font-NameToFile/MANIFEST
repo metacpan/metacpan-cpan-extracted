@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+lib/Win32/Font/NameToFile.pm
+t/test.t

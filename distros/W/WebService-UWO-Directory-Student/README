@@ -1,0 +1,42 @@
+$Id: README 9531 2009-10-04 04:38:26Z FREQUENCY@cpan.org $
+
+WebService::UWO::Directory::Student is a Perl module for searching the UWO
+student directory
+
+Copyright 2006-2009 by Jonathan Yu <jawnsy@cpan.org>. All rights reserved.
+
+INSTALLATION
+
+  This module depends on Module::Build for its installation mechanism.
+
+  To install this module type the following:
+  $ perl Build.PL
+  $ perl Build
+  $ perl Build test
+  $ perl Build install
+
+  Module::Build will complain if any dependencies are missing, or if
+  you can install some other modules to enhance its functionality.
+
+USAGE AND DOCUMENTATION
+
+  In order to use the module, you'll probably need the documentation. Once
+  installed, you can read that using:
+  $ perldoc WebService::UWO::Directory::Student
+
+LICENSE
+
+  In a perfect world, I could just say that this package and all of the
+  code it contains is Public Domain. It's a bit more complicated than
+  that; you'll have to read LICENSE to get the full details.
+
+  Here are some nice things to live by:
+  1. Give credit where it's due.
+  2. Share your modifications, so everyone benefits from them.
+  3. Do something nice for the authors.
+  4. Help someone who needs it.
+  5. Don't waste. Anything. Be especially careful not to waste energy that
+     comes from non-renewable sources.
+  6. Be tolerant. Everything that's good in nature comes from cooperation.
+  Paraphrased a bit from Alberto Bertogli's Buena Onda License Agreement.
+  For the full text, see: http://blitiri.com.ar/p/bola/

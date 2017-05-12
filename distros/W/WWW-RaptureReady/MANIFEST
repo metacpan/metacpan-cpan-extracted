@@ -1,0 +1,15 @@
+bin/rapture-ready.pl
+Changes
+lib/WWW/RaptureReady.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/10-original_tests.t
+t/critic.rc
+t/critic.t
+t/pod-coverage.t
+t/pod.t
+t/rap2.html
+META.yml                                 Module meta-data (added by MakeMaker)

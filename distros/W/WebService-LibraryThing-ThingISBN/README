@@ -1,0 +1,49 @@
+WebService::LibraryThing::ThingISBN is a Perl interface to the
+LibraryThing social cataloging website's thingISBN web service, which
+"takes an ISBN and returns a list of ISBNs from the same 'work' (ie.,
+other editions and translations)."
+
+The web service is freely available for noncommercial use, per the
+terms at http://www.librarything.com/api
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::LibraryThing::ThingISBN
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-LibraryThing-ThingISBN
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-LibraryThing-ThingISBN
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-LibraryThing-ThingISBN
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-LibraryThing-ThingISBN/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Anirvan Chatterjee
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

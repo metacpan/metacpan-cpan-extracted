@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/Win32-IEAutomation.t
+lib/Win32/IEAutomation.pm
+lib/Win32/IEAutomation/Element.pm
+lib/Win32/IEAutomation/Table.pm
+lib/Win32/IEAutomation/AutoItX3.dll

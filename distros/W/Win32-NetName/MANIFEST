@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+test.pl
+lib/Win32/NetName.pm
+lib/Win32/VolumeInformation.pm

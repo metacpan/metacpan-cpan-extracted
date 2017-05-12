@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/WWW/Crab/Client.pm
+MANIFEST
+META.json
+META.yml
+README
+t/1_compile.t

@@ -1,0 +1,11 @@
+Revision history for Perl extension Wx::Mozilla.
+
+0.01  Tue Mar  7 12:42:29 2006
+	- original version; created by h2xs 1.23 with options
+		-n Wx::Mozilla wxMozilla/src/wxMozillaBrowser.h
+
+0.04  Sun Mar 12 13:45
+	- Patched up enough to install
+
+0.05  Thu Mar 23 16:59
+        - Added in the event classes

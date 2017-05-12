@@ -1,0 +1,99 @@
+Watchdog::Process, Watchdog::HTTP and Watchdog::Mysql are classes for
+monitoring whether a process, http server or mysql server respectively
+is functioning.
+
+The module also includes a number of 'monitor' scripts which can be
+used with the system monitoring package 'Mon'
+(http://kernel.org/pub/software/admin/mon/).  These scripts make use of the
+Watchdog classes and SNMP.
+
+  bin/mysql.monitor (Watchdog::Mysql)
+  bin/partition.monitor (SNMP)
+  bin/swap.monitor (SNMP) 
+
+new Maintainer: Clemens Gesell clemens.gesell@vegatron.org
+Paul Sharpe <paul@miraclefish.com>
+
+Prerequisites
+=============
+Alias
+Proc::ProcessTable (for Watchdog::Process)
+libwww (for Watchdog::HTTP)
+DBI, DBD::mysql (for Watchdog::Mysql)
+
+Installation
+============
+
+perl Makefile.PL
+make
+make test
+make install
+
+To Do
+=====
+
+
+History
+=======
+11-Nov-2003               Clemens Gesell          <clemens.gesell@vegatron.org>
+-------------------------------------------------------------------------------
+Release 0.10
+    - it is now possible to do HTTP Requests against 
+      look at http://vegatron.net/~gesell/cobalt.pl for an example script 
+
+06-Jul-2003               Clemens Gesell          <clemens.gesell@vegatron.org>
+-------------------------------------------------------------------------------
+Release 0.09
+    - change url for mon scripts 
+
+05-Jul-2003               Clemens Gesell          <clemens.gesell@vegatron.org>
+-------------------------------------------------------------------------------
+Release 0.08
+    - BUG FIX in Base.pm
+    - new Maintainer
+
+27-Jan-1999               Paul Sharpe                    <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.07
+
+BUG FIXES
+  Mysql::
+    - Minor bug in specifying data source name in is_alive()
+
+30-Nov-1998               Paul Sharpe                    <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.06
+- Bug fix to swap.ext
+
+16-Oct-1998               Paul Sharpe                    <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.05
+- Added OSF1 support to swap.ext
+
+Oct-1998                 Paul Sharpe                     <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.04
+- Classes renamed (suggested by Tim Bunce).
+    Watchdog::Service => Watchdog::Process
+    Watchdog::HTTPService => Watchdog::HTTP
+    Watchdog::MysqlService => Watchdog::Mysql
+- Watchdog::Process de-coupled from other classes as Proc::ProcessTable only 
+  compiles on Linux and Solaris.
+- Watchdog::Mysql::is_alive() returns reason for failure.
+- Added 'Mon' monitors
+- t/{mysql.t,process.t} now skipped if prerequisites not installed
+
+24-Sep-1998                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.03
+- Bug fixes.
+
+4-Sep-1998                  Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.02
+- Corrected bug in Watchdog::Service SYNOPSIS.
+
+3-Sep-1998                  Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+Release 0.01
+- Initial release.

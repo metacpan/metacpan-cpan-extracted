@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Weather-Bug
+version:            0.25
+abstract:           Provide an object oriented interface to the WeatherBug API.
+author:
+    - G. Wade Johnson <wade@anomaly.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTime:             0
+    DateTime::Format::Builder:  0
+    LWP::Simple:          0
+    Moose:                0
+    overload:             0
+    Test::Group:          0
+    Test::More:           0
+    XML::LibXML:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

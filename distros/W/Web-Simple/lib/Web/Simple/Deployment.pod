@@ -1,0 +1,77 @@
+=head1 NAME
+
+Web::Simple::Deployment - various deployment options
+
+=head1 DESCRIPTION
+
+This file documents common deployment methods for Web::Simple. If you feel one
+is missing, please ask in the IRC channel and we'll work with you to add it.
+
+=head1 CGI
+
+The most basic deployment option is as a CGI script loading and running your
+Web::Simple-module:
+
+  #!/usr/bin/env perl
+
+  use Your::Web::Simple::App;
+  Your::Web::Simple::App->run_if_script;
+
+Save that as script.cgi and your web server will handle it correctly.
+
+=head1 Plack-Server
+
+This works in with exactly the same code as CGI deployment. However instead of
+letting your web server load script.cgi, you run this on the command line:
+
+  plackup script.cgi
+
+=head2 Self-contained CGI
+
+Sometimes your app is so small that you have only one or two tiny classes that
+you want to run as a CGI script. Web::Simple offers a helpful mechanism to
+achieve that.
+
+  #!/usr/bin/env perl
+
+  use Web::Simple 'HelloWorld';   # enables strictures and warnings for the file
+                                  # additionally, HelloWorld is upgraded to a
+                                  # Web::Simple application
+  {
+    package HelloWorld;
+
+    sub dispatch_request {
+      sub (GET) {
+        [
+          200,
+          [ 'Content-type', 'text/plain' ],
+          [ 'Hello world! It is a fine ' . HelloWorld::Helper->day ]
+        ]
+      },
+      sub () {
+        [ 405, [ 'Content-type', 'text/plain' ], [ 'Method not allowed' ] ]
+      }
+    }
+  }
+
+  {
+    package HelloWorld::Helper;
+
+    use DateTime;
+
+    sub day {
+      return DateTime->now->day_name;
+    }
+  }
+
+  HelloWorld->run_if_script;
+
+=head1 AUTHORS
+
+See L<Web::Simple> for authors.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<Web::Simple> for the copyright and license.
+
+=cut

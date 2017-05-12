@@ -1,0 +1,19 @@
+Changes
+lib/WWW/Mechanize/Plugin/Cache.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/cache-server
+t/cache.t
+t/hooks.t
+t/local/LocalServer.pm
+t/log-server
+t/pod-coverage.t
+t/pod.t
+t/referer-server
+t/referer.t
+t/reload-old.t
+t/reload.t
+t/reuse.t

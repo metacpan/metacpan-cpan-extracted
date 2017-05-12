@@ -1,0 +1,59 @@
+{
+  "id": 1,
+  "name": "サイト閲覧不可",
+  "manager": null,
+  "status": "open",
+  "detection": "msp",
+  "cause": "overcapacity",
+  "cause_supplement": "Webサーバがアクセス過多でダウン",
+  "point": "middleware",
+  "scale": "whole",
+  "pend_text": "Webサーバの再起動を行う",
+  "close_text": "Webサーバのスケールアウトを検討",
+  "closed_by": null,
+  "closed_at": null,
+  "pended_by": null,
+  "pended_at": null,
+  "created_by": 0,
+  "created_at": 1430208000,
+  "updated_by": 0,
+  "updated_at": 1430208000,
+  "topics": [
+    {
+      "id": 1,
+      "name": "原因調査",
+      "status": "open",
+      "color": "#5661aa",
+      "closed_by": null,
+      "closed_at": null,
+      "created_by": 0,
+      "created_at": 1430208000,
+      "updated_by": 0,
+      "updated_at": 1430208000
+    },
+    {
+      "id": 2,
+      "name": "復旧作業",
+      "status": "open",
+      "color": "#077f40",
+      "closed_by": null,
+      "closed_at": null,
+      "created_by": 0,
+      "created_at": 1430208000,
+      "updated_by": 0,
+      "updated_at": 1430208000
+    }
+  ],
+  "notifications": {
+    "id": 1,
+    "notification_text": "Webサーバで障害が発生。至急対応をお願い致します。",
+    "notification_call": true,
+    "notificated_for": {
+      "phone": ["1", "3"],
+      "email1": ["1", "2", "3"],
+      "email2": ["1", "2"],
+      "imkayac": ["1"]
+    },
+    "created_at": 1430208000
+  }
+}

@@ -1,0 +1,26 @@
+---
+abstract: 'Check Track Shipments (Sagawa Express Co.,Ltd. /Japan)'
+author:
+  - 'OONO Yoshitaka <aab61120@pop12.odn.ne.jp>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-SagawaKyubin
+provides:
+  WebService::SagawaKyubin:
+    file: lib/WebService/SagawaKyubin.pm
+    version: v0.0.5
+requires:
+  Encode: 0
+  Test::More: 0
+  WWW::Mechanize: 1.22
+  Web::Scraper: 0
+  YAML: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.5

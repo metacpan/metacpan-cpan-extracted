@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Win32-UrlCache
+version:             0.06
+abstract:            parse Internet Explorer's history/cache/cookies
+license:             perl
+author:              
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    DateTime:                      0
+    Math::BigInt:                  1.78
+    Test::UseAllModules:           0
+    Win32::API:                    0
+    Win32::TieRegistry:            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

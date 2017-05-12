@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<GUI
+xmlns="http://www.numeninest.com/Perl/WGX"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.numeninest.com/Perl/WGX http://www.numeninest.com/Perl/WGX/win32-gui-xmlbuilder.xsd">
+<AcceleratorTable name='A'>
+	<Item key='Control-X' sub='CX'/>
+	<Item key='Shift-A' sub='sub { $self->{L}->Text("Shift-A pressed"); }'/>
+</AcceleratorTable>
+<Window name='W'
+	size='[150, 50]'
+	text='Accelerator'
+	accel='$self->{A}'
+	hasminimize='0' hasmaximize='0' resizable='0'
+>
+	<Label name='L' size='[150, 50]' text='Press Shift-A or Ctrl-X'/>
+</Window>
+<WGXPost><![CDATA[
+	sub CX { 
+		$self->{L}->Text("Control-X pressed"); 
+	}
+]]></WGXPost>
+</GUI>

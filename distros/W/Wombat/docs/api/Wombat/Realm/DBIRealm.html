@@ -1,0 +1,223 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Realm::DBIRealm - internal realm base clas</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Realm::DBIRealm - internal realm base clas</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Implementation of <STRONG>Wombat::Realm</STRONG> that works with any DBI supported
+database.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Realm::RealmBase</STRONG> instance,
+initializing fields appropriately. If subclasses override the
+constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_setConnectionName"><CODE>setConnectionName($connectionName)</CODE></A></STRONG><BR>
+<DD>
+Set the username to use to connect to the database.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connectionName">$connectionName</A></STRONG><BR>
+<DD>
+the database username
+<P></P></DL>
+<DT><STRONG><A NAME="item_setConnectionPassword"><CODE>setConnectionPassword($connectionPassword)</CODE></A></STRONG><BR>
+<DD>
+Set the password to use to connect to the database.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connectionPassword">$connectionPassword</A></STRONG><BR>
+<DD>
+the database password
+<P></P></DL>
+<DT><STRONG><A NAME="item_setConnectionURL"><CODE>setConnectionURL($connectionURL)</CODE></A></STRONG><BR>
+<DD>
+Set the URL to use to connect to the database. The URL is the part of
+the DBI data source after the driver name. In this example
+<PRE>
+  DBI:mysql:hostname=localhost;port=12345;database=hi</PRE>
+<P>the URL is</P>
+<PRE>
+  hostname=localhost;port=12345;database=hi</PRE>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connectionURL">$connectionURL</A></STRONG><BR>
+<DD>
+the database URL
+<P></P></DL>
+<DT><STRONG><A NAME="item_setDriverName"><CODE>setDriverName($driverName)</CODE></A></STRONG><BR>
+<DD>
+Set the DBI driver to use.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24driverName">$driverName</A></STRONG><BR>
+<DD>
+the DBI driver name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setRoleNameCol"><CODE>setRoleNameCol($roleNameCol)</CODE></A></STRONG><BR>
+<DD>
+Set the column in the user role table that names a role.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24roleNameCol">$roleNameCol</A></STRONG><BR>
+<DD>
+the column name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setUserCredCol"><CODE>setUserCredCol($userCredCol)</CODE></A></STRONG><BR>
+<DD>
+Set the column in the user table that holds the user's credentials.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24userCredCol">$userCredCol</A></STRONG><BR>
+<DD>
+the column name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setUserNameCol"><CODE>setUserNameCol($userNameCol)</CODE></A></STRONG><BR>
+<DD>
+Set the column in the user table that holds the user's name.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24userNameCol">$userNameCol</A></STRONG><BR>
+<DD>
+the column name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setUserRoleTable"><CODE>setUserRoleTable($userRoleTable)</CODE></A></STRONG><BR>
+<DD>
+Set the table that holds the relation between users and roles.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24userRoleTable">$userRoleTable</A></STRONG><BR>
+<DD>
+the table name
+<P></P></DL>
+<DT><STRONG><A NAME="item_setUserTable"><CODE>setUserTable($userTable)</CODE></A></STRONG><BR>
+<DD>
+Set the table that holds user data.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24userTable">$userTable</A></STRONG><BR>
+<DD>
+the table name
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_authenticate">authenticate ($username, $credentials)</A></STRONG><BR>
+<DD>
+Return the Principal associated with the specified username and
+credentials, if there is one, or <CODE>undef</CODE> otherwise.
+<P>If there are any errors with the DBI connection, executing the query
+or anything else, do not authenticate and return <CODE>undef</CODE>. This event
+is also logged, and the connection will be closed so that a subsequent
+request will automatically re-open it.</P>
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24username">$username</A></STRONG><BR>
+<DD>
+username of the principal to be looked up
+<P></P>
+<DT><STRONG><A NAME="item_%24credentials">$credentials</A></STRONG><BR>
+<DD>
+password or other credentials to use in authenticating this username
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_close"><CODE>close()</CODE></A></STRONG><BR>
+<DD>
+Close the database connection.
+<P></P>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return a short name for this Realm implementation.
+<P></P>
+<DT><STRONG><A NAME="item_open"><CODE>open()</CODE></A></STRONG><BR>
+<DD>
+Open the database connection.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this Realm, opening the database
+connection. This method should be called before any of the public
+methods of the Realm are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AException"><STRONG>Servlet::Util::Exception</STRONG></A></STRONG><BR>
+<DD>
+if the Realm has already been started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this Realm, closing the database
+connection. Once this method has been called, no public methods of the
+Realm should be utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::Exception</STRONG></STRONG><BR>
+<DD>
+if the Realm is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>DBI</EM>,
+<A HREF="../../../api/Wombat/Realm/RealmBase.html">the Wombat::Realm::RealmBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

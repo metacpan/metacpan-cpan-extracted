@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <items_returned>4</items_returned>
+  <items_available>4</items_available>
+  <first_item_position>1</first_item_position>
+  <result>
+    <message uri="http://www.ohloh.net/accounts/Yanick/messages/4024">
+      <id>4024</id>
+      <account uri="http://www.ohloh.net/accounts/Yanick">Yanick</account>
+      <avatar uri="http://www.gravatar.com/avatar.php?gravatar_id=a15c336550dd22cbdff9743a54b56b3b"/>
+      <created_at>2008-07-15T00:40:25Z</created_at>
+      <body>Adding messages to the API of #www-ohloh-api</body>
+      <tags>
+        <project uri="http://www.ohloh.net/projects/www-ohloh-api">WWW::Ohloh::API</project>
+      </tags>
+    </message>
+    <message uri="http://www.ohloh.net/accounts/Yanick/messages/3806">
+      <id>3806</id>
+      <account uri="http://www.ohloh.net/accounts/Yanick">Yanick</account>
+      <avatar uri="http://www.gravatar.com/avatar.php?gravatar_id=a15c336550dd22cbdff9743a54b56b3b"/>
+      <created_at>2008-07-11T03:56:20Z</created_at>
+      <body>After wrestling a wee bit with #Angerwhale, and finding how to retrieve stuff from use.perl.org, I have a new blog at http://babyl.dyndns.org/techblog. Huzzah!</body>
+    </message>
+    <message uri="http://www.ohloh.net/accounts/Yanick/messages/3769">
+      <id>3769</id>
+      <account uri="http://www.ohloh.net/accounts/Yanick">Yanick</account>
+      <avatar uri="http://www.gravatar.com/avatar.php?gravatar_id=a15c336550dd22cbdff9743a54b56b3b"/>
+      <created_at>2008-07-10T17:08:46Z</created_at>
+      <body>The #ohloh api &lt;items_available&gt; element for languages seems to be stuck at 10.  Hmmm...</body>
+    </message>
+    <message uri="http://www.ohloh.net/accounts/Yanick/messages/3603">
+      <id>3603</id>
+      <account uri="http://www.ohloh.net/accounts/Yanick">Yanick</account>
+      <avatar uri="http://www.gravatar.com/avatar.php?gravatar_id=a15c336550dd22cbdff9743a54b56b3b"/>
+      <created_at>2008-07-08T15:38:58Z</created_at>
+      <body>Musing over squeezing XML::Writer under Pod::2::DocBook's hood.</body>
+    </message>
+  </result>
+</response>

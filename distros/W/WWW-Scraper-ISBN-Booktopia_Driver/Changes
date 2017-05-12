@@ -1,0 +1,90 @@
+Revision history for WWW-Scraper-ISBN-Booktopia_Driver
+======================================================
+
+0.22    2015-02-11
+        - test data updated, due bad data on site.
+
+0.21    2015-02-26
+        - test data updated, due to site changes.
+
+0.20    2014-10-30
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.19    2014-10-25
+        - fixed license fields in META.json to be lists.
+
+0.18    2013-06-13
+        - added git repository links to metadata.
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - reworked test failure checks
+
+0.17    2013-03-26
+        - tests changed to reflect website updates.
+
+0.16    2013-03-17
+        - exposed depth values.
+        - added isbn-check.pl to examples.
+        - META updates.
+        - more error reporting in tests.
+        - code changed to reflect website updates.
+
+0.15    2012-12-16
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.14    2012-06-17
+        - updated pattern matching due to page layout changes.
+        - updated tests due to data changes.
+
+0.13    2012-05-22
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.12    2011-03-16
+        - updated test with more generic test results.
+
+0.11    2011-03-14
+        - updated tests due to data change.
+
+0.10    2011-02-16
+        - upgraded to Test::CPAN::Meta::JSON for tests.
+        - updated tests due to data change.
+
+0.09    2011-02-14
+        - updated tests due to data change.
+
+0.08    2010-11-03
+        - added further skip test if test books are withdrawn from the site.
+
+0.07    2010-10-29
+        - update to author pattern
+        - test data update
+
+0.06    2010-10-07
+        - further fixes due to changes in page layout.
+        - adapted code to cope with weird weights.
+        - amended pingtest() in network tests.
+
+0.05    2010-10-06
+        - fixed skip count.
+        - provided alternate ping test methods.
+        - fixes due to changes in page layout.
+
+0.04    2010-09-15
+        - reworked test structure, so easier to add sample sets.
+
+0.03    2010-09-14
+        - protect against amending undefined strings.
+
+0.02    2010-09-08
+        - weight is actually given in grammes not kilogrammes as stated.
+        - all matches are now case insensitive.
+        - fixed support for ISBN10 searches.
+
+0.01    2010-07-30
+        - initial release

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ee0294a67911ea989f73df3a819a0645172fbaae Changes
+SHA1 c74a9f55fa4ed3907c178bbfdacce534d602989c MANIFEST
+SHA1 75b754d4885e123859bdc8702eb6f81a591931c3 META.json
+SHA1 b99fcff112b8d07b0114bacd9a29205aa582d218 META.yml
+SHA1 cf091169818983b069b346ccfdb427e2e4fcc275 Makefile.PL
+SHA1 a2aec9b3ee8dd29ff5b00ef4d037a6c47e007d81 README
+SHA1 8623271c99b72496acffae9cc1371aa21afe89b7 lib/App/TDWTF.pm
+SHA1 ec81552703236b6b2ed0b4a1aa9906045d44af28 lib/WebService/TDWTF.pm
+SHA1 ffb315a6b8cc3e316abe6e71c01929fad9c09bfd lib/WebService/TDWTF/Article.pm
+SHA1 ff7b487a92b024dfda5276cb9ce90b8057339650 t/App-TDWTF.t
+SHA1 0a985fb699b8f38a126bd1a12759aabf51fbbc3e t/WebService-TDWTF.t
+SHA1 ce3970dcb35fcb8a01591fbc26f2477223ac287d tdwtf
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJW7aByAAoJEMoENb5ewbNia1QP/2zvHId2LJPPyoHBSLLcW5vj
+x8r+Ngv7zO3eeq373DDmfVCThuEkwjaN9LkhaKl04xCSz4VSdWq47DdGuTq2l0+T
+vlDHeBnLSsx41x1dh0XmMhgkDHgk11xWdUScSR+jqfPY/WNQ8q8qrhGhYHTKLHIT
+iyhSHaJNllVafWXfxuZtqF5VAziPJmrzeYupeWtm8Wsg5FVQU6xpMbyY6qvHGomd
+rtfpgU20AXX6c6JqfCRmSrToZz1g39p/JKm4FkxMIVr1C+LqFY1bPFgsjkUY4E1V
+zoOOy62LfZyi3yLPsLnhSolH4552yaDTgN5GpcwtQ8zWnYZUC5emmWritTVR2kGK
+hy4NT/g4LK9KZjssf8gBlgA+E43UWNHT//+B7zjbTCIs3xd1XQeptogb4wa5RFsK
+rdf+lHDpPo4Xvc7nqPBO4qdurvj3eYbaGER0vxRI8VHKfQVkegVGeBK0xuWlmC2E
+17P8cChirIN1kZ9v0ZK6RVNjHt2FinYa2EqUroRJ3UeXiZpifFu0dDbMBt8dxyVp
+iAByDVMcznGOvGKWyZ57VTcXnONGB/gEji/BfCdNPaSgWY2Ff90L1nqapcIZCEfb
+Onc+15ZMuvV8j+rT3TjkoZY9jqK3tt57W1cBO/N9jXpNvxhiZ1H03oMKp8KR7TDW
+cLKQCibZxY6to58idj0A
+=hzyh
+-----END PGP SIGNATURE-----

@@ -1,0 +1,49 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'CGI::Simple' => '1.115',
+                                      'Class::Inspector' => '1.28',
+                                      'Exporter::Tiny' => '0.042',
+                                      'HTTP::Body' => '1.22',
+                                      'HTTP::Message' => '6.06',
+                                      'JSON::MaybeXS' => '1.003',
+                                      'Moo' => '2.001001',
+                                      'Role::Tiny' => '2.000001',
+                                      'Subclass::Of' => '0.003',
+                                      'Try::Tiny' => '0.22',
+                                      'URI' => '1.67',
+                                      'Unexpected' => 'v0.43.0',
+                                      'namespace::autoclean' => '0.26',
+                                      'perl' => '5.010001',
+                                      'strictures' => '2.000000'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'IO::String' => '1.08',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Requires' => '0.06',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,97 @@
+word2vec
+  SYNOPSIS
+      The word2vec-interface module provides perl suite of utilities and functions
+      wrapped around 'word2vec'. This includes word2vec word vector data generation and 
+      manipulation of word vectors.
+
+  INSTALL
+        To install these modules run:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the modules in the standard locations. You will, 
+        most probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home
+
+        It is possible to modify other parameters during installation. The
+        details of these can be found in the ExtUtils::MakeMaker
+        documentation. However, it is highly recommended not messing 
+        around with other parameters, unless you know what you're doing.
+
+  CONTENTS
+        All the modules that will be installed in the Perl system directory are
+        present in the '/lib' directory tree of the package. These include the
+        word2vec interface dependency modules -- 
+
+          Word2vec/Interface.pm
+          Word2vec/Word2vec.pm
+          Word2vec/Word2phrase.pm
+          Word2vec/Xmltow2v.pm
+          Word2vec/W2vbst.pm
+          Word2vec/Wsddata.pm
+          Word2vec/Bst.pm
+          Word2vec/Node.pm
+
+        -- present in the lib/ subdirectory. All these modules, once installed
+        in the Perl system directory, can be directly used by Perl programs.
+
+        The package contains a utils/ directory that contain Perl utility 
+        programs. These utilities use the modules or provide some supporting
+        functionality.
+
+          Word2vec-Interface.pl         -- simple example of using the module
+
+  SOFTWARE COPYRIGHT AND LICENSE
+        Copyright (C) 2016 Clint Cuffy
+
+        This suite of programs is free software; you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation; either version 2 of the License, or (at
+        your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        General Public License for more details.
+
+        You should have received a copy of the GNU General Public License along
+        with this program; if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+        Note: The text of the GNU General Public License is provided in the file
+        'GPL.txt' that you should have received with this distribution.
+
+  SEE ALSO
+    <http://search.cpan.org/dist/word2vec>
+
+  CONTACT US
+    You may also contact me directly :
+
+            Bridgett McInnes: btmcinnes at vcu.edu
+      Clint Cuffy: cuffyca at vcu.edu
+
+  AUTHORS
+     Clint Cuffy, Virginia Commonwealth University
+     cuffyca at vcu.edu
+
+  DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2016 Bridgett McInnes, Clint Cuffy
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at:
+
+    <http://www.gnu.org/copyleft/fdl.html>
+
+    and is included in this distribution as FDL.txt.
+

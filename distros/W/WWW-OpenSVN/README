@@ -1,0 +1,21 @@
+WWW-OpenSVN
+
+This is an automated interface against OpenSVN.csie.org. Currently all it
+can do is fetch dumps of the subversion repository.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Shlomi Fish
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the MIT X11 License.

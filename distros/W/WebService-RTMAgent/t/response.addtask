@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Connection: keep-alive
+Date: Mon, 24 Dec 2007 10:18:18 GMT
+Server: nginx/RTM
+Vary: Accept-Encoding
+Content-Type: text/xml; charset="utf-8"
+Client-Date: Mon, 24 Dec 2007 10:19:47 GMT
+Client-Peer: 75.126.232.204:80
+Client-Response-Num: 1
+Client-Transfer-Encoding: chunked
+Keep-Alive: timeout=300
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rsp stat="ok"><transaction id="920671842" undoable="0"/><list id="1917453"><taskseries id="8551046" created="2007-12-24T10:18:18Z" modified="2007-12-24T10:18:18Z" name="A new task" source="api" url="" location_id=""><tags/><participants/><notes/><task id="12662499" due="" has_due_time="0" added="2007-12-24T10:18:18Z" completed="" deleted="" priority="N" postponed="0" estimate=""/></taskseries></list></rsp>
+
+

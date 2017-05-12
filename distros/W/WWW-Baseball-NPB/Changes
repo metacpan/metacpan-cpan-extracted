@@ -1,0 +1,12 @@
+Revision history for Perl extension WWW::Baseball::NPB
+
+0.03  
+	* Added bbgames script in eg/ directory
+	- Renamed Result class to Game class
+	- Fixed HTML parsing code
+
+0.02  Sun Mar 31 01:56:06 JST 2002
+	- Fixed HTML parsing when games are not yet started.
+
+0.01  Sat Mar 30 22:21:54 2002
+	- original version

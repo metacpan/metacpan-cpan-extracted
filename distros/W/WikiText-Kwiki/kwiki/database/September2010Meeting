@@ -1,0 +1,26 @@
+= September2010Meeting
+
+ Wed. September 8th, 6:53pm at FreeGeek -- 1731 SE 10th Ave.
+
+== Modern Perl / Test::Builder2 
+
+speakers: chromatic and Michael Schwern
+
+This meeting will be two shorter presentations back-to-back.  The Modern Perl talk is broadly targetted at beginners and everyday general usage concepts while the Test::Builder 2 talk will delve much deeper into particular details of Perl's testing system.
+
+=== [chromatic] on Modern Perl
+
+Perl masters talk about strange subjects such as whipupitude, manipulexity, 
+context, lexicals, and linguistic principles.  It may seem that you must be a wizard to apply these notions to your code and dexterously wield Perl's essential strengths.  In truth, these ideas and idioms are deceptively simple: you use them every day when you read or write plain English.
+
+Demystifying the linguistic concepts in Perl opens up the doors of Perl mastery.  Come learn the philosophy behind Perl's design in order to /understand/ Perl and how to use its unique isms to improve your code.
+
+=== [Schwern MichaelSchwern] on Test::Builder2
+
+[Test::Builder http://search.cpan.org/perldoc?Test::Builder] is what most Test modules are written with these days.  It lets them quietly coordinate with each other and frees the authors from having to worry about the details.  It was written in 2001 and in that decade there's been an explosion of testing modules.
+
+A decade later, Test::Builder is starting to show its age and limitations.  Its assumptions and biases are restraining the Perl testing community.  Perl has moved on, too.  When Test::Builder was written, testing was still a "new" thing.  Now it's a given.  We have a real object system now and a sophisticated community to take advantage.
+
+Enter [Test::Builder2 http://github.com/schwern/test-more/blob/Test-Builder2/lib/Test/Builder2/Design.pod].  A total rewrite of Test::Builder to remove its biases and let test authors do whatever they can dream up while still being the solid iron core of Perl testing and remaining compatible with Test::Builder.  It takes advantage of things like Mouse (that's a small Moose), method wrappers and roles.  Counter-intuitively, it does less than Test::Builder does while providing more opportunities.
+
+Schwern has a [grant for Test::Builder2 from the Perl Foundation http://www.perlfoundation.org/test_builder_2] and if he doesn't release something by October they'll break his legs.  So he's hoping to generate some contributors by showing off the design and code!

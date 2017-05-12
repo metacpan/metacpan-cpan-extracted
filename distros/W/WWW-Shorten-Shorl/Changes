@@ -1,0 +1,29 @@
+Revision history for WWW-Shorten-Shorl
+
+2.101     2016-03-16 19:10:08-04:00 America/New_York
+
+2.101     2016-03-16 19:07:27-04:00 America/New_York
+    - added author and release tests
+    - made Travis test a bit more in-depth
+
+2.100   2016-03-13
+    - version bump up to fix a problem with another release
+    - added examples to the function documentation
+
+1.931   2016-03-11
+    - Cleaned up a bit
+    - Standardized documentation a bit. Made sure links were present
+    - added contributors
+    - removed function prototypes
+    - stopped testing since shorl.com doesn't allow repeat requests and no API
+    - document that you shouldn't use shorl.com since there's no API
+    - fixed up scraping regex a bit
+
+1.93    2015-07-18
+    - Fixed tests.
+    - Added .travis.yml
+    - Added .gitignore
+
+1.92    2009-12-19
+    - Changed to working URL in the test
+    - Initial version.

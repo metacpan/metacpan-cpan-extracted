@@ -1,0 +1,749 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Console Reference</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+
+
+<FONT FACE=Arial><H2><A NAME=Reference>Reference Manual</H2></FONT>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=Methods>Methods</H3></FONT>
+
+<DL>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Alloc>
+
+    <B>Alloc</B>
+
+<DD>Allocates a new console for the process. Returns <B>undef</B> on errors,
+    a nonzero value on success.
+    A process cannot be associated with more than one console, so this method
+    will fail if there is already an allocated console. Use <A HREF="#Free">Free</A>
+    to detach the process from the console, and then call <A HREF="#Alloc">Alloc</A>
+    to create a new console.
+    <BR>
+    See also: <A HREF="#Free">Free</A>
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->Alloc();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Attr>
+
+    <B>Attr</B> <I>[attr]</I>
+
+<DD>Gets or sets the current console attribute. 
+    This attribute is used by the <A HREF="#Write">Write</A> method.
+    <BR>
+    Example:</FONT><PRE> $attr = $CONSOLE->Attr();
+ $CONSOLE->Attr($FG_YELLOW | $BG_BLUE);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Close>
+
+    <B>Close</B>
+
+<DD>Closes a shortcut object. 
+    Note that it is not "strictly" required to close the objects you created, since
+    the Win32::Shortcut objects are automatically closed when the program ends (or when you
+    elsehow destroy such an object).
+    <BR>
+    Example:</FONT>
+<PRE> $LINK->Close();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Cls>
+
+    <B>Cls</B> <I>[attr]</I>
+
+<DD>Clear the console, with the specified <I>attr</I> if given,
+    or using <A HREF="#ATTR_NORMAL">ATTR_NORMAL</A> otherwise.
+    <BR>
+    Example:</FONT><PRE> $CONSOLE->Cls();
+ $CONSOLE->Cls($FG_WHITE | $BG_GREEN);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Cursor>
+
+    <B>Cursor</B> <I>[x, y, size, visible]</I>
+
+<DD>Gets or sets cursor position and appearance.
+    Returns <B>undef</B> on errors, or a 4-element list containing:
+    <I>x, y, size, visible</I>. <I>x</I> and <I>y</I> are the current
+    cursor position; ...
+    <BR>
+    Example:</FONT><PRE> ($x, $y, $size, $visible) = $CONSOLE->Cursor();
+
+ # Get position only
+ ($x, $y) = $CONSOLE->Cursor();
+ 
+ $CONSOLE->Cursor(40, 13, 50, 1);
+ 
+ # Set position only
+ $CONSOLE->Cursor(40, 13);
+
+ # Set size and visibility without affecting position
+ $CONSOLE->Cursor(-1, -1, 50, 1);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Display>
+
+    <B>Display</B>
+
+<DD>Displays the specified console on the screen.
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->Display();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=FillAttr>
+
+    <B>FillAttr</B> <I>[attribute, number, col, row]</I>
+
+<DD>Fills the specified <I>number</I> of consecutive attributes, beginning at <I>col, row</I>,
+    with the value specified in <I>attribute</I>.
+    Returns the number of attributes filled,
+    or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#FillChar">FillChar</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->FillAttr($FG_BLACK | $BG_BLACK, 80*25, 0, 0);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=FillChar>
+
+    <B>FillChar</B> <I>char, number, col, row</I>
+
+<DD>Fills the specified <I>number</I> of consecutive characters, beginning at <I>col, row</I>,
+    with the character specified in <I>char</I>.
+    Returns the number of characters filled,
+    or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#FillAttr">FillAttr</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->FillChar("X", 80*25, 0, 0);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Flush>
+
+    <B>Flush</B>
+
+<DD>Flushes the console input buffer. All the events in the buffer are discarded.
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->Flush();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Free>
+
+    <B>Free</B>
+
+<DD>Detaches the process from the console.
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    See also: <A HREF="#Alloc">Alloc</A>
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->Free();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=GenerateCtrlEvent>
+
+    <B>GenerateCtrlEvent</B> <I>[type, processgroup]</I>
+
+<DD>Sends a break signal of the specified <I>type</I> to the specified <I>processgroup</I>.
+    <BR>
+    <I>type</I> can be one of the following constants:</FONT><PRE> CTRL_BREAK_EVENT
+ CTRL_C_EVENT</PRE><FONT FACE=Arial SIZE=2>
+    they signal, respectively, the pressing of Control + Break 
+    and of Control + C; if not specified, it defaults to CTRL_C_EVENT.
+    <BR>
+    <I>processgroup</I> is the pid of a process sharing the same console.
+    If omitted, it defaults to 0 (the current process), which is also the only
+    meaningful value that you can pass to this function.
+    <BR>
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    Example:</FONT>
+<PRE> # break this script now
+ $CONSOLE->GenerateCtrlEvent();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=GetEvents>
+
+    <B>GetEvents</B>
+
+<DD>Returns the number of unread input events in the console's input buffer,
+    or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#Input">Input</A>, <A HREF="#InputChar">InputChar</A>,
+              <A HREF="#PeekInput">PeekInput</A>, <A HREF="#WriteInput">WriteInput</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $events = $CONSOLE->GetEvents();</PRE>
+<P>
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Info>
+
+    <B>Info</B>
+
+<DD>Returns an array of informations about the console (or <B>undef</B> on errors), which contains:
+    <UL COMPACT TYPE=square>
+    <LI>columns (X size) of the console buffer.    
+    <LI>rows (Y size) of the console buffer.
+    <LI>current column (X position) of the cursor.
+    <LI>current row (Y position) of the cursor.
+    <LI>current attribute used for <A HREF="#Write">Write</A>.
+    <LI>left column (X of the starting point) of the current console window.
+    <LI>top row (Y of the starting point) of the current console window.
+    <LI>right column (X of the final point) of the current console window.
+    <LI>bottom row (Y of the final point) of the current console window.
+    <LI>maximum number of columns for the console window, given the current buffer size, font and the
+        screen size. 
+    <LI>maximum number of rows for the console window, given the current buffer size, font and the
+        screen size. 
+    </UL>
+    <BR>
+    See also: <A HREF="#Attr">Attr</A>, <A HREF="#Cursor">Cursor</A>, <A HREF="#Size">Size</A>, <A HREF="#Window">Window</A>, <A HREF="#MaxWindow">MaxWindow</A>.
+    <BR>
+    Example:</FONT>
+<PRE> @info = $CONSOLE->Info();
+ print "Cursor at $info[3], $info[4].\n";</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Input>
+
+    <B>Input</B>
+
+<DD>Reads an event from the input buffer. Returns a list of values,
+    which depending on the event's nature are:
+      <UL>
+      <LI>a <B>keyboard</B> event, the list will contain:
+        <UL>
+        <LI><I>event type</I>: 1 for keyboard
+        <LI><I>key down</I>: TRUE if the key is being pressed, FALSE if the key is being released
+        <LI><I>repeat count</I>: the number of times the key is being held down
+        <LI><I>virtual keycode</I>: the virtual key code of the key
+        <LI><I>virtual scancode</I>: the virtual scan code of the key
+        <LI><I>char</I>: the ASCII code of the character (if the key is a character key, 0 otherwise)
+        <LI><I>control key state</I>: the state of the control keys (SHIFTs, CTRLs, ALTs, etc.)
+        </UL>
+
+      <LI>a <B>mouse</B> event:
+        <UL>
+        <LI><I>event type</I>: 2 for mouse
+        <LI><I>mouse pos. X</I>: X coordinate (column) of the mouse location
+        <LI><I>mouse pos. Y</I>: Y coordinate (row) of the mouse location
+        <LI><I>button state</I>: the mouse button(s) which are pressed
+        <LI><I>control key state</I>: the state of the control keys (SHIFTs, CTRLs, ALTs, etc.)
+        <LI><I>event flags</I>: the type of the mouse event
+        </UL>
+      </UL>
+    This method will return <B>undef</B> on errors.
+    <BR>
+    Note that the events returned are depending on the input <A HREF="#Mode">Mode</A> 
+    of the console; for example, mouse events are not intercepted unless 
+    </FONT><TT>ENABLE_MOUSE_INPUT</TT><FONT FACE=Arial SIZE=2>
+    is specified.
+    <P>
+    See also: <A HREF="#GetEvents">GetEvents</A>, <A HREF="#InputChar">InputChar</A>, 
+              <A HREF="#Mode">Mode</A>, 
+              <A HREF="#PeekInput">PeekInput</A>, <A HREF="#WriteInput">WriteInput</A>.
+    <BR>
+    Example:</FONT><PRE> @event = $CONSOLE->Input();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=InputChar>
+
+    <B>InputChar</B> <I>number</I>
+
+<DD>Reads and returns <I>number</I> characters from the console input buffer, or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#Input">Input</A>, <A HREF="#Mode">Mode</A>.
+    <BR>
+    Example:</FONT><PRE> $key = $CONSOLE->InputChar(1);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=InputCP>
+
+    <B>InputCP</B> <I>[codepage]</I>
+
+<DD>Gets or sets the input code page used by the console. Note that 
+    this doesn't apply to a console object, but to the standard input
+    console.
+    This attribute is used by the <A HREF="#Write">Write</A> method.
+    <BR>
+    See also: <A HREF="#OutputCP">OutputCP</A>.
+    <BR>
+    Example:</FONT><PRE> $codepage = $CONSOLE->InputCP();
+ $CONSOLE->InputCP(437);
+ 
+ # you may want to use the non-instanciated form to avoid confuzion :)
+ $codepage = Win32::Console::InputCP();
+ Win32::Console::InputCP(437);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=MaxWindow>
+
+    <B>MaxWindow</B>
+
+<DD>Returns the size of the largest possible console window, based on the current font and the size of the display.
+    The result is <B>undef</B> on errors, otherwise a 2-element list containing <I>col, row</I>.
+    <BR>
+    Example:</FONT><PRE> ($maxCol, $maxRow) = $CONSOLE->MaxWindow();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Mode>
+
+    <B>Mode</B> <I>[flags]</I>
+
+<DD>Gets or sets the input or output mode of a console. 
+    <I>flags</I> can be a combination of the following constants:</FONT><PRE> ENABLE_LINE_INPUT
+ ENABLE_ECHO_INPUT
+ ENABLE_PROCESSED_INPUT
+ ENABLE_WINDOW_INPUT
+ ENABLE_MOUSE_INPUT
+ ENABLE_PROCESSED_OUTPUT
+ ENABLE_WRAP_AT_EOL_OUTPUT</PRE><FONT FACE=Arial SIZE=2>    
+
+    For more informations on the meaning of those flags, please refer to the
+    <A HREF="#msdocs">Microsoft's Documentation</A>.
+    <BR>
+    Example:</FONT><PRE> $mode = $CONSOLE->Mode();
+ $CONSOLE->Mode(ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=MouseButtons>
+
+    <B>MouseButtons</B>
+
+<DD>Returns the number of the buttons on your mouse, or <B>undef</B> on errors.
+    <BR>
+    Example:</FONT><PRE> print "Your mouse has ", $CONSOLE->MouseButtons(), " buttons.\n";</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=new>
+
+    <B>new Win32::Console</B> <I>standard_handle</I>
+<DT><B>new Win32::Console</B> <I>[accessmode, sharemode]</I>
+
+<DD>Creates a new console object. The first form creates a handle to a standard channel, 
+    <I>standard_handle</I> can be one of the following:</FONT>
+<PRE> STD_OUTPUT_HANDLE
+ STD_ERROR_HANDLE
+ STD_INPUT_HANDLE</PRE><FONT FACE=Arial SIZE=2>
+    The second form, instead, creates a console screen buffer in memory, which you can access
+    for reading and writing as a normal console, and then redirect on the standard output 
+    (the screen) with <A HREF="#Display">Display</A>. 
+    In this case, you can specify one or both of the following values
+    for <I>accessmode</I>:</FONT>
+<PRE> GENERIC_READ
+ GENERIC_WRITE</PRE><FONT FACE=Arial SIZE=2>
+    which are the permissions you will have on the created buffer, and one or both of 
+    the following values for <I>sharemode</I>:</FONT>
+<PRE> FILE_SHARE_READ
+ FILE_SHARE_WRITE</PRE><FONT FACE=Arial SIZE=2>
+    which affect the way the console can be shared.
+    If you don't specify any of those parameters, all 4 flags will be used.
+    <BR>
+    Example:</FONT>
+<PRE> $STDOUT = new Win32::Console(STD_OUTPUT_HANDLE);
+ $STDERR = new Win32::Console(STD_ERROR_HANDLE);
+ $STDIN  = new Win32::Console(STD_INPUT_HANDLE);
+
+ $BUFFER = new Win32::Console();
+ $BUFFER = new Win32::Console(GENERIC_READ | GENERIC_WRITE);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=OutputCP>
+
+    <B>OutputCP</B> <I>[codepage]</I>
+
+<DD>Gets or sets the output code page used by the console. Note that 
+    this doesn't apply to a console object, but to the standard output
+    console.
+    <BR>
+    See also: <A HREF="#InputCP">InputCP</A>.
+    <BR>
+    Example:</FONT><PRE> $codepage = $CONSOLE->OutputCP();
+ $CONSOLE->OutputCP(437);
+ 
+ # you may want to use the non-instanciated form to avoid confuzion :)
+ $codepage = Win32::Console::OutputCP();
+ Win32::Console::OutputCP(437);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=PeekInput>
+
+    <B>PeekInput</B>
+
+<DD>Does exactly the same as <A HREF="#Input">Input</A>, except that
+    the event read is not removed from the input buffer.
+    <BR>
+    See also: <A HREF="#GetEvents">GetEvents</A>, 
+              <A HREF="#Input">Input</A>, <A HREF="#InputChar">InputChar</A>, 
+              <A HREF="#Mode">Mode</A>, <A HREF="#WriteInput">WriteInput</A>.
+    <BR>
+    Example:</FONT><PRE> @event = $CONSOLE->PeekInput();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ReadAttr>
+
+    <B>ReadAttr</B> <I>[number, col, row]</I>
+
+<DD>Reads the specified <I>number</I> of consecutive attributes, beginning at <I>col, row</I>,
+    from the console.
+    Returns the attributes read (a variable containing one character for each attribute),
+    or <B>undef</B> on errors.
+    You can then pass the returned variable to <A HREF="#WriteAttr">WriteAttr</A> to
+    restore the saved attributes on screen.
+    <BR>
+    See also: <A HREF="#ReadChar">ReadChar</A>, <A HREF="#ReadRect">ReadRect</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $colors = $CONSOLE->ReadAttr(80*25, 0, 0);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ReadChar>
+
+    <B>ReadChar</B> <I>[number, col, row]</I>
+
+<DD>Reads the specified <I>number</I> of consecutive characters, beginning at <I>col, row</I>,
+    from the console.
+    Returns a string containing the characters read,
+    or <B>undef</B> on errors.
+    You can then pass the returned variable to <A HREF="#WriteChar">WriteChar</A> to
+    restore the saved characters on screen.
+    <BR>
+    See also: <A HREF="#ReadAttr">ReadAttr</A>, <A HREF="#ReadRect">ReadRect</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $chars = $CONSOLE->ReadChar(80*25, 0, 0);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ReadRect>
+
+    <B>ReadRect</B> <I>left, top, right, bottom</I>
+
+<DD>Reads the content (characters and attributes) of the rectangle specified by
+    <I>left, top, right, bottom</I> from the console.
+    Returns a string containing the rectangle read,
+    or <B>undef</B> on errors.
+    You can then pass the returned variable to <A HREF="#WriteRect">WriteRect</A> to
+    restore the saved rectangle on screen (or on another console).
+    <BR>
+    See also: <A HREF="#ReadAttr">ReadAttr</A>, <A HREF="#ReadRect">ReadChar</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $rect = $CONSOLE->ReadRect(0, 0, 80, 25);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Scroll>
+
+    <B>Scroll</B> <I>left, top, right, bottom, col, row, char, attr, [cleft, ctop, cright, cbottom]</I>
+
+<DD>Moves a block of data in a console buffer; the block is identified by <I>left, top, right, bottom</I>,
+    wile <I>row, col</I> identify the new location of the block. The cells left empty as a result of the move
+    are filled with the character <I>char</I> and attribute <I>attr</I>.
+    Optionally you can specify a clipping region with <I>cleft, ctop, cright, cbottom</I>, so that the
+    content of the console outside this rectangle are unchanged.
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    Example:</FONT>
+<PRE> # scrolls the screen 10 lines down, filling with black spaces
+ $CONSOLE->Scroll(0, 0, 80, 25, 0, 10, " ", $FG_BLACK | $BG_BLACK);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Select>
+
+    <B>Select</B> <I>standard_handle</I>
+
+<DD>Redirects a standard handle to the specified console. 
+    <I>standard_handle</I> can have one of the following values:</FONT><PRE> STD_INPUT_HANDLE
+ STD_OUTPUT_HANDLE
+ STD_ERROR_HANDLE</PRE><FONT FACE=Arial SIZE=2>
+    Returns <B>undef</B> on errors, a nonzero value on success.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->Select(STD_OUTPUT_HANDLE);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Size>
+
+    <B>Size</B> <I>[col, row]</I>
+
+<DD>Gets or sets the console buffer size.
+    <BR>
+    Example:</FONT><PRE> ($x, $y) = $CONSOLE->Size();
+ $CONSOLE->Size(80, 25);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Title>
+
+    <B>Title</B> <I>[title]</I>
+
+<DD>Gets or sets the title bar the string of the current console window.
+    <BR>
+    Example:</FONT><PRE> $title = $CONSOLE->Title();
+ $CONSOLE->Title("This is a title");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Window>
+
+    <B>Window</B> <I>[flag, left, top, right, bottom]</I>
+
+<DD>Gets or sets the current console window size.
+    If called without arguments, returns a 4-element list containing 
+    the current window coordinates in the form of 
+    <I>left, top, right, bottom</I>.
+    To set the window size, you have to specify an additional <I>flag</I>
+    parameter: if it is 0 (zero), coordinates are considered relative to
+    the current coordinates; if it is non-zero, coordinates are absolute.
+    <BR>
+    Example:</FONT><PRE> ($left, $top, $right, $bottom) = $CONSOLE->Window();
+ $CONSOLE->Window(1, 0, 0, 80, 50);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Write>
+
+    <B>Write</B> <I>string</I>
+
+<DD>Writes <I>string</I> on the console, using the current attribute, 
+    that you can set with <A HREF="#Attr">Attr</A>, and advancing the
+    cursor as needed. This isn't so different from Perl's "print" statement.
+    Returns the number of characters written or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#WriteAttr">WriteAttr</A>, <A HREF="#WriteChar">WriteChar</A>, 
+              <A HREF="#WriteRect">WriteRect</A>.
+    <BR>
+    Example:</FONT><PRE> $CONSOLE->Write("Hello, world!");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=WriteAttr>
+
+    <B>WriteAttr</B> <I>attrs, col, row</I>
+
+<DD>Writes the attributes in the string <I>attrs</I>, beginning at <I>col, row</I>,
+    without affecting the characters that are on screen.
+    The string <I>attrs</I> can be the result of a <A HREF="#ReadAttr">ReadAttr</A>
+    function, or you can build your own attribute string;
+    in this case, keep in mind that every attribute is treated as a character,
+    not a number (see example).
+    Returns the number of attributes written or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#Write">Write</A>, <A HREF="#WriteChar">WriteChar</A>,
+              <A HREF="#WriteRect">WriteRect</A>.
+    <BR>
+    Example:</FONT><PRE> $CONSOLE->WriteAttr($attrs, 0, 0);
+
+ # note the use of chr()...
+ $attrs = chr($FG_BLACK | $BG_WHITE) x 80; 
+ $CONSOLE->WriteAttr($attrs, 0, 0);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=WriteChar>
+
+    <B>WriteChar</B> <I>chars, col, row</I>
+
+<DD>Writes the characters in the string <I>attr</I>, beginning at <I>col, row</I>,
+    without affecting the attributes that are on screen.
+    The string <I>chars</I> can be the result of a <A HREF="#ReadChar">ReadChar</A>
+    function, or a normal string.
+    Returns the number of characters written or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#Write">Write</A>, <A HREF="#WriteAttr">WriteAttr</A>,
+              <A HREF="#WriteRect">WriteRect</A>.
+    <BR>
+    Example:</FONT><PRE> $CONSOLE->WriteChar("Hello, worlds!", 0, 0);</PRE>
+<P>
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=WriteInput>
+
+    <B>WriteInput</B> <I>(event)</I>
+
+<DD>Pushes data in the console input buffer. <I>(event)</I> is a list of values,
+    for more information see <A HREF="#Input">Input</A>.
+    The string <I>chars</I> can be the result of a <A HREF="#ReadChar">ReadChar</A>
+    function, or a normal string.
+    Returns the number of characters written or <B>undef</B> on errors.
+    <BR>
+    See also: <A HREF="#Write">Write</A>, <A HREF="#WriteAttr">WriteAttr</A>,
+              <A HREF="#WriteRect">WriteRect</A>.
+    <BR>
+    Example:</FONT><PRE> $CONSOLE->WriteInput(@event);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=WriteRect>
+
+    <B>WriteRect</B> <I>rect, left, top, right, bottom</I>
+
+<DD>Writes a rectangle of characters and attributes (contained in <I>rect</I>) on
+    the console at the coordinates specified by <I>left, top, right, bottom</I>.
+    <I>rect</I> can be the result of a <A HREF="#ReadRect">ReadRect</A>
+    function.
+    Returns <B>undef</B> on errors, otherwise a 4-element list containing the 
+    coordinates of the affected rectangle, in the format <I>left, top, right, bottom</I>.
+    <BR>
+    See also: <A HREF="#Write">Write</A>, <A HREF="#WriteAttr">WriteAttr</A>, <A HREF="#WriteChar">WriteChar</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $CONSOLE->WriteRect($rect, 0, 0, 80, 25);</PRE>
+<P>
+
+
+
+</DL>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=Constants>Constants</H3></FONT>
+
+<FONT FACE=Arial SIZE=2>
+The following constants are exported in the main namespace of your script using Win32::Console:
+</FONT><FONT SIZE=3 FACE=><PRE>
+    BACKGROUND_BLUE
+    BACKGROUND_GREEN
+    BACKGROUND_INTENSITY
+    BACKGROUND_RED
+    CAPSLOCK_ON
+    CONSOLE_TEXTMODE_BUFFER    
+    ENABLE_ECHO_INPUT
+    ENABLE_LINE_INPUT
+    ENABLE_MOUSE_INPUT
+    ENABLE_PROCESSED_INPUT
+    ENABLE_PROCESSED_OUTPUT
+    ENABLE_WINDOW_INPUT
+    ENABLE_WRAP_AT_EOL_OUTPUT
+    ENHANCED_KEY
+    FILE_SHARE_READ
+    FILE_SHARE_WRITE
+    FOREGROUND_BLUE
+    FOREGROUND_GREEN
+    FOREGROUND_INTENSITY
+    FOREGROUND_RED
+    LEFT_ALT_PRESSED
+    LEFT_CTRL_PRESSED
+    NUMLOCK_ON
+    GENERIC_READ
+    GENERIC_WRITE
+    RIGHT_ALT_PRESSED
+    RIGHT_CTRL_PRESSED
+    SCROLLLOCK_ON
+    SHIFT_PRESSED
+    STD_INPUT_HANDLE
+    STD_OUTPUT_HANDLE
+    STD_ERROR_HANDLE
+</PRE></FONT>
+<FONT FACE=Arial SIZE=2>
+
+Additionally, the following variables can be used:
+</FONT><FONT SIZE=3 FACE=><PRE>
+    $FG_BLACK
+    $FG_BLUE
+    $FG_LIGHTBLUE
+    $FG_RED
+    $FG_LIGHTRED
+    $FG_GREEN
+    $FG_LIGHTGREEN
+    $FG_MAGENTA
+    $FG_LIGHTMAGENTA
+    $FG_CYAN
+    $FG_LIGHTCYAN
+    $FG_BROWN
+    $FG_YELLOW
+    $FG_GRAY
+    $FG_WHITE
+
+    $BG_BLACK
+    $BG_BLUE
+    $BG_LIGHTBLUE
+    $BG_RED
+    $BG_LIGHTRED
+    $BG_GREEN
+    $BG_LIGHTGREEN
+    $BG_MAGENTA
+    $BG_LIGHTMAGENTA
+    $BG_CYAN
+    $BG_LIGHTCYAN
+    $BG_BROWN
+    $BG_YELLOW
+    $BG_GRAY
+    $BG_WHITE
+
+    $ATTR_NORMAL
+    $ATTR_INVERSE
+</PRE></FONT>
+<FONT FACE=Arial SIZE=2>
+
+<A NAME=ATTR_NORMAL><B>ATTR_NORMAL</B> is set to gray foreground on black background 
+(DOS's standard colors).
+
+<P>
+
+<HR>
+
+<FONT FACE=Arial><H3><A NAME=msdocs>Microsoft's Documentation</H3></FONT>
+
+Documentation for the Win32 Console and Character mode Functions can be found
+on Microsoft's site at this URL:<BR>
+
+<A HREF="http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar.htm">http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar.htm</A>
+
+<P>
+
+A reference of the available functions is at:<BR>
+
+<A HREF="http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar_34.htm">http://www.microsoft.com/msdn/sdk/platforms/doc/sdk/win32/sys/src/conchar_34.htm</A>
+
+<P>
+
+<HR>
+<P>
+
+<FONT FACE=Arial SIZE=1>
+07 Apr 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;
+</FONT><P>
+
+</BODY>
+</HTML>

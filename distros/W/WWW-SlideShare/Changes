@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::SlideShare.
+
+0.00  Wed May 26 03:03:27 2010
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::SlideShare
+
+1.01  Thu Jun 3 00:00:00 2010
+	- changed POD and tests

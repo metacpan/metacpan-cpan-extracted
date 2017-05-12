@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page
+	import="Import::Client"
+	transform="view.xsl"
+	xmlns:page="urn:www-page">
+
+	<manifest>
+		<title>Sandbox WWW::Page Web-Site</title>
+		<locale>en-gb</locale>
+		<page:keyword-list/>
+		<page:message-counter/>
+	</manifest>
+
+	<content>
+		<page:main-view count="5"/>
+		<page:tag-cloud/>
+		<page:month-calendar/>
+	</content>
+</page>

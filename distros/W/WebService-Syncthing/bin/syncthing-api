@@ -1,0 +1,189 @@
+#!/usr/bin/env perl
+#
+# Simple command line interface to WebService::Syncthing.
+# All output is just printed using Data::Printer.
+#
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long;
+use Data::Printer;
+use Pod::Usage;
+use Encode;
+
+use WebService::Syncthing;
+
+# ABSTRACT: Simple command line interface to WebService::Syncthing
+our $VERSION = '0.10'; # VERSION
+
+## Expect utf8 encoded input/output
+binmode STDOUT, ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)";
+@ARGV = map { Encode::decode("UTF-8", $_) } @ARGV;
+
+# Complete list of API methods
+my @api_cmds = qw(
+                     get_ping get_version get_model get_connections get_completion
+                     get_config get_config_sync get_system get_errors get_discovery
+                     get_deviceid get_upgrade get_ignores get_need
+
+                     post_ping post_config post_restart post_reset
+                     post_shutdown post_error post_error_clear post_discovery_hint
+                     post_scan post_upgrade post_ignores post_bump
+             );
+
+# Extra cmds/opts we require for individual API commands
+my @cmds = ( @api_cmds,
+             qw(
+                   help auth-token=s url=s
+
+                   folder=s device=s
+
+           ) );
+
+my %Options = map { $_ =~ s/=.*//r => undef } @cmds;
+
+GetOptions(\%Options, @cmds)
+    or die "Error: invalid command line arguments\n";
+
+pod2usage(0) if ($Options{help});
+
+## Check only one command is given
+my @provided_cmds = map { $Options{$_} ? $_ : () } @api_cmds;
+
+pod2usage('Error: Only provide one and only one command')
+    if (scalar @provided_cmds != 1);
+my $cmd = $provided_cmds[0];
+
+my $auth_token = $Options{'auth-token'} || $ENV{SYNCTHING_AUTH_TOKEN};
+my $url = $Options{'url'} || $ENV{SYNCTHING_URL};
+
+## Create Syncthing object and call the command
+my $ST = WebService::Syncthing->new(
+    auth_token => $auth_token,
+    base_url   => $url,
+);
+
+my $rc = \&{ $cmd };
+$rc->();
+
+sub get_ping {
+    p $ST->get_ping();
+}
+
+sub get_version {
+    p $ST->get_version();
+}
+
+sub get_model {
+    my $folder = $Options{folder} // die "Error: Require --folder\n";
+
+    p $ST->get_folder($folder);
+}
+
+sub get_connections {
+    p $ST->get_connections();
+}
+
+sub get_completion {
+    my $device = $Options{device} // die "Error: Require --device\n";
+    my $folder = $Options{folder} // die "Error: Require --folder\n";
+
+    p $ST->get_completion($device, $folder);
+}
+
+sub get_config {
+    p $ST->get_config();
+}
+
+sub get_config_sync {
+    p $ST->get_config_sync();
+}
+
+sub get_system {
+    p $ST->get_system();
+}
+
+sub get_errors {
+    p $ST->get_errors();
+}
+
+sub get_discovery {
+    p $ST->get_discovery();
+}
+
+sub get_deviceid {
+    my $device = $Options{device} // die "Error: Require --device\n";
+    p $ST->get_deviceid();
+}
+
+sub get_upgrade {
+    p $ST->get_upgrade();
+}
+
+sub get_ignores {
+    my $folder = $Options{folder} // die "Error: Require --folder\n";
+
+    p $ST->get_ignores($folder);
+}
+
+sub get_need {
+    my $folder = $Options{folder} // die "Error: Require --folder\n";
+
+    p $ST->get_need($folder);
+}
+
+# PODNAME: syncthing-api
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+syncthing-api - Simple command line interface to WebService::Syncthing
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+Provides a command line interface to every API call in the
+WebService::Syncthing module.
+
+syncthing-api [OPTIONS] <command>
+
+Examples:
+
+   syncthing-api --get_users
+
+Set authentication via SYNCTHING_AUTH_TOKEN environment variable, or with
+--auth-token option.
+
+Set the Syncthing GUI URL via SYNCTHING_URL environment variable, or with
+--url option.
+
+=head1 COMMANDS
+
+Too many to list ...
+
+=head1 OPTIONS
+
+Too many to list ...
+
+=head1 AUTHOR
+
+Chris Hughes <chrisjh@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Chris Hughes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

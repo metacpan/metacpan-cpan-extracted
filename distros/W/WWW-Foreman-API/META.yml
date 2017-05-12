@@ -1,0 +1,28 @@
+---
+abstract: 'Perl client to the Foreman API'
+author:
+  - 'Vincent Lequertier <vi.le@autistici.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Foreman-API
+requires:
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  REST::Client: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?WWW-Foreman-API
+  repository: git://github.com/SkySymbol/perl-www-foreman-api.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

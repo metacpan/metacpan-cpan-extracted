@@ -1,0 +1,46 @@
+Revision history for WWW-DuckDuckGo
+
+0.016     2013-12-10 03:04:20 Europe/Berlin
+
+0.015     2013-04-18 00:29:51 Europe/Berlin
+
+0.014     2012-10-21 21:42:46 America/Denver
+
+0.013     2012-07-07 14:14:30 America/Denver
+
+0.012     2012-05-28 01:13:43 Europe/Berlin
+
+0.011     2012-05-14 21:41:10 America/Denver
+
+0.010     2012-05-15 05:26:36 Europe/Berlin
+
+0.009     2012-05-15 05:16:42 Europe/Berlin
+
+0.008     2012-03-12 08:33:23 Europe/Berlin
+
+0.007     2011-11-04 17:21:23 Europe/Berlin
+	- Add safeoff attribute
+
+0.006     2011-03-09 04:00:52 Europe/Berlin
+	- I am stupid
+
+0.005     2011-03-09 03:55:17 Europe/Berlin
+	- Bugfix about handling of empty icon
+
+0.004     2011-03-09 00:32:40 Europe/Berlin
+	- Added ability to use https and forcesecure switch
+	  for deactivating the fallback of http
+	- Various changes and bugfixes
+	- Added ability to set agent name
+
+0.003     2011-03-07 07:09:55 Europe/Berlin
+	- Fixed abstract of WWW::DDG
+	- Fixed typo in sample synopsis
+
+0.002     2011-03-07 04:09:09 Europe/Berlin
+	- Added tons of documentation
+	- Added WWW::DDG short alias package
+
+0.001     2011-03-06 20:13:46 Europe/Berlin
+	- First release, ZeroClickInfo implemented
+

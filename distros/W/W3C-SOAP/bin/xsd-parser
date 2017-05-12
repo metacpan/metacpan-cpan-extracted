@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+
+# Created on: 2012-05-26 19:20:50
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Scalar::Util;
+use List::Util;
+#use List::MoreUtils;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use Template;
+use W3C::SOAP::XSD::Parser;
+use File::ShareDir qw/dist_dir/;
+
+our $VERSION = 0.14;
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    ns_module_map => {},
+    lib           => 'lib',
+    verbose       => 0,
+    man           => 0,
+    help          => 0,
+    VERSION       => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'ns_module_map|ns|namespace-map|n=s%',
+        'module_base|module-base|b=s',
+        'lib|l=s',
+        'show|s',
+        'path|p=s',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    my $file = shift @ARGV;
+    my $template = Template->new(
+        INCLUDE_PATH => ($option{path} ? "$option{path}:" : '' . dist_dir('W3C-SOAP')),
+        INTERPOLATE  => 0,
+        EVAL_PERL    => 1,
+    );
+    $option{module_base} = 'Static::XSD' if $option{show} && !$option{module_base};
+    my $parser = W3C::SOAP::XSD::Parser->new(
+        location => $file,
+        template => $template,
+        %option
+    );
+
+    return show($parser) if $option{show};
+
+    return $parser->write_modules;
+}
+
+sub show {
+    my ($parser) = @_;
+    my @xsd = @{$parser->document};
+
+    while ( my $xsd = shift @xsd ) {
+        print "\nNamespace = " . $xsd->target_namespace . "\n";
+        my $module = $xsd->module;
+        my $file   = "$option{lib}/" . $module;
+        $file =~ s{::}{/}g;
+        $file = file $file;
+        my $parent = $file->parent;
+        my @missing;
+        while ( !-d $parent ) {
+            push @missing, $parent;
+            $parent = $parent->parent;
+        }
+        mkdir $_ for reverse @missing;
+        my @parents;
+
+        if ( @{ $xsd->imports } ) {
+            print "Imports:\n";
+            for my $import ( @{ $xsd->imports } ) {
+                print "\t", $import->target_namespace, "\n";
+                push @xsd, $import;
+                push @parents, $import->module;
+            }
+        }
+        if ( @{ $xsd->includes } ) {
+            print "Includes:\n";
+            for my $include ( @{ $xsd->includes } ) {
+                print "\t", $include->target_namespace, "\n";
+                push @xsd, $include;
+                push @parents, $include->module;
+            }
+        }
+        if ( @{ $xsd->simple_types } ) {
+            print "Simple Types:\n";
+            for my $stype ( @{ $xsd->simple_types } ) {
+                print "\t", $stype->name, ' : ', $stype->type, '(' . @{ $stype->enumeration } . ')', "\n";
+            }
+        }
+        if ( @{ $xsd->complex_types } ) {
+            print "Complex Types:\n";
+            for my $ctype ( @{ $xsd->complex_types } ) {
+                print "\t", $ctype->name, '(' . @{ $ctype->sequence } . ')', "\n";
+                print "\tElements:\n";
+                for my $seq ( @{ $ctype->sequence } ) {
+                    print "\t\t", $seq->name, ' : ', $seq->package, "\n";
+                }
+                my $type_module = $module . '::' . $ctype->name;
+                push @parents, $type_module;
+                my $type_file = "$option{lib}/" . $type_module;
+                $type_file =~ s{::}{/}g;
+                $type_file = file $type_file;
+                mkdir $type_file->parent if !-d $type_file->parent;
+
+            }
+        }
+        if ( @{ $xsd->elements } ) {
+            print "Elements:\n";
+            for my $elem ( @{ $xsd->elements } ) {
+                print "\t", $elem->name, ' : ', $elem->package, "\n";
+            }
+        }
+
+    }
+    $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Indent   = 1;
+    #print Dumper $xsd;
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+xsd-parser - Parse XSD files and create perl/Moose modules that encapsulate
+that information.
+
+=head1 VERSION
+
+This documentation refers to xsd-parser version 0.14.
+
+=head1 SYNOPSIS
+
+   xsd-parser [option]
+
+ OPTIONS:
+  -s --show         Show details about found XSDs rather than creating files
+  -b --module-base[=]str
+                    Let the program auto generate package names with this value
+                    as the base of the module name. (Note packages will be valid
+                    but not pretty)
+  -n --namespace-map uri=module
+                    Map of XML namespace URIs to Perl Modules
+  -l --lib[=]path   The default path where outputted xml files should be placed
+  -p --path[=]path  Extra path where overridded template toolkit files can be
+                    found.
+
+  -v --verbose      Show more detailed option
+     --version      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for xsd-parser
+
+=head1 DESCRIPTION
+
+This
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

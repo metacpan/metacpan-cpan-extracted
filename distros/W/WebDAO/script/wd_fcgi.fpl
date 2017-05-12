@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: wd_fcgi.fpl
+#
+#  DESCRIPTION:  FastCGI script for WebDAO project
+#       AUTHOR:  Aliaksandr P. Zahatski (Mn), <zag@cpan.org>
+#===============================================================================
+use WebDAO;
+use FCGI;
+use WebDAO::CVfcgi;
+use WebDAO::Session;
+use WebDAO::Lex;
+use WebDAO::FCGI::ProcManager;
+use WebDAO::Util;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+use warnings;
+use POSIX;
+
+use Carp;
+
+my ( $listen, $nproc, $pidfile, $manager, $detach, $man, $help, $maxreq );
+
+#set defaults
+$nproc = 1;
+my %opt = ( 'help|?' => \$help, man => \$man, );
+GetOptions(
+    'help|?'      => \$help,
+    'listen|l=s'  => \$listen,
+    'nproc|n=i'   => \$nproc,
+    'pidfile|p=s' => \$pidfile,
+    'daemon|d'    => \$detach,
+    'maxreq|m=i'  => \$maxreq,
+    'man'         => \$man
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+#begin init socket
+my $sock = 0;
+if ($listen) {
+    my $saved_umask = umask(0);
+    $sock = FCGI::OpenSocket( $listen, 100 )
+     or die "failed to open FastCGI socket: $!";
+    umask($saved_umask);
+}
+elsif ( $^O ne 'MSWin32' ) {
+    -S STDIN
+      or die "STDIN is not a socket; specify a listen location";
+}
+
+#fix FCGI output update after FCGI::VERSION 0.68
+# https://rt.cpan.org/Public/Bug/Display.html?id=52400
+my $fcgi_controller = 'WebDAO::CVfcgi';
+if ( $FCGI::VERSION <= 0.68 ) {
+    #die "Update FCGI to > 0.68 !";
+    $fcgi_controller = 'WebDAO::CVfcgiold'
+} else {
+    # enable UTF-8 output and UTF-8 input 
+    binmode STDOUT, ':encoding(UTF-8)';
+    binmode STDIN, ':encoding(UTF-8)'; # HTTP POST only?
+}
+my $proc_manager;
+if ($listen) {
+    &daemon_fork() if $detach;
+    $proc_manager = new WebDAO::FCGI::ProcManager::(
+        {
+            n_processes => $nproc,
+            pid_fname   => $pidfile,
+        }
+    );
+
+    # detach *before* the ProcManager inits
+    &daemon_detach() if $detach;
+    $proc_manager->pm_manage();
+}
+
+=head2 daemon_fork
+
+Performs the first part of daemon initialisation.  Specifically,
+forking.  STDERR, etc are still connected to a terminal.
+
+=cut
+
+sub daemon_fork {
+
+    fork && exit;
+}
+
+=head2 daemon_detach
+
+Performs the second part of daemon initialisation.  Specifically,
+disassociates from the terminal.
+
+However, this does B<not> change the current working directory to "/",
+as normal daemons do.  It also does not close all open file
+descriptors (except STDIN, STDOUT and STDERR, which are re-opened from
+F</dev/null>).
+
+=cut
+
+sub daemon_detach {
+    print "FastCGI daemon started (pid $$)\n";
+    open STDIN,  "+</dev/null" or die $!;
+    open STDOUT, ">&STDIN"     or die $!;
+    open STDERR, ">&STDIN"     or die $!;
+    POSIX::setsid();
+}
+    #preload defaults
+    WebDAO::Util::get_classes(__env => \%ENV, __preload=>1);
+
+
+my $count_req = $maxreq || $ENV{wdFCGIreq} || -1;
+my $request = FCGI::Request(
+  \*STDIN, \*STDOUT, \*STDERR, \%ENV, $sock, 1
+  );
+
+
+while ( $count_req != 0 and ($request->Accept() >= 0) ) {
+
+    $proc_manager && $proc_manager->pm_pre_dispatch();
+
+    if ( $ENV{SERVER_SOFTWARE} && $ENV{SERVER_SOFTWARE} =~ /lighttpd/ ) {
+        $ENV{PATH_INFO} ||= delete $ENV{SCRIPT_NAME};
+    }
+
+    my $ini = WebDAO::Util::get_classes(__env => \%ENV, __preload=>1);
+
+    my $cv = $fcgi_controller->new(env=>\%ENV);
+
+    my $sess = "$ini->{wdSession}"->new(
+        %{ $ini->{wdSessionPar} },
+        cv    => $cv,
+    );
+
+    #determine root document
+    my $env_var = $ENV{wdIndexFile} || $ENV{WD_INDEXFILE};
+    my %ini_pars = ();
+    if ( $env_var && $env_var ne '-' && !-z $env_var ) {
+        my ($filename) = grep { -r $_ && -f $_ } $env_var,
+          "$ENV{DOCUMENT_ROOT}/$env_var", "$ENV{DOCUMENT_ROOT}/index.xhtml";
+        die "$0 ERR:: file not found or can't access (WD_INDEXFILE): $env_var"
+          unless $filename;
+
+        open FH, "<$filename" or die $!;
+        my $content ='';
+        { local $/=undef;
+        $content = <FH>;
+        }
+        close FH;
+        my $lex = new WebDAO::Lex:: tmpl => $content;
+        $ini_pars{lex} = $lex;
+    }
+    else {
+        $ini_pars{source} = '';
+    }
+     my $eng = "$ini->{wdEngine}"->new(
+        %{ $ini->{wdEnginePar} },
+        %ini_pars,
+        session => $sess,
+    );
+
+    $sess->ExecEngine($eng);
+    $sess->destroy;
+    --$count_req if $count_req > 0;
+    $proc_manager && $proc_manager->pm_post_dispatch();
+}
+FCGI::finish();
+
+__END__
+
+=head1 NAME
+
+wd_fcgi.fpl - FastCGI script for WebDAO project
+
+=head1 SYNOPSIS
+
+wd_fcgi.fpl [options]
+
+    -d -daemon     Daemonize the server.
+    -p -pidfile    Write a pidfile with the pid of the process manager.
+    -l -listen     Listen on a socket path, hostname:port, or :port.
+    -n -nproc      The number of processes started to handle requests.
+    -m -maxreq     Number of request before process will be restarted 
+                   -1 - unlimited. (defailt: -1)
+                   
+
+=head1 SETUP
+
+
+
+=head1 SEE ALSO
+
+http://sourceforge.net/projects/webdao, WebDAO
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

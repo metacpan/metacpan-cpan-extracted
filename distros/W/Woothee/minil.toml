@@ -1,0 +1,4 @@
+name = "Woothee"
+
+[FileGatherer]
+exclude_match = ['^maint.*', '^woothee.*']

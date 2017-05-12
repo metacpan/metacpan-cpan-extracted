@@ -1,0 +1,359 @@
+#!/usr/bin/perl -w
+use strict;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use WordPress::Post;
+use WordPress::CLIDeprecated;
+use Cwd;
+
+
+
+my $o = gopts('D:t:i:c:U:p:P:T');
+
+### $o
+
+my $c = WordPress::CLIDeprecated::_conf();
+$c||={};
+for(qw(U P p)){
+   $o->{$_} ||= $c->{$_};
+   $o->{$_} or die('missing config args');
+}
+
+my $w = WordPress::Post->new({
+   proxy    => $o->{p},
+   username => $o->{U},
+   password => $o->{P},
+});
+
+
+
+$o->{i} or die('missing -i description,body of post or content file to slurp');
+
+
+if($o->{i}=~/\//) { # interpret as a file to slurp
+   my $abs = Cwd::abs_path($o->{i}) or die;
+   $abs=~/\.txt$|\.html?$/i or die("cant use $abs as input, not txt or html file");
+
+   local $/;
+   open(FILE,'<',$abs) or die ($!);
+   my $guts = <FILE>;
+   close FILE;
+
+
+   $o->{i} = $guts;
+
+   #use the filename as title ??
+   unless( $o->{t} ){
+      my $title = _string_prettify($abs) or die("nothing left of title");
+      $o->{t} = $title;   
+   }
+}
+
+sub _string_prettify {
+   my $string = shift;
+  
+   $string=~s/^.+\///; # if it's a path
+   $string=~s/\.\w{3,4}$//;
+   $string=~s/_/ /g; # take out some stupid stuff
+   $string=~s/[[^\s]\W]+//g; #take out all other non word chars
+   return $string;
+}
+
+# are there attachments
+attach();
+
+
+
+
+sub attach {
+ # ONLY SUPPORT IMAGE ATTACHMENTS PRESENTLY
+  
+   my @attachments = grep { /\.jpe?g$|png$/i } @ARGV;
+
+   @attachments or return;
+
+   my $html; # what we append or prepend to the body of the post
+
+   
+
+
+   # upload and get html for each
+   my @lines = map { _attach_image_html($_,$o->{T}) } @attachments;
+   
+   ### @lines
+
+   # 1 or two thumbs, then place attop and wrap text around it
+   if( scalar @lines < 3 and $o->{T} ){
+
+      $html.='<div class="post_images_a">';
+      map { $html.="<span>$_</span>" } @lines;
+      $html.='<span style="break:both;"></span></div>';
+      
+      $o->{i} = $html . $o->{i}; # PREPEND
+   }
+
+   else {
+      
+      $html.='<div class="post_images_b">';
+      map { $html.=qq{<span>$_</span>} } @lines; 
+      $html.= '<span style="break:both"></span></div>';
+
+      $o->{i} .= $html; # APPEND
+   
+   }
+   
+
+   # done.
+   return ; 
+}
+
+
+
+sub _attach_image_html {
+   my $_img = shift;
+   my $as_thumb = shift;
+   $as_thumb ||=0;
+
+   my $img = Cwd::abs_path($_img) or die("cant resolve $_img");
+   my $maxwidth = 400;
+   my $thumbsize = '128x96';
+   $img=~/\.jpe?g$|\.png$/i or die("cant attach image, $img not jpg or png");
+
+   # is it wider then a post page, by how much?
+   # if by not much, just resize
+   # if by lots, resize 
+
+   # if over 200px, make a thumb, no questions asked
+
+   require Image::Magick;
+   my $i = new Image::Magick;
+   die("error reading $img") if $i->Read($img);
+   
+   my $width = $i->Get('width');
+
+
+   if ($img=~/\.thumbnails\.|\/medium_[^\/]+$/){
+      warn("$img skipped");
+      return;
+   }
+
+
+
+   if ($width > 400 ){
+      my $img_med = $img;
+      $img_med=~s/\/([^\/]+)$/\/medium_$1/ or die;
+      unless( -f $img_med ){
+         system( 'convert', $img, '-resize', $maxwidth."x$maxwidth", $img_med ) == 0 
+            or die("cant make $img_med, $?");      
+      }
+
+      ### image was too big, resized a copy..
+      #
+      # use that instead to upload
+      $img = $img_med;   
+   }
+
+
+
+   # POST AS A THUMBNAIL IN THERE??
+   my ($abs_thumb,$url_thumb);
+   if ($as_thumb){
+      # thumbnail?
+
+      if( $width > 200 ) {
+         $abs_thumb = _assure_thumb($img);
+       
+         # i guess upload it regardless
+         $url_thumb = $w->post_file($abs_thumb) or die("could not post $abs_thumb");
+         ### $url_thumb
+         ### $abs_thumb
+      }
+   }
+
+
+
+
+
+   # post the image itself..
+   
+   my $url_image = $w->post_file($img) or die("could not post $img");
+
+
+
+
+
+
+   # build and return the html
+
+   my $image_title = _string_prettify($img) or die;
+
+   my $html_out;
+   
+   if($url_thumb){      
+      $html_out = qq{<a href="$url_image" title="view image"><img src="$url_thumb" alt="$image_title"></a>};   
+   }
+   else {      
+      $html_out = qq{<img src="$url_image" alt="$image_title">};   
+   }
+
+   return $html_out;
+}
+
+
+sub _assure_thumb {
+   my $img = shift;
+   my $thumbsize = '128x96';
+
+   my $thumb= $img;
+   $thumb=~s/(\.\w{3,5})$/\.thumbnails$1/i or die();
+
+   unless( -f $thumb ){
+      system( 'convert', $img, '-resize', $thumbsize, $thumb ) == 0 
+         or die("cant make thumb for $img, $?");
+   }
+   return $thumb;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+my $categories = [];
+if ($o->{c}){
+   $categories = [ split(/,/,$o->{c}) ];   
+}
+
+### $categories
+
+
+my $struct = {
+   title => $o->{t},
+   description => $o->{i},
+   categories => $categories,
+};
+
+if($o->{D}){
+   $struct->{dateCreated} = $o->{D};
+}
+
+
+
+
+
+$w->post($struct) or die; 
+
+
+
+
+
+
+
+
+
+=pod
+
+=head1 NAME
+
+wppost - DEPRECATED post to wordpress blog
+
+=head1 DESCRIPTION
+
+I like the wordpress gui for users and for ocassional management.
+However, what if I want to populate a million entries at once?
+Or upload a set of galleries with descriptions totaling 1000 images?
+That would "intake rear". This is a small tool to help with taking care of this problem.
+
+
+=head1 PARAMETERS
+
+   -c category, can be a list separated by commas, no spaces
+   -t title
+   -i description, main body of post, if it has a slash, it is interpreted as a file to slurp
+      like a text or html file
+   -D iso formatted date for post, can be left out
+
+If these are not provided, they will be sought in ~/.wppost
+   -U username
+   -P password
+   -p address of xmlrpc.php file, http://yoursite/wpinstalldir/xmlrpc.php
+
+=head2 OPTION FLAGS
+
+   -T if there are image attachments, place them as thumbnails only, with link, not just resized
+
+=head1 USAGE EXAMPLES
+
+Most basic of usage, (provided you have a ~/.wppost file)
+
+   wppost -t 'hi everyone' -i 'i just wanted to say hello'
+
+If you want to specify two different categories:
+
+   wppost -t 'Another Apple' -i 'Apples are really great. I do love them so.' -c food,rant -D 20071231
+
+If the body of the post is in a file
+
+   wppost -t 'title here' -i ./content.txt 
+
+If the content of the post is in a file and you want to use the file name as the title
+   
+   wppost -i ./Title_Here.txt
+
+If you want to have file attachments:
+
+   wppost -t 'recent photos' -i 'these are recent pictures i took' ./*jpg
+
+=head1 CONFIG FILE
+
+It can be exhaustive to pass username, password,and proxy every time.
+Also, it's a risk on certain machines, because commands can be seen in the system
+by ps xau, so, it would show your parameters in the process list, thus showing your password.
+
+you should have a config file that is YAML formatted in ~/.wppost, and then you can ommit the -U
+-P and -p parameters when you post.
+
+=head2 ~/.wppost
+
+ ---
+ U: username
+ P: password
+ p: 'http://proxy.address'
+
+=head1 NOTES
+
+If you provide a -D date, it will be checked for iso compliance.
+If you provide categories, it is checked that the category exists.
+You must provide -t title and -i description.
+
+supported struct is...
+
+ title - post's title, must be string
+ description  - main body of post, must be string
+
+ mt_excerpt
+ mt_text_more
+ mt_allow_comments
+ mt_allow_pings
+
+ mt_tb_ping_urls
+ dateCreated - can be empty, auto filled out for current time if empty, must be iso8601
+ categories - list, array of categories to post into
+
+=head1 SEE ALSO
+
+WordPress::Post
+LEOCHARRE::CLI
+Image::Magick
+
+WordPress::CLI - replacement
+
+=cut

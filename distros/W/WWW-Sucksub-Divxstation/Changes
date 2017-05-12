@@ -1,0 +1,17 @@
+Revision history for WWW-Sucksub-Divxstation
+
+0.01    24/10/2005 18:00:00
+        First version, released on an unsuspecting world.
+
+0.02	24/10/2005	20:13:32
+		 - Add /eg dir for example
+		 - correct. Makefile.PL
+		 
+0.03  	28/10/2005
+		* correct test -> pod-coverage avoid private func.
+		* correct pod code ind Divxstation.pm
+		* readme : precisions
+		* TO DO : make a lang() method to allow searching other sub. langages.
+
+0.04	15/11/2005
+		* correct makefiles : Alias.pm dependancies

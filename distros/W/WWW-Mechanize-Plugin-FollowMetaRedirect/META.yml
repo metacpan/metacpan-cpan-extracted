@@ -1,0 +1,40 @@
+---
+abstract: "Follows 'meta refresh' link"
+author:
+  - 'Ryo Okamoto <ryo@aquahill.net>'
+build_requires:
+  Test::More: 0.88
+  Time::HiRes: 0
+  URI: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Mechanize-Plugin-FollowMetaRedirect
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  WWW::Mechanize::Plugin::FollowMetaRedirect:
+    file: lib/WWW/Mechanize/Plugin/FollowMetaRedirect.pm
+    version: 0.03
+requires:
+  HTML::TokeParser: 0
+  WWW::Mechanize: 0
+resources:
+  bugtracker: https://github.com/ryochin/p5-www-mechanize-plugin-followmetaredirect/issues
+  homepage: https://github.com/ryochin/p5-www-mechanize-plugin-followmetaredirect
+  repository: git://github.com/ryochin/p5-www-mechanize-plugin-followmetaredirect.git
+version: 0.03

@@ -1,0 +1,61 @@
+Revision history for Perl extension WWW::Search::FirstGov.
+
+2003-04-08  Dennis Sutch <dennis@sutch.com>
+  Release 1.14
+  - updated parsing
+  - documented new search parameters
+
+2002-06-04  Dennis Sutch <dennis@sutch.com>
+  Release 1.13
+  - updated Makefile.PL to reflect requirement for WWW::Search version 2.33
+  - rewrote tests to use WWW::Search::Test
+
+2002-06-03  Dennis Sutch <dennis@sutch.com>
+  Release 1.12
+  - updated to reflect changes to FirstGov (switched to a new search engine built by Fast Search & Transfer of Oslo, Norway on 2002 Jun 03)
+    - the native_query options 'fr' and 'st' are obsolete
+    - the native_query option 'in0' now accepts the value 'any' instead of 'anywhere', and the value of 'home' is obsolete
+  - removed redefined WWW::Search functionality
+
+ 2002-03-13  Dennis Sutch <dennis@sutch.com>
+  Release 1.11
+  - updated to reflect changed FirstGov search engine parameters
+  - approximate_result_count() now returns 1 more than the result count when FirstGov's result count is "more than X relevant results"
+  - changed test case 4 to finish sooner
+
+2002-03-05  Dennis Sutch <dennis@sutch.com>
+  Release 1.10
+  - updated to handle new FirstGov search engine format and to use HTML::TreeBuilder
+  - fixed problem that caused one too many searches against FirstGov.gov
+  - documented additional options, including adding notes from FirstGov.gov documentation
+
+2001-07-16  Dennis Sutch <dennis@sutch.com>
+
+  Release 1.04
+  - fixed parsing problem
+  - commented out user_agent_delay, since it wasn't working anyway
+
+2001-03-01  Dennis Sutch <dennis@sutch.com>
+
+  Release 1.03
+  - removed 'require 5.005_62;' to allow engine to run under versions earlier
+    than 5.6 (thanks to Martin Thurn for pointing this out)
+
+2001-03-01  Dennis Sutch <dennis@sutch.com>
+
+  Release 1.02
+  - replaced 'my' declarations with variable names prefixed with package name
+
+2001-02-26  Dennis Sutch <dennis@sutch.com>
+
+  Release 1.01
+  - quoted a string that caused problems under MSWin
+  - changed 'our' declarations to 'my'
+  - used variable $MAINTAINER to stop warning when using -w flag 
+
+2001-02-23  Dennis Sutch <dennis@sutch.com>
+
+  Release 1.00
+
+0.01  Fri Feb 23 10:30:02 2001
+	- original version; created by h2xs 1.20

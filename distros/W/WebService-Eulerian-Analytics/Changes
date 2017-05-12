@@ -1,0 +1,38 @@
+Revision history for Perl module WebService::Eulerian::Analytics
+
+v0.8	Mon Dec 21 01:29:01 CET 2009
+  - support for Website/Order : cancel / valid # for automatic validation and 
+  cancelation of order references with documentation
+
+v0.7	Thu Oct 15 20:03:05 CEST 2009
+  - support for Website/TPOpedataClick : getLogByOpeName
+  - added without_channel option for Website/TPOpedataClick : getLogByTPMediaName / getLogByTPOpeName
+
+v0.6.1	(failed on pause index)
+
+v0.6	Thu Jul  9 12:32:56 CEST 2009
+  - support for Website/Order : cancel / valid # for automatic validation and 
+  cancelation of order references (defered to v0.8)
+  - fixed #41703 : Wrong perl prerequisite specification (thanks to SREZIC)
+  - support for Website/Order : search method
+
+v0.5 	Tue Sep 30 02:45:57 CEST 2008
+  - support for Website/TPOpedataCick : getLogByTPMediaName
+  - support for Website/TPOpe : getById / getByName / search / getURL
+
+v0.4	Sun Sep  7 18:47:20 CEST 2008 (first public release)
+  - support for Website/TPOpe methods : getById / getByName / search
+  - support for Website/TPPublisher methods : getById / getByName / search
+  - support for Website/TPMedia methods : getById / getByName / search
+  - support for Website/TPCategory methods : getById / getByName / search
+
+v0.3	Wed Sep  3 20:48:13 CEST 2008 (internal)
+  - support for Website Service methods : getById / getByName / getAll
+  - support for TPOrderInject Service methods : replay
+  - support for Website/Order Service methods : replay
+  - support for Website/TPOpedataClick Service methods : getLogByTPOpeName
+  - added examples for other languages : raw SOAP::Lite + php in other/
+
+v0.2	Tue Sep  2 16:22:08 CEST 2008	(internal)
+
+v0.1	Mon Sep  1 16:22:08 CEST 2008	(internal)

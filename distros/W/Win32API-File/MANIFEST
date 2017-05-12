@@ -1,0 +1,21 @@
+Changes
+inc/ExtUtils/Myconst2perl.pm
+File.pm
+File.xs
+MANIFEST
+Makefile.PL
+README
+buffers.h
+cFile.h
+cFile.pc
+const2perl.h
+ex/CopyBoot.bat
+ex/DiskGeom.plx
+ex/FormatFloppy.plx
+ex/ListDevs.plx
+ppport.h
+t/file.t
+t/tie.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

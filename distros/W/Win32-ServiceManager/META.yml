@@ -1,0 +1,27 @@
+---
+abstract: 'Manage Windows Services'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Deep: '0.11'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-ServiceManager
+requires:
+  IPC::System::Simple: '1.21'
+  List::Util: '0'
+  Moo: '1.000007'
+  Syntax::Keyword::Junction: '0'
+  Time::HiRes: '0'
+  Win32::Service: '0'
+resources:
+  bugtracker: https://github.com/frioux/Win32-ServiceManager/issues
+  homepage: https://github.com/frioux/Win32-ServiceManager
+  repository: https://github.com/frioux/Win32-ServiceManager.git
+version: '0.002003'

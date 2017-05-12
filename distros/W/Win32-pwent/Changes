@@ -1,0 +1,10 @@
+Revision history for Win32-pwent
+
+0.100   2010-07-21
+        - implement setpwent/setgrent as recommended by Ashish SHUKLA
+          <ashish@freebsd.org>
+        - add basic description of the exported functions
+
+0.01    2010-05-11
+        First version, released on an unsuspecting world.
+

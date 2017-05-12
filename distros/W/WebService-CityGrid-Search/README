@@ -1,0 +1,42 @@
+NAME
+    WebService::CityGrid::Search - Interface to the CityGrid Search API
+
+METHODS
+    make_url
+          $url = $cs->make_url({
+              mode => 'locations', 
+              where => '90210',
+              what  => 'pizza%20and%20burgers', });
+
+        Construct a url to make a call against the CityGrid API.
+
+    javascript_tracker
+        Under construction
+
+SYNOPSIS
+      use WebService::CityGrid::Search;
+      $cs = WebService::CityGrid::Search->new(
+          api_key   => $my_apikey,
+          publisher => $my_pubid, );
+
+      $url = $cs->make_url({ mode => 'locations', 
+          where => '90210',
+          what  => 'pizza%20and%20burgers', });
+
+DESCRIPTION
+    Currently just returns a url that can represents a call to the CityGrid
+    Web Service.
+
+SEE ALSO
+    <http://developer.citysearch.com/docs/search/>
+
+AUTHOR
+    Fred Moyer, <fred@slwifi.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Silver Lining Networks
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

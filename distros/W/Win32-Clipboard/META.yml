@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Win32-Clipboard
+abstract: Interaction with the Windows clipboard
+version: 0.58
+author:
+  - Aldo Calpini <dada@perl.it>
+  - Hideyo Imazu <himazu@gmail.com>
+  - Jan Dubois <jand@activestate.com>
+license: perl
+requires: 
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jandubois/win32-clipboard
+meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: Jan Dubois

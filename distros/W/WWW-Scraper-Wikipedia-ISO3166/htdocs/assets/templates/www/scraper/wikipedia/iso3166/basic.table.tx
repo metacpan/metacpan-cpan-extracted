@@ -1,0 +1,8 @@
+<table align="center" border = "1" summary = "Names">
+: for $row -> $item {
+<tr>
+		: include "basic.column.tx" { column => $item };
+</tr>
+: }
+</table>
+

@@ -1,0 +1,29 @@
+Revision history for Perl extension Win32::InstallShield
+
+Version 0.7 (2011/12/13)
+	- Handle empty key columns (from Torsten Werner)
+
+Version 0.6 (2011/10/18)
+	- Detect file encoding, and use it when writing modified tables
+		(from Torsten Werner)
+	- Added set_encoding and get_encoding methods
+
+Version 0.5 (2009/10/14)
+	- Added methods to manipulate the summary table
+	- Added methods to get and set component attributes
+
+Version 0.4 (2007/07/11)
+	- Added 'has_table' method
+
+Version 0.3 (2007/07/10)
+	- Added 'tables', 'property', 'purge_row', and 'featureComponents' methods
+	- Fixed a POD typo in one of the examples
+
+Version 0.2 (2006/10/03)
+	- Fix for multi-line values in tables
+	- Added AddOrUpdate method
+	- Made savefile filename default to previous loadfile value
+	- Added searchHash and searchArray methods
+
+Version 0.1 (2006/09/29)
+	- initial release

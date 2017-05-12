@@ -1,0 +1,22 @@
+Revision history for Perl extension WWW::BurrpTV.
+
+0.04 Thu May  6 23:20:01 IST 2010
+	1. Bug fix - Using HTML::TreeBuilder's look_down method instead of directly accessing elements for more robust parsing.
+	2. Creates tree of directories if cache path does not exist
+	3. New dependencies required: Path::Abstract, File::Path
+
+0.02  Tue Sep  8 20:06:15 IST 2009
+	1. Bug fix - Deleted HTML::TreeBuilder tree from constructor
+	2. Bug fix - Fixed parsing problems in get_shows()
+	3. Cleaned up code with the help of perlcritic
+	4. Improvement - Hashref returned by get_shows() contains more keys (_season, _episode)
+	5. Improvement - New method, timezone() to change default timezone
+	6. Improvement - Error handling
+	7. Improvement - Time::Normalize is no longer needed
+	8. Online and offline tests added
+
+0.01  Wed Sep  2 22:54:47 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n WWW::BurrpTV --skip-exporter
+
+

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/WWW/Billomat.pm
+lib/WWW/Billomat/Client.pm
+lib/WWW/Billomat/Invoice.pm
+lib/WWW/Billomat/Invoice/Item.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-live.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json
+Makefile.PL

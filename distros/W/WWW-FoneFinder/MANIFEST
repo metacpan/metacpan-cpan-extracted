@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-FoneFinder.t
+lib/WWW/FoneFinder.pm
+META.yml                                 Module meta-data (added by MakeMaker)

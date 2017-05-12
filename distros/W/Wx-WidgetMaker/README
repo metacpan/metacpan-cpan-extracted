@@ -1,0 +1,41 @@
+Wx::WidgetMaker
+===============
+
+When starting to learn wxPerl, it can be frustrating
+trying to figure out which widgets handle what functionality.
+If you've ever done CGI development, you soon realize why
+it's not a bad idea to leverage the web browser as a graphical
+user interface: it can be complicated to implement functionality
+that you take for granted as an HTML/CGI developer.
+
+This module tries to make implementing wxPerl dialogs friendlier
+to a Perl CGI programmer by using an API similar to CGI.pm.
+(Specifically, it supports what I consider to be a
+useful/relevant subset of CGI.pm's :standard export tags.)
+It tries to adhere as faithfully as reasonable to the CGI
+API where applicable, and otherwise to do something intuitive.
+
+For more details, read `perldoc Wx::WidgetMaker`.
+
+
+INSTALLATION
+
+To install this module, type the following:
+
+   perl ./Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+or, if you don't have Module::Build,
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires wxPerl to be installed.
+I've tried it with wxPerl 0.20, wxGTK 2.4 on Linux.

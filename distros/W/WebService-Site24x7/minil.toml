@@ -1,0 +1,6 @@
+name = "WebService-Site24x7"
+# badges = ["travis"]
+authority="cpan:KABLAMO"
+
+module_maker="ModuleBuildTiny"
+

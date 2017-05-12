@@ -1,0 +1,8 @@
+
+ ** 0.02 / 2016-07-09
+  - Return the 'value' attribute from the 'valueNode' subnode when
+    asking for a SELECT widget's value
+
+ ** 0.01 / 2016-06-23
+  - Initial release to replace LedgerSMB's
+    (https://github.com/ledgersmb/LedgerSMB) test code

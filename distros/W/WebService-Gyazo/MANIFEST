@@ -1,0 +1,19 @@
+Makefile.PL
+MANIFEST
+README
+t/img.jpg
+t/WebService_Gyazo_Image_getImageId.t
+t/WebService_Gyazo_Image_getImageUrl.t
+t/WebService_Gyazo_Image_getSiteUrl.t
+t/WebService_Gyazo_Image_testPOD.t
+t/WebService_Gyazo_Image_testPODcoverage.t
+t/WebService_Gyazo_erros.t
+t/WebService_Gyazo_setId.t
+t/WebService_Gyazo_setProxy.t
+t/WebService_Gyazo_testPOD.t
+t/WebService_Gyazo_testPODcoverage.t
+t/WebService_Gyazo_uploadFile.t
+lib/WebService/Gyazo/Image.pm
+lib/WebService/Gyazo.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

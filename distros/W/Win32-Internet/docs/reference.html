@@ -1,0 +1,1311 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Internet Reference</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+
+
+<FONT FACE=Arial><H2><A NAME=Reference>Reference Manual</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+To use this module, first add the following line at the beginning of your script:
+</FONT><PRE> use Win32::Internet;</PRE><FONT FACE=Arial SIZE=2>
+
+Then you have to open an Internet connection with this command:
+</FONT><PRE> $Connection = new Win32::Internet();</PRE><FONT FACE=Arial SIZE=2>
+
+This is required to use any of the function of this module.
+It will create an Internet object in Perl on which you can act upon with the 
+<A HREF="#Internet_Functions">Internet Functions</A> explained later.
+<P>
+
+The objects available are:
+<UL>
+  <LI>Internet connections (the main object, see <A HREF="#new">new</A>)
+  <LI>URLs (see <A HREF="#OpenURL">OpenURL</A>)
+  <LI>FTP sessions (see <A HREF="#FTP">FTP</A>)
+  <LI>HTTP sessions (see <A HREF="#HTTP">HTTP</A>)
+  <LI>HTTP requests (see <A HREF="#OpenRequest">OpenRequest</A>)
+</UL>
+
+As in the good Perl tradition, there are in this extension different ways to do the same thing;
+there are, in fact, different levels of implementation of the Win32 Internet
+Functions. Some routines use several Win32 API functions to perform a complex task 
+in a single call; they are simpler to use, but of course less powerful. 
+<P>
+There are then other functions that implement nothing more and nothing less than the
+corresponding API function, so you can use all of their power, but with some 
+additional programming steps.
+<P>
+
+To make an example, there is a function called <A HREF="#FetchURL">FetchURL</A> that
+you can use to fetch the content of any HTTP, FTP or GOPHER URL with this simple commands:
+</FONT><PRE> $INET = new Win32::Internet();
+ $file = $INET->FetchURL("http://www.yahoo.com");</PRE><FONT FACE=Arial SIZE=2>
+
+You can have the same result (and this is actually what is done by FetchURL) this way:
+</FONT><PRE> $INET = new Win32::Internet();
+ $URL = $INET->OpenURL("http://www.yahoo.com");
+ $file = $URL->ReadFile();
+ $URL->Close();</PRE><FONT FACE=Arial SIZE=2>
+
+Or, you can open a complete HTTP session:
+</FONT><PRE> $INET = new Win32::Internet();
+ $HTTP = $INET->HTTP("www.yahoo.com", "anonymous", "dada@perl.it");
+ ($statuscode, $headers, $file) = $HTTP->Request("/");
+ $HTTP->Close();</PRE><FONT FACE=Arial SIZE=2>
+
+Finally, you can choose to manage even the HTTP request:
+</FONT><PRE> $INET = new Win32::Internet();
+ $HTTP = $INET->HTTP("www.yahoo.com", "anonymous", "dada@perl.it");
+ $HTTP->OpenRequest($REQ, "/");
+ $REQ->AddHeader("If-Modified-Since: Saturday, 16-Nov-96 15:58:50 GMT");
+ $REQ->SendRequest();
+ $statuscode = $REQ->QueryInfo("",HTTP_QUERY_STATUS_CODE);
+ $lastmodified = $REQ->QueryInfo("Last-Modified");
+ $file = $REQ->ReadEntireFile();
+ $REQ->Close();
+ $HTTP->Close();</PRE><FONT FACE=Arial SIZE=2>
+
+To open and control a complete FTP session, type:
+</FONT><PRE> $Connection->FTP($Session, "ftp://ftp.activeware.com", "anonymous", "dada\@perl.it");</PRE><FONT FACE=Arial SIZE=2>
+
+This will create an FTP object in Perl to which you can apply the
+<A HREF="#FTP_Functions">FTP functions</A> provided by the package:
+</FONT><PRE> $Session->Cd("/ntperl/perl5.001m/CurrentBuild");
+ $Session->Ascii();
+ $Session->Get("110-i86.zip");
+ $Session->Close();</PRE><FONT FACE=Arial SIZE=2>
+
+For a more complete example, see the TEST.PL file that comes with the package.
+
+</FONT>
+<P>
+
+<!-- ***** General Internet Functions ***** -->
+<HR ALIGN=center>
+
+<FONT FACE=Arial><H2><A NAME=Internet_Functions>General Internet Functions</H2></FONT>
+<FONT FACE=Arial><H3>General Note</H3></FONT>
+
+<FONT FACE=Arial SIZE=2>
+All methods assume that you have the line:
+
+</FONT><PRE> use Win32::Internet;</PRE><FONT FACE=Arial SIZE=2>
+
+somewhere before the method calls, and that you have an Internet object called <TT>$INET</TT>
+which was created using this call:
+
+</FONT><PRE> $INET = new Win32::Internet();</PRE><FONT FACE=Arial SIZE=2>
+
+See <A HREF="#new">new</A> for more information.
+
+<P>
+</FONT>
+
+<FONT FACE=Arial><H3>Methods</H3></FONT>
+
+<DL>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=CanonicalizeURL>
+
+    <B>CanonicalizeURL</B> <I>URL, [flags]</I>
+
+<DD>Converts a URL to a canonical format, which includes converting unsafe characters to escape sequences.
+    Returns the canonicalized URL or <B>undef</B> on errors.
+    For the possible values of <I>flags</I>,
+    refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    See also <A HREF="#CombineURL">CombineURL</A> and <A HREF="#OpenURL">OpenURL</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $cURL = $INET->CanonicalizeURL($URL);
+ $URL = $INET->CanonicalizeURL($cURL, ICU_DECODE);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Close>
+
+    <B>Close</B>
+<DT><B>Close</B> <I>object</I>
+
+<DD>Closes an Internet connection. This can be applied to any Win32::Internet object (Internet
+    connections, URLs, FTP sessions, etc.).
+    Note that it is not "strictly" required to close the connections you create, since
+    the Win32::Internet objects are automatically closed when the program ends (or when you
+    elsehow destroy such an object).
+    <BR>
+    Example:</FONT>
+<PRE> $INET->Close();
+ $FTP->Close();
+ $INET->Close($FTP); # same as above...</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=CombineURL>
+
+    <B>CombineURL</B> <I>baseURL, relativeURL, [flags]</I>
+
+<DD>Combines a base and relative URL into a single URL. 
+    Returns the (canonicalized) combined URL or <B>undef</B> on errors.
+    For the possible values of <I>flags</I>,
+    refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    See also <A HREF="#CombineURL">CombineURL</A> and <A HREF="#OpenURL">OpenURL</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $URL = $INET->CombineURL("http://www.divinf.it/dada/perl/internet", "..");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ConnectBackoff>
+
+    <B>ConnectBackoff</B> <I>[value]</I>
+
+<DD>Reads or sets the delay value, in milliseconds, to wait between connection retries.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the delay between retries is set to <I>value</I>.
+    See also <A HREF="#ConnectTimeout">ConnectTimeout</A>,
+    <A HREF="#ConnectRetries">ConnectRetries</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->ConnectBackoff(2000);
+ $backoff = $HTTP->ConnectBackoff();</PRE>
+<P>
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ConnectRetries>
+
+    <B>ConnectRetries</B> <I>[value]</I>
+
+<DD>Reads or sets the number of times a connection is retried before considering it failed.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the number of retries is set to <I>value</I>.
+    The default value for ConnectRetries is 5.
+    See also <A HREF="#ConnectBackoff">ConnectBackoff</A>, 
+    <A HREF="#ConnectTimeout">ConnectTimeout</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->ConnectRetries(20);
+ $retries = $HTTP->ConnectRetries();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ConnectTimeout>
+
+    <B>ConnectTimeout</B> <I>[value]</I>
+
+<DD>Reads or sets the timeout value (in milliseconds) before a connection is considered failed.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the timeout is set to <I>value</I>.
+    The default value for ConnectTimeout is infinite.
+    See also <A HREF="#ConnectBackoff">ConnectBackoff</A>, 
+    <A HREF="#ConnectRetries">ConnectRetries</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->ConnectTimeout(10000);
+ $timeout = $HTTP->ConnectTimeout();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ControlReceiveTimeout>
+
+    <B>ControlReceiveTimeout</B> <I>[value]</I>
+
+<DD>Reads or sets the timeout value (in milliseconds) to use for non-data (control) receive requests before they are canceled.
+    Currently, this value has meaning only for <A HREF="#FTP">FTP</A> sessions.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the timeout is set to <I>value</I>.
+    The default value for ControlReceiveTimeout is infinite.
+    See also <A HREF="#ControlSendTimeout">ControlSendTimeout</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->ControlReceiveTimeout(10000);
+ $timeout = $HTTP->ControlReceiveTimeout();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ControlSendTimeout>
+
+    <B>ControlSendTimeout</B> <I>[value]</I>
+
+<DD>Reads or sets the timeout value (in milliseconds) to use for non-data (control) send requests before they are canceled.
+    Currently, this value has meaning only for <A HREF="#FTP">FTP</A> sessions.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the timeout is set to <I>value</I>.
+    The default value for ControlSendTimeout is infinite.
+    See also <A HREF="#ControlReceiveTimeout">ControlReceiveTimeout</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->ControlSendTimeout(10000);
+ $timeout = $HTTP->ControlSendTimeout();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=CrackURL>
+
+    <B>CrackURL</B> <I>URL, [flags]</I>
+
+<DD>Splits an URL into its component parts and returns them in an array.
+    Returns <B>undef</B> on errors, otherwise the array will contain the following values:
+    <P>
+    <I>scheme, host, port, username, password, path, extrainfo</I><P>
+    For example, the URL "http://www.divinf.it/index.html#top" can be splitted in:<P>
+    </FONT><TT>http, www.divinf.it, 80, anonymous, dada@perl.it, /index.html, #top</TT><FONT FACE=Arial SIZE=2>
+    <P>    
+    If you don't specify a <I>flags</I> parameter, 
+    </FONT><TT>ICU_ESCAPE</TT><FONT FACE=Arial SIZE=2>
+    will be used by default; for the possible values of <I>flags</I> refer to the 
+    <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation.
+    See also <A HREF="#CreateURL">CreateURL</A>.
+    <BR>
+    Example:</FONT>
+<PRE> @parts=$INET->CrackURL("http://www.activeware.com");
+ ($scheme, $host, $port, $user, $pass, $path, $extra) = 
+      $INET->CrackURL("http://www.divinf.it:80/perl-win32/index.sht#feedback");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=CreateURL>
+
+    <B>CreateURL</B> <I>scheme, hostname, port, username, password, path, extrainfo, [flags]</I>
+<DT><B>CreateURL</B> <I>hashref, [flags]</I>
+<DD>Creates a URL from its component parts. Returns <B>undef</B> on errors, 
+    otherwise the created URL.
+    <BR>
+    If you pass hashref (a reference to an hash array), the following
+    values are taken from the array: 
+    <P>
+</FONT><PRE> %hash=(
+   "scheme"    => "<I>scheme</I>",
+   "hostname"  => "<I>hostname</I>",
+   "port"      => <I>port</I>,
+   "username"  => "<I>username</I>",
+   "password"  => "<I>password</I>",
+   "path"      => "<I>path</I>",
+   "extrainfo" => "<I>extrainfo</I>",
+ );</PRE><FONT FACE=Arial SIZE=2>
+    <P>    
+    If you don't specify a <I>flags</I> parameter, 
+    </FONT><TT>ICU_ESCAPE</TT><FONT FACE=Arial SIZE=2>
+    will be used by default; for the other possible values of <I>flags</I> refer to the 
+    <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation.
+    See also <A HREF="#CrackURL">CrackURL</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $URL=$I->CreateURL("http", "www.divinf.it", 80, "", "", "/perl-win32/index.sht", "#feedback");
+ $URL=$I->CreateURL(\%params);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=DataReceiveTimeout>
+
+    <B>DataReceiveTimeout</B> <I>[value]</I>
+
+<DD>Reads or sets the timeout value (in milliseconds) to use for data receive requests before they are canceled.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the timeout is set to <I>value</I>.
+    The default value for DataReceiveTimeout is infinite.
+    See also <A HREF="#DataSendTimeout">DataSendTimeout</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->DataReceiveTimeout(10000);
+ $timeout = $HTTP->DataReceiveTimeout();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=DataSendTimeout>
+
+    <B>DataSendTimeout</B> <I>[value]</I>
+
+<DD>Reads or sets the timeout value (in milliseconds) to use for data send requests before they are canceled.
+    If no <I>value</I> parameter is specified, the current value is returned; 
+    otherwise, the timeout is set to <I>value</I>.
+    The default value for DataSendTimeout is infinite.
+    See also <A HREF="#DataReceiveTimeout">DataReceiveTimeout</A>, 
+    <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->DataSendTimeout(10000);
+ $timeout = $HTTP->DataSendTimeout();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Error>
+
+    <B>Error</B>
+
+<DD>Returns the last recorded error in the form of an array or
+    string (depending upon the context) containing the error number and an 
+    error description. Can be applied on any Win32::Internet object (FTP sessions, etc.).
+    There are 3 types of error you can encounter; they are recognizable by the error number
+    returned:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Error number</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2>-1</TD>
+      <TD><FONT FACE=Arial SIZE=2>A "trivial" error has occurred in the package. For example, you tried to use a method on the wrong type of object.</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2>1 .. 11999</TD>
+      <TD><FONT FACE=Arial SIZE=2>A generic error has occurred and the Win32::GetLastError error message is returned.</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2>12000 and higher</TD>
+      <TD><FONT FACE=Arial SIZE=2>An Internet error has occurred; the extended Win32 Internet API error message is returned.</TD>
+    </TABLE>
+    <P>
+
+    See also <A HREF="#GetResponse">GetResponse</A>.
+    <BR>
+    Example:</FONT>
+<PRE> die $INET->Error(), qq(\n);
+ ($ErrNum, $ErrText) = $INET->Error();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=FetchURL>
+    <B>FetchURL</B> <I>URL</I>
+<DD>Fetch the content of an HTTP, FTP or GOPHER URL. Returns the content of the file read 
+    (or <B>undef</B> if there was an error and nothing was read).
+    See also <A HREF="#OpenURL">OpenURL</A> and <A HREF="#ReadFile">ReadFile</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $file = $INET->FetchURL("http://www.yahoo.com/");
+ $file = $INET->FetchURL("ftp://www.activeware.com/contrib/internet.zip");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=FTP>
+
+    <B>FTP</B> <I>ftpobject, server, username, password, [port, pasv, context]</I>
+<DT><B>FTP</B> <I>ftpobject, hashref</I>
+
+<DD>Opens an FTP connection to <I>server</I> logging in with the given 
+    <I>username</I> and <I>password</I>. 
+    <BR>
+    The parameters and their values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Parameter</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Default</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>server</TD>
+      <TD><FONT FACE=Arial SIZE=2>The server to connect to.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>username</TD>
+      <TD><FONT FACE=Arial SIZE=2>The username used to login to the server.</TD>
+      <TD><TT>anonymous</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>password</TD>
+      <TD><FONT FACE=Arial SIZE=2>The password used to login to the server.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>port</TD>
+      <TD><FONT FACE=Arial SIZE=2>The port of the FTP service on the server.</TD>
+      <TD><TT>21</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>pasv</TD>
+      <TD><FONT FACE=Arial SIZE=2>If it is a value other than 0, use passive transfer mode.</TD>
+      <TD><FONT FACE=Arial SIZE=2>is taken from the parent Internet connection object; 
+          you can set this value with the <A HREF="#Pasv">Pasv</A>
+          method.
+      </TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>context</TD>
+      <TD><FONT FACE=Arial SIZE=2>A number to identify this operation if it is asynchronous. See <A HREF="#SetStatusCallback">SetStatusCallback</A> and <A HREF="#GetStatusCallback">GetStatusCallback</A> for more info on asynchronous operations.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+
+    </TABLE>
+    <P>
+    If you pass <I>hashref</I> (a reference to an hash array), the following values are taken 
+    from the array:
+</FONT><PRE> %hash=(
+   "server"   => "<I>server</I>",
+   "username" => "<I>username</I>",
+   "password" => "<I>password</I>",
+   "port"     => <I>port</I>,
+   "pasv"     => <I>pasv</I>,
+   "context"  => <I>context</I>,
+ );</PRE><FONT FACE=Arial SIZE=2>
+    <P>
+    This method returns <B>undef</B> if the connection failed, a number otherwise.
+    You can then call any of the <A HREF="#FTP_Functions">FTP functions</A> as methods
+    of the newly created <I>ftpobject</I>.
+    <BR>
+    Example:</FONT>
+<PRE> $result = $INET->FTP($FTP, "ftp.activeware.com", "anonymous", "dada\@perl.it");
+ # and then for example... 
+ $FTP->Cd("/ntperl/perl5.001m/CurrentBuild");
+
+ $params{"server"} = "ftp.activeware.com";
+ $params{"password"} = "dada\@perl.it";
+ $params{"pasv"} = 0;
+ $result = $INET->FTP($FTP,\%params);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=GetResponse>
+
+    <B>GetResponse</B>
+
+<DD>Returns the text sent by a remote server in response to the last function executed.
+    It applies on any Win32::Internet object, particularly of course on 
+    <A HREF="#FTP_Functions">FTP sessions</A>. See also the <A HREF="#Error">Error</A> function.
+    <BR>
+    Example:</FONT>
+<PRE> print $INET->GetResponse();
+ $INET->FTP($FTP, "ftp.activeware.com", "anonymous", "dada\@perl.it");
+ print $FTP->GetResponse();</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=GetStatusCallback>
+
+    <B>GetStatusCallback</B> <I>context</I>
+
+<DD>Returns information about the progress of the asynchronous operation 
+    identified by <I>context</I>;
+    those informations consist of two values: a status code 
+    (one of the INTERNET_STATUS_* <A HREF="append.html#constants">constants</A>)
+    and an additional value depending on the status code; for example, if the
+    status code returned is INTERNET_STATUS_HANDLE_CREATED, the second value
+    will hold the handle just created.
+    For more informations on those values, please refer to the 
+    <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation.
+    See also <A HREF="#SetStatusCallback">SetStatusCallback</A>.
+    <BR>
+    Example:</FONT>
+<PRE> ($status, $info) = $INET->GetStatusCallback(1);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=HTTP>
+
+    <B>HTTP</B> <I>httpobject, server, username, password, [port, flags, context]</I>
+<DT><B>HTTP</B> <I>httpobject, hashref</I>
+
+<DD>Opens an HTTP connection to <I>server</I> logging in with the given 
+    <I>username</I> and <I>password</I>. 
+    <BR>
+    The parameters and their values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Parameter</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Default</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>server</TD>
+      <TD><FONT FACE=Arial SIZE=2>The server to connect to.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>username</TD>
+      <TD><FONT FACE=Arial SIZE=2>The username used to login to the server.</TD>
+      <TD><TT>anonymous</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>password</TD>
+      <TD><FONT FACE=Arial SIZE=2>The password used to login to the server.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>port</TD>
+      <TD><FONT FACE=Arial SIZE=2>The port of the HTTP service on the server.</TD>
+      <TD><TT>80</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>flags</TD>
+      <TD><FONT FACE=Arial SIZE=2>Additional flags affecting the behavior of the function.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>context</TD>
+      <TD><FONT FACE=Arial SIZE=2>A number to identify this operation if it is asynchronous. See <A HREF="#SetStatusCallback">SetStatusCallback</A> and <A HREF="#GetStatusCallback">GetStatusCallback</A> for more info on asynchronous operations.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+    </TABLE>
+    <P>
+    Refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation for more details
+    on those parameters.
+    <P>
+    If you pass <I>hashref</I> (a reference to an hash array), the following values are taken 
+    from the array:
+</FONT><PRE> %hash=(
+   "server"   => "<I>server</I>",
+   "username" => "<I>username</I>",
+   "password" => "<I>password</I>",
+   "port"     => <I>port</I>,
+   "flags"    => <I>flags</I>,
+   "context"  => <I>context</I>,
+ );</PRE><FONT FACE=Arial SIZE=2>
+    This method returns <B>undef</B> if the connection failed, a number otherwise.
+    You can then call any of the <A HREF="#HTTP_Functions">HTTP functions</A> as methods
+    of the newly created <I>httpobject</I>.
+    <BR>
+    Example:</FONT>
+<PRE> $result = $INET->HTTP($HTTP,"www.activeware.com","anonymous","dada\@perl.it");
+ # and then for example... 
+ ($statuscode, $headers, $file) = $HTTP->Request("/gifs/camel.gif");
+
+ $params{"server"} = "www.activeware.com";
+ $params{"password"} = "dada\@perl.it";
+ $params{"flags"} = INTERNET_FLAG_RELOAD;
+ $result = $INET->HTTP($HTTP,\%params);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=new>
+
+    <B>new Win32::Internet</B> <I>[useragent, opentype, proxy, proxybypass, flags]</I>
+<DT><B>new Win32::Internet</B> <I>[hashref]</I>
+
+<DD>Creates a new Internet object and initializes the use of the Internet functions; 
+    this is required before any of the functions of this
+    package can be used. Returns <B>undef</B> if the connection fails, 
+    a number otherwise.
+    The parameters and their values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Parameter</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Default</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>useragent</TD>
+      <TD><FONT FACE=Arial SIZE=2>The user agent passed to HTTP requests. See <A HREF="#OpenRequest">OpenRequest</A>.</TD>
+      <TD><TT>Perl-Win32::Internet/<I>version</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>opentype</TD>
+      <TD><FONT FACE=Arial SIZE=2>How to access to the Internet (eg. directly or using a proxy).</TD>
+      <TD><TT>INTERNET_OPEN_TYPE_DIRECT</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>proxy</TD>
+      <TD><FONT FACE=Arial SIZE=2>Name of the proxy server (or servers) to use. </TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>proxybypass</TD>
+      <TD><FONT FACE=Arial SIZE=2>Optional list of host names or IP addresses, or both, that are known locally.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>flags</TD>
+      <TD><FONT FACE=Arial SIZE=2>Additional flags affecting the behavior of the function.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+    </TABLE>
+    <P>
+    Refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation for more details
+    on those parameters.
+    If you pass <I>hashref</I> (a reference to an hash array), the following values are taken 
+    from the array:
+</FONT><PRE> %hash=(
+   "useragent"   => "<I>useragent</I>",
+   "opentype"    => "<I>opentype</I>",
+   "proxy"       => "<I>proxy</I>",
+   "proxybypass" => "<I>proxybypass</I>",
+   "flags"       => <I>flags</I>,
+ );</PRE><FONT FACE=Arial SIZE=2>
+    Example:</FONT>
+<PRE> $INET = new Win32::Internet();
+ die qq(Cannot connect to Internet...\n) if ! $INET;
+
+ $INET = new Win32::Internet("Mozilla/3.0", INTERNET_OPEN_TYPE_PROXY, "www.microsoft.com", "");
+
+ $params{"flags"} = INTERNET_FLAG_ASYNC;
+ $INET = new Win32::Internet(\%params);</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=OpenURL>
+
+    <B>OpenURL</B> <I>urlobject, URL</I>
+
+<DD>Opens a connection to an HTTP, FTP or GOPHER Uniform Resource Location (URL). 
+    Returns <B>undef</B> on errors or a number if the connection was succesful. 
+    You can then retrieve the URL content by applying the methods
+    <A HREF="#QueryDataAvailable">QueryDataAvailable</A> and 
+    <A HREF="#ReadFile">ReadFile</A>
+    on the newly created <I>urlobject</I>. 
+    See also <A HREF="#FetchURL">FetchURL</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->OpenURL($URL, "http://www.yahoo.com/");
+ $bytes = $URL->QueryDataAvailable();
+ $file = $URL->ReadEntireFile();
+ $URL->Close();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Password>
+
+    <B>Password</B> <I>[password]</I>
+
+<DD>Reads or sets the password used for an <A HREF="#FTP">FTP</A> 
+    or <A HREF="#HTTP">HTTP</A> connection. 
+    If no <I>password</I> parameter is specified, the current value is returned; 
+    otherwise, the password is set to <I>password</I>.
+    See also <A HREF="#Username">Username</A>, <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->Password("splurfgnagbxam");
+ $password = $HTTP->Password();</PRE>
+<P>
+
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=QueryDataAvailable>
+
+    <B>QueryDataAvailable</B>
+
+<DD>Returns the number of bytes of data that are available to be read immediately by
+    a subsequent call to <A HREF="#ReadFile">ReadFile</A> (or <B>undef</B> on errors).
+    Can be applied to <A HREF="#OpenURL">URL</A> or <A HREF="#OpenRequest">HTTP request</A>
+    objects.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->OpenURL($URL, "http://www.yahoo.com/");
+ $bytes = $URL->QueryDataAvailable();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=QueryOption>
+
+    <B>QueryOption</B> <I>option</I>
+
+<DD>Queries an Internet option. For the possible values of <I>option</I>,
+    refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    See also <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $value = $INET->QueryOption(INTERNET_OPTION_CONNECT_TIMEOUT);
+ $value = $HTTP->QueryOption(INTERNET_OPTION_USERNAME);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ReadEntireFile>
+
+    <B>ReadEntireFile</B>
+
+<DD>Reads all the data available from an opened <A HREF="#OpenURL">URL</A> or 
+    <A HREF="#OpenRequest">HTTP request</A> object. Returns what have been read or 
+    <B>undef</B> on errors.
+    See also <A HREF="#ReadFile">ReadFile</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->OpenURL($URL, "http://www.yahoo.com/");
+ $file = $URL->ReadEntireFile();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=ReadFile>
+
+    <B>ReadFile</B> <I>bytes</I>
+
+<DD>Reads <I>bytes</I> bytes of data from an opened <A HREF="#OpenURL">URL</A> or 
+    <A HREF="#OpenRequest">HTTP request</A> object. Returns what have been read 
+    or <B>undef</B> on errors.
+    See also <A HREF="#QueryDataAvailable">QueryDataAvailable</A> and 
+    <A HREF="#ReadEntireFile">ReadEntireFile</A>.
+    <P>
+    <B>NOTE</B>: be careful to keep <I>bytes</I> to an acceptable value (eg. don't tell him to swallow megabytes at once...).
+    <A HREF="#ReadEntireFile">ReadEntireFile</A> in fact uses <A HREF="#QueryDataAvailable">QueryDataAvailable</A> and <A HREF="#ReadFile">ReadFile</A> in a loop to read no more than 16k at a time.
+    <P>
+    Example:</FONT>
+<PRE> $INET->OpenURL($URL, "http://www.yahoo.com/");
+ $chunk = $URL->ReadFile(16000);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=SetOption>
+
+    <B>SetOption</B> <I>option, value</I>
+
+<DD>Sets an Internet option. For the possible values of <I>option</I>,
+    refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    See also <A HREF="#QueryOption">QueryOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->SetOption(INTERNET_OPTION_CONNECT_TIMEOUT,10000);
+ $HTTP->SetOption(INTERNET_OPTION_USERNAME,"dada");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=SetStatusCallback>
+
+    <B>SetStatusCallback</B>
+
+<DD>Initializes the callback routine used to return data about the progress of an asynchronous operation.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->SetStatusCallback();</PRE><FONT FACE=Arial SIZE=2>
+    This is one of the step required to perform asynchronous operations; the complete procedure is:
+</FONT><PRE> # use the INTERNET_FLAG_ASYNC when initializing
+ $params{'flags'}=INTERNET_FLAG_ASYNC;
+ $INET = new Win32::Internet(\%params);
+
+ # initialize the callback routine
+ $INET->SetStatusCallback();
+
+ # specify the context parameter (the last 1 in this case)
+ $INET->HTTP($HTTP, "www.yahoo.com", "anonymous", "dada\@perl.it", 80, 0, 1);</PRE><FONT FACE=Arial SIZE=2>
+
+At this point, control returns immediately to Perl and 
+</FONT><TT>$INET->Error()</TT><FONT FACE=Arial SIZE=2>
+will return 997, which means an asynchronous I/O operation is pending.
+Now, you can call 
+</FONT><PRE> $HTTP->GetStatusCallback(1);</PRE><FONT FACE=Arial SIZE=2>
+in a loop to verify what's happening; see also <A HREF="#GetStatusCallback">GetStatusCallback</A>.
+</FONT>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=TimeConvert>
+
+    <B>TimeConvert</B> <I>time</I><BR>
+    <B>TimeConvert</B> <I>seconds, minute, hours, day, month, year, day_of_week, RFC</I>
+<DD>The first form takes a HTTP date/time string and returns the date/time converted in the following array:
+ <P><I>seconds, minute, hours, day, month, year, day_of_week</I>
+ <P>The second form does the opposite (or at least it should, because actually seems 
+    to be malfunctioning): it takes the values and returns an HTTP date/time string,
+    in the RFC format specified by the <I>RFC</I> parameter (OK, I didn't find yet any accepted value
+    in the range 0..2000, let me know if you have more luck with it).
+    <BR>
+    Example:</FONT>
+<PRE> ($sec, $min, $hour, $day, $mday, $year, $wday) = 
+    $INET->TimeConvert("Sun, 26 Jan 1997 20:01:52 GMT");
+ 
+ # the opposite DOESN'T WORK! which value should $RFC have???
+ $time = $INET->TimeConvert(52, 1, 20, 26, 1, 1997, 0, $RFC);</PRE>
+</FONT>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=UserAgent>
+
+    <B>UserAgent</B> <I>[name]</I>
+
+<DD>Reads or sets the user agent used for HTTP requests. If no <I>name</I> parameter
+    is specified, the current value is returned; otherwise, the user agent is set
+    to <I>name</I>.
+    See also <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $INET->UserAgent("Mozilla/3.0");
+ $useragent = $INET->UserAgent();</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Username>
+
+    <B>Username</B> <I>[name]</I>
+
+<DD>Reads or sets the username used for an <A HREF="#FTP">FTP</A> 
+    or <A HREF="#HTTP">HTTP</A> connection. 
+    If no <I>name</I> parameter is specified, the current value is returned; 
+    otherwise, the username is set to <I>name</I>.
+    See also <A HREF="#Password">Password</A>, <A HREF="#QueryOption">QueryOption</A> and 
+    <A HREF="#SetOption">SetOption</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->Username("dada");
+ $username = $HTTP->Username();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Version>
+
+    <B>Version</B>
+
+<DD>Returns the version numbers for the Win32::Internet package and the 
+    WININET.DLL version, as an array or string, depending on the context.
+    The string returned will contain "<I>package_version</I>/<I>DLL_version</I>",
+    while the array will contain: "<I>package_version</I>", "<I>DLL_version</I>".
+    <BR>
+    Example:</FONT>
+<PRE> $version = $INET->Version(); # should return "0.06/4.70.1215"
+ @version = $INET->Version(); # should return ("0.06", "4.70.1215")</PRE>
+<P>
+
+
+</DL>
+
+
+<HR ALIGN=center>
+
+<FONT FACE=Arial><H2><A NAME="FTP_Functions">FTP Functions</A></H2></FONT>
+<FONT FACE=Arial><H3>General Note</H3></FONT>
+
+<FONT FACE=Arial SIZE=2>
+All methods assume that you have the following lines:
+
+</FONT><PRE> use Win32::Internet;
+ $INET = new Win32::Internet();
+ $INET->FTP($FTP, "<I>hostname</I>", "<I>username</I>", "<I>password</I>");</PRE>
+
+<FONT FACE=Arial SIZE=2>
+somewhere before the method calls; in other words, we assume that you have an Internet 
+object called 
+</FONT><TT>$INET</TT><FONT FACE=Arial SIZE=2> and an open FTP session called 
+</FONT><TT>$FTP</TT><FONT FACE=Arial SIZE=2>.
+<P>
+
+See <A HREF="#new">new</A> and <A HREF="#FTP">FTP</A> for more information.
+
+<P>
+</FONT>
+
+<FONT FACE=Arial><H3>Methods</H3></FONT>
+
+
+<DL>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Ascii>
+
+    <B>Ascii</B>
+<DT><B>Asc</B>
+
+<DD>Sets the ASCII transfer mode for this FTP session. It will be applied to the
+    subsequent <A HREF="#Get">Get</A> functions. 
+    See also the <A HREF="#Binary">Binary</A> and <A HREF="#Mode">Mode</A> function.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Ascii();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Binary>
+
+    <B>Binary</B>
+<DT><B>Bin</B>
+
+<DD>Sets the binary transfer mode for this FTP session. It will be applied to the
+    subsequent <A HREF="#Get">Get</A> functions.
+    See also the <A HREF="#Ascii">Ascii</A> and <A HREF="#Mode">Mode</A> function.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Binary();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Cd>
+
+    <B>Cd</B> <I>path</I>
+<DT><B>Cwd</B> <I>path</I>
+<DT><B>Chdir</B> <I>path</I>
+
+<DD>Changes the current directory on the FTP remote host. Returns <I>path</I> or <B>undef</B> on error.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Cd("/pub");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Delete>
+
+    <B>Delete</B> <I>file</I>
+<DT><B>Del</B> <I>file</I>
+
+<DD>Deletes a file on the FTP remote host. Returns <B>undef</B> on error.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Delete("110-i86.zip");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Get>
+
+    <B>Get</B> <I>remote, [local, overwrite, flags, context]</I>
+
+<DD>Gets the <I>remote</I> FTP file and saves it locally in <I>local</I>. If <I>local</I> is
+    not specified, it will be the same name as <I>remote</I>. Returns <B>undef</B> on error.
+   
+    The parameters and their values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Parameter</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Default</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>remote</TD>
+      <TD><FONT FACE=Arial SIZE=2>The name of the remote file on the FTP server.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>local</TD>
+      <TD><FONT FACE=Arial SIZE=2>The name of the local file to create.</TD>
+      <TD><TT>remote</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>overwrite</TD>
+      <TD><FONT FACE=Arial SIZE=2>If 0, overwrites </FONT><TT>local</TT><FONT FACE=Arial SIZE=2> if it exists; with any other value, the function fails if the local file already exists.</TD>
+      <TD><TT>0</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>flags</TD>
+      <TD><FONT FACE=Arial SIZE=2>Additional flags affecting the behavior of the function.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>context</TD>
+      <TD><FONT FACE=Arial SIZE=2>A number to identify this operation if it is asynchronous. See <A HREF="#SetStatusCallback">SetStatusCallback</A> and <A HREF="#GetStatusCallback">GetStatusCallback</A> for more info on asynchronous operations.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+    </TABLE>
+    <P>
+    Refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation for more details
+    on those parameters.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Get("110-i86.zip");
+ $FTP->Get("/pub/perl/languages/CPAN/00index.html", "CPAN_index.html");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=List>
+
+    <B>List</B> <I>[pattern, listmode]</I>
+<DT><B>Ls</B> <I>[pattern, listmode]</I>
+<DT><B>Dir</B> <I>[pattern, listmode]</I>
+
+<DD>Returns a list containing the files found in this directory, eventually matching the
+    given <I>pattern</I> (which, if omitted, is considered "*.*").
+    The content of the returned list depends on the <I>listmode</I> parameter, which can have
+    the following values:
+    <P>
+
+    <UL><LI><I>listmode</I>=1 (or omitted)<BR>
+        the list contains the names of the files found.
+        Example:</FONT>
+<PRE> @files = $FTP->List();
+ @textfiles = $FTP->List("*.txt");
+ foreach $file (@textfiles) {
+   print "Name: ", $file, "\n";
+ }</PRE><FONT FACE=Arial SIZE=2>
+
+        <LI><I>listmode</I>=2<BR>
+        the list contains 7 values for each file, which respectively are:
+          <UL><LI>the file name
+              <LI>the DOS short file name, aka 8.3
+              <LI>the size
+              <LI>the attributes
+              <LI>the creation time
+              <LI>the last access time
+              <LI>the last modified time
+          </UL>
+          Example:</FONT>
+<PRE> @files = $FTP->List("*.*", 2);
+ for($i=0; $i<=$#files; $i+=7) {
+   print "Name: ", @files[$i], "\n";
+   print "Size: ", @files[$i+2], "\n";
+  print "Attr: ", @files[$i+3], "\n";
+  }</PRE><FONT FACE=Arial SIZE=2>
+
+        <LI><I>listmode</I>=3<BR>
+        the list contains a reference to an hash array for each found file; each hash contains:
+          <UL><LI><I>name</I> <TT>=></TT> the file name
+              <LI><I>altname</I> <TT>=></TT> the DOS short file name, aka 8.3
+              <LI><I>size</I> <TT>=></TT> the size
+              <LI><I>attr</I> <TT>=></TT> the attributes
+              <LI><I>ctime</I> <TT>=></TT> the creation time
+              <LI><I>atime</I> <TT>=></TT> the last access time
+              <LI><I>mtime</I> <TT>=></TT> the last modified time
+          </UL>
+          Example:</FONT>
+<PRE> @files = $FTP->List("*.*", 3);
+ foreach $file (@files) {
+   print $file->{'name'}, " ", $file->{'size'}, " ", $file->{'attr'}, "\n";
+ }</PRE><FONT FACE=Arial SIZE=2>
+
+    </UL>
+
+    <B>Note</B>: all times are reported as strings of the following format:<BR>
+    <I>second, hour, minute, day, month, year</I>.
+    <BR>
+    Example:</FONT>
+<PRE> $file->{'mtime'} == "0,10,58,9,12,1996" stands for 09 Dec 1996 at 10:58:00</PRE>
+
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Mkdir>
+
+    <B>Mkdir</B> <I>name</I>
+<DT><B>Md</B> <I>name</I>
+
+<DD>Creates a directory on the FTP remote host. Returns <B>undef</B> on error.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Mkdir("NextBuild");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Mode>
+
+    <B>Mode</B> [<I>mode</I>]
+
+<DD>If called with no arguments, returns the current transfer mode for this FTP session 
+    ("asc" for ASCII or "bin" for binary).
+    The <I>mode</I> argument can be "asc" or "bin", in which case the appropriate
+    transfer mode is selected. See also the <A HREF="#Ascii">Ascii</A> and 
+    <A HREF="#Binary">Binary</A> functions.
+    Returns <B>undef</B> on errors.
+    <BR>
+    Example:</FONT>
+<PRE> print "Current mode is: ", $FTP->Mode();
+ $FTP->Mode("asc"); # ... same as $FTP->Ascii();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Pasv>
+
+    <B>Pasv</B> <I>[mode]</I>
+
+<DD>If called with no arguments, returns 1 if the current FTP session has passive transfer
+    mode enabled, 0 if not. 
+    <BR>
+    You can call it with a <I>mode</I> parameter (0/1) only as a method of a 
+    <A HREF="#new">Internet object</A>, in which case it will
+    set the default value for the next <A HREF="#FTP">FTP objects</A> you create
+    (read: set it before, because you can't change this value once you opened the FTP session).
+    <BR>
+    Example:</FONT>
+<PRE> print "Pasv is: ", $FTP->Pasv();
+
+ $INET->Pasv(1);
+ $INET->FTP($FTP,"ftp.activeware.com", "anonymous", "dada\@perl.it");
+ $FTP->Pasv(0); # this will be ignored...</PRE>
+<P>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Put>
+
+    <B>Put</B> <I>local, [remote, context]</I>
+
+<DD>Upload the <I>local</I> file to the FTP server saving it under the name <I>remote</I>, which if
+    if omitted is the same name as <I>local</I>. Returns <B>undef</B> on error.<BR>
+    <I>context</I> is a number to identify this operation if it is asynchronous. See <A HREF="#SetStatusCallback">SetStatusCallback</A> and <A HREF="#GetStatusCallback">GetStatusCallback</A> for more info on asynchronous operations.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Put("internet.zip");
+ $FTP->Put("d:/users/dada/temp.zip", "/temp/dada.zip");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Pwd>
+
+    <B>Pwd</B>
+
+<DD>Returns the current directory on the FTP server or <B>undef</B> on errors.
+    <BR>
+    Example:</FONT>
+<PRE> $path = $FTP->Pwd();</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Rename>
+
+    <B>Rename</B> <I>oldfile</I>, <I>newfile</I>
+<DT><B>Ren</B> <I>oldfile</I>, <I>newfile</I>
+
+<DD>Renames a file on the FTP remote host. Returns <B>undef</B> on error.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Rename("110-i86.zip", "68i-011.zip");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Rmdir>
+
+    <B>Rmdir</B> <I>name</I>
+<DT><B>Rd</B> <I>name</I>
+
+<DD>Removes a directory on the FTP remote host. Returns <B>undef</B> on error.
+    <BR>
+    Example:</FONT>
+<PRE> $FTP->Rmdir("CurrentBuild");</PRE>
+<P>
+
+
+</DL>
+
+
+
+<HR ALIGN=center>
+
+<A NAME=HTTP_Functions>
+<FONT FACE=Arial><H2>HTTP Functions</H2></FONT>
+<FONT FACE=Arial><H3>General Note</H3></FONT>
+
+<FONT FACE=Arial SIZE=2>
+All methods assume that you have the following lines:
+
+</FONT><PRE> use Win32::Internet;
+ $INET = new Win32::Internet();
+ $INET->HTTP($HTTP, "<I>hostname</I>", "<I>username</I>", "<I>password</I>");</PRE>
+
+<FONT FACE=Arial SIZE=2>
+somewhere before the method calls; in other words, we assume that you have an Internet 
+object called 
+</FONT><TT>$INET</TT><FONT FACE=Arial SIZE=2> and an open HTTP session called 
+</FONT><TT>$HTTP</TT><FONT FACE=Arial SIZE=2>.
+<P>
+See <A HREF="#new">new</A> and <A HREF="#HTTP">HTTP</A> for more information.<P>
+</FONT>
+
+<FONT FACE=Arial><H3>Methods</H3></FONT>
+
+
+<DL>
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=AddHeader>
+    <B>AddHeader</B> <I>header, [flags]</I>
+<DD>Adds HTTP request headers to an HTTP request object created with <A HREF="#OpenRequest">OpenRequest</A>.
+    For the possible values of <I>flags</I> refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->OpenRequest($REQUEST,"/index.html");
+ $REQUEST->AddHeader("If-Modified-Since:  Sunday, 17-Nov-96 11:40:03 GMT");
+ $REQUEST->AddHeader("Accept: text/html\r\n", HTTP_ADDREQ_FLAG_REPLACE);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=OpenRequest>
+
+    <B>OpenRequest</B> <I>requestobject, [path, method, version, referer, accept, flags, context]</I>
+<DT><B>OpenRequest</B> <I>requestobject, hashref</I>
+
+<DD>Opens an HTTP request. Returns <B>undef</B> on errors or a number
+    if the connection was succesful. You can then use one of the 
+    <A HREF="#AddHeader">AddHeader</A>, <A HREF="#SendRequest">SendRequest</A>, 
+    <A HREF="#QueryInfo">QueryInfo</A>, <A HREF="#QueryDataAvailable">QueryDataAvailable</A> and
+    <A HREF="#ReadFile">ReadFile</A> methods on the newly created <I>requestobject</I>. 
+    The parameters and their values are:
+    <TABLE>
+      <TD><FONT FACE=Arial SIZE=2><B>Parameter</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Meaning</TD>
+      <TD><FONT FACE=Arial SIZE=2><B>Default</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>path</TD>
+      <TD><FONT FACE=Arial SIZE=2>The object to request. This is generally a file name, an executable module, etc.</TD>
+      <TD><TT>/</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>method</TD>
+      <TD><FONT FACE=Arial SIZE=2>The method to use; can actually be GET, POST, HEAD or PUT.</TD>
+      <TD><TT>GET</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>version</TD>
+      <TD><FONT FACE=Arial SIZE=2>The HTTP version.</TD>
+      <TD><TT>HTTP/1.0</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>referer</TD>
+      <TD><FONT FACE=Arial SIZE=2>The URL of the document from which the URL in the request was obtained.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>accept</TD>
+      <TD><FONT FACE=Arial SIZE=2>The content types accepted. They must be separated by a "\0" (ASCII zero).</TD>
+      <TD><TT>text/* image/gif image/jpeg</TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>flags</TD>
+      <TD><FONT FACE=Arial SIZE=2>Additional flags affecting the behavior of the function.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+      <TR VALIGN=top>
+      <TD><FONT FACE=Arial SIZE=2><I>context</TD>
+      <TD><FONT FACE=Arial SIZE=2>A number to identify this operation if it is asynchronous. See <A HREF="#SetStatusCallback">SetStatusCallback</A> and <A HREF="#GetStatusCallback">GetStatusCallback</A> for more info on asynchronous operations.</TD>
+      <TD><FONT FACE=Arial SIZE=2><I>none</I></TD>
+    </TABLE>
+    <P>
+    Refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> documentation for more details
+    on those parameters.
+    If you pass <I>hashref</I> (a reference to an hash array), the following values are taken 
+    from the array:
+</FONT><PRE> %hash=(
+   "path"        => "<I>path</I>",
+   "method"      => "<I>method</I>",
+   "version"     => "<I>version</I>",
+   "referer"     => "<I>referer</I>",
+   "accept"      => "<I>accept</I>",
+   "flags"       => <I>flags</I>,
+   "context"     => <I>context</I>,
+ );</PRE><FONT FACE=Arial SIZE=2>
+    See also <A HREF="#Request">Request</A>.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->OpenRequest($REQUEST, "/index.html");
+ $HTTP->OpenRequest($REQUEST, "/index.html", "GET", "HTTP/0.9");
+
+ $params{"path"} = "/index.html";
+ $params{"flags"} = " 
+ $HTTP->OpenRequest($REQUEST, \%params);</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=QueryInfo>
+
+    <B>QueryInfo</B> <I>header, [flags]</I>
+
+<DD>Queries information about an HTTP request object created with 
+    <A HREF="#OpenRequest">OpenRequest</A>.
+    You can specify an <I>header</I> (for example, "Content-type") and/or one or more <I>flags</I>.
+    If you don't specify <I>flags</I>, 
+    </FONT><TT>HTTP_QUERY_CUSTOM</TT><FONT FACE=Arial SIZE=2>
+    will be used by default; this means
+    that <I>header</I> should contain a valid HTTP header name.
+    For the possible values of <I>flags</I> refer to the <A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->OpenRequest($REQUEST,"/index.html");
+ $statuscode = $REQUEST->QueryInfo("", HTTP_QUERY_STATUS_CODE);
+ $headers = $REQUEST->QueryInfo("", HTTP_QUERY_RAW_HEADERS_CRLF); # will get all the headers
+ $length = $REQUEST->QueryInfo("Content-length");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=Request>
+
+    <B>Request</B> <I>[path, method, version, referer, accept, flags]</I>
+<DT><B>Request</B> <I>hashref</I>
+
+<DD>Performs an HTTP request and returns an array containing the status code, the headers and the content of the file.
+    It is a one-step procedure that makes an <A HREF="#OpenRequest">OpenRequest</A>, a <A HREF="#SendRequest">SendRequest</A>, 
+    some <A HREF="#QueryInfo">QueryInfo</A>, <A HREF="#ReadFile">ReadFile</A> and finally <A HREF="#Close">Close</A>.
+    For a description of the parameters, see <A HREF="#OpenRequest">OpenRequest</A>.
+    <BR>
+    Example:</FONT>
+<PRE> ($statuscode, $headers, $file) = $HTTP->Request("/index.html");
+ ($s, $h, $f) = $HTTP->Request("/index.html", "GET", "HTTP/1.0");</PRE>
+<P>
+
+
+<DT><FONT FACE=Arial SIZE=2><A NAME=SendRequest>
+
+    <B>SendRequest</B> [<I>postdata</I>]
+
+<DD>Send an <A HREF="#OpenRequest">HTTP request</A> to the destination server.
+    <I>postdata</I> are any optional data to send immediately after the request header; this is generally
+    used for POST or PUT requests.
+    <BR>
+    Example:</FONT>
+<PRE> $HTTP->OpenRequest($REQUEST, "/index.html");
+ $REQUEST->SendRequest();
+ 
+ # A POST request...
+ $HTTP->OpenRequest($REQUEST, "/cgi-bin/somescript.pl", "POST");
+ 
+ #This line is a must -> (thanks Philip :)
+ $REQUEST->AddHeader("Content-Type: application/x-www-form-urlencoded");
+
+ $REQUEST->SendRequest("key1=value1&key2=value2&key3=value3");</PRE>
+<P>
+
+</DL>
+
+<P>
+
+<HR>
+
+<FONT FACE=Arial SIZE=1>
+10 Feb 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;
+</FONT><P>
+
+</BODY>
+</HTML>

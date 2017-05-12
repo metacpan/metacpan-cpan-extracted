@@ -1,0 +1,23 @@
+Revision history for WebService-WebService-Face
+
+0.04    2011/03/23 
+        Rename from Face::Client to the more appropriate WebService::Face (mail suggestion from 'ratz?')
+        Change documentation
+        Add the Abstraction/simplification WebService::Face::Store object
+
+0.03    2011/03/22 
+        First release candidate to be pushed on CPAN
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !!!           API change : All params now passed through hashref (for consistency)                !!!
+        !!! faces_xxxt(), tags_xxx(), account_xxx() methods of WebService::Face::Client                   !!!
+        !!!                    require a hashref as parameter !!!                                         !!!
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Rename _get_url() to the more meaningful _get_credential_parameters
+        Documentation update.
+
+0_02    2011/03/13 
+        First (barely) usable version (with recognition scenario described in README)
+
+0_01    2011/01/14 
+        First version, released on an unsuspecting world.
+

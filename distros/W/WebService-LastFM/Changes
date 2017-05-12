@@ -1,0 +1,27 @@
+Revision history for Perl extension WebService::LastFM.
+
+0.06  Thu Sept 08 2008
+        - Strictly a version change for ownership switch to Christian Brink
+          
+0.05  Thu May 29 2008
+        - Added change_tag() method.
+          (Thanks to Renan Rangel)
+
+0.04  Fri Jan 11 2008
+        - Fixed codes to be correspondent to the new spec of the API.
+          (Thanks to David Leadbeater)
+        - Added t/01_request.t.
+        - Added a caveat into the POD to indicate this module is now obsolete.
+
+0.03  Tue Jan 18 2005
+        - modify with webservice update
+          add directions for 'rtp' and 'nortp' command.
+          change the way of request for 'control.php' and 'tune.php' to POST from GET
+          see http://www.audioscrobbler.com/forum/14868/_/17794 for more details of webservice update.
+
+0.02  Mon Jan 17 2005
+        - add WebService::LastFM::Session
+          WebService::LastFM::get_session now returns a WebService::LastFM::Session object not hashref
+
+0.01  Sat Jan 15 2005
+        - initial release

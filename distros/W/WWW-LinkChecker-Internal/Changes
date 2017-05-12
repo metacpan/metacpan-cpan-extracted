@@ -1,0 +1,29 @@
+Revision history for WWW-LinkChecker-Internal
+
+0.4.0   2016-05-11
+    * Add the --state-filename flag for preserving the state.
+
+0.2.0   2015-03-22
+    * Add the --start option for an alternative start URL.
+    * Print an output on successful finish.
+    * Both changes were done to address this bug:
+        * See https://rt.cpan.org/Public/Bug/Display.html?id=102724
+        * Thanks to Gabor Szabo (SZABGAB) for the report and analysis.
+
+0.0.4   2015-03-12
+    * Add t/style-trailing-space.t .
+    * Add resources and keywords to the META.yml.
+    * Made the link-checker script's error on empty @ARGV more user-friendly
+        * See https://rt.cpan.org/Ticket/Display.html?id=102723
+        * Thanks to Gabor Szabo (SZABGAB) for the report and analysis.
+
+0.0.3   2012-08-30
+    * Add the --pre-skip and --before-insert-skip flags.
+    * A memory/speed optimisation.
+
+0.0.2   2012-08-29
+    * Add missing dependencies to Makefile.PL.
+
+0.0.1   2012-08-29
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,56 @@
+Revision history for WiX3
+
+0.011  Sun 05 Jun 2011
+       - Compatible with (and *requires*) Moose 2.00.
+
+0.010003  Tue 22 Feb 2011
+       - Updating documentation.
+
+0.010002  Tue 19 Oct 2010
+       - Allow parameters to be undefined in more places.
+
+0.010001  Sat 02 Oct 2010
+       - Updating module requirements because of RT #61001.
+
+0.010  Fri 27 Aug 2010
+       - Role created allowing inner text added.
+       - A number of WiX3::XML::* classes added (Property, WixVariable, 
+       Custom, CustomAction, InstallExecuteSequence, and TagTypes)
+       - Updating some of the tags to be more specific about tag types allowed.
+
+0.009102  Thu 29 Jul 2010
+       - Allowing single quotes in attributes.
+       - Several enums added (CHORNY)
+       - First attempt of WiX3::XML::RegistryKey and WiX3::XML::RegistryValue (CHORNY)
+
+0.009101  Never got released.
+       - Adding push_tracelevel routine to WiX3::Role::Traceable.
+
+0.009100  Fri 28 May 2010
+       - Fixing to work with newest version of Perl-Dist-WiX
+       - Trace object is now stored outside the object, 
+         rather than within it. WiX3::Role::Traceable now 
+         just adds methods. 
+       - Tests updated
+
+0.009  Feb 02 2010
+       - Added merge-module tags
+
+0.008  Wed Sep 16 2009
+       - Updating to work with Moose 0.90.
+       - Took out the "e-mail traced lines" code 
+         (may implement it another way later.)
+
+0.007  Sat Sep 12 2009
+       - Adding RemoveFolder tag.
+       - Bug fixes found when testing Perl-Dist-WiX.
+       - Will fix documentation and testing in future
+         versions.
+
+0.006  Sun Aug 30 2009
+       - More tags (Shortcut, FeatureRef)
+	   - Fixing to work with Perl-Dist-WiX
+
+0.005  Sat Aug 15 2009
+       - Initial release of WiX3. Basic testing only, and 
+         not every module is implemented.

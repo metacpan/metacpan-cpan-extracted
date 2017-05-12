@@ -1,0 +1,146 @@
+Revision history for W3C-SOAP-WADL
+
+0.007   2015-09-05
+        Updating for release of version 0.007
+        Removed creation of makefile (Ivan Wills)
+
+0.006   2015-07-25
+        Updating for release of version 0.006
+        Fixed subdir use from Path::Tiny conversion (Ivan Wills)
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.005   2015-05-18
+        Updating for release of version 0.005
+        Changed dependencies to Test::Warnings (Ivan Wills)
+        Fixing documentation (Ivan Wills)
+        Added missing module/file tests and updated code to latest standards (Ivan Wills)
+        Added missing module test (Ivan Wills)
+        Updated license (Ivan Wills)
+        Added missing method documentation (Ivan Wills)
+        Fixed the version numbers (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Added more details about generated client (Ivan Wills)
+        Changed to test README.pod (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added use warnings to make perlcritic happy (Ivan Wills)
+        Added return to make perlcritic happy (Ivan Wills)
+        Removed WWW::Mech as a runtime dependency (Ivan Wills)
+        Correct location logic so that XML::Rabbit passes the value on correctly (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP-WADL (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP-WADL (Ivan Wills)
+        Added downloading WADLs if passed as a URL (Ivan Wills)
+        Changed to default module name to base (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Starting to produce XSD files along with WADLs (Ivan Wills)
+        Changed schemas to use new lib (Ivan Wills)
+        Helper for loading XSD files (Ivan Wills)
+        Trying to get XSDs in (Ivan Wills)
+        Factored out path -> name to reuse (Ivan Wills)
+        Added try/catch around method generation so that working methods can be generated (Ivan Wills)
+        Fixed repeated "use" statements (Ivan Wills)
+        Fixed other extranious (non-perl) characters from appearing in module names (Ivan Wills)
+        Fixed generating of class file names from paths (Ivan Wills)
+        Mojolicious appears to have changed headder formatts so dependency bumpped and changed made (Ivan Wills)
+        Updated tests (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/W3C-SOAP-WADL (Ivan Wills)
+        Fixed typo for spelling test (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Fixed file rename (Ivan Wills)
+        Added correct use statements rather rely on the fact that the modules have been loaded else where (Ivan Wills)
+        white space fixes (Ivan Wills)
+        white space fixes (Ivan Wills)
+        Working on documentation (Ivan Wills)
+        Removed XSD references (Ivan Wills)
+        Made names more understandable (Ivan Wills)
+        Renamed to match W3C::SOAP's naming convention (Ivan Wills)
+        Changed to allow the dynamic creation of modules (Ivan Wills)
+        Changed to support generating module name if module_base is supplied (Ivan Wills)
+
+0.004   2013-07-21
+        Updating for release of version 0.004 (Ivan Wills)
+        Added diagnostics to show tests are really passing (Ivan Wills)
+
+0.003   2013-07-20
+        Added better server start check (Ivan Wills)
+
+0.002   2013-07-20
+        Fixed spelling test failures (Ivan Wills)
+        Added element attributes (Ivan Wills)
+        Started to add auto generated documentation (Ivan Wills)
+        Cleaned out default documentation (Ivan Wills)
+        Working on getting documentation up to scratch (Ivan Wills)
+        removed unused module lib/W3C/SOAP/WADL/Document/Node.pm (Ivan Wills)
+        removed unused module lib/W3C/SOAP/WADL/Node.pm (Ivan Wills)
+        More documentation (Ivan Wills)
+        Cleaning documentation (Ivan Wills)
+        Fixed ignoring build packages (Ivan Wills)
+
+0.0.1   2013-06-28
+        Added missing module test
+        Got tests working better
+        Fixed manifest files
+        Fixed tests so that app app-static can run on different ports
+        Added representations attribute
+        Changed setting location default to correct value
+        Added setting the location
+        Had two responses with the same status, changed to two different representations
+        Moved default representation passing from WADL parser code to the client code
+        Generated elements now compile
+        Added loading dependancies and generating operations
+        Added operation helper
+        Removed accedentially added warn
+        Fixed? class name generation
+        Fixed trying to remove created test files when none were created, added test lib dir to @INC
+        Added ignoring created test libs
+        Added testing that we generate a Test::Ping module and creating a new object
+        Got static lib generation starting
+        Moved WWW::Mechanize to build dependency as that is where it's used
+        Removed warning
+        Changed 4 from examples to templates
+        Fixed Mojolicious removing render_json method
+        Added use strict (even if XML::Rabbit supplies it) to satisfy Kwalitee
+        Added place holder for documentation
+        Added missing file
+        Fixed spelling
+        Fixed double opening
+        Added config for v, make sure it isn't distibuted
+        Starting to get static client generation going
+        Fixed ignores and missing files from manifest
+        Removed todo
+        Added configure requires section
+        Got templates writing
+        Starting to work on non static implementation
+        Updated manifest files
+        Changed from using mech to using LWP::UserAgent to match W3C::SOAP change
+        Updated dependancies
+        Changed to specify all files as order matters
+        Added testing returned content
+        Implemented passing returned content
+        started testing returned response
+        Added post result
+        Started to build request and process response
+        Got boilerplate test workgin
+        Added tests for dynamic objects
+        New modules for building dynamic objects
+        Now building dynamic objects
+        Added predicates
+        Test WADL application and script
+        Fixed minor issues
+        Fixed incorrect attribute name
+        Specified all attributes/elements per the documentation at http://www.w3.org/Submission/wadl/
+        Started on getting parsing working
+        Converted to using XML::Rabit
+        More WADL baised objects
+        Parser script
+        Lots of new modules
+        Added ignores
+        initial commit
+

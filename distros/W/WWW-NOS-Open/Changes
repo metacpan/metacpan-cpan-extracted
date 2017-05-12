@@ -1,0 +1,26 @@
+Revision history for Perl extension WWW::NOS::Open.
+
+0.101 Sat Apr 22 19:08:15 UTC 2017
+    - fixed RT#121289
+
+0.100 Sun Nov  4 11:25:26 UTC 2012
+    - Handle 401 and 403 with missing encodings
+    - Configured recommended modules
+    - Improved documentation
+    - Fixed a bug that made thumbnail URLs mandatory while the service uses
+      them optionally
+    - Changed default port of dummy server from 8888 to 18081
+    - Added github repository to meta data
+    - Switched version control from subversion to Github
+      <https://github.com/ipenburg/WWW-NOS-Open>
+    - Refactored from ExtUtils::MakeMaker to Module::Build
+    - refactored to 5.12 package name version syntax
+    - Bumped minimal perl to 5.14 to get unicode right
+
+0.02  Thu Jan  13 21:54:02 2011
+    - improved documentation and refactoring
+    - dates can now also be DateTime objects
+    - fixed RT#64456, RT#64468, RT#64480
+
+0.01  Mon Jan  03 22:54:02 2011
+    - original version

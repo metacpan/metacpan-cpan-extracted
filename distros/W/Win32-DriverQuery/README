@@ -1,0 +1,16 @@
+NAME
+    Win32::DriverQuery - query system for installed drivers and their
+    versions
+
+SYNOPSIS
+      my @modules = Win32::DriverQuery->query;
+      print join(' :: ', $_->{FullPathName}, ($_->{version}//'undef'),
+        ( -e $_->{FullPathName} ? "" : "no path" )), "\n" for @modules;
+
+DESCRIPTION
+    The class method "query" returns a list of hashrefs with keys
+    "FullPathName" and "version", for each installed driver.
+
+AUTHOR
+    Ed J took Daniel Dragan's excellent script and made it into a module.
+

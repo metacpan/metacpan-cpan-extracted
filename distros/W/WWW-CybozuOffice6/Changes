@@ -1,0 +1,15 @@
+Revision history for Perl extension WWW::CybozuOffice6.
+
+0.04  Thu Aug 31 12:48:03 2006
+	- remove unnecessary output to stdout
+
+0.03  Tue Aug 29 13:37:44 2006
+	- merge patch from bonnu-san (http://d.hatena.ne.jp/boxphere/20060825/1156498432)
+
+0.02  Tue Dec 27 16:22:00 2005
+	- initial release
+ 
+0.01  Tue Dec 27 11:18:19 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n WWW::CybozuOffice6
+

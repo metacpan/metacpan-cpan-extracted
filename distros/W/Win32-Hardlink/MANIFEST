@@ -1,0 +1,25 @@
+Changes
+Hardlink.xs
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Test/Builder.pm
+inc/Test/Builder/Module.pm
+inc/Test/More.pm
+lib/Win32/Hardlink.pm
+lnw.cpp
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/0-signature.t
+t/1-basic.t
+typemap

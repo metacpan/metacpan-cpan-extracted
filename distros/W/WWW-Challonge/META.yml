@@ -1,0 +1,31 @@
+---
+abstract: 'Perl wrapper for the Challonge API'
+author:
+  - 'Alex Kerr <kirby@cpan.org>'
+build_requires:
+  JSON: '2.61'
+  Test::Deep: '0'
+  Test::LWP::UserAgent: '0.029'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Challonge
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.04'
+  JSON: '2.61'
+  LWP::Protocol::https: '6.06'
+  LWP::UserAgent: '6.13'
+  perl: '5.01'
+resources:
+  repository: git://github.com/kirbyUK/WWW-Challonge.git
+version: '1.01'

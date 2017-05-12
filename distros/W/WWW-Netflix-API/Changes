@@ -1,0 +1,92 @@
+Revision history for WWW-Netflix-API
+
+0.12	2012-01-??
+	* RT#77862 fixed by updating and then moving the hard coded Netflix API base_url to a variable.
+    * removed references to defunct api calls.
+
+0.11	2012-12-21
+	--> This was unreleased from 2009-11-12 ... Blindly releasing it now before new co-maintainer takesover.
+	* add a couple new examples/ files
+	* RT#51740 Makefile.PL prereq error
+		patch from stro
+
+0.10	2009-11-11
+	* RT#48863: Can't locate object "as_string"
+		patch from zsan
+	* RT#47201: Double url encoding of application name causing netflix 401 error
+		patch from chrisrhodes
+	* Changed __OAuth_Request to consider '200 OK' and error if content is empty.
+	* test suite update for api change to support nickname for $netflix->REST->Users
+	* Added 'APPLICATIONS' section to the POD
+
+0.09	2008-12-30 # not released
+	* updated proper error message in t/access_token.t
+	* Tested (successfully) against Net-OAuth-0.14
+
+0.08	2008-12-08
+	* added examples/catalog-lwp_handlers.pl to MANIFEST
+	* changed examples/catalog.pl to show saving directly to file
+		by using content_filter => $filename
+	* examples/catalog2db.pl updated to reflect catalog.xml scheme change
+	* now defulats ->ua attribute in the constructor, instead of waiting
+		for first invocation of _submit().
+	* if content_filter exists and is a scalar, then use it as the
+		filename to write to instead of content being in memory.
+		Added pod to that effect.
+	* added 'Retrieve entire catalog:' example in pod.
+
+0.07	2008-11-17
+	* refactored the internal methods that wrap Net::OAuth calls.
+	* made the underlying LWP::UserAgent an attribute. (Jim Spath)
+	* added t/urlappender.t
+	* additional tests for error handling in t/access_token.t
+
+0.06	2008-11-16
+	* Support for basic resources (e.g. catalog) w/o requiring access_token.
+		(Thanks to Jim Spath for the Net::OAuth subclass)
+	* Added t/catalog.t to test w/o access_token.
+	* Require Net::OAuth >= 0.13 Net::OAuth::ConsumerRequest
+	* t/api.t -- added sleep(1)'s to avoid 'Over queries per second limit'.
+
+0.05	2008-10-21
+	* added examples/catalog.pl -- pulls entire catalog down to catalog.xml.
+	* added examples/search.pl -- uses the catalog api to search for a term.
+	* added examples/catalog2db.pl -- converts catalog.xml to a SQLite database.
+	* changed the content-related attributes/behavior.  Now is much more memory
+		efficient. _set_content() takes and stored a scalar ref, so large
+		(for example the catalog index) content is copied around. Also, the
+		content_filter isn't used until the first invocation of content(),
+		at which point the results are cached in the _filtered_content attribute.
+	* t/attributes.t updated accordingly.
+	* updated EXAMPLES pod.
+	* updated ATTRIBUTES pod.
+	* added t/rest2sugar.t to MANIFEST
+
+0.04	2008-10-15
+	* added some extra error handling in RequestAccess() method. (thanks to report from laral4)
+	* fixed examples/login.pl typo.
+	* misc pod fixes.
+	* Improved the EXAMPLES pod section.
+	* Added the TEST SUITE pod section, including documenting the ENV vars.
+
+0.03	2008-10-10
+	* POD fix: s/submit/Get/
+
+0.02	2008-10-09
+	* New tests (including queue management test):
+		t/api-errors.t
+		t/attributes.t
+		t/queue.t
+	* clean skip of tests is XML::Simple is not installed.
+	* examples/ directory.
+	* increased coverage stats.
+	* replaced LWP::Simple w/LWP::UserAgent for status on error.
+	* renamed xml_filter to content_filter.
+	* content arributes are now: content, original_content, content_error.
+	* new internal method _set_content().
+	* replaced submit() with Get(), Post(), and Delete().
+	* additional POD updates/fixes.
+
+0.01	2008-10-07
+	* Initial release.
+

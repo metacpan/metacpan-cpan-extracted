@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2268af7a84ed76f499e2c27bbfd5d0edf5049bd0 API4.pm
+SHA1 f87a5bf711f82718ead39864ab71d3ac2ae9f214 API4/Struct.pm
+SHA1 9a340ad9a52d56a52a856424456bc920fd1141f3 Changes
+SHA1 2aec7fc0350639f8b5ac5ce5a5ab7740dc64109b LICENSE
+SHA1 2455d2380bf436a39a7bfa6985ce5935b2465955 MANIFEST
+SHA1 bcb019b7dc0355a6ac3641c4ec594e721a8f02db META.yml
+SHA1 60f67b0ac4de37dc7dace79a71c89260143d087b Makefile.PL
+SHA1 fb5ebe54328df3538495b74e28881172dc118d2e README
+SHA1 3745fadd7c5cbd038ab6f46958f8eae592b052fd examples/ex1.pl
+SHA1 339fec27fa787b676672a62c2ae1fcf439f0f6f2 examples/ex2.pl
+SHA1 d7e330d743bbaae6aa60d3461e61b123e86f05b5 examples/ex3.pl
+SHA1 dc0c0cffd4e3f5b7ca6a811c590c03a2ed9ed6c2 examples/ex4.pl
+SHA1 e2affd72618eefe4afe7e35a900354a2f6a06a47 examples/ex5.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 890958d44b84187708d0a6ac6530d08e9fbd61a2 t/WebService-Kramerius-API4/01-use.t
+SHA1 3145af44246b4364b6831a40f7a6ee8069caf7e2 t/WebService-Kramerius-API4/02-version.t
+SHA1 7fd7720a80feaa22e20ff06cd0b71f86787df4a9 xt/WebService-Kramerius-API4/01-pod_coverage.t
+SHA1 70c70ce1681d28f83807287bdc3f4045302aaa17 xt/WebService-Kramerius-API4/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAligyg8ACgkQKyiOZjWe
+rHZkwAgAl7m3x49OphS3Zf6GR9N1fGpthjszr2yb2RFE+1utotjEeM+CZ5jx063h
+jImyYZNubkvB4U9NQ0GOLN6LC1WWEP5BXV2lqVRPL98rUTtihOOPdXzyVFT2Q3m8
+2G05L5vAYfqtOlGGoAxfKQqq+N5tUh2vdege7ZXBAPRCSRJ0k9odhhc9s3mgg+L/
+0D+ginEU+C52L02ly99t70RjsTkKt4KbjaMTv5BSbuyZZaDQvjEkXzDGDP46bmez
+yhk68/iug+oS7s47LPnJAD5Epw1zIEqvRF+GfpGSfZHIVQ2WdiKR/s74dm6Ng/Zz
+xCJkrlHPVU7Ji6bBnBcaVZejF6hc9g==
+=JsBA
+-----END PGP SIGNATURE-----

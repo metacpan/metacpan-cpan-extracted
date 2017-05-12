@@ -1,0 +1,53 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="eng">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/Content/Gamercard/default/gamercard.css" />
+        <meta name="robots" content="noindex,nofollow" />
+        <meta name="category" content="Gamercard" />
+        <base target="_top" />
+        <title>skflgnskjdgnsuibfsdgdsgsgdsg</title>
+    </head>
+    <body>
+        <div class="XbcGamercard Silver  ">
+            
+            <a id="Gamertag" href="http://gamercard.xbox.com/en-US/MyXbox/Profile?Gamertag=skflgnskjdgnsuibfsdgdsgsgdsg">skflgnskjdgnsuibfsdgdsgsgdsg</a>
+            <a href="http://gamercard.xbox.com/en-US/MyXbox/Profile?Gamertag=skflgnskjdgnsuibfsdgdsgsgdsg">
+                <img id="Gamerpic" src="http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000" alt="Xbox 360 Dashboard" title="Xbox 360 Dashboard"/>
+            </a>
+            <div class="RepContainer">
+                <label>Rep</label>
+                
+                    <div class="Star Empty"></div>
+                    <div class="Star Empty"></div>
+                    <div class="Star Empty"></div>
+                    <div class="Star Empty"></div>
+                    <div class="Star Empty"></div>
+            </div>
+            <div class="GamerscoreContainer">
+                <label></label>
+                <div id="Gamerscore">--</div>
+            </div>
+            <div id="Location"></div>
+            <div id="Motto"></div>
+            <div id="Name"></div>
+            <div id="Bio"></div>
+
+            
+            <ol id="PlayedGames" class="NoGames">
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+                <li class="Unplayed"></li>
+            
+            </ol>
+        </div>
+        
+    </body>
+</html>

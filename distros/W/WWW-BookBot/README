@@ -1,0 +1,47 @@
+WWW::BookBot version 0.12
+========================
+
+Bot to fetch web e-texts with catalog, books and chapters.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Encode
+	File::Basename
+	File::Spec::Functions
+	File::Path
+	Fcntl
+	LWP::UserAgent
+	HTTP::Request::Common
+	HTTP::Response
+	HTTP::Cookies
+	HTTP::Date
+	URI
+	Carp
+	Data::Dumper
+	POSIX
+	Getopt::Long
+
+WARNING
+
+WWW::BookBot is in pre-alpha stage. Interface may be changed latter.
+More documents are required to support extended development.
+
+BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-BookBot
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Qing-Jie Zhou (qjzhou@hotmail.com)

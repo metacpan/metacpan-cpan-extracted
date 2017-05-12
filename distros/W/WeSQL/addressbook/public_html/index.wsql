@@ -1,0 +1,39 @@
+<!-- LAYOUT listheader -->
+<!-- LAYOUT listbody -->
+
+<center>
+<h1><en>Sample WeSQL application</en><nl>Voorbeeld WeSQL applicatie</nl></h1>
+<!-- LAYOUT liststarttable1 -->
+<en 1>People Search</en><nl 1>Zoek mensen</nl>
+<!-- LAYOUT liststarttable2 -->
+<tr><td align=center colspan=2>
+<en 2>Use any of the fields to search for people in the database.<br>
+Alternatively, use the links below to get a list of all people in the database.
+</en>
+<nl 2>Gebruik de volgende velden om te zoeken naar mensen in de database.<br>
+Of gebruik één van de links hieronder om een lijst met alle mensen in de database te krijgen.
+</nl>
+</td></tr>
+<form action=jlist.wsql method=get>
+<input type=hidden name=view value=people>
+<tr>
+<td><b><en 3>First name</en><nl 3>Voornaam</nl>:</b></td>
+<td><input type=textbox name=firstname></td>
+</tr><tr>
+<td><b><en 4>Last name</en><nl 4>Familienaam</nl>:</b></td>
+<td><input type=textbox name=lastname></td>
+</tr><tr>
+<td><b><en 5>Birthday</en><nl 5>Geboortedatum</nl>:</b></td>
+<td><input type=textbox name=birthday></td>
+</tr><tr>
+<td colspan=2 align=center><input type=submit name=button value=<en 6>Search</en><nl 6>Zoeken</nl>></td>
+</tr>
+</form>
+<tr><td align=center colspan=2>
+[<a href=jform.wsql?view=person&id=new&editdest=/><en 7>Add Person</en><nl 7>Persoon toevoegen</nl></a>]
+[<a href=jlist.wsql?view=people><en 8>List People</en><nl 8>Persoonslijst</nl></a>]
+[<a href=jlist.wsql?view=addresses><en 9>List Addresses</en><nl 9>Adreslijst</nl></a>]
+</td></tr>
+</center>
+<!-- LAYOUT liststoptable -->
+<!-- LAYOUT listfooter -->

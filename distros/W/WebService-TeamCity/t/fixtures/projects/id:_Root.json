@@ -1,0 +1,358 @@
+{
+   "buildTypes" : {
+      "buildType" : [],
+      "count" : 0
+   },
+   "description" : "Contains all other projects",
+   "href" : "/httpAuth/app/rest/projects/id:_Root",
+   "id" : "_Root",
+   "name" : "<Root project>",
+   "projects" : {
+      "count" : 45,
+      "project" : [
+         {
+            "href" : "/httpAuth/app/rest/projects/id:NetCommunityProjects",
+            "id" : "NetCommunityProjects",
+            "name" : ".NET Community Projects (Sandbox)",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=NetCommunityProjects"
+         },
+         {
+            "description" : "typica & maragogype",
+            "href" : "/httpAuth/app/rest/projects/id:AmazonApiClient",
+            "id" : "AmazonApiClient",
+            "name" : "Amazon API client",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=AmazonApiClient"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:ApacheAnt",
+            "id" : "ApacheAnt",
+            "name" : "Apache Ant",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=ApacheAnt"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:ApacheIvy",
+            "id" : "ApacheIvy",
+            "name" : "Apache Ivy",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=ApacheIvy"
+         },
+         {
+            "description" : "Bundler gem (http://github.com/carlhuda/bundler.git)",
+            "href" : "/httpAuth/app/rest/projects/id:Bundler",
+            "id" : "Bundler",
+            "name" : "Bundler",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Bundler"
+         },
+         {
+            "description" : "https://github.com/checkstyle/checkstyle",
+            "href" : "/httpAuth/app/rest/projects/id:Checkstyle",
+            "id" : "Checkstyle",
+            "name" : "Checkstyle",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Checkstyle"
+         },
+         {
+            "description" : "Cucumber BDD Framework (http://cukes.info)",
+            "href" : "/httpAuth/app/rest/projects/id:Cucumber",
+            "id" : "Cucumber",
+            "name" : "Cucumber",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Cucumber"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:EasyHttpJvm",
+            "id" : "EasyHttpJvm",
+            "name" : "EasyHttp.JVM",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=EasyHttpJvm"
+         },
+         {
+            "description" : "https://biolabs.intellij.net",
+            "href" : "/httpAuth/app/rest/projects/id:Epigenome",
+            "id" : "Epigenome",
+            "name" : "Epigenome",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Epigenome"
+         },
+         {
+            "description" : "Google Web Toolkit - Trunk",
+            "href" : "/httpAuth/app/rest/projects/id:GoogleWebToolkit",
+            "id" : "GoogleWebToolkit",
+            "name" : "Google Web Toolkit",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=GoogleWebToolkit"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:GroovyOldBranch",
+            "id" : "GroovyOldBranch",
+            "name" : "Groovy (old branch)",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=GroovyOldBranch"
+         },
+         {
+            "description" : "Humanizer for the JVM",
+            "href" : "/httpAuth/app/rest/projects/id:HumanizerJvm",
+            "id" : "HumanizerJvm",
+            "name" : "HumanizerJVM",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=HumanizerJvm"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:IdeaJps",
+            "id" : "IdeaJps",
+            "name" : "IDEA JPS",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=IdeaJps"
+         },
+         {
+            "description" : "IntelliJ IDEA Community Edition",
+            "href" : "/httpAuth/app/rest/projects/id:IntelliJIdeaCe",
+            "id" : "IntelliJIdeaCe",
+            "name" : "IntelliJ IDEA CE",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=IntelliJIdeaCe"
+         },
+         {
+            "description" : "IntelliJ IDEA Community Edition",
+            "href" : "/httpAuth/app/rest/projects/id:IntelliJIdeaCe111branch117",
+            "id" : "IntelliJIdeaCe111branch117",
+            "name" : "IntelliJ IDEA CE (11.1 branch 117)",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=IntelliJIdeaCe111branch117"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:IntellijIdeaPlugins",
+            "id" : "IntellijIdeaPlugins",
+            "name" : "Intellij IDEA plugins",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=IntellijIdeaPlugins"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:IntellijPluginVerifier",
+            "id" : "IntellijPluginVerifier",
+            "name" : "Intellij Plugin Verifier",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=IntellijPluginVerifier"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:JetBrainsDependencyRetrieve",
+            "id" : "JetBrainsDependencyRetrieve",
+            "name" : "JetBrains Dependency Retrieve",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=JetBrainsDependencyRetrieve"
+         },
+         {
+            "description" : "Building JGit library",
+            "href" : "/httpAuth/app/rest/projects/id:JGit",
+            "id" : "JGit",
+            "name" : "JGit",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=JGit"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:JMock2",
+            "id" : "JMock2",
+            "name" : "JMock 2",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=JMock2"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:Joustim",
+            "id" : "Joustim",
+            "name" : "joustim",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Joustim"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:Joustsim",
+            "id" : "Joustsim",
+            "name" : "joustsim",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Joustsim"
+         },
+         {
+            "description" : "Kotlin compiler, IDE and tests",
+            "href" : "/httpAuth/app/rest/projects/id:Kotlin",
+            "id" : "Kotlin",
+            "name" : "Kotlin",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Kotlin"
+         },
+         {
+            "description" : "[home|https://github.com/nunit]",
+            "href" : "/httpAuth/app/rest/projects/id:NUnit",
+            "id" : "NUnit",
+            "name" : "NUnit",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=NUnit"
+         },
+         {
+            "description" : "http://code.google.com/p/odata4j/",
+            "href" : "/httpAuth/app/rest/projects/id:OData4j",
+            "id" : "OData4j",
+            "name" : "OData4j",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=OData4j"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:Picocontainer",
+            "id" : "Picocontainer",
+            "name" : "Picocontainer",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Picocontainer"
+         },
+         {
+            "description" : "https://github.com/fabioz/PyDev.Debugger",
+            "href" : "/httpAuth/app/rest/projects/id:PydevDebugger",
+            "id" : "PydevDebugger",
+            "name" : "Pydev.Debugger",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=PydevDebugger"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:RubyDebugGem",
+            "id" : "RubyDebugGem",
+            "name" : "Ruby-Debug Gem",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=RubyDebugGem"
+         },
+         {
+            "description" : "A project for internal tests",
+            "href" : "/httpAuth/app/rest/projects/id:Sandbox",
+            "id" : "Sandbox",
+            "name" : "Sandbox",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Sandbox"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:Scala",
+            "id" : "Scala",
+            "name" : "Scala",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Scala"
+         },
+         {
+            "description" : "Easy to use Java XMPP client library.",
+            "href" : "/httpAuth/app/rest/projects/id:Smack",
+            "id" : "Smack",
+            "name" : "Smack",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Smack"
+         },
+         {
+            "description" : "Spek - A Specification Framework",
+            "href" : "/httpAuth/app/rest/projects/id:Spek",
+            "id" : "Spek",
+            "name" : "Spek",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Spek"
+         },
+         {
+            "description" : "TeamCity Android App",
+            "href" : "/httpAuth/app/rest/projects/id:TCity",
+            "id" : "TCity",
+            "name" : "TCity",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TCity"
+         },
+         {
+            "description" : "https://confluence.jetbrains.com/display/TW/TeamCity+Plugins",
+            "href" : "/httpAuth/app/rest/projects/id:TeamCityPluginsByJetBrains",
+            "id" : "TeamCityPluginsByJetBrains",
+            "name" : "TeamCity Plugins by JetBrains",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TeamCityPluginsByJetBrains"
+         },
+         {
+            "description" : "This project shows TeamCity Rake Runner Plugin in action. See (http://confluence.jetbrains.net/display/TW/Rake+Runner)",
+            "href" : "/httpAuth/app/rest/projects/id:TeamCityRakeRunnerDemo",
+            "id" : "TeamCityRakeRunnerDemo",
+            "name" : "TeamCity Rake Runner Demo",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TeamCityRakeRunnerDemo"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:TeamCityThirdPartyPlugins",
+            "id" : "TeamCityThirdPartyPlugins",
+            "name" : "TeamCity Third-Party Plugins",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TeamCityThirdPartyPlugins"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:TestNG",
+            "id" : "TestNG",
+            "name" : "TestNG",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TestNG"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:ttorrent",
+            "id" : "ttorrent",
+            "name" : "ttorrent",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=ttorrent"
+         },
+         {
+            "description" : "Python Profiler https://github.com/vmprof/vmprof-python",
+            "href" : "/httpAuth/app/rest/projects/id:VMprofPython",
+            "id" : "VMprofPython",
+            "name" : "VMprof Python",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=VMprofPython"
+         },
+         {
+            "description" : "Simple HTTP framework in Kotlin",
+            "href" : "/httpAuth/app/rest/projects/id:Wasabi",
+            "id" : "Wasabi",
+            "name" : "Wasabi",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Wasabi"
+         },
+         {
+            "description" : "Xodus is pure Java transactional schemaless embedded database",
+            "href" : "/httpAuth/app/rest/projects/id:Xodus",
+            "id" : "Xodus",
+            "name" : "Xodus",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Xodus"
+         },
+         {
+            "href" : "/httpAuth/app/rest/projects/id:XStream",
+            "id" : "XStream",
+            "name" : "XStream",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=XStream"
+         },
+         {
+            "archived" : true,
+            "description" : "http://confluence.jetbrains.net/display/GQRY/Genome+Query",
+            "href" : "/httpAuth/app/rest/projects/id:GenomeQuery",
+            "id" : "GenomeQuery",
+            "name" : "Genome Query",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=GenomeQuery"
+         },
+         {
+            "archived" : true,
+            "href" : "/httpAuth/app/rest/projects/id:Juxy",
+            "id" : "Juxy",
+            "name" : "Juxy",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=Juxy"
+         },
+         {
+            "archived" : true,
+            "href" : "/httpAuth/app/rest/projects/id:NUnitV3",
+            "id" : "NUnitV3",
+            "name" : "NUnit v3",
+            "parentProjectId" : "_Root",
+            "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=NUnitV3"
+         }
+      ]
+   },
+   "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=_Root"
+}

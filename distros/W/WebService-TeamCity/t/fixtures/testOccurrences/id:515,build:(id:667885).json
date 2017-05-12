@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:32:30,547]   WARN - ggers.vcs.git.FetchCommandImpl - Cannot lock the ref refs/heads/master, will wait and try again \n\r\n[2016-01-13 14:32:35,548]   WARN - ggers.vcs.git.FetchCommandImpl - Remove ref lock /mnt/agent/temp/buildTmp/test-851912718/custom-dir/refs/heads/master.lock \n",
+   "duration" : 5050,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:515,build:(id:667885)",
+   "id" : "id:515,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_update_local_ref_when_it_locked(false)",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:-5532931644634976152",
+      "id" : -5532931644634976152,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_update_local_ref_when_it_locked(false)"
+   }
+}

@@ -1,0 +1,10 @@
+<%args>$article</%args>
+<div id='author'>
+<img alt='Gravatar Image' style='vertical-align:middle' src=<% Gravatar::URL::gravatar_url(
+  email  => $article->author_email,
+  rating => 'g',
+  size   => 80,
+  default => 'retro',
+) %> />
+This article contributed by: <% $article->author |h %>
+</div>

@@ -1,0 +1,82 @@
+{
+   "count" : 2,
+   "cod" : "200",
+   "list" : [
+      {
+         "sys" : {
+            "country" : "GB"
+         },
+         "dt" : 1400106519,
+         "name" : "London",
+         "main" : {
+            "grnd_level" : 1037.64,
+            "pressure" : 1037.64,
+            "sea_level" : 1047.97,
+            "temp" : 54.67,
+            "temp_min" : 54.67,
+            "temp_max" : 54.67,
+            "humidity" : 61
+         },
+         "wind" : {
+            "speed" : 3.65,
+            "deg" : 35
+         },
+         "weather" : [
+            {
+               "icon" : "04n",
+               "id" : 803,
+               "description" : "broken clouds",
+               "main" : "Clouds"
+            }
+         ],
+         "coord" : {
+            "lat" : 51.50853,
+            "lon" : -0.12574
+         },
+         "clouds" : {
+            "all" : 68
+         },
+         "id" : 2643743
+      },
+      {
+         "rain" : {
+            "3h" : 0
+         },
+         "sys" : {
+            "country" : "CA"
+         },
+         "dt" : 1400106593,
+         "name" : "London",
+         "main" : {
+            "grnd_level" : 1005.79,
+            "pressure" : 1005.79,
+            "sea_level" : 1030.02,
+            "temp" : 63.13,
+            "temp_min" : 63.13,
+            "temp_max" : 63.13,
+            "humidity" : 91
+         },
+         "wind" : {
+            "speed" : 6.89,
+            "deg" : 25.5
+         },
+         "weather" : [
+            {
+               "icon" : "04d",
+               "id" : 804,
+               "description" : "overcast clouds",
+               "main" : "Clouds"
+            }
+         ],
+         "clouds" : {
+            "all" : 92
+         },
+         "coord" : {
+            "lat" : 42.983391,
+            "lon" : -81.23304
+         },
+         "id" : 6058560
+      }
+   ],
+   "message" : "accurate"
+}

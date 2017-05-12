@@ -1,0 +1,23 @@
+<html lang="en-US">
+<head>
+<include file="include.html" head=1/>
+</head>
+<body>
+<p>
+Include PSP Test Body
+<p>
+<include file="include.txt"/>
+<perl method="include"/>
+<p>
+<include file="include.html" body=1/>
+</body>
+</html>
+__PERL__
+sub include {
+	my $s=shift();
+	my @r;
+	push @r,$s->include({ file=>'include.inc', block=>'include0' });
+	push @r,$s->include({ file=>'include.inc', block=>'include1',  
+		param=>{ hello=>'Hello World Include Library Again' }});
+	\@r;
+}

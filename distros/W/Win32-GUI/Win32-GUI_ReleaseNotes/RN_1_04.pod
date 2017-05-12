@@ -1,0 +1,354 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_04 - This is the release notes for Version 1.04 of Win32::GUI
+
+=head1 Release Date
+
+15th October, 2006.
+
+=head1 IMPORTANT INFORMATION
+
+This section details issues that are essential to understand when
+upgrading from earlier versions of Win32::GUI.
+
+=head2 Exported Constants
+
+The way that Win32::GUI exports constants has changed.  Ensure that
+you read the
+L<"Deprecated feature status"|/"Deprecated feature status">
+section of this document so that you understand the backwards
+compatibility issues.
+
+=head2 Dual-life modules
+
+This version of Win32::GUI includes the modules
+L<Win32::GUI::AxWindow|Win32::GUI::AxWindow>,
+L<Win32::GUI::DIBitmap|Win32::GUI::DIBitmap>,
+L<Win32::GUI::Grid|Win32::GUI::Grid>, and
+L<Win32::GUI::Scintilla|Win32::GUI::Scintilla>
+(originally by Laurent Rocher:
+L<http://rocherl.club.fr/Win32GUI.html>).
+
+Please uninstall any previous versions of these modules that you
+may have installed before installing this version of Win32::GUI.
+
+=head1 Summary of Changes
+
+This is a summary of changes between V1.03 and V1.04
+See the CHANGELOG file in the distribution for the
+full detail.
+
+=head2 New Features
+
+=head3 New Packages
+
+=over
+
+=item L<Win32::GUI::AxWindow|Win32::GUI::AxWindow>
+
+=item L<Win32::GUI::Constants|Win32::GUI::Constants>
+
+=item L<Win32::GUI::DIBitmap|Win32::GUI::DIBitmap>
+
+=item L<Win32::GUI::DropFiles|Win32::GUI::DropFiles>
+
+=item L<Win32::GUI::Grid|Win32::GUI::Grid>
+
+=item L<Win32::GUI::Scintilla|Win32::GUI::Scintilla>
+
+=item L<Win32::GUI::ReleaseNotes|Win32::GUI::ReleaseNotes>
+
+=back
+
+=head3 New Methods
+
+=over
+
+=item Win32::GUI
+
+L<Acceptfiles|Win32::GUI::Reference::Methods/AcceptFiles> (Tracker: 1323988),
+L<Animate|Win32::GUI::Reference::Methods/Animate> (Tracker: 1266930),
+L<ClassData|Win32::GUI::Reference::Methods/ClassData>,
+L<GetKeyState|Win32::GUI::Reference::Methods/GetKeyState>,
+L<SetWindowPos|Win32::GUI::Reference::Methods/SetWindowPos> (Tracker: 1469648).
+
+=item Win32::GUI::Region
+
+L<ExtCreateRegion|Win32::GUI::Region/ExtCreateRegion> (Tracker: 1469648),
+L<GetRegionData|Win32::GUI::Region/GetRegionData>.
+
+=item Win32::GUI::Tooltip
+
+L<AdjustRect|Win32::GUI::Tooltip/AdjustRect>,
+L<GetBubbleSize|Win32::GUI::Tooltip/GetBubbleSize>,
+L<SetTitle|Win32::GUI::Tooltip/SetTitle>.
+
+=back
+
+=head3 New Events
+
+=over
+
+=item For all Windows
+
+L<DropFiles|Win32::GUI::Reference::Events/DropFiles> (Tracker: 1323988).
+
+=back
+
+=head3 New Documentation
+
+=over
+
+=item Win32::GUI::ListBox
+
+Better documentation for the differences between
+L<SetCurSel|Win32::GUI::ListBox/SetCurSel>
+and
+L<SetSel|Win32::GUI::ListBox/SetSel> (Tracker: 1177898).
+
+=item Win32::GUI::Textfield
+
+Correct documentation for
+L<-autohscroll|Win32::GUI::Textfield/autohscroll>
+and
+L<-autovscroll|Win32::GUI::Textfield/autovscroll>.
+
+=item Win32::GUI::Tooltip
+
+Complete documentation for the Win32::GUI::Tooltip class
+
+=back
+
+=head3 Other Features
+
+=over
+
+=item Better dialog navigation for Textfields
+
+<TAB> can now be used to move out of a multi-line
+Textfield when using the
+L<-dialogui|Win32::GUI::Reference::Options/dialogui>
+option on a Window.
+
+A L<-wantreturn|Win32::GUI::Textfield/wantreturn> option
+has been added to stop the <RETURN> key firing the default
+Click event for a multi-line Textfield when using the
+L<-dialogui|Win32::GUI::Reference::Options/dialogui>
+option on a Window.  This replaces the
+previous use of C<< -addstyle => ES_WANTRETURN >>.
+
+=item Ballon tooltips for NotifyIcon
+
+The L<Win32::GUI::NotifyIcon|Win32::GUI::NotifyIcon> package
+has been re-worked.  There is now no need to use the
+L<-id|/"Deprecated feature status"> option, and balloon
+tooltips are supported on Win2k and above.
+(Tracker: 1065072)
+
+=item More options for Win32::GUI::DoEvents()
+
+It is now possible to select which messages you want to process
+with L<DoEvents|Win32::GUI::Reference::Events/DoEvents>.
+
+=item More ways to create cursors, icons and bitmaps
+
+The
+L<Cursor|Win32::GUI::Cursor/new>,
+L<Icon|Win32::GUI::Icon/new> and
+L<Bitmap|Win32::GUI::Bitmap/new>
+constructors have been enhanced to allow creation
+from resources, including the "standard" windows
+resources.  See the F<standard_images.pl> sample to
+browse the standard resources.
+
+=item Easier way to browse and run the demos
+
+A new script F<win32-gui-demos> will be installed in
+your perl bin directory.  You should be able to get a
+full list of the sample code distributed with
+Win32::GUI, view the source and run the demos by
+typing C<win32-gui-demos> at your command prompt.
+
+=item Better Splitter implementation
+
+The L<Win32::GUI::Splitter|Win32::GUI::Splitter>
+implementation has been re-written to provide
+more robust operation.  The splitter bar can no
+longer be moved outside the parent window, which
+used to result in drawing problems, and the bar itself
+is now more nicely drawn.  (Tracker:1363141)
+
+The L<-background|Win32::GUI::Reference::Options/background>
+option now works for splitter windows.
+
+=item Better behaviour from LoadLibrary
+
+The L<Win32::GUI::LoadLibrary()|Win32::GUI::Reference::Methods/LoadLibrary>
+function has been enhanced so that it converts any passed
+path to a Win32 representation before trying to use it.
+Specifically this means that slashes are canonicalised to 'C<\>',
+and under Cygwin, cygwin style paths are converted to
+Win32 paths.
+
+=item Complete re-work of Tooltip class
+
+The L<Win32::GUI::Tooltip|Win32::GUI::Tooltip>
+implementation has been re-worked to allow
+all the features to be used, and now there
+should be no crashes with many of the methods
+which had been incorrectly implemented.  The
+new implementation should be backwards compatible
+with what was there before, but read the documentation
+to find out about all the new features you can use.
+
+The constructor has some new options C<-nofade>, C<-noamimate>
+and the C<-balloon> option is documented.  C<-balloon> option
+along with the new L<SetTitle|Win32::GUI::Tooltip/SetTitle>
+method allows you to make use of balloon tooltips.
+
+The events (NeedText, Pop, Show) now have a second parameter
+allowing you to correctly determine if the first parameter is
+a window handle or a tool id.
+
+=back
+
+=head2 Bug Fixes
+
+=head3 Reported Bugs
+
+=over
+
+=item Fix some crashes (Trackers 1243378 and 1248578)
+
+=item Fix some memory leaks (Tracker: 1201190)
+
+=item Fix drawing problems with coloured backgrounds (Tracker:1363141)
+
+=back
+
+=head3 Other Bugs
+
+=over
+
+=item -background and -foreground options now work for RichEdit windows
+
+=item The SendMessageTimout implementation now matches the documentation
+
+=item -truncate option now works correctly for Label windows
+
+=item SetTabStops() method now works for ListBox windows
+
+=item The demo code all works
+
+=item Fix memory leak in Win32::GUI::DIBitmap::AlphaCopyToDC method
+
+=back
+
+=head1 Deprecated feature status
+
+This section documents features that have been deprecated
+in this release, or in recent releases, and feature that
+will be deprecated in up-coming releases.
+
+=head2 Win32::GUI::Constants
+
+The introduction of Win32::GUI::Constants means that we now have access
+to a very large number of constants, so the current behaviour of Win32::GUI
+to export all constants to the calling namespace by default is no longer
+appropriate. So, a bare
+
+  use Win32::GUI;
+
+now generates a warning that the old default behaviour will be deprecated -
+although the export behaviour of Win32::GUI 1.03 is maintained except for this
+warning.
+
+To eliminate this warning and correct your script, do one of the following:
+
+=over
+
+=item If you don't need any constants, use the empty list:
+
+  use Win32::GUI();
+
+=item If you need some constants, name them explicitly:
+
+  use Win32::GUI qw(ES_WANTRETURN CW_USEDEFAULT); # Two constants exported
+  use Win32::GUI qw(/^MB_/);   # Export all constants starting with MB_
+
+=back
+
+See the L<Win32::GUI::Constants|Win32::GUI::Constants> documentation
+for the full allowable syntax.
+
+You are advised to fix your scripts now, as the next version will stop
+exporting any constants by default.
+
+Although not advised, you can suppress the warnings by turning deprecated
+warnings off:
+
+  no warnings 'deprecated';
+
+Additionally accessing constants from within the Win32::GUI namespace
+is deprecated.  I.e.
+
+   -addstyle => Win32::GUI::WS_BORDER,
+
+will generate a warning with this release, and will stop working with
+the next release.  Use one of the following methods instead:
+
+=over
+
+=item use the Win32::GUI::Constants namespace instead
+
+  -addstyle => Win32::GUI::Constants::WS_BORDER(),
+
+=item use any other namespace you fancy
+
+  use Win32::GUI qw(-exportpkg => A::B -autoload);
+  ...
+  -addstyle => A::B::WS_BORDER(),
+
+=item maintain compatibility of existing scripts
+
+  use Win32::GUI::Constants qw(-exportpkg => Win32::GUI :compatibility_win32_gui);
+  ...
+  -addstyle => Win32::GUI::WS_BORDER,
+
+=back
+
+=head2 Win32::GUI::NotifyIcon
+
+It is no longer necessary to use the '-id' option to any of the
+Win32::GUI::NotifyIcon methods.  The ID is now entirely handled
+internally.  You will receive deprecated warnings if you use it.
+
+In particular, removing Icons from the system tray should be done
+using
+
+  $NI->Remove();
+
+and not by the (now deprecated)
+
+  $NI->Delete(-id => 1);
+
+=head2 Removal of GUI:: namespace
+
+For at least the last 6 years the Win32::GUI namespace has been
+aliased to the GUI namespace for backwards compatibility with
+very early scripts.  This aliasing has been removed, and any
+remaining scripts will need updating.
+
+=head1 Contributors to this release
+
+=over
+
+=item Robert May
+
+=item Reini Urban
+
+=item Jeremy White
+
+=back
+
+=cut

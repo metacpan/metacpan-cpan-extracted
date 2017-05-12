@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Sync>
+  <Collections>
+    <Collection>
+      <Class>Contacts</Class>
+      <SyncKey>2</SyncKey>
+      <CollectionId>2</CollectionId>
+      <Status>1</Status>
+      <Commands>
+        <Add>
+          <ServerId>2:1</ServerId>
+          <ApplicationData>
+            <Body>
+              <Type>1</Type>
+              <EstimatedDataSize>0</EstimatedDataSize>
+              <Truncated>1</Truncated>
+            </Body>
+            <FileAs>Hall, Don</FileAs>
+            <FirstName>Don</FirstName>
+            <LastName>Hall</LastName>
+            <NativeBodyType>1</NativeBodyType>
+          </ApplicationData>
+        </Add>
+      </Commands>
+    </Collection>
+  </Collections>
+</Sync>

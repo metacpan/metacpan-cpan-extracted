@@ -1,0 +1,41 @@
+A Kwiki Welcome
+===============
+
+Welcome to Kwiki. Obviously you have installed a kwiki. Good job. If it's not
+working properly, check the Installation Notes below. Remember that the
+primary source of Kwiki help is:
+
+    http://www.kwiki.org
+
+Cheers, Brian Ingerson (That Kwiki Guy)
+
+
+Kwiki Installation Notes
+========================
+
+If you are running an Apache web server, you'll want to add a section like
+this to your httpd.conf file:
+
+    Alias /kwiki/ <%PWD%>/
+    <Directory <%PWD%>/>
+        Order allow,deny
+        Allow from all
+        AllowOverride All
+        Options ExecCGI
+        AddHandler cgi-script .cgi
+        DirectoryIndex index.cgi
+    </Directory>
+
+Make all your overrides in:
+
+    config.yaml
+    plugins
+
+Don't touch the other files unless you know what you are doing.
+
+Kwiki Plugin Installation Notes
+===============================
+
+1) Download and install plugins from CPAN
+2) Add the new module names to the 'plugins' config file
+3) Type 'kwiki -update'

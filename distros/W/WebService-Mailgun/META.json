@@ -1,0 +1,77 @@
+{
+   "abstract" : "API client for Mailgun (L<https://mailgun.com/>)",
+   "author" : [
+      "Kan Fushihara <kan.fushihara@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Mailgun",
+   "no_index" : {
+      "file" : [
+         "Dockerfile"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::XS" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "String::Random" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Time::Piece" : "0",
+            "Time::Seconds" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Mailgun" : {
+         "file" : "lib/WebService/Mailgun.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kan/p5-web-service-mailgun/issues"
+      },
+      "homepage" : "https://github.com/kan/p5-web-service-mailgun",
+      "repository" : {
+         "url" : "git://github.com/kan/p5-web-service-mailgun.git",
+         "web" : "https://github.com/kan/p5-web-service-mailgun"
+      }
+   },
+   "version" : "0.06"
+}

@@ -1,0 +1,19 @@
+Changes
+CpuUsage.xs
+Makefile.PL
+MANIFEST
+StdAfx.h
+cpuUsage.h
+ppport.h
+README
+test.pl
+t/Win32-SystemInfo-CpuUsage.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Win32/SystemInfo/CpuUsage.pm
+exe/cpuUsage.c
+exe/cpuUsage.dsp
+exe/cpuUsage.dsw
+exe/StdAfx.cpp
+exe/StdAfx.h
+META.yml                                 Module meta-data (added by MakeMaker)

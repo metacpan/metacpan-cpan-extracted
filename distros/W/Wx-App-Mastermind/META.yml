@@ -1,0 +1,50 @@
+---
+name: Wx-App-Mastermind
+version: 0.02
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: a nontrivial example of wxPerl threads
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0.27
+  Class::Publisher: 0.02
+  Games::Mastermind: 0.01
+  Games::Mastermind::Solver::BruteForce: 0.02
+  Thread::Queue::Any::Monitored: 0.07
+  Wx: 0.56
+provides:
+  Wx::App::Mastermind:
+    file: lib/Wx/App/Mastermind.pm
+    version: 0.02
+  Wx::App::Mastermind::Board:
+    file: lib/Wx/App/Mastermind/Board.pm
+  Wx::App::Mastermind::Board::Editor:
+    file: lib/Wx/App/Mastermind/Board/Editor.pm
+  Wx::App::Mastermind::Board::Peg:
+    file: lib/Wx/App/Mastermind/Board/Peg.pm
+  Wx::App::Mastermind::Board::PegStrip:
+    file: lib/Wx/App/Mastermind/Board/PegStrip.pm
+  Wx::App::Mastermind::Player:
+    file: lib/Wx/App/Mastermind/Player.pm
+  Wx::App::Mastermind::Player::Computer:
+    file: lib/Wx/App/Mastermind/Player/Computer.pm
+  Wx::App::Mastermind::Player::ComputerListener:
+    file: lib/Wx/App/Mastermind/Player/Computer.pm
+  Wx::App::Mastermind::Player::Human:
+    file: lib/Wx/App/Mastermind/Player/Human.pm
+  Wx::App::Mastermind::Player::HumanListener:
+    file: lib/Wx/App/Mastermind/Player/Human.pm
+  Wx::Perl::Thread::ClassPublisher:
+    file: lib/Wx/Perl/Thread/ClassPublisher.pm
+  Wx::Perl::Thread::Listener:
+    file: lib/Wx/Perl/Thread/Listener.pm
+  Wx::Perl::Thread::Object:
+    file: lib/Wx/Perl/Thread/Object.pm
+  Wx::Perl::Thread::Object::Proxy:
+    file: lib/Wx/Perl/Thread/Object.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

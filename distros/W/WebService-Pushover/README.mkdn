@@ -1,0 +1,240 @@
+# NAME
+
+WebService::Pushover - interface to Pushover API
+
+# VERSION
+
+This document describes WebService::Pushover version 1.0.0.
+
+# SYNOPSIS
+
+    use WebService::Pushover;
+
+    my $push = WebService::Pushover->new(
+        user_token => 'PUSHOVER USER TOKEN',
+        api_token  => 'PUSHOVER API TOKEN',
+    ) or die( "Unable to instantiate WebService::Pushover.\n" );
+
+    my %params = (
+        message  => 'test test test',
+        priority => 0,
+    );
+
+    my $status = $push->message( %params );
+
+# DESCRIPTION
+
+This module provides a Perl wrapper around the Pushover
+( [http://pushover.net](http://pushover.net) ) RESTful API.  You'll need to register with
+Pushover to obtain an API token for yourself and for your application
+before you'll be able to do anything with this module.
+
+# INTERFACE
+
+- new(_%params_)
+
+    Creates an object that allows for interaction with Pushover. The following
+    are valid arguments; all are optional:
+
+    - base\_url **OPTIONAL**
+
+        Sets the base URL for the API to connect to. Defaults to [http://api.pushover.net](http://api.pushover.net)
+
+    - user\_token **OPTIONAL**
+
+        The Pushover user token, obtained by registering at [http://pushover.net](http://pushover.net).
+        If specified, will be used as a default in any call that requires a user token.
+
+    - api\_token **OPTIONAL**
+
+        The Pushover application token, obtained by registering at [http://pushover.net/apps](http://pushover.net/apps).
+        If specified, will be used as a default in any call that requires an API token.
+
+    - debug **OPTIONAL**
+
+        Set this to a true value in order to enable tracing of API call operations.
+
+- debug()
+
+    _debug()_ returns 1 if debugging is enabled, and 0 otherwise.
+
+- message(_%params_)
+
+    _message()_ sends a message to Pushover and returns a scalar reference
+    representation of the message status.  The following are valid parameters:
+
+    - token **OPTIONAL**
+
+        The Pushover application token.
+        If not specified, the `api_token` specified in `new` will be used.
+
+    - user **OPTIONAL**
+
+        The Pushover user token.
+        If not specified, the `user_token` specified in `new` will be used.
+
+    - device **OPTIONAL**
+
+        The Pushover device name; if not supplied, the user will be validated if at
+        least one device is registered to that user.
+
+    - title **OPTIONAL**
+
+        A string that will appear as the title of the message; if not supplied, the
+        name of the application registered to the application token will appear.
+
+    - message **REQUIRED**
+
+        A string that will appear as the body of the message.
+
+    - timestamp **OPTIONAL**
+
+        The desired message timestamp, in Unix epoch seconds.
+
+    - priority **OPTIONAL**
+
+        Set this value to "2" to mark the message as emergency priority, "1" to mark
+        the message as high priority, set it to "-1" to mark the message as low
+        priority, or set it to "0" or leave it unset for standard priority.
+
+    - retry **OPTIONAL**
+
+        You must pass this parameter when sending messages at emergency priority.  Set
+        this value to the number of seconds before Pushover tries again to obtain
+        confirmation of message receipt.
+
+    - expire **OPTIONAL**
+
+        You must pass this parameter when sending messages at emergency priority.  Set
+        this value to the number of seconds before Pushover stops trying to obtain
+        confirmation of message receipt.
+
+    - url **OPTIONAL**
+
+        A string that will be attached to the message as a supplementary URL.
+
+    - url\_title **OPTIONAL**
+
+        A string that will be displayed as the title of any supplementary URL.
+
+    - sound **OPTIONAL**
+
+        Select a sound to be associated with this notification.  Check the Pushover API
+        documentation for valid values.
+
+- user(_%params_)
+
+    _user()_ sends an application token and a user token to Pushover and
+    returns a scalar reference representation of the validity of those tokens.  The
+    following are valid parameters:
+
+    - token **OPTIONAL**
+
+        The Pushover application token.
+        If not specified, the `api_token` specified in `new` will be used.
+
+    - user **OPTIONAL**
+
+        The Pushover user token.
+        If not specified, the `user_token` specified in `new` will be used.
+
+    - device **OPTIONAL**
+
+        The Pushover device name; if not supplied, the message will go to all devices
+        registered to the user token.
+
+- receipt(_%params_)
+
+    _receipt()_ sends an application token and a receipt token to Pushover and
+    returns a scalar reference representation of the confirmation status of the
+    notification associated with the receipt.  The following are valid parameters:
+
+    - token **OPTIONAL**
+
+        The Pushover application token.
+        If not specified, the `api_token` specified in `new` will be used.
+
+    - receipt **REQUIRED**
+
+        The Pushover receipt token, obtained by parsing the output returned after
+        sending a message with emergency priority.
+
+- sounds(_%params_)
+
+    _sounds()_ sends an application token to Pushover and returns a hash reference
+    listing the available sounds (suitable for passing to the _sound_ parameter of
+    the _message()_.  The following are valid parameters:
+
+    - token **OPTIONAL**
+
+        The Pushover application token.
+        If not specified, the `api_token` specified in `new` will be used.
+
+## DEPRECATED METHODS
+
+The following methods are depreated, and will be removed in a future
+release. They remain for now to provide backwards compatibility.
+
+- push(_%params_)
+
+    _push()_ is a **DEPRECATED** alias for _message()_.
+
+- tokens(_%params_)
+
+    _tokens()_ is a **DEPRECATED** alias for _user()_.
+
+# DIAGNOSTICS
+
+Inspect the value returned by any method, which will be a Perl data structure
+parsed from the JSON or XML response returned by the Pushover API.
+
+# DEPENDENCIES
+
+- [DateTime](https://metacpan.org/pod/DateTime)
+- [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime::Format::Strptime)
+- [Moo](https://metacpan.org/pod/Moo)
+- [WebService::Simple](https://metacpan.org/pod/WebService::Simple)
+- [WebService::Simple::Parser::JSON](https://metacpan.org/pod/WebService::Simple::Parser::JSON)
+- [Params::Validate](https://metacpan.org/pod/Params::Validate)
+- [Readonly](https://metacpan.org/pod/Readonly)
+- [URI](https://metacpan.org/pod/URI)
+
+# BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at [https://github.com/hakamadare/webservice-pushover/issues](https://github.com/hakamadare/webservice-pushover/issues).
+
+# AUTHOR
+
+Steve Huff  `<shuff@cpan.org>`
+
+# LICENCE AND COPYRIGHT
+
+Copyright (c) 2012, Steve Huff `<shuff@cpan.org>`. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See [perlartistic](https://metacpan.org/pod/perlartistic).
+
+# DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

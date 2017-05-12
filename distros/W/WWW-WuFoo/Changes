@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::WuFoo.
+
+0.01  Fri Nov 23 17:31:10 2012
+	- original version; created by h2xs 1.23 with options
+		-XAn WWW::WuFoo
+

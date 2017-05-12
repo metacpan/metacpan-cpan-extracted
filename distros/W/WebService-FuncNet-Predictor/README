@@ -1,0 +1,49 @@
+
+WebService::FuncNet::Predictor - Interface to FuncNet prediction webservices
+
+    v0.01 - first release under this name (previously WebService::Cath::FuncNet)
+    
+    See http://funcnet.eu/ for more information
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+I've pulled the following from the pre-requisites. It may looks like a lot, but 
+IMO you should have all these anyway :)
+
+    Test::More
+    Moose
+    Moose::Util::TypeConstraints
+    XML::Compile::WSDL11
+    XML::Compile::Transport::SOAPHTTP
+    XML::Compile::Schema
+    URI
+    LWP::UserAgent
+    File::Temp
+    Readonly
+    Log::Log4perl
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Ian Sillitoe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

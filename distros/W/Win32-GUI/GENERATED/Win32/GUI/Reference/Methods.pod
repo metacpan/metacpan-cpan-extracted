@@ -1,0 +1,2190 @@
+
+=head1 NAME
+
+Win32::GUI::Reference::Methods - Common Methods
+
+=head1 DESCRIPTION
+
+The Win32::GUI package defines a set of methods that apply to most windows and
+controls. Some of the methods are applicable to resources. See the individual
+method documentation for more details.
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AbsLeft
+
+B<AbsLeft([LEFT])>
+
+Gets or sets the absolute left (screen) co-ordinate of a window.
+
+See also L<Left()|Win32::GUI::Reference::Methods/Left>
+See also L<Move()|Win32::GUI::Reference::Methods/Move>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AbsTop
+
+B<AbsTop([TOP])>
+
+Gets or sets the absolute top (screen) co-ordinate of a window.
+
+See also L<Top()|Win32::GUI::Reference::Methods/Top>
+See also L<Move()|Win32::GUI::Reference::Methods/Move>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AcceptFiles
+
+B<AcceptFiles([FLAG])>
+
+Gets/sets the L<-acceptfiles|Win32::GUI::Reference::Options/acceptfiles>
+options on a window.  If C<FLAG> is not provided, returns the current
+state.  If FLAG is provided it sets or unsets the state, returning the
+previous state.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Animate
+
+B<Animate(%OPTIONS)>
+
+Apply special effects when showing or hiding a window.  Used instead of
+L<Show()|Win32::GUI::Reference::Methods/Show> or
+L<Hide()|Win32::GUI::Reference::Methods/Hide>.
+
+OPTIONS can take the following values:
+
+  -show      => (0|1)                             default: 1
+    Hide(0) or Show(1) the window
+
+  -activate  => (0|1)                             default: 0
+    Activate the window.  Ignored if hiding the
+    window
+
+  -animation => (roll|slide|blend|center)         default: 'roll'
+    Animation type:
+        roll:   use roll animation
+        slide:  use slide animation
+        blend:  use a fade effect.  Top-level
+                windows only
+        center: expand out if showing, collapse
+                in when hiding
+
+  -time      => time                              default: 200
+    Animation time in milli-seconds
+
+  -direction => (lr|tlbr|tb|trbl|rl|brtl|bt|bltr) default: 'lr'
+    Animation direction (l=left, r=right, t=top, b=bottom).
+    Ignored for animation types blend and center
+
+Returns a true value on success or a false value on failure
+
+NOTE: blend animation does not work on Win98.  It is recomended
+that you always check the return value from this function and
+issue a suitable Show() or Hide() on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ArrangeIconicWindows
+
+B<ArrangeIconicWindows()>
+
+Arranges all the minimized child windows of the specified parent window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AttachThreadInput
+
+B<AttachThreadInput(FROM, TO, [FLAG])>
+
+If you have multiple windows running in different threads, this function
+allows you to attach one thread's input processor to a different thread.
+
+For example, you can redirect thread A's input to thread B, and then
+call SetFocus on an object running in thread B to set the keyboard focus
+to that object. You would not normally be able to do this.
+
+B<FROM> and B<TO> should be thread IDs. B<FLAG> should be non-zero to attach the
+threads (the default operation if B<FLAG> is not specified), or zero to
+detach the threads.
+
+see also L<GetWindowThreadProcessId()|Win32::GUI::Reference::Methods/GetWindowThreadProcessId>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BringWindowToTop
+
+B<BringWindowToTop()>
+
+Brings a window to the foreground (on top of other windows). This does
+not make the window "always on top". If the window is already on top,
+it is activated. If the window is a child window, the top-level
+parent window associated with the child window is activated.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 BrowseForFolder
+
+B<BrowseForFolder(%OPTIONS)>
+
+Displays the standard "Browse For Folder" dialog box. Returns the
+selected item's name, or undef if no item was selected or an error
+occurred.
+
+Allowed B<%OPTIONS> are:
+
+ -title => STRING
+     the title for the dialog
+ -computeronly => 0/1 (default 0)
+     only enable computers to be selected
+ -domainonly => 0/1 (default 0)
+     only enable computers in the current domain or workgroup
+ -driveonly => 0/1 (default 0)
+     only enable drives to be selected
+ -editbox => 0/1 (default 0)
+     if 1, the dialog will include an edit field in which
+     the user can type the name of an item
+ -folderonly => 0/1 (default 0)
+     only enable folders to be selected
+ -includefiles => 0/1 (default 0)
+     the list will include files as well folders
+ -newui => 0/1 (default 0)
+     use the "new" user interface (which has a "New folder" button)
+ -nonewfolder => 0/1 (default 0)
+     hides the "New folder" button (only meaningful with -newui => 1)
+ -owner => WINDOW
+     A Win32::GUI::Window or Win32::GUI::DialogBox object specifiying the
+     owner window for the dialog box
+ -printeronly => 0/1 (default 0)
+     only enable printers to be selected
+ -directory => PATH
+     the default start directory for browsing
+ -root => PATH or CONSTANT
+     the root directory for browsing; this can be either a
+     path or one of the following constants (minimum operating systems or
+     Internet Explorer versions that support the constant are shown in
+     square brackets. NT denotes Windows NT 4.0, Windows 2000, XP, etc.):
+
+      CSIDL_FLAG_CREATE (0x8000)
+          [2000/ME] Combining this with any of the constants below will create the folder if it does not already exist.
+      CSIDL_ADMINTOOLS (0x0030)
+          [2000/ME] Administrative Tools directory for current user
+      CSIDL_ALTSTARTUP (0x001d)
+          [All] Non-localized Startup directory in the Start menu for current user
+      CSIDL_APPDATA (0x001a)
+          [IE4] Application data directory for current user
+      CSIDL_BITBUCKET (0x000a)
+          [All] Recycle Bin
+      CSIDL_CDBURN_AREA (0x003b)
+          [XP] Windows XP directory for files that will be burned to CD
+      CSIDL_COMMON_ADMINTOOLS (0x002f)
+          [2000/ME] Administrative Tools directory for all users
+      CSIDL_COMMON_ALTSTARTUP (0x001e)
+          [All] Non-localized Startup directory in the Start menu for all users
+      CSIDL_COMMON_APPDATA (0x0023)
+          [2000/ME] Application data directory for all users
+      CSIDL_COMMON_DESKTOPDIRECTORY (0x0019)
+          [NT] Desktop directory for all users
+      CSIDL_COMMON_DOCUMENTS (0x002e)
+          [IE4] My Documents directory for all users
+      CSIDL_COMMON_FAVORITES (0x001f)
+          [NT] Favorites directory for all users
+      CSIDL_COMMON_MUSIC (0x0035)
+          [XP] Music directory for all users
+      CSIDL_COMMON_PICTURES (0x0036)
+          [XP] Image directory for all users
+      CSIDL_COMMON_PROGRAMS (0x0017)
+          [NT] Start menu "Programs" directory for all users
+      CSIDL_COMMON_STARTMENU (0x0016)
+          [NT] Start menu root directory for all users
+      CSIDL_COMMON_STARTUP (0x0018)
+          [NT] Start menu Startup directory for all users
+      CSIDL_COMMON_TEMPLATES (0x002d)
+          [NT] Document templates directory for all users
+      CSIDL_COMMON_VIDEO (0x0037)
+          [XP] Video directory for all users
+      CSIDL_CONTROLS (0x0003)
+          [All] Control Panel applets
+      CSIDL_COOKIES (0x0021)
+          [All] Cookies directory
+      CSIDL_DESKTOP (0x0000)
+          [All] Namespace root (shown as "Desktop", but is parent to my computer, control panel, my documents, etc.)
+      CSIDL_DESKTOPDIRECTORY (0x0010)
+          [All] Desktop directory (for desktop icons, folders, etc.) for the current user
+      CSIDL_DRIVES (0x0011)
+          [All] My Computer (drives and mapped network drives)
+      CSIDL_FAVORITES (0x0006)
+          [All] Favorites directory for the current user
+      CSIDL_FONTS (0x0014)
+          [All] Fonts directory
+      CSIDL_HISTORY (0x0022)
+          [All] Internet Explorer history items for the current user
+      CSIDL_INTERNET (0x0001)
+          [All] Internet root
+      CSIDL_INTERNET_CACHE (0x0020)
+          [IE4] Temporary Internet Files directory for the current user
+      CSIDL_LOCAL_APPDATA (0x001c)
+          [2000/ME] Local (non-roaming) application data directory for the current user
+      CSIDL_MYMUSIC (0x000d)
+          [All] My Music directory for the current user
+      CSIDL_MYPICTURES (0x0027)
+          [2000/ME] Image directory for the current user
+      CSIDL_MYVIDEO (0x000e)
+          [XP] Video directory for the current user
+      CSIDL_NETHOOD (0x0013)
+          [All] My Network Places directory for the current user
+      CSIDL_NETWORK (0x0012)
+          [All] Root of network namespace (Network Neighbourhood)
+      CSIDL_PERSONAL (0x0005)
+          [All] My Documents directory for the current user
+      CSIDL_PRINTERS (0x0004)
+          [All] List of installed printers
+      CSIDL_PRINTHOOD (0x001b)
+          [All] Network printers directory for the current user
+      CSIDL_PROFILE (0x0028)
+          [2000/ME] The current user's profile directory
+      CSIDL_PROFILES (0x003e)
+          [XP] The directory that holds user profiles (see CSDIL_PROFILE)
+      CSIDL_PROGRAM_FILES (0x0026)
+          [2000/ME] Program Files directory
+      CSIDL_PROGRAM_FILES_COMMON (0x002b)
+          [2000] Directory for files that are used by several applications. Usually Program Files\Common
+      CSIDL_PROGRAMS (0x0002)
+          [All] Start menu "Programs" directory for the current user
+      CSIDL_RECENT (0x0008)
+          [All] Recent Documents directory for the current user
+      CSIDL_SENDTO (0x0009)
+          [All] "Send To" directory for the current user
+      CSIDL_STARTMENU (0x000b)
+          [All] Start Menu root for the current user
+      CSIDL_STARTUP (0x0007)
+          [All] Start Menu "Startup" folder for the current user
+      CSIDL_SYSTEM (0x0025)
+          [2000/ME] System directory. Usually \Windows\System32
+      CSIDL_TEMPLATES (0x0015)
+          [All] Document templates directory for the current user
+      CSIDL_WINDOWS (0x0024)
+          [2000/ME] Windows root directory, can also be accessed via the environment variables %windir% or %SYSTEMROOT%.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Caption
+
+B<Caption([TEXT])>
+
+See L<Text()|Win32::GUI::Reference::Methods/Text>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change(HANDLE, %OPTIONS)>
+
+Change most of the options used when the object was created.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeCursor
+
+B<ChangeCursor(CURSOR)>
+
+Changes the default cursor for a window to B<CURSOR> (a Win32::GUI::Cursor
+object). Returns the handle of the previous default cursor.
+
+see also new Win32::GUI::Cursor
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeIcon
+
+B<ChangeIcon(ICON)>
+
+Changes the default icon for a window to B<ICON> (a Win32::GUI::Icon
+object). Returns the handle of the previous default icon.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChangeSmallIcon
+
+B<ChangeSmallIcon(ICON)>
+
+Changes the default small icon for a window to B<ICON> (a Win32::GUI::Icon
+object). Returns the handle of the previous default small icon.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChooseColor
+
+B<ChooseColor(%OPTIONS)>
+
+Allowed B<%OPTIONS> are:
+
+ -owner => WINDOW
+     Identifies the window that owns the dialog box.
+ -color => COLOR
+     Initial color selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ChooseFont
+
+B<ChooseFont(%OPTIONS)>
+
+Allowed B<%OPTIONS> are:
+
+ -owner => WINDOW
+     Identifies the window that owns the dialog box.
+ -pointsize
+ -height
+ -width
+ -escapement
+ -orientation
+ -weight
+ -bold
+ -italic
+ -underline
+ -strikeout
+ -charset
+ -outputprecision
+ -clipprecision
+ -quality
+ -family
+ -name
+ -face (== -name)
+ -color
+ -ttonly
+ -fixedonly
+ -effects
+ -script
+ -minsize
+ -maxsize
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ClassData
+
+B<ClassData([value])>
+
+Sets or reads class instance data associated with the window or control.
+
+ my $data=$win->ClassData();#retrieve any data associated with the window
+ $win->ClassData('some string');#associate data to the window
+
+Class instance data can be any perl scalar or reference.
+
+When reading returns the stored instance data, or undef if nothing is
+stored.
+When setting returns a true value if the instance data is stored
+correctly, or a false value on error
+
+Class instance data is private to the package that sets the data.  I.e. it
+is only accessable as a method call from within the package that sets the
+data, not from a sub-class.  So, if you wish to make data stored this way
+accessible to sub-classes you must proved assessor methods in your package.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ClientToScreen
+
+B<ClientToScreen(X, Y)>
+
+Converts client-area co-ordinates to screen co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ClipCursor
+
+B<ClipCursor([LEFT, TOP, RIGHT, BOTTOM])>
+
+Confines the cursor to the specified screen rectangle. Call it without
+parameters to release the cursor. Returns nonzero on success
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseEnhMetaFile
+
+B<CloseEnhMetaFile(HANDLE)>
+
+Closes an enhanced-metafile device context and returns a handle that identifies an enhanced-format metafile.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CloseWindow
+
+B<CloseWindow()>
+
+Minimizes a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CommDlgExtendedError
+
+B<CommDlgExtendedError()>
+
+Returns the common dialog library error code.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 CreateEnhMetaFile
+
+B<CreateEnhMetaFile(FILENAME, [DESCRIPTION])>
+
+Creates a device context for an enhanced-format metafile.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteEnhMetaFile
+
+B<DeleteEnhMetaFile(HANDLE)>
+
+Deletes an enhanced-format metafile or an enhanced-format metafile handle.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Dialog
+
+B<Dialog()>
+
+Enter the GUI dialog phase: the script halts, the user can interact with
+the created windows and events subroutines are triggered as necessary;
+note that this function must be called without ANY parameter or
+instantiation (eg. don't call it as method of a created object):
+
+  Win32::GUI::Dialog(); # correct
+  $Window->Dialog();    # !!!WRONG!!!
+
+Win32::GUI::Dialog(); does a similar thing to
+
+   while(Win32::GUI::DoEvents() != -1) {};
+
+See also L<DoEvents()|Win32::GUI::Reference::Methods/DoEvents>
+See also L<DoModal()|Win32::GUI::Reference::Methods/DoModal>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DialogUI
+
+B<DialogUI(HANDLE, [FLAG])>
+
+Gets or sets whether a window accepts dialog-box style input (tab between
+fields, accelerator keys etc). B<FLAG> should be 1 to enable this functionality,
+or 0 to disable it.
+
+See also L<new Win32::GUI::DialogBox()|Win32::GUI::DialogBox/new>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Disable
+
+B<Disable()>
+
+Disables a window or control. Disabled widgets cannot be interacted with,
+and often change appearance to indicate that they are disabled. This is
+the same as Enable(0).
+
+See also L<Enable()|Win32::GUI::Reference::Methods/Enable>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DoEvents
+
+B<DoEvents(hwnd=NULL,wMsgFilterMin=0,wMsgFilterMax=0,wRemoveMsg=PM_REMOVE)>
+
+Performs all pending GUI events and returns the status. If DoEvents()
+returns -1, your GUI has normally terminated.
+
+You can call $window->DoEvents() to process pending events relating to a
+specific window, or Win32::GUI::DoEvents() to process pending events for all
+windows.
+
+see also L<Dialog()|Win32::GUI::Reference::Methods/Dialog>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DoModal
+
+B<DoModal([DISABLE_ALL=FALSE])>
+
+Enter the GUI dialog phase for a specific window: the script halts, the
+user can interact with the window, events subroutines are triggered as
+necessary, but no other windows in the application will accept input.
+DoModal() also brings the window on top of all other windows.
+
+B<DISABLE_ALL> flag can set for deactivate all top window and not only parent/active window.
+
+The correct usage is:
+
+  $window->DoModal(1);
+
+To exit from the GUI dialog phase of the modal window, return -1 from the event handler.
+
+See also L<Dialog()|Win32::GUI::Reference::Methods/Dialog>
+See also L<DoEvents()|Win32::GUI::Reference::Methods/DoEvents>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DrawMenuBar
+
+B<DrawMenuBar()>
+
+Forces redrawing of the menu bar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Enable
+
+B<Enable([FLAG])>
+
+Enables (or disables) a window or control. Controls do not accept input
+when they are disabled.
+
+B<FLAG> should be 0 to disable the control (the same as calling Disable() on
+a control), or 1 to enable it.
+
+See also L<Disable()|Win32::GUI::Reference::Methods/Disable>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 EnumMyWindows
+
+B<EnumMyWindows()>
+
+Returns a list of top-level window handles created by your application.
+
+Usage:
+
+   @windows = Win32::GUI::EnumMyWindows();
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindWindow
+
+B<FindWindow(CLASSNAME, WINDOWNAME)>
+
+Returns the handle of the window whose class name and window name match
+the specified strings; both strings can be empty. Note that the function
+does not search child windows, only top level windows.
+
+If no matching windows is found, the return value is zero.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FreeLibrary
+
+B<FreeLibrary(LIBRARY)>
+
+The FreeLibrary function decrements the reference count of the loaded dynamic-link library (DLL) module.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetAbsClientRect
+
+B<GetAbsClientRect()>
+
+Gets the absolute screen co-ordinates of the client rectangle and returns
+an array of left, top, right, and bottom co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetActiveWindow
+
+B<GetActiveWindow()>
+
+Returns the handle of the active window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetAsyncKeyState
+
+B<GetAsyncKeyState(keyCode)>
+
+Retrieve the status of the specified virtual key at the time the function
+is called. The status specifies whether the key is up or down.
+
+keyCode -- If A..Z0..9, use the ASCII code. Otherwise, use
+a virtual key code. Example: VK_SHIFT
+
+Return 1 if the key is depressed, 0 if it's not.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCapture
+
+B<GetCapture()>
+
+Returns the handle of the window that has the captured the mouse.
+If no window has captured the mouse zero is returned.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetClassName
+
+B<GetClassName()>
+
+Returns the class name for a window or control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetClientRect
+
+B<GetClientRect()>
+
+Gets the client area rectangle and returns an array of left, top, right,
+and bottom co-ordinates if successful. Left and top will always be 0,
+right and bottom are equivalent to the width and height of the client
+area.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCursor
+
+B<GetCursor()>
+
+Returns the handle of the current cursor.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCursorPos
+
+B<GetCursorPos()>
+
+Gets the absolute mouse cursor position. Returns an array containing
+x and y co-ordinates.
+
+Usage:
+
+  ($x, $y) = Win32::GUI::GetCursorPos;
+
+See also L<ScreenToClient()|Win32::GUI::Reference::Methods/ScreenToClient>
+See also L<SetCursorPos()|Win32::GUI::Reference::Methods/SetCursorPos>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDesktopWindow
+
+B<GetDesktopWindow()>
+
+Returns the handle of the desktop window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDlgItem
+
+B<GetDlgItem(ID)>
+
+Returns the handle of a control in the dialog box given its B<ID>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEffectiveClientRect
+
+B<GetEffectiveClientRect(HANDLE, @CONTROLS)>
+
+Returns the left, top, right and bottom co-ordinates of a rectangle that
+can accommodate all the controls specified. The elements of B<@CONTROLS>
+should be control identifiers.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetEvent
+
+B<GetEvent(NAME)>
+
+Retrieves an event. If the New Event Model is being used, this will
+return the code-reference of the event you named, otherwise it will
+return undef.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFocus
+
+B<GetFocus()>
+
+Returns the handle of the window that has the keyboard focus.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFont
+
+B<GetFont(FONT)>
+
+Gets the font of the window (returns an handle; use to get font details).
+
+  $Font = $W->GetFont();
+  %details = Win32::GUI::Font::Info( $Font );
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetFontName
+
+B<GetFontName()>
+
+Returns the name of the font that is currently assigned to a window or
+control
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetForegroundWindow
+
+B<GetForegroundWindow()>
+
+Returns the handle of the foreground window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetKeyboardState
+
+B<GetKeyboardState()>
+
+Return array ref with the status of the 256 virtual keys.
+
+The index in the array is the virtual key code. If the value
+is true, that key is depressed.
+
+Example:
+
+  $key=Win32::GUI::GetKeyboardState;
+  print 'CTRL is down' if $key->[0x11];
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetKeyState
+
+B<GetKeyState(keyCode)>
+
+Retrieve the status of the specified virtual key at the time the last
+keyboard message was retrieved from the message queue.
+
+In scalar context returns a value specifying whether the key is up(0)
+or down(1). In list context, returns a 2 element list with the first
+element as in scalar context and the second member specifying whether
+the key is toggled(1) or not(0) - this is only meaningful for keys that
+have a toggled state: Caps Lock, Num Lock etc.
+
+keyCode -- If A..Z0..9, use the ASCII code. Otherwise, use
+a virtual key code. Example: VK_SHIFT
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMenu
+
+B<GetMenu()>
+
+Returns the handle of the menu associated with the window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetMessage
+
+B<GetMessage([MIN=0, MAX=0])>
+
+Retrieves a message sent to the window, optionally considering only
+messages identifiers in the range B<MIN..MAX>.
+
+If a message is found, the function returns a 7 elements array containing:
+
+  - the result code of the message
+  - the message identifier
+  - the wParam argument
+  - the lParam argument
+  - the time when message occurred
+  - the x coordinate at which message occurred
+  - the y coordinate at which message occurred
+
+If the result code of the message was -1 the function returns undef. Note
+that this function should not be normally used unless you know very well
+what you're doing.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetOpenFileName
+
+B<GetOpenFileName(%OPTIONS)>
+
+Allowed B<%OPTIONS> are:
+
+ -owner => WINDOW
+     Identifies the window that owns the dialog box.
+ -title => STRING
+     The title for the dialog
+ -directory => STRING
+     Specifies the initial directory
+ -file => STRING
+     Specifies a name that will appear on the dialog's edit field
+ -filter => ARRAY REFERENCE
+     Specifies an array containing pairs of filter strings.
+     The first string in each pair is a display string that describes the filter
+     (for example, "Text Files"), and the second string specifies the filter pattern
+     (for example, "*.TXT"). To specify multiple filter patterns for a single display
+     string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
+     A pattern string can be a combination of valid filename characters and the
+     asterisk (*) wildcard character. Do not include spaces in the pattern string.
+ -defaultextension => STRING
+     Contains the default extension. GetOpenFileName append this extension to the
+     filename if the user fails to type an extension. This string can be any length,
+     but only the first three characters are appended. The string should not contain a
+     period (.).
+ -defaultfilter => NUMBER
+     Specifies the index of the currently selected filter in the File Types control.
+     The first pair of strings has an index value of 0, the second pair 1, and so on.
+ -createprompt => 0/1 (default 0)
+     If the user specifies a file that does not exist, this flag causes the dialog box
+     to prompt the user for permission to create the file. If the user chooses to create
+     the file, the dialog box closes and the function returns the specified name; otherwise,
+     the dialog box remains open. If you use this flag with the -multisel flag, the dialog
+     box allows the user to specify only one nonexistent file.
+ -multisel => 0/1 (default 0)
+     Allow multiple file selection
+     If the user selects more than one file then return filename with full path.
+     If the user selects more than one file then return an array with the path
+     to the current directory followed by the filenames of the selected files.
+ -explorer => 0/1 (default 1)
+     Explorer look.
+ -extensiondifferent => 0/1 (default 0)
+     Specifies that the user can typed a filename extension that differs from the extension
+     specified by -defaultextension.
+ -filemustexist => 0/1 (default 0)
+     Specifies that the user can type only names of existing files in the File Name entry
+     field. If this flag is specified and the user enters an invalid name, the dialog box
+     procedure displays a warning in a message box.
+ -hidereadonly => 0/1 (default 1)
+     Hides the Read Only check box. If -hidereadonly is set to 0, the read only status is
+     return only in array context as last value.
+ -nochangedir => 0/1 (default 0)
+     Restores the current directory to its original value if the user changed the directory
+     while searching for files.
+ -nodeferencelinks => 0/1 (default 0)
+     Directs the dialog box to return the path and filename of the selected
+     shortcut (.LNK) file. If this value is not given, the dialog box returns the
+     path and filename of the file referenced by the shortcut.
+ -nonetwork  => 0/1 (default 0)
+     Hides and disables the Network button
+ -noreadonlyreturn => 0/1 (default 0)
+     Specifies that the returned file does not have the Read Only check box checked and is
+     not in a write-protected directory.
+ -pathmustexist => 0/1 (default 0)
+     Specifies that the user can type only valid paths and filenames.
+     If this flag is used and the user types an invalid path and filename in the File Name
+     entry field, the dialog box function displays a warning in a message box.
+ -readonly => 0/1 (default 0)
+     Causes the Read Only check box to be checked initially when the dialog box is created.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetParent
+
+B<GetParent()>
+
+Returns the parent window for this child control/window. If there is no
+parent window or there has been an error, undef is returned.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetPerlWindow
+
+B<GetPerlWindow()>
+
+Returns the handle of the command prompt window your perl script is
+running in; if called in an array context, returns the handle and the
+HINSTANCE of your perl process.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSaveFileName
+
+B<GetSaveFileName(%OPTIONS)>
+
+Allowed B<%OPTIONS> are:
+
+ -owner => WINDOW
+     Identifies the window that owns the dialog box.
+ -title => STRING
+     The title for the dialog
+ -directory => STRING
+     Specifies the initial directory
+ -file => STRING
+     Specifies a name that will appear on the dialog's edit field
+ -filter => ARRAY REFERENCE
+     Specifies an array containing pairs of filter strings.
+     The first string in each pair is a display string that describes the filter
+     (for example, "Text Files"), and the second string specifies the filter pattern
+     (for example, "*.TXT"). To specify multiple filter patterns for a single display
+     string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
+     A pattern string can be a combination of valid filename characters and the asterisk (*)
+     wildcard character. Do not include spaces in the pattern string.
+ -defaultextension => STRING
+     Contains the default extension. GetSaveFileName append this extension to the filename if the user
+     fails to type an extension. This string can be any length, but only the first three characters are
+     appended. The string should not contain a period (.).
+ -defaultfilter => NUMBER
+     Specifies the index of the currently selected filter in the File Types control.
+     The first pair of strings has an index value of 0, the second pair 1, and so on.
+ -createprompt => 0/1 (default 0)
+     If the user specifies a file that does not exist, this flag causes the dialog box to prompt
+     the user for permission to create the file. If the user chooses to create the file, the dialog box
+     closes and the function returns the specified name; otherwise, the dialog box remains open.
+     If you use this flag with the -multisel flag, the dialog box allows the user to specify
+     only one nonexistent file.
+ -explorer => 0/1 (default 1)
+     Explorer look.
+ -extensiondifferent => 0/1 (default 0)
+     Specifies that the user can typed a filename extension that differs from the extension
+     specified by -defaultextension.
+ -filemustexist => 0/1 (default 0)
+     Specifies that the user can type only names of existing files in the File Name entry field.
+     If this flag is specified and the user enters an invalid name, the dialog box procedure displays
+     a warning in a message box.
+ -nochangedir => 0/1 (default 0)
+     Restores the current directory to its original value if the user changed the directory
+     while searching for files.
+ -nodeferencelinks => 0/1 (default 0)
+     Directs the dialog box to return the path and filename of the selected shortcut (.LNK) file.
+     If this value is not given, the dialog box returns the path and filename of the file
+     referenced by the shortcut.
+ -nonetwork  => 0/1 (default 0)
+     Hides and disables the Network button
+ -noreadonlyreturn => 0/1 (default 0)
+     Specifies that the returned file is not in a write-protected directory.
+ -pathmustexist => 0/1 (default 1)
+     Specifies that the user can type only valid paths and filenames.
+     If this flag is used and the user types an invalid path and filename in the File Name
+     entry field, the dialog box function displays a warning in a message box.
+ -overwriteprompt => 0/1 (default 1)
+     Generate a message box if the selected file already exists. The user must confirm8
+     whether to overwrite the file.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetStockObject
+
+B<GetStockObject(OBJECT)>
+
+Returns the handle of the specified predefined system object (pen, brush
+or font).
+
+B<OBJECT> can have one of the following values:
+
+  0 WHITE_BRUSH
+  1 GRAY_BRUSH
+  2 LTGRAY_BRUSH
+  3 DKGRAY_BRUSH
+  4 BLACK_BRUSH
+  5 NULL_BRUSH (also HOLLOW_BRUSH)
+  6 WHITE_PEN
+  7 BLACK_PEN
+  8 NULL_PEN
+ 10 OEM_FIXED_FONT
+ 11 ANSI_FIXED_FONT
+ 12 ANSI_VAR_FONT
+ 13 SYSTEM_FONT
+ 14 DEVICE_DEFAULT_FONT
+ 15 DEFAULT_PALETTE
+ 16 SYSTEM_FIXED_FONT
+ 17 DEFAULT_GUI_FONT
+ 18 DC_BRUSH (Windows 2000/XP only)
+ 19 DC_PEN (Windows 2000/XP only)
+
+The returned handle can be referenced as if it was a Win32::GUI object
+(eg. a Win32::GUI::Brush or Win32::GUI::Font), but note that it is not
+blessed, so you can't directly invoke methods on it:
+
+   $Font = Win32::GUI::GetStockObject(17);    # DEFAULT_GUI_FONT
+   print $Font->GetMetrics();                 # !!!WRONG!!!
+   print Win32::GUI::Font::GetMetrics($Font); # correct
+   $Window->SetFont($Font);                   # correct
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSystemMetrics
+
+B<GetSystemMetrics(INDEX)>
+
+Retrieves various system metrics (dimensions of display elements) and
+configuration settings. Too numerous to list here. See WinUser.h for
+a complete list of SM_* constants that you can use for INDEX.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextExtentPoint32
+
+B<GetTextExtentPoint32(STRING, [FONT])>
+
+Returns a two elements array containing the x and y size of the
+specified B<STRING> in the window (eventually with the speficied B<FONT>), or
+undef on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTopWindow
+
+B<GetTopWindow()>
+
+Returns the handle of the foreground window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetWindow
+
+B<GetWindow(COMMAND)>
+
+Returns handle of the window that has the specified
+relationship (given by B<COMMAND>) with the specified window.
+
+Available B<COMMAND> are:
+
+  GW_CHILD
+  GW_HWNDFIRST
+  GW_HWNDLAST
+  GW_HWNDNEXT
+  GW_HWNDPREV
+  GW_OWNER
+
+Example:
+
+    $Button->GetWindow(GW_OWNER);
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetWindowLong
+
+B<GetWindowLong(INDEX)>
+
+Retrieves a windows property; for more info consult the original API
+documentation.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetWindowRect
+
+B<GetWindowRect()>
+
+Returns a four elements array defining the windows rectangle (left, top,
+right, bottom) in screen co-ordinates or undef on errors.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetWindowThreadProcessId
+
+B<GetWindowThreadProcessId()>
+
+Returns a two elements array containing the thread and the process
+identifier for the specified window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Height
+
+B<Height([HEIGHT])>
+
+Sets or retrieves the height of a window.
+
+See also L<Resize()|Win32::GUI::Reference::Methods/Resize>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Hide
+
+B<Hide()>
+
+Hides a window or control.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Hook
+
+B<Hook(MSG,CODEREF)>
+
+Adds a new handler to the list of handlers for a particular window
+message / command / notification.
+
+Hook() can be used with the New Event Model and the Old Event Model. You
+can Hook() normal window messages, WM_COMMAND codes and WM_NOTIFY codes.
+You can add as many hooks for one message as you like. To remove hooks
+see L<UnHook()|Win32::GUI::Reference::Methods/UnHook>.
+
+Here's an example Perl handler routine:
+
+ sub click_handler {
+    ($object, $wParam, $lParam, $type, $msgcode) = @_;
+    print "Click handler called!\n";
+ }
+
+Here, $object is the Perl object for the widget, $wParam and $lParam are
+the parameters received with the message, $type is the type of message
+(0, WM_NOTIFY or WM_COMMAND, see below), and $msgcode is the original
+numeric code for the message.
+
+If you call Hook() on a child widget, such as a button, the Hook will be
+called if the parent window receives WM_COMMAND and the code given with
+WM_COMMAND matches the MSG argument you passed to Hook(). Put simply,
+what this means is that things like
+
+    $button->Hook(BN_CLICKED, \&button_clicked);
+
+will work. When your handler is called it will be passed a $type argument
+of WM_COMMAND (numeric 273).
+
+The same is true for WM_NOTIFY messages, although handlers defined for
+those are passed a $type argument of WM_NOTIFY (numeric 78).
+
+Any message that was not WM_NOTIFY or WM_COMMAND gets passed a $type of 0.
+It is important to check your $type argument. Certain codes for WM_COMMAND
+messages may conflict with codes for WM_NOTIFY messages or regular window
+messages, meaning the handler you defined for a particular WM_NOTIFY code
+may get triggered by a WM_COMMAND code. The $type argument is there to
+allow you to check this. The rule is to just return immediately if $type
+is not what you were expecting.
+
+If Hook() successfully added a hook for the event, it returns true. If
+the hook already exists (the coderef you gave is already in the list of
+hooks for the specified event), or if there was an error in creating the
+new hook, it returns false.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InvalidateRect
+
+B<InvalidateRect(...)>
+
+Forces a refresh of a window, or a rectangle of it.
+
+The parameters can be B<(FLAG)> for the whole area of the window, or B<(LEFT, TOP, RIGHT, BOTTOM,
+[FLAG])> to specify a rectangle. If the B<FLAG> parameter is set to TRUE, the
+background is erased before the window is refreshed (this is the default).
+
+See also L<Redraw()|Win32::GUI::Reference::Methods/Redraw>
+See also L<Update()|Win32::GUI::Reference::Methods/Update>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsEnabled
+
+B<IsEnabled()>
+
+Returns TRUE if the window is enabled, FALSE otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsIconic
+
+B<IsIconic()>
+
+Returns TRUE if the window is minimized, FALSE otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsVisible
+
+B<IsVisible()>
+
+Returns TRUE if the window is visible, FALSE otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsWindow
+
+B<IsWindow()>
+
+Returns TRUE if the window is a window, FALSE otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 IsZoomed
+
+B<IsZoomed()>
+
+Returns TRUE if the window is maximized, FALSE otherwise.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Left
+
+B<Left([LEFT])>
+
+Gets or sets the left co-ordinate of an object, relative to the object's
+parent if it has one, or absolute screen co-ordinate if it doesn't.
+
+See also L<AbsLeft()|Win32::GUI::Reference::Methods/AbsLeft>
+See also L<Move()|Win32::GUI::Reference::Methods/Move>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadCursor
+
+B<LoadCursor(ID)>
+
+This function loads one of the default cursors. ID can be one of:
+
+ 32650 IDC_APPSTARTING  Standard arrow and small hourglass
+ 32512 IDC_ARROW        Standard arrow
+ 32515 IDC_CROSS        Crosshair
+ 32649 IDC_HAND         Windows 98/Me, Windows 2000/XP: Hand
+ 32651 IDC_HELP         Arrow and question mark
+ 32513 IDC_IBEAM        I-beam
+ 32641 IDC_ICON         Obsolete for applications marked version 4.0 or later.
+ 32648 IDC_NO           Slashed circle
+ 32640 IDC_SIZE         Obsolete for applications marked version 4.0 or later. Use IDC_SIZEALL.
+ 32646 IDC_SIZEALL      Four-pointed arrow pointing north, south, east, and west
+ 32643 IDC_SIZENESW     Double-pointed arrow pointing northeast and southwest
+ 32645 IDC_SIZENS       Double-pointed arrow pointing north and south
+ 32642 IDC_SIZENWSE     Double-pointed arrow pointing northwest and southeast
+ 32644 IDC_SIZEWE       Double-pointed arrow pointing west and east
+ 32516 IDC_UPARROW      Vertical arrow
+ 32514 IDC_WAIT         Hourglass
+
+On success returns a Win32::GUI::Cursor object, on failure undef.
+
+Example:
+
+my $hourglass=Win32::GUI::LoadCursor(32514);
+
+NOTE: it is better to use Win32::GUI::Cursor->new(ID);
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadLibrary
+
+B<LoadLibrary(NAME)>
+
+The LoadLibrary function maps the specified executable module into the
+address space of the calling process.
+
+The return value is a handle to the module, or undef on failure.
+
+Directory seperators are normalised to windows seperators (C<\>).
+
+Under Cygwin, cygwin paths are converted to windows paths
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadResource
+
+B<LoadResource(NAME)>
+
+Loads a generic resource from the EXE file that your perl process is
+running as. This is for use when distributing your application. Resources
+can be packed into the EXE file using many tools including ResHacker.
+
+Note that packing resources into a PAR executable will not work. You must
+first pack the resources into par.exe then use PAR to build your
+executable.
+
+For this routine to work, any resources you wish to load with it must
+be added to the executable with the RCDATA resource type.
+
+If the resource is not found in the EXE, this function will return NULL,
+otherwise it will return a scalar containing the raw resource data.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LoadString
+
+B<LoadString(ID)>
+
+The LoadString method loads a string resource from the executable file
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LockWindowUpdate
+
+B<LockWindowUpdate(flag)>
+
+The LockWindowUpdate method disables or enables drawing in the specified window. Only one window
+can be locked at a time.
+
+If an application with a locked window (or any locked child windows) calls the GetDC function,
+the called function returns a device context with a visible region that is empty. This will
+occur until the application unlocks the window by calling LockWindowUpdate method specifying a
+value for the flag.
+Example:
+$win->LockWindowUpdate;     #Locks window
+$win->LockWindowUpdate(1);  #Unlocks window
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Maximize
+
+B<Maximize()>
+
+Maximizes a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MessageBeep
+
+B<MessageBeep([TYPE=MB_OK])>
+
+Plays a sound.
+
+B<TYPE> specifies the sound type :
+
+ MB_OK : Play SystemDefault sound.
+ MB_ICONASTERISK : Play SystemAsterisk sound.
+ MB_ICONEXCLAMATION : Play SystemExclamation sound.
+ MB_ICONHAND : Play SystemHand sound.
+ MB_ICONQUESTION : Play SystemQuestion sound.
+ 0xFFFFFFFF Play Standard beep using the computer speaker
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MessageBox
+
+B<MessageBox([HANDLE], TEXT, [CAPTION], [TYPE])>
+
+Shows a standard Windows message box and waits for the user to dismiss it.
+You can set the window that the message box corresponds to by passing
+a specific B<HANDLE> (window handle or object). The given B<TEXT> will appear
+in the message box client area, and the given B<CAPTION> text will appear
+in the message box titlebar. B<TYPE> specifies various flags that change
+the appearance of the message box. These are:
+
+To set which buttons appear on the message box, specify one of the following values:
+
+ 0x0000 MB_OK show an OK button
+ 0x0001 MB_OKCANCEL show an OK button and a Cancel button
+ 0x0002 MB_ABORTRETRYIGNORE show Abort, Retry and Ignore buttons
+ 0x0003 MB_YESNOCANCEL show Yes, No and Cancel buttons
+ 0x0004 MB_YESNO show Yes and No buttons
+ 0x0005 MB_RETRYCANCEL show Retry and Cancel buttons
+ 0x0006 MB_CANCELTRYCONTINUE show Cancel, Try Again and Continue buttons (2000/XP only)
+
+To add a help button to the message box, specify the following value:
+
+ 0x4000 MB_HELP
+
+To show an icon in the message box, specify one of these values:
+
+ 0x0010 MB_ICONHAND show a stop-sign icon (used for errors)
+ 0x0020 MB_ICONQUESTION show a question mark icon
+ 0x0030 MB_ICONEXCLAMATION show an exclamation mark icon (used for warnings)
+ 0x0040 MB_ICONASTERISK show an asterisk icon (the letter "i" in a circle) (used for information)
+
+To set a default button, specify one of these values (if none of these are specified, the first
+button will be the default button):
+
+ 0x0100 MB_DEFBUTTON2 The second button is default
+ 0x0200 MB_DEFBUTTON3 The third button is default
+ 0x0300 MB_DEFBUTTON4 The fourth button is default
+
+To specify how the message box affects other windows and various other flags, use one or
+more of the following values:
+
+ 0x0000   MB_APPLMODAL The user must dismiss the message box before continuing work in
+             the window specified by HANDLE (this is the default)
+ 0x1000   MB_SYSTEMMODAL Same as MB_APPLMODAL but the window appears on top of all other
+             windows on the desktop.
+ 0x2000   MB_TASKMODAL Same as MB_APPLMODAL except that all the top-level windows belonging
+             to the current thread are disabled if no HANDLE is specified
+ 0x8000   MB_NOFOCUS Does not give the message box input focus
+ 0x10000  MB_SETFOREGROUND Makes the message box become the foreground window
+ 0x20000  MB_DEFAULT_DESKTOP_ONLY If the current desktop is not the default
+             desktop, MessageBox will not return until the user switches to the default desktop
+ 0x40000  MB_TOPMOST Makes the message box become the topmost window
+ 0x80000  MB_RIGHT Makes text in the message box right-aligned
+ 0x100000 MB_RTLREADING Displays message and caption text using right-to-left reading
+             order on Hebrew and Arabic systems.
+ 0x200000 MB_SERVICE_NOTIFICATION Displays the message box even if no user is logged
+             in on Windows NT/2000/XP. You should not specify a HANDLE when using this.
+
+To combine several values together, use a bitwise OR operator (|).
+
+MessageBox will return one of the following values depending on the user's action:
+
+  1 IDOK       The user clicked the OK button.
+  2 IDCANCEL   The user clicked the Cancel button.
+  3 IDABORT    The user clicked the Abort button.
+  4 IDRETRY    The user clicked the Retry button.
+  5 IDIGNORE   The user clicked the Ignore button.
+  6 IDYES      The user clicked the Yes button.
+  7 IDNO       The user clicked the No button.
+  8 IDCLOSE    The user closed the message box.
+  9 IDHELP     The user clicked the Help button.
+ 10 IDTRYAGAIN The user clicked the Try Again button.
+ 11 IDCONTINUE The user clicked the Continue button.
+
+The default B<TYPE> value is a warning icon with an OK button (MB_ICONEXCLAMATION|MB_OK).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Minimize
+
+B<Minimize()>
+
+See L<CloseWindow()|Win32::GUI::Reference::Methods/CloseWindow>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Move
+
+B<Move(X, Y)>
+
+Moves a window to the given B<X> and B<Y> co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 OpenIcon
+
+B<OpenIcon()>
+
+Restores a minimized window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PeekMessage
+
+B<PeekMessage([MIN, MAX, MESSAGE])>
+
+Inspects the window's message queue and eventually returns data
+about the message it contains; it can optionally check only for message
+identifiers in the range B<MIN..MAX>; the last B<MESSAGE parameter>, if
+specified, must be an array reference.
+
+If a message is found, the function puts in that array 7 elements
+containing:
+
+  - the handle of the window to which the message is addressed
+  - the message identifier
+  - the wParam argument
+  - the lParam argument
+  - the time when message occurs
+  - the x coordinate at which message occurs
+  - the y coordinate at which message occurs
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PlayEnhMetaFile
+
+B<PlayEnhMetaFile(FILENAME)>
+
+Displays the picture stored in the specified enhanced-format metafile.
+This function use current window device context (-DC).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PlayWinMetaFile
+
+B<PlayWinMetaFile(FILENAME)>
+
+Displays the picture stored in the specified enhanced-format metafile.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PostMessage
+
+B<PostMessage(MSG, WPARAM, LPARAM)>
+
+Posts a message to a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 PostQuitMessage
+
+B<PostQuitMessage([EXITCODE])>
+
+Sends a quit message to a window, optionally with an B<EXITCODE>;
+if no B<EXITCODE> is given, it defaults to 0.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Redraw
+
+B<Redraw()>
+
+Repaints a window
+
+See also L<Update()|Win32::GUI::Reference::Methods/Update>
+See also L<InvalidateRect()|Win32::GUI::Reference::Methods/InvalidateRect>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ReleaseCapture
+
+B<ReleaseCapture()>
+
+Releases the mouse capture.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Resize
+
+B<Resize(WIDTH, HEIGHT)>
+
+Resizes a window to the given B<WIDTH> and B<HEIGHT>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Restore
+
+B<Restore()>
+
+See L<OpenIcon()|Win32::GUI::Reference::Methods/OpenIcon>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Result
+
+B<Result(HANDLE, RESULT)>
+
+Explicitly set the result to be returned from a handler. For safety and
+backwards compatibility, results returned from Win32::GUI handlers are
+discarded. You can use this method (with GREAT CARE) to explicitly force
+a return value for your handler. Consult the API documentation for valid
+return values as they vary from message to message.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SaveBMP
+
+B<SaveBMP(handle)>
+
+Saves the window content to a BMP file.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScaleHeight
+
+B<ScaleHeight()>
+
+Returns the windows client area height.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScaleWidth
+
+B<ScaleWidth()>
+
+Returns the windows client area width.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScreenToClient
+
+B<ScreenToClient(X, Y)>
+
+Converts screen co-ordinates to client-area co-ordinates.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(scrollbar,operation[,position, [thumbtrack_flag]])>
+
+Handles scrollbar scrolling if you don't want to do it yourself. This is
+most useful in the Scroll event handler for a window or dialog box.
+
+B<scrollbar> can be:
+
+  SB_HOR(0)  : Horizontal scrollbar
+  SB_VERT(1) : Vertical scrollbar
+
+B<operation> is an identifier for the operation being performed on the
+scrollbar, this can be:
+
+  SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+  SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+  SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, or SB_ENDSCROLL
+
+B<position> is ignored unless B<operation> is SB_THUMBPOSITION, or
+B<operation> is SB_THUMBTRACK and B<thumbtrack_flag> is TRUE. If
+B<position> is not provided (or provided and equal to -1), then
+the position used is taken from the internal scrollbar structure:
+this is the prefered method of operation.
+
+B<thumbtrack_flag> indicates whether SB_THUMBTRACK messages are
+processed (TRUE) or not (FALSE).  It defaults to false.
+
+Returns the new position of the scrollbar, or undef on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScrollPage
+
+B<ScrollPage(scrollbar,[pagesize])>
+
+Sets / Gets page size of a window scrollbar (if enabled).
+B<scrollbar> argument should be set as follows:
+
+  0 : Horizontal scrollbar
+  1 : Vertical scrollbar
+
+Returns the scrollbar page size or undef on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScrollPos
+
+B<ScrollPos(scrollbar,[pos])>
+
+Sets / Gets position of a window scrollbar (if enabled).
+B<scrollbar> argument should be set as follows:
+
+  0 : Horizontal scrollbar
+  1 : Vertical scrollbar
+
+Returns the scrollbar position or undef on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ScrollRange
+
+B<ScrollRange(scrollbar,[min, max])>
+
+Sets / Gets range for a window scrollbar (if enabled).
+B<scrollbar> argument should be set as follows:
+
+  0 : Horizontal scrollbar
+  1 : Vertical scrollbar
+
+Returns the scrollbar range as an array, or undef on failure.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SendMessage
+
+B<SendMessage(MSG, WPARAM, LPARAM)>
+
+Sends a message to a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SendMessageTimeout
+
+B<SendMessageTimeout(MSG, WPARAM, LPARAM, [FLAGS=SMTO_NORMAL], TIMEOUT)>
+
+Sends a message to a window and wait for it to be processed or until the
+specified B<TIMEOUT> (number of milliseconds) elapses.
+
+Returns the result code of the processed message or undef on errors.
+
+If undef is returned and a call to Win32::GetLastError() returns 0,
+then the window timed out processing the message.
+
+The B<FLAGS> parameter is optional, possible values are:
+
+ 0 : SMTO_NORMAL
+     The calling thread can process other requests while waiting; this is the default setting.
+ 1 : SMTO_BLOCK
+     The calling thread does not process other requests.
+ 2 : SMTO_ABORTIFHUNG
+     Returns without waiting if the receiving process seems to be "hung".
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetActiveWindow
+
+B<SetActiveWindow()>
+
+Activates a window.
+Returns the handle of the previously active window or 0.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCapture
+
+B<SetCapture()>
+
+Assigns the mouse capture to a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCursor
+
+B<SetCursor(CURSOR)>
+
+Draws the specified B<CURSOR> (a Win32::GUI::Cursor object). Returns the
+handle of the previously displayed cursor. Note that the cursor will
+change back to the default one as soon as the mouse moves or a system
+command is performed. To change the cursor stablily, use ChangeCursor().
+
+see also L<ChangeCursor()|Win32::GUI::Reference::Methods/ChangeCursor>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCursorPos
+
+B<SetCursorPos(X, Y)>
+
+Moves the mouse cursor to the specified screen coordinates.
+
+see also L<GetCursorPos()|Win32::GUI::Reference::Methods/GetCursorPos>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetEvent
+
+B<SetEvent(NAME,HANDLER)>
+
+Sets an event. If the New Event Model is being used, this will enable
+the specified event and set it to be handled by the specified C<HANDLER>,
+which should be a code-reference.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetFocus
+
+B<SetFocus()>
+
+Set focus to a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetFont
+
+B<SetFont(FONT)>
+
+Sets the font of the window (FONT is a Win32::GUI::Font object).
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetForegroundWindow
+
+B<SetForegroundWindow()>
+
+Brings the window to the foreground.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetIcon
+
+B<SetIcon(ICON, [TYPE])>
+
+Sets the icon of the window; B<TYPE> can be 0 for the small icon, 1 for
+the big icon. Default is the same icon for small and big.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetMenu
+
+B<SetMenu(MENU)>
+
+Associates the specified MENU to a window.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetRedraw
+
+B<SetRedraw(FLAG)>
+
+Determines if a window is automatically redrawn when its content changes.
+
+B<FLAG> can be a true value to allow redraw, false to prevent it.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetWindowLong
+
+B<SetWindowLong(INDEX, VALUE)>
+
+Sets a windows property; for more info consult the original API
+documentation.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetWindowPos
+
+B<SetWindowPos(INSERTAFTER,X,Y,cx,cy,FLAGS)>
+
+The SetWindowPos function changes the size, position,
+and Z order of a child, pop-up, or top-level
+window. Child, pop-up, and top-level windows are
+ordered according to their appearance on the
+screen. The topmost window receives the highest rank
+and is the first window in the Z order.
+
+INSERTAFTER - window to precede the positioned window
+in the Z order. This parameter must be a window object,
+a window handle or one of the following integer values.
+
+  HWND_BOTTOM
+    Places the window at the bottom of the Z order. If
+    the WINDOW parameter identifies a topmost window,
+    the window loses its topmost status and is placed
+    at the bottom of all other windows.
+  HWND_NOTOPMOST
+    Places the window above all non-topmost windows
+    (that is, behind all topmost windows). This flag
+    has no effect if the window is already a
+    non-topmost window.
+  HWND_TOP
+    Places the window at the top of the Z order.
+  HWND_TOPMOST
+    Places the window above all non-topmost
+    windows. The window maintains its topmost position
+    even when it is deactivated.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetWindowRgn
+
+B<SetWindowRgn(region,flag)>
+
+The SetWindowRgn method sets the window region of a window. The window region determines the area
+within the window where the system permits drawing. The system does not display any portion of a window
+that lies outside of the window region
+
+flag : Specifies whether the system redraws the window after setting the window region. If flag is TRUE,
+the system does so; otherwise, it does not.
+Typically, you set flag to TRUE if the window is visible.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ShellExecute
+
+B<ShellExecute(window,operation,file,parameters,directory,showcmd)>
+
+Performs an operation on a file.
+
+B<Operation>. A string that specifies the action to be performed. The set of available action verbs depends
+on the particular file or folder. Generally, the actions available from an object's shortcut menu are
+available verbs.
+
+  edit     - Launches an editor and opens the document for editing. If File is not a document file,
+             the function will fail.
+  explore  - Explores the folder specified by File.
+  find     - Initiates a search starting from the specified directory.
+  open     - Opens the file specified by the File parameter. The file can be an executable file,
+             a document file, or a folder.
+  print    - Prints the document file specified by lpFile. If lpFile is not a document file,
+             the function will fail.
+  ""(NULL) - For systems prior to Microsoft Windows 2000, the default verb is used if it is valid
+             and available in the registry. If not, the "open" verb is used. For Windows 2000 and
+             later systems, the default verb is used if available. If not, the "open" verb is used.
+             If neither verb is available, the system uses the first verb listed in the registry.
+
+B<File>. A string that specifies the file or object on which to execute the specified verb. To specify
+a Shell namespace object, pass the fully qualified parse name. Note that not all verbs are supported on
+all objects. For example, not all document types support the "print" verb.
+
+B<Parameters>. If the File parameter specifies an executable file, Parameters is a string that specifies
+the parameters to be passed to the application. The format of this string is determined by the verb that
+is to be invoked. If File specifies a document file, Parameters should be NULL.
+
+B<Directory>. A string that specifies the default directory.
+
+B<ShowCmd>. Flags that speciow an application is to be displayed when it is opened. If File specifies a
+document file, the flag is simply passed to the associated application. It is up to the application to
+decide how to handle it.
+
+  0  SW_HIDE            Hides the window and activates another window.
+  3  SW_MAXIMIZE        Maximizes the specified window.
+  6  SW_MINIMIZE        Minimizes the specified window and activates the next top-level window in the z-order.
+  9  SW_RESTORE         Activates and displays the window. If the window is minimized or maximized,
+                        Windows restores it to its original size and position. An application should specify
+                        this flag when restoring a minimized window.
+  5  SW_SHOW            Activates the window and displays it in its current size and position.
+  10 SW_SHOWDEFAULT     Sets the show state based on the SW_ flag specified in the STARTUPINFO structure
+                        passed to the CreateProcess function by the program that started the application.
+                        An application should call ShowWindow with this flag to set the initial show state of
+                        its main window.
+  2  SW_SHOWMINIMIZED   Activates the window and displays it as a minimized window.
+  7  SW_SHOWMINNOACTIVE Displays the window as a minimized window. The active window remains active.
+  8  SW_SHOWNA          Displays the window in its current state. The active window remains active.
+  4  SW_SHOWNOACTIVATE  Displays a window in its most recent size and position. The active window remains active.
+  1  SW_SHOWNORMAL      Activates and displays a window. If the window is minimized or maximized, Windows
+                        restores it to its original size and position. An application should specify this flag
+                        when displaying the window for the first time.
+
+Returns a value greater than 32 if successful, or an error value that is less than or equal to 32 otherwise.
+The following table lists the error values.
+
+  0  The operating system is out of memory or resources.
+  3  ERROR_PATH_NOT_FOUND   The specified path was not found.
+  11 ERROR_BAD_FORMAT       The .exe file is invalid (non-Microsoft Win32 .exe or error in .exe image).
+  5  SE_ERR_ACCESSDENIED    The operating system denied access to the specified file.
+  27 SE_ERR_ASSOCINCOMPLETE The file name association is incomplete or invalid.
+  30 SE_ERR_DDEBUSY         The Dynamic Data Exchange (DDE) transaction could not be completed because
+                            other DDE transactions were being processed.
+  29 SE_ERR_DDEFAIL         The DDE transaction failed.
+  28 SE_ERR_DDETIMEOUT      The DDE transaction could not be completed because the request timed out.
+  32 SE_ERR_DLLNOTFOUND     The specified dynamic-link library (DLL) was not found.
+  2  SE_ERR_FNF             The specified file was not found.
+  31 SE_ERR_NOASSOC         There is no application associated with the given file name extension. This
+                            error will also be returned if you attempt to print a file that is not printable.
+  8  SE_ERR_OOM             There was not enough memory to complete the operation.
+  3  SE_ERR_PNF             The specified path was not found.
+  26 SE_ERR_SHARE           A sharing violation occurred.
+
+Examples:
+
+Open a web page in the default browser
+
+  my $exitval = $win->ShellExecute('open','http://www.perl.org','','',1);
+
+Open a text file in nodepad
+
+  my $exitval = $win->ShellExecute('open','notepad.exe','readme.txt','',1) ;
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Show
+
+B<Show([COMMAND=SW_SHOWNORMAL])>
+
+Shows a window (or change its showing state to B<COMMAND>);
+
+Available B<COMMAND> are:
+
+  0  : SW_HIDE
+  1  : SW_SHOWNORMAL
+  1  : SW_NORMAL
+  2  : SW_SHOWMINIMIZED
+  3  : SW_SHOWMAXIMIZED
+  3  : SW_MAXIMIZE
+  4  : SW_SHOWNOACTIVATE
+  5  : SW_SHOW
+  6  : SW_MINIMIZE
+  7  : SW_SHOWMINNOACTIVE
+  8  : SW_SHOWNA
+  9  : SW_RESTORE
+  10 : SW_SHOWDEFAULT
+  11 : SW_FORCEMINIMIZE
+  11 : SW_MAX
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Text
+
+B<Text([TEXT])>
+
+Sets or gets the text associated with a window or control. For example,
+for windows, this is the text in the titlebar of the window. For button
+controls, it's the text on the button, and so on. Text() and Caption()
+are synonymous with oneanother.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Top
+
+B<Top([TOP])>
+
+Gets or sets the top co-ordinate of an object, relative to the object's
+parent if it has one, or absolute screen co-ordinate if it doesn't.
+
+See also L<AbsTop()|Win32::GUI::Reference::Methods/AbsTop>
+See also L<Move()|Win32::GUI::Reference::Methods/Move>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TrackMouse
+
+B<TrackMouse([TIMEOUT=HOVER_DEFAULT, EVENTS=TME_HOVER|TME_LEAVE])>
+
+Causes the window to receive messages when the mouse pointer leaves a
+window or hovers over a window for a specified amount of time (B<TIMEOUT>, in
+milliseconds).
+
+B<EVENTS> can be set to one or more of the following values (ORed together):
+
+ 0x0001 TME_HOVER     Makes the window receive WM_MOUSEHOVER messages when the mouse hovers over it.
+ 0x0002 TME_LEAVE     Makes the window receive a WM_MOUSELEAVE message when the mouse leaves it.
+ 0x0010 TME_NONCLIENT Specifies that the non-client area should be included when tracking the mouse.
+                      The window will receive WM_NCMOUSEHOVER and WM_NCMOUSELEAVE messages depending
+                      on whether TME_HOVER and/or TME_LEAVE are set.
+
+See also L<UntrackMouse()|Win32::GUI::Reference::Methods/UntrackMouse>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 TrackPopupMenu
+
+B<TrackPopupMenu(MENU [, X, Y [, LEFT, TOP, RIGHT, BOTTOM] [, FLAGS [, CODEREF]]])>
+
+Displays the menu B<MENU> at the specified co-ordinates (X,Y) and tracks the
+selection of items on the menu. X and Y are absolute screen co-ordinates.
+
+If X and Y are not provided, uses the current cursor position.
+
+If LEFT, TOP, RIGHT and BOTTOM are provided they describe a rectangle in absolute screen
+co-ordinates over which the menu will not be drawn (the excluded rectangle).
+
+The following flags can be set (combine flags with bitwise OR (|) )
+
+  0x0000 TPM_LEFTBUTTON      Menu items can only be selected with left mouse button
+  0x0002 TPM_RIGHTBUTTON     Menu items can be selected with either left or right mouse button
+  0x0000 TPM_LEFTALIGN       Menu is aligned to the left of the given X co-ordinate
+  0x0004 TPM_CENTERALIGN     Menu is centered on the given X co-ordinate
+  0x0008 TPM_RIGHTALIGN      Menu is aligned to the right of the given X co-ordinate
+  0x0000 TPM_TOPALIGN        Menu is aligned above the given Y co-ordinate
+  0x0010 TPM_VCENTERALIGN    Menu is centered on the given Y co-ordinate
+  0x0020 TPM_BOTTOMALIGN     Menu is aligned below the given Y co-ordinate
+  0x0100 TPM_RETURNCMD       TrackPopupMenu returns the selected menu item identifier in the return value
+  0x0400 TPM_HORPOSANIMATION Menu will be animated from left to right (ignored if menu fading is on)
+  0x0800 TPM_HORNEGANIMATION Menu will be animated from right to left (ignored if menu fading is on)
+  0x1000 TPM_VERPOSANIMATION Menu will be animated from top to bottom (ignored if menu fading is on)
+  0x2000 TPM_VERNEGANIMATION Menu will be animated from bottom to top (ignored if menu fading is on)
+  0x4000 TPM_NOANIMATION     Menu will not be animated and will not "fade" in and out even if menu
+                             fading is enabled
+  0x0001 TPM_RECURSE         Allows you to display a menu when another menu is already displayed.
+                             This is intended to support context menus within a menu. (Windows 2000/XP only)
+
+The default flags are C<TPM_LEFTALIGN | TPM_TOPALIGN | TPM_LEFTBUTTON>
+
+If an excluded rectangle is spefified then the following flags may also be used, and TPM_VERTICAL is added to
+the default flags:
+
+  0x0000 TPM_HORIZONTAL      If the menu cannot be shown at the specified location without overlapping
+                             the excluded rectangle, the system tries to accommodate the requested
+                             horizontal alignment before the requested vertical alignment.
+  0x0040 TPM_VERTICAL        If the menu cannot be shown at the specified location without overlapping
+                             the excluded rectangle, the system tries to accommodate the requested
+                             vertical alignment before the requested horizontal alignment.
+
+If you specify C<TPM_RETURNCMD>, then the menu item ID of the selected item is returned. If an error
+occurs or the user does not select an item, zero is returned.
+If you do not specify C<TPM_RETURNCMD>, the return value will be nonzero on success or zero on failure.
+
+If B<CODEREF> is provided, then it is a code reference to a callback procedure that will be called for windows
+events that occur while the menu is displayed (normally such events are not available, as TrackPopupMenu has
+its own internal event loop).  The callback will recieve a reference to the Win32::GUI object used to call
+TrackPopupMenu on, and the message code, wParam and lParam of the event that occured. The callback should
+return nothing or 1 to allow the event to be processed normally, or 0 to prevent the event being passed to the
+default event handler.  See MSDN documentation for SetWindowsHookEx with idHook set to WH_MSGFILTER for
+the full gore.
+
+The callback prototype is:
+
+    sub callback {
+        my ($self, $message, $wParam, $lParam) = @_;
+
+        # Process messages you are interested in
+
+        return;
+    }
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 UnHook
+
+B<UnHook(MSG,[CODEREF])>
+
+Removes a specific code reference from the hooks listing for the given
+message, or removes all code references for the given message if no
+coderef is specified.
+
+Returns true on success, and false on failure (no such hook).
+
+See L<Hook()|Win32::GUI::Reference::Methods/Hook> documentation for more information on hooks and their
+usage.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 UntrackMouse
+
+B<UntrackMouse()>
+
+Disables the tracking of mouse hover or leave events for a window.
+
+See also L<TrackMouse()|Win32::GUI::Reference::Methods/TrackMouse>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Update
+
+B<Update()>
+
+Repaints a window if it's update region is not empty.
+
+see also L<Redraw()|Win32::GUI::Reference::Methods/Redraw>
+see also L<InvalidateRect()|Win32::GUI::Reference::Methods/InvalidateRect>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 UserData
+
+B<UserData([value])>
+
+Sets or reads user data associated with the window or control.
+
+ my $data=$win->UserData();#retrieve any data associated with the window
+ $win->UserData('some string');#associate user data to the window
+
+User data can be any perl scalar or reference.
+
+When reading returns the stored user data, or undef if nothing is stored.
+When setting returns a true value if the user data is stored correctly, or
+a false value on error
+
+If you are writing a class that you expect others to use, then this
+method should B<NOT> be used to store class instance data. See
+L<ClassData()|Win32::GUI::Reference::Methods/ClassData> instead.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Version
+
+B<Version()>
+
+Returns the module version number.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 WaitMessage
+
+B<WaitMessage()>
+
+The WaitMessage function yields control to other threads when a thread
+has no other messages in its message queue. The WaitMessage function suspends
+the thread and does not return until a new message is placed in the thread's
+message queue.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Width
+
+B<Width([WIDTH])>
+
+Sets or retrieves the width of a window.
+
+See also L<Resize()|Win32::GUI::Reference::Methods/Resize>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 WindowFromPoint
+
+B<WindowFromPoint(X, Y)>
+
+Returns the handle of the window at the specified screen position.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

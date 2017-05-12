@@ -1,0 +1,45 @@
+.perltidyrc
+Changes
+example/basic.pl
+example/checkbot.pl
+example/pages.pl
+example/search.pl
+lib/WWW/Crawler/Mojo.pm
+lib/WWW/Crawler/Mojo/Job.pm
+lib/WWW/Crawler/Mojo/Queue.pm
+lib/WWW/Crawler/Mojo/Queue/Memory.pm
+lib/WWW/Crawler/Mojo/Queue/MySQL.pm
+lib/WWW/Crawler/Mojo/ScraperUtil.pm
+lib/WWW/Crawler/Mojo/UserAgent.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/.DS_Store
+t/collect_urls.t
+t/empty.t
+t/form.t
+t/guess_encoding.t
+t/job.t
+t/main.t
+t/practical.t
+t/public/css/css1.css
+t/public/index.html
+t/public/js/js1.js
+t/public/png/png1.png
+t/public/png/png2.png
+t/public/png/png3.png
+t/public/space.txt
+t/public2/index.html
+t/public2/index2.html
+t/public2/index3.html
+t/queue-mysql.t
+t/queue.t
+t/resolve_href.t
+t/sitemap.t
+t/user_agent_userinfo.t
+xt/memory_usage.t
+xt/pod.t
+xt/podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use WWW::StaticBlog::Site;
+
+our $VERSION = 0.02;
+
+my $site = WWW::StaticBlog::Site->new_with_options();
+$site->run();
+
+__END__
+
+=head1 NAME
+
+www-staticblog - Generate a static site using WWW::StaticBlog
+
+=head1 VERSION
+
+0.02
+
+=head1 SYNOPSIS
+
+    www-staticblog --title <title> [options...]
+    www-staticblog --configfile <file>
+    www-staticblog ( -? | --usage | --help )
+
+
+=head1 DESCRIPTION
+
+You can use this program to generate a static site (most likely a blog) from a
+set of templates, and posts.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over 4
+
+=item --title <title>
+
+The site's title.  Populated in C<site_title> for the templates.
+
+=item --tagline <tagline>
+
+The site's tagline.  Populated in C<site_tagline> for the templates.
+
+=item --posts_dir <posts_dir>
+
+Directory contining the post entry files to parse.
+
+=item --authors_dir <authors_dir>
+
+Directory containing the author files to parse.
+
+=item --static_dir <static_dir>
+
+Directory containing static/pre-generated files to be copied into
+C<--output_dir>.
+
+=item --output_dir <output_dir> (Default: `pwd`)
+
+Directory to ouput the generated site.
+
+=item --template_class <template_class> (Default: '::Template::Toolkit')
+
+Module to use for templating.  Will look under C<WWW::StaticBlog::>, if it
+starts with C<::>.
+
+=item --template_options <template_options>
+
+Options to pass to the template class constructor.
+
+=item --index_template <index_template>
+
+Template to use when rendering the site's index page.
+
+=item --index_post_count <#> (Default: 10)
+
+The number of posts to show on the index page (by populating this many in
+C<posts> for the template).
+
+=item --post_template <post_template>
+
+Template to use when rendering posts.
+
+=item --author_template <author_template>
+
+Template to use when rendering author pages.
+
+=item --tag_template <tag_template>
+
+Template to use when rendering tag pages.
+
+=item --debug
+
+Render site in debugging mode, by setting C<debug> for the templates.
+
+=item --post_feed <post_feed>
+
+The location of where to generate an Atom feed of posts.
+
+    --post_feed feed/atom.xml
+
+=item --post_feed_count <#> (Default: 10)
+
+The number of posts to show in the Atom feed.
+
+=item --recent_posts_count <#> (Default: 15)
+
+Used to determine how many (at most) posts to populate in C<recent_posts> for
+the templates.
+
+=item --url <url>
+
+Base URL of the site being generated. (Must be provided when C<--post_feed> is
+given.)
+
+=item --configfile <file>
+
+Configuration file to read options from.
+
+For example L<http://technosorcery.net> uses the following
+F<www-staticblog.yaml> config file:
+
+    ---
+    title: Technosorcery Networks
+    tagline: Ramblings of Jacob Helwig
+    authors_dir: authors
+    posts_dir: articles
+    static_dir: static
+    output_dir: build
+    template_class: '::Template::Toolkit'
+    template_options:
+        INCLUDE_PATH:
+            - template/src
+            - template/lib
+        WRAPPER: site
+    index_template: index.tt2
+    post_template: post.tt2
+    author_template: author.tt2
+    tag_template: tag.tt2
+    post_feed: feed/atom.xml
+    url: http://technosorcery.net/
+
+=item -?, --usage, --help
+
+Output a list of all of the options.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-www-staticblog@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+=head1 AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN site
+near you. Or see <http://www.perl.com/CPAN/authors/id/J/JH/JHELWIG/>.
+
+=head1 AUTHOR
+
+Jacob Helwig C<< <jhelwig at cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010 by Jacob Helwig
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

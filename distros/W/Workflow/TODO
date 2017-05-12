@@ -1,0 +1,65 @@
+TODO file for Workflow
+
+$Id$
+
+- Address the sections marked with ## no critic scattered throughout the code
+  base, this might be valid, but another perspective and suggestions for
+  refactorings might be a good idea (patches?)
+
+- follow up up Perl::Critic policies disabled and marked as TODO in the
+  t/perlcriticrc file
+
+- Look into inconsistent XML configuration for persisters, this might however 
+  break backwards compatibility
+
+- Add more tests of persister configurations, could the new SQLlite emulation
+  modules be of interest for more testing? DBD::PgLite and related
+
+- Document general workflow initialization phase and the call to the
+  Workflow classes init method in a more general way
+
+- Document relation between actions and validators
+
+- Investigate if either Workflow::Validator::InEnumeratedType or
+  Workflow::Validator::MatchesDateFormat are violating an (undefined) abstract 
+  class. One holds a validate method the other a validator method.
+
+- Add support for string based configuration instead of file based (copying
+  behavior from XML::Simple) ?
+
+- Write more POD, including a tutorial
+
+- Write more tests (we need better coverage)
+
+- Deal with whatever is in the RT queue
+
+    - Workflow::Factory sub-classing reported by Andrew (RT #18159)
+      http://rt.cpan.org/Ticket/Display.html?id=18159
+
+    - Enabling of dynamic loading of config, patch from Andrew (RT #18265)
+      http://rt.cpan.org/Ticket/Display.html?id=18265
+
+- Investigate whether use warnings pragma, breaks too much backwards
+  compatibility [TestingAndDebugging::RequireUseWarnings]
+
+- Move some constant candidates to central place
+
+- Investigate violations of Perl::Critic policy
+  [Subroutines::ProhibitExplicitReturnUndef]
+
+- Investigate violations of Perl::Critic policy
+  [ValuesAndExpressions::ProhibitMagicNumbers]
+
+- Added POD sections on diagnostics to all classes.
+
+- Decide where to put the configuration for the built-in
+  validators/conditions/actions? Should we make it part of the
+  WorkflowFactory initialization process, maybe just keep the built-ins
+  configured in a class that's distributed with the module? (We don't
+  want to force people to reference a separate file every time...
+
+- Make the action/description of initial history created configurable
+  (optional?)
+
+- Investigate possible integration with standardized XML format
+  see interesting module by MARKOV

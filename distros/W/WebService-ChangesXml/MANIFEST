@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WebService/ChangesXml.pm
+t/00_compile.t
+t/01_event.t
+t/02_simple.t

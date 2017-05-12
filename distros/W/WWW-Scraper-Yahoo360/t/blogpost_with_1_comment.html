@@ -1,0 +1,1288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="">
+<head>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META HTTP-EQUIV="Content-Script-Type" CONTENT="text/javascript">
+
+<meta name="ad-spaceid" content="2011300004">
+<meta name="ad-location" content="HEAD,FOOT">
+<meta name="ad-property" content="360">
+<meta name="ad-nopageview" content="DOC.AD_MIME_NOPAGEVIEW">
+<meta name="ad-site_attribute" content="DOC.AD_MIME_SITE_ATTRIBUTE">
+<meta name="ad-dma" content="807">
+<meta name="ad-state" content="ca">
+<meta name="ad-city" content="Sunnyvale">
+<meta name="ad-zip" content="94089">
+<meta name="ad-geocode" content="DOC.AD_MIME_GEOCODE">
+
+
+<title>Yahoo! 360&#176; - Dieu Anh&#39;s Blog - Trình duyệt cho ĐTDĐ Opera Mini, nhanh, trẻ, khỏe, miễn phí :)</title>
+<link type="text/css" rel="stylesheet" href="http://us.js2.yimg.com/us.js.yimg.com/lib/cmty/ymgl_global_200608161000.css" media="screen">
+<link type="text/css" rel="stylesheet" href="http://us.js2.yimg.com/us.js.yimg.com/lib/cmty/thm/ymgl_classic_200608161000.css" media="screen">
+<link type="text/css" rel="stylesheet" href="http://us.js2.yimg.com/us.js.yimg.com/lib/cmty/thm/ymgl_tinyhouse_200611101015.css" media="screen">
+<link type="text/css" rel="stylesheet" href="http://us.js2.yimg.com/us.js.yimg.com/lib/common/widgets/2/container/css/container_2.0.0-b3.css" media="screen">
+
+<style type="text/css">
+    .profile .body #ymgl-customize-links {
+   margin-top: 7px;
+}
+
+.profile .body .user-card-shadow .user-card .user-photo {
+*width:190px;
+}
+/*tags*/
+#ymgl-tagcloud .hTagcloud .popularity {
+   margin:0;
+	padding:0;
+	list-style:none;
+}
+
+#ymgl-tagcloud .hTagcloud .popularity li {
+   display:inline;
+	padding:0 2px;
+}
+
+#ymgl-tagcloud .hTagcloud .popularity li.popular {
+   font-size:80%;
+}
+
+#ymgl-tagcloud .hTagcloud .popularity li.vv-popular {
+   font-size:100%;
+}
+
+#ymgl-tagcloud .hTagcloud .popularity li.vvvv-popular {
+   font-size:130%;
+}#ymgl-blog-calendar {}
+#ymgl-blog-calendar iframe {width:205px; height:219px;}
+#tooltip {
+  position:absolute;
+  top:0; 
+  left:0;
+  visibility: hidden;
+  width: 200px;
+  border: 1px solid #999;
+  background-color: #ffeecf;
+  padding: 7px;
+  z-index: 1000000010;
+}
+
+#tooltip ul {margin:0; padding:0; list-style:none;}
+#tooltip li{margin: 0 0 7px 0;}
+#tooltip a.highlight {font-weight:bold;}
+
+
+
+/* mingle css */ 
+
+#doc-head #ymgl-blog-menu {
+   background:#fff;
+   color:#404040;
+}
+
+#doc-head #ymgl-blog-menu .thm-box {
+   background:#fff;
+}
+
+#doc-head #ymgl-blog-menu a:link,
+#doc-head #ymgl-blog-menu a:visited {
+   color:#247cd4;
+}
+
+#doc-head #ymgl-blog-menu .footnote {
+   color:#404040;
+}
+
+#ymgl-blog-menu ul {
+   margin-bottom:6px;
+}
+
+#ymgl-blog-menu li {
+   display:inline;
+   padding:0 7px 2px 7px;
+   border-right:1px solid #404040;
+}
+
+#ymgl-blog-menu li.last {
+   border-right:0;
+}
+
+#ymgl-blog-menu h2 {
+   font-size: 100%;
+   font-weight: bold;
+   color:#404040;
+   margin: 7px 10px 0 10px;
+}
+
+#ymgl-blog-menu p {
+   margin: 0 10px 5px 10px;
+}
+
+#ymgl-blog-menu .section{
+   border-top: 1px solid #d4d4d4; 
+   margin-top: 7px; 
+   padding-top: 5px;
+}
+
+#ymgl-blog-menu ul {
+    margin: 5px 10px 0 10px;
+    padding: 0;
+    list-style: none;
+}
+
+#ymgl-blog-menu li {
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+#ymgl-blog-menu .user-action li {
+   min-height:19px;
+   line-height:19px;
+   background-repeat:no-repeat;
+   background-position: 0 0;
+}
+
+#ymgl-blog-menu .user-action .action {
+   background-image: url(http://l.yimg.com/us.yimg.com/i/us/cmty/icon_arrow.gif);
+   padding-left:19px;
+}
+
+#ymgl-blog-menu .user-action .compose {
+   background-image: url(http://l.yimg.com/us.yimg.com/i/us/cmty/icon_pencil.gif);
+   padding-left:19px;
+}
+
+#ymgl-blog-menu p.section {margin-bottom: 10px;}
+
+#ymgl-blog-menu p .footnote {display:block; margin: 0;}
+
+
+#ymgl-blog-menu .foot {
+    border-top: 1px solid #d4d4d4;
+    margin: 0 10px 0 10px;
+    padding: 10px 0 10px 0;
+}
+
+#ymgl-blog-menu .foot h2, #ymgl-blog-menu .foot p {margin: 0;}
+
+/* mingle css */
+
+/* end menu */
+
+            
+#tt1{
+ /*put the tooltip on top */ 
+  z-index:  10000000000000;
+}
+#tt1 .bd{
+ /* this force the div in IE to shrink-wrap */ 
+   white-space:nowrap;
+   color:#404040;
+   font-size: 80%;  
+  *width:10px;
+}
+
+/*blast edit*/
+/*move profile down if there's a blast*/
+.profile {margin-top:10px;}
+
+#ymgl-blast {
+   position: relative;
+   min-width: 350px;
+   margin:0 0 13px 0;
+}
+#ymgl-blast form {
+   zoom:1;
+}
+
+#ymgl-blast form:after {
+   content:".";
+   display:block;
+   clear:both;
+   visibility:hidden;
+   height:1px;
+}
+
+#ymgl-blast .highlight {
+   color:#404040;
+   background-color:#ffffd3;
+}
+
+#ymgl-blast .content {
+   width:100%;
+   margin-right:0;
+}
+#ymgl-blast .form-wrapper {
+   display:block;
+   clear:both;
+   float:none;
+   margin:0 18px;
+   position:relative;
+   z-index:6000000;
+   text-align:left;
+}
+
+#ymgl-blast .form-wrapper input,
+#ymgl-blast .form-wrapper select {
+   display:inline;
+   clear:none;
+   font:74% verdana;
+   margin:0 1px;
+}
+
+#ymgl-blast .form-wrapper input {
+   width:200px;
+}
+
+#ymgl-blast .form-wrapper .active,
+#ymgl-blast .form-wrapper .inactive {
+   width:auto;
+}
+
+#ymgl-blast textarea {
+   display:inline;
+   clear:right;
+   float:left;
+   height:33px;
+   margin:0 1px 0 18px;
+   width:70%;
+   position:relative;
+}
+
+#ymgl-blast.sale textarea,
+#ymgl-blast.sale .wrapper {
+   margin-top:3px;
+}
+
+#ymgl-blast .form-wrapper label {
+   font:74% verdana;
+}
+
+#ymgl-blast .wrapper {
+   clear:right;
+   float:left;
+   font:74% verdana;
+   position:relative;
+   width:140px;
+   margin:0 0 0 10px;
+   text-align:left;
+}
+
+#ymgl-blast .wrapper a {
+   font-size:100%;
+   display:inline;
+   margin:0;
+}
+
+#ymgl-blast .wrapper p {
+   clear:both;
+   float:none;
+   margin:0;
+}
+
+#ymgl-blast .wrapper p em {
+   font-weight:bold;
+}
+
+#ymgl-blast span.edit-link {
+   clear:both;
+   float:none;
+   border:0;
+   background:transparent;
+   padding:0;
+   width:auto;
+   text-align:right;
+}
+
+#ymgl-blast.quote span.edit-link {
+   right:26px;
+}
+
+#ymgl-blast div.empty {
+   clear:both;
+   float:none;
+   background:#fff;
+   border:1px solid #d9d9d9;
+   padding-top:3px;
+   margin:auto;
+   width:200px;
+   min-height:30px;
+   position:relative;
+   text-align:center;
+}
+
+#ymgl-blast .empty a {
+   display:block;
+   font:100% arial;
+   font-weight:bold;
+   text-align:center;
+}
+#ymgl-blast .empty .footnote a {
+   font:74% verdana;
+   font-weight:normal;
+   display:block;
+   margin-bottom:4px;
+   font-size:100%;
+}
+
+#ymgl-blast textarea.empty-blast {
+   color:#666;
+   font-style:italic;
+}
+
+#ymgl-blast span.alert {
+   display:block;
+   background:#f7ffad;
+}
+/* end blast bubble */
+    
+
+.yfla-upgrade { border: 1px solid #d9d9d9; background:#fff; width: 300px; height: 200px; }
+
+.yfla-upgrade p { font:100% arial; color:#404040; text-align: center; }
+
+.yfla-upgrade span { display: block; margin-top: 20px; text-align:center;}
+.yfla-upgrade a:link,
+.yfla-upgrade a:visited {color:#247cd4;}
+
+#ymgl-blog .head {
+    border-bottom: 1px solid #7b9400;
+    padding-bottom: 10px;
+}
+
+#ymgl-blog .head h3 {
+    display: block;
+    clear: both;
+    float: none;
+    padding: 0;
+    margin-left:0;
+}
+
+#ymgl-blog .head h3 span.footnote {
+   font-size:60%;
+}
+
+#ymgl-blog .head h3 span.view-toggle {
+   font-size:60%;
+   margin-left: 15px;
+}
+
+#ymgl-blog dl.body {
+    margin: 20px 25px 0 25px;
+}
+
+#ymgl-blog dt.post-head {
+    clear: both;
+    font: 170% georgia, times new roman, serif;
+    margin: 0 0 10px 0;
+}
+
+#ymgl-blog dd.post-body {
+    border-bottom: 1px solid #d6d6e7;
+    margin: 0 0 25px 0;
+}
+
+#ymgl-blog dd.post-body em {
+    font-style: italic;
+}
+
+#ymgl-blog dd.post-body .content-wrapper {
+    font: 100% georgia, times new roman, serif;
+}
+
+#ymgl-blog dd.post-body p {
+    clear: both;
+    text-align: left;
+    margin: 0 0 .75em 0;
+}
+
+#ymgl-blog dd.post-body ul, #ymgl-blog dd.post-body ol {
+    padding-left:27px;
+    margin-bottom:10px;
+    vertical-align:top;
+}
+
+#ymgl-blog dd.post-body li {
+    clear:both;
+    float:none;
+    margin: 0 0 5px 0;
+    padding:0;
+    vertical-align:top;
+}
+
+#ymgl-blog dd.post-body .image-wrapper {
+    text-align: center;
+    margin: 0 0 15px 0;
+}
+
+#ymgl-blog dd.last {
+    border-bottom: 0;
+   margin-bottom:0;
+}
+
+#ymgl-blog dd.post-body .foot {
+    font: 74% verdana, arial, helvetica;
+    margin: 23px 0 10px 0;
+    text-align: left;
+    *padding-bottom:10px;
+}
+#ymgl-blog dd.post-body .alert {
+   color:#ea3307;
+   padding:3px 2px;
+   background:#f7ffad;
+}
+
+#ymgl-blog dd.post-body .foot span {
+   display:block;
+   clear:both;
+   float: none;
+}
+
+
+#ymgl-blog .no-entry {
+    text-align: center;
+    margin-left: 25px;
+    padding: 50px 0 50px;
+}
+
+#ymgl-blog .no-entry em {
+    display: block;
+    font-style: italic;
+    line-height: 2em;
+}
+
+#ymgl-blog .add-rss {
+    text-align: left;
+    margin: 10px 25px 7px 25px;
+    padding-top: 7px;
+    border-top: 1px solid #d4d4d4;
+}
+#ymgl-blog .add-rss a {display:block; clear:none; float:left; font:74% verdana; margin-right:7px;}
+
+/*music plugin*/  
+#ymgl-blog .music-plugin {
+	font:100% arial, helvetica;
+}
+
+#ymgl-blog .music-plugin .image-wrapper {
+	display:block;
+	clear:right;
+	float:left;
+	border:1px solid #000;
+	width:82px;
+	height:82px;
+}
+
+#ymgl-blog .music-plugin .image-wrapper img {
+	border:1px solid #fff;
+}
+
+#ymgl-blog .music-plugin .music-wrapper {
+	clear:right;
+	float:left;
+	width:80%;
+	margin:0;
+	padding-left:5px;
+}
+
+#ymgl-blog .music-plugin .music-wrapper h4 {
+	font-size:100%;
+	font-weight:bold;
+	margin:0;
+}
+
+#ymgl-blog .music-plugin .music-wrapper p {
+	font:85% verdana, arial, helvetica;
+}
+
+#ymgl-blog .music-plugin .music-wrapper span {
+	display:block;
+	clear:both;
+}
+
+#ymgl-blog .music-plugin .music-wrapper .footnote {font-size:100%;}
+
+#ymgl-blog .music-plugin br { clear:both;  }/*comments*/
+#ymgl-blog .comments {
+    border-top: 1px solid #7b9400;
+    background: #f7f7f7;
+    margin:0;
+    position:relative;
+    *bottom:0;
+}
+
+#ymgl-blog.default .comments {
+   border-color:#7b9ebd;
+}
+
+#ymgl-blog .comments .pagination {
+   margin-right:10px;
+   background:transparent;
+}
+
+#ymgl-blog .comments .top {
+   margin:10px 20px 0 0;
+   padding:0;
+   border:0;
+}
+
+#ymgl-blog .comments .bottom {
+   margin:0 20px 7px 0;
+   padding:0;
+   border:0;
+}
+
+#ymgl-blog .comments .head {
+    border: 0;
+    margin: 10px 25px 0 25px;    
+}
+
+#ymgl-blog .comments .head h4 {
+    display: inline;
+    font-weight: bold;
+    font-size: 100%;
+    font-family: arial, helvetica, sans-serif;
+    color: #7d9c54;
+}
+
+#ymgl-blog .comments .head em {
+    font-style: italic;
+    font-weight: normal;
+}
+
+#ymgl-blog .comments .head a {
+    font-size: 74%;
+}
+
+#ymgl-blog .comments .row {
+    margin: 10px 25px 0 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+#ymgl-blog .comments .row .user-card {
+    clear: right;
+    float: left;
+    margin-right: 45px;
+    *margin-right: 22px;
+   width:75px;
+}
+
+#ymgl-blog .comments .row .user-card .user-photo,
+#ymgl-blog .comments .row .user-card .vitals {
+   display:block;
+   clear:both;
+   float:none;
+   width:auto;
+}
+
+#ymgl-blog .comments .row .wrapper {
+    clear: right;
+    float: left;
+    width: 75%;
+}
+
+#ymgl-blog .comments .row .wrapper .comment {
+    font-size: 89%;
+    font-family: georgia, times new roman, serif;
+    margin-bottom: .75em;
+}
+
+#ymgl-blog .comments .row .wrapper .datestamp {
+    font-size: 74%;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+#ymgl-blog .comments .last {border: 0;}
+
+#ymgl-comment-add .body {
+    margin: 15px 25px 10px 25px;
+}
+
+#ymgl-comment-add .body h3 {
+    margin-bottom: 10px;
+}
+
+#ymgl-comment-add .body label {
+    display: block;
+    font-weight: bold;
+    font-size: 74%;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+#ymgl-comment-add .body .word-verify {
+    margin: 25px 0 0 0;
+}
+
+#ymgl-comment-add .body .word-verify h4 {
+    font-size: 100%;
+    font-weight: bold;
+    margin:0;
+}
+
+#ymgl-comment-add .body .word-verify p {
+	margin:0 0 7px 0;
+}
+
+#ymgl-comment-add .body .word-verify img {
+	clear: right;
+	float: left;
+    border: 1px solid #d4d4d4;
+	margin: 0 15px 15px 0;
+}
+
+#ymgl-comment-add .body .word-verify input {
+    clear: right;
+    float: left;
+    width: 100px;
+}
+
+#ymgl-comment-add .foot {
+	background:transparent;
+    text-align: right;
+    margin: 0 10px 10px 0;
+}
+
+#ymgl-comment-add .foot input {
+   margin: 0 0 0 8px;
+}
+
+#ymgl-comment-add .logged-out {
+   font-weight:bold;
+   margin:10px;
+   text-align:center;
+}
+        
+
+</style>
+<script type="text/javascript">logd = function() { };</script><script type="text/javascript" src="http://us.js2.yimg.com/us.js.yimg.com/lib/cmty/ymgl_fla_20061130134131.js"></script>
+</head>
+<body  onload=" hlx_js_init(); ">
+
+<div class="doc-layout-head wide my-page" id="doc-head">
+    <span class="beacon"></span>
+    
+<!-- SpaceID=0 noserver -->
+
+<div class="container-0" id="ymgl-north-wrapper">
+<!-- SpaceID=0 noserver -->
+
+</div>
+<div class="container-0" id="ymgl-feedback">
+<span class="caption"><a href="http://blog.360.yahoo.com/product_360">Yahoo! 360&#176; News</a> | <a href="http://add.yahoo.com/fast/help/us/360/cgi_feedback">Beta Feedback</a></span>
+</div>
+<div class="container-0" id="ymgl-masthead">
+    <span class="ct"><span class="cl"></span></span>
+    
+        
+<h1><span>My Blog</span></h1>
+
+     <div class="body">
+        <a href="http://360.yahoo.com/;_ylt=AocuoxwZSjiIQgurGjvwhP6kAOJ3?.login=1">Home</a>|<a href="http://360.yahoo.com/my_profile-jfCUH8k5fqpqLD7PHOY4YMCi5eU-;_ylt=ApDQ2T9TOXtUE5hKe2h63bOkAOJ3?cq=1">My Page</a>|<a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-;_ylt=Ahh.fFfn7rOv1yyxJEbj8Q2kAOJ3?cq=1" class="selected">My Blog</a>|<a href="http://360.yahoo.com/friends/index.html;_ylt=AlQuNyJGJcOD4qCGWwWCt0qkAOJ3">My Friends</a>|<a href="http://message.360.yahoo.com/mailbox/;_ylt=AkHLCNMvTmTzttqBxGQsYGmkAOJ3">Mailbox</a>|<a href="http://message.360.yahoo.com/invites/compose.html;_ylt=ArnJoUuGF2g3WND8ULFnqkKkAOJ3">Invite</a>|<a href="http://360.yahoo.com/search.html;_ylt=Auj4j134PZg9Rc7sCMYC5_ekAOJ3">Search</a>|<a href="http://360.yahoo.com/edit/identity.html;_ylt=ArL0bCnBOwOm1zgTM.xvOvqkAOJ3">Settings</a>
+    </div>
+    <span class="cb"><span class="cl"></span></span>
+</div>
+
+
+
+<div id="ymgl-blog-menu" class="container-0 default">
+<span class="ct"><span class="cl"></span></span>
+<ul class="user-action">
+<li class="compose"><a href="http://blog.360.yahoo.com/blog/compose.html;_ylt=AiSqX5n78Rxo.ojtldmQ_5WkAOJ3">Compose Blog Entry</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog/recent_comments.html">Blog Comments</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog/blogroll.html;_ylt=AteqiQlEQRH2h1djAZq6ZFakAOJ3">Edit Blogroll</a></li>
+<li class="last"><a href="http://blog.360.yahoo.com/blog/edit_settings.html;_ylt=AuSMalwxMIidngRyz.4Irm6kAOJ3">Edit Blog Settings</a></li></ul> 
+<p class="footnote">Your blog can be seen by  <strong>Public</strong>  and can be commented by  <strong>Public</strong>. <a href="http://blog.360.yahoo.com/blog/edit_settings.html">(Change this)</a></p>
+        <span class="cb"><span class="cl"></span></span>
+ </div>
+
+
+</div>
+<div class="doc-layout-body wide my-page" id="doc-body">
+    <div class="thm-wrapper">
+        <span class="beacon"></span>
+        <div class="doc-layout-1" id="doc-1">
+            
+<div class="container-1 profile" id="ymgl-profile">
+<span class="shadow"></span>
+<div class="thm-box">
+    <div class="head">
+        <h2>
+            <span class="ct"><span class="cl"></span></span>
+            <span class="nickname">Dieu Anh L</span>
+         <span class="alias">
+            
+         </span>  
+        </h2>
+        <p>
+<a href="http://360.yahoo.com/profile-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1">Top Page</a>
+&nbsp;|&nbsp;
+<a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1">Blog</a>
+&nbsp;|&nbsp;
+<a href="http://360.yahoo.com/feeds-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1">Feeds</a>
+&nbsp;|&nbsp;
+<a href="http://360.yahoo.com/friends-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1">Friends</a>
+&nbsp;|&nbsp;
+<a href="http://360.yahoo.com/lists-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1">Lists</a>
+
+
+
+
+        </p>
+    </div>
+    <div class="body">
+        
+    
+<div class="user-card-shadow">
+   <div class="user-card" id="user-photos">
+          
+
+<div class="user-photo" id="user-photos-wrap">
+   <img src="http://a367.yahoofs.com/mingle/49c0b12ez1c2131c3/profile/__sr_/ff49.jpg?mg4zu7JBV7KUCUmB"  id="user-photos-full" height="185" width="140" border="">
+</div>
+<div class="thumb-wrapper" id="user-photos-thumbs">
+      <span><img src=""  height="-21" width="60" border=""></span>
+      <span></span>
+      <span></span>
+</div>
+    
+          
+<ul class="vitals">
+    
+<li>Dieu Anh Le Vu, 23</li>
+        
+<li> Norway</li>
+        
+<li>Work: Opera Software</li>
+    
+</ul>
+    
+   </div>
+</div>
+    
+
+
+        
+        
+        <p class="degree">
+            <span></span>
+            <span>This is your page.</span>
+        </p>
+
+        
+<div class="action-menu">
+    <span class="ct"><span class="cl"></span></span>
+    <ul>
+            
+<li class="opi "><a href="ymsgr:sendIM?hellodieuanh" title="Send IM"><img src="http://l.yimg.com/us.yimg.com/i/us/msg/6/gr/online_12px_1.gif"  height="12" width="12" border="0"> Send IM</a></li>
+             
+<li class="send-message last"><a href="http://message.360.yahoo.com/mailbox/message/compose-jfCUH8k5fqpqLD7PHOY4YMCi5eU-;_ylt=AhOsxJYCqjfP8FqSQuSZpGqkAOJ3?cq=1">Send Message</a></li>
+     
+    </ul>
+    <span class="cb"><span class="cl"></span></span>
+</div>
+
+        <ul class="options">
+        
+<li><strong><a href="ymsgr:addfriend?hellodieuanh">Add to Messenger</a></strong></li>
+
+        <li><a href="http://360.yahoo.com/friends/ignore_list.html?ignore=jfCUH8k5fqpqLD7PHOY4YMCi5eU-&.crumb=pkvCv4JOnNx">Ignore</a> this person <span><a href="http://help.yahoo.com/l/us/yahoo/360/friends/friends-04.html" title="Learn what it means to ignore someone.">(What's this?)</a></span></li>
+        <li><a href="http://add.yahoo.com/fast/help/us/360/cgi_abuse">Report for abuse</a></li>
+        </ul>
+        <ul id="ymgl-customize-links" class="options">
+<li></li>
+<li></li>
+</ul>
+
+    </div>
+    <div class="foot">
+        <p class="datestamp">
+        <span>Last updated Tue Nov 11, 2008</span>
+        <span>Member since August 2008</span>
+	
+        </p>
+    </div>
+<span class="cb"><span class="cl"></span></span>
+</div>
+</div>
+<div id="ymgl-tagcloud" class="container-1 publish intro">
+<span class="shadow"></span>
+<div class="thm-box">
+   <span class="ct"><span class="cl"></span></span>
+	<div class="head">
+	   <h3>Tag Cloud</h3>
+	</div>
+	<div class="body">
+	   <!-- begin tagcloud microformat-->
+
+	   <div class="hTagcloud">
+	      <ul class="popularity">
+              <li class="vvvv-popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=4.2">4.2</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=alpha">alpha</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=android">android</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=b%C3%A1nhn%C6%B0%E1%BB%9Bng">bánhnướng</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=b%C3%A1oc%C3%A1o">báocáo</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=b%E1%BA%A3nth%C3%A2n">bảnthân</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=beta">beta</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=blog">blog</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=computer">computer</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=conc%C3%A1i">concái</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=fun">fun</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=l%E1%BB%97i">lỗi</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=l%E1%BB%9Di%C4%91%E1%BA%A7u">lờiđầu</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=makemebabies">makemebabies</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=m%C3%A1yt%C3%ADnh">máytính</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=m%E1%BA%B7tm%C5%A9i">mặtmũi</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=me">me</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=mini">mini</a></li>
+<li class="vvvv-popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=myopera">myopera</a></li>
+<li class="vvvv-popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=opera">opera</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=opera10">opera10</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=operalogo">operalogo</a></li>
+<li class="vvvv-popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=operamini">operamini</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=ph%E1%BA%A7nm%E1%BB%81m">phầnmềm</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=qu%E1%BA%A3ngc%C3%A1o">quảngcáo</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=s%E1%BB%ADal%E1%BB%97i">sửalỗi</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=stuff">stuff</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=thaydoi">thaydoi</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=th%C3%B4ngb%C3%A1ol%E1%BB%97i">thôngbáolỗi</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=ti%E1%BA%BFngvi%E1%BB%87t">tiếngviệt</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=tienich">tienich</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=tr%C3%ACnhduy%E1%BB%87t">trìnhduyệt</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=tr%C3%B2vui">tròvui</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=trungthu">trungthu</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=usb">usb</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=v%C3%A0il%E1%BB%9Di">vàilời</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=v%C3%A0om%E1%BA%A1ng">vàomạng</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=videoqu%E1%BA%A3ngc%C3%A1o">videoquảngcáo</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=webmobile">webmobile</a></li>
+<li class="popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=yahoomessengerforvista">yahoomessengerforvista</a></li>
+<li class="vvvv-popular"><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&tag=%C4%91td%C4%91">đtdđ</a></li>
+
+ 	      </ul>
+      </div>
+	   <p class="footnote"><a href=""></a></p>
+	</div>
+	<span class="cb"><span class="cl"></span></span>
+
+</div>
+</div>
+<div id="ymgl-blog-calendar" class="container-1">
+<span class="shadow"></span>
+<div class="thm-box">
+<iframe name='calendar' id="blog-calendar-iframe" src="/blog/calendar_content.html?id=jfCUH8k5fqpqLD7PHOY4YMCi5eU-&cyy=2009&cmm=4" frameborder="0" marginheight="0" marginwidth="0" scrolling="no"></iframe>
+</div>
+</div>
+
+
+        </div>
+        <div class="doc-layout-2 wide" id="doc-2">
+            <span class="beacon"></span>
+            
+<div class="container-0 blast shout " id="ymgl-blast">
+   <div class="thm-box" id="jBlast-thm-box">
+        <span class="ct"><span class="cl"></span></span>
+        <span class="tail"></span>
+        <p class="content" id="jBlastGraph"><span class="snippet" >Opera mới cập nhật. Tải phiên bản mới 9.64 tại</span><span id="linksspan" class="links"><a href="http://www.opera.com/download" id="ymgl-blast-outside-link" class="outside-link">--&gt;&nbsp;Click&nbsp;here</a> <a href="http://message.360.yahoo.com/mailbox/message/compose-jfCUH8k5fqpqLD7PHOY4YMCi5eU-;_ylt=Ag_QDEUs7MzHcwfALgdjYrykAOJ3?cq=1&blst=1" class="action-link">Reply</a></span></p>
+        
+        <span class="cb"><span class="cl"></span></span>
+   </div>
+</div>
+
+            <div class="doc-layout-11">
+            <span class="beacon"></span>
+                
+<div id="ymgl-blog" class="container-0 publish post">
+<span class="shadow"></span>
+<div class="thm-box">
+        <span class="ct"><span class="cl"></span></span>
+        <dl class="body">
+            <dt class="post-head">Trình duyệt cho ĐTDĐ Opera Mini, nhanh, trẻ, khỏe, miễn phí :)</dt>
+            <dd class="post-body last">
+                <div class="image-wrapper"><img src="http://a367.yahoofs.com/blog/49c0b13ez354b1c3d/11/__sr_/3e05.jpg?mg4zu7JBj9gPEZet"  alt="333" height="146" width="333" border="0"> <a href="http://blog.360.yahoo.com/blog/slideshow.html?p=16&id=jfCUH8k5fqpqLD7PHOY4YMCi5eU-" id="m16"><img src="http://l.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/srch12_1.gif"  class="magnify" alt="magnify" height="12" width="12" border="0"></a></div>
+		<div class="content-wrapper">
+Nhân dịp đạt được 20 triệu người sử dụng Opera Mini mỗi tháng , công ty Opera Software cho ra bản thử nghiệm của Opera Mini 4.2 beta, cho phép người sử dụng internet một cách cá nhân hơn với một số giao diện mới, hỗ trợ YouTube () vả các dịch vụ cung cấp video cho ĐTDĐ một cách hiệu quả hơn, và hoạt động được trên nhiều mẫu điện thoại hơn. Ngoài đồng bộ hóa trang lưu và các trang web vừa xem, Opera Link còn được cải tiến với khả năng đồng bộ hóa các ghi chú giữa ĐTDĐ và máy tính.   <br />    <br />  Opera Mini sử dụng tốt trên mọi ĐTDĐ dùng Java.   <br />  Còn chờ đợi gì nữa, Opera Mini 4.2 beta có thể được tải về miễn phí tại <a href="http://www.operamini.com/beta/">http://www.operamini.com/beta/</a>   <br />    <br />  Hơn nữa, để gửi lời chúc mừng sự kiện 20 triệu người sử dụng Opera mini hàng tháng đến blog Opera Mini bằng điện thoại di động hay email ! Địa chỉ email MMS là &quot;blog+miniblog@my.opera.com&quot;. Hãy gửi ảnh nơi bạn đang dùng Opera Mini : trên xe buýt, ở nhà, ở nơi làm việc vv… Xin hãy ghi rõ nơi bạn dùng trên tiêu đề/chủ để MMS.  <br />    <br />  Vui vẻ nhé !  <br />    <br />
+
+		</div>
+                <div class="foot">
+                    <span>Tags: <span style="display:inline" id="tag-container-16"><a href="?tag=operamini" rel="nofollow tag">operamini</a>, <a href="?tag=4.2" rel="nofollow tag">4.2</a>, <a href="?tag=beta" rel="nofollow tag">beta</a>, <a href="?tag=tr%C3%ACnhduy%E1%BB%87t" rel="nofollow tag">trìnhduyệt</a>, <a href="?tag=%C4%91td%C4%91" rel="nofollow tag">đtdđ</a> | </span><a href="http://blog.360.yahoo.com/blog/compose.html?msgid=lxtKKmpgLQ--" id="edit-tag-16" class="edit-tags">Edit Tags</a></span>
+<form><input type="hidden" name="tagslist" value="operamini, 4.2, beta, trìnhduyệt, đtdđ" id="tag-list-16" /></form>
+<div class="alert" style="display:none" id="tag-error-16"></div>
+
+                    <p>Tuesday November 11, 2008 - 04:01am (PST) <a href="http://blog.360.yahoo.com/blog/compose.html?msgid=lxtKKmpgLQ--">Edit</a> | <a href="http://blog.360.yahoo.com/blog/delete.html?msgid=lxtKKmpgLQ--&.crumb=c8trvNsLZSO">Delete</a></p>
+                    <p class="nav">
+			<span>Next Post: <a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=19">Origami Opera Logo</a></span>
+                        <span>Previous Post: <a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=14">Đón trung thu kiểu geek</a></span>
+		    </p>
+                </div>
+           </dd>
+        </dl>
+
+
+<div class="comments" id="comments">
+    <div class="head"><h4>Comments</h4><em>(1 total)</em> <a href="#writecomment">Post a Comment</a></div>
+<span class="pagination top"></span>
+    
+    <div class="row last">
+	    
+<div class="user-card ">
+        
+<div class="user-photo "><a href="http://360.yahoo.com/profile-V2Lt0mQwda6fNY400gJbDLI-?cq=1" title="palbongro"><img src="http://a367.yahoofs.com/mingle/49aa6ba5z44269e67/profile/__tn_/2c3d.jpg?mg4zu7JBChvR7ucx"  width="64" border="0"></a></div>
+    
+        
+<ul class="vitals">
+    
+<li class="user-name"><a href="http://360.yahoo.com/profile-V2Lt0mQwda6fNY400gJbDLI-?cq=1" title="palbongro">palbo&#8230;</a></li>
+        
+<li class="opi"><a href="ymsgr:sendIM?anhbk3011" title="Offline IM"><img src="http://l.yimg.com/us.yimg.com/i/us/msg/6/gr/offline_12px_1.gif"  height="12" width="12" border="0"> Offline IM</a></li>
+    
+</ul>
+    
+</div>
+    
+	<div class="wrapper">
+		<p class="comment">welcome u visit to my blog! kekeke E cũng c&oacute; một c&aacute;i opera m&agrave; sao e thấy ở VN &iacute;t người x&agrave;i wa chị!</p>
+		<p class="datestamp">Tuesday November 11, 2008 - 10:26pm (ICT) <a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?p=16&dc=18&c=ZKjAgDD%2FW8U">Remove Comment</a></p>
+	</div>
+    </div>
+
+<span class="pagination bottom"></span>
+</div>
+
+
+
+
+        <span class="cb"><span class="cl"></span></span>
+</div>
+</div>
+
+<div id="ymgl-comment-add" class="container-0 message">
+<span class="shadow"></span>
+<div class="thm-box">
+    <span id="writecomment" class="ct"><span class="cl"></span></span>
+    <form name="blog_comments" action="/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=16" method="POST"><div class="body">
+    <h3>Compose a comment for this post</h3>
+    <label>Comment:</label>
+    <span class="alert"></span>
+    <textarea name="comment" rows="5" cols="80" id="comment_ff"></textarea>
+    <p class="caption" style="text-align:right;"><span id="caption" style="float:left;">Limit 4000 characters.</span>No HTML, please.</p>
+</div>
+<div class="foot"><input type="submit" value="Post Comment" name="post" class="inactive"/></div>
+<input type=hidden name=".crumb" value="c8trvNsLZSO">
+<input type=hidden name="form_submitted" value="blog_comments">
+</form><span class="cb"><span class="cl"></span></span></div>
+</div>
+
+            </div>
+            <div class="doc-layout-10">
+                
+<div id="ymgl-sticky-post" class="container-0 my-links">
+<span class="shadow"></span>
+<div class="thm-box">
+<h4>HIGHLIGHTED POSTS</h4>
+<ul>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=27" title="Dịch vụ blog / lưu giữ tài liệu My Opera ra phiên bản tiếng Việt">Dịch vụ blog / lưu giữ tài liệu My Opera r...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=25" title="Alpha Opera 10 : món quà Noel cho những người hâm mộ Opera và cho developer">Alpha Opera 10 : món quà Noel cho những ng...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=23" title="Trình duyệt Opera Mini ra bản chính thức 4.2 và beta cho Android">Trình duyệt Opera Mini ra bản chính thức 4...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=21" title="Việt Nam đứng thứ 4 trong khu vực Đông Nam Á về truy cập mạng qua ĐTDĐ">Việt Nam đứng thứ 4 trong khu vực Đông Nam...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=19" title="Origami Opera Logo">Origami Opera Logo</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=16" title="Trình duyệt cho ĐTDĐ Opera Mini, nhanh, trẻ, khỏe, miễn phí :)">Trình duyệt cho ĐTDĐ Opera Mini, nhanh, tr...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=14" title="Đón trung thu kiểu geek">Đón trung thu kiểu geek</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=12" title="Con cái của bạn mặt mũi sẽ ra làm sao ?">Con cái của bạn mặt mũi sẽ ra làm sao ?</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=10" title="Giải mã các thông báo lỗi thông dụng trên máy tính">Giải mã các thông báo lỗi thông dụng trên ...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=8" title="10 lý do khiến bạn nên chuyển blog sang My Opera">10 lý do khiến bạn nên chuyển blog sang My...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=5" title="Chết cười - quảng cáo rất ấn tượng và hiệu quả">Chết cười - quảng cáo rất ấn tượng và hiệu...</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=3" title="Have you used Yahoo! Messenger for Vista ?">Have you used Yahoo! Messenger for Vista ?</a></li>
+
+<li><a href="http://blog.360.yahoo.com/blog-jfCUH8k5fqpqLD7PHOY4YMCi5eU-?cq=1&p=1" title="Ta đây !">Ta đây !</a></li>
+
+</ul>
+</div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="doc-layout-foot my-page" id="doc-foot">
+    <span class="beacon"></span> 
+    <!-- beacons component //-->
+<script>
+
+</script>
+
+
+<!-- SpaceID=0 noserver -->
+
+
+</div>
+
+</body>
+<head>
+<script type="text/javascript" language="JavaScript" src="http://us.js2.yimg.com/us.js.yimg.com/lib/cmty/utils/y360_20061114143852.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://us.js2.yimg.com/us.yimg.com/lib/cmty/ymgl_rotate_200602061654.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://us.js2.yimg.com/us.yimg.com/lib/g/yg_browser.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/connection_2.1.0.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/animation_2.0.0-b3.js"></script>
+
+<script type="text/javascript">
+function hlx_js_init() {
+    YAHOO.y360.CustomThemeDisabler('style_toggle', 'custom_style', {"turn_on":"<b>View page with theme<\/b>","turn_off":"<b>View page without theme<\/b>"});
+YAHOO.util.Event.addListener('make_it_mine', 'click', function(e) { if (!confirm("Clicking \"OK\" will make this theme yours, excluding custom images.\n\nYour current theme settings will not be saved.")) { YAHOO.util.Event.stopEvent(e); } });
+up_images = new Array();
+up_sizes = new Array();
+up_images[0] = "http://a367.yahoofs.com/mingle/49c0b12ez1c2131c3/profile/__sr_/ff49.jpg?mg4zu7JBV7KUCUmB";
+up_sizes[0] = {"thumbw":60,"thumbh":79,"bigw":140,"bigh":185};
+up_images[1] = "";
+up_sizes[1] = {"thumbw":60,"thumbh":-21,"bigw":-1614947232,"bigh":578466339};
+
+try { if(avKey){} } catch (e) { avKey = ''; }
+
+initThumbnails('user-photos', false, 500);
+
+YAHOO.y360.evenColumns();
+
+//hide dropshadow from opera
+function hideShadow() {
+    if (!YAHOO.y360.isOpera) { return false; }
+    var findSpans = document.getElementById('doc-body').getElementsByTagName('span');
+    for (var i=0; i < findSpans.length; i++) {
+        if (findSpans[i].className == 'shadow') {
+            findSpans[i].style.display = 'none';
+        }
+    }
+}
+hideShadow();
+
+gPAGELOADED = true;
+
+YAHOO.y360.evenColumns();
+YAHOO.y360.Mp3.go('ymgl-blast');
+         
+
+function yg_popup(u,n,w,h,k){
+	var a=[],o=null,r=arguments;
+	a[0]="width="+w+",height="+h;
+	a[1]=",scrollbars="+((k&1)?1:0);
+	a[2]=",resizable="+((k&2)?1:0);
+	a[3]=",toolbar="+((k&4)?1:0);
+	a[4]=",status="+((k&8)?1:0);
+	a[5]=",location="+((k&16)?1:0);
+	a[6]=",menubar="+((k&32)?1:0);
+	if(r.length>=6){a[7]=(document.layers)?",screenX="+r[5]:",left="+r[5]}
+	if(r.length>=7){a[8]=(document.layers)?",screenY="+r[6]:",top="+r[6]}
+	a=a.join("");o=open(u,n,a);o.focus();
+	return o;
+}
+
+function initPopup(p_sId, p_sURL, p_sWinName, p_nWidth, p_nHeight, p_sYLibCode)
+{
+	var oLink = document.getElementById(p_sId);
+	if (!oLink) return;
+	oLink.winURL = (p_sURL) ? p_sURL : oLink.href;
+	oLink.winWidth = p_nWidth; 
+	oLink.winName = p_sWinName;
+	oLink.winHeight = p_nHeight
+	oLink.winOptions = p_sYLibCode
+	oLink.onclick = popupLink;
+}
+
+function popupLink()
+{
+	yg_popup(this.winURL,this.winName, this.winWidth, this.winHeight,this.winOptions);
+	return false;
+}
+
+
+initPopup('m16', '/blog/popup_slideshow.html?p=16&id=jfCUH8k5fqpqLD7PHOY4YMCi5eU-', null, 800, 700, 2);
+
+
+var tags_inline_ids = ["16"];
+var tags_inline_form = {"edit":"<input type=\"text\" name=\"newtags\" value=\"%tags\" id=\"newtags-%id\" \/>\n<input type=\"button\" name=\"save\" value=\"Save\" id=\"tag-save-%id\" \/>\n<input type=\"button\" name=\"cancel\" value=\"Cancel\" id=\"tag-cancel-%id\" \/>\n","saving":"Saving...\n"};
+var tags_errors = { 'xhrfail' : "Communication with server failed..."};
+
+var tagging_widget = function(id,forms,errors){
+	var oldtaglist = '';
+
+	//get form html from template
+	var get_form = function(){
+		var oldtags = get_oldtags(); 
+		var newform = forms.edit;
+
+		newform = newform.replace(/%tags/, oldtags);
+		newform = newform.replace(/%id/g, id);
+		return newform;
+	}
+
+
+	//get old tag list cached in hidden form
+	var get_oldtags = function(){
+		var oldtag_e = document.getElementById("tag-list-"+id);
+	 	return oldtag_e ? oldtag_e.value.replace(/"/g, '&quot;') : '';	
+	}
+
+	//get tag list container element
+	var get_container = function(){
+		return document.getElementById("tag-container-"+id);
+	}
+
+	//get save web service URL
+	var get_save_url = function(newtags, oldtags){
+		var url = 'http://' + location.hostname + '/blog/tagging_ws.html?action=update';
+		url += '&msgid=' + id;
+		url += '&newtags=' + urlencode(newtags);
+		url += '&oldtags=' + urlencode(oldtags);
+		return url; 
+	}
+
+	//save button click actions
+	var do_save = function(){
+		var newval = document.getElementById('newtags-'+id);
+		if (!newval) return;
+		var newtags = newval.value;
+		var oldtags = get_oldtags();
+		var url = get_save_url(newtags, oldtags); 
+		var callback = {success:on_xhr_success, failure:on_xhr_failure};
+		var container = get_container();
+		container.innerHTML = forms.saving;
+		var request = YAHOO.util.Connect.asyncRequest('GET', url, callback);
+		//console.log("fired:"+url);
+	}
+
+	//url encode
+	var urlencode =  function(s){
+		return encodeURI(s).replace(/\'/g, '%27').replace(/\"/g,'%22').replace(/\+/g, '%2B').replace(/\//g,'%2F').replace(/#/g, '%23');
+	}
+
+	//handle successful xhr call
+	var on_xhr_success = function(o){
+		var container = get_container(); 
+		var edit_link = document.getElementById("edit-tag-"+id);
+		var tag_list = document.getElementById("tag-list-"+id);
+		if (o.status!=200 || o.responseText.length==0) return on_xhr_failure(o);
+		try{
+			var resp = eval("("+o.responseText+")");
+		}catch(err){
+			var resp = {stat:"fail"};
+		}
+
+		if (resp.stat=='ok'){
+			container.innerHTML = resp.mkp;
+			edit_link.style.display = "";
+			tag_list.value = resp.tags;
+		}else{
+			do_cancel();
+			if (resp.error) do_error(resp.error);
+			else do_error(errors.xhrfail);
+		}
+	}
+
+	//handle failed xhr call
+	var on_xhr_failure = function(o){
+		do_cancel();
+		do_error(errors.xhrfail);
+	}
+
+	//clear error
+	var clear_error = function(){
+		var errDiv = document.getElementById('tag-error-'+id);
+		//YAHOO.util.Anim('tag-error-'+id, { opacity: { to: 0 } }, 1, YAHOO.util.Easing.easeOut);
+		errDiv.innerHTML='';
+                errDiv.style.display = 'none';
+	}
+
+	//show error message
+	var do_error = function(error){
+		var errDiv = document.getElementById('tag-error-'+id);
+		errDiv.innerHTML = error;
+                errDiv.style.display = '';
+		setTimeout(clear_error, 10000);
+		//console.log("Got error: "+error);
+	}
+
+	//cancel button click actions
+	var do_cancel = function(){
+		var container = get_container();
+		var edit_link = document.getElementById('edit-tag-'+id);
+		if (edit_link && container){
+			container.innerHTML = oldtaglist;
+			edit_link.style.display = '';
+		}
+		//console.log('canceled '+id);
+	}
+
+	var save_handler = function(save_click){
+		do_save();
+		YAHOO.util.Event.stopEvent(save_click);
+	}
+
+	var cancel_handler = function(click){
+		do_cancel();
+		YAHOO.util.Event.stopEvent(click);
+	}
+
+	var handle_edit = function(edit_click){
+		
+		var container = get_container(); 
+
+		try{
+			//get form, do template replacements, swap into container
+			var newform = get_form();
+			oldtaglist = container.innerHTML;
+			container.innerHTML = newform;
+
+			//attach new event listeners to 'save' and 'cancel' buttons
+			YAHOO.util.Event.addListener("tag-save-"+id, "click", save_handler);
+			YAHOO.util.Event.addListener("tag-cancel-"+id, "click", cancel_handler);
+
+		}catch(err){
+			//console.log('error in init', err);
+			//something went wrong.  get out so the user can be taken to teh compose page
+			return false;
+		}
+
+		YAHOO.util.Event.stopEvent(edit_click);
+
+		//get rid of edit link
+		var  link = edit_click.target || edit_click.srcElement;
+		link.style.display = "none";
+	}
+
+
+    YAHOO.util.Event.addListener('edit-tag-'+id, 'click', handle_edit);
+}
+
+var init_tagging_widgets = function(ids, form, errors, widget){
+    for(i in ids) widget(ids[i], form, errors);
+}
+
+init_tagging_widgets(tags_inline_ids, tags_inline_form, tags_errors, tagging_widget);
+
+
+
+
+
+YAHOO.y360.TextAreaCounter('comment_ff', 'caption', 4000, {"pre":" ","post":"characters left."});
+        
+
+
+}
+</script>
+</head>
+</html>
+<!-- 0.98593 -->
+<!-- feblg10.mgl.re2.yahoo.com compressed/chunked Wed Apr 22 02:51:15 PDT 2009 -->

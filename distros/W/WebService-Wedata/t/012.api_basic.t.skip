@@ -1,0 +1,58 @@
+use Test::More tests => 7;
+use WebService::Wedata;
+use Data::Dumper;
+
+# item interface test
+
+my $my_api_key = 'YOUR_API_KEY';
+my $now = time;
+my $db_name = 'test_db_from_WebService::Wedata' . $now;
+my $item_name = 'test_db_from_WebService::Wedata::Item' . $now;
+
+my $wedata = WebService::Wedata->new($my_api_key);
+my $database = $wedata->create_database(
+    name => $db_name,
+    required_keys => [qw/foo bar baz/],
+    optional_keys => [qw/hoge fuga/],
+    permit_other_keys => 1,
+);
+
+my $item_name = "test_item";
+$item = $database->create_item(
+    name => $item_name,
+    data => {
+        foo => 'foo_value',
+        bar => 'bar_value',
+        baz => 'baz_value',
+    }
+);
+check_item($item, {
+    foo => 'foo_value',
+    bar => 'bar_value',
+    baz => 'baz_value',
+});
+
+$item->update(
+    foo => 'foo_updated',
+    bar => 'bar_updated',
+    baz => 'baz_updated',
+);
+check_item($item, {
+    foo => 'foo_updated',
+    bar => 'bar_updated',
+    baz => 'baz_updated',
+});
+
+# CLEAN UP
+$item->delete;
+my @items;
+$items = $database->get_items;
+is(scalar(@{$items}), 0, "delete $item_name");
+$database->delete;
+
+sub check_item {
+    my($item, $expect) = @_;
+    while (my($k, $v) = each(%{ $item->{data} })) {
+        is($v, $expect->{$k}, 'data[' . $k . ']');
+    }
+}

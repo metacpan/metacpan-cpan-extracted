@@ -1,0 +1,15 @@
+#!/usr/bin/perl 
+use warnings;
+use strict;
+
+use Wily;
+use Wily::Message;
+
+die "Usage: $0 name\b" unless @ARGV;
+
+my $wily = Wily->new();
+my $win = $wily->win("+Man $ARGV[0]");
+$win->set_body(scalar qx{man -a $ARGV[0] | col -bx});
+
+
+

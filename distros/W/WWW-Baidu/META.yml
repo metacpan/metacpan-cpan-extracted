@@ -1,0 +1,21 @@
+abstract: Perl interface for the www.baidu.com search engine
+author: Agent Zhang <agentzh@gmail.com>
+build_requires: 
+  Test::More: 0.66
+  YAML::Syck: 0.72
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: WWW-Baidu
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0.30
+  HTML::Parser: 3.56
+  HTML::TreeBuilder: 3.23
+  WWW::Mechanize: 1.20
+  WWW::Mechanize::Cached: 1.32
+  perl: 5.8.1
+version: 0.06

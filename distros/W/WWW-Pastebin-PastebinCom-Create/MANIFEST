@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/WWW/Pastebin/PastebinCom/Create.pm
+MANIFEST
+README
+LICENSE
+examples/paste.pl
+t/00-load.t
+t/01-paste.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+Makefile.PL
+META.yml
+META.json

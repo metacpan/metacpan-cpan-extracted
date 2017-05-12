@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               WWW-Facebook-API
+version:            0.4.18
+abstract:           Facebook API implementation
+author:
+    - David Romano <unobe@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::SSLeay:   0
+    Digest::MD5:     0
+    JSON::Any:       0
+    LWP::UserAgent:  0
+    Readonly:        0
+    Time::HiRes:     0
+    version:         0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/unobe/perl-wfa/
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

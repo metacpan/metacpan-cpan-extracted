@@ -1,0 +1,16 @@
+201[
+    {
+        "end_user_description": "end user description", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259822, 
+        "pub_title": "Test Attirubute", 
+        "resource_name": "attribute", 
+        "friendly_id": "8ceeed54190b11e0a1e71434627823de", 
+        "attributes": [], 
+        "created_timestamp": 1294259822, 
+        "pub_description": "test description", 
+        "end_user_title": "end user title", 
+        "id": 15496
+    }, 
+    {}
+]

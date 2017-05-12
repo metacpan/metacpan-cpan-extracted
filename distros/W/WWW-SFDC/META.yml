@@ -1,0 +1,43 @@
+---
+abstract: 'Wrappers around the Salesforce.com APIs.'
+author:
+  - 'Alexander Brett <alexander.brett@sophos.com> L<http://alexander-brett.co.uk>'
+build_requires:
+  Config::Properties: '0'
+  File::Slurp: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-SFDC
+requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  IO::Compress::Zip: '0'
+  IO::File: '0'
+  IO::Uncompress::Unzip: '0'
+  List::NSect: '0'
+  List::Util: '1.29'
+  Log::Log4perl: '0'
+  MIME::Base64: '0'
+  Method::Signatures: '0'
+  Module::Loaded: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  SOAP::Lite: '0'
+  Scalar::Util: '0'
+  XML::Parser: '0'
+  overload: '0'
+  perl: v5.12.0
+  strict: '0'
+  warnings: '0'
+version: '0.37'

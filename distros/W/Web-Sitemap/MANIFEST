@@ -1,0 +1,8 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Web/Sitemap.pm
+lib/Web/Sitemap/Url.pm
+t/001_load.t

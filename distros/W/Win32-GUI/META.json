@@ -1,0 +1,75 @@
+{
+   "abstract" : "Perl-Win32 Graphical User Interface Extension",
+   "author" : [
+      "Aldo Calpini <dada@perl.it>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-GUI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "build_tools",
+         "samples",
+         "docs",
+         "Win32-GUI_ReleaseNotes",
+         "Win32-GUI_Constants/hash",
+         "Win32-GUI_AxWindow/t",
+         "Win32-GUI_BitmapInline/t",
+         "Win32-GUI_Constants/t",
+         "Win32-GUI_DIBitmap/t",
+         "Win32-GUI_DropFiles/t",
+         "Win32-GUI_Grid/t",
+         "Win32-GUI_ReleaseNotes/t",
+         "Win32-GUI_Scintilla/t",
+         "Win32-GUI_DIBitmap/demos",
+         "Win32-GUI_Scintilla/demos",
+         "Win32-GUI_Grid/demos",
+         "Win32-GUI_DropFiles/demos",
+         "Win32-GUI_Constants/demos",
+         "Win32-GUI_AxWindow/demos"
+      ],
+      "file" : [
+         "Win32-GUI_DIBitmap/extlib/Readme.txt",
+         "Win32-GUI_DropFiles/Readme.txt",
+         "Win32-GUI_Scintilla/Include/Readme.txt",
+         "README.html"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://sourceforge.net/p/perl-win32-gui/bugs/"
+      },
+      "repository" : {
+         "url" : "http://sourceforge.net/p/perl-win32-gui/git/"
+      }
+   },
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

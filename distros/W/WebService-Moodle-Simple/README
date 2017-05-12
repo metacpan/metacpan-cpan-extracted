@@ -1,0 +1,100 @@
+NAME
+    WebService::Moodle::Simple - Client API and CLI for Moodle Web Services
+
+SYNOPSIS
+  CLI
+      moodlews login        - login with your Moodle password and retrieve token
+      moodlews add_user     - Create a Moodle user account
+      moodlews get_users    - Get all users
+      moodlews enrol        - Enrol user into a course
+      moodlews set_password - Update a user account password
+
+  API
+      use WebService::Moodle::Simple;
+
+      my $moodle = WebService::Moodle::Simple->new(
+        domain   =>  'moodle.example.edu',
+        target   =>  'example_webservice'
+      );
+
+      my $rh_token = $moodle->login( username => 'admin', password => 'p4ssw0rd');
+
+DESCRIPTION
+    WebService::Moodle::Simple is Client API and CLI for Moodle Web Services
+
+    __THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE__.
+
+USAGE
+  CLI
+    Get instructions on CLI usage
+
+      moodlews
+
+  Example - Login and Get Users
+      moodlews login -u admin -d moodle.example.edu -p p4ssw0rd -t example_webservice
+
+    Retrieve the user list using the token returned from the login command
+
+      moodlews get_users -o becac8d120119eb2a312a385644eb709 -d moodle.example.edu -t example_webservice
+
+  Unit Tests
+      prove -rlv t
+
+   Full Unit Tests
+      TEST_WSMS_ADMIN_PWD=p4ssw0rd \
+      TEST_WSMS_DOMAIN=moodle.example.edu \
+      TEST_WSMS_TARGET=example_webservice prove -rlv t
+
+    __NOTE: Full unit tests write to Moodle Database - only run them against
+    a test Moodle server__.
+
+  Methods
+    *   *$OBJ*->login( username => *str*, password => *str*, )
+
+        Returns { msg => *str*, ok => *bool*, token => *str* }
+
+    *   *$OBJ*->set_password( username => *str*, password => *str*, token =>
+        *str*, )
+
+    *   *$OBJ*->add_user( firstname => *str*, lastname => *str*, email =>
+        *str*, username => *str*, password => *str*, token => *str*, )
+
+    *   *$OBJ*->get_users( token => *str*, )
+
+    *   *$OBJ*->enrol_student( username => *str*, course => *str*, token =>
+        *str*, )
+
+    *   *$OBJ*->get_course_id( short_cname => *str*, token => *str*, )
+
+    *   *$OBJ*->get_user( token => *str*, username => *str*, )
+
+    *   *$OBJ*->suspend_user( token => *str*, username => *str*, suspend =>
+        *bool default TRUE* )
+
+        If suspend is true/nonzero (which is the default) it kills the
+        user's session and suspends their account preventing them from
+        logging in. If suspend is false they are given permission to login.
+        NOTE: This will only work if the Moodle server has had this patch
+        (or its equivalent) applied:
+        https://github.com/fabiomsouto/moodle/compare/MOODLE_22_STABLE...MDL
+        -31465-MOODLE_22_STABLE
+
+    *   *$OBJ*->raw_api( method => *moodle webservice method name*, token =>
+        *str*, params => *hashref of method parameters* )
+
+        returns Moodle's response.
+
+AUTHOR
+    Andrew Solomon <andrew@geekuni.com>
+
+COPYRIGHT
+    Copyright 2014- Andrew Solomon
+
+ACKNOWLEDGEMENT
+    Built by Dist::Milla
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

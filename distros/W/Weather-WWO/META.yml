@@ -1,0 +1,24 @@
+---
+abstract: 'World Weather Online Data'
+author:
+  - 'Mateu Hunter C<hunter@missoula.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Weather-WWO
+requires:
+  HTTP::Tiny: 0
+  JSON: 0
+  Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  strictures: 0
+version: 0.07

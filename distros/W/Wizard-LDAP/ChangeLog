@@ -1,0 +1,5 @@
+1999-11-10  Jochen Wiedmann  <joe@ispsoft.de>
+
+	* Renamed "user=foo, topic=user, dc=ispsoft, dc=de" to
+	  "cn=foo, topic=user, dc=ispsoft, dc=de".
+

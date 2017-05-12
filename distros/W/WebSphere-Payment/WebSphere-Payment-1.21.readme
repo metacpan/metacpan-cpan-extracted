@@ -1,0 +1,29 @@
+WebSphere::Payment provides a simple Interface to the
+API of the payment engine IBM WebSphere Payment
+Manager 2.2. It achieves this task, through commands
+send via http POST method.
+
+The installation follows the standard protocol...
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+
+More info see
+$ perldoc WebSphere::Payment
+
+Included on this distribution are the files
+WebSphere-Payment.ppd
+WebSphere-Payment.wsc
+The purpose of this is to make easier the setup on a Windows 
+environment. 
+
+The first file WebSphere-Payment.ppd can be used to put the module on
+a Web Server an then install on Windows using the tool included
+on perl for Windows (ActiveState) ppm.
+
+The second file WebSphere-Payment.wsc, can be used to integrate this
+tool with Windows asp technology using Windows Script Component.
+
+This module was originally created in Jun 2001 by Luis Moreno

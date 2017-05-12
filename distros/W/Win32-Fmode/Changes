@@ -1,0 +1,26 @@
+Revision history for Perl extension Win32::Fmode.
+
+1.0  Wed Mar  8 04:37:44 2006
+    - original version; created by h2xs 1.23 with options
+        -APf -n Win32::Fmode -v1.0
+
+1.0.1 10 March 2006
+    - Minor changes to makefile to remove warning
+    - More conventional POD
+    - Both courtesy of syphilis/perlmonks.com
+    
+1.0.2 10 MArch 2006
+    - correct packaging error
+    
+1.003 13 March 2006
+    - Added check for undefined filehandle
+    
+1.0.4 17 March 2006
+    - Modified test to cater for the undocumented -1
+    return value from fileno() when passed an open ram file handle
+    
+1.0.6 17 March 2006
+    - Corrected some typos
+    - Updated this file
+    - Added some development tests
+    

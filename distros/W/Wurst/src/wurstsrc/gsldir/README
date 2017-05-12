@@ -1,0 +1,8 @@
+This code is taken from the GNU scientific software library and
+is used mainly for integrating under the Gaussian's in the
+probability calculations and maybe in the protein coordinate
+superposition code.  Obviously, all this code is covered by the
+authors' license (GPL).
+
+It probably also means that the rest of our code has to be under
+the same license.

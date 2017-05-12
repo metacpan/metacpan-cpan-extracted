@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><aws:weather xmlns:aws="http://www.aws.com/aws"><aws:alerts><aws:alert><aws:type>Air Quality Alert</aws:type><aws:title>OZONE WATCH ISSUED FOR SATURDAY</aws:title></aws:alert></aws:alerts></aws:weather>

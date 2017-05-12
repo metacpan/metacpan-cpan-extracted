@@ -1,0 +1,14 @@
+Revision history for Perl extension WebService::Dwolla.
+
+0.01  Sat Jan 12 22:50:54 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn WebService::Dwolla
+0.02  Tue Jan 29 22:50:54 2013
+    - Added dependenies to CPAN. Added / corrected documentation. Added examples to MANIFEST.
+0.03  Sun Feb 03 02:50:54 2013
+    - Several fixes. Added / corrected documetation. Added more examples.
+0.04  Wed Feb 06 00:30:54 2013
+    - Fixed transactions-related methods (listings,stats). Added more examples.
+0.05  Thu Feb 07 00:30:54 2013
+    - Added masspay methods / examples. Added groupId and fixed delimiter in listings. Corrected miscellaneous docs.
+

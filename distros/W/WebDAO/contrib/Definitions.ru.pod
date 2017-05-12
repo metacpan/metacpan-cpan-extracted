@@ -1,0 +1,121 @@
+=begin pod
+=CHAPTER Язык определений
+
+=defn object
+
+В качестве имени класса используется название perl модуля. Например:
+
+  <body>
+  <div>
+   <wd>
+        <object class="MyTest" id="page"/>
+        <object class="MySite::Login" id="login"/>
+        <object class="MySite::Status" id="status"/>
+   </wd>
+  </div>
+  </body>
+
+Атрибут B<id> - имя объекта. Это имя используется в URL.
+
+    http:://example.com/page/Method1?param=1&param2=2
+
+=defn regclass
+
+Имеется возможность определять псевдонимы (aka b<alias>) для используемых классов. Для этого предназначено определение I<regclass>. Пример:
+
+    <head>
+    <wd>
+        <regclass class="MySite::Components::LoginForm" alias="form"/>
+        <regclass class="MySite::Status" alias="stat"/>
+    </wd>
+    </head>
+
+Определенные таким образом соответствия классов и псевдонимов, можно использовать в качестве имен классов:
+
+  <body>
+  <div>
+   <wd>
+        <object class="form" id="login"/>
+        <object class="stat" id="status"/>
+   </wd>
+  </div>
+  </body>
+
+
+=defn include
+
+Данное определение используется для вставки содержимого внешнего файла в текущую позицию.
+
+    <wd>
+    <include file="$filename"/>
+    </wd>
+
+F<$filename> - путь и имя  подключаемого файла. Текущим каталогом является I<DOCUMENT_ROOT>.
+
+=defn method
+
+Производится обработка вызова с адресом указанным в атрибуте I<path> и текстом, указанным в содержимом тэга. Текст не обязателен и не рекомендуется к использованию. Пример кода страницы, в котором производится вывод простого меню.
+
+ 
+  <body>
+      <div id="header">
+      <wd><method path="/menu/Menu"/></wd>
+    </div>
+    <div>
+      <wd>
+         <object class="MyMenu" id="menu"/>
+      </wd>
+    </div>
+ </body>
+
+
+В данном примере, производится вызов метода I<Menu> у экземпляра класса I<MyMenu>. Результат вызова вставляется в текущую позицию. Например:
+
+    package MyMenu;
+    use WebDAO;
+    use base 'WebDAO';
+
+    #default no output
+    sub fetch { return }
+
+    #puplic method for write menu html
+    sub Menu {
+        return <<MENU;
+            <ul id="genmenu">    
+                <li  title="Home" class="active">
+                  <a href="/page/Blogs" > Home</a>
+                </li>    
+                <li  title="Setup" >
+                   <a href="/page/Menu_personal" >Setup</a>
+                </li>    
+                <li  title="Admin" >
+                    <a href="/page/Admin_menu" >Admin</a>
+                </li>
+            </ul>
+    MENU
+    }
+    1;
+
+
+Вывод запроса будет выглядеть следующим образом:
+
+  <body>
+      <div id="header">
+              <ul id="genmenu">    
+            <li  title="Home" class="active">
+              <a href="/page/Blogs" > Home</a>
+            </li>    
+            <li  title="Setup" >
+               <a href="/page/Menu_personal" >Setup</a>
+            </li>    
+            <li  title="Admin" >
+                <a href="/page/Admin_menu" >Admin</a>
+            </li>
+        </ul>
+    </div>
+    <div>
+    </div>
+  </body>
+
+=end pod
+

@@ -1,0 +1,152 @@
+Name
+    WWW::PDAScraper - Class for scraping PDA-friendly content from websites
+
+Synopsis
+      use WWW::PDAScraper;
+      my $scraper = WWW::PDAScraper->new qw ( NewScientist Yahoo::Entertainment );
+      $scraper->scrape();
+  
+    or
+
+      use WWW::PDAScraper;
+      my $scraper = WWW::PDAScraper->new;
+      $scraper->scrape qw( NewScientist Yahoo::Entertainment );
+
+    or
+
+      perl -MWWW::PDAScraper -e "scrape qw( NewScientist Yahoo::Entertainment )"
+
+Description
+    Having written various kludgey scripts to download PDA-friendly content
+    from various websites, I decided to try and write a generalised solution
+    which would
+
+    * parse out the section of a news page which contains the links we want
+
+    * munge those links into the URL for the print-friendly version, if
+    possible
+
+    * download those pages and make an index page for them
+
+    The moving of the pages to your PDA is not part of the scope of the
+    module: the open-source browser and "distiller", Plucker, from
+    http://plkr.org/ is recommended. Just get it to read the index.html file
+    with a depth of 1 from disk, using a URL like file:///path/to/index.html
+
+The Sub-modules
+    WWW::PDAScraper uses a set of rules for scraping a particular website
+    from a second module, i.e. "WWW::PDAScraper::Yahoo::Entertainment::TV"
+    contains the rules for scraping the Yahoo TV News website:
+
+        package WWW::PDAScraper::Yahoo::Entertainment::TV;
+        # WWW::PDAScraper.pm rules for scraping the
+        # Yahoo TV website
+        sub config {
+            return {
+                name       => 'Yahoo TV',
+                start_from => 'http://news.yahoo.com/i/763',
+                chunk_spec => [ "_tag", "div", "id", "indexstories" ],
+                url_regex => [ '$', '&printer=1' ]
+            };
+        }
+        1;
+
+    A more or less random selection of modules is included, as well as a
+    full set for Yahoo, to demonstrate a logical set of modules in
+    categories.
+
+    Creating a new sub-module ought to be relatively simple, see the
+    template provided, WWW::PDAScraper::Template.pm - you need "name",
+    "start_from", then either "chunk_spec" or "url_spec", then optionally a
+    "url_regex" for transformation into the print-friendly URL.
+
+    Then either move your new module to the same location as the other ones
+    on your system, or make sure they're available to your script with a
+    line like "use lib '/path/to/local/modules/PDAScraper/'"
+
+USAGE
+    WWW::PDAScraper ought to be very simple to run, assuming you have the
+    right sub-module(s).
+
+    It only has two main methods, new() and scrape(), and two supplementary
+    ones, for assigning a proxy server to the user-agent and one for
+    over-riding the default download location.
+
+    Either object-oriented, loading the sub-module(s) as part of "new":
+
+      use WWW::PDAScraper;
+      my $scraper = WWW::PDAScraper->new qw ( NewScientist Yahoo::Entertainment );
+      $scraper->scrape();
+
+    or object-oriented, loading the sub-module(s) as part of each call to
+    scrape():
+
+      use WWW::PDAScraper;
+      my $scraper = WWW::PDAScraper->new;
+      $scraper->scrape qw( NewScientist Yahoo::Entertainment );
+      $scraper->scrape qw( SomethingElse );
+
+    or procedural:
+
+      use WWW::PDAScraper;
+      scrape qw( NewScientist Yahoo::Entertainment );
+
+    or from the command line:
+
+      perl -MWWW::PDAScraper -e "scrape qw( NewScientist Yahoo::Entertainment )"
+  
+    The only extras involved would be adding a proxy to the user-agent
+    and/or over-riding the default download location of $ENV{'HOME'}/scrape/
+
+    Object-oriented:
+
+      use WWW::PDAScraper;
+      my $scraper = WWW::PDAScraper->new;
+      $scraper->proxy('http://your.proxy.server:port/');
+      $scraper->download_location("/path/to/folder/");
+
+    procedural:
+
+      use WWW::PDAScraper;
+      proxy('http://your.proxy.server:port/');
+      download_location("/path/to/folder/");
+
+I wish I didn't need this code
+    In the days of modern web publishing, I shouldn't need to create this
+    code. All websites should make themselves PDA-friendly by the use of
+    client detection or smart CSS or XML. But they don't.
+
+Bugs
+    The websites will certainly change, and at that time the sub-modules
+    will stop working. There's no way around that.
+
+    Obviously it would be useful if there were a developer/user community
+    which contributed new modules and updated the old ones.
+
+See Also
+    HTML::Element, for the syntax of "chunk_spec" in sub-modules.
+
+To do
+    The user-agent should really be part of the object, I guess. That would
+    be neater.
+
+    And it should actually use WWW::Robot instead of LWP so it doesn't
+    hammer servers.
+
+    And we could either add arbitrary numbers of regexes for fixing up the
+    pages of sites which don't have a print-friendly version of the page, or
+    add a second level of parsing to find the print-friendly link, for sites
+    which don't have a logical relationship between the regular link and the
+    print-friendly.
+
+Author
+            John Horner
+            CPAN ID: CODYP
+        
+            bounce@johnhorner.nu
+            http://pdascraper.johnhorner.nu/
+
+Copyright
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

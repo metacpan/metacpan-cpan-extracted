@@ -1,0 +1,26 @@
+---
+abstract: 'Replay HTTP requests from HAR ( HTTP Archive ) file'
+author:
+  - 'Achilles Xu <xudaye@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-HarWalk
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Exporter: 0
+  HTTP::Request: 0
+  JSON: 0
+  perl: 5.006
+version: 0.13

@@ -1,0 +1,41 @@
+---
+abstract: 'Perl Interface to the XING API'
+author:
+  - 'Bernhard Graf, C<< <graf (a) cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-XING
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Encode::StdIO: 0
+  File::HomeDir: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  JSON: 2
+  LWP::UserAgent: 0
+  Mo: 0.3
+  Net::OAuth: 0
+  Term::Encoding: 0
+  URI: 0
+  YAML: 0
+  perl: 5.10.0
+resources:
+  homepage: https://github.com/augensalat/webservice-xing
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/augensalat/webservice-xing.git
+version: 0.030

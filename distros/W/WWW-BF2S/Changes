@@ -1,0 +1,17 @@
+WWW::BF2S Changes:
+
+  0.03 - Mon May 22 20:26:34 UTC 2006 - Dusty Wilson
+  Renamed to WWW:BF2S (was Net::BF2S).
+    Updated module package name.
+    Updated documentation.
+
+  0.02 - Mon May 22 05:34:05 UTC 2006 - Dusty Wilson
+  Modified documentation:
+    Fixed documentation bugs (exposed E<lt>gtE<gt>).
+    Added information about the getData method.
+    Added information about the BF2S Data Source Restrictions.
+    Added information about the Stats Cache.
+    Added information about the PID Request Candidates.
+
+  0.01 - Sun May 21 21:52:31 UTC 2006 - Dusty Wilson
+  New module with basic functionality.

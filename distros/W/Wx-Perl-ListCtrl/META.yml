@@ -1,0 +1,22 @@
+---
+abstract: 'a sensible API for Wx::ListCtrl'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wx-Perl-ListCtrl
+provides:
+  Wx::Perl::ListCtrl:
+    file: lib/Wx/Perl/ListCtrl.pm
+    version: 0.03
+requires:
+  Test::More: 0.50
+  Wx: 0.20
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

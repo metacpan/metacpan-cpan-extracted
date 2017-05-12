@@ -1,0 +1,375 @@
+=head1 NAME
+
+WebService::GData::YouTube::Doc::BrowserBasedUpload - YouTube Video browser based upload system
+
+=head1 SYNOPSIS
+
+    use WebService::GData::YouTube;
+    
+    #set your key obtained via the dashboard
+    
+    use constant KEY=>'*****r*****************s**************B*';
+    
+    #connect to an account via ClientLogin
+    
+    my $auth; 
+    eval {
+        $auth = new WebService::GData::ClientLogin(
+                email=>'********@gmail.com',
+                password=>'*********',
+                key=>KEY
+        );
+    };
+    
+    #handle error
+    
+    if(my $error = $@){
+       #do something meaningful
+       #$error->code,$error->content
+    }
+
+    #create an empty video placeholder with read access
+    
+    my $video = new WebService::GData::YouTube($auth)->video;
+
+    #set the data (from a form for example):
+    
+    $video->title('Live at Shibuya tonight');
+    
+    $video->description('Live performance by 6 local bands.');
+    
+    $video->keywords('music','live','shibuya','tokyo');
+    
+    $video->category('Music');
+    
+    #from google map for example
+    $video->location('0.12121452 0.232323525');
+    
+    #who can see me?
+    $video->is_private(1);
+    
+    #all the available settings can be set
+    $video->access_control('comment','allowed');
+   
+    #make the request
+    
+    my($url,$token);  
+    eval {
+      ($url,$token)= $video->save();
+    };
+    
+    if(my $error = $@){
+        #do someting meaningful
+        #$error->code,$error->content
+    }
+
+	#url encode with your favorite module before sending it:    
+	
+    my $nexturl = 'http://www.example.com/thankyou.html';
+    
+    #create a form and display it
+    #the token and file as input name is a requirement
+    #as is the nexturl parameter
+    
+    my $form = <<FORM;
+    
+    <form action="$url?nexturl=$nexturl" method="post" enctype="multipart/form-data">
+         <input id="file" type="file" name="file"/>
+         <input type="hidden" name="token" value="$token"/>
+         <input type="submit" value="upload" />
+    </form>
+    
+    FORM
+    
+    #once uploaded, YouTube redirect the user to your nexturl parameter.
+    #it can look like the url below if everything went fine:
+    
+    http://www.example.com/thankyou.html?id=sxZekqqleksk&status=200
+
+    #or something went wrong:
+    http://www.example.com/thankyou.html?status=403&code=INVALID_TOKEN 
+
+=head1 DESCRIPTION
+
+!WARNINGS! Developer release. Starting refactoring. Low level API only available for now.
+Things may change or break but feel free to give me some feedbacks!
+
+=over 
+
+Browser-based uploading is one of the mechanism that allows you to upload a video to YouTube.
+
+It is ideal if you do not want to host the video on your server.
+
+=back
+
+
+=head2 GENERAL OVERVIEW
+
+
+=over
+
+Browser-based uploading is a 5 step mechanism:
+
+=item * First get the meta data of the video (title,description,keywords...)
+
+=item * Send to YouTube the meta data with authorization headers
+
+=item * If it successfully records your meta data, YouTube sends back an url and a token.
+        This data is used to link together the meta data and the video file itself.
+        
+=item * Present the user with a way to choose the video he/she wants to upload
+        and send the data directly over YouTube.
+
+=item * If the upload process is finished (either success or failure),
+        YouTube redirects your user to the url you've specified; with some extra parameters
+
+You can read an in-depth explanation of the process:
+
+L<http://code.google.com/intl/en/apis/youtube/2.0/developers_guide_protocol_browser_based_uploading.html#Browser_Upload_Process>
+
+=back
+
+=head2 AUTHENTICATION AND DASHBOARD
+
+=over
+
+In order to write data to YouTube, you must do two things:
+
+=item * Register an application to the YouTube Dashboard:
+
+L<http://code.google.com/apis/youtube/dashboard/>
+
+By registering your application, you will get a unique developer key that will be required when 
+doing any write actions.
+
+=item * Authorized the user to do write actions
+
+Saving meta data, updating meta data or uploading a file require to be authorized.
+
+Actually only ClientLogin mechanism is implemented in the library but OAuth will arrive soon.
+
+ClientLogin is by far the simplest authorization mechanism. Basically, you log in yourself into an account
+by giving email, password and your key and you get back an authorization key.
+
+OAuth requires some steps ahead before using it and we won't see them as long as the mechanism is not in place.
+
+
+=back
+
+=head3 ClientLogin and Developer key
+
+=over
+
+In order to be authorized you must log in into an account. You can do so by using L<WebService::GData::ClientLogin>.
+
+Example:
+
+    #key from your dashboard
+	
+    use constant KEY=>'*****r*****************s**************B*';
+    
+    #connect to an account via ClientLogin
+    
+    my $auth; 
+    eval {
+        $auth = new WebService::GData::ClientLogin(
+                email=>'********@gmail.com',
+                password=>'*********',
+                key=>KEY
+        );
+    };
+    
+    #handle error
+    
+    if(my $error = $@){
+       #do something meaningful
+       #$error->code,$error->content
+    }
+    
+If everything went fine, you can create a YouTube instance with write access.
+
+See L<WebService::GData::ClientLogin> for further details about the log in mechanism.
+
+=back
+
+
+=head2 CREATING A VIDEO
+
+
+=over
+
+Now that you are logged in, you have to pass the authorization object to the YouTube instance:
+
+
+Example:
+
+    use WebService::GData::ClientLogin;
+    use WebService::GData::YouTube;
+	
+    #log in
+    my $auth = new WebService::GData::ClientLogin(...);
+
+    #create an empty video placeholder with read access
+    
+    my $video = new WebService::GData::YouTube($auth)->video;
+
+Now you have a place holder, it is just a matter of filling the proper information.
+You should create a form where the user would enter the following information(* specify an optional information):
+
+=item * Title of the video
+
+=item * Description of the video
+
+=item * Keywords
+
+=item * Category (predefined categories from YouTube: People,Music...)
+
+=item * Location* (longitude and latitude coming from a map, let's say Google Map)
+
+=item * Private* (if set to private only predefined user will be able to see the video)
+
+=item * Access Control* See L<http://code.google.com/intl/en/apis/youtube/2.0/reference.html#youtube_data_api_tag_yt:accessControl>
+
+So it could be something like that:
+
+Example:
+
+    use CGI;
+    #create an empty video placeholder with read access
+    
+    my $video = new WebService::GData::YouTube($auth)->video;
+
+    my $request= new CGI;
+    
+    $video->title($request->param('title'));
+    
+    $video->description($request->param('description'));
+    
+    $video->keywords($request->param('keywords'));
+    
+    $video->category($request->param('category'));
+    
+    #from google map for example
+    $video->location($request->param('location'));
+    
+    #who can see me?
+    $video->is_private(1) if($request->param('is_private'));
+    
+    #all the available settings can be set
+    $entry->access_control('comment',$request->param('comment'));
+    $entry->access_control('comment',$request->param('embed'));
+    
+
+=back
+
+
+=head2 SAVING VIDEO META DATA
+
+=over
+
+Now that we have all the meta information we need, let's save them:
+
+
+Example:
+
+    use CGI;
+    #create an empty video placeholder with read access
+    
+    my $video = new WebService::GData::YouTube($auth)->video;
+
+    my $request= new CGI;
+    
+    $video->title($request->param('title'));
+    
+    $video->description($request->param('description'));
+
+    ....
+    
+    my($url,$token)= $video->save;
+   
+
+As you can see the save method sends back two variables: an url and a token.
+At this stage of the process, the meta information is stored as temporary information within YouTube.
+The $url and $token does expire after a certain amount of time (15 minutes it seems.)
+
+=head2 SAVING VIDEO FILE
+
+The above $url and $token variables must be used in the form that will be presented to the user to upload the video.
+
+You must also set an url to go back to your site once the upload process is finished. 
+You do so by adding ?nexturl=http%3A%2F%2Fwww.example.com after the $url.
+As you can see the url must be encoded.
+
+Example:
+
+    my $nexturl = 'http://www.example.com/thankyou.html';#encode the url with URI::Escape for example
+    
+    #create a form and display it
+    #the token and file as input name is a requirement
+    #as is the nexturl parameter
+    
+    my $form = <<FORM;
+    
+    <form action="$url?nexturl=$nexturl" method="post" enctype="multipart/form-data">
+         <input id="file" type="file" name="file"/>
+         <input type="hidden" name="token" value="$token"/>
+         <input type="submit" value="upload" />
+    </form>
+    
+    FORM
+    
+
+=back
+
+
+=head2 HANDLING RETURNED VALUE
+
+=over
+
+The user has choosen his/her video, pressed upload.
+
+YouTube handled the request directly and will redirect to your website (well, to the url specified in nexturl)
+by adding some parameters defining the state of the video.
+
+=head3 SUCCESSFUL UPLOAD
+
+Example:
+    
+    http://www.example.com/thankyou.html?id=sxZekqqleksk&status=200
+    
+The id parameter is the newly created unique id for your video. 
+
+	
+=head3 FAILED UPLOAD
+
+Example:
+   
+	http://www.example.com/thankyou.html?status=403&code=INVALID_TOKEN 
+	
+If an error occurs, you will have to look into the status and code parameter and inform the user, log,etc.
+    
+
+=back
+
+=head2 SEE ALSO
+
+=over 
+
+=item * L<WebService::GData::ClientLogin>
+
+=item * L<WebService::GData::YouTube>
+
+=item * L<WebService::GData::YouTube::Feed::Video>
+
+=back
+
+=head1 AUTHOR
+
+shiriru E<lt>shirirulestheworld[arobas]gmail.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

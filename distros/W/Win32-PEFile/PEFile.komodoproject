@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="6b0d75e4-9cd8-4470-9f14-656c1a931b39" kpf_version="5" name="PEFile.komodoproject">
+<preference-set idref="6b0d75e4-9cd8-4470-9f14-656c1a931b39" id="project" preftype="project">
+  <string relative="path" id="import_dirname"></string>
+  <string relative="path" id="perlExtraPaths">lib</string>
+  <boolean id="perl_debuggerlogenabled">0</boolean>
+</preference-set>
+</project>

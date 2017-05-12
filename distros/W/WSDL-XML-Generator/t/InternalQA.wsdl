@@ -1,0 +1,53 @@
+<definitions name="InternalQA" targetNamespace="http://soap.lookdata.cn/v1/InternalQA" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.lookdata.cn/v1/InternalQA" xmlns:lookdata="http://soap.lookdata.cn/v1/example" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.lookdata.cn/v1/InternalQA" >
+  <documentation>WSDL Specification for InternalQA</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.lookdata.cn/v1/InternalQA">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.lookdata.cn/v1/example" schemaLocation="./Internal.xsd" />
+      <xsd:element name="logMessage">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="lookdata:Authentication" />
+            <xsd:element name="message" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="logMessageResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="lookdata:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="logMessage_in">
+    <part element="tns:logMessage" name="parameters" />
+  </message>
+  <message name="logMessage_out">
+    <part element="tns:logMessageResponse" name="parameters" />
+  </message>
+  <portType name="InternalQAPortType">
+    <operation name="logMessage">
+      <input message="tns:logMessage_in" />
+      <output message="tns:logMessage_out" />
+    </operation>
+  </portType>
+  <binding name="InternalQABinding" type="tns:InternalQAPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="logMessage">
+      <soap:operation soapAction="http://soap.lookdata.cn/v1/InternalQA#logMessage" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="InternalQA">
+    <port binding="tns:InternalQABinding" name="InternalQAPort">
+      <soap:address location="https://soap.lookdata.cn/soap.pl" />
+    </port>
+  </service>
+</definitions>

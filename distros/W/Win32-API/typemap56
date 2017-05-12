@@ -1,0 +1,31 @@
+HV *			T_HVREF
+AV *			T_AVREF
+
+INPUT
+T_HVREF
+	STMT_START {
+		SV* const xsub_tmp_sv = $arg;
+		SvGETMAGIC(xsub_tmp_sv);
+		if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVHV){
+		    $var = (HV*)SvRV(xsub_tmp_sv);
+		}
+		else{
+		    Perl_croak_nocontext( \"%s: %s is not a HASH reference\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\");
+		}
+	} STMT_END
+
+T_AVREF
+	STMT_START {
+		SV* const xsub_tmp_sv = $arg;
+		SvGETMAGIC(xsub_tmp_sv);
+		if (SvROK(xsub_tmp_sv) && SvTYPE(SvRV(xsub_tmp_sv)) == SVt_PVAV){
+		    $var = (AV*)SvRV(xsub_tmp_sv);
+		}
+		else{
+		    Perl_croak_nocontext( \"%s: %s is not an ARRAY reference\",
+				${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+				\"$var\");
+		}
+	} STMT_END

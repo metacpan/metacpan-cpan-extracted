@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CGIReadme.pl</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#webservice::googlehack_web_installation_guide">WebService::Google-Hack Web Installation Guide</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#installation_guide">Installation Guide</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="webservice::googlehack_web_installation_guide">WebService::Google-Hack Web Installation Guide</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>The WebService::Google-Hack web interface provides an easy to use interface
+for some of the features of WebService::Google-Hack.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>To install the interface please follow these steps:</p>
+<p>The web interface for WebService::Google-Hack has been implemented such that, there needs to be a WebService::Google-Hack Server running in the background, so that the client file index.cgi can connect to the server on a specific port, and retrieve results.</p>
+<p>
+</p>
+<hr />
+<h1><a name="installation_guide">Installation Guide</a></h1>
+<p>1) Create a directory named ghack in your cgi-bin directory (Where all your cgi files reside). So it should be something like:</p>
+<p>/webspace/cgi-bin/ghack</p>
+<p>2) Next, copy the file named index.cgi, which is given with the 
+distribution of the google-hack package into your cgi-bin/ghack/ directory.</p>
+<p>3) Open the index.cgi file, and change the lib path to the path where 
+WebService::GoogleHack has been installed on your machine.</p>
+<p>use lib ``/home/lib/perl5/site_perl/'';</p>
+<p>*Note:
+The index.cgi file is in the WebInterface directory of GoogleHack.
+For eg: WebService/GoogleHack/WebInterface.</p>
+<p>4) Now, open the ghack_server.pl file (which is also given in the  WebInterface directory of GoogleHack), and change the lib path to the path where WebService::GoogleHack has been installed on your machine.
+</p>
+<pre>
+
+use lib &quot;/home/lib/perl5/site_perl/&quot;;</pre>
+<p>5) In the ghack_server.pl file, change the following variables accordingly:</p>
+<p>$BASEDIR = '/webspace/cgi-bin/ghack';</p>
+<p>$localport = 32983;</p>
+<p>$lock_file = ``$BASEDIR/ghack_server.lock'';</p>
+<p>$error_log = ``$BASEDIR/error.log'';</p>
+<p>Basedir should be the path to the cgi-bin directory in which index.cgi 
+resides.</p>
+<p>The localport should be a number above 1024, and less than around 66,000. Make
+ sure that localport number is the same on both the client and server side.</p>
+<p>The lockfile &amp; error_log variables will remain the same.</p>
+<p>6) Now, open the index.cgi  file (which is also given in the  WebInterface directory of GoogleHack),</p>
+<p>Set the remotr_host, and remote_port variables to the correct values.</p>
+<p>$remote_host = '';</p>
+<p>$remote_port = '';</p>
+<p>The remote host will be the IP address of the machine where the google_hack server will be running.
+The remote port needs to be the same as the $localport variable in ghack_server.pl</p>
+<p>7)If your ghack server is running behind a firewall, you will need to
+edit the file /etc/sysconfig/iptables to allow clients to connect to the machine through the port you had given.  There is a line that looks like this:</p>
+<p>-A RH-Firewall-1-INPUT -p tcp --dport XXXXX -j ACCEPT</p>
+<p>Where XXXXX is the port that your client will be connecting to (the value of $localport in ghack_server.pl).</p>
+<p>Now start the server by running the ghack_server.pl as you would run a 
+regular perl file.
+</p>
+<pre>
+
+You should now be able to use the web interface.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Ted Pedersen, &lt;<a href="mailto:tpederse@d.umn.edu">tpederse@d.umn.edu</a>&gt;</p>
+<p>Pratheepan Raveendranathan, &lt;<a href="mailto:rave0029@d.umn.edu">rave0029@d.umn.edu</a>&gt;</p>
+<p>Date 11/08/2004</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (c) 2003 by Pratheepan Raveendranathan, Ted Pedersen</p>
+<p>This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.</p>
+<p>This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License along with
+this program; if not, write to</p>
+<p>The Free Software Foundation, Inc.,
+59 Temple Place - Suite 330,
+Boston, MA  02111-1307, USA.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

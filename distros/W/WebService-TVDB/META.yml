@@ -1,0 +1,46 @@
+---
+abstract: 'Interface to http://thetvdb.com/'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  File::Spec: 0
+  FindBin: 0
+  HTTP::Online: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Net::Ping: 2.33
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-TVDB
+requires:
+  Archive::Zip: 0
+  Carp: 0
+  Exporter: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Path: 0
+  LWP::Simple: 0
+  Object::Tiny: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-Net-TVDB/issues
+  homepage: https://github.com/andrewrjones/perl5-Net-TVDB
+  repository: https://github.com/andrewrjones/perl5-Net-TVDB.git
+version: 1.133200
+x_contributors:
+  - 'Andrew Jones <andrew@andrew-jones.com>'
+  - 'Andrew Jones <andrewjones86@googlemail.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Tim De Pauw <tim@pwnt.be>'

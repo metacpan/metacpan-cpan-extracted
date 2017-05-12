@@ -1,0 +1,15 @@
+.cvsignore
+Build.PL
+Changes
+lib/Wiki/Toolkit/Formatter/Mediawiki.pm
+lib/Wiki/Toolkit/Formatter/Mediawiki/Link.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+SIGNATURE
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

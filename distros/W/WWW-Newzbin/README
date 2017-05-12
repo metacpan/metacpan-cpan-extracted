@@ -1,0 +1,398 @@
+NAME
+    WWW::Newzbin - Interface to Newzbin.com's Usenet index
+
+SYNOPSIS
+            use WWW::Newzbin;
+            use WWW::Newzbin::Constants qw(:all);
+        
+            my $nzb = WWW::Newzbin->new(
+                    username => "joebloggs",
+                    password => "secretpass123"
+            );
+
+            $nzb->lwp_useragent->timeout(10); # ADVANCED: allow less time for responses from newzbin
+        
+            my @results = $nzb->search_files(
+                    query => "the john smith orchestra",
+                    category => [ NEWZBIN_CAT_MUSIC, NEWZBIN_CAT_MOVIES ], # search in Newzbin's "music" and "movies" categories...
+                    group => [ "alt.binaries.music", "alt.binaries.test" ], # ...and return results from these groups only
+                    retention => 30, # no more than 30 days old
+                    resultlimit => 50, # return maximum of 50 results
+                    sortfield => NEWZBIN_SORTFIELD_SUBJECT, # sort by subject...
+                    sortorder => NEWZBIN_SORTORDER_ASC # ...in ascending order
+            );
+        
+            if ($nzb->error_code) {
+                    print "Error # " . $nzb->error_code . ": " . $nzb->error_message;
+            } else {
+                    print "Total number of results found: " . $nzb->search_files_total;
+                    print "Subject of result #1: " . $results[0]->{subject};
+            }
+        
+            # make an nzb file for binaries in newzbin report #12345678
+            my ($nzb_file, $report_name, $report_category) = $nzb->get_nzb(reportid => 12345678);
+        
+            # make an nzb file for binaries in newzbin report #12345678, and leave the nzb file gzip-compressed
+            my ($nzb_file_gzipped, $report_name, $report_category) = $nzb->get_nzb(
+                    reportid => 12345678,
+                    leavegzip => 1
+            );
+        
+            # make an nzb file for binaries with the newzbin file ids #123, #456 and #789, and don't compress it when downloading it
+            my $nzb_file = $nzb->get_nzb(
+                    fileid => [ 123, 456, 789 ],
+                    nogzip => 1
+            );
+
+DESCRIPTION
+    This module is a Perl interface to the Newzbin.com v3 direct APIs.
+    Newzbin is a Usenet binary indexing service that also offers .nzb files
+    - short summary files containing all the information a newsreader
+    requires to download any given binary or set of binaries from Usenet.
+
+METHODS
+  COMMON METHODS
+   new
+            my $nzb = WWW::Newzbin->new(
+                    username => "joebloggs",
+                    password => "secretpass123"
+            );
+
+    The "new()" method constructs a new "WWW::Newzbin" object.
+
+    "username" and "password" should be valid Newzbin credentials, and both
+    must be supplied for the object to be successfully constructed. The
+    "new()" method does not check whether these credentials are valid.
+
+    Other (optional) parameters are:
+
+    *   "nowarnings" - "WWW::Newzbin" "warn"s whenever something unexpected
+        happens (for example, if an unrecognised parameter is passed to a
+        method, or if a recognised parameter is passed in an incorrect
+        manner). Any true value (e.g. 1) for "nowarnings" disables all
+        warnings issued by "WWW::Newzbin".
+
+    *   "proxy" - Defines a proxy server that the underlying LWP::UserAgent
+        object will use when accessing Newzbin. Should be given in the
+        format "http://proxy.address:port".
+
+    "die"s if the username or password are missing, and "warn"s if any
+    unrecognised parameters are given.
+
+   error_code
+            print "Error code for last error: " . $nzb->error_code;
+
+    If an error occurred during the last method call, this method will
+    return an integer describing what kind of error occurred (or "undef" if
+    an error did not occur during the last method call). Check the
+    documentation for each individual method for a list of expected return
+    values from "error_code".
+
+    This method's output is programmatically useful, but isn't pretty to
+    give back to a user. Consider "error_message" for user feedback.
+
+   error_message
+            print "An error occurred while processing your request: " . $nzb->error_message;
+
+    If an error occurred during the last method call, this method will
+    return a short description of the error (or "undef" if an error did not
+    occur during the last method call). Check the documentation for each
+    individual method for an idea of what to expect for a return value from
+    this method - the message will depend on the "error_code".
+
+    This method's output is useful for user feedback, but isn't very useful
+    programmatically. Consider "error_code" for handling errors using code.
+
+   search_files
+            my @results = $nzb->search_files(
+                    query => "the john smith orchestra",
+                    category => [ NEWZBIN_CAT_MUSIC, NEWZBIN_CAT_MOVIES ],
+                    group => [ "alt.binaries.music", "alt.binaries.test" ],
+                    retention => 30,
+                    resultlimit => 50,
+                    sortfield => NEWZBIN_SORTFIELD_SUBJECT,
+                    sortorder => NEWZBIN_SORTORDER_ASC
+            );
+
+    Searches Newzbin's files index for a given string, and (optionally)
+    filters the results based on given criteria. Please note that it is not
+    possible to search Newzbin without a valid Premium account.
+
+    Search criteria are passed as parameters to the method. The following
+    parameters are allowed; each is optional unless otherwise specified:
+
+    *   "query" (required) - The string of text to search for.
+
+    *   "category" - The Newzbin category (or categories) to search. Any of
+        the "NEWZBIN_CAT_*" constants specified in WWW::Newzbin::Constants
+        are valid. May be a single constant if only one category is to be
+        searched, or an arrayref of constants if more than one category is
+        to be searched. Default is none (i.e. all categories are searched).
+
+    *   "group" - The Usenet newsgroup (or newsgroups) to search. May be a
+        scalar containing the name of a single newsgroup to search, or an
+        arrayref of scalars if more than one newsgroup is to be searched.
+        Default is none (i.e. all newsgroups are searched).
+
+    *   "retention" - The maximum age (in days) of a file that is permitted
+        for it to be included as a search result. Must be at least 1, and at
+        most 240 (this might change without notice; see "LIMITATIONS").
+        Default is currently 7 (again, this might change without notice; see
+        "LIMITATIONS").
+
+    *   "minsize" and "maxsize" - Respectively, the minimum and maximum
+        sizes (in bytes) that files must be to count as results. Either
+        parameter may be given; if both are given, "minsize" must be less
+        than or equal to "maxsize", otherwise neither criteria will be
+        considered in the search. Defaults are 0 for both parameters (i.e.
+        no file size restrictions).
+
+    *   "filetype" - Filter by file type. At the time of writing, values
+        currently accepted by Newzbin for this field are *SFV*, *NFO* and
+        *NZB* (this might change without notice; see "LIMITATIONS"). Default
+        is none (i.e. all file types are allowed).
+
+    *   "resultoffset" and "resultlimit" - Respectively, the offset at which
+        to begin returning results and the maximum number of results to
+        return for this search. Either parameter (or both) may be specified.
+        "resultoffset" should be at least 0 and "resultlimit" must be at
+        most 5000 (this might change without notice; see "LIMITATIONS"),
+        otherwise neither criteria will be considered in the search.
+        Defaults are 0 for "resultoffset" and 500 for "resultlimit" (again,
+        this might change without notice; see "LIMITATIONS").
+
+    *   "sortfield" and "sortorder" - Respectively, the field by which to
+        sort and the order in which to sort. Any of the
+        "NEWZBIN_SORTFIELD_*" constants specified in WWW::Newzbin::Constants
+        are valid for the "sortfield" parameter, and any of the
+        "NEWZBIN_SORTORDER_*" constants specified in WWW::Newzbin::Constants
+        are valid for the "sortorder" parameter. If an invalid value is used
+        for either parameter, the values given for both parameters will not
+        be considered as search criteria. Defaults are
+        "NEWZBIN_SORTFIELD_DATE" (the file's posted date) for "sortfield"
+        and "NEWZBIN_SORTORDER_ASC" (ascending) for "sortorder" (either of
+        these might change without notice; see "LIMITATIONS").
+
+    If the search is successful, the method returns an array of results
+    (with the first result at the head of the array). Each result is a
+    hashref containing the following keys:
+
+    *   "fileid" - Newzbin's unique, internal ID for this file. Suitable for
+        use in "get_nzb".
+
+    *   "subject" - The file's subject (title), as given by its poster.
+
+    *   "posttime" - Unix representation of the date and time at which the
+        file was posted to Usenet (may not be completely accurate; see
+        "LIMITATIONS").
+
+    *   "filesize" - The size of the file, in bytes (may not be completely
+        accurate; see "LIMITATIONS").
+
+    *   "author" - The name of the user who posted the file to Usenet.
+
+    *   "groups" - An arrayref containing a list of the newsgroups to which
+        this file was posted.
+
+    The method "die"s if required parameters were not passed to it, and
+    "warn"s if unrecognised parameters were passed (but the search will
+    still progress). If the search was otherwise unsuccessful, the method
+    returns "undef" and "error_code" will return one of the following
+    values:
+
+    *   -1 - The search could not be carried out due to a technical fault;
+        "error_message" gives a more verbose reason.
+
+    *   -2 - Invalid Newzbin account credentials were given in the
+        constructor for "WWW::Newzbin".
+
+    *   -3 - The account credentials given in the constructor were valid,
+        but the account is not a Newzbin Premium account. A Premium account
+        is required for searching.
+
+    *   -4 - No results that matched the given search criteria could be
+        found.
+
+   search_files_total
+            print "Total number of files found: " . $nzb->search_files_total;
+
+    If used after a successful call to "search_files", this method returns
+    the total number of results that would have been returned if
+    "resultlimit" had not been specified. If used after an unsuccessful (or
+    no) call to "search_files", returns "undef".
+
+   get_nzb
+            my ($nzb_file, $report_name, $report_category) = $nzb->get_nzb(reportid => 12345678);
+        
+            my ($nzb_file_gzipped, $report_name, $report_category) = $nzb->get_nzb(
+                    reportid => 12345678,
+                    leavegzip => 1
+            );
+        
+            my $nzb_file = $nzb->get_nzb(
+                    fileid => [ 123, 456, 789 ]
+            );
+
+    Constructs an NZB (.nzb file) based on either a Newzbin report ID or one
+    or more Newzbin file IDs. Please note that it is not possible to
+    construct NZB files without a valid Premium account.
+
+    NZB files are easily compressed, and Newzbin supports *gzip* file
+    compression for NZB downloads. If Compress::Zlib is available,
+    "WWW::Newzbin" will transparently handle compression to reduce bandwidth
+    usage; otherwise, the NZB file will be downloaded uncompressed.
+
+    Either (but not both) of the following parameters are required:
+
+    *   "reportid" - A scalar containing the ID of the Newzbin report to
+        download. All files listed in the report will be included in the
+        NZB.
+
+    *   "fileid" - A scalar or arrayref of scalars containing the Newzbin
+        file ID or IDs to include in the NZB.
+
+    Other acceptable parameters for this method are as follows (all
+    parameters listed below are optional):
+
+    *   "nogzip" - If set to a true value (i.e. 1), forcefully disables the
+        compression feature explained above. Use this if Compress::Zlib is
+        installed but isn't working for some reason.
+
+    *   "leavegzipped" - If set to a true value (i.e. 1), download the
+        compressed version of the NZB file, but leave it compressed when the
+        method returns (rather than decompressing it and returning that,
+        which is the default behaviour). Useful if the NZB file needs to be
+        transferred over a network to another end-user.
+
+    The method's return value depends on how it was called:
+
+    *   If "fileid" was supplied, the method returns a scalar containing the
+        NZB file.
+
+    *   If "reportid" was supplied, the method returns an array containing
+        the following (in this order):
+
+        *   A scalar containing the NZB file;
+
+        *   A scalar containing the name of the report;
+
+        *   The Newzbin category in which the report was filed (see
+            WWW::Newzbin::Constants).
+
+    The method "die"s if one of the required parameters were not passed to
+    it, and "warn"s if unrecognised parameters were passed (but the download
+    will still occur). If the download was otherwise unsuccessful, the
+    method returns "undef" and "error_code" will return one of the following
+    values:
+
+    *   Any integer greater than 0 - Newzbin rate-limits the number of NZB
+        download requests that a user can make in a given timeframe. A
+        positive integer means your account is being rate-limited and that
+        you must wait this many seconds before sending your request again.
+        See "LIMITATIONS".
+
+    *   -1 - The download could not be requested due to a technical fault;
+        "error_message" gives a more verbose reason.
+
+    *   -2 - Invalid Newzbin account credentials were given in the
+        constructor for "WWW::Newzbin".
+
+    *   -3 - The account credentials given in the constructor were valid,
+        but the account is not a Newzbin Premium account. A Premium account
+        is required for downloading NZB files.
+
+    *   -4 - In the words of Newzbin's documentation: *"the data trying to
+        be fetched does not exist or is not accessible"*. If this error code
+        is returned, do not try the same request again because you will
+        receive the same response.
+
+    *   -5 - "WWW::Newzbin" downloaded the compressed version of the NZB and
+        tried to decompress it using Compress::Zlib, but failed for some
+        reason. If this error code is returned, consider using "nogzip" or
+        "leavegzipped" to bypass decompression.
+
+  ADVANCED METHODS
+   lwp_useragent
+            $nzb->lwp_useragent->timeout(30);
+
+    Grants access to the underlying LWP::UserAgent object that powers
+    "WWW::Newzbin". Useful for fine-tuning; if you just need to specify a
+    proxy server for LWP::UserAgent, consider using the far-neater "proxy"
+    parameter in the "new" constructor.
+
+LIMITATIONS
+  USENET LIMITATIONS
+    The "posttime" and "filesize" values returned for each result by
+    "search_files" may not always be accurate because Newzbin reports the
+    post time and file size based on the first news server on which it sees
+    the file. Newzbin's *FileFind* documentation states that the file size
+    *"should be accurate to within a few kilobytes"*, however.
+
+  NEWZBIN LIMITATIONS
+    *FileFind*, the Newzbin API upon which "search_files" relies, has
+    default values for a number of its parameters (specifically:
+    "retention", "resultoffset" and "resultlimit"). The "WWW::Newzbin"
+    documentation states these defaults but they are actually set by the
+    Newzbin API, not by this module. This means, of course, that the Newzbin
+    developers could change these default values at any time, which may
+    drastically alter the search results that "WWW::Newzbin" returns. Every
+    effort will be made to keep this documentation up-to-date with any
+    changes made to the default values in the *FileFind* API, but you are
+    advised to explicitly specify "search_files" parameters rather than
+    relying too much on the defaults.
+
+    Newzbin's retention is currently 240 days. At the moment no mainstream
+    Usenet provider has a retention that Newzbin doesn't cover, but this
+    might change in future. Therefore, while the "WWW::Newzbin"
+    documentation states that the "search_files" "retention" parameter must
+    not exceed 240, this limit is not hardcoded and specifying longer
+    retentions will not result in a warning or error.
+
+    Newzbin intentionally caps *FileFind*'s result limit to 5000. The
+    "search_files" "resultlimit" parameter, therefore, should not exceed
+    5000; although Newzbin could of course change or remove this limit at
+    any time without notice, so "WWW::Newzbin" will not produce a warning or
+    error if "resultlimit" is greater than 5000.
+
+    The "search_files" "filetype" parameter only accepts a handful of file
+    types. Newzbin's *FileFind* documentation states that you're welcome to
+    contact them to request indexing of other file types. Nevertheless, the
+    *FileFind* documentation also states that file type filtering is
+    *"fairly accurate, but don't rely on it as any malicious Usenet poster
+    could easily circumvent it"*.
+
+    *DirectNZB*, the Newzbin API upon which "get_nzb" relies, only allows
+    either one report ID or several file IDs per request. The documentation
+    states that this is unlikely to change in future.
+
+    *DirectNZB* also limits the rate at which accounts can generate NZB
+    files - currently the restriction is 5 NZB files per minute per IP
+    address. If "get_nzb" reports a positive integer as its "error_code",
+    you are advised to wait that many seconds (or, preferably, 60 seconds)
+    before calling "get_nzb" again. Failure to do so might result in your IP
+    address (or even the entire account) being banned from accessing
+    Newzbin.
+
+DEPENDENCIES
+    WWW::Newzbin::Constants, LWP::UserAgent
+
+    Optional: Compress::Zlib
+
+SEE ALSO
+    Documentation for associated modules (see "DEPENDENCIES").
+
+    <http://docs.newzbin.com/index.php/Newzbin:FileFind> - Newzbin
+    documentation for *FileFind*, which powers the "search_files" method.
+
+    <http://docs.newzbin.com/index.php/Newzbin:DirectNZB> - Newzbin
+    documentation for *DirectNZB*, which powers the "get_nzb" method.
+
+AUTHOR
+    Chris Novakovic <chrisn@cpan.org>
+
+COPYRIGHT
+    Copyright 2007-8 Chris Novakovic.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

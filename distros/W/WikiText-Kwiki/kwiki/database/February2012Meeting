@@ -1,0 +1,9 @@
+  Thu. February 9th, 6:53pm at FreeGeek – 1731 SE 10th Ave.
+
+= Code cleanup and refactoring without the "scary".
+
+speaker: Chad 'Exodist' Granum
+
+Refactoring is something many developers approach with a great deal of fear. Sometimes you may need to refactor code that you do not understand. Sometimes there are no unit tests. Sometimes things can be scary.
+
+I will be showing techniques for cleaning/refactoring code that will help avoid errors, and make things less scary. Ideally people will bring small/medium code samples or modules as examples. If nobody brings anything we may pull something off of cpan.

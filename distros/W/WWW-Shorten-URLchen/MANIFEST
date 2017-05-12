@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/WWW/Shorten/URLchen.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-urlchen.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

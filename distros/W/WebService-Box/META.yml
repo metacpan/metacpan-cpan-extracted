@@ -1,0 +1,33 @@
+---
+abstract: 'manage your documents on Box.com'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Box
+requires:
+  Carp: 0
+  DateTime: 1.03
+  HTTP::Tiny: 0.034
+  HTTP::Tiny::Multipart: 0.02
+  IO::Socket::SSL: 1.953
+  JSON: 2.53
+  Moo: 1.003001
+  OAuth2::Box: 0.03
+  Sub::Identify: 0.04
+  Sub::Name: 0.05
+  Test::Exception: 0.32
+  Test::Warn: 0.24
+  Type::Tiny: 0.026
+resources:
+  bugtracker: http://github.com/reneeb/WebService-Box/issues
+  homepage: http://github.com/reneeb/WebService-Box
+  repository: git://github.com/reneeb/WebService-Box.git
+version: 0.02

@@ -1,0 +1,41 @@
+---
+abstract: 'parser and builder for application/x-www-form-urlencoded'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  JSON: '2'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Form-UrlEncoded
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::Form::UrlEncoded:
+    file: lib/WWW/Form/UrlEncoded.pm
+    version: '0.24'
+  WWW::Form::UrlEncoded::PP:
+    file: lib/WWW/Form/UrlEncoded/PP.pm
+requires:
+  Exporter: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kazeburo/WWW-Form-UrlEncoded/issues
+  homepage: https://github.com/kazeburo/WWW-Form-UrlEncoded
+  repository: git://github.com/kazeburo/WWW-Form-UrlEncoded.git
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

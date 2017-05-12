@@ -1,0 +1,211 @@
+
+=head1 NAME
+
+Win32::GUI::DialogBox - Create and manipulate Windows
+
+=head1 DESCRIPTION
+
+Just like Window, but with a predefined dialog box look: by default, a DialogBox
+can not be sized, has no maximize box and has C<-dialogui> enabled (eg.
+interprets tab/enter/esc).
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(%OPTIONS)>
+
+Creates a new DialogBox object. See L<new Win32::GUI::Window()|Win32::GUI::Window/new>.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Activate (Win32::GUI::Window)
+
+B<Activate()>
+
+Sent when the window is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Deactivate (Win32::GUI::Window)
+
+B<Deactivate()>
+
+Sent when the window is deactivated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InitMenu (Win32::GUI::Window)
+
+B<InitMenu(MENU)>
+
+Sent when a menu is about to become active. It occurs when the user clicks
+an item on the menu bar or presses a menu key. This allows the application
+to modify the menu before it is displayed.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Maximize (Win32::GUI::MDIChild)
+
+B<Maximize()>
+
+Sent when the window is maximized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Maximize (Win32::GUI::Window)
+
+B<Maximize()>
+
+Sent when the window is maximized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Minimize (Win32::GUI::MDIChild)
+
+B<Minimize()>
+
+Sent when the window is minimized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Minimize (Win32::GUI::Window)
+
+B<Minimize()>
+
+Sent when the window is minimized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Paint (Win32::GUI::Window)
+
+B<Paint(DC)>
+
+Sent when the window needs to be repainted.
+
+Note that you get the DC of the window object in parameter,
+and then Validate() the DC to inform Windows
+that you painted the DC area (otherwise it will
+continue to call the Paint event continuously).
+Example:
+
+  sub Graphic_Paint {
+      my $DC = shift;
+      $DC->MoveTo(0, 0);
+      $DC->LineTo(100, 100);
+      $DC->Validate();
+  }
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Resize (Win32::GUI::MDIChild)
+
+B<Resize()>
+
+Sent when the window is resized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Resize (Win32::GUI::Window)
+
+B<Resize()>
+
+Sent when the window is resized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll (Win32::GUI::MDIChild)
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+OPERATION can be compared against one of the following constants:
+SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+Related messages: WM_HSCROLL, WM_VSCROLL
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll (Win32::GUI::Window)
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+OPERATION can be compared against one of the following constants:
+SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+Related messages: WM_HSCROLL, WM_VSCROLL
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Terminate (Win32::GUI::MDIChild)
+
+B<Terminate()>
+
+Sent when the window is closed.
+The event should return -1 to terminate the interaction
+and return control to the perl script; see L<Dialog()|Win32::GUI::DialogBox/Dialog>.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Terminate (Win32::GUI::Window)
+
+B<Terminate()>
+
+Sent when the window is closed.
+The event should return -1 to terminate the interaction
+and return control to the perl script; see L<Dialog()|Win32::GUI::DialogBox/Dialog>.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

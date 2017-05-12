@@ -1,0 +1,12 @@
+Revision history for BigDoor
+
+0.1.1  Thu Jan 20 23:13:01 2011
+       make perlcritic.t, pod.t, podcoverage.t, strict.t, kwalitee.t tests off
+       by default, requires TEST_AUTHOR to run
+
+0.1.0  Wed Jan  5 22:07:59 2011
+       Initial CPAN release.
+
+0.0.1  Tue Nov 23 22:00:47 2010
+       Initial release.
+

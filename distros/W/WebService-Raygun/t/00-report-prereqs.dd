@@ -1,0 +1,57 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::GUID' => '0',
+                                      'DateTime' => '0',
+                                      'DateTime::Format::Strptime' => '0',
+                                      'Filesys::DfPortable' => '0',
+                                      'JSON' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'Mouse' => '0',
+                                      'Mouse::Util::TypeConstraints' => '0',
+                                      'Mozilla::CA' => '0',
+                                      'POSIX' => '0',
+                                      'Sys::Info' => '0',
+                                      'Sys::Info::OS' => '0',
+                                      'Try::Tiny' => '0',
+                                      'URI' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Request' => '0',
+                                   'Moose' => '0',
+                                   'Test::Class' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'parent' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

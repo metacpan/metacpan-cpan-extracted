@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f88b76401cbaba81de237c0426923b2f71d8eada INSTALL
+SHA1 b7c121b8153c26d8f70eb45db2fd6ff7e099edb3 LICENSE
+SHA1 7cb9406fb7fb7358cd6e26ab329b0fa9dfa0aeb7 MANIFEST
+SHA1 61d32d410e9910a413ebd5db4c7496853e8ade35 META.json
+SHA1 8c887cbcbd4e4d48f638d6af004e3b7a8f420ff0 META.yml
+SHA1 ee5070052e530c37e4e6e66d5e5b4f46af866ddd Makefile.PL
+SHA1 6cab01ada303d10a414ea220656b5726b564776d README
+SHA1 52cc7a1aa3cb7b32af73d56cc287bdfccab5b99f dist.ini
+SHA1 57674a56291562397091bc6926545fd255ce8607 lib/WWW/Lk4.pm
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iEYEARECAAYFAlesUrwACgkQ9IHYOgPo3G0StgCgxvD65snk8eyNWh+YU34pefNT
+nfAAn2/KjJHx0IBl7zCjZelTk74BH4E/
+=a5EX
+-----END PGP SIGNATURE-----

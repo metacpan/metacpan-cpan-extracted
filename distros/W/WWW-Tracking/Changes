@@ -1,0 +1,18 @@
+Revision history for WWW-Tracking
+
+0.05   9 October 2016
+    - fixes as reported by CPANTS (#2, thanks to Mohammad S Anwar)
+    - add requires DateTime and URI
+
+0.04   8 October 2016
+    - add requires List::MoreUtils
+
+0.03   7 October 2016
+    - move author tests to xt/
+
+0.02   12 Sep 2011
+    - google analytics fixes
+    - piwik tracking support
+
+0.01    1 Sep 2011
+    - initial

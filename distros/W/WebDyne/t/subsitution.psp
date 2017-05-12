@@ -1,0 +1,82 @@
+<start_html lang="en-US">
+<p>
+<perl method="hello0">${hello} ${hello}</perl>
+<p>
+<perl method="hello1">${hello} ${hello}</perl>
+<perl method="hello2"><p>${hello}</perl>
+<p>
+<form action="">
+<popup_menu values="@{qw(red blue)}" name="popup_array"/>
+<p>
+<popup_menu values="!{[qw(red blue)]}" name="popup_array"/>
+<p>
+<popup_menu values="!{tie(my %h, 'Tie::IxHash', ( red=>Red, blue=>Blue, green=>Green )); \%h}" name="popup_hash"/>
+<p>
+<popup_menu values="%{red=>'Red', blue=>'Blue', green=>Green}" name="popup_hash"/>
+<p>
+<popup_menu values="!{! [keys %{${__PACKAGE__.'::TEST_HR'}} ] !}" /></td>
+<p>
+<perl method="popup0">
+<popup_menu values="${popup_ar}" name="${name}"/>
+</perl>
+<p>
+<perl method="popup1">
+<popup_menu values="${popup_hr}" name="${name}"/>
+</perl>
+<perl method="iterate">
+<p>i ${i}
+</perl>
+<perl method="submit1">
+<submit name="foo=bar;car=${i};dar=${dar}"/>
+<submit name="i=${i};dar=${dar}"/>
+<submit name="foo=bar&car=${i}&dar=${dar}"/>
+<submit name="i=${i}&dar=${dar}"/>
+<submit name="${i}=1&dar=${dar}"/>
+<submit name="*{ASDF}"/>
+Text *{ASDF} ${dar} 
+</perl>
+</form>
+<end_html>
+__PERL__
+
+$ENV{'ASDF'}='GEFK';
+tie(our %TEST_HR, 'Tie::IxHash', ( green=>'Green', red=>'red' ));
+our $TEST_HR=\%TEST_HR;
+
+sub hello0 {
+	shift()->render( hello=>'Hello World 0' );
+}
+
+sub hello1 {
+	shift()->render({ param=> { hello=>'Hello World 1' }});
+}
+
+sub hello2 {
+	my $s=shift();
+	my @r=map { $s->render( hello=>'Hello World 2' ) } (0..2);
+	return \@r;
+}
+
+sub popup0 {
+	shift()->render(
+		popup_ar => [qw(red blue)],
+		name     => 'popup0'
+	)
+}
+
+sub popup1 {
+	shift()->render(
+		popup_hr => do { tie(my %hash, Tie::IxHash, ( blue=>'Blue', red=>'Red',  )); \%hash },
+		name     => 'popup1'
+	)
+}
+
+sub iterate {
+	my $s=shift();
+	my @r=map { $s->render( i=>$_, dar=>'dar' ) } (0..2);
+	return \@r;
+}
+
+sub submit1 {
+        shift()->render( i=>1, dar=>'dar' )
+}

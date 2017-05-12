@@ -1,0 +1,19 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_0_0_502 - This is the release notes for Version 0.0.502 of Win32::GUI
+
+=head1 Release Date
+
+12th December, 2000
+
+=head1 Summary of Changes
+
+This is the source distribution of Win32::GUI. contains source code
+(you need a C++ compiler to install the module), documentation and
+samples.
+
+=head1 Contributors to this release
+
+Unknown
+
+=cut

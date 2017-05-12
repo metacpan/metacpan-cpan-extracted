@@ -1,0 +1,12 @@
+lib/WebService/Autotask.pm
+t/01-pod.t
+t/01-pragmas.t
+t/02-pod-coverage.t
+t/03-perlcritic.t
+t/Autotask.t
+t/perlcriticrc
+README
+Makefile.PL
+Changes
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

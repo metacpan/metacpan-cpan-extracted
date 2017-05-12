@@ -1,0 +1,15 @@
+Revision history for module Win32::RunAsAdmin
+
+0.02 2014-05-05
+
+ - Switch to Devel::PL_origargv to obtain the command line
+   *before* Perl has its way with it (per rt#95078)
+ - Save the argv before anybody else gets to play with it, too, and
+   update documentation to warn about this (e.g. use Win32::RunAsAdmin
+   before use Getopt::Euclid, or you'll regret it!)
+ - Switch to Win32::IsAdminUser (per rt#95077)
+
+0.01 2014-04-17
+
+ - Initial release
+

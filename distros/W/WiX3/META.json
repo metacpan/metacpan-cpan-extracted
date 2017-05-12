@@ -1,0 +1,193 @@
+{
+   "abstract" : "Objects useful for generating Windows Installer XML files.",
+   "author" : [
+      "Curtis Jewell <csjewell@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WiX3",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.61",
+            "Test::UseAllModules" : "0.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.33"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Readonly::XS" : "1.05"
+         },
+         "requires" : {
+            "Data::UUID" : "1.202",
+            "Dist::CheckConflicts" : "0.02",
+            "Exception::Class" : "1.29",
+            "List::MoreUtils" : 0,
+            "Moose" : "2.00",
+            "MooseX::Singleton" : "0.25",
+            "MooseX::Types" : "0.24",
+            "Params::Util" : "1.00",
+            "Readonly" : "1.03",
+            "Regexp::Common" : "2.122",
+            "namespace::autoclean" : "0.08",
+            "parent" : "0.221",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "provides" : {
+      "WiX3" : {
+         "file" : "lib/WiX3.pm",
+         "version" : "0.011"
+      },
+      "WiX3::Exceptions" : {
+         "file" : "lib/WiX3/Exceptions.pm",
+         "version" : "0.011"
+      },
+      "WiX3::Role::Traceable" : {
+         "file" : "lib/WiX3/Role/Traceable.pm",
+         "version" : "0.011"
+      },
+      "WiX3::Traceable" : {
+         "file" : "lib/WiX3/Traceable.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Component" : {
+         "file" : "lib/WiX3/XML/Component.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::ComponentRef" : {
+         "file" : "lib/WiX3/XML/ComponentRef.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::CreateFolder" : {
+         "file" : "lib/WiX3/XML/CreateFolder.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Custom" : {
+         "file" : "lib/WiX3/XML/Custom.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::CustomAction" : {
+         "file" : "lib/WiX3/XML/CustomAction.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Directory" : {
+         "file" : "lib/WiX3/XML/Directory.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::DirectoryRef" : {
+         "file" : "lib/WiX3/XML/DirectoryRef.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Environment" : {
+         "file" : "lib/WiX3/XML/Environment.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Feature" : {
+         "file" : "lib/WiX3/XML/Feature.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::FeatureRef" : {
+         "file" : "lib/WiX3/XML/FeatureRef.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::File" : {
+         "file" : "lib/WiX3/XML/File.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Fragment" : {
+         "file" : "lib/WiX3/XML/Fragment.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Fragment::CreateFolder" : {
+         "file" : "lib/WiX3/XML/Fragment/CreateFolder.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Icon" : {
+         "file" : "lib/WiX3/XML/Icon.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::InstallExecuteSequence" : {
+         "file" : "lib/WiX3/XML/InstallExecuteSequence.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Merge" : {
+         "file" : "lib/WiX3/XML/Merge.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::MergeRef" : {
+         "file" : "lib/WiX3/XML/MergeRef.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Property" : {
+         "file" : "lib/WiX3/XML/Property.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::RegistryKey" : {
+         "file" : "lib/WiX3/XML/RegistryKey.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::RegistryValue" : {
+         "file" : "lib/WiX3/XML/RegistryValue.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::RemoveFolder" : {
+         "file" : "lib/WiX3/XML/RemoveFolder.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Role::Fragment" : {
+         "file" : "lib/WiX3/XML/Role/Fragment.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Role::GeneratesGUID" : {
+         "file" : "lib/WiX3/XML/Role/GeneratesGUID.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Role::InnerText" : {
+         "file" : "lib/WiX3/XML/Role/InnerText.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Role::Tag" : {
+         "file" : "lib/WiX3/XML/Role/Tag.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Role::TagAllowsChildTags" : {
+         "file" : "lib/WiX3/XML/Role/TagAllowsChildTags.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::Shortcut" : {
+         "file" : "lib/WiX3/XML/Shortcut.pm",
+         "version" : "0.011"
+      },
+      "WiX3::XML::WixVariable" : {
+         "file" : "lib/WiX3/XML/WixVariable.pm",
+         "version" : "0.011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=WiX3"
+      },
+      "homepage" : "http://csjewell.comyr.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://hg.curtisjewell.name/WiX3"
+      }
+   },
+   "version" : "0.011"
+}

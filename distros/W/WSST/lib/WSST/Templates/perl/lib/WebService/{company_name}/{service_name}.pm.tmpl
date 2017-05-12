@@ -1,0 +1,171 @@
+package [% package_name %];
+
+use strict;
+use base qw( Class::Accessor::Fast );
+use vars qw( $VERSION );
+$VERSION = '[% version %]';
+
+[% FOREACH method = methods -%]
+use [% "${package_name}::${method.class_name}" %];
+[% END -%]
+
+my $TPPCFG = [qw( user_agent lwp_useragent http_lite utf8_flag )];
+__PACKAGE__->mk_accessors( @$TPPCFG, 'param' );
+
+sub new {
+    my $package = shift;
+    my $self    = {@_};
+    $self->{user_agent} ||= __PACKAGE__."/$VERSION ";
+    bless $self, $package;
+    $self;
+}
+
+sub add_param {
+    my $self = shift;
+    my $param = $self->param() || {};
+    %$param = ( %$param, @_ ) if scalar @_;
+    $self->param($param);
+}
+
+sub get_param {
+    my $self = shift;
+    my $key = shift;
+    my $param = $self->param() or return;
+    $param->{$key} if exists $param->{$key};
+}
+
+sub init_treepp_config {
+    my $self = shift;
+    my $api  = shift;
+    my $treepp = $api->treepp();
+    foreach my $key ( @$TPPCFG ) {
+        next unless exists $self->{$key};
+        next unless defined $self->{$key};
+        $treepp->set( $key => $self->{$key} );
+    }
+}
+
+sub init_query_param {
+    my $self = shift;
+    my $api  = shift;
+    my $param = $self->param();
+    foreach my $key ( keys %$param ) {
+        next unless defined $param->{$key};
+        $api->add_param( $key => $param->{$key} );
+    }
+}
+
+[% FOREACH method = methods -%]
+sub [% method.interface_name %] {
+    my $self = shift or return;
+    $self = $self->new() unless ref $self;
+    my $api = [% package_name %]::[% method.class_name %]->new();
+    $self->init_treepp_config( $api );
+    $self->init_query_param( $api );
+    $api->add_param( @_ );
+    $api->request();
+    $api;
+}
+
+[% END -%]
+=head1 NAME
+
+[% package_name %] - An Interface for [% title %]
+
+=head1 SYNOPSIS
+
+    use [% package_name %];
+    
+    my $service = [% package_name %]->new();
+    
+    my $param = {
+[% FOREACH key = sort_keys(methods.0.first_good_test.params) -%]
+        '[% key %]' => [% methods.0.first_good_test.params.$key | $env_param %],
+[% END -%]
+    };
+    my $res = $service->[% methods.0.interface_name %]( %$param );
+    my $root = $res->root;
+[% FOREACH node = tree_to_array(methods.0.return) -%]
+[% LAST IF loop.index > 6 -%]
+[% NEXT IF node.depth == 1 -%]
+    printf("[% node.name %]: %s\n", $root[% node_access(node) %]);
+[% END -%]
+    print "...\n";
+
+=head1 DESCRIPTION
+
+[% perl_abstract or abstract %]
+
+=head1 METHODS
+
+=head2 new
+
+This is the constructor method for this class.
+
+    my $service = [% package_name %]->new();
+
+This accepts optional parameters.
+
+    my $conf = {
+        utf8_flag => 1,
+        param => {
+            # common parameters of this web service 
+        },
+    };
+    my $service = [% package_name %]->new( %$conf );
+
+=head2 add_param
+
+Add common parameter of tihs web service.
+
+    $service->add_param( param_key => param_value );
+
+You can add multiple parameters by calling once.
+
+    $service->add_param( param_key1 => param_value1,
+                         param_key2 => param_value2,
+                         ...);
+
+=head2 get_param
+
+Returns common parameter value of the specified key.
+
+    my $param_value = $service->get( 'param_key' );
+
+[% FOREACH method = methods -%]
+=head2 [% method.interface_name %]
+
+This makes a request for C<[% method.name %]> API.
+See L<[% "${package_name}::${method.class_name}" %]> for details.
+
+    my $res = $service->[% method.interface_name %]( %$param );
+
+[% END -%]
+=head2 utf8_flag / user_agent / lwp_useragent / http_lite
+
+This modules uses L<XML::TreePP> module internally.
+Following methods are available to configure it.
+
+    $service->utf8_flag( 1 );
+    $service->user_agent( 'Foo-Bar/1.0 ' );
+    $service->lwp_useragent( LWP::UserAgent->new() );
+    $service->http_lite( HTTP::Lite->new() );
+
+[% IF perl_see_also or see_also -%]
+=head1 SEE ALSO
+
+[% perl_see_also or see_also %]
+
+[% END -%]
+=head1 AUTHOR
+
+[% join(",\n", author) %]
+
+[% IF perl_copyright or copyright -%]
+=head1 COPYRIGHT
+
+[% perl_copyright or copyright %]
+
+[% END -%]
+=cut
+1;

@@ -1,0 +1,60 @@
+Revision history for perl module WWW::betfair
+
+1.03 2015-04-22
+    - Added deprecation notice
+
+1.02 2013-11-17
+    - Updated betfair.pm POD.
+
+1.01 2013-08-24
+    - Updated getAllMarkets split to correctly parse the string data.
+
+1.00 2013-07-28
+    - Filled missing hyperlink labels to betfair documentation.
+    - Filled missing anchor page H2 links to betfair simple data types.
+
+0.14 2013-07-20
+    - Added getMarketProfitAndLoss method.
+    - Tested and updated non-free methods.
+    - Updated documentation to remove beta label and re-ordered H1 paragraphs.
+    - Fixed Changes file formatting to address RT ticket 87067.
+
+0.13 2013-07-18
+    - Added remaining non-free API methods.
+        
+0.12 2013-07-07
+    - Added getInPlayMarkets, getMarketInfo, getMarketPrices, getMarketPricesCompressed and getMUBetsLite methods.
+    - Refactored getEvents method.
+
+0.10 2013-07-02
+    - Added getBetLite, getBetMatchesLite, getCurrentBetsLite, and getAvailableMktDepth methods.
+
+0.09 2013-07-01
+    - Added getMarketTradedVolume, getMarketTradedVolumeCompressed and cancelBetsByMarket methods.
+    - Refactored and renamed getCompleteMarketPrices to getCompleteMarketPricesCompressed to be in line with the betfair API method of the same name.
+
+0.08 2013-06-30
+    - Added getBetHistory method.
+
+0.07 2013-06-28
+    - Re-uploaded to CPAN, no changes.
+
+0.06 2013-06-28
+    - Added new currency methods, updated getCurrentBets method. Added v5.10.1 requirement to Makefile.
+
+0.05 2013-06-27
+    - Corrected MANIFEST to include TypeCheck.t and betfair.t
+
+0.04 2013-06-27
+    - Corrected MANIFEST to include TypeCheck.pm.
+
+0.03 2013-06-24
+    - Added TypeCheck.pm and basic parameter checking to API methods.
+    - Minor corrections to documentation.
+
+0.02 2013-06-18
+    - Fixed login method, added new test file, corrected documentation.
+
+0.01 2013-06-15
+    - Initial version with some API methods released.
+

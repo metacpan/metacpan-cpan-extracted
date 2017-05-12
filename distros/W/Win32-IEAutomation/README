@@ -1,0 +1,33 @@
+Win32-IEAutomation version 0.01
+===============================
+
+This module tries to give web application automation using internet explorer on windows platform.
+It internally uses Win32::OLE to create automation object for IE.
+It drives internet explorer using its DOM properties and methods.
+The module allows user to interact with web page controls like links, buttons, radios, checkbox, text fields etc.
+It also supports frames, popup window and interaction with dialogs like security alert, confirmation dialog etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Win32
+ Win32::OLE
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Prashant Shewale (pvshewale@gmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

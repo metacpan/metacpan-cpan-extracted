@@ -1,0 +1,430 @@
+{
+  'action' => {
+    'RecentChangesAtom' => [
+      'RecentChangesAtom'
+    ],
+    'RecentChangesRSS' => [
+      'RecentChangesRSS'
+    ],
+    'display' => [
+      'display'
+    ],
+    'edit' => [
+      'edit'
+    ],
+    'edit_contention' => [
+      'edit'
+    ],
+    'edit_noUserName' => [
+      'EditRequireUserName'
+    ],
+    'recent_changes' => [
+      'recent_changes'
+    ],
+    'recent_changes_ajax_list' => [
+      'recent_changes'
+    ],
+    'revisions' => [
+      'revisions'
+    ],
+    'search' => [
+      'search'
+    ],
+    'user_preferences' => [
+      'user_preferences'
+    ]
+  },
+  'add_order' => {
+    'EditRequireUserName' => {
+      'action' => [
+        'edit_noUserName'
+      ]
+    },
+    'RecentChangesAtom' => {
+      'action' => [
+        'RecentChangesAtom'
+      ],
+      'toolbar' => [
+        'atom_button'
+      ]
+    },
+    'RecentChangesRSS' => {
+      'action' => [
+        'RecentChangesRSS'
+      ],
+      'toolbar' => [
+        'rss_button'
+      ]
+    },
+    'archive' => {},
+    'display' => {
+      'action' => [
+        'display'
+      ],
+      'preference' => [
+        'display_changed_by'
+      ],
+      'toolbar' => [
+        'home_button'
+      ]
+    },
+    'edit' => {
+      'action' => [
+        'edit',
+        'edit_contention'
+      ],
+      'toolbar' => [
+        'edit_button'
+      ]
+    },
+    'recent_changes' => {
+      'action' => [
+        'recent_changes_ajax_list',
+        'recent_changes'
+      ],
+      'preference' => [
+        'recent_changes_depth'
+      ],
+      'toolbar' => [
+        'recent_changes_button',
+        'recent_changes_options'
+      ]
+    },
+    'revisions' => {
+      'action' => [
+        'revisions'
+      ],
+      'prerequisite' => [
+        'archive'
+      ],
+      'toolbar' => [
+        'revisions_button',
+        'revisions_controls'
+      ]
+    },
+    'search' => {
+      'action' => [
+        'search'
+      ],
+      'toolbar' => [
+        'search_box'
+      ]
+    },
+    'status' => {
+      'preload' => [
+        'status'
+      ]
+    },
+    'theme' => {
+      'preload' => [
+        'theme'
+      ],
+      'prerequisite' => [
+        'toolbar',
+        'widgets',
+        'status'
+      ]
+    },
+    'toolbar' => {
+      'preload' => [
+        'toolbar'
+      ]
+    },
+    'user_name' => {
+      'preference' => [
+        'user_name'
+      ],
+      'preload' => [
+        'user_name'
+      ]
+    },
+    'user_preferences' => {
+      'action' => [
+        'user_preferences'
+      ],
+      'toolbar' => [
+        'user_preferences_button'
+      ]
+    },
+    'widgets' => {
+      'preload' => [
+        'widgets'
+      ]
+    }
+  },
+  'classes' => {
+    'EditRequireUserName' => 'Kwiki::Edit::RequireUserName',
+    'RecentChangesAtom' => 'Kwiki::RecentChanges::Atom',
+    'RecentChangesRSS' => 'Kwiki::RecentChangesRSS',
+    'archive' => 'Kwiki::Archive::Rcs',
+    'cgi' => 'Kwiki::CGI',
+    'command' => 'Kwiki::Command',
+    'config' => 'Kwiki::Config',
+    'cookie' => 'Kwiki::Cookie',
+    'css' => 'Kwiki::CSS',
+    'display' => 'Kwiki::Display',
+    'edit' => 'Kwiki::Edit',
+    'files' => 'Kwiki::Files',
+    'formatter' => 'Kwiki::Formatter',
+    'headers' => 'Spoon::Headers',
+    'hooks' => 'Spoon::Hooks',
+    'hub' => 'Kwiki::Hub',
+    'javascript' => 'Kwiki::Javascript',
+    'page' => 'Kwiki::Page',
+    'page_metadata' => 'Kwiki::PageMeta',
+    'pages' => 'Kwiki::Pages',
+    'preferences' => 'Kwiki::Preferences',
+    'recent_changes' => 'Kwiki::RecentChanges',
+    'registry' => 'Kwiki::Registry',
+    'revisions' => 'Kwiki::Revisions',
+    'search' => 'Kwiki::Search',
+    'status' => 'Kwiki::Status',
+    'template' => 'Kwiki::Template::TT2',
+    'theme' => 'Kwiki::Theme::Basic',
+    'toolbar' => 'Kwiki::Toolbar',
+    'user_name' => 'Kwiki::UserName',
+    'user_preferences' => 'Kwiki::UserPreferences',
+    'users' => 'Kwiki::Users',
+    'widgets' => 'Kwiki::Widgets'
+  },
+  'hook' => {
+    'Kwiki::Edit' => [
+      [
+        'Kwiki::Edit::edit',
+        'pre',
+        'Kwiki::Edit::RequireUserName::require_username'
+      ]
+    ],
+    'Kwiki::Page' => [
+      [
+        'Kwiki::Page::store',
+        'post',
+        'Kwiki::Archive::Rcs::commit_hook'
+      ]
+    ]
+  },
+  'plugins' => [
+    {
+      'id' => 'display',
+      'title' => 'Page Display'
+    },
+    {
+      'id' => 'edit',
+      'title' => 'Page Edit'
+    },
+    {
+      'id' => 'EditRequireUserName',
+      'title' => 'Require UserName to edit'
+    },
+    {
+      'id' => 'theme',
+      'title' => 'Basic Theme'
+    },
+    {
+      'id' => 'toolbar',
+      'title' => 'Kwiki Toolbar'
+    },
+    {
+      'id' => 'status',
+      'title' => 'Kwiki Status'
+    },
+    {
+      'id' => 'widgets',
+      'title' => 'Kwiki Widgets'
+    },
+    {
+      'id' => 'recent_changes',
+      'title' => 'Kwiki Recent Changes'
+    },
+    {
+      'id' => 'archive',
+      'title' => 'Page Archive'
+    },
+    {
+      'id' => 'revisions',
+      'title' => 'Kwiki Revisions'
+    },
+    {
+      'id' => 'user_preferences',
+      'title' => 'User Preferences'
+    },
+    {
+      'id' => 'user_name',
+      'title' => 'Kwiki User Name'
+    },
+    {
+      'id' => 'search',
+      'title' => 'Kwiki Search'
+    },
+    {
+      'id' => 'RecentChangesAtom',
+      'title' => 'RecentChangesAtom'
+    },
+    {
+      'id' => 'RecentChangesRSS',
+      'title' => 'RecentChangesRSS'
+    }
+  ],
+  'preference' => {
+    'display_changed_by' => [
+      'display',
+      'object',
+      bless( {
+        'default' => 0,
+        'handler' => 'display_changed_by_handler',
+        'id' => 'display_changed_by',
+        'name' => 'Display Changed By',
+        'owner_id' => 'display',
+        'query' => 'Show a "Changed by ..." section on each page?',
+        'type' => 'boolean'
+      }, 'Kwiki::Preference' )
+    ],
+    'recent_changes_depth' => [
+      'recent_changes',
+      'object',
+      bless( {
+        'choices' => [
+          1,
+          'Last 24 hours',
+          2,
+          'Last 2 Days',
+          3,
+          'Last 3 Days',
+          7,
+          'Last Week',
+          14,
+          'Last 2 Weeks',
+          30,
+          'Last Month',
+          60,
+          'Last 2 Months',
+          90,
+          'Last 3 Months',
+          182,
+          'Last 6 Months'
+        ],
+        'default' => 7,
+        'handler' => 'recent_changes_depth_handler',
+        'id' => 'recent_changes_depth',
+        'name' => 'Recent Changes Depth',
+        'owner_id' => 'recent_changes',
+        'query' => 'What time interval should "Recent Changes" display?',
+        'type' => 'pulldown'
+      }, 'Kwiki::Preference' )
+    ],
+    'user_name' => [
+      'user_name',
+      'object',
+      bless( {
+        'default' => '',
+        'edit' => 'check_user_name',
+        'handler' => 'user_name_handler',
+        'id' => 'user_name',
+        'name' => 'User Name',
+        'owner_id' => 'user_name',
+        'query' => 'Enter a KwikiUserName to identify yourself.',
+        'size' => 15,
+        'type' => 'input'
+      }, 'Kwiki::Preference' )
+    ]
+  },
+  'preload' => {
+    'status' => [
+      'status'
+    ],
+    'theme' => [
+      'theme',
+      'priority',
+      1
+    ],
+    'toolbar' => [
+      'toolbar'
+    ],
+    'user_name' => [
+      'user_name'
+    ],
+    'widgets' => [
+      'widgets'
+    ]
+  },
+  'prerequisite' => {
+    'archive' => [
+      'revisions'
+    ],
+    'status' => [
+      'theme'
+    ],
+    'toolbar' => [
+      'theme'
+    ],
+    'widgets' => [
+      'theme'
+    ]
+  },
+  'toolbar' => {
+    'atom_button' => [
+      'RecentChangesAtom',
+      'template',
+      'atom_button.html'
+    ],
+    'edit_button' => [
+      'edit',
+      'template',
+      'edit_button.html',
+      'show_for',
+      [
+        'display',
+        'revisions',
+        'edit_contention'
+      ]
+    ],
+    'home_button' => [
+      'display',
+      'template',
+      'home_button.html'
+    ],
+    'recent_changes_button' => [
+      'recent_changes',
+      'template',
+      'recent_changes_button.html'
+    ],
+    'recent_changes_options' => [
+      'recent_changes',
+      'template',
+      'recent_changes_options.html',
+      'show_for',
+      'recent_changes'
+    ],
+    'revisions_button' => [
+      'revisions',
+      'template',
+      'revisions_button.html',
+      'show_for',
+      'display'
+    ],
+    'revisions_controls' => [
+      'revisions',
+      'template',
+      'revisions_controls.html',
+      'show_for',
+      'revisions',
+      'params_class',
+      'revisions'
+    ],
+    'rss_button' => [
+      'RecentChangesRSS',
+      'template',
+      'rss_button.html'
+    ],
+    'search_box' => [
+      'search',
+      'template',
+      'search_box.html'
+    ],
+    'user_preferences_button' => [
+      'user_preferences',
+      'template',
+      'user_preferences_button.html'
+    ]
+  }
+}

@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+
+%aliases = qw[
+];
+
+@pack2interf = (qw[
+XML::DOM::Lite::Document  Document
+XML::DOM::Lite::Node      Node
+XML::DOM::Lite::NodeList  NodeList
+]);
+
+%interf2pack = reverse(@pack2interf);
+
+
+%is_hash = qw/ NodeList 1 /;
+%is_ary = qw/ NodeList 1 /;
+
+use File::Basename;
+use File::Slurp;
+BEGIN { chdir dirname $0;} 
+use XML::DOM::Lite;
+
+%types = qw(
+	void VOID
+	boolean BOOL
+	DOMString STR
+	short NUM
+	long NUM
+);
+
+open STDOUT, ">../lib/WWW/Scripter/Plugin/Ajax/_xml_interf.pm" or die
+	"Hey, you can’t expect me to write to that file if there is \L$!!";
+
+print '# Interface for XML::DOM::Lite, version ' .
+	XML::DOM::Lite->VERSION . "\n\n";
+print "  %WWW::Scripter::Plugin::Ajax::_xml_interf = (\n";
+print "  \t'" . shift(@pack2interf) . "' => '" . shift(@pack2interf) .
+	"',\n" while @pack2interf;
+
+for (<*.idl>) {
+
+*_ = \scalar read_file $_;
+
+# This is not a full-blown IDL parser. It is simply one I threw together
+# that happens to work with the DOM IDL files.
+
+s/\/\/.*//g;
+
+while(/interface\s+(\w+)\s*(?::\s*(\w+)\s*)?\{(.*?)\}/sg) {
+	my($name,$super,$members) = map $$_, 1..3;
+	next unless exists $interf2pack{$name};
+	
+	if($aliases{$name}) {
+		$name = $aliases{$name};
+		$super and $super{$name} = $super;
+	} else {
+	 push @interfaces, $name;
+	 push @{$interfaces{$name}}, "\t\t_isa => '" .
+		($super{$name}||$super) . "',\n" if $super;
+	 $interfaces{$name}[0] .= "\t\t_hash => " . (0+$is_hash{$name})
+		 . ",\n" .
+		"\t\t_array => " . (0+$is_ary{$name})
+		. ",\n";
+	} # else
+
+	next if $members =~ /^\s*$/;
+	for (split /;\s*/, $members) {
+		if(/((?s).*?)\(/) {
+			split ' ', $1;
+			# $_[0] has the type; $_[1] has the name
+			push @{$interfaces{$name}},
+				"  " .
+				('#' x! $interf2pack{$name}->can($_[1])) .
+				"\t\t$_[1] => METHOD | " . 
+				($types{$_[0]} || 'OBJ') . ",\n";
+			next;
+		}
+		split;
+		if ($_[0] eq 'const') {
+			# $_[3] is the name of the constant 
+			push @{$constants{$name}}, $_[3];
+			next
+		}
+		my $ro = $_[0] eq 'readonly';
+		# $_[-1] has the name
+		# $_[-2] has the type
+		push @{$interfaces{$name}},
+			"  " .
+			('#' x! $interf2pack{$name}->can($_[-1])) .
+			"\t\t$_[-1] => " . 
+			($types{$_[-2]} || 'OBJ') .
+			' | READONLY' x $ro . ",\n";
+	}
+}
+
+} #for <*.idl>
+
+
+for (@interfaces) {
+	print "  \t $_ => {\n",shift @{$interfaces{$_}};
+	if($constants{$_}) {
+		print "  \t\t_constants => [qw[\n";
+		for $c (@{$constants{$_}}) {
+			print "  " . 
+				('#' x! defined &{"$interf2pack{$_}::$c"})
+				. "\t\t\t$interf2pack{$_}::$c\n"
+			;
+	
+		}
+		print "  \t\t]],\n";
+	}
+	print @{$interfaces{$_}}, "  \t },\n";
+}
+print "  );\n";
+
+

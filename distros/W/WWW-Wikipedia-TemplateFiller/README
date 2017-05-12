@@ -1,0 +1,83 @@
+WWW::Wikipedia::TemplateFiller
+==============================
+
+This module generates Wikipedia template markup for various sources of
+information such as PubMed IDs, ISBNs, URLs, etc. While it works with
+multiple templates, it was predominantly created to lower the
+activation energy associated with filling out citation templates.
+
+In writing a Wikipedia article, one aims to cite sufficient
+references. The trouble is that there are many different ways of
+citing different sources, all with different Wikipedia citation
+templates, and many requiring information that may be difficult to
+obtain. The initial goal of this module was to streamline the process
+of generating citation templates. Sure, the module's grown and it's
+been generalized to other templates (Drugbox, etc.), but the
+principles persist.
+
+SYNOPSIS
+
+  use WWW::Wikipedia::TemplateFiller;
+
+  my $filler = new WWW::Wikipedia::TemplateFiller();
+
+  my $source = $filler->get( pubmed_id => '2309482' )->fill;
+  print $source->output;
+  
+  # Roughly gives:
+  #   {{cite journal |author=Garty BZ, Kauli R |title=Alopecia
+  #   universalis in autoimmune polyglandular syndrome type I
+  #   |journal=The Western journal of medicine |volume=152 |issue=1
+  #   |pages=76–7 |year=1990 |month=January |pmid=2309482 |pmc=1002273
+  #   |doi= |url=}}
+
+  # Same thing, in one line
+  print $filler->get( pubmed_id => '2309482' )->fill->output;
+
+  # With fill-time options
+  $source = $filler->get( pubmed_id => '123456' )->fill( add_url => 1 );
+  print $source->output;
+
+  # With output-time (mostly for formatting) options
+  print $source->output( vertical => 1, add_accessdate => 1 );
+
+INSTALLATION
+
+Simple installation instructions are given below. Additional
+information, including instructions on installing the included web
+application, are found in INSTALL.
+
+  % perl -MCPAN -e 'install WWW::Wikipedia::TemplateFiller'
+
+There's also a web interface if you're so inclined:
+
+  http://diberri.dyndns.org/cgi-bin/templatefiller/
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc WWW::Wikipedia::TemplateFiller
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-Wikipedia-TemplateFiller
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Wikipedia-TemplateFiller
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/WWW-Wikipedia-TemplateFiller
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/WWW-Wikipedia-TemplateFiller
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) David J. Iberri <diberri@cpan.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html

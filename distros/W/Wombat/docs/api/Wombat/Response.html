@@ -1,0 +1,187 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Response - internal response interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Response - internal response interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface extends <STRONG>Servlet::ServletResponse</STRONG> to provide
+fields and methods accessible only to the container.</P>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getApplication"><CODE>getApplication()</CODE></A></STRONG><BR>
+<DD>
+Return the Application within which this Response is being generated.
+<P></P>
+<DT><STRONG><A NAME="item_setApplication"><CODE>setApplication($application)</CODE></A></STRONG><BR>
+<DD>
+Set the Application within which this Response is being generated. This
+must be called as soon as the appropriate Application is identified.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24application">$application</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Application</STRONG> within which the Response is being generated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getConnector"><CODE>getConnector()</CODE></A></STRONG><BR>
+<DD>
+Return the Connector through which this Response is returned.
+<P></P>
+<DT><STRONG><A NAME="item_setConnector"><CODE>setConnector($connector)</CODE></A></STRONG><BR>
+<DD>
+Set the Connector through which this response is returned.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24connector">$connector</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Connector</STRONG> that will return the response
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContentCount"><CODE>getContentCount()</CODE></A></STRONG><BR>
+<DD>
+Return the number of bytes actually written to the output stream.
+<P></P>
+<DT><STRONG><A NAME="item_isError"><CODE>isError()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not this is an error response.
+<P></P>
+<DT><STRONG><A NAME="item_setError"><CODE>setError($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not this is an error response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag">$flag</A></STRONG><BR>
+<DD>
+a boolean value indicating whether or not this is an error response
+<P></P></DL>
+<DT><STRONG><A NAME="item_isIncluded"><CODE>isIncluded()</CODE></A></STRONG><BR>
+<DD>
+Return a flag indicating whether or not this Response is being
+processed as an include.
+<P></P>
+<DT><STRONG><A NAME="item_setIncluded"><CODE>setIncluded($flag)</CODE></A></STRONG><BR>
+<DD>
+Set a flag indicating whether or not this Response is being processed
+as an include.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$flag</STRONG><BR>
+<DD>
+a boolean value indicating whether or not this response is included
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHandle"><CODE>getHandle()</CODE></A></STRONG><BR>
+<DD>
+Return the output handle associated with this Response.
+<P></P>
+<DT><STRONG><A NAME="item_setHandle"><CODE>setHandle($handle)</CODE></A></STRONG><BR>
+<DD>
+Set the input handle associated with this Response.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24handle">$handle</A></STRONG><BR>
+<DD>
+the <STRONG>IO::Handle</STRONG> associated with this Response
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequest"><CODE>getRequest()</CODE></A></STRONG><BR>
+<DD>
+Return the Request with which this Response is associated.
+<P></P>
+<DT><STRONG><A NAME="item_setRequest"><CODE>setRequest($request)</CODE></A></STRONG><BR>
+<DD>
+Set the Request with which this Response is associated.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> with which this response is associated
+<P></P></DL>
+<DT><STRONG><A NAME="item_getResponse"><CODE>getResponse()</CODE></A></STRONG><BR>
+<DD>
+Return the ServletResponse which acts as a facade for this Response to
+servlet applications.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_createOutputHandle"><CODE>createOutputHandle()</CODE></A></STRONG><BR>
+<DD>
+Create and return a <STRONG>Servlet::ServletOutputHandle</STRONG> to write the content
+associated with this Response.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException">Servlet::Util::IOException</A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_finishResponse"><CODE>finishResponse()</CODE></A></STRONG><BR>
+<DD>
+Perform whatever actions are required to flush and close the output
+handle or writer.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG>Servlet::Util::IOException</STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_getContentLength"><CODE>getContentLength()</CODE></A></STRONG><BR>
+<DD>
+Return the content length, in bytes, that was set or calculated for
+this Response.
+<P></P>
+<DT><STRONG><A NAME="item_getContentType"><CODE>getContentType()</CODE></A></STRONG><BR>
+<DD>
+Return the MIME type that was set or calculated for this response.
+<P></P>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/IO/Handle.html">the IO::Handle manpage</A>,
+<A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A>,
+<A HREF="../../api/Servlet/ServletServletOutputHandle.html">the Servlet::ServletServletOutputHandle manpage</A>,
+<A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../api/Wombat/Application.html">the Wombat::Application manpage</A>,
+<A HREF="../../api/Wombat/Connector.html">the Wombat::Connector manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

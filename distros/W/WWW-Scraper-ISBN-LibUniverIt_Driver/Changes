@@ -1,0 +1,11 @@
+Revision history for WWW-Scraper-ISBN-LibUniverIt
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.11    Date/time
+        fix docs and test and install layout.
+0.12    Date/time
+        fix publisher regex.
+0.13	Date/Time
+		fix regex to match new page layout
+

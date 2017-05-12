@@ -1,0 +1,551 @@
+
+=head1 NAME
+
+Web::DataService::Tutorial - how to build an application using Web::DataService
+
+=head1 SYNOPSIS
+
+This file explains the process of creating a Web::DataService application,
+using the example code provided as part of this distribution.  The sections
+below will include instructions for setting up an example Web::DataService
+application, along with a description of what each part does.  You can then use
+this example code as a basis for your own application.
+
+=head1 GETTING STARTED
+
+In order to build an application using Web::DataService, you must start with a
+I<foundation framework>.  The only one you can use at the present time is
+L<Dancer>, though we hope to soon release plugins that will enable
+Web::DataService applications to be written on top of other frameworks such as
+C<Catalyst>, C<Mojolicious>, C<Dancer2>, etc.
+
+=over 
+
+=item 1.
+
+The first step, therefore, is to make sure that L<Dancer> is installed on your
+system.  You will also want to install L<Template-Toolkit|Template>, which is
+used for displaying documentation pages.  And, of course, you must also
+install Web::DataService.
+
+=item 2.
+
+Next, create a new Dancer project using the program C<dancer> (which is included
+with that module):
+
+    dancer -a dstest
+
+This will create a new directory called 'dstest' and install into it
+all of the necessary files for a Dancer application.
+
+=item 3.
+
+Next, use the program C<wdsinstallfiles>, which is included with the current
+module, to add the necessary files for the example data service.  You must
+first change to the project directory:
+
+    cd dstest
+    wdsinstallfiles
+
+This invocation will install the data service application as F<lib/Example.pm>.
+The stub program used to invoke the data service is F<bin/dataservice.pl>.
+
+=item 4.
+
+Run the application, and verify that it executes without error.  It will
+listen for requests on port 3000, unless you override this using the "Port"
+directive in the configuration file.
+
+    bin/dataservice.pl
+
+Once it is running, you can open a web browser and view the documentation for
+this data service under the following URL:
+
+    http://localhost:3000/data1.0/
+
+You can test the data service by sending some requests such as:
+
+    http://localhost:3000/data1.0/single.json?state=NY
+    http://localhost:3000/data1.0/list.txt?region=NE,MW&show=hist,total
+
+Note: if you are getting errors when running this example application, try
+editing F<bin/dataservice.pl> and removing the -T flag from the first line.
+
+=item 5.
+
+Now try editing Example.pm and/or PopulationData.pm, and then re-running the
+application to see how the behavior changes.  Here are some things to try:
+
+=over
+
+=item *
+
+Change the path prefix on Line 60 of F<lib/Example.pm>.
+
+=item *
+
+Disable the feature 'format_suffix' and add the special parameter 'format' on
+lines 58-59 of F<lib/Example.pm>:
+
+    features => 'standard, no_format_suffix',
+    special_params => 'standard, format',
+
+=item *
+
+Disable the feature 'documentation', on line 58 of F<Example.pm>:
+
+    features => 'standard, no_documentation',
+
+=item *
+
+Change the title, docstring, and/or usage of one or more of the nodes defined
+in lines 103-141 of F<lib/Example.pm>.  The docstrings are the strings that appear
+on lines 112, 121, etc., each one documenting the node whose definition it
+follows.
+
+=item *
+
+Change the names and/or docstrings of one or more of the output fields
+specified in lines 59-88 of F<lib/PopulationData.pm>.  You can change the name of
+any field by adding the key C<name> to its definition hash:
+
+    { output => 'pop2010', name => 'current' },
+
+=item *
+
+Change the names and/or docstrings of one or more of the parameters specified
+in lines 140-164 of F<PopulationData.pm>.
+
+=item *
+
+Add a new value for the parameter "order", that will sort the states by their
+population in 1900 instead of by their population in 2010.  This will require
+modifying the C<define_set> call at line 116 of F<lib/PopulationData.pm>, and
+also adding some code to lines 281-299.
+
+=back
+
+=item 6.
+
+You can now use this example project as a base for creating your own data
+service.  The various pieces of the code are described below, along with the
+function of each and some ideas for how you might want to modify them.
+
+=back
+
+=head1 OVERVIEW
+
+Under the Web::DataService framework, a data service application consists of the following components.
+In order to create your own data service using this framework, you will have to write each of the following:
+
+=over
+
+=item Main application
+
+The main application, written using a foundation framework such as L<Dancer>, is responsible for initializing
+all of the necessary elements to define a data service and for providing the basic response loop.  It must
+start by creating a new instance of L<Web::DataService> and then define a variety of data service elements
+(see L<Web::DataService::Configuration>) so as to configure each of the different operations that make up your
+data service.
+
+The main application must respond appropriately to each incoming request, which in the case of Dancer means
+defining one or more L<route handlers|Dancer::Introduction/USAGE> that specify the response to each possible
+URL path.  In the simplest case, as shown in the L<example application|/lib/Example.pm> below, a single route
+handler simply accepts all requests and passes them off to the C<handle_request> method of
+L<Web::DataService>.
+
+In addition, the main application is responsible for error handling.  The example application hands off all
+errors to the Web::DataService code, rather than using the native Dancer error response.
+
+=item Configuration file
+
+The foundation framework includes a configuration file (L</config.yml> in the case of Dancer) with which you
+can specify many of the attributes of your data service.  Specifying them here rather than putting them in the
+code will allow others to easily find and change these attributes as necessary during the process of
+developing and maintaining your data service.
+
+=item Data service roles and methods
+
+The core of your data service consists of subroutines that talk to the backend data store to fetch and/or
+store the necessary data.  You will need to write one of these for each different operation provided by your
+data service.  These are called I<operation methods> and, as the name suggests, are called as methods of a
+L<Web::DataService::Request> object.
+
+These operation methods must be organized into one or more modules that can function as L<Moo>
+L<roles|Moo::Role>.  These modules will then be automatically composed into appropriate subclasses of
+Web::DataService::Request.  Your role files may include any other code that you wish, and your operation
+methods may also call any of the methods provided by L<Web::DataService::Request>.  For more information, see
+L<libE<sol>PopulationData.pm|/lib/PopulationData.pm>.
+
+Each of these role modules will typically include a method called C<initialize>, which is called automatically
+at application startup.  This method can then define data service elements relevant to this particular role,
+such as parameter rules, value sets, and output fields.  A typical data service application will contain
+several role modules, one for each different kind of data to be returned.
+
+=item Documentation templates
+
+Each feature of your data service should be documented by an appropriate web page.  To expedite this,
+Web::DataService provides facilities for auto-generating most of the necessary documentation based on the data
+service element definitions.
+
+The documentation files take the form of templates, which can include a variety of predefined elements.  See
+L<Web::DataService::Documentation> for more information.  At the time of template evaluation these are
+replaced by various sections of auto-generated documentation.  The only templating system currently supported
+is L<Template-Toolkit>.  We plan to include others in the near future.
+
+=back
+
+=head1 FILES
+
+This section will cover the files from the example data service one at a time, hilighting the important
+features of each.  You can use these files, and this example application in general, as a basis for your own
+projects.  When going through this section, you may wish to open each file in turn so as to have the contents
+visible while reading the description.
+
+=head2 config.yml
+
+This is the main configuration file for the data service application.  As you can see from the comments, some
+of the settings are used by Dancer and others by Web::DataService.  In general, most of the
+L<data service attributes|Web::DataService::Configuration/Data service attributes> can be set in this file,
+and many of the L<node attributes|Web::DataService::Configuration/Node attributes> can be given default values
+as well.  The example demonstrates this with settings such as C<data_source> and C<default_limit>.
+
+For a description of the configuration settings read by Dancer, see L<Dancer::Config>.
+
+=head2 bin/dataservice.pl
+
+This is just a stub program; the actual application code is in F<lib/Example.pm>, with the exception of the
+last line of this file which activates the main event loop.
+
+This program can run standalone, in which case it listens on port 3000 (by default) and is able to respond to
+one request at a time.  In order to deploy it as a full-scale web application, you have a number of different
+deployment options (see L<Dancer:Deployment>).
+
+Note that this program is run in L<taint mode|perlsec>, which is a good idea for any public server.  If you
+are having trouble running this program because it cannot find required modules, this is probably because
+taint mode ignores the environment variables C<PERL5LIB> and C<PERLLIB>.  In this case, you can either remove
+the -T flag, or add a second C<use lib> line to add the missing directory to @INC.
+
+=head2 lib/Example.pm
+
+This file contains the main application code for the example data service.  It starts out by declaring the
+main package for this application ("Example") and then loading the necessary modules.  L<Dancer> and
+L<Template> are required before L<Web::DataService>, so that the latter can configure itself to make use of
+them.  Next, we require the module F<lib/PopulationData.pm>.  This defines the methods that will be used to
+execute the various data service operations for this application.
+
+In lines 42-50, we specify what to do if this application is executed with the command-line argument 'GET'.
+In this case the second argument should be a URL path, and the optional third one (which should be
+single-quoted if given) should be a URL-encoded parameter string (without the '?').  The application will
+proceed to execute this single request and print the result to standard output.  This functionality is useful
+primarily for debugging; you can run this under C<perl -d>, and you can put C<$DB::single = 1;> in your code
+wherever you wish to have a predefined breakpoint.  For example:
+
+    perl -d bin/dataservice.pl GET /data1.0/list.json 'region=MW&show=total'
+
+In lines 55-60, we generate a L<new instance|Web::DataService::Configuration/Data service instantiation> of
+Web::DataService.  This instance will use the standard set of features and special parameters, and will use
+"data1.0/" as its path prefix.  The path prefix attribute is not mandatory, but if specified it will be
+removed from all incoming requests before they are matched against the set of data service nodes.  You may
+want to do this in order to distinguish the data service URLs from other URLs that will reside on the same
+website, or to provide for multiple data service versions.
+
+Lines 67-79 specify the L<response formats|Web::DataService::Configuration/Response format definitions> that
+will be available from this data service.  In the case of this example, these are: JSON, comma-delimited text,
+and tab-delimited text.
+
+Lines 87-141 define a series of data service nodes.  Each of these nodes
+corresponds to one of the following:
+
+=over 4
+
+=item 1.
+
+A data service operation, and its accompanying documentation page
+
+=item 2.
+
+A standalone documentation page
+
+=item 3.
+
+A file or files that are available for retrieval (e.g. the stylesheet for the documentation pages).
+
+=back
+
+As explained in L<Web::DataService::Configuration>, nodes inherit their attributes hierarchically according to
+their "path" attributes.  The node with path "/" provides default values for all of the other nodes, and also
+gives the attributes for the main documentation page.  Note that all of the operation nodes use methods from
+the module C<PopulationData>, which is described below.
+
+Lines 153-156 define the route handler for all URL requests.  This may be all that your application needs, but
+you are free to add additional routes as needed.
+
+Lines 163-171 are boilerplate code that causes errors to be handled by
+Web::DataService rather than by Dancer.
+
+This file is designed to be included from F<bin/dataservice.pl>.  Once it has been fully processed, the last
+line of that file initiates the Dancer main loop.  This loop waits for incoming requests, and calls the
+matching route handler for each one.
+
+=head2 lib/PopulationData.pm
+
+This file defines the elements that make up the data service operations provided by the example application.
+These definitions include rules for validating request parameters, formats for the resulting output, and code
+that uses the request parameters to retrieve data from the backend.  The calls to C<define_node> in the main
+application combine these various elements into data service operation nodes.  A full-scale data service will
+often have more than one file like this, one for each different type of data that it handles.
+
+Line 18 defines the package name, which will be used with the node attribute C<role>.
+
+Lines 20-21 define the modules used by this one.  Line 20 provides access to the predefined validator
+functions of L<HTTP::Validate>, in case you wish to use them in rulesets.
+
+Line 23 makes this module into a L<Moo> L<role|MOO::Role>, which allows the methods defined here to be
+composed into an automatically generated subclass of L<Web::DataService::Request>.
+
+Lines 41-169 define an initialization method which will be called automatically at application startup time.
+It is passed two arguments, the first being the class name and the second being the instance of
+Web::DataService that is being initialized.  The purpose of this method is two-fold:
+
+=over
+
+=item 1.
+
+Execute any setup tasks that need to be done in order to access the backend data.
+
+=item 2.
+
+Define all of the elements that will be referenced by data service node definitions which use this role.
+
+=back
+
+Lines 50-54 accomplish the first of these tasks.  In this simple example, we just read the data out of a
+file and store it in lexically scoped variables that can be accessed by the data service operation methods
+defined below.  A more complex application might obtain a database connection using the C<get_connection>
+method and then use it to read and cache important data.
+
+Lines 59-88 define a set of L<output blocks|Web::DataService::Configuration/Output block definitions> that
+select and describe the various data fields that will be returned by data service operations.  The names of
+these blocks will be used with the node attribute C<output>.  Note that the actual response to each request
+will be automatically generated by the appropriate serialization module, using the appropriate output block(s)
+and the set of data records generated by the appropriate operation method, as selected by the request
+attributes and by the data service node that matches the request.
+
+Lines 93-97 specify a L<set|Web::DataService::Configuration/Set definitions> of output blocks that can be
+optionally added to any request by the use of the special parameter C<show>.  The name of this output map
+(set) will be used with the node attribute C<optional_output>.
+
+Lines 102-124 define two more L<sets|Web::DataService::Configuration/Set definitions>.  The first gives the
+acceptable values for the parameter C<region>, and the second for the parameter C<order>.
+
+Lines 128-132 define a validator function which will be used for the parameter C<state>.  This function makes
+use of a hash of state names that was generated from the data file at line 54 above.
+
+Lines 136-168 define a series of L<rulesets|Web::DataService::Configuration/Ruleset definitions> for
+validating request parameters.  The first of these validates the special parameters made available by
+Web::DataService.  Note that in the main application file (see above) the data service is instantiated with
+the "standard" set of special parameters.  If you modify the instantiation to add or remove some of these
+parameters, the ruleset will automatically reflect this.
+
+The remaining rulesets validate the individual request parameters for each available data service operation.
+Their names correspond to the node paths defined in F<lib/Example.pm>.  If you wish to use different ruleset
+names, you would override this using the node attribute C<ruleset>.
+
+Lines 221-319 define the operation methods that implement the various data service operations.  These are
+invoked in response to data service requests, and are called as methods of a request object that has been
+blessed into a subclass of L<Web::DataService::Request>.  As such, they are free to call any of the methods
+from that class in order to:
+
+=over
+
+=item *
+
+access attributes of the request such as C<request_url>, C<node_path>, C<result_limit>, etc.
+
+=item *
+
+get a connection to the backend data service using C<get_connection>
+
+=item *
+
+get the parameter values that were provided with this request using C<clean_param>, etc.
+
+=item *
+
+specify the result of the operation using C<single_result>, C<list_result>, etc.
+
+=back 
+
+The first of these operation methods returns information about a single state, and is called by the node
+'single' (see F</lib/Example.pm>).  This simple operation proceeds by retrieving the cleaned value of the 'state'
+parameter and retrieving the corresponding data record.  It finishes by calling the method C<single_result>,
+setting the result of the operation to the single record that was retrieved.
+
+The next operation method returns information about multiple states, and is called by the node 'list'.  This is
+a much more complex task, involving a number of different possible parameters.  This method retrieves the
+relevant parameter values, selects the matching records, orders them as requested, and adds an additional
+"total" record if that was requested.  It ends by calling the C<list_result> method, setting the result of the
+operation to this list of records.
+
+The final operation method returns the set of region codes, and is called by the node 'regions'.  This is
+included so that a client application can retrieve this information and, for example, use it in generating
+a web form to be used in making queries on this data service.
+
+By using the power of Web::DataService, this small amount of code can generate a quite complex data service
+application along with all of the necessary documentation.
+
+=head2 doc/doc_defs.tt
+
+This file contains all of the definitions necessary for auto-generating the documentation pages.  Before
+you mess with it, make sure you have a good understanding of the L<Template-Toolkit|Template> syntax.
+
+=head2 doc/doc_strings.tt
+
+This file contains the text strings used in the process of auto-generating the documentation pages.  You can
+edit this file in whatever way you choose, but be careful with the syntax.  Template-Toolkit does not provide
+very good error messages.
+
+=head2 doc/doc_header.tt
+
+This file defines a common header for the data service documentation pages.  You can edit it in whatever way
+you choose, or use the node attribute C<doc_header> to select a different file.  You can even select different
+files for different pages, or use node attribute inheritance to select different files for hierarchical groups
+of pages.
+
+See L<Web::DataService::Documentation> for a list of the predefined template elements that you can use
+in this file and the ones described below.
+
+=head2 doc/doc_footer.tt
+
+This file defines a common footer for the data service documentation pages.  You can edit it in whatever way
+you choose, or use the node attribute C<doc_footer> to select a different file.
+
+=head2 doc/operation.tt
+
+This file provides a template for documentation pages for the operation nodes.  You can edit it in whatever
+way you choose, or use the node attribute C<doc_default_op_template> to select a different file.  You can also
+create a specific documentation page for any node by creating a template file having the same path relative to
+the C<doc> directory as the node path.
+
+=head2 doc/doc_not_found.tt
+
+This file provides a template for documentation pages for the non-operation nodes.  You can edit it in
+whatever way you choose, or use the node attribute C<doc_default_template> to select a different file.  You
+can also create a specific documentation page for any node by creating a template file having the same path
+relative to the C<doc> directory as the node path.
+
+=head2 doc/index.tt
+
+This file serves as the main documentation page for the data service.  You can edit it in whatever way you
+choose.
+
+=head2 doc/special_doc.tt
+
+This file documents the special parameters.  Note that it will automatically display just the parameters that
+are selected when the data service is instantiated.
+
+=head2 doc/formats/index.tt
+
+This file provides an overview of the available output formats.
+
+=head2 doc/formats/json_doc.tt
+
+This file documents the JSON output format in detail.  If you are using this example as a basis for your own
+project, you will want to edit this file and the one listed next so that the example URLs are ones that
+actually work under the new data service definition.
+
+=head2 doc/formats/text_doc.tt
+
+This file documents the plain text output formats.
+
+=head2 public/css/dsdoc.css
+
+This file provides a stylesheet for the documentation pages.  You can edit it in whatever way you choose.
+
+=head2 data/population_data.txt
+
+This file provides the data for the example application.
+
+=head1 VERSIONING
+
+Before you start developing a new application using Web::DataService, it is a good idea to come up with a plan
+for versioning.  After you have released the initial version of your application, you may still want to keep
+adding new features, output fields, parameters, etc.  At some point, you may find yourself in a position where
+you want to make changes that are not backward-compatible, but do not wish to break existing data service
+clients.  Your best option at that point is to define a second version of your service, keeping the first one
+available for the old clients (and so that old URLs posted elsewhere on the Web will continue to work
+properly).  The Web::DataService framework supports two different ways of doing this: by using path prefixes,
+and by using a version-selector parameter.  You can choose either one, but we recommend that you make use of
+one of them from the very beginning of your data service.  This way, you will be prepared should you want to
+add incompatible changes to the interface at any point in the future.
+
+In order to create a second version of the data service, you will have to alter your application as follows:
+
+=over
+
+=item 1.
+
+Move the route handler(s) to a separate file.  Put them in the same package as your main application.
+
+=item 2.
+
+Duplicate your main application file (without the route handlers), and change the name.  Don't change the
+package name.  The C<name> attribute in the data service instantiation call must differ between the two files.
+You must also set up some means of selecting between the two data service instances, typically either
+differing path prefixes or version selectors (see below).
+
+=item 3.
+
+Duplicate your role files, and change the names.  Do change the package names, so that the new ones differ
+from the old ones.
+
+=item 4.
+
+Change your stub program to include all of these files.
+
+=item 5.
+
+You can now start making changes to the "new" versions of your application files, and the "old" version will
+remain active and will respond according to the old definitions.
+
+=back
+
+Of course, you can repeat this pattern whenever a new version is needed.
+
+=head2 Path prefixes
+
+The example application is configured to use a path prefix of C<data1.0/>.  All URLs generated for this
+application will thus include the prefix, and can easily be distinguished from any future versions of the
+service.  If you wish to use path prefixes to distinguish between versions, just give the "new" data service
+instance a prefix such as C<data1.1/> or C<data2.0/>.  The C<handle_request> method will automatically select
+the proper data service instance based on the prefix of the URL.
+
+=head2 Version selector parameters
+
+If you wish to use a version selector parameter instead, you can enable the special parameter C<selector>.
+Note that you must do this for every data service instance.  You must then define a unique selector key for
+each instance, using the attribute C<key>.  The default name for this parameter is C<v>; if the keys you
+define are, say, "1.0" and "2.0", then the C<handle_request> method will automatically select the proper data
+service instance for each request based upon whether it contains the parameter C<v=1.0> or C<v=2.0>.  You may
+at your option define a common path prefix for all of the data service instances, or none at all.  Note that a
+request with an empty path will always return the main documentation page of the first data service instance
+defined, so this should always be the most recent one.
+
+=head2 Other mechanisms
+
+You are free to define any other mechanism that you wish for selecting between data service instances.  In
+this case, you will probably need to write your own route handler(s).  The easiest way to do things in this
+case is to put each data service instance into a separate global variable (i.e. C<$ds1>, C<$ds2>, C<$ds3>, ... )
+and write your own code to select which one should be used.  You can then call the C<handle_request> method on
+the proper instance directly.  For example:
+
+    if ( param('foo') eq 'debug' )
+    {
+        $ds2->handle_request(request);
+    }
+    
+    else
+    {
+        $ds1->handle_request(request);
+    }

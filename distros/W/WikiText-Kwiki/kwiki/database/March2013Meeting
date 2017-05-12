@@ -1,0 +1,11 @@
+= Moe, Moose, Reindeer, Mo, Moo, Mouse, Zeus, and Seuss
+
+A "Perl with Objects" round table.  We'll examine usage and issues with class composition, performance, and compatibility with various lighter-weight alternatives.
+
+Thursday March 14th - 6:53pm at Free Geek
+
+* Mouse vs Moose vs Moo, when to use which?  --Schwern
+* Moose, Mouse, and Moo performance -- Dana Jacobsen
+* Zeus and Contradictory.pm -- EricWilhelm
+* Reindeer -- Chris Weyl
+* MOP in the core -- Duke Leto

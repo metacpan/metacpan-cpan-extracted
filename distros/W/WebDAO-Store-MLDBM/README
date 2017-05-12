@@ -1,0 +1,41 @@
+#$Id: README,v 1.2 2006/10/13 12:39:08 zag Exp $
+
+WebDAO::Store::MLDBM - Implement session store using MLDBM
+========================
+WebDAO session storage using MLDBM
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Apache conf sample:
+
+    #for use storage
+    SetEnv wdStore WebDAO::Store::MLDBM
+    SetEnv wdStorePar path=/tmp
+
+
+DEPENDENCIES
+
+This module requires  Perl 5.005 or greater and libraries:
+
+
+
+AUTHOR
+
+Zahatski Aliaksandr
+zagap@users.sourceforge.net
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2002-2009 Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

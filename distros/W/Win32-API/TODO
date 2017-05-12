@@ -1,0 +1,85 @@
+Last updated: 2012/06/05
+
+* Review Win32::API::Struct
+
+  1) make code style consistent
+  2) remove warnings
+  3) implement test cases for the various structure types,
+     including compound structures, struct containing arrays,
+	 and types non aligned to 4 bytes
+  4) implement a 64-bit flag, so that all word sizes are automatically
+     calculated as 8 bytes instead of hardwiring 4 bytes
+
+
+bulk88's comments
+
+1.  callback's in parameters are similar to api's out parameter and
+    callback's out parameter is similar to api's in parameter, merge them
+2.  vararg prototype processing, whether to supply the stack pointer as an IV
+    or implement a Perl class with c lib va_list API IDK
+3.  Callback.xs needs to be eliminated, its too small to put in its own DLL
+4.  Use Win32's LoadLibrary and FreeLibrary instead of our own to save DLL
+    space?
+5.  *DONE* APIPARAM needs to be a union
+6.  create 1 time use intra-process DLLs with Callback's function pointers in
+    the DLL export table?
+7.  create standalone DLLs that start a perl interps in the process and have
+    Callback's function pointers in the DLL export table?
+8.  stop using unpackstring in Callback, start using unpackstring in API?
+9.  Register user supplied callbacks for type packing/unpacking, probably
+    it should inspect caller() to make sure one packages/module's type callbacks
+    dont collide with the type callbacks of another
+10. Void ** doesn't parse.
+11. Callback needs more logic to be moved from runtime to constructor time.
+    Currently a bad type letter isn't caught until runtime, with
+    a croak/longjmp through the foreign C lib.
+12. Multi OS threading catching stderr message isn't tested properly by
+    the test suite.
+13. Certain calling conventions on certain platforms, pass by copy silently
+    becomes pass by pointer when the struct exceeds a certain size.
+    API/Callback's C parsing don't do this at the moment.
+14. *DONE* Alot of GV lookups could be cached to their pointers and kept inside
+    START_MY_CXT globals. On clone the pointers can be refreshed from the new
+    interp. I (bulk88) have done this before.
+15. *DONE* When using hv_fetch and hv_store, a slight performance optimization can
+    be obtained by the char * being passed, being exactly equal to the PV *
+    in the SV thats part of the HEK using the shared string table system,
+    and by precalculating the hash number for that string per interp.
+    I (bulk88) have done this before.
+16. *DONE* Stop installing Test.pm on users computers, delete existing copies.
+17. If someone asks for fastcall/thiscall on x86, add it.
+18. If someone asks for MSVC C++ name demangling and supplies a patch, add it.
+    No reason other it being extremely extremely difficult that C++ can't be
+    supported.
+19. *DONE* On x86, add a stack pointer checker similar to runtime checks by visual
+    studio, requires asm code, will catch stdcall funcs called with wrong
+    prototype, or very broken cdecl funcs written in asm, maybe setjmp/longjmp
+    is of use for this idea
+20. XP and newer has "Manifests" and "Activation Contexts", maybe some of that
+    API will have to be exposed one day in Win32::API, some DLLs such as late
+    2000s/2010s MS CRTs explode with error messages if they are loaded into a
+    process that isn't manifest compliant.
+21. Enums, unions and bitfields aren't supported by Win32::API::Struct
+22. convert SEH exceptions (access vio and friends) into Perl exceptions? GCC
+    SEH is a problem, SEH is completly different between Win32/Win64, SEH is
+    completly different between GCC and VC, so a total of 3 different
+    implementations required, GCC 64, GCC 32, and VC
+23. Whats the calling convetion on WinCE or WOA? Will Perl ever run again/on
+    those 2 platforms?
+24. Win32::API::Struct type name system is messy, struct foo * doesn't work,
+    struct foo doesn't work, pass by copy structs don't work
+25. always UTF8 vs always bytes vs always perl scalar "internal format"
+    semantics aren't defined, I've never seen a force bytes or force utf8
+    in Win32::API, the current behaviour of Win32::API needs to be documented
+    on what actually is passed to the C funcs, and maybe a discussion what
+    should the behaviour should be (feeding UTF8 to Win32 'A' functions never
+    does what is intended)
+26. C types aren't sanitized for whitespace in many places, non matches or
+    other security type bugs can come up by exploiting the lack of type name
+    sanitization
+27. Use DeviceIOControl to copy a APIPARAM array to a NT Driver that comes with
+    Win32::API. NT Driver will run the kernel mode function and return the
+    results in a APIPARAM. NT Driver is Perl License just like ::API.
+28. Implement a proper OOP class for HMODULEs that is fork ok, similar to
+    implementation of Win32::API::Callback::HeapBlock, current fork fix for
+    DLLs is a hack.

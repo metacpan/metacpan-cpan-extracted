@@ -1,0 +1,10 @@
+Revision history for Perl extension Win32::TieRegistry::PMVersionInfo.
+
+0.2   Tue Feb 11 10:56:00 2002
+	- added ability to ignore certain directories above the
+	  "file_root" slot.
+
+0.01  Tue Dec  4 20:01:42 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Win32::TieRegistry::PMVersionInfo
+

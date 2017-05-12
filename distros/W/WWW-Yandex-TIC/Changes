@@ -1,0 +1,42 @@
+2009-09-25	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.07
+
+	Fixed issue with regexp
+
+2009-03-05	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.06
+
+	Documentation typo fixes
+
+
+2008-11-11	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.05
+
+	Added support for additional LWP::UserAgent params
+	
+2008-08-06	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.04
+
+	Some fix
+
+2008-08-05	Dmitry Bashlov <bashlov@cpan.org>
+
+	Release 0.03
+
+	Bug fix
+
+2008-08-04	Dmitry Bashlov <bashlov@cpan.org>
+
+	Release 0.02
+
+	Changes related to changes in site design yaca.yandex.ru
+
+2005-12-16	Dmitry Bashlov <bashlov@cpan.org>
+
+	Release 0.01
+
+	Initial module

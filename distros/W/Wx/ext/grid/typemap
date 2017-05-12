@@ -1,0 +1,54 @@
+#############################################################################
+## Name:        ext/grid/typemap
+## Purpose:     typemap
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     04/12/2001
+## RCS-ID:      $Id: typemap 3020 2011-03-12 10:16:00Z mbarbon $
+## Copyright:   (c) 2001, 2003-2009, 2011 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+TYPEMAP
+wxGridSelectionModes    T_ENUM
+wxGridAttrKind          T_ENUM
+
+wxGrid *                O_WXOBJECT
+wxGridEvent *          O_WXOBJECT
+wxGridSizeEvent *      O_WXOBJECT
+wxGridRangeSelectEvent * O_WXOBJECT
+wxGridEditorCreatedEvent * O_WXOBJECT
+
+wxGridUpdateLocker *   O_NON_WXOBJECT_THR
+
+wxGridCellCoords *      O_NON_WXOBJECT_THR
+wxGridCellAttr *        O_NON_WXOBJECT_THR_SV
+wxGridCellAttr::wxAttrKind      T_ENUM
+
+wxGridCellRenderer *            O_WXCLIENTDATACONTAINER_THR_SV
+wxGridCellStringRenderer *      O_NON_WXOBJECT_THR_SV
+wxGridCellNumberRenderer *      O_NON_WXOBJECT_THR_SV
+wxGridCellFloatRenderer *       O_NON_WXOBJECT_THR_SV
+wxGridCellBoolRenderer *        O_NON_WXOBJECT_THR_SV
+wxGridCellAutoWrapStringRenderer * O_NON_WXOBJECT_THR_SV
+wxGridCellEnumRenderer *	O_NON_WXOBJECT_THR_SV
+wxGridCellDateTimeRenderer *	O_NON_WXOBJECT_THR_SV
+wxPlGridCellRenderer *          O_WXCLIENTDATACONTAINER_THR_SV
+
+wxGridCellEditor *              O_WXCLIENTDATACONTAINER_THR_SV
+wxGridCellTextEditor *          O_NON_WXOBJECT_THR_SV
+wxGridCellNumberEditor *        O_NON_WXOBJECT_THR_SV
+wxGridCellFloatEditor *         O_NON_WXOBJECT_THR_SV
+wxGridCellBoolEditor *          O_NON_WXOBJECT_THR_SV
+wxGridCellChoiceEditor *        O_NON_WXOBJECT_THR_SV
+wxGridCellAutoWrapStringEditor * O_NON_WXOBJECT_THR_SV
+wxGridCellEnumEditor *		O_NON_WXOBJECT_THR_SV
+wxPlGridCellEditor *            O_WXCLIENTDATACONTAINER_THR_SV
+
+wxPlGridTable*                  O_WXOBJECT
+wxGridTableBase*                O_WXOBJECT
+
+wxGridTableMessage*             O_NON_WXOBJECT_THR
+
+wxGridCellAttrProvider *        O_NON_WXOBJECT_THR

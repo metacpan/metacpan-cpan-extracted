@@ -1,0 +1,97 @@
+h1. WebService::MtGox - a Perl interface to MtGox's BitCoin trading API
+
+h2. What is BitCoin?
+
+Bitcoin is a peer-to-peer currency. Peer-to-peer means that no central
+authority issues new money or tracks transactions. These tasks are managed
+collectively by the network.  I have a feeling that this might be a real
+game changer, and it will be very interesting to see how governments and
+banks react to this new liberatory technology.
+
+h2. What is MtGox?
+
+"MtGox":https://mtgox.com/ is currently (as of June 2011) the most heavily
+traded BitCoin market.  They have been kind enough to provide an API that
+lets you automate your trading.
+
+h2. Some Sample Code
+
+This is a fairly straight-forward expression of "MtGox's Trading API":https://mtgox.com/support/tradeAPI .
+
+  use common::sense;
+  use WebService::MtGox;
+
+  my $m = WebService::MtGox->new(user => 'me', password => 's3cr3t');
+  my $depth = $m->depth;
+  my $buy   = $m->buy(amount => 10, price => 30.9999);
+  my $sell  = $m->sell(amount => 10, price => 34.54321);
+
+h2. The Command Line Client
+
+This module comes with a command line client called *mg* that lets you
+get market data and initiate trades.  If you're a command line junky,
+you'll find it quite convenient.
+
+  Usage:
+        mg <COMMAND> [OPTION]...
+
+  Options:
+      ticker
+        Get ticker.
+
+      depth
+        Get trading depth.
+
+      trades
+        Get recent trades.
+
+      balance
+        Get your balance.
+
+      buy
+        Buy some bitcoins.
+
+        --amount=NUMBER
+        --price=NUMBER
+
+      sell
+        Sell some bitcoins.
+
+        --amount=NUMBER
+        --price=NUMBER
+
+      ls
+      list
+        List your orders.
+
+      cancel
+        Cancel an order.
+
+        --oid=ID
+            The order id.
+
+        --type=NUMBER
+            The type may be 1 for buy or 2 for sell.
+
+      send
+        Send bitcoins from your MtGox account to a bitcoin address.
+
+        --amount=NUMBER
+        --address=BITCOIN_ADDRESS
+
+      usd [BITCOINS]
+        Display the total value of your balance in US Dollars. You can also
+        use this to find the value of an arbitrary amount of bitcoins in US
+        Dollars.
+
+          # How much is 1000 btc worth in US Dollars?
+          mg usd 1000
+
+      btc [USD]
+        Display the total value of your balance in bitcoins. You can also use
+        this to find the value of an arbitrary amount of US Dollars in
+        bitcoins.
+
+          # How much is $400 worth in bitcoins?
+          mg btc 400
+

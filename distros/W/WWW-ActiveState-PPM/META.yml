@@ -1,0 +1,25 @@
+---
+abstract: 'Scrape build status from the ActiveState build farm'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  LWP::Online: 1.07
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: WWW::ActiveState::PPM
+name: WWW-ActiveState-PPM
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  LWP::Simple: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

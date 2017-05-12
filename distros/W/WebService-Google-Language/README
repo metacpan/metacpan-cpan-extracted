@@ -1,0 +1,86 @@
+WebService::Google::Language
+============================
+
+WebService::Google::Language is an object-oriented interface to the
+Google AJAX Language API (http://code.google.com/apis/ajaxlanguage/).
+
+The AJAX Language API is a web service to translate and detect the language
+of blocks of text.
+
+
+DEPRECATION WARNING
+
+The v1 API, which this module is based on, WILL BE SHUT OFF COMPLETELY
+by Google on Dec 1, 2011.
+
+See http://code.google.com/apis/language/translate/overview.html
+
+
+SYNOPSIS
+
+    use WebService::Google::Language;
+
+    my $service = WebService::Google::Language->new(
+      referer => 'http://example.com/',
+      src     => '',
+      dest    => 'en',
+    );
+
+    my $result = $service->translate('Hallo Welt');
+    if ($result->error) {
+      printf "Error code: %s\n", $result->code;
+      printf "Message:    %s\n", $result->message;
+    }
+    else {
+      printf "Detected language: %s\n", $result->language;
+      printf "Translation:       %s\n", $result->translation;
+    }
+
+    $result = $service->detect('Bonjour tout le monde');
+    printf "Detected language: %s\n", $result->language;
+    printf "Is reliable:       %s\n", $result->is_reliable ? 'yes' : 'no';
+    printf "Confidence:        %s\n", $result->confidence;
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    HTTP::Response      (required by "make test")
+    JSON 2.0+
+    LWP::UserAgent
+    Test::More 0.62+    ("make test")
+    URI
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command:
+
+    perldoc WebService::Google::Language
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2008-2011 Henning Manske. All rights reserved.
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/
+
+This module is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

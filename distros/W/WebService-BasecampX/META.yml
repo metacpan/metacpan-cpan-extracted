@@ -1,0 +1,34 @@
+---
+abstract: 'Perl interface to the bcx Basecamp API'
+author:
+  - 'Mike Greb <michael@thegrebs.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-BasecampX
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Net::HTTP::Spore: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/mikegrb/WebService-BasecampX/issues
+  homepage: https://github.com/mikegrb/WebService-BasecampX
+  repository: https://github.com/mikegrb/WebService-BasecampX.git
+version: 0.03
+x_contributors:
+  - 'Rev Michael Greb <michael@thegrebs.com>'
+  - 'mikegrb <mgreb@linode.com>'

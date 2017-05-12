@@ -1,0 +1,25 @@
+0.1 - 12-06-2014
+	- Initial release.  0.2 - 12-06-2014
+	- Created class-hierarchy to allow different storage backends.
+	- Allow Redis to be used as a backing store.
+	- Updated POD.
+
+0.3 - 13-06-2014
+	- Store two-way mappings between the zone ID and the zone name.
+	  This allows deletions to succeed correctly.
+
+0.4 - 13-06-2014
+	- Correctly remove keys when zones are deleted.
+	- Added POD to the caching back-ends.
+	- Added test-cases.
+	- Added README.md
+	- Posted code to GitHub.com
+
+0.4.1 - 07-08-2014
+	- Added dependencies for test-suite, Test::NoTabs, Test::Strict, etc.
+	- Added license file to repository.
+	- Added license to POD.
+
+0.4.2 - 20-03-2016
+    - Added missing dependency upon DB_File.
+

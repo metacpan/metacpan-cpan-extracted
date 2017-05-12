@@ -1,0 +1,10 @@
+Revision history for Perl module Win32::MessageLoop
+
+0.01 2013-11-11
+ - First CPAN release
+
+0.02 2013-11-11
+ - Added XS file to the manifest. Sigh.
+
+0.03 2013-11-11
+ - Argh. Third time's a charm. This time with Windows permission fixes so PAUSE won't choke.

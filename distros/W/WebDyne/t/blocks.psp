@@ -1,0 +1,82 @@
+<start_html lang="en-US" title="blocks">
+<p>
+
+<block name="invisible0">
+SHOULD NOT DISPLAY 0
+</block>
+<block name="hello0" display=1>
+Hello World 0
+</block>
+
+<p>
+
+<perl method="hello1">
+<block name="hello1">
+Hello World 1
+</block>
+<block name="invisible1">
+SHOULD NOT DISPLAY 1
+</block>
+</perl>
+
+<p>
+
+<perl method="hello2">
+<block name="hello2">
+Hello World 2
+</block>
+<block name="hello2">
+Hello World 2 Again
+</block>
+</perl>
+
+<p>
+
+<perl method="hello3">
+<block name="hello3">
+Hello World 3
+</block>
+</perl>
+<block name="hello3">
+SHOULD NOT DISPLAY 3
+</block>
+
+<p>
+
+
+<block name="hello4">
+SHOULD NOT DISPLAY 4
+</block>
+<perl method="hello4"/>
+<block name="hello4">
+Hello World 4
+</block>
+<block name="hello4">
+Hello World 4 Again
+</block>
+
+<end_html>
+__PERL__
+
+sub hello1 {
+	my $s=shift();
+	$s->render_block('hello1');
+	$s->render();
+}
+
+sub hello2 {
+	my $s=shift();
+	$s->render_block('hello2');
+	$s->render();
+}
+
+sub hello3 {
+	my $s=shift();
+	$s->render_block('hello3');
+	$s->render();
+}
+
+sub hello4 {
+	my $s=shift();
+	$s->render_block('hello4');
+}

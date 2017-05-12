@@ -1,0 +1,8 @@
+this module just follows the typical
+
+$ perl Makefile.PL
+$ make && make test
+$ su
+# make install
+
+install routine.

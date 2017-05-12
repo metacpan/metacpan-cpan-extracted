@@ -1,0 +1,22 @@
+Makefile.PL
+README
+Changes
+MANIFEST			This list of files
+
+lib/WWW/CPAN.pm
+lib/WWW/CPAN.pod
+lib/App/WWW/CPAN.pm
+lib/App/WWW/CPAN.pod
+
+bin/cpanq
+
+t/01use.t
+t/10compile.t
+t/02basic.t
+t/03meta.t
+t/98pod-coverage.t
+t/99pod.t
+
+t/lib/Devel/CheckNet.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

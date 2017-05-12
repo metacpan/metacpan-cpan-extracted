@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perl extension for extract address from CEP (zip code) number",
+   "author" : [
+      "Renato CRON <rentocron@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Correios-CEP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "LWP::UserAgent" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/renatocron/WWW--Correios--CEP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://renatocron@github.com/renatocron/WWW--Correios--CEP.git",
+         "web" : "http://github.com/renatocron/WWW--Correios--CEP"
+      }
+   },
+   "version" : "1.02"
+}
+

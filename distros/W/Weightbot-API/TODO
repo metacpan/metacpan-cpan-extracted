@@ -1,0 +1,5 @@
+== TODO
+
+ * add method to get data for the second time
+ * put pod2readme in make process
+ * croak if there are unknown parameters in constructor

@@ -1,0 +1,42 @@
+This example directory shows a skeleton of how to use
+WebService::TicketAuth in a SOAP::Lite daemon architecture.
+
+This shows how the WebService::TicketAuth::DBI works against a simple
+SQL user database.  The auth system is placed in the service using a
+HAS-A relationship instead of IS-A, which allows better security of the
+database password &tc.
+
+To use this, install the following pre-req's on the server:
+
+   * SOAP::Lite
+   * WebService::TicketAuth
+   * Digest::MD5
+   * DBI
+
+On the client, install the following pre-req's:
+   * Pod::Usage
+   * Getopt::Long
+   * Soap::Lite
+   * Data::Dumper
+   * Storable
+   * Term::ReadKey
+
+Set up the mysql database by issuing the following commands as root
+   # mysqladmin -p -u root create authdb
+   # echo "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,INDEX
+           ON authdb.*
+           TO authdb_user@localhost
+           IDENTIFIED BY 'authdb_pass';
+           FLUSH PRIVILEGES;" | mysql -p -u root
+   # cat authdb.sql | mysql -u authdb_user --password="authdb_pass" authdb
+
+Then run the server:
+
+   $ ./auth_server.pl
+
+And run the client like this:
+
+   $ ./login.pl admin
+   Password:   [admin]
+
+   $ ./auth_client.pl

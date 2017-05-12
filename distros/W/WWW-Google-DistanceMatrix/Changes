@@ -1,0 +1,58 @@
+Revision history for WWW-Google-DistanceMatrix
+
+0.15    Thu Nov 12 10:45:00 2015
+        - Added LICENSE file.
+        - Minor pod changes to the package WWW::Google::DistanceMatrix.
+
+0.14    Wed Nov 04 12:55:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.20.
+
+0.13    Wed Sep 09 10:50:00 2015
+        - Added link to the official Google API document.
+
+0.12    Tue Aug 18 10:50:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.18.
+
+0.11    Fri Aug 07 12:00:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.17.
+
+0.10    Wed Feb 25 11:15:00 2015
+        - Upgraded to use WWW::Google::UserAgent v0.16.
+        - Updated method getDistance() description in the pod document.
+        - Replaced die with exception where applicable.
+        - Updated unit test to reflect the above changes.
+
+0.09    Sat Feb 21 22:50:00 2015
+        - Handled error message appropriately as reported by renan carvalho.
+        - Validated latlng correctly as suggested by renan carvalho.
+        - Upgraded to use WWW::Google::UserAgent v0.14.
+
+0.08    Sat Jan 17 10:20:00 2015
+        - Removed SIGNATURE file.
+        - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+        - Updated Copyright year information.
+
+0.07    Fri Aug 29 10:27:11 2014
+        - Added section "REPOSITORY" to the pod document.
+        - Added key "META_MERGE" to Makefile.PL file.
+
+0.06    Sat Aug 09 00:17:15 2014
+        - Tidied up README file.
+
+0.05    Sat Aug 02 03:58:19 2014
+        - Minor changes to the pod document.
+        - Updated COPYRIGHT year details.
+
+0.04    Sat Aug 02 02:38:03 2014
+        - Added missing unit test.
+
+0.03    Fri Aug 01 00:45:00 2014
+        - Re-structured the code using 'Moo'
+        - Returns the result in object format.
+
+0.02    Mon Aug 08 12:48:11 2011
+        - Made Readonly v1.03 as minimum requirement.
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.01    Mon Aug 01 15:15:01 2011
+        - First version, released.

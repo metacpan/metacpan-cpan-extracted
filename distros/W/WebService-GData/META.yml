@@ -1,0 +1,32 @@
+---
+abstract: 'Google data protocol v2.'
+author:
+  - 'shiriru <shirirulestheworld[arobas]gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-GData
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Crypt::SSLeay: 0
+requires:
+  JSON: 2
+  LWP: 0
+  Test::Mock::LWP: 0.05
+  Test::More: 0
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/szabgab/WebService-GData
+version: 0.06

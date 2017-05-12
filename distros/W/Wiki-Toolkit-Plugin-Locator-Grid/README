@@ -1,0 +1,13 @@
+NAME
+    Wiki::Toolkit::Plugin::Locator::Grid - A Wiki::Toolkit plugin to manage
+    co-ordinate data.
+
+DESCRIPTION
+    Access to and calculations using co-ordinate metadata supplied to a
+    Wiki::Toolkit wiki when writing a node.
+
+    Note: This is *read-only* access. If you want to write to a node's
+    metadata, you need to do it using the "write_node" method of Wiki::Toolkit.
+
+    We assume that the points are located on a flat, square grid with unit
+    squares of side 1 metre.

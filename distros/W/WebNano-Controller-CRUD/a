@@ -1,0 +1,17 @@
+Use of uninitialized value $new_result in warn at /home/zby/progs/html-formhandler-model-dbic/lib//HTML/FormHandler/TraitFor/Model/DBIC.pm line 366.
+Warning: something's wrong at /home/zby/progs/html-formhandler-model-dbic/lib//HTML/FormHandler/TraitFor/Model/DBIC.pm line 366.
+DBIx::Class::ResultSource::Table=HASH(0x2ea59c8) at /home/zby/progs/html-formhandler-model-dbic/lib//HTML/FormHandler/TraitFor/Model/DBIC.pm line 372.
+<form id="form992" method="post">
+<div>
+<label for="tags">Tags</label>
+<select name="tags" id="tags" multiple="multiple"><option value="1" id="tags.0">aaa</option><option value="2" id="tags.1">bbb</option></select>
+</div>
+<div>
+<label for="name">Name</label>
+<textarea name="name" id="name" rows="5" cols="10"></textarea>
+</div>
+<div>
+<label for="submit">Submit</label>
+<input type="submit" name="submit" id="submit" value="" />
+</div>
+</form>

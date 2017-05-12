@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-distribution.t
+t/00-signature.t
+t/01-WWW-Mechanize-Plugin-AutoWrite.t
+lib/WWW/Mechanize/Plugin/AutoWrite.pm
+t/pod-coverage.t
+t/pod.t
+examples/bratislava-pm.pl
+examples/olympic.pl
+examples/search-cpan.pl
+META.yml                                 Module meta-data (added by MakeMaker)

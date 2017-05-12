@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f9a36d0ba9cc6cb6264998833c1fea0ceca49308 Build.PL
+SHA1 a600234b5da17ee773a1fab169f45ea068ac0eac Changes
+SHA1 d3a82c1ffe42f287411fdafd684b48cfb17b5e24 INSTALL
+SHA1 840af132b924d6406b0a6ae46e2fb4f7fab0cfd4 LICENSE
+SHA1 73cf43d74b48c1b2daa9541c290c106fb188706b MANIFEST
+SHA1 de4a93ff9f61034a889ac3422ff9d19e6f2184e2 META.yml
+SHA1 11b3d9398704dda9f01c1f616ed90529e4e360d3 Makefile.PL
+SHA1 d68d38c39cfb159cd11ef3eb52e481c3d1b0f5c2 README
+SHA1 311338f54f725659665c0a92a7a73418d04b6b2e ignore.txt
+SHA1 e4f176d865699082856b547002dc705c2f802c91 index.html
+SHA1 8bd2a3bc8ecf5c797b8b9883b7cc306d40a385b3 lib/WWW/Wordnik/API.pm
+SHA1 2de3cbb21da1c539a443572e3ea906d865da9d6e t/00.load.t
+SHA1 51a38f307af8ac862cece90404a0c171a3421034 t/10.object-creation.t
+SHA1 f03af34aaaed78f9c5c9706dbed7e8606495039f t/20.selectors.t
+SHA1 c80feb6b876f49d6b7173e1ec8e15245baded275 t/30.methods.t
+SHA1 0a5400995594eff74e85534c01c127504e3a79f2 t/40.internal.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk1ZrmUACgkQvUI03qKHSRrL/gCeKHrzv5IS8fupncVBbgie2Oi6
+Tm0AnjQxUV5HLkMv4wYOiqqw0SRkqnDb
+=9DcA
+-----END PGP SIGNATURE-----

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-UserAgent-Random.t
+lib/WWW/UserAgent/Random.pm
+docs/user_agent_list.txt

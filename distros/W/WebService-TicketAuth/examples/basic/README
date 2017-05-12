@@ -1,0 +1,37 @@
+This example directory shows a skeleton of how to use
+WebService::TicketAuth in a SOAP::Lite daemon architecture.
+
+This uses a simple inheritance of the auth system into the Service
+itself.  This approach exposes the new() function to the client, which
+is ok in this case since we don't have to pass any parameters to new().
+In a more real-world case, you'll need to do some initialization work
+for the auth system, so may want to use a HAS-A relationship instead of
+an IS-A inheritance one.
+
+
+To use this, install the following pre-req's on the server:
+
+   * SOAP::Lite
+   * WebService::TicketAuth
+   * Digest::MD5
+
+
+On the client, install the following pre-req's:
+   * Pod::Usage
+   * Getopt::Long
+   * Soap::Lite
+   * Data::Dumper
+   * Storable
+   * Term::ReadKey
+
+
+Then run the server:
+
+   $ ./auth_server.pl
+
+And run the client like this:
+
+   $ ./login.pl admin
+   Password:   [admin]
+
+   $ ./auth_client.pl

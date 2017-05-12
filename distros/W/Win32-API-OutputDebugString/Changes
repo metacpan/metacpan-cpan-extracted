@@ -1,0 +1,12 @@
+Revision history for Perl extension Win32::API::OutputDebugString.
+
+0.03  Fri Mar 23 09:47:19 2001
+        - Doc. Changes.
+
+0.02  Fri Mar 23 09:47:19 2001
+        - First public release
+
+0.01  Fri Mar 23 09:47:19 2001
+	- original version; created by h2xs 1.20 with options
+		-xn Win32::API::OutputDebugString c:\home\alf\scratch\OutputDebugString.h
+

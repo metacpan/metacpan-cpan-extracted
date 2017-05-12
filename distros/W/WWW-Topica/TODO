@@ -1,0 +1,12 @@
+* command line options for topica2mail        - DONE
+* cleverer name/email extraction              - DONE
+* strip HTML in subject                       - DONE
+* relogin after (before?) timeout             - DONE
+* better docs                                 - DONE
+* date handling                               - DONE
+* fake message id                             - DONE
+* make it so you don't have to login          - 
+* catch login failures                        - 
+
+
+

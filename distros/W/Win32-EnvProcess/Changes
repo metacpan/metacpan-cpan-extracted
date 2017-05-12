@@ -1,0 +1,38 @@
+Revision history for Perl extension Win32::EnvProcess.
+
+0.01  Fri Dec 21 14:23:00 2007
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -n Win32::EnvProcess
+
+0.02  Fri Feb 15 10:15:00 2008
+        - changed tests to allow for multiple cmd.exe sessions
+
+0.03  Wed Mar 26 11:03:00 2008
+	- removed dependency on Psapi.lib (specifically for Strawberry Perl)
+	- default process id for functions is now the parent process id.
+	- additional tests for new features
+	
+0.04  Thu June 19 11:10:00 2008
+	- minor corrections to remove warnings in gcc (for Strawberry Perl)
+	- improvements to free remote memory and fix a small memory leak
+	- defaulting the name of the env.var. in GetEnvProcess now returns a
+	  list of the first 127 environment variables and their values
+	- additional tests for new features
+	- README documentation of MakeMaker patch for Visual Studio 2005
+
+0.05  Sun June 22 15:30:00 2008
+	- Clarified in the README file that a C/C++ compiler is required
+	- Fixed a bug (from 0.04) where an nonexistent variable returned the
+	  PID from GetEnvProcess.
+	- Fixed a bug where a large environment block resulted in no variables
+	  being returned by GetEnvProcess.  An error message is now returned.
+	- Improved error reporting.  Nonexistent environment variables now set
+	  $^E to 603 ERROR_ENVVAR_NOT_FOUND.  Other errors set relevant values.
+	- Improved POD concerning error numbers
+	- Mutex was being released too early in SetEnvProcess and DelEnvProcess
+	- Adapted tests for changes
+	
+0.06  Sun June 29 07:30:00 2008 
+	- Fixed ERROR_ALREADY_EXISTS bug caused by early release of Mutex in SetEnvProcess
+	  This was a timing bug and not possible to reliably place into automated tests.
+	- Corrected MANIFEST file  

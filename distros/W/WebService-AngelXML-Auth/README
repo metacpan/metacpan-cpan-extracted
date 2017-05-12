@@ -1,0 +1,11 @@
+To install the module...
+
+cpan2rpm WebService::AngelXML::Auth
+rpm -Uhv WebService::AngelXML::Auth-X.XX.rpm
+
+or 
+
+perl Makefile.PL
+make
+make test
+make install

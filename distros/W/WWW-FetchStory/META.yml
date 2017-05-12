@@ -1,0 +1,46 @@
+---
+abstract: 'Fetch a story from a fiction website'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-FetchStory
+requires:
+  Archive::Zip: '0'
+  Date::Format: '0'
+  EBook::EPUB: '0'
+  Encode: '0'
+  Encode::ZapCP1252: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Getopt::Long: '2.34'
+  HTML::Entities: '0'
+  HTML::Strip: '0'
+  HTML::Tidy::libXML: '0'
+  HTTP::Cookies: '0'
+  HTTP::Cookies::Mozilla: '0'
+  Module::Pluggable: '0'
+  Pod::Usage: '0'
+  WWW::Mechanize::Sleepy: '0'
+  XML::LibXML: '0'
+  YAML::Any: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/rubykat/WWW-FetchStory
+  repository: https://github.com/rubykat/WWW-FetchStory.git
+version: '0.1902'

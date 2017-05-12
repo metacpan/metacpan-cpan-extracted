@@ -1,0 +1,49 @@
+{
+   "abstract" : "get titles of web pages",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-GetPageTitle",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Data::Accessor" : "0.04001",
+            "HTML::Entities" : "1.35",
+            "LWP::UserAgent" : "2.036",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::GetPageTitle" : {
+         "file" : "lib/WWW/GetPageTitle.pm",
+         "version" : "0.0104"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0104"
+}

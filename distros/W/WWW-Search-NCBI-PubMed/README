@@ -1,0 +1,83 @@
+NAME
+    WWW::Search::NCBI::PubMed - fetch bibliographic entries in NLM's PubMed database
+
+KEYWORDS
+    internet, searching, content retrieval, PubMed, MEDLINE, NCBI, National
+    Center for Biotechnology Information, National Library of Medicine, NLM.
+
+DESCRIPTION
+    PubMed is the National Library of Medicine's search service that
+    provides access to over 11 million citations in MEDLINE, PreMEDLINE, and
+    other related databases, with links to participating online journals.
+    This module is an interface to access this service via the generic
+    "WWW::Search" interface. This class exports no public interface; all
+    interaction should be done through WWW::Search objects.
+
+SYNOPSIS
+    use WWW::Search;
+
+      my $www_search = new WWW::Search('NCBI::PubMed');
+
+      $www_search->maximum_to_retrieve( 10 );
+
+      $www_search->native_query( my $query_pubmed = 'stress AND cardiovascular risk' );
+
+      while ( my $r = $www_search->next_result )
+      {
+         print "$_\n" for ( $r->url, $r->title, $r->description );
+      }
+
+INSTALLATION
+    To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+    Please study the PREREQ_PM field within this distributions Makefile.PL file.
+
+NCBI DISCLAIMER AND COPYRIGHT
+    I personally encourage everybody to read
+    <http://www.ncbi.nlm.nih.gov/About/disclaimer.html> before using the
+    service via this module. Because using it is like surfing the original pages
+    i am sure all legal consequences that refer to the website are
+    inherited by this tool. 
+
+    Please read http://www.ncbi.nlm.nih.gov/About/disclaimer.html.
+
+BUGS AND CAVEATS
+    While this tool tries to present the original information in its essence
+    via extracting interesting information, it may fail to do so. So do not
+    rely on the information retreived by this tool without rigorous
+    confirmation of the original sources (http://www.pubmed.com website or
+    original print journal articles).
+
+    Because the parser depends on the static webserver response it may brake
+    as soon as the html is significantly altered. Please inform the author
+    via 
+
+    http://rt.cpan.org
+
+    if this happens and subject all other reports there. Escpecially I am open 
+    to every improvement towards robust parsing.
+    
+AUTHOR
+    muenalan@cpan.org <Murat Uenalan>.
+
+    "WWW::Search::NCBI::PubMed" was inspired by the outdated
+    "WWW::Search::PubMed" (last updated 2000). "WWW::Search::PubMed" was
+    written by Jim Smyser <jsmyser@bigfoot.com>.
+
+COPYRIGHT AND DISCLAIMERS
+    This module is Copyright (c) 1994-2003 Murat Uenana. Germany. All rights
+    reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+    THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+	

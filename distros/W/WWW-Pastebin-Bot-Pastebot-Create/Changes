@@ -1,0 +1,10 @@
+Revision history for WWW-Pastebin-Bot-Pastebot-Create
+
+0.002   2013-11-12
+        - Fixed the completely broken module
+        - Changes the default pastebin site to http://p3m.org/pfn
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.001   2008-03-26
+        - First version, released on an unsuspecting world.
+

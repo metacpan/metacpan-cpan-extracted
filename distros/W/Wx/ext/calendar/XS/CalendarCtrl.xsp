@@ -1,0 +1,192 @@
+#############################################################################
+## Name:        ext/calendar/XS/CalendarCtrl.xsp
+## Purpose:     XS++ for Wx::CalenderCtrl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     05/10/2002
+## RCS-ID:      $Id: CalendarCtrl.xsp 3224 2012-03-18 05:19:08Z mdootson $
+## Copyright:   (c) 2002-2006, 2008, 2010 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+#include <wx/event.h>
+#include <wx/calctrl.h>
+#include "xspp/calendar.h"
+
+%module{Wx};
+%file{xspp/calendar.h};
+%{
+
+double calendar_constant( const char* name, int arg )
+{
+    // !package: Wx
+    // !parser: sub { $_[0] =~ m<^\s*r\w*\(\s*(\w+)\s*\);\s*(?://(.*))?$> }
+    // !tag: calendar
+#define r( n ) \
+    if( strEQ( name, #n ) ) \
+        return n;
+
+    WX_PL_CONSTANT_INIT();
+
+    switch( fl )
+    {
+    case 'C':
+        r( wxCAL_SUNDAY_FIRST );
+        r( wxCAL_MONDAY_FIRST );
+        r( wxCAL_SHOW_HOLIDAYS );
+        r( wxCAL_NO_YEAR_CHANGE );
+        r( wxCAL_NO_MONTH_CHANGE );
+        r( wxCAL_SHOW_SURROUNDING_WEEKS );
+#if WXPERL_W_VERSION_GE( 2, 9, 0 )
+        r( wxCAL_SHOW_WEEK_NUMBERS );
+#endif
+        r( wxCAL_SEQUENTIAL_MONTH_SELECTION );
+
+        r( wxCAL_HITTEST_NOWHERE );
+        r( wxCAL_HITTEST_HEADER );
+        r( wxCAL_HITTEST_DAY );
+        r( wxCAL_HITTEST_DECMONTH );
+        r( wxCAL_HITTEST_INCMONTH );
+        r( wxCAL_HITTEST_SURROUNDING_WEEK );
+
+        r( wxCAL_BORDER_NONE );
+        r( wxCAL_BORDER_SQUARE );
+        r( wxCAL_BORDER_ROUND );
+        break;
+    case 'E':
+        r( wxEVT_CALENDAR_SEL_CHANGED );
+        r( wxEVT_CALENDAR_DAY_CHANGED );
+        r( wxEVT_CALENDAR_MONTH_CHANGED );
+        r( wxEVT_CALENDAR_YEAR_CHANGED );
+        r( wxEVT_CALENDAR_DOUBLECLICKED );
+        r( wxEVT_CALENDAR_WEEKDAY_CLICKED );
+
+#if WXPERL_W_VERSION_GE( 2, 5, 4 )
+        r( wxEVT_DATE_CHANGED );
+#endif
+#if WXPERL_W_VERSION_GE( 2, 9, 3 )
+        r( wxEVT_TIME_CHANGED );
+#endif
+        break;
+    }
+#undef r
+
+    WX_PL_CONSTANT_CLEANUP();
+}
+
+wxPlConstants calendar_module( &calendar_constant );
+
+%}
+%file{-};
+
+%typemap{wxDateEvent*}{simple};
+%typemap{wxCalendarEvent*}{simple};
+%typemap{wxCalendarCtrl*}{simple};
+%typemap{wxCalendarDateAttr*}{simple};
+%typemap{wxDateTime__WeekDay}{simple};
+
+#if WXPERL_W_VERSION_GE( 2, 5, 4 )
+
+%name{Wx::DateEvent} class wxDateEvent
+{
+    const wxDateTime& GetDate();
+    void SetDate(const wxDateTime& date);
+};
+
+#endif
+
+%name{Wx::CalendarEvent} class wxCalendarEvent
+{
+#if WXPERL_W_VERSION_LE( 2, 5, 3 ) && WXPERL_W_VERSION_GE( 2, 5, 2 )
+    void SetDate(const wxDateTime& date);
+    void SetWeekDay(wxDateTime__WeekDay weekDay);
+#endif
+#if WXPERL_W_VERSION_LE( 2, 5, 3 )
+    const wxDateTime& GetDate();
+#endif
+    wxDateTime__WeekDay GetWeekDay();
+};
+
+%name{Wx::CalendarCtrl} class wxCalendarCtrl
+{
+    %name{newDefault} wxCalendarCtrl()
+        %code{% RETVAL = new wxCalendarCtrl();
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+    %name{newFull} wxCalendarCtrl( wxWindow* parent,
+                                   wxWindowID id = wxID_ANY,
+                                   const wxDateTime& date =
+                                       wxDefaultDateTimePtr,
+                                   const wxPoint& pos = wxDefaultPosition,
+                                   const wxSize& size = wxDefaultSize,
+                                   long style = wxCAL_SHOW_HOLIDAYS,
+                                   const wxString& name = wxCalendarNameStr )
+        %code{% RETVAL = new wxCalendarCtrl( parent, id, *date,
+                                             pos, size, style, name );
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+
+    bool Create( wxWindow* parent, wxWindowID id = wxID_ANY,
+                 const wxDateTime& date = wxDefaultDateTimePtr,
+                 const wxPoint& pos = wxDefaultPosition,
+                 const wxSize& size = wxDefaultSize,
+                 long style = wxCAL_SHOW_HOLIDAYS,
+                 const wxString& name = wxCalendarNameStr );
+
+    void SetDate( const wxDateTime& date );
+    const wxDateTime& GetDate();
+
+#if !defined(wxHAS_NATIVE_CALENDARCTRL)
+    void EnableYearChange( bool enable = true );
+#endif
+    void EnableMonthChange( bool enable = true );
+    void EnableHolidayDisplay( bool display = true );
+    void SetHoliday( size_t day );
+
+#if !defined(wxHAS_NATIVE_CALENDARCTRL)
+    bool SetLowerDateLimit( const wxDateTime& date = wxDefaultDateTimePtr );
+    const wxDateTime& GetLowerDateLimit();
+    bool SetUpperDateLimit( const wxDateTime& date = wxDefaultDateTimePtr );
+    const wxDateTime& GetUpperDateLimit();
+#endif
+
+    bool SetDateRange ( const wxDateTime& lowerdate = wxDefaultDateTimePtr,
+                        const wxDateTime& upperdate = wxDefaultDateTimePtr );
+
+    void SetHeaderColours( const wxColour& colFg, const wxColour& colBg );
+    void SetHighlightColours( const wxColour& colFg, const wxColour& colBg );
+    void SetHolidayColours( const wxColour& colFg, const wxColour& colBg );
+    const wxColour& GetHeaderColourFg();
+    const wxColour& GetHeaderColourBg();
+    const wxColour& GetHighlightColourFg();
+    const wxColour& GetHighlightColourBg();
+    const wxColour& GetHolidayColourFg();
+    const wxColour& GetHolidayColourBg();
+
+    wxCalendarDateAttr* GetAttr( size_t day )
+        %code{%
+            RETVAL = THIS->GetAttr(day);
+            RETVAL = RETVAL ? new wxCalendarDateAttr( *RETVAL ) : NULL;
+        %};
+
+    void SetAttr( size_t day, wxCalendarDateAttr* attr )
+        %code{%
+            THIS->SetAttr( day,
+                           attr ? new wxCalendarDateAttr( *attr ) : NULL );
+        %};
+
+    void ResetAttr( size_t day );
+};
+
+%{
+
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::CalendarCtrl::new" )
+
+%}

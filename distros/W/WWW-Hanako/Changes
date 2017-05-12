@@ -1,0 +1,19 @@
+Revision history for Perl extension WWW::Hanako.
+
+0.05  Wed Feb 25 01:42:31 2009
+	- fixed bug 43565
+
+0.04  Tue Feb 24 01:37:42 2009
+	- enumerate wind direction.
+
+0.03  Sun Feb 22 01:37:42 2009
+	- added example code.
+
+0.02  Sat Feb 21 01:50:42 2009
+	- modified constructor arguments.
+	- wrote document and test
+
+0.01  Wed Feb 18 23:50:42 2009
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter WWW::Hanako
+

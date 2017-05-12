@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/WebService/Google/Contact.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/01.contact_uri.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml

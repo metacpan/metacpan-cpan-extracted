@@ -1,0 +1,52 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Webqq::Encryption - Webqq Login Encryption Library
+
+=head1 SYNOPSIS
+
+    use Webqq::Encryption qw(pwd_encrypt pwd_encrypt_js);
+
+    #输入的参数依次是：登录密码的32位MD5值，盐，验证码
+
+    #使用纯Perl代码进行加密计算,需要安装 Crypt::RSA （或者Crypt::OpenSSL::RSA Crypt::OpenSSL::Bignum）
+    $p = pwd_encrypt($pwd,$md5_salt,$verifycode);
+
+    #使用原始javascript进行加密计算,需要安装 JE 模块 （速度慢）
+    $p = pwd_encrypt_js($pwd,$md5_salt,$verifycode);
+    
+
+=head1 DESCRIPTION
+
+此模块应用在 L<Mojo::Webqq> L<Webqq::Client>以及L<Webqq::Qun>中，也可能应用在其他的基于web的腾讯登录页面
+
+因为腾讯的web登录方式是统一的，该模块集成了javascript解释器，支持使用原生的javascript代码进行运算（速度较慢）
+
+如果希望提升运算速度，可以选择安装Crypt::RSA（或者Crypt::OpenSSL::RSA Crypt::OpenSSL::Bignum）
+
+更多详情可以参考L<Webqq::Client>和L<Webqq::Qun>
+
+=head1 SEE ALSO
+
+L<https://github.com/sjdy521/Webqq-Encryption>
+
+L<Webqq::Client>
+
+L<Webqq::Qun>
+
+=head1 AUTHOR
+
+sjdy521, E<lt>sjdy521@163.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

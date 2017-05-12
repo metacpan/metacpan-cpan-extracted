@@ -1,0 +1,27 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/WebService/CloudFlare/Host.pm
+lib/WebService/CloudFlare/Host/Exception.pm
+lib/WebService/CloudFlare/Host/Request/UserAuth.pm
+lib/WebService/CloudFlare/Host/Request/UserCreate.pm
+lib/WebService/CloudFlare/Host/Request/UserLookup.pm
+lib/WebService/CloudFlare/Host/Request/ZoneDelete.pm
+lib/WebService/CloudFlare/Host/Request/ZoneLookup.pm
+lib/WebService/CloudFlare/Host/Request/ZoneSet.pm
+lib/WebService/CloudFlare/Host/Response/UserAuth.pm
+lib/WebService/CloudFlare/Host/Response/UserCreate.pm
+lib/WebService/CloudFlare/Host/Response/UserLookup.pm
+lib/WebService/CloudFlare/Host/Response/ZoneDelete.pm
+lib/WebService/CloudFlare/Host/Response/ZoneLookup.pm
+lib/WebService/CloudFlare/Host/Response/ZoneSet.pm
+lib/WebService/CloudFlare/Host/Role/Request.pm
+lib/WebService/CloudFlare/Host/Role/Response.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml

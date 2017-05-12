@@ -1,0 +1,52 @@
+{
+   "abstract" : "The API for Megaplan.ru service (Web-based business automatization service)",
+   "author" : [
+      "Sergey Leschenko <sergle.ua@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Megaplan",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : 0,
+            "Digest::HMAC_SHA1" : 0,
+            "Digest::MD5" : 0,
+            "HTTP::Tiny" : 0,
+            "JSON" : 0,
+            "MIME::Base64" : 0,
+            "POSIX" : 0
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Megaplan" : {
+         "file" : "lib/WebService/Megaplan.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,45 @@
+WebService-Google-Voice-SendSMS version 1.002, released February 21, 2015
+
+
+This module allows you to send SMS messages using your Google Voice
+account.  It's based on the phpgooglevoice class by LostLeon.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                Minimum Version
+  ---------------------- ---------------
+  perl                    5.8.0
+  Carp                    
+  HTTP::Request::Common   
+  LWP::UserAgent          6
+
+
+
+CHANGES
+    Here's what's new in version 1.002 of WebService-Google-Voice-SendSMS:
+    (See the file "Changes" for the full revision history.)
+
+	- Fetch https://www.google.com/voice/m/sms to get XSRF token
+	  (This is a smaller page than https://www.google.com/voice/m/)
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

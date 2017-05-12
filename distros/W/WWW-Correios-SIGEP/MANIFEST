@@ -1,0 +1,14 @@
+lib/WWW/Correios/SIGEP.pm
+lib/WWW/Correios/SIGEP/Common.pm
+lib/WWW/Correios/SIGEP/LogisticaReversa.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+share/live/atende_cliente.wsdl
+share/live/scol.wsdl
+share/sandbox/atende_cliente.wsdl
+share/sandbox/scol.wsdl
+t/00-load.t
+t/01-sigep.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

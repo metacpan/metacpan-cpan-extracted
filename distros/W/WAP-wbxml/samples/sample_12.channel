@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<!DOCTYPE channel PUBLIC "-//WAPFORUM//DTD CHANNEL 1.2//EN"
+      "channel.dtd">
+<channel
+      maxspace="2048"
+      base="http://wap.operator.com/"
+      eventid="wtaev-cc/ic"
+      channelid="IncommingCallChannel"
+      success="success.wta-wml"
+      failure="failure.wta-wml"
+>
+      <title>Call Selection</title>
+
+      <abstract>
+        Incoming Call Selection service!
+      </abstract>
+
+      <resource href="welcome.wta-wml" />
+      <resource href="first.wta-wml" />
+      <resource href="script.wmls" />
+</channel>

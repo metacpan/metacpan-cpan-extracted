@@ -1,0 +1,112 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 df7e0c3efd460f1e3c23677119a91db35e6d3b7c Build.PL
+SHA1 4823c09d3c46e4ac9c55c8a2f1e7db9f2ac1136f ChangeLog
+SHA1 9580c2e8b7255edaec0d2afb712e5b913631685d ChangeLog.xml
+SHA1 c05b16ddd8701b7baf7353d2001adfc16e8af5f6 MANIFEST
+SHA1 e47bc0568fece0725756e00a4707fcf11aa346d1 MANIFEST.SKIP
+SHA1 0dcb80e4a5994ab3b96e91d10f824d51432d3eab META.yml
+SHA1 caa1b9956617d7869c1ad202ef37433706d27f23 Makefile.PL
+SHA1 8b9b6abd223673f90839254a11b9c8fc438e4900 README
+SHA1 a9283489bd29f8605143c4cee247a67e7beafa46 etc/ChangeLogML.xsd
+SHA1 48c2ca4acedd5d75588c3604dbca6c0a9fdb4410 lib/WebService/ISBNDB.pm
+SHA1 a59c01d60f9da09d37945a2ed5336507224cd61c lib/WebService/ISBNDB/API.pm
+SHA1 a19d9570d0ac1f13cef5ef268258538b08b55f6e lib/WebService/ISBNDB/API/Authors.pm
+SHA1 0737751e6381bcf66e2b609ae6a6b9504fe3dcde lib/WebService/ISBNDB/API/Books.pm
+SHA1 e3eb1a2c7a217f2f8c4bc76598191c79fc44bf38 lib/WebService/ISBNDB/API/Categories.pm
+SHA1 e9b0f360e6eecf150b9239fbc6f1a255d7274794 lib/WebService/ISBNDB/API/Publishers.pm
+SHA1 a769e7537663b64ffc9392396a89bceebb12d18d lib/WebService/ISBNDB/API/Subjects.pm
+SHA1 2cc28e4cbadc027f94fd7ee54c56f716135019c8 lib/WebService/ISBNDB/Agent.pm
+SHA1 cb8db6e81d5a11f3a49bae50fe659972636d1d53 lib/WebService/ISBNDB/Agent/REST.pm
+SHA1 27b4a96275630d3d6023e32f7cd1cba536d407ea lib/WebService/ISBNDB/Iterator.pm
+SHA1 3dd5f6e0a929cfba96d9a971748eab38096c699a t/00_load.t
+SHA1 93cf406b6843f5392811fa436bee8d134c110942 t/00_signature.t
+SHA1 ce62f7d2c44c372cf352392bbac1ed0601c60165 t/01_pod.t
+SHA1 8fbeb15969f1b52213bd470f36740c426ba64fcb t/02_pod_coverage.t
+SHA1 dcf518056f48115ef9f0e8a20a8dc8282e01f146 t/05_api_baseclass.t
+SHA1 02bada4d79d3be8f0620714a6e9de6667ecdddc6 t/07_agent_baseclass.t
+SHA1 8a0a8a47a1723cb8fb084549ef016ccf7aba7ae5 t/10_categories.t
+SHA1 f060c5758692165b907e22fdfe2f898f39b0360b t/20_publishers.t
+SHA1 3f0ab04a1b777541ff3fcb449e74feb2399a17c8 t/30_subjects.t
+SHA1 968dd3d1745970e175aaf4b9c157254ac8dad862 t/40_authors.t
+SHA1 a7c916e5bba3fe1f2f252e1f7c4a530bda7fc181 t/50_books.t
+SHA1 a93f344ab102bbdfbc62c7e76e16b6b1b4ca7391 t/60_iterator.t
+SHA1 6c6197a3b8e46ed82663c3b5211d941dc211c3e0 t/DUMMY.pm
+SHA1 443ba270a092c80e714e4d3657f4ff0997049204 t/testing.key
+SHA1 ce15cef51040202b110e5379d52c6cb85e1542b5 t/util.pl
+SHA1 3b51cadd7a22a9899b3dbb0a4bd3f25fef346beb t/xml/Authors-person_id=kulchenko_pavel.xml
+SHA1 f46fa8a546971e389b622321c1baf44e2dd622fe t/xml/Authors-person_id=poe_edgar_allan.xml
+SHA1 94ad12de99d3f250b948cb51d7753fd31577279b t/xml/Authors-person_id=ray_randy_j.xml
+SHA1 b3b941de76391c526b5a29f7177bcf8ba19c9501 t/xml/Books-book_id=programming_web_services_with_perl.xml
+SHA1 b3b941de76391c526b5a29f7177bcf8ba19c9501 t/xml/Books-isbn=0596002068.xml
+SHA1 0d407d1f4dc6e0ceef43bae971f120aa9c3b8647 t/xml/Books-page_number=10-person_id=poe_edgar_allan.xml
+SHA1 38f07f915df7e4d76d39d593a15041cd3a21359f t/xml/Books-page_number=11-person_id=poe_edgar_allan.xml
+SHA1 8f7c09f432fc8a271263851fe9d25ab5d2008e74 t/xml/Books-page_number=12-person_id=poe_edgar_allan.xml
+SHA1 e68c03caeb05ca7dab8e75c65ddc41dea94e2724 t/xml/Books-page_number=13-person_id=poe_edgar_allan.xml
+SHA1 503dbfd2a81198202fe37f2c5dace994f04be2ef t/xml/Books-page_number=14-person_id=poe_edgar_allan.xml
+SHA1 497f3e10feaa5ee232149f673672961503b8642d t/xml/Books-page_number=15-person_id=poe_edgar_allan.xml
+SHA1 aaf834928da30f783cee74b4f1e618d8dbf132dd t/xml/Books-page_number=16-person_id=poe_edgar_allan.xml
+SHA1 0ed3f56dd12fe3ecc93872f638b2b0515f07d737 t/xml/Books-page_number=17-person_id=poe_edgar_allan.xml
+SHA1 df6f3aa06abcb88c2280592b54517dc02a023ba3 t/xml/Books-page_number=18-person_id=poe_edgar_allan.xml
+SHA1 5c9a072813f7dacd6c4273663c360bbd709c4463 t/xml/Books-page_number=19-person_id=poe_edgar_allan.xml
+SHA1 54d868b4af404332ec4dd83219e1d3bd941f573e t/xml/Books-page_number=2-person_id=poe_edgar_allan.xml
+SHA1 ad1297871c1fca89f6e26cbe7d26eacc04aeb1e6 t/xml/Books-page_number=20-person_id=poe_edgar_allan.xml
+SHA1 a5dd3f5a130ce736e789a52ddf61c685ad5fd1fc t/xml/Books-page_number=21-person_id=poe_edgar_allan.xml
+SHA1 881e7647f5845eef8d3e4f6b4b4e7595b34ebc80 t/xml/Books-page_number=22-person_id=poe_edgar_allan.xml
+SHA1 d488744dfa3ffa65cc2e19f0e6a089aa04a0de09 t/xml/Books-page_number=23-person_id=poe_edgar_allan.xml
+SHA1 122f84d33b2aa70cf40dc66c4acce0655e57c21f t/xml/Books-page_number=24-person_id=poe_edgar_allan.xml
+SHA1 61e65c93b5cc55123e3f2a60ed64668937b4049c t/xml/Books-page_number=25-person_id=poe_edgar_allan.xml
+SHA1 fd97600ab1399a3815439d95c518868bb7727540 t/xml/Books-page_number=26-person_id=poe_edgar_allan.xml
+SHA1 a82c3394aeb12a1b2e2d732dcc23acad6b3dd5df t/xml/Books-page_number=3-person_id=poe_edgar_allan.xml
+SHA1 9dd90d099cf43e2e7227edde38c12b2317757cb3 t/xml/Books-page_number=4-person_id=poe_edgar_allan.xml
+SHA1 a5f72cfbeff3a0c9def15b6ec4b0da619af503c1 t/xml/Books-page_number=5-person_id=poe_edgar_allan.xml
+SHA1 80501fe92c60fcff4669bdc26851d4338d6b0d05 t/xml/Books-page_number=6-person_id=poe_edgar_allan.xml
+SHA1 d4928d20a4fc7f82225ac9a0d35ba530803fb9b7 t/xml/Books-page_number=7-person_id=poe_edgar_allan.xml
+SHA1 81440a4dae640158d629f79794321bd6dde19b47 t/xml/Books-page_number=8-person_id=poe_edgar_allan.xml
+SHA1 c59ef0b6bf7a97d41527682952e47d675d18ad7c t/xml/Books-page_number=9-person_id=poe_edgar_allan.xml
+SHA1 4dd1daf4f97d24f649c6de3db490a5aa0aadd976 t/xml/Books-person_id=poe_edgar_allan.xml
+SHA1 562b301f2529a6ac85d7b8a80bb2a9a65cc0db9d t/xml/Categories-category_id=alphabetically.authors.r.a.y.xml
+SHA1 6a4eeda5399e2594d3e9f2c74ae3617c74281ddd t/xml/Categories-category_id=alphabetically.publishers.o.r.xml
+SHA1 5cab4f4b98ded2f16628f92d3b1d62ef637e32d4 t/xml/Categories-category_id=computers.programming.languages.perl.xml
+SHA1 458f80676399a3a908b79911e7651b566d633c0c t/xml/Categories-category_id=science.astronomy.xml
+SHA1 99e9b8fc6ef720b51f4afc6fda89673e5dffbc37 t/xml/Categories-category_id=science.biology.xml
+SHA1 2030fe91360a32e880878fdd705a9d7501c34a0e t/xml/Categories-category_id=science.botany.xml
+SHA1 c14dd74224167fd2ac65a3989b31c38e2f55b458 t/xml/Categories-category_id=science.chemistry.xml
+SHA1 f6264a2a142ba4d48585a62b75160779b3368c51 t/xml/Categories-category_id=science.computer_science.xml
+SHA1 9e7a1137a057f12cdecf3f9468dc94cead72a2b5 t/xml/Categories-category_id=science.earth_sciences.xml
+SHA1 918bd50ea761d45b3636ab9286c53cd9996e2244 t/xml/Categories-category_id=science.economics.xml
+SHA1 abce6e0456c6c7a56b3df12a2e0173a799fc41cd t/xml/Categories-category_id=science.geography.xml
+SHA1 9e7b33f408db3996ff81192e1a2e1cf774c42c29 t/xml/Categories-category_id=science.mathematics.xml
+SHA1 10be845fdf05e5f994407efd01fc4bdfad6da86f t/xml/Categories-category_id=science.mineralogy.xml
+SHA1 7356bd08739d1054e91617c3c2677ba83592427b t/xml/Categories-category_id=science.paleontology.xml
+SHA1 5248519e612a0c26383d9947d8e00c57adc20335 t/xml/Categories-category_id=science.philosophy.xml
+SHA1 c3bba271af9a746efd3ef0579647fd7d8ebed8a6 t/xml/Categories-category_id=science.physics.xml
+SHA1 df120ef7bc491b01937372350e3fa149332863f5 t/xml/Categories-category_id=science.political_science.xml
+SHA1 d86c12a9f23596108c9248b9ada71ac2f7d105ed t/xml/Categories-category_id=science.psychology.xml
+SHA1 5db30478fb8b1f392ec60085a03ed2ce3c929cf7 t/xml/Categories-category_id=science.social_sciences.xml
+SHA1 6502ec8d08fac2dad4cfe6c8bad6162b4c00efe3 t/xml/Categories-category_id=science.sociology.xml
+SHA1 f4c8029208f19859f287b109719efa1a5c70189e t/xml/Categories-category_id=science.xml
+SHA1 f6a59b98a34bac0bc4ca1c67c788fe2309eed381 t/xml/Publishers-publisher_id=oreilly.xml
+SHA1 e0c0ffa9a1529119be72d2537f5a3905c8294159 t/xml/Subjects-subject_id=internet_programming.xml
+SHA1 05626c3f827f5f57998332c66b7e07a01f2d6fd3 t/xml/Subjects-subject_id=perl_computer_program_language.xml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFH+Mpc3Cp33jjp81URArlJAJ0UWvHI/Wc0KTdjrVEkyBjeWXWNDQCfWNve
+VUYu3T4A+NU0PVI0D3O3XPk=
+=SZDm
+-----END PGP SIGNATURE-----

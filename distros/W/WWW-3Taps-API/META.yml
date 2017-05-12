@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               WWW-3Taps-API
+version:            0.06
+abstract:           ~
+author:
+    - Eden Cardim <edencardim@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTimeX::Easy:      0
+    JSON::Any:            0
+    LWP::UserAgent:       0
+    Moose:                0
+    MooseX::Params::Validate:  0
+    MooseX::Types:        0
+    MooseX::Types::Locale::Language:  0
+    MooseX::Types::Moose:  0
+    MooseX::Types::Structured:  0
+    Test::Exception:      0
+    Test::More:           0
+    URI:                  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

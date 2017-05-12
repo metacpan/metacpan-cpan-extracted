@@ -1,0 +1,31 @@
+
+A.pod_link { color: #0000F0; text-decoration: none; font-weight: bold; }
+
+.pod_verbatim { border-width: 1; border-style: solid; background-color: #F5F5F5; border-color: #AAAAAA; margin-left: 10px; padding: 6px; }
+
+.pod_heading { color: #00A0A0; }
+
+DT.pod_term, TD.field_name, TD.pod_term { color: #A00000; font-weight: bold; }
+
+DT.pod_term2, TD.pod_term2 { color: #CC8080; font-weight: bold; }
+
+TD.pod_term, TD.pod_def { vertical-align: top; }
+
+.pod_th TD { color: #00A0A0; text-align: center; }
+
+H1 { font-size: 150%; }
+
+H2 { font-size: 120%; }
+
+H3 { font-size: 100%; }
+
+H4 { font-size: 100%; }
+
+TABLE.response, TABLE.pod_list { border-width: 1; border-style: solid; border-color: #AAAAAA; border-spacing: 0; }
+
+TABLE.response TD, TABLE.pod_list TD { border-width: 1; border-style: solid; border-color: #AAAAAA; padding: 6px; }
+
+TABLE.pod_list2 TD { border-width: 0; padding: 3px; vertical-align: top; };
+
+TR.resp_head { color: #00A0A0; text-align: center; }
+

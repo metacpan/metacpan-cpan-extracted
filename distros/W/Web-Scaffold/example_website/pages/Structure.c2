@@ -1,0 +1,19 @@
+Each web page is assembled by <b>Web::Scaffold</b> as follows:
+<pre>
+  &lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt; [from page title or heading] &lt;/title&gt;
+  [optional] Default.meta or Page.meta
+  internally generated style statements 
+  [optional] Default.head or Page.head  
+  &lt;/head&gt;
+  &lt;body&gt; 
+  [optional] Default.top or Page.top
+  [optional] menu bar as specified for this Page
+  internally generated column spec for this Page
+  {    column 1    }{    column 2    }....{ column N }
+   Page.c1 or blank  Page.c2 or blank ... etc...
+  [optional] trailer
+  &lt;/body&gt;
+  &lt;/html&gt;
+</pre>

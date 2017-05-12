@@ -1,0 +1,53 @@
+#############################################################################
+## Name:        ext/xrc/XS/XmlDocument.xsp
+## Purpose:     XS for Wx::XmlDocument
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     25/07/2003
+## RCS-ID:      $Id: XmlDocument.xsp 2281 2007-11-11 13:46:12Z mbarbon $
+## Copyright:   (c) 2003, 2007 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxXmlNode*}{simple};
+
+%name{Wx::XmlDocument} class wxXmlDocument
+{
+##    wxXmlDocument();
+##    wxXmlDocument(const wxString& filename,
+##                  const wxString& encoding = wxT("UTF-8"));
+##    wxXmlDocument(wxInputStream& stream,
+##                  const wxString& encoding = wxT("UTF-8"));
+##    ~wxXmlDocument() { delete m_root; }
+
+##    wxXmlDocument(const wxXmlDocument& doc);
+##    wxXmlDocument& operator=(const wxXmlDocument& doc);
+
+##    bool Load(const wxString& filename,
+##              const wxString& encoding = wxT("UTF-8"));
+##    bool Load(wxInputStream& stream,
+##              const wxString& encoding = wxT("UTF-8"));
+    
+##    // Saves document as .xml file.
+##    bool Save(const wxString& filename) const;
+##    bool Save(wxOutputStream& stream) const;
+
+    bool IsOk() const;
+
+    wxXmlNode *GetRoot() const;
+
+    wxString GetVersion() const;
+    wxString GetFileEncoding() const;
+
+    void SetRoot(wxXmlNode *node);
+    void SetVersion(const wxString& version);
+    void SetFileEncoding(const wxString& encoding);
+
+#if !wxUSE_UNICODE
+    wxString GetEncoding() const;
+    void SetEncoding(const wxString& enc);
+#endif
+};

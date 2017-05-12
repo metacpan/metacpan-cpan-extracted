@@ -1,0 +1,20 @@
+Link is a largely experimental module for storing information about
+Links (such as hyperlinks between documents).  I use it within my link
+checking system LinkController, but I think that the ideas and code
+included could be extended to become generally useful.  Also, I'd like
+to provide a public interface to the information which LinkController
+contains and that is what WWW::Link will eventually evolve into.
+
+I feel at some point soon an object-relational re-implementation of
+some kind may become useful.  So far, the benefits of the simple
+semi-persistant object model of MLDBM have outweighed that,
+particularly because I don't yet need sophisticated reporting.  This
+will most probably change when I want to use information directly in
+web page generation.
+
+If you have any thoughts about this module, then please send a mail to
+my CPAN address and I'll be happy to consider them and maybe even code
+them for you.
+
+All of this means that all interfaces are subject to change without
+notice.

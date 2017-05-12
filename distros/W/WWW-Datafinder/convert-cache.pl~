@@ -1,0 +1,38 @@
+use strict;
+use warnings;
+use File::Spec::Functions qw(catfile catdir splitpath);
+use File::Path qw(make_path);
+
+my $dir = '/var/tmp/datafinder-cache/';
+opendir(my $d, $dir) or die $!;
+while (my $f = readdir($d)) {
+    next if $f =~ m/^\./;
+    
+    my $cache_dir = catdir($dir, 
+                       substr($f, 0, 2),
+                       substr($f, 2, 2));
+
+    unless (-d $cache_dir ) {
+        print "Making $cache_dir\n";
+        my $err;
+        unless (
+            make_path(
+                $cache_dir,
+                {
+                    mode  => 0700,
+                    error => \$err
+                   }
+               )
+           )
+          {
+              warn(
+                  "Cannot create cache directory : $cache_dir($err),".
+                    " caching turned off");
+              next;
+          }
+    }
+    if (link(catfile($dir, $f), catfile($cache_dir, $f)) && unlink(catfile($dir, $f))) {
+        print "moved $f to $cache_dir\n";
+    }
+}
+closedir($d);

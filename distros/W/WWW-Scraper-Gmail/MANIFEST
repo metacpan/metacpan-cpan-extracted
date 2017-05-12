@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+set1.pl
+MANIFEST
+README
+t/WWW-Scraper-Gmail.t
+lib/WWW/Scraper/Gmail.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Revision history for WebService-Lingr-Archives
+
+0.03    2014-08-17
+        - No implementation change.
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.02    2014-07-27
+        - Use LWP::UserAgent instead of Furl.
+        - Some meta-data updates.
+
+0.01    2013-08-16
+        - Initial release.

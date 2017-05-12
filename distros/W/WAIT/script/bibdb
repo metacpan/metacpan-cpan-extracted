@@ -1,0 +1,167 @@
+######################### -*- Mode: Perl -*- #########################
+##
+## $Basename: bibdb $
+## $Revision: 1.7 $
+##
+## Author           : Ulrich Pfeifer
+## Created On       : Mon Sep  2 12:57:12 1996
+##
+## Last Modified By : Ulrich Pfeifer
+## Last Modified On : Fri Apr  7 13:45:36 2000
+## 
+## Copyright (c) 1996-1997, Ulrich Pfeifer
+## 
+## 
+######################################################################
+
+use strict;
+use File::Path;
+use DB_File;
+use Getopt::Long;
+use Cwd;
+
+require WAIT::Config;
+require WAIT::Database;
+require WAIT::Parse::Bibdb;
+require WAIT::Document::Split;
+require WAIT::InvertedIndex;
+
+
+$DB_BTREE->{'cachesize'} = 200_000 ;
+
+my %OPT = (clean    => 0,
+           database => 'DB',
+           dir      => $WAIT::Config->{WAIT_home} || '/tmp',
+           table    => 'bibdb',
+          );
+
+GetOptions(\%OPT,
+           'clean!',
+           'database=s',
+           'dir=s',
+           'table=s',
+          ) || die "Usage: ...\n";
+
+if ($OPT{clean} and -d "$OPT{dir}/$OPT{database}") {
+  my $tmp = WAIT::Database->open(name        => $OPT{database},
+                                 'directory' => $OPT{dir})
+    or die "Could not open table $OPT{table}: $@\n";
+  my $tbl = $tmp->table(name => $OPT{table});
+  $tbl->drop if $tbl;
+  rmtree("$OPT{dir}/$OPT{database}/$OPT{table}", 1, 1)
+    if -d "$OPT{dir}/$OPT{database}/$OPT{table}";
+  $tmp->close;
+}
+
+my $db;
+unless (-d "$OPT{dir}/$OPT{database}") {
+  $db = WAIT::Database->create(name       => $OPT{database},
+                              'directory' => $OPT{dir})
+    or die "Could not open database $OPT{database}: $@\n";
+}
+else {
+  $db = WAIT::Database->open(name        => $OPT{database},
+                             'directory' => $OPT{dir})
+    or die "Could not open table $OPT{table}: $@\n";
+}
+
+my $layout = new WAIT::Parse::Bibdb;
+
+my $stem  = ['detex', 'isotr', 'isolc', 'split2', 'stop', 'Stem'];
+my $text  = [{
+              'prefix'    => ['detex', 'isotr', 'isolc'],
+              'intervall' => ['detex', 'isotr', 'isolc'],
+             },
+             'detex', 'isotr', 'isolc', 'split2', 'stop'];
+my $sound = ['detex', 'isotr', 'isolc', 'split2', 'Soundex'],;
+
+my $cwd = cwd;
+my($file) = grep -e $_, @ARGV, "$cwd/t/test.ste", '/usr/local/ls6/tex/bib/bibdb.ste';
+
+my %D;
+my $access = tie %D, 'WAIT::Document::Split', 'sep', '\f', $file
+  or die "Couldn't tie to $file: $!\n";
+
+my $tb = $db->create_table(name     => $OPT{table},
+                           attr     => ['docid', 'headline'],
+                           layout   => $layout,
+                           access   => $access,
+                           invindex =>
+                           [
+                            'ti' => $stem, 'ti' => $text,
+                            'jt' => $stem, 'jt' => $text,
+                            'bt' => $stem, 'bt' => $text,
+                            'sd' => $stem, 'sd' => $text,
+                            'ft' => $stem, 'ft' => $text,
+                            'ab' => $stem,
+                            'au' => $text, 'au' => $sound,
+                            'pn' => $text, 'pn' => $sound,
+                            'cc' => [{'prefix' => ['cctr',  'isolc']},
+                                     'cctr',  'isolc', 'split3'],
+                            'ed' => [{'intervall' => 1}, 'split6'],
+                            'py' => [{'intervall' => 1}, 'split4'],
+                           ]
+                          );
+die "Couldn't create table $OPT{table}: $@\n" unless $tb;
+
+my ($did, $value);
+while (($did, $value) = each %D) {
+  my $record = $layout->split($value);
+  my $headline = sprintf("%-20s %s", ($record->{ck}||''), $record->{ti});
+  printf "%s\n", substr($headline,0,80);
+  $tb->insert('docid'  => $did,
+              headline => $headline,
+              %{$record});
+}
+
+$db->close();
+
+$WAIT::Config = $WAIT::Config; # make perl -w happy
+
+
+__END__
+## ###################################################################
+## pod
+## ###################################################################
+
+=head1 NAME
+
+bibdb - generate an WAIT index for bibdb records
+
+=head1 SYNOPSIS
+
+B<bibdb>
+[B<-clean>] [B<-noclean>]
+[B<-database> I<dbname>]
+[B<-dir> I<directory>]
+[B<-table> I<table name>]
+
+=head1 DESCRIPTION
+
+Either indexes F<$WAIT/t/test.ste> (if called from directory F<$WAIT>)
+or F</usr/local/ls6/tex/bib/bibdb.ste>.
+
+=head1 OPTIONS
+
+=over 5
+
+=item B<-clean> / B<-noclean>
+
+Clean the table before indexing. Default is B<off>.
+
+=item B<-database> I<dbname>
+
+Specify database name. Default is F<DB>.
+
+=item B<-dir> I<directory>
+
+Alternate directory where databases are located. Default is the
+directory specified during configuration of WAIT.
+
+=item B<-table> I<table name>
+
+Specify an alternate table name. Default is C<bibdb>.
+
+=head1 AUTHOR
+
+Ulrich Pfeifer E<lt>F<pfeifer@ls6.informatik.uni-dortmund.de>E<gt>

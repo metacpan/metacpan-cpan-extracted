@@ -1,0 +1,25 @@
+#$Id: TYPEMAP,v 1.2 2006/06/11 15:46:52 robertemay Exp $
+TYPEMAP
+CContainer*  T_CONTAINER
+HWND         T_HANDLE
+LPCTSTR      T_PV
+DWORD        T_IV
+BOOL         T_IV
+
+################################################################################
+INPUT
+T_HANDLE
+    if(SvROK($arg)) {
+        SV** out=hv_fetch((HV*)SvRV($arg), \"-handle\", 7, 0);
+        if(out != NULL)
+            $var = INT2PTR($type,SvIV(*out));
+        else
+            $var = NULL;
+    } else
+       $var = INT2PTR($type,SvIV($arg));
+
+T_CONTAINER
+    $var = ($type) SvIV(*(hv_fetch((HV*)SvRV($arg), \"-CContainer\", 11, 0)));
+
+################################################################################
+OUTPUT

@@ -1,0 +1,262 @@
+#!/usr/bin/perl
+use strict;
+# ABSTRACT= 'upoad post to wordpress'
+use lib './lib';
+use WordPress::CLI::Base ':all';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+use LEOCHARRE::Strings ':all';
+use Getopt::Std::Strict 'ht:d:D:c:u:p:x:vnC:k';
+$opt_h and print STDERR usage() and exit;
+$opt_v and print "$VERSION\n" and exit;
+
+sub usage {q{wordpres-upload-post [OPTION].. FILE
+Upoad post to wordpress.
+
+   -d path     simple text/html file or FILE containing content 
+   -h          help
+   -t string   title *
+   -D string   date
+   -c number   category name or id, can be comma separated
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -n          don't post, just test
+   -C path     load username, password, and proxy from this config file
+   -k          clean description text
+
+* required
+Try 'man wordpress-upload-post' for more info.
+}}
+
+
+###############################################################################
+# load config from file ?
+if ($opt_C){
+   _opts_from_file(\%OPT,$opt_C) 
+      or die("you asked to load args from $opt_C, but file's not on disk");
+   ### %OPT
+}
+
+
+###############################################################################
+# check we have all options wanted
+# turn into args
+my $u = usage();
+while ( $u=~/\s+-(\w)\s(\w+)\s+(.+)\*/g ){
+   my($option,$value,$desc)=($1,$2,$3);
+   shomp $desc;
+   $OPT{$option} or die("missing $desc (-$option), value must be $value");
+}
+
+
+
+###############################################################################
+# check login credentials
+my $wp = _wordpress_xmlrpc_object_or_die(\%OPT);
+
+
+
+###############################################################################
+# resolve options 
+#
+if( my $count = scalar @ARGV ){
+   $count ==1 or die("can only set one FILE as argument for post content file");
+   $opt_d and die("use either the -d argument OR an argument, not both");
+   $opt_d = $ARGV[0];
+}
+   
+if( $opt_d ){ # description content file
+   -f $opt_d or die("not on disk $opt_d");
+   $opt_d = slurp($opt_d);
+
+   if ($opt_k){
+      # if we see a newline but the chars in between are word chars not uppercase
+      $opt_d=~s/(?<=[a-z])\s*\n(?=[a-z])/ /g;
+      # this helps prevent wordpress from adding breaks where we dont want then
+      # because for flat text files, 80 width is great
+      # but for the web, not so much
+   }
+
+
+   length($opt_d) > 10 or warn("description had very little length");
+   ### description content seems ok
+}
+
+if ($opt_D){ # date
+   $opt_D = _date2wordpressdate($opt_D) or die;      
+}
+
+###############################################################################
+### if categories specified.. make sure they exist for real
+if ($opt_c){# categories
+
+   my @cats;
+   my @wanted = split(/,/,$opt_c);
+
+   for my $category_arg (@wanted){      
+      shomp $category_arg;
+      my ($name,$id)=_resolve_cat_arg($wp, $category_arg) or die;
+      push @cats, $name;      
+   }
+
+   $opt_c=[ @cats ];
+   ### $opt_c
+   ### categories ok
+}
+
+
+
+
+###############################################################################
+### BUILD STRUCT
+my $struct;
+if ($opt_D){ # date
+   $struct->{dateCreated} = $opt_D;
+   $struct->{date_created_gmt} = undef; # maybe needs that
+}
+
+$struct->{title}=$opt_t;
+if ($opt_c){ $struct->{categories} = $opt_c; }
+if ($opt_d){
+   $struct->{description} = $opt_d;
+}
+
+
+
+
+
+
+###############################################################################
+### INSERT POST
+### $opt_n
+
+unless( $opt_n){
+   my $new_post_id = $wp->newPost($struct, 1) or die("failed");
+   ### $new_post_id
+
+}
+
+exit 0;
+
+
+
+
+###############################################################################
+### subs
+
+sub slurp {   
+   open(FILE, '<', $_[0]) or warn("Can't open file for reading: '$_[0]', $!") and return;   
+   local $/;
+   my $text = <FILE>;
+   close FILE or die($!);
+   $text;
+}
+
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+wordpress-upload-post - upoad post to wordpress
+
+=head1 DESCRIPTION
+
+If you provide a date, we check for correctness before attempt.
+If you specify a category or more, we check that they do exist.
+
+=head2 Motivation
+
+I've workded on other cli scripts to wordpress- but I found them too complex.
+This simply allows you to post content to a category in your blog, via the comand line.
+
+=head1 USAGE
+
+wordpress-upload-post [OPTIONS].. [PATH|DESCRIPTION]
+
+   -d path     simple text/html FILE containing content 
+   -h          help
+   -t string   title *
+   -D string   date
+   -c number   category name or id, can be comma separated 
+   -u string   username *
+   -p string   password *
+   -x url      proxy, xmlrpc address *
+   -n          don't post, just test
+   -k          clean description text
+
+* Required.
+
+=head2 USAGE EXAMPLES
+
+Load the login info from a file:
+   wordpress-upload-post -d ./content.txt -t 'Red House Found' -C ./conf.txt 
+
+Login conf example file:
+
+   -u usenamejim
+   -p passew2t42t
+   -x http://jimmysite.net/xmlrpc.php
+
+Set a date for the post, also upload to category 'yummy' and 'broke', you can also specify 
+an id for a category instead, we check that the category exists.
+
+   wordpress-upload-post -D 'June 2001' -t 'simple title' -c 'yummy,broke,35' -u leo -p 2g32 -x http://site.com/xmlrpc.php
+
+You may specify the file with content for the description (the body of the post), via -d
+argument or via an argument. Not both, and not more than one.
+
+
+=head3 clean description text flag
+
+If you want to clean the description text, use the -k flag.
+This makes it so
+
+   This is another kind of 
+   break that happens here.
+   
+   As well as this 
+    one.
+
+Gets turned to
+
+   This is another kind of break that happens here.
+   
+   As well as this 
+    one.
+
+This is useful if you have as decription input file, properly formatted 80 char wide
+data. This prevents wordpress from inserting breaks where we don't want them.
+For the web, it's best to have only paragraphs, the user can set the width and.. well.
+You know the argument.
+   
+
+
+=head1 SEE ALSO
+
+WordPress::XMLRPC
+WordPress::CLI - parent package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

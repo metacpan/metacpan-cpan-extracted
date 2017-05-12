@@ -1,0 +1,105 @@
+NAME
+    WWW::PunchTab - PunchTab REST API
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use WWW::PunchTab;
+        use Data::Dumper;
+
+        my $pt = WWW::PunchTab->new(
+            domain     => 'fayland.org',
+            access_key => 'f4f8290698320a98b1044615e722af79',
+            client_id  => '1104891876',
+            secret_key => 'ed73f70966dd10b7788b8f7953ec1d07',
+        );
+
+        $pt->sso_auth(
+            {'id' => '2', 'first_name' => 'Fayland', 'last_name' => 'Lam', 'email' => 'fayland@gmail.com'}
+        ) or die $pt->errstr;
+
+        my $x = $pt->create_activity('view', 200) or die $pt->errstr; # view with 200 points
+        print Dumper(\$x);
+
+DESCRIPTION
+    <http://www.punchtab.com/developer-docs#REST-API-Documentation>
+
+  METHODS
+   CONSTRUCTION
+        my $pt = WWW::PunchTab->new(
+            domain     => 'fayland.org',
+            access_key => 'f4f8290698320a98b1044615e722af79',
+            client_id  => '1104891876',
+            secret_key => 'ed73f70966dd10b7788b8f7953ec1d07',
+        );
+
+    *   domain
+
+    *   access_key
+
+    *   client_id
+
+    *   secret_key
+
+        All required.
+
+   sso_auth
+        $pt->sso_auth(
+            {'id' => '2', 'first_name' => 'Fayland', 'last_name' => 'Lam', 'email' => 'fayland@gmail.com'}
+        ) or die $pt->errstr;
+
+   sso_auth_js
+        print $pt->sso_auth_js({'id' => '2', 'first_name' => 'Fayland', 'last_name' => 'Lam', 'email' => 'fayland@gmail.com'});
+
+    js sso auth example:
+
+        var _pt_pre_config = {
+            auth_request: 'xxx',
+            signature: 'xxx',
+            timestamp: 1348843966,
+            client_id: 123
+        };
+
+   auth_logout
+        my $status = $pt->auth_logout or die $pt->errstr;
+
+   auth_status
+    return 'connected' or 'disconnected'
+
+        my $status = $pt->auth_status($access_token) or die $pt->errstr;
+
+   activity
+        my $activity = $pt->activity() or die $pt->errstr;
+        my $activity = $pt->activity('like') or die $pt->errstr;
+
+   create_activity
+         my $x = $pt->create_activity('view', 200) or die $pt->errstr; # view with 200 points
+
+   redeem_reward
+         my $x = $pt->redeem_reward($reward_id) or die $pt->errstr;
+
+   leaderboard
+         my $leaderboard = $pt->leaderboard() or die $pt->errstr;
+         my $leaderboard = $pt->leaderboard(
+            with => 'me',
+            limit => 20,
+            page  => 1,
+         ) or die $pt->errstr;
+
+   reward
+         my $reward = $pt->reward() or die $pt->errstr;
+         my $reward = $pt->reward($limit) or die $pt->errstr;
+
+   user
+         my $user = $pt->user() or die $pt->errstr;
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,18 @@
+author: John Cappiello <jcap@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: WWW-Google-API
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Test::Deep: 0
+  XML::Atom::Entry: 0
+  XML::Atom::Util: 0
+  YAML::Syck: 0
+version: 0.003

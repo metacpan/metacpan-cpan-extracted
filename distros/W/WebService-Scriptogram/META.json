@@ -1,0 +1,59 @@
+{
+   "abstract" : "Scriptogr.am API",
+   "author" : [
+      "Steve Huff <shuff@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Scriptogram",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Params::Validate" : "0",
+            "Readonly" : "0",
+            "WebService::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Scriptogram" : {
+         "file" : "lib/WebService/Scriptogram.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Scriptogram"
+      },
+      "homepage" : "https://github.com/hakamadare/webservice-scriptogram",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hakamadare/webservice-scriptogram.git"
+      }
+   },
+   "version" : "v0.0.2"
+}

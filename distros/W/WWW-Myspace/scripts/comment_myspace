@@ -1,0 +1,358 @@
+#!/usr/bin/perl -w
+######################################################################
+# comment_myspace
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: comment_myspace,v 1.3 2006/03/15 01:49:48 grant Exp $
+######################################################################
+# Copyright (c) 2005 Grant Grueninger, Commercial Systems Corp.
+#
+
+=head1 NAME
+
+comment_myspace - Leave a comment for your Myspace friends
+
+=head1 VERSION
+
+Version 0.03
+
+=cut
+
+our $VERSION = '0.03';
+
+=head1 SYNOPSIS
+
+ usage: comment_myspace ( -m message | -f filename ) [-y] [-d] [-i] [-r]
+     [-n max_count] [-u username -p password] [-c cache_file]
+     [friendID ...]
+
+Simple script to leave a comment for each of our friends using the
+WWW::Myspace::Comment Perl module.  By default, it will leave a maximum
+of 50 comments (see the -n option below), then exit displaying
+a message containing the result code returned from the post_comments
+method (DONE, COUNTER, or CAPTCHA). "perldoc WWW::Myspace::Comment" for
+more info.
+
+=over
+
+=item -m message
+
+Post "message" to the friends' page (beware shell escapes!)
+
+=item -f filename
+
+Read the account, password, and message from filename. The file
+must contain the username on the first line, the password on the
+second line, and the message starting on the third line, like this:
+
+	joe@somewhere.com
+	ILike2havelongpasswords
+	Just stopping by to say hi!
+	
+	- Joe
+
+The above will set username to "joe@somewhere.com", the password
+to "ILike2havelongpasswords", and the message to:
+
+  Just stopping by to say hi!
+  
+  - Joe
+
+All characters are safe when passing comments this way, and you
+can also pass HTML in the message. Note that myspace does allow users
+to strip HTML from comments, so make sure your stripped message
+is still readable.
+
+=item -y
+
+Yes mode: Don't ask for confirmation, just do it. (careful!!!)
+This is for cron jobs, but normally you should use the confirmation
+to make sure the shell hasn't munged your message and that the friend
+count and exclusion count look ok before you go send stuff you didn't
+want to people you didn't want to...
+
+=item -d
+
+Inserts a random delay before running. Do this is you're running the
+script from crontab to make it look more like a human.
+
+=item -i
+
+Ignore Duplicates.  If the -i flag is passed, comment_myspace will not
+check the profile page for duplciate comments, it will just post.
+
+=item -r
+
+Reset the exclusions file.  comment_myspace remembers who it has commented
+before and won't comment them again.  Using the -r flag resets this list
+(maybe I should call it -f for "forget?" :)
+Use this if you want to post a new comment to people and you don't
+care if you've commented them before. Note that unless you
+use the -i flag also, comment_myspace will still skip profiles on which
+it sees your profile link already.
+
+The reset is done -before- commenting begins.
+
+=item -n max_count
+
+Only post max_count comments.  This defaults to 50 in
+WWW::Myspace::Comment as of this writing.  Setting a value here will
+pass it to the WWW::Myspace::Comment object. This is mostly useful
+for posting fewer than 50 comments at a time, since Myspace
+won't let you post more than that without giving you a CAPTCHA.
+
+=item -u username
+
+Use "username" as the username when logging in
+
+=item -p password
+
+Use this password to log in (must be provided if -u is used
+
+=item friendID
+
+Post to this (or these) friendIDs only
+
+=item -c cache_file
+
+Use "cache_file" as the file to store/read the list of friends
+we've commented. As comments are left, the status of the post will
+be written to this file. If you don't provide this,
+the default cache_file will be used. See WWW::Myspace::Comment
+for details.
+
+=back
+
+=head1 Examples
+
+  Post to only two friends (will prompt for username
+  and password):
+  comment -m 'Merry Christmas\!\!\!' 370234 275034
+  
+  Post "Happy New Year!!!" to all our friends (will prompt for username
+  and password):
+  comment -m 'Happy New Year\!\!\!'
+
+  Post to all Joe's friends using "joe@somewhere.com"'s account:
+  comment -m 'Just saying hi' -u joe@somewhere.com -p FooBar92
+
+=head1 Known Issues / To Do
+
+CAPTCHA: MySpace.com allows 53 or 55 posts before requiring a CATCHA
+response, then allows 3 before requiring it agian. Not sure what the
+timeout is on this (12 hours?).
+
+Note that the evolving point of leaving comments is to make sure that
+we're linked to from as many pages as possible, and mentioned on as
+many pages as possible. We want to appear to "be everywhere". Since we
+can only post to about 50 pages a day, we maximize our exposure by
+checking each page we're going to post on to see if we're already there
+and skipping it if we are.
+
+To Do:
+
+  - Provide a CGI interface so band members can coordinate and type in the
+    CAPTCHA code. Interface would act as a relay: for each person we'd
+    auto-post to, display the filled in comment form and have them customize
+    it and/or fill in the captcha code. Could run in semi-automatic mode
+    where it'd only display the page for them if it got a code request.
+
+=cut
+
+#
+######################################################################
+# Setup
+
+# Debugging?
+$DEBUG=0;
+
+######################################################################
+# Libraries we use
+
+($DEBUG) && print "Getting Libraries...\n";
+use WWW::Myspace;
+use WWW::Myspace::Comment;
+
+######################################################################
+# Main Program
+
+# Get passed arguments
+my %args = &parse_args(@ARGV);
+
+# Wait?
+if ( defined $args{'delay'} ) {
+	# Randomly delay up to 1 hour
+	sleep 60 * int( rand( 60 ) )
+}
+
+# Log in, let "WWW::Myspace" prompt for username and password
+print "Logging in to myspace...\n";
+my $myspace = "";
+if ( $args{"username"} ) {
+	$myspace = WWW::Myspace->new( $args{"username"}, $args{"password"} );
+} else {
+	$myspace = new WWW::Myspace;
+}
+die "Login failed\n" unless ( $myspace->logged_in );
+
+# Get list of friends (comment would do the get_friends thing for us, 
+# but we'll do it here so we can display more complete info to the user).
+print "Logged in. Getting friends...\n";
+if ( $args{'friend_ids'} ) {
+	@friend_ids = @{$args{'friend_ids'}};
+} else {
+	@friend_ids = $myspace->get_friends;
+}
+
+# Get our Comment object
+my $comment = WWW::Myspace::Comment->new( $myspace );
+
+# Set max_count if we need to
+if ( $args{'max_count'} ) {
+	$comment->max_count( $args{'max_count'} )
+}
+
+# Set ignore_exclusinos if we need to
+if ( defined $args{'ignore_duplicates'} ) {
+	$comment->ignore_duplicates(1);
+}
+
+# Set bypass
+if ( defined $args{'bypass'} ) {
+	$comment->{send_message_on_captcha} = 1;
+}
+
+# Set the exclusions file if they gave us one.
+$comment->cache_file( $args{'cache_file'} ) if ( defined $args{'cache_file'} );
+
+# Reset exclusions file if we need to
+if ( defined $args{'reset_exclusions'} ) {
+	$comment->reset_exlucions('all')
+}
+
+# Get the list of exclusions (we just want the count, really, but
+# this does it.
+@exclusions = $comment->exclusions;
+
+# Tell them what we're going to do
+print "Sending the following comment to ". @friend_ids ." friends,\n".
+	"excluding " . @exclusions . " friends:\n\n" .
+	$args{'message'} . "\n\n";
+
+# Unless they said to just go ahead (i.e. when running from cron),
+# confirm first.
+unless ( $args{'silent'} ) {
+
+	print "Ok (y/n)? ";
+	my $ans=<STDIN>;
+	unless ( $ans =~ /y/i ) { exit 1; }
+
+}
+
+# Comment them
+$comment->noisy(1);
+my $result = $comment->post_comments( $args{'message'}, @friend_ids );
+
+print "Done. Stopped due to $result\n";
+
+#----------------------------------------------------------------------
+# parse_args( @ARGS )
+# Parse command-line arguments and return a has of values
+
+sub parse_args {
+
+	my ( @passed_args ) = @_;
+
+	# Initialize
+	my %args = ();
+	my @friend_ids = ();
+
+	while ( $arg = shift( @passed_args ) ) {
+		if ( $arg eq "-m" ) {
+			$args{'message'} = shift( @passed_args )
+		} elsif ( $arg eq "-y" ) {
+			$args{'silent'}=1;
+		} elsif ( $arg eq "-d" ) {
+			$args{'delay'}=1;
+		} elsif ( $arg eq "-u" ) {
+			$args{'username'}=shift( @passed_args );
+		} elsif ( $arg eq "-p" ) {
+			$args{'password'}=shift( @passed_args );
+		} elsif ( $arg eq "-f" ) {
+			$args{'filename'}=shift( @passed_args );
+		} elsif ( $arg eq "-c" ) {
+			$args{'cache_file'}=shift( @passed_args );
+		} elsif ( $arg eq "-n" ) {
+			$args{'max_count'}=shift( @passed_args );
+		} elsif ( $arg eq "-i" ) {
+			$args{'ignore_duplicates'}=1;
+		} elsif ( $arg eq "-r" ) {
+			$args{'reset_exclusions'}=1;
+		} elsif ( $arg eq "-b" ) {
+			$args{'bypass'}=1;
+		} elsif ( $arg =~ /^[0-9]+$/ ) {
+			push ( @friend_ids, $arg );
+		} else {
+			print "Invalid argument: $arg\n";
+			&fail()
+		}
+
+	}
+
+	# Add friends if we got them
+	if ( @friend_ids ) {
+		$args{'friend_ids'} = \@friend_ids;
+	}
+
+	# Verify data
+	if ( ( $args{'username'} ) && ( ! $args{'password'} ) ) {
+		print "You must specify a password if you provide a username\n";
+		&fail();
+	}
+	
+	# Check for -f flag - means we read username, password, and message
+	# from a file
+	if ( defined $args{'filename'} ) {
+		open FILE, "<$args{'filename'}" or die "Invalid filename: $args{'filename'}";
+		
+		$args{'username'} = <FILE>;
+		$args{'password'} = <FILE>;
+		undef $args{'message'}; # Just in case...
+		foreach $line ( <FILE> ) {
+			$args{'message'} .= $line;
+		}
+		
+		close FILE;
+	}
+	
+	# Check the comment
+	unless ( $args{'message'} ) {
+		print "Must provide a message to post using the -m flag\n";
+		&fail();
+	}
+	
+	# Debugging output
+	if ( $DEBUG ) {
+		print "Got arguments:\n";
+		foreach $arg (sort( keys( %args ) ) ) {
+			print "$arg:" . $args{"$arg"} . "\n";
+		}
+	}
+
+	# Return our arguments
+	return %args;
+}
+
+#----------------------------------------------------------------------
+# fail()
+# Print usage and exit
+
+sub fail {
+
+	print <<EOT;
+ usage: comment_myspace ( -m message | -f filename ) [-y] [-d] [-i]
+     [-n max_count] [-u username -p password] [-c cache_file]
+     [friendID ...]
+EOT
+	exit 1;
+
+}

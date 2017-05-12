@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Reddit.t
+lib/WWW/Reddit.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+---
+abstract: "Interact with Mailman's web interface from a Perl program"
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Mailman
+requires:
+  Carp: '0'
+  HTTP::Cookies: '0'
+  URI: '0'
+  WWW::Mechanize: '1.52'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mailman
+  repository: http://github.com/book/WWW-Mailman.git
+version: '1.061'
+x_contributors:
+  - 'Gábor Szabó <szabgab@cpan.org>'
+  - <reinpost@win.tue.nl>

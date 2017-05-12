@@ -1,0 +1,90 @@
+Sample Addressbook Application for Apache::WeSQL version 0.53
+=============================================================
+
+This directory contains the 'sample' application, basically an Addressbook application for WeSQL.
+
+You have just installed WeSQL, and now you want to see what it can do, right? The good news is that you've come to the right place. But, you'll have to do a few things to get it working.
+
+First we need to have a working database in place. Is your MySQL or PostgreSQL up and running? If not, make sure it is!
+Also, you haven't forgotten about these perl modules that need to be installed, or did you?
+
+       o DBI
+       o Data-ShowTable
+       o ApacheDBI
+       o DBD-Mysql or DBD-Pg	(don't use the Msql-Mysql module, it has bugs!)
+
+Now let's create the database for the addressbook application. In the database directory you will find 6 files:
+
+pg_recreatedb.sh
+pg_recreate_tables.sql
+pg_startdata.sql
+recreatedb.sh
+recreate_tables.sql
+startdata.sql
+
+If you use PostgreSQL, you will only need the files starting with pg_. If you are using MySQL, you'll only need the other three files.
+
+1. First of all, verify that you don't already have a database called 'addressbook'. Any database with this name will be mercilessly erased, you have been warned!
+2. Edit the (pg_)recreatedb file. Update the user/password combination for your system following the instructions at the top of the file.
+3. Have a look through (pg_)recreate_tables.sql
+4. Have a look through (pg_)startdata.sql
+5. Take a deep breath and run (pg_)recreatedb.sh
+
+So, now we should have our 'addressbook' database in place, and even with some initial data in it. Verify this.
+
+Next, edit WeSQL.pl in the 'conf' directory (just one level deeper in the tree than this README file).
+
+1. If you are using PostgreSQL, comment the $dbtype and $dsn for MySQL, and uncomment the ones for PostgreSQL
+2. Make sure the $dbuser and $dbpass are a sensible combination with access to the 'addressbook' database on your system.
+
+Finally, we need to configure Apache to use WeSQL. This can be done by adding the following lines to the httpd.conf file:
+
+           PerlModule Apache::DBI
+           PerlSetVar WeSQLConfig /PATH_TO_THE_SAMPLEAPPLICATION/conf/WeSQL.pl
+           PerlModule Apache::WeSQL::AppHandler
+
+           <FilesMatch "*.wsql">
+             SetHandler perl-script
+             PerlHandler Apache::WeSQL::AppHandler
+           </FilesMatch>
+           DocumentRoot "/PATH_TO_THE_SAMPLEAPPLICATION/public_html"
+           DirectoryIndex index.wsql
+
+I usually make a separate Virtual Host in the configuration file, like this:
+
+             NameVirtualHost YOURIPHERE
+             PerlModule Apache::DBI
+
+             <VirtualHost YOURIPHERE>
+               ServerAdmin someone@somewhere.org
+               ServerName somesite.somewhere.org
+               ErrorLog logs/somesite.somewhere.org-error_log
+               CustomLog logs/somesite.somewhere.org-access_log combined
+
+               PerlSetVar WeSQLConfig /PATH_TO_THE_SAMPLEAPPLICATION/conf/WeSQL.pl
+               PerlModule Apache::WeSQL::AppHandler
+
+               <FilesMatch "*.wsql">
+                 SetHandler perl-script
+                 PerlHandler Apache::WeSQL::AppHandler
+               </FilesMatch>
+               DocumentRoot "/PATH_TO_THE_SAMPLEAPPLICATION/public_html"
+               DirectoryIndex index.wsql
+             </VirtualHost>
+
+Don't forget to adapt the path and your IP address, and probably the ServerName & CustomLog & ErrorLog directives too.
+
+Well that should do it. Restart your web server and try it out! Don't forget that you will need to restart Apache every time you change something in WeSQL.pl (which is basically hardly ever as the configuration in there is fairly static).
+
+The whole site lives in the 'public_html' directory. Have a look through it, and see that the whole application is 61 KB :-)
+
+All the other documentation is in the man pages: Apache::WeSQL, Apache::WeSQL::Display, Apache::WeSQL::Journalled, Apache::WeSQL::SqlFunc, Apache::WeSQL::Auth, and Apache::WeSQL::AppHandler.
+
+Do drop me a line at w@wesql.org about how you use WeSQL, and enjoy!
+Ward Vandewege,
+2002.05.19
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2000-2002 Ward Vandewege. This program is free software; you can redistribute it and/or modify it under the terms of the GPL.
+See the file COPYING in this directory for more information.

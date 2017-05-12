@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+ex/pshell.pl
+lib/WWW/Postini.pm
+lib/WWW/Postini/Assert.pm
+lib/WWW/Postini/Constants.pm
+lib/WWW/Postini/Exception.pm
+lib/WWW/Postini/UserAgent.pm
+lib/WWW/Postini/Exception/AssertionFailure.pm
+lib/WWW/Postini/Exception/InvalidParameter.pm
+lib/WWW/Postini/Exception/LoginFailure.pm
+lib/WWW/Postini/Exception/UnexpectedResponse.pm
+t/WWW-Postini.t

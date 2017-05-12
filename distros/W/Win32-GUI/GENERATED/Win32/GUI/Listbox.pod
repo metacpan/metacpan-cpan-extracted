@@ -1,0 +1,531 @@
+
+=head1 NAME
+
+Win32::GUI::Listbox - Create and manipulate listbox controls
+
+=head1 DESCRIPTION
+
+[TBD]
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new Listbox object;
+can also be called as PARENT->AddListbox(%OPTIONS).
+
+Class specific B<%OPTIONS> are:
+
+   -multisel => 0/1/2 (default 0)
+       specifies the selection type:
+           0 single selection
+           1 multiple selection
+           2 multiple selection ehnanced (with Shift, Control, etc.)
+   -sort     => 0/1 (default 0)
+       items are sorted alphabetically.
+   -multicolumn => 0/1 (default 0)
+   -nointegralheight => 0/1 (default 0)
+   -noredraw => 0/1 (default 0)
+   -notify => 0/1 (default 0)
+   -usetabstop => 0/1 (default 0)
+   -disablenoscroll => 0/1 (default 0)
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Add
+
+B<Add(STRING, STRING .. STRING)>
+
+Add multiple string.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddFile
+
+B<AddFile(STRING)>
+
+Add the specified filename to a list box that contains a directory listing.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddString
+
+B<AddString(STRING)>
+
+Add a string to a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Count
+
+B<Count()>
+
+See L<GetCount()|Win32::GUI::Listbox/GetCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DeleteString
+
+B<DeleteString(index)>
+
+Removes the zero-based INDEX item from the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Dir
+
+B<Dir(string,flag)>
+
+Add a list of filenames to a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindString
+
+B<FindString(STRING, [INDEX])>
+
+Find the first string in a list box that contains the specified prefix.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FindStringExact
+
+B<FindStringExact(STRING, [INDEX])>
+
+Find the first Listbox string that matches the specified string.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 FirstVisibleItem
+
+B<FirstVisibleItem([INDEX])>
+
+Set or Get first visible item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetAnchorIndex
+
+B<GetAnchorIndex()>
+
+Retrieve the index of the anchor item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCaretIndex
+
+B<GetCaretIndex()>
+
+Determine the index of the item that has the focus rectangle in a multiple-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCount
+
+B<GetCount()>
+
+Returns the number of items in the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetCurSel
+
+B<GetCurSel()>
+
+Retrieve the index of the currently selected item, if any, in a single-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetHorizontalExtent
+
+B<GetHorizontalExtent()>
+
+Retrieve from a list box the width, in pixels, by which the Listbox can be scrolled horizontally (the scrollable width) if the list box has a horizontal scroll bar.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemHeight
+
+B<GetItemHeight(index)>
+
+Retrieve the height of items in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetItemRect
+
+B<GetItemRect(index)>
+
+Retrieve the dimensions of the rectangle that bounds a Listbox item as it is currently displayed in the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetLocale
+
+B<GetLocale()>
+
+Retrieve the current locale of the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSel
+
+B<GetSel(index)>
+
+Retrieve the selection state of an item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelCount
+
+B<GetSelCount()>
+
+Retrieve the total number of selected items in a multiple-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetSelItems
+
+B<GetSelItems()>
+
+Returns an array containing the zero-based indexes of the selected items
+in a multiple selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetString
+
+B<GetString(INDEX)>
+
+See L<GetText()|Win32::GUI::Listbox/GetText>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetText
+
+B<GetText(INDEX)>
+
+Returns the string at the specified zero-based INDEX in the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTextLen
+
+B<GetTextLen()>
+
+Retrieve the length of a string in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetTopIndex
+
+B<GetTopIndex()>
+
+Retrieve the index of the first visible item in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertItem
+
+B<InsertItem(STRING, [INDEX])>
+
+See L<InsertString()|Win32::GUI::Listbox/InsertString>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InsertString
+
+B<InsertString(STRING, [INDEX])>
+
+Inserts an item at the specified zero-based B<INDEX> in the Listbox,
+or adds it at the end if INDEX is not specified.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Item
+
+B<Item(INDEX)>
+
+Return an Listbox::Item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemFromPoint
+
+B<ItemFromPoint(X, Y)>
+
+Retrieve the zero-based index of the item nearest the specified point in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ItemHeight
+
+B<ItemHeight([HEIGHT])>
+
+Gets or sets the items height in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 List
+
+B<List()>
+
+Return a list of Listbox::Item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RemoveItem
+
+B<RemoveItem(index)>
+
+See L<DeleteString()|Win32::GUI::Listbox/DeleteString>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ResetContent
+
+B<ResetContent()>
+
+Remove all items from a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Select
+
+B<Select(INDEX)>
+
+See L<SetCurSel()|Win32::GUI::Listbox/SetCurSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectCount
+
+B<SelectCount()>
+
+See L<GetSelCount()|Win32::GUI::Listbox/GetSelCount>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItem
+
+B<SelectedItem()>
+
+See L<GetCurSel()|Win32::GUI::Listbox/GetCurSel>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectedItems
+
+B<SelectedItems()>
+
+See L<GetSelItems()|Win32::GUI::Listbox/GetSelItems>
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelectString
+
+B<SelectString(STRING, [INDEX])>
+
+Search in a Listbox for an item that begins with the characters in a specified string. If a matching item is found, the item is selected.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelItemRange
+
+B<SelItemRange(FIRST,LAST,[FLAG=TRUE])>
+
+Select one or more consecutive items in a multiple-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelItemRangeEx
+
+B<SelItemRangeEx(FIRST,LAST)>
+
+Select one or more consecutive items in a multiple-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetAnchorIndex
+
+B<SetAnchorIndex(index)>
+
+Set the anchor item that is, the item from which a multiple selection starts. A multiple selection spans all items from the anchor item to the caret item.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCaretIndex
+
+B<SetCaretIndex(index)>
+
+Set the focus rectangle to the item at the specified index in a multiple-selection Listbox. If the item is not visible, it is scrolled into view.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetColumnWidth
+
+B<SetColumnWidth(Width)>
+
+Set the width, in pixels, of all columns in a multi-column Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCount
+
+B<SetCount(Count)>
+
+Set the count of items in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetCurSel
+
+B<SetCurSel(INDEX)>
+
+Selects the zero-based INDEX item in the Listbox.  Can only be used
+with single selection listboxes.  For multiple-selection listboxes
+see L<SetSel()|Win32::GUI::Listbox/SetSel>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetHorizontalExtent
+
+B<SetHorizontalExtent(cxExtent)>
+
+Set the width, in pixels, by which a Listbox can be scrolled horizontally.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetItemHeight
+
+B<SetItemHeight(Height)>
+
+Set the height, in pixels, of items in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetLocal
+
+B<SetLocal(local)>
+
+Set the current locale of the Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetSel
+
+B<SetSel(index,[FLAG=TRUE])>
+
+Select a string in a multiple-selection Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTabStops
+
+B<SetTabStops(...)>
+
+Set the tab-stop positions in a Listbox.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetTopIndex
+
+B<SetTopIndex(index)>
+
+Ensure that a particular item in a Listbox is visible.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Click
+
+B<Click()>
+
+DEPRECATED use SelChange event.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DblClick
+
+B<DblClick()>
+
+Sent when the user double clicks on the control.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GotFocus
+
+B<GotFocus()>
+
+Sent when the control is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 LostFocus
+
+B<LostFocus()>
+
+Sent when the control is deactivated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelCancel
+
+B<SelCancel()>
+
+Sent when the user cancels the selection in a Listbox.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SelChange
+
+B<SelChange()>
+
+[TBD]
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

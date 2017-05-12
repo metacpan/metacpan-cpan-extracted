@@ -1,0 +1,8 @@
+Workflow::Lite - A very simplistic workflow framework
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

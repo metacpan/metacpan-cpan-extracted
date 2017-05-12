@@ -1,0 +1,18 @@
+  Thursday, August 9th, 6:53pm at FreeGeek – 1731 SE 10th Ave.
+
+= rosettacode.org chrestomathy review
+
+We will review some of the examples from rosettacode.org, with a focus on Perl 6 (and Perl 5), but may also compare to some of the other language examples.
+
+Please volunteer to pick an example or two to review.  Just look for something with a Perl 6 implementation and be prepared to talk us through the problem statement and how the Perl 6 solution works.
+
+Agenda:
+
+* your name here - problem link
+* Eric - [http://rosettacode.org/wiki/Sum_digits_of_an_integer Sum Digits of an Integer]
+* Igal - [http://rosettacode.org/wiki/99_Bottles_of_Beer 99 Bottles of Beer]
+* Anthony - [http://rosettacode.org/wiki/Fibonacci_n-step_number_sequences#Perl_6 n-onacci]
+
+* you - [http://rosettacode.org/wiki/Sorting_algorithms/Strand_sort Strand Sort] - from Larry's state of the onion
+
+See also: [https://github.com/rakudo/star/downloads/ Rakudo Star] [https://github.com/sorear/niecza/ Niecza]

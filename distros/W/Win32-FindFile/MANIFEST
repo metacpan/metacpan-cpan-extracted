@@ -1,0 +1,14 @@
+Changes
+FindFile.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/01-use.t
+t/02-wchar.t
+t/03-is_entry.t
+t/04-relname.t
+lib/Win32/FindFile.pm
+lib/Win32/FindFile/FileData.pm
+META.yml                                 Module meta-data (added by MakeMaker)

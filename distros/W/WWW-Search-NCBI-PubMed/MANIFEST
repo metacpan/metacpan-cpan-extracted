@@ -1,0 +1,18 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+t/WWW-Search-NCBI-PubMed.t
+lib/WWW/Search/NCBI/PubMed.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+
+example/ENTRY
+example/response.htm
+example/response.txt
+lib/WWW/Search/NCBI/PubMed/article_to_ascii.xslt
+lib/WWW/Search/NCBI/PubMed/article_to_html.xslt
+script/pubmed.pl
+xml/dtd/nlmcommon.dtd
+xml/dtd/nlmmedline.dtd
+xml/dtd/nlmmedlinecitation.dtd
+xml/dtd/pubmed_001211.dtd

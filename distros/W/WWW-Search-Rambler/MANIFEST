@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/www-search-rambler.t
+lib/WWW/Search/Rambler.pm
+example/rambler-ru.pl
+META.yml                                 Module meta-data (added by MakeMaker)

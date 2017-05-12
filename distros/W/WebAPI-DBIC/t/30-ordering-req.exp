@@ -1,0 +1,150 @@
+=== order by PK asc
+Request:
+GET /cd?order=me.cdid
+Accept: application/vnd.wapid+json
+Response:
+200 OK
+Content-type: application/vnd.wapid+json
+[
+   {
+      "artist" : 1,
+      "cdid" : 1,
+      "genreid" : 1,
+      "single_track" : null,
+      "title" : "Spoonful of bees",
+      "year" : "1999"
+   },
+   {
+      "artist" : 1,
+      "cdid" : 2,
+      "genreid" : 2,
+      "single_track" : null,
+      "title" : "Forkful of bees",
+      "year" : "2001"
+   },
+   {
+      "artist" : 1,
+      "cdid" : 3,
+      "genreid" : 2,
+      "single_track" : null,
+      "title" : "Caterwaulin' Blues",
+      "year" : "1997"
+   },
+   {
+      "artist" : 2,
+      "cdid" : 4,
+      "genreid" : 3,
+      "single_track" : null,
+      "title" : "Generic Manufactured Singles",
+      "year" : "2001"
+   },
+   {
+      "artist" : 3,
+      "cdid" : 5,
+      "genreid" : 4,
+      "single_track" : null,
+      "title" : "Come Be Depressed With Us",
+      "year" : "1998"
+   }
+]
+
+=== order by PK desc
+Request:
+GET /cd?order=me.cdid%20desc&fields=cdid,year
+Accept: application/vnd.wapid+json
+Response:
+200 OK
+Content-type: application/vnd.wapid+json
+[
+   {
+      "cdid" : 5,
+      "year" : "1998"
+   },
+   {
+      "cdid" : 4,
+      "year" : "2001"
+   },
+   {
+      "cdid" : 3,
+      "year" : "1997"
+   },
+   {
+      "cdid" : 2,
+      "year" : "2001"
+   },
+   {
+      "cdid" : 1,
+      "year" : "1999"
+   }
+]
+
+=== order by year desc and title desc
+Request:
+GET /cd?sort=me.year%20desc,title%20desc&fields=cdid,year,title
+Accept: application/vnd.wapid+json
+Response:
+200 OK
+Content-type: application/vnd.wapid+json
+[
+   {
+      "cdid" : 4,
+      "title" : "Generic Manufactured Singles",
+      "year" : "2001"
+   },
+   {
+      "cdid" : 2,
+      "title" : "Forkful of bees",
+      "year" : "2001"
+   },
+   {
+      "cdid" : 1,
+      "title" : "Spoonful of bees",
+      "year" : "1999"
+   },
+   {
+      "cdid" : 5,
+      "title" : "Come Be Depressed With Us",
+      "year" : "1998"
+   },
+   {
+      "cdid" : 3,
+      "title" : "Caterwaulin' Blues",
+      "year" : "1997"
+   }
+]
+
+=== order by year desc and title desc using JSON API style
+Request:
+GET /cd?sort=-year,-title&fields=cdid,year,title
+Accept: application/vnd.wapid+json
+Response:
+200 OK
+Content-type: application/vnd.wapid+json
+[
+   {
+      "cdid" : 4,
+      "title" : "Generic Manufactured Singles",
+      "year" : "2001"
+   },
+   {
+      "cdid" : 2,
+      "title" : "Forkful of bees",
+      "year" : "2001"
+   },
+   {
+      "cdid" : 1,
+      "title" : "Spoonful of bees",
+      "year" : "1999"
+   },
+   {
+      "cdid" : 5,
+      "title" : "Come Be Depressed With Us",
+      "year" : "1998"
+   },
+   {
+      "cdid" : 3,
+      "title" : "Caterwaulin' Blues",
+      "year" : "1997"
+   }
+]
+

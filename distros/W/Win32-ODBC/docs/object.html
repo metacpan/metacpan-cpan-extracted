@@ -1,0 +1,480 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+
+<HTML>
+
+<!-- ***** Header ***** -->
+<HEAD>
+
+<!-- ***** Title ***** -->
+<TITLE>Win32::ODBC - Object</TITLE>
+</HEAD>
+
+<!-- *********************************************************************** -->
+<BODY>
+
+<!-- ***** Main Heading ***** -->
+<H1 ALIGN=center>Win32::ODBC - Object</H1>
+
+<!-- ***** Table of Contents ***** -->
+<HR ALIGN=center NOSHADE>
+<HR ALIGN=center NOSHADE>
+
+<H2>Contents</H2>
+
+<H3>Part I</H3>
+<UL>
+	<LI><A HREF="odbc.html#ModDesc">Module Description</A>
+	<LI><A HREF="odbc.html#Business">Business Stuff</A>
+	<UL>
+		<LI><A HREF="odbc.html#Copyright">Copyright Notice</A>
+		<LI><A HREF="odbc.html#Disclaimer">Disclaimer</A>
+		<LI><A HREF="odbc.html#GNU-GPL">GNU General Public License</A>
+		<LI><A HREF="odbc.html#LWall-AL">Larry Wall's "Artistic License"</A>
+	</UL>
+	<LI><A HREF="odbc.html#History">Version History</A>
+	<UL>
+		<LI><A HREF="odbc.html#Authors">Author List</A>
+	</UL>
+	<LI><A HREF="odbc.html#Features">Features/Limits</A>
+	<LI><A HREF="odbc.html#Install">Installation Instructions</A>
+	<LI><A HREF="odbc.html#Bugs">Bug Reports</A>
+	<LI><A HREF="odbc.html#Latest">Latest Versions</A>
+	<LI><A HREF="odbc.html#Info">For More Information on Perl</A>
+</UL>
+
+<H3>Part II</H3>
+<UL>
+	<LI><A HREF="object.html#Define">Creating an ODBC Object</A>
+	<LI><A HREF="object.html#Methods">Object Methods</A>
+	<UL>
+		<LI><A HREF="object.html#Catalog">Catalog()</A>
+		<LI><A HREF="object.html#Connection">Connection()</A>
+		<LI><A HREF="object.html#Close">Close()</A>
+		<LI><A HREF="object.html#Data">Data()</A>
+		<LI><A HREF="object.html#DataHash">DataHash()</A>
+		<LI><A HREF="object.html#DataSources">DataSources()</A>
+		<LI><A HREF="object.html#Drivers">Drivers()</A>
+		<LI><A HREF="object.html#DumpError">DumpError()</A>
+		<LI><A HREF="object.html#DumpData">DumpData()</A>
+		<LI><A HREF="object.html#Error">Error()</A>
+		<LI><A HREF="object.html#FetchRow">FetchRow()</A>
+		<LI><A HREF="object.html#FieldNames">FieldNames()</A>
+		<LI><A HREF="object.html#GetConnections">GetConnections()</A>
+		<LI><A HREF="object.html#GetDSN">GetDSN()</A>
+		<LI><A HREF="object.html#GetStmtCloseType">GetStmtCloseType()</A>
+		<LI><A HREF="object.html#GetMaxBufSize">GetMaxBufSize()</A>
+		<LI><A HREF="object.html#MoreResults">MoreResults()</A>
+		<LI><A HREF="object.html#new">new()</A>
+		<LI><A HREF="object.html#RowCount">RowCount()</A>
+		<LI><A HREF="object.html#Run">Run()</A>
+		<LI><A HREF="object.html#SetMaxBufSize">SetMaxBufSize()</A>
+		<LI><A HREF="object.html#SetStmtCloseType">SetStmtCloseType()</A>
+		<LI><A HREF="object.html#Shutdown">Shutdown()</A>
+		<LI><A HREF="object.html#Sql">Sql()</A>
+		<LI><A HREF="object.html#TableList">TableList()</A>
+	</UL>
+	<LI><A HREF="object.html#Examples">Examples</A>
+</UL>
+<P>
+
+<!-- ***** Creating an ODBC Object ***** -->
+<HR ALIGN=center>
+
+<H2><A NAME="Define">Creating an ODBC Object</A></H2>
+
+Your script will need to have the following line:<BR>
+<PRE>	use Win32::ODBC;</PRE>
+
+Then you will need to create a data connection to your DSN:<BR>
+<PRE>	$Data = new Win32::ODBC("MyDSN");</PRE>
+
+You shoud check to see if <EM>$Data</EM> is indeed defined otherwise there has
+been an error.  You can now send SQL queries and retrieve info to your heart's
+content!  See the description of functions below and also test.pl to see how it
+all works.<BR>
+<P>
+
+<STRONG><EM>Make sure that you close your connection when you are finished:</EM></STRONG>
+<PRE>	$Data->Close();</PRE>
+<P>
+
+<!-- ***** Object Methods ***** -->
+<HR ALIGN=center>
+
+<H2><A NAME="Methods">Object Methods</A></H2>
+<H3>General Note</H3>
+All methods assume that you have the line:
+
+<PRE>	use Win32::ODBC;</PRE>
+
+somewhere before the method calls, and that you have an ODBC object called $db
+which was created using some call similar to:
+
+<PRE>	$db = new Win32::ODBC("MyDSN");</PRE>
+
+See <A HREF="#new">new</A> for more information.<P>
+
+Also, in an effort to keep the examples short, no error checking is done on
+return values for any calls other than the one being exemplified.  You should
+<EM>always</EM> check for error conditions in production code.<P>
+
+<EM><STRONG>WARNING:</STRONG> The example code has not yet been tested.  This will
+be fixed ASAP, but be forwarned!</EM>
+
+<H3>Methods</H3>
+
+<!-- ***** Start the data list ***** -->
+<DL>
+
+<!-- Catalog -->
+<DT><STRONG><A NAME="Catalog">Catalog</A></STRONG>
+	<EM>qualifier</EM>, <EM>owner</EM>, <EM>name</EM>, <EM>type</EM>
+<DD>Retrieves the catalog from the current ODBC object.  Returns a four-element
+	array (Qualifier, Owner, Name, Type).  <STRONG>Note:</STRONG>All fieldnames
+	are uppercase!
+<PRE>Example:
+<STRONG>($qualifier, $owner, $name, $type) = $db->Catalog("", "", "%", "'TABLE'");</STRONG></PRE>
+<P>
+
+<!-- Connection -->
+<DT><STRONG><A NAME="Connection">Connection</A></STRONG>
+<DD>Returns the object's ODBC connection number.
+<PRE>Example:
+<STRONG>$cnum = $db->Connection;</STRONG></PRE>
+<P>
+
+<!-- Close -->
+<DT><STRONG><A NAME="Close">Close</A></STRONG>
+<DD>Closes the ODBC connection for this object.  It always returns
+	<STRONG>undef</STRONG>.
+<PRE>Example:												  
+<STRONG>$db->Close();</STRONG></PRE>
+<P>
+
+<!-- Data -->
+<DT><STRONG><A NAME="Data">Data</A></STRONG>
+<DT><STRONG>Data</STRONG> <EM>list</EM>
+<DD>Retrieve data from previous fetch for a list of field names.  In a scalar
+	context it returns all of the field values concatenated together.  In an
+	array context, it returns an array of the values, in the order in which they
+	were specified.  If no field names are given, all fields are returned in an
+	unspecified order.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT f1, f2, f3 FROM foo");
+$db->FetchRow();
+($f1, $f2) = $db->Data("f1", "f2");</STRONG>
+
+or
+
+<STRONG>$db->Sql("SELECT * FROM foo");
+$db->FetchRow();
+@values = $db->Data;</STRONG></PRE>
+
+See also: <A HREF="#DataHash">DataHash</A>
+<P>
+
+<!-- DataHash -->
+<DT><STRONG><A NAME="DataHash">DataHash</A></STRONG>
+<DT><STRONG>DataHash</STRONG> <EM>list</EM>
+<DD>Retrieve data from previous fetch for a list of field names.  Returns a hash
+	where the field name is the key.  If no field names are given, all fields
+	are returned.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT f1, f2, f3 FROM foo");
+$db->FetchRow();
+%hash = $db->DataHash("f1", "f2");
+print $hash{f1};</STRONG>
+
+or
+
+<STRONG>$db->Sql("SELECT * FROM foo");
+$db->FetchRow();
+%hash = $db->DataHash;
+foreach $key (sort(keys %hash)) {
+	print $key, '=', $hash{$key}, "\n";
+}</STRONG></PRE>
+
+See also: <A HREF="#Data">Data</A>
+<P>
+
+<!-- DataSources -->
+<DT><STRONG><A NAME="DataSources">DataSources</A></STRONG>
+<DD>Returns an associative array of Data Sources and ODBC remarks in the form
+	of:
+<PRE>$ArrayName{'DSN'} = Remark</PRE>
+where DSN is the Data Source Name and Remark is, well, the remark.
+<PRE>Example:
+<STRONG>%rem = $db->DataSources;
+print LOG qq(Current DSN's Remark: "), %rem{$db->GetDSN}, qq("\n);</STRONG></PRE>
+<P>
+
+<!-- Drivers -->
+<DT><STRONG><A NAME="Drivers">Drivers</A></STRONG>
+<DD>Returns an associative array of Drivers and their attributes in the form
+	of:
+<PRE>$ArrayName{'DRIVER'} = Attrib1;Attrib2;Attrib3;...</PRE>
+where DRIVER is the ODBC Driver Name and AttribX are the driver-defined
+attributes.
+<PRE>Example:
+<STRONG>%attrib = $db->Drivers;
+print LOG qq($driver: $attrib{$driver}\n) foreach $driver (keys %attrib);</STRONG></PRE>
+<P>
+
+<!-- DumpError -->
+<DT><STRONG><A NAME="DumpError">DumpError</A></STRONG>
+<DD>Dump to the screen details about the last error condition. This
+    includes error number, error text and the ODBC connection number that
+    caused the error (if there is one). This is used primarily for debugging.
+<PRE>Example:
+<STRONG>$db = new Win32::ODBC("My DSN");
+if (undef $db){
+    Win32::ODBC::DumpError();
+}
+if ($db->Sql("Select * FROM foo")){
+    $db->DumpError;
+}</STRONG></PRE>
+<P>
+
+<!-- DumpData -->
+<DT><STRONG><A NAME="DumpData">DumpData</A></STRONG>
+<DD>Dump to the screen all field names and the data in all rows of the current
+	dataset.  This is used primarily for debugging.
+<PRE>Example:
+<STRONG>$db->Sql("Select * FROM foo");
+$db->DumpData;</STRONG></PRE>
+<P>
+
+<!-- Error -->
+<DT><STRONG><A NAME="Error">Error</A></STRONG>
+<DD>Returns the last recorded error in the form of an array or
+    string (depending upon the context) containing the error number,
+    error text and the ODBC connection that caused the	error (if 
+    there is one). 
+<PRE>Example:
+<STRONG>die $db->Error(), qq(\n);
+
+($ErrNum, $ErrText, $ErrConn) = $db->Error();</STRONG></PRE>
+<P>
+
+<!-- FetchRow -->
+<DT><STRONG><A NAME="FetchRow">FetchRow</A></STRONG>
+<DD>Fetches the next row of data from the previous specified SQL statement.
+	You would then call <A HREF="#Data">Data</A> or <A HREF="#DataHash">DataHash</A>
+	to actually retrieve the individual elements of data.  Returns
+<STRONG>undef</STRONG> if there's an error, <STRONG>TRUE</STRONG> otherwise.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT * FROM foo");
+$db->FetchRow() || die qq(Fetch error: ), $db->Error(), qq(\n);
+$f1 = $db->Data("f1");</STRONG></PRE>
+
+See also: <A HREF="#Sql">Sql</A>, <A HREF="#Data">Data</A>,
+<A HREF="#DataHash">DataHash</A>
+<P>
+
+<!-- FieldNames -->
+<DT><STRONG><A NAME="FieldNames">FieldNames</A></STRONG>
+<DD>Returns a list of field names extracted from the current dataset.  This is
+	used mostly for testing/debugging.  FieldNames returns the data in an array,
+	with no guarantee of the order of the names.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT * FROM foo");
+$db->FetchRow();
+foreach $fd ($db->FieldNames()) print qq($fd: "), $db->Data($fd), qq("\n);</STRONG></PRE>
+<P>
+
+<!-- GetConnections -->
+<DT><STRONG><A NAME="GetConnections">GetConnections</A></STRONG>
+<DD>Returns an array of connection numbers for all objects.
+<PRE>Example:
+<STRONG>@cnums = $db->GetConnections;</STRONG></PRE>
+<P>
+
+<!-- GetDSN -->
+<DT><STRONG><A NAME="GetDSN">GetDSN</A></STRONG>
+<DT><STRONG>GetDSN</STRONG> <EM>conn</EM>
+<DD>Returns the DSN (Data Source Name) or the ODBCDriverConnect string for the
+	connection <EM>conn</EM>, or the current connection if not specified.
+<PRE>Example:
+<STRONG>print LOG qq(Current connection: "), $db->GetDSN, qq("\n);</STRONG></PRE>
+<P>
+
+<!-- GetMaxBufSize -->
+<DT><STRONG><A NAME="GetMaxBufSize">GetMaxBufSize</A></STRONG>
+<DD>Returns the current maximum single field data size, in bytes.
+<PRE>Example:
+<STRONG>$max = $db->GetMaxBufSize;
+$db->SetMaxBufSize($needed) if ($max &lt; $needed);</STRONG></PRE>
+See also: <A HREF="#SetMaxBufSize">SetMaxBufSize</A>
+<P>
+
+<!-- GetStmtCloseType -->
+<DT><STRONG><A NAME="GetStmtCloseType">GetStmtCloseType</A></STRONG>
+<DD>Returns the current ODBC close type setting.  This is used mainly for
+	debugging.  Type will be one of: SQL_CLOSE, SQL_DROP, SQL_UNBIND, or
+	SQL_RESET_PARAMS.  See <A HREF="#SetStmtCloseType">SetStmtCloseType</A> for
+	more info on what each of the types mean, and how they are used.
+<PRE>Example:
+<STRONG>$oldct = $db->GetStmtCloseType;
+$db->SetStmtCloseType(SQL_DROP);
+...
+$db->SetStmtCloseType($oldct);</STRONG></PRE>
+See also: <A HREF="#SetStmtCloseType">SetStmtCloseType</A>
+<P>
+
+<!-- MoreResults -->
+<DT><STRONG><A NAME="MoreResults">MoreResults</A></STRONG>
+<DD>Sees if more result sets are present and initializes for fetching rows from
+next result set.  You would then call <A HREF="#FetchRow">FetchRow</A> to
+actually fetch the next row of the next result set.  Returns <STRONG>undef</STRONG>
+if there's an error, <STRONG>TRUE</STRONG> otherwise.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT * FROM foo\n  SELECT * FROM bar");
+$db->FetchRow() || die qq(Fetch error: ), $db->Error(), qq(\n);
+$f1 = $db->Data("f1");
+$db->MoreResults() || die qq(Error checking for more result sets: ), $db->Error(), qq(\n);
+$db->FetchRow() || die qq(Fetch error: ), $db->Error(), qq(\n);
+$f1 = $db->Data("f1");</STRONG></PRE>
+See also: <A HREF="#Sql">Sql</A>, <A HREF="#Data">Data</A>
+<P>
+
+<!-- new -->
+<DT><STRONG><A NAME="new">new Win32::ODBC(DSN)</A></STRONG>
+<DT><STRONG>new Win32::ODBC(ODBCDriverConnect)</STRONG>
+<DD>Creates a new ODBC object, given a DSN (Data Source Name) or a properly
+	formatted ODBCDriverConnect string.  Returns the created ODBC object or
+	<STRONG>undef</STRONG> if there is an error.
+<PRE>Example:
+<STRONG>$DSN = "MyDSN";
+$db = new Win32::ODBC($DSN);
+die qq(Cannot open new ODBC\n) if ! $db;</STRONG>
+
+or
+
+<STRONG>$db = new Win32::ODBC("dsn=FOO;UID=BAR;PWD=FUBAR");
+die qq(Cannot open new ODBC\n) if ! $db;</STRONG></PRE>
+<P>
+
+<!-- RowCount -->
+<DT><STRONG><A NAME="RowCount">RowCount</A></STRONG>
+<DD>Returns the number of rows that were affected by the previous SQL command.
+	<STRONG>Note:</STRONG> This does not work on all ODBC connections.
+<PRE>Example:
+<STRONG>$db->Sql("SELECT * FROM foo");
+print DBG q(# of records: ), $db->RowCount(), qq(\n);</STRONG></PRE>
+
+<!-- Run -->
+<DT><STRONG><A NAME="Run">Run</A></STRONG> <EM>stmt</EM>
+<DD>Submit the SQL statement <EM>stmt</EM> and print data about it.  This is
+	used only in debugging.
+<PRE>Example:
+<STRONG>$db->Run("SELECT * FROM foo");</STRONG></PRE>
+See also: <A HREF="#Sql">Sql</A>
+<P>
+
+<!-- SetMaxBufSize -->
+<DT><STRONG><A NAME="SetMaxBufSize">SetMaxBufSize</A></STRONG> <EM>size</EM>
+<DD>Sets the maximum buffer size that a single field can allocate when executing
+	a <A HREF="#FetchRow">FetchRow</A>.  The default limit is 10240 bytes and
+	the absolute maximum is set to 2147483647 bytes.  This absolute maximum can
+	be reset by recompiling the module.  Returns <STRONG>undef</STRONG> if
+	successful.
+<PRE>Example:
+<STRONG>$newsize = 20480;
+$rc = $db->SetMaxBufSize($newsize);
+die qq(SetMaxBufSize($newsize) error: ), $db->Error, qq(\n) if ! $rc;</STRONG></PRE>
+See also: <A HREF="#GetMaxBufSize">GetMaxBufSize</A>
+<P>
+
+<!-- SetStmtCloseType -->
+<DT><STRONG><A NAME="SetStmtCloseType">SetStmtCloseType</A></STRONG> <EM>type</EM>
+<DD>Sets the current ODBC close type setting used by the ODBC Manager.  This is
+	used mainly for debugging.  Normally, when you open a statement handle and
+	perform a query (or whatever) the results are associated with the statement.
+	You need to free the statement in order to execute another query.  When you
+	do this, usually the dataset (from the query) is cached.  This caching
+	action may be good for speed but could cause some memory problems if your
+	dataset is huge.  See the ODBC API call
+	<STRONG>SQLFreeStmt(hstmt, option)</STRONG> for more details.  (All of this
+	is handled automatically by the Win32::ODBC package).<BR>
+	<BR>
+	Type will be one of:
+	<UL PLAIN>
+		<LI>SQL_CLOSE - just close the statement (use caching)
+		<LI>SQL_DROP - close and drop all results (do not use caching)
+		<LI>SQL_UNBIND - close and remove bindings to columns (odbc.pll does not
+			bind vars to columns)
+		<LI>SQL_RESET_PARAMS - close and reset all of the bound parameters
+			(such as type casting for columns; see
+			<STRONG>SQLFreeStmt()</STRONG>)
+	</UL>
+<PRE>Example:
+<STRONG>$oldct = $db->GetStmtCloseType;
+$db->SetStmtCloseType(SQL_DROP);
+...
+$db->SetStmtCloseType($oldct);</STRONG></PRE>
+See also: <A HREF="#GetStmtCloseType">GetStmtCloseType</A>
+<P>
+
+<!-- ShutDown -->
+<DT><STRONG><A NAME="ShutDown">ShutDown</A></STRONG>
+<DD>Closes the ODBC connection and print data about it.  This is used only in
+	debugging.
+<PRE>Example:
+<STRONG>$db->Shutdown;</STRONG></PRE>
+See also: <A HREF="#Close">Close</A>
+<P>
+
+<!-- Sql -->
+<DT><STRONG><A NAME="Sql">Sql</A></STRONG> <EM>stmt</EM>
+<DD>Executes the SQL command <EM>stmt</EM>.  Returns <STRONG>undef</STRONG> on success,
+SQL error code on failure.
+<PRE>Example:
+<STRONG>$stmt = "SELECT * FROM foo";
+$rc = $db->Sql($stmt);
+die qq(SQL failed "$stmt": ), $db->Error(), qq(\n) if $rc;</STRONG></PRE>
+See also: <A HREF="#Error">Error</A>
+<P>
+
+<!-- TableList -->
+<DT><STRONG><A NAME="TableList">TableList</A></STRONG>
+<DT><STRONG>TableList</STRONG>
+	<EM>qualifier</EM>, <EM>owner</EM>, <EM>name</EM>, <EM>type</EM>
+<DD>Retrieves the list of table names from the current ODBC object using
+	<A HREF="#Catalog">Catalog</A>.  If not specified, <EM>qualifier</EM> and
+	<EM>owner</EM> default to "", <EM>name</EM> defaults to "%", and
+	<EM>table</EM> defaults to "'TABLE'".  TableList returns an array of table
+	names.  <STRONG>Note:</STRONG>All fieldnames are uppercase!
+<PRE>Example:
+<STRONG>@tables = $db->TableList;</STRONG></PRE>
+See also: <A HREF="#Catalog">Catalog</A>
+<P>
+
+<!-- ***** end the data list ***** -->
+</DL>
+
+<!-- ***** Examples ***** -->
+<HR ALIGN=center>
+
+<H2><A NAME="Examples">Examples</A></H2>
+
+<P>
+
+<!-- ***** Closing ***** -->
+<HR ALIGN=center NOSHADE>
+
+This page maintined by Joe Casadonte.  Please let me if something is wrong or
+does not make sense.  Send these or other comments to:
+<A HREF="mailto:joc@netaxs.com">joc@netaxs.com</A>.<P>
+
+<ADDRESS>Copyright &copy; Dave Roth and Joseph L. Casadonte Jr. 1996.  All rights reserved.</ADDRESS>
+<ADDRESS>Win32::ODBC - Object / 22 Jul 1996 / joc@netaxs.com</ADDRESS>
+
+</BODY>
+</HTML>
+
+<!-- *********************************************************************** -->
+<!-- *****  EOF  *****  EOF  *****  EOF  *****  EOF  ******  EOF  ********** -->

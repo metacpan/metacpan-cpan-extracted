@@ -1,0 +1,25 @@
+Web::Feed
+
+DESCRIPTION
+
+Generate Atom and RSS feeds and sitemaps.xml files.
+Experimental code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make manifest
+   make test
+   make install
+
+COPYRIGHT
+
+(c) 2014 Gabor Szabo
+
+LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl 5 itself.

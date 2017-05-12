@@ -1,0 +1,44 @@
+----------------------------------------------------------------------------
+Win32::AD::Control::DirSync - - LDAPv3 DirSync control wrapper for Net::LDAP
+----------------------------------------------------------------------------
+
+Copyright (c) 2005 Alexey Kravchuk. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+
+Overview
+--------
+"Win32::AD::Control::DirSync" provides an interface for the creation
+and manipulation of objects that represent the "DirSync" control, used
+to synchronize with Active Directory(r).
+
+Links
+-----
+
+DirSync control description:
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ldap/ldap/ldap_server_dirsync_oid.asp
+
+Using DirSync for synchronizing with AD:
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ad/ad/polling_for_changes_using_the_dirsync_control.asp
+
+Other AD-synchronizing techniques:
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ad/ad/tracking_changes.asp
+
+
+Prerequisites
+-------------
+
+Required Modules:
+    perl-ldap modules
+    Convert::ASN1 
+    
+Build & Install
+---------------
+
+First ensure the above modules/distributions are installed then
+build/install Win32::AD::Control::DirSync by doing
+
+    perl Makefile.PL
+    make
+    make install

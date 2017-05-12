@@ -1,0 +1,16 @@
+WORD			T_IV
+SHORT			T_IV
+WCHAR			T_IV
+LONG                    T_IV
+DWORD                   T_IV
+LPBYTE                  T_PV
+LPSTR			T_PV
+LPDWORD                 T_PV
+HANDLE                  T_PTR
+LPCSTR                  T_PV
+LPCTSTR                 T_PV
+LPCTSTR *               T_PTR
+BOOL                    T_BOOL
+LPVOID                  T_PTR
+UINT                    T_IV
+LPTSTR                  T_PV

@@ -1,0 +1,12 @@
+{
+  "id": 33,
+  "notification_text": "Webサーバで障害が発生しました。至急対応をお願い致します。",
+  "notification_call": true,
+  "notificated_for": {
+    "phone": ["1", "3"],
+    "email1": ["1", "2", "3"],
+    "email2": ["1", "2"],
+    "imkayac": ["1"]
+  },
+  "created_at": 1430208000
+}

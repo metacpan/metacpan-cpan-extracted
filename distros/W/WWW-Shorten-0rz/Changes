@@ -1,0 +1,43 @@
+Revision history for WWW-Shorten-0rz
+
+0.074     2016-05-24
+    - Add Test::More to Test requirements
+    - Add initial release to the changes history.
+    - Use the DZil @starter package rather than @basic
+    - Move actual tests to author testing only
+
+0.073     2016-04-19
+    - Add Travis-CI
+    - Fix missing dependency by no longer using that dependency
+    - Fix up testing
+
+0.072     2016-04-19
+    - Spelling fix
+    - Fix missing dependency
+
+0.071     2016-04-18
+    - Move to Dist::Zilla
+    - Removed indirect object syntax
+    - Scrape results page using Mojo::DOM58
+    - Updated POD and added new README in markdown format
+
+0.07      2009-04-28
+    - makeashorterlink now returns undef upon any errors, to match WWW::Shorten's document.
+
+0.06      2009-01-21
+    - Catch-up with the latest version of 0rz.tw website
+
+0.05      2007-04-22
+    - Add POD tests to improve Module Kwalitee
+
+0.04      2006-09-29
+    - 0rz.net moved to 0rz.tw
+
+0.03      2006-08-31
+    - add lwhsu's short_already patch.
+
+0.02      2004-12-18
+    - Add WWW::Shorten requirement
+
+0.01      2004-12-17
+    - Initial release

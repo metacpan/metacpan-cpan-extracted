@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Rapidshare/Free.pm
+example/download.pl
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/invalid.dl
+t/valid.dl
+t/rapidshare.t
+META.yml                                 Module meta-data (added by MakeMaker)

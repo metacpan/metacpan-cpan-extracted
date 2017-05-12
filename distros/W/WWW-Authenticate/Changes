@@ -1,0 +1,9 @@
+Revision history for Perl extension WWW::Authenticate.
+
+0.5  Mon Sep 24 13:05:07 2001
+	- original version;
+
+0.6  Mon Jan 14, 2002 10:17:20 2002
+	- added Logout function;
+
+

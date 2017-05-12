@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use WebService::HipChat;
+
+my ($room, $color, $notify, $msg_format);
+my $help;
+my $auth_token = $ENV{HIPCHAT_AUTH_TOKEN};
+my $base_url = $ENV{HIPCHAT_BASE_URL};
+
+GetOptions(
+    "auth-token=s"   => \$auth_token,
+    "base-url=s"     => \$base_url,
+    "color=s"        => \$color,
+    "f|msg-format=s" => \$msg_format,
+    "notify"         => \$notify,
+    "help"           => \$help,
+    "room=s"         => \$room,
+) or die "Error: invalid command line arguments\n";
+
+pod2usage(0) if $help;
+pod2usage('Error: --room is required') unless $room;
+pod2usage('Error: --auth-token or $HIPCHAT_AUTH_TOKEN env var is required')
+    unless $auth_token;
+
+my $msg = "@ARGV";
+if (!$msg) {
+    print "enter message: ";
+    $msg = <STDIN>;
+}
+chomp $msg;
+
+pod2usage('Error: no message was provided') unless $msg;
+
+my $hc = WebService::HipChat->new(
+    auth_token => $auth_token,
+    $base_url ? ( base_url => $base_url ) : (),
+    $color    ? ( color    => $color    ) : (),
+);
+
+my $data = { message => $msg };
+$data->{color} = $color if $color;
+$data->{message_format} = $msg_format if $msg_format;
+$data->{notify} = ($notify ? 'true': 'false' );
+
+$hc->send_notification($room, $data);
+
+# PODNAME: hipchat-send
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+hipchat-send
+
+=head1 VERSION
+
+version 0.2000
+
+=head1 SYNOPSIS
+
+hipchat-send [OPTIONS] <message>
+
+Examples:
+
+    hipchat-send --help
+
+    hipchat-send --room=Foo hello world
+
+    echo hello world | hipchat-send -r Foo
+
+    hipchat-send -r Foo
+    <type stuff><ENTER>
+
+=head1 OPTIONS
+
+    -r, --room
+        Required. The id or name of the room to send the message to.
+
+    -a, --auth-token
+        Required unless $HIPCHAT_AUTH_TOKEN env var exists.
+
+    -b, --base-url
+        Optional. Overrides $HIPCHAT_BASE_URL env var.
+
+    -c, --color
+        Optional. The background color for the message.
+
+    -f, --msg-format
+        Optional. [text|html]. The message format.
+
+    -n, --notify
+        Optional. Notify the room of message.
+
+    -h, --help
+
+=head1 AUTHOR
+
+Naveed Massjouni <naveed@vt.edu>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Naveed Massjouni.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

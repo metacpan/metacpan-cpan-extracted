@@ -1,0 +1,190 @@
+WebService::GoogleHack Version 0.15
+
+WebService::GoogleHack Installation Guide
+
+Requirements:
+=============
+
+1) Perl Version 5.8  or better Required for WebService::GoogleHack.
+
+   You can check the version of Perl you have by issuing the following command.
+
+   COMMAND:Perl -V
+
+2) Brill Tagger - Required only if you are using sentiment classification stuff.
+   Installation file and instructions @ : 
+   
+   http://www.cs.jhu.edu/~brill/RBT1_14.tar.Z
+
+3) Other Required PERL Modules
+
+   SOAP::Lite;
+   Set::Scalar;
+   Text::English;
+   LWP::Simple;
+   URI::URL;
+   LWP::UserAgent;
+   HTML::LinkExtor;
+   Data::Dumper;
+
+   Brill Tagger Installation Instructions (Required only For Sentiment Classification)
+   ===================================================================================
+
+   Download the Brill Tagger Installation file from 
+
+   http://www.cs.jhu.edu/~brill/RBT1_14.tar.Z 
+   
+   and store the installation file in your local directory:
+
+   Eg, /home/username/
+
+   *Note: The following commands are for the Unix/Linux Command prompt.
+
+   Next, unzip and untar the file into your local directory.
+   
+   COMMAND: uncompress RBT1_14.tar.Z
+   COMMAND: tar -xvf RBT1_14.tar.Z
+
+   This command would have unpacked the tagger into
+
+   /home/username/RULE_BASED_TAGGER_V1.14/
+   
+   (If you had unpacked the Brill Tagger from you local directory) 
+  
+   Next, Change the directory to the Brill Tagger directory. 
+
+   COMMAND: cd /home/username/RULE_BASED_TAGGER_V1.14/
+
+   The Brill Tagger uses the "cc" compiler. Current Unix and Linux 
+   versions use the "gcc" compiler. Hence, change every occurence of "cc" to 
+   "gcc" in the file named Makefile.
+
+   Finally, make the installation,
+   
+   COMMAND: make  
+
+   You should now be able to access the tagger.  So if you had installed the 
+   Brill tagger in
+
+   /home/username/
+
+   then, you should be able to see the tagger in
+
+   /home/username/RULE_BASED_TAGGER_V1.14/
+
+   To run the tagger, you would have to go into the Bin_and_Data directory and 
+   issue the following command:
+  
+   COMMAND: tagger LEXICON inputfile BIGRAMS LEXICALRULEFILE CONTEXTUALRULEFILE
+
+   Use the name of the file to be tagged instead of inputfile in the above 
+   command. The input file is basically a corpus of text.
+
+
+INSTALLATION
+-------------
+
+If you would like more information on installing Perl modules, visit:
+
+   http://www.perl.com/pub/a/2002/04/10/mod_perl.html
+
+
+Please make sure to install the entire package.
+
+There are multiple ways to install the module. 
+
+
+1) You can use CPAN.pm to install WebSerivce::GoogleHack. To install the module type the following commands in the Unix command prompt:
+
+   COMMAND: perl -MCPAN -e 'install WebSerice::GoogleHack'
+
+The advantage of Using CPAN to install the module is that it will also install 
+all the other modules required by WebSerivce::GoogleHack.
+
+2) Otherwise, to install the module manually:
+
+   2.1) Unzip and untar the GoogleHack installation files.
+
+   COMMAND: gunzip WebService-GoogleHack-0.1.tar.gz
+
+   COMMAND: tar -xvf WebService-GoogleHack-0.1
+
+   2.2) Next, CD into the untarred GoogleHack directory.
+
+   COMMAND: cd WebService/GoogleHack/
+
+   2.3) Next, make the installation:
+
+   For the command given below, please make sure to replace LOCALPERLLIBPATH 
+   and  LOCALBINPATH with the path to your local perl lib directory and 
+   your local bin directory respectively. We do not need to create these 
+   directories manually, because the installation command later on will 
+   automatically take care of that. An example command is also given.
+
+   COMMAND: perl Makefile.PL PREFIX=LOCALPERLLIBPATH LIB=LOCALBINPATH
+
+   EXAMPLE COMMAND: perl Makefile.PL PREFIX=/home/username/lib/ LIB=/home/username/bin
+
+   2.4) Next, type in the following command:
+
+   COMMAND: make
+   
+   2.5) Next, We need to test if the package is working correctly:
+   
+   *Note: This command will also prompt the user for the Google API key, and 
+    the path to the Google wsdl file.
+    
+   COMMAND: make test
+
+   2.6) If the tests were succesful, install the program:
+
+   COMMAND: make install
+
+   If the tests were not successful, you must be missing some of the 
+   pre-requisites or you must have typed in the wrong API key or path to 
+   WSDL file.
+
+
+3) Next, we need to add this LOCALBINPATH to the perl @INC variable. To do 
+   this, open your .cshrc file, this should be in your local directory.
+
+   /home/username/.cshrc
+
+   3.1) Open your .cshrc file and add this line to it:
+
+   3.1)setenv PERL5LIB LOCALBINPATH
+
+   Where you would replace LOCALBINPATH with the your local directory name.
+
+   EG: setenv PERL5LIB /home/username/bin 
+
+   Save the changes, Next issue the command:
+   
+   COMMAND: source .cshrc
+
+   *Note:If you get an error saying command "setenv" not found, replace the 
+   word sentenv with the word "export" and try sourcing the .cshrc file again.
+
+   This should have added the LOCALBINPATH to your Perl @INC variable.To see if
+   the command was successful, issue the following command:
+
+   COMMAND:perl -V
+
+   This command will print out all the directories in which Perl would look for
+    modules.
+
+4) To install the web interface please follow the instructions given in 
+
+WebInterface/CGIReadme.pod
+
+
+
+
+
+
+
+
+
+
+
+

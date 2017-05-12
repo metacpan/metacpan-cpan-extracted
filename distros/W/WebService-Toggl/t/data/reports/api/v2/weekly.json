@@ -1,0 +1,42 @@
+{
+  "total_grand":36004000,
+  "total_billable":14400000,
+  "total_currencies":[{"currency":"EUR","amount":40.00}],
+  "data":[
+    {
+      "title":{"project":"Toggl Desktop","client":"Toggl"},
+      "pid":7363449,
+      "totals":[null,null,null,null,14400000,null,null,14400000],
+      "details":[
+        {
+          "uid":352243,
+          "title":{"user":"John Swift"},
+          "totals":[null,null,null,null,14400000,null,null,14400000]
+        }
+      ]
+    },{
+      "title":{"project":"Important Client","client":null},
+      "pid":1651,
+      "totals":[null,null,14400000,null,null,null,null,14400000],
+      "details":[
+        {
+          "uid":31232243,
+          "title":{"user":"Jane Doe"},
+          "totals":[null,null,14400000,null,null,null,null,14400000]
+        }
+      ]
+    },{
+      "title":{"project":null,"client":null},
+      "pid":null,
+      "totals":[null,null,1000,7203000,null,null,null,7204000],
+      "details":[
+        {
+          "uid":19569,
+          "title":{"user":"John Swift"},
+          "totals":[null,null,1000,7203000,null,null,null,7204000]
+        }
+      ]
+    }
+  ],
+  "week_totals":[null,null,14401000,7203000,14400000,null,null,36004000]
+}

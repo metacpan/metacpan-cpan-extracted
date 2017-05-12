@@ -1,0 +1,320 @@
+<%- #
+    # This template belongs to the package Web::DataService, and contains
+    # default definitions for generating documentation pages.
+    # 
+    # You can edit this in order to modify the look of your documentation pages.
+    #
+    # ===========================
+
+    #USE dumper;
+    SET block_done = { };
+    
+    # Edit the following definitions to modify the labels used for navigation
+    # -----------------------------------------------------------------------
+    
+    PROCESS doc_strings.tt;
+    
+    IF ds.version; SET main_doc_label = "$main_doc_label $ds.name v$ds.version"; END;
+        
+    msgval = {
+    	format_param = ds.special_param('format')
+	vocab_param = ds.special_param('vocab')
+	show_param = ds.special_param('show')
+    };
+    
+    MACRO sub_message(text) IF message.$text; message.$text; ELSE; text; "\n"; END;
+    MACRO sub_value(msg, value) GET message.$msg FILTER replace('%s', value);
+    
+    # 
+    # DESCRIPTION_SECTION: Include a "description" section for this node
+    # ------------------------------------------------------------------
+    
+    BLOCK DESCRIPTION_SECTION;
+        IF block_done.descrip; RETURN; ELSE; SET block_done.descrip = 1; END;
+	SET descrip_doc = request.document_node;
+	IF descrip_doc or opt_force;
+    	    GET "\n=head2 $section_label.descrip\n\n";
+            GET descrip_doc or sub_message("MSG_DOCSTRING_MISSING");
+        END;
+    END;
+    
+    MACRO DESCRIPTION_SECTION INCLUDE DESCRIPTION_SECTION;
+    
+    # 
+    # DOCSTRING: Include the node documentation string
+    # ------------------------------------------------
+    
+    BLOCK DOCSTRING;
+        SET node_doc = request.document_node;
+	GET node_doc or sub_message("MSG_DOCSTRING_MISSING");
+    END;
+    
+    MACRO DOCSTRING INCLUDE DOCSTRING;
+    
+    #     
+    # USAGE_SECTION, USAGE: Document the usage examples, if any, for this node
+    # ------------------------------------------------------------------------
+    
+    BLOCK USAGE_SECTION;
+        IF block_done.usage; RETURN; ELSE; SET block_done.usage = 1; END;
+        SET usage_doc = request.document_usage;
+	IF usage_doc;
+	    "\n=head2 $section_label.usage\n\n";
+            IF content; GET content FILTER trim; "\n\n";
+            ELSE; sub_message("MSG_USAGE_HEADER_LONG"); "\n\n";
+            END;
+            GET usage_doc;
+        ELSIF opt_force;
+            "\n=head2 $section_label.usage\n\n";
+            GET sub_message("MSG_USAGE_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO USAGE_SECTION INCLUDE USAGE_SECTION;
+    
+    BLOCK USAGE;
+        SET usage_doc = request.document_usage;
+	IF usage_doc; usage_doc;
+	ELSIF opt_force; sub_message("MSG_USAGE_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO USAGE INCLUDE USAGE;
+    
+    # 
+    # NODELIST: List all that have a 'place' attribute
+    # ------------------------------------------------
+    
+    BLOCK NODELIST;
+	SET options = { };
+	IF opt_usage; options.usage = sub_message("MSG_USAGE_HEADER_SHORT"); END;
+	IF opt_list; options.list = opt_list; END;
+    	SET nodelist_doc = request.document_nodelist(options);
+	IF nodelist_doc;
+	    IF content; GET content FILTER trim; "\n\n";
+	    END;
+	    nodelist_doc;
+        END;
+    END;
+    
+    MACRO NODELIST INCLUDE NODELIST;
+    
+    #
+    # PARAMETER_SECTION, PARAMETERS: Document the parameters corresponding to this URL path
+    # -------------------------------------------------------------------------------------
+    
+    BLOCK PARAMETER_SECTION;
+        IF block_done.params; RETURN; ELSE; SET block_done.params = 1; END;
+	SET param_doc = request.document_params(ruleset);
+	IF param_doc;
+    	    "\n=head2 $section_label.params\n\n";
+	    IF content; GET content FILTER trim; "\n\n";
+            END;
+            GET param_doc;
+        ELSIF opt_force;
+            "\n=head2 $section_label.usage\n\n";
+            GET sub_message("MSG_PARAM_NONE_DEFINED"); "\n\n";
+        END;
+    END;
+    
+    MACRO PARAMETER_SECTION INCLUDE PARAMETER_SECTION;
+    
+    BLOCK PARAMETERS;
+        SET param_doc = request.document_params(ruleset);
+	IF param_doc; param_doc;
+	ELSIF opt_force; sub_message("MSG_PARAM_NONE_DEFINED"); "\n\n";
+        END;
+    END;
+    
+    MACRO PARAMETERS INCLUDE PARAMETERS;
+    
+    #
+    # METHOD_SECTION, METHODS: Document the HTTP methods accepted by this URL path
+    # ----------------------------------------------------------------------------
+    
+    BLOCK METHOD_SECTION;
+        IF block_done.methods; RETURN; ELSE; SET block_done.methods = 1; END;
+        SET method_list = request.document_http_methods;
+        IF method_list;
+      	    "\n=head2 $section_label.methods\n\n";
+            IF content; GET content FILTER trim;
+ 	    ELSIF request.node_has_operation; sub_message("MSG_METHOD_HEADER_OP");
+ 	    ELSE; sub_message("MSG_METHOD_HEADER_NODE");
+	    END;
+	    GET " $method_list";
+        ELSIF opt_force;
+      	    "\n=head2 $section_label.methods\n\n";
+	    sub_message("MSG_METHOD_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO METHOD_SECTION INCLUDE METHOD_SECTION;
+    
+    BLOCK METHODS;
+        SET method_doc = request.document_http_methods;
+	IF method_doc; method_doc;
+	ELSIF opt_force; sub_message("MSG_METHOD_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO METHODS INCLUDE METHODS;
+    
+    # 
+    # RESPONSE_SECTION: Document the response fields returned by this URL path
+    # ------------------------------------------------------------------------
+    
+    BLOCK RESPONSE_SECTION;
+        IF block_done.response; RETURN; ELSE; SET block_done.response = 1; END;
+        "\n=head2 $section_label.response\n\n";
+	SET response_doc = request.document_response;
+	SET fixed = request.output_label;
+	SET optional = request.optional_output;
+	IF response_doc;
+  	    IF response_doc.match('^MSG_'); sub_message(response_doc);
+	    ELSIF content; GET content FILTER trim; "\n\n$response_doc";
+	    ELSE;
+	        sub_message("MSG_RESPONSE_HEADER");
+	    	IF fixed && optional;
+	            sub_value("MSG_RESPONSE_HEADER_FIXED", fixed);
+	    	    sub_message("MSG_RESPONSE_HEADER_OPT");
+	    	ELSIF optional;
+	            sub_message("MSG_RESPONSE_HEADER_OPT_ONLY");
+	    	END;
+		"\n\n$response_doc";
+	    END;
+	ELSE;
+	    sub_message("MSG_RESPONSE_NONE_DEFINED");
+	END;
+	SET summary_doc = request.document_summary;
+	IF summary_doc;
+	    sub_message("MSG_RESPONSE_SUMMARY"); "\n\n";
+	    summary_doc;
+        END;
+    END;
+    
+    MACRO RESPONSE_SECTION INCLUDE RESPONSE_SECTION;
+    
+    BLOCK RESPONSE;
+        SET response_doc = request.document_response;
+  	IF response_doc.match('^MSG_'); sub_message(response_doc);
+	ELSIF response_doc; response_doc;
+	ELSE; sub_message("MSG_RESPONSE_NONE_DEFINED");
+	END;
+   END;
+    
+    MACRO RESPONSE INCLUDE RESPONSE;
+    
+    #
+    # FORMAT_SECTION, FORMATS: Document the formats allowed by this URL path
+    # ----------------------------------------------------------------------
+    
+    BLOCK FORMAT_SECTION;
+        IF block_done.formats; RETURN; ELSE; SET block_done.formats = 1; END;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+	SET format_doc = request.document_formats(options);
+	GET "\n=head2 $section_label.formats\n\n";
+  	IF format_doc.match('^MSG_'); sub_message(format_doc);
+	ELSIF content; GET content FILTER trim; "\n\n$format_doc";
+	ELSIF options.all;
+	    sub_message("MSG_FORMAT_HEADER_ALL");
+	    sub_message("MSG_FORMAT_HEADER_SUFFIX") IF ds.has_feature('format_suffix');
+	    sub_message("MSG_FORMAT_HEADER_PARAM") IF ds.special_param('format');
+	    GET "\n\n$format_doc";
+	ELSE;
+	    sub_message("MSG_FORMAT_HEADER_SOME");
+	    sub_message("MSG_FORMAT_HEADER_SUFFIX") IF ds.has_feature('format_suffix');
+	    sub_message("MSG_FORMAT_HEADER_PARAM") IF ds.special_param('format');
+	    IF not ds.has_feature('format_suffix');
+	        default_value = request.default_format;
+	        sub_value("MSG_FORMAT_HEADER_DEFAULT", default_value) IF default_value;
+	    END;
+	    GET "\n\n$format_doc";
+        END;
+    END;
+    
+    MACRO FORMAT_SECTION INCLUDE FORMAT_SECTION;
+    
+    BLOCK FORMATS;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+        SET format_doc = request.request.document_formats(options);
+  	IF format_doc.match('^MSG_'); sub_message(format_doc);
+	ELSE; format_doc;
+        END;
+    END;
+    
+    MACRO FORMATS INCLUDE FORMATS;
+    
+    #
+    # VOCAB_SECTIOn, VOCABS: Document the vocabularies allowed by this URL path
+    # -------------------------------------------------------------------------
+    
+    BLOCK VOCAB_SECTION;
+        IF block_done.vocabs; RETURN; ELSE; SET block_done.vocabs = 1; END;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+	SET vocab_doc = request.document_vocabs(options);
+	GET "\n=head2 $section_label.vocabs\n\n";
+  	IF vocab_doc.match('^MSG_'); sub_message(vocab_doc);
+	ELSIF content; GET content FILTER trim; "\n\n$vocab_doc";
+	ELSIF options.all;
+	    sub_message("MSG_VOCAB_HEADER_ALL");
+	    sub_message("MSG_VOCAB_HEADER_PARAM") IF ds.special_param('vocab');
+	    "\n\n$vocab_doc";
+	ELSE;
+	    sub_message("MSG_VOCAB_HEADER_SOME");
+	    sub_message("MSG_VOCAB_HEADER_PARAM") IF ds.special_param('vocab');
+	    "\n\n$vocab_doc";
+        END;
+    END;
+        
+    MACRO VOCAB_SECTION INCLUDE VOCAB_SECTION;
+    
+    BLOCK VOCABS;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+        SET vocab_doc = request.request.document_vocabs(options);
+  	IF vocab_doc.match('^MSG_'); sub_message(vocab_doc);
+	ELSIF vocab_doc; vocab_doc;
+	ELSE; sub_message("MSG_VOCAB_NONE_ALLOWED");
+        END;
+    END;
+    
+    MACRO VOCABS INCLUDE VOCABS;
+    
+    # 
+    # TRAIL: Add a navigation trail to the page
+    # -----------------------------------------
+    
+    BLOCK NAVTRAIL;
+        # IF block_done.trail; RETURN; ELSE; SET block_done.trail = 1; END;
+	SET navtrail = "";
+        FOREACH item IN request.list_navtrail(main_doc_label);
+	    IF navtrail; SET navtrail = "$navtrail E<GT> $item";
+	    ELSE; SET navtrail = item; END;
+        END;
+        "\n=for wds_nav =head3 $main_doc_prefix$navtrail\n";
+    END;
+    
+    MACRO NAVTRAIL INCLUDE NAVTRAIL;
+    
+    # URL: Display a URL according to this service's configuration
+    # ------------------------------------------------------------
+    
+    BLOCK URL;
+        SET url_string = opt_url or request.node_path;
+        GET request.generate_url(url_string);
+    END;
+    
+    MACRO URL(opt_url) INCLUDE URL;
+    
+-%>

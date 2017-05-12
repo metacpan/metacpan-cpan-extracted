@@ -1,0 +1,11 @@
+Changes
+lib/WWW/SmugMug/API.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+WWW-SmugMug-API.html
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,1433 @@
+2017-04-30  Kingpin  <martin@martin-M17x>
+
+	* Makefile.PL: fixed for Perl 5.26
+
+2015-12-13  Kingpin  <martin@localhost.localdomain>
+
+	*  removed MYMETA files from distro (again)
+
+2015-06-06  Kingpin  <Martin@EV-9D9>
+
+	* lib/WWW/Search/Test.pm: removed Date::Manip::TZ setting
+
+2013-11-18  Kingpin  <Martin@EV-9D9>
+
+	* lib/WWW/Search/Test.pm (test_most_results): better error messages
+
+2013-10-05  Kingpin  <martin@localhost.localdomain>
+
+	* MANIFEST.SKIP: do not ship MYMETA files
+
+2013-08-20  Kingpin  <martin@localhost.localdomain>
+
+	* Makefile.PL (MY::preamble): added fix for devel on Windows 7
+
+2013-06-23  Kingpin  <martin@localhost.localdomain>
+
+	* lib/WWW/Search/Test.pm (test_most_results): fixed quote problem in eval
+
+2013-03-25  Kingpin  <martin@localhost.localdomain>
+
+	* lib/WWW/Search/Test.pm (test_most_results): fixed off-by-one error
+
+2010-05-20  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Test.pm (test_most_results): fixed percentage test!
+
+2008-11-28  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Test.pm (test_most_results): new function
+
+2008-11-27  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm (user_agent): wrap {new LWP::UserAgent} in an eval
+
+2008-11-10  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm (_native_retrieve_some): check for empty _next_url
+
+2008-07-20  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/SearchResult.pm (sources): new method
+	(add_sources): new method
+
+2008-07-15  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search/Test.pm (find_websearch): look bin blib/script also
+
+2008-07-13  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm (_parse_tree): now calls parse_tree() for backward compatibility
+
+2008-06-01  Kingpin  <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm (parse_tree): don't need conditional
+
+2008-04-05    <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm: renamed parse_tree() to _parse_tree()
+
+2008-03-05    <Martin@BLUEMAX>
+
+	* lib/WWW/Search.pm (native_retrieve_some): turn on UTF-8 mode in HTML parser
+
+2007-11-11    <Daddy@C-3PO>
+
+	* all: use warnings in all modules
+
+2007-07-26    <Daddy@C-3PO>
+
+	* t/use.t: do not use the deprecated IO::Capture::ErrorMessages
+
+2007-07-04    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (native_retrieve_some): prevent undef warning
+
+2007-06-03    <Daddy@C-3PO>
+
+	* various: make sure to use strict
+
+2007-05-19    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (count_results): print result number in front of URL
+
+2007-05-07    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (count_results): added eighth argument
+
+2007-03-24    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (strip_tags): fix for possible "modify read-only" error
+	(absurl): fix for possible undef error
+
+2007-03-23    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (count_results): FIX to not waste time getting too many results
+
+2007-01-29    <Daddy@C-3PO>
+
+	* code/AutoSearch-code.pl (main): added timezone to HTML email
+
+2006-07-30    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (tm_run_test_no_approx): new function
+	(count_results): FIX to allow more than 300 results
+
+2006-04-24    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (result_as_HTML): FIX for backends that use WWW::Search::Result
+
+2006-04-22    <Daddy@C-3PO>
+
+	* code/AutoSearch-code.pl (main): now uses result_as_HTML() to format email
+
+2006-04-21    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (result_as_HTML): new method
+
+2006-04-19    <Daddy@C-3PO>
+
+	* lib/WWW/SearchResult.pm (sold): new method
+
+2006-03-19    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm: tweak pod (thanks to Brian Sammon)
+
+2006-03-14    <Daddy@C-3PO>
+
+	* lib/WWW/SearchResult.pm (as_HTML): new method
+
+2006-03-11    <Daddy@C-3PO>
+
+	* lib/WWW/SearchResult.pm (shipping): new method
+	(as_HTML): new method
+
+2006-03-10    <Daddy@C-3PO>
+
+	* lib/WWW/SearchResult.pm (question_count): new method
+	(watcher_count): new method
+
+2006-01-12    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (results): add pod about how to detect errors
+
+	* code/AutoSearch-code.pl (send_email): fix the call syntax of Email::Send
+
+2006-01-07    <Daddy@C-3PO>
+
+	* lib/WWW/Search.pm (results): add pod about how to check for errors
+
+	* t/use.t: use IO::Capture::Stderr instead of ::ErrorMessages
+
+2005-12-27    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (count_results): set absolute maximum of 299 hits
+
+	* code/AutoSearch-code.pl (main): make sure email contains HTML of new hits
+        (send_email): don't need Email::Send::SMTP::Auth any more (Email::Send::SMTP will do)
+	(make_date): fix URL of autosearch webpage
+
+2005-12-26    <Daddy@C-3PO>
+
+	* lib/WWW/Search/Test.pm (count_results): bugfix for when argument for max is undef
+
+2005-12-25    <Daddy@C-3PO>
+
+	* lib/WWW/SearchResult.pm: new attribute 'category'
+
+2005-07-15  Kingpin  <mthurn@verizon.net>
+
+	* Makefile.PL (MY::postamble): get pod2test to work without cat or dos2unix
+
+2005-07-09  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (main): report HTTP error even if we got some results
+
+2005-07-07  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (results): on error, now returns empty list instead of undef
+
+2005-06-19  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/SearchResult.pm (image_url): new method
+	(thumb_url): new method
+
+2005-04-18  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (make_date): fix link to AutoSearch webpage
+
+2005-03-12  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (main): add result count to email message
+
+2005-02-02  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (http_proxy): BUGFIX for calling with no args setting the value
+
+2004-11-05  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Test.pm (find_websearch): try harder to find a working WebSearch
+
+2004-10-26  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Test.pm (find_websearch): avoid warnings
+
+	* lib/WWW/Search/Null/Count.pm: delete extra spaces in pod directives
+
+2004-10-10  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (new): do NOT put login name into agent_e_mail
+
+2004-10-07  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Test.pm (tm_new_engine): new function
+	(tm_run_test): new function
+
+	* code/AutoSearch-code.pl (main): add backend name to email body
+
+2004-09-25  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/SearchResult.pm (bid_count): new method
+	(bid_amount): new method
+
+2004-08-21  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl: added pod
+
+2004-08-19  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (agent_name): new method
+
+2004-07-31  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (send_email): use Email::Send
+	* code/AutoSearch-code.pl (send_email): send HTML using proper MIME-type
+
+2004-06-30  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (installed_engines): make it run much faster!
+
+2004-06-01  Kingpin  <mthurn@verizon.net>
+
+	* t/use.t: added a lot of tests for coverage
+
+	* lib/WWW/Search.pm (_load_env_useragent): new function
+
+2004-05-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Null/Count.pm: add $VERSION
+	* lib/WWW/Search/Null/Empty.pm: add $VERSION
+	* lib/WWW/Search/Null/Error.pm: add $VERSION
+	* lib/WWW/Search/Null/Count.pm: add _ in front of function names
+	* lib/WWW/Search/Null/Empty.pm: add _ in front of function names
+	* lib/WWW/Search/Null/Error.pm: add _ in front of function names
+	* lib/WWW/Search/Null/NoVersion.pm: new file (for testing)
+
+	* lib/WWW/Search/Null/Count.pm (native_retrieve_some): set and test all SearchResult fields
+
+2004-05-01  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (need_to_delay): new method
+
+2004-03-05  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (main): new option --emailfrom
+
+2004-03-03  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (approximate_result_count): clean up args
+	(http_request): clean up redirect-following code
+
+2004-02-24  Kingpin  <mthurn@verizon.net>
+
+	* t/use.t: add tests for approximate_result_count() args
+
+	* lib/WWW/Search.pm (approximate_result_count): fix empty-string warning
+
+	* code/AutoSearch-code.pl (print_version): convert to Pod::Usage
+	(main): reorder --stats messages
+
+2004-02-09  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (main): do not try to send email if MIME::Lite is not available
+
+	* lib/WWW/Search.pm: convert to 3-digit version number; code cleanups
+
+	* t/pod.t: new file
+
+2004-01-30  Kingpin  <mthurn@verizon.net>
+
+	* Makefile.PL: converted to use Module::Install
+
+2004-01-20  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl: minor clean ups and prevent undef warnings
+
+2004-01-09  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (http_request): detect redirect loops
+
+2003-12-29  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (strip_tags): avoid warnings if we get undef argument
+
+2003-12-19  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (user_agent): fix for undef warnings in LWP::UserAgent::proxy
+
+2003-11-29  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (user_agent): fix $sUA creation
+
+2003-11-27  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (main): added date to error messages in index.html
+	(main): new option --cmdline
+
+2003-11-25  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl: new option --cleanup
+
+	* lib/WWW/Search.pm (user_agent): new $ENV{WWW_SEARCH_USERAGENT} mechanism
+
+2003-11-24  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (strip_tags): reduce embedded spaces
+
+2003-11-14  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search.pm (http_proxy): now takes same arguments as LWP::UserAgent::proxy()
+	(user_agent): get proxy password from %ENV
+
+2003-10-21  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl (usage): new option --ignore_channels
+
+	* lib/WWW/Search.pm (approximate_result_count): fixed so can be called without explicitly calling retrieve_some() first
+
+2003-09-16  Kingpin  <mthurn@verizon.net>
+
+	* Makefile.PL (MY::postamble): fixed path for pod2text; etc.
+
+2003-08-31  Kingpin  <mthurn@verizon.net>
+
+	* lib/WWW/Search/Test.pm (count_results): new 7th argument = search options hash
+
+2003-08-30  Kingpin  <mthurn@verizon.net>
+
+	* code/AutoSearch-code.pl: new option --ignore_channels
+
+2003-07-28  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm (preprocess_results_page): BUGFIX bad return value
+
+2003-07-14  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Test.pm (count_results): printResults output is more verbose
+
+2003-07-05  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm (parse_tree): new NOP stub function
+
+2003-07-04  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm (login): now returns flag for success/failure
+
+	* lib/WWW/Search/Test.pm (find_websearch): new function
+
+2003-07-03  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Test.pm (count_results): call login() before getting results
+
+2003-06-24  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm (cookie_jar): allow any flavor of HTTP::Cookies
+
+2003-06-06  Kingpin  <mthurn@megapipe.net>
+
+	* code/AutoSearch-code.pl: new option --listnewurls
+
+2003-05-27  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Test.pm (new_engine_test_more): new function for use with Test::More
+	(run_test_test_more): new function for use with Test::More
+
+2003-05-22  Kingpin  <mthurn@megapipe.net>
+
+	* code/WebSearch-code.pl (list_engines): new option --list
+	new options --username --password
+
+2003-05-14  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Test.pm (count_results): when dumping, print title as well as url and description
+
+2003-04-16  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search/Null/Count.pm: fixed the Test::Inline pod directives (also in Empty.pm and Error.pm)
+
+	* lib/WWW/Search.pm (retrieve_some): do not complain about empty query if $self->{'_allow_empty_query'} is set
+
+2003-03-13  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm (strip_tags): avoid undef warnings
+
+2003-02-06  Kingpin  <mthurn@megapipe.net>
+
+	* lib/WWW/Search.pm: don't croak if query is undef or empty
+
+2002-12-20  Kingpin  <mthurn@carbon.>
+
+	* lib/WWW/Search.pm (approximate_hit_count): new method (synonym for approximate_result_count)
+
+2002-12-16  Kingpin  <mthurn@carbon.>
+
+	* code/AutoSearch-code.pl: new option --help
+
+2002-10-22  Kingpin  <mthurn@carbon>
+
+	* code/WebSearch-code.pl: new option --terse; --count now prints actual count
+
+2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* WWW::Search VERSION 2.36 RELEASED!
+
+2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Test.pm (run_our_test): FIX miscalculation of max
+
+2002-07-18  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* WWW::Search VERSION 2.35 RELEASED!
+
+2002-07-17  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Test.pm (count_results): new function
+
+2002-06-13  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (http_request): do not infinite loop when HTTP::Response is_error!
+
+2002-06-04  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (login, logout): new methods
+	(new): initialize _debug parameter to 0
+
+2002-06-03  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (cookie_jar): return jar if no args
+
+2002-05-31  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (hash_to_cgi_string): delete keys whose value is undef
+	(http_method): new get/set method
+
+2002-04-29  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Test.pm: `use WWW::Search` so client doesn't have to
+
+2002-04-22  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* code/AutoSearch-code.pl: fix for case-sensitive cmd-line args
+
+2002-04-19  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (installed_engines): new function
+
+	* t/use.t: upgrade to use Test::More
+
+	* lib/WWW/Search.pm: get rid of @ENGINES_WORKING
+
+	* lib/WWW/Search/Gopher.pm (native_retrieve_some): remove duplicate declaration warnings;
+	added $VERSION
+
+	* lib/WWW/Search.pm (generic_option): gracefully handle missing argument
+
+2002-03-29  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* code/WebSearch-code.pl (print_version): show version of --engine, too
+
+2002-03-28  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (native_retrieve_some): add debug msgs
+	(native_retrieve_some): better pod
+	(native_retrieve_some): make it able to re-use the TreeBuilder object!
+
+2002-03-22  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (native_retrieve_some): do not try to delete the TreeBuilder
+
+2002-03-15  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (native_retrieve_some): allow backends to specify the HTML::TreeBuilder object to be used
+
+2002-03-12  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* Makefile.PL: require 2 more modules
+
+2002-03-11  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (user_agent): do not require users to call user_agent() explicitly;
+	set default email to local user@host;
+	(results): prevent warning when 0 hits
+
+2002-02-05  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (http_request): use URI instead of $HTTP::URI_CLASS
+	(absurl): same
+
+2002-01-22  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (http_request): do not use URI::URL
+
+2001-12-20  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Test.pm: remove warning about ./WebSearch
+
+	* lib/WWW/Search.pm (preprocess_results_page): new method
+
+2001-11-23  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (http_request): delete bogus argument to http_request_to_file() call
+
+2001-11-02  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* code/AutoSearch-code.pl: new option --debug
+
+2001-10-25  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search/Test.pm (skip_test): new method
+
+2001-09-10  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (native_retrieve_some): new method
+
+2001-09-07  Kingpin  <mthurn@copper.dulles.tasc.com>
+
+	* lib/WWW/Search.pm (strip_tags): convert <BR> to one space
+
+	* lib/WWW/Search/Test.pm (run_our_test): new argument to print results to STDERR
+	(run_our_test): do not set maximum if user expects an exact number of results
+
+2001-08-31  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (env_proxy): new method
+
+2001-08-29  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm: tweaked debugging messages
+
+2001-07-16  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Test.pm (run_gui_test): new method
+
+	* lib/WWW/Search.pm (date_from): new method
+	(date_to): new method
+
+2001-07-05  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Test.pm (run_test): new functionality for simple test-running
+
+	* lib/WWW/Search.pm (http_proxy): added proxy support
+
+2001-06-14  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.21 RELEASED!
+
+2001-06-13  Kingpin  <mthurn@tasc.com>
+
+	* removed Scraper.pm and Sherlock.pm
+
+2001-05-08  Kingpin  <mthurn@tasc.com>
+	
+	* WWW::Search VERSION 2.19 RELEASED!
+	
+2001-05-07  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (results): BUGFIX always returned 500!
+
+2001-05-04  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Scraper.pm: updated to 1.20
+
+2001-05-02  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Scraper.pm: updated to 1.10
+
+2001-05-02  Kingpin  <mthurn@tasc.com>
+	
+	* WWW::Search VERSION 2.17 RELEASED!
+	
+2001-05-02  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Scraper.pm: new module contributed by Glenn Wood
+
+2001-04-10  Kingpin  <mthurn@tasc.com>
+
+	* AutoSearch-code.pl (main): new option --mail for emailing new results
+
+	* AutoSearch.PL: move real code to separate file (and update Makefile.PL)
+
+2001-03-28  Kingpin  <mthurn@tasc.com>
+	
+	* WWW::Search VERSION 2.16 RELEASED!
+	
+2001-03-27  Kingpin  <mthurn@tasc.com>
+	
+	* lib/WWW/Search.pm (submit): new method
+
+2001-03-20  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (reset_search): BUGFIX: reset approx_count (thanks to Alexander Mikhailian)
+
+2001-03-15  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/AltaVista/NL.pm: new backend
+
+2000-10-25  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm: many minor pod updates
+
+2000-10-13  Kingpin  <mthurn@tasc.com>
+
+	* Infoseek.pm et al. removed (use Go.pm instead)
+
+2000-10-06  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (http_referer): new method
+
+2000-10-04  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (cookie_jar): do not save cookies if user gave us HTTP::Cookie object
+
+2000-10-03  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.15 RELEASED!
+
+2000-10-02  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (split_lines): new optional first arg: list of patterns
+
+2000-09-22  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (cookie_jar): new method to handle web cookies
+
+2000-08-08  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm updated to version 2.9
+
+2000-06-15  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Lycos.pm: removed to its own separate registered module
+
+2000-06-12  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/LookSmart.pm: removed to its own separate registered module
+
+	* lib/WWW/Search/NorthernLight.pm: removed to its own separate registered module
+
+2000-05-26  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/AltaVista.pm: updated to 2.6 (parse only 1 result)
+
+2000-05-17  Kingpin  <mthurn@tasc.com>
+
+	* removed Lycos/Sites.pm from the distribution (finally)
+
+	* lib/WWW/Search/Yahoo/Classifieds/Employment.pm: updated to 1.02
+
+2000-05-04  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Test.pm: updated to 2.03 (fix pod typos)
+
+2000-05-02  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.14 RELEASED!
+	
+	* lib/WWW/Search/AltaVista.pm (native_retrieve_some): fix next_url
+
+2000-05-01  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Euroseek.pm: removed to its own separate registered module
+	* lib/WWW/Search/GoTo.pm: removed to its own separate registered module
+	* lib/WWW/Search/Google.pm: removed to its own separate registered module
+	* lib/WWW/Search/Snap.pm: removed to its own separate registered module
+	* lib/WWW/Search/ZDNet.pm: removed to its own separate registered module
+
+2000-04-27  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (reset_search): do not clear search_base_url
+
+2000-04-12  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Test.pm: now uses File::Spec for all paths and filenames
+
+2000-04-11  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (user_agent): now sets agent_name for non-robot UserAgent
+
+2000-04-03  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.13 RELEASED!
+	
+2000-04-02  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (reset_search): correctly and silently handle intermixed calls to gui_query() and native_query()
+
+2000-03-24  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Google.pm: updated to 2.18 (fix rare garbage in URLs)
+
+2000-03-23  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.12 RELEASED!
+	
+2000-03-23  Kingpin  <mthurn@tasc.com>
+
+	* t/use.t: added test to make sure we're getting *any* results
+
+	* lib/WWW/Search.pm (escape_query): fixed BUG in argument parsing
+
+2000-03-22  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.11 RELEASED!
+	
+2000-03-21  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Excite/News.pm: updated to 2.03 (new output format)
+
+	* lib/WWW/Search/VoilaFr.pm: new backend for www.voila.fr GUI searches
+
+2000-03-13  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Snap.pm updated to 2.04
+
+	* lib/WWW/Search/Google.pm updated to 2.17
+
+2000-03-09  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/AltaVista/Intranet.pm: updated to 2.04 (pod only)
+
+2000-02-28  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Magellan.pm: removed to its own separate registered module
+
+2000-02-26  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.10 RELEASED!
+
+2000-02-25  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (reset_search): new method.  New feature: if
+	you call native_query() a second time on the same WWW::Search
+	object, a new search will be started.  (Before this change, you
+	would get the results of the first query all over again)
+
+2000-02-24  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Dejanews.pm et al.: removed to their own separate registered module
+	
+2000-02-15  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/AltaVista/Intranet.pm (native_retrieve_some): parse Rank integer
+
+2000-02-08  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.09 RELEASED!
+
+2000-02-07  Kingpin  <mthurn@tasc.com>
+
+	* WebSearch: new option --gui to mimic query in browser
+
+2000-02-04  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/OpenDirectory.pm: updated to 2.02
+
+	* lib/WWW/Search/Yahoo.pm: removed to its own separate registered module
+
+2000-02-01  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (maintainer): new method
+
+2000-01-31  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Test.pm: new module
+
+	* lib/WWW/Search/Magellan.pm: updated to 2.04 (new test cases)
+
+2000-01-28  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Excite.pm: removed to its own separate registered module
+
+2000-01-19  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search.pm (gui_query): new method
+
+	* lib/WWW/Search/HotBot.pm: removed to its own separate registered module
+
+2000-01-18  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Dejanews.pm: updated to 2.07 (new output format)
+
+2000-01-14  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Euroseek.pm: new backend
+
+2000-01-13  Kingpin  <mthurn@tasc.com>
+
+	* lib/WWW/Search/Snap.pm: updated to 2.03
+
+	* lib/WWW/Search/Google.pm: updated to 2.16
+
+2000-01-03  Kingpin  <mthurn@tasc.com>
+
+	* Lycos::Sites retired
+
+	* Lycos.pm updated to 2.09 (thanks to dbradford@bdctechnologies.com)
+
+1999-12-24  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.08 RELEASED!
+	
+1999-12-23  Kingpin  <mthurn@tasc.com>
+
+	* Google.pm updated to 2.15 (return more details for each result)
+
+1999-12-22  Kingpin  <mthurn@tasc.com>
+
+	* HotBot.pm updated to 2.10 (new output format)
+
+	* Lycos::Pages retired
+
+	* Lycos.pm updated to 2.08 (new URL for advanced search)
+
+1999-12-15  Kingpin  <mthurn@tasc.com>
+
+	* Profusion.pm retired
+	
+	* HotBot.pm updated to 2.09 (handle new result count format)
+
+	* Google.pm updated to 2.12 (new output format, etc.)
+
+1999-12-13  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo::Classifieds::Employment updated to 1.01 (remove unneeded 'use Socket')
+
+	* Monster updated to 1.01 (remove unneeded 'use Socket')
+
+	* HeadHunter updated to 1.01 (remove unneeded 'use Socket')
+
+1999-12-11  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.07 RELEASED!
+
+1999-12-10  Kingpin  <mthurn@tasc.com>
+
+	* Magellan.pm updated to 2.03 (new test cases)
+
+	* Lycos::Sites.pm updated to 2.05 (fix for missing 'next' link)
+
+	* HotBot.pm updated to 2.08 (was missing next-page link)
+
+	* Dejanews.pm updated to 2.06 (ignore more deja-internal links)
+
+	* SearchResult.pm updated to 2.06 (pod additions & corrections)
+
+	* Infoseek.pm updated to 2.05 (handles new output format)
+
+	* Lycos.pm updated to 2.07 (handles new output format)
+
+1999-12-07  Kingpin  <mthurn@tasc.com>
+
+	* Dejanews.pm updated to 2.05 (new test cases, and pod typo)
+
+1999-12-06  Kingpin  <mthurn@tasc.com>
+
+	* Dejanews.pm updated to 2.04 (handles new output format)
+
+1999-12-03  Kingpin  <mthurn@tasc.com>
+
+	* Makefile.PL modified for new test suite call sequence
+	
+	* NetFind.pm updated to 1.8
+
+	* Lycos::Sites.pm updated to 2.05 (handles new url and new output format)
+
+	* Lycos.pm updated to 2.05 (handles new output format for Lycos::Sites)
+
+1999-12-01  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.06 RELEASED!
+
+1999-11-30  Kingpin  <mthurn@tasc.com>
+
+	* ZDNet.pm updated to 2.02 (handles new output format)
+
+1999-11-29  Kingpin  <mthurn@tasc.com>
+
+	* AltaVista::Intranet.pm updated to 2.02 (fixed to work with latest AltaVista.pm)
+
+1999-11-22  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm updated to 2.06 (supports Yahoo Korea)
+
+1999-11-12  Kingpin  <mthurn@tasc.com>
+
+	* HotBot.pm updated to 2.07 (clean up and fix regexen)
+
+1999-11-08  Kingpin  <mthurn@tasc.com>
+
+	* Span.pm updated to 2.03
+
+	* NorthernLight.pm updated to 2.04 (strip tags, etc.)
+
+1999-11-05  Kingpin  <mthurn@tasc.com>
+
+	* MetaCrawler.pm fixed, renamed, and updated to 2.06
+
+	* GoTo.pm updated to 1.05
+
+1999-10-29  Kingpin  <mthurn@tasc.com>
+
+	* AltaVista.pm updated (handles new output format)
+
+1999-10-22  Kingpin  <mthurn@tasc.com>
+
+	* Lycos.pm updated to 2.04 (use strip_tags, and extract real URL
+	from www.lycos.com's redirection URL)
+
+1999-10-20  Kingpin  <mthurn@tasc.com>
+
+	* Excite.pm updated to 2.03 (fixed parser for new output format,
+	and now strips tags out of title and description)
+
+1999-10-18  Kingpin  <mthurn@tasc.com>
+
+	* GoTo.pm updated to 1.04 (now uses source field of SearchResult)
+
+	* new backend Dice.pm for searching jobs at www.dice.com
+
+	* new backend AOL::Classifieds::Employment
+
+	* new backend AltaVista::Careers
+
+	* new backend Yahoo::Classifieds::Employment
+
+	* new backend Monster.pm for searching jobs at jobsearch.monster.com
+
+	* new backend HeadHunter.pm for searching jobs at www.headhunter.net
+
+	* Google.pm updated to 2.09 (fixed parser for new output format)
+
+	* HotBot.pm updated to 2.06 (strip tags, and new output format)
+
+1999-10-14  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm updated to 2.05 (strip tags, ignore newsgroups)
+
+	* Fireball.pm updated to 2.00 (fixed)
+
+1999-10-13  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.05 RELEASED!
+
+1999-10-12  Kingpin  <mthurn@tasc.com>
+
+	* Google.pm updated to 2.06 (fixed parser for new output format)
+
+1999-10-11  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm updated to 2.04 (fixed parser for new output)
+
+	* NetFind.pm updated to 1.5 (fixed parser for new output format)
+
+1999-10-08  Kingpin  <mthurn@tasc.com>
+
+	* new fields in WWW::SearchResult (company, location, source)
+
+	* cleaned up output of test.pl (again)
+
+	* WebSearch now prints error messages to STDERR instead of STDOUT, and only prints "Nothing found." in verbose mode
+
+1999-10-05  Kingpin  <mthurn@tasc.com>
+
+	* Yahoo.pm updated to 2.03 (use hash_to_cgi_string)
+
+	* WebCrawler.pm updated to 2.02 (use hash_to_cgi_string)
+
+	* Magellan.pm updated to 2.02 (use hash_to_cgi_string)
+
+	* Lycos.pm updated to 2.03 (use hash_to_cgi_string)
+
+	* LookSmart.pm updated to 2.02 (fixed)
+	
+	* Infoseek.pm updated to 2.05 (fix parser for Companies and News searches, and use hash_to_cgi_string)
+
+	* HotBot.pm updated to 2.05 (new test cases and uses hash_to_cgi_string)
+
+	* Excite::News.pm updated to 2.02 (fix parser)
+
+	* Excite.pm updated to 2.02 (use hash_to_cgi_string)
+
+	* Dejanews.pm updated to 2.03 (use hash_to_cgi_string)
+
+	* new method WWW::Search::hash_to_cgi_string to control construction of parameter lists
+	
+1999-10-04  Kingpin  <mthurn@tasc.com>
+
+	* fixed pod2man error in NetFind.pm pod
+
+1999-10-02  Kingpin  <mthurn@tasc.com>
+
+	* AltaVista.pm updated (gets approximate_result_count better now)
+
+	* Search.pm updated (no longer screws up if
+	approximate_result_count is called before parsing any results)
+	
+1999-10-01  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.04 RELEASED!
+	
+1999-09-30  Kingpin  <mthurn@tasc.com>
+
+	* cleaned up the output of `make test`
+
+1999-09-29  Kingpin  <mthurn@tasc.com>
+
+	* new module Lycos::Sites.pm for searching Lycos categorized sites
+	
+	* new module Lycos::Pages.pm for searching Lycos indexed web pages
+	
+	* Lycos.pm updated to 2.02 to recognize Sites searches
+	
+	* Yahoo.pm updated to 2.02 (new test cases, and pod update)
+
+	* Infoseek.pm updated to 2.03 
+	(handle \n in descriptions and ignore "company profile" URLs)
+
+1999-09-28  Kingpin  <mthurn@tasc.com>
+
+	* Infoseek.pm updated to 2.02 (fixed "next" page URL parsing)
+
+	* WebSearch has a new option --debug to turn on debugging in backends
+	
+	* WebSearch has a new option --lwpdebug to turn on low-level LWP debugging
+
+1999-09-27  Kingpin  <mthurn@tasc.com>
+
+	* Google.pm updated to 2.05
+
+	* Metapedia.pm updated to 2.06
+
+1999-09-22  Kingpin  <mthurn@tasc.com>
+
+	* GoTo.pm updated to 1.03 (format change, URL unencryption fixed)
+
+	* WebSearch pod reflects long option names
+
+1999-09-20  Kingpin  <mthurn@tasc.com>
+
+	* NetFind.pm updated to 0.7 (AOL moved/merged their search services)
+
+1999-09-17  Kingpin  <mthurn@tasc.com>
+
+	* Dejanews.pm updated to version 2.02 (fixed URL parsing)
+
+	* new backend Deja.pm for searching www.deja.com
+
+1999-09-15  Kingpin  <mthurn@tasc.com>
+
+	* new backend GoTo.pm for searching www.goto.com
+
+	* WebSearch has a new option --count to show the approximate_result_count
+
+1999-09-13  Kingpin  <mthurn@tasc.com>
+
+	* `make test -u` now deletes existing test files before updating
+
+	* NorthernLight.pm updated to version 2.03 (fixed URL parsing)
+
+1999-09-09  Kingpin  <mthurn@tasc.com>
+
+	* new backend NetFind.pm for searching netfind2.aol.com
+
+1999-09-07  Kingpin  <mthurn@tasc.com>
+
+	* extraneous warnings removed from AutoSearch
+
+1999-08-19  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.03 RELEASED!
+
+1999-08-18  Kingpin  <mthurn@tasc.com>
+
+	* AutoSearch updated to version 2.01, with new command-line arguments -host and -port
+
+	* AutoSearch now allows multiple -options arguments with the same key
+
+1999-08-16  Kingpin  <mthurn@tasc.com>
+
+	* complete package tested with ActivePerl 519 in WinNT
+
+	* It finally happened!  Our "Bogus" query string is starting to
+	appear in web archives and is being indexed by search engines.
+	Therefore, the "Bogus" query string now contains some "random"
+	numbers so that it can never be indexed.
+
+1999-08-09  Kingpin  <mthurn@tasc.com>
+
+	* WebSearch now allows long command-line argument names with double-minus
+
+	* WebSearch updated to version 2.04, with new command-line arguments --host and --port
+
+	* WebSearch now allows multiple --options arguments with the same key
+
+1999-08-01  Kingpin  <mthurn@tasc.com>
+
+	* WebSearch now has its own VERSION number
+
+1999-07-23  Jim Smyser
+
+	* NorthernLight.pm updated to 2.02 (fix description parsing)
+
+1999-07-16  Kingpin  <mthurn@tasc.com>
+
+	* complete package tested with ActivePerl 517 in Win98
+
+1999-07-14  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 2.01 RELEASED!
+
+1999-07-13  Kingpin  <mthurn@tasc.com>
+
+	* various cleanups in test.pl
+	
+	* All backends with their own version numbers have been bumped up
+	to 2.01 (this is to clean up the CPAN database)
+
+	* Makefile.PL and the test suite now work in Win32
+
+	* all test cases updated for all working backends; test cases
+	eliminated for known broken backends
+
+	* NorthernLight.pm updated
+
+	* new backend Google.pm for searching www.google.com
+
+	* new backend OpenDirectory.pm for searching search.dmoz.org
+
+1999-07-09  Kingpin  <mthurn@tasc.com>
+
+	* Infoseek.pm updated to version 1.18; warnings removed
+
+	* new backend LookSmart.pm for searching looksmart.com
+
+1999-07-06  Kingpin  <mthurn@tasc.com>
+
+	* Dejanews.pm updated to version 1.12; now uses www.deja.com;
+	adheres to new test mechanism
+
+	* AltaVista/AdvancedWeb.pm updated to version 2.01
+
+1999-07-02  Kingpin  <mthurn@tasc.com>
+
+	* ZDNet.pm FIXED and updated to version 1.03
+
+	* NorthernLight.pm FIXED and updated to version 1.05
+
+1999-07-01  Kingpin  <mthurn@tasc.com>
+
+	* WWW::Search VERSION 1.025 RELEASED!
+
+1999-06-30  Kingpin  <mthurn@tasc.com>
+
+	* WebCrawler.pm updated to version 1.14; adheres to new test mechanism
+
+	* Infoseek.pm now strips HTML from titles and descriptions
+
+	* Infoseek/Companies.pm updated to version 1.10; adheres to new test mechanism
+
+	* Infoseek/News.pm updated to version 1.09; adheres to new test mechanism
+
+	* Infoseek/Web.pm updated to version 1.10; adheres to new test mechanism
+
+	* new exported function strip_tags()
+
+1999-06-29  Kingpin  <mthurn@tasc.com>
+
+	* Excite.pm updated to version 1.11; adheres to new test mechanism
+
+	* new test mechanism puts list of test cases into each module's
+	code (no more duplicate test code!)
+
+	* Infoseek.pm updated to version 1.14; Companies and News searches fixed
+
+1999-06-28  Kingpin  <mthurn@tasc.com>
+
+	* test/test.pl is more informative about errors
+
+	* Infoseek.pm updated to version 1.13
+
+1999-06-24  Kingpin  <mthurn@tasc.com>
+
+	* Profusion.pm updated to version 1.05
+
+	* OpenDirectory.pm updated
+
+1999-06-22  Kingpin  <mthurn@tasc.com>
+
+	* The version method is now implemented within the WWW::Search
+	module, so backends no longer need to declare it locally
+
+	* Snap.pm updated
+
+1999-06-21  Kingpin  <mthurn@tasc.com>
+
+	* NorthernLight.pm updated; now returns score and date for each hit
+
+	* new backend AltaVista::Intranet
+
+	* HotBot.pm updated; now unescapes URLs before returning them
+
+=====================================
+
+RELEASE HISTORY (moved here from the README file):
+	
+1.002:  (11 October 1996)
+- First public release.
+
+1.004:  (31 October 1996)
+- new:  AutoSearch, a client application (see below for details)
+- new:  WWW::Search is now in CPAN (see GETTING WWW::Search for details)
+- bug fix:  installation problem (no rule to make CLIENTS/search) fixed
+
+1.005:  (12 November 1996)
+- new: back-ends for HotBot, Lycos, and several AltaVista variants
+- new: application support for search-engine selection
+- new: application and library support for search-engine options
+
+1.006:  (25 November 1996)
+- private beta release, see 1.007 for list of new features
+
+1.007: (17 December 1996)
+- new: back-ends for Dejanews (from Cesare Feroldi de Rosa),
+	Infoseek (also from Cesare Feroldi de Rosa),
+	and Excite (from GLen Pringle)
+- new: more fields in SearchResult (score, dates, etc., see the man page)
+	(problem found by Cesare Feroldi de Rosa)
+- new: better error handling on network failures
+	(AutoSearch should report errors on its pages,
+	$search->response() provides an API for error reporting)
+- new (internal):  user_agent handling has changed
+- new:  proxy support added to WWW::Search (still needed in applications)
+	(problem and fix suggested by T. V. Raman)
+- bug-fix: numerous documentation updates
+	(problems found by Larry Virden)
+- bug-fix: AltaVista web search was occasionally dropping hits
+	(problem found by Larry Virden, fixed by Bill Scheding)
+- bug-fix: all non-alphanumeric characters are now escaped
+	(problem found by Larry Virden)
+
+1.008:  (8 January 1997)
+- private alpha release, see 1.009 for list of new features
+
+
+1.009:  (14 January 1997)
+overview:  1.009 is primarily a maintenance release to accommodate
+	changes to LWP and some search engines.
+- change:  search application renamed WebSearch (a more specific name)
+- bug-fix:  the WWW::Search error in formatting is fixed
+	(problem found by Larry Virden, fix by him and johnh)
+- bug-fix:  RobotUA handling updated for new LWP in Search.pm
+- bug-fix:  update for Infoseek (page format changed about 1 Jan 97)
+	(problem found by Joseph McDonald, fix by Cesare Feroldi de Rosa)
+- bug-fix:  update for Excite (page format changed about 9 Jan 97)
+	(problem found by Juan Jose Amor, fix by GLen Pringle)
+
+1.010: (20 August 1997)
+overview:  an interim release to fix AltaVista
+- new: normalized_score, a back-end independent score (from Paul Lindner)
+- new: generic options are supported by several back-ends
+	(specify search engine URL, debugging, etc.)
+- new: AltaVista back-end now sets SearchResult::raw
+- bug-fix: update for AltaVista (page format changed Jul 97)
+	(some information wrt fix provided by Guy Decoux)
+
+1.011:  (8 October 1997)
+- internal alpha release, see 1.012 for list of new features
+
+1.012:   (3 November 1997)
+- Overview:  an alpha release for test-suite testing
+- new: for testing, HTTP results can be saved to disk and played back
+- new: test scripts (try "make test")
+- bug-fix: Lycos works again and is now maintained by John Heidemann
+- bug-fix: AltaVista advanced and news searches have been repaired
+- bug-fix: some uninitialized value warnings suppressed
+	(fix suggested by R. Chandrasekar (Mickey))
+- new: new back-ends PLweb
+- new: documentation for PLweb (contributed by Paul Linder)
+- new: new back-ends: Gopher, Simple (contributed by Paul Linder)
+- new: WWW::Search mailing list:
+	to subscribe, send "subscribe info-www-search" as
+	the body of a message to <info-www-search-request@isi.edu>
+
+1.013, (19 February 1998)
+overview:  this is an alpha release to include Martin's new back-ends
+
+- bug fix:  HotBot back-end updated by Martin Thurn <mthurn@tasc.com>
+- new:  Yahoo back-end now works, by Martin Thurn <mthurn@tasc.com>
+- problem: several back-ends don't work (Lycos)
+- problem: several back-ends don't have test suites and
+	so may or may not work (DejaNews, Excite, HotBot, Infoseek, PLweb,
+	SFgate, Verity, Yahoo)
+- reminder: WWW::Search mailing list:
+	to subscribe, send "subscribe info-www-search" as
+	the body of a message to <info-www-search-request@isi.edu>
+
+
+1.014, (24 March 1998)
+overview:  this is an alpha release to fix the AltaVista/Lycos back-ends
+- bug fix:  AltaVista/Lycos back-ends
+	(problem reported by Bilal Siddiqui <bilal.siddiqui@mankato.msus.edu>)
+- known problem: some back-end test suites give intermittent results
+	(AltaVista::News)
+- problem: several back-ends don't have test suites and
+	so may or may not work (DejaNews, Excite, HotBot, Infoseek, PLweb,
+	SFgate, Verity, Yahoo)
+
+1.015, (2-Apr-98)
+overview:  this is an alpha release with several new back-ends
+- new: back-ends: Magellan, WebCrawler (thanks to Martin Thurn)
+- bug fix:  Yahoo/HotBot/Excite back-ends,
+	with test suites.  Many thanks to Martin Thurn.
+- bug fix:  AltaVista news test suites have been relaxed,
+	even though the code worked before, the test suites
+	used to report false negatives.
+- bug fix: AltaVista is now more careful to detect the end of
+	a hit's raw HTML
+- new: the test suite has been enhanced to be less sensitive
+	to changes in what's indexed
+- problem: several back-ends don't have test suites and
+	so may or may not work (DejaNews, Infoseek, PLweb,
+	SFgate, Verity)
+- reminder: WWW::Search mailing list:
+	to subscribe, send "subscribe info-www-search" as
+	the body of a message to <info-www-search-request@isi.edu>
+
+1.016, 21-May-98
+overview: this is an alpha to fix HotBot/Infoseek
+- bug fix: Infoseek/HotBot back ends now work again.
+	(HotBot problem reported by Alan McCoy <a.r.mccoy@larc.nasa.gov>,
+	both back-ends fixed by Martin Thurn)
+- addition: Infoseek test suite
+- addition: test output now includes the version number
+
+1.017, 27-May-98
+overview:  this is the public release since 1.012
+- bug fix: Lycos bug fix
+
+1.018, 31-May-98
+overview:  back-end updates
+- bug fix: Excite and WebCrawler (by Martin Thurn),
+	AltaVista (by John Heidemann)
+	updated 30-May-98
+- known bugs:  WWW::Search doesn't work on MacPerl because of
+	end-of-line differences.  A fix for this problem is in
+	progress.  (Problem identified and fix suggested by 
+	Chris Nandor.)
+
+1.019, 25-Jun-98
+overview:  back-end updates
+- bug fix: test suite bugs were causing false negatives on
+	Yahoo, Excite, Magellan, WebCrawler (reported by Martin Thurn,
+	fixed John Heidemann)
+- new feature:  the test suite is now run daily (automatically).
+	Output can be found at
+	<http://www.isi.edu/~johnh/WORK/LSAM/WWW_SEARCH/>.
+- new feature: verbose mode of WebSearch is more verbose
+- bug fix: AltaVista was recording the RealName URL on some queries
+	(bug reported by Vassilis Papadimos <vpapad@dblab.ece.ntua.gr>)
+- bug fix: AltaVista wasn't correctly reporting change_time/size 
+	(bug and fix from Martin Valldeby <martin.valldeby@pakom.se>)
+
+1.020, 12-Aug-98
+overview:  lots of bug fixes and new back-ends
+- bug fix:  maximum_to_retrieve now works for very small values.
+	(Problem identified by Vidyut Luther <vluther@hpctc.org>.)
+- new back-ends: ExciteForWebServers, FolioViews, Livelink, MSIndexServer,
+	Null, Search97
+	all from Paul Lindner (thanks!)
+- bug fix:  Gopher, PLweb, SFgate, Simple, Verity from Paul Lindner
+- bug fix:  Lycos from John Heidemann
+- new test suites:  PLweb, FolioViews, Null, MSIndexServer, Search97,
+	SFgate, ExciteForWebServers rom Paul Lindner
+- bug fix:  HotBot repair from Martin Thurn
+
+1.021, 27-Aug-98
+overview:  a general release
+- new:  Windows installation is now supported by
+	Jim Smyser <jsmyser@bigfoot.com>; please see his web
+	page <http://pubinfo.phx.primenet.com/www.search/>
+	for details.
+- new:  MacPerl should now be supported.  Thanks to Chris Nandor
+	for the problem and a fix.
+- bug fix:  Infoseek, WebCrawler, Dejanews, HotBot by Martin Thurn
+- bug fix:  AltaVista approx_count bug found by
+	Darren Stalder <darren@u.washington.edu>
+- bug fix: documentation cleanups from Neil Bowers
+
+1.022, 16-Oct-98
+overview:  An interim release to fix several broken back-ends.
+- bug fix: documentation cleanups from Ave Wrigley
+- bug fix: Infoseek updates (from Martin Thurn)
+- bug fix: AltaVista update (minor format changes Oct. 1998,
+	partial fix from Andreas Borchert)
+- new: back ends for Crawler, Fireball, NorthernLight from Andreas Borchert
+
+1.024, 11-Dec-98
+overview:  primarily bug fixes for back ends
+- new: proxy support added to WebSearch and AutoSearch
+	(based on code from Paul Linder)
+- new: new back end for Snap.com (from Jim Smyser)
+- bug fix:  Yahoo, HotBot, Excite, Lycos (from Martin Thurn),
+	NorthernLight (from Jim Smyser)
+

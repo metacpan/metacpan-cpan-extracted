@@ -1,0 +1,304 @@
+#!perl
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions :config bundling);
+use Pod::Usage qw(pod2usage);
+use WWW::YouTube::Download;
+use Encode qw(find_encoding decode_utf8);
+use Time::HiRes;
+
+my $encode    = 'utf8';
+my $overwrite = 0;
+my $verbose   = -t STDOUT ? 1 : 0; # don't be verbose on dump terminal
+my $interval  = 1; # sec
+my $proxy     = undef;
+my $interactive = undef;
+GetOptions(
+    'C|no-colors!' => \my $disable_colors,
+    'U|url!'       => \my $playback_url,
+    'o|output=s'   => \my $output,
+    'F|fmt=i',     => \my $fmt,
+    's|skip'       => \my $skip,
+    'n|dry-run'    => \my $dry_run,
+    'user-agent=s' => \my $user_agent,
+    'v|verbose!'   => \$verbose,
+    'i|interval=i' => \$interval,
+    'a|interactive' => \$interactive, # 'a' for 'ask', 'i' was taken
+    'e|encode=s'   => \$encode,
+    'f|force!'     => \$overwrite,
+    'p|proxy=s'    => \$proxy,
+    'q|quiet!'     => sub { $verbose = 0 },
+    'h|help'       => sub { help() },
+    'm|man'        => sub { pod2usage(-verbose => 2) },
+    'V|version!'   => sub { show_version() },
+) or help();
+challeng_load_argv_from_fh() unless @ARGV;
+help() unless @ARGV;
+
+my $encoder = find_encoding($encode) or throw("not supported encoding: $encode");
+$output = $encoder->decode($output) if $output;
+
+my $client = WWW::YouTube::Download->new;
+
+if ($proxy) {
+    $client->{ua}->proxy(['http','https'] => $proxy);
+        print "--> Using proxy $proxy\n";
+}
+
+if ($user_agent) {
+    $client->{ua}->agent($user_agent);
+        print "--> Using user-agent-string: \"".$client->{ua}->agent()."\"\n";
+}
+
+main: {
+    while (@ARGV) {
+        my $video_id = shift @ARGV;
+        my $meta_data = $client->prepare_download($video_id);
+        chatty("--> Working on $meta_data->{video_id}");
+
+	ASK:
+	if($interactive){
+		print "YouTube tells us these formats are available:\n";
+		print " format-tag \tresolution \tsuffix\n";
+		print "-----------------------------------------------\n";
+		for(sort keys %{ $$meta_data{video_url_map} }){
+			my $ref = ${ $$meta_data{video_url_map} }{$_};
+			print " $ref->{fmt} \t\t$ref->{resolution} \t$ref->{suffix}\n";
+		}
+		print "Your selection (currently: ". ($fmt ? $fmt : '"best"/default' )."): ";
+		$fmt = <>; chomp($fmt);
+	}
+
+        if ($fmt && !$client->_is_supported_fmt($video_id, $fmt)) {
+		if($interactive){
+		print "[$meta_data->{video_id}] this video is not offered in fmt: $fmt\n";
+			goto ASK if $interactive;
+		}
+            throw("[$meta_data->{video_id}] this video is not offered in fmt: $fmt");
+        }
+
+        if ($playback_url) {
+            my $p_url = $client->playback_url($video_id, { fmt => $fmt });
+            chatty("Playback URL: $p_url");
+            next;
+        }
+
+        # multibyte fixes
+        my $filename = $client->_format_filename($output, {
+            video_id   => $meta_data->{video_id},
+            user       => $meta_data->{user},
+            resolution => $meta_data->{resolution},
+            title      => decode_utf8($meta_data->{title}),
+            suffix     => $fmt ? $meta_data->{video_url_map}{$fmt}{suffix} : $meta_data->{suffix},
+            fmt        => $fmt || $meta_data->{fmt},
+        });
+        $filename = filename_normalize($filename);
+        $filename = $encoder->encode($filename, sub { sprintf 'U+%x', shift });
+
+        if ($dry_run) {
+            print "$filename\n";
+            next;
+        }
+
+        if ($skip && -e $filename) {
+            print "Skipping existing file: $filename\n";
+            next;
+        }
+
+        eval {
+            $client->download($video_id, {
+                filename  => $filename,
+                fmt       => $fmt,
+                verbose   => $verbose,
+                overwrite => $overwrite,
+            });
+        };
+        if (my $e = $@) {
+           unlink $filename if -e $filename && !-s $filename;
+           throw("[$meta_data->{video_id}] $e");
+        }
+
+        chatty(pcolor(['green'], 'Download successful!'));
+
+        Time::HiRes::sleep($interval) if @ARGV;
+    }
+}
+
+exit;
+
+sub challeng_load_argv_from_fh {
+    return unless $0 ne '-' && !-t STDIN;
+
+    # e.g. $ youtube-download < video_list
+    while (defined (my $line = <STDIN>)) {
+        chomp $line;
+        $line =~ s/#.*$//;       # comment
+        $line =~ s/^\s+|\s+$//g; # trim spaces
+        push @ARGV, $line;
+    }
+}
+
+sub filename_normalize {
+    my $filename = shift;
+    $filename =~ s#[[:cntrl:]]##smg;          # remove all control characters
+    $filename =~ s#^\s+|\s+$##g;              # trim spaces
+    $filename =~ s#^\.+##;                    # remove multiple leading dots
+    $filename =~ tr#"/\\:*?<>|#'\-\-\-_____#; # NTFS and FAT unsupported characters
+    return $filename;
+}
+
+sub throw {
+    die pcolor(['red'], 'ERROR: ', @_), "\n";
+}
+
+sub chatty {
+    print @_, "\n";
+}
+
+sub pcolor {
+    my ($color, @msg) = @_;
+
+    if ($^O eq 'MSWin32' || $disable_colors || !-t STDOUT) {
+        return @msg;
+    }
+
+    eval { require Term::ANSIColor };
+    return @msg if $@; # module not available
+    return Term::ANSIColor::colored($color, @msg);
+}
+
+sub show_version {
+    print "youtube-download (WWW::YouTube::Download) version $WWW::YouTube::Download::VERSION\n";
+    exit;
+}
+
+sub help {
+    print << 'HELP';
+Usage:
+    youtube-download [options] video_id_or_video_url ...
+
+Options:
+    -C, --no-colors     Disable colored output
+    -o, --output        Output filename, supports `{$value}` format
+    -e, --encode        File system encoding (e.g. cp932)
+    -F, --fmt           Video quality (SEE ALSO Wikipedia)
+    -f, --force         Force overwrite output file
+    -s, --skip          Skip download when output file exists
+    -i, --interval      Download interval
+    -p, --proxy         Use the stated proxy
+    -n, --dry-run       Do not download any videos, print target filenames
+    -v, --verbose       Turns on chatty output (default: enabled)
+    -q, --quiet         Turns off progress
+    -U, --url           Display playback URL for a video
+    -h, --help          Display help
+    -m, --man           Display man page
+    -V, --version       Display version
+    --user-agent        Supply your own user-agent string
+
+supported `{$value}` format are:
+    {video_id} / {user} / {title} / {fmt} / {suffix} / {resolution}
+
+    Examples:
+        $ youtube-download -o "[{video_id}] {title}.{suffix}"
+        $ youtube-download -p socks://127.0.0.1:4321/ -o "{title} by {user} (youtube {video_id}).{suffix}"
+
+HELP
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+youtube-download - Download video(s) from YouTube
+
+=head1 SYNOPSIS
+
+  $ youtube-download bT8yLWy4B5w
+  $ youtube-download http://www.youtube.com/watch?v=bT8yLWy4B5w
+  $ youtube-download < video_list_file
+
+=head1 OPTIONS
+
+=over
+
+=item -C, --no-colors
+
+Force disable colored output
+
+=item -o, --output
+
+output filename, supports `{$value}` format (default: {video_id}.{suffix})
+
+=item -i, --interval
+
+Download interval (default: 1 (sec))
+
+=item -p
+
+Use the given proxy. Requires LWP::Protocol::socks to be installed for socks proxies. See examples for syntax. (default: no proxy)
+
+=item -e, --encode
+
+File system encoding (default: utf8)
+
+=item -s, --skip
+
+Skip downloading a video, if target file exists.
+
+=item -f, --force
+
+Force overwrite output file (default: disabled)
+
+=item -n, --dry-run
+
+Do not download any videos, but print their target filenames,
+as defined by -o option. This option still sends query to
+Google servers to fetch details about given video.
+
+=item -F, --fmt
+
+Video quality (SEE ALSO Wikipedia)
+
+=item -v, --verbose
+
+Turns on chatty output (default: enabled)
+
+=item -U, --url
+
+Show playback URL of a video, but do not download it
+
+=item -q, --quiet
+
+Turns off the most output
+
+=item -h, --help
+
+Display help
+
+=item -m, --man
+
+Display help page
+
+=item -V, --version
+
+Display version
+
+=item --user-agent
+
+Supply your own user agent string
+
+=back
+
+=head2 supported `{$value}` format
+
+{video_id} / {user} / {title} / {fmt} / {suffix} / {resolution}
+
+  Example:
+  $ youtube-download -o "[{video_id}] {title}.{suffix}"
+  $ youtube-download -p socks://127.0.0.1:4321/ -o "{title} by {user} (youtube {video_id}).{suffix}"
+
+=head1 AUTHOR
+
+Yuji Shimada (xaicron)
+

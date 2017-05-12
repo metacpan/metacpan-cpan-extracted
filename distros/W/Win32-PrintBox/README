@@ -1,0 +1,59 @@
+Win32::PrintBox - Redirects print STDOUT and warn statements to a message box under wperl
+
+Version 0.01
+
+SYNOPSIS
+
+    use Win32::PrintBox;
+    
+    print "Program output\n";
+    warn "I am here\n";
+
+This module makes a perl script act like a windows application when started with 
+wperl.exe, using message boxes. It has no effect when scripts are executed from 
+a shell.
+
+For perl (not wperl) scripts started from Explorer, or any other windows 
+application, a final "Press any key to continue" is added, to allowing the user 
+to see all output before the console window closes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Win32::PrintBox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-PrintBox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Win32-PrintBox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Win32-PrintBox
+
+    Search CPAN
+        http://search.cpan.org/dist/Win32-PrintBox/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 David Clarke
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+lib/WWW/Comic/Plugin/Jerkcity.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

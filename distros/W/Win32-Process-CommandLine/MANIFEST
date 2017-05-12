@@ -1,0 +1,18 @@
+Changes
+CommandLine.xs
+Makefile.PL
+MANIFEST
+StdAfx.h
+CommandLine.h
+ppport.h
+README
+t/Win32-Process-CommandLine.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Win32/Process/CommandLine.pm
+test.pl
+test_all_pid.pl
+test_one_pid.pl
+exe/CommandLine.c
+exe/CommandLine.h
+META.yml                                 Module meta-data (added by MakeMaker)

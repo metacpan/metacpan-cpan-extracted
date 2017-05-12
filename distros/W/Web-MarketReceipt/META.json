@@ -1,0 +1,97 @@
+{
+   "abstract" : "iOS and Android receipt verification module.",
+   "author" : [
+      "Konboi <ryosuke.yabuki@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Web-MarketReceipt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::RSA" : "0",
+            "Exception::Tiny" : "0",
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::XS" : "0",
+            "MIME::Base64" : "0",
+            "Mouse" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Web::MarketReceipt" : {
+         "file" : "lib/Web/MarketReceipt.pm",
+         "version" : "0.02"
+      },
+      "Web::MarketReceipt::Order" : {
+         "file" : "lib/Web/MarketReceipt/Order.pm"
+      },
+      "Web::MarketReceipt::Verifier" : {
+         "file" : "lib/Web/MarketReceipt/Verifier.pm"
+      },
+      "Web::MarketReceipt::Verifier::AppStore" : {
+         "file" : "lib/Web/MarketReceipt/Verifier/AppStore.pm"
+      },
+      "Web::MarketReceipt::Verifier::AppStore::Exception" : {
+         "file" : "lib/Web/MarketReceipt/Verifier/AppStore.pm"
+      },
+      "Web::MarketReceipt::Verifier::GooglePlay" : {
+         "file" : "lib/Web/MarketReceipt/Verifier/GooglePlay.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kayac/p5-Web-MarketReceipt/issues"
+      },
+      "homepage" : "https://github.com/kayac/p5-Web-MarketReceipt",
+      "repository" : {
+         "url" : "git://github.com/kayac/p5-Web-MarketReceipt.git",
+         "web" : "https://github.com/kayac/p5-Web-MarketReceipt"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

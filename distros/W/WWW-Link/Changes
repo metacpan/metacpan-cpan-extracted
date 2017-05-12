@@ -1,0 +1,28 @@
+0.34 - Sun Jan 06 2002
+
+	We handle correctly fixing of links with fragments.
+	Previously we failed to fix these.  
+
+	LongList reporter now uses a file to url conversion function
+	instead of base arguments.
+
+0.33 - Sun Jan 06 2002
+
+	We renamed $link->never_checked to $link->is_not_checked().
+	Now we document that.
+
+	Handling of non-existent links is now corrected.
+
+0.32 - Wed Jan 02 2002
+
+	Dependency fixes based on CPAN test fail.
+
+0.29 - Sat Dec 12 2001
+
+	Substitutor interface completely re-worked.
+	generate_file_substitutor is now the preferred entry point.
+
+	This module is now completely independent from the
+	Link_Controller system.  Functions such as
+	translation of urls to local files names and back are supposed
+	to be provided by the user as CODE references.

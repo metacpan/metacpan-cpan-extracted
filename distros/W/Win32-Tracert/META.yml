@@ -1,0 +1,23 @@
+---
+abstract: 'Call Win32 tracert tool or parse Win32 tracert output'
+author:
+  - 'Sébastien Deseille <sebastien.deseille@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Tracert
+requires:
+  Net::hostent: '0'
+  Object::Tiny: '1.08'
+  Socket: '0'
+  Test::More: '0'
+resources:
+  homepage: https://github.com/sdeseille/win32-tracert
+  repository: https://github.com/sdeseille/win32-tracert.git
+version: '0.011'

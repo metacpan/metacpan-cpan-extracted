@@ -1,0 +1,3 @@
+TYPEMAP
+DWORD        T_UV
+BOOL         T_BOOL

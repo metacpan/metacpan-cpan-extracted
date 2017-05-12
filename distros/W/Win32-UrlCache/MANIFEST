@@ -1,0 +1,20 @@
+Changes
+lib/Win32/UrlCache.pm
+lib/Win32/UrlCache/Cache.pm
+lib/Win32/UrlCache/Cookies.pm
+lib/Win32/UrlCache/FileTime.pm
+lib/Win32/UrlCache/FileTimePP.pm
+lib/Win32/UrlCache/History.pm
+lib/Win32/UrlCache/Title.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/20_filetime.t
+t/20_filetime_pp.t
+t/30_cache.t
+t/30_cookies.t
+t/30_history.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

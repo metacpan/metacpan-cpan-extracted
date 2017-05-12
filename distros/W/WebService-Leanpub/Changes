@@ -1,0 +1,36 @@
+Revision history for WebService-Leanpub
+
+0.3.0  Fr 14. Feb 22:20:18 CET 2014
+    - added method summary() which provides information about the book
+    - added command summary to bin/leanpub
+    - added method single() to create a preview from a single file
+    - added command single to bin/leanpub
+    - added method subset() as alias for partial_preview() to library
+    - added command subset as alias for partial to bin/leanpub
+    - changed Preview.txt to Subset.txt in POD
+
+0.2.0  Wed Oct 16 11:20:05 CEST 2013
+    - functions for coupons (create, list, update) now available
+
+0.1.0  Fri Aug 30 09:24:55 CEST 2013
+    - WebService/Leanpub.pm: added partial_preview()
+    - bin/leanpub: added command partial_preview
+
+0.0.4  Mon Aug 26 23:18:30 CEST 2013
+    - bin/leanpub: added option --version
+    - bin/leanpub: added documentation for configuration files
+    - publish(): send email and release notes
+
+0.0.3  Fri Aug 23 11:19:40 CEST 2013
+    - return error if missing API key
+    - return error if missing SLUG
+    - set User Agent to "libwebservice-leanpub-perl/$VERSION"
+    - use URI::Escape to protect URL variables
+
+0.0.2  Thu Aug 22 08:27:29 CEST 2013
+    - added dependency LWP::UserAgent to Build.PL
+    - added option page to retrieval of individual purchases
+
+0.0.1  Sun Aug 18 19:19:13 2013
+       Initial release.
+

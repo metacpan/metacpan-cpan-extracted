@@ -1,0 +1,25 @@
+Win32/Net/Session version 0.01
+==============================
+
+With Win32::Net::Session you can list informations about conected clients on a Windows server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are no dependencies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Reinhard Pagitsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/WWW/Bing/Search.pm
+t/00_compile.t

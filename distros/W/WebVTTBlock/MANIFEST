@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/WebVTTBlock.pm
+META.yml
+META.json

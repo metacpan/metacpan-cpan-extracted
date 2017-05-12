@@ -1,0 +1,16 @@
+#define STRICT
+#define WINVER       0x0400 /* Not 0x0501, for VC6 compatibility */
+#define _WIN32_WINNT 0x0400 /* Not 0x0501, for VC6 compatibility */
+#include <Windows.h>
+
+#ifndef ISOLATION_AWARE_MANIFEST_ID
+#define ISOLATION_AWARE_MANIFEST_ID 2
+#endif
+
+#ifndef RT_MANIFEST
+#define RT_MANIFEST 24
+#endif
+
+ISOLATION_AWARE_MANIFEST_ID RT_MANIFEST "VisualStyles.manifest"
+
+#include "VisualStyles.version"

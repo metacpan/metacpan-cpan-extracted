@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Spyder
+version:      0.22
+version_from: lib/WWW/Spyder.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   0
+    HTML::Entities:                0
+    HTML::Parser:                  3
+    HTTP::Cookies:                 0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    URI::URL:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

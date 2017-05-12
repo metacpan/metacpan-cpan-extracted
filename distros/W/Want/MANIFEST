@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+Want.pm
+Want.xs
+t/all.t
+t/assign.t
+t/boolean.t
+t/damian.t
+t/err.t
+t/methcall.t
+t/object.t
+t/threads.p
+t/threads.t
+META.yml                                 Module meta-data (added by MakeMaker)

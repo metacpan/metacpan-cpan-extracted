@@ -1,0 +1,149 @@
+{
+   "abstract" : "a simple wrapper for Slack Web API",
+   "author" : [
+      "Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Slack-WebApi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Class::Accessor::Lite::Lazy" : "0",
+            "Class::Load" : "0",
+            "Data::Validator" : "0",
+            "Exception::Tiny" : "0",
+            "Furl" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::XS" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover::Report::Coveralls" : "0",
+            "Test::Mock::Furl" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Slack::WebApi" : {
+         "file" : "lib/WebService/Slack/WebApi.pm",
+         "version" : "0.08"
+      },
+      "WebService::Slack::WebApi::Api" : {
+         "file" : "lib/WebService/Slack/WebApi/Api.pm"
+      },
+      "WebService::Slack::WebApi::Auth" : {
+         "file" : "lib/WebService/Slack/WebApi/Auth.pm"
+      },
+      "WebService::Slack::WebApi::Base" : {
+         "file" : "lib/WebService/Slack/WebApi/Base.pm"
+      },
+      "WebService::Slack::WebApi::Channels" : {
+         "file" : "lib/WebService/Slack/WebApi/Channels.pm"
+      },
+      "WebService::Slack::WebApi::Chat" : {
+         "file" : "lib/WebService/Slack/WebApi/Chat.pm"
+      },
+      "WebService::Slack::WebApi::Client" : {
+         "file" : "lib/WebService/Slack/WebApi/Client.pm"
+      },
+      "WebService::Slack::WebApi::Emoji" : {
+         "file" : "lib/WebService/Slack/WebApi/Emoji.pm"
+      },
+      "WebService::Slack::WebApi::Exception" : {
+         "file" : "lib/WebService/Slack/WebApi/Exception.pm"
+      },
+      "WebService::Slack::WebApi::Exception::FailureResponse" : {
+         "file" : "lib/WebService/Slack/WebApi/Exception.pm"
+      },
+      "WebService::Slack::WebApi::Files" : {
+         "file" : "lib/WebService/Slack/WebApi/Files.pm"
+      },
+      "WebService::Slack::WebApi::Generator" : {
+         "file" : "lib/WebService/Slack/WebApi/Generator.pm"
+      },
+      "WebService::Slack::WebApi::Groups" : {
+         "file" : "lib/WebService/Slack/WebApi/Groups.pm"
+      },
+      "WebService::Slack::WebApi::Im" : {
+         "file" : "lib/WebService/Slack/WebApi/Im.pm"
+      },
+      "WebService::Slack::WebApi::Oauth" : {
+         "file" : "lib/WebService/Slack/WebApi/Oauth.pm"
+      },
+      "WebService::Slack::WebApi::Reactions" : {
+         "file" : "lib/WebService/Slack/WebApi/Reactions.pm"
+      },
+      "WebService::Slack::WebApi::Rtm" : {
+         "file" : "lib/WebService/Slack/WebApi/Rtm.pm"
+      },
+      "WebService::Slack::WebApi::Search" : {
+         "file" : "lib/WebService/Slack/WebApi/Search.pm"
+      },
+      "WebService::Slack::WebApi::Stars" : {
+         "file" : "lib/WebService/Slack/WebApi/Stars.pm"
+      },
+      "WebService::Slack::WebApi::Team" : {
+         "file" : "lib/WebService/Slack/WebApi/Team.pm"
+      },
+      "WebService::Slack::WebApi::Users" : {
+         "file" : "lib/WebService/Slack/WebApi/Users.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues"
+      },
+      "homepage" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi",
+      "repository" : {
+         "url" : "git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git",
+         "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "likkradyus <git@li.que.jp>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>",
+      "Sterling Hanenkamp <sterling@hanenkamp.com>",
+      "Steven Arnott <steven.arnott@grantstreet.com>"
+   ]
+}

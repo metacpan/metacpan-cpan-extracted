@@ -1,0 +1,76 @@
+{
+   "abstract" : "A client for the CDNetworks's Cache Flush Open API",
+   "author" : [
+      "Jean Pierre Ducassou <jpducassou at gmail dot com, no spaces>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-CDNetworks-Purge",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Metrics::Simple" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0",
+            "perl" : "v5.8.8",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "1.04"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::CDNetworks::Purge" : {
+         "file" : "lib/WebService/CDNetworks/Purge.pm",
+         "version" : "0.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jpducassou/perl-WebService-CDNetworks-Purge/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jpducassou/perl-WebService-CDNetworks-Purge",
+         "web" : "http://github.com/jpducassou/perl-WebService-CDNetworks-Purge"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

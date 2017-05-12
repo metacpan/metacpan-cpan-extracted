@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3da76f1256b991f277e7093294ef4c2029636df4 Changes
+SHA1 17ccae049a10e59da6b55818e65c16da41f7b082 MANIFEST
+SHA1 79b03c748a3745a312b1a626fe07b89d89fb290e META.yml
+SHA1 53a49fe85dcb5c87439cf865a94f80170c5af447 Makefile.PL
+SHA1 e09ce7033035158c9bfc1bd65a3fe3c6970089f9 lib/Wiki/Toolkit/Plugin/Categoriser.pm
+SHA1 1bf411c36941891c8137ef0cb31126ff52a2efd1 t/categoriser.t
+SHA1 51f31ec687aa79b759c086a6a6cf31636e5941e1 t/nested_categories.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iD8DBQFK5HzFYzuFKFF44qURAnfwAKCsjCbFqq5KpbGANtjR9gwgebYDrACguTw9
+7/mIEv5Tq/qNPaWdTNM0/WQ=
+=app1
+-----END PGP SIGNATURE-----

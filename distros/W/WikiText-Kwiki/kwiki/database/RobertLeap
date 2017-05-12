@@ -1,0 +1,1 @@
+I'm new to Perl programming, just started learning it about 3 months ago.  My only programming experience is with VB.  I am a long time resident of Portland.  I currently work as a Programmer Analyst for First Tech CU in Beaverton.  So far I have found Perl to be very easy to learn and extremely useful in my job and I'm looking forward to learning more about it.   

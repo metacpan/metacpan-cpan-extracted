@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_auth.t
+t/02_api.t
+lib/WebService/Riya.pm
+META.yml                                 Module meta-data (added by MakeMaker)

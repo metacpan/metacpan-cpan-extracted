@@ -1,0 +1,59 @@
+NAME
+
+    WWW-ColiPoste - Fetch and print shipping status from ColiPoste
+
+DESCRIPTION
+
+    This module allows you to fetch the status of packages shipped by 
+    ColiPoste, the service from the French national postal service.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with 
+    the perldoc command.
+
+        perldoc WWW::ColiPoste
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-ColiPoste
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/WWW-ColiPoste
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/WWW-ColiPoste
+
+        Search CPAN
+            http://search.cpan.org/dist/WWW-ColiPoste
+
+        Kobes Search
+            http://cpan.uwinnipeg.ca/dist/WWW-ColiPoste
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2008 Sebastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

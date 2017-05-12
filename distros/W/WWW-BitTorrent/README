@@ -1,0 +1,67 @@
+WWW::BitTorrent - Search and Download .torrent(s) files from BitTorrents boards.
+
+= Copyright =
+
+    Copyright (c) 2006 Amit Sides. All rights reserved.
+
+= LICENSE =
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 1, or (at
+    your option) any later version.
+
+= LIMITATIONS =
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+= DESCRIPTION =
+
+    "WWW::BitTorrent" provides an object interface to using two BitTorrent
+    based boards: "TBSource", "BrokenStone" (tell me about more).  This
+    boards are being update every day with files.  this module allows you
+    to search for files in a couple of ways.
+
+    NOTE: any use of this module that is illegal is out of my responsi‐
+    bilty.
+   
+= INSTALL =
+
+    WWW::BitTorrent uses the following modules:
+
+	LWP::Simple 	- to get the .torrent file
+	LWP::UserAgent 	- to get information from the site using cookies and headers.
+ 
+    Before installing make sure you have this modules: LWP::Simple , LWP::UserAgent.
+    If you dont: enter cpan command shell (`cpan`) and run install LWP::Simple
+							   install LWP::UserAgent
+    After that run this commands:
+	
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    then perldoc WWW::BitTorrent.
+
+========================================================================================
+
+= COMPATIBILITY =
+    
+    This module was developed under Hoary ubunut linux 5.10 and been tested on a couple
+    of bittorrent boards.
+
+= TODO =
+   
+    * Support all kind of BitTorrent base boards .
+
+= Bugs =
+
+    for bug reports and comments < amit.sides@gmail.com > 
+
+========================================================================================
+
+EOF

@@ -1,0 +1,71 @@
+Revision history for Perl extension WAP::wbxml.
+
+1.14  Mon Jan 25 17:30:00 2016
+	- fix compileDatetime (thanks to John Cochrane)
+
+1.13  Mon May 30 15:30:00 2011
+	- wbxml.pm : handle unknown PublicId
+	- activesync.wbrules.xml : new file (thanks to Viacheslav Tykhanovskyi)
+	- Makefile.PL : fix custom install
+
+1.12  Sat Jan  8 11:30:00 2011
+	- fix RT#64586 (thanks to Jason Simpson):
+		WAP::wbxml converts attribute values of "0" to "" in compileAttributeValues()
+
+1.11  Fri Oct 26 08:30:00 2007
+	- some Perl Best Practices
+
+1.10  Fri Feb 18 12:30:00 2005
+	- wbxml.pm : select the best token/codepage
+	- wbxml.pm : don't generate an empty inline string at the end of ATTR Value
+	- wap.wbrules.xml : update WAP-ProvCont
+
+1.09  Wed Jul  7 18:30:00 2004
+	- wbxmlc.pl : add option -h (display help)
+	- wbxmlc.pl : add option -v (display version)
+	- wbxml.pm : add support Wireless Village
+	- wv.wbrules.xml : new file (Wireless Village)
+	- wap.wbrules.xml : update WAP -> OMA
+	- syncml.wbrules.xml : update SyncML -> OMA
+
+1.08  Thu Jul 22 12:30:00 2003
+	- add option -p : path for rules
+	- rename wbrules.xml to wap.wbrules.xml
+	- add syncml.wbrules.xml for SyncML
+	- ignore unknown element in *.wbrules.xml
+
+1.07  Thu Sep 26 12:30:00 2002
+	- bug in Makefile.PL
+
+1.06  Tue Sep 24 12:30:00 2002
+	- Fix for perl 5.6.1
+	- rename xmlc to wbxmlc.pl
+	- add attribute 'publicid' in wbrules.xml
+
+1.05  Thu Feb 14 20:30:00 2002
+	- use of I18N-Charset
+	- add rules for WAP PROV 1.0
+
+1.04  Wed Jan 23 17:30:00 2002
+	- bug in Makefile.PL
+
+1.03  Thu Jan 17 20:30:00 2002
+	- Process character entities (nbsp & shy)
+	(wbrules.xml and its internal DTD were modified)
+	- suppress xmld, see now the module WAP::SAXDriver::wbxml
+
+1.02  Mon Dec 17 10:30:00 2001
+	- Fix a bug (modif 1.01)
+
+1.01  Fri Dec 14 18:30:00 2001
+	- The value of an attribute that name is unknown, is put in the string table.
+	- XHTML samples.
+	- Fix a bug in Processing Instruction.
+
+1.0   Sun Nov 18 10:05:00 2001
+	- first release
+
+0.01  Sat Oct  6 16:19:16 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n WAP::wbxml
+

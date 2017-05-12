@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w -I../lib
+# Display the comments left for the specified user.
+
+use WWW::Myspace;
+
+my ( $friend_id, $filter ) = @ARGV;
+
+$myspace = new WWW::Myspace;
+
+print "Getting comments...\n";
+my $comments = $myspace->get_comments( friend_id => $friend_id );
+
+die $myspace->error if $myspace->error;
+
+foreach $comment ( @{$comments} ) {
+    next if ( $filter && ( $filter != $comment->{sender} ) );
+    print "Comment ID: " . $comment->{comment_id} . "\n";
+    print "Sender: " . $comment->{sender} . "\n";
+    print "Sender Name: " . $comment->{sendername} . "\n";
+    print "Date: " . $comment->{date} . "\n";
+    print "Comment: " . $comment->{comment} . "\n";
+}

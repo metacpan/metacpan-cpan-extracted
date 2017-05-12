@@ -1,0 +1,18 @@
+Revision history for Win32::FTDI::FTD2XX
+$Id: Changes,v 1.3 2008/11/17 15:11:42 395502 Exp $
+
+(see BUGS file for bug references)
+
+1.01b  - Initial Beta Release
+1.02b  - Cosmetic and documentation corrections.
+1.03b  - Fixed CyclePort() FT_HANDLE BUG# FTD2XX-1.02-01
+         Updated API Method doc to reflect the behavior.
+1.04b  - In preparations for production release (scheduled for 1.05):
+         Completed most of the Classic Interfaces and added the Extended FT API
+         functions for BitBang modes etc.
+         All EXPORTS were converted to constants.
+         The package now handles packing and passing of the FT API UCHAR 
+         parameters intended for limited-range numeric use, as UINTS and casts
+         them back to proper type within the DLL, so as to avoid mangling
+         values in Unicode-Character environments.
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-phpBB.t
+lib/WWW/phpBB.pm
+META.yml                                 Module meta-data (added by MakeMaker)

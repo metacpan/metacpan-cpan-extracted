@@ -1,0 +1,16 @@
+Revision history for WWW-RoboCop
+
+0.000004  2015-04-17 00:18:09+02:00 Europe/Berlin
+    - Adds test dependency
+
+0.000003  2015-04-16 23:46:27+02:00 Europe/Berlin
+    - Return URI objects rather than strings in default report
+    - Default report only has a redirects key if redirects were followed
+    - Add target_url to default report when redirects have been followed
+
+0.000002  2015-01-08 23:31:28-05:00 America/Toronto
+    - Don't try to follow href="#"
+    - get_report() now returns a Hash rather than HashRef
+
+0.000001  2015-01-07 17:44:31-05:00 America/Toronto
+    - Initial release.

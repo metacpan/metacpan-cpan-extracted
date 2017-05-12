@@ -1,0 +1,53 @@
+Apache::WeSQL version 0.53
+==========================
+
+The Web-enabled SQL (WeSQL) Apache mod_perl module is an extension to HTML, 
+acting as a glue between HTML and SQL. It allows the use of pure SQL queries 
+directly in HTML files, embedded in a special tag. WeSQL translates the special 
+tags into pure HTML, so using WeSQL is transparant for the browser. WeSQL is 
+aimed at rapid web-database integration. WeSQL is written entirely in Perl 
+and currently supports both MySQL and PostgreSQL as backend SQL databases.
+
+In this directory, you will also find a '.spec' file to create a WeSQL rpm.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please note that 'make test' will NOT work on versions of Perl older than 5.006. 
+This is nothing to worry about (but do consider upgrading your Perl, because 
+older than 5.006 is truely ancient! I recommend perl 5.6.1).
+
+CONFIGURATION
+
+The sample Addressbook application is provided in this directory in the 
+'addressbook' directory. See ./addressbook/README for information on how to 
+install it.
+
+See the Apache::WeSQL manpage for more information on how to get a new WeSQL going.
+
+DEPENDENCIES
+
+Prerequisites for an easy installation: a unix system with working Apache, perl, 
+mod_perl, and MySQL or PostgreSQL. We want to interface to a database, so we need 
+several Perl modules (do yourself a favour and get the latest versions!):
+
+DBI
+Data-ShowTable
+ApacheDBI
+DBI-Mysql or DBD-Pg
+
+But if you are brave, there is no reason why WeSQL should not run on any system 
+with any webserver that can execute Perl code as cgi-scripts, and can connect to a 
+MySQL or PostgreSQL server.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2000-2002 Ward Vandewege. This program is free software; you can 
+redistribute it and/or modify it under the terms of the GPL. See the file COPYING in 
+this directory for more information.

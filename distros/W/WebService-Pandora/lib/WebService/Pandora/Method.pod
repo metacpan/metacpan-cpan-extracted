@@ -1,0 +1,146 @@
+=head1 NAME
+
+WebService::Pandora::Method - Pandora WebService API Method
+
+=head1 SYNOPSIS
+
+  use WebService::Pandora::Method;
+
+  $method = WebService::Pandora::Method->new( name => 'methodName',
+                                              partnerAuthToken => 'token',
+                                              userAuthToken => 'token',
+                                              partnerId => 'id',
+                                              userId => 'id',
+                                              syncTime => 1356998400,
+                                              host => 'tuner.pandora.com',
+                                              ssl => 1,
+                                              encrypt => 1,
+                                              cryptor => WebService::Pandora::Cryptor::iOS->new(),
+                                              timeout => 10,
+                                              params => {'param1' => 'val1',
+                                                         'param2' => 'val2'} );
+
+  $result = $method->execute() or die( $method->error() );
+
+=head1 DESCRIPTION
+
+B<WebService::Pandora::Method> is a module which queries the Pandora JSON API using the
+B<LWP::UserAgent> and B<HTTP::Request> libraries.  It is used by the main B<WebService::Pandora>
+module for all of the webservice methods it exposes.  It handles all of the encryption,
+decryption, JSON conversion, and the Pandora API oddities for you.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Creates a new B<WebService::Pandora::Method> object with the arguments given.  The method can
+then be B<execute()>ed, returning a decrypted hashref representation of the JSON string returned
+by the Pandora API method.
+
+  $method = WebService::Pandora::Method->new( name => 'methodName',
+                                              partnerAuthToken => 'token',
+                                              userAuthToken => 'token',
+                                              partnerId => 'id',
+                                              userId => 'id',
+                                              syncTime => 1356998400,
+                                              host => 'tuner.pandora.com',
+                                              ssl => 1,
+                                              encrypt => 1,
+                                              cryptor => WebService::Pandora::Cryptor::iOS->new(),
+                                              timeout => 10,
+                                              params => {'param1' => 'val1',
+                                                         'param2' => 'val2'} );
+
+=over 4
+
+=item name =E<gt> STRING [required]
+
+The name of the Pandora API method to call.
+
+=item partnerAuthToken STRING [optional]
+
+The partner authentication token to use.  This is returned by the B<auth.partnerLogin> API method
+and needed for some of the subsequent method calls.
+
+=item userAuthToken STRING [optional]
+
+The user authentication token to use.  This is returned by the B<auth.userLogin> API method and
+needed for some of the subsequent method calls.
+
+=item partnerId STRING [optional]
+
+The partner id to use.  This is returned by the B<auth.partnerLogin> API method and needed for
+some of the subsequent method calls.
+
+=item userId STRING [optional]
+
+The user id to use.  This is returned by the B<auth.userLogin> API method and needed for some of
+the subsequent method calls.
+
+=item syncTime INTEGER [optional]
+
+The unix epoch timestamp from when we logged in to the Pandora API.  This is returned by the
+B<auth.partnerLogin> API method and needed for some of the subsequent method calls.
+
+=item host STRING [required]
+
+The host portion of the URL where the Pandora JSON API is located.  This is typically either
+B<tuner.pandora.com> or B<internal-tuner.pandora.com>.
+
+=item ssl BOOLEAN [optional]
+
+Whether or not to use HTTP or HTTPS when executing the method.  Defaults to false (HTTP).  Some
+of the Pandora API methods require HTTP, and others require HTTPS, so its important to specify
+the correct option depending upon which method.
+
+=item encrypt BOOLEAN [optional]
+
+Whether or not to encrypt the JSON data being sent using the B<WebService::Pandora::Cryptor>
+object given via the B<cryptor> argument.  Defaults to true, as most Pandora API methods require
+it.
+
+=item cryptor B<WebService::Pandora::Cryptor> [optional]
+
+The cryptor object to use to encrypt the JSON data when the B<encrypt> option is given a true
+value.
+
+=item timeout INTEGER [optional]
+
+The timeout, in seconds, to pass to the underlying B<LWP::UserAgent> object when the method is
+B<execute()>ed.  Defaults to 10.
+
+=item params HASHREF [optional]
+
+Any additional name => value pairs of parameters to pass to the method being executed.  Many of
+the Pandora API methods require parameters to be given, so its important to specify the correct
+ones.
+
+=back
+
+=head1 METHODS
+
+=head2 execute
+
+Returns either a JSON-decrypted hashref of the result from the Pandora API method call, or a
+true or false value to indicate success or failure.  Use the B<error()> method to find out why
+the method call failed.  Internally, it will use B<LWP::UserAgent> to send a crafted
+B<HTTP::Request> based upon all the arguments provided to the constructor.
+
+=head2 error
+
+Returns a string containing a message about why the method call failed.  The error string may
+come from internally in the module, from a failed HTTP request, or from the Pandora API itself.
+
+=head1 SEE ALSO
+
+L<WebService::Pandora>
+L<WebService::Pandora::Cryptor>
+L<LWP::UserAgent>
+L<HTTP::Request>
+L<JSON>
+
+=head1 AUTHOR
+
+Mitch McCracken E<lt>mrmccrac@gmail.comE<gt>
+
+=cut

@@ -1,0 +1,62 @@
+NAME
+    WebService::Hatena::BookmarkCount -- Interface for Hatena::Bookmark's
+    XML-RPC API
+
+SYNOPSIS
+        use WebService::Hatena::BookmarkCount;
+
+        my @list = (
+            'http://www.hatena.ne.jp/info/webservices',
+            'http://www.kawa.net/works/perl/hatena/bookmarkcount.html',
+        );
+        my $hash = WebService::Hatena::BookmarkCount->getCount( @list );
+        foreach my $url ( @list ) {
+            printf( "%5d   %s\n", $hash->{$url}, $url );
+        }
+
+        my $top = 'http://japan.cnet.com/';
+        my $total = WebService::Hatena::BookmarkCount->getTotalCount( $top );
+
+DESCRIPTION
+    WebService::Hatena::BookmarkCount is a interface for the
+    Hatena::Bookmark Web Services's XML-RPC API. This provides two methods,
+    *bookmark.getCount* and *bookmark.getTotalCount*, to get numbers of
+    count on bookmarks.
+
+METHODS
+   $hash = WebService::Hatena::BookmarkCount->getCount( @list );
+    This method makes a *bookmark.getCount* XML-RPC call for the
+    Hatena::Bookmark Web Services. @list is list of URLs to get a number of
+    registrations in Hatena::Bookmark. This method returns a reference for a
+    hash, which keys are URLs and which values are counts returned by the
+    Hatena Web Services.
+
+   $hash = WebService::Hatena::BookmarkCount->getTotalCount( $url );
+    This method makes a *bookmark.getTotalCount* XML-RPC call for the
+    Hatena::Bookmark Web Services. $url is the URL to get a number of
+    registrations in Hatena::Bookmark.
+
+MODULE DEPENDENCIES
+    XML::TreePP
+
+    LWP::UserAgent or HTTP::Lite
+
+SEE ALSO
+    Hatena Bookmark http://b.hatena.ne.jp/
+
+    Documents in Japanese
+    http://www.kawa.net/works/perl/hatena/bookmarkcount.html
+
+AUTHOR
+    Yusuke Kawasaki http://www.kawa.net/
+
+COPYRIGHT
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2006-2010 Yusuke Kawasaki
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

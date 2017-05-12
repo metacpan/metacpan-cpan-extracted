@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+# Copyright 2011, 2012, Olof Johansson <olof@ethup.se>
+# Copyright 2011, Magnus Woldrich <magnus@trapd00r.se>
+#
+# Copying and distribution of this file, with or without
+# modification, are permitted in any medium without royalty
+# provided the copyright notice are preserved. This file is
+# offered as-is, without any warranty.
+
+our $VERSION = '0.3';
+our $APP  = 'svtplay';
+
+use strict;
+use warnings FATAL => 'all';
+use feature qw/say/;
+
+use WWW::SVT::Play::Video;
+use Getopt::Long qw/:config gnu_getopt/;
+use Pod::Usage qw/pod2usage/;
+use YAML;
+use List::Util qw/max/;
+
+sub usage {
+	pod2usage(
+		verbose  => 99,
+		exitval  => 0,
+		sections => q{DESCRIPTION|OPTIONS},
+	);
+}
+
+GetOptions(
+	my $opts = {
+		help => \&usage,
+		version => sub {
+			say("$APP v", __PACKAGE__->VERSION) && exit
+		},
+		type => 'list',
+	}, qw(
+		type|t=s
+		bitrate|b:i
+		max-bitrate|m
+		download|d
+		stream|s
+		output|o=s
+		help|h
+		debug|D
+		force|F
+		version|v
+	)
+) or exit 1;
+
+sub run_rtmp {
+	my $svtp = shift;
+	die "No RMTP streams available!\n" unless $svtp->has_rtmp;
+
+	my $filename = $opts->{filename};
+	$filename //= $svtp->filename('rtmp');
+
+	my $bitrate = $opts->{bitrate};
+	$bitrate = $svtp->bitrates if $opts->{'max-bitrate'};
+	$bitrate //= $svtp->bitrates;
+
+	my $stream = $svtp->stream(
+		protocol => 'rtmp',
+		bitrate => $bitrate
+	);
+
+	if ($opts->{download}) {
+		$stream->download(
+			output => $filename,
+			force => $opts->{force},
+		);
+	} elsif ($opts->{stream}) {
+		$stream->stream();
+	}
+}
+
+sub run_hls {
+	my $svtp = shift;
+	die "No HLS streams available!\n" unless $svtp->has_hls;
+
+	my $filename = $opts->{filename};
+	$filename //= $svtp->filename('hls');
+
+	my $stream = $svtp->stream( protocol => 'hls' );
+
+	do_stream($svtp, $stream, $filename);
+}
+
+sub run_list {
+	my $svtp = shift;
+	my %streams;
+
+	$streams{HLS} = $svtp->stream(protocol => 'hls')->url
+		if $svtp->has_hls;
+	$streams{HDS} = $svtp->stream(protocol => 'hds')->url
+		if $svtp->has_hds;
+	$streams{HTTP} = $svtp->stream(protocol => 'http')->url
+		if $svtp->has_http;
+	$streams{RTMP} = $svtp->stream(protocol => 'rtmp')
+		if $svtp->has_rtmp;
+
+	$streams{rtmp} = map {
+		$_ => $streams{rtmp}->{$_}->url
+	} keys $streams{rtmp} if $svtp->has_rtmp;
+
+	gen_table(
+		Title => $svtp->title,
+		Filename => $svtp->filename,
+		Duration => $svtp->duration,
+
+		Streams => \%streams,
+	);
+}
+
+sub gen_table {
+	my %args = @_;
+
+	# compute width of field names
+	my $w = (max map { length } keys %args)+1;
+
+	# ugly way to keep order of arguments, but works :(
+	while (my $key = shift) {
+		my $val = shift;
+
+		if (ref $val eq 'HASH') {
+			say "$key:";
+			for my $k (keys %$val) {
+				say ' 'x8, "$k: $val->{$k}";
+			}
+		} else {
+			printf "%-${w}s %s\n", "$key:", $val;
+		}
+	}
+}
+
+sub get_action {
+	return 'download' if $opts->{download};
+	return 'stream'   if $opts->{stream};
+	return 'output';
+}
+
+sub do_stream {
+	my $svtp   = shift;
+	my $stream = shift;
+
+	my $action = get_action();
+
+	return download($svtp, $stream) if $action eq 'download';
+	return stream  ($stream)        if $action eq 'stream';
+
+	say $stream->url;
+}
+
+sub get_filename {
+	my $svtp   = shift;
+	my $stream = shift;
+
+	return $opts->{filename} if $opts->{filename};
+	return $svtp->filename($stream->type);
+}
+
+sub download {
+	my $svtp   = shift;
+	my $stream = shift;
+
+	$stream->download(
+		output => get_filename($svtp, $stream),
+		force  => $opts->{force},
+	);
+}
+
+my $url = shift or usage();
+
+my $svtp = WWW::SVT::Play::Video->new($url) or
+	die "Failed?";
+
+my %dispatch_type = (
+	rtmp => \&run_rtmp,
+	hls  => \&run_hls,
+	list => \&run_list,
+);
+
+$dispatch_type{$opts->{type}}->($svtp)
+	if exists $dispatch_type{$opts->{type}};
+
+__END__
+
+=pod
+
+=head1 NAME
+
+svtplay - extract URLs from svtplay.se
+
+=head1 DESCRIPTION
+
+svtplay is a script that lets you extract RTMP URLs from SVT Play.
+You can feed this URL to e.g. rtmpdump and extract the video using
+options to the script.
+
+=head1 SYNOPSIS
+
+  svtplay [OPTIONS] <URL>
+
+=head1 OPTIONS
+
+  -d, --download     download video
+  -b, --bitrate      choose bitrate. only list available bitrates if omitted
+  -m, --max-bitrate  choose the best available bitrate
+  -o, --output file  specify output filename
+
+  -h, --help         show the help and exit
+  -v, --version      show version info and exit
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Magnus Woldrich, magnus@trapd00r.se, http://japh.se, trapd00r on github
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2011 -- 2012, Olof Johansson <olof@ethup.se>
+(and contributors...)
+
+Copying and distribution of this file, with or without
+modification, are permitted in any medium without royalty
+provided the copyright notice are preserved. This file is
+offered as-is, without any warranty.

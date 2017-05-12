@@ -1,0 +1,26 @@
+WebFetch To-Do List
+$Revision: 1.2 $
+------------------------------------------------------------------------------
+
+* Use the Perl5 "Resources" module to add a configuration infrastructure to
+  the core WebFetch.pm which reads site defaults and configuration from a
+  file
+  [required for 1.0]
+* Once the config files are in, add a feature which can schedule WebFetch
+  modules with specific parameters to be launched at various times.
+  This is to replace the currently-necessary launch scripts with all their
+  parameters.
+* Add docs for each WebFetch-derived module explaining better how to call
+  it from within Perl.  (Current docs emphasize the command line because
+  that's how it's been used.  But it isn't the only way to use it.)
+  [required for 1.0]
+* add more fetch modules:
+  * calendar/upcoming events [wanted for 1.0]
+  * XML downloads [wanted for 1.0]
+  * RDF downloads [wanted for 1.0]
+  * dmoz.org Open Directory Project RDF download [wanted for 1.0]
+  * ARRL W1AW bulletins
+  * California State OES bulletins
+  * watch for updates to any web page from a specified list
+  * others as submitted by users
+

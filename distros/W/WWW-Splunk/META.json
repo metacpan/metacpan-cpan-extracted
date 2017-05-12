@@ -1,0 +1,67 @@
+{
+   "abstract" : "Client library for Splunk log search engine",
+   "author" : [
+      "Michal Josef Spacek <skim@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Splunk",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "XML::LibXML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Date::Manip" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "Text::CSV" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::Splunk" : {
+         "file" : "lib/WWW/Splunk.pm",
+         "version" : "2.06"
+      },
+      "WWW::Splunk::API" : {
+         "file" : "lib/WWW/Splunk/API.pm",
+         "version" : "2.06"
+      },
+      "WWW::Splunk::XMLParser" : {
+         "file" : "lib/WWW/Splunk/XMLParser.pm",
+         "version" : "2.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tupinek/perl-WWW-Splunk"
+      }
+   },
+   "version" : "2.06"
+}

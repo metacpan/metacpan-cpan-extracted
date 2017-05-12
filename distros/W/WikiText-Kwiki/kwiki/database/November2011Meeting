@@ -1,0 +1,19 @@
+  Thu. November 10th, 6:53pm at FreeGeek – 1731 SE 10th Ave.
+
+= DCI: A new way to OOP.
+
+speaker: Chad 'Exodist' Granum
+
+The DCI concept was created by Trygve Reenskaug, (inventor of MVC) and James Coplien.
+
+DCI Stands for Data, Context, Interactions. It was created to solve the problem of unpredictable emergent behavior in networks of interacting objects. This problem shows itself in complex OOP projects, most commonly in projects with deep polymorphism. This is a problem that Procedural/Imperative Programming does not have.
+
+DCI does not replace OOP, instead it augments it with lessons learned from looking back at Procedural Programming. It defines a way to encapsulate use cases into a single place. This provides an advantage to the programmer by reducing the number of interactions that need to be tracked. Another advantage is the reduction of side-effects between contexts.
+
+Another way to look at it is that a DCI implementation is much more maintainable as a project matures. Changes to requirements and additional features cause clean OOP project to degrade into spaghetti. DCI on the other hand maintains code clarity under changing requirements.
+
+== You will Learn:
+* How to think in DCI
+* How the DCI cpan package helps you write DCI
+* That you may already write things in a form of DCI
+* How a DCI implementation compares to an OOP implementation (in a generic task)

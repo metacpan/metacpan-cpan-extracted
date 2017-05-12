@@ -1,0 +1,38 @@
+Revision history for Perl extension Win32::Setupsup.
+
+1.12  2013-12-14
+	- no functional changes
+	- fix build failure with Strawberry Perl 5.10.0.6
+
+
+1.11  2012-10-24
+	- document that Exporter version 5.57 or later is required
+	  (it has been since Win32::Setupsup 1.03, but wasn't documented)
+
+
+1.10  2012-09-16
+	- port to Strawberry Perl and gcc
+	- fix old C++ syntax to work with Visual C++ 2010
+	- fix refresh parameter in WaitForWindowClose (was ignored)
+
+
+1.03  2011-11-11
+	- use Win32API::Registry instead of Win32::Registry
+	- use XSLoader instead of DynaLoader
+
+
+1.02  2011-11-05
+	- now maintained by Christopher J. Madsen <perl@cjmweb.net>
+	- install with normal "perl Makefile.PL ; nmake ; nmake install"
+	- now requires at least Perl 5.6
+
+
+1.01  2000-10-15
+	- contains version information
+	- supports Perl 5.6
+	- ready to install via PPM
+
+
+1.00  1999-01-20
+	- original version by Jens Helberg <jens.helberg@de.bosch.com>
+	- contains some calls to remote control Windows applications

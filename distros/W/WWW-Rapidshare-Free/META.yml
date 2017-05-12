@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                WWW-Rapidshare-Free
+version:             0.01
+abstract:            Automates downloading from Rapidshare.com and checking links for free users
+license:             perl
+author:              
+    - Alan Haggai Alavi <alanhaggai@alanhaggai.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Validate::URI:           0
+    HTML::Form:                    0
+    HTML::Parser:                  0
+    Test::More:                    0
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

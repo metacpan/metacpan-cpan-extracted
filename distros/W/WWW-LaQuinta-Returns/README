@@ -1,0 +1,24 @@
+WWW::LaQuinta::Returns
+====================
+
+This module provides an object-oriented Perl interface to the La Quinta Returns website.
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    WWW::Mechanize
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Michael Aquilina. All rights reserved.

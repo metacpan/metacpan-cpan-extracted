@@ -1,0 +1,55 @@
+---
+abstract: 'Implements V2.0 of the DNSMadeEasy API'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  JSON: 0
+  Test::More: 0.98
+configure_requires:
+  Module::Build::Tiny: 0.035
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-DNSMadeEasy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::DNSMadeEasy:
+    file: lib/WebService/DNSMadeEasy.pm
+    version: 0.02
+  WebService::DNSMadeEasy::Client:
+    file: lib/WebService/DNSMadeEasy/Client.pm
+  WebService::DNSMadeEasy::ManagedDomain:
+    file: lib/WebService/DNSMadeEasy/ManagedDomain.pm
+  WebService::DNSMadeEasy::ManagedDomain::Record:
+    file: lib/WebService/DNSMadeEasy/ManagedDomain/Record.pm
+  WebService::DNSMadeEasy::Monitor:
+    file: lib/WebService/DNSMadeEasy/Monitor.pm
+requires:
+  DDP: 0
+  DateTime: 0
+  DateTime::Format::HTTP: 0
+  Digest::HMAC_SHA1: 0
+  HTTP::Request: 0
+  Moo: 0
+  MooX::Singleton: 0
+  Role::REST::Client: 0
+  String::CamelSnakeKebab: 0
+resources:
+  bugtracker: https://github.com/kablamo/WebService-DNSMadeEasy/issues
+  homepage: https://github.com/kablamo/WebService-DNSMadeEasy
+  repository: git://github.com/kablamo/WebService-DNSMadeEasy.git
+version: 0.02
+x_authority: cpan:KABLAMO

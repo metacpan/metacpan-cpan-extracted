@@ -1,0 +1,14 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\CLSID\{045DB10D-2728-4963-A11A-A626CC1B51C6}]
+   @="pl Extension"
+[HKEY_CLASSES_ROOT\CLSID\{045DB10D-2728-4963-A11A-A626CC1B51C6}\InProcServer32]
+   @="c:\perl\bin\perlshellext.dll"
+     "ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\plmenu]
+   @="{045DB10D-2728-4963-A11A-A626CC1B51C6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved]
+   "{045DB10D-2728-4963-A11A-A626CC1B51C6}"="perl menu shell extension"
+

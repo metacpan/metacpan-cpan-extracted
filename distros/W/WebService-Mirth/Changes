@@ -1,0 +1,22 @@
+Revision history for WebService-Mirth
+
+0.131220  2013-05-02 02:21:39 America/Chicago
+
+  * Mojolicious requires IO::Socket::SSL version 1.75 or greater for TLS
+    support, so have this distribution adhere to that (resolves GitHub
+    issue #2)
+
+0.131050  2013-04-14 19:19:56 America/Chicago
+
+  * Remove minor warning test that was failing (resolves GitHub issue
+    #1)
+
+0.131020  2013-04-12 13:51:55 America/Chicago
+
+  * Update "resources" metadata for distribution to GitHub URIs
+
+0.131000  2013-04-09 22:44:08 America/Chicago
+
+  * Initial release
+
+vim: syntax=:softtabstop=2:shiftwidth=2

@@ -1,0 +1,44 @@
+{
+   "abstract" : "Accessing Twilio's REST API with Perl",
+   "author" : [
+      "Scott Wiersdorf <scott@perlcode.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Twilio-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "2.03",
+            "List::Util" : "1.29",
+            "URI::Escape" : "3.28"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21"
+}

@@ -1,0 +1,2085 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+wdsinstallfiles - helper script to create new Web::DataService applications
+
+=head1 SYNOPSIS
+
+wdsinstallfiles [options] [files]
+
+=head1 OPTIONS
+
+    -h, --help            : print what you are currently reading
+    -f, --force           : force installation
+    -p, --path            : the path where application will be created
+                              (current directory if not specified)
+    -x, --no-check        : don't check for the latest version of Web::DataService
+                              (checking version implies internet connection)
+    -v, --version         : print the version of Web::DataService being used
+
+If you name one or more files or file paths, i.e. "doc" or
+"bin/dataservice.pl", then only that file or files will be installed.
+Otherwise, all files necessary for the example application will be installed.
+
+=cut
+
+eval 'exec /opt/local/bin/perl5.12  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use lib 'lib';
+
+use strict;
+use warnings;
+use File::Basename 'basename', 'dirname';
+use File::Path 'mkpath';
+use File::Spec::Functions;
+use Getopt::Long;
+use Pod::Usage;
+use LWP::UserAgent;
+
+use Web::DataService;
+
+use constant FILE => 1;
+use constant EXEC => 2;
+use constant REMOVE => 4;
+
+
+# options
+my $help = 0;
+my $no_check = 0;
+my $report_version = 0;
+my $name = undef;
+my $path = '.';
+my $force_install = 0;
+my $make = 0;
+
+
+GetOptions(
+    "h|help"          => \$help,
+    "f|force"	      => \$force_install,
+    "p|path=s"        => \$path,
+    "x|no-check"      => \$no_check,
+    "v|version"       => \$report_version,
+    "M|make"          => \$make,
+) or pod2usage( -verbose => 1 );
+
+# main
+
+my $PERL_INTERPRETER = -r '/usr/bin/env' ? '!/usr/bin/env perl -T' : "!$^X -T";
+my $DO_OVERWRITE_ALL = -r 'bin/app.pl';
+
+my $TARGET_NAME = 'wdsinstallfiles';
+
+if ( $make )
+{
+    &make_program;
+    exit(0);
+}
+
+pod2usage( -verbose => 1 ) if $help;
+
+die "Cannot write to $path: $!\n" unless -d $path && -w $path;
+
+my $WDS_VERSION   = $Web::DataService::VERSION;
+
+if ( $report_version )
+{
+    print "Web::DataService $WDS_VERSION\n";
+    exit 0;
+}
+
+# If filename arguments were specified, grab those.
+
+my (%INSTALL_FILTER);
+
+foreach my $f ( @ARGV )
+{
+    $INSTALL_FILTER{$f} = 1;
+}
+
+
+# Now determine which foundation framework we are using.  Currently, the only
+# one available is Dancer.
+
+if ( -r "environments" && -r "public/404.html" )
+{
+    eval { require Dancer };
+    
+    unless ( $INC{'Dancer.pm'} )
+    {
+	die "It looks as though you are trying to build a Dancer application, but Dancer is not installed.\n";
+    }
+    
+    eval { require YAML; };
+    
+    unless ( $INC{'YAML.pm'} )
+    {
+	die "You must install YAML in order to use Web::DataService with Dancer.\n";
+    }
+    
+    version_check() unless $no_check;
+    unpack_files( &dancer_app_tree, &templates, '.' );
+    exit 0;
+}
+
+else
+{
+    eval { require Dancer };
+    
+    unless ( $INC{'Dancer.pm'} )
+    {
+	die "You must install Dancer in order to use Web::DataService.\n";
+    }
+    
+    if ( $force_install )
+    {
+	version_check() unless $no_check;
+	unpack_files( &dancer_app_tree, &templates, '.' );
+    }
+    
+    die "You must run this program from the root directory of an already-installed Dancer application.  Try 'dancer -a myappname'.\n"
+	unless $force_install;
+}
+
+
+# dancer_app_tree ( )
+# 
+# Return the install tree for a Dancer-based application.  Currently this is
+# the only one available, but we will eventually add catalyst_app_tree, etc.
+
+sub dancer_app_tree {
+    
+    return {
+        "lib" => {
+            "Example.pm" => FILE,
+	    "PopulationData.pm" => FILE,
+        },
+        "bin" => {
+            "dataservice.pl" => EXEC,
+	    "app.pl" => REMOVE,
+        },
+        "config.yml"         => FILE,
+	"data" => {
+	    "population_data.txt" => FILE,
+	},
+	"doc" => {
+	    "doc_defs.tt"    => FILE,
+	    "doc_strings.tt" => FILE,
+	    "doc_header.tt"  => FILE,
+	    "doc_footer.tt"  => FILE,
+	    "doc_not_found.tt" => FILE,
+	    "operation.tt"   => FILE,
+	    "index.tt"       => FILE,
+            "special_doc.tt" => FILE,
+	    "formats" => {
+	        "json_doc.tt" => FILE,
+		"text_doc.tt" => FILE,
+		"index.tt" => FILE,
+	    },
+	},
+        "public" => {
+            "css"            => {
+                "dsdoc.css" => FILE,
+            },
+        },
+    };
+}
+
+
+# unpack_files ( tree, templates, path )
+# 
+# This subroutine is called recursively to unpack a tree of files.  The tree
+# structure must be passed as the first argument, followed by a hash whose
+# keys are paths from the tree and whose values are the corresponding file
+# contents.  The third argument is the path under which to create the files.
+
+sub unpack_files {
+    
+    my ($node, $templates, $file_root, $template_root, $subtree_override) = @_;
+    
+    while ( my ($name, $thing) = each %$node )
+    {
+	next unless defined $thing;
+	
+        my $file_path = catfile($file_root, $name);
+	my $template_path = $template_root ? "$template_root/$name" : $name;
+	
+	my $in_subtree = $subtree_override;
+	
+	if ( %INSTALL_FILTER )
+	{
+	    next unless $INSTALL_FILTER{$template_path} || $in_subtree;
+	    $in_subtree = 1;
+	}
+	
+        if ( ref $thing eq 'HASH' )
+	{
+            safe_mkdir($file_path);
+            unpack_files($thing, $templates, $file_path, $template_path, $in_subtree);
+        }
+	
+	elsif ( ref $thing eq 'CODE' )
+	{
+            # The content is a coderef, which, given the path to the file it
+            # should create, will do the appropriate thing:
+            $thing->($file_path);
+	}
+	
+	else
+	{
+	    if ( $thing eq FILE || $thing eq EXEC )
+	    {
+		my $template = $templates->{$template_path};
+		
+		unless ( defined $template )
+		{
+		    warn "no template found for $template_path";
+		    next;
+		}
+		
+		my $vars = { PERL_INTERPRETER => $PERL_INTERPRETER };
+		
+		write_file($file_path, $template, $vars);
+		chmod 0755, $file_path if $thing eq EXEC;
+	    }
+	    
+	    elsif ( $thing eq REMOVE )
+	    {
+		unlink($file_path);
+	    }
+        }
+    }
+}
+
+sub safe_mkdir {
+    my ($dir) = @_;
+    if (not -d $dir) {
+        print "+ $dir\n";
+        mkpath $dir or die "could not mkpath $dir: $!";
+    }
+    else {
+        print "  $dir\n";
+    }
+}
+
+
+# read_file ( path, contents_ref )
+# 
+# Read a file using the filename given by $path, and append its contents to the
+# scalar pointed to by $contents_ref.  Change any initial occurrence of = to
+# ), so that files containing Pod are protected from interpretation.
+
+sub read_file {
+
+    my ($path, $contents_ref) = @_;
+    
+    my $infile;
+    
+    unless ( open $infile, "<", $path )
+    {
+	warn "Cannot read $path: $!\n";
+	return;
+    }
+    
+    while (<$infile>)
+    {
+	s{^=}{)};
+	s{^use lib '\.\.}{#use lib '..}m;
+	$$contents_ref .= $_;
+    }
+    
+    close $infile or warn $!;
+}
+
+
+# write_file ( path, template, vars )
+# 
+# Write a file to the filename given by $path, using $template as the file
+# contents.  Substitute any occurrence of <<% var_name %> by looking up
+# 'var_name' in $vars.
+# 
+# Change any occurrence of ) at the beginning of a line to =, to reverse the
+# transformation carried out in &read_file.
+
+sub write_file {
+    my ($path, $template, $vars) = @_;
+    
+    # if file already exists, ask for confirmation
+    if (-f $path && (not $DO_OVERWRITE_ALL)) {
+        print "! $path exists, overwrite? [N/y/a]: ";
+        my $res = <STDIN>; chomp($res);
+        $DO_OVERWRITE_ALL = 1 if $res eq 'a';
+        return 0 unless ($res eq 'y') or ($res eq 'a');
+    }
+
+    $template =~ s| <<% \s* (\w+) \s* %>> | $vars->{$1} |xmge;
+    $template =~ s| ^[)] | "=" |xmge;
+    
+    print "+ $path\n";
+    
+    my $fh;
+    open $fh, '>', $path or die "unable to open file `$path' for writing: $!";
+    print $fh $template;
+    close $fh;
+}
+
+sub send_http_request {
+    my $url = shift;
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout(10);
+    $ua->env_proxy();
+
+    my $response = $ua->get($url);
+
+    if ($response->is_success) {
+        return $response->content;
+    }
+    else {
+        return;
+    }
+}
+
+sub version_check {
+    my $latest_version = 0;
+    
+    my $resp = send_http_request('http://search.cpan.org/api/module/Web::DataService');
+
+    if ($resp) {
+        if ( $resp =~ /"version" (?:\s+)? \: (?:\s+)? "(\d\.\d+)"/x ) {
+            $latest_version = $1;
+        } else {
+            die "Can't understand search.cpan.org's reply.\n";
+        }
+    }
+
+    return if $WDS_VERSION =~  m/_/;
+
+    if ($latest_version > $WDS_VERSION) {
+        print qq|
+The latest stable Dancer release is $latest_version, you are currently using $WDS_VERSION.
+Please check http://search.cpan.org/dist/Dancer/ for updates.
+
+|;
+    }
+}
+
+# make_program ( )
+# 
+# Create a new script called $TARGET_NAME, in the same directory as this
+# one, but with the string __TEMPLATES_GO_HERE__ replaced by the contents of
+# each of the files listed in the app_tree hash (see below).  These files are
+# copied from the directory "./files".
+
+sub make_program {
+    
+    # First get all of the contents.
+    
+    my $contents = '';
+    pack_files( &dancer_app_tree, \$contents, './files' );
+    
+    my $source_name = $0;
+    my $target_name = $source_name;
+    $target_name =~ s{ [^/]+ $ }{ $TARGET_NAME }xe;
+    
+    open my $source, "<", $source_name or die "File $source_name: $!";
+    open my $target, ">", $target_name or die "File $target_name: $!";
+    
+    while (<$source>)
+    {
+	if ( /^#_TEMPLATES_GO_HERE/ )
+	{
+	    print $target $contents;
+	}
+	
+	else
+	{
+	    print $target $_;
+	}
+    }
+    
+    close $source or die "File $source_name: $!";
+    close $target or die "File $target_name: $!";
+    
+    chmod(0755, $target_name) or die "File $target_name: $!";
+}
+
+sub pack_files {
+    
+    my ($node, $contents_ref, $file_root, $template_root) = @_;
+    
+    while ( my ($name, $thing) = each %$node )
+    {
+	next unless defined $thing;
+	
+	my $file_path = "$file_root/$name";
+	my $template_path = $template_root ? "$template_root/$name" : $name;
+	
+	if ( ref $thing eq 'HASH' )
+	{
+	    pack_files($thing, $contents_ref, $file_path, $template_path);
+	}
+	
+	elsif ( $thing eq FILE || $thing eq EXEC )
+	{
+	    $$contents_ref .= "    '$template_path' => << 'END_END_END',\n";
+	    my $content = read_file($file_path, $contents_ref);
+	    $$contents_ref .= "END_END_END\n";
+	}
+    }
+}
+
+
+=head1 DESCRIPTION
+
+This script is designed to be run inside the main directory of a newly-created
+Dancer application.  It adds the files necessary for the Web::DataService
+example application (see L<Web::DataService::Tutorial>) which you can then use
+as a basis for your own project.
+
+=head1 EXAMPLE
+
+Here is an application created using dancer and wdsinstallfiles:
+
+    $ dancer -a dstest
+    + dstest
+    + dstest/bin
+    + dstest/bin/app.pl
+    + dstest/config.yml
+    + dstest/environments
+    + dstest/environments/development.yml
+    + dstest/environments/production.yml
+    + dstest/views
+    + dstest/views/index.tt
+    + dstest/views/layouts
+    + dstest/views/layouts/main.tt
+    + dstest/lib
+    + dstest/lib/dstest.pm
+    + dstest/public
+    + dstest/public/css
+    + dstest/public/css/style.css
+    + dstest/public/css/error.css
+    + dstest/public/images
+    + dstest/public/500.html
+    + dstest/public/404.html
+    + dstest/public/dispatch.fcgi
+    + dstest/public/dispatch.cgi
+    + dstest/public/javascripts
+    + dstest/public/javascripts/jquery.js
+    + dstest/Makefile.PL
+    + dstest/t
+    + dstest/t/002_index_route.t
+    + dstest/t/001_base.t
+    
+    $ cd dstest
+    $ wdsinstallfiles
+    + ./config.yml
+      ./bin
+    + bin/dataservice.pl
+      ./public
+      public/css
+    + public/css/dsdoc.css
+      ./lib
+    + lib/PopulationData.pm
+    + lib/Example.pm
+      ./doc
+    + doc/doc_footer.tt
+    + doc/doc_not_found.tt
+    + doc/index.tt
+    + doc/doc_header.tt
+      doc/formats
+    + doc/formats/index.tt
+    + doc/formats/json_doc.tt
+    + doc/formats/text_doc.tt
+    + doc/doc_defs.tt
+    + doc/special_doc.tt
+    + doc/operation.tt
+    + doc/doc_strings.tt
+      ./data
+    + data/population_data.txt
+
+The application is ready to serve:
+
+    $ bin/dataservice.pl
+    >> Listening on 0.0.0.0:3000
+    == Entering the development dance floor ...
+
+=head1 AUTHOR
+
+This script has been written by Michael McClennen <mmcclenn@cpan.org>, based on
+the "dancer" script from the L<Dancer> distribution.
+
+=head1 SOURCE CODE
+
+See L<Web::DataService> for more information.
+
+=head1 LICENSE
+
+This module is free software and is published under the same
+terms as Perl itself.
+
+=cut
+
+
+sub templates {
+
+    return {
+
+    'config.yml' => << 'END_END_END',
+# Example configuration file for a Web::DataService application using
+# Dancer as the foundation framework.
+
+# These settings are read by Web::DataService
+
+title: "Web::DataService Example"
+data_source: "U.S. Bureau of the Census"
+data_file: "data/population_data.txt"
+contact_name: "J. A. Perlhacker"
+contact_email: "japh@example.com"
+
+# Settings may be placed under the data service name, as well as at
+# the top level.
+
+data1.0:
+    default_limit: 500
+
+# These settings are read by Dancer
+
+port: 3000
+charset: "UTF-8"
+environment: "production"
+
+# If you wish to access a backend datastore via DBI, you can uncomment the following and substitute the
+# appropriate settings.  You will need to make sure that your main application requires the module
+# Dancer::Plugin::Database.  Then, you can use the method 'get_connection' to retrieve a database handle
+# whenever you need one.
+
+# plugins:
+#     Database:
+#       driver: 'mysql'
+#       database: 'my_database'
+#       host: 'localhost:mysql_socket=my_socket_path'
+#       username: 'my_username'
+#       password: 'my_password'
+
+END_END_END
+    'bin/dataservice.pl' => << 'END_END_END',
+#<<% PERL_INTERPRETER %>>
+use lib './lib';
+use Dancer;
+use Example;
+dance;
+END_END_END
+    'public/css/dsdoc.css' => << 'END_END_END',
+
+A.pod_link { color: #0000F0; text-decoration: none; font-weight: bold; }
+
+.pod_verbatim { border-width: 1; border-style: solid; background-color: #F5F5F5; border-color: #AAAAAA; margin-left: 10px; padding: 6px; }
+
+.pod_heading { color: #00A0A0; }
+
+DT.pod_term, TD.field_name, TD.pod_term { color: #A00000; font-weight: bold; }
+
+DT.pod_term2, TD.pod_term2 { color: #CC8080; font-weight: bold; }
+
+TD.pod_term, TD.pod_def { vertical-align: top; }
+
+.pod_th TD { color: #00A0A0; text-align: center; }
+
+H1 { font-size: 150%; }
+
+H2 { font-size: 120%; }
+
+H3 { font-size: 100%; }
+
+H4 { font-size: 100%; }
+
+TABLE.response, TABLE.pod_list { border-width: 1; border-style: solid; border-color: #AAAAAA; border-spacing: 0; }
+
+TABLE.response TD, TABLE.pod_list TD { border-width: 1; border-style: solid; border-color: #AAAAAA; padding: 6px; }
+
+TABLE.pod_list2 TD { border-width: 0; padding: 3px; vertical-align: top; };
+
+TR.resp_head { color: #00A0A0; text-align: center; }
+
+END_END_END
+    'lib/PopulationData.pm' => << 'END_END_END',
+# 
+# PopulationData.pm
+# 
+# This module is used by the example data service application that comes with
+# Web::DataService.  It provides the "primary role" for all of the data
+# service requests supported by that application.  
+# 
+# You can use this as a base for your own data service application.
+# 
+# AUTHOR:
+# 
+#   mmcclenn@cpan.org
+
+
+
+use strict;
+
+package PopulationData;
+
+use HTTP::Validate qw(:validators);
+use Carp qw(carp croak);
+
+use Moo::Role;
+
+
+my ($data, $states);
+
+# The following 'initialize' method is called automatically at application
+# startup.  It is passed a reference to the Web::DataService object, which can
+# then be used to read data, define output blocks, define rulesets, etc.  If
+# you are using a backend database, and if the relevant information has been
+# added to the file config.yml, you can call the get_connection method if
+# necessary to obtain a handle by which you can make queries.
+
+# You can define the necessary output blocks and rulesets either here or in
+# the main application file, or in a separate file, depending upon how you
+# wish to structure your code.  The author finds it best to put them here,
+# together with the methods for carrying out the various data service
+# operations.
+
+sub initialize {
+
+    my ($class, $ds) = @_;
+    
+    # First read in the data that we will be serving, and put it in the data
+    # service scratchpad for use by the various data service operations.  A
+    # more complex data service application might instead set up a database
+    # connection and read from it as necessary to satisfy each operation.
+    
+    my $datafile = $ds->config_value('data_file');
+    croak "no data file was specified: add the configuration directive 'data_file' to the file 'config.yml'.\n"
+	unless defined $datafile && $datafile ne '';
+    
+    $class->read_data($datafile, \$data, \$states);
+    
+    # Next we define some output blocks, each of which specifies one or more
+    # fields to be displayed as part of the output.
+    
+    $ds->define_block( 'basic' =>
+	{ output => 'name' },
+	    "The name of the state",
+	{ output => 'abbrev' },
+	    "The standard abbreviation for the state",
+	{ output => 'region' },
+	    "The region of the country in which the state is located",
+	{ output => 'pop2010' },
+	    "The population of the state in 2010");
+    
+    $ds->define_block( 'history' =>
+	{ output => 'pop2000' },
+	    "The population of the state in 2000",
+	{ output => 'pop1990' },
+	    "The population of the state in 1990",
+	{ output => 'pop1950' },
+	    "The population of the state in 1950",
+	{ output => 'pop1900' },
+	    "The population of the state in 1900",
+	{ output => 'pop1790' },
+	    "The population of the state in 1790");
+    
+    $ds->define_block( 'total' =>
+	{ select => 'totals' });
+    
+    $ds->define_block( 'regions' =>
+	{ output => 'value', name => 'code' },
+	    "Region code",
+	{ output => 'doc_string', name => 'description' },
+	    "Region description");
+    
+    # This map selects additional optional information that can be selected
+    # with the 'show' parameter.
+    
+    $ds->define_output_map( 'extra' =>
+	{ value => 'hist', maps_to => 'history' },
+	    "Include historical population information",
+	{ value => 'total', maps_to => 'total' },
+	    "Add a record for the total population of the selected state(s)");
+    
+    # The following map specifies the region codes that can be used for selecting
+    # states. 
+    
+    $ds->define_set( 'regions' =>
+	{ value => 'NE' },
+	    "New England",
+	{ value => 'MA' },
+	    "Mid Atlantic",
+	{ value => 'SE' },
+	    "South East",
+	{ value => 'MW' },
+	    "Mid West",
+	{ value => 'WE' },
+	    "West");
+    
+    # The following map specifies the options for output ordering.
+    
+    $ds->define_set( 'output_order' =>
+	{ value => 'name' },
+	    "Order the output records alphabetically by name",
+	{ value => 'name.desc' },
+	    "Order the output records reverse alphabetically by name",
+	{ value => 'pop' },
+	    "Order the output records by current population, least to most",
+	{ value => 'pop.desc' },
+	    "Order the output records by current population, most to least");
+    
+    # Create a validator for state names.
+    
+    my $valid_state = sub {
+	my ($value) = @_;
+	return { error => "the value of {param} must be a valid state name or abbreviation" }
+	    unless $states->{uc $value};
+    };
+    
+    # The following rulesets are used to validate the parameters for these operations.
+    
+    $ds->define_ruleset( 'special' =>
+	{ ignore => 'doc' },
+	{ optional => 'SPECIAL(all)' });
+    
+    $ds->define_ruleset( 'single' =>
+        "The following parameter is required for this operation:",
+	{ param => 'state', valid => $valid_state, clean => 'uc' },
+	    "Return information about the specified state.",
+	    "You may specify either the full name or standard abbreviation.",
+        "You may also use the following parameter if you wish:",
+	{ optional => 'SPECIAL(show)', valid => 'extra' },
+	    "Display additional information about the specified state.  The value",
+	    "of this parameter must be one or more of the following, separated by commas.",
+	{ allow => 'special' },
+	"^You can also use any of the L<special parameters|node:special> with this request.");
+    
+    $ds->define_ruleset( 'list' =>
+	"You can use any of the following parameters with this operation:",
+	{ optional => 'state', valid => $valid_state, list => qr{,}, clean => 'uc' },
+	    "Return information about the specified state or states.",
+	    "You may specify either the full names or standard abbreviations,",
+	    "and you may specify more than one separated by commas.",
+	{ optional => 'region', valid => 'regions', list => qr{,}, clean => 'uc' },
+	    "Return information about all of the states in the specified region(s).",
+	    "The regions are as follows:",
+	{ optional => 'order', valid => 'output_order' },
+	    "Specify how the output records should be ordered:",
+	{ optional => 'SPECIAL(show)', valid => 'extra' },
+	    "Display additional information about the selected states.  The value",
+	    "of this parameter must be one or more of the following, separated by commas.",
+	{ allow => 'special' },
+	"^You can also use any of the L<special parameters|node:special> with this request.");
+    
+    $ds->define_ruleset( 'regions' =>
+	{ allow => 'special' },
+	"^You can use any of the L<special parameters|node:special> with this request.");
+}
+
+
+# read_data ( filename, data_ref, states_ref )
+# 
+# Reads the specified data file, and returns two data handles.  The first will
+# be a list of records, and the second a hash of state names.
+
+sub read_data {
+
+    my ($class, $filename, $data_ref, $states_ref) = @_;
+    
+    my @records;
+    my %names;
+    my $past_header;
+    
+    open( my $infile, "<", $filename ) || die "could not open data file '$filename': $!";
+    
+ LINE:
+    while ( <$infile> )
+    {
+	next LINE unless $past_header++;
+	
+	s/\s+$//;
+	my @values = split /\t/;
+	
+	$names{uc $values[0]} = 1;
+	$names{uc $values[1]} = 1;
+	
+	push @records, { name => $values[0],
+			 name_uc => uc $values[0],
+			 abbrev => $values[1],
+			 region => $values[2],
+			 pop2010 => $values[3],
+			 pop2000 => $values[4],
+			 pop1990 => $values[5],
+			 pop1950 => $values[6],
+			 pop1900 => $values[7],
+			 pop1790 => $values[8] };
+    }
+    
+    $$data_ref = \@records;
+    $$states_ref = \%names;
+}
+
+
+# The following methods are associated with data service operations by the
+# calls to 'define_path' in the main application file.
+# =========================================================================
+
+# Return information about a single state.
+
+sub single {
+
+    my ($request) = @_;
+    
+    # Get the relevant request parameters.
+    
+    my $name = $request->clean_param('state');
+    
+    # Locate the matching record, if any, and return it.
+    
+    foreach my $record ( @$data )
+    {
+	next unless $record->{name_uc} eq $name || $record->{abbrev} eq $name;
+	return $request->single_result($record);
+    }
+}
+
+
+# Return information about multiple states.
+
+sub list {
+
+    my ($request) = @_;
+    
+    # Get the relevant request parameters.
+    
+    my $name_filter = $request->clean_param_hash('state');
+    my $region_filter = $request->clean_param_hash('region');
+    my $order = $request->clean_param('order');
+    my $totals = $request->has_block('total');
+    
+    my $return_all; $return_all = 1 unless $request->param_given('state') ||
+	$request->param_given('region');
+    
+    # Filter for matching records.
+    
+    my @result;
+    my $total; $total = { name => "Total" } if $totals;
+    
+    foreach my $record ( @$data )
+    {
+	if ( $return_all ||
+	     ($name_filter->{$record->{name_uc}}) ||
+	     ($name_filter->{$record->{abbrev}}) ||
+	     ($region_filter->{$record->{region}}) )
+	{
+	    push @result, $record;
+	    
+	    if ( $totals )
+	    {
+		foreach my $field ( qw( pop1790 pop1900 pop1950 pop1990 pop2000 pop2010 ) )
+		{
+		    $total->{$field} += $record->{$field} if $record->{$field};
+		}
+	    }
+	}
+    }
+    
+    # Now sort them if we were so requested.
+    
+    if ( $order eq 'pop' )
+    {
+	@result = sort { $a->{pop2010} <=> $b->{pop2010} } @result;
+    }
+    
+    elsif ( $order eq 'pop.desc' )
+    {
+	@result = sort { $b->{pop2010} <=> $a->{pop2010} } @result;
+    }
+    
+    elsif ( $order eq 'name' )
+    {
+	@result = sort { $a->{name_uc} cmp $b->{name_uc} } @result;
+    }
+    
+    elsif ( $order eq 'name.desc' )
+    {
+	@result = sort { $b->{name_uc} cmp $a->{name_uc} } @result;
+    }
+    
+    # Add the total record if one was requested;
+    
+    push @result, $total if $totals;
+    
+    # Now return the result set.
+    
+    $request->list_result(\@result);
+}
+
+
+# Return the list of region codes.
+
+sub regions {
+    
+    my ($request) = @_;
+    
+    my $ds = $request->ds;
+    $request->list_result($ds->set_values('regions'));
+}
+
+1;
+END_END_END
+    'lib/Example.pm' => << 'END_END_END',
+# 
+# Example Data Service
+# 
+# This file provides the base application for an example data service implemented
+# using the Web::DataService framework.
+# 
+# You can use it as a starting point for setting up your own data service.
+# 
+# Author: Michael McClennen <mmcclenn@cpan.org>
+
+use strict;
+
+package Example;
+
+#use lib '../lib';		# Required for testing.  Remove from production app.
+
+use Dancer ':syntax';		# This module is required for
+                                # Web::DataService, until plugins for other
+                                # foundation frameworks are written.
+
+#use Dancer::Plugin::Database;  # You can uncomment this if you wish to use a
+				# backend database via DBI (the example
+				# application does not need it).
+
+eval { require Template; };	# This is required in order to generate
+                                # documentation pages.
+
+use Web::DataService;		# Bring in Web::DataService.
+
+use PopulationData;		# Load the code which will implement the
+                                # data service operations for this
+                                # application.  If you use the current file as
+                                # a basis for your own application, replace
+                                # this line with your own module or modules.
+
+
+# If we were called from the command line with 'GET' as the first argument,
+# then assume that we have been called for debugging purposes.  The second
+# argument should be the URL path, and the third should contain any query
+# parameters.
+
+if ( defined $ARGV[0] and lc $ARGV[0] eq 'get' )
+{
+    set apphandler => 'Debug';
+    set logger => 'console';
+    set traces => 1;
+    set show_errors => 0;
+    
+    Web::DataService->set_mode('debug', 'one_request');
+}
+
+
+# We begin by instantiating a data service object.
+
+my $ds = Web::DataService->new(
+    { name => 'data1.0',
+      title => 'Example Data Service',
+      features => 'standard',
+      special_params => 'standard',
+      path_prefix => 'data1.0/' });
+
+
+# Continue by defining some output formats.  These are automatically handled
+# by the plugins Web::DataService::Plugin::JSON and
+# Web::DataService::Plugin::Text.
+
+$ds->define_format(
+    { name => 'json', doc_node => 'formats/json', title => 'JSON' },
+	"The JSON format is intended primarily to support client applications.",
+    { name => 'txt', doc_node => 'formats/text', title => 'Plain text' },
+	"The plain text format is intended for direct responses to humans,",
+	"or for loading into a spreadsheet.  Data is formatted as lines of",
+        "comma-separated values.",
+    { name => 'csv', doc_node => 'formats/text', title => 'Comma Separated Values' },
+	"The csv text format is identical to plain text, except that ",
+	"most browsers will offer to save it as a download",
+    { name => 'tsv', doc_node => 'formats/text', title => 'Tab Separated Values' },
+	"The tsv text format returns data as lines of tab-separated values.",
+	"Most browsers will offer to save it as a download.");
+
+
+# We then define a hierarchy of data service nodes.  These nodes define the
+# operations and documentation pages that will be available to users of this
+# service.  The node '/' defines a set of root attributes that will be
+# inherited by all other nodes.
+
+$ds->define_node({ path => '/', 
+		   title => 'Main Documentation',
+		   public_access => 1,
+		   default_format => 'json',
+		   doc_default_template => 'doc_not_found.tt',
+		   doc_default_op_template => 'operation.tt',
+		   output => 'basic' });
+
+# Any URL path starting with /css indicates a stylesheet file:
+
+$ds->define_node({ path => 'css',
+		   file_dir => 'css' });
+
+
+# Some example operations:
+
+$ds->define_node(
+    { path => 'single',
+      title => 'Single state',
+      place => 1,
+      usage => [ "single.json?state=wi",
+		 "single.txt?state=tx&show=hist&header=no" ],
+      output => 'basic',
+      optional_output => 'extra',
+      role => 'PopulationData',
+      method => 'single' },
+	"Returns information about a single U.S. state.",
+    { path => 'list',
+      title => 'Multiple states',
+      place => 2,
+      usage => [ "list.json?region=ne&show=total",
+		 "list.txt?region=we&show=hist,total&count&datainfo" ],
+      output => 'basic',
+      optional_output => 'extra',
+      role => 'PopulationData',
+      method => 'list' },
+	"Returns information about all of the states matching specified criteria.",
+    { path => 'regions',
+      title => 'Regions',
+      place => 3,
+      usage => "regions.txt",
+      output => 'regions',
+      role => 'PopulationData',
+      method => 'regions' },
+	"Returns the list of region codes used by this data set.");
+
+
+# Add documentation about the various output formats, parameters, etc..
+
+$ds->define_node(
+    { path => 'formats',
+      title => 'Output formats' },
+    { path => 'formats/json',
+      title => 'JSON format' },
+    { path => 'formats/text',
+      title => 'Plain text formats' },
+    { path => 'special',
+      title => 'Special parameters' });
+
+
+# Next we configure the Dancer routes that will allow this application to
+# respond to various URL paths.  For this simple example, all we
+# need is a single route with which to capture all requests.
+
+# This may be all you need even for more complicated applications.  But if the
+# node structure of Web::DataService is not sufficient to properly describe
+# your application, you are free to add additional routes to process
+# certain URLs differently.
+
+any qr{.*} => sub {
+    
+    return Web::DataService->handle_request(request);
+};
+
+
+# If an error occurs, we want to generate a Web::DataService response rather
+# than the default Dancer response.  In order for this to happen, we need the
+# following two hooks:
+
+hook on_handler_exception => sub {
+    
+    var(error => $_[0]);
+};
+
+hook after_error_render => sub {
+    
+    $ds->error_result(var('error'), var('wds_request'));
+};
+
+1;
+END_END_END
+    'doc/doc_footer.tt' => << 'END_END_END',
+
+)head2 CONTACT
+
+If you have questions about this data service, or wish to report a bug, please
+contact <% request.admin_name %> L<<% request.contact_info.name %>|mailto:<% request.contact_info.email %>>
+(put your real contact info here).
+
+
+END_END_END
+    'doc/doc_not_found.tt' => << 'END_END_END',
+
+)head2 ERROR: documentation page for <% title %> not found.
+
+END_END_END
+    'doc/index.tt' => << 'END_END_END',
+
+This is an example data service, built using the Web::DataService framework.  It provides
+information about the historical population of U.S. states, based on data from the
+L<Bureau of the Census|http://www.census.gov/>.
+
+You can use this code as a basis for building your own data services.
+
+)head2 OPERATIONS
+
+The following data service operations are available:
+
+<% NODELIST(opt_usage=1) %>
+
+<% FORMAT_SECTION(opt_extended=1) %>
+
+<% VOCAB_SECTION(opt_extended=1, opt_all=1) %>
+
+
+
+
+END_END_END
+    'doc/doc_header.tt' => << 'END_END_END',
+)encoding utf8
+
+)head1 <% ds.title %>: <% doc_title %>
+
+<% NAVTRAIL %>
+
+END_END_END
+    'doc/formats/index.tt' => << 'END_END_END',
+
+)head2 DESCRIPTION
+
+This data service is capable of returning its results in a variety of formats.  This capability
+provides great flexibility, allowing such diverse activities as:
+
+)over
+
+)item *
+
+Support for client applications written in Javascript
+
+)item *
+
+Downloads of data in text format for use in spreadsheets
+
+)item *
+
+Viewing of data in browser tabs.
+
+)back
+
+Each format has a default vocabulary in which its data is expressed.  The
+available formats and vocabularies are discussed below.
+
+<% FORMAT_SECTION(opt_extended=1) %>
+
+<% VOCAB_SECTION(opt_extended=1, opt_all=1) %>
+END_END_END
+    'doc/formats/json_doc.tt' => << 'END_END_END',
+)head2 DESCRIPTION
+
+This page describes the JSON response format in detail.
+
+)head2 SYNOPSIS
+
+The JSON (L<JavaScript Object Notation|http://en.wikipedia.org/wiki/Json>)
+format is selected by ending a URL path with the suffix C<.json>.  This format
+is very flexible, and is intended for use by web applications built on top of
+this data service as well as for transmitting content to and from other
+databases.  JSON responses are always encoded in UTF-8.
+
+The body of a response in this format consists of a single JSON object,
+containing one or more of the following fields:
+
+)for wds_table_no_header Field* | Description
+
+)over
+
+)item C<records>
+
+The value of this field is an array of objects, each representing a record
+from the database.
+
+This field will always be present if the URL path and parameters are
+interpreted to be a valid query, but the array may be empty if the query does
+not match any records.
+
+)item C<records_found>
+
+This field will be present if the parameter L<count|node:special> was specified.  Its
+value will be the number of records matched by the main query.
+
+)item C<records_returned>
+
+This field will be present if the paramter L<count|node:special> was specified.  Its
+value will be the number of records actually returned.
+<%- IF request.default_limit %>
+This may be less than the total number of records found, because the
+size of the result set is limited by default to <% request.default_limit %>.
+You can override this using the L<limit|node:special> parameter.
+<%- END %>
+
+)item C<record_offset>
+
+This field will be present if the parameter L<count|node:special> was specified, and if
+the parameter L<offset|node:special> was specified with a value greater than zero.  The
+value in the second column will be the number of records that were skipped at the beginning
+of the result set.
+
+)item C<data_source>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the name of this data source.
+
+)item C<documentation_url>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be a URL that provides documentation about the URL path
+used to fetch this data.  This URL will document both the parameters and the response fields.
+This information may be helpful in guiding the later interpretation of this data.
+
+)item C<data_url>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the actual URL that was used to fetch this data.
+If this dataset is saved to disk, the included field will allow someone to later repeat this query.
+
+)item C<access_time>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.
+Its value will be the date and time time (GMT) at which this data
+was accessed.  If this dataset is saved to disk, the included field will enable it to be
+compared with other datasets on the basis of access time.
+
+)item C<parameters>
+
+This field will be present if the parameter L<datainfo|node:special> was specified.  Its
+value will be an object whose fields represent the parameters and values that were used to 
+generate this result.  If this dataset is saved to disk, the parameter information may be 
+helpful in documenting how the data was selected, what it includes, and what it does not include.
+
+)item C<warnings>
+
+This field will be present if any warnings were generated during the execution
+of the query.  Its value will be an array of strings, each representing a
+warning message.
+
+)item C<errors>
+
+This field will be present if a fatal error condition was encountered.  Its
+value will be an array of strings, each representing an error message.  In general,
+if this field is present then none of the others will be.
+
+)item C<status_code>
+
+This field will be present if the HTTP status code is anything other than
+200.  Its value will be one of the following:
+
+)over
+
+)item 400
+
+One or more of the URL parameters was invalid.  The reasons will be given by
+the field C<errors>.  This request should not be repeated without
+modification.
+
+)item 401
+
+This request requires authentication.  Note that the authentication module has
+not yet been added to the data service, so you should not be seeing this yet. 
+
+)item 404
+
+The URL path was invalid.  This request should not be repeated without
+modification.
+
+)item 500
+
+An internal error occurred.  If this condition persists, you should contact
+the server administrator.  Otherwise, the request may be resubmitted later.
+
+)back
+
+)back
+
+For example, consider the following URL path:
+
+)over
+
+)item *
+
+L<op:single.json?state=WI>
+
+)back
+
+The body of the response is as follows:
+
+    {
+	"records": [
+	    {
+		"name": "Wisconsin",
+		"abbrev": "WI",
+		"region": "MW",
+		"pop2010": 5686986
+	    }
+	]
+    }
+
+This body is made up of an object containing the field "records", whose value is an array.
+Each element of the array represents a single record fetched from the
+database.  The definitions of the various fields can be found on the
+documentation page for this URL path: L<node:single#RESPONSE>.
+
+Many URL paths will, of course, return multiple records.  For example:
+
+)over
+
+)item *
+
+L<op:list.json?state=wi,mn,il&count>
+
+)back
+
+    {
+	"elapsed_time": 0.000283,
+	"records_found": 3,
+	"records_returned": 3,
+	"records": [
+	    {
+		"name": "Illinois",
+		"abbrev": "IL",
+		"region": "MW",
+		"pop2010": 12830632
+	    },
+	    {
+		"name": "Minnesota",
+		"abbrev": "MN",
+		"region": "MW",
+		"pop2010": 5303925
+	    },
+	    {
+		"name": "Wisconsin",
+		"abbrev": "WI",
+		"region": "MW",
+		"pop2010": 5686986
+	    }
+	]
+    }
+
+This response body contains multiple records, but is otherwise structured
+identically.  Note the presence of the C<count> parameter, which causes the
+inclusion of the fields C<elapsed_time>, C<records_found>, and C<records_returned>.
+
+Finally, consider the following URL:
+
+)over
+
+)item *
+
+L<op:list.json?state=WI,IX&foo=1>
+
+)back
+
+    {
+	"status_code": 400,
+	"errors": [
+	    "unknown parameter 'foo'"
+	],
+	"warnings": [
+	    "the value of 'state' must be a valid state name or abbreviation"
+	]
+    }
+
+This response body conveys both an error and a warning, along with a status
+code of 400 (Bad Request) which indicates a problem with the URL parameters.
+END_END_END
+    'doc/formats/text_doc.tt' => << 'END_END_END',
+
+)head2 DESCRIPTION
+
+This page describes the text response formats in detail.
+
+)head2 SYNOPSIS
+
+This service can produce responses in two different text formats: tab-separated and comma-separated.  Both
+of these formats can be loaded into a spreadsheet, or copied into an e-mail message or other text document.
+
+You may choose from any of the following three suffixes:
+
+)for wds_table_no_header Suffix* | Description
+
+)over
+
+)item C<.csv>
+
+Generate a download file in comma-separated text format.  Most browsers will save this
+file directly to disk; if you would rather see it immediately in a browser tab, then use
+the suffix C<.txt> instead.
+
+)item C<.tsv>
+
+Generate a download file in tab-separated text format.
+
+)item C<.txt>
+
+Display the results in a browser tab in comma-separated text format.
+You will then be able to save this file to disk using the "Save Page As..." 
+menu item in your browser, which will produce the same result
+as if you had used the C<csv> suffix.
+
+)back
+
+Note that you should only use the C<.txt> suffix if your result set is
+of small to moderate size.  If you try to display a large result set
+directly in a browser tab, it may take a long time to render and use
+up an enormous amount of memory.
+
+In addition, you may choose to include one or more of the following URL parameters:
+
+)for wds_table_no_header Parameter* | Description
+
+)over
+
+)item datasource
+
+If this parameter is specified, then extra header lines will be included at the
+beginning of the response.  These lines will include information about the data
+source, the URL used to generate this response, and more.  See below for more
+information.
+
+)item count
+
+If this parameter is specified, then extra header lines will be included at the
+beginning of the response.  These lines will specify the number of records found
+and the number returned, as well as the elapsed time to compute this result.  See
+below for more information.
+
+)item header=no
+
+If this parameter is specified, then no header material at all will be
+included.  The first line of the file will be the first data record,
+if any.  If no data records were found, the file will be empty.  This
+parameter doesn't need any value.
+
+)item lb=cr
+
+If this parameter is specified, then each line will be terminated by a
+single carriage return instead of the standard carriage return/line
+feed sequence.
+
+)back
+
+The body of the response consists of a series of lines containing comma-separated or tab-separated values.
+The initial part of the file may contain some or all of the following lines:
+
+)for wds_table_no_header Label* | Description
+
+)over
+
+)item C<Data Source:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the name of this data source.
+
+)item C<Documentation URL:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be a URL that provides documentation about the URL path
+used to fetch this data.  This URL will document both the parameters and the response fields.
+This information may be helpful in guiding the later interpretation of this data.
+
+)item C<Data URL:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the actual URL that was used to fetch this data.
+If this dataset is saved to disk, the included line will allow someone to later repeat this query.
+
+)item C<Access Time:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.
+The value in the second column will be the date and time time (GMT) at which this data
+was accessed.  If this dataset is saved to disk, the included line will enable it to be
+compared with other datasets on the basis of access time.
+
+)item C<Parameters:>
+
+This line will be present if the parameter L<datainfo|node:special> was specified.  It will
+be followed by one line per parameter, giving the parameter name and value(s) used to generate this 
+result.  If this dataset is saved to disk, the parameter information may be helpful in documenting how
+the data was selected, what it includes, and what it does not include.
+
+)item C<Records Found:>
+
+This line will be present if the parameter L<count|node:special> was specified.  The 
+value in the second column will be the number of records that matched the main query.
+
+)item C<Records Returned:>
+
+This line will be present if the paramter L<count|node:special> was specified.  The value
+in the second column will be the number of records actually returned.
+<%- IF request.default_limit %>
+This may be less than the total number of records found, because the
+size of the result set is limited by default to <% request.default_limit %>.
+You can override this using the L<limit|node:special> parameter.
+<%- END %>
+
+)item C<Record Offset:>
+
+This line will be present if the parameter L<count|node:special> was specified, and if
+the parameter L<offset|node:special> was specified with a value greater than zero.  The
+value in the second column will be the number of records that were skipped at the beginning
+of the result set.
+
+)item C<Warning:>
+
+One or more of these lines will be present if any warnings were generated during the execution
+of the query.  The warning message(s) will appear in the second column.
+
+)item C<Records:>
+
+If any of the lines mentioned so far in this table appear in the output, this line will appear immediately
+before the data header line.  It serves to mark off the supplementary header material from the data.
+
+)item I<data header>
+
+Unless the parameter L<header=no|node:special> was specified, a data header line will always precede
+the first data line.  This header line will contain the name of each column.
+
+)back
+
+The data records will follow this header material, one record per line until the end of the file.
+
+For example, the following URL will produce the following output, consisting of a single data record
+with accompanying header line:
+
+)over
+
+)item *
+
+L<op:single.txt?state=WI>
+
+)back
+
+    "name","abbrev","region","pop2010"
+    "Wisconsin","WI","MW","5686986"
+
+By contrast, the following URL includes some additional header information, terminated by a "Records:" line.
+
+)over
+
+)item *
+
+L<op:list.txt?state=wi,mn,il&count>
+
+)back
+
+    "Elapsed Time:","0.000152"
+    "Records Found:","3"
+    "Records Returned:","3"
+    "Records:"
+    "name","abbrev","region","pop2010"
+    "Illinois","IL","MW","12830632"
+    "Minnesota","MN","MW","5303925"
+    "Wisconsin","WI","MW","5686986"
+
+This output includes several header lines, terminated by the "Records:" line.  Following that is the data header, and then the data records.
+
+The following URL returns an HTTP error response instead of a data response:
+
+)over
+
+)item *
+
+L<op:list.txt?state=WI,IX&foo=1>
+
+)back
+
+    400 Bad Request
+    
+        unknown parameter 'foo'
+    
+    Warnings:
+    
+        the value of 'state' must be a valid state name or abbreviation
+
+Lastly, the following URL generates just the data records with no header information at all:
+
+)over
+
+)item *
+
+L<op:list.txt?region=NE&header=no>
+
+)back
+
+    "Connecticut","CT","NE","3574097"
+    "Maine","ME","NE","1328361"
+    "Massachusetts","MA","NE","6547629"
+    "New Hampshire","NH","NE","1316472"
+    "Rhode Island","RI","NE","1052567"
+    "Vermont","VT","NE","625741"
+
+END_END_END
+    'doc/doc_defs.tt' => << 'END_END_END',
+<%- #
+    # This template belongs to the package Web::DataService, and contains
+    # default definitions for generating documentation pages.
+    # 
+    # You can edit this in order to modify the look of your documentation pages.
+    #
+    # ===========================
+
+    #USE dumper;
+    SET block_done = { };
+    
+    # Edit the following definitions to modify the labels used for navigation
+    # -----------------------------------------------------------------------
+    
+    PROCESS doc_strings.tt;
+    
+    IF ds.version; SET main_doc_label = "$main_doc_label $ds.name v$ds.version"; END;
+        
+    msgval = {
+    	format_param = ds.special_param('format')
+	vocab_param = ds.special_param('vocab')
+	show_param = ds.special_param('show')
+    };
+    
+    MACRO sub_message(text) IF message.$text; message.$text; ELSE; text; "\n"; END;
+    MACRO sub_value(msg, value) GET message.$msg FILTER replace('%s', value);
+    
+    # 
+    # DESCRIPTION_SECTION: Include a "description" section for this node
+    # ------------------------------------------------------------------
+    
+    BLOCK DESCRIPTION_SECTION;
+        IF block_done.descrip; RETURN; ELSE; SET block_done.descrip = 1; END;
+	SET descrip_doc = request.document_node;
+	IF descrip_doc or opt_force;
+    	    GET "\n=head2 $section_label.descrip\n\n";
+            GET descrip_doc or sub_message("MSG_DOCSTRING_MISSING");
+        END;
+    END;
+    
+    MACRO DESCRIPTION_SECTION INCLUDE DESCRIPTION_SECTION;
+    
+    # 
+    # DOCSTRING: Include the node documentation string
+    # ------------------------------------------------
+    
+    BLOCK DOCSTRING;
+        SET node_doc = request.document_node;
+	GET node_doc or sub_message("MSG_DOCSTRING_MISSING");
+    END;
+    
+    MACRO DOCSTRING INCLUDE DOCSTRING;
+    
+    #     
+    # USAGE_SECTION, USAGE: Document the usage examples, if any, for this node
+    # ------------------------------------------------------------------------
+    
+    BLOCK USAGE_SECTION;
+        IF block_done.usage; RETURN; ELSE; SET block_done.usage = 1; END;
+        SET usage_doc = request.document_usage;
+	IF usage_doc;
+	    "\n=head2 $section_label.usage\n\n";
+            IF content; GET content FILTER trim; "\n\n";
+            ELSE; sub_message("MSG_USAGE_HEADER_LONG"); "\n\n";
+            END;
+            GET usage_doc;
+        ELSIF opt_force;
+            "\n=head2 $section_label.usage\n\n";
+            GET sub_message("MSG_USAGE_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO USAGE_SECTION INCLUDE USAGE_SECTION;
+    
+    BLOCK USAGE;
+        SET usage_doc = request.document_usage;
+	IF usage_doc; usage_doc;
+	ELSIF opt_force; sub_message("MSG_USAGE_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO USAGE INCLUDE USAGE;
+    
+    # 
+    # NODELIST: List all that have a 'place' attribute
+    # ------------------------------------------------
+    
+    BLOCK NODELIST;
+	SET options = { };
+	IF opt_usage; options.usage = sub_message("MSG_USAGE_HEADER_SHORT"); END;
+	IF opt_list; options.list = opt_list; END;
+    	SET nodelist_doc = request.document_nodelist(options);
+	IF nodelist_doc;
+	    IF content; GET content FILTER trim; "\n\n";
+	    END;
+	    nodelist_doc;
+        END;
+    END;
+    
+    MACRO NODELIST INCLUDE NODELIST;
+    
+    #
+    # PARAMETER_SECTION, PARAMETERS: Document the parameters corresponding to this URL path
+    # -------------------------------------------------------------------------------------
+    
+    BLOCK PARAMETER_SECTION;
+        IF block_done.params; RETURN; ELSE; SET block_done.params = 1; END;
+	SET param_doc = request.document_params(ruleset);
+	IF param_doc;
+    	    "\n=head2 $section_label.params\n\n";
+	    IF content; GET content FILTER trim; "\n\n";
+            END;
+            GET param_doc;
+        ELSIF opt_force;
+            "\n=head2 $section_label.params\n\n";
+            GET sub_message("MSG_PARAM_NONE_DEFINED"); "\n\n";
+        END;
+    END;
+    
+    MACRO PARAMETER_SECTION INCLUDE PARAMETER_SECTION;
+    
+    BLOCK PARAMETERS;
+        SET param_doc = request.document_params(ruleset);
+	IF param_doc; param_doc;
+	ELSIF opt_force; sub_message("MSG_PARAM_NONE_DEFINED"); "\n\n";
+        END;
+    END;
+    
+    MACRO PARAMETERS INCLUDE PARAMETERS;
+    
+    #
+    # METHOD_SECTION, METHODS: Document the HTTP methods accepted by this URL path
+    # ----------------------------------------------------------------------------
+    
+    BLOCK METHOD_SECTION;
+        IF block_done.methods; RETURN; ELSE; SET block_done.methods = 1; END;
+        SET method_list = request.document_http_methods;
+        IF method_list;
+      	    "\n=head2 $section_label.methods\n\n";
+            IF content; GET content FILTER trim;
+ 	    ELSIF request.node_has_operation; sub_message("MSG_METHOD_HEADER_OP");
+ 	    ELSE; sub_message("MSG_METHOD_HEADER_NODE");
+	    END;
+	    GET " $method_list";
+        ELSIF opt_force;
+      	    "\n=head2 $section_label.methods\n\n";
+	    sub_message("MSG_METHOD_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO METHOD_SECTION INCLUDE METHOD_SECTION;
+    
+    BLOCK METHODS;
+        SET method_doc = request.document_http_methods;
+	IF method_doc; method_doc;
+	ELSIF opt_force; sub_message("MSG_METHOD_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO METHODS INCLUDE METHODS;
+    
+    # 
+    # RESPONSE_SECTION: Document the response fields returned by this URL path
+    # ------------------------------------------------------------------------
+    
+    BLOCK RESPONSE_SECTION;
+        IF block_done.response; RETURN; ELSE; SET block_done.response = 1; END;
+        "\n=head2 $section_label.response\n\n";
+	SET response_doc = request.document_response;
+	SET fixed = request.output_label;
+	SET optional = request.optional_output;
+	IF response_doc;
+  	    IF response_doc.match('^MSG_'); sub_message(response_doc);
+	    ELSIF content; GET content FILTER trim; "\n\n$response_doc";
+	    ELSE;
+	        sub_message("MSG_RESPONSE_HEADER");
+	    	IF fixed && optional;
+	            sub_value("MSG_RESPONSE_HEADER_FIXED", fixed);
+	    	    sub_message("MSG_RESPONSE_HEADER_OPT");
+	    	ELSIF optional;
+	            sub_message("MSG_RESPONSE_HEADER_OPT_ONLY");
+	    	END;
+		"\n\n$response_doc";
+	    END;
+	ELSE;
+	    sub_message("MSG_RESPONSE_NONE_DEFINED");
+	END;
+    END;
+    
+    MACRO RESPONSE_SECTION INCLUDE RESPONSE_SECTION;
+    
+    BLOCK RESPONSE;
+        SET response_doc = request.document_response;
+  	IF response_doc.match('^MSG_'); sub_message(response_doc);
+	ELSIF response_doc; response_doc;
+	ELSE; sub_message("MSG_RESPONSE_NONE_DEFINED");
+        END;
+    END;
+    
+    MACRO RESPONSE INCLUDE RESPONSE;
+    
+    #
+    # FORMAT_SECTION, FORMATS: Document the formats allowed by this URL path
+    # ----------------------------------------------------------------------
+    
+    BLOCK FORMAT_SECTION;
+        IF block_done.formats; RETURN; ELSE; SET block_done.formats = 1; END;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+	SET format_doc = request.document_formats(options);
+	GET "\n=head2 $section_label.formats\n\n";
+  	IF format_doc.match('^MSG_'); sub_message(format_doc);
+	ELSIF content; GET content FILTER trim; "\n\n$format_doc";
+	ELSIF options.all;
+	    sub_message("MSG_FORMAT_HEADER_ALL");
+	    sub_message("MSG_FORMAT_HEADER_SUFFIX") IF ds.has_feature('format_suffix');
+	    sub_message("MSG_FORMAT_HEADER_PARAM") IF ds.special_param('format');
+	    GET "\n\n$format_doc";
+	ELSE;
+	    sub_message("MSG_FORMAT_HEADER_SOME");
+	    sub_message("MSG_FORMAT_HEADER_SUFFIX") IF ds.has_feature('format_suffix');
+	    sub_message("MSG_FORMAT_HEADER_PARAM") IF ds.special_param('format');
+	    IF not ds.has_feature('format_suffix');
+	        default_value = request.default_format;
+	        sub_value("MSG_FORMAT_HEADER_DEFAULT", default_value) IF default_value;
+	    END;
+	    GET "\n\n$format_doc";
+        END;
+    END;
+    
+    MACRO FORMAT_SECTION INCLUDE FORMAT_SECTION;
+    
+    BLOCK FORMATS;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+        SET format_doc = request.request.document_formats(options);
+  	IF format_doc.match('^MSG_'); sub_message(format_doc);
+	ELSE; format_doc;
+        END;
+    END;
+    
+    MACRO FORMATS INCLUDE FORMATS;
+    
+    #
+    # VOCAB_SECTION, VOCABS: Document the vocabularies allowed by this URL path
+    # -------------------------------------------------------------------------
+    
+    BLOCK VOCAB_SECTION;
+        IF block_done.vocabs; RETURN; ELSE; SET block_done.vocabs = 1; END;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+	SET vocab_doc = request.document_vocabs(options);
+	GET "\n=head2 $section_label.vocabs\n\n";
+  	IF vocab_doc.match('^MSG_'); sub_message(vocab_doc);
+	ELSIF content; GET content FILTER trim; "\n\n$vocab_doc";
+	ELSIF options.all;
+	    sub_message("MSG_VOCAB_HEADER_ALL");
+	    sub_message("MSG_VOCAB_HEADER_PARAM") IF ds.special_param('vocab');
+	    "\n\n$vocab_doc";
+	ELSE;
+	    sub_message("MSG_VOCAB_HEADER_SOME");
+	    sub_message("MSG_VOCAB_HEADER_PARAM") IF ds.special_param('vocab');
+	    "\n\n$vocab_doc";
+        END;
+    END;
+        
+    MACRO VOCAB_SECTION INCLUDE VOCAB_SECTION;
+    
+    BLOCK VOCABS;
+        SET options = { };
+        IF opt_extended; options.extended = 1; END;
+	IF opt_all; options.all = 1; END;
+	IF request.node_path == '/'; options.all = 1; END;
+        SET vocab_doc = request.request.document_vocabs(options);
+  	IF vocab_doc.match('^MSG_'); sub_message(vocab_doc);
+	ELSIF vocab_doc; vocab_doc;
+	ELSE; sub_message("MSG_VOCAB_NONE_ALLOWED");
+        END;
+    END;
+    
+    MACRO VOCABS INCLUDE VOCABS;
+    
+    # 
+    # TRAIL: Add a navigation trail to the page
+    # -----------------------------------------
+    
+    BLOCK NAVTRAIL;
+        # IF block_done.trail; RETURN; ELSE; SET block_done.trail = 1; END;
+	SET navtrail = "";
+        FOREACH item IN request.list_navtrail(main_doc_label);
+	    IF navtrail; SET navtrail = "$navtrail E<GT> $item";
+	    ELSE; SET navtrail = item; END;
+        END;
+        "\n=for wds_nav =head3 $main_doc_prefix$navtrail\n";
+    END;
+    
+    MACRO NAVTRAIL INCLUDE NAVTRAIL;
+    
+    # URL: Display a URL according to this service's configuration
+    # ------------------------------------------------------------
+    
+    BLOCK URL;
+        SET url_string = opt_url or request.node_path;
+        GET request.generate_url(url_string);
+    END;
+    
+    MACRO URL(opt_url) INCLUDE URL;
+    
+-%>
+END_END_END
+    'doc/special_doc.tt' => << 'END_END_END',
+
+<% WRAPPER PARAMETERS(special) %>
+You can use any of the following special parameters with any request:
+<% END %>
+END_END_END
+    'doc/operation.tt' => << 'END_END_END',
+
+<% DESCRIPTION_SECTION(opt_force=1) %>
+
+<% USAGE_SECTION %>
+
+<% PARAMETER_SECTION(opt_force=1) %>
+
+<% METHOD_SECTION(opt_force=1) %>
+
+<% RESPONSE_SECTION(opt_force=1) %>
+
+<% FORMAT_SECTION %>
+
+<% VOCAB_SECTION %>
+END_END_END
+    'doc/doc_strings.tt' => << 'END_END_END',
+<%-
+    
+    main_doc_label = "Example Data Service";
+    main_doc_prefix = "";
+    
+    section_label = {
+        descrip = "DESCRIPTION"
+        usage = "USAGE"
+        params = "PARAMETERS"
+ 	methods = "METHODS"
+    	response = "RESPONSE"
+    	formats = "FORMATS"
+    	vocabs = "VOCABULARIES"
+    };
+    
+    special_param = {
+        show = ds.special_param('show')
+	format = ds.special_param('format')
+        vocab = ds.special_param('vocab')
+    };
+    
+    message = {
+        
+	MSG_DOCSTRING_MISSING = "I<The documentation string for this node is missing.>  "
+	
+	MSG_USAGE_HEADER_LONG = "Here are some usage examples:"
+	MSG_USAGE_HEADER_SHORT = "For example:"
+	MSG_USAGE_NONE_DEFINED = "I<No usage examples are given.>"
+	
+	MSG_PARAM_HEADER_LONG = "You can use any of the following parameters with this operation:"
+	MSG_PARAM_NONE_DEFINED = "I<No parameters are defined.>"
+	
+    	MSG_FORMAT_HEADER_SOME = "The following response formats are available for this operation.  "
+    	MSG_FORMAT_HEADER_ALL = "The following response formats are available for this data service.  Not all of these may be available for every operation.  "
+	MSG_FORMAT_HEADER_SUFFIX = "You must select the desired format for a request by adding the appropriate suffix to the URI path.  "
+	MSG_FORMAT_HEADER_PARAM = "You can select the desired format by using the parameter C<$special_param.format> with the appropriate format name.  "
+	MSG_FORMAT_HEADER_DEFAULT = "The default format for this operation is C<%s>."
+        MSG_FORMAT_NONE_DEFINED = "I<No output formats are defined for this data service.>  "
+	MSG_FORMAT_NONE_ALLOWED = "I<No output formats are configured for this operation.>  "
+	
+	MSG_VOCAB_HEADER_SOME = "The following response vocabularies are available for this operation.  "
+    	MSG_VOCAB_HEADER_ALL = "The following response vocabularies are available for this data service.  "
+	MSG_VOCAB_HEADER_PARAM = "If you wish your responses to be expressed in a vocabulary other than the default for your selected format, you can use the C<$special_param.vocab> parameter with the appropriate vocabulary name.  "
+	MSG_VOCAB_NONE_ALLOWED = "I<No output vocabularies are configured for this operation.>  "
+	
+	MSG_METHOD_NONE_DEFINED = "I<none are defined>"
+	MSG_METHOD_HEADER_OP = "You can use the following HTTP methods with this operation:"
+	MSG_METHOD_HEADER_NODE = "This data service accepts the following HTTP methods:"
+	
+	MSG_RESPONSE_HEADER = "The response to an HTTP request on this path will consist of fields from the following list.  "
+	MSG_RESPONSE_HEADER_FIXED = "The block C<%s> is always present.  "
+	MSG_RESPONSE_HEADER_OPT = "The others may be selected using the parameter C<$special_param.show>.  "
+	MSG_RESPONSE_HEADER_OPT_ONLY = "You can select which blocks will be present in the response using the parameter C<$special_param.show>.  "
+	MSG_RESPONSE_NONE_DEFINED = "I<No response is defined for this operation.>  "
+    };
+        
+-%>
+END_END_END
+    'data/population_data.txt' => << 'END_END_END',
+State	Abbreviation	Region	2010 Population	2000 Population	1990 Population	1950 Population	1900 Population	1790 Population
+Alabama	AL	SE	4779735	4447100	4040587	3061743	1828697	
+Alaska	AK	WE	710231	626932	550043	128643	63592	
+Arizona	AZ	WE	6329013	5130632	3665228	749587	122931	
+Arkansas	AR	MW	2915921	2673400	2350725	1909511	1311564	
+California	CA	WE	37253956	33871648	29760021	10586223	1485053	
+Colorado	CO	WE	5029196	4301261	3294394	1325089	539700	
+Connecticut	CT	NE	3574097	3405565	3287116	2007280	908420	237946
+Delaware	DE	MA	897934	783600	666168	318085	184735	59096
+DC	DC	MA	601723	572059	606900	802178	278718	
+Florida	FL	SE	18801311	15982378	12937926	2771305	528542	
+Georgia	GA	SE	9687653	8186453	6478216	3444578	2216331	82548
+Hawaii	HI	WE	1360301	1211537	1108229	499794	154001	
+Idaho	ID	WE	1567582	1293953	1006749	588637	161772	
+Illinois	IL	MW	12830632	12419293	11430602	8712176	4821550	
+Indiana	IN	MW	6483800	6080485	5544159	3934224	2516462	
+Iowa	IA	MW	3046350	2926324	2776755	2621073	2231853	
+Kansas	KS	MW	2853118	2688418	2477574	1905299	1470495	
+Kentucky	KY	MW	4339362	4041769	3685296	2944806	2147174	73677
+Louisiana	LA	SE	4533372	4468976	4219973	2683516	1381625	
+Maine	ME	NE	1328361	1274923	1227928	913774	694466	96540
+Maryland	MD	MA	5773552	5296486	4781468	2343001	1188044	319728
+Massachusetts	MA	NE	6547629	6349097	6016425	4690514	2805346	378787
+Michigan	MI	MW	9883635	9938444	9295297	6371766	2420982	
+Minnesota	MN	MW	5303925	4919479	4375099	2982483	1751394	
+Mississippi	MS	SE	2967297	2844658	2573216	2178914	1551270	
+Missouri	MO	MW	5988927	5595211	5117073	3954653	3106665	
+Montana	MT	WE	989415	902195	799065	591024	243329	
+Nebraska	NE	MW	1826341	1711263	1578385	1325510	1066300	
+Nevada	NV	WE	2700551	1998257	1201833	160083	42335	
+New Hampshire	NH	NE	1316472	1235786	1109252	533242	411588	141885
+New Jersey	NJ	MA	8791894	8414350	7730188	4835329	1883669	184139
+New Mexico	NM	WE	2059180	1819046	1515069	681187	195310	
+New York	NY	MA	19378104	18976457	17990455	14830192	7268894	340120
+North Carolina	NC	SE	9535475	8049313	6628637	4061929	1893810	393751
+North Dakota	ND	MW	672591	642200	638800	619636	319146	
+Ohio	OH	MW	11536502	11353140	10847115	7946627	4157545	
+Oklahoma	OK	MW	3751354	3450654	3145585	2233351	7903912	
+Oregon	OR	WE	3831074	3421399	2842321	1521341	413536	
+Pennsylvania	PA	MA	12702379	12281054	11881643	10498012	6302115	434373
+Rhode Island	RI	NE	1052567	1048319	1003464	791896	428556	68825
+South Carolina	SC	SE	4625364	4012012	3486703	2117027	1340316	249073
+South Dakota	SD	MW	814180	754844	696004	652740	401570	
+Tennessee	TN	SE	6346110	5689283	4877185	3291718	2020616	35691
+Texas	TX	MW	25145561	20851820	16986510	7711194	3048710	
+Utah	UT	WE	2763885	2233169	1722850	688862	276749	
+Vermont	VT	NE	625741	608827	562758	377747	343641	85425
+Virginia	VA	MA	8001024	7078515	6187358	3318680	1854184	7476103
+Washington	WA	WE	6724540	5894121	4866692	2378963	518103	
+West Virginia	WV	MA	1852996	1808344	1793477	2005552	958800	
+Wisconsin	WI	MW	5686986	5363675	4891769	3434575	2069042	
+Wyoming	WY	WE	563626	493782	453588	290529	92531	
+END_END_END
+
+    };
+}
+

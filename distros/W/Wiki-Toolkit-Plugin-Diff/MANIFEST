@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+lib/Wiki/Toolkit/Plugin/Diff.pm
+t/02_diff.t
+t/pod.t
+t/pod_coverage.t

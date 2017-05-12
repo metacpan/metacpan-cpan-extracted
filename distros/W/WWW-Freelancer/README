@@ -1,0 +1,192 @@
+WWW-Freelancer version 0.0.1
+
+NAME
+    WWW::Freelancer - Provides access to Freelancer.com API
+
+VERSION
+    This document describes WWW::Freelancer version 0.0.1
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SYNOPSIS
+        use WWW::Freelancer;
+
+        my $freelancer = WWW::Freelancer->new();
+        my $project    = $freelancer->get_project(1000);
+        my $user       = $freelancer->get_user('alanhaggai');
+
+        print 'Project ID: ',   $project->get_id(),   "\n";
+        print 'Project Name: ', $project->get_name(), "\n";
+        print 'Project URL: ',  $project->get_url(),  "\n";
+        print 'User ID: ',      $project->get_id(),   "\n";
+
+DESCRIPTION
+    This module provides access to Freelancer.com API 1.0
+    (<http://apidocs.getafreelancer.com/index.html>).
+
+INTERFACE
+    "new()"
+        Returns a new Freelancer object.
+
+    "get_project( id )"
+        Accepts "id" of a project and returns a project object.
+
+    "get_user( id | username )"
+        Returns a user object corresponding to the provided "id" or
+        "username".
+
+    "search_project( HASH )"
+        Searches for a project and returns an array of project objects.
+        Accepts a HASH with the following keys:
+
+        'keyword'
+            Search keyword.
+
+        'owner'
+            Username of ID of project owner.
+
+        'winner'
+            Username of ID of project winner.
+
+        'jobs'
+            Names of job categories from the available list on
+            Freelancer.com (Perl, XML, AJAX, et cetera.). This key accepts
+            an array reference.
+
+            For example:
+
+                'jobs' => [
+                              'Perl',
+                              'XML',
+                              'AJAX',
+                          ]
+
+        'featured'
+            If 1, only featured projects, else if 0, only non-featured
+            projects.
+
+        'trial'
+            If 1, only trial projects, else if 0, only non-trial projects
+
+        'for_gold_members'
+            If 1, only 'for gold members' projects, else if 0, only 'for
+            non-gold members' projects.
+
+        'nonpublic'
+            If 1, only nonpublic projects, else if 0, only public projects.
+
+        'minimum_budget'
+            Only projects with budget higher or equal to "minimum_budget".
+
+        'maximum_budget'
+            Only projects with budget lower or equal to "maximum_budget".
+
+        'bidding_ends'
+            Only projects ending sooner than "bidding_ends" days.
+
+        'order'
+            Order projects in the result output. Accepts a hash reference
+            with keys and values corresponding to order criteria:
+
+            'id'
+                Order by project ID.
+
+            'submitdate'
+                Order by date when project was added (default).
+
+            'state'
+                Order by state of project. Active/open projects will be
+                listed first, frozen projects then, and at last closed
+                projects.
+
+            'bid_count'
+                Order by number of bids.
+
+            'bid_average'
+                Order by average bid.
+
+            'bid_enddate'
+                Order by bidding end time.
+
+            'buyer'
+                Order by buyer's username.
+
+            'budget'
+                Order by budget.
+
+            'relevance'
+                Order by relevance of search by keyword. This criterion
+                should be used with the parameter "keyword".
+
+            'random'
+                Order randomly.
+
+        'order_direction'
+            Direction of sorting. If the parameter is equal to "asc",
+            results are ordered in ascending way, otherwise, descending
+            ("desc").
+
+CONFIGURATION AND ENVIRONMENT
+    WWW::Freelancer requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    LWP::UserAgent
+        Not in CORE
+
+    JSON
+        Not in CORE
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-www-freelancer@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Alan Haggai Alavi "<haggai@cpan.org>"
+
+SEE ALSO
+    *   WWW::Freelancer::Project
+
+    *   WWW::Freelancer::User
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010, Alan Haggai Alavi "<haggai@cpan.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.

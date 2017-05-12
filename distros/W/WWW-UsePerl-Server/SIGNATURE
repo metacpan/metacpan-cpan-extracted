@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 efc892588c17207abb607195214a457a1f437a92 Build.PL
+SHA1 90fb1b31deced3a736b7f59f123690479bc9bb7d CHANGES
+SHA1 c24c5f3e328a1da44c15d3117c39ddb9483aca45 LICENSE
+SHA1 01a397acceedf7b177841747c6ea1b7f69cc4221 MANIFEST
+SHA1 c650161712023a7990a8cc77cef648d61f6f6751 META.json
+SHA1 f6f78d2d59b8d42246ffa7a6cf0d5cc98cd5fae8 META.yml
+SHA1 ee50dc3c3d3e559e91a7dabbe907d251aad413a9 README
+SHA1 268fbb7f7b9405df49c8312f20f3bdeff68f6ead lib/WWW/UsePerl/Server.pm
+SHA1 f13af325309802969ae4cef2372890130273bbd6 lib/WWW/UsePerl/Server/Controller/Root.pm
+SHA1 eb85be2e20d5b3976355630cc20a366059f98987 lib/WWW/UsePerl/Server/Model/DB.pm
+SHA1 4938419b73bf601b0427e9850f45ac0816148b98 lib/WWW/UsePerl/Server/Schema.pm
+SHA1 7e8502fff2c658b47bf86aed9243aa105d460798 lib/WWW/UsePerl/Server/Schema/Result/Comment.pm
+SHA1 159c1d4739e4c888bc9104bb6e85137f1852d6f4 lib/WWW/UsePerl/Server/Schema/Result/Journal.pm
+SHA1 1462b29107f42cc56aa5f9354eed2931135b97b6 lib/WWW/UsePerl/Server/Schema/Result/Story.pm
+SHA1 126c04cbedb793cc77cd7947fabe05831b2f33b9 lib/WWW/UsePerl/Server/Schema/Result/User.pm
+SHA1 de5b7b9555d5882023a440b6de97c7552771b70b lib/WWW/UsePerl/Server/View/TT.pm
+SHA1 b51e8f33272e9d7386c950b7737da17bb05e7c8f root/about.tt
+SHA1 1d8d504463c53b07923718efe4bb76d1259c241c root/author.tt
+SHA1 adf484991e2fa0039e750482cc1da1cdaf52a73e root/authors.tt
+SHA1 1d08aa94f9fcdc3b24ea3ee49720a86b7cac801f root/favicon.ico
+SHA1 d0ac81d62a364db59426c2a48ec85ac3b4349a05 root/index.tt
+SHA1 a8ef2a7a946c02e62b4978ba383d111a5defef78 root/journal.tt
+SHA1 280fe8bfc89a69a651e8a05a7c543b2d4d01cfe9 root/journals.tt
+SHA1 fd6d9d3b2d395de38888b3689a9411cc87c4b790 root/lib/comments.tt
+SHA1 a79e85f9f905e6b92305a27a7c399abdd4879cb4 root/lib/pagination.tt
+SHA1 65e01eb1601eb565bab9bd10c790796a3171c820 root/lib/wrapper.tt
+SHA1 e3815257d0f7787f4eb0faae4ad36baeec8fc7b2 root/static/css/bootstrap-responsive.css
+SHA1 cc500e1daf1ed075e84a4d21a459d3cec8c3e3e1 root/static/css/bootstrap-responsive.min.css
+SHA1 4e56af9d82f4f2275a05f177dbd06f383a5c3ccd root/static/css/bootstrap.css
+SHA1 3e28a7125c88fa60e719afb4f940dfdcaf199f7a root/static/css/bootstrap.min.css
+SHA1 718dabe32f2509bdcfc8bf9946560657ce76ae68 root/static/img/glyphicons-halflings-white.png
+SHA1 5b31a9a18265413e32b572a9e3adee91c11354e6 root/static/img/glyphicons-halflings.png
+SHA1 0c9638071da36804e11c7a88765649ab2d78883b root/static/img/slashhead.png
+SHA1 e62589021109c81e5c0fe1eac6f9cf7359038061 root/static/js/bootstrap.js
+SHA1 807ae793c4941d1483631334097b31348e8e4f55 root/static/js/bootstrap.min.js
+SHA1 de4064e2c5950ff92107beb2cd7a0d94797d4948 root/stories.tt
+SHA1 8212528ddb707d7550d1e739845a16d91240c42c root/story.tt
+SHA1 60db7d09ce89cf5aebff08754e1fd01d2bd48093 script/www_useperl_server_cgi.pl
+SHA1 164e833fc9f086fb0216776d26a4ce214fe79ffb script/www_useperl_server_create.pl
+SHA1 caa9c4ab173b5620e5393de6fb02938b5ae1f216 script/www_useperl_server_fastcgi.pl
+SHA1 449c4f93784a908882003bc57edcf6858c29ecce script/www_useperl_server_server.pl
+SHA1 0c7a92751c04866e15f9e505e435c837d7acefb0 script/www_useperl_server_test.pl
+SHA1 d1f5fde5060886ee5a5c7a13e786350bd6cb99d5 www_useperl_server.conf
+SHA1 032168e1dcc701bd33c6387b54b9f76301dfe9d3 www_useperl_server.psgi
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk+leLMACgkQnvdMljFk9hXlfQCfUuJzyFLqwIHkeHP+12hwft4C
+zLcAoJteptUZCjwJRzt9SPBe8cy0+dt/
+=I3ge
+-----END PGP SIGNATURE-----

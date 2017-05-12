@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+Changes
+README
+lib/WWW/Github/Files.pm
+lib/WWW/Github/Files/Mock.pm
+t/01-basic.t
+t/02-mock.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

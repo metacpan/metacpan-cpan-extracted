@@ -1,0 +1,129 @@
+[% PROCESS config.tt -%]
+package [% module %];
+
+# Created on: [% date %] [% time %]
+# Create by:  [% user %]
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use Moose;
+use warnings;
+use namespace::autoclean;
+use Data::Dumper qw/Dumper/;
+use W3C::SOAP::WSDL::Utils;
+[%- IF config.alias %]
+use MooseX::Aliases;
+[%- END %]
+use [% xsd %];
+[%- FOR schema IN wsdl.xsd_modules %]
+use [% schema %];
+[%- END %]
+
+extends '[% config.wsdl.parent_module  || 'W3C::SOAP::WSDL' %]';
+
+our $VERSION = version->new('0.0.1');
+
+has '+w3c_built_with_version' => (
+    default => sub {version->new('[% w3c_version %]')},
+);
+has '+location' => (
+    default => '[% wsdl.services.0.ports.0.address %]',
+);
+[% FOR service IN wsdl.services;
+    FOR port IN service.ports;
+        FOR operation IN port.binding.operations;
+            in_element = operation.port_type.inputs.0.message.element;
+            in_header_element =  operation.port_type.inputs.0.header.element
+            out_element = operation.port_type.outputs.0.message.element;
+            out_header_element =  operation.port_type.outputs.0.header.element
+            faults = operation.port_type.faults;
+ %]
+operation [% operation.perl_name %] => (
+    wsdl_operation => '[% operation.name %]',
+[%- IF in_element %]
+    in_class       => '[% in_element.module %]',
+    in_attribute   => '[% in_element.perl_name %]',
+[%- END %]
+[%- IF in_header_element %]
+    in_header_class       => '[% in_header_element.module %]',
+    in_header_attribute   => '[% in_header_element.perl_name %]',
+[%- END %]
+[%- IF out_element %]
+    out_class      => '[% out_element.module %]',
+    out_attribute  => '[% out_element.perl_name %]',
+[%- END %]
+[%- IF out_header_element %]
+    out_header_class       => '[% out_header_element.module %]',
+    out_header_attribute   => '[% out_header_element.perl_name %]',
+[%- END %]
+[%- IF faults %]
+    faults         => [
+[%-     FOREACH fault IN faults %]
+        {
+            class => '[% fault.message.element.module %]',
+            name  => '[% fault.message.element.perl_name %]',
+        },
+[%-     END %]
+    ],
+[%- END %]
+);
+[%- IF config.alias && element.name.replace('^\w+:', '') != element.perl_name %]
+alias [% element.name.replace('^\w+:', '') %] => '[% element.perl_name %]';
+[%- END %]
+[%         END %]
+[%     END %]
+[% END %]
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=head1 NAME
+
+[% module %] - Talks to the [% end_point %] on the ESB
+
+=head1 VERSION
+
+This documentation refers to [% module %] version 0.1.
+
+=head1 SYNOPSIS
+
+   use [% module %];
+
+   # Brief but working code example(s) here showing the most common usage(s)
+   # This section will be as far as many users bother reading, so make it as
+   # educational and exemplary as possible.
+
+=head1 DESCRIPTION
+
+This SOAP client code was extracted from L<[% location %]>;
+
+=head1 SUBROUTINES/METHODS
+
+=over 4
+[% FOR service IN wsdl.services;
+    FOR port IN service.ports;
+        FOR operation IN port.binding.operations %]
+=item C<[% operation.perl_name %] (%args)>
+
+[%
+           IF operation.port_type.outputs.0.message.element;
+                in_element = operation.port_type.inputs.0.message.element;
+                out_element = operation.port_type.outputs.0.message.element;
+-%]
+Passes C<%args> to C<[% operation.name %]> (via L<[% in_element.module %]>->[% in_element.perl_name %])
+and returns the result (via L<[% in_element.module %]/[% out_element.perl_name %]>->[% out_element.perl_name %])
+[%-
+            ELSIF operation.port_type.outputs.0.message.type;
+                type = operation.port_type.outputs.0.message.type
+%]
+Not yet implemented properly
+[%-         END %]
+[%         END %]
+[%     END %]
+[% END %]
+=back
+
+[% INCLUDE pod.tt %]

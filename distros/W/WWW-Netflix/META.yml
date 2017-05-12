@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WWW-Netflix
+version:             0.05
+abstract:            ~
+license:             perl
+author:              
+    - Christie Robertson and Colin Meyer <pants@helvella.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::SSL:                      2.84
+    WWW::Mechanize:                0.59
+    YAML:                          0.66
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/Win32/pwent.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-pwent.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

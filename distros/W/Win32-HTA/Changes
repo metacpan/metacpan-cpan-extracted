@@ -1,0 +1,14 @@
+Revision history for Perl extension Win32::HTA.
+
+1.00  2016-02-09
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Win32::HTA
+
+1.01  2016-02-10
+    - documented javascript utility functions
+
+1.02  2016-04-07
+    - better Makefile.PL thanks to Alexandr Ciornii (CHORNY@cpan.org)
+    - fixed author and copyright in pod
+    - fixed docs for dependency on JSON and Win32::Process for AJAX
+    - lowered needed perl level to 5.010

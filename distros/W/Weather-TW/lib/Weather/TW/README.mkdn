@@ -1,0 +1,101 @@
+# NAME
+
+Weather::TW::Forecast - Get Taiwan forecasts
+
+# SYNOPSIS
+
+    use Weather::TW::Forecast;
+    my $weather = Weather::TW::Forecast->new(
+      location => '台北',
+    );
+    foreach ($weather->short_forecasts){
+      say $_->start;
+      say $_->end;         # DateTime objects specify forecast time interval
+      say $_->temperature; # Temperature string, ex: '23 ~ 25'
+      say $_->weather;     # Weather string, ex "陰短暫陣雨" 
+      say $_->confortable; # ex '舒適'
+      say $_->rain;        # probabilty to rain, 0~100%
+    }
+    foreach ($weather->weekly_forecasts){
+      say $_->day;         # DateTime object
+      say $_->temperature; # Temperature string, ex: '23 ~ 25'
+      say $_->weather;     # Weather string, ex "陰短暫陣雨" 
+    }
+    my $hash_ref = $weather->montly_mean;
+    say $hash_ref->{temp_high}; # Maximum temperature
+    say $hash_ref->{temp_low};  # Mininum temperature
+    say $hash_ref->{rain};      # Rain precipitation (mm)
+
+# DESCRIPTION
+
+This module reimplement [Weather::TW](http://search.cpan.org/perldoc?Weather::TW) with new web address (from V6 to V7) and
+new parser (use [Mojo::DOM](http://search.cpan.org/perldoc?Mojo::DOM) instead of [HTML::TreeBulder](http://search.cpan.org/perldoc?HTML::TreeBulder)). The methods in 
+[Weather::TW](http://search.cpan.org/perldoc?Weather::TW) will be deprecated and shiped to [Weather::TW::Forecast](http://search.cpan.org/perldoc?Weather::TW::Forecast). More
+submodules will be develop to handle obsevations and detail rain infos.
+[Weather::TW](http://search.cpan.org/perldoc?Weather::TW) will be a abstract class to access these submodules.
+
+# METHODS
+
+## `new`
+
+    my $weather = Weather::TW::Forecast->new(
+      location => '台北',
+    );
+
+Construct a new Weather::TW::Forecast object.
+
+Available locations are
+
+    台北市 新北市 台中市 台南市 高雄市 基隆北海岸 桃園 新竹 苗栗 彰化 南投 雲林 嘉義 屏東 恆春半島 宜蘭 花蓮 台東 澎湖 金門 馬祖
+
+Weather::TW::Forecast will do the fetching right after location is set.
+
+## `location`
+
+    $weather->location('台中市'); 
+    # Change location to 台中市 and do the fetching
+    
+
+    $location = $weather->location();
+    # Get the location string of $weather
+
+Setter and getter of location.
+
+## `all_locations`
+
+Simply return all available locations
+
+## `short_forecast`
+
+    foreach ($weather->short_forecasts){
+      say $_->start;
+      say $_->end;         # DateTime objects specify forecast time interval
+      say $_->temperature; # Temperature string, ex: '23 ~ 25'
+      say $_->weather;     # Weather string, ex "陰短暫陣雨" 
+      say $_->confortable; # ex '舒適'
+      say $_->rain;        # probabilty to rain, 0~100%
+    }
+
+This method returns an array of `Weather::TW::Forecast::ShortForecast` objects.
+The object owns six attributes, as shown as above.
+
+## `weekly`
+
+    foreach ($weather->weekly_forecasts){
+      say $_->day;         # DateTime object
+      say $_->temperature; # Temperature string, ex: '23 ~ 25'
+      say $_->weather;     # Weather string, ex "陰短暫陣雨" 
+    }
+
+Returns a sequence of [Weather::TW::Weekly](http://search.cpan.org/perldoc?Weather::TW::Weekly) objects, the contents of the object
+is as same as above. 
+
+## `montly_mean`
+
+    my $hash_ref = $weather->montly_mean;
+    say $hash_ref->{temp_high}; # Maximum temperature
+    say $hash_ref->{temp_low};  # Mininum temperature
+    say $hash_ref->{rain};      # Rain precipitation (mm)
+
+A hash references contains maximum temperature, minimun temperature, and rain
+precipitation (mm).

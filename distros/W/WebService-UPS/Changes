@@ -1,0 +1,6 @@
+Revision history for Perl extension WebService::UPS.
+
+0.01  Wed Mar 18 14:50:11 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n WebService::UPS
+

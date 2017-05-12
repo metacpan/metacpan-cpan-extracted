@@ -1,0 +1,7 @@
+Revision history for Perl extension Win32::RASE.
+
+1.00  Wed Jan 19 02:49:03 2000
+	- initial release
+1.01  Thu Mar  9 02:55:19 2000
+      The only thing touched is Makefile.PL. The distribution is packed
+      now using UNIX conventions (LF only, unlike the 1.00 dist)

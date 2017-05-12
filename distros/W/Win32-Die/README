@@ -1,0 +1,19 @@
+Win32/Die version 0.03
+======================
+
+Windows automatically ("helpfully") closes DOS windows when they quit. This can be annoying when your Perl program dies, 
+since you don't get a chance to read the error message. Win32::Die detects if your program was double-clicked, or run 
+from a command line, and alters %SIG{__DIE__} appropriately. The DOS window remains put until you close the window or 
+hit a key.  
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Term::ReadKey
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, 2004 Alex Vandiver and Mike Accardo
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.  

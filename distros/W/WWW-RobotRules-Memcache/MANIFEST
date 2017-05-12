@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/WWW/RobotRules/Memcache.pm
+t/00-compile.t
+t/04-pod.t
+t/11-usage.t

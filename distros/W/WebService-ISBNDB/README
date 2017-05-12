@@ -1,0 +1,47 @@
+WebService::ISBNDB - Access to the isbndb.com API
+
+Version: 0.34
+
+WHAT IS IT
+
+This is a module to provide programmatic access to the database of book and
+author information hosted by isbndb.com (see http://isbndb.com). To access
+the API provided by the site, you will have to register a user account and
+create an access key.
+
+
+BUILDING/INSTALLING
+
+This package is set up to configure and build like a typical Perl extension.
+To build:
+
+        perl Build.PL
+        ./Build
+	./Build test
+
+If WebService::ISBNDB passes all tests, then:
+
+        ./Build install
+
+You may need super-user access to install.
+
+
+PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to rjray@blackperl.com
+
+
+CHANGES
+
+Fixed/updated copyright and licensing information. All licensing links
+are current with regards to Artistic 2.0 and LGPL 2.1.
+
+Fixed a bug found by Gavin Carr in which search attempts routed through
+static-method invocations of search() in any of the types (Books,
+Authors, etc.) would fail to get the API key unless one had been set as
+a default.
+
+Fixed $VERSION strings to bump them up; bitten by svn oversight again.
+
+Added the warnings pragma for cleanliness and consistency (despite this
+being a dummy module).

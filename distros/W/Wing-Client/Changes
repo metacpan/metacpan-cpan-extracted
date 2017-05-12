@@ -1,0 +1,25 @@
+1.0000 - December 28, 2016
+ * WARNING: Breaks compatibility.
+ * New options hashref on put and post methods.
+ * Uploads no longer work unless you pass an option for uploading.
+ * Now allows for multiple copies of the same param to be posted.
+
+0.0402 - March 9, 2016
+ * Fix links to bug tracker.
+ * Fix test returning environment variables.
+
+0.0401 - July 1, 2013
+ * Require the newest version of HTTP::Tiny to get around the IO::Socket::SSL problems for SSL_verify_mode
+
+0.0400 - June 21, 2013
+ * Fix git merge issues with HTTP::Thin branch
+ * Push out another release since I forgot the changelog notice for 0.0300
+
+0.0200 - June 18, 2013
+ * Add requirement HTTP::CookieJar to keep track of cookies sent by the Wing server.
+ * Move from LWP::UserAgent to HTTP::Thin internally.
+ * Add tests
+
+0.0100 - May 31, 2013
+ * Initial public release.
+

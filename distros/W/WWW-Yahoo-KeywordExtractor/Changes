@@ -1,0 +1,5 @@
+Revision history for WWW-Yahoo-KeywordExtractor
+
+0.5 2007-04-29
+ - Removed dependancies on XML::Simple and Digest::MD5.
+

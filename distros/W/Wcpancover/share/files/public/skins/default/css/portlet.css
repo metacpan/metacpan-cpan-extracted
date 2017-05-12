@@ -1,0 +1,16 @@
+.column {
+  min-width: 100px;
+  float: left;
+  padding-bottom: 100px;
+}
+.portlet {
+  margin: 0 1em 1em 0;
+}
+.ui-sortable-placeholder {
+  border: 1px dotted black;
+  visibility: visible !important;
+  height: 50px !important;
+}
+.ui-sortable-placeholder * {
+  visibility: hidden;
+}

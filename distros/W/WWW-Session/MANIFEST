@@ -1,0 +1,24 @@
+Changes
+lib/WWW/Session.pm
+lib/WWW/Session/Serialization/JSON.pm
+lib/WWW/Session/Serialization/Storable.pm
+lib/WWW/Session/Storage/File.pm
+lib/WWW/Session/Storage/Memcached.pm
+lib/WWW/Session/Storage/MySQL.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/serialization-json.t
+t/serialization-storable.t
+t/session.t
+t/session-tie.t
+t/storage-file.t
+t/storage-memcached.t
+t/storage-mysql.t
+t/triggers.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

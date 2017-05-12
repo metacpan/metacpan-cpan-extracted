@@ -1,0 +1,55 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::UserAgent::MojoUA
+at lib/WebService/Async/UserAgent/MojoUA.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::UserAgent::MojoUA - make requests using L<Mojo::UserAgent>
+
+=head1 VERSION
+
+version 0.006
+
+=head1 DESCRIPTION
+
+Provides a L</request> method which will use L<Mojo::UA> to make
+requests and return a L<Future> containing the result. Used internally by
+L<WebService::Async::UserAgent>.
+
+=head2 new
+
+Instantiate.
+
+=head2 request
+
+Issues the request. Expects a single L<HTTP::Request> object,
+and returns a L<Future> which will resolve to the decoded
+response content on success, or the failure reason on failure.
+
+=head2 ua
+
+Returns the L<LWP::UserAgent> instance.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::UserAgent>
+
+L<GET|WebService::Async::UserAgent/GET>, L<get|WebService::Async::UserAgent/get>, L<parallel|WebService::Async::UserAgent/parallel>, L<ssl_args|WebService::Async::UserAgent/ssl_args>, L<timeout|WebService::Async::UserAgent/timeout>, L<user_agent|WebService::Async::UserAgent/user_agent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.

@@ -1,0 +1,21 @@
+Changes
+Embedding_API.pod
+MANIFEST
+README
+TODO
+Makefile.PL
+lib/WebFetch.pm
+lib/WebFetch/Input/Atom.pm
+lib/WebFetch/Input/PerlStruct.pm
+lib/WebFetch/Input/RSS.pm
+lib/WebFetch/Input/SiteNews.pm
+lib/WebFetch/Output/Dump.pm
+lib/WebFetch/Output/TT.pm
+lib/WebFetch/Output/TWiki.pm
+lib/WebFetch/Data/Store.pm
+lib/WebFetch/Data/Record.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

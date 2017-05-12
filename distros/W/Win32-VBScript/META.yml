@@ -1,0 +1,28 @@
+---
+abstract: 'Run Visual Basic programs '
+author:
+  - 'Klaus Eichner <klaus03@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-VBScript
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  Win32::OLE: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klaus03/Win32-VBScript
+  repository: https://github.com/klaus03/Win32-VBScript.git
+version: '0.07'

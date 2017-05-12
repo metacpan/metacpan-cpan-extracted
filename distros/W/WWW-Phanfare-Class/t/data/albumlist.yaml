@@ -1,0 +1,183 @@
+--- 
+albums: 
+  album: 
+    - 
+      album_creation_date: 2011-01-04T06:55:24
+      album_descr: ''
+      album_end_date: 2010-01-04T00:00:00
+      album_id: 4966288
+      album_last_modified: 2011-01-04T06:55:25
+      album_name: "Sample: Skiing Vacation"
+      album_start_date: 2010-01-02T00:00:00
+      album_type: Dated
+      album_url: http://albums.phanfare.com/isolated/SLSr7qm2/1/4966288
+      auto_date: 1
+      groups: 
+        num_groups: 0
+      imageinfo: 
+        album_id: 4966288
+        caption: ''
+        filename: C:\phanfare\SampleAlbums\Skiing\File.57384337.jpg
+        hidden: 0
+        image_date: 2010-01-02T00:00:00
+        image_id: 118921362
+        is_video: 0
+        renditions: 
+          num_renditions: 6
+          rendition: 
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 1050
+              media_type: Jpeg
+              quality: 95
+              rendition_type: Full
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_Full_2/0_0_8b2072655b63c11dd1f721a6bdd3c860_1
+              width: 1400
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 1000
+              media_type: Jpeg
+              quality: 91
+              rendition_type: WebLarge
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_WebLarge_2/0_0_2210ca361a09c5173876ea495736bf16_1
+              width: 1333
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 525
+              media_type: Jpeg
+              quality: 91
+              rendition_type: Web
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_Web_2/0_0_6626fbe9e6ff920c08ac6b38dc1c1ce7_1
+              width: 700
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 431
+              media_type: Jpeg
+              quality: 91
+              rendition_type: WebSmall
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_WebSmall_2/0_0_40cf263794802dcd8409edc4bee564c4_1
+              width: 575
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 89
+              media_type: Jpeg
+              quality: 91
+              rendition_type: Thumbnail
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_Thumbnail_2/0_0_ba8c07776f47cf0992c0464867b6eb64_1
+              width: 119
+            - 
+              created_date: 2011-01-04T01:55:24
+              filesize: 0
+              height: 34
+              media_type: Jpeg
+              quality: 91
+              rendition_type: ThumbnailSmall
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966288_118921362_ThumbnailSmall_2/0_0_e3b13dd49507fcaf1486f93ab28ac168_1
+              width: 45
+        section_id: 5555444
+      owner_uid: 9497612
+      sections: 
+        num_sections: 1
+        section: 
+          album_id: 4966288
+          images: 
+            num_images: 4
+          section_descr: ''
+          section_id: 5555444
+          section_name: Main Section
+    - 
+      album_creation_date: 2011-01-04T06:55:25
+      album_descr: ''
+      album_end_date: 2009-09-20T00:00:00
+      album_id: 4966289
+      album_last_modified: 2011-01-04T06:55:25
+      album_name: "Sample: Arizona Vacation"
+      album_start_date: 2009-09-15T00:00:00
+      album_type: Dated
+      album_url: http://albums.phanfare.com/isolated/q8wFzHqF/1/4966289
+      auto_date: 1
+      groups: 
+        num_groups: 0
+      imageinfo: 
+        album_id: 4966289
+        caption: ''
+        filename: C:\phanfare\SampleAlbums\Arizona Vacation\File.1132037.jpg
+        hidden: 0
+        image_date: 2009-09-15T00:00:00
+        image_id: 118921367
+        is_video: 0
+        renditions: 
+          num_renditions: 6
+          rendition: 
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 933
+              media_type: Jpeg
+              quality: 95
+              rendition_type: Full
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_Full_2/0_0_5342dfabe76ba6c7bc8b56bb4da2d410_1
+              width: 1400
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 933
+              media_type: Jpeg
+              quality: 91
+              rendition_type: WebLarge
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_WebLarge_2/0_0_e0733a49878bd3a7dbeb106fa15c3861_1
+              width: 1400
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 466
+              media_type: Jpeg
+              quality: 91
+              rendition_type: Web
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_Web_2/0_0_594cb6c152694cf3f83a7d20c29ddc7d_1
+              width: 700
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 383
+              media_type: Jpeg
+              quality: 91
+              rendition_type: WebSmall
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_WebSmall_2/0_0_899cffe3c978b77c79e1f5e66135de79_1
+              width: 575
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 79
+              media_type: Jpeg
+              quality: 91
+              rendition_type: Thumbnail
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_Thumbnail_2/0_0_f1677e3fecc2c4670391d50e8f9eccbe_1
+              width: 119
+            - 
+              created_date: 2011-01-04T01:55:25
+              filesize: 0
+              height: 30
+              media_type: Jpeg
+              quality: 91
+              rendition_type: ThumbnailSmall
+              url: http://cdn-2-service.phanfare.com/images/external/9497612_4966289_118921367_ThumbnailSmall_2/0_0_de2ec24e3c0c51787feac8a7b851df11_1
+              width: 45
+        section_id: 5555445
+      owner_uid: 9497612
+      sections: 
+        num_sections: 1
+        section: 
+          album_id: 4966289
+          images: 
+            num_images: 4
+          section_descr: ''
+          section_id: 5555445
+          section_name: Main Section
+  num_albums: 2
+stat: ok

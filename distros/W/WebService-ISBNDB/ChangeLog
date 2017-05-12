@@ -1,0 +1,249 @@
+Revision history for Perl module WebService-ISBNDB.
+# $Id: ChangeLog 51 2008-04-06 11:02:35Z  $
+
+0.34	Sun Apr  6 04:00:00 PDT 2008
+
+	lib/WebService/ISBNDB.pm
+	lib/WebService/ISBNDB/API.pm
+	lib/WebService/ISBNDB/API/Authors.pm
+	lib/WebService/ISBNDB/API/Books.pm
+	lib/WebService/ISBNDB/API/Categories.pm
+	lib/WebService/ISBNDB/API/Publishers.pm
+	lib/WebService/ISBNDB/API/Subjects.pm
+	lib/WebService/ISBNDB/Agent.pm
+	lib/WebService/ISBNDB/Agent/REST.pm
+	lib/WebService/ISBNDB/Iterator.pm
+	t/DUMMY.pm
+	Fixed/updated copyright and licensing information. All licensing links
+	are current with regards to Artistic 2.0 and LGPL 2.1.
+
+	lib/WebService/ISBNDB.pm
+	lib/WebService/ISBNDB/API.pm
+	lib/WebService/ISBNDB/API/Authors.pm
+	lib/WebService/ISBNDB/API/Books.pm
+	lib/WebService/ISBNDB/API/Categories.pm
+	lib/WebService/ISBNDB/API/Publishers.pm
+	lib/WebService/ISBNDB/API/Subjects.pm
+	lib/WebService/ISBNDB/Agent/REST.pm
+	Fixed a bug found by Gavin Carr in which search attempts routed through
+	static-method invocations of search() in any of the types (Books,
+	Authors, etc.) would fail to get the API key unless one had been set as
+	a default.
+
+	lib/WebService/ISBNDB/API/Authors.pm
+	lib/WebService/ISBNDB/API/Categories.pm
+	lib/WebService/ISBNDB/API/Publishers.pm
+	lib/WebService/ISBNDB/API/Subjects.pm
+	lib/WebService/ISBNDB/Agent/REST.pm
+	Fixed $VERSION strings to bump them up; bitten by svn oversight again.
+
+	lib/WebService/ISBNDB.pm
+	Added the warnings pragma for cleanliness and consistency (despite this
+	being a dummy module).
+
+0.33	Tue Sep 11 04:04:20 PDT 2007
+
+	lib/WebService/ISBNDB/API/Books.pm:
+	Re-wrote areas that use Business::ISBN, due to some interface
+	changes in the latest version. Some just broke tests, but one
+	flat out broke this module.
+
+0.32	Sat Dec  2 03:46:00 MST 2006
+
+	lib/WebService/ISBNDB/API.pm:
+	Fixed a bug reported by Kevin Old in which trying to "find" an item
+	using a handle with a non-default API key, and the factory
+	syntax, would fail to use the existing API key.
+
+0.31	Thu Oct 12 22:27:13 MDT 2006
+
+	Build.PL:
+	lib/WebService/ISBNDB.pm:
+	t/00_load.t:
+	Added a WebService::ISBNDB module. This is an empty module that acts
+	as the version place-holder, both for build numbering and for testing
+	by modules that depend on this package.
+
+	lib/WebService/ISBNDB/API.pm:
+	t/05_api_baseclass.t:
+	Found that creating an API object with an explicit API key argument was
+	ignoring the user argument and using the default all the time. Also
+	created test cases to check this going forward.
+
+	lib/WebService/ISBNDB/API/Books.pm:
+	t/50_books.t:
+	t/Books-book_id=programming_web_services_with_perl.xml:
+	Fixed a bug in which looking up a book (via find()) with the ID instead
+	of the ISBN did not work. Added a unit test for this, as well.
+
+0.30	Wed Oct 11 02:58:55 MDT 2006
+
+	lib/WebService/ISBNDB/API/Books.pm:
+	lib/WebService/ISBNDB/Agent/REST.pm:
+	t/50_books.t:
+	t/Books-isbn=0596002068.xml:
+	Removed explicit specification of "UTC" in str2time calls, since talk
+	with isbndb.com verified that these are already in UTC. Added 'Z'
+	suffix to strings when setting them via set_*_sec methods, to ensure
+	UTC.
+
+	lib/WebService/ISBNDB/Agent.pm:
+	t/07_agent_baseclass.t:
+	Renamed the "agent" attribute to "useragent", and renamed the
+	associated accessors.
+
+	t/DUMMY.pm:
+	Fixed the handling of arguments to make sure that page_number is
+	included and properly handled.
+
+	t/10_categories.t:
+	t/20_publishers.t:
+	t/30_subjects.t:
+	t/40_authors.t:
+	t/50_books.t:
+	It is no longer necessary to test connectivity to isbndb.com before
+	running the tests.
+ 
+	lib/WebService/ISBNDB/Agent/REST.pm:
+	lib/WebService/ISBNDB/Agent.pm:
+	lib/WebService/ISBNDB/Iterator.pm:
+	t/60_iterator.t:
+	t/Authors-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=10-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=11-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=12-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=13-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=14-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=15-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=16-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=17-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=18-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=19-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=2-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=20-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=21-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=22-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=23-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=24-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=25-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=26-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=3-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=4-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=5-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=6-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=7-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=8-person_id=poe_edgar_allan.xml:
+	t/Books-page_number=9-person_id=poe_edgar_allan.xml:
+	t/Books-person_id=poe_edgar_allan.xml:
+	Implementation of an Iterator class, with tests and test data.
+	Integrated into the REST protocol module as the return value from
+	request_all().
+
+0.20	Sun Sep 24 20:45:08 MDT 2006
+
+	lib/WebService/ISBNDB/Agent.pm:
+	Extended the _lr_trim() method to also translate newlines to spaces
+	and squeeze sequences of spaces.
+
+	Build.PL:
+	Added dependency specification for other non-core modules this
+	module uses (Class::Std, Error, Business::ISBN). Added a "recommends"
+	spec for Date::Parse, which is used only if available. Bumped the
+	dist version number.
+
+	t/00_signature.t:
+	t/01_pod.t:
+	t/02_pod_coverage.t:
+	Added svn Id keywork for tracking purposes.
+
+	lib/WebService/ISBNDB/API/Books.pm:
+	lib/WebService/ISBNDB/Agent/REST.pm:
+	Added the rest of the data isbndb.com makes available for books.
+
+	t/05_api_baseclass.t:
+	t/07_agent_baseclass.t:
+	t/10_categories.t:
+	t/20_publishers.t:
+	t/30_subjects.t:
+	t/40_authors.t:
+	t/50_books.t:
+	t/Authors-person_id=kulchenko_pavel.xml:
+	t/Authors-person_id=ray_randy_j.xml:
+	t/Books-isbn=0596002068.xml:
+	t/Categories-category_id=alphabetically.authors.r.a.y.xml:
+	t/Categories-category_id=alphabetically.publishers.o.r.xml:
+	t/Categories-category_id=computers.programming.languages.perl.xml:
+	t/Categories-category_id=science.astronomy.xml:
+	t/Categories-category_id=science.biology.xml:
+	t/Categories-category_id=science.botany.xml:
+	t/Categories-category_id=science.chemistry.xml:
+	t/Categories-category_id=science.computer_science.xml:
+	t/Categories-category_id=science.earth_sciences.xml:
+	t/Categories-category_id=science.economics.xml:
+	t/Categories-category_id=science.geography.xml:
+	t/Categories-category_id=science.mathematics.xml:
+	t/Categories-category_id=science.mineralogy.xml:
+	t/Categories-category_id=science.paleontology.xml:
+	t/Categories-category_id=science.philosophy.xml:
+	t/Categories-category_id=science.physics.xml:
+	t/Categories-category_id=science.political_science.xml:
+	t/Categories-category_id=science.psychology.xml:
+	t/Categories-category_id=science.social_sciences.xml:
+	t/Categories-category_id=science.sociology.xml:
+	t/Categories-category_id=science.xml:
+	t/DUMMY.pm:
+	t/Publishers-publisher_id=oreilly.xml:
+	t/Subjects-subject_id=internet_programming.xml:
+	t/Subjects-subject_id=perl_computer_program_language.xml:
+	t/testing.key:
+	t/util.pl:
+	A more comprehensive suite of tests. Includes XML files that are
+	snapshots of the corresponding data from isbndb.com, so that the tests
+	don't keep using up the daily allotment of requests for the key. Also
+	includes DUMMY.pm, a dummy connector for WebService::ISBNDB::Agent that
+	reads the XML from the snapshot files.
+
+	lib/WebService/ISBNDB/API.pm:
+	lib/WebService/ISBNDB/API/Authors.pm:
+	lib/WebService/ISBNDB/API/Books.pm:
+	lib/WebService/ISBNDB/API/Categories.pm:
+	lib/WebService/ISBNDB/API/Publishers.pm:
+	lib/WebService/ISBNDB/API/Subjects.pm:
+	lib/WebService/ISBNDB/Agent.pm:
+	lib/WebService/ISBNDB/Agent/REST.pm:
+	Bug-fixes directly resulting from the unit-test suites.
+
+0.12	Thu Sep 14 03:11:29 MDT 2006
+
+	Moved the lib/Net directory to lib/WebService.
+
+	lib/WebService/ISBNDB/API.pm::
+	lib/WebService/ISBNDB/API/Authors.pm:
+	lib/WebService/ISBNDB/API/Books.pm:
+	lib/WebService/ISBNDB/API/Categories.pm:
+	lib/WebService/ISBNDB/API/Publishers.pm:
+	lib/WebService/ISBNDB/API/Subjects.pm:
+	lib/WebService/ISBNDB/Agent.pm:
+	lib/WebService/ISBNDB/Agent/REST.pm:
+	MANIFEST:
+	Changed all file-references and class-references from Net to
+	WebService.
+
+	t/00_load.t:
+	Changed all file-references and class-references from Net to
+	WebService.
+
+	Build.PL:
+	MANIFEST:
+	MANIFEST.SKIP:
+	Makefile.PL:
+	Changed the build control from ExtUtils::MakeMaker to Module::Build.
+	Put in a compatibility layer for EU::MM.
+
+0.11	Wed Sep 13 02:10:32 MDT 2006
+
+	Initial release left changelog files and README out of the manifest.
+
+0.10	Wed Sep 13 01:15:06 MDT 2006
+
+	Initial release.

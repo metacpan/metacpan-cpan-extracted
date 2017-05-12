@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.011';
+
+use App::WWW::CPAN;
+App::WWW::CPAN->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+cpanq - A CLI interface to WWW::CPAN
+
+=head1 SYNOPSIS
+
+  cpanq search Foo
+  cpanq search query=File::Temp mode=all
+
+  cpanq meta Foo
+  cpanq meta dist=WWW-CPAN version=0.003
+
+=head1 DESCRIPTION
+
+This script runs a simple interface to execute
+API methods of L<WWW::CPAN> via the command line.
+Currently, this is a work in progress and
+offered more like an example code for C<WWW::CPAN>.
+
+The actual implementation code lives in the
+module L<App::WWW::CPAN>.
+
+The expected arguments for the script are like:
+
+  command single-arg
+  command key1=val1 key2=val2
+
+where the supported commands by now are B<search>
+and B<meta>.
+
+  search Foo # translates to WWW::CPAN->search('Foo')
+  search query=File::Temp mode=all # WWW::CPAN->search({ query => 'File::Temp', mode => 'all' });
+
+  meta Foo # WWW::CPAN->fetch_distmeta('Foo');
+  meta dist=WWW-CPAN version=0.003 # WWW::CPAN->fetch_distmeta({ dist => 'WWW-CPAN', version => '0.003' })
+
+There are also the synonym commands: B<query>
+which is the same as B<search> and B<distmeta>
+an alias of B<meta>.
+
+The results are dumped with the help of
+L<Data::Dump::Streamer> into STDOUT.
+
+=head1 FEATURES
+
+Since 0.007 version, B<cpanq> uses a cache to
+avoid hitting search.cpan.org with the same query
+in a very short time period. This cache lives at
+F<~/.cpanq> (or platform-equivalent home directory).
+The expiration actually happens after 10 minutes.
+
+=head1 OPTIONS
+
+(None yet)
+
+=head1 SEE ALSO
+
+  WWW::CPAN
+  App::WWW::CPAN
+
+=head1 BUGS
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-CPAN>
+or L<mailto://bugs-WWW-CPAN@rt.cpan.org>.
+
+=head1 AUTHORS
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007, 2008 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

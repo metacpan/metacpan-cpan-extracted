@@ -1,0 +1,118 @@
+=head1 NAME 
+
+TODO LIST FOR WordNet::SenseRelate::TargetWord
+
+=head1 SYNOPSIS
+
+A list of things to do for WordNet::SenseRelate::TargetWord. 
+
+=head1 DESCRIPTION
+
+As these items are completed, move them down into Recently
+Completed Items, make sure to date and initial. When we have
+a version release, all of the recently completed items 
+should be moved into changelog.pod. 
+
+=head2 FOR FUTURE VERSIONS
+
+=over
+
+=item *
+
+Add test scripts to the package.
+
+=item *
+
+Add Viterbi algorithm to the disambiguation algorithm modules.
+
+=item *
+
+Add information content based module to context selection modules.
+
+=item *
+
+For the GUI setup screens, find a way for the user to specify the
+order of the preprocess and postprocess modules.
+
+=item *
+
+Create option to save user specified configuration options to a file.
+
+=back
+
+=head2 GOOD IDEAS FOR FUTURE WORK, DO WHEN POSSIBLE
+
+=over
+
+=item *
+
+Combine WordNet::SenseRelate::TargetWord with WordNet::SenseRelate::AllWords.
+
+=item * 
+
+Incorporate the Senseval-2 evaluation software into the interface code.
+
+=item *
+
+Use a more portable toolkit (Perl/Tk, FLTK, Gtk2) for the graphical interfaces.
+
+=item *
+
+Improve GUIs (setup screens, main screen) -- make them more intuitive.
+
+=back
+
+=head2 RECENTLY COMPLETED
+
+=over
+
+=item *
+
+Added a Graphical Interface for processing Senseval-2 formatted
+data, to the package.
+
+=item *
+
+Added documentation to the package.
+
+=item *
+
+Created graphical interface for plain text input for WSD.
+
+=item *
+
+Improved the man page documentation.
+
+=back
+
+=head1 AUTHORS
+
+ Ted Pedersen, University of Minnesota, Duluth
+ tpederse at d.umn.edu
+
+ Siddharth Patwardhan, University of Utah, Salt Lake City
+ sidd at cs.utah.edu
+
+ Satanjeev Banerjee, Carnegie Mellon University, Pittsburgh
+ banerjee+ at cs.cmu.edu
+
+=head1 SEE ALSO
+
+changelog.pod
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Ted Pedersen, Siddharth Patwardhan, and Satanjeev 
+Banerjee. 
+
+Permission is granted to copy, distribute and/or modify this  document  
+under the terms of the GNU Free Documentation License, Version 1.2 or any  
+later version published by the Free Software Foundation; with no  
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+Note: a copy of the GNU Free Documentation License is available on the web   
+at L<http://www.gnu.org/copyleft/fdl.html> and is included in this    
+distribution as FDL.txt. 
+
+=cut
+

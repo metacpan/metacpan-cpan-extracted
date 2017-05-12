@@ -1,0 +1,179 @@
+Mon Jul 30 14:31:45 PDT 2001
+
+	Release version 1.04.
+
+Mon Jul 30 14:24:56 PDT 2001
+
+	Update the test script to match the new error codes from
+	www.perl.com and ftp.gps.caltech.edu.
+
+Fri Feb  2 16:28:18 PST 2001
+
+        Release version 1.03.
+
+Fri Feb  2 16:17:40 PST 2001
+
+	Include two patches to apply to LWPng-alpha-0.24 to improve
+	portibility to newer versions of Perl and Win32 platforms.
+
+	The test script was failing in one test since the FTP site
+	being used for testing was slightly modified.  Change the
+	script to hopefully do the same test in a location that will
+	not change.
+
+Thu Nov  2 11:00:13 PST 2000
+
+	Release version 1.02.
+
+Thu Nov  2 10:44:11 PST 2000
+
+	Require and use the latest versions of all the HTTP related
+	Perl modules, since the error messages from the modules appear
+	to have changed and this will make sure that the test scripts
+	in the test directory pass.  This means using the following
+	new modules:
+
+	    Net::FTP 2.56
+	    LWPng 0.24
+	    LWP 5.48
+	    URI 1.09
+
+Thu Nov  2 10:25:34 PST 2000
+
+	Change all of the email addresses in all of the documentation
+	from blair@geostaff.com to blair@akamai.com.
+
+	In WebFS::FileCopy::Put::File, when opening the output file
+	call binmode() on the file handle so that binary files are
+	properly written on Windows operating systems.
+
+	When opening a FTP connection to put a file on the FTP server,
+	no longer set default values for the username, password and
+	account in WebFS::FileCopy::_open_ftp_connection and instead
+	let the Net::FTP module set these since it has some code to
+	handle FTP proxy's.  In particular, having
+	WebFS::FileCopy::_open_ftp_connection set the account value to
+	`home' if the account value was not previously set would cause
+	failures on some FTP servers since Net::FTP would always
+	attempt the ACCT command on the FTP server, which some servers
+	do not recognize and the login would fail.
+
+Mon Jul  5 11:34:24 PDT 1999
+
+	Object destruction was not occurring of LWP::Request objects since
+	the data_cb and done_cb hash elements are anonymous subroutines
+	that contained references to external objects.	Now all the
+	WebFS::FileCopy subroutines delete these hash elements and object
+	destruction occurs normally.
+
+	Add some debugging code to the modules.  If
+	$WebFS::FileCopy::WARN_DESTROY is true, then upon destruction
+	some modules will now print a message that they were destructed.
+
+	Add a test to check the filename to directory appending code
+	in copy_urls.
+
+Fri Jul  2 22:00:01 PDT 1999
+
+	Allow HTTP::Request and LWP::Request's to be passed to all
+	WebFS::FileCopy subroutines.  This allows authentication to
+	be included in a HTTP::Request to log into private portions of
+	web sites.
+
+	Do a lot of internal renaming of URL to URI.
+
+Mon Jun 28 16:19:44 PDT 1999
+
+	Fix a typo in Makefile.PL as noted by Roland Bauer
+	<roland.bauer@fff.at>.
+
+Tue Apr 13 09:29:13 PDT 1999 <bzajac@akamai.com> (Blair Zajac)
+
+	Update the module to use URI instead of URI::URL.  Check for
+	URI 1.02 in Makefile.PL.
+
+	Update to use LWPng-alpha 0.24 which now uses URI instead of
+	URI::URL.
+
+	Increase the number of tests in t/01copy.t to check the return
+	from any WebFS::FileCopy command for a defined values.
+
+	Check for Digest::MD5 version 2.06 instead of MD5 version 1.7
+	in Makefile.PL.
+
+	Release version 1.00.
+
+Thu Apr  8 10:20:30 PDT 1999 <bzajac@akamai.com> (Blair Zajac)
+
+	Have ok() in t/*.t return the success or failure of the test
+	instead of the number of tests performed.
+
+Thu Jul  9 12:45:01 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Release version 0.03.
+
+Wed Jul  8 10:05:41 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Update Makefile.PL to require HTML::Parser 2.20.
+
+Tue Jul  7 10:25:39 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Update Makefile.PL to require LWPng_alpha 0.23, LWP 5.34, and
+	HTML::Parser 2.19.
+
+	Rename all gen_response to give_response after LWPng changed the
+	name of LWP::Request->gen_response to LWP::Request->give_response.
+
+Sat Jul  4 09:59:33 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Replace occurrences of EGADS with WebFS::FileCopy in Makefile.PL.
+	Noted by Lupe Christoph <lupe@alanya.m.isar.de>.
+
+	Rename the WebFS::UA package to WebFS::FileCopy::UA and
+	WebFS::Response to WebFS::FileCopy::Response to keep the name
+	space cleaner.
+
+Thu Jul  2 10:45:31 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Per Gisle's request, put _start_read_request and
+	_start_transfer_request in a new WebFS::UA package and
+	_read_content in a new WebFS::Response package.
+
+	Update t/01copy.t to pass all tests on Windows NT.
+
+Sun Jun 28 11:22:57 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Have WebFS::FileCopy use version 0.21 of LWPng or greater.
+
+	Add warning note in README regarding the alpha LWPng code.
+
+	Release version 0.02.
+
+Fri Jun 26 13:47:48 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Rename URI::Copy to WebFS::FileCopy.
+
+Sun Jun 21 11:14:07 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Rename URI::File::Copy to URI::Copy.
+
+Thu Jun 18 12:16:25 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Remove use Data::Dumper from URI::File::Copy.
+
+	Add README documentation.
+
+Thu May 21 17:33:55 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Fix a mistake in the example code for get_urls.
+
+Fri May 15 15:18:22 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Added list_url, which returns a list of files in a directory
+	pointed to by a URL.
+
+Wed May 13 18:19:38 PDT 1998 <blair@gps.caltech.edu> (Blair Zajac)
+
+	Version 0.01
+
+	First version.

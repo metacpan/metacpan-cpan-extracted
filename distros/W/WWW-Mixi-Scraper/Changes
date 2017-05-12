@@ -1,0 +1,175 @@
+Revision history for WWW-Mixi-Scraper
+
+0.34 2011/10/29
+  - fixed login url
+
+0.33 2011/07/05
+  - identical to 0.32, packaging fix only
+
+0.32 2011/07/05
+  - fixed ViewEvent plugin (handling of quit users etc)
+  - fixed ShowFriend plugin (relation/step can't be scraped anymore)
+  - added maybe_(string|uri) test rules
+
+0.31 2011/06/13
+  - deprecated ShowLog plugin
+
+0.30 2011/04/18
+  - fixed (List|View)Diary (the last entry in the list and comments)
+    (patched by ktat)
+
+0.29 2010/07/03
+  - deprecated ShowCalendar plugin, which is replaced by ShowSchedule
+    plugin
+
+0.28 2010/04/21
+  - fixed login issue, applied a patch by nipotan++
+  - deprecated ListEcho, RecentEcho, ResEcho, ViewEcho, ListBookmark
+    plugins
+
+0.27  2010/02/27
+  - forgot to fix metadata
+
+0.26  2010/02/27
+  - deprecated NewMusic plugin
+  - fixed broken ListDiary, NewFriendDiary, ViewDiary, ViewEcho
+    (pages have been changed)
+  - moved public repository from coderepos to github
+
+0.25  2009/07/28
+  - fixed pod (L<NAME|http://...> style of links are not permitted)
+  - removed WWW::Mechanize::DecodedContent dependency,
+    as the current WWW::Mechanize (>= 1.50) does the trick by itself
+
+0.24  2009/03/24
+  - list_message now supports box=outbox etc (thanks to knagano)
+
+0.23  2009/01/29
+  - fixed broken ListMessage (html has been changed;
+    thanks to Keiichiro Nagano)
+
+0.22  2009/01/08
+  - mixi refactored its "show_log", and now we can't get
+    the year part of the logs. This may cause serious problem
+    if you use Plagger to know who came to see you.
+
+0.21  2008/12/20
+  - replaced Module::Pluggable::Fast with Module::Find
+  - made (List|Recent)Echo more text-friendly
+  - made ViewMessage more html-friendly, too
+
+0.20  2008/11/23
+  - bumped up the version req of WWW::Mechanize::DecodedContent
+    to 0.02 (to support new LWP/WWW::Mechanize's fix)
+  - mixi seems to have changed its html for view_message.
+
+0.19  2008/09/08
+  - oops, pods for echo stuff were stale,
+    and manifest was not updated. sorry.
+
+0.18  2008/09/08
+  - new plugins: ListEcho, RecentEcho, ResEcho, ViewEcho
+    (by Kazuhiro Osawa)
+
+0.17  2008/07/29
+  - oops, forgot to add a live test for ListBookmark
+
+0.16  2008/07/29
+  - new plugin: ListBookmark (by Tomohiro Hosaka)
+  - added notes on Plagger::Plugin::CustomFeed::MixiScraper and
+    on sending me a patch.
+
+0.15  2008/07/07
+  - mixi renewed its navigation bar, which affected view_diary's
+    main link. fixed its scraping rule.
+
+0.14  2008/06/04
+  - mixi seems to have changed show_calendar format
+    fixed scraping rules (thanks to otsune)
+
+0.13  2008/03/05
+  - no significant code changes
+  - hid t_live::lib::Utils from PAUSE
+
+0.12  2008/02/10
+  - fixed typo in t_live/new_music.t (thanks to drry)
+  - mixi seems to have changed new_music's datetime format.
+    fixed its live test.
+  - added Exporter dependency to export several internal functions
+    (5.10 dies without it; thanks to tokuhirom)
+
+0.11  2007/11/26
+  - suppress redefine warnings (thanks to yugui)
+  - last comment in view_diary was missing
+    (thanks to anemo and miyagawa)
+  - increased wait
+
+0.10  2007/10/21
+  - mixi has slightly changed html/css for show_calendar.pl
+    thanks to otsune for the report.
+
+0.09  2007/10/09
+  - the content of the comment 'link' of ViewBBS/ViewEvent,
+    which was commenter's profile uri, is now stored in the
+    newly created 'name_link'. And the 'link' now denotes
+    pseudo permanent uri of the comment to make plagger/rss
+    readers happier. Note that this is *incompatible* with
+    WWW::Mixi.
+  - now ViewBBS's comments have their comment numbers in
+    'subject' (this also is incompatible with WWW::Mixi;
+    thanks to false at www.wizard-limit.net).
+
+0.08  2007/10/06
+  - changed Web::Scraper's rendering option to 'HTML' for some
+    of the longer texts (diary body, comment body, bbs/event
+    description, friend's profile).
+  - removed a hackery which ripped <br> tags before scraping.
+    (thanks to otsune for both above)
+  - bumped up the version requirement of Web::Scraper to 0.17.
+
+0.07  2007/10/02
+  - scraping rules are totally refactored due to the mixi's renewal.
+    now it uses id/class attributes everywhere, so scraping is much
+    easier. mixi++ (and k*z*b*r*++, who secretly sent me a patch)
+  - and now live tests dump their contents if you test verbosely.
+  - new plugin: NewMusic
+
+0.06  2007/08/11
+  - new plugin: ViewEvent
+  - several View... plugins return ->{link} and ->{images} properly
+  - requested uri is now preserved in plugin's $self->{uri}
+    for later use (and added ->uri shortcut to Mech.pm)
+  - ShowFriend returns outline info as well
+
+0.05  2007/07/31
+  - applied patches from kazeburo
+    (http://blog.nomadscafe.jp/archives/000723.html)
+
+0.04  2007/07/03
+  - new plugin: NewVideo (by Tatsuhiko Miyagawa)
+  - some of the live tests spat warnings and/or failed
+    when the scraper returns nothing
+
+0.03  2007/07/02
+  - now you can tweak_uri() built in the build_uri()
+    e.g. to get contents from 'video.mixi.jp/view_video.pl'
+    (instead of 'mixi.jp/view_video.pl')
+
+0.02  2007/07/02
+  - new plugins: ListMessage, ViewMessage, ShowCalendar
+  - included several live tests
+    (these won't be tested by normal make process and requires
+    extra modules not declared in Makefile.PL, such as YAML,
+    DateTime::Format::Strptime, File::Slurp, etc)
+  - now logs in just before it needs to get contents;
+    i.e. doesn't log in while testing with local files
+  - added Time::HiRes dependency to behave and not to
+    access too frequently.
+  - fixed _datetime() as some pages doesn't have date info.
+  - fixed validator() (actually, is_valid) not to spit errors
+    when it receives some undefined query parameters.
+    thanks to miyagawa.
+
+0.01  2007/06/04
+  - initial release
+

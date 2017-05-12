@@ -1,0 +1,96 @@
+NAME
+
+    WebService::Braintree - A Client Library for wrapping the Braintree
+    Payment Services Gateway API
+
+ FORK
+
+    This is a fork of the original vendor-issued Net::Braintree. While the
+    original is depreacted, it continues to work. However, it contains a
+    number of code-style and maintainability problems. This fork was
+    produced to address some of those problems and to provide a community
+    driven basis for going forward.
+
+ DOCUMENTATION
+
+    The module is sparesly documented at best. The public facing API is
+    very similar to the ruby libraries which are documented at
+    https://developers.braintreepayments.com/ruby/sdk/server/overview.
+
+    You can also look over the test suite for guidance of usage, especially
+    the xt/sandbox tests. Not all of these tests work (ones marked
+    todo_skip. This is because they are an adaptation of code used against
+    Braintree's private integration server. Care has been taken that the
+    same sandbox tests that fail in this module also fail for
+    Net::Braintree, and in the same manner.
+
+ ISSUES
+
+    The bugtracker is at
+    https://github.com/singingfish/braintree_perl/issues.
+
+    Patches welcome!
+
+ TODO/WISHLIST/ROADMAP
+
+    There is no pod documentation.
+
+    Sandbox tests fail
+
+      Some of this is likely needed because the sandbox account needs to be
+      set up just right, and some may be because the paypal test
+      integration server is emulating stateful transactions.
+
+    Excessive metaobject wrangling
+
+      The usage of Moose in this code is sub-opimtimal. In particular the
+      following classes use the metaobject in a way that makes what is
+      happening difficult to understand:
+
+      WebService::Braintree::ResultObject
+
+	This class is now the only one that is not immutable in the
+	codebase. Unpicking how to make this mutable is problematic.
+
+	The constructors for the following should be fixed to be explicit
+	(requires understanding of what ResultObject is doing):
+
+      WebService::Braintree::AdvancedSearchFields
+
+      WebService::Braintree::SubscriptionSearch
+
+      WebService::Braintree::CreditCardVerificationSearch
+
+      WebService::Braintree::CustomerSearch
+
+      WebService::Braintree::Result
+
+      WebService::Braintree::TransactionSearch
+
+      Also, having stared at the internals of some objects in the perl
+      debugger for a bit, I fear there may be memory leaks, but I have not
+      investigated this closely. It's also possible that the way that
+      several of the above methods use a $field variable in package lexical
+      scope that this module may not be fork-safe. These concerns also
+      apply to Net::Braintree (only it has a bigger memory footprint).
+
+    Sandbox tests
+
+      One of the sandbox tests is really really slow.
+
+ ACKNOWLEDGEMENTS
+
+    Thanks to the staff at Braintree for endorsing this fork.
+
+ LICENSE AND COPYRIGHT
+
+    Copyright 2017 Kieren Diment <zarquon@cpan.org>
+
+    Copyright 2011-2014 Braintree, a division of PayPal, Inc.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

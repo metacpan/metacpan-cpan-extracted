@@ -1,0 +1,8 @@
+Revision history for WebService::Beeminder
+
+0.003     2014-02-05 14:19:17EST+1100 Australia/Melbourne
+
+    * META: Corrected repository metadata. (Thanks dsteinbrunner!)
+    * DOCS: Fixed typos.
+    * TESTS: Updated wet tests now that Beeminder returns most recent
+             data points first.

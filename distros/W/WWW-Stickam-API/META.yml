@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Stickam-API
+version:      0.02
+version_from: lib/WWW/Stickam/API.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0
+    JSON::XS:                      0
+    LWP::UserAgent:                0
+    Test::More:                    0
+    Time::HiRes:                   0
+    UNIVERSAL::require:            0
+    URI:                           0
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,75 @@
+Revision history for Win32::Readch
+
+0.10 - 2016-01-12T20:06:50+01:00
+
+  [BUG FIX]
+
+  - Fix a problem in funckey()
+
+0.09 - 2016-01-11T20:48:33+01:00
+
+  [ENHANCEMENTS]
+
+  - Optionally accept function keys
+
+0.08 - 2016-01-09T13:41:12+01:00
+
+  [ENHANCEMENTS]
+
+  - Rename function inpline() into getstr_echo()
+  - New function readch_timeout($millisec)
+
+0.07 - 2015-12-26T19:46:40+01:00
+
+  [ENHANCEMENTS]
+
+  - Some minor bug fixes
+
+0.06 - 2015-12-19T15:20:13+01:00
+
+  [ENHANCEMENTS]
+
+  - Allow Readch under chcp 65001 on a French or German keyboard 
+
+0.05 - 2014-12-28T11:30:55+01:00
+
+  [BUG FIX]
+
+  - Let Dist::Zilla handle version numbers
+
+0.04 - 2014-12-28T09:24:30+01:00
+
+  [DOCUMENTATION]
+
+  - Migrate to Dist::Zilla
+
+0.03 - 2014-09-20T19:29:17+01:00
+
+  [DOCUMENTATION]
+
+  - Add a .gitignore file
+
+  - Changelog dates are better written as YYYY.MM.DD and probably ordered in
+    the other, descending, direction
+    Remark: I have decided to follow the ISO 8601 standard at
+    http://www.w3.org/TR/NOTE-datetime
+
+  - Just use a Makefile.PL and not a Build.PL the latter does not have any
+    added value any more
+  - In Makefile.PL ==> meta files link to repository
+
+0.02 - 2013-02-23T12:00:00+01:00
+
+  [BUG FIX]
+
+  - Fix an obvious bug in sub readch_block where the initial call to readch_noblock
+    was missing. The effect of this bug was that while normal keyboard input was processed
+    correctly, a copy/paste action only processed the first character. This bug is now fixed
+    with version 0.02
+
+0.01 - 2012-12-11T12:00:00+01:00
+
+  [ENHANCEMENTS]
+
+  - First version, released on an unsuspecting world.
+

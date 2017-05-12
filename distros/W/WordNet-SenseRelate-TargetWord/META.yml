@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WordNet-SenseRelate-TargetWord
+version:      0.09
+version_from: lib/WordNet/SenseRelate/TargetWord.pm
+installdirs:  site
+requires:
+    WordNet::QueryData:            1.32
+    WordNet::Similarity:           0.13
+    XML::Parser:                   2.34
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

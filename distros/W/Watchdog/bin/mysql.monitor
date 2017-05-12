@@ -1,0 +1,70 @@
+#!/usr/local/bin/perl -w
+
+=head1 NAME 
+
+mysql.monitor - monitor Mysql database server
+
+=head1 SYNOPSIS
+
+mysql.monitor [--port=port] host [...]
+
+=head1 DESCRIPTION
+
+B<mysql.monitor> monitors a Mysql database server.  It is designed to
+be used as a monitor for the B<mon> package.  As such if any host's
+Mysql server is dead it returns 1 and outputs the hostnames that
+failed.  If all hosts' servers are alive 0 is returned.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --port=port
+
+The port on which to look for a Mysql server (default is 3306)
+
+=item host [...]
+
+Space separated list of hosts to monitor.
+
+=back
+
+=head1 SEE ALSO
+
+L<Watchdog::Mysql> (available from CPAN)
+
+I<http://consult.ml.org/~trockij/mon/>
+
+=head1 AUTHOR
+
+Paul Sharpe E<lt>paul@miraclefish.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998 Paul Sharpe. England.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use Pod::Usage;
+use Watchdog::Mysql;
+use Getopt::Long;
+
+# avoid warning about only using variables only once
+$opt_port = undef;
+pod2usage('') unless GetOptions("port:i");
+pod2usage("") unless @ARGV;
+
+for ( @ARGV ) {
+  $server = new Watchdog::Mysql('mysql',$_,$opt_port);
+  my($alive,$error) = $server->is_alive;
+  push(@failures,"$_ $error") unless $alive; 
+}
+
+if (@failures) {
+  print join (", ", @failures), "\n";
+  exit 1;
+}
+
+exit 0;

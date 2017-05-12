@@ -1,0 +1,15 @@
+eg/example.key
+eg/live_auth.cgi
+lib/WWW/Live/Auth.pm
+lib/WWW/Live/Auth/ApplicationToken.pm
+lib/WWW/Live/Auth/ConsentToken.pm
+lib/WWW/Live/Auth/Offer.pm
+lib/WWW/Live/Auth/SecretKey.pm
+lib/WWW/Live/Auth/Utils.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-basics.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

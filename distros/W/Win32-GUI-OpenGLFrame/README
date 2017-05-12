@@ -1,0 +1,35 @@
+Win32::GUI::OpenGLFrame - Integrate OpenGL with Win32::GUI
+
+  Win32::GUI::OpenGLFrame allows you to use OpenGL for drawing
+  in Win32::GUI windows.
+
+  It provides a child window (or frame) that can be drawn into
+  using OpenGL primatives.  The interface is modified slightly
+  from the standard Win32::GUI style so as to be (slightly)
+  more familiar to those used to using the glut interface
+  on Win32.
+
+  It should eb possible to have more than one Win32::GUI::OpenGLFrame
+  window with differetn content.  demos\example3.pl shows this in
+  action.
+
+  I am not an OpenGL expert, and all the OpenGL code is 'borrowed'
+  from elsewhere, and may or may not be good style.
+
+  The C bindings (XS) and OpenGL code in OpenGLFrame.PL could use
+  a review from an OpenGL specialist.
+
+INSTALLING
+  Please see the INSTALLING file, supplied with the distribution.
+
+SEEING IT IN ACTION
+ There are a number of demo files provided with the distribution. If the
+ installation went correctly you should eb able to run the Win32::GUI
+ demo tool
+   
+   C:\> win32-gui-demos
+   
+ from the command line and find the demos listed.
+
+AUTHOR
+ Robert May <robertmay@cpan.org>

@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+URLToys.pm
+test.pl
+ChangeLog
+urltoys.pod

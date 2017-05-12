@@ -1,0 +1,307 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+{
+package Adapter::Async::Transformed;
+# Adapter::Async::OrderedList::Array
+$Adapter::Async::Transformed::VERSION = '0.001';
+=pod
+
+Forwards methods to the adapter, 
+
+=cut
+
+sub adapter { shift->{adapter} }
+sub bus { shift->{bus} ||= Adapter::Async::Bus->new }
+
+sub splice { shift->adapter->splice(@_) }
+
+}
+use Tickit::DSL qw(:async);
+
+use curry;
+use Log::Any qw($log);
+
+use Net::Async::Tangence::Client;
+
+use POSIX qw(strftime);
+
+use Log::Any::Adapter 'Stderr';
+
+=head2 subscribe_event
+
+Subscribes to an event.
+
+=over 4
+
+=item * $code - callback to run on event trigger
+
+=item * $obj - L<Tangence::ObjectProxy> to watch
+
+=item * $ev - which event
+
+=back
+
+=cut
+
+sub subscribe_event(&@) {
+	my ($code, $obj, $ev) = @_;
+	my $f = loop->new_future;
+	$obj->subscribe_event(
+		event         => $ev,
+		on_fire       => $code,
+		on_subscribed => sub { $f->done($obj) },
+		on_fail       => $f->curry::fail
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+sub call_method(@) {
+	my ($obj, $method, @args) = @_;
+	my $f = loop->new_future;
+	$obj->call_method(
+		method    => $method,
+		args      => \@args,
+		on_result => sub { $f->done(@_) },
+		on_error  => sub { $f->fail(@_) },
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+use Adapter::Async::OrderedList::Array;
+
+sub property_adapter {
+	my ($obj, $prop, $adapter, %args) = @_;
+	my $f = loop->new_future;
+	$adapter //= Adapter::Async::OrderedList::Array->new(
+		data => [],
+	);
+
+	$obj->watch_property(
+		property     => $prop,
+		want_initial => 1,
+		on_set       => sub {
+			my ($data) = @_;
+			if(my $ref = ref $data) {
+				if($ref eq 'HASH') {
+					$log->debugf("Original data is [%s]", [ keys %$data ]);
+					$adapter->clear->on_done(sub {
+						for my $k (sort keys %$data) {
+							my $item = $args{transform} ? $args{transform}->(
+								$data->{$k}, $k
+							) : $k;
+							$adapter->push([ $item ]);
+						}
+					});
+				} elsif($ref eq 'ARRAY') {
+					$log->debugf("Original data is [%s]", $data);
+					$adapter->clear->on_done(sub {
+						for my $k (0..$#$data) {
+							my $item = $args{transform} ? $args{transform}->(
+								$data->[$k], $k
+							) : $k;
+							$adapter->push([ $item ]);
+						}
+					});
+				} else {
+					die "bad ref $ref"
+				}
+			} else {
+				die "non ref $data";
+			}
+		},
+		on_push      => sub {
+			my ($item) = @_;
+			$log->debugf("push $item");
+			$adapter->push($item);
+		},
+		on_splice    => sub {
+			my ($start, $len, $items) = @_;
+			$adapter->splice($start, $len, $items);
+		},
+		on_move      => sub {
+			my ($start, $len, $items) = @_;
+			$adapter->splice($start, $len, $items);
+		},
+		on_shift     => sub {
+			$adapter->shift
+		},
+		on_add       => sub { die "add - unhandled" },
+		on_del       => sub { die "del - unhandled" },
+		on_watched   => sub { $f->done($obj) },
+		on_error     => sub { $f->fail(@_) },
+	);
+	$f->on_ready(sub { undef $f });
+}
+
+my %adapter;
+vbox {
+	desktop {
+		tree {
+		} data => [
+			'Regions' => $adapter{regions} = Adapter::Async::OrderedList::Array->new(data => []),
+		], 'parent:label'  => 'Server',
+		   'parent:top'    => 0,
+		   'parent:left'   => 0,
+		   'parent:cols'   => 30,
+		   'parent:bottom' => 0;
+		vbox {
+			table {
+			} adapter => $adapter{regions},
+			  item_transformations => [ sub {
+				  my ($idx, $item) = @_;
+				  $log->debugf("have item %s", $item);
+				  Future->new(
+					  $item->prop('name'),
+					  0
+				  )
+			  } ],
+			 columns => [
+				{ label => 'Region', align => 'left' },
+				{ label => 'Tables', width => 6, align => 'right' },
+			], 'parent:expand' => 1;
+		}  'parent:label'  => 'Regions',
+		   'parent:left'   => 29,
+		   'parent:right'  => 0,
+		   'parent:bottom' => 10,
+		   'parent:top'    => 0;
+		scroller {
+			scroller_text 'test';
+		}  'parent:label'  => 'Log',
+		   'parent:left'   => 29,
+		   'parent:right'  => 0,
+		   'parent:lines'  => 11,
+		   'parent:bottom' => 0;
+	} 'parent:expand' => 1;
+	statusbar {};
+};
+
+loop->later(sub {
+	loop->add(
+		my $client = Net::Async::Tangence::Client->new(
+		)
+	);
+
+	$client->connect_url(
+		'tcp://localhost:3008/',
+		on_connected => sub {
+			$log->debug("We have connected to the server");
+		},
+		on_root => sub {
+			my $obj = shift;
+			$log->debugf("We have received a root object [%s]", "$obj");
+			my $watcher = sub {
+				my %args = @_;
+				my $on_add = sub {
+					my ($k, $v) = @_;
+					$args{added}->($k, $v);
+				};
+				my $on_set = sub {
+					my $prop = shift;
+					for my $k (sort keys %$prop) {
+						$on_add->($k, $prop->{$k});
+					}
+				};
+				$log->debug("Watch for [%s] on object ID [%s]");
+				$args{object}->watch_property(
+					property => $args{property},
+					want_initial => 1,
+					on_set => $on_set,
+					on_add => $on_add,
+					on_del => sub { },
+					on_error => sub {
+						my $err = shift;
+						$log->debugf("Error: %s", $err);
+					}
+				);
+			};
+			property_adapter(
+				$obj,
+				'regions' => $adapter{regions},
+				transform => sub {
+					my ($region, $name) = @_;
+					# Table storage
+					my $tables = Adapter::Async::OrderedList::Array->new(data => []);
+					property_adapter(
+						$region,
+						'tables' => $tables,
+						transform => sub {
+							my ($tbl, $idx) = @_;
+							+[
+								scalar($tbl->prop('name')) => [
+									qw(Attributes),
+								]
+							]
+						}
+					);
+					+[
+						$name => [
+							Tables => $tables,
+							'Clients',
+							'Auth' => [
+								'Keys',
+								'IAM Roles'
+							],
+						]
+					]
+				}
+			);
+#			$watcher->(
+#				object   => $obj,
+#				property => 'regions',
+#				added    => sub {
+#					my ($k, $v) = @_;
+#					$log->debug("Had a new region - [%s] (%s)", $k, $v->classname);
+#					return unless $k =~ /^eu/;
+#					$log->debugf("Region [%s] subscribe to error", $k);
+#					my $f = (subscribe_event {
+#						my ($err) = @_;
+#						$log->debugf("Region [%s] reports error [%s]", $k, $err);
+#					} $v => 'error')->then(sub {
+##						$v->watch_property(
+##							property     => 'tables',
+##							want_initial => 1,
+##							on_set       => sub {
+##								my ($data) = @_;
+##								$log->debugf("Have %d tables for [%s]", 0 + @$data, $k);
+##							},
+##							on_push      => sub {
+##								my ($tbl) = @_;
+##								$log->debugf("Our new table is [%s]", $tbl->prop('name'));
+##							},
+##							on_splice    => sub { status '..!splice' },
+##							on_move      => sub { status '..!move' },
+##							on_shift     => sub { status '..!hsift' },
+##		#					on_add       => $on_add,
+##							on_del       => sub { },
+##							on_error     => sub {
+##								my $err = shift;
+##								status "Error: $err";
+##							}
+##						);
+#						call_method(
+#							$v,
+#							create_table => {
+#								TableName => 'test',
+#								AttributeDefinitions => [ {
+#									AttributeName => 'id',
+#									AttributeType => 'S',
+#								} ],
+#								KeySchema => [ {
+#									AttributeName => 'id',
+#									KeyType => 'HASH'
+#								} ],
+#								ProvisionedThroughput => {
+#									ReadCapacityUnits => "5",
+#									WriteCapacityUnits => "5",
+#								}
+#							}
+#						)
+#					});
+#					$f->on_ready(sub { undef $f });
+#				}
+#			);
+		},
+	);
+});
+tickit->run;

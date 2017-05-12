@@ -1,0 +1,139 @@
+Revision history for WWW::Scripter::Plugin::Ajax
+
+0.09    27 March, 2011
+        getAllResponseHeaders now returns the headers with CR LF line
+        endings instead of just LF.
+
+0.08    15 August, 2010
+        file:  URLs now work when they contain  %-escapes  beyond the
+        ASCII range.
+
+0.07    20 June, 2010
+      • send()  now sets the Content-Length header for a POST request.
+        Thanks to Erwan Mas for fixing this.
+      • send(data)  now actually sends the data when the Content-Type
+        has been set explicitly with an encoding. Thanks to Erwan Mas
+        for finding this.
+
+0.06    7 March, 2010
+      • perl 5.8.4 and lower are no longer supported.
+      • t/http.t  is now skipped on Windows,  which does not  support
+        open FH, '-|', LIST.
+      • LWP errors are now also turned into  NETWORK_ERRs,  just like
+        infinite redirects.
+      • Encoding detection now uses  HTTP::Message’s  content_charset
+        feature (which correctly detects XML and HTML encoding),  and
+        resorts to BOM-sniffing if the former doesn’t  work,  instead
+        of relying solely on the Content-Type header.
+      • Invalid byte sequences are now turned into single  (not multi-
+        ple) U+FFFD characters during decoding.
+      • The  open  method now dies if the name  argument  contains  a
+        colon.  (Before, it would record the name and the send method
+        would die instead.)
+      • Names and passwords are now sent in UTF-8 encoding. They used
+        to be sent in Latin 1,  except for those with  chars  outside
+        its range, which would cause errors instead.
+      • The body of a request is now encoded in UTF-8 if it  is  text,
+        or in whatever encoding  is  specified  via  setRequestHeader.
+      • Document objects passed to send() are now serialised properly,
+        instead of simply being converted to strings.
+      • send now returns nothing, the way it’s supposed to.  It  used
+        to return true for successful HTTP status codes.
+      • onreadystatechange  is no longer triggered multiple times  by
+        send() for synchronous requests.
+      • The  abort  method now actually aborts  when  called  from  a
+        readystatechange handler.
+      • The abort method now switches the state to DONE and calls the
+        readystatechange handlers before aborting if the send  method
+        is active.
+
+0.05    8 November, 2009
+        Fixed to work with LWP 5.833
+
+0.04    4 October, 2009
+        Fixed a really nasty bug:  Sending any data  via  the  send()
+        method via  HTTP  would tickle an incompatibility  with  LWP/
+        Protocol/http.pm  that would result in an  LWP-generated  500
+        error (Not a SCALAR reference). (We now stringify the content
+        before passing it to LWP.) Thanks to Steven Nikkel for report-
+        ing the error.
+
+0.03    30 September, 2009
+      • Infinite or external redirects are  now  turned  into  errors
+        (NETWORK_ERRs) if async is false. In any case, they now cause
+        all information pertaining to the response  to  be  discarded.
+      • getResponseHeader and  getAllResponseHeaders  now produce the
+        correct type of error  (INVALID_STATE_ERR)  when the state is
+        UNSENT or OPENED.
+      • As a temporary hack to get someone’s code working,  this  mod-
+        ule adds textContent to XML::DOM::Lite::Node,  if it does not
+        already exist.
+
+0.02    15 August, 2009
+        Fixed to work  with  WWW::Scripter::Plugin::JavaScript  0.002.
+        The test script was relying on a bug in that module.
+
+0.01    5 April, 2009
+        First version. Just a renamed version of the Mech plugin with
+        a few tweaks.
+
+
+Revision history for WWW::Mechanize::Plugin::Ajax
+
+0.05    16 October, 2008
+        Fixed to work with  LWP  5.818,  which has a heart attack when
+        an HTTP header’s value is an object that happens indirectly to
+        reference a code reference.
+
+0.04    15 October, 2008
+        No new features; simply updated to work with LWP 5.815
+
+0.03    9 September, 2008
+        • The errors produced when the URL passed to open is from the
+          wrong site/port/etc. are now DOMException objects.
+        • The open method now clears the responseText and the
+          request headers.
+        • The send method now raises a readystatechange event on send-
+          ing (without changing the readyState)  and for the ‘loading’
+          state (3).
+        • The setRequestHeader method now dies when called at a time
+          other than between open and send.
+        • setRequestHeader now throws a syntax error when the argu-
+          ments do not conform to HTTP syntax.
+        • The send method no longer runs scripts on HTML pages that
+          it fetches.
+        • setRequestHeader now ignores certain HTTP headers for the
+          sake of security and HTTP compliancy.
+        • The send method now dies when the readyState is not OPENED
+          or when it is called recursively.
+        • Assigning null to onreadystatechange no longer causes warn-
+          ings and errors during event dispatch.
+        • The argument to the send method is now ignored for GET and
+          HEAD requests.
+
+0.02    19 August, 2008
+        • Relative URIs are now supported.
+        • URIs are now checked to see whether they originate from the
+          same server  (and port and  scheme)  as  the  current  page.
+        • Fake cookies (created by setRequestHeader) are no longer
+          clobbered when there are real cookies.
+        • The event methods addEventListener, removeEventListener and
+          dispatchEvent have been added.
+        • There are now constants for the readyState
+          (XMLHttpRequest.UNSENT etc.).
+        • Non-standard HTTP method names are no longer folded to
+          uppercase.
+        • The ‘open’ method now dies if the method name is not a
+          valid HTTP token or if it is CONNECT,  TRACE or  TRACK
+          (case-tolerant).
+        • The fragment part (#...) of a URI is now stripped.
+        • The ‘open’ method now dies if the URL’s scheme is not
+          supported.
+        • Username and password are now gleaned from the URL if pres-
+          ent and if the corresponding  args  to  open  are  omitted.
+        • The username and password info no  longer  leaks  from  one
+          object to the next. (The send method used to set the creden-
+          tials for all XHR objects that didn’t have any.)
+
+0.01    29 July, 2008
+        First release

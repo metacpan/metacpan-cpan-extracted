@@ -1,0 +1,22 @@
+Revision history for Perl extension WWW-PGXN.
+
+0.12.4  2013-11-06T05:56:15Z
+      - Removed the Pod tests from the distribution.
+      - Fixed user agent string so it actually includes the version number.
+        This prevents nginx from returning a 400 response.
+
+0.12.3  2012-11-28T01:09:09Z
+      - Updated URI::Template to v0.16 for its support for `{+var}` and
+        dropped the nasty hack required to work around the lack of it in
+        earlier versions.
+      - Fixed test failure on Perl 5.17 due to hash order randomization.
+
+0.12.2  2011-08-10T17:25:27
+      - Require URI::Template 0.15.
+
+0.12.1  2011-05-12T18:11:02
+      - Fixed test failures on Windows.
+      - Support Perl 5.10 and higher. Tests were failing on 5.8.
+
+0.12.0  2011-04-29T21:50:27
+      - Initial public release on CPAN.

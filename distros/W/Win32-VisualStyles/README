@@ -1,0 +1,48 @@
+Win32::VisualStyles - Apply Win32 Visual (aka XP) Styles to windows
+
+  Win32::VisualStyles allows you to use the new styled windows controls
+  provided by Microsoft in Comctl32.dll version 6, as supplied with
+  WinXP and later.
+
+  Before the availability of this module, it was necessary to add
+  a "V6 manifest" to the perl executable, either by embedding it
+  in perl.exe or as a file alongside perl.exe, called
+  perl.exe.manifest.  Supplying a manifest as a part of a re-distributable
+  script is problematic, and affects the perl evnironment for all
+  scripts. To turn off visual styles the manifest needs removing (and on
+  Vista the manifest cache needs invalidating, either by rebooting, or by
+  touching the timestamp on the perl.exe file).
+
+  This module eases the re-distribution problem to one of distributing
+  this module (an issue that all perl authors should be familiar with),
+  and allows for the visual styles to be turned on for a single script.
+
+  The most common use of this module will be simply:
+
+    use Win32::VisualStyles;
+
+  in a script, or:
+
+    perl -MWin32::VisualStyles somescript.pl
+
+  from the command line.
+
+  The module also provides access to some related Win32 APIs for
+  managing styles - please see the POD documentation with the
+  module for more information.
+
+INSTALLING
+  Please see the INSTALLING file, supplied with the distribution.
+
+SEEING IT IN ACTION
+ If you have the Win32::GUI module available then there is a script,
+ themes.pl, provided in the scripts directory of the distribution that
+ you can run to see the effect of the various API calls.
+
+ Otherwise try these one-liners:
+
+  C:\>perl -MWin32 -e"Win32::MsgBox(q(Some Message))"
+  C:\>perl -MWin32 -MWin32::VisualStyles -e"Win32::MsgBox(q(Some Message))"
+
+AUTHOR
+ Robert May <robertmay@cpan.org>

@@ -1,0 +1,27 @@
+Before Install
+
+you should installed the Win32::API Module, if not you can install by ppm, in the console mode
+type command:  
+
+ppm install http://www.bribes.org/perl/ppm/Win32-API.ppd
+
+INSTALL
+
+To install this module you do the following:
+
+1.  Download and install the NMake Program from:  http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+
+2.  Extract the ZIP file, and with console mode type command:
+
+perl Makefile.PL
+nmake
+nmake install
+
+AUTHOR
+
+Lilo Huang
+
+COPYRIGHT
+
+Copyright 2006 by Lilo Huang All Rights Reserved.
+You can use this module under the same terms as Perl itself.

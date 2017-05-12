@@ -1,0 +1,136 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::Valve - internal valve interface</TITLE>
+<LINK REL="stylesheet" HREF="../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::Valve - internal valve interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface specifies a component that assists in processing
+requests for a particular Container. A series of Valves is generally
+associated with each other via a Pipeline.</P>
+<P>A Valve <STRONG>MAY</STRONG> perform the following actions, in the specified order:</P>
+<OL>
+<LI>
+Examine and/or modify the properties of the specified Request and
+Response.
+<P></P>
+<LI>
+Examine the properties of the specified Request, completely generate
+the corresponding Response, and return control to the caller.
+<P></P>
+<LI>
+Examine the properties of the specified Request and Response, wrap
+either or both of these objects to supplement their functionality, and
+pass them on.
+<P></P>
+<LI>
+If the corresponding Response was not generated (and control was not
+returned), call the next Valve in the Pipeline by calling
+<CODE>invokeNext()</CODE> on the Valve's Container.
+<P></P>
+<LI>
+Examine, but not modify, the properties of the resulting Response
+(which was created by a subsequently invoked Valve or Container).
+<P></P></OL>
+<P>A Valve <STRONG>MUST NOT</STRONG> do any of the following things:</P>
+<OL>
+<LI>
+Change request properties that have already been used to direct the
+flow of processing control for this request.
+<P></P>
+<LI>
+Create a completed Response <STRONG>AND</STRONG> pass this Request and Response on
+to the next Valve in the Pipeline.
+<P></P>
+<LI>
+Consume bytes from the input handle associated with the Request,
+unless it is completely generating the Response or wrapping the
+Request before passing it on.
+<P></P>
+<LI>
+Modify the HTTP headers included with the Response after
+<CODE>invokeNext()</CODE> has returned.
+<P></P>
+<LI>
+Perform any actions on the output handle associated with the specified
+Response after <CODE>invokeNext()</CODE> has returned.
+<P></P></OL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_invoke">invoke ($request, $response, $context)</A></STRONG><BR>
+<DD>
+Perform request processing as required by this Valve.
+<P><STRONG>Parameters</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request">$request</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Request</STRONG> to be processed
+<P></P>
+<DT><STRONG><A NAME="item_%24response">$response</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Response</STRONG> to be created
+<P></P>
+<DT><STRONG><A NAME="item_%24context">$context</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::ValveContext</STRONG> allowing access to the next Valve in the
+Pipeline being processed
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if a servlet error occurs or is thrown by a subsequently invoked
+Valve, Filter or Servlet
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A>,
+<A HREF="../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../api/Wombat/Exception.html">the Wombat::Exception manpage</A>,
+<A HREF="../../api/Wombat/Pipeline.html">the Wombat::Pipeline manpage</A>,
+<A HREF="../../api/Wombat/Request.html">the Wombat::Request manpage</A>,
+<A HREF="../../api/Wombat/Response.html">the Wombat::Response manpage</A>,
+<A HREF="../../api/Wombat/ValveContext.html">the Wombat::ValveContext manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

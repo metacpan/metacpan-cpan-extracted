@@ -1,0 +1,58 @@
+{
+   "abstract" : "Scripting www.ruten.com.tw",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Ruten",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : 0,
+            "HTML::Selector::XPath" : 0,
+            "HTML::TreeBuilder::XPath" : 0,
+            "WWW::Mechanize" : "1.66",
+            "perl" : "5.008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/WWW-Ruten/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/www-ruten.git",
+         "web" : "https://github.com/gugod/WWW-Ruten"
+      }
+   },
+   "version" : "0.03"
+}
+

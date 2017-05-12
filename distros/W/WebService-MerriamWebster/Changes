@@ -1,0 +1,9 @@
+Revision history for WebService-MerriamWebster
+
+0.11  2014-08-15 20:04:17 PDT
+        - error message format, enforce lowercase
+0.10  2014-08-10 13:28:30 PDT
+        - add travis support
+0.09  2014-08-10 13:23:21 PDT
+        - Change name from Net::MW::API
+

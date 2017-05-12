@@ -1,0 +1,86 @@
+NAME
+       WWW::Find - Web Resource Finder
+
+SYNOPSIS
+       use LWP::UserAgent;
+       use HTTP::Request;
+       use WWW::Find;
+
+       $agent = LWP::UserAgent->new;
+
+       $request = HTTP::Request->new(GET => 'http://begin.url');
+
+       $find = WWW::Find->new(AGENT => $agent,
+                              REQUEST => $request,
+                              MAX_DEPTH => 2,
+                              MATCH_SUB => \&match,
+                              FOLLOW_SUB => \&follow
+                             );
+
+       $find->go;
+
+DESCRIPTION
+       WWW::Find is a Perl module that simplifies the task of searching the 
+       web for specific types of information. The inspiration for this project 
+       came from the recursive website mirroring program, w3mir.  WWW::Find 
+       is similar to w3mir, but with a more general feature set.
+                                                                               
+       In a nutshell, a WWW::Find object extracts all the HREF links from an
+       HTML document, creates a HTTP::Request object for each link, matches
+       the HTTP::Response object against user specified criteria, and then
+       does something with the matching links (possibly performing the entire
+       operation all over again on certain links).  Be careful not to set the
+       MAX_DEPTH parameter too high, otherwise you could easily begin the end-
+       less task of requesting every page on the net!
+                                                                               
+       In addition to a LPW::UserAgent and a HTTP::Request object, you'll need
+       to create two subroutines: a &match subroutine and a &follow subrou-
+       tine.  
+
+       The &follow subroutine should attempt to match the HTTP::Response
+       object against user defined criteria.  If a match is found, the entire
+       operation is performed all over again on the matching link.  For exam-
+       ple, the following subroutine matches all links where the header con-
+       tent-type matches the regular expression /text/.
+                                                                               
+       sub follow {
+           my $find_obj = shift;
+           my $header = HTTP::Request->new(HEAD => $find_obj->{REQUEST}->uri);
+           my $response = $find_obj->{AGENT}->request($header) || next;
+           $response->content_type =~ /text/io
+           ? return 1
+           : return 0;
+       }
+
+       The &match subroutine should perform some action on links matching user 
+       defined criteria.  For example, the following subroutine simply prints
+       out the URL of all links matching the regular expression /html?$/
+                                                                               
+       sub match {
+           my $find_obj = shift;
+           if($find_obj->{REQUEST}->uri =~ /html?$/io) {
+               print $find_obj->{REQUEST}->uri . "\n";
+           }
+           return;
+       }
+
+DEPENDENCIES
+       HTML::LinkExtor
+       LWP::UserAgent
+       HTTP::Request
+       URI
+
+SEE ALSO
+       HTTP::Request
+       LPW::UserAgent
+ 
+AUTHOR
+       Nathaniel Graham, <broom@cpan.org<gt> 
+       http://www.gnusto.net is the offical home page of WWW::Find
+ 
+COPYRIGHT AND LICENSE
+       Copyright 2003 by Nathaniel Graham
+ 
+       This module is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+

@@ -1,0 +1,30 @@
+Revision history for Perl extension WebService::Validator::CSS::W3C.
+
+0.3   May 2013
+	- fix for http://cpants.cpanauthors.org/dist/WebService-Validator-CSS-W3C issues
+	- fix for https://rt.cpan.org/Public/Bug/Display.html?id=80710
+	- fix for https://rt.cpan.org/Public/Bug/Display.html?id=33040
+	- fix for https://rt.cpan.org/Public/Bug/Display.html?id=33039
+	- fix for https://rt.cpan.org/Public/Bug/Display.html?id=33038
+
+0.2   Fri Jan 19 2007
+        - workaround for MacOSX tar adding resource files in the dist
+
+0.1   Thu Jan 18 2007
+        - removing workarounds for ill-formed soap output
+        - requiring SOAP::Lite > 0.65
+        - added errorcount and warningcount routines
+
+0.02  Wed Jun 02 2004
+	- fix for 6470 Leftover copyright placeholder text from h2xs
+		- http://rt.cpan.org/NoAuth/Bug.html?id=6470
+
+	- fix for 6469 Makefile.PL lacks Class::Accessor req
+		- http://rt.cpan.org/NoAuth/Bug.html?id=6464
+
+	- fix for 6464 Missing Cs in POD
+		- http://rt.cpan.org/NoAuth/Bug.html?id=6469
+
+0.01  Mon May 31 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 WebService::Validator::CSS::W3C

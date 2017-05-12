@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Wetware/Test.pm
+lib/Wetware/Test/Class.pm
+lib/Wetware/Test/Class/Load.pm
+lib/Wetware/Test/Mock.pm
+lib/Wetware/Test/Suite.pm
+lib/Wetware/Test/Utilities.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01_test_classes.t
+t/lib/Wetware/Test/Suite/TestSuite.pm
+t/lib/Wetware/Test/Utilities/TestSuite.pm
+t/test_data/TestSuite.pm

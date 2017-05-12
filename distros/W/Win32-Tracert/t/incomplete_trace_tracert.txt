@@ -1,0 +1,33 @@
+
+Détermination de l'itinéraire vers lacuna.com [68.178.254.85]
+avec un maximum de 30 sauts :
+
+  1     2 ms     2 ms     2 ms  gwvlan13.si3si.int [172.24.11.10]
+  2    <1 ms    <1 ms    <1 ms  172.18.160.49
+  3    <1 ms    <1 ms    <1 ms  terre.si3si.int [172.25.24.102]
+  4    <1 ms    <1 ms    <1 ms  lpb.chouchou.fr [192.168.0.12]
+  5     1 ms     1 ms    <1 ms  254-161.252-81.static-ip.oleane.fr [81.252.161.254]
+  6    <1 ms    <1 ms    <1 ms  81.54.103.177
+  7    <1 ms    <1 ms    <1 ms  Ge-3-1-1.LILP1.Lille.raei.transitip.francetelecom.net [81.52.8.129]
+  8     1 ms    <1 ms    <1 ms  193.253.14.29
+  9    <1 ms    <1 ms    <1 ms  ae20-0.nclil101.VilleneuveDascq.francetelecom.net [193.253.89.189]
+ 10     1 ms    <1 ms    <1 ms  ae41-0.nilil101.VilleneuveDascq.francetelecom.net [193.252.100.106]
+ 11     2 ms     2 ms     6 ms  81.253.184.178
+ 12     8 ms     4 ms     2 ms  level3-3.GW.opentransit.net [193.251.255.218]
+ 13    85 ms   109 ms   100 ms  ae-70-70.csw2.Paris1.Level3.net [4.69.168.126]
+ 14    70 ms    78 ms    89 ms  ae-72-72.ebr2.Paris1.Level3.net [4.69.161.97]
+ 15    81 ms    66 ms    68 ms  ae-41-41.ebr2.Washington1.Level3.net [4.69.137.50]
+ 16    78 ms    74 ms   118 ms  ae-72-72.csw2.Washington1.Level3.net [4.69.134.150]
+ 17    75 ms    96 ms   107 ms  ae-71-71.ebr1.Washington1.Level3.net [4.69.134.133]
+ 18     *        *        *     Délai d'attente de la demande dépassé.
+ 19    77 ms    77 ms    80 ms  ae-7-7.ebr3.Dallas1.Level3.net [4.69.134.21]
+ 20    84 ms   149 ms   148 ms  ae-63-63.csw1.Dallas1.Level3.net [4.69.151.133]
+ 21   152 ms   152 ms   151 ms  ae-61-61.ebr1.Dallas1.Level3.net [4.69.151.126]
+ 22   139 ms   153 ms   152 ms  ae-1-8.bar1.Phoenix1.Level3.net [4.69.133.29]
+ 23   136 ms    82 ms   124 ms  THE-GO-DADD.bar1.Phoenix1.Level3.net [4.53.104.2]
+ 24   110 ms   120 ms   119 ms  ip-184-168-0-113.ip.secureserver.net [184.168.0.113]
+ 25   135 ms   107 ms    78 ms  ip-184-168-0-113.ip.secureserver.net [184.168.0.113]
+ 26    74 ms    63 ms    77 ms  ip-184-168-1-134.ip.secureserver.net [184.168.1.134]
+ 27     *        *        *     Délai d'attente de la demande dépassé.
+
+Itinéraire déterminé.

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Cache/Google.pm
+lib/WWW/Cache/Google/Imode.pm
+t/00_google.t
+t/01_imode.t

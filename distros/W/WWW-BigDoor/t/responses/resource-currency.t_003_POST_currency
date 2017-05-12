@@ -1,0 +1,20 @@
+201[
+    {
+        "end_user_description": "can only be purchased", 
+        "read_only": 0, 
+        "modified_timestamp": 1294259842, 
+        "pub_title": "Coins", 
+        "currency_type_title": "Redeemable Purchase Currency", 
+        "currency_type_id": 1, 
+        "exchange_rate": "900", 
+        "resource_name": "currency", 
+        "urls": [], 
+        "created_timestamp": 1294259842, 
+        "pub_description": "an example of the Purchase currency type", 
+        "end_user_title": "Coins", 
+        "relative_weight": "2", 
+        "id": 5804, 
+        "currency_type_description": ""
+    }, 
+    {}
+]

@@ -1,0 +1,196 @@
+NAME
+    WWW::Comic - Retrieve comic strip images
+
+SYNOPSIS
+     use strict;
+     use WWW::Comic qw();
+     
+ # Create a WWW::Comic object
+     my $wc = new WWW::Comic;
+     
+ # Get a list of supported comics
+     my @comics = $wc->comics;
+     
+ # Allow HTTP requests to retrieve a full list of supported
+     # comics if necessary (some plugins may not know what comics
+     # they support until they make an HTTP request)
+     my @comics = $wc->comics(probe => 1);
+     
+ for my $comic (@comics) {
+         # Get the most recent comic strip URL for $comic
+         my $url = $comic->strip_url(comic => $comic);
+          
+     # Download the most recent comic strip
+         # for $comic in to $blob
+         my $blob = $comic->get_strip(comic => $comic);
+          
+     # Write the most recent comic strip for
+         # $comic to disk
+         my $filename = $comic->mirror_strip(comic => $comic);
+     }
+
+DESCRIPTION
+    This module will download cartoon comic strip images from various
+    websites and return a binary blob of the image, or write it to disk.
+    Multiple comic strips can be supported through subclassed plugin
+    modules.
+
+    A number of plugin modules are bundled as part of this distrubution. You
+    may want to refer to their documentation for any additional custom
+    methods and features. Specifically, WWW::Comic::Plugin::UFS and
+    WWW::Comic::Plugin::uComics require use of the "probe" paramater with
+    the "comics" method on order to retrieve a list of supported commics.
+
+    To find out what plugin modules you currently have installed and
+    available, run the following:
+
+     perl -MWWW::Comic -MData::Dumper -e"print Dumper([WWW::Comic->new->plugins]);"
+
+METHODS
+  new
+     my $wc = new WWW::Comic;
+
+    Creates a new WWW::Comic object.
+
+  comics
+     my @comics = $wc->comics(probe => 1);
+
+    Returns a list of available comics. The "probe" paramater is optional.
+    (See below).
+
+    probe
+        This paramater is an optional boolean value supported by a few
+        plugins that do not automatically know what comics they support.
+        Specifying a boolean true value for this paramater will tell those
+        plugins that they should make HTTP requests to find out what comics
+        they can make available. Plugins should cache this information in
+        memory once they have performed an initial probe.
+
+  strip_url
+     # Get the URL of the most recent "mycomic" comic image
+     my $url = $wc->strip_url(comic => "mycomic");
+     
+ # Get the URl of a specific "mycomic" comic image
+     my $specificStripUrl = $wc->strip_url(
+                                 comic => "mycomic",
+                                 id => 990317
+                             );
+
+    Returns the URL of a comic strip. The "comic" paramater is mandatory and
+    must be a valid supported comic as listed by the "comics()" method. The
+    most recent comic strip image URL will be returned unless otherwise
+    specified (see the "id" paramater below).
+
+    This method will return an "undef" value upon failure.
+
+    The "id" paramater is optional and can be used to specify a specific
+    comic (if supported by the plugin in question). Comic IDs are typically
+    date based in some way, but this is unique to each comic and follows no
+    special format for the purposes of this module. See each plugin module's
+    documentation for further information.
+
+    comic
+        This paramater is mandatory. It specifies the comic that this method
+        should process. See the "comics()" method.
+
+    id  This paramater is optional. It specifies a specfic comic that should
+        be processed.
+
+  get_strip
+     # Retrieve the most recent "mycomic" comic strip image
+     my $imageBlob = $wc->get_strip(comic => "mycomic");
+     
+ # Retrieve a specific "mycomic" comic strip image
+     my $image2 = $wc->get_strip(
+                            comic => "mycomic",
+                            id => "0042304973"
+                        );
+
+    Downloads a copy of a comic strip image and returns the binary data as a
+    scalar. The "comic" paramater is mandatory and must be a valid supported
+    comic as listed by the "comics()" method. The most recent comic strip
+    image will be returned unless otherwise specified.
+
+    This method will return an "undef" value upon failure.
+
+    comic
+        This paramater is mandatory. It specifies the comic that this method
+        should process. See the "comics()" method.
+
+    id  This paramater is optional. It specifies a specfic comic that should
+        be processed.
+
+    url This paramater is optional. It specifies a specific comic that
+        should be processed. If specified it must be a fully qualified and
+        valid absolute HTTP URL. This paramater is typically only used when
+        being called indirectly by the "mirror_strip()" method.
+
+  mirror_strip
+     # Write the most recent "mycomic" comic strip to disk
+     # and return the name of the file that was written
+     my $filename = $wc->mirror_strip(comic => "mycomic");
+     
+ # Write the "mycomic" comic strip image (reference 132)
+     # to disk, specifcally to mycomic.gif, and return the
+     # actual filename that was written to disk in to $file2
+     my $file2 = $wc->mirror_strip(
+                           comic => "mycomic",
+                           id => "132",
+                           filename => "mycomic.gif"
+                      );
+
+    Download a copy of a comic strip image and write it to disk, returning
+    the name of the file that was actually written. This method accepts the
+    same paramaters as the "get_strip()" method, with the addition of the
+    "filename" paramater.
+
+    This method will return an "undef" value upon failure.
+
+    comic
+        This paramater is mandatory. It specifies the comic that this method
+        should process. See the "comics()" method.
+
+    id  This paramater is optional. It specifies a specfic comic that should
+        be processed.
+
+    url This paramater is optional. It specifies a specific comic that
+        should be processed. If specified it must be a fully qualified and
+        valid absolute HTTP URL.
+
+    filename
+        This paramater is optional. It specifiec the target filename that
+        you would like to be written to disk. If you do not supply an image
+        file extension, one will be added for you automatically. If you
+        specify an image file extension that differs to the file format of
+        the file that is to ultimately be written disk, it will be altered
+        for you automatically.
+
+  plugins
+     my @plugins = $wc->plugins;
+
+    Return a list of loaded plugins.
+
+PLUGINS
+    Support for different comics is handled through the WWW::Comic::Plugin
+    superclass. See the POD for WWW::Comic::Plugin on how to create a new
+    plugin.
+
+SEE ALSO
+    WWW::Comic::Plugin, WWW::Dilbert, WWW::VenusEnvy
+
+VERSION
+    $Id: Comic.pm,v 1.5 2006/01/10 15:45:44 nicolaw Exp $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

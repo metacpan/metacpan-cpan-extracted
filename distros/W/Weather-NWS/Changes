@@ -1,0 +1,8 @@
+Revision history for Weather-NWS-NDFDgen
+
+0.01    2006-02-07
+    Initial release to CPAN
+
+0.02    2008-01-27
+    SOAP interface doesn't work will with SOAP::Lite any longer, but luckily there is
+    a RESTful interface that I could use instead of the two methods that I support.

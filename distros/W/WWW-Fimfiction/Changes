@@ -1,0 +1,33 @@
+Revision history for WWW-Fimfiction
+===================================
+
+v0.3.7 - 20 Jan 2012
+--------------------
+
+- Fixed some issues with XML responses
+- Added delay to consecutive POST requsts to appease the spam filter
+
+v0.3.0 - 19 Jan 2012
+--------------------
+
+- Changed basically everything. Focus is now on CRUD tasks rather than just data
+retrieval. The old story() function has been replaced with a simple JSON decode into
+hash ref. No more fluffy Moose attribute carriers.
+- Authentication
+- Add/edit/publish/delete chapter methods added
+
+v0.2.1 - 10 Dec 2012
+--------------------
+
+- Fixed test to consider the site's new URL scheme
+
+v0.2.0 - 10 Dec 2012
+--------------------
+
+- Documented accessors in ::Story, ::User, and ::Chapter
+- Made `01-story.t` skip if Fimfiction 503's
+
+v0.1.0 - 08 Dec 2012
+--------------------
+
+- First released with working `story()` function

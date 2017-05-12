@@ -1,0 +1,49 @@
+{
+   "abstract" : "Write JSON with simplicities",
+   "author" : [
+      "Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WJSON",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WJSON" : {
+         "file" : "lib/WJSON.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.08"
+}

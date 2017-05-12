@@ -1,0 +1,43 @@
+---
+abstract: 'Request Azure Search API'
+author:
+  - 'sys_cat <systemcat91@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Azure-Search
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Azure::Search:
+    file: lib/WebService/Azure/Search.pm
+    version: '0.04'
+requires:
+  Carp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  repository: git://github/sys-cat/WebService-Azure-Search.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

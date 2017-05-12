@@ -1,0 +1,502 @@
+=head1 NAME
+
+README - General Information about WordNet::SenseRelate::AllWords
+
+=head1 OVERVIEW
+
+This module carries out word sense disambiguation (WSD), which is the  
+process of selcting the correct sense for a word in a given context. The  
+correct sense is selected from a sense inventory which lists the possible  
+meanings of a word. This module uses the WordNet lexical database as it's  
+sense inventory.
+
+=head1 SYNOPSIS
+
+    use WordNet::SenseRelate::AllWords;
+    use WordNet::QueryData;
+    use WordNet::Tools;
+
+    my $qd = WordNet::QueryData->new;
+    my $wntools = WordNet::Tools->new($qd);    
+    my %options = (wordnet => $qd,
+		   wntools => $wntools,
+                   measure => 'WordNet::Similarity::lesk'
+                   );
+
+   my $obj = WordNet::SenseRelate::AllWords->new(%options);
+   my @context = qw/when in the course of human events/;
+   my @res = $obj->disambiguate (window => 3,
+				  scheme => 'normal',
+				  tagged => 0,
+				  context => [@context]);                                    
+   print join (' ', @res), "\n";
+
+=head1 CONTENTS
+
+When the distribution is unpacked, several subdirectories are created:
+
+=over
+
+=item /lib
+
+This directory contains the Perl modules that do the actual work of
+disambiguation. By default, these files are installed into
+/usr/local/lib/perl5/site_perl/PERL_VERSION (where PERL_VERSION is the
+version of Perl you are using).  See the INSTALL file for more information.
+
+=item /utils
+
+This directoy contains a number of scripts that let you run word sense 
+disambiguation experiments and reformat data. 
+
+These scripts will be install when 'make install' is run.  By default,  
+these files are installed into your /usr/local/bin directory.  See the  
+INSTALL file for more information.  The scripts in this directory are:
+
+=over
+
+=item wsd.pl
+
+This very useful script can be used to disambiguate a file of words.
+It is discussed in greater detail later in this document.
+
+=item semcor-reformat.pl
+
+This script will reformat a Semcor file so that it can be used as input
+to wsd.pl
+
+=item scorer2-format.pl
+
+This script will reformat the output of wsd.pl so that it can be used as
+input to the Senseval scorer2 program.
+
+=item scorer2-sort.pl
+
+This script will sort the output of scorer2-format.pl so that it can be used as
+input to the Senseval scorer2 program.
+
+=item wsd-experiments.pl
+
+This script will call the above scripts and will run wsd experiments. 
+
+=item allwords-scorer2.pl
+
+This script is modeled after the senseval scorer2 C program (http://www.senseval.org/senseval3/scoring)
+and will be used for scoring. 
+
+=item sentence_split.pl
+
+This script splits text into sentences. We expect that the input format to allwords 
+should be one sentence per line, one line per sentence. If your text is not in this
+format, you can use this script to split the text into sentences. Note that this script 
+is not included anywhere and if your text is not in the required format, you should call 
+this script explicitly before using wsd.pl or the web interface. 
+
+=item extract-semcor-plaintext.pl 
+
+extracts plain text from a semcor formatted file. The text contains function words, content words 
+as well as punctuation marks. This text is used for part-of-speech tagging.  
+
+=item extract-semcor-contentwords.pl
+
+extracts content words given an answer file (typically a plain text file extracted using 
+extract-semcor-plaintext.pl which has been tagged using a part of speech tagger) and 
+a key file extracted using extract-semcor-plaintext.pl --key option.
+
+=item convert-PENN-to-WN.pl 
+
+takes PENN tree bank tagged text (format : word PENNPOS per line) and converts it to WordNet 
+tagged text.
+
+=back
+
+Each of these scripts has detailed documentation.  Run perldoc on a file
+to see the detailed documentation; for example, 'perldoc wsd.pl'
+shows the documentation for wsd.pl.
+
+=item /doc
+
+This directory contains all of the *pod files used to document the 
+system. These are processed via pod2text and the output of this is 
+placed in the top level directory, although these top level text files 
+should be considered read only.
+
+=item /samples
+
+This directory contains examples of the different formats of data that  
+are supported by this package. It also contains a sample stoplist. There  
+is a README file in the directory that describes the contents in more 
+detail.
+
+=item /t
+
+This directory contains test scripts.  These scripts are run when you
+execute 'make test'.
+
+=item /web
+
+This directory contains the allwords web server and interface. There are 
+detailed README and INSTALL instructions within this directory. 
+Installing the web interface is optional, and is separate from 
+installing the main package. 
+
+=back
+
+=head1 DESCRIPTION
+
+Words can have multiple meanings or senses.  For example, the word
+I<glass> in WordNet [1] has seven senses as a noun and five senses
+as a verb.  Glass can mean a clear solid, a container
+for drinking, the quantity a drinking container will hold, etc.
+WSD is the process of selecting the correct sense of a word when
+that word occurs in a specific context.  For example, in the sentence,
+"the window is made of glass", the correct sense of glass is the
+first sense, a clear solid.
+
+WordNet::SenseRelate::AllWords extends a word sense disambiguation   
+algorithm described by Pedersen, Banerjee, and Patwardhan [2] by making  
+it disambiguate all words in text. The previous version of the algorithm 
+was intended for lexical sample data, which means that a single word in a  
+context is designated as the target word and is the only word to be 
+disambiguated. By contrast, WordNet::SenseRelate::AllWords will assign a 
+sense to every word known to WordNet that appears in a context. 
+
+Prior to execution of the algorithm, we remove any word that is not known  
+to WordNet, and any word that appears in a stoplist. The input to the 
+algorithm is presumed to be a single sentence  where non-WordNet words   
+and stoplisted words have been removed. WordNet::SenseRelate::AllWords  
+does not cross sentence boundaries when carrying out disambiguation. 
+
+=head2 Algorithm
+
+  for each word w in sentence
+    disambiguate-single-word (w)
+
+  disambiguate-single-word (w)
+    for each sense s_ti of target word t, where i=0..N
+        let score_i = 0
+
+        for each word w_j in context_window 
+            next if j = t
+
+            for each sense s_jk of w_j
+                temp-score_k = relatedness (s_ti, s_jk)
+	    best-score = max temp-score
+            if best-score > pairScore
+               	score_i = score_i + best-score
+
+    return s_ti s.t. score_i > score_j for all j in 
+		{s_t0, ..., s_tN} and score_i > contextScore
+
+=head2 The Context Window
+
+The size of the context window can be specified by the user.  A context
+window of size 3 means that the context window will consist of three
+words, including the target word.  Thus, the three words would be the
+word to the left of the target word, the target word itself, and the
+word to the right of the target word.  The algorithm will expand the context
+window so that the three words will be words known to WordNet (the algorithm
+is unable to disambiguate words unknown to WordNet).  For example, if the
+word 'the', occurs in the context window to the left of the target word,
+then the window will be expanded by one word to the left.
+
+If the window size is an even number, then there will be one more word
+to the left of the target word than to the right.  For example, if the
+window size is 4, there will be two words to the left of the target word
+and one word to the right.
+
+Note that the context window will only include words in the same sentence
+as the target word.  If, for example, the target word is the first word
+in the sentence, then there will be no words to left of the target word
+in the context window regarless of the specified window size.
+
+The minimum window size is 2 because a smaller window mean that there
+are no context words in the window.  When the window size is 2, there
+is no context to use for disambiguating the first word in a sentence.
+To assign a sense number to that first word, the first sense of the
+word is chosen (i.e., sense number 1).  Sense number 1 is usually the
+most frequent sense of a word.
+
+=head2 Part of Speech Coercion
+
+Certain measures of semantic similarity only work on noun-noun or verb-verb
+pairs; therefore, the usefulness of these measures for WSD is somewhat
+limited.  As a way of coping with this problem, WordNet::SenseRelate::AllWords
+provides
+an option to "coerce" words in the context window to be of the same part
+of speech as the target word.
+
+When POS coercion is in effect, if the target word is a noun, then
+WordNet::SenseRelate::AllWords will attempt to convert non-nouns in the
+context window
+to noun forms of the same word.  For example, if the target word is a noun
+and the verb I<love> occurs in the window, the module might convert that
+word to the noun I<love>.
+
+WordNet::SenseRelate::AllWords first uses the validForms method from
+WordNet::QueryData to find any valid forms of the word being coerced that
+are of the desired part of speech.  In the case of part of speech tagged
+text, the POS tags are discarded.  If validForms did not return any
+forms of the desired part of speech, then the derived forms relation
+in WordNet is used to find possible forms of the word.  If neither of these
+methods returned usable forms, then no further attempt is made to coerce
+the word to be the desired part of speech.
+
+=head2 Tracing/Debugging
+
+Several different levels of trace output are available.  The trace level
+can be specified as a command-line option to wsd.pl or as a parameter
+to the WordNet::SenseRelate::AllWords module.
+
+=head3 Trace Levels
+
+The trace levels are:
+
+  1 Show the context window for each pass through the algorithm.
+
+  2 Display winning score for each pass (i.e., for each target word).
+
+  4 Display the non-zero scores for each sense of each target
+    word (overrides 2).
+
+  8 Display the non-zero values from the semantic relatedness measures.
+
+ 16 Show the zero values as well when combined with either 4 or 8.
+    When not used with 4 or 8, this has no effect.
+
+ 32 Display traces from the semantic relatedness module.
+
+Different trace levels can be combined to achieve the desired behavior.
+For example, by specifying a trace level of 3, both level 1 and level 2
+traces are generated (i.e., the context window will be shown along with
+the winning score for each pass).
+
+=head2 Using wsd.pl
+
+The wsd.pl script provides an easy method of performing disambiguation
+from the command line.  The text to be disambiguated is read from a file
+provided by the user on the command line.
+
+=head3 Output
+
+The output of wsd.pl is simply the disambiguated words.  The output will be
+in the form word#part_of_speech#sense_number.  The
+part of speech will be one of 'n' for noun, 'v' for verb, 'a' for
+adjective, or 'r' for adverb.  Words from other parts of speech are not
+disambiguated and are not found in WordNet.  The sense number will be a
+WordNet sense number.  WordNet sense numbers are assigned by frequency,
+so sense 1 of a word is more common than sense 2, etc.
+
+Sometimes when a word is disambiguated, a "different" but synonymous word
+will be found in the output.  This is not a bug but is a consequence
+of how WordNet works.  The word sense returned will always be the first
+word sense in a synset (synonym set) to which the original word belongs.
+
+=head3 Usage
+
+Usage: wsd.pl --context FILE --format FORMAT [--scheme SCHEME]
+              [--type MEASURE] [--config FILE]
+              [--stoplist file] [--window INT] [--contextScore NUM]
+              [--pairScore NUM] [--outfile FILE] [--trace INT]
+              [--glosses][--forcepos][--nocompoundify][--usemono][--backoff]
+              | {--help | --version}
+
+
+The format option specifies one of the three different formats supported
+by wsd.pl.  The three formats are:
+
+=over
+
+=item raw
+
+Raw text that is not part of speech tagged. This text should be 
+formatted so that there is one sentence per line, one line per 
+sentence. For example:
+
+
+   Red cars are faster than white cars.  
+   However, white cars are less expensive.
+
+Except for a few cases, punctuation will be ignored and will be replaced with a space character. 
+The compounds known to WordNet will be identified automatically (e.g., 'winston churchill' will be 
+recognized as a compound and converted to winston_churchill).
+
+All characters other than the characters from the set {\s,-,a-z,A-Z,0-9,_,',\n} will be removed 
+from words except for the user identified compound words. For example, consider the following 
+sentence
+
+St._Petersburg is a city in Pinellas County, Florida, United States.
+
+In this sentence, the period from the word St._Petersburg will not be removed. However, the period
+from 'United States.' will be removed. If the user identified compound occurs at the end of the 
+sentence, for example 'St._Petersburg.', then the period at the end of the compound is considered 
+as the end of sentence marker and will be removed. 
+
+Punctuation will not be removed for the words 'i.e.' and 'et_al.' because in this case, if the puctuation 
+is removed, 'i.e.' will be treated as two different words 'i' and 'e'. This is not expected as i.e. and et_al. 
+are defined by WordNet. We include these two words because we found those in SemCor 3.0 while doing the 
+experiments. If your text has words like this then you can include those in wsd.pl code. 
+
+=item tagged
+
+Tagged text has been Part of Speech tagged (using the Penn TreeBank
+tag set). This text should be formatted so that there is one sentence
+per line, one line per sentence. For example:
+
+ Red/JJ cars/NNS are/VBP faster/RBR than/IN white/JJ cars/NNS ./.
+ However/RB white/JJ cars/NNS are/VBP less/RBR expensive/JJ ./.
+
+Words that are not tagged will be ignored even if they are known to 
+WordNet. Punctuation is ignored. Compounds will not be automatically
+identified, they must be specified by the user (e.g., 
+winston_churchill/NNP, red_tape/NNS). 
+
+=item wntagged
+
+Identical to tagged text, except that the part of speech tags are
+from the WordNet tag set, which limits them to 'n', 'v', 'a', or 'r',
+for nouns, verbs, adjectives and adverbs. This text should be formatted 
+so that there is one sentence per line, one line per sentence. For 
+example:
+
+ red#a car#n be#v faster#r than white#a car#n .
+ however white#a car#n be#v less#r expensive#a . 
+
+Words that are not tagged will be ignored even if they are known to 
+WordNet. Punctuation is ignored. Compounds will not be automatically
+identified, they must be specified by the user (e.g., 
+winston_churchill#n, red_tape#n). 
+
+Additionally, no attempt will be made to search for other valid forms of the
+words in the input.  For example, if 'dogs#n' is in the input, the program
+will not attempt to use other forms such as 'dog#n'.
+
+=back
+
+The different options and parameters for wsd.pl are discussed in detail
+in the documentation for wsd.pl.  Run 'perldoc wsd.pl' to view the
+documentation.
+
+=head3 Usage Examples
+
+=over
+
+=item 1.
+
+wsd.pl --context input.txt --format raw
+
+=item 2.
+
+wsd.pl --trace 3 --context input.txt --format raw
+
+=item 3.
+
+wsd.pl --trace 3 --context input.txt --window 4 --format raw
+
+=back
+
+=head2 Using the Disambiguation Module
+
+The WordNet::SenseRelate::AllWords Perl module can be used in other Perl
+programs to perform word sense disambiguation.
+
+=head3 Example
+
+    use WordNet::SenseRelate::AllWords;
+    use WordNet::QueryData;
+    use WordNet::Tools;
+
+    my $qd = WordNet::QueryData->new;
+    my $wntools = WordNet::Tools->new($qd);
+    my %options = (wordnet => $qd,
+		   wntools => $wntools,
+                   measure => 'WordNet::Similarity::lesk'
+                   );
+   my $obj = WordNet::SenseRelate::AllWords->new(%options);
+   my @context = qw/when in the course of human events/;
+   my @res = $obj->disambiguate (window => 3,
+				  scheme => 'normal',
+				  tagged => 0,
+				  context => [@context]);               
+   print join (' ', @res), "\n";
+
+The context parameter to disambiguate() specifies a set of words to
+disambiguate.  The function treats the context as one sentence.  To
+disambiguate multiple sentences, make a call to disambiguate() for
+each sentence.
+
+The usage of the disambiguation module is discussed in detail in
+the documentation for the module.  Run 'perldoc WordNet::SenseRelate::AllWords'
+or 'man WordNet::SenseRelate::AllWords'
+(after installing the module) to view the documentation.  To view the
+documentation before installing the module, run
+'perldoc lib/WordNet/SenseRelate/AllWords.pm'.
+
+=head1 REFERENCES
+
+=over
+
+=item 1.
+
+Christiane Fellbaum (editor) (1998) WordNet: an Electronic Lexical 
+Database.  MIT Press.
+
+=item 2.
+
+Ted Pedersen, Satanjeev Banerjee, and Siddharth Patwardhan (2005)
+Maximizing Semantic Relatedness to Perform Word Sense Disambiguation, 
+University of Minnesota Supercomputing Institute Research Report UMSI 
+2005/25, March. 
+L<http://www.msi.umn.edu/general/Reports/rptfiles/2005-25.pdf>
+
+=item 3. 
+
+Jason Michelizzi (2005), Semantic Relatedness Applied to All Words 
+Sense Disambiguation, Master of Science Thesis, Department of Computer 
+Science, University of Minnesota, Duluth, July, 2005. 
+L<http://www.d.umn.edu/~tpederse/Pubs/jason-thesis.pdf>
+
+=back
+
+=head1 SEE ALSO
+
+L<WordNet::SenseRelate::AllWords>
+
+The main web page for SenseRelate is :
+
+ L<http://senserelate.sourceforge.net/>
+
+There are several mailing lists for SenseRelate :
+
+ L<http://lists.sourceforge.net/lists/listinfo/senserelate-users/>
+
+ L<http://lists.sourceforge.net/lists/listinfo/senserelate-news/>
+
+ L<http://lists.sourceforge.net/lists/listinfo/senserelate-developers/>
+
+=head1 AUTHORS
+
+ Ted Pedersen <tpederse at d.umn.edu>
+
+ Varada Kolhatkar <kolha002 at d.umn.edu> 
+
+ Jason Michelizzi <jmichelizzi at users.sourceforge.net>
+
+Last updated by :
+
+# $Id: README.pod,v 1.15 2009/05/27 21:10:11 kvarada Exp $
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004-2008 by Ted Pedersen, Varada Kolhatkar, Jason Michelizzi
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+

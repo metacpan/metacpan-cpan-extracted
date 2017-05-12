@@ -1,0 +1,217 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+{
+package DynamoDB::Table;
+$DynamoDB::Table::VERSION = '0.001';
+use parent qw(Tangence::Object);
+use Log::Any qw($log);
+
+sub new {
+	my $class = shift;
+	my %args = @_;
+	my $self;
+	eval {
+		$log->debugf("make new table for great success");
+		my $tbl = delete $args{table};
+		$self = $class->SUPER::new(%args);
+		$self->set_prop_name($tbl->name);
+		$self->set_prop_state($tbl->state);
+		$self->set_prop_items({ });
+		$self->set_prop_history([ ]);
+		$self->set_prop_item_history([ ]);
+		$self->set_prop_read_throughput_history([ ]);
+		$self->set_prop_write_throughput_history([ ]);
+		$log->debugf("Table setup done for [%s]", $tbl->name);
+		1
+	} or do { $log->debugf("shit be al fucked up - %s", $@) };
+
+#	$self->dynamodb->bus->subscribe_to_event(
+#		error        => $self->curry::weak::on_error,
+#		create_table => $self->curry::weak::on_create_table,
+#	);
+	$self
+}
+
+sub table { shift->{table} }
+
+}
+
+{
+package DynamoDB::Region;
+$DynamoDB::Region::VERSION = '0.001';
+use parent qw(Tangence::Object);
+use Log::Any qw($log);
+
+use curry::weak;
+use WebService::Amazon::DynamoDB::Server;
+
+=head2 new
+
+=cut
+
+sub new {
+	my $class = shift;
+	my %args = @_;
+	my $self = $class->SUPER::new(%args);
+	$self->set_prop_name(delete $args{name});
+	$self->set_prop_tables([ ]);
+	$self->dynamodb->bus->subscribe_to_event(
+		error        => $self->curry::weak::on_error,
+		create_table => $self->curry::weak::on_create_table,
+	);
+	$self
+}
+
+sub on_create_table {
+	my ($self, $ev, $req, $rslt, $tbl) = @_;
+	eval {
+		if(my $failure = $rslt->failure) {
+			$log->debugf("Saw failed table creation event - %s", $failure)
+		} else {
+			$log->debugf("Creating table [%s]", $tbl->name);
+			my $table = $self->registry->construct(
+				'DynamoDB::Table',
+				table => $tbl,
+			);
+			$log->debugf("Construted Tan proxy");
+
+			$self->push_prop_tables($table);
+			$log->debugf("push new Tan proxy");
+		}
+	} or do {
+		$log->debugf("no joy on create - %s", $@);
+	}
+}
+
+sub on_error {
+	my ($self, $ev, $req, $f) = @_;
+	eval {
+		my $err = $f->failure;
+		$log->debugf("Had error [%s] from [%s]", $err, $req);
+		$self->fire_event(
+			error => $err
+		);
+		1
+	} or do {
+		$log->debugf("Had exception while raising error - %s", $@);
+	}
+}
+
+sub dynamodb {
+	shift->{dynamodb} //= WebService::Amazon::DynamoDB::Server->new;
+}
+
+sub method_create_table {
+	my ($self, $ctx, $args) = @_;
+	$log->debugf("Creating table - %s", $args);
+	$self->dynamodb->create_table(%$args)->on_ready(sub {
+		$log->debugf("Finished creating table - %s", [ @_ ]);
+	});
+	return 12;
+}
+
+}
+
+{
+package DynamoDB::Root;
+$DynamoDB::Root::VERSION = '0.001';
+use parent qw(Tangence::Object);
+use feature qw(say);
+
+use JSON::MaybeXS;
+
+=head2 json
+
+=cut
+
+sub json { shift->{json} //= JSON::MaybeXS->new }
+
+=head2 new
+
+=cut
+
+sub new {
+	my $class = shift;
+	my %args = @_;
+	my $self = $class->SUPER::new(%args);
+	$self->set_prop_regions({ });
+	$self->load_initial_regions;
+	$self
+}
+
+=head2 load_initial_regions
+
+Load our regions from our share directory.
+
+=cut
+
+sub load_initial_regions {
+	my ($self) = @_;
+	my $regions = $self->json->decode(do {
+		open my $fh, '<:encoding(UTF-8)', 'share/regions.json' or die $!;
+		local $/;
+		<$fh>;
+	});
+	for(@{$regions->{regions}}) {
+		my $k = $_->{region};
+		say "Region - [$k]";
+		my $region = $self->registry->construct(
+			'DynamoDB::Region',
+			name => $k
+		);
+		$self->add_prop_regions(
+			$k => $region
+		)
+	}
+}
+
+}
+{
+package DynamoDB::Tangence;
+$DynamoDB::Tangence::VERSION = '0.001';
+use Tangence::Registry;
+use Net::Async::Tangence::Server;
+use Scalar::Util qw(weaken);
+
+use parent qw(IO::Async::Notifier);
+
+sub _add_to_loop {
+	my $self = shift;
+	$self->{registry} = Tangence::Registry->new(
+		tanfile => "share/dynamodb.tan",
+	);
+	$self->{root} = $self->registry->construct(
+		'DynamoDB::Root',
+		loop => $self->loop,
+	);
+	my $srv = Net::Async::Tangence::Server->new(
+		registry => $self->registry,
+	);
+	$self->add_child($srv);
+	$srv->listen(
+		service => 3008,
+		socktype => 'stream',
+			on_resolve_error => sub { print STDERR "Cannot resolve - $_[0]\n"; },
+			on_listen_error  => sub { print STDERR "Cannot listen\n"; },
+	);
+	Scalar::Util::weaken($self->{server} = $srv);
+	$self
+}
+
+sub registry { shift->{registry} }
+sub root { shift->{root} }
+}
+
+use Heap;
+use IO::Async::Loop::Epoll;
+use Log::Any::Adapter 'Stdout';
+
+my $loop = IO::Async::Loop::Epoll->new;
+$loop->add(
+	my $ddb = DynamoDB::Tangence->new
+);
+$loop->run;
+
+1;

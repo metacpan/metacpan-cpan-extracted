@@ -1,0 +1,8 @@
+Revision history for Perl extension WWW::RaptureReady.
+
+0.2   2010-07-13
+      - Fix/Update the HTML scraper.
+
+0.1   200501
+      - Initial version of WWW::RaptureReady
+

@@ -1,0 +1,89 @@
+Revision history for Web::ComposableRequest
+
+0.19.1    2017-03-12 22:39:59
+          - Fixes role classname composition
+          - Toolchain update CVE-2016-1238
+          - Fixes UTF8 encoding of new uris
+          - Clones hashes before returning
+
+0.18.1    2017-01-01 00:05:46
+          - Fixes multiple values in query params
+
+0.17.1    2016-11-14 03:45:44
+          - Adds collect_status_messages
+
+0.16.1    2016-10-05 18:10:19
+          - Adds reset session
+          - Added broken smoker
+
+0.15.1    2016-10-02 04:23:39
+          - Adds session clearer
+          - Collects rest of uri params from W::S into _args
+          - Added broken smoker
+
+0.14.1    2016-09-06 15:05:37
+          - Adds collect_message_id
+
+0.13.1    2016-08-18 04:34:09
+          - Toolchain update
+          - Added broken smoker
+          - Renames session_expired to expire_session
+
+0.12.1    2016-08-02 21:36:48
+          - Adds session_expired callback
+
+0.11.1    2016-06-18 00:25:07
+          - Adds referer to base class
+
+0.10.1    2016-06-12 03:06:36
+          - Fixed undefined uri params warnings in uri_for
+          - Removed patch to Role::Tiny since RT#106276 fixed
+
+0.9.1     2016-04-12 00:52:04
+          - Set HTTP::Body::tmpdir. Permissions in production
+
+0.8.1     2016-03-05 20:16:49
+          - Better exception message for uri_params
+
+0.7.1     2016-02-07 03:15:34
+          - Refactored merge_attributes function
+          - Added coverage badge markup
+          - Can set the base when generating URIs
+          - Added new signature to uri_for
+          - Can set extension when generating static URIs
+          - Improved test coverage
+
+0.6.1     2015-12-19 12:10:53
+          - Fixed missing Exception.pm (srezic++)
+
+0.5.1     2015-12-19 02:21:05
+          - Cannot seek on a socket
+          - Appended query to uri. Was there originally
+          - Added protocol attribute
+          - Toolchain update
+          - Created Utils compose_class
+
+0.4.1     2015-09-05 11:42:51
+          - Toolchain update
+          - Split request_config_roles into add_ and list_ config roles
+          - Enhanced L10N locale attribute builder
+          - Better prereq data for build and test phases
+
+0.3.1     2015-08-28 17:05:34
+          - Added hashref inflation for body_params and query_params
+          - Fixed left over undecoded keys error in Util decode_hash
+          - Added badge markup
+
+0.2.1     2015-08-23 23:17:18
+          - Works with App::Doh
+          - Monkey patch Role::Tiny until RT#106276 is fixed
+          - Minimum test coverage
+          - Passing author tests
+          - Added main POD
+          - Added Cookie and JSON roles
+          - Updated prereqs
+          - Passing initial 10test_script.t
+
+0.1.1     2015-08-03 01:04:57
+          - Added project files to master branch
+

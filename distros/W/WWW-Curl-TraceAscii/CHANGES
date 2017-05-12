@@ -1,0 +1,97 @@
+==================================================
+Changes from 2013-06-10 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.05 at 2014-06-10 16:20:36 +0000
+-----------------------------------------
+
+  Change: 2279a1c45ebad11ca09491812554cc7211f30216
+  Author: Jason Terry <oaxlin@cpan.org>
+  Date : 2014-06-10 10:20:11 +0000
+
+    Minor version bump to add minimum perl version 
+
+  Change: 9dcef59cca3c38db45861a084f41403df11e7ff1
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 11:42:25 +0000
+
+    Version bump so PAUSE gets the updated tests 
+
+  Change: 091786b0a88775a867c65659929bc84f1842f323
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2014-01-15 19:39:34 +0000
+
+    Update to not check for a doctype. Google doesn't always send it. 
+
+  Change: b92b8f3b888739f3d7b1c9b51e58fa97bb685e25
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2014-01-07 17:06:44 +0000
+
+    Helps if you pod the right method name 
+
+  Change: 45962b7327ccdb13c20ee4b6610adf7cbee982f7
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2014-01-07 17:05:42 +0000
+
+    Move setopt below new, add pod 
+
+  Change: 081f2dfad0c35a0c19f80f3c39a549dbc3b26b0f
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2014-01-07 17:02:24 +0000
+
+    Update prereqs to include WWW::Curl::Easy (duh) Change trace_headers
+    to return a pointer, similar to the other methods. Add trace_response
+    Update tests 
+
+  Change: ea2d9802c07923eefc874213b7141f582e0d9a9f
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 18:11:48 +0000
+
+    oops version number on an ignore file lol 
+
+  Change: 9c3065ffa8fe8ed4c272560859cb87e4f2d74c14
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 18:07:29 +0000
+
+    Update for cpan 
+
+  Change: f99c2d61baff535027808f86eb2b5e4dcef517b4
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 18:05:41 +0000
+
+    pod coverage 
+
+  Change: 4b38ee5187ad63500d95b8d9771919017c4675c9
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 18:02:02 +0000
+
+    Add readme 
+
+  Change: 8d5f25f3dfe230a0e98c83cd1616af8e8b9fedf7
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 17:49:30 +0000
+
+    dzil and test files 
+
+  Change: 5e140eab8dd763a31e8bc4f4f7bc04f2b878e7e4
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 17:40:46 +0000
+
+    First release is ready 
+
+  Change: 1a97792a4c0a6c627a1ff6547a30c09974b2bd26
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 17:39:30 +0000
+
+    Ignore dzil files 
+
+  Change: 068129c5f79201d1889ca773f7ed085183d531a2
+  Author: root <root@ww1.test.cartmanager.visiongrp.com>
+  Date : 2013-12-23 11:46:11 +0000
+
+    Add response to example 
+
+================
+End of releases.
+================

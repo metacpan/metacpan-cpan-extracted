@@ -1,0 +1,104 @@
+#############################################################################
+## Name:        XS/TopLevelWindow.xsp
+## Purpose:     XS++ for Wx::TopLevelWindow
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     04/01/2005
+## RCS-ID:      $Id: TopLevelWindow.xsp 3380 2012-09-26 23:01:45Z mdootson $
+## Copyright:   (c) 2005-2007 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxTopLevelWindow*}{simple};
+
+#if !defined(__WXMOTIF__) || WXPERL_W_VERSION_GE( 2, 5, 1 )
+
+#include <wx/toplevel.h>
+#include "cpp/overload.h"
+
+%name{Wx::TopLevelWindow} class wxTopLevelWindow
+{
+#if WXPERL_W_VERSION_GE( 2, 5, 3 )
+    void RequestUserAttention( int flags = wxUSER_ATTENTION_INFO );
+#endif
+#if WXPERL_W_VERSION_GE( 2, 7, 0 )
+    bool IsAlwaysMaximized();
+
+    wxWindow* GetDefaultItem();
+    wxWindow* SetDefaultItem( wxWindow* win );
+    wxWindow* GetTmpDefaultItem() const;
+    wxWindow* SetTmpDefaultItem( wxWindow* win );
+
+    bool SetTransparent( wxByte alpha );
+    bool CanSetTransparent();
+#endif
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    bool EnableCloseButton( bool enable );
+#endif
+    const wxIcon& GetIcon() const;
+    const wxIconBundle& GetIcons() const;
+
+    void SetIcon( const wxIcon& icon );
+    void SetIcons( const wxIconBundle& icons );
+
+    void Iconize( bool iconize );
+    void Maximize( bool maximize );
+    bool ShowFullScreen( bool show, long style = wxFULLSCREEN_ALL );
+
+    bool IsFullScreen() const;
+    bool IsActive() const;
+    bool IsIconized() const;
+    bool IsMaximized() const;
+#ifdef __WXUNIVERSAL__
+    bool IsUsingNativeDecorations() const;
+#endif
+#if defined(__WXMSW__) && WXPERL_W_VERSION_GE( 2, 7, 1 )
+    void SetLayoutDirection( wxLayoutDirection direction );
+#endif
+    void SetShape( const wxRegion& region );
+
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    bool ShouldPreventAppExit();
+#endif
+
+#if defined(__WXMSW__) && WXPERL_W_VERSION_GE( 2, 9, 3 )
+    wxMenu* MSWGetSystemMenu () const;
+#endif
+
+#if WXPERL_W_VERSION_GE( 2, 9, 4 )
+    bool OSXIsModified() const;
+    void OSXSetModified( bool modified);
+    void SetRepresentedFilename(const wxString& filename);
+    void SetMinSize(const wxSize& minSize);
+    void SetMaxSize(const wxSize& maxSize);
+#endif
+
+#ifdef __WXUNIVERSAL__
+    void UseNativeDecorations( bool native = true );
+%{
+void
+wxTopLevelWindow::UseNativeDecorationsByDefault( native = true )
+    bool native
+  CODE:
+    wxTopLevelWindow::UseNativeDecorationsByDefault( native );
+%}
+#endif
+};
+
+%{
+
+##void
+##wxIconBundle::new( ... )
+##  PPCODE:
+##    BEGIN_OVERLOAD()
+##        MATCH_VOIDM_REDISP( newEmpty )
+##        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_n, newFile, 1 )
+##        MATCH_REDISP( wxPliOvl_wico, newIcon )
+##    END_OVERLOAD( Wx::IconBundle::new )
+
+%}
+
+#endif

@@ -1,0 +1,15 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+examples/WWW/Mechanize/Boilerplate/BBC.pm
+examples/bbc
+lib/WWW/Mechanize/Boilerplate.pm
+t/010_units.t
+t/020_create_methods.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

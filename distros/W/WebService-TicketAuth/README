@@ -1,0 +1,37 @@
+
+See the WebService::TicketAuth manpage for a description of the module. 
+
+For more information on how to use the script, see the
+pod documentation via the command
+  perldoc WebService::TicketAuth
+or, after installation, view the man pages with
+  man WebService::TicketAuth
+
+For instructions on how to install the script, see the
+file INSTALL.
+
+WebService::TestSystem is Copyright (c) 2001, by Paul Kulchenko.
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+SSL:
+
+To add SSL support to your ticket authentication, add something like
+this to your daemon:
+
+my $opt_ssl = 1;
+
+if ($opt_ssl) {
+    $args{'SSL_key_file'} = $opt_ssl_key_file;
+    $args{'SSL_cert_file'} = $opt_ssl_cert_file;
+}
+
+my $daemon = SOAP::Transport::HTTP::Daemon
+    -> new ( %args )
+    -> dispatch_to('WebService::MySystem')
+    ;
+
+For more info about certificates, see
+http://www.sendmail.org/~ca/email/other/cagreg.html 

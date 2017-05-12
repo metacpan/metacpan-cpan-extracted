@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::Unicode::InternetShortcut.
+
+0.02  Mon Jun 30 12:25:00 2012
+	- Tentative fix for swprintf prototype wooes
+
+0.01  Mon May 28 10:20:46 2012
+	- original version; created by h2xs 1.23 with options
+		-cn Win32::Unicode::InternetShortcut
+

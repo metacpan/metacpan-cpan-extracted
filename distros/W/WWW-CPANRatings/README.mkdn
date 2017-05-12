@@ -1,0 +1,68 @@
+# NAME
+
+WWW::CPANRatings - parsing CPANRatings data
+
+# SYNOPSIS
+
+    use WWW::CPANRatings;
+
+    my $r = WWW::CPANRatings->new;
+
+    my $all_ratings = $r->rating_data;  # get rating data.
+
+    my $ratings = $r->get_ratings( 'Moose' );  # get Moose rating scores.
+
+    my @reviews = $r->get_reviews( 'Moose' );  # parse review text from cpanratings.perl.org.
+
+
+
+
+
+
+
+    for my $r ( @reviews ) {
+        $r->{dist};
+        $r->{dist_link};
+        $r->{version}
+        $r->{user};
+        $r->{user_link};
+        $r->{created_on};  # DateTime object.
+        $r->{ratings};
+    }
+
+# DESCRIPTION
+
+# METHODS
+
+## $r->fetch_ratings()
+
+Download/Parse csv rating data.
+
+## AllRatingData | HashRef = $r->rating_data()
+
+Get csv rating data.
+
+## RatingData | HashRef = $r->get_ratings( DistName | String )
+
+Get rating data of a distribution
+
+## Reviews | Array = $r->get_reviews( DistName | String )
+
+Get distribution reviews (including text, user, timestamp)
+
+## $r->get_all_reviews
+
+Get reviews from all distributions.
+
+# AUTHOR
+
+Yo-An Lin <cornelius.howl {at} gmail.com>
+
+# SEE ALSO
+
+[WWW::CPANRatings::RSS](http://search.cpan.org/perldoc?WWW::CPANRatings::RSS)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

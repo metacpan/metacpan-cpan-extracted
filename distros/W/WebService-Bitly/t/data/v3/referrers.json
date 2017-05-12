@@ -1,0 +1,21 @@
+{
+    "data": {
+        "created_by": "bitly",
+        "global_hash": "djZ9g4",
+        "referrers": [
+            {
+                "clicks": 42,
+                "referrer": "direct"
+            },
+            {
+                "clicks": 8,
+                "referrer_app": "TweetDeck",
+                "url": "http://www.tweetdeck.com/"
+            }
+        ],
+        "short_url": "http://bit.ly/djZ9g4",
+        "user_hash": "djZ9g4"
+    },
+    "status_code": 200,
+    "status_txt": "OK"
+}

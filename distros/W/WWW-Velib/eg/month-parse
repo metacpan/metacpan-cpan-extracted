@@ -1,0 +1,27 @@
+use strict;
+use warnings;
+
+my $str = do { local $/ = undef; <> };
+
+my $detail_re_0 = qr{<table  border="0" class="detail_consommation">
+\s*<tr >
+\s*<th scope="col"> Date</th>
+\s*<th scope="col"> Trajet</th>
+\s*<th scope="col"> Durée</th>
+\s*<th scope="col"> Montant</th>
+\s*</tr>
+(?:\s*<tr class="(?:pyjama)?">
+\s*<td>&nbsp;([^<]+)</td>
+\s*<td>([^<]+)</td>
+\s*<td>([^<]+)</td>
+\s*<td>(\S+) &euro;</td>
+\s*</tr>)+};
+
+my $detail_re = qr{\s*<tr class="(?:pyjama)?">
+\s*<td>&nbsp;(\d\d/\d\d/\d\d\d\d)</td>
+\s*<td>(.*?) -> ([^<]+)</td>
+\s*<td>(\d+)h (\d+)min</td>
+\s*<td>(\d+,\d+) &euro;</td>
+\s*</tr>};
+
+my (@match) = ($str =~ /$detail_re/g);

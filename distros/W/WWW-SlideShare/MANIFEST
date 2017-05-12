@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-SlideShare.t
+lib/WWW/SlideShare.pm
+lib/WWW/SlideShare/Object.pm

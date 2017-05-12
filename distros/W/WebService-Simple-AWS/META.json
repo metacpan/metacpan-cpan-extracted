@@ -1,0 +1,80 @@
+{
+   "abstract" : "Simple Interface to Amazon Web Service using WebService::Simple",
+   "author" : [
+      "Yusuke Wada  C<< <yusuke@kamawada.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Simple-AWS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Filter::Util::Call" : "0",
+            "URI::Escape" : "0",
+            "WebService::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Simple::AWS" : {
+         "file" : "lib/WebService/Simple/AWS.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yusukebe/WebService-Simple-AWS/issues"
+      },
+      "homepage" : "https://github.com/yusukebe/WebService-Simple-AWS",
+      "repository" : {
+         "url" : "git://github.com/yusukebe/WebService-Simple-AWS.git",
+         "web" : "https://github.com/yusukebe/WebService-Simple-AWS"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Yusuke Wada <yusukebe@cpan.org>",
+      "Yusuke Wada <yusuke@kamawada.com>"
+   ]
+}

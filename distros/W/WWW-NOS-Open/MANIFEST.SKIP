@@ -1,0 +1,13 @@
+# git
+^.git/
+^.gitmodules$
+^git2cl/
+.gitignore$
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^Build$
+^_build/
+^MYMETA.yml$
+^MYMETA.json$

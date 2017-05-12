@@ -1,0 +1,41 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Amazon::IAM::Client
+at lib/WebService/Amazon/IAM/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+WebService::Amazon::IAM::Client - client support for Amazon IAM role functionality
+
+=head1 VERSION
+
+version 0.002
+
+=head1 DESCRIPTION
+
+Coming soon.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Amazon::IAM>
+
+L<active_roles|WebService::Amazon::IAM/active_roles>, L<base_uri|WebService::Amazon::IAM/base_uri>, L<build_uri|WebService::Amazon::IAM/build_uri>, L<credentials_for_role|WebService::Amazon::IAM/credentials_for_role>, L<json|WebService::Amazon::IAM/json>, L<new|WebService::Amazon::IAM/new>, L<ua|WebService::Amazon::IAM/ua>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014. Licensed under the same terms as Perl itself.

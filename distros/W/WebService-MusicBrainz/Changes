@@ -1,0 +1,133 @@
+Revision history for Perl extension WebService::MusicBrainz.
+
+0.01  Mon Apr 24 23:43:14 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn WebService::MusicBrainz
+
+0.02  Thu Apr 27 2006
+        - Improved documentation
+	- Removed debug print statement
+	- Added factory object WebService::MusicBrainz
+	- Improved test cases, added Factory.t test script
+	- include META.yml which was missing originally
+	- Remove .swp file accidentally left in distribution
+
+0.03 Wed Sep 27 2006
+        - RT Bug 21511 fix (Thomas Adamcik)
+        - RT Bug 21755 fix (Powder)
+
+0.04 Wed Nov 15 2006
+	- Added feature for alternate mirrored host
+	- Added more response objects to more closly match schema
+	- Much closer to spec compliant (Schema: musicbrainz_mmd-1.0rc5.rng)
+
+0.05 Thu Nov 16 2006
+	- Some test were failing so I corrected those and added a few more
+
+0.06 Mon Nov 26 2006
+	- Incomplete MANIFEST file causing failures
+
+0.07 Tue Feb 13 2007
+	- Failing test due to data change, test corrected (HairMetalAddict)
+
+0.08 Web Apr 25 2007
+	- Another test was failing due to data change.
+
+0.09 Sun May 13 2007
+        - Switched XML parsing from XML::Twig to XML::LibXML
+	- Converted packaging to Module::Build with ExtUtils::MakeMaker compatibility
+        - Fixed failing test in Release.t
+
+0.10 Mon May 28 2007
+	- RT Bug 27287 fix (Ron Kuper)
+	- More tests to check offsets are usable
+	- Set user agent string
+
+0.11 Mon Jul 9 2007
+	- LWP::UserAgent proxy enabled - Michael Ablassmeier
+	- Fix bug with Response.pm - Michael Ablassmeier
+	- Fixed failing tests in Release.t
+
+0.12 Thu Nov 15 2007
+	- More compliant with 1.2 MMD Schema
+	- Added "label" support and test cases
+	- Fixed test case count in Release.t
+
+0.13 Sun Dec 2 2007
+	- Fixed failing tests in Release.t
+
+0.14 Mon Dec 3 2007
+	- Fixed test count in Release.t
+
+0.15 Mon Dec 3 2007
+	- Added "URI" to required modules in Build.PL
+
+0.16 Wed Dec 5 2007
+	- Updated t/Release.t
+
+0.17 Sat Mar 2 2008
+	- Added URI escaping to URL (Edward Allen)
+	- Added support for label, catno, and barcode in realease events
+	- Changed how first object returned from collection (was shift, now ->[0])
+	- Added delays in test scripts to help not exceed webservice request threshold
+	- Updated test cases
+
+0.18 Wed May 14th 2008
+	- Update test in Release.t (Stefan)
+
+0.19 Tue Oct 21st 2008
+	- RT bug 39945 - Chris Key
+
+0.20 Mon Jan 5th 2009
+	- RT Bug 40597 - Slaven
+	    - Updated Build.PL perl version
+	- RT Bug 42169 - pbryan
+	    - Fixed PUID object creation
+            - Added test cases for PUID objects to Track.t
+
+0.21 Mon Feb 2nd 2009
+	- RT Bug 42482 - orivej
+            - Changed URI creation for multiple INC params
+	- RT Bug 42534 - Chris Key
+	    - Applied patch to fix tag and alias parsing
+	- fixed failing test in Artist.t
+        - Added documentation about multiple INC params
+        - Added test case to Artist.t for multiple INC params
+
+0.22 Sat Apr 25th 2009
+	- RT Bug 44065 - Chris Key
+            - Added new API "relation_lists" to Release response object
+            - API method "relation_list" returns first relation list object
+            - New API method "relation_lists" returns array ref with all relation lists
+            - Added more tests to Release.t
+
+0.90 Tue Oct 13th 2009
+	- RT Bug 48661 - Chris Key
+		- Integrated supplied patch
+		- Added ISRC support
+	- RT Bug 50054 - Peter Oliver
+		- Integrated supplied patch
+		- Fixed UTF8 support
+	- Made compliant with MMD 1.4 schema
+	- Rewrote test cases (still more to do)
+	- Added support for direct Lucene queries (suggest: Dave Hodgkinson)
+
+0.91 Mon Oct 19th 2009
+	- RT Bug 50581 - Andreas Koenig
+		- Added prereq for Test::More 0.88
+
+0.92 Sat Nov 1st 2009
+	- Fixed failing test in Release.t
+
+0.93 Fri Nov 27th 2009
+	- Release event lists are now sorted from earliest to the most recent
+
+0.94 Tuesday Auguest 2016
+	- Fixed tests
+
+1.0 2017
+	- Rewrite for version 2.0 of MusicBrainz API
+
+1.0.1 Sunday March 26th 2017
+	- More tests
+	- Fix minimum Mojolicious version

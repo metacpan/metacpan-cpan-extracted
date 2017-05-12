@@ -1,0 +1,31 @@
+WebService-NotifyMyAndroid version 0.0.4
+
+WebService-NotifyMyAndroid provides a Perl wrapper arround the web API
+to the "Notify My Android" service (http://nma.usk.bz).  Use this module
+to send messages to your Android device.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+    Readonly
+    WebService::Simple
+    XML::Simple
+
+Android devices must be running OS version 2.2 (FroYo) or later in order
+to receive push notifications.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, Steve Huff
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

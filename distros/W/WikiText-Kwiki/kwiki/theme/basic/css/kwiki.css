@@ -1,0 +1,38 @@
+#logo_pane {
+    text-align: center;
+}
+    
+#logo_pane img {
+    width: 90px;
+}
+    
+#group {
+    width: 100%;
+}
+
+#group_1 {
+    vertical-align: top;
+}
+
+#group_2 {
+    vertical-align: top;
+    width: 125px;
+}
+
+body {
+    background:#fff;        
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0px;
+    padding: 0px;
+    font-weight: bold;
+}
+
+.error, .empty {
+    color: #f00;
+}
+
+div.navigation a:visited {
+    color: #00f;
+}

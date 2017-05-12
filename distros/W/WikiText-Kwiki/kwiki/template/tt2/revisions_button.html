@@ -1,0 +1,8 @@
+<!-- BEGIN revisions_button -->
+[% revisions = hub.archive.show_revisions %]
+[% IF revisions %]
+<a href="[% script_name %]?action=revisions&page_name=[% page_uri %]&revision_id=-1" accesskey="r" title="[% IF revisions > 1 %][% revisions %] Revisions[% ELSE %]Previous Revision[% END %]">
+[% INCLUDE revisions_button_icon.html %]
+</a>
+[% END %]
+<!-- END revisions_button -->

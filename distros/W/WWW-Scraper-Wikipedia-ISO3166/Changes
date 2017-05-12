@@ -1,0 +1,58 @@
+Revision history for Perl extension WWW::Scraper::Wikipedia::ISO3166.
+
+2.00  2016-05-10T14:51:00
+	- Switch from HTML::TreeBuilder to Mojo::DOM for parsing Wikipedia pages, now that the latter
+		have made significant changes to their page formats.
+	- Change 'utf8' to 'UTF-8'.
+	- Add the subcounty_categories table to the database, and a corresponding method for reading it.
+	- Add the subcounty_info table to the database, and a corresponding method for reading it.
+	- Add subcountry_info table and data/subcountry.info.csv.
+	- Switch from obsolete ISO_3166-2.3.html to ISO_3166-1.html.
+	- Add a column called 'number' to the countries table, derived from ISO_3166-1.html.
+	- Add method Import.check_downloads().
+	- Fix a couple of typos in the names of programs listed in the Description.
+	- Switch from File::Slurp to File::Slurper.
+	- Add an FAQ about the way SQLite allocates primary keys, and hence how you can force them to
+		start from 1.
+	- Stop supporting any FIPS-related stuff.
+	- Add data/www.scraper.wikipedia.iso3166.schema.svg for the database schema.
+	- Add scripts/build.database.sh.
+	- Add scripts/find.db.pl (but only run it after installation!).
+	- Add scripts/report.Australian.statistics.pl.
+	- Fix check.downloads.pl to call the right method.
+	- Remove scripts/test.nfc.pl.
+
+1.04  2016-05-10T10:34:00
+	- Rename t/load.t to t/report.t, and make it run scripts/report.statistics.pl for a real test.
+	- Update pre-reqs since t/report.t uses Capture::Tiny.
+	- Reformat lines in this file to be <= 100 chars wide, as per my new policy.
+
+1.03  2016-05-10T09:38:00
+	- Adopt new repo structure.
+	- Replace Hash::FieldHash with Moo and Types::Standard.
+	- Change licence from Artistic to Perl.
+	- Fix usage of nested L<...L<...>...> link. See RT#114174. Thanx to K. H. Williamson.
+	- Fix another link-based typo.
+	- Move t/pod.t into xt/author/.
+	- Rename CHANGES to Changes as per CPAN::Spec::Changes
+	- Change format of dates in this file.
+
+1.02  2013-05-14T13:43:00
+	- Make ISO3166.pm a UTF-8 file, to match its use of =encoding utf8.
+	- Add scripts/test.nfc.pl.
+	- In the FAQ, clarify use of NFC() rather than NFD().
+	- Add scripts/get.statoids.pl in case we need their FIPS 10-4 codes one day.
+	- Add scripts/get.fips.pages.pl and data/List_of_FIPS_region_codes_*.html.
+	- Add scripts/populate.fips.pages.pl, data/wikipedia.fips.codes.txt and
+		data/wikipedia.fips.mismatch.log.
+	- Update the POD re the new files.
+	- Update the pre-reqs.
+
+1.01  2012-05-16T09:50:00
+	- Neither code nor data changes made.
+	- Update the web page template to include the version #, and links to MetaCPAN.
+		This affects data/iso.3166-2.html.
+	- Add a new section to the docs: Wikipedia's Terms of Use.
+
+1.00  2012-05-15T15:37:00
+	- Original version

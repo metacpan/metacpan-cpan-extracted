@@ -1,0 +1,32 @@
+---
+abstract: 'Allows web authentication using cookies and a storage engine. '
+author:
+  - 'Adam Hopkins <srchulo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Web-Authenticate
+requires:
+  CGI: '0'
+  CGI::Cookie: '0'
+  Carp: '0'
+  Crypt::PBKDF2: '0'
+  DBIx::Raw: '0'
+  DateTime: '0'
+  Digest::SHA: '0'
+  Mouse: '0'
+  Mouse::Role: '0'
+  Mouse::Util::TypeConstraints: '0'
+  Ref::Util: '0'
+  Session::Token: '0'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/srchulo/Web-Authenticate/issues
+version: '0.011'
+x_serialization_backend: 'YAML::Tiny version 1.69'

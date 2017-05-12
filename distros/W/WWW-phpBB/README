@@ -1,0 +1,54 @@
+WWW-phpBB version 0.03
+======================
+
+DESCRIPTION
+
+This module can be used to scrape a phpBB2 installation using the web interface.
+It requires a local phpBB2 setup (you can download the old 2.x versions from
+http://sourceforge.net/projects/phpbb/files/phpBB%202/ ) that will be
+overwritten and it can only access what is available to the web browser (i.e. no
+private messages or user settings). Make sure the username used during the
+local installation doesn't exist in the remote forum. Scraping is possible as a
+guest or as a logged in member. If used with an administrator name and password
+it will copy all the member e-mails (not just the public ones) allowing them to
+request a new random password from the new installation site and continue using
+the forum. The current implementation lacks search support, but this can be fixed
+by converting the forum to phpBB3 or SMF. The "mforum" script is supported.
+
+NOTES
+
+- if you have admin access on the remote forum make sure that emailing through the forum interface is disabled
+- on the local forum you might want to enable remote avatars
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+WWW::Mechanize
+Compress::Zlib
+HTML::TokeParser::Simple
+DBI
+DBD::mysql
+
+TODO
+
+- better smiley set handling; copy smilies along with the post data
+- parse more search engine friendly URLs
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2006-2011 by Stefan Talpalaru - <stefantalpalaru@yahoo.com>
+[ email tied to a paypal account in case you want to buy me a cup of tea ;-) ]
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

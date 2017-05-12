@@ -1,0 +1,114 @@
+Wetware/llyrisWeb version 0.01
+======================================
+
+This is the first in some extensions to simplify our own
+use of the Lyris 4.2 list server - and it requires that
+the lyris LCP perl interface is available on the machine
+that you run this module.. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+CGI and lyris.pl
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 andrew f. hampe - for drieuxish Software ToolKits
+drieux AT wetware.com - you figure it out.
+
+Please review the LICENSE file for the gory details.
+
+But please, if you use it, remember where you found it.
+
+Let me know if you liked it.
+
+#-------------------pod2Text-------------
+
+NAME
+
+    Wetware::llyrisWeb - PM for lyris mailserver support
+
+SYNOPSIS
+
+      use Wetware::llyrisWeb;
+  
+      dtk_show_query_page($PageTitle);
+
+      show_answerPage($PageTitle, @string);
+
+      &Wetware::llyrisWeb::parse_cmd_line(@ARGV);
+
+DESCRIPTION
+
+    This is the start of how to extend the lyris web front end to solve a
+    problem for our list admin types.
+
+    the first two are simple CGI based tricks. The first puts up a brain
+    stoopid query page. The submit button will set the
+    param('ourInputStrings');
+
+    The second is the response page portion - given @strings to go searching
+    through the lyris emaillists for, it will construct the results of that
+    query in html and ship it back.
+
+    The third is for command line running on your Lyris Host so that one
+    merely passes in at the command line the $tokens that you wish to search
+    for.
+
+    TIMTOWTDI
+
+EXAMPLES
+
+    The simple CGI front end would be something like:
+
+      if ( $request =~ /GET/ ) {
+
+        dtk_show_query_page($QUERY_PAGE_TITLE);
+
+       } elsif ( $request =~ /POST/) {
+
+        my $stuff = param('ourInputStrings');
+        my @string = split(' ', $stuff);
+        show_answerPage($RESPONSE_PAGE_TITLE, @string);
+
+      }
+
+    The simple Command Line Script Would Be:
+
+        #!/usr/bin/perl -w
+        use Wetware::llyrisWeb qw/parse_cmd_line/;
+        parse_cmd_line(@ARGV);
+ 
+EXPORT
+
+    None by default.
+
+COREQUISITES
+
+    CGI
+
+    "'lyrislib.pl'"
+
+AUTHOR
+
+    drieux, just drieux, <drieux@wetware.com<gt>
+
+SEE ALSO
+
+    the perl manpage.
+
+    the CGI manpage.
+
+OS TRIED ON
+
+    Solaris, Linux Redhat 7.2
+

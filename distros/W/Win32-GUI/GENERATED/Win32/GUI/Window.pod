@@ -1,0 +1,510 @@
+
+=head1 NAME
+
+Win32::GUI::Window - Create and manipulate Windows
+
+=head1 DESCRIPTION
+
+This is the main container of a regular GUI; also known as "top level window".
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(%OPTIONS)>
+
+Creates a new Window object.
+
+Class specific B<%OPTIONS> are:
+
+  -accel => Win32::GUI::Accelerator
+  -accelerators => Win32::GUI::Accelerator
+  -acceleratortable => Win32::GUI::Accelerator
+    Associate accelerator table to Window
+  -minsize => [X, Y]
+    Specifies the minimum size (width and height) in pixels;
+    X and Y must be passed in an array reference
+  -maxsize => [X, Y]
+    Specifies the maximum size (width and height) in pixels;
+    X and Y must be passed in an array reference
+  -minwidth  => N
+  -minheight => N
+  -maxwidht  => N
+  -maxheight => N
+    Specify the minimum and maximum size width and height, in pixels
+  -hasmaximize => 0/1
+  -maximizebox => 0/1
+    Set/Unset maximize box.
+  -hasminimize => 0/1
+  -minimizebox => 0/1
+    Set/Unset minimize box.
+  -sizable => 0/1
+  -resizable => 0/1
+    Set/Unset tick frame style.
+  -sysmenu => 0/1
+  -menubox => 0/1
+  -controlbox => 0/1
+    Set/Unset system menu style.
+  -titlebar => 0/1
+    Set/Unset caption style.
+  -helpbutton => 0/1
+  -helpbox => 0/1
+  -hashelp => 0/1
+    Set/Unset help context extended style.
+  -toolwindow => 0/1
+    Set/Unset tool window extended style.
+  -appwindow => 0/1
+    Set/Unset app window extended style.
+  -topmost => 0/1 (default 0)
+    The window "stays on top" even when deactivated
+  -controlparent => 0/1 (default 0)
+    Set/Unset control parent extended style.
+  -noflicker => 0/1 (default 0)
+    Set to 1 to enable anti-flicker. This will eliminate all flicker from
+    your window, but may prevent things like Graphic objects from showing
+    correctly.
+  -dialogui => 0/1
+    Act as a dialog box.
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddAnimation
+
+B<AddAnimation(%OPTIONS)>
+
+See L<new Win32::GUI::Animation()|Win32::GUI::Animation/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddButton
+
+B<AddButton(%OPTIONS)>
+
+See L<new Win32::GUI::Button()|Win32::GUI::Button/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddCheckbox
+
+B<AddCheckbox(%OPTIONS)>
+
+See L<new Win32::GUI::Checkbox()|Win32::GUI::Checkbox/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddCombobox
+
+B<AddCombobox(%OPTIONS)>
+
+See L<new Win32::GUI::Combobox()|Win32::GUI::Combobox/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddComboboxEx
+
+B<AddComboboxEx(%OPTIONS)>
+
+See L<new Win32::GUI::ComboboxEx()|Win32::GUI::ComboboxEx/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddDateTime
+
+B<AddDateTime(%OPTIONS)>
+
+See L<new Win32::GUI::DateTime()|Win32::GUI::DateTime/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddGraphic
+
+B<AddGraphic(%OPTIONS)>
+
+See L<new Win32::GUI::Graphic()|Win32::GUI::Graphic/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddGroupbox
+
+B<AddGroupbox(%OPTIONS)>
+
+See L<new Win32::GUI::Groupbox()|Win32::GUI::Groupbox/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddHeader
+
+B<AddHeader(%OPTIONS)>
+
+See L<new Win32::GUI::Header()|Win32::GUI::Header/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddLabel
+
+B<AddLabel(%OPTIONS)>
+
+See L<new Win32::GUI::Label()|Win32::GUI::Label/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddListbox
+
+B<AddListbox(%OPTIONS)>
+
+See L<new Win32::GUI::Listbox()|Win32::GUI::Listbox/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddListView
+
+B<AddListView(%OPTIONS)>
+
+See L<new Win32::GUI::ListView()|Win32::GUI::ListView/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddMenu
+
+B<AddMenu()>
+
+See L<new Win32::GUI::Menu()|Win32::GUI::Menu/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddMonthCal
+
+B<AddMonthCal(%OPTIONS)>
+
+See L<new Win32::GUI::MonthCal()|Win32::GUI::MonthCal/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddNotifyIcon
+
+B<AddNotifyIcon(%OPTIONS)>
+
+See L<new Win32::GUI::NotifyIcon()|Win32::GUI::NotifyIcon/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddProgressBar
+
+B<AddProgressBar(%OPTIONS)>
+
+See L<new Win32::GUI::ProgressBar()|Win32::GUI::ProgressBar/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddRadioButton
+
+B<AddRadioButton(%OPTIONS)>
+
+See L<new Win32::GUI::RadioButton()|Win32::GUI::RadioButton/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddRebar
+
+B<AddRebar(%OPTIONS)>
+
+See L<new Win32::GUI::Rebar()|Win32::GUI::Rebar/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddRichEdit
+
+B<AddRichEdit(%OPTIONS)>
+
+See L<new Win32::GUI::RichEdit()|Win32::GUI::RichEdit/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddSlider
+
+B<AddSlider(%OPTIONS)>
+
+See L<new Win32::GUI::Slider()|Win32::GUI::Slider/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddSplitter
+
+B<AddSplitter(%OPTIONS)>
+
+See L<new Win32::GUI::Splitter()|Win32::GUI::Splitter/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddStatusBar
+
+B<AddStatusBar(%OPTIONS)>
+
+See L<new Win32::GUI::StatusBar()|Win32::GUI::StatusBar/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTabStrip
+
+B<AddTabStrip(%OPTIONS)>
+
+See L<new Win32::GUI::TabStrip()|Win32::GUI::TabStrip/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTextfield
+
+B<AddTextfield(%OPTIONS)>
+
+See L<new Win32::GUI::Textfield()|Win32::GUI::Textfield/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTimer
+
+B<AddTimer(NAME, ELAPSE)>
+
+See L<new Win32::GUI::Timer()|Win32::GUI::Timer/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddToolbar
+
+B<AddToolbar(%OPTIONS)>
+
+See L<new Win32::GUI::Toolbar()|Win32::GUI::Toolbar/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTooltip
+
+B<AddTooltip(%OPTIONS)>
+
+See L<new Win32::GUI::Tooltip()|Win32::GUI::Tooltip/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddTreeView
+
+B<AddTreeView(%OPTIONS)>
+
+See L<new Win32::GUI::TreeView()|Win32::GUI::TreeView/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 AddUpDown
+
+B<AddUpDown(%OPTIONS)>
+
+See L<new Win32::GUI::UpDown()|Win32::GUI::UpDown/new>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Center
+
+B<Center([Parent])>
+
+Center the window vertically and horizontally in the Parent (Default: the Desktop window).
+Parent can be either a Win32::GUI::Window or a hwind.
+Return 1 on success, else 0.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 GetDC
+
+B<GetDC()>
+
+Returns the DC object associated with the window.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Activate
+
+B<Activate()>
+
+Sent when the window is activated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Deactivate
+
+B<Deactivate()>
+
+Sent when the window is deactivated.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 InitMenu
+
+B<InitMenu(MENU)>
+
+Sent when a menu is about to become active. It occurs when the user clicks
+an item on the menu bar or presses a menu key. This allows the application
+to modify the menu before it is displayed.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Maximize
+
+B<Maximize()>
+
+Sent when the window is maximized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Maximize (Win32::GUI::MDIChild)
+
+B<Maximize()>
+
+Sent when the window is maximized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Minimize
+
+B<Minimize()>
+
+Sent when the window is minimized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Minimize (Win32::GUI::MDIChild)
+
+B<Minimize()>
+
+Sent when the window is minimized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Paint
+
+B<Paint(DC)>
+
+Sent when the window needs to be repainted.
+
+Note that you get the DC of the window object in parameter,
+and then Validate() the DC to inform Windows
+that you painted the DC area (otherwise it will
+continue to call the Paint event continuously).
+Example:
+
+  sub Graphic_Paint {
+      my $DC = shift;
+      $DC->MoveTo(0, 0);
+      $DC->LineTo(100, 100);
+      $DC->Validate();
+  }
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Resize
+
+B<Resize()>
+
+Sent when the window is resized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Resize (Win32::GUI::MDIChild)
+
+B<Resize()>
+
+Sent when the window is resized.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+OPERATION can be compared against one of the following constants:
+SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+Related messages: WM_HSCROLL, WM_VSCROLL
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Scroll (Win32::GUI::MDIChild)
+
+B<Scroll(SCROLLBAR, OPERATION, POSITION)>
+
+Sent when one of the window scrollbars is moved. SCROLLBAR identifies
+which bar was moved, 0 for horizontal and 1 for vertical.
+
+OPERATION can be compared against one of the following constants:
+SB_LINEUP, SB_LINELEFT, SB_LINEDOWN, SB_LINERIGHT, SB_PAGEUP
+SB_PAGELEFT, SB_PAGEDOWN, SB_PAGERIGHT, SB_THUMBPOSITION,
+SB_THUMBTRACK, SB_TOP, SB_LEFT, SB_BOTTOM, SB_RIGHT, SB_ENDSCROLL
+
+Related messages: WM_HSCROLL, WM_VSCROLL
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Terminate
+
+B<Terminate()>
+
+Sent when the window is closed.
+The event should return -1 to terminate the interaction
+and return control to the perl script; see L<Dialog()|Win32::GUI::Window/Dialog>.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Terminate (Win32::GUI::MDIChild)
+
+B<Terminate()>
+
+Sent when the window is closed.
+The event should return -1 to terminate the interaction
+and return control to the perl script; see L<Dialog()|Win32::GUI::Window/Dialog>.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

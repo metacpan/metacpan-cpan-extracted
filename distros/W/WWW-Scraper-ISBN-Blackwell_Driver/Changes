@@ -1,0 +1,44 @@
+Revision history for WWW-Scraper-ISBN-Blackwell_Driver
+======================================================
+
+0.09    2014-11-03
+        - extended META test suite.
+        - ping fix for Cygwin (thanks to Alexandr Ciornii).
+
+0.08    2014-10-23
+        - fixed license fields in META.json to be lists.
+
+0.07    2014-06-05
+        - fixed distribution name in META.
+        - upgrade to WWW-Scraper-ISBN-1.00.
+        - conversion routines now moved to WWW::Scraper::ISBN::Driver.
+        - conversion tests no longer required.
+        - reworked test failure checks
+
+0.06    2014-03-09
+        - site updated, new image links.
+
+0.05    2013-11-10
+        - added git repository links to metadata.
+        - live data updated.
+        - added missing pre-requisite, Data::Dumper.
+
+0.04    2013-03-10
+        - added isbn-check.pl to examples.
+        - License updated consistently to Artistic License v2.0.
+        - META updates.
+
+0.03    2012-12-16
+        - site stats have been updated, failing test fixed.
+        - change file dates changed to meet W3CDTF standards.
+        - updated test suite.
+
+0.02    2012-05-22
+        - updated pattern matching due to page layout changes.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.01    2010-11-18
+        - initial release

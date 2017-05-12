@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+# ************************************************************************* 
+# Copyright (c) 2014-2015-2015, SUSE LLC
+# 
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of SUSE LLC nor the names of its contributors may be
+# used to endorse or promote products derived from this software without
+# specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+# ************************************************************************* 
+#
+# Dochazka CLI script
+#
+use 5.012;
+use strict;
+use warnings;
+
+use App::CELL qw( $CELL $log $site $meta );
+use Data::Dumper;
+use File::ShareDir;
+use File::Spec;
+use Getopt::Long 2.32;
+use Log::Any::Adapter;
+use Pod::Usage;
+use Term::ReadLine;
+use Try::Tiny;
+use Web::MREST::CLI qw( init_cli_client normalize_filespec );
+use Web::MREST::CLI::Parser;
+
+my $Parser = 'Web::MREST::CLI::Parser';
+
+local $Data::Dumper::Terse = 1;
+
+
+
+
+#
+# logger initialization routine
+#
+sub init_logger {
+
+    my $logfile = normalize_filespec( $site->MREST_CLI_LOG_FILE );
+    print( "Log file is $logfile\n" );
+    unlink $logfile if $site->MREST_CLI_LOG_FILE_RESET;
+    # -----------------------------------------------------------
+    # -- to debug configuration file loading issues, uncomment --
+    # -- this and call init_logger() before $CELL->load(...)   --
+    # -----------------------------------------------------------
+    #my $logfile = normalize_filespec( "mrest-cli.log" );
+    #unlink $logfile;
+
+    Log::Any::Adapter->set('File', $logfile);
+    $log->init( ident => 'mrest-cli', debug_mode => 1 );
+    $log->debug( 'Logger initialized' );
+}
+
+#
+# CLI client initialization routine: might die
+#
+sub init {
+    my ( $early_debug ) = @_;
+
+    die if defined( $site->MREST_CLI_LOG_FILE );
+
+    my $status = init_cli_client( distro => 'Web-MREST-CLI', early_debug => $early_debug );
+    return $status unless $status->ok;
+
+    die unless defined( $site->MREST_CLI_LOG_FILE );
+    
+    if ( ! ( $meta->MREST_CLI_URI_BASE ) ) {
+        $meta->set( 'MREST_CLI_URI_BASE', 'http://localhost:5000' );
+    }
+    print "Using URI base " . $meta->MREST_CLI_URI_BASE . "\n";
+    print "Hopefully, a server is listening there. . .\n";
+
+    # initialize CLI-specific logger
+    init_logger();
+
+    return $CELL->status_ok;
+}
+
+#
+# get prompt
+#
+sub get_prompt { "$Parser> " }
+
+
+# -------------------------------------------------------------------------
+# main
+# -------------------------------------------------------------------------
+
+# process command-line options
+my $help = 0;
+my $sitedir;
+my $early_debug;
+GetOptions( 
+    'help|?' => \$help, 
+    'early-debug|e=s' => \$early_debug,
+);
+pod2usage(1) if $help;
+
+if ( $early_debug ) {
+    print "Early debugging activated; will log early messages to $early_debug\n";
+}
+
+# initialize CLI client
+my $status;
+if ( ( my $status = init( $early_debug ) )->not_ok ) {
+    print '(' . $status->level . ') ' . $status->text . "\n";
+    exit;
+}
+
+my $term = new Term::ReadLine 'mrest-cli';
+
+binmode STDOUT, ":utf8";
+
+my $cmd;
+while ( defined ( $cmd = $term->readline( get_prompt() ) ) ) {
+    my @tokens = split /\s+/, $cmd;
+    next unless @tokens;
+    #print join( ' ', @tokens ), "\n";
+    # parse_tokens will die with the status
+    try { 
+        Web::MREST::CLI::Parser::parse_tokens( [], \@tokens ); 
+    } catch { 
+        $status = $_;
+    };
+    if ( ref( $status ) ne 'App::CELL::Status' ) {
+        $status = $CELL->status_crit( 'MREST_CLI_PARSER_DECEASED', payload => $status );
+    }
+    last if $status->code eq 'MREST_CLI_EXIT';
+    if ( $status->code ne 'MREST_CLI_PARSE_ERROR' ) {
+        print "HTTP status: " . ( delete $status->{'http_status'} || '<NONE>' ) . "\n";
+        print "Non-suppressed headers: " . Dumper( $status->{'headers'} ) if $status->{'headers'};
+        delete $status->{'headers'};
+        my $expurgated_status = $status->expurgate;
+        #print Dumper( $expurgated_status );
+        print "Response: " . Dumper( $expurgated_status ) . "\n";
+    } else {
+        print( ( $status->code eq 'MREST_CLI_PARSE_ERROR' ) 
+            ? $status->text . "\n"
+            : $status->code . ' (' . $status->level . ') ' . $status->text . "\n" );
+    }
+}
+
+__END__
+
+=head1 NAME
+
+mrest-cli - Web::MREST demo/testing command-line client
+
+
+=head1 SYNOPSIS
+
+    $ mrest-cli -h
+    --help      -h      Get help
+    --sitedir   -s      Specify sitedir (defaults to none)
+
+    $ mrest-cli
+    Web::MREST> get bugreport
+    DISPATCH_BUGREPORT (OK) See payload for bug reporting instructions
+    HTTP status: 200 OK
+    Non-suppressed headers: {
+      'X-Web-Machine-Trace' => 'b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,c3,c4,d4,e5,f6,g7,g8,h10,i12,l13,m16,n16,o16,o18,o18b'
+    }
+    Response: {
+      'report_bugs_to' => 'bug-App-MREST@rt.cpan.org'
+    }
+
+
+=head1 DESCRIPTION
+
+This is the L<Web::MREST> demo/testing command line interface (CLI). It enables
+the user to generate HTTP requests (GET, PUT, POST, DELETE) to the REST server
+and view the server's responses. Each REST resource has a documented CLI syntax
+that can be viewed by querying the REST server -- e.g., via a web browser.
+
+For more information, see L<http://metacpan.org/pod/Web::MREST>.
+

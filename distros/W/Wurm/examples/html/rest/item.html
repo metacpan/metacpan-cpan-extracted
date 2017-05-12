@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html>
+<head>
+  <title>Detail: [= $_context->{id} =]</title>
+  <meta charset="utf-8">
+  <style>
+    #content {
+      border:        1px solid #000;
+      border-radius: 4px;
+      min-height:    256px;
+    }
+  </style>
+</head>
+<body>
+  <p><a href="/">Index</a></p>
+  <h2>[= $id =]</h2>
+  <p id="content">[= $_context->{text} =]</p>
+  <form method="PATCH" onSubmit='patch_item(); return false;'>
+    <textarea id="text" name="text" cols="80" rows="25">[= $_context->{text} =]</textarea><br>
+    <input type="submit" value="Patch">
+  </form>
+</body>
+<script>
+function patch_item() {
+  var xhr = new XMLHttpRequest;
+
+  xhr.addEventListener('load', function() {
+    if(xhr.status === 204) {
+      window.location.reload();
+    }
+    else {
+      console.log('Failed to patch item: '+ xhr.status.toString(10));
+    }
+  });
+
+  xhr.open('PATCH', '/[= $_context->{id} =]');
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send('text='+ encodeURIComponent(document.getElementById('text').value));
+}
+</script>
+</html>

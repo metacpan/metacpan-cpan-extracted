@@ -1,0 +1,32 @@
+WWW::Scraper::Delicious version 0.10
+
+This module implements a very simple and effective way to scrape links
+from the http://del.icio.us/ site without the requirement of using the
+del.icio.us API, authentication, or RSS. Although links can be scraped
+from any valid del.icio.us URL, the intended use of this module is to
+provide users a simple way to backup and/or mirror their own links.
+There is no hard limit for the number of user links that can be
+returned, but a limit of 100 is respected for other types of link
+queries.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Adam Foust. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

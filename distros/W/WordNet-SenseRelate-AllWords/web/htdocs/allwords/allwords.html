@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>AllWords</title></head>
+
+<body>
+<dl>
+  <dt></dt>
+</dl>
+<form enctype="multipart/form-data" method="post" action="../../cgi-bin/allwords/allwords.cgi" name="AllWords">
+  <h1><a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/doc/README.pod">WordNet::SenseRelate::AllWords</a>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;<br>
+  </h1>
+Enter a sentence<br>
+  <textarea wrap="virtual" cols="40" rows="3" name="text1"></textarea>&nbsp;&nbsp;&nbsp;
+&nbsp; OR&nbsp;&nbsp; &nbsp; <input name="contextfile" type="file"><br>
+  <br>
+  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/doc/README.pod#The_Context_Window">Window
+Size</a>&nbsp; &nbsp;
+  <select name="winsize"><option>2</option><option selected="selected">3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option></select>
+&nbsp;&nbsp;&nbsp; <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--format=FORMAT">Format</a>&nbsp;
+&nbsp;
+  <select name="format"><option selected="selected">raw</option><option>tagged</option><option>wntagged</option></select>
+&nbsp;&nbsp;&nbsp; <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--scheme=SCHEME">Scheme</a>&nbsp;&nbsp;
+  <select name="scheme"><option selected="selected">normal</option><option>fixed</option><option>sense1</option><option>random</option></select> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;<a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/doc/README.pod#Part_of_Speech_Coercion">ForcePos</a>&nbsp;&nbsp;<input name="forcepos" type="checkbox"><br>
+  <br>
+  <a href="http://marimba.d.umn.edu/similarity/measures.html">Measure</a>&nbsp;
+  <span style="font-family: MS Shell Dlg;">
+  <select name="measure"><optgroup label="Path Based"><option>path (Path Length)</option><option>wup (Wu &amp; Palmer)</option><option>lch</option><option>hso (Hirst &amp;St-Onge)</option></optgroup><optgroup label="Info Content Based"><option>res (Resnik)</option><option>lin</option><option>jcn (Jiang &amp; Conrath)</option></optgroup><optgroup label="Gloss based"><option selected="selected">lesk (Extended Gloss
+Overlaps)</option><option>vector (Gloss Vectors)</option><option>vector-pairs (Gloss Vectors - pairwise)</option></optgroup></select>
+  </span>&nbsp;&nbsp;&nbsp;<span style="text-decoration: underline;"></span>&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;<br>
+  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--stoplist=FILE">Stoplist</a>
+&nbsp; <input name="stoplist" type="file">&nbsp;
+  <a href="http://cpansearch.perl.org/src/TPEDERSE/WordNet-SenseRelate-AllWords-0.14/samples/default-stoplist-raw.txt">Default
+Stoplist</a> &nbsp;<input checked="checked" name="defstoplist" type="checkbox"> <a href="http://cpansearch.perl.org/src/TPEDERSE/WordNet-SenseRelate-AllWords-0.14/samples/default-stoplist-raw.txt"></a><span style="text-decoration: underline;"></span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;<br>
+  <br>
+  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/doc/README.pod#Tracing/Debugging">Trace
+Level</a> &nbsp;&nbsp;<input name="level1" value="1" type="checkbox">1&nbsp; &nbsp; <input name="level2" value="2" type="checkbox">2
+&nbsp;&nbsp;&nbsp;&nbsp;<input name="level4" value="4" type="checkbox">4&nbsp;&nbsp;&nbsp;
+  <input name="level8" value="8" type="checkbox">8&nbsp;&nbsp;&nbsp;
+  <input name="level16" value="16" type="checkbox">16&nbsp;&nbsp;&nbsp;
+  <input name="level32" value="32" type="checkbox">32&nbsp;&nbsp;
+  <br>
+  <br>
+  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--contextScore=REAL">Context
+Score</a> &nbsp;<input maxlength="10" name="contextscore" value="0.0">&nbsp;&nbsp;&nbsp;
+  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--pairScore=REAL">Pair
+Score</a> &nbsp;&nbsp;<input maxlength="10" name="pairscore" value="0.0"><br><br><a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--nocompoundify">nocompoundify</a>&nbsp;&nbsp;&nbsp;
+  <span style="text-decoration: underline;"></span><input name="nocompoundify" type="checkbox"> &nbsp;&nbsp;&nbsp;  <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--backoff">backoff</a>&nbsp;
+  <span style="text-decoration: underline;"></span><input name="backoff" type="checkbox">&nbsp;&nbsp;&nbsp; <a href="http://search.cpan.org/dist/WordNet-SenseRelate-AllWords/utils/wsd.pl#--usemono">usemono</a>&nbsp; &nbsp;<span style="text-decoration: underline;"></span><input name="usemono" type="checkbox"><br>
+  <br>
+  <input name="disambiguate" value="Disambiguate" type="submit">&nbsp;&nbsp;&nbsp; <input name="reset" value="Reset" type="reset"><br>
+  <br>
+  <a href="../../cgi-bin/allwords/version.cgi?version=yes">Show
+version info</a>
+  <hr style="width: 100%; height: 2px;"><small style="color: rgb(102, 51, 0);">Created by Ted Pedersen and
+Varada Kolhatkar<br>
+E-mail: tpederse (at) d (dot) umn (dot) edu or kolha002 (at) d (dot)
+umn (dot) edu</small><br>
+</form>
+<h1>&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; </h1>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp; <br>
+<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+<hr style="width: 100%; height: 2px;">
+</body></html>

@@ -1,0 +1,17 @@
+---
+abstract: 'Query Alexa.com Traffic Rank of website.'
+author:
+  - 'FileDir <guruperl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.30'
+license: perl
+installdirs: site
+distribution_type: module
+name: WWW-Alexa-TrafficRank
+requires:
+  LWP::UserAgent: 0
+version: 1.11

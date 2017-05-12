@@ -1,0 +1,11 @@
+Revision history for WWW-Mechanize-Script
+
+0.101	2014-05-10
+    - fix RT#95369 - thanks Frew Schmidt for reporting it
+    - switch to MakeMaker for distribution
+
+0.100   2012-08-14
+    - First public version, released on an unsuspecting world.
+
+0.001_* 2012-07-26 .. 2012-08-10
+    - First version, evolved to replace check_web nagios check

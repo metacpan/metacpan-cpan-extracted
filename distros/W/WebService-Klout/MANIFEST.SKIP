@@ -1,0 +1,12 @@
+\B\.git\b
+\B\.gitignore\b
+\B\.shipit\b
+
+\.bak$
+\.old$
+\.rej$
+\.DS_Store
+
+^Makefile$
+\bblib/
+\bpm_to_blib$

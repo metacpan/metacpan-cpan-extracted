@@ -1,0 +1,28 @@
+Revision history for Perl extension WWW::2ch.
+
+0.07  Tue Mar  472006
+	* added permalink to WWW::2ch::Res
+	* added key, resid attr to WWW::2ch::Res
+	* supported plugin file to WWW::2ch
+
+0.06  Sat Mar  4 2006
+	* support old format of date to 2ch and jbbs. Thanks to hkrn
+	* how to take the article on jbbs was changed. Thanks to hkrn
+	* change to cash is surely used. 
+
+0.05  Sat Mar  4 2006
+	* Change max_redirect to UserAgent
+
+0.04  Fri Mar  3 2006
+	* Added fetch time to subject/dat cache
+	* Added subject data to dat cache
+
+0.03  Fri Mar  3 2006
+	CPAN release.
+
+0.02  Sat Feb 28 2006
+	Inital release.
+
+0.01  Sat Feb 28 2006
+	pre release
+

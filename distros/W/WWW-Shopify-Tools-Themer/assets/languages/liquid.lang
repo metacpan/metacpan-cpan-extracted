@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="liquid" _name="Liquid" version="2.0" _section="Markup">
+    <metadata>
+      <property name="mimetypes">application/liquid</property>
+      <property name="globs">*.liquid</property>
+      <property name="block-comment-start">&lt;!--</property>
+      <property name="block-comment-end">--&gt;</property>
+    </metadata>
+
+    <styles>
+        <style id="comment" _name="Comment" map-to="xml:comment"/>
+        <style id="keyword" _name="Keyword" map-to="def:keyword"/>
+        <style id="strings" _name="Strings" map-to="def:string"/>
+        <style id="filters" _name="Filters" map-to="def:type"/>
+        <style id="properties" _name="Properties" map-to="def:character"/>
+        <style id="enclosers" _name="Enclosers" map-to="def:keyword"/>
+    </styles>
+
+    <default-regex-options case-sensitive="false"/>
+
+    <definitions>
+        <context id="comment-liquid" style-ref="comment" class="comment">
+            <start>{%\s*comment\s*%}</start>
+            <end>{%\s*endcomment\s*%}</end>
+            <include>
+                <context ref="def:in-comment"/>
+            </include>
+        </context>
+
+	<context id="string-liquid-single" style-ref="strings" class="strings">
+		<start>'</start>
+		<end>'</end>
+	</context>
+	<context id="string-liquid-double" style-ref="strings" class="strings">
+		<start>"</start>
+		<end>"</end>
+	</context>
+	<context id="liquid-properties" style-ref="properties" class="properties">
+		<keyword>paginate.page_size</keyword>
+		<keyword>paginate.current_page</keyword>
+		<keyword>paginate.current_offset</keyword>
+		<keyword>paginate.pages</keyword>
+		<keyword>paginate.items</keyword>
+		<keyword>paginate.previous.title</keyword>
+		<keyword>paginate.previous.url</keyword>
+		<keyword>paginate.previous</keyword>
+		<keyword>paginate.next.url</keyword>
+		<keyword>paginate.next</keyword>
+		<keyword>paginate.parts</keyword>
+		<keyword>part.is_link</keyword>
+		<keyword>part</keyword>
+
+		<keyword>blog.id</keyword>
+		<keyword>blog.handle</keyword>
+		<keyword>blog.title</keyword>
+		<keyword>blog.articles</keyword>
+		<keyword>blog.articles_count</keyword>
+		<keyword>blog.url</keyword>
+		<keyword>blog.comments_enabled?</keyword>
+		<keyword>blog.moderated?</keyword>
+		<keyword>blog.next_article</keyword>
+		<keyword>blog.previous_article</keyword>
+		<keyword>blog.all_tags</keyword>
+		<keyword>blog.tags</keyword>
+		<keyword>blog</keyword>
+
+		<keyword>article.id</keyword>
+		<keyword>article.title</keyword>
+		<keyword>article.author</keyword>
+		<keyword>article.content</keyword>
+		<keyword>article.created_at</keyword>
+		<keyword>article.published_at</keyword>
+		<keyword>article.url</keyword>
+		<keyword>article.comments</keyword>
+		<keyword>article.comments_count</keyword>
+		<keyword>article.comment_post_url</keyword>
+		<keyword>article.comments_enabled?</keyword>
+		<keyword>article.moderated?</keyword>
+		<keyword>article.excerpt</keyword>
+		<keyword>article.tags</keyword>
+		<keyword>article</keyword>
+
+		<keyword>comment.id</keyword>
+		<keyword>comment.author</keyword>
+		<keyword>comment.email</keyword>
+		<keyword>comment.content</keyword>
+		<keyword>comment.status</keyword>
+		<keyword>comment.url</keyword>
+		<keyword>comment</keyword>
+
+		<keyword>collection.id</keyword>
+		<keyword>collection.title</keyword>
+		<keyword>collection.handle</keyword>
+		<keyword>collection.description</keyword>
+		<keyword>collection.all_types</keyword>
+		<keyword>collection.all_vendors</keyword>
+		<keyword>collection.products</keyword>
+		<keyword>collection.products_count</keyword>
+		<keyword>collection.all_products</keyword>
+		<keyword>collection.all_products_count</keyword>
+		<keyword>collection.tags</keyword>
+		<keyword>collection.all_tags</keyword>
+		<keyword>collection.next_product</keyword>
+		<keyword>collection.previous_product</keyword>
+		<keyword>collection.url</keyword>
+		<keyword>collection</keyword>
+
+		<keyword>page.id</keyword>
+		<keyword>page.handle</keyword>
+		<keyword>page.title</keyword>
+		<keyword>page.content</keyword>
+		<keyword>page.url</keyword>
+		<keyword>page.author</keyword>
+		<keyword>page</keyword>
+
+		<keyword>image.id</keyword>
+		<keyword>image.product_id</keyword>
+		<keyword>image.position</keyword>
+		<keyword>image.src</keyword>
+		<keyword>image.alt</keyword>
+		<keyword>image</keyword>
+
+		<keyword>product.id</keyword>
+		<keyword>product.title</keyword>
+		<keyword>product.handle</keyword>
+		<keyword>product.type</keyword>
+		<keyword>product.vendor</keyword>
+		<keyword>product.price</keyword>
+		<keyword>product.price_min</keyword>
+		<keyword>product.compare_at_price_min</keyword>
+		<keyword>product.price_max</keyword>
+		<keyword>product.compare_at_price_max</keyword>
+		<keyword>product.price_varies</keyword>
+		<keyword>product.compare_at_price_varies</keyword>
+		<keyword>product.url</keyword>
+		<keyword>product.featured_image</keyword>
+		<keyword>product.images</keyword>
+		<keyword>product.description</keyword>
+		<keyword>product.content</keyword>
+		<keyword>product.variants</keyword>
+		<keyword>product.available</keyword>
+		<keyword>product.collections</keyword>
+		<keyword>product.tags</keyword>
+		<keyword>product</keyword>
+
+		<keyword>variant.id</keyword>
+		<keyword>variant.title</keyword>
+		<keyword>variant.price</keyword>
+		<keyword>variant.compare_at_price</keyword>
+		<keyword>variant.available</keyword>
+		<keyword>variant.inventory_management</keyword>
+		<keyword>variant.inventory_quantity</keyword>
+		<keyword>variant.weight</keyword>
+		<keyword>variant.sku</keyword>
+		<keyword>variant.option1</keyword>
+		<keyword>variant.option2</keyword>
+		<keyword>variant.option3</keyword>
+		<keyword>variant</keyword>
+
+		<keyword>cart.item_count</keyword>
+		<keyword>cart.items</keyword>
+		<keyword>cart.total_price</keyword>
+		<keyword>cart.total_weight</keyword>
+		<keyword>cart.note</keyword>
+		<keyword>cart.attributes</keyword>
+		<keyword>cart</keyword>
+
+		<keyword>linklist.id</keyword>
+		<keyword>linklist.title</keyword>
+		<keyword>linklist.handle</keyword>
+		<keyword>linklist.links</keyword>
+		<keyword>linklist.object</keyword>
+		<keyword>linklist</keyword>
+
+		<keyword>link.title</keyword>
+		<keyword>link.active</keyword>
+		<keyword>link.url</keyword>
+		<keyword>link.type</keyword>
+		<keyword>link.object</keyword>
+		<keyword>link</keyword>
+
+		<keyword>shop.name</keyword>
+		<keyword>shop.email</keyword>
+		<keyword>shop.description</keyword>
+		<keyword>shop.currency</keyword>
+		<keyword>shop.url</keyword>
+		<keyword>shop.domain</keyword>
+		<keyword>shop.products_count</keyword>
+		<keyword>shop.collections_count</keyword>
+		<keyword>shop.vendors</keyword>
+		<keyword>shop.types</keyword>
+		<keyword>shop</keyword>
+
+		<keyword>settings</keyword>
+	</context>
+
+	<context id="full-liquid" class="no-spell-check">
+		<start>{%</start>
+		<end>%}</end>
+
+		<include>
+			<context ref="liquid-properties"/>
+		 	<context id="keywords" style-ref="keyword" class="keyword">
+				<keyword>if</keyword>
+				<keyword>else</keyword>
+				<keyword>endif</keyword>
+				<keyword>unless</keyword>
+				<keyword>endunless</keyword>
+				<keyword>for</keyword>
+				<keyword>endfor</keyword>
+				<keyword>in</keyword>
+				<keyword>cycle</keyword>
+				<keyword>case</keyword>
+				<keyword>when</keyword>
+				<keyword>comment</keyword>
+				<keyword>raw</keyword>
+				<keyword>layout</keyword>
+				<keyword>include</keyword>
+				<keyword>paginate</keyword>
+				<keyword>by</keyword>
+				<keyword>endpaginate</keyword>
+				<keyword>capture</keyword>
+				<keyword>endcapture</keyword>
+				<keyword>assign</keyword>
+			</context>
+			<context ref="string-liquid-single"/>
+			<context ref="string-liquid-double"/>
+
+                        <context sub-pattern="0" where="start" style-ref="enclosers"/>
+                        <context sub-pattern="0" where="end" style-ref="enclosers"/>
+		</include>
+	</context>
+
+	<context id="inline-liquid" class="no-spell-check">
+		<start>{{</start>
+		<end>}}</end>
+
+		<include>
+			<context id="filters" style-ref="filters" class="filter">
+				<keyword>escape</keyword>
+				<keyword>append</keyword>
+				<keyword>prepend</keyword>
+				<keyword>size</keyword>
+				<keyword>join</keyword>
+				<keyword>downcase</keyword>
+				<keyword>upcase</keyword>
+				<keyword>strip_html</keyword>
+				<keyword>strip_newlines</keyword>
+				<keyword>truncate</keyword>
+				<keyword>truncatewords</keyword>
+				<keyword>date</keyword>
+				<keyword>first</keyword>
+				<keyword>last</keyword>
+				<keyword>newline_to_br</keyword>
+				<keyword>replace</keyword>
+				<keyword>replace_first</keyword>
+				<keyword>remove</keyword>
+				<keyword>remove_first</keyword>
+				<keyword>plus</keyword>
+				<keyword>minus</keyword>
+				
+				<keyword>asset_url</keyword>
+				<keyword>camelize</keyword>
+				<keyword>capitalize</keyword>
+				<keyword>default_pagination</keyword>
+				<keyword>global_asset_url</keyword>
+				<keyword>handleize</keyword>
+				<keyword>img_tag</keyword>
+				<keyword>link_to</keyword>
+				<keyword>link_to_vendor</keyword>
+				<keyword>link_to_type</keyword>
+				<keyword>link_to_tag</keyword>
+				<keyword>link_to_add_tag</keyword>
+				<keyword>link_to_remove_tag</keyword>
+				<keyword>highlight_active_tag</keyword>
+				<keyword>money_with_currency</keyword>
+				<keyword>money_without_currency</keyword>
+				<keyword>money</keyword>
+				<keyword>pluralize</keyword>
+				<keyword>product_img_url</keyword>
+				<keyword>script tag</keyword>
+				<keyword>stylesheet_tag</keyword>
+				<keyword>url_for_type</keyword>
+				<keyword>url_for_vendor</keyword>
+				<keyword>weight_with_unit</keyword>
+				<keyword>within</keyword>
+			</context>
+			<context id="keyword" style-ref="keyword" class="keyword">
+				<keyword>|</keyword>
+			</context>
+			<context ref="string-liquid-single"/>
+			<context ref="string-liquid-double"/>
+			<context ref="liquid-properties"/>
+                        <context sub-pattern="0" where="start" style-ref="enclosers"/>
+                        <context sub-pattern="0" where="end" style-ref="enclosers"/>
+		</include>
+	</context>
+
+	<context id="liquid">
+		<include>
+			<context ref="comment-liquid"/>
+			<context ref="full-liquid"/>
+			<context ref="inline-liquid"/>
+			<context ref="html:html"/>
+		</include>
+	</context>
+
+    </definitions>
+</language>

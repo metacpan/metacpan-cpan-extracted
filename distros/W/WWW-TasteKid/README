@@ -1,0 +1,53 @@
+WWW::TasteKid  
+
+Get suggestions of similar or related music (mainly bands),
+movies (titles mostly, some directors and actors) and books.
+Simply put, "I can help you explore your taste". 
+
+Potentially discover a new band (movie/book) in the 
+same 'ilk' as a currently know one.
+
+This is a perl interface to the API of TasteKid.com
+
+NOTE: Their terms of service have changed you need to send them a request 
+first: http://www.tastekid.com/ask/page/api_request
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WWW::TasteKid
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-TasteKid
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WWW-TasteKid
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WWW-TasteKid
+
+    Search CPAN
+        http://search.cpan.org/dist/WWW-TasteKid
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 David Wright
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

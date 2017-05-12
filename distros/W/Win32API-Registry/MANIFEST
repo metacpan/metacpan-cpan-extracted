@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Registry.pm
+Registry.xs
+buffers.h
+const2perl.h
+cRegistry.h
+cRegistry.pc
+ppport.h
+test.pl
+typemap
+ExtUtils/Myconst2perl.pm
+META.yml                                 Module meta-data (added by MakeMaker)

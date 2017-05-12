@@ -1,0 +1,52 @@
+{
+   "abstract" : "check remote website HTML and send email alert via SMTP if check fails. ",
+   "author" : [
+      "David Farrell <sillymoos@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-CheckHTML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "0",
+            "Carp" : "1.26",
+            "Email::Sender::Simple" : "1.300006",
+            "Email::Sender::Transport::SMTP" : "0",
+            "Email::Simple" : "2.201",
+            "Email::Simple::Creator" : "0",
+            "HTTP::Tiny" : "0.034",
+            "MIME::Base64" : "0",
+            "Method::Signatures" : "0",
+            "Time::Piece" : "0",
+            "YAML::XS" : "0.41",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

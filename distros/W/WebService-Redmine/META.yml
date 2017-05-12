@@ -1,0 +1,23 @@
+---
+abstract: 'Wrapper for RedMine REST API (http://www.redmine.org/projects/redmine/wiki/Rest_api).'
+author:
+  - 'Anton Soldatov <igelhaus@gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::Pod: '1.00'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Redmine
+requires:
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+version: '0.06'

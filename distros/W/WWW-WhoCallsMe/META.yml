@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                WWW-WhoCallsMe
+version:             0.02
+abstract:            Query WhoCallsMe.com for details about a caller's phone number
+license:             ~
+author:              
+    - Dusty Wilson <dusty--at--hey--d0t--nu>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP:                           0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

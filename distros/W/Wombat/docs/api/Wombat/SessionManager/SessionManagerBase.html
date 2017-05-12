@@ -1,0 +1,195 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::SessionManager::SessionManagerBase - session manager base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::SessionManager::SessionManagerBase - session manager base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Minimal base implementation of <STRONG>Wombat::SessionManager</STRONG>. This class
+supports no session persistence or distributable capabilities. This
+class may be subclassed to create more sophisticated Manager
+implementations.  Subclasses <STRONG>MUST</STRONG> override <A HREF="#item_add"><CODE>add()</CODE></A>, <A HREF="#item_getName"><CODE>getName()</CODE></A>,
+<A HREF="#item_getSession"><CODE>getSession()</CODE></A>, <A HREF="#item_getSessions"><CODE>getSessions()</CODE></A>, and <A HREF="#item_remove"><CODE>remove()</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::SessionManager::SessionManagerBase</STRONG>
+instance, initializing fields appropriately. If subclasses override
+the constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getContainer"><CODE>getContainer()</CODE></A></STRONG><BR>
+<DD>
+Return the Container for which this SessionManager manages Sessions.
+<P></P>
+<DT><STRONG><A NAME="item_setContainer"><CODE>setContainer($container)</CODE></A></STRONG><BR>
+<DD>
+Set the Container for which this SessionManager manages Sessions.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24container">$container</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Container</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_getMaxInactiveInterval"><CODE>getMaxInactiveInterval()</CODE></A></STRONG><BR>
+<DD>
+Return the default maximum inactive interval in seconds for Sessions
+created by this SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_setMaxInactiveInterval"><CODE>setMaxInactiveInterval($interval)</CODE></A></STRONG><BR>
+<DD>
+Set the default maximum inactive interval for Sessions created by this
+SessionManager.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24interval">$interval</A></STRONG><BR>
+<DD>
+the new interval, in seconds
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_createSession"><CODE>createSession()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::Session</STRONG>, based on the default
+settings specified by this SessionManager's fields. The session id
+will be assigned by this method.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if a new Session cannot be created for, any reason
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<P>Subclasses <STRONG>MUST</STRONG> override all of these methods.</P>
+<DL>
+<DT><STRONG><A NAME="item_add"><CODE>add($session)</CODE></A></STRONG><BR>
+<DD>
+Add this Session to the set of active Sessions for this
+SessionManager.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24session">$session</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Session</STRONG> to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return the display name of this SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession($id)</CODE></A></STRONG><BR>
+<DD>
+Return the active Session managed by this SessionManager with the
+specified id, or <CODE>undef</CODE> if no session exists with that id.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24id">$id</A></STRONG><BR>
+<DD>
+the id for the Session to be returned
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the session exists but cannot be returned, for any reason
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSessions"><CODE>getSessions()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the active Sessions managed by this
+SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_remove"><CODE>remove($session)</CODE></A></STRONG><BR>
+<DD>
+Remove this Session from the active Sessions managed by this
+SessionManager.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$session</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Session</STRONG> to remove
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this SessionManager. This method should be
+called before any of the public methods of the SessionManager are
+utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the SessionManager has already been started
+<P></P></DL>
+<DT><STRONG><A NAME="item_stop"><CODE>stop()</CODE></A></STRONG><BR>
+<DD>
+Gracefully terminate active use of this SessionManager. Once this
+method has been called, no public methods of the SessionManager should
+be utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Wombat::LifecycleException</STRONG></STRONG><BR>
+<DD>
+if the SessionManager is not started
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../../api/Wombat/Core/Session.html">the Wombat::Core::Session manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

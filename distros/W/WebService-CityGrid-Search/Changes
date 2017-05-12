@@ -1,0 +1,15 @@
+Revision history for Perl extension WebService-CityGrid-Search.
+
+0.04 Mon Feb 7 2011
+    - fix failing test
+
+0.03  Fri Feb 4 2011
+    - dependencies
+
+0.02  Tue Feb 1 2011
+    - Add result class
+
+0.01  Wed May 19 20:19:42 2010
+	- original version; created by h2xs 1.23 with options
+		-X WebService-CityGrid-Search
+

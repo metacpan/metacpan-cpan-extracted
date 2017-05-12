@@ -1,0 +1,13 @@
+Revision history for Perl extension Working::Daemon.
+
+0.31  Fri Jan 23 01:33:05 PST 2009
+      - Removed development debugging
+
+0.30  Wed Jan 21 21:26:39 PST 2009
+      - changed syntax to support default values
+      - made --help show help
+
+0.29  Sat Dec 20 12:47:35 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Working::Daemon
+

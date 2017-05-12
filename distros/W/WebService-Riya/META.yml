@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WebService-Riya
+version:      0.01
+version_from: lib/WebService/Riya.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0.25
+    HTTP::Request::Common:         1.26
+    LWP:                           0
+    Test::More:                    0.32
+    URI:                           1.35
+    XML::LibXML:                   1.6
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

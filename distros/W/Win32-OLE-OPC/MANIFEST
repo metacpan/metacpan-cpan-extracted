@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+OPC.html
+OPC.pm
+OPC.txt
+test.pl
+examples/README.txt
+examples/browserproperties.pl
+examples/groups.pl
+examples/items.pl
+examples/serverproperties.pl
+examples/tiedhash.pl

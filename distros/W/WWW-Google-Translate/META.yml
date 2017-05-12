@@ -1,0 +1,29 @@
+---
+abstract: 'Perl interface for the Google Translate API'
+author:
+  - 'Dylan Doxey <dylan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Google-Translate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '2.128'
+  File::Spec: '0'
+  HTTP::Status: '0'
+  JSON: '2.27'
+  LWP::UserAgent: '5.835'
+  Readonly: '1.03'
+  Sys::Hostname: '0'
+  URI: '1.56'
+version: '0.09'

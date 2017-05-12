@@ -1,0 +1,59 @@
+---
+abstract: 'Freebox v6 OS Perl Interface'
+author:
+  - 'Laurent Kislaire <teebeenator@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-FBX
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::FBX:
+    file: lib/WWW/FBX.pm
+    version: '0.19'
+  WWW::FBX::API:
+    file: lib/WWW/FBX/API.pm
+  WWW::FBX::Error:
+    file: lib/WWW/FBX/Error.pm
+  WWW::FBX::Meta::Method:
+    file: lib/WWW/FBX/API.pm
+  WWW::FBX::Role::API::APIv3:
+    file: lib/WWW/FBX/Role/API/APIv3.pm
+  WWW::FBX::Role::Auth:
+    file: lib/WWW/FBX/Role/Auth.pm
+requires:
+  Carp::Clan: '0'
+  Devel::StackTrace: '0'
+  Digest::HMAC_SHA1: '0'
+  HTTP::Request: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  URI::Escape: '0'
+  namespace::autoclean: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/architek/WWW-FBX/issues
+  homepage: https://github.com/architek/WWW-FBX
+  repository: git://github.com/architek/WWW-FBX.git
+version: '0.19'
+x_contributors:
+  - 'root <root@debian-asus>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

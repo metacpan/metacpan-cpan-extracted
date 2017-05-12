@@ -1,0 +1,69 @@
+The file is the README for WWw::Velib version 0.05
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following module for thorough testing:
+
+    Test::More
+
+If the PERL_AUTHOR_TESTING environment variable is set to a true value,
+the following optional test modules may be used to test the POD.
+
+    Test::Pod
+    Test::Pod::Coverage
+
+ADVANCED TESTING
+
+To test the module against the live Velib server the following
+environment variables may be set:
+
+	PERL_TESTING_WWW_VELIB_LOGIN=<your login number>
+	PERL_TESTING_WWW_VELIB_PIN=<your pin>
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MWWW::Velib -le 'print $INC{"WWW/Velib.pm"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader, as is the
+removal of WWW::Velib::{Map,Station,Trip}.
+
+USAGE
+
+use WWW::Velib;
+
+my $v = WWW::Velib->new(login => '0000123456', password => '1234');
+
+print "You have made ", $v->trips, " this month\n";
+
+for my $t ($v->detail) {
+	print "$t->{date} from $t->{from} to $t->{to}\n";
+}
+
+STATUS
+
+This module is under active development.
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2007.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,98 @@
+SYNOPSIS
+
+    Use one of the WordList::* modules.
+
+DESCRIPTION
+
+    EARLY DEVELOPMENT, SPECIFICATION MIGHT STILL CHANGE CONSIDERABLY.
+
+    WordList::* modules are modules that contain, well, list of words. This
+    module, WordList, serves as a base class and establishes convention for
+    such modules.
+
+    WordList is an alternative interface for Games::Word::Wordlist and
+    Games::Word::Wordlist::*. Its main difference is: WordList::* modules
+    are designed to have low startup overhead. This makes it more suitable
+    for use in CLI scripts which often only want to pick a word from one or
+    several lists.
+
+    Words (or phrases) must be put in __DATA__ section, *sorted*, one per
+    line. By putting it in the __DATA__ section, perl doesn't have to parse
+    the list. To search for words or picking some random words from the
+    list, the module need not slurp the whole list into memory (and will
+    not do so unless explicitly instructed.) Sorting must be
+    asciibetical/by Unicode codepoint. This makes it more convenient to
+    diff different versions of the module, as well as performing binary
+    search.
+
+    Since this is a new and non-backward compatible interface from
+    Games::Word::Wordlist, I also make some other changes:
+
+      * Namespace is put outside Games::
+
+      Because obviously word lists are not only useful for games.
+
+      * Interface is simpler
+
+      The methods provided are just:
+
+      - pick (pick one or several random entries)
+
+      - word_exists (check whether a word is in the list)
+
+      - each_word (run code for each entry)
+
+      - all_words (return all the words in a list)
+
+      A couple of other functions might be added, with careful
+      consideration.
+
+      * Namespace is more language-neutral and not English-centric
+
+    TODOS:
+
+      * Interface for random pick from a subset
+
+      Pick $n words of length $L.
+
+      Pick $n words matching regex $re.
+
+      * Interface to enable faster lookup/caching
+
+METHODS
+
+ new()
+
+    Constructor
+
+ $wl->each_word($code)
+
+    Call $code for each word in the list. The code will receive the word as
+    its first argument.
+
+ pick($n = 1) => list
+
+    Pick $n (default: 1) random words from the list. If there are less then
+    $n words in the list, only that many will be returned.
+
+    The algorithm used is from perlfaq ("perldoc -q "random line""), which
+    scans the whole list once. The algorithm is for returning a single
+    entry and is modified to support returning multiple entries.
+
+ word_exists($word) => bool
+
+    Check whether $word is in the list.
+
+    Algorithm is binary search (NOTE: not yet implemented, currently linear
+    search).
+
+ $wl->all_words() => list
+
+    Return all the words in a list.
+
+SEE ALSO
+
+    Bencher::Scenario::GamesWordlistModules
+
+    Bencher::Scenario::WordListModules
+

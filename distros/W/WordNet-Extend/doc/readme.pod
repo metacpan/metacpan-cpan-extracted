@@ -1,0 +1,95 @@
+# run perldoc on this file to get nicely formatted documentation
+
+=head1 NAME
+
+README - Introduction to WordNet::Extend
+
+=head1 DESCRIPTION
+
+This package contains Perl modules that implement the ability
+to locate a calculated place for inserting a new out of vocabulary 
+(OOV) Lemma into WordNet. This is accomplished primarily by overlaps 
+desribed by Lesk (1986), and the extended gloss overlap
+measure described by Banerjee and Pedersen (2003).
+
+The Perl modules are designed as objects that takes in OOV
+Lemma(s) and outputs the highest scoring WordNet sense
+matched to the OOV Lemma. These modules allow the insertion
+of a single OOV Lemma or a whole file of OOV Lemmas. The 
+modules also allow tweaking of the clean up process the lemmas
+undergo alogn with the options of what items are included in
+the overlaps to allow greater control of how the best sense
+is calculated.
+
+This package also contains a module that implements the ability
+for a user to insert new words into WordNet.
+
+=head1 CONTENTS
+
+The package contains the extend modules along with usable
+data files and old data from SemEval14-2016.
+
+=head2 Modules
+
+All the modules that will be installed in the Perl system directory are
+in the '/lib' folder in this package. These include Insert.pm and Locate.pm. 
+All these modules, once installed in the Perl system directory, can be directly
+used by Perl programs.
+
+=head2 Samples
+
+If the proper package was downloaded, a '/samples' subdirectory should
+appear in the package. This subdirectory contains example files that 
+can be run by using the locateFile() method in Extend::Locate.pm.
+ $obj->locateFile('samples/inSample','samples/outSample');       
+
+=head1 REFERENCES
+
+1. Michael Lesk. Automatic sense disambiguation using
+   machine readable dictionaries: How to tell a pine cone
+   from an ice cream cone. In Proceedings of the 5th An-
+   nual International Conference on Systems Documen-
+   tation, SIGDOC '86, pages 24-26, New York, NY,
+   USA, 1986. ACM.
+
+2. Banerjee S. and Pedersen T. 2003. Extended Gloss Overlaps as a
+   Measure of Semantic Relatedness. In the Proceedings of the
+   Eighteenth International Joint Conference on Artificial
+   Intelligence. Acapulco, Mexico.
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+=head1 AUTHORS
+
+Ted Pedersen, University of Minnesota Duluth
+tpederse at d.umn.edu
+ 
+Jon Rusert, University of Minnesota Duluth
+ruse0008 at d.umn.edu	
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2016, Ted Pedersen, Jonathan D Rusert
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
+ 

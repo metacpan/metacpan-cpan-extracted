@@ -1,0 +1,64 @@
+WWW::Search::PubMedLite
+=======================
+
+This module queries the NCBI PubMed database in much the same way as
+the WWW::Search::PubMed module. The difference is that this module,
+W::S::PubMedLite, returns more data and in a slightly different format
+than the original W::S::PubMed module.
+
+Notably, this module was developed for WWW::Wikipedia::TemplateFiller.
+
+INSTALLATION
+
+  % perl -MCPAN -e 'install WWW::Search::PubMedLite'
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use WWW::Search;
+  my $search = new WWW::Search('PubMedLite');
+
+  $search->native_query( 126941 );
+  my $article = $search->next_result;
+
+  my @fields = qw(
+    pmid
+    journal
+    journal_abbreviation
+    volulme
+    issue
+    title
+    page
+    year
+    month
+    affiliation
+    abstract
+    language
+    doi
+    text_url
+    pmc_id
+  );
+
+  foreach my $field ( @fields ) {
+    printf "%s: %s\n", $field, $article->{$field};
+  }
+
+There's also a web interface if you're so inclined:
+
+  http://diberri.dyndns.org/cgi-bin/templatefiller/
+
+PREREQUISITES
+
+  * WWW::Search
+  * HTML::Entities
+  * XML::LibXML
+
+COPYRIGHT
+
+Copyright (c) David J. Iberri <diberri@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html

@@ -1,0 +1,27 @@
+<%@LANGUAGE="PerlScript" CODEPAGE="65001"%>
+<%
+use Win32::ASP;
+use WWW::Kinghost::Painel;
+
+$Response->{charset}="utf-8";
+
+my $painel = WWW::Kinghost::Painel->new();
+
+$painel->logar('email@revenda.com.br','xxxxxxx');
+
+my $empresa = "Yougurteiras Top Jeca";
+my $nome = "José da Silva";
+my $tipoPessoa = "F"; # F J I()ignorar
+my $cpfcnpj = "000.000.000-00";
+my $email = 'josesilva@gmail.com'; # não deve ser igual @dominiodocliente.com.br
+my $emailcobranca = 'josesilva@gmail.com'; # não deve ser igual @dominiodocliente.com.br
+my $senha = "testefuzzy";
+my $senhaConfimacao = "testefuzzy";
+my $telefone = "";
+my $fax = "";
+my $cep = "";
+my $endereco = "";
+my $cidade = "";
+my $estado = "";
+print $painel->novoCliente($empresa, $nome, $tipoPessoa, $cpfcnpj, $email, $emailcobranca, $senha, $senhaConfimacao, $telefone, $fax, $cep, $endereco, $cidade, $estado);
+%>

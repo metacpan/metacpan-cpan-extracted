@@ -1,0 +1,92 @@
+Revision history for WebService-JotForm
+
+0.020   2015-03-03
+	- Switch to using JSON::MaybeXS instead of deprecated JSON::Any
+	- Add support for TravisCI testing
+	- Add create_form_webhook method
+
+0.019   2014-10-05
+	- add support for create_form_report method
+	
+0.018   2014-10-05
+	- add support for create_form_report()
+
+0.018   2014-10-03
+	- added support for set_form_properties()
+	- minor documentation fixes	
+
+0.017   2014-09-27
+	- improved documentation of get_user_submissions optional parameters
+	- added edit_form_question support
+
+0.016   2014-09-13
+	- added support for clone_form() and create_form_question() endpoints
+
+0.015   2014-09-11
+	- added support for create_form and create_forms endpoints
+
+0.014   2014-09-09
+	- added register_user, login_user, and update_user_settings methods 
+
+0.013   2014-09-02
+	- README updates
+        - another attempt at getting repository info to show on MetaCPAN
+ 
+0.012   2014-09-01
+	- Fix META.json file so it parses correctly 
+
+0.011   2014-08-31
+	- Add Repository and other resource links to META.json and META.yml
+
+0.010   2014-08-29
+	- Another fix to include Test::Deep in build requirement
+
+0.009   2014-08-28
+	- Fix to include Test::Deep in build requirement
+
+0.008   2014-08-27
+	- Another attempt to get the license to not show unknown on CPAN
+
+0.007   2014-08-27
+
+More release tests, and hopefully correct license meta-data so it doesn't show unknown on CPAN
+
+0.006   2014-08-27
+[Tests]
+	Improved subroutine test coverage
+
+[Bugs Fixed]
+	Fixed bug with get_submission method pointing to incorrect API endpoint
+
+
+0.005   2014-08-27
+[Tests]
+	Added more author release tests / increased coverage based on Devel::Cover results
+[Docs]
+	Documentation Fixes
+[Meta]
+	Improvements to license meta data for showing on CPAN
+
+
+0.004   2014-08-26
+[Tests]
+	Added more release tests
+
+[Bugs Fixed]
+	Fixed get_user_submissions end point
+	Corrected url encoding of parameters
+
+     
+0.003   2014-08-18     
+
+[Docs]
+POD formatting Improvements
+
+0.002   2014-08-18     
+
+Added some module prerequisites, based on testing reports 
+
+0.001   2014-08-16     
+
+First version, released on an unsuspecting world.
+

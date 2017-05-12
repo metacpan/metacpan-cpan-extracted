@@ -1,0 +1,45 @@
+Revision history for Perl extension ToolHelp.
+
+0.32    Thu Oct 29 12:35:00 2009
+	Failed to get this to work with ActivePerl 5.10.1 1006 and 'nmake'.
+	For mysterious reasons my nmake says it does the compile for Impl.c
+	but no .o file is produced. My nmake is 6.00.9782.0, will investigate
+	to see if other versions work. Adapt to use dmake as an alternative.
+	
+	* Changed the command for creating the archive to use a tab instead of
+	spaces since dmake won't recognize it otherwise.
+	* Also adapted to the fact that Config{ar} no longer contained just 'ar',
+	but a full path.
+	* Added specific tarflags for the dist target since (at least my) tar puts
+	some very stupid modes on the files (specifically, no x for directories)
+	which creates problems when uploading to PAUSE.
+	
+0.31    Sat Mar  28 22:30:30 2009
+	No changes; just trying to get a tarball that is acceptable to the CPAN
+	indexer...
+	
+0.3	    Sat Mar  28 21:35:06 2009
+	This version uploaded by knth@cpan.org. Steffen Mueller has graciously
+	made me co-maintainer for the moment as the real maintainer is currently
+	unavailable.
+
+	Added the possibility to build with the gcc toolchain (MinGW).
+	Specifically, detecting use of gcc and making sure lib creation
+	options are correct when 'ar' is used instead of 'lib.
+	
+0.2		Mon Jul  15 11:08:15 2002
+	! quotation marks were cut from the XS_VERSION passed to the compiler
+	  via -DXS_VERSION=\"0.1\" (XS_VERSION redefined in ToolHelp.xs as I
+	  hadn't found quickly the reason)
+
+0.1		Fri Jul  5 19:35:15 2002
+	* original version; created by h2xs 1.21 with options
+		-O -n ToolHelp Win32/ToolHelp/Impl/Impl.h
+	+ PROCESSENTRY32* GetProcesses()
+	+ MODULEENTRY32* GetProcessModules(pid)
+	+ PROCESSENTRY32 GetProcess(pid)
+	+ MODULEENTRY32 GetProcessModule(pid, mid)
+	+ MODULEENTRY32 GetProcessMainModule(pid)
+	+ PROCESSENTRY32 SearchProcess(pname)
+	+ MODULEENTRY32 SearchProcessModule(pid, mname)
+	+ MODULEENTRY32 SearchProcessMainModule(pname)

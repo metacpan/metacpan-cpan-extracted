@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use WebService::Google::Sets qw(get_large_gset get_gset);
+use Getopt::Std;
+use File::Basename;
+
+
+my %opts;
+getopts('ls', \%opts); # see usage for full details;
+
+
+my @words = @ARGV;
+my $expanded_set;
+
+
+# do sanity checks and exit if they fail.
+usage() if (scalar @words > 5 || scalar @words < 1);
+usage() if ($opts{'s'} && $opts{'l'});
+
+
+# get a big set if we were asked for one else default to a small one.
+if ($opts{'l'}) {
+  $expanded_set = get_large_gset(@words);
+} else {
+  $expanded_set = get_gset(@words);
+}
+
+for my $set_element (@$expanded_set) {
+  print "$set_element\n";
+}
+
+#----------------------------#
+
+sub usage {
+  my $app = basename($0);
+  die "$app: [-s|-l] <word> [additional words]\n";
+}

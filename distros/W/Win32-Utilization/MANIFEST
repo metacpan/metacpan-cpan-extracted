@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+'inc\\Devel\\AssertOS.pm'
+'inc\\Devel\\AssertOS\\Cygwin.pm'
+'inc\\Devel\\AssertOS\\MSWin32.pm'
+'inc\\Devel\\CheckOS.pm'
+lib/Win32/Utilization.pm
+t/00-load.t
+t/01-base.t
+t/release-check-changes.t
+t/release-pod-syntax.t

@@ -1,0 +1,16 @@
+Revision history for Wiki-Toolkit-Formatter-Markdown
+
+0.0.4 2008-12-21
+	- Fix horribly broken MultiMarkdown 
+	
+0.0.3 2008-12-21
+	- Add MultiMarkdown
+
+0.0.2 2008-10-30
+	- fix pod
+	- move to lazy_build now that it is documented in Mouse
+	- bump Mouse version dep
+
+0.0.1  Wed May 28 12:00:17 2008
+	- Initial release.
+

@@ -1,0 +1,18 @@
+{
+   "builds" : {
+      "href" : "/httpAuth/app/rest/buildTypes/id:TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x/builds/"
+   },
+   "href" : "/httpAuth/app/rest/buildTypes/id:TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+   "id" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+   "name" : "JetBrains Git Plugin (TeamCity 9.1.x)",
+   "project" : {
+      "href" : "/httpAuth/app/rest/projects/id:TeamCityPluginsByJetBrains_Git",
+      "id" : "TeamCityPluginsByJetBrains_Git",
+      "name" : "Git",
+      "parentProjectId" : "TeamCityPluginsByJetBrains",
+      "webUrl" : "https://teamcity.jetbrains.com/project.html?projectId=TeamCityPluginsByJetBrains_Git"
+   },
+   "projectId" : "TeamCityPluginsByJetBrains_Git",
+   "projectName" : "TeamCity Plugins by JetBrains :: Git",
+   "webUrl" : "https://teamcity.jetbrains.com/viewType.html?buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+}

@@ -1,0 +1,4 @@
+POST https://api.rememberthemilk.com/services/rest/
+Content-Type: application/x-www-form-urlencoded
+
+method=rtm.tasks.add&name="A new task"&api_key=key&api_sig=cf6929e4981c376cd79ebf3ebaf2017e

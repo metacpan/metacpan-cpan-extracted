@@ -1,0 +1,35 @@
+#-------------------------------------------------------------------------------
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+#-------------------------------------------------------------------------------
+Revision history for Wetware-Test
+
+0.07    2009.05.11 1540h
+
+		Add in Wetware::Test::Class::Load to avoid any of the
+		CVS and .svn sub directories that would be copied into blib/lib
+		by the stock Module::Build solution.
+		
+0.06    2009.05.09 0920
+		add readable_file_path() since that is useful both for
+		the methods that will call is_testsuite_module() but also
+		for testability. 
+
+0.05    2009.05.08 1515h
+		Add the Wetware::Test::Utilities Module
+
+0.04    2009.05.07 14.33h
+		Why not have the test_new() in the base class?
+
+0.03 	2009.05.07 10.00h
+		Why yes, there is a is_test_class() method that can be
+		overridden, AND we just mandate a TestSuite.pm approach.
+
+0.02    2009.05.06
+         work on the basic pod to try to explain the process.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

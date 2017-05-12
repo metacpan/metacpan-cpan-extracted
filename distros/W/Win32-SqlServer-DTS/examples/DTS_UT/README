@@ -1,0 +1,74 @@
+DTS_UT version 0.01
+===================
+
+DTS_UT is a web application provided as example of using of PerlDTS project.
+
+This set of Perl modules and files are a complete MVC based web application that enables unit test to be
+executed against MS SQL Server DTS packages.
+
+The application will use a single YAML configuration file with details to connect to a MS SQL Server. Then
+it will be able to list all DTS packages available and the user can select one or more packages to execute a
+already defined test.
+
+Check the POD documentation after installing for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+If you're using ActivePerl 5.8.x or 5.10.x, then it will be easier if you download a PPM package from the project
+website. After unziping the file, execute:
+
+   ppm install DTS.ppd
+
+This application was tested against IIS 5 and Apache 2.2.
+
+SETUP FOR IIS
+
+Step 1: create an environment variable (system variable) with the name CGIAPP_CONFIG_FILE. This variable will be used by 
+the application to know the location of the YAML configuration file, so the value of this variable must be the location
+of this file.
+
+Step 2: after the PPM package (or the tarball) of PerlDTS was installed, the configuration file will be located at 
+<Perl location>site\lib\DTS_UT\config, where <Perl location> is the directory where Perl was installed. Copy the file
+config.yml to the location you had setup for CGIAPP_CONFIG_FILE in step 1.
+
+Step 3: edit the config.yml file as necessary. The default values should work.
+
+Step 4: copy the files checkAll.js and test_result.css (in site\lib\DTS_UT\View) to the webroot directory in IIS 
+web server.
+
+Step 5: copy the file dts.pl to the Scripts directory of IIS. If you installed ActivePerl correctly, all mappings
+to execute the script will be already done.
+
+Step 6: edit the file ut_config.yml. This file has the credentials to log in the MS SQL Server where the DTS packages
+are located. This configuration file expected that you're using a trusted connection,  if not you will need to change
+the modules DTS_UT::Model::UnitTestExec.pm and DTS_UT::Model::DTS too.
+
+Step 7: add the IIS user as a MS SQL Server user, or you will not be able to authenticate to the database server.
+
+Step 8: finally, connect to http://localhost/scripts/dts.pl or whatever host name you use to access the IIS.
+
+SETUP FOR APACHE
+
+Almost the same for IIS, except that you will need to edit the httpd.conf file (check the last line of httpd.conf
+provided as a sample in the config directory of PerlDTS distribution) and the dts.cgi file must be copied to the
+directory cgi-bin.
+
+To test, just point to http://localhost/cgi-bin/dts.cgi.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

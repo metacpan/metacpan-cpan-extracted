@@ -1,0 +1,43 @@
+Revision history for Perl extension WebService::Strike.
+
+0.006 2016-01-30T18:47+00:00
+ - Mark module as obsolete since the API was discontinued
+ - Disable the API-related tests
+
+0.005 2016-01-2318:51+00:00
+ - Update for API V2.1
+ - Make torrent method die as the corresponding API call was removed
+ - Implement magnet method manually as the server no longer returns the magnet link
+ - Remove dependency on Date::Parse
+
+0.004003 2015-08-08T13:31+03:00
+ - Fix failing test
+ - Lowercase keys in strike_imdb response
+
+0.004002 2015-05-23T12:16+03:00
+ - Fix failing test
+
+0.004001 2015-04-18T10:34+03:00
+ - Fix dependencies
+
+0.004 2015-04-11T12:45+03:00
+ - Use HTTPS for API calls
+ - Add description support
+ - Add IMDB support
+
+0.003 2015-03-28T14:48+02:00
+ - Update to API v2
+ - Support more than 50 hashes in strike_query
+ - Use HTTPS in repository URL
+
+0.002 2015-03-17T22:51+02:00
+ - Add search support
+
+0.001002 2015-03-15T15:45+02:00
+ - Use timezone UTC for calls to Date::Parse
+
+0.001001 2015-03-15T12:20+02:00
+ - Add Class::Accessor::Fast to dependencies
+
+0.001 2015-03-15T12:05+02:00
+ - Initial release

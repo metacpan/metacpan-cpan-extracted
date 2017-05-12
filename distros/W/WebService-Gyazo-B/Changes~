@@ -1,0 +1,26 @@
+Revision history for WebService-Gyazo-B
+
+0.0405  2015-11-26
+    - ->error() was called on $image instead of $ua in a test.
+        - http://www.cpantesters.org/cpan/report/112677a6-9231-11e5-8bc6-e0798fb2e322
+        - Thanks to Chris Williams “BINGOS” for the CPAN Testers report.
+
+0.0404  2015-10-21
+    - Code cleanup by @netangel .
+
+0.0403  2015-10-10
+    - Translated the comments from Russian to English.
+        - Thanks to @Varadinsky:
+        - https://github.com/shlomif/WebService--Gyazo/pull/1
+
+0.0402  2015-10-10
+    - Log the error in t/WebService_Gyazo_uploadFile.t upon failure.
+
+0.0401  2015-10-09
+    - Update the build/installation instructions in the README.md.
+
+0.04    2015-10-09
+    - Forked from WebService-Gyazo-0.03.
+    - Fix the tests for the new semantics of the Gyazo webservice.
+    - Remove trailing whitespace.
+    - Convert to Dist-Zilla.

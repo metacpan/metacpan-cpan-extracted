@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:50Z">
+<BookList total_results="252" page_size="10" page_number="21" shown_results="10">
+<BookData book_id="the_poetic_principle" isbn="0585049815">
+<Title>The poetic principle</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="bibliobytes">Hoboken, N.J. : BiblioBytes ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2605" change_time="2006-05-14T15:43:54Z" price_time="2006-10-08T08:02:49Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://0-www.netLibrary.com.bianca.penlib.du.edu/urlapi.asp?action=summary&amp;v=1&amp;bookid=2008570 View electronic book</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_poetry">American poetry</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Denver" last_update="2006-05-14T15:43:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-266-the_poetic_principle-20060514.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_poe_encyclopedia" isbn="0313277680">
+<Title>The Poe encyclopedia</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Frederick S. Frank and Anthony Magistrale</AuthorsText>
+<PublisherText publisher_id="greenwood_press">Westport, Conn. : Greenwood Press, 1997.</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="xxii, 453 p. ; 24 cm." language="eng" edition_info="(alk. paper)" dewey_decimal_normalized="818.309" lcc_number="PS2630" change_time="2003-11-05T18:00:25Z" price_time="2006-10-08T08:02:52Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. [389]-394) and indexes.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780313277689" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-06T15:28:36Z" currency_rate="1" price="63.45" />
+<Price store_isbn="" store_title="Poe Encyclopedia" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-06T15:28:36Z" currency_rate="1" price="120.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-06T15:28:37Z" currency_rate="1" price="130.95" />
+<Price store_isbn="" store_title="The Poe Encyclopedia" store_url="http://www.biblio.com/details.php?dcx=57656648&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-06T15:28:39Z" currency_rate="1" price="90" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="187.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="187.95" />
+<Price store_isbn="" store_title="The Poe Encyclopedia" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="149.95" />
+<Price store_isbn="" store_title="The Poe Encyclopedia" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="60.38" />
+<Price store_isbn="" store_title="The Poe Encyclopedia" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:21Z" currency_rate="1" price="125" />
+<Price store_isbn="" store_title="The Poe Encyclopedia" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:21Z" currency_rate="1" price="65" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:26Z" currency_rate="1" price="55.55" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:08Z" currency_rate="1" price="117.5" />
+<Price store_isbn="" store_title="The Poe Encyclopedia Product 1196380" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1196380&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:57:16Z" currency_rate="1" price="105.55" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_poe_encyclopedia/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T08:02:52Z" currency_rate="1" price="137.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_encyclopedias">Poe, Edgar Allan,1809-1849 -- Encyclopedias</Subject>
+<Subject subject_id="fantasy_literature_american_encyclopedias">Fantasy literature, American -- Encyclopedias</Subject>
+<Subject subject_id="encyclopedias">Encyclopedias</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Western Washington University" last_update="2003-11-05T18:00:25Z" marc_url="http://isbndb.com/x/libdata/isbndb-44-the_poe_encyclopedia-20031105.mrc" />
+<MARC library_name="University of New Orleans" last_update="2004-03-16T21:07:45Z" marc_url="http://isbndb.com/x/libdata/isbndb-218-the_poe_encyclopedia-20040316.mrc" />
+<MARC library_name="University of Virginia" last_update="2004-07-03T12:46:50Z" marc_url="http://isbndb.com/x/libdata/isbndb-202-the_poe_encyclopedia-20040703.mrc" />
+<MARC library_name="Yale University Library" last_update="2006-05-01T05:03:33Z" marc_url="http://isbndb.com/x/libdata/isbndb-yale-the_poe_encyclopedia-20060430.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="frank_frederick_s">Frank, Frederick S.</Person>
+<Person person_id="magistrale_tony">Magistrale, Tony</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_poe_encyclopedia_a01" isbn="0313003513">
+<Title>The Poe encyclopedia</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Frederick S. Frank and Anthony Magistrale</AuthorsText>
+<PublisherText publisher_id="greenwood_press">Westport, Conn. : Greenwood Press, 1997.</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="xxii, 453 p. ; 24 cm." language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="818.309" lcc_number="PS2630" change_time="2005-12-08T17:14:23Z" price_time="2006-10-08T08:02:55Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. [389]-394) and indexes.
+
+Electronic reproduction.Boulder, Colo. :NetLibrary,2003.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.tamu.edu:2048/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=81896 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_encyclopedias">Poe, Edgar Allan,1809-1849 -- Encyclopedias</Subject>
+<Subject subject_id="fantasy_literature_american_encyclopedias">Fantasy literature, American -- Encyclopedias</Subject>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Texas A &amp; M University Database" last_update="2005-12-08T17:14:23Z" marc_url="http://isbndb.com/x/libdata/isbndb-274-the_poe_encyclopedia_a01-20051208.mrc" />
+<MARC library_name="University of Alabama, Birmingham" last_update="2006-02-14T18:25:48Z" marc_url="http://isbndb.com/x/libdata/isbndb-79-the_poe_encyclopedia_a01-20060214.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="frank_frederick_s">Frank, Frederick S.</Person>
+<Person person_id="magistrale_tony">Magistrale, Tony</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_portable_poe" isbn="067001012X">
+<Title>The Portable Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allen Poe, Philip Van Doren Stern (Editor)</AuthorsText>
+<PublisherText publisher_id="viking_adult">Viking Adult</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Hardcover; 1959-11-20" dewey_decimal_normalized="" lcc_number="" change_time="2006-01-08T08:40:42Z" price_time="2006-10-08T08:02:59Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Portable Poe: Tales and Poems" store_url="http://www.biblio.com/details.php?dcx=2535309&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-08T08:40:50Z" currency_rate="1" price="4" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780670010127" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-08T08:40:51Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="3.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:17Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:23Z" currency_rate="1" price="17.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:23Z" currency_rate="1" price="1.45" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:26Z" currency_rate="1" price="2.4" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_portable_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:56:12Z" currency_rate="1" price="3.71" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="stern_philip_m">Stern, Philip M.</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_power_of_words_a02" isbn="0585052204">
+<Title>The power of words</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:29Z" price_time="2006-10-08T08:03:03Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086016 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:29Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_power_of_words_a02-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_premature_burial" isbn="0585052220">
+<Title>The premature burial</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:34Z" price_time="2006-10-08T08:03:06Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086018 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="burial_premature_fiction">Burial, Premature -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:34Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_premature_burial-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_purloined_letter" isbn="0531010783">
+<Title>The purloined letter</Title>
+<TitleLong>The purloined letter. The murders in the Rue Morgue</TitleLong>
+<AuthorsText>Illus. by Rick Schreiter</AuthorsText>
+<PublisherText publisher_id="f_watts">New York, F. Watts [1966]</PublisherText>
+<Details dewey_decimal="" physical_description_text="85 p. illus. 23 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PZ3" change_time="2005-04-28T22:47:49Z" price_time="2005-04-28T22:48:19Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Purloined Letter and Murders in Rue Morgue" store_url="http://isbndb.com/x/book/the_purloined_letter/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-04-28T22:48:12Z" currency_rate="1" price="18.95" />
+<Price store_isbn="" store_title="Purloined Letter and Murders in Rue Morgue" store_url="http://isbndb.com/x/book/the_purloined_letter/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-04-28T22:48:12Z" currency_rate="1" price="19.23" />
+<Price store_isbn="" store_title="Purloined Letter and Murders in Rue Morgue." store_url="http://isbndb.com/x/book/the_purloined_letter/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-04-28T22:48:17Z" currency_rate="1" price="19.18" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="River Bend Library System (Eastern Iowa/Western Illinois)" last_update="2005-04-28T22:47:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-194-the_purloined_letter-20050428.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="schreiter_rick">Schreiter, Rick</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_purloined_letter_a01" isbn="0886820618">
+<Title>The purloined letter</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="creative_education_inc">Mankato, Minn. : Creative Education, Inc., c1986.</PublisherText>
+<Details dewey_decimal="[Fic]" physical_description_text="48 p. ; 22 cm." language="eng" edition_info="$17.45" dewey_decimal_normalized="" lcc_number="" change_time="2006-09-20T16:04:26Z" price_time="2006-09-20T16:17:50Z" />
+<Summary>The brilliant Dupin uses psychological reasoning to deduce the hiding place of a stolen letter.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_purloined_letter_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-20T16:04:46Z" currency_rate="1" price="50" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_purloined_letter_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-20T16:04:47Z" currency_rate="1" price="13.11" />
+<Price store_isbn="" store_title="The Purloined Letter (Creative's Classics)" store_url="http://isbndb.com/x/book/the_purloined_letter_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-20T16:04:47Z" currency_rate="1" price="8.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_purloined_letter_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-20T16:04:47Z" currency_rate="1" price="32.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="mystery_and_detective_stories">Mystery and detective stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Hurst Public Library (Hurst, TX)" last_update="2006-09-20T16:04:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-233-the_purloined_letter_a01-20060920.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_raven" isbn="0838313825">
+<Title>The raven</Title>
+<TitleLong>The raven. With literary and historical commentary</TitleLong>
+<AuthorsText>by John H. Ingram</AuthorsText>
+<PublisherText publisher_id="haskell_house_publishers">New York, Haskell House Publishers, 1972.</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="122, [2] p. 23 cm." language="eng" edition_info="" dewey_decimal_normalized="811.3" lcc_number="PS2609" change_time="2003-10-20T10:13:17Z" price_time="2006-06-15T11:01:51Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1885 ed.
+
+Poem in English, French, German, Hungarian, and Latin.
+
+Bibliography: p. [123]</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Raven: With Literary and Historical Commentary" store_url="http://isbndb.com/x/book/the_raven/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2004-12-23T13:30:50Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="The Raven: With Literary and Historical Commentary" store_url="http://isbndb.com/x/book/the_raven/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2004-12-23T13:30:50Z" currency_rate="1" price="140" />
+<Price store_isbn="" store_title="The Raven: With Literary and Historical Commentary," store_url="http://isbndb.com/x/book/the_raven/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-15T10:57:00Z" currency_rate="1" price="92.44" />
+<Price store_isbn="" store_title="The Raven: With Literary and Historical Commentary" store_url="http://isbndb.com/x/book/the_raven/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-15T10:57:00Z" currency_rate="1" price="92.44" />
+<Price store_isbn="" store_title="The Raven: With Literary and Historical Commentary" store_url="http://isbndb.com/x/book/the_raven/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-15T10:57:00Z" currency_rate="1" price="96.34" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Arizona State University" last_update="2003-10-20T10:13:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-31-the_raven-20031020.mrc" />
+<MARC library_name="Texas A &amp; M University Database" last_update="2004-03-18T04:56:46Z" marc_url="http://isbndb.com/x/libdata/isbndb-274-the_raven-20040317.mrc" />
+<MARC library_name="Auburn University" last_update="2004-07-22T18:18:00Z" marc_url="http://isbndb.com/x/libdata/isbndb-16-the_raven-20040722.mrc" />
+<MARC library_name="Louisiana State University--Shreveport" last_update="2004-07-22T23:35:25Z" marc_url="http://isbndb.com/x/libdata/isbndb-314-the_raven-20040722.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="ingram_john_henry">Ingram, John Henry</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_raven_a03" isbn="0802117562">
+<Title>The raven</Title>
+<TitleLong></TitleLong>
+<AuthorsText>lyrics and text by Lou Reed; with photographs by Julian Schnabel</AuthorsText>
+<PublisherText publisher_id="grove_press">New York : Grove Press, c2003.</PublisherText>
+<Details dewey_decimal="782.1/40268" physical_description_text="116 p. : ill. ; 19 cm." language="eng" edition_info="" dewey_decimal_normalized="782.140268" lcc_number="ML50" change_time="2004-08-01T22:12:36Z" price_time="2006-08-16T01:14:50Z" />
+<Summary></Summary>
+<Notes>Libretto of a studio adaptation of the musical POEtry.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="14.21" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="14.21" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="13.38" />
+<Price store_isbn="" store_title="The Raven" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="The Raven" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="12.89" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0802117562&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:46Z" currency_rate="1" price="18.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="13.04" />
+<Price store_isbn="" store_title="The Raven" store_url="http://www.biblio.com/details.php?dcx=59466534&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="The Raven (Deluxe Limited Edition)" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Raven" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="13.25" />
+<Price store_isbn="" store_title="The Raven by Alexius Reed, Edgar Allan Poe (2003)" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:47Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33831784%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:48Z" currency_rate="1" price="11.59" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780802117564" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-16T01:14:48Z" currency_rate="1" price="2.1" />
+<Price store_isbn="" store_title="Raven" store_url="http://isbndb.com/x/book/the_raven_a03/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:48Z" currency_rate="1" price="18.95" />
+<Price store_isbn="" store_title="The Raven Product 2228585" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2228585&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-16T01:14:50Z" currency_rate="1" price="17.81" />
+</Prices>
+<Subjects>
+<Subject subject_id="musicals_librettos">Musicals -- Librettos</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Yale University Library" last_update="2004-08-01T22:12:36Z" marc_url="http://isbndb.com/x/libdata/isbndb-yale-the_raven_a03-20040801.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-08-16T01:14:45Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_raven_a03-20060815.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="reed_lou">Reed, Lou</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

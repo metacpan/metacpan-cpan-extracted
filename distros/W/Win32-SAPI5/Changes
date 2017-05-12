@@ -1,0 +1,13 @@
+Revision history for Perl extension Win32::SAPI5.
+
+0.01  Tue September 28 2004
+	- original version
+0.02  Wed September 29 2004
+        - Fixed bug in passing arguments in Autoloader sub
+        - Added Win32::SAPI4 compatible utilitymethods
+0.03  Thu September 30 2004
+	- Made a workaround to show names of voices by Cepstral
+	  (these return empty strings on GetDescription, but
+	  do return their name on GetAttribute('Name')
+0.04  Fri October 1 2004
+	- Added the GetObject method to all classes (thanks to Tatsuhiko Miyagawa)

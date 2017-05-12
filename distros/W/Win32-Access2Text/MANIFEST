@@ -1,0 +1,8 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/Win32-Access2Text.t
+lib/Win32/Access2Text.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Korean spellchecker",
+   "author" : [
+      "C.H. Kang <chahkang@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-KoreanSpeller",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "namespace::autoclean" : "0",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aero/WebService-KoreanSpeller/issues"
+      },
+      "homepage" : "https://github.com/aero/WebService-KoreanSpeller",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aero/WebService-KoreanSpeller.git",
+         "web" : "https://github.com/aero/WebService-KoreanSpeller"
+      }
+   },
+   "version" : "0.012",
+   "x_contributors" : [
+      "aero <chahkang@gmail.com>"
+   ]
+}
+

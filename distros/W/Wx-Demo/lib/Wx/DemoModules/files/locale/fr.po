@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-04-14 18:10-0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Mark Dootson <mark.dootson@znix.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: t\n"
+"X-Poedit-Basepath: c:\\perl\\site\\lib\\Wx\\Demomodules\\files\\locale\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: c:\\perl\\site\\lib\\Wx\\Demomodules\n"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:108
+msgid "Select Language\tCtrl+S"
+msgstr "Sélection de la langue\tCtrl+S"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:115
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:188
+msgid "&Locale"
+msgstr "&Locale"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:122
+msgid "Translations from English provided by Google. Please use the menu to select a different locale."
+msgstr "Traductions de l'anglais fourni par Google. S’il vous plaît utilisez le menu pour sélectionner un autre endroit."
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:123
+msgid "Time Now"
+msgstr "Temps"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:124
+msgid "Number"
+msgstr "Nombre"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:130
+msgid "Wx::Locale Example"
+msgstr "Wx::Locale Exemple"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:131
+msgid "Select the required application language"
+msgstr "Sélectionnez la langue de demande requis"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:132
+msgid "English"
+msgstr "Anglais"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:133
+msgid "French"
+msgstr "Français"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:134
+msgid "Italian"
+msgstr "Italien"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:135
+msgid "German"
+msgstr "Allemand"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:136
+msgid "Spanish"
+msgstr "Espagnol"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:198
+msgid "ok"
+msgstr "ok"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:199
+msgid "cancel"
+msgstr "annuler"
+
+#: c:\perl\site\lib\Wx\Demomodules/wxLocale.pm:200
+msgid "ctrl"
+msgstr "ctrl"
+
+#~ msgid "OK"
+#~ msgstr "OK"
+

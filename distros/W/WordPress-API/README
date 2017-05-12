@@ -1,0 +1,31 @@
+WordPress::API
+
+This distro is in development.
+
+
+TESTING
+
+If you want to test live against your blog (recommended), you should create a yaml file in t/wppost
+such as:
+
+   ---
+   proxy: 'http://yoursite.com/xmlrpc.php'
+   username: jorge
+   password: garrapudos
+
+This is before you run the tests.
+
+
+INSTALLATION
+
+I suggest you install from tarball by hand, not cpan- In order to test.
+
+perl Makefile.PL
+make test
+make install
+make realclean
+
+
+BUGS, HELP, SUGGESTIONS
+
+Leo Charre leocharre at cpan dot org

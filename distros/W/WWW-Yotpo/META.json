@@ -1,0 +1,63 @@
+{
+   "abstract" : "API for Yotpo",
+   "author" : [
+      "Fayland Lam <fayland@binary.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Yotpo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fayland/perl-WWW-Yotpo/issues"
+      },
+      "homepage" : "https://github.com/fayland/perl-WWW-Yotpo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fayland/perl-WWW-Yotpo.git",
+         "web" : "https://github.com/fayland/perl-WWW-Yotpo"
+      }
+   },
+   "version" : "0.01"
+}
+

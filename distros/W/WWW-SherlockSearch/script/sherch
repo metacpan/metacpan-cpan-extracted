@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use lib '.';
+use open OUT => ':utf8';
+use WWW::SherlockSearch;
+
+die "Usage: $0 template_file [ query_string [ max_results ] ]\n" unless @ARGV;
+
+my $sourcefile = -f $ARGV[0] ? $ARGV[0] : "plugins/$ARGV[0]";
+my $infoSearch = WWW::SherlockSearch->new;
+
+$infoSearch->loadFile($sourcefile);
+
+my $results = $infoSearch->find($ARGV[1], $ARGV[2]);
+print $infoSearch->resultsAsRssString if $results;
+
+__END__
+
+=head1 NAME
+
+sherch - Sherlock Searcher
+
+=head1 SYNOPSIS
+
+    # search 'perl' in google, return top five hits as RSS
+    % sherch google.src perl 5
+
+=head1 DESCRIPTION
+
+This program executes a sherlock search and returns the result as
+a RSS string.
+
+=head1 AUTHORS
+
+Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002 by Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

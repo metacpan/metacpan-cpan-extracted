@@ -1,0 +1,30 @@
+---
+abstract: 'this class provides a simple abstraction layer between SOAP::Lite and Salesforce.com.'
+author:
+  - 'Fred Moyer <fred@redhotpenguin.com>'
+build_requires:
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Salesforce
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Crypt::SSLeay: '0.56'
+  SOAP::Lite: '0.68'
+resources:
+  homepage: https://github.com/redhotpenguin/WWW-Salesforce
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/redhotpenguin/WWW-Salesforce.git
+version: '0.25'

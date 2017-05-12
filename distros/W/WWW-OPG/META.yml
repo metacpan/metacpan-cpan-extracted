@@ -1,0 +1,33 @@
+---
+abstract: "Perl interface to Ontario Power Generation's site"
+author:
+  - 'Jonathan Yu <jawnsy@cpan.org>'
+build_requires:
+  Test::NoWarnings: 0.084
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3601'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-OPG
+provides:
+  WWW::OPG:
+    file: lib/WWW/OPG.pm
+    version: 1.005
+  WWW::OPG::Scraper:
+    file: lib/WWW/OPG/Scraper.pm
+    version: 1.004
+requires:
+  DateTime: 0.4305
+  LWP::UserAgent: 0
+  Test::More: 0.62
+  perl: 5.006
+resources:
+  Ratings: http://cpanratings.perl.org/d/WWW-OPG
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-OPG
+  license: http://edwardsamuels.com/copyright/beyond/articles/public.html
+  repository: http://svn.ali.as/cpan/trunk/WWW-OPG
+version: 1.005

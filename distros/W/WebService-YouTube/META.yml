@@ -1,0 +1,28 @@
+---
+abstract: 'Perl interfece to YouTube'
+author:
+  - 'Hironori Yoshida <yoshida@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-YouTube
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+requires:
+  Class::Accessor::Fast: 0
+  Encode: 0
+  HTTP::Date: 0
+  LWP::UserAgent: 0
+  URI::Escape: 0
+  XML::Simple: 0
+  perl: 5.6.0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0.3

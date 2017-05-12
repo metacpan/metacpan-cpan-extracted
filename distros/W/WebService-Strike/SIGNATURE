@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 db58c3b0751be2f1f43675d9c4fab39f82384bc4 Changes
+SHA1 b016c54e36d16a5d88513a426b5958a4d3929910 MANIFEST
+SHA1 b1c581d0cab445e829a85ef32b4caed088fdd9d5 META.json
+SHA1 a1059d18c7e399de3be6fe76aacf8816ea70de96 META.yml
+SHA1 6b1f2de30b0c3fd206baef5764aec4a59605bd13 Makefile.PL
+SHA1 618335530429cecd98a569423a6f368b9610aaeb README
+SHA1 f86d0cf0b6fe2aee5426151e121d931aa923bae5 lib/WebService/Strike.pm
+SHA1 aac1a9e8fb2d831c7ce91604d6ad949791dec526 lib/WebService/Strike/Torrent.pm
+SHA1 9468db5d3faf0e35a9f5fdd101b81e6b86d36c63 t/WebService-Strike-Torrent.t
+SHA1 ffc59f683fea1e3ac6d0adc14a7eceb77cecd577 t/WebService-Strike.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWrQVoAAoJEMoENb5ewbNicSsQAJ2QYjDEpM/9UjAFzaKHB7GD
+sxT8E1eVbQWYId7gBpJAxRceOyceuKs/sICy+MzlhY/5+iyYRoWM7Unq0eyvWZ2T
+Mtf7rGvIEZcUSHTA1kHWwfLurtsCWKSLDKgQIre9xCG/BPFYQh1BgcBJWmwwJNYW
+REO7Dl8ELUFYSKWWUZNimD8cdewretPNimp2oopoT6nJwEr95BnyZOaBwOpl2nv2
+dSbLivIfTg+2UluDQI0Mi9aMGcWP/ZKkwqazqPVnqzBKHN/URzoH6mqwmK6TyPE8
+meDJ4RMDC/IDIIs+DkSkeS0Txuadxs3ElU6ap2WFmeOzVWv7rfRJxZGPdcUddECC
+E5EZqwomARG9zGl8FLl9gUjgGPYGItoORX+US4zSViWbiX5UuCfAFWZyPpuPkEy4
+qS6KXsN91UIoUWgRApaXs4AH6EjI4qAZgyyF3OUronA9lebIJaw0DG8tY2/TpA2e
+f9BvrPAnBgB91L+GnBFNfyqsnE+IfwoqyY13iiWTEQMzoqhC3zpQmYj84Ikip0k/
+/zrXL26c9OIofWz/IG/Z4rYzFxf1FGbvj3HNcvgKp3qd0PsrW5JwgxNGOijgUAw/
+Ikh8y1l4ZDuKcny00sTTKXpLheUnc62H4XUVmmRoWKgy15ty6lfb+HS5WK6Eknec
+iZpz1e5oFLSbokD7Fv5Z
+=Mm4U
+-----END PGP SIGNATURE-----

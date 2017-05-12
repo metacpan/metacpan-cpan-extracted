@@ -1,0 +1,34 @@
+<!-- PERL: Hide Perl`s script
+<?perl 
+ Header(type=>'content',val=>'text/html; charset=Windows-1251');  # HTTP Content-type header
+ ClearBuffer();
+ flush_print(1);        # Must be called!
+ set_printing_mode('');
+ print "<DIV style='background:yellow'>";
+ for (1..9)
+   {
+    print "Line $_<BR>";
+    select(undef,undef,undef,0.5);
+    print ("\n" x 20000);
+   }
+ print '</DIV>';
+ set_printing_mode('buffered');
+ print "<DIV style='background:silver'>";
+ for (1..9)
+   {
+    print "Line $_<BR>";
+    select(undef,undef,undef,0.5);
+    print ("\n" x 20000);
+   }
+ print '</DIV>';
+ set_printing_mode('');
+ print "<DIV style='background:red'>";
+ for (1..9)
+   {
+    print "Line $_<BR>";
+    select(undef,undef,undef,0.5);
+    print ("\n" x 20000);
+   }
+ print '</DIV>';
+?>
+//-->

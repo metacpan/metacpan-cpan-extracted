@@ -1,0 +1,13 @@
+Revision history for Perl module WWW::Gazetteer::Getty: 
+
+0.11 Tue Jun 23 20:44:33 BST 2009
+   - perltidy
+   - use new URLs and HTML
+   - add computer-readable license
+   - add human-readable license
+   - move test into t/ directory
+   - use warnings
+   - add pod tests
+
+0.10 Fri Oct 25 17:22:19 BST 2002
+	- first released version

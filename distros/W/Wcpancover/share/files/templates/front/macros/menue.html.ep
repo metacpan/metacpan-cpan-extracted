@@ -1,0 +1,33 @@
+<!-- MENUE -->
+<div class="container">                                 
+<div class="row">
+
+<div class="span12 menu">
+    <ul>
+        <li><a href="">Testseiten</a>
+            <ul >
+                <li><a title="Login" href="/site/xitavis/login">Login</a></li>
+                <li><a title="Portal" href="/site/xitavis/portal">Portal</a></li>
+                <li><a title="Stammdaten - Firma" href="/site/xitavis/stammdaten/firma">Firmendaten</a></li>
+            </ul>
+        </li>
+        <li><a href="">Styleguide</a>
+            <ul>
+                <li><a title="Zielsetzung"  href="/site/fixpunkt/aim">Zielsetzung</a></li>
+                <li><a title="Standards"  href="/site/fixpunkt/standards">Standards</a></li>
+                <li><a title="Icons"  href="/site/fixpunkt/icons">Icons</a></li>
+            </ul>
+        </li>
+        <li><a href="">Templates</a>
+            <ul>
+                <li><a title="Layout"  href="/site/fixpunkt/layout">Layout</a></li>
+                <li><a title="Formulare"  href="/site/fixpunkt/formulare">Formulare</a></li>
+            </ul>
+        </li>        
+    </ul>
+</div>
+
+<!-- /div -->
+</div>
+</div>  
+<!-- END MENUE -->

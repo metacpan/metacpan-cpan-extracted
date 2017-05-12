@@ -1,0 +1,34 @@
+WWW-Mechanize-XML version 0.02
+=====================================
+
+This is a subclass of WWW::Mechanize that provides an XML DOM accessor which
+parses the contents of the response and returns it as an XML::LibXML::Document.
+The motivation for developing this module was to facilitate testing of XML APIs
+and XHTML web sites.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Test::Exception
+  WWW::Mechanize
+  XML::LibXML
+  File::Temp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Barry White
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

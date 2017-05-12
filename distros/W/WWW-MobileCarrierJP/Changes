@@ -1,0 +1,252 @@
+Revision history for Perl module WWW::MobileCarrierJP
+
+0.65 2016-08-30T10:38:32Z
+
+    commit 0e6d9b0b8d9dd31db539d41d5025dc8f0edf6a5e
+    Author: Kazuma Shiraiwa <cyberlib@gmail.com>
+    Date:   Tue Aug 30 12:14:02 2016 +0900
+
+        背景色及び備考欄による取得条件を現状にあわせて修正しました
+
+0.64 2013-07-22T07:16:12Z
+    - fix for supports current willcome's webpage (on 2013-07-22)
+      (nyarla <nyarla@thotep.net>)
+
+0.63 2012-10-22
+   - MISC: update inc::Module::Install for perl5.16 (thanks miyagawa)
+
+0.62 2012-02-15
+    - EZWeb::CIDR: follow site chage.
+    - AirHPhone::CIDR: fixed removed ip including.
+
+0.61 2011-11-29
+    - EZWeb::CIDR: fixed including PCSV site's CIDR by changing ez site
+      from November 28 (thanks hiratara)
+
+0.60 2011-11-20
+    - fixed Softbank::CIDR (thanks hiratara)
+    - fixed author test broken
+
+0.59 2011-10-21
+    - fixed Softbank::HTTPHeader's garbage. (walf443)
+
+0.58 2011-10-13
+    - Test::Base is not include to inc/. It is test_requires module. (walf443)
+
+0.57 2011-10-12
+    - follow SoftBank URL changing. (walf443)
+    - follow changing Au Terminal Information. ( walf443)
+
+0.56 2011-09-19
+    - follow DoCoMo URL changing. (walf443)
+    - deduplicate AirHPhone::CIDR (walf443)
+
+0.55 2011-06-14
+    - remove pcsv ips from EZweb::CIDR's result.
+      (walf443)
+
+0.54 2011-05-19
+    - Fixed AIRHPHONE scraper.
+      0.53 IS BROKEN.
+
+0.53 2011-05-19
+    - fixed AIRHPhone scraper
+
+0.52 2011-02-26
+    - softbank removes sjis pictogram information from web page!
+
+0.51 2011-02-25
+    - fixed test case
+    - added url method for each scraper classes.
+    - better docs
+    - rename Thirdforce to Softbank.
+      But Thirdforce::* module still be exists for compatibility.
+
+0.50 2010-12-28
+    - move live tests to xt/ for fast installing(suggested by miyagawa++)
+
+0.49 not released
+    - depend to HTML-TableExtract(tokuhirom)
+    - WWW::MobileCarrierJP::DoCoMo::CIDR: fixed broken scraper(tokuhirom)
+    - ezweb is no longer provides brew device information. we can't provides
+      the feature.(tokuhirom)
+
+0.48 2010-09-20
+    - some tweaks for Makefile.PL(tokuhirom)
+    - depend to latest HTML::TreeBuilder::LibXML
+
+0.47 2010-08-03
+    - fix scraper rule of flash_lite for ezweb(takuya yamamoto)
+
+0.46 2010-07-27
+    - ThirdForce::Display: added(tnj)
+    - DoCoMo::UserAgent: user-agent has useless whitespace on its head(tnj)
+
+0.45 2010-07-19
+    [INCOMPATIBLE CHANGE]
+    - flash information was moved to
+      http://creation.mb.softbank.jp/terminal/?lup=y&cat=flash
+    - If you want to scrape flash information,
+      use ::Flash instead of ::Service.
+
+0.44 2010-05-09
+    - no feature changes
+    - added 'use LWP::Online ":skip_all";' for all tests.
+
+0.43 2010-05-08
+    - more better error message for CPAN testers.
+    - added HTML::TreeBuilder::LibXML as recommends.
+
+0.42 2010-05-08
+    - workaround for perl5.12's issue.
+      ref http://rt.perl.org/rt3/Public/Bug/Display.html?id=74982
+
+0.41 2010-04-18
+    - fixed some test issue. softbank removed some informations from web page.
+      (noblejasper)
+
+0.40 2010-02-20
+    - DoCoMo::Java: scrape all java info
+      (Seiji Harada)
+
+0.39 2010-02-15
+    - added DoCoMo::Java, ThirdForce::Java
+      (Seiji Harada)
+
+0.38 2009-12-20
+    - fixed bugs around invalid html.
+
+0.37 2009-10-14
+    - Fixed uninitialized value and unnecessary data for docomo useragent
+      (zigorou++)
+
+0.36 2009-09-24
+    - ignore no i-mode browser(chiba)
+
+0.35 2009-06-08
+    - oops
+
+0.34 2009-06-08
+    - added DoCoMo::UserAgent based on id:takefumi's work
+
+0.33 2009-06-04
+    - DoCoMo::HTMLVersion: support i-mode browser 2.0
+
+0.32 2009-04-21
+    - fixed deps
+
+0.31 2009-04-08
+    - HTML::TreeBuilder::LibXML requires void context
+
+0.30 2009-03-25
+    - release 0.30!too many f*cking changes provided by carriers!
+    - use HTML::TreeBuilder::LibXML, if it is available!
+      This is very fast!
+
+0.29 2009-03-10
+    - ignore deprecated au cidr
+
+0.28 2009-03-09
+    - f*cking j-phone changed html...
+
+0.27 2009-02-19
+    - use Exporter instead of Sub::Exporter
+      Exporter is good enough for this module.
+
+0.26 2009-02-11
+    - F - U - C - K (thanks to lestrrat++)
+      softbank changes some symbols in html...
+
+0.25 2008-12-28
+    - updated scraper for Willcom CIDR
+
+0.24 2008-11-25
+    - DoCoMoのDisplay情報 新機種に対応(by kazeburo++)
+
+0.23 2008-11-07
+    - ezweb site injects white space in the td!(reported by nobjas++)
+
+0.22 2008-11-07
+    - f*cking docomo changed html.
+
+0.21 2008-10-31
+    - fixed some code for renewal softbank site
+
+0.20 2008-09-02
+    - INCOMPATIBLILITY: WWW::MobileCarrierJP::ThirdForce::UserAgent
+      softbank changes developers site structure.
+      softbank--
+
+0.19 2008-08-05
+    - fixed test: NM706i was released...
+                  this model supports HTML version 4.0...
+
+0.18 2008-07-29
+    - good bye tu-ka...
+
+0.17 2008-06-23
+    - f*cking thirdforce changed uri.
+      fixed WWW::MobileCarrierJP.
+
+0.16 2008-05-19
+    - bug fixed: around ※
+    - enhancement the tests
+    - i don't need boolean.pm
+
+0.15 2008-05-16
+    - added service info scraper for thirdforce
+      service info contains flash, gps, etc.
+
+0.14 2008-04-10
+    - (No feature changes)
+    - test fixed(reported by yappo++)
+      TU-KA is DEAD.
+
+0.13 2008-03-09
+    - fixed the bug in the tests.
+      (No feature changes)
+
+0.12 2008-02-06
+    - added WWW::MobileCarrierJP::EZWeb::BREW
+
+0.11 2008-01-23
+    - fixed tests(Yoshiki Kurihara)
+
+0.10 2008-01-06
+    - added WWW::MobileCarrierJP::DoCoMo::HTMLVersion.
+      easy to get the html version.
+
+0.09 2007-12-30
+    - no feature changes.
+
+0.08
+    - install www-mobilecarrierjp-dump_all.pl.
+
+0.07 2007-12-30
+    - more docs.
+    - no feature cheangs.
+
+0.06 2007-12-27
+    - oops. fixed test.
+      no feature changes included in this release.
+
+0.05 2007-12-13
+    - ezweb display size support.
+
+0.04 2007-12-08 02:57:07 PST
+    - bug fixed orz...
+      bug fixed in ezweb device id scraper...
+
+0.03 2007-12-07 19:01:38 PST
+     - added docomo flash site scraper
+     - added thirdforce user agent scraper
+     - added ezweb gif/png/flash_lite/jpeg scraper
+
+0.02 2007-12-06 21:32:20 PST
+    - added Pictogram Info scraper.
+      copied from Encode-JP-Mobile.
+      miyagawa++
+
+0.01 2007-12-06
+    - original version
+

@@ -1,0 +1,38 @@
+<%flags>inherit => '/page.mhtml'</%flags>
+
+<%method subtitle>
+<%args>
+$article
+</%args>
+<% $article->title |h %>
+</%method>
+
+<%method content>
+<%args>
+$article
+$prev => undef
+$next => undef
+</%args>
+
+<h1 class='title'><% $article->title |h %></h1>
+<div class='subtitle'><% $article->topic |h %> - <% $article->date->ymd %></div>
+
+<% $article->body_html %>
+
+<& /credit.mhtml, article => $article &>
+
+<ul id="pager">
+% if ($prev) {
+    <li class="previous"><a title="<% $prev->title |h %>" href="<% $prev->date->ymd %>.html">Previous</a></li>
+% } else {
+    <li class="previous">Previous</li>
+% }
+
+% if ($next) {
+    <li class="next"><a title="<% $next->title |h %>" href="<% $next->date->ymd %>.html">Next</a></li>
+% } else {
+    <li class="next">Next</li>
+% }
+</ul>
+<div style="clear: both"></div>
+</%method>

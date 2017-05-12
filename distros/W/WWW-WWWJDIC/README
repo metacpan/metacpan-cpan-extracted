@@ -1,0 +1,99 @@
+  __        ____        ____        __      
+  \ \      / /\ \      / /\ \      / /  _ _ 
+   \ \ /\ / /  \ \ /\ / /  \ \ /\ / /  (_|_)
+    \ V  V /    \ V  V /    \ V  V /    _ _ 
+     \_/\_/      \_/\_/      \_/\_/    (_|_)
+                                            
+  __        ____        ____        __  _ ____ ___ ____ 
+  \ \      / /\ \      / /\ \      / / | |  _ \_ _/ ___|
+   \ \ /\ / /  \ \ /\ / /  \ \ /\ / /  | | | | | | |    
+    \ V  V /    \ V  V /    \ V  V / |_| | |_| | | |___ 
+     \_/\_/      \_/\_/      \_/\_/ \___/|____/___\____|
+                                                        
+
+
+This is the README for WWW::WWWJDIC version 0.001.
+
+WWW::WWWJDIC is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+WWW::WWWJDIC - Get information from online Japanese dictionary WWWJDIC
+
+Scrape the WWWJDIC online dictionaries.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?WWW::WWWJDIC
+    * http://metacpan.org/release/WWW-WWWJDIC
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc WWW::WWWJDIC
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan WWW::WWWJDIC
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm WWW::WWWJDIC
+
+To install the module from the source file, WWW-WWWJDIC-0.001.tar.gz,
+follow this sequence of commands:
+
+    tar xfz WWW-WWWJDIC-0.001.tar.gz
+    cd WWW-WWWJDIC-0.001
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/WWW-WWWJDIC/issues>,
+
+or if you want to alter the source code of WWW::WWWJDIC, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/WWW-WWWJDIC>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Feb  2 16:08:34 2017.
+
+-----------------------------------------------------------------------------

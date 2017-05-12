@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 d4571552510c77433a4f2cca68ef0642144b1604 Changes
+SHA1 76f5dfa71ce9f6972479a579b83e2bb2ce7ba456 MANIFEST
+SHA1 6500089cdabeb6529281d163312f2e608f8cb225 META.json
+SHA1 148487b51064f93a97d69034a0cf5f12ed1bc715 META.yml
+SHA1 070210e36aa9ad5da95a0564d6d0625990cfd79b Makefile.PL
+SHA1 2ad62699cee213781c5708581feed4b5b663cdc3 README
+SHA1 4a48dbb7a95f2ebb1c62ecbc93a5e7c98506d4e1 lib/WWW/Search/Coveralia.pm
+SHA1 0722d7954a4adad7a111682af818caa0f48f746c lib/WWW/Search/Coveralia/Albums.pm
+SHA1 be9226628e352deaf43db34c0cc20a1da2a186f6 lib/WWW/Search/Coveralia/Artists.pm
+SHA1 d92edc698d5b4bc8360b202156c507e98808a794 lib/WWW/Search/Coveralia/Result/Album.pm
+SHA1 fadd6fabac6ce1613abdd999987696949773039e lib/WWW/Search/Coveralia/Result/Artist.pm
+SHA1 4b2e169409d2e618d90259056fdda3c4684afeb0 t/albums.t
+SHA1 179565de673ccd709d029e2166edb6ab021f3c4b t/artists.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJUXo7IAAoJEMoENb5ewbNikp8P/0jZyZ7VUZ9cDcVOyUdsTCRl
+D/P/xz6pNDGsizWfVSJroz0+XyeGdnUwNBQ1sXc/eI2Sh0zW3raNYAs+ltfLZaZl
+YFD3jW+yOyn6elC1FQaMSr9M7pi0nNHMrvp005Urd7VxYCb1Sb3s1iFmEi0jkIae
+gAyjhr7A6AkNbs65gYfZHYxlqcYFFJSEVvkeBVirr80pBjjHlwSdhRKPKDHdehLC
+6QBG15d1fd8HegDM9jquWCeJ14M0usQbNnq3a7+ePDx2wUeykDuONo/ro+pkB32Z
++/xoDbawmt1Hrjyno2om3y2OBksW2tLv7WrJG1Pp8Y67+aynuNxd/Dp8whaB2orI
+eJg6n0REzbBws8C0KUwFGh7FktyepEBjwd7Sx65lEC6hAIkf5DhLTFuFuI0+Io0H
+MPd/QV+kXh7ccIviyOvO6mGNNU/0KV//TGjCMIHoeoYNJnmw1HgB7PAYLqDKEyya
+5F4/vWvd+aPMd3VFYnVAMEh7S8I7rrserIW6QPD4+54+dQAllwTgJb5J9Q3yoFOa
+CJoUT38Ju6UnoQWB+rMYtOHW4h3sk7IW/ZzZ26TesLQHS+f9H+kwoz0MJel7sV8V
+taE+NFvTG9mUw7buiGhInnCAatTkMR95JYON96F+0bVw0D3yB48mZkqUp5xI90zV
+mXks1hHhrgYsaPuWrH6+
+=5Ixu
+-----END PGP SIGNATURE-----

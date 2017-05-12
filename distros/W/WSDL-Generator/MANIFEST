@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+README
+lib/WSDL/Generator.pm
+lib/WSDL/Generator/Schema.pm
+lib/WSDL/Generator/Binding.pm
+lib/WSDL/Generator/Base.pm
+test.pl
+WSDLTest.pm
+WSDLTest.wsdl
+HowTo-SOAPLite.txt
+META.yml                                 Module meta-data (added by MakeMaker)

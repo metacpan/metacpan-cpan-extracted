@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w -I../lib
+######################################################################
+# friend_changes
+# Sccsid:  %Z%  %M%  %I%  Delta: %G%
+# $Id: friend_changes,v 1.3 2006/01/18 01:59:34 grant Exp $
+######################################################################
+# Copyright (c) 2004 Grant Grueninger, Commercial Systems Corp.
+#
+# Description:
+
+#---------------------------------------------------------------------
+# Setup Variables
+
+# Debugging?
+#$DEBUG=0;
+
+#---------------------------------------------------------------------
+# Libraries
+
+use WWW::Myspace;
+use WWW::Myspace::FriendChanges;
+
+######################################################################
+# Main Program
+
+my $myspace = new WWW::Myspace;
+
+my $fc = new WWW::Myspace::FriendChanges( $myspace );
+
+my @added_friends = $fc->added_friends;
+
+my @deleted_friends = $fc->deleted_friends;
+
+print "Added " . @added_friends . " friends:\n";
+foreach $id ( @added_friends ) {
+	print $id. "\n";
+}
+
+print "Deleted " . @deleted_friends . " friends:\n";
+foreach $id ( @deleted_friends ) {
+	print $id. "\n";
+}
+
+# If they gave the -w flag, write the cache file out.
+if ( ( @ARGV ) && ( $ARGV[0] eq "-w" ) ) {
+	$fc->write_cache;
+}

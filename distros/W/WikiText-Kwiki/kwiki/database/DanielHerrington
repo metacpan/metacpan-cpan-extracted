@@ -1,0 +1,1 @@
+I'm a NE Portlander working for a consulting firm on Workload Automation Software. I've been doing more and more perl scripting in the last few years. Recently I've been trying to refactor my scripts to make them more object oriented. I'm definitely interested in building my perl knowledge.

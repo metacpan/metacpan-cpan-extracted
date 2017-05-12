@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/WWW/Search/Scrape.pm
+lib/WWW/Search/Scrape/Google.pm
+lib/WWW/Search/Scrape/Bing.pm
+lib/WWW/Search/Scrape/Yahoo.pm
+t/00-load.t
+t/01-scrape.t
+t/02-google.t
+t/03-bing.t
+t/pod-coverage.t
+t/pod.t
+t/samples/google-no-result.htm
+t/samples/google-result.html
+example/demo.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+Revision history for WWW-Mechanize-Plugin-FollowMetaRedirect
+
+0.03	Sun May 11 10:13:15 UTC 2014
+    * fixed tests for sleep problem on Win32.
+
+0.02    Tue Jun 25 04:48:48 UTC 2013
+
+    * added more test patterns, especially for single quote mark. (slinkingly thanks to @gcd_org)
+    * updated tests wholly.
+    * Switched to Test::More's done_testing style.
+    * Switched to Minilla.
+
+0.01    Thu Jun 12 07:34:57 UTC 2008
+
+    * First release.
+

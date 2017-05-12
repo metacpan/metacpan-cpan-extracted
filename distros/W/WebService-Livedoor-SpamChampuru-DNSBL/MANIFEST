@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/WebService/Livedoor/SpamChampuru/DNSBL.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-dnslookup.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

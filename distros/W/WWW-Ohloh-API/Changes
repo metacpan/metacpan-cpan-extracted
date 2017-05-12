@@ -1,0 +1,71 @@
+Revision history for WWW-Ohloh-API
+
+0.3.2 - 26 June 2012
+    * fix overloading tests [RT62023] 
+
+
+0.3.0 - Sun Aug 10 21:52:58 EDT 2008
+    * Repository object's url is now a URI object
+    * tests using Test::Exception skipped if T::E is not installed
+    * new tests using Test::Pod::Snippets
+    * In W:O:A:Stack, update_time is now a Time::Piece
+    * In W:O:A:Account, creation_time is now a Time::Piece
+    * In W:O:A:Repository, url is now a URI object, thanks
+        to Yuval Kogman.
+
+0.2.0 - Sun Jul 27 18:29:27 2008
+
+    * Brought in Yuval Kogman's fix to have Enlistments confirm to the
+        collection interface.
+    * Added W:O:A:Messages, W:O:A:Message and W:O:A:Message::Tag.
+    * Modified W:O:A:Languages to play nice with new paginated interface.
+
+0.1.0 Mon May  5 21:33:51 EDT 2008
+    * Added W:O:A:Stack, W:O:A:StackEntry and W:O:A:SizeFact.
+
+0.0.9 Wed Mar 12 21:10:09 EDT 2008
+    * Fixed bug in W:O:A:Factoid.
+    * Changed the wrapping of 5.10-tests to be eval "", not eval {}.
+    * Put online and author tests in their own directories.
+    
+
+0.0.8 Tue Mar 11 09:07:53 EDT 2008
+    * Wrapped Perl 5.10-specific test in eval{} so early Perls don't 
+        fail the test.
+
+0.0.7 Sun Mar  9 18:36:32 EDT 2008
+    * Added W:O:A:Enlistment, W:O:A:Repository and W:O:A:Factoid.
+    * Changed W:O:A:ContributorFact to reflect API change
+        (see http://www.ohloh.net/forums/3492/topics/835)
+
+0.0.6 Mon Jan 28 22:15:27 EST 2008
+    * Added W:O:A:Kudo and W:O:A:Kudos.
+
+0.0.5 Fri Jan 18 08:35:11 EST 2008
+    * Removed XML::Simple mention in tests.
+    * Removed test using Perl 5.10 features.
+
+0.0.4 Thu Jan 17 22:49:05 EST 2008
+    * Added W:O:A:ActivityFacts and W:O:A:ActivityFact.
+    * Dropped support for Perl 5.6.0.
+    * Added Build.PL dependency List::MoreUtils and Params::Validate, 
+        removed XML::Simple.
+    * Added dependency test for TEST_AUTHOR.
+
+0.0.3   Mon Jan 14 23:04:10 EST 2008
+    * Added Pod::Manual script in docs/manual.pl to generate pdf
+        manual.
+    * Added W:O:A:Language and W:O:A:Languages.
+    * Changed how Readonly is used in an attempt to please
+        Perl 5.6.
+    * Added missing dependencies.
+
+0.0.2   Wed Jan  9 21:30:59 EST 2008
+    * Added W:O:A::Project, W:O:A::Projects and W:O:A::Analysis.
+    * Internal: switched XML engine from XML::Simple to XML::LibXML.
+    * Added script to generate manual (via Pod::Manual).
+    * pod-coverage is no longer run by everyone.
+
+0.0.1   Wed Jan  2 16:24:48 2008
+    * Initial release.
+

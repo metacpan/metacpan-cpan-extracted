@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/WWW/Purolator/TrackingInfo.pm
+examples/track.pl
+t/00-load.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+t/01-track.t
+Makefile.PL
+META.yml
+META.json

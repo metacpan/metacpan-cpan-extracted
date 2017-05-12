@@ -1,0 +1,48 @@
+mRevision history for Perl extension WebService::GoogleHack.
+
+0.05  2004-12/08
+      * Updated documentation.
+
+0.06 2005-01/02
+     * Updated readme and install instructions.
+     * added ranking measure to sets of related words.
+     * 0.05 and previous modules had problem with perldoc, so made changes to that.
+
+0.07 2005-02/19
+     * Google-Hack now requires the use of the Brill-Tagger (Please refer to INSTALL file for more information on installing the Brill-Tagger).
+     * Added a function to read in a file of text, and return a list of positive and negative words.
+       FUNCTION NAME:  predictWordSentiment
+     * Updated the Review Classification function to use the Brill-Tagger.
+     * PLEASE MAKE SURE TO ADAPT NEW CONFIG FILE.
+     * Updated README and INSTALL Instructions.
+
+0.08 2005-03-13	      
+     * Google-Hack now	 requires the use of the Brill-Tagger if you are using the sentiment classification functions(Please refer to INSTALL file for more information on installing the Brill-Tagger).
+
+     * Updated the base  line algorithm function, wordClusterInPage to be soley based on frequency.
+
+0.09 2005-03-13	      
+     * Algorithm2 of Google-Hack is released in this version. This is a step better than the Algorithm1.
+		  - Accepts more than 2 terms
+		  - Has 3 relatedness scores
+		  - Accepts unigrams and 2-word collocation as input
+		  - Results also contain 2-word collocations
+		  - A score cutoff is also included along with frequency cutoff
+		  - A bigram cutoff is also included.
+
+0.1 2005-04-4
+    - Changed measureSemanticRelatedness1 from log(hits(w1)) + log(hits(w2)) -  log(hits(w1w2)) to log(hits(w1)) + log(hits(w2)) - 2 * log(hits(w1w2)).
+    - Updated README and PERLDOC.
+
+0.12 2005-04-07
+    - Trying to figure out the missing functions links
+
+0.13 2005-04-08
+   - Documentation updated
+
+0.14 2005-04-20
+   - Updated web interface and documentation
+
+0.15 2005-04-21
+   - Problem with Search.pm (a new function was incomplete - removed it 
+     for now)

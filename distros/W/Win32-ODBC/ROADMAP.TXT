@@ -1,0 +1,74 @@
+
+
+        +==========================================================+
+        |                                                          |
+        |              ODBC extension for Win32 Perl               |
+        |                                                          |
+        |                     ODBC.PM package                      |
+        |                                                          |
+        |              ------ Version 970208 -------               |
+        |                                                          |
+        |              by Dave Roth <rothd@roth.net>               |
+        |                                                          |
+        |                                                          |
+        |  Copyright (c) 1996-1997 Dave Roth. All rights reserved. |
+        |   This program is free software; you can redistribute    |
+        | it and/or modify it under the same terms as Perl itself. |
+        |                                                          |
+        +==========================================================+
+
+
+          based on original code by Dan DeMaggio <dmag@umich.edu>
+
+ Use under GNU General Public License or Larry Wall's "Artistic License"
+
+
+    ---------------------------------------------------------------------
+        CHECK OUT THE FAQ!!! HTTP://WWW.ROTH.NET/ODBC/ODBCFAQ.HTM
+    ---------------------------------------------------------------------
+
+    This package contains all you need to get Activeware's Win32 Perl
+    up and running with ODBC. It contains the essentials:
+
+    + \lib\auto\Win32\ODBC.PLL          The ODBC extention for builds
+                                        106 - 110.
+
+    + \beta\lib\auto\Win32\ODBC.PLL     The ODBC extension for builds 303
+                                        and higher.
+
+    + \lib\Win32\ODBC.pm                The ODBC wrapper package.
+    --------------------------------
+    + README.TXT                        The instructions -- kinda'!    
+    + TEST.PL                           ODBC extention test perl script.
+    + ODBCTest.mdb                      Test Access database.
+    + docs\*.htm                        Documentation in HTML format.
+                                        -----------------------------
+                                        Special thanks to:
+                                            Joseph L. Casadonte Jr.
+                                            <joc@netaxs.com>
+                                        THESE DOCS may be outdated.
+
+                                        Check them  out  for changes
+                                        at the Win32::ODBC homepage:
+                                           http://www.roth.net/odbc/
+
+
+    Please report bugs to <rothd@roth.net>.
+
+    This package was built using Win NT 4.0, Visual C++ 2.2 using Win32
+    Perl build 110/303. This package was compiled for the 486 processor
+    (I presume that most using this will be using at least a  486). All
+    tests have been run successfully on my platform.
+    
+    READ THE README.TXT FILE!
+    ---- --- ---------- ----
+
+
+
+    Dave Roth <rothd@roth.net>
+	Roth Consulting
+	http://www.roth.net/
+    -------------------------------------------------------------------
+
+
+.

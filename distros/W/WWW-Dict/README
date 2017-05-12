@@ -1,0 +1,32 @@
+WWW-Dict version 0.0.1
+======================
+
+This module is the base class for WWW::Dict::* modules, also a loder
+class for them. It doesn't query to any dictionary website itself, but
+only dispatch request to a proper subclass.
+
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+============
+
+This module requires UNIVERSAL::require and Perl v5.8.0 or later.
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2006, Kang-min Liu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

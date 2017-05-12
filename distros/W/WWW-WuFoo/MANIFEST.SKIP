@@ -1,0 +1,4 @@
+\B\.git\b
+\.gitignore$
+\B\.gitignore\b
+

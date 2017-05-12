@@ -1,0 +1,35 @@
+---
+name: WWW-Arbeitsagentur
+version: 0.02
+author:
+  - Ingo Wiarda
+abstract: Search for jobs via arbeitsagentur.de
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Digest::SHA: 5.34
+  HTTP::Cookies: 1.39
+  WWW::Mechanize: 1.18
+provides:
+  WWW::Arbeitsagentur:
+    file: lib/WWW/Arbeitsagentur.pm
+    version: 0.02
+  WWW::Arbeitsagentur::Applicant:
+    file: lib/WWW/Arbeitsagentur/Applicant.pm
+    version: 0.3
+  WWW::Arbeitsagentur::Arbeitnehmer:
+    file: lib/WWW/Arbeitsagentur/Arbeitnehmer.pm
+    version: 0.0.1
+  WWW::Arbeitsagentur::Search:
+    file: lib/WWW/Arbeitsagentur/Search.pm
+    version: 0.0.1
+  WWW::Arbeitsagentur::Search::FastSearchForWork:
+    file: lib/WWW/Arbeitsagentur/Search/FastSearchForWork.pm
+    version: 0.0.1
+  WWW::Arbeitsagentur::Search::Filter:
+    file: lib/WWW/Arbeitsagentur/Search/Filter.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

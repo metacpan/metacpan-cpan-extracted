@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Meta-XML-Browser
+version:      0.08
+version_from: Browser.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   0
+    HTTP::Cookies:                 0
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    Time::HiRes:                   0
+    URI::Escape:                   0
+    XML::LibXML:                   0
+    XML::LibXSLT:                  
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

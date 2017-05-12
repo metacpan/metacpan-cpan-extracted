@@ -1,0 +1,36 @@
+{
+  "results_start": 1,
+  "event": [
+    {
+      "limit": 5,
+      "users": [
+        {
+          "profile_url": "http//example.com/aaa",
+          "status": "1",
+          "nickname": "AAA",
+          "user_id": "123"
+        },
+        {
+          "profile_url": "http//example.com/bbb",
+          "status": "1",
+          "nickname": "BBB",
+          "user_id": "456"
+        },
+        {
+          "profile_url": "http//example.com/ccc",
+          "status": "1",
+          "nickname": "CCC",
+          "user_id": "789"
+        }
+      ],
+      "title": "Sample Event",
+      "updated_at": "2013-02-11T14:28:57Z",
+      "accepted": 3,
+      "pay_type": "1",
+      "event_url": "http://www.zusaar.com/event/999999",
+      "waiting": 0,
+      "event_id": "999999"
+    }
+  ],
+  "results_returned": 1
+}

@@ -1,0 +1,28 @@
+Win32-SystemInfo-CpuUsage version 0.01
+======================================
+
+Win32::SystemInfo::CpuUsage is designed for monitoring CPU usage and
+return the value in percentage. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+- A C compiler. This module is verified in VC++ 6.
+
+CHANGE LOGs
+- Add platform checking in Makefile.PL
+
+
+Copyleft (C) 2007 by Jing Kang (kxj@hotmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

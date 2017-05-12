@@ -1,0 +1,28 @@
+Revision history for Perl module WWW::HostipInfo
+
+0.14 Fri Dec 14 15:49:08 2012
+    - modified test file for the change of hostip.info server
+
+0.13 Tue Dec  4 17:00:24 2012
+    - modified test file for the change of hostip.info ip
+
+0.12 Wed Mar 17 17:52:01 2010
+    - added missing META.yml
+
+0.11 Wed Mar 17 16:21:31 2010
+    - enhanced info parsing part
+
+0.10 Mon Nov  9 16:57:22 2009
+    - changed API url.
+    - remove guess() function.
+    - new() accepts a hash option.
+    - added url(), ua()
+
+0.08 Sun Oct 16 17:07:23 2005
+    - added guess() function for unknown cities.
+    - now don't use API when the ip address is private.
+    - added country accessor (an alias to contry_name) into Info class.
+
+0.05 Wed Oct 12 10:28:06 2005
+    - released version; created by ExtUtils::ModuleMaker 0.43
+

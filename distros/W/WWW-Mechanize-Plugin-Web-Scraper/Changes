@@ -1,0 +1,11 @@
+Revision history for Perl module WWW::Mechanize::Plugin::Web::Scraper
+
+0.02 2009/02/04
+    - Feeding HTTP::Response to Web::Scraper. Let MIYAGAWA handle encoding ;-)
+      (thanks Y.Suzuki!)
+    - Fixed missing quote in example in POD (thanks Joffie!)
+
+0.01 2008/06/11
+    - original version
+
+

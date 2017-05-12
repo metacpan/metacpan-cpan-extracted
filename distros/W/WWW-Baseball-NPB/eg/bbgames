@@ -1,0 +1,14 @@
+#!/usr/local/bin/perl -w
+use strict;
+use WWW::Baseball::NPB;
+
+my $baseball = WWW::Baseball::NPB->new;
+my @games  = $baseball->games;
+
+for my $game (@games) {
+    my $home    = $game->home;
+    my $visitor = $game->visitor;
+    printf "%s %s - %s %s (%s) [%s]\n",
+	$home, $game->score($home), $game->score($visitor),
+	    $visitor, $game->status, $game->stadium;
+}

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+examples/build_publishing_point.pl
+lib/Win32/WindowsMedia.pm
+#lib/Win32/WindowsMedia/Control.pm
+#lib/Win32/WindowsMedia/Information.pm
+#lib/Win32/WindowsMedia/Provision.pm
+lib/Win32/WindowsMedia/BaseVariables.pm
+t/00-load.t

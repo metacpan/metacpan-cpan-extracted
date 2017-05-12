@@ -1,0 +1,87 @@
+Win32-FTDI-FTD2XX version 1.02
+==============================
+$Id: README,v 1.5 2008/11/17 15:00:38 395502 Exp $
+==============================
+
+Win32::FTDI::FTD2XX provides a Perl5 interface to FTDI's D2XX Direct USB 
+Drivers (CDM 2.04.06 as of this writing). It comes in two major components, 
+the FTD2XX.pm module and an encapsulation and abstraction library, called
+P5FTD2XX.DLL, which wraps the FTDI FTD2XX.DLL, providing a cleaner interface
+which works better with Win32::API.
+
+For instance, the simpler parameter passing mechanisms of Win32::API were
+never meant to handle things like (de)referencing and passing of pointers to
+pointers to buffers etc. The native FT_Open() driver function requires this
+to open the device handle, which then becomes the primary identifier for the
+connection to the rest of the API routines. Even when trying to pass the
+returned pointer around as an opaque datatype when returned through
+Win32::API, it fails to be recognized as a valid handle by the FT library,
+since the underlying pointer type's value/meaning gets mangled.
+
+The P5FTD2XX Windows DLL abstracts the more complicated API calls and
+datatypes (like wrapping 'FT_HANDLE' with 'PFT_HANDLE') and provides 
+other extensions to allow Perl to more conveniently interact with the
+FTDI devices using the native CDM drivers instead of the Virtual Comm Port
+(VCP), which can be problematic on Windows when trying to use older
+interfaces like Win32::CommPort or Win32::Serial.
+
+The Win32::FTDI Perl object further abstracts and extends the API to make it
+most convenient for the Perl programming space, and looks after allocating &
+deallocating the PFT_HANDLEs and packed datatypes for parameter passing. In
+general, any export (see EXPORTS below) beginning with 'FT' is a direct Perl
+derivative of the original typedef's and #define's from the FTD2XX.H file.
+Any export prefixed with 'PFT' is an extension provided by the
+Win32::FTDI::FTD2Xxx.pm/P5FTD2XX DLL package.
+
+Many of the native FT API's have been completely preserved, such as
+'(P)FT_SetDataCharacteristics', others, like the multi-function 'FT_Open',
+have been divided into simpler dedicated interfaces as 'PFT_OpenBySerial'
+and 'PFT_OpenByIndex' (Note: The object interface methods do not require the
+'PFT_' prefix, except where noted). Other convenience methods have been added,
+like 'waitForModem( bitmask )' and the 'crack...' methods which extract
+bit fields from FT status bytes for you if you don't care to use the values
+directly.
+
+Note: For performance gains at load time, each object method is autosplit/
+autoloaded on demand, at which time each API Method also imports the actual 
+API function from the DLL. 
+
+The entire package was developed and tested using an FTDI UM232R USB to 
+Serial Bridge device, with an Atmel ATMegaX8 AVR microcontroller backend.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+The FTDI/FTD2XX Drivers, at least CDM 2.04.06, must be installed in
+conjunction with this module for it to be functional (and, obviously, to get
+very far, you'll need an FTDI device plugged into your USB bus...)
+
+The perl object uses Win32::API (v0.55 on my ActiveState 5.8.8 build) to
+interface with the P5FTD2XX DLL, which will be copied to the windows
+system32 directory alongside the FTD2XX DLL.  If you seem to get 
+'INVALID_API' returned from almost all methods, the P5FTD2XX DLL probably
+can't be found. Copy it manually from the {PerlRoot}/site/lib/Win32/FTDI
+directory to {SystemRoot}/System32 directory, or make sure your PATH 
+statement includes {PerlRoot}/site/lib/Win32/FTDI.
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2008 by Scott K. MacPherson, Akron, Ohio
+<skmacphe@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

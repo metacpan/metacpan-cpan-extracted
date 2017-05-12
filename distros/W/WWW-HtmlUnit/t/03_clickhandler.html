@@ -1,0 +1,8 @@
+<html>
+<head><title>Test Page</title></head>
+<body onload="alert('load alert');">
+    
+</body>
+    <input type="submit" value="submit" id="submit" onclick="var rtn = confirm('clicked'); var content = document.getElementById('content'); if (rtn) { content.innerHTML = 'I am confirmed!'; } else { content.innerHTML = 'I was denied!'; } return;">
+    <div id='content'></div>
+</html>

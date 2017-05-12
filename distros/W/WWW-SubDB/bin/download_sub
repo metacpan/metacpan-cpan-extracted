@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use WWW::SubDB;
+
+
+##############################################################################
+# This script is used to downlaod the subtitle for a given movie file
+#
+# Usage: download_sub <movie_file> <languages>
+#
+#   examploe: download_sub movie.mp4 en,pt 
+#
+#   it will automatically create the file movie.srt
+# 
+#
+################################################################
+
+
+my $subdb = WWW::SubDB->new( debug => 0);
+
+
+
+my $file = shift || die;
+my $lang = shift || 'en';
+
+if (!-e $file) {
+    die 'file not found';
+}
+
+my @tok = split(/\./, $file);
+pop @tok;
+push @tok, 'srt';
+
+my $srt_file = join('.', @tok);
+
+if (-e $srt_file) {
+    die 'srt file already exists'
+}
+
+my $s = $subdb->download($file, $lang);
+if ($subdb->error) {
+    die "Wasn't able to find the subtitle";
+}
+
+open(my $fh, ">", $srt_file);
+print $fh $s;
+close($fh)
+
+
+

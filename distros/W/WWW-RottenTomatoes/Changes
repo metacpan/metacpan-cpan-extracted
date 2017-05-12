@@ -1,0 +1,11 @@
+Revision history for WWW::RottenTomatoes
+
+0.03      2011-05-15 00:41:26 America/Los_Angeles
+    - added method (movie_similar) "Shows similar movies for a movie"
+    - updated documentation
+
+0.02      2011-05-04 00:25:24 America/Los_Angeles
+    - updated documentation
+
+0.01      2011-04-16 14:23:35 America/Los_Angeles
+    - initial commit

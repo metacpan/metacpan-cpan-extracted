@@ -1,0 +1,88 @@
+=head1 NAME
+
+WWW::SourceForge - Interfaces to the SourceForge data API
+
+=head1 SYNOPSIS
+
+The WWW::SourceForge family of modules are intended to implement the API
+documented at https://sourceforge.net/p/forge/documentation/API/
+
+While this isn't an "official" SourceForge project, I am a SourceForge
+employee, and maintain these as part of my job. I also use these modules as part
+of my daily tasks, and so I have an interest in making them work well.
+
+These are part of a larger package of tools
+(https://sourceforge.net/projects/sfprojecttools/) including
+greasemonkey scripts, and hopefully some day other implementations of
+the API (PHP and Python would be a winner).
+
+=head1 USAGE
+
+=head2 WWW::SourceForge::User
+
+ Usage: 
+ 
+    my $user = new WWW::SourceForge::User( id => 1234 );
+    my $user2 = new WWW::SourceForge::User( username => 'rbowen' );
+    my @projects = $user->projects(); # WWW::SourceForge::Project objects
+
+=head2 WWW::SourceForge::Project
+
+ Usage: 
+ 
+    my $proj = new WWW::SourceForge::Project( id => 1234 );
+    my $proj2 = new WWW::SourceForge::Project( name => 'flightics' );
+
+    my @admins = $proj->admins(); # WWW::SourceForge::User objects
+    my @developers = $proj->developers(); # Ditto
+
+    # WARNING: This method is probably going to change in the future to
+    # return more detailed download data. Check docs frequently.
+    my $download_count = $proj->downloads(
+        start_date => '2012-07-01',
+        end_date   => '2012-07-25'
+    );
+
+    # WARNING: This method is probably going to change in the future so
+    # that we can return actual File or Release objects. Still to be
+    # decided. Check docs frequently.
+    my @files = $proj->files();
+    my $date_string = $proj->latest_release();
+
+=head2 WWW::SourceForge::Release (future?)
+
+=head1 AUTHOR
+
+    Rich Bowen
+    CPAN ID: RBOW
+    SourceForge Community Manager
+    rbowen@apache.org
+
+=head1 SOURCE
+
+The source is in Git on SourceForge: https://sourceforge.net/p/sfprojecttools/code/
+Patches make me happy.
+
+=head1 SUPPORT
+
+https://sourceforge.net/p/sfprojecttools/tickets/
+
+=head1 HISTORY
+
+A WWW::SourceForge module was originally developed by Kang-min Liu
+(gugod@gugod.org), which utilized WWW::Mechanize to retrieve project
+information from SourceForge project pages. With the many changes to the
+SourceForge website, that module gradually fell out of usefulness. With
+the new(ish) SourceForge data API, we have a means of accessing this
+data without having to parse HTML. But many thanks to Kang-min Liu for
+his early effort, and for his cooperation with me.
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

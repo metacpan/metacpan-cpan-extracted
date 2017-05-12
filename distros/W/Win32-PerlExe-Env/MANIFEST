@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Copyright
+t/Win32-PerlExe-Env.t
+t/pod.t
+t/pod_coverage.t
+lib/Win32/PerlExe/Env.pm
+examples/01_Win32-PerlExe-Env.pl
+win32/res/icons/ActiveState.ico
+win32/res/icons/Camel.ico
+win32/res/icons/Copyright
+win32/res/icons/Get_Info.ico
+win32/Win32-PerlExe-Env.bat
+win32/Win32-PerlExe-Env.exe
+win32/Win32-PerlExe-Env.perlapp
+win32/Win32-PerlExe-Env.pl
+META.yml                                 Module meta-data (added by MakeMaker)

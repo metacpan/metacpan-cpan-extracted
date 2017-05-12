@@ -1,0 +1,80 @@
+WWW::Scripter::Plugin::JavaScript::SpiderMonkey 0.003 (alpha)
+
+A SpiderMonkey back end for WWW::Scripter’s JavaScript plugin
+
+
+CHANGES IN THIS RELEASE
+
+• A circular reference preventing the  window  (WWW::Scripter)  object
+  from being freed has been fixed.
+• Perl 5.8.8 no longer crashes on exit.
+
+
+INSTALLATION
+
+The easiest way to install this module is to  use  the  cpan  script:
+
+    [sudo] cpan WWW::Scripter::Plugin::JavaScript::SpiderMonkey
+
+Or you can use the following  (after installing the prerequisite  mod-
+ules listed below):
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+If that does not all go smoothly,  make sure  you  have  SpiderMonkey
+installed in a place where JavaScript.pm can find it. The procedure I
+use on Mac OS X is as follows (this will need to be adjusted slightly
+for other Unixes,  and a lot for Windows -- sorry I can’t help more):
+
+First download one of the js-* files at ftp://ftp.mozilla.org/pub/js/.
+Then run:
+
+    tar xzf js-<version>.tar.gz
+    cd js/src
+    make -f Makefile.ref
+    sudo mv Darwin_DBG.OBJ/* /usr/local/lib
+
+
+DEPENDENCIES
+
+This module requires:
+
+- perl 5.8.3 or higher (5.8.6 or higher recommended)
+
+- JavaScript.pm 1.12 or higher
+
+- HTML::DOM 0.008 or higher
+
+- WWW::Scripter 0.016 or higher
+
+- Hash::Util::FieldHash::Compat
+
+- constant::lexical
+
+- URI
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc  command,  although you will  probably  find  the  JavaScript
+plugin’s docs to be more helpful:
+
+    perldoc WWW::Scripter::Plugin::JavaScript::SpiderMonkey
+    perldoc WWW::Scripter::Plugin::JavaScript
+
+Or try using man (it’s faster, in my experience):
+
+    man WWW::Scripter::Plugin::JavaScript::SpiderMonkey
+    man WWW::Scripter::Plugin::JavaScript
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2010-11 Father Chrysostomos
+
+This program is free software;  you may redistribute it, modify it or
+both under the same terms as perl.

@@ -1,0 +1,9 @@
+#!/bin/bash
+xclip -o
+echo
+echo -e "Ok to send the above? (Ctrl+C if no, Enter for yes) "
+read answer
+nopaste cp
+echo xclip -o yields:
+xclip -o
+echo

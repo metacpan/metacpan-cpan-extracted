@@ -1,0 +1,22 @@
+---
+abstract: 'Expand any URL shortener link'
+author:
+  - 'Konrad Borowski <x.fix@o2.pl>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Expand
+requires:
+  Carp: '0'
+  Exporter: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  strictures: '1'
+version: 0.1.5

@@ -1,0 +1,109 @@
+-----------------------------------------------------------------------------
+| Want v0.29    - Robin Houston, 2016-02-26
+-----------------------------------------------------------------------------
+
+For full documentation, see the POD included with the module.
+Below is a brief extract of the documentation, to give you an
+idea of what this module does. It requires Perl version 5.6 or
+later.
+
+
+NAME
+       Want - Implement the `want' command
+
+SYNOPSIS
+         use Want;
+         sub foo :lvalue {
+             if    (want(qw'LVALUE ASSIGN')) {
+               print "We have been assigned ", want('ASSIGN');
+               lnoreturn;
+             }
+             elsif (want('LIST')) {
+               rreturn (1, 2, 3);
+             }
+             elsif (want('BOOL')) {
+               rreturn 0;
+             }
+             elsif (want(qw'SCALAR !REF')) {
+               rreturn 23;
+             }
+             elsif (want('HASH')) {
+               rreturn { foo => 17, bar => 23 };
+             }
+             return
+         }
+
+DESCRIPTION
+       This module generalises the mechanism of the wantarray
+       function, allowing a function to determine in some detail
+       how its return value is going to be immediately used.
+
+       ...
+
+EXAMPLES
+
+    use Carp 'croak';
+    use Want 'howmany';
+    sub numbers {
+        my $count = howmany();
+        croak("Can't make an infinite list") if !defined($count);
+        return (1..$count);
+    }
+    my ($one, $two, $three) = numbers();
+
+
+    use Want 'want';
+    sub pi () {
+        if    (want('ARRAY')) {
+            return [3, 1, 4, 1, 5, 9];
+        }
+        elsif (want('LIST')) {
+            return (3, 1, 4, 1, 5, 9);
+        }
+        else {
+            return 3;
+        }
+    }
+    print pi->[2];      # prints 4
+    print ((pi)[3]);    # prints 1
+
+
+    use Want;
+    use strict;
+    sub backstr :lvalue {
+        if (want(qw'LVALUE ASSIGN')) {
+            my ($a) = want('ASSIGN');
+            $_[0] = reverse $a;
+            lnoreturn;
+        }
+        elsif (want('RVALUE')) {
+            rreturn scalar reverse $_[0];
+        }
+        else {
+            carp("Not in ASSIGN context");
+        }
+        return
+    }
+ 
+    print "foo -> ", backstr("foo"), "\n";	# foo -> oof
+    backstr(my $robin) = "nibor";
+    print "\$robin is now $robin\n";		# $robin is now robin
+
+
+AUTHOR
+       Robin Houston, <robin@cpan.org>
+       
+       Thanks to Damian Conway for encouragement and good
+       suggestions, and to Father Chrysostomos and Matthew
+       Horsfall for patches.
+
+SEE ALSO
+       o   the wantarray entry in the perlfunc manpage
+
+       o   Perl6 RFC 21, by Damian Conway.
+           http://dev.perl.org/rfc/21.html
+
+COPYRIGHT
+       Copyright (c) 2001-2012, Robin Houston. All Rights Reserved.
+       This module is free software. It may be used, redistributed
+       and/or modified under the same terms as Perl itself.

@@ -1,0 +1,21 @@
+TYPEMAP
+DWORD				T_HANDLE
+HKEY				T_HANDLE
+HANDLE			        T_HANDLE
+PPERF_DATA_BLOCK		T_PTROBJ
+PPERF_OBJECT_TYPE		T_PTROBJ
+PPERF_INSTANCE_DEFINITION	T_PTROBJ
+PPERF_COUNTER_DEFINITION	T_PTROBJ
+PPERF_COUNTER_BLOCK		T_PTROBJ
+
+#############################################################################
+INPUT
+
+T_HANDLE
+        $var = INT2PTR($type, SvIV($arg))
+
+#############################################################################
+OUTPUT
+
+T_HANDLE
+        sv_setiv($arg, PTR2IV($var));

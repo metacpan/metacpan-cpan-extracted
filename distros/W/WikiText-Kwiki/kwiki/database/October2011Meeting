@@ -1,0 +1,11 @@
+  Thu. October 13th, 6:53pm at FreeGeek – 1731 SE 10th Ave.
+
+= Shebangml: a markup language with bacon
+
+speaker: EricWilhelm
+
+Shebangml is a [markup language http://search.cpan.org/dist/Shebangml/lib/Shebangml/Syntax.pod] which saves programmers from gouging their eyes out on pointy angle brackets.  Most pointy ML data (SGML/XML/XHTML/HTML) can be translated to and from this human-readable, bacony syntax.  This allows modern programmers to interface with legacy software such as WWW browsers and other relics like "Enterprise Java Software".  But the true power of shebangml lies in the '#!' (hash-bang/shebang) and its programmable templating features.
+
+Unlike most "don't make me write HTML" generators and markup replacements, hbml preserves the good parts of the quoting constructs and attributes+content nature of XML.  This makes it not only a fine replacement for obsolete markup languages, but also an ideal foundation for new dialects and applications.  The pluggable syntax and interpreter allow you to define static or dynamically loadable constructs, which allows your application to balance convenience features with security issues using clear separations.
+
+This presentation will cover the Shebangml syntax, the basics of the parser/interpreter module, the extensions API, and two real-world applications (the !FreeTUIT declarative GUI toolkit and the presentation generator Text::Slidez.)

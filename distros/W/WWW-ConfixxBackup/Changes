@@ -1,0 +1,69 @@
+Revision history for Perl extension WWW::ConfixxBackup.
+
+0.1001 Thu Nov 06 11:36
+    + changed order in Changes
+    + fixed the can_ok calls in
+        * 01_*.t
+        * 02_*.t
+        * 03_*.t
+        * 10_*.t
+        * 11_*.t
+        * 12_*.t
+    + fixed the filter in 
+        * 97_*.t 
+    + fixed version checks in
+        * 13_*.t
+        * 14_*.t
+
+0.10  Mon Nov 03 11:57:23
+    + fixed a bug in 06_*.t that caused the test to fail
+
+0.09  Wed Jan 02 13:36:13 2008
+    + added "file_prefix" to enable parallel downloads
+    + added "_detect_version" for automatic "confixx_version" detection (when confixx_version is not set)
+    + added tests:
+        * t/09_file_prefix.t
+        * t/10_check_can_ok.t
+        * t/11_can_ok_Confixx.t
+        * t/12_can_ok_FTP.t
+        * t/13_detect_version.t
+        * t/14_detect_version_2.t
+    + added debug() to WWW::ConfixxBackup, WWW::ConfixxBackup::Confixx, WWW::ConfixxBackup::FTP
+    + added DEBUG() to WWW::ConfixxBackup, WWW::ConfixxBackup::Confixx, WWW::ConfixxBackup::FTP
+    + added some debugging stuff
+
+0.0801 Sat Dec 29 12:55:31 2007
+    + use binary mode for FTP transfer
+
+0.08  Fri Dec 28 09:12:13 2007
+    + added new functionality:
+       + confixx_version
+       + available_confixx_versions
+       + default_confixx_version
+    + added new test:
+       + 08_confixx_version.t
+
+0.07  Tue Sep 18 11:11:11 2007
+    - bugfix: ConfixxBackup.pm / now you can pass parameters to constructor
+    - pod: fixed some typos in documentation
+
+0.06  Mon Dec 18 11:00:05 2006
+    - bugfix: 99_pod_coverage.t
+
+0.05  Fri Dec 08 10:17:16 2006
+    - added: 97_manifest.t
+    - added: 98_boilerplate.t
+    - added: 99_pod.t
+    - added: 99_pod_coverage.t
+    - added: LICENSE field in Makefile.PL
+    
+0.03  Tue Jun 20 20:04:33 2006
+    - bug in test script fixed
+        
+0.02  Sat Jun 17 23:58:52 2006
+    - bug fixed in WWW::ConfixxBackup::Confixx.pm
+    - new method wait()
+
+0.01  Wed Feb 22 11:07:34 2006
+    - original version; created by h2xs 1.23 with options
+        -b 5.6.1 -XA -n WWW::ConfixxBackup

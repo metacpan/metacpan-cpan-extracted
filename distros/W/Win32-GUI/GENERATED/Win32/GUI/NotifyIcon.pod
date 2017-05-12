@@ -1,0 +1,279 @@
+
+=head1 NAME
+
+Win32::GUI::NotifyIcon - Create and manipulate icons and tooltips in the system tray
+
+=head1 DESCRIPTION
+
+The functionality of Win32::GUI::NotifyIcon is affected by the version
+of shell32.dll installed with the windows system running your script. You
+can find this version from $Win32::GUI::NotifyIcon::SHELLDLL_VERSION,
+which contains the major version number of the shell32.dll library that
+has been loaded.
+
+=for comment $Id: per_package_method_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 METHODS
+
+L<Common methods|Win32::GUI::Reference::Methods> apply to most windows, controls and resources.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 new
+
+B<new(PARENT, %OPTIONS)>
+
+Creates a new NotifyIcon (also known as system tray icon) object;
+can also be called as PARENT->AddNotifyIcon(%OPTIONS).
+
+B<%OPTIONS> are:
+
+    -icon => Win32::GUI::Icon object
+        the icon to display in the taskbar
+    -name => STRING
+        the name for the object
+    -tip => STRING
+        the text that will appear as a tooltip when the mouse is
+        hovering over the NotifyIcon.  For shell32.dll versions prior
+        to 5.0 the text length is limited to 63 characters;  For
+        later versions it is limited to 127 characters.  The string
+        provided will be truncated as necessary.
+    -event => NEM Event Hash
+       Set NEM event handler (you can also use -on Event Option).
+
+For shell32.dll version 5.0 and later balloon tooltips can be used,
+the following options control balloon tooltips.  If your version
+of shell32.dll does not support balloon tooltips, then these options
+are silently ignored:
+
+    -balloon => 0/1
+       A flag controlling whether the ballon tip is displayed by
+       new() or Change(), or whether the ShowBalloon() method
+       must be called to display the balloon tooltip.  Defaults
+       to 0 (not displayed).
+    -balloon_tip => STRING
+       Sets the text that will appear in the body of the balloon tip.
+       Will cause the balloon tip to be removed from the screen if set
+       to the empty string and displayed. The string is limited to
+       255 characters and will be truncated as necessary.
+    -balloon_title => STRING
+       Sets the text that appears as a title at the top of the balloon
+       tip. The string is limited to 63 characters and will be truncated
+       as necessary.
+    -balloon_icon  => STRING
+       Sets the icon that is displayed next to the balloon tip title. If
+       the balloon tip title is not set (or is set to the empty string),
+       then no icon is displayed.  Allowed values for STRING are:
+       error, info, warning, none.  Defaults to 'none'.
+   -balloon_timeout => NUMBER
+       The maximum time for which a balloon tooltip is displayed before
+       being removed, in milliseconds.  The system will limit the range
+       allowed (typically to between 10 and 30 seconds).  If a balloon
+       is being displayed and another taskbar icon tries to display a
+       balloon tip, then the one being displayed will be removed after
+       it has been displayed for the system minimum time (typically 10
+       seconds), and only then will the new tooltip be displayed.
+       Defaults to 10 seconds.
+
+Returns a Win32::GUI::NotifyIcon object on success, undef on failure
+
+See also the L<common options|Win32::GUI::Reference::Options>.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Change
+
+B<Change(%OPTIONS)>
+
+Change all options. See L<new Win32::GUI::NotifyIcon()|Win32::GUI::NotifyIcon/new>.
+
+Returns 1 on success, 0 on failure
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Delete
+
+B<Delete()>
+
+Deprecated method for removing notify icon from the system tray.  Will be
+removed from future Win32::GUI versions without further warning.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 HideBalloon
+
+B<HideBalloon([FLAG=1])>
+
+Only supported by shell32.dll v5.0 and above
+
+Show or hide a balloon tooltip with details supplied from the new() or
+Change() methods, using the -balloon_tip, -balloon_title, -balloon_timeout
+and -balloon_icon options.
+
+Set B<FLAG> to a false value to display the balloon tooltip, or to a true
+value to hide the tip (it will automatically be hidden by the system
+after -balloon_timeout millseconds).  If B<FLAG> is omitted, hides the
+tooltip.  If the tooltip is already showing, re-showing it queues
+a new balloon tooltip to be displayed once the existing one times out.
+
+Returns 1 on success, 0 on failure or undef if not supported.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Remove
+
+B<Remove()>
+
+Remove the Notify Icon from the system tray, and free its related resources
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetBehaviour
+
+B<SetBehaviour([FLAG])>
+
+Only supported by shell32.dll v5.0 and above
+
+Set FLAG to a true value to get the Windows 2000 taskbar behaviour. set
+FLAG to a flase value to get Windows 95 taskbar behaviour.  See the MSDN
+documentation for Shell_NotifyIcon for more details.
+
+Returns 1 on success, 0 on failure and undef if not supported.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 SetFocus
+
+B<SetFocus()>
+
+Only supported by shell32.dll v5.0 and above
+
+Return focus to the taskbar notification area.  For example if the
+taskbar icon displays a shortcut menu and the user cancels the menu
+with ESC, then use this method to return focus to the taskbar
+notification area.
+
+Returns 1 on success, 0 on failure and undef if not supported.
+
+=for comment $Id: per_package_method.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 ShowBalloon
+
+B<ShowBalloon([FLAG=1])>
+
+Only supported by shell32.dll v5.0 and above
+
+Show or hide a balloon tooltip with details supplied from the new() or
+Change() methods, using the -balloon_tip, -balloon_title, -balloon_timeout
+and -balloon_icon options.
+
+Set B<FLAG> to a true value to display the balloon tooltip, or to a false
+value to hide the tip (it will automatically be hidden by the system
+after -balloon_timeout millseconds).  If B<FLAG> is omitted, displays the
+tooltip.  If the tooltip is already showing, re-showing it queues
+a new balloon tooltip to be displayed once the existing one times out.
+
+Returns 1 on success, 0 on failure or undef if not supported.
+
+
+
+
+=for comment $Id: per_package_event_section.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head1 EVENTS
+
+L<Common events|Win32::GUI::Reference::Events> apply to most windows and controls.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 Click
+
+B<Click()>
+
+Sent when the user clicks the left mouse button on
+a NotifyIcon.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 DblClick
+
+B<DblClick()>
+
+Sent when the user double clicks the left mouse button on
+a NotifyIcon.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MiddleClick
+
+B<MiddleClick()>
+
+Sent when the user clicks the middle mouse button on
+a NotifyIcon.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MiddleDblClick
+
+B<MiddleDblClick()>
+
+Sent when the user double clicks the middle mouse button on
+a NotifyIcon.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 MouseEvent
+
+B<MouseEvent(MSG)>
+
+Sent when the user performs any other mouse event on
+a NotifyIcon; MSG is the message code.
+For shell.dll greater than V6 will also fire for balloon
+events.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RightClick
+
+B<RightClick()>
+
+Sent when the user clicks the right mouse button on
+a NotifyIcon.
+
+=for comment $Id: per_package_event.tpl,v 1.3 2006/03/16 21:11:13 robertemay Exp $
+
+=head2 RightDblClick
+
+B<RightDblClick()>
+
+Sent when the user double clicks the right mouse button on
+a NotifyIcon.
+
+
+
+
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/per_package.tpl> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

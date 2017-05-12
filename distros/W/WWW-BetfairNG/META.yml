@@ -1,0 +1,29 @@
+---
+abstract: 'Object-oriented Perl interface to the Betfair JSON API'
+author:
+  - 'Myrddin Wyllt <myrddinwyllt@tiscali.co.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-BetfairNG
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.26'
+  HTTP::Tiny: '0.049'
+  IO::Socket::SSL: '1.56'
+  IO::Uncompress::Gunzip: '2.06'
+  JSON::MaybeXS: '1.002002'
+  Net::Ping: '0'
+  Net::SSLeay: '1.49'
+  perl: '5.010001'
+version: '0.14'

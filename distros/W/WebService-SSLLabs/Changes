@@ -1,0 +1,83 @@
+Revision history for WebService-SSLLabs
+
+0.27   Mon May 01 18:48:00 2016
+	updated README
+
+0.26   Mon May 01 18:26:00 2016
+	correcting Synopsis section
+
+0.25   Mon Nov 21 19:14:00 2016
+	adding version for URI::Escape dependency
+
+0.24   Sun Nov 20 20:33:00 2016
+	adding support kx_info to Simulation
+
+0.23   Tue Sep 20 20:47:00 2016
+	adding support for must_staple to Cert, protocol_intolerance, misc_intolerance to EndPointDetails
+
+0.22   Wed Jun 29 20:04:00 2016
+	adding support for drown_hosts, drown_errors, drown_vulnerable and openssl_lucky_minus_20 to EndPointDetails
+
+0.21   Tue Dec 15 06:53:00 2015
+	adding support for chacha20_preference, get_root_certs_raw, hsts_policy, hpkp_policy, hpkp_ro_policy
+
+0.20   Wed Nov 18 21:24:00 2015
+        Documentation fixes
+
+0.19   Tue Nov 17 20:15:00 2015
+        adding support for rc4_only, new_assessment_cool_off
+	adding support for current_assessments and max_assessments from the X-Max-Assessments and X-Current-Assessments headers
+
+0.18   Sun Aug 02 07:15:00 2015
+        more forcing boolean 0|1 responses
+
+0.17   Fri Jul 31 21:26:00 2015
+        Documentation fixes
+
+0.16   Fri Jul 31 18:49:00 2015
+        Added eta method for Host object, previous_eta for SSLLabs object, documentation fixes
+
+0.15   Thu Jul 30 18:00:00 2015
+        API additions for error handling
+
+0.14   Thu Jul 30.18:24:00 2015
+        API change for Host object
+
+0.13   Wed Jul 29 05:58:00 2015
+        Fixed test cases
+
+0.12   Tue Jul 28 18:48:00 2015
+        Changed API to allow greater access to Host object
+
+0.11   Sun Jul 26 07:34:00 2015
+        Changed namespace to WebService-SSLLabs
+
+0.10   Sun Jul 26 07:04:00 2015
+        Documentation fixes
+
+0.09   Sat Jul 25 10:56:00 2015
+        Fixed parameter ordering in URIs
+
+0.08   Fri Jul 24 21:14:00 2015
+        Fixed documentation, improved test coverage
+
+0.07   Fri Jul 24 06:25:00 2015
+        Changed capitalisation of parameters, fixed documentation
+
+0.06   Wed Jul 22 20:05:00 2015
+        Documentation fixes
+
+0.05   Wed Jul 22 05:54:00 2015
+        API change to lower case and underscores, now using URI::Escape
+
+0.04   Tue Jul 21 20:04:00 2015
+        Documentation fixes and force boolean 0|1 responses
+
+0.03   Tue Jul 21 06:01:00 2015
+        More fixes to documentation
+
+0.02   Tue Jul 21 05:32:00 2015
+        Fixes to documentation, tests
+
+0.01   Mon Jul 20.23:00:00 2015
+        Initial release.

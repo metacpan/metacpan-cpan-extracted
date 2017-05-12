@@ -1,0 +1,71 @@
+NAME
+    WWW::Mechanize::Meta - Adds HEAD tag parsing to WWW::Mechanize
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+        use WWW::Mechanize::Meta;
+
+        my $mech = WWW::Mechanize::Meta->new();
+        my @css=$mech->link('stylesheet');
+        foreach (@css){
+            print "$_->{href}\n";
+        }
+
+METHODS
+  link( [$type] )
+    Returns link tag with attribure rel = $type. If no attribute $type
+    given, returns all link tags.
+
+  rss
+    Returns all rss objects for this page
+
+  headtag
+    Returns raw header object
+
+INTERNAL METHODS
+  new
+  title
+  update_html
+  _parse_head
+AUTHOR
+    Andrey Kostenko, "<andrey@kostenko.name>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-www-mechanize-meta at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Mechanize-Meta>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc WWW::Mechanize::Meta
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/WWW-Mechanize-Meta>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/WWW-Mechanize-Meta>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Meta>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/WWW-Mechanize-Meta>
+
+ACKNOWLEDGEMENTS
+LICENSE
+    Copyright 2007 Andrey Kostenko, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

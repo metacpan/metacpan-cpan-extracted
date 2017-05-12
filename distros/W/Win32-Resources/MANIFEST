@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+TYPEMAP
+Resources.xs
+t/0-load.t
+t/1-updateresource.t
+t/2-loadresource.t
+t/test.exe
+lib/Win32/Resources.pm
+lib/Win32/Resources/Update.pm
+META.yml
+script/add_xpmanifest.pl

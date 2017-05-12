@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+test.pl
+lib/WAP/SAXDriver/wbxml.pm
+bin/wbxmld
+bin/syncmld
+bin/mkwbrules
+README
+META.yml                                 Module meta-data (added by MakeMaker)

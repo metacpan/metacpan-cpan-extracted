@@ -1,0 +1,111 @@
+=head1 NAME
+
+Win32::GUI::ReleaseNotes::RN_1_02 - This is the release notes for Version 1.02 of Win32::GUI
+
+=head1 Release Date
+
+11th July, 2005
+
+=head1 Summary of Changes
+
+This is a summary of changes between V1.0 and V1.02
+See the CHANGELOG file in the distribution for the
+full detail.
+
+=head2 New Features
+
+=head3 New Methods
+
+=over
+
+=item Win32::GUI
+
+ClientToScreen, GetCapture, LoadCursor, SetWindowRgn, ShellExecute,
+WaitMessage
+
+=item Win32::GUI::Menu
+
+RemoveMenu
+
+=item Win32::GUI::Region
+
+CombineRgn
+
+=item Win32::GUI::Toolbar
+
+GetString
+
+=back
+
+=head3 New Events
+
+=over
+
+=item Listview
+
+BeginDrag
+
+=item ComboxBox
+
+CloseUp, DropDown
+
+=item Rebar
+
+ChevronPushed
+
+=back
+
+=head3 New Documention
+
+General documenation tidy-up.
+
+=head3 Other Features
+
+=over
+
+=item Chevrons for Win32::GUI::Rebar
+
+Added support for chevrons to Rebar (see -idealwidth, ChevronPushed event)
+
+=item Relative widths for Win32::GUI::GridLayout
+
+Added support for relative widths to Win32::GUI::GridLayout
+
+=item More ways of using TrackPopupMenu
+
+Re-worked TrackPopupMenu, which now allows for obtaining events while
+tracking a menu
+
+=back
+
+=head2 Bug Fixes
+
+ + Fixed crash with UpDown control when using the SetBuddy, Buddy
+   and GetBuddy methods
+ + Fixed crash on program termination with Richedit
+ + Fixed Win32::GUI::EnumMyWindows
+ + Fixed defaults for Trackbar Pos(), Min(), Max(), SelStart() and
+   SelEnd() methods
+ + Hooked events now report errors correctly
+ + Hooked events now work correctly for WM_NOTIFY messages
+ + Toolbar ButtonClick event now fires correctly for dropdown buttons
+ + Toolbar GetButtonInfo, SetButtonInfo methods now work correctly
+ + Label -bitmap option now works as expected
+ + now builds under cygwin
+ + Fixed prototype for Listview method GetOrigin.
+
+=head1 Contributors to this release
+
+=over
+
+=item Jeremy White
+
+=item Chris Wearn
+
+=item Alexander Romanenko
+
+=item Robert May
+
+=back
+
+=cut

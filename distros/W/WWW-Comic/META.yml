@@ -1,0 +1,48 @@
+---
+name: WWW-Comic
+version: 1.06
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Retrieve comic strip images
+license: open_source
+requires:
+  Carp: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Module::Pluggable: 2.96
+  WWW::Dilbert: 1.18
+  WWW::VenusEnvy: 1.06
+build_requires:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  WWW::Comic:
+    file: lib/WWW/Comic.pm
+    version: 1.06
+  WWW::Comic::Plugin:
+    file: lib/WWW/Comic/Plugin.pm
+    version: 1.07
+  WWW::Comic::Plugin::Dilbert:
+    file: lib/WWW/Comic/Plugin/Dilbert.pm
+    version: 1.03
+  WWW::Comic::Plugin::Goats:
+    file: lib/WWW/Comic/Plugin/Goats.pm
+    version: 1.01
+  WWW::Comic::Plugin::MrWiggles:
+    file: lib/WWW/Comic/Plugin/MrWiggles.pm
+    version: 1.01
+  WWW::Comic::Plugin::UFS:
+    file: lib/WWW/Comic/Plugin/UFS.pm
+    version: 1.07
+  WWW::Comic::Plugin::UserFriendly:
+    file: lib/WWW/Comic/Plugin/UserFriendly.pm
+    version: 1.01
+  WWW::Comic::Plugin::VenusEnvy:
+    file: lib/WWW/Comic/Plugin/VenusEnvy.pm
+    version: 1.03
+  WWW::Comic::Plugin::uComics:
+    file: lib/WWW/Comic/Plugin/uComics.pm
+    version: 1.03
+generated_by: Module::Build version 0.2611

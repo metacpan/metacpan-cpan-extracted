@@ -1,0 +1,7 @@
+Revision history for WWW-NameGen
+
+0.01    2006-03-21
+        First version, released on an unsuspecting world.
+
+0.02	2006-03-29
+		Updated tests, added t/03-perl_critic.t

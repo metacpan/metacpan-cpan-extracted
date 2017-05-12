@@ -1,0 +1,11 @@
+Revision history for WWW-Scrape-Mailman-RSS
+
+0.12 	Wed Feb  9 10:09:50 EST 2011
+	changing name to: WWW::Scrape::Mailman::RSS
+
+0.11 	Sat Feb  5 13:15:21 EST 2011
+	resolved bug related to mis-ordered feed
+
+0.10    Sat Feb  5 00:05:16 EST 2011 
+        First version, released on an unsuspecting world.
+

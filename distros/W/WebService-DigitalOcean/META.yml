@@ -1,0 +1,61 @@
+---
+abstract: 'Access the DigitalOcean RESTful API (v2)'
+author:
+  - 'André Walker <andre@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-DigitalOcean
+provides:
+  WebService::DigitalOcean:
+    file: lib/WebService/DigitalOcean.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::DomainRecords:
+    file: lib/WebService/DigitalOcean/Role/DomainRecords.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Domains:
+    file: lib/WebService/DigitalOcean/Role/Domains.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::DropletActions:
+    file: lib/WebService/DigitalOcean/Role/DropletActions.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Droplets:
+    file: lib/WebService/DigitalOcean/Role/Droplets.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Images:
+    file: lib/WebService/DigitalOcean/Role/Images.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Keys:
+    file: lib/WebService/DigitalOcean/Role/Keys.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Regions:
+    file: lib/WebService/DigitalOcean/Role/Regions.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::Sizes:
+    file: lib/WebService/DigitalOcean/Role/Sizes.pm
+    version: '0.026'
+  WebService::DigitalOcean::Role::UserAgent:
+    file: lib/WebService/DigitalOcean/Role/UserAgent.pm
+    version: '0.026'
+requires:
+  Carp: '0'
+  DateTime: '0'
+  FindBin: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/andrewalker/p5-webservice-digitalocean/issues
+  repository: git://github.com/andrewalker/p5-webservice-digitalocean.git
+version: '0.026'
+x_serialization_backend: 'YAML::Tiny version 1.69'

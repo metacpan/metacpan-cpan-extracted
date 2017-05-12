@@ -1,0 +1,18 @@
+2016-03-11 9.991
+    - Cleaned up a bit, removed from TravisCI (No need to CI test a dead dist)
+    - Standardized documentation a bit. Made sure links were present.
+
+2015-07-19 9.99
+    - Marked 1sl as dead. Bumped version for release. [f1dd80d]
+
+2015-07-18
+    - Added .travis.yml [8ce302b]
+
+2015-07-17
+    - Added .gitignore [33b866a]
+
+2009-11-22
+    - Discovered that 1sl.net is dead. That was easy :-/ [cd5e324]
+
+2009-11-21
+    - Initial version. [b66d608]

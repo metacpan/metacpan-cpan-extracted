@@ -1,0 +1,76 @@
+CHANGES
+
+0.38 -> 0.39
+Added Perl Journal Article.
+
+0.37 -> 0.38
+Updated to work with Win32::GUI 1.05.
+Import specific constants.
+Convert GUI:: to Win32::GUI::.
+Some minor fixes.
+
+0.36 -> 0.37
+New element WGXPanel.
+Inrtuction of substitution variable %P%.
+fix seperator typo in menus.xml sample.
+added wgxpanel_wizard.xml example.
+fixed separator typo in Schema.
+added aplication_template.xml sample.
+rewrite of hash2tree.pl sample.
+
+0.35 -> 0.36
+Remove unnecessary maxsize attribute from ImageList element.
+Fixed bug in systray.xml, NotifyIcon icon now shows.
+Menu replaced with MakeMenu.
+Non-Item children in MakeMenu elements are ignored.
+New element WGXMenu introduced.
+XML Schema for WGX introduced.
+
+0.34 -> 0.35
+Allow _Generic Widgets to have children.
+ Thus top level widgets as children have children.
+Fix: replay auto dim value to widget option on creation.
+Add Resize event to top level wigets as childern.
+Fix: PostExec(WGXPost) not evaled twice on each parse.
+Allow 'show' attribute to accept '$self' or 'exec:' values.
+PostExec/PreExec replaced with WGXPost/WGXExec resp.
+New element WGXExec introduced.
+buildfile.pl now explicity destroys previous GUI if exists.
+buildfile.pl now has a reload function.
+Use inline bitmap to hold default WGX icon.
+Check StatusBar is defined before fetching height in examples.
+
+0.33 -> 0.34
+Fixed doc error SplitterPair -> WGXSplitter.
+Replace internal _context_ var with getParent func.
+ Thus removed need for _resize_ internal var.
+Now allows top level widgets as children, see modal2.xml example.
+Default dimensions to parent if parent a top level.
+
+0.32 -> 0.33
+Implemented TabStrip (TabFrame now deprecated, please update your progs!)
+Internal rewrite to allow for special new elements.
+ Builtin Resize/Move now use Width/Height/Left/Top.
+ Implement getParent to discover correct top-level widgets.
+Added WGXSplitter element.
+
+0.31 -> 0.32
+Fix print to STDERR in Rebar bug.
+Remove errors on insertItems subs.
+Use pushstyles instead of style.
+Fix bug where LRs Grid|DIBitmap|AxWindow|Scintilla modules break
+ since they use parent attribute.
+
+0.30 -> 0.31
+Support DialogBox, MDI, Timer, Accelerator widgets/objects.
+Fixed bug in _Generic constructors parent attribute (also fixes systray.xml example).
+Complete support for most widgets except those listed in TODO.
+Rebar - push non-Band attributes into child Window class (now can have colored bands!)
+
+0.21 -> 0.30
+Moved to OO framework. No longer fixed global variable %GUI.
+Added checkbox framework  to Menu Items.
+Added NEM events.
+Standardized MakeMenu Item elements.
+'show' attribute now defaults to '1'.
+lots more!

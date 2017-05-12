@@ -1,0 +1,18 @@
+---
+scraper:
+  - process:
+    - a[rel="contact"]
+    - friends[]
+    - scraper:
+      - process:
+        - a
+        - url 
+        - @href
+        - name 
+        - @title
+      - process:
+        - img
+        - src
+        - @src
+  - result: friends
+

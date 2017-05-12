@@ -1,0 +1,136 @@
+#--------------------------------------------------------------------
+0.24 - 26 February 2008
+Applying a fairly large feature patch from Sean Mostafavi. There are
+no new tests with it and I'm sorry to say the test suite is quite
+lacking to begin with... so there you have it.
+
+Changed all "$ego" to "$self." While I enjoy the shorter and easier to
+type version, it's too alien to other devs. Fixed some POD up a little
+but didn't change much. Brought in the regular license disclaimer.
+
+#--------------------------------------------------------------------
+0.23 - 8 September 2007
+The secret files keep making it through. From a fresh setup with
+Module::Install this time. They aren't in the MANIFEST or my zipped
+copy so if they make it to CPAN, my only recourse is tears.
+
+Solved, I think. On OS X: COPY_EXTENDED_ATTRIBUTES_DISABLE needs to be
+true.
+
+#--------------------------------------------------------------------
+0.22 - 4 September 2007
+AH! I only realized today how thin some of the POD is. Stubbing some
+new stuff. Fixing for the new tests and the bad resource fork files
+that STILL made it into the last release.
+
+#--------------------------------------------------------------------
+0.21 - 3 September 2007
+Ditto for 0.20. Bad upload, included the blib. Redid dist from
+module-starter for a clean break with the original dist.
+
+#--------------------------------------------------------------------
+0.20 - 1 September 2007
+A perlmonk noticed the dist files were all messed up. Fixed that with
+a MANIFEST.skip. Lame.
+
+Also, I realize calling outside without 1) checking for a connection
+and 2) asking permission, is bad form. Tuits lacking.
+
+#--------------------------------------------------------------------
+0.19 - 22 December 2006
+Fixed typo (seed_url) in POD. Thanks to Begzudin Omerovic for catch.
+No longer uses POSIX::nice -- no other code changes.
+Linked a couple modules, added PREFER text.
+
+#--------------------------------------------------------------------
+0.18 -  20 July 2002 - Maintenance release
+Cleaned up the POD further. Changed a mistake that was *so* completely
+bone-head stupid, there should be a law passed against me (iterating
+on the new() auto-install methods hash without calling "keys").
+
+Got some nice feedback from a couple perl folks that I may implement
+in another version. Next real version is still a ways away.
+
+#--------------------------------------------------------------------
+0.17 - 11 March 2002
+Updated test.pl again to account for pages being crawled that aren't
+HTML. Added "Bugs" and "Readme" into the MANIFEST. Added the
+"spyder-mini-bio" script.
+
+#--------------------------------------------------------------------
+0.16 - 10 March 2002
+There was a new bug from fixing the other bug with the _exit_check().
+This time it seems to have tested out correctly. I am changing the
+tests one more time to account for this bug so it can't slip through
+again.
+
+#--------------------------------------------------------------------
+0.15 - 10 March 2002
+There was a new bug from fixing the other bug with the continue block.
+I moved the exit check back to the top of crawl() and it should be
+good again. There was also a new bug in the test.pl.
+
+#--------------------------------------------------------------------
+0.14 - 10 March 2002
+Overloaded Enqueue objects to deliver the URL if interpolated. 
+Created the Bugs file (fixed major bug).
+Changed name of seed_url() to seed().
+Added verbosity() method.
+Did preliminary work on ::Seed and ::Exclude but nothing complete.
+
+#--------------------------------------------------------------------
+0.13 - 27 February 2002
+See 0.12.
+
+#--------------------------------------------------------------------
+0.12 - 27 February 2002
+Added ::Seed space (not yet used). Fixed some of the POD formatting
+that was clashing with the HTML'ized version. Updated POD descriptions
+a bit. Fixed some misspellings.
+
+#--------------------------------------------------------------------
+0.11 - 25 February 2002
+Changed named block CRAWL to a while loop so I can use the continue to
+do resetting and failure:success tracking. Not in there yet. Also
+changed the Page link objects iteration to return Enqueue objects one
+at a time with next_link() so that url(), domain(), and name() can be
+used directly on them.
+
+#--------------------------------------------------------------------
+0.10 - 23 February 2002
+Jumped some versions b/c the implementation of the URL queues changed
+dramatically. I added the Spyder::Enqueue package to deal with the URL
+queue entries as objects that are aware of their name, if any, and
+domain as well as the URL. More might be added. Memory footprint
+jumped about 25-30% for this but it's much easier to handle some
+things I'd like to add: specifically automated exclusion based on
+success to failure ratios on 'names' and 'URL's.
+
+#--------------------------------------------------------------------
+BUG-->> Segfault on HUGE headers corrected by substringing them down
+to size when they happen.
+
+#--------------------------------------------------------------------
+0.04 - 16 February 2002
+Adding the terms parsing. Went from 5 queues to 10 queues. Wrote some
+tests with Test::Simple.
+
+#--------------------------------------------------------------------
+BUG-->> Subroutine _exit_check redefined at Spyder.pm line 476. FIXED.
+
+#--------------------------------------------------------------------
+0.03 - 14 February 2002
+Added *many* parts, including sub ::namespaces, though some aren't
+being used yet: track downloaded bytes, priority queues, etc. Put in
+the skeleton to build a method that sets limits on the Spyder's
+crawling lifetime and tests to know when it's time to give up the
+ghost. Fixed quite a few problems.
+
+
+#--------------------------------------------------------------------
+0.01 - 12 February 2002
+
+First version of Spyder. Much of the functionality, the design and
+parts of the code are carried over from a web research agent I started
+in the winter of 2000/2001. 0.01 is mostly a mishmash of features
+from various test scripts crammed into an object.

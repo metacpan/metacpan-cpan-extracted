@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/WWW/NationalRail.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/data/oneway_detail.html
+t/data/oneway_summary.html
+t/data/return_detail.html
+t/data/return_summary.html
+t/download.pl
+t/offline.t
+t/pod-coverage.t
+t/pod.t
+t/WWW-NationalRail.t

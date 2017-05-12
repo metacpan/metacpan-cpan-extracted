@@ -1,0 +1,70 @@
+{
+   "abstract" : "access the API of europeana.eu",
+   "author" : [
+      "Peter Mayr <pmayr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Europeana",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.90",
+            "LWP::UserAgent" : "6.15",
+            "Log::Any" : "1.032",
+            "Method::Signatures" : "20141021",
+            "Moo" : "2.000002",
+            "Try::Tiny" : "0.22",
+            "URL::Encode" : "0.03",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Markdown" : "3.003",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Europeana" : {
+         "file" : "lib/WebService/Europeana.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hatorikibble/webservice-europeana/issues"
+      },
+      "homepage" : "https://github.com/hatorikibble/webservice-europeana",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hatorikibble/webservice-europeana.git",
+         "web" : "https://github.com/hatorikibble/webservice-europeana"
+      }
+   },
+   "version" : "0.0.2"
+}
+

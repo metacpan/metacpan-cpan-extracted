@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Config::Tiny;
+use Getopt::Long;
+use WWW::Notifo qw( notifo );
+
+use constant CONFIG => glob '~/.notifo';
+
+my %Opt = (
+  username => undef,
+  secret   => undef,
+  to       => undef,
+  msg      => undef,
+  label    => undef,
+  title    => undef,
+  uri      => undef,
+  help     => undef,
+);
+
+if ( -e CONFIG ) {
+  my $conf = Config::Tiny->read( CONFIG )
+   || die "$Config::Tiny::errstr\n";
+  %Opt = ( %Opt, %{ $conf->{_} } );
+}
+
+GetOptions(
+  'U|username=s' => \$Opt{username},
+  'S|secret=s'   => \$Opt{secret},
+  'T|to=s'       => \$Opt{to},
+  'M|msg=s'      => \$Opt{msg},
+  'L|label=s'    => \$Opt{label},
+  'title=s'      => \$Opt{title},
+  'uri=s'        => \$Opt{uri},
+  'help'         => \$Opt{help},
+) or do { print STDERR syntax(); exit 1 };
+do { print syntax(); exit 0 } if delete $Opt{help};
+
+$Opt{msg} = join ' ', grep defined, $Opt{msg}, @ARGV;
+$Opt{to} ||= $Opt{username};
+
+my @missing = grep { !$Opt{$_} } qw( username secret to msg );
+die "Missing options: ", join( ', ', sort @missing ), "\n"
+ if @missing;
+
+notifo( %Opt );
+
+sub syntax {
+  <<EOS;
+Syntax: notifo [options] --to user message
+
+Options:
+  -U, --username  Notifo user name
+  -S, --secret    API secret
+  -T, --to        User to send to; defaults to username
+  -M, --msg       Message text (may also be provided after options)
+  -L, --label     Label text
+      --title     Title text
+      --uri       URI to link message to
+      --help      See this text
+
+Defaults may be provided in inifile format in ~/.notifo.
+
+EOS
+}
+
+# vim:ts=2:sw=2:sts=2:et:ft=perl
+

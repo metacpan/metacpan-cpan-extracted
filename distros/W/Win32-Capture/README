@@ -1,0 +1,26 @@
+Before Install
+
+Win32::API and Win32::GUI::DIBitmap are required. If you don't have these modules, install them via ppm of console window,
+
+ppm install http://www.bribes.org/perl/ppm/Win32-API.ppd
+ppm install http://www.bribes.org/perl/ppm/Win32-GUI.ppd
+
+INSTALL
+
+To install this module:
+
+1.  Download and install the NMake tool from internet.
+2.  Extract ZIP file, open console window with commands,
+
+perl Makefile.PL
+nmake
+nmake install
+
+AUTHOR
+
+Lilo Huang
+
+COPYRIGHT
+
+Copyright 2014 by Lilo Huang All Rights Reserved.
+You can use this module under the same terms as Perl itself.

@@ -1,0 +1,23 @@
+---
+abstract: "WebService::Sift - an interface to siftscience.com's Events, Score and Label APIs using Web::API"
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Sift
+requires:
+  Modern::Perl: '0'
+  Mouse: '0'
+  Web::API: '0'
+resources:
+  bugtracker: https://github.com/nupfel/WebService-Sift/issues
+  homepage: https://github.com/nupfel/WebService-Sift/wiki
+  repository: git://github.com/nupfel/WebService-Sift.git
+version: '0.2'

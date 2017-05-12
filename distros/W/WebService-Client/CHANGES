@@ -1,0 +1,276 @@
+==================================================
+Changes from 2007-04-29 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0502 at 2017-04-26 14:17:19 +0000
+-------------------------------------------
+
+  Change: 4c896c03328f2e43edff98a716cd794550d8f5a0
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2017-04-26 10:16:46 +0000
+
+    v0.0502 
+
+  Change: b349c3555fc9d5ec367d1077cc439e8236e64c65
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-04-26 10:09:48 +0000
+
+    Merge pull request #10 from ByteFoundryAU/master
+
+    use JSON::MaybeXS, this means JSON can go faster 
+
+  Change: 8b5ff5fb2b87998c983e84db8cb3501b31f47c4c
+  Author: Dean Hamstead <dean@fragfest.com.au>
+  Date : 2017-04-26 08:20:08 +0000
+
+    use JSON::MaybeXS, this means JSON can go faster 
+
+  Change: cb77e11a9ef475abdec69f2be270b21ae0c94946
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-12-16 04:01:11 +0000
+
+    Merge pull request #9 from ironcamel/validate-retries
+
+    validate that retries is a nonnegative int 
+
+  Change: 7da3fef8d44008b78080151b9ae8fa26c83a8311
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-12-16 03:49:32 +0000
+
+    validate that retries is a nonnegative int 
+
+-------------------------------------------
+version 0.0501 at 2015-08-28 16:50:13 +0000
+-------------------------------------------
+
+  Change: dd464112f6757ca77b08b90c122a6336f9169d74
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-28 12:50:13 +0000
+
+    v0.0501 
+
+  Change: c02c21a76f16194b9c0275f458ffc1583f55cf11
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-08-28 12:49:00 +0000
+
+    Merge pull request #8 from comstud/fix_patch
+
+    Fix PATCH 
+
+  Change: 9206b1df3aa742acb9ba93dc9d079862332c1807
+  Author: Chris Behrens <chris@tilt.com>
+  Date : 2015-08-28 16:46:36 +0000
+
+    Fix PATCH
+
+    With HTTP::Request->new, $content is a positional param taking a ref. 
+
+-------------------------------------------
+version 0.0500 at 2015-08-28 16:32:21 +0000
+-------------------------------------------
+
+  Change: 352149de006f8102b100e0b14a0b3b8e8c9c247d
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-28 12:32:21 +0000
+
+    v0.0500 
+
+  Change: 135cacefa4e579af25a6d667b1b5740430fef890
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-14 16:27:33 +0000
+
+    patch 
+
+-------------------------------------------
+version 0.0400 at 2015-08-03 06:12:00 +0000
+-------------------------------------------
+
+  Change: e720503829aa327f7676c7540679cd708a9eec99
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-03 02:12:00 +0000
+
+    releasing v0.0400 
+
+  Change: 3f0b8f632e110f791fcffe753324d078e283dc61
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-03 02:07:32 +0000
+
+    Added serializer and deserializer attributes and arguments
+
+    This will allow users of this library the flexibilty to
+    de/selerialize their data in any format they wish, or to skip
+    de/serialization altogether. 
+
+  Change: a5011174918350c108cacb492038ef3620478133
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-08-01 00:32:23 +0000
+
+    fixed a bug that was not applying the stringable role in some cases
+
+    Thanks Dan Schmidt! 
+
+  Change: 3822b1fab6b8a86aa54becb5ae60a60383709dae
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-05-03 23:06:09 +0000
+
+    Merge pull request #6 from trwww/user-provided-debug-method
+
+    allow user to specify the method to be called on the logger object 
+
+  Change: 2df5d52a5a40463e316bb4f948fb15ad42587a8b
+  Author: Todd Wade <waveright@gmail.com>
+  Date : 2015-05-03 06:58:44 +0000
+
+    allow user to specify the method to be called on the logger object
+
+    Log::log4perl uses lowercase logging method names, so allow the user
+    to provide the name of the method that is called on the logger
+    object. 
+
+-------------------------------------------
+version 0.0300 at 2015-03-03 22:26:01 +0000
+-------------------------------------------
+
+  Change: 089499f210b0f3b3d3e3e5c0922a5546332752cb
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-03 17:26:01 +0000
+
+    v0.0300 
+
+  Change: 949c7112f68883d53551cc9214a46cd0ea3efb5c
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-03 16:56:51 +0000
+
+    added support for query param arrays, php style 
+
+-------------------------------------------
+version 0.0204 at 2015-01-26 23:13:26 +0000
+-------------------------------------------
+
+  Change: 129207b2c5522fb8b60880221fa7771380720698
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-26 18:13:26 +0000
+
+    v0.0204 fixed get() documentation 
+
+-------------------------------------------
+version 0.0203 at 2014-12-02 07:29:47 +0000
+-------------------------------------------
+
+  Change: 5c4a24ab100a29ad7475c9efe793cab1c398311f
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2014-12-02 02:29:47 +0000
+
+    v0.0203 better content-type detection 
+
+  Change: 22c14aa437de0ce5d21e71d59ac39e23028a5e2e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-19 03:33:02 +0000
+
+    added WebService::Stripe to examples 
+
+-------------------------------------------
+version 0.0202 at 2014-11-19 06:32:02 +0000
+-------------------------------------------
+
+  Change: 725a7d85d0136e9783785285d98cbec184de66f3
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-19 01:32:02 +0000
+
+    v0.0202 
+
+  Change: 3973e888ca21255b127d16beea31b4d6a6fff72a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-19 01:30:47 +0000
+
+    better logging and require latest HTTP::Message 
+
+  Change: 62e07ff76045154b85d775f2267cfa83c75c4f79
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-18 10:26:53 +0000
+
+    v0.0201 
+
+  Change: 453481aa994390f8f52cd07c74d4cb086941cbf0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-18 10:22:58 +0000
+
+    don't squash custom Content-Type header if it is passed in 
+
+  Change: eae81021cbe77207897a8c9d7b42980a25855e6c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-18 07:59:56 +0000
+
+    allow headers as hashref or arrayref 
+
+  Change: 08e5f209b43fde2bcbdcfa4f38dd6efdee3a77b8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 19:03:06 +0000
+
+    require HTTP::Response::Stringable v0.0002 
+
+  Change: 4898e4ebcfa2095f45ea719d2fd939c77b969f4a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 18:55:22 +0000
+
+    Merge pull request #4 from ironcamel/custom-headers
+
+    allow custom headers to be provided 
+
+-------------------------------------------
+version 0.0200 at 2014-11-17 23:54:11 +0000
+-------------------------------------------
+
+  Change: be6ece67554b62ed05ae1f64c61242008551ba2f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 18:54:11 +0000
+
+    v0.0200 
+
+  Change: 4199d427ad05c705baec939cb734d18bdd6ce8fd
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 18:50:32 +0000
+
+    use HTTP::Response and HTTP::Request's built in as_string() for
+    logging 
+
+  Change: 63541d4b92c0325754ead75ab2b8de192f28753e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-17 17:48:36 +0000
+
+    allow custom headers to be provided 
+
+-------------------------------------------
+version 0.0100 at 2014-11-12 22:03:20 +0000
+-------------------------------------------
+
+  Change: 7f09133c780ab68789739655e646933fa622f901
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 17:03:20 +0000
+
+    more docs 
+
+  Change: d28a38f4722e8b31289106e7e480f2d3ce228b52
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 16:51:36 +0000
+
+    Merge pull request #2 from ironcamel/content-type
+
+    added support for different request content types 
+
+  Change: be423db958ee19ad6130eb133d3ce3002d79cea5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 16:41:15 +0000
+
+    added support for different request content types 
+
+  Change: f2a672f19f4a9f486febca710466d2878e14348a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-26 02:39:39 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

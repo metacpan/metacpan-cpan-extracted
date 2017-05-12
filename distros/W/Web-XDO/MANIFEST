@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+LICENSE
+Makefile.PL
+Build.PL
+META.yml
+README
+lib/Web/XDO.pm
+lib/Web/XDO.pod
+t/test.t

@@ -1,0 +1,12 @@
+Revision history for WWW-Weebly
+
+0.03    Dec 16, 2013
+        Cleaned up POD and removed debug statements.
+
+0.02    Dec 15, 2013
+        Removed 'debug' file handle code in WeeblyTieFile.pm
+        Removed 'IO::Interactive' dependency
+
+0.01    May 14th, 2013
+        Initial Release
+

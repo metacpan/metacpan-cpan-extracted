@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/WWW/WebDevout/BrowserSupportInfo.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/kwalitee.t
+examples/support.pl
+Makefile.PL
+META.yml
+META.json

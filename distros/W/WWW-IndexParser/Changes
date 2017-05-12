@@ -1,0 +1,50 @@
+Revision history for Perl extension WWW::IndexParser.
+
+0.91  Mon Jun 23 11:51:00 2008
+	- Dont carp/warn on failure yo et index unless debug is turned on.
+
+0.8   Sun Nov 19 12:15:00 2006
+	- Correct bug with status_line() in IndexParser.pm
+
+0.7   Mon Nov 13 00:14:00 2006
+	- Add support for lighttpd (www.lighttpd.net) thanks to the patch at:
+	  http://bulknews.net/lib/archives/patches/
+	  with thanks to Tatsuhiko Miyagawa
+	- Removed the tests that request content from remote servers to 
+	  limit information disclosure (damned if you do, damned if you don't)
+	- Acnowledge contribution from 'srezic' on AnnoCPAN:
+	  http://annocpan.org/~JEB/WWW-IndexParser-0.6/lib/WWW/IndexParser/Entry.pm#note_1161 
+	  "Note that it is also possible to read standard Apache indexes 
+	   with the File::Listing module, which is bundled in libwww, 
+	   though it is not documented at all"
+
+0.5.1 Sun Sep 24 18:55:00 2006
+	- Correct a missing 'if defined $self->time' in WWW::IndexParser::Entry
+
+0.5   Sat Sep 23 23:10:00 2006
+	- Correct parsing of Apache autoindex to not miss the final 
+	  entry in the list!
+	- Add support for passing 'debug => 1' in the contstructor method 
+	  (new()) so we can get debug output from the module
+	- Get WWW::IndexParser::Entry to print the file's time when 
+	  being coerced to a string using print().
+	- Realise the Version number in the Changes file is not the 
+	  Version number in the module (off by a factor of 10).
+	- This release is dedicated to Peter Trevor Holland, RIP.
+
+0.04  Tue Jun 06 21:21:00 2006
+	- Correct time handling for 12 hour formats converting to ctime
+	- Correct handling of Content-Type being returned as an array
+
+0.03  Tue, Aug 30 12:19:40 2005
+	- Correct URL parsing in WWW::IndexParser::Entry: url() method was 
+	  rejecting some valid URLs.
+
+0.02  Thu, Aug 25 19:42:20 2005
+	- Support IIS and Tomcat style auto indexes.
+	- Correct Dependencies
+
+0.01  Tue Jul 19 00:27:35 2005
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::IndexParser
+

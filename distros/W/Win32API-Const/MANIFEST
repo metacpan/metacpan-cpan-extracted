@@ -1,0 +1,12 @@
+Changes
+const.pl
+Const.pm
+Const.xs
+lgpl.license.txt
+Makefile.PL
+MANIFEST
+README
+test.pl
+typemap
+win32.const.h
+t/const.t

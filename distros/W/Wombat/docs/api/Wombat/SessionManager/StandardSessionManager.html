@@ -1,0 +1,164 @@
+<HTML>
+<HEAD>
+<TITLE>Wombat::SessionManager::StandardSessionManager - caching session
+manager implementation</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#accessor methods">ACCESSOR METHODS</A></LI>
+	<LI><A HREF="#public methods">PUBLIC METHODS</A></LI>
+	<LI><A HREF="#package methods">PACKAGE METHODS</A></LI>
+	<LI><A HREF="#lifecycle methods">LIFECYCLE METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Wombat::SessionManager::StandardSessionManager - caching session
+manager implementation</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Subclass of <STRONG>Wombat::SessionManager::SessionManagerBase</STRONG> that uses an
+implementation of <STRONG>Cache::Cache</STRONG> to manage a lightweight cache of
+sessions. Typically <STRONG>Cache::MemoryCache</STRONG> will be used in
+single-process scenarios; <STRONG>Cache::SharedMemoryCache</STRONG> is useful for
+multi-process deployments. This class does not support any persistence
+or distributable capabilities.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Construct and return a <STRONG>Wombat::SessionManager::StandardSessionManager</STRONG>
+instance, initializing fields appropriately. If subclasses override
+the constructor, they must be sure to call
+<PRE>
+  $self-&gt;SUPER::new();</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="accessor methods">ACCESSOR METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getCacheClass"><CODE>getCacheClass()</CODE></A></STRONG><BR>
+<DD>
+Return the cache class for this SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_setCacheClass"><CODE>setCacheClass($class)</CODE></A></STRONG><BR>
+<DD>
+Set the cache class for this SessionManager.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24class">$class</A></STRONG><BR>
+<DD>
+the <STRONG>Cache::Cache</STRONG> implementation to use for the cache
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="public methods">PUBLIC METHODS</A></H1>
+<P>
+<HR>
+<H1><A NAME="package methods">PACKAGE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_add"><CODE>add($session)</CODE></A></STRONG><BR>
+<DD>
+Add this Session to the cache of active Sessions for this
+SessionManager.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24session">$session</A></STRONG><BR>
+<DD>
+the <STRONG>Wombat::Session</STRONG> to be added
+<P></P></DL>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Return the display name of this SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession($id)</CODE></A></STRONG><BR>
+<DD>
+Return the active Session cached by this SessionManager with the
+specified id, or <CODE>undef</CODE> if no session exists with that id.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24id">$id</A></STRONG><BR>
+<DD>
+the id for the Session to be returned
+<P></P></DL>
+<DT><STRONG><A NAME="item_getSessions"><CODE>getSessions()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the active Sessions cached by this
+SessionManager.
+<P></P>
+<DT><STRONG><A NAME="item_remove"><CODE>remove($session)</CODE></A></STRONG><BR>
+<DD>
+Remove this Session from this SessionManager's cache.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$session</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Session</STRONG> to remove
+<P></P></DL>
+<DT><STRONG><A NAME="item_save"><CODE>save($session)</CODE></A></STRONG><BR>
+<DD>
+Write the current state of this Session to this SessionManager's
+cache.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$session</STRONG><BR>
+<DD>
+the <STRONG>Wombat::Session</STRONG> to save
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="lifecycle methods">LIFECYCLE METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_start"><CODE>start()</CODE></A></STRONG><BR>
+<DD>
+Prepare for active use of this SessionManager and initialize the
+session cache. This method should be called before any of the public
+methods of the SessionManager are utilized.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Wombat%3A%3ALifecycleException"><STRONG>Wombat::LifecycleException</STRONG></A></STRONG><BR>
+<DD>
+if the SessionManager has already been started or if the cache cannot
+be initialized
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Cache/Cache.html">the Cache::Cache manpage</A>,
+<A HREF="../../../api/Wombat/Container.html">the Wombat::Container manpage</A>,
+<A HREF="../../../api/Wombat/Core/Session.html">the Wombat::Core::Session manpage</A>,
+<A HREF="../../../api/Wombat/SessionManager/SessionManagerBase.html">the Wombat::SessionManager::SessionManagerBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

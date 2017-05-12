@@ -1,0 +1,15 @@
+Revision history for Web-Util-DBIC-Paging
+
+0.001003  2013-06-26 17:32:02 CST6CDT
+ - Make simple_search search TEXT fields with -like (Gabriel Andrade)
+
+0.001002  2013-06-03 15:27:18 CST6CDT
+ - Fix a few more simple_search issues (with like and arrayrefs) (ChinaXing)
+
+0.001001  2013-05-31 23:31:38 CST6CDT
+ - simple_search now uses equality instead of -like for non char columns
+
+0.001000  2013-05-28 09:11:37 CST6CDT
+ - Initial Release (factored out of
+   Catalyst::TraitFor::Controller::DBIC::DoesPaging)
+

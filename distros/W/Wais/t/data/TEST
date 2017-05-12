@@ -1,0 +1,175 @@
+CK: Fuhr/Pfeifer:91
+DT: IP
+AU: Fuhr, N.; Pfeifer, U.
+TI: Combining Model-Oriented and Description-Oriented Approaches for
+    Probabilistic Indexing
+ER: Bookstein, A.; Chiaramella, Y.; Salton, G.; Raghavan, V.V.
+BT: Proceedings of the Fourteenth Annual International ACM/SIGIR
+    Conference on Research and Development in Information Retrieval
+PN: ACM
+PA: New York
+PP: 46-56
+LA: EN
+ED: 28.10.91
+PY: 1991
+LO: P
+RD: Fu
+CC: H.3.3; H.99.3
+SD: retrieval models
+FT: probabilistic retrieval
+
+CK: Fuhr/Pfeifer:94
+DT: AR
+AU: Fuhr, N.; Pfeifer, U.
+TI: Probabilistic Information Retrieval as Combination of Abstraction,
+    Inductive Learning and Probabilistic Assumptions
+JT: TOIS
+VO: 12
+NO: 1
+PP: 92-115
+LA: EN
+ED: 04.01.93
+PY: 1994
+LO: D
+RD: Fu
+CC: H.3.3; H.99.3
+SD: retrieval models
+FT: probabilistic retrieval
+
+CK: Pfeifer:91
+DT: IP
+AU: Pfeifer, U.
+TI: Entwicklung linear iterativer und logistischer
+    Indexierungsfunktionen
+ER: Fuhr, N.
+BT: Information Retrieval
+PN: Springer
+PA: Berlin et al.
+PP: 23-37
+LA: GE
+ED: 02.07.91
+PY: 1991 
+RD: Pf
+GT: experimentation
+CC: H.3.1; G.1.2
+SD: least squares approximation; indexing methods
+FT: logistic functions; indexing functions; DIA
+
+CK: Fuhr/etal:94
+DT: IP
+CR: TREC-2
+AU: Fuhr, N.; Pfeifer, U.; Bremkamp, C.; Pollmann, M.; Buckley, C.
+TI: Probabilistic  Learning Approaches for Indexing and Retrieval
+    with the TREC-2 Collection
+LA: EN
+ED: 02.12.93
+PY: 1994
+PR: TOAPP
+LO: D
+RD: Fu
+CC: G.1.2; H.3.1; H.3.3; H.99.3
+SD: least squares approximation; indexing methods; retrieval models
+FT: probabilistic models; query expansion 
+PP: 67-74
+
+CK: Pfeifer/etal:94
+DT: MC
+AU: Pfeifer, U.; Pennekamp, S.; Fuhr, N.
+TI: Incremental Processing of Vague Queries in Interactive Retrieval Systems
+ED: 10.01.94
+PY: 1994
+PR: SUBMITTED
+LO: D
+RD: Fu
+CC: H.3.2
+SD: file organization
+
+CK: Poersch/Pfeifer:94
+DT: MC
+AU: Poersch, T.; Pfeifer, U.
+TI: Similarity Measures for Strings
+LA: EN
+ED: 10.01.94
+PY: 1994
+PR: SUBMITTED
+LO: D
+RD: Fu
+CC: H.99.3
+
+CK: Pfeifer/etal:95
+DT: IP
+AU: Pfeifer, U.; Fuhr, N.; Huynh, T.
+TI: Searching Structured Documents with the Enhanced Retrieval
+    Functionality of freeWAIS-sf and SFgate
+ER: D. Kroemker
+BT: Computer Networks and ISDN Systems; Proceedings of the third
+    International World-Wide Web Conference
+PN: Elsevier
+PA: Amsterdam - Lausanne - New York - Oxford - Shannon - Tokyo
+PP: 1027-1036
+LA: EN
+ED: 03.02.95
+PY: 1995
+PM: APR
+PR: Available in electronic form from
+    http://www.igd.fhg.de/www/www95/papers/47/fwsf/fwsf.html and
+    http://www.elsevier.nl (passwd els4www3)
+LO: P
+RD: Pf
+CC: H.2.3; H.3.2
+SD: Query languages 
+FT: WAIS, Form, User-Interface, Query Language, Retrieval, Search,
+    Multi-Server Search, Network Information Retrieval
+AB: The original WAIS implementation by Thinking Machines et
+    al. treats documents as uniform bags of terms. Since most
+    documents exhibit some internal structure, it is desirable to
+    provide the user means to exploit this structure in his
+    queries. ...
+
+CK: Pfeifer/etal:95a
+DT: IP
+CR: HIM:95
+AU: Pfeifer, U; Poersch, T; Fuhr, N.
+TI: Searching Proper Names in Databases
+PP: 259-276
+LA: EN
+ED: 03.02.95
+PY: 1995
+LO: P
+RD: tha
+
+CK: Pfeifer/Fuhr:95
+DT: IP
+AU: Pfeifer, U.; Fuhr, N.
+TI: Efficient Processing of Vague Queries using a Data Stream Approach
+BT: Proceedings of the 18th International {ACM SIGIR} Conference on
+    Research and Development in Information Retrieval
+PN: ACM
+PA: New York
+PP: 189-198
+LA: EN
+ED: 10.03.95
+PY: 1995
+CN: (to appear)
+LO: P
+RD: Pf
+CC: H.2.4; H.3.3; H.99.4
+SD: query processing; selection process
+FT: stream-oriented
+
+CK: Pfeifer:90
+DT: TR
+RT: DPA
+AU: Pfeifer, U.
+TI: Development of Log-Linear and Linear-Iterative Indexing Functions
+    (in German)
+PI: DVS2
+LA: GE
+ED: 09.01.90
+PY: 1990
+LO: D
+RD: Fu
+CC: I.5.1; I.2.6; G.1.2; H.3.1
+SD: statistical models; parameter learning; least squares
+    approximation; nonlinear approximation; Indexing methods
+FT: DIA; logistic regression; maximum likelihood estimation

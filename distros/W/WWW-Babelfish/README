@@ -1,0 +1,74 @@
+WWW::Babelfish, version .16
+
+STATUS
+======
+This is BETA software; use at your own risk. 
+
+Comments, bug reports, patches etc. are appreciated.
+
+DESCRIPTION
+===========
+This module is a simple perl front-end to the Babelfish, Google or Yahoo
+translation servers.  It's more fun than useful, but it might have a
+place in IRC/talk clients or perhaps a translating web proxy. It makes
+an attempt at breaking longer pieces of text up into chunks that
+Babelfish can handle and then reassembling them. 
+
+
+INSTALLATION
+============
+This module needs the following modules, all available from CPAN:
+
+HTTP::Request    (in the libwww-perl bundle)
+LWP::UserAgent   (in the libwww-perl bundle)
+HTML::TokeParser (in the libwww-perl bundle)
+IO::String
+Encode
+
+After unpacking the tar file, do the usual:
+
+        perl Makefile.PL 
+        make
+	make test
+        make install
+
+There is embedded POD documentation in Babelfish.pm
+
+ACKNOWLEDGEMENTS
+================
+Brian Raven <brianr@liffe.com>		Patch to fix warning when
+					source text doesn't start with
+					whitespace. 
+Peter Tirsek <peter@tirsek.com>		Patch to fix bug in whitespace
+					handling at beginning of
+					paragraph AND new Babelfish
+					URL and format.
+Olivier Scherler <olivier.scherler@urbanet.ch>
+					Patch for subtle whitespace
+					handling bug. 
+Brett T Warden <bwarden@wgz.com>	Patch for handling non-roman 
+					translations.
+Martin K. Sluka <martin@sluka.de>	Patch to add languagepairs 
+					method.
+Eric R. Meyers <ermeyers@adelphia.net>	Patch to fix corruption of main 
+					package space.
+Jan Willamowius <jan@willamowius.de>	Patch to add Yahoo translation 
+					service.
+<FANY@cpan.org>				Patch for some Babelfish glitches.
+Djihed Afifi <djihed@gmail.com>		Patch for Google format change.
+
+Many many thanks also to Wolfgang Schlueschen
+<wolfgang.schlueschen@philips.com> and Daniel van Balen
+<vdaniel@trompo.com> who simultaneously submitted patches for the new
+Babelfish URL and format.
+
+COPYRIGHT
+=========
+Copyright (c) 1999-2006 Daniel J. Urist. All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+--
+Daniel J. Urist
+durist@frii.com

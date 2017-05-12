@@ -1,0 +1,38 @@
+---
+abstract: 'Interface to the Solr search engine'
+author:
+  - 'Andy Lester <andy@petdance.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Solr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Page: '0'
+  Data::Pageset: '0'
+  Encode: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Test::Mock::LWP: '0.05'
+  Test::More: '0.94'
+  Types::Standard: '0.008'
+  URI: '1.28'
+  XML::Easy: '0'
+  XML::Simple: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/petdance/ack3
+  homepage: https://github.com/petdance/webservice-solr
+version: '0.42'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

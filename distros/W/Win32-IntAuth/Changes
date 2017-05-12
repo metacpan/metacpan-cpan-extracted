@@ -1,0 +1,16 @@
+Revision history for Perl extension Win32::IntAuth.
+
+0.1 Tue Apr 22 11:11:37 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Win32::IntAuth
+
+0.11 Tue May 13 13:05:37 2008
+    - skip tests if no UPN found
+
+0.12 Tue May 13 14:02:37 2008
+    - changed minimum perl version to 5.008
+
+0.20 Tue Apr 12 14:03:49 2011
+    - applied patches from Paul K. (Bugfix) and Jason Taylor 
+      (allowing other security packages than "Negotiate")
+      Thanks to both!     

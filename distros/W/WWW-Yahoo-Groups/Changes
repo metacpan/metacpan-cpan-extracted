@@ -1,0 +1,249 @@
+# Change log for WWW::Yahoo::Groups
+
+# The following versions are available on CPAN:
+
+---
+version: 1.91
+date:    1 Dec 2003
+changes:
+
+    - Demangling removed due to Yahoo changing algorithm.
+    - Requires newer Mech and LWP.
+    - Bug with empty messages fixed.
+    - Bad variable in example program fixed.
+
+    - Spidering Hacks mentioned.
+
+    - Documentation updated with some nits fixed.
+    - Documentation shuffled all around.
+    - new() can now take arguments for options.
+
+---
+version: 1.89
+date:    12 Sep 2003
+changes:
+    - Documented auxiliary classes.
+    - Updated some aspects of Mech usage.
+    - Removed is_error methods.
+    - Changed default sleep to 1 second.
+
+---
+version: 1.88
+date:    11 Sep 2003
+changes:
+    - Updated mangling table.
+
+---
+version: 1.87
+date:    26 Aug 2003
+changes:
+    - Hash randomisation problems fixed. Thanks merlyn.
+    - Corrected requirements.
+
+---
+version: 1.86
+date:    22 Aug 2003
+changes:
+    - Automatic address demunging.
+    - Yahoo now using RSS 2.
+    - Yahoo have redone their pages, thus new content parser.
+    - Headers now reformatted by default.
+    - Autosleep is on 5 by default rather than 0. Yahoo now throttle.
+    - Gone back to using our own agent rather than agent_alias.
+    - Trailing newlines (except one) stripped from messages.
+    - Header continuations identification improved.
+    - Use proxies if available.
+    - Automatic address demunging added.
+
+---
+version: 1.85
+date:    30 Jul 2003
+changes:
+    - Adult confirmation pass throughs fixed.
+    - Added preliminary header reformatter.
+    - We use agent_alias now instead of our own agent.
+    - Removed File::Slurp from example.
+    - Versioned sub-modules.
+    - Fix warning when URI was not defined.
+    - Refactored tests slightly.
+
+---
+version: 1.84
+date:    24 July 2003
+changes:
+    - Page title handling smartened.
+    - Ad identification and progression smartened.
+    - Found cause of unknown test failures. Repaired.
+    - Use find_link rather than obsolete extract_links.
+
+---
+version: 1.8.3
+date:    03 July 2003
+changes:
+    - Removed Advanced Technology to make Andy happy. 
+
+---
+version: 1.8.2
+date:    31 May 2003
+changes:
+    - Adult confirmations automatically handled.
+
+---
+version: 1.8.1
+date:    22 May 2003
+changes:
+    - Some non-English groups have different page titles.
+    - Refactored use of Mechanize and thus Errors
+
+# Versions below here are available on BACKPAN
+# http://history.perl.org/backpan/authors/id/S/SP/SPOON/
+
+---
+version: 1.7.9
+date:    16 May 2003
+changes:
+    - Bypass "age restriction" notices. (ray c)
+    - Get first_msg_id as well as last_msg_id. (ray c)
+
+---
+version: 1.7.8
+date:    05 May 2003
+changes:
+    - Error handling renovated.
+    - Example script documented.
+    - Example script uses autosleep() now.
+    - Build.pm auxiliary file documented.
+    - Relogin message corrected for new features.
+    - Updated for some changes Yahoo made to the pages.
+
+---
+version: 1.7.7
+date:    14 Oct 2002
+changes:
+    - This file mentions the lines at which CPAN/BACKPAN are drawn.
+    - Aligned items in Build.PL =)
+    - Added Module::Signature test, for those with said module.
+    - >
+      Made it so Test::Prereq would not barf that Module::Signature is
+      not actually required. We just require a particular version
+      of Module::Signature if it is actually installed.
+    - I18N and L10N!
+    - Thus lots of new files and Build.PL extended massively.
+    - Remove Test::Prereq since it was having major problems.
+    - Added Test::Signature
+    - Skip YAML tests if YAML is not installed.
+
+---
+version: 1.7.6
+date:    10 Oct 2002
+changes:
+    - logout() added. Thus one can log in and out with the one bot.
+    - Appropriate tests added.
+
+---
+version: 1.7.5
+date:    10 Oct 2002
+changes:
+    - GPL renamed COPYING (to fit search.cpan.org)
+    - CREDITS file added (generated from POD)
+    - last_msg_id() added. Based on code from Simon Hanmer.
+    - Tests for last_msg_id() added.
+    - Brief note about being a well behaved bot added.
+    - list() ensures appropriate characters in list name.
+    - Automatically sleep() in get(), courtesy autosleep().
+    - Tests for sleep() added.
+
+---
+version: 1.7.4
+date:    10 Oct 2002
+changes:
+    - Tabs in MANIFEST now spaces.
+    - loggedin() added. Returns if one is logged in or not.
+    - lists() added. Based on code from Simon Hanmer.
+    - Documentation for list() clarified.
+    - New exceptions 'NotLoggedIn' and 'AlreadyLoggedIn'.
+    - Typo of 'gruop' instead of 'group' fixed.
+    - Tests for lists() and loggedin() added.
+    - login() throws an exception if one is already logged in.
+    - TODO list expanded for better re-login() handling.
+
+---
+version: 1.7.2
+date:    09 Oct 2002
+changes:
+    - RSS fetching can fetch a particular number of items in the list.
+    - Thus, fetch_rss() can now take a parameter.
+    - Appropriate documentation updated, and validation extended.
+    - Test for giving fetch_message() too many params added.
+    - fetch_rss() param tests exapnded to cope with the new errors.
+    - RSS fetching tests verify number of items returned.
+    - And tests for fetching assorted boundary cases.
+
+---
+version: 1.7
+date:    08 Oct 2002
+changes:
+    - Added Test::Prereq::Build to tests. [ Hi brian d foy ]
+    - Throw exception if message missing from archive.
+    - This file now in YAML =)  [ Hi Ingy ]
+    - Assorted build checks in tests.
+    - INSTALL added. Gives a nice rundown of how to install the module.
+    - New tests to verify YAML files are valid and up to date.
+    - Mention search.cpan.org URL in README
+    - Example program improved for new exceptions, and tidied.
+    - Mention message number of message failing anything.
+    - Fix exception type in fetching test.
+    - Add test to fetch a message that doesn't exist.
+    - Added MANIFEST.SKIP with appropriate entries.
+    - Added .cvsignore (not that most people will see it).
+    - Added TODO file (also YAML).
+    - Added comments to test files.
+    - >
+      Test suite reports information on the installed modules.
+      Useful for when debugging failed tests on other machines.
+    - Exceptions appropriately documented.
+    - Mentioned a few other bits in the SEE ALSO part of the POD.
+    - LICENSE and COPYRIGHT section added to POD.
+    - INSTALL, LICENSE and README files generated from templates.
+    - GPL and Artistic license files included.
+    - MANIFEST file given comments on the purpose of each file.
+    - It's been a fun release, hasn't it?
+
+---
+version: 1.6
+date:    03 Oct 2002
+changes:
+    - Aaron Straup Cope wrote a module to play with Yahoo RSS.
+    - So I added a bit to get the RSS in an abstract fashion.
+
+---
+version: 1.5
+date:    02 Oct 2002
+changes:
+    - But it helps to not mess up the MB scripts. Ta Merlyn.
+
+---
+version: 1.4
+date:    02 Oct 2002
+changes:
+    - Module::Build is nicer than ExtUtils::MakeMaker
+
+---
+version: 1.3
+date:    01 Oct 2002
+changes:
+    - Added SIGNATURE (Module::Signature)
+    - Added example program.
+    - Refined doco.
+
+---
+version: 1.2
+date:    01 Oct 2002
+changes:
+    - More tests, more exceptions, param validation.
+
+---
+version: 1.1
+date:    29 Sep 2002
+changes:
+    - Initial (crappy) release.

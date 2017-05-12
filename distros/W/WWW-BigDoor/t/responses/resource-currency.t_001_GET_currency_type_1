@@ -1,0 +1,16 @@
+200[
+    {
+        "read_only": 0, 
+        "modified_timestamp": 1263933875, 
+        "resource_name": "currency_type", 
+        "description": "", 
+        "title": "Redeemable Purchase Currency", 
+        "can_be_cross_publisher": 0, 
+        "can_be_purchased": 1, 
+        "can_be_rewarded": 0, 
+        "created_timestamp": 1263933875, 
+        "has_dollar_exchange_rate_integrity": 1, 
+        "id": 1
+    }, 
+    {}
+]

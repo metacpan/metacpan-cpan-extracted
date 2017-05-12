@@ -1,0 +1,51 @@
+---
+abstract: 'CEPH Client for simple workflow'
+author:
+  - 'Victor Efimov <efimov@reg.ru>'
+  - 'Aleksandr Babenko <babenko@reg.ru>'
+build_requires:
+  File::Temp: 0
+  HTTP::Daemon: 0
+  IO::Handle: 0
+  LWP::UserAgent: 0
+  Module::Build: 0.3601
+  POSIX: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Spec: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-CEPH
+provides:
+  WebService::CEPH:
+    file: lib/WebService/CEPH.pm
+    version: 0.014
+  WebService::CEPH::FileShadow:
+    file: lib/WebService/CEPH/FileShadow.pm
+    version: 0.014
+  WebService::CEPH::NetAmazonS3:
+    file: lib/WebService/CEPH/NetAmazonS3.pm
+    version: 0.014
+requires:
+  Carp: 0
+  Digest::MD5: 0
+  Fcntl: 0
+  File::Copy: 0
+  File::Path: 2.07
+  File::Slurp: 0
+  HTTP::Status: 0
+  Net::Amazon::S3: 0.80
+  parent: 0
+  perl: 5.014000
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://metacpan.org/release/WebService-CEPH
+version: 0.014

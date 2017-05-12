@@ -1,0 +1,6 @@
+lib/Win32/AD/Constant.pm
+lib/Win32/AD/Control/DirSync.pm
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

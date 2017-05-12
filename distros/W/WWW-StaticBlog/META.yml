@@ -1,0 +1,95 @@
+---
+abstract: 'Generate a set of static pages for a blog.'
+author:
+  - 'Jacob Helwig, C<< <jhelwig at cpan.org> >>'
+  - 'Jacob Helwig <jhelwig@cpan.org>'
+build_requires:
+  Data::Faker: 0
+  Data::Faker::DateTime: 0
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Temp: 0
+  Test::CheckChanges: 0.14
+  Test::Mini: 0
+  Test::Mini::Unit: 0
+  Test::TempDir: 0
+  Text::Lorem: 0
+  Text::Outdent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-StaticBlog
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  WWW::StaticBlog:
+    file: lib/WWW/StaticBlog.pm
+    version: 0.02
+  WWW::StaticBlog::Author:
+    file: lib/WWW/StaticBlog/Author.pm
+    version: 0.02
+  WWW::StaticBlog::Post:
+    file: lib/WWW/StaticBlog/Post.pm
+    version: 0.02
+  WWW::StaticBlog::Role::FileLoader:
+    file: lib/WWW/StaticBlog/Role/FileLoader.pm
+    version: 0.02
+  WWW::StaticBlog::Role::Template:
+    file: lib/WWW/StaticBlog/Role/Template.pm
+    version: 0.02
+  WWW::StaticBlog::Site:
+    file: lib/WWW/StaticBlog/Site.pm
+    version: 0.02
+  WWW::StaticBlog::Template::Toolkit:
+    file: lib/WWW/StaticBlog/Template/Toolkit.pm
+    version: 0.02
+  WWW::StaticBlog::Types:
+    file: lib/WWW/StaticBlog/Types.pm
+    version: 0.02
+  WWW::StaticBlog::Util:
+    file: lib/WWW/StaticBlog/Util.pm
+    version: 0.02
+requires:
+  Class::MOP: 0
+  Config::JFDI: 0
+  Cwd: 0
+  Data::Dumper: 0
+  Date::Parse: 0
+  DateTime: 0
+  DateTime::TimeZone: 0
+  Email::Simple: 0
+  File::Copy::Recursive: 0
+  File::Find: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec: 0
+  Hash::Merge: 0
+  List::MoreUtils: 0
+  List::PowerSet: 0
+  Moose: 0
+  Moose::Exporter: 0
+  MooseX::Declare: 0
+  MooseX::Getopt: 0
+  MooseX::Method::Signatures: 0
+  MooseX::SimpleConfig: 0
+  MooseX::Types: 0
+  Set::Object: 0
+  Text::CSV: 0
+  Text::Multi: 0
+  Time::SoFar: 0
+  XML::Atom::SimpleFeed: 0
+  aliased: 0
+  parent: 0
+  perl: 0
+resources:
+  homepage: http://github.com/jhelwig/WWW-StaticBlog
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jhelwig/WWW-StaticBlog.git
+version: 0.02

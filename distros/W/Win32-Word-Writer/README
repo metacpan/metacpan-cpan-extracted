@@ -1,0 +1,558 @@
+NAME
+    Win32::Word::Writer - Create Microsoft Word documents
+
+DESCRIPTION
+    Easily create MS Word documents, abstracting away the Word.Application
+    DOM interface and all the required workarounds. The DOM interface is
+    still exposed for doing more fancy stuff.
+
+SYNOPSIS
+        use strict;
+        use Win32::Word::Writer;
+
+        my $oWriter = Win32::Word::Writer->new();
+
+        #Adding text and paragraphs with different styles
+        $oWriter->WriteParagraph("Example document", heading => 1);          #Heading  level 1
+        $oWriter->WriteParagraph("Usage", style => "Heading 2");             #Style "Heading 2"
+        $oWriter->WriteParagraph("Write sentences to the document using a"); #Normal
+        $oWriter->WriteParagraph("heading level, or Normal
+        if none is specified. ");                            #\n is new paragraph
+
+        $oWriter->Write("Add some more text the current paragraph");
+
+        $oWriter->NewParagraph(style => "Envelope Return");  #The style must exist
+        $oWriter->Write("Return to sender. ");
+
+        $oWriter->SetStyle("Envelope Address");              #Change the current style
+        $oWriter->Write("Nope, we changed the style of the entire paragraph");
+        $oWriter->Write("to a footer style");
+
+        #Setting character styles
+        $oWriter->WriteParagraph("Some more normal text. ");
+        $oWriter->SetStyle("Hyperlink");                 #A charachter style
+        $oWriter->Write("http://www.DarSerMan.com/Perl/");
+        $oWriter->ClearCharacterFormatting();            #Clear character style
+        $oWriter->Write("  <-- my ");
+
+        #Bold/Italics
+        $oWriter->ToggleBold();         #Toggle bold
+        $oWriter->Write("Perl ");
+        $oWriter->SetItalic(1);         #Turn on Italic
+        $oWriter->Write("stuff.");
+        $oWriter->ToggleItalic();       #Toggle Italic
+        $oWriter->SetBold(0);           #Turn off bold
+
+        #Bullet point lists
+        $oWriter->ListBegin();
+        $oWriter->ListItem();
+        $oWriter->Write("The first bullet item");
+        $oWriter->ListItem();
+        $oWriter->Write("The second bullet item");
+
+        $oWriter->ListBegin();   #Nested bullet point list
+        $oWriter->ListItem();
+        $oWriter->Write("The first inner bullet item");
+        $oWriter->ListItem();
+        $oWriter->Write("The second inner bullet item");
+
+        $oWriter->ListEnd();
+        $oWriter->ListEnd();
+
+
+        #Do this at regular intervals (say, every couple of 10K of text you add)
+        $oWriter->Checkpoint();
+
+
+        #Tables
+        $oWriter->WriteParagraph("Table example", heading => 1);
+        $oWriter->NewParagraph();
+
+        $oWriter->TableBegin();
+        $oWriter->TableRowBegin();
+        $oWriter->TableColumnBegin();
+        $oWriter->SetBold(1);
+        $oWriter->Write("HTML table");
+        $oWriter->TableColumnBegin();
+        $oWriter->Write("Win32::Word::Writer");
+
+        $oWriter->TableRowBegin();
+        $oWriter->TableColumnBegin();
+        $oWriter->SetBold(0);
+        $oWriter->Write("<table>");
+        $oWriter->TableColumnBegin();
+        $oWriter->Write("TableBegin()");
+
+        $oWriter->TableRowBegin();
+        $oWriter->TableColumnBegin();
+        $oWriter->Write("<tr>");
+        $oWriter->TableColumnBegin();
+        $oWriter->Write("TableRowBegin()");
+
+        $oWriter->TableEnd();
+
+
+        #Save the document
+        $oWriter->SaveAs("01example.doc");
+
+INSTALLATION
+    With <Strawberry Perl>, the regular CPAN shell should work:
+
+      cpan Win32::Word::Writer
+
+    All dependencies except Microsoft Word itself should sort itself out
+    automatically.
+
+    This may work with ActiveState too if you have the MinGW compiler, or it
+    might be easier to install with "ppm" (if available, I'm not sure about
+    the state of the PPM repos at this point).
+
+CONCEPTS
+    Win32::Word::Writer uses an OLE instance of Word to create Word
+    documents.
+
+    The documents are constructed in a linear fashion, i.e. you add text to
+    the document and generally don't move around the document a lot.
+
+  Styles
+    A "style" in Word is a set of properties that can be assigned to a piece
+    of text. There are two types of styles: Paragraph and Character styles.
+
+    "Normal", and "Heading 1" are example of paragraph styles.
+
+    When a paragraph gets applied to a piece of text it applies to the
+    entire paragraph, whereas the character style only affects the actual
+    chars. You can see the difference if you open a Word document and look
+    at the available styles.
+
+PROPERTIES
+  oWord
+    A Win32::OLE object with a Word Application instance.
+
+  oDocument
+    A Win32::OLE object with the Application's Document object. Often used
+    shorthand.
+
+  oSelection
+    A Win32::OLE object with the Application's Selection object.
+
+  oTable
+    The current Win32::Word::Writer::Table object, if a table is being
+    created, or undef if not.
+
+METHODS
+    Note that all methods return 1 or die on errors, unless otherwise
+    stated.
+
+  new()
+    Create new Word Writer object which can be written to.
+
+    Return new object, or die on errors.
+
+  init()
+    Init the object. Called by new.
+
+  Open($file)
+    Discard the current document and open the Word document in $file.
+
+    Note that you may want to MoveToEnd() after opening an existing document
+    before adding new text.
+
+    Note that this object is in an unusable state if the Open fails to load
+    a document.
+
+  SaveAs($file, %hOpt)
+    Save the document to $file (may be a relative file name). %hOpt is:
+
+      format => $format -- Save $file as $format (default:
+      Document). Valid values are: Document, DOSText, DOSTextLineBreaks,
+      EncodedText, HTML, RTF, Template, Text, TextLineBreaks, UnicodeText
+
+    (A common mistake is to inspect the document in another Word instance
+    when re-running a script. The document will be locked by Word and the
+    script can't re-create the file.)
+
+  Checkpoint()
+    Checkpoint the document, i.e. save it to a temp file.
+
+    This is necessary to do sometimes because Word seems to keep state until
+    the document is saved, and when using Word automation you tend to
+    exercise the application in ways they haven't tested properly. And after
+    a while you get weird errors, just because Word couldn't deal with all
+    that information.
+
+    So you should call this after adding, say, 20K of text to the document
+    (this is true for Word 2000, it may be better in later versions).
+
+  Close()
+    Discard the current document no-questions-asked (i.e. even if it's not
+    saved).
+
+    Note that this object is in an unusable state until a new document is
+    created or opened.
+
+METHODS - ADDING TEXT
+  Write($text)
+    Append $text to the document (using the current style etc).
+
+  WriteParagraph($text, [heading => $level], [style => $name])
+    Append $text as a new paragraph of heading $level or style $name. The
+    style overrides heading. The style should be a paragraph style.
+
+    The default style is "Normal".
+
+  NewParagraph([heading => $level], [style => $name])
+    Start a new paragraph of heading $level or with style $name. The style
+    overrides heading. The style should be a paragraph style.
+
+    The default style is "Normal".
+
+  SetStyle([$style = "Normal"])
+    Set the style to $style.
+
+    If $style is a paragraph style, it will change the style of the current
+    paragraph.
+
+    If $style is a character style, it will turn on that style. It will be
+    in effect until a new style is set somehow, or until it's cleared with
+    ClearCharacterFormatting().
+
+  ClearCharacterFormatting()
+    Clear the characther formatting/set it to default.
+
+    The paragraph can have a style, and individual characters a separate
+    formatting style.
+
+  StyleSpec([heading => $level], [style => $name])
+    Return the final style, given a specification of heading $level or style
+    $name. The style overrides heading.
+
+    The default style is "Normal".
+
+  ToggleBold()
+    Toggle the current Bold charachter setting
+
+  SetBold($enable)
+    Set the Bold status to 1 or 0.
+
+    Return the new Bold state, or throw OLE exception.
+
+  ToggleItalic()
+    Toggle the current Italic charachter setting
+
+  SetItalic($enable)
+    Set the Italic status to 1 or 0.
+
+    Return the new Italic state, or throw OLE exception.
+
+METHODS - BULLET POINT LISTS
+  ListBegin()
+    Begin a new bullet point list.
+
+    Can be nested to create sub-lists.
+
+    Use ListItem() to create new bullet points before adding text to the
+    list.
+
+  ListItem()
+    Start a new bullet point in the list.
+
+    The first text you Write() after this becomes the new bullet text.
+
+    You should not WriteParagraph() within a list item. New paragraphs are
+    signals to Word to advance to the next list item, so that will confuse
+    Win32::Word::Writer and/or Word.
+
+  ListEnd()
+    End an existing bullet point list.
+
+    If it's the outermost list, go back to normal text.
+
+METHODS - TABLES
+  TableBegin()
+    Begin a new table.
+
+    The table model resembles a HTML table with rows and columns, but you
+    don't have to close columns or rows. Simply start a new one.
+
+    A row and col must be created with TableRowBegin() and
+    TableColumnBegin() before any text is added.
+
+    Tables can not be nested.
+
+    Note that tables are rather fragile so don't expect them to work with
+    very complex layouts, or very wide columns. Prepare for exceptions to be
+    thrown.
+
+  TableRowBegin()
+    Begin a new row in the current table.
+
+    Add a column also before adding text to the table.
+
+  TableColumnBegin()
+    Begin a column in the current table in the current row.
+
+    Any new text/paragraph added to the document will end up in this table
+    cell until a new row or column is created, or the table is ended.
+
+  TableEnd()
+    Begin a column in the current table in the current row.
+
+    Any new text/paragraph added to the document will end up in this table
+    cell until a new row or column is created, or the table is ended.
+
+METHODS - MOVEMENT AND SELECTION
+  MoveToEnd()
+    Set the insertion point at the end of the document.
+
+  SelectAll()
+    Make the selection the entire document.
+
+    Return 1 on success, else die.
+
+METHODS - FIELDS AND TABLES
+  FieldsUpdate()
+    Update the fields in the entire document. Retain the current cursor
+    location.
+
+    But note this doesn't always work with Table of Contents tables.
+
+    Return 1 on success, else die.
+
+  ToCUpdate()
+    Update both entries and page numebers of all the Tables of Contents in
+    the entire document. Retain the current cursor location.
+
+    Return 1 on success, else die.
+
+METHODS - IMAGES
+  InsertPicture($file, $embed = 0)
+    Insert the picture $file at the current cursor location. $file must be
+    one Word supports.
+
+    If $embed is 1, the picture $file itself will be embedded inside the
+    Word document. If $embed is 0, the picture is isn't embedded in the
+    document, but linked to it.
+
+    Return 1 on success, else die.
+
+METHODS - BOOKMARKS
+  BookmarkAdd($name)
+    Add a new bookmark called $name at the current cursor location.
+
+    Return 1 on success, else die.
+
+  BookmarkGoto($name)
+    Go to bookmark called $name. The bookmark should exist.
+
+    Return 1 on success, else die.
+
+  BookmarkDelete($name)
+    Delete bookmark called $name. The bookmark should exist.
+
+    Return 1 on success, else die.
+
+METHODS - UTILITY
+  MarkDocumentAsSaved()
+    Mark the Word document as "saved". This is in effect until the document
+    is changed again.
+
+    Being saved e.g. means it can be abandoned without questions.
+
+    Return 1 on success, else die.
+
+  GetFileTemp()
+    Return a temporary file name in fileTemp().
+
+  DESTROY
+    Release objects including the OLE Word object.
+
+KNOWN BUGS
+  Supressing dialog boxes
+    The most serious problem I have with Word is that the documented way of
+    supressing interactive dialog boxes... doesn't work! This is worked
+    around in a few cases (see below), but mostly it's broken.
+
+    I don't know if this only goes for my Office 2000 Word, but it may
+    affect you too.
+
+    It's a very bad thing anyhow, since it can cause your program to just
+    freeze, waiting for user interaction. To boot, the dialog boxes are
+    usually displayed below other applications.
+
+    I blame Bill's minions.
+
+  Only four columns in tables
+    It might be that your version of Word only supports four columns. Using
+    Word 2003, adding a fifth column results in:
+
+      This exceeds the maximum width.
+
+    This is described in <http://support.microsoft.com/kb/253600/>.
+    Unfortunately(?), this doesn't happen when I use Word interactively,
+    only under OLE Automation. The suggestions in the KB article won't solve
+    the problem.
+
+    In Word 2000 this wasn't a problem. It may be fixed in later versions.
+    Who knows?
+
+  OLE errors during global destruction
+    If you are in the middle of a table and something goes wrong, there will
+    be strange OLE warnings during global destruction. I haven't found out
+    why this happens.
+
+  Layout too complex
+    I have run into this problem where, despite the no-don't- show-dialogs,
+    Word pops up an error dialog below all other windows (so you can't see
+    it, great!).
+
+    After clicking Ok in this dialog a number of times, the OLE call finally
+    fails properly and dies in the Perl application layer.
+
+    http://support.microsoft.com/kb/292174
+
+    The only way to not run into this problem seems to be to save the
+    document to disk after adding some text. The Checkpoint() method does
+    this for you.
+
+  Rouge WINWORD.EXE processes
+    Sometimes it seems like Win32::OLE has some problems with closing the
+    Word instance during global destruction. This happens mostly when things
+    die().
+
+TODO
+    Tests for Tables of Contents etc
+
+    Tests for Bookmarks
+
+APPLICATION DOM INFORMATION
+    So what does the Word DOM look like? Actually, the documentation is
+    available when installing Office.
+
+    Start Word and press Alt-F11 to bring up the VBA window. There is an
+    Object Browser in the toolbar. Select an object, method or property and
+    press F1 to bring up the help.
+
+    A good way to figure out how to do something is to record a Macro and
+    then bring up the VBA window and inspect the code written by the Macro
+    Recorder.
+
+DESIGN ISSUES
+  Software versions
+    This is tested and developed using w2k and Office 2000. Things may be
+    different with other versions. Please let me know.
+
+  Supressing the "Save as..." dialog box
+    The problem with this is that it doesn't work to follow the manual and
+    advice found on the Net.
+
+    The usual answer is to set DisplayAlerts to False, or wdAlertsNone. That
+    doesn't work for me.
+
+    What works is to set the Document.Saved property to False before
+    quitting (the MarkDocumentAsSaved() method).
+
+    That's why the ActiveX object is Quit from the DESTROY method, and not
+    using the exit handler in CreateObject which is the normal course of
+    action.
+
+GOOD IDEAS
+  Keep an eye on the Task Manager
+    When you fiddle around with this program, it's useful to keep the Task
+    Manager window open to keep track of any WINWORD.EXE processes that may
+    be stuck in memory if you e.g. C-Break out of the script (don't do that,
+    Win32::OLE won't have a chance of cleaning up the Word instance it
+    created).
+
+    Kill abandoned Word processes (but make sure you don't kill any
+    documents you may be editing :)
+
+EXTENDING THE MODULE
+    The interface of this module is spotty in an opportunistic way; I have
+    added utility methods as I needed them.
+
+    If you need to add your own methods, I suggest you simply inject them in
+    this namespace to get your application working and send me a patch.
+
+    If you don't know how to create a patch file, just send me the code in
+    an email, or the changed source file as an attachment.
+
+    If you write something non-trivial, I'd like some tests to go with it
+    too, thanks!
+
+FAQ
+    Actual questions. Some of them even frequent.
+
+  Do I need Windows to run Win32::Word::Writer or does it work on Linux?
+    Yes, you do need Windows. Win32::Word::Writer is using the actual
+    Microsoft Word program installed on your computer.
+
+  Can Win32::Word::Writer do X?
+    If you can't find it described in the docs, probaby not. But if you've
+    seen it done in Word, it's clearly doable somehow (modulo Word bugs
+    courtesy of MS).
+
+    You can probably implement it yourself if you give it a try. Read the
+    Win32::Word::Writer source for hints on how to accomplish things.
+
+  Can you implement X for me?
+    No, not really.
+
+    I rarely touch this project nowadays, and I don't think I've actually
+    used it after the initial thing I needed to write it for years ago.
+
+    I'm happy that others find it useful though.
+
+    If you find it so useful that you need it to do more things, I urge you
+    to give it a shot at adding the functionality yourself.
+
+  If so many people e-mail you to say they like Win32::Word::Writer, why are there no reviews?
+    (okay, so this is my question)
+
+    Maybe they don't know the link to the <CPAN Reviews site>.
+
+AUTHOR
+    Johan Lindström, "<johanl[ÄT]DarSerMan.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-win32-word-writer@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-Word-Writer>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Johan Lindström, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+PRIVATE PROPERTIES
+    These are considered implementation details, but you may need to fiddle
+    with them if you extend the module.
+
+  hasWrittenParagraph
+    Whether the writer has written a paragraph yet.
+
+  hasWrittenText
+    Whether the writer has written any text or paragraph yet.
+
+  levelIndent
+    The indentation level for bullet point lists.
+
+    Default: 0
+
+  hasWrittenInIndent
+    Whether the writer has written anything after changing indentation
+    level.
+
+  rhConst
+    Ref to hash with imported Word constant symbold.
+
+  styleOld
+    The previous style.
+
+  fileTemp
+    The name of a temporary file.
+

@@ -1,0 +1,41 @@
+NAME
+    WWW::TypePad - Client for the TypePad Platform
+
+SYNOPSIS
+      use WWW::TypePad;
+      my $tp = WWW::TypePad->new(
+          consumer_key => 'YOUR-CONSUMER-KEY',
+          consumer_secret => 'YOUR-CONSUMER-SECRET',
+      );
+
+      # See samples/debug-console/app.psgi for the OAuth authentication flow
+      my $uid  = '6p0134842724af970c';
+      my $user = $tp->users->get($uid);
+
+      # See each modules POD documents for the API methods
+
+DESCRIPTION
+    WWW::TypePad is a Perl library implementing an interface to the TypePad
+    API platform.
+
+WARNINGS
+    The object interface and implementations are considered ALPHA and will
+    be likely to change in the future versions.
+
+AUTHOR
+    Benjamin Trott, Tatsuhiko Miyagawa and Martin Atkins <cpan@sixapart.com>
+
+COPYRIGHT
+    Copyright 2010- Six Apart, Ltd.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+COMMUNITY
+    <http://github.com/sixapart/perl-typepad-api>
+
+SEE ALSO
+    <http://developers.typepad.com/>
+    <http://www.typepad.com/services/apidocs>
+

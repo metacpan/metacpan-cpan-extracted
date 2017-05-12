@@ -1,0 +1,31 @@
+Win32/Wallpaper version 0.04
+============================
+
+The Win32::Wallpaper module allows you to modify the wallpaper, 
+or background image, on your Win32 desktop. BitMaPs (BMPs) are 
+the only images supported. 
+
+You can set three wallpaper styles: center, stretch, and tile.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Win32::API, Win32::TieRegistry, Image::Size
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Mike Accardo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

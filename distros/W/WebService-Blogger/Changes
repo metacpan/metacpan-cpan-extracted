@@ -1,0 +1,55 @@
+Revision history for WebService-Blogger
+
+0.22    04 Sept 2015 Change ownership to Kedar Warriner
+
+0.21    16 June 2015 Deprecate the module due to changes in Blogger's authentication mechanism
+
+0.20    13 June 2014 Fix request parameter passing
+
+0.19    11 April 2014 Remove extra debugging script
+
+0.18    11 April 2014 Fixed issue with XML namespaces in Blogger API calls.
+
+0.17    09 April 2014 Improved Unicode support.
+
+0.16    10 July 2012 Fixed a bug in credentials handling.
+
+0.15    10 July 2012 Fixed a bug in credentials handling. Allowed to specify full path to the
+        config file in WEBSERVICE_BLOGGER_CONFIG environment variable. Added support for
+        entries without content.
+
+0.13    17 Sep 2010 Fixed bug in build file.
+
+0.12    17 Sep 2010 A a bugfix, made Moose a dependency.
+
+0.11    25 Aug 2010 Factored out XML parsing routine into a role for
+        cleaner and more backward-compatible code.
+
+0.10    21 Aug 2010
+        Added support for credentials on ~/.www_blogger_rc, improved entry
+        creation workflow, improved tests and documentation.
+
+0.09    19 Aug 2010
+        Added entry search, more tests, updated documentation. Renamed package to WebService::Blogger.
+
+0.08    19 Aug 2010
+        Added $blog->destroy to work around circular references. Updated documentation.
+
+0.07    18 Aug 2010
+        Added deletion of entries. Code cleaned up.
+
+0.06    17 Aug 2010
+        Removed POD coverage testing as it complained about not documenting private attributes.
+
+0.04    17 Aug 2010
+        Specifying numeric blogger ID is no longer required.
+
+0.03    17 Aug 2010
+        Included dependencies in the packaging.
+
+0.02    17 Aug 2010
+        Improved performance and documentation.
+
+0.01    15 Aug 2010
+        First working version.
+

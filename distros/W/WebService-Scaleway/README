@@ -1,0 +1,30 @@
+WebService-Scaleway version 0.001001
+====================================
+
+Scaleway is an IaaS provider that offers bare metal ARM cloud servers.
+WebService::Scaleway is a Perl interface to the Scaleway API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* JSON::MaybeXS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

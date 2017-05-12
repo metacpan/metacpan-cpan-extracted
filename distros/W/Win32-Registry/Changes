@@ -1,0 +1,71 @@
+Revision history for Perl extension Win32::Registry.
+
+0.12  Wed Dec 11 2013
+	- Really add Github repo link to META.yml
+
+0.11  Wed Dec 6 2013
+	- Fix required perl version 5.6 -> 5.006.
+	- Add Github repo link to META.yml
+        - Fix "Could not find a typemap for C type 'FILETIME'" problem
+          [rt#75671].
+        - Fix lastwritetime return value of RegQueryInfoKey(). Existing
+          code would never assign it back to the output parameter.
+
+0.10  Mon Jun 23 2008
+        - Skip tests when not running as an administrator.
+
+0.09  Fri Jun 13 2008
+        - Fixes for Win64 support
+
+0.08  Tue Apr 15 2008
+	- version 0.08 for separate upload to CPAN
+	- simplified Makefile.PL
+	- added META.yml
+
+0.07  Mon May 22 21:47:32 2000
+	- added retry for RegQueryValueEx (courtesy Tye McQueen
+	  <tye@metronet.com>)
+	- add DESTROY() for proper cleanup (from Jenda Krynicky
+	  <Jenda@Krynicky.cz>)
+	- added POD documentation
+	- failed API calls now call SetLastError() making it visible
+	  via $^E; RegEnumKeyEx() added to XS code (thanks to Jenda
+	  Krynicky)
+	- *DO NOT USE THIS MODULE* in new code; use Win32::TieRegistry
+	  instead
+
+0.06  Sat Nov 14 23:05:24 1998
+	- missing SetPrivilege() in UnLoadKey()
+
+0.05  Tue Sep 15 12:29:06 1998
+	- support setting REG_NONE
+	- clean up the perl (somewhat)
+
+0.04  Thu Apr 16 23:00:26 1998
+	- export compatibility symbols RegFoo() (courtesy Tye McQueen
+	  <tye@metronet.com>)
+	- enable priveleges in Reg*Key() functions as needed (courtesy
+	  Jutta M. Klebe <jmk@exc.bybyte.de>)
+	- fix wrong number of args to RegQueryValueEx()
+
+0.03  Fri Feb  6 21:24:30 1998
+	- import changes from AS build 315
+	- eliminate hardcoded constants in Registry.pm
+	- add additional XSUBs for missing Win32 API counterparts
+	- fix for Load()/UnLoad() courtesy Jutta M. Klebe <jmk@exc.bybyte.de>
+
+0.02  Sat Aug  2 00:45:08 1997
+	- added RegQueryValueEx() (as suggested by
+	  Jutta Klebe <jmk@exc.bybyte.de>)
+	- Add missing arg for RegQueryInfoKey()
+	- Fixed RegSetValueEx() for empty values, and memory corruption
+	- Following two changes courtesy Jeff Urlwin
+	  <jurlwin@access.digex.net> and Michael Frederick:
+	    * new Connect() method and remote.pl example for accessing
+	      remove registry objects
+	    * iis_install.pl example
+
+0.01  Sat Apr  5 14:23:42 1997
+	- original version; created by h2xs 1.18
+	- imported Activeware version
+

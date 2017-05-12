@@ -1,0 +1,22 @@
+Revision history for Perl extension Win32::FileNotify.
+
+0.31 Thu Aug 05 2010
+     + bugfix: do not plan the tests in t/pod_coverage.t
+     + use UNIX EOL
+
+0.3  Thu Jul 29 2010
+     + bugfix: accidentially -s was used instead of the modified time.
+       Thanks to Mark Ginsburg (RT#59795)
+
+0.2  Thu Nov  6 11:58:22 2008
+     + added manifest.t
+     + updated MANIFEST
+     + updated README (deleted boilerplate text, added 2008 to copyright)
+     + added META.yml
+     + added pod.t
+     + added pod_coverage.t
+
+0.1  Wed Nov  7 11:31:18 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Win32::FileNotify
+

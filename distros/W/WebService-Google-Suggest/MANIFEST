@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WebService/Google/Suggest.pm
+t/00-compile.t
+t/00_compile.t
+t/01_suggest.t
+t/author-critic.t
+t/release-distmeta.t
+t/release-pod-coverage.t

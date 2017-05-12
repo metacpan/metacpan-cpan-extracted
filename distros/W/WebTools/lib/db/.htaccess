@@ -1,0 +1,14 @@
+AuthUserFile /dev/null
+AuthGroupFile /dev/null
+AuthName DenyViaWeb
+AuthType Basic
+
+<Files ~ "\.(stb|mdb|sdb|pl|cgi|html?|sql)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<LimitExcept GET POST OPTIONS PROPFIND>
+        Order deny,allow
+        Deny from all
+</LimitExcept>

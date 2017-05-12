@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/WebService/SongLyrics.pm
+MANIFEST			This list of files
+README
+t/pod-coverage.t
+t/pod.t
+t/test-kwalitee.t
+t/WebServiceSongLyrics.t
+Makefile.PL
+META.yml

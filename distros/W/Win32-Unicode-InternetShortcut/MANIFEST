@@ -1,0 +1,15 @@
+Changes
+InternetShortcut.xs
+InternetShortcut.h
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00_load.t
+t/01_basic.t
+t/02_compat.t
+t/03_threads.t
+lib/Win32/Unicode/InternetShortcut.pm
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+$Id: README 1933 2006-04-22 04:53:48Z btrott $
+
+This is WWW::Blog::Metadata::Icon, a class to extract icon/photo URIs
+from weblogs.
+
+PREREQUISITES
+
+    * WWW::Blog::Metadata
+    * URI
+    * LWP::UserAgent
+    * XML::FOAF
+
+INSTALLATION
+
+WWW::Blog::Metadata::Icon installation is straightforward. If your CPAN shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install WWW::Blog::Metadata::Icon'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Benjamin Trott / ben+cpan@stupidfool.org

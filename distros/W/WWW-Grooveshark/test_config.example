@@ -1,0 +1,15 @@
+# Copy or rename this file to 'test_config' and it will be read during testing
+
+# Testing is currently done with the staging server by default because the
+# live one is slightly out-of-date.  Uncomment to use the live server for
+# testing:
+# $staging = 0;
+
+# Uncomment and specify to run tests requiring a session:
+# $api_key = 'deadbeef';
+
+# Uncomment and specify to run tests requiring user authentication:
+# $user = 'bob';
+# $pass = 'secret';
+
+1;

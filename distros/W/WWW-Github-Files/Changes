@@ -1,0 +1,19 @@
+0.13 September 20, 2013
+	- YAPC::Asia::2013 edition
+	- add ability to use Github's Personal Access Tokens
+
+0.12 May 28, 2013
+	- Add JSON to dependencies
+	- test should skip if we got API limit reached
+
+0.11 May 25, 2013
+	- On communication error, now print the msg body for better debugging
+
+0.10 May 22, 2013
+    - Added a mocking module
+
+0.02 March 13, 2013
+    - Added tests and fixed bugs
+
+0.01 March 1, 2013
+    - Initial release

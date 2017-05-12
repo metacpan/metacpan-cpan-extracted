@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.74.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 52e2d0f2f40a78a935aee7c75a8567fc1aa5b44d Changes
+SHA1 0cc9cee7ca33c2d917235f0adf7082afe2d4d86d MANIFEST
+SHA1 76155f7b7cb37bc83dfd58925606e5de40243ef8 META.yml
+SHA1 1d51861ad694c4f272a430754fa72a8ca6b59e8f Makefile.PL
+SHA1 8960c2197084dad3eba776e5e9f4edb901aed479 README
+SHA1 6f2af5dd0f3db435e1d7c481b92af68f81bf0b6e README.mkdn
+SHA1 ab490aa2c6df158de499157a0fb1934bb28216c6 Symlink.pm
+SHA1 a07af5e71e48e91c126837b47491e84b37f8ab73 Symlink.xs
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 9892f830ea9b5fb1005ff17e38f9309a94f6ea0d inc/Module/Install/GithubMeta.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 eed821215a8910a6b379273c93eb9f10d76a4d19 inc/Pod/Markdown.pm
+SHA1 5977a9cf7d714cf1d96118a068542d16bec1c448 pgsymlink.c
+SHA1 837adeb23a5cb9bb8124fa4d075aa283d1306738 t/1-basic.t
+SHA1 534be2ebd0ebfa956b5c2604d228853c39c38ecd tclreadlink.c
+SHA1 7fefab9e3cbe37a7a900a3082ac4d454999bdb5b typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlUsL4UACgkQtLPdNzw1AaDhYQCgpHTyb4IApZXGvRvxdGPl7ScC
+ycQAn3GKYl8/Jt8ewpQw0Rgt1BjP++2p
+=JYMS
+-----END PGP SIGNATURE-----

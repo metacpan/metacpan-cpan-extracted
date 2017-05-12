@@ -1,0 +1,481 @@
+=encoding ISO8859-1
+
+
+=head1 NAME
+
+Win32::GUI::UserGuide::Concepts - General Concepts
+
+=head1 Packages
+
+Packages in Win32::GUI can be divided into three main
+categories: B<Windows>, B<Controls> and B<Resources>;
+but a big part of the core of this module is in the
+L<Win32::GUI|Win32::GUI::GUI> package. All the generic
+functions are defined there, and all the components 
+of the user interface inherit from it, so that most 
+of the functions that refer to windows (eg. Show, Hide,
+Height, Enable, and so on) apply to every object and
+can be used as their methods:
+
+    $Window->Show();
+    $Window->Button1->Show();
+
+Some other functions (like for example GetCursorPos)
+aren't applicable to an object, and they require
+a fully qualified call including the package name:
+
+    ($x, $y) = Win32::GUI::GetCursorPos();
+
+L<Windows|/Windows> are the well known windows that you see on 
+your screen; your script will probably generate one
+or more window that contain your user interface;
+this content is usually made up of B<Controls> (eg.
+labels, buttons, input fields and so on).
+They can also be considered as child windows,
+and, as said, they are all inherited from the 
+Win32::GUI package.
+
+L<Resources|/Resources> are of a different category: they
+build up, so to say, the graphical Windows
+toolkit (usually referred to as GDI, Graphics
+Device Interface); you'll find there fonts, 
+brushes, bitmaps, icons, cursors and so on.
+These objects are generally associated with
+your windows and controls (eg. you can set
+a windows or controls font); some of them,
+like pens and brushes, are used instead with
+the L<DC|Win32::GUI::DC> package, which
+implement the drawing primitives.
+
+There are then some packages that simply don't
+fit into the three categories above, because
+their use goes beyond the simple user interface:
+this is the case with L<Class|/Others>
+and the mentioned L<DC|/Others>.
+
+
+=head1 Objects
+
+You create an object using its B<constructor>,
+which is usally of the form:
+
+    $Object = new Win32::GUI::<something>( <options> );
+
+where <something> is the class of the object you want 
+to create (eg. Window, Menu, Font, etc.) and <options>
+are the characteristics of your object. Once you have
+the $Object variable, you can invoke methods on it:
+
+    $Object->Show();
+
+A different approach is possible with B<Controls>.
+Usually, once you created your $Window object, you
+will add controls in it with this construct:
+
+    $Window->AddButton( <options> );
+
+This function will return a $Button object as you
+may expect, but you don't need to store it in a
+variable: Win32::GUI will use the very special
+C<-name> option to store the object reference
+in the window as a named key (or sub-object):
+
+    $Window->AddButton( -name => "Button1" );
+    $Window->Button1->Show();
+    # or
+    $Window->{'Button1'}->Show();
+
+These sub-objects are really hash keys, but
+for your convenience are also AUTOLOAD'ed
+as if they were subroutines (see AutoLoader
+for details); this can introduce some confusion
+if you name an object with the same name as a
+Win32::GUI function.
+
+    $Window->AddButton( -name => "Show" );
+    $Window->Show->Show();
+
+This syntax will not work because "Show" is
+already defined as a method of your $Window
+object. The advice is to use a different
+name for your object, but if you B<really>
+can't renounce to it, you can still use the
+safer syntax:
+
+    $Window->{'Show'}->Show();
+
+It is of course always possible, if you don't
+mind using too much variables, to use the 
+less elegant form:
+
+    $Button1 = $Window->AddButton( ... );
+    $Button1->Show();
+
+=head1 Options
+
+The definition of an object is made up of
+B<options>, which are pretty much
+like an associative array; option names
+are always lowercase and preceded by a dash (-),
+while their value vary (can be strings,
+numbers, objects or array references).
+
+A number of options is common to any window
+(and control), and they're documented in 
+L<Common options|Win32::GUI::Reference::Options>; furthermore,
+different objects have different specific
+options, documented in the single packages
+reference.
+
+The most important option for a window is
+C<-name>; this defines the name of the object
+in its container (as explained above) and
+the name used in the L<Events|/Events> naming 
+convention:
+
+    $Window->AddButton( -name => "Button1" );
+    
+    $Window->Button1->Show();
+    
+    sub Button1_Click { print "ouch!\n"; }
+
+An example of using a complete set of options:
+
+    $Window = new Win32::GUI::Window(
+        -name   => "Window",
+        -title  => "Perl Window Example",
+        -left   => 100,  
+        -top    => 100,
+        -width  => 500, 
+        -height => 400,         
+        -menu   => $Menu,
+    );
+
+=head1 The dialog phase
+
+After creating your windows and done all the needed
+initialization processes, you may probably want your
+script to present the user with a window and await
+for his actions; in other words, you want to interact
+with the user. This is done in the dialog phase.
+
+To enter the dialog phase simply call this instruction:
+
+    Win32::GUI::Dialog();
+
+or better yet, if you want to check the exit code
+of your GUI program:
+
+    $exitcode = Win32::GUI::Dialog();
+
+When the script encounter this instruction, its 
+execution halts and the user has the ability to 
+interact with what's on the screen. Since windows
+are by default created in an invisible state, you
+may probably call before something like:
+
+    $Window->Show();
+
+if your program is supposed to start with $Window
+as its entry point.
+
+While in the dialog phase, user's actions will
+generate B<Events> as needed. This phase ends
+when an event returns -1 or you press Cancel
+in response to a program error (see below for
+more details); when it ends, the control returns
+to the main body of your script (at the line after
+the one with the Win32::GUI::Dialog call) 
+and it can go on normally.
+
+
+=head1 Events
+
+Events are Perl subs that are called in response
+to an event that occurred in the user interface, usually
+generated by an action of the user. For example,
+a button has a Click event that is called when the
+user pushes it. The naming convention for events
+follows the Microsoft Visual Basic's one; its form
+is:
+
+    OBJECTNAME_Eventname
+
+(note there's an underscore in between),
+where B<OBJECTNAME> is the value of the C<-name>
+option used when creating the object, and 
+B<Eventname> is the event name, eg. Click.
+So if you have a button named C<Button1>, your
+Click event will be defined as follows:
+
+    sub Button1_Click {
+        # ...do something...
+    }
+
+The code inside will be executed when C<Button1>
+gets pressed.
+
+Win32::GUI also interprets the value returned
+by the sub; unless otherwise documented in the
+event description, the meaning of the return
+value is:
+
+=over
+
+=item * 1 (one, or a true value)
+
+the script proceeds normally and the event is
+passed to the underlying default event 
+processor.
+
+=item * 0 (zero)
+
+the dialog phase continues but the event is
+not passed to the default event processor
+(what this means effectively depends on the
+event).
+
+=item * -1 (minus one)
+
+the dialog phase ends, and control returns to
+the main body of your script. You will most
+probably use this to end your program:
+
+    sub Window_Terminate {
+        return -1;
+    }
+
+=back
+
+The behaviour of the default event processor
+depends on the control and the event; in case
+of doubt, is always a good idea to end your event 
+with an explicit:
+
+    return 1;
+
+Finally, you should note that events are really
+B<evaluated> (as if they were called with B<eval()>),
+so that errors are trapped, and a message box is shown.
+This box reports the offending event name on the title bar, 
+the error message in its body and has OK and Cancel
+buttons. If you press OK, Win32::GUI will ignore the
+error and go on with the dialog (the event, of course,
+doesn't take place); if you press Cancel instead the
+dialog will end (with return code -1).
+This means that for example if you define an event like:
+
+    sub Button1_Click {
+        die();
+    }
+
+your script will not die immediately at the click of a
+button, but the message box will appear, reporting for 
+example "Died at script.pl line 73".
+
+=head1 Windows
+
+In its widest acception, windows include what you normally
+call a window (sometimes referred to as a "top level window"),
+controls (sometimes referred to as "child windows") and even 
+L<Non-owned windows|/Non-owned windows> (not created by Win32::GUI).
+
+Real (top level) windows are the container of your user
+interface; Win32::GUI defines two packages, L<Window|Win32::GUI::Window>
+and L<DialogBox|Win32::GUI::DialogBox>. By default, a Window has a title
+bar, the usual minimize/maximize/close buttons, a system
+menu (the button on the top left corner) and resizable borders. 
+A DialogBox is very similar, except that by default it cannot 
+be resized and it doesn't have the minimize and maximize buttons.
+The main difference between the two packages is in the dialog
+phase; DialogBox intercepts the tab and arrow keys to switch 
+between controls, the use of Return and Esc for the Ok and
+Cancel button and accelerators, while Window not.
+
+=head1 Controls
+
+Also known as "widgets" , these represent the content of 
+your windows, and includes almost all the controls provided
+by Windows:
+
+=over
+
+=item * L<Animation|Win32::GUI::Animation>
+
+=item * L<Button|Win32::GUI::Button>
+
+=item * L<Checkbox|Win32::GUI::Checkbox>
+
+=item * L<Combobox|Win32::GUI::Combobox>
+
+=item * L<Label|Win32::GUI::Label>
+
+=item * L<ListView|Win32::GUI::ListView>
+
+=item * L<Listbox|Win32::GUI::ListBox>
+
+=item * L<NotifyIcon|Win32::GUI::NotifyIcon>
+
+=item * L<ProgressBar|Win32::GUI::ProgressBar>
+
+=item * L<RadioButton|Win32::GUI::RadioButton>
+
+=item * L<Rebar|Win32::GUI::Rebar>
+
+=item * L<RichEdit|Win32::GUI::RichEdit>
+
+=item * L<Slider|Win32::GUI::Slider>
+
+=item * L<StatusBar|Win32::GUI::StatusBar>
+
+=item * L<TabStrip|Win32::GUI::Tabstrip>
+
+=item * L<Textfield|Win32::GUI::Textfield>
+
+=item * L<Timer|Win32::GUI::Timer>
+
+=item * L<Toolbar|Win32::GUI::Toolbar>
+
+=item * L<Tooltip|Win32::GUI::Tooltip>
+
+=item * L<TreeView|Win32::GUI::TreeView>
+
+=item * L<UpDown|Win32::GUI::UpDown>
+
+=back
+
+=head1 Resources
+
+=over
+
+=item * L<Bitmap|Win32::GUI::Bitmap>
+
+=item * L<Brush|Win32::GUI::Brush>
+
+=item * L<Cursor|Win32::GUI::Cursor>
+
+=item * L<Font|Win32::GUI::Font>
+
+=item * L<Icon|Win32::GUI::Icon>
+
+=item * L<ImageList|Win32::GUI::ImageList>
+
+=item * L<Menu|Win32::GUI::Menu>
+
+=item * L<MenuButton|Win32::GUI::MenuButton>
+
+=item * L<MenuItem|Win32::GUI::MenuItem>
+
+=item * L<Pen|Win32::GUI::Pen>
+
+=back
+
+=head1 Others
+
+=over
+
+=item * L<Class|Win32::GUI::Class>
+
+=item * L<DC|Win32::GUI::DC>
+
+=back
+
+=head1 Non-owned windows
+
+Every window, even windows not created by your Perl script,
+can be referenced by Win32::GUI; all you need to know is
+its "handle", a numerical value that identifies that window.
+Many functions in the Win32::GUI package return such handles,
+as for example:
+
+    $First = Win32::GUI::GetForegroundWindow();
+
+This value can then be passed to any function that requires
+a window object; but of course, not being an object, you can't
+call it as a method:
+
+    Win32::GUI::Hide($First); # correct
+    $First->Hide();           # wrong
+
+Should you need to know the numerical handle of a window
+created by Win32::GUI, it is stored in its C<-handle> key
+(this is the value that almost all function really use):
+
+    print "Window handle is $Window->{-handle} \n";
+
+=head1 Colors
+
+Wherever you need to express a color, there are two
+possibilities: 
+
+=over
+
+=item first: 
+
+Use a numeric value that
+contains red, green and blue components
+(that's the form Windows uses); expressing this
+form in hexadecimal, components are reversed with
+respect to the traditional (RGB) order:
+
+    0xBBGGRR
+
+Each components range is 0 to 0xFF, or 255; 
+a value of 0, 0, 0 (0x000000) represents black,
+while a value of 255, 255, 255 (0xFFFFFF) represents
+white.
+The following are all valid color definitions in
+hexadecimal and decimal format (for practical reasons, 
+you would probably prefer the hexadecimal notation):
+
+    $color = 0xFF0000;  # blue
+    $color = 16711680;  # blue
+    $color = 255 << 16; # blue
+    $color = 0x00FF00;  # green
+    $color = 65280;     # green
+    $color = 0x80FFFF;  # pale yellow
+    $color = 8454143;   # pale yellow
+
+=item second:
+
+Use a reference to a list with 3 values that
+express the red, green and blue components as above:
+
+    [ R, G, B ]
+
+Note that this is NOT a plain list (since a color
+is usually one parameter in a list of parameters to a 
+function, it wouldn't make much sense); so the following
+forms are valid:
+
+    [ 0, 0, 0 ]
+    [ 255, 255, 255]
+    [ 0x80, 0xFF, 0xFF ]
+    \@color
+
+=back
+
+=for comment $Id: pod_postamble.tpl,v 1.2 2005/08/03 21:45:59 robertemay Exp $
+
+=head1 VERSION
+
+Documentation for Win32::GUI v1.13 created 26 Jul 2016
+
+This document is autogenerated by the build process. Edits made here will be lost.
+Edit F<docs/GUI/UserGuide/Concepts.pod> instead.
+
+=head1 SUPPORT
+
+Homepage: L<http://perl-win32-gui.sourceforge.net/>.
+
+For further support join the users mailing list from the website
+at L<http://lists.sourceforge.net/lists/listinfo/perl-win32-gui-users>.  There is a searchable list archive at L<http://sourceforge.net/p/perl-win32-gui/mailman/perl-win32-gui-users/>.
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright (c) 1997..2016 Aldo Calpini. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

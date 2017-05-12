@@ -1,0 +1,6 @@
+  - Scintilla.PL should be re-written to be more generic when
+    parsing scintilla.iface
+  - Generate the majority of Scintilla.pod from scintilla.iface
+  - More subclasses for syntax high-lighting other languages
+  - find a way to make Scintilla (SciLexer.dll) play nicely with PAR
+  - NEM event support

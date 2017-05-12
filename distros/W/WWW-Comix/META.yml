@@ -1,0 +1,43 @@
+---
+name: WWW-Comix
+version: 0.1.1
+author:
+  - 'Flavio Poletti <flavio [at] polettix [dot] it>'
+abstract: programmatically access comics on the web
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Entities: 0
+  HTML::LinkExtor: 0
+  List::MoreUtils: 0
+  Module::Pluggable: 0
+  Moose: 0
+  Moose::Policy::FollowPBP: 0
+  Path::Class: 0
+  Readonly: 0
+  Test::More: 0
+  URI: 0
+  WWW::Mechanize: 0
+  perl: 5.8.0
+  version: 0
+provides:
+  WWW::Comix:
+    file: lib/WWW/Comix.pm
+    version: 0.1.1
+  WWW::Comix::Plugin:
+    file: lib/WWW/Comix/Plugin.pm
+  WWW::Comix::Plugin::ArcaMax:
+    file: lib/WWW/Comix/Plugin/ArcaMax.pm
+  WWW::Comix::Plugin::ComicsDotCom:
+    file: lib/WWW/Comix/Plugin/ComicsDotCom.pm
+  WWW::Comix::Plugin::Creators:
+    file: lib/WWW/Comix/Plugin/Creators.pm
+  WWW::Comix::Plugin::GoComics:
+    file: lib/WWW/Comix/Plugin/GoComics.pm
+  WWW::Comix::Plugin::KingFeatures:
+    file: lib/WWW/Comix/Plugin/KingFeatures.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

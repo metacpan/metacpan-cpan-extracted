@@ -1,0 +1,409 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+	<meta name="title" content="Vie de merde : Vos histoires de la vie quotidienne">
+	<meta name="description" content="Ma vie c'est de la merde, et je vous emmerde. Partagez vos petits malheurs et drôles d'histoires de la vie quotidienne.">
+	<meta name="author" content="Maxime Valette, Antoine Descamps, Guillaume Passaglia">
+	<link rel="shortcut icon" href="http://cdn.betacie.com/viedemerde/images/favicon.png">
+	<link rel="alternate" type="application/rss+xml" title="Suivez les VDM" href="http://feeds.feedburner.com/viedemerde">
+	<link rel="alternate" type="application/rss+xml" title="Suivez le blog de VDM" href="http://feeds.feedburner.com/blogdemerde">
+	<link rel="alternate" type="application/rss+xml" title="Suivez les commentaires VDM" href="http://feeds.feedburner.com/commdemerde">
+	<link rel="alternate" type="application/rss+xml" title="Suivez les vidéos VDM" href="http://feeds.feedburner.com/videosdemerde">
+	<link rel="stylesheet" media="screen" type="text/css" href="documentation_fichiers/style.css">
+	<link rel="stylesheet" media="screen" type="text/css" href="documentation_fichiers/jtip.css">
+	<link rel="stylesheet" media="screen" type="text/css" href="documentation_fichiers/rater.css">
+	<title>Vie de merde : Vos histoires de la vie quotidienne</title>
+	<script type="text/javascript" src="documentation_fichiers/jquery-1.js"></script>
+	<script type="text/javascript" src="documentation_fichiers/viedemerde.js"></script>
+	<script type="text/javascript" src="documentation_fichiers/jtip.js"></script>
+</head><body>
+<div id="content">
+	<div id="haut">
+		<div class="premiere"><img src="documentation_fichiers/premiere.png" alt="En partenariat avec Premiere.fr" align="base"></div>
+		<div style="float: right; font-size: 9px; width: 200px;">
+			<div class="recherche_aide"><a href="http://www.viedemerde.fr/recherche/avance"><b>Nouveau</b> : Recherche avancée</a></div>
+			<form action="/apps/recherche.php?type=vdm&amp;from=top" method="post" id="recherche_haut">
+				<input src="documentation_fichiers/chercher.gif" value="texte" id="submit_srch" type="image"> <input name="texte" id="mot" type="text">
+			</form>
+		</div>
+		<div class="maintitle"><a href="http://www.viedemerde.fr/" title="Accueil">Vie de merde</a></div>
+		<div class="title">Ma vie c'est de la merde, et je vous emmerde</div>
+		<div class="menu">
+			<h1><a href="http://www.viedemerde.fr/">Accueil</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/faq">FAQ</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/api">API 1.2</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/top">Le Top</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/flop">Le Flop</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/aleatoire">VDM aléatoire</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/tshirts">Boutique VDM</a></h1><div class="tiret">-</div>
+			<h1><a href="javascript:submitToggle();" class="submit">Soumettez votre VDM</a></h1><div class="tiret">-</div>
+			<h1><a href="http://www.viedemerde.fr/moderation" style="font-weight: bold; color: rgb(186, 44, 44);">Modérez les VDM</a></h1>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+<div id="submit">
+	<h1>Soumettez votre vie de merde :</h1><br>
+	<ul style="list-style-type: none; margin-bottom: 10px;"><li>- <b>Rappel du concept :</b> Une anecdote qui commence par "Aujourd'hui" et qui se termine par "VDM".</li>
+	<li>- <b>Attention :</b> Relisez-vous. Une anecdote écrite en SMS ou comportant trop de fautes d'orthographe est toujours refusée.</li><li>- N'utilisez pas cet espace pour des discussions, de la publicité ou pour tout autre texte n'étant pas une VDM.</li></ul>
+	<form method="post" action="/apps/submit.php">
+	<fieldset>
+	<div class="input_auteur">Votre pseudo : <input name="auteur" value="" type="text"></div>	<div class="input_cat">Catégorie : <select name="cat">
+		<option value="amour">Amour</option>
+<option value="argent">Argent</option>
+<option value="enfants">Enfants</option>
+<option value="travail">Travail</option>
+<option value="sante">Santé</option>
+<option value="sexe">Sexe</option>
+<option value="inclassable" selected="selected">Inclassable</option>
+	</select></div>
+	<textarea id="update" name="content" rows="6" onkeyup="cut(this);"></textarea>
+	<div class="input_mail"><a href="javascript:displayMail();">Être prévenu par e-mail ?</a></div>
+	<div class="ok"><span id="compteur"></span> <input name="ok" value="Balance la sauce" type="submit"></div>
+	<input id="firstname" value="" name="firstname" type="text">
+	</fieldset>
+	</form>
+</div>
+
+
+<div id="wrapper">
+
+<div class="post">
+	<p style="text-align: center;">
+		<a href="http://www.viedemerde.fr/api/applications">Liste des applications</a> | <strong>Documentation API</strong> | <a href="http://www.viedemerde.fr/api/developpeurs">Espace développeurs</a>
+	</p>
+</div>
+
+<div class="post">
+
+<h3>Documentation de l'API VDM</h3>
+
+<div class="blog">
+
+<p>Ci-dessous la description du fonctionnement de l'API VDM, version <strong>1.2</strong>.</p>
+
+<ul>
+	<li><a href="#principe">Principe de fonctionnement</a></li>
+	<li style="list-style-type: none;">&nbsp;</li>
+	<li><a href="#cle">Clé de développement</a></li>
+	<li><a href="#ident">Identification membres</a></li>
+	<li style="list-style-type: none;">&nbsp;</li>
+	<li><a href="#action_view">Action /view</a></li>
+	<li><a href="#action_vote">Action /vote</a></li>
+	<li><a href="#action_submit">Action /submit</a></li>
+	<li><a href="#action_comment">Action /comment</a></li>
+	<li><a href="#action_mod">Action /mod</a></li>
+	<li><a href="#action_compte">Action /compte</a></li>
+	<li><a href="#action_dev">Action /dev</a></li>
+</ul>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="principe"></a><strong>Principe de fonctionnement</strong></p>
+
+<p>Les appels à l'API doivent être faits avec des requêtes HTTP GET sur le domaine api.viedemerde.fr, du type :</p>
+
+<div class="clear"></div>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/last</p>
+
+<p>Le format de retour est du XML, qui dans sa plus simple expression se résume à cela :</p>
+
+<p class="code">&lt;root&gt;<br>
+
+	<i>( ... réponse ... )</i><br>
+	&lt;code&gt;1&lt;/code&gt;<br>
+	&lt;erreurs/&gt;<br>
+&lt;/root&gt;</p>
+
+<ul>
+	<li><strong>code</strong> est à 1 lorsque l'opération est un succès, 0 sinon</li>
+
+	<li><strong>erreurs</strong> contient les erreurs dans le cas où le code est à 0</li>
+</ul>
+
+<p>Les retours XML ne sont pas expliqués dans les détails, faites des
+tests par vous-même, ils sont suffisamment explicites pour ne pas avoir
+à les documenter :)</p>
+
+<p>Pour effectuer des tests sans affecter la base de données, vous pouvez désormais utiliser <strong>sandbox.viedemerde.fr</strong> comme serveur à la place de l'habituel api.viedemerde.fr.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="cle"></a><strong>Clé de développement</strong></p>
+
+<p>La version 1.2 apporte une amélioration notable par rapport à la version 1.1 pour ce qui est de la clé de développement.</p>
+
+<p>Beaucoup d'applications utilisant l'API VDM se basant sur la version
+1.0 n'utilisent que des fonctions qui ne font pas appel à une action
+qui modifie quelque chose sur le site. C'est pourquoi dans la version
+1.2 nous avons repris ce système en proposant une <strong>clé lecture seule</strong>.
+
+</p><p>Cette clé lecture seule vous permet donc d'utiliser l'API pour
+toutes les actions qui ne requièrent pas d'identification du membre :</p>
+
+<p class="code">?key=readonly</p>
+
+<p>A noter que si vous fournissez une mauvaise clé de développement, vous passez automatiquement en lecture seule.</p>
+
+<p>Pour pouvoir utiliser complètement l'API en revanche, vous devez
+disposer d'une clé de développement. Aucune contrainte particulière
+n'est appliquée, vous devez simplement en faire la demande dans <a href="http://www.viedemerde.fr/api/developpeurs">l'espace développeurs</a>, vous recevrez une clé instantanément par e-mail.</p>
+
+<p>Une fois que vous disposez de cette clé, vous devez toujours la mentionner en paramètre de vos appels à l'API :</p>
+
+<p class="code">?key=XXXXXXXXXXXXX</p>
+
+<p>Cette clé nous permet de faire de meilleures statistiques sur
+l'utilisation de l'API, et ainsi de pouvoir l'améliorer plus facilement
+et rapidement. Grâce à cette clé nous pourrons aussi vous contacter
+pour les mises à jour majeures de l'API.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="ident"></a><strong>Identification membres</strong></p>
+
+<p>Pour plus de sécurité, vous ne pouvez pas demander aux membres de
+vous donner leurs identifiants via l'API. Le membre doit aller sur une
+URL du type ci-dessous :</p>
+
+<p class="code">http://www.viedemerde.fr/compte/token/&lt;votre clé API&gt;</p>
+
+<p>Sur cette URL le membre confirmera qu'il veut vous donner accès à
+son compte membre et il recevra une chaîne de caractère appelée token,
+dont vous aurez besoin pour effectuer des actions sur son compte via
+l'API :</p>
+
+<p class="code">&amp;token=XXXXXXXXXXXXX</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_view"></a><strong>Action /view</strong></p>
+
+<p>Affiche les VDM de plusieurs façons :</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/last<span class="opt">[/page]</span></p>
+
+<p>Affiche les dernières VDM postées sur le site par page de 15.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/random</p>
+
+<p>Affiche une VDM au hasard avec ses commentaires.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/top<span class="opt">[/page]</span></p>
+
+<p>Affiche le top VDM. Pour préciser un intervalle, changer le paramètre en : top_jour / top_semaine / top_mois</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/flop<span class="opt">[/page]</span></p>
+
+<p>Affiche le flop VDM. Pour préciser un intervalle, changer le paramètre en : flop_jour / flop_semaine / flop_mois</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/<span class="opt">[cat]</span><span class="opt">[/page]</span></p>
+
+<p>Affiche les dernières VDM de la catégorie nommée, par page de 15. Le paramètre peut être : amour / argent / travail / 
+
+sante / sexe / inclassable</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/<span class="opt">[numero]</span><span class="opt">[/nocomment]</span></p>
+
+<p>Affiche la VDM #[numero] avec ses commentaires. Rajoutez le paramètre /nocomment pour ne pas afficher les commentaires.</p>
+
+<p class="code">POST http://api.viedemerde.fr/1.2/view/recherche/?recherche=<span class="opt">[recherche]</span></p>
+
+<p>Affiche les VDM correspondant à la recherche. Pour connaître les astuces, rendez-vous sur la <a href="http://www.viedemerde.fr/rechercher">page dédiée</a> à la recherche sur VDM. Attention, se passe en <strong>POST</strong> !</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/categories</p>
+
+<p>Affiche les catégories disponibles sur le site.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/new</p>
+
+<p>Affiche les VDM non-lues du membre.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/view/favoris</p>
+
+<p>Affiche les VDM favorites du membre.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_vote"></a><strong>Action /vote</strong></p>
+
+<p>Cette action permet de voter via l'API pour les VDM. Cette fonction est réservée aux membres VDM (token).</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/vote/<span class="opt">[numero]</span>/<span class="opt">[type]</span></p>
+
+<p>Unique fonction de l'action vote, remplacer par le numéro de la VDM à voter, et type peut être : je_valide / bien_merite</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_submit"></a><strong>Action /submit</strong></p>
+
+<p>Envoie une VDM :</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/submit</p>
+
+<p>Attention, les éléments du formulaire se passent en paramètres :</p>
+
+<p class="code">&amp;auteur= <span class="com">// Auteur de la VDM</span><br>
+&amp;cat= <span class="com">// Catégorie</span><br>
+&amp;texte= <span class="com">// Texte</span><br>
+&amp;mail= <span class="com">// Mail (facultatif)</span></p>
+
+<p>La catégorie peut être : amour / argent / travail / sante / sexe /
+inclassable. Les mêmes restrictions que la soumission d'une VDM via le
+site s'appliquent : Limitation de 300 caractères notamment.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_comment"></a><strong>Action /comment</strong></p>
+
+<p>Envoie un commentaire sur une VDM :</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/comment</p>
+
+<p>Attention, les éléments du formulaire se passent en paramètres :</p>
+
+<p class="code">&amp;id= <span class="com">// ID de la VDM</span><br>
+&amp;texte= <span class="com">// Texte</span><br>
+&amp;url= <span class="com">// Site web (facultatif)</span></p>
+
+<p>L'utilisateur qui poste un commentaire doit être membre de VDM et identifié via l'API (token).</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_mod"></a><strong>Action /mod</strong></p>
+
+<p>Intégration de l'auto-modération dans l'API :</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/mod/last</p>
+
+<p>Affiche la dernière VDM à modérer.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/mod/view<span class="opt">[/numero]</span></p>
+
+<p>Dans le [numero], cette commande renvoie la liste de toutes les VDM
+restant à modérer. Avec le numéro, elle affiche une VDM en particulier.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/mod/<span class="opt">[oui|non]</span>/<span class="opt">[numero]</span></p>
+
+<p>Modère selon si OUI ou NON la VDM en question doit être acceptée sur le site.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_compte"></a><strong>Action /compte</strong></p>
+
+<p>Utilitaires pour les comptes membre :</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/compte/infos</p>
+
+<p>Renvoie les informations du compte identifié.</p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/compte/logout/<span class="opt">[token]</span></p>
+
+<p>Supprime le token de la base de l'API pour déconnecter le membre de manière sûre.</p>
+
+</div></div>
+
+<div class="post"><div class="blog">
+
+<p><a name="action_dev"></a><strong>Action /dev</strong></p>
+
+<p class="code">GET http://api.viedemerde.fr/1.2/dev</p>
+
+<p>Affiche plusieurs statistiques sur votre compte développeur.</p>
+
+</div></div>
+
+</div>
+<div id="droite">
+	<div class="box" id="box_categories">
+		<div class="titretop">Catégories</div>
+		<ul>
+			<li><a href="http://www.viedemerde.fr/">Voir tout</a></li>
+<li id="amour" class=""><h3><a href="http://www.viedemerde.fr/amour">Amour</a></h3></li>
+<li id="argent" class=""><h3><a href="http://www.viedemerde.fr/argent">Argent</a></h3></li>
+<li id="enfants" class=""><h3><a href="http://www.viedemerde.fr/enfants">Enfants</a></h3></li>
+<li id="travail" class=""><h3><a href="http://www.viedemerde.fr/travail">Travail</a></h3></li>
+<li id="sante" class=""><h3><a href="http://www.viedemerde.fr/sante">Santé</a></h3></li>
+<li id="sexe" class=""><h3><a href="http://www.viedemerde.fr/sexe">Sexe</a></h3></li>
+<li id="inclassable" class=""><h3><a href="http://www.viedemerde.fr/inclassable">Inclassable</a></h3></li>
+		</ul>
+	</div>
+		<div class="box">
+		<div class="titretop">Votre compte</div>
+		<div class="loginform">
+		<form name="login" action="/apps/login.php" method="post">
+			<input name="login" value="Pseudo" onfocus="if (this.value == 'Pseudo') { this.value = ''; }" type="text">
+			<input name="pass" value="Mot de passe" onfocus="if (this.value == 'Mot de passe') { this.value = ''; }" type="password">
+			<div style="text-align: center;"><input src="documentation_fichiers/btn_connexion.gif" value="COnnexion" id="submit_connexion" type="image"></div>
+			<div class="liens"><a href="http://www.viedemerde.fr/inscription">Inscription</a></div>
+			<div class="liens"><a href="http://www.viedemerde.fr/motdepasse">Mot de passe ?</a></div>
+		</form>
+		</div>
+	</div>
+		<div class="box">
+		<h4>Blog de l'équipe</h4>
+		<ul>
+			<li><a href="http://www.viedemerde.fr/blog/119">Une nouvelle page dans notre histoire</a></li><li class="resume">D'un délire entre amis à quelque chose dont ...</li>			<li class="tout"><a href="http://www.viedemerde.fr/blog">Voir tout le blog</a></li>
+		</ul>
+	</div>
+	<div class="box publicite">
+		<script type="text/javascript" src="documentation_fichiers/a.html"></script><script type="text/javascript" src="documentation_fichiers/NETAVENIR.js"></script><script type="text/javascript" src="documentation_fichiers/a_002.html"></script><script type="text/javascript" src="documentation_fichiers/show_ads.js"></script><script> window.google_render_ad(); </script><iframe name="google_ads_frame" src="documentation_fichiers/ads.html" http:="" www.macromedia.com="" frameborder="0" height="600" width="120">Macromedia&amp;reg;&lt;/A&gt;&lt;P&gt;GPLFLash
+homepage : &lt;A
+HREF="http://gplflash.sf.net"&gt;gplflash.sf.net&lt;/A&gt;&amp;u_h=800&amp;u_w=1280&amp;u_ah=800&amp;u_aw=1280&amp;u_cd=24&amp;u_tz=120&amp;u_his=3&amp;u_java=true&amp;u_nplug=3&amp;u_nmime=33"
+marginwidth="0" marginheight="0" vspace="0" hspace="0"
+allowtransparency="true" scrolling="no"&gt;</iframe><script type="text/javascript" src="documentation_fichiers/tracking.js"></script><iframe hspace="0" vspace="0" style="visibility: hidden;" src="documentation_fichiers/save.html" frameborder="0" height="0" width="0"></iframe><noscript><a
+href="http://www.netavenir.fr/">Net Avenir : gestion publicitaire<img
+src="http://engine.espace.netavenir.com/?zid=1990&amp;noscript=true"
+width="0" height="0" border="0" alt="Net Avenir : gestion publicitaire"
+/></a></noscript>
+	</div>
+	<div class="box footer">
+		<p>© 2008.</p>
+		<ul>
+			<li>Créé par <a href="http://www.maximevalette.com/">Maxime VALETTE</a></li>
+			<li>pour <a href="http://www.betacie.com/">Beta&amp;Cie</a></li>
+			<li><a href="mailto:contact@viedemerde.fr">Contactez-nous</a> (e-mail)</li>
+			<li><a href="http://www.viedemerde.fr/conditions">Conditions d'utilisation</a></li>
+		</ul>
+	</div>
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+	<div class="post">
+		<a href="http://www.viedemerde.fr/tshirts">Boutique</a> - <a href="http://www.viedemerde.fr/amour">Amour</a> - <a href="http://www.viedemerde.fr/argent">Argent</a> - <a href="http://www.viedemerde.fr/enfants">Enfants</a> - <a href="http://www.viedemerde.fr/travail">Travail</a> - <a href="http://www.viedemerde.fr/sante">Santé</a> - <a href="http://www.viedemerde.fr/sexe">Sexe</a> - <a href="http://www.viedemerde.fr/inclassable">Inclassable</a> - <a href="http://www.viedemerde.fr/recherche/resultat/?membre=1">Membre</a> - <a href="http://www.sooweb.fr/">Référencement Naturel</a> <a href="http://www.sooweb.fr/">Sooweb</a>
+	</div>	
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="documentation_fichiers/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-2538950-3");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<script type="text/javascript"> audience = {id:78, externalData:{}};
+var a = audience.externalData; document.write('<scr' + 'ipt type="text/javascript" src="http://audience.netavenir.com/tracking.js"></scr' + 'ipt>'); </script><script type="text/javascript" src="documentation_fichiers/tracking.js"></script><iframe hspace="0" vspace="0" style="visibility: hidden;" src="documentation_fichiers/save_002.html" frameborder="0" height="0" width="0"></iframe>
+</body></html>

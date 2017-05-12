@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="US-ASCII" ?>
+<!DOCTYPE wbxml [
+  <!ELEMENT wbxml (PublicIdentifiers,App+)>
+  <!ATTLIST wbxml version NMTOKEN #REQUIRED>
+  <!ELEMENT PublicIdentifiers (PublicIdentifier)*>
+  <!ELEMENT PublicIdentifier EMPTY>
+  <!ATTLIST PublicIdentifier value NMTOKEN #REQUIRED>
+  <!ATTLIST PublicIdentifier name CDATA #REQUIRED>
+  <!ELEMENT App (TagTokens?,AttrStartTokens?,AttrValueTokens?,Ext0Values?,Ext1Values?,Ext2Values?,CharacterEntities?)>
+  <!ATTLIST App publicid CDATA #REQUIRED>
+  <!ATTLIST App systemid CDATA #IMPLIED>
+  <!ATTLIST App use-default (no|yes) #IMPLIED>
+  <!ATTLIST App variable-subs (no|yes) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST App textual-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App tokenised-ext NMTOKEN #IMPLIED>
+  <!ATTLIST App xml-space (default|preserve) #IMPLIED>
+  <!ELEMENT TagTokens (TAG)*>
+  <!ELEMENT TAG EMPTY>
+  <!ATTLIST TAG token NMTOKEN #REQUIRED>
+  <!ATTLIST TAG name NMTOKEN #REQUIRED>
+  <!ATTLIST TAG codepage NMTOKEN #IMPLIED>
+  <!ATTLIST TAG encoding (base64|datetime|integer) #IMPLIED>	<!-- WV -->
+  <!ELEMENT AttrStartTokens (ATTRSTART)*>
+  <!ELEMENT ATTRSTART EMPTY>
+  <!ATTLIST ATTRSTART token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART name NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRSTART value CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART codepage NMTOKEN #IMPLIED>
+  <!ATTLIST ATTRSTART default CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART fixed CDATA #IMPLIED>
+  <!ATTLIST ATTRSTART validate (std|length|vdata) #IMPLIED>	<!-- WAP / WML -->
+  <!ATTLIST ATTRSTART encoding (std|iso-8601) #IMPLIED>		<!-- WAP -->
+  <!ELEMENT AttrValueTokens (ATTRVALUE)*>
+  <!ELEMENT ATTRVALUE EMPTY>
+  <!ATTLIST ATTRVALUE token NMTOKEN #REQUIRED>
+  <!ATTLIST ATTRVALUE value CDATA #REQUIRED>
+  <!ATTLIST ATTRVALUE codepage NMTOKEN #IMPLIED>
+  <!ELEMENT Ext0Values (EXTVALUE)*>	<!-- WV -->
+  <!ELEMENT Ext1Values (EXTVALUE)*>
+  <!ELEMENT Ext2Values (EXTVALUE)*>
+  <!ELEMENT EXTVALUE EMPTY>
+  <!ATTLIST EXTVALUE index NMTOKEN #REQUIRED>
+  <!ATTLIST EXTVALUE value CDATA #REQUIRED>
+  <!ELEMENT CharacterEntities (CharacterEntity)*>
+  <!ELEMENT CharacterEntity EMPTY>
+  <!ATTLIST CharacterEntity name NMTOKEN #REQUIRED>
+  <!ATTLIST CharacterEntity code NMTOKEN #REQUIRED>
+  <!ENTITY quot "&#34;">
+  <!ENTITY amp "&#38;#38;">
+  <!ENTITY apos "&#39;">
+  <!ENTITY lt "&#38;#60;">
+  <!ENTITY gt ">">
+]>
+<wbxml version="1.3">
+  <!--  see: Binary XML Content Format, Version 1.3 -->
+  <!--       WAP-192-WBXML-20010725-a -->
+  <PublicIdentifiers>
+    <!-- The normative list of well known public identifiers issued, and maintained,
+         by the OMNA (Open Mobile Naming Authority) SHALL be found
+         at http://www.openmobilealliance.org/tech/omna/omna-wbxml-public-docid.htm -->
+    <!-- value="1"  Unknown or missing public identifier -->
+    <!-- if no value, publicid is encoding as string -->
+    <PublicIdentifier value="2" name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <PublicIdentifier value="2"  name="-//WAPFORUM//DTD WML 1.0//EN"/>
+    <!--   DEPRECATED       value="3"  name="-//WAPFORUM//DTD WTA 1.0//EN" -->
+    <PublicIdentifier value="4"  name="-//WAPFORUM//DTD WML 1.1//EN"/>
+    <PublicIdentifier value="5"  name="-//WAPFORUM//DTD SI 1.0//EN"/>
+    <PublicIdentifier value="6"  name="-//WAPFORUM//DTD SL 1.0//EN"/>
+    <PublicIdentifier value="7"  name="-//WAPFORUM//DTD CO 1.0//EN"/>
+    <PublicIdentifier value="8"  name="-//WAPFORUM//DTD CHANNEL 1.1//EN"/>
+    <PublicIdentifier value="9"  name="-//WAPFORUM//DTD WML 1.2//EN"/>
+    <PublicIdentifier value="A"  name="-//WAPFORUM//DTD WML 1.3//EN"/>
+    <PublicIdentifier value="B"  name="-//WAPFORUM//DTD PROV 1.0//EN"/>
+    <PublicIdentifier value="C"  name="-//WAPFORUM//DTD WTA-WML 1.2//EN"/>
+    <PublicIdentifier value="D"  name="-//WAPFORUM//DTD EMN 1.0//EN"/>
+    <PublicIdentifier value="E"  name="-//OMA//DTD DRMREL 1.0//EN"/>
+    <PublicIdentifier value="F"  name="-//WIRELESSVILLAGE//DTD CSP 1.0//EN"/>
+    <PublicIdentifier value="10" name="-//WIRELESSVILLAGE//DTD CSP 1.1//EN"/>
+    <PublicIdentifier value="11" name="-//OMA//DTD WV-CSP 1.2//EN"/>
+    <!-- values 12-7F : Reserved -->
+  </PublicIdentifiers>
+  <!--
+       [MS-ASWBXML]: ActiveSync WAP Binary XML (WBXML) Protocol Specification
+  -->
+  <App publicid="" systemid="">
+    <!-- see: msdn.microsoft.com/en-us/library/dd299442(v=exchg.80).aspx -->
+    <TagTokens>
+
+      <!-- Sync -->
+
+      <TAG token="05" name="Sync" />
+      <TAG token="06" name="Responses" />
+      <TAG token="07" name="Add" />
+      <TAG token="08" name="Change" />
+      <TAG token="09" name="Delete" />
+      <TAG token="0A" name="Fetch" />
+      <TAG token="0B" name="SyncKey" />
+      <TAG token="0C" name="ClientId" />
+      <TAG token="0D" name="ServerId" />
+      <TAG token="0E" name="Status" />
+      <TAG token="0F" name="Collection" />
+      <TAG token="10" name="Class" />
+      <TAG token="12" name="CollectionId" />
+      <TAG token="13" name="GetChanges" />
+      <TAG token="14" name="MoreAvailable" />
+      <TAG token="15" name="WindowSize" />
+      <TAG token="16" name="Commands" />
+      <TAG token="17" name="Options" />
+      <TAG token="18" name="FilterType" />
+      <TAG token="1B" name="Conflict" />
+      <TAG token="1C" name="Collections" />
+      <TAG token="1D" name="ApplicationData" />
+      <TAG token="1E" name="DeletesAsMoves" />
+      <TAG token="20" name="Supported" />
+      <TAG token="21" name="SoftDelete" />
+      <TAG token="22" name="MIMESupport" />
+      <TAG token="23" name="MIMETruncation" />
+      <TAG token="24" name="Wait" />
+      <TAG token="25" name="Limit" />
+      <TAG token="26" name="Partial" />
+      <TAG token="27" name="ConversationMode" />
+      <TAG token="28" name="MaxItems" />
+      <TAG token="29" name="HeartbeatInterval" />
+
+      <!-- Contacts -->
+
+      <TAG token="05" codepage="01" name="Anniversary" />
+      <TAG token="06" codepage="01" name="AssistantName" />
+      <TAG token="07" codepage="01" name="AssistantTelephoneNumber" />
+      <TAG token="08" codepage="01" name="Birthday" />
+      <TAG token="0C" codepage="01" name="Business2PhoneNumber" />
+      <TAG token="0D" codepage="01" name="BusinessCity" />
+      <TAG token="0E" codepage="01" name="BusinessCountry" />
+      <TAG token="0F" codepage="01" name="BusinessPostalCode" />
+      <TAG token="10" codepage="01" name="BusinessState" />
+      <TAG token="11" codepage="01" name="BusinessStreet" />
+      <TAG token="12" codepage="01" name="BusinessFaxNumber" />
+      <TAG token="13" codepage="01" name="BusinessPhoneNumber" />
+      <TAG token="14" codepage="01" name="CarPhoneNumber" />
+      <TAG token="15" codepage="01" name="Categories" />
+      <TAG token="16" codepage="01" name="Category" />
+      <TAG token="17" codepage="01" name="Children" />
+      <TAG token="18" codepage="01" name="Child" />
+      <TAG token="19" codepage="01" name="CompanyName" />
+      <TAG token="1A" codepage="01" name="Department" />
+      <TAG token="1B" codepage="01" name="Email1Address" />
+      <TAG token="1C" codepage="01" name="Email2Address" />
+      <TAG token="1D" codepage="01" name="Email3Address" />
+      <TAG token="1E" codepage="01" name="FileAs" />
+      <TAG token="1F" codepage="01" name="FirstName" />
+      <TAG token="20" codepage="01" name="Home2PhoneNumber" />
+      <TAG token="21" codepage="01" name="HomeCity" />
+      <TAG token="22" codepage="01" name="HomeCountry" />
+      <TAG token="23" codepage="01" name="HomePostalCode" />
+      <TAG token="24" codepage="01" name="HomeState" />
+      <TAG token="25" codepage="01" name="HomeStreet" />
+      <TAG token="26" codepage="01" name="HomeFaxNumber" />
+      <TAG token="27" codepage="01" name="HomePhoneNumber" />
+      <TAG token="28" codepage="01" name="JobTitle" />
+      <TAG token="29" codepage="01" name="LastName" />
+      <TAG token="2A" codepage="01" name="MiddleName" />
+      <TAG token="2B" codepage="01" name="MobilePhoneNumber" />
+      <TAG token="2C" codepage="01" name="OfficeLocation" />
+      <TAG token="2D" codepage="01" name="OtherCity" />
+      <TAG token="2E" codepage="01" name="OtherCountry" />
+      <TAG token="2F" codepage="01" name="OtherPostalCode" />
+      <TAG token="30" codepage="01" name="OtherState" />
+      <TAG token="31" codepage="01" name="OtherStreet" />
+      <TAG token="32" codepage="01" name="PagerNumber" />
+      <TAG token="33" codepage="01" name="RadioPhoneNumber" />
+      <TAG token="34" codepage="01" name="Spouse" />
+      <TAG token="35" codepage="01" name="Suffix" />
+      <TAG token="36" codepage="01" name="Title" />
+      <TAG token="37" codepage="01" name="Webpage" />
+      <TAG token="38" codepage="01" name="YomiCompanyName" />
+      <TAG token="39" codepage="01" name="YomiFirstName" />
+      <TAG token="3A" codepage="01" name="YomiLastName" />
+      <TAG token="3C" codepage="01" name="Picture" />
+      <TAG token="3D" codepage="01" name="Alias" />
+      <TAG token="3E" codepage="01" name="WeightedRank" />
+
+      <!-- Email -->
+
+      <TAG token="0F" codepage="02" name="DateReceived" />
+      <TAG token="11" codepage="02" name="DisplayTo" />
+      <TAG token="12" codepage="02" name="Importance" />
+      <TAG token="13" codepage="02" name="MessageClass" />
+      <TAG token="14" codepage="02" name="Subject" />
+      <TAG token="15" codepage="02" name="Read" />
+      <TAG token="16" codepage="02" name="To" />
+      <TAG token="17" codepage="02" name="CC" />
+      <TAG token="18" codepage="02" name="From" />
+      <TAG token="19" codepage="02" name="ReplyTo" />
+      <TAG token="1A" codepage="02" name="AllDayEvent" />
+      <TAG token="1B" codepage="02" name="Categories" />
+      <TAG token="1C" codepage="02" name="Category" />
+      <TAG token="1D" codepage="02" name="DTStamp" />
+      <TAG token="1E" codepage="02" name="EndTime" />
+      <TAG token="1F" codepage="02" name="InstanceType" />
+      <TAG token="20" codepage="02" name="BusyStatus" />
+      <TAG token="21" codepage="02" name="Location" />
+      <TAG token="22" codepage="02" name="MeetingRequest" />
+      <TAG token="23" codepage="02" name="Organizer" />
+      <TAG token="24" codepage="02" name="RecurrenceId" />
+      <TAG token="25" codepage="02" name="Reminder" />
+      <TAG token="26" codepage="02" name="ResponseRequested" />
+      <TAG token="27" codepage="02" name="Recurrences" />
+      <TAG token="28" codepage="02" name="Recurrence" />
+      <TAG token="29" codepage="02" name="Recurrence_Type" />
+      <TAG token="2A" codepage="02" name="Recurrence_Until" />
+      <TAG token="2B" codepage="02" name="Recurrence_Occurrences" />
+      <TAG token="2C" codepage="02" name="Recurrence_Interval" />
+      <TAG token="2D" codepage="02" name="Recurrence_DayOfWeek" />
+      <TAG token="2E" codepage="02" name="Recurrence_DayOfMonth" />
+      <TAG token="2F" codepage="02" name="Recurrence_WeekOfMonth" />
+      <TAG token="30" codepage="02" name="Recurrence_MonthOfYear" />
+      <TAG token="31" codepage="02" name="StartTime" />
+      <TAG token="32" codepage="02" name="Sensitivity" />
+      <TAG token="33" codepage="02" name="TimeZone" />
+      <TAG token="34" codepage="02" name="GlobalObjId" />
+      <TAG token="35" codepage="02" name="ThreadTopic" />
+      <TAG token="39" codepage="02" name="InternetCPID" />
+      <TAG token="3A" codepage="02" name="Flag" />
+      <TAG token="3B" codepage="02" name="FlagStatus" />
+      <TAG token="3C" codepage="02" name="ContentClass" />
+      <TAG token="3D" codepage="02" name="FlagType" />
+      <TAG token="3E" codepage="02" name="CompleteTime" />
+      <TAG token="3F" codepage="02" name="DisallowNewTimeProposal" />
+
+      <!-- Calendar -->
+
+      <TAG token="05" codepage="04" name="TimeZone" />
+      <TAG token="06" codepage="04" name="AllDayEvent" />
+      <TAG token="07" codepage="04" name="Attendees" />
+      <TAG token="08" codepage="04" name="Attendee" />
+      <TAG token="09" codepage="04" name="Attendee_Email" />
+      <TAG token="0A" codepage="04" name="Attendee_Name" />
+      <TAG token="0D" codepage="04" name="BusyStatus" />
+      <TAG token="0E" codepage="04" name="Categories" />
+      <TAG token="0F" codepage="04" name="Category" />
+      <TAG token="11" codepage="04" name="DTStamp" />
+      <TAG token="12" codepage="04" name="EndTime" />
+      <TAG token="13" codepage="04" name="Exception" />
+      <TAG token="14" codepage="04" name="Exceptions" />
+      <TAG token="15" codepage="04" name="Exception_Deleted" />
+      <TAG token="16" codepage="04" name="Exception_StartTime" />
+      <TAG token="17" codepage="04" name="Location" />
+      <TAG token="18" codepage="04" name="MeetingStatus" />
+      <TAG token="19" codepage="04" name="Organizer_Email" />
+      <TAG token="1A" codepage="04" name="Organizer_Name" />
+      <TAG token="1B" codepage="04" name="Recurrence" />
+      <TAG token="1C" codepage="04" name="Recurrence_Type" />
+      <TAG token="1D" codepage="04" name="Recurrence_Until" />
+      <TAG token="1E" codepage="04" name="Recurrence_Occurrences" />
+      <TAG token="1F" codepage="04" name="Recurrence_Interval" />
+      <TAG token="20" codepage="04" name="Recurrence_DayOfWeek" />
+      <TAG token="21" codepage="04" name="Recurrence_DayOfMonth" />
+      <TAG token="22" codepage="04" name="Recurrence_WeekOfMonth" />
+      <TAG token="23" codepage="04" name="Recurrence_MonthOfYear" />
+      <TAG token="24" codepage="04" name="Reminder" />
+      <TAG token="25" codepage="04" name="Sensitivity" />
+      <TAG token="26" codepage="04" name="Subject" />
+      <TAG token="27" codepage="04" name="StartTime" />
+      <TAG token="28" codepage="04" name="UID" />
+      <TAG token="29" codepage="04" name="Attendee_Status" />
+      <TAG token="2A" codepage="04" name="Attendee_Type" />
+      <TAG token="33" codepage="04" name="DisallowNewTimeProposal" />
+      <TAG token="34" codepage="04" name="ResponseRequested" />
+      <TAG token="35" codepage="04" name="AppointmentReplyTime" />
+      <TAG token="36" codepage="04" name="ResponseType" />
+      <TAG token="37" codepage="04" name="CalendarType" />
+      <TAG token="38" codepage="04" name="IsLeapMonth" />
+      <TAG token="39" codepage="04" name="FirstDayOfWeek" />
+      <TAG token="3A" codepage="04" name="OnlineMeetingConfLink" />
+      <TAG token="3B" codepage="04" name="OnlineMeetingExternalLink" />
+
+      <!-- Move -->
+
+      <TAG token="05" codepage="05" name="MoveItems" />
+      <TAG token="06" codepage="05" name="Move" />
+      <TAG token="07" codepage="05" name="SrcMsgId" />
+      <TAG token="08" codepage="05" name="SrcFldId" />
+      <TAG token="09" codepage="05" name="DstFldId" />
+      <TAG token="0A" codepage="05" name="Response" />
+      <TAG token="0B" codepage="05" name="Status" />
+      <TAG token="0C" codepage="05" name="DstMsgId" />
+
+      <!-- ItemEstimate -->
+
+      <TAG token="05" codepage="06" name="GetItemEstimate" />
+      <TAG token="06" codepage="06" name="Version" />
+      <TAG token="07" codepage="06" name="Collections" />
+      <TAG token="08" codepage="06" name="Collection" />
+      <TAG token="09" codepage="06" name="Class" />
+      <TAG token="0A" codepage="06" name="CollectionId" />
+      <TAG token="0B" codepage="06" name="DateTime" />
+      <TAG token="0C" codepage="06" name="Estimate" />
+      <TAG token="0D" codepage="06" name="Response" />
+      <TAG token="0E" codepage="06" name="Status" />
+
+      <!-- FolderHierarchy -->
+
+      <TAG token="07" codepage="07" name="DisplayName" />
+      <TAG token="08" codepage="07" name="ServerId" />
+      <TAG token="09" codepage="07" name="ParentId" />
+      <TAG token="0A" codepage="07" name="Type" />
+      <TAG token="0C" codepage="07" name="Status" />
+      <TAG token="0E" codepage="07" name="Changes" />
+      <TAG token="0F" codepage="07" name="Add" />
+      <TAG token="10" codepage="07" name="Delete" />
+      <TAG token="11" codepage="07" name="Update" />
+      <TAG token="12" codepage="07" name="SyncKey" />
+      <TAG token="13" codepage="07" name="FolderCreate" />
+      <TAG token="14" codepage="07" name="FolderDelete" />
+      <TAG token="15" codepage="07" name="FolderUpdate" />
+      <TAG token="16" codepage="07" name="FolderSync" />
+      <TAG token="17" codepage="07" name="Count" />
+
+      <!-- MeetingResponse -->
+
+      <TAG token="05" codepage="09" name="CalendarId" />
+      <TAG token="06" codepage="09" name="CollectionId" />
+      <TAG token="07" codepage="09" name="MeetingResponse" />
+      <TAG token="08" codepage="09" name="RequestId" />
+      <TAG token="09" codepage="09" name="Request" />
+      <TAG token="0A" codepage="09" name="Result" />
+      <TAG token="0B" codepage="09" name="Status" />
+      <TAG token="0C" codepage="09" name="UserResponse" />
+      <TAG token="0E" codepage="09" name="InstanceId" />
+
+      <!-- ResolveRecipients -->
+
+      <TAG token="05" codepage="0A" name="ResolveRecipients" />
+      <TAG token="06" codepage="0A" name="Response" />
+      <TAG token="07" codepage="0A" name="Status" />
+      <TAG token="08" codepage="0A" name="Type" />
+      <TAG token="09" codepage="0A" name="Recipient" />
+      <TAG token="0A" codepage="0A" name="DisplayName" />
+      <TAG token="0B" codepage="0A" name="EmailAddress" />
+      <TAG token="0C" codepage="0A" name="Certificates" />
+      <TAG token="0D" codepage="0A" name="Certificate" />
+      <TAG token="0E" codepage="0A" name="MiniCertificate" />
+      <TAG token="0F" codepage="0A" name="Options" />
+      <TAG token="10" codepage="0A" name="To" />
+      <TAG token="11" codepage="0A" name="CertificateRetrieval" />
+      <TAG token="12" codepage="0A" name="RecipientCount" />
+      <TAG token="13" codepage="0A" name="MaxCertificates" />
+      <TAG token="14" codepage="0A" name="MaxAmbiguousRecipients" />
+      <TAG token="15" codepage="0A" name="CertificateCount" />
+      <TAG token="16" codepage="0A" name="Availability" />
+      <TAG token="17" codepage="0A" name="StartTime" />
+      <TAG token="18" codepage="0A" name="EndTime" />
+      <TAG token="19" codepage="0A" name="MergedFreeBusy" />
+      <TAG token="1A" codepage="0A" name="Picture" />
+      <TAG token="1B" codepage="0A" name="MaxSize" />
+      <TAG token="1C" codepage="0A" name="Data" />
+      <TAG token="1D" codepage="0A" name="MaxPictures" />
+
+      <!-- ValidateCert -->
+
+      <TAG token="05" codepage="0B" name="ValidateCert" />
+      <TAG token="06" codepage="0B" name="Certificates" />
+      <TAG token="07" codepage="0B" name="Certificate" />
+      <TAG token="08" codepage="0B" name="CertificateChain" />
+      <TAG token="09" codepage="0B" name="CheckCRL" />
+      <TAG token="0A" codepage="0B" name="Status" />
+
+      <!-- Contacts2 -->
+
+      <TAG token="05" codepage="0C" name="CustomerId" />
+      <TAG token="06" codepage="0C" name="GovernmentId" />
+      <TAG token="07" codepage="0C" name="IMAddress" />
+      <TAG token="08" codepage="0C" name="IMAddress2" />
+      <TAG token="09" codepage="0C" name="IMAddress3" />
+      <TAG token="0A" codepage="0C" name="ManagerName" />
+      <TAG token="0B" codepage="0C" name="CompanyMainPhone" />
+      <TAG token="0C" codepage="0C" name="AccountName" />
+      <TAG token="0D" codepage="0C" name="NickName" />
+      <TAG token="0E" codepage="0C" name="MMS" />
+
+      <!-- Ping -->
+
+      <TAG token="05" codepage="0D" name="Ping" />
+      <TAG token="06" codepage="0D" name="AutdState" />
+      <TAG token="07" codepage="0D" name="Status" />
+      <TAG token="08" codepage="0D" name="HeartbeatInterval" />
+      <TAG token="09" codepage="0D" name="Folders" />
+      <TAG token="0A" codepage="0D" name="Folder" />
+      <TAG token="0B" codepage="0D" name="Id" />
+      <TAG token="0C" codepage="0D" name="Class" />
+      <TAG token="0D" codepage="0D" name="MaxFolders" />
+
+      <!-- Provision -->
+
+      <TAG token="05" codepage="0E" name="Provision" />
+      <TAG token="06" codepage="0E" name="Policies" />
+      <TAG token="07" codepage="0E" name="Policy" />
+      <TAG token="08" codepage="0E" name="PolicyType" />
+      <TAG token="09" codepage="0E" name="PolicyKey" />
+      <TAG token="0A" codepage="0E" name="Data" />
+      <TAG token="0B" codepage="0E" name="Status" />
+      <TAG token="0C" codepage="0E" name="RemoteWipe" />
+      <TAG token="0D" codepage="0E" name="EASProvisionDoc" />
+      <TAG token="0E" codepage="0E" name="DevicePasswordEnabled" />
+      <TAG token="0F" codepage="0E" name="AlphanumericDevicePasswordRequired" />
+      <TAG token="10" codepage="0E" name="DeviceEncryptionEnabled" />
+      <TAG token="10" codepage="0E" name="RequireStorageCardEncryption" />
+      <TAG token="11" codepage="0E" name="PasswordRecoveryEnabled" />
+      <TAG token="13" codepage="0E" name="AttachmentsEnabled" />
+      <TAG token="14" codepage="0E" name="MinDevicePasswordLength" />
+      <TAG token="15" codepage="0E" name="MaxInactivityTimeDeviceLock" />
+      <TAG token="16" codepage="0E" name="MaxDevicePasswordFailedAttempts" />
+      <TAG token="17" codepage="0E" name="MaxAttachmentSize" />
+      <TAG token="18" codepage="0E" name="AllowSimpleDevicePassword" />
+      <TAG token="19" codepage="0E" name="DevicePasswordExpiration" />
+      <TAG token="1A" codepage="0E" name="DevicePasswordHistory" />
+      <TAG token="1B" codepage="0E" name="AllowStorageCard" />
+      <TAG token="1C" codepage="0E" name="AllowCamera" />
+      <TAG token="1D" codepage="0E" name="RequireDeviceEncryption" />
+      <TAG token="1E" codepage="0E" name="AllowUnsignedApplications" />
+      <TAG token="1F" codepage="0E" name="AllowUnsignedInstallationPackages" />
+      <TAG token="20" codepage="0E" name="MinDevicePasswordComplexCharacters" />
+      <TAG token="21" codepage="0E" name="AllowWiFi" />
+      <TAG token="22" codepage="0E" name="AllowTextMessaging" />
+      <TAG token="23" codepage="0E" name="AllowPOPIMAPEmail" />
+      <TAG token="24" codepage="0E" name="AllowBluetooth" />
+      <TAG token="25" codepage="0E" name="AllowIrDA" />
+      <TAG token="26" codepage="0E" name="RequireManualSyncWhenRoaming" />
+      <TAG token="27" codepage="0E" name="AllowDesktopSync" />
+      <TAG token="28" codepage="0E" name="MaxCalendarAgeFilter" />
+      <TAG token="29" codepage="0E" name="AllowHTMLEmail" />
+      <TAG token="2A" codepage="0E" name="MaxEmailAgeFilter" />
+      <TAG token="2B" codepage="0E" name="MaxEmailBodyTruncationSize" />
+      <TAG token="2C" codepage="0E" name="MaxEmailHTMLBodyTruncationSize" />
+      <TAG token="2D" codepage="0E" name="RequireSignedSMIMEMessages" />
+      <TAG token="2E" codepage="0E" name="RequireEncryptedSMIMEMessages" />
+      <TAG token="2F" codepage="0E" name="RequireSignedSMIMEAlgorithm" />
+      <TAG token="30" codepage="0E" name="RequireEncryptionSMIMEAlgorithm" />
+      <TAG token="31" codepage="0E" name="AllowSMIMEEncryptionAlgorithmNegotiation" />
+      <TAG token="32" codepage="0E" name="AllowSMIMESoftCerts" />
+      <TAG token="33" codepage="0E" name="AllowBrowser" />
+      <TAG token="34" codepage="0E" name="AllowConsumerEmail" />
+      <TAG token="35" codepage="0E" name="AllowRemoteDesktop" />
+      <TAG token="36" codepage="0E" name="AllowInternetSharing" />
+      <TAG token="37" codepage="0E" name="UnapprovedInROMApplicationList" />
+      <TAG token="38" codepage="0E" name="ApplicationName" />
+      <TAG token="39" codepage="0E" name="ApprovedApplicationList" />
+      <TAG token="3A" codepage="0E" name="Hash" />
+
+      <!-- Search -->
+
+      <TAG token="05" codepage="0F" name="Search" />
+      <TAG token="07" codepage="0F" name="Store" />
+      <TAG token="08" codepage="0F" name="Name" />
+      <TAG token="09" codepage="0F" name="Query" />
+      <TAG token="0A" codepage="0F" name="Options" />
+      <TAG token="0B" codepage="0F" name="Range" />
+      <TAG token="0C" codepage="0F" name="Status" />
+      <TAG token="0D" codepage="0F" name="Response" />
+      <TAG token="0E" codepage="0F" name="Result" />
+      <TAG token="0F" codepage="0F" name="Properties" />
+      <TAG token="10" codepage="0F" name="Total" />
+      <TAG token="11" codepage="0F" name="EqualTo" />
+      <TAG token="12" codepage="0F" name="Value" />
+      <TAG token="13" codepage="0F" name="And" />
+      <TAG token="14" codepage="0F" name="Or" />
+      <TAG token="15" codepage="0F" name="FreeText" />
+      <TAG token="17" codepage="0F" name="DeepTraversal" />
+      <TAG token="18" codepage="0F" name="LongId" />
+      <TAG token="19" codepage="0F" name="RebuildResults" />
+      <TAG token="1A" codepage="0F" name="LessThan" />
+      <TAG token="1B" codepage="0F" name="GreaterThan" />
+      <TAG token="1E" codepage="0F" name="UserName" />
+      <TAG token="1F" codepage="0F" name="Password" />
+      <TAG token="20" codepage="0F" name="ConversationId" />
+      <TAG token="21" codepage="0F" name="Picture" />
+      <TAG token="22" codepage="0F" name="MaxSize" />
+      <TAG token="23" codepage="0F" name="MaxPictures" />
+
+      <!-- GAL -->
+
+      <TAG token="05" codepage="10" name="DisplayName" />
+      <TAG token="06" codepage="10" name="Phone" />
+      <TAG token="07" codepage="10" name="Office" />
+      <TAG token="08" codepage="10" name="Title" />
+      <TAG token="09" codepage="10" name="Company" />
+      <TAG token="0A" codepage="10" name="Alias" />
+      <TAG token="0B" codepage="10" name="FirstName" />
+      <TAG token="0C" codepage="10" name="LastName" />
+      <TAG token="0D" codepage="10" name="HomePhone" />
+      <TAG token="0E" codepage="10" name="MobilePhone" />
+      <TAG token="0F" codepage="10" name="EmailAddress" />
+      <TAG token="10" codepage="10" name="Picture" />
+      <TAG token="11" codepage="10" name="Status" />
+      <TAG token="12" codepage="10" name="Data" />
+
+      <!-- AirSyncBase -->
+
+      <TAG token="05" codepage="11" name="BodyPreference" />
+      <TAG token="06" codepage="11" name="Type" />
+      <TAG token="07" codepage="11" name="TruncationSize" />
+      <TAG token="08" codepage="11" name="AllOrNone" />
+      <TAG token="0A" codepage="11" name="Body" />
+      <TAG token="0B" codepage="11" name="Data" />
+      <TAG token="0C" codepage="11" name="EstimatedDataSize" />
+      <TAG token="0D" codepage="11" name="Truncated" />
+      <TAG token="0E" codepage="11" name="Attachments" />
+      <TAG token="0F" codepage="11" name="Attachment" />
+      <TAG token="10" codepage="11" name="DisplayName" />
+      <TAG token="11" codepage="11" name="FileReference" />
+      <TAG token="12" codepage="11" name="Method" />
+      <TAG token="13" codepage="11" name="ContentId" />
+      <TAG token="14" codepage="11" name="(not used) ContentLocation" />
+      <TAG token="15" codepage="11" name="IsInline" />
+      <TAG token="16" codepage="11" name="NativeBodyType" />
+      <TAG token="17" codepage="11" name="ContentType" />
+      <TAG token="18" codepage="11" name="Preview" />
+      <TAG token="19" codepage="11" name="BodyPartPreference" />
+      <TAG token="1A" codepage="11" name="BodyPart" />
+      <TAG token="1B" codepage="11" name="Status" />
+
+      <!-- Settings -->
+
+      <TAG token="05" codepage="12" name="Settings" />
+      <TAG token="06" codepage="12" name="Status" />
+      <TAG token="07" codepage="12" name="Get" />
+      <TAG token="08" codepage="12" name="Set" />
+      <TAG token="09" codepage="12" name="Oof" />
+      <TAG token="0A" codepage="12" name="OofState" />
+      <TAG token="0B" codepage="12" name="StartTime" />
+      <TAG token="0C" codepage="12" name="EndTime" />
+      <TAG token="0D" codepage="12" name="OofMessage" />
+      <TAG token="0E" codepage="12" name="AppliesToInternal" />
+      <TAG token="0F" codepage="12" name="AppliesToExternalKnown" />
+      <TAG token="10" codepage="12" name="AppliesToExternalUnknown" />
+      <TAG token="11" codepage="12" name="Enabled" />
+      <TAG token="12" codepage="12" name="ReplyMessage" />
+      <TAG token="13" codepage="12" name="BodyType" />
+      <TAG token="14" codepage="12" name="DevicePassword" />
+      <TAG token="15" codepage="12" name="Password" />
+      <TAG token="16" codepage="12" name="DeviceInformaton" />
+      <TAG token="17" codepage="12" name="Model" />
+      <TAG token="18" codepage="12" name="IMEI" />
+      <TAG token="19" codepage="12" name="FriendlyName" />
+      <TAG token="1A" codepage="12" name="OS" />
+      <TAG token="1B" codepage="12" name="OSLanguage" />
+      <TAG token="1C" codepage="12" name="PhoneNumber" />
+      <TAG token="1D" codepage="12" name="UserInformation" />
+      <TAG token="1E" codepage="12" name="EmailAddresses" />
+      <TAG token="1F" codepage="12" name="SmtpAddress" />
+      <TAG token="20" codepage="12" name="UserAgent" />
+      <TAG token="21" codepage="12" name="EnableOutboundSMS" />
+      <TAG token="22" codepage="12" name="MobileOperator" />
+      <TAG token="23" codepage="12" name="PrimarySmtpAddress" />
+      <TAG token="24" codepage="12" name="Accounts" />
+      <TAG token="25" codepage="12" name="Account" />
+      <TAG token="26" codepage="12" name="AccountId" />
+      <TAG token="27" codepage="12" name="AccountName" />
+      <TAG token="28" codepage="12" name="UserDisplayName" />
+      <TAG token="29" codepage="12" name="SendDisabled" />
+      <TAG token="2B" codepage="12" name="ihsManagementInformation" />
+
+      <!-- DocumentLibrary -->
+
+      <TAG token="05" codepage="13" name="LinkId" />
+      <TAG token="06" codepage="13" name="DisplayName" />
+      <TAG token="07" codepage="13" name="IsFolder" />
+      <TAG token="08" codepage="13" name="CreationDate" />
+      <TAG token="09" codepage="13" name="LastModifiedDate" />
+      <TAG token="0A" codepage="13" name="IsHidden" />
+      <TAG token="0B" codepage="13" name="ContentLength" />
+      <TAG token="0C" codepage="13" name="ContentType" />
+
+      <!-- ItemOperations -->
+
+      <TAG token="05" codepage="14" name="ItemOperations" />
+      <TAG token="06" codepage="14" name="Fetch" />
+      <TAG token="07" codepage="14" name="Store" />
+      <TAG token="08" codepage="14" name="Options" />
+      <TAG token="09" codepage="14" name="Range" />
+      <TAG token="0A" codepage="14" name="Total" />
+      <TAG token="0B" codepage="14" name="Properties" />
+      <TAG token="0C" codepage="14" name="Data" />
+      <TAG token="0D" codepage="14" name="Status" />
+      <TAG token="0E" codepage="14" name="Response" />
+      <TAG token="0F" codepage="14" name="Version" />
+      <TAG token="10" codepage="14" name="Schema" />
+      <TAG token="11" codepage="14" name="Part" />
+      <TAG token="12" codepage="14" name="EmptyFolderContents" />
+      <TAG token="13" codepage="14" name="DeleteSubFolders" />
+      <TAG token="14" codepage="14" name="UserName" />
+      <TAG token="15" codepage="14" name="Password" />
+      <TAG token="16" codepage="14" name="Move" />
+      <TAG token="17" codepage="14" name="DstFldId" />
+      <TAG token="18" codepage="14" name="ConversationId" />
+      <TAG token="19" codepage="14" name="MoveAlways" />
+
+      <!-- ComposeMail -->
+
+      <TAG token="05" codepage="15" name="SendMail" />
+      <TAG token="06" codepage="15" name="SmartForward" />
+      <TAG token="07" codepage="15" name="SmartReply" />
+      <TAG token="08" codepage="15" name="SaveInSentItems" />
+      <TAG token="09" codepage="15" name="ReplaceMime" />
+      <TAG token="0B" codepage="15" name="Source" />
+      <TAG token="0C" codepage="15" name="FolderId" />
+      <TAG token="0D" codepage="15" name="ItemId" />
+      <TAG token="0E" codepage="15" name="LongId" />
+      <TAG token="0F" codepage="15" name="InstanceId" />
+      <TAG token="10" codepage="15" name="MIME" />
+      <TAG token="11" codepage="15" name="ClientId" />
+      <TAG token="12" codepage="15" name="Status" />
+      <TAG token="13" codepage="15" name="AccountId" />
+
+      <!-- Email2 -->
+
+      <TAG token="05" codepage="16" name="UmCallerID" />
+      <TAG token="06" codepage="16" name="UmUserNotes" />
+      <TAG token="07" codepage="16" name="UmAttDuration" />
+      <TAG token="08" codepage="16" name="UmAttOrder" />
+      <TAG token="09" codepage="16" name="ConversationId" />
+      <TAG token="0A" codepage="16" name="ConversationIndex" />
+      <TAG token="0B" codepage="16" name="LastVerbExecuted" />
+      <TAG token="0C" codepage="16" name="LastVerbExecutionTime" />
+      <TAG token="0D" codepage="16" name="ReceivedAsBcc" />
+      <TAG token="0E" codepage="16" name="Sender" />
+      <TAG token="0F" codepage="16" name="CalendarType" />
+      <TAG token="10" codepage="16" name="IsLeapMonth" />
+      <TAG token="11" codepage="16" name="AccountId" />
+      <TAG token="12" codepage="16" name="FirstDayOfWeek" />
+      <TAG token="13" codepage="16" name="MeetingMessageType" />
+
+      <!-- Notes -->
+
+      <TAG token="05" codepage="17" name="Subject" />
+      <TAG token="06" codepage="17" name="MessageClass" />
+      <TAG token="07" codepage="17" name="LastModifiedDate" />
+      <TAG token="08" codepage="17" name="Categories" />
+      <TAG token="09" codepage="17" name="Category" />
+
+      <!-- RightsManagement -->
+
+      <TAG token="05" codepage="18" name="RightsManagementSupport" />
+      <TAG token="06" codepage="18" name="RightsManagementTemplates" />
+      <TAG token="07" codepage="18" name="RightsManagementTemplate" />
+      <TAG token="08" codepage="18" name="RightsManagementLicense" />
+      <TAG token="09" codepage="18" name="EditAllowed" />
+      <TAG token="0A" codepage="18" name="ReplyAllowed" />
+      <TAG token="0B" codepage="18" name="ReplyAllAllowed" />
+      <TAG token="0C" codepage="18" name="ForwardAllowed" />
+      <TAG token="0D" codepage="18" name="ModifyRecipientsAllowed" />
+      <TAG token="0E" codepage="18" name="ExtractAllowed" />
+      <TAG token="0F" codepage="18" name="PrintAllowed" />
+      <TAG token="10" codepage="18" name="ExportAllowed" />
+      <TAG token="11" codepage="18" name="ProgrammaticAccessAllowed" />
+      <TAG token="12" codepage="18" name="RMOwner" />
+      <TAG token="13" codepage="18" name="ContentExpiryDate" />
+      <TAG token="14" codepage="18" name="TemplateID" />
+      <TAG token="15" codepage="18" name="TemplateName" />
+      <TAG token="16" codepage="18" name="TemplateDescription" />
+      <TAG token="17" codepage="18" name="ContentOwner" />
+      <TAG token="18" codepage="18" name="RemoveRightsManagementDistribution" />
+
+    </TagTokens>
+  </App>
+</wbxml>

@@ -1,0 +1,51 @@
+==================================================
+Changes from 2015-03-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-03-09 19:53:31 +0000
+------------------------------------------
+
+  Change: c713ec66457e7f7a39c223418f4c94e8d5542819
+  Author: Mike Ballard <mike.ballard@gmail.com>
+  Date : 2016-03-09 11:24:21 +0000
+
+    License Clarification
+
+    Fix license in the LetsEncrypt.pm file to match the license file
+    (which it what it should have been). 
+
+  Change: 7d0a7a4b37b9bba9a12ad71729d899aa566fde55
+  Author: Mike Ballard <mike.ballard@gmail.com>
+  Date : 2016-03-09 09:29:39 +0000
+
+    Add LICENSE and README
+
+    Dist::Zilla is use primarily for generating all of the fun files,
+    like the actual README and CHANGES file. 
+
+------------------------------------------
+version 0.001 at 2016-03-09 17:24:20 +0000
+------------------------------------------
+
+  Change: 2c60858e6c9f3a86595279e3796d84b41b423072
+  Author: Mike Ballard <mike.ballard@gmail.com>
+  Date : 2016-03-09 09:24:20 +0000
+
+    DNS-DCV Message handling
+
+    This commit updates Authorization to better support DNS DCV. 
+
+  Change: 4968af34be2f940f2c72a69a21188820abbe61d1
+  Author: Mike Ballard <mike.ballard@gmail.com>
+  Date : 2016-03-09 09:24:18 +0000
+
+    First Commit
+
+    This commit introduces the various modules we use for API calling
+    Let's Encrypt servers. Please see the individual module
+    documentation. 
+
+================
+End of releases.
+================

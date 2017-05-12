@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Waft/jQuery.pm
+t/convert_text_part.t
+t/output_jquery_request_script.t
+t/output_jquery_sync_script.t

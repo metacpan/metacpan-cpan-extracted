@@ -1,0 +1,31 @@
+{
+   "abstract" : "Simplifies working with TRADOS Registry values",
+   "author" : [
+      "Michael Roberts <michael@vivtek.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32-TRADOS-Languages",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Vivtek/Win32-TRADOS-Languages.git",
+         "web" : "https://github.com/Vivtek/Win32-TRADOS-Languages"
+      }
+   },
+   "version" : "0.01"
+}

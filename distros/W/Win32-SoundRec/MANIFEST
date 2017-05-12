@@ -1,0 +1,8 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST.SKIP
+lib/Win32/SoundRec.pm
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

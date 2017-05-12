@@ -1,0 +1,154 @@
+# NAME
+
+WebService::Shutterstock - Easy access to Shutterstock's public API
+
+# VERSION
+
+version 0.006
+
+# SYNOPSIS
+
+	my $shutterstock = WebService::Shutterstock->new(
+		api_username => 'justme',
+		api_key      => 'abcdef1234567890'
+	);
+
+	# perform an image search
+	my $search = $shutterstock->search( type => 'image', searchterm => 'hummingbird' );
+
+	# or, a video search
+	my $videos = $shutterstock->search( type => 'video', searchterm => 'hummingbird' );
+
+	# retrieve results of search
+	my $results = $search->results;
+
+	# details about a specific image (lookup by ID)
+	my $image = $shutterstock->image( 59915404 );
+
+	# certain actions require credentials for a specific customer account
+	my $customer = $shutterstock->auth( username => $customer, password => $password );
+
+# DESCRIPTION
+
+This module provides an easy way to interact with the [Shutterstock, Inc. API](http://api.shutterstock.com).  You will need an API username
+and key from Shutterstock with the appropriate permissions in order to
+use this module.
+
+While there are some actions you can perform with this object (as shown
+under the ["METHODS"](#METHODS) section), many API operations are done within
+the context of a specific user/account or a specific subscription.
+Below are some additional examples of how to use this set of API modules.
+You will find more examples and documentation in the related modules as
+well as the `examples` directory in the source of the distribution.
+
+### Licensing and Downloading
+
+Licensing images happens in the context of a
+[WebService::Shutterstock::Customer](http://search.cpan.org/perldoc?WebService::Shutterstock::Customer) object.  For example:
+
+	my $licensed_image = $customer->license_image(
+		image_id => 59915404,
+		size     => 'medium'
+	);
+
+If you have more than one active subscription, you will need to
+specify which subscription to license the image under.  Please see
+["license\_image" in WebService::Shutterstock::Customer](http://search.cpan.org/perldoc?WebService::Shutterstock::Customer#license\_image) for more details.
+
+Once you have a [licensed image](http://search.cpan.org/perldoc?WebService::Shutterstock::LicensedImage),
+you can then download the image:
+
+	$licensed_image->download(file => '/my/photos/hummingbird.jpg');
+
+Every image licensed under your account (whether through shutterstock.com or the
+API) can be retrieved using the [customer](http://search.cpan.org/perldoc?WebService::Shutterstock::Customer)
+object as well:
+
+	my $downloads = $customer->downloads;
+
+Or, you can fetch one "page" (40 items) of downloads. Pages start being numbered at 0.
+
+	my $page_two_of_downloads = $customer->downloads( page_number => 1 );
+
+Or, you can fetch the `redownloadable_state` of a particular image.
+
+	my $redownloadable_state = $customer->downloads(
+		image_id => 11024440,
+		field    => "redownloadable_state"
+	);
+
+### Lightboxes
+
+Lightbox retrieval starts with a [customer](http://search.cpan.org/perldoc?WebService::Shutterstock::Customer)
+as well but most methods are documented in the
+[WebService::Shutterstock::Lightbox](http://search.cpan.org/perldoc?WebService::Shutterstock::Lightbox) module.  Here's a short example:
+
+	my $lightboxes = $customer->lightboxes;
+	my($favorites) = grep {$_->name eq 'Favorites'} @$lightboxes;
+	$favorites->add_image(59915404);
+
+	my $favorite_images = $favorite->images;
+
+# METHODS
+
+## new( api\_username => $api\_username, api\_key => $api\_key )
+
+Constructor method, requires both the `api_username` and `api_key`
+parameters be passed in.  If you provide invalid values that the API
+doesn't recognize, the first API call you make will throw an exception
+
+## auth(username => $username, password => $password)
+
+Authenticate for a specific customer account.  Returns a
+[WebService::Shutterstock::Customer](http://search.cpan.org/perldoc?WebService::Shutterstock::Customer) object.  If authentication fails, an
+exception is thrown (see [WebService::Shutterstock::Exception](http://search.cpan.org/perldoc?WebService::Shutterstock::Exception) and ["ERRORS"](#ERRORS)
+section for more information).
+
+This is the main entry point for any operation dealing with subscriptions,
+image licensing, download history or lightboxes.
+
+## categories
+
+Returns a list of photo categories (useful for specifying a category\_id when searching).
+
+## search(%search\_query)
+
+Perform a search.  This method assumes you want to search images unless
+you specify a `type` parameter as part of the `%search_query`.  Accepts
+any params documented here: [http://api.shutterstock.com/\#imagessearch](http://api.shutterstock.com/\#imagessearch).
+Returns a [WebService::Shutterstock::SearchResults](http://search.cpan.org/perldoc?WebService::Shutterstock::SearchResults) object.
+
+## search\_images(%search\_query)
+
+Equivalent to calling `search` with a `type` parameter of `image`.
+
+## search\_videos(%search\_query)
+
+Equivalent to calling `search` with a `type` parameter of `video`.
+
+## image($image\_id)
+
+Performs a lookup on a single image.  Returns a [WebService::Shutterstock::Image](http://search.cpan.org/perldoc?WebService::Shutterstock::Image) object (or `undef` if the image doesn't exist).
+
+## video($video\_id)
+
+Performs a lookup on a single video.  Returns a [WebService::Shutterstock::Video](http://search.cpan.org/perldoc?WebService::Shutterstock::Video) object (or `undef` if the image doesn't exist).
+
+# ERROR HANDLING
+
+If an API call fails in an unexpected way, an exception object (see
+[WebService::Shutterstock::Exception](http://search.cpan.org/perldoc?WebService::Shutterstock::Exception)) will be thrown.  This object should
+have all the necessary information for you to handle the error if you
+choose but also stringifies to something informative enough to be
+useful as well.
+
+# AUTHOR
+
+Brian Phillips <bphillips@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Brian Phillips and Shutterstock, Inc. (http://shutterstock.com).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

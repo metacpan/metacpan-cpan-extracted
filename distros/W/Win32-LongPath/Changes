@@ -1,0 +1,42 @@
+Revision history for Win32::LongPath
+
+1.07 September 7, 2016
+	- (pauloscustodio) fixed flags for Cygwin
+
+1.06 May 16, 2016
+	- (andrewgregory) fixed Perl 5.22 bug opening files w/a scalar reference
+
+1.05 March 14, 2016
+	- only set Windows error, not $! (issue #2)
+	- NOTE: utimeL () test may fail if within 24 hours of DST change
+
+1.04 February 2, 2016
+	- testL('s') returns file size similar to the Perl -s function (#107117)
+	- Updated Module-Install to v1.16
+	- Added META.yml for CPAN compliance
+
+1.03 December 4, 2013
+	- Added support for Cygwin.
+	- Added -static options to loader.
+	- Adjusted ppport in Makefile.PL to work in older versions of ActivePerl.
+
+1.02 September 30, 2013
+	- Really added IO_REPARSE_TAG_SYMLINK definition!
+
+1.01 September 20, 2013
+	- Added IO_REPARSE_TAG_SYMLINK definition if missing from include.
+
+1.0 September 19, 2013
+	- Official release.
+
+0.04 September 5, 2013
+	- Fixed bug when stat () a file > 2 ^ 31 bytes.
+
+0.03 August 26, 2013
+	- Fixed bug when stat () a file > 2 ^ 32 bytes.
+
+0.02 August 6, 2013
+	- Fixed bugs caused by PerlCritic adjustments.
+
+0.01 August 6, 2013
+	- First release.

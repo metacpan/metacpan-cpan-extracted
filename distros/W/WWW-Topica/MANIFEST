@@ -1,0 +1,17 @@
+MANIFEST
+Changes
+README
+TODO
+Makefile.PL
+t/01use.t
+bin/topica2mail
+lib/WWW/Topica.pm
+lib/WWW/Topica/Index.pm
+lib/WWW/Topica/Mail.pm
+lib/WWW/Topica/Reply.pm
+t/local_files/list_first.html
+t/local_files/list_last.html
+t/local_files/list_middle.html
+t/local_files/mail.html
+t/local_files/reply.html
+META.yml                                 Module meta-data (added by MakeMaker)

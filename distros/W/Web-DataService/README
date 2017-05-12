@@ -1,0 +1,68 @@
+Web-DataService 0.20
+
+This module provides a framework for you to use in building data service
+applications for the World Wide Web.  Such applications sit between a data
+storage and retrieval system on one hand and the Web on the other, and fulfill
+HTTP-based data requests.  Each valid request is handled by fetching or
+storing the appropriate data using the backend data system and serializing the
+output in a format such as JSON, CSV, or XML.
+
+Using the methods provided by this module, you start by defining a set of data
+service elements: output formats, output blocks, vocabularies, and parameter
+rules, followed by a set of data service nodes representing the various
+operations to be provided by your service.  Each of these objects is
+configured by a set of attributes, optionally including documentation strings.
+You continue by writing one or more roles whose methods will handle the
+"meat" of each operation: talking to the backend data system to fetch and/or
+store the relevant data, based on the parameter values provided in a data
+service request.
+
+This module then handles the rest of the work necessary for handling each
+request, including checking the parameter values, determining the output
+format, and serializing the result.  It also generates appropriate error
+messages when necessary.  Finally, it auto-generates documentation pages for
+each operation based on the elements you have defined, so that your data
+service is always fully and correctly documented.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Web::DataService
+
+or online at:
+
+    https://metacpan.org/release/Web-DataService
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Web-DataService
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Web-DataService
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Web-DataService
+
+    Search CPAN
+        http://search.cpan.org/dist/Web-DataService/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Michael McClennen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

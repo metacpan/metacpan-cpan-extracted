@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Weblogic/UserAdmin.pm
+t/001_load.t
+t/002_prereq.t
+t/003_strict.t
+t/004_distribution.t
+META.yml         

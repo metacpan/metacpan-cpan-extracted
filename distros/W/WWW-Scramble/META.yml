@@ -1,0 +1,35 @@
+---
+abstract: 'Get only needed from the Web page'
+author:
+  - 'Cheng-Lung Sung, C<< <clsung at cpan.org> >>'
+  - 'Cheng-Lung Sung <clsung@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Temp: 0
+  HTML::FormatText: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Scramble
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Find::Rule: 0
+  HTML::Element: 0
+  HTML::TreeBuilder::XPath: 0
+  Moose: 0
+  MooseX::AttributeHelpers: 0
+  URI: 0
+  WWW::Mechanize: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

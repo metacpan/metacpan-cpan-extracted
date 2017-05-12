@@ -1,0 +1,54 @@
+Win32-Monitoring-WindowPing
+===========================
+
+INSTALLATION
+
+    Unpack the distribution into a local directory, and from a command
+    prompt in that directory follow the instructions below.
+
+    These instructions assume that you have already set up your build
+    environment, and that you can build source distributions. The 
+    following environments are known to work:
+
+  Microsoft Visual Studio 2008
+
+    Other versions of Visual Studio may work, adjust Makefile.PL 
+    as necessary for your build environment
+
+      perl Makefile.PL
+      nmake
+      nmake test
+      nmake install
+
+SUPPORT
+
+    Homepage: <http://oss.oetiker.ch/optools/>.
+
+AUTHORS
+
+    Roman Plessl,
+    Tobias Oetiker
+
+COPYRIGHT
+
+    Copyright (c) 2008 by OETIKER+PARTNER AG. All rights reserved.
+
+LICENSE
+
+    Win32::Monitoring::WindowPing is free software: you can redistribute 
+    it and/or modify it under the terms of the GNU General Public License 
+    as published by the Free Software Foundation, either version 3 of the 
+    License, or (at your option) any later version.
+
+    Win32::Monitoring::WindowPing is distributed in the hope that it will 
+    be useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Win32::Monitoring::WindowPing. If not, see 
+    <http://www.gnu.org/licenses/>.
+
+SEE ALSO
+
+    Homepage: http://oss.oetiker.ch/optools/

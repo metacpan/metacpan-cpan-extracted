@@ -1,0 +1,8 @@
+Revision history for Perl extension WebService::Hatena::Exist.
+
+0.02  Thu Sep 29 12:58 2005
+        - WebService::Hatena::Exist use LWP::UserAgent to URI::Fetch::SimpleCache.
+
+0.01  Sat Sep 24 23:45 2005
+        - Initial release
+

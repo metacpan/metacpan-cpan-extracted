@@ -1,0 +1,24 @@
+---
+abstract: 'A client for connecting to a swig service'
+author:
+  - 'Nikolay Martynov <>, Logan Bell <logie@cpan.org>, Webstack Team'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-SwigClient
+requires:
+  File::Slurp: 0
+  Getopt::Long: 0
+  JSON::XS: 0
+  Moo: 0
+  Test::Easy: 0
+  Test::Most: 0
+  WWW::Curl::Easy: 0
+resources: {}
+version: 0.001

@@ -1,0 +1,32 @@
+NAME
+    WWW::UsePerl::Server - Serve use.perl.org content
+
+SYNOPSIS
+        script/www_useperl_server_server.pl
+
+DESCRIPTION
+    use.perl.org was a Perl-specific blogging website created by Chris
+    Nandor and hosted at Geeknet. It was up from early 2001 until late 2010.
+    This is project along the lines of Archive Team
+    (http://www.archiveteam.org) to save historical Perl websites and keep
+    the content going. Using this module you can host your own use.perl.org
+    mirror.
+
+    You'll need a MySQL server. Update www_useperl_server.conf with the
+    database connection details. Then import the (26MB compressed, 94MB
+    uncompressed) database dump from:
+
+        https://s3.amazonaws.com/useperl/useperl-2012-04-29.sql.bz2
+
+    And run script/www_useperl_server_server.pl.
+
+SEE ALSO
+    WWW::UsePerl::Server::Controller::Root, Catalyst
+
+AUTHOR
+    Leon Brocard, acme@astray.com
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

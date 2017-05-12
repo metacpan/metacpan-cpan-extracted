@@ -1,0 +1,24 @@
+Copyright © 2004, Mark Jaroski.  All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+
+WWW::Mediawiki::Client provides a very simple cvs-like interface for
+Mediawiki driven WikiWiki websites, such as Wikitravel or Wikipedia.  The
+interface mimics the two most basic cvs commands: update and commit with
+similarly named methods.  Each of these has a shorter alias, as in cvs.
+Verbosity is controled through an output_level accessor method.
+
+Included with the module is a command line wrapper called "mvs":
+
+mvs is a command line client whose purpose is to simplify offline editing
+of Wiki content.  It allows you to get any number of pages from a given
+Mediawiki site, edit the pages with any editor, get and merge any
+concurrent updates of the pages, and then safely commit the users own
+changes back to the version of the page on the server.
+
+All mvs commands allow you to specify one or more files to get from the
+wiki server.  If no file is specified on the command line mvs will
+attempt to perform the specified commnd on all files under the current
+working directory with the extension .wiki.
+
+

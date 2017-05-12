@@ -1,0 +1,15 @@
+Revision history for Perl extension WWW::NicoVideo.
+
+0.03  Thu Nov 29 21:54:48 JST 2007
+	- Added dependency for Class::Accessor.
+	- Scraper changed for new NicoVideo HTML.
+	
+0.02  Sun Nov 25 23:10:59 JST 2007
+	- Fixed sort/order/page options bug in getEntries* methods.
+	- Replaced "//" (defined-or) operators with equivarent statement.
+	- Some functions moved to WWW::NicoVideo::Scraper and
+	  WWW::NicoVideo::URL.
+
+0.01  Sun Nov 18 20:59:41 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n WWW::NicoVideo

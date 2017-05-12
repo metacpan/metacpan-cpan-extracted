@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:20">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="alphabetically.publishers.o.r" parent_id="alphabetically.publishers.o">
+<Name>R</Name>
+<Details summary="Publishers, 'OR'" depth="3" element_count="461" />
+<SubCategories></SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

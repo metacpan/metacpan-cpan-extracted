@@ -1,0 +1,19 @@
+Revision history for Perl extension Win32API::Process.
+
+0.01  Sun Jul 14 11:18:03 2002
+	* original version; created by h2xs 1.21 with options
+		-A -n Win32API::Process
+
+	  it comes with a subset of the functions in the Win32 Process API
+	  in the meanwhile fo enumerating the processes and their modules,
+	  structures returned as hashes:
+
+	+ BOOL EnumProcesses(LPDWORD lpidProcess DWORD cb, LPDWORD cbNeeded);
+	+ BOOL EnumProcessModules(HANDLE hProcess, LPHMODULE lphModule,
+		DWORD cb, LPDWORD lpcbNeeded);
+	+ BOOL GetModuleBaseName(HANDLE hProcess, HMODULE hModule,
+		LPTSTR lpBaseName, DWORD nSize);
+	+ BOOL GetModuleFileNameEx(HANDLE hProcess, HMODULE hModule,
+		LPTSTR lpFilename, DWORD nSize);
+	+ BOOL GetModuleInformation(HANDLE hProcess, HMODULE hModule,
+		LPMODULEINFO lpmodinfo, DWORD cb);

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
+<title>WWW::Hashbang::Pastebin</title>
+<style>
+a { text-decoration: none }
+</style>
+</head>
+<body>
+<pre>
+WWW::Hashbang::Pastebin(3)      User Contributed Perl Documentation      WWW::Hashbang::Pastebin(3)
+
+NAME
+    <a href="https://metacpan.org/module/WWW::Hashbang::Pastebin">WWW::Hashbang::Pastebin</a> - command line pastebin
+
+SYNOPSIS
+    command | curl -F 'p=<-' [% url %]
+
+DESCRIPTION
+    add lang to resulting url for line numbers and syntax highlighting
+
+EXAMPLES
+    ~$ curl -F 'p=&lt;-' [% url %] < /var/log/maillog
+       [% url %]VZiY
+    ~$ chromium-browser [% url %]VZiY?py#n-7
+
+SEE ALSO
+    <a href="http://sprunge.us">http://sprunge.us</a>
+</pre>
+</body>
+</html>

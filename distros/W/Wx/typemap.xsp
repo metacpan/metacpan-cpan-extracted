@@ -1,0 +1,213 @@
+#############################################################################
+## Name:        typemap.xsp
+## Purpose:     Main typemap file for xsubppp.pl
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     01/03/2003
+## RCS-ID:      $Id: typemap.xsp 3312 2012-07-13 02:02:29Z mdootson $
+## Copyright:   (c) 2003-2011 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%typemap{void}{simple};
+%typemap{bool}{simple};
+%typemap{char}{simple};
+%typemap{short}{simple};
+%typemap{int}{simple};
+%typemap{long}{simple};
+%typemap{unsigned short}{simple};
+%typemap{unsigned}{simple};
+%typemap{unsigned int}{simple};
+%typemap{unsigned long}{simple};
+%typemap{float}{simple};
+%typemap{double}{simple};
+%typemap{wxChar}{simple};
+%typemap{SV*}{simple};
+%typemap{wxDouble}{simple};
+
+%typemap{size_t}{simple};
+%typemap{time_t}{simple};
+
+%typemap{wxUint32}{simple};
+%typemap{wxUIntPtr}{simple};
+%typemap{wxIntPtr}{simple};
+%typemap{wxByte}{simple};
+
+%typemap{wxArrayString}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+
+%typemap{wxArrayString*}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+
+%typemap{wxArrayInt}{parsed}{
+  %output_list{%
+    PUTBACK;
+    wxPli_intarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{const wxArrayString&}{parsed}{
+  %cpp_type{%wxArrayString%};
+  %output_list{%
+    PUTBACK;
+    wxPli_stringarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{const wxArrayInt&}{parsed}{
+  %cpp_type{%wxArrayInt%};
+  %output_list{%
+    PUTBACK;
+    wxPli_intarray_push( aTHX_ RETVAL );
+    SPAGAIN;
+  %};
+};
+%typemap{wxArrayInt&}{parsed}{%wxArrayInt%};
+
+%typemap{wxWindowID}{simple};
+%typemap{wxCoord}{simple};
+%typemap{wxEventType}{simple};
+%typemap{wxDirection}{simple};
+%typemap{wxLayoutDirection}{simple};
+
+%typemap{const wxChar*}{simple};
+%typemap{PlClassName}{simple};
+%typemap{wxPliUserDataCD*}{simple};
+%typemap{wxPliUserDataCD**}{simple};
+
+%typemap{wxString}{simple};
+%typemap{wxString&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{const wxString&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{const wxRect&}{reference};
+%typemap{const wxSize&}{parsed}{
+    %cpp_type{%wxSize%};
+};
+%typemap{const wxPoint&}{parsed}{
+    %cpp_type{%wxPoint%};
+};
+%typemap{const wxPosition&}{parsed}{
+    %cpp_type{%wxPosition%};
+};
+%typemap{wxSize}{parsed}{
+    %cpp_type{%wxSize%};
+};
+%typemap{wxPoint}{parsed}{
+    %cpp_type{%wxPoint%};
+};
+%typemap{wxPoint*}{simple};
+%typemap{wxPosition}{parsed}{
+    %cpp_type{%wxPosition%};
+};
+%typemap{wxPosition*}{simple};
+
+%typemap{const wxArtID&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{const wxArtClient&}{parsed}{
+    %cpp_type{%wxString%};
+};
+%typemap{wxArtProvider*}{simple};
+%typemap{wxArtProvider&}{reference};
+%typemap{wxBitmap}{reference};
+%typemap{const wxBitmap&}{reference};
+%typemap{wxCursor}{reference};
+%typemap{const wxCursor&}{reference};
+%typemap{wxIcon}{reference};
+%typemap{wxFont}{reference};
+%typemap{wxFont*}{simple};
+%typemap{wxAnimation*}{simple};
+%typemap{wxAnimation&}{reference};
+%typemap{const wxAnimation&}{reference};
+%typemap{wxAnimationType}{simple};
+
+%typemap{wxDC*}{simple};
+%typemap{wxDC&}{reference};
+%typemap{const wxDC&}{reference};
+%typemap{wxWindowDC*}{simple};
+%typemap{wxWindowDC&}{reference};
+%typemap{const wxWindowDC&}{reference};
+%typemap{wxMemoryDC*}{simple};
+%typemap{wxMemoryDC&}{reference};
+%typemap{const wxMemoryDC&}{reference};
+%typemap{wxPrinterDC*}{simple};
+%typemap{wxPrinterDC&}{reference};
+%typemap{const wxPrinterDC&}{reference};
+%typemap{const wxValidator&}{reference};
+
+%typemap{const wxPen&}{reference};
+%typemap{const wxBrush&}{reference};
+%typemap{const wxFont&}{reference};
+
+%typemap{wxDateTime*}{simple};
+%typemap{wxDateTime&}{reference};
+%typemap{const wxDateTime&}{reference};
+%typemap{wxDateSpan*}{simple};
+%typemap{wxDateSpan&}{reference};
+%typemap{const wxDateSpan&}{reference};
+%typemap{wxTimeSpan*}{simple};
+%typemap{wxTimeSpan&}{reference};
+%typemap{const wxTimeSpan&}{reference};
+
+%typemap{wxObject*}{simple};
+%typemap{wxEvtHandler*}{simple};
+%typemap{wxSplitterWindow*}{simple};
+%typemap{wxSplitterEvent*}{simple};
+%typemap{wxWindow*}{simple};
+%typemap{wxListView*}{simple};
+%typemap{wxSizer*}{simple};
+%typemap{wxIconBundle*}{simple};
+%typemap{wxFrame*}{simple};
+%typemap{wxDialog*}{simple};
+%typemap{wxChoice*}{simple};
+%typemap{wxTreeCtrl*}{simple};
+%typemap{wxToolBarBase*}{simple};
+%typemap{wxToolBar*}{simple};
+%typemap{wxTextCtrl*}{simple};
+%typemap{wxControl*}{simple};
+%typemap{wxMenu*}{simple};
+
+%typemap{wxKeyEvent&}{reference};
+
+%typemap{wxColour}{reference};
+%typemap{const wxColour&}{reference};
+%typemap{const wxIcon&}{reference};
+%typemap{const wxIconBundle&}{reference};
+%typemap{const wxFont&}{reference};
+%typemap{const wxRegion&}{reference};
+
+%typemap{wxImageList*}{simple};
+%typemap{wxImage*}{simple};
+%typemap{wxImage&}{reference};
+
+%typemap{wxPliInputStream}{simple};
+%typemap{wxPliOutputStream}{simple};
+
+%typemap{wxGraphicsContext*}{simple};
+%typemap{wxGraphicsContext&}{reference};
+%typemap{const wxGraphicsContext&}{reference};
+%typemap{const wxGraphicsPath&}{reference};
+%typemap{const wxGraphicsMatrix&}{reference};
+%typemap{const wxGraphicsPen&}{reference};
+%typemap{const wxGraphicsBrush&}{reference};
+%typemap{const wxGraphicsFont&}{reference};
+
+%typemap{wxVariant*}{simple};
+%typemap{wxVariant&}{reference};
+%typemap{const wxVariant&}{reference};

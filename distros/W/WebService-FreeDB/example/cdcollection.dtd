@@ -1,0 +1,16 @@
+<!ELEMENT  cd           (medium?,id,artist?, title, year?,source?,quality?,tracklist?)   >
+<!ATTLIST  cd
+             type       (maxi|album|sampler|soundtrack|div)            #IMPLIED >
+<!ELEMENT  medium       (#PCDATA)                                    >  <!-- mp3|cd|div-->
+<!ELEMENT  id           (#PCDATA)                                    >
+<!ELEMENT  artist       (#PCDATA)                                    >
+<!ELEMENT  title        (#PCDATA)                                    >
+<!ELEMENT  year         (#PCDATA)                                    >
+<!ELEMENT  source       (#PCDATA)                                    >  <!--   (mp3|cd|unknown)    -->
+<!ELEMENT  quality      (#PCDATA)                                    >  <!--   (untested|passed|failed|<Bitrate>) -->
+<!ELEMENT  comment      (#PCDATA)                                    >  <!--    comment for infos of missing tracks alternate names etc.-->
+<!ELEMENT  tracklist    (track+)                                     >
+
+<!ELEMENT  track        (artist?,name,time?,quality?)                 >
+<!ELEMENT  name         (#PCDATA)                                    >
+<!ELEMENT  time         (#PCDATA)                                    >

@@ -1,0 +1,53 @@
+This patch for WWW::Mechanize stops these warnings from appearing when using
+WWW::Myspace:
+
+    Parsing of undecoded UTF-8 will give garbage when decoding entities at
+     /usr/local/lib/perl/5.8.8/HTML/PullParser.pm line 83.
+
+It is not necessary to use this patch, but you may wish to use it if you want
+to stop those warnings from appearing.  It is provided for your convenience but
+there is no guarantee it won't break functionality of other programs dependent
+on WWW::Mechanize.  Use at your own risk!
+
+It can be applied against an extracted copy of the WWW::Mechanize distribution
+before testing and installing it, for example:
+
+    tar -zxvf WWW-Mechanize-1.34.tar.gz
+    cd WWW-Mechanize-1.34/
+    patch -p1 < /path/to/WWW-Myspace/mechanize.patch
+    make
+    make test
+    sudo make install
+
+Alternatively, it can be applied to an already-installed copy of the module,
+as long as you know where to find it.  If your all of your Perl modules are in
+/usr/share/perl5 (as is the case for Debian-packaged Perl modules), do the
+following:
+
+    cd /usr/share/perl5
+    sudo patch -p2 < /path/to/WWW-Myspace/mechanize.patch
+
+If you don't know where the module is installed, you can do the following to
+search for all installed versions of WWW::Mechanize and try to patch all of
+them (at your own risk) :
+
+    perl -e 'foreach $d (@INC) { print "$d\n" if ( $d =~ /^\// && -f "$d/WWW/Mechanize.pm" ); }' | while read d ; do cd "$d" && sudo patch --dry-run -p2 < /path/to/WWW-Myspace/mechanize.patch ; done
+
+Note that this patch was created against WWW::Mechanize version 1.34.  The
+patch may fail to apply against later versions.  Hopefully the problem will be
+fixed in WWW::Mechanize itself and there soon won't be any need to patch it.
+
+diff -Nru WWW-Mechanize-1.34.orig/lib/WWW/Mechanize.pm WWW-Mechanize-1.34/lib/WWW/Mechanize.pm
+--- WWW-Mechanize-1.34.orig/lib/WWW/Mechanize.pm	2008-08-17 02:59:35.000000000 +0100
++++ WWW-Mechanize-1.34/lib/WWW/Mechanize.pm	2008-08-17 02:59:26.000000000 +0100
+@@ -2146,9 +2146,7 @@
+ 
+     # Try to decode the content. Undef will be returned if there's nothing to decompress.
+     # See docs in HTTP::Message for details. Do we need to expose the options there? 
+-    # use charset => 'none' because while we want LWP to handle Content-Encoding for 
+-    # the auto-gzipping with Compress::Zlib we don't want it messing with charset
+-    my $content = $res->decoded_content( charset => 'none' );
++    my $content = $res->decoded_content;
+     $content = $res->content if (not defined $content);
+ 
+     $content .= _taintedness();

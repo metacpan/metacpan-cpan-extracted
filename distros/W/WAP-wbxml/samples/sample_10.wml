@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+     <!DOCTYPE WML PUBLIC "-//WAPFORUM//DTD WML 1.0//EN"
+                  "wml.xml">
+<WML>
+  <CARD NAME="abc" STYLE="LIST">
+      <DO TYPE="ACCEPT">
+        <GO URL="http://xyz.org/s"/>
+      </DO>
+      X: $(X)<BR/>
+      Y: $(&#x59;)<BR MODE="NOWRAP"/>
+      Enter name: <INPUT TYPE="TEXT" KEY="N"/>
+  </CARD>
+</WML>
+

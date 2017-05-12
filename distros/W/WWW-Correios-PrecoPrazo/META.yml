@@ -1,0 +1,30 @@
+---
+abstract: 'Serviço de cálculo de preços e prazos de entrega de encomendas (Brazilian Postal shipping cost and delivery time)'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Correios-PrecoPrazo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Const::Fast: '0.012'
+  LWP::UserAgent: '0'
+  Test::More: '0.88'
+  URI: '0'
+  URI::Escape: '0'
+resources:
+  bugtracker: https://github.com/garu/WWW-Correios-PrecoPrazo/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/garu/WWW-Correios-PrecoPrazo.git
+version: 0.32

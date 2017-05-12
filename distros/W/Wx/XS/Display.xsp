@@ -1,0 +1,118 @@
+#############################################################################
+## Name:        XS/Display.xsp
+## Purpose:     XS++ for Wx::Display
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     26/09/2007
+## RCS-ID:      $Id: Display.xsp 2557 2009-05-11 10:41:11Z mbarbon $
+## Copyright:   (c) 2007, 2009 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+#include <wx/vidmode.h>
+#include <wx/display.h>
+
+#define wxDefaultVideoModePtr (wxVideoMode*)&wxDefaultVideoMode
+
+%typemap{wxDisplay*}{simple};
+%typemap{wxVideoMode*}{simple};
+%typemap{const wxVideoMode&}{reference};
+
+%name{Wx::VideoMode} class wxVideoMode
+{
+    wxVideoMode( int width = 0, int height = 0, int depth = 0, int freq = 0 );
+
+%{
+static void
+wxVideoMode::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxVideoMode()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::VideoMode", THIS, ST(0) );
+                 delete THIS;
+               %};
+
+    bool Matches( const wxVideoMode& other ) const;
+    int GetWidth() const;
+    int GetHeight() const;
+    int GetDepth() const;
+    bool IsOk() const;
+};
+
+%name{Wx::Display} class wxDisplay
+{
+    wxDisplay( unsigned n = 0 );
+
+%{
+static void
+wxDisplay::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+%}
+    ## // thread OK
+    ~wxDisplay()
+        %code%{  wxPli_thread_sv_unregister( aTHX_ "Wx::Display", THIS, ST(0) );
+                 delete THIS;
+               %};
+
+%{
+int
+GetCount()
+  CODE:
+    RETVAL = wxDisplay::GetCount();
+  OUTPUT: RETVAL
+
+int
+GetFromPoint( point )
+    wxPoint point
+  CODE:
+    RETVAL = wxDisplay::GetFromPoint( point );
+  OUTPUT: RETVAL
+
+#if WXPERL_W_VERSION_GE( 2, 7, 0 )
+
+int
+GetFromWindow( window )
+    wxWindow* window
+  CODE:
+    RETVAL = wxDisplay::GetFromWindow( window );
+  OUTPUT: RETVAL
+
+#endif
+
+%}
+
+    bool IsOk() const;
+    const wxRect& GetGeometry() const;
+#if WXPERL_W_VERSION_GE( 2, 7, 2 )
+    const wxRect& GetClientArea() const;
+#endif
+    wxString GetName() const;
+    bool IsPrimary() const;
+
+#if wxUSE_DISPLAY
+%{
+void
+wxDisplay::GetModes( videoMode = wxDefaultVideoModePtr )
+    wxVideoMode* videoMode
+  PPCODE:
+    wxArrayVideoModes modes = THIS->GetModes( *videoMode );
+    size_t mx = modes.GetCount();
+    EXTEND( SP, int(mx) );
+    for( size_t i = 0; i < mx; ++i )
+    {
+        wxVideoMode* mode = new wxVideoMode( modes[i] );
+        PUSHs( wxPli_non_object_2_sv( aTHX_ sv_newmortal(),
+                                      mode, "Wx::VideoMode" ) );
+    }
+%}
+    const wxVideoMode& GetCurrentMode() const;
+    bool ChangeMode( const wxVideoMode& mode = wxDefaultVideoModePtr );
+    void ResetMode();
+#endif // wxUSE_DISPLAY
+};

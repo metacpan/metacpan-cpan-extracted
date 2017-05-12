@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>chartJS</title>
+    <meta charset='utf-8'>
+    <script src="Chart.js"></script>
+  </head>
+  <body>
+    <canvas id="chart-content" width="400" height="400"></canvas>
+  </body>
+  <script type="text/javascript">
+
+    function drawChart(opts) {
+      var tar = document.getElementById('chart-content');
+      tar.width = opts.width;
+      tar.height = opts.height;
+      var ctx = tar.getContext("2d");
+      var chartjs = new Chart(ctx);
+      var myNewChart = chartjs[opts.type](opts.data, opts.config);
+    };
+
+  </script>
+</html>

@@ -1,0 +1,37 @@
+                                              Win32-Process-Perf
+                                                 Version 1.04
+                                                 11. Nov 2006
+				     
+	                          Copyright (C) 2004-2006 Reinhard Pagitsch.  All Rights Reserved
+		                             Homepage: http://members.aon.at/rpagitsch/
+							
+                                      This is free software; you can redistribute it and/or
+                                         modify it under the same terms as Perl itself.
+					
+
+The latest version can be retrieved from:
+
+http://search.cpan.org/~rpagitsch/
+
+The following modules are required:
+
+	Win32::Locale
+	File::Basename
+
+INSTALLATION
+
+To install Win32-Process-Perf type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DESCRIPTION
+
+Win32-Process-Perf is a module to get performance data of a running process.
+Win32-Process-Perf collects all available data and returns them as a hash value.
+Please see in the test.pl which is an example how to collect the performance data.
+
+The module can only be used on win32 platforms which have the pdh.dll installed.
+These shall be from NT4 upwards.

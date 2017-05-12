@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 199672d9e950392715810ea8cb52d7ba82afd4e6 COPYRIGHT
+SHA1 d179492c62fdf84fa2e063a73b66ae8f28fb23d3 CREDITS
+SHA1 edf08d40318e0b3a5c26be590aa42fabed6ae7fb Changes
+SHA1 e82f15307080209d67edf4f308809497b7948d11 INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 315e2e7a0b8fd4d766f8c9cd464a7b45a09e5251 MANIFEST
+SHA1 c055e51e43cbad745867187aa0e6415d64b93f41 META.json
+SHA1 86b8d69070647f0b5e5a616b5923d91b4efb93a3 META.yml
+SHA1 22891f3ba3a5498c817af81699f489a5ef1af06f Makefile.PL
+SHA1 d435bb1c1238a751a264f1445b53b196f3342ba4 README
+SHA1 ac9e2d0cc3f48317e89038cd0bfebfb3ed424059 dist.ini
+SHA1 7c1f9865c9577e1a95b3d29ee1caf22408d1467d doap.ttl
+SHA1 42fd4caeb9333e3f37e86c2bdb38cec4ccbc78c0 examples/certificate-generation.pl
+SHA1 03d3c6b48b15ad2bbbcfea677a3257374c208c0a examples/certificate-parsing.pl
+SHA1 25a49eb596594a24623220134cedcb4d7e6d477c examples/fingerpoint-test.pl
+SHA1 477d08c3e793ffbc4e2ed23d5a0dfbef135a304d examples/web-id-validation.pl
+SHA1 9af56a0e240838869e5ba9de2591f72277e55fba lib/Plack/Middleware/Auth/WebID.pm
+SHA1 d77967b43b726ed0a782f97eb1211d311b9a2b30 lib/Web/ID.pm
+SHA1 ed4470e9071785bed4852e596286b71d6ec2a4ab lib/Web/ID/Certificate.pm
+SHA1 a871000c6cdee1e74c11ffd0790f2b0d2e34259a lib/Web/ID/Certificate/Generator.pm
+SHA1 f5814fea529758d9913f8211f44e852644f14bba lib/Web/ID/FAQ.pod
+SHA1 7d8e70c18cb7d4e27f50e9b93a46fdf9837de297 lib/Web/ID/RSAKey.pm
+SHA1 3a404ea3a31e5c95e9362f109dec581923e28bd3 lib/Web/ID/SAN.pm
+SHA1 f4e0b01765bb742ef22a9848aeeeeeed684f9152 lib/Web/ID/SAN/Email.pm
+SHA1 d8426af865c0c3271063e56f8981ea8cf965599f lib/Web/ID/SAN/URI.pm
+SHA1 a9ed7c63fb767deab0b16e5d8645b1e4006b2030 lib/Web/ID/Types.pm
+SHA1 199649a794bf7454466005978b2545bc62300c25 lib/Web/ID/Util.pm
+SHA1 f25723dfc071f6097e326c05f69b75343deeddeb lib/Web/ID/Util/FindOpenSSL.pm
+SHA1 311478d30fce690179458dd8b5ca2afc951c8e42 t/01mouse.t
+SHA1 61357e85d9676b656a5cedf29618fbdcfc7405b3 t/02moose.t
+SHA1 6bccc6bac755209db20f7eb4ccfe2fbcb6780d06 t/03certificate.t
+SHA1 b468d166763361712722420123189e969ab2fb4f t/04webid.t
+SHA1 c145c4023e4f8a015b0110476aedd8deccac81e2 t/lib/Test/HTTP/Server.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlNudI0ACgkQzr+BKGoqfTmbRQCfRmn60i9ivvgYKpccVXYcxBOL
+4IoAniB0sPBKl6p59JJMt6g6p5e2FdQl
+=OTD5
+-----END PGP SIGNATURE-----

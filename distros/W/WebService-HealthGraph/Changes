@@ -1,0 +1,15 @@
+Revision history for WebService-Runkeeper
+
+0.000004  2016-10-27 09:55:25-04:00 America/Toronto
+    - url_for() is now uri_for() and accepts query params as a second arg.
+    - Response objects now support pagination.
+
+0.000003  2016-06-10 08:54:10-04:00 America/Toronto
+    - Adds proper handling for team endpoint.
+    - Adds url_for() method.
+
+0.000002  2016-06-08 23:00:50-04:00 America/Toronto
+    - Adds more documentation and endpoints.
+
+0.000001  2016-06-08 00:18:52-04:00 America/Toronto
+    - Initial release.

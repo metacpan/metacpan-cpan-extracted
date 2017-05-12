@@ -1,0 +1,40 @@
+Changes
+demo/echo.pl
+doc/Client.pod
+lib/pfwx.pm
+lib/Weixin/Client.pm
+lib/Weixin/Client.pod
+lib/Weixin/Client/Base.pm
+lib/Weixin/Client/Cache.pm
+lib/Weixin/Client/Callback.pm
+lib/Weixin/Client/Chatroom.pm
+lib/Weixin/Client/Cron.pm
+lib/Weixin/Client/Friend.pm
+lib/Weixin/Client/Operate.pm
+lib/Weixin/Client/Plugin.pm
+lib/Weixin/Client/Plugin/ShowMsg.pm
+lib/Weixin/Client/Plugin/SmartReply.pm
+lib/Weixin/Client/Private/_get_chatroom.pm
+lib/Weixin/Client/Private/_get_qrcode_image.pm
+lib/Weixin/Client/Private/_get_qrcode_uuid.pm
+lib/Weixin/Client/Private/_init.pm
+lib/Weixin/Client/Private/_is_need_login.pm
+lib/Weixin/Client/Private/_login.pm
+lib/Weixin/Client/Private/_logout.pm
+lib/Weixin/Client/Private/_send_text_msg.pm
+lib/Weixin/Client/Private/_sync.pm
+lib/Weixin/Client/Private/_synccheck.pm
+lib/Weixin/Client/Private/_update_chatroom_member.pm
+lib/Weixin/Client/Private/_update_friend.pm
+lib/Weixin/Client/Request.pm
+lib/Weixin/Message.pm
+lib/Weixin/Message/Constant.pm
+lib/Weixin/Message/Queue.pm
+lib/Weixin/UserAgent.pm
+lib/Weixin/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/load_module.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

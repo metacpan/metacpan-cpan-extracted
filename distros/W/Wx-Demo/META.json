@@ -1,0 +1,56 @@
+{
+   "abstract" : "the wxPerl demo",
+   "author" : [
+      "Mattia Barbon <mbarbon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Wx-Demo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/Wx/DemoModules/files/"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.2",
+            "File::Slurp" : "0.01",
+            "File::Spec" : "0.8",
+            "File::chdir" : "0.06",
+            "IO::Scalar" : "2",
+            "Module::Pluggable" : "3.1",
+            "UNIVERSAL::require" : "0.1",
+            "Wx" : "0.64"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://wxperl.sourceforge.net/",
+      "repository" : {
+         "url" : "https://wxperl.svn.sourceforge.net/svnroot/wxperl/wxDemo/trunk"
+      },
+      "x_MailingList" : "wxperl-users@perl.org"
+   },
+   "version" : "0.22"
+}

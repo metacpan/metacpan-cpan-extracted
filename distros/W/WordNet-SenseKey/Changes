@@ -1,0 +1,8 @@
+Revision history for Perl extension WordNet::SenseKey.
+
+1.03  Sat Jan  3 18:09:09 2009
+	- CPAN archive package created by h2xs 1.23 with options
+		-AXc -n WordNet::SenseKey
+
+1.01 August 2008
+	- original version

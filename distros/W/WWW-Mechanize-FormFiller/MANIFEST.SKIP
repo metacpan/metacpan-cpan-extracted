@@ -1,0 +1,14 @@
+^.cvsignore
+^t/.cvsignore
+^.lwpcookies
+^.releaserc
+^blib/
+^WWW-Mechanize-FormFiller-.*
+CVS/
+\.git/
+^pm_to_blib
+.tar.gz$
+.old$
+^Makefile$
+.*.bak
+MYMETA\..*

@@ -1,0 +1,23 @@
+Wx::Perl::Throbber - An animated throbber/spinner
+
+Copyright (c) 2003 Simon Flack
+
+See the COPYRIGHT section in Wx/Perl/Throbber.pm for usage and distribution
+rights
+
+QUICK START:
+
+Wx::Perl::Throbber requires wxPerl. See the 'Wx' package on the CPAN or
+http://wxperl.sourceforge.net for more information.
+
+Install Wx::Perl::Throbber by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Wx::Perl::Throbber' to read the full documentation.
+

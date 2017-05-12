@@ -1,0 +1,11 @@
+0.004    
+- Fixed a new failure in testing.  Yahoo! no longer permits shortening URLs which redirect with a 3xx HTTP response code.
+
+0.003
+- Created explicit dependence on WWW::Shorten::generic.
+
+0.002
+- Fixed bug with missing variable.
+
+0.001    
+- Initial revision includes select and insert functionality with tests.

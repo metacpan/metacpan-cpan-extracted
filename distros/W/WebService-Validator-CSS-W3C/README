@@ -1,0 +1,35 @@
+WebService-Validator-CSS-W3C version 0.1
+=========================================
+
+This module is a Web Service interface to the W3C CSS Validation online
+service <http://jigsaw.w3.org/css-validator/>, based on its
+SOAP 1.2 support. It helps to find errors in Cascading Style Sheets.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+  LWP::UserAgent
+  URI::QueryParam
+  SOAP::Lite
+  URI
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Bjoern Hoehrmann <bjoern@hoehrmann.de>
+Maintained by Bjoern Hoehrmann and olivier Thereaux <ot@w3.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

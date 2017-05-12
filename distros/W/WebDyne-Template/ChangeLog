@@ -1,0 +1,94 @@
+commit a1cdf90da0ed434fbb380054b6ddbc4d592fa0dd
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Oct 2 01:48:10 2011 +0930
+
+    Tag: WebDyne-Template_1.023
+    
+    Made compliant with new Webdyne metafile structure, include template in meta manifest
+
+commit 50faa1e86c8251f987e795aa1d0560620164bb8e
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Thu Jul 14 16:31:41 2011 +0930
+
+    Tag: WebDyne-Template_1.022
+    
+    Changed to new versioning system - dist version now held in main module and removed from VERSION.pm file.
+
+commit fc0e771339a2dfc7119d73252d80df2c032834b9
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Wed Jul 13 17:23:40 2011 +0930
+
+    Tag: WebDyne-Template_1.019
+    
+    Modify Makefile PREREQ section to be more compatible with older version of CPAN
+
+commit b664d7774d6ac73293e51957a73e8cd921425463
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 12:43:50 2010 +0930
+
+    Tag: WebDyne-Template_1.018
+    
+    clean mm_ver redundancy in Makefile.PL, edit README
+
+commit a2162b86e3f0cdecdd559cabcb07476f337cd70e
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Mon Apr 12 00:08:31 2010 +0930
+
+    Tag: WebDyne-Template_1.017
+    
+    Added basic POD documentation.
+
+commit dae78996eec76cc98bcba1988f02a83c13789b53
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 22:12:40 2010 +0930
+
+    Tag: WebDyne-Template_1.016
+    
+    Update to YAML spec 1.4
+
+commit 2d9331d18c9d57f001c06a75f82c59150f9343f0
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 17:00:51 2010 +0930
+
+    Tag: WebDyne-Template_1.015
+    
+    Updated META.yml
+
+commit 429b1328ee90d0d20e345736a5caca8b530fa95f
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 16:59:09 2010 +0930
+
+    Tag: WebDyne-Template_1.014
+    
+    Added module load basic test
+
+commit 51b89c7d6f0af068984a1ff397d09c940e560245
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 16:57:15 2010 +0930
+
+    Tag: WebDyne-Template_1.013
+    
+    Cleaned up copyright and author information, updated Makefile.PL to generate better META.yml
+
+commit 91646cafaf67cae78429d2aa913f7105f89777fd
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Thu Feb 25 01:13:58 2010 +1030
+
+    Tag: WebDyne-Template_1.12
+    
+    Removed superflous prereq to WebDyne
+
+commit 4a53abc8ff2d96c6b974f97be666ea3f5b23d524
+Author: Andrew Speer <aspeer@silicon.isolutions.com.au>
+Date:   Thu Feb 25 01:12:56 2010 +1030
+
+    Tag: WebDyne-Template_1.11
+    
+    Located files to WebDyne standard locations and updated Makefile.PL
+
+commit de3b4b981161dbbbcafe8ad042a1c5582e46036b
+Author: Andrew Speer <aspeer@copper.isolutions.com.au>
+Date:   Sat Feb 20 21:15:56 2010 +1030
+
+    MANIFEST Import
+

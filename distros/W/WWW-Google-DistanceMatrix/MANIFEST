@@ -1,0 +1,16 @@
+Changes
+LICENSE
+lib/WWW/Google/DistanceMatrix.pm
+lib/WWW/Google/DistanceMatrix/Params.pm
+lib/WWW/Google/DistanceMatrix/Result.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-new.t
+t/02-getDistance.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

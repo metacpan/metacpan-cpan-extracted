@@ -1,0 +1,35 @@
+---
+abstract: 'a client library for WWW::Hashbang::Pastebin websites'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Hashbang-Pastebin-Client
+no_index:
+  directory:
+    - corpus
+requires:
+  Carp: 0
+  Getopt::Long: 0
+  HTTP::Tiny: 0
+  Pod::Usage: 0
+  perl: v5.10.1
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/WWW-Hashbang-Pastebin-Client/issues
+  homepage: http://metacpan.org/release/WWW-Hashbang-Pastebin-Client/
+  repository: git://github.com/doherty/WWW-Hashbang-Pastebin-Client.git
+version: 0.003

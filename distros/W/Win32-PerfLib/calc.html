@@ -1,0 +1,1010 @@
+<html>
+<head>
+<title>Calculations for Raw Counter Data</title>
+</head>
+<body bgcolor="#ffffff">
+<font face="Verdana, Arial, sans-serif" size=2>
+<h3><font face="Verdana, Arial, sans-serif">Calculations for Raw Counter Data</font></h3>
+<p><font face="Verdana, Arial, sans-serif" size=2>This section lists the types of performance counters and the calculations that the Performance Monitor uses to convert the raw data to the information you would expect from the counter name. The counter types and calculations are defined in winperf.h. For the calculations, the following key applies:</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0 width=70%>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Symbol</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Symbol Definition</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Numerator</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>D</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Denominator</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>TB</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Time base (indicates the units of raw data if not used in calculation)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>B</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Base count (number of entries)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N0</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Oldest or first sample taken (of the numerator in this case; D0 would be of the denominator)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N1</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>More recent sample</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Nx</font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>Most recent sample in calculation array (for average calculation)</font></td>
+  </tr>
+</table>
+
+<h5><font face="Verdana, Arial, sans-serif">PERF_100NSEC_MULTI_TIMER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Timer for when multiple instances are in use, so the result can exceed 100%. The number of instances is in the next counter.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100NsTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100Ns</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+	
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_100NSEC_MULTI_TIMER_INV</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The inverse of the timer for multiple instances (when the object is not in use).</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100NsTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100Ns</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(B-((N1-N0)/(D1-D0)))</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(B-((Nx-N0)/(Dx-D0)))</font></td>
+  </tr>
+</table>
+
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_100NSEC_TIMER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Timer for when the object is in use.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100NsTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100Ns</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_100NSEC_TIMER_INV</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The inverse of the timer (when the object is not in use).</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100NsTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>100Ns</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(1-((N1-N0)/(D1-D0)))</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2> (1-((Nx-N0)/(Dx-D0)))</font></td>
+  </tr>
+</table>
+
+
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_AVERAGE_BASE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Used as the denominator in the computation of time or count averages.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_AVERAGE_BULK</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>A count which usually gives the bytes per operation when divided by the number of operations.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>BaseData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_AVERAGE_TIMER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>A timer which usually gives time per operation when divided by the number of operations.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>BaseData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>((N1-N0)/TB)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>((Nx-N0)/TB)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_BULK_COUNT</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Used to count byte transmission rates.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/((D1-D0)/TB)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/((Dx-D0)/TB)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_COUNTER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Rate of counts. The most common counter.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/((D1-D0)/TB)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/((Dx-D0)/TB)</font></td>
+  </tr>
+</table>
+
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_DELTA</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Difference between two counters.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_LARGE_DELTA</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Difference between two counters.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_LARGE_QUEUELEN_TYPE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Average count per time interval.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_LARGE_RAWCOUNT</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Instantaneous counter value.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>SUM(N)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_LARGE_RAWCOUNT_HEX</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Instantaneous counter value, as a hexadecimal number.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>SUM(N)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_MULTI_BASE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Base for MULTI counters.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_MULTI_TIMER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Timer for when multiple instances are in use, so the result can exceed 100%. The number of instances is in the next counter.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_MULTI_TIMER_INV</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The inverse of the timer for multiple instances (when the object is not in use).</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(B-((N1-N0)/(D1-D0)))</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(B-((Nx-N0)/(Dx-D0)))</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_NODATA</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>There is no data for this counter.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>0</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>0</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>0</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_QUEUELEN_TYPE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Average count per time interval.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_RAWCOUNT</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Instantaneous counter value.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>SUM(N)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_RAWCOUNT_HEX</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Instantaneous counter value, as a hexadecimal number.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>SUM(N)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_TEXT</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Indicates the data is not a counter, but is Unicode text.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_TIMER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The most common timer.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_COUNTER_TIMER_INV</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The inverse of the timer (when the object is not in use).</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(1-((N1-N0)/(D1-D0)))</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(1-((Nx-N0)/(Dx-D0)))</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_ELAPSED_TIME</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>The data is the start time of the item being measured. For display, subtract the start time from the snapshot time to yield the elapsed time. The PerfTime member of the PERF_OBJECT_TYPE structure contains the sample time. Use the PerfFreq member of the PERF_OBJECT_TYPE structure to convert the time into seconds.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>ObjectTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>ObjectFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(D0-N0)/TB</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Dx-N0)/TB</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_RAW_BASE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Used as a base. Check that this value is greater than zero before dividing.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_RAW_FRACTION</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Instantaneous value, to be divided by the base.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>BaseData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N0/D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>SUM(N/D)/x</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_SAMPLE_BASE</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>Used as a base. Check that this value is greater than zero before dividing.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_SAMPLE_COUNTER</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>A count that is sampled on each sampling interrupt. Must be divided by the base.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfTime</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>PerfFreq</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/((D1-D0)/TB)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/((Dx-D0)/TB)</font></td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<hr noshade color="#000000" size=1>
+<h5><font face="Verdana, Arial, sans-serif">PERF_SAMPLE_FRACTION</font></h5>
+<p><font face="Verdana, Arial, sans-serif" size=2>A count that is either 1 or 0 on each sampling interrupt.</font></p>
+
+<table cellpadding=3 cellspacing=2 border=0>
+  <tr>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Element</b></font></td>
+	<td bgcolor="#808080"><font face="Verdana, Arial, sans-serif" size=2><b>Value</b></font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Numerator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>CounterData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Denominator</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>BaseData</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Time base</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>N/A</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Calculation</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(N1-N0)/(D1-D0)</font></td>
+  </tr>
+  <tr>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2><b>Average function</b></font></td>
+	<td valign=top bgcolor="#e0e0e0"><font face="Verdana, Arial, sans-serif" size=2>(Nx-N0)/(Dx-D0)</font></td>
+  </tr>
+</table>
+
+

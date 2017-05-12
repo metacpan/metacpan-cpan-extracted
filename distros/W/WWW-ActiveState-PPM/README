@@ -1,0 +1,69 @@
+NAME
+    WWW::ActiveState::PPM - Scrape build status from the ActiveState build
+    farm
+
+DESCRIPTION
+    THIS MODULE IS CONSIDERED EXPERIMENTAL
+
+    API OR FUNCTIONALITY MAY CHANGE WITHOUT NOTICE
+
+    YOU HAVE BEEN WARNED!
+
+    This module is used to extract the build state of all the modules from
+    the ActiveState PPM website, located at <http://ppm.activestate.com/>.
+
+METHODS
+  new
+      my $scraper = WWW::ActiveState::PPM->new(
+          trace   => 0,
+          version => '5.10',
+      );
+
+    The "new" constructor creates a new website scraping object.
+
+    The optional boolean "trace" param (off by default) is supplied to make
+    the scraping object print status to STDOUT as it runs.
+
+    The optional "version" param (5.10 by default) is used to set the
+    version of Perl that the scraper should target. Legal values are '5.6',
+    '5.8' and '5.10'.
+
+    Returns a new WWW::ActiveState::PPM object, or throws an exception on
+    error.
+
+  trace
+    The "trace" accessor is used to discover if tracing is enabled for the
+    object.
+
+  version
+    The "version" accessor returns the version of Perl that the scraper is
+    targetting.
+
+  run
+    The "run" method is used to kick off the parsing process.
+
+    Returns true when all packages have been checked, or throws an exception
+    if an error occurs.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-ActiveState-PPM>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    <http://ppm.activestate.com>
+
+COPYRIGHT
+    Copyright 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

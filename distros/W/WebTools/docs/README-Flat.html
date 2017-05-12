@@ -1,0 +1,209 @@
+<html>
+<head>
+<title>README-FLAT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" BORDER="0" BACKGROUND="images/bgimage.jpg">
+  <tr><td>
+<div align="center">
+  <p><b><font color="#000000" size="4">FLAT DB</font></b></p>
+        <p align="left">&nbsp;&nbsp;&nbsp;<b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">This 
+          README file regards Flat DB users and this is all information you need 
+          to get Flat DB up!<br>
+          <br>
+          Installation:<br>
+          &nbsp;&nbsp;&nbsp;Before you can use Flat DB you may need to install 
+          only one standart module:<br>
+          That is </font><font color="#000000"><a href="http://cpan.valueclick.com/authors/id/TIMB/DBI-1.21.tar.gz"><font face="Verdana, Arial, Helvetica, sans-serif" size="2">DBI</font></a></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+          (you need it to run properly DBD::Sprite. On most systems DBI module 
+          is already installed!)<br>
+          After successful installation you have to make your own database:<br>
+          <br>
+          &nbsp;You have 'system' database with webtools installation(don't use 
+          it...create new one comply with your OS):<br>
+          &nbsp;Database: webtoolsdb<br>
+          &nbsp;User: user<br>
+          &nbsp;Password: pass<br>
+          <br>
+          <font color="#FF0000">STOP: Use Web based script install.cgi introduced 
+          in WebTools ver. 1.16 to manage config.pl file and to create base structure 
+          of Flat database!</font><br>
+          <br>
+          Because Password is crypted you can't change it in your 'system' DB, 
+          so you must create your own database when you use this DB engine for 
+          professionl purposes!</font></b></p>
+  <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">To 
+    create your own DB you have to follow next steps:<br>
+    &nbsp;&nbsp;&nbsp;<font color="#000099">cd</font> &nbsp;&nbsp;to_your_<font color="#000099">webtools/db/</font><br>
+          &nbsp;&nbsp;&nbsp;<font color="#000099">rename</font> or <font color="#000099">move</font> 
+          system DB: <font color="#990000">webtoolsdb.sdb</font> and it's tables: 
+          <font color="#990000">webtools_sessions.stb</font> <font color="#990000">webtools_users.stb</font> 
+          to some other place/directory (we need to use the same names for DB 
+          and tables: only for example purposes)<br>
+    &nbsp;&nbsp;&nbsp;<font color="#000099">cd</font> &nbsp;&nbsp;to_your_<font color="#000099">webtools/db/structures</font>_directory 
+    <br>
+          and remove old <font color="#990000">webtoolsdb.sdb</font> (if available)<br>
+    <br>
+    <i>NOTE:</i> You can choose your own names for database and/or tables, but 
+    you must change that names where is needful! I.e. you need to edit config.pl 
+    and don't forgot to change $webtools::sql_user and $webtools::sql_pass. <br>
+    &nbsp;&nbsp;&nbsp;User name and password in config.pl MUST be the same as 
+    </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font></b></font> 
+    <font face="Verdana, Arial, Helvetica, sans-serif" size="2">and </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">its_password</font></font></b></font> 
+    <font face="Verdana, Arial, Helvetica, sans-serif" size="2">in code below!<br>
+    </font></b></p>
+  <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000"><font color="#000000">Please 
+    configure follow sections of '../../conf/config.pl':<br>
+    <br>
+    <font color="#006600">#[Name_Of_Project]<br>
+          $webtools::projectname = '<font color="#990000">webtools</font>'; &nbsp;&nbsp;&nbsp;&nbsp;# 
+          Name of project! (be careful what exacly you write here!) </font></font></font></font></b></p>
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[SQL]<br>
+    $webtools::db_support = '<font color="#990000">db_flat</font>'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    &nbsp;&nbsp;# Driver for Flat DB support<br>
+    $webtools::sql_host = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">localhost</font></font>';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Your address to SQL server.<br>
+    $webtools::sql_port = '3306'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Your port of SQL server.<br>
+    $webtools::sql_user = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font>'; 
+    &nbsp;&nbsp;# Don't forget user!<br>
+    $webtools::sql_pass = '<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">its_password</font></font>'; 
+    &nbsp;&nbsp;&nbsp;&nbsp;# and password<br>
+    $webtools::mysqlbequiet = '1';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    # MySQL be QUIET?</b></font></p>
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b>#[DataBase]<br>
+    $webtools::sql_database_sessions = <font color="#990000">$webtools::projectname</font>.'db';&nbsp;&nbsp; 
+    &nbsp;&nbsp;&nbsp;&nbsp;# Database name.<br>
+    $webtools::sql_sessions_table = <font color="#990000">$webtools::projectname</font>.'_sessions'; 
+    # Session table.<br>
+    $webtools::sql_user_table = <font color="#990000">$webtools::projectname</font>.'_users'; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 
+    Contain all users (and admin too).</b></font></p>
+  <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><i>NOTE:</i> 
+    Before countinue you must edit <font color="#000099">webtoolsdb-flat.pl</font> 
+    file, because it contain default admin user name and password.<br>
+    <br>
+          Now&nbsp;run <font color="#000099">perl makesdb.pl </font>and insert 
+          follow data:<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database name: 
+    <font color="#990000">webtoolsdb</font><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: 
+    </font><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#006600"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><font color="#990000">webtools_user</font></font></b></font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+    ( user)</font><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User 
+    password: <font color="#006600"><b><font color="#990000">its_password</font></b></font></font> 
+    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">( pass)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">Database 
+    path:</font></font> <font color="#990000" size="2" face="Verdana, Arial, Helvetica, sans-serif">/full_path_to_webtools/db/</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+    (eg: '/usr/local/apache/cgi-bin/webtools/db/')<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Table 
+    file extension (default .stb): </font></b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#FF0000"><i><b>ENTER</b></i></font><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Record delimiter 
+    (default \r\n): <i><font color="#FF0000">ENTER</font></i><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Field delimiter 
+    (default ::): <i><font color="#FF0000">ENTER</font></i><br>
+          Press <i>ENTER</i> again to leave script (sometimes <font color="#006600">ctrl+d</font> 
+          and <font color="#006600">enter</font>) or continue with entering another 
+          DB users.<br>
+    <font color="#990000"></font></font></b></p>
+        <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"> 
+          Now you have to create <font color="#990000">webtools_sessions</font> 
+          and <font color="#990000">webtools_users</font> tables, so first copy 
+          new database <font color="#990000">webtoolsdb.sdb</font> to <font color="#990000">../</font> 
+          directory (i.e. to <font color="#990000">db</font> directory) and then:<br>
+          <br>
+          run <font color="#000099">perl webtoolsdb-flat.pl</font> and this must 
+          create for you wished tables!</font></b><br>
+          <font size="2" face="Verdana, Arial, Helvetica, sans-serif"><b>(please 
+          be convinced that variable <font color="#006600">$webtools::check_module_functions</font> 
+          in config.pl has '<font color="#FF0000">off</font>' value. After execution 
+          of line above please turn <font color="#006600">$webtools::check_module_functions</font> 
+          to '<font color="#FF0000">on</font>' again).<br>
+          You need '<font color="#FF0000">off</font>' value when everything is 
+          OK and you want to use WebTools in &quot;normal&quot; mode!</b></font><br>
+          <br>
+          <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">That's 
+          all!<br>
+          </font></b></p>
+        <p align="left"><font color="#0000CC" face="Verdana, Arial, Helvetica, sans-serif"><b>--------------------------------------------------------------------------------</b></font><br>
+          <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#FF0000">Configuration, 
+          step by step example:</font><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          <font color="#006600">Installation of webtools I assume is in <font color="#333333">/usr/local/apache/cgi-bin/whtml</font></font><br>
+          <font color="#000099">cd /usr/local/apache/cgi-bin/whtml/</font><br>
+          <font color="#000099">pico conf/config.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#990000">edit 
+          follow vars to:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::projectname = 'webhtml'; 
+          <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::sql_user = 'mynewuser';<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::sql_pass = 'mynewpass';</font><br>
+          <font color="#000099">rm db/webtoolsdb.sdb<br>
+          rm db/webtools_sessions.stb<br>
+          rm db/webtools_users.stb <br>
+          cd db/structures/<br>
+          perl makesdb.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#990000">Database 
+          name: webhtmldb &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(must 
+          be same as $webtools::projectname plus 'db' at the end!!!)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database user: mynewuser<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database password: mynewpass<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database path: /usr/local/apache/cgi-bin/whtml/<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Table file ext: ENTER<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Record delimit: ENTER<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Field delimite: ENTER<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Database user: ENTER</font><br>
+          <font color="#000099">cp webhtmldb.sdb ../<br>
+          pico webtoolsdb-flat.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#990000">edit 
+          follow vars to: <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::admin_user = 'myadmin';<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::admin_pass = 'mysecretadminpassword';<br>
+          <font color="#000099">pico ../../conf/config.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;edit follow var to:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::check_module_functions 
+          = 'off';</font><br>
+          <font color="#000099">perl webtoolsdb-flat.pl<br>
+          pico ../../conf/config.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#990000">edit 
+          follow var to:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::check_module_functions 
+          = 'on';</font> <br>
+          <font color="#006600">Ok, now write down in your browser: <br>
+          <font color="#FF0000">http://www.your_host.com/cgi-bin/whtml/process.cgi</font><br>
+          and see what process.cgi with $webtools::check_module_functions = 'on' will show 
+          to you.<br>
+          You should see &quot;Test DB Engine...looks good&quot; : This line mean 
+          that webtools can connect, insert, select, update and delete rows from 
+          your database throught driver you selected in config.pl<br>
+          Note: If you don't configure you config.pl file properly you will get 
+          errors and warnnings!<br>
+          If your config.pl is properly configured you can turn $webtools::check_module_functions 
+          &quot;off&quot; !</font><br>
+          <font color="#000099">pico ../../conf/config.pl</font><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#990000">edit 
+          follow var to:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$webtools::check_module_functions 
+          = 'off';</font> </font></b><br>
+          <br>
+          <font color="#663399" size="2" face="Verdana, Arial, Helvetica, sans-serif"><b><i>Unix/Linux-WIN/DOS 
+          Legend</i></b>: <br>
+          <b><i>&nbsp;&nbsp;&nbsp;&nbsp;cp &lt;-&gt; copy<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;rm &lt;-&gt; del<br>
+          &nbsp;&nbsp;&nbsp; pico/vi/mcedit &lt;-&gt; notepad.exe/edit.exe<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;/ &lt;-&gt; \</i></b></font><br>
+          <font color="#0000CC" face="Verdana, Arial, Helvetica, sans-serif"><b>--------------------------------------------------------------------------------</b></font><br>
+          <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><br>
+          &nbsp;Actualy configuration of Flat DB is harder than other DB engines, 
+          but some times you can use only simple flat, text files :| and no SQL 
+          DB engine available. Also Flat DB is absolutely FREE :-)</font></b></p>
+        <p align="left"><b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">I 
+          hope evrything is ok and now you can run your tests/examples...enjoy!<br>
+          </font></b><br>
+          <b><font face="Verdana, Arial, Helvetica, sans-serif" size="-1">Author:<br>
+          <a href="mailto:jlishev@cpan.org">julian@proscriptum.com</a></font></b></p>
+  </div>
+  </td></tr></table>
+</body>
+</html>

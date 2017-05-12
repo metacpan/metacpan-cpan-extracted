@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:47Z">
+<BookList total_results="252" page_size="10" page_number="18" shown_results="10">
+<BookData book_id="the_gold_bug_a01" isbn="0585051917">
+<Title>The gold-bug</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:22:51Z" price_time="2006-10-08T08:01:31Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085987 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:22:51Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-the_gold_bug_a01-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_gold_bug_and_other_tales" isbn="0486268756">
+<Title>The gold-bug and other tales</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="dover_publications">New York : Dover Publications, 1991.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="121 p. ; 21 cm." language="eng" edition_info="$1.00" dewey_decimal_normalized="813.3" lcc_number="PS2615" change_time="2005-11-09T12:54:20Z" price_time="2006-10-08T08:01:34Z" />
+<Summary></Summary>
+<Notes>Ligeia -- The fall of the House of Usher -- The murders in the Rue Morgue -- The masque of the Red Death -- The pit and the pendulum -- The tell-tale heart -- The gold-bug -- The black cat -- The cask of Amontillado.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales" store_url="57628935&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:11:13Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780486268750" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:11:16Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:11:19Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:11:19Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales by Edgar Allan Poe (1991)" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:43:31Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="6" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales (Dover Thrift Editions)" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="3.49" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales (Dover Thrift Editions)" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="1.02" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="1.13" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:09Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:09Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales (Dover Thrift Editions)" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:10Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30082585%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:34Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:21Z" currency_rate="1" price="1.13" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:55:21Z" currency_rate="1" price="0.65" />
+<Price store_isbn="" store_title="The Gold-Bug and Other Tales Product 426797" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.426797&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:35Z" currency_rate="1" price="1.41" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug_and_other_tales/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:01:34Z" currency_rate="1" price="1.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_horror_united_states">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_horror_general">Amazon.com -- Horror -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+<Subject subject_id="amazon_com_teens_horror">Amazon.com -- Teens -- Horror</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="North of Boston Library Exchange (NOBLE)" last_update="2005-11-09T12:54:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-65-the_gold_bug_and_other_tales-20051109.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_illustrated_edgar_allan_poe" isbn="0517527421">
+<Title>The illustrated Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Satty</AuthorsText>
+<PublisherText publisher_id="c_n_potter_distributed_by__a02">New York : C. N. Potter : distributed by Crown Publishers, c1976.</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="184 p. : ill. ; 29 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2602" change_time="2004-03-16T21:30:02Z" price_time="2006-10-08T08:01:38Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-13T22:17:41Z" currency_rate="1" price="10.05" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-13T22:17:42Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe" store_url="http://www.biblio.com/details.php?dcx=32304508&amp;aid=isbndb" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-13T22:17:43Z" currency_rate="1" price="9.94" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="13.27" />
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="1.24" />
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:10Z" currency_rate="1" price="5.71" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:10Z" currency_rate="1" price="5.76" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Emory University" last_update="2004-03-16T21:30:02Z" marc_url="http://isbndb.com/x/libdata/isbndb-35-the_illustrated_edgar_allan_poe-20040316.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="satty_wilfried">Satty, Wilfried</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_illustrated_edgar_allan_poe_a01" isbn="0904041573">
+<Title>The illustrated Edgar Allan Poe</Title>
+<TitleLong>The illustrated Edgar Allan Poe: a selection of the tales together with a poem</TitleLong>
+<AuthorsText>edited and with an introduction by Roy Gasson</AuthorsText>
+<PublisherText publisher_id="jupiter_books">London : Jupiter Books, 1976.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xix, 236, [2] p., viii, 48 p. of plates : ill. (some col.), 2 ports. ; 26 cm." language="eng" edition_info="Đ5.50" dewey_decimal_normalized="813.3" lcc_number="PZ3" change_time="2004-07-25T06:46:40Z" price_time="2006-10-08T08:01:42Z" />
+<Summary></Summary>
+<Notes>Filmography: p. 229-232.
+
+Bibliography: p. 233-236.
+
+A descent into the maelstrm̲.--The cask of Amontillado.--The fall of the House of Usher.--The gold-bug.--The black cat.--Ms. found in a bottle.--The raven.--William Wilson.--The facts in the case of M. Valdemar.--Ligeia.--The murders in the Rue Morgue.--The mystery of Marie Rogt̊.--The premature burial.--The tell-tale heart.--The pit and the pendulum.--The masque of the red death.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The illustrated Edgar Allan Poe: A selection of the tales together with a poem" store_url="51510169&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:11:34Z" currency_rate="1" price="2.15" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:11:36Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="The illustrated Edgar Allan Poe: A selection of the tal" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:43:46Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="The illustrated Edgar Allan Poe: A selection of the tales together with a poem" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:07Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="The illustrated Edgar Allan Poe: A selection of the tales together with a poem" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:07Z" currency_rate="1" price="2.17" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:07Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe: a Selection of the Tales Together With a Poem" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:11Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The illustrated Edgar Allan Poe: A selection of the tales together with a poem" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:11Z" currency_rate="1" price="2.15" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Deakin University" last_update="2004-07-25T06:46:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-185-the_illustrated_edgar_allan_poe_a01-20040724.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-02-07T21:01:12Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_illustrated_edgar_allan_poe_a01-20060207.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_illustrated_edgar_allan_poe_a02" isbn="0847310655">
+<Title>The illustrated Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="drake_publishers">New York : Drake Publishers, 1975.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="184 p. : ill. ; 28 cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="PS2602" change_time="2004-09-15T03:02:14Z" price_time="2006-10-08T08:01:50Z" />
+<Summary></Summary>
+<Notes>On cover: The illustrated tales of Edgar Allan Poe.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-09-15T03:02:14Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_illustrated_edgar_allan_poe_a02-20040914.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_illustrated_edgar_allan_poe_a03" isbn="084731183X">
+<Title>The illustrated Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="drake_publishers">New York : Drake Publishers, 1975.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="184 p. : ill. ; 28 cm." language="eng" edition_info="pbk. :$6.95" dewey_decimal_normalized="813.3" lcc_number="PS2602" change_time="2004-09-15T03:02:16Z" price_time="2006-10-08T08:01:54Z" />
+<Summary></Summary>
+<Notes>On cover: The illustrated tales of Edgar Allan Poe.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe." store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a03/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="Illustrated Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a03/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:11Z" currency_rate="1" price="12.38" />
+<Price store_isbn="" store_title="The Illustrated Edgar Allan Poe." store_url="http://isbndb.com/x/book/the_illustrated_edgar_allan_poe_a03/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:12Z" currency_rate="1" price="3.94" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-09-15T03:02:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_illustrated_edgar_allan_poe_a03-20040914.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_imaginary_voyages" isbn="0805785345">
+<Title>The imaginary voyages</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited by Burton R. Pollin</AuthorsText>
+<PublisherText publisher_id="twayne_publishers">Boston : Twayne Publishers, 1981.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xix, 667 p. ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2004-08-31T00:56:02Z" price_time="2006-10-06T03:03:10Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references and index.
+
+The narrative of Arthur Gordon Pym -- The unparalleled adventure of one Hans Pfaall -- The journal of Julius Rodman.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The imaginary voyages (Collected writings of Edgar Allan Poe)" store_url="http://isbndb.com/x/book/the_imaginary_voyages/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-06T03:02:27Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="The Imaginary Voyages (collected Writings Of Edgar Allan Poe)" store_url="http://isbndb.com/x/book/the_imaginary_voyages/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-06T03:02:27Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="The Imaginary Voyages (Collected Writings of Edgar Allan Poe)" store_url="http://isbndb.com/x/book/the_imaginary_voyages/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-06T03:02:27Z" currency_rate="1" price="74.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_fiction_american">Fantasy fiction, American</Subject>
+<Subject subject_id="voyages_imaginary">Voyages, Imaginary</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="LANCE -- a MOBIUS Library Catalog (Missouri)" last_update="2004-08-31T00:56:02Z" marc_url="http://isbndb.com/x/libdata/isbndb-286-the_imaginary_voyages-20040830.mrc" />
+<MARC library_name="Louisiana State University" last_update="2005-10-29T12:17:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-louisianasu-the_imaginary_voyages-20051029.mrc" />
+<MARC library_name="University of London" last_update="2006-03-02T21:41:18Z" marc_url="http://isbndb.com/x/libdata/isbndb-214-the_imaginary_voyages-20060302.mrc" />
+<MARC library_name="Michigan State University" last_update="2006-04-10T05:23:50Z" marc_url="http://isbndb.com/x/libdata/isbndb-62-the_imaginary_voyages-20060409.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="pollin_burton_ralph">Pollin, Burton Ralph</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_imaginary_voyages_a01" isbn="0877522383">
+<Title>The imaginary voyages</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited by Burton R. Pollin</AuthorsText>
+<PublisherText publisher_id="gordian_press">New York : Gordian Press, 1994.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xix, 667 p. : ill. ; 25 cm." language="eng" edition_info="(acid-free paper)" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2004-11-08T03:03:20Z" price_time="2006-09-06T00:13:02Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. 582-653) and index.
+
+The narrative of Arthur Gordon Pym -- The unparalleled adventure of one Hans Pfaall -- The journal of Julius Rodman.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Collected Writings of Edgar Allan Poe Imaginary Voyages (Collected writings of Edgar Allan Poe)" store_url="http://isbndb.com/x/book/the_imaginary_voyages_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-06T00:12:58Z" currency_rate="1" price="67.5" />
+<Price store_isbn="" store_title="Collected Writings of Edgar Allan Poe Imaginary Voyages (Collected writings of Edgar Allan Poe)" store_url="http://isbndb.com/x/book/the_imaginary_voyages_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-06T00:12:58Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="Collected Writings of Edgar Allan Poe Imaginary Voyages" store_url="http://isbndb.com/x/book/the_imaginary_voyages_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-06T00:12:59Z" currency_rate="1" price="95" />
+<Price store_isbn="" store_title="Collected Writings of Edgar Allan Poe Imaginary Voyages" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D36341025%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-06T00:13:02Z" currency_rate="1" price="87.94" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_fiction_american">Fantasy fiction, American</Subject>
+<Subject subject_id="voyages_imaginary">Voyages, Imaginary</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-11-08T03:03:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_imaginary_voyages_a01-20041107.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="pollin_burton_ralph">Pollin, Burton Ralph</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_james_carling_illustrations_of_edgar_allan_poes_the_rave" isbn="0911303014">
+<Title>The James Carling illustrations of Edgar Allan Poe's The Raven</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited by Roscoe Brown Fisher; notes on the illustrations by Bruce K. B. Laughton and the writing of "The Raven" by Thomas Ollive Mabbott</AuthorsText>
+<PublisherText publisher_id="delmar_publishers_and_printers">Charlotte, N.C. : Delmar Publishers and Printers, c1982.</PublisherText>
+<Details dewey_decimal="" physical_description_text="150 p. : ill. ; 27 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2003-10-31T10:48:07Z" price_time="2005-02-08T08:43:23Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The James Carling Illustrations of Edgar Allan Poe's &quot;The Raven&quot;" store_url="http://isbndb.com/x/book/the_james_carling_illustrations_of_edgar_allan_poes_the_rave/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-02-08T08:43:22Z" currency_rate="1" price="23.29" />
+<Price store_isbn="" store_title="The James Carling Illustrations of Edgar Allan Poe's &quot;The Raven&quot;" store_url="http://isbndb.com/x/book/the_james_carling_illustrations_of_edgar_allan_poes_the_rave/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-02-08T08:43:22Z" currency_rate="1" price="22" />
+<Price store_isbn="" store_title="The James Carling Illustrations of Edgar Allan Poe's &quot;the Raven&quot;" store_url="http://isbndb.com/x/book/the_james_carling_illustrations_of_edgar_allan_poes_the_rave/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-02-08T08:43:22Z" currency_rate="1" price="21.95" />
+<Price store_isbn="" store_title="James Carling Illustrations of Edgar Allan Poe's &quot;the Raven&quot;" store_url="http://isbndb.com/x/book/the_james_carling_illustrations_of_edgar_allan_poes_the_rave/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-02-08T08:43:23Z" currency_rate="1" price="23.29" />
+</Prices>
+<Subjects>
+<Subject subject_id="carling_james_1857_1887">Carling, James,1857-1887</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_raven">Poe, Edgar Allan,1809-1849. -- Raven</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Emory University" last_update="2003-10-31T10:48:07Z" marc_url="http://isbndb.com/x/libdata/isbndb-35-the_james_carling_illustrations_of_edgar_allan_poes_the_rave-20031031.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="carling_james">Carling, James</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="fisher_roscoe_brown">Fisher, Roscoe Brown</Person>
+<Person person_id="laughton_bruce">Laughton, Bruce</Person>
+<Person person_id="mabbott_thomas_ollive">Mabbott, Thomas Ollive</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_landscape_garden" isbn="0585051992">
+<Title>The landscape garden</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:25:35Z" price_time="2006-06-21T04:09:51Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085995 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:25:35Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-the_landscape_garden-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

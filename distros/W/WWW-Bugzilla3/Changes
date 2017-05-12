@@ -1,0 +1,25 @@
+Revision history for WWW-Bugzilla3
+
+0.71	07 Oct 2008
+	Fix bug#39850
+
+0.7	28 Dec 2007
+	Fix bug#29736, update docs.
+
+0.6	01 Sep 2007
+	Migrate to RPC::XML::Client
+
+0.5	25 Jul 2007
+	Documentation update.
+
+0.4	09 Jul 2007
+	Add named_search() and search() methods.
+
+0.3	06 Jul 2007
+	Documentation update.
+
+0.2	05 Jul 2007
+	Documentation update.
+	
+0.1	05 Jul 2007 
+	First version, released on an unsuspecting world.

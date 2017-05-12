@@ -1,0 +1,452 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="/www/webservice-ovh//docs/html/default.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:pjendral@sfpajend.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_existing">_new_existing</a></li>
+      <li><a href="#new">_new</a></li>
+      <li><a href="#is_valid">is_valid</a></li>
+      <li><a href="#is_valid1">_is_valid</a></li>
+      <li><a href="#name">name</a></li>
+      <li><a href="#id">id</a></li>
+      <li><a href="#domain">domain</a></li>
+      <li><a href="#properties">properties</a></li>
+      <li><a href="#language">language</a></li>
+      <li><a href="#options">options</a></li>
+      <li><a href="#owner_email">owner_email</a></li>
+      <li><a href="#reply_to">reply_to</a></li>
+      <li><a href="#nb_subscribers_update_date">nb_subscribers_update_date</a></li>
+      <li><a href="#nb_subscribers">nb_subscribers</a></li>
+      <li><a href="#change">change</a></li>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#change_options">change_options</a></li>
+      <li><a href="#moderators">moderators</a></li>
+      <li><a href="#moderators1">moderators</a></li>
+      <li><a href="#add_moderator">add_moderator</a></li>
+      <li><a href="#delete_moderator">delete_moderator</a></li>
+      <li><a href="#delete_moderator1">delete_moderator</a></li>
+      <li><a href="#subscribers">subscribers</a></li>
+      <li><a href="#subscriber">subscriber</a></li>
+      <li><a href="#add_subscriber">add_subscriber</a></li>
+      <li><a href="#delete_subscriber">delete_subscriber</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Webservice::OVH::Email::Domain::Domain::MailingList</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use Webservice::OVH;</p>
+
+<p>my $ovh = Webservice::OVH-&gt;new_from_json(&quot;credentials.json&quot;);</p>
+
+<p>my $email_domain = $ovh-&gt;email-&gt;domain-&gt;domain(&#39;testdomain.de&#39;);</p>
+
+<p>my $mailing_list = $email_domain-&gt;new_redirection(language &#39;de&#39;, name =&gt; &#39;infos&#39;, options =&gt; {moderatorMessage =&gt; &#39;true&#39;, subscribeByModerator =&gt; &#39;true&#39;, usersPostOnly =&gt; &#39;false&#39;}, owner_email =&gt; &#39;owner@test.de&#39; );</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides ability to create, delete, change and manage mailinglists.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_existing">_new_existing</h2>
+
+<p>Internal Method to create a MailingList object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $domain - parent domain Objekt, $mailing_list_name =&gt; unique name</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Email/Domain/Domain/MailingList.html">Webservice::OVH::Email::Domain::Domain::MailingList</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Email::Domain::Domain::MailingList-&gt;_new_existing($ovh_api_wrapper, $domain, $mailing_list_name, $module);</p>
+
+</li>
+</ul>
+
+<h2 id="new">_new</h2>
+
+<p>Internal Method to create the MailingList object. This method should never be called directly.</p>
+
+<ul>
+
+<li><p>Parameter: $api_wrapper - ovh api wrapper object, $module - root object, $domain - parent domain, %params - key =&gt; value</p>
+
+</li>
+<li><p>Return: <a href="/www/webservice-ovh/docs/html/../Webservice/OVH/Email/Domain/Domain/MailingList.html">Webservice::OVH::Email::Domain::Domain::MailingList</a></p>
+
+</li>
+<li><p>Synopsis: Webservice::OVH::Email::Domain::Domain::MailingList-&gt;_new($ovh_api_wrapper, $domain, $module, language &#39;DE&#39;, name =&gt; &#39;infos&#39;, options =&gt; {}, owner_email =&gt; &#39;owner@test.de&#39;, reply_to =&gt; &#39;test@test.de&#39; );</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid">is_valid</h2>
+
+<p>When this mailinglist is deleted on the api side, this method returns 0.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: print &quot;Valid&quot; if $mailing_list-&gt;is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="is_valid1">_is_valid</h2>
+
+<p>Intern method to check validity. Difference is that this method carps an error.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: $mailing_list-&gt;_is_valid;</p>
+
+</li>
+</ul>
+
+<h2 id="name">name</h2>
+
+<p>Unique identifier.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $name = $redirection-&gt;name;</p>
+
+</li>
+</ul>
+
+<h2 id="id">id</h2>
+
+<p>Secondary unique identifier.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $id = $mailing_list-&gt;id;</p>
+
+</li>
+</ul>
+
+<h2 id="domain">domain</h2>
+
+<p>Returns the email-domain this redirection is attached to.</p>
+
+<ul>
+
+<li><p>Return: <a>Webservice::Email::Domain::Domain</a></p>
+
+</li>
+<li><p>Synopsis: my $email_domain = $mailing_list-&gt;domain;</p>
+
+</li>
+</ul>
+
+<h2 id="properties">properties</h2>
+
+<p>Returns the raw properties as a hash. This is the original return value of the web-api.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $mailing_list-&gt;properties;</p>
+
+</li>
+</ul>
+
+<h2 id="language">language</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $language = $mailing_list-&gt;language;</p>
+
+</li>
+</ul>
+
+<h2 id="options">options</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $options = $mailing_list-&gt;options;</p>
+
+</li>
+</ul>
+
+<h2 id="owner_email">owner_email</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $owner_email = $mailing_list-&gt;owner_email;</p>
+
+</li>
+</ul>
+
+<h2 id="reply_to">reply_to</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $reply_to = $mailing_list-&gt;reply_to;</p>
+
+</li>
+</ul>
+
+<h2 id="nb_subscribers_update_date">nb_subscribers_update_date</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $nb_subscribers_update_date = $mailing_list-&gt;nb_subscribers_update_date;</p>
+
+</li>
+</ul>
+
+<h2 id="nb_subscribers">nb_subscribers</h2>
+
+<p>Exposed property value.</p>
+
+<ul>
+
+<li><p>Return: VALUE</p>
+
+</li>
+<li><p>Synopsis: my $nb_subscribers = $mailing_list-&gt;nb_subscribers;</p>
+
+</li>
+</ul>
+
+<h2 id="change">change</h2>
+
+<p>Changes the objcet.</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value language owner_email reply_to</p>
+
+</li>
+<li><p>Synopsis: $mailing_list-&gt;change( language =&gt; &#39;en&#39;, owner_email =&gt; &#39;other@test.de&#39;, reply_to =&gt; &#39;reply@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="delete">delete</h2>
+
+<p>Deletes the mailinglist api sided and sets this object invalid.</p>
+
+<ul>
+
+<li><p>Synopsis: $mailing_list-&gt;delete;</p>
+
+</li>
+</ul>
+
+<h2 id="change_options">change_options</h2>
+
+<p>Changes additional options.</p>
+
+<ul>
+
+<li><p>Parameter: %params - key =&gt; value moderator_message subscribe_by_moderator users_post_only</p>
+
+</li>
+<li><p>Synopsis: $mailing_list-&gt;change_options( moderator_message =&gt; &#39;false&#39;, subscribe_by_moderator =&gt; &#39;false&#39;, users_post_only =&gt; &#39;true&#39; );</p>
+
+</li>
+</ul>
+
+<h2 id="moderators">moderators</h2>
+
+<p>Returns an array of all moderators of this mailinglist.</p>
+
+<ul>
+
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $moderators = $mailing_list-&gt;moderators();</p>
+
+</li>
+</ul>
+
+<h2 id="moderators1">moderators</h2>
+
+<p>Returns properties for a specified moderator E-Mail</p>
+
+<ul>
+
+<li><p>Parameter: $email - email address</p>
+
+</li>
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $properties = $mailing_list-&gt;moderator(&#39;moderator@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="add_moderator">add_moderator</h2>
+
+<p>Adds a moderator via E-Mail address.</p>
+
+<ul>
+
+<li><p>Parameter: $email - email address</p>
+
+</li>
+<li><p>Synopsis: my $properties = $mailing_list-&gt;add_moderator(&#39;moderator@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="delete_moderator">delete_moderator</h2>
+
+<p>Deletes a moderator via E-Mail address.</p>
+
+<ul>
+
+<li><p>Parameter: $email - email address</p>
+
+</li>
+<li><p>Synopsis: my $properties = $mailing_list-&gt;delete_moderator(&#39;moderator@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="delete_moderator1">delete_moderator</h2>
+
+<p>Sends the subscriber and moderator list to a specified E-Mail address.</p>
+
+<ul>
+
+<li><p>Parameter: $email - email address</p>
+
+</li>
+<li><p>Synopsis: my $properties = $mailing_list-&gt;send_list_by_email(&#39;moderator@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="subscribers">subscribers</h2>
+
+<p>Returns an array of all subscribers or a filtered list.</p>
+
+<ul>
+
+<li><p>$email - filter for specified E-Mail address</p>
+
+</li>
+<li><p>Return: <a>ARRAY</a></p>
+
+</li>
+<li><p>Synopsis: my $subscribers = $mailing_list-&gt;subscribers();</p>
+
+</li>
+</ul>
+
+<h2 id="subscriber">subscriber</h2>
+
+<p>Returns the properties of a single subscriber.</p>
+
+<ul>
+
+<li><p>Parameter: $email - E-Mail address</p>
+
+</li>
+<li><p>Return: HASH</p>
+
+</li>
+<li><p>Synopsis: my $subscriber = $mailing_list-&gt;subscriber(&#39;sub@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="add_subscriber">add_subscriber</h2>
+
+<p>Adds an subscriber to the mailinglist.</p>
+
+<ul>
+
+<li><p>Parameter: $email - E-Mail address</p>
+
+</li>
+<li><p>Synopsis: $mailing_list-&gt;add_subscriber(&#39;sub@test.de&#39;);</p>
+
+</li>
+</ul>
+
+<h2 id="delete_subscriber">delete_subscriber</h2>
+
+<p>Deletes an subscriber to the mailinglist.</p>
+
+<ul>
+
+<li><p>Parameter: $email - E-Mail address</p>
+
+</li>
+<li><p>Synopsis: $mailing_list-&gt;delete_subscriber(&#39;sub@test.de&#39;);</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

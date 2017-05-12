@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/WebService/Libris.pm
+lib/WebService/Libris/Author.pm
+lib/WebService/Libris/Book.pm
+lib/WebService/Libris/FileCache.pm
+lib/WebService/Libris/Library.pm
+lib/WebService/Libris/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/basic.t
+t/data/auth_246603.xml
+t/data/bib_9604288.xml
+t/data/library_Q.xml
+t/manifest.t
+t/pod.t

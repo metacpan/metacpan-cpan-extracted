@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Mechanize-Pliant
+version:      0.12
+version_from: Pliant.pm
+installdirs:  site
+requires:
+    HTML::Entities:                0
+    Carp:                          0
+    Test::More:                    0.47
+    WWW::Mechanize:                1.00
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21_03

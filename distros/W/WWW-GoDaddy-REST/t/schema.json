@@ -1,0 +1,340 @@
+{
+  "type": "collection",
+  "links": {
+    "self": "http://example.com/v1/schemas",
+    "schemas": "http://example.com/v1/schemas"
+  },
+  "resourceType": "schema",
+  "data": [
+    {
+      "id": "schema",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/schema",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [
+        "GET"
+      ],
+      "resourceActions": {},
+      "resourceFields": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "resourceActions": {
+          "type": "map[apiaction]"
+        },
+        "resourceFields": {
+          "type": "map[field]"
+        },
+        "resourceMethods": {
+          "type": "array[string]"
+        },
+        "collectionActions": {
+          "type": "map[apiaction]"
+        },
+        "collectionFields": {
+          "type": "map[field]"
+        },
+        "collectionMethods": {
+          "type": "array[string]"
+        },
+        "collectionFilters": {
+          "type": "map[filter]"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "collection",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/collection",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "actions": {
+          "type": "map[string]"
+        },
+        "data": {
+          "type": "array[resource]"
+        },
+        "filters": {
+          "type": "map[string]"
+        },
+        "type": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "createTypes": {
+          "type": "array[string]"
+        },
+        "links": {
+          "type": "map[string]"
+        },
+        "pagination": {
+          "type": "map[string]"
+        },
+        "sort": {
+          "type": "map[string]"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "filter",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/filter",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "modifiers": {
+          "type": "array[string]"
+        },
+        "options": {
+          "type": "array[string]"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "sort",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/sort",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "name": {
+          "type": "string"
+        },
+        "order": {
+          "type": "enum",
+          "options": [
+            "asc",
+            "desc"
+          ]
+        },
+        "reverse": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "resource",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/resource",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "apiversion",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/apiversion",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "apiaction",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/apiaction",
+        "schemas": "http://example.com/v1/schemas"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {},
+      "resourceFields": {
+        "input": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "slowResponse",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/slowResponse",
+        "schemas": "http://example.com/v1/schemas",
+        "collection": "http://example.com/v1/slowResponses"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [ "GET" ],
+      "resourceActions": {},
+      "resourceFields": {
+        "request_method": {
+          "type": "string"
+        },
+        "request_uri": {
+          "type": "string"
+        },
+        "request_content": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "echoResponse",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/echoResponse",
+        "schemas": "http://example.com/v1/schemas",
+        "collection": "http://example.com/v1/echoResponses"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [ "GET" ],
+      "resourceActions": {},
+      "resourceFields": {
+        "request_method": {
+          "type": "string"
+        },
+        "request_uri": {
+          "type": "string"
+        },
+        "request_content": {
+          "type": "string"
+        },
+        "child_resource": {
+          "type": "echoResponseChild"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "echoResponseChild",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/echoResponseChild",
+        "schemas": "http://example.com/v1/schemas",
+        "collection": "http://example.com/v1/echoResponseChildren"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [],
+      "resourceActions": {
+        "exampleAction": {
+          "output" : "int"
+        }
+      },
+      "resourceFields": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": []
+    },
+    {
+      "id": "respondNonResource",
+      "type": "schema",
+      "links": {
+        "self": "http://example.com/v1/schemas/respondNonResource",
+        "schemas": "http://example.com/v1/schemas",
+        "collection": "http://example.com/v1/respondNonResource"
+      },
+      "collectionActions": {},
+      "collectionFields": {},
+      "collectionFilters": {},
+      "collectionMethods": [ "GET", "POST" ],
+      "resourceActions": {},
+      "resourceFields": {
+        "request_method": {
+          "type": "string"
+        },
+        "request_uri": {
+          "type": "string"
+        },
+        "request_content": {
+          "type": "string"
+        }
+      },
+      "resourceMethods": [
+        "GET"
+      ]
+    }
+  ],
+  "sortLinks": {
+    "id": "http://example.com/v1/schemas?sort=id&order=asc"
+  }
+}

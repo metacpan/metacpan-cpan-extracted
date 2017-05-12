@@ -1,0 +1,77 @@
+=for comment $Id: Part9.pod,v 1.2 2005/10/05 22:20:49 robertemay Exp $
+
+=head1 NAME
+
+Win32::GUI::Tutorial::Part9 - Some peripheral issues
+
+=head1 Win32::GUI Tutorial - Part 9
+
+=head2 What about that console window?
+
+One thing I have glossed over in all of the above is precisely how we run our
+Win32::GUI Perl program. There are a number of possibilities you might have
+used.
+
+=over
+
+=item *
+
+Enter the command "perl MyApp.pl" from a Windows console window.
+
+=item *
+
+Enter the command "perl MyApp.pl" in the Windows "Run" box.
+
+=item *
+
+Double click on the file "MyApp.pl" (assuming you have .pl files associated
+with the perl.exe application).
+
+=back
+
+In the first case, you will notice that the command prompt does not return
+until you close your GUI application's window. In the second and third case,
+it's worse - a console window opens and stays visible until the GUI
+application terminates.
+
+This is ugly. Unfortunately, it's fairly inevitable, because of the way
+Windows works. Perl itself is a Windows "console" application, and so it
+behaves the way we see. You can't change this without changing Perl itself.
+
+There is a fix for this, if you have Windows development tools available.
+Simply take a copy of perl.exe, call it perlw.exe, and change its "subsystem"
+setting from "console" to "windows". With Microsoft Visual Studio, the command
+to do this is
+
+    editbin /subsystem:windows perlw.exe
+
+ActiveState Perl comes with an executable called wperl.exe (you'll find it
+n the same place as your perl.exe).  This is an executable with exactly
+this change already made to it.
+
+If you can't (or don't want to) create a perlw.exe, then a compromise is to hide 
+the console window while your application is running. This is reasonable for the 
+second and third cases above, but less so for the first (where the application 
+is run from an existing console window).
+
+The code to do this is
+
+    my ($DOS) = Win32::GUI::GetPerlWindow();
+    Win32::GUI::Hide($DOS);
+
+Note that C<GetPerlWindow()> returns a windows handle, not a C<Win32::GUI::Window>
+object, so we have to use the static call to C<Win32::GUI::Hide()> as discussed
+in part 1 of the tutorial.
+
+Do this as early as possible. Obviously, if we hide the console, we must show
+it when we finish (otherwise, someone who runs your program from a command
+prompt will be B<very> cross with you!)
+
+To do this, we need to put
+
+    Win32::GUI::Show($DOS);
+
+just before our program terminates. After the Win32::GUI::Dialog() call is
+usually the right place.
+
+__W32G_POSTAMBLE__

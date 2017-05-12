@@ -1,0 +1,7 @@
+^blib/
+^const-(?:c|xs)\.inc$
+^Makefile(?:\.old)?$
+^pm_to_blib$
+^vc60\.pdb$
+^UTCFileTime\.(?:bs|c|def|obj)$
+^Win32-UTCFileTime-\d\.\d\d\.(?:tar\.gz|zip)$

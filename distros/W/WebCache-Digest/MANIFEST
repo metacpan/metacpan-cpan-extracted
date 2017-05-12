@@ -1,0 +1,8 @@
+README
+MANIFEST
+ChangeLog
+Makefile.PL
+WebCache/Digest.pm
+cache-digest-v5.txt
+dpeek.pl
+dpoke.pl

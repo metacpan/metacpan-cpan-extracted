@@ -1,0 +1,51 @@
+Revision history for Perl extension WWW-StaticBlog
+
+0.02  Thu, 30 Sep 2010 03:17:57 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Update tag pages to be tag/index.html, instead of tag.html
+     - Update to use the latest beta version of Test::Mini.
+     - Fix typo in POD
+     - Ditch Dist::Zilla in favor of Module::Install and ShipIt
+     - Add author only test for checking spelling in POD.
+     - Add some documentation to the runner script.
+
+0.01  Mon, 05 Apr 2010 04:59:17 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Initial commit.
+     - Start collection object for posts & authors.
+     - Add ability to populate Compendium posts and authors from a directory.
+     - Remove unused "use" from test.
+     - Add tests for loading authors from files.
+     - Convert to Test::Mini for tests, instead of Test::Sweet.
+     - Add missing use from WWW::StaticBlog::Post
+     - Add equals method to WWW::StaticBlog::Post for use in tests.
+     - Checkpoint, with rendering posts somewhat working.
+     - Add support for writing the posts back out with updated information.
+     - Add a runner script, and make sure that Dist::Zilla installs it.
+     - Add timing information to output.
+     - Add ability for a post to say what it's URL is, and use that to determine where to save the file for it.
+     - Add ability to render the index page.
+     - Default the posted_on for a Post to be now.
+     - Show the posts in reverse chronological order on the index page.
+     - Write out the individual posts before we write out the index page.
+     - Add ability to have a static dir with CSS/Images/etc copied into the output_dir.
+     - Make sure that the inline_css sections are only included once per unique text.
+     - Add the ability for the templates to know if we're in debug mode.
+     - Fix failing test now that index_template is required.
+     - Show when debug mode is enabled.
+     - Add support for an atom feed of posts.
+     - Respect existing 'Slug: ' headers in posts.
+     - Make sure that we actually save out the tag list properly.
+     - Update Template::Toolkit to create 'fixtures' at process time.
+     - Setup fixture template data for recent posts listings.
+     - Add tag helpers to WWW::StaticBlog::Compendium.
+     - Add template fixture data for links to top-level tag pages.
+     - Create pages for all combinations of tags that actually have posts.
+     - Make sure the fixture tag URLs end in .html.
+     - Fix generation of dates for Post-Date, and Updated-On.
+     - Use // instead of || where we really want to check for definedness.
+     - Sort posts_for_tags by date, newest first.
+     - Remove reverse from feed post ordering.
+     - Hack in the beginnings of support for proper Tag objects.
+     - Fix the order of multi-tag page URL parts.
+     - Fix the failing tests that have been neglected.
+     - Remove unused directive from dist.ini
+     - Mark v0.001 release.

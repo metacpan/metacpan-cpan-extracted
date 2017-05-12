@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:s0="urn:UnusualNames" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:UnusualNames">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified" targetNamespace="urn:UnusualNames">
+      <xsd:element name="OpGet" type="s0:GetInputMap"/>
+      <xsd:complexType name="GetInputMap">
+        <xsd:sequence>
+          <xsd:element name="Task_ID" type="xsd:string"/>
+          <xsd:element name="CR_Ref" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="OpGetResponse" type="s0:GetOutputMap"/>
+      <xsd:complexType name="GetOutputMap">
+        <xsd:sequence>
+          <xsd:element name="Actual_Effort" type="xsd:int"/>
+          <xsd:element name="Back-out_Plan" type="xsd:string"/>
+          <xsd:element name="Cancel_Reason" type="xsd:string"/>
+          <xsd:element name="Cancellation_Reason" type="xsd:string"/>
+          <xsd:element name="Change_Description" type="xsd:string"/>
+          <xsd:element name="Change_End_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change_Reason" type="xsd:string"/>
+          <xsd:element name="Change_Start_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change_Summary" type="xsd:string"/>
+          <xsd:element name="Change.Billing" type="s0:Change.BillingType"/>
+          <xsd:element name="Change.Create_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change.Last_Modified_By" type="xsd:string"/>
+          <xsd:element name="Change.Mainframe_Order" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.Modified_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change.New_Data_Centre_Related" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.Order_No" type="xsd:string"/>
+          <xsd:element name="Change.Publish_to_Calendar_Status" type="xsd:string"/>
+          <xsd:element name="Change.Publish_to_Global_Flag" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.Publish_to_Region" type="xsd:string"/>
+          <xsd:element name="Change.Request_ID" type="xsd:string"/>
+          <xsd:element name="Change.Requested_by" type="s0:Change.Requested_byType"/>
+          <xsd:element name="Change.Submitter" type="xsd:string"/>
+          <xsd:element name="Close_Code" type="xsd:string"/>
+          <xsd:element name="CR_Ref" type="xsd:string"/>
+          <xsd:element name="Estimated_Effort" type="xsd:int"/>
+          <xsd:element name="Event_Category" type="xsd:string"/>
+          <xsd:element name="Event_Sub_Category" type="xsd:string"/>
+          <xsd:element name="Event_Type" type="xsd:string"/>
+          <xsd:element name="Files_Being_Changed" type="xsd:string"/>
+          <xsd:element name="First_Name" type="xsd:string"/>
+          <xsd:element name="Full_Name" type="xsd:string"/>
+          <xsd:element name="Group_ID" type="xsd:int"/>
+          <xsd:element name="Imp_User_First_Name" type="xsd:string"/>
+          <xsd:element name="Imp_User_Last_Name" type="xsd:string"/>
+          <xsd:element name="Implementer_Group" type="xsd:string"/>
+          <xsd:element name="Implementer_Name" type="xsd:string"/>
+          <xsd:element name="Implementer_Phone" type="xsd:string"/>
+          <xsd:element name="Join.Request_ID" type="xsd:string"/>
+          <xsd:element name="Last_Name" type="xsd:string"/>
+          <xsd:element name="Phone" type="xsd:string"/>
+          <xsd:element name="Planned_End" type="xsd:dateTime"/>
+          <xsd:element name="Planned_Start" type="xsd:dateTime"/>
+          <xsd:element name="Planning_Required" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Product_Code" type="xsd:string"/>
+          <xsd:element name="Product_Name" type="xsd:string"/>
+          <xsd:element name="Push_To_ITSM" type="s0:Push_To_ITSMType"/>
+          <xsd:element name="rad_Publish_to_Global_Markets_CAB" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Request_Type" type="s0:Request_TypeType"/>
+          <xsd:element name="RFC_Closure_Date" type="xsd:dateTime"/>
+          <xsd:element name="RFC.Affected_Businesses_String" type="xsd:string"/>
+          <xsd:element name="RFC.Alternate_Contacts" type="xsd:string"/>
+          <xsd:element name="RFC.Config_Item_String" type="xsd:string"/>
+          <xsd:element name="RFC.Locations_Activity_String" type="xsd:string"/>
+          <xsd:element name="RFC.Locations_Affected_String" type="xsd:string"/>
+          <xsd:element name="RFC.Template.GCM_ID" type="xsd:string"/>
+          <xsd:element name="RFC.Verification_Comments" type="xsd:string"/>
+          <xsd:element name="RFC.Verification_Status" type="xsd:string"/>
+          <xsd:element name="Risk_Category" type="xsd:string"/>
+          <xsd:element name="Service_Impact" type="xsd:string"/>
+          <xsd:element name="sr.Advanced_Query" type="xsd:string"/>
+          <xsd:element name="sr.Display_Results_to" type="s0:sr.Display_Results_toType"/>
+          <xsd:element name="sr.External_QBE_Field" type="xsd:string"/>
+          <xsd:element name="sr.Method" type="s0:sr.MethodType"/>
+          <xsd:element name="sr.Query_to_Run" type="xsd:string"/>
+          <xsd:element name="sr.SCHEMAID" type="xsd:int"/>
+          <xsd:element name="sr.Search_Name" type="xsd:string"/>
+          <xsd:element name="sr.TIMESTAMP_INT" type="xsd:int"/>
+          <xsd:element name="sr.VALUE_CHR" type="xsd:string"/>
+          <xsd:element name="sr.VALUE_DEC" type="xsd:decimal"/>
+          <xsd:element name="sr.VALUE_INT" type="xsd:int"/>
+          <xsd:element name="sr.VALUE_REAL" type="xsd:double"/>
+          <xsd:element name="sr.zTmpCopyToField" type="xsd:string"/>
+          <xsd:element name="sr.zTmpInsertStatement" type="xsd:string"/>
+          <xsd:element name="sr.zTmpQuery_to_Run" type="xsd:string"/>
+          <xsd:element name="Status" type="s0:StatusType"/>
+          <xsd:element name="StatusDisplay" type="xsd:string"/>
+          <xsd:element name="Summer_Flag" type="s0:Summer_FlagType"/>
+          <xsd:element name="Task_Description" type="xsd:string"/>
+          <xsd:element name="Task_ID" type="xsd:string"/>
+          <xsd:element name="Task_Status" type="xsd:string"/>
+          <xsd:element name="Task_Verification" type="xsd:string"/>
+          <xsd:element name="Task.CI_Summary_String" type="xsd:string"/>
+          <xsd:element name="Task.Closure_Code" type="xsd:string"/>
+          <xsd:element name="Task.Create_Date" type="xsd:dateTime"/>
+          <xsd:element name="Task.Last_Modified_By" type="xsd:string"/>
+          <xsd:element name="Task.Locations_Activity_String" type="xsd:string"/>
+          <xsd:element name="Task.Modified_Date" type="xsd:dateTime"/>
+          <xsd:element name="Task.Planning_Required" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Task.Request_ID" type="xsd:string"/>
+          <xsd:element name="Task.Status" type="s0:Task.StatusType"/>
+          <xsd:element name="Task.Submitter" type="xsd:string"/>
+          <xsd:element name="Template_Category" type="xsd:string"/>
+          <xsd:element name="Template_Shared" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Template_Status" type="s0:Template_StatusType"/>
+          <xsd:element name="Template_Sub_Category" type="xsd:string"/>
+          <xsd:element name="tmp_Char1" type="xsd:string"/>
+          <xsd:element name="TSK.Actual_End" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Actual_Start" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Amended_Ops_Procedures" type="xsd:string"/>
+          <xsd:element name="TSK.BCP_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.BCP_Details" type="xsd:string"/>
+          <xsd:element name="TSK.Closure_Comment" type="xsd:string"/>
+          <xsd:element name="TSK.CMDB_Update_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Downtime_End" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Downtime_Reason" type="xsd:string"/>
+          <xsd:element name="TSK.Downtime_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Downtime_Start" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Implementer_Email" type="xsd:string"/>
+          <xsd:element name="TSK.Key_Financial_Control_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Operational_Procs_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Secure_Equipment_Room_Data_Centre_Access_Reqd" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Template.Task_ID" type="xsd:string"/>
+          <xsd:element name="TSK.Testing_Details" type="xsd:string"/>
+          <xsd:element name="TSK.Testing_Details_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="unusedShort_Description" type="xsd:string"/>
+          <xsd:element name="Urgency" type="xsd:string"/>
+          <xsd:element name="Verification_Required" type="s0:Change.Mainframe_OrderType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:simpleType name="Change.BillingType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Change"/>
+          <xsd:enumeration value="RFS"/>
+          <xsd:enumeration value="P2P"/>
+          <xsd:enumeration value="Baseline"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Change.Mainframe_OrderType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Yes"/>
+          <xsd:enumeration value="No"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Change.Requested_byType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Bank"/>
+          <xsd:enumeration value="Vendor"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Planning_RequiredType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="No"/>
+          <xsd:enumeration value="Yes"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Push_To_ITSMType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Request"/>
+          <xsd:enumeration value="Task"/>
+          <xsd:enumeration value="Delete Request"/>
+          <xsd:enumeration value="Delete Task"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Request_TypeType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="RFC"/>
+          <xsd:enumeration value="OPR"/>
+          <xsd:enumeration value="RFSC"/>
+          <xsd:enumeration value="PFC"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="sr.Display_Results_toType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Edit the Change/Task/Approval"/>
+          <xsd:enumeration value="Report/Extract"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="sr.MethodType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="A"/>
+          <xsd:enumeration value="B"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="StatusType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Draft"/>
+          <xsd:enumeration value="Planning"/>
+          <xsd:enumeration value="Review"/>
+          <xsd:enumeration value="Pending"/>
+          <xsd:enumeration value="Approved"/>
+          <xsd:enumeration value="Verify"/>
+          <xsd:enumeration value="Closed"/>
+          <xsd:enumeration value="Rejected"/>
+          <xsd:enumeration value="Cancelled"/>
+          <xsd:enumeration value="Template"/>
+          <xsd:enumeration value="SCT Draft"/>
+          <xsd:enumeration value="SCT Pending"/>
+          <xsd:enumeration value="SCT Approved"/>
+          <xsd:enumeration value="SCT Rejected"/>
+          <xsd:enumeration value="SCT Cancelled"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Summer_FlagType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Summer"/>
+          <xsd:enumeration value="Non Summer"/>
+          <xsd:enumeration value="Summer AND Non Summer"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Task.StatusType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Draft"/>
+          <xsd:enumeration value="Rework"/>
+          <xsd:enumeration value="Planning"/>
+          <xsd:enumeration value="Planned"/>
+          <xsd:enumeration value="Closed"/>
+          <xsd:enumeration value="Cancelled"/>
+          <xsd:enumeration value="Template"/>
+          <xsd:enumeration value="SCT"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="Template_StatusType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Active"/>
+          <xsd:enumeration value="Inactive"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="OpGetList" type="s0:GetListInputMap"/>
+      <xsd:complexType name="GetListInputMap">
+        <xsd:sequence>
+          <xsd:element name="CR_Ref" type="xsd:string"/>
+          <xsd:element name="Task_ID" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="OpGetListResponse" type="s0:GetListOutputMap"/>
+      <xsd:complexType name="GetListOutputMap">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" name="getListValues">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="Actual_Effort" type="xsd:int"/>
+                <xsd:element name="Back-out_Plan" type="xsd:string"/>
+                <xsd:element name="Cancel_Reason" type="xsd:string"/>
+                <xsd:element name="Cancellation_Reason" type="xsd:string"/>
+                <xsd:element name="Change_Description" type="xsd:string"/>
+                <xsd:element name="Change_End_Date" type="xsd:dateTime"/>
+                <xsd:element name="Change_Reason" type="xsd:string"/>
+                <xsd:element name="Change_Start_Date" type="xsd:dateTime"/>
+                <xsd:element name="Change_Summary" type="xsd:string"/>
+                <xsd:element name="Change.Billing" type="s0:Change.BillingType"/>
+                <xsd:element name="Change.Create_Date" type="xsd:dateTime"/>
+                <xsd:element name="Change.Last_Modified_By" type="xsd:string"/>
+                <xsd:element name="Change.Mainframe_Order" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="Change.Modified_Date" type="xsd:dateTime"/>
+                <xsd:element name="Change.New_Data_Centre_Related" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="Change.Order_No" type="xsd:string"/>
+                <xsd:element name="Change.Request_ID" type="xsd:string"/>
+                <xsd:element name="Change.Requested_by" type="s0:Change.Requested_byType"/>
+                <xsd:element name="Change.Submitter" type="xsd:string"/>
+                <xsd:element name="Close_Code" type="xsd:string"/>
+                <xsd:element name="CR_Ref" type="xsd:string"/>
+                <xsd:element name="Estimated_Effort" type="xsd:int"/>
+                <xsd:element name="Event_Category" type="xsd:string"/>
+                <xsd:element name="Event_Sub_Category" type="xsd:string"/>
+                <xsd:element name="Event_Type" type="xsd:string"/>
+                <xsd:element name="Files_Being_Changed" type="xsd:string"/>
+                <xsd:element name="First_Name" type="xsd:string"/>
+                <xsd:element name="Full_Name" type="xsd:string"/>
+                <xsd:element name="Group_ID" type="xsd:int"/>
+                <xsd:element name="Imp_User_First_Name" type="xsd:string"/>
+                <xsd:element name="Imp_User_Last_Name" type="xsd:string"/>
+                <xsd:element name="Implementer_Group" type="xsd:string"/>
+                <xsd:element name="Implementer_Name" type="xsd:string"/>
+                <xsd:element name="Implementer_Phone" type="xsd:string"/>
+                <xsd:element name="Join.Request_ID" type="xsd:string"/>
+                <xsd:element name="Last_Name" type="xsd:string"/>
+                <xsd:element name="Phone" type="xsd:string"/>
+                <xsd:element name="Planned_End" type="xsd:dateTime"/>
+                <xsd:element name="Planned_Start" type="xsd:dateTime"/>
+                <xsd:element name="Planning_Required" type="s0:Planning_RequiredType"/>
+                <xsd:element name="Product_Code" type="xsd:string"/>
+                <xsd:element name="Product_Name" type="xsd:string"/>
+                <xsd:element name="Push_To_ITSM" type="s0:Push_To_ITSMType"/>
+                <xsd:element name="rad_Publish_to_Global_Markets_CAB" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="Request_Type" type="s0:Request_TypeType"/>
+                <xsd:element name="RFC_Closure_Date" type="xsd:dateTime"/>
+                <xsd:element name="RFC.Affected_Businesses_String" type="xsd:string"/>
+                <xsd:element name="RFC.Alternate_Contacts" type="xsd:string"/>
+                <xsd:element name="RFC.Config_Item_String" type="xsd:string"/>
+                <xsd:element name="RFC.Locations_Activity_String" type="xsd:string"/>
+                <xsd:element name="RFC.Locations_Affected_String" type="xsd:string"/>
+                <xsd:element name="RFC.Template.GCM_ID" type="xsd:string"/>
+                <xsd:element name="RFC.Verification_Comments" type="xsd:string"/>
+                <xsd:element name="RFC.Verification_Status" type="xsd:string"/>
+                <xsd:element name="Risk_Category" type="xsd:string"/>
+                <xsd:element name="Service_Impact" type="xsd:string"/>
+                <xsd:element name="sr.Advanced_Query" type="xsd:string"/>
+                <xsd:element name="sr.Display_Results_to" type="s0:sr.Display_Results_toType"/>
+                <xsd:element name="sr.External_QBE_Field" type="xsd:string"/>
+                <xsd:element name="sr.Method" type="s0:sr.MethodType"/>
+                <xsd:element name="sr.Query_to_Run" type="xsd:string"/>
+                <xsd:element name="sr.SCHEMAID" type="xsd:int"/>
+                <xsd:element name="sr.Search_Name" type="xsd:string"/>
+                <xsd:element name="sr.TIMESTAMP_INT" type="xsd:int"/>
+                <xsd:element name="sr.VALUE_CHR" type="xsd:string"/>
+                <xsd:element name="sr.VALUE_DEC" type="xsd:decimal"/>
+                <xsd:element name="sr.VALUE_INT" type="xsd:int"/>
+                <xsd:element name="sr.VALUE_REAL" type="xsd:double"/>
+                <xsd:element name="Status" type="s0:StatusType"/>
+                <xsd:element name="StatusDisplay" type="xsd:string"/>
+                <xsd:element name="Summer_Flag" type="s0:Summer_FlagType"/>
+                <xsd:element name="Task_Description" type="xsd:string"/>
+                <xsd:element name="Task_ID" type="xsd:string"/>
+                <xsd:element name="Task_Status" type="xsd:string"/>
+                <xsd:element name="Task_Verification" type="xsd:string"/>
+                <xsd:element name="Task.CI_Summary_String" type="xsd:string"/>
+                <xsd:element name="Task.Closure_Code" type="xsd:string"/>
+                <xsd:element name="Task.Create_Date" type="xsd:dateTime"/>
+                <xsd:element name="Task.Last_Modified_By" type="xsd:string"/>
+                <xsd:element name="Task.Locations_Activity_HTML" type="xsd:string"/>
+                <xsd:element name="Task.Locations_Activity_String" type="xsd:string"/>
+                <xsd:element name="Task.Modified_Date" type="xsd:dateTime"/>
+                <xsd:element name="Task.Planning_Required" type="s0:Planning_RequiredType"/>
+                <xsd:element name="Task.Request_ID" type="xsd:string"/>
+                <xsd:element name="Task.Status" type="s0:Task.StatusType"/>
+                <xsd:element name="Task.Submitter" type="xsd:string"/>
+                <xsd:element name="Template_Category" type="xsd:string"/>
+                <xsd:element name="Template_Shared" type="s0:Planning_RequiredType"/>
+                <xsd:element name="Template_Status" type="s0:Template_StatusType"/>
+                <xsd:element name="Template_Sub_Category" type="xsd:string"/>
+                <xsd:element name="tmp_Char1" type="xsd:string"/>
+                <xsd:element name="TSK.Actual_End" type="xsd:dateTime"/>
+                <xsd:element name="TSK.Actual_Start" type="xsd:dateTime"/>
+                <xsd:element name="TSK.Amended_Ops_Procedures" type="xsd:string"/>
+                <xsd:element name="TSK.BCP_Affected" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.BCP_Details" type="xsd:string"/>
+                <xsd:element name="TSK.Closure_Comment" type="xsd:string"/>
+                <xsd:element name="TSK.CMDB_Update_Required" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.Downtime_End" type="xsd:dateTime"/>
+                <xsd:element name="TSK.Downtime_Reason" type="xsd:string"/>
+                <xsd:element name="TSK.Downtime_Required" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.Downtime_Start" type="xsd:dateTime"/>
+                <xsd:element name="TSK.Implementer_Email" type="xsd:string"/>
+                <xsd:element name="TSK.Key_Financial_Control_Affected" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.Operational_Procs_Affected" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.Secure_Equipment_Room_Data_Centre_Access_Reqd" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="TSK.Template.Task_ID" type="xsd:string"/>
+                <xsd:element name="TSK.Testing_Details" type="xsd:string"/>
+                <xsd:element name="TSK.Testing_Details_Required" type="s0:Change.Mainframe_OrderType"/>
+                <xsd:element name="unusedShort_Description" type="xsd:string"/>
+                <xsd:element name="Urgency" type="xsd:string"/>
+                <xsd:element name="Verification_Required" type="s0:Change.Mainframe_OrderType"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="OpSet" type="s0:SetInputMap"/>
+      <xsd:complexType name="SetInputMap">
+        <xsd:sequence>
+          <xsd:element name="Actual_Effort" type="xsd:int"/>
+          <xsd:element name="Back-out_Plan" type="xsd:string"/>
+          <xsd:element name="Cancel_Reason" type="xsd:string"/>
+          <xsd:element name="Cancellation_Reason" type="xsd:string"/>
+          <xsd:element name="Change_Description" type="xsd:string"/>
+          <xsd:element name="Change_End_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change_Reason" type="xsd:string"/>
+          <xsd:element name="Change_Start_Date" type="xsd:dateTime"/>
+          <xsd:element name="Change_Summary" type="xsd:string"/>
+          <xsd:element name="Change.Billing" type="s0:Change.BillingType"/>
+          <xsd:element name="Change.Config_Item_HTML" type="xsd:string"/>
+          <xsd:element name="Change.HTML_ApprovalManager_Summary" type="xsd:string"/>
+          <xsd:element name="Change.HTML_CRPortal_Summary" type="xsd:string"/>
+          <xsd:element name="Change.HTML_CRPortal_Task_Summary" type="xsd:string"/>
+          <xsd:element name="Change.HTML_GCM_Portal_CR_Summary_Popup" type="xsd:string"/>
+          <xsd:element name="Change.Locations_Activity_HTML" type="xsd:string"/>
+          <xsd:element name="Change.Locations_Affected_HTML" type="xsd:string"/>
+          <xsd:element name="Change.Mainframe_Order" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.New_Data_Centre_Related" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.Order_No" type="xsd:string"/>
+          <xsd:element name="Change.Publish_to_Calendar_Status" type="xsd:string"/>
+          <xsd:element name="Change.Publish_to_Global_Flag" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Change.Publish_to_Region" type="xsd:string"/>
+          <xsd:element name="Change.Requested_by" type="s0:Change.Requested_byType"/>
+          <xsd:element name="Change.Submitter" type="xsd:string"/>
+          <xsd:element name="Close_Code" type="xsd:string"/>
+          <xsd:element name="CR_Ref" type="xsd:string"/>
+          <xsd:element name="Estimated_Effort" type="xsd:int"/>
+          <xsd:element name="Event_Category" type="xsd:string"/>
+          <xsd:element name="Event_Sub_Category" type="xsd:string"/>
+          <xsd:element name="Event_Type" type="xsd:string"/>
+          <xsd:element name="Files_Being_Changed" type="xsd:string"/>
+          <xsd:element name="First_Name" type="xsd:string"/>
+          <xsd:element name="Full_Name" type="xsd:string"/>
+          <xsd:element name="Group_ID" type="xsd:int"/>
+          <xsd:element name="Imp_User_First_Name" type="xsd:string"/>
+          <xsd:element name="Imp_User_Last_Name" type="xsd:string"/>
+          <xsd:element name="Implementer_Group" type="xsd:string"/>
+          <xsd:element name="Implementer_Name" type="xsd:string"/>
+          <xsd:element name="Implementer_Phone" type="xsd:string"/>
+          <xsd:element name="Last_Name" type="xsd:string"/>
+          <xsd:element name="Phone" type="xsd:string"/>
+          <xsd:element name="Planned_End" type="xsd:dateTime"/>
+          <xsd:element name="Planned_Start" type="xsd:dateTime"/>
+          <xsd:element name="Planning_Required" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Product_Code" type="xsd:string"/>
+          <xsd:element name="Product_Name" type="xsd:string"/>
+          <xsd:element name="Push_To_ITSM" type="s0:Push_To_ITSMType"/>
+          <xsd:element name="rad_Publish_to_Global_Markets_CAB" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Request_Type" type="s0:Request_TypeType"/>
+          <xsd:element name="RFC_Closure_Date" type="xsd:dateTime"/>
+          <xsd:element name="RFC.Affected_Businesses_String" type="xsd:string"/>
+          <xsd:element name="RFC.Alternate_Contacts" type="xsd:string"/>
+          <xsd:element name="RFC.Config_Item_String" type="xsd:string"/>
+          <xsd:element name="RFC.Locations_Activity_String" type="xsd:string"/>
+          <xsd:element name="RFC.Locations_Affected_String" type="xsd:string"/>
+          <xsd:element name="RFC.Template.GCM_ID" type="xsd:string"/>
+          <xsd:element name="RFC.Verification_Comments" type="xsd:string"/>
+          <xsd:element name="RFC.Verification_Status" type="xsd:string"/>
+          <xsd:element name="Risk_Category" type="xsd:string"/>
+          <xsd:element name="Service_Impact" type="xsd:string"/>
+          <xsd:element name="sr.Advanced_Query" type="xsd:string"/>
+          <xsd:element name="sr.Display_Results_to" type="s0:sr.Display_Results_toType"/>
+          <xsd:element name="sr.External_QBE_Field" type="xsd:string"/>
+          <xsd:element name="sr.Method" type="s0:sr.MethodType"/>
+          <xsd:element name="sr.Query_to_Run" type="xsd:string"/>
+          <xsd:element name="sr.SCHEMAID" type="xsd:int"/>
+          <xsd:element name="sr.Search_Name" type="xsd:string"/>
+          <xsd:element name="sr.TIMESTAMP_INT" type="xsd:int"/>
+          <xsd:element name="sr.VALUE_CHR" type="xsd:string"/>
+          <xsd:element name="sr.VALUE_DEC" type="xsd:decimal"/>
+          <xsd:element name="sr.VALUE_INT" type="xsd:int"/>
+          <xsd:element name="sr.VALUE_REAL" type="xsd:double"/>
+          <xsd:element name="sr.zTmpCopyToField" type="xsd:string"/>
+          <xsd:element name="sr.zTmpInsertStatement" type="xsd:string"/>
+          <xsd:element name="sr.zTmpQuery_to_Run" type="xsd:string"/>
+          <xsd:element name="Status" type="s0:StatusType"/>
+          <xsd:element name="StatusDisplay" type="xsd:string"/>
+          <xsd:element name="Summer_Flag" type="s0:Summer_FlagType"/>
+          <xsd:element name="Task_Description" type="xsd:string"/>
+          <xsd:element name="Task_ID" type="xsd:string"/>
+          <xsd:element name="Task_Status" type="xsd:string"/>
+          <xsd:element name="Task_Verification" type="xsd:string"/>
+          <xsd:element name="Task.CI_Summary_String" type="xsd:string"/>
+          <xsd:element name="Task.Closure_Code" type="xsd:string"/>
+          <xsd:element name="Task.HTML_CI_Summary" type="xsd:string"/>
+          <xsd:element name="Task.HTML_Dependant_Tasks" type="xsd:string"/>
+          <xsd:element name="Task.HTML_Portal_CR_Summary_Task_Popup" type="xsd:string"/>
+          <xsd:element name="Task.HTML_Preceeding_Tasks" type="xsd:string"/>
+          <xsd:element name="Task.HTML_Task_Summary" type="xsd:string"/>
+          <xsd:element name="Task.Locations_Activity_HTML" type="xsd:string"/>
+          <xsd:element name="Task.Locations_Activity_String" type="xsd:string"/>
+          <xsd:element name="Task.Planning_Required" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Task.Status" type="s0:Task.StatusType"/>
+          <xsd:element name="Task.Submitter" type="xsd:string"/>
+          <xsd:element name="Template_Category" type="xsd:string"/>
+          <xsd:element name="Template_Shared" type="s0:Planning_RequiredType"/>
+          <xsd:element name="Template_Status" type="s0:Template_StatusType"/>
+          <xsd:element name="Template_Sub_Category" type="xsd:string"/>
+          <xsd:element name="tmp_Char1" type="xsd:string"/>
+          <xsd:element name="TSK.Actual_End" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Actual_Start" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Amended_Ops_Procedures" type="xsd:string"/>
+          <xsd:element name="TSK.BCP_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.BCP_Details" type="xsd:string"/>
+          <xsd:element name="TSK.Closure_Comment" type="xsd:string"/>
+          <xsd:element name="TSK.CMDB_Update_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Downtime_End" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Downtime_Reason" type="xsd:string"/>
+          <xsd:element name="TSK.Downtime_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Downtime_Start" type="xsd:dateTime"/>
+          <xsd:element name="TSK.Implementer_Email" type="xsd:string"/>
+          <xsd:element name="TSK.Key_Financial_Control_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Operational_Procs_Affected" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Secure_Equipment_Room_Data_Centre_Access_Reqd" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="TSK.Template.Task_ID" type="xsd:string"/>
+          <xsd:element name="TSK.Testing_Details" type="xsd:string"/>
+          <xsd:element name="TSK.Testing_Details_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="unusedShort_Description" type="xsd:string"/>
+          <xsd:element name="Urgency" type="xsd:string"/>
+          <xsd:element name="Verification_Required" type="s0:Change.Mainframe_OrderType"/>
+          <xsd:element name="Join.Request_ID" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="OpSetResponse" type="s0:SetOutputMap"/>
+      <xsd:complexType name="SetOutputMap">
+        <xsd:sequence/>
+      </xsd:complexType>
+      <xsd:element name="AuthenticationInfo" type="s0:AuthenticationInfo"/>
+      <xsd:complexType name="AuthenticationInfo">
+        <xsd:sequence>
+          <xsd:element name="userName" type="xsd:string"/>
+          <xsd:element name="password" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="authentication" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="locale" type="xsd:string"/>
+          <xsd:element minOccurs="0" name="timeZone" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="OpSetSoapOut">
+    <wsdl:part element="s0:OpSetResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpGetSoapOut">
+    <wsdl:part element="s0:OpGetResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ARAuthenticate">
+    <wsdl:part element="s0:AuthenticationInfo" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpGetSoapIn">
+    <wsdl:part element="s0:OpGet" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpGetListSoapOut">
+    <wsdl:part element="s0:OpGetListResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpSetSoapIn">
+    <wsdl:part element="s0:OpSet" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="OpGetListSoapIn">
+    <wsdl:part element="s0:OpGetList" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="UnusualNamesPortType">
+    <wsdl:operation name="OpGet">
+      <wsdl:input message="s0:OpGetSoapIn"/>
+      <wsdl:output message="s0:OpGetSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="OpGetList">
+      <wsdl:input message="s0:OpGetListSoapIn"/>
+      <wsdl:output message="s0:OpGetListSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="OpSet">
+      <wsdl:input message="s0:OpSetSoapIn"/>
+      <wsdl:output message="s0:OpSetSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="UnusualNamesSoapBinding" type="s0:UnusualNamesPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="OpGet">
+      <soap:operation soapAction="urn:UnusualNames/OpGet" style="document"/>
+      <wsdl:input>
+        <soap:header message="s0:ARAuthenticate" part="parameters" use="literal">
+
+            </soap:header>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpGetList">
+      <soap:operation soapAction="urn:UnusualNames/OpGetList" style="document"/>
+      <wsdl:input>
+        <soap:header message="s0:ARAuthenticate" part="parameters" use="literal">
+
+            </soap:header>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpSet">
+      <soap:operation soapAction="urn:UnusualNames/OpSet" style="document"/>
+      <wsdl:input>
+        <soap:header message="s0:ARAuthenticate" part="parameters" use="literal">
+
+            </soap:header>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="UnusualNamesService">
+    <wsdl:port binding="s0:UnusualNamesSoapBinding" name="UnusualNamesSoap">
+       <soap:address location="https://example.com/UnusualNames"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

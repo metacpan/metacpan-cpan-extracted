@@ -1,0 +1,134 @@
+<%method pod>
+
+<%perl>
+my @m;
+
+foreach( @{ $m->base_comp->call_method( 'prereq' ) } )
+{
+push @m, sprintf "L<%s> (%s)", $_->{name}, $_->{version};
+}
+
+print join ', ', @m;
+</%perl>
+
+</%method>
+
+<%method text>
+<%perl>
+foreach( @{ $m->base_comp->call_method( 'prereq' ) } )
+{
+printfln "%-20s %-s\n", $_->{name}, $_->{version};
+}
+</%perl>
+</%method>
+
+<%method code>
+# the static prerequisites
+<%perl>
+foreach( @{ $m->base_comp->call_method( 'prereq' ) } )
+{
+printf "'%s' => '%-s',\n", $_->{name}, $_->{version};
+}
+</%perl>
+</%method>
+
+<%method dumped>
+<%perl>
+$Data::Dumper::Terse=1;
+print Data::Dumper->Dump( [ $m->base_comp->call_method( 'prereq' ) ] );
+</%perl>
+</%method>
+
+<%method prereq>
+<%perl>
+return [
+    	{ name => 'Class::Maker', 	version => '0.05.17' },
+
+    	{ name => 'Regexp::Box', 	version => '0.01' },
+
+    	{ name => 'Error', 			version => '0.15' },
+
+    	{ name => 'IO::Extended', 	version => '0.06' },
+
+	{ name => 'Tie::ListKeyedHash', version => '0.41' },
+
+	{ name => 'Data::Iter', 			version => '0' },
+
+	{ name => 'Class::Multimethods', version => '1.70' },
+
+	#{ name => 'Locale::Maketext', version => '1.03' },
+
+	{ name => 'Attribute::Util', version => '0.01' },
+
+	{ name => 'DBI', version => '1.30' },
+
+	{ name => 'Text::TabularDisplay', version => '1.18' },
+	
+	{ name => 'String::ExpandEscapes', version => '0.01' }, 
+	
+	{ name => 'XML::LibXSLT', version => '1.53' },
+
+	];
+</%perl>
+</%method>
+
+<%method type_list>
+
+=over 1
+
+<%perl>
+
+ our $a = $dtq->depends();
+
+foreach ( keys %$a )
+{
+printf "=item %s (%s)\n\n", $_, $a->{$_}->{version};
+print "=over 2\n\n";
+printf "=item by %s\n\n", join( ', ', map { $_->{name} } @{ $a->{$_}->{types} } );
+print "=back\n\n";
+}
+</%perl>
+
+=back
+</%method>
+
+<%method type_codelist>
+# prerequisites by datatype
+
+%  our $a = $dtq->depends();
+%foreach ( keys %$a )
+%{
+'<% $_ %>' => '<% $a->{$_}->{version} || '' %>', # <% join( ', ', map { $_->{name} } @{ $a->{$_}->{types} } ) %>
+%}
+</%method>
+
+<%method type_list_as_text>
+<%perl>
+foreach( @{ $m->base_comp->call_method( 'prereq' ) } )
+{
+	printf "    %s %s\n\n", $_->{name}, $_->{version};
+}
+our $a = $dtq->depends();
+foreach ( keys %$a )
+{
+	printf "    %s %s\n\n", $_, $a->{$_}->{version};
+}
+</%perl>
+</%method>
+
+<%method type_list_compact_pod>
+<%perl>
+my @tl;
+foreach( @{ $m->base_comp->call_method( 'prereq' ) } )
+{
+push @tl, sprintf( "%s (%s)", $_->{name}, $_->{version} );
+}
+our $a = $dtq->depends();
+foreach ( keys %$a )
+{
+push @tl, sprintf( "%s (%s)", $_, $a->{$_}->{version} );
+}
+
+print join( ', ', @tl ), "\n";
+</%perl>
+</%method>

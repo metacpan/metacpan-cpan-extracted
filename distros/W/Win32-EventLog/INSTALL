@@ -1,0 +1,4 @@
+If you have problems with eventlog.t, check that you event log entries
+are not in the future. If you have such entries, you can clear event log,
+it is available from it's program in Control Panel.
+

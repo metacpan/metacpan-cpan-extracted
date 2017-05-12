@@ -1,0 +1,79 @@
+NAME
+    WWW::ASN - Retrieve learning objectives from Achievement Standards
+    Network
+
+SYNOPSIS
+        use WWW::ASN;
+
+        my $asn = WWW::ASN->new({
+            jurisdictions_cache => './jurisdictions.xml',
+        });
+        for my $jurisdiction (@{ $asn->jurisdictions }) {
+            if ($jurisdictions->name =~ /Common Core/i) {
+                my @standards_docs = $jurisdictions->documents({ status => 'published' })
+                ...
+            }
+        }
+
+DESCRIPTION
+    This module allows you to retrieve standards documents from the
+    Achievement Standards Network (http://asn.jesandco.org/).
+
+    As illustrated in the SYNOPSIS, you will typically first retrieve a
+    jurisdiction such as a state, or other organization that creates
+    standards documents. From this jurisdiction you can then retrieve
+    specific documents.
+
+ATTRIBUTES
+  jurisdictions_cache
+
+    Optional. The name of a file containing the XML data from
+    http://asn.jesandco.org/api/1/jurisdictions
+
+    If the file does not exist, it will be created.
+
+    Leave this option undefined to force retrieval each time jurisdictions
+    is called.
+
+  subjects_cache
+
+    Optional. The name of a file containing the XML data from
+    http://asn.jesandco.org/api/1/subjects
+
+    If the file does not exist, it will be created.
+
+    Leave this option undefined to force retrieval each time subjects is
+    called.
+
+METHODS
+  jurisdictions
+
+    Returns an array reference of WWW::ASN::Jurisdiction objects.
+
+  subjects
+
+    Returns an array reference of WWW::ASN::Subject objects.
+
+AUTHOR
+    Mark A. Stratman, `<stratman at gmail.com>'
+
+SEE ALSO
+    WWW::ASN::Jurisdiction
+
+    WWW::ASN::Document
+
+    WWW::ASN::Subject
+
+ACKNOWLEDGEMENTS
+    This library retrieves and manipulates data from the Achievement
+    Standards Network. http://asn.jesandco.org/
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Mark A. Stratman.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

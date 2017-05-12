@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Salesforce-Message.t
+lib/WebService/Salesforce/Message.pm
+lib/WebService/Salesforce/Message/Notification.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

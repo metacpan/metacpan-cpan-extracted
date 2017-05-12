@@ -1,0 +1,32 @@
+Win32::GUI::XMLBuilder
+======================
+
+Copyright (c) 2007 Blair Sutton. All rights reserved. 
+This program is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Win32::GUI 1.05 or higher
+   XML::Twig 3.14 or higher
+
+Latest version of Win32::GUI can be obtained from CPAN.
+
+INSTRUCTIONS
+
+Please read the perldoc and try the samples.
+
+AUTHOR
+
+   Blair Sutton (bsdz@cpan.org)

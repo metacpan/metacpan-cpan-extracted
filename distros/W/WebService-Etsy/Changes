@@ -1,0 +1,41 @@
+0.1 2009-02-05
+
+    - Initial very-alpha release.
+
+0.2 2009-02-06
+
+    - Fixed an issue with CPAN's indexer.
+    - Moved Result objects into an separate class
+
+0.3 2009-02-06
+
+    - Created a generic "get method" method in WebService::Etsy.
+    - Simplified the WebService::Etsy::Methods to use the new method.
+    - Simplified the generate_methods.pl script.
+
+0.4 2009-02-06
+
+    - Fixed a bug in WebService::Etsy::Result::Shop - should extend WebService::Etsy::Result::User
+
+0.5 2009-03-05
+
+    - Added shop() method to WebService::Etsy::Result::User
+    - Added listings() method to WebService::Etsy::Result::Shop
+    - Added listings() method to WebService::Etsy::Result::GiftGuide
+    - Added children() and spaced() methods to WebService::Etsy::Result::Tag
+    - Added default_detail() and default_limit() methods and constructor params to WebService::Etsy
+    - Added logging options
+    - Restructured the code generating Result objects.
+    - Added WebService::Etsy::Result::ShopSection and made the Shop object's sections() method return an array of them.
+    - Made WebService::Etsy::Result::Listing return an array of Tag objects for tags and Material objects for materials.
+
+0.6 2009-03-05
+
+    - Renamed WebService::Etsy::Result (and subclasses) to WebService::Etsy::Resource
+    - Added extra fields to the Feedback resource object
+    - Removed workaround for bug in getChildTags().
+
+0.7 2010-11-23
+
+    - Interim release to provide basic functionality with the v2 API.
+    - Not all new resources supported.

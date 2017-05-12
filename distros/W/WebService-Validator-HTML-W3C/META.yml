@@ -1,0 +1,31 @@
+---
+abstract: 'Access the W3Cs online HTML validator'
+author:
+  - 'Struan Donald E<lt>struan@cpan.orgE<gt>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Validator-HTML-W3C
+provides:
+  WebService::Validator::HTML::W3C:
+    file: lib/WebService/Validator/HTML/W3C.pm
+    version: 0.28
+  WebService::Validator::HTML::W3C::Error:
+    file: lib/WebService/Validator/HTML/W3C/Error.pm
+    version: 0
+  WebService::Validator::HTML::W3C::Warning:
+    file: lib/WebService/Validator/HTML/W3C/Warning.pm
+    version: 0
+requires:
+  Class::Accessor: 0
+  LWP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.28

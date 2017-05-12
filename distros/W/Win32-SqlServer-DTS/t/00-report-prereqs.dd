@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.008009'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::Exception' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::Accessor' => '0.25',
+                                      'Class::Publisher' => '0.2',
+                                      'Data::Dumper' => '0',
+                                      'DateTime' => '0.35',
+                                      'File::Spec' => '0',
+                                      'Hash::Util' => '0',
+                                      'Params::Validate' => '1.24',
+                                      'Win32::OLE' => '0.1704',
+                                      'Win32::OLE::Variant' => '0',
+                                      'XML::Simple' => '2.18',
+                                      'base' => '0',
+                                      'constant' => '0',
+                                      'perl' => '5.008009'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::Exception' => '0.43',
+                                   'Test::More' => '0',
+                                   'perl' => '5.008009'
+                                 }
+                 }
+     };
+  $x;
+ }

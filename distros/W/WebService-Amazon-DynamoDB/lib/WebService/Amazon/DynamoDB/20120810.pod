@@ -1,0 +1,225 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Amazon::DynamoDB::20120810
+at lib/WebService/Amazon/DynamoDB/20120810.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+WebService::Amazon::DynamoDB::20120810 - interact with DynamoDB using API version 20120810
+
+=head1 VERSION
+
+version 0.005
+
+=head1 DESCRIPTION
+
+=head2 new
+
+Instantiates the API object.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * implementation - the object which provides a Future-returning C<request> method,
+see L<WebService::Amazon::DynamoDB::NaHTTP> for example.
+
+=item * uri - the base URI for constructing requests
+
+=item * security - 'iam' or 'key'
+
+=item * access_key - the access key for signing requests (only for security=key)
+
+=item * secret_key - the secret key for signing requests (only for security=key)
+
+=item * role - the role to use for requests (only for security=iam, usually autodetected from EC2 instance metadata)
+
+=item * algorithm - which signing algorithm to use, default AWS4-HMAC-SHA256
+
+=back
+
+=head2 security_token
+
+=head2 create_table
+
+Creates a new table. It may take some time before the table is marked
+as active - use L</wait_for_table> to poll until the status changes.
+
+Named parameters:
+
+=over 4
+
+=item * table - the table name
+
+=item * read_capacity - expected read capacity units (optional, default 5)
+
+=item * write_capacity - expected write capacity units (optional, default 5)
+
+=item * fields - an arrayref specifying the fields, in pairs of (name, type),
+where type is N for numeric, S for string, SS for string sequence, B for binary
+etc.
+
+=item * primary - the primary keys as an arrayref of pairs indicating (name, type),
+default type is hash so ['pkey'] would create a single HASH primary key
+
+=back
+
+=head2 describe_table
+
+Describes the given table.
+
+Takes a single named parameter:
+
+=over 4
+
+=item * table - the table name
+
+=back
+
+and returns the table spec.
+
+=head2 delete_table
+
+Delete a table entirely.
+
+Takes a single named parameter:
+
+=over 4
+
+=item * table - the table name
+
+=back
+
+=head2 wait_for_table
+
+Waits for the given table to be marked as active.
+
+Takes a single named parameter:
+
+=over 4
+
+=item * table - the table name
+
+=back
+
+=head2 each_table
+
+Run code for all current tables.
+
+Takes a coderef as the first parameter, will call this for each table found.
+
+=head2 list_tables
+
+Returns a L<Future> which will resolve with a list of all tables.
+
+Takes no parameters.
+
+ $ddb->list_tables->on_done(sub {
+  my @tbl = @_;
+  print "Table: $_\n" for @tbl;
+ });
+
+=head2 put_item
+
+Writes a single item to the table.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * table - the table name
+
+=item * fields - the field spec, as a { key => value } hashref
+
+=back
+
+=head2 update_item
+
+Updates a single item in the table.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * table - the table name
+
+=item * item - the item to update, as a{ key => value } hashref
+
+=item * fields - the field spec, as a { key => value } hashref
+
+=back
+
+=head2 delete_item
+
+Deletes a single item from the table.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * table - the table name
+
+=item * item - the item to delete, as a { key => value } hashref
+
+=back
+
+=head2 batch_get_item
+
+Retrieve a batch of items from one or more tables.
+
+Takes a coderef which will be called for each found item, followed by
+these named parameters:
+
+=over 4
+
+=item * items - the search spec, as { table => { attribute => 'value', ... }, ... }
+
+=back
+
+=head2 scan
+
+Scan a table for values with an optional filter expression.
+
+=head1 METHODS - Internal
+
+The following methods are intended for internal use and are documented
+purely for completeness - for normal operations see L</METHODS> instead.
+
+=head1 FUNCTIONS - Internal
+
+=head2 type_for_value
+
+Returns an appropriate type (N, S, SS etc.) for the given
+value.
+
+Rules are similar to L<JSON> - if you want numeric, numify (0+$value),
+otherwise you'll get a string.
+
+=head2 type_and_value
+
+Returns a pair of (type, value), using L</type_for_value>.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Amazon::DynamoDB>
+
+L<cached_iam_credentials|WebService::Amazon::DynamoDB/cached_iam_credentials>, L<credentials|WebService::Amazon::DynamoDB/credentials>, L<find_iam_role|WebService::Amazon::DynamoDB/find_iam_role>, L<iam|WebService::Amazon::DynamoDB/iam>, L<make_request|WebService::Amazon::DynamoDB/make_request>, L<retrieve_iam_credentials|WebService::Amazon::DynamoDB/retrieve_iam_credentials>, L<security|WebService::Amazon::DynamoDB/security>, L<uri|WebService::Amazon::DynamoDB/uri>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2013-2015. Licensed under the same terms as Perl itself.

@@ -1,0 +1,45 @@
+Revision history for Perl extension WebService::Bloglines
+
+0.12  Sun Nov 12 00:18:47 JST 2006
+        - Fixed a bug in $bloglines->username()
+        - Added Encode.pm dependency
+        - Added env_proxy() support
+
+0.11  2006-03-06T01:18:43Z
+        - Added use_liberal option to use XML::Liberal to work with bad XML
+
+0.10  2006-03-01T10:37:38Z
+        - Workaround for bad UTF-8 sequence in Bloglines XML. YAY!
+
+0.09  Fri Aug 26 07:34:53 UTC 2005
+        - Fix bug in 0.08: HTML::Entities::encode() is not good for utf-8 bytes
+
+0.08  Thu Aug 25 19:53:16 UTC 2005
+        - Workaround Bloglines' bug that has unescaped string in <webMaster/>
+
+0.07  Wed Aug 24 22:34:20 UTC 2005
+        - uses LibXML everywhere, removed XML::XPath and XML::RSS dependency
+
+0.06  Wed Aug 24 22:15:21 UTC 2005
+        - handle '304 No Change' as no updates, not fatal error
+          (Thanks to Ben Trott)
+
+0.05  Tue Feb 15 23:08:23 JST 2005
+	- Added BloglinesUnread in each folder of Subscriptions
+	  (Thanks to Gosuke Miyashita)
+
+0.04  Sat Jan 15 21:09:35 JST 2005
+	- $update->items returns arrayref in scalar context. It still
+	  returns array in a list context.
+
+0.03  Wed Jan 12 18:25:07 JST 2005
+	* $bloglines->getitems() returns array of Entries in a list
+ 	  context. It allows you to fetch all unread items in a single
+	  getitems(0) call.
+
+0.02  Thu Sep 30 19:54:36 JST 2004
+	- Added XML::RSS to PREREQ_PM
+	- Encode module is now optional for Perl < 5.8
+
+0.01  Mon Aug 16 22:27:32 2004
+	- original version

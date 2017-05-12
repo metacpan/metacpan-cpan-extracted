@@ -1,0 +1,11 @@
+Revision history for WWW-Mechanize-Cached-GZip
+
+0.12    2011-02-14
+        Added WWW::Mechanize::GZip to PREREQUISITES
+
+0.11    2011-01-29
+        Fixed upload problems
+
+0.10    2011-01-28
+        First version.
+

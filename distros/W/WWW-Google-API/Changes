@@ -1,0 +1,11 @@
+WWW::Google::API
+
+0.03  2007-04-03
+      Version bump to fix my forgetting to change this file
+      for 0.002
+
+0.02  2007-04-03
+      Dependency and Test fixes
+
+0.01  2007-03-23
+      Initial Release

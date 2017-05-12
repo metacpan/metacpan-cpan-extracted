@@ -1,0 +1,160 @@
+{
+   "abstract" : "The base object for WADL clients.",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "W3C-SOAP-WADL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Mojolicious" : "5",
+            "Mojolicious::Lite" : "0",
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0",
+            "WWW::Mechanize" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Coverage" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Spelling" : "0"
+         },
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Meta::Method" : "2.1206",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Template" : "0",
+            "TryCatch" : "0",
+            "W3C::SOAP::Client" : "0.08",
+            "W3C::SOAP::Parser" : "0.08",
+            "W3C::SOAP::Utils" : "0.08",
+            "W3C::SOAP::XSD" : "0.08",
+            "W3C::SOAP::XSD::Document" : "0.08",
+            "W3C::SOAP::XSD::Parser" : "0.08",
+            "XML::Rabbit" : "0",
+            "XML::Rabbit::Root" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "W3C::SOAP::WADL" : {
+         "file" : "lib/W3C/SOAP/WADL.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document" : {
+         "file" : "lib/W3C/SOAP/WADL/Document.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Doc" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Doc.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Grammars" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Grammars.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Link" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Link.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Method" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Method.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Option" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Option.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Param" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Param.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Representation" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Representation.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Request" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Request.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Resource" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Resource.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::ResourceType" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/ResourceType.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Resources" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Resources.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Document::Response" : {
+         "file" : "lib/W3C/SOAP/WADL/Document/Response.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Element" : {
+         "file" : "lib/W3C/SOAP/WADL/Element.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Meta::Method" : {
+         "file" : "lib/W3C/SOAP/WADL/Meta/Method.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Parser" : {
+         "file" : "lib/W3C/SOAP/WADL/Parser.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Traits" : {
+         "file" : "lib/W3C/SOAP/WADL/Traits.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::Utils" : {
+         "file" : "lib/W3C/SOAP/WADL/Utils.pm",
+         "version" : "0.007"
+      },
+      "W3C::SOAP::WADL::XSD" : {
+         "file" : "lib/W3C/SOAP/WADL/XSD.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=W3C::SOAP::WADL"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/W3C-SOAP-WADL.git"
+      }
+   },
+   "version" : "0.007"
+}

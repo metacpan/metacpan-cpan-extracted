@@ -1,0 +1,5 @@
+TODO
+
+* Put back the examples, some taken away for a initial release
+* The example catalog-lwp_handlers.pl output a warning from WWW::Lovefilm::API
+  which can be ignore but looks really ugly. Fix!

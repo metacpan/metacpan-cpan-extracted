@@ -1,0 +1,209 @@
+#!perl -w
+
+# Copyright 2012, 2013 Kevin Ryde
+
+# This file is part of Wx-Perl-PodBrowser.
+#
+# Wx-Perl-PodBrowser is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Wx-Perl-PodBrowser is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Wx-Perl-PodBrowser.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Wx;
+use Wx::Perl::PodBrowser;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+
+our $VERSION = 15;
+
+my @goto_document;
+my @goto_position;
+sub set_goto_document {
+  my (@args) = @_;
+  if (@goto_document) {
+    print STDERR Wx::gettext('Cannot open more than one file or module');
+    exit 1;
+  }
+  @goto_document = @args;
+}
+sub set_goto_position {
+  my (@args) = @_;
+  if (@goto_position) {
+    print STDERR Wx::gettext('Cannot go to more than one line or section');
+    exit 1;
+  }
+  @goto_position = @args;
+}
+
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('pass_through');
+Getopt::Long::GetOptions
+  ('module=s' => sub {
+     my ($optname, $value) = @_;
+     set_goto_document (module => $value);
+   },
+   'file=s' => sub {
+     my ($optname, $value) = @_;
+     set_goto_document (filename => $value);
+   },
+   'stdin' => sub {
+     my ($optname) = @_;
+     set_goto_document (filehandle => \*STDIN);
+   },
+
+   'section=s' => sub {
+     my ($optname, $value) = @_;
+     set_goto_position (section => $value);
+   },
+   'line=i' => sub {
+     my ($optname, $value) = @_;
+     set_goto_position (line => $value);
+   },
+
+   'help' => sub {
+     print "Usage: wx-perl-podbrowser [--options] module_or_filename\n";
+     print "  --file FILENAME       open a file\n";
+     print "  --module MODULENAME   open a module\n";
+     print "  --stdin               open POD from standard input\n";
+     print "  --section SECTNAME    scroll to heading or item\n";
+     print "  --line LINENUM        scroll to line number\n";
+     print "  --help                print this help message\n";
+     print "  --version             print the program version number\n";
+     exit 0;
+   },
+   'version' => sub {
+     print "wx-perl-podbrowser version $VERSION\n";
+     exit 0;
+   },
+  )
+  or return 1;  # GetOptions() unrecognised option
+
+# ordinary argument is either a module or filename
+foreach my $arg (@ARGV) {
+  set_goto_document (guess => $arg);
+}
+### @goto_document
+### @goto_position
+
+my $app = Wx::SimpleApp->new;
+$app->SetAppName(Wx::gettext('POD Browser'));
+
+my $browser = Wx::Perl::PodBrowser->new;
+$browser->Show;
+$browser->goto_pod (@goto_document, @goto_position);
+
+$app->MainLoop;
+exit 0;
+
+__END__
+
+=for stopwords Ryde Wx-Perl-PodBrowser wx-perl-podbrowser wxWidgets filename Tk Gtk Prima
+
+=head1 NAME
+
+wx-perl-podbrowser -- POD browser for wxWidgets
+
+=head1 SYNOPSIS
+
+ wx-perl-podbrowser [--options] [module_or_filename]
+
+=head1 DESCRIPTION
+
+C<wx-perl-podbrowser> opens a L<Wx::Perl::PodBrowser> window to display POD
+documentation for a given Perl module,
+
+    wx-perl-podbrowser Hash::Util
+
+or filename
+
+    wx-perl-podbrowser /usr/share/perl5/Regexp/Common.pm
+
+=head2 Document Options
+
+=over
+
+=item C<--file FILENAME>
+
+Open a file.
+
+=item C<--module MODULENAME>
+
+Open a module.
+
+=item C<--stdin>
+
+Display POD read from the standard input.
+
+=back
+
+=head2 Position Options
+
+=over
+
+=item C<--section SECTNAME>
+
+Scroll to the given section of the document.  C<SECTNAME> can be a heading
+or an item.
+
+=item C<--line LINENUM>
+
+Scroll to the given line number.  The first line is number 1.
+
+=back
+
+=head2 Other Options
+
+=over
+
+=item C<--help>
+
+Print a short help message and exit.
+
+=item C<--version>
+
+Print the program version number and exit.
+
+=back
+
+=head1 SEE ALSO
+
+L<Wx::Perl::PodBrowser>
+
+L<tkpod> (Tk), L<podviewer> (Gtk), L<podview> (Prima)
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/wx-perl-podbrowser/index.html>
+
+=head1 LICENSE
+
+Copyright 2012, 2013 Kevin Ryde
+
+Wx-Perl-PodBrowser is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any later
+version.
+
+Wx-Perl-PodBrowser is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+Wx-Perl-PodBrowser.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

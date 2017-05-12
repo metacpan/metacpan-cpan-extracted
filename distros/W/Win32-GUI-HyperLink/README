@@ -1,0 +1,41 @@
+Win32-GUI-HyperLink
+-------------------
+
+VERSION
+
+This is Win32::GUI::HyperLink v0.14
+
+INTRODUCTION
+
+Win32::GUI::HyperLink is a Win32::GUI class that implements a Label
+object that acts as a clickable hyperlink:
+
+By default it has a 'hand' Cursor, is drawn in blue text rather than
+black and the text is underlined when the mouse is over the text.
+The Label can be clicked to launch a hyperlink.
+
+REQUIRES
+
+Win32::GUI v1.02 or higher
+
+DOCUMENTATION
+
+There is full POD documentation inside the HyperLink.pm file.
+There is a demonstration script provided, showing most of the
+features.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    [n|d]make
+    [n|d]make test
+    [n|d]make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005..2009 Robert May
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

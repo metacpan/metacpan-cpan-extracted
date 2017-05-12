@@ -1,0 +1,35 @@
+Changelog for WWW::Pastebin::Sprunge
+
+0.010     2014-08-29
+  - Detect missing content more reliably
+
+0.009     2013-08-02
+  - Declare all tests requiring an internet connection
+    as "extended". Set EXTENDED_TESTING=1 in your
+    environment to enable these tests.
+
+0.008     2013-05-30
+  - File contents are no longer slurped [GH#1]
+
+0.007     2012-06-25
+  - Update test suite for purged paste
+
+0.006     2011-04-21
+  - Avoid some deprecation warnings in 5.14.0-RC1
+
+0.005     2011-02-02
+  - Fix test suite
+
+0.004     2011-02-02
+  - Add lib/WWW/Pastebin/Sprunge.pod - thanks to Christian Walde
+
+0.003     2011-02-01
+  - Merged WWW::P::S::Create and ::Retrieve into a single repository & distribution
+  - Fixed errors with unicode & expanded tests to cover these cases
+  - Expanded test coverage for loading a file
+
+0.002     2010-11-28
+  - Use Perl_5 license
+
+0.001     2010-10-18
+  - Initial version

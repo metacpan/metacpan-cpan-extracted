@@ -1,0 +1,59 @@
+diff -rc ../LWPng-alpha-0.24/lib/LWP/Conn/FILE.pm ./lib/LWP/Conn/FILE.pm
+*** ../LWPng-alpha-0.24/lib/LWP/Conn/FILE.pm	Mon Apr 12 04:29:36 1999
+--- ./lib/LWP/Conn/FILE.pm	Tue Apr 13 10:07:17 1999
+***************
+*** 84,89 ****
+--- 84,99 ----
+      local(*FILE);
+      if (sysopen(FILE, $path, 0)) {
+  	my $res = $req->new_response(200, "OK");
++ 
++ 	# Guess the content type and try to determine if the file
++ 	# should be read in binary or text mode.  Go into binary
++ 	# mode unless the content type is some form of text.
++ 	$res->header("Content-Location" => "file:$path"); # XXX absolutize
++ 	my $content_type = guess_media_type($path, $res);
++ 	unless ($content_type =~ /^text/i) {
++ 	    binmode(FILE);
++ 	}
++ 
+  	my $now = time;
+  
+  	$res->date($now);
+***************
+*** 95,101 ****
+  	my $uname = ($has_getpwuid ? getpwuid($uid) : undef) || $uid;
+  	my $gname = ($has_getgrgid ? getgrgid($gid) : undef) || $gid;
+  
+! 	# far more than you ever wanted to know
+  	$res->header("INode" => sprintf("[%04x]:%d", $dev, $ino)) if $ino;
+  	$res->header("Owner" => $uname);
+  	$res->header("Group" => $gname);
+--- 105,111 ----
+  	my $uname = ($has_getpwuid ? getpwuid($uid) : undef) || $uid;
+  	my $gname = ($has_getgrgid ? getgrgid($gid) : undef) || $gid;
+  
+! 	# Far more than you ever wanted to know.
+  	$res->header("INode" => sprintf("[%04x]:%d", $dev, $ino)) if $ino;
+  	$res->header("Owner" => $uname);
+  	$res->header("Group" => $gname);
+***************
+*** 105,114 ****
+  	$res->header("Last-Accessed" => time2str($atime));
+  	$res->header("Status-Modified" => time2str($ctime));
+  
+! 	$res->header("Content-Location" => "file:$path"); # XXX absolutize
+! 	guess_media_type($path, $res);
+! 
+! 	# We use the same algoritm as Apache to generate an etag.
+  	my $etag = sprintf qq("%x-%x-%x"), $ino, $filesize, $mtime;
+  	$etag = "W/$etag" if $now - $mtime < 2;
+  	$res->header("ETag" => $etag);
+--- 115,121 ----
+  	$res->header("Last-Accessed" => time2str($atime));
+  	$res->header("Status-Modified" => time2str($ctime));
+  
+! 	# We use the same algorithm as Apache to generate an etag.
+  	my $etag = sprintf qq("%x-%x-%x"), $ino, $filesize, $mtime;
+  	$etag = "W/$etag" if $now - $mtime < 2;
+  	$res->header("ETag" => $etag);

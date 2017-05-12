@@ -1,0 +1,66 @@
+{
+   "abstract" : "Client library for GoodData REST-ful API",
+   "author" : [
+      "Lubomir Rintel <lkundrak@v3.sk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-GoodData",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.36",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Pod::Usage" : "0",
+            "Text::ParseWords" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "LWP::Authen::Gooddata" : {
+         "file" : "lib/LWP/Authen/Gooddata.pm",
+         "version" : 0
+      },
+      "WWW::GoodData" : {
+         "file" : "lib/WWW/GoodData.pm",
+         "version" : "1.11"
+      },
+      "WWW::GoodData::Agent" : {
+         "file" : "lib/WWW/GoodData/Agent.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-GoodData"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/lkundrak/www-gooddata"
+      }
+   },
+   "version" : "1.11"
+}

@@ -1,0 +1,76 @@
+#############################################################################
+## Name:        XS/Treebook.xsp
+## Purpose:     XS++ for Wx::Treebook
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     30/07/2006
+## RCS-ID:      $Id: Treebook.xsp 2148 2007-08-15 17:10:50Z mbarbon $
+## Copyright:   (c) 2006-2007 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+%module{Wx};
+
+%typemap{wxTreebook*}{simple};
+%typemap{wxTreebookEvent*}{simple};
+
+#if WXPERL_W_VERSION_GE( 2, 7, 0 )
+
+#include <wx/treebook.h>
+
+%name{Wx::TreebookEvent} class wxTreebookEvent
+{
+    wxTreebookEvent( wxEventType commandType = wxEVT_NULL, int id = 0,
+                     int nSel = wxNOT_FOUND, int nOldSel = wxNOT_FOUND );
+
+    int GetOldSelection() const;
+    int GetSelection() const;
+};
+
+%name{Wx::Treebook} class wxTreebook
+{
+    %name{newDefault} wxTreebook()
+        %code{% RETVAL = new wxTreebook();
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+    %name{newFull} wxTreebook(wxWindow *parent,
+                              wxWindowID id = wxID_ANY,
+                              const wxPoint& pos = wxDefaultPosition,
+                              const wxSize& size = wxDefaultSize,
+                              long style = 0,
+                              const wxString& name = wxEmptyString)
+        %code{% RETVAL = new wxTreebook( parent, id, pos, size, style, name );
+                wxPli_create_evthandler( aTHX_ RETVAL, CLASS );
+             %};
+
+    bool Create(wxWindow *parent,
+                wxWindowID id = wxID_ANY,
+                const wxPoint& pos = wxDefaultPosition,
+                const wxSize& size = wxDefaultSize,
+                long style = 0,
+                const wxString& name = wxEmptyString);
+
+    bool InsertSubPage( size_t pos, wxWindow* page,
+                        const wxString& text, bool bSelect = false,
+                        int imageId = wxNOT_FOUND );
+    bool AddSubPage( wxWindow* page, const wxString& text,
+                     bool bSelect = false, int imageId = wxNOT_FOUND );
+    bool IsNodeExpanded( size_t pos ) const;
+    bool ExpandNode( size_t pos, bool expand = true );
+    bool CollapseNode( size_t pos );
+    int GetPageParent( size_t pos ) const;
+    wxTreeCtrl* GetTreeCtrl() const;
+};
+
+%{
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_VOIDM_REDISP( newDefault )
+        MATCH_ANY_REDISP( newFull )
+    END_OVERLOAD( "Wx::Treebook::new" )
+%}
+
+#endif

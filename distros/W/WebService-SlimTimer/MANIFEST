@@ -1,0 +1,17 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/slimtimer-report
+dist.ini
+lib/WebService/SlimTimer.pm
+lib/WebService/SlimTimer/Task.pm
+lib/WebService/SlimTimer/TimeEntry.pm
+lib/WebService/SlimTimer/Types.pm
+t/release-pod-coverage.t
+t/simple.t
+t/task.t
+t/time_entry.t
+t/with_login.t

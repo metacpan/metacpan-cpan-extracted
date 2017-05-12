@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+use WebService::APIKeys::AutoChanger;
+use Test::More tests => 2; 
+
+my $changer = WebService::APIKeys::AutoChanger->new;
+
+isa_ok( $changer, 'WebService::APIKeys::AutoChanger');
+
+$changer->set(
+    api_keys => [
+        'aaaaaaaaaaaaaaaaaaa',
+        'bbbbbbbbbbbbbbbbbbb',
+        'ccccccccccccccccccc',
+    ]
+);
+
+isa_ok($changer->throttle, 'Data::Valve');

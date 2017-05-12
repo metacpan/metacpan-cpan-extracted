@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/Win32/EventLog/Carp.pm
+eg/click.pl
+t/01-basic.t
+t/02-optional.t
+t/03-register.t
+t/04-pod-coverage.t
+t/05-pod.t

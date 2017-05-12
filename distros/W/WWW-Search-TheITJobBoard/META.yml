@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WWW-Search-TheITJobBoard
+version:             0.04
+abstract:            Search TheITJobBoard.com
+license:             ~
+author:              
+    - lee goddard <lgoddard -at- cpan -dot- org>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    HTML::TokeParser:              0.1
+    WWW::Search:                   0.1
+    WWW::SearchResult:             0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

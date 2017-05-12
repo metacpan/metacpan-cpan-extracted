@@ -1,0 +1,33 @@
+---
+abstract: "Object-oriented interface to YR.no's weather service."
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Slurp: '0'
+  FindBin: '0'
+  Test::More: '0.98'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Weather-YR
+requires:
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  DateTime::TimeZone: '0'
+  LWP::UserAgent: '0'
+  Mojo::URL: '0'
+  Moose: '0'
+  XML::LibXML: '0'
+  XML::Simple: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+version: '0.38'

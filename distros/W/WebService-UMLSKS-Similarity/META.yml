@@ -1,0 +1,24 @@
+---
+abstract: 'access the Unified Medical Language System (UMLS) via Webservices'
+author:
+  - 'Mugdha Choudhari <choudhary.mugdha@gmail.com> , Ted Pedersen <tpederse@d.umn.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-UMLSKS-Similarity
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::SSLeay: 0
+  SOAP::Lite: 0.71
+  Test::More: 0
+version: 0.23

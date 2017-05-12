@@ -1,0 +1,15 @@
+<!-- BEGIN revisions_controls -->
+[% IF previous_id -%]
+<a href="[% script_name %]?action=revisions&page_name=[% page_uri %]&revision_id=[% previous_id %]" accesskey="p" title="Previous Revision">
+[% INCLUDE revisions_controls_previous_icon.html %]
+</a> &nbsp; 
+[% END -%]
+<a href="[% script_name %]?[% page_uri %]" accesskey="c" title="Current Revision">
+[% INCLUDE revisions_controls_current_icon.html %]
+</a>
+[% IF next_id -%]
+ &nbsp; <a href="[% script_name %]?action=revisions&page_name=[% page_uri %]&revision_id=[% next_id %]" accesskey="n" title="Next Revision">
+[% INCLUDE revisions_controls_next_icon.html %]
+</a>
+[% END -%]
+<!-- END revisions_controls -->

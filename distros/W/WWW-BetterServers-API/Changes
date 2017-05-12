@@ -1,0 +1,25 @@
+Revision history for Perl module WWW::BetterServers::API
+
+0.08 2014-03-10
+
+    * set object attributes after instantiation
+
+0.07 2014-03-07
+
+    * fix for URL-encoded parameters
+
+0.06 2014-01-27
+
+    * use Mojo::URL
+
+0.05 2013-11-05
+
+    * Require Mojolicious 4.50
+
+0.04 2013-10-01
+
+    * Changes file conformant to CPAN::Changes
+
+0.03 2013-09-30
+
+    * First version released to CPAN

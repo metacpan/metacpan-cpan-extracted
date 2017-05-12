@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                WWW-Crawler-Lite
+version:             0.005
+abstract:            A single-threaded crawler/spider for the web.
+license:             ~
+author:              
+    - John Drago <jdrago_999@yahoo.com>
+generated_by:        hand
+distribution_type:   module
+test_requires:
+    Test::More:             0
+requires:
+    LWP::UserAgent:         5.834
+    HTTP::Request::Common:  5.824
+    Time::HiRes:            0
+    Carp:                   0
+    URI::URL:               0
+    HTML::LinkExtor:        0
+resources:
+  repository: git://github.com/jdrago999/WWW-Crawler-Lite.git
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

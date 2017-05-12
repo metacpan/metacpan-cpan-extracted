@@ -1,0 +1,66 @@
+=head1 NAME
+
+WebService::Pandora::Cryptor - Encryption/Decryption for Pandora API
+
+=head1 SYNOPSIS
+
+  use WebService::Pandora::Cryptor;
+
+  $cryptor = WebService::Pandora::Cryptor->new( encryption_key => 'key',
+                                                decryption_key => 'key' );
+
+  $encrypted = $cryptor->encrypt( "string" );
+  $decrypted = $cryptor->decrypt( $encrypted );
+
+=head1 DESCRIPTION
+
+B<WebService::Pandora::Cryptor> is used to encrypt and decrypt the data sent to and from
+the Pandora JSON API.  Some methods require the JSON to be sent using the Blowfish
+algorithm in ECB mode.  Some of the attributes returned by the API are encrypted and thus
+need to be decrypted to read.  Each B<WebService::Pandora::Partner> uses a different key
+for encryption and decryption.  If the B<WebService::Pandora::Method> object is passed
+a true value for the B<encrypt> boolean, it uses this module to do so for the submitted
+JSON data.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Creates a B<WebService::Pandora::Cryptor> object with the arguments given.  The
+B<encryption_key> and B<decryption_key> options are both required.
+
+  $cryptor = WebService::Pandora::Cryptor->new( encryption_key => 'key',
+                                                decryption_key => 'key' );
+
+=head1 METHODS
+
+=head2 encrypt ( STRING ) [required]
+
+Returns a Blowfish ECB hex encrypted string of the JSON data given that the Pandora
+API expects, using the provided B<encryption_key> specified in the constructor.
+
+  $encrypted = $cryptor->encrypt( $json_str );
+
+=head2 decrypt ( ENCRYPTED ) [required]
+
+Returns the decrypted string, given a hex encrypted Blowfish ECB string, that the
+Pandora JSON API may send.  Uses the B<decryption_key> specified in the constructor.
+
+  $decrypted = $cryptor->decrypt( $encrypted );
+
+=head2 error
+
+Returns a string containing a message about why the last method call failed.
+
+=head1 SEE ALSO
+
+L<WebService::Pandora>
+L<WebService::Pandora::Method>
+L<Crypt::ECB>
+L<Crypt::Blowfish>
+
+=head1 AUTHOR
+
+Mitch McCracken E<lt>mrmccrac@gmail.comE<gt>
+
+=cut

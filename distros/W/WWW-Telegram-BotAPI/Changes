@@ -1,0 +1,35 @@
+0.08 2017-02-13
+  - Handle plain text error messages returned by old versions of Mojolicious. See issue #16.
+  - Add a note in the documentation about how important is to reuse objects and the undefined
+    behavior that happens with asynchronous requests when that rule is not honoured. See issue #13.
+0.07 2016-08-23
+  - Don't encode to UTF-8 when JSON::MaybeXS takes care of it.
+0.06 2016-08-21
+  - Fix a critical encoding issue involving LWP, file uploads and UTF-8 fields.
+0.05 2016-08-21
+  - Fix compatibility with older Perls.
+  - Improve debugging output.
+0.04 2016-08-08
+  - Major change to how requests are handled. Every request is now sent using `application/json`
+    by default, except when uploading, where `multipart/form-data` is used instead.
+    This has the benefit of allowing the usage of complex objects with zero effort.
+    It *should not* be a breaking change (except if dealing with the internals of this module).
+  - Implement `parse_error`. This new method allows to parse errors and obtain information about
+    them, such as their source or code. Please see the updated documentation.
+  - Asynchronous callbacks are no more mandatory when async mode is enabled. When the callback is
+    missing, requests are simply executed synchronously.
+0.03 2015-10-31
+  - Happy Halloween!
+  - Add new debugging mode, enabled by setting the `TELEGRAM_BOTAPI_DEBUG` environment variable
+    to a true value.
+  - `api_request` now dies when, in the response, `ok` is missing or set to a false value.
+    This means that `undef` can no longer be returned.
+    Consequently, error messages returned from Telegram - when available - are now shown when
+    dying (instead of showing just the HTTP response code).
+  - Several improvements to the documentation and the code.
+0.02 2015-09-02
+  - DESTROY is not handled by AUTOLOAD anymore.
+  - Now using `Carp::confess` instead of `die` for server-side errors.
+  - The documentation now has more examples.
+0.01 2015-06-28
+  - First release.

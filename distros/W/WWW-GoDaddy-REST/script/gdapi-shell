@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use WWW::GoDaddy::REST::Shell;
+
+my $shell = WWW::GoDaddy::REST::Shell->new();
+
+if ( !@ARGV ) {
+    $shell->cmdloop();
+}
+else {
+    no warnings 'redefine';
+    local *Term::Shell::page = sub { print $_[1] };
+    $shell->run(@ARGV) or exit 1;
+}
+exit;
+
+=head1 NAME
+
+gdapi-shell - shell to explore APIs that use the Go Daddy API spec
+
+=head1 SYNOPSIS
+
+gdapi-shell [options] [command]
+
+Options:
+
+ --url            Base URL to the API (including version string)
+ --username       Username for HTTP basic auth
+ --password       Password for HTTP basic auth
+ --config         Path to a configuration file as an alternative
+                  to the url, username, password options.
+ -help            brief help message
+ -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--url>
+
+This is the Base URL to the API that must conform to the Go Daddy
+API specification.  This URL must include the version string if
+applicable.
+
+The value specified here will override any configuration file
+which may also be used.
+
+=item B<--username>
+
+The username to use for HTTP Basic Auth (if applicable).  The
+value specified here will override any configuration file which
+may also be used.
+
+=item B<--password>
+
+The password to use for HTTP Basic Auth (if applicable).  This
+method is not recommended.  Using a configuration file is a 
+much better idea.
+
+The value specified here will override any configuration file
+which may also be used.
+
+=item B<--config>
+
+An absolute or relative path to a configuration file that may
+contain the following items:
+
+ url
+ username
+ password
+
+The format of the file can be YAML, INI, XML, or any format
+that the L<Config::Any> module can parse.  It is a simple
+key/value file format.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> is a command line shell that will allow you to explore
+basic APIs that conform to the Go Daddy API specification.
+
+The shell allows you to perform Read and Search operations as well as
+some Schema exploration tools so that you can learn the API.
+
+You may also run a single command on the command line for whatever
+scripting purposes you have.  For example:
+
+ gdapi-shell --config=myconfig.yml get /schemas
+
+The command will exit normally on a successfully HTTP response. It
+will exit non-zero if there was an error.  This includes 4xx and 5xx
+HTTP errors even if valid JSON is returned.
+
+Detaied information on the API specification may be found here:
+L<https://github.com/godaddy/gdapi>
+
+=head1 AUTHOR
+
+David Bartle, C<< <davidb@mediatemple.net> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2014 Go Daddy Operating Company, LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"), 
+to deal in the Software without restriction, including without limitation 
+the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell copies of the Software, and to permit persons to whom the 
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+
+=cut

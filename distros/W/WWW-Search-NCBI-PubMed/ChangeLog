@@ -1,0 +1,7 @@
+Revision history for Perl extension WWW::Search::NCBI::PubMed.
+
+0.01  Mon Apr 26 07:37:25 2004
+	- original version; created by h2xs 1.23 with options
+		-n WWW::Search::NCBI::PubMed -X
+
+  - Initial release

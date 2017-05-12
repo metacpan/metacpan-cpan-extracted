@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl interface to the Google AJAX Language API",
+   "author" : [
+      "Henning Manske <hma@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-Google-Language",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Response" : 0,
+            "JSON" : "2.0",
+            "LWP::UserAgent" : 0,
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.0",
+            "LWP::UserAgent" : 0,
+            "URI" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Google-Language"
+      },
+      "homepage" : "http://search.cpan.org/dist/WebService-Google-Language/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/hma/WebService-Google-Language"
+      }
+   },
+   "version" : "0.14"
+}

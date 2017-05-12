@@ -1,0 +1,21 @@
+---
+name: WebSphere-MQTT-Client
+version: 0.03
+author: ~
+abstract: WebSphere MQ Telemetry Transport Client
+license: restrictive
+requires:
+  Data::Dumper: 0
+  Getopt::Std: 0
+  Pod::Usage: 0
+  Test: 1.00
+  Time::HiRes: 0
+build_requires:
+  Module::Build: 0.20
+provides:
+  WebSphere::MQTT::Client:
+    file: lib/WebSphere/MQTT/Client.pm
+    version: 0.03
+  WebSphere::MQTT::Persist::File:
+    file: lib/WebSphere/MQTT/Persist/File.pm
+generated_by: Module::Build version 0.26

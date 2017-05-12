@@ -1,0 +1,11 @@
+libwww-robot-perl (0.026) unstable; urgency=low
+
+  * Normaly runs with utf-8 content (Closes: 42870)
+
+ -- Bernhard R. Link <brlink@debian.org>  Sun, 20 Jul 2008 15:06:19 +0200
+
+libwww-robot-perl (0.025-1) unstable; urgency=low
+
+  * Initial Release
+
+ -- Konstantin Matyukhin <kmatyukhin@gmail.com>  Tue,  9 Jun 2007 01:52:08 +0300

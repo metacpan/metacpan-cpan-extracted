@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/WWW/DME.pm
+lib/WWW/DNSMadeEasy.pm
+lib/WWW/DNSMadeEasy/Domain.pm
+lib/WWW/DNSMadeEasy/Domain/Record.pm
+t/00-load.t
+t/01-sandbox.t
+t/05-hmac-doc-example.t
+t/release-pod-syntax.t

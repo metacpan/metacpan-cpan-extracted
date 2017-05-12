@@ -1,0 +1,11 @@
+Changes
+lib/WebService/SimpleAPI/Wikipedia.pm
+lib/WebService/SimpleAPI/Wikipedia/Parser.pm
+lib/WebService/SimpleAPI/Wikipedia/ResultSet.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00_compile.t
+t/01_errors.t
+t/02_forward.t

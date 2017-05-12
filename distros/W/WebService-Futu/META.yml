@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               WebService-Futu
+version:            0.02
+abstract:           Perl interface to the Futu API
+author:
+    - Vaclav Dovrtel <vaclav.dovrtel@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:    0
+    HTTP::Cookies:   0
+    HTTP::Status:    0
+    JSON::XS:        0
+    LWP::UserAgent:  0
+    Test::More:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

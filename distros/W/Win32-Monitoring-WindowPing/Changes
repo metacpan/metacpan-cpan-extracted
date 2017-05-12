@@ -1,0 +1,35 @@
+Revision history for Perl extension Win32::Monitoring::WindowPing.
+
+Win32-Monitoring-WindowsPing-0.07, Tue 2012-05-01
+-------------------------------------------------
+- Make working for up- and download
+
+Win32-Monitoring-WindowsPing-0.06, Tue 2012-05-01
+-------------------------------------------------
+- Make compiling again
+
+Win32-Monitoring-WindowsPing-0.05, Fri 2008-08-22
+-------------------------------------------------
+- added ppd file
+- added remarks on development download area
+
+Win32-Monitoring-WindowsPing-0.04, Thu 2008-08-21
+-------------------------------------------------
+- added new example and more documentation
+
+Win32-Monitoring-WindowsPing-0.03, Wed 2008-08-13 
+-------------------------------------------------
+- added license and license comments
+
+Win32-Monitoring-WindowsPing-0.02, Fri 2008-07-25
+--------------------------------------------------
+- first running version
+- moved a lot code to XS specific code sections
+- added documentation
+- added example application
+
+Win32-Monitoring-WindowsPing-0.01, Web 2008-07-23
+--------------------------------------------------
+- original version; created by h2xs 1.23 with options
+  -cfn Win32::Monitoring::WindowPing
+

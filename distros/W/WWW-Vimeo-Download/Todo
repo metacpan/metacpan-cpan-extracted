@@ -1,0 +1,5 @@
+TODO list for Perl module WWW::Vimeo::Download
+
+- get more video information (created on, etc)
+- add date filter ( ex list all newer than X date and download )
+

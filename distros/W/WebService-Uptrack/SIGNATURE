@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8e679a8e2c89cff45473ef1f1f6f11c2a4e8756c Build.PL
+SHA1 f31be6b64123413da7cf7f918489001dc987e744 Changes
+SHA1 a4ec5f7f0eba05f783ccb256b01d68525ee0d272 MANIFEST
+SHA1 04f8834cc8a8a60b0610b9ce5b78088371abdf01 META.yml
+SHA1 4f39820d3729a1130815b0fa5a90ad464cd7c2b6 Makefile.PL
+SHA1 7f6ae5d9674d583a72d89d1522fd228c4c80c953 README
+SHA1 a73123a8ad8f20eb4ae042a83553cdebb28a7618 TODO
+SHA1 206f8fcd69a3bdc932adb3e612e428e4100d5035 lib/WebService/Uptrack.pm
+SHA1 6808d7f9ca5f7427c360d8d7cf7f5913f5c63548 t/00.load.t
+SHA1 39199a2c0076afb021bd05c78dc2a913f935d3c9 t/01.init.t
+SHA1 93c1f1daa3357442d04ee8a56be5dcce6b79c668 t/02.ua.t
+SHA1 7ef2a59f9b0172267a0cda26243f916672aa43a0 t/03.json.t
+SHA1 9a81759b55c8bcad4f757fad92fb32076a01072d t/kwalitee.t
+SHA1 a31356049234be3053dea2ff5c6a8f3b619232a5 t/perlcritic.t
+SHA1 d685a1a9d85b958c0ee2490af1865ae383898efb t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFMr2furVQCUYR3twYRAnn0AKClwn6gFcOww4tlprt6lJ6Wgtx67wCeNYd/
+b2m7ta5Dbf0ahJca1El1Ick=
+=XXPf
+-----END PGP SIGNATURE-----

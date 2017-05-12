@@ -1,0 +1,10 @@
+0.003     2013-08-27 13:22:25 Europe/London
+  rename to Wight::Chart, support other charting libraries.
+
+0.002     2013-08-09 15:27:45 Europe/London
+
+  decode UTF8, fix height option
+
+0.001     2013-08-07 12:03:18 Europe/London
+
+  Initial release

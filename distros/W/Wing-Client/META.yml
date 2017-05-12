@@ -1,0 +1,29 @@
+---
+abstract: "A simple client to Wing's web services."
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Wing-Client
+requires:
+  HTTP::CookieJar: '0.004'
+  HTTP::Request::Common: '0'
+  HTTP::Thin: '0'
+  HTTP::Tiny: '0.034'
+  JSON: '0'
+  Moo: '1.002000'
+  Ouch: '0.0400'
+  Test::Deep: '0'
+  Test::More: '0'
+  URI: '0'
+resources:
+  bugtracker: http://github.com/plainblack/Wing-Client/issues
+  repository: git://github.com/plainblack/Wing-Client.git
+version: '1.0000'

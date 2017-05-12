@@ -1,0 +1,6 @@
+Revision history for Perl extension WKHTMLTOX:XS.
+
+0.01  Sat Jun 21 13:21:12 2014
+	- original version; created by h2xs 1.23 with options
+		-b 5.0.0 -n WKHTMLTOX:XS -A perl-wkhtmltox.h
+

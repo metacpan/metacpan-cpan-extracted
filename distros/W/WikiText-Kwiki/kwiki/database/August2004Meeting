@@ -1,0 +1,18 @@
+== August Meeting ==
+==== August 11, 2004 6:30pm at Free Geek, 1741 SE 10th Ave ====
+
+*Discovering Bricolage*, by David Wheeler
+
+[slides http://conferences.oreillynet.com/presentations/os2004/wheeler_david.pdf] (pdf)
+
+[bricolage site http://bricolage.cc/]
+
+Content management is a huge issue for organizations of all sizes, addressed by products ranging from simple in-house solutions to multi-million dollar commercial applications. Bricolage, an enterprise-class open source content management system powered by Apache/mod_perl and PostgreSQL, aims to bridge the gap between these extremes by offering an intuitive interface with powerful capabilities. As a result, Bricolage has gained wide adoption from organizations as diverse as Entertainment Tonight Online, The RAND Corporation, and the World Health Organization. Its power and ease of use led to its being named "Most Impressive" of 2002 by eWeek.
+
+Join Bricolage lead developer and maintainer David Wheeler for a practical introduction to Bricolage. As an open source product with commercial-class features such as document type definition, granular access control, flexible templating, and platform-independent content distribution, Bricolage enables a deep and comprehensive organizational content management workflow. Following a brief review of its history, we'll focus on the essentials needed to start using Bricolage. The topics covered include:
+
+* Analysis and logical modeling of document types in an organization
+* Mason template development
+* Document editing
+* Replicating and managing organizational workflow
+* Publishing and distribution

@@ -1,0 +1,90 @@
+#############################################################################
+## Name:        ext/dataview/XS/DataViewColumn.xsp
+## Purpose:     XS++ for Wx::DataViewColumn
+## Author:      Mattia Barbon
+## Modified by:
+## Created:     25/11/2007
+## RCS-ID:      $Id: DataViewColumn.xsp 2573 2009-05-17 16:56:34Z mbarbon $
+## Copyright:   (c) 2007, 2009 Mattia Barbon
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+#if wxUSE_DATAVIEWCTRL
+
+#include <wx/dataview.h>
+
+# DECLARE_OVERLOAD( wdvr, Wx::DataViewRenderer )
+
+%module{Wx};
+
+%name{Wx::DataViewColumn} class wxDataViewColumn {
+%{
+void
+new( ... )
+  PPCODE:
+    BEGIN_OVERLOAD()
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_s_wdvr_n_n_n_n, new1, 3 )
+        MATCH_REDISP_COUNT_ALLOWMORE( wxPliOvl_wbmp_wdvr_n_n_n_n, new2, 3 )
+    END_OVERLOAD( "Wx::DataViewColumn::new" )
+%}
+
+    %name{new1}
+    wxDataViewColumn( const wxString& title,
+                      wxDataViewRendererDisown* renderer,
+                      unsigned int model_column,
+                      int width = wxDVC_DEFAULT_WIDTH,
+                      wxAlignment align = wxALIGN_CENTRE,
+                      int flags = wxDATAVIEW_COL_RESIZABLE );
+    %name{new2}
+    wxDataViewColumn( const wxBitmap& bitmap,
+                      wxDataViewRendererDisown* renderer,
+                      unsigned int model_column,
+                      int width = wxDVC_DEFAULT_WIDTH,
+                      wxAlignment align = wxALIGN_CENTRE,
+                      int flags = wxDATAVIEW_COL_RESIZABLE );
+
+%{
+static void
+wxDataViewColumn::CLONE()
+  CODE:
+    wxPli_thread_sv_clone( aTHX_ CLASS, (wxPliCloneSV)wxPli_detach_object );
+
+## // thread OK
+void
+wxDataViewColumn::DESTROY()
+  CODE:
+    wxPli_thread_sv_unregister( aTHX_ "Wx::DataViewColumn", THIS, ST(0) );
+    if( wxPli_object_is_deleteable( aTHX_ ST(0) ) )
+        delete THIS;
+%}
+
+    void SetTitle( const wxString &title );
+    void SetAlignment( wxAlignment align );
+    void SetSortable( bool sortable );
+    void SetReorderable(bool reorderable);
+    void SetResizeable( bool resizeable );
+    void SetHidden( bool hidden );
+    void SetSortOrder( bool ascending );
+    void SetFlags( int flags );
+    void SetOwner( wxDataViewCtrl* owner );
+    void SetBitmap( const wxBitmap &bitmap );
+    void SetMinWidth( int minWidth );
+    void SetWidth( int width );
+    wxString GetTitle() const;
+    wxAlignment GetAlignment() const;
+    int GetWidth() const;
+    int GetMinWidth() const;
+    int GetFlags() const;
+    bool IsHidden() const;
+    bool IsReorderable() const;
+    bool IsResizeable() const;
+    bool IsSortable() const;
+    bool IsSortOrderAscending() const;
+    const wxBitmap& GetBitmap() const;
+    unsigned int GetModelColumn() const;
+    wxDataViewCtrl* GetOwner() const;
+    wxDataViewRendererDisown* GetRenderer() const;
+};
+
+#endif

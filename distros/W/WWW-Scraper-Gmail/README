@@ -1,0 +1,73 @@
+WWW-Scraper-Gmail version 0.01
+==============================
+
+This is a very simple interface into GMail.
+It is based off of the code by Ilia Alshanetsky (http://ilia.ws)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTES
+    This is my first perl module and was written quickly. There are bugs, and it is
+    not done "correctly" I'm sure. If you have any suggestions, bug fixes, hate mail
+    feel free to send it to kastner@gmail.com
+
+    I hope somone finds this useful.
+
+    you must have a file ~/.gmailrc. The format is as follows:
+[gmail]
+username=<username>
+password=<password>
+
+    you should chmod it 700 so it is not readable
+
+FUNCTIONS
+
+These are the functions in the Module, they may change, but it will be noted here
+    fetchMail()
+        Returns an array of hash refs of all msgs in inbox (read and unread)
+            {
+                from    => ,
+                subject => ,
+                date    => ,
+                blurb   => ,
+                new     => 
+            };
+    outputMail()
+        Spits out all unread mail from inbox in the format
+            "$from$delim$subject$delim$time$delim$blurb\n";
+        where $delim is either $ARGV[0] or ";;"
+
+    countMail()
+        returns the number of unread msgs from inbox
+
+    setPrefs({ Signature => "Sig", MaxPer => 25 });
+        sets some preferences
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  Crypt::SSLeay (or any SSL thingie for LWP)
+  ENV
+  HTML::Entities
+
+COPYRIGHT AND LICENCE
+
+LICENSE... do what you want with it - I don't care. Claim its yours... whatever
+this was just a quick thing, have fun
+
+Copyright (C) 2004 by Erik F. Kastner (kastner@gmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,48 @@
+README for WebCache::ICP
+by Martin Hamilton <martinh@gnu.org>
+
+This Perl module tries to implement the Internet Cache Protocol (ICP), as
+specified in RFCs 2186 and 2187 - included here in the 'doc' subdirectory
+of the module distribution.
+
+If you downloaded this package from CPAN or a CPAN mirror site, you may
+want to check back to its home page to see if there's a newer version:
+<URL:http://wwwcache.ja.net/dev/perlmod/>
+
+
+You install the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+Please report any bugs/suggestions to the author at the above address.
+
+
+Two sample scripts and associated config files are included in the
+'scripts' subdirectory.  These are:
+
+  jellyfish.pl - a fake ICP server which can be used to selectively
+                   report hits for those URLs you have mirrored.
+
+  starfish.pl -  a Squid redirector which, on being given one of the
+                   possible URLs for a widely replicated resource,
+                   rewrites this to the URL of your local mirror copy.
+
+Together these programs let you integrate a mirror server into a WWW
+caching hierarchy, by making the mirror server appear to be a cache
+server which already knows about the contents of the mirrored sites -
+and all of the sites which mirror them.  See the file 'scripts/README'
+for more information.
+
+
+Copyright (c) 1999, Martin Hamilton <martinh@gnu.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+It was developed by the JANET Web Cache Service, with funding from the
+Joint Information Systems Committee (JISC) of the UK Higher Education
+Funding Councils and TERENA, the Trans-European Research and Education
+Networking Association.
+

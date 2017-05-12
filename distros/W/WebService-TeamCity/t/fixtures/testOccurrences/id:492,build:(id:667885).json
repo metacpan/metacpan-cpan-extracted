@@ -1,0 +1,24 @@
+{
+   "build" : {
+      "branchName" : "refs/heads/Hajipur-9.1.x",
+      "buildTypeId" : "TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x",
+      "defaultBranch" : true,
+      "href" : "/httpAuth/app/rest/builds/id:667885",
+      "id" : 667885,
+      "number" : "snapshot-43",
+      "state" : "finished",
+      "status" : "SUCCESS",
+      "webUrl" : "https://teamcity.jetbrains.com/viewLog.html?buildId=667885&buildTypeId=TeamCityPluginsByJetBrains_Git_JetBrainsGitPluginTeamCity91x"
+   },
+   "details" : "\n------- Stdout: -------\n[2016-01-13 14:32:12,681]   WARN - Triggers.vcs.git.GitVcsSupport - List remote refs failed: Session.connect: java.net.SocketException: Connection reset, 5 attempt(s) left \n\r\n[2016-01-13 14:32:12,681]   WARN - Triggers.vcs.git.GitVcsSupport - List remote refs failed: Session.connect: java.net.SocketException: Software caused connection abort, 4 attempt(s) left \n\r\n[2016-01-13 14:32:12,682]   WARN - Triggers.vcs.git.GitVcsSupport - List remote refs failed: com.jcraft.jsch.JSchException: connection is closed by foreign host, 3 attempt(s) left \n\r\n[2016-01-13 14:32:12,682]   WARN - Triggers.vcs.git.GitVcsSupport - List remote refs failed: java.net.UnknownHostException: some.org, 2 attempt(s) left \n\r\n[2016-01-13 14:32:12,683]   WARN - Triggers.vcs.git.GitVcsSupport - List remote refs failed: com.jcraft.jsch.JSchException: verify: false, 1 attempt(s) left \n",
+   "duration" : 84,
+   "href" : "/httpAuth/app/rest/testOccurrences/id:492,build:(id:667885)",
+   "id" : "id:492,build:(id:667885)",
+   "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_retry_getCurrentState_if_it_fails",
+   "status" : "SUCCESS",
+   "test" : {
+      "href" : "/httpAuth/app/rest/tests/id:8403103115239345452",
+      "id" : 8403103115239345452,
+      "name" : "Git Suite: jetbrains.buildServer.buildTriggers.vcs.git.tests.GitVcsSupportTest.should_retry_getCurrentState_if_it_fails"
+   }
+}

@@ -1,0 +1,51 @@
+WebSphere-MQTT-Client version 0.03
+==================================
+
+WebSphere::MQTT::Client is a perl module that talks:
+
+	IBM's WebSphere MQ Telemetry Transport
+
+to a broker.
+
+It uses the C source code provided by IBM in SupportPac IA93, plus a new
+Perl implementation of persistence.
+
+This perl module is single threaded in the C code at the moment; this means
+that if the remote address is a blackhole, the API can block for several
+minutes while it attempts to connect.
+
+LWT (Last Will and Testament) has also not been implemented.
+
+
+
+
+INSTALLATION
+
+	I use Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the debian package:
+
+		libmodule-build-perl
+
+
+AUTHORS
+
+	Nicholas Humfrey, njh@ecs.soton.ac.uk
+	Brian Candler, B.Candler@pobox.com (version 0.02, 0.03 changes)
+
+COPYRIGHT AND LICENSE
+
+	Perl Code Copyright (C) 2005 University of Southampton
+	C Code in /src Copyright (C) 2002, 2003 IBM Corp, except
+	/lib/WebSphere/MQTT/Persist/File.pm and
+	/src/ppersist.{c,h} which are Copyright (C) 2006 Brian Candler
+

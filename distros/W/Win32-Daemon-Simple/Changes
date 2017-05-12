@@ -1,0 +1,25 @@
+Revision history for Perl extension Win32::Daemon::Simple.
+
+0.1.0  Thu Oct 31 19:28 2002 (CET)
+	- original version
+
+0.1.2  Tue Nov 5 14:46 2002 (CET)
+	- a few small tuneups
+	- changed the way param_modify handlers report invalid data
+	- added -default and -defaultPARAM options
+
+0.1.3  Tue Nov 5 16:04 2002 (CET)
+	- fixed ticking
+
+0.2.2	Wed Feb 26, 2003 (CET)
+	- changed the format of datestamps
+	- added more commandline options
+
+0.2.5 Mon Apr 7, 2003
+	- added support for multiple services running the same script/executable
+	- added service options setting (-service:user, -service:interactive, ...)
+	- the service prints the old value plus the error message if a param_modify=> handler dies
+	- fixed a bug causing incorrect DoEvents() handler to be called when the service is unpaused
+
+0.2.6 Sun Mar 14, 2004
+	- added a check for Win32::Registry 0.08 or my patch

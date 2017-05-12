@@ -1,0 +1,80 @@
+WWW::Scripter, version 0.032 (alpha)
+
+For scripting web sites that have scripts
+
+This is a subclass of WWW::Mechanize that uses the W3C DOM and pro-
+vides scripting support.
+
+
+RECENT CHANGES
+
+See the Changes file for the long version.
+
+0.032
+-----
+• Minor documentation fixes,  with thanks to Jim Keenan  [rt.cpan.org
+  #89070].
+• Links to fragments on data URL pages now work.
+
+0.031
+-----
+WWW::Scripter no longer fails to load if a sub named ‘::’ exists.
+
+0.030
+-----
+• The "content"  method no longer  fails when  "dom_enabled" has been
+  unset [rt.cpan.org #84639].
+• The "content"  method  now returns  the  correct content  when  the
+  request chain  contains  both  server-  and  client-side  redirects
+  [rt.cpan.org #84472].
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install WWW::Scripter"
+
+    [sudo] cpan WWW::Scripter
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+PREREQUISITES
+
+This module requires  perl  5.8.3 or higher (5.8.4  or  higher  recom-
+mended)  and the following modules,  which can be found on the  CPAN:
+
+  HTML::DOM 0.053 or higher
+  LWP 5.77 or higher
+  URI
+  WWW::Mechanize 1.2 or higher
+
+If you are using perl 5.8.x, you will also need:
+
+  Tie::RefHash::Weak 0.08
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc WWW::Scripter
+
+Or try using man (it's faster, in my experience):
+
+    man WWW::Scripter
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-16 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

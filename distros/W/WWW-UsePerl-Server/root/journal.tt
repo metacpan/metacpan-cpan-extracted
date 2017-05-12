@@ -1,0 +1,24 @@
+[% page.title = 'use.perl.org journal of ' _ user.nickname _ ': ' _
+journal.description %]
+
+<div class="container">
+
+<div class="row">
+
+<div class="span4">
+<h1>[% journal.description | html  %]</h1>
+<h2><a href="[% c.uri_for('~' _ user.nickname _ '/' ) %]">[% user.nickname |
+        html %]</a> on [% journal.date | html %]</h2>
+</div> <!-- /span4 -->
+
+
+<div class="span8">
+<p>[% journal.article_html %]</p>
+
+[% INCLUDE lib/comments.tt %]
+
+</div> <!-- /span8 -->
+
+</div> <!-- row -->
+</div> <!-- /container -->
+

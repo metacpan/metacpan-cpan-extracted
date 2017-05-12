@@ -1,0 +1,85 @@
+WebService-Face
+
+******************* Caution : Work in progress !!! ******************
+The API isn't fully covered, the module is barely usable yet.
+
+API change : All params now passed through hashref (for consistency)
+
+    faces_xxxt() methods 
+    tags_xxx() methods 
+    account_xxx() methods 
+    
+now require a hashref as parameter
+
+*********************************************************************
+
+This module aims to provide a high-level interface to
+the Face.com face recognition REST API.
+
+
+Face recognition scenario :
+
+    # First submit pictures
+    @tags = $client->faces_detect( { urls => "http://img.clubic.com/03520176-photo-kevin-polizzi-fondateur-jaguar-network.jpg,http://media.linkedin.com/mpr/pub/image-ydXbyfluDqrF4odQH8fDyBF07ONcpJdQHNaYyXk1s4K8Dk6Q/kevin-polizzi.jpg,http://experts-it.fr/files/2011/01/Jaguar-Kevin-Polizzi.jpg,http://www.jaguar-network.com/jn/templates/images/img57.jpg" } );
+    
+    # Then save the tags id with the associated user id
+    my $ids = join ",", map {$_->tid} @tags;
+    my @st = $client->tags_save( { tids => $ids,uid => 'kevin.polizzi@face-client-perl' } );
+
+    # Train for the use
+    $client->faces_train( { uids => 'kevin.polizzi@face-client-perl' } );
+
+    # From now on, you can try to recognize user on urL
+    @tags = $client->faces_recognize( { urls => "http://img.clubic.com/03520176-photo-kevin-polizzi-fondateur-jaguar-network.jpg", uids => 'kevin.polizzi@face-client-perl' } );
+    if ($tags[0]->recognized) {
+        ... 
+    }
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::Face::Client
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Face
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/WebService-Face
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/WebService-Face
+
+    Search CPAN
+        http://search.cpan.org/dist/WebService-Face/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Arnaud (Arhuman) ASSAD
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

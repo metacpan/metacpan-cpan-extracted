@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for Yandex mailhosting'
+author:
+  - 'dctabuyz <dctabuyz@yandex.ru>, Andrei Lukovenko <aluck@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WWW-Yandex-PDD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::ConnCache: 0
+  LWP::UserAgent: 0
+  URI::Escape: 0
+  XML::LibXML: 0
+  perl: 5.01
+version: 0.05

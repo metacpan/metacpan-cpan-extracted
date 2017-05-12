@@ -1,0 +1,16 @@
+Revision history for WWW-GetPageTitle
+
+0.0104  2013-11-09
+        - Minor fixes to comply with specs and Kwalitee game
+        - Added a warning to use URI::Title and that this module
+          might be removed in the future, in favor of URI::Title
+
+0.0103  2011-03-30
+        - Fix a bug where undefined titles would cause a crash
+
+0.0102  2008-10-12
+        - Added a second check for the title
+
+0.0101  2008-10-12
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,10 @@
+* 0.0.2
+
+multiple query facets allowed
+added Test::Pod in testing requirements
+added "provides" section in META
+fixed POD
+
+* 0.0.1
+
+initial release

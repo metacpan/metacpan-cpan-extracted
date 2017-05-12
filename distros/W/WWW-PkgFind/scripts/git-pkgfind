@@ -1,0 +1,185 @@
+#!/bin/sh
+
+# Script to pull patches or tarballs from remote git repositories
+
+usage() {
+    cat <<EOF
+Usage: $0 [-b <BRANCH>] [-c <CLONES_DIR>] [-d <DEST_DIR>]
+          [-e <PATCH_EXT>] [-p <PATCH_PREFIX>] [-r <REPO>] 
+          [-s <SYMLINK_DIR>] [-?] [-h] [-f] [-F] [-T]
+
+Creates a patch (or tarball if -T is specified) from BRANCH of REPO in
+the directory DEST_DIR, named
+"PATCH_PREFIX-<branch_id>-BRANCH.PATCH_EXT".  Will not overwrite an
+existing file by this name, unless the -f option is specified.  A clone
+of the branch will be created and cached in "CLONES_DIR/BRANCH".  The
+cached tree will be reused, if it exists, unless the -F option is
+specified.  <branch_id> is determined from the git clone and will be a
+string beginning with 'g' of the form "g1234abc".  If the 'origin'
+branch is used, then the patch will be named
+"PATCH_PREFIX-origin.PATCH_EXT"
+
+If not specified, the CLONES_DIR and DEST_DIR will be the current
+working directory, PATCH_EXT will be "diff", REPO will be 
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git,
+and PATCH_PREFIX will be "linux".  BRANCH defaults to "origin".
+
+If the -s option is specified, a symbolic link to the generated patch
+will also be created in the specified directory.  This link will be
+created with the same filename as the patch, so SYMLINK_DIR must not
+be the same as DEST_DIR.
+
+Each of these parameters may also be provided as environment variables,
+prefixed by PKGFIND_.  E.g., PKGFIND_BRANCH.
+
+Example:
+  $0 -p linux \\
+     -r git://linux-nfs.org/~bfields/exports/linux.git \\
+     -b nfs-server-stable \\
+     -d /testing/packages/nfsv4/ \\
+     -s /testing/packages/QUEUE/ \\
+     -c /var/cache/git
+EOF
+    exit $1
+}
+
+CLONES_DIR=${PKGFIND_CLONES_DIR:-"."}
+PATCH_PREFIX=${PKGFIND_PATCH_PREFIX:-"linux"}
+REPO=${PKGFIND_REPO:-"git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git"}
+BRANCH=${PKGFIND_BRANCH:-"origin"}
+PATCH_EXT=${PKGFIND_PATCH_EXT:-"diff"}
+DEST_DIR=${PKGFIND_DEST_DIR:-"$PWD"}
+SYMLINK_DIR=${PKGFIND_SYMLINK_DIR:-""}
+FORCE_PATCH_GENERATION=0
+FORCE_RECLONE=0
+TARBALL=0
+
+while getopts "b:c:d:e:p:r:s:FT\?" opt; do
+    case $opt in
+    b) BRANCH=$OPTARG ;;
+    c) CLONES_DIR=$OPTARG ;;
+    d) DEST_DIR=$OPTARG ;;
+    e) PATCH_EXT=$OPTARG ;;
+    f) FORCE_PATCH_GENERATION=1 ;;
+    p) PATCH_PREFIX=$OPTARG ;;
+    r) REPO=$OPTARG ;;
+    s) SYMLINK_DIR=$OPTARG ;;
+    F) FORCE_RECLONE=1 ;;
+    T) TARBALL=1 ;;
+    \?) usage 1 ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+if [ ! -w $CLONES_DIR ]; then
+    echo "ERROR:  '$CLONES_DIR' is not writable"
+    exit 1
+fi
+
+# We will cache the cloned tree under $BRANCH
+if [ $FORCE_RECLONE -eq 1 ]; then
+   if [ -e "$CLONES_DIR/$BRANCH" ]; then
+       echo "Removing existing '$CLONES_DIR/$BRANCH'"
+       rm -rf "$CLONES_DIR/$BRANCH"
+       if [ $? -ne 0 ]; then
+           echo "ERROR:  Could not rm '$CLONES_DIR/$BRANCH'"
+           exit 1
+       fi
+   fi
+fi
+
+cd $CLONES_DIR
+if [ $? -ne 0 ]; then
+    echo "ERROR:  Could not cd to '$CLONES_DIR'"
+    exit 1
+fi
+
+if [ ! -d "$CLONES_DIR/$BRANCH" ]; then
+   echo "Cloning $REPO"
+   git clone $REPO $BRANCH
+   if [ $? -ne 0 ]; then
+       echo "ERROR:  Could not clone $REPO" 
+       exit 1
+   fi
+fi
+
+cd "$CLONES_DIR/$BRANCH"
+if [ $? -ne 0 ]; then
+    echo "ERROR:  Could not cd to '$CLONES_DIR/$BRANCH'"
+    exit 1
+fi
+
+if [ $TARBALL -eq 1 ]; then
+    # Create a tarball of the tip of the branch
+    git tar-tree $BRANCH
+    if [ $? -ne 0 ]; then
+        echo "ERROR:  Could not create tarball in '$DEST_DIR'"
+        exit 1
+    fi
+fi
+
+if [ "$BRANCH" != "origin" ]; then
+    echo "git fetch --force origin $BRANCH:$BRANCH"
+    fetch_output=`git fetch --force origin $BRANCH:$BRANCH 2>&1`
+    if [ $? -ne 0 ]; then
+        echo "ERROR:  Could not switch to origin for $BRANCH"
+        exit 1
+    fi
+    echo "Fetch returned:  $fetch_output"
+else
+    echo "TODO:  Should call git-fetch here..."
+fi
+
+echo "git describe $BRANCH"
+BRANCH_ID=`git describe $BRANCH`
+BRANCH_DESC="-$BRANCH"
+if [ "$BRANCH" == "origin" ]; then
+    BRANCH_ID=$BRANCH
+    BRANCH_DESC=""
+elif [ -z "$BRANCH_ID" ]; then
+    echo "ERROR:  Could not determine branch id"
+    exit 1
+fi
+
+# Strip off the -extraversion portion
+BASE=`echo $BRANCH_ID | sed "s/-g[a-z0-9]*$//"`
+
+# Strip off leading 'v' if necessary
+BRANCH_ID=`echo $BRANCH_ID | sed "s/^v//"`
+
+PATCH="$PATCH_PREFIX-$BRANCH_ID$BRANCH_DESC.$PATCH_EXT"
+
+if [ -e $DEST_DIR/$PATCH ]; then
+    if [ $FORCE_PATCH_GENERATION -eq 0 ]; then
+        echo "Not overwriting existing '$DEST_DIR/$PATCH'.  Use -f to force."
+        exit 10
+    else
+        echo "WARNING:  Overwriting existing '$DEST_DIR/$PATCH'"
+    fi
+fi
+
+# Get the diff between base and the tip of the branch
+echo "git diff $BASE $BRANCH > $DEST_DIR/$PATCH"
+git diff $BASE $BRANCH > $DEST_DIR/$PATCH
+if [ $? -ne 0 ]; then
+    echo "ERROR:  Could not create patch '$DEST_DIR/$PATCH'"
+    exit 1
+fi
+
+if [ -s "$DEST_DIR/$PATCH" ]; then
+    echo "$PATCH"
+    if [ ! -z "$SYMLINK_DIR" ]; then
+        echo "Symlinking '$DEST_DIR/$PATCH' to '$SYMLINK_DIR/$PATCH'"
+        if [ "$SYMLINK_DIR" == "$DEST_DIR" ]; then
+            echo "ERROR:  Symlink dir must be different than dest_dir"
+        else
+            ln -s $DEST_DIR/$PATCH $SYMLINK_DIR/$PATCH
+        fi
+    fi
+elif [ -f "$DEST_DIR/$PATCH" ]; then
+    echo "no diff available"
+    rm "$DEST_DIR/$PATCH"
+fi
+
+exit 0
+

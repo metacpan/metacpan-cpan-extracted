@@ -1,0 +1,18 @@
+Revision history for WWW-CheckHTML
+
+0.05    2013-11-17
+        - Updated CheckHTML.pm POD
+
+0.04    2013-10-20
+        - Updated t/CheckHTML.t planned test count
+
+0.03    2013-10-19
+        - Updated to accept path variable for yaml configuration file 
+
+0.02    2013-09-14
+        - Updated timeout logic.
+        - Updated Makefile dependencies.
+
+0.01    2013-09-09
+        - First version, released on an unsuspecting world.
+

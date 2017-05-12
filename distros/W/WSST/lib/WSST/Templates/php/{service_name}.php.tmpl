@@ -1,0 +1,127 @@
+<?php
+
+[% INCLUDE inc_file_header.tmpl class_name=package_name -%]
+
+require_once 'PEAR.php';
+
+require_once '[% package_dir %]/Factory.php';
+require_once '[% package_dir %]/Request.php';
+require_once '[% package_dir %]/Response.php';
+
+[% INCLUDE inc_class_header.tmpl class_title="User interface class for accessing Web Service \"$title\"" -%]
+class [% package_name %]
+{
+    /**
+     * Factory object
+     * 
+     * @access private
+     * @var object
+     */
+    var $_fac = null;
+
+    /**
+     * Common parameters
+     * 
+     * @access private
+     * @var array
+     */
+    var $_params;
+
+    /**
+     * Constructor
+     *
+     * @access public
+     * @param array $params common parameters
+     * @param object $fac Factory object
+     */
+    function [% package_name %]($params = array(), $fac = null)
+    {
+        if (is_null($fac)) {
+            $fac =& new [% package_name %]_Factory();
+        }
+        $this->_fac =& $fac;
+        $this->_params = $params;
+    }
+    
+    /**
+     * Get factory object
+     * 
+     * @access public
+     * @return object Factory object
+     */
+    function &getFactory()
+    {
+        return $this->_fac;
+    }
+
+    /**
+     * Set factory object
+     * 
+     * @access public
+     * @param object $fac Factory object
+     * @return void
+     */
+    function setFactory(&$fac)
+    {
+        $this->_fac =& $fac;
+    }
+    
+    /**
+     * Get common parameters
+     * 
+     * @access public
+     * @return array common parameters
+     */
+    function getCommonParams()
+    {
+        return $this->_params;
+    }
+    
+    /**
+     * Set common parameters
+     * 
+     * @access public
+     * @param array $params common parameters
+     * @return void
+     */
+    function setCommonParams($params)
+    {
+        $this->_params = $params;
+    }
+    
+    /**
+     * Add common parameters
+     * 
+     * @access public
+     * @param array $params common parameters
+     * @return void
+     */
+    function addCommonParams($params)
+    {
+        $this->_params = array_merge($this->_params, $params);
+    }
+[% FOREACH method = methods -%]
+
+    /**
+     * Makes a request for [% method.name %] API.
+     * See [% package_name %]_[% method.class_name %] for details.
+     *
+     * @access public
+     * @param array $params parameters
+     * @return mixed [% package_name %]_Method|PEAR_Error
+     * @see [% package_name %]_[% method.class_name %]
+     */
+    function &[% method.interface_name %]($params = array())
+    {
+        require_once '[% package_dir %]/Method/[% method.class_name %].php';
+        $method =& new [% package_name %]_Method_[% method.class_name %]($this->_fac);
+        $res =& $method->execute(array_merge($this->_params, $params));
+        if (PEAR::isError($res)) {
+            return $res;
+        }
+        return $method;
+    }
+[% END -%]
+}
+
+?>

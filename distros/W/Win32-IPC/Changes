@@ -1,0 +1,174 @@
+Revision history for the Perl Win32-IPC modules.
+
+1.11  2014-11-15
+	- There are no functional changes in 1.11.
+
+	- Change build process to use Module::Metadata instead of deprecated
+	  Module::Build::ModuleInfo (Klaus Eichner, GitHub#1)
+
+1.10  2014-08-30
+	- There are no functional changes in 1.10.
+
+	- Release tests moved to xt/
+
+1.09  2012-01-14
+	- There are no functional changes in 1.09.
+
+	- Document incompatibility with signal handlers.
+
+	- The tools directory has been renamed inc for consistency
+	  with other CPAN distributions.
+
+1.08  2010-12-11
+	- Localize $@ when using eval
+
+	- Includes a CPAN Meta v2 META.json file.
+
+	- The passthrough Makefile.PL has been removed.
+
+1.07  2008-04-16
+	- There are no significant functional changes in 1.07.	If
+	  you've already installed 1.06, don't bother upgrading.
+
+	- Give a more useful error message if Module::Build is not installed
+
+	- Don't bother to test $! after fetching constant('INFINITE')
+
+	- Added LICENSE AND COPYRIGHT section to documentation
+
+1.06  2008-04-15
+	- *** INCOMPATIBLE CHANGE ***
+
+	  Passing undef as the value of an optional parameter is now
+	  the same as omitting that parameter.	In previous versions,
+	  undef was interpreted as either the empty string or 0 (along
+	  with a warning about "Use of uninitialized value...").
+
+	  In particular, if you pass undef as the timeout, it now
+	  means INFINITE, but to previous versions it meant 0.
+
+	- The modules now use XSLoader instead of DynaLoader.
+
+	- Copied Yves Orton's fix (from Win32::ChangeNotify 1.04) so
+	  "a true value" no longer has to be a non-zero number to all
+	  relevant places.
+
+	- Win32::IPC and its subclasses are now distributed separately
+	  from libwin32 (which has been broken up).  Prior to this
+	  release, each module had its own Changes file, and their
+	  version numbers were not synchronized.  Those files are
+	  appended below.
+
+
+======================================================================
+Revision history for Perl extension Win32::IPC.
+
+1.03  2003-07-11
+	- revised how WaitForMultiple handles non-Win32::IPC objects
+
+1.02  2000-05-22
+	- support for building under Perl v5.6.0
+
+1.01  1998-09-15
+	- use New/Safefree instead of safemalloc/safefree
+
+1.00  1998-02-06
+	- Rewritten from ActiveWare version by Christopher J. Madsen
+	- Simplified code; converted from C++ to C
+	- Fixed fatal bugs in WaitForMultipleObjects
+	- New interface using lower-case method names
+
+0.03  1998-02-02
+	- added Win32::Event to WaitForMultipleObjects
+
+0.02  1997-07-04
+	- fixed refs to obsolete "ChangeNotification"
+
+0.01  1997-04-05
+	- original version; created by h2xs 1.18
+
+
+======================================================================
+Revision history for Perl extension Win32::ChangeNotify.
+
+1.05  2005-09-06
+	- Remove USING_WIDE() code and fix cygwin compiler warnings
+
+1.04  2002-12-18
+	- Fixed $subtree handling. Up till now it had to be a true numeric value
+	  contrary to what the docs say "a true value...." (Yves Orton)
+
+1.03  2000-05-22
+        - support for passing Unicode strings to new() method
+
+1.02  1999-06-13
+	- Bug fix to AUTOLOAD (FILE_NOTIFY_CHANGE_* constants now work)
+	  (courtesy Christopher J. Madsen)
+
+1.01  1998-04-26
+	- Bug fixes to `new' and `close' methods (courtesy
+	  Chris Madsen)
+
+1.00  1998-02-06
+	- Rewritten from ActiveWare version by Christopher J. Madsen
+	- Simplified code; converted from C++ to C
+	- New interface using lower-case method names
+
+0.01  1997-04-05
+	- original version; created by h2xs 1.18
+
+
+======================================================================
+Revision history for Perl extension Win32::Event.
+
+1.01  2000-05-22
+	- support for passing Unicode strings to the new() and open() methods
+	  under Perl 5.6.0 (thanks to Doug Lankshear <doug@lankshear.net>)
+
+1.00  1998-02-06
+	- Rewritten from ActiveWare version by Christopher J. Madsen
+	- Simplified code; converted from C++ to C
+	- New interface using lower-case method names
+
+0.01  1998-02-02
+	- original version; copied from Win32::Mutex 0.01 (libwin32 0.9)
+
+
+======================================================================
+Revision history for Perl extension Win32::Mutex.
+
+1.02  2000-05-22
+	- support for passing Unicode strings to the new() and open()
+	  methods (thanks to Doug Lankshear <doug@lankshear.net>)
+
+1.01  1998-02-08
+	- Added Open() function for compat
+
+1.00  1998-02-06
+	- Rewritten from ActiveWare version by Christopher J. Madsen
+	- Simplified code; converted from C++ to C
+	- New interface using lower-case method names
+
+0.01  1997-04-05
+	- original version; created by h2xs 1.18
+
+
+======================================================================
+Revision history for Perl extension Win32::Semaphore.
+
+1.02  2000-05-22
+	- support for passing Unicode strings to new() and open() methods
+	  (Doug Lankshear <doug@lankshear.net>)
+
+1.01  1998-02-08
+	- Add Open() function for compat
+
+1.00  1998-02-06
+	- Rewritten from ActiveWare version by Christopher J. Madsen
+	- Simplified code; converted from C++ to C
+	- New interface using lower-case method names
+	- Created some tests in test.pl
+
+0.01  1997-04-05
+	- original version; created by h2xs 1.18
+	- imported Activeware version

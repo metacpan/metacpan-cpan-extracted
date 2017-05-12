@@ -1,0 +1,8 @@
+Revision history for perl module WWW-Saucelabs
+
+0.0201 2016-03-02
+ - Adjust API schema due to changes in Knork dep
+ - Remove .build files from tarball
+
+0.01 2014-02-07
+ - Partial spec implementation of Saucelabs API

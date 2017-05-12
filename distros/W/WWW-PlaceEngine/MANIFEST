@@ -1,0 +1,6 @@
+Changes
+lib/WWW/PlaceEngine.pm
+Makefile.PL
+MANIFEST
+t/WWW-PlaceEngine.t
+META.yml                                 Module meta-data (added by MakeMaker)

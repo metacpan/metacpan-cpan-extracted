@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Win32::Internet Reference - Appendices</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white"
+      onLoad="window.defaultStatus=document.title; return true">
+
+
+<FONT FACE=Arial><H2><A NAME=WinInet>Microsoft's WinInet Documentation</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+Complete documentation for the Microsoft Win32 Internet Functions can be found, in both HTML and zipped Word format, at this address:
+<P>
+<A TARGET=_top HREF="http://www.microsoft.com/intdev/sdk/docs/wininet/">http://www.microsoft.com/intdev/sdk/docs/wininet/</A>
+<P>
+
+
+<FONT FACE=Arial><H2><A NAME=Functions>Functions Table</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+This table reports the correspondence between the functions offered by WININET.DLL and their implementation
+in the Win32::Internet extension.
+Functions showing a "---" are not currently implemented. Functions enclosed in parens <B>( )</B> 
+aren't implemented straightforwardly, but in a higher-level routine, eg. together with other functions. 
+
+<P>
+
+<TABLE>
+<TD><FONT FACE=Arial SIZE=2><B>WININET.DLL</TD>
+<TD><FONT FACE=Arial SIZE=2><B>Win32::Internet</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetOpen</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#new">new Win32::Internet</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetConnect</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#FTP">FTP</A> / <A HREF="reference.html#HTTP">HTTP</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetCloseHandle</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Close">Close</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetQueryOption</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#QueryOption">QueryOption</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetSetOption</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#SetOption">SetOption</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetSetOptionEx</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetSetStatusCallback</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#SetStatusCallback">SetStatusCallback</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetStatusCallback</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#GetStatusCallback">GetStatusCallback</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetConfirmZoneCrossing</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetTimeFromSystemTime</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#TimeConvert">TimeConvert</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetTimeToSystemTime</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#TimeConvert">TimeConvert</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetAttemptConnect</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetReadFile</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#ReadFile">ReadFile</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetSetFilePointer</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetFindNextFile</TD>
+<TD><FONT FACE=Arial SIZE=2><B>(</B><A HREF="reference.html#List">List</A><B>)</B></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetQueryDataAvailable</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#QueryDataAvailable">QueryDataAvailable</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetGetLastResponseInfo</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#GetResponse">GetResponse</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetWriteFile</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetCrackUrl</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#CrackURL">CrackURL</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetCreateUrl</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#CreateURL">CreateURL</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetCanonicalizeUrl</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#CanonicalizeURL">CanonicalizeURL</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetCombineUrl</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#CombineURL">CombineURL</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetOpenUrl</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#OpenURL">OpenURL</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpFindFirstFile</TD>
+<TD><FONT FACE=Arial SIZE=2><B>(</B><A HREF="#List">List</A><B>)</B></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpGetFile</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Get">Get</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpPutFile</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Put">Put</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpDeleteFile</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Delete">Delete</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpRenameFile</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Rename">Rename</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpOpenFile</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpCreateDirectory</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Mkdir">Mkdir</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpRemoveDirectory</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Rmdir">Rmdir</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpSetCurrentDirectory</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Cd">Cd</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>FtpGetCurrentDirectory</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#Pwd">Pwd</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>HttpOpenRequest</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#OpenRequest">OpenRequest</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>HttpAddRequestHeaders</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#AddHeader">AddHeader</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>HttpSendRequest</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#SendRequest">SendRequest</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>HttpQueryInfo</TD>
+<TD><FONT FACE=Arial SIZE=2><A HREF="reference.html#QueryInfo">QueryInfo</A></TD>
+<TR>
+<TD><FONT FACE=Arial SIZE=2>InternetErrorDlg</TD>
+<TD><FONT FACE=Arial SIZE=2>---</TD>
+
+</TABLE>
+<P>
+Actually, I don't plan to add support for Gopher, Cookie and Cache functions.
+I will if there will be consistent requests to do so.
+<P>
+There are a number of higher-level functions in the Win32::Internet that simplify 
+some usual procedures, calling more that one WININET API function.
+This table reports those functions and the relative WININET functions they use.
+<P>
+
+<TABLE>
+<TD><FONT FACE=Arial SIZE=2><B>Win32::Internet</TD>
+<TD><FONT FACE=Arial SIZE=2><B>WININET.DLL</TD>
+<TR>
+<TD VALIGN=top><FONT FACE=Arial SIZE=2><A HREF="reference.html#FetchURL">FetchURL</TD>
+<TD><FONT FACE=Arial SIZE=2>InternetOpenUrl<BR>InternetQueryDataAvailable<BR>InternetReadFile<BR>InternetCloseHandle</TD>
+<TR>
+<TD VALIGN=top><FONT FACE=Arial SIZE=2><A HREF="reference.html#ReadEntireFile">ReadEntireFile</A></TD>
+<TD><FONT FACE=Arial SIZE=2>InternetQueryDataAvailable<BR>InternetReadFile</TD>
+<TR>
+<TD VALIGN=top><FONT FACE=Arial SIZE=2><A HREF="reference.html#Request">Request</A></TD>
+<TD><FONT FACE=Arial SIZE=2>HttpOpenRequest<BR>HttpSendRequest<BR>HttpQueryInfo<BR>InternetQueryDataAvailable<BR>InternetReadFile<BR>InternetCloseHandle</TD>
+<TR>
+<TD VALIGN=top><FONT FACE=Arial SIZE=2><A HREF="reference.html#List">List</A></TD>
+<TD><FONT FACE=Arial SIZE=2>FtpFindFirstFile<BR>InternetFindNextFile</TD>
+
+</TABLE>
+</FONT>
+<P>
+
+<FONT FACE=Arial><H2><A NAME=Constants>Constants</H2></FONT>
+
+<FONT FACE=Arial SIZE=2>
+Those are the constants exported by the package in the main namespace 
+(eg. you can use them in your scripts); 
+for their meaning and proper use, refer to the 
+<A HREF="append.html#WinInet">Microsoft Win32 Internet Functions</A> document.
+<P>
+</FONT></FONT><PRE>
+    HTTP_ADDREQ_FLAG_ADD
+    HTTP_ADDREQ_FLAG_REPLACE
+    HTTP_QUERY_ALLOW
+    HTTP_QUERY_CONTENT_DESCRIPTION
+    HTTP_QUERY_CONTENT_ID
+    HTTP_QUERY_CONTENT_LENGTH
+    HTTP_QUERY_CONTENT_TRANSFER_ENCODING
+    HTTP_QUERY_CONTENT_TYPE
+    HTTP_QUERY_COST
+    HTTP_QUERY_CUSTOM
+    HTTP_QUERY_DATE
+    HTTP_QUERY_DERIVED_FROM
+    HTTP_QUERY_EXPIRES
+    HTTP_QUERY_FLAG_REQUEST_HEADERS
+    HTTP_QUERY_FLAG_SYSTEMTIME
+    HTTP_QUERY_LANGUAGE
+    HTTP_QUERY_LAST_MODIFIED
+    HTTP_QUERY_MESSAGE_ID
+    HTTP_QUERY_MIME_VERSION
+    HTTP_QUERY_PRAGMA
+    HTTP_QUERY_PUBLIC
+    HTTP_QUERY_RAW_HEADERS
+    HTTP_QUERY_RAW_HEADERS_CRLF
+    HTTP_QUERY_REQUEST_METHOD
+    HTTP_QUERY_SERVER
+    HTTP_QUERY_STATUS_CODE
+    HTTP_QUERY_STATUS_TEXT
+    HTTP_QUERY_URI
+    HTTP_QUERY_USER_AGENT
+    HTTP_QUERY_VERSION
+    HTTP_QUERY_WWW_LINK
+    ICU_BROWSER_MODE
+    ICU_DECODE
+    ICU_ENCODE_SPACES_ONLY
+    ICU_ESCAPE
+    ICU_NO_ENCODE
+    ICU_NO_META
+    ICU_USERNAME
+    INTERNET_CONNECT_FLAG_PASSIVE
+    INTERNET_FLAG_ASYNC
+    INTERNET_FLAG_HYPERLINK
+    INTERNET_FLAG_KEEP_CONNECTION
+    INTERNET_FLAG_MAKE_PERSISTENT
+    INTERNET_FLAG_NO_AUTH
+    INTERNET_FLAG_NO_AUTO_REDIRECT
+    INTERNET_FLAG_NO_CACHE_WRITE
+    INTERNET_FLAG_NO_COOKIES
+    INTERNET_FLAG_READ_PREFETCH
+    INTERNET_FLAG_RELOAD
+    INTERNET_FLAG_RESYNCHRONIZE
+    INTERNET_FLAG_TRANSFER_ASCII
+    INTERNET_FLAG_TRANSFER_BINARY
+    INTERNET_INVALID_PORT_NUMBER
+    INTERNET_INVALID_STATUS_CALLBACK
+    INTERNET_OPEN_TYPE_DIRECT
+    INTERNET_OPEN_TYPE_PROXY
+    INTERNET_OPEN_TYPE_PROXY_PRECONFIG
+    INTERNET_OPTION_CONNECT_BACKOFF
+    INTERNET_OPTION_CONNECT_RETRIES
+    INTERNET_OPTION_CONNECT_TIMEOUT
+    INTERNET_OPTION_CONTROL_SEND_TIMEOUT
+    INTERNET_OPTION_CONTROL_RECEIVE_TIMEOUT
+    INTERNET_OPTION_DATA_SEND_TIMEOUT
+    INTERNET_OPTION_DATA_RECEIVE_TIMEOUT
+    INTERNET_OPTION_HANDLE_TYPE
+    INTERNET_OPTION_LISTEN_TIMEOUT
+    INTERNET_OPTION_PASSWORD
+    INTERNET_OPTION_READ_BUFFER_SIZE
+    INTERNET_OPTION_USER_AGENT
+    INTERNET_OPTION_USERNAME
+    INTERNET_OPTION_VERSION
+    INTERNET_OPTION_WRITE_BUFFER_SIZE
+    INTERNET_SERVICE_FTP
+    INTERNET_SERVICE_GOPHER
+    INTERNET_SERVICE_HTTP
+    INTERNET_STATUS_CLOSING_CONNECTION
+    INTERNET_STATUS_CONNECTED_TO_SERVER    
+    INTERNET_STATUS_CONNECTING_TO_SERVER
+    INTERNET_STATUS_CONNECTION_CLOSED
+    INTERNET_STATUS_HANDLE_CLOSING
+    INTERNET_STATUS_HANDLE_CREATED
+    INTERNET_STATUS_NAME_RESOLVED
+    INTERNET_STATUS_RECEIVING_RESPONSE
+    INTERNET_STATUS_REDIRECT    
+    INTERNET_STATUS_REQUEST_COMPLETE    
+    INTERNET_STATUS_REQUEST_SENT    
+    INTERNET_STATUS_RESOLVING_NAME    
+    INTERNET_STATUS_RESPONSE_RECEIVED
+    INTERNET_STATUS_SENDING_REQUEST    
+</PRE>
+<P>
+
+<HR>
+
+<FONT FACE=Arial SIZE=1>
+10 Jan 1997, Aldo Calpini 
+&lt;<A HREF="mailto:dada@perl.it">dada@perl.it</A>&gt;
+</FONT><P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,13 @@
+0.03      2013-01-20 21:33:30 Europe/London
+
+- Loosen type constraints
+- Support non-free API attributes
+- Bug fix for url_metrics API call to continue returning data
+
+0.02      2012-05-14 23:52:42 Europe/London
+
+- Fixed a bug where the mozrank and mozrank_raw was mixed up
+
+0.01      2011-07-03 13:59:58 Europe/London
+
+- Initial release of SEOmoz API wrapper

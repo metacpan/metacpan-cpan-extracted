@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WebService-Postcodeanywhere-BACS-REST.t
+lib/WebService/Postcodeanywhere/BACS/REST.pm
+examples/get_bacs_details.pl
+META.yml                                 Module meta-data (added by MakeMaker)

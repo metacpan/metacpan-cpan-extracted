@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use WWW::Selenium::Utils qw(generate_suite);
+use Getopt::Long;
+
+my $quiet = 0;
+my $base;
+my $perdir;
+my $index;
+GetOptions( 
+            'quiet'      => \$quiet,
+            'base=s'     => \$base,
+            'd|perdir'   => \$perdir,
+            'index=s'    => \$index,
+          ) or usage();
+
+my $testdir = shift;
+
+generate_suite( test_dir  => $testdir,
+                verbose   => !$quiet,
+                base_href => $base,
+                perdir    => $perdir,
+                index     => $index,
+              );
+
+
+sub usage {
+    my $msg = shift || '';
+    die <<EOT;
+$msg
+USAGE: $0 [options] [/path/to/selenium/tests]
+
+Options:
+ --quiet        Won't print informative output
+ --base=<base>  Sets the base href for generated html files
+ -d or --perdir Creates a seperate TestSuite.html for each 
+                sub-directory.
+ --index=<file> Create a html index of all the TestSuite.html files
+
+This script will convert any .wiki files in the tests/ directory
+to regular .html format selenium test files.  It will then put 
+all tests/*.html files into tests/TestSuite.html
+
+The TestSuite.html file contains links to all of the test files.  
+The files are sorted by filename in the TestSuite.  However, the
+TestSuite will show the title of the test file instead of the
+filename.  This allows you to manipulate the ordering of your 
+testcases without changing the user-visible names.
+
+The path to the selenium tests can be read from a config file.  
+The default config file location is PREFIX/etc/selutils.conf,
+where PREFIX is perl's install prefix.  The prefix can also be 
+specified in the \$SELUTILS_ROOT environment variable.
+
+EOT
+}

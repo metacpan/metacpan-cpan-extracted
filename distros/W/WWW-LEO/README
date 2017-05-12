@@ -1,0 +1,64 @@
+WWW/LEO version 0.01
+====================
+
+The WWW::LEO module provides an object-oriented interface to the
+English-German online dictionary at http://dict.leo.org.  That is, you
+can query for search expressions and get the results.  See the module
+documentation and the included sample client (eg/leo.pl) for
+information on how to use this thing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You'll need to be online to 'make test'.
+
+DEPENDENCIES
+
+This module requires these other modules available from CPAN:
+
+  o LWP::UserAgent (comes with LWP)
+  o HTML::TokeParser (comes with HTML::Parser)
+  o URI::Escape (comes with URI)
+
+For the sample client (eg/leo.pl), additional module are necessary:
+
+  o Term::ReadKey
+  o Term::ReadLine::Gnu (not required, but recommended for best
+    functionality)
+
+SUPPORT
+
+Please contact the current maintainer of this module to report any
+bugs or suggest changes to this module:
+
+  Jörg Ziefle <ziefle@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jörg Ziefle
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+THANKS
+
+... to the guys at LEO to provide this nice dictionary.
+... to the folks that filled it up with entries. :)
+
+REFERENCES
+
+  o The dictionary itself at http://dict.leo.org
+  o Other Perl implementations of LEO clients are available (at the
+    time of writing) at:
+    - ftp://ftp.daemon.de/scip/Scripts/leo
+    - http://cgi.xwolf.de/perl/leo.txt
+    - http://scripts.irssi.de/html/leodict.pl.html (this is a plugin
+      script for the irssi IRC client, see http://www.irssi.org)
+
+vim:tw=70

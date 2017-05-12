@@ -1,0 +1,42 @@
+This is WebSource version 2.4
+-------------------------------------------------------------------
+Bugs :
+
+- Update tests
+
+Wishes :
+
+- Build a description on the fly in the command line
+- Load/Save network state to disk (in order to stop and restart network)
+- Use cleaner enveloppes (all XML/DOM ?)
+- File based data sharing
+- Convert WebSource 1 descriptions into WebSource 2 descriptions
+- Create more source descriptions
+- Create a WebSource::Error class to handle errors
+- Make query building more flexible
+- Complete transformation from dia to wsd allowing graphical
+  construction of source descriptions
+- Add a WebSource::Queue modules which allows to control the
+  order in which values come out using a priority meta-value
+- Module composition : define in one file a module m1 and
+  be able to use it in another module m2
+-------------------------------------------------------------------
+Don't hesitate to give me some suggestions
+
+
+The following things are now done
+
+- Define an easy way to do filtering (by using tests ?)
+  => See the module WebSource::Filter::tests
+
+- Create a WebSource::Param class containing shared parameters
+  => now wsd files can contain a <ws:options> element which defines
+     options which can be passed to this task
+
+     these values can be used by any sub-task by using the
+     <ws:set-attribute name="attr-name" value="opt-name" /> element
+     which before building the task adds and attribut tp the parent
+     not of the ws:set-attribut element using the value of
+     opt-name which can be set by passing the appropriate options to
+     the ws-query command.
+

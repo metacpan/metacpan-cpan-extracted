@@ -1,0 +1,8 @@
+Revision history for Perl extension Win32API::Const.
+
+0.011 Sun Oct 10 1998
+	- renamed to Win32API::Const
+
+0.01  Sat Oct  3 18:21:20 1998
+	- original version; created by h2xs 1.18
+

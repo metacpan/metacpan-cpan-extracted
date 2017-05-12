@@ -1,0 +1,46 @@
+1.001     2016-10-24 10:44:09-07:00 America/Los_Angeles
+
+    * Return synthetic false status when json fails to decode
+    * Remove the code for the non-existent (or removed) rewards->take endpoint
+      (HT: Arthur Axel fREW Schmidt)
+    * Return synthetic false status when json fails to decode
+      (HT: Arthur Axel fREW Schmidt)
+
+1.000     2016-08-24 00:09:53-05:00 America/Chicago
+
+    * Switching internals from Furl to LWP::UserAgent for better keepalive
+      and encoding handling. (#4)
+    * Bonusly has made receiver_email and amount deprecated on bonuses and moved
+      these to the reason instead. Therefore, they are now marked as optional.
+      (HT: sjohnston)
+    * Improved internals related to build handling.
+    * Added some more tests and CI via Travis-CI.
+
+0.160291  2016-01-29 08:58:06-06:00 America/Chicago
+
+    * Expanded support to include new parameters and actions using the published
+      documentation on gelato.io.
+    * Added stub POD to service files to point back to Bonusly.pm
+    * Added support for custom_properties in GET requests, e.g., as seen in
+      bonuses.list and users.list
+
+0.160290  2016-01-28 23:38:09-06:00 America/Chicago
+
+    * Moved critical code from the templates to Base.pm and Service.pm in order
+      to make the modules a little easier to maintain.
+    * Added debug mode for Frew.
+    * Added tests. \o/
+    * Moved the API configuration to api.yml, which is used for code generation
+      and for testing.
+    * Added an AUTO-GENERATED FILE warning to the top of auto-generated files.
+    * Bug: Fixed a bug where DELETE method requests were being sent as GET instead.
+    * Bug: Fixed a missing id requirement on users.redemptions.
+
+v0.153420 December 7, 2015
+
+    * Added /user/me support (HT: sjohnston)
+    * Fixed a missing =cut in Bonusly.pm
+
+v0.151580 June 6, 2015
+
+    * Initial release

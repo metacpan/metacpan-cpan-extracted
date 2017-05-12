@@ -1,0 +1,52 @@
+=pod
+
+=head1 Apache Menu
+
+Beim Start des Apache Wizard Menues werden folgende Optionen
+zur Verfuegung gestellt.
+
+=head2 Host Menu
+
+Hier werden Hosts konfiguriert (siehe Host Administration)
+
+=head2 Apache Wizard Preferences
+
+Hier wird die globale Konfiguration mittels folgender Optionen
+festgelegt: 
+
+=over 4
+
+=item I<apache_prefs_basedir> Base Directory of Apache Wizard
+
+Verzeichnis in dem die Daten ueber Hosts, Server, etc... 
+abgelegt werden.
+
+=back
+
+=head1 AUTHORS AND COPYRIGHT
+
+This module is
+
+  Copyright (C) 1999     Jochen Wiedmann
+                         Am Eisteich 9
+                         72555 Metzingen
+                         Germany
+
+                         Email: joe@ispsoft.de
+                         Phone: +49 7123 14887
+
+                 and     Amarendran R. Subramanian
+                         Grundstr. 32
+                         72810 Gomaringen
+                         Germany
+
+                         Email: amar@ispsoft.de
+                         Phone: +49 7072 920696
+
+All Rights Reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+=cut
+

@@ -1,0 +1,106 @@
+<DT><STRONG><A NAME="item_%pages">%pages</A></STRONG><BR>
+<DD>
+The specifications for menus and pages. Menus can be single link or a series
+of drop down menu depending on how you specifiy the page. The page names are
+the keys to the hash and are used as the menu-bar link text. All page files
+are placed in the 'pages' directory.
+<P>FILE NAME SYNTAX:</P>
+<P>Files are named with the 'key' name of the page as the lefthand side and 
+a suffix designating the file's purpose as the right hand side. For the 
+required page 'Home', they are as follows:</P>
+<PRE>
+ # [optional] page used if there are not individual pages
+ # NOTE: neither a Default page or individual page is required
+  Default.meta          # meta text loaded after &lt;title&gt;
+  Default.head          # optional additional &lt;head&gt; text
+                        # that is on every page, end of page
+  Default.top           # optional body text that appears
+                        # on every page before menu-bar
+                        # i.e. logo, etc...
+ # for each individual page
+  Home.meta             # meta text loaded after &lt;title&gt;
+  Home.head             # optional additional &lt;head&gt; text
+  Home.top              # body text that appears before
+                        # menu-bar. i.e. logo, etc...
+  Home.c1               # [optional] column 1 content
+  Home.c2               # [optional] column 2 content
+  Home.cn               # [optional] column 'n' content</PRE>
+<PRE>
+  %pages = (</PRE>
+<PRE>
+  # REQUIRED page
+  #
+        Home    =&gt; {
+  #                     SEE: detailed link format below
+            menu        =&gt; ['Home', 'Page1', 'Page2', 'Page5'],
+  # optional title text - if missing, 'heading' text will be used
+            title       =&gt; 'page title',</PRE>
+<PRE>
+  # optional table row immediately under menu. This allows a &quot;drop&quot;
+  # shadow to be added to the menu bar with a &quot;1&quot; pixel wide image, 'example'
+            menustripe  =&gt; '&lt;img src=&quot;images/stripe1.gif&quot; height=4 width=100%&gt;',</PRE>
+<PRE>
+  # optional
+            heading     =&gt; 'Text under menu, over body text',</PRE>
+<PRE>
+  # number of columns and column width in pixels
+            column      =&gt; [20, 200, 400],    # three columns</PRE>
+<PRE>
+  # optional
+            submenu     =&gt; [qw(Page3 Page4)], # drop down menu</PRE>
+<PRE>
+  # optional trailer bar
+            trailer     =&gt; {</PRE>
+<PRE>
+  # a named page
+                links   =&gt; [qw(Page5 Page6)],</PRE>
+<PRE>
+  # optional right hand side text. if there are no links then the
+  # text will be placed on the left hand side of the trailer bar
+                text    =&gt; 'Copyright 2006, yourname',</PRE>
+<PRE>
+  # optional table row immediately above trailer bar. this allows a &quot;drop&quot;
+  # shadow to be added to trailer bar with a &quot;1&quot; pixel wide image, 'example'
+                top     =&gt; '&lt;img src=&quot;images/stripe2.gif&quot; height=4 width=100%&gt;',</PRE>
+<PRE>
+  # optional table row immediately below trailer bar. This allows a &quot;top&quot; 
+  # shadow to be added to trailer bar with a &quot;1&quot; pixel wide image,  'example'
+                bottom  =&gt; '&lt;img src=&quot;images/stripe1.gif&quot; height=4 width=100%&gt;',
+            },
+        },</PRE>
+<PRE>
+  # next page
+  #
+        Page1   =&gt;      ... same as above
+        },
+  #
+  #     ... and so on</PRE>
+<PRE>
+  # for the auto-generated Sitemap page, there is one additional
+  # specification element...
+  #
+        Sitemap =&gt; {
+                ...
+  # specify the column in which the sitemap should appear
+  # defaults to '1'
+                autocol =&gt; 1,
+                ...
+        },</PRE>
+<PRE>
+  # and for debug... example
+  # load this page segment as source in a single window</PRE>
+<PRE>
+        'Home.top' =&gt; {</PRE>
+<PRE>
+  # copy prototype page from this one page.</PRE>
+<PRE>
+            debug       =&gt; 'Home',</PRE>
+<PRE>
+  # optional location if not in the 'pages' directory
+  #
+            location    =&gt; 'path/to/filename',
+        },
+  );</PRE>
+<P></P></DL>
+<P>
+<HR>

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         WWW-Mixi-OO
+version:      0.03
+version_from: lib/WWW/Mixi/OO.pm
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0
+    Hash::Case::Preserve:          0
+    HTML::Parser:                  0
+    LWP::UserAgent:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

@@ -1,0 +1,25 @@
+Revision history for WWW-Shorten-VGd
+
+0.005     2017-02-06
+    - Cleaned up parsing a bit
+    - Removed some redundant tests
+    - Remove MANIFEST.SKIP file
+    - LWP::Protocol::https requirement
+    - Remove requirement for IO::Socket::SSL
+    - Add LICENSE file to repository
+    - Add CONTRIBUTING.md to repository
+
+0.004     2016-07-06
+    - Updated the build to use [@Starter]
+    - Placed dependencies in cpanfile
+    - Require IO::Socket::SSL now that the site uses HTTPS only
+    - move the live tests to author-only tests
+
+0.003     2011-04-22
+    * Packaging updates
+
+0.002     2011-01-21
+    * Tests are slightly more robust
+
+0.001     2011-01-18
+    * First released version

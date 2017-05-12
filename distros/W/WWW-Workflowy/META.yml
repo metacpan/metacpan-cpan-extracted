@@ -1,0 +1,25 @@
+---
+abstract: 'Faked up API interface to the workflowy.com collaborative outlining webapp'
+author:
+  - 'Scott Walters <scott@slowass.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Workflowy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP: '0.01'
+  LWP::Protocol::https: '0.01'
+  PadWalker: '0.01'
+  autobox: '0.01'
+version: '0.6'

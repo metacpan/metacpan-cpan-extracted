@@ -1,0 +1,22 @@
+---
+name: WWW-ItsABot
+version: 0.01
+author:
+  - 'Jonathan Leto <jonathan@leto.net>'
+abstract: Ask itsabot.com if a Twitter user is a bot
+license: perl
+resources:
+  license: ~
+requires:
+  LWP::Simple: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  WWW::ItsABot:
+    file: lib/WWW/ItsABot.pm
+    version: 0.01
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

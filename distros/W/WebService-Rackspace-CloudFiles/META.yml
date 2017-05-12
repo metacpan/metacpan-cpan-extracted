@@ -1,0 +1,46 @@
+---
+abstract: 'Interface to Rackspace CloudFiles service'
+author:
+  - "Christiaan Kras <ckras@cpan.org>.\r"
+  - 'Christiaan Kras <ckras@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::LWP::UserAgent: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Rackspace-CloudFiles
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Crypt::SSLeay: 0
+  DateTime::Format::HTTP: 0.39
+  Digest::MD5: 0
+  Digest::MD5::File: 0
+  File::Slurp: 0
+  File::stat: 1.0
+  JSON::Any: 1.29
+  LWP: 0
+  LWP::ConnCache: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent::Determined: 0
+  Moo: 2.000000
+  MooX::StrictConstructor: 0
+  Types::Standard: 0
+  URI: 1.59
+  perl: 5.8.8
+resources:
+  bugtracker: http://github.com/Htbaa/WebService-Rackspace-CloudFiles/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Htbaa/WebService-Rackspace-CloudFiles
+version: 2.01

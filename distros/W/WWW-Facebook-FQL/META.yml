@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                WWW-Facebook-FQL
+version:             0.03
+abstract:            Simple interface to Facebook's FQL query language
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Digest::MD5:                   0
+    URI::Escape:                   0
+    WWW::Mechanize:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Sean O'Rourke <seano@cpan.org>

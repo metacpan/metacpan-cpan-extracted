@@ -1,0 +1,35 @@
+=head1 NAME
+
+W3C::SOAP::Manual::XSD
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+L<W3C::SOAP::XSD::Parser> maps XMLSchema Documents to perl/Moose objects. There
+are some limitations in the way this is done but the basic mapping is:
+
+=over 4
+
+=item schema
+
+A common class is created that represents the whole schema, this class includes
+all other classes that are created. The attributes of this class are the
+C<xs:element>s of the XSD
+
+=item xs:element
+
+These are mapped to attributes of the XSD
+
+=item xs:simpleType
+
+These are mapped to MooseX::Types and located in the {BaseClass}::Types module.
+They then need to be imported into modules that need them.
+
+=item xs:complexType
+
+These are mapped to Moose classes under the {BaseClass} namespace
+
+=back
+
+=cut

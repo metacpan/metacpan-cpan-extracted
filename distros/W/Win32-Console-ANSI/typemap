@@ -1,0 +1,6 @@
+
+BOOL            T_IV
+BYTE            T_UV
+TCHAR           T_UV
+UINT            T_UV
+DWORD           T_UV

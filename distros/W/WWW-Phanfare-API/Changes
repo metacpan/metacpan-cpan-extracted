@@ -1,0 +1,29 @@
+Revision history for WWW-Phanfare-API
+
+0.09    2011-08-17
+        Test hide/unhide image
+
+0.08    2011-06-05
+        Suppress warning on missing image_date
+
+0.07    2011-01-16
+        Pass POST content as parameter
+
+0.06    2011-01-10
+        Load data from any url to enable fetching images
+
+0.05    2010-12-06
+        Fix test errors when Config::General is not installed
+
+0.04    2010-12-04
+        Image Upload
+
+0.03    2010-12-04
+        Current version number
+
+0.02    2010-12-04
+        Make tests pass when no .phanfarerc file present
+
+0.01    2010-12-03
+        First version, using autoload to wrap around REST call and XML parsing.
+

@@ -1,0 +1,15 @@
+Revision history for Perl extension WebService::SyncSBS::D2H.
+
+0.03  Thu Dec  1 18:52:34 JST 2005
+        - tags of hatena became 10.
+	  - via ttp://hatena.g.hatena.ne.jp/hatenabookmark/20051129/1133249715 (japanese)
+	- fixed bug for Hatena.pm. infinite loop bug of get_recent method.
+
+0.02  Tue Aug  9 12:25:18 JST 2005
+	- It corresponds dc:subject tags of hatena.
+	- It corresponds to synchronization with hatena.
+
+0.01  Wed Jun  1 09:47:16 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A WebService::SyncSBS::D2H
+

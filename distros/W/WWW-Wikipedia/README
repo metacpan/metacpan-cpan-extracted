@@ -1,0 +1,127 @@
+NAME
+    WWW::Wikipedia - Automated interface to the Wikipedia
+
+SYNOPSIS
+      use WWW::Wikipedia;
+      my $wiki = WWW::Wikipedia->new();
+
+      ## search for 'perl' 
+      my $result = $wiki->search( 'perl' );
+
+      ## if the entry has some text print it out
+      if ( $result->text() ) { 
+          print $result->text();
+      }
+
+      ## list any related items we can look up 
+      print join( "\n", $result->related() );
+
+DESCRIPTION
+    WWW::Wikipedia provides an automated interface to the Wikipedia
+    <http://www.wikipedia.org>, which is a free, collaborative, online
+    encyclopedia. This module allows you to search for a topic and return
+    the resulting entry. It also gives you access to related topics which
+    are also available via the Wikipedia for that entry.
+
+INSTALLATION
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  new()
+    The constructor. You can pass it a two letter language code, or nothing
+    to let it default to 'en'.
+
+        ## Default: English
+        my $wiki = WWW::Wikipedia->new();
+
+        ## use the French wiki instead
+        my $wiki = WWW::Wikipedia->new( language => 'fr' );
+
+    WWW::Wikipedia is a subclass of LWP::UserAgent. If you would like to
+    have more control over the user agent (control timeouts, proxies ...)
+    you have full access.
+
+        ## set HTTP request timeout
+        my $wiki = WWW::Wikipedia->new();
+        $wiki->timeout( 2 );
+
+    You can turn off the following of wikipedia redirect directives by
+    passing a false value to "follow_redirects".
+
+    Together with the Wiki markup, some entries include HTML tags. They can
+    be stripped out using the "clean_html" option:
+
+       my $wiki = WWW::Wikipedia->new( clean_html => 1 );
+
+    See "clean_html" documentation below for details.
+
+  language()
+    This allows you to get and set the language you want to use. Two letter
+    language codes should be used. The default is 'en'.
+
+        my $wiki = WWW::Wikipedia->new( language => 'es' );
+    
+        # Later on...
+        $wiki->language( 'fr' );
+
+  clean_html()
+    Allows you to get/set if HTML is being stripped out.
+
+        # set HTML strip
+        $wiki->clean_html( 1 );
+
+    This option removes all tags and attributes they might have. Their
+    contents, however, is maintained (for now). Comments are also removed.
+
+  follow_redirects()
+    By default, wikipeda redirect directives are followed. Set this to false
+    to turn that off.
+
+  search()
+    Which performs the search and returns a WWW::Wikipedia::Entry object
+    which you can query further. See WWW::Wikipedia::Entry docs for more
+    info.
+
+        $entry = $wiki->search( 'Perl' );
+        print $entry->text();
+
+    If there's a problem connecting to Wikipedia, "undef" will be returned
+    and the error message will be stored in "error()".
+
+  random()
+    This method fetches a random wikipedia page.
+
+  error()
+    This is a generic error accessor/mutator. You can retrieve any searching
+    error messages here.
+
+TODO
+    *   Be more specific on the HTML clean methodology. For now all tags are
+        removed, keeping only their contents. In the future the behaviour
+        might change accordingly with each specific tag.
+
+    *   Watch the development of Special:Export XML formatting, eg:
+        http://en.wikipedia.org/wiki/Special:Export/perl
+
+SEE ALSO
+    *   LWP::UserAgent
+
+REPOSITORY
+    <https://github.com/edsu/www-wikipedia>
+
+AUTHORS
+    Ed Summers <ehs@pobox.com>
+
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2017 by Ed Summers
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

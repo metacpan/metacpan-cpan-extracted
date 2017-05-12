@@ -1,0 +1,41 @@
+NAME
+    WWW::Google::Calculator - Perl interface for Google calculator
+
+SYNOPSIS
+        use WWW::Google::Calculator;
+    
+        my $calc = WWW::Google::Calculator->new;
+    
+        print $calc->calc('1+1'); # => 1 + 1 = 2
+        print $calc->calc('300kbps in KB/s'); # => 300 kbps = 37.5 kilobytes / second
+
+DESCRIPTION
+    This module provide simple interface for Google calculator.
+
+SEE ALSO
+    http://www.google.com/help/calculator.html
+
+METHODS
+  new
+    create new instance
+
+  calc( $query )
+    calculate $query using by Google and return result.
+
+    return undef when something error occurred. (and use $self->error to get
+    last error message)
+
+  parse_html
+  error
+    return last error
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

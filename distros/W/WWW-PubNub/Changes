@@ -1,0 +1,41 @@
+==================================================
+Changes from 1742-05-24 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2016-03-07 05:08:41 +0000
+------------------------------------------
+
+  Change: 04ff07d464ff10e5201b74ee523ceaacd9ab661e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-03-07 06:07:44 +0000
+
+    Arghl... 
+
+  Change: fe082f0b54acd9d46bb76b4e102f5fd7bd5b90a1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-03-07 06:05:58 +0000
+
+    Wtf, Dist::Zilla::Plugin::PkgVersion... wtf wtf.... 
+
+  Change: 008faa492d408f5c2f460629f08fe92efe911b24
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-03-07 06:02:24 +0000
+
+    Added description for subscribe function 
+
+  Change: 1ff78a55e91e81ba1c3634e1d294f265aeb3d0df
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-03-05 06:44:53 +0000
+
+    First implementation, subscribe feature implemented 
+
+  Change: 4df9dd6576f8050009c478dc4dcbbe3395e16147
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-03-05 01:34:03 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

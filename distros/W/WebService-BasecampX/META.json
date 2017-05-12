@@ -1,0 +1,67 @@
+{
+   "abstract" : "Perl interface to the bcx Basecamp API",
+   "author" : [
+      "Mike Greb <michael@thegrebs.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-BasecampX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::HTTP::Spore" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mikegrb/WebService-BasecampX/issues"
+      },
+      "homepage" : "https://github.com/mikegrb/WebService-BasecampX",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mikegrb/WebService-BasecampX.git",
+         "web" : "https://github.com/mikegrb/WebService-BasecampX"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Rev Michael Greb <michael@thegrebs.com>",
+      "mikegrb <mgreb@linode.com>"
+   ]
+}
+

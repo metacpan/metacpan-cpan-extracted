@@ -1,0 +1,17 @@
+abstract: Chinese Lorem Ipsum Generator
+author: Kang-min Liu <gugod@gugod.org>.
+build_requires: 
+  IO::All: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.60
+license: perl
+name: WWW-Lipsum-Chinese
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Encode: 0
+  LWP::Simple: 0
+version: 0.03
